@@ -1,0 +1,44 @@
+﻿#####################################################################
+##                                                                 ##
+##                        My ads v2.4.x                            ##
+##                     http://www.krhost.ga                        ##
+##                   e-mail: admin@krhost.ga                       ##
+##                                                                 ##
+##                       copyright (c) 2021                        ##
+##                                                                 ##
+##                    This script is freeware                      ##
+##                                                                 ##
+#####################################################################
+
+RewriteEngine on
+RewriteRule ^u/(.*) user.php?u=$1 [NC,L]
+RewriteRule ^e([0-9.]+)  user.php?e=$1 [NC,L]
+RewriteRule ^p([0-9.]+)  user.php?p=$1 [NC,L]
+RewriteRule ^followers/([0-9.]+) user.php?fl=$1 [NC,L]
+RewriteRule ^following/([0-9.]+) user.php?fg=$1 [NC,L]
+RewriteRule ^tag/(.*) portal.php?tag=$1 [NC,L]
+RewriteRule ^cat/(.*) directory.php?cat=$1 [NC,L]
+RewriteRule ^site-(.*) directory.php?dir=$1 [NC,L]
+RewriteRule ^add-site.html directory.php?p=$1 [NC,L]
+RewriteRule ^t([0-9.]+) forum.php?t=$1 [NC,L]
+RewriteRule ^f([0-9.]+) forum.php?f=$1 [NC,L]
+RewriteRule ^post forum.php?p=$1 [NC,L]
+RewriteRule ^editor/([0-9.]+) forum.php?e=$1 [NC,L]
+RewriteRule ^message/([0-9.]+) messages.php?m=$1 [NC,L]
+RewriteRule ^notif/([0-9.]+) messages.php?n=$1 [NC,L]
+RewriteRule ^notification messages.php?ntf [NC,L]
+RewriteRule ^download/(.*) store.php?download=$1 [NC,L]
+RewriteRule ^producer/(.*) store.php?producer=$1 [NC,L]
+RewriteRule ^kb/([A-Za-z0-9_]+)$ store.php?kb=$1 [NC,L]
+RewriteRule ^kb/([A-Za-z0-9_]+):(.*)$ store.php?kb=$1&st=$2 [NC,L]
+RewriteRule ^kb store.php?nf [NC,L]
+RewriteRule ^edk/([A-Za-z0-9_]+):(.*)$ store.php?tr=$1&ed=$2 [NC,L]
+RewriteRule ^pgk/([A-Za-z0-9_]+):(.*)$ store.php?pr=$1&pg=$2 [NC,L]
+RewriteRule ^hkd/([A-Za-z0-9_]+):(.*)$ store.php?pp=$1&tt=$2 [NC,L]
+RewriteRule ^edk store.php?nf [NC,L]
+RewriteRule ^update/(.*) store.php?update=$1 [NC,L]
+RewriteRule ^add_store store.php?add [NC,L]
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}.php -f
+RewriteRule ^(.*)$ $1.php
+ErrorDocument 404 https://www.adstn.gq/404
