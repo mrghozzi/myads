@@ -1,0 +1,39 @@
+<?php if($s_st=="buyfgeufb"){  ?>
+		<div id="page-wrapper">
+			<div class="main-page">
+				<!--buttons-->
+				<div class="grids-section">
+					<h2 class="hdg"><?php lang('list'); echo"&nbsp;"; lang('textads'); ?></h2>
+
+			<div class="clearfix"></div>
+			</div>
+            <div class="col-md-12 table-grid">
+                <div class="panel panel-widget">
+                <a href="promote?p=link" class="btn btn-info" ><?php lang('add'); ?></a>
+					<table id="tablepagination" class="table table-hover">
+						<thead>
+							<tr>
+                              <th>#ID</th>
+							  <th>Name</th>
+                              <th>Url</th>
+							  <th>Clik</th>
+                              <th>Statu</th>
+                              <th></th>
+                            </tr>
+						</thead>
+						<tbody>
+                        <?php lnk_list();  ?>
+               </tbody>
+					</table>
+				</div>
+				</div> <div class="clearfix"></div>
+                  <script type="text/javascript">
+            $(document).ready(function() {
+    $('#tablepagination').dataTable( {
+    "order": [[ 0, 'DESC' ]]
+} );
+} );
+</script>
+				</div>
+				</div>
+<?php }else{ echo"404"; }  ?>
