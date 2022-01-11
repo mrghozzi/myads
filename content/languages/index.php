@@ -1,11 +1,11 @@
 ﻿<?php
 #####################################################################
 ##                                                                 ##
-##                        My ads v1.2.x                            ##
-##                 http://www.kariya-host.com                      ##
-##                 e-mail: admin@kariya-host.com                   ##
+##                        My ads v2.x.x                            ##
+##                     http://www.krhost.ga                        ##
+##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
-##                       copyright (c) 2018                        ##
+##                       copyright (c) 2019                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
