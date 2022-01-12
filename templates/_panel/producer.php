@@ -387,7 +387,9 @@ echo "<tr>
 					</table>
                               <script type="text/javascript">
             $(document).ready(function() {
-    $('#tablepagination').DataTable();
+    $('#tablepagination').DataTable({
+      "order": [[0, 'DESC']]
+    });
 } );
 </script>
                                   <?php
