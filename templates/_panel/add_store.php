@@ -180,7 +180,7 @@
 
               <script src="<?php url_site();  ?>/templates/_panel/editor/minified/formats/xhtml.min.js"></script>
                        <script src="<?php url_site();  ?>/templates/_panel/editor/minified/jquery.sceditor.min.js"></script>
-                       <script src="<?php url_site();  ?>/templates/_panel/editor/languages/ar.js"></script>
+                       <script src="<?php url_site();  ?>/templates/_panel/editor/languages/<?php lang('lg'); ?>.js"></script>
 
                        <script>
 // Replace the textarea #example with SCEditor
