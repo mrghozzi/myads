@@ -111,7 +111,7 @@ $ndfk = $strtid['id'];
 
   <div class="panel-body">
 								<div class=" col-md-8 compose-btn">
-  <b class="btn btn-sm btn-default"><?php lang('Version_nbr');   echo $strtid['name']; ?></b>
+  <a href="javascript:void(0);" data-toggle="modal" data-target="#Versions" class="btn btn-sm btn-default"><?php lang('Version_nbr');   echo $strtid['name']; ?></a>
 <?php
  $catname = $catussc['name'];
  $catname = $lang["{$catname}"];
@@ -317,7 +317,113 @@ function postulike{$sucat['id']}(){
                  }else{
                     $storeinfo = $lang['tpfree'];
                  }
-                   echo " <!-- //modal Download -->
+
+       echo " <!-- //modal Versions -->
+              <div class=\"modal fade\" id=\"Versions\" tabindex=\"-1\" role=\"dialog\">
+				<div class=\"modal-dialog\" role=\"document\">
+					<div class=\"modal-content modal-info\">
+						<div class=\"modal-header\">
+                        <i class=\"fa fa-info-circle\" aria-hidden=\"true\"></i>&nbsp;{$storeinfo}
+							<button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button>
+						</div>
+						<div class=\"modal-body\">
+							<div class=\"more-grids\">
+
+                                  ";  ?>
+                                  <table id="tablepagination" class="table table-hover">
+						<thead>
+							<tr>
+                              <th><center><?php lang('Version_nbr'); ?></center></th>
+							  <th><center><?php lang('download');  ?></center></th>
+                              <?php if((isset($uRow['id']) AND ($uRow['id']==$catuss['id'])) OR (isset($_COOKIE['admin']) AND ($_COOKIE['admin']==$hachadmin))){ ?>
+                              <th><center><?php lang('options');  ?></center></th>
+                              <?php } ?>
+                            </tr>
+						</thead>
+						<tbody>
+                  <?php
+                  $sttidv = $db_con->prepare("SELECT * FROM `options` WHERE `o_type` = 'store_file' AND `o_parent` =".$strname['id']." ORDER BY `o_order`  DESC " );
+                  $sttidv->execute();
+                  while($strtidv=$sttidv->fetch(PDO::FETCH_ASSOC)){
+
+echo "<tr>
+      <td><center>{$strtidv['name']}</center></td>
+      <td><center>";
+                 $sdfv = $strtidv['o_mode'];
+                 $ndfkv = $strtidv['id'];
+                 $dir_lnk_hash_v = $url_site."/download/".hash('crc32', $sdfv.$ndfkv );
+                 $contfilsv = 0;
+                 $stormfnbv = $db_con->prepare("SELECT  clik FROM short WHERE sh_type=7867 AND tp_id=:tp_id  " );
+                 $stormfnbv->bindParam(":tp_id", $ndfkv);
+                 $stormfnbv->execute();
+                 $sfilenbrv=$stormfnbv->fetch(PDO::FETCH_ASSOC);
+                 $contfilsv += $sfilenbrv['clik'];
+
+      if(isset($_COOKIE['user'])){ ?>
+        <a href="<?php echo $dir_lnk_hash_v; ?>"  class="btn btn-primary" role="button"><i class="fa fa-download"></i>&nbsp;<?php lang('download');  ?>&nbsp;<span class="badge badge-info"><font face="Comic Sans MS"><b><?php echo $contfilsv; ?></b><br></font></span></a>
+        <?php }else{ ?>
+        <a href="javascript:void(0);" data-toggle="modal" data-target="#Dlogin" class="btn btn-primary" role="button"><i class="fa fa-download"></i>&nbsp;<?php lang('download');  ?>&nbsp;<span class="badge badge-info"><font face="Comic Sans MS"><b><?php echo $contfilsv; ?></b><br></font></span></a>
+        <?php     }
+        echo "</center></td>";
+        if((isset($uRow['id']) AND ($uRow['id']==$catuss['id'])) OR (isset($_COOKIE['admin']) AND ($_COOKIE['admin']==$hachadmin))){
+       echo " <td><center></center></td>";
+       }
+      echo " </tr>";
+                  }
+
+
+                    ?>
+
+                               </tbody>
+               <tfoot>
+							<tr>
+                              <th><center><?php lang('Version_nbr'); ?></center></th>
+							  <th><center><?php lang('download');  ?></center></th>
+                              <?php if((isset($uRow['id']) AND ($uRow['id']==$catuss['id'])) OR (isset($_COOKIE['admin']) AND ($_COOKIE['admin']==$hachadmin))){ ?>
+                              <th><center><?php lang('options');  ?></center></th>
+                              <?php } ?>
+                            </tr>
+						</tfoot>
+					</table>
+                              <script type="text/javascript">
+            $(document).ready(function() {
+    $('#tablepagination').DataTable();
+} );
+</script>
+                                  <?php
+                                 echo "
+                            <br />
+
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+          <script>
+     \$(\"document\").ready(function() {
+   \$(\"#D{$strname['id']}\").click(postlike{$strname['id']});
+
+});
+
+function postlike{$strname['id']}(){
+    \$.ajax({
+        url : '$dir_lnk_hash',
+        data : {
+            test_like : \$(\"#lval\").val()
+        },
+        datatype : \"json\",
+        type : 'post',
+        success : function(result) {
+
+        },
+        error : function() {
+
+        }
+    });
+}
+   </script>
+	   <!-- //modal Versions  -->";
+                          echo " <!-- //modal Download -->
               <div class=\"modal fade\" id=\"Download\" tabindex=\"-1\" role=\"dialog\">
 				<div class=\"modal-dialog\" role=\"document\">
 					<div class=\"modal-content modal-info\">
@@ -384,7 +490,8 @@ function postlike{$strname['id']}(){
 				</div>
 			</div>
 
-	   <!-- //modal Dlogin  -->"; ?>
+	   <!-- //modal Dlogin  -->";
+        ?>
                             <hr />
    <?php if(isset($_COOKIE['user'])){  ?>
                             <div class=" col-md-12 inbox-grid1">
