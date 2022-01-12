@@ -77,6 +77,8 @@ echo "<div class=\"modal fade\" id=\"ban{$wt['id']}\" tabindex=\"-1\" role=\"dia
 							<tr>
                               <th>#ID</th>
 							  <th>Username</th>
+                              <th>online</th>
+                              <th>check</th>
                               <th>Mail</th>
 							  <th>PTS</th>
                               <th></th>
