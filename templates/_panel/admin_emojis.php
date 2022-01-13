@@ -21,7 +21,7 @@ select {
 							<tr>
                               <th>#ID</th>
                               <th>Name</th>
-                              <th>Emojis</th>
+                              <th>Emojis Icon Link</th>
                               <th></th>
                               <th></th>
 

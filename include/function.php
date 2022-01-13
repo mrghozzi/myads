@@ -2,7 +2,7 @@
 
 #####################################################################
 ##                                                                 ##
-##                        My ads v2.4.2                            ##
+##                        My ads v2.4.3                            ##
 ##                     http://www.krhost.ga                        ##
 ##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
@@ -22,10 +22,10 @@ $s_st="buyfgeufb";
    } catch(PDOException $e){
       header("Location: install") ;
     }
-$stversion = "2.4.2";
+$stversion = "2.4.3";
 
 $o_type = "version" ;
-$name = "2-4-2";
+$name = "2-4-3";
 $jversion = $db_con->prepare("SELECT * FROM `options` WHERE `o_type` = :o_type  ");
 $jversion->bindParam(":o_type", $o_type);
 $jversion->execute();

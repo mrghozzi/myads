@@ -1,8 +1,8 @@
 <?php if(isset($s_st)=="buyfgeufb"){
 
  ?>
-     <link rel="stylesheet" href="<?php url_site();  ?>/templates/_panel/editor/minified/themes/default.min.css" />
-<script src="<?php url_site();  ?>/templates/_panel/editor/minified/sceditor.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sceditor@3/minified/themes/default.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/sceditor@3/minified/sceditor.min.js"></script>
    	<div id="page-wrapper">
           <div class="main-page">
      <div class="col-md-12 validation-grid">
@@ -178,9 +178,9 @@
     });
     </script>
 
-              <script src="<?php url_site();  ?>/templates/_panel/editor/minified/formats/xhtml.min.js"></script>
-                       <script src="<?php url_site();  ?>/templates/_panel/editor/minified/jquery.sceditor.min.js"></script>
-                       <script src="<?php url_site();  ?>/templates/_panel/editor/languages/ar.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sceditor@3/minified/formats/xhtml.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sceditor@3/minified/jquery.sceditor.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sceditor@3/languages/<?php lang('lg'); ?>.js"></script>
 
                        <script>
 // Replace the textarea #example with SCEditor
@@ -215,7 +215,7 @@ if($c >= 2){
   },";
 }
  ?>
-style: '<?php url_site();  ?>/templates/_panel/editor/minified/themes/content/default.min.css'
+style: 'https://cdn.jsdelivr.net/npm/sceditor@3/minified/themes/content/default.min.css'
 });
 </script>
 <?php
