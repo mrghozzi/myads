@@ -499,8 +499,8 @@ function postlike{$strname['id']}(){
                             <div class=" col-md-12 inbox-grid1">
         <div class="panel panel-default">
   <div class="panel-body">
- <link rel="stylesheet" href="<?php url_site();  ?>/templates/_panel/editor/minified/themes/default.min.css" />
-<script src="<?php url_site();  ?>/templates/_panel/editor/minified/sceditor.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sceditor@3/minified/themes/default.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/sceditor@3/minified/sceditor.min.js"></script>
 <textarea id='comment' class='form-control'></textarea><br />
 <center><button id = 'btn' class="btn btn-info" >Post Comment</button></center>
   </div>

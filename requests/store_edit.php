@@ -5,7 +5,7 @@
 ##                     http://www.krhost.ga                        ##
 ##                    e-mail: admin@krhost.ga                      ##
 ##                                                                 ##
-##                       copyright (c) 2021                        ##
+##                       copyright (c) 2022                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
@@ -35,20 +35,21 @@ $catusz->execute();
 $sucat=$catusz->fetch(PDO::FETCH_ASSOC);
      ?>
 <div class="input-group">
-<link rel="stylesheet" href="<?php echo $url_site;  ?>/templates/_panel/editor/minified/themes/default.min.css" />
-<script src="<?php echo $url_site;  ?>/templates/_panel/editor/minified/sceditor.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sceditor@3/minified/themes/default.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/sceditor@3/minified/sceditor.min.js"></script>
 <form action="<?php echo $url_site;  ?>/requests/store_edit.php?id=<?php echo $_GET['id']; ?>" method="POST">
 <textarea type="txt" name="svtxt" id="stxt" class="form-control"  rows="16" placeholder="Site Description" required><?php if(isset($sucat['txt'])){ echo $sucat['txt']; }  ?></textarea>
 <br /><center><button  type="submit" name="submit" value="Publish" class="btn btn-primary" ><i class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp; <?php echo $lang['save'];  ?></button></center>
-</form>                       <script src="<?php echo $url_site;  ?>/templates/_panel/editor/minified/formats/xhtml.min.js"></script>
-                       <script src="<?php echo $url_site;  ?>/templates/_panel/editor/minified/jquery.sceditor.min.js"></script>
-                       <script src="<?php echo $url_site;  ?>/templates/_panel/editor/languages/<?php echo $lang['lg']; ?>.js"></script>
+</form>
+<script src="https://cdn.jsdelivr.net/npm/sceditor@3/minified/formats/xhtml.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sceditor@3/minified/jquery.sceditor.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sceditor@3/languages/<?php echo $lang['lg']; ?>.js"></script>
 
                        <script>
 // Replace the textarea #example with SCEditor
 var textarea = document.getElementById('stxt');
 sceditor.create(textarea, {
-    format: 'xhtml',
+	format: 'xhtml',
     locale : 'ar',
 <?php
 $smlusen = $db_con->prepare("SELECT *  FROM emojis ");
@@ -66,7 +67,7 @@ while($smlssen=$smlusen->fetch(PDO::FETCH_ASSOC)){
     <?php
     }
    ?>
-   '<?php echo $smlssen['name'];  ?>' : '<?php echo $smlssen['img'];  ?>',
+   '<?php echo $smlssen['name'];  ?>': '<?php echo $smlssen['img'];  ?>',
    <?php
 
 
@@ -77,7 +78,7 @@ if($c >= 2){
   },";
 }
  ?>
-style: '<?php echo $url_site;  ?>/templates/_panel/editor/minified/themes/content/default.min.css'
+style: 'https://cdn.jsdelivr.net/npm/sceditor@3/minified/themes/content/default.min.css'
 });
 </script>
                        </div>
