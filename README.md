@@ -1,12 +1,8 @@
-# <b>MYADS</b> : Social networking scripts and the exchange of ads between website owners.
+# <b>MYADS v2.4.3</b> : Social networking scripts and the exchange of ads between website owners.
 
 >
-<<<<<<< HEAD
-> ![MYADS v2.4.3](https://www.adstn.gq/bnr/myads.png)
-=======
 > ![MYADS](https://www.adstn.gq/bnr/myads.png)
 
->>>>>>> main
 * Program name: [MYADS](https://github.com/mrghozzi/myads)
 * Official Site : [Kariya Host](http://www.krhost.ga)
 * Demo Site : [ADStn](https://adstn.gq) ``Username: vvvbbb`` ``Password: vvvbbb`` 
