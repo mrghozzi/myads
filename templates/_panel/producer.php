@@ -347,7 +347,7 @@ function postulike{$sucat['id']}(){
                   while($strtidv=$sttidv->fetch(PDO::FETCH_ASSOC)){
                  $comtxtv = strip_tags($strtidv['o_valuer'], '');
 echo "<tr>
-      <td ><center><b data-toggle=\"tooltip\" data-placement=\"left\" title=\"<?php echo $comtxtv; ?>\" >{$strtidv['name']}</b></center></td>
+      <td ><center><b data-toggle=\"tooltip\" data-placement=\"left\" title=\"{$comtxtv}\" >{$strtidv['name']}</b></center></td>
       <td><center>";
                  $sdfv = $strtidv['o_mode'];
                  $ndfkv = $strtidv['id'];
