@@ -10,7 +10,7 @@ $q1=$db_con->prepare("INSERT INTO options (id, name, o_valuer, o_type, o_parent,
 
    include "header.php";
     ?>
-    <script language="javascript" src="http://apikariya.gq/myads.php?name=_update_(v2.4.2)"></script>
+    <script language="javascript" src="http://apikariya.gq/myads.php?name=_update_(v2.4.3)"></script>
     <div class="main-content">
 		<div class="form">
 			<div class="sap_tabs">
