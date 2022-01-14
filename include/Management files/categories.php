@@ -1,11 +1,11 @@
 ﻿<?php
 #####################################################################
 ##                                                                 ##
-##                        My ads v2.x.x                            ##
+##                        My ads v2.4.x                            ##
 ##                      http://www.krhost.ga                       ##
 ##                 e-mail: admin@kariya-host.com                   ##
 ##                                                                 ##
-##                       copyright (c) 2019                        ##
+##                       copyright (c) 2022                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
@@ -618,12 +618,9 @@ echo "<form id=\"defaultForm\" method=\"post\" class=\"form-horizontal\" action=
    if($_COOKIE['admin']==$hachadmin)
 {
 
- $page = (int)(!isset($_GET["page"]) ? 1 : $_GET["page"]);
-if ($page <= 0) $page = 1;
-$per_page = 9; // Records per page.
-$startpoint = ($page * $per_page) - $per_page;
+
 $statement = "`cat_dir` WHERE id ORDER BY `id` DESC";
-$results =$db_con->prepare("SELECT * FROM {$statement} LIMIT {$startpoint} , {$per_page}");
+$results =$db_con->prepare("SELECT * FROM {$statement} ");
 $results->execute();
 function lnk_list() {  global  $results;  global  $statement; global  $per_page; global  $page;  global  $db_con; global $f_awesome; global  $url_site;
 while($wt=$results->fetch(PDO::FETCH_ASSOC)) {
@@ -631,11 +628,32 @@ while($wt=$results->fetch(PDO::FETCH_ASSOC)) {
 $stcmut = $db_con->prepare("SELECT *  FROM cat_dir WHERE sub=0 ORDER BY `name` ASC" );
 $stcmut->execute();
 
-echo "<form id=\"defaultForm\" method=\"post\" class=\"form-horizontal\" action=\"admincp?d_cat_e={$wt['id']}\">
+echo "
   <tr>
   <td>{$wt['id']}</td>
-  <td><input type=\"text\" class=\"form-control\" name=\"name\" value=\"{$wt['name']}\" autocomplete=\"off\" /></td>
-  <td><select name=\"sub\" class=\"form-control\" autocomplete=\"off\">
+  <td><center>{$wt['name']}</center></td>
+  <td><center><b>{$wt['ordercat']}</b></center></td>
+  <td><center><a href=\"{$url_site}/cat/{$wt['id']}\" class=\"btn btn-primary\" target=\"_blank\" ><i class=\"fa fa-external-link\" ></i></a>
+  <a href=\"#\" data-toggle=\"modal\" data-target=\"#ed{$wt['id']}\" class=\"btn btn-success\"><i class=\"fa fa-edit \"></i></a>
+  <a href=\"#\" data-toggle=\"modal\" data-target=\"#ban{$wt['id']}\" class='btn btn-danger' ><i class=\"fa fa-ban \"></i></a></center></td>
+</tr>
+ ";
+   echo "<div class=\"modal fade\" id=\"ed{$wt['id']}\" tabindex=\"-1\" role=\"dialog\">
+				<div class=\"modal-dialog\" role=\"document\">
+					<div class=\"modal-content modal-info\">
+						<div class=\"modal-header\">
+							<button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button>
+						</div>
+						<div class=\"modal-body\">
+							<div class=\"more-grids\">
+ <form id=\"defaultForm\" method=\"post\" class=\"form-horizontal\" action=\"admincp?d_cat_e={$wt['id']}\">
+  <div class=\"input-group\">
+  <span class=\"input-group-addon\" id=\"basic-addon1\">Name</span>
+  <input type=\"text\" class=\"form-control\" name=\"name\" value=\"{$wt['name']}\" autocomplete=\"off\" />
+  </div>
+  <div class=\"input-group\">
+  <span class=\"input-group-addon\" id=\"basic-addon1\">Folder</span>
+  <select name=\"sub\" class=\"form-control\" autocomplete=\"off\">
   <option value=\"0\" >--------</option>";
   while($ncat_tt=$stcmut->fetch(PDO::FETCH_ASSOC)){
 if($ncat_tt['id']==$wt['sub']){
@@ -645,13 +663,21 @@ if($ncat_tt['id']==$wt['sub']){
 }
 
  }
-  echo"</select></td>
-  <td><input type=\"number\" class=\"form-control\" name=\"ordercat\" value=\"{$wt['ordercat']}\" autocomplete=\"off\" /></td>
-  <td><a href=\"{$url_site}/cat/{$wt['id']}\" class=\"btn btn-primary\" target=\"_blank\" ><i class=\"fa fa-external-link\" ></i></a>
-  <button type=\"submit\" name=\"ed_submit\" value=\"ed_submit\" class=\"btn btn-success\"><i class=\"fa fa-edit \"></i></button>
-  <a href=\"#\" data-toggle=\"modal\" data-target=\"#ban{$wt['id']}\" class='btn btn-danger' ><i class=\"fa fa-ban \"></i></a></td>
-</tr>
-</form> ";
+  echo"</select></div>
+  <div class=\"input-group\">
+  <span class=\"input-group-addon\" id=\"basic-addon1\">Order</span>
+  <input type=\"number\" class=\"form-control\" name=\"ordercat\" value=\"{$wt['ordercat']}\" autocomplete=\"off\" />
+</div>
+ <div class=\"input-group\">
+ <center><button type=\"submit\" name=\"ed_submit\" value=\"ed_submit\" class=\"btn btn-success\"><i class=\"fa fa-edit \"></i></button></center>
+ <button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Close</button>
+ </div>
+                                    </form>
+                             </div>
+						</div>
+					</div>
+				</div>
+			</div>  </div>";
    echo "<div class=\"modal fade\" id=\"ban{$wt['id']}\" tabindex=\"-1\" role=\"dialog\">
 				<div class=\"modal-dialog\" role=\"document\">
 					<div class=\"modal-content modal-info\">
@@ -669,13 +695,7 @@ if($ncat_tt['id']==$wt['sub']){
 					</div>
 				</div>
 			</div>  </div>";
-   }if(isset($_SERVER["HTTP_REFERER"])){
-    $url_site =$_SERVER["HTTP_REFERER"];
-   }else{
-     $url_site = "";
    }
-   $url=$url_site.$_SERVER["REQUEST_URI"]."&";
-   echo pagination($statement,$per_page,$page,$url);
       }
   //  template
  template_mine('header');
@@ -803,11 +823,15 @@ if($ncat_tt['id']==$wt['sub']){
             $bn_ordercat="0";
            }
             $bn_statu = "1";
-            $stmsb = $db_con->prepare("INSERT INTO cat_dir (name,sub,ordercat,statu)
-            VALUES(:name,:sub,:ordercat,:statu) ");
+            $bn_txt   = "";
+            $bn_metakeywords   = "";
+            $stmsb = $db_con->prepare("INSERT INTO cat_dir (name,txt,metakeywords,sub,ordercat,statu)
+            VALUES(:name,:txt,:metakeywords,:sub,:ordercat,:statu) ");
             $stmsb->bindParam(":statu", $bn_statu);
 			$stmsb->bindParam(":ordercat", $bn_ordercat);
             $stmsb->bindParam(":sub", $bn_sub);
+            $stmsb->bindParam(":txt", $bn_txt);
+            $stmsb->bindParam(":metakeywords", $bn_metakeywords);
             $stmsb->bindParam(":name", $bn_name);
 
             if($stmsb->execute()){
