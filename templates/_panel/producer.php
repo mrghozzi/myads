@@ -333,6 +333,7 @@ function postulike{$sucat['id']}(){
                                   <table id="tablepagination" class="table table-hover">
 						<thead>
 							<tr>
+                              <th><center>#ID</center></th>
                               <th><center><?php lang('Version_nbr'); ?></center></th>
 							  <th><center><?php lang('download');  ?></center></th>
                               <?php if((isset($uRow['id']) AND ($uRow['id']==$catuss['id'])) OR (isset($_COOKIE['admin']) AND ($_COOKIE['admin']==$hachadmin))){ ?>
@@ -347,6 +348,7 @@ function postulike{$sucat['id']}(){
                   while($strtidv=$sttidv->fetch(PDO::FETCH_ASSOC)){
                  $comtxtv = strip_tags($strtidv['o_valuer'], '');
 echo "<tr>
+      <td ><center><b>{$strtidv['id']}</b></center></td>
       <td ><center><b data-toggle=\"tooltip\" data-placement=\"left\" title=\"{$comtxtv}\" >{$strtidv['name']}</b></center></td>
       <td><center>";
                  $sdfv = $strtidv['o_mode'];
@@ -404,6 +406,7 @@ function postlike{$strtidv['id']}(){
                                </tbody>
                <tfoot>
 							<tr>
+                              <th><center>#ID</center></th>
                               <th><center><?php lang('Version_nbr'); ?></center></th>
 							  <th><center><?php lang('download');  ?></center></th>
                               <?php if((isset($uRow['id']) AND ($uRow['id']==$catuss['id'])) OR (isset($_COOKIE['admin']) AND ($_COOKIE['admin']==$hachadmin))){ ?>
