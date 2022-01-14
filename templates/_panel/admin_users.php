@@ -85,7 +85,7 @@ echo "<div class=\"modal fade\" id=\"ban{$wt['id']}\" tabindex=\"-1\" role=\"dia
                             </tr>
 						</tfoot>
 					</table>
-                              <script type="text/javascript">
+<script type="text/javascript">
             $(document).ready(function() {
     $('#tablepagination').DataTable();
 } );
