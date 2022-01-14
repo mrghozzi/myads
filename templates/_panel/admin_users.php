@@ -14,12 +14,12 @@
                  <table id="tablepagination" class="table table-hover">
 						<thead>
 							<tr>
-                              <th>#ID</th>
-							  <th>Username</th>
-                              <th>online</th>
-                              <th>check</th>
-                              <th>Mail</th>
-							  <th>PTS</th>
+                              <th><center>#<b>ID</b></center></th>
+							  <th><center><b>Username</b></center></th>
+                              <th><center><b>Online</b></center></th>
+                              <th><center><b>Check</b></center></th>
+                              <th><center><b>Mail</b></center></th>
+							  <th><center><b>PTS</b></center></th>
                               <th></th>
                             </tr>
 						</thead>
@@ -37,19 +37,19 @@ while($wt=$results->fetch(PDO::FETCH_ASSOC)) {
 
 
 echo "<tr>
-  <td>{$wt['id']}</td>
-  <td><a href=\"u/{$wt['id']}\"><img class=\"imgu-bordered-sm\" src=\"{$url_site}/{$wt['img']}\" style=\"width: 35px;\" alt=\"user image\">{$wt['username']}</a></td>";
-  echo "<td>";
+  <td><center>{$wt['id']}</center></td>
+  <td><center><a href=\"u/{$wt['id']}\"><img class=\"imgu-bordered-sm\" src=\"{$url_site}/{$wt['img']}\" style=\"width: 34px;\" alt=\"user image\">&nbsp;<b>{$wt['username']}</b></a></center></td>";
+  echo "<center><td>";
   online_us($wt['id']);
-  echo "<br /><i class=\"fa fa-clock-o \"></i>&nbsp;{$wt['online']}</td><td>";
+  echo "<br /><i class=\"fa fa-clock-o \"></i>&nbsp;{$wt['online']}</center></td><td><center>&nbsp;";
    check_us($wt['id']);
-  echo "</td>
-  <td>{$wt['email']}</td>
-  <td>{$wt['pts']}</td>
-  <td><a href=\"admincp?state&ty=banner&st={$wt['id']}\" class='btn btn-warning' ><i class=\"fa fa-link \"></i></a>
-  <a href=\"admincp?state&ty=link&st={$wt['id']}\" class='btn btn-primary' ><i class=\"fa fa-eye \"></i></a>
-  <a href=\"admincp?us_edit={$wt['id']}\" class='btn btn-success' ><i class=\"fa fa-edit \"></i></a>
-  <a href=\"#\" data-toggle=\"modal\" data-target=\"#ban{$wt['id']}\" class='btn btn-danger' ><i class=\"fa fa-ban \"></i></a></td>
+  echo "&nbsp;<br />{$wt['ucheck']}</center></td>
+  <td><center>{$wt['email']}</center></td>
+  <td><center>{$wt['pts']}</center></td>
+  <td><center><div><a href=\"admincp?state&ty=banner&st={$wt['id']}\" class='btn btn-warning' ><i class=\"fa fa-link \"></i></a>
+  <a href=\"admincp?state&ty=link&st={$wt['id']}\" class='btn btn-primary' ><i class=\"fa fa-eye \"></i></a></div>
+  &nbsp;<div><a href=\"admincp?us_edit={$wt['id']}\" class='btn btn-success' ><i class=\"fa fa-edit \"></i></a>
+  <a href=\"#\" data-toggle=\"modal\" data-target=\"#ban{$wt['id']}\" class='btn btn-danger' ><i class=\"fa fa-ban \"></i></a></div></center></td>
 </tr>";
 echo "<div class=\"modal fade\" id=\"ban{$wt['id']}\" tabindex=\"-1\" role=\"dialog\">
 				<div class=\"modal-dialog\" role=\"document\">
@@ -75,12 +75,12 @@ echo "<div class=\"modal fade\" id=\"ban{$wt['id']}\" tabindex=\"-1\" role=\"dia
                </tbody>
                <tfoot>
 							<tr>
-                              <th>#ID</th>
-							  <th>Username</th>
-                              <th>online</th>
-                              <th>check</th>
-                              <th>Mail</th>
-							  <th>PTS</th>
+                              <th><center>#ID</center></th>
+							  <th><center>Username</center></th>
+                              <th><center>online</center></th>
+                              <th><center>check</center></th>
+                              <th><center>Mail</center></th>
+							  <th><center>PTS</center></th>
                               <th></th>
                             </tr>
 						</tfoot>
