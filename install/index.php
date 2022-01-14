@@ -16,7 +16,8 @@
 								        <a href="install2.php" type="next" />Install</a>
 							        </div>
                                     <div class="sign-up">
-								        <a href="update1.php" type="next" />Update</a>
+                                        <a href="update1.php" type="next" />Update<p><span><u>If you are using v2.3.x.</u></span></p></a>
+
 							        </div>
                                 </form>
 						    </div>

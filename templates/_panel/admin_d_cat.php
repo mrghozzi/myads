@@ -16,33 +16,73 @@ select {
                      <div class="alert alert-danger" role="alert"><?php echo $_GET['bnerrMSG'];  ?></div>
                         <?php }  ?>
                 <div class="panel panel-widget">
-					<table class="table table-hover">
+     <?php  echo "<a href=\"#\" data-toggle=\"modal\" data-target=\"#ADD\" class='btn btn-info' ><i class=\"fa fa-plus \"></i></a>
+ <div class=\"modal fade\" id=\"ADD\" tabindex=\"-1\" role=\"dialog\">
+				<div class=\"modal-dialog\" role=\"document\">
+					<div class=\"modal-content modal-info\">
+						<div class=\"modal-header\">
+							<button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button>
+						</div>
+						<div class=\"modal-body\">
+							<div class=\"more-grids\">
+ <form id=\"defaultForm\" method=\"post\" class=\"form-horizontal\" action=\"admincp.php?d_cat_a\"><tr>
+  <div class=\"input-group\">
+  <span class=\"input-group-addon\" id=\"basic-addon1\">Name</span>
+  <input type=\"text\" class=\"form-control\" name=\"name\"  autocomplete=\"off\" />
+  </div>
+  <div class=\"input-group\">
+  <span class=\"input-group-addon\" id=\"basic-addon1\">Folder</span>
+  <select name=\"sub\" class=\"form-control\" autocomplete=\"off\">
+  <option value=\"0\" >--------</option>
+  <?php \$stcmut = \$db_con->prepare(\"SELECT *  FROM cat_dir WHERE sub=0 ORDER BY `name` ASC\" );
+  \$stcmut->execute();
+while(\$ncat_tt=\$stcmut->fetch(PDO::FETCH_ASSOC)){ ?>
+<option value=\"<?php echo \$ncat_tt['id']; ?>\" ><?php echo \$ncat_tt['name']; ?></option>
+<?php } ?>
+</select></div>
+  <div class=\"input-group\">
+  <span class=\"input-group-addon\" id=\"basic-addon1\">Order</span>
+  <input type=\"number\" class=\"form-control\" name=\"ordercat\" value=\"0\" autocomplete=\"off\" />
+</div>
+ <div class=\"input-group\">
+ <center><button type=\"submit\" name=\"ed_submit\" value=\"ed_submit\" class=\"btn btn-info\"><i class=\"fa fa-plus \"></i></button></center>
+ <button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Close</button
+ </div>
+                                    </form>
+                             </div>
+						</div>
+					</div>
+				</div>
+			</div>  </div>"; ?>
+					<table id="tablepagination" class="table table-hover">
 						<thead>
 							<tr>
-                              <th>#ID</th>
-                              <th>Name</th>
-                              <th>Folder</th>
-                              <th>Order</th>
+                              <th><center>#ID</center></th>
+                              <th><center>Name</center></th>
+                              <th><center>Order</center></th>
+                              <th></th>
                            </tr>
 						</thead>
 						<tbody>
-   <form id="defaultForm" method="post" class="form-horizontal" action="admincp.php?d_cat_a"><tr>
-  <td><i class="fa fa-plus "></i></td>
-  <td><input type="text" class="form-control" name="name"  autocomplete="off" /></td>
-  <td><select name="sub" class="form-control" autocomplete="off">
-  <option value="0" >--------</option>
-  <?php $stcmut = $db_con->prepare("SELECT *  FROM cat_dir WHERE sub=0 ORDER BY `name` ASC" );
-  $stcmut->execute();
-while($ncat_tt=$stcmut->fetch(PDO::FETCH_ASSOC)){ ?>
-<option value="<?php echo $ncat_tt['id']; ?>" ><?php echo $ncat_tt['name']; ?></option>
-<?php } ?>
-</select></td>
-  <td><input type="number" class="form-control" name="ordercat" value="0" autocomplete="off" /></td>
-  <td><button type="submit" name="ed_submit" value="ed_submit" class="btn btn-info"><i class="fa fa-plus "></i></button></td>
-</tr></form>
+
                         <?php lnk_list();  ?>
                </tbody>
+               <tfoot>
+							<tr>
+                              <th><center>#ID</center></th>
+                              <th><center>Name</center></th>
+                              <th><center>Order</center></th>
+                              <th></th>
+                           </tr>
+			  </tfoot>
 					</table>
+<script type="text/javascript">
+            $(document).ready(function() {
+    $('#tablepagination').DataTable({
+      "order": [[0, 'DESC']]
+    });
+} );
+</script>
 				</div>
 				</div> <div class="clearfix"></div>
 				</div>

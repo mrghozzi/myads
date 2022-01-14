@@ -333,6 +333,7 @@ function postulike{$sucat['id']}(){
                                   <table id="tablepagination" class="table table-hover">
 						<thead>
 							<tr>
+                              <th><center>#ID</center></th>
                               <th><center><?php lang('Version_nbr'); ?></center></th>
 							  <th><center><?php lang('download');  ?></center></th>
                               <?php if((isset($uRow['id']) AND ($uRow['id']==$catuss['id'])) OR (isset($_COOKIE['admin']) AND ($_COOKIE['admin']==$hachadmin))){ ?>
@@ -345,9 +346,10 @@ function postulike{$sucat['id']}(){
                   $sttidv = $db_con->prepare("SELECT * FROM `options` WHERE `o_type` = 'store_file' AND `o_parent` =".$strname['id']." ORDER BY `o_order`  DESC " );
                   $sttidv->execute();
                   while($strtidv=$sttidv->fetch(PDO::FETCH_ASSOC)){
-
+                 $comtxtv = strip_tags($strtidv['o_valuer'], '');
 echo "<tr>
-      <td><center>{$strtidv['name']}</center></td>
+      <td ><center><b>{$strtidv['id']}</b></center></td>
+      <td ><center><b data-toggle=\"tooltip\" data-placement=\"left\" title=\"{$comtxtv}\" >{$strtidv['name']}</b></center></td>
       <td><center>";
                  $sdfv = $strtidv['o_mode'];
                  $ndfkv = $strtidv['id'];
@@ -360,7 +362,7 @@ echo "<tr>
                  $contfilsv += $sfilenbrv['clik'];
 
       if(isset($_COOKIE['user'])){ ?>
-        <a href="<?php echo $dir_lnk_hash_v; ?>"  class="btn btn-primary" role="button"><i class="fa fa-download"></i>&nbsp;<?php lang('download');  ?>&nbsp;<span class="badge badge-info"><font face="Comic Sans MS"><b><?php echo $contfilsv; ?></b><br></font></span></a>
+        <a href="<?php echo $url_site."/".$sdfv; ?>" data-toggle="tooltip" data-placement="left" title="<?php echo $comtxtv; ?>" id="V<?php echo $strtidv['id']; ?>" class="btn btn-primary" role="button"><i class="fa fa-download"></i>&nbsp;<?php lang('download');  ?>&nbsp;<span class="badge badge-info"><font face="Comic Sans MS"><b><?php echo $contfilsv; ?></b><br></font></span></a>
         <?php }else{ ?>
         <a href="javascript:void(0);" data-toggle="modal" data-target="#Dlogin" class="btn btn-primary" role="button"><i class="fa fa-download"></i>&nbsp;<?php lang('download');  ?>&nbsp;<span class="badge badge-info"><font face="Comic Sans MS"><b><?php echo $contfilsv; ?></b><br></font></span></a>
         <?php     }
@@ -368,7 +370,34 @@ echo "<tr>
         if((isset($uRow['id']) AND ($uRow['id']==$catuss['id'])) OR (isset($_COOKIE['admin']) AND ($_COOKIE['admin']==$hachadmin))){
        echo " <td><center></center></td>";
        }
-      echo " </tr>";
+      echo " </tr>
+      <script>
+      \$(function () {
+  \$('[data-toggle=\"tooltip\"]').tooltip()
+});
+     \$(\"document\").ready(function() {
+   \$(\"#V{$strtidv['id']}\").click(postlike{$strtidv['id']});
+
+});
+
+function postlike{$strtidv['id']}(){
+    \$.ajax({
+        url : '$dir_lnk_hash_v',
+        data : {
+            test_like : \$(\"#lval\").val()
+        },
+        datatype : \"json\",
+        type : 'post',
+        success : function(result) {
+
+        },
+        error : function() {
+
+        }
+    });
+}
+   </script>
+   ";
                   }
 
 
@@ -377,6 +406,7 @@ echo "<tr>
                                </tbody>
                <tfoot>
 							<tr>
+                              <th><center>#ID</center></th>
                               <th><center><?php lang('Version_nbr'); ?></center></th>
 							  <th><center><?php lang('download');  ?></center></th>
                               <?php if((isset($uRow['id']) AND ($uRow['id']==$catuss['id'])) OR (isset($_COOKIE['admin']) AND ($_COOKIE['admin']==$hachadmin))){ ?>
@@ -401,29 +431,7 @@ echo "<tr>
 					</div>
 				</div>
 			</div>
-          <script>
-     \$(\"document\").ready(function() {
-   \$(\"#D{$strname['id']}\").click(postlike{$strname['id']});
 
-});
-
-function postlike{$strname['id']}(){
-    \$.ajax({
-        url : '$dir_lnk_hash',
-        data : {
-            test_like : \$(\"#lval\").val()
-        },
-        datatype : \"json\",
-        type : 'post',
-        success : function(result) {
-
-        },
-        error : function() {
-
-        }
-    });
-}
-   </script>
 	   <!-- //modal Versions  -->";
                           echo " <!-- //modal Download -->
               <div class=\"modal fade\" id=\"Download\" tabindex=\"-1\" role=\"dialog\">

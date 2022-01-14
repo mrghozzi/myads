@@ -115,7 +115,8 @@
                         </div>
                         <div class="form-group">
                             <div class="col-lg-9 col-lg-offset-3">
-                                <center><button type="submit" name="submit" id="button" value="Publish" class="btn btn-primary"><i class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp; <?php lang('save');  ?></button></center>
+                                <center><button type="submit" name="submit" id="button" value="Publish" class="btn btn-primary"><i class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp; <?php lang('save');  ?></button>
+                                <a href="https://www.adstn.gq/kb/myads:add_store" class="btn btn-default" target="_blank" >&nbsp;<i class="fa fa-question-circle" aria-hidden="true"></i></a></center>
                             </div>
                         </div>
      <?php if(isset($_SESSION['snotvalid'])){ echo "<div class=\"alert alert-danger\" role=\"alert\"><strong><i class=\"fa fa-exclamation-triangle\" aria-hidden=\"true\"></i></strong>&nbsp; ";
