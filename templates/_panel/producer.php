@@ -362,11 +362,7 @@ echo "<tr>
                  $contfilsv += $sfilenbrv['clik'];
 
       if(isset($_COOKIE['user'])){ ?>
-<<<<<<< HEAD
-        <a href="<?php echo $url_site."/".$sdfv; ?>"  id="V<?php echo $strtidv['id']; ?>" class="btn btn-primary" role="button"><i class="fa fa-download"></i>&nbsp;<?php lang('download');  ?>&nbsp;<span class="badge badge-info"><font face="Comic Sans MS"><b><?php echo $contfilsv; ?></b><br></font></span></a>
-=======
         <a href="<?php echo $url_site."/".$sdfv; ?>" data-toggle="tooltip" data-placement="left" title="<?php echo $comtxtv; ?>" id="V<?php echo $strtidv['id']; ?>" class="btn btn-primary" role="button"><i class="fa fa-download"></i>&nbsp;<?php lang('download');  ?>&nbsp;<span class="badge badge-info"><font face="Comic Sans MS"><b><?php echo $contfilsv; ?></b><br></font></span></a>
->>>>>>> cd931b3987facfe1aac5b3374aa47d8931ee8f55
         <?php }else{ ?>
         <a href="javascript:void(0);" data-toggle="modal" data-target="#Dlogin" class="btn btn-primary" role="button"><i class="fa fa-download"></i>&nbsp;<?php lang('download');  ?>&nbsp;<span class="badge badge-info"><font face="Comic Sans MS"><b><?php echo $contfilsv; ?></b><br></font></span></a>
         <?php     }
@@ -376,12 +372,9 @@ echo "<tr>
        }
       echo " </tr>
       <script>
-<<<<<<< HEAD
-=======
       \$(function () {
   \$('[data-toggle=\"tooltip\"]').tooltip()
 });
->>>>>>> cd931b3987facfe1aac5b3374aa47d8931ee8f55
      \$(\"document\").ready(function() {
    \$(\"#V{$strtidv['id']}\").click(postlike{$strtidv['id']});
 
