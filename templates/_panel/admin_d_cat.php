@@ -16,7 +16,7 @@ select {
                      <div class="alert alert-danger" role="alert"><?php echo $_GET['bnerrMSG'];  ?></div>
                         <?php }  ?>
                 <div class="panel panel-widget">
-     <?php  echo "<a href=\"#\" data-toggle=\"modal\" data-target=\"#ADD\" class='btn btn-info' ><i class=\"fa fa-plus \"></i></a>
+<?php  echo "<a href=\"#\" data-toggle=\"modal\" data-target=\"#ADD\" class='btn btn-info' ><i class=\"fa fa-plus \"></i></a>
  <div class=\"modal fade\" id=\"ADD\" tabindex=\"-1\" role=\"dialog\">
 				<div class=\"modal-dialog\" role=\"document\">
 					<div class=\"modal-content modal-info\">
@@ -25,7 +25,7 @@ select {
 						</div>
 						<div class=\"modal-body\">
 							<div class=\"more-grids\">
- <form id=\"defaultForm\" method=\"post\" class=\"form-horizontal\" action=\"admincp.php?d_cat_a\"><tr>
+ <form id=\"defaultForm\" method=\"post\" class=\"form-horizontal\" action=\"admincp.php?d_cat_a\">
   <div class=\"input-group\">
   <span class=\"input-group-addon\" id=\"basic-addon1\">Name</span>
   <input type=\"text\" class=\"form-control\" name=\"name\"  autocomplete=\"off\" />
@@ -33,13 +33,13 @@ select {
   <div class=\"input-group\">
   <span class=\"input-group-addon\" id=\"basic-addon1\">Folder</span>
   <select name=\"sub\" class=\"form-control\" autocomplete=\"off\">
-  <option value=\"0\" >--------</option>
-  <?php \$stcmut = \$db_con->prepare(\"SELECT *  FROM cat_dir WHERE sub=0 ORDER BY `name` ASC\" );
-  \$stcmut->execute();
-while(\$ncat_tt=\$stcmut->fetch(PDO::FETCH_ASSOC)){ ?>
-<option value=\"<?php echo \$ncat_tt['id']; ?>\" ><?php echo \$ncat_tt['name']; ?></option>
-<?php } ?>
-</select></div>
+  <option value=\"0\" >--------</option>";
+ $stcmut = $db_con->prepare("SELECT *  FROM cat_dir WHERE sub=0 ORDER BY `name` ASC" );
+ $stcmut->execute();
+ while($ncat_tt=$stcmut->fetch(PDO::FETCH_ASSOC)){
+    echo "<option value=\"{$ncat_tt['id']}\" >{$ncat_tt['name']}</option>";
+  }
+echo "</select></div>
   <div class=\"input-group\">
   <span class=\"input-group-addon\" id=\"basic-addon1\">Order</span>
   <input type=\"number\" class=\"form-control\" name=\"ordercat\" value=\"0\" autocomplete=\"off\" />
