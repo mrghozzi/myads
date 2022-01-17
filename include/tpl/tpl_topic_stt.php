@@ -62,7 +62,7 @@ $catruss=$catrus->fetch(PDO::FETCH_ASSOC);
 $usecho =  "<b>{$catruss['username']}</b> <i class=\"fa fa-retweet\" aria-hidden=\"true\"></i>   " ;
 }
 
-echo "<div id=\"tpcid{$sucat['id']}\" class=\"col-md-12 photoday-grid\">
+echo "<div id=\"tpcid{$sucat['id']}\" class=\"col-md-12 photoday-grid\" style=\"border-radius: 15px;background-color: #A9A9A9;\" >
 							<div class=\"photoday\">
                                 <div class=\"photo1\">";
             if((isset($uRow['id']) AND ($uRow['id']==$sucat['uid'])) OR (isset($uRow['id']) AND ($uRow['id']==$sutcat['uid'])) OR (isset($_COOKIE['admin']) AND ($_COOKIE['admin']== $hachadmin))){

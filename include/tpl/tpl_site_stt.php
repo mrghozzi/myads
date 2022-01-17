@@ -60,9 +60,9 @@ $likeuscm = $db_con->prepare("SELECT  * FROM `like` WHERE uid='{$uRow['id']}' AN
 $likeuscm->execute();
 $uslike=$likeuscm->fetch(PDO::FETCH_ASSOC);
 $time_stt=convertTime($sutcat['date']);
-echo "<div id=\"dirid{$sucat['id']}\" class=\"col-md-12 photoday-grid\">
+echo "<div id=\"dirid{$sucat['id']}\" class=\"col-md-12 photoday-grid\" style=\"border-radius: 15px;background-color: blue;\" >
 							<div class=\"photoday\">
-                                <div class=\"photo1\">";
+                                <div class=\"photo1\" >";
             if((isset($uRow['id']) AND ($uRow['id']==$sucat['uid'])) OR (isset($uRow['id']) AND ($uRow['id']==$sutcat['uid'])) OR (isset($_COOKIE['admin']) AND ($_COOKIE['admin']== $hachadmin))){
                echo "<div class=\"col-md-2 phot-grid\">
 										<a href=\"#\" data-toggle=\"modal\" data-target=\"#trash{$sucat['id']}\" >{$lang['delete']}&nbsp;<i class=\"glyphicon glyphicon-trash\" aria-hidden=\"true\"></i> </a>
