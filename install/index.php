@@ -11,7 +11,7 @@
 					        <div class="register">
 						         <form>
                                  <h4>install</h4>
-                                 <h4>MyAds v2.4.3</h4>
+                                 <h4>MyAds v2.4.4</h4>
 							        <div class="sign-up">
 								        <a href="install2.php" type="next" />Install</a>
 							        </div>
