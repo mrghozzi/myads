@@ -1,12 +1,12 @@
-﻿<?php
+﻿<?PHP
 
 #####################################################################
 ##                                                                 ##
-##                        My ads v2.x.x                            ##
+##                        My ads v2.4.x                            ##
 ##                     http://www.krhost.ga                        ##
 ##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
-##                       copyright (c) 2019                        ##
+##                       copyright (c) 2022                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
@@ -643,6 +643,7 @@ echo "<tr>
   include "include/Management files/plugins.php";  //plugins
   include "include/Management files/knowledgebase.php";  //plugins
   include "include/Management files/social_login.php";  //plugins
+  include "include/Management files/updates.php";  //plugins
   $o_type = "Management_files";
   $stmut = $db_con->prepare("SELECT *  FROM options WHERE o_type='{$o_type}' ORDER BY `o_order` DESC" );
   $stmut->execute();
