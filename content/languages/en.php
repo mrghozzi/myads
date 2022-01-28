@@ -254,5 +254,6 @@ $lang['Clik_ads']    = "of the ads that have been clicked.";
 $lang['yshbv']       = "Your site has been viewed";
 $lang['latest_sites']= "Latest sites";
 $lang['latest_post'] = "Latest post";
+$lang['latest_version']= "You have the latest version";
 
 ?>
