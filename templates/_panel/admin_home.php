@@ -81,7 +81,7 @@
 								<td><center><a href="http://www.krhost.ga">Kariya host</a></center></td>
 								<td><center>MYads</center></td>
 								<td><center>v<?php myads_version();  ?></center></td>
-								<td><center><script language="javascript" src="https://www.adstn.gq/store?v=myads&l=v<?php myads_fversion();  ?>"></script></center></td>
+								<td><center><script language="javascript" src="https://www.adstn.gq/store?v=myads&l=v<?php myads_fversion();  ?>"></script><br /><a href="<?php echo $url_site;  ?>/admincp?updates"><i class="fa fa-refresh" ></i></a></center></td>
 							</tr>
 						</tbody>
 					</table>
