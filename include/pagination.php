@@ -1,6 +1,16 @@
-<?php
- /*  Myads v2.4.x */
-     /* by : krhost.ga */
+<?PHP
+
+#####################################################################
+##                                                                 ##
+##                        My ads v2.4.x                            ##
+##                     http://www.krhost.ga                        ##
+##                   e-mail: admin@krhost.ga                       ##
+##                                                                 ##
+##                       copyright (c) 2022                        ##
+##                                                                 ##
+##                    This script is freeware                      ##
+##                                                                 ##
+#####################################################################
 
 function pagination($query,$per_page=10,$page=10,$url='?'){
   global  $db_con ;

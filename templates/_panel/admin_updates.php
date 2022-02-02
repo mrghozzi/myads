@@ -18,7 +18,25 @@
                     if($last_time_updates==$versionRow['o_valuer']){
                      echo $lang['latest_version'];
                    }else{
-                     echo 2;
+                   $myads_last_updates = 'https://www.adstn.gq/last_updates.txt';
+                   $last_updates = @file_get_contents($myads_last_updates);
+                   $file_get = @fopen($last_updates, 'r');
+        $To ="upload/";
+        $Tob =$_SERVER['DOCUMENT_ROOT']."/ads";
+        @file_put_contents($To."Tmpfile.zip", $file_get);
+
+		$zip = new ZipArchive;
+		$file = $To.'Tmpfile.zip';
+		//$path = pathinfo(realpath($file), PATHINFO_DIRNAME);
+		if ($zip->open($file) === TRUE) {
+		    $zip->extractTo($Tob);
+
+		    $ziped = 1;
+		} else {
+		   $ziped = 0;
+		}
+
+                  echo $ziped;
                    }
                     ?>
 				</div>
