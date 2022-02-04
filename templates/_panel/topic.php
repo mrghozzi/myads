@@ -255,10 +255,8 @@ while($smlssen=$smlusen->fetch(PDO::FETCH_ASSOC)){
          $comment = str_replace($emojis['name'], $emojis['img'], $comment);
 }
 
-$comment = preg_replace('/[ˆ]+([A-Za-z0-9-_]+)/', '<b>$1</b>', $comment);
-$comment = preg_replace('/[~]+([A-Za-z0-9-_]+)/', '<i>$1</i>', $comment );
 $comment = preg_replace('/ #([^\s]+) /', '<a  href="'.$url_site.'/tag/$1" >#$1</a>', $comment );
-$comment = strip_tags($comment, '<p><a><b>');
+$comment = strip_tags($comment, '<p><a><b><br><li><ul><font><span><pre><u><s><img>');
 $ecomment = preg_replace("/[\r\n]*/","",$sutcat['txt']);
  ?>
        <div class=" col-md-12 inbox-grid1" id="coment<?php echo $sutcat['id'];  ?>" >

@@ -1,11 +1,12 @@
-﻿<?php
+﻿<?PHP
+
 #####################################################################
 ##                                                                 ##
-##                        My ads v2.x.x                            ##
-##                      http://www.krhost.ga                       ##
-##                 e-mail: admin@kariya-host.com                   ##
+##                        My ads v2.4.x                            ##
+##                     http://www.krhost.ga                        ##
+##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
-##                       copyright (c) 2019                        ##
+##                       copyright (c) 2022                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
@@ -18,26 +19,76 @@ if($vrf_License=="65fgh4t8x5fe58v1rt8se9x"){
    if($_COOKIE['admin']==$hachadmin)
 {
 
- $page = (int)(!isset($_GET["page"]) ? 1 : $_GET["page"]);
-if ($page <= 0) $page = 1;
-$per_page = 9; // Records per page.
-$startpoint = ($page * $per_page) - $per_page;
 $statement = "`news` WHERE id ORDER BY `id` DESC";
-$results =$db_con->prepare("SELECT * FROM {$statement} LIMIT {$startpoint} , {$per_page}");
+$results =$db_con->prepare("SELECT * FROM {$statement} ");
 $results->execute();
-function lnk_list() {  global  $results;  global  $statement; global  $per_page; global  $page;  global  $db_con;
+function lnk_list() {  global  $results;  global  $statement; global  $per_page; global  $page;  global  $db_con;  global  $lang;
 while($wt=$results->fetch(PDO::FETCH_ASSOC)) {
 $news_time=date('Y-m-d',$wt['date']);
 echo "<form id=\"defaultForm\" method=\"post\" class=\"form-horizontal\" action=\"admincp?e_news={$wt['id']}\">
   <tr>
-  <td>{$wt['id']}</td>
-  <td>{$news_time}</td>
-  <td><input type=\"text\" class=\"form-control\" name=\"name\" value=\"{$wt['name']}\" autocomplete=\"off\" /></td>
-  <td><textarea type=\"text\" class=\"form-control\" name=\"txt\"  autocomplete=\"off\">{$wt['text']}</textarea></td>
-  <td><button type=\"submit\" name=\"ed_submit\" value=\"ed_submit\" class=\"btn btn-success\"><i class=\"fa fa-edit \"></i></button>
-  <a href=\"#\" data-toggle=\"modal\" data-target=\"#ban{$wt['id']}\" class='btn btn-danger' ><i class=\"fa fa-ban \"></i></a></td>
+  <td><center><b>{$wt['id']}</b></center></td>
+  <td><center><b>{$news_time}</b></center></td>
+  <td><center><b>{$wt['name']}</b></center></td>
+  <td><center><a href=\"#\" data-toggle=\"modal\" data-target=\"#ed{$wt['id']}\" data-target=\".bs-example-modal-lg\" class=\"btn btn-success\"><i class=\"fa fa-edit \"></i></a>
+  <a href=\"#\" data-toggle=\"modal\" data-target=\"#ban{$wt['id']}\" class='btn btn-danger' ><i class=\"fa fa-ban \"></i></a></center></td>
 </tr>
 </form> ";
+echo "
+ <div class=\"modal fade\" id=\"ed{$wt['id']}\" aria-labelledby=\"myLargeModalLabel\" tabindex=\"-1\" role=\"dialog\">
+				<div class=\"modal-dialog-lg\" role=\"document\">
+					<div class=\"modal-content modal-info\">
+						<div class=\"modal-header\">
+							<button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button>
+						</div>
+						<div class=\"modal-body\">
+							<div class=\"more-grids\">
+ <form id=\"defaultForm\" method=\"post\" class=\"form-horizontal\" action=\"admincp.php?e_news={$wt['id']}\">
+  <div class=\"input-group\">
+  <span class=\"input-group-addon\" id=\"basic-addon1\"><i class=\"fa fa-edit\" aria-hidden=\"true\"></i></span>
+  <input type=\"text\" class=\"form-control\" name=\"name\" value=\"{$wt['name']}\" autocomplete=\"off\" />
+  </div>
+  <div class=\"input-group\">
+  <span class=\"input-group-addon\" id=\"basic-addon1\"><i class=\"fa fa-text-width\" aria-hidden=\"true\"></i></span>
+  <textarea type=\"text\" id=\"edito{$wt['id']}\" class=\"form-control\" name=\"txt\"  autocomplete=\"off\">{$wt['text']}</textarea></div>
+  <div class=\"input-group\">
+ <center><button type=\"submit\" name=\"ed_submit\" value=\"ed_submit\" class=\"btn btn-info\">{$lang['edit']}&nbsp;<i class=\"fa fa-plus \"></i></button></center>
+ <button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Close</button
+ </div>
+                                    </form>
+                             </div>
+						</div>
+					</div>
+				</div>
+			</div>  </div>";
+echo "<script>
+// Replace the textarea #example with SCEditor
+var textarea = document.getElementById('edito{$wt['id']}');
+sceditor.create(textarea, {
+	format: 'xhtml',
+    locale : 'ar',   ";
+
+$smlusen = $db_con->prepare("SELECT *  FROM emojis ");
+$smlusen->execute();
+$c = 1;
+while($smlssen=$smlusen->fetch(PDO::FETCH_ASSOC)){
+  if($c == 1){
+ echo " emoticons: {
+  dropdown: { ";
+  }else if($c == 11){
+   echo "  },
+  more: { ";
+    }
+  echo " '{$smlssen['name']}': '{$smlssen['img']}', ";
+  $c++; }
+  if($c >= 2){
+  echo "}
+  },";
+}
+echo "
+style: 'https://cdn.jsdelivr.net/npm/sceditor@3/minified/themes/content/default.min.css'
+});
+</script> ";
    echo "<div class=\"modal fade\" id=\"ban{$wt['id']}\" tabindex=\"-1\" role=\"dialog\">
 				<div class=\"modal-dialog\" role=\"document\">
 					<div class=\"modal-content modal-info\">
@@ -56,13 +107,7 @@ echo "<form id=\"defaultForm\" method=\"post\" class=\"form-horizontal\" action=
 					</div>
 				</div>
 			</div>  </div>";
-   }if(isset($_SERVER["HTTP_REFERER"])){
-    $url_site =$_SERVER["HTTP_REFERER"];
-   }else{
-     $url_site = "";
    }
-   $url=$url_site.$_SERVER["REQUEST_URI"]."&";
-   echo pagination($statement,$per_page,$page,$url);
       }
   //  template
  template_mine('header');

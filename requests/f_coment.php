@@ -1,12 +1,11 @@
 ﻿<?php
-
 #####################################################################
 ##                                                                 ##
 ##                        My ads v2.4.x                            ##
 ##                     http://www.krhost.ga                        ##
 ##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
-##                       copyright (c) 2021                        ##
+##                       copyright (c) 2022                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
@@ -65,7 +64,7 @@ $sucat=$catusz->fetch(PDO::FETCH_ASSOC);
             $stmntf->bindParam(":time", $bn_time);
             $stmntf->bindParam(":state", $bn_state);
             if($stmntf->execute()){
-
+             header('Location: ' . $_SERVER['HTTP_REFERER']);
          	}
             }
 $comment =  $_POST['comment'] ;
@@ -88,7 +87,7 @@ $comment = preg_replace('/[$]+([A-Za-z0-9-_]+)/', '<s>$1</s>', $comment );
               $catusscm=$catuscm->fetch(PDO::FETCH_ASSOC);
             $result = "<div class=\" col-md-12 inbox-grid1\">
         <div class=\"panel panel-default\">
-  <div class=\"panel-heading\"><a  href=\"{$url_site}/u/{$catusscm['id']}\"   ><img class=\"imgu-bordered-sm\" src=\"{$url_site}/{$catusscm['img']}\" style=\"width: 35px;\" alt=\"user image\"> {$catusscm['username']} </div>
+  <div class=\"panel-heading\"><a  href=\"{$url_site}/u/{$catusscm['id']}\"   ><img class=\"imgu-bordered-sm\" src=\"{$url_site}/{$catusscm['img']}\" style=\"width: 35px;\" alt=\"user image\"> {$catusscm['username']}</a></div>
   <div class=\"panel-body\">
    {$comment}
   </div>

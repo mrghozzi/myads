@@ -1,4 +1,5 @@
-﻿<?php
+﻿<?PHP
+
 #####################################################################
 ##                                                                 ##
 ##                        My ads v2.4.x                            ##
@@ -23,7 +24,7 @@ $dir_text = preg_replace('/ #([^\s]+)/', '<a  href="'.$url_site.'/tag/$1" >#$1</
 
 
 $time_stt=convertTime($sutcat['date']);
-echo "<div class=\"col-md-12 photoday-grid\">
+echo "<div class=\"col-md-12 photoday-grid\" style=\"border-radius: 15px;background-color: #7C38BC;\" >
 							<div class=\"message-top\">
                                 <h3>News&nbsp;{$title_s}</h3>
 								<div class=\"message-right\">

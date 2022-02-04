@@ -1,0 +1,100 @@
+﻿<?PHP
+
+#####################################################################
+##                                                                 ##
+##                        My ads v2.4.x                            ##
+##                     http://www.krhost.ga                        ##
+##                   e-mail: admin@krhost.ga                       ##
+##                                                                 ##
+##                       copyright (c) 2022                        ##
+##                                                                 ##
+##                    This script is freeware                      ##
+##                                                                 ##
+#####################################################################
+if($vrf_License=="65fgh4t8x5fe58v1rt8se9x"){
+ //  there_update
+   if(isset($_GET['updates']))
+{
+   if($_COOKIE['admin']==$hachadmin)
+{
+
+
+  //  template
+ template_mine('header');
+ if(!isset($_COOKIE['user'])!="")
+{
+ template_mine('404');
+}else{
+ template_mine('admin_updates');
+ }
+ template_mine('footer');
+
+ }else{
+   header("Location: home");
+ }
+ }
+      // Update now
+   if(isset($_GET['e_update']))
+{
+   if($_COOKIE['admin']==$hachadmin)
+{
+  	   if($_POST['up_submit']){
+        $versionnow = $_POST['versionnow'];
+        $myads_last_updates = "https://www.adstn.gq/last_updates.txt";
+        $last_updates       = @file_get_contents($myads_last_updates);
+        $file_get           = @fopen($last_updates, 'r');
+        $Tob                = $_SERVER['DOCUMENT_ROOT']."/ads";
+        $To                 = $Tob."/upload/";
+        @file_put_contents($To."Tmpfile.zip", $file_get);
+        $zip                = new ZipArchive;
+		$file               = $To."Tmpfile.zip";
+     // $path               = pathinfo(realpath($file), PATHINFO_DIRNAME);
+		if ($zip->open($file) === TRUE) {
+		    $zip->extractTo($Tob);
+            chmod($Tob."/install", 777);
+            header("Location: install/update.php?v={$versionnow}&admin");
+        } else {
+        $bn_get= "?updates&bnerrMSG=".$lang['not_update'];
+        header("Location: admincp{$bn_get}");
+		}
+
+    }
+
+ }else {  header("Location: 404");  }
+}
+
+      // remove  install dir
+   if(isset($_GET['d_install']))
+{
+   if($_COOKIE['admin']==$hachadmin)
+{
+   $dfolder = $_SERVER['DOCUMENT_ROOT']."/ads/install";
+   function remove_dir($path){
+     if(is_dir($path) === false)	{
+       return false;
+       }
+     $dir = opendir($path);
+     while (($file = readdir($dir) )!== false)	{
+       if($file == '.' OR $file == '..')		{
+         continue;
+         }
+         if(is_file($path.'/'.$file))		{
+           unlink($path.'/'.$file);
+           }elseif(is_dir($path.'/'.$file))		{
+             remove_dir($path.'/'.$file);		}
+             }
+             rmdir($path);
+             closedir($dir);
+             }
+             remove_dir($dfolder);
+
+   header("Location: admincp?updates");
+
+ }else {  header("Location: 404");  }
+}
+
+
+}else{
+ header("Location: .../404 ") ;
+}
+  ?>

@@ -12,11 +12,9 @@
 ##                                                                 ##
 #####################################################################
 
-
-
 include "dbconfig.php";
 include "include/function.php";
-$title_page = "Link Click";
+$title_page = "Banners Ads";
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
      }
@@ -25,21 +23,22 @@ $uidss = $_SESSION['user'];
 	{
 		$id = $_GET['id'];
 		// select image from db to delete
-		$stmht_select = $db_con->prepare('SELECT * FROM link WHERE uid=:uid AND id=:did ');
+		$stmht_select = $db_con->prepare('SELECT * FROM visits WHERE uid=:uid AND id=:did ');
 		$stmht_select->execute(array(':uid'=>$uidss,':did'=>$id));
 		$bnRow=$stmht_select->fetch(PDO::FETCH_ASSOC);
 
-    if(isset($bnRow['uid'])==$uidss){
+    if($bnRow['uid']==$uidss){
  function bnr_echo($name) {  global  $bnRow;
   echo $bnRow["{$name}"];
  }
- if(isset($bnRow['px']))  {   $slctRow = $bnRow['px'];  }
+ $slctRow = $bnRow['tims'];
 
- if(isset($_POST['ed_submit'])){
+ if($_POST['ed_submit']){
 
            $bn_name = $_POST['name'];
            $bn_url = $_POST['url'];
-           $bn_desc = $_POST['desc'];
+           $bn_exch = $_POST['exch'];
+
            $bn_uid = $uRow['id'];
 
            if(empty($bn_name)){
@@ -53,22 +52,22 @@ $uidss = $_SESSION['user'];
            if(!isset($bnerrMSG))
 		{
 
-            $stmsb = $db_con->prepare("UPDATE link SET name=:a_da,url=:opm,txt=:ptdk
+            $stmsb = $db_con->prepare("UPDATE visits SET name=:a_da,url=:opm,tims=:ptdk
             WHERE id=:ertb AND uid=:uid");
 			$stmsb->bindParam(":uid", $bn_uid);
             $stmsb->bindParam(":opm", $bn_url);
             $stmsb->bindParam(":a_da", $bn_name);
-            $stmsb->bindParam(":ptdk", $bn_desc);
+            $stmsb->bindParam(":ptdk", $bn_exch);
 
             $stmsb->bindParam(":ertb", $id);
          	if($stmsb->execute()){
-             header("Location: l_list.php");
+             header("Location: v_list.php");
          	}
 
 
 
     }else{
-      header("Location: l_edit.php{$bn_get}");
+      header("Location: v_edit.php{$bn_get}");
     }
     }
 
@@ -83,7 +82,7 @@ $uidss = $_SESSION['user'];
 {
  template_mine('404');
 }else{
- template_mine('l_edit');
+ template_mine('v_edit');
  }
  template_mine('footer');
 

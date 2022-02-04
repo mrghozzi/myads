@@ -305,6 +305,8 @@ $q54= $db_con->prepare("CREATE TABLE `options`
  , `o_mode` VARCHAR(255) NOT NULL DEFAULT '0'
  ) ENGINE = InnoDB;" );
  $q54->execute();
+$q55=$db_con->prepare("INSERT INTO options (id, name, o_valuer, o_type, o_parent, o_order, o_mode) VALUES (NULL, 'script', '0', 'storecat', '0', '0', 'script'), (NULL, 'plugins', '0', 'storecat', '0', '0', 'plugins'), (NULL, 'templates', '0', 'storecat', '0', '0', 'templates'), (NULL, 'blogs', '0', 'scriptcat', '0', '0', 'blogs'), (NULL, 'cms', '0', 'scriptcat', '0', '0', 'cms'), (NULL, 'forums', '0', 'scriptcat', '0', '0', 'forums'), (NULL, 'socialnetwor', '0', 'scriptcat', '0', '0', 'socialnetwor'), (NULL, 'admanager', '0', 'scriptcat', '0', '0', 'admanager'), (NULL, 'games', '0', 'scriptcat', '0', '0', 'games'), (NULL, 'ecommerce', '0', 'scriptcat', '0', '0', 'ecommerce'), (NULL, 'educational', '0', 'scriptcat', '0', '0', 'educational'), (NULL, 'directory', '0', 'scriptcat', '0', '0', 'directory'), (NULL, 'others', '0', 'scriptcat', '0', '0', 'others')" );
+$q55->execute();
  include "header.php";
     ?>
 
@@ -430,9 +432,15 @@ $q54= $db_con->prepare("CREATE TABLE `options`
                                   }
                                   if($q54)
                                    {
-	                               echo "<p style='color:#04B404' >ALTER TABLE 'options'</p>";
+	                               echo "<p style='color:#04B404' >CREATE TABLE 'options'</p>";
                                   }	else{
-		                          echo "<p style='color:#FF0000' >ALTER TABLE '<b>like</b>'</p>";
+		                          echo "<p style='color:#FF0000' >CREATE TABLE '<b>options</b>'</p>";
+	                              }
+                                  if($q55)
+                                   {
+	                               echo "<p style='color:#04B404' >CREATE 'store'</p>";
+                                  }	else{
+		                          echo "<p style='color:#FF0000' >CREATE '<b>store</b>'</p>";
 	                              }
 
                                  ?>

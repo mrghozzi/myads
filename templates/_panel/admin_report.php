@@ -19,12 +19,10 @@ select {
 					<table id="tablepagination" class="table table-hover">
 						<thead>
 							<tr>
-                              <th>#ID</th>
-                              <th>Username</th>
-                              <th>Messages</th>
-                              <th>Report</th>
-                              <th></th>
-
+                              <th><center><b>#ID</b></center></th>
+                              <th><center><b>Username</b></center></th>
+                              <th><center><b>Messages</b></center></th>
+                              <th><center><b>Report</b></center></th>
                            </tr>
 						</thead>
 						<tbody>

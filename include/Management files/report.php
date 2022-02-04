@@ -1,11 +1,12 @@
-﻿<?php
+﻿<?PHP
+
 #####################################################################
 ##                                                                 ##
 ##                        My ads v2.4.x                            ##
-##                      http://www.krhost.ga                       ##
-##                 e-mail: admin@kariya-host.com                   ##
+##                     http://www.krhost.ga                        ##
+##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
-##                       copyright (c) 2021                        ##
+##                       copyright (c) 2022                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
@@ -40,7 +41,11 @@ if($wt['s_type']==1){
 $rptus = $db_con->prepare("SELECT *  FROM users WHERE  id='{$wt['uid']}'");
 $rptus->execute();
 $rapruss=$rptus->fetch(PDO::FETCH_ASSOC);
-
+if($wt['uid']==0){
+$r_username = "<b><i class=\"fa fa-user\" aria-hidden=\"true\"></i>&nbsp;Guest</b>";
+}else{
+$r_username = "<b>{$rapruss['username']}</b>&nbsp;<a href=\"{$url_site}/message/{$rapruss['id']}\" class=\"btn btn-info\"><p class=\"fa fa-envelope\" aria-hidden=\"true\"></p></a>";
+}
 $catusz = $db_con->prepare("SELECT *  FROM `{$s_type}` WHERE id=".$wt['tp_id'] );
 $catusz->execute();
 $sucat=$catusz->fetch(PDO::FETCH_ASSOC);
@@ -54,9 +59,9 @@ $sutcat=$sttcatusz->fetch(PDO::FETCH_ASSOC);
  }else{
    echo "<tr>";
  }
-echo "                        <td>#{$wt['id']}</td>
-                              <td>{$rapruss['username']}&nbsp;<a href=\"{$url_site}/message/{$rapruss['id']}\" class=\"btn btn-info\"><p class=\"fa fa-envelope\" aria-hidden=\"true\"></p></a></td>
-                              <td><a href=\"#\" data-toggle=\"modal\" data-target=\"#report{$wt['id']}\" class=\"btn btn-warning\" ><i class=\"fa fa-eye\" aria-hidden=\"true\"></i> </a>
+echo "                        <td><center><b>{$wt['id']}</b></center></td>
+                              <td><center>{$r_username}</center></td>
+                              <td><center><a href=\"#\" data-toggle=\"modal\" data-target=\"#report{$wt['id']}\" class=\"btn btn-warning\" ><i class=\"fa fa-eye\" aria-hidden=\"true\"></i> </a>
      <!-- //modal report -->
               <div class=\"modal fade\" id=\"report{$wt['id']}\" tabindex=\"-1\" role=\"dialog\">
 				<div class=\"modal-dialog\" role=\"document\">
@@ -118,15 +123,15 @@ echo "                        <td>#{$wt['id']}</td>
 				</div>
 			</div>
 
-	   <!-- //modal report --></td>
-                              <td>";
+	   <!-- //modal report --></center></td>
+                              <td><center>";
              if($wt['statu']=="1"){
                               echo "<a href=\"{$url_site}/admincp?report&wtid={$wt['id']}\" class=\"btn btn-danger\">
                               <i class=\"fa fa-eye-slash\" aria-hidden=\"true\"></i>
                               </a>" ;
                                     }
-            echo "</td>
-                              <td></td>
+            echo "</center></td>
+
 </tr>";
  }
    } }

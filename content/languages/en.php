@@ -1,4 +1,4 @@
-﻿<?php
+﻿<?PHP
 
 #####################################################################
 ##                                                                 ##
@@ -254,5 +254,10 @@ $lang['Clik_ads']    = "of the ads that have been clicked.";
 $lang['yshbv']       = "Your site has been viewed";
 $lang['latest_sites']= "Latest sites";
 $lang['latest_post'] = "Latest post";
+$lang['latest_version']= "You have the latest version";
+$lang['import_update']= "<p><strong>Important :</strong> Before updating, please take a backup of your database and other files.</p>";
+$lang['there_update']= "<p>There is a new version of MyAds available to update!</p>";
+$lang['now_update']  = "Update now";
+$lang['not_update']  = "The update could not be performed"; 
 
 ?>

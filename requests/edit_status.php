@@ -1,12 +1,12 @@
-﻿<?PHP
+﻿<?php
 
 #####################################################################
 ##                                                                 ##
-##                        My ads v1.2.x                            ##
-##                 http://www.kariya-host.com                      ##
-##                 e-mail: admin@kariya-host.com                   ##
+##                        My ads v2.4.x                            ##
+##                     http://www.krhost.ga                        ##
+##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
-##                       copyright (c) 2018                        ##
+##                       copyright (c) 2022                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
@@ -34,7 +34,7 @@ if($vrf_License=="65fgh4t8x5fe58v1rt8se9x"){
            $bn_txt  = $_POST['txt'];
            $bn_type = $_POST['s_type'];
            if(isset($_SESSION['user']) OR (isset($_COOKIE['admin']) AND ($_COOKIE['admin']==$hachadmin))){
-             if(isset($bn_type['s_type']) AND ($bn_type['s_type']==1)){
+             if(isset($bn_type) AND ($bn_type==1)){
  $s_type ="directory";
  $bn_url  = $_POST['url'];
  $bn_tag  = $_POST['tag'];

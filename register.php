@@ -1,4 +1,4 @@
-﻿<?php
+﻿<?PHP
 
 #####################################################################
 ##                                                                 ##
@@ -6,7 +6,7 @@
 ##                     http://www.krhost.ga                        ##
 ##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
-##                       copyright (c) 2021                        ##
+##                       copyright (c) 2022                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##

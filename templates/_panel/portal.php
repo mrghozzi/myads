@@ -63,7 +63,7 @@
                        <div class="input-group">
                         <span class="input-group-addon" id="basic-addon1"><i class="fa fa-text-width" aria-hidden="true"></i></span>
                        <textarea name="txt"  id="txt" class="form-control"  placeholder="Description" required></textarea>
-                     
+
                        </div>
 <?php   if($uRow['ucheck']==1) {
 ?>
@@ -122,9 +122,9 @@
                        <div class="input-group">
                         <span class="input-group-addon" id="basic-addon1"><i class="fa fa-text-width" aria-hidden="true"></i></span>
                        <textarea name="txt"  id="txt" class="form-control"  placeholder="Description" required></textarea>
-                       </div>  
+                       </div>
 
-                        
+
 <div class="input-group">
                         <span class="input-group-addon" id="basic-addon1"><i class="fa fa-image" aria-hidden="true"></i></span>
 <textarea style="visibility:hidden" name="file"  required></textarea>
@@ -198,7 +198,6 @@
 					</div>
 
   </div></div></div>
-
 </div>
 <script>
 
@@ -211,37 +210,30 @@
 <?php } ?>
    <hr />
    <?php ads_site(4); ?>
-
-
-
      <div class="col-md-8 photoday-grid">
-
- <?php
+<?php
 
 
  forum_tpc_list();
 
   ?>
-                      </div></div>   
-
-    <div class="col-md-4 photoday-grid">
-        <div class="photoday">
-
+     </div>
+       </div>
+<div class="col-md-4 photoday-grid">
+     <div class="photoday">
         <div class="col-md-12 inbox-grid">
-
-
-        <div class="grid-inbox">
-        <div class="inbox-bottom">
-								<ul>
+          <div class="grid-inbox">
+           <div class="inbox-bottom">
+<ul>
   <li><a href="<?php url_site();  ?>/forum" class="compose" ><i class="fa fa-comments-o"></i> <?php lang('forum');  ?></a></li>
   <li><a href="<?php url_site();  ?>/directory" class="compose" ><i class="fa fa-globe"></i> <?php lang('directory');  ?></a></li>
   <li><a href="<?php url_site();  ?>/store" class="compose" ><i class="fa fa-shopping-cart"></i> <?php lang('Store');  ?>&nbsp;<span class="badge badge-info"><font face="Comic Sans MS">beta<br></font></span></a></li>
 </ul>
-         </div>
-          <div class="online">
-									<h4 style="color: #000099;" >Suggestions</h4>
-									<ul>
-                                       <?php
+           </div>
+<div class="online">
+	 <h4 style="color: #000099;" >Suggestions</h4>
+	 <ul>
+<?php
                 if(isset($uRow['id'])){
                   $s_usid =$uRow['id'];
                 }else{
@@ -252,25 +244,21 @@
      while($usb=$stt->fetch(PDO::FETCH_ASSOC)){ ?>
 		   <li><a href="<?php url_site();  ?>/u/<?php echo $usb['id']; ?>"> <b><?php check_us($usb['id']); echo $usb['username']; ?></b> <?php online_us($usb['id']); ?></a></li>
      <?php } ?>
-								   </ul>
-								</div>
-                                <hr>
-                                <?php ads_site(5); ?>
-                           </div>
-
-
-             </div></div>
+	</ul>
+</div>
+<hr>
+<?php ads_site(5); ?>
         </div>
-         <script>
-           $(function () {
-  $('[data-toggle="popover"]').popover()
+      </div>
+    </div>
+</div>
+<script>
+$(function () {
+$('[data-toggle="popover"]').popover()
 });
 
-                   $(function(){
-
-
+$(function(){
 function objectifyForm(formArray) {//serialize data function
-
 var returnArray = {};
 for (var i = 0; i < formArray.length; i++){
 returnArray[formArray[i]['name']] = formArray[i]['value'];
@@ -405,7 +393,7 @@ error: function(){ $(".alert-danger").fadeIn(); }
 $btn.button('reset') }) </script>
              <div class="clearfix"></div>
 			 </div>
-                <div class="clearfix"> </div>
+             <div class="clearfix"> </div>
            </div>
            </div>
 <?php }else{ echo"404"; }  ?>
