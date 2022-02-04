@@ -11,12 +11,12 @@
 					        <div class="register">
 						         <form>
                                  <h4>install</h4>
-                                 <h4>MyAds v2.4.4</h4>
+                                 <h4>MyAds <?php echo $version; ?></h4>
 							        <div class="sign-up">
 								        <a href="install2.php" type="next" />Install</a>
 							        </div>
                                     <div class="sign-up">
-                                        <a href="update1.php" type="next" />Update<p><span><u>If you are using v2.3.x.</u></span></p></a>
+                                        <a href="update1.php" type="next" />Update</a>
 
 							        </div>
                                 </form>

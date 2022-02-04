@@ -12,7 +12,7 @@
 ##                                                                 ##
 #####################################################################
 if($vrf_License=="65fgh4t8x5fe58v1rt8se9x"){
- //  menu List
+ //  there_update
    if(isset($_GET['updates']))
 {
    if($_COOKIE['admin']==$hachadmin)
@@ -33,105 +33,66 @@ if($vrf_License=="65fgh4t8x5fe58v1rt8se9x"){
    header("Location: home");
  }
  }
-      // menu List edite
-   if(isset($_GET['e_menu']))
+      // Update now
+   if(isset($_GET['e_update']))
 {
    if($_COOKIE['admin']==$hachadmin)
 {
-  		$id = $_GET['e_menu'];
-		// select image from db to delete
-	  if($_POST['ed_submit']){
-
-           $bn_name = $_POST['name'];
-           $bn_url = $_POST['dir'];
-
-
-           if(empty($bn_name)){
-			$bnerrMSG = "Please Enter name.";
+  	   if($_POST['up_submit']){
+        $versionnow = $_POST['versionnow'];
+        $myads_last_updates = "https://www.adstn.gq/last_updates.txt";
+        $last_updates       = @file_get_contents($myads_last_updates);
+        $file_get           = @fopen($last_updates, 'r');
+        $Tob                = $_SERVER['DOCUMENT_ROOT']."/ads";
+        $To                 = $Tob."/upload/";
+        @file_put_contents($To."Tmpfile.zip", $file_get);
+        $zip                = new ZipArchive;
+		$file               = $To."Tmpfile.zip";
+     // $path               = pathinfo(realpath($file), PATHINFO_DIRNAME);
+		if ($zip->open($file) === TRUE) {
+		    $zip->extractTo($Tob);
+            chmod($Tob."/install", 777);
+            header("Location: install/update.php?v={$versionnow}&admin");
+        } else {
+        $bn_get= "?updates&bnerrMSG=".$lang['not_update'];
+        header("Location: admincp{$bn_get}");
 		}
-         if(empty($bn_url)){
-			$bnerrMSG = "Please Enter Url.";
-		}
 
-        $bn_get= "?menu&bnerrMSG=".$bnerrMSG;
-           if(!isset($bnerrMSG))
-		{
-
-            $stmsb = $db_con->prepare("UPDATE menu SET name=:a_da,dir=:opm
-            WHERE id_m=:ertb ");
-			$stmsb->bindParam(":opm", $bn_url);
-            $stmsb->bindParam(":a_da", $bn_name);
-
-
-            $stmsb->bindParam(":ertb", $id);
-         	if($stmsb->execute()){
-             header("Location: admincp?menu");
-         	}
-
-
-
-    }else{
-      header("Location: admincp{$bn_get}");
-    }
     }
 
  }else {  header("Location: 404");  }
 }
-      // menu List ADD
-   if(isset($_GET['a_menu']))
+
+      // remove  install dir
+   if(isset($_GET['d_install']))
 {
    if($_COOKIE['admin']==$hachadmin)
 {
+   $dfolder = $_SERVER['DOCUMENT_ROOT']."/ads/install";
+   function remove_dir($path){
+     if(is_dir($path) === false)	{
+       return false;
+       }
+     $dir = opendir($path);
+     while (($file = readdir($dir) )!== false)	{
+       if($file == '.' OR $file == '..')		{
+         continue;
+         }
+         if(is_file($path.'/'.$file))		{
+           unlink($path.'/'.$file);
+           }elseif(is_dir($path.'/'.$file))		{
+             remove_dir($path.'/'.$file);		}
+             }
+             rmdir($path);
+             closedir($dir);
+             }
+             remove_dir($dfolder);
 
- if($_POST['ed_submit']){
-
-           $bn_name = $_POST['name'];
-           $bn_url = $_POST['dir'];
-
-
-           if(empty($bn_name)){
-			$bnerrMSG = "Please Enter name.";
-		}
-         if(empty($bn_url)){
-			$bnerrMSG = "Please Enter Url.";
-		}
-
-        $bn_get= "?menu&bnerrMSG=".$bnerrMSG;
-           if(!isset($bnerrMSG))
-		{
-
-            $stmsb = $db_con->prepare("INSERT INTO menu (name,dir)
-            VALUES(:a_da,:opm) ");
-			$stmsb->bindParam(":opm", $bn_url);
-            $stmsb->bindParam(":a_da", $bn_name);
-
-            if($stmsb->execute()){
-             header("Location: admincp?menu");
-         	}
-
-
-
-    }else{
-      header("Location: admincp{$bn_get}");
-    }
-    }
+   header("Location: admincp?updates");
 
  }else {  header("Location: 404");  }
- }
-     // Ban menu List
-  if(isset($_GET['menu_ban']))
-{
-   if($_COOKIE['admin']==$hachadmin)
-{
-  $bn_id = $_GET['menu_ban'];
-   $stmt=$db_con->prepare("DELETE FROM menu WHERE id_m=:id  ");
-	$stmt->execute(array(':id'=>$bn_id));
-    header("Location: admincp?menu");
+}
 
- }else{
-   header("Location: home");
- }
- }
 
 }else{
  header("Location: .../404 ") ;

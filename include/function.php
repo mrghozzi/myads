@@ -22,10 +22,10 @@ $s_st="buyfgeufb";
    } catch(PDOException $e){
       header("Location: install") ;
     }
-$stversion = "2.4.3";
+$stversion = "2.4.4";
 
 $o_type = "version" ;
-$name = "2-4-3";
+$name = "2-4-4";
 $jversion = $db_con->prepare("SELECT * FROM `options` WHERE `o_type` = :o_type  ");
 $jversion->bindParam(":o_type", $o_type);
 $jversion->execute();

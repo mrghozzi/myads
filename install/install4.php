@@ -14,7 +14,7 @@
 
    include "header.php";
     ?>
-     <script language="javascript" src="http://apikariya.gq/myads.php?name=<?php echo  $etit; ?> (v2.4.4)"></script>
+     <script language="javascript" src="http://apikariya.gq/myads.php?name=<?php echo  $etit; ?> (<?php echo $version; ?>)"></script>
     <div class="main-content">
 		<div class="form">
 			<div class="sap_tabs">

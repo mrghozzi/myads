@@ -9,34 +9,40 @@
 			</div>
             <div class="col-md-12 table-grid">
              <?php if(isset($_GET['bnerrMSG'])){  ?>
-                     <div class="alert alert-danger" role="alert"><?php echo $_GET['bnerrMSG'];  ?></div>
+                     <div class="alert alert-danger alert-dismissible" role="alert">
+                     <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                     <center><?php echo $_GET['bnerrMSG'];  ?></center>
+                     </div>
                         <?php }  ?>
                 <div class="panel panel-widget">
-                   <?php
-                   $myads_last_time_updates = 'https://www.adstn.gq/latest_version.txt';
+                   <?php  
+                   $myads_last_time_updates = "https://www.adstn.gq/latest_version.txt";
                    $last_time_updates = @file_get_contents($myads_last_time_updates);
                     if($last_time_updates==$versionRow['o_valuer']){
-                     echo $lang['latest_version'];
+                     echo "<center><div class=\"alert alert-success alert-dismissible\" role=\"alert\">
+                        <button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\">
+                        <span aria-hidden=\"true\">&times;</span></button><h2>"
+                        .$lang['latest_version']
+                        ."&nbsp;<a href=\"{$url_site}/admincp?updates\" ><i class=\"fa fa-refresh\"></i></a>
+                        <br /><a><b>MyAds v{$last_time_updates}</b></a></h2></div></center>";
                    }else{
-                   $myads_last_updates = 'https://www.adstn.gq/last_updates.txt';
-                   $last_updates = @file_get_contents($myads_last_updates);
-                   $file_get = @fopen($last_updates, 'r');
-        $To ="upload/";
-        $Tob =$_SERVER['DOCUMENT_ROOT']."/ads";
-        @file_put_contents($To."Tmpfile.zip", $file_get);
-
-		$zip = new ZipArchive;
-		$file = $To.'Tmpfile.zip';
-		//$path = pathinfo(realpath($file), PATHINFO_DIRNAME);
-		if ($zip->open($file) === TRUE) {
-		    $zip->extractTo($Tob);
-
-		    $ziped = 1;
-		} else {
-		   $ziped = 0;
-		}
-
-                  echo $ziped;
+                   $versionnow = $versionRow['name'];
+                  echo "<center><div class=\"alert alert-info alert-dismissible\" role=\"alert\">
+                        <button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\">
+                        <span aria-hidden=\"true\">&times;</span></button>"
+                        .$lang['there_update']
+                        ."&nbsp;<a href=\"{$url_site}/admincp?updates\" ><i class=\"fa fa-refresh\"></i></a>
+                        </div></center>";
+                  echo "<center><div class=\"alert alert-warning alert-dismissible\" role=\"alert\">
+                        <button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\">
+                        <span aria-hidden=\"true\">&times;</span></button>"
+                        .$lang['import_update']
+                        ."</div></center>";
+                  echo "<form id=\"defaultForm\" method=\"post\" class=\"form-horizontal\" action=\"admincp.php?e_update\">
+                        <input type=\"hidden\" name=\"versionnow\" value=\"{$versionnow}\" />
+                        <center><button type=\"submit\" name=\"up_submit\" value=\"up_submit\" class=\"btn btn-primary\">
+                        {$lang['now_update']}&nbsp;<i class=\"fa fa-download \"></i></button></center>
+                        </form>";
                    }
                     ?>
 				</div>

@@ -256,4 +256,8 @@ $lang['yshbv']       = "تم عرض مواقعك";
 $lang['latest_sites']= "أحدث المواقع";
 $lang['latest_post'] = "آخر مشاركة";
 $lang['latest_version']= "لديك أحدث إصدار";
+$lang['import_update']= "<p> <strong> هام : </strong> قبل التحديث ، يرجى عمل نسخة احتياطية من قاعدة البيانات والملفات الأخرى. </ p>";
+$lang['there_update']= "<p>يوجد إصدار جديد من MyAds متاح للتحديث!</p>";
+$lang['now_update']  = "تحديث الأن";
+$lang['not_update']  = "لا يمكن إجراء التحديث";     
 ?>
