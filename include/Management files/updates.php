@@ -51,7 +51,7 @@ if($vrf_License=="65fgh4t8x5fe58v1rt8se9x"){
      // $path               = pathinfo(realpath($file), PATHINFO_DIRNAME);
 		if ($zip->open($file) === TRUE) {
 		    $zip->extractTo($Tob);
-            chmod($Tob."/install", 777);
+            chmod($Tob."/install", 0777);
             header("Location: install/update.php?v={$versionnow}&admin");
         } else {
         $bn_get= "?updates&bnerrMSG=".$lang['not_update'];
