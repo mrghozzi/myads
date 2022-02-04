@@ -1,4 +1,4 @@
-﻿<?PHP
+<?PHP
 
 #####################################################################
 ##                                                                 ##
@@ -43,7 +43,7 @@ if($vrf_License=="65fgh4t8x5fe58v1rt8se9x"){
         $myads_last_updates = "https://www.adstn.gq/last_updates.txt";
         $last_updates       = @file_get_contents($myads_last_updates);
         $file_get           = @fopen($last_updates, 'r');
-        $Tob                = $_SERVER['DOCUMENT_ROOT']."/ads";
+        $Tob                = $_SERVER['DOCUMENT_ROOT'];
         $To                 = $Tob."/upload/";
         @file_put_contents($To."Tmpfile.zip", $file_get);
         $zip                = new ZipArchive;
@@ -68,7 +68,7 @@ if($vrf_License=="65fgh4t8x5fe58v1rt8se9x"){
 {
    if($_COOKIE['admin']==$hachadmin)
 {
-   $dfolder = $_SERVER['DOCUMENT_ROOT']."/ads/install";
+   $dfolder = $_SERVER['DOCUMENT_ROOT']."/install";
    function remove_dir($path){
      if(is_dir($path) === false)	{
        return false;
