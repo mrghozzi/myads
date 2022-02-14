@@ -18,7 +18,4 @@ include "include/function.php";
  template_mine('header');
  template_mine('404');
  template_mine('footer');
-
-
 ?>
-
