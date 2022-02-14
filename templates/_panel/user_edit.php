@@ -82,7 +82,7 @@ $sus=$usz->fetch(PDO::FETCH_ASSOC);
                         </div>
                         <div class="form-group">
                             <div class="col-lg-9 col-lg-offset-3">
-                                <button type="submit" name="ed_submit" value="ed_submit" class="btn btn-primary">Submit</button>
+                                <center><button type="submit" name="ed_submit" value="ed_submit" class="btn btn-primary"><?php lang('edit'); ?></button></center>
                             </div>
                         </div>
                     </form>

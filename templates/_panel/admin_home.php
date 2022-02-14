@@ -108,7 +108,6 @@ echo $abcat['nbr']; ?></span></a>
 <a href="<?php echo $url_site;  ?>/sitemap" class="btn btn-info" ><b>Sitemap</b></a>
 <?php } ?>
 					</div>
-                    <script language="javascript" src="http://apikariya.gq/news/myads.php?v=<?php myads_fversion();  ?>"></script>
                     </div>
       <div class="clearfix"> </div>
 			</div>

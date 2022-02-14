@@ -38,7 +38,7 @@ while($wt=$results->fetch(PDO::FETCH_ASSOC)) {
 
 echo "<tr>
   <td><center>{$wt['id']}</center></td>
-  <td><center><a href=\"u/{$wt['id']}\"><img class=\"imgu-bordered-sm\" src=\"{$url_site}/{$wt['img']}\" style=\"width: 34px;\" alt=\"user image\">&nbsp;<b>{$wt['username']}</b></a></center></td>";
+  <td><center><a href=\"{$url_site}/u/{$wt['id']}\"><img class=\"imgu-bordered-sm\" src=\"{$url_site}/{$wt['img']}\" style=\"width: 34px;\" alt=\"user image\">&nbsp;<b>{$wt['username']}</b></a></center></td>";
   echo "<center><td>";
   online_us($wt['id']);
   echo "<br /><i class=\"fa fa-clock-o \"></i>&nbsp;{$wt['online']}</center></td><td><center>&nbsp;";
@@ -46,9 +46,9 @@ echo "<tr>
   echo "&nbsp;<br />{$wt['ucheck']}</center></td>
   <td><center>{$wt['email']}</center></td>
   <td><center>{$wt['pts']}</center></td>
-  <td><center><div><a href=\"admincp?state&ty=banner&st={$wt['id']}\" class='btn btn-warning' ><i class=\"fa fa-link \"></i></a>
-  <a href=\"admincp?state&ty=link&st={$wt['id']}\" class='btn btn-primary' ><i class=\"fa fa-eye \"></i></a></div>
-  &nbsp;<div><a href=\"admincp?us_edit={$wt['id']}\" class='btn btn-success' ><i class=\"fa fa-edit \"></i></a>
+  <td><center><div><a href=\"{$url_site}/admincp?state&ty=banner&st={$wt['id']}\" class='btn btn-warning' ><i class=\"fa fa-link \"></i></a>
+  <a href=\"{$url_site}/admincp?state&ty=link&st={$wt['id']}\" class='btn btn-primary' ><i class=\"fa fa-eye \"></i></a></div>
+  &nbsp;<div><a href=\"{$url_site}/admincp?us_edit={$wt['id']}\" class='btn btn-success' ><i class=\"fa fa-edit \"></i></a>
   <a href=\"#\" data-toggle=\"modal\" data-target=\"#ban{$wt['id']}\" class='btn btn-danger' ><i class=\"fa fa-ban \"></i></a></div></center></td>
 </tr>";
 echo "<div class=\"modal fade\" id=\"ban{$wt['id']}\" tabindex=\"-1\" role=\"dialog\">
@@ -61,7 +61,7 @@ echo "<div class=\"modal fade\" id=\"ban{$wt['id']}\" tabindex=\"-1\" role=\"dia
 							<div class=\"more-grids\">
                                     <h3>Delete !</h3>
 									<p>Sure to Delete User \"{$wt['username']}\" ID no {$wt['id']} ? </p><br />
-                                    <center><a  href=\"admincp?us_ban={$wt['id']}\" class=\"btn btn-danger\" >Delete</a></center>
+                                    <center><a  href=\"{$url_site}/admincp?us_ban={$wt['id']}\" class=\"btn btn-danger\" >Delete</a></center>
 									  <button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Close</button
 
 							</div>
