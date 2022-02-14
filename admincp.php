@@ -501,6 +501,7 @@ echo "<tr>
   include "include/Management files/social_login.php";  //plugins
   include "include/Management files/updates.php";  //plugins
   include "include/Management files/users.php";  //plugins
+
   $o_type = "Management_files";
   $stmut = $db_con->prepare("SELECT *  FROM options WHERE o_type='{$o_type}' ORDER BY `o_order` DESC" );
   $stmut->execute();
