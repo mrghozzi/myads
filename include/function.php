@@ -2,7 +2,7 @@
 
 #####################################################################
 ##                                                                 ##
-##                        My ads v2.4.3                            ##
+##                        My ads v2.4.5                            ##
 ##                     http://www.krhost.ga                        ##
 ##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
@@ -22,10 +22,10 @@ $s_st="buyfgeufb";
    } catch(PDOException $e){
       header("Location: install") ;
     }
-$stversion = "2.4.3";
+$stversion = "2.4.5";
 
 $o_type = "version" ;
-$name = "2-4-3";
+$name = "2-4-5";
 $jversion = $db_con->prepare("SELECT * FROM `options` WHERE `o_type` = :o_type  ");
 $jversion->bindParam(":o_type", $o_type);
 $jversion->execute();
@@ -398,7 +398,7 @@ function msg_Login()          {    global  $msg_alertl ; if($msg_alertl){ echo $
 function header_template()    {    global  $template ;   global  $c_lang;   global  $s_st;  $t = "templates/$template";  include "$t/header.php";    }
 function footer_template()    {    global  $template ;   global  $s_st;  $t = "templates/$template";  include "$t/footer.php";    }
 function template($name)      {    global  $template ;   global  $s_st;  $t = "templates/$template";  include "$t/$name.php";     }
-function template_mine($name) {    global  $title_s  ;   global  $title_page ;  global  $db_con;  global  $_GET;   global $c_lang ; global $url_site; global $uRow ; global  $template ;  global $slctRow; global $s_st; global $f_awesome; global $hachadmin; global  $usrRow; global $username_topic; global $lang; global $_SESSION; $t = "templates/_panel";  include "$t/$name.php";    }
+function template_mine($name) {    global  $title_s  ;   global  $title_page ;  global  $db_con;  global  $_GET;   global $c_lang ; global $url_site; global $uRow ; global  $template ;  global $slctRow; global $s_st; global $f_awesome; global $hachadmin; global  $usrRow; global $username_topic; global $lang; global $_SESSION; global $versionRow; $t = "templates/_panel";  include "$t/$name.php";    }
 function grid_mine($a,$b)     {    global  $template ;   global  $url_site;     global $uRow ;  $t = "?ref=".$uRow['id']; $code= "<!-- ADStn code begin --><a href=\"{$url_site}/{$t}\"><img src=\"{$url_site}/bnr/{$a}x{$b}.gif\" width=\"{$a}\" height=\"{$b}\" ></a><!-- ADStn code begin -->"; echo htmlspecialchars($code);    }
 function grid_bnr($a,$b)      {    global  $template ;   global  $url_site;     global $uRow ;  $t = "?ref=".$uRow['id']; $code= "<a href=\"{$url_site}/{$t}\"><img src=\"{$url_site}/bnr/{$a}x{$b}.gif\" width=\"{$a}\" height=\"{$b}\" ></a>"; echo $code;    }
 function bnr_mine($a,$b)      {    global  $template ;   global  $url_site;     global $uRow ;  $t = $uRow['id']; $code= "<!-- ADStn code begin --><script  language=\"javascript\" src=\"{$url_site}/bn.php?ID={$t}&px={$a}\"></script><!-- ADStn code begin -->"; echo htmlspecialchars($code);    }

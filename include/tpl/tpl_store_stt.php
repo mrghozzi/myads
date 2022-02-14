@@ -1,11 +1,12 @@
-﻿<?php
+﻿<?PHP
+
 #####################################################################
 ##                                                                 ##
 ##                        My ads v2.4.x                            ##
 ##                     http://www.krhost.ga                        ##
 ##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
-##                       copyright (c) 2021                        ##
+##                       copyright (c) 2022                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
@@ -28,6 +29,7 @@ $servictp = "store_type" ;
 $catustp = $db_con->prepare("SELECT *  FROM options WHERE  ( o_type='{$servictp}' AND o_order='{$sucat['id']}' ) ");
 $catustp->execute();
 $catusstp=$catustp->fetch(PDO::FETCH_ASSOC);
+$stortype = $catusstp['name'];
 $servicef = "store_file" ;
 $catuscf = $db_con->prepare("SELECT *  FROM options WHERE  ( o_type='{$servicef}' AND o_parent='{$catusstp['o_parent']}' ) ");
 $catuscf->execute();
@@ -69,7 +71,13 @@ $catrus->execute();
 $catruss=$catrus->fetch(PDO::FETCH_ASSOC);
 $usecho =  "<b>{$catruss['username']}</b> <i class=\"fa fa-retweet\" aria-hidden=\"true\"></i>   " ;
 }
-echo "<div id=\"strid{$sucat['id']}\" class=\"col-md-12 photoday-grid\">
+if(isset($catussc['o_order']) AND ($catussc['o_order']>0)){
+                   $storepts = $catussc['o_order']."&nbspPTS";
+                 }else{
+                    $storepts = $lang['free'];
+                 }
+$stortype = $lang["$stortype"];
+echo "<div id=\"strid{$sucat['id']}\" class=\"col-md-12 photoday-grid\" style=\"border-radius: 15px;background-color: red;\" >
 							<div class=\"photoday\">
                                 <div class=\"photo1\">";
 
@@ -112,7 +120,9 @@ echo "<div id=\"strid{$sucat['id']}\" class=\"col-md-12 photoday-grid\">
 
                    <img src=\"{$catussc['o_mode']}\" onerror=\"this.src='{$url_site}/templates/_panel/images/error_plug.png'\" style=\"width: 280;height: 170;\" >
                               <hr />
-                                  <h3>  <a href=\"{$url_site}/producer/{$catussc['name']}\"  >{$catussc['name']}_<sub>{$catusscf['name']}</sub></a></h3>
+                                  <h3>  <a href=\"{$url_site}/producer/{$catussc['name']}\"  ><b>{$catussc['name']}</b>&nbsp;
+                                  <span class=\"badge badge-info\"><font face=\"Comic Sans MS\"><b>{$storepts}</b></font></span>
+                                  <span class=\"badge badge-warning\"><b>{$stortype}</b></span></a></h3>
                                    <p> {$comtxt} </p>
 
 <div class=\"clearfix\"></div></div>

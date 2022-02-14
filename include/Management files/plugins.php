@@ -1,11 +1,12 @@
-﻿<?php
+﻿<?PHP
+
 #####################################################################
 ##                                                                 ##
-##                        My ads v2.x.x                            ##
-##                      http://www.krhost.ga                       ##
-##                 e-mail: admin@kariya-host.com                   ##
+##                        My ads v2.4.x                            ##
+##                     http://www.krhost.ga                        ##
+##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
-##                       copyright (c) 2019                        ##
+##                       copyright (c) 2022                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
@@ -20,6 +21,7 @@ if($vrf_License=="65fgh4t8x5fe58v1rt8se9x"){
  $d = dir("content/plugins");
  $c = 0;
 while (false !== ($entry = $d->read())) {
+  if($entry!="index.php"){
   if ( $c>=2)   {
 
   include "content/plugins/".$entry."/extension.php";
@@ -117,7 +119,7 @@ if($abplug['o_valuer']== "1"){
 }
 $c++;
 
-
+}
 }
 $d->close();
 if($c==2){

@@ -1,4 +1,13 @@
-<?php if($s_st=="buyfgeufb"){  ?>
+<?php if($s_st=="buyfgeufb"){
+$myads_last_time_updates = "https://www.adstn.gq/latest_version.txt";
+                   $last_time_updates = @file_get_contents($myads_last_time_updates);
+                    if($last_time_updates==$versionRow['o_valuer']){
+                     $last_time_updates = $last_time_updates."&nbsp;<a href=\"{$url_site}/admincp?updates\" ><i class=\"fa fa-refresh\"></i></a>";
+                   }else{
+                     $last_time_updates = $last_time_updates."&nbsp;<a href=\"{$url_site}/admincp?updates\" class=\"btn btn-info\"><i class=\"fa fa-download\"></i></a>";
+                   }  
+
+?>
 		<div id="page-wrapper">
         <?php dinstall_d();  ?>
 			<div class="main-page">
@@ -81,7 +90,7 @@
 								<td><center><a href="http://www.krhost.ga">Kariya host</a></center></td>
 								<td><center>MYads</center></td>
 								<td><center>v<?php myads_version();  ?></center></td>
-								<td><center><script language="javascript" src="https://www.adstn.gq/store?v=myads&l=v<?php myads_fversion();  ?>"></script></center></td>
+								<td><center><?php echo $last_time_updates; ?></center></td>
 							</tr>
 						</tbody>
 					</table>
@@ -99,7 +108,6 @@ echo $abcat['nbr']; ?></span></a>
 <a href="<?php echo $url_site;  ?>/sitemap" class="btn btn-info" ><b>Sitemap</b></a>
 <?php } ?>
 					</div>
-                    <script language="javascript" src="http://apikariya.gq/news/myads.php?v=<?php myads_fversion();  ?>"></script>
                     </div>
       <div class="clearfix"> </div>
 			</div>

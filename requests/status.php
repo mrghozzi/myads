@@ -1,4 +1,4 @@
-﻿<?php
+﻿<?PHP
 
 #####################################################################
 ##                                                                 ##
@@ -6,7 +6,7 @@
 ##                     http://www.krhost.ga                        ##
 ##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
-##                       copyright (c) 2021                        ##
+##                       copyright (c) 2022                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
@@ -22,16 +22,16 @@ if($vrf_License=="65fgh4t8x5fe58v1rt8se9x"){
     if($_POST['submit']){
 
            $bn_time = time();
-           $bn_name = $_POST['name'];
-           $bn_url  = $_POST['url'];
-           $bn_txt  = $_POST['txt'];
-           $bn_tag  = $_POST['tag'];
-           $bn_cat  = $_POST['categ'];
-           $bn_type = $_POST['s_type'];
-           $capt    = $_POST['capt'];
-           $edte    = $_POST['edte'];
-           $file     = $_POST['file'];
-           $edte    = strtotime($edte); 
+           if(isset($_POST['name']))  { $bn_name = $_POST['name'];   }
+           if(isset($_POST['url']))   { $bn_url  = $_POST['url'];    }
+           if(isset($_POST['txt']))   { $bn_txt  = $_POST['txt'];    }
+           if(isset($_POST['tag']))   { $bn_tag  = $_POST['tag'];    }
+           if(isset($_POST['categ'])) { $bn_cat  = $_POST['categ'];  }
+           if(isset($_POST['s_type'])){ $bn_type = $_POST['s_type']; }
+           if(isset($_POST['capt']))  { $capt    = $_POST['capt'];   }
+           if(isset($_POST['edte']))  { $edte    = $_POST['edte'];   }
+           if(isset($_POST['file']))  { $file    = $_POST['file'];   }
+           if(isset($_POST['edte']))  { $edte    = strtotime($edte); }
 
            session_start();
            if(isset($_COOKIE['user'])){
@@ -53,16 +53,18 @@ if($vrf_License=="65fgh4t8x5fe58v1rt8se9x"){
            }
            $bn_vu   = "0";
            $bn_statu= "1";
-           if (filter_var($bn_url, FILTER_VALIDATE_URL) === FALSE) {
-   $VALIDATE_URL = "notvalid";
-}
+
            
        if($bn_type=="1"){
+         if (filter_var($bn_url, FILTER_VALIDATE_URL) === FALSE) {
+             $VALIDATE_URL = "notvalid";
+           }
 		   if($capt_sess=="no"){
              header("Location: ../404");
            }else if($VALIDATE_URL == "notvalid"){
             header("Location: ../directory?errMSG=url-not-valid");
            }else{
+          if(empty($bn_cat)) { $bn_cat  = "";  }
           $stmsb = $db_con->prepare("INSERT INTO directory (uid,name,url,txt,metakeywords,cat,vu,statu)
             VALUES(:uid,:name,:url,:txt,:tag,:cat,:vu,:statu)");
 			$stmsb->bindParam(":uid",   $bn_uid);
@@ -98,6 +100,7 @@ if($vrf_License=="65fgh4t8x5fe58v1rt8se9x"){
          	}
 			}
        }else if($bn_type=="2"){
+         if(empty($bn_cat)) { $bn_cat  = "";  }
           $stmsb = $db_con->prepare("INSERT INTO forum (uid,name,txt,cat,statu)
             VALUES(:uid,:name,:txt,:cat,:statu)");
 			$stmsb->bindParam(":uid",   $bn_uid);
@@ -106,10 +109,7 @@ if($vrf_License=="65fgh4t8x5fe58v1rt8se9x"){
             $stmsb->bindParam(":cat",   $bn_cat);
             $stmsb->bindParam(":statu", $bn_statu);
             if($stmsb->execute()){
-           
- if($edte > 0) {
-        $bn_time = $edte ; 
-}
+            if($edte > 0) {    $bn_time = $edte ;  }
             $bn_tid = $db_con->lastInsertId();
             $stmsbs = $db_con->prepare("INSERT INTO status (uid,date,s_type,tp_id)
             VALUES(:uid,:a_da,:opm,:ptdk)");

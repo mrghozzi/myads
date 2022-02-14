@@ -1,11 +1,12 @@
-﻿<?php
+﻿<?PHP
+
 #####################################################################
 ##                                                                 ##
-##                        My ads v2.x.x                            ##
-##                      http://www.krhost.ga                       ##
-##                 e-mail: admin@kariya-host.com                   ##
+##                        My ads v2.4.x                            ##
+##                     http://www.krhost.ga                        ##
+##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
-##                       copyright (c) 2019                        ##
+##                       copyright (c) 2022                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
@@ -17,27 +18,47 @@ if($vrf_License=="65fgh4t8x5fe58v1rt8se9x"){
    if($_COOKIE['admin']==$hachadmin)
 {
 
- $page = (int)(!isset($_GET["page"]) ? 1 : $_GET["page"]);
-if ($page <= 0) $page = 1;
-$per_page = 9; // Records per page.
-$startpoint = ($page * $per_page) - $per_page;
 $statement = "`emojis` WHERE id ORDER BY `id` DESC";
-$results =$db_con->prepare("SELECT * FROM {$statement} LIMIT {$startpoint} , {$per_page}");
+$results =$db_con->prepare("SELECT * FROM {$statement} ");
 $results->execute();
 function emojis_list() {  global  $results;  global  $statement; global  $per_page; global  $page;  global  $db_con; global $f_awesome; global  $url_site;
 while($wt=$results->fetch(PDO::FETCH_ASSOC)) {
 
 
-echo "<form id=\"defaultForm\" method=\"post\" class=\"form-horizontal\" action=\"admincp?emojis_e={$wt['id']}\">
+echo "
   <tr>
-  <td>{$wt['id']}</td>
-  <td><input type=\"text\" class=\"form-control\" name=\"name\" value=\"{$wt['name']}\" autocomplete=\"off\" /></td>
-  <td><input type=\"text\" class=\"form-control\" name=\"img\" value=\"{$wt['img']}\" autocomplete=\"off\" /></td>
-  <td><img src=\"{$wt['img']}\" width=\"23\" height=\"23\" /></td>
-  <td><button type=\"submit\" name=\"ed_submit\" value=\"ed_submit\" class=\"btn btn-success\"><i class=\"fa fa-edit \"></i></button>
-  <a href=\"#\" data-toggle=\"modal\" data-target=\"#ban{$wt['id']}\" class='btn btn-danger' ><i class=\"fa fa-ban \"></i></a></td>
-</tr>
-</form> ";
+  <td><center><b>{$wt['id']}</b></center></td>
+  <td><center><b>{$wt['name']}</b></center></td>
+  <td><center><img src=\"{$wt['img']}\" width=\"23\" height=\"23\" /></center></td>
+  <td><center><a href=\"#\" data-toggle=\"modal\" data-target=\"#ed{$wt['id']}\" class='btn btn-success' ><i class=\"fa fa-edit \"></i></a>
+  <a href=\"#\" data-toggle=\"modal\" data-target=\"#ban{$wt['id']}\" class='btn btn-danger' ><i class=\"fa fa-ban \"></i></a></center></td>
+</tr>  ";
+echo "<div class=\"modal fade\" id=\"ed{$wt['id']}\" tabindex=\"-1\" role=\"dialog\">
+				<div class=\"modal-dialog\" role=\"document\">
+					<div class=\"modal-content modal-info\">
+						<div class=\"modal-header\">
+							<button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button>
+						</div>
+						<div class=\"modal-body\">
+							<div class=\"more-grids\">
+ <form id=\"defaultForm\" method=\"post\" class=\"form-horizontal\" action=\"admincp.php?emojis_e={$wt['id']}\">
+  <div class=\"input-group\">
+  <span class=\"input-group-addon\" id=\"basic-addon1\">Emoji Shortcut</span>
+  <input type=\"text\" class=\"form-control\" name=\"name\" value=\"{$wt['name']}\" autocomplete=\"off\" />
+  </div>
+  <div class=\"input-group\">
+  <span class=\"input-group-addon\" id=\"basic-addon1\">Emojis Icon Link</span>
+  <input type=\"text\" class=\"form-control\" name=\"img\" value=\"{$wt['img']}\" autocomplete=\"off\" /></div>
+  <div class=\"input-group\">
+ <center><button type=\"submit\" name=\"ed_submit\" value=\"ed_submit\" class=\"btn btn-info\"><i class=\"fa fa-plus \"></i></button></center>
+ <button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Close</button
+ </div>
+                                    </form>
+                             </div>
+						</div>
+					</div>
+				</div>
+			</div>  </div>";
    echo "<div class=\"modal fade\" id=\"ban{$wt['id']}\" tabindex=\"-1\" role=\"dialog\">
 				<div class=\"modal-dialog\" role=\"document\">
 					<div class=\"modal-content modal-info\">
@@ -56,8 +77,7 @@ echo "<form id=\"defaultForm\" method=\"post\" class=\"form-horizontal\" action=
 					</div>
 				</div>
 			</div>  </div>";
-   }$url=$url_site.$_SERVER["REQUEST_URI"]."&";
-   echo pagination($statement,$per_page,$page,$url);
+   }
       }
   //  template
  template_mine('header');

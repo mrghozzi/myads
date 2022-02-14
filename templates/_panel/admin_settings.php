@@ -39,7 +39,8 @@
                             <label class="col-lg-3 control-label">Language Default</label>
                             <div class="col-lg-5">
                                 <input type="text" class="form-control" name="lang" value="<?php bnr_echo('lang'); ?>" autocomplete="off" />
-                            </div>  <p><b>Ex :</b>ar | en ...</p>
+                                <p><b>Ex :</b>ar | en ...</p>
+                            </div>
                         </div>
       <div class="form-group">
                             <label class="col-lg-3 control-label">Timezone </label>
@@ -157,7 +158,7 @@
                         </div>
                        <div class="form-group">
                             <div class="col-lg-9 col-lg-offset-3">
-                                <button type="submit" name="ed_submit" value="ed_submit" class="btn btn-primary">Submit</button>
+                                <center><button type="submit" name="ed_submit" value="ed_submit" class="btn btn-primary"><?php lang('edit'); ?></button></center>
                             </div>
                         </div>
                     </form>

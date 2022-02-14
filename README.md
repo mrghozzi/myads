@@ -1,4 +1,4 @@
-# <b>MYADS v2.4.3</b> : Social networking scripts and the exchange of ads between website owners.
+# <b>MYADS v2.4.5</b> : ***php scripts*** for social networking and exchanging ads between website owners.
 
 >
 > ![MYADS](https://www.adstn.gq/bnr/myads.png)
@@ -37,6 +37,7 @@
 # Script features (for administrator)
 
 - These are fully compatible with PHP version 7
+- Automatic update of the latest "myads" updates ``NEW``
 - Know the number of members and control their accounts
 - Know the number of all ads of all sizes and have full control over them
 - Full control of the forum settings

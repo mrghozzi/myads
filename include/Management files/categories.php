@@ -1,9 +1,10 @@
-﻿<?php
+﻿<?PHP
+
 #####################################################################
 ##                                                                 ##
 ##                        My ads v2.4.x                            ##
-##                      http://www.krhost.ga                       ##
-##                 e-mail: admin@kariya-host.com                   ##
+##                     http://www.krhost.ga                        ##
+##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
 ##                       copyright (c) 2022                        ##
 ##                                                                 ##
@@ -18,23 +19,39 @@ if($vrf_License=="65fgh4t8x5fe58v1rt8se9x"){
    if($_COOKIE['admin']==$hachadmin)
 {
 
- $page = (int)(!isset($_GET["page"]) ? 1 : $_GET["page"]);
-if ($page <= 0) $page = 1;
-$per_page = 9; // Records per page.
-$startpoint = ($page * $per_page) - $per_page;
 $statement = "`f_cat` WHERE id ORDER BY `id` DESC";
-$results =$db_con->prepare("SELECT * FROM {$statement} LIMIT {$startpoint} , {$per_page}");
+$results =$db_con->prepare("SELECT * FROM {$statement} ");
 $results->execute();
 function lnk_list() {  global  $results;  global  $statement; global  $per_page; global  $page;  global  $db_con; global $f_awesome;
 while($wt=$results->fetch(PDO::FETCH_ASSOC)) {
 $c_icon_r = $wt['icons'];
 
 $c_icon_r = $f_awesome["{$c_icon_r}"];
-echo "<form id=\"defaultForm\" method=\"post\" class=\"form-horizontal\" action=\"admincp?f_cat_e={$wt['id']}\">
+echo "
   <tr>
-  <td>{$wt['id']}</td>
-  <td><input type=\"text\" class=\"form-control\" name=\"name\" value=\"{$wt['name']}\" autocomplete=\"off\" /></td>
-  <td><select class=\"form-control\" name=\"icons\">
+  <td><center><b>{$wt['id']}</b></center></td>
+  <td><center><b>{$wt['name']}</b></center></td>
+  <td><center><h3><i class=\"fa {$wt['icons']}\"></i></h3></center></td>
+  <td><center><a href=\"#\" data-toggle=\"modal\" data-target=\"#ed{$wt['id']}\" class=\"btn btn-success\"><i class=\"fa fa-edit \"></i></a>
+  <a href=\"#\" data-toggle=\"modal\" data-target=\"#ban{$wt['id']}\" class='btn btn-danger' ><i class=\"fa fa-ban \"></i></a></center></td>
+</tr> ";
+
+echo "<div class=\"modal fade\" id=\"ed{$wt['id']}\" tabindex=\"-1\" role=\"dialog\">
+				<div class=\"modal-dialog\" role=\"document\">
+					<div class=\"modal-content modal-info\">
+						<div class=\"modal-header\">
+							<button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button>
+						</div>
+						<div class=\"modal-body\">
+							<div class=\"more-grids\">
+ <form id=\"defaultForm\" method=\"post\" class=\"form-horizontal\" action=\"admincp?f_cat_e={$wt['id']}\">
+  <div class=\"input-group\">
+  <span class=\"input-group-addon\" id=\"basic-addon1\">Name</span>
+  <input type=\"text\" class=\"form-control\" name=\"name\" value=\"{$wt['name']}\" autocomplete=\"off\" />
+  </div>
+  <div class=\"input-group\">
+  <span class=\"input-group-addon\" id=\"basic-addon1\">Icons</span>
+  <select class=\"form-control\" name=\"icons\">
     <option value=\"{$wt['icons']}\">&#x{$c_icon_r} {$wt['icons']}</option>
     <option value=\"fa-align-left\">&#xf036; fa-align-left</option>
     <option value=\"fa-align-right\">&#xf038; fa-align-right</option>
@@ -468,11 +485,17 @@ echo "<form id=\"defaultForm\" method=\"post\" class=\"form-horizontal\" action=
     <option value=\"fa-tachometer\">&#xf0e4; fa-tachometer</option>
     <option value=\"fa-tag\">&#xf02b; fa-tag</option>
     <option value=\"fa-tags\">&#xf02c; fa-tags</option>
-  </select></td>
-  <td><button type=\"submit\" name=\"ed_submit\" value=\"ed_submit\" class=\"btn btn-success\"><i class=\"fa fa-edit \"></i></button>
-  <a href=\"#\" data-toggle=\"modal\" data-target=\"#ban{$wt['id']}\" class='btn btn-danger' ><i class=\"fa fa-ban \"></i></a></td>
-</tr>
-</form> ";
+  </select></div>
+  <div class=\"input-group\">
+ <center><button type=\"submit\" name=\"ed_submit\" value=\"ed_submit\" class=\"btn btn-success\"><i class=\"fa fa-edit \"></i></button></center>
+ <button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Close</button>
+ </div>
+                                    </form>
+                             </div>
+						</div>
+					</div>
+				</div>
+			</div>  </div>";
    echo "<div class=\"modal fade\" id=\"ban{$wt['id']}\" tabindex=\"-1\" role=\"dialog\">
 				<div class=\"modal-dialog\" role=\"document\">
 					<div class=\"modal-content modal-info\">
@@ -491,13 +514,7 @@ echo "<form id=\"defaultForm\" method=\"post\" class=\"form-horizontal\" action=
 					</div>
 				</div>
 			</div>  </div>";
-   }if(isset($_SERVER["HTTP_REFERER"])){
-    $url_site =$_SERVER["HTTP_REFERER"];
-   }else{
-     $url_site = "";
    }
-   $url=$url_site.$_SERVER["REQUEST_URI"]."&";
-   echo pagination($statement,$per_page,$page,$url);
       }
   //  template
  template_mine('header');

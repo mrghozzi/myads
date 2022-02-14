@@ -93,9 +93,6 @@ $q6=$db_con->prepare("CREATE TABLE IF NOT EXISTS `setting` (
   `linkedin` varchar(320) NOT NULL DEFAULT '#wasp'
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;");
   $q6->execute();
-$q7=$db_con->prepare("INSERT INTO `setting` ( `titer`, `description`, `url`, `styles`, `lang`, `close`, `close_text`, `a_mail`, `a_not`, `facebook`, `twitter`, `linkedin`) VALUES
-('MyAds', 'Description Sit web', 'http://mysite.com', 'default', 'ar', 1, '', 'mail@maysit.com', '', '#facebook', '#twitter', '#wasp');");
-  $q7->execute();
 $q8=$db_con->prepare("CREATE TABLE IF NOT EXISTS `short` (
   `id` int(15) NOT NULL,
   `uid` int(15) NOT NULL,
@@ -129,80 +126,7 @@ $q10=$db_con->prepare("CREATE TABLE IF NOT EXISTS `visits` (
   `name` varchar(255) NOT NULL,
   `tims` int(7) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;");
-
   $q10->execute();
-$q11=$db_con->prepare("ALTER TABLE `ads`
-  ADD PRIMARY KEY (`id`);");
-  $q11->execute();
-$q12=$db_con->prepare("ALTER TABLE `banner`
-  ADD PRIMARY KEY (`id`);");
-  $q12->execute();
-$q13=$db_con->prepare("ALTER TABLE `link`
-  ADD PRIMARY KEY (`id`);");
-  $q13->execute();
-$q14=$db_con->prepare("ALTER TABLE `menu`
-  ADD PRIMARY KEY (`id_m`);");
-  $q14->execute();
-$q15=$db_con->prepare("ALTER TABLE `messages`
-  ADD PRIMARY KEY (`id_msg`);");
-  $q15->execute();
-$q16=$db_con->prepare("ALTER TABLE `news`
-  ADD PRIMARY KEY (`id`);");
-  $q16->execute();
-$q17=$db_con->prepare("ALTER TABLE `notif`
-  ADD PRIMARY KEY (`id`);");
-  $q17->execute();
-$q18=$db_con->prepare("ALTER TABLE `referral`
-  ADD PRIMARY KEY (`id`);");
-  $q18->execute();
-$q19=$db_con->prepare("ALTER TABLE `setting`
-  ADD PRIMARY KEY (`id`);");
-  $q19->execute();
-$q20=$db_con->prepare("ALTER TABLE `short`
-  ADD PRIMARY KEY (`id`);");
-  $q20->execute();
-$q21=$db_con->prepare("ALTER TABLE `users`
-  ADD PRIMARY KEY (`id`);");
-  $q21->execute();
-$q22=$db_con->prepare("ALTER TABLE `visits`
-  ADD PRIMARY KEY (`id`);");
-  $q22->execute();
-$q30=$db_con->prepare("ALTER TABLE `ads`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=4;");
-  $q30->execute();
-$q31=$db_con->prepare("ALTER TABLE `banner`
-  MODIFY `id` int(15) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;");
-  $q31->execute();
-$q32=$db_con->prepare("ALTER TABLE `link`
-  MODIFY `id` int(15) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;");
-  $q32->execute();
-$q33=$db_con->prepare("ALTER TABLE `menu`
-  MODIFY `id_m` int(9) NOT NULL AUTO_INCREMENT;");
-  $q33->execute();
-$q34=$db_con->prepare("ALTER TABLE `messages`
-  MODIFY `id_msg` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;");
-  $q34->execute();
-$q35=$db_con->prepare("ALTER TABLE `news`
-  MODIFY `id` int(15) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;");
-  $q35->execute();
-$q36=$db_con->prepare("ALTER TABLE `notif`
-  MODIFY `id` int(15) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;");
-  $q36->execute();
-$q37=$db_con->prepare("ALTER TABLE `referral`
-  MODIFY `id` int(15) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;");
-  $q37->execute();
-$q38=$db_con->prepare("ALTER TABLE `setting`
-  MODIFY `id` int(15) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;");
-  $q38->execute();
-$q39=$db_con->prepare("ALTER TABLE `short`
-  MODIFY `id` int(15) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;");
-  $q39->execute();
-$q40=$db_con->prepare("ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;");
-  $q40->execute();
-$q41=$db_con->prepare("ALTER TABLE `visits`
-  MODIFY `id` int(15) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;");
-  $q41->execute();
 $q42=$db_con->prepare("CREATE TABLE IF NOT EXISTS `state` (
   `id` int(15) NOT NULL,
   `sid` int(15) NOT NULL DEFAULT '0',
@@ -214,12 +138,6 @@ $q42=$db_con->prepare("CREATE TABLE IF NOT EXISTS `state` (
   `v_ip` varchar(255) NOT NULL DEFAULT '0'
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;");
 $q42->execute();
-$q43=$db_con->prepare("ALTER TABLE `state`
-  ADD PRIMARY KEY (`id`);");
-  $q43->execute();
-$q44=$db_con->prepare("ALTER TABLE `state`
-  MODIFY `id` int(15) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;");
-  $q44->execute();
 $q45=$db_con->prepare("CREATE TABLE `directory`
 ( `id` INT(15) NOT NULL AUTO_INCREMENT ,
 `uid` INT(15) NOT NULL ,
@@ -305,6 +223,89 @@ $q54= $db_con->prepare("CREATE TABLE `options`
  , `o_mode` VARCHAR(255) NOT NULL DEFAULT '0'
  ) ENGINE = InnoDB;" );
  $q54->execute();
+$q11=$db_con->prepare("ALTER TABLE `ads`
+  ADD PRIMARY KEY (`id`);");
+  $q11->execute();
+$q12=$db_con->prepare("ALTER TABLE `banner`
+  ADD PRIMARY KEY (`id`);");
+  $q12->execute();
+$q13=$db_con->prepare("ALTER TABLE `link`
+  ADD PRIMARY KEY (`id`);");
+  $q13->execute();
+$q14=$db_con->prepare("ALTER TABLE `menu`
+  ADD PRIMARY KEY (`id_m`);");
+  $q14->execute();
+$q15=$db_con->prepare("ALTER TABLE `messages`
+  ADD PRIMARY KEY (`id_msg`);");
+  $q15->execute();
+$q16=$db_con->prepare("ALTER TABLE `news`
+  ADD PRIMARY KEY (`id`);");
+  $q16->execute();
+$q17=$db_con->prepare("ALTER TABLE `notif`
+  ADD PRIMARY KEY (`id`);");
+  $q17->execute();
+$q18=$db_con->prepare("ALTER TABLE `referral`
+  ADD PRIMARY KEY (`id`);");
+  $q18->execute();
+$q19=$db_con->prepare("ALTER TABLE `setting`
+  ADD PRIMARY KEY (`id`);");
+  $q19->execute();
+$q20=$db_con->prepare("ALTER TABLE `short`
+  ADD PRIMARY KEY (`id`);");
+  $q20->execute();
+$q21=$db_con->prepare("ALTER TABLE `users`
+  ADD PRIMARY KEY (`id`);");
+  $q21->execute();
+$q22=$db_con->prepare("ALTER TABLE `visits`
+  ADD PRIMARY KEY (`id`);");
+  $q22->execute();
+$q43=$db_con->prepare("ALTER TABLE `state`
+  ADD PRIMARY KEY (`id`);");
+  $q43->execute();
+$q30=$db_con->prepare("ALTER TABLE `ads`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=4;");
+  $q30->execute();
+$q31=$db_con->prepare("ALTER TABLE `banner`
+  MODIFY `id` int(15) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;");
+  $q31->execute();
+$q32=$db_con->prepare("ALTER TABLE `link`
+  MODIFY `id` int(15) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;");
+  $q32->execute();
+$q33=$db_con->prepare("ALTER TABLE `menu`
+  MODIFY `id_m` int(9) NOT NULL AUTO_INCREMENT;");
+  $q33->execute();
+$q34=$db_con->prepare("ALTER TABLE `messages`
+  MODIFY `id_msg` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;");
+  $q34->execute();
+$q35=$db_con->prepare("ALTER TABLE `news`
+  MODIFY `id` int(15) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;");
+  $q35->execute();
+$q36=$db_con->prepare("ALTER TABLE `notif`
+  MODIFY `id` int(15) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;");
+  $q36->execute();
+$q37=$db_con->prepare("ALTER TABLE `referral`
+  MODIFY `id` int(15) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;");
+  $q37->execute();
+$q38=$db_con->prepare("ALTER TABLE `setting`
+  MODIFY `id` int(15) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;");
+  $q38->execute();
+$q39=$db_con->prepare("ALTER TABLE `short`
+  MODIFY `id` int(15) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;");
+  $q39->execute();
+$q40=$db_con->prepare("ALTER TABLE `users`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;");
+  $q40->execute();
+$q41=$db_con->prepare("ALTER TABLE `visits`
+  MODIFY `id` int(15) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;");
+  $q41->execute();
+$q44=$db_con->prepare("ALTER TABLE `state`
+  MODIFY `id` int(15) NOT NULL AUTO_INCREMENT,AUTO_INCREMENT=1;");
+  $q44->execute();
+$q55=$db_con->prepare("INSERT INTO options (id, name, o_valuer, o_type, o_parent, o_order, o_mode) VALUES (NULL, 'script', '0', 'storecat', '0', '0', 'script'), (NULL, 'plugins', '0', 'storecat', '0', '0', 'plugins'), (NULL, 'templates', '0', 'storecat', '0', '0', 'templates'), (NULL, 'blogs', '0', 'scriptcat', '0', '0', 'blogs'), (NULL, 'cms', '0', 'scriptcat', '0', '0', 'cms'), (NULL, 'forums', '0', 'scriptcat', '0', '0', 'forums'), (NULL, 'socialnetwor', '0', 'scriptcat', '0', '0', 'socialnetwor'), (NULL, 'admanager', '0', 'scriptcat', '0', '0', 'admanager'), (NULL, 'games', '0', 'scriptcat', '0', '0', 'games'), (NULL, 'ecommerce', '0', 'scriptcat', '0', '0', 'ecommerce'), (NULL, 'educational', '0', 'scriptcat', '0', '0', 'educational'), (NULL, 'directory', '0', 'scriptcat', '0', '0', 'directory'), (NULL, 'others', '0', 'scriptcat', '0', '0', 'others')" );
+$q55->execute();
+$q7=$db_con->prepare("INSERT INTO `setting` ( `titer`, `description`, `url`, `styles`, `lang`, `close`, `close_text`, `a_mail`, `a_not`, `facebook`, `twitter`, `linkedin`) VALUES
+('MyAds', 'Description Sit web', 'http://mysite.com', 'default', 'ar', 1, '', 'mail@maysit.com', '', '#facebook', '#twitter', '#wasp');");
+  $q7->execute();
  include "header.php";
     ?>
 
@@ -430,9 +431,15 @@ $q54= $db_con->prepare("CREATE TABLE `options`
                                   }
                                   if($q54)
                                    {
-	                               echo "<p style='color:#04B404' >ALTER TABLE 'options'</p>";
+	                               echo "<p style='color:#04B404' >CREATE TABLE 'options'</p>";
                                   }	else{
-		                          echo "<p style='color:#FF0000' >ALTER TABLE '<b>like</b>'</p>";
+		                          echo "<p style='color:#FF0000' >CREATE TABLE '<b>options</b>'</p>";
+	                              }
+                                  if($q55)
+                                   {
+	                               echo "<p style='color:#04B404' >CREATE 'store'</p>";
+                                  }	else{
+		                          echo "<p style='color:#FF0000' >CREATE '<b>store</b>'</p>";
 	                              }
 
                                  ?>
