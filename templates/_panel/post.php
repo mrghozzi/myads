@@ -111,8 +111,8 @@ style: 'https://cdn.jsdelivr.net/npm/sceditor@3/minified/themes/content/default.
                            <input type="hidden" name="s_type" value="7867" />
                            <?php    }  ?>
                            <input type="hidden" name="set" value="Publish" />
-                           <button  type="submit" name="submit" value="Publish" class="btn btn-primary" >
-                              Publish</button>
+                           <center><button  type="submit" name="submit" value="Publish" class="btn btn-primary" >
+                              <?php lang('spread');  ?></button></center>
                            </form>
 							</div>
                     	</div>

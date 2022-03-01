@@ -1,4 +1,4 @@
-<?PHP
+﻿<?PHP
 
 #####################################################################
 ##                                                                 ##
@@ -55,7 +55,7 @@ $b_px= $_GET['px'];
   if (isset($ab['id']))
 {
      if(isset($if_type) AND ($if_type==1)){
-           echo "<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css'><link rel='stylesheet' href='{$url_site}/templates/linkads.css'><div><div class='blog-card' style='box-sizing: border-box;'><div class='meta'><div class='photo' href='{$url_site}/show.php?ads=$ab[id]&vu=$userRow[id]' style='background-image: url(".$ab['img'].");'></div><ul class='details'><li ><a href='{$url_site}/show.php?ads=$ab[id]&vu=$userRow[id]'><h1>'$ab[name]'</h1></a></li></ul></div><div class='description'><p class='adstn'>ADS by  <a href='{$url_site}?ref={$user}'>{$title_s}</a></p></div></div></div>";
+           echo "<table style=' width: 100%;  height: auto; '><tr><tdstyle=' width: 100%;  height: auto; ' valign='top' align='left'><a target='_top' href='{$url_site}/show.php?ads=$ab[id]&vu=$userRow[id]'><img border=0 src='$ab[img]' style=' width: 100%;  height: auto; '></a></td></tr><tr><td  style=' width: 100%;  height: auto; '  bgcolor='#0099ff'><a class='attribution' href='{$url_site}?ref={$user}' target='_blank'><font style='font-size:12px; font-family:verdana,arial,sans-serif; line-height:13px;color:#FFFFFF; text-decoration:none' color='#FFFFFF'>&copy;{$title_s}</font></a></td></tr></table>";
      }else{
            echo "<table border=0 cellpadding=0 cellspacing=0 width={$w_px}><tr><td width={$w_px} valign='top' align='left'><a target='_top' href='{$url_site}/show.php?ads=$ab[id]&vu=$userRow[id]'><img border=0 src='$ab[img]' width={$w_px} height={$hh_px}></a></td></tr><tr><td  width={$w_px} height=8  bgcolor='#0099ff'><a class='attribution' href='{$url_site}?ref={$user}' target='_blank'><font style='font-size:12px; font-family:verdana,arial,sans-serif; line-height:13px;color:#FFFFFF; text-decoration:none' color='#FFFFFF'>&copy;{$title_s}</font></a></td></tr></table>";
 
@@ -92,11 +92,23 @@ $b_px= $_GET['px'];
          	if($stmsb->execute()){ }
 }
 else
-{ echo "<table border=0 cellpadding=0 cellspacing=0 width={$w_px}><tr><td width={$w_px} valign='top' align='left'><a target='_top' href='{$url_site}?ref={$user}'><img border=0 src='{$url_site}/bnr/{$d_px}.gif' width={$w_px} height={$hh_px} ></a></td></tr><tr><td  width={$w_px} height=8  bgcolor='#0099ff'><a class='attribution' href='{$url_site}?ref={$user}' target='_blank'><font style='font-size:12px; font-family:verdana,arial,sans-serif; line-height:13px;color:#FFFFFF; text-decoration:none' color='#FFFFFF'>&copy;{$title_s}</font></a></td></tr></table>";
+{
+ if(isset($if_type) AND ($if_type==1)){
+           echo "<table style=' width: 100%;  height: auto; '><tr><td style=' width: 100%;  height: auto; ' valign='top' align='left'><a target='_top' href='{$url_site}?ref={$user}'><img border=0 src='{$url_site}/bnr/{$d_px}.gif' style=' width: 100%;  height: auto; ' ></a></td></tr><tr><td  style=' width: 100%;  height: auto; '  bgcolor='#0099ff'><a class='attribution' href='{$url_site}?ref={$user}' target='_blank'><font style='font-size:12px; font-family:verdana,arial,sans-serif; line-height:13px;color:#FFFFFF; text-decoration:none' color='#FFFFFF'>&copy;{$title_s}</font></a></td></tr></table>";
+     }else{
+           echo "<table border=0 cellpadding=0 cellspacing=0 width={$w_px}><tr><td width={$w_px} valign='top' align='left'><a target='_top' href='{$url_site}?ref={$user}'><img border=0 src='{$url_site}/bnr/{$d_px}.gif' width={$w_px} height={$hh_px} ></a></td></tr><tr><td  width={$w_px} height=8  bgcolor='#0099ff'><a class='attribution' href='{$url_site}?ref={$user}' target='_blank'><font style='font-size:12px; font-family:verdana,arial,sans-serif; line-height:13px;color:#FFFFFF; text-decoration:none' color='#FFFFFF'>&copy;{$title_s}</font></a></td></tr></table>";
+
+     }
 }
 
   }else
-{ echo "<table border=0 cellpadding=0 cellspacing=0 width={$w_px}><tr><td width={$w_px} valign='top' align='left'><a target='_top' href='{$url_site}?ref={$user}'><img border=0 src='{$url_site}/bnr/{$d_px}.gif' width={$w_px} height={$hh_px} ></a></td></tr><tr><td  width={$w_px} height=8  bgcolor='#0099ff'><a class='attribution' href='{$url_site}?ref={$user}' target='_blank'><font style='font-size:12px; font-family:verdana,arial,sans-serif; line-height:13px;color:#FFFFFF; text-decoration:none' color='#FFFFFF'>&copy;{$title_s}</font></a></td></tr></table>";
+{
+  if(isset($if_type) AND ($if_type==1)){
+           echo "<table style=' width: 100%;  height: auto; '><tr><td style=' width: 100%;  height: auto; ' valign='top' align='left'><a target='_top' href='{$url_site}?ref={$user}'><img border=0 src='{$url_site}/bnr/{$d_px}.gif' style=' width: 100%;  height: auto; ' ></a></td></tr><tr><td  style=' width: 100%;  height: auto; '  bgcolor='#0099ff'><a class='attribution' href='{$url_site}?ref={$user}' target='_blank'><font style='font-size:12px; font-family:verdana,arial,sans-serif; line-height:13px;color:#FFFFFF; text-decoration:none' color='#FFFFFF'>&copy;{$title_s}</font></a></td></tr></table>";
+     }else{
+           echo "<table border=0 cellpadding=0 cellspacing=0 width={$w_px}><tr><td width={$w_px} valign='top' align='left'><a target='_top' href='{$url_site}?ref={$user}'><img border=0 src='{$url_site}/bnr/{$d_px}.gif' width={$w_px} height={$hh_px} ></a></td></tr><tr><td  width={$w_px} height=8  bgcolor='#0099ff'><a class='attribution' href='{$url_site}?ref={$user}' target='_blank'><font style='font-size:12px; font-family:verdana,arial,sans-serif; line-height:13px;color:#FFFFFF; text-decoration:none' color='#FFFFFF'>&copy;{$title_s}</font></a></td></tr></table>";
+
+     }
 }
  echo "\");";
 ?>
