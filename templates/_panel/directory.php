@@ -3,13 +3,13 @@
            <div class="main-page">
     <?php if(isset($_COOKIE['user'])){  ?>
            <div  >
-   	<a href="#" data-toggle="modal" data-target="#newdir" class="btn btn-success" ><i class="fa fa-plus" aria-hidden="true"></i> </a>
-     <!-- //modal newdir -->
+   	<a href="#" data-toggle="modal" data-target="#newdir" class="btn btn-success" ><?php lang('addWebsite');  ?>&nbsp;<i class="fa fa-plus" aria-hidden="true"></i> </a>
+     <br /><!-- //modal newdir -->
               <div class="modal fade" id="newdir" tabindex="-1" role="dialog">
 				<div class="modal-dialog" role="document">
 					<div class="modal-content modal-info">
 						<div class="modal-header">
-                        <?php lang('addwebsitdir');  ?>
+                       <center> <h2><?php lang('addwebsitdir');  ?></h2> </center>
 							<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
 						</div>
 						<div class="modal-body">
@@ -50,11 +50,14 @@
                        </div>
                            <input type="hidden" name="s_type" value="1" />
                            <input type="hidden" name="set" value="Publish" />
+                           <center>
                            <button  type="submit" name="submit" value="Publish" class="btn btn-primary" >
-                              <?php lang('spread');  ?></button>
-                           <button type="button" class="btn btn-default" data-dismiss="modal"><?php lang('close');  ?></button>
+                           <?php lang('spread');  ?></button>
+                           <a href="<?php url_site();  ?>/add-site.html" class="btn btn-default" >&nbsp;<i class="fa fa-arrows-alt" aria-hidden="true"></i>&nbsp;</a>
                            <a href="https://www.adstn.gq/kb/myads:Add a new Web site" class="btn btn-default" target="_blank" >&nbsp;<i class="fa fa-question-circle" aria-hidden="true"></i></a>
-                           </form>
+                           <button type="button" class="btn btn-default" data-dismiss="modal"><?php lang('close');  ?></button>
+                           </center>
+                       </form>
 							</div>
 						</div>
 					</div>
@@ -64,7 +67,7 @@
 	   <!-- //modal newdir -->
 
      <div class="clearfix"></div>
-    </div>
+    </div> <hr />
     <?php }else{?>
     <a href="<?php url_site();  ?>/add-site.html" class="btn btn-success" ><i class="fa fa-plus" aria-hidden="true"></i> </a>
      <?php }  ?>

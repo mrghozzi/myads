@@ -5,7 +5,7 @@
 			<div class="main-page">
 			  <div class="modal-content modal-info">
 						<div class="modal-header"> 
-                        Add a new Web site
+                        <h2><?php lang('addwebsitdir');  ?></h2>
 						</div>
 						<div class="modal-body">
 							<div class="more-grids">
@@ -83,9 +83,12 @@ style: 'https://cdn.jsdelivr.net/npm/sceditor@3/minified/themes/content/default.
                        </div>
                            <input type="hidden" name="s_type" value="1" />
                            <input type="hidden" name="set" value="Publish" />
+                           <center>
                            <button  type="submit" name="submit" value="Publish" class="btn btn-primary" >
-                              Publish</button>
-                           </form>
+                           <?php lang('spread');  ?></button>
+                           <a href="https://www.adstn.gq/kb/myads:Add a new Web site" class="btn btn-default" target="_blank" >&nbsp;<i class="fa fa-question-circle" aria-hidden="true"></i></a>
+                           </center>
+                       </form>
 							</div>
 						</div>
 					</div>

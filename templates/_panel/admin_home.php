@@ -1,6 +1,8 @@
 <?php if($s_st=="buyfgeufb"){
-$myads_last_time_updates = "https://www.adstn.gq/latest_version.txt";
-                   $last_time_updates = @file_get_contents($myads_last_time_updates);
+                   $myads_last_time_updates = "https://www.adstn.gq/latest_version.txt";
+                   $last_time_updates = @file_get_contents($myads_last_time_updates, FILE_USE_INCLUDE_PATH);
+                   $last_time_updates = strip_tags($last_time_updates, '');
+                   $last_time_updates=substr($last_time_updates,0,5);
                     if($last_time_updates==$versionRow['o_valuer']){
                      $last_time_updates = $last_time_updates."&nbsp;<a href=\"{$url_site}/admincp?updates\" ><i class=\"fa fa-refresh\"></i></a>";
                    }else{

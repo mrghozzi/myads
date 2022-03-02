@@ -85,11 +85,13 @@
                        </div>
                            <input type="hidden" name="s_type" value="2" />
                            <input type="hidden" name="set" value="Publish" />
+                           <center>
                            <button  type="submit" name="submit" value="Publish" class="btn btn-primary" >
-                              <?php lang('spread');  ?></button>
+                           <?php lang('spread');  ?></button>
                            <a href="<?php url_site();  ?>/post" class="btn btn-default" >&nbsp;<i class="fa fa-arrows-alt" aria-hidden="true"></i>&nbsp;</a>
-                            <a href="https://www.adstn.gq/kb/myads:Add a new Topic" class="btn btn-default" target="_blank" >&nbsp;<i class="fa fa-question-circle" aria-hidden="true"></i></a>
-                            </form>
+                           <a href="https://www.adstn.gq/kb/myads:Add a new Topic" class="btn btn-default" target="_blank" >&nbsp;<i class="fa fa-question-circle" aria-hidden="true"></i></a>
+                           </center>
+                       </form>
                             </div>
 						</div>
 					</div>
@@ -133,10 +135,12 @@
 
                            <input type="hidden" name="s_type" value="4" />
                            <input type="hidden" name="set" value="Publish" />
+                           <center>
                            <button  type="submit" name="submit" value="Publish" class="btn btn-primary" >
-                              <?php lang('spread');  ?></button>
+                           <?php lang('spread');  ?></button>
                            <a href="https://www.adstn.gq/kb/myads:Add a new image" class="btn btn-default" target="_blank" >&nbsp;<i class="fa fa-question-circle" aria-hidden="true"></i></a>
-                           </form>
+                          </center>
+                       </form>
                             </div>
 						</div>
 					</div>
@@ -189,10 +193,13 @@
                        </div>
                            <input type="hidden" name="s_type" value="1" />
                            <input type="hidden" name="set" value="Publish" />
+                           <center>
                            <button  type="submit" name="submit" value="Publish" class="btn btn-primary" >
-                              <?php lang('spread');  ?></button>
-                             <a href="https://www.adstn.gq/kb/myads:Add a new Web site" class="btn btn-default" target="_blank" >&nbsp;<i class="fa fa-question-circle" aria-hidden="true"></i></a>
-                           </form>
+                           <?php lang('spread');  ?></button>
+                           <a href="<?php url_site();  ?>/add-site.html" class="btn btn-default" >&nbsp;<i class="fa fa-arrows-alt" aria-hidden="true"></i>&nbsp;</a>
+                           <a href="https://www.adstn.gq/kb/myads:Add a new Web site" class="btn btn-default" target="_blank" >&nbsp;<i class="fa fa-question-circle" aria-hidden="true"></i></a>
+                           </center>
+                       </form>
 							</div>
 						</div>
 					</div>

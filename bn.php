@@ -79,7 +79,7 @@ $b_px= $_GET['px'];
 		    $bn_nm = "banner";
             $bn_dt = time();
             $bn_ag = $_SERVER['HTTP_USER_AGENT'];
-            $bn_ip=$_SERVER['REMOTE_ADDR'];
+            $bn_ip = file_get_contents('https://api.ipify.org');
 		    $stmsb = $db_con->prepare("INSERT INTO state (sid,pid,t_name,r_link,r_date,visitor_Agent,v_ip)
             VALUES(:a_da,:a_db,:opm,:ptdk,:bn_px,:ptag,:bn_ip)");
 			$stmsb->bindParam(":opm", $bn_nm);

@@ -65,10 +65,10 @@ if($flsus=$flusz->fetch(PDO::FETCH_ASSOC)){
  <div class="panel-body">
 <ul class="nav nav-tabs" id="myTab" role="tablist">
   <li class="nav-item">
-    <a class="nav-link " data-toggle="tab" href="#Topic" role="tab" aria-controls="Topic">Topic</a>
+    <a class="nav-link " data-toggle="tab" href="#Topic" role="tab" aria-controls="Topic"><?php lang('add_topic');  ?></a>
   </li>
   <li class="nav-item">
-    <a class="nav-link" data-toggle="tab" href="#Directory" role="tab" aria-controls="Site">Directory</a>
+    <a class="nav-link" data-toggle="tab" href="#Directory" role="tab" aria-controls="Site"><?php lang('addWebsite');  ?></a>
   </li>
   <li class="nav-item">
     <a class="nav-link" data-toggle="tab" href="#x" role="tab" aria-controls="x"><i class="fa fa-chevron-up" aria-hidden="true"></i></a>
@@ -82,7 +82,7 @@ if($flsus=$flusz->fetch(PDO::FETCH_ASSOC)){
   <div class="panel panel-primary"><div class="panel-heading">
   <div class="modal-content modal-info">
 						<div class="modal-header">
-                        <p style="color: #000000"><b>Add a new Topic</b></p>
+                        <p style="color: #000000"><b><?php lang('w_new_tpc');  ?></b></p>
 						</div>
 						<div class="modal-body">
 							<div class="more-grids">
@@ -114,72 +114,14 @@ if($flsus=$flusz->fetch(PDO::FETCH_ASSOC)){
                        </div>
                            <input type="hidden" name="s_type" value="2" />
                            <input type="hidden" name="set" value="Publish" />
+                           <center>
                            <button  type="submit" name="submit" value="Publish" class="btn btn-primary" >
-                              Publish</button>
+                           <?php lang('spread');  ?></button>
                            <a href="<?php url_site();  ?>/post" class="btn btn-default" >&nbsp;<i class="fa fa-arrows-alt" aria-hidden="true"></i>&nbsp;</a>
-                           <button type="button" class="btn btn-lg btn-default" data-toggle="popover" data-html="true"
-title="Variables when previewing text."
-data-content="<p><span style='color:#000000' >@text = <b>text</b></span> <span style='color:#A9A9A9'>// Bold</span><br />
-              <span style='color:#000000' >$text = <s>text</s></span> <span style='color:#A9A9A9'>// Strikethrough</span><br />
-              <span style='color:#000000' >#text = <i>text</i></span> <span style='color:#A9A9A9'>// Italic</span></p>
- "><i class="fa fa-question-circle" aria-hidden="true"></i></button>
-                           </form>
+                           <a href="https://www.adstn.gq/kb/myads:Add a new Topic" class="btn btn-default" target="_blank" >&nbsp;<i class="fa fa-question-circle" aria-hidden="true"></i></a>
+                           </center>
+                       </form>
 							</div>
-						</div>
-					</div>
-
-  </div></div>
-  </div>
-
-
-  <div class="tab-pane " id="service" role="tabpanel">
-  <div class="panel"><div class="panel-heading">
-  <div class="modal-content modal-info">
-						<div class="modal-header">
-
-                        <p style="color: #000000"><b>Add a new service</b> </p>
-						</div>
-						<div class="modal-body">
-							<div class="more-grids">
-                            <div class="alert alert-success" role="alert" style="display: none;">
-                               Published
-
-                              </div>
-                              <div class="alert alert-danger" role="alert" style="display: none;">
-                              There error. Try again
-                               </div>
-                      <form  method="POST">
-                       <div class="input-group">
-                        <span class="input-group-addon" id="basic-addon1"><i class="fa fa-edit" aria-hidden="true"></i></span>
-                       <input type="text" class="form-control" name="name" placeholder="service name" aria-describedby="basic-addon1" required>
-                       </div>
-                       <div class="input-group">
-                        <span class="input-group-addon" id="basic-addon1"><i class="fa fa-text-width" aria-hidden="true"></i></span>
-                       <textarea name="txt"  id="txt" class="form-control"  placeholder="Description" required></textarea>
-                       </div>  
-
-                       <div class="input-group">
-                        <span class="input-group-addon" id="basic-addon1"><i class="fa fa-money" aria-hidden="true"></i></span>
-                       <input type="number" class="form-control" name="pts" placeholder="PTS" aria-describedby="basic-addon1" required>
-                       </div>
-                        
-<div class="input-group">
-                        <span class="input-group-addon" id="basic-addon1"><i class="fa fa-image" aria-hidden="true"></i></span> 
-<textarea style="visibility:hidden" name="file"  required></textarea>
-
-                       </div>  
-
-                           <input type="hidden" name="s_type" value="4" />
-                           <input type="hidden" name="set" value="Publish" />
-                           <button  type="submit" name="submit" value="Publish" class="btn btn-primary" >
-                              Publish</button>
-                           <a href="<?php url_site();  ?>/new_service" class="btn btn-default" >&nbsp;<i class="fa fa-arrows-alt" aria-hidden="true"></i>&nbsp;</a>
-                           <button type="button" class="btn btn-lg btn-default" data-toggle="popover" data-html="true"
-data-content="<b style='color:#0099CC' >Variables when previewing text.</b><hr/><p><span style='color:#000000' >@text = <b>text</b></span> <span style='color:#A9A9A9'>// Bold</span><br />
-              <span style='color:#000000' >$text = <s>text</s></span> <span style='color:#A9A9A9'>// Strikethrough</span><br />
-              <span style='color:#000000' >#text = <i>text</i></span> <span style='color:#A9A9A9'>// Italic</span></p>
- "><i class="fa fa-question-circle" aria-hidden="true"></i></button></form>
-                            </div>
 						</div>
 					</div>
 
@@ -191,7 +133,7 @@ data-content="<b style='color:#0099CC' >Variables when previewing text.</b><hr/>
   <div class="panel panel-primary"><div class="panel-heading">
 <div class="modal-content modal-info">
 						<div class="modal-header">
-                       <p style="color: #000000"><b> Add a new Web site </b></p>
+                       <p style="color: #000000"><b> <?php lang('addwebsitdir');  ?> </b></p>
 						</div>
 						<div class="modal-body">
 							<div class="more-grids">
@@ -231,15 +173,13 @@ data-content="<b style='color:#0099CC' >Variables when previewing text.</b><hr/>
                        </div>
                            <input type="hidden" name="s_type" value="1" />
                            <input type="hidden" name="set" value="Publish" />
+                           <center>
                            <button  type="submit" name="submit" value="Publish" class="btn btn-primary" >
-                              Publish</button>
-                        <button type="button" class="btn btn-lg btn-default" data-toggle="popover" data-html="true"
-title="Variables when previewing text."
-data-content="<p><span style='color:#000000' >@text = <b>text</b></span> <span style='color:#A9A9A9'>// Bold</span><br />
-              <span style='color:#000000' >$text = <s>text</s></span> <span style='color:#A9A9A9'>// Strikethrough</span><br />
-              <span style='color:#000000' >#text = <i>text</i></span> <span style='color:#A9A9A9'>// Italic</span></p>
- "><i class="fa fa-question-circle" aria-hidden="true"></i></button>
-                           </form>
+                           <?php lang('spread');  ?></button>
+                           <a href="<?php url_site();  ?>/add-site.html" class="btn btn-default" >&nbsp;<i class="fa fa-arrows-alt" aria-hidden="true"></i>&nbsp;</a>
+                           <a href="https://www.adstn.gq/kb/myads:Add a new Web site" class="btn btn-default" target="_blank" >&nbsp;<i class="fa fa-question-circle" aria-hidden="true"></i></a>
+                           </center>
+                       </form>
 							</div>
 						</div>
 					</div>
