@@ -109,26 +109,22 @@ if($spstt['s_type']==1){
 }else if($spstt['s_type']==4){
 $sp_type ="forum";            // image
 }
+if(isset($sp_type)){
 $spcatusz = $db_con->prepare("SELECT *  FROM `{$sp_type}` WHERE statu=1 AND id=".$spstt['tp_id'] );
 $spcatusz->execute();
 $spcat=$spcatusz->fetch(PDO::FETCH_ASSOC);
-;
+
     if($spcat['statu']=="1") {
  if($spstt['s_type']==1){
  tpl_site_stt($spstt,1);    // directory
 }else if($spstt['s_type']==2){
  tpl_topic_stt($spstt,1);   // topic
 }else if($spstt['s_type']==4){
- tpl_image_stt($spstt,1);   // image 
+ tpl_image_stt($spstt,1);   // image
 }
-
-  }
-
-  } 
-
-
-
-
+   }
+     }
+      }
   $sp_stat++;
  }   echo pagination($statement,$per_page,$page);
        }
