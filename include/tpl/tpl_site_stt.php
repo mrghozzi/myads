@@ -20,9 +20,8 @@ global  $db_con; global  $catsum;  global  $uRow; global $lang; global $url_site
 $catusz = $db_con->prepare("SELECT *  FROM `directory` WHERE  id=".$sutcat['tp_id'] );
 $catusz->execute();
 $sucat=$catusz->fetch(PDO::FETCH_ASSOC);
-$comtxt = preg_replace('/[@]+([A-Za-z0-9-_]+)/', '<b>@$1</b>', $sucat['txt'] );
-$comtxt = preg_replace('/ #([^\s]+)/', '<a  href="'.$url_site.'/tag/$1" >#$1</a>', $comtxt );
-$comtxt = strip_tags($comtxt, '<br>');
+$comtxt = preg_replace('/#([^\s]+)/', '<a  href="'.$url_site.'/tag/$1" >#$1</a>', $sucat['txt'] );
+$comtxt = strip_tags($comtxt, '<a><br>');
 $sdf= $sucat['url'];
 $dir_text=substr($comtxt,0,480);
 $dir_lnk_hash = $url_site."/site-".hash('crc32', $sdf.$sucat['id'] );

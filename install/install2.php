@@ -1,4 +1,4 @@
- <?php
+﻿ <?php
  include '../dbconfig.php';
 $q=$db_con->prepare("CREATE TABLE IF NOT EXISTS `ads` (
   `id` int(11) NOT NULL,

@@ -1,8 +1,8 @@
-<?php
+﻿<?php
 
 #####################################################################
 ##                                                                 ##
-##                        My ads v2.4.5                            ##
+##                        My ads v2.4.6                            ##
 ##                     http://www.krhost.ga                        ##
 ##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
@@ -22,32 +22,7 @@ $s_st="buyfgeufb";
    } catch(PDOException $e){
       header("Location: install") ;
     }
-$stversion = "2.4.5";
 
-$o_type = "version" ;
-$name = "2-4-5";
-$jversion = $db_con->prepare("SELECT * FROM `options` WHERE `o_type` = :o_type  ");
-$jversion->bindParam(":o_type", $o_type);
-$jversion->execute();
- $versionRow=$jversion->fetch(PDO::FETCH_ASSOC);
-  if( isset($versionRow['o_type']) AND ($versionRow['o_type']==$o_type)){
-  if( isset($versionRow['o_valuer']) AND ($versionRow['o_valuer']==$stversion)){  }else{
-       $ostmsbs = $db_con->prepare("UPDATE options SET name=:name,o_valuer=:o_valuer,o_type=:o_type
-            WHERE id=:id");
-            $ostmsbs->bindParam(":o_type", $o_type);
-            $ostmsbs->bindParam(":o_valuer", $stversion);
-            $ostmsbs->bindParam(":name", $name);
-            $ostmsbs->bindParam(":id", $versionRow['id']);
-            if($ostmsbs->execute()){ }
-   }
-   }else{
-   $ostmsbs = $db_con->prepare(" INSERT INTO options  (name,o_valuer,o_type,o_parent,o_order,o_mode)
-            VALUES (:name,:o_valuer,:o_type,0,0,0) ");
-	        $ostmsbs->bindParam(":o_type", $o_type);
-            $ostmsbs->bindParam(":o_valuer", $stversion);
-            $ostmsbs->bindParam(":name", $name);
-            if($ostmsbs->execute()){   }
- }
  $template   = $stt['styles'];
  $title_s    = $stt['titer'];
  $descr_site = $stt['description'];
@@ -56,7 +31,8 @@ $jversion->execute();
  $mail_site  = $stt['a_mail'];
  $lang_site  = $stt['lang'];
 
-
+ //  MyAds Version
+ include "include/myads_version.php";
  function myads_version()         {    global  $versionRow ; if(isset($versionRow['o_valuer'])){ echo $versionRow['o_valuer']; }    }
  function myads_fversion()        {    global  $versionRow ; if(isset($versionRow['name'])){ echo $versionRow['name'];         }    }
 
@@ -74,67 +50,9 @@ $bads3 = $stads['code_ads'];
 {
     date_default_timezone_set($stt['timezone']);
 }
-//  user Session
-session_start();
- if(isset($_COOKIE['userha'])!="")
-{
 
-  $_SESSION['user']=$_COOKIE['user'];
+include "include/user_session.php";  //  user Session
 
- $stmus = $db_con->prepare("SELECT * FROM users WHERE id=:user ");
- $stmus->bindParam(":user", $_SESSION['user']);
- $stmus->execute();
- $uRow=$stmus->fetch(PDO::FETCH_ASSOC);
- $bn_online = time();
- $conf_us_log=$uRow['id'].$uRow['username'].$uRow['email'];
- $md5_cook_us=$_COOKIE['userha'];
- $stmsbus = $db_con->prepare("UPDATE users SET online=:online WHERE id=:user  ");
-            $stmsbus->bindParam(":user", $uRow['id']);
-            $stmsbus->bindParam(":online",  $bn_online);
-            if($stmsbus->execute()){
-
-         	}
- if(md5($conf_us_log)==$md5_cook_us){ $_SESSION['user']=$uRow['id'];}
- else{ header("Location: {$url_site}/logout?logout"); }
-class session{
-  private static function _RegenerateId()
-    {
-        session_regenerate_id(true);
-    }
-  public static function init(){
-   session_start();
-  }
-  public static function set($key,$value){
-    $_SESSION[$key]=$value;
-    session::_RegenerateId();
-  }
-  public static function get($key, $secondKey = false){
-    session::_RegenerateId();
-    if(isset($_SESSION[$key]))
-    return $_SESSION[$key];
-        if ($secondKey == true)
-        {
-            if (isset($_SESSION[$key][$secondKey]))
-            return $_SESSION[$key][$secondKey];
-        }
-        else
-        {
-            if (isset($_SESSION[$key]))
-            return $_SESSION[$key];
-        }
-
-  }
-  public static function destroy(){
-    session_destroy();
-  }
-} }
- // admin
- $id_admin = "1";
- $stadmin_select = $db_con->prepare('SELECT * FROM users WHERE id=:id ');
- $stadmin_select->bindParam(":id", $id_admin);
- $stadmin_select->execute();
- $usadmin=$stadmin_select->fetch(PDO::FETCH_ASSOC);
- $hachadmin= md5($usadmin['pass'].$usadmin['username']) ;
 //  Language
  if (isset($_GET["en"])) {
      $lg_md5 = time() + (365 * 24 * 60 * 60);
@@ -160,11 +78,12 @@ while($exlang=$exlanguages->fetch(PDO::FETCH_ASSOC)){
 if (isset($_COOKIE['lang'])) {
       $c_lang=$_COOKIE['lang'] ;
        } else {  $c_lang=$lang_site ; }
+
 include "content/languages/$c_lang.php"; //  Language File
 function lang($name) {    global  $lang ;   echo  $lang["{$name}"];    }
 //    install exists
  $filename = 'install';
- if (file_exists($filename)) {
+if (file_exists($filename)) {
  echo "<center>";
  lang('dinstall');
  echo "</center>";
@@ -176,7 +95,7 @@ function dinstall_d() {
 </div>";
     }
  }else{
-  function dinstall_d() { }
+function dinstall_d() { }
  }
 
 include "include/agent.php";  //  Get Browser

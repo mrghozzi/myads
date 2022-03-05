@@ -66,15 +66,15 @@ function forum_tpc_list() {
   $sp_stat = 0;
 while($sutcat=$catsum->fetch(PDO::FETCH_ASSOC))
 {  if($sutcat['s_type']==1){
- $s_type ="directory";
+ $s_type ="directory";            // directory
 }else if($sutcat['s_type']==2){
- $s_type ="forum";
+ $s_type ="forum";                // topic
 }else if($sutcat['s_type']==3){
- $s_type ="news";
+ $s_type ="news";                 // news
 }else if($sutcat['s_type']==4){
- $s_type ="forum";
+ $s_type ="forum";                // image
 }else if($sutcat['s_type']==7867){
- $s_type ="forum";
+ $s_type ="forum";                // store
 }
 $catusz = $db_con->prepare("SELECT *  FROM `{$s_type}` WHERE statu=1  AND id=".$sutcat['tp_id'] );
 $catusz->execute();
@@ -82,15 +82,15 @@ $sucat=$catusz->fetch(PDO::FETCH_ASSOC);
 
 if($sucat['statu']=="1") {
  if($sutcat['s_type']==1){
- tpl_site_stt($sutcat,0);
+ tpl_site_stt($sutcat,0);        // directory
 }else if($sutcat['s_type']==2){
- tpl_topic_stt($sutcat,0);
+ tpl_topic_stt($sutcat,0);       // topic
 }else if($sutcat['s_type']==3){
- tpl_news_stt($sutcat);
+ tpl_news_stt($sutcat);          // news
 }else if($sutcat['s_type']==4){
- tpl_image_stt($sutcat,0);
+ tpl_image_stt($sutcat,0);       // image
 }else if($sutcat['s_type']==7867){
- tpl_store_stt($sutcat,0);   
+ tpl_store_stt($sutcat,0);       // store
 }
 
   }
@@ -103,32 +103,28 @@ $spstusz = $db_con->prepare("SELECT *  FROM `status` WHERE date<={$stt_time_go} 
 $spstusz->execute();
 $spstt=$spstusz->fetch(PDO::FETCH_ASSOC);
 if($spstt['s_type']==1){
- $sp_type ="directory";
+ $sp_type ="directory";       // directory
 }else if($spstt['s_type']==2){
- $sp_type ="forum";
+ $sp_type ="forum";           // topic
 }else if($spstt['s_type']==4){
-$sp_type ="forum";
+$sp_type ="forum";            // image
 }
+if(isset($sp_type)){
 $spcatusz = $db_con->prepare("SELECT *  FROM `{$sp_type}` WHERE statu=1 AND id=".$spstt['tp_id'] );
 $spcatusz->execute();
 $spcat=$spcatusz->fetch(PDO::FETCH_ASSOC);
-;
+
     if($spcat['statu']=="1") {
  if($spstt['s_type']==1){
- tpl_site_stt($spstt,1);
+ tpl_site_stt($spstt,1);    // directory
 }else if($spstt['s_type']==2){
- tpl_topic_stt($spstt,1);
+ tpl_topic_stt($spstt,1);   // topic
 }else if($spstt['s_type']==4){
- tpl_image_stt($spstt,1);
+ tpl_image_stt($spstt,1);   // image
 }
-
-  }
-
-  } 
-
-
-
-
+   }
+     }
+      }
   $sp_stat++;
  }   echo pagination($statement,$per_page,$page);
        }

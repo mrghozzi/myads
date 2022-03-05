@@ -21,7 +21,7 @@
 
                              ?>
                         	<div class="modal-header">
-                        <?php lang('e_topic'); ?>
+                        <h2><?php lang('e_topic'); ?></h2>
 						</div>
 						<div class="modal-body">
 							<div class="more-grids">
@@ -29,7 +29,7 @@
                        <input type="hidden" name="tid" value="<?php if(isset($sucat['id'])){ echo $sucat['id']; }  ?>" />
                        <?php }else{  ?>
                        	<div class="modal-header">
-                        <?php lang('w_new_tpc'); ?>
+                        <h2><?php lang('w_new_tpc'); ?></h2>
 						</div>
 						<div class="modal-body">
 							<div class="more-grids">
@@ -111,9 +111,12 @@ style: 'https://cdn.jsdelivr.net/npm/sceditor@3/minified/themes/content/default.
                            <input type="hidden" name="s_type" value="7867" />
                            <?php    }  ?>
                            <input type="hidden" name="set" value="Publish" />
+                           <center>
                            <button  type="submit" name="submit" value="Publish" class="btn btn-primary" >
-                              Publish</button>
-                           </form>
+                           <?php lang('spread');  ?></button>
+                           <a href="https://www.adstn.gq/kb/myads:Add a new Topic" class="btn btn-default" target="_blank" >&nbsp;<i class="fa fa-question-circle" aria-hidden="true"></i></a>
+                           </center>
+                       </form>
 							</div>
                     	</div>
 					</div>

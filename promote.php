@@ -17,7 +17,7 @@
 include "dbconfig.php";
 include "include/function.php";
 $title_page = $lang['Promotysite'];
-        
+
         if(isset($_POST['le_submit'])){
 
            $le_name = $_POST['name'];
@@ -40,8 +40,8 @@ $title_page = $lang['Promotysite'];
            if(!isset($errMSG))
 		{
           if(isset($le_type) AND ($le_type =="L")){
-            $stms = $db_con->prepare("INSERT INTO `link` (uid,name,url,txt,clik)
-            VALUES(:uid,:a_da,:opm,:ptdk,0)");
+            $stms = $db_con->prepare("INSERT INTO `link` (uid,name,url,txt,clik,statu)
+            VALUES(:uid,:a_da,:opm,:ptdk,0,1)");
 			$stms->bindParam(":uid", $le_uid);
             $stms->bindParam(":opm", $le_url);
             $stms->bindParam(":a_da", $le_name);
@@ -51,8 +51,8 @@ $title_page = $lang['Promotysite'];
          	}
             }
           if(isset($le_type) AND ($le_type=="E")){
-            $stms = $db_con->prepare("INSERT INTO visits (uid,name,url,tims,vu)
-            VALUES(:uid,:a_da,:opm,:ptdk,0)");
+            $stms = $db_con->prepare("INSERT INTO visits (uid,name,url,tims,vu,statu)
+            VALUES(:uid,:a_da,:opm,:ptdk,0,1)");
 			$stms->bindParam(":uid", $le_uid);
             $stms->bindParam(":opm", $le_url);
             $stms->bindParam(":a_da", $le_name);
@@ -85,8 +85,8 @@ $title_page = $lang['Promotysite'];
            if(!isset($bnerrMSG))
 		{
 
-            $stmsb = $db_con->prepare("INSERT INTO banner (uid,name,url,img,px,vu)
-            VALUES(:uid,:a_da,:opm,:ptdk,:bn_px,0)");
+            $stmsb = $db_con->prepare("INSERT INTO banner (uid,name,url,img,px,vu,statu,clik)
+            VALUES(:uid,:a_da,:opm,:ptdk,:bn_px,0,1,0)");
 			$stmsb->bindParam(":uid", $bn_uid);
             $stmsb->bindParam(":opm", $bn_url);
             $stmsb->bindParam(":a_da", $bn_name);
@@ -112,6 +112,4 @@ $title_page = $lang['Promotysite'];
  }
  template_mine('footer');
 
-
 ?>
-

@@ -25,7 +25,7 @@ $wtcat=$rescat->fetch(PDO::FETCH_ASSOC);
 				<div class="modal-dialog modal-lg" role="document">
 					<div class="modal-content modal-info">
 						<div class="modal-header">
-                        <?php lang('w_new_tpc'); ?>
+                       <center> <h2><?php lang('w_new_tpc'); ?></h2> </center>
 							<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                         </div>
 						<div class="modal-body">
@@ -60,12 +60,14 @@ $wtcat=$rescat->fetch(PDO::FETCH_ASSOC);
                        </div>
                            <input type="hidden" name="s_type" value="2" />
                            <input type="hidden" name="set" value="Publish" />
+                           <center>
                            <button  type="submit" name="submit" value="Publish" class="btn btn-primary" >
-                              <?php lang('spread'); ?></button>
-                            <a href="<?php url_site();  ?>/post" class="btn btn-default" >&nbsp;<i class="fa fa-arrows-alt" aria-hidden="true"></i>&nbsp;</a>
-                           <button type="button" class="btn btn-default" data-dismiss="modal"><?php lang('close');  ?></button>
+                           <?php lang('spread'); ?></button>
+                           <a href="<?php url_site();  ?>/post" class="btn btn-default" >&nbsp;<i class="fa fa-arrows-alt" aria-hidden="true"></i>&nbsp;</a>
                            <a href="https://www.adstn.gq/kb/myads:Add a new Topic" class="btn btn-default" target="_blank" >&nbsp;<i class="fa fa-question-circle" aria-hidden="true"></i></a>
-                           </form>
+                           <button type="button" class="btn btn-default" data-dismiss="modal"><?php lang('close');  ?></button>
+                           </center>
+                       </form>
 							</div>
 						</div>
 					</div>

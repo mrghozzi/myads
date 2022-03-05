@@ -59,12 +59,15 @@ echo "<div class=\"modal fade\" id=\"ban{$wt['id']}\" tabindex=\"-1\" role=\"dia
 						</div>
 						<div class=\"modal-body\">
 							<div class=\"more-grids\">
-                                    <h3>Delete !</h3>
-									<p>Sure to Delete User \"{$wt['username']}\" ID no {$wt['id']} ? </p><br />
-                                    <center><a  href=\"{$url_site}/admincp?us_ban={$wt['id']}\" class=\"btn btn-danger\" >Delete</a></center>
-									  <button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Close</button
-
-							</div>
+                                    <center><h3>{$lang['delete']}&nbsp;!</h3></center>
+                                    <hr />
+									<center><h4>{$lang['aysywtd']} \"{$wt['username']}\"  ? </h4></center>
+                                    <hr />
+                                    <center>
+                                    <a  href=\"{$url_site}/admincp?us_ban={$wt['id']}\" class=\"btn btn-danger\" >{$lang['delete']}&nbsp;<i class=\"glyphicon glyphicon-trash\" aria-hidden=\"true\"></i></a>
+                                    <button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">{$lang['close']}</button>
+                                    </center>
+                            </div>
 						</div>
 					</div>
 				</div>

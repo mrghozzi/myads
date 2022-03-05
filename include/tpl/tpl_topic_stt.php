@@ -49,10 +49,9 @@ $namesher = strip_tags($namesher, '');
 $linksher =  "{$url_site}/t{$catdid}";
 $linksher = strip_tags($linksher, '');
 
-$comtxt = preg_replace('/[ˆ]+([A-Za-z0-9-_]+)/', '<b>$1</b>', $sucat['txt'] );
-$comtxt = preg_replace('/[~]+([A-Za-z0-9-_]+)/', '<i>$1</i>', $comtxt );
-$comtxt = preg_replace('/ #([^\s]+) /', '<a  href="'.$url_site.'/tag/$1" >#$1</a>', $comtxt );
-$comtxt = strip_tags($comtxt, '<br><iframe>');
+$comtxt = preg_replace('/ #([^\s]+)/', '<a  href="'.$url_site.'/tag/$1" >#$1</a>', $sucat['txt'] );
+$comtxt = strip_tags($comtxt, '<a><br><iframe>');
+
 $comtxt=substr($comtxt,0,480);
 if($sucat['uid']==$sutcat['uid']){
 $usecho = "";
@@ -413,12 +412,7 @@ echo "   </div> 	<div class=\"clearfix\"></div>
                            <button  type=\"submit\" name=\"submit\" value=\"edit\" class=\"btn btn-primary\" >
                               {$lang['spread']}</button>
                               <a href=\"{$url_site}/editor/{$sucat['id']}\" class=\"btn btn-default\" >&nbsp;<i class=\"fa fa-arrows-alt\" aria-hidden=\"true\"></i>&nbsp;</a>
-                            <button type=\"button\" class=\"btn btn-lg btn-default\" data-toggle=\"popover\" data-html=\"true\"
-title=\"<b>Variables when previewing text.</b>\"
-data-content=\"@text = <b>text</b> <p><span style='color:#A9A9A9'>// Bold</span></p><br />
-              $text = <s>text</s> <p><span style='color:#A9A9A9'>// Strikethrough</span></p><br />
-              #text = <i>text</i> <p><span style='color:#A9A9A9'>// Italic</span></p><br />
- \"><i class=\"fa fa-question-circle\" aria-hidden=\"true\"></i></button>
+                            
                            <button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">{$lang['close']}</button>
                            </form>
 							</div>
