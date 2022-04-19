@@ -1,27 +1,103 @@
 <?php if($s_st=="buyfgeufb"){  ?>
-    <div id="page-wrapper">
-			<div class="main-page">
-				<div class="sign-form">
-					<h4>Sign Up</h4>
-					<h5><strong>Create</strong> your account.</h5>
-					<form method="post"  action="register.php">
-                          <?php if(isset($_GET['bnerrMSG'])){  ?>
-                     <div class="alert alert-danger" role="alert"><?php echo $_GET['bnerrMSG'];  ?></div>
-                        <?php }  ?>
-						<input type="text" name="username" placeholder="Choose a username" required>
-						<input type="text" name="email" class="pass" placeholder="Email address" required>
-						<input type="password"  name="pass1" placeholder="Password" required>
-						<input type="password" name="pass2" class="pass" placeholder="Confirm password" required>
-						<button class="btn btn-info btn-block" name="submit" type="submit">Sign up</button>
-						<p class="center-block mg-t mg-b text-center">Already have an account?</p>
-							
-					</form>
+<div class="content-grid">
 
-					<a href="login.php" class="button1"><button class="btn btn-warning btn-block" type="submit">Login</button></a>
-                    <?php act_extensions("login_ext");  ?>
-                    <br />
-				</div>
-		</div>
-	</div>
+      <!-- FORM BOX -->
+      <div class="widget-box" >
+      <?php if(isset($_GET['bnerrMSG'])){  ?>
+      <div class="alert alert-danger" role="alert"><?php echo $_GET['bnerrMSG'];  ?></div>
+      <?php }  ?>
+        <!-- FORM BOX TITLE -->
+        <h2 class="form-box-title">Create your Account!</h2>
+        <!-- /FORM BOX TITLE -->
+
+        <!-- FORM -->
+        <form class="form" method="post"  action="register.php">
+          <div class="form-row">
+            <!-- FORM ITEM -->
+            <div class="form-item">
+              <!-- FORM INPUT -->
+              <div class="form-input">
+                <label for="register-email">Your Email</label>
+                <input type="text" id="register-email" name="email">
+              </div>
+              <!-- /FORM INPUT -->
+            </div>
+            <!-- /FORM ITEM -->
+          </div>
+          <!-- FORM ROW -->
+          <div class="form-row">
+            <!-- FORM ITEM -->
+            <div class="form-item">
+              <!-- FORM INPUT -->
+              <div class="form-input">
+                <label for="register-username">Username</label>
+                <input type="text" id="register-username" name="username">
+              </div>
+              <!-- /FORM INPUT -->
+            </div>
+            <!-- /FORM ITEM -->
+          </div>
+          <!-- /FORM ROW -->
+
+          <!-- FORM ROW -->
+          <div class="form-row">
+            <!-- FORM ITEM -->
+            <div class="form-item">
+              <!-- FORM INPUT -->
+              <div class="form-input">
+                <label for="register-password">Password</label>
+                <input type="password" id="register-password" name="pass1">
+              </div>
+              <!-- /FORM INPUT -->
+            </div>
+            <!-- /FORM ITEM -->
+          </div>
+          <!-- /FORM ROW -->
+
+          <!-- FORM ROW -->
+          <div class="form-row">
+            <!-- FORM ITEM -->
+            <div class="form-item">
+              <!-- FORM INPUT -->
+              <div class="form-input">
+                <label for="register-password-repeat">Repeat Password</label>
+                <input type="password" id="register-password" name="pass2">
+              </div>
+              <!-- /FORM INPUT -->
+            </div>
+            <!-- /FORM ITEM -->
+          </div>
+          <!-- /FORM ROW -->
+
+          <!-- FORM ROW -->
+          <div class="form-row">
+            <!-- FORM ITEM -->
+            <div class="form-item">
+              <!-- BUTTON -->
+              <button class="button medium secondary" name="submit" type="submit">Register Now!</button>
+              <!-- /BUTTON -->
+            </div>
+            <!-- /FORM ITEM -->
+          </div>
+          <!-- /FORM ROW -->
+        </form>
+        <!-- /FORM -->
+         <hr />
+        <!-- LINED TEXT -->
+        <p class="lined-text">Already have an account?</p>
+        <br />
+        <!-- /LINED TEXT -->
+        <button class="button medium tertiary"><a href="login.php" style="color: #fff;" >Login</a></button>
+        <hr />
+        <p class="lined-text">Login with your Social Account</p>
+        <!-- SOCIAL LINKS -->
+        <div class="social-links">
+          <?php act_extensions("login_ext");  ?>
+        </div>
+        <!-- /SOCIAL LINKS -->
+      </div>
+      <!-- /FORM BOX -->
+
+</div>
 	<!--typo-ends-->
 <?php }else{ echo"404"; }  ?>

@@ -14,7 +14,7 @@
 if($vrf_License=="65fgh4t8x5fe58v1rt8se9x"){
           // state List
    if(isset($_GET['state']))
-{
+{   $admin_page=1;
    if($_COOKIE['admin']==$hachadmin)
 {
 

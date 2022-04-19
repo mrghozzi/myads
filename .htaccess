@@ -19,6 +19,7 @@ RewriteRule ^following/([0-9.]+) user.php?fg=$1 [NC,L]
 RewriteRule ^tag/(.*) portal.php?tag=$1 [NC,L]
 RewriteRule ^cat/(.*) directory.php?cat=$1 [NC,L]
 RewriteRule ^site-(.*) directory.php?dir=$1 [NC,L]
+RewriteRule ^dr(.*) directory.php?s=$1 [NC,L]
 RewriteRule ^add-site.html directory.php?p=$1 [NC,L]
 RewriteRule ^t([0-9.]+) forum.php?t=$1 [NC,L]
 RewriteRule ^f([0-9.]+) forum.php?f=$1 [NC,L]
@@ -41,4 +42,11 @@ RewriteRule ^add_store store.php?add [NC,L]
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteCond %{REQUEST_FILENAME}.php -f
 RewriteRule ^(.*)$ $1.php
-ErrorDocument 404 https://www.adstn.gq/404
+ErrorDocument 401 default
+ErrorDocument 403 default
+ErrorDocument 404 default
+ErrorDocument 405 default
+ErrorDocument 406 default
+ErrorDocument 500 default
+ErrorDocument 501 default
+ErrorDocument 503 default

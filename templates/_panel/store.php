@@ -1,30 +1,108 @@
 <?php if($s_st=="buyfgeufb"){
 
  ?>
+   <!-- SECTION BANNER -->
+<div class="section-banner" style="background: url(<?php url_site();  ?>/templates/_panel/img/banner/Newsfeed.png) no-repeat 50%;" >
+      <!-- SECTION BANNER ICON -->
+      <img class="section-banner-icon" src="<?php url_site();  ?>/templates/_panel/img/banner/marketplace-icon.png" >
+      <!-- /SECTION BANNER ICON -->
 
+      <!-- SECTION BANNER TITLE -->
+      <p class="section-banner-title"><?php lang('Store'); ?></p>
+      <!-- /SECTION BANNER TITLE -->
 
+      <!-- SECTION BANNER TEXT -->
+      <p class="section-banner-text"><b><i class="fa fa-gift" aria-hidden="true"></i>&nbsp;Tout Points&nbsp;:&nbsp;<font color="#339966">
+        <?php   echo $uRow['pts'];   ?></font>&nbsp;<font face="Comic Sans MS">PTS</font></b></p>
+      <!-- /SECTION BANNER TEXT -->
+</div>
+    <!-- /SECTION BANNER -->
+<div class="section-header">
+      <!-- SECTION HEADER INFO -->
+      <div class="section-header-info">
+        <!-- SECTION PRETITLE -->
+        <p class="section-pretitle">Search what you want!</p>
+        <!-- /SECTION PRETITLE -->
 
-		<!-- main content start-->
-		<div id="page-wrapper">
-			<div class="main-page">
-				<!--grids-->
-				<div class="grids">
-                <?php  if(isset($_COOKIE['user'])){  ?>
-                <a href="<?php echo $url_site; ?>/add_store" class="btn btn-default" role="button"><i class="fa fa-plus" aria-hidden="true"></i>&nbsp;<?php lang('add_product');  ?></a><hr />
-                    <p><b><i class="fa fa-gift" aria-hidden="true"></i>&nbsp;Tout Points&nbsp;:&nbsp;<font color="#339966"><?php
-                         echo $uRow['pts'];   ?></font>&nbsp;<font face="Comic Sans MS">PTS</font></b>
-                         </p>
-                        <?php } ?>
-                        <hr />
-					<div class="progressbar-heading grids-heading">
-						<h2><i class="fa fa-shopping-cart" aria-hidden="true"></i>&nbsp;<?php lang('Store');  ?></h2>
+        <!-- SECTION TITLE -->
+        <h2 class="section-title">Market Categories</h2>
+        <!-- /SECTION TITLE -->
+      </div>
+      <!-- /SECTION HEADER INFO -->
+</div>
+<div class="grid grid-3-3-3 centered">
+      <!-- PRODUCT CATEGORY BOX -->
+      <a class="product-category-box category-all"  href="#" style="background: url(<?php url_site();  ?>/templates/_panel/img/banner/script.png) no-repeat 100% 0,linear-gradient(90deg,#615dfa,#8d7aff);">
+        <!-- PRODUCT CATEGORY BOX TITLE -->
+        <p class="product-category-box-title"><?php echo $lang['script']; ?></p>
+        <!-- /PRODUCT CATEGORY BOX TITLE -->
 
-                        <hr />
-                    </div>
+        <!-- PRODUCT CATEGORY BOX TEXT -->
+        <p class="product-category-box-text">...</p>
+        <!-- /PRODUCT CATEGORY BOX TEXT -->
 
-      <div class="row">
+        <!-- PRODUCT CATEGORY BOX TAG -->
+        <p class="product-category-box-tag">soon</p>
+        <!-- /PRODUCT CATEGORY BOX TAG -->
+      </a>
+      <!-- /PRODUCT CATEGORY BOX -->
 
-    <?php
+      <!-- PRODUCT CATEGORY BOX -->
+      <a class="product-category-box category-featured" href="#" style="background: url(<?php url_site();  ?>/templates/_panel/img/banner/templates.png) no-repeat 100% 0,linear-gradient(90deg,#417ae1,#5aafff);">
+        <!-- PRODUCT CATEGORY BOX TITLE -->
+        <p class="product-category-box-title"><?php echo $lang['templates']; ?></p>
+        <!-- /PRODUCT CATEGORY BOX TITLE -->
+
+        <!-- PRODUCT CATEGORY BOX TEXT -->
+        <p class="product-category-box-text">...</p>
+        <!-- /PRODUCT CATEGORY BOX TEXT -->
+
+        <!-- PRODUCT CATEGORY BOX TAG -->
+        <p class="product-category-box-tag">soon</p>
+        <!-- /PRODUCT CATEGORY BOX TAG -->
+      </a>
+      <!-- /PRODUCT CATEGORY BOX -->
+
+      <!-- PRODUCT CATEGORY BOX -->
+      <a class="product-category-box category-digital" href="#" style="background: url(<?php url_site();  ?>/templates/_panel/img/banner/plugins.png) no-repeat 100% 0,linear-gradient(90deg,#2ebfef,#4ce4ff);">
+        <!-- PRODUCT CATEGORY BOX TITLE -->
+        <p class="product-category-box-title"><?php echo $lang['plugins']; ?></p>
+        <!-- /PRODUCT CATEGORY BOX TITLE -->
+
+        <!-- PRODUCT CATEGORY BOX TEXT -->
+        <p class="product-category-box-text">...</p>
+        <!-- /PRODUCT CATEGORY BOX TEXT -->
+
+        <!-- PRODUCT CATEGORY BOX TAG -->
+        <p class="product-category-box-tag">soon</p>
+        <!-- /PRODUCT CATEGORY BOX TAG -->
+      </a>
+      <!-- /PRODUCT CATEGORY BOX -->
+
+</div>
+<div class="section-header">
+      <!-- SECTION HEADER INFO -->
+      <div class="section-header-info">
+        <!-- SECTION PRETITLE -->
+        <p class="section-pretitle">See what's new!</p>
+        <!-- /SECTION PRETITLE -->
+
+        <!-- SECTION TITLE -->
+        <h2 class="section-title">Latest Items</h2>
+        <!-- /SECTION TITLE -->
+      </div>
+      <!-- /SECTION HEADER INFO -->
+
+      <!-- SECTION HEADER ACTIONS -->
+      <div class="section-header-actions">
+        <!-- SECTION HEADER ACTION -->
+        <a class="button secondary" role="button" href="<?php echo $url_site; ?>/add_store">&nbsp;&nbsp;<i class="fa fa-plus" aria-hidden="true"></i>&nbsp;<?php lang('add_product');  ?>&nbsp;&nbsp;</a>
+        <!-- /SECTION HEADER ACTION -->
+      </div>
+      <!-- /SECTION HEADER ACTIONS -->
+</div>
+<div class="grid grid-3-3-3-3 centered">
+<?php
                  $errstor = 0;
                  $o_type = "store";
                  $stormt = $db_con->prepare("SELECT *  FROM options WHERE o_type=:o_type ORDER BY `id` " );
@@ -33,9 +111,9 @@
                  while($store=$stormt->fetch(PDO::FETCH_ASSOC) ) {
 
                  if(isset($store['o_order']) AND ($store['o_order']>0)){
-                   $storepts = $store['o_order']."&nbspPTS";
+                   $storepts = $store['o_order']."&nbsp;<span class=\"highlighted\">PTS</span>";
                  }else{
-                    $storepts = $lang['free'];
+                   $storepts = $lang['free'];
                  }
                  $o_parent = $store['o_parent'];
                  $catusen = $db_con->prepare("SELECT *  FROM users WHERE  id=:id ");
@@ -75,107 +153,76 @@
                  $stortyp=$stormy->fetch(PDO::FETCH_ASSOC);
                  $stortype = $stortyp['name'];
 
-                ?>
-  <div class="col-sm-6 col-md-4">
-    <div class="thumbnail">
-      <a href="<?php echo $url_site; ?>/producer/<?php echo $store['name']; ?>">
-      <img src="<?php echo $store['o_mode']; ?>" onerror="this.src='<?php echo $url_site;  ?>/templates/_panel/images/error_plug.png'" style="width: 280;height: 170;" ></a>
-      <div class="caption">
-        <h3><a href="<?php echo $url_site; ?>/producer/<?php echo $store['name']; ?>" style="color: black;" >
-        <?php echo $store['name']; ?>_<sub><?php echo $storefile['name'];  ?></sub>
-        <span class="badge badge-info"><font face="Comic Sans MS"><b><?php echo $storepts; ?>
-        </b></font></span>
-        <span class="badge badge-warning"><b><?php echo $lang["$stortype"]; ?>
-        </b></span></a></h3>
-        <?php echo "<a  href=\"{$url_site}/u/{$catussen['id']}\"   ><img class=\"imgu-bordered-sm\" src=\"{$url_site}/{$catussen['img']}\" align=\"left\" style=\"width: 35px;\" alt=\"{$catussen['username']}\">{$catussen['username']}";
-            online_us($catussen['id']);
-            check_us($catussen['id']);
-            echo "</a>  " ;  ?><hr />
-        <p><?php echo $store['o_valuer']; ?></p> <hr />
-        <p><?php if(isset($_COOKIE['user'])){ ?>
-        <a href="javascript:void(0);" data-toggle="modal" data-target="#Download<?php echo $store['id'];  ?>" class="btn btn-primary" role="button"><i class="fa fa-download"></i>&nbsp;<?php lang('download');  ?>&nbsp;<span class="badge badge-info"><font face="Comic Sans MS"><b><?php echo $contfils; ?></b><br></font></span></a>
-        <?php }else{ ?>
-        <a href="javascript:void(0);" data-toggle="modal" data-target="#Dlogin<?php echo $store['id'];  ?>" class="btn btn-primary" role="button"><i class="fa fa-download"></i>&nbsp;<?php lang('download');  ?>&nbsp;<span class="badge badge-info"><font face="Comic Sans MS"><b><?php echo $contfils; ?></b><br></font></span></a>
-        <?php     }  ?>
-        <a href="<?php echo $url_site; ?>/producer/<?php echo $store['name']; ?>" class="btn btn-default"  role="button"><i class="fa fa-info-circle"></i>&nbsp;Details</a>
-        </p>
-       </div>
-    </div>
-  </div>
-   <?php
+?>
+<div class="product-preview">
+        <!-- PRODUCT PREVIEW IMAGE -->
+        <a href="<?php echo $url_site; ?>/producer/<?php echo $store['name']; ?>">
+          <figure class="product-preview-image liquid" style="background: rgba(0, 0, 0, 0) url(<?php url_site();  ?>/templates/_panel/img/error_plug.png) no-repeat scroll center center / cover;">
+            <img src="<?php echo $store['o_mode']; ?>" alt="<?php echo $store['name']; ?>" style="display: none;">
+          </figure>
+        </a>
+        <!-- /PRODUCT PREVIEW IMAGE -->
+
+        <!-- PRODUCT PREVIEW INFO -->
+        <div class="product-preview-info">
+          <!-- TEXT STICKER -->
+          <p class="text-sticker"><?php echo $storepts; ?></p>
+          <!-- /TEXT STICKER -->
+
+          <!-- PRODUCT PREVIEW TITLE -->
+          <p class="product-preview-title"><a href="<?php echo $url_site; ?>/producer/<?php echo $store['name']; ?>"><?php echo $store['name']; ?></a></p>
+          <!-- /PRODUCT PREVIEW TITLE -->
+
+          <!-- PRODUCT PREVIEW CATEGORY -->
+          <p class="product-preview-category digital"><a href="#"><?php echo $lang["$stortype"]; ?></a></p>
+          <!-- /PRODUCT PREVIEW CATEGORY -->
+
+          <!-- PRODUCT PREVIEW TEXT -->
+          <p class="product-preview-text"><?php echo $store['o_valuer']; ?></p>
+          <!-- /PRODUCT PREVIEW TEXT -->
+        </div>
+        <!-- /PRODUCT PREVIEW INFO -->
+
+        <!-- PRODUCT PREVIEW META -->
+        <div class="product-preview-meta">
+          <!-- PRODUCT PREVIEW AUTHOR -->
+          <div class="product-preview-author">
+            <!-- PRODUCT PREVIEW AUTHOR IMAGE -->
+            <a class="product-preview-author-image user-avatar micro no-border" href="<?php echo "{$url_site}/u/{$catussen['id']}"; ?>">
+              <!-- USER AVATAR CONTENT -->
+              <div class="user-avatar-content">
+                <!-- HEXAGON -->
+                <div class="hexagon-image-18-20" data-src="<?php echo "{$url_site}/{$catussen['img']}"; ?>" style="width: 18px; height: 20px; position: relative;"><canvas style="position: absolute; top: 0px; left: 0px;" width="18" height="20"></canvas></div>
+                <!-- /HEXAGON -->
+              </div>
+              <!-- /USER AVATAR CONTENT -->
+            </a>
+            <!-- /PRODUCT PREVIEW AUTHOR IMAGE -->
+
+            <!-- PRODUCT PREVIEW AUTHOR TITLE -->
+            <p class="product-preview-author-title">Posted By</p>
+            <!-- /PRODUCT PREVIEW AUTHOR TITLE -->
+
+            <!-- PRODUCT PREVIEW AUTHOR TEXT -->
+            <p class="product-preview-author-text"><a href="<?php echo "{$url_site}/u/{$catussen['id']}"; ?>"><?php echo $catussen['username']; ?></a></p>
+            <!-- /PRODUCT PREVIEW AUTHOR TEXT -->
+          </div>
+          <!-- /PRODUCT PREVIEW AUTHOR -->
+
+          <!-- RATING LIST -->
+          <div class="rating-list">
+            <b><?php echo $storefile['name'];  ?></b>
+          </div>
+          <!-- /RATING LIST -->
+        </div>
+        <!-- /PRODUCT PREVIEW META -->
+      </div>
+<?php
    if(isset($store['o_order']) AND ($store['o_order']>0)){
                    $storeinfo = $store['o_order']."&nbspPTS";
                  }else{
                     $storeinfo = $lang['tpfree'];
                  }
-   echo " <!-- //modal Download {$store['id']} -->
-              <div class=\"modal fade\" id=\"Download{$store['id']}\" tabindex=\"-1\" role=\"dialog\">
-				<div class=\"modal-dialog\" role=\"document\">
-					<div class=\"modal-content modal-info\">
-						<div class=\"modal-header\">
-                        <i class=\"fa fa-info-circle\" aria-hidden=\"true\"></i>&nbsp;{$storeinfo}
-							<button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button>
-						</div>
-						<div class=\"modal-body\">
-							<div class=\"more-grids\">
-                                 <center>
-                                   <a onclick=\"ourl('{$sdf}');\" href=\"javascript:void(0);\" id=\"D{$store['id']}\" class=\"btn btn-success\" ><i class=\"fa fa-download\"></i>&nbsp;{$lang['download']}</a>
-                                   <button type=\"button\" class=\"btn btn-danger\" data-dismiss=\"modal\" aria-label=\"Close\"><span aria-hidden=\"true\"><i class=\"fa fa-times-circle\"></i>&nbsp;{$lang['close']}</span></button>
-                                    </center>
-                            <br />
-
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-           <script>
-     \$(\"document\").ready(function() {
-   \$(\"#D{$store['id']}\").click(postlike{$store['id']});
-
-});
-
-function postlike{$store['id']}(){
-    \$.ajax({
-        url : '$dir_lnk_hash',
-        data : {
-            test_like : \$(\"#lval\").val()
-        },
-        datatype : \"json\",
-        type : 'post',
-        success : function(result) {
-
-        },
-        error : function() {
-
-        }
-    });
-}
-   </script>
-	   <!-- //modal Download {$store['id']} -->";
-    echo " <!-- //modal Dlogin {$store['id']} -->
-              <div class=\"modal fade\" id=\"Dlogin{$store['id']}\" tabindex=\"-1\" role=\"dialog\">
-				<div class=\"modal-dialog\" role=\"document\">
-					<div class=\"modal-content modal-info\">
-						<div class=\"modal-header\">
-                        You do not have an account!
-							<button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button>
-						</div>
-						<div class=\"modal-body\">
-							<div class=\"more-grids\">
-                                 <center>
-                                   <a href=\"{$url_site}/login\" class=\"btn btn-success\" ><i class=\"fa fa-sign-in\"></i>{$lang['login']}</a>
-                        <a href=\"{$url_site}/register\" class=\"btn btn-danger\" ><i class=\"fa fa-user-plus\"></i>{$lang['sign_up']}</a>
-                                    </center>
-                            <br />
-
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-
-	   <!-- //modal Dlogin {$store['id']} -->";
      $errstor ++;
     }
     if(isset($errstor) AND ($errstor==0)){
@@ -185,23 +232,5 @@ function postlike{$store['id']}(){
     }
 
      ?>
-
-
 </div>
-
-
-
-
-
-
-
-  				</div>
-				<!--//grids-->
-
-			</div>
-		</div>
-
-
-
-
 <?php  }else{ echo "404"; }  ?>

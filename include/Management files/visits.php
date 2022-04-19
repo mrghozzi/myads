@@ -14,7 +14,7 @@
 if($vrf_License=="65fgh4t8x5fe58v1rt8se9x"){
       //  Visits ex List
    if(isset($_GET['v_list']))
-{
+{    $admin_page=1;
    if($_COOKIE['admin']==$hachadmin)
 {
 
@@ -42,8 +42,8 @@ echo "<tr>
   <td><a href=\"admincp?v_edit={$wt['id']}\" class='btn btn-success' ><i class=\"fa fa-edit \"></i></a>
   <a href=\"#\" data-toggle=\"modal\" data-target=\"#ban{$wt['id']}\" class='btn btn-danger' ><i class=\"fa fa-ban \"></i></a></td>
 </tr>";
-   echo "<div class=\"modal fade\" id=\"ban{$wt['id']}\" tabindex=\"-1\" role=\"dialog\">
-				<div class=\"modal-dialog\" role=\"document\">
+   echo "<div class=\"modal fade\" id=\"ban{$wt['id']}\" data-backdrop=\"\" tabindex=\"-1\" role=\"dialog\">
+				<div class=\"modal-dialog modal-dialog-centered\" role=\"document\">
 					<div class=\"modal-content modal-info\">
 						<div class=\"modal-header\">
 							<button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button>
@@ -91,9 +91,9 @@ echo "<tr>
  function bnr_echo($name) {  global  $bnRow;
   echo $bnRow["{$name}"];
  }
- $slctRow = $bnRow['tims'];
-
- if($_POST['ed_submit']){
+ $slctRow  = $bnRow['tims'];
+ $statuRow = $bnRow['statu'];
+ if(isset($_POST['ed_submit'])){
 
            $bn_name = $_POST['name'];
            $bn_url = $_POST['url'];

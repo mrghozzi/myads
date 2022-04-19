@@ -88,8 +88,8 @@ if($abplug['o_valuer']== "1"){
 </script>
 <?php  echo "
   <!-- //modal {$entry} -->
-              <div class=\"modal fade\" id=\"{$entry}\" tabindex=\"-1\" role=\"dialog\">
-				<div class=\"modal-dialog\" role=\"document\">
+              <div class=\"modal fade\" id=\"{$entry}\" data-backdrop=\"\" tabindex=\"-1\" role=\"dialog\">
+				<div class=\"modal-dialog modal-dialog-centered\" role=\"document\">
 					<div class=\"modal-content modal-info\">
 						<div class=\"modal-header\">
                         <b>";
@@ -132,7 +132,8 @@ if($c==2){
 {
  template_mine('404');
 }else{
- template_mine('admin_plugins');
+ template_mine('admin/admin_header');
+ template_mine('admin/admin_plugins');
  }
  template_mine('footer');
 

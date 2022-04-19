@@ -51,7 +51,7 @@ $stntfb = $db_con->prepare("UPDATE notif SET state=:state
     include_once('include/pagination.php');
     $page = (int)(!isset($_GET["page"]) ? 1 : $_GET["page"]);
 if ($page <= 0) $page = 1;
-$per_page = 9; // Records per page.
+$per_page = 15; // Records per page.
 $startpoint = ($page * $per_page) - $per_page;
 $statement = "`notif` WHERE uid='{$msgusid}' ORDER BY `time` DESC";
 $results = $db_con->prepare("SELECT  * FROM {$statement} LIMIT {$startpoint} , {$per_page} " );
@@ -65,16 +65,42 @@ $catusen->execute();
 $catussen=$catusen->fetch(PDO::FETCH_ASSOC);
 $time_cmt=convertTime($wt['time']);
  if($wt['state']=="1"){
-     echo "<tr class=\"active\" >";
+     $ntfread = "read";
+  }else if($wt['state']=="3"){
+     $ntfread = "unread";
   }else{
-     echo "<tr>";
+     $ntfread = "";
   }
-echo "<td>#{$wt['id']}</td>
-  <td><b><a href=\"{$url_site}/notif/{$wt['id']}\"><div class=\"user_img\"><img src=\"{$url_site}/templates/_panel/images/{$wt['logo']}\" alt=\"\"></div>{$wt['name']}</a></b></td>
-  <td><a href=\"{$url_site}/notif/{$wt['id']}\">{$time_cmt}</a></td>
-</tr>";
+echo "<div class=\"notification-box\">
+            <!-- USER STATUS -->
+            <div class=\"user-status notification\">
+              <!-- USER STATUS TITLE -->
+              <p class=\"user-status-title\"><a href=\"{$url_site}/notif/{$wt['id']}\">{$wt['name']}</a></p>
+              <!-- /USER STATUS TITLE -->
 
-   }echo pagination($statement,$per_page,$page);
+              <!-- USER STATUS TIMESTAMP -->
+              <p class=\"user-status-timestamp small-space\">{$time_cmt}</p>
+              <!-- /USER STATUS TIMESTAMP -->
+
+              <!-- USER STATUS ICON -->
+              <div class=\"user-status-icon\">
+                <!-- ICON COMMENT -->
+                <svg class=\"icon-{$wt['logo']}\">
+                  <use xlink:href=\"#svg-{$wt['logo']}\"></use>
+                </svg>
+                <!-- /ICON COMMENT -->
+              </div>
+              <!-- /USER STATUS ICON -->
+            </div>
+            <!-- /USER STATUS -->
+
+            <!-- MARK UNREAD BUTTON -->
+            <div class=\"mark-{$ntfread}-button\"></div>
+            <!-- /MARK UNREAD BUTTON -->
+</div>";
+
+   }$url=$url_site."/messages?ntf&";
+   echo pagination($statement,$per_page,$page,$url);
      }
    template_mine('header');
    template_mine('notification');

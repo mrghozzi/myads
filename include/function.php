@@ -2,7 +2,7 @@
 
 #####################################################################
 ##                                                                 ##
-##                        My ads v2.4.6                            ##
+##                        My ads v2.4.5                            ##
 ##                     http://www.krhost.ga                        ##
 ##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
@@ -52,6 +52,20 @@ $bads3 = $stads['code_ads'];
 }
 
 include "include/user_session.php";  //  user Session
+
+//  Mode (Light/Dark)
+ if (isset($_GET["light"])) {
+     $lg_md5 = time() + (365 * 24 * 60 * 60);
+     setcookie("modedark", "css", $lg_md5);
+     header('Location: ' . $_SERVER['HTTP_REFERER']);
+    } else if (isset($_GET["dark"])){
+      $lg_md5 = time() + (365 * 24 * 60 * 60);
+     setcookie("modedark", "css_d", $lg_md5);
+     header('Location: ' . $_SERVER['HTTP_REFERER']);
+        }
+    if (isset($_COOKIE['modedark'])) {
+      $c_mode=$_COOKIE['modedark'];
+       } else {  $c_mode="css";  }
 
 //  Language
  if (isset($_GET["en"])) {
@@ -149,42 +163,97 @@ function ntf_nbr($name) {   global $_SESSION ;  global $db_con ;  global $url_si
         $ant=$stmnt->fetch(PDO::FETCH_ASSOC);
         $net_n=$ant['nbr'];
         if($name=="vu"){ echo $net_n; }
-        if($name=="span"){ if($net_n==0){}else{ echo "<span class='badge blue'>{$net_n}</span>"; } }
+        if($name=="span"){ if($net_n==0){}else{ echo "<span class='badge badge-danger'>{$net_n}</span>"; } }
         if($name=="list"){ $msgusen = $db_con->prepare("SELECT *  FROM notif
-        WHERE time<'{$etime}' AND uid=:msgusid ORDER BY `time` DESC LIMIT 5");
+        WHERE time<'{$etime}' AND uid=:msgusid ORDER BY `time` DESC LIMIT 10");
         $msgusen->bindParam(":msgusid", $msgusid);
         $msgusen->execute();
  while($msgssen=$msgusen->fetch(PDO::FETCH_ASSOC)){
   $time_cmt=convertTime($msgssen['time']);
-  if(($msgssen['state']=="1") OR ($msgssen['state']=="3")){
-     echo "<li class=\"active\" >";
-  }else{
-     echo "<li>";
-  }
-  echo "<a href=\"{$url_site}/notif/{$msgssen['id']}\" >
-								 <div class=\"user_img\"><img src=\"{$url_site}/templates/_panel/images/{$msgssen['logo']}\" alt=\"\"></div>
-								 <div class=\"notification_desc\">
-									<p style=\"color: #FF0033\" >{$msgssen['name']}</p>
-									<p><span>{$time_cmt}</span></p>
-								</div>
-								 <div class=\"clearfix\"></div>
-								</a></li>";
-} }
+
+echo "
+              <!-- DROPDOWN BOX LIST ITEM -->
+              <div class=\"dropdown-box-list-item unread\">
+                <!-- USER STATUS -->
+                <div class=\"user-status notification\">
+                  <!-- USER STATUS TITLE -->
+                  <p class=\"user-status-title\"><a href=\"{$url_site}/notif/{$msgssen['id']}\" >{$msgssen['name']}</a></p>
+                  <!-- /USER STATUS TITLE -->
+
+                  <!-- USER STATUS TIMESTAMP -->
+                  <p class=\"user-status-timestamp\">{$time_cmt}</p>
+                  <!-- /USER STATUS TIMESTAMP -->
+
+                  <!-- USER STATUS ICON -->
+                  <div class=\"user-status-icon\">
+                    <!-- ICON COMMENT -->
+                    <svg class=\"icon-{$msgssen['logo']}\">
+                      <use xlink:href=\"#svg-{$msgssen['logo']}\"></use>
+                    </svg>
+                    <!-- /ICON COMMENT -->
+                  </div>
+                  <!-- /USER STATUS ICON -->
+                </div>
+                <!-- /USER STATUS -->
+              </div>
+              <!-- /DROPDOWN BOX LIST ITEM -->
+          ";
+}
+ }
         }
 
-
-// online
+// online all
 function online_admin()
 {
   global  $db_con ;
-$bn_online = time()-60;
+$bn_online = time()-240;
 $bncount = $db_con->prepare("SELECT  COUNT(id) as nbr FROM users WHERE online > :online ");
 $bncount->bindParam(":online", $bn_online);
 $bncount->execute();
 $abbn=$bncount->fetch(PDO::FETCH_ASSOC);
 $contbn= $abbn['nbr']; echo $contbn;
 }
-function online_us($id)
+
+// online user
+function online_us($id,$yesno = false)
+{
+  global  $db_con ;
+ $bn_online = time()-240;
+
+$bncount = $db_con->prepare("SELECT  * FROM users WHERE id = :id ");
+$bncount->bindParam(":id", $id);
+$bncount->execute();
+$abbn=$bncount->fetch(PDO::FETCH_ASSOC);
+if(isset($yesno) AND ($yesno==1)){
+if($abbn['online']>$bn_online){
+  echo "online";
+}else{
+  echo "offline";
+}
+}else{
+if($abbn['online']>$bn_online){
+  echo "online";
+}
+}
+}
+
+//  check_user
+function check_us($id,$yesno = false)
+{
+  global  $db_con ;
+$bncount = $db_con->prepare("SELECT  * FROM users WHERE id = :id ");
+$bncount->bindParam(":id", $id);
+$bncount->execute();
+$abbn=$bncount->fetch(PDO::FETCH_ASSOC);
+if(isset($yesno) AND ($yesno==1)){
+ return  $abbn['ucheck'];
+}else if($abbn['ucheck']=="1"){
+  echo "<i class=\"fa fa-fw fa-check-circle\" style=\"color: #0066CC;\" ></i>";
+}
+}
+
+// GET user
+function get_user($id,$name)
 {
   global  $db_con ;
  $bn_online = time()-60;
@@ -193,23 +262,10 @@ $bncount = $db_con->prepare("SELECT  * FROM users WHERE id = :id ");
 $bncount->bindParam(":id", $id);
 $bncount->execute();
 $abbn=$bncount->fetch(PDO::FETCH_ASSOC);
-if($abbn['online']>$bn_online){
-  echo "<i class=\"fa fa-fw fa-circle\" style=\"color: #00CC33;\" ></i>";
-}
+  echo $abbn["{$name}"];
 }
 
-//
-function check_us($id)
-{
-  global  $db_con ;
-$bncount = $db_con->prepare("SELECT  * FROM users WHERE id = :id ");
-$bncount->bindParam(":id", $id);
-$bncount->execute();
-$abbn=$bncount->fetch(PDO::FETCH_ASSOC);
-if($abbn['ucheck']=="1"){
-  echo "<i class=\"fa fa-fw fa-check-circle\" style=\"color: #0066CC;\" ></i>";
-}
-}
+// Referral
 if(isset($_GET['ref'])!=""){
  $refeid= $_GET['ref'];
  $nextWeekr = time() + (2 * 24 * 60 * 60);
@@ -224,6 +280,7 @@ $msg_alertl=$_SESSION['msgl'];
 if (isset($_COOKIE['user'])){
 $user_conect=$_COOKIE['user'];
 }
+
 function nev_menu() {    global  $stmut ; global $user_conect ; global $uRow ;  global $url_site;
 while($menu_tt=$stmut->fetch(PDO::FETCH_ASSOC)){
   $m_name=$menu_tt['name']; $m_dir=$menu_tt['dir']; echo "<li><a href='{$m_dir}' >{$m_name}</a></li>"; }
@@ -269,11 +326,11 @@ function mail_site() {    global  $mail_site ;  echo $mail_site;   }
 function ads_site($name) {    global  $db_con ;    $sads = $db_con->prepare("SELECT *  FROM ads WHERE id=:name "); $sads->bindParam(":name", $name); $sads->execute();  $stads=$sads->fetch(PDO::FETCH_ASSOC);
 $bads1 = $stads['code_ads']; echo $bads1;   }
 function social_site($s_media) {    global  $stt ;  echo $stt["{$s_media}"];   }
-function nbr_state($s_tabel) {    global  $db_con ;
+function nbr_state($s_tabel,$ret = false) {    global  $db_con ;
 $bncount = $db_con->prepare("SELECT  COUNT(id) as nbr FROM $s_tabel   " );
 $bncount->execute();
 $abbn=$bncount->fetch(PDO::FETCH_ASSOC);
-$contbn= $abbn['nbr']; echo $contbn;   }
+$contbn= $abbn['nbr'];  if(isset($ret) AND ($ret==1)){  return  $contbn;  }else{ echo $contbn;   }   }
 function admin_state($s_tabel) {    global  $db_con ;
 $bncount = $db_con->prepare("SELECT  COUNT(id) as nbr FROM state WHERE t_name=:s_tabel  " );
 $bncount->bindParam(":s_tabel", $s_tabel);
@@ -294,30 +351,51 @@ $bnsum->bindParam(":usrow", $usrow);
 $bnsum->execute();
 while($subn=$bnsum->fetch(PDO::FETCH_ASSOC))
 { $contbn+= $subn["{$tabl}"]; } if(isset($contbn)){ echo $contbn; }else{ echo "0"; }    }
+function last_state($s_tabel,$tabl,$ret = false) {    global  $db_con ;
+
+$bnsum = $db_con->prepare("SELECT  * FROM $s_tabel ORDER BY `id` DESC");
+$bnsum->execute();
+$subn=$bnsum->fetch(PDO::FETCH_ASSOC);
+if(isset($ret) AND ($ret==1)){
+ return  $subn["{$tabl}"];
+}else{
+echo $subn["{$tabl}"];   }  }
 function nbr_posts($usr) {    global  $db_con ;
 $bncount = $db_con->prepare("SELECT  COUNT(id) as nbr FROM status WHERE uid=:usrow  " );
 $bncount->bindParam(":usrow", $usr);
 $bncount->execute();
 $abbn=$bncount->fetch(PDO::FETCH_ASSOC);
 $contbn= $abbn['nbr']; echo $contbn;   }
-function nbr_follow($usr,$follow) {    global  $db_con ;
+function nbr_follow($usr,$follow,$ret = false) {    global  $db_con ;
 $bnfollow = $db_con->prepare("SELECT  COUNT(id) as nbr FROM `like` WHERE {$follow}=:usrow  AND type=1 " );
 $bnfollow->bindParam(":usrow", $usr);
 $bnfollow->execute();
 $abfollow=$bnfollow->fetch(PDO::FETCH_ASSOC);
-$contfollow= $abfollow['nbr']; echo $contfollow;   }
-function act_extensions($o_type) {    global  $db_con ;
+$contfollow= $abfollow['nbr']; if(isset($ret) AND ($ret==1)){  return  $contfollow;  }else{ echo $contfollow;   } }
+function nbr_follows($ret = false) {    global  $db_con ;
+$bnfollow = $db_con->prepare("SELECT  COUNT(id) as nbr FROM `like` WHERE type=1 " );
+$bnfollow->execute();
+$abfollow=$bnfollow->fetch(PDO::FETCH_ASSOC);
+$contfollow= $abfollow['nbr']; if(isset($ret) AND ($ret==1)){  return  $contfollow;  }else{ echo $contfollow;   } }
+function act_extensions($o_type) {    global  $db_con ;    // extensions
 $bnextensions = $db_con->prepare("SELECT  * FROM `options` WHERE o_type=:o_type ORDER BY `o_order` DESC " );
 $bnextensions->bindParam(":o_type", $o_type);
 $bnextensions->execute();
 while($abextensions=$bnextensions->fetch(PDO::FETCH_ASSOC)){  echo $abextensions['o_valuer'];   }  }
+function widgets($bn_plas) {    global  $db_con ;   global $s_st;      // widgets
+$o_type = "box_widget";
+$bnwidgets = $db_con->prepare("SELECT  * FROM `options` WHERE o_parent=:o_parent AND o_type=:o_type ORDER BY `o_order` DESC " );
+$bnwidgets->bindParam(":o_parent", $bn_plas);
+$bnwidgets->bindParam(":o_type", $o_type);
+$bnwidgets->execute();
+while($abwidgets=$bnwidgets->fetch(PDO::FETCH_ASSOC)){ $name =$abwidgets['o_mode'] ; $t = "templates/_panel/widgets";   include "$t/$name.php";   }  }
 function if_gstore($name)     {    global  $_SESSION    ; if(isset($_SESSION["{$name}"])){ echo $_SESSION["{$name}"];  unset($_SESSION["{$name}"]);  }    }
 function msg_Signup()         {    global  $msg_alertr ; if($msg_alertr){ echo $msg_alertr; session_destroy(); unset($_SESSION['msgr']); }    }
 function msg_Login()          {    global  $msg_alertl ; if($msg_alertl){ echo $msg_alertl; session_destroy(); unset($_SESSION['msgl']); }    }
 function header_template()    {    global  $template ;   global  $c_lang;   global  $s_st;  $t = "templates/$template";  include "$t/header.php";    }
 function footer_template()    {    global  $template ;   global  $s_st;  $t = "templates/$template";  include "$t/footer.php";    }
 function template($name)      {    global  $template ;   global  $s_st;  $t = "templates/$template";  include "$t/$name.php";     }
-function template_mine($name) {    global  $title_s  ;   global  $title_page ;  global  $db_con;  global  $_GET;   global $c_lang ; global $url_site; global $uRow ; global  $template ;  global $slctRow; global $s_st; global $f_awesome; global $hachadmin; global  $usrRow; global $username_topic; global $lang; global $_SESSION; global $versionRow; $t = "templates/_panel";  include "$t/$name.php";    }
+function template_mine($name) {    global  $title_s  ;   global  $title_page ;  global $description_page;  global $image_page;  global  $db_con;  global  $_GET;   global $c_lang ; global $c_mode; global $url_site; global $uRow ; global  $template ;  global $slctRow; global $statuRow; global $s_st; global $f_awesome; global $hachadmin; global  $usrRow; global $username_topic; global $lang; global $_SESSION; global $versionRow; $t = "templates/_panel";  include "$t/$name.php";    }
 function grid_mine($a,$b)     {    global  $template ;   global  $url_site;     global $uRow ;  $t = "?ref=".$uRow['id']; $code= "<!-- ADStn code begin --><a href=\"{$url_site}/{$t}\"><img src=\"{$url_site}/bnr/{$a}x{$b}.gif\" width=\"{$a}\" height=\"{$b}\" ></a><!-- ADStn code begin -->"; echo htmlspecialchars($code);    }
 function grid_bnr($a,$b)      {    global  $template ;   global  $url_site;     global $uRow ;  $t = "?ref=".$uRow['id']; $code= "<a href=\"{$url_site}/{$t}\"><img src=\"{$url_site}/bnr/{$a}x{$b}.gif\" width=\"{$a}\" height=\"{$b}\" ></a>"; echo $code;    }
 function bnr_mine($a,$b)      {    global  $template ;   global  $url_site;     global $uRow ;  $t = $uRow['id']; $code= "<!-- ADStn code begin --><script  language=\"javascript\" src=\"{$url_site}/bn.php?ID={$t}&px={$a}\"></script><!-- ADStn code begin -->"; echo htmlspecialchars($code);    }

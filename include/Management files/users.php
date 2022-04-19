@@ -22,7 +22,8 @@ if($vrf_License=="65fgh4t8x5fe58v1rt8se9x"){
 {
  template_mine('404');
 }else{
- template_mine('admin_users');
+ template_mine('admin/admin_header');
+ template_mine('admin/admin_users');
  }
  template_mine('footer');
 
@@ -153,7 +154,8 @@ $stausr->bindParam(":o_order", $id);
 {
  template_mine('404');
 }else{
- template_mine('admin_us_edit');
+ template_mine('admin/admin_header');
+ template_mine('admin/admin_us_edit');
  }
  template_mine('footer');
 

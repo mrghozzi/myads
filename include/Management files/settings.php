@@ -30,16 +30,16 @@ if($vrf_License=="65fgh4t8x5fe58v1rt8se9x"){
 
  if(isset($_POST['ed_submit'])){
 
-           $bn_name = $_POST['name'];
-           $bn_url = $_POST['url'];
-           $bn_desc = $_POST['desc'];
-           $bn_styles = $_POST['styles'];
-           $bn_lang = $_POST['lang'];
+           $bn_name     = $_POST['name'];
+           $bn_url      = $_POST['url'];
+           $bn_desc     = $_POST['desc'];
+           $bn_styles   = $_POST['styles'];
+           $bn_lang     = $_POST['lang'];
            $bn_timezone = $_POST['timezone'];
-           $bn_a_mail = $_POST['a_mail'];
-           $bn_facebook = $_POST['facebook'];
-           $bn_twitter = $_POST['twitter'];
-           $bn_linkedin = $_POST['linkedin'];
+           $bn_a_mail   = $_POST['a_mail'];
+           $bn_facebook = "#";
+           $bn_twitter  = "#";
+           $bn_linkedin = "#";
 
            if(empty($bn_name)){
 			$bnerrMSG = "Please Enter site name.";
@@ -93,7 +93,8 @@ if($vrf_License=="65fgh4t8x5fe58v1rt8se9x"){
 {
  template_mine('404');
 }else{
- template_mine('admin_settings');
+ template_mine('admin/admin_header');
+ template_mine('admin/admin_settings');
  }
  template_mine('footer');
 

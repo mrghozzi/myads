@@ -33,8 +33,8 @@ echo "
   <td><center><a href=\"#\" data-toggle=\"modal\" data-target=\"#ed{$wt['id']}\" class='btn btn-success' ><i class=\"fa fa-edit \"></i></a>
   <a href=\"#\" data-toggle=\"modal\" data-target=\"#ban{$wt['id']}\" class='btn btn-danger' ><i class=\"fa fa-ban \"></i></a></center></td>
 </tr>  ";
-echo "<div class=\"modal fade\" id=\"ed{$wt['id']}\" tabindex=\"-1\" role=\"dialog\">
-				<div class=\"modal-dialog\" role=\"document\">
+echo "<div class=\"modal fade\" id=\"ed{$wt['id']}\" data-backdrop=\"\" tabindex=\"-1\" role=\"dialog\">
+				<div class=\"modal-dialog modal-dialog-centered\" role=\"document\">
 					<div class=\"modal-content modal-info\">
 						<div class=\"modal-header\">
 							<button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button>
@@ -59,8 +59,8 @@ echo "<div class=\"modal fade\" id=\"ed{$wt['id']}\" tabindex=\"-1\" role=\"dial
 					</div>
 				</div>
 			</div>  </div>";
-   echo "<div class=\"modal fade\" id=\"ban{$wt['id']}\" tabindex=\"-1\" role=\"dialog\">
-				<div class=\"modal-dialog\" role=\"document\">
+   echo "<div class=\"modal fade\" id=\"ban{$wt['id']}\" data-backdrop=\"\" tabindex=\"-1\" role=\"dialog\">
+				<div class=\"modal-dialog modal-dialog-centered\" role=\"document\">
 					<div class=\"modal-content modal-info\">
 						<div class=\"modal-header\">
 							<button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button>
@@ -85,7 +85,8 @@ echo "<div class=\"modal fade\" id=\"ed{$wt['id']}\" tabindex=\"-1\" role=\"dial
 {
  template_mine('404');
 }else{
- template_mine('admin_emojis');
+ template_mine('admin/admin_header');
+ template_mine('admin/admin_emojis');
  }
  template_mine('footer');
 

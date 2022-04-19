@@ -1,28 +1,22 @@
 <?php if($s_st=="buyfgeufb"){  ?>
-		<div id="page-wrapper">
-			<div class="main-page">
-				<!--buttons-->
-				<div class="grids-section">
-					<h2 class="hdg">Notification</h2>
+<div class="account-hub-content">
+ <div class="section-header">
+          <!-- SECTION HEADER INFO -->
+          <div class="section-header-info">
+            <!-- SECTION PRETITLE -->
+            <p class="section-pretitle">My Profile</p>
+            <!-- /SECTION PRETITLE -->
 
-			<div class="clearfix"></div>
-			</div>
-            <div class="col-md-12 table-grid">
-                <div class="panel panel-widget">
-                 <table class="table table-hover">
-						<thead>
-							<tr>
-                              <th>#ID</th>
-							  <th></th>
-							  <th>Time</th>
-                            </tr>
-						</thead>
-						<tbody>
-                        <?php ntf_list();  ?>
-               </tbody>
-					</table>
-                </div>
-				</div> <div class="clearfix"></div>
-				</div>
-				</div>
+            <!-- SECTION TITLE -->
+            <h2 class="section-title">Notifications</h2>
+            <!-- /SECTION TITLE -->
+          </div>
+          <!-- /SECTION HEADER INFO -->
+
+ </div>
+ <div class="notification-box-list" >
+ <?php ntf_list();  ?>
+ </div>
+
+</div>
 <?php }else{ echo"404"; }  ?>

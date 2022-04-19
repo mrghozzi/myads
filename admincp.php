@@ -41,7 +41,8 @@ if(md5($conf_admin_log)==$_COOKIE['userha'])
 {
  template_mine('404');
 }else{
- template_mine('admin_home');
+ template_mine('admin/admin_header');
+ template_mine('admin/admin_home');
  }
  template_mine('footer');
 
@@ -52,7 +53,6 @@ if(md5($conf_admin_log)==$_COOKIE['userha'])
      // include files
   include "include/Management files/settings.php";   //settings
   include "include/Management files/menu.php";   //menu
-  include "include/Management files/advertisement.php";   //advertisement
   include "include/Management files/news.php";   //news
   include "include/Management files/state.php";   //state
   include "include/Management files/categories.php";   //categories
@@ -66,6 +66,7 @@ if(md5($conf_admin_log)==$_COOKIE['userha'])
   include "include/Management files/visits.php";  //visits
   include "include/Management files/banners.php";  //banners
   include "include/Management files/link.php";  //link
+  include "include/Management files/widgets.php";  //widgets
 
      // include DB
   $o_type = "Management_files";

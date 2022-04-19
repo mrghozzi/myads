@@ -35,8 +35,8 @@ echo "<form id=\"defaultForm\" method=\"post\" class=\"form-horizontal\" action=
 </tr>
 </form> ";
 echo "
- <div class=\"modal fade\" id=\"ed{$wt['id']}\" aria-labelledby=\"myLargeModalLabel\" tabindex=\"-1\" role=\"dialog\">
-				<div class=\"modal-dialog-lg\" role=\"document\">
+ <div class=\"modal fade\" id=\"ed{$wt['id']}\" aria-labelledby=\"myLargeModalLabel\" data-backdrop=\"\" tabindex=\"-1\" role=\"dialog\">
+				<div class=\"modal-dialog modal-dialog-centered\" role=\"document\">
 					<div class=\"modal-content modal-info\">
 						<div class=\"modal-header\">
 							<button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button>
@@ -89,8 +89,8 @@ echo "
 style: 'https://cdn.jsdelivr.net/npm/sceditor@3/minified/themes/content/default.min.css'
 });
 </script> ";
-   echo "<div class=\"modal fade\" id=\"ban{$wt['id']}\" tabindex=\"-1\" role=\"dialog\">
-				<div class=\"modal-dialog\" role=\"document\">
+   echo "<div class=\"modal fade\" id=\"ban{$wt['id']}\" data-backdrop=\"\" tabindex=\"-1\" role=\"dialog\">
+				<div class=\"modal-dialog modal-dialog-centered\" role=\"document\">
 					<div class=\"modal-content modal-info\">
 						<div class=\"modal-header\">
 							<button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button>
@@ -115,7 +115,8 @@ style: 'https://cdn.jsdelivr.net/npm/sceditor@3/minified/themes/content/default.
 {
  template_mine('404');
 }else{
- template_mine('admin_news');
+ template_mine('admin/admin_header');
+ template_mine('admin/admin_news');
  }
  template_mine('footer');
 

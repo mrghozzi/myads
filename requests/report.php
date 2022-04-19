@@ -19,11 +19,11 @@ include "../dbconfig.php";
     date_default_timezone_set('GMT');
 }
 if($vrf_License=="65fgh4t8x5fe58v1rt8se9x"){
-    if($_POST['submit']){
+    if($_GET['submit']){
            $admin_uid=1;
            $bn_txt = $_POST['txt'];
-           $bn_type = $_POST['s_type'];
-           $bn_tid = $_POST['tid'];
+           $bn_type = $_GET['s_type'];
+           $bn_tid = $_GET['tid'];
            session_start();
            if($_SESSION['user']>=1){
            $bn_uid = $_SESSION['user'];
@@ -42,7 +42,7 @@ if($vrf_License=="65fgh4t8x5fe58v1rt8se9x"){
             if($stmsb->execute()){
               $bn_name  = "Report abuse";
               $bn_nurl = "admincp?report";
-              $bn_logo  = "flag-icon.png";
+              $bn_logo  = "info";
               $bn_time = time();
               $bn_state = "1";
             $stmntf = $db_con->prepare("INSERT INTO notif (uid,name,nurl,logo,time,state)

@@ -35,6 +35,8 @@ if($wt['s_type']==1){
  $s_type ="forum";
 }else if($wt['s_type']==7867){
  $s_type ="forum";
+}else if($wt['s_type']==100){
+ $s_type ="forum";
 }else if($wt['s_type']==99){
  $s_type ="users";
 }
@@ -44,7 +46,7 @@ $rapruss=$rptus->fetch(PDO::FETCH_ASSOC);
 if($wt['uid']==0){
 $r_username = "<b><i class=\"fa fa-user\" aria-hidden=\"true\"></i>&nbsp;Guest</b>";
 }else{
-$r_username = "<b>{$rapruss['username']}</b>&nbsp;<a href=\"{$url_site}/message/{$rapruss['id']}\" class=\"btn btn-info\"><p class=\"fa fa-envelope\" aria-hidden=\"true\"></p></a>";
+$r_username = "<b>{$rapruss['username']}</b>&nbsp;<a href=\"{$url_site}/message/{$rapruss['id']}\" class=\"btn btn-info\"><i class=\"fa fa-envelope\" aria-hidden=\"true\"></i></a>";
 }
 $catusz = $db_con->prepare("SELECT *  FROM `{$s_type}` WHERE id=".$wt['tp_id'] );
 $catusz->execute();
@@ -61,17 +63,7 @@ $sutcat=$sttcatusz->fetch(PDO::FETCH_ASSOC);
  }
 echo "                        <td><center><b>{$wt['id']}</b></center></td>
                               <td><center>{$r_username}</center></td>
-                              <td><center><a href=\"#\" data-toggle=\"modal\" data-target=\"#report{$wt['id']}\" class=\"btn btn-warning\" ><i class=\"fa fa-eye\" aria-hidden=\"true\"></i> </a>
-     <!-- //modal report -->
-              <div class=\"modal fade\" id=\"report{$wt['id']}\" tabindex=\"-1\" role=\"dialog\">
-				<div class=\"modal-dialog\" role=\"document\">
-					<div class=\"modal-content modal-info\">
-						<div class=\"modal-header\">
-                        <b>{$s_type}</b>
-							<button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button>
-						</div>
-						<div class=\"modal-body\">
-							<div class=\"more-grids\">";
+                              <td><center><div class=\"grid grid-12\" ><div class=\"grid-column\" >";
 
  if($sutcat['s_type']==1){
  tpl_site_stt($sutcat,0);
@@ -88,25 +80,7 @@ echo "                        <td><center><b>{$wt['id']}</b></center></td>
  echo "<center><a href=\"{$url_site}/u/{$sucat['id']}\" class=\"btn btn-warning\"><i class=\"fa fa-user\" aria-hidden=\"true\"></i>&nbsp;{$sucat['username']}</a>&nbsp;";
   echo "<a href=\"{$url_site}/message/{$sucat['id']}\" class=\"btn btn-info\"><i class=\"fa fa-envelope\" aria-hidden=\"true\"></i>&nbsp;</a>&nbsp;";
   echo "<a href=\"{$url_site}/admincp?us_edit={$sucat['id']}\" class='btn btn-success' ><i class=\"fa fa-edit \"></i>&nbsp;</a>&nbsp;";
-  echo "<a href=\"#\" data-toggle=\"modal\" data-target=\"#ban{$sucat['id']}\" class='btn btn-danger' ><i class=\"fa fa-ban \"></i>&nbsp;</a>";
-  echo "<div class=\"modal fade\" id=\"ban{$sucat['id']}\" tabindex=\"-1\" role=\"dialog\">
-				<div class=\"modal-dialog\" role=\"document\">
-					<div class=\"modal-content modal-info\">
-						<div class=\"modal-header\">
-							<button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button>
-						</div>
-						<div class=\"modal-body\">
-							<div class=\"more-grids\">
-                                    <h3>Delete !</h3>
-									<p>Sure to Delete User \"{$sucat['username']}\" ID no {$sucat['id']} ? </p><br />
-                                    <center><a  href=\"{$url_site}/admincp?us_ban={$sucat['id']}\" class=\"btn btn-danger\" >Delete</a></center>
-									  <button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Close</button
-
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>  </div></center>"; }else{
+  echo "</center>"; }else{
             echo "<center><b>The reported content has been removed</b>1</center>";
 			}
 }else{
@@ -115,22 +89,15 @@ echo "                        <td><center><b>{$wt['id']}</b></center></td>
 
 						   echo "
                               <hr/>
-                              <h3>{$rapruss['username']}&nbsp;<a href=\"{$url_site}/message/{$rapruss['id']}\" class=\"btn btn-info\"><i class=\"fa fa-envelope\" aria-hidden=\"true\"></i></a></h3>
                               <p>{$wt['txt']}</p>
-                           </div><div class=\"clearfix\"></div>
-						</div>
-					</div>
-				</div>
-			</div>
-
-	   <!-- //modal report --></center></td>
+                           </center></td>
                               <td><center>";
              if($wt['statu']=="1"){
                               echo "<a href=\"{$url_site}/admincp?report&wtid={$wt['id']}\" class=\"btn btn-danger\">
                               <i class=\"fa fa-eye-slash\" aria-hidden=\"true\"></i>
                               </a>" ;
                                     }
-            echo "</center></td>
+            echo "</div></div></center></td>
 
 </tr>";
  }
@@ -152,7 +119,8 @@ echo "                        <td><center><b>{$wt['id']}</b></center></td>
 {
  template_mine('404');
 }else{
- template_mine('admin_report');
+ template_mine('admin/admin_header');
+ template_mine('admin/admin_report');
  }
  template_mine('footer');
 

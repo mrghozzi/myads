@@ -1,0 +1,177 @@
+/*--------------------------------
+    6. SECTION PAGER BAR WRAP
+--------------------------------*/
+
+.dataTable{
+border-radius: 10px;
+padding: 12px 24px;
+color: #000000;
+font-size: .75rem;
+font-weight: 700;
+cursor: pointer;
+white-space: nowrap;
+overflow: hidden;
+text-overflow: ellipsis;
+background-color: #fff;
+box-shadow: 0 0 40px 0 rgba(94,92,154,.06);
+margin-bottom: 6px;
+}
+
+.paginate_button{
+display: inline-block;
+height: 28px;
+width: 38px;
+border-radius: 10px;
+background-color: #615dfa;
+color: #fff;
+font-size: .875rem;
+font-weight: 700;
+text-align: center;
+line-height: 28px;
+cursor: pointer;
+transition: background-color .2s ease-in-out,color .2s ease-in-out,border-color .2s ease-in-out,box-shadow .2s ease-in-out;
+margin-right: 5px;
+}
+
+.paginate_button.current {
+
+background-color: #7289da;
+
+}
+
+.ellipsis{
+display: inline-block;
+height: 28px;
+width: 38px;
+border-radius: 10px;
+background-color: #2e2e47;
+color: #fff;
+font-size: .875rem;
+font-weight: 700;
+text-align: center;
+line-height: 28px;
+cursor: pointer;
+transition: background-color .2s ease-in-out,color .2s ease-in-out,border-color .2s ease-in-out,box-shadow .2s ease-in-out;
+margin-right: 5px;
+}
+
+.paginate_button.previous  {
+display: inline-block;
+height: 28px;
+width: 55px;
+border-radius: 10px;
+background-color: #2e2e47;
+color: #fff;
+font-size: .875rem;
+font-weight: 700;
+text-align: center;
+line-height: 28px;
+cursor: pointer;
+transition: background-color .2s ease-in-out,color .2s ease-in-out,border-color .2s ease-in-out,box-shadow .2s ease-in-out;
+margin-right: 5px;
+}
+
+.paginate_button.next  {
+display: inline-block;
+height: 28px;
+width: 55px;
+border-radius: 10px;
+background-color: #2e2e47;
+color: #fff;
+font-size: .875rem;
+font-weight: 700;
+text-align: center;
+line-height: 28px;
+cursor: pointer;
+transition: background-color .2s ease-in-out,color .2s ease-in-out,border-color .2s ease-in-out,box-shadow .2s ease-in-out;
+margin-right: 5px;
+}
+
+.dataTables_info {
+border-radius: 10px;
+padding: 6px 12px;
+color: #fff;
+font-size: .75rem;
+font-weight: 700;
+cursor: pointer;
+white-space: nowrap;
+overflow: hidden;
+text-overflow: ellipsis;
+background-color: #615dfa;
+margin-bottom: 6px;
+}
+
+.dataTables_filter{
+border-radius: 10px;
+padding: 12px 24px;
+color: #fff;
+font-size: .75rem;
+font-weight: 700;
+cursor: pointer;
+white-space: nowrap;
+overflow: hidden;
+text-overflow: ellipsis;
+background-color: #615dfa;
+margin-bottom: 6px;
+}
+
+.dataTables_filter label{
+
+padding: 0 6px;
+font-size: .75rem;
+top: -6px;
+left: 58px;
+color: #fff;
+font-size: 1rem;
+font-weight: 600;
+transition: all .3s ease-in-out;
+}
+
+.dataTables_filter input{
+border-radius: 5px;
+height: 28px;
+width: 38px;
+font-size: 1rem;
+font-weight: 700;
+background-color: #fff;
+border: 1px solid #dedeea;
+color: #3e3f5e;
+transition: border-color .2s ease-in-out;
+}
+
+.dataTables_length{
+border-radius: 10px;
+padding: 12px 24px;
+color: #fff;
+font-size: .75rem;
+font-weight: 700;
+cursor: pointer;
+white-space: nowrap;
+overflow: hidden;
+text-overflow: ellipsis;
+background-color: #615dfa;
+margin-bottom: 6px;
+}
+
+.dataTables_length label{
+
+padding: 0 6px;
+font-size: .75rem;
+top: -6px;
+left: 58px;
+color: #fff;
+font-size: 1rem;
+font-weight: 600;
+transition: all .3s ease-in-out;
+}
+.dataTables_length select{
+border-radius: 5px;
+height: 28px;
+width: 38px;
+font-size: 1rem;
+font-weight: 700;
+background-color: #fff;
+border: 1px solid #dedeea;
+color: #3e3f5e;
+transition: border-color .2s ease-in-out;
+}

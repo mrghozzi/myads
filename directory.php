@@ -97,6 +97,34 @@ $stmdr->bindParam(":ertb", $catdid);
  template_mine('header');
  template_mine('newdir');
  template_mine('footer');
+ }else if(isset($_GET['s'])){   // new site
+  $get_cat=$_GET['s'];
+  $catusz = $db_con->prepare("SELECT *  FROM `directory` WHERE statu=1 AND  id=".$_GET['s'] );
+  $catusz->execute();
+  $sucat=$catusz->fetch(PDO::FETCH_ASSOC);
+   $title_page = "Forum - ".$sucat['name'];
+   $description_page = strip_tags($sucat['txt'], '');
+   $catus = $db_con->prepare("SELECT *  FROM users WHERE  id='{$sucat['uid']}'");
+   $catus->execute();
+   $catuss=$catus->fetch(PDO::FETCH_ASSOC);
+   $username_topic = $catuss['username'] ;
+   $catdid=$sucat['id'];
+   $catdname=$sucat['name'];
+$catust = $db_con->prepare("SELECT * FROM status WHERE s_type IN (1) AND tp_id =".$catdid );
+$catust->execute();
+$susat=$catust->fetch(PDO::FETCH_ASSOC);
+
+     $title_page = $sucat['name']."&nbsp;-&nbsp;".$sucat['txt'];
+   template_mine('header');
+   tpl_site_stt($susat,0);
+ ?>
+<script>
+$(".comment_1_<?php echo $sucat['id']; ?>").load('<?php url_site();  ?>/templates/_panel/status/post_comment.php?s_type=1&tid=<?php echo $sucat['id']; ?>');
+$(".sh_comment_s<?php echo $susat['id']; ?>").addClass('active');
+</script>
+<?php
+   template_mine('footer');
+
  }else{                      //   ALL Categories
  $title_page = "Directory - ALL Categories";
  include_once('include/pagination.php');

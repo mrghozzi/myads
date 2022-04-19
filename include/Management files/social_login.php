@@ -34,12 +34,14 @@ echo "<form id=\"defaultForm\" method=\"post\" class=\"form-horizontal\" action=
   <td>{$wt['name']}</td>
   <td><input type=\"text\" class=\"form-control\" name=\"o_valuer\" value=\"{$wt['o_valuer']}\" autocomplete=\"off\" /></td>
   <td><input type=\"text\" class=\"form-control\" name=\"o_mode\" value=\"{$wt['o_mode']}\" autocomplete=\"off\" /></td>
-  <td><button type=\"submit\" name=\"ed_submit\" value=\"ed_submit\" class=\"btn btn-success\"><i class=\"fa fa-edit \"></i></button>
-  <a href=\"#\" data-toggle=\"modal\" data-target=\"#ban{$wt['id']}\" class='btn btn-danger' ><i class=\"fa fa-ban \"></i></a></td>
+  <td><div class=\"btn-group-vertical\">
+  <button type=\"submit\" name=\"ed_submit\" value=\"ed_submit\" class=\"btn btn-success\"><i class=\"fa fa-edit \"></i></button>
+  <a href=\"#\" data-toggle=\"modal\" data-target=\"#ban{$wt['id']}\" class='btn btn-danger' ><i class=\"fa fa-ban \"></i></a>
+  </div></td>
 </tr>
 </form> ";
-   echo "<div class=\"modal fade\" id=\"ban{$wt['id']}\" tabindex=\"-1\" role=\"dialog\">
-				<div class=\"modal-dialog\" role=\"document\">
+   echo "<div class=\"modal fade\" id=\"ban{$wt['id']}\" data-backdrop=\"\" tabindex=\"-1\" role=\"dialog\">
+				<div class=\"modal-dialog modal-dialog-centered\" role=\"document\">
 					<div class=\"modal-content modal-info\">
 						<div class=\"modal-header\">
 							<button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button>
@@ -49,7 +51,7 @@ echo "<form id=\"defaultForm\" method=\"post\" class=\"form-horizontal\" action=
                                     <h3>Delete !</h3>
 									<p>Sure to Delete ID no {$wt['id']} ? </p><br />
                                     <center><a  href=\"admincp?social_login_ban={$wt['id']}\" class=\"btn btn-danger\" >Delete</a></center>
-									  <button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Close</button
+									  <button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Close</button>
 
 							</div>
 						</div>
@@ -65,8 +67,10 @@ echo "<form id=\"defaultForm\" method=\"post\" class=\"form-horizontal\" action=
   <td>WASP</td>
   <td><input type=\"text\" class=\"form-control\" name=\"o_valuer\"    required/></td>
   <td><input type=\"text\" class=\"form-control\" name=\"o_mode\"   required/></td>
-  <td><button type=\"submit\" name=\"ed_submit\" value=\"ed_submit\" class=\"btn btn-info\"><i class=\"fa fa-plus \"></i></button>
-  <a href=\"https://www.adstn.gq/kb/myads:social_login:wasp\"  class='btn btn-warning' ><i class=\"fa fa-question-circle \"></i></a></td>
+  <td><div class=\"btn-group-vertical\">
+  <button type=\"submit\" name=\"ed_submit\" value=\"ed_submit\" class=\"btn btn-info\"><i class=\"fa fa-plus \"></i></button>
+  <a href=\"https://www.adstn.gq/kb/myads:social_login:wasp\"  class='btn btn-warning' ><i class=\"fa fa-question-circle \"></i></a>
+  </div></td>
 </tr>
 </form> ";
 
@@ -79,7 +83,8 @@ echo "<form id=\"defaultForm\" method=\"post\" class=\"form-horizontal\" action=
 {
  template_mine('404');
 }else{
- template_mine('admin_social_login');
+ template_mine('admin/admin_header');
+ template_mine('admin/admin_social_login');
  }
  template_mine('footer');
 
@@ -123,7 +128,7 @@ echo "<form id=\"defaultForm\" method=\"post\" class=\"form-horizontal\" action=
          	if($stmsb->execute()){
          	  $bn_x_type   = "login_ext";
               $bn_x_mode   = "{$bn_name}_login_ext";
-              $bn_x_valuer = "<a href=\"https://www.wasp.gq/oauth?app_id={$bn_o_valuer}\"><button class=\"btn btn-danger btn-block\" type=\"submit\">{$lang['connect_with']} {$bn_name}</button></a>";
+              $bn_x_valuer = "<a class=\"social-link discord\" href=\"https://www.wasp.gq/oauth?app_id={$bn_o_valuer}\"><img src=\"{$url_site}/templates/_panel/img/icons/wasp.png\" /></a>";
              $stmsbx = $db_con->prepare("UPDATE options SET o_valuer=:o_valuer
             WHERE ( o_type=:o_type AND o_mode=:o_mode ) ");
 			$stmsbx->bindParam(":o_valuer", $bn_x_valuer);
@@ -177,7 +182,7 @@ echo "<form id=\"defaultForm\" method=\"post\" class=\"form-horizontal\" action=
             if($stmsb->execute()){
               $bn_x_type   = "login_ext";
               $bn_x_mode   = "{$bn_name}_login_ext";
-              $bn_x_valuer = "<a href=\"https://www.wasp.gq/oauth?app_id={$bn_o_valuer}\"><button class=\"btn btn-danger btn-block\" type=\"submit\">{$lang['connect_with']} {$bn_name}</button></a>";
+              $bn_x_valuer = "<a class=\"social-link discord\" href=\"https://www.wasp.gq/oauth?app_id={$bn_o_valuer}\"><img src=\"{$url_site}/templates/_panel/img/icons/wasp.png\" /></a>";
            $stmsex = $db_con->prepare("INSERT INTO options (name,o_valuer,o_mode,o_type)
             VALUES(:name,:o_valuer,:o_mode,:o_type) ");
 			$stmsex->bindParam(":o_valuer", $bn_x_valuer);

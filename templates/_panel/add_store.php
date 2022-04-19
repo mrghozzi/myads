@@ -3,47 +3,69 @@
  ?>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sceditor@3/minified/themes/default.min.css" />
 <script src="https://cdn.jsdelivr.net/npm/sceditor@3/minified/sceditor.min.js"></script>
-   	<div id="page-wrapper">
-          <div class="main-page">
-     <div class="col-md-12 validation-grid">
-                        <h4><span><i class="fa fa-plus" aria-hidden="true"></i> </span>&nbsp;<?php lang('add_product');  ?></h4>
-						<div class="validation-grid1">
+    <!-- SECTION BANNER -->
+<div class="section-banner" style="background: url(<?php url_site();  ?>/templates/_panel/img/banner/Newsfeed.png) no-repeat 50%;" >
+      <!-- SECTION BANNER ICON -->
+      <img class="section-banner-icon" src="<?php url_site();  ?>/templates/_panel/img/banner/marketplace-icon.png" >
+      <!-- /SECTION BANNER ICON -->
 
-                       <section>
-                         <div class="valid-top2">
-								 <form id="addstore" method="post" class="form-horizontal" action="requests/add_product.php">
+      <!-- SECTION BANNER TITLE -->
+      <p class="section-banner-title"><span><i class="fa fa-cart-plus" aria-hidden="true"></i> </span>&nbsp;<?php lang('add_product');  ?></p>
+      <!-- /SECTION BANNER TITLE -->
 
-                        <div class="form-group">
-                            <label class="col-lg-3 control-label"><?php lang('titer');  ?></label>
-                            <div class="col-lg-5">
-
-          <?php if(isset($_SESSION['sname'])){  $sname="1"; } ?>
-                                <input type="text" class="form-control sname" name="name" value="<?php if_gstore('sname');  ?>" minlength="3" maxlength="35" pattern="^[-a-zA-Z0-9_]+$"  autocomplete="off" required />
-                               <div id="msg_name" >
-          <?php if(isset($sname) AND ($sname=="1")){ }else{    ?>
-                                <input type="txt" style="visibility:hidden" value="" name="vname"  required>
-                 <?php } ?>
-                                </div>
-                             </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="col-lg-3 control-label"><?php lang('desc');  ?> </label>
-                            <div class="col-lg-5">
-                                <input type="text" class="form-control" name="desc" value="<?php if_gstore('sdesc');  ?>" minlength="10" maxlength="240" autocomplete="off" required />
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label class="col-lg-3 control-label"><?php lang('Version_nbr');  ?> </label>
-                            <div class="col-lg-5">
-                                <input type="text" class="form-control" name="vnbr" value="<?php if_gstore('svnbr');  ?>" placeholder="<?php lang('version');  ?> | EX: v1.0" minlength="2" maxlength="10" pattern="^[-a-zA-Z0-9.]+$" autocomplete="off" required />
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="col-lg-3 control-label"><?php lang('cat');  ?> </label>
-                            <div class="col-lg-5" id="storecat">
-                                <?php
+      <!-- SECTION BANNER TEXT -->
+      <p class="section-banner-text"></p>
+      <!-- /SECTION BANNER TEXT -->
+</div>
+    <!-- /SECTION BANNER -->
+   <div class="grid grid">
+     <div class="widget-box no-padding">
+         <div class="widget-box-status">
+          <div class="widget-box-status-content" >
+           <form id="addstore" method="post" class="form-horizontal" action="requests/add_product.php" >
+             <div class="form-row" >
+               <div class="form-item">
+                    <!-- FORM INPUT -->
+                    <div class="form-input small">
+                      <label for="titer"><?php lang('titer');  ?></label>
+                      <input type="text" class="form-control sname" name="name" value="<?php if_gstore('sname');  ?>" minlength="3" maxlength="35" pattern="^[-a-zA-Z0-9_]+$" required >
+                      <?php if(isset($_SESSION['sname'])){  $sname="1"; } ?>
+                       <div id="msg_name" >
+                        <?php if(isset($sname) AND ($sname=="1")){ }else{    ?>
+                         <input type="txt" style="visibility:hidden" value="" name="vname"  required>
+                        <?php } ?>
+                       </div>
+                    </div>
+                    <!-- /FORM INPUT -->
+                  </div>
+             </div>
+             <div class="form-row" >
+               <div class="form-item">
+                    <!-- FORM INPUT -->
+                    <div class="form-input small active">
+                      <label for="desc"><?php lang('desc');  ?></label>
+                      <input type="text" class="form-control" name="desc" value="<?php if_gstore('sdesc');  ?>" minlength="10" maxlength="240" required >
+                    </div>
+                    <!-- /FORM INPUT -->
+                  </div>
+             </div>
+             <div class="form-row" >
+               <div class="form-item">
+                    <!-- FORM INPUT -->
+                    <div class="form-input small active">
+                      <label for="Version_nbr"><?php lang('Version_nbr');  ?></label>
+                      <input type="text" id="profile-name" name="vnbr" value="<?php if_gstore('svnbr');  ?>" placeholder="<?php lang('version');  ?> | EX: v1.0" minlength="2" maxlength="10" pattern="^[-a-zA-Z0-9.]+$" required >
+                    </div>
+                    <!-- /FORM INPUT -->
+                  </div>
+             </div>
+             <div class="form-row" >
+               <div class="form-item">
+                    <!-- FORM INPUT -->
+                    <div class="form-input small active">
+                      <label for="cat"><?php lang('cat');  ?></label>
+                      <div id="storecat" >
+                      <?php
                  $o_type = "storecat";
                  $setcats = $db_con->prepare("SELECT * FROM `options` WHERE `o_type` = :o_type  ");
                  $setcats->bindParam(":o_type", $o_type);
@@ -63,7 +85,9 @@
 
                  }  echo " </select> ";
                   }
-                  ?>    <script>
+                  ?>
+
+<script>
     $(document).ready(function(){
         $('#cat_s').change(function(){
           $("#storecat").html("<div class='progress'><div class='progress-bar progress-bar-striped active' role='progressbar' aria-valuenow='100' aria-valuemin='0' aria-valuemax='100' style='width:100%'> Uploading </div> </div> ");
@@ -84,55 +108,102 @@
 
         });
     });
-     </script>
-                            </div>
-                        </div>
-
-                        <div class="input-group">
-                        <label class="col-lg-3 control-label"><?php lang('topic');  ?> </label>
-                           <div class="col-lg-10">
-                       <textarea name="txt" id="editor1" class="form-control"  minlength="10" rows="15" placeholder="<?php lang('topic');  ?>" required><?php if_gstore('stxt');  ?></textarea>
-
-                              </div>
-                            </div>
-                        <div class="form-group">
-                            <label class="col-lg-3 control-label"><?php lang('file');  ?> </label>
-                            <div class="col-lg-5">
-                                <input type="file" class="form-control" style=" font-family: calibri; -webkit-border-radius: 5px; border: 1px dashed #fff; text-align: center; background-color: #8e44ad; cursor: pointer; color: #fff; " name="fzip" id="media" autocomplete="off"  />
-                                <br /><div class="result">
-                                <?php if(isset($_SESSION['slinkzip'])){  echo "<img src=\"{$url_site}/templates/_panel/images/zip.png\"  />&nbsp; ";
+</script>
+                    </div>
+                    </div>
+                    <!-- /FORM INPUT -->
+                  </div>
+             </div>
+             <div class="form-row" >
+               <div class="form-item">
+                    <!-- FORM INPUT -->
+                    <div class="form-input">
+                      <label for="profile-name"><?php lang('topic');  ?></label>
+                      <textarea name="txt" id="editor1"  rows="15" required><?php if_gstore('stxt');  ?></textarea>
+                    </div>
+                    <!-- /FORM INPUT -->
+                  </div>
+             </div>
+             <div class="form-row" >
+               <div class="form-item">
+                    <!-- FORM INPUT -->
+                    <div class="form-input small active">
+                      <label for="profile-name" style=" background-color: #8e44ad; color: #fff; "><?php lang('file');  ?></label>
+                      <input type="file" class="form-control" style=" font-family: calibri; -webkit-border-radius: 5px; border: 1px dashed #fff; text-align: center; background-color: #8e44ad; cursor: pointer; color: #fff; " accept=".zip" name="fzip" id="media" >
+                      <br />
+                       <div class="result">
+                        <?php if(isset($_SESSION['slinkzip'])){  echo "<img src=\"{$url_site}/templates/_panel/img/zip.png\"  />&nbsp; ";
                                 echo $_SESSION['slinkzip'];
                                 echo "<br />" ; }  ?>
-                                <input type="txt" style="visibility:hidden" value="<?php if_gstore('slinkzip');  ?>" name="linkzip" id="text" required>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="col-lg-3 control-label"><?php lang('img');  ?> </label>
-                            <div class="col-lg-5">
-                                <input type="url" class="form-control" name="img"  value="<?php if_gstore('simg');  ?>" placeholder="http(s)://" autocomplete="off" required />
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <div class="col-lg-9 col-lg-offset-3">
-                                <center><button type="submit" name="submit" id="button" value="Publish" class="btn btn-primary"><i class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp; <?php lang('save');  ?></button>
-                                <a href="https://www.adstn.gq/kb/myads:add_store" class="btn btn-default" target="_blank" >&nbsp;<i class="fa fa-question-circle" aria-hidden="true"></i></a></center>
-                            </div>
-                        </div>
-     <?php if(isset($_SESSION['snotvalid'])){ echo "<div class=\"alert alert-danger\" role=\"alert\"><strong><i class=\"fa fa-exclamation-triangle\" aria-hidden=\"true\"></i></strong>&nbsp; ";
-     if_gstore('snotvalid');
-     echo "</div>" ; }  ?>
+                        <input type="txt" style="visibility:hidden" value="<?php if_gstore('slinkzip');  ?>" name="linkzip" id="text" required>
+                       </div>
+                    </div>
+                    <!-- /FORM INPUT -->
+                  </div>
+             </div>
+             <div class="form-row" >
+               <div class="form-item">
+                    <!-- FORM INPUT -->
+               <div id="OpenImgUpload" class="upload-box">
+              <!-- UPLOAD BOX ICON -->
+              <svg class="upload-box-icon icon-photos">
+                <use xlink:href="#svg-photos"></use>
+              </svg>
+              <!-- /UPLOAD BOX ICON -->
 
-                    </form>
-                </div>
-            </section>
+              <!-- UPLOAD BOX TITLE -->
+              <p class="upload-box-title"><?php lang('upload');  ?></p>
+              <!-- /UPLOAD BOX TITLE -->
 
-							</div>
-				</div>
-   				</div>
-               <div class="clearfix"> </div>
+              <!-- UPLOAD BOX TEXT -->
+              <p class="upload-box-text"><?php lang('img');  ?></p>
+              <!-- /UPLOAD BOX TEXT -->
             </div>
-
+            <center><br /><div  id="showImgUpload" ><input type="txt" name="img" style="display:none" required></div></center>
+            <input type="file" id="imgupload" accept=".jpg, .jpeg, .png, .gif" style="display:none">
+                    <!-- /FORM INPUT -->
+                  </div>
+             </div>
+             <hr />
+             <div class="form-item split">
+               <!-- FORM SELECT -->
+               <a href="https://www.adstn.gq/kb/myads:store:update" class="button default" target="_blank" >&nbsp;<i class="fa fa-question-circle" aria-hidden="true"></i></a>
+               <!-- BUTTON -->
+               <button type="submit" name="submit" id="button" value="Publish" class="button primary"><i class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp; <?php lang('save');  ?></button>
+             </div>
+           </form>
+          </div>
+          <div class="widget-box-status-content" >
+           <?php if(isset($_SESSION['snotvalid'])){ echo "<div class=\"alert alert-danger\" role=\"alert\"><strong><i class=\"fa fa-exclamation-triangle\" aria-hidden=\"true\"></i></strong>&nbsp; ";
+            if_gstore('snotvalid');
+           echo "</div>" ; }  ?>
+           <hr />
+          </div>
+		 </div>
+	 </div>
+</div>
+<script>$('#OpenImgUpload').click(function(){ $('#imgupload').trigger('click'); });</script>
+<script>
+    $(document).ready(function(){
+        $('#imgupload').change(function(e){
+          $("#showImgUpload").html("<div class='progress'><div class='progress-bar progress-bar-striped active' role='progressbar' aria-valuenow='100' aria-valuemin='0' aria-valuemax='100' style='width:100%'> Uploading </div> </div> ");
+            var file = this.files[0];
+            var form = new FormData();
+            form.append('fimg', file);
+            $.ajax({
+                url : "<?php url_site();  ?>/requests/up_image.php",
+                type: "POST",
+                cache: false,
+                contentType: false,
+                processData: false,
+                data : form,
+                success: function(response){
+                    $('#showImgUpload').html(response)
+                }
+            });
+        });
+    });
+</script>
  <script>
     $(document).ready(function(){
         $('.sname').change(function(){

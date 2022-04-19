@@ -91,8 +91,15 @@ while($sutcat=$catsum->fetch(PDO::FETCH_ASSOC))
  $s_type ="forum";
 }else if($sutcat['s_type']==7867){
  $s_type ="forum";
+}else if($sutcat['s_type']==100){
+ $s_type ="forum";
 }
-if(($sutcat['s_type']==1) OR ($sutcat['s_type']==2) OR ($sutcat['s_type']==4) OR ($sutcat['s_type']==7867)){
+if(   ($sutcat['s_type']==1)
+   OR ($sutcat['s_type']==2)
+   OR ($sutcat['s_type']==4)
+   OR ($sutcat['s_type']==7867)
+   OR ($sutcat['s_type']==100)
+){
 $catusz = $db_con->prepare("SELECT *  FROM `{$s_type}` WHERE statu=1 AND  id=:tp_id ");
 $catusz->bindParam(":tp_id", $sutcat['tp_id']);
 $catusz->execute();
@@ -106,6 +113,8 @@ if($sucat['statu']=="1") {
  tpl_image_stt($sutcat,0);
 }else if($sutcat['s_type']==7867){
  tpl_store_stt($sutcat,0);
+}else if($sutcat['s_type']==100){
+ tpl_post_stt($sutcat,0);
 }
  }
   }
