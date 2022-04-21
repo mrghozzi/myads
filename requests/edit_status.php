@@ -2,7 +2,7 @@
 
 #####################################################################
 ##                                                                 ##
-##                        My ads v2.4.x                            ##
+##                         MYads  v3.x.x                           ##
 ##                     http://www.krhost.ga                        ##
 ##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
@@ -37,9 +37,6 @@ if($vrf_License=="65fgh4t8x5fe58v1rt8se9x"){
 if(isset($_SESSION['user']) OR (isset($_COOKIE['admin']) AND ($_COOKIE['admin']==$hachadmin))){
              if(isset($bn_type) AND ($bn_type==1)){
  $s_type ="directory";
- $bn_url  = $_POST['url'];
- $bn_tag  = $_POST['tag'];
- $bn_cat  = $_POST['categ'];
 }else if(isset($bn_type) AND ($bn_type==2)){
  $s_type ="forum";
  $bn_cat  = $_POST['categ'];
@@ -62,26 +59,13 @@ $sucat=$catusz->fetch(PDO::FETCH_ASSOC);
 
            }
       if($bn_type=="1"){
-            $stmsb = $db_con->prepare("UPDATE directory SET name=:name,url=:url,txt=:txt,metakeywords=:tag,cat=:cat
+            $stmsb = $db_con->prepare("UPDATE directory SET txt=:txt
             WHERE id=:id AND uid=:uid");
             $stmsb->bindParam(":uid",   $bn_uid);
-            $stmsb->bindParam(":name",  $bn_name);
-            $stmsb->bindParam(":url",   $bn_url);
             $stmsb->bindParam(":txt",   $bn_txt);
-            $stmsb->bindParam(":tag",   $bn_tag);
-            $stmsb->bindParam(":cat",   $bn_cat);
             $stmsb->bindParam(":id",    $bn_id);
             if($stmsb->execute()){
-            $dir_lnk_hash = hash('crc32', $bn_url.$bn_id );
-            $stmsbsh = $db_con->prepare("UPDATE short SET sho=:lnk_hash,url=:url
-            WHERE tp_id=:tp_id AND uid=:uid AND sh_type=:sh_type ");
-            $stmsbsh->bindParam(":uid", $bn_uid);
-            $stmsbsh->bindParam(":lnk_hash", $dir_lnk_hash);
-            $stmsbsh->bindParam(":url", $bn_url);
-            $stmsbsh->bindParam(":sh_type", $bn_type);
-            $stmsbsh->bindParam(":tp_id", $bn_id);
-            if($stmsbsh->execute()){
-            }
+
          	}
       }else if(($bn_type=="2") OR ($bn_type=="7867")){
 

@@ -271,8 +271,11 @@ style: 'https://cdn.jsdelivr.net/npm/sceditor@3/minified/themes/content/default.
                  $catusen->bindParam(":id",$o_parent );
                  $catusen->execute();
                  $catussen=$catusen->fetch(PDO::FETCH_ASSOC);
-
-                 $catdid=$store['o_parent'];
+                 $servictp = "store_type" ;
+                 $catustp = $db_con->prepare("SELECT *  FROM options WHERE  ( o_type='{$servictp}' AND o_parent='{$store['id']}' ) ");
+                 $catustp->execute();
+                 $catusstp=$catustp->fetch(PDO::FETCH_ASSOC);
+                 $catdid=$catusstp['o_order'];
                  $catust = $db_con->prepare("SELECT * FROM status WHERE s_type IN (7867) AND tp_id =".$catdid );
                  $catust->execute();
                  $susat=$catust->fetch(PDO::FETCH_ASSOC);

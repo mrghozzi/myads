@@ -2,7 +2,7 @@
 
 #####################################################################
 ##                                                                 ##
-##                        My ads v2.4.x                            ##
+##                        MYads  v3.0.0                            ##
 ##                     http://www.krhost.ga                        ##
 ##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
@@ -14,9 +14,9 @@
 if($s_st=="buyfgeufb"){
 
 //  MyAds Version
-$myads_generation  = "2";
-$myads_Version     = "4";
-$myads_Update      = "6";
+$myads_generation  = "3";
+$myads_Version     = "0";
+$myads_Update      = "0";
 $stversion = "{$myads_generation}.{$myads_Version}.{$myads_Update}";
 $o_type = "version" ;
 $name = "{$myads_generation}-{$myads_Version}-{$myads_Update}";

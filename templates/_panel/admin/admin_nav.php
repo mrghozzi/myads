@@ -16,10 +16,12 @@
     <p class="btn btn-light" ><i class="fa fa-paint-brush"></i>&nbsp;<?php lang('style'); ?></p>
     <a class="btn btn-dark" href="<?php url_site();  ?>/admincp?widgets"><i class="fa fa-th-large"></i> <?php lang('widgets'); ?></a>
     <a class="btn btn-dark" href="<?php url_site();  ?>/admincp?menu"><i class="fa fa-bars"></i> <?php lang('menu'); ?></a>
+    <a class="btn btn-dark" href="<?php url_site();  ?>/admincp?ads"><i class="fa fa-bullhorn"></i> <?php lang('e_ads'); ?></a>
     <a class="btn btn-dark" href="<?php url_site();  ?>/admincp?plug" ><i class="fa fa-plug"></i> Plugins</a>
     <p class="btn btn-light" ><i class="fa fa-cog"></i>&nbsp;<?php lang('options'); ?></p>
     <a class="btn btn-dark" href="<?php url_site();  ?>/admincp?settings"><?php lang('settings'); ?></a>
     <a class="btn btn-dark" href="<?php url_site();  ?>/admincp?social_login"><?php lang('social_login'); ?></a>
+    <a class="btn btn-dark" href="<?php url_site();  ?>/admincp?updates">Updates</a>
 
 </div>
 <?php }else{ echo"404"; }  ?>

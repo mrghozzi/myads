@@ -2,7 +2,7 @@
 
 #####################################################################
 ##                                                                 ##
-##                        My ads v2.4.x                            ##
+##                        MYads  v3.x.x                            ##
 ##                     http://www.krhost.ga                        ##
 ##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
@@ -126,7 +126,6 @@ $stausr->bindParam(":o_order", $id);
  $o_type = "user" ;
  $uid = $us_uid;
  $name = $bn_name;
- $o_mode = "0";
  $string = urlencode(mb_ereg_replace('\s+', '-', $us_slug));
  $string = str_replace(array(' '),array('-'),$string);
         $ostmsbs = $db_con->prepare("UPDATE `options` SET `name` = :name, `o_valuer` = :a_daf, `o_type` = :o_type WHERE `o_order` = :uid ");

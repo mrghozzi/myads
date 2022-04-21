@@ -2,7 +2,7 @@
 
 #####################################################################
 ##                                                                 ##
-##                        My ads v2.4.x                            ##
+##                         MYads  v3.x.x                           ##
 ##                     http://www.krhost.ga                        ##
 ##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
@@ -14,10 +14,10 @@
 
 include "../dbconfig.php";
  $stmt = $db_con->prepare("SELECT *  FROM setting   " );
-        $stmt->execute();
-        $ab=$stmt->fetch(PDO::FETCH_ASSOC);
-        $lng=$ab['lang'];
-        $url_site   = $ab['url'];
+ $stmt->execute();
+ $ab=$stmt->fetch(PDO::FETCH_ASSOC);
+ $lng=$ab['lang'];
+ $url_site   = $ab['url'];
 header('Content-type: text/html; charset=utf-8');
  if( ! ini_get('date.timezone') )
 {

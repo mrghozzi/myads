@@ -2,7 +2,7 @@
 
 #####################################################################
 ##                                                                 ##
-##                        My ads v2.4.x                            ##
+##                        MYads  v3.x.x                            ##
 ##                     http://www.krhost.ga                        ##
 ##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
@@ -67,6 +67,7 @@ if(md5($conf_admin_log)==$_COOKIE['userha'])
   include "include/Management files/banners.php";  //banners
   include "include/Management files/link.php";  //link
   include "include/Management files/widgets.php";  //widgets
+  include "include/Management files/advertisement.php";   //advertisement
 
      // include DB
   $o_type = "Management_files";

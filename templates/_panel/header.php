@@ -86,6 +86,8 @@ License URL: http://creativecommons.org/licenses/by/3.0/
       <?php template_mine('header/page_loader');  ?>
       <?php template_mine('header/nav');  ?>
       <?php template_mine('header/sidemenu');  ?>
+      <?php template_mine('header/desktop_sidebar');  ?>
+      <?php template_mine('header/mobile_sidebar');  ?>
       <?php template_mine('header/floaty_bar');  ?>
 
 <div class="content-grid">

@@ -1,13 +1,14 @@
 <?php if($s_st=="buyfgeufb"){  ?>
-		<div id="page-wrapper">
-			<div class="main-page">
-				<!--buttons-->
-				<div class="grids-section">
-					<center><h2 class="hdg">Updates MYads</h2></center>
-
-			<div class="clearfix"></div>
-			</div>
-            <div class="col-md-12 table-grid">
+<div class="grid grid-3-6-3 medium-space" >
+<div class="grid-column" >
+<?php template_mine('admin/admin_nav');  ?>
+</div>
+<div class="grid-column" >
+		  <!--buttons-->
+		  <div class="widget-box">
+			 <center><h2 class="hdg">Updates MYads</h2></center>
+          </div>
+          <div class="col-md-12 table-grid">
              <?php if(isset($_GET['bnerrMSG'])){  ?>
                      <div class="alert alert-danger alert-dismissible" role="alert">
                      <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
@@ -15,7 +16,7 @@
                      </div>
                         <?php }  ?>
                 <div class="panel panel-widget">
-                   <?php  
+                   <?php
                    $myads_last_time_updates = "https://www.adstn.gq/latest_version.txt";
                    $last_time_updates = @file_get_contents($myads_last_time_updates);
                     if($last_time_updates==$versionRow['o_valuer']){
@@ -25,7 +26,7 @@
                         .$lang['latest_version']
                         ."&nbsp;<a href=\"{$url_site}/admincp?updates\" ><i class=\"fa fa-refresh\"></i></a>
                         <br /><a><b>MyAds v{$last_time_updates}</b></a></h2></div></center>";
-                   }else{
+                   }else{      
                    $versionnow = $versionRow['name'];
                   echo "<center><div class=\"alert alert-info alert-dismissible\" role=\"alert\">
                         <button type=\"button\" class=\"close\" data-dismiss=\"alert\" aria-label=\"Close\">
@@ -46,7 +47,7 @@
                    }
                     ?>
 				</div>
-				</div><div class="clearfix"></div>
-				</div>
-				</div>
+		  </div>
+</div>
+</div>
 <?php }else{ echo"404"; }  ?>

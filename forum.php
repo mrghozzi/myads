@@ -2,7 +2,7 @@
 
 #####################################################################
 ##                                                                 ##
-##                        My ads v2.4.x                            ##
+##                        MYads  v3.x.x                            ##
 ##                     http://www.krhost.ga                        ##
 ##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
@@ -44,6 +44,7 @@ if($susat['s_type'] == 7867){
       $description_page = strip_tags($sucat['txt'], '');
      $title_page = $sucat['name']."&nbsp;-&nbsp;".$posttxt;
    template_mine('header');
+   ads_site(5);
    tpl_post_stt($susat,0);
    ?>
 <script>
@@ -62,6 +63,7 @@ $(".sh_comment_p<?php echo $susat['id']; ?>").addClass('active');
      $catussc=$catusc->fetch(PDO::FETCH_ASSOC);
      $image_page = $catussc['o_valuer'];
    template_mine('header');
+   ads_site(5);
    tpl_image_stt($susat,0);
    ?>
 <script>

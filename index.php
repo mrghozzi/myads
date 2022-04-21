@@ -2,7 +2,7 @@
 
 #####################################################################
 ##                                                                 ##
-##                        My ads v2.4.x                            ##
+##                        MYads  v3.x.x                            ##
 ##                     http://www.krhost.ga                        ##
 ##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
@@ -23,7 +23,6 @@ require "include/function.php";
 }else{
   template_mine('home');
 }
-
  template_mine('footer');
   }else{
   print  401 ;

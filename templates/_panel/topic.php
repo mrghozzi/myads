@@ -83,6 +83,7 @@ $comtxt = preg_replace('/ #([^\s]+) /', '<a  href="'.$url_site.'/tag/$1" >#$1</a
       <!-- /SECTION BANNER TEXT -->
 </div>
     <!-- /SECTION BANNER -->
+    <?php ads_site(5); ?>
 <div class="section-header">
       <!-- SECTION HEADER INFO -->
       <div class="section-header-info">

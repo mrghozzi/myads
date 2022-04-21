@@ -2,7 +2,7 @@
 
 #####################################################################
 ##                                                                 ##
-##                        My ads v2.4.x                            ##
+##                        MYads  v3.x.x                            ##
 ##                     http://www.krhost.ga                        ##
 ##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
@@ -25,7 +25,8 @@ if($vrf_License=="65fgh4t8x5fe58v1rt8se9x"){
 {
  template_mine('404');
 }else{
- template_mine('admin_updates');
+ template_mine('admin/admin_header');
+ template_mine('admin/admin_updates');
  }
  template_mine('footer');
 

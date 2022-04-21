@@ -2,7 +2,7 @@
 
 #####################################################################
 ##                                                                 ##
-##                        My ads v2.4.x                            ##
+##                        MYads  v3.x.x                            ##
 ##                     http://www.krhost.ga                        ##
 ##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
@@ -31,6 +31,18 @@ $stt_time_dw=time()-(7 * 24 * 60 * 60);
 
 if(isset($_GET['tag'] )){
 $tagkdsfh="#".$_GET['tag'];
+$statement = "`status`
+WHERE (
+ (  tp_id
+   IN( SELECT id  FROM `directory` WHERE txt LIKE '%{$tagkdsfh}%' AND statu=1   ) AND  s_type=1 )
+   OR
+ ( tp_id
+   IN(   SELECT id    FROM `forum`  WHERE txt LIKE '%{$tagkdsfh}%' AND statu=1  )
+   AND ( s_type=2 OR s_type=4 OR s_type=100 OR s_type=7867 ) )  )
+   AND date<={$stt_time_go}
+ORDER BY `date` DESC";
+}else if(isset($_GET['search'] )){
+$tagkdsfh = $_GET['search'];
 $statement = "`status`
 WHERE (
  (  tp_id

@@ -9,7 +9,7 @@
         <!-- BAR PROGRESS WRAP -->
         <div class="bar-progress-wrap">
           <!-- BAR PROGRESS INFO -->
-          <p class="bar-progress-info">soon </p>
+          <p class="bar-progress-info"><?php user_row('pts'); ?>&nbsp;PTS</p>
           <!-- /BAR PROGRESS INFO -->
         </div>
       </div>
@@ -22,12 +22,22 @@
       <!-- ACTION LIST -->
       <div class="action-list dark">
         <!-- ACTION LIST ITEM -->
+        <a class="action-list-item" href="<?php url_site();  ?>/portal">
+          <!-- ACTION LIST ITEM ICON -->
+          <svg class="action-list-item-icon icon-newsfeed">
+            <use xlink:href="#svg-newsfeed"></use>
+          </svg>
+          <!-- /ACTION LIST ITEM ICON -->
+        </a>
+        <!-- /ACTION LIST ITEM -->
+        <!-- ACTION LIST ITEM -->
         <a class="action-list-item" href="<?php url_site();  ?>/messages">
           <!-- ACTION LIST ITEM ICON -->
           <svg class="action-list-item-icon icon-messages">
             <use xlink:href="#svg-messages"></use>
           </svg>
           <!-- /ACTION LIST ITEM ICON -->
+          <?php msg_nbr('span');  ?>
         </a>
         <!-- /ACTION LIST ITEM -->
 
@@ -58,6 +68,19 @@
         </div>
         <!-- /ACTION ITEM -->
       </a>
+      <?php if(isset($_COOKIE['user']) && isset($_COOKIE['admin']) && ($_COOKIE['admin']==$hachadmin)  ){ ?>
+      <a class="action-item-wrap" href="<?php url_site();  ?>/admincp?home">
+        <!-- ACTION ITEM -->
+        <div class="action-item dark">
+          <!-- ACTION ITEM ICON -->
+          <svg class="action-item-icon icon-private">
+            <use xlink:href="#svg-private"></use>
+          </svg>
+          <!-- /ACTION ITEM ICON -->
+        </div>
+        <!-- /ACTION ITEM -->
+      </a>
+      <?php } ?>
       <!-- /ACTION ITEM WRAP -->
     </div>
     <!-- /BAR ACTIONS -->

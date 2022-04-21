@@ -2,7 +2,7 @@
 
 #####################################################################
 ##                                                                 ##
-##                        My ads v2.4.x                            ##
+##                        MYads  v3.x.x                            ##
 ##                     http://www.krhost.ga                        ##
 ##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
@@ -33,7 +33,7 @@ $sus=$usz->fetch(PDO::FETCH_ASSOC);
     $o_type = "user" ;
  $uid = $sus['id'];
   $name = $sus['username'];
-  $o_mode = "0";
+  $o_mode = "upload/cover.jpg";
    $string = urlencode(mb_ereg_replace('\s+', '-', $name));
    $string = str_replace(array(' '),array('-'),$string);
    $ostmsbs = $db_con->prepare(" INSERT INTO options  (name,o_valuer,o_type,o_parent,o_order,o_mode)
@@ -64,8 +64,13 @@ $string = urlencode(mb_ereg_replace('\s+', '-', $_GET['u']));
 
 $stausr = $db_con->prepare("SELECT * FROM `options` WHERE `o_type` = 'user' AND `o_valuer` LIKE :o_valuer ");
 $stausr->bindParam(":o_valuer", $string);
- $stausr->execute();
- $usrRow=$stausr->fetch(PDO::FETCH_ASSOC);
+$stausr->execute();
+$usrRow=$stausr->fetch(PDO::FETCH_ASSOC);
+ if($usrRow['o_mode']=="0"){
+   $us_cover = $url_site."/upload/cover.jpg";
+ }else{
+   $us_cover = $url_site."/".$usrRow['o_mode'];
+ }
 $guser_id = $usrRow['o_order'];
 $statement = "`status` WHERE uid='{$guser_id}' AND date<={$stt_time_go} ORDER BY `date` DESC";
 $catsum = $db_con->prepare("SELECT  * FROM {$statement} LIMIT {$startpoint} , {$per_page} " );
@@ -136,19 +141,30 @@ $usz->execute();
 $sus=$usz->fetch(PDO::FETCH_ASSOC);
  $title_page = $sus['username']." - ".$lang['e_profile'] ;
 template_mine('header');
- template_mine('user_edit');
+ template_mine('user_settings/user_edit');
  template_mine('footer');
  }else if(isset($_GET['p'])AND isset($_COOKIE['user']) AND ($_GET['p']==$_COOKIE['user'])){
-  $usz = $db_con->prepare("SELECT *  FROM `users` WHERE id=:u_id");
+$usz = $db_con->prepare("SELECT *  FROM `users` WHERE id=:u_id");
 $usz->bindParam(":u_id", $_GET['p']);
 $usz->execute();
 $sus=$usz->fetch(PDO::FETCH_ASSOC);
+$string = $sus['id'];
+
+$stausr = $db_con->prepare("SELECT * FROM `options` WHERE `o_type` = 'user' AND `o_order`=:o_order ");
+$stausr->bindParam(":o_order", $string);
+$stausr->execute();
+$usrRow=$stausr->fetch(PDO::FETCH_ASSOC);
+ if($usrRow['o_mode']=="0"){
+   $us_cover = $url_site."/upload/cover.jpg";
+ }else{
+   $us_cover = $url_site."/".$usrRow['o_mode'];
+ }
  $title_page = $sus['username']." - ".$lang['edit'] ;
 template_mine('header');
- template_mine('user_edit');
+ template_mine('user_settings/user_photo');
  template_mine('footer');
  }else if((int)isset($_GET['fl'])){
-  $usz = $db_con->prepare("SELECT *  FROM `users` WHERE id=:u_id");
+$usz = $db_con->prepare("SELECT *  FROM `users` WHERE id=:u_id");
 $usz->bindParam(":u_id", $_GET['fl']);
 $usz->execute();
 $sus=$usz->fetch(PDO::FETCH_ASSOC);
@@ -164,6 +180,15 @@ $sus=$usz->fetch(PDO::FETCH_ASSOC);
  $title_page = $sus['username']." - Following" ;
   template_mine('header');
  template_mine('follow');
+ template_mine('footer');
+ }else if((int)isset($_GET['o'])){
+$usz = $db_con->prepare("SELECT *  FROM `users` WHERE id=:u_id");
+$usz->bindParam(":u_id", $_GET['o']);
+$usz->execute();
+$sus=$usz->fetch(PDO::FETCH_ASSOC);
+ $title_page = $sus['username']." - ".$lang['options'] ;
+  template_mine('header');
+ template_mine('user_settings/user_options');
  template_mine('footer');
  }else{
  template_mine('header');

@@ -2,7 +2,7 @@
 
 #####################################################################
 ##                                                                 ##
-##                        My ads v2.4.x                            ##
+##                         MYads  v3.x.x                           ##
 ##                     http://www.krhost.ga                        ##
 ##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
@@ -69,11 +69,29 @@ echo "<p style=\"color: #ff0000f7;-webkit-border-radius: 5px;border: 1px dashed 
 {
 echo "<p style=\"color: #ff0000f7;-webkit-border-radius: 5px;border: 1px dashed #f00;\">{$lang['invalidfile']}</p><input type=\"txt\" style=\"visibility:hidden\" name=\"img\" value=\"\" id=\"text\" required>";
 }else{
-  $bn_zip="{$url_site}/upload/" . $filename;
+  if(isset($_GET['avatar']) AND ($_GET['avatar']=="1")){
+    $bn_zip="upload/" . $filename;
+  }else if(isset($_GET['cover']) AND ($_GET['cover']=="1")){
+    $bn_zip="upload/" . $filename;
+  }else{
+    $bn_zip="{$url_site}/upload/" . $filename;
+  }
   $zipname =$_FILES["fimg"]["name"];
   move_uploaded_file($_FILES["fimg"]["tmp_name"],$destination);
-  echo "<img src=\"{$bn_zip}\"  /><br />" ;
-  echo "<input type=\"txt\" name=\"img\" style=\"visibility:hidden\" value=\"{$bn_zip}\">";
+  if(isset($_GET['avatar']) AND ($_GET['avatar']=="1")){
+    echo "<input type=\"hidden\" name=\"av_type\" value=\"1\" />" ;
+    echo "<input type=\"txt\" name=\"img\" style=\"visibility:hidden\" value=\"{$bn_zip}\">";
+    echo "<input type=\"submit\" name=\"submit\" value=\"{$lang['save']}\" class=\"btn btn-info\" /><br />";
+    echo "<img src=\"{$url_site}/{$bn_zip}\" width=\"480\"  />" ;
+  }else if(isset($_GET['cover']) AND ($_GET['cover']=="1")){
+    echo "<input type=\"hidden\" name=\"av_type\" value=\"2\" />" ;
+    echo "<input type=\"txt\" name=\"img\" style=\"visibility:hidden\" value=\"{$bn_zip}\">";
+    echo "<input type=\"submit\" name=\"submit\" value=\"{$lang['save']}\" class=\"btn btn-info\" /><br />";
+    echo "<img src=\"{$url_site}/{$bn_zip}\" width=\"480\"  />" ;
+  }else{
+    echo "<img src=\"{$bn_zip}\"  /><br />" ;
+    echo "<input type=\"txt\" name=\"img\" style=\"visibility:hidden\" value=\"{$bn_zip}\">";
+  }
 
 }
 

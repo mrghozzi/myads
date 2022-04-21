@@ -2,7 +2,7 @@
 
 #####################################################################
 ##                                                                 ##
-##                        My ads v2.4.5                            ##
+##                        MYads  v3.0.0                            ##
 ##                     http://www.krhost.ga                        ##
 ##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
@@ -36,9 +36,6 @@ $s_st="buyfgeufb";
  function myads_version()         {    global  $versionRow ; if(isset($versionRow['o_valuer'])){ echo $versionRow['o_valuer']; }    }
  function myads_fversion()        {    global  $versionRow ; if(isset($versionRow['name'])){ echo $versionRow['name'];         }    }
 
- // menu
-$stmut = $db_con->prepare("SELECT *  FROM menu   " );
-$stmut->execute();
 
 // ads
 $sads = $db_con->prepare("SELECT *  FROM ads WHERE id=3" );
@@ -126,7 +123,7 @@ $mstmt = $db_con->prepare("SELECT  COUNT(id_msg) as nbr FROM messages WHERE stat
         $amsg=$mstmt->fetch(PDO::FETCH_ASSOC);
         $msg_n=$amsg['nbr'];
         if($name=="vu"){ echo $msg_n; }
-        if($name=="span"){ if($msg_n==0){}else{ echo "<span class='badge'>{$msg_n}</span>"; } }
+        if($name=="span"){ if($msg_n==0){}else{ echo "<span class='badge badge-danger'>{$msg_n}</span>"; } }
         if($name=="list"){ $msgusen = $db_con->prepare("SELECT *  FROM messages
         WHERE us_rec=:msgusid ORDER BY `time` DESC LIMIT 5");
 $msgusen->bindParam(":msgusid", $msgusid);
@@ -137,19 +134,46 @@ $catusen->bindParam(":us_env", $msgssen['us_env']);
 $catusen->execute();
 $catussen=$catusen->fetch(PDO::FETCH_ASSOC);
 $time_cmt=convertTime($msgssen['time']);
-  if($msgssen['state']=="1"){
-     echo "<li class=\"active\" >";
-  }else{
-     echo "<li>";
-  }
-  echo "<a href=\"{$url_site}/message/{$msgssen['us_env']}\" >
-								 <div class=\"user_img\"><img class=\"imgu-bordered-sm\" src=\"{$url_site}/{$catussen['img']}\" alt=\"\"></div>
-								 <div class=\"notification_desc\">
-									<p style=\"color: #FF0033\" >{$catussen['username']}</p>
-									<p><span>{$time_cmt}</span></p>
-								</div>
-								 <div class=\"clearfix\"></div>
-								</a></li>";
+
+echo "               <!-- DROPDOWN BOX LIST ITEM -->
+              <a class=\"dropdown-box-list-item \" href=\"{$url_site}/message/{$msgssen['us_env']}\">
+                <!-- USER STATUS -->
+                <div class=\"user-status\">
+                  <!-- USER STATUS AVATAR -->
+                  <div class=\"user-status-avatar\">
+                    <!-- USER AVATAR -->
+                    <div class=\"user-avatar small no-outline\">
+                      <!-- USER AVATAR CONTENT -->
+                      <div class=\"user-avatar-content\">
+                        <!-- HEXAGON -->
+                        <div class=\"hexagon-image-30-32\" data-src=\"{$url_site}/{$catussen['img']}\"></div>
+                        <!-- /HEXAGON -->
+                      </div>
+                      <!-- /USER AVATAR CONTENT -->
+                      <!-- USER AVATAR PROGRESS BORDER -->
+                      <div class=\"user-avatar-progress-border\">
+                        <!-- HEXAGON -->
+                        <div class=\"hexagon-border-40-44\"></div>
+                        <!-- /HEXAGON -->
+                      </div>
+                      <!-- /USER AVATAR PROGRESS BORDER -->
+
+                    </div>
+                    <!-- /USER AVATAR -->
+                  </div>
+                  <!-- /USER STATUS AVATAR -->
+
+                  <!-- USER STATUS TITLE -->
+                  <p class=\"user-status-title\"><span class=\"bold\">{$catussen['username']}</span></p>
+                  <!-- /USER STATUS TITLE -->
+
+                 <!-- USER STATUS TIMESTAMP -->
+                  <p class=\"user-status-timestamp floaty\">{$time_cmt}</p>
+                  <!-- /USER STATUS TIMESTAMP -->
+                </div>
+                <!-- /USER STATUS -->
+              </a>
+              <!-- /DROPDOWN BOX LIST ITEM -->";
 } }
         }
 //  notif   COUNT
@@ -281,11 +305,21 @@ if (isset($_COOKIE['user'])){
 $user_conect=$_COOKIE['user'];
 }
 
-function nev_menu() {    global  $stmut ; global $user_conect ; global $uRow ;  global $url_site;
+function nev_menu() {   global $user_conect ; global $uRow ;  global $url_site; global $db_con;
+$stmut = $db_con->prepare("SELECT *  FROM menu   " );   $stmut->execute();
 while($menu_tt=$stmut->fetch(PDO::FETCH_ASSOC)){
-  $m_name=$menu_tt['name']; $m_dir=$menu_tt['dir']; echo "<li><a href='{$m_dir}' >{$m_name}</a></li>"; }
-  if($user_conect){ echo "<li><a href='{$url_site}/home' >Dashboard</a></li><li><a href='{$url_site}/u/{$uRow['id']}' >{$uRow['username']}</a></li>"."<li><a href='{$url_site}/logout?logout' >Logout</a></li>"; }
-  else{  echo "<li><a href='{$url_site}/login' >Login</a></li>"."<li><a href='{$url_site}/register' >Signup</a></li>"; }    }
+  $m_name=$menu_tt['name']; $m_dir=$menu_tt['dir']; echo "<li class='menu-item'><a class='menu-item-link text-tooltip-tfr' href='{$m_dir}' >{$m_name}</a></li>"; }
+  }
+function sid_menu() {   global $user_conect ; global $uRow ;  global $url_site; global $db_con;
+$stmut = $db_con->prepare("SELECT *  FROM menu   " );   $stmut->execute();
+while($menu_tt=$stmut->fetch(PDO::FETCH_ASSOC)){
+  $m_name=$menu_tt['name']; $m_dir=$menu_tt['dir']; echo "<li class='menu-main-item'><a class='menu-main-item-link' href='{$m_dir}' >{$m_name}</a></li>"; }
+  }
+function mob_menu() {   global $user_conect ; global $uRow ;  global $url_site; global $db_con;
+$stmut = $db_con->prepare("SELECT *  FROM menu   " );   $stmut->execute();
+while($menu_tt=$stmut->fetch(PDO::FETCH_ASSOC)){
+  $m_name=$menu_tt['name']; $m_dir=$menu_tt['dir']; echo "<a class='navigation-widget-section-link' href='{$m_dir}' >{$m_name}</a>"; }
+  }
 function news_site() { global $db_con;
 $stmut = $db_con->prepare("SELECT *  FROM news WHERE id ORDER BY `id` DESC LIMIT 5   " ); $stmut->execute();
 while($news_tt=$stmut->fetch(PDO::FETCH_ASSOC)){
@@ -395,7 +429,7 @@ function msg_Login()          {    global  $msg_alertl ; if($msg_alertl){ echo $
 function header_template()    {    global  $template ;   global  $c_lang;   global  $s_st;  $t = "templates/$template";  include "$t/header.php";    }
 function footer_template()    {    global  $template ;   global  $s_st;  $t = "templates/$template";  include "$t/footer.php";    }
 function template($name)      {    global  $template ;   global  $s_st;  $t = "templates/$template";  include "$t/$name.php";     }
-function template_mine($name) {    global  $title_s  ;   global  $title_page ;  global $description_page;  global $image_page;  global  $db_con;  global  $_GET;   global $c_lang ; global $c_mode; global $url_site; global $uRow ; global  $template ;  global $slctRow; global $statuRow; global $s_st; global $f_awesome; global $hachadmin; global  $usrRow; global $username_topic; global $lang; global $_SESSION; global $versionRow; $t = "templates/_panel";  include "$t/$name.php";    }
+function template_mine($name) {    global  $title_s  ;   global  $title_page ;  global $description_page;  global $image_page;  global  $db_con;  global  $_GET;   global $c_lang ; global $c_mode; global $url_site; global $uRow ; global  $template ;  global $slctRow; global $statuRow; global $s_st; global $f_awesome; global $hachadmin; global  $usrRow; global $username_topic; global $lang; global $_SESSION; global $versionRow; global $us_cover; $t = "templates/_panel";  include "$t/$name.php";    }
 function grid_mine($a,$b)     {    global  $template ;   global  $url_site;     global $uRow ;  $t = "?ref=".$uRow['id']; $code= "<!-- ADStn code begin --><a href=\"{$url_site}/{$t}\"><img src=\"{$url_site}/bnr/{$a}x{$b}.gif\" width=\"{$a}\" height=\"{$b}\" ></a><!-- ADStn code begin -->"; echo htmlspecialchars($code);    }
 function grid_bnr($a,$b)      {    global  $template ;   global  $url_site;     global $uRow ;  $t = "?ref=".$uRow['id']; $code= "<a href=\"{$url_site}/{$t}\"><img src=\"{$url_site}/bnr/{$a}x{$b}.gif\" width=\"{$a}\" height=\"{$b}\" ></a>"; echo $code;    }
 function bnr_mine($a,$b)      {    global  $template ;   global  $url_site;     global $uRow ;  $t = $uRow['id']; $code= "<!-- ADStn code begin --><script  language=\"javascript\" src=\"{$url_site}/bn.php?ID={$t}&px={$a}\"></script><!-- ADStn code begin -->"; echo htmlspecialchars($code);    }

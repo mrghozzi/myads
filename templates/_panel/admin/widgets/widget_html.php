@@ -115,9 +115,17 @@ if (typeof Promise !== "undefined") {
 <script>
     $(document).ready(function(){
         $('#close').click(function(e){
-          var wname=$(this).val();
           $("#widget_block").html('');
         });
     });
 </script>
+<?php if(isset($_GET['id'])){ $d_id = $_GET['id']; ?>
+<script>
+    $(document).ready(function(){
+        $('#delete').click(function(e){
+          $("#widget_block").load('<?php echo $url_site;  ?>/templates/_panel/admin/widgets/d_block.php?id=<?php echo $d_id;  ?>');
+        });
+    });
+</script>
+<?php }  ?>
 <?php } ?>

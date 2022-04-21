@@ -81,7 +81,7 @@
           <!-- /banner BOX TEXT -->
         </div>
         <!-- /banner BOX -->
-        <!-- link BOX -->
+       <!-- link BOX -->
         <div class="stats-box small " style="background: url(<?php url_site();  ?>/templates/_panel/img/graph/stat/02.jpg) no-repeat center;background-size: cover;">
           <!-- link BOX VALUE WRAP -->
           <div class="stats-box-value-wrap">
@@ -196,6 +196,7 @@
         </div>
         <!-- /pts BOX -->
         </div>
+        <?php ads_site(2); ?>
           <!-- banner DECORATION -->
           <div class="stats-decoration v2 big secondary" id="Views" style="background: url(<?php url_site();  ?>/templates/_panel/img/graph/stat/05-big.png) repeat-x bottom ;" >
             <!-- banner DECORATION TITLE -->
@@ -311,6 +312,7 @@
             <!-- /PERCENTAGE DIFF -->
           </div>
           <!-- /Exchange DECORATION -->
+          <?php ads_site(2); ?>
           <!-- pts DECORATION -->
           <div class="widget-box" id="pts" style="background: url(<?php url_site();  ?>/templates/_panel/img/ad_pattern.png) repeat <?php if($c_lang=="ar"){  ?> direction: rtl; <?php } ?> " >
             <!-- pts DECORATION TITLE -->
@@ -376,5 +378,6 @@
             <!-- /PERCENTAGE DIFF -->
           </div>
           <!-- /pts DECORATION -->
+          <?php ads_site(2); ?>
  </div>
 <?php }else{ echo"404"; }  ?>

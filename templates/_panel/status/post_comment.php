@@ -152,7 +152,7 @@ $comment = strip_tags($comment, '<p><a><b><br><li><ul><font><span><pre><u><s><im
                     <!-- /META LINE TIMESTAMP -->
                   </div>
                   <!-- /META LINE -->
-  <?php if((isset($_COOKIE['user']) AND ($_COOKIE['user']==$cmnt_us) ) OR ((isset($_COOKIE['admin']) AND ($_COOKIE['admin']==$uRow['pass'])))){  ?>
+  <?php if((isset($_COOKIE['user']) AND ($_COOKIE['user']==$cmnt_us) ) OR ((isset($_COOKIE['admin'])))){  ?>
                   <!-- META LINE -->
                   <div class="meta-line trash_comment<?php echo $sutcat['id'];  ?>" id="btntrash<?php echo $sutcat['id'];  ?>">
                     <!-- META LINE TIMESTAMP -->

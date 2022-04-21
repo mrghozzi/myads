@@ -1,16 +1,3 @@
-﻿<?PHP
-
-#####################################################################
-##                                                                 ##
-##                        My ads v2.4.x                            ##
-##                     http://www.krhost.ga                        ##
-##                   e-mail: admin@krhost.ga                       ##
-##                                                                 ##
-##                       copyright (c) 2022                        ##
-##                                                                 ##
-##                    This script is freeware                      ##
-##                                                                 ##
-#####################################################################
-
-header("Location: .../404.php ") ;
+﻿<?php
+header("Location: https://www.adstn.gq/404") ; 
   ?>

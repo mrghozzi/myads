@@ -16,8 +16,8 @@ if($flsus=$flusz->fetch(PDO::FETCH_ASSOC)){
  ?>
 <div class="profile-header">
       <!-- PROFILE HEADER COVER -->
-      <figure class="profile-header-cover liquid" style="background: rgba(0, 0, 0, 0) url(<?php url_site();  ?>/upload/cover.jpg) no-repeat scroll center center / cover;">
-        <img src="<?php url_site();  ?>/upload/cover.jpg" alt="cover-<?php echo $sus['username']; ?>" style="display: none;">
+      <figure class="profile-header-cover liquid" style="background: rgba(0, 0, 0, 0) url(<?php echo $us_cover;  ?>) no-repeat scroll center center / cover;">
+        <img src="<?php echo $us_cover;  ?>" alt="cover-<?php echo $sus['username']; ?>" style="display: none;">
       </figure>
       <!-- /PROFILE HEADER COVER -->
 

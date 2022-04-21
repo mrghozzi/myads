@@ -168,6 +168,7 @@ $scatname = $lang["{$scatname}"];
       </div>
       <!-- /SECTION HEADER ACTIONS -->
 </div>
+<?php ads_site(5); ?>
 <div class="grid grid post<?php echo $susat['id']; ?>">
      <div class="widget-box no-padding">
                     <!-- WIDGET BOX SETTINGS -->
