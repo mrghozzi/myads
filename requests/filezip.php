@@ -2,7 +2,7 @@
 
 #####################################################################
 ##                                                                 ##
-##                        My ads v2.4.x                            ##
+##                         MYads  v3.x.x                           ##
 ##                     http://www.krhost.ga                        ##
 ##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
@@ -13,7 +13,8 @@
 #####################################################################
 
 include "../dbconfig.php";
-
+ if(isset($_COOKIE['user']))
+{
  $stmt = $db_con->prepare("SELECT *  FROM setting   " );
         $stmt->execute();
         $ab=$stmt->fetch(PDO::FETCH_ASSOC);
@@ -61,7 +62,7 @@ echo "Return Code: " . $_FILES["fzip"]["error"] . "<input type=\"txt\" style=\"v
   $bn_zip="upload/" . $filename;
   $zipname =$_FILES["fzip"]["name"];
   move_uploaded_file($_FILES["fzip"]["tmp_name"],$destination);
-  echo "<img src=\"{$url_site}/templates/_panel/images/fzip.png\"  />&nbsp;{$zipname}<br />" ;
+  echo "<img src=\"{$url_site}/templates/_panel/img/fzip.png\"  />&nbsp;{$zipname}<br />" ;
   echo "<input type=\"txt\" name=\"linkzip\" style=\"visibility:hidden\" value=\"{$bn_zip}\" id=\"text\">";
   
 }
@@ -78,4 +79,5 @@ echo "<p style=\"color: #ff0000f7;-webkit-border-radius: 5px;border: 1px dashed 
 
     }
  }else{ echo"404"; }
+}else{ echo"404"; }
 ?>

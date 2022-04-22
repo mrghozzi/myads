@@ -1,7 +1,7 @@
 ﻿<?php
 #####################################################################
 ##                                                                 ##
-##                        My ads v2.4.(+)                          ##
+##                        MYads  v3.x.x                            ##
 ##                      http://www.krhost.ga                       ##
 ##                 e-mail: admin@kariya-host.com                   ##
 ##                                                                 ##
@@ -13,7 +13,7 @@
 if($vrf_License=="65fgh4t8x5fe58v1rt8se9x"){
            //  report List
    if(isset($_GET['knowledgebase']))
-{
+{      $admin_page=1;
    if($_COOKIE['admin']==$hachadmin)
 {
 

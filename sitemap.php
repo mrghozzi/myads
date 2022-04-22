@@ -2,7 +2,7 @@
 
 #####################################################################
 ##                                                                 ##
-##                        My ads v2.4.x                            ##
+##                        MYads  v3.x.x                            ##
 ##                     http://www.krhost.ga                        ##
 ##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
@@ -19,9 +19,7 @@ include "include/function.php";
     if($_COOKIE['admin']==$hachadmin)
 {
    ob_start();
-
-
-  $new="<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+$new="<?xml version=\"1.0\" encoding=\"UTF-8\"?>
 <urlset
       xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\"
       xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"
@@ -34,12 +32,12 @@ include "include/function.php";
 </url>
 <url>
   <loc>{$url_site}/portal</loc>
-  <changefreq>monthly</changefreq>
+  <changefreq>weekly</changefreq>
   <priority>0.80</priority>
 </url>
 <url>
   <loc>{$url_site}/directory</loc>
-  <changefreq>monthly</changefreq>
+  <changefreq>weekly</changefreq>
   <priority>0.80</priority>
 </url>
 <url>
@@ -49,7 +47,12 @@ include "include/function.php";
 </url>
 <url>
   <loc>{$url_site}/forum</loc>
-  <changefreq>monthly</changefreq>
+  <changefreq>weekly</changefreq>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>{$url_site}/store</loc>
+  <changefreq>weekly</changefreq>
   <priority>0.80</priority>
 </url>
 <url>
@@ -59,7 +62,7 @@ include "include/function.php";
 </url>
 <url>
   <loc>{$url_site}/register</loc>
-  <changefreq>weekly</changefreq>
+  <changefreq>monthly</changefreq>
   <priority>0.80</priority>
 </url>
 ";
@@ -73,12 +76,34 @@ $stmtcat = $db_con->prepare("SELECT *  FROM forum WHERE id ORDER BY `id` DESC " 
   <priority>0.50</priority>
 </url>".$nn_art_s ;
 
-   } 
+   }
+$stmtcat = $db_con->prepare("SELECT *  FROM directory WHERE id ORDER BY `id` DESC " );
+   $stmtcat->execute();
+   while($s_post=$stmtcat->fetch(PDO::FETCH_ASSOC) ) {
+
+    $nn_art_s="<url>
+  <loc>{$url_site}/dr".$s_post['id']."</loc>
+  <changefreq>weekly</changefreq>
+  <priority>0.50</priority>
+</url>".$nn_art_s ;
+
+   }
+$k_type = "knowledgebase";
+$storknow = $db_con->prepare("SELECT *  FROM options WHERE  o_type=:o_type AND o_order=0 ORDER BY `id` " );
+$storknow->bindParam(":o_type", $k_type);
+$storknow->execute();
+while($sknowled=$storknow->fetch(PDO::FETCH_ASSOC) ) {
+    $nn_art_s="<url>
+  <loc>{$url_site}/kb/{$sknowled['o_mode']}:{$sknowled['name']}</loc>
+  <changefreq>weekly</changefreq>
+  <priority>0.50</priority>
+</url>".$nn_art_s ;
+}
   $stmtnews = $db_con->prepare("SELECT *  FROM cat_dir WHERE id ORDER BY `id` DESC " );
    $stmtnews->execute();
    while($s_news=$stmtnews->fetch(PDO::FETCH_ASSOC) ) {
 
-    $nn_news_s="<url>
+$nn_news_s="<url>
   <loc>{$url_site}/cat/".$s_news['id']."</loc>
   <changefreq>weekly</changefreq>
   <priority>0.50</priority>

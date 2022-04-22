@@ -2,7 +2,7 @@
 
 #####################################################################
 ##                                                                 ##
-##                        My ads v2.4.x                            ##
+##                        MYads  v3.x.x                            ##
 ##                     http://www.krhost.ga                        ##
 ##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
@@ -30,7 +30,7 @@ if(isset($_GET['ban'])){
 $statement = "`visits` WHERE uid={$uidss} ORDER BY `id` DESC";
 $results =$db_con->prepare("SELECT * FROM {$statement} ");
 $results->execute();
-function lnk_list() {  global  $results;  global  $statement;
+function lnk_list() {  global  $results;  global  $statement; global  $lang; global $url_site;
 while($wt=$results->fetch(PDO::FETCH_ASSOC)) {
 if($wt['statu']=="1"){ $fgft="ON"; } else if($wt['statu']=="2"){ $fgft="OFF"; }
 $repvu = array("1","2","3","4");
@@ -46,26 +46,32 @@ echo "<tr>
   <td><a href=\"v_edit.php?id={$wt['id']}\" class='btn btn-success' ><i class=\"fa fa-edit \"></i></a>
   <a href=\"#\" data-toggle=\"modal\" data-target=\"#ban{$wt['id']}\" class='btn btn-danger' ><i class=\"fa fa-ban \"></i></a></td>
 </tr>";
-   echo "<div class=\"modal fade\" id=\"ban{$wt['id']}\" tabindex=\"-1\" role=\"dialog\">
-				<div class=\"modal-dialog\" role=\"document\">
-					<div class=\"modal-content modal-info\">
-						<div class=\"modal-header\">
-							<button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button>
-						</div>
-						<div class=\"modal-body\">
-							<div class=\"more-grids\">
-                                    <h3>Delete !</h3>
-									<p>Sure to Delete ID no {$wt['id']} ? </p><br />
-                                    <center><a  href=\"v_list.php?ban={$wt['id']}\" class=\"btn btn-danger\" >Delete</a></center>
-									  <button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Close</button
-
-							</div>
-						</div>
-					</div>
+   echo "<div class=\"modal fade\"  id=\"ban{$wt['id']}\" aria-hidden=\"true\" data-backdrop=\"\" tabindex=\"-1\" role=\"dialog\">
+				<div class=\"modal-dialog modal-dialog-centered\" role=\"document\">
+					<div class=\"modal-content content-grid\">
+                        <div class=\"popup-close-button popup-event-creation-trigger\" data-dismiss=\"modal\" aria-label=\"Close\">
+                        <!-- POPUP CLOSE BUTTON ICON -->
+                        <svg class=\"popup-close-button-icon icon-cross\">
+                        <use xlink:href=\"#svg-cross\"></use>
+                        </svg>
+                        <!-- /POPUP CLOSE BUTTON ICON -->
+                        </div>
+                        <p class=\"popup-box-title\"><h2><i class=\"fa fa-trash \"></i>&nbsp;{$lang['delete']}&nbsp;!</h2></p>
+                        <hr />
+                        <p class=\"popup-event-text\"><b>{$lang['aysywtd']}&nbsp;<kbd>{$wt['name']}</kbd>&nbsp;? </b></p>
+                        &nbsp;
+                        <a class=\"popup-event-button button tertiary popup-event-information-trigger\" href=\"{$url_site}/v_list?ban={$wt['id']}\"  >{$lang['delete']}</a>
+                        &nbsp;
+                        <p class=\"popup-event-button button  popup-event-information-trigger\" class=\"btn btn-default\" data-dismiss=\"modal\">
+                        <span aria-hidden=\"true\">&times;</span>&nbsp;{$lang['close']}
+                        </p>
+                    </div>
 				</div>
-			</div>  </div>";
+			</div>
+          </div>
+         ";
    }
-   }
+}
 
  template_mine('header');
  if(!isset($_COOKIE['user'])!="")

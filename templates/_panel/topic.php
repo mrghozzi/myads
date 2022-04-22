@@ -1,5 +1,7 @@
 <?php
-if($s_st=="buyfgeufb"){ 
+if($s_st=="buyfgeufb"){
+  global $susat;
+  $sutcat = $susat;
 $catusz = $db_con->prepare("SELECT *  FROM `forum` WHERE statu=1 AND  id=".$_GET['t'] );
 $catusz->execute();
 $sucat=$catusz->fetch(PDO::FETCH_ASSOC);
@@ -14,413 +16,512 @@ $susat=$catust->fetch(PDO::FETCH_ASSOC);
 $catus = $db_con->prepare("SELECT *  FROM users WHERE  id='{$sucat['uid']}'");
 $catus->execute();
 $catuss=$catus->fetch(PDO::FETCH_ASSOC);
+
+$ssust = $db_con->prepare("SELECT * FROM `options` WHERE `o_type` = 'user' AND `o_order` =".$catuss['id'] );
+$ssust->execute();
+$srus=$ssust->fetch(PDO::FETCH_ASSOC);
+
 $catusc = $db_con->prepare("SELECT *  FROM f_cat WHERE  id='{$sucat['cat']}'");
 $catusc->execute();
 $catussc=$catusc->fetch(PDO::FETCH_ASSOC);
-$catdnb = $db_con->prepare("SELECT  COUNT(id) as nbr FROM status WHERE s_type IN (2,4) AND tp_id ='{$catdid}' " );
+$catdnb = $db_con->prepare("SELECT  COUNT(id) as nbr FROM status WHERE s_type IN (2) AND tp_id ='{$catdid}' " );
 $catdnb->execute();
 $abdnb=$catdnb->fetch(PDO::FETCH_ASSOC);
 
-if($susat['s_type'] == 4) {
-$sscatust = $db_con->prepare("SELECT * FROM `options` WHERE `o_type` = 'service' AND `o_parent` =".$catdid );
-$sscatust->execute();
-$srvat=$sscatust->fetch(PDO::FETCH_ASSOC);
+$likeuscm = $db_con->prepare("SELECT  * FROM `like` WHERE uid='{$uRow['id']}' AND sid='{$catdid}' AND  type=2 " );
+$likeuscm->execute();
+$uslike=$likeuscm->fetch(PDO::FETCH_ASSOC);
+
+if(isset($uslike) AND ($uslike['sid']==$catdid)){
+$o_parent = $uslike['id'];
+$o_type   = "data_reaction";
+$likeuscmr = $db_con->prepare("SELECT  * FROM `options` WHERE o_order='{$uRow['id']}' AND o_parent='{$o_parent}' AND  o_type='{$o_type}' " );
+$likeuscmr->execute();
+$usliker=$likeuscmr->fetch(PDO::FETCH_ASSOC);
+ if(isset($usliker)  AND ($usliker['o_parent']==$o_parent)){
+$reaction_img  = "<img class=\"reaction-option-image\" src=\"{$url_site}/templates/_panel/img/reaction/{$usliker['o_valuer']}.png\"  width=\"30\" alt=\"reaction-{$usliker['o_valuer']}\">";
+$reaction_name = $usliker['o_valuer'];
+     if($usliker['o_valuer']=="like"){         $reaction_color = "style=\"color: #1bc8db;\""; }
+     else if($usliker['o_valuer']=="love"){    $reaction_color = "style=\"color: #fc1f3b;\""; }
+     else if($usliker['o_valuer']=="dislike"){ $reaction_color = "style=\"color: #3f3cf8;\""; }
+     else if($usliker['o_valuer']=="sad"){     $reaction_color = "style=\"color: #139dff;\""; }
+     else if($usliker['o_valuer']=="angry"){   $reaction_color = "style=\"color: #fa690e;\""; }
+     else if($usliker['o_valuer']=="happy"){   $reaction_color = "style=\"color: #ffda21;\""; }
+     else if($usliker['o_valuer']=="funny"){   $reaction_color = "style=\"color: #ffda21;\""; }
+     else if($usliker['o_valuer']=="wow"){     $reaction_color = "style=\"color: #ffda21;\""; }
+     else {                                    $reaction_color = "style=\"color: #ffda21;\""; }
+ }else{
+$reaction_img   = "<img class=\"reaction-option-image\" src=\"{$url_site}/templates/_panel/img/reaction/like.png\"  width=\"30\" alt=\"reaction-like\">";
+$reaction_color = "style=\"color: #1bc8db;\"";
+$reaction_name  = "like";
+ }
 }
 
 $time_stt=convertTime($susat['date']);
-$comtxt = preg_replace('/[ˆ]+([A-Za-z0-9-_]+)/', '<b>$1</b>', $sucat['txt'] );
-$comtxt = preg_replace('/[~]+([A-Za-z0-9-_]+)/', '<i>$1</i>', $comtxt );
+$namesher =  "{$sucat['name']} - {$title_s}";
+$namesher = strip_tags($namesher, '');
+$linksher =  "{$url_site}/t{$catdid}";
+$linksher = strip_tags($linksher, '');
+
+$comtxt = strip_tags($sucat['txt'], '<p><a><b><br><li><ul><font><span><pre><u><s><img><iframe>');
 $comtxt = preg_replace('/ #([^\s]+) /', '<a  href="'.$url_site.'/tag/$1" >#$1</a>', $comtxt );
 
-
-  ?>
-		<div id="page-wrapper">
-			<div class="main-page">
-				<!--buttons-->
-				<div class="inbox-section">
-                    <div class="inbox-grids">
-						<div class="col-md-3 inbox-grid">
-                        <a href="<?php url_site();  ?>/u/<?php echo $catuss['id']; ?>" >
-							<div class="grid-inbox">
-								<div class="inbox-top">
-									<div class="inbox-img">
-										<img src="<?php url_site();  ?>/<?php echo $catuss['img']; ?>" class="img-responsive" alt="">
-									</div>
-										<div class="inbox-text">
-										<h5><?php echo $catuss['username']; check_us($catuss['id']);  ?></h5>
-								   </div>
-									<div class="clearfix"></div>
-								</div>
-<?php if($susat['s_type'] == 4) {
-
- $sasrvst = $db_con->prepare("SELECT * FROM `options` WHERE `o_type` = 'a_service' AND `o_parent` =".$catdid." ORDER BY `id` DESC LIMIT 15 " );
-$sasrvst->execute();
-while($aservt=$sasrvst->fetch(PDO::FETCH_ASSOC)){
-$srvatus = $db_con->prepare("SELECT *  FROM users WHERE  id='{$aservt['name']}'");
-$srvatus->execute();
-$servtuss=$srvatus->fetch(PDO::FETCH_ASSOC);
-echo "<a>#".$aservt['id']."</a>    ".$servtuss['username'];
-}
  ?>
-                                <a href="<?php url_site();  ?>/portal" class="compose" ><i class="fa fa-globe"></i> Portal</a>
-								 <?php ads_site(5);  ?>
-<?php }else{   ?>
-                                <a href="<?php url_site();  ?>/portal" class="compose" ><i class="fa fa-globe"></i> Portal</a>
-								<a href="<?php url_site();  ?>/forum" class="compose" ><i class="fa fa-comments-o"></i> <?php lang('forum');  ?></a> <br />
+<style> .forum-content img { margin-top: 24px; width: 75%; height: auto;   border-radius: 12px; } </style>
+  <!-- SECTION BANNER -->
+<div class="section-banner" style="background: url(<?php url_site();  ?>/templates/_panel/img/banner/Newsfeed.png) no-repeat 50%;" >
+      <!-- SECTION BANNER ICON -->
+      <img class="section-banner-icon" src="<?php url_site();  ?>/templates/_panel/img/banner/discussion-icon.png" >
+      <!-- /SECTION BANNER ICON -->
 
-                                <?php ads_site(5);  ?>
-           <?php } ?>
-                           </div>
-                           </a>
-						</div>
-						<div class="col-md-9 inbox-grid1">
-							<div class="mailbox-content">
-                            <div class="panel panel-primary">
-                            <div class="panel-heading"><center><b><?php echo $sucat['name']; ?></b></center></div>
-                            <?php if($susat['s_type'] == 4) {
-?>
-                            <div class="panel-panel-info"><center><hr><?php echo $srvat['o_valuer']; ?></center></div>
-                            <?php   } ?>
-  <div class="panel-body">
-								<div class=" col-md-8 compose-btn">
-<?php if($susat['s_type'] == 4) {
-?>
-<a class="btn btn-sm btn-success"  ><i class="fa fa-image"></i> Image </a>
-<?php  }else{
-if($catussc['id'] > 0) {  ?>
-                                    <a class="btn btn-sm btn-primary" href="<?php url_site();  ?>/f<?php echo $catussc['id']; ?>" class="btn btn-sm btn-primary" ><b><i class="fa <?php echo $catussc['icons']; ?>" aria-hidden="true"></i> <?php echo $catussc['name']; ?></b></a>
-<?php }  } ?>                         <?php if($susat['s_type'] == 2) {
-?>
-                                    <?php if((isset($uRow['id'])==isset($catuss['id'])) OR (isset($_COOKIE['admin'])==isset($hachadmin))){  ?>
-                                    <a class="btn btn-sm btn-primary" href="<?php url_site();  ?>/editor/<?php echo $sucat['id']; ?>"><i class="fa fa-pencil-square-o"></i> <?php lang('edit'); ?></a>
-                                    <?php }  } ?>
+      <!-- SECTION BANNER TITLE -->
+      <p class="section-banner-title"><?php lang('forum'); ?></p>
+      <!-- /SECTION BANNER TITLE -->
 
-            <a class="btn btn-sm btn-primary" href="#old_comment"><i class="fa fa-reply"></i> Reply</a>
-
-                                </div>
-								<div class="col-md-4 text-right">
-                                      <p class="date"> <?php echo $time_stt;  ?></p>
-                                  </div>
-
-                                  </div> </div>
-                                  <div class=" col-md-12 inbox-grid1">
-        <div class="panel panel-default">
-  <div class="panel-body">
-								  <div class="view-mail">
-								   <?php echo $comtxt; ?>
-                                    </div>
-						   <div class="compose-btn pull-left">
-                                  <a class="btn btn-sm btn-primary" href="#old_comment"><i class="fa fa-reply"></i> Reply</a>
-
-                                    <p  class="btn" id="heart<?php echo $sucat['id'];  ?>">
-                                    <?php
-                                    $likeuscm = $db_con->prepare("SELECT  * FROM `like` WHERE uid='{$uRow['id']}' AND sid='{$catdid}' AND  type=2 " );
-                                    $likeuscm->execute();
-                                     $uslike=$likeuscm->fetch(PDO::FETCH_ASSOC);
-                                     $likenbcm = $db_con->prepare("SELECT  COUNT(id) as nbr FROM `like` WHERE sid='{$catdid}' AND  type=2 " );
-                                     $likenbcm->execute();
-                                     $abdlike=$likenbcm->fetch(PDO::FETCH_ASSOC);
-                                     if(isset($_COOKIE['user']) OR (isset($_COOKIE['admin']) AND ($_COOKIE['admin']==$hachadmin) )  ){
-                                       if($uslike['sid']==$catdid){
-                                       echo "<a style=\"color: #FF0000;\"  href=\"javascript:void(0);\" id=\"ulike{$sucat['id']}\" ><i class=\"fa fa-heart\" style=\"color: #FF0000;\"  aria-hidden=\"true\"></i>{$abdlike['nbr']}</a>
-                                       <input type=\"hidden\" id=\"lval\" value=\"test_like\" />";
-                                       }else{
-                                       echo "<a href=\"javascript:void(0);\" id=\"like{$sucat['id']}\"   ><i class=\"fa fa-heart-o\" aria-hidden=\"true\"></i>{$abdlike['nbr']}</a>
-                                       <input type=\"hidden\" id=\"lval\" value=\"test_like\" />
-                                       ";
-                                       }
-                                       echo "
-                                              <script>
-     \$(\"document\").ready(function() {
-   \$(\"#like{$sucat['id']}\").click(postlike{$sucat['id']});
-
-});
-
-function postlike{$sucat['id']}(){
-    \$(\"#heart{$sucat['id']}\").html(\"<i class='fa fa-thumbs-up' aria-hidden='true'></i>\");
-    \$.ajax({
-        url : '{$url_site}/requests/f_like.php?id={$sucat['id']}&f_like=like_up&t=f',
-        data : {
-            test_like : \$(\"#lval\").val()
-        },
-        datatype : \"json\",
-        type : 'post',
-        success : function(result) {
-               $(\"#heart{$sucat['id']}\").html(result);
-        },
-        error : function() {
-            alert(\"Error reaching the server. Check your connection\");
-        }
-    });
-}
- \$(\"document\").ready(function() {
-   \$(\"#ulike{$sucat['id']}\").click(postulike{$sucat['id']});
-
-});
-
-function postulike{$sucat['id']}(){
-    \$(\"#heart{$sucat['id']}\").html(\"<i class='fa fa-thumbs-down' aria-hidden='true'></i>\");
-    \$.ajax({
-        url : '{$url_site}/requests/f_like.php?id={$sucat['id']}&f_like=like_down&t=f',
-        data : {
-            test_like : \$(\"#lval\").val()
-        },
-        datatype : \"json\",
-        type : 'post',
-        success : function(result) {
-               $(\"#heart{$sucat['id']}\").html(result);
-        },
-        error : function() {
-            alert(\"Error reaching the server. Check your connection\");
-        }
-    });
-}
-     </script>";
-                                       }else{
-                                       echo "<a href=\"javascript:void(0);\" data-toggle=\"modal\" data-target=\"#mlike{$sucat['id']}\" ><i class=\"fa fa-heart-o\" aria-hidden=\"true\"></i>{$abdlike['nbr']}</a>
-                                       <!-- //modal like {$sucat['id']} -->
-              <div class=\"modal fade\" id=\"mlike{$sucat['id']}\" tabindex=\"-1\" role=\"dialog\">
-				<div class=\"modal-dialog\" role=\"document\">
-					<div class=\"modal-content modal-info\">
-						<div class=\"modal-header\">
-                        You do not have an account!
-							<button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button>
-						</div>
-						<div class=\"modal-body\">
-							<div class=\"more-grids\">
-                                 <center>
-                                   <a href=\"{$url_site}/login\" class=\"btn btn-success\" ><i class=\"fa fa-sign-in\"></i>{$lang['login']}</a>
-                        <a href=\"{$url_site}/register\" class=\"btn btn-danger\" ><i class=\"fa fa-user-plus\"></i>{$lang['sign_up']}</a>
-                                    </center>
-                            <br />
-
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-
-	   <!-- //modal like {$sucat['id']} -->";
-                                       }  ?>
-                                    </p>
-
-                              </div>
-							</div> <div class="clearfix"></div>
-                              </div>
-
-                                  </div> </div>
-                            <hr />
-   <?php if(isset($_COOKIE['user'])){  ?>
-                            <div class=" col-md-12 inbox-grid1">
-        <div class="panel panel-default">
-  <div class="panel-body">
-
-<textarea id='comment' class='form-control'></textarea><br />
-<center><button id = 'btn' class="btn btn-info" >Post Comment</button></center>
-  </div>
+      <!-- SECTION BANNER TEXT -->
+      <p class="section-banner-text"></p>
+      <!-- /SECTION BANNER TEXT -->
 </div>
-       </div>
-       <div id='old_comment'></div>
- <?php        }
- include_once('include/pagination.php');
-$page = (int)(!isset($_GET["page"]) ? 1 : $_GET["page"]);
-if ($page <= 0) $page = 1;
-$per_page = 30; // Records per page.
-$startpoint = ($page * $per_page) - $per_page;
-$statement = "`f_coment` WHERE tid='{$catdid}' ORDER BY `id` DESC";
-$catsum = $db_con->prepare("SELECT  * FROM {$statement} LIMIT {$startpoint} , {$per_page} ");
-$catsum->execute();
-
-
-
-if ($catsum->rowCount() == 0) {
-    echo "<h2><center>No Coment</center></h2>";
-} else {
-while($sutcat=$catsum->fetch(PDO::FETCH_ASSOC))
-{
-$catuscm = $db_con->prepare("SELECT *  FROM users WHERE  id='{$sutcat['uid']}'");
-$catuscm->execute();
-$catusscm=$catuscm->fetch(PDO::FETCH_ASSOC);
-$time_cmt=convertTime($sutcat['date']);
-$comment =  $sutcat['txt'] ;
-$emojis = array();
-$smlusen = $db_con->prepare("SELECT *  FROM emojis ");
-$smlusen->execute();
-while($smlssen=$smlusen->fetch(PDO::FETCH_ASSOC)){
-    $emojis['name'][]=$smlssen['name'];
-    $emojis['img'][]= "<img src=\"{$smlssen['img']}\" width=\"23\" height=\"23\" />";
-}
-
- if(isset($emojis['name']) && isset($emojis['img']) ) {
-         $comment = str_replace($emojis['name'], $emojis['img'], $comment);
-}
-
-$comment = preg_replace('/ #([^\s]+) /', '<a  href="'.$url_site.'/tag/$1" >#$1</a>', $comment );
-$comment = strip_tags($comment, '<p><a><b><br><li><ul><font><span><pre><u><s><img>');
-$ecomment = preg_replace("/[\r\n]*/","",$sutcat['txt']);
- ?>
-       <div class=" col-md-12 inbox-grid1" id="coment<?php echo $sutcat['id'];  ?>" >
-        <div class="panel panel-default cmt<?php echo $sutcat['id'];  ?>">
-  <div class="panel-heading"><b><?php echo  "<a  href=\"{$url_site}/u/{$catusscm['id']}\"   ><img class=\"imgu-bordered-sm\" src=\"{$url_site}/{$catusscm['img']}\" style=\"width: 35px;\" alt=\"user image\"> {$catusscm['username']} ";
-            online_us($catusscm['id']);
-            check_us($catusscm['id']);
-            echo "</a>  " ;  ?></b><p style="text-align: right"><?php echo $time_cmt; ?></p></div>
-  <div class="panel-body">
-   <?php echo $comment; ?>
-  </div>
-  <?php if((isset($_COOKIE['user']) AND ($_COOKIE['user']==$sutcat['uid']) ) OR ((isset($_COOKIE['admin']) AND ($_COOKIE['admin']==$uRow['pass'])))){  ?>
-  <div class="bttn<?php echo $sutcat['id'];  ?>" >
-  <input type="hidden" id="trashid" value="<?php echo $sutcat['id'];  ?>'>" />
-  <button id = 'btntrash<?php echo $sutcat['id'];  ?>' class="btn btn-danger" ><i class="glyphicon glyphicon-trash" aria-hidden="true"></i></button>
-  <button id = 'btnedit<?php echo $sutcat['id'];  ?>' class="btn btn-success edit<?php echo $sutcat['id'];  ?>" ><i class="fa fa-pencil-square-o" aria-hidden="true"></i></button>
-  </div>
-  <?php }  ?>
+    <!-- /SECTION BANNER -->
+    <?php ads_site(5); ?>
+<div class="section-header">
+      <!-- SECTION HEADER INFO -->
+      <div class="section-header-info">
+        <!-- SECTION TITLE -->
+        <h2 class="section-title"><?php echo $sucat['name']; ?></h2>
+        <!-- /SECTION TITLE -->
+      </div>
+      <!-- /SECTION HEADER INFO -->
 </div>
-       </div>
-       <script>
-    $(document).ready(function(){
-        $('.edit<?php echo $sutcat['id'];  ?>').click(function(){
-        $(".cmt<?php echo $sutcat['id'];  ?>").html("<form action=\"<?php url_site();  ?>/requests/f_coment.php?ed=<?php echo $sutcat['id']; ?>\" method=\"POST\"><textarea id='comment<?php echo $sutcat['id'];  ?>' name='comment' class='form-control'><?php echo $ecomment; ?> </textarea><br /><center><button type=\"submit\" name=\"btned\" id =\"btnedite<?php echo $sutcat['id'];  ?>\" class=\"btn btn-primary edite<?php echo $sutcat['id'];  ?>\" ><i class=\"fa fa-floppy-o\" aria-hidden=\"true\"></i></button></center></form>");
+<div class="section-filters-bar v7">
+      <!-- SECTION FILTERS BAR ACTIONS -->
+      <div class="section-filters-bar-actions">
+        <!-- SECTION FILTERS BAR INFO -->
+        <div class="section-filters-bar-info">
+          <!-- SECTION FILTERS BAR TITLE -->
+          <p class="section-filters-bar-title">
+            <a href="<?php url_site();  ?>/forum"><?php lang('forum'); ?></a>
+            <span class="separator"></span><a href="<?php url_site();  ?>/f<?php echo $catussc['id']; ?>"><i class="fa <?php echo $catussc['icons']; ?>" aria-hidden="true"></i>&nbsp;<?php echo $catussc['name']; ?></a>
+            <span class="separator"></span><a href="<?php url_site();  ?>/t<?php echo $sucat['id']; ?>"><?php echo $sucat['name']; ?></a>
+          </p>
+          <!-- /SECTION FILTERS BAR TITLE -->
+
+          <!-- SECTION FILTERS BAR TEXT -->
+          <div class="section-filters-bar-text small-space">
+            <?php echo $time_stt;  ?>
+          </div>
+          <!-- /SECTION FILTERS BAR TEXT -->
+        </div>
+        <!-- /SECTION FILTERS BAR INFO -->
+      </div>
+      <!-- /SECTION FILTERS BAR ACTIONS -->
+</div>
+<div class="grid grid post<?php echo $sutcat['id']; ?>" >
+ <div class="forum-content" >
+    <div class="forum-post-header">
+          <!-- FORUM POST HEADER TITLE -->
+          <p class="forum-post-header-title">Author</p>
+          <!-- /FORUM POST HEADER TITLE -->
+
+          <!-- FORUM POST HEADER TITLE -->
+          <p class="forum-post-header-title">Post</p>
+          <!-- /FORUM POST HEADER TITLE -->
+    </div>
+    <div class="forum-post-list" >
+      <div class="forum-post">
+            <!-- FORUM POST META -->
+            <div class="forum-post-meta">
+              <!-- FORUM POST TIMESTAMP -->
+              <p class="forum-post-timestamp"><?php echo date("Y-m-d H:i:s",$susat['date']);  ?></p>
+              <!-- /FORUM POST TIMESTAMP -->
+
+              <!-- FORUM POST ACTIONS -->
+              <div class="forum-post-actions">
+                <!-- FORUM POST ACTION -->
+                <p class="forum-post-action">          <!-- WIDGET BOX SETTINGS -->
+          <div class="widget-box-settings">
+            <!-- POST SETTINGS WRAP -->
+            <div class="post-settings-wrap" style="position: relative;">
+              <!-- POST SETTINGS -->
+              <div class="post-settings widget-box-post-settings-dropdown-trigger">
+                <!-- POST SETTINGS ICON -->
+                <svg class="post-settings-icon icon-more-dots">
+                  <use xlink:href="#svg-more-dots"></use>
+                </svg>
+                <!-- /POST SETTINGS ICON -->
+              </div>
+              <!-- /POST SETTINGS -->
+
+              <!-- SIMPLE DROPDOWN -->
+              <div class="simple-dropdown widget-box-post-settings-dropdown" style="position: absolute; z-index: 9999; top: 30px; right: 9px; opacity: 0; visibility: hidden; transform: translate(0px, -20px); transition: transform 0.3s ease-in-out 0s, opacity 0.3s ease-in-out 0s, visibility 0.3s ease-in-out 0s;">
+<?php if(((isset($uRow['id'])AND isset($sucat['uid']) AND ($uRow['id']==$sucat['uid'])) OR (isset($_COOKIE['admin'])  AND ($_COOKIE['admin']==$hachadmin) )) ){ ?>
+                <!-- SIMPLE DROPDOWN LINK -->
+                <a class="simple-dropdown-link" href="<?php echo $url_site; ?>/editor/<?php echo $sucat['id']; ?>"><i class="fa fa-edit" aria-hidden="true"></i>&nbsp;<?php echo $lang['edit']; ?></a>
+                <!-- /SIMPLE DROPDOWN LINK -->
+<?php } ?>
+<?php if(((isset($uRow['id']) AND ($uRow['id']==$sucat['uid'])) OR (isset($uRow['id']) AND ($uRow['id']==$sutcat['uid'])) OR (isset($_COOKIE['admin']) AND ($_COOKIE['admin']== $hachadmin)))){ ?>
+                <!-- SIMPLE DROPDOWN LINK -->
+                <p class="simple-dropdown-link post_delete<?php echo $sutcat['id']; ?>" ><i class="fa fa-trash" aria-hidden="true"></i>&nbsp;<?php echo $lang['delete']; ?></p>
+                <!-- /SIMPLE DROPDOWN LINK -->
+<?php } ?>
+                <!-- SIMPLE DROPDOWN LINK -->
+                <p class="simple-dropdown-link post_report<?php echo $sucat['id']; ?>"><i class="fa fa-flag" aria-hidden="true"></i>&nbsp;<?php echo $lang['report']; ?></p>
+                <!-- /SIMPLE DROPDOWN LINK -->
+
+                <!-- SIMPLE DROPDOWN LINK -->
+                <p class="simple-dropdown-link author_report<?php echo $sucat['id']; ?>"><i class="fa fa-flag" aria-hidden="true"></i>&nbsp;<?php echo $lang['report']; ?> Author</p>
+                <!-- /SIMPLE DROPDOWN LINK -->
+              </div>
+              <!-- /SIMPLE DROPDOWN -->
+            </div>
+            <!-- /POST SETTINGS WRAP -->
+          </div>
+          <!-- /WIDGET BOX SETTINGS --></p>
+                <!-- /FORUM POST ACTION -->
+              </div>
+              <!-- /FORUM POST ACTIONS -->
+            </div>
+            <!-- /FORUM POST META -->
+
+            <!-- FORUM POST CONTENT -->
+            <div class="forum-post-content">
+              <!-- FORUM POST USER -->
+              <div class="forum-post-user">
+                <!-- USER AVATAR -->
+                <a class="user-avatar no-outline <?php online_us($catuss['id']); ?>" href="<?php url_site();  ?>/u/<?php echo $srus['o_valuer']; ?>">
+                  <!-- USER AVATAR CONTENT -->
+                  <div class="user-avatar-content">
+                    <!-- HEXAGON -->
+                    <div class="hexagon-image-68-74" data-src="<?php url_site();  ?>/<?php echo $catuss['img']; ?>" style="width: 68px; height: 74px; position: relative;"><canvas style="position: absolute; top: 0px; left: 0px;" width="68" height="74"></canvas></div>
+                    <!-- /HEXAGON -->
+                  </div>
+                  <!-- /USER AVATAR CONTENT -->
+
+                  <!-- USER AVATAR PROGRESS BORDER -->
+                  <div class="user-avatar-progress-border">
+                    <!-- HEXAGON -->
+                    <div class="hexagon-border-84-92" style="width: 84px; height: 92px; position: relative;"><canvas style="position: absolute; top: 0px; left: 0px;" width="84" height="92"></canvas></div>
+                    <!-- /HEXAGON -->
+                  </div>
+                  <!-- /USER AVATAR PROGRESS BORDER -->
+<?php
+if(check_us($catuss['id'],1)==1){
+ echo                   " <!-- USER AVATAR BADGE -->
+                            <div class=\"user-avatar-badge\">
+                              <!-- USER AVATAR BADGE BORDER -->
+                              <div class=\"user-avatar-badge-border\">
+                                <!-- HEXAGON -->
+                                <div class=\"hexagon-28-32\" style=\"width: 22px; height: 24px; position: relative;\"></div>
+                                <!-- /HEXAGON -->
+                              </div>
+                              <!-- /USER AVATAR BADGE BORDER -->
+
+                              <!-- USER AVATAR BADGE CONTENT -->
+                              <div class=\"user-avatar-badge-content\">
+                                <!-- HEXAGON -->
+                                <div class=\"hexagon-dark-22-24\" style=\"width: 16px; height: 18px; position: relative;\"></div>
+                                <!-- /HEXAGON -->
+                              </div>
+                              <!-- /USER AVATAR BADGE CONTENT -->
+
+                              <!-- USER AVATAR BADGE TEXT -->
+                              <p class=\"user-avatar-badge-text\"><i class=\"fa fa-fw fa-check\" ></i></p>
+                              <!-- /USER AVATAR BADGE TEXT -->
+                            </div>
+                            <!-- /USER AVATAR BADGE -->       ";
+                              }
+?>
+                 </a>
+                <!-- /USER AVATAR -->
+
+                <!-- USER AVATAR -->
+                <a class="user-avatar small no-outline <?php online_us($catuss['id']); ?>" href="<?php url_site();  ?>/u/<?php echo $srus['o_valuer']; ?>">
+                  <!-- USER AVATAR CONTENT -->
+                  <div class="user-avatar-content">
+                    <!-- HEXAGON -->
+                    <div class="hexagon-image-30-32" data-src="<?php url_site();  ?>/<?php echo $catuss['img']; ?>" style="width: 30px; height: 32px; position: relative;"><canvas style="position: absolute; top: 0px; left: 0px;" width="30" height="32"></canvas></div>
+                    <!-- /HEXAGON -->
+                  </div>
+                  <!-- /USER AVATAR CONTENT -->
+
+                  <!-- USER AVATAR PROGRESS BORDER -->
+                  <div class="user-avatar-progress-border">
+                    <!-- HEXAGON -->
+                    <div class="hexagon-border-40-44" style="width: 40px; height: 44px; position: relative;"><canvas style="position: absolute; top: 0px; left: 0px;" width="40" height="44"></canvas></div>
+                    <!-- /HEXAGON -->
+                  </div>
+                  <!-- /USER AVATAR PROGRESS BORDER -->
+<?php
+                                              if(check_us($catuss['id'],1)==1){
+ echo                   " <!-- USER AVATAR BADGE -->
+                            <div class=\"user-avatar-badge\">
+                              <!-- USER AVATAR BADGE BORDER -->
+                              <div class=\"user-avatar-badge-border\">
+                                <!-- HEXAGON -->
+                                <div class=\"hexagon-22-24\" style=\"width: 22px; height: 24px; position: relative;\"></div>
+                                <!-- /HEXAGON -->
+                              </div>
+                              <!-- /USER AVATAR BADGE BORDER -->
+
+                              <!-- USER AVATAR BADGE CONTENT -->
+                              <div class=\"user-avatar-badge-content\">
+                                <!-- HEXAGON -->
+                                <div class=\"hexagon-dark-16-18\" style=\"width: 16px; height: 18px; position: relative;\"></div>
+                                <!-- /HEXAGON -->
+                              </div>
+                              <!-- /USER AVATAR BADGE CONTENT -->
+
+                              <!-- USER AVATAR BADGE TEXT -->
+                              <p class=\"user-avatar-badge-text\"><i class=\"fa fa-fw fa-check\" ></i></p>
+                              <!-- /USER AVATAR BADGE TEXT -->
+                            </div>
+                            <!-- /USER AVATAR BADGE -->       ";
+                              }
+?>
+                  </a>
+                <!-- /USER AVATAR -->
+
+                <!-- FORUM POST USER TITLE -->
+                <p class="forum-post-user-title"><a href="<?php url_site();  ?>/u/<?php echo $srus['o_valuer']; ?>"><?php echo $catuss['username']; ?></a></p>
+                <!-- /FORUM POST USER TITLE -->
+
+                <!-- FORUM POST USER TITLE -->
+                <p class="forum-post-user-text"><a href="<?php url_site();  ?>/u/<?php echo $srus['o_valuer']; ?>">@<?php echo @urldecode($srus['o_valuer']); ?></a></p>
+                <!-- /FORUM POST USER TITLE -->
+
+              </div>
+              <!-- /FORUM POST USER -->
+
+              <!-- FORUM POST INFO -->
+              <div class="forum-post-info">
+                <!-- FORUM POST PARAGRAPH -->
+                <div   id="post_form<?php echo $sucat['id']; ?>" ><div id="report<?php echo $sucat['id']; ?>" ></div></div>
+                <p class="forum-post-paragraph">
+                  <?php echo $comtxt; ?>
+                </p>
+                <!-- /FORUM POST PARAGRAPH -->
+               </div>
+              <!-- /FORUM POST INFO -->
+            </div>
+            <!-- /FORUM POST CONTENT -->
+          </div>
+          <!-- POST OPTIONS -->
+
+    </div>
+ </div>
+
+</div>
+<div class="post-options post<?php echo $sutcat['id']; ?>">
+<?php   if(isset($_COOKIE['user'])){ ?>
+            <!-- POST OPTION WRAP -->
+            <div class="post-option-wrap" style="position: relative;">
+              <!-- POST OPTION -->
+              <div class="post-option reaction-options-dropdown-trigger">
+              <div id="reaction_image<?php echo $sutcat['id']; ?>" >
+<?php if($uslike['sid']==$catdid){  ?>
+                <?php echo $reaction_img;  ?>
+<?php }else{ ?>
+              <!-- POST OPTION ICON -->
+                <svg class="post-option-icon icon-thumbs-up">
+                  <use xlink:href="#svg-thumbs-up" ></use>
+                </svg>
+                <!-- /POST OPTION ICON -->
+<?php } ?>
+                </div>
+                <!-- POST OPTION TEXT -->
+                <p class="post-option-text reaction_txt<?php echo $sutcat['id']; ?>" <?php if($uslike['sid']==$catdid){ echo $reaction_color; } ?> >
+                &nbsp;<?php if($uslike['sid']==$catdid){ echo $reaction_name; }else{ echo $lang['react']; } ?></p>
+                <!-- /POST OPTION TEXT -->
+              </div>
+              <!-- /POST OPTION -->
+
+              <!-- REACTION OPTIONS -->
+              <div class="reaction-options reaction-options-dropdown" style="position: absolute; z-index: 9999; bottom: 54px; left: -16px; opacity: 0; visibility: hidden; transform: translate(0px, 20px); transition: transform 0.3s ease-in-out 0s, opacity 0.3s ease-in-out 0s, visibility 0.3s ease-in-out 0s;">
+                <!-- REACTION OPTION -->
+                <div class="reaction-option text-tooltip-tft reaction_2_<?php echo $sucat['id']; ?>" data-title="like" style="position: relative;">
+                  <!-- REACTION OPTION IMAGE -->
+                  <img class="reaction-option-image" src="<?php url_site();  ?>/templates/_panel/img/reaction/like.png" alt="reaction-like">
+                  <!-- /REACTION OPTION IMAGE -->
+                <div class="xm-tooltip" style="white-space: nowrap; position: absolute; z-index: 99999; top: -28px; left: 50%; margin-left: -22px; opacity: 0; visibility: hidden; transform: translate(0px, 10px); transition: all 0.3s ease-in-out 0s;"><p class="xm-tooltip-text">Like</p></div></div>
+                <!-- /REACTION OPTION -->
+
+                <!-- REACTION OPTION -->
+                <div class="reaction-option text-tooltip-tft reaction_2_<?php echo $sucat['id']; ?>" data-title="love" style="position: relative;">
+                  <!-- REACTION OPTION IMAGE -->
+                  <img class="reaction-option-image" src="<?php url_site();  ?>/templates/_panel/img/reaction/love.png" alt="reaction-love">
+                  <!-- /REACTION OPTION IMAGE -->
+                <div class="xm-tooltip" style="white-space: nowrap; position: absolute; z-index: 99999; top: -28px; left: 50%; margin-left: -23.5px; opacity: 0; visibility: hidden; transform: translate(0px, 10px); transition: all 0.3s ease-in-out 0s;"><p class="xm-tooltip-text">Love</p></div></div>
+                <!-- /REACTION OPTION -->
+
+                <!-- REACTION OPTION -->
+                <div class="reaction-option text-tooltip-tft reaction_2_<?php echo $sucat['id']; ?>" data-title="dislike" style="position: relative;">
+                  <!-- REACTION OPTION IMAGE -->
+                  <img class="reaction-option-image" src="<?php url_site();  ?>/templates/_panel/img/reaction/dislike.png" alt="reaction-dislike">
+                  <!-- /REACTION OPTION IMAGE -->
+                <div class="xm-tooltip" style="white-space: nowrap; position: absolute; z-index: 99999; top: -28px; left: 50%; margin-left: -28px; opacity: 0; visibility: hidden; transform: translate(0px, 10px); transition: all 0.3s ease-in-out 0s;"><p class="xm-tooltip-text">Dislike</p></div></div>
+                <!-- /REACTION OPTION -->
+
+                <!-- REACTION OPTION -->
+                <div class="reaction-option text-tooltip-tft reaction_2_<?php echo $sucat['id']; ?>" data-title="happy" style="position: relative;">
+                  <!-- REACTION OPTION IMAGE -->
+                  <img class="reaction-option-image" src="<?php url_site();  ?>/templates/_panel/img/reaction/happy.png" alt="reaction-happy">
+                  <!-- /REACTION OPTION IMAGE -->
+                <div class="xm-tooltip" style="white-space: nowrap; position: absolute; z-index: 99999; top: -28px; left: 50%; margin-left: -27.5px; opacity: 0; visibility: hidden; transform: translate(0px, 10px); transition: all 0.3s ease-in-out 0s;"><p class="xm-tooltip-text">Happy</p></div></div>
+                <!-- /REACTION OPTION -->
+
+                <!-- REACTION OPTION -->
+                <div class="reaction-option text-tooltip-tft reaction_2_<?php echo $sucat['id']; ?>" data-title="funny" style="position: relative;">
+                  <!-- REACTION OPTION IMAGE -->
+                  <img class="reaction-option-image" src="<?php url_site();  ?>/templates/_panel/img/reaction/funny.png" alt="reaction-funny">
+                  <!-- /REACTION OPTION IMAGE -->
+                <div class="xm-tooltip" style="white-space: nowrap; position: absolute; z-index: 99999; top: -28px; left: 50%; margin-left: -27px; opacity: 0; visibility: hidden; transform: translate(0px, 10px); transition: all 0.3s ease-in-out 0s;"><p class="xm-tooltip-text">Funny</p></div></div>
+                <!-- /REACTION OPTION -->
+
+                <!-- REACTION OPTION -->
+                <div class="reaction-option text-tooltip-tft reaction_2_<?php echo $sucat['id']; ?>" data-title="wow" style="position: relative;">
+                  <!-- REACTION OPTION IMAGE -->
+                  <img class="reaction-option-image" src="<?php url_site();  ?>/templates/_panel/img/reaction/wow.png" alt="reaction-wow">
+                  <!-- /REACTION OPTION IMAGE -->
+                <div class="xm-tooltip" style="white-space: nowrap; position: absolute; z-index: 99999; top: -28px; left: 50%; margin-left: -24px; opacity: 0; visibility: hidden; transform: translate(0px, 10px); transition: all 0.3s ease-in-out 0s;"><p class="xm-tooltip-text">Wow</p></div></div>
+                <!-- /REACTION OPTION -->
+
+                <!-- REACTION OPTION -->
+                <div class="reaction-option text-tooltip-tft reaction_2_<?php echo $sucat['id']; ?>" data-title="angry" style="position: relative;">
+                  <!-- REACTION OPTION IMAGE -->
+                  <img class="reaction-option-image" src="<?php url_site();  ?>/templates/_panel/img/reaction/angry.png" alt="reaction-angry">
+                  <!-- /REACTION OPTION IMAGE -->
+                <div class="xm-tooltip" style="white-space: nowrap; position: absolute; z-index: 99999; top: -28px; left: 50%; margin-left: -26.5px; opacity: 0; visibility: hidden; transform: translate(0px, 10px); transition: all 0.3s ease-in-out 0s;"><p class="xm-tooltip-text">Angry</p></div></div>
+                <!-- /REACTION OPTION -->
+
+                <!-- REACTION OPTION -->
+                <div class="reaction-option text-tooltip-tft reaction_2_<?php echo $sucat['id']; ?>" data-title="sad" style="position: relative;">
+                  <!-- REACTION OPTION IMAGE -->
+                  <img class="reaction-option-image" src="<?php url_site();  ?>/templates/_panel/img/reaction/sad.png" alt="reaction-sad">
+                  <!-- /REACTION OPTION IMAGE -->
+                <div class="xm-tooltip" style="white-space: nowrap; position: absolute; z-index: 99999; top: -28px; left: 50%; margin-left: -21.5px; opacity: 0; visibility: hidden; transform: translate(0px, 10px); transition: all 0.3s ease-in-out 0s;"><p class="xm-tooltip-text">Sad</p></div></div>
+                <!-- /REACTION OPTION -->
+              </div>
+              <!-- /REACTION OPTIONS -->
+            </div>
+            <!-- /POST OPTION WRAP -->
+<?php } ?>
+<?php   if(isset($_COOKIE['user'])){ ?>
+            <!-- POST OPTION -->
+            <div  class="post-option sh_comment_t<?php echo $sutcat['id']; ?>">
+              <!-- POST OPTION ICON -->
+              <svg class="post-option-icon icon-comment">
+                <use xlink:href="#svg-comment"></use>
+              </svg>
+              <!-- /POST OPTION ICON -->
+
+              <!-- POST OPTION TEXT -->
+              <p class="post-option-text"><?php echo $lang['comment']; ?></p>
+              <!-- /POST OPTION TEXT -->
+            </div>
+            <!-- /POST OPTION -->
+<?php } ?>
+            <!-- POST OPTION -->
+            <div class="post-option-wrap" style="position: relative;">
+              <!-- POST OPTION -->
+              <div class="post-option reaction-options-dropdown-trigger">
+                <!-- POST OPTION ICON -->
+                <svg class="post-option-icon icon-share">
+                  <use xlink:href="#svg-share"></use>
+                </svg>
+                <!-- /POST OPTION ICON -->
+
+                <!-- POST OPTION TEXT -->
+                <p class="post-option-text"><?php echo $lang['share']; ?></p>
+                <!-- /POST OPTION TEXT -->
+              </div>
+              <!-- /POST OPTION -->
+
+              <!-- REACTION OPTIONS -->
+              <div class="reaction-options reaction-options-dropdown" style="position: absolute; z-index: 9999; bottom: 54px; left: -16px; opacity: 0; visibility: hidden; transform: translate(0px, 20px); transition: transform 0.3s ease-in-out 0s, opacity 0.3s ease-in-out 0s, visibility 0.3s ease-in-out 0s;">
+                <!-- REACTION OPTION -->
+                <div class="reaction-option text-tooltip-tft" data-title="facebook" style="position: relative;">
+                  <!-- REACTION OPTION IMAGE -->
+                  <a onClick="window.open('https://www.facebook.com/sharer/sharer.php?u=<?php echo $linksher; ?>');" href="javascript:void(0);" >
+                  <img class="reaction-option-image" src="<?php url_site();  ?>/templates/_panel/img/icons/facebook-icon.png" >
+                  </a>
+                  <!-- /REACTION OPTION IMAGE -->
+                </div>
+                <!-- /REACTION OPTION -->
+
+                <!-- REACTION OPTION -->
+                <div class="reaction-option text-tooltip-tft" data-title="twitter" style="position: relative;">
+                  <!-- REACTION OPTION IMAGE -->
+                  <a onClick="window.open('https://twitter.com/intent/tweet?text=<?php echo $namesher; ?>&url=<?php echo $linksher; ?>');" href="javascript:void(0);" >
+                  <img class="reaction-option-image" src="<?php url_site();  ?>/templates/_panel/img/icons/twitter-icon.png" >
+                  </a>
+                  <!-- /REACTION OPTION IMAGE -->
+                </div>
+                <!-- /REACTION OPTION -->
+
+                <!-- REACTION OPTION -->
+                <div class="reaction-option text-tooltip-tft" data-title="linkedin" style="position: relative;">
+                  <!-- REACTION OPTION IMAGE -->
+                  <a onClick="window.open('https://www.linkedin.com/sharing/share-offsite/?url=<?php echo $linksher; ?>');" href="javascript:void(0);" >
+                  <img class="reaction-option-image" src="<?php url_site();  ?>/templates/_panel/img/icons/linkedin-icon.png" >
+                  </a>
+                  <!-- /REACTION OPTION IMAGE -->
+                </div>
+                <!-- /REACTION OPTION -->
+
+                <!-- REACTION OPTION -->
+                <div class="reaction-option text-tooltip-tft" data-title="wasp" style="position: relative;">
+                  <!-- REACTION OPTION IMAGE -->
+                  <a onClick="window.open('https://www.wasp.gq/sharer?url=<?php echo $linksher; ?>&nbsp;<?php echo $namesher; ?>');" href="javascript:void(0);" >
+                  <img class="reaction-option-image" src="<?php url_site();  ?>/templates/_panel/img/icons/wasp-icon.png" >
+                  </a>
+                  <!-- /REACTION OPTION IMAGE -->
+                </div>
+                <!-- /REACTION OPTION -->
+
+
+               </div>
+              <!-- /REACTION OPTIONS -->
+            </div>
+            <!-- /POST OPTION -->
+          </div>
+<div class="post-comment-list comment_2_<?php echo $sucat['id']; ?> post<?php echo $sutcat['id']; ?>" ></div>
+<script>
+$(".comment_2_<?php echo $sucat['id']; ?>").load('<?php url_site();  ?>/templates/_panel/status/post_comment.php?s_type=2&tid=<?php echo $sucat['id']; ?>');
+$(".sh_comment_t<?php echo $susat['id']; ?>").addClass('active');
+</script>
+<script>
+$('.post_report<?php echo $sucat['id']; ?>').click(function(){
+  $("#report<?php echo $sucat['id']; ?>").load('<?php url_site();  ?>/templates/_panel/status/post_report.php?s_type=2&tid=<?php echo $sucat['id']; ?>');
         });
-    });
-     </script>
-
-       <script>
+</script>
+<script>
+$('.author_report<?php echo $sucat['id']; ?>').click(function(){
+  $("#report<?php echo $sucat['id']; ?>").load('<?php url_site();  ?>/templates/_panel/status/post_report.php?s_type=2&tid=<?php echo $sucat['id']; ?>&a_type=99');
+        });
+</script>
+<script>
+$('.post_delete<?php echo $sutcat['id']; ?>').click(function(){
+  $("#post_form<?php echo $sucat['id']; ?>").load('<?php url_site();  ?>/templates/_panel/status/post_delete.php?sid=<?php echo $sutcat['id']; ?>&dc=1');
+        });
+</script>
+<script>
      $("document").ready(function() {
-   $("#btntrash<?php echo $sutcat['id'];  ?>").click(btntrashComent<?php echo $sutcat['id'];  ?>);
+   $(".reaction_2_<?php echo $sucat['id']; ?>").click(postreaction<?php echo $sutcat['id']; ?>);
 
 });
+function postreaction<?php echo $sutcat['id']; ?>(){
+    var data_reaction = $(this).attr("data-title");
+   $.ajax({
+type: "POST",
+url: "<?php url_site();  ?>/requests/f_like.php?id=<?php echo $sucat['id']; ?>&f_like=like_up&t=f",
+data: "data_reaction=" + data_reaction,
+success: function (response) {
+// This code will run after the Ajax is successful
+$("#reaction_image<?php echo $sutcat['id']; ?>").html(response);
+$(".reaction_txt<?php echo $sutcat['id']; ?>").html("");
 
-function btntrashComent<?php echo $sutcat['id'];  ?>(){
-    $("#trash_comment<?php echo $sutcat['id'];  ?>").html("trash comment ...");
-    $.ajax({
-        url : '<?php url_site();  ?>/requests/f_coment.php?trash=<?php echo $sutcat["id"];  ?>',
-        data : {
-            trashid : $("#trashid").val()
-        },
-        datatype : "json",
-        type : 'post',
-        success : function(result) {
-                $("#coment<?php echo $sutcat['id'];  ?>").html("");
-        },
-        error : function() {
-            alert("Error reaching the server. Check your connection");
-        }
-    });
 }
-     </script>
-<?php }   echo pagination($statement,$per_page,$page); } ?>
-                           </div>
-						<div class="clearfix"></div>
-					</div>
-				</div>
-			</div>
-			</div>
-     <script>
-     $("document").ready(function() {
-   $("#btn").click(postComent);
-
-});
-
-function postComent(){
-    $("#old_comment").html("posting comment ...");
-    $.ajax({
-        url : '<?php url_site();  ?>/requests/f_coment.php?id=<?php echo $catdid; ?>',
-        data : {
-            comment : $("#comment").val()
-        },
-        datatype : "json",
-        type : 'post',
-        success : function(result) {
-                $("#old_comment").html(result);
-        },
-        error : function() {
-            alert("Error reaching the server. Check your connection");
-        }
-    });
+})
 }
-     </script>
-
-   <script>
-
-                   $(function(){
-
-
-function objectifyForm(formArray) {//serialize data function
-
-var returnArray = {};
-for (var i = 0; i < formArray.length; i++){
-returnArray[formArray[i]['name']] = formArray[i]['value'];
-}
-returnArray['submit'] = "Valider";
-return returnArray;
-}
-
-                     $('form').on('submit', function (e) {
-                       e.preventDefault();
-                    var returnArray = {};
-                    var getSelected = $(this).parent().find('input[name="set"]');
-                    var link = "";
-                    var getval = getSelected.val();
-
-                    if(getval=="share"){
-                    var typeId = $(this).parent().find('input[name="tid"]');
-                     returnArray['tid'] = typeId.val();
-                     var sType = $(this).parent().find('input[name="s_type"]');
-                     returnArray['s_type'] = sType.val();
-                     returnArray['submit'] = "Valider";
-                     link="<?php url_site();  ?>/requests/share.php" ;
-                        }else if(getval=="delete"){
-                    var typeId = $(this).parent().find('input[name="did"]');
-                    returnArray['did'] = typeId.val();
-                    returnArray['submit'] = "Valider";
-                    link="<?php url_site();  ?>/requests/delete.php" ;
-                    alert(link);
-                        }else if(getval=="Publish"){
-                    var typeId = $(this).parent().find('input[name="name"]');
-                    returnArray['name'] = typeId.val();
-                    var typeId = $(this).parent().find('textarea[name="txt"]');
-                    returnArray['txt'] = typeId.val();
-                    var typeId = $(this).parent().find('select[name="categ"]');
-                    returnArray['categ'] = typeId.val();
-                    var typeId = $(this).parent().find('input[name="s_type"]');
-                    returnArray['s_type'] = typeId.val();
-                    returnArray['submit'] = "Valider";
-                    link="<?php url_site();  ?>/requests/status.php" ;
-                    }else if(getval=="edit"){
-                    var typeId = $(this).parent().find('input[name="name"]');
-                    returnArray['name'] = typeId.val();
-                    var typeId = $(this).parent().find('textarea[name="txt"]');
-                    returnArray['txt'] = typeId.val();
-                    var typeId = $(this).parent().find('select[name="categ"]');
-                    returnArray['categ'] = typeId.val();
-                    var typeId = $(this).parent().find('input[name="tid"]');
-                    returnArray['tid'] = typeId.val();
-                    var typeId = $(this).parent().find('input[name="s_type"]');
-                    returnArray['s_type'] = typeId.val();
-                    returnArray['submit'] = "Valider";
-                    link="<?php url_site();  ?>/requests/edit_status.php" ;
-                    }else if(getval=="Report"){
-                    var typeId = $(this).parent().find('textarea[name="txt"]');
-                    returnArray['txt'] = typeId.val();
-                     var typeId = $(this).parent().find('input[name="tid"]');
-                    returnArray['tid'] = typeId.val();
-                    var typeId = $(this).parent().find('input[name="s_type"]');
-                    returnArray['s_type'] = typeId.val();
-                    returnArray['submit'] = "Valider";
-                    link="<?php url_site();  ?>/requests/report.php" ;
-                    }
-        $.ajax({
-type:"POST",
-data:returnArray,
-url: link,
-success:function(){ $(".alert-success").fadeIn();},
-error: function(){ $(".alert-danger").fadeIn(); }
-
-});
-    });
-});
-
-                   </script>
+</script>
 <?php }else{ template_mine('404'); } }else{ echo"404"; }  ?>
-          

@@ -1,4 +1,4 @@
-﻿<?php if($s_st=="buyfgeufb"){
+﻿<?php if($s_st=="buyfgeufb"){   global $admin_page;
   include "requests/captcha.php";
   if(isset($_GET['st'])){
  $k_type = "knowledgebase";
@@ -34,65 +34,54 @@
 				<div class="inbox-section">
                     <div class="inbox-grids">
 						<div class="col-md-3 inbox-grid">
-                        <div class="grid-inbox">
-                                <div class="inbox-top">
-                                        <div class="inbox-text">
-										<center><h5><b><?php lang('knowledgebase');  ?></b></h5></center>
-								   </div>
-									<div class="clearfix"></div>
-								</div>
-
-                                <a class="btn-default compose" href="<?php url_site();  ?>/producer/<?php echo $tpstorRow['name']; ?>" >
-                                <img src="<?php echo $tpstorRow['o_mode']; ?>" class="img-responsive" alt="">
-                                <br />
-                                <font face="Comic Sans MS"><b><?php echo $tpstorRow['name']; ?>
-                                </b></font>
-                                </a>
-
-                                <a href="<?php url_site();  ?>/portal" class="compose" ><i class="fa fa-globe"></i> Portal</a>
-								<a href="<?php url_site();  ?>/store" class="compose" ><i class="fa fa-shopping-cart"></i> <?php lang('Store');  ?>&nbsp;
-                                <span class="badge badge-info"><font face="Comic Sans MS">beta<br></font></span></a> <br />
-
-
-<?php ads_site(5);  ?>                           </div>
-
+                          <div class="grid-inbox">
+                            <div class="inbox-top">
+                               <div class="inbox-text">
+								  <center><h5><b><?php lang('knowledgebase');  ?></b></h5></center>
+							   </div>
+							</div>
+                            <hr />
+                            <a class="btn-default compose" href="<?php url_site();  ?>/producer/<?php echo $tpstorRow['name']; ?>" >
+                            <img src="<?php echo $tpstorRow['o_mode']; ?>" class="img-responsive" alt="">
+                            <br />
+                            <font face="Comic Sans MS"><b><?php echo $tpstorRow['name']; ?></b></font>
+                            </a>
+                          </div>
+                           <hr />
 						</div>
-						<div class="col-md-9 inbox-grid1">
-							<div class="mailbox-content">
-                            <div class="panel panel-primary">
-                            <div class="panel-heading"><center><b><?php echo $sknowled['name']; ?></b></center></div>
-
-  <div class="panel-body">
-								<div class=" col-md-8 compose-btn">
-                                    <a class="btn btn-sm btn-default" href="<?php url_site();  ?>/pgk/<?php echo $tpstorRow['name']; ?>:<?php echo $sknowled['name']; ?>"><?php lang('pending');  ?>
-                                    &nbsp;<span class="badge badge-info"><font face="Comic Sans MS"><b><?php echo $contknow; ?></b><br></font></span></a>
-                                    <a class="btn btn-sm btn-success" href="<?php url_site();  ?>/producer/<?php echo $tpstorRow['name']; ?>"><b> <?php echo $tpstorRow['name']; ?></b></a>
-                                    <a class="btn btn-sm btn-primary" href="<?php url_site();  ?>/edk/<?php echo $tpstorRow['name']; ?>:<?php echo $sknowled['name']; ?>">
-                                    <i class="fa fa-pencil-square-o"></i> <?php lang('edit'); ?></a>
-                                    <a class="btn btn-sm btn-info" href="<?php url_site();  ?>/hkd/<?php echo $tpstorRow['name']; ?>:<?php echo $sknowled['name']; ?>">
-                                    <i class="fa fa-history"></i>&nbsp;<?php lang('history');  ?></a>
-                                </div>
-
-
-                                  </div> </div>
-                                  <div class=" col-md-12 inbox-grid1">
-        <div class="panel panel-default">
-  <div class="panel-body">
-    <div class="topic">
-								   <p><?php echo $sknowled['o_valuer']; ?></p>
-
-                                  </div> <hr>
-
-							</div> <div class="clearfix"></div>
-                              </div>
-
-                                  </div> </div>
-                                           </div>
-						<div class="clearfix"></div>
-					</div>
-				</div>
-			</div>
-			</div>
+<div class="col-md-9 inbox-grid1">
+ <div class="mailbox-content">
+    <div class="panel panel-primary">
+            <div class="panel-heading"><center><b><?php echo $sknowled['name']; ?></b></center></div>
+            <div class="panel-body">
+				  <div class=" col-md-8 compose-btn">
+                      <a class="btn btn-sm btn-default" href="<?php url_site();  ?>/pgk/<?php echo $tpstorRow['name']; ?>:<?php echo $sknowled['name']; ?>"><?php lang('pending');  ?>
+                      &nbsp;<span class="badge badge-info"><font face="Comic Sans MS"><b><?php echo $contknow; ?></b><br></font></span></a>
+                      <a class="btn btn-sm btn-success" href="<?php url_site();  ?>/producer/<?php echo $tpstorRow['name']; ?>"><b> <?php echo $tpstorRow['name']; ?></b></a>
+                      <a class="btn btn-sm btn-primary" href="<?php url_site();  ?>/edk/<?php echo $tpstorRow['name']; ?>:<?php echo $sknowled['name']; ?>">
+                      <i class="fa fa-pencil-square-o"></i> <?php lang('edit'); ?></a>
+                      <a class="btn btn-sm btn-info" href="<?php url_site();  ?>/hkd/<?php echo $tpstorRow['name']; ?>:<?php echo $sknowled['name']; ?>">
+                      <i class="fa fa-history"></i>&nbsp;<?php lang('history');  ?></a>
+                  </div>
+            </div>
+    </div>
+ <div class=" col-md-12 inbox-grid1">
+  <hr />
+  <div class="panel panel-default">
+    <div class="panel-body">
+     <div class="topic">
+	  <p><?php echo $sknowled['o_valuer']; ?></p>
+     </div>
+    </div>
+    <hr />
+  </div>
+ </div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
  <?php }else{    ?>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sceditor@3/minified/themes/default.min.css" />
 <script src="https://cdn.jsdelivr.net/npm/sceditor@3/minified/sceditor.min.js"></script>
@@ -257,7 +246,7 @@ style: 'https://cdn.jsdelivr.net/npm/sceditor@3/minified/themes/content/default.
 			</div>
 		</div>
  <?php }else if(isset($_GET['kb'])){
-  $o_type = "store";
+                 $o_type = "store";
                  $stormt = $db_con->prepare("SELECT *  FROM options WHERE name=:name AND o_type=:o_type ORDER BY `id` " );
                  $stormt->bindParam(":o_type", $o_type);
                  $stormt->bindParam(":name", $_GET['kb']);
@@ -282,28 +271,25 @@ style: 'https://cdn.jsdelivr.net/npm/sceditor@3/minified/themes/content/default.
                  $catusen->bindParam(":id",$o_parent );
                  $catusen->execute();
                  $catussen=$catusen->fetch(PDO::FETCH_ASSOC);
+                 $servictp = "store_type" ;
+                 $catustp = $db_con->prepare("SELECT *  FROM options WHERE  ( o_type='{$servictp}' AND o_parent='{$store['id']}' ) ");
+                 $catustp->execute();
+                 $catusstp=$catustp->fetch(PDO::FETCH_ASSOC);
+                 $catdid=$catusstp['o_order'];
+                 $catust = $db_con->prepare("SELECT * FROM status WHERE s_type IN (7867) AND tp_id =".$catdid );
+                 $catust->execute();
+                 $susat=$catust->fetch(PDO::FETCH_ASSOC);
  ?>
-		<div id="page-wrapper">
-			<div class="main-page">
+     <!-- GRID -->
+    <div class="grid">
+      <!-- GRID -->
+      <div class="grid grid-12 centered">
+      <?php tpl_store_stt($susat,0); ?>
 				<!--buttons-->
 				<div class="grids-section">
 				   <div class="panel panel-widget">
 				  <div class="inbox-top">
-									<div class="inbox-img">
-<a href="<?php echo $url_site; ?>/producer/<?php echo $store['name']; ?>">
-<img src="<?php echo $store['o_mode']; ?>" onerror="this.src='<?php echo $url_site;  ?>/templates/_panel/images/error_plug.png'"  class="img-responsive" ></a>
-      </div>  <br />
-										<div class="inbox-text">
-										        <h3><a href="<?php echo $url_site; ?>/producer/<?php echo $store['name']; ?>">
-                                                <?php echo $store['name']; ?>_<sub><?php echo $storefile['name'];  ?></sub>
-                                                <span class="badge badge-info"><font face="Comic Sans MS"><b><?php echo $storepts; ?>
-                                                </b><br></font></span></a></h3>
-                                                 <?php echo "<a  href=\"{$url_site}/u/{$catussen['id']}\"   ><img class=\"imgu-bordered-sm\" src=\"{$url_site}/{$catussen['img']}\" align=\"left\" style=\"width: 35px;\" alt=\"{$catussen['username']}\">{$catussen['username']}";
-            online_us($catussen['id']);
-            check_us($catussen['id']);
-            echo "</a>  " ;  ?><hr />
-									 </div>
-									<div class="clearfix"></div>
+                     <a href="javascript:void(0);" data-toggle="modal" data-target="#addkb" class="btn btn-info" role="button" ><?php lang('add'); ?></a>
 								</div>
                                    </div>
 
@@ -311,9 +297,9 @@ style: 'https://cdn.jsdelivr.net/npm/sceditor@3/minified/themes/content/default.
 			</div>
             <div class="col-md-12 table-grid">
                 <div class="panel panel-widget">
-                <a href="javascript:void(0);" data-toggle="modal" data-target="#addkb" class="btn btn-info" role="button" ><?php lang('add'); ?></a>
-                <div class="modal fade" id="addkb" tabindex="-1" role="dialog">
-				<div class="modal-dialog" role="document">
+
+                <div class="modal fade" id="addkb" data-backdrop="" tabindex="-1" role="dialog">
+				<div class="modal-dialog modal-dialog-centered" role="document">
 					<div class="modal-content modal-info">
 						<div class="modal-header">
                         <i class="fa fa-info-circle" aria-hidden="true"></i><?php lang('add'); ?>&nbsp;>&nbsp;<?php lang('knowledgebase'); ?>
@@ -365,8 +351,8 @@ style: 'https://cdn.jsdelivr.net/npm/sceditor@3/minified/themes/content/default.
                        echo "<tr>
                               <th>#{$sknowled['id']}</th>
 							  <th><a href=\"{$url_site}/kb/{$store['name']}:{$sknowled['name']}\">{$sknowled['name']}</a>
-            <div class=\"modal fade\" id=\"{$sknowled['id']}\" tabindex=\"-1\" role=\"dialog\">
-				<div class=\"modal-dialog\" role=\"document\">
+            <div class=\"modal fade\" id=\"{$sknowled['id']}\" data-backdrop=\"\" tabindex=\"-1\" role=\"dialog\">
+				<div class=\"modal-dialog modal-dialog-centered\" role=\"document\">
 					<div class=\"modal-content modal-info\">
 						<div class=\"modal-body\">
 							<div class=\"more-grids\">
@@ -390,13 +376,7 @@ style: 'https://cdn.jsdelivr.net/npm/sceditor@3/minified/themes/content/default.
 					</table>
                 </div>
 				</div>  <div class="clearfix"></div>
-                    <script type="text/javascript">
-            $(document).ready(function() {
-    $('#tablepagination').dataTable( {
-    "order": [[ 0, 'DESC' ]]
-} );
-} );
-</script>
+
 				</div>
 				</div>
         <?php }else if(isset($_GET['pr']) AND isset($_GET['pg'])){
@@ -480,8 +460,8 @@ style: 'https://cdn.jsdelivr.net/npm/sceditor@3/minified/themes/content/default.
   OR (isset($_COOKIE['admin']) AND ($_COOKIE['admin']==$hachadmin))){
     echo "<a href=\"javascript:void(0);\" data-toggle=\"modal\" data-target=\"#replacing\" class=\"btn btn-primary\" role=\"button\">
              <i class=\"fa fa-exchange\"></i>&nbsp;{$lang['replacing']}</a>";
-               echo "<div class=\"modal fade\" id=\"replacing\" tabindex=\"-1\" role=\"dialog\">
-				<div class=\"modal-dialog\" role=\"document\">
+               echo "<div class=\"modal fade\" id=\"replacing\" data-backdrop=\"\" tabindex=\"-1\" role=\"dialog\">
+				<div class=\"modal-dialog modal-dialog-centered\" role=\"document\">
 					<div class=\"modal-content modal-info\">
                     <div class=\"modal-header\">
                         <i class=\"fa fa-info-circle\" aria-hidden=\"true\"></i>
@@ -508,13 +488,7 @@ style: 'https://cdn.jsdelivr.net/npm/sceditor@3/minified/themes/content/default.
                     </form>
                 </div>
 				</div>  <div class="clearfix"></div>
-                    <script type="text/javascript">
-            $(document).ready(function() {
-    $('#tablepagination').dataTable( {
-    "order": [[ 0, 'DESC' ]]
-} );
-} );
-</script>
+
 				</div>
 				</div>
               <?php }else if(isset($_GET['pp']) AND isset($_GET['tt'])){
@@ -598,8 +572,8 @@ style: 'https://cdn.jsdelivr.net/npm/sceditor@3/minified/themes/content/default.
   OR (isset($_COOKIE['admin']) AND ($_COOKIE['admin']==$hachadmin))){
     echo "<a href=\"javascript:void(0);\" data-toggle=\"modal\" data-target=\"#recovery\" class=\"btn btn-primary\" role=\"button\">
              <i class=\"fa fa-undo\"></i>&nbsp;{$lang['recovery']}</a>";
-               echo "<div class=\"modal fade\" id=\"recovery\" tabindex=\"-1\" role=\"dialog\">
-				<div class=\"modal-dialog\" role=\"document\">
+               echo "<div class=\"modal fade\" id=\"recovery\" data-backdrop=\"\" tabindex=\"-1\" role=\"dialog\">
+				<div class=\"modal-dialog modal-dialog-centered\" role=\"document\">
 					<div class=\"modal-content modal-info\">
                     <div class=\"modal-header\">
                         <i class=\"fa fa-info-circle\" aria-hidden=\"true\"></i>
@@ -626,22 +600,74 @@ style: 'https://cdn.jsdelivr.net/npm/sceditor@3/minified/themes/content/default.
                     </form>
                 </div>
 				</div>  <div class="clearfix"></div>
-                    <script type="text/javascript">
-            $(document).ready(function() {
-    $('#tablepagination').dataTable( {
-    "order": [[ 0, 'DESC' ]]
-} );
-} );
-</script>
+
 				</div>
 				</div>
                 <?php }else if(isset($_GET['knowledgebase'])){    ?>
-		<div id="page-wrapper">
-			<div class="main-page">
-				<!--buttons-->
+<?php if(isset($admin_page) AND ($admin_page==1)){ ?>
+<?php template_mine('admin/admin_header');  ?>
+<div class="grid grid-3-6-3 medium-space" >
+<div class="grid-column" >
+<?php template_mine('admin/admin_nav');  ?>
+</div>
+<?php }else{ ?>
+<div class="grid grid change-on-desktop" >
+       <div class="achievement-box secondary" style="background: url(<?php url_site();  ?>/templates/_panel/img/banner/03.jpg) no-repeat 50%; background-size: cover " >
+          <!-- ACHIEVEMENT BOX INFO WRAP -->
+          <div class="achievement-box-info-wrap">
+            <!-- ACHIEVEMENT BOX IMAGE -->
+            <img class="achievement-box-image" src="<?php url_site();  ?>/templates/_panel/img/banner/exchange.png" alt="badge-caffeinated-b">
+            <!-- /ACHIEVEMENT BOX IMAGE -->
 
-            <div class="col-md-12 table-grid">
-                <div class="panel panel-widget">
+            <!-- ACHIEVEMENT BOX INFO -->
+            <div class="achievement-box-info">
+              <!-- ACHIEVEMENT BOX TITLE -->
+              <p class="achievement-box-title"><?php lang('list'); ?>&nbsp;<?php lang('exvisit'); ?></p>
+              <!-- /ACHIEVEMENT BOX TITLE -->
+
+              <!-- ACHIEVEMENT BOX TEXT -->
+              <p class="achievement-box-text"><b><?php lang('ctevbtexp'); ?></b></p>
+              <!-- /ACHIEVEMENT BOX TEXT -->
+            </div>
+            <!-- /ACHIEVEMENT BOX INFO -->
+          </div>
+          <!-- /ACHIEVEMENT BOX INFO WRAP -->
+
+          <!-- BUTTON -->
+          <a class="button white-solid" onClick="window.open('visits.php?id=<?php user_row('id') ; ?>');" href="javascript:void(0);" >
+          <i class="fa fa-exchange nav_icon"></i>&nbsp;<?php lang('exvisit'); ?>
+          </a>
+          <!-- /BUTTON -->
+       </div>
+</div>
+<div class="section-filters-bar v6">
+      <!-- SECTION FILTERS BAR ACTIONS -->
+      <div class="section-filters-bar-actions" >
+      <a href="https://www.adstn.gq/kb/myads:<?php lang('list'); ?>&nbsp;<?php lang('exvisit'); ?>" class="button primary " target="_blank">&nbsp;<b><i class="fa fa-question-circle" aria-hidden="true"></i></b></a>
+      </div>
+      <p class="text-sticker">
+          <!-- TEXT STICKER ICON -->
+          <svg class="text-sticker-icon icon-info">
+            <use xlink:href="#svg-info"></use>
+          </svg>
+          <!-- TEXT STICKER ICON -->
+          <?php echo $lang['you_have']."&nbsp;"; user_row('vu'); echo "&nbsp;".$lang['ptvysa']; ?>&nbsp;|&nbsp;
+          <?php echo $lang['yshbv']."&nbsp;:&nbsp;"; vu_state_row('visits','vu');  ?>
+      </p>
+      <div class="section-filters-bar-actions">
+        <!-- BUTTON -->
+        <a href="<?php url_site();  ?>/promote?p=exchange" class="button secondary" style="color: #fff;" >
+        <i class="fa fa-plus nav_icon"></i>&nbsp;
+        <?php lang('add'); ?>
+        </a>
+        <!-- /BUTTON -->
+      </div>
+      <!-- /SECTION FILTERS BAR ACTIONS -->
+</div>
+<div class="grid grid" >
+<?php } ?>
+	  <div class="grid-column" >
+    <div class="widget-box" >
                      <center> <h1><b><i><?php echo $lang['knowledgebase'];  ?></i></b></h1></center><hr />
 					<table id="tablepagination" class="table table-hover">
 						<thead>
@@ -672,8 +698,8 @@ style: 'https://cdn.jsdelivr.net/npm/sceditor@3/minified/themes/content/default.
                        echo "<tr>
                               <th>#{$sknowled['id']}</th>
 							  <th><a href=\"{$url_site}/kb/{$sknowled['o_mode']}:{$sknowled['name']}\">{$sknowled['name']}</a>
-            <div class=\"modal fade\" id=\"{$sknowled['id']}\" tabindex=\"-1\" role=\"dialog\">
-				<div class=\"modal-dialog\" role=\"document\">
+            <div class=\"modal fade\" id=\"{$sknowled['id']}\" data-backdrop=\"\" tabindex=\"-1\" role=\"dialog\">
+				<div class=\"modal-dialog modal-dialog-centered\" role=\"document\">
 					<div class=\"modal-content modal-info\">
 						<div class=\"modal-body\">
 							<div class=\"more-grids\">
@@ -697,15 +723,7 @@ style: 'https://cdn.jsdelivr.net/npm/sceditor@3/minified/themes/content/default.
                </tbody>
 					</table>
                 </div>
-				</div>  <div class="clearfix"></div>
-                    <script type="text/javascript">
-            $(document).ready(function() {
-    $('#tablepagination').dataTable( {
-    "order": [[ 0, 'DESC' ]]
-} );
-} );
-</script>
-				</div>
+                </div>
 				</div>
               <?php   } ?>
 <?php }else{ echo"404"; }  ?>

@@ -1,7 +1,7 @@
 ﻿<?php
 #####################################################################
 ##                                                                 ##
-##                        My ads v2.4.x                            ##
+##                         MYads  v3.x.x                           ##
 ##                     http://www.krhost.ga                        ##
 ##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
@@ -49,7 +49,7 @@ $catusz->execute();
 $sucat=$catusz->fetch(PDO::FETCH_ASSOC);
               if($sucat['uid']!=$bn_uid){
             $bn_nurl = "t".$bn_tid;
-            $bn_logo  = "comment.png";
+            $bn_logo  = "comment";
             $bn_state = "1";
             $usz = $db_con->prepare("SELECT *  FROM `users` WHERE id=".$bn_uid );
             $usz->execute();
@@ -64,36 +64,74 @@ $sucat=$catusz->fetch(PDO::FETCH_ASSOC);
             $stmntf->bindParam(":time", $bn_time);
             $stmntf->bindParam(":state", $bn_state);
             if($stmntf->execute()){
-             header('Location: ' . $_SERVER['HTTP_REFERER']);
          	}
             }
 $comment =  $_POST['comment'] ;
-$emojis = array();
-$smlusen = $db_con->prepare("SELECT *  FROM emojis ");
-$smlusen->execute();
-while($smlssen=$smlusen->fetch(PDO::FETCH_ASSOC)){
-    $emojis['name'][]=$smlssen['name'];
-    $emojis['img'][]="<img src=\"{$smlssen['img']}\" width=\"23\" height=\"23\" />";
-}
-  if(isset($emojis['name']) && isset($emojis['img']) ) {
-         $comment = str_replace($emojis['name'], $emojis['img'], $comment);
-}
-
-             $comment = preg_replace('/[@]+([A-Za-z0-9-_]+)/', '<b>$1</b>', $comment );
-$comment = preg_replace('/[#]+([A-Za-z0-9-_]+)/', '<i>$1</i>', $comment );
-$comment = preg_replace('/[$]+([A-Za-z0-9-_]+)/', '<s>$1</s>', $comment );
+$comment = preg_replace('/ #([^\s]+) /', '<a  href="'.$url_site.'/tag/$1" >#$1</a>', $comment );
+$comment = strip_tags($comment, '<p><a><b><br><li><ul><font><span><pre><u><s><img>');
               $catuscm = $db_con->prepare("SELECT *  FROM users WHERE  id='{$bn_uid}'");
               $catuscm->execute();
               $catusscm=$catuscm->fetch(PDO::FETCH_ASSOC);
-            $result = "<div class=\" col-md-12 inbox-grid1\">
-        <div class=\"panel panel-default\">
-  <div class=\"panel-heading\"><a  href=\"{$url_site}/u/{$catusscm['id']}\"   ><img class=\"imgu-bordered-sm\" src=\"{$url_site}/{$catusscm['img']}\" style=\"width: 35px;\" alt=\"user image\"> {$catusscm['username']}</a></div>
-  <div class=\"panel-body\">
-   {$comment}
-  </div>
-</div>
-       </div>" ;
-            echo $result;
+ ?>          <hr />
+             <!-- POST COMMENT -->
+            <div class="post-comment">
+              <!-- USER AVATAR -->
+              <a class="user-avatar small no-outline online" href="<?php echo "{$url_site}/u/{$catusscm['id']}"; ?>">
+                <!-- USER AVATAR CONTENT -->
+                <div class="user-avatar-content ">
+                  <!-- HEXAGON -->
+                  <div class="hexagon-image-30-32" data-src="<?php echo "{$url_site}/{$catusscm['img']}"; ?>" style="width: 30px; height: 32px; position: relative;"><canvas style="position: absolute; top: 0px; left: 0px;" width="30" height="32"></canvas></div>
+                  <!-- /HEXAGON -->
+                </div>
+                <!-- /USER AVATAR CONTENT -->
+
+                <!-- USER AVATAR PROGRESS BORDER -->
+                <div class="user-avatar-progress-border">
+                  <!-- HEXAGON -->
+                  <div class="hexagon-border-40-44" style="width: 40px; height: 44px; position: relative;"><canvas style="position: absolute; top: 0px; left: 0px;" width="40" height="44"></canvas></div>
+                  <!-- /HEXAGON -->
+                </div>
+                <!-- /USER AVATAR PROGRESS BORDER -->
+ <?php  if($catusscm['ucheck']=="1"){  ?>
+                <!-- USER AVATAR BADGE -->
+                <div class="user-avatar-badge">
+                  <!-- USER AVATAR BADGE BORDER -->
+                  <div class="user-avatar-badge-border">
+                    <!-- HEXAGON -->
+                    <div class="hexagon-22-24" style="width: 22px; height: 24px; position: relative;"><canvas style="position: absolute; top: 0px; left: 0px;" width="22" height="24"></canvas></div>
+                    <!-- /HEXAGON -->
+                  </div>
+                  <!-- /USER AVATAR BADGE BORDER -->
+
+                  <!-- USER AVATAR BADGE CONTENT -->
+                  <div class="user-avatar-badge-content">
+                    <!-- HEXAGON -->
+                    <div class="hexagon-dark-16-18" style="width: 16px; height: 18px; position: relative;"><canvas style="position: absolute; top: 0px; left: 0px;" width="16" height="18"></canvas></div>
+                    <!-- /HEXAGON -->
+                  </div>
+                  <!-- /USER AVATAR BADGE CONTENT -->
+
+                  <!-- USER AVATAR BADGE TEXT -->
+                  <p class="user-avatar-badge-text"><i class="fa fa-fw fa-check" ></i></p>
+                  <!-- /USER AVATAR BADGE TEXT -->
+                </div>
+<?php } ?>
+                <!-- /USER AVATAR BADGE -->
+              </a>
+              <!-- /USER AVATAR -->
+
+              <!-- POST COMMENT TEXT -->
+              <p class="post-comment-text">
+              <a class="post-comment-text-author" href="<?php echo "{$url_site}/u/{$catusscm['id']}"; ?>"><?php echo $catusscm['username']; ?></a>
+              <?php echo $comment; ?>
+              </p>
+              <!-- /POST COMMENT TEXT -->
+
+            </div>
+            <!-- /POST COMMENT -->
+<script src="<?php echo $url_site;  ?>/templates/_panel/js/global.hexagons.js"></script>
+ <?php
+
          	}
 
 

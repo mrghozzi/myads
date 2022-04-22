@@ -2,7 +2,7 @@
 
 #####################################################################
 ##                                                                 ##
-##                        My ads v2.4.x                            ##
+##                         MYads  v3.x.x                           ##
 ##                     http://www.krhost.ga                        ##
 ##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
@@ -20,7 +20,7 @@ include "../dbconfig.php";
  $usadmin=$stadmin_select->fetch(PDO::FETCH_ASSOC);
  $hachadmin= md5($usadmin['pass'].$usadmin['username']) ;
 if($vrf_License=="65fgh4t8x5fe58v1rt8se9x"){
-    if($_POST['submit']){
+    if($_GET['submit']){
 
            $bn_tid = $_POST['did'];
 
@@ -36,6 +36,10 @@ if($vrf_License=="65fgh4t8x5fe58v1rt8se9x"){
  $s_type ="forum";
 }else if($catuss['s_type']==4){
  $s_type ="forum";
+}else if($catuss['s_type']==100){
+ $s_type ="forum";
+}else if($catuss['s_type']==7867){
+ $s_type ="forum";
 }
     $catusd = $db_con->prepare("SELECT *  FROM {$s_type} WHERE  id='{$bn_did}'");
     $catusd->execute();
@@ -49,6 +53,27 @@ if($vrf_License=="65fgh4t8x5fe58v1rt8se9x"){
     if($catussd['uid']==$bn_uid){
     $stmt=$db_con->prepare("DELETE FROM {$s_type} WHERE id=:id AND uid=:uid ");
 	$stmt->execute(array(':id'=>$bn_did,':uid'=>$bn_uid));
+ if($catuss['s_type']==7867){
+   $servictp = "store_type" ;
+   $catustp = $db_con->prepare("SELECT *  FROM options WHERE  ( o_type='{$servictp}' AND o_order='{$bn_did}' ) ");
+   $catustp->execute();
+   $catusstp=$catustp->fetch(PDO::FETCH_ASSOC);
+    $Tob      = $_SERVER['DOCUMENT_ROOT'];
+    $servicst = "store" ;
+    $stmtst=$db_con->prepare("DELETE FROM options WHERE ( o_type=:o_type AND id=:id AND o_parent=:uid ) ");
+	$stmtst->execute(array(':o_type'=>$servicst,':id'=>$catusstp['o_parent'],':uid'=>$bn_uid));
+    $sttnid = $db_con->prepare("SELECT * FROM `options` WHERE `o_type` = 'store_file' AND `o_parent` =".$catusstp['o_parent']." " );
+    $sttnid->execute();
+     while($strtnid=$sttnid->fetch(PDO::FETCH_ASSOC)){
+    $servicfl = "store_file" ;
+    $stmtst=$db_con->prepare("DELETE FROM options WHERE ( o_type=:o_type AND id=:id ) ");
+	$stmtst->execute(array(':o_type'=>$servicfl,':id'=>$strtnid['id']));
+    unlink($Tob.'/'.$strtnid['o_mode']);
+     }
+    $servicst = "store_type" ;
+    $stmtst=$db_con->prepare("DELETE FROM options WHERE ( o_type=:o_type AND id=:id AND o_parent=:o_parent ) ");
+	$stmtst->execute(array(':o_type'=>$servicst,':id'=>$catusstp['id'],':o_parent'=>$catusstp['o_parent']));
+ }
     $catusdd = $db_con->prepare("SELECT *  FROM status WHERE  tp_id='{$bn_did}' AND s_type='{$bn_s_type}' ");
     $catusdd->execute();
     while($catudd=$catusdd->fetch(PDO::FETCH_ASSOC)){

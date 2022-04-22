@@ -5,65 +5,100 @@ $msgeid = $_GET['m'];
 $catus = $db_con->prepare("SELECT *  FROM users WHERE  id='{$_GET['m']}'");
 $catus->execute();
 $catuss=$catus->fetch(PDO::FETCH_ASSOC);  ?>
-		<div id="page-wrapper">
-			<div class="main-page">
-               <div class="col-md-4 table-grid">
-               <a href="<?php url_site();  ?>/u/<?php echo $catuss['id']; ?>" >
-               <div class="panel panel-widget">
-				  <div class="inbox-top">
-									<div class="inbox-img">
-										<img src="<?php url_site();  ?>/<?php echo $catuss['img']; ?>" class="img-responsive" alt="">
-									</div>
-										<div class="inbox-text">
-										<h5><?php echo $catuss['username'];  ?></h5>
-									 </div>
-									<div class="clearfix"></div>
-								</div>
-                                   </div>  </a>
+<div class="account-hub-content">
+        <!-- SECTION HEADER -->
+        <div class="section-header">
+          <!-- SECTION HEADER INFO -->
+          <div class="section-header-info">
+            <!-- SECTION PRETITLE -->
+            <p class="section-pretitle">My Profile</p>
+            <!-- /SECTION PRETITLE -->
+
+            <!-- SECTION TITLE -->
+            <h2 class="section-title">Messages</h2>
+            <!-- /SECTION TITLE -->
+          </div>
+          <!-- /SECTION HEADER INFO -->
+
+        </div>
+        <!-- /SECTION HEADER -->
+
+        <!-- CHAT WIDGET WRAP -->
+        <div class="chat-widget-wrap">
+          <!-- CHAT WIDGET -->
+          <div class="chat-widget" style="width: 100%;">
+            <!-- CHAT WIDGET HEADER -->
+            <div class="chat-widget-header">
+              <!-- USER STATUS -->
+              <div class="user-status">
+                <!-- USER STATUS AVATAR -->
+                <div class="user-status-avatar">
+                  <!-- USER AVATAR -->
+                  <div class="user-avatar small no-outline <?php online_us($catuss['id']); ?>">
+                    <!-- USER AVATAR CONTENT -->
+                    <div class="user-avatar-content">
+                      <!-- HEXAGON -->
+                      <div class="hexagon-image-30-32" data-src="<?php url_site();  ?>/<?php echo $catuss['img']; ?>" ><canvas width="30" height="32"></canvas></div>
+                      <!-- /HEXAGON -->
                     </div>
-             <hr /><br />
-            <div class="col-md-12 table-grid">
-                <div class="panel panel-widget">
+                    <!-- /USER AVATAR CONTENT -->
 
-
-
-                            <div class=" col-md-12 inbox-grid1">
-        <div class="panel panel-default">
-  <div class="panel-body">
-
-<textarea id='comment' class='form-control'></textarea><br />
-<center><button id = 'btn' class="btn btn-info" ><i class="fa fa-paper-plane"></i></button>
-<button type="button" class="btn btn-lg btn-warning" data-toggle="popover" data-html="true"
-title="<span style='color:#FFCC00'><i class='fa fa-smile-o' ></i></span> Emojis"
-data-content="
+                    <!-- USER AVATAR PROGRESS BORDER -->
+                    <div class="user-avatar-progress-border">
+                      <!-- HEXAGON -->
+                      <div class="hexagon-border-40-44" ><canvas width="40" height="44"></canvas></div>
+                      <!-- /HEXAGON -->
+                    </div>
+                    <!-- /USER AVATAR PROGRESS BORDER -->
 <?php
-$smlusen = $db_con->prepare("SELECT *  FROM emojis ");
-$smlusen->execute();
-$c = 1;
-while($smlssen=$smlusen->fetch(PDO::FETCH_ASSOC)){
-    echo "<span class='label label-default'><b>".$smlssen['name']."</b> = ";
-    echo  "<img src='{$smlssen['img']}' width='23' height='23' /></span>";
-    if($c == 3){ echo "<br />"; $c = 0; }else{ echo " | "; }
-$c++; } ?>
-"><i class="fa fa-smile-o" aria-hidden="true"></i></button>
-<button type="button" class="btn btn-lg btn-default" data-toggle="popover" data-html="true"
-title="<b>Variables when previewing text.</b>"
-data-content="@text = <b>text</b> <p><span style='color:#A9A9A9'>// Bold</span></p><br />
-              $text = <s>text</s> <p><span style='color:#A9A9A9'>// Strikethrough</span></p><br />
-              #text = <i>text</i> <p><span style='color:#A9A9A9'>// Italic</span></p><br />
- "><i class="fa fa-question-circle" aria-hidden="true"></i></button></center>
-  </div>
-</div>
-       </div>
-       <div id='new_msg'></div>
+if(check_us($catuss['id'],1)==1){
+ echo                   " <!-- USER AVATAR BADGE -->
+                            <div class=\"user-avatar-badge\">
+                              <!-- USER AVATAR BADGE BORDER -->
+                              <div class=\"user-avatar-badge-border\">
+                                <!-- HEXAGON -->
+                                <div class=\"hexagon-22-24\" ></div>
+                                <!-- /HEXAGON -->
+                              </div>
+                              <!-- /USER AVATAR BADGE BORDER -->
+
+                              <!-- USER AVATAR BADGE CONTENT -->
+                              <div class=\"user-avatar-badge-content\">
+                                <!-- HEXAGON -->
+                                <div class=\"hexagon-dark-16-18\" ></div>
+                                <!-- /HEXAGON -->
+                              </div>
+                              <!-- /USER AVATAR BADGE CONTENT -->
+
+                              <!-- USER AVATAR BADGE TEXT -->
+                              <p class=\"user-avatar-badge-text\"><i class=\"fa fa-fw fa-check\" ></i></p>
+                              <!-- /USER AVATAR BADGE TEXT -->
+                            </div>
+                            <!-- /USER AVATAR BADGE -->       ";
+                              }
+?>
+                </div>
+
+                <!-- /USER STATUS AVATAR -->
+                 </div>
+                <!-- USER STATUS TITLE -->
+                <p class="user-status-title"><span class="bold"><?php echo $catuss['username'];  ?></span></p>
+                <!-- /USER STATUS TITLE -->
+
+                <!-- USER STATUS TAG -->
+                <p class="user-status-tag <?php online_us($catuss['id']); ?>"><?php online_us($catuss['id'],1); ?></p>
+                <!-- /USER STATUS TAG -->
+              </div>
+              <!-- /USER STATUS -->
+            </div>
+            <!-- /CHAT WIDGET HEADER -->
+
+            <!-- CHAT WIDGET CONVERSATION -->
+            <div class="chat-widget-conversation" data-simplebar="init"><div class="simplebar-wrapper" ><div class="simplebar-height-auto-observer-wrapper"><div class="simplebar-height-auto-observer"></div></div><div class="simplebar-mask"><div class="simplebar-offset"><div class="simplebar-content-wrapper" ><div class="simplebar-content">
+ <div id='new_msg'></div>
  <?php
- include_once('include/pagination.php');
-$page = (int)(!isset($_GET["page"]) ? 1 : $_GET["page"]);
-if ($page <= 0) $page = 1;
-$per_page = 30; // Records per page.
-$startpoint = ($page * $per_page) - $per_page;
 $statement = "`messages` WHERE (us_env='{$msgdid}' AND us_rec='{$msgeid}') OR (us_env='{$msgeid}' AND us_rec='{$msgdid}') ORDER BY `id_msg` DESC";
-$catsum = $db_con->prepare("SELECT  * FROM {$statement} LIMIT {$startpoint} , {$per_page} " );
+$catsum = $db_con->prepare("SELECT  * FROM {$statement}" );
 $catsum->execute();
 while($sutcat=$catsum->fetch(PDO::FETCH_ASSOC))
 {
@@ -92,34 +127,103 @@ while($smlssen=$smlusen->fetch(PDO::FETCH_ASSOC)){
          $comment = str_replace($emojis['name'], $emojis['img'], $comment);
 }
 
-$comment = preg_replace('/[@]+([A-Za-z0-9-_]+)/', '<b>$1</b>', $comment );
-$comment = preg_replace('/[#]+([A-Za-z0-9-_]+)/', '<i>$1</i>', $comment );
-$comment = preg_replace('/[$]+([A-Za-z0-9-_]+)/', '<s>$1</s>', $comment );
+$comment = strip_tags($comment, '<p><a><b><br><li><ul><font><span><pre><u><s><img>');
+$comment = preg_replace("/[\r\n]*/","",$comment);
  $time_cmt=convertTime($sutcat['time']);
  ?>
-       <div class=" col-md-12 inbox-grid1">
-       <?php if($sutcat['state']=="1"){ ?>
-        <div class="panel panel-warning">
-        <?php }else{ ?>
-        <div class="panel panel-info">
-        <?php } ?>
-  <div class="panel-heading"><b><?php echo $catussen['username']."  "; online_us($catussen['id']); ?></b></div>
-  <div class="panel-body">
-   <?php echo $comment; ?>
-   <hr />
-   <p style="text-align: right"><?php echo $time_cmt; ?></p>
-  </div>
-</div>
-       </div>
-<?php }   echo pagination($statement,$per_page,$page);  ?>
+<?php if($msgdid==$sutcat['us_env']){ ?>
+              <!-- CHAT WIDGET SPEAKER -->
+              <div class="chat-widget-speaker right">
+                <!-- CHAT WIDGET SPEAKER MESSAGE -->
+                <p class="chat-widget-speaker-message"><?php echo $comment; ?></p>
+                <!-- /CHAT WIDGET SPEAKER MESSAGE -->
 
-                </div>	<div class="clearfix"></div>
-				</div> 
-     <script>
-       $(function () {
-  $('[data-toggle="popover"]').popover()
-});
-     $("document").ready(function() {
+                <!-- CHAT WIDGET SPEAKER TIMESTAMP -->
+                <p class="chat-widget-speaker-timestamp"><?php echo $time_cmt; ?></p>
+                <!-- /CHAT WIDGET SPEAKER TIMESTAMP -->
+              </div>
+              <!-- /CHAT WIDGET SPEAKER -->
+ <?php }else{ ?>
+             <!-- CHAT WIDGET SPEAKER -->
+              <div class="chat-widget-speaker left">
+                <!-- CHAT WIDGET SPEAKER AVATAR -->
+                <div class="chat-widget-speaker-avatar">
+                  <!-- USER AVATAR -->
+                  <div class="user-avatar tiny no-border">
+                    <!-- USER AVATAR CONTENT -->
+                    <div class="user-avatar-content">
+                      <!-- HEXAGON -->
+                      <div class="hexagon-image-24-26" data-src="<?php url_site();  ?>/<?php echo $catussen['img']; ?>" ><canvas width="24" height="26"></canvas></div>
+                      <!-- /HEXAGON -->
+                    </div>
+                    <!-- /USER AVATAR CONTENT -->
+                  </div>
+                  <!-- /USER AVATAR -->
+                </div>
+                <!-- /CHAT WIDGET SPEAKER AVATAR -->
+
+                <!-- CHAT WIDGET SPEAKER MESSAGE -->
+                <p class="chat-widget-speaker-message"><?php echo $comment; ?></p>
+                <!-- /CHAT WIDGET SPEAKER MESSAGE -->
+
+                <!-- CHAT WIDGET SPEAKER TIMESTAMP -->
+                <p class="chat-widget-speaker-timestamp"><?php echo $time_cmt; ?></p>
+                <!-- /CHAT WIDGET SPEAKER TIMESTAMP -->
+              </div>
+              <!-- /CHAT WIDGET SPEAKER -->
+ <?php } ?>
+ <?php } ?>
+
+           </div></div></div></div><div class="simplebar-placeholder" ></div></div><div class="simplebar-track simplebar-horizontal" ><div class="simplebar-scrollbar" ></div></div><div class="simplebar-track simplebar-vertical" ><div class="simplebar-scrollbar" ></div></div></div>
+            <!-- /CHAT WIDGET CONVERSATION -->
+
+            <!-- CHAT WIDGET FORM -->
+            <div class="chat-widget-form">
+              <!-- FORM ROW -->
+              <div class="form-row split">
+                <!-- FORM ITEM -->
+                <div class="form-item">
+                  <!-- INTERACTIVE INPUT -->
+                  <div class="interactive-input small">
+                    <input type="text" id="comment"  placeholder="Write a message...">
+                   <!-- INTERACTIVE INPUT ACTION -->
+                    <div class="interactive-input-action">
+                      <!-- INTERACTIVE INPUT ACTION ICON -->
+                      <svg class="interactive-input-action-icon icon-cross-thin">
+                        <use xlink:href="#svg-cross-thin"></use>
+                      </svg>
+                      <!-- /INTERACTIVE INPUT ACTION ICON -->
+                    </div>
+                    <!-- /INTERACTIVE INPUT ACTION -->
+                  </div>
+                  <!-- /INTERACTIVE INPUT -->
+                </div>
+                <!-- /FORM ITEM -->
+
+                <!-- FORM ITEM -->
+                <div class="form-item auto-width" id="btn">
+                  <!-- BUTTON -->
+                  <p class="button primary padded">
+                    <!-- BUTTON ICON -->
+                    <svg class="button-icon no-space icon-send-message">
+                      <use xlink:href="#svg-send-message"></use>
+                    </svg>
+                    <!-- /BUTTON ICON -->
+                  </p>
+                  <!-- /BUTTON -->
+                </div>
+                <!-- /FORM ITEM -->
+              </div>
+              <!-- /FORM ROW -->
+            </div>
+            <!-- /CHAT WIDGET FORM -->
+          </div>
+          <!-- /CHAT WIDGET -->
+        </div>
+        <!-- /CHAT WIDGET WRAP -->
+      </div>
+<script>
+$("document").ready(function() {
    $("#btn").click(postComent);
 
 });
@@ -135,6 +239,7 @@ function postComent(){
         type : 'post',
         success : function(result) {
                 $("#new_msg").html(result);
+                $("#comment").val("");
         },
         error : function() {
             alert("Error reaching the server. Check your connection");
@@ -142,44 +247,5 @@ function postComent(){
     });
 }
      </script>
-      <script>
-    $(function ()
-    {
-        $('#comment').keyup(function (e){
-            if(e.keyCode == 13){
-                var curr = getCaret(this);
-                var val = $(this).val();
-                var end = val.length;
 
-                $(this).val( val.substr(0, curr) + '<br>' + val.substr(curr, end));
-            }
-
-        })
-    });
-
-    function getCaret(el) {
-        if (el.selectionStart) {
-            return el.selectionStart;
-        }
-        else if (document.selection) {
-            el.focus();
-
-            var r = document.selection.createRange();
-            if (r == null) {
-                return 0;
-            }
-
-            var re = el.createTextRange(),
-            rc = re.duplicate();
-            re.moveToBookmark(r.getBookmark());
-            rc.setEndPoint('EndToStart', re);
-
-            return rc.text.length;
-        }
-        return 0;
-    }
-
-</script>
-				</div> 	<div class="clearfix"></div>
-				</div>
 <?php }else{ echo"404"; }  ?>

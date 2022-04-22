@@ -2,7 +2,7 @@
 
 #####################################################################
 ##                                                                 ##
-##                        My ads v2.4.x                            ##
+##                        MYads  v3.x.x                            ##
 ##                     http://www.krhost.ga                        ##
 ##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
@@ -14,7 +14,7 @@
 if($vrf_License=="65fgh4t8x5fe58v1rt8se9x"){
      //  Banners ads List
    if(isset($_GET['b_list']))
-{
+{     $admin_page=1;
    if($_COOKIE['admin']==$hachadmin)
 {
 
@@ -42,8 +42,8 @@ echo "<tr>
   <a href=\"admincp?b_edit={$wt['id']}\" class='btn btn-success' ><i class=\"fa fa-edit \"></i></a>
   <a href=\"#\" data-toggle=\"modal\" data-target=\"#ban{$wt['id']}\" class='btn btn-danger' ><i class=\"fa fa-ban \"></i></a></td>
 </tr>";
-   echo "<div class=\"modal fade\" id=\"ban{$wt['id']}\" tabindex=\"-1\" role=\"dialog\">
-				<div class=\"modal-dialog\" role=\"document\">
+   echo "<div class=\"modal fade\" id=\"ban{$wt['id']}\" data-backdrop=\"\" tabindex=\"-1\" role=\"dialog\">
+				<div class=\"modal-dialog modal-dialog-centered\" role=\"document\">
 					<div class=\"modal-content modal-info\">
 						<div class=\"modal-header\">
 							<button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button>
@@ -91,7 +91,8 @@ echo "<tr>
  function bnr_echo($name) {  global  $bnRow;
   echo $bnRow["{$name}"];
  }
- $slctRow = $bnRow['px'];
+ $slctRow  = $bnRow['px'];
+ $statuRow = $bnRow['statu'];
 
  if(isset($_POST['ed_submit'])){
 

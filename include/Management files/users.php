@@ -2,7 +2,7 @@
 
 #####################################################################
 ##                                                                 ##
-##                        My ads v2.4.x                            ##
+##                        MYads  v3.x.x                            ##
 ##                     http://www.krhost.ga                        ##
 ##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
@@ -22,7 +22,8 @@ if($vrf_License=="65fgh4t8x5fe58v1rt8se9x"){
 {
  template_mine('404');
 }else{
- template_mine('admin_users');
+ template_mine('admin/admin_header');
+ template_mine('admin/admin_users');
  }
  template_mine('footer');
 
@@ -125,7 +126,6 @@ $stausr->bindParam(":o_order", $id);
  $o_type = "user" ;
  $uid = $us_uid;
  $name = $bn_name;
- $o_mode = "0";
  $string = urlencode(mb_ereg_replace('\s+', '-', $us_slug));
  $string = str_replace(array(' '),array('-'),$string);
         $ostmsbs = $db_con->prepare("UPDATE `options` SET `name` = :name, `o_valuer` = :a_daf, `o_type` = :o_type WHERE `o_order` = :uid ");
@@ -153,7 +153,8 @@ $stausr->bindParam(":o_order", $id);
 {
  template_mine('404');
 }else{
- template_mine('admin_us_edit');
+ template_mine('admin/admin_header');
+ template_mine('admin/admin_us_edit');
  }
  template_mine('footer');
 

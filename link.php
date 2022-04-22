@@ -2,7 +2,7 @@
 
 #####################################################################
 ##                                                                 ##
-##                        My ads v2.4.x                            ##
+##                        MYads  v3.x.x                            ##
 ##                     http://www.krhost.ga                        ##
 ##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
@@ -11,7 +11,7 @@
 ##                    This script is freeware                      ##
 ##                                                                 ##
 #####################################################################
-#####################################################################
+
 require_once "dbconfig.php";
 include "include/function.php";
  if(isset($_GET))
@@ -54,7 +54,8 @@ include "include/function.php";
             }
             $bn_dt = time();
             $bn_ag = $_SERVER['HTTP_USER_AGENT'];
-            $bn_ip = file_get_contents('https://api.ipify.org');
+            $bn_ip = $_SERVER['REMOTE_ADDR'];
+
 
             if ($num_rows = $results2->fetchColumn() == 0) {   } else {
             $idp2=$ab2['id'];;

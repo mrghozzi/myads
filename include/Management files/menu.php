@@ -2,7 +2,7 @@
 
 #####################################################################
 ##                                                                 ##
-##                        My ads v2.4.x                            ##
+##                        MYads  v3.x.x                            ##
 ##                     http://www.krhost.ga                        ##
 ##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
@@ -33,12 +33,14 @@ echo "<form id=\"defaultForm\" method=\"post\" class=\"form-horizontal\" action=
   <td>{$wt['id_m']}</td>
   <td><input type=\"text\" class=\"form-control\" name=\"name\" value=\"{$wt['name']}\" autocomplete=\"off\" /></td>
   <td><input type=\"text\" class=\"form-control\" name=\"dir\" value=\"{$wt['dir']}\" autocomplete=\"off\" /></td>
-  <td><button type=\"submit\" name=\"ed_submit\" value=\"ed_submit\" class=\"btn btn-success\"><i class=\"fa fa-edit \"></i></button>
-  <a href=\"#\" data-toggle=\"modal\" data-target=\"#ban{$wt['id_m']}\" class='btn btn-danger' ><i class=\"fa fa-ban \"></i></a></td>
+  <td><div class=\"btn-group-vertical\">
+  <button type=\"submit\" name=\"ed_submit\" value=\"ed_submit\" class=\"btn btn-success\"><i class=\"fa fa-edit \"></i></button>
+  <a href=\"#\" data-toggle=\"modal\" data-target=\"#ban{$wt['id_m']}\" class='btn btn-danger' ><i class=\"fa fa-ban \"></i></a>
+  </div></td>
 </tr>
 </form> ";
-   echo "<div class=\"modal fade\" id=\"ban{$wt['id_m']}\" tabindex=\"-1\" role=\"dialog\">
-				<div class=\"modal-dialog\" role=\"document\">
+   echo "<div class=\"modal fade\" id=\"ban{$wt['id_m']}\" data-backdrop=\"\" tabindex=\"-1\" role=\"dialog\">
+				<div class=\"modal-dialog modal-dialog-centered\" role=\"document\">
 					<div class=\"modal-content modal-info\">
 						<div class=\"modal-header\">
 							<button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button>
@@ -48,7 +50,7 @@ echo "<form id=\"defaultForm\" method=\"post\" class=\"form-horizontal\" action=
                                     <h3>Delete !</h3>
 									<p>Sure to Delete ID no {$wt['id_m']} ? </p><br />
                                     <center><a  href=\"admincp?menu_ban={$wt['id_m']}\" class=\"btn btn-danger\" >Delete</a></center>
-									  <button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Close</button
+									  <button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Close</button>
 
 							</div>
 						</div>
@@ -69,7 +71,8 @@ echo "<form id=\"defaultForm\" method=\"post\" class=\"form-horizontal\" action=
 {
  template_mine('404');
 }else{
- template_mine('admin_menu');
+ template_mine('admin/admin_header');
+ template_mine('admin/admin_menu');
  }
  template_mine('footer');
 

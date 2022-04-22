@@ -6,93 +6,225 @@ $bnextensions->execute();
 $abextensions=$bnextensions->fetch(PDO::FETCH_ASSOC);
 $extensions_code = $abextensions['o_valuer'];
  ?>
-<div id="page-wrapper">
-			<div class="main-page">
-				<!--buttons-->
-				<div class="grids-section">
-					<h2 class="hdg">Referral Code</h2>
+<div class="grid grid change-on-desktop" >
+       <div class="achievement-box secondary" style="background: url(<?php url_site();  ?>/templates/_panel/img/banner/03.jpg) no-repeat 50%; background-size: cover " >
+          <!-- ACHIEVEMENT BOX INFO WRAP -->
+          <div class="achievement-box-info-wrap">
+            <!-- ACHIEVEMENT BOX IMAGE -->
+            <img class="achievement-box-image" src="<?php url_site();  ?>/templates/_panel/img/banner/referral.png" alt="badge-caffeinated-b">
+            <!-- /ACHIEVEMENT BOX IMAGE -->
 
-			<div class="clearfix"></div>
-			</div>
-           <div class="panel panel-success">
-    <div class="panel-heading">Your referral link <span class="input-group-addon" id="basic-addon3"><?php ref_url(); ?></span>  </div>
+            <!-- ACHIEVEMENT BOX INFO -->
+            <div class="achievement-box-info">
+              <!-- ACHIEVEMENT BOX TITLE -->
+              <p class="achievement-box-title"><?php lang('codes'); ?>&nbsp;<?php lang('referal'); ?></p>
+              <!-- /ACHIEVEMENT BOX TITLE -->
 
-  <div class="panel-body">
-    <center>  <?php lang('ryffyrly'); ?></center>
-  </div> </div>
- <div class="panel panel-primary">
-    <div class="panel-heading"><i class="fa fa-share"></i>Share your referral link</div>
+              <!-- ACHIEVEMENT BOX TEXT -->
+              <p class="achievement-box-text"><b><?php lang('ryffyrly'); ?></b></p>
+              <!-- /ACHIEVEMENT BOX TEXT -->
+            </div>
+            <!-- /ACHIEVEMENT BOX INFO -->
+          </div>
+          <!-- /ACHIEVEMENT BOX INFO WRAP -->
 
-  <div class="panel-body">
-
-  <a href="https://www.facebook.com/sharer/sharer.php?u=<?php ref_url(); ?>">
-  <font size="14" face="Arial" color="#0066FF"><i class="fa fa-facebook" ></i></font></a>  &nbsp;
-  <a href="https://twitter.com/home?status=<?php title_site(''); echo"&nbsp;"; ref_url(); ?>">
-  <font size="14" face="Arial" color="#00CCFF"><i class="fa fa-twitter" ></i></font></a> &nbsp;
-  </div> </div>
- <div class="panel panel-primary">
- <div class="panel-body">
-<ul class="nav nav-tabs" id="myTab" role="tablist">
-  <li class="nav-item">
-    <a class="nav-link active" data-toggle="tab" href="#h" role="tab" aria-controls="home">728x90</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" data-toggle="tab" href="#p" role="tab" aria-controls="profile">300x250</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" data-toggle="tab" href="#m" role="tab" aria-controls="messages">160x600</a>
-  </li>
-  <li class="nav-item">
-    <a class="nav-link" data-toggle="tab" href="#s" role="tab" aria-controls="settings">468x60</a>
-  </li>
-</ul>
-
-<div class="tab-content">
-  <div class="tab-pane active" id="h" role="tabpanel">
-  <div class="panel panel-primary"><div class="panel-heading">
-  Your sponsorship tag 728x90
-
-       <div class="well" style="color: black;" ><?php grid_mine('728','90');  ?><?php echo htmlspecialchars($extensions_code);  ?></div>
-             <br />
-	 <center><?php grid_bnr('728','90');  ?></center>
-
-  </div></div>
-  </div>
-  <div class="tab-pane" id="p" role="tabpanel">
-  <div class="panel panel-primary"><div class="panel-heading">
-  Your sponsorship tag 300x250
-
-        <div class="well" style="color: black;" ><?php grid_mine('300','250');  ?><?php echo htmlspecialchars($extensions_code);  ?></div>
-             <br />
-	 <center><?php grid_bnr('300','250');  ?></center>
-
-  </div></div></div>
-  <div class="tab-pane" id="m" role="tabpanel">
-  <div class="panel panel-primary"><div class="panel-heading">
-  Your sponsorship tag 160x600
-
-        <div class="well" style="color: black;" ><?php grid_mine('160','600');  ?><?php echo htmlspecialchars($extensions_code);  ?></div>
-            <br />
-	 <center><?php grid_bnr('160','600');  ?></center>
-
-  </div></div></div>
-  <div class="tab-pane" id="s" role="tabpanel">
-  <div class="panel panel-primary"><div class="panel-heading">
-  Your sponsorship tag 468x60
-
-        <div class="well" style="color: black;" ><?php grid_mine('468','60');  ?><?php echo htmlspecialchars($extensions_code);  ?></div>
-          <br />
-	 <center><?php grid_bnr('468','60');  ?></center>
-
-  </div></div></div>
+          <!-- BUTTON -->
+          <a class="button white-solid" href="<?php url_site();  ?>/referral">
+          <i class="fa fa-list" aria-hidden="true"></i>&nbsp;<?php lang('list'); ?>&nbsp;<?php lang('referal'); ?>
+          </a>
+          <!-- /BUTTON -->
+       </div>
 </div>
+<div class="grid grid" >
+  <div class="grid-column" >
+    <div class="widget-box" >
+         <!-- WIDGET BOX TITLE -->
+         <p class="widget-box-title">Your referral link</p>
+         <br />
+         <blockquote class="widget-box" >
+         <center><kbd><?php ref_url(); ?></kbd></center>
+         </blockquote>
+         <br />
+         <p class="widget-box-title"><i class="fa fa-share"></i>&nbsp;Share your referral link</p>
+         <div class="widget-box-content">
+            <!-- SOCIAL LINKS -->
+            <div class="social-links multiline align-left">
+              <!-- SOCIAL LINK -->
+              <a class="social-link small facebook" href="https://www.facebook.com/sharer/sharer.php?u=<?php ref_url(); ?>" target="_blank" >
+                <!-- SOCIAL LINK ICON -->
+                <svg class="social-link-icon icon-facebook">
+                  <use xlink:href="#svg-facebook"></use>
+                </svg>
+                <!-- /SOCIAL LINK ICON -->
+              </a>
+              <!-- /SOCIAL LINK -->
 
-<script>
-  $(function () {
-    $('#myTab a:last').tab('show')
-  })
-</script>   </div> </div>
+              <!-- SOCIAL LINK -->
+              <a class="social-link small twitter" href="https://twitter.com/home?status=<?php title_site(''); echo"&nbsp;"; ref_url(); ?>" target="_blank" >
+                <!-- SOCIAL LINK ICON -->
+                <svg class="social-link-icon icon-twitter">
+                  <use xlink:href="#svg-twitter"></use>
+                </svg>
+                <!-- /SOCIAL LINK ICON -->
+              </a>
+              <!-- /SOCIAL LINK -->
 
-				</div>
-				</div>
-<?php }else{ echo"404"; }  ?> 
+              <!-- SOCIAL LINK -->
+              <a class="social-link small youtube" href="https://www.wasp.gq/sharer?url=<?php title_site(''); echo"&nbsp;"; ref_url(); ?>" target="_blank" >
+                <!-- SOCIAL LINK ICON -->
+                <i class="fa fa-wikipedia-w" aria-hidden="true" style="color: #fff;" ></i>
+                <!-- /SOCIAL LINK ICON -->
+              </a>
+              <!-- /SOCIAL LINK -->
+
+           </div>
+         <!-- WIDGET BOX TITLE -->
+    </div>
+  </div>
+  <div class="tab-box">
+          <!-- TAB BOX OPTIONS -->
+          <div class="tab-box-options">
+            <!-- TAB BOX OPTION -->
+            <div class="tab-box-option active">
+              <!-- TAB BOX OPTION TITLE -->
+              <p class="tab-box-option-title">728x90</p>
+              <!-- /TAB BOX OPTION TITLE -->
+            </div>
+            <!-- /TAB BOX OPTION -->
+
+            <!-- TAB BOX OPTION -->
+            <div class="tab-box-option">
+              <!-- TAB BOX OPTION TITLE -->
+              <p class="tab-box-option-title">300x250</p>
+              <!-- /TAB BOX OPTION TITLE -->
+            </div>
+            <!-- /TAB BOX OPTION -->
+
+            <!-- TAB BOX OPTION -->
+            <div class="tab-box-option">
+              <!-- TAB BOX OPTION TITLE -->
+              <p class="tab-box-option-title">160x600</p>
+              <!-- /TAB BOX OPTION TITLE -->
+            </div>
+            <!-- /TAB BOX OPTION -->
+
+            <!-- TAB BOX OPTION -->
+            <div class="tab-box-option">
+              <!-- TAB BOX OPTION TITLE -->
+              <p class="tab-box-option-title">468x60</p>
+              <!-- /TAB BOX OPTION TITLE -->
+            </div>
+            <!-- /TAB BOX OPTION -->
+          </div>
+          <!-- /TAB BOX OPTIONS -->
+
+          <!-- TAB BOX ITEMS -->
+          <div class="tab-box-items">
+            <!-- TAB BOX ITEM -->
+            <div class="tab-box-item" style="display: block;">
+              <!-- TAB BOX ITEM CONTENT -->
+              <div class="tab-box-item-content">
+                <!-- TAB BOX ITEM TITLE -->
+                <p class="tab-box-item-title">Your sponsorship tag 728x90</p>
+                <hr />
+                <!-- /TAB BOX ITEM TITLE -->
+                <div class="well" style="color: black;" >
+                <textarea class="form-control" type="text"  readonly >
+                <?php grid_mine('728','90');  ?>
+                <?php echo htmlspecialchars($extensions_code);  ?>
+                </textarea>
+                </div>
+                <!-- TAB BOX ITEM PARAGRAPH -->
+                <p class="tab-box-item-paragraph">
+                <center><?php grid_bnr('728','90');  ?></center>
+                </p>
+                <!-- /TAB BOX ITEM PARAGRAPH -->
+
+
+              </div>
+              <!-- /TAB BOX ITEM CONTENT -->
+            </div>
+            <!-- /TAB BOX ITEM -->
+
+            <!-- TAB BOX ITEM -->
+            <div class="tab-box-item" style="display: none;">
+              <!-- TAB BOX ITEM CONTENT -->
+              <div class="tab-box-item-content">
+                <!-- TAB BOX ITEM TITLE -->
+                <p class="tab-box-item-title">Your sponsorship tag 300x250</p>
+                <hr />
+                <!-- /TAB BOX ITEM TITLE -->
+                <div class="well" style="color: black;" >
+                <textarea class="form-control" type="text"  readonly >
+                <?php grid_mine('300','250');  ?>
+                <?php echo htmlspecialchars($extensions_code);  ?>
+                </textarea>
+                </div>
+                <!-- TAB BOX ITEM PARAGRAPH -->
+                <p class="tab-box-item-paragraph">
+                <center><?php grid_bnr('300','250');  ?></center>
+                </p>
+                <!-- /TAB BOX ITEM PARAGRAPH -->
+
+
+              </div>
+              <!-- /TAB BOX ITEM CONTENT -->
+            </div>
+            <!-- /TAB BOX ITEM -->
+            <!-- TAB BOX ITEM -->
+            <div class="tab-box-item" style="display: none;">
+              <!-- TAB BOX ITEM CONTENT -->
+              <div class="tab-box-item-content">
+                <!-- TAB BOX ITEM TITLE -->
+                <p class="tab-box-item-title">Your sponsorship tag 160x600</p>
+                <hr />
+                <!-- /TAB BOX ITEM TITLE -->
+                <div class="well" style="color: black;" >
+                <textarea class="form-control" type="text"  readonly >
+                <?php grid_mine('160','600');  ?>
+                <?php echo htmlspecialchars($extensions_code);  ?>
+                </textarea>
+                </div>
+                <!-- TAB BOX ITEM PARAGRAPH -->
+                <p class="tab-box-item-paragraph">
+                <center><?php grid_bnr('160','600');  ?></center>
+                </p>
+                <!-- /TAB BOX ITEM PARAGRAPH -->
+
+
+              </div>
+              <!-- /TAB BOX ITEM CONTENT -->
+            </div>
+            <!-- /TAB BOX ITEM -->
+            <!-- TAB BOX ITEM -->
+            <div class="tab-box-item" style="display: none;">
+              <!-- TAB BOX ITEM CONTENT -->
+              <div class="tab-box-item-content">
+                <!-- TAB BOX ITEM TITLE -->
+                <p class="tab-box-item-title">Your sponsorship tag 468x60</p>
+                <hr />
+                <!-- /TAB BOX ITEM TITLE -->
+                <div class="well" style="color: black;" >
+                <textarea class="form-control" type="text"  readonly >
+                <?php grid_mine('468','60');  ?>
+                <?php echo htmlspecialchars($extensions_code);  ?>
+                </textarea>
+                </div>
+                <!-- TAB BOX ITEM PARAGRAPH -->
+                <p class="tab-box-item-paragraph">
+                <center><?php grid_bnr('468','60');  ?></center>
+                </p>
+                <!-- /TAB BOX ITEM PARAGRAPH -->
+
+
+              </div>
+              <!-- /TAB BOX ITEM CONTENT -->
+            </div>
+            <!-- /TAB BOX ITEM -->
+
+          </div>
+          </div>
+          <!-- /TAB BOX ITEMS -->
+  </div>
+</div>
+<?php }else{ echo"404"; }  ?>

@@ -2,7 +2,7 @@
 
 #####################################################################
 ##                                                                 ##
-##                        My ads v2.4.x                            ##
+##                        MYads  v3.x.x                            ##
 ##                     http://www.krhost.ga                        ##
 ##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
@@ -33,7 +33,7 @@ $uidss = $_SESSION['user'];
  }
  $slctRow = $bnRow['tims'];
 
- if($_POST['ed_submit']){
+ if(isset($_POST['ed_submit'])){
 
            $bn_name = $_POST['name'];
            $bn_url = $_POST['url'];

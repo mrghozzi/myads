@@ -2,7 +2,7 @@
 
 #####################################################################
 ##                                                                 ##
-##                        My ads v2.4.x                            ##
+##                         MYads  v3.x.x                           ##
 ##                     http://www.krhost.ga                        ##
 ##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
@@ -23,6 +23,7 @@ if($vrf_License=="65fgh4t8x5fe58v1rt8se9x"){
 
            $bn_time = time();
            $bn_cmnt = $_GET['follow'];
+           if(isset($_COOKIE['user'])){
            $bn_uid = $_COOKIE['user'];
            $bn_typ = 1;
 
@@ -35,7 +36,7 @@ if($vrf_License=="65fgh4t8x5fe58v1rt8se9x"){
             if($stmsb->execute()){
 
             $bn_nurl = "followers/".$bn_cmnt;
-            $bn_logo  = "add_follow.png";
+            $bn_logo  = "add-friend";
             $bn_state = "1";
             $usz = $db_con->prepare("SELECT *  FROM `users` WHERE id=".$bn_uid );
             $usz->execute();
@@ -50,13 +51,13 @@ if($vrf_License=="65fgh4t8x5fe58v1rt8se9x"){
             $stmntf->bindParam(":time", $bn_time);
             $stmntf->bindParam(":state", $bn_state);
             if($stmntf->execute()){
-            header("Location: ../{$bn_nurl}");
+            header("Location: {$_SERVER['HTTP_REFERER']}");
          	}
 
          	}
-
-
-
+         }else{
+        header("Location: ../login");
+      }
 
     }else if($_GET['unfollow']){
 
@@ -74,7 +75,7 @@ if($vrf_License=="65fgh4t8x5fe58v1rt8se9x"){
             $stmtnft=$db_con->prepare("DELETE FROM `notif` WHERE uid=:id AND time=:time AND state=1 ");
         	$stmtnft->execute(array(':id'=>$susunf['sid'],':time'=>$susunf['time_t']));
 
-            header("Location: ../{$bn_nurl}");
+            header("Location: {$_SERVER['HTTP_REFERER']}");
 
      }
  }else{ echo"404"; }

@@ -1,7 +1,7 @@
 ﻿<?php
 #####################################################################
 ##                                                                 ##
-##                         My ads v2.4(+).x                        ##
+##                         MYads  v3.x.x                           ##
 ##                      http://www.krhost.ga                       ##
 ##                     e-mail: admin@krhost.ga                     ##
 ##                                                                 ##
@@ -82,7 +82,11 @@ $catdurl=$catussd['url'];
 $stmdr = $db_con->prepare("UPDATE directory SET vu=vu+1 WHERE id=:ertb");
 $stmdr->bindParam(":ertb", $catdid);
   if($stmdr->execute()){
- header("Refresh: 0; url=$catdurl");
+    if (filter_var($catdurl, FILTER_VALIDATE_URL) === FALSE) {
+    header("Location: {$url_site}/404");
+           }else{
+    header("Location: {$catdurl}");
+           }
  }
     }else{
 
@@ -97,6 +101,42 @@ $stmdr->bindParam(":ertb", $catdid);
  template_mine('header');
  template_mine('newdir');
  template_mine('footer');
+ }else if(isset($_GET['s'])){   // new site
+  $get_cat=$_GET['s'];
+  $catusz = $db_con->prepare("SELECT *  FROM `directory` WHERE statu=1 AND  id=".$_GET['s'] );
+  $catusz->execute();
+  $sucat=$catusz->fetch(PDO::FETCH_ASSOC);
+   $title_page = "Forum - ".$sucat['name'];
+   $description_page = strip_tags($sucat['txt'], '');
+   $catus = $db_con->prepare("SELECT *  FROM users WHERE  id='{$sucat['uid']}'");
+   $catus->execute();
+   $catuss=$catus->fetch(PDO::FETCH_ASSOC);
+   $username_topic = $catuss['username'] ;
+   $catdid=$sucat['id'];
+   $catdname=$sucat['name'];
+ if(isset($catdid) AND ($catdid==$get_cat)){
+$catust = $db_con->prepare("SELECT * FROM status WHERE s_type IN (1) AND tp_id =".$catdid );
+$catust->execute();
+$susat=$catust->fetch(PDO::FETCH_ASSOC);
+    $title_page = $sucat['name']."&nbsp;-&nbsp;".$sucat['txt'];
+   template_mine('header');
+   ads_site(5);
+   tpl_site_stt($susat,0);
+   }else{
+
+    template_mine('header');
+    template_mine('404');
+    template_mine('footer');
+
+    }
+ ?>
+<script>
+$(".comment_1_<?php echo $sucat['id']; ?>").load('<?php url_site();  ?>/templates/_panel/status/post_comment.php?s_type=1&tid=<?php echo $sucat['id']; ?>');
+$(".sh_comment_s<?php echo $susat['id']; ?>").addClass('active');
+</script>
+<?php
+   template_mine('footer');
+
  }else{                      //   ALL Categories
  $title_page = "Directory - ALL Categories";
  include_once('include/pagination.php');

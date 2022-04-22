@@ -2,7 +2,7 @@
 
 #####################################################################
 ##                                                                 ##
-##                        My ads v2.4.x                            ##
+##                        MYads  v3.x.x                            ##
 ##                     http://www.krhost.ga                        ##
 ##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
@@ -20,10 +20,8 @@ if(isset($q1)) {
 }else{
  $echoup = "<p style='color:#FF0000' >CREATE TABLE '<b>update options</b>'</p>";
 }
- if(isset($_GET['admin'])){ header("Location: ../admincp?d_install"); }
 }else{
  $echoup = "<p>You have the latest version</p>";
- if(isset($_GET['admin'])){ header("Location: ../admincp?d_install"); }
 }
 
 ?>

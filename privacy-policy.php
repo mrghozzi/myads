@@ -2,7 +2,7 @@
 
 #####################################################################
 ##                                                                 ##
-##                        My ads v2.4.x                            ##
+##                        MYads  v3.x.x                            ##
 ##                     http://www.krhost.ga                        ##
 ##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
@@ -16,8 +16,9 @@
 require "dbconfig.php";
 require "include/function.php";
 
- template('privacy-policy');
- footer_template();
+ template_mine('header');
+ template_mine('privacy-policy');
+ template_mine('footer');
 
 
 ?>
