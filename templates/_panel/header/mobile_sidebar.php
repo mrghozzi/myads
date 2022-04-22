@@ -10,28 +10,20 @@
       <!-- NAVIGATION WIDGET CLOSE BUTTON ICON -->
     </div>
     <!-- /NAVIGATION WIDGET CLOSE BUTTON -->
-
+     <?php if(isset($_COOKIE['user'])){ ?>
     <!-- NAVIGATION WIDGET INFO WRAP -->
     <div class="navigation-widget-info-wrap">
       <!-- NAVIGATION WIDGET INFO -->
       <div class="navigation-widget-info">
         <!-- USER AVATAR -->
-        <a class="user-avatar small no-outline" href="profile-timeline.html">
+        <a class="user-avatar small no-outline" href="<?php url_site();  ?>/u/<?php user_row('id'); ?>">
           <!-- USER AVATAR CONTENT -->
           <div class="user-avatar-content">
             <!-- HEXAGON -->
-            <div class="hexagon-image-30-32" data-src="img/avatar/01.jpg"></div>
+            <div class="hexagon-image-30-32" data-src="<?php url_site();  ?>/<?php user_row('img'); ?>"></div>
             <!-- /HEXAGON -->
           </div>
           <!-- /USER AVATAR CONTENT -->
-
-          <!-- USER AVATAR PROGRESS -->
-          <div class="user-avatar-progress">
-            <!-- HEXAGON -->
-            <div class="hexagon-progress-40-44"></div>
-            <!-- /HEXAGON -->
-          </div>
-          <!-- /USER AVATAR PROGRESS -->
 
           <!-- USER AVATAR PROGRESS BORDER -->
           <div class="user-avatar-progress-border">
@@ -41,34 +33,11 @@
           </div>
           <!-- /USER AVATAR PROGRESS BORDER -->
 
-          <!-- USER AVATAR BADGE -->
-          <div class="user-avatar-badge">
-            <!-- USER AVATAR BADGE BORDER -->
-            <div class="user-avatar-badge-border">
-              <!-- HEXAGON -->
-              <div class="hexagon-22-24"></div>
-              <!-- /HEXAGON -->
-            </div>
-            <!-- /USER AVATAR BADGE BORDER -->
-
-            <!-- USER AVATAR BADGE CONTENT -->
-            <div class="user-avatar-badge-content">
-              <!-- HEXAGON -->
-              <div class="hexagon-dark-16-18"></div>
-              <!-- /HEXAGON -->
-            </div>
-            <!-- /USER AVATAR BADGE CONTENT -->
-
-            <!-- USER AVATAR BADGE TEXT -->
-            <p class="user-avatar-badge-text">24</p>
-            <!-- /USER AVATAR BADGE TEXT -->
-          </div>
-          <!-- /USER AVATAR BADGE -->
-        </a>
+       </a>
         <!-- /USER AVATAR -->
 
         <!-- NAVIGATION WIDGET INFO TITLE -->
-        <p class="navigation-widget-info-title"><a href="profile-timeline.html">Marina Valentine</a></p>
+        <p class="navigation-widget-info-title"><a href="<?php url_site();  ?>/u/<?php user_row('id'); ?>"><?php user_row('username'); ?></a></p>
         <!-- /NAVIGATION WIDGET INFO TITLE -->
 
         <!-- NAVIGATION WIDGET INFO TEXT -->
@@ -82,7 +51,12 @@
       <!-- /NAVIGATION WIDGET BUTTON -->
     </div>
     <!-- /NAVIGATION WIDGET INFO WRAP -->
-
+    <?php }else{  ?>
+    <div class="navigation-widget-info-wrap">
+    <a href="<?php url_site();  ?>/login" class="navigation-widget-info-button button small secondary"><?php lang('login'); ?></a>
+    <a href="<?php url_site();  ?>/register" class="navigation-widget-info-button button small secondary"><?php lang('sign_up'); ?></a>
+    </div>
+    <?php }  ?>
     <!-- NAVIGATION WIDGET SECTION TITLE -->
     <p class="navigation-widget-section-title">Sections</p>
     <!-- /NAVIGATION WIDGET SECTION TITLE -->
@@ -165,7 +139,7 @@
       <!-- /MENU ITEM -->
     </ul>
     <!-- /MENU -->
-
+    <?php if(isset($_COOKIE['user'])){ ?>
     <!-- NAVIGATION WIDGET SECTION TITLE -->
     <p class="navigation-widget-section-title"><?php lang('account'); ?></p>
     <!-- /NAVIGATION WIDGET SECTION TITLE -->
@@ -175,7 +149,8 @@
     <a class="navigation-widget-section-link" href="<?php url_site();  ?>/p<?php echo $_COOKIE['user']; ?>">Change Avatar/Cover</a>
     <a class="navigation-widget-section-link" href="<?php url_site();  ?>/options/<?php echo $_COOKIE['user']; ?>"><?php echo $lang['options']; ?></a>
     <!-- /NAVIGATION WIDGET SECTION LINK -->
-    <?php if($_COOKIE['user']=="1" ){ ?>
+    <?php  } ?>
+    <?php if(isset($_COOKIE['user']) AND ($_COOKIE['user']=="1") ){ ?>
     <!-- NAVIGATION WIDGET SECTION TITLE -->
     <p class="navigation-widget-section-title"><?php lang('mode_admin'); ?></p>
     <!-- /NAVIGATION WIDGET SECTION TITLE -->

@@ -52,8 +52,7 @@ if($vrf_License=="65fgh4t8x5fe58v1rt8se9x"){
      // $path               = pathinfo(realpath($file), PATHINFO_DIRNAME);
 		if ($zip->open($file) === TRUE) {
 		    $zip->extractTo($Tob);
-            chmod($Tob."/install", 0777);
-            header("Location: install/update.php?v={$versionnow}&admin");
+            header("Location: requests/update.php?v={$versionnow}&admin");
         } else {
         $bn_get= "?updates&bnerrMSG=".$lang['not_update'];
         header("Location: admincp{$bn_get}");
@@ -63,37 +62,6 @@ if($vrf_License=="65fgh4t8x5fe58v1rt8se9x"){
 
  }else {  header("Location: 404");  }
 }
-
-      // remove  install dir
-   if(isset($_GET['d_install']))
-{
-   if($_COOKIE['admin']==$hachadmin)
-{
-   $dfolder = $_SERVER['DOCUMENT_ROOT']."/install";
-   function remove_dir($path){
-     if(is_dir($path) === false)	{
-       return false;
-       }
-     $dir = opendir($path);
-     while (($file = readdir($dir) )!== false)	{
-       if($file == '.' OR $file == '..')		{
-         continue;
-         }
-         if(is_file($path.'/'.$file))		{
-           unlink($path.'/'.$file);
-           }elseif(is_dir($path.'/'.$file))		{
-             remove_dir($path.'/'.$file);		}
-             }
-             rmdir($path);
-             closedir($dir);
-             }
-             remove_dir($dfolder);
-
-   header("Location: admincp?updates");
-
- }else {  header("Location: 404");  }
-}
-
 
 }else{
  header("Location: .../404 ") ;

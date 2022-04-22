@@ -124,16 +124,39 @@ $catusen->execute();
 $catussen=$catusen->fetch(PDO::FETCH_ASSOC);
 $time_cmt=convertTime($wt['time']);
  if($wt['state']=="1"){
-     echo "<tr class=\"active\" >";
+     $ntfread = "read";
+  }else if($wt['state']=="3"){
+     $ntfread = "unread";
   }else{
-     echo "<tr>";
+     $ntfread = "";
   }
-echo "<td>#{$wt['id_msg']}</td>
-  <td><b>@<a href=\"{$url_site}/message/{$catussen['id']}\">{$catussen['username']}  ";
-  online_us($catussen['id']);
-  echo "</a></b></td>
-  <td><a href=\"{$url_site}/message/{$catussen['id']}\">{$time_cmt}</a></td>
-</tr>";
+echo "<div class=\"notification-box\">
+            <!-- USER STATUS -->
+            <div class=\"user-status notification\">
+              <!-- USER STATUS TITLE -->
+              <p class=\"user-status-title\"><a href=\"{$url_site}/message/{$catussen['id']}\">{$catussen['username']}</a></p>
+              <!-- /USER STATUS TITLE -->
+
+              <!-- USER STATUS TIMESTAMP -->
+              <p class=\"user-status-timestamp small-space\">{$time_cmt}</p>
+              <!-- /USER STATUS TIMESTAMP -->
+
+              <!-- USER STATUS ICON -->
+              <div class=\"user-status-icon\">
+                <!-- ICON COMMENT -->
+                <svg class=\"icon-messages\">
+                  <use xlink:href=\"#svg-messages\"></use>
+                </svg>
+                <!-- /ICON COMMENT -->
+              </div>
+              <!-- /USER STATUS ICON -->
+            </div>
+            <!-- /USER STATUS -->
+
+            <!-- MARK UNREAD BUTTON -->
+            <div class=\"mark-{$ntfread}-button\"></div>
+            <!-- /MARK UNREAD BUTTON -->
+</div>";
 
    }echo pagination($statement,$per_page,$page);
     }

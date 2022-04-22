@@ -13,6 +13,17 @@
 #####################################################################
 
 include "../dbconfig.php";
+ $stmt = $db_con->prepare("SELECT *  FROM setting   " );
+        $stmt->execute();
+        $ab=$stmt->fetch(PDO::FETCH_ASSOC);
+        $lang_site  = $ab['lang'];
+        $url_site   = $ab['url'];
+        if (isset($_COOKIE["lang"])) {
+        $lng=$_COOKIE["lang"] ;
+                              } else {
+        $lng        = $lang_site ;
+                              }
+include "../content/languages/$lng.php";
  if( ! ini_get('date.timezone') )
 {
     date_default_timezone_set('GMT');
@@ -47,21 +58,21 @@ while($smlssen=$smlusen->fetch(PDO::FETCH_ASSOC)){
  if(isset($emojis['name']) && isset($emojis['img']) ) {
          $comment = str_replace($emojis['name'], $emojis['img'], $comment);
 }
-$comment = preg_replace('/[@]+([A-Za-z0-9-_]+)/', '<b>$1</b>', $comment );
-$comment = preg_replace('/[#]+([A-Za-z0-9-_]+)/', '<i>$1</i>', $comment );
-$comment = preg_replace('/[$]+([A-Za-z0-9-_]+)/', '<s>$1</s>', $comment );
-              $catuscm = $db_con->prepare("SELECT *  FROM users WHERE  id='{$bn_uid}'");
-              $catuscm->execute();
-              $catusscm=$catuscm->fetch(PDO::FETCH_ASSOC);
-            $result = "<div class=\" col-md-12 inbox-grid1\">
-        <div class=\"panel panel-warning\">
-  <div class=\"panel-heading\"><b>{$catusscm['username']}</b></div>
-  <div class=\"panel-body\">
-   {$comment}
-  </div>
-</div>
-       </div>" ;
-            echo $result;
+
+$catuscm = $db_con->prepare("SELECT *  FROM users WHERE  id='{$bn_uid}'");
+$catuscm->execute();
+$catusscm=$catuscm->fetch(PDO::FETCH_ASSOC);
+echo "              <!-- CHAT WIDGET SPEAKER -->
+              <div class=\"chat-widget-speaker right\">
+                <!-- CHAT WIDGET SPEAKER MESSAGE -->
+                <p class=\"chat-widget-speaker-message\">{$comment}</p>
+                <!-- /CHAT WIDGET SPEAKER MESSAGE -->
+
+                <!-- CHAT WIDGET SPEAKER TIMESTAMP -->
+                <p class=\"chat-widget-speaker-timestamp\">Now</p>
+                <!-- /CHAT WIDGET SPEAKER TIMESTAMP -->
+              </div>
+              <!-- /CHAT WIDGET SPEAKER -->";
          	}
 
 
