@@ -144,7 +144,34 @@ $stausr->bindParam(":o_order", $id);
       header("Location: admincp{$bn_get}");
     }
     }
+ if(isset($_POST['ps_submit'])){
 
+           $bn_pass  = $_POST['n_pass'];
+           $us_uid   = $usRow['id'];
+
+           if(empty($bn_pass)){
+			$bnerrMSG = "Please Enter New password.";
+		}
+        if (strlen($bn_pass) <= '8') {
+        $bnerrMSG = "Your New password Must Contain At Least 8 Characters!";
+        }
+
+         $bn_get= "?us_edit=".$id."&bnerrMSG=".$bnerrMSG;
+           if(!isset($bnerrMSG))
+		{
+            $passhach = password_hash($bn_pass, PASSWORD_DEFAULT);
+            $stmsb = $db_con->prepare("UPDATE users SET pass=:passhach
+            WHERE id=:id");
+			$stmsb->bindParam(":passhach", $passhach);
+            $stmsb->bindParam(":id", $us_uid);
+         	if($stmsb->execute())
+            {
+              header("Location: admincp?us_edit={$us_uid}");
+            }
+    }else{
+      header("Location: admincp{$bn_get}");
+    }
+    }
  }else {  header("Location: 404");  }
  }else {  header("Location: 404");  }
  //  template

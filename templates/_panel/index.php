@@ -232,7 +232,7 @@
     <div class="widget-box">
     <center><h1><?php lang('ads'); ?></h1></center>
     <hr>
-    <center><script language="javascript" src="<?php url_site();  ?>/bn.php?ID=1&px=728"></script></center>
+    <center><script language="javascript" src="<?php url_site();  ?>/bn.php?ID=1&px=responsive"></script></center>
     </div>
     <div class="widget-box">
     <center>

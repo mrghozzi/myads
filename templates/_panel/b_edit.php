@@ -41,9 +41,9 @@
          <!-- WIDGET BOX TITLE -->
          <p class="widget-box-title"><?php lang('bannads'); ?></p>
          <br />
-<?php if(isset($_COOKIE['user']) AND !isset($_COOKIE['admin']) ){ ?>
+<?php if(isset($_COOKIE['user']) AND isset($_GET['id']) ){ ?>
       <form id="defaultForm" method="post" class="form" action="<?php url_site();  ?>/b_edit?id=<?php echo $_GET['id'];  ?>">
-<?php }else if(isset($_COOKIE['user'])=="1" AND isset($_COOKIE['admin'])==$uRow['pass'] ){   ?>
+<?php }else if((isset($_COOKIE['user'])=="1") AND (isset($_COOKIE['admin'])==$uRow['pass']) AND (isset($_GET['b_edit'])) ){   ?>
       <form id="defaultForm" method="post" class="form" action="<?php url_site();  ?>/admincp?b_edit=<?php echo $_GET['b_edit'];  ?>">
 <?php } ?>
          <div class="form-row split">
@@ -104,7 +104,7 @@
          </div>
          <div class="form-row split">
                     <!-- FORM ITEM -->
-<?php if(isset($_COOKIE['user'])=="1" AND isset($_COOKIE['admin'])==$uRow['pass'] ){   ?>
+<?php if((isset($_COOKIE['user'])=="1") AND (isset($_COOKIE['admin'])==$uRow['pass']) AND (isset($_GET['b_edit'])) ){   ?>
                   <div class="form-item">
                     <!-- FORM SELECT -->
                     <div class="form-select">

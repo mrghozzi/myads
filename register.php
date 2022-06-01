@@ -19,10 +19,18 @@ if (session_status() == PHP_SESSION_NONE) {
 }
 if(isset($_POST['submit']))
 {
-    $usern = $_POST['username'];
-    $email = $_POST['email'];
-    $upas1 = $_POST['pass1'];
-    $upas2 = $_POST['pass2'];
+    if(isset($_POST['username']))  { $usern = $_POST['username']; }
+    if(isset($_POST['email']))     { $email = $_POST['email'];    }
+    if(isset($_POST['pass1']))     { $upas1 = $_POST['pass1'];    }
+    if(isset($_POST['pass2']))     { $upas2 = $_POST['pass2'];    }
+    if(isset($_POST['capt']))      { $capt  = $_POST['capt'];     }
+
+             if((int)isset($_SESSION['CAPCHA'])){
+             $capt_sess=$_SESSION['CAPCHA'];
+             }else{
+              $capt_sess="no";
+             }
+             if($capt==$capt_sess){
     if (filter_var($email, FILTER_VALIDATE_EMAIL)) {
     if (strlen($upas1) <= '8') {
         $bnerrMSG = "Your password Must Contain At Least 8 Characters!";
@@ -109,9 +117,15 @@ if(isset($_POST['submit']))
      $bnerrMSG = "Email address '$email' is considered invalid.\n";
       $bn_get= "register?bnerrMSG=".$bnerrMSG;
       header("Location: {$bn_get}") ;
-}
+     }
+    } else {
+     $bnerrMSG = "verification code is considered invalid.\n";
+      $bn_get= "register?bnerrMSG=".$bnerrMSG;
+      header("Location: {$bn_get}") ;
+     }
 
  }else{
+   include "requests/captcha.php";
    //  template
  template_mine('header');
  if(!isset($_COOKIE['user'])!="")

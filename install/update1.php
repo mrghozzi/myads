@@ -13,6 +13,7 @@
                                  <h4>Update TO <?php echo $version; ?></h4>
 							        <div class="sign-up">
                                         <a href="update2.php?v=2-3-x" type="next" /><span>(<u>v2.3.x</u>)&nbsp;&nbsp;<b>TO</b>&nbsp;&nbsp;(<u><?php echo $version; ?></u>)</span></a>
+                                        <a href="update2.php?v=3-0-0" type="next" /><span>(<u>v3.0.0</u>)&nbsp;&nbsp;<b>TO</b>&nbsp;&nbsp;(<u><?php echo $version; ?></u>)</span></a>
                                     </div>
                                 </form>
 						    </div>

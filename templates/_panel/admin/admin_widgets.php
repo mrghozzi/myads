@@ -26,6 +26,7 @@
             <select id="widget_cat" name="widget_cat">
               <option></option>
               <option value="widget_html">Html code</option>
+              <option value="widget_members">Suggest Members</option>
             </select>
             <!-- FORM SELECT ICON -->
             <svg class="form-select-icon icon-small-arrow">

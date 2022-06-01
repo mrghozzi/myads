@@ -8,7 +8,7 @@
               <use xlink:href="#svg-messages"></use>
             </svg>
             <!-- /ACTION LIST ITEM ICON -->
-            <div id="count">
+            <div>
             <?php msg_nbr('span');  ?>
             </div>
           </div>

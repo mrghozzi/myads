@@ -34,11 +34,16 @@ function bnr_list() {  global  $results;  global  $statement;
 
 
 while($wt=$results->fetch(PDO::FETCH_ASSOC)) {
-if($wt['statu']=="1"){ $fgft="ON"; } else if($wt['statu']=="2"){ $fgft="OFF"; }
-
+$str_name = mb_strlen($wt['name'], 'utf8');
+if($str_name > 25){
+   $bnname = substr($wt['name'],0,25)."&nbsp;...";
+ }else{
+   $bnname = $wt['name'];
+ }
+ if($wt['statu']=="1"){ $fgft="ON"; } else if($wt['statu']=="2"){ $fgft="OFF"; }
 echo "<tr>
   <td>{$wt['id']}</td>
-  <td>{$wt['name']}</td>
+  <td>{$bnname}</td>
   <td>{$wt['vu']}</td>
   <td>{$wt['clik']}</td>
   <td>{$wt['px']}</td>

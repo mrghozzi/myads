@@ -20,8 +20,9 @@ global  $db_con; global  $catsum;  global  $uRow; global $lang; global $url_site
 $catusz = $db_con->prepare("SELECT *  FROM `directory` WHERE  id=".$sutcat['tp_id'] );
 $catusz->execute();
 $sucat=$catusz->fetch(PDO::FETCH_ASSOC);
-$comtxt = preg_replace('/#([^\s]+)/', '<a  href="'.$url_site.'/tag/$1" >#$1</a>', $sucat['txt'] );
-$comtxt = strip_tags($comtxt, '<a><br>');
+
+$comtxt = strip_tags($sucat['txt'], '<br>');
+$comtxt = preg_replace('/#([^\s]+)/', '<a  href="'.$url_site.'/tag/$1" >#$1</a>', $comtxt );
 $sdf    = $sucat['url'];
 $bn_tid = $sucat['id'];
 $bn_time= $sutcat['date'];
@@ -125,7 +126,7 @@ $time_stt=convertTime($sutcat['date']);
                 <!-- /SIMPLE DROPDOWN LINK -->
 
                 <!-- SIMPLE DROPDOWN LINK -->
-                <p class="simple-dropdown-link author_report<?php echo $sucat['id']; ?>"><i class="fa fa-flag" aria-hidden="true"></i>&nbsp;<?php echo $lang['report']; ?> Author</p>
+                <p class="simple-dropdown-link author_report<?php echo $sucat['id']; ?>"><i class="fa fa-flag" aria-hidden="true"></i>&nbsp;<?php echo $lang['report']; ?> <?php echo $lang['author']; ?></p>
                 <!-- /SIMPLE DROPDOWN LINK -->
               </div>
               <!-- /SIMPLE DROPDOWN -->
@@ -208,9 +209,9 @@ echo                 " </div>
                         <p class=\"user-status-title medium\">";
                         if($sucat['uid']==0){ echo "<a class=\"bold\" \">Guest</a>"; }
                         else{ echo "<a class=\"bold\" href=\"{$url_site}/u/{$catuss['id']}\">".$catuss['username']."</a>"; }
-echo                   "&nbsp;created a
-                        &nbsp;<span class=\"bold\"><a href=\"{$url_site}/dr{$sucat['id']}\">Link</a></span>
-                        &nbsp;on
+echo                   "&nbsp;{$lang['create_a']}
+                        &nbsp;<span class=\"bold\"><a href=\"{$url_site}/dr{$sucat['id']}\">{$lang['link']}</a></span>
+                        &nbsp;{$lang['on_i']}
                         &nbsp;<a href=\"{$url_site}/cat/{$catussc['id']}\" color=\"#23d2e2\"><i class=\"fa fa-tag\" aria-hidden=\"true\"></i>&nbsp;{$catussc['name']}</a>
                         </p>
                         <!-- /USER STATUS TITLE -->

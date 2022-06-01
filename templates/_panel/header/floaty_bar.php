@@ -2,6 +2,7 @@
 <?php if(isset($_COOKIE['user'])){ ?>
    <!-- FLOATY BAR -->
   <aside class="floaty-bar">
+  <?php   if(isset($_COOKIE['user']))  { ?>
     <!-- BAR ACTIONS -->
     <div class="bar-actions">
       <!-- PROGRESS STAT -->
@@ -16,7 +17,7 @@
       <!-- /PROGRESS STAT -->
     </div>
     <!-- /BAR ACTIONS -->
-
+    <?php } ?>
     <!-- BAR ACTIONS -->
     <div class="bar-actions">
       <!-- ACTION LIST -->

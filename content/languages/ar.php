@@ -2,7 +2,7 @@
 
 #####################################################################
 ##                                                                 ##
-##                        My ads v2.4.x                            ##
+##                        My ads v3.x.x                            ##
 ##                     http://www.krhost.ga                        ##
 ##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
@@ -108,6 +108,7 @@ $lang['version']     = "رقم الإصدار";
 $lang['panel']       = "التحكم";
 $lang['us_name']     = "إسم المستخدم";
 $lang['users']       = "الأعضاء";
+$lang['author']      = "مؤلف";
 $lang['e_user']      = "تعديل عضو";
 $lang['n_user']      = "عضو جديد";
 $lang['a_user']      = "إضافة عضو";
@@ -272,5 +273,9 @@ $lang['was_desc']    = "اكتب وصفًا بسيطًا  ...";
 $lang['react']       = "تفاعل !";
 $lang['reactions']   = "تفاعلات";
 $lang['mode_admin']  = "وضع المدير";
+$lang['create_a']    = "أنشء";
+$lang['in_the_forum']= "في المنتدى";
+$lang['on_i']        = "في";
+$lang['link']        = "رابط";
 
 ?>

@@ -37,6 +37,7 @@ if($vrf_License=="65fgh4t8x5fe58v1rt8se9x"){
            $bn_lang     = $_POST['lang'];
            $bn_timezone = $_POST['timezone'];
            $bn_a_mail   = $_POST['a_mail'];
+           $bn_e_links   = $_POST['e_links'];
            $bn_facebook = "#";
            $bn_twitter  = "#";
            $bn_linkedin = "#";
@@ -60,7 +61,7 @@ if($vrf_License=="65fgh4t8x5fe58v1rt8se9x"){
 		{
 
             $stmsb = $db_con->prepare("UPDATE setting SET titer=:a_da,url=:opm,description=:ptdk,styles=:styles
-            ,lang=:lang ,timezone=:timezone ,a_mail=:a_mail ,facebook=:facebook ,twitter=:twitter ,linkedin=:linkedin
+            ,lang=:lang ,timezone=:timezone ,a_mail=:a_mail ,e_links=:e_links ,facebook=:facebook ,twitter=:twitter ,linkedin=:linkedin
             WHERE id=:ertb ");
 			$stmsb->bindParam(":opm", $bn_url);
             $stmsb->bindParam(":a_da", $bn_name);
@@ -69,6 +70,7 @@ if($vrf_License=="65fgh4t8x5fe58v1rt8se9x"){
             $stmsb->bindParam(":lang", $bn_lang);
             $stmsb->bindParam(":timezone", $bn_timezone);
             $stmsb->bindParam(":a_mail", $bn_a_mail);
+            $stmsb->bindParam(":e_links", $bn_e_links);
             $stmsb->bindParam(":facebook", $bn_facebook);
             $stmsb->bindParam(":twitter", $bn_twitter);
             $stmsb->bindParam(":linkedin", $bn_linkedin);

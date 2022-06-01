@@ -44,7 +44,7 @@
                     <!-- FORM INPUT -->
                     <div class="form-input small active">
                       <label for="desc"><?php lang('desc');  ?></label>
-                      <input type="text" class="form-control" name="desc" value="<?php if_gstore('sdesc');  ?>" minlength="10" maxlength="240" required >
+                      <input type="text" class="form-control" name="desc" value="<?php if_gstore('sdesc');  ?>" minlength="10" maxlength="2400" required >
                     </div>
                     <!-- /FORM INPUT -->
                   </div>
@@ -54,7 +54,7 @@
                     <!-- FORM INPUT -->
                     <div class="form-input small active">
                       <label for="Version_nbr"><?php lang('Version_nbr');  ?></label>
-                      <input type="text" id="profile-name" name="vnbr" value="<?php if_gstore('svnbr');  ?>" placeholder="<?php lang('version');  ?> | EX: v1.0" minlength="2" maxlength="10" pattern="^[-a-zA-Z0-9.]+$" required >
+                      <input type="text" id="profile-name" name="vnbr" value="<?php if_gstore('svnbr');  ?>" placeholder="<?php lang('version');  ?> | EX: v1.0" minlength="2" maxlength="12" pattern="^[-a-zA-Z0-9.]+$" required >
                     </div>
                     <!-- /FORM INPUT -->
                   </div>
@@ -167,7 +167,9 @@
              <hr />
              <div class="form-item split">
                <!-- FORM SELECT -->
+               <?php if(isset($elnk_site) AND ($elnk_site==1)){ ?>
                <a href="https://www.adstn.gq/kb/myads:store:update" class="button default" target="_blank" >&nbsp;<i class="fa fa-question-circle" aria-hidden="true"></i></a>
+               <?php } ?>
                <!-- BUTTON -->
                <button type="submit" name="submit" id="button" value="Publish" class="button primary"><i class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp; <?php lang('save');  ?></button>
              </div>

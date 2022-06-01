@@ -41,9 +41,9 @@
          <!-- WIDGET BOX TITLE -->
          <p class="widget-box-title"><?php lang('exvisit'); ?></p>
          <br />
-<?php if(isset($_COOKIE['user']) AND !isset($_COOKIE['admin']) ){ ?>
+<?php if(isset($_COOKIE['user']) AND isset($_GET['id'])){ ?>
       <form id="defaultForm" method="post" class="form" action="<?php url_site();  ?>/v_edit?id=<?php echo $_GET['id'];  ?>">
-<?php }else if(isset($_COOKIE['user'])=="1" AND isset($_COOKIE['admin'])==$uRow['pass'] ){   ?>
+<?php }else if((isset($_COOKIE['user'])=="1") AND (isset($_COOKIE['admin'])==$uRow['pass']) AND (isset($_GET['v_edit']))){   ?>
       <form id="defaultForm" method="post" class="form" action="<?php url_site();  ?>/admincp?v_edit=<?php echo $_GET['v_edit'];  ?>">
 <?php } ?>
          <div class="form-row split">
@@ -89,7 +89,7 @@
                     <!-- /FORM SELECT -->
                   </div>
                     <!-- FORM SELECT -->
-<?php if(isset($_COOKIE['user'])=="1" AND isset($_COOKIE['admin'])==$uRow['pass'] ){   ?>
+<?php if((isset($_COOKIE['user'])=="1") AND (isset($_COOKIE['admin'])==$uRow['pass']) AND (isset($_GET['v_edit']))){   ?>
                   <div class="form-item">
                     <!-- FORM SELECT -->
                     <div class="form-select">

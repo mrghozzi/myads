@@ -33,7 +33,7 @@ $uidss = $_SESSION['user'];
  }
  $slctRow = $bnRow['px'];
 
- if(isset($_POST['ed_submit'])){
+ if(isset($_POST['bn_submit'])){
 
            $bn_name = $_POST['name'];
            $bn_url = $_POST['url'];

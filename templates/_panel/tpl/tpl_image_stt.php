@@ -20,8 +20,8 @@ global  $db_con; global  $catsum;  global  $uRow; global $lang; global $url_site
 $catusz = $db_con->prepare("SELECT *  FROM `forum` WHERE   id=".$sutcat['tp_id'] );
 $catusz->execute();
 $sucat=$catusz->fetch(PDO::FETCH_ASSOC);
-$comtxt = preg_replace('/#([^\s]+)/', '<a  href="'.$url_site.'/tag/$1" >#$1</a>', $sucat['txt'] );
-$comtxt = strip_tags($comtxt, '<a><br><iframe>');
+$comtxt = strip_tags($sucat['txt'], '<br><iframe>');
+$comtxt = preg_replace('/#([^\s]+)/', '<a  href="'.$url_site.'/tag/$1" >#$1</a>', $comtxt );
 $imgtxt = strip_tags($comtxt, '');
 
 
@@ -122,7 +122,7 @@ $usecho =  "<b>{$catruss['username']}</b> <i class=\"fa fa-retweet\" aria-hidden
                 <!-- /SIMPLE DROPDOWN LINK -->
 
                 <!-- SIMPLE DROPDOWN LINK -->
-                <p class="simple-dropdown-link author_report<?php echo $sucat['id']; ?>"><i class="fa fa-flag" aria-hidden="true"></i>&nbsp;<?php echo $lang['report']; ?> Author</p>
+                <p class="simple-dropdown-link author_report<?php echo $sucat['id']; ?>"><i class="fa fa-flag" aria-hidden="true"></i>&nbsp;<?php echo $lang['report']; ?> <?php echo $lang['author']; ?></p>
                 <!-- /SIMPLE DROPDOWN LINK -->
               </div>
               <!-- /SIMPLE DROPDOWN -->

@@ -35,7 +35,9 @@ $wtcat=$rescat->fetch(PDO::FETCH_ASSOC)
             <!-- POST PEEK LIST -->
             <div class="post-peek-list">
               <a href="<?php url_site();  ?>/forum" class="btn btn-primary" >&nbsp;<i class="fa fa-home" aria-hidden="true"></i>&nbsp;</a>
+              <?php   if(isset($_COOKIE['user']))  { ?>
               <a href="<?php url_site();  ?>/post" class="btn btn-success" ><?php lang('w_new_tpc');  ?>&nbsp;<i class="fa fa-plus" aria-hidden="true"></i> </a>
+              <?php } ?>
             </div>
             <!-- /POST PEEK LIST -->
           </div>

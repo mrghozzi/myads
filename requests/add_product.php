@@ -72,10 +72,10 @@ if($vrf_License=="65fgh4t8x5fe58v1rt8se9x"){
             }else if ((empty($bn_txt)) OR ($str_txt < 10)) {
             $bn_notvalid = "notvalid";
             $_SESSION['snotvalid'] = $lang['ssbalcl'];
-            }else if ((empty($bn_vnbr)) OR ($str_vnbr < 2) OR ($str_vnbr > 10)) {
+            }else if ((empty($bn_vnbr)) OR ($str_vnbr < 2) OR ($str_vnbr > 12)) {
             $bn_notvalid = "notvalid";
             $_SESSION['snotvalid'] = $lang['tvnmba'];
-            }else if ((empty($bn_desc)) OR ($str_desc < 10) OR ($str_desc > 240)) {
+            }else if ((empty($bn_desc)) OR ($str_desc < 10) OR ($str_desc > 2400)) {
             $bn_notvalid = "notvalid";
             $_SESSION['snotvalid'] = $lang['pdmbbac'];
             }else if ((empty($bn_name)) OR ($str_name < 3) OR ($str_name > 35)) {

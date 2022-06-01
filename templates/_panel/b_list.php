@@ -39,8 +39,10 @@
 <div class="section-filters-bar v6">
       <!-- SECTION FILTERS BAR ACTIONS -->
       <div class="section-filters-bar-actions" >
+      <?php if(isset($elnk_site) AND ($elnk_site==1)){ ?>
       <a href="https://www.adstn.gq/kb/myads:<?php lang('list'); ?>&nbsp;<?php lang('bannads'); ?>" class="button primary " target="_blank">&nbsp;<b><i class="fa fa-question-circle" aria-hidden="true"></i></b></a>
       &nbsp;
+      <?php } ?>
       <a class="button tertiary " href="<?php url_site();  ?>/state?ty=banner&st=vu">&nbsp;<i class="fa fa-line-chart" aria-hidden="true"></i>&nbsp;</a>
       </div>
       <p class="text-sticker">
@@ -65,7 +67,7 @@
 <?php } ?>
   <div class="grid-column" >
     <div class="widget-box" >
-					<table id="tablepagination" class="table table-borderless table-hover">
+					<table id="tablepagination" class="table table table-hover">
 						<thead>
 							<tr>
                               <th>#ID</th>

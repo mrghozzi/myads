@@ -62,7 +62,7 @@ if($vrf_License=="65fgh4t8x5fe58v1rt8se9x"){
             if (empty($bn_linkzip)) {
             $bn_notvalid = "notvalid";
             $_SESSION['snotvalid'] = $lang['yhnutf'];
-            }else if ((empty($bn_vnbr)) OR ($str_vnbr < 2) OR ($str_vnbr > 10)) {
+            }else if ((empty($bn_vnbr)) OR ($str_vnbr < 2) OR ($str_vnbr > 12)) {
             $bn_notvalid = "notvalid";
             $_SESSION['snotvalid'] = $lang['tvnmba'];
             }else if ((empty($bn_desc)) OR ($str_desc < 10) OR ($str_desc > 2400)) {
@@ -74,7 +74,7 @@ if($vrf_License=="65fgh4t8x5fe58v1rt8se9x"){
            $_SESSION['sdesc']    = $_POST['desc'];
            $_SESSION['svnbr']    = $_POST['vnbr'];
            $_SESSION['slinkzip'] = $_POST['linkzip'];
-            header("Location: {$url_site}/up_product/{$bn_name}");
+            header("Location: {$url_site}/update/{$bn_name}");
            }else{
 
               $bn_tid = $catstorRow['id'];

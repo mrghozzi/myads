@@ -4,15 +4,15 @@
 <?php template_mine('admin/admin_nav');  ?>
 </div>
 <div class="grid-column" >
-                     <div class="widget-box">
+           <div class="widget-box">
                      <center>
                      <a href="<?php echo $url_site; ?>/admincp?users" class="btn btn-primary" ><i class="fa fa-users"></i></a>
                      <a href="<?php echo $url_site; ?>/u/<?php echo $_GET['us_edit']; ?>" class="btn btn-primary" ><i class="fa fa-user"></i></a>
                      <a href="<?php echo $url_site; ?>/admincp?state&ty=banner&st=<?php echo $_GET['us_edit']; ?>" class="btn btn-warning" ><i class="fa fa-link"></i></a>
                      <a href="<?php echo $url_site; ?>/admincp?state&ty=link&st=<?php echo $_GET['us_edit']; ?>" class="btn btn-success" ><i class="fa fa-eye "></i></a>
                      </center>
-                     </div>
-					<div class="widget-box">
+           </div>
+		   <div class="widget-box">
 						<h4><span>Edit </span> User</h4>
 						<div class="widget-box-content">
 
@@ -133,6 +133,34 @@
           </form>
          </div>
      </div>
-    </div>
+     <div class="widget-box">
+             <h4><?php lang('e_pass'); ?></h4>
+		  <div class="widget-box-content">
+             <form id="defaultForm" method="post" class="form-horizontal" action="admincp.php?us_edit=<?php echo $_GET['us_edit'];  ?>">
+              <div class="form-row">
+               <!-- FORM ITEM -->
+                  <div class="form-item">
+                    <!-- FORM INPUT -->
+                    <div class="form-input small active">
+                      <label for="profile-tagline"><?php lang('n_pass'); ?></label>
+                      <input type="password" id="profile-Slug" name="n_pass" autocomplete="off">
+                    </div>
+                    <!-- /FORM INPUT -->
+                  </div>
+                 <!-- /FORM ITEM -->
+               </div>
+               <div class="form-row">
+                  <!-- FORM ITEM -->
+                  <div class="form-item">
+                    <!-- FORM INPUT -->
+                    <button type="submit" name="ps_submit" value="ps_submit" class="btn btn-primary"><?php lang('edit'); ?></button>
+                    <!-- /FORM INPUT -->
+                  </div>
+                  <!-- /FORM ITEM -->
+               </div>
+             </form>
+          </div>
+     </div>
+</div>
 </div>
 <?php }else{ echo"404"; }  ?>

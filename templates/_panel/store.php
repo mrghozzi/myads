@@ -92,7 +92,7 @@
         <!-- /SECTION TITLE -->
       </div>
       <!-- /SECTION HEADER INFO -->
-
+      <?php   if(isset($_COOKIE['user']))  { ?>
       <!-- SECTION HEADER ACTIONS -->
       <div class="section-header-actions">
         <!-- SECTION HEADER ACTION -->
@@ -100,6 +100,7 @@
         <!-- /SECTION HEADER ACTION -->
       </div>
       <!-- /SECTION HEADER ACTIONS -->
+      <?php } ?>
 </div>
 <div class="grid grid-3-3-3-3 centered">
 <?php

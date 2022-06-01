@@ -174,7 +174,7 @@ if(check_us($sus['id'],1)==1){
           <!-- USER STAT -->
           <div class="user-stat big">
             <!-- USER STAT TITLE -->
-            <p class="user-stat-title"><?php nbr_follow($sus['id'],"uid"); ?></p>
+            <p class="user-stat-title"><?php nbr_posts($sus['id']); ?></p>
             <!-- /USER STAT TITLE -->
 
             <!-- USER STAT TEXT -->

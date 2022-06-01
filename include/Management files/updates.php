@@ -41,7 +41,7 @@ if($vrf_License=="65fgh4t8x5fe58v1rt8se9x"){
 {
   	   if($_POST['up_submit']){
         $versionnow = $_POST['versionnow'];
-        $myads_last_updates = "https://www.adstn.gq/last_updates.txt";
+        $myads_last_updates = "https://apikariya.gq/myads/last_updates.txt";
         $last_updates       = @file_get_contents($myads_last_updates);
         $file_get           = @fopen($last_updates, 'r');
         $Tob                = $_SERVER['DOCUMENT_ROOT'];

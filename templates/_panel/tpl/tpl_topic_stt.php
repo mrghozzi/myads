@@ -119,7 +119,7 @@ $usecho =  "<b>{$catruss['username']}</b> <i class=\"fa fa-retweet\" aria-hidden
                 <!-- /SIMPLE DROPDOWN LINK -->
 
                 <!-- SIMPLE DROPDOWN LINK -->
-                <p class="simple-dropdown-link author_report<?php echo $sucat['id']; ?>"><i class="fa fa-flag" aria-hidden="true"></i>&nbsp;<?php echo $lang['report']; ?> Author</p>
+                <p class="simple-dropdown-link author_report<?php echo $sucat['id']; ?>"><i class="fa fa-flag" aria-hidden="true"></i>&nbsp;<?php echo $lang['report']; ?> <?php echo $lang['author']; ?></p>
                 <!-- /SIMPLE DROPDOWN LINK -->
               </div>
               <!-- /SIMPLE DROPDOWN -->
@@ -189,9 +189,9 @@ echo                 " </div>
                         <!-- USER STATUS TITLE -->
                         <p class=\"user-status-title medium\">
                         <a class=\"bold\" href=\"{$url_site}/u/{$catuss['id']}\">{$catuss['username']}</a>
-                        &nbsp;created a
+                        &nbsp;{$lang['create_a']}
                         &nbsp;<a class=\"bold\" href=\"{$url_site}/t{$sucat['id']}\">{$sucat['name']}</a>
-                        &nbsp;in the forum
+                        &nbsp;{$lang['in_the_forum']}
                         &nbsp;<a href=\"{$url_site}/f{$catussc['id']}\" class=\"bold\" >
                         <i class=\"fa {$catussc['icons']}\" aria-hidden=\"true\" ></i>&nbsp;{$catussc['name']}</a>
                         </p>

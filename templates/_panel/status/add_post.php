@@ -1,4 +1,7 @@
-﻿<?php if($s_st=="buyfgeufb"){  ?>
+﻿<?php if($s_st=="buyfgeufb"){
+   if(isset($_COOKIE['user']))
+{
+ ?>
 <div class="quick-post">
 <style> .result img { margin-top: 24px; width: 100%; height: auto;   border-radius: 12px; } </style>
           <!-- QUICK POST BODY -->
@@ -118,4 +121,5 @@
         });
     });
 </script>
-<?php }else{ echo"404"; }  ?>
+<?php }
+ }else{ echo"404"; }  ?>
