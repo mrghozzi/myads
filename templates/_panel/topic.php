@@ -120,11 +120,11 @@ $comtxt = preg_replace('/ #([^\s]+) /', '<a  href="'.$url_site.'/tag/$1" >#$1</a
  <div class="forum-content" >
     <div class="forum-post-header">
           <!-- FORUM POST HEADER TITLE -->
-          <p class="forum-post-header-title">Author</p>
+          <p class="forum-post-header-title"><?php echo $lang['author']; ?></p>
           <!-- /FORUM POST HEADER TITLE -->
 
           <!-- FORUM POST HEADER TITLE -->
-          <p class="forum-post-header-title">Post</p>
+          <p class="forum-post-header-title"><?php echo $lang['Posts']; ?></p>
           <!-- /FORUM POST HEADER TITLE -->
     </div>
     <div class="forum-post-list" >
@@ -169,7 +169,7 @@ $comtxt = preg_replace('/ #([^\s]+) /', '<a  href="'.$url_site.'/tag/$1" >#$1</a
                 <!-- /SIMPLE DROPDOWN LINK -->
 
                 <!-- SIMPLE DROPDOWN LINK -->
-                <p class="simple-dropdown-link author_report<?php echo $sucat['id']; ?>"><i class="fa fa-flag" aria-hidden="true"></i>&nbsp;<?php echo $lang['report']; ?> Author</p>
+                <p class="simple-dropdown-link author_report<?php echo $sucat['id']; ?>"><i class="fa fa-flag" aria-hidden="true"></i>&nbsp;<?php echo $lang['report']; ?> <?php echo $lang['author']; ?></p>
                 <!-- /SIMPLE DROPDOWN LINK -->
               </div>
               <!-- /SIMPLE DROPDOWN -->

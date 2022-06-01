@@ -124,7 +124,9 @@
      <?php }  ?>
                <div class="form-item split">
               <!-- FORM SELECT -->
+              <?php if(isset($elnk_site) AND ($elnk_site==1)){ ?>
               <a href="https://www.adstn.gq/kb/myads:Add a new Web site" class="button default" target="_blank" >&nbsp;<i class="fa fa-question-circle" aria-hidden="true"></i></a>
+              <?php } ?>
               <input type="hidden" name="s_type" value="1" />
               <input type="hidden" name="set" value="Publish" />
               <!-- BUTTON -->

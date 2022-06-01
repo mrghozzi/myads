@@ -36,10 +36,15 @@ if($wt['statu']=="1"){ $fgft="ON"; } else if($wt['statu']=="2"){ $fgft="OFF"; }
 $repvu = array("1","2","3","4");
 $repvu_to = array("10s","20s","30s","60s");
 $tims_vu = str_replace($repvu,$repvu_to,$wt['tims']);
+$str_name = mb_strlen($wt['name'], 'utf8');
+if($str_name > 25){
+   $bnname = substr($wt['name'],0,25)."&nbsp;...";
+ }else{
+   $bnname = $wt['name'];
+ }
 echo "<tr>
   <td>{$wt['id']}</td>
-  <td>{$wt['name']}</td>
-  <td>{$wt['url']}</td>
+  <td>{$bnname}</td>
   <td>{$wt['vu']}</td>
   <td>{$tims_vu}</td>
   <td>{$fgft}</td>

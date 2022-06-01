@@ -18,8 +18,11 @@
 <div class="section-filters-bar v6">
       <!-- SECTION FILTERS BAR ACTIONS -->
       <div class="section-filters-bar-actions">
+      <?php if(isset($elnk_site) AND ($elnk_site==1)){ ?>
       <a href="https://www.adstn.gq/kb/myads:post" class="button primary " target="_blank">&nbsp;<b><i class="fa fa-question-circle" aria-hidden="true"></i></b></a>
+      <?php } ?>
       </div>
+      <?php   if(isset($_COOKIE['user']))  { ?>
       <div class="section-filters-bar-actions">
         <!-- BUTTON -->
         <a href="<?php url_site();  ?>/post" class="button secondary" style="color: #fff;">
@@ -27,6 +30,7 @@
         <?php lang('add'); ?></a>
         <!-- /BUTTON -->
       </div>
+      <?php } ?>
       <!-- /SECTION FILTERS BAR ACTIONS -->
 </div>
 <div class="table table-forum-category">

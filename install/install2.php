@@ -11,7 +11,8 @@ $q2=$db_con->prepare("INSERT INTO `ads` (`id`, `code_ads`) VALUES
 (2, '<!-- MyAds code begin -->'),
 (3, '<!-- MyAds code begin -->'),
 (4, '<!-- MyAds code begin -->'),
-(5, '<!-- MyAds code begin -->');");
+(5, '<!-- MyAds code begin -->'),
+(6, '<!-- MyAds code begin -->');");
   $q2->execute();
 $q3=$db_con->prepare("CREATE TABLE IF NOT EXISTS `banner` (
   `id` int(15) NOT NULL,
@@ -88,6 +89,7 @@ $q6=$db_con->prepare("CREATE TABLE IF NOT EXISTS `setting` (
   `close_text` text NOT NULL DEFAULT '',
   `a_mail` varchar(250) NOT NULL DEFAULT '',
   `a_not` text NOT NULL DEFAULT '',
+  `e_links` int(15) NOT NULL DEFAULT '1',
   `facebook` varchar(320) NOT NULL DEFAULT '#facebook',
   `twitter` varchar(320) NOT NULL DEFAULT '#twitter',
   `linkedin` varchar(320) NOT NULL DEFAULT '#wasp'

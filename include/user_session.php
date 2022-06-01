@@ -35,38 +35,7 @@ session_start();
          	}
  if(md5($conf_us_log)==$md5_cook_us){ $_SESSION['user']=$uRow['id'];}
  else{ header("Location: {$url_site}/logout?logout"); }
-class session{
-  private static function _RegenerateId()
-    {
-        session_regenerate_id(true);
-    }
-  public static function init(){
-   session_start();
-  }
-  public static function set($key,$value){
-    $_SESSION[$key]=$value;
-    session::_RegenerateId();
-  }
-  public static function get($key, $secondKey = false){
-    session::_RegenerateId();
-    if(isset($_SESSION[$key]))
-    return $_SESSION[$key];
-        if ($secondKey == true)
-        {
-            if (isset($_SESSION[$key][$secondKey]))
-            return $_SESSION[$key][$secondKey];
-        }
-        else
-        {
-            if (isset($_SESSION[$key]))
-            return $_SESSION[$key];
-        }
-
-  }
-  public static function destroy(){
-    session_destroy();
-  }
-} }
+ }
  // admin
  $id_admin = "1";
  $stadmin_select = $db_con->prepare('SELECT * FROM users WHERE id=:id ');

@@ -1,6 +1,6 @@
 ﻿<?php if($s_st=="buyfgeufb"){
 
-                   $myads_last_time_updates = "https://www.adstn.gq/latest_version.txt";
+                   $myads_last_time_updates = "https://apikariya.gq/myads/latest_version.txt";
                    $last_time_updates = @file_get_contents($myads_last_time_updates, FILE_USE_INCLUDE_PATH);
                    $last_time_updates = strip_tags($last_time_updates, '');
                    $last_time_updates=substr($last_time_updates,0,5);

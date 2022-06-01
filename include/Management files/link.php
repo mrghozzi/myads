@@ -22,24 +22,32 @@ if($vrf_License=="65fgh4t8x5fe58v1rt8se9x"){
 $statement = "`link` WHERE id ORDER BY `id` DESC";
 $results =$db_con->prepare("SELECT * FROM {$statement} ");
 $results->execute();
-function lnk_list() {  global  $results;  global  $statement;   global  $db_con;
+function lnk_list() {  global  $results;  global  $statement;   global  $db_con;  global  $url_site;
 while($wt=$results->fetch(PDO::FETCH_ASSOC)) {
         $lus_id = $wt['uid'];
         $stmht_select = $db_con->prepare('SELECT * FROM users WHERE id=:id ');
 		$stmht_select->execute(array(':id'=>$lus_id));
 		$lusRow=$stmht_select->fetch(PDO::FETCH_ASSOC);
 if($wt['statu']=="1"){ $fgft="ON"; } else if($wt['statu']=="2"){ $fgft="OFF"; }
-
+$str_name = mb_strlen($wt['name'], 'utf8');
+if($str_name > 25){
+   $bnname = substr($wt['name'],0,25)."&nbsp;...";
+ }else{
+   $bnname = $wt['name'];
+ }
 echo "<tr>
-  <td>{$wt['id']}-{$lusRow['username']}</td>
-  <td>{$wt['name']}</td>
-  <td>{$wt['url']}</td>
-  <td>{$wt['clik']}</td>
-  <td>{$fgft}</td>
-  <td><a href=\"admincp?state&ty=link&id={$wt['id']}\" class='btn btn-warning' ><i class=\"fa fa-eye \"></i></a>
-  <a href=\"admincp?state&ty=clik&id={$wt['id']}\" class='btn btn-primary' ><i class=\"fa fa-bar-chart \"></i></a>
+  <td>{$wt['id']}&nbsp;-&nbsp;<a href=\"{$url_site}/u/{$lusRow['id']}\">{$lusRow['username']}</a>
+  <hr />
   <a href=\"admincp?l_edit={$wt['id']}\" class='btn btn-success' ><i class=\"fa fa-edit \"></i></a>
   <a href=\"#\" data-toggle=\"modal\" data-target=\"#ban{$wt['id']}\" class='btn btn-danger' ><i class=\"fa fa-ban \"></i></a></td>
+  <td>{$bnname}</td>
+  <td>{$wt['clik']}
+  <hr />
+  <a href=\"admincp?state&ty=link&id={$wt['id']}\" class='btn btn-warning' ><i class=\"fa fa-eye \"></i></a>
+  <a href=\"admincp?state&ty=clik&id={$wt['id']}\" class='btn btn-primary' ><i class=\"fa fa-bar-chart \"></i></a></td>
+  <td>{$fgft}</td>
+  <td>
+  </td>
 </tr>";
    echo "<div class=\"modal fade\" id=\"ban{$wt['id']}\" data-backdrop=\"\" tabindex=\"-1\" role=\"dialog\">
 				<div class=\"modal-dialog modal-dialog-centered\" role=\"document\">

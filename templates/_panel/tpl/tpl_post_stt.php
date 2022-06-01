@@ -75,11 +75,11 @@ $namesher = strip_tags($namesher, '');
 $linksher =  "{$url_site}/t{$catdid}";
 $linksher = strip_tags($linksher, '');
 
-$comtxt2 = preg_replace('/ #([^\s]+)/', '<a  href="'.$url_site.'/tag/$1" >#$1</a>', $sucat['txt'] );
-$comtxt1 = strip_tags($comtxt2, '<a><br><iframe>');
+$comtxt1 = strip_tags($sucat['txt'], '<br><iframe>');
+$comtxt2 = preg_replace('/ #([^\s]+)/', '<a  href="'.$url_site.'/tag/$1" >#$1</a>',$comtxt1  );
 $comtxt3 = strip_tags($sucat['txt'], '');
 
-$comtxt=substr($comtxt1,0,600);
+$comtxt=substr($comtxt2,0,600);
 $ecomtxt = preg_replace("/[\r\n]*/","",$comtxt3);
 if($sucat['uid']==$sutcat['uid']){
 $usecho = "";
@@ -121,7 +121,7 @@ $usecho =  "<b>{$catruss['username']}</b> <i class=\"fa fa-retweet\" aria-hidden
                 <!-- /SIMPLE DROPDOWN LINK -->
 
                 <!-- SIMPLE DROPDOWN LINK -->
-                <p class="simple-dropdown-link author_report<?php echo $sucat['id']; ?>"><i class="fa fa-flag" aria-hidden="true"></i>&nbsp;<?php echo $lang['report']; ?> Author</p>
+                <p class="simple-dropdown-link author_report<?php echo $sucat['id']; ?>"><i class="fa fa-flag" aria-hidden="true"></i>&nbsp;<?php echo $lang['report']; ?> <?php echo $lang['author']; ?></p>
                 <!-- /SIMPLE DROPDOWN LINK -->
               </div>
               <!-- /SIMPLE DROPDOWN -->

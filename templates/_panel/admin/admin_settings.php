@@ -39,8 +39,9 @@
                   <!-- FORM ITEM -->
                   <div class="form-item">
                     <!-- FORM INPUT -->
-                    <div class="form-input small full">
-                      <textarea id="profile-desc" name="desc" placeholder="Description"><?php bnr_echo('description'); ?></textarea>
+                    <div class="form-input small active">
+                      <label for="Url-website">Description</label>
+                      <textarea id="profile-desc" name="desc" ><?php bnr_echo('description'); ?></textarea>
                     </div>
                     <!-- /FORM INPUT -->
                   </div>
@@ -64,6 +65,20 @@
                     <div class="form-input small active">
                       <label for="Language-Default">Language Default</label>
                       <input type="text" id="Language-Default" name="lang" value="<?php bnr_echo('lang'); ?>">
+                    </div>
+                    <!-- /FORM INPUT -->
+                  </div>
+                  <!-- /FORM ITEM -->
+
+                  <!-- FORM ITEM -->
+                  <div class="form-item">
+                    <!-- FORM INPUT -->
+                    <div class="form-select small active">
+                      <label for="Language-Default">Educational Links</label>
+                      <select id="Educational-Links" name="e_links" >
+                       <option value="1"><?php lang('activate'); ?></option>
+                       <option value="0"><?php lang('close'); ?></option>
+                      </select>
                     </div>
                     <!-- /FORM INPUT -->
                   </div>

@@ -68,7 +68,26 @@
             <!-- /FORM ITEM -->
           </div>
           <!-- /FORM ROW -->
+          <!-- FORM ROW -->
+          <div class="form-row split">
+            <!-- FORM ITEM -->
+            <div class="form-item">
+            <center><b><?php captcha() ;  ?>&nbsp;=</b></center>
+             </div>
+          <div class="form-item">
+              <div class="form-input social-input small active">
+                      <!-- name -->
 
+                      <!-- /name -->
+                      <label for="capt">verification code</label>
+                      <input type="text" id="capt" name="capt" required>
+                    </div>
+              <!-- /FORM SELECT -->
+             <!-- /FORM INPUT -->
+            </div>
+            <!-- /FORM ITEM -->
+          </div>
+          <!-- /FORM ROW -->
           <!-- FORM ROW -->
           <div class="form-row">
             <!-- FORM ITEM -->

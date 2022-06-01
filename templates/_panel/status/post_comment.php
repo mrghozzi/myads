@@ -66,7 +66,7 @@ if(isset($_GET['s_type']) AND (($_GET['s_type']==100) OR ($_GET['s_type']==4) OR
 ?>
 
 <?php
-$statement = "`{$s_type}` WHERE {$o_type} ORDER BY `id` ASC";
+$statement = "`{$s_type}` WHERE {$o_type} ORDER BY `id` DESC";
 $catsum = $db_con->prepare("SELECT  * FROM {$statement} LIMIT {$comentlimet} ");
 $catsum->execute();
 while($sutcat=$catsum->fetch(PDO::FETCH_ASSOC))

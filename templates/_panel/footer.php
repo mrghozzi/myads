@@ -1,6 +1,6 @@
 ﻿<?php if($s_st=="buyfgeufb"){  ?>
 
-
+    <?php ads_site(6); ?>
 	</div>
 <!-- bootstrap -->
 <script src="<?php url_site();  ?>/templates/_panel/js/bootstrap.min.js"></script>

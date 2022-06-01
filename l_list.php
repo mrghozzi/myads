@@ -34,11 +34,15 @@ function lnk_list() {  global  $results;  global  $statement;
 
 while($wt=$results->fetch(PDO::FETCH_ASSOC)) {
 if($wt['statu']=="1"){ $fgft="ON"; } else if($wt['statu']=="2"){ $fgft="OFF"; }
-
+$str_name = mb_strlen($wt['name'], 'utf8');
+if($str_name > 25){
+   $bnname = substr($wt['name'],0,25)."&nbsp;...";
+ }else{
+   $bnname = $wt['name'];
+ }
 echo "<tr>
   <td>{$wt['id']}</td>
-  <td>{$wt['name']}</td>
-  <td>{$wt['url']}</td>
+  <td>{$bnname}</td>
   <td>{$wt['clik']}</td>
   <td>{$fgft}</td>
   <td><a href=\"state.php?ty=link&id={$wt['id']}\" class='btn btn-warning' ><i class=\"fa fa-eye \"></i></a>

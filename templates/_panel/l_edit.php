@@ -41,9 +41,9 @@
          <!-- WIDGET BOX TITLE -->
          <p class="widget-box-title"><?php lang('textads'); ?></p>
          <br />
-<?php if(isset($_COOKIE['user']) AND !isset($_COOKIE['admin']) ){ ?>
+<?php if(isset($_COOKIE['user']) AND isset($_GET['id'])){ ?>
       <form id="defaultForm" method="post" class="form" action="<?php url_site();  ?>/l_edit?id=<?php echo $_GET['id'];  ?>">
-<?php }else if(isset($_COOKIE['user'])=="1" AND isset($_COOKIE['admin'])==$uRow['pass'] ){   ?>
+<?php }else if((isset($_COOKIE['user'])=="1") AND (isset($_COOKIE['admin'])==$uRow['pass']) AND (isset($_GET['l_edit']))){   ?>
       <form id="defaultForm" method="post" class="form" action="<?php url_site();  ?>/admincp?l_edit=<?php echo $_GET['l_edit'];  ?>">
 <?php } ?>
          <div class="form-row split">
@@ -81,7 +81,7 @@
                   <!-- /FORM ITEM -->
          </div>
          <div class="form-row split">
-<?php if(isset($_COOKIE['user'])=="1" AND isset($_COOKIE['admin'])==$uRow['pass'] ){   ?>
+<?php if((isset($_COOKIE['user'])=="1") AND (isset($_COOKIE['admin'])==$uRow['pass']) AND (isset($_GET['l_edit']))){   ?>
                   <div class="form-item">
                     <!-- FORM SELECT -->
                     <div class="form-select">

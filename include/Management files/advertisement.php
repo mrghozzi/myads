@@ -33,6 +33,7 @@ $ads_name[2] ="User Dashboard";
 $ads_name[3] ="Header Exchange";
 $ads_name[4] ="Forum";
 $ads_name[5] ="Topic";
+$ads_name[6] ="Footer";
 echo "<form id=\"defaultForm\" method=\"post\" class=\"form-horizontal\" action=\"admincp?e_ads={$wt['id']}\">
   <tr>
   <td><center><h3>{$ads_name[$ads_id]}</h3></center><br />

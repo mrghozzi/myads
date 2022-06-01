@@ -213,8 +213,10 @@
 
             <!-- banner DECORATION TEXT -->
             <p class="stats-decoration-text">
+              <?php if(isset($elnk_site) AND ($elnk_site==1)){ ?>
               <a href="https://www.adstn.gq/kb/myads:Banners Ads" class="button primary padded" target="_blank" >&nbsp;<b><i class="fa fa-question-circle" aria-hidden="true"></i></b></a>
                &nbsp;
+              <?php } ?>
               <a class="button tertiary padded" href="<?php url_site();  ?>/state?ty=banner&st=vu" >&nbsp;<i class="fa fa-line-chart" aria-hidden="true"></i>&nbsp;</a>
                &nbsp;
               <a  href="<?php url_site();  ?>/b_list.php" class="button secondary padded" ><?php lang('list'); echo"&nbsp;"; lang('bannads'); ?></a>
@@ -251,8 +253,10 @@
 
             <!-- link DECORATION TEXT -->
             <p class="stats-decoration-text">
+              <?php if(isset($elnk_site) AND ($elnk_site==1)){ ?>
               <a href="https://www.adstn.gq/kb/myads:Text Ads" class="button primary padded" target="_blank" >&nbsp;<b><i class="fa fa-question-circle" aria-hidden="true"></i></b></a>
                &nbsp;
+              <?php } ?>
               <a class="button tertiary padded" href="<?php url_site();  ?>/state?ty=link&st=vu" >&nbsp;<i class="fa fa-line-chart" aria-hidden="true"></i>&nbsp;</a>
                &nbsp;
               <a  href="<?php url_site();  ?>/l_list.php" class="button secondary padded" ><?php lang('list'); echo"&nbsp;"; lang('textads'); ?></a>
@@ -289,8 +293,10 @@
 
             <!-- Exchange DECORATION TEXT -->
             <p class="stats-decoration-text">
+              <?php if(isset($elnk_site) AND ($elnk_site==1)){ ?>
               <a href="https://www.adstn.gq/kb/myads:Exchange" class="button primary padded" target="_blank" >&nbsp;<b><i class="fa fa-question-circle" aria-hidden="true"></i></b></a>
                &nbsp;
+              <?php } ?>
               <a  href="<?php url_site();  ?>/v_list" class="button secondary padded" ><?php lang('list'); echo"&nbsp;"; lang('exvisit'); ?></a>
                &nbsp;
               <a class="button padded" onClick="window.open('visits.php?id=<?php user_row('id') ; ?>');" href="javascript:void(0);" >
@@ -322,7 +328,9 @@
 
             <!-- pts DECORATION SUBTITLE -->
             <p class="switch-option-title">
+            <?php if(isset($elnk_site) AND ($elnk_site==1)){ ?>
             <a href="https://www.adstn.gq/kb/myads:pts" class="button primary padded" target="_blank" >&nbsp;<b><i class="fa fa-question-circle" aria-hidden="true"></i></b></a>
+            <?php } ?>
             <a class="button padded" href="<?php url_site();  ?>/r_code" ><i class="fa fa-users"></i>&nbsp;<?php lang('referal'); ?></a>
 
             </p>

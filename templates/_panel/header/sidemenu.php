@@ -100,6 +100,7 @@
     <!-- HEADER ACTIONS -->
     <div class="header-actions">
       <!-- PROGRESS STAT -->
+      <?php   if(isset($_COOKIE['user']))  { ?>
       <div class="progress-stat">
         <!-- BAR PROGRESS WRAP -->
         <div class="bar-progress-wrap">
@@ -108,8 +109,8 @@
           <!-- /BAR PROGRESS INFO -->
         </div>
         <!-- /BAR PROGRESS WRAP -->
-
       </div>
+      <?php } ?>
       <!-- /PROGRESS STAT -->
       <?php if(isset($_COOKIE['user']) && isset($_COOKIE['admin']) && ($_COOKIE['admin']==$hachadmin)  ){ ?>
       <?php template_mine('header/admin_board');  ?>

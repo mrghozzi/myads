@@ -2,7 +2,7 @@
 
 #####################################################################
 ##                                                                 ##
-##                        My ads v2.4.x                            ##
+##                        My ads v3.x.x                            ##
 ##                     http://www.krhost.ga                        ##
 ##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
@@ -108,6 +108,7 @@ $lang['version']     = "Version";
 $lang['panel']       = "Panel";
 $lang['us_name']     = "Username";
 $lang['users']       = "Users";
+$lang['author']      = "Author";
 $lang['e_user']      = "Edit User";
 $lang['n_user']      = "New User";
 $lang['a_user']      = "Add User";
@@ -272,5 +273,9 @@ $lang['was_desc']    = "Write a simple description...";
 $lang['react']       = "React!";
 $lang['reactions']   = "Reactions";
 $lang['mode_admin']  = "Mode Admin";
+$lang['create_a']    = "Create a";
+$lang['in_the_forum']= "in the forum";
+$lang['on_i']        = "on";
+$lang['link']        = "Link";
 
 ?>
