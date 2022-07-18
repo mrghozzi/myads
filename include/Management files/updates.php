@@ -52,7 +52,8 @@ if($vrf_License=="65fgh4t8x5fe58v1rt8se9x"){
      // $path               = pathinfo(realpath($file), PATHINFO_DIRNAME);
 		if ($zip->open($file) === TRUE) {
 		    $zip->extractTo($Tob);
-            header("Location: requests/update.php?v={$versionnow}&admin");
+            include "requests/update.php";
+
         } else {
         $bn_get= "?updates&bnerrMSG=".$lang['not_update'];
         header("Location: admincp{$bn_get}");

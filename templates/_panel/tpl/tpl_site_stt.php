@@ -21,6 +21,7 @@ $catusz = $db_con->prepare("SELECT *  FROM `directory` WHERE  id=".$sutcat['tp_i
 $catusz->execute();
 $sucat=$catusz->fetch(PDO::FETCH_ASSOC);
 
+$st_type = "22";
 $comtxt = strip_tags($sucat['txt'], '<br>');
 $comtxt = preg_replace('/#([^\s]+)/', '<a  href="'.$url_site.'/tag/$1" >#$1</a>', $comtxt );
 $sdf    = $sucat['url'];
@@ -264,6 +265,15 @@ echo                   "</p>
               <div class="content-actions">
                 <!-- CONTENT ACTION -->
                 <div class="content-action">
+                <?php
+
+                 if(isset($_COOKIE['user'])){
+
+                 include "templates/_panel/status/reaction_list.php";
+
+                 }
+
+                 ?>
                   <!-- META LINE -->
                   <div class="meta-line">
                     <!-- META LINE TEXT -->
