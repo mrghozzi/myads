@@ -1,4 +1,4 @@
-# <b>MYADS v3.0.1 beta</b> : ***php scripts*** for exchanging ads and social networking between website owners.
+# <b>MYADS v3.0.2</b> : ***php scripts*** for social networking and exchanging ads between website owners.
 
 >
 > ![MYADS](https://www.adstn.gq/bnr/myads.png)

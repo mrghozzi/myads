@@ -24,7 +24,7 @@ $comtxt = strip_tags($sucat['txt'], '<br><iframe>');
 $comtxt = preg_replace('/#([^\s]+)/', '<a  href="'.$url_site.'/tag/$1" >#$1</a>', $comtxt );
 $imgtxt = strip_tags($comtxt, '');
 
-
+$st_type = "2";
 $dir_text=substr($comtxt,0,340);
 $catdid=$sucat['id'];
 $catus = $db_con->prepare("SELECT *  FROM users WHERE  id='{$sucat['uid']}'");
@@ -223,6 +223,15 @@ echo                   "</p>
               <div class="content-actions">
                 <!-- CONTENT ACTION -->
                 <div class="content-action">
+                <?php
+
+                 if(isset($_COOKIE['user'])){
+
+                 include "templates/_panel/status/reaction_list.php";
+
+                 }
+
+                 ?>
                   <!-- META LINE -->
                   <div class="meta-line">
                     <!-- META LINE TEXT -->

@@ -38,6 +38,7 @@ RewriteRule ^edk/([A-Za-z0-9_]+):(.*)$ store.php?tr=$1&ed=$2 [NC,L]
 RewriteRule ^pgk/([A-Za-z0-9_]+):(.*)$ store.php?pr=$1&pg=$2 [NC,L]
 RewriteRule ^hkd/([A-Za-z0-9_]+):(.*)$ store.php?pp=$1&tt=$2 [NC,L]
 RewriteRule ^edk store.php?nf [NC,L]
+RewriteRule ^forgot-password login?forgot-password [NC,L]
 RewriteRule ^update/(.*) store.php?update=$1 [NC,L]
 RewriteRule ^add_store store.php?add [NC,L]
 RewriteCond %{REQUEST_FILENAME} !-d

@@ -20,7 +20,7 @@ global  $db_con; global  $catsum;  global  $uRow; global $lang; global $url_site
 $catusz = $db_con->prepare("SELECT *  FROM `forum` WHERE statu=1 AND  id=".$sutcat['tp_id'] );
 $catusz->execute();
 $sucat=$catusz->fetch(PDO::FETCH_ASSOC);
-
+$st_type = "2";
 $catdid=$sucat['id'];
 $catus = $db_con->prepare("SELECT *  FROM users WHERE  id='{$sucat['uid']}'");
 $catus->execute();
@@ -218,6 +218,15 @@ echo                   "</p>
               <div class="content-actions">
                 <!-- CONTENT ACTION -->
                 <div class="content-action">
+                <?php
+
+                 if(isset($_COOKIE['user'])){
+
+                 include "templates/_panel/status/reaction_list.php";
+
+                 }
+
+                 ?>
                   <!-- META LINE -->
                   <div class="meta-line">
                     <!-- META LINE TEXT -->
