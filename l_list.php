@@ -30,7 +30,7 @@ if(isset($_GET['ban'])){
 $statement = "`link` WHERE uid={$uidss} ORDER BY `id` DESC";
 $results =$db_con->prepare("SELECT * FROM {$statement} ");
 $results->execute();
-function lnk_list() {  global  $results;  global  $statement;
+function lnk_list() {  global  $results;  global  $statement; global  $db_con;
 
 while($wt=$results->fetch(PDO::FETCH_ASSOC)) {
 if($wt['statu']=="1"){ $fgft="ON"; } else if($wt['statu']=="2"){ $fgft="OFF"; }
@@ -40,15 +40,20 @@ if($str_name > 25){
  }else{
    $bnname = $wt['name'];
  }
+ $ty_id = $wt['id'];
+ $ty2="link";
+$statementv = " `state` WHERE  pid='{$ty_id}' AND t_name='{$ty2}' ";
+$resultsv = $db_con->prepare("SELECT COUNT(id) as nbr FROM {$statementv} ");
+$resultsv->execute();
+$wtv=$resultsv->fetch(PDO::FETCH_ASSOC);
 echo "<tr>
   <td>{$wt['id']}</td>
-  <td>{$bnname}</td>
-  <td>{$wt['clik']}</td>
-  <td>{$fgft}</td>
-  <td><a href=\"state.php?ty=link&id={$wt['id']}\" class='btn btn-warning' ><i class=\"fa fa-eye \"></i></a>
-  <a href=\"state.php?ty=clik&id={$wt['id']}\" class='btn btn-primary' ><i class=\"fa fa-bar-chart \"></i></a>
-  <a href=\"l_edit.php?id={$wt['id']}\" class='btn btn-success' ><i class=\"fa fa-edit \"></i></a>
+  <td>{$bnname}<hr />
+    <a href=\"l_edit.php?id={$wt['id']}\" class='btn btn-success' ><i class=\"fa fa-edit \"></i></a>
   <a href=\"#\" data-toggle=\"modal\" data-target=\"#ban{$wt['id']}\" class='btn btn-danger' ><i class=\"fa fa-ban \"></i></a></td>
+  <td><a href=\"state.php?ty=link&id={$wt['id']}\" class='btn btn-warning' >{$wtv['nbr']}</a></td>
+  <td><a href=\"state.php?ty=clik&id={$wt['id']}\" class='btn btn-primary' >{$wt['clik']}</a></td>
+  <td>{$fgft}</td>
 </tr>";
    echo "<div class=\"modal fade\" id=\"ban{$wt['id']}\" data-backdrop=\"\" tabindex=\"-1\" role=\"dialog\">
 				<div class=\"modal-dialog modal-dialog-centered\" role=\"document\">
