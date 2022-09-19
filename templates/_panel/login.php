@@ -1,6 +1,5 @@
 <?php if($s_st=="buyfgeufb"){  ?>
-<div class="content-grid">
-
+<div class="content">
       <!-- FORM BOX -->
       <div class="widget-box" >
       <?php if(isset($_GET['bnerrMSG'])){  ?>
