@@ -6,7 +6,7 @@
       <div class="alert alert-danger" role="alert"><?php echo $_GET['bnerrMSG'];  ?></div>
       <?php }  ?>
         <!-- FORM BOX TITLE -->
-        <h2 class="form-box-title">Account Login</h2>
+        <center><h2><?php lang('sign_in'); ?></h2></center><br />
         <!-- /FORM BOX TITLE -->
 
         <!-- FORM -->
@@ -17,7 +17,7 @@
             <div class="form-item">
               <!-- FORM INPUT -->
               <div class="form-input">
-                <label for="login-username">Username or Email</label>
+                <label for="login-username"><?php lang('usermail'); ?></label>
                 <input type="text" id="login-username" name="username">
               </div>
               <!-- /FORM INPUT -->
@@ -32,7 +32,7 @@
             <div class="form-item">
               <!-- FORM INPUT -->
               <div class="form-input">
-                <label for="login-password">Password</label>
+                <label for="login-password"><?php lang('password'); ?></label>
                 <input type="password" id="login-password" name="pass">
               </div>
               <!-- /FORM INPUT -->
@@ -78,7 +78,7 @@
             <!-- FORM ITEM -->
             <div class="form-item">
               <!-- BUTTON -->
-              <button class="button medium secondary" name="login" type="submit">Login to your Account!</button>
+              <button class="button medium secondary" name="login" type="submit"><?php lang('login'); ?></button>
               <!-- /BUTTON -->
             </div>
             <!-- /FORM ITEM -->
@@ -88,17 +88,29 @@
         <!-- /FORM -->
          <hr />
         <!-- LINED TEXT -->
-        <p class="lined-text">Dont have and account?</p>
+        <p class="lined-text"><?php lang('donthaacc'); ?></p>
         <br />
         <!-- /LINED TEXT -->
-        <button class="button medium tertiary"><a href="register.php" style="color: #fff;" >Signup here.</a></button>
+        <button class="button medium tertiary"><a href="register.php" style="color: #fff;" ><?php lang('sign_up'); ?></a></button>
         <hr />
+        <?php
+        $o_type =  "login_ext";
+        $bnlogin_ext = $db_con->prepare("SELECT  COUNT(id) as nbr FROM `options` WHERE o_type=:o_type ORDER BY `o_order` DESC" );
+        $bnlogin_ext->bindParam(":o_type", $o_type);
+        $bnlogin_ext->execute();
+        $ablogin_ext=$bnlogin_ext->fetch(PDO::FETCH_ASSOC);
+        $contlogin_ext= $ablogin_ext['nbr'];
+        if(isset($contlogin_ext) AND ($contlogin_ext == 0)){
+
+        }else{
+        ?>
         <p class="lined-text">Login with your Social Account</p>
         <!-- SOCIAL LINKS -->
         <div class="social-links">
           <?php act_extensions("login_ext");  ?>
         </div>
         <!-- /SOCIAL LINKS -->
+        <?php } ?>
       </div>
       <!-- /FORM BOX -->
 

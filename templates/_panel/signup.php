@@ -7,7 +7,7 @@
       <div class="alert alert-danger" role="alert"><?php echo $_GET['bnerrMSG'];  ?></div>
       <?php }  ?>
         <!-- FORM BOX TITLE -->
-        <h2 class="form-box-title">Create your Account!</h2>
+        <center><h2><?php lang('creayoacc'); ?></h2></center><br />
         <!-- /FORM BOX TITLE -->
 
         <!-- FORM -->
@@ -17,7 +17,7 @@
             <div class="form-item">
               <!-- FORM INPUT -->
               <div class="form-input">
-                <label for="register-email">Your Email</label>
+                <label for="register-email"><?php lang('email'); ?></label>
                 <input type="text" id="register-email" name="email">
               </div>
               <!-- /FORM INPUT -->
@@ -30,7 +30,7 @@
             <div class="form-item">
               <!-- FORM INPUT -->
               <div class="form-input">
-                <label for="register-username">Username</label>
+                <label for="register-username"><?php lang('username'); ?></label>
                 <input type="text" id="register-username" name="username">
               </div>
               <!-- /FORM INPUT -->
@@ -45,7 +45,7 @@
             <div class="form-item">
               <!-- FORM INPUT -->
               <div class="form-input">
-                <label for="register-password">Password</label>
+                <label for="register-password"><?php lang('password'); ?></label>
                 <input type="password" id="register-password" name="pass1">
               </div>
               <!-- /FORM INPUT -->
@@ -60,7 +60,7 @@
             <div class="form-item">
               <!-- FORM INPUT -->
               <div class="form-input">
-                <label for="register-password-repeat">Repeat Password</label>
+                <label for="register-password-repeat"><?php lang('rep_password'); ?></label>
                 <input type="password" id="register-password" name="pass2">
               </div>
               <!-- /FORM INPUT -->
@@ -93,7 +93,7 @@
             <!-- FORM ITEM -->
             <div class="form-item">
               <!-- BUTTON -->
-              <button class="button medium secondary" name="submit" type="submit">Register Now!</button>
+              <button class="button medium secondary" name="submit" type="submit"><?php lang('sign_up'); ?></button>
               <!-- /BUTTON -->
             </div>
             <!-- /FORM ITEM -->
@@ -103,17 +103,29 @@
         <!-- /FORM -->
          <hr />
         <!-- LINED TEXT -->
-        <p class="lined-text">Already have an account?</p>
+        <p class="lined-text"><?php lang('alrehaacc'); ?></p>
         <br />
         <!-- /LINED TEXT -->
-        <button class="button medium tertiary"><a href="login.php" style="color: #fff;" >Login</a></button>
+        <button class="button medium tertiary"><a href="login.php" style="color: #fff;" ><?php lang('login'); ?></a></button>
         <hr />
+        <?php
+        $o_type =  "login_ext";
+        $bnlogin_ext = $db_con->prepare("SELECT  COUNT(id) as nbr FROM `options` WHERE o_type=:o_type ORDER BY `o_order` DESC" );
+        $bnlogin_ext->bindParam(":o_type", $o_type);
+        $bnlogin_ext->execute();
+        $ablogin_ext=$bnlogin_ext->fetch(PDO::FETCH_ASSOC);
+        $contlogin_ext= $ablogin_ext['nbr'];
+        if(isset($contlogin_ext) AND ($contlogin_ext == 0)){
+
+        }else{
+        ?>
         <p class="lined-text">Login with your Social Account</p>
         <!-- SOCIAL LINKS -->
         <div class="social-links">
           <?php act_extensions("login_ext");  ?>
         </div>
         <!-- /SOCIAL LINKS -->
+        <?php } ?>
       </div>
       <!-- /FORM BOX -->
 
