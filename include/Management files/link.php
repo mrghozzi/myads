@@ -35,19 +35,22 @@ if($str_name > 25){
  }else{
    $bnname = $wt['name'];
  }
+  $ty_id = $wt['id'];
+ $ty2="link";
+$statementv = " `state` WHERE  pid='{$ty_id}' AND t_name='{$ty2}' ";
+$resultsv = $db_con->prepare("SELECT COUNT(id) as nbr FROM {$statementv} ");
+$resultsv->execute();
+$wtv=$resultsv->fetch(PDO::FETCH_ASSOC);
 echo "<tr>
   <td>{$wt['id']}&nbsp;-&nbsp;<a href=\"{$url_site}/u/{$lusRow['id']}\">{$lusRow['username']}</a>
   <hr />
   <a href=\"admincp?l_edit={$wt['id']}\" class='btn btn-success' ><i class=\"fa fa-edit \"></i></a>
   <a href=\"#\" data-toggle=\"modal\" data-target=\"#ban{$wt['id']}\" class='btn btn-danger' ><i class=\"fa fa-ban \"></i></a></td>
   <td>{$bnname}</td>
-  <td>{$wt['clik']}
-  <hr />
-  <a href=\"admincp?state&ty=link&id={$wt['id']}\" class='btn btn-warning' ><i class=\"fa fa-eye \"></i></a>
-  <a href=\"admincp?state&ty=clik&id={$wt['id']}\" class='btn btn-primary' ><i class=\"fa fa-bar-chart \"></i></a></td>
+  <td><a href=\"admincp?state&ty=link&id={$wt['id']}\" class='btn btn-warning' >{$wtv['nbr']}</a></td>
+  <td><a href=\"admincp?state&ty=clik&id={$wt['id']}\" class='btn btn-primary' >{$wt['clik']}</a></td>
   <td>{$fgft}</td>
-  <td>
-  </td>
+
 </tr>";
    echo "<div class=\"modal fade\" id=\"ban{$wt['id']}\" data-backdrop=\"\" tabindex=\"-1\" role=\"dialog\">
 				<div class=\"modal-dialog modal-dialog-centered\" role=\"document\">

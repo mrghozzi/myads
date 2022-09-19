@@ -71,9 +71,9 @@
 				  <tr>
                    <th>#ID</th>
 				   <th>Name</th>
+                   <th>Vu</th>
                    <th>Clik</th>
                    <th>Statu</th>
-                   <th></th>
                   </tr>
 				 </thead>
 				 <tbody>
