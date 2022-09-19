@@ -127,7 +127,7 @@
               <!-- STAT BLOCK INFO -->
               <div class="stat-block-info">
                 <!-- STAT BLOCK TITLE -->
-                <p class="stat-block-title">Last Registered Member</p>
+                <p class="stat-block-title"><?php lang('lastrm'); ?></p>
                 <!-- /STAT BLOCK TITLE -->
 
                 <!-- STAT BLOCK TEXT -->
@@ -157,7 +157,7 @@
               <!-- STAT BLOCK INFO -->
               <div class="stat-block-info">
                 <!-- STAT BLOCK TITLE -->
-                <p class="stat-block-title">Last post</p>
+                <p class="stat-block-title"><?php lang('lastps'); ?></p>
                 <!-- /STAT BLOCK TITLE -->
                 <?php $last_post = last_state('status','date',1); ?>
                 <!-- STAT BLOCK TEXT -->
@@ -187,11 +187,11 @@
               <!-- STAT BLOCK INFO -->
               <div class="stat-block-info">
                 <!-- STAT BLOCK TITLE -->
-                <p class="stat-block-title">All Reactions</p>
+                <p class="stat-block-title"><?php lang('allreactions'); ?></p>
                 <!-- /STAT BLOCK TITLE -->
                  <?php $all_react = nbr_state('`like`',1)-nbr_follows(1); ?>
                 <!-- STAT BLOCK TEXT -->
-                <p class="stat-block-text"><?php echo $all_react;  ?> React</p>
+                <p class="stat-block-text"><?php echo $all_react;  ?> <?php lang('react2'); ?></p>
                 <!-- /STAT BLOCK TEXT -->
               </div>
               <!-- /STAT BLOCK INFO -->
@@ -217,11 +217,11 @@
               <!-- STAT BLOCK INFO -->
               <div class="stat-block-info">
                 <!-- STAT BLOCK TITLE -->
-                <p class="stat-block-title">All Follower</p>
+                <p class="stat-block-title"><?php lang('allFollowers'); ?></p>
                 <!-- /STAT BLOCK TITLE -->
                 <?php $all_follows = nbr_follows(1); ?>
                 <!-- STAT BLOCK TEXT -->
-                <p class="stat-block-text"><?php echo $all_follows;  ?> followers</p>
+                <p class="stat-block-text"><?php echo $all_follows;  ?> <?php lang('Followers'); ?></p>
                 <!-- /STAT BLOCK TEXT -->
               </div>
               <!-- /STAT BLOCK INFO -->
