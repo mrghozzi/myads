@@ -2,11 +2,11 @@
 
 #####################################################################
 ##                                                                 ##
-##                        MYads  v3.0.1                            ##
+##                        MYads  v3.0.4                            ##
 ##                     http://www.krhost.ga                        ##
 ##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
-##                       copyright (c) 2022                        ##
+##                       copyright (c) 2023                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
@@ -74,7 +74,11 @@ include "include/user_session.php";  //  user Session
       $lg_md5 = time() + (365 * 24 * 60 * 60);
      setcookie("lang", "ar", $lg_md5);
      header('Location: ' . $_SERVER['HTTP_REFERER']);
-        }
+    } else if (isset($_GET["fr"])){
+      $lg_md5 = time() + (365 * 24 * 60 * 60);
+     setcookie("lang", "fr", $lg_md5);
+     header('Location: ' . $_SERVER['HTTP_REFERER']);
+    }
 $o_type = "languages";
 $exlanguages = $db_con->prepare("SELECT  * FROM `options` WHERE o_type=:o_type ORDER BY `o_order` DESC " );
 $exlanguages->bindParam(":o_type", $o_type);

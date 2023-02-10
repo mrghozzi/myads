@@ -2,11 +2,11 @@
 
 #####################################################################
 ##                                                                 ##
-##                        MYads  v3.x.x                            ##
+##                        MYads  v3.x.4                            ##
 ##                     http://www.krhost.ga                        ##
 ##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
-##                       copyright (c) 2022                        ##
+##                       copyright (c) 2023                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
