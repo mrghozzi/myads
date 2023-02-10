@@ -33,6 +33,16 @@
     </a>
     </div>
   </div>
+    <div class="col-sm-6 col-md-3">
+    <div class="thumbnail">
+    <a href="<?php url_site();  ?>?fr">
+      <img src="<?php url_site();  ?>/templates/_panel/img/fr.png" alt="">
+      <div class="caption">
+        <p>Francais <br>par_absouini</p>
+      </div>
+    </a>
+    </div>
+  </div>
   <?php
 $o_type = "languages";
 $exlanguages = $db_con->prepare("SELECT  * FROM `options` WHERE o_type=:o_type ORDER BY `o_order` DESC " );
@@ -43,7 +53,7 @@ while($exlang=$exlanguages->fetch(PDO::FETCH_ASSOC)){
    <div class="col-sm-6 col-md-3">
     <div class="thumbnail">
     <a href="?<?php echo $exlang['o_valuer']; ?>">
-      <img src="https://www.countryflags.io/<?php echo $exlang['o_valuer']; ?>/flat/32.png" onerror="this.src='<?php url_site();  ?>/templates/_panel/images/language.png'" >
+      <img src="https://flagcdn.com/32x24/<?php echo $exlang['o_valuer']; ?>.png" onerror="this.src='<?php url_site();  ?>/templates/_panel/img/language.png'" >
       <div class="caption">
         <p><?php echo $exlang['name']; ?></p>
       </div>
