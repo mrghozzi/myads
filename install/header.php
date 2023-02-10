@@ -1,5 +1,5 @@
 <?php
-$version = "v3.0.3";
+$version = "v3.0.4";
 echo "<!DOCTYPE html>
 <html>
 <head>
