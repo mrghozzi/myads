@@ -77,7 +77,7 @@ $comment = preg_replace("/[\r\n]*/","",$comment);
                     <!-- USER AVATAR CONTENT -->
                     <div class="user-avatar-content">
                       <!-- HEXAGON -->
-                      <img src="<?php echo $url_site;  ?>/<?php echo $catussen['img']; ?>" class="hexagon" width="24" height="26" alt="">
+                      <img src="<?php echo $url_site;  ?>/<?php echo $catussen['img']; ?>"  width="24" height="26" alt="">
                       <!-- /HEXAGON -->
                     </div>
                     <!-- /USER AVATAR CONTENT -->
