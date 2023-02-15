@@ -1,4 +1,3 @@
-
 <?php if($s_st=="buyfgeufb"){
 $msgdid = $uRow['id'];
 $msgeid = $_GET['m'];
@@ -25,6 +24,10 @@ $catuss=$catus->fetch(PDO::FETCH_ASSOC);  ?>
 
         <!-- CHAT WIDGET WRAP -->
         <div class="chat-widget-wrap">
+          <!-- CHAT WIDGET -->
+
+          <!-- /CHAT WIDGET -->
+
           <!-- CHAT WIDGET -->
           <div class="chat-widget" style="width: 100%;">
             <!-- CHAT WIDGET HEADER -->
@@ -94,9 +97,10 @@ if(check_us($catuss['id'],1)==1){
             <!-- /CHAT WIDGET HEADER -->
 
             <!-- CHAT WIDGET CONVERSATION -->
-            <div class="chat-widget-conversation" data-simplebar="init"><div class="simplebar-wrapper" ><div class="simplebar-height-auto-observer-wrapper"><div class="simplebar-height-auto-observer"></div></div><div class="simplebar-mask"><div class="simplebar-offset"><div class="simplebar-content-wrapper" ><div class="simplebar-content">
- <div id='new_msg'></div>
- <?php
+            <div class="chat-widget-conversation" id="new_msg" data-simplebar>
+            <div id="load_msg" ></div>
+
+<?php
 $statement = "`messages` WHERE (us_env='{$msgdid}' AND us_rec='{$msgeid}') OR (us_env='{$msgeid}' AND us_rec='{$msgdid}') ORDER BY `id_msg` DESC";
 $catsum = $db_con->prepare("SELECT  * FROM {$statement}" );
 $catsum->execute();
@@ -153,7 +157,7 @@ $comment = preg_replace("/[\r\n]*/","",$comment);
                     <!-- USER AVATAR CONTENT -->
                     <div class="user-avatar-content">
                       <!-- HEXAGON -->
-                      <div class="hexagon-image-24-26" data-src="<?php url_site();  ?>/<?php echo $catussen['img']; ?>" ><canvas width="24" height="26"></canvas></div>
+                      <img src="<?php echo $url_site;  ?>/<?php echo $catussen['img']; ?>"  width="24" height="26" alt="">
                       <!-- /HEXAGON -->
                     </div>
                     <!-- /USER AVATAR CONTENT -->
@@ -173,8 +177,7 @@ $comment = preg_replace("/[\r\n]*/","",$comment);
               <!-- /CHAT WIDGET SPEAKER -->
  <?php } ?>
  <?php } ?>
-
-           </div></div></div></div><div class="simplebar-placeholder" ></div></div><div class="simplebar-track simplebar-horizontal" ><div class="simplebar-scrollbar" ></div></div><div class="simplebar-track simplebar-vertical" ><div class="simplebar-scrollbar" ></div></div></div>
+            </div>
             <!-- /CHAT WIDGET CONVERSATION -->
 
             <!-- CHAT WIDGET FORM -->
@@ -222,14 +225,14 @@ $comment = preg_replace("/[\r\n]*/","",$comment);
         </div>
         <!-- /CHAT WIDGET WRAP -->
       </div>
-<script>
+ <script>
 $("document").ready(function() {
    $("#btn").click(postComent);
 
 });
 
 function postComent(){
-    $("#new_msg").html("posting ...");
+    $("#load_msg").html("posting ...");
     $.ajax({
         url : '<?php url_site();  ?>/requests/msg.php?id=<?php echo $msgeid; ?>',
         data : {
@@ -238,7 +241,7 @@ function postComent(){
         datatype : "json",
         type : 'post',
         success : function(result) {
-                $("#new_msg").html(result);
+                $("#new_msg").load('<?php url_site();  ?>/templates/_panel/status/conversation_load.php?id=<?php echo $msgdid; ?>&mid=<?php echo $msgeid; ?>');;
                 $("#comment").val("");
         },
         error : function() {
@@ -246,6 +249,11 @@ function postComent(){
         }
     });
 }
-     </script>
-
+  </script>
+<script language="javascript" type="text/javascript">
+var timeout = setInterval(reloadChat, 5000);
+function reloadChat () {
+    $("#new_msg").load("<?php url_site();  ?>/templates/_panel/status/conversation_load.php?id=<?php echo $msgdid; ?>&mid=<?php echo $msgeid; ?>");
+}
+</script>
 <?php }else{ echo"404"; }  ?>
