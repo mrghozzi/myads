@@ -1,8 +1,8 @@
 ﻿<?PHP
-<?php
+
 #####################################################################
 ##                                                                 ##
-##                        My ads v3.0.4(+)                         ##
+##                        My ads v3.0.5(+)                         ##
 ##                     https://surfer.42web.io                     ##
 ##                         par_absouini                            ##
 ##                                                                 ##
@@ -287,5 +287,16 @@ $lang['link']        = "Lien";
 $lang['lastrm']      = "Dernier membre enregistré";
 $lang['lastps']      = "Dernier message";
 $lang['allreactions']= "Toutes les réactions";
+$lang['now']         = "Maintenant";
+$lang['second']      = "Seconde";
+$lang['minute']      = "Minute";
+$lang['hour']        = "Heure";
+$lang['days']        = "Jours";
+$lang['weeks']       = "Semaines";
+$lang['month']       = "Mois";
+$lang['year']        = "Année";
+$lang['years']       = "Années";
+$lang['ago']         = "Il y a";
+$lang['lastcontact'] = "Dernier contact depuis";
 
 ?>

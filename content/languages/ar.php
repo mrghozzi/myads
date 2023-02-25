@@ -2,11 +2,11 @@
 
 #####################################################################
 ##                                                                 ##
-##                        My ads v3.x.x                            ##
+##                        My ads v3.0.5(+)                         ##
 ##                     http://www.krhost.ga                        ##
 ##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
-##                       copyright (c) 2022                        ##
+##                       copyright (c) 2023                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
@@ -288,5 +288,16 @@ $lang['link']        = "رابط";
 $lang['lastrm']      = "آخر عضو مسجل";
 $lang['lastps']      = "أخر نشر";
 $lang['allreactions']= "كل ردود الفعل";
+$lang['now']         = "الأن";
+$lang['second']      = "ثانيه";
+$lang['minute']      = "دقيقة";
+$lang['hour']        = "ساعة";
+$lang['days']        = "أيام";
+$lang['weeks']       = "أسابيع";
+$lang['month']       = "شهر";
+$lang['year']        = "سنة";
+$lang['years']       = "سنوات";
+$lang['ago']         = "منذ";
+$lang['lastcontact'] = "أخر إتصال منذ";
 
 ?>

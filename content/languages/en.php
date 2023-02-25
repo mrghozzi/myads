@@ -2,11 +2,11 @@
 
 #####################################################################
 ##                                                                 ##
-##                        My ads v3.x.x                            ##
+##                        My ads v3.0.5(+)                         ##
 ##                     http://www.krhost.ga                        ##
 ##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
-##                       copyright (c) 2022                        ##
+##                       copyright (c) 2023                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
@@ -287,5 +287,16 @@ $lang['link']        = "Link";
 $lang['lastrm']      = "Last Registered Member";
 $lang['lastps']      = "Last post";
 $lang['allreactions']= "All Reactions";
+$lang['now']         = "Now";
+$lang['second']      = "Second";
+$lang['minute']      = "Minute";
+$lang['hour']        = "Hour";
+$lang['days']        = "Days";
+$lang['weeks']       = "Weeks";
+$lang['month']       = "Month";
+$lang['year']        = "Year";
+$lang['years']       = "Years";
+$lang['ago']         = "Ago";
+$lang['lastcontact'] = "Last contact since";
 
 ?>
