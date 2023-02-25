@@ -25,14 +25,14 @@ function convertTime($ptime)
     {
         return $lang['now'];
     }
-    $a = array(  2 * 365* 24 * 60 * 60            =>   $lang['years'].'<br /> '.date("Y-m-d H:i",$ptime),
-365* 24 * 60 * 60            =>   $lang['year'].'<br /> '.date("Y-m-d H:i",$ptime),
-30 * 24 * 60 * 60            =>  'شهر',
-7 * 24 * 60 * 60            =>  $lang['weeks'],
-24 * 60 * 60            =>  $lang['days'],
-                60 * 60                 =>  $lang['hour'],
-                60                      =>  $lang['minute'],
-                1                       =>  $lang['second']
+    $a = array(  2 * 365* 24 * 60 * 60            =>  $lang['years'].'<br /> '.date("Y-m-d H:i",$ptime),
+                     365* 24 * 60 * 60            =>  $lang['year'].'<br /> '.date("Y-m-d H:i",$ptime),
+                     30 * 24 * 60 * 60            =>  $lang['month'],
+                      7 * 24 * 60 * 60            =>  $lang['weeks'],
+                          24 * 60 * 60            =>  $lang['days'],
+                               60 * 60            =>  $lang['hour'],
+                                    60            =>  $lang['minute'],
+                                     1            =>  $lang['second']
                 );
     foreach ($a as $secs => $str)
     {
