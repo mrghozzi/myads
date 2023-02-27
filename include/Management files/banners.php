@@ -6,7 +6,7 @@
 ##                     http://www.krhost.ga                        ##
 ##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
-##                       copyright (c) 2022                        ##
+##                       copyright (c) 2023                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
@@ -42,12 +42,10 @@ echo "<tr>
   <a href=\"#\" data-toggle=\"modal\" data-target=\"#ban{$wt['id']}\" class='btn btn-danger' ><i class=\"fa fa-ban \"></i></a>
   </td>
   <td>{$bnname}</td>
-  <td>{$wt['vu']}<hr /><a href=\"admincp?state&ty=banner&id={$wt['id']}\" class='btn btn-warning' ><i class=\"fa fa-link \"></i></a></td>
-  <td>{$wt['clik']}<hr /><a href=\"admincp?state&ty=vu&id={$wt['id']}\" class='btn btn-primary' ><i class=\"fa fa-bar-chart \"></i></a> </td>
+  <td><a href=\"admincp?state&ty=banner&id={$wt['id']}\" class='btn btn-warning' >{$wt['vu']}</a></td>
+  <td><a href=\"admincp?state&ty=vu&id={$wt['id']}\" class='btn btn-primary' >{$wt['clik']}</a> </td>
   <td>{$wt['px']}</td>
   <td>{$fgft}</td>
-  <td>
-  </td>
 </tr>";
    echo "<div class=\"modal fade\" id=\"ban{$wt['id']}\" data-backdrop=\"\" tabindex=\"-1\" role=\"dialog\">
 				<div class=\"modal-dialog modal-dialog-centered\" role=\"document\">
