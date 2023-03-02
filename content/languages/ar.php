@@ -299,5 +299,7 @@ $lang['year']        = "سنة";
 $lang['years']       = "سنوات";
 $lang['ago']         = "منذ";
 $lang['lastcontact'] = "أخر إتصال منذ";
+$lang['notifs']      = "إشعارات";
+$lang['all_notifs']  = "عرض جميع الإشعارات";
 
 ?>

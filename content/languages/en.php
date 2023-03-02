@@ -29,6 +29,7 @@ $lang['p_sign_up']   = "Sign Up";
 $lang['dinstall']    = "Delete The Folder 'install'  Or Changing The Name";
 $lang['all_f_m']     = "&nbsp; all the fields are mandatory !";
 $lang['username']    = "Username";
+$lang['e_mail']      = "Address Mail :";
 $lang['email']       = "Address Mail";
 $lang['password']    = "Password";
 $lang['rep_password']= "Repeat Password";
@@ -298,5 +299,7 @@ $lang['year']        = "Year";
 $lang['years']       = "Years";
 $lang['ago']         = "Ago";
 $lang['lastcontact'] = "Last contact since";
+$lang['notifs']      = "Notifications";
+$lang['all_notifs']  = "View all Notifications";
 
 ?>

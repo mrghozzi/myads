@@ -5,7 +5,7 @@
 ##                        My ads v3.0.5(+)                         ##
 ##                     https://surfer.42web.io                     ##
 ##                         par_absouini                            ##
-##                                                                 ##
+##                         and_mrghozzi                            ##
 ##                       copyright (c) 2023                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
@@ -29,6 +29,7 @@ $lang['p_sign_up']   = "S'enregistrer";
 $lang['dinstall']    = "Supprimer le dossier 'install' ou changer le nom";
 $lang['all_f_m']     = "&nbsp; tous les champs sont obligatoires !";
 $lang['username']    = "Identifiant :";
+$lang['e_mail']      = "Address e-mail :";
 $lang['email']       = "Address e-mail";
 $lang['password']    = "Mot de passe";
 $lang['rep_password']= "Répéter le mot de passe";
@@ -298,5 +299,7 @@ $lang['year']        = "Année";
 $lang['years']       = "Années";
 $lang['ago']         = "Il y a";
 $lang['lastcontact'] = "Dernier contact depuis";
+$lang['notifs']      = "Notifications";
+$lang['all_notifs']  = "Afficher toutes les notifications";
 
 ?>
