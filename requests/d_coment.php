@@ -5,7 +5,7 @@
 ##                     http://www.krhost.ga                        ##
 ##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
-##                       copyright (c) 2022                        ##
+##                       copyright (c) 2023                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
@@ -50,7 +50,7 @@ if($vrf_License=="65fgh4t8x5fe58v1rt8se9x"){
 $catusz = $db_con->prepare("SELECT *  FROM `directory` WHERE statu=1 AND  id=".$bn_tid );
 $catusz->execute();
 $sucat=$catusz->fetch(PDO::FETCH_ASSOC);
-              if($sucat['uid']!=$bn_uid){
+              if(($sucat['uid']!=$bn_uid) AND ($sucat['uid']!=0)){
             $bn_nurl = "t".$bn_tid;
             $bn_logo  = "comment";
             $bn_state = "1";
