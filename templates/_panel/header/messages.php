@@ -19,7 +19,7 @@
             <!-- DROPDOWN BOX HEADER -->
             <div class="dropdown-box-header">
               <!-- DROPDOWN BOX HEADER TITLE -->
-              <p class="dropdown-box-header-title">Messages</p>
+              <p class="dropdown-box-header-title"><?php lang('msgs');  ?></p>
               <!-- /DROPDOWN BOX HEADER TITLE -->
 
             </div>
