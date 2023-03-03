@@ -35,13 +35,13 @@ $title_page = $lang['home'];
            if(!isset($errMSG))
 		{
             $o_type  = "hest_pts";
-            $bn_name = $le_type;
+            $bn_desc = $le_name;
             if($le_type=="link"){
-              $bn_desc = "tostads";
+              $bn_name = "tostads";
               }else if($le_type=="banners"){
-              $bn_desc = "towthbaner";
+              $bn_name = "towthbaner";
               }else if($le_type=="exchv"){
-              $bn_desc = "toexchvisi";
+              $bn_name = "toexchvisi";
               }
             $bn_uid = $uRow['id'];
             $bn_sid = "0";
