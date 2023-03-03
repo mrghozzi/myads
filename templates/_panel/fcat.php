@@ -33,7 +33,7 @@
       <?php } ?>
       <!-- /SECTION FILTERS BAR ACTIONS -->
 </div>
-<div class="table table-forum-category">
+<div class="table table-forum">
       <!-- TABLE HEADER -->
       <div class="table-header">
         <!-- TABLE HEADER COLUMN -->
