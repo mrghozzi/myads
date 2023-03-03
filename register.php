@@ -6,7 +6,7 @@
 ##                     http://www.krhost.ga                        ##
 ##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
-##                       copyright (c) 2022                        ##
+##                       copyright (c) 2023                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
@@ -69,7 +69,21 @@ if(isset($_POST['submit']))
         VALUES('$dfgrdj','$lasteid','$d_dkt')");
         if($stmtqr->execute())
 		{
-
+            $o_type  = "hest_pts";
+            $bn_desc = "10";
+            $bn_name = "referal";
+            $bn_uid = $dfgrdj;
+            $bn_sid = $lasteid;
+            $o_time = time();
+            $inshest = $db_con->prepare("INSERT INTO options (name,o_valuer,o_type,o_parent,o_order,o_mode)
+            VALUES(:name,:o_valuer,:o_type,:o_parent,:o_order,:o_mode)");
+			$inshest->bindParam(":name",      $bn_name);
+            $inshest->bindParam(":o_valuer",  $bn_desc);
+            $inshest->bindParam(":o_type",    $o_type);
+            $inshest->bindParam(":o_parent",  $bn_uid);
+            $inshest->bindParam(":o_order",   $bn_sid);
+            $inshest->bindParam(":o_mode",    $o_time);
+            if($inshest->execute()){ }
         $stmsb = $db_con->prepare("UPDATE users SET pts=pts+10 ,vu=vu+10 ,nvu=nvu+10 ,nlink=nlink+10
             WHERE id=:ertb");
 			 $stmsb->bindParam(":ertb", $dfgrdj);
