@@ -269,6 +269,7 @@ echo $abcat['nbr']; ?></span></a>
 <?php }else{  ?>
 <a href="<?php echo $url_site;  ?>/sitemap" class="btn btn-info" ><b>Sitemap</b></a>
 <?php } ?>
+<a href="https://github.com/mrghozzi/myads/wiki/changelogs" class="btn btn-warning" target="_blank">Changelogs&nbsp;<b><i class="fa fa-external-link" ></i></b></a>
    </div>
 </div>
 </div>
