@@ -33,7 +33,13 @@ $sus=$usz->fetch(PDO::FETCH_ASSOC);
   if($_GET['u']==$sus['id']){
    $o_type = "user" ;
    $uid = $sus['id'];
-   $name = $sus['username'];
+    if ( is_numeric($sus['username']) ) {
+    $refrow_hash = hash('crc32', $sus['username']);
+    $name = $refrow_hash."_".$sus['username'];
+    } else {
+    $name = $sus['username'];
+    }
+   $usname = $sus['username'];
    $o_mode = "upload/cover.jpg";
    $string = urlencode(mb_ereg_replace('\s+', '-', $name));
    $string = str_replace(array(' '),array('-'),$string);
@@ -43,7 +49,7 @@ $sus=$usz->fetch(PDO::FETCH_ASSOC);
     $ostmsbs->bindParam(":o_type", $o_type);
     $ostmsbs->bindParam(":a_daf", $string);
     $ostmsbs->bindParam(":dptdk", $o_mode);
-    $ostmsbs->bindParam(":name", $name);
+    $ostmsbs->bindParam(":name", $usname);
     $ostmsbs->bindParam(":o_mode", $o_mode);
      if($ostmsbs->execute()){
         $eusrpage = $usrRow['o_valuer'];

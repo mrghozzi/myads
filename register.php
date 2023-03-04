@@ -91,9 +91,15 @@ if(isset($_POST['submit']))
             setcookie("ref", "", time()-3600);
         }}}
          $o_type = "user" ;
- $uid = $refrow['id'];
-  $name = $refrow['username'];
-  $o_mode = "0";
+  $uid = $refrow['id'];
+    if ( is_numeric($refrow['username']) ) {
+    $refrow_hash = hash('crc32', $refrow['username']);
+    $name = $refrow_hash."_".$refrow['username'];
+    } else {
+    $name = $refrow['username'];
+    }
+   $usname = $refrow['username'];
+   $o_mode = "0";
    $string = urlencode(mb_ereg_replace('\s+', '-', $name));
    $string = str_replace(array(' '),array('-'),$string);
    $ostmsbs = $db_con->prepare(" INSERT INTO options  (name,o_valuer,o_type,o_parent,o_order,o_mode)
@@ -102,7 +108,7 @@ if(isset($_POST['submit']))
             $ostmsbs->bindParam(":o_type", $o_type);
             $ostmsbs->bindParam(":a_daf", $string);
             $ostmsbs->bindParam(":dptdk", $o_mode);
-            $ostmsbs->bindParam(":name", $name);
+            $ostmsbs->bindParam(":name", $usname);
              $ostmsbs->bindParam(":o_mode", $o_mode);
             if($ostmsbs->execute()){
               header("Location: login") ;
