@@ -134,7 +134,17 @@ if($vrf_License=="65fgh4t8x5fe58v1rt8se9x"){
             $stmntf->bindParam(":logo", $bn_logo);
             $stmntf->bindParam(":time", $bn_time);
             $stmntf->bindParam(":state", $bn_state);
-            if($stmntf->execute()){ }
+            if($stmntf->execute()){
+            $stmsb = $db_con->prepare("UPDATE users SET pts=pts+1
+            WHERE id=:usid");
+			$stmsb->bindParam(":usid", $bn_sid);
+         	if($stmsb->execute()){
+               $stmsc = $db_con->prepare("UPDATE users SET pts=pts+2
+               WHERE id=:usid");
+			   $stmsc->bindParam(":usid", $bn_uid);
+         	   if($stmsc->execute()){  }
+             }
+             }
             }
 
       echo   "<img class=\"reaction-option-image\" src=\"{$url_site}/templates/_panel/img/reaction/{$data_reaction}.png\"  width=\"30\" alt=\"reaction-{$data_reaction}\">";
