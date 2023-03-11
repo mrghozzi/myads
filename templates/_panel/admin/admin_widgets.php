@@ -27,6 +27,7 @@
               <option></option>
               <option value="widget_html">Html code</option>
               <option value="widget_members">Suggest Members</option>
+              <option value="widget_stats_box">Stats Box</option>
             </select>
             <!-- FORM SELECT ICON -->
             <svg class="form-select-icon icon-small-arrow">
