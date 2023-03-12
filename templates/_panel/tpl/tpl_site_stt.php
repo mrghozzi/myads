@@ -27,7 +27,7 @@ $comtxt = preg_replace('/#([^\s]+)/', '<a  href="'.$url_site.'/tag/$1" >#$1</a>'
 $sdf    = $sucat['url'];
 $bn_tid = $sucat['id'];
 $bn_time= $sutcat['date'];
-$dir_text=substr($comtxt,0,600);
+$dir_text=substr($comtxt,0,1600);
 $dir_lnk_hash = $url_site."/site-".hash('crc32', $sdf.$sucat['id'] );
 $var_sdf    = parse_url($sdf, PHP_URL_HOST);
 
