@@ -2,11 +2,11 @@
 
 #####################################################################
 ##                                                                 ##
-##                        My ads v3.x.x                            ##
+##                        My ads v3.0.5(+)                         ##
 ##                     http://www.krhost.ga                        ##
 ##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
-##                       copyright (c) 2022                        ##
+##                       copyright (c) 2023                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
@@ -29,6 +29,7 @@ $lang['p_sign_up']   = "Sign Up";
 $lang['dinstall']    = "Delete The Folder 'install'  Or Changing The Name";
 $lang['all_f_m']     = "&nbsp; all the fields are mandatory !";
 $lang['username']    = "Username";
+$lang['e_mail']      = "Address Mail :";
 $lang['email']       = "Address Mail";
 $lang['password']    = "Password";
 $lang['rep_password']= "Repeat Password";
@@ -287,5 +288,18 @@ $lang['link']        = "Link";
 $lang['lastrm']      = "Last Registered Member";
 $lang['lastps']      = "Last post";
 $lang['allreactions']= "All Reactions";
+$lang['now']         = "Now";
+$lang['second']      = "Second";
+$lang['minute']      = "Minute";
+$lang['hour']        = "Hour";
+$lang['days']        = "Days";
+$lang['weeks']       = "Weeks";
+$lang['month']       = "Month";
+$lang['year']        = "Year";
+$lang['years']       = "Years";
+$lang['ago']         = "Ago";
+$lang['lastcontact'] = "Last contact since";
+$lang['notifs']      = "Notifications";
+$lang['all_notifs']  = "View all Notifications";
 
 ?>

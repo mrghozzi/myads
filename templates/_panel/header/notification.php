@@ -19,7 +19,7 @@
             <!-- DROPDOWN BOX HEADER -->
             <div class="dropdown-box-header">
               <!-- DROPDOWN BOX HEADER TITLE -->
-              <p class="dropdown-box-header-title">Notifications</p>
+              <p class="dropdown-box-header-title"><?php lang('notifs');  ?></p>
               <!-- /DROPDOWN BOX HEADER TITLE -->
 
              </div>
@@ -29,7 +29,7 @@
             <?php ntf_nbr('list'); ?>
             </div>
             <!-- DROPDOWN BOX BUTTON -->
-            <a class="dropdown-box-button secondary" href="<?php url_site();  ?>/notification">View all Notifications</a>
+            <a class="dropdown-box-button secondary" href="<?php url_site();  ?>/notification"><?php lang('all_notifs'); ?></a>
             <!-- /DROPDOWN BOX BUTTON -->
           </div>
           <!-- /DROPDOWN BOX -->

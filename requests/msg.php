@@ -47,33 +47,8 @@ if(isset($vrf_License)=="65fgh4t8x5fe58v1rt8se9x"){
             $stmsb->bindParam(":ptdk", $bn_time);
             $stmsb->bindParam(":a_da", $bn_rid);
             if($stmsb->execute()){
-$comment =  $_POST['comment'] ;
-$emojis = array();
-$smlusen = $db_con->prepare("SELECT *  FROM emojis ");
-$smlusen->execute();
-while($smlssen=$smlusen->fetch(PDO::FETCH_ASSOC)){
-    $emojis['name'][]=$smlssen['name'];
-    $emojis['img'][]="<img src=\"{$smlssen['img']}\" width=\"23\" height=\"23\" />";
-}
- if(isset($emojis['name']) && isset($emojis['img']) ) {
-         $comment = str_replace($emojis['name'], $emojis['img'], $comment);
-}
-
-$catuscm = $db_con->prepare("SELECT *  FROM users WHERE  id='{$bn_uid}'");
-$catuscm->execute();
-$catusscm=$catuscm->fetch(PDO::FETCH_ASSOC);
-echo "              <!-- CHAT WIDGET SPEAKER -->
-              <div class=\"chat-widget-speaker right\">
-                <!-- CHAT WIDGET SPEAKER MESSAGE -->
-                <p class=\"chat-widget-speaker-message\">{$comment}</p>
-                <!-- /CHAT WIDGET SPEAKER MESSAGE -->
-
-                <!-- CHAT WIDGET SPEAKER TIMESTAMP -->
-                <p class=\"chat-widget-speaker-timestamp\">Now</p>
-                <!-- /CHAT WIDGET SPEAKER TIMESTAMP -->
-              </div>
-              <!-- /CHAT WIDGET SPEAKER -->";
-         	}
+             echo "execute" ;
+         	}else{ echo"err"; }
 
 
 

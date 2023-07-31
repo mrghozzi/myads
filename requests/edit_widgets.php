@@ -6,7 +6,7 @@
 ##                     http://www.krhost.ga                        ##
 ##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
-##                       copyright (c) 2022                        ##
+##                       copyright (c) 2023                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
@@ -42,6 +42,12 @@ if($vrf_License=="65fgh4t8x5fe58v1rt8se9x"){
      $bn_order    = $_POST['p_order'];
  }
   if(isset($gt_name) AND ($gt_name=="widget_members")){          // widget_html
+     $bn_name     = $_POST['name'];
+     $bn_desc     = "";
+     $bn_id       = $_POST['id_w'];
+     $bn_order    = $_POST['p_order'];
+ }
+  if(isset($gt_name) AND ($gt_name=="widget_stats_box")){          // widget_html
      $bn_name     = $_POST['name'];
      $bn_desc     = "";
      $bn_id       = $_POST['id_w'];

@@ -76,7 +76,6 @@
 							  <th>Clik</th>
                               <th>Size</th>
                               <th>Statu</th>
-                              <th></th>
                             </tr>
 						</thead>
 						<tbody>

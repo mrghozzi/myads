@@ -2,11 +2,11 @@
 
 #####################################################################
 ##                                                                 ##
-##                        My ads v2.4.x                            ##
+##                        My ads v3.0.5(+)                         ##
 ##                     http://www.krhost.ga                        ##
 ##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
-##                       copyright (c) 2022                        ##
+##                       copyright (c) 2023                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
@@ -27,7 +27,7 @@ $comtxt = preg_replace('/#([^\s]+)/', '<a  href="'.$url_site.'/tag/$1" >#$1</a>'
 $sdf    = $sucat['url'];
 $bn_tid = $sucat['id'];
 $bn_time= $sutcat['date'];
-$dir_text=substr($comtxt,0,600);
+$dir_text=substr($comtxt,0,1600);
 $dir_lnk_hash = $url_site."/site-".hash('crc32', $sdf.$sucat['id'] );
 $var_sdf    = parse_url($sdf, PHP_URL_HOST);
 
@@ -219,7 +219,7 @@ echo                   "&nbsp;{$lang['create_a']}
 
                         <!-- USER STATUS TEXT -->
                         <p class=\"user-status-text small\">
-                        <i class=\"fa fa-clock-o\" ></i>&nbsp;منذ {$time_stt}";
+                        <i class=\"fa fa-clock-o\" ></i>&nbsp;{$lang['ago']}&nbsp; {$time_stt}";
                         if($Suggestion==1){ echo "&nbsp;<i class=\"fa fa-random\" aria-hidden=\"true\"></i>&nbsp;Suggestion"; }
                         else if($Suggestion==2){ echo "&nbsp;<i class=\"fa fa-bullhorn\" aria-hidden=\"true\"></i>&nbsp;Sponsoring"; }
 echo                   "</p>

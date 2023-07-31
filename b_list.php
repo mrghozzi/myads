@@ -6,7 +6,7 @@
 ##                     http://www.krhost.ga                        ##
 ##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
-##                       copyright (c) 2022                        ##
+##                       copyright (c) 2023                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
@@ -43,15 +43,14 @@ if($str_name > 25){
  if($wt['statu']=="1"){ $fgft="ON"; } else if($wt['statu']=="2"){ $fgft="OFF"; }
 echo "<tr>
   <td>{$wt['id']}</td>
-  <td>{$bnname}</td>
-  <td>{$wt['vu']}</td>
-  <td>{$wt['clik']}</td>
+  <td>{$bnname}<hr />
+   <a href=\"b_edit.php?id={$wt['id']}\" class='btn btn-success' ><i class=\"fa fa-edit \"></i></a>
+   <a href=\"#\" data-toggle=\"modal\" data-target=\"#ban{$wt['id']}\" class='btn btn-danger' ><i class=\"fa fa-ban \"></i></a>
+  </td>
+  <td><a href=\"state.php?ty=banner&id={$wt['id']}\" class='btn btn-warning' >{$wt['vu']}</a></td>
+  <td><a href=\"state.php?ty=vu&id={$wt['id']}\" class='btn btn-primary' >{$wt['clik']}</a></td>
   <td>{$wt['px']}</td>
   <td>{$fgft}</td>
-  <td><a href=\"state.php?ty=banner&id={$wt['id']}\" class='btn btn-warning' ><i class=\"fa fa-link \"></i></a>
-  <a href=\"state.php?ty=vu&id={$wt['id']}\" class='btn btn-primary' ><i class=\"fa fa-bar-chart \"></i></a>
-  <a href=\"b_edit.php?id={$wt['id']}\" class='btn btn-success' ><i class=\"fa fa-edit \"></i></a>
-  <a href=\"#\" data-toggle=\"modal\" data-target=\"#ban{$wt['id']}\" class='btn btn-danger' ><i class=\"fa fa-ban \"></i></a></td>
 </tr>";
    echo "<div class=\"modal fade\" id=\"ban{$wt['id']}\" data-backdrop=\"\" tabindex=\"-1\" role=\"dialog\">
 				<div class=\"modal-dialog modal-dialog-centered\" role=\"document\">

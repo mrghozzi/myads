@@ -6,7 +6,7 @@
 ##                     http://www.krhost.ga                        ##
 ##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
-##                       copyright (c) 2022                        ##
+##                       copyright (c) 2023                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
@@ -22,7 +22,7 @@ if($vrf_License=="65fgh4t8x5fe58v1rt8se9x"){
 $statement = "`report` WHERE id ORDER BY `id` DESC";
 $results =$db_con->prepare("SELECT * FROM {$statement} ");
 $results->execute();
-function report_list() {  global  $results;  global  $statement;   global  $db_con; global $f_awesome; global  $url_site;
+function report_list() {  global  $results;  global  $statement;   global  $db_con; global $f_awesome; global  $url_site;  global $lang;
 while($wt=$results->fetch(PDO::FETCH_ASSOC)) {
   if($wt['s_type'] !=0){
 if($wt['s_type']==1){
@@ -63,34 +63,35 @@ $sutcat=$sttcatusz->fetch(PDO::FETCH_ASSOC);
  }
 echo "                        <td><center><b>{$wt['id']}</b></center></td>
                               <td><center>{$r_username}</center></td>
-                              <td><center><div class=\"grid grid-12\" ><div class=\"grid-column\" >";
+                              <td><center><div class=\"grid grid-12\" ><div class=\"grid-column\" >
+                              <p>{$wt['txt']}</p>
+                              <hr/>
+                              ";
 
  if($sutcat['s_type']==1){
- tpl_site_stt($sutcat,0);
+ echo "<a href=\"{$url_site}/dr{$sucat['id']}\" target=\"_blank\" class=\"btn btn-warning\"><i class=\"fa fa-external-link\" aria-hidden=\"true\"></i>&nbsp;{$lang['preview']}</a>";
 }else if($sutcat['s_type']==2){
- tpl_topic_stt($sutcat,0);
+ echo "<a href=\"{$url_site}/t{$sucat['id']}\" target=\"_blank\" class=\"btn btn-warning\"><i class=\"fa fa-external-link\" aria-hidden=\"true\"></i>&nbsp;{$lang['preview']}</a>";
+}else if($sutcat['s_type']==100){
+ echo "<a href=\"{$url_site}/t{$sucat['id']}\" target=\"_blank\" class=\"btn btn-warning\"><i class=\"fa fa-external-link\" aria-hidden=\"true\"></i>&nbsp;{$lang['preview']}</a>";
 }else if($sutcat['s_type']==3){
  tpl_news_stt($sutcat);
 }else if($sutcat['s_type']==4){
- tpl_image_stt($sutcat,0);
+ echo "<a href=\"{$url_site}/t{$sucat['id']}\" target=\"_blank\" class=\"btn btn-warning\"><i class=\"fa fa-external-link\" aria-hidden=\"true\"></i>&nbsp;{$lang['preview']}</a>";
 }else if($sutcat['s_type']==7867){
- tpl_store_stt($sutcat,0);
+ echo "<a href=\"{$url_site}/t{$sucat['id']}\" target=\"_blank\" class=\"btn btn-warning\"><i class=\"fa fa-external-link\" aria-hidden=\"true\"></i>&nbsp;{$lang['preview']}</a>";
 }else if($wt['s_type']==99){
    if(isset($sucat['id'])){
  echo "<center><a href=\"{$url_site}/u/{$sucat['id']}\" class=\"btn btn-warning\"><i class=\"fa fa-user\" aria-hidden=\"true\"></i>&nbsp;{$sucat['username']}</a>&nbsp;";
   echo "<a href=\"{$url_site}/message/{$sucat['id']}\" class=\"btn btn-info\"><i class=\"fa fa-envelope\" aria-hidden=\"true\"></i>&nbsp;</a>&nbsp;";
   echo "<a href=\"{$url_site}/admincp?us_edit={$sucat['id']}\" class='btn btn-success' ><i class=\"fa fa-edit \"></i>&nbsp;</a>&nbsp;";
   echo "</center>"; }else{
-            echo "<center><b>The reported content has been removed</b>1</center>";
+            echo "<center><b>The reported content has been removed</b></center>";
 			}
 }else{
- echo "<center><b>The reported content has been removed</b>2</center>";
+ echo "<center><b>The reported content has been removed</b></center>";
 }
-
-						   echo "
-                              <hr/>
-                              <p>{$wt['txt']}</p>
-                           </center></td>
+echo " </center></td>
                               <td><center>";
              if($wt['statu']=="1"){
                               echo "<a href=\"{$url_site}/admincp?report&wtid={$wt['id']}\" class=\"btn btn-danger\">

@@ -5,7 +5,7 @@
 ##                     http://www.krhost.ga                        ##
 ##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
-##                       copyright (c) 2022                        ##
+##                       copyright (c) 2023                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
@@ -50,7 +50,7 @@ if($vrf_License=="65fgh4t8x5fe58v1rt8se9x"){
 $catusz = $db_con->prepare("SELECT *  FROM `directory` WHERE statu=1 AND  id=".$bn_tid );
 $catusz->execute();
 $sucat=$catusz->fetch(PDO::FETCH_ASSOC);
-              if($sucat['uid']!=$bn_uid){
+              if(($sucat['uid']!=$bn_uid) AND ($sucat['uid']!=0)){
             $bn_nurl = "t".$bn_tid;
             $bn_logo  = "comment";
             $bn_state = "1";
@@ -67,6 +67,15 @@ $sucat=$catusz->fetch(PDO::FETCH_ASSOC);
             $stmntf->bindParam(":time", $bn_time);
             $stmntf->bindParam(":state", $bn_state);
             if($stmntf->execute()){
+            $stmsb = $db_con->prepare("UPDATE users SET pts=pts+1
+            WHERE id=:usid");
+			$stmsb->bindParam(":usid", $sucat['uid']);
+         	if($stmsb->execute()){
+               $stmsc = $db_con->prepare("UPDATE users SET pts=pts+2
+               WHERE id=:usid");
+			   $stmsc->bindParam(":usid", $bn_uid);
+         	   if($stmsc->execute()){  }
+             }
          	}
             }
 $comment =  $_POST['comment'] ;
@@ -154,6 +163,10 @@ $comment = strip_tags($comment, '<p><a><b><br><li><ul><font><span><pre><u><s><im
            $bn_uid = $_SESSION['user'];
            $stmt=$db_con->prepare("DELETE FROM options WHERE id=:id AND o_order=:uid ");
      	   $stmt->execute(array(':id'=>$bn_tid,':uid'=>$bn_uid));
+           $stmsb = $db_con->prepare("UPDATE users SET pts=pts-2
+            WHERE id=:usid");
+			$stmsb->bindParam(":usid", $bn_uid);
+         	if($stmsb->execute()){ }
            echo "DELETE";
            }else{
          echo "NO DELETE";

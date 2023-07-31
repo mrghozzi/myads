@@ -2,11 +2,11 @@
 
 #####################################################################
 ##                                                                 ##
-##                        My ads v2.4.x                            ##
+##                        My ads v3.0.5(+)                         ##
 ##                     http://www.krhost.ga                        ##
 ##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
-##                       copyright (c) 2022                        ##
+##                       copyright (c) 2023                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
@@ -198,7 +198,7 @@ echo                 " </div>
 
                         <!-- USER STATUS TEXT -->
                         <p class=\"user-status-text small\">
-                        <i class=\"fa fa-clock-o\" ></i>&nbsp;منذ {$time_stt}";
+                        <i class=\"fa fa-clock-o\" ></i>&nbsp;{$lang['ago']}&nbsp; {$time_stt}";
                         if($Suggestion==1){ echo "&nbsp;<i class=\"fa fa-random\" aria-hidden=\"true\"></i>&nbsp;Suggestion"; }
                         else if($Suggestion==2){ echo "&nbsp;<i class=\"fa fa-bullhorn\" aria-hidden=\"true\"></i>&nbsp;Sponsoring"; }
 echo                   "</p>

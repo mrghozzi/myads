@@ -6,7 +6,7 @@
 ##                     http://www.krhost.ga                        ##
 ##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
-##                       copyright (c) 2022                        ##
+##                       copyright (c) 2023                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
@@ -56,7 +56,7 @@ if($vrf_License=="65fgh4t8x5fe58v1rt8se9x"){
         	$stmtl->execute(array(':id'=>$susunf['id'],':uid'=>$bn_uid));
             $stmto=$db_con->prepare("DELETE FROM `options` WHERE id=:id AND o_order=:uid AND o_type=:o_type ");
         	$stmto->execute(array(':id'=>$usliker['id'],':uid'=>$bn_uid,':o_type'=>$o_type));
-            if($bn_sid==$bn_uid){ }else{
+            if($bn_sid!=$bn_uid){
             $stmtnft=$db_con->prepare("DELETE FROM `notif` WHERE uid=:id AND time=:time AND state=1 ");
         	$stmtnft->execute(array(':id'=>$bn_sid,':time'=>$bn_time_t));
             }
@@ -88,7 +88,7 @@ if($vrf_License=="65fgh4t8x5fe58v1rt8se9x"){
         	$stmtl->execute(array(':id'=>$susunf['id'],':uid'=>$bn_uid));
             $stmto=$db_con->prepare("DELETE FROM `options` WHERE id=:id AND o_order=:uid AND o_type=:o_type ");
         	$stmto->execute(array(':id'=>$usliker['id'],':uid'=>$bn_uid,':o_type'=>$o_type));
-            if($bn_sid==$bn_uid){ }else{
+            if($bn_sid!=$bn_uid){
             $stmtnft=$db_con->prepare("DELETE FROM `notif` WHERE uid=:id AND time=:time AND state=1 ");
         	$stmtnft->execute(array(':id'=>$bn_sid,':time'=>$bn_time_t));
             }
@@ -124,7 +124,7 @@ if($vrf_License=="65fgh4t8x5fe58v1rt8se9x"){
             $catusz->execute();
             $sucat=$catusz->fetch(PDO::FETCH_ASSOC);
             $bn_sid = $sucat['uid'];
-            if($bn_sid==$bn_uid){ }else{
+            if(($bn_sid!=$bn_uid) AND ($bn_sid!=0)){
             $bn_name  = $sus['username']." reacted to your post.";
             $stmntf = $db_con->prepare("INSERT INTO notif (uid,name,nurl,logo,time,state)
             VALUES(:uid,:name,:nurl,:logo,:time,:state)");
@@ -134,7 +134,17 @@ if($vrf_License=="65fgh4t8x5fe58v1rt8se9x"){
             $stmntf->bindParam(":logo", $bn_logo);
             $stmntf->bindParam(":time", $bn_time);
             $stmntf->bindParam(":state", $bn_state);
-            if($stmntf->execute()){ }
+            if($stmntf->execute()){
+            $stmsb = $db_con->prepare("UPDATE users SET pts=pts+1
+            WHERE id=:usid");
+			$stmsb->bindParam(":usid", $bn_sid);
+         	if($stmsb->execute()){
+               $stmsc = $db_con->prepare("UPDATE users SET pts=pts+2
+               WHERE id=:usid");
+			   $stmsc->bindParam(":usid", $bn_uid);
+         	   if($stmsc->execute()){  }
+             }
+             }
             }
 
       echo   "<img class=\"reaction-option-image\" src=\"{$url_site}/templates/_panel/img/reaction/{$data_reaction}.png\"  width=\"30\" alt=\"reaction-{$data_reaction}\">";

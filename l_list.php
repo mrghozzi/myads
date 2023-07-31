@@ -6,7 +6,7 @@
 ##                     http://www.krhost.ga                        ##
 ##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
-##                       copyright (c) 2022                        ##
+##                       copyright (c) 2023                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
@@ -50,7 +50,7 @@ echo "<tr>
   <td>{$wt['id']}</td>
   <td>{$bnname}<hr />
     <a href=\"l_edit.php?id={$wt['id']}\" class='btn btn-success' ><i class=\"fa fa-edit \"></i></a>
-  <a href=\"#\" data-toggle=\"modal\" data-target=\"#ban{$wt['id']}\" class='btn btn-danger' ><i class=\"fa fa-ban \"></i></a></td>
+    <a href=\"#\" data-toggle=\"modal\" data-target=\"#ban{$wt['id']}\" class='btn btn-danger' ><i class=\"fa fa-ban \"></i></a></td>
   <td><a href=\"state.php?ty=link&id={$wt['id']}\" class='btn btn-warning' >{$wtv['nbr']}</a></td>
   <td><a href=\"state.php?ty=clik&id={$wt['id']}\" class='btn btn-primary' >{$wt['clik']}</a></td>
   <td>{$fgft}</td>

@@ -1,6 +1,6 @@
 ﻿<?php if($s_st=="buyfgeufb"){
 
-                   $myads_last_time_updates = "https://apikariya.gq/myads/latest_version.txt";
+                   $myads_last_time_updates = "https://api.adstn.gq/myads/latest_version.txt";
                    $last_time_updates = @file_get_contents($myads_last_time_updates, FILE_USE_INCLUDE_PATH);
                    $last_time_updates = strip_tags($last_time_updates, '');
                    $last_time_updates=substr($last_time_updates,0,5);
@@ -269,6 +269,7 @@ echo $abcat['nbr']; ?></span></a>
 <?php }else{  ?>
 <a href="<?php echo $url_site;  ?>/sitemap" class="btn btn-info" ><b>Sitemap</b></a>
 <?php } ?>
+<a href="https://github.com/mrghozzi/myads/wiki/changelogs" class="btn btn-warning" target="_blank">Changelogs&nbsp;<b><i class="fa fa-external-link" ></i></b></a>
    </div>
 </div>
 </div>

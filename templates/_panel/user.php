@@ -140,7 +140,7 @@ if(check_us($sus['id'],1)==1){
           <!-- /USER SHORT DESCRIPTION TITLE -->
 
           <!-- USER SHORT DESCRIPTION TEXT -->
-          <p class="user-short-description-text"><?php echo "  أخر إتصال منذ ".convertTime($sus['online']); ?></p>
+          <p class="user-short-description-text"><?php echo $lang['lastcontact']."&nbsp;".convertTime($sus['online']); ?></p>
           <!-- /USER SHORT DESCRIPTION TEXT -->
         </div>
         <!-- /USER SHORT DESCRIPTION -->

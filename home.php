@@ -6,7 +6,7 @@
 ##                     http://www.krhost.ga                        ##
 ##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
-##                       copyright (c) 2022                        ##
+##                       copyright (c) 2023                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
@@ -34,6 +34,27 @@ $title_page = $lang['home'];
     $le_get= "?errMSG=".$errMSG;
            if(!isset($errMSG))
 		{
+            $o_type  = "hest_pts";
+            $bn_desc = $le_name;
+            if($le_type=="link"){
+              $bn_name = "tostads";
+              }else if($le_type=="banners"){
+              $bn_name = "towthbaner";
+              }else if($le_type=="exchv"){
+              $bn_name = "toexchvisi";
+              }
+            $bn_uid = $uRow['id'];
+            $bn_sid = "0";
+            $o_time = time();
+            $inshest = $db_con->prepare("INSERT INTO options (name,o_valuer,o_type,o_parent,o_order,o_mode)
+            VALUES(:name,:o_valuer,:o_type,:o_parent,:o_order,:o_mode)");
+			$inshest->bindParam(":name",      $bn_name);
+            $inshest->bindParam(":o_valuer",  $bn_desc);
+            $inshest->bindParam(":o_type",    $o_type);
+            $inshest->bindParam(":o_parent",  $bn_uid);
+            $inshest->bindParam(":o_order",   $bn_sid);
+            $inshest->bindParam(":o_mode",    $o_time);
+            if($inshest->execute()){
           if($le_type=="link"){
             $le_go = $le_name/2;
             $stms = $db_con->prepare("UPDATE users SET nlink=nlink+:a_da,pts=pts-:pts
@@ -74,7 +95,7 @@ $title_page = $lang['home'];
          	  $le_get= "?MSG=".$MSG;
              header("Location: home.php{$le_get}");
          	}}
-
+              }
     }else{
       header("Location: home.php{$le_get}");
     }

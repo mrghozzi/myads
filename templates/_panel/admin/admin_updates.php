@@ -17,7 +17,7 @@
                         <?php }  ?>
                 <div class="panel panel-widget">
                    <?php
-                   $myads_last_time_updates = "https://apikariya.gq/myads/latest_version.txt";
+                   $myads_last_time_updates = "https://api.adstn.gq/myads/latest_version.txt";
                    $last_time_updates = @file_get_contents($myads_last_time_updates);
                     if($last_time_updates==$versionRow['o_valuer']){
                      echo "<center><div class=\"alert alert-success alert-dismissible\" role=\"alert\">

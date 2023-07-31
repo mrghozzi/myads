@@ -93,15 +93,17 @@
 						</div>
 						<div class="modal-body">
 							<div class="more-grids">
-
-
                        <form  method="POST" action="<?php url_site();  ?>/requests/kb_edit.php" >
                        <div class="input-group">
                         <span class="input-group-addon" id="basic-addon1"><i class="fa fa-edit" aria-hidden="true"></i></span>
                        <input type="text" class="form-control" name="name" value="<?php echo $_GET['st']; ?>"  placeholder="<?php lang('name_o');  ?>" aria-describedby="basic-addon1" required>
                        </div>
-                       <div class="input-group">
-                        <span class="input-group-addon" id="basic-addon1"><i class="fa fa-text-width" aria-hidden="true"></i></span>
+                <div class="form-row">
+                  <!-- FORM ITEM -->
+                   <div class="form-item">
+                     <!-- FORM INPUT -->
+                      <div class="form-input">
+                       <span class="input-group-addon" id="basic-addon1"><i class="fa fa-text-width" aria-hidden="true"></i></span>
                        <textarea name="txt" id="editor1" class="form-control"  rows="15" placeholder="<?php lang('topic');  ?>" required>
                        <?php if_gstore('stxt');  ?></textarea>
 <script src="https://cdn.jsdelivr.net/npm/sceditor@3/minified/formats/xhtml.min.js"></script>
@@ -145,6 +147,8 @@ style: 'https://cdn.jsdelivr.net/npm/sceditor@3/minified/themes/content/default.
 });
 </script>
                        </div>
+                       </div>
+                       </div>
                            <div class="input-group col-md-2">
                         <span class="input-group-addon" id="basic-addon1"><?php captcha() ;  ?>&nbsp;=&nbsp;</span>
                        <input type="text"  class="form-control" name="capt" required  />
@@ -185,8 +189,11 @@ style: 'https://cdn.jsdelivr.net/npm/sceditor@3/minified/themes/content/default.
 
                        <form  method="POST" action="<?php url_site();  ?>/requests/kb_edit.php?name=<?php echo $_GET['ed']; ?>" >
 
-                       <div class="input-group">
-                        <span class="input-group-addon" id="basic-addon1"><i class="fa fa-text-width" aria-hidden="true"></i></span>
+                <div class="form-row">
+                  <!-- FORM ITEM -->
+                   <div class="form-item">
+                     <!-- FORM INPUT -->
+                      <div class="form-input">                        <span class="input-group-addon" id="basic-addon1"><i class="fa fa-text-width" aria-hidden="true"></i></span>
                        <textarea name="txt" id="editor1" class="form-control"  rows="15" placeholder="<?php lang('topic');  ?>" required>
                        <?php if(isset($sknowled['o_valuer'])){ echo $sknowled['o_valuer']; }  ?></textarea>
 <script src="https://cdn.jsdelivr.net/npm/sceditor@3/minified/formats/xhtml.min.js"></script>
@@ -229,6 +236,8 @@ if($c >= 2){
 style: 'https://cdn.jsdelivr.net/npm/sceditor@3/minified/themes/content/default.min.css'
 });
 </script>
+                       </div>
+                       </div>
                        </div>
                            <div class="input-group col-md-2">
                         <span class="input-group-addon" id="basic-addon1"><?php captcha() ;  ?>&nbsp;=&nbsp;</span>

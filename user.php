@@ -6,7 +6,7 @@
 ##                     http://www.krhost.ga                        ##
 ##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
-##                       copyright (c) 2022                        ##
+##                       copyright (c) 2023                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
@@ -30,24 +30,36 @@ $stausr->bindParam(":o_order", $_GET['u']);
 $usz->bindParam(":u_id", $_GET['u']);
 $usz->execute();
 $sus=$usz->fetch(PDO::FETCH_ASSOC);
-    $o_type = "user" ;
- $uid = $sus['id'];
-  $name = $sus['username'];
-  $o_mode = "upload/cover.jpg";
+  if($_GET['u']==$sus['id']){
+   $o_type = "user" ;
+   $uid = $sus['id'];
+    if ( is_numeric($sus['username']) ) {
+    $refrow_hash = hash('crc32', $sus['username']);
+    $name = $refrow_hash."_".$sus['username'];
+    } else {
+    $name = $sus['username'];
+    }
+   $usname = $sus['username'];
+   $o_mode = "upload/cover.jpg";
    $string = urlencode(mb_ereg_replace('\s+', '-', $name));
    $string = str_replace(array(' '),array('-'),$string);
    $ostmsbs = $db_con->prepare(" INSERT INTO options  (name,o_valuer,o_type,o_parent,o_order,o_mode)
-            VALUES (:name,:a_daf,:o_type,:dptdk,:uid,:o_mode) ");
-	     $ostmsbs->bindParam(":uid", $uid);
-            $ostmsbs->bindParam(":o_type", $o_type);
-            $ostmsbs->bindParam(":a_daf", $string);
-            $ostmsbs->bindParam(":dptdk", $o_mode);
-            $ostmsbs->bindParam(":name", $name);
-             $ostmsbs->bindParam(":o_mode", $o_mode);
-            if($ostmsbs->execute()){
-             $eusrpage = $usrRow['o_valuer'];
-             header("Location: {$url_site}/u/{$string}") ;
-         	}
+                                 VALUES (:name,:a_daf,:o_type,:dptdk,:uid,:o_mode) ");
+	$ostmsbs->bindParam(":uid", $uid);
+    $ostmsbs->bindParam(":o_type", $o_type);
+    $ostmsbs->bindParam(":a_daf", $string);
+    $ostmsbs->bindParam(":dptdk", $o_mode);
+    $ostmsbs->bindParam(":name", $usname);
+    $ostmsbs->bindParam(":o_mode", $o_mode);
+     if($ostmsbs->execute()){
+        $eusrpage = $usrRow['o_valuer'];
+        header("Location: {$url_site}/u/{$string}") ;
+     }
+  }else{
+   template_mine('header');
+   template_mine('404');
+   template_mine('footer');
+ }
  }
 
 }else if(isset($_GET['u'])){
