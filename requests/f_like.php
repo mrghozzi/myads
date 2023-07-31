@@ -59,6 +59,16 @@ if($vrf_License=="65fgh4t8x5fe58v1rt8se9x"){
             if($bn_sid!=$bn_uid){
             $stmtnft=$db_con->prepare("DELETE FROM `notif` WHERE uid=:id AND time=:time AND state=1 ");
         	$stmtnft->execute(array(':id'=>$bn_sid,':time'=>$bn_time_t));
+            // delete pts
+            $stmsb = $db_con->prepare("UPDATE users SET pts=pts-1
+            WHERE id=:usid");
+			$stmsb->bindParam(":usid", $bn_sid);
+         	if($stmsb->execute()){
+               $stmsc = $db_con->prepare("UPDATE users SET pts=pts-2
+               WHERE id=:usid");
+			   $stmsc->bindParam(":usid", $bn_uid);
+         	   if($stmsc->execute()){  }
+             }
             }
             echo "<svg class=\"post-option-icon icon-thumbs-up\"><use xlink:href=\"#svg-thumbs-up\" ></use></svg>";
            }else{
@@ -134,7 +144,17 @@ if($vrf_License=="65fgh4t8x5fe58v1rt8se9x"){
             $stmntf->bindParam(":logo", $bn_logo);
             $stmntf->bindParam(":time", $bn_time);
             $stmntf->bindParam(":state", $bn_state);
-            if($stmntf->execute()){ }
+            if($stmntf->execute()){
+            $stmsb = $db_con->prepare("UPDATE users SET pts=pts+1
+            WHERE id=:usid");
+			$stmsb->bindParam(":usid", $bn_sid);
+         	if($stmsb->execute()){
+               $stmsc = $db_con->prepare("UPDATE users SET pts=pts+2
+               WHERE id=:usid");
+			   $stmsc->bindParam(":usid", $bn_uid);
+         	   if($stmsc->execute()){  }
+             }
+            }
             }
 
       echo   "<img class=\"reaction-option-image\" src=\"{$url_site}/templates/_panel/img/reaction/{$data_reaction}.png\"  width=\"30\" alt=\"reaction-{$data_reaction}\">";

@@ -2,10 +2,10 @@
 #####################################################################
 ##                                                                 ##
 ##                         MYads  v3.x.x                           ##
-##                      http://www.krhost.ga                       ##
+##                    http://www.kariya-host.gq                    ##
 ##                     e-mail: admin@krhost.ga                     ##
 ##                                                                 ##
-##                       copyright (c) 2022                        ##
+##                       copyright (c) 2023                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
