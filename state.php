@@ -1,4 +1,4 @@
-﻿<?PHP
+<?PHP
 
 #####################################################################
 ##                                                                 ##
@@ -15,9 +15,7 @@
 include "dbconfig.php";
 include "include/function.php";
 $title_page = "Statistics" ;
-if (session_status() == PHP_SESSION_NONE) {
-    session_start();
-     }
+
 $uidss = $_SESSION['user'];
 if(isset($_GET)){
 if(isset($_GET['ty'])){
@@ -38,9 +36,7 @@ $sadsty->execute();
 $stadsty=$sadsty->fetch(PDO::FETCH_ASSOC);
 $batyid = $stadsty['uid'];
 }else{
- if (session_status() == PHP_SESSION_NONE) {
-    session_start();
-     }
+
   $batyid = $_SESSION['user'];
   }
 if($uidss==$batyid){

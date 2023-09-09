@@ -1,4 +1,4 @@
-﻿<?php if($s_st=="buyfgeufb"){
+<?php if($s_st=="buyfgeufb"){
    if(isset($_COOKIE['user']))
 {
  ?>

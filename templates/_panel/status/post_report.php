@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 include "../../../dbconfig.php";
  $stmt = $db_con->prepare("SELECT *  FROM setting   " );
         $stmt->execute();

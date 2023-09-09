@@ -1,4 +1,4 @@
-﻿<?php if($s_st=="buyfgeufb"){   global $admin_page;
+<?php if($s_st=="buyfgeufb"){   global $admin_page;
   include "requests/captcha.php";
   if(isset($_GET['st'])){
  $k_type = "knowledgebase";

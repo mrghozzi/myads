@@ -1,4 +1,4 @@
-﻿<?php if($s_st=="buyfgeufb"){ dinstall_d(); ?>
+<?php if($s_st=="buyfgeufb"){ dinstall_d(); ?>
 <style> body{  background-image: url(<?php url_site();  ?>/templates/_panel/img/background.webp); } </style>
 <div class="grid grid-12" >
   <div class="grid-column" >

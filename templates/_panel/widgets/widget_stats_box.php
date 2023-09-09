@@ -1,4 +1,4 @@
-﻿<?php if(isset($s_st) AND ($s_st=="buyfgeufb")){ ?>
+<?php if(isset($s_st) AND ($s_st=="buyfgeufb")){ ?>
 <div class="stats-box-slider">
           <!-- STATS BOX SLIDER CONTROLS -->
           <div class="stats-box-slider-controls">

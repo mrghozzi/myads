@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 #####################################################################
 ##                                                                 ##
@@ -13,6 +13,7 @@
 #####################################################################
 
 if($vrf_License=="65fgh4t8x5fe58v1rt8se9x"){
+
 $s_st="buyfgeufb";
  //  $setting
  try{
@@ -64,7 +65,7 @@ include "include/user_session.php";  //  user Session
     if (isset($_COOKIE['modedark'])) {
       $c_mode=$_COOKIE['modedark'];
        } else {  $c_mode="css";  }
-
+       
 //  Language
  if (isset($_GET["en"])) {
      $lg_md5 = time() + (365 * 24 * 60 * 60);
@@ -79,6 +80,8 @@ include "include/user_session.php";  //  user Session
      setcookie("lang", "fr", $lg_md5);
      header('Location: ' . $_SERVER['HTTP_REFERER']);
     }
+
+    
 $o_type = "languages";
 $exlanguages = $db_con->prepare("SELECT  * FROM `options` WHERE o_type=:o_type ORDER BY `o_order` DESC " );
 $exlanguages->bindParam(":o_type", $o_type);
@@ -99,6 +102,7 @@ include "content/languages/$c_lang.php"; //  Language File
 function lang($name) {    global  $lang ;   echo  $lang["{$name}"];    }
 //    install exists
  $filename = 'install';
+ 
 if (file_exists($filename)) {
  echo "<center>";
  lang('dinstall');
@@ -113,7 +117,7 @@ function dinstall_d() {
  }else{
 function dinstall_d() { }
  }
-
+ 
 include "include/agent.php";  //  Get Browser
 include "include/tpl_status.php";  //  Get templates status
 include "include/f_awesome.php";  //  Get Font Awesome v. 4.6.

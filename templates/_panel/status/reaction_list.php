@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
  $n_like = 0;
  $n_love = 0;

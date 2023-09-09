@@ -1,4 +1,4 @@
-﻿<?PHP
+<?PHP
 
 #####################################################################
 ##                                                                 ##
@@ -17,9 +17,7 @@
 include "dbconfig.php";
 include "include/function.php";
 $title_page = "Link Click";
-if (session_status() == PHP_SESSION_NONE) {
-    session_start();
-     }
+
 $uidss = $_SESSION['user'];
    if(isset($_GET['id']) && !empty($_GET['id']))
 	{

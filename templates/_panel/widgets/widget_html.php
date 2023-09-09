@@ -1,4 +1,4 @@
-﻿<?php if(isset($s_st) AND ($s_st=="buyfgeufb")){ ?>
+<?php if(isset($s_st) AND ($s_st=="buyfgeufb")){ ?>
 <div class="widget-box">
           <!-- WIDGET BOX TITLE -->
           <p class="widget-box-title"><?php echo $abwidgets['name']; ?></p>

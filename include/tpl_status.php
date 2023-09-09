@@ -1,4 +1,4 @@
-﻿<?PHP
+<?PHP
 
 #####################################################################
 ##                                                                 ##
@@ -12,7 +12,7 @@
 ##                                                                 ##
 #####################################################################
 if($s_st=="buyfgeufb"){
-
+    
  //  Get Browser
 include "./templates/_panel/tpl/tpl_site_stt.php";
 include "./templates/_panel/tpl/tpl_topic_stt.php";
