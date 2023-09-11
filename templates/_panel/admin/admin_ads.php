@@ -1,6 +1,6 @@
 <?php if($s_st=="buyfgeufb"){  ?>
 <link href="<?php echo $url_site;  ?>/templates/_panel/css/codemirror.css" rel='stylesheet' type='text/css' />
-<div class="grid grid-3-6-3 medium-space" >
+<div class="grid grid-3-9 medium-space" >
 <div class="grid-column" >
 <?php template_mine('admin/admin_nav');  ?>
 </div>

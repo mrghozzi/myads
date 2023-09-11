@@ -3,14 +3,14 @@
 select {
   font-family: 'FontAwesome', 'sans-serif';
 }</style>
-<div class="grid grid-3-6-3 medium-space" >
+<div class="grid grid-3-9 medium-space" >
 <div class="grid-column" >
 <?php template_mine('admin/admin_nav');  ?>
 </div>
 <div class="grid-column" >
 				<!--buttons-->
 				<div class="grids-section">
-					<h2 class="hdg">Report&nbsp;<span>!</span></h2>
+					<h2 class="hdg">Reports</h2>
 
             <div class="clearfix"></div>
 			</div>

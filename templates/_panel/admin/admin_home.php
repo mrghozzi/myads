@@ -170,6 +170,36 @@
           </div>
           <!-- /SLIDER SLIDE -->
 
+        </div></div></div></div>
+        <!-- /SLIDER SLIDES -->
+      </div>
+      <div class="slider-line">
+        <!-- SLIDER CONTROLS -->
+        <div id="stat-block-slider-controls" class="slider-controls" aria-label="Carousel Navigation" tabindex="0">
+          <!-- SLIDER CONTROL -->
+          <div class="slider-control left" aria-controls="stat-block-slider" tabindex="-1" data-controls="prev" aria-disabled="true">
+            <!-- SLIDER CONTROL ICON -->
+            <svg class="slider-control-icon icon-small-arrow">
+              <use xlink:href="#svg-small-arrow"></use>
+            </svg>
+            <!-- /SLIDER CONTROL ICON -->
+          </div>
+          <!-- /SLIDER CONTROL -->
+
+          <!-- SLIDER CONTROL -->
+          <div class="slider-control right" aria-controls="stat-block-slider" tabindex="-1" data-controls="next">
+            <!-- SLIDER CONTROL ICON -->
+            <svg class="slider-control-icon icon-small-arrow">
+              <use xlink:href="#svg-small-arrow"></use>
+            </svg>
+            <!-- /SLIDER CONTROL ICON -->
+          </div>
+          <!-- /SLIDER CONTROL -->
+        </div>
+        <!-- /SLIDER CONTROLS -->
+
+        <!-- SLIDER SLIDES -->
+        <div class="tns-outer" id="stat-block-slider-ow"><div class="tns-liveregion tns-visually-hidden" aria-live="polite" aria-atomic="true">slide <span class="current">1 to 4</span>  of 5</div><div id="stat-block-slider-mw" class="tns-ovh"><div class="tns-inner" id="stat-block-slider-iw"><div id="stat-block-slider" class="slider-slides  tns-slider tns-carousel tns-subpixel tns-calc tns-horizontal" style="transition-duration: 0s; transform: translate3d(0px, 0px, 0px);">
           <!-- SLIDER SLIDE -->
           <div class="slider-slide tns-item tns-slide-active" id="stat-block-slider-item3">
             <!-- STAT BLOCK -->
@@ -232,45 +262,60 @@
         </div></div></div></div>
         <!-- /SLIDER SLIDES -->
       </div>
-      <div class="widget-box">
+
+</div>
+<div class="grid-column" >
+  <div class="widget-box">
+     <a href="<?php url_site();  ?>/admincp?report" class="btn btn-primary" >Report
+      <span class="badge badge-light">
+        <?php $catcount = $db_con->prepare("SELECT  COUNT(id) as nbr FROM report WHERE statu=1" );
+              $catcount->execute();
+              $abcat=$catcount->fetch(PDO::FETCH_ASSOC);
+              echo $abcat['nbr'];
+        ?>
+      </span>
+    </a>
+        <?php if(isset($_GET['sitemap'])){  ?>
+    <a href="<?php echo $url_site;  ?>/sitemap" class="btn btn-info" ><b>Sitemap</b></a>
+    <a href="<?php echo $url_site;  ?>/sitemap.xml" class="btn btn-warning" target="_blank">/sitemap.xml&nbsp;<b><i class="fa fa-external-link" ></i></b></a>
+        <?php }else{  ?>
+    <a href="<?php echo $url_site;  ?>/sitemap" class="btn btn-info" ><b>Sitemap</b></a>
+         <?php } ?>
+    <a href="https://github.com/mrghozzi/myads/wiki/changelogs" class="btn btn-warning" target="_blank">Changelogs&nbsp;<b><i class="fa fa-external-link" ></i></b></a>
+  </div>
+  <div class="widget-box">
         <div class="widget-box-content no-margin-top">
            <div class="table table-top-friends join-rows">
 						<div class="table-header">
-
-								<div class="table-header-column textpost"><center>Devlope by</center></div>
-								<div class="table-header-column textpost"><center>Program name</center></div>
-								<div class="table-header-column textpost"><center><?php lang('version');  ?></center></div>
-								<div class="table-header-column textpost"><center>Latest version</center></div>
-
+                <div class="table-header-column textpost">
+                   <center>Devlope by : <a href="http://www.kariya-host.gq">Kariya host</a></center>
+                </div>
+                
 						</div>
 						<div class="table-body">
 							<div class="table-row tiny">
-								<div class="table-column textpost"><center><a href="http://www.krhost.ga">Kariya host</a></center></div>
-								<div class="table-column textpost"><center>MYads</center></div>
-								<div class="table-column textpost"><center>v<?php myads_version();  ?></center></div>
-								<div class="table-column textpost"><center><?php echo $last_time_updates; ?></center></div>
+                <div class="table-header-column textpost">
+                   <center>Program name : MYads</center>
+                </div>
+							</div>
+						</div>
+            <div class="table-body">
+							<div class="table-row tiny">
+                <div class="table-header-column textpost">
+                   <center><?php lang('version');  ?> : v<?php myads_version();  ?></center>
+                </div>
+							</div>
+						</div>
+            <div class="table-body">
+							<div class="table-row tiny">
+                <div class="table-header-column textpost">
+                   <center>Latest version : <?php echo $last_time_updates; ?></center>
+                </div>
 							</div>
 						</div>
 		   </div>
         </div>
       </div>
-</div>
-<div class="grid-column" >
-   <div class="widget-box">
-     <a href="<?php url_site();  ?>/admincp?report" class="btn btn-primary" >Report
-  <span class="badge badge-light"><?php $catcount = $db_con->prepare("SELECT  COUNT(id) as nbr FROM report WHERE statu=1" );
-$catcount->execute();
-$abcat=$catcount->fetch(PDO::FETCH_ASSOC);
-echo $abcat['nbr']; ?></span></a>
-                    <?php if(isset($_GET['sitemap']))
-{  ?>
-<a href="<?php echo $url_site;  ?>/sitemap" class="btn btn-info" ><b>Sitemap</b></a>
-<a href="<?php echo $url_site;  ?>/sitemap.xml" class="btn btn-warning" target="_blank">/sitemap.xml&nbsp;<b><i class="fa fa-external-link" ></i></b></a>
-<?php }else{  ?>
-<a href="<?php echo $url_site;  ?>/sitemap" class="btn btn-info" ><b>Sitemap</b></a>
-<?php } ?>
-<a href="https://github.com/mrghozzi/myads/wiki/changelogs" class="btn btn-warning" target="_blank">Changelogs&nbsp;<b><i class="fa fa-external-link" ></i></b></a>
-   </div>
 </div>
 </div>
 <?php }else{ echo"404"; }  ?>

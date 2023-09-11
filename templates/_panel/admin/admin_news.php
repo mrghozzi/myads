@@ -1,7 +1,7 @@
 <?php if($s_st=="buyfgeufb"){  ?>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sceditor@3/minified/themes/default.min.css" />
 <script src="https://cdn.jsdelivr.net/npm/sceditor@3/minified/sceditor.min.js"></script>
-<div class="grid grid-3-6-3 medium-space" >
+<div class="grid grid-3-9 medium-space" >
 <div class="grid-column" >
 <?php template_mine('admin/admin_nav');  ?>
 </div>
@@ -9,36 +9,36 @@
 				<!--buttons-->
 				<div class="widget-box">
 					<h2 class="hdg">News List</h2>
-                     <?php  echo "<a href=\"#\" data-toggle=\"modal\" data-target=\"#ADD\" data-target=\".bs-example-modal-lg\" class='btn btn-info' >{$lang['new_topic']}&nbsp;<i class=\"fa fa-plus \"></i></a>
- <div class=\"modal fade\" id=\"ADD\" aria-labelledby=\"myLargeModalLabel\" data-backdrop=\"\" tabindex=\"-1\" role=\"dialog\">
-				<div class=\"modal-dialog modal-dialog-centered\" role=\"document\">
-					<div class=\"modal-content modal-info\">
-						<div class=\"modal-header\">
-							<button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button>
-						</div>
-						<div class=\"modal-body\">
-							<div class=\"more-grids\">
- <form id=\"defaultForm\" method=\"post\" class=\"form-horizontal\" action=\"admincp.php?a_news\">
-  <div class=\"input-group\">
-  <span class=\"input-group-addon\" id=\"basic-addon1\"><i class=\"fa fa-edit\" aria-hidden=\"true\"></i></span>
-  <input type=\"text\" class=\"form-control\" name=\"name\"  autocomplete=\"off\" />
-  </div>
-  <div class=\"input-group\">
-  <span class=\"input-group-addon\" id=\"basic-addon1\"><i class=\"fa fa-text-width\" aria-hidden=\"true\"></i></span>
-  <textarea type=\"text\" id=\"editor1\" class=\"form-control\" name=\"txt\"  autocomplete=\"off\"></textarea></div>
-  <div class=\"input-group\">
- <center><button type=\"submit\" name=\"ed_submit\" value=\"ed_submit\" class=\"btn btn-info\">{$lang['add']}&nbsp;<i class=\"fa fa-plus \"></i></button></center>
- <button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Close</button
- </div>
-                                    </form>
-                             </div>
-						</div>
-					</div>
-				</div>
-			</div>  </div>"; ?>
-                </div>
-
-           <div class="widget-box">
+            <?php  echo "<a href=\"#\" data-toggle=\"modal\" data-target=\"#ADD\" data-target=\".bs-example-modal-lg\" class='btn btn-info' >{$lang['new_topic']}&nbsp;<i class=\"fa fa-plus \"></i></a>
+                         <div class=\"modal fade\" id=\"ADD\" aria-labelledby=\"myLargeModalLabel\" data-backdrop=\"\" tabindex=\"-1\" role=\"dialog\">
+				                 <div class=\"modal-dialog modal-dialog-centered\" role=\"document\">
+					               <div class=\"modal-content modal-info\">
+						             <div class=\"modal-header\">
+							           <button type=\"button\" class=\"close\" data-dismiss=\"modal\" aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button>
+						             </div>
+						             <div class=\"modal-body\">
+							           <div class=\"more-grids\">
+                         <form id=\"defaultForm\" method=\"post\" class=\"form-horizontal\" action=\"admincp.php?a_news\">
+                         <div class=\"input-group\">
+                         <span class=\"input-group-addon\" id=\"basic-addon1\"><i class=\"fa fa-edit\" aria-hidden=\"true\"></i></span>
+                         <input type=\"text\" class=\"form-control\" name=\"name\"  autocomplete=\"off\" />
+                         </div>
+                         <div class=\"input-group\">
+                         <span class=\"input-group-addon\" id=\"basic-addon1\"><i class=\"fa fa-text-width\" aria-hidden=\"true\"></i></span>
+                         <textarea type=\"text\" id=\"editor1\" class=\"form-control\" name=\"txt\"  autocomplete=\"off\"></textarea></div>
+                         <div class=\"input-group\">
+                         <center><button type=\"submit\" name=\"ed_submit\" value=\"ed_submit\" class=\"btn btn-info\">{$lang['add']}&nbsp;<i class=\"fa fa-plus \"></i></button></center>
+                         <button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Close</button
+                         </div>
+                         </form>
+                         </div>
+						             </div>
+					               </div>
+				                 </div>
+			                   </div>  
+                         </div>"; ?>
+        </div>
+        <div class="widget-box">
             <div class="col-md-12 table-grid">
              <?php if(isset($_GET['bnerrMSG'])){  ?>
                      <div class="alert alert-danger" role="alert"><?php echo $_GET['bnerrMSG'];  ?></div>

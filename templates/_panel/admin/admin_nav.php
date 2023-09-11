@@ -12,7 +12,7 @@
 	<a class="btn btn-dark" href="<?php url_site();  ?>/admincp?d_cat">Directory Categories</a>
 	<a class="btn btn-dark" href="<?php url_site();  ?>/admincp?emojis">Emojis</a>
 	<a class="btn btn-dark" href="<?php url_site();  ?>/admincp?news">News Site</a>
-	<a class="btn btn-dark" href="<?php url_site();  ?>/admincp?report">Report</a>
+	<a class="btn btn-dark" href="<?php url_site();  ?>/admincp?report">Reports</a>
     <p class="btn btn-light" ><i class="fa fa-paint-brush"></i>&nbsp;<?php lang('style'); ?></p>
     <a class="btn btn-dark" href="<?php url_site();  ?>/admincp?widgets"><i class="fa fa-th-large"></i> <?php lang('widgets'); ?></a>
     <a class="btn btn-dark" href="<?php url_site();  ?>/admincp?menu"><i class="fa fa-bars"></i> <?php lang('menu'); ?></a>
