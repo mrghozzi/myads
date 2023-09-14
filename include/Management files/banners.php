@@ -113,8 +113,10 @@ echo "<tr>
          if(empty($bn_url)){
 			$bnerrMSG = "Please Enter Url.";
 		}
-
+    if(isset($bnerrMSG))
+		{
          $bn_get= "?b_edit=".$id."&bnerrMSG=".$bnerrMSG;
+    }
            if(!isset($bnerrMSG))
 		{
 

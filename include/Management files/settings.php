@@ -6,7 +6,7 @@
 ##                     http://www.krhost.ga                        ##
 ##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
-##                       copyright (c) 2022                        ##
+##                       copyright (c) 2023                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
@@ -55,8 +55,10 @@ if($vrf_License=="65fgh4t8x5fe58v1rt8se9x"){
 			$bnerrMSG = "Please Enter Language Default.";
 		}
 
-
+    if(isset($bnerrMSG))
+		{
          $bn_get= "?settings&bnerrMSG=".$bnerrMSG;
+    }
            if(!isset($bnerrMSG))
 		{
 

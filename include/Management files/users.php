@@ -6,7 +6,7 @@
 ##                     http://www.krhost.ga                        ##
 ##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
-##                       copyright (c) 2022                        ##
+##                       copyright (c) 2023                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
@@ -104,8 +104,10 @@ $stausr->bindParam(":o_order", $id);
         if(empty($us_slug)){
 			$bnerrMSG = "Please Enter User Slug.";
 		}
-
+    if(isset($bnerrMSG))
+		{
          $bn_get= "?us_edit=".$id."&bnerrMSG=".$bnerrMSG;
+    }
            if(!isset($bnerrMSG))
 		{
 
@@ -155,8 +157,10 @@ $stausr->bindParam(":o_order", $id);
         if (strlen($bn_pass) <= '8') {
         $bnerrMSG = "Your New password Must Contain At Least 8 Characters!";
         }
-
+        if(isset($bnerrMSG))
+        {
          $bn_get= "?us_edit=".$id."&bnerrMSG=".$bnerrMSG;
+        }
            if(!isset($bnerrMSG))
 		{
             $passhach = password_hash($bn_pass, PASSWORD_DEFAULT);

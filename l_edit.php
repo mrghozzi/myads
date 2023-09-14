@@ -46,8 +46,10 @@ $uidss = $_SESSION['user'];
          if(empty($bn_url)){
 			$bnerrMSG = "Please Enter Url.";
 		}
-
+         if(isset($bnerrMSG))
+		{
          $bn_get= "?id=".$id."&bnerrMSG=".$bnerrMSG;
+      }
            if(!isset($bnerrMSG))
 		{
 

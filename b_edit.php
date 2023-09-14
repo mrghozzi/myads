@@ -6,7 +6,7 @@
 ##                     http://www.krhost.ga                        ##
 ##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
-##                       copyright (c) 2022                        ##
+##                       copyright (c) 2023                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
@@ -48,7 +48,10 @@ $uidss = $_SESSION['user'];
         if(empty($bn_img)){
 			$bnerrMSG = "Please Enter Image Link.";
 		}
-         $bn_get= "?id=".$id."&bnerrMSG=".$bnerrMSG;
+      if(isset($bnerrMSG))
+		{
+         $bn_get = "?id=".$id."&bnerrMSG=".$bnerrMSG;
+      }
            if(!isset($bnerrMSG))
 		{
 
@@ -61,7 +64,7 @@ $uidss = $_SESSION['user'];
             $stmsb->bindParam(":bn_px", $bn_px);
             $stmsb->bindParam(":ertb", $id);
          	if($stmsb->execute()){
-             header("Location: b_list.php");
+              header("Location: b_list.php");
          	}
 
 

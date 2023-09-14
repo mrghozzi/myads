@@ -6,7 +6,7 @@
 ##                     http://www.krhost.ga                        ##
 ##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
-##                       copyright (c) 2022                        ##
+##                       copyright (c) 2023                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
@@ -99,8 +99,10 @@ echo "<form id=\"defaultForm\" method=\"post\" class=\"form-horizontal\" action=
          if(empty($bn_url)){
 			$bnerrMSG = "Please Enter Url.";
 		}
-
+      if(isset($bnerrMSG))
+		{
         $bn_get= "?menu&bnerrMSG=".$bnerrMSG;
+      }
            if(!isset($bnerrMSG))
 		{
 
@@ -142,8 +144,10 @@ echo "<form id=\"defaultForm\" method=\"post\" class=\"form-horizontal\" action=
          if(empty($bn_url)){
 			$bnerrMSG = "Please Enter Url.";
 		}
-
+      if(isset($bnerrMSG))
+		{
         $bn_get= "?menu&bnerrMSG=".$bnerrMSG;
+      }
            if(!isset($bnerrMSG))
 		{
 

@@ -6,7 +6,7 @@
 ##                     http://www.krhost.ga                        ##
 ##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
-##                       copyright (c) 2022                        ##
+##                       copyright (c) 2023                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
@@ -143,8 +143,10 @@ style: 'https://cdn.jsdelivr.net/npm/sceditor@3/minified/themes/content/default.
          if(empty($bn_txt)){
 			$bnerrMSG = "Please Enter Text.";
 		}
-
+      if(isset($bnerrMSG))
+		{
         $bn_get= "?news&bnerrMSG=".$bnerrMSG;
+      }
            if(!isset($bnerrMSG))
 		{
 
@@ -187,8 +189,10 @@ style: 'https://cdn.jsdelivr.net/npm/sceditor@3/minified/themes/content/default.
          if(empty($bn_txt)){
 			$bnerrMSG = "Please Enter Text.";
 		}
-
+      if(isset($bnerrMSG))
+		{
         $bn_get= "?news&bnerrMSG=".$bnerrMSG;
+      }
            if(!isset($bnerrMSG))
 		{
 

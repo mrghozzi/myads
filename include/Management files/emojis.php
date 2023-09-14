@@ -6,7 +6,7 @@
 ##                     http://www.krhost.ga                        ##
 ##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
-##                       copyright (c) 2022                        ##
+##                       copyright (c) 2023                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
@@ -112,8 +112,10 @@ echo "<div class=\"modal fade\" id=\"ed{$wt['id']}\" data-backdrop=\"\" tabindex
          if(empty($bn_img)){
 			$bnerrMSG = "Please Enter emojis.";
 		}
-
+      if(isset($bnerrMSG))
+		{
         $bn_get= "?emojis&bnerrMSG=".$bnerrMSG;
+      }
            if(!isset($bnerrMSG))
 		{
 
@@ -170,14 +172,12 @@ echo "<div class=\"modal fade\" id=\"ed{$wt['id']}\" data-backdrop=\"\" tabindex
 			$bnerrMSG = "Please Enter Emojis.";
 		}
 
-
+      if(isset($bnerrMSG))
+		{
         $bn_get= "?emojis&bnerrMSG=".$bnerrMSG;
+      }
            if(!isset($bnerrMSG))
 		{
-            if($bn_sub=="A"){
-            $bn_sub="0";
-           }
-
             $stmsb = $db_con->prepare("INSERT INTO emojis (name,img)
             VALUES(:name,:img) ");
             $stmsb->bindParam(":img", $bn_img);
