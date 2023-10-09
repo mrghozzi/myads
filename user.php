@@ -202,7 +202,16 @@ $sus=$usz->fetch(PDO::FETCH_ASSOC);
   template_mine('header');
  template_mine('user_settings/user_options');
  template_mine('footer');
- }else{
+ }else if((int)isset($_GET['h'])){
+  $usz = $db_con->prepare("SELECT *  FROM `users` WHERE id=:u_id");
+  $usz->bindParam(":u_id", $_GET['o']);
+  $usz->execute();
+  $sus=$usz->fetch(PDO::FETCH_ASSOC);
+   $title_page = $sus['username']." - ".$lang['options'] ;
+    template_mine('header');
+   template_mine('user_settings/uesr_history');
+   template_mine('footer');
+   }else{
  template_mine('header');
  template_mine('404');
  template_mine('footer');

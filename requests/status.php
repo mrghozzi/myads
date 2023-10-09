@@ -6,7 +6,7 @@
 ##                     http://www.krhost.ga                        ##
 ##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
-##                       copyright (c) 2022                        ##
+##                       copyright (c) 2023                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
@@ -65,7 +65,7 @@ if($vrf_License=="65fgh4t8x5fe58v1rt8se9x"){
              $VALIDATE_URL = "notvalid";
            }
 		   if(isset($capt_sess) AND ($capt_sess=="no")){
-             header("Location: {$url_site}/directory?p&errMSG=Wrong verification code");
+            header("Location: {$url_site}/directory?p&errMSG=Wrong verification code");
            }else if(isset($VALIDATE_URL) AND ($VALIDATE_URL == "notvalid")){
             header("Location: {$url_site}/directory?p&errMSG=Url Not Valid");
            }else{
