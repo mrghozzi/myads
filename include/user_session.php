@@ -1,4 +1,4 @@
-﻿<?PHP
+<?PHP
 
 #####################################################################
 ##                                                                 ##
@@ -12,12 +12,11 @@
 ##                                                                 ##
 #####################################################################
 if($s_st=="buyfgeufb"){ 
-
+  
  //  user Session
-session_start();
  if(isset($_COOKIE['userha'])!="")
 {
-
+  session_start();
   $_SESSION['user']=$_COOKIE['user'];
 
  $stmus = $db_con->prepare("SELECT * FROM users WHERE id=:user ");

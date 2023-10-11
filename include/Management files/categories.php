@@ -1,4 +1,4 @@
-﻿<?PHP
+<?PHP
 
 #####################################################################
 ##                                                                 ##
@@ -6,7 +6,7 @@
 ##                     http://www.krhost.ga                        ##
 ##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
-##                       copyright (c) 2022                        ##
+##                       copyright (c) 2023                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
@@ -550,8 +550,10 @@ echo "<div class=\"modal fade\" id=\"ed{$wt['id']}\" data-backdrop=\"\" tabindex
          if(empty($bn_icons)){
 			$bnerrMSG = "Please Enter Icons.";
 		}
-
+      if(isset($bnerrMSG))
+		{
         $bn_get= "?f_cat&bnerrMSG=".$bnerrMSG;
+      }
            if(!isset($bnerrMSG))
 		{
 
@@ -607,8 +609,10 @@ echo "<div class=\"modal fade\" id=\"ed{$wt['id']}\" data-backdrop=\"\" tabindex
          if(empty($bn_icons)){
 			$bnerrMSG = "Please Enter Icons.";
 		}
-
+      if(isset($bnerrMSG))
+		{
         $bn_get= "?f_cat&bnerrMSG=".$bnerrMSG;
+      }
            if(!isset($bnerrMSG))
 		{
 
@@ -758,8 +762,10 @@ if($ncat_tt['id']==$wt['sub']){
          if(empty($bn_ordercat)){
 			$bnerrMSG = "Please Enter Order.";
 		}
-
+      if(isset($bnerrMSG))
+		{
         $bn_get= "?d_cat&bnerrMSG=".$bnerrMSG;
+      }
            if(!isset($bnerrMSG))
 		{
             if($bn_sub=="A"){
@@ -831,8 +837,10 @@ if($ncat_tt['id']==$wt['sub']){
          if(empty($bn_ordercat)){
 			$bnerrMSG = "Please Enter Order.";
 		}
-
+      if(isset($bnerrMSG))
+		{
         $bn_get= "?d_cat&bnerrMSG=".$bnerrMSG;
+      }
            if(!isset($bnerrMSG))
 		{
             if($bn_sub=="A"){

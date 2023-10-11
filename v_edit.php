@@ -1,4 +1,4 @@
-﻿<?PHP
+<?PHP
 
 #####################################################################
 ##                                                                 ##
@@ -6,7 +6,7 @@
 ##                     http://www.krhost.ga                        ##
 ##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
-##                       copyright (c) 2022                        ##
+##                       copyright (c) 2023                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
@@ -15,9 +15,7 @@
 include "dbconfig.php";
 include "include/function.php";
 $title_page = "Banners Ads";
-if (session_status() == PHP_SESSION_NONE) {
-    session_start();
-     }
+
 $uidss = $_SESSION['user'];
    if(isset($_GET['id']) && !empty($_GET['id']))
 	{
@@ -47,8 +45,10 @@ $uidss = $_SESSION['user'];
          if(empty($bn_url)){
 			$bnerrMSG = "Please Enter Url.";
 		}
-
+        if(isset($bnerrMSG))
+		{
          $bn_get= "?id=".$id."&bnerrMSG=".$bnerrMSG;
+      }
            if(!isset($bnerrMSG))
 		{
 

@@ -1,4 +1,4 @@
-﻿<?php if($s_st=="buyfgeufb"){  ?>
+<?php if($s_st=="buyfgeufb"){  ?>
 
     <?php ads_site(6); ?>
 	</div>

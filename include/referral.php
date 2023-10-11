@@ -1,4 +1,4 @@
-﻿<?PHP
+<?PHP
 
 #####################################################################
 ##                                                                 ##
@@ -13,9 +13,7 @@
 #####################################################################
 if($s_st=="buyfgeufb"){ 
 include_once('include/pagination.php');
-if (session_status() == PHP_SESSION_NONE) {
-    session_start();
-}
+
 $uidss = $_SESSION['user'];
 
 $statement = "`referral` WHERE uid={$uidss} ORDER BY `id` DESC";

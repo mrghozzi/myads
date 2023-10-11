@@ -1,4 +1,4 @@
-﻿<?php if(isset($s_st)=="buyfgeufb"){  ?>
+<?php if(isset($s_st)=="buyfgeufb"){  ?>
 <div class="grid grid-3-6-3 medium-space" >
 <div class="grid-column" >
 <?php template_mine('user_settings/nav_settings');  ?>

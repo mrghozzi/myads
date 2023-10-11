@@ -1,4 +1,4 @@
-﻿<?PHP
+<?PHP
 
 #####################################################################
 ##                                                                 ##
@@ -6,7 +6,7 @@
 ##                     http://www.krhost.ga                        ##
 ##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
-##                       copyright (c) 2022                        ##
+##                       copyright (c) 2023                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
@@ -31,30 +31,30 @@ header('Content-type: text/html; charset=utf-8');
    $catdid=$sucat['id'];
    $catdname=$sucat['name'];
    try{
-$catust = $db_con->prepare("SELECT * FROM status WHERE s_type IN (2,4,7867,100) AND tp_id =".$catdid );
-$catust->execute();
-$susat=$catust->fetch(PDO::FETCH_ASSOC);
+   $catust = $db_con->prepare("SELECT * FROM status WHERE s_type IN (2,4,7867,100) AND tp_id =".$catdid );
+   $catust->execute();
+   $susat=$catust->fetch(PDO::FETCH_ASSOC);
     } catch(PDOException $e){
       header("Location: {$url_site}/404") ;
     }
-if($susat['s_type'] == 7867){
-  header("Location: {$url_site}/producer/{$catdname}");
-}else if($susat['s_type'] == 100){
+   if($susat['s_type'] == 7867){
+   header("Location: {$url_site}/producer/{$catdname}");
+   }else if($susat['s_type'] == 100){
       $posttxt = strip_tags($sucat['txt'], '');
       $description_page = strip_tags($sucat['txt'], '');
-     $title_page = $sucat['name']."&nbsp;-&nbsp;".$posttxt;
-   template_mine('header');
-   ads_site(5);
-   tpl_post_stt($susat,0);
+      $title_page = $sucat['name']."&nbsp;-&nbsp;".$posttxt;
+      template_mine('header');
+      ads_site(5);
+       tpl_post_stt($susat,0);
    ?>
-<script>
-$(".comment_100_<?php echo $sucat['id']; ?>").load('<?php url_site();  ?>/templates/_panel/status/post_comment.php?s_type=100&tid=<?php echo $sucat['id']; ?>');
-$(".sh_comment_p<?php echo $susat['id']; ?>").addClass('active');
-</script>
+     <script>
+      $(".comment_100_<?php echo $sucat['id']; ?>").load('<?php url_site();  ?>/templates/_panel/status/post_comment.php?s_type=100&tid=<?php echo $sucat['id']; ?>');
+      $(".sh_comment_p<?php echo $susat['id']; ?>").addClass('active');
+     </script>
 <?php
 
    template_mine('footer');
-}else if($susat['s_type'] == 4){
+     }else if($susat['s_type'] == 4){
      $imgtxt = strip_tags($sucat['txt'], '');
      $title_page = $sucat['name']."&nbsp;-&nbsp;".$imgtxt;
      $image_post = "image_post" ;
@@ -66,9 +66,9 @@ $(".sh_comment_p<?php echo $susat['id']; ?>").addClass('active');
    ads_site(5);
    tpl_image_stt($susat,0);
    ?>
-<script>
-$(".comment_4_<?php echo $sucat['id']; ?>").load('<?php url_site();  ?>/templates/_panel/status/post_comment.php?s_type=4&tid=<?php echo $sucat['id']; ?>');
-$(".sh_comment_i<?php echo $susat['id']; ?>").addClass('active');
+   <script>
+   $(".comment_4_<?php echo $sucat['id']; ?>").load('<?php url_site();  ?>/templates/_panel/status/post_comment.php?s_type=4&tid=<?php echo $sucat['id']; ?>');
+   $(".sh_comment_i<?php echo $susat['id']; ?>").addClass('active');
 </script>
 <?php
    template_mine('footer');

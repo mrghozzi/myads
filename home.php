@@ -1,4 +1,4 @@
-﻿<?PHP
+<?PHP
 
 #####################################################################
 ##                                                                 ##
@@ -30,8 +30,10 @@ $title_page = $lang['home'];
        }else if($le_name=="0"){
          $errMSG= $lang['cnc0p'];
        }
-
+       if(isset($errMSG))
+       {
     $le_get= "?errMSG=".$errMSG;
+       }
            if(!isset($errMSG))
 		{
             $o_type  = "hest_pts";

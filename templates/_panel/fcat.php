@@ -1,4 +1,4 @@
-﻿<?php if($s_st=="buyfgeufb"){  ?>
+<?php if($s_st=="buyfgeufb"){  ?>
   <!-- SECTION BANNER -->
 <div class="section-banner" style="background: url(<?php url_site();  ?>/templates/_panel/img/banner/Newsfeed.png) no-repeat 50%;" >
       <!-- SECTION BANNER ICON -->

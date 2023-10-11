@@ -1,4 +1,4 @@
-﻿<?php if($s_st=="buyfgeufb"){   global $admin_page;
+<?php if($s_st=="buyfgeufb"){   global $admin_page;
   include "requests/captcha.php";
   if(isset($_GET['st'])){
  $k_type = "knowledgebase";
@@ -615,7 +615,7 @@ style: 'https://cdn.jsdelivr.net/npm/sceditor@3/minified/themes/content/default.
                 <?php }else if(isset($_GET['knowledgebase'])){    ?>
 <?php if(isset($admin_page) AND ($admin_page==1)){ ?>
 <?php template_mine('admin/admin_header');  ?>
-<div class="grid grid-3-6-3 medium-space" >
+<div class="grid grid-3-9 medium-space" >
 <div class="grid-column" >
 <?php template_mine('admin/admin_nav');  ?>
 </div>

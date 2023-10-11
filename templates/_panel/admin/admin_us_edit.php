@@ -1,5 +1,5 @@
 <?php if($s_st=="buyfgeufb"){  ?>
-<div class="grid grid-3-6-3 medium-space" >
+<div class="grid grid-3-9 medium-space" >
 <div class="grid-column" >
 <?php template_mine('admin/admin_nav');  ?>
 </div>

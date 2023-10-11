@@ -1,4 +1,4 @@
-﻿<?PHP
+<?PHP
 
 #####################################################################
 ##                                                                 ##
@@ -17,9 +17,7 @@
 include "dbconfig.php";
 include "include/function.php";
 $title_page = "Link Click";
-if (session_status() == PHP_SESSION_NONE) {
-    session_start();
-     }
+
 $uidss = $_SESSION['user'];
    if(isset($_GET['id']) && !empty($_GET['id']))
 	{
@@ -48,8 +46,10 @@ $uidss = $_SESSION['user'];
          if(empty($bn_url)){
 			$bnerrMSG = "Please Enter Url.";
 		}
-
+         if(isset($bnerrMSG))
+		{
          $bn_get= "?id=".$id."&bnerrMSG=".$bnerrMSG;
+      }
            if(!isset($bnerrMSG))
 		{
 

@@ -1,4 +1,4 @@
-﻿<?PHP
+<?PHP
 
 #####################################################################
 ##                                                                 ##
@@ -29,14 +29,14 @@ $lang['p_sign_up']   = "Sign Up";
 $lang['dinstall']    = "Delete The Folder 'install'  Or Changing The Name";
 $lang['all_f_m']     = "&nbsp; all the fields are mandatory !";
 $lang['username']    = "Username";
-$lang['e_mail']      = "Address Mail :";
-$lang['email']       = "Address Mail";
+$lang['e_mail']      = "E-mail address :";
+$lang['email']       = "E-mail address";
 $lang['password']    = "Password";
 $lang['rep_password']= "Repeat Password";
 $lang['c_account']   = "&nbsp; Create Account";
 $lang['sign_in']     = " Sign In";
 $lang['creayoacc']   = "Create your Account!";
-$lang['donthaacc']   = "Dont have and account?";
+$lang['donthaacc']   = "Don't have an account?";
 $lang['alrehaacc']   = "Already have an account?";
 $lang['search']      = "search :";
 $lang['btn_search']  = "search";

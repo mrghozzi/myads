@@ -1,4 +1,4 @@
-﻿<?PHP
+<?PHP
 
 #####################################################################
 ##                                                                 ##
@@ -6,7 +6,7 @@
 ##                     http://www.krhost.ga                        ##
 ##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
-##                       copyright (c) 2022                        ##
+##                       copyright (c) 2023                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
@@ -20,12 +20,12 @@ $title_page = $lang['Promotysite'];
 
         if(isset($_POST['le_submit'])){
 
-           $le_name = $_POST['name'];
-           $le_url = $_POST['url'];
-           $le_type = $_POST['type'];
-           $le_desc = $_POST['desc'];
-           $le_exch = $_POST['exch'];
-           $le_uid = $uRow['id'];
+          if(isset($_POST['name'])){ $le_name = $_POST['name']; }
+          if(isset($_POST['url'])){  $le_url  = $_POST['url'];  }
+          if(isset($_POST['type'])){ $le_type = $_POST['type']; }
+          if(isset($_POST['desc'])){ $le_desc = $_POST['desc']; }
+          if(isset($_POST['exch'])){ $le_exch = $_POST['exch']; }
+          if(isset($uRow['id'])){    $le_uid  = $uRow['id'];    }
 
            if(empty($le_name)){
 			$errMSG = "Please Enter name.";
@@ -36,7 +36,10 @@ $title_page = $lang['Promotysite'];
         if(empty($le_type)){
 			$errMSG = "Please Enter select type ADS .";
 		}
-         $le_get= "?le_name=".$le_name."&le_url=".$le_url."&le_desc=".$le_desc."&le_exch=".$le_exch."&errMSG=".$errMSG;
+       if(isset($errMSG))
+		{ 
+       $le_get= "?le_name=".$le_name."&le_url=".$le_url."&le_desc=".$le_desc."&le_exch=".$le_exch."&errMSG=".$errMSG;
+    }
            if(!isset($errMSG))
 		{
           if(isset($le_type) AND ($le_type =="L")){
@@ -81,7 +84,10 @@ $title_page = $lang['Promotysite'];
         if(empty($bn_img)){
 			$bnerrMSG = "Please Enter Image Link.";
 		}
+        if(isset($bnerrMSG))
+		{ 
          $bn_get= "?bn_name=".$bn_name."&bn_url=".$bn_url."&bn_img=".$bn_img."&bn_px=".$bn_px."&bnerrMSG=".$bnerrMSG;
+    }
            if(!isset($bnerrMSG))
 		{
 

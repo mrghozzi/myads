@@ -1,4 +1,4 @@
-﻿<?PHP
+<?PHP
 
 #####################################################################
 ##                                                                 ##
@@ -6,7 +6,7 @@
 ##                     http://www.krhost.ga                        ##
 ##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
-##                       copyright (c) 2022                        ##
+##                       copyright (c) 2023                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
@@ -94,7 +94,7 @@ while($sutcat=$catsum->fetch(PDO::FETCH_ASSOC))
 }else if($sutcat['s_type']==7867){
  $s_type ="forum";                // store
 }else if($sutcat['s_type']==100){
- $s_type ="forum";                // store
+ $s_type ="forum";                // text
 }
  if(isset($s_type)){
 $catusz = $db_con->prepare("SELECT *  FROM `{$s_type}` WHERE statu=1  AND id=".$sutcat['tp_id'] );
@@ -113,7 +113,7 @@ if($sucat['statu']=="1") {
 }else if($sutcat['s_type']==7867){
  tpl_store_stt($sutcat,0);       // store
 }else if($sutcat['s_type']==100){
- tpl_post_stt($sutcat,0);       // store
+ tpl_post_stt($sutcat,0);       // text
 }
 
   }
@@ -132,7 +132,7 @@ if($spstt['s_type']==1){
 }else if($spstt['s_type']==4){
 $sp_type ="forum";            // image
 }else if($spstt['s_type']==100){
- $sp_type ="forum";                // store
+ $sp_type ="forum";                // text
 }
 if(isset($sp_type)){
 $spcatusz = $db_con->prepare("SELECT *  FROM `{$sp_type}` WHERE statu=1 AND id=".$spstt['tp_id'] );
@@ -147,7 +147,7 @@ $spcat=$spcatusz->fetch(PDO::FETCH_ASSOC);
 }else if($spstt['s_type']==4){
  tpl_image_stt($spstt,1);   // image
 }else if($spstt['s_type']==100){
- tpl_post_stt($spstt,0);       // store
+ tpl_post_stt($spstt,0);       // text
 }
    }
      }

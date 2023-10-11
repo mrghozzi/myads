@@ -25,7 +25,7 @@
           <!-- /DROPDOWN NAVIGATION LINK -->
 
           <!-- DROPDOWN NAVIGATION LINK -->
-          <a class="dropdown-navigation-link" href="<?php url_site();  ?>/options/<?php echo $_COOKIE['user']; ?>"><?php echo $lang['options']; ?></a>
+          <a class="dropdown-navigation-link" href="<?php url_site();  ?>/options"><?php echo $lang['options']; ?></a>
           <!-- /DROPDOWN NAVIGATION LINK -->
 
           <!-- DROPDOWN NAVIGATION CATEGORY -->

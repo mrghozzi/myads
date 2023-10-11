@@ -1,4 +1,4 @@
-﻿<?PHP
+<?PHP
 
 #####################################################################
 ##                                                                 ##
@@ -106,7 +106,7 @@ $usecho =  "<b>{$catruss['username']}</b> <i class=\"fa fa-retweet\" aria-hidden
               <!-- /POST SETTINGS -->
 
               <!-- SIMPLE DROPDOWN -->
-              <div class="simple-dropdown widget-box-post-settings-dropdown" style="position: absolute; z-index: 9999; top: 30px; right: 9px; opacity: 0; visibility: hidden; transform: translate(0px, -20px); transition: transform 0.3s ease-in-out 0s, opacity 0.3s ease-in-out 0s, visibility 0.3s ease-in-out 0s;">
+              <div class="simple-dropdown widget-box-post-settings-dropdown" >
 <?php if(((isset($uRow['id'])AND isset($sucat['uid']) AND ($uRow['id']==$sucat['uid'])) OR (isset($_COOKIE['admin'])  AND ($_COOKIE['admin']==$hachadmin) )) AND ($Suggestion==0)){ ?>
               <!-- SIMPLE DROPDOWN LINK -->
                 <p class="simple-dropdown-link post_edit<?php echo $sucat['id']; ?>"><i class="fa fa-edit" aria-hidden="true"></i>&nbsp;<?php echo $lang['edit']; ?></p>
@@ -145,7 +145,7 @@ echo"                      <!-- USER STATUS -->
                             <!-- USER AVATAR CONTENT -->
                             <div class=\"user-avatar-content\">
                               <!-- HEXAGON -->
-                              <div class=\"hexagon-image-30-32\" data-src=\"{$url_site}/{$catuss['img']}\" style=\"width: 30px; height: 32px; position: relative;\"><canvas style=\"position: absolute; top: 0px; left: 0px;\" width=\"30\" height=\"32\"></canvas></div>
+                              <div class=\"hexagon-image-30-32\" data-src=\"{$url_site}/{$catuss['img']}\" ><canvas ></canvas></div>
                               <!-- /HEXAGON -->
                             </div>
                             <!-- /USER AVATAR CONTENT -->
@@ -155,7 +155,7 @@ echo"                      <!-- USER STATUS -->
                             <!-- USER AVATAR PROGRESS BORDER -->
                             <div class=\"user-avatar-progress-border\">
                               <!-- HEXAGON -->
-                              <div class=\"hexagon-border-40-44\" style=\"width: 40px; height: 44px; position: relative;\"></div>
+                              <div class=\"hexagon-border-40-44\" ></div>
                               <!-- /HEXAGON -->
                             </div>
                             <!-- /USER AVATAR PROGRESS BORDER -->  ";
@@ -165,7 +165,7 @@ echo"                      <!-- USER STATUS -->
                               <!-- USER AVATAR BADGE BORDER -->
                               <div class=\"user-avatar-badge-border\">
                                 <!-- HEXAGON -->
-                                <div class=\"hexagon-22-24\" style=\"width: 22px; height: 24px; position: relative;\"></div>
+                                <div class=\"hexagon-22-24\" ></div>
                                 <!-- /HEXAGON -->
                               </div>
                               <!-- /USER AVATAR BADGE BORDER -->
@@ -173,7 +173,7 @@ echo"                      <!-- USER STATUS -->
                               <!-- USER AVATAR BADGE CONTENT -->
                               <div class=\"user-avatar-badge-content\">
                                 <!-- HEXAGON -->
-                                <div class=\"hexagon-dark-16-18\" style=\"width: 16px; height: 18px; position: relative;\"></div>
+                                <div class=\"hexagon-dark-16-18\" ></div>
                                 <!-- /HEXAGON -->
                               </div>
                               <!-- /USER AVATAR BADGE CONTENT -->
@@ -267,7 +267,7 @@ echo                   "</p>
           <div class="post-options">
 <?php   if(isset($_COOKIE['user'])){ ?>
             <!-- POST OPTION WRAP -->
-            <div class="post-option-wrap" style="position: relative;">
+            <div class="post-option-wrap" >
               <!-- POST OPTION -->
               <div class="post-option reaction-options-dropdown-trigger">
               <div id="reaction_image<?php echo $sutcat['id']; ?>" >
@@ -289,69 +289,69 @@ echo                   "</p>
               <!-- /POST OPTION -->
 
               <!-- REACTION OPTIONS -->
-              <div class="reaction-options reaction-options-dropdown" style="position: absolute; z-index: 9999; bottom: 54px; left: -16px; opacity: 0; visibility: hidden; transform: translate(0px, 20px); transition: transform 0.3s ease-in-out 0s, opacity 0.3s ease-in-out 0s, visibility 0.3s ease-in-out 0s;">
+              <div class="reaction-options reaction-options-dropdown" >
                 <!-- REACTION OPTION -->
-                <div class="reaction-option text-tooltip-tft reaction_4_<?php echo $sucat['id']; ?>" data-title="like" style="position: relative;">
+                <div class="reaction-option text-tooltip-tft reaction_4_<?php echo $sucat['id']; ?>" data-title="like" >
                   <!-- REACTION OPTION IMAGE -->
                   <img class="reaction-option-image" src="<?php url_site();  ?>/templates/_panel/img/reaction/like.png" alt="reaction-like">
                   <!-- /REACTION OPTION IMAGE -->
-                <div class="xm-tooltip" style="white-space: nowrap; position: absolute; z-index: 99999; top: -28px; left: 50%; margin-left: -22px; opacity: 0; visibility: hidden; transform: translate(0px, 10px); transition: all 0.3s ease-in-out 0s;"><p class="xm-tooltip-text">Like</p></div></div>
+                </div>
                 <!-- /REACTION OPTION -->
 
                 <!-- REACTION OPTION -->
-                <div class="reaction-option text-tooltip-tft reaction_4_<?php echo $sucat['id']; ?>" data-title="love" style="position: relative;">
+                <div class="reaction-option text-tooltip-tft reaction_4_<?php echo $sucat['id']; ?>" data-title="love" >
                   <!-- REACTION OPTION IMAGE -->
                   <img class="reaction-option-image" src="<?php url_site();  ?>/templates/_panel/img/reaction/love.png" alt="reaction-love">
                   <!-- /REACTION OPTION IMAGE -->
-                <div class="xm-tooltip" style="white-space: nowrap; position: absolute; z-index: 99999; top: -28px; left: 50%; margin-left: -23.5px; opacity: 0; visibility: hidden; transform: translate(0px, 10px); transition: all 0.3s ease-in-out 0s;"><p class="xm-tooltip-text">Love</p></div></div>
+                </div>
                 <!-- /REACTION OPTION -->
 
                 <!-- REACTION OPTION -->
-                <div class="reaction-option text-tooltip-tft reaction_4_<?php echo $sucat['id']; ?>" data-title="dislike" style="position: relative;">
+                <div class="reaction-option text-tooltip-tft reaction_4_<?php echo $sucat['id']; ?>" data-title="dislike" >
                   <!-- REACTION OPTION IMAGE -->
                   <img class="reaction-option-image" src="<?php url_site();  ?>/templates/_panel/img/reaction/dislike.png" alt="reaction-dislike">
                   <!-- /REACTION OPTION IMAGE -->
-                <div class="xm-tooltip" style="white-space: nowrap; position: absolute; z-index: 99999; top: -28px; left: 50%; margin-left: -28px; opacity: 0; visibility: hidden; transform: translate(0px, 10px); transition: all 0.3s ease-in-out 0s;"><p class="xm-tooltip-text">Dislike</p></div></div>
+                </div>
                 <!-- /REACTION OPTION -->
 
                 <!-- REACTION OPTION -->
-                <div class="reaction-option text-tooltip-tft reaction_4_<?php echo $sucat['id']; ?>" data-title="happy" style="position: relative;">
+                <div class="reaction-option text-tooltip-tft reaction_4_<?php echo $sucat['id']; ?>" data-title="happy" >
                   <!-- REACTION OPTION IMAGE -->
                   <img class="reaction-option-image" src="<?php url_site();  ?>/templates/_panel/img/reaction/happy.png" alt="reaction-happy">
                   <!-- /REACTION OPTION IMAGE -->
-                <div class="xm-tooltip" style="white-space: nowrap; position: absolute; z-index: 99999; top: -28px; left: 50%; margin-left: -27.5px; opacity: 0; visibility: hidden; transform: translate(0px, 10px); transition: all 0.3s ease-in-out 0s;"><p class="xm-tooltip-text">Happy</p></div></div>
+                </div>
                 <!-- /REACTION OPTION -->
 
                 <!-- REACTION OPTION -->
-                <div class="reaction-option text-tooltip-tft reaction_4_<?php echo $sucat['id']; ?>" data-title="funny" style="position: relative;">
+                <div class="reaction-option text-tooltip-tft reaction_4_<?php echo $sucat['id']; ?>" data-title="funny" >
                   <!-- REACTION OPTION IMAGE -->
                   <img class="reaction-option-image" src="<?php url_site();  ?>/templates/_panel/img/reaction/funny.png" alt="reaction-funny">
                   <!-- /REACTION OPTION IMAGE -->
-                <div class="xm-tooltip" style="white-space: nowrap; position: absolute; z-index: 99999; top: -28px; left: 50%; margin-left: -27px; opacity: 0; visibility: hidden; transform: translate(0px, 10px); transition: all 0.3s ease-in-out 0s;"><p class="xm-tooltip-text">Funny</p></div></div>
+                </div>
                 <!-- /REACTION OPTION -->
 
                 <!-- REACTION OPTION -->
-                <div class="reaction-option text-tooltip-tft reaction_4_<?php echo $sucat['id']; ?>" data-title="wow" style="position: relative;">
+                <div class="reaction-option text-tooltip-tft reaction_4_<?php echo $sucat['id']; ?>" data-title="wow" >
                   <!-- REACTION OPTION IMAGE -->
                   <img class="reaction-option-image" src="<?php url_site();  ?>/templates/_panel/img/reaction/wow.png" alt="reaction-wow">
                   <!-- /REACTION OPTION IMAGE -->
-                <div class="xm-tooltip" style="white-space: nowrap; position: absolute; z-index: 99999; top: -28px; left: 50%; margin-left: -24px; opacity: 0; visibility: hidden; transform: translate(0px, 10px); transition: all 0.3s ease-in-out 0s;"><p class="xm-tooltip-text">Wow</p></div></div>
+                </div>
                 <!-- /REACTION OPTION -->
 
                 <!-- REACTION OPTION -->
-                <div class="reaction-option text-tooltip-tft reaction_4_<?php echo $sucat['id']; ?>" data-title="angry" style="position: relative;">
+                <div class="reaction-option text-tooltip-tft reaction_4_<?php echo $sucat['id']; ?>" data-title="angry" >
                   <!-- REACTION OPTION IMAGE -->
                   <img class="reaction-option-image" src="<?php url_site();  ?>/templates/_panel/img/reaction/angry.png" alt="reaction-angry">
                   <!-- /REACTION OPTION IMAGE -->
-                <div class="xm-tooltip" style="white-space: nowrap; position: absolute; z-index: 99999; top: -28px; left: 50%; margin-left: -26.5px; opacity: 0; visibility: hidden; transform: translate(0px, 10px); transition: all 0.3s ease-in-out 0s;"><p class="xm-tooltip-text">Angry</p></div></div>
+                </div>
                 <!-- /REACTION OPTION -->
 
                 <!-- REACTION OPTION -->
-                <div class="reaction-option text-tooltip-tft reaction_4_<?php echo $sucat['id']; ?>" data-title="sad" style="position: relative;">
+                <div class="reaction-option text-tooltip-tft reaction_4_<?php echo $sucat['id']; ?>" data-title="sad" >
                   <!-- REACTION OPTION IMAGE -->
                   <img class="reaction-option-image" src="<?php url_site();  ?>/templates/_panel/img/reaction/sad.png" alt="reaction-sad">
                   <!-- /REACTION OPTION IMAGE -->
-                <div class="xm-tooltip" style="white-space: nowrap; position: absolute; z-index: 99999; top: -28px; left: 50%; margin-left: -21.5px; opacity: 0; visibility: hidden; transform: translate(0px, 10px); transition: all 0.3s ease-in-out 0s;"><p class="xm-tooltip-text">Sad</p></div></div>
+                </div>
                 <!-- /REACTION OPTION -->
               </div>
               <!-- /REACTION OPTIONS -->
@@ -373,7 +373,7 @@ echo                   "</p>
             <!-- /POST OPTION -->
 <?php } ?>
             <!-- POST OPTION -->
-            <div class="post-option-wrap" style="position: relative;">
+            <div class="post-option-wrap" >
               <!-- POST OPTION -->
               <div class="post-option reaction-options-dropdown-trigger">
                 <!-- POST OPTION ICON -->
@@ -389,9 +389,9 @@ echo                   "</p>
               <!-- /POST OPTION -->
 
               <!-- REACTION OPTIONS -->
-              <div class="reaction-options reaction-options-dropdown" style="position: absolute; z-index: 9999; bottom: 54px; left: -16px; opacity: 0; visibility: hidden; transform: translate(0px, 20px); transition: transform 0.3s ease-in-out 0s, opacity 0.3s ease-in-out 0s, visibility 0.3s ease-in-out 0s;">
+              <div class="reaction-options reaction-options-dropdown" >
                 <!-- REACTION OPTION -->
-                <div class="reaction-option text-tooltip-tft" data-title="facebook" style="position: relative;">
+                <div class="reaction-option text-tooltip-tft" data-title="facebook" >
                   <!-- REACTION OPTION IMAGE -->
                   <a onClick="window.open('https://www.facebook.com/sharer/sharer.php?u=<?php echo $linksher; ?>');" href="javascript:void(0);" >
                   <img class="reaction-option-image" src="<?php url_site();  ?>/templates/_panel/img/icons/facebook-icon.png" >
@@ -401,7 +401,7 @@ echo                   "</p>
                 <!-- /REACTION OPTION -->
 
                 <!-- REACTION OPTION -->
-                <div class="reaction-option text-tooltip-tft" data-title="twitter" style="position: relative;">
+                <div class="reaction-option text-tooltip-tft" data-title="twitter" >
                   <!-- REACTION OPTION IMAGE -->
                   <a onClick="window.open('https://twitter.com/intent/tweet?text=<?php echo $namesher; ?>&url=<?php echo $linksher; ?>');" href="javascript:void(0);" >
                   <img class="reaction-option-image" src="<?php url_site();  ?>/templates/_panel/img/icons/twitter-icon.png" >
@@ -411,7 +411,7 @@ echo                   "</p>
                 <!-- /REACTION OPTION -->
 
                 <!-- REACTION OPTION -->
-                <div class="reaction-option text-tooltip-tft" data-title="linkedin" style="position: relative;">
+                <div class="reaction-option text-tooltip-tft" data-title="linkedin" >
                   <!-- REACTION OPTION IMAGE -->
                   <a onClick="window.open('https://www.linkedin.com/sharing/share-offsite/?url=<?php echo $linksher; ?>');" href="javascript:void(0);" >
                   <img class="reaction-option-image" src="<?php url_site();  ?>/templates/_panel/img/icons/linkedin-icon.png" >
@@ -421,7 +421,7 @@ echo                   "</p>
                 <!-- /REACTION OPTION -->
 
                 <!-- REACTION OPTION -->
-                <div class="reaction-option text-tooltip-tft" data-title="wasp" style="position: relative;">
+                <div class="reaction-option text-tooltip-tft" data-title="wasp" >
                   <!-- REACTION OPTION IMAGE -->
                   <a onClick="window.open('https://www.wasp.gq/sharer?url=<?php echo $linksher; ?>&nbsp;<?php echo $namesher; ?>');" href="javascript:void(0);" >
                   <img class="reaction-option-image" src="<?php url_site();  ?>/templates/_panel/img/icons/wasp-icon.png" >

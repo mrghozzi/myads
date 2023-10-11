@@ -1,9 +1,9 @@
-﻿<?PHP
+<?PHP
 
 #####################################################################
 ##                                                                 ##
-##                        MYads  v3.0.5                            ##
-##                  http://www.kariya-host.gq                      ##
+##                        MYads  v3.0.4                            ##
+##                     http://www.krhost.ga                        ##
 ##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
 ##                       copyright (c) 2023                        ##
@@ -16,7 +16,7 @@ if($s_st=="buyfgeufb"){
 //  MyAds Version
 $myads_generation  = "3";
 $myads_Version     = "0";
-$myads_Update      = "5";
+$myads_Update      = "6";
 $stversion = "{$myads_generation}.{$myads_Version}.{$myads_Update}";
 $o_type = "version" ;
 $name = "{$myads_generation}-{$myads_Version}-{$myads_Update}";

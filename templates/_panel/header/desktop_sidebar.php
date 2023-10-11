@@ -1,4 +1,4 @@
-﻿<?php if($s_st=="buyfgeufb"){  ?>
+<?php if($s_st=="buyfgeufb"){  ?>
    <!-- NAVIGATION WIDGET -->
   <nav id="navigation-widget" class="navigation-widget navigation-widget-desktop sidebar left hidden" data-simplebar>
    <!-- MENU -->
