@@ -10,7 +10,7 @@
         <!-- BAR PROGRESS WRAP -->
         <div class="bar-progress-wrap">
           <!-- BAR PROGRESS INFO -->
-          <p class="bar-progress-info"><?php user_row('pts'); ?>&nbsp;PTS</p>
+          <a class="bar-progress-info" href="<?php url_site();  ?>/history"><?php user_row('pts'); ?>&nbsp;PTS</a>
           <!-- /BAR PROGRESS INFO -->
         </div>
       </div>

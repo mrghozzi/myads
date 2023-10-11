@@ -147,7 +147,7 @@
     <!-- NAVIGATION WIDGET SECTION LINK -->
     <a class="navigation-widget-section-link" href="<?php url_site();  ?>/e<?php echo $_COOKIE['user']; ?>"><?php echo $lang['e_profile']; ?></a>
     <a class="navigation-widget-section-link" href="<?php url_site();  ?>/p<?php echo $_COOKIE['user']; ?>">Change Avatar/Cover</a>
-    <a class="navigation-widget-section-link" href="<?php url_site();  ?>/options/<?php echo $_COOKIE['user']; ?>"><?php echo $lang['options']; ?></a>
+    <a class="navigation-widget-section-link" href="<?php url_site();  ?>/options"><?php echo $lang['options']; ?></a>
     <!-- /NAVIGATION WIDGET SECTION LINK -->
     <?php  } ?>
     <?php if(isset($_COOKIE['user']) AND ($_COOKIE['user']=="1") ){ ?>
