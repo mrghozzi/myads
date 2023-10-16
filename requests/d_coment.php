@@ -51,7 +51,7 @@ $catusz = $db_con->prepare("SELECT *  FROM `directory` WHERE statu=1 AND  id=".$
 $catusz->execute();
 $sucat=$catusz->fetch(PDO::FETCH_ASSOC);
               if(($sucat['uid']!=$bn_uid) AND ($sucat['uid']!=0)){
-            $bn_nurl = "t".$bn_tid;
+            $bn_nurl = "dr".$bn_tid;
             $bn_logo  = "comment";
             $bn_state = "1";
             $usz = $db_con->prepare("SELECT *  FROM `users` WHERE id=".$bn_uid );
