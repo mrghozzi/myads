@@ -114,7 +114,7 @@ if($vrf_License=="65fgh4t8x5fe58v1rt8se9x"){
             $stmsbr->bindParam(":o_mode",   $bn_time);
             $stmsbr->bindParam(":o_parent", $bn_tid);
             if($stmsbr->execute()){
-             $bn_nurl  = "t".$bn_id;
+             $bn_nurl  = "dr".$bn_id;
              $bn_logo  = "thumbs-up";
              $bn_state = "1";
             $usz = $db_con->prepare("SELECT *  FROM `users` WHERE id=".$bn_uid );
