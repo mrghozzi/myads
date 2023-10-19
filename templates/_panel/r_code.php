@@ -1,4 +1,4 @@
-<?php if($s_st=="buyfgeufb"){
+<?php if($s_st=="buyfgeufb"){ dinstall_d();
  $o_type =  "extensions_code";
  $bnextensions = $db_con->prepare("SELECT  * FROM `options` WHERE o_type=:o_type " );
 $bnextensions->bindParam(":o_type", $o_type);

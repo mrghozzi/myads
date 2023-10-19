@@ -1,9 +1,7 @@
 <?php if($s_st=="buyfgeufb"){  ?>
 <!--
 author: Kariya host
-author URL: http://www.krhost.ga
-Design: W3layouts
-License: Creative Commons Attribution 3.0 Unported
+author URL: http://www.kariya-host.gq/
 License URL: http://creativecommons.org/licenses/by/3.0/
 -->
 <!DOCTYPE HTML>

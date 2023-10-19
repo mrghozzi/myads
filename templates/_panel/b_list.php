@@ -1,4 +1,4 @@
-<?php if($s_st=="buyfgeufb"){ global $admin_page; ?>
+<?php if($s_st=="buyfgeufb"){ dinstall_d(); global $admin_page; ?>
 
 <?php if(isset($admin_page) AND ($admin_page==1)){ ?>
 <?php template_mine('admin/admin_header');  ?>

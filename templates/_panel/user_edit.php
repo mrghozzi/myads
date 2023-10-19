@@ -1,5 +1,5 @@
-<?php if(isset($s_st)=="buyfgeufb"){
-if(isset($_GET['p'])){
+<?php if(isset($s_st)=="buyfgeufb"){ 
+if(isset($_GET['p'])){ 
   $usz = $db_con->prepare("SELECT *  FROM `users` WHERE id=".$_GET['p'] );
 $usz->execute();
 $sus=$usz->fetch(PDO::FETCH_ASSOC);
@@ -32,7 +32,7 @@ $sus=$usz->fetch(PDO::FETCH_ASSOC);
 								</div>
                <div class="clearfix"> </div>
             </div>
-            <?php }else if(isset($_GET['e'])){
+            <?php }else if(isset($_GET['e'])){ 
               $usz = $db_con->prepare("SELECT *  FROM `users` WHERE id=".$_GET['e'] );
 $usz->execute();
 $sus=$usz->fetch(PDO::FETCH_ASSOC);
@@ -82,7 +82,7 @@ $sus=$usz->fetch(PDO::FETCH_ASSOC);
                         </div>
                         <div class="form-group">
                             <div class="col-lg-9 col-lg-offset-3">
-                                <center><button type="submit" name="ed_submit" value="ed_submit" class="btn btn-primary"><?php lang('edit'); ?></button></center>
+                                <center><button type="submit" name="ed_submit" value="ed_submit" class="btn btn-primary"><?php lang('edit');  ?></button></center>
                             </div>
                         </div>
                     </form>

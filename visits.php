@@ -198,7 +198,7 @@ window.onload = function(){
     <table width='464' width2='230' height cellspacing='0' cellpadding='2' border='0'>
     <tr style='cursor:pointer' width='229' height='41' align='center' valign='top'   >
     		<font style='font-size:11px; font-family:verdana,arial,sans-serif; line-height:14px; text-decoration:underline;color:#660066' color='#660066'>
-            				<b>{$ab['name']}</b>
+            <a href='{$url_site}/report?visits={$ab['id']}' target='_blank'><img src='{$url_site}/templates/_panel/img/Alert-icon.png' alt='Report'></a> | <b>{$ab['name']}</b>
             </font>
      </tr>
         <br />

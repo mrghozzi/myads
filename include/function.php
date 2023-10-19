@@ -104,9 +104,7 @@ function lang($name) {    global  $lang ;   echo  $lang["{$name}"];    }
  $filename = 'install';
  
 if (file_exists($filename)) {
- echo "<center>";
- lang('dinstall');
- echo "</center>";
+
 function dinstall_d() {
    global  $lang ;
    echo "<div class=\"alert alert-danger alert-dismissible\" role=\"alert\">

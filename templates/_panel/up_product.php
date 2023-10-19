@@ -1,4 +1,4 @@
-<?php if(isset($s_st)=="buyfgeufb"){
+<?php if(isset($s_st)=="buyfgeufb"){ dinstall_d();
 
  ?>
     <!-- SECTION BANNER -->

@@ -238,7 +238,7 @@
     <center>
     <?php echo "All rights reserved &nbsp;&copy;".date("Y")."&nbsp;"; title_site(''); ?>&trade;
     | <a href="<?php url_site();  ?>/privacy-policy">PRIVACY POLICY</a>
-    | `MyAds v<?php myads_version();  ?>`  Devlope by <a href="http://www.krhost.ga/">Kariya Host</a>
+    | `MyAds v<?php myads_version();  ?>`  Devlope by <a href="http://www.kariya-host.gq/">Kariya Host</a>
     </center>
     </div>
   </div>

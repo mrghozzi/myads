@@ -6,7 +6,7 @@
 ##                     http://www.krhost.ga                        ##
 ##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
-##                       copyright (c) 2022                        ##
+##                       copyright (c) 2023                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
@@ -55,9 +55,9 @@ $b_px= $_GET['px'];
   if (isset($ab['id']))
 {
      if(isset($if_type) AND ($if_type==1)){
-           echo "<table style=' width: 100%;  height: auto; '><tr><tdstyle=' width: 100%;  height: auto; ' valign='top' align='left'><a target='_top' href='{$url_site}/show.php?ads=$ab[id]&vu=$userRow[id]'><img border=0 src='$ab[img]' style=' width: 100%;  height: auto; '></a></td></tr><tr><td  style=' width: 100%;  height: auto; '  bgcolor='#0099ff'><a class='attribution' href='{$url_site}?ref={$user}' target='_blank'><font style='font-size:12px; font-family:verdana,arial,sans-serif; line-height:13px;color:#FFFFFF; text-decoration:none' color='#FFFFFF'>&copy;{$title_s}</font></a></td></tr></table>";
+           echo "<table style=' width: 100%;  height: auto; '><tr><tdstyle=' width: 100%;  height: auto; ' valign='top' align='left'><a target='_top' href='{$url_site}/show.php?ads=$ab[id]&vu=$userRow[id]'><img border=0 src='$ab[img]' style=' width: 100%;  height: auto; '></a></td></tr><tr><td  style=' width: 100%;  height: auto; '  bgcolor='#0099ff'><a href='{$url_site}/report?banner={$ab['id']}' target='_blank'><img src='{$url_site}/templates/_panel/img/Alert-icon.png' alt='Report'></a><b style='color:#FFFFFF'> | </b><a class='attribution' href='{$url_site}?ref={$user}' target='_blank'><font style='font-size:12px; font-family:verdana,arial,sans-serif; line-height:13px;color:#FFFFFF; text-decoration:none' color='#FFFFFF'>&copy;{$title_s}</font></a></td></tr></table>";
      }else{
-           echo "<table border=0 cellpadding=0 cellspacing=0 width={$w_px}><tr><td width={$w_px} valign='top' align='left'><a target='_top' href='{$url_site}/show.php?ads=$ab[id]&vu=$userRow[id]'><img border=0 src='$ab[img]' width={$w_px} height={$hh_px}></a></td></tr><tr><td  width={$w_px} height=8  bgcolor='#0099ff'><a class='attribution' href='{$url_site}?ref={$user}' target='_blank'><font style='font-size:12px; font-family:verdana,arial,sans-serif; line-height:13px;color:#FFFFFF; text-decoration:none' color='#FFFFFF'>&copy;{$title_s}</font></a></td></tr></table>";
+           echo "<table border=0 cellpadding=0 cellspacing=0 width={$w_px}><tr><td width={$w_px} valign='top' align='left'><a target='_top' href='{$url_site}/show.php?ads=$ab[id]&vu=$userRow[id]'><img border=0 src='$ab[img]' width={$w_px} height={$hh_px}></a></td></tr><tr><td  width={$w_px} height=8  bgcolor='#0099ff'><a href='{$url_site}/report?banner={$ab['id']}' target='_blank'><img src='{$url_site}/templates/_panel/img/Alert-icon.png' alt='Report'></a><b style='color:#FFFFFF'> | </b><a class='attribution' href='{$url_site}?ref={$user}' target='_blank'><font style='font-size:12px; font-family:verdana,arial,sans-serif; line-height:13px;color:#FFFFFF; text-decoration:none' color='#FFFFFF'>&copy;{$title_s}</font></a></td></tr></table>";
 
      }
 

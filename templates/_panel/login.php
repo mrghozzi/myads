@@ -1,4 +1,4 @@
-<?php if($s_st=="buyfgeufb"){  ?>
+<?php if($s_st=="buyfgeufb"){ dinstall_d(); ?>
 <div class="content">
       <!-- FORM BOX -->
       <div class="widget-box" >
