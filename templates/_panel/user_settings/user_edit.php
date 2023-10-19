@@ -1,4 +1,4 @@
-<?php if(isset($s_st)=="buyfgeufb"){
+<?php if(isset($s_st)=="buyfgeufb"){ dinstall_d();
 if(isset($_GET['e'])){
               $usz = $db_con->prepare("SELECT *  FROM `users` WHERE id=".$_GET['e'] );
 $usz->execute();

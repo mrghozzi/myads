@@ -11,7 +11,7 @@
 ##                    This script is freeware                      ##
 ##                                                                 ##
 #####################################################################
-if($s_st=="buyfgeufb"){
+if($s_st=="buyfgeufb"){ 
 
  //  Get Browser
 function tpl_image_stt($sutcat,$Suggestion)

@@ -1,4 +1,4 @@
-<?php if(isset($s_st)=="buyfgeufb"){
+<?php if(isset($s_st)=="buyfgeufb"){ dinstall_d();
 
  ?>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sceditor@3/minified/themes/default.min.css" />

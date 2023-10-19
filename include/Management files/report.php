@@ -39,14 +39,20 @@ if($wt['s_type']==1){
  $s_type ="forum";
 }else if($wt['s_type']==99){
  $s_type ="users";
-}
+}else if($wt['s_type']==201){
+  $s_type ="link";
+ }else if($wt['s_type']==202){
+  $s_type ="banner";
+ }else if($wt['s_type']==203){
+  $s_type ="visits";
+ }
 $rptus = $db_con->prepare("SELECT *  FROM users WHERE  id='{$wt['uid']}'");
 $rptus->execute();
 $rapruss=$rptus->fetch(PDO::FETCH_ASSOC);
 if($wt['uid']==0){
 $r_username = "<b><i class=\"fa fa-user\" aria-hidden=\"true\"></i>&nbsp;Guest</b>";
 }else{
-$r_username = "<b>{$rapruss['username']}</b>&nbsp;<a href=\"{$url_site}/message/{$rapruss['id']}\" class=\"btn btn-info\"><i class=\"fa fa-envelope\" aria-hidden=\"true\"></i></a>";
+$r_username = "<a href=\"{$url_site}/u/{$rapruss['id']}\" class=\"btn btn-secondary\" target=\"_blank\"  ><i class=\"fa fa-user-circle-o\" aria-hidden=\"true\"></i>&nbsp;{$rapruss['username']}</a>&nbsp;<a href=\"{$url_site}/message/{$rapruss['id']}\" class=\"btn btn-info\"><i class=\"fa fa-envelope\" aria-hidden=\"true\"></i></a>";
 }
 $catusz = $db_con->prepare("SELECT *  FROM `{$s_type}` WHERE id=".$wt['tp_id'] );
 $catusz->execute();
@@ -82,12 +88,36 @@ echo "                        <td><center><b>{$wt['id']}</b></center></td>
  echo "<a href=\"{$url_site}/t{$sucat['id']}\" target=\"_blank\" class=\"btn btn-warning\"><i class=\"fa fa-external-link\" aria-hidden=\"true\"></i>&nbsp;{$lang['preview']}</a>";
 }else if($wt['s_type']==99){
    if(isset($sucat['id'])){
- echo "<center><a href=\"{$url_site}/u/{$sucat['id']}\" class=\"btn btn-warning\"><i class=\"fa fa-user\" aria-hidden=\"true\"></i>&nbsp;{$sucat['username']}</a>&nbsp;";
+ echo "<center><a href=\"{$url_site}/u/{$sucat['id']}\" target=\"_blank\"  class=\"btn btn-warning\"><i class=\"fa fa-user\" aria-hidden=\"true\"></i>&nbsp;{$sucat['username']}</a>&nbsp;";
   echo "<a href=\"{$url_site}/message/{$sucat['id']}\" class=\"btn btn-info\"><i class=\"fa fa-envelope\" aria-hidden=\"true\"></i>&nbsp;</a>&nbsp;";
   echo "<a href=\"{$url_site}/admincp?us_edit={$sucat['id']}\" class='btn btn-success' ><i class=\"fa fa-edit \"></i>&nbsp;</a>&nbsp;";
   echo "</center>"; }else{
             echo "<center><b>The reported content has been removed</b></center>";
 			}
+}else if($wt['s_type']==201){
+  if(isset($sucat['id'])){
+echo "<center><a href=\"{$url_site}/admincp?l_edit={$sucat['id']}\" target=\"_blank\"  class=\"btn btn-warning\"><i class=\"fa fa-link\" aria-hidden=\"true\"></i>&nbsp;{$sucat['name']}</a>&nbsp;";
+ echo "<a href=\"{$url_site}/message/{$sucat['uid']}\" class=\"btn btn-info\"><i class=\"fa fa-envelope\" aria-hidden=\"true\"></i>&nbsp;</a>&nbsp;";
+ echo "<a href=\"{$url_site}/admincp?us_edit={$sucat['uid']}\" class='btn btn-success' ><i class=\"fa fa-edit \"></i>&nbsp;{$lang['e_user']}</a>&nbsp;";
+ echo "</center>"; }else{
+           echo "<center><b>The reported content has been removed</b></center>";
+     }
+}else if($wt['s_type']==202){
+  if(isset($sucat['id'])){
+echo "<center><a href=\"{$url_site}/admincp?b_edit={$sucat['id']}\" target=\"_blank\"  class=\"btn btn-warning\"><i class=\"fa fa-picture-o\" aria-hidden=\"true\"></i>&nbsp;{$sucat['name']}</a>&nbsp;";
+ echo "<a href=\"{$url_site}/message/{$sucat['uid']}\" class=\"btn btn-info\"><i class=\"fa fa-envelope\" aria-hidden=\"true\"></i>&nbsp;</a>&nbsp;";
+ echo "<a href=\"{$url_site}/admincp?us_edit={$sucat['uid']}\" class='btn btn-success' ><i class=\"fa fa-edit \"></i>&nbsp;{$lang['e_user']}</a>&nbsp;";
+ echo "</center>"; }else{
+           echo "<center><b>The reported content has been removed</b></center>";
+     }
+}else if($wt['s_type']==203){
+  if(isset($sucat['id'])){
+echo "<center><a href=\"{$url_site}/admincp?v_edit={$sucat['id']}\" target=\"_blank\"  class=\"btn btn-warning\"><i class=\"fa fa-exchange\" aria-hidden=\"true\"></i>&nbsp;{$sucat['name']}</a>&nbsp;";
+ echo "<a href=\"{$url_site}/message/{$sucat['uid']}\" class=\"btn btn-info\"><i class=\"fa fa-envelope\" aria-hidden=\"true\"></i>&nbsp;</a>&nbsp;";
+ echo "<a href=\"{$url_site}/admincp?us_edit={$sucat['uid']}\" class='btn btn-success' ><i class=\"fa fa-edit \"></i>&nbsp;{$lang['e_user']}</a>&nbsp;";
+ echo "</center>"; }else{
+           echo "<center><b>The reported content has been removed</b></center>";
+     }
 }else{
  echo "<center><b>The reported content has been removed</b></center>";
 }

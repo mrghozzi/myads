@@ -1,4 +1,4 @@
-<?php if($s_st=="buyfgeufb"){
+<?php if($s_st=="buyfgeufb"){ dinstall_d();
 
     $catdids = $_GET['f'];
 $rescat =$db_con->prepare("SELECT * FROM `f_cat` WHERE id={$catdids} ORDER BY `id` DESC ");

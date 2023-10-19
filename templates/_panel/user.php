@@ -1,4 +1,4 @@
-<?php if(isset($s_st)=="buyfgeufb"){
+<?php if(isset($s_st)=="buyfgeufb"){ dinstall_d();
 if(isset($_COOKIE['user'])){ $my_user_1=$_COOKIE['user'];  }
 $usz = $db_con->prepare("SELECT *  FROM `users` WHERE id=:u_id");
 $usz->bindParam(":u_id", $usrRow['o_order']);

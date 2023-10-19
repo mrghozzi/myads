@@ -1,5 +1,5 @@
 <?php
-if($s_st=="buyfgeufb"){
+if($s_st=="buyfgeufb"){ dinstall_d();
   global $susat;
   $sutcat = $susat;
 $catusz = $db_con->prepare("SELECT *  FROM `forum` WHERE statu=1 AND  id=".$_GET['t'] );

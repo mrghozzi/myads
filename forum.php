@@ -16,7 +16,6 @@
 
 include "dbconfig.php";
 include "include/function.php";
-header('Content-type: text/html; charset=utf-8');
  if(isset($_GET['t'])){     //   Categories
   $get_cat=$_GET['t'];
   $catusz = $db_con->prepare("SELECT *  FROM `forum` WHERE statu=1 AND  id=".$_GET['t'] );
