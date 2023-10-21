@@ -181,9 +181,10 @@ $usz->bindParam(":u_id", $_GET['fl']);
 $usz->execute();
 $sus=$usz->fetch(PDO::FETCH_ASSOC);
  $title_page = $sus['username']." - Followers" ;
+
   template_mine('header');
- template_mine('follow');
- template_mine('footer');
+  template_mine('follow');
+  template_mine('footer');
  }else if((int)isset($_GET['fg'])){
   $usz = $db_con->prepare("SELECT *  FROM `users` WHERE id=:u_id");
 $usz->bindParam(":u_id", $_GET['fg']);
@@ -191,8 +192,8 @@ $usz->execute();
 $sus=$usz->fetch(PDO::FETCH_ASSOC);
  $title_page = $sus['username']." - Following" ;
   template_mine('header');
- template_mine('follow');
- template_mine('footer');
+  template_mine('follow');
+  template_mine('footer');
  }else if((int)isset($_GET['o'])){
 $usz = $db_con->prepare("SELECT *  FROM `users` WHERE id=:u_id");
 $usz->bindParam(":u_id", $_GET['o']);
