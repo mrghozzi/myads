@@ -252,16 +252,6 @@ $msgusid=$sus['id'];
         </div>
         <!-- /SECTION HEADER INFO -->
         <div class="grid">
-        <table class="table table-hover">
-						<thead>
-							<tr>
-                              <th>#ID</th>
-							  <th></th>
-                              <th>Username</th>
-							  <th>Time</th>
-                            </tr>
-						</thead>
-						<tbody>
 		<?php include_once('include/pagination.php');
  $page = (int)(!isset($_GET["page"]) ? 1 : $_GET["page"]);
 if ($page <= 0) $page = 1;
@@ -278,21 +268,12 @@ $catusen->execute();
 $catussen=$catusen->fetch(PDO::FETCH_ASSOC);
 $time_cmt=convertTime($wt['time_t']);
 if($catussen['id'] != ""){
-	
-echo "<tr>
-<td>#{$wt['id']}</td>
-  <td><a href=\"{$url_site}/u/{$catussen['id']}\"><img class=\"imgu-bordered-sm\" src=\"{$url_site}/{$catussen['img']}\" style=\"width: 35px;\" alt=\"user image\"></a></td>
-  <td><b><a href=\"{$url_site}/u/{$catussen['id']}\">{$catussen['username']}</a></b>";
-  online_us($catussen['id'])." "; check_us($catussen['id']);
-  echo"</td>
-  <td><a href=\"{$url_site}/u/{$catussen['id']}\">{$time_cmt}</a></td>
-</tr>";
+include "templates/_panel/users_templates/user_list.php";	
+
  } }$url=$url_site."/user?fl=".$_GET['fl']."&";
     echo pagination($statement,$per_page,$page,$url);
       ?>
-               </tbody>
-					</table>      
-		</div>	
+    </div>	
  </section>
 
 <?php }else if(isset($_GET['fg'])){
@@ -315,16 +296,7 @@ $msgusid=$sus['id'];
   </div>
   <!-- /SECTION HEADER INFO -->
   <div class="grid">
-  <table class="table table-hover">
-      <thead>
-        <tr>
-                        <th>#ID</th>
-          <th></th>
-                        <th>Username</th>
-          <th>Time</th>
-                      </tr>
-      </thead>
-      <tbody> 
+
 <?php include_once('include/pagination.php');
  $page = (int)(!isset($_GET["page"]) ? 1 : $_GET["page"]);
 if ($page <= 0) $page = 1;
@@ -341,19 +313,10 @@ $catusen->execute();
 $catussen=$catusen->fetch(PDO::FETCH_ASSOC);
 $time_cmt=convertTime($wt['time_t']);
 if($catussen['id'] != ""){
-echo "<tr>
-<td>#{$wt['id']}</td>
-  <td><a href=\"{$url_site}/u/{$catussen['id']}\"><img class=\"imgu-bordered-sm\" src=\"{$url_site}/{$catussen['img']}\" style=\"width: 35px;\" alt=\"user image\"></a></td>
-  <td><b><a href=\"{$url_site}/u/{$catussen['id']}\">{$catussen['username']}</a></b>";
-  online_us($catussen['id'])." "; check_us($catussen['id']);
-  echo"</td>
-  <td><a href=\"{$url_site}/u/{$catussen['id']}\">{$time_cmt}</a></td>
-</tr>";
+include "templates/_panel/users_templates/user_list.php";
  } }$url=$url_site."/user?fg=".$_GET['fg']."&";
     echo pagination($statement,$per_page,$page,$url);
-      ?>
-               </tbody>
-					</table>      
+      ?>    
 		</div>	
  </section>
 <?php }else{ echo "404"; }
