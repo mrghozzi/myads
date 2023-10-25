@@ -38,7 +38,7 @@
     <a href="<?php url_site();  ?>?fr">
       <img src="<?php url_site();  ?>/templates/_panel/img/fr.png" alt="">
       <div class="caption">
-        <p>Francais <br>par_absouini</p>
+        <p>Francais</p>
       </div>
     </a>
     </div>
