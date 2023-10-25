@@ -213,7 +213,25 @@ echo                   "</p>
               <!-- WIDGET BOX STATUS TEXT -->
               <p class="widget-box-status-text post_text<?php echo $sucat['id']; ?>">
               <div  class="textpost" id="post_form<?php echo $sucat['id']; ?>" >
-              <?php echo $comtxt ?>
+              <a class="video-status" href="<?php echo $url_site."/t".$sucat['id']; ?>" >
+                <div class="video-status-info" style="background-image: url(<?php echo $url_site; ?>/templates/_panel/img/background_topic.jpg);">
+                  <!--  STATUS TITLE -->
+                  <p class="video-status-title">
+                    <span class="bold"><?php echo $sucat['name']; ?></span> 
+                  </p>
+                  <!-- / STATUS TITLE -->
+
+                  <!--  STATUS META -->
+                  <p class="video-status-title" ><span class="highlighted">
+                    <svg class="menu-item-link-icon icon-forums">
+                     <use xlink:href="#svg-forums"></use>
+                    </svg>
+                    <?php echo $catussc['name']; ?></span>
+                  </p>
+                  <!-- / STATUS META -->
+                </div>
+                <!-- / STATUS INFO -->
+              </a>
               <div id="report<?php echo $sucat['id']; ?>" ></div>
               </div></p>
               <!-- /WIDGET BOX STATUS TEXT -->
