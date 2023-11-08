@@ -62,8 +62,7 @@ License URL: http://creativecommons.org/licenses/by/3.0/
 <link rel="stylesheet" href="<?php url_site();  ?>/templates/_panel/<?php echo $c_mode; ?>/dataTables.css">
 
  <!-- font-awesome icons -->
-<link href="<?php url_site();  ?>/templates/_panel/<?php echo $c_mode; ?>/font-awesome.css" rel="stylesheet">
-<link href="<?php url_site();  ?>/templates/_panel/<?php echo $c_mode; ?>/font-awesome.min.css" rel="stylesheet">
+<link href="https://use.fontawesome.com/releases/v6.4.2/css/all.css" rel="stylesheet">
 
 <!--webfonts-->
 <link href='//fonts.googleapis.com/css?family=Comfortaa:400,700,300' rel='stylesheet' type='text/css'>
