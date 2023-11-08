@@ -13,7 +13,6 @@
 #####################################################################
 
 
-
 include "dbconfig.php";
 include "include/function.php";
 $title_page = $lang['home'];
@@ -37,7 +36,7 @@ $title_page = $lang['home'];
            if(!isset($errMSG))
 		{
             $o_type  = "hest_pts";
-            $bn_desc = $le_name;
+            $bn_desc = "-".$le_name;
             if($le_type=="link"){
               $bn_name = "tostads";
               }else if($le_type=="banners"){

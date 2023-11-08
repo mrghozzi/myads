@@ -37,6 +37,7 @@ $catuss=$catus->fetch(PDO::FETCH_ASSOC);  ?>
                 <!-- USER STATUS AVATAR -->
                 <div class="user-status-avatar">
                   <!-- USER AVATAR -->
+                  <a href="<?php url_site();  ?>/u/<?php echo $catuss['id'];  ?>" >
                   <div class="user-avatar small no-outline <?php online_us($catuss['id']); ?>">
                     <!-- USER AVATAR CONTENT -->
                     <div class="user-avatar-content">
@@ -81,7 +82,7 @@ if(check_us($catuss['id'],1)==1){
                               }
 ?>
                 </div>
-
+                 </a>
                 <!-- /USER STATUS AVATAR -->
                  </div>
                 <!-- USER STATUS TITLE -->

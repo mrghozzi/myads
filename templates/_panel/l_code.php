@@ -52,27 +52,23 @@ $extensions_code = $abextensions['o_valuer'];
               <!-- SOCIAL LINK -->
               <a class="social-link small facebook" href="https://www.facebook.com/sharer/sharer.php?u=<?php ref_url(); ?>" target="_blank" >
                 <!-- SOCIAL LINK ICON -->
-                <svg class="social-link-icon icon-facebook">
-                  <use xlink:href="#svg-facebook"></use>
-                </svg>
+                <i class="fa-brands fa-facebook-f" style="color: #ffffff;"></i>
                 <!-- /SOCIAL LINK ICON -->
               </a>
               <!-- /SOCIAL LINK -->
 
               <!-- SOCIAL LINK -->
-              <a class="social-link small twitter" href="https://twitter.com/home?status=<?php title_site(''); echo"&nbsp;"; ref_url(); ?>" target="_blank" >
+              <a class="social-link small" href="https://twitter.com/intent/tweet?text=<?php title_site(''); echo"&url="; ref_url(); ?>" style="background-color: #011a24;" target="_blank" >
                 <!-- SOCIAL LINK ICON -->
-                <svg class="social-link-icon icon-twitter">
-                  <use xlink:href="#svg-twitter"></use>
-                </svg>
+                <i class="fa-brands fa-x-twitter" style="color: #ffffff;"></i>
                 <!-- /SOCIAL LINK ICON -->
               </a>
               <!-- /SOCIAL LINK -->
 
               <!-- SOCIAL LINK -->
-              <a class="social-link small youtube" href="https://www.wasp.gq/sharer?url=<?php title_site(''); echo"&nbsp;"; ref_url(); ?>" target="_blank" >
+              <a class="social-link small" href="https://www.wasp.gq/sharer?url=<?php title_site(''); echo"&nbsp;"; ref_url(); ?>" style="background-color: #1f48ec;" target="_blank" >
                 <!-- SOCIAL LINK ICON -->
-                <i class="fa fa-wikipedia-w" aria-hidden="true" style="color: #fff;" ></i>
+                <i class="fa-brands fa-weebly" style="color: #ffffff;"></i>
                 <!-- /SOCIAL LINK ICON -->
               </a>
               <!-- /SOCIAL LINK -->
