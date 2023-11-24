@@ -2,11 +2,11 @@
 
 #####################################################################
 ##                                                                 ##
-##                        My ads v3.0.5(+)                         ##
-##                     http://www.krhost.ga                        ##
+##                        My ads v3.1.x                            ##
+##                     http://www.adstn.gq                         ##
 ##                   e-mail: admin@krhost.ga                       ##
 ##                                                                 ##
-##                       copyright (c) 2023                        ##
+##                       copyright © 2023                          ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
@@ -210,11 +210,7 @@ echo                 " </div>
                         <p class=\"user-status-title medium\">";
                         if($sucat['uid']==0){ echo "<a class=\"bold\" \">Guest</a>"; }
                         else{ echo "<a class=\"bold\" href=\"{$url_site}/u/{$catuss['id']}\">".$catuss['username']."</a>"; }
-echo                   "&nbsp;{$lang['create_a']}
-                        &nbsp;<span class=\"bold\"><a href=\"{$url_site}/dr{$sucat['id']}\">{$lang['link']}</a></span>
-                        &nbsp;{$lang['on_i']}
-                        &nbsp;<a href=\"{$url_site}/cat/{$catussc['id']}\" color=\"#23d2e2\"><i class=\"fa fa-tag\" aria-hidden=\"true\"></i>&nbsp;{$catussc['name']}</a>
-                        </p>
+echo                   "</p>
                         <!-- /USER STATUS TITLE -->
 
                         <!-- USER STATUS TEXT -->
@@ -238,17 +234,15 @@ echo                   "</p>
               <!-- /WIDGET BOX STATUS TEXT -->
 
               <!-- LINK STATUS BOX -->
-              <a class="video-status" href="<?php echo $dir_lnk_hash; ?>" target="_blank">
+              <a class="video-status small" href="<?php echo $dir_lnk_hash; ?>" style="background-color: #efeff9;" target="_blank">
                 <!-- LINK STATUS IMAGE -->
-                <img class="video-status-image" src="https://mini.site-shot.com/800x400/800/png/?<?php echo $sdf; ?>">
+                <figure class="video-status-image liquid" >
+                  <img class="video-status-image" src="<?php echo $url_site; ?>/templates/_panel/img/dir_link.png">
+                </figure>
                 <!-- /LINK STATUS IMAGE -->
 
                 <!-- LINK STATUS INFO -->
-                <div class="video-status-info">
-                  <!-- LINK STATUS META -->
-                  <p class="video-status-meta"><i class="fa fa-eye" aria-hidden="true"></i>&nbsp;<?php echo $sucat['vu']; ?></p>
-                  <!-- /LINK STATUS META -->
-
+                <div class="video-status-info" style="background-color: #efeff9;" >
                   <!-- LINK STATUS TITLE -->
                   <p class="video-status-title"><span class="bold"><?php echo $sucat['name']; ?></span></p>
                   <!-- /LINK STATUS TITLE -->
@@ -260,6 +254,22 @@ echo                   "</p>
                 <!-- /LINK STATUS INFO -->
               </a>
               <!-- LINK STATUS BOX -->
+
+              <!--  TAG LIST  -->
+              <div class="tag-list">
+                <!-- LINK STATUS META -->
+                <p class="text-sticker meta-line-link" ><i class="fa fa-eye" aria-hidden="true"></i>&nbsp;<?php echo $sucat['vu']; ?></p>
+                
+                <!-- /LINK STATUS META -->
+                <!-- TAG TITLE -->
+                <a class="tag-item secondary" href="<?php echo $url_site; ?>/dr<?php echo $sucat['id']; ?>"><?php echo $sucat['name']; ?></a>
+                <!-- /TAG TITLE -->
+                
+                <!-- TAG ITEM -->
+                <a class="tag-item secondary" href="<?php echo "{$url_site}/cat/{$catussc['id']}"; ?>"><?php echo $catussc['name']; ?></a>
+                <!-- /TAG ITEM -->
+              </div>
+              <!-- / TAG LIST  -->
 
               <!-- CONTENT ACTIONS -->
               <div class="content-actions">
