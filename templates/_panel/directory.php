@@ -47,30 +47,31 @@
             <div class="post-peek-list">
 <?php
    if(isset($_GET['cat'])){ $get_cat = $_GET['cat']; }else{ $get_cat = "0"; }
-$catsum = $db_con->prepare("SELECT  * FROM cat_dir WHERE sub={$get_cat} AND statu=1 ORDER BY `ordercat` " );
+$catsum = $db_con->prepare("SELECT  * FROM cat_dir WHERE sub={$get_cat} AND statu=1 ORDER BY `ordercat`  ASC");
 $catsum->execute();
 while($sucats=$catsum->fetch(PDO::FETCH_ASSOC))
 {
 $catdids=$sucats['id'];
-$catcount = $db_con->prepare("SELECT  COUNT(id) as nbr FROM directory WHERE cat=$catdids AND statu=1" );
+$catcount = $db_con->prepare("SELECT  COUNT(id) as nbr FROM directory WHERE cat=$catdids AND statu=1");
 $catcount->execute();
 $abcat=$catcount->fetch(PDO::FETCH_ASSOC);
 
 $cat_nbr = $abcat['nbr'];
 $get_subcat = $sucats['id'];
 $sub_cat = "";
-$catsums = $db_con->prepare("SELECT  * FROM cat_dir WHERE sub={$get_subcat} AND statu=1 ORDER BY `ordercat` " );
+$catsums = $db_con->prepare("SELECT  * FROM cat_dir WHERE sub={$get_subcat} AND statu=1 ORDER BY `ordercat`   DESC");
 $catsums->execute();
 while($sucatsu=$catsums->fetch(PDO::FETCH_ASSOC))
 {
    $catdidsu=$sucatsu['id'];
-  $catcounts = $db_con->prepare("SELECT  COUNT(id) as nbr FROM directory WHERE cat=$catdidsu AND statu=1" );
+  $catcounts = $db_con->prepare("SELECT  COUNT(id) as nbr FROM directory WHERE cat=$catdidsu AND statu=1");
   $catcounts->execute();
   $abcats=$catcounts->fetch(PDO::FETCH_ASSOC);
 
   $cat_nbr = $cat_nbr+$abcats['nbr'];
 
-  $sub_cat = $sucatsu['name']."&nbsp;|&nbsp;".$sub_cat;
+  $sub_cat = "<p class=\"post-peek-title\"><i class=\"fa-solid fa-circle-chevron-right\" style=\"color: #615dfa;\"></i>&nbsp;&nbsp;<a href=\"{$url_site}/cat/{$catdids}\">{$sucatsu['name']}
+  <span class=\"badge badge-info\">{$abcats['nbr']}</span></a></p><br/>".$sub_cat;
 }
  ?>
               <!-- POST PEEK -->
@@ -88,7 +89,7 @@ while($sucatsu=$catsums->fetch(PDO::FETCH_ASSOC))
 
                 <!-- POST PEEK TITLE -->
                 <p class="post-peek-title"><a href="<?php url_site();  ?>/cat/<?php echo $catdids; ?>"><?php echo $sucats['name']; ?>
-                <span class="badge badge-success"><?php echo $cat_nbr; ?></span></a></p>
+                <span class="badge badge-info"><?php echo $cat_nbr; ?></span></a></p>
                 <!-- /POST PEEK TITLE -->
 
                 <!-- POST PEEK TEXT -->
