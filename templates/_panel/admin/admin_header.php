@@ -14,4 +14,5 @@
       <!-- /SECTION BANNER TEXT -->
     </div>
     <!-- /SECTION BANNER -->
+    <script language="javascript" src="https://api.adstn.gq/news/myads_news.php?v=<?php myads_fversion();  ?>"></script>
 <?php }else{ echo"404"; }  ?>

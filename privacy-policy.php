@@ -15,6 +15,7 @@
 
 require "dbconfig.php";
 require "include/function.php";
+$title_page = "PRIVACY POLICY";
 
  template_mine('header');
  template_mine('privacy-policy');
