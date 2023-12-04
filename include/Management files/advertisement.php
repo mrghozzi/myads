@@ -34,12 +34,10 @@ $ads_name[3] ="Header Exchange";
 $ads_name[4] ="Forum";
 $ads_name[5] ="Topic";
 $ads_name[6] ="Footer";
-echo "<form id=\"defaultForm\" method=\"post\" class=\"form-horizontal\" action=\"admincp?e_ads={$wt['id']}\">
-  <tr>
-  <td><center><h3>{$ads_name[$ads_id]}</h3></center><br />
+echo "<form id=\"defaultForm\" method=\"post\" action=\"admincp?e_ads={$wt['id']}\">
+  <center><h3>{$ads_name[$ads_id]}</h3></center><br />
   <textarea id=\"code{$ads_id}\" name=\"code_ads\" class=\"form-control\"  >{$wt['code_ads']}</textarea><br />
- <center> <button type=\"submit\" name=\"ed_submit\" value=\"ed_submit\" class=\"btn btn-success\"><i class=\"fa fa-edit \"></i></button></center></td>
-</tr>
+ <center> <button type=\"submit\" name=\"ed_submit\" value=\"ed_submit\" class=\"btn btn-success\"><i class=\"fa fa-edit \"></i></button></center>
 </form> ";
  echo "<script type='text/javascript' src='{$url_site}/templates/_panel/js/codemirror.js'></script>
 <script>

@@ -6,8 +6,10 @@
                    $last_time_updates=substr($last_time_updates,0,5);
                     if($last_time_updates==$versionRow['o_valuer']){
                      $last_time_updates = $last_time_updates."&nbsp;<a href=\"{$url_site}/admincp?updates\" ><i class=\"fa fa-refresh\"></i></a>";
+                     $last_time_updates_bg = " ";
                    }else{
-                     $last_time_updates = $last_time_updates."&nbsp;<a href=\"{$url_site}/admincp?updates\" class=\"btn btn-info\"><i class=\"fa fa-download\"></i></a>";
+                     $last_time_updates = $last_time_updates."&nbsp;<a href=\"{$url_site}/admincp?updates\" class=\"btn btn-primary\"><i class=\"fa fa-download\"></i></a>";
+                     $last_time_updates_bg = "bg-warning";
                    }  
 
 ?>
@@ -265,7 +267,8 @@
 
 </div>
 <div class="grid-column" >
-  <div class="widget-box">
+
+  <div class="btn-group-vertical">
      <a href="<?php url_site();  ?>/admincp?report" class="btn btn-primary" >Report
       <span class="badge badge-light">
         <?php $catcount = $db_con->prepare("SELECT  COUNT(id) as nbr FROM report WHERE statu=1" );
@@ -276,12 +279,13 @@
       </span>
     </a>
         <?php if(isset($_GET['sitemap'])){  ?>
-    <a href="<?php echo $url_site;  ?>/sitemap" class="btn btn-info" ><b>Sitemap</b></a>
-    <a href="<?php echo $url_site;  ?>/sitemap.xml" class="btn btn-warning" target="_blank">/sitemap.xml&nbsp;<b><i class="fa fa-external-link" ></i></b></a>
+    <a href="<?php echo $url_site;  ?>/sitemap" class="btn btn-danger" ><b>Sitemap</b></a>
+    <a href="<?php echo $url_site;  ?>/sitemap.xml" class="btn btn-dark" target="_blank">/sitemap.xml&nbsp;<b><i class="fa fa-external-link" ></i></b></a>
         <?php }else{  ?>
-    <a href="<?php echo $url_site;  ?>/sitemap" class="btn btn-info" ><b>Sitemap</b></a>
+    <a href="<?php echo $url_site;  ?>/sitemap" class="btn btn-success" ><b>Sitemap</b></a>
          <?php } ?>
     <a href="https://github.com/mrghozzi/myads/wiki/changelogs" class="btn btn-warning" target="_blank">Changelogs&nbsp;<b><i class="fa fa-external-link" ></i></b></a>
+    
   </div>
   <div class="widget-box">
         <div class="widget-box-content no-margin-top">
@@ -306,7 +310,7 @@
                 </div>
 							</div>
 						</div>
-            <div class="table-body">
+            <div class="table-body <?php echo $last_time_updates_bg; ?>">
 							<div class="table-row tiny">
                 <div class="table-header-column textpost">
                    <center>Latest version : <?php echo $last_time_updates; ?></center>
