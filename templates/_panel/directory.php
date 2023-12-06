@@ -35,10 +35,18 @@
           </div>
           <!-- /WIDGET BOX CONTENT -->
        </div>
+<?php 
+      if(isset($_GET['cat'])){ $get_cat = $_GET['cat']; }else{ $get_cat = "0"; }
+      $wcatcount = $db_con->prepare("SELECT  COUNT(id) as nbr FROM cat_dir WHERE sub={$get_cat} AND statu=1");
+      $wcatcount->execute();
+      $wabcat=$wcatcount->fetch(PDO::FETCH_ASSOC);
+      $wcat_nbr = $wabcat['nbr'];
+      if(isset($wcat_nbr) AND ($wcat_nbr>=1)){
+      ?>     
        <div class="widget-box">
 
           <!-- WIDGET BOX TITLE -->
-          <p class="widget-box-title"><h4><?php lang('cat_s');  ?></h4></p>
+          <p class="widget-box-title"><h4><?php lang('cat_s'); ?></h4></p>
           <!-- /WIDGET BOX TITLE -->
 
           <!-- WIDGET BOX CONTENT -->
@@ -46,7 +54,6 @@
             <!-- POST PEEK LIST -->
             <div class="post-peek-list">
 <?php
-   if(isset($_GET['cat'])){ $get_cat = $_GET['cat']; }else{ $get_cat = "0"; }
 $catsum = $db_con->prepare("SELECT  * FROM cat_dir WHERE sub={$get_cat} AND statu=1 ORDER BY `ordercat`  ASC");
 $catsum->execute();
 while($sucats=$catsum->fetch(PDO::FETCH_ASSOC))
@@ -103,6 +110,7 @@ while($sucatsu=$catsums->fetch(PDO::FETCH_ASSOC))
           </div>
           <!-- /WIDGET BOX CONTENT -->
        </div>
+<?php } ?>      
 <?php widgets(5); ?>       
 </div>
 <div class="grid-column" >
