@@ -2,22 +2,23 @@
 
 #####################################################################
 ##                                                                 ##
-##                        MYads  v3.x.x                            ##
-##                     http://www.krhost.ga                        ##
-##                   e-mail: admin@krhost.ga                       ##
+##                        MYads  v3.1.x                            ##
+##                     https://www.adstn.gq                        ##
+##                    e-mail: admin@adstn.gq                       ##
 ##                                                                 ##
-##                       copyright (c) 2022                        ##
+##                       copyright (c) 2024                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
 #####################################################################
 
 include "dbconfig.php";
- if($_GET['ads'])
+include "include/function.php";
+ if(isset($_GET['ads'])  AND is_numeric($_GET['ads']))
  {
 $bn= $_GET['ads'];
 
-    if($_GET['vu'])
+    if(isset($_GET['vu'])  AND is_numeric($_GET['vu']))
 	{
 
     $query = $db_con->prepare("SELECT * FROM banner WHERE id=".$bn);
@@ -54,14 +55,19 @@ $bn= $_GET['ads'];
             $stmsb->bindParam(":ptag", $bn_ag);
             $stmsb->bindParam(":bn_ip", $bn_ip);
          	if($stmsb->execute()){ }
+          if(isset($banner['url'])){
+           @header("Location: {$banner['url']}");
+          }else{
+            @header("Location: {$url_site}/404") ; 
+          }
+ }else{
+           @header("Location: {$url_site}/404") ; 
  }
-  @header("Location: {$banner['url']}");
-   }
- if($_GET['link'])
- {
+  
+   }else if(isset($_GET['link'])  AND is_numeric($_GET['link'])){
 $bn= $_GET['link'];
 
-    if($_GET['clik'])
+    if(isset($_GET['clik'])  AND is_numeric($_GET['clik']))
 	{
 
     $query = $db_con->prepare("SELECT * FROM link WHERE id=".$bn);
@@ -97,8 +103,17 @@ $bn= $_GET['link'];
             $stmsb->bindParam(":ptag", $bn_ag);
             $stmsb->bindParam(":bn_ip", $bn_ip);
          	if($stmsb->execute()){ }
-         }
-  @header("Location: {$link['url']}");
-   }
+          @header("Location: {$link['url']}");
+          if(isset($link['url'])){
+            @header("Location: {$link['url']}");
+           }else{
+             @header("Location: {$url_site}/404") ; 
+           }
+      }else{
+          @header("Location: {$url_site}/404") ; 
+      }
+ }else{
+  @header("Location: {$url_site}/404") ; 
+}
 
 ?>

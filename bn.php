@@ -2,11 +2,11 @@
 
 #####################################################################
 ##                                                                 ##
-##                        MYads  v3.x.x                            ##
-##                     http://www.krhost.ga                        ##
-##                   e-mail: admin@krhost.ga                       ##
+##                        MYads  v3.1.x                            ##
+##                     https://www.adstn.gq                        ##
+##                    e-mail: admin@adstn.gq                       ##
 ##                                                                 ##
-##                       copyright (c) 2023                        ##
+##                       copyright (c) 2024                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
@@ -16,11 +16,11 @@ include "include/function.php";
 $user= $_GET['ID'];
 $b_px= $_GET['px'];
 
-  if($b_px=="728"){  $w_px =728; $h_px =90; $hh_px=$h_px-10; $d_px =$w_px."x".$h_px; }
-  if($b_px=="300"){  $w_px =300; $h_px =250; $hh_px=$h_px-10; $d_px =$w_px."x".$h_px; }
-  if($b_px=="160"){  $w_px =160; $h_px =600; $hh_px=$h_px-10; $d_px =$w_px."x".$h_px; }
-  if($b_px=="468"){  $w_px =468; $h_px =60; $hh_px=$h_px-10; $d_px =$w_px."x".$h_px; }
-  if($b_px=="responsive"){  $if_rand = rand(0, 3);   $if_type = 1;
+  if($b_px=="728"){  $w_px =728; $h_px =90; $hh_px=$h_px-10; $d_px =$w_px."x".$h_px; 
+  }else if($b_px=="300"){  $w_px =300; $h_px =250; $hh_px=$h_px-10; $d_px =$w_px."x".$h_px; 
+  }else if($b_px=="160"){  $w_px =160; $h_px =600; $hh_px=$h_px-10; $d_px =$w_px."x".$h_px; 
+  }else if($b_px=="468"){  $w_px =468; $h_px =60; $hh_px=$h_px-10; $d_px =$w_px."x".$h_px; 
+  }else if($b_px=="responsive"){  $if_rand = rand(0, 3);   $if_type = 1;
                   if(isset($if_rand) AND ($if_rand==0)){
                      $w_px =468; $h_px =60; $hh_px=$h_px-10; $d_px =$w_px."x".$h_px;
                   }else if(isset($if_rand) AND ($if_rand==1)){
@@ -30,10 +30,10 @@ $b_px= $_GET['px'];
                   }else if(isset($if_rand) AND ($if_rand==3)){
                      $w_px =728; $h_px =90; $hh_px=$h_px-10; $d_px =$w_px."x".$h_px;
                   }
-                         }
+}
 
-
-    $stt = $db_con->prepare("SELECT *FROM users where  id=:id " );
+if(isset($w_px) AND is_numeric($user)){
+    $stt = $db_con->prepare("SELECT * FROM users where  id=:id " );
      $stt->execute(array(':id'=>$user));
      $userRow=$stt->fetch(PDO::FETCH_ASSOC);
        $ids  = $userRow['id'] ;
@@ -55,10 +55,9 @@ $b_px= $_GET['px'];
   if (isset($ab['id']))
 {
      if(isset($if_type) AND ($if_type==1)){
-           echo "<table style=' width: 100%;  height: auto; '><tr><tdstyle=' width: 100%;  height: auto; ' valign='top' align='left'><a target='_top' href='{$url_site}/show.php?ads=$ab[id]&vu=$userRow[id]'><img border=0 src='$ab[img]' alt='$ab[name]' style=' width: 100%;  height: auto; '></a></td></tr><tr><td  style=' width: 100%;  height: auto; '  bgcolor='#0099ff'><a href='{$url_site}/report?banner={$ab['id']}' target='_blank'><img src='{$url_site}/templates/_panel/img/Alert-icon.png' alt='Report'></a><b style='color:#FFFFFF'> | </b><a class='attribution' href='{$url_site}?ref={$user}' target='_blank'><font style='font-size:12px; font-family:verdana,arial,sans-serif; line-height:13px;color:#FFFFFF; text-decoration:none' color='#FFFFFF'>&copy;{$title_s}</font></a></td></tr></table>";
+           echo "<style>.banner_r_$ab[id] {background-image: url('$ab[img]');height: {$hh_px}px;width: {$w_px}px;background-size: cover;background-position: center;position: relative;}.banner_r_$ab[id] a {display: block;height: 100%;width: 100%;text-decoration: none;}.banner_r_icon_$ab[id] {position: absolute;top: 0;left: 0;padding: 5px;color: white;background-color: rgba(0, 0, 0, 0.5);}@media screen and (max-width: 728px) {.banner_r_$ab[id] {width: 100%;}}</style><div class='banner_r_$ab[id]'><a href='{$url_site}/show.php?ads=$ab[id]&vu=$userRow[id]' target='_blank'><div class='banner_r_icon_$ab[id]'><a href='{$url_site}?ref={$user}' target='_blank'><img src='{$url_site}/bnr/logo_w.png' width='16' height='16' alt='{$title_s}'></a><a href='{$url_site}/report?banner={$ab['id']}' target='_blank'><img src='{$url_site}/templates/_panel/img/Alert-icon.png' alt='Report'></a></div></a></div>";
      }else{
-           echo "<table border=0 cellpadding=0 cellspacing=0 width={$w_px}><tr><td width={$w_px} valign='top' align='left'><a target='_top' href='{$url_site}/show.php?ads=$ab[id]&vu=$userRow[id]'><img border=0 src='$ab[img]' alt='$ab[name]' width={$w_px} height={$hh_px}></a></td></tr><tr><td  width={$w_px} height=8  bgcolor='#0099ff'><a href='{$url_site}/report?banner={$ab['id']}' target='_blank'><img src='{$url_site}/templates/_panel/img/Alert-icon.png' alt='Report'></a><b style='color:#FFFFFF'> | </b><a class='attribution' href='{$url_site}?ref={$user}' target='_blank'><font style='font-size:12px; font-family:verdana,arial,sans-serif; line-height:13px;color:#FFFFFF; text-decoration:none' color='#FFFFFF'>&copy;{$title_s}</font></a></td></tr></table>";
-
+           echo "<style>.banner_$ab[id] {background-image: url('$ab[img]');height: {$hh_px}px;width: {$w_px}px;background-size: cover;background-position: center;position: relative;}.banner_$ab[id] a {display: block;height: 100%;width: 100%;text-decoration: none;}.banner_icon_$ab[id] {position: absolute;top: 0;left: 0;padding: 5px;color: white;background-color: rgba(0, 0, 0, 0.5);}@media screen and (max-width: {$w_px}px) {.banner_$ab[id] {width: 100%;}}</style><div class='banner_$ab[id]'><a href='{$url_site}/show.php?ads=$ab[id]&vu=$userRow[id]' target='_blank'><div class='banner_icon_$ab[id]'><a href='{$url_site}?ref={$user}' target='_blank'><img src='{$url_site}/bnr/logo_w.png' width='16' height='16' alt='{$title_s}'></a><a href='{$url_site}/report?banner={$ab['id']}' target='_blank'><img src='{$url_site}/templates/_panel/img/Alert-icon.png' alt='Report'></a></div></a></div>";
      }
 
  	  $ids = $ab['id'];
@@ -93,22 +92,21 @@ $b_px= $_GET['px'];
 }
 else
 {
- if(isset($if_type) AND ($if_type==1)){
-           echo "<table style=' width: 100%;  height: auto; '><tr><td style=' width: 100%;  height: auto; ' valign='top' align='left'><a target='_top' href='{$url_site}?ref={$user}'><img border=0 src='{$url_site}/bnr/{$d_px}.gif' alt='{$title_s}' style=' width: 100%;  height: auto; ' ></a></td></tr><tr><td  style=' width: 100%;  height: auto; '  bgcolor='#0099ff'><a class='attribution' href='{$url_site}?ref={$user}' target='_blank'><font style='font-size:12px; font-family:verdana,arial,sans-serif; line-height:13px;color:#FFFFFF; text-decoration:none' color='#FFFFFF'>&copy;{$title_s}</font></a></td></tr></table>";
+   if(isset($if_type) AND ($if_type==1)){
+      echo "<style>.banner_r_$ab[id] {background-image: url('{$url_site}/bnr/{$d_px}.gif');height: {$hh_px}px;width: {$w_px}px;background-size: cover;background-position: center;position: relative;}.banner_r_$ab[id] a {display: block;height: 100%;width: 100%;text-decoration: none;}.banner_r_icon_$ab[id] {position: absolute;top: 0;left: 0;padding: 5px;color: white;background-color: rgba(0, 0, 0, 0.5);}@media screen and (max-width: 728px) {.banner_r_$ab[id] {width: 100%;}}</style><div class='banner_r_$ab[id]'><a href='{$url_site}?ref={$user}' target='_blank'><div class='banner_r_icon_$ab[id]'><a href='{$url_site}?ref={$user}' target='_blank'><img src='{$url_site}/bnr/logo_w.png' width='16' height='16' alt='{$title_s}'></a></div></a></div>";
      }else{
-           echo "<table border=0 cellpadding=0 cellspacing=0 width={$w_px}><tr><td width={$w_px} valign='top' align='left'><a target='_top' href='{$url_site}?ref={$user}'><img border=0 src='{$url_site}/bnr/{$d_px}.gif' alt='{$title_s}' width={$w_px} height={$hh_px} ></a></td></tr><tr><td  width={$w_px} height=8  bgcolor='#0099ff'><a class='attribution' href='{$url_site}?ref={$user}' target='_blank'><font style='font-size:12px; font-family:verdana,arial,sans-serif; line-height:13px;color:#FFFFFF; text-decoration:none' color='#FFFFFF'>&copy;{$title_s}</font></a></td></tr></table>";
-
-     }
+      echo "<style>.banner_$ab[id] {background-image: url('{$url_site}/bnr/{$d_px}.gif');height: {$hh_px}px;width: {$w_px}px;background-size: cover;background-position: center;position: relative;}.banner_$ab[id] a {display: block;height: 100%;width: 100%;text-decoration: none;}.banner_icon_$ab[id] {position: absolute;top: 0;left: 0;padding: 5px;color: white;background-color: rgba(0, 0, 0, 0.5);}@media screen and (max-width: {$w_px}px) {.banner_$ab[id] {width: 100%;}}</style><div class='banner_$ab[id]'><a href='{$url_site}?ref={$user}' target='_blank'><div class='banner_icon_$ab[id]'><a href='{$url_site}?ref={$user}' target='_blank'><img src='{$url_site}/bnr/logo_w.png' width='16' height='16' alt='{$title_s}'></a></div>";
+     }     
 }
 
   }else
 {
   if(isset($if_type) AND ($if_type==1)){
-           echo "<table style=' width: 100%;  height: auto; '><tr><td style=' width: 100%;  height: auto; ' valign='top' align='left'><a target='_top' href='{$url_site}?ref={$user}'><img border=0 src='{$url_site}/bnr/{$d_px}.gif' alt='{$title_s}' style=' width: 100%;  height: auto; ' ></a></td></tr><tr><td  style=' width: 100%;  height: auto; '  bgcolor='#0099ff'><a class='attribution' href='{$url_site}?ref={$user}' target='_blank'><font style='font-size:12px; font-family:verdana,arial,sans-serif; line-height:13px;color:#FFFFFF; text-decoration:none' color='#FFFFFF'>&copy;{$title_s}</font></a></td></tr></table>";
-     }else{
-           echo "<table border=0 cellpadding=0 cellspacing=0 width={$w_px}><tr><td width={$w_px} valign='top' align='left'><a target='_top' href='{$url_site}?ref={$user}'><img border=0 src='{$url_site}/bnr/{$d_px}.gif' alt='{$title_s}' width={$w_px} height={$hh_px} ></a></td></tr><tr><td  width={$w_px} height=8  bgcolor='#0099ff'><a class='attribution' href='{$url_site}?ref={$user}' target='_blank'><font style='font-size:12px; font-family:verdana,arial,sans-serif; line-height:13px;color:#FFFFFF; text-decoration:none' color='#FFFFFF'>&copy;{$title_s}</font></a></td></tr></table>";
-
-     }
+    echo "<style>.banner_r_$ab[id] {background-image: url('{$url_site}/bnr/{$d_px}.gif');height: {$hh_px}px;width: {$w_px}px;background-size: cover;background-position: center;position: relative;}.banner_r_$ab[id] a {display: block;height: 100%;width: 100%;text-decoration: none;}.banner_r_icon_$ab[id] {position: absolute;top: 0;left: 0;padding: 5px;color: white;background-color: rgba(0, 0, 0, 0.5);}@media screen and (max-width: 728px) {.banner_r_$ab[id] {width: 100%;}}</style><div class='banner_r_$ab[id]'><a href='{$url_site}?ref={$user}' target='_blank'><div class='banner_r_icon_$ab[id]'><a href='{$url_site}?ref={$user}' target='_blank'><img src='{$url_site}/bnr/logo_w.png' width='16' height='16' alt='{$title_s}'></a></div></a></div>";
+   }else{
+    echo "<style>.banner_$user {background-image: url('{$url_site}/bnr/{$d_px}.gif');height: {$hh_px}px;width: {$w_px}px;background-size: cover;background-position: center;position: relative;}.banner_$user a {display: block;height: 100%;width: 100%;text-decoration: none;}.banner_icon_$user {position: absolute;top: 0;left: 0;padding: 5px;color: white;background-color: rgba(0, 0, 0, 0.5);}@media screen and (max-width: {$w_px}px) {.banner_$user {width: 100%;}}</style><div class='banner_$user'><a href='{$url_site}?ref={$user}' target='_blank'><div class='banner_icon_$user'><a href='{$url_site}?ref={$user}' target='_blank'><img src='{$url_site}/bnr/logo_w.png' width='16' height='16' alt='{$title_s}'></a></div>";
+    }
 }
  echo "\");";
+}
 ?>

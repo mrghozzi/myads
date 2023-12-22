@@ -2,11 +2,11 @@
 
 #####################################################################
 ##                                                                 ##
-##                        MYads  v3.x.x                            ##
-##                     http://www.krhost.ga                        ##
-##                   e-mail: admin@krhost.ga                       ##
+##                        MYads  v3.1.x                            ##
+##                     https://www.adstn.gq                        ##
+##                    e-mail: admin@adstn.gq                       ##
 ##                                                                 ##
-##                       copyright (c) 2023                        ##
+##                       copyright (c) 2024                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
@@ -29,8 +29,9 @@ $startpoint = ($page * $per_page) - $per_page;
 $stt_time_go=time();
 $stt_time_dw=time()-(7 * 24 * 60 * 60);
 
-if(isset($_GET['tag'] )){
+if(isset($_GET['tag'] )){  
 $tagkdsfh="#".$_GET['tag'];
+$tagkdsfh=preg_replace("/\'/", "&prime;", $tagkdsfh);
 $statement = "`status`
 WHERE (
  (  tp_id
@@ -43,6 +44,7 @@ WHERE (
 ORDER BY `date` DESC";
 }else if(isset($_GET['search'] )){
 $tagkdsfh = $_GET['search'];
+$tagkdsfh=preg_replace("/\'/", "&prime;", $tagkdsfh);
 $statement = "`status`
 WHERE (
  (  tp_id
@@ -53,7 +55,11 @@ WHERE (
    AND ( s_type=2 OR s_type=4 OR s_type=100 OR s_type=7867 ) )  )
    AND date<={$stt_time_go}
 ORDER BY `date` DESC";
-}else if(isset ($_COOKIE['user']) AND  !isset($_COOKIE['admin'])){
+}else if(isset($_COOKIE['user']) AND  isset($_GET['all'] )){
+  $tabitem_portal = "all";
+  $statement = "`status` WHERE date<={$stt_time_go} ORDER BY `date` DESC";
+}else if(isset($_COOKIE['user'])){
+  $tabitem_portal = "me";
   $my_user_1=$uRow['id'];
 $statement = "`status`
 WHERE ( uid

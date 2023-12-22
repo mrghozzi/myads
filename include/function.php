@@ -430,6 +430,19 @@ $bnwidgets->bindParam(":o_parent", $bn_plas);
 $bnwidgets->bindParam(":o_type", $o_type);
 $bnwidgets->execute();
 while($abwidgets=$bnwidgets->fetch(PDO::FETCH_ASSOC)){ $name =$abwidgets['o_mode'] ; $t = "templates/_panel/widgets";   include "$t/$name.php";   }  }
+function convert_links($text) {
+  $pattern = '/ (http|https|ftp|ftps)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/';
+  preg_match_all($pattern, $text, $matches);
+  $links = $matches[0];
+  $num_links = count($links);
+
+  if ($num_links == 1 && preg_match('/\.(jpg|jpeg|png|gif|bmp)$/i', $links[0])) {
+      $text = preg_replace($pattern, '<br><img src="$0" alt="Image" style="max-width: 100%; max-height: 500px; height: auto;"><br>', $text);
+  } else {
+      $text = preg_replace($pattern, '<a href="$0">$0</a>', $text);
+  }
+  return $text;
+}
 function if_gstore($name)     {    global  $_SESSION    ; if(isset($_SESSION["{$name}"])){ echo $_SESSION["{$name}"];  unset($_SESSION["{$name}"]);  }    }
 function msg_Signup()         {    global  $msg_alertr ; if($msg_alertr){ echo $msg_alertr; session_destroy(); unset($_SESSION['msgr']); }    }
 function msg_Login()          {    global  $msg_alertl ; if($msg_alertl){ echo $msg_alertl; session_destroy(); unset($_SESSION['msgl']); }    }

@@ -22,6 +22,20 @@
 </div>
 <div class="grid-column" >
 <?php template_mine('status/add_post');  ?>
+<?php   global  $tabitem_portal; if(isset ($_COOKIE['user']) AND  isset($tabitem_portal)){ ?> 
+        <!-- SIMPLE TAB ITEMS -->
+        <div class="simple-tab-items">
+          <!-- SIMPLE TAB ITEM -->
+          <a href="<?php echo $url_site; ?>/portal/all" class="simple-tab-item <?php   if($tabitem_portal=="all"){ echo "active"; } ?>">All Updates</a>
+          <!-- /SIMPLE TAB ITEM -->
+
+          <!-- SIMPLE TAB ITEM -->
+          <a href="<?php echo $url_site; ?>/portal" class="simple-tab-item <?php   if($tabitem_portal=="me"){ echo "active"; } ?>">Following</a>
+          <!-- /SIMPLE TAB ITEM -->
+
+        </div>
+        <!-- /SIMPLE TAB ITEMS -->
+<?php } ?>        
 <?php   forum_tpc_list();   ?>
 </div>
 <div class="grid-column" >

@@ -65,7 +65,7 @@ echo "<tr>
 
    }
    }
-  } if(isset($_GET['st'])=="vu"){
+  } if(isset($_GET['st']) && $_GET['st']=="vu"){
    $statement = " `state` WHERE  sid='{$uidss}' AND t_name='{$ty2}' ORDER BY `id` DESC";
 $results =$db_con->prepare("SELECT * FROM {$statement} ");
 $results->execute();
@@ -111,4 +111,3 @@ echo "<tr>
 }
 
 ?>
-

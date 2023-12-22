@@ -1,9 +1,12 @@
 <?php if($s_st=="buyfgeufb"){ dinstall_d();
 
-    $catdids = $_GET['f'];
+$catdids = $_GET['f'];
+$catdids=preg_replace("/\'/", "", $catdids);
+if(is_numeric($catdids)){
 $rescat =$db_con->prepare("SELECT * FROM `f_cat` WHERE id={$catdids} ORDER BY `id` DESC ");
-$rescat->execute();
-$wtcat=$rescat->fetch(PDO::FETCH_ASSOC)
+if($rescat->execute()){
+$wtcat=$rescat->fetch(PDO::FETCH_ASSOC);
+if(isset($wtcat['id'])){
  ?>
 
   <!-- SECTION BANNER -->
@@ -97,4 +100,8 @@ $catdid = $sucat['id'];
 <?php widgets(4); ?>
 </div>
 </div>
-<?php }else{ echo"404"; }  ?>
+<?php 
+   }else{ template_mine('404'); }
+  }else{ template_mine('404'); }
+ }else{ template_mine('404'); }
+}else{ echo"404"; }  ?>
