@@ -293,7 +293,9 @@ $bncount = $db_con->prepare("SELECT  * FROM users WHERE id = :id ");
 $bncount->bindParam(":id", $id);
 $bncount->execute();
 $abbn=$bncount->fetch(PDO::FETCH_ASSOC);
+  if(isset($abbn['id'])){
   echo $abbn["{$name}"];
+}
 }
 
 // Referral

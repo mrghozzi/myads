@@ -224,7 +224,13 @@ echo                   "</p>
                       <!-- /USER STATUS -->
                     ";
 ?>
-
+              <div class="tag-sticker">
+              <!-- TAG STICKER ICON -->
+              <svg class="tag-sticker-icon icon-public">
+                <use xlink:href="#svg-public"></use>
+              </svg>
+              <!-- /TAG STICKER ICON -->
+              </div>
               <!-- WIDGET BOX STATUS TEXT -->
               <p class="widget-box-status-text post_text<?php echo $sucat['id']; ?>">
               <div class="textpost"  id="post_form<?php echo $sucat['id']; ?>" >
@@ -246,10 +252,11 @@ echo                   "</p>
                   <!-- LINK STATUS TITLE -->
                   <p class="video-status-title"><span class="bold"><?php echo $sucat['name']; ?></span></p>
                   <!-- /LINK STATUS TITLE -->
-
+                  
                   <!-- LINK STATUS TEXT -->
                   <p class="video-status-text"><?php echo $var_sdf; ?></p>
                   <!-- /LINK STATUS TEXT -->
+ 
                 </div>
                 <!-- /LINK STATUS INFO -->
               </a>
@@ -258,8 +265,7 @@ echo                   "</p>
               <!--  TAG LIST  -->
               <div class="tag-list">
                 <!-- LINK STATUS META -->
-                <p class="text-sticker meta-line-link" ><i class="fa fa-eye" aria-hidden="true"></i>&nbsp;<?php echo $sucat['vu']; ?></p>
-                
+          
                 <!-- /LINK STATUS META -->
                 <!-- TAG TITLE -->
                 <a class="tag-item secondary" href="<?php echo $url_site; ?>/dr<?php echo $sucat['id']; ?>"><?php echo $sucat['name']; ?></a>
@@ -293,7 +299,20 @@ echo                   "</p>
                   <!-- /META LINE -->
                 </div>
                 <!-- /CONTENT ACTION -->
+                <!-- CONTENT ACTION -->
+                <div class="content-action">
+                  <!-- META LINE -->
+                  <div class="meta-line">
+                    <!-- META LINE text -->
+                    <p class="meta-line-text">
+                    <p class="meta-line-text" ><i class="fa fa-eye" aria-hidden="true"></i>&nbsp;<?php echo $sucat['vu']; ?></p>
+                    </p>
+                    <!-- /META LINE text -->
+                  </div>
+                  <!-- /META LINE -->
 
+                </div>
+                <!-- /CONTENT ACTION -->
                 <!-- CONTENT ACTION -->
                 <div class="content-action">
                   <!-- META LINE -->
@@ -308,6 +327,7 @@ echo                   "</p>
 
                 </div>
                 <!-- /CONTENT ACTION -->
+
               </div>
               <!-- /CONTENT ACTIONS -->
             </div>

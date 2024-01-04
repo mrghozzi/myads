@@ -11,6 +11,7 @@
 #####################################################################
 
 RewriteEngine on
+
 RewriteRule ^u/(.*) user.php?u=$1 [NC,L]
 RewriteRule ^e([0-9.]+)  user.php?e=$1 [NC,L]
 RewriteRule ^p([0-9.]+)  user.php?p=$1 [NC,L]

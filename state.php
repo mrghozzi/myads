@@ -2,11 +2,11 @@
 
 #####################################################################
 ##                                                                 ##
-##                        MYads  v3.x.x                            ##
-##                     http://www.krhost.ga                        ##
-##                   e-mail: admin@krhost.ga                       ##
+##                        MYads  v3.1.x                            ##
+##                     https://www.adstn.gq                        ##
+##                    e-mail: admin@adstn.gq                       ##
 ##                                                                 ##
-##                       copyright (c) 2023                        ##
+##                       copyright (c) 2024                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
@@ -15,7 +15,7 @@
 include "dbconfig.php";
 include "include/function.php";
 $title_page = "Statistics" ;
-
+if(isset($_SESSION['user'])){
 $uidss = $_SESSION['user'];
 if(isset($_GET)){
 if(isset($_GET['ty'])){
@@ -23,12 +23,13 @@ if(isset($_GET['ty'])){
   $ty="link";
  }else if($_GET['ty']=="vu"){
   $ty="banner";
- }
- else{
-$ty= $_GET['ty'];
-}
+ }else if(($_GET['ty']=="banner") OR ($_GET['ty']=="link")){
+  $ty= $_GET['ty'];
+ }else{
+  header("Location: 404.php") ;
+  }
 if(isset($_GET['ty'])){ $ty2= $_GET['ty']; }
-if(isset($_GET['id'])){ $ty_id= $_GET['id']; }
+if(isset($_GET['id']) AND is_numeric($_GET['id'])){ $ty_id= $_GET['id']; }else{ $ty_id= 0;  }
 function ty_link() { global $ty; global $_GET; if($_GET['st']=="vu"){ echo "home.php"; }else if($ty=="link"){ echo "l_list.php"; }else if($ty=="banner"){ echo "b_list.php"; } }
 if(isset($_GET['id'])){
 $sadsty = $db_con->prepare("SELECT *  FROM {$ty} WHERE id={$ty_id}" );
@@ -65,7 +66,7 @@ echo "<tr>
 
    }
    }
-  } if(isset($_GET['st']) && $_GET['st']=="vu"){
+  }else if(isset($_GET['st']) && $_GET['st']=="vu"){
    $statement = " `state` WHERE  sid='{$uidss}' AND t_name='{$ty2}' ORDER BY `id` DESC";
 $results =$db_con->prepare("SELECT * FROM {$statement} ");
 $results->execute();
@@ -90,7 +91,9 @@ echo "<tr>
    }
 
    }
-  }
+  }else{
+    header("Location: 404.php") ;
+   }
 
  template_mine('header');
  if(!isset($_COOKIE['user'])!="")
@@ -109,5 +112,7 @@ echo "<tr>
 }else{
  header("Location: 404.php") ;
 }
-
+}else{
+  header("Location: 404.php") ;
+ }
 ?>

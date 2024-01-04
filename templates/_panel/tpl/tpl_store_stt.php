@@ -224,7 +224,13 @@ echo                   "</p>
                       <!-- /USER STATUS -->
                     ";
 ?>
-
+              <div class="tag-sticker">
+              <!-- TAG STICKER ICON -->
+              <svg class="tag-sticker-icon icon-shopping-bag">
+                <use xlink:href="#svg-shopping-bag"></use>
+              </svg>
+              <!-- /TAG STICKER ICON -->
+              </div>
               <!-- WIDGET BOX STATUS TEXT -->
               <p class="widget-box-status-text">
               <div class="product-preview"  >

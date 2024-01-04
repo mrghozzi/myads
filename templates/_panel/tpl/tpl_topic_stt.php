@@ -190,11 +190,6 @@ echo                 " </div>
                         <!-- USER STATUS TITLE -->
                         <p class=\"user-status-title medium\">
                         <a class=\"bold\" href=\"{$url_site}/u/{$catuss['id']}\">{$catuss['username']}</a>
-                        &nbsp;{$lang['create_a']}
-                        &nbsp;<a class=\"bold\" href=\"{$url_site}/t{$sucat['id']}\">{$sucat['name']}</a>
-                        &nbsp;{$lang['in_the_forum']}
-                        &nbsp;<a href=\"{$url_site}/f{$catussc['id']}\" class=\"bold\" >
-                        <i class=\"fa {$catussc['icons']}\" aria-hidden=\"true\" ></i>&nbsp;{$catussc['name']}</a>
                         </p>
                         <!-- /USER STATUS TITLE -->
 
@@ -209,7 +204,13 @@ echo                   "</p>
                       <!-- /USER STATUS -->
                     ";
 ?>
-
+              <div class="tag-sticker">
+              <!-- TAG STICKER ICON -->
+              <svg class="tag-sticker-icon icon-forums">
+                <use xlink:href="#svg-forums"></use>
+              </svg>
+              <!-- /TAG STICKER ICON -->
+              </div>
               <!-- WIDGET BOX STATUS TEXT -->
               <p class="widget-box-status-text post_text<?php echo $sucat['id']; ?>">
               <div  class="textpost" id="post_form<?php echo $sucat['id']; ?>" >
@@ -223,9 +224,7 @@ echo                   "</p>
 
                   <!--  STATUS META -->
                   <p class="video-status-title" ><span class="highlighted">
-                    <svg class="menu-item-link-icon icon-forums">
-                     <use xlink:href="#svg-forums"></use>
-                    </svg>
+                  <i class="fa <?php echo $catussc['icons']; ?>" aria-hidden="true" ></i>
                     <?php echo $catussc['name']; ?></span>
                   </p>
                   <!-- / STATUS META -->

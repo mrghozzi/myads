@@ -207,9 +207,16 @@ echo                   "</p>
                       <!-- /USER STATUS -->
                     ";
 ?>
-
+              <div class="tag-sticker">
+              <!-- TAG STICKER ICON -->
+              <svg class="tag-sticker-icon icon-blog-posts">
+                <use xlink:href="#svg-blog-posts"></use>
+              </svg>
+              <!-- /TAG STICKER ICON -->
+              </div>
               <!-- WIDGET BOX STATUS TEXT -->
               <p class="widget-box-status-text post_text<?php echo $sucat['id']; ?>">
+              <br/>
               <div  class="textpost" id="post_form<?php echo $sucat['id']; ?>" >
               <?php echo $comtxt ?>
               <div id="report<?php echo $sucat['id']; ?>" ></div>
