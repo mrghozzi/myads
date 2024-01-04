@@ -20,7 +20,8 @@ global  $db_con; global  $catsum;  global  $uRow; global $lang; global $url_site
 $catusz = $db_con->prepare("SELECT *  FROM `forum` WHERE   id=".$sutcat['tp_id'] );
 $catusz->execute();
 $sucat=$catusz->fetch(PDO::FETCH_ASSOC);
-$comtxt = strip_tags($sucat['txt'], '<br><iframe>');
+$comtxt  = nl2br($sucat['txt']);
+$comtxt  = strip_tags($comtxt, '<br>');
 $comtxt = preg_replace('/#([^\s]+)/', '<a  href="'.$url_site.'/tag/$1" >#$1</a>', $comtxt );
 $imgtxt = strip_tags($comtxt, '');
 
@@ -207,7 +208,13 @@ echo                   "</p>
                       <!-- /USER STATUS -->
                     ";
 ?>
-
+              <div class="tag-sticker">
+              <!-- TAG STICKER ICON -->
+              <svg class="tag-sticker-icon icon-photos">
+                <use xlink:href="#svg-photos"></use>
+              </svg>
+              <!-- /TAG STICKER ICON -->
+              </div>
               <!-- WIDGET BOX STATUS TEXT -->
               <p class="widget-box-status-text post_text<?php echo $sucat['id']; ?>">
               <div class="textpost"  id="post_form<?php echo $sucat['id']; ?>" >

@@ -120,7 +120,8 @@ $catussen=$catusen->fetch(PDO::FETCH_ASSOC);
             if($stmsb->execute()){
 
          	}
-$comment =  $sutcat['msg'] ;
+$comment  =  $sutcat['msg'] ;
+$comment  = nl2br($comment);
 $emojis = array();
 $smlusen = $db_con->prepare("SELECT *  FROM emojis ");
 $smlusen->execute();
@@ -131,7 +132,7 @@ while($smlssen=$smlusen->fetch(PDO::FETCH_ASSOC)){
  if(isset($emojis['name']) && isset($emojis['img']) ) {
          $comment = str_replace($emojis['name'], $emojis['img'], $comment);
 }
-
+$comment  = convert_links($comment);
 $comment = strip_tags($comment, '<p><a><b><br><li><ul><font><span><pre><u><s><img>');
 $comment = preg_replace("/[\r\n]*/","",$comment);
  $time_cmt=convertTime($sutcat['time']);
@@ -188,8 +189,8 @@ $comment = preg_replace("/[\r\n]*/","",$comment);
                 <!-- FORM ITEM -->
                 <div class="form-item">
                   <!-- INTERACTIVE INPUT -->
-                  <div class="interactive-input small">
-                    <input type="text" id="comment"  placeholder="Write a message...">
+                  <div class="interactive-input">
+                    <textarea type="text" id="comment"  placeholder="Write a message..."></textarea>
                    <!-- INTERACTIVE INPUT ACTION -->
                     <div class="interactive-input-action">
                       <!-- INTERACTIVE INPUT ACTION ICON -->

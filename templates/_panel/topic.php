@@ -1,8 +1,8 @@
 <?php
 if($s_st=="buyfgeufb"){ dinstall_d();
-  global $susat;
+  global $susat; global $get_cat;
   $sutcat = $susat;
-$catusz = $db_con->prepare("SELECT *  FROM `forum` WHERE statu=1 AND  id=".$_GET['t'] );
+$catusz = $db_con->prepare("SELECT *  FROM `forum` WHERE statu=1 AND  id=".$get_cat );
 $catusz->execute();
 $sucat=$catusz->fetch(PDO::FETCH_ASSOC);
 if(isset($sucat['id'])) {

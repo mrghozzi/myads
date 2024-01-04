@@ -138,7 +138,7 @@ style: 'https://cdn.jsdelivr.net/npm/sceditor@3/minified/themes/content/default.
                <div class="form-item split">
               <!-- FORM SELECT -->
               <?php if(isset($elnk_site) AND ($elnk_site==1)){ ?>
-              <a href="https://www.adstn.gq/kb/myads:Add a new Topic" class="button default" target="_blank" >&nbsp;<i class="fa fa-question-circle" aria-hidden="true"></i></a>
+              <a href="https://www.adstn.gq/kb/myads:Add٪20a٪20new٪20Topic" class="button default" target="_blank" >&nbsp;<i class="fa fa-question-circle" aria-hidden="true"></i></a>
               <?php } ?>
               <?php if(isset($ifstorp) AND ($ifstorp == 2)){ ?>
               <input type="hidden" name="s_type" value="2" />

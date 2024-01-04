@@ -1,9 +1,12 @@
 <?php if($s_st=="buyfgeufb"){ dinstall_d();
 
-    $catdids = $_GET['f'];
+$catdids = $_GET['f'];
+$catdids=preg_replace("/\'/", "", $catdids);
+if(is_numeric($catdids)){
 $rescat =$db_con->prepare("SELECT * FROM `f_cat` WHERE id={$catdids} ORDER BY `id` DESC ");
-$rescat->execute();
-$wtcat=$rescat->fetch(PDO::FETCH_ASSOC)
+if($rescat->execute()){
+$wtcat=$rescat->fetch(PDO::FETCH_ASSOC);
+if(isset($wtcat['id'])){
  ?>
 
   <!-- SECTION BANNER -->
@@ -12,12 +15,12 @@ $wtcat=$rescat->fetch(PDO::FETCH_ASSOC)
       <img class="section-banner-icon" src="<?php url_site();  ?>/templates/_panel/img/banner/discussion-icon.png"  alt="overview-icon">
       <!-- /SECTION BANNER ICON -->
 
-      <!-- SECTION BANNER TITLE -->
-      <p class="section-banner-title"><center><h1 style="color: #fff;" ><?php lang('forum'); ?></h1></center></p>
-      <!-- /SECTION BANNER TITLE -->
-
       <!-- SECTION BANNER TEXT -->
-      <p class="section-banner-text"><h4 style="color: #fff;" ><center><i class="fa <?php echo $wtcat['icons'];  ?>" aria-hidden="true"></i>&nbsp;<?php echo $wtcat['name'];  ?></h4></center></p>
+      <p class="section-banner-title">
+        <h3 style="color: #fff; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" >
+         <?php echo $wtcat['name'];  ?>
+        </h3>
+      </p>
       <!-- /SECTION BANNER TEXT -->
     </div>
     <!-- /SECTION BANNER -->
@@ -97,4 +100,8 @@ $catdid = $sucat['id'];
 <?php widgets(4); ?>
 </div>
 </div>
-<?php }else{ echo"404"; }  ?>
+<?php 
+   }else{ template_mine('404'); }
+  }else{ template_mine('404'); }
+ }else{ template_mine('404'); }
+}else{ echo"404"; }  ?>

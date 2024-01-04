@@ -2,11 +2,11 @@
 
 #####################################################################
 ##                                                                 ##
-##                        MYads  v3.x.x                            ##
-##                     http://www.krhost.ga                        ##
-##                   e-mail: admin@krhost.ga                       ##
+##                        MYads  v3.1.x                            ##
+##                     https://www.adstn.gq                        ##
+##                    e-mail: admin@adstn.gq                       ##
 ##                                                                 ##
-##                       copyright (c) 2023                        ##
+##                       copyright (c) 2024                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
@@ -16,10 +16,12 @@
 
 include "dbconfig.php";
 include "include/function.php";
- if(isset($_GET['t'])){     //   Categories
+ if((int)isset($_GET['t'])){     //   Categories
   $get_cat=$_GET['t'];
-  $catusz = $db_con->prepare("SELECT *  FROM `forum` WHERE statu=1 AND  id=".$_GET['t'] );
-  $catusz->execute();
+  $get_cat=preg_replace("/\'/", "", $get_cat);
+  if(is_numeric($get_cat)){
+  $catusz = $db_con->prepare("SELECT *  FROM `forum` WHERE statu=1 AND  id=".$get_cat );
+  if($catusz->execute()){
   $sucat=$catusz->fetch(PDO::FETCH_ASSOC);
    $title_page = "Forum - ".$sucat['name'];
    $description_page = strip_tags($sucat['txt'], '');
@@ -76,7 +78,8 @@ include "include/function.php";
    template_mine('topic');
    template_mine('footer');
 }
-
+    }else{ header("Location: {$url_site}/404") ; }
+     }else{ header("Location: {$url_site}/404") ; }
   }else if(isset($_GET['p']) OR isset($_GET['e'])){     //   new post
 
    template_mine('header');
@@ -89,6 +92,8 @@ include "include/function.php";
    }else if(isset($_GET['f'])){                      //   ALL Categories
  $title_page = "Forum";
  $get_cat =  $_GET['f'];
+ $get_cat=preg_replace("/\'/", "", $get_cat);
+ if(is_numeric($get_cat)){
  include_once('include/pagination.php');
  $page = (int)(!isset($_GET["page"]) ? 1 : $_GET["page"]);
 if ($page <= 0) $page = 1;
@@ -101,7 +106,7 @@ $statement = "`status` WHERE (  tp_id IN(
   WHERE cat='{$get_cat}'  AND statu=1
 )  AND s_type=2 AND date<={$stt_time_go} ) ORDER BY `id` DESC";
 $catsum = $db_con->prepare("SELECT  * FROM {$statement} LIMIT {$startpoint} , {$per_page} " );
-$catsum->execute();
+if($catsum->execute()){
 function forum_tpc_list() {
   global  $db_con;
   global  $catsum;
@@ -124,10 +129,12 @@ if(isset($sucat['statu'])=="1") {   tpl_topic_stt($sutcat,0);   }
     template_mine('header');
     template_mine('forum');
     template_mine('footer');
-     }else{
+  }else{ header("Location: {$url_site}/404") ; }
+    }else{ header("Location: {$url_site}/404") ; }
+}else{
 
     template_mine('header');
     template_mine('fcat');
     template_mine('footer');
-     }
+ }
 ?>

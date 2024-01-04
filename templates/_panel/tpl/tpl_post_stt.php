@@ -70,16 +70,18 @@ $reaction_name  = "like";
 
 $time_stt=convertTime($sutcat['date']);
 
-$namesher =  "{$sucat['name']} - {$title_s}";
+$namesher = "{$sucat['name']} - {$title_s}";
 $namesher = strip_tags($namesher, '');
-$linksher =  "{$url_site}/t{$catdid}";
+$linksher = "{$url_site}/t{$catdid}";
 $linksher = strip_tags($linksher, '');
+$comtxt0  = nl2br($sucat['txt']);
+$comtxt1  = strip_tags($comtxt0, '<br>');
+$comtxt2  = preg_replace('/ #([^\s]+)/', '<a  href="'.$url_site.'/tag/$1" >#$1</a>',$comtxt1  );
+$comtxt3  = strip_tags($sucat['txt'], '');
 
-$comtxt1 = strip_tags($sucat['txt'], '<br><iframe>');
-$comtxt2 = preg_replace('/ #([^\s]+)/', '<a  href="'.$url_site.'/tag/$1" >#$1</a>',$comtxt1  );
-$comtxt3 = strip_tags($sucat['txt'], '');
+$comtxt  = substr($comtxt2,0,600);
+$comtxt  = convert_links($comtxt);
 
-$comtxt=substr($comtxt2,0,600);
 $ecomtxt = preg_replace("/[\r\n]*/","",$comtxt3);
 if($sucat['uid']==$sutcat['uid']){
 $usecho = "";
@@ -205,9 +207,16 @@ echo                   "</p>
                       <!-- /USER STATUS -->
                     ";
 ?>
-
+              <div class="tag-sticker">
+              <!-- TAG STICKER ICON -->
+              <svg class="tag-sticker-icon icon-blog-posts">
+                <use xlink:href="#svg-blog-posts"></use>
+              </svg>
+              <!-- /TAG STICKER ICON -->
+              </div>
               <!-- WIDGET BOX STATUS TEXT -->
               <p class="widget-box-status-text post_text<?php echo $sucat['id']; ?>">
+              <br/>
               <div  class="textpost" id="post_form<?php echo $sucat['id']; ?>" >
               <?php echo $comtxt ?>
               <div id="report<?php echo $sucat['id']; ?>" ></div>

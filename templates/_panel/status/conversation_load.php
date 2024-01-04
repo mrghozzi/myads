@@ -12,6 +12,20 @@ include "../../../dbconfig.php";
 }
    include "../../../content/languages/$lng.php";
    include "../../../include/convertTime.php";
+   function convert_links($text) {
+    $pattern = '/(http|https|ftp|ftps)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/';
+    preg_match_all($pattern, $text, $matches);
+    $links = $matches[0];
+    $num_links = count($links);
+
+    if ($num_links == 1 && preg_match('/\.(jpg|jpeg|png|gif|bmp)$/i', $links[0])) {
+        $text = preg_replace($pattern, '<br><img src="$0" alt="Image" style="max-width: 100%; max-height: 500px; height: auto;"><br>', $text);
+    } else {
+        $text = preg_replace($pattern, '<a href="$0">$0</a>', $text);
+    }
+    return $text;
+}
+
      if(isset($_COOKIE['user']))
     {
     if (session_status() == PHP_SESSION_NONE) {
@@ -40,6 +54,7 @@ $catussen=$catusen->fetch(PDO::FETCH_ASSOC);
 
          	}
 $comment =  $sutcat['msg'] ;
+$comment  = nl2br($comment);
 $emojis = array();
 $smlusen = $db_con->prepare("SELECT *  FROM emojis ");
 $smlusen->execute();
@@ -50,7 +65,7 @@ while($smlssen=$smlusen->fetch(PDO::FETCH_ASSOC)){
  if(isset($emojis['name']) && isset($emojis['img']) ) {
          $comment = str_replace($emojis['name'], $emojis['img'], $comment);
 }
-
+$comment  = convert_links($comment);
 $comment = strip_tags($comment, '<p><a><b><br><li><ul><font><span><pre><u><s><img>');
 $comment = preg_replace("/[\r\n]*/","",$comment);
  $time_cmt=convertTime($sutcat['time']);

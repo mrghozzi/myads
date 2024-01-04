@@ -23,7 +23,7 @@ else if(isset($_GET['ty']) AND ($_GET['ty']=="clik")){ lang('textads'); echo "<b
               <!-- ACHIEVEMENT BOX TEXT -->
               <p class="achievement-box-text"><b>
 <?php
-if(isset($_GET['id'])){  echo "N&deg;".$_GET['id']; }
+if(isset($_GET['id']) AND is_numeric($_GET['id'])){  echo "N&deg;".$_GET['id']; }
 else if(isset($_GET['st'])){ echo "@"; get_user($_GET['st'],"username"); }
 ?>
               </b></p>
@@ -32,12 +32,19 @@ else if(isset($_GET['st'])){ echo "@"; get_user($_GET['st'],"username"); }
             <!-- /ACHIEVEMENT BOX INFO -->
           </div>
           <!-- /ACHIEVEMENT BOX INFO WRAP -->
-
+          <?php if(isset($_SERVER['HTTP_REFERER'])){ ?>
           <!-- BUTTON -->
           <a class="button white-solid" href="<?php echo $_SERVER['HTTP_REFERER'];  ?>">
           <i class="fa fa-angle-double-left" aria-hidden="true"></i>&nbsp;<?php lang('go_back'); ?>
           </a>
           <!-- /BUTTON -->
+          <?php }else{ ?>
+          <!-- BUTTON -->
+          <a class="button white-solid" href="<?php ty_link();  ?>">
+          <i class="fa fa-angle-double-left" aria-hidden="true"></i>&nbsp;<?php lang('go_back'); ?>
+          </a>
+          <!-- /BUTTON -->
+            <?php } ?> 
        </div>
 </div>
 <?php if(isset($admin_page) AND ($admin_page==1)){ ?>
