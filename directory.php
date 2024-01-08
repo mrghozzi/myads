@@ -103,10 +103,12 @@ $stmdr->bindParam(":ertb", $catdid);
  template_mine('footer');
  }else if(isset($_GET['s'])){   // new site
   $get_cat=$_GET['s'];
+  $ifdir_vst = "yes";
   $catusz = $db_con->prepare("SELECT *  FROM `directory` WHERE statu=1 AND  id=".$_GET['s'] );
   $catusz->execute();
   $sucat=$catusz->fetch(PDO::FETCH_ASSOC);
-   $title_page = "Forum - ".$sucat['name'];
+   $title_page = $sucat['name'];
+   $metakeywords_page = $sucat['metakeywords'];
    $description_page = strip_tags($sucat['txt'], '');
    $catus = $db_con->prepare("SELECT *  FROM users WHERE  id='{$sucat['uid']}'");
    $catus->execute();
@@ -118,10 +120,10 @@ $stmdr->bindParam(":ertb", $catdid);
 $catust = $db_con->prepare("SELECT * FROM status WHERE s_type IN (1) AND tp_id =".$catdid );
 $catust->execute();
 $susat=$catust->fetch(PDO::FETCH_ASSOC);
-    $title_page = $sucat['name']."&nbsp;-&nbsp;".$sucat['txt'];
+
    template_mine('header');
    ads_site(5);
-   tpl_site_stt($susat,0);
+   tpl_site_vst($susat,0);
    }else{
 
     template_mine('header');

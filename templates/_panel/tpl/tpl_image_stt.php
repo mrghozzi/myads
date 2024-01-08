@@ -22,7 +22,11 @@ $catusz->execute();
 $sucat=$catusz->fetch(PDO::FETCH_ASSOC);
 $comtxt  = nl2br($sucat['txt']);
 $comtxt  = strip_tags($comtxt, '<br>');
-$comtxt = preg_replace('/#([^\s]+)/', '<a  href="'.$url_site.'/tag/$1" >#$1</a>', $comtxt );
+$comtxt   = preg_replace('/#(\w+)/', '<a  href="'.$url_site.'/tag/$1" >#$1</a>',$comtxt );
+// تحويل النص إلى اليمين إذا كان النص باللغة العربية
+if (preg_match('/\p{Arabic}/u', $comtxt)) {
+  $comtxt = '<div style="text-align: right;">' . $comtxt . '</div>';
+}
 $imgtxt = strip_tags($comtxt, '');
 
 $st_type = "2";
@@ -146,7 +150,7 @@ echo"                      <!-- USER STATUS -->
                             <!-- USER AVATAR CONTENT -->
                             <div class=\"user-avatar-content\">
                               <!-- HEXAGON -->
-                              <div class=\"hexagon-image-30-32\" data-src=\"{$url_site}/{$catuss['img']}\" ><canvas ></canvas></div>
+                              <div class=\"hexagon-image-30-32\" data-src=\"{$url_site}/{$catuss['img']}\" ></div>
                               <!-- /HEXAGON -->
                             </div>
                             <!-- /USER AVATAR CONTENT -->

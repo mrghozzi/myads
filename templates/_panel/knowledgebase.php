@@ -1,5 +1,5 @@
 <?php if($s_st=="buyfgeufb"){  dinstall_d();  global $admin_page;
-  include "requests/captcha.php";
+  
   if(isset($_GET['st'])){
  $k_type = "knowledgebase";
                  $storknow = $db_con->prepare("SELECT *  FROM options WHERE name=:name AND o_mode=:o_mode AND o_type=:o_type AND o_order=0 " );
@@ -150,7 +150,8 @@ style: 'https://cdn.jsdelivr.net/npm/sceditor@3/minified/themes/content/default.
                        </div>
                        </div>
                            <div class="input-group col-md-2">
-                        <span class="input-group-addon" id="basic-addon1"><?php captcha() ;  ?>&nbsp;=&nbsp;</span>
+                           <?php  include "requests/captcha.php"; ?>
+                        <span class="input-group-addon" id="basic-addon1"><?php captcha() ;  ?></span>
                        <input type="text"  class="form-control" name="capt" required  />
                        </div>
                        <?php if(isset($_SESSION['snotvalid'])){ echo "<div class=\"alert alert-danger\" role=\"alert\"><strong><i class=\"fa fa-exclamation-triangle\" aria-hidden=\"true\"></i></strong>&nbsp; ";
@@ -240,7 +241,8 @@ style: 'https://cdn.jsdelivr.net/npm/sceditor@3/minified/themes/content/default.
                        </div>
                        </div>
                            <div class="input-group col-md-2">
-                        <span class="input-group-addon" id="basic-addon1"><?php captcha() ;  ?>&nbsp;=&nbsp;</span>
+                           <?php  include "requests/captcha.php"; ?>
+                        <span class="input-group-addon" id="basic-addon1"><?php captcha() ;  ?></span>
                        <input type="text"  class="form-control" name="capt" required  />
                        </div>
                        <?php if(isset($_SESSION['snotvalid'])){ echo "<div class=\"alert alert-danger\" role=\"alert\"><strong><i class=\"fa fa-exclamation-triangle\" aria-hidden=\"true\"></i></strong>&nbsp; ";

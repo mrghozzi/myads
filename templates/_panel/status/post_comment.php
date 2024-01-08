@@ -83,8 +83,16 @@ $time_cmt=convertTime($sutcat['o_mode']);
 $comment =  $sutcat['o_valuer'] ;
  }
 
-$comment = preg_replace('/ #([^\s]+) /', '<a  href="'.$url_site.'/tag/$1" >#$1</a>', $comment );
-$comment = strip_tags($comment, '<p><a><b><br><li><ul><font><span><pre><u><s><img>');
+
+$comment  = nl2br($comment);
+$comment  = strip_tags($comment, '<br>');
+// تحويل الروابط إلى روابط قابلة للنقر
+$comment = preg_replace('@(http?://([-\w\.]+[-\w])+(:\d+)?(/([\w/_\.]*(\?\S+)?)?)?)@', '<a href="$1">$1</a>', $comment);
+$comment   = preg_replace('/#(\w+)/', '<a  href="'.$url_site.'/tag/$1" >#$1</a>',$comment  );
+// تحويل النص إلى اليمين إذا كان النص باللغة العربية
+if (preg_match('/\p{Arabic}/u', $comment)) {
+  $comment = '<div style="text-align: right;">' . $comment . '</div>';
+}
   ?>
             <!-- POST COMMENT -->
             <div class="post-comment coment<?php echo $sutcat['id'];  ?>">
@@ -152,7 +160,8 @@ $comment = strip_tags($comment, '<p><a><b><br><li><ul><font><span><pre><u><s><im
                     <!-- /META LINE TIMESTAMP -->
                   </div>
                   <!-- /META LINE -->
-  <?php if((isset($_COOKIE['user']) AND ($_COOKIE['user']==$cmnt_us) ) OR ((isset($_COOKIE['admin'])))){  ?>
+                  
+<?php if((isset($_COOKIE['user']) AND ($_COOKIE['user']==$cmnt_us) ) OR ((isset($_COOKIE['admin'])))){  ?>
                   <!-- META LINE -->
                   <div class="meta-line trash_comment<?php echo $sutcat['id'];  ?>" id="btntrash<?php echo $sutcat['id'];  ?>">
                     <!-- META LINE TIMESTAMP -->
@@ -261,7 +270,7 @@ $catusscm=$catuscm->fetch(PDO::FETCH_ASSOC);
                   <div class="form-item">
                     <!-- FORM INPUT -->
                     <div class="form-input small">
-                      <input type="text" id="txt_comment<?php echo $bn_id; ?>">
+                      <textarea type="text" id="txt_comment<?php echo $bn_id; ?>"></textarea>
                       <button id ="btn_comment<?php echo $bn_id; ?>" class="btn" >
                        <svg class="interactive-input-icon icon-send-message">
                         <use xlink:href="#svg-send-message"></use>

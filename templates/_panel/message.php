@@ -135,6 +135,7 @@ while($smlssen=$smlusen->fetch(PDO::FETCH_ASSOC)){
 $comment  = convert_links($comment);
 $comment = strip_tags($comment, '<p><a><b><br><li><ul><font><span><pre><u><s><img>');
 $comment = preg_replace("/[\r\n]*/","",$comment);
+
  $time_cmt=convertTime($sutcat['time']);
  ?>
 <?php if($msgdid==$sutcat['us_env']){ ?>

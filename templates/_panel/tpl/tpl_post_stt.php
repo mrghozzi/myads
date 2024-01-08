@@ -76,13 +76,13 @@ $linksher = "{$url_site}/t{$catdid}";
 $linksher = strip_tags($linksher, '');
 $comtxt0  = nl2br($sucat['txt']);
 $comtxt1  = strip_tags($comtxt0, '<br>');
-$comtxt2  = preg_replace('/ #([^\s]+)/', '<a  href="'.$url_site.'/tag/$1" >#$1</a>',$comtxt1  );
-$comtxt3  = strip_tags($sucat['txt'], '');
+$comtxt2  = convert_links($comtxt1);
+$comtxt   = preg_replace('/#(\w+)/', '<a  href="'.$url_site.'/tag/$1" >#$1</a>',$comtxt2  );
+// تحويل النص إلى اليمين إذا كان النص باللغة العربية
+if (preg_match('/\p{Arabic}/u', $comtxt)) {
+  $comtxt = '<div style="text-align: right;">' . $comtxt . '</div>';
+}
 
-$comtxt  = substr($comtxt2,0,600);
-$comtxt  = convert_links($comtxt);
-
-$ecomtxt = preg_replace("/[\r\n]*/","",$comtxt3);
 if($sucat['uid']==$sutcat['uid']){
 $usecho = "";
    }else{
