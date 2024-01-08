@@ -23,7 +23,11 @@ $sucat=$catusz->fetch(PDO::FETCH_ASSOC);
 
 $st_type = "22";
 $comtxt = strip_tags($sucat['txt'], '<br>');
-$comtxt = preg_replace('/#([^\s]+)/', '<a  href="'.$url_site.'/tag/$1" >#$1</a>', $comtxt );
+$comtxt   = preg_replace('/#(\w+)/', ' <a  href="'.$url_site.'/tag/$1" >#$1</a> ',$comtxt );
+// تحويل النص إلى اليمين إذا كان النص باللغة العربية
+if (preg_match('/\p{Arabic}/u', $comtxt)) {
+  $comtxt = '<div style="text-align: right;">' . $comtxt . '</div>';
+}
 $sdf    = $sucat['url'];
 $bn_tid = $sucat['id'];
 $bn_time= $sutcat['date'];

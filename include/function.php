@@ -439,9 +439,9 @@ function convert_links($text) {
   $num_links = count($links);
 
   if ($num_links == 1 && preg_match('/\.(jpg|jpeg|png|gif|bmp)$/i', $links[0])) {
-      $text = preg_replace($pattern, '<br><img src="$0" alt="Image" style="max-width: 100%; max-height: 500px; height: auto;"><br>', $text);
+      $text = preg_replace($pattern, ' <br> <img src="$0" alt="Image" style="max-width: 100%; max-height: 500px; height: auto;"> <br> ', $text);
   } else {
-      $text = preg_replace($pattern, '<a href="$0">$0</a>', $text);
+      $text = preg_replace($pattern, ' <a href="$0">$0</a> ', $text);
   }
   return $text;
 }

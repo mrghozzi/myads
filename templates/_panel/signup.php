@@ -72,7 +72,7 @@
           <div class="form-row split">
             <!-- FORM ITEM -->
             <div class="form-item">
-            <center><b><?php captcha() ;  ?>&nbsp;=</b></center>
+            <center><?php captcha() ;  ?></center>
              </div>
           <div class="form-item">
               <div class="form-input social-input small active">

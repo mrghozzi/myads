@@ -110,12 +110,9 @@
      <?php if(!isset($_COOKIE['user'])){ ?>
               <!-- FORM SELECT -->
               <div class="form-input social-input small active">
-                      <!-- name -->
-                      <div class="social-link no-hover name">
-                        <!-- ICON  -->
-                        <?php captcha() ;  ?>=
-                        <!-- /ICON  -->
-                      </div>
+              <center><?php captcha() ;  ?></center>
+                </div>
+              <div class="form-input social-input small active">
                       <!-- /name -->
                       <label for="capt">verification code</label>
                       <input type="text" id="capt" name="capt" required>

@@ -46,6 +46,26 @@ License URL: http://creativecommons.org/licenses/by/3.0/
 <meta name="twitter:label1" content="كُتب بواسطة">
 <meta name="twitter:data1" content="<?php echo $username_topic; ?>">
 <?php } ?>
+<?php global $ifdir_vst; global $metakeywords_page;
+ if(isset($_GET['s']) AND isset($ifdir_vst) AND ($ifdir_vst == "yes")){ ?>
+<meta name="description" content="<?php echo $description_page; ?>" />
+<meta name="keywords" content="<?php echo $metakeywords_page; ?>" />
+<meta name="author" content="<?php echo $username_topic; ?>">
+<meta property="og:type" content="article" />
+<meta property="og:title" content="<?php title_site($title_page); ?>" />
+<meta property="og:description" content="<?php echo $description_page; ?>" />
+<meta property="og:url" content="<?php url_page('/dr'.$_GET['s']);  ?>" />
+<meta property="og:site_name" content="<?php echo $title_s;  ?>" />
+<?php if(isset($image_page)){ ?>
+<meta property="og:image" content="<?php echo $image_page;  ?>" />
+<?php }else{ ?>
+<meta property="og:image" content="<?php url_page('/bnr/logo.png');  ?>" />
+<?php } ?>
+<meta property="og:image:width" content="420" />
+<meta property="og:image:height" content="280" />
+<meta name="twitter:label1" content="كُتب بواسطة">
+<meta name="twitter:data1" content="<?php echo $username_topic; ?>">
+<?php } ?>
 <script type="application/x-javascript"> addEventListener("load", function() { setTimeout(hideURLbar, 0); }, false); function hideURLbar(){ window.scrollTo(0,1); } </script>
 
   <!-- bootstrap 4.3.1 -->
