@@ -9,7 +9,7 @@
     <p class="btn btn-warning" ><i class="fa fa-cog"></i><i class="fa fa-comments"></i>&nbsp;<?php lang('Comusetting'); ?></p>
     <a class="btn btn-dark" href="<?php url_site();  ?>/admincp?knowledgebase"><?php lang('knowledgebase'); ?></a>
 	<a class="btn btn-dark" href="<?php url_site();  ?>/admincp?f_cat">Forum Categories</a>
-	<a class="btn btn-dark" href="<?php url_site();  ?>/admincp?d_cat">Directory Categories</a>
+	<a class="btn btn-dark" href="<?php url_site();  ?>/admincp?d_cat"><?php lang('dir_cats'); ?></a>
 	<a class="btn btn-dark" href="<?php url_site();  ?>/admincp?emojis">Emojis</a>
 	<a class="btn btn-dark" href="<?php url_site();  ?>/admincp?news">News Site</a>
 	<a class="btn btn-dark" href="<?php url_site();  ?>/admincp?report">Reports</a>
