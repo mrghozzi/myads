@@ -14,7 +14,7 @@
  include "dbconfig.php";
  include "include/function.php";
  include_once('include/pagination.php');
-  if(md5($conf_us_log)==$md5_cook_us){
+  if(isset($conf_us_log) AND isset($md5_cook_us) AND (md5($conf_us_log)==$md5_cook_us)){
 
  $stadmin = $db_con->prepare("SELECT * FROM users WHERE id=1 ");
  $stadmin->execute();

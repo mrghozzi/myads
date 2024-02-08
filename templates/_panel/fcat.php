@@ -65,7 +65,7 @@
       <!-- TABLE BODY -->
       <div class="table-body">
 <?php
-$statement = "`f_cat` WHERE id ORDER BY `id` DESC";
+$statement = "`f_cat` WHERE id ORDER BY `ordercat` ASC";
 $results =$db_con->prepare("SELECT * FROM {$statement} ");
 $results->execute();
 while($wt=$results->fetch(PDO::FETCH_ASSOC)) {
@@ -87,6 +87,8 @@ $time_stt= convertTime($abdnb['date']);
   $time_stt = "";
 
 }
+$cat_txt  = nl2br($wt['txt']);
+$cat_txt  = strip_tags($cat_txt, '<br>');
 ?>
         <!-- TABLE ROW -->
         <div class="table-row big">
@@ -105,7 +107,7 @@ $time_stt= convertTime($abdnb['date']);
                 <!-- FORUM CATEGORY TITLE -->
                 <p class="forum-category-title"><a href="<?php echo "{$url_site}/f{$wt['id']}"; ?>"><?php echo $wt['name']; ?></a></p>
                 <!-- /FORUM CATEGORY TITLE -->
-
+                <p class="forum-category-text"><?php echo $cat_txt; ?></p>
               </div>
               <!-- /FORUM CATEGORY INFO -->
             </div>

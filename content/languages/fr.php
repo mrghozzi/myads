@@ -302,5 +302,6 @@ $lang['lastcontact'] = "Dernier contact depuis";
 $lang['notifs']      = "Notifications";
 $lang['all_notifs']  = "Afficher toutes les notifications";
 $lang['dir_cats']    = "Catégories du répertoire";
+$lang['forum_cats']  = "Catégories du forum";
 
 ?>

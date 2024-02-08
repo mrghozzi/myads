@@ -1,4 +1,4 @@
-﻿ <?php
+﻿<?php
  include '../dbconfig.php';
 $q=$db_con->prepare("CREATE TABLE IF NOT EXISTS `ads` (
   `id` int(11) NOT NULL,
@@ -191,6 +191,8 @@ $q49=$db_con->prepare("CREATE TABLE `forum`
 $q50=$db_con->prepare("CREATE TABLE `f_cat` ( `id` INT(15) NOT NULL AUTO_INCREMENT ,
  `name` VARCHAR(255) NOT NULL ,
  `icons` VARCHAR(255) NOT NULL ,
+ `txt` TEXT NOT NULL ,
+ `ordercat` INT(15) NOT NULL ,
  PRIMARY KEY (`id`)) ENGINE = InnoDB;");
  $q50->execute();
 $q51=$db_con->prepare("CREATE TABLE `f_coment` (
