@@ -302,5 +302,6 @@ $lang['lastcontact'] = "آخر إتصال منذ";
 $lang['notifs']      = "إشعارات";
 $lang['all_notifs']  = "عرض جميع الإشعارات";
 $lang['dir_cats']    = "أقسام دليل المواقع";
+$lang['forum_cats']  = "أقسام المنتدى";
 
 ?>

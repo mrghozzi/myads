@@ -71,6 +71,7 @@ License URL: http://creativecommons.org/licenses/by/3.0/
   <!-- bootstrap 4.3.1 -->
 <link href="<?php url_site();  ?>/templates/_panel/<?php echo $c_mode; ?>/bootstrap.min.css" rel='stylesheet' type='text/css' />
 <link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap4.min.css" rel='stylesheet' type='text/css' />
+
   <!-- styles -->
 <link href="<?php url_site();  ?>/templates/_panel/<?php echo $c_mode; ?>/styles.min.css" rel='stylesheet' type='text/css' />
 <link href="<?php url_site();  ?>/templates/_panel/<?php echo $c_mode; ?>/prestyle.css" rel='stylesheet' type='text/css' />

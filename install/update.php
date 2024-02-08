@@ -19,6 +19,8 @@ $q2=$db_con->prepare("INSERT INTO `ads` (`id`, `code_ads`) VALUES ('6', '<!-- My
 $q2->execute();
 $q3=$db_con->prepare("ALTER TABLE `setting` ADD `e_links` INT(15) NOT NULL DEFAULT '1' AFTER `a_not`;" );
 $q3->execute();
+$q4=$db_con->prepare("ALTER TABLE `f_cat` ADD `txt` TEXT NOT NULL AFTER `icons`, ADD `ordercat` INT(15) NOT NULL AFTER `txt`" );
+$q4->execute();
 if(isset($q1)) {
  $echoup = "<p style='color:#04B404' >Update Table 'options'</p>";
 }else{
@@ -34,11 +36,18 @@ if(isset($q3)) {
 }else{
  $echoup = $echoup."<br /><p style='color:#FF0000' >Update Table '<b>setting</b>'</p>";
 }
-}else if(isset($_GET['v']) AND ($_GET['v']=="3-0-0")){
+if(isset($q4)) {
+    $echoup = $echoup."<br /><p style='color:#04B404' >Update Table 'f_cat'</p>";
+   }else{
+    $echoup = $echoup."<br /><p style='color:#FF0000' >Update Table '<b>f_cat</b>'</p>";
+   }
+}else if(isset($_GET['v']) AND ($_GET['v']=="3-1-0")){
 $q1=$db_con->prepare("INSERT INTO `ads` (`id`, `code_ads`) VALUES ('6', '<!-- MyAds code begin -->');" );
 $q1->execute();
 $q2=$db_con->prepare("ALTER TABLE `setting` ADD `e_links` INT(15) NOT NULL DEFAULT '1' AFTER `a_not`;" );
 $q2->execute();
+$q3=$db_con->prepare("ALTER TABLE `f_cat` ADD `txt` TEXT NOT NULL AFTER `icons`, ADD `ordercat` INT(15) NOT NULL AFTER `txt`" );
+$q3->execute();
 if(isset($q1)) {
  $echoup = "<p style='color:#04B404' >Update Table 'ads'</p>";
 }else{
@@ -49,6 +58,11 @@ if(isset($q2)) {
 }else{
  $echoup = $echoup."<br /><p style='color:#FF0000' >Update Table '<b>setting</b>'</p>";
 }
+if(isset($q3)) {
+    $echoup = $echoup."<br /><p style='color:#04B404' >Update Table 'f_cat'</p>";
+   }else{
+    $echoup = $echoup."<br /><p style='color:#FF0000' >Update Table '<b>f_cat</b>'</p>";
+   }
 }else{
  $echoup = "<p>You have the latest version</p>";
 }

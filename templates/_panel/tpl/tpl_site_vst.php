@@ -233,7 +233,7 @@ echo                   "</p>
               </div>
               <!-- WIDGET BOX STATUS TEXT -->
               <p class="widget-box-status-text post_text<?php echo $sucat['id']; ?>">
-              <div class="textpost"  id="post_form<?php echo $sucat['id']; ?>" >
+              <div class="textpost"  >
               <br/>
               <div class="event-info" >
       <!--  EVENT TITLE -->
@@ -303,7 +303,9 @@ echo                   "</p>
       <!-- /DECORATED FEATURE LIST -->
       <br/>
       <!--  TEXT -->
+      <div id="post_form<?php echo $sucat['id']; ?>" >
       <p class="event-text" style="text-align: center"><?php echo $comtxt ?></p>
+      </div>
       <!-- / TEXT -->
       </div>
             <div id="report<?php echo $sucat['id']; ?>" ></div>
