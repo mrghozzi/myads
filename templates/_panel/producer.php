@@ -1,5 +1,5 @@
 <?php
-if($s_st=="buyfgeufb"){ dinstall_d();
+if(isset($s_st) AND ($s_st=="buyfgeufb")){ dinstall_d();
   $gproducer =  $_GET['producer'];
   $stname = $db_con->prepare("SELECT * FROM `options` WHERE `o_type` = 'store' AND `name` ='".$gproducer."' " );
 $stname->execute();
@@ -331,7 +331,7 @@ echo                 " </div>
       <!-- SECTION FILTERS BAR ACTIONS -->
       <div class="section-filters-bar-actions">
       <?php if(isset($elnk_site) AND ($elnk_site==1)){ ?>
-      <a href="https://www.adstn.gq/kb/myads:producer" class="button primary " target="_blank">&nbsp;<b><i class="fa fa-question-circle" aria-hidden="true"></i></b></a>
+      <a href="https://github.com/mrghozzi/myads/wiki/producer" class="button primary " target="_blank">&nbsp;<b><i class="fa fa-question-circle" aria-hidden="true"></i></b></a>
       &nbsp;
       <?php } ?>
       <a class="button tertiary " href="<?php url_site();  ?>/kb/<?php echo $strname['name']; ?>"><i class="fa fa-database" aria-hidden="true"></i>&nbsp;<?php lang('knowledgebase');  ?></a>
@@ -671,10 +671,10 @@ function downloadv{$strtidv['id']}(){
                 <!-- /REACTION OPTION -->
 
                 <!-- REACTION OPTION -->
-                <div class="reaction-option text-tooltip-tft" data-title="wasp" style="position: relative;">
+                <div class="reaction-option text-tooltip-tft" data-title="telegram" style="position: relative;">
                   <!-- REACTION OPTION IMAGE -->
-                  <a onClick="window.open('https://www.wasp.gq/sharer?url=<?php echo $linksher; ?>&nbsp;<?php echo $namesher; ?>');" href="javascript:void(0);" >
-                  <img class="reaction-option-image" src="<?php url_site();  ?>/templates/_panel/img/icons/wasp-icon.png" >
+                  <a onClick="window.open('https://telegram.me/share/url?url=<?php echo $linksher; ?>&text=<?php echo $namesher; ?>');" href="javascript:void(0);" >
+                  <img class="reaction-option-image" src="<?php url_site();  ?>/templates/_panel/img/icons/telegram-icon.png" >
                   </a>
                   <!-- /REACTION OPTION IMAGE -->
                 </div>

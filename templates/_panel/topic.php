@@ -1,5 +1,5 @@
 <?php
-if($s_st=="buyfgeufb"){ dinstall_d();
+if(isset($s_st) AND ($s_st=="buyfgeufb")){ dinstall_d();
   global $susat; global $get_cat;
   $sutcat = $susat;
 $catusz = $db_con->prepare("SELECT *  FROM `forum` WHERE statu=1 AND  id=".$get_cat );
@@ -469,10 +469,10 @@ if(check_us($catuss['id'],1)==1){
                 <!-- /REACTION OPTION -->
 
                 <!-- REACTION OPTION -->
-                <div class="reaction-option text-tooltip-tft" data-title="wasp" style="position: relative;">
+                <div class="reaction-option text-tooltip-tft" data-title="telegram" style="position: relative;">
                   <!-- REACTION OPTION IMAGE -->
-                  <a onClick="window.open('https://www.wasp.gq/sharer?url=<?php echo $linksher; ?>&nbsp;<?php echo $namesher; ?>');" href="javascript:void(0);" >
-                  <img class="reaction-option-image" src="<?php url_site();  ?>/templates/_panel/img/icons/wasp-icon.png" >
+                  <a onClick="window.open('https://telegram.me/share/url?url=<?php echo $linksher; ?>&text=<?php echo $namesher; ?>');" href="javascript:void(0);" >
+                  <img class="reaction-option-image" src="<?php url_site();  ?>/templates/_panel/img/icons/telegram-icon.png" >
                   </a>
                   <!-- /REACTION OPTION IMAGE -->
                 </div>

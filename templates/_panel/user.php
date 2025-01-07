@@ -1,4 +1,4 @@
-<?php if(isset($s_st)=="buyfgeufb"){ dinstall_d();
+<?php if(isset($s_st) AND ($s_st=="buyfgeufb")){ dinstall_d();
 if(isset($_COOKIE['user'])){ $my_user_1=$_COOKIE['user'];  }
 $usz = $db_con->prepare("SELECT *  FROM `users` WHERE id=:u_id");
 $usz->bindParam(":u_id", $usrRow['o_order']);
@@ -219,7 +219,7 @@ if(check_us($sus['id'],1)==1){
       </div>
       <!-- /PROFILE HEADER INFO -->
     </div>
-
+<?php template_mine('users_templates/user_navigation');  ?>
 <div class="grid grid-3-6-3 mobile-prefer-content" >
 <div class="grid-column" >
 <?php widgets(7); ?>

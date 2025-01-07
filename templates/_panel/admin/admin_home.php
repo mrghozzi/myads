@@ -1,6 +1,6 @@
-<?php if($s_st=="buyfgeufb"){
+<?php if(isset($s_st) AND ($s_st=="buyfgeufb")){
 
-                   $myads_last_time_updates = "https://api.adstn.gq/myads/latest_version.txt";
+                   $myads_last_time_updates = "https://github.com/mrghozzi/myads_check_updates/raw/main/latest_version.txt";
                    $last_time_updates = @file_get_contents($myads_last_time_updates, FILE_USE_INCLUDE_PATH);
                    $last_time_updates = strip_tags($last_time_updates, '');
                    $last_time_updates=substr($last_time_updates,0,5);
@@ -292,7 +292,7 @@
            <div class="table table-top-friends join-rows">
 						<div class="table-header">
                 <div class="table-header-column textpost">
-                   <center>Devlope by : <a href="http://www.kariya-host.gq">Kariya host</a></center>
+                   <center>Devlope by : <a href="https://github.com/mrghozzi">MrGhozzi</a></center>
                 </div>
                 
 						</div>

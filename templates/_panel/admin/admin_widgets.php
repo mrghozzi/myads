@@ -1,4 +1,4 @@
-<?php if($s_st=="buyfgeufb"){
+<?php if(isset($s_st) AND ($s_st=="buyfgeufb")){
     function wid_plase() {
     return array(
         '1' => 'portal_left',

@@ -1,4 +1,5 @@
 <?php
+if(isset($_GET['tid']) AND isset($_GET['s_type']))   {
 include "../../../dbconfig.php";
  $stmt = $db_con->prepare("SELECT *  FROM setting   " );
         $stmt->execute();
@@ -323,3 +324,4 @@ function postcomment<?php echo $bn_id; ?>(){
   $(".comment_<?php echo $_GET['s_type']; ?>_<?php echo $bn_id; ?>").load('<?php echo $url_site;  ?>/templates/_panel/status/post_comment.php?s_type=<?php echo $_GET['s_type']; ?>&tid=<?php echo $bn_id; ?>&limet=<?php echo $comentlimet; ?>');
     });
 </script>
+<?php }else{ echo "404"; } ?>

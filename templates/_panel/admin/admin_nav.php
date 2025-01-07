@@ -1,4 +1,4 @@
-<?php if($s_st=="buyfgeufb"){  ?>
+<?php if(isset($s_st) AND ($s_st=="buyfgeufb")){  ?>
 <div class="btn-group-vertical">
     <a href="<?php url_site();  ?>/admincp?home" class="btn btn-primary" ><i class="fa fa-tachometer "></i>&nbsp;<?php lang('board'); ?></a>
     <a  href="<?php url_site();  ?>/admincp?users" class="btn btn-primary" ><i class="fa fa-users "></i>&nbsp;<?php lang('list'); ?> <?php lang('users'); ?></a>

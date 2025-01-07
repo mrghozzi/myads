@@ -1,4 +1,4 @@
-<?php if($s_st=="buyfgeufb"){  dinstall_d();  global $admin_page;
+<?php if(isset($s_st) AND ($s_st=="buyfgeufb")){  dinstall_d();  global $admin_page;
   
   if(isset($_GET['st'])){
  $k_type = "knowledgebase";
@@ -654,7 +654,7 @@ style: 'https://cdn.jsdelivr.net/npm/sceditor@3/minified/themes/content/default.
 <div class="section-filters-bar v6">
       <!-- SECTION FILTERS BAR ACTIONS -->
       <div class="section-filters-bar-actions" >
-      <a href="https://www.adstn.gq/kb/myads:<?php lang('list'); ?>&nbsp;<?php lang('exvisit'); ?>" class="button primary " target="_blank">&nbsp;<b><i class="fa fa-question-circle" aria-hidden="true"></i></b></a>
+      <a href="https://github.com/mrghozzi/myads/wiki/<?php lang('list'); ?>&nbsp;<?php lang('exvisit'); ?>" class="button primary " target="_blank">&nbsp;<b><i class="fa fa-question-circle" aria-hidden="true"></i></b></a>
       </div>
       <p class="text-sticker">
           <!-- TEXT STICKER ICON -->

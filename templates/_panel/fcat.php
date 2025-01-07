@@ -1,4 +1,4 @@
-<?php if($s_st=="buyfgeufb"){ dinstall_d(); ?>
+<?php if(isset($s_st) AND ($s_st=="buyfgeufb")){ dinstall_d(); ?>
   <!-- SECTION BANNER -->
 <div class="section-banner" style="background: url(<?php url_site();  ?>/templates/_panel/img/banner/Newsfeed.png) no-repeat 50%;" >
       <!-- SECTION BANNER ICON -->
@@ -19,7 +19,7 @@
       <!-- SECTION FILTERS BAR ACTIONS -->
       <div class="section-filters-bar-actions">
       <?php if(isset($elnk_site) AND ($elnk_site==1)){ ?>
-      <a href="https://www.adstn.gq/kb/myads:post" class="button primary " target="_blank">&nbsp;<b><i class="fa fa-question-circle" aria-hidden="true"></i></b></a>
+      <a href="https://github.com/mrghozzi/myads/wiki/post" class="button primary " target="_blank">&nbsp;<b><i class="fa fa-question-circle" aria-hidden="true"></i></b></a>
       <?php } ?>
       </div>
       <?php   if(isset($_COOKIE['user']))  { ?>
@@ -97,9 +97,9 @@ $cat_txt  = strip_tags($cat_txt, '<br>');
             <!-- FORUM CATEGORY -->
             <div class="forum-category">
               <!-- FORUM CATEGORY IMAGE -->
-              <h1><a href="<?php echo "{$url_site}/f{$wt['id']}"; ?>">
+              <a href="<?php echo "{$url_site}/f{$wt['id']}"; ?>">
                 <i class="fa <?php echo $wt['icons']; ?>" aria-hidden="true"></i>
-              </a></h1>
+              </a>
               <!-- /FORUM CATEGORY IMAGE -->
 
               <!-- FORUM CATEGORY INFO -->

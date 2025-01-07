@@ -1,4 +1,4 @@
-<?php if(isset($s_st)=="buyfgeufb"){ dinstall_d();
+<?php if(isset($s_st) AND ($s_st=="buyfgeufb")){ dinstall_d();
 
  ?>
     <!-- SECTION BANNER -->
@@ -61,7 +61,7 @@
              <div class="form-item split">
                <!-- FORM SELECT -->
                <?php if(isset($elnk_site) AND ($elnk_site==1)){ ?>
-               <a href="https://www.adstn.gq/kb/myads:store:update" class="button default" target="_blank" >&nbsp;<i class="fa fa-question-circle" aria-hidden="true"></i></a>
+               <a href="https://github.com/mrghozzi/myads/wiki/store:update" class="button default" target="_blank" >&nbsp;<i class="fa fa-question-circle" aria-hidden="true"></i></a>
                <?php } ?>
                <!-- BUTTON -->
                <button type="submit" name="submit" id="button" value="Publish" class="button primary"><i class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp; <?php lang('save');  ?></button>

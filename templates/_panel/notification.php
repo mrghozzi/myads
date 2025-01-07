@@ -1,4 +1,4 @@
-<?php if($s_st=="buyfgeufb"){ dinstall_d();  ?>
+<?php if(isset($s_st) AND ($s_st=="buyfgeufb")){ dinstall_d();  ?>
 <div class="account-hub-content">
  <div class="section-header">
           <!-- SECTION HEADER INFO -->

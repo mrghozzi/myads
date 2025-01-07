@@ -6,7 +6,7 @@
 ##                     https://surfer.42web.io                     ##
 ##                         par_absouini                            ##
 ##                         and_mrghozzi                            ##
-##                       copyright (c) 2023                        ##
+##                       copyright (c) 2025                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
@@ -303,5 +303,6 @@ $lang['notifs']      = "Notifications";
 $lang['all_notifs']  = "Afficher toutes les notifications";
 $lang['dir_cats']    = "Catégories du répertoire";
 $lang['forum_cats']  = "Catégories du forum";
+$lang['friends']     = "Amis";
 
 ?>

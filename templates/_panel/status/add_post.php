@@ -1,4 +1,4 @@
-<?php if($s_st=="buyfgeufb"){
+<?php if(isset($s_st) AND ($s_st=="buyfgeufb")){
    if(isset($_COOKIE['user']))
 {
  ?>
@@ -27,7 +27,7 @@
                 <!-- /FORM ITEM -->
               </div>
               <input type="file" id="imgupload" accept=".jpg, .jpeg, .png, .gif" style="display:none"/>
-              <input type="hidden" name="submit_post" value="submit" />
+              <input type="submit" name="submit_post" id="submit_post" value="submit" style="display:none"/>
               <!-- /FORM ROW -->
             </form>
             <!-- /FORM -->
@@ -80,6 +80,7 @@
           <!-- /QUICK POST FOOTER -->
 </div>
 
+<script>$('#btnpost').click(function(){ $('#submit_post').trigger('click'); });</script>
 <script>$('#OpenImgUpload').click(function(){ $('#imgupload').trigger('click'); });</script>
 <script>$('#Open_link').click(function(){
   $(".add_link").html("<div class='input-group'><span class='input-group-text'><i class='fa fa-edit' ></i></span><input type='txt' class='form-control' name='name' id='name'  placeholder='Name' autocomplete='off' required /></div><div class='input-group'><span class='input-group-text'><i class='fa fa-link' ></i></span><input type='url' class='form-control' name='url' id='url'  placeholder='http(s)://' autocomplete='off' required /></div><div class='input-group'><span class='input-group-text'><i class='fa fa-tag' ></i></span><select class='form-control' name='categ' id='categ' ><?php $selectdir = $db_con->prepare("SELECT *  FROM cat_dir WHERE  statu=1 ORDER BY `name` ASC "); $selectdir->execute(); while($selrs15=$selectdir->fetch(PDO::FETCH_ASSOC)){ echo "<option value='{$selrs15['id']}'>{$selrs15['name']}</option>"; } ?></select></div><div class='input-group'><span class='input-group-text'><i class='fa fa-folder' ></i></span><input type='txt' class='form-control' name='tag' id='tag'  placeholder='tags' autocomplete='off' required /></div>");
@@ -99,7 +100,6 @@
          });
      });
 </script>
-<script>$('#btnpost').click(function(){ $('.form').trigger('submit'); });</script>
 <script>
     $(document).ready(function(){
         $('#imgupload').change(function(e){

@@ -7,7 +7,7 @@ include "../../../dbconfig.php";
         $url_site   = $ab['url'];
    include "../../../content/languages/$lng.php";
 
-if(isset($_GET['tid']))   { $bn_id = $_GET['tid'];   }
+if(isset($_GET['tid']))   { $bn_id = $_GET['tid'];   
 
 if(isset($_GET['s_type']) AND (($_GET['s_type']==100) OR ($_GET['s_type']==4) OR ($_GET['s_type']==2) OR ($_GET['s_type']==7867))){
  $s_type ="forum";
@@ -73,3 +73,4 @@ $('#post_close<?php echo $sucat['id']; ?>').click(function(){
   $("#report<?php echo $sucat['id']; ?>").html("");
         });
 </script>
+<?php }else{ echo "404"; } ?>

@@ -3,10 +3,10 @@
 #####################################################################
 ##                                                                 ##
 ##                        My ads v3.0.5(+)                         ##
-##                     http://www.krhost.ga                        ##
-##                   e-mail: admin@krhost.ga                       ##
+##                  https://github.com/mrghozzi                    ##
 ##                                                                 ##
-##                       copyright (c) 2023                        ##
+##                                                                 ##
+##                       copyright (c) 2025                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
@@ -303,5 +303,6 @@ $lang['notifs']      = "Notifications";
 $lang['all_notifs']  = "View all Notifications";
 $lang['dir_cats']    = "Directory Categories";
 $lang['forum_cats']  = "Forum Categories";
+$lang['friends']     = "Friends";
 
 ?>

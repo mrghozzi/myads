@@ -2,11 +2,10 @@
 
 #####################################################################
 ##                                                                 ##
-##                        MYads  v3.x.5                            ##
-##                     http://www.krhost.ga                        ##
-##                   e-mail: admin@krhost.ga                       ##
+##                        MYads  v3.2.x                            ##
+##                  https://github.com/mrghozzi                    ##
 ##                                                                 ##
-##                       copyright (c) 2023                        ##
+##                      copyright (c) 2025                         ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
@@ -41,14 +40,14 @@ if($vrf_License=="65fgh4t8x5fe58v1rt8se9x"){
 {
   	   if($_POST['up_submit']){
         $versionnow = $_POST['versionnow'];
-        $myads_last_updates = "https://api.adstn.gq/myads/last_updates.txt";
+        $myads_last_updates = "https://github.com/mrghozzi/myads_check_updates/raw/main/last_updates.txt";
         $last_updates       = @file_get_contents($myads_last_updates);
         $file_get           = @fopen($last_updates, 'r');
         $Tob                = $_SERVER['DOCUMENT_ROOT'];
         $To                 = $Tob."/upload/";
         @file_put_contents($To."Tmpfile.zip", $file_get);
         $zip                = new ZipArchive;
-		$file               = $To."Tmpfile.zip";
+		  $file               = $To."Tmpfile.zip";
      // $path               = pathinfo(realpath($file), PATHINFO_DIRNAME);
 		if ($zip->open($file) === TRUE) {
 		    $zip->extractTo($Tob);

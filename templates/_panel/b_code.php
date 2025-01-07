@@ -1,4 +1,4 @@
-<?php if($s_st=="buyfgeufb"){ dinstall_d();
+<?php if(isset($s_st) AND ($s_st=="buyfgeufb")){ dinstall_d();
    $o_type =  "extensions_code";
  $bnextensions = $db_con->prepare("SELECT  * FROM `options` WHERE o_type=:o_type " );
 $bnextensions->bindParam(":o_type", $o_type);
@@ -66,9 +66,9 @@ $extensions_code = $abextensions['o_valuer'];
               <!-- /SOCIAL LINK -->
 
               <!-- SOCIAL LINK -->
-              <a class="social-link small youtube" href="https://www.wasp.gq/sharer?url=<?php title_site(''); echo"&nbsp;"; ref_url(); ?>" style="background-color: #1f48ec;" target="_blank" >
+              <a class="social-link small youtube" href="https://telegram.me/share/url?url=<?php ref_url(); echo"&text="; title_site(''); ?>" style="background-color: #0088cc;" target="_blank" >
                 <!-- SOCIAL LINK ICON -->
-                <i class="fa-brands fa-weebly" style="color: #ffffff;"></i>
+                <i class="fa-brands fa-telegram" style="color: #ffffff;"></i>
                 <!-- /SOCIAL LINK ICON -->
               </a>
               <!-- /SOCIAL LINK -->

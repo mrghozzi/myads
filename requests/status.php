@@ -2,11 +2,11 @@
 
 #####################################################################
 ##                                                                 ##
-##                         MYads  v3.x.x                           ##
-##                     http://www.krhost.ga                        ##
-##                   e-mail: admin@krhost.ga                       ##
+##                         MYads  v3.2.x                           ##
+##                  https://github.com/mrghozzi                    ##
 ##                                                                 ##
-##                       copyright (c) 2023                        ##
+##                                                                 ##
+##                       copyright (c) 2025                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
@@ -107,6 +107,8 @@ if($vrf_License=="65fgh4t8x5fe58v1rt8se9x"){
 			}
        }else if($bn_type=="2"){
          if(empty($bn_cat)) { $bn_cat  = "";  }
+         if(!empty($bn_name)){
+          if(!empty($bn_name)){
           $stmsb = $db_con->prepare("INSERT INTO forum (uid,name,txt,cat,statu)
             VALUES(:uid,:name,:txt,:cat,:statu)");
 			      $stmsb->bindParam(":uid",   $bn_uid);
@@ -127,7 +129,8 @@ if($vrf_License=="65fgh4t8x5fe58v1rt8se9x"){
             header("Location: {$url_site}/t{$bn_tid}");
          	}
          	}
-
+        }else{ header('Location: ' . $_SERVER['HTTP_REFERER']); }
+      }else{ header('Location: ' . $_SERVER['HTTP_REFERER']); }
 }else if($bn_type=="4"){
             $bn_name = "image";
             $bn_cat = "0";
@@ -167,6 +170,7 @@ if($vrf_License=="65fgh4t8x5fe58v1rt8se9x"){
 }else if($bn_type=="100"){
           $bn_cat  = "0";
           $bn_name = "post";
+          if (!empty($bn_txt)) {
           $stmsb = $db_con->prepare("INSERT INTO forum (uid,name,txt,cat,statu)
             VALUES(:uid,:name,:txt,:cat,:statu)");
 			      $stmsb->bindParam(":uid",   $bn_uid);
@@ -185,16 +189,12 @@ if($vrf_License=="65fgh4t8x5fe58v1rt8se9x"){
             $stmsbs->bindParam(":ptdk", $bn_tid);
             if($stmsbs->execute()){
             header("Location: {$url_site}/t{$bn_tid}");
+            }
          	}
-         	}
+         	}else{ header('Location: ' . $_SERVER['HTTP_REFERER']); }
 
-       }
+       }else{ echo"404"; }
 
-
-
-
-        
-
-    }
+    }else{ echo"404"; }
  }else{ echo"404"; }
 ?>

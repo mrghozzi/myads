@@ -2,11 +2,11 @@
 
 #####################################################################
 ##                                                                 ##
-##                        MYads  v3.x.x                            ##
-##                     http://www.krhost.ga                        ##
-##                   e-mail: admin@krhost.ga                       ##
+##                        MYads  v3.2.x                            ##
+##                  https://github.com/mrghozzi                    ##
 ##                                                                 ##
-##                       copyright (c) 2022                        ##
+##                                                                 ##
+##                       copyright (c) 2025                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
@@ -69,7 +69,7 @@ echo "<form id=\"defaultForm\" method=\"post\" class=\"form-horizontal\" action=
   <td><input type=\"text\" class=\"form-control\" name=\"o_mode\"   required/></td>
   <td><div class=\"btn-group-vertical\">
   <button type=\"submit\" name=\"ed_submit\" value=\"ed_submit\" class=\"btn btn-info\"><i class=\"fa fa-plus \"></i></button>
-  <a href=\"https://www.adstn.gq/kb/myads:social_login:wasp\"  class='btn btn-warning' ><i class=\"fa fa-question-circle \"></i></a>
+  <a href=\"https://github.com/mrghozzi/myads/wiki/social_login:wasp\"  class='btn btn-warning' ><i class=\"fa fa-question-circle \"></i></a>
   </div></td>
 </tr>
 </form> ";

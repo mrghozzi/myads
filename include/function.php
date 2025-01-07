@@ -2,11 +2,11 @@
 
 #####################################################################
 ##                                                                 ##
-##                        MYads  v3.0.5                            ##
-##                     http://www.krhost.ga                        ##
-##                   e-mail: admin@krhost.ga                       ##
+##                        MYads  v3.2.x                            ##
+##                  https://github.com/mrghozzi                    ##
 ##                                                                 ##
-##                       copyright (c) 2023                        ##
+##                                                                 ##
+##                       copyright (c) 2025                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
@@ -415,6 +415,12 @@ $bnfollow->bindParam(":usrow", $usr);
 $bnfollow->execute();
 $abfollow=$bnfollow->fetch(PDO::FETCH_ASSOC);
 $contfollow= $abfollow['nbr']; if(isset($ret) AND ($ret==1)){  return  $contfollow;  }else{ echo $contfollow;   } }
+function nbr_friends($usr,$ret = false) {    global  $db_con ;
+  $bnfollow = $db_con->prepare("SELECT  COUNT(id) as nbr FROM `like` WHERE uid IN(   SELECT sid    FROM `like`  WHERE uid=:usrow AND type=1  )AND type=1 " );
+  $bnfollow->bindParam(":usrow", $usr);
+  $bnfollow->execute();
+  $abfollow=$bnfollow->fetch(PDO::FETCH_ASSOC);
+  $contfollow= $abfollow['nbr']; if(isset($ret) AND ($ret==1)){  return  $contfollow;  }else{ echo $contfollow;   } }
 function nbr_follows($ret = false) {    global  $db_con ;
 $bnfollow = $db_con->prepare("SELECT  COUNT(id) as nbr FROM `like` WHERE type=1 " );
 $bnfollow->execute();

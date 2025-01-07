@@ -1,4 +1,4 @@
-<?php if($s_st=="buyfgeufb"){  ?>
+<?php if(isset($s_st) AND ($s_st=="buyfgeufb")){  ?>
 <!-- NAVIGATION WIDGET -->
   <nav id="navigation-widget-small" class="navigation-widget navigation-widget-desktop closed sidebar left delayed">
     <!-- USER AVATAR -->

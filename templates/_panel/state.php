@@ -1,4 +1,4 @@
-<?php if($s_st=="buyfgeufb"){ global $admin_page;  ?>
+<?php if(isset($s_st) AND ($s_st=="buyfgeufb")){ global $admin_page;  ?>
 <div class="grid grid change-on-desktop" >
        <div class="achievement-box secondary" style="background: url(<?php url_site();  ?>/templates/_panel/img/banner/state_banner.png) no-repeat 50%; background-size: cover " >
           <!-- ACHIEVEMENT BOX INFO WRAP -->

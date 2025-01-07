@@ -1,4 +1,4 @@
-<?php if($s_st=="buyfgeufb"){ 
+<?php if(isset($s_st) AND ($s_st=="buyfgeufb")){ 
     $stausrff = $db_con->prepare("SELECT * FROM `options` WHERE `o_type` = 'user' AND `o_order` = :o_order ");
     $stausrff->bindParam(":o_order", $catussen['id']);
     $stausrff->execute();

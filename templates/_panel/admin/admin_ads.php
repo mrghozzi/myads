@@ -1,4 +1,4 @@
-<?php if($s_st=="buyfgeufb"){   ?>
+<?php if(isset($s_st) AND ($s_st=="buyfgeufb")){   ?>
 <link href="<?php echo $url_site;  ?>/templates/_panel/css/codemirror.css" rel='stylesheet' type='text/css' />
 <div class="grid grid-3-9 medium-space" >
  <div class="grid-column" >

@@ -9,7 +9,7 @@ include "../../../dbconfig.php";
 
   if(isset($_COOKIE['user']))
 {
-if(isset($_GET['tid']))   { $bn_id = $_GET['tid'];   }
+if(isset($_GET['tid']))   { $bn_id = $_GET['tid'];   
 if(isset($_GET['s_type']) AND (($_GET['s_type']==100) OR ($_GET['s_type']==4))){
  $s_type ="forum";
 }else if(isset($_GET['s_type']) AND ($_GET['s_type']==1)){
@@ -74,4 +74,5 @@ $('#post_close<?php echo $sucat['id']; ?>').click(function(){
   $("#post_form<?php echo $sucat['id']; ?>").html("<?php echo $comtxt ?><div id='report<?php echo $sucat['id']; ?>' ></div>");
         });
 </script>
-<?php } ?>
+<?php } 
+      }else{ echo "404"; } ?>

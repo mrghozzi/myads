@@ -1,4 +1,4 @@
-<?php if($s_st=="buyfgeufb"){ dinstall_d(); ?>
+<?php if(isset($s_st) AND ($s_st=="buyfgeufb")){ dinstall_d(); ?>
   <!-- SECTION BANNER -->
     <div class="section-banner" style="background: url(<?php url_site();  ?>/templates/_panel/img/banner/home_banner.png) no-repeat 50%;" >
       <!-- SECTION BANNER ICON -->
@@ -214,7 +214,7 @@
             <!-- banner DECORATION TEXT -->
             <p class="stats-decoration-text">
               <?php if(isset($elnk_site) AND ($elnk_site==1)){ ?>
-              <a href="https://www.adstn.gq/kb/myads:Banners Ads" class="button primary padded" target="_blank" >&nbsp;<b><i class="fa fa-question-circle" aria-hidden="true"></i></b></a>
+              <a href="https://github.com/mrghozzi/myads/wiki/Banners Ads" class="button primary padded" target="_blank" >&nbsp;<b><i class="fa fa-question-circle" aria-hidden="true"></i></b></a>
                &nbsp;
               <?php } ?>
               <a class="button tertiary padded" href="<?php url_site();  ?>/state?ty=banner&st=vu" >&nbsp;<i class="fa fa-line-chart" aria-hidden="true"></i>&nbsp;</a>
@@ -254,7 +254,7 @@
             <!-- link DECORATION TEXT -->
             <p class="stats-decoration-text">
               <?php if(isset($elnk_site) AND ($elnk_site==1)){ ?>
-              <a href="https://www.adstn.gq/kb/myads:Text Ads" class="button primary padded" target="_blank" >&nbsp;<b><i class="fa fa-question-circle" aria-hidden="true"></i></b></a>
+              <a href="https://github.com/mrghozzi/myads/wiki/Text Ads" class="button primary padded" target="_blank" >&nbsp;<b><i class="fa fa-question-circle" aria-hidden="true"></i></b></a>
                &nbsp;
               <?php } ?>
               <a class="button tertiary padded" href="<?php url_site();  ?>/state?ty=link&st=vu" >&nbsp;<i class="fa fa-line-chart" aria-hidden="true"></i>&nbsp;</a>
@@ -294,7 +294,7 @@
             <!-- Exchange DECORATION TEXT -->
             <p class="stats-decoration-text">
               <?php if(isset($elnk_site) AND ($elnk_site==1)){ ?>
-              <a href="https://www.adstn.gq/kb/myads:Exchange" class="button primary padded" target="_blank" >&nbsp;<b><i class="fa fa-question-circle" aria-hidden="true"></i></b></a>
+              <a href="https://github.com/mrghozzi/myads/wiki/Exchange" class="button primary padded" target="_blank" >&nbsp;<b><i class="fa fa-question-circle" aria-hidden="true"></i></b></a>
                &nbsp;
               <?php } ?>
               <a  href="<?php url_site();  ?>/v_list" class="button secondary padded" ><?php lang('list'); echo"&nbsp;"; lang('exvisit'); ?></a>
@@ -329,7 +329,7 @@
             <!-- pts DECORATION SUBTITLE -->
             <p class="switch-option-title">
             <?php if(isset($elnk_site) AND ($elnk_site==1)){ ?>
-            <a href="https://www.adstn.gq/kb/myads:pts" class="button primary padded" target="_blank" >&nbsp;<b><i class="fa fa-question-circle" aria-hidden="true"></i></b></a>
+            <a href="https://github.com/mrghozzi/myads/wiki/pts" class="button primary padded" target="_blank" >&nbsp;<b><i class="fa fa-question-circle" aria-hidden="true"></i></b></a>
             <?php } ?>
             <a class="button padded" href="<?php url_site();  ?>/r_code" ><i class="fa fa-users"></i>&nbsp;<?php lang('referal'); ?></a>
 

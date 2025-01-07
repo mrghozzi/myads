@@ -1,4 +1,4 @@
-<?php if($s_st=="buyfgeufb"){ dinstall_d(); ?>
+<?php if(isset($s_st) AND ($s_st=="buyfgeufb")){ dinstall_d(); ?>
   <!-- SECTION BANNER -->
     <div class="section-banner" style="background: url(<?php url_site();  ?>/templates/_panel/img/banner/state_banner.png) no-repeat 50%;" >
       <!-- SECTION BANNER ICON -->

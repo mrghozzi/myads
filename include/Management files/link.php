@@ -2,11 +2,11 @@
 
 #####################################################################
 ##                                                                 ##
-##                        MYads  v3.x.x                            ##
-##                     http://www.krhost.ga                        ##
-##                   e-mail: admin@krhost.ga                       ##
+##                        MYads  v3.2.x                            ##
+##                  https://github.com/mrghozzi                    ##
 ##                                                                 ##
-##                       copyright (c) 2023                        ##
+##                                                                 ##
+##                       copyright (c) 2025                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
@@ -19,7 +19,7 @@ if($vrf_License=="65fgh4t8x5fe58v1rt8se9x"){
 {
 
 
-$statement = "`link` WHERE id ORDER BY `id` DESC";
+$statement = "`link` WHERE id ORDER BY 'id' DESC";
 $results =$db_con->prepare("SELECT * FROM {$statement} ");
 $results->execute();
 function lnk_list() {  global  $results;  global  $statement;   global  $db_con;  global  $url_site;
