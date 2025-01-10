@@ -124,7 +124,9 @@ $catusz = $db_con->prepare("SELECT *  FROM `forum` WHERE statu=1 AND  id=".$sutc
 $catusz->execute();
 $sucat=$catusz->fetch(PDO::FETCH_ASSOC);
 if(isset($sucat['statu'])=="1") {   tpl_topic_stt($sutcat,0);   }
- }   echo pagination($statement,$per_page,$page);
+ } 
+ $url=$url_site."/forum?f=".$_GET['f']."&";  
+ echo pagination($statement,$per_page,$page,$url);
       }
     template_mine('header');
     template_mine('forum');
