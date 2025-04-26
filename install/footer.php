@@ -1,7 +1,9 @@
 <?php
-echo "<div class=\"footer\">
-		<p>Copyright © 2022 All Rights Reserved <a href=\"http://www.krhost.ga\">kariya-host</a></p>
-	</div>
+echo "<footer>
+        <div class=\"footer-container\">
+            <p>&copy; 2025 MyAds. All rights reserved.</p>
+        </div>
+    </footer>
 </body>
 </html>";
 ?>

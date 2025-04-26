@@ -1,64 +1,63 @@
-﻿ <?php
- require_once '../dbconfig.php';
+﻿<?php
+require_once '../dbconfig.php';
 
-      if($_POST)
-	{
-        $etit = $_POST['etit'];
-		$eurl = $_POST['eurl'];
-        $eid  = "1";
-        $stmt = $db_con->prepare("UPDATE setting SET titer=:etit,url=:eurl  WHERE id=:id ");
-		$stmt->bindParam(":etit", $etit);
-		$stmt->bindParam(":eurl", $eurl);
-        $stmt->bindParam(":id", $eid);
-  }
+// تحديث الإعدادات في قاعدة البيانات
+if ($_POST) {
+    $etit = $_POST['etit'];
+    $eurl = $_POST['eurl'];
+    $eid  = "1";
 
-   include "header.php";
-    ?>
-     <script language="javascript" src="http://api.adstn.gq/myads.php?name=<?php echo  $etit; ?> (<?php echo $version; ?>)"></script>
-    <div class="main-content">
-		<div class="form">
-			<div class="sap_tabs">
-				<div id="horizontalTab" style="display: block; width: 100%; margin: 0px;">
+    $stmt = $db_con->prepare("UPDATE setting SET titer=:etit, url=:eurl WHERE id=:id");
+    $stmt->bindParam(":etit", $etit);
+    $stmt->bindParam(":eurl", $eurl);
+    $stmt->bindParam(":id", $eid);
+}
 
-                       <div class="facts">
-					        <div class="register">
-                            <p><?php if($stmt->execute())
-		{
-         echo "Successfully updated";
-		}
-		else{
-             	echo "Query Problem";
-		} ?></p>
-						         <form method='post'  action='install5.php'>
-                                 <h3>Admin Username:</h3>
-							     <input  type="text" placeholder="Username" name="user_name">
-							     <h3>Admin Email:</h3>
-							     <input  type="text" placeholder="Email address" name="user_email">
-                                 <h3>Password:</h3>
-							     <input type="password" placeholder="Password" name="password">
-                                 <div class="sign-up">
-								 <input type="submit" value='Next' class="btn btn-primary" name="btn-signup"/>
-								 </div>
-                                </form>
-						    </div>
-				        </div>
+include "header.php";
+?>
 
-			 	</div>
-		    </div>
+<div class="main-content">
+    <div class="form">
+        <div class="sap_tabs">
+            <div id="horizontalTab" style="display: block; width: 100%; margin: 0px;">
+                <div class="facts">
+                    <div class="register">
+                        <p>
+                            <?php
+                            if ($stmt->execute()) {
+                                echo "<span style='color: green;'>Successfully updated</span>";
+                            } else {
+                                echo "<span style='color: red;'>Query Problem</span>";
+                            }
+                            ?>
+                        </p>
+                        <form method="post" action="install5.php">
+                            <h3>Admin Username:</h3>
+                            <input type="text" placeholder="Username" name="user_name" required>
+
+                            <h3>Admin Email:</h3>
+                            <input type="email" placeholder="Email address" name="user_email" required>
+
+                            <h3>Password:</h3>
+                            <input type="password" placeholder="Password" name="password" required>
+
+                            <div class="sign-up">
+                                <input type="submit" value="Next" class="btn btn-primary" name="btn-signup">
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="right">
-			<h4>Step 3</h4>
-			<ul>
-				<li><p>Type your username or e-mail and password for administration</p></li>
-				<li><p>Click on the next button</p></li>
+    </div>
+    <div class="right">
+        <h4>Step 3</h4>
+        <ul>
+            <li><p>Type your username, email, and password for administration.</p></li>
+            <li><p>Click on the "Next" button to proceed.</p></li>
+        </ul>
+    </div>
+    <div class="clear"></div>
+</div>
 
-			</ul>
-
-
-		</div>
-		<div class="clear"></div>
-	</div>
-
-
-
-   <?php   include "footer.php";   ?>
+<?php include "footer.php"; ?>

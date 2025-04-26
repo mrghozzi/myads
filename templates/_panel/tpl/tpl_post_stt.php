@@ -51,7 +51,7 @@ $likeuscmr->execute();
 $usliker=$likeuscmr->fetch(PDO::FETCH_ASSOC);
  if(isset($usliker)  AND ($usliker['o_parent']==$o_parent)){
 $reaction_img  = "<img class=\"reaction-option-image\" src=\"{$url_site}/templates/_panel/img/reaction/{$usliker['o_valuer']}.png\"  width=\"30\" alt=\"reaction-{$usliker['o_valuer']}\">";
-$reaction_name = $usliker['o_valuer'];
+$reaction_name = $lang[$usliker['o_valuer']]; // استخدام النصوص من ملفات اللغة
      if($usliker['o_valuer']=="like"){         $reaction_color = "style=\"color: #1bc8db;\""; }
      else if($usliker['o_valuer']=="love"){    $reaction_color = "style=\"color: #fc1f3b;\""; }
      else if($usliker['o_valuer']=="dislike"){ $reaction_color = "style=\"color: #3f3cf8;\""; }
