@@ -347,19 +347,20 @@ $msgusid=$sus['id'];
 if ($page <= 0) $page = 1;
 $per_page = 20; // Records per page.
 $startpoint = ($page * $per_page) - $per_page;
-$statement = "`like` WHERE uid IN(   SELECT sid    FROM `like`  WHERE uid={$msgusid} AND type=1  )AND type=1 ORDER BY `time_t` DESC";
-$results = $db_con->prepare("SELECT  * FROM {$statement} LIMIT {$startpoint} , {$per_page} " );
+$statement = "`like` a
+    JOIN `like` b ON a.uid = b.sid AND a.sid = b.uid
+    JOIN users u ON u.id = a.sid
+    WHERE a.uid = {$msgusid} AND a.type = 1 AND b.type = 1
+    ORDER BY a.time_t DESC";
+$results = $db_con->prepare("SELECT  u.* FROM {$statement} LIMIT {$startpoint} , {$per_page} " );
 $results->execute();
 
-while($wt=$results->fetch(PDO::FETCH_ASSOC)) {
-$fgft=$wt['uid'];
-$catusen = $db_con->prepare("SELECT *  FROM users WHERE  id='{$fgft}' ");
-$catusen->execute();
-$catussen=$catusen->fetch(PDO::FETCH_ASSOC);
-$time_cmt=convertTime($wt['time_t']);
-if($catussen['id'] != ""){
+while($catussen=$results->fetch(PDO::FETCH_ASSOC)) {
+
+$time_cmt= "";
+
 include "templates/_panel/users_templates/user_list.php";
- } }$url=$url_site."/user?ff=".$_GET['ff']."&";
+ } $url=$url_site."/user?ff=".$_GET['ff']."&";
     echo pagination($statement,$per_page,$page,$url);
       ?>    
 		</div>	

@@ -415,12 +415,30 @@ $bnfollow->bindParam(":usrow", $usr);
 $bnfollow->execute();
 $abfollow=$bnfollow->fetch(PDO::FETCH_ASSOC);
 $contfollow= $abfollow['nbr']; if(isset($ret) AND ($ret==1)){  return  $contfollow;  }else{ echo $contfollow;   } }
-function nbr_friends($usr,$ret = false) {    global  $db_con ;
-  $bnfollow = $db_con->prepare("SELECT  COUNT(id) as nbr FROM `like` WHERE uid IN(   SELECT sid    FROM `like`  WHERE uid=:usrow AND type=1  )AND type=1 " );
-  $bnfollow->bindParam(":usrow", $usr);
-  $bnfollow->execute();
-  $abfollow=$bnfollow->fetch(PDO::FETCH_ASSOC);
-  $contfollow= $abfollow['nbr']; if(isset($ret) AND ($ret==1)){  return  $contfollow;  }else{ echo $contfollow;   } }
+function nbr_friends($usr, $ret = false) {
+  global $db_con;
+
+  $query = "
+      SELECT COUNT(*) AS nbr
+      FROM `like` a
+      JOIN `like` b ON a.uid = b.sid AND a.sid = b.uid
+      WHERE a.uid = :usr AND a.type = 1 AND b.type = 1
+  ";
+
+  $stmt = $db_con->prepare($query);
+  $stmt->bindParam(':usr', $usr);
+  $stmt->execute();
+
+  $result = $stmt->fetch(PDO::FETCH_ASSOC);
+  $count = $result['nbr'];
+
+  // Return the count or echo it based on the $ret parameter
+  if ($ret) {
+      return $count;
+  } else {
+      echo $count;
+  }
+}
 function nbr_follows($ret = false) {    global  $db_con ;
 $bnfollow = $db_con->prepare("SELECT  COUNT(id) as nbr FROM `like` WHERE type=1 " );
 $bnfollow->execute();
