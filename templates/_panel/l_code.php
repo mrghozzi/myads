@@ -109,7 +109,7 @@ $extensions_code = $abextensions['o_valuer'];
                 <hr />
                 <!-- /TAB BOX ITEM TITLE -->
                 <div class="well" style="color: black;" >
-                <textarea class="form-control" type="text"  readonly >
+                <textarea class="form-control" type="text" readonly onclick="this.select(); document.execCommand('copy');">
                 <?php lnk_mine('468','60');  ?>
                 <?php echo htmlspecialchars($extensions_code);  ?>
                 </textarea>
@@ -132,7 +132,7 @@ $extensions_code = $abextensions['o_valuer'];
                 <hr />
                 <!-- /TAB BOX ITEM TITLE -->
                 <div class="well" style="color: black;" >
-                <textarea class="form-control" type="text"  readonly >
+                <textarea class="form-control" type="text" readonly onclick="this.select(); document.execCommand('copy');">
                 <?php lnk_mine('510','320');  ?>
                 <?php echo htmlspecialchars($extensions_code);  ?>
                 </textarea>

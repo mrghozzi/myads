@@ -125,7 +125,7 @@ $extensions_code = $abextensions['o_valuer'];
                 <hr />
                 <!-- /TAB BOX ITEM TITLE -->
                 <div class="well" style="color: black;" >
-                <textarea class="form-control" type="text"  readonly >
+                <textarea class="form-control" type="text" readonly onclick="this.select(); document.execCommand('copy');">
                 <?php grid_mine('728','90');  ?>
                 <?php echo htmlspecialchars($extensions_code);  ?>
                 </textarea>
@@ -151,7 +151,7 @@ $extensions_code = $abextensions['o_valuer'];
                 <hr />
                 <!-- /TAB BOX ITEM TITLE -->
                 <div class="well" style="color: black;" >
-                <textarea class="form-control" type="text"  readonly >
+                <textarea class="form-control" type="text" readonly onclick="this.select(); document.execCommand('copy');">
                 <?php grid_mine('300','250');  ?>
                 <?php echo htmlspecialchars($extensions_code);  ?>
                 </textarea>
@@ -176,7 +176,7 @@ $extensions_code = $abextensions['o_valuer'];
                 <hr />
                 <!-- /TAB BOX ITEM TITLE -->
                 <div class="well" style="color: black;" >
-                <textarea class="form-control" type="text"  readonly >
+                <textarea class="form-control" type="text" readonly onclick="this.select(); document.execCommand('copy');">
                 <?php grid_mine('160','600');  ?>
                 <?php echo htmlspecialchars($extensions_code);  ?>
                 </textarea>
@@ -201,7 +201,7 @@ $extensions_code = $abextensions['o_valuer'];
                 <hr />
                 <!-- /TAB BOX ITEM TITLE -->
                 <div class="well" style="color: black;" >
-                <textarea class="form-control" type="text"  readonly >
+                <textarea class="form-control" type="text" readonly onclick="this.select(); document.execCommand('copy');">
                 <?php grid_mine('468','60');  ?>
                 <?php echo htmlspecialchars($extensions_code);  ?>
                 </textarea>
