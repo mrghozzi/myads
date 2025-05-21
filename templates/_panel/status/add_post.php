@@ -14,7 +14,7 @@
                 <div class="form-item">
                   <!-- FORM TEXTAREA -->
                   <div class="form-textarea">
-                    <textarea id="txt" class="quicktext" name="txt" placeholder="Hi <?php echo $uRow['username']; ?>! Share your post here..."></textarea>
+                    <textarea id="txt" class="quicktext" name="txt" placeholder="<?php echo str_replace("[username]", $uRow['username'] , $lang['husyph']);?>"></textarea>
                     <div class="result" ></div>
                     <!-- FORM TEXTAREA LIMIT TEXT -->
                     <p class="form-textarea-limit-text"></p>
@@ -44,10 +44,6 @@
                 <svg class="quick-post-footer-action-icon icon-camera">
                   <use xlink:href="#svg-camera"></use>
                 </svg>
-                <!-- /QUICK POST FOOTER ACTION ICON -->
-              <div class="xm-tooltip" style="white-space: nowrap; position: absolute; z-index: 99999; top: -32px; left: 50%; margin-left: -42.5px; opacity: 0; visibility: hidden; transform: translate(0px, 10px); transition: all 0.3s ease-in-out 0s;">
-              <p class="xm-tooltip-text">Insert Photo</p>
-              </div>
               </div>
               <!-- /QUICK POST FOOTER ACTION -->
 
@@ -56,9 +52,6 @@
                 <!-- QUICK POST FOOTER ACTION ICON -->
                 <i class="fa fa-link" ></i>
                 <!-- /QUICK POST FOOTER ACTION ICON -->
-              <div class="xm-tooltip" style="white-space: nowrap; position: absolute; z-index: 99999; top: -32px; left: 50%; margin-left: -35.5px; opacity: 0; visibility: hidden; transform: translate(0px, 10px); transition: all 0.3s ease-in-out 0s;">
-              <p class="xm-tooltip-text">Insert Link</p>
-              </div>
               </div>
               <!-- /QUICK POST FOOTER ACTION -->
 
@@ -72,7 +65,7 @@
                 <!-- /BUTTON -->
 
                 <!-- BUTTON -->
-                <p class="button small secondary" id="btnpost" >Post</p>
+                <p class="button small secondary" id="btnpost" ><?php lang('spread'); ?></p>
                 <!-- /BUTTON -->
               </div>
               <!-- /QUICK POST FOOTER ACTIONS -->

@@ -29,21 +29,29 @@
        $replace = array("1","2","3","4");
        $replace_torzer = array("1","2","5","10");
        $replace_to = array(
- "<script>function refreshpage(interval, countdownel, totalel){
-	var countdownel = document.getElementById(countdownel)
-	var totalel = document.getElementById(totalel)
-	var timeleft = interval+1
-	var countdowntimer
-    function countdown(){timeleft--countdownel.innerHTML = timeleftif (timeleft == 0){clearTimeout(countdowntimer)window.location.reload()}
-	countdowntimer = setTimeout(function(){countdown()
-		}, 1000)
-	}
-    countdown()
-}
-window.onload = function(){
-	refreshpage(10, \"countdown\") // refreshpage(duration_in_seconds, id_of_element_to_show_result)
+ "<script>
+function refreshPage(interval, countdownEl) {
+  let timeLeft = interval;
+  const countdownElement = document.getElementById(countdownEl);
+  
+  if (!countdownElement) return;
+  
+  countdownElement.textContent = timeLeft;
+  
+  const timer = setInterval(() => {
+    timeLeft--;
+    countdownElement.textContent = timeLeft;
+    
+    if (timeLeft <= 0) {
+      clearInterval(timer);
+      window.location.reload();
+    }
+  }, 1000);
 }
 
+document.addEventListener('DOMContentLoaded', () => {
+  refreshPage(10, 'countdown');
+});
 </script>",
  "<script>
 function refreshpage(interval, countdownel, totalel){
@@ -156,65 +164,139 @@ window.onload = function(){
 }
 
 </script>";
-  echo "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\">\n<HTML><HEAD>
-  <META http-equiv=Content-Type content=\"text/html;\"><title>{$title_s}</title></HEAD>
-  <BODY>
-  <table width='936' width2='234' height='60' cellspacing='1' cellpadding='0' border='0' bgcolor='#0099ff' style='background-color:#0099ff'>
- <tr>
- <td>
- <table width='934' width2='232' height='58' cellspacing='0' cellpadding='1' border='0' bgcolor='#FFFFFF' style='background-color:#FFFFFF'>
- 	<tr>
-    <td colspan='2' width height>
-    <table width='464' width2='230' height cellspacing='0' cellpadding='2' border='0'>
-    <tr>
-
-
-    <td style='cursor:pointer' width='229' height='41' align='left' valign='top'   >
-    	  <center>".$bads3."</center>
-    </td> </tr>
-  </table>
-                            			</td>
-                                        	</tr>
-                                            	<tr>
-     <td nowrap width='50%' height='11' align='left' bgcolor='#0099ff'>
-        	<a class='attribution'  >
-            	<font style='font-size:12px; font-family:verdana,arial,sans-serif; line-height:13px;color:#FFFFFF; text-decoration:none' color='#FFFFFF'>
-                			<div>Next site in <b id=\"countdown\"></b> seconds</div></font></a></td>
-     			</tr></table>		</td>	</tr></table>
-  <IFRAME SRC='{$url_site}' width=100% height=100% marginwidth=0 marginheight=0 hspace=0 vspace=0 frameborder=0 scrolling='no'></IFRAME></BODY>";
+  echo "<!DOCTYPE html>
+<html lang=\"en\">
+<head>
+  <meta charset=\"UTF-8\">
+  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
+  <title>{$title_s}</title>
+  <style>
+    .traffic-container {
+      max-width: 100%;
+      margin: 0 auto;
+      font-family: Arial, sans-serif;
+    }
+    .header {
+      background-color: #0099ff;
+      color: white;
+      padding: 15px;
+      border-radius: 5px 5px 0 0;
+    }
+    .content {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 0 0 5px 5px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .countdown {
+      font-weight: bold;
+      color:rgb(255, 255, 255);
+    }
+    .site-frame {
+      width: 100%;
+      height: calc(100vh - 150px);
+      border: none;
+      margin-top: 10px;
+    }
+    @media (max-width: 768px) {
+      .header, .content {
+        padding: 10px;
+      }
+    }
+  </style>
+</head>
+<body class=\"traffic-container\">
+  <div class=\"header\">
+    <div>Next site in <span class=\"countdown\" id=\"countdown\"></span> seconds</div>
+  </div>
+  <div class=\"content\">
+    <iframe class=\"site-frame\" src=\"{$url_site}\"></iframe>
+  </div>
+</body>
+</html>";
 
 }
      }else{
-  echo "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\">\n<HTML><HEAD>
-  <META http-equiv=Content-Type content=\"text/html;\"><title>{$ab['name']}</title></HEAD>
-  <BODY>
+  echo "<!DOCTYPE html>
+<html lang=\"en\">
+<head>
+  <meta charset=\"UTF-8\">
+  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
+  <title>{$ab['name']}</title>
+  <style>
+    .traffic-container {
+      max-width: 100%;
+      margin: 0 auto;
+      font-family: Arial, sans-serif;
+    }
+    .header {
+      background-color: #0099ff;
+      color: white;
+      padding: 15px;
+      border-radius: 5px 5px 0 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .site-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .report-btn {
+      color: white;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .content {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 0 0 5px 5px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .countdown {
+      font-weight: bold;
+      color:rgb(255, 255, 255);
+    }
+    .site-frame {
+      width: 100%;
+      height: calc(100vh - 150px);
+      border: none;
+      margin-top: 10px;
+    }
+    @media (max-width: 768px) {
+      .header, .content {
+        padding: 10px;
+      }
+      .header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+    }
+  </style>
+</head>
+<body class=\"traffic-container\">
   {$type}
-  <table width='936' width2='234' height='60' cellspacing='1' cellpadding='0' border='0' bgcolor='#0099ff' style='background-color:#0099ff'>
- <tr>
- <td>
- <table width='934' width2='232' height='58' cellspacing='0' cellpadding='1' border='0' bgcolor='#FFFFFF' style='background-color:#FFFFFF'>
- 	<tr>
-    <td colspan='2' width height>
-    <table width='464' width2='230' height cellspacing='0' cellpadding='2' border='0'>
-    <tr style='cursor:pointer' width='229' height='41' align='center' valign='top'   >
-    		<font style='font-size:11px; font-family:verdana,arial,sans-serif; line-height:14px; text-decoration:underline;color:#660066' color='#660066'>
-            <a href='{$url_site}/report?visits={$ab['id']}' target='_blank'><img src='{$url_site}/templates/_panel/img/Alert-icon.png' alt='Report'></a> | <b>{$ab['name']}</b>
-            </font>
-     </tr>
-        <br />
-    <tr style='cursor:pointer' width='229' height='41' align='center' valign='top'   >
-    	<center>".$bads3."</center>
-    </tr>
-  </table>
-                            			</td>
-                                        	</tr>
-                                            	<tr>
-     <td nowrap width='50%' height='11' align='left' bgcolor='#0099ff'>
-        	<a class='attribution' >
-            	<font style='font-size:12px; font-family:verdana,arial,sans-serif; line-height:13px;color:#FFFFFF; text-decoration:none' color='#FFFFFF'>
-                			<div>Next site in <b id=\"countdown\"></b> seconds</div></font></a></td>
-     			</tr></table>		</td>	</tr></table>
-  <IFRAME SRC='{$ab['url']}'  width=100% height=100% marginwidth=0 marginheight=0 hspace=0 vspace=0 frameborder=0 scrolling='no'></IFRAME></BODY>";
+  <div class=\"header\">
+    <div class=\"site-info\">
+      <a href=\"{$url_site}/report?visits={$ab['id']}\" target=\"_blank\" class=\"report-btn\">
+        <img src=\"{$url_site}/templates/_panel/img/Alert-icon.png\" alt=\"Report\" width=\"16\">
+        Report
+      </a>
+      <span>{$ab['name']}</span>
+    </div>
+	{$bads3}
+    <div>Next site in <span class=\"countdown\" id=\"countdown\"></span> seconds</div>
+  </div>
+  <div class=\"content\">
+    
+    <iframe class=\"site-frame\" src=\"{$ab['url']}\"></iframe>
+  </div>
+</body>
+</html>";
 
  	  $ids = $ab['id'];
       $idu = $ab['uid'];

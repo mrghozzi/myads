@@ -4,20 +4,6 @@
       <!-- SECTION MENU -->
       <div id="section-navigation-slider" class="section-menu">
         <!-- SECTION MENU ITEM -->
-        <a class="section-menu-item" href="profile-about.html">
-          <!-- SECTION MENU ITEM ICON -->
-          <svg class="section-menu-item-icon icon-profile">
-            <use xlink:href="#svg-profile"></use>
-          </svg>
-          <!-- /SECTION MENU ITEM ICON -->
-
-          <!-- SECTION MENU ITEM TEXT -->
-          <p class="section-menu-item-text">About</p>
-          <!-- /SECTION MENU ITEM TEXT -->
-        </a>
-        <!-- /SECTION MENU ITEM -->
-
-        <!-- SECTION MENU ITEM -->
         <a class="section-menu-item <?php if(isset($_GET['u'])){ echo "active"; } ?>" href="<?php url_site();  ?>/u/<?php echo $usrRow['o_valuer']; ?>">
           <!-- SECTION MENU ITEM ICON -->
           <svg class="section-menu-item-icon icon-timeline">
@@ -26,7 +12,7 @@
           <!-- /SECTION MENU ITEM ICON -->
   
           <!-- SECTION MENU ITEM TEXT -->
-          <p class="section-menu-item-text">Timeline</p>
+          <p class="section-menu-item-text"><?php lang('timeline'); ?></p>
           <!-- /SECTION MENU ITEM TEXT -->
         </a>
         <!-- /SECTION MENU ITEM -->
@@ -54,7 +40,7 @@
           <!-- /SECTION MENU ITEM ICON -->
   
           <!-- SECTION MENU ITEM TEXT -->
-          <p class="section-menu-item-text">Photos</p>
+          <p class="section-menu-item-text"><?php lang('photos'); ?></p>
           <!-- /SECTION MENU ITEM TEXT -->
         </a>
         <!-- /SECTION MENU ITEM -->
@@ -68,7 +54,7 @@
           <!-- /SECTION MENU ITEM ICON -->
 
           <!-- SECTION MENU ITEM TEXT -->
-          <p class="section-menu-item-text">Blog</p>
+          <p class="section-menu-item-text"><?php lang('blogs'); ?></p>
           <!-- /SECTION MENU ITEM TEXT -->
         </a>
         <!-- /SECTION MENU ITEM -->

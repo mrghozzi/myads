@@ -1,16 +1,16 @@
 <?php if (isset($s_st) AND ($s_st == "buyfgeufb")) { ?>
 <div class="btn-group-vertical">
-    <!-- لوحة التحكم -->
+    <!-- Control Panel -->
     <a href="<?php url_site(); ?>/admincp?home" class="btn btn-primary">
         <i class="fa fa-tachometer"></i>&nbsp;<?php lang('board'); ?>
     </a>
 
-    <!-- إدارة المستخدمين -->
+    <!-- Users Management -->
     <a href="<?php url_site(); ?>/admincp?users" class="btn btn-primary">
         <i class="fa fa-users"></i>&nbsp;<?php lang('list'); ?> <?php lang('users'); ?>
     </a>
 
-    <!-- الإعلانات -->
+    <!-- Ads -->
     <p class="btn btn-warning">
         <i class="fa fa-bar-chart"></i>&nbsp;<?php lang('list'); ?>&nbsp;<?php lang('ads'); ?>
     </p>
@@ -24,7 +24,7 @@
         <?php lang('list'); ?> <?php lang('exvisit'); ?>
     </a>
 
-    <!-- الإعدادات العامة -->
+    <!-- General Settings -->
     <p class="btn btn-warning">
         <i class="fa fa-cog"></i><i class="fa fa-comments"></i>&nbsp;<?php lang('Comusetting'); ?>
     </p>
@@ -47,7 +47,7 @@
         <?php lang('reports'); ?>
     </a>
 
-    <!-- التصميم -->
+    <!-- Design -->
     <p class="btn btn-warning">
         <i class="fa fa-paint-brush"></i>&nbsp;<?php lang('style'); ?>
     </p>
@@ -64,7 +64,7 @@
         <i class="fa fa-plug"></i> <?php lang('plugins'); ?>
     </a>
 
-    <!-- الخيارات -->
+    <!-- Options -->
     <p class="btn btn-warning">
         <i class="fa fa-cog"></i>&nbsp;<?php lang('options'); ?>
     </p>

@@ -1,4 +1,5 @@
 <?php if(isset($s_st) AND ($s_st=="buyfgeufb")){
+    // Check for system updates
 
                    $myads_last_time_updates = "https://github.com/mrghozzi/myads_check_updates/raw/main/latest_version.txt";
                    $last_time_updates = @file_get_contents($myads_last_time_updates, FILE_USE_INCLUDE_PATH);
@@ -13,12 +14,18 @@
                    }  
 
 ?>
+<!-- Main grid structure -->
 <div class="grid grid-3-6-3 medium-space" >
+<!-- First column - Navigation menu -->
+<!-- Main column - Statistics -->
 <div class="grid-column" >
 <?php template_mine('admin/admin_nav');  ?>
 </div>
+<!-- First column - Navigation menu -->
+<!-- Main column - Statistics -->
 <div class="grid-column" >
-   <div class="grid grid-half">
+   <!-- Statistics grid -->
+<div class="grid grid-half">
           <!-- STATS DECORATION -->
           <div class="stats-decoration v2 secondary">
             <!-- STATS DECORATION TITLE -->
@@ -266,6 +273,8 @@
       </div>
 
 </div>
+<!-- First column - Navigation menu -->
+<!-- Main column - Statistics -->
 <div class="grid-column" >
 
   <div class="btn-group-vertical">
@@ -287,7 +296,8 @@
     <a href="https://github.com/mrghozzi/myads/wiki/changelogs" class="btn btn-warning" target="_blank">Changelogs&nbsp;<b><i class="fa fa-external-link" ></i></b></a>
     
   </div>
-  <div class="widget-box">
+  <!-- Developer info box -->
+<div class="widget-box">
         <div class="widget-box-content no-margin-top">
            <div class="table table-top-friends join-rows">
 						<div class="table-header">

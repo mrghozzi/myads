@@ -1,4 +1,6 @@
-<?php if(isset($s_st) AND ($s_st=="buyfgeufb")){  dinstall_d();  global $admin_page;
+<?php 
+// Check admin permissions
+if(isset($s_st) AND ($s_st=="buyfgeufb")){  dinstall_d();  global $admin_page;
   
   if(isset($_GET['st'])){
  $k_type = "knowledgebase";
@@ -30,10 +32,12 @@
 
             <div id="page-wrapper" style="min-height: 486px;">
 			<div class="main-page">
-				<!--buttons-->
+				<!-- Buttons -->
 				<div class="inbox-section">
+				<!-- Inbox section -->
                     <div class="inbox-grids">
-						<div class="col-md-3 inbox-grid">
+						<!-- Sidebar column -->
+<div class="col-md-3 inbox-grid">
                           <div class="grid-inbox">
                             <div class="inbox-top">
                                <div class="inbox-text">
@@ -49,9 +53,11 @@
                           </div>
                            <hr />
 						</div>
+<!-- Main column -->
 <div class="col-md-9 inbox-grid1">
  <div class="mailbox-content">
-    <div class="panel panel-primary">
+    <!-- Main info panel -->
+<div class="panel panel-primary">
             <div class="panel-heading"><center><b><?php echo $sknowled['name']; ?></b></center></div>
             <div class="panel-body">
 				  <div class=" col-md-8 compose-btn">
@@ -67,7 +73,8 @@
     </div>
  <div class=" col-md-12 inbox-grid1">
   <hr />
-  <div class="panel panel-default">
+  <!-- Content display panel -->
+<div class="panel panel-default">
     <div class="panel-body">
      <div class="topic">
 	  <p><?php echo $sknowled['o_valuer']; ?></p>
@@ -291,12 +298,12 @@ style: 'https://cdn.jsdelivr.net/npm/sceditor@3/minified/themes/content/default.
                  $catust->execute();
                  $susat=$catust->fetch(PDO::FETCH_ASSOC);
  ?>
-     <!-- GRID -->
+     <!-- Grid layout -->
     <div class="grid">
-      <!-- GRID -->
+      <!-- Grid layout -->
       <div class="grid grid-12 centered">
       <?php tpl_store_stt($susat,0); ?>
-				<!--buttons-->
+				<!-- Action buttons -->
 				<div class="grids-section">
 				   <div class="panel panel-widget">
 				  <div class="inbox-top">
@@ -309,30 +316,35 @@ style: 'https://cdn.jsdelivr.net/npm/sceditor@3/minified/themes/content/default.
             <div class="col-md-12 table-grid">
                 <div class="panel panel-widget">
 
-                <div class="modal fade" id="addkb" data-backdrop="" tabindex="-1" role="dialog">
-				<div class="modal-dialog modal-dialog-centered" role="document">
-					<div class="modal-content modal-info">
-						<div class="modal-header">
-                        <i class="fa fa-info-circle" aria-hidden="true"></i><?php lang('add'); ?>&nbsp;>&nbsp;<?php lang('knowledgebase'); ?>
-							<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
-						</div>
-						<div class="modal-body">
-							<div class="more-grids">
-                                 <center>
-                     <form  method="GET" action="<?php url_site();  ?>/store.php" >
-                 <input type="text" class="form-control" name="st"   placeholder="<?php lang('name_o');  ?>" aria-describedby="basic-addon1" required>
-                 <br />
-                 <button  type="submit" name="kb" value="<?php echo $_GET['kb']; ?>" class="btn btn-primary" >
-                              <?php lang('add');  ?></button>
-                       </form>
-                                  </center>
-                            <br>
-
-							</div>
+                <div class="modal fade" id="addkb" tabindex="-1" aria-labelledby="addkbLabel" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-content">
+			<div class="modal-header bg-primary text-white">
+				<h5 class="modal-title" id="addkbLabel">
+					<i class="fas fa-info-circle me-2"></i><?php lang('add'); ?> <?php lang('knowledgebase'); ?>
+				</h5>
+				<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<form method="GET" action="<?php url_site(); ?>/store.php" class="needs-validation" novalidate>
+					<div class="mb-3">
+						<label for="kbName" class="form-label"><?php lang('name_o'); ?></label>
+						<input type="text" class="form-control" id="kbName" name="st" required>
+						<div class="invalid-feedback">
+							<?php lang('name_o'); ?> <?php lang('required'); ?>
 						</div>
 					</div>
-				</div>
+					<input type="hidden" name="kb" value="<?php echo $_GET['kb']; ?>">
+					<div class="d-grid gap-2">
+						<button type="submit" class="btn btn-primary">
+							<i class="fas fa-plus me-1"></i> <?php lang('add'); ?>
+						</button>
+					</div>
+				</form>
 			</div>
+		</div>
+	</div>
+</div>
 					<table id="tablepagination" class="table table-hover">
 						<thead>
 							<tr>
@@ -401,7 +413,7 @@ style: 'https://cdn.jsdelivr.net/npm/sceditor@3/minified/themes/content/default.
  ?>
 		<div id="page-wrapper">
 			<div class="main-page">
-				<!--buttons-->
+				<!-- Action buttons -->
 				<div class="grids-section">
 				   <div class="panel panel-widget">
 				  <div class="inbox-top">
@@ -410,7 +422,8 @@ style: 'https://cdn.jsdelivr.net/npm/sceditor@3/minified/themes/content/default.
 									 </div>
 									<div class="clearfix"></div>
 								</div>
-              <div class="panel panel-default">
+              <!-- Content display panel -->
+<div class="panel panel-default">
   <div class="panel-body">
     <div class="topic">
                <?php echo $sknowledp['o_valuer']; ?>
@@ -513,7 +526,7 @@ style: 'https://cdn.jsdelivr.net/npm/sceditor@3/minified/themes/content/default.
  ?>
 		<div id="page-wrapper">
 			<div class="main-page">
-				<!--buttons-->
+				<!-- Action buttons -->
 				<div class="grids-section">
 				   <div class="panel panel-widget">
 				  <div class="inbox-top">
@@ -522,7 +535,8 @@ style: 'https://cdn.jsdelivr.net/npm/sceditor@3/minified/themes/content/default.
 									 </div>
 									<div class="clearfix"></div>
 								</div>
-              <div class="panel panel-default">
+              <!-- Content display panel -->
+<div class="panel panel-default">
   <div class="panel-body">
     <div class="topic">
                <?php echo $sknowledp['o_valuer']; ?>
@@ -680,59 +694,56 @@ style: 'https://cdn.jsdelivr.net/npm/sceditor@3/minified/themes/content/default.
 	  <div class="grid-column" >
     <div class="widget-box" >
                      <center> <h1><b><i><?php echo $lang['knowledgebase'];  ?></i></b></h1></center><hr />
-					<table id="tablepagination" class="table table-hover">
-						<thead>
-							<tr>
-                              <th>#ID</th>
-                              <th><?php lang('topics');  ?></th>
-                              <th><?php lang('Store');  ?></th>
-							  <th><?php lang('pending');  ?></th>
-                            </tr>
-						</thead>
-						<tbody>
-                         <?php
-                          $k_type = "knowledgebase";
-                 $storknow = $db_con->prepare("SELECT *  FROM options WHERE  o_type=:o_type AND o_order=0 ORDER BY `id` " );
-                 $storknow->bindParam(":o_type", $k_type);
-                 $storknow->execute();
-                 while($sknowled=$storknow->fetch(PDO::FETCH_ASSOC) ) {
-                   $n_type = "knowledgebase";
-                 $n_order = "1";
-                 $tonknow = $db_con->prepare("SELECT  COUNT(id) as nbr FROM options WHERE name=:name AND o_mode=:o_mode AND o_type=:o_type AND o_order=:o_order " );
-                 $tonknow->bindParam(":o_type", $n_type);
-                 $tonknow->bindParam(":o_order", $n_order);
-                 $tonknow->bindParam(":o_mode", $sknowled['o_mode']);
-                 $tonknow->bindParam(":name", $sknowled['name']);
-                 $tonknow->execute();
-                 $stonknow=$tonknow->fetch(PDO::FETCH_ASSOC);
-                 $contknow= $stonknow['nbr'];
-                       echo "<tr>
-                              <th>#{$sknowled['id']}</th>
-							  <th><a href=\"{$url_site}/kb/{$sknowled['o_mode']}:{$sknowled['name']}\">{$sknowled['name']}</a>
-            <div class=\"modal fade\" id=\"{$sknowled['id']}\" data-backdrop=\"\" tabindex=\"-1\" role=\"dialog\">
-				<div class=\"modal-dialog modal-dialog-centered\" role=\"document\">
-					<div class=\"modal-content modal-info\">
-						<div class=\"modal-body\">
-							<div class=\"more-grids\">
-                                 <center>
-                                    {$sknowled['o_valuer']}
-                                  </center>
-                            <br>
-
+					<div class="table-responsive">
+	<table id="tablepagination" class="table table-hover table-striped table-bordered">
+		<thead class="table-dark">
+			<tr>
+				<th class="text-center">#ID</th>
+				<th class="text-center"><?php lang('topics'); ?></th>
+				<th class="text-center"><?php lang('Store'); ?></th>
+				<th class="text-center"><?php lang('pending'); ?></th>
+			</tr>
+		</thead>
+		<tbody>
+			<?php
+			$k_type = "knowledgebase";
+			$storknow = $db_con->prepare("SELECT * FROM options WHERE o_type=:o_type AND o_order=0 ORDER BY `id`");
+			$storknow->bindParam(":o_type", $k_type);
+			$storknow->execute();
+			while($sknowled = $storknow->fetch(PDO::FETCH_ASSOC)) {
+				$n_type = "knowledgebase";
+				$n_order = "1";
+				$tonknow = $db_con->prepare("SELECT COUNT(id) as nbr FROM options WHERE name=:name AND o_mode=:o_mode AND o_type=:o_type AND o_order=:o_order");
+				$tonknow->bindParam(":o_type", $n_type);
+				$tonknow->bindParam(":o_order", $n_order);
+				$tonknow->bindParam(":o_mode", $sknowled['o_mode']);
+				$tonknow->bindParam(":name", $sknowled['name']);
+				$tonknow->execute();
+				$stonknow = $tonknow->fetch(PDO::FETCH_ASSOC);
+				$contknow = $stonknow['nbr'];
+				echo "<tr class='align-middle'>
+					<td class='text-center fw-bold'>#{$sknowled['id']}</td>
+					<td><a href='{$url_site}/kb/{$sknowled['o_mode']}:{$sknowled['name']}' class='text-decoration-none'>{$sknowled['name']}</a>
+						<div class='modal fade' id='{$sknowled['id']}' data-backdrop='' tabindex='-1' role='dialog'>
+							<div class='modal-dialog modal-dialog-centered' role='document'>
+								<div class='modal-content modal-info'>
+									<div class='modal-body'>
+										<div class='more-grids'>
+											<center>{$sknowled['o_valuer']}</center>
+										</div>
+									</div>
+								</div>
 							</div>
 						</div>
-					</div>
-				</div>
-			</div>
-                              </th>
-                              <th><a href=\"{$url_site}/producer/{$sknowled['o_mode']}\">{$sknowled['o_mode']}</a></th>
-                              <th><span class=\"badge badge-info\"><font face=\"Comic Sans MS\"><b>{$contknow}</b><br></font></span></th>
-                            </tr>";
-
-                          }
-                          ?>
-               </tbody>
-					</table>
+					</td>
+					<td><a href='{$url_site}/producer/{$sknowled['o_mode']}' class='text-decoration-none'>{$sknowled['o_mode']}</a></td>
+					<td class='text-center'><span class='badge bg-primary rounded-pill'><b>{$contknow}</b></span></td>
+				</tr>";
+			}
+			?>
+		</tbody>
+	</table>
+</div>
                 </div>
                 </div>
 				</div>

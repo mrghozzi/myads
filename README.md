@@ -1,11 +1,10 @@
 # <b>MYADS v3.2.0</b> : ***php scripts*** for social networking and exchanging ads between website owners.
 
 >
-> ![MYADS](https://www.adstn.gq/bnr/myads.png)
+> ![MYADS](https://github.com/mrghozzi/myads_check_updates/raw/main/myads.png)
 
 * Program name: [MYADS](https://github.com/mrghozzi/myads)
-* Official Site : [Kariya Host](http://www.krhost.ga)
-* Demo Site : [ADStn](https://adstn.gq) ``Username: vvvbbb`` ``Password: vvvbbb`` 
+* Demo Site : [ADStn](http://adstn.is-best.net) ``Username: vvvbbb`` ``Password: vvvbbb`` 
 * Author : [mrghozzi](https://github.com/mrghozzi "mrghozzi")
 
 

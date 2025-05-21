@@ -354,11 +354,8 @@ $statement = "`like` a
     ORDER BY a.time_t DESC";
 $results = $db_con->prepare("SELECT  u.* FROM {$statement} LIMIT {$startpoint} , {$per_page} " );
 $results->execute();
-
 while($catussen=$results->fetch(PDO::FETCH_ASSOC)) {
-
 $time_cmt= "";
-
 include "templates/_panel/users_templates/user_list.php";
  } $url=$url_site."/user?ff=".$_GET['ff']."&";
     echo pagination($statement,$per_page,$page,$url);

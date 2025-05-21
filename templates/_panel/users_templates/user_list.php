@@ -95,7 +95,7 @@
             <!-- BADGE LIST -->
             <div class="badge-list small">
               <!-- BADGE ITEM -->
-              <?php echo $lang['ago']."&nbsp;".$time_cmt; ?>
+              <?php if (!isset($_GET['ff'])) { echo $lang['ago']."&nbsp;".$time_cmt; } ?>
               <!-- /BADGE ITEM -->
             </div>
             <!-- /BADGE LIST -->

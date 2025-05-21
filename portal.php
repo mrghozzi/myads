@@ -12,8 +12,6 @@
 ##                                                                 ##
 #####################################################################
 
-
-
 include "dbconfig.php";
 include "include/function.php";
 header('Content-type: text/html; charset=utf-8');
