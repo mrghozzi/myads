@@ -19,7 +19,7 @@ $myads_Version     = "1";
 $myads_Update      = "0";
 $stversion = "{$myads_generation}.{$myads_Version}.{$myads_Update}";
 $o_type = "version" ;
-$name = "{$myads_generation}-{$myads_Version}-{$myads_Update}";
+$version_name = "{$myads_generation}-{$myads_Version}-{$myads_Update}";
 $jversion = $db_con->prepare("SELECT * FROM `options` WHERE `o_type` = :o_type  ");
 $jversion->bindParam(":o_type", $o_type);
 $jversion->execute();
@@ -30,7 +30,7 @@ $jversion->execute();
             WHERE id=:id");
             $ostmsbs->bindParam(":o_type", $o_type);
             $ostmsbs->bindParam(":o_valuer", $stversion);
-            $ostmsbs->bindParam(":name", $name);
+            $ostmsbs->bindParam(":name", $version_name);
             $ostmsbs->bindParam(":id", $versionRow['id']);
             if($ostmsbs->execute()){ }
    }
@@ -39,7 +39,7 @@ $jversion->execute();
             VALUES (:name,:o_valuer,:o_type,0,0,0) ");
 	        $ostmsbs->bindParam(":o_type", $o_type);
             $ostmsbs->bindParam(":o_valuer", $stversion);
-            $ostmsbs->bindParam(":name", $name);
+            $ostmsbs->bindParam(":name", $version_name);
             if($ostmsbs->execute()){   }
  }
 

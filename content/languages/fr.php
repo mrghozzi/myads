@@ -273,6 +273,7 @@ $lang['yshbv']       = "Votre site a été consulté";
 $lang['latest_sites']= "Les derniers sites";
 $lang['latest_post'] = "Dernier article";
 $lang['latest_version']= "Vous avez la dernière version";
+$lang['support_project'] = "Soutenir le projet";
 $lang['import_update']= "<p><strong>Important :</strong> Avant de procéder à la mise à jour, veuillez faire une sauvegarde de votre base de données et de vos autres fichiers.</p>";
 $lang['there_update']= "<p>Une nouvelle version de MyAds est disponible pour la mise à jour.!</p>";
 $lang['now_update']  = "Mise à jour maintenant";
@@ -337,5 +338,10 @@ $lang['language_default'] = "Langue par défaut";
 $lang['educational_links'] = "Liens éducatifs";
 $lang['timezone'] = "Timezone";
 $lang['admin_email'] = "Courriel de l'administrateur";
+$lang['timeline']    = "Chronologie";
+$lang['photos']      = "Photos";
+$lang['husyph']      = "Bonjour [username] ! Partagez votre message ici…";
+$lang['insertlink']  = "Insérer un lien";
+$lang['insertphoto'] = "Insérer une photo";
 
 ?>

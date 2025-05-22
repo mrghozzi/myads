@@ -273,6 +273,7 @@ $lang['yshbv']       = "Your site has been viewed";
 $lang['latest_sites']= "Latest sites";
 $lang['latest_post'] = "Latest post";
 $lang['latest_version']= "You have the latest version";
+$lang['support_project'] = "Support Project";
 $lang['import_update']= "<p><strong>Important :</strong> Before updating, please take a backup of your database and other files.</p>";
 $lang['there_update']= "<p>There is a new version of MyAds available to update!</p>";
 $lang['now_update']  = "Update now";
@@ -337,5 +338,10 @@ $lang['language_default'] = "Language Default";
 $lang['educational_links'] = "Educational Links";
 $lang['timezone'] = "Timezone";
 $lang['admin_email'] = "Admin Email";
+$lang['timeline']    = "Timeline";
+$lang['photos']      = "Photos";
+$lang['husyph']      = "Hi [username]! Share your post here...";
+$lang['insertlink']  = "Insert Link";
+$lang['insertphoto'] = "Insert Photo";
 
 ?>

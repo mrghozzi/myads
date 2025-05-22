@@ -14,5 +14,11 @@
       <!-- /SECTION BANNER TEXT -->
     </div>
     <!-- /SECTION BANNER -->
-    <script language="javascript" src="https://api.adstn.gq/news/myads_news.php?v=<?php myads_fversion();  ?>"></script>
-<?php }else{ echo"404"; }  ?>
+    <?php
+    $news_url = "https://raw.githubusercontent.com/mrghozzi/myads_check_updates/main/news/v".myads_fversion().".html";
+    $news_content = @file_get_contents($news_url);
+    if($news_content !== false) {
+        echo $news_content;
+    }
+    ?>
+    <?php }else{ echo"404"; }  ?>

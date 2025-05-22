@@ -14,6 +14,7 @@
 
 $lang['language']    = "(العربية)";
 $lang['lg']          = "ar";
+$lang['dir']         = "rtl";
 
 $lang['comment']     = "تعليق";
 $lang['comments']    = "التعليقات";
@@ -47,6 +48,14 @@ $lang['tage']        = "الكلمات الدلالية";
 $lang['cat_s']       = "الأقسام";
 $lang['rec_post']    = "أخر المقالات";
 $lang['succ_add']    = "تم بنجاح";
+$lang['admin_panel'] = "لوحة التحكم";
+$lang['admin_home']  = "الصفحة الرئيسية";
+$lang['users']       = "المستخدمين";
+$lang['posts']       = "المقالات";
+$lang['settings']    = "الإعدادات";
+$lang['online']      = "متصل";
+$lang['offline']     = "غير متصل";
+$lang['points']      = "النقاط";
 $lang['q_Problem']   = "مشكلة في قاعدة البينات";
 $lang['no_com']      = "لا يوجد تعليقات";
 $lang['no_post']     = "لا يوجد مقالات جديدة";
@@ -267,6 +276,7 @@ $lang['yshbv']       = "تم عرض مواقعك";
 $lang['latest_sites']= "أحدث المواقع";
 $lang['latest_post'] = "آخر مشاركة";
 $lang['latest_version']= "لديك أحدث إصدار";
+$lang['support_project'] = "دعم المشروع";
 $lang['import_update']= "<p> <strong> هام : </strong> قبل التحديث ، يرجى عمل نسخة احتياطية من قاعدة البيانات والملفات الأخرى. </ p>";
 $lang['there_update']= "<p>يوجد إصدار جديد من MyAds متاح للتحديث!</p>";
 $lang['now_update']  = "تحديث الأن";
@@ -337,5 +347,10 @@ $lang['language_default'] = "اللغة الافتراضية";
 $lang['educational_links'] = "الروابط التعليمية";
 $lang['timezone'] = "المنطقة الزمنية";
 $lang['admin_email'] = "البريد الإلكتروني للمسؤول";
+$lang['timeline']    = "الجدول الزمني";
+$lang['photos']      = "الصور";
+$lang['husyph']      = "مرحباً [username]! شارك منشورك هنا...";
+$lang['insertlink']  = "إدراج الرابط";
+$lang['insertphoto'] = "إدراج الصورة";
 
 ?>

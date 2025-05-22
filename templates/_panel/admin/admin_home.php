@@ -330,6 +330,27 @@
 		   </div>
         </div>
       </div>
+      <!-- Project Support Buttons -->
+<div class="widget-box" style="margin-top:20px;text-align:center;">
+  <p class="widget-box-title"><?php lang('support_project'); ?></p>
+  
+  <div style="display:flex;justify-content:space-around;padding:20px;">
+    <a href="https://www.patreon.com/MrGhozzi" target="_blank" style="color:#000000;">
+    <img src="<?php url_site();  ?>/templates/_panel/img/icons/patreon-icon.svg" width="24" height="24" >
+      Patreon
+    </a>
+    
+    <a href="https://ko-fi.com/mrghozzi" target="_blank" style="color:#ff9900;">
+    <img src="<?php url_site();  ?>/templates/_panel/img/icons/kofi-icon.svg" width="24" height="24" >
+      Ko-fi
+    </a>
+    
+    <a href="https://www.ba9chich.com/en/mrghozzi" target="_blank" style="color:#29abe0;">
+    <img src="<?php url_site();  ?>/templates/_panel/img/icons/ba9chich-icon.svg" width="24" height="24" >
+      Ba9chich
+    </a>
+  </div>
+</div>
 </div>
 </div>
 <?php }else{ echo"404"; }  ?>

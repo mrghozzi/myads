@@ -36,7 +36,7 @@ $s_st="buyfgeufb";
  //  MyAds Version
  include "include/myads_version.php";
  function myads_version()         {    global  $versionRow ; if(isset($versionRow['o_valuer'])){ echo $versionRow['o_valuer']; }    }
- function myads_fversion()        {    global  $versionRow ; if(isset($versionRow['name'])){ echo $versionRow['name'];         }    }
+ function myads_fversion()        {    global  $versionRow ; if(isset($versionRow['name'])){ return $versionRow['name'];       }    }
 
 
 // ads
