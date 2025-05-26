@@ -128,6 +128,21 @@ if ($vrf_License == "65fgh4t8x5fe58v1rt8se9x") {
                         $stmsb->bindParam(":ertb", $id);
 
                         if ($stmsb->execute()) {
+                            // Check if status changed
+                            $nurl = "b_edit?id=".$id;
+                            $time = time();
+                            if ($statuRow != $bn_statu) {
+                                $notif_stmt = $db_con->prepare("INSERT INTO notif (uid, name, nurl, logo, time, state) VALUES (:uid, :name, :nurl, 'overview', :time, 1)");
+                                $notif_stmt->bindParam(':uid', $bnRow['uid']);
+                                $notif_stmt->bindParam(':time', $time);
+                                $notif_stmt->bindParam(':nurl', $nurl);
+                                if ($bn_statu == 1) {
+                                    $notif_stmt->bindParam(':name', $lang['your_ad_has_been_activated']);
+                                } else {
+                                    $notif_stmt->bindParam(':name', $lang['your_ad_as_been_blocked']);
+                                }
+                                $notif_stmt->execute();
+                            }
                             header("Location: admincp?b_list");
                         }
                     } else {
@@ -155,8 +170,22 @@ if ($vrf_License == "65fgh4t8x5fe58v1rt8se9x") {
     if (isset($_GET['b_ban'])) {
         if ($_COOKIE['admin'] == $hachadmin) {
             $bn_id = $_GET['b_ban'];
+           // select banner from db to delete
+         $stmht_select = $db_con->prepare('SELECT * FROM banner WHERE  id=:did ');
+         $stmht_select->execute(array(':did'=>$bn_id));
+         $bnRow=$stmht_select->fetch(PDO::FETCH_ASSOC);
+         // delete banner
             $stmt = $db_con->prepare("DELETE FROM banner WHERE id=:id");
             $stmt->execute(array(':id' => $bn_id));
+         // Check if status changed
+         $nurl = "b_list";
+         $time = time();
+         $notif_stmt = $db_con->prepare("INSERT INTO notif (uid, name, nurl, logo, time, state) VALUES (:uid, :name, :nurl, 'delete', :time, 1)");
+         $notif_stmt->bindParam(':uid', $bnRow['uid']);
+         $notif_stmt->bindParam(':time', $time);
+         $notif_stmt->bindParam(':nurl', $nurl);
+         $notif_stmt->bindParam(':name', $lang['your_ad_has_been_deleted']);
+         $notif_stmt->execute();
             header("Location: admincp?b_list");
         } else {
             header("Location: home");

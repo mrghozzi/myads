@@ -131,6 +131,21 @@ echo "<tr>
 
             $stmsb->bindParam(":ertb", $id);
          	if($stmsb->execute()){
+                            // Check if status changed
+                            $nurl = "l_edit?id=".$id;
+                            $time = time();
+                            if ($statuRow != $bn_statu) {
+                                $notif_stmt = $db_con->prepare("INSERT INTO notif (uid, name, nurl, logo, time, state) VALUES (:uid, :name, :nurl, 'overview', :time, 1)");
+                                $notif_stmt->bindParam(':uid', $bnRow['uid']);
+                                $notif_stmt->bindParam(':time', $time);
+                                $notif_stmt->bindParam(':nurl', $nurl);
+                                if ($bn_statu == 1) {
+                                    $notif_stmt->bindParam(':name', $lang['your_ad_has_been_activated']);
+                                } else {
+                                    $notif_stmt->bindParam(':name', $lang['your_ad_as_been_blocked']);
+                                }
+                                $notif_stmt->execute();
+                            }
              header("Location: admincp?l_list");
          	}
 
@@ -160,8 +175,22 @@ echo "<tr>
    if($_COOKIE['admin']==$hachadmin)
 {
   $bn_id = $_GET['l_ban'];
+    		 // select link from db to delete
+         $stmht_select = $db_con->prepare('SELECT * FROM link WHERE  id=:did ');
+         $stmht_select->execute(array(':did'=>$bn_id));
+         $bnRow=$stmht_select->fetch(PDO::FETCH_ASSOC);
+         // delete link
    $stmt=$db_con->prepare("DELETE FROM link WHERE id=:id  ");
 	$stmt->execute(array(':id'=>$bn_id));
+         // Check if status changed
+         $nurl = "l_list";
+         $time = time();
+         $notif_stmt = $db_con->prepare("INSERT INTO notif (uid, name, nurl, logo, time, state) VALUES (:uid, :name, :nurl, 'delete', :time, 1)");
+         $notif_stmt->bindParam(':uid', $bnRow['uid']);
+         $notif_stmt->bindParam(':time', $time);
+         $notif_stmt->bindParam(':nurl', $nurl);
+         $notif_stmt->bindParam(':name', $lang['your_ad_has_been_deleted']);
+         $notif_stmt->execute();
     header("Location: admincp?l_list");
 
  }else{

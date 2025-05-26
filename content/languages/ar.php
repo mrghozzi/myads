@@ -352,5 +352,9 @@ $lang['photos']      = "الصور";
 $lang['husyph']      = "مرحباً [username]! شارك منشورك هنا...";
 $lang['insertlink']  = "إدراج الرابط";
 $lang['insertphoto'] = "إدراج الصورة";
-
+$lang['copy_link']   = "نسخ الرابط";
+$lang['link_copied'] = "تم نسخ الرابط!";
+$lang['your_ad_has_been_activated'] = "تم تفعيل إعلانك";
+$lang['your_ad_as_been_blocked'] = "تم حظر إعلانك";
+$lang['your_ad_has_been_deleted'] = "تم حذف إعلانك";
 ?>

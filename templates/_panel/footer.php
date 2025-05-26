@@ -2,6 +2,13 @@
 
     <?php ads_site(6); ?>
 	</div>
+    <div class="widget-box">
+    <center>
+    <?php echo "All rights reserved &nbsp;&copy;".date("Y")."&nbsp;"; title_site(''); ?>&nbsp;
+    | <a href="<?php url_site();  ?>/privacy-policy">PRIVACY POLICY</a>
+    | `MyAds v<?php myads_version();  ?>`  Devlope by <a href="https://github.com/mrghozzi/myads">MrGhozzi</a>
+    </center>
+    </div>	
 <!-- bootstrap -->
 <script src="<?php url_site();  ?>/templates/_panel/js/bootstrap.min.js"></script>
 <!-- datatables -->

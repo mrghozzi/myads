@@ -71,9 +71,6 @@
     <a class="btn btn-dark" href="<?php url_site(); ?>/admincp?settings">
         <?php lang('settings'); ?>
     </a>
-    <a class="btn btn-dark" href="<?php url_site(); ?>/admincp?social_login">
-        <?php lang('social_login'); ?>
-    </a>
     <a class="btn btn-dark" href="<?php url_site(); ?>/admincp?updates">
         <?php lang('updates'); ?>
     </a>

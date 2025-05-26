@@ -129,6 +129,10 @@ $usecho =  "<b>{$catruss['username']}</b> <i class=\"fa fa-retweet\" aria-hidden
                 <!-- SIMPLE DROPDOWN LINK -->
                 <p class="simple-dropdown-link author_report<?php echo $sucat['id']; ?>"><i class="fa fa-flag" aria-hidden="true"></i>&nbsp;<?php echo $lang['report']; ?> <?php echo $lang['author']; ?></p>
                 <!-- /SIMPLE DROPDOWN LINK -->
+                 
+                <!-- SIMPLE DROPDOWN LINK -->
+                <p class="simple-dropdown-link copy_link" onclick="navigator.clipboard.writeText('<?php echo $url_site; ?>/t<?php echo $sucat['id']; ?>'); var notif = document.getElementById('notif<?php echo $sucat['id']; ?>'); notif.innerHTML = '<div class=\'alert alert-success\' role=\'alert\'><?php echo $lang['link_copied']; ?></div>'; notif.style.display = 'block'; setTimeout(function() { notif.style.display = 'none'; }, 5000);" ><i class="fa fa-link" aria-hidden="true"></i>&nbsp;<?php echo $lang['copy_link']; ?></p>
+                <!-- /SIMPLE DROPDOWN LINK -->
               </div>
               <!-- /SIMPLE DROPDOWN -->
             </div>
@@ -230,6 +234,7 @@ echo                   "</p>
               <a class="post-box-picture" href="<?php echo $url_site; ?>/t<?php echo $sucat['id']; ?>">
                <img  src="<?php echo $catussc['o_valuer'];  ?>" alt="<?php echo $imgtxt;  ?>">
               </a>
+              <div id="notif<?php echo $sucat['id']; ?>" ></div>
               <!-- CONTENT ACTIONS -->
               <div class="content-actions">
                 <!-- CONTENT ACTION -->

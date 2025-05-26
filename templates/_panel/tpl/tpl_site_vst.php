@@ -316,7 +316,7 @@ echo                   "</p>
               <a class="video-status small" href="<?php echo $dir_lnk_hash; ?>" style="background-color: #efeff9;" target="_blank">
                 <!-- LINK STATUS IMAGE -->
                 <figure class="video-status-image liquid" >
-                  <img class="video-status-image" src="https://mini.site-shot.com/800x400/800/png/?<?php echo $sdf; ?>">
+                  <img class="video-status-image" src="<?php url_site();  ?>/templates/_panel/img/dir_image.png">
                 </figure>
                 <!-- /LINK STATUS IMAGE -->
 

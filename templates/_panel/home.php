@@ -331,8 +331,8 @@
             <?php if(isset($elnk_site) AND ($elnk_site==1)){ ?>
             <a href="https://github.com/mrghozzi/myads/wiki/pts" class="button primary padded" target="_blank" >&nbsp;<b><i class="fa fa-question-circle" aria-hidden="true"></i></b></a>
             <?php } ?>
+            <a class="button secondary padded" href="<?php url_site();  ?>/referral" ><i class="fa fa-list" aria-hidden="true"></i>&nbsp;<?php lang('list'); ?>&nbsp;<?php lang('referal'); ?></a>
             <a class="button padded" href="<?php url_site();  ?>/r_code" ><i class="fa fa-users"></i>&nbsp;<?php lang('referal'); ?></a>
-
             </p>
             <!-- /pts DECORATION SUBTITLE -->
              <hr />

@@ -133,6 +133,10 @@ $time_stt=convertTime($sutcat['date']);
                 <!-- SIMPLE DROPDOWN LINK -->
                 <p class="simple-dropdown-link author_report<?php echo $sucat['id']; ?>"><i class="fa fa-flag" aria-hidden="true"></i>&nbsp;<?php echo $lang['report']; ?> <?php echo $lang['author']; ?></p>
                 <!-- /SIMPLE DROPDOWN LINK -->
+
+                <!-- SIMPLE DROPDOWN LINK -->
+                <p class="simple-dropdown-link copy_link" onclick="navigator.clipboard.writeText('<?php echo $url_site; ?>/dr<?php echo $sucat['id']; ?>'); var notif = document.getElementById('notif<?php echo $sucat['id']; ?>'); notif.innerHTML = '<div class=\'alert alert-success\' role=\'alert\'><?php echo $lang['link_copied']; ?></div>'; notif.style.display = 'block'; setTimeout(function() { notif.style.display = 'none'; }, 5000);" ><i class="fa fa-link" aria-hidden="true"></i>&nbsp;<?php echo $lang['copy_link']; ?></p>
+                <!-- /SIMPLE DROPDOWN LINK -->
               </div>
               <!-- /SIMPLE DROPDOWN -->
             </div>
@@ -242,12 +246,12 @@ echo                   "</p>
               <div id="report<?php echo $sucat['id']; ?>" ></div>
               </div></p>
               <!-- /WIDGET BOX STATUS TEXT -->
-
+              <div id="notif<?php echo $sucat['id']; ?>" ></div>
               <!-- LINK STATUS BOX -->
               <a class="video-status small" href="<?php echo $dir_lnk_hash; ?>" style="background-color: #efeff9;" target="_blank">
                 <!-- LINK STATUS IMAGE -->
                 <figure class="video-status-image liquid" >
-                  <img class="video-status-image" src="https://mini.site-shot.com/800x400/800/png/?<?php echo $sdf; ?>">
+                  <img class="video-status-image" src="<?php url_site();  ?>/templates/_panel/img/dir_image.png" >
                 </figure>
                 <!-- /LINK STATUS IMAGE -->
 

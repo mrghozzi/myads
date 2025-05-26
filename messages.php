@@ -112,7 +112,7 @@ echo "<div class=\"notification-box\">
 if ($page <= 0) $page = 1;
 $per_page = 9; // Records per page.
 $startpoint = ($page * $per_page) - $per_page;
-$statement = "`messages` WHERE us_rec='{$msgusid}' OR us_env='{$msgusid}' ORDER BY `time` DESC";
+$statement = "`messages` WHERE us_rec='{$msgusid}' OR us_env='{$msgusid}' GROUP BY us_env ORDER BY `time` DESC";
 $results = $db_con->prepare("SELECT  * FROM {$statement} LIMIT {$startpoint} , {$per_page} " );
 $results->execute();
     function msg_list() {

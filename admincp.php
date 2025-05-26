@@ -60,7 +60,6 @@ if(md5($conf_admin_log)==$_COOKIE['userha'])
   include "include/Management files/emojis.php";   //emojis
   include "include/Management files/plugins.php";  //plugins
   include "include/Management files/knowledgebase.php";  //knowledgebase
-  include "include/Management files/social_login.php";  //social login
   include "include/Management files/updates.php";  //updates
   include "include/Management files/users.php";  //users
   include "include/Management files/visits.php";  //visits

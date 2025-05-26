@@ -131,8 +131,7 @@ $mstmt = $db_con->prepare("SELECT  COUNT(id_msg) as nbr FROM messages WHERE stat
         $msg_n=$amsg['nbr'];
         if($name=="vu"){ echo $msg_n; }
         if($name=="span"){ if($msg_n==0){}else{ echo "<span class='badge badge-danger'>{$msg_n}</span>"; } }
-        if($name=="list"){ $msgusen = $db_con->prepare("SELECT *  FROM messages
-        WHERE us_rec=:msgusid ORDER BY `time` DESC LIMIT 5");
+        if($name=="list"){ $msgusen = $db_con->prepare("SELECT * FROM messages WHERE us_rec=:msgusid GROUP BY us_env ORDER BY `time` DESC LIMIT 5");
 $msgusen->bindParam(":msgusid", $msgusid);
 $msgusen->execute();
 while($msgssen=$msgusen->fetch(PDO::FETCH_ASSOC)){

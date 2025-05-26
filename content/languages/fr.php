@@ -291,6 +291,8 @@ $lang['mode_admin']  = "Mode Admin";
 $lang['create_a']    = "Créer un";
 $lang['in_the_forum']= "dans le forum";
 $lang['on_i']        = "on";
+$lang['copy_link']   = "Copier le lien";
+$lang['link_copied'] = "Lien copié!";
 $lang['link']        = "Lien";
 $lang['lastrm']      = "Dernier membre enregistré";
 $lang['lastps']      = "Dernier message";
@@ -343,5 +345,8 @@ $lang['photos']      = "Photos";
 $lang['husyph']      = "Bonjour [username] ! Partagez votre message ici…";
 $lang['insertlink']  = "Insérer un lien";
 $lang['insertphoto'] = "Insérer une photo";
+$lang['your_ad_has_been_activated'] = "Votre annonce a été activée";
+$lang['your_ad_as_been_blocked'] = "Votre annonce a été bloquée";
+$lang['your_ad_has_been_deleted'] = "Votre annonce a été supprimée.";
 
 ?>

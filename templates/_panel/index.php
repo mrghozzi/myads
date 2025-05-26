@@ -234,13 +234,7 @@
     <hr>
     <center><script language="javascript" src="<?php url_site();  ?>/bn.php?ID=1&px=responsive"></script></center>
     </div>
-    <div class="widget-box">
-    <center>
-    <?php echo "All rights reserved &nbsp;&copy;".date("Y")."&nbsp;"; title_site(''); ?>&trade;
-    | <a href="<?php url_site();  ?>/privacy-policy">PRIVACY POLICY</a>
-    | `MyAds v<?php myads_version();  ?>`  Devlope by <a href="http://www.kariya-host.gq/">Kariya Host</a>
-    </center>
-    </div>
+
   </div>
 </div>
 <?php }else{ echo"404"; }  ?>
