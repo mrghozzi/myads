@@ -357,4 +357,8 @@ $lang['link_copied'] = "تم نسخ الرابط!";
 $lang['your_ad_has_been_activated'] = "تم تفعيل إعلانك";
 $lang['your_ad_as_been_blocked'] = "تم حظر إعلانك";
 $lang['your_ad_has_been_deleted'] = "تم حذف إعلانك";
+$lang['pmbno']       = "السعر (PTS) : يجب أن يكون أرقام فقط";
+$lang['price_pts']   = "السعر (PTS)";
+
+
 ?>

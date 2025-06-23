@@ -197,10 +197,11 @@ $scatname = $lang["{$scatname}"];
                 <p class="simple-dropdown-link post_delete<?php echo $susat['id']; ?>" ><i class="fa fa-trash" aria-hidden="true"></i>&nbsp;<?php echo $lang['delete']; ?></p>
                 <!-- /SIMPLE DROPDOWN LINK -->
 <?php } ?>
+<?php if(((isset($uRow['id']) AND ($uRow['id']==$sucat['uid'])) OR (isset($uRow['id']) AND ($uRow['id']==$susat['uid'])) OR (isset($_COOKIE['admin']) AND ($_COOKIE['admin']== $hachadmin)))){ ?>
                 <!-- SIMPLE DROPDOWN LINK -->
                 <a href="<?php echo $url_site; ?>/update/<?php echo $strname['name']; ?>" class="simple-dropdown-link"><i class="fa fa-refresh" aria-hidden="true"></i>&nbsp;<?php lang('update');  ?></a>
                 <!-- /SIMPLE DROPDOWN LINK -->
-
+                <?php } ?>
                 <!-- SIMPLE DROPDOWN LINK -->
                 <p class="simple-dropdown-link post_report<?php echo $sucat['id']; ?>"><i class="fa fa-flag" aria-hidden="true"></i>&nbsp;<?php echo $lang['report']; ?></p>
                 <!-- /SIMPLE DROPDOWN LINK -->
@@ -345,14 +346,22 @@ echo                 " </div>
           <?php lang('Version_nbr'); ?>&nbsp;<?php echo $strtid['name']; ?></p>
       <div class="section-filters-bar-actions">
         <!-- BUTTON -->
-        <a <?php if(isset($_COOKIE['user'])){ echo "href=\"{$url_site}/{$sdf}\" id=\"D{$strname['id']}\" "; }else{ echo "href=\"{$url_site}/login\""; } ?> class="button secondary" style="color: #fff;">
+        <a <?php if(isset($_COOKIE['user']) AND isset($uRow['pts']) AND isset($strname['o_order']) AND ($uRow['pts'] < $strname['o_order'])){ 
+          echo "href=\"javascript:void(0);\" id=\"not_enough_points\" "; 
+          }else if(isset($_COOKIE['user'])){ 
+          echo "href=\"{$url_site}/{$sdf}\" id=\"D{$strname['id']}\" "; 
+           }else{ 
+            echo "href=\"{$url_site}/login\""; 
+            } ?> class="button secondary" style="color: #fff;">
         <i class="fa fa-download"></i>&nbsp;<?php lang('download');  ?>
         <span class="badge badge-light"><font face="Comic Sans MS"><b><?php echo $contfils; ?></b></font></span>
         </a>
 <script>
      $("document").ready(function() {
    $("#D<?php echo $strname['id']; ?>").click(downloadf<?php echo $strname['id']; ?>);
-
+   $("#not_enough_points").click(function(){
+      alert("نقاطك غير كافية");
+   });
 });
 
 function downloadf<?php echo $strname['id']; ?>(){

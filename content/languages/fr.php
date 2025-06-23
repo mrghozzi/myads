@@ -348,5 +348,7 @@ $lang['insertphoto'] = "Insérer une photo";
 $lang['your_ad_has_been_activated'] = "Votre annonce a été activée";
 $lang['your_ad_as_been_blocked'] = "Votre annonce a été bloquée";
 $lang['your_ad_has_been_deleted'] = "Votre annonce a été supprimée.";
+$lang['pmbno']       = "Prix ​​(PTS) : Doit être composé uniquement de chiffres";
+$lang['price_pts']   = "Prix (PTS)";
 
 ?>
