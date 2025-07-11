@@ -350,5 +350,6 @@ $lang['your_ad_as_been_blocked'] = "Your ad has been blocked";
 $lang['your_ad_has_been_deleted'] = "Your ad has been deleted.";
 $lang['pmbno']       = "Price (PTS): Must be numbers only";
 $lang['price_pts']   = "Price (PTS)";
+$lang['insufficient_points'] = "Your points are insufficient";
 
 ?>

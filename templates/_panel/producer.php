@@ -356,11 +356,12 @@ echo                 " </div>
         <i class="fa fa-download"></i>&nbsp;<?php lang('download');  ?>
         <span class="badge badge-light"><font face="Comic Sans MS"><b><?php echo $contfils; ?></b></font></span>
         </a>
+          <input type="hidden" id="strId<?php echo $strname['id']; ?>" name="strId" value="<?php echo $strname['id']; ?>"> 
 <script>
      $("document").ready(function() {
    $("#D<?php echo $strname['id']; ?>").click(downloadf<?php echo $strname['id']; ?>);
    $("#not_enough_points").click(function(){
-      alert("نقاطك غير كافية");
+      alert("<?php echo $lang['insufficient_points']; ?>");
    });
 });
 
@@ -368,7 +369,7 @@ function downloadf<?php echo $strname['id']; ?>(){
     $.ajax({
         url : '<?php echo $dir_lnk_hash; ?>',
         data : {
-            test_like : $("#lval").val()
+            strId : $("#strId<?php echo $strname['id']; ?>").val()
         },
         datatype : "json",
         type : 'post',
@@ -467,7 +468,7 @@ $comtxtv = strip_tags($strtidv['o_valuer'], '<br><b><a><p><img><span>');
 echo "<tr>
       <td>{$strtidv['id']}</td>
       <td><center><b>{$strtidv['name']}</b></center></td>
-      <td><center>";
+      <td><input type=\"hidden\" id=\"strId{$strname['id']}\" name=\"strId\" value=\"{$strname['id']}\"><center>";
 $sdfv = $strtidv['o_mode'];
 $ndfkv = $strtidv['id'];
 $dir_lnk_hash_v = $url_site."/download/".hash('crc32', $sdfv.$ndfkv );
@@ -478,7 +479,11 @@ $stormfnbv->execute();
 $sfilenbrv=$stormfnbv->fetch(PDO::FETCH_ASSOC);
 $contfilsv += $sfilenbrv['clik'];
 
-if(isset($_COOKIE['user'])){ ?>
+if(isset($_COOKIE['user']) AND isset($uRow['pts']) AND isset($strname['o_order']) AND ($uRow['pts'] < $strname['o_order'])){ 
+    ?>   
+        <a href="javascript:void(0);"  id="not_enough_points<?php echo $strtidv['id']; ?>" class="button secondary" style="color: #fff;" >&nbsp;<i class="fa fa-download"></i>&nbsp;<?php lang('download');  ?>&nbsp;<span class="badge badge-light"><font face="Comic Sans MS"><b><?php echo $contfilsv; ?></b></font></span>&nbsp;</a>
+<?php
+  }else if(isset($_COOKIE['user'])){ ?>
         <a href="<?php echo $url_site."/".$sdfv; ?>"  id="V<?php echo $strtidv['id']; ?>" class="button secondary" style="color: #fff;" >&nbsp;<i class="fa fa-download"></i>&nbsp;<?php lang('download');  ?>&nbsp;<span class="badge badge-light"><font face="Comic Sans MS"><b><?php echo $contfilsv; ?></b></font></span>&nbsp;</a>
 <?php }else{ ?>
         <a href="<?php echo $url_site."/login"; ?>"  id="V<?php echo $strtidv['id']; ?>" class="button secondary" style="color: #fff;" >&nbsp;<i class="fa fa-download"></i>&nbsp;<?php lang('download');  ?>&nbsp;<span class="badge badge-light"><font face="Comic Sans MS"><b><?php echo $contfilsv; ?></b></font></span>&nbsp;</a>
@@ -489,10 +494,14 @@ echo " <td>{$comtxtv}</td>";
 echo " <td><center></center></td>";
        }
 echo " </tr>
+
 <script>
 
    \$(\"document\").ready(function() {
    \$(\"#V{$strtidv['id']}\").click(downloadv{$strtidv['id']});
+   \$(\"#not_enough_points{$strtidv['id']}\").click(function(){
+      alert(\"{$lang['insufficient_points']}\");
+   });
 
 });
 
@@ -500,7 +509,7 @@ function downloadv{$strtidv['id']}(){
     \$.ajax({
         url : '$dir_lnk_hash_v',
         data : {
-            test_like : \$(\"#lval\").val()
+            strId : \$(\"#strId{$strname['id']}\").val()
         },
         datatype : \"json\",
         type : 'post',

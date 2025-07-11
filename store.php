@@ -20,6 +20,7 @@ require "include/function.php";
  if(isset($_GET['download'])){       //     download
  if(isset($_SESSION['user']) OR (isset($_COOKIE['admin']) AND ($_COOKIE['admin']==$hachadmin))){
 $ndfk=$_GET['download'];
+$strId=$_POST['strId'];
 $catusd = $db_con->prepare("SELECT *  FROM `short` WHERE  sh_type=7867 AND sho='{$ndfk}'" );
 $catusd->execute();
 if($catussd=$catusd->fetch(PDO::FETCH_ASSOC)){
@@ -29,6 +30,50 @@ $stmdr = $db_con->prepare("UPDATE short SET clik=clik+1 WHERE id=:ertb");
 $stmdr->bindParam(":ertb", $catdid);
   if($stmdr->execute()){
 
+   $strids = $db_con->prepare("SELECT * FROM `options` WHERE `o_type` = 'store' AND `id` =:id " );
+   $strids->bindParam(":id", $strId);
+   $strids->execute();
+   $U_strids = $strids->fetch(PDO::FETCH_ASSOC);
+   $U_parent = $U_strids['o_parent'];
+   $U_pts    = $U_strids['o_order'];
+   $U_uid    = $uRow['id'];
+     if($U_pts != 0 ){ 
+            $nstmsbpts = $db_con->prepare("UPDATE users  SET pts=pts-:pts
+            WHERE id=:id");
+            $nstmsbpts->bindParam(":id",   $U_uid);
+            $nstmsbpts->bindParam(":pts",  $U_pts);
+            if($nstmsbpts->execute()){
+            $o_type  = "hest_pts";
+            $bn_desc = "-".$U_pts;
+            $bn_name = "Store";
+            $o_time = time();
+            $inshest = $db_con->prepare("INSERT INTO options (name,o_valuer,o_type,o_parent,o_order,o_mode)
+            VALUES(:name,:o_valuer,:o_type,:o_parent,:o_order,:o_mode)");
+			   $inshest->bindParam(":name",      $bn_name);
+            $inshest->bindParam(":o_valuer",  $bn_desc);
+            $inshest->bindParam(":o_type",    $o_type);
+            $inshest->bindParam(":o_parent",  $U_uid);
+            $inshest->bindParam(":o_order",   $U_parent);
+            $inshest->bindParam(":o_mode",    $o_time);
+            if($inshest->execute()){ }
+            $addstmsbpts = $db_con->prepare("UPDATE users  SET pts=pts+:pts
+            WHERE id=:id");
+            $addstmsbpts->bindParam(":id",   $U_parent);
+            $addstmsbpts->bindParam(":pts",  $U_pts);
+            if($addstmsbpts->execute()){
+
+            $addinshest = $db_con->prepare("INSERT INTO options (name,o_valuer,o_type,o_parent,o_order,o_mode)
+            VALUES(:name,:o_valuer,:o_type,:o_parent,:o_order,:o_mode)");
+			   $addinshest->bindParam(":name",      $bn_name);
+            $addinshest->bindParam(":o_valuer",  $U_pts);
+            $addinshest->bindParam(":o_type",    $o_type);
+            $addinshest->bindParam(":o_parent",  $U_parent);
+            $addinshest->bindParam(":o_order",   $U_uid);
+            $addinshest->bindParam(":o_mode",    $o_time);
+            if($addinshest->execute()){ }
+         	}
+         	}
+         }
     }else{
     template_mine('header');
     template_mine('404');
@@ -57,8 +102,8 @@ $stmdr->bindParam(":ertb", $catdid);
  $gproducer =  $_GET['producer'];
   $stname = $db_con->prepare("SELECT * FROM `options` WHERE `o_type` = 'store' AND `name` =:name " );
   $stname->bindParam(":name", $gproducer);
-$stname->execute();
-$strname=$stname->fetch(PDO::FETCH_ASSOC);
+  $stname->execute();
+  $strname=$stname->fetch(PDO::FETCH_ASSOC);
  template_mine('header');
  if(isset($strname['name']) AND ($strname['name']==$_GET['producer'])){
  template_mine('producer');
