@@ -1,4 +1,5 @@
 <?php
+if(isset($_GET['id']) AND isset($_GET['mid'])){
 include "../../../dbconfig.php";
  $stmt = $db_con->prepare("SELECT *  FROM setting   " );
         $stmt->execute();
@@ -112,4 +113,6 @@ $comment = preg_replace("/[\r\n]*/","",$comment);
               <!-- /CHAT WIDGET SPEAKER -->
  <?php } ?>
  <?php } ?>
- <?php }else{ echo "404"; } ?>
+ <?php }else{ echo "404"; }
+        }else{ echo "404"; }
+         ?>

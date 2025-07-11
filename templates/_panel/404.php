@@ -1,4 +1,4 @@
-<?php if($s_st=="buyfgeufb"){  ?>
+<?php if(isset($s_st) AND ($s_st=="buyfgeufb")){  ?>
   <style> body{  background-image: url(<?php url_site();  ?>/templates/_panel/img/background.webp); } </style>
   <div class="grid grid-12" >
   <div class="grid-column" >

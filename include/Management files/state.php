@@ -2,11 +2,11 @@
 
 #####################################################################
 ##                                                                 ##
-##                        MYads  v3.1.x                            ##
-##                     https://www.adstn.gq                        ##
-##                    e-mail: admin@adstn.gq                       ##
+##                        MYads  v3.2.x                            ##
+##                  https://github.com/mrghozzi                    ##
 ##                                                                 ##
-##                       copyright (c) 2024                        ##
+##                                                                 ##
+##                       copyright (c) 2025                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
@@ -55,7 +55,7 @@ echo "<tr>
   <td>{$covtime}</td>
   <td>{$getBrowser['name']}<br />{$getBrowser['version']}</td>
   <td>{$getBrowser['platform']}</td>
-  <td><a href=\"https://ip.adstn.gq/?ip={$wt['v_ip']}\">{$wt['v_ip']}</a></td>
+  <td><a href=\"http://ip.is-best.net/?ip={$wt['v_ip']}\">{$wt['v_ip']}</a></td>
   </tr>";
 
    }
@@ -83,7 +83,7 @@ echo "<tr>
   <td>{$covtime}</td>
   <td>{$getBrowser['name']}<br />{$getBrowser['version']}</td>
   <td>{$getBrowser['platform']}</td>
-  <td><a href=\"https://ip.adstn.gq/?ip={$wt['v_ip']}\">{$wt['v_ip']}</a></td>
+  <td><a href=\"http://ip.is-best.net/?ip={$wt['v_ip']}\">{$wt['v_ip']}</a></td>
   </tr>";
 
    }

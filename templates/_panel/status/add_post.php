@@ -1,4 +1,4 @@
-<?php if($s_st=="buyfgeufb"){
+<?php if(isset($s_st) AND ($s_st=="buyfgeufb")){
    if(isset($_COOKIE['user']))
 {
  ?>
@@ -14,7 +14,7 @@
                 <div class="form-item">
                   <!-- FORM TEXTAREA -->
                   <div class="form-textarea">
-                    <textarea id="txt" class="quicktext" name="txt" placeholder="Hi <?php echo $uRow['username']; ?>! Share your post here..."></textarea>
+                    <textarea id="txt" class="quicktext" name="txt" placeholder="<?php echo str_replace("[username]", $uRow['username'] , $lang['husyph']);?>"></textarea>
                     <div class="result" ></div>
                     <!-- FORM TEXTAREA LIMIT TEXT -->
                     <p class="form-textarea-limit-text"></p>
@@ -27,7 +27,7 @@
                 <!-- /FORM ITEM -->
               </div>
               <input type="file" id="imgupload" accept=".jpg, .jpeg, .png, .gif" style="display:none"/>
-              <input type="hidden" name="submit_post" value="submit" />
+              <input type="submit" name="submit_post" id="submit_post" value="submit" style="display:none"/>
               <!-- /FORM ROW -->
             </form>
             <!-- /FORM -->
@@ -44,10 +44,6 @@
                 <svg class="quick-post-footer-action-icon icon-camera">
                   <use xlink:href="#svg-camera"></use>
                 </svg>
-                <!-- /QUICK POST FOOTER ACTION ICON -->
-              <div class="xm-tooltip" style="white-space: nowrap; position: absolute; z-index: 99999; top: -32px; left: 50%; margin-left: -42.5px; opacity: 0; visibility: hidden; transform: translate(0px, 10px); transition: all 0.3s ease-in-out 0s;">
-              <p class="xm-tooltip-text">Insert Photo</p>
-              </div>
               </div>
               <!-- /QUICK POST FOOTER ACTION -->
 
@@ -56,9 +52,6 @@
                 <!-- QUICK POST FOOTER ACTION ICON -->
                 <i class="fa fa-link" ></i>
                 <!-- /QUICK POST FOOTER ACTION ICON -->
-              <div class="xm-tooltip" style="white-space: nowrap; position: absolute; z-index: 99999; top: -32px; left: 50%; margin-left: -35.5px; opacity: 0; visibility: hidden; transform: translate(0px, 10px); transition: all 0.3s ease-in-out 0s;">
-              <p class="xm-tooltip-text">Insert Link</p>
-              </div>
               </div>
               <!-- /QUICK POST FOOTER ACTION -->
 
@@ -72,7 +65,7 @@
                 <!-- /BUTTON -->
 
                 <!-- BUTTON -->
-                <p class="button small secondary" id="btnpost" >Post</p>
+                <p class="button small secondary" id="btnpost" ><?php lang('spread'); ?></p>
                 <!-- /BUTTON -->
               </div>
               <!-- /QUICK POST FOOTER ACTIONS -->
@@ -80,6 +73,7 @@
           <!-- /QUICK POST FOOTER -->
 </div>
 
+<script>$('#btnpost').click(function(){ $('#submit_post').trigger('click'); });</script>
 <script>$('#OpenImgUpload').click(function(){ $('#imgupload').trigger('click'); });</script>
 <script>$('#Open_link').click(function(){
   $(".add_link").html("<div class='input-group'><span class='input-group-text'><i class='fa fa-edit' ></i></span><input type='txt' class='form-control' name='name' id='name'  placeholder='Name' autocomplete='off' required /></div><div class='input-group'><span class='input-group-text'><i class='fa fa-link' ></i></span><input type='url' class='form-control' name='url' id='url'  placeholder='http(s)://' autocomplete='off' required /></div><div class='input-group'><span class='input-group-text'><i class='fa fa-tag' ></i></span><select class='form-control' name='categ' id='categ' ><?php $selectdir = $db_con->prepare("SELECT *  FROM cat_dir WHERE  statu=1 ORDER BY `name` ASC "); $selectdir->execute(); while($selrs15=$selectdir->fetch(PDO::FETCH_ASSOC)){ echo "<option value='{$selrs15['id']}'>{$selrs15['name']}</option>"; } ?></select></div><div class='input-group'><span class='input-group-text'><i class='fa fa-folder' ></i></span><input type='txt' class='form-control' name='tag' id='tag'  placeholder='tags' autocomplete='off' required /></div>");
@@ -99,7 +93,6 @@
          });
      });
 </script>
-<script>$('#btnpost').click(function(){ $('.form').trigger('submit'); });</script>
 <script>
     $(document).ready(function(){
         $('#imgupload').change(function(e){

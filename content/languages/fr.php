@@ -6,7 +6,7 @@
 ##                     https://surfer.42web.io                     ##
 ##                         par_absouini                            ##
 ##                         and_mrghozzi                            ##
-##                       copyright (c) 2023                        ##
+##                       copyright (c) 2025                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
@@ -21,6 +21,7 @@ $lang['lcomment']    = "Laisser un commentaire:";
 $lang['scomment']    = "Envoyer un commentaire";
 $lang['LMComments']  = "Charger plus de commentaires";
 $lang['follow']      = "NOUS SUIVRE";
+$lang['unfollow']    = "Ne plus suivre";
 $lang['logout']      = "Déconnexion";
 $lang['login']       = "Connexion";
 $lang['sign_up']     = "S'inscrire";
@@ -29,6 +30,9 @@ $lang['p_sign_up']   = "S'enregistrer";
 $lang['dinstall']    = "Supprimer le dossier 'install' ou changer le nom";
 $lang['all_f_m']     = "&nbsp; tous les champs sont obligatoires !";
 $lang['username']    = "Identifiant :";
+$lang['online']      = "En ligne";
+$lang['check']       = "Vérifier";
+$lang['pts']         = "PTS";
 $lang['e_mail']      = "Address e-mail :";
 $lang['email']       = "Address e-mail";
 $lang['password']    = "Mot de passe";
@@ -71,7 +75,10 @@ $lang['add']         = "Ajouter";
 $lang['save']        = "Enregistrer";
 $lang['edit']        = "Modifier";
 $lang['delete']      = "supprimer";
+$lang['sure_to_delete'] = "Assurez-vous de supprimer le le numéro ID";
 $lang['close']       = "fermer";
+$lang['please_enter_name'] = "Veuillez entrer le nom.";
+$lang['please_enter_url'] = "Veuillez saisir l'URL.";
 $lang['activate']    = "Activez";
 $lang['topics']      = "Sujets";
 $lang['topic']       = "sujet";
@@ -175,7 +182,6 @@ $lang['referal']     = "Referrals";
 $lang['list']        = "Liste";
 $lang['codes']       = "Codes";
 $lang['Promotysite'] = "Promouvoir votre site";
-$lang['pts']         = "Points";
 $lang['Views']       = "Vues";
 $lang['Click']       = "clique";
 $lang['Total']       = "Total";
@@ -267,6 +273,7 @@ $lang['yshbv']       = "Votre site a été consulté";
 $lang['latest_sites']= "Les derniers sites";
 $lang['latest_post'] = "Dernier article";
 $lang['latest_version']= "Vous avez la dernière version";
+$lang['support_project'] = "Soutenir le projet";
 $lang['import_update']= "<p><strong>Important :</strong> Avant de procéder à la mise à jour, veuillez faire une sauvegarde de votre base de données et de vos autres fichiers.</p>";
 $lang['there_update']= "<p>Une nouvelle version de MyAds est disponible pour la mise à jour.!</p>";
 $lang['now_update']  = "Mise à jour maintenant";
@@ -284,6 +291,8 @@ $lang['mode_admin']  = "Mode Admin";
 $lang['create_a']    = "Créer un";
 $lang['in_the_forum']= "dans le forum";
 $lang['on_i']        = "on";
+$lang['copy_link']   = "Copier le lien";
+$lang['link_copied'] = "Lien copié!";
 $lang['link']        = "Lien";
 $lang['lastrm']      = "Dernier membre enregistré";
 $lang['lastps']      = "Dernier message";
@@ -303,5 +312,44 @@ $lang['notifs']      = "Notifications";
 $lang['all_notifs']  = "Afficher toutes les notifications";
 $lang['dir_cats']    = "Catégories du répertoire";
 $lang['forum_cats']  = "Catégories du forum";
+$lang['friends']     = "Amis";
+$lang['send_message']= "Envoyer un message";
+$lang['my_profile']  = "Mon profil";
+$lang['notifications'] = "Notifications";
+$lang['like'] = "J'aime";
+$lang['love'] = "Amour";
+$lang['dislike'] = "Je n'aime pas";
+$lang['happy'] = "heureux";
+$lang['funny'] = "drôle";
+$lang['wow'] = "Ouah";
+$lang['angry'] = "En colère";
+$lang['sad'] = "Triste";
+$lang['facebook'] = "Facebook";
+$lang['twitter'] = "Twitter";
+$lang['linkedin'] = "LinkedIn";
+$lang['telegram'] = "Telegram";
+$lang['emojis'] = "Émojis";
+$lang['news_site'] = "Site d'actualités";
+$lang['reports'] = "Rapports";
+$lang['updates'] = "Mises à jour";
+$lang['settings_site'] = "Paramètres du site";
+$lang['site_name'] = "Nom du site";
+$lang['url_link'] = "Lien URL";
+$lang['description'] = "Description";
+$lang['language_default'] = "Langue par défaut";
+$lang['educational_links'] = "Liens éducatifs";
+$lang['timezone'] = "Timezone";
+$lang['admin_email'] = "Courriel de l'administrateur";
+$lang['timeline']    = "Chronologie";
+$lang['photos']      = "Photos";
+$lang['husyph']      = "Bonjour [username] ! Partagez votre message ici…";
+$lang['insertlink']  = "Insérer un lien";
+$lang['insertphoto'] = "Insérer une photo";
+$lang['your_ad_has_been_activated'] = "Votre annonce a été activée";
+$lang['your_ad_as_been_blocked'] = "Votre annonce a été bloquée";
+$lang['your_ad_has_been_deleted'] = "Votre annonce a été supprimée.";
+$lang['pmbno']       = "Prix ​​(PTS) : Doit être composé uniquement de chiffres";
+$lang['price_pts']   = "Prix (PTS)";
+$lang['insufficient_points'] = "Vos points sont insuffisants";
 
 ?>

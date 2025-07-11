@@ -1,11 +1,12 @@
-﻿<?php
+﻿<?PHP
+
 #####################################################################
 ##                                                                 ##
-##                         MYads  v3.x.x                           ##
-##                    http://www.kariya-host.gq                    ##
-##                     e-mail: admin@krhost.ga                     ##
+##                        MYads  v3.2.x                            ##
+##                  https://github.com/mrghozzi                    ##
 ##                                                                 ##
-##                       copyright (c) 2023                        ##
+##                                                                 ##
+##                       copyright (c) 2025                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##

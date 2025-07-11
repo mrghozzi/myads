@@ -1,5 +1,5 @@
 <?php
-
+ if(isset($db_con)){
  $n_like = 0;
  $n_love = 0;
  $n_dislike = 0;
@@ -269,3 +269,4 @@ $catrussr=$catrusr->fetch(PDO::FETCH_ASSOC);
                       <!-- /REACTION ITEM -->
 <?php } ?>
 </div>
+<?php }else{ echo "404"; } ?>

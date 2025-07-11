@@ -1,6 +1,7 @@
-<?php if($s_st=="buyfgeufb"){
+<?php if(isset($s_st) AND ($s_st=="buyfgeufb")){
+    // Check for system updates
 
-                   $myads_last_time_updates = "https://api.adstn.gq/myads/latest_version.txt";
+                   $myads_last_time_updates = "https://github.com/mrghozzi/myads_check_updates/raw/main/latest_version.txt";
                    $last_time_updates = @file_get_contents($myads_last_time_updates, FILE_USE_INCLUDE_PATH);
                    $last_time_updates = strip_tags($last_time_updates, '');
                    $last_time_updates=substr($last_time_updates,0,5);
@@ -13,12 +14,18 @@
                    }  
 
 ?>
+<!-- Main grid structure -->
 <div class="grid grid-3-6-3 medium-space" >
+<!-- First column - Navigation menu -->
+<!-- Main column - Statistics -->
 <div class="grid-column" >
 <?php template_mine('admin/admin_nav');  ?>
 </div>
+<!-- First column - Navigation menu -->
+<!-- Main column - Statistics -->
 <div class="grid-column" >
-   <div class="grid grid-half">
+   <!-- Statistics grid -->
+<div class="grid grid-half">
           <!-- STATS DECORATION -->
           <div class="stats-decoration v2 secondary">
             <!-- STATS DECORATION TITLE -->
@@ -266,6 +273,8 @@
       </div>
 
 </div>
+<!-- First column - Navigation menu -->
+<!-- Main column - Statistics -->
 <div class="grid-column" >
 
   <div class="btn-group-vertical">
@@ -287,12 +296,13 @@
     <a href="https://github.com/mrghozzi/myads/wiki/changelogs" class="btn btn-warning" target="_blank">Changelogs&nbsp;<b><i class="fa fa-external-link" ></i></b></a>
     
   </div>
-  <div class="widget-box">
+  <!-- Developer info box -->
+<div class="widget-box">
         <div class="widget-box-content no-margin-top">
            <div class="table table-top-friends join-rows">
 						<div class="table-header">
                 <div class="table-header-column textpost">
-                   <center>Devlope by : <a href="http://www.kariya-host.gq">Kariya host</a></center>
+                   <center>Devlope by : <a href="https://github.com/mrghozzi">MrGhozzi</a></center>
                 </div>
                 
 						</div>
@@ -320,6 +330,27 @@
 		   </div>
         </div>
       </div>
+      <!-- Project Support Buttons -->
+<div class="widget-box" style="margin-top:20px;text-align:center;">
+  <p class="widget-box-title"><?php lang('support_project'); ?></p>
+  
+  <div style="display:flex;justify-content:space-around;padding:20px;">
+    <a href="https://www.patreon.com/MrGhozzi" target="_blank" style="color:#000000;">
+    <img src="<?php url_site();  ?>/templates/_panel/img/icons/patreon-icon.svg" width="24" height="24" >
+      Patreon
+    </a>
+    
+    <a href="https://ko-fi.com/mrghozzi" target="_blank" style="color:#ff9900;">
+    <img src="<?php url_site();  ?>/templates/_panel/img/icons/kofi-icon.svg" width="24" height="24" >
+      Ko-fi
+    </a>
+    
+    <a href="https://www.ba9chich.com/en/mrghozzi" target="_blank" style="color:#29abe0;">
+    <img src="<?php url_site();  ?>/templates/_panel/img/icons/ba9chich-icon.svg" width="24" height="24" >
+      Ba9chich
+    </a>
+  </div>
+</div>
 </div>
 </div>
 <?php }else{ echo"404"; }  ?>

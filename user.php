@@ -2,11 +2,11 @@
 
 #####################################################################
 ##                                                                 ##
-##                        MYads  v3.x.x                            ##
-##                     http://www.krhost.ga                        ##
-##                   e-mail: admin@krhost.ga                       ##
+##                        MYads  v3.2.x                            ##
+##                  https://github.com/mrghozzi                    ##
 ##                                                                 ##
-##                       copyright (c) 2023                        ##
+##                                                                 ##
+##                       copyright (c) 2025                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
@@ -146,7 +146,322 @@ $sus=$usz->fetch(PDO::FETCH_ASSOC);
  template_mine('header');
  template_mine('user');
  template_mine('footer');
- }else if(isset($_GET['e'])AND isset($_COOKIE['user']) AND ($_GET['e']==$_COOKIE['user'])){
+ }else if(isset($_GET['ph'])){
+  //   ALL Categories
+include_once('include/pagination.php');
+$page = (int)(!isset($_GET["page"]) ? 1 : $_GET["page"]);
+if ($page <= 0) $page = 1;
+$per_page = 21; // Records per page.
+$startpoint = ($page * $per_page) - $per_page;
+$stt_time_go=time();
+
+
+$string = urlencode(mb_ereg_replace('\s+', '-', $_GET['ph']));
+
+$stausr = $db_con->prepare("SELECT * FROM `options` WHERE `o_type` = 'user' AND `o_valuer` LIKE :o_valuer ");
+$stausr->bindParam(":o_valuer", $string);
+$stausr->execute();
+$usrRow=$stausr->fetch(PDO::FETCH_ASSOC);
+if($usrRow['o_mode']=="0"){
+  $us_cover = $url_site."/upload/cover.jpg";
+}else{
+  $us_cover = $url_site."/".$usrRow['o_mode'];
+}
+$guser_id = $usrRow['o_order'];
+$statement = "`status` WHERE uid='{$guser_id}' AND date<={$stt_time_go} AND s_type=4 ORDER BY `date` DESC";
+$catsum = $db_con->prepare("SELECT  * FROM {$statement} LIMIT {$startpoint} , {$per_page} " );
+$catsum->execute();
+function forum_tpc_list() {
+ global  $db_con;
+ global  $catsum;
+ global  $statement;
+ global  $per_page;
+ global  $page;
+ global  $uRow;
+ global  $lang;
+ global  $url_site;
+ global  $title_s;
+ global  $_GET;
+ global  $usrRow;
+while($sutcat=$catsum->fetch(PDO::FETCH_ASSOC))
+{  if($sutcat['s_type']==4){
+$s_type ="forum";
+}
+if($sutcat['s_type']==4){
+$catusz = $db_con->prepare("SELECT *  FROM `{$s_type}` WHERE statu=1 AND  id=:tp_id ");
+$catusz->bindParam(":tp_id", $sutcat['tp_id']);
+$catusz->execute();
+$sucat=$catusz->fetch(PDO::FETCH_ASSOC);
+if($sucat['statu']=="1") {
+if($sutcat['s_type']==4){
+tpl_image_stt($sutcat,0);
+}
+}
+ }
+}$url=$url_site."/user?ph=".$_GET['ph']."&";
+   echo pagination($statement,$per_page,$page,$url);
+           }
+$usz = $db_con->prepare("SELECT *  FROM `users` WHERE id=:u_id");
+$usz->bindParam(":u_id", $usrRow['o_order']);
+$usz->execute();
+$sus=$usz->fetch(PDO::FETCH_ASSOC);
+$title_page = $sus['username']." - Profile" ;
+template_mine('header');
+template_mine('user');
+template_mine('footer');
+}else if(isset($_GET['blog'])){
+  //   ALL Categories
+include_once('include/pagination.php');
+$page = (int)(!isset($_GET["page"]) ? 1 : $_GET["page"]);
+if ($page <= 0) $page = 1;
+$per_page = 21; // Records per page.
+$startpoint = ($page * $per_page) - $per_page;
+$stt_time_go=time();
+
+
+$string = urlencode(mb_ereg_replace('\s+', '-', $_GET['blog']));
+
+$stausr = $db_con->prepare("SELECT * FROM `options` WHERE `o_type` = 'user' AND `o_valuer` LIKE :o_valuer ");
+$stausr->bindParam(":o_valuer", $string);
+$stausr->execute();
+$usrRow=$stausr->fetch(PDO::FETCH_ASSOC);
+if($usrRow['o_mode']=="0"){
+  $us_cover = $url_site."/upload/cover.jpg";
+}else{
+  $us_cover = $url_site."/".$usrRow['o_mode'];
+}
+$guser_id = $usrRow['o_order'];
+$statement = "`status` WHERE uid='{$guser_id}' AND date<={$stt_time_go} AND s_type=100 ORDER BY `date` DESC";
+$catsum = $db_con->prepare("SELECT  * FROM {$statement} LIMIT {$startpoint} , {$per_page} " );
+$catsum->execute();
+function forum_tpc_list() {
+ global  $db_con;
+ global  $catsum;
+ global  $statement;
+ global  $per_page;
+ global  $page;
+ global  $uRow;
+ global  $lang;
+ global  $url_site;
+ global  $title_s;
+ global  $_GET;
+ global  $usrRow;
+while($sutcat=$catsum->fetch(PDO::FETCH_ASSOC))
+{  if($sutcat['s_type']==100){
+$s_type ="forum";
+}
+if($sutcat['s_type']==100){
+$catusz = $db_con->prepare("SELECT *  FROM `{$s_type}` WHERE statu=1 AND  id=:tp_id ");
+$catusz->bindParam(":tp_id", $sutcat['tp_id']);
+$catusz->execute();
+$sucat=$catusz->fetch(PDO::FETCH_ASSOC);
+if($sucat['statu']=="1") {
+if($sutcat['s_type']==100){
+  tpl_post_stt($sutcat,0);
+}
+}
+ }
+}$url=$url_site."/user?blog=".$_GET['blog']."&";
+   echo pagination($statement,$per_page,$page,$url);
+           }
+$usz = $db_con->prepare("SELECT *  FROM `users` WHERE id=:u_id");
+$usz->bindParam(":u_id", $usrRow['o_order']);
+$usz->execute();
+$sus=$usz->fetch(PDO::FETCH_ASSOC);
+$title_page = $sus['username']." - Profile" ;
+template_mine('header');
+template_mine('user');
+template_mine('footer');
+}else if(isset($_GET['uforum'])){
+  //   ALL Categories
+include_once('include/pagination.php');
+$page = (int)(!isset($_GET["page"]) ? 1 : $_GET["page"]);
+if ($page <= 0) $page = 1;
+$per_page = 21; // Records per page.
+$startpoint = ($page * $per_page) - $per_page;
+$stt_time_go=time();
+
+
+$string = urlencode(mb_ereg_replace('\s+', '-', $_GET['uforum']));
+
+$stausr = $db_con->prepare("SELECT * FROM `options` WHERE `o_type` = 'user' AND `o_valuer` LIKE :o_valuer ");
+$stausr->bindParam(":o_valuer", $string);
+$stausr->execute();
+$usrRow=$stausr->fetch(PDO::FETCH_ASSOC);
+if($usrRow['o_mode']=="0"){
+  $us_cover = $url_site."/upload/cover.jpg";
+}else{
+  $us_cover = $url_site."/".$usrRow['o_mode'];
+}
+$guser_id = $usrRow['o_order'];
+$statement = "`status` WHERE uid='{$guser_id}' AND date<={$stt_time_go} AND s_type=2 ORDER BY `date` DESC";
+$catsum = $db_con->prepare("SELECT  * FROM {$statement} LIMIT {$startpoint} , {$per_page} " );
+$catsum->execute();
+function forum_tpc_list() {
+ global  $db_con;
+ global  $catsum;
+ global  $statement;
+ global  $per_page;
+ global  $page;
+ global  $uRow;
+ global  $lang;
+ global  $url_site;
+ global  $title_s;
+ global  $_GET;
+ global  $usrRow;
+while($sutcat=$catsum->fetch(PDO::FETCH_ASSOC))
+{  if($sutcat['s_type']==2){
+$s_type ="forum";
+}
+if($sutcat['s_type']==2){
+$catusz = $db_con->prepare("SELECT *  FROM `{$s_type}` WHERE statu=1 AND  id=:tp_id ");
+$catusz->bindParam(":tp_id", $sutcat['tp_id']);
+$catusz->execute();
+$sucat=$catusz->fetch(PDO::FETCH_ASSOC);
+if($sucat['statu']=="1") {
+if($sutcat['s_type']==2){
+  tpl_topic_stt($sutcat,0);
+}
+}
+ }
+}$url=$url_site."/user?uforum=".$_GET['uforum']."&";
+   echo pagination($statement,$per_page,$page,$url);
+           }
+$usz = $db_con->prepare("SELECT *  FROM `users` WHERE id=:u_id");
+$usz->bindParam(":u_id", $usrRow['o_order']);
+$usz->execute();
+$sus=$usz->fetch(PDO::FETCH_ASSOC);
+$title_page = $sus['username']." - Profile" ;
+template_mine('header');
+template_mine('user');
+template_mine('footer');
+}else if(isset($_GET['ulinks'])){
+  //   ALL Categories
+include_once('include/pagination.php');
+$page = (int)(!isset($_GET["page"]) ? 1 : $_GET["page"]);
+if ($page <= 0) $page = 1;
+$per_page = 21; // Records per page.
+$startpoint = ($page * $per_page) - $per_page;
+$stt_time_go=time();
+
+
+$string = urlencode(mb_ereg_replace('\s+', '-', $_GET['ulinks']));
+
+$stausr = $db_con->prepare("SELECT * FROM `options` WHERE `o_type` = 'user' AND `o_valuer` LIKE :o_valuer ");
+$stausr->bindParam(":o_valuer", $string);
+$stausr->execute();
+$usrRow=$stausr->fetch(PDO::FETCH_ASSOC);
+if($usrRow['o_mode']=="0"){
+  $us_cover = $url_site."/upload/cover.jpg";
+}else{
+  $us_cover = $url_site."/".$usrRow['o_mode'];
+}
+$guser_id = $usrRow['o_order'];
+$statement = "`status` WHERE uid='{$guser_id}' AND date<={$stt_time_go} AND s_type=1 ORDER BY `date` DESC";
+$catsum = $db_con->prepare("SELECT  * FROM {$statement} LIMIT {$startpoint} , {$per_page} " );
+$catsum->execute();
+function forum_tpc_list() {
+ global  $db_con;
+ global  $catsum;
+ global  $statement;
+ global  $per_page;
+ global  $page;
+ global  $uRow;
+ global  $lang;
+ global  $url_site;
+ global  $title_s;
+ global  $_GET;
+ global  $usrRow;
+while($sutcat=$catsum->fetch(PDO::FETCH_ASSOC))
+{  if($sutcat['s_type']==1){
+$s_type ="directory";
+}
+if($sutcat['s_type']==1){
+$catusz = $db_con->prepare("SELECT *  FROM `{$s_type}` WHERE statu=1 AND  id=:tp_id ");
+$catusz->bindParam(":tp_id", $sutcat['tp_id']);
+$catusz->execute();
+$sucat=$catusz->fetch(PDO::FETCH_ASSOC);
+if($sucat['statu']=="1") {
+if($sutcat['s_type']==1){
+  tpl_site_stt($sutcat,0);
+}
+}
+ }
+}$url=$url_site."/user?ulinks=".$_GET['ulinks']."&";
+   echo pagination($statement,$per_page,$page,$url);
+           }
+$usz = $db_con->prepare("SELECT *  FROM `users` WHERE id=:u_id");
+$usz->bindParam(":u_id", $usrRow['o_order']);
+$usz->execute();
+$sus=$usz->fetch(PDO::FETCH_ASSOC);
+$title_page = $sus['username']." - Profile" ;
+template_mine('header');
+template_mine('user');
+template_mine('footer');
+}else if(isset($_GET['ushop'])){
+  //   ALL Categories
+include_once('include/pagination.php');
+$page = (int)(!isset($_GET["page"]) ? 1 : $_GET["page"]);
+if ($page <= 0) $page = 1;
+$per_page = 21; // Records per page.
+$startpoint = ($page * $per_page) - $per_page;
+$stt_time_go=time();
+
+
+$string = urlencode(mb_ereg_replace('\s+', '-', $_GET['ushop']));
+
+$stausr = $db_con->prepare("SELECT * FROM `options` WHERE `o_type` = 'user' AND `o_valuer` LIKE :o_valuer ");
+$stausr->bindParam(":o_valuer", $string);
+$stausr->execute();
+$usrRow=$stausr->fetch(PDO::FETCH_ASSOC);
+if($usrRow['o_mode']=="0"){
+  $us_cover = $url_site."/upload/cover.jpg";
+}else{
+  $us_cover = $url_site."/".$usrRow['o_mode'];
+}
+$guser_id = $usrRow['o_order'];
+$statement = "`status` WHERE uid='{$guser_id}' AND date<={$stt_time_go} AND s_type=7867 ORDER BY `date` DESC";
+$catsum = $db_con->prepare("SELECT  * FROM {$statement} LIMIT {$startpoint} , {$per_page} " );
+$catsum->execute();
+function forum_tpc_list() {
+ global  $db_con;
+ global  $catsum;
+ global  $statement;
+ global  $per_page;
+ global  $page;
+ global  $uRow;
+ global  $lang;
+ global  $url_site;
+ global  $title_s;
+ global  $_GET;
+ global  $usrRow;
+while($sutcat=$catsum->fetch(PDO::FETCH_ASSOC))
+{  if($sutcat['s_type']==7867){
+$s_type ="forum";
+}
+if($sutcat['s_type']==7867){
+$catusz = $db_con->prepare("SELECT *  FROM `{$s_type}` WHERE statu=1 AND  id=:tp_id ");
+$catusz->bindParam(":tp_id", $sutcat['tp_id']);
+$catusz->execute();
+$sucat=$catusz->fetch(PDO::FETCH_ASSOC);
+if($sucat['statu']=="1") {
+if($sutcat['s_type']==7867){
+  tpl_store_stt($sutcat,0);
+}
+}
+ }
+}$url=$url_site."/user?ushop=".$_GET['ushop']."&";
+   echo pagination($statement,$per_page,$page,$url);
+           }
+$usz = $db_con->prepare("SELECT *  FROM `users` WHERE id=:u_id");
+$usz->bindParam(":u_id", $usrRow['o_order']);
+$usz->execute();
+$sus=$usz->fetch(PDO::FETCH_ASSOC);
+$title_page = $sus['username']." - Profile" ;
+template_mine('header');
+template_mine('user');
+template_mine('footer');
+}else if(isset($_GET['e'])AND isset($_COOKIE['user']) AND ($_GET['e']==$_COOKIE['user'])){
 $usz = $db_con->prepare("SELECT *  FROM `users` WHERE id=:u_id");
 $usz->bindParam(":u_id", $_GET['e']);
 $usz->execute();
@@ -188,6 +503,15 @@ $sus=$usz->fetch(PDO::FETCH_ASSOC);
  }else if((int)isset($_GET['fg'])){
   $usz = $db_con->prepare("SELECT *  FROM `users` WHERE id=:u_id");
 $usz->bindParam(":u_id", $_GET['fg']);
+$usz->execute();
+$sus=$usz->fetch(PDO::FETCH_ASSOC);
+ $title_page = $sus['username']." - Following" ;
+  template_mine('header');
+  template_mine('follow');
+  template_mine('footer');
+ }else if((int)isset($_GET['ff'])){
+  $usz = $db_con->prepare("SELECT *  FROM `users` WHERE id=:u_id");
+$usz->bindParam(":u_id", $_GET['ff']);
 $usz->execute();
 $sus=$usz->fetch(PDO::FETCH_ASSOC);
  $title_page = $sus['username']." - Following" ;

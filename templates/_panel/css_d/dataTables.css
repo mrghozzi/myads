@@ -5,15 +5,15 @@
 .dataTable{
 border-radius: 10px;
 padding: 12px 24px;
-color: #000000;
+color: #ffffff;
 font-size: .75rem;
 font-weight: 700;
 cursor: pointer;
 white-space: nowrap;
 overflow: hidden;
 text-overflow: ellipsis;
-background-color: #fff;
-box-shadow: 0 0 40px 0 rgba(94,92,154,.06);
+background-color: #293249;;
+box-shadow: 0 0 40px 0 rgba(10, 120, 17, 0.06);
 margin-bottom: 6px;
 }
 
@@ -22,7 +22,7 @@ display: inline-block;
 height: 28px;
 width: 38px;
 border-radius: 10px;
-background-color: #615dfa;
+background-color: #40d04f;
 color: #fff;
 font-size: .875rem;
 font-weight: 700;
@@ -35,7 +35,7 @@ margin-right: 5px;
 
 .paginate_button.current {
 
-background-color: #7289da;
+background-color: #40d04f;
 
 }
 
@@ -97,7 +97,7 @@ cursor: pointer;
 white-space: nowrap;
 overflow: hidden;
 text-overflow: ellipsis;
-background-color: #615dfa;
+background-color: #40d04f;
 margin-bottom: 6px;
 }
 
@@ -111,7 +111,7 @@ cursor: pointer;
 white-space: nowrap;
 overflow: hidden;
 text-overflow: ellipsis;
-background-color: #615dfa;
+background-color: #40d04f;
 margin-bottom: 6px;
 }
 
@@ -135,7 +135,7 @@ font-size: 1rem;
 font-weight: 700;
 background-color: #fff;
 border: 1px solid #dedeea;
-color: #3e3f5e;
+color: #fafafa;
 transition: border-color .2s ease-in-out;
 }
 
@@ -149,7 +149,7 @@ cursor: pointer;
 white-space: nowrap;
 overflow: hidden;
 text-overflow: ellipsis;
-background-color: #615dfa;
+background-color: #40d04f;
 margin-bottom: 6px;
 }
 
@@ -172,6 +172,6 @@ font-size: 1rem;
 font-weight: 700;
 background-color: #fff;
 border: 1px solid #dedeea;
-color: #3e3f5e;
+color: #ffffff;
 transition: border-color .2s ease-in-out;
 }

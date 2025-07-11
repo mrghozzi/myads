@@ -1,4 +1,4 @@
-<?php if($s_st=="buyfgeufb"){  ?>
+<?php if(isset($s_st) AND ($s_st=="buyfgeufb")){  ?>
    <!-- HEADER -->
   <header class="header">
     <!-- HEADER ACTIONS -->

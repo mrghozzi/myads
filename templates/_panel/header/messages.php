@@ -1,4 +1,4 @@
-<?php if($s_st=="buyfgeufb"){  ?>
+<?php if(isset($s_st) AND ($s_st=="buyfgeufb")){  ?>
 <!-- ACTION LIST ITEM WRAP -->
         <div class="action-list-item-wrap">
           <!-- ACTION LIST ITEM -->

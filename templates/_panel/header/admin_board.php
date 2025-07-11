@@ -1,4 +1,4 @@
-<?php if($s_st=="buyfgeufb"){  ?>
+<?php if(isset($s_st) AND ($s_st=="buyfgeufb")){  ?>
 <?php if($_COOKIE['user']=="1" ){ ?>
 <?php if(isset($_COOKIE['admin'])==isset($hachadmin)){ ?>
 <!-- ACTION ITEM WRAP -->

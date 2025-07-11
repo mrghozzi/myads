@@ -1,5 +1,5 @@
-<?php if($s_st=="buyfgeufb"){   ?>
-<link href="<?php echo $url_site;  ?>/templates/_panel/css/codemirror.css" rel='stylesheet' type='text/css' />
+<?php if(isset($s_st) AND ($s_st=="buyfgeufb")){  global $c_mode; ?> 
+<link href="<?php echo $url_site;  ?>/templates/_panel/<?php echo $c_mode; ?>/codemirror.css" rel='stylesheet' type='text/css' />
 <div class="grid grid-3-9 medium-space" >
  <div class="grid-column" >
   <?php template_mine('admin/admin_nav');  ?>

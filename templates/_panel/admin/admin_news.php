@@ -1,4 +1,4 @@
-<?php if($s_st=="buyfgeufb"){  ?>
+<?php if(isset($s_st) AND ($s_st=="buyfgeufb")){  ?>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sceditor@3/minified/themes/default.min.css" />
 <script src="https://cdn.jsdelivr.net/npm/sceditor@3/minified/sceditor.min.js"></script>
 <div class="grid grid-3-9 medium-space" >
@@ -21,7 +21,7 @@
                          <form id=\"defaultForm\" method=\"post\" class=\"form-horizontal\" action=\"admincp.php?a_news\">
                          <div class=\"input-group\">
                          <span class=\"input-group-addon\" id=\"basic-addon1\"><i class=\"fa fa-edit\" aria-hidden=\"true\"></i></span>
-                         <input type=\"text\" class=\"form-control\" name=\"name\"  autocomplete=\"off\" />
+                         <input type=\"text\" class=\"form-control\" name=\"name\"  autocomplete=\"off\" required />
                          </div>
                          <div class=\"input-group\">
                          <span class=\"input-group-addon\" id=\"basic-addon1\"><i class=\"fa fa-text-width\" aria-hidden=\"true\"></i></span>

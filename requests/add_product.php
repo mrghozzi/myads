@@ -2,11 +2,11 @@
 
 #####################################################################
 ##                                                                 ##
-##                         MYads  v3.x.x                           ##
-##                     http://www.krhost.ga                        ##
-##                   e-mail: admin@krhost.ga                       ##
+##                         MYads  v3.2.x                           ##
+##                  https://github.com/mrghozzi                    ##
 ##                                                                 ##
-##                       copyright (c) 2022                        ##
+##                                                                 ##
+##                       copyright (c) 2025                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
@@ -41,8 +41,7 @@ if($vrf_License=="65fgh4t8x5fe58v1rt8se9x"){
            $bn_txt     = $_POST['txt'];
            $bn_linkzip = $_POST['linkzip'];
            $bn_img     = $_POST['img'];
-
-           $bn_pts     = "0";    // Determine the number of points (in the future)
+           $bn_pts     = $_POST['pts'];  
 
            session_start();
 
@@ -90,7 +89,10 @@ if($vrf_License=="65fgh4t8x5fe58v1rt8se9x"){
             }else if ((empty($bn_cat_s)) OR empty($bn_sc_cat)) {
             $bn_notvalid = "notvalid";
             $_SESSION['snotvalid'] = $lang['ymsac'];
-            }
+            }else if ((empty($bn_pts)) || !is_numeric($bn_pts)) {
+              $bn_notvalid = "notvalid";
+              $_SESSION['snotvalid'] = $lang['pmbno'];
+              }
 
 
 
@@ -105,6 +107,7 @@ if($vrf_License=="65fgh4t8x5fe58v1rt8se9x"){
            $_SESSION['stxt']     = $_POST['txt'];
            $_SESSION['slinkzip'] = $_POST['linkzip'];
            $_SESSION['simg']     = $_POST['img'];
+           $_SESSION['pts']      = $_POST['pts'];
             header("Location: {$url_site}/add_store");
            }else{
           $insstr = $db_con->prepare("INSERT INTO options (name,o_valuer,o_type,o_parent,o_order,o_mode)

@@ -3,10 +3,10 @@
 #####################################################################
 ##                                                                 ##
 ##                        My ads v3.0.5(+)                         ##
-##                     http://www.krhost.ga                        ##
-##                   e-mail: admin@krhost.ga                       ##
+##                  https://github.com/mrghozzi                    ##
 ##                                                                 ##
-##                       copyright (c) 2023                        ##
+##                                                                 ##
+##                       copyright (c) 2025                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
@@ -14,6 +14,7 @@
 
 $lang['language']    = "(العربية)";
 $lang['lg']          = "ar";
+$lang['dir']         = "rtl";
 
 $lang['comment']     = "تعليق";
 $lang['comments']    = "التعليقات";
@@ -28,7 +29,7 @@ $lang['usermail']    = "اسم المستخدم أو البريد الالكتر
 $lang['p_sign_up']   = "تسجيل حساب جديد";
 $lang['dinstall']    = "أو غير إسمه 'install' تحذير أمني : أحذف مجلد";
 $lang['all_f_m']     = " جميع الحقول إجبارية ! ";
-$lang['username']    = "إسم المستخدم";
+$lang['username']    = "اسم المستخدم";
 $lang['e_mail']      = "البريد الإلكتروني :";
 $lang['email']       = "البريد الإلكتروني";
 $lang['password']    = "كلمة السر";
@@ -47,6 +48,14 @@ $lang['tage']        = "الكلمات الدلالية";
 $lang['cat_s']       = "الأقسام";
 $lang['rec_post']    = "أخر المقالات";
 $lang['succ_add']    = "تم بنجاح";
+$lang['admin_panel'] = "لوحة التحكم";
+$lang['admin_home']  = "الصفحة الرئيسية";
+$lang['users']       = "المستخدمين";
+$lang['posts']       = "المقالات";
+$lang['settings']    = "الإعدادات";
+$lang['online']      = "متصل";
+$lang['offline']     = "غير متصل";
+$lang['points']      = "النقاط";
 $lang['q_Problem']   = "مشكلة في قاعدة البينات";
 $lang['no_com']      = "لا يوجد تعليقات";
 $lang['no_post']     = "لا يوجد مقالات جديدة";
@@ -71,7 +80,7 @@ $lang['add']         = "أضف";
 $lang['save']        = "حفظ";
 $lang['edit']        = "تعديل";
 $lang['delete']      = "حذف";
-$lang['close']       = "غلق";
+$lang['close']       = "إغلاق";
 $lang['activate']    = "تفعيل";
 $lang['topics']      = "المواضيع";
 $lang['topic']       = "موضوع";
@@ -267,6 +276,7 @@ $lang['yshbv']       = "تم عرض مواقعك";
 $lang['latest_sites']= "أحدث المواقع";
 $lang['latest_post'] = "آخر مشاركة";
 $lang['latest_version']= "لديك أحدث إصدار";
+$lang['support_project'] = "دعم المشروع";
 $lang['import_update']= "<p> <strong> هام : </strong> قبل التحديث ، يرجى عمل نسخة احتياطية من قاعدة البيانات والملفات الأخرى. </ p>";
 $lang['there_update']= "<p>يوجد إصدار جديد من MyAds متاح للتحديث!</p>";
 $lang['now_update']  = "تحديث الأن";
@@ -303,5 +313,53 @@ $lang['notifs']      = "إشعارات";
 $lang['all_notifs']  = "عرض جميع الإشعارات";
 $lang['dir_cats']    = "أقسام دليل المواقع";
 $lang['forum_cats']  = "أقسام المنتدى";
+$lang['friends']     = "أصدقاء";
+$lang['unfollow']    = "إلغاء المتابعة";
+$lang['send_message']= "إرسال رسالة";
+$lang['my_profile']  = "ملفي الشخصي";
+$lang['notifications'] = "الإشعارات";
+$lang['like']        = "إعجاب";
+$lang['love']        = "حب";
+$lang['dislike']     = "عدم إعجاب";
+$lang['happy']       = "سعيد";
+$lang['funny']       = "مضحك";
+$lang['wow']         = "رائع";
+$lang['angry']       = "غاضب";
+$lang['sad']         = "حزين";
+$lang['sure_to_delete'] = "هل أنت متأكد أنك تريد حذف المعرف رقم";
+$lang['please_enter_name'] = "يرجى إدخال الاسم.";
+$lang['please_enter_url'] = "يرجى إدخال الرابط.";
+$lang['facebook']    = "فيسبوك";
+$lang['twitter']     = "تويتر";
+$lang['linkedin']    = "لينكد إن";
+$lang['telegram']    = "تليجرام";
+$lang['online']      = "متصل";
+$lang['check']       = "التحقق";
+$lang['emojis']      = "الرموز التعبيرية";
+$lang['news_site']   = "أخبار الموقع";
+$lang['reports']     = "التقارير";
+$lang['updates']     = "التحديثات";
+$lang['settings_site'] = "إعدادات الموقع";
+$lang['site_name'] = "اسم الموقع";
+$lang['url_link'] = "رابط الموقع";
+$lang['description'] = "الوصف";
+$lang['language_default'] = "اللغة الافتراضية";
+$lang['educational_links'] = "الروابط التعليمية";
+$lang['timezone'] = "المنطقة الزمنية";
+$lang['admin_email'] = "البريد الإلكتروني للمسؤول";
+$lang['timeline']    = "الجدول الزمني";
+$lang['photos']      = "الصور";
+$lang['husyph']      = "مرحباً [username]! شارك منشورك هنا...";
+$lang['insertlink']  = "إدراج الرابط";
+$lang['insertphoto'] = "إدراج الصورة";
+$lang['copy_link']   = "نسخ الرابط";
+$lang['link_copied'] = "تم نسخ الرابط!";
+$lang['your_ad_has_been_activated'] = "تم تفعيل إعلانك";
+$lang['your_ad_as_been_blocked'] = "تم حظر إعلانك";
+$lang['your_ad_has_been_deleted'] = "تم حذف إعلانك";
+$lang['pmbno']       = "السعر (PTS) : يجب أن يكون أرقام فقط";
+$lang['price_pts']   = "السعر (PTS)";
+$lang['insufficient_points'] = "نقاطك غير كافية";
+
 
 ?>

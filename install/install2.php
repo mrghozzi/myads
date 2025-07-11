@@ -92,7 +92,7 @@ $q6=$db_con->prepare("CREATE TABLE IF NOT EXISTS `setting` (
   `e_links` int(15) NOT NULL DEFAULT '1',
   `facebook` varchar(320) NOT NULL DEFAULT '#facebook',
   `twitter` varchar(320) NOT NULL DEFAULT '#twitter',
-  `linkedin` varchar(320) NOT NULL DEFAULT '#wasp'
+  `linkedin` varchar(320) NOT NULL DEFAULT '#linkedin'
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;");
   $q6->execute();
 $q8=$db_con->prepare("CREATE TABLE IF NOT EXISTS `short` (
@@ -308,22 +308,20 @@ $q44=$db_con->prepare("ALTER TABLE `state`
 $q55=$db_con->prepare("INSERT INTO options (id, name, o_valuer, o_type, o_parent, o_order, o_mode) VALUES (NULL, 'script', '0', 'storecat', '0', '0', 'script'), (NULL, 'plugins', '0', 'storecat', '0', '0', 'plugins'), (NULL, 'templates', '0', 'storecat', '0', '0', 'templates'), (NULL, 'blogs', '0', 'scriptcat', '0', '0', 'blogs'), (NULL, 'cms', '0', 'scriptcat', '0', '0', 'cms'), (NULL, 'forums', '0', 'scriptcat', '0', '0', 'forums'), (NULL, 'socialnetwor', '0', 'scriptcat', '0', '0', 'socialnetwor'), (NULL, 'admanager', '0', 'scriptcat', '0', '0', 'admanager'), (NULL, 'games', '0', 'scriptcat', '0', '0', 'games'), (NULL, 'ecommerce', '0', 'scriptcat', '0', '0', 'ecommerce'), (NULL, 'educational', '0', 'scriptcat', '0', '0', 'educational'), (NULL, 'directory', '0', 'scriptcat', '0', '0', 'directory'), (NULL, 'others', '0', 'scriptcat', '0', '0', 'others')" );
 $q55->execute();
 $q7=$db_con->prepare("INSERT INTO `setting` ( `titer`, `description`, `url`, `styles`, `lang`, `close`, `close_text`, `a_mail`, `a_not`, `facebook`, `twitter`, `linkedin`) VALUES
-('MyAds', 'Description Sit web', 'http://mysite.com', 'default', 'ar', 1, '', 'mail@maysit.com', '', '#facebook', '#twitter', '#wasp');");
+('MyAds', 'Description Sit web', 'http://mysite.com', 'default', 'ar', 1, '', 'mail@maysit.com', '', '#facebook', '#twitter', '#linkedin');");
   $q7->execute();
  include "header.php";
     ?>
 
-    <div class="main-content">
-		<div class="form">
-			<div class="sap_tabs">
-				<div id="horizontalTab" style="display: block; width: 100%; margin: 0px;">
-
-
-
-				        <div class="facts">
-					        <div class="register">
-						         <form>
-                                 <p  >
+<div class="main-content">
+    <div class="form">
+        <div class="sap_tabs">
+            <div id="horizontalTab" style="display: block; width: 100%; margin: 0px;">
+                <div class="facts">
+                    <div class="register">
+                        <form>
+                            <h4>Step 1: Database Installation</h4>
+                            <p>
                                  <?php
                                   if($q)
                                    {
@@ -447,30 +445,16 @@ $q7=$db_con->prepare("INSERT INTO `setting` ( `titer`, `description`, `url`, `st
 	                              }
 
                                  ?>
-                                 </p>
-							        <div class="sign-up">
-								        <a href="install3.php" type="next" />next</a>
-							        </div>
-                                </form>
-						    </div>
-				        </div>
-
-			 	</div>
-		    </div>
+                            </p>
+                            <div class="sign-up">
+                                <a href="install3.php" class="btn btn-primary">Next Step</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="right">
-			<h4>Step 1</h4>
-			<ul>
-				<li><p>Install the tables in the database </p></li>
-				<li><p>Click on the next button</p></li>
+    </div>
+</div>
 
-			</ul>
-
-
-		</div>
-		<div class="clear"></div>
-	</div>
-
-
-
-   <?php  include "footer.php";   ?>
+<?php include "footer.php"; ?>

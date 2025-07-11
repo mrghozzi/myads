@@ -1,4 +1,4 @@
-<?php if(isset($s_st)=="buyfgeufb"){ dinstall_d();
+<?php if(isset($s_st) AND ($s_st=="buyfgeufb")){ dinstall_d();
 
  ?>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sceditor@3/minified/themes/default.min.css" />
@@ -49,12 +49,20 @@
                     <!-- /FORM INPUT -->
                   </div>
              </div>
-             <div class="form-row" >
-               <div class="form-item">
+             <div class="form-row split" >
+                 <div class="form-item">
                     <!-- FORM INPUT -->
                     <div class="form-input small active">
                       <label for="Version_nbr"><?php lang('Version_nbr');  ?></label>
                       <input type="text" id="profile-name" name="vnbr" value="<?php if_gstore('svnbr');  ?>" placeholder="<?php lang('version');  ?> | EX: v1.0" minlength="2" maxlength="12" pattern="^[-a-zA-Z0-9.]+$" required >
+                    </div>
+                    <!-- /FORM INPUT -->
+                  </div>
+                  <div class="form-item">
+                    <!-- FORM INPUT -->
+                    <div class="form-input small active">
+                      <label for="price_pts"><?php lang('price_pts');  ?></label>
+                      <input type="text" id="profile-name" name="pts" value="<?php if_gstore('pts');  ?>" placeholder="<?php lang('pmbno');  ?>" minlength="1" maxlength="6" pattern="[0-9]+" required >
                     </div>
                     <!-- /FORM INPUT -->
                   </div>
@@ -168,7 +176,7 @@
              <div class="form-item split">
                <!-- FORM SELECT -->
                <?php if(isset($elnk_site) AND ($elnk_site==1)){ ?>
-               <a href="https://www.adstn.gq/kb/myads:store:update" class="button default" target="_blank" >&nbsp;<i class="fa fa-question-circle" aria-hidden="true"></i></a>
+               <a href="https://github.com/mrghozzi/myads/wiki/store:update" class="button default" target="_blank" >&nbsp;<i class="fa fa-question-circle" aria-hidden="true"></i></a>
                <?php } ?>
                <!-- BUTTON -->
                <button type="submit" name="submit" id="button" value="Publish" class="button primary"><i class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp; <?php lang('save');  ?></button>

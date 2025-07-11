@@ -1,4 +1,4 @@
-<?php if($s_st=="buyfgeufb"){ dinstall_d();
+<?php if(isset($s_st) AND ($s_st=="buyfgeufb")){ dinstall_d();
 $msgdid = $uRow['id'];
 $msgeid = $_GET['m'];
 $catus = $db_con->prepare("SELECT *  FROM users WHERE  id='{$_GET['m']}'");

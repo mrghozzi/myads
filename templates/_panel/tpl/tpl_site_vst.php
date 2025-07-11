@@ -2,16 +2,16 @@
 
 #####################################################################
 ##                                                                 ##
-##                        MYads  v3.1.x                            ##
-##                     https://www.adstn.gq                        ##
-##                    e-mail: admin@adstn.gq                       ##
+##                        My ads v3.1.x                            ##
+##                  https://github.com/mrghozzi                    ##
 ##                                                                 ##
-##                       copyright (c) 2024                        ##
+##                                                                 ##
+##                       copyright (c) 2025                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
 #####################################################################
-if($s_st=="buyfgeufb"){
+if(isset($s_st) AND ($s_st=="buyfgeufb")){ 
 
  //  Get Browser
 function tpl_site_vst($sutcat,$Suggestion)
@@ -316,7 +316,7 @@ echo                   "</p>
               <a class="video-status small" href="<?php echo $dir_lnk_hash; ?>" style="background-color: #efeff9;" target="_blank">
                 <!-- LINK STATUS IMAGE -->
                 <figure class="video-status-image liquid" >
-                  <img class="video-status-image" src="https://mini.site-shot.com/800x400/800/png/?<?php echo $sdf; ?>">
+                  <img class="video-status-image" src="<?php url_site();  ?>/templates/_panel/img/dir_image.png">
                 </figure>
                 <!-- /LINK STATUS IMAGE -->
 
@@ -551,10 +551,10 @@ echo                   "</p>
                 <!-- /REACTION OPTION -->
 
                 <!-- REACTION OPTION -->
-                <div class="reaction-option text-tooltip-tft" data-title="wasp" style="position: relative;">
+                <div class="reaction-option text-tooltip-tft" data-title="telegram" style="position: relative;">
                   <!-- REACTION OPTION IMAGE -->
-                  <a onClick="window.open('https://www.wasp.gq/sharer?url=<?php echo $linksher; ?>&nbsp;<?php echo $namesher; ?>');" href="javascript:void(0);" >
-                  <img class="reaction-option-image" src="<?php url_site();  ?>/templates/_panel/img/icons/wasp-icon.png" >
+                  <a onClick="window.open('https://telegram.me/share/url?url=<?php echo $linksher; ?>&text=<?php echo $namesher; ?>');" href="javascript:void(0);" >
+                  <img class="reaction-option-image" src="<?php url_site();  ?>/templates/_panel/img/icons/telegram-icon.png" >
                   </a>
                   <!-- /REACTION OPTION IMAGE -->
                 </div>

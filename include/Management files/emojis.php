@@ -2,11 +2,11 @@
 
 #####################################################################
 ##                                                                 ##
-##                        MYads  v3.x.x                            ##
-##                     http://www.krhost.ga                        ##
-##                   e-mail: admin@krhost.ga                       ##
+##                        MYads  v3.2.x                            ##
+##                  https://github.com/mrghozzi                    ##
 ##                                                                 ##
-##                       copyright (c) 2023                        ##
+##                                                                 ##
+##                       copyright (c) 2025                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
@@ -44,11 +44,11 @@ echo "<div class=\"modal fade\" id=\"ed{$wt['id']}\" data-backdrop=\"\" tabindex
  <form id=\"defaultForm\" method=\"post\" class=\"form-horizontal\" action=\"admincp.php?emojis_e={$wt['id']}\">
   <div class=\"input-group\">
   <span class=\"input-group-addon\" id=\"basic-addon1\">Emoji Shortcut</span>
-  <input type=\"text\" class=\"form-control\" name=\"name\" value=\"{$wt['name']}\" autocomplete=\"off\" />
+  <input type=\"text\" class=\"form-control\" name=\"name\" value=\"{$wt['name']}\" autocomplete=\"off\" required />
   </div>
   <div class=\"input-group\">
   <span class=\"input-group-addon\" id=\"basic-addon1\">Emojis Icon Link</span>
-  <input type=\"text\" class=\"form-control\" name=\"img\" value=\"{$wt['img']}\" autocomplete=\"off\" /></div>
+  <input type=\"text\" class=\"form-control\" name=\"img\" value=\"{$wt['img']}\" autocomplete=\"off\" required /></div>
   <div class=\"input-group\">
  <center><button type=\"submit\" name=\"ed_submit\" value=\"ed_submit\" class=\"btn btn-info\"><i class=\"fa fa-plus \"></i></button></center>
  <button type=\"button\" class=\"btn btn-default\" data-dismiss=\"modal\">Close</button

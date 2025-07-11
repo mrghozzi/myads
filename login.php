@@ -2,11 +2,11 @@
 
 #####################################################################
 ##                                                                 ##
-##                        MYads  v3.1.x                            ##
-##                     https://www.adstn.gq                        ##
-##                    e-mail: admin@adstn.gq                       ##
+##                        MYads  v3.2.x                            ##
+##                  https://github.com/mrghozzi                    ##
 ##                                                                 ##
-##                       copyright (c) 2024                        ##
+##                                                                 ##
+##                       copyright (c) 2025                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##

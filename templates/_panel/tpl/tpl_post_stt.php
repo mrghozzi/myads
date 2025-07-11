@@ -2,16 +2,16 @@
 
 #####################################################################
 ##                                                                 ##
-##                        My ads v3.0.5(+)                         ##
-##                     http://www.krhost.ga                        ##
-##                   e-mail: admin@krhost.ga                       ##
+##                        My ads v3.1.x                            ##
+##                  https://github.com/mrghozzi                    ##
 ##                                                                 ##
-##                       copyright (c) 2023                        ##
+##                                                                 ##
+##                       copyright (c) 2025                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
 #####################################################################
-if($s_st=="buyfgeufb"){
+if(isset($s_st) AND ($s_st=="buyfgeufb")){ 
 
  //  Get Browser
 function tpl_post_stt($sutcat,$Suggestion)
@@ -51,7 +51,7 @@ $likeuscmr->execute();
 $usliker=$likeuscmr->fetch(PDO::FETCH_ASSOC);
  if(isset($usliker)  AND ($usliker['o_parent']==$o_parent)){
 $reaction_img  = "<img class=\"reaction-option-image\" src=\"{$url_site}/templates/_panel/img/reaction/{$usliker['o_valuer']}.png\"  width=\"30\" alt=\"reaction-{$usliker['o_valuer']}\">";
-$reaction_name = $usliker['o_valuer'];
+$reaction_name = $lang[$usliker['o_valuer']]; // استخدام النصوص من ملفات اللغة
      if($usliker['o_valuer']=="like"){         $reaction_color = "style=\"color: #1bc8db;\""; }
      else if($usliker['o_valuer']=="love"){    $reaction_color = "style=\"color: #fc1f3b;\""; }
      else if($usliker['o_valuer']=="dislike"){ $reaction_color = "style=\"color: #3f3cf8;\""; }
@@ -124,6 +124,9 @@ $usecho =  "<b>{$catruss['username']}</b> <i class=\"fa fa-retweet\" aria-hidden
 
                 <!-- SIMPLE DROPDOWN LINK -->
                 <p class="simple-dropdown-link author_report<?php echo $sucat['id']; ?>"><i class="fa fa-flag" aria-hidden="true"></i>&nbsp;<?php echo $lang['report']; ?> <?php echo $lang['author']; ?></p>
+                <!-- /SIMPLE DROPDOWN LINK -->
+                <!-- SIMPLE DROPDOWN LINK -->
+                <p class="simple-dropdown-link copy_link" onclick="navigator.clipboard.writeText('<?php echo $url_site; ?>/t<?php echo $sucat['id']; ?>'); var notif = document.getElementById('notif<?php echo $sucat['id']; ?>'); notif.innerHTML = '<div class=\'alert alert-success\' role=\'alert\'><?php echo $lang['link_copied']; ?></div>'; notif.style.display = 'block'; setTimeout(function() { notif.style.display = 'none'; }, 5000);" ><i class="fa fa-link" aria-hidden="true"></i>&nbsp;<?php echo $lang['copy_link']; ?></p>
                 <!-- /SIMPLE DROPDOWN LINK -->
               </div>
               <!-- /SIMPLE DROPDOWN -->
@@ -206,7 +209,7 @@ echo                   "</p>
                       </div>
                       <!-- /USER STATUS -->
                     ";
-?>
+?>              
               <div class="tag-sticker">
               <!-- TAG STICKER ICON -->
               <svg class="tag-sticker-icon icon-blog-posts">
@@ -222,7 +225,7 @@ echo                   "</p>
               <div id="report<?php echo $sucat['id']; ?>" ></div>
               </div></p>
               <!-- /WIDGET BOX STATUS TEXT -->
-
+              <div id="notif<?php echo $sucat['id']; ?>" ></div>
               <!-- CONTENT ACTIONS -->
               <div class="content-actions">
                 <!-- CONTENT ACTION -->
@@ -245,7 +248,7 @@ echo                   "</p>
                   <!-- /META LINE -->
                 </div>
                 <!-- /CONTENT ACTION -->
-
+                
                 <!-- CONTENT ACTION -->
                 <div class="content-action">
                   <!-- META LINE -->
@@ -266,7 +269,7 @@ echo                   "</p>
             <!-- /WIDGET BOX STATUS CONTENT -->
           </div>
           <!-- /WIDGET BOX STATUS -->
-
+          
           <!-- POST OPTIONS -->
           <div class="post-options">
 <?php   if(isset($_COOKIE['user'])){ ?>
@@ -426,10 +429,10 @@ echo                   "</p>
                 <!-- /REACTION OPTION -->
 
                 <!-- REACTION OPTION -->
-                <div class="reaction-option text-tooltip-tft" data-title="wasp" style="position: relative;">
+                <div class="reaction-option text-tooltip-tft" data-title="telegram" style="position: relative;">
                   <!-- REACTION OPTION IMAGE -->
-                  <a onClick="window.open('https://www.wasp.gq/sharer?url=<?php echo $linksher; ?>&nbsp;<?php echo $namesher; ?>');" href="javascript:void(0);" >
-                  <img class="reaction-option-image" src="<?php url_site();  ?>/templates/_panel/img/icons/wasp-icon.png" >
+                  <a onClick="window.open('https://telegram.me/share/url?url=<?php echo $linksher; ?>&text=<?php echo $namesher; ?>');" href="javascript:void(0);" >
+                  <img class="reaction-option-image" src="<?php url_site();  ?>/templates/_panel/img/icons/telegram-icon.png" >
                   </a>
                   <!-- /REACTION OPTION IMAGE -->
                 </div>

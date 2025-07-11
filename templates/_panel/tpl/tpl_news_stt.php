@@ -2,16 +2,16 @@
 
 #####################################################################
 ##                                                                 ##
-##                        My ads v3.0.5(+)                         ##
-##                     http://www.krhost.ga                        ##
-##                   e-mail: admin@krhost.ga                       ##
+##                        My ads v3.1.x                            ##
+##                  https://github.com/mrghozzi                    ##
 ##                                                                 ##
-##                       copyright (c) 2023                        ##
+##                                                                 ##
+##                       copyright (c) 2025                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
 #####################################################################
-if($s_st=="buyfgeufb"){
+if(isset($s_st) AND ($s_st=="buyfgeufb")){ 
 
  function tpl_news_stt($sutcat)
 {

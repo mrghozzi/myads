@@ -2,11 +2,11 @@
 
 #####################################################################
 ##                                                                 ##
-##                        MYads  v3.x.x                            ##
-##                     http://www.krhost.ga                        ##
-##                   e-mail: admin@krhost.ga                       ##
+##                        MYads  v3.2.x                            ##
+##                  https://github.com/mrghozzi                    ##
 ##                                                                 ##
-##                       copyright (c) 2022                        ##
+##                                                                 ##
+##                       copyright (c) 2025                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
@@ -14,17 +14,28 @@
 
 
 
+// Include database configuration and functions
 include "dbconfig.php";
 include "include/function.php";
- $title_page = $lang['codes']."&nbsp;".$lang['referal'];
- template_mine('header');
- if(!isset($_COOKIE['user'])!="")
+
+// Set the page title using language variables
+$title_page = $lang['codes']."&nbsp;".$lang['referal'];
+
+// Display the header template
+template_mine('header');
+
+// Check if the user is logged in
+if(!isset($_COOKIE['user'])!="")
 {
- template_mine('404');
+    // If not logged in, show 404 page
+    template_mine('404');
 }else{
- template_mine('r_code');
- }
- template_mine('footer');
+    // If logged in, show referral code page
+    template_mine('r_code');
+}
+
+// Display the footer template
+template_mine('footer');
 
 
 ?>

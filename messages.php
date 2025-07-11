@@ -2,11 +2,11 @@
 
 #####################################################################
 ##                                                                 ##
-##                        MYads  v3.x.x                            ##
-##                     http://www.krhost.ga                        ##
-##                   e-mail: admin@krhost.ga                       ##
+##                        MYads  v3.2.x                            ##
+##                  https://github.com/mrghozzi                    ##
 ##                                                                 ##
-##                       copyright (c) 2022                        ##
+##                                                                 ##
+##                       copyright (c) 2025                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
@@ -112,7 +112,7 @@ echo "<div class=\"notification-box\">
 if ($page <= 0) $page = 1;
 $per_page = 9; // Records per page.
 $startpoint = ($page * $per_page) - $per_page;
-$statement = "`messages` WHERE us_rec='{$msgusid}' OR us_env='{$msgusid}' ORDER BY `time` DESC";
+$statement = "`messages` WHERE us_rec='{$msgusid}' OR us_env='{$msgusid}' GROUP BY us_env ORDER BY `time` DESC";
 $results = $db_con->prepare("SELECT  * FROM {$statement} LIMIT {$startpoint} , {$per_page} " );
 $results->execute();
     function msg_list() {

@@ -2,16 +2,16 @@
 
 #####################################################################
 ##                                                                 ##
-##                        My ads v3.0.5(+)                         ##
-##                     http://www.krhost.ga                        ##
-##                   e-mail: admin@krhost.ga                       ##
+##                        My ads v3.1.x                            ##
+##                  https://github.com/mrghozzi                    ##
 ##                                                                 ##
-##                       copyright (c) 2023                        ##
+##                                                                 ##
+##                       copyright (c) 2025                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
 #####################################################################
-if($s_st=="buyfgeufb"){
+if(isset($s_st) AND ($s_st=="buyfgeufb")){ 
 
  //  Get Browser
 function tpl_topic_stt($sutcat,$Suggestion)
@@ -121,6 +121,10 @@ $usecho =  "<b>{$catruss['username']}</b> <i class=\"fa fa-retweet\" aria-hidden
 
                 <!-- SIMPLE DROPDOWN LINK -->
                 <p class="simple-dropdown-link author_report<?php echo $sucat['id']; ?>"><i class="fa fa-flag" aria-hidden="true"></i>&nbsp;<?php echo $lang['report']; ?> <?php echo $lang['author']; ?></p>
+                <!-- /SIMPLE DROPDOWN LINK -->
+
+                <!-- SIMPLE DROPDOWN LINK -->
+                <p class="simple-dropdown-link copy_link" onclick="navigator.clipboard.writeText('<?php echo $url_site; ?>/t<?php echo $sucat['id']; ?>'); var notif = document.getElementById('notif<?php echo $sucat['id']; ?>'); notif.innerHTML = '<div class=\'alert alert-success\' role=\'alert\'><?php echo $lang['link_copied']; ?></div>'; notif.style.display = 'block'; setTimeout(function() { notif.style.display = 'none'; }, 5000);" ><i class="fa fa-link" aria-hidden="true"></i>&nbsp;<?php echo $lang['copy_link']; ?></p>
                 <!-- /SIMPLE DROPDOWN LINK -->
               </div>
               <!-- /SIMPLE DROPDOWN -->
@@ -234,7 +238,7 @@ echo                   "</p>
               <div id="report<?php echo $sucat['id']; ?>" ></div>
               </div></p>
               <!-- /WIDGET BOX STATUS TEXT -->
-
+              <div id="notif<?php echo $sucat['id']; ?>" ></div>
               <!-- CONTENT ACTIONS -->
               <div class="content-actions">
                 <!-- CONTENT ACTION -->
@@ -438,10 +442,10 @@ echo                   "</p>
                 <!-- /REACTION OPTION -->
 
                 <!-- REACTION OPTION -->
-                <div class="reaction-option text-tooltip-tft" data-title="wasp" style="position: relative;">
+                <div class="reaction-option text-tooltip-tft" data-title="telegram" style="position: relative;">
                   <!-- REACTION OPTION IMAGE -->
-                  <a onClick="window.open('https://www.wasp.gq/sharer?url=<?php echo $linksher; ?>&nbsp;<?php echo $namesher; ?>');" href="javascript:void(0);" >
-                  <img class="reaction-option-image" src="<?php url_site();  ?>/templates/_panel/img/icons/wasp-icon.png" >
+                  <a onClick="window.open('https://telegram.me/share/url?url=<?php echo $linksher; ?>&text=<?php echo $namesher; ?>');" href="javascript:void(0);" >
+                  <img class="reaction-option-image" src="<?php url_site();  ?>/templates/_panel/img/icons/telegram-icon.png" >
                   </a>
                   <!-- /REACTION OPTION IMAGE -->
                 </div>

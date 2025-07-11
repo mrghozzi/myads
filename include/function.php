@@ -2,11 +2,11 @@
 
 #####################################################################
 ##                                                                 ##
-##                        MYads  v3.0.5                            ##
-##                     http://www.krhost.ga                        ##
-##                   e-mail: admin@krhost.ga                       ##
+##                        MYads  v3.2.x                            ##
+##                  https://github.com/mrghozzi                    ##
 ##                                                                 ##
-##                       copyright (c) 2023                        ##
+##                                                                 ##
+##                       copyright (c) 2025                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
@@ -36,7 +36,7 @@ $s_st="buyfgeufb";
  //  MyAds Version
  include "include/myads_version.php";
  function myads_version()         {    global  $versionRow ; if(isset($versionRow['o_valuer'])){ echo $versionRow['o_valuer']; }    }
- function myads_fversion()        {    global  $versionRow ; if(isset($versionRow['name'])){ echo $versionRow['name'];         }    }
+ function myads_fversion()        {    global  $versionRow ; if(isset($versionRow['name'])){ return $versionRow['name'];       }    }
 
 
 // ads
@@ -131,8 +131,7 @@ $mstmt = $db_con->prepare("SELECT  COUNT(id_msg) as nbr FROM messages WHERE stat
         $msg_n=$amsg['nbr'];
         if($name=="vu"){ echo $msg_n; }
         if($name=="span"){ if($msg_n==0){}else{ echo "<span class='badge badge-danger'>{$msg_n}</span>"; } }
-        if($name=="list"){ $msgusen = $db_con->prepare("SELECT *  FROM messages
-        WHERE us_rec=:msgusid ORDER BY `time` DESC LIMIT 5");
+        if($name=="list"){ $msgusen = $db_con->prepare("SELECT * FROM messages WHERE us_rec=:msgusid GROUP BY us_env ORDER BY `time` DESC LIMIT 5");
 $msgusen->bindParam(":msgusid", $msgusid);
 $msgusen->execute();
 while($msgssen=$msgusen->fetch(PDO::FETCH_ASSOC)){
@@ -415,6 +414,30 @@ $bnfollow->bindParam(":usrow", $usr);
 $bnfollow->execute();
 $abfollow=$bnfollow->fetch(PDO::FETCH_ASSOC);
 $contfollow= $abfollow['nbr']; if(isset($ret) AND ($ret==1)){  return  $contfollow;  }else{ echo $contfollow;   } }
+function nbr_friends($usr, $ret = false) {
+  global $db_con;
+
+  $query = "
+      SELECT COUNT(*) AS nbr
+      FROM `like` a
+      JOIN `like` b ON a.uid = b.sid AND a.sid = b.uid
+      WHERE a.uid = :usr AND a.type = 1 AND b.type = 1
+  ";
+
+  $stmt = $db_con->prepare($query);
+  $stmt->bindParam(':usr', $usr);
+  $stmt->execute();
+
+  $result = $stmt->fetch(PDO::FETCH_ASSOC);
+  $count = $result['nbr'];
+
+  // Return the count or echo it based on the $ret parameter
+  if ($ret) {
+      return $count;
+  } else {
+      echo $count;
+  }
+}
 function nbr_follows($ret = false) {    global  $db_con ;
 $bnfollow = $db_con->prepare("SELECT  COUNT(id) as nbr FROM `like` WHERE type=1 " );
 $bnfollow->execute();

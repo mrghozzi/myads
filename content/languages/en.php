@@ -3,10 +3,10 @@
 #####################################################################
 ##                                                                 ##
 ##                        My ads v3.0.5(+)                         ##
-##                     http://www.krhost.ga                        ##
-##                   e-mail: admin@krhost.ga                       ##
+##                  https://github.com/mrghozzi                    ##
 ##                                                                 ##
-##                       copyright (c) 2023                        ##
+##                                                                 ##
+##                       copyright (c) 2025                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
@@ -20,7 +20,8 @@ $lang['comments']    = "Comments";
 $lang['lcomment']    = "Leave a Comment:";
 $lang['scomment']    = "Send comment";
 $lang['LMComments']  = "Load More Comments";
-$lang['follow']      = "FOLLOW US";
+$lang['follow']      = "Follow";
+$lang['unfollow']    = "Unfollow";
 $lang['logout']      = "Logout";
 $lang['login']       = "Login";
 $lang['sign_up']     = "Register";
@@ -29,6 +30,9 @@ $lang['p_sign_up']   = "Sign Up";
 $lang['dinstall']    = "Delete The Folder 'install'  Or Changing The Name";
 $lang['all_f_m']     = "&nbsp; all the fields are mandatory !";
 $lang['username']    = "Username";
+$lang['online']      = "Online";
+$lang['check']       = "Check";
+$lang['pts']         = "PTS";
 $lang['e_mail']      = "E-mail address :";
 $lang['email']       = "E-mail address";
 $lang['password']    = "Password";
@@ -71,7 +75,10 @@ $lang['add']         = "Add";
 $lang['save']        = "Save";
 $lang['edit']        = "Edit";
 $lang['delete']      = "Delete";
+$lang['sure_to_delete'] = "Sure to Delete ID no";
 $lang['close']       = "Close";
+$lang['please_enter_name'] = "Please Enter name.";
+$lang['please_enter_url'] = "Please Enter Url.";
 $lang['activate']    = "Activate";
 $lang['topics']      = "Topics";
 $lang['topic']       = "Topic";
@@ -175,7 +182,6 @@ $lang['referal']     = "Referrals";
 $lang['list']        = "List";
 $lang['codes']       = "Codes";
 $lang['Promotysite'] = "Promote your site";
-$lang['pts']         = "Points";
 $lang['Views']       = "Views";
 $lang['Click']       = "Click";
 $lang['Total']       = "Total";
@@ -267,6 +273,7 @@ $lang['yshbv']       = "Your site has been viewed";
 $lang['latest_sites']= "Latest sites";
 $lang['latest_post'] = "Latest post";
 $lang['latest_version']= "You have the latest version";
+$lang['support_project'] = "Support Project";
 $lang['import_update']= "<p><strong>Important :</strong> Before updating, please take a backup of your database and other files.</p>";
 $lang['there_update']= "<p>There is a new version of MyAds available to update!</p>";
 $lang['now_update']  = "Update now";
@@ -284,6 +291,8 @@ $lang['mode_admin']  = "Mode Admin";
 $lang['create_a']    = "Create a";
 $lang['in_the_forum']= "in the forum";
 $lang['on_i']        = "on";
+$lang['copy_link']   = "Copy Link";
+$lang['link_copied'] = "Link copied!";
 $lang['link']        = "Link";
 $lang['lastrm']      = "Last Registered Member";
 $lang['lastps']      = "Last post";
@@ -303,5 +312,44 @@ $lang['notifs']      = "Notifications";
 $lang['all_notifs']  = "View all Notifications";
 $lang['dir_cats']    = "Directory Categories";
 $lang['forum_cats']  = "Forum Categories";
+$lang['friends']     = "Friends";
+$lang['send_message']= "Send Message";
+$lang['my_profile']  = "My Profile";
+$lang['notifications'] = "Notifications";
+$lang['like'] = "Like";
+$lang['love'] = "Love";
+$lang['dislike'] = "Dislike";
+$lang['happy'] = "Happy";
+$lang['funny'] = "Funny";
+$lang['wow'] = "Wow";
+$lang['angry'] = "Angry";
+$lang['sad'] = "Sad";
+$lang['facebook'] = "Facebook";
+$lang['twitter'] = "Twitter";
+$lang['linkedin'] = "LinkedIn";
+$lang['telegram'] = "Telegram";
+$lang['emojis'] = "Emojis";
+$lang['news_site'] = "News Site";
+$lang['reports'] = "Reports";
+$lang['updates'] = "Updates";
+$lang['settings_site'] = "Settings Site";
+$lang['site_name'] = "Site Name";
+$lang['url_link'] = "Url Link";
+$lang['description'] = "Description";
+$lang['language_default'] = "Language Default";
+$lang['educational_links'] = "Educational Links";
+$lang['timezone'] = "Timezone";
+$lang['admin_email'] = "Admin Email";
+$lang['timeline']    = "Timeline";
+$lang['photos']      = "Photos";
+$lang['husyph']      = "Hi [username]! Share your post here...";
+$lang['insertlink']  = "Insert Link";
+$lang['insertphoto'] = "Insert Photo";
+$lang['your_ad_has_been_activated'] = "Your ad has been activated";
+$lang['your_ad_as_been_blocked'] = "Your ad has been blocked";
+$lang['your_ad_has_been_deleted'] = "Your ad has been deleted.";
+$lang['pmbno']       = "Price (PTS): Must be numbers only";
+$lang['price_pts']   = "Price (PTS)";
+$lang['insufficient_points'] = "Your points are insufficient";
 
 ?>

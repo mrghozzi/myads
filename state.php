@@ -2,11 +2,11 @@
 
 #####################################################################
 ##                                                                 ##
-##                        MYads  v3.1.x                            ##
-##                     https://www.adstn.gq                        ##
-##                    e-mail: admin@adstn.gq                       ##
+##                        MYads  v3.2.x                            ##
+##                  https://github.com/mrghozzi                    ##
 ##                                                                 ##
-##                       copyright (c) 2024                        ##
+##                                                                 ##
+##                       copyright (c) 2025                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
@@ -43,7 +43,7 @@ $batyid = $stadsty['uid'];
 if($uidss==$batyid){
 
  if(isset($_GET['id'])){
-$statement = " `state` WHERE  pid='{$ty_id}' AND t_name='{$ty2}' ORDER BY `id` DESC";
+$statement = " `state` WHERE  pid='{$ty_id}' AND t_name='{$ty2}' ORDER BY 'id' DESC";
 $results =$db_con->prepare("SELECT * FROM {$statement} ");
 $results->execute();
 function bnr_list() {  global  $results;  global  $statement;     global  $url_site;
@@ -61,13 +61,13 @@ echo "<tr>
   <td>{$covtime}</td>
   <td>{$getBrowser['name']}<br />{$getBrowser['version']}</td>
   <td>{$getBrowser['platform']}</td>
-  <td><a href=\"https://ip.adstn.gq/?ip={$wt['v_ip']}\">{$wt['v_ip']}</a></td>
+  <td><a href=\"http://ip.is-best.net/?ip={$wt['v_ip']}\">{$wt['v_ip']}</a></td>
   </tr>";
 
    }
    }
   }else if(isset($_GET['st']) && $_GET['st']=="vu"){
-   $statement = " `state` WHERE  sid='{$uidss}' AND t_name='{$ty2}' ORDER BY `id` DESC";
+   $statement = " `state` WHERE  sid='{$uidss}' AND t_name='{$ty2}' ORDER BY 'id' DESC";
 $results =$db_con->prepare("SELECT * FROM {$statement} ");
 $results->execute();
 function bnr_list() {  global  $results;  global  $statement;   global  $url_site;
@@ -85,7 +85,7 @@ echo "<tr>
   <td>{$covtime}</td>
   <td>{$getBrowser['name']}<br />{$getBrowser['version']}</td>
   <td>{$getBrowser['platform']}</td>
-  <td><a href=\"https://ip.adstn.gq/?ip={$wt['v_ip']}\">{$wt['v_ip']}</a></td>
+  <td><a href=\"http://ip.is-best.net/?ip={$wt['v_ip']}\">{$wt['v_ip']}</a></td>
   </tr>";
 
    }

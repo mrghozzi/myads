@@ -1,10 +1,10 @@
 ﻿#####################################################################
 ##                                                                 ##
-##                        MYads  v3.x.x                            ##
-##                     http://www.krhost.ga                        ##
-##                   e-mail: admin@krhost.ga                       ##
+##                        MYads  v3.2.x                            ##
+##                  https://github.com/mrghozzi                    ##
 ##                                                                 ##
-##                       copyright (c) 2021                        ##
+##                                                                 ##
+##                       copyright (c) 2025                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
@@ -18,6 +18,12 @@ RewriteRule ^p([0-9.]+)  user.php?p=$1 [NC,L]
 RewriteRule ^options  user.php?o=$1 [NC,L]
 RewriteRule ^followers/([0-9.]+) user.php?fl=$1 [NC,L]
 RewriteRule ^following/([0-9.]+) user.php?fg=$1 [NC,L]
+RewriteRule ^uFriends/([0-9.]+) user.php?ff=$1 [NC,L]
+RewriteRule ^uPhotos/(.*) user.php?ph=$1 [NC,L]
+RewriteRule ^uBlog/(.*) user.php?blog=$1 [NC,L]
+RewriteRule ^ulinks/(.*) user.php?ulinks=$1 [NC,L]
+RewriteRule ^uforum/(.*) user.php?uforum=$1 [NC,L]
+RewriteRule ^ushop/(.*) user.php?ushop=$1 [NC,L]
 RewriteRule ^history user.php?h=$1 [NC,L]
 RewriteRule ^tag/(.*) portal.php?tag=$1 [NC,L]
 RewriteRule ^portal/all portal.php?all=$1 [NC,L]

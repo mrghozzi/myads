@@ -2,11 +2,11 @@
 
 #####################################################################
 ##                                                                 ##
-##                        MYads  v3.x.x                            ##
-##                     http://www.krhost.ga                        ##
-##                   e-mail: admin@krhost.ga                       ##
+##                        MYads  v3.2.x                            ##
+##                  https://github.com/mrghozzi                    ##
 ##                                                                 ##
-##                       copyright (c) 2023                        ##
+##                                                                 ##
+##                       copyright (c) 2025                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
@@ -19,7 +19,7 @@ if($vrf_License=="65fgh4t8x5fe58v1rt8se9x"){
 {
 
 
-$statement = "`visits` WHERE id ORDER BY `id` DESC";
+$statement = "`visits` WHERE id ORDER BY 'id' DESC";
 $results =$db_con->prepare("SELECT * FROM {$statement} ");
 $results->execute();
 function lnk_list() {  global  $results;  global  $statement;   global  $db_con;
@@ -127,6 +127,21 @@ echo "<tr>
 
             $stmsb->bindParam(":ertb", $id);
          	if($stmsb->execute()){
+                            // Check if status changed
+                            $nurl = "v_edit?id=".$id;
+                            $time = time();
+                            if ($statuRow != $bn_statu) {
+                                $notif_stmt = $db_con->prepare("INSERT INTO notif (uid, name, nurl, logo, time, state) VALUES (:uid, :name, :nurl, 'overview', :time, 1)");
+                                $notif_stmt->bindParam(':uid', $bnRow['uid']);
+                                $notif_stmt->bindParam(':time', $time);
+                                $notif_stmt->bindParam(':nurl', $nurl);
+                                if ($bn_statu == 1) {
+                                    $notif_stmt->bindParam(':name', $lang['your_ad_has_been_activated']);
+                                } else {
+                                    $notif_stmt->bindParam(':name', $lang['your_ad_as_been_blocked']);
+                                }
+                                $notif_stmt->execute();
+                            }
              header("Location: admincp?v_list");
          	}
 
@@ -156,8 +171,23 @@ echo "<tr>
    if($_COOKIE['admin']==$hachadmin)
 {
   $bn_id = $_GET['v_ban'];
+  		 // select visits from db to delete
+        $stmht_select = $db_con->prepare('SELECT * FROM visits WHERE  id=:did ');
+        $stmht_select->execute(array(':did'=>$bn_id));
+        $bnRow=$stmht_select->fetch(PDO::FETCH_ASSOC);
+        // delete visits
    $stmt=$db_con->prepare("DELETE FROM visits WHERE id=:id  ");
 	$stmt->execute(array(':id'=>$bn_id));
+         // Check if status changed
+         $nurl = "v_list";
+         $time = time();
+         $notif_stmt = $db_con->prepare("INSERT INTO notif (uid, name, nurl, logo, time, state) VALUES (:uid, :name, :nurl, 'delete', :time, 1)");
+         $notif_stmt->bindParam(':uid', $bnRow['uid']);
+         $notif_stmt->bindParam(':time', $time);
+         $notif_stmt->bindParam(':nurl', $nurl);
+         $notif_stmt->bindParam(':name', $lang['your_ad_has_been_deleted']);
+         $notif_stmt->execute();
+                             
     header("Location: admincp?v_list");
 
  }else{

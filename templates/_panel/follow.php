@@ -1,6 +1,7 @@
-<?php if(isset($s_st)=="buyfgeufb"){ dinstall_d();
+<?php if(isset($s_st) AND ($s_st=="buyfgeufb")){ dinstall_d();
 if((int)isset($_GET['fl'])){ $string = $_GET['fl']; }
 if((int)isset($_GET['fg'])){ $string = $_GET['fg']; }
+if((int)isset($_GET['ff'])){ $string = $_GET['ff']; }
  
 $stausr = $db_con->prepare("SELECT * FROM `options` WHERE `o_type` = 'user' AND `o_order` = :o_order ");
 $stausr->bindParam(":o_order", $string);
@@ -231,6 +232,7 @@ if(check_us($sus['id'],1)==1){
       </div>
       <!-- /PROFILE HEADER INFO -->
     </div>
+    <?php template_mine('users_templates/user_navigation');  ?>
 <?php 
 if(isset($_GET['fl'])){
   $usz = $db_con->prepare("SELECT *  FROM `users` WHERE id=".$_GET['fl'] );
@@ -315,6 +317,47 @@ $time_cmt=convertTime($wt['time_t']);
 if($catussen['id'] != ""){
 include "templates/_panel/users_templates/user_list.php";
  } }$url=$url_site."/user?fg=".$_GET['fg']."&";
+    echo pagination($statement,$per_page,$page,$url);
+      ?>    
+		</div>	
+ </section>
+ <?php }else if(isset($_GET['ff'])){
+  $usz = $db_con->prepare("SELECT *  FROM `users` WHERE id=".$_GET['ff'] );
+$usz->execute();
+$sus=$usz->fetch(PDO::FETCH_ASSOC);
+$msgusid=$sus['id'];
+ ?>
+ <section class="section">
+  
+  <!-- SECTION HEADER INFO -->
+  <div class="section-header-info">
+    <!-- SECTION PRETITLE -->
+    <p class="section-pretitle">@<?php echo $sus['username']; ?></p>
+    <!-- /SECTION PRETITLE -->
+
+    <!-- SECTION TITLE -->
+    <h2 class="section-title"><?php lang('friends'); ?> <span class="highlighted"><?php nbr_friends($sus['id']); ?></span></h2>
+    <!-- /SECTION TITLE -->
+  </div>
+  <!-- /SECTION HEADER INFO -->
+  <div class="grid">
+
+<?php include_once('include/pagination.php');
+ $page = (int)(!isset($_GET["page"]) ? 1 : $_GET["page"]);
+if ($page <= 0) $page = 1;
+$per_page = 20; // Records per page.
+$startpoint = ($page * $per_page) - $per_page;
+$statement = "`like` a
+    JOIN `like` b ON a.uid = b.sid AND a.sid = b.uid
+    JOIN users u ON u.id = a.sid
+    WHERE a.uid = {$msgusid} AND a.type = 1 AND b.type = 1
+    ORDER BY a.time_t DESC";
+$results = $db_con->prepare("SELECT  u.* FROM {$statement} LIMIT {$startpoint} , {$per_page} " );
+$results->execute();
+while($catussen=$results->fetch(PDO::FETCH_ASSOC)) {
+$time_cmt= "";
+include "templates/_panel/users_templates/user_list.php";
+ } $url=$url_site."/user?ff=".$_GET['ff']."&";
     echo pagination($statement,$per_page,$page,$url);
       ?>    
 		</div>	

@@ -31,7 +31,7 @@ echo "
       <!-- FORM INPUT -->
        <div class=\"form-input small active\">
         <label for=\"{$lang['name']}\">{$lang['name']}</label>
-        <input type=\"text\" name=\"name\" value=\"{$wt['name']}\" >
+        <input type=\"text\" name=\"name\" value=\"{$wt['name']}\" required >
        </div>
       <!-- /FORM INPUT -->
       </div>
@@ -495,7 +495,7 @@ echo "
       <!-- FORM INPUT -->
        <div class=\"form-input small active\">
         <label for=\"Order\"><i class=\"fa-solid fa-arrow-down-1-9\" ></i> Order</label>
-        <input type=\"number\"  name=\"ordercat\" value=\"{$wt['ordercat']}\" autocomplete=\"off\">
+        <input type=\"number\"  name=\"ordercat\" value=\"{$wt['ordercat']}\" autocomplete=\"off\" required>
        </div>
       <!-- /FORM INPUT -->
       </div>

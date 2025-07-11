@@ -2,16 +2,16 @@
 
 #####################################################################
 ##                                                                 ##
-##                        My ads v3.0.5(+)                         ##
-##                     http://www.krhost.ga                        ##
-##                   e-mail: admin@krhost.ga                       ##
+##                        My ads v3.1.x                            ##
+##                  https://github.com/mrghozzi                    ##
 ##                                                                 ##
-##                       copyright (c) 2023                        ##
+##                                                                 ##
+##                       copyright (c) 2025                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
 #####################################################################
-if($s_st=="buyfgeufb"){ 
+if(isset($s_st) AND ($s_st=="buyfgeufb")){ 
 
  //  Get Browser
 function tpl_image_stt($sutcat,$Suggestion)
@@ -62,7 +62,7 @@ $likeuscmr->execute();
 $usliker=$likeuscmr->fetch(PDO::FETCH_ASSOC);
  if(isset($usliker)  AND ($usliker['o_parent']==$o_parent)){
 $reaction_img  = "<img class=\"reaction-option-image\" src=\"{$url_site}/templates/_panel/img/reaction/{$usliker['o_valuer']}.png\"  width=\"30\" alt=\"reaction-{$usliker['o_valuer']}\">";
-$reaction_name = $usliker['o_valuer'];
+$reaction_name = $lang[$usliker['o_valuer']]; // استخدام النصوص من ملفات اللغة
      if($usliker['o_valuer']=="like"){         $reaction_color = "style=\"color: #1bc8db;\""; }
      else if($usliker['o_valuer']=="love"){    $reaction_color = "style=\"color: #fc1f3b;\""; }
      else if($usliker['o_valuer']=="dislike"){ $reaction_color = "style=\"color: #3f3cf8;\""; }
@@ -128,6 +128,10 @@ $usecho =  "<b>{$catruss['username']}</b> <i class=\"fa fa-retweet\" aria-hidden
 
                 <!-- SIMPLE DROPDOWN LINK -->
                 <p class="simple-dropdown-link author_report<?php echo $sucat['id']; ?>"><i class="fa fa-flag" aria-hidden="true"></i>&nbsp;<?php echo $lang['report']; ?> <?php echo $lang['author']; ?></p>
+                <!-- /SIMPLE DROPDOWN LINK -->
+                 
+                <!-- SIMPLE DROPDOWN LINK -->
+                <p class="simple-dropdown-link copy_link" onclick="navigator.clipboard.writeText('<?php echo $url_site; ?>/t<?php echo $sucat['id']; ?>'); var notif = document.getElementById('notif<?php echo $sucat['id']; ?>'); notif.innerHTML = '<div class=\'alert alert-success\' role=\'alert\'><?php echo $lang['link_copied']; ?></div>'; notif.style.display = 'block'; setTimeout(function() { notif.style.display = 'none'; }, 5000);" ><i class="fa fa-link" aria-hidden="true"></i>&nbsp;<?php echo $lang['copy_link']; ?></p>
                 <!-- /SIMPLE DROPDOWN LINK -->
               </div>
               <!-- /SIMPLE DROPDOWN -->
@@ -230,6 +234,7 @@ echo                   "</p>
               <a class="post-box-picture" href="<?php echo $url_site; ?>/t<?php echo $sucat['id']; ?>">
                <img  src="<?php echo $catussc['o_valuer'];  ?>" alt="<?php echo $imgtxt;  ?>">
               </a>
+              <div id="notif<?php echo $sucat['id']; ?>" ></div>
               <!-- CONTENT ACTIONS -->
               <div class="content-actions">
                 <!-- CONTENT ACTION -->
@@ -300,70 +305,40 @@ echo                   "</p>
               <!-- /POST OPTION -->
 
               <!-- REACTION OPTIONS -->
-              <div class="reaction-options reaction-options-dropdown" >
+              <div class="reaction-options reaction-options-dropdown">
                 <!-- REACTION OPTION -->
-                <div class="reaction-option text-tooltip-tft reaction_4_<?php echo $sucat['id']; ?>" data-title="like" >
-                  <!-- REACTION OPTION IMAGE -->
-                  <img class="reaction-option-image" src="<?php url_site();  ?>/templates/_panel/img/reaction/like.png" alt="reaction-like">
-                  <!-- /REACTION OPTION IMAGE -->
+                <div class="reaction-option text-tooltip-tft reaction_4_<?php echo $sucat['id']; ?>" data-title="like">
+                    <img class="reaction-option-image" src="<?php url_site(); ?>/templates/_panel/img/reaction/like.png" alt="reaction-like">
+                    <p class="reaction-option-text"><?php echo $lang['like']; ?></p>
                 </div>
-                <!-- /REACTION OPTION -->
-
-                <!-- REACTION OPTION -->
-                <div class="reaction-option text-tooltip-tft reaction_4_<?php echo $sucat['id']; ?>" data-title="love" >
-                  <!-- REACTION OPTION IMAGE -->
-                  <img class="reaction-option-image" src="<?php url_site();  ?>/templates/_panel/img/reaction/love.png" alt="reaction-love">
-                  <!-- /REACTION OPTION IMAGE -->
+                <div class="reaction-option text-tooltip-tft reaction_4_<?php echo $sucat['id']; ?>" data-title="love">
+                    <img class="reaction-option-image" src="<?php url_site(); ?>/templates/_panel/img/reaction/love.png" alt="reaction-love">
+                    <p class="reaction-option-text"><?php echo $lang['love']; ?></p>
                 </div>
-                <!-- /REACTION OPTION -->
-
-                <!-- REACTION OPTION -->
-                <div class="reaction-option text-tooltip-tft reaction_4_<?php echo $sucat['id']; ?>" data-title="dislike" >
-                  <!-- REACTION OPTION IMAGE -->
-                  <img class="reaction-option-image" src="<?php url_site();  ?>/templates/_panel/img/reaction/dislike.png" alt="reaction-dislike">
-                  <!-- /REACTION OPTION IMAGE -->
+                <div class="reaction-option text-tooltip-tft reaction_4_<?php echo $sucat['id']; ?>" data-title="dislike">
+                    <img class="reaction-option-image" src="<?php url_site(); ?>/templates/_panel/img/reaction/dislike.png" alt="reaction-dislike">
+                    <p class="reaction-option-text"><?php echo $lang['dislike']; ?></p>
                 </div>
-                <!-- /REACTION OPTION -->
-
-                <!-- REACTION OPTION -->
-                <div class="reaction-option text-tooltip-tft reaction_4_<?php echo $sucat['id']; ?>" data-title="happy" >
-                  <!-- REACTION OPTION IMAGE -->
-                  <img class="reaction-option-image" src="<?php url_site();  ?>/templates/_panel/img/reaction/happy.png" alt="reaction-happy">
-                  <!-- /REACTION OPTION IMAGE -->
+                <div class="reaction-option text-tooltip-tft reaction_4_<?php echo $sucat['id']; ?>" data-title="happy">
+                    <img class="reaction-option-image" src="<?php url_site(); ?>/templates/_panel/img/reaction/happy.png" alt="reaction-happy">
+                    <p class="reaction-option-text"><?php echo $lang['happy']; ?></p>
                 </div>
-                <!-- /REACTION OPTION -->
-
-                <!-- REACTION OPTION -->
-                <div class="reaction-option text-tooltip-tft reaction_4_<?php echo $sucat['id']; ?>" data-title="funny" >
-                  <!-- REACTION OPTION IMAGE -->
-                  <img class="reaction-option-image" src="<?php url_site();  ?>/templates/_panel/img/reaction/funny.png" alt="reaction-funny">
-                  <!-- /REACTION OPTION IMAGE -->
+                <div class="reaction-option text-tooltip-tft reaction_4_<?php echo $sucat['id']; ?>" data-title="funny">
+                    <img class="reaction-option-image" src="<?php url_site(); ?>/templates/_panel/img/reaction/funny.png" alt="reaction-funny">
+                    <p class="reaction-option-text"><?php echo $lang['funny']; ?></p>
                 </div>
-                <!-- /REACTION OPTION -->
-
-                <!-- REACTION OPTION -->
-                <div class="reaction-option text-tooltip-tft reaction_4_<?php echo $sucat['id']; ?>" data-title="wow" >
-                  <!-- REACTION OPTION IMAGE -->
-                  <img class="reaction-option-image" src="<?php url_site();  ?>/templates/_panel/img/reaction/wow.png" alt="reaction-wow">
-                  <!-- /REACTION OPTION IMAGE -->
+                <div class="reaction-option text-tooltip-tft reaction_4_<?php echo $sucat['id']; ?>" data-title="wow">
+                    <img class="reaction-option-image" src="<?php url_site(); ?>/templates/_panel/img/reaction/wow.png" alt="reaction-wow">
+                    <p class="reaction-option-text"><?php echo $lang['wow']; ?></p>
                 </div>
-                <!-- /REACTION OPTION -->
-
-                <!-- REACTION OPTION -->
-                <div class="reaction-option text-tooltip-tft reaction_4_<?php echo $sucat['id']; ?>" data-title="angry" >
-                  <!-- REACTION OPTION IMAGE -->
-                  <img class="reaction-option-image" src="<?php url_site();  ?>/templates/_panel/img/reaction/angry.png" alt="reaction-angry">
-                  <!-- /REACTION OPTION IMAGE -->
+                <div class="reaction-option text-tooltip-tft reaction_4_<?php echo $sucat['id']; ?>" data-title="angry">
+                    <img class="reaction-option-image" src="<?php url_site(); ?>/templates/_panel/img/reaction/angry.png" alt="reaction-angry">
+                    <p class="reaction-option-text"><?php echo $lang['angry']; ?></p>
                 </div>
-                <!-- /REACTION OPTION -->
-
-                <!-- REACTION OPTION -->
-                <div class="reaction-option text-tooltip-tft reaction_4_<?php echo $sucat['id']; ?>" data-title="sad" >
-                  <!-- REACTION OPTION IMAGE -->
-                  <img class="reaction-option-image" src="<?php url_site();  ?>/templates/_panel/img/reaction/sad.png" alt="reaction-sad">
-                  <!-- /REACTION OPTION IMAGE -->
+                <div class="reaction-option text-tooltip-tft reaction_4_<?php echo $sucat['id']; ?>" data-title="sad">
+                    <img class="reaction-option-image" src="<?php url_site(); ?>/templates/_panel/img/reaction/sad.png" alt="reaction-sad">
+                    <p class="reaction-option-text"><?php echo $lang['sad']; ?></p>
                 </div>
-                <!-- /REACTION OPTION -->
               </div>
               <!-- /REACTION OPTIONS -->
             </div>
@@ -400,48 +375,32 @@ echo                   "</p>
               <!-- /POST OPTION -->
 
               <!-- REACTION OPTIONS -->
-              <div class="reaction-options reaction-options-dropdown" >
-                <!-- REACTION OPTION -->
-                <div class="reaction-option text-tooltip-tft" data-title="facebook" >
-                  <!-- REACTION OPTION IMAGE -->
-                  <a onClick="window.open('https://www.facebook.com/sharer/sharer.php?u=<?php echo $linksher; ?>');" href="javascript:void(0);" >
-                  <img class="reaction-option-image" src="<?php url_site();  ?>/templates/_panel/img/icons/facebook-icon.png" >
-                  </a>
-                  <!-- /REACTION OPTION IMAGE -->
+              <div class="reaction-options reaction-options-dropdown">
+                <div class="reaction-option text-tooltip-tft" data-title="facebook">
+                    <a onClick="window.open('https://www.facebook.com/sharer/sharer.php?u=<?php echo $linksher; ?>');" href="javascript:void(0);">
+                        <img class="reaction-option-image" src="<?php url_site(); ?>/templates/_panel/img/icons/facebook-icon.png">
+                        <p class="reaction-option-text"><?php echo $lang['facebook']; ?></p>
+                    </a>
                 </div>
-                <!-- /REACTION OPTION -->
-
-                <!-- REACTION OPTION -->
-                <div class="reaction-option text-tooltip-tft" data-title="twitter" >
-                  <!-- REACTION OPTION IMAGE -->
-                  <a onClick="window.open('https://twitter.com/intent/tweet?text=<?php echo $namesher; ?>&url=<?php echo $linksher; ?>');" href="javascript:void(0);" >
-                  <img class="reaction-option-image" src="<?php url_site();  ?>/templates/_panel/img/icons/twitter-icon.png" >
-                  </a>
-                  <!-- /REACTION OPTION IMAGE -->
+                <div class="reaction-option text-tooltip-tft" data-title="twitter">
+                    <a onClick="window.open('https://twitter.com/intent/tweet?text=<?php echo $namesher; ?>&url=<?php echo $linksher; ?>');" href="javascript:void(0);">
+                        <img class="reaction-option-image" src="<?php url_site(); ?>/templates/_panel/img/icons/twitter-icon.png">
+                        <p class="reaction-option-text"><?php echo $lang['twitter']; ?></p>
+                    </a>
                 </div>
-                <!-- /REACTION OPTION -->
-
-                <!-- REACTION OPTION -->
-                <div class="reaction-option text-tooltip-tft" data-title="linkedin" >
-                  <!-- REACTION OPTION IMAGE -->
-                  <a onClick="window.open('https://www.linkedin.com/sharing/share-offsite/?url=<?php echo $linksher; ?>');" href="javascript:void(0);" >
-                  <img class="reaction-option-image" src="<?php url_site();  ?>/templates/_panel/img/icons/linkedin-icon.png" >
-                  </a>
-                  <!-- /REACTION OPTION IMAGE -->
+                <div class="reaction-option text-tooltip-tft" data-title="linkedin">
+                    <a onClick="window.open('https://www.linkedin.com/sharing/share-offsite/?url=<?php echo $linksher; ?>');" href="javascript:void(0);">
+                        <img class="reaction-option-image" src="<?php url_site(); ?>/templates/_panel/img/icons/linkedin-icon.png">
+                        <p class="reaction-option-text"><?php echo $lang['linkedin']; ?></p>
+                    </a>
                 </div>
-                <!-- /REACTION OPTION -->
-
-                <!-- REACTION OPTION -->
-                <div class="reaction-option text-tooltip-tft" data-title="wasp" >
-                  <!-- REACTION OPTION IMAGE -->
-                  <a onClick="window.open('https://www.wasp.gq/sharer?url=<?php echo $linksher; ?>&nbsp;<?php echo $namesher; ?>');" href="javascript:void(0);" >
-                  <img class="reaction-option-image" src="<?php url_site();  ?>/templates/_panel/img/icons/wasp-icon.png" >
-                  </a>
-                  <!-- /REACTION OPTION IMAGE -->
+                <div class="reaction-option text-tooltip-tft" data-title="telegram">
+                    <a onClick="window.open('https://telegram.me/share/url?url=<?php echo $linksher; ?>&text=<?php echo $namesher; ?>');" href="javascript:void(0);">
+                        <img class="reaction-option-image" src="<?php url_site(); ?>/templates/_panel/img/icons/telegram-icon.png">
+                        <p class="reaction-option-text"><?php echo $lang['telegram']; ?></p>
+                    </a>
                 </div>
-                <!-- /REACTION OPTION -->
-
-               </div>
+              </div>
               <!-- /REACTION OPTIONS -->
             </div>
             <!-- /POST OPTION -->

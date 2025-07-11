@@ -2,17 +2,15 @@
 
 #####################################################################
 ##                                                                 ##
-##                        MYads  v3.1.x                            ##
-##                     https://www.adstn.gq                        ##
-##                    e-mail: admin@adstn.gq                       ##
+##                        MYads  v3.2.x                            ##
+##                  https://github.com/mrghozzi                    ##
 ##                                                                 ##
-##                       copyright (c) 2024                        ##
+##                                                                 ##
+##                       copyright (c) 2025                        ##
 ##                                                                 ##
 ##                    This script is freeware                      ##
 ##                                                                 ##
 #####################################################################
-
-
 
 include "dbconfig.php";
 include "include/function.php";
@@ -34,13 +32,13 @@ $tagkdsfh="#".$_GET['tag'];
 $tagkdsfh=preg_replace("/\'/", "&prime;", $tagkdsfh);
 $statement = "`status`
 WHERE (
- (  tp_id
-   IN( SELECT id  FROM `directory` WHERE txt LIKE '%{$tagkdsfh}%' AND statu=1   ) AND  s_type=1 )
+ (  tp_id  IN( SELECT id  FROM `directory` WHERE txt LIKE '%{$tagkdsfh}%' AND statu=1   ) AND  s_type=1 )
    OR
- ( tp_id
-   IN(   SELECT id    FROM `forum`  WHERE txt LIKE '%{$tagkdsfh}%' AND statu=1  )
-   AND ( s_type=2 OR s_type=4 OR s_type=100 OR s_type=7867 ) )  )
-   AND date<={$stt_time_go}
+ ( tp_id IN(   SELECT id    FROM `forum`  WHERE txt LIKE '%{$tagkdsfh}%' AND statu=1  )
+   AND 
+ ( s_type=2 OR s_type=4 OR s_type=100 OR s_type=7867 ) )  )
+   AND 
+  date<={$stt_time_go}
 ORDER BY `date` DESC";
 }else if(isset($_GET['search'] )){
 $tagkdsfh = $_GET['search'];

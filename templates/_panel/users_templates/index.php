@@ -1,3 +1,3 @@
 <?php
-header("Location: https://www.adstn.gq/404") ; 
+ @header("Location: https://www.adstn.gq/404") ; 
   ?>

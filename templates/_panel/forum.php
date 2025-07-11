@@ -1,4 +1,4 @@
-<?php if($s_st=="buyfgeufb"){ dinstall_d();
+<?php if(isset($s_st) AND ($s_st=="buyfgeufb")){ dinstall_d();
 
 $catdids = $_GET['f'];
 $catdids=preg_replace("/\'/", "", $catdids);
@@ -56,36 +56,41 @@ if(isset($wtcat['id'])){
           <div class="widget-box-content">
             <!-- POST PEEK LIST -->
             <div class="post-peek-list">
-<?php
-$statement = "`f_cat` WHERE id ORDER BY `id` DESC";
-$results =$db_con->prepare("SELECT * FROM {$statement} ");
-$results->execute();
-while($wt=$results->fetch(PDO::FETCH_ASSOC)) {
-  $catdids = $wt['id'];
-$catcount = $db_con->prepare("SELECT  COUNT(id) as nbr FROM forum WHERE statu=1 AND cat={$catdids} " );
-$catcount->execute();
-$abcat=$catcount->fetch(PDO::FETCH_ASSOC);
-$catusz = $db_con->prepare("SELECT *  FROM `forum` WHERE statu=1 AND  cat={$catdids} ORDER BY `id` DESC " );
-$catusz->execute();
-$sucat=$catusz->fetch(PDO::FETCH_ASSOC);
-$catdid = $sucat['id'];
- ?>
-              <!-- POST PEEK -->
+              <?php
+              // Get all forum categories
+              $categories = $db_con->prepare("SELECT * FROM `f_cat` ORDER BY `id` DESC");
+              $categories->execute();
+              
+              while($category = $categories->fetch(PDO::FETCH_ASSOC)) {
+                $cat_id = $category['id'];
+                
+                // Count active topics in this category
+                $topic_count = $db_con->prepare("SELECT COUNT(id) as count FROM forum WHERE statu=1 AND cat=:cat_id");
+                $topic_count->bindParam(':cat_id', $cat_id);
+                $topic_count->execute();
+                $count_result = $topic_count->fetch(PDO::FETCH_ASSOC);
+                
+                // Get latest topic in this category
+                $latest_topic = $db_con->prepare("SELECT * FROM `forum` WHERE statu=1 AND cat=:cat_id ORDER BY `id` DESC LIMIT 1");
+                $latest_topic->bindParam(':cat_id', $cat_id);
+                $latest_topic->execute();
+                $latest_result = $latest_topic->fetch(PDO::FETCH_ASSOC);
+              ?>
+              
+              <!-- CATEGORY ITEM -->
               <div class="post-peek card">
-                <!-- POST PEEK IMAGE -->
-
-                <!-- POST PEEK TITLE -->
+                <!-- CATEGORY LINK -->
                 <h4>
-                <a href="<?php echo "{$url_site}/f{$wt['id']}"; ?>">
-                <i class="fa <?php echo $wt['icons']; ?>" aria-hidden="true"></i>&nbsp;<?php echo $wt['name']; ?></a>
+                  <a href="<?php echo "{$url_site}/f{$category['id']}"; ?>">
+                    <i class="fa <?php echo $category['icons']; ?>" aria-hidden="true"></i>
+                    &nbsp;<?php echo $category['name']; ?>
+                  </a>
                 </h4>
-                <!-- /POST PEEK TITLE -->
-
-
-                <!-- /POST PEEK TEXT -->
+                <!-- /CATEGORY LINK -->
               </div>
-              <!-- /POST PEEK -->
-<?php } ?>
+              <!-- /CATEGORY ITEM -->
+              
+              <?php } ?>
             </div>
             <!-- /POST PEEK LIST -->
           </div>
