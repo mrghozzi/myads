@@ -49,19 +49,19 @@ $results->execute();
 function bnr_list() {  global  $results;  global  $statement;     global  $url_site;
 while($wt=$results->fetch(PDO::FETCH_ASSOC)) {
 $getBrowser=getBrowser($wt['visitor_Agent']);
-$covtime=date(' d,M Y - H:i:s',$wt['r_date']);
+$covtime=date(' d,M Y',$wt['r_date'])."</br><i class=\"fa-solid fa-clock\"></i> ".date('H:i:s',$wt['r_date']);
 if($wt['r_link'] == "N"){
-  $heuyuv= "";
+  $heuyuv= "<p class=\"btn btn-danger\" ><i class=\"fa-solid fa-link-slash\"></i></p>";
 }else{
- $heuyuv= "<a href=\"{$wt['r_link']}\">&nbsp;<i class=\"fa fa-link \"></i></a>";
+ $heuyuv= "<a class=\"btn btn-success\" href=\"{$wt['r_link']}\" target=\"_blank\" ><i class=\"fa-solid fa-up-right-from-square\"></i></a>";
 }
 echo "<tr>
   <td>{$wt['id']}</td>
-  <td>{$wt['r_link']}$heuyuv</td>
+  <td>{$heuyuv}</td>
   <td>{$covtime}</td>
   <td>{$getBrowser['name']}<br />{$getBrowser['version']}</td>
   <td>{$getBrowser['platform']}</td>
-  <td><a href=\"http://ip.is-best.net/?ip={$wt['v_ip']}\">{$wt['v_ip']}</a></td>
+  <td><a class=\"btn btn-primary\" href=\"http://ip.is-best.net/?ip={$wt['v_ip']}\" target=\"_blank\" ><i class=\"fa-solid fa-file-invoice fa-bounce\"></i></a></td>
   </tr>";
 
    }
@@ -73,19 +73,19 @@ $results->execute();
 function bnr_list() {  global  $results;  global  $statement;   global  $url_site;
 while($wt=$results->fetch(PDO::FETCH_ASSOC)) {
 $getBrowser=getBrowser($wt['visitor_Agent']);
-$covtime=date(' d,M Y - H:i:s',$wt['r_date']);
+$covtime=date(' d,M Y',$wt['r_date'])."</br><i class=\"fa-solid fa-clock\"></i> ".date('H:i:s',$wt['r_date']);
 if($wt['r_link'] == "N"){
-  $heuyuv= "";
+  $heuyuv= "<p class=\"btn btn-danger\" ><i class=\"fa-solid fa-link-slash\"></i></p>";
 }else{
- $heuyuv= "<a href=\"{$wt['r_link']}\">&nbsp;<i class=\"fa fa-link \"></i></a>";
+ $heuyuv= "<a class=\"btn btn-success\" href=\"{$wt['r_link']}\" target=\"_blank\" ><i class=\"fa-solid fa-up-right-from-square\"></i></a>";
 }
 echo "<tr>
   <td>{$wt['id']}</td>
-  <td>{$wt['r_link']}$heuyuv</td>
+  <td>{$heuyuv}</td>
   <td>{$covtime}</td>
   <td>{$getBrowser['name']}<br />{$getBrowser['version']}</td>
   <td>{$getBrowser['platform']}</td>
-  <td><a href=\"http://ip.is-best.net/?ip={$wt['v_ip']}\">{$wt['v_ip']}</a></td>
+  <td><a class=\"btn btn-primary\" href=\"http://ip.is-best.net/?ip={$wt['v_ip']}\" target=\"_blank\" ><i class=\"fa-solid fa-file-invoice fa-bounce\"></i></a></td>
   </tr>";
 
    }

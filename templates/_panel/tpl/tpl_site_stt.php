@@ -17,7 +17,8 @@ if(isset($s_st) AND ($s_st=="buyfgeufb")){
 function tpl_site_stt($sutcat,$Suggestion)
 {
 global  $db_con; global  $catsum;  global  $uRow; global $lang; global $url_site; global $title_s; global $hachadmin;
-$catusz = $db_con->prepare("SELECT *  FROM `directory` WHERE  id=".$sutcat['tp_id'] );
+$catusz = $db_con->prepare("SELECT *  FROM `directory` WHERE  id=:id");
+$catusz->bindValue(':id', $sutcat['tp_id'], PDO::PARAM_INT);
 $catusz->execute();
 $sucat=$catusz->fetch(PDO::FETCH_ASSOC);
 
@@ -28,10 +29,15 @@ $comtxt   = preg_replace('/#(\w+)/', ' <a  href="'.$url_site.'/tag/$1" >#$1</a> 
 if (preg_match('/\p{Arabic}/u', $comtxt)) {
   $comtxt = '<div style="text-align: right;">' . $comtxt . '</div>';
 }
+$dir_text=substr($comtxt,0,1600);
+if (strlen($comtxt) > 1600) {
+    $dir_text .= '...';
+}
+$dir_text = nl2br($dir_text);
 $sdf    = $sucat['url'];
 $bn_tid = $sucat['id'];
 $bn_time= $sutcat['date'];
-$dir_text=substr($comtxt,0,1600);
+
 $dir_lnk_hash = $url_site."/site-".hash('crc32', $sdf.$sucat['id'] );
 $var_sdf    = parse_url($sdf, PHP_URL_HOST);
 
@@ -40,11 +46,13 @@ $namesher = strip_tags($namesher, '');
 $linksher = strip_tags($dir_lnk_hash, '');
 
 $catdid=$sucat['id'];
-$catus = $db_con->prepare("SELECT *  FROM users WHERE  id='{$sucat['uid']}'");
+$catus = $db_con->prepare("SELECT *  FROM users WHERE  id=:uid");
+$catus->bindValue(':uid', $sucat['uid'], PDO::PARAM_INT);
 $catus->execute();
 $catuss=$catus->fetch(PDO::FETCH_ASSOC);
 
-$catusc = $db_con->prepare("SELECT *  FROM cat_dir WHERE  id='{$sucat['cat']}'");
+$catusc = $db_con->prepare("SELECT *  FROM cat_dir WHERE  id=:cat_id");
+$catusc->bindValue(':cat_id', $sucat['cat'], PDO::PARAM_INT);
 $catusc->execute();
 $catussc=$catusc->fetch(PDO::FETCH_ASSOC);
 $catdnb = $db_con->prepare("SELECT  COUNT(id) as nbr FROM status WHERE tp_id='{$catdid}' AND s_type=1 " );
@@ -242,7 +250,7 @@ echo                   "</p>
               <!-- WIDGET BOX STATUS TEXT -->
               <p class="widget-box-status-text post_text<?php echo $sucat['id']; ?>">
               <div class="textpost"  id="post_form<?php echo $sucat['id']; ?>" >
-              <?php echo $dir_text ?>
+              <?php echo htmlspecialchars_decode($dir_text) ?>
               <div id="report<?php echo $sucat['id']; ?>" ></div>
               </div></p>
               <!-- /WIDGET BOX STATUS TEXT -->
