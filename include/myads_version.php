@@ -15,7 +15,7 @@ if($s_st=="buyfgeufb"){
 
 //  MyAds Version
 $myads_generation  = "3";
-$myads_Version     = "1";
+$myads_Version     = "2";
 $myads_Update      = "0";
 $stversion = "{$myads_generation}.{$myads_Version}.{$myads_Update}";
 $o_type = "version" ;
