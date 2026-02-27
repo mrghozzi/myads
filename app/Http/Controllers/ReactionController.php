@@ -92,7 +92,7 @@ class ReactionController extends Controller
                     }
                     $result = [
                         'action' => 'updated',
-                        'html' => '<img class="reaction-option-image" src="' . asset('themes/default/assets/img/reaction/' . $reaction . '.png') . '" width="' . $imgSize . '" alt="reaction-' . $reaction . '">'
+                        'html' => '<img class="reaction-option-image" src="' . theme_asset('img/reaction/' . $reaction . '.png') . '" width="' . $imgSize . '" alt="reaction-' . $reaction . '">'
                     ];
                 }
             } else {
@@ -100,7 +100,7 @@ class ReactionController extends Controller
                 $this->addReaction($user, $id, $dbType, $reaction);
                 $result = [
                     'action' => 'added',
-                    'html' => '<img class="reaction-option-image" src="' . asset('themes/default/assets/img/reaction/' . $reaction . '.png') . '" width="' . $imgSize . '" alt="reaction-' . $reaction . '">'
+                    'html' => '<img class="reaction-option-image" src="' . theme_asset('img/reaction/' . $reaction . '.png') . '" width="' . $imgSize . '" alt="reaction-' . $reaction . '">'
                 ];
             }
 

@@ -337,7 +337,7 @@ class AdsController extends Controller
             return response('document.write("' . addslashes($html) . '");', 200)->header('Content-Type', 'application/javascript');
         } else {
             // Default Banner
-            $defaultImg = asset('themes/default/assets/img/banner/banner_ads.png'); // Updated path
+            $defaultImg = theme_asset('img/banner/banner_ads.png');
             $html = "<a href='" . url('/') . "?ref=" . $user_id . "' target='_blank'><img src='" . $defaultImg . "' width='" . $this->getWidth($px) . "' height='" . $this->getHeight($px) . "' border='0'></a>";
             return response('document.write("' . addslashes($html) . '");', 200)->header('Content-Type', 'application/javascript');
         }

@@ -37,7 +37,7 @@ class AdsServingController extends Controller
         $w_px = $this->getWidth($pxValue);
         
         $banner = Banner::where('statu', 1)
-            ->where('px', $px)
+            ->where('px', $pxValue)
             ->whereHas('user', function ($query) use ($user_id) {
                 $query->where('nvu', '>=', 1)->where('id', '!=', $user_id);
             })
@@ -57,7 +57,7 @@ class AdsServingController extends Controller
 
             // Return JS to display banner (Matches old bn.php output style)
             $url = route('ads.redirect', ['ads' => $banner->id, 'vu' => $user_id]);
-            $html = "<style>.banner_{$banner->id} {background-image: url('{$banner->img}');height: {$this->getHeight($px)}px;width: {$w_px}px;background-size: cover;background-position: center;position: relative;}.banner_{$banner->id} a {display: block;height: 100%;width: 100%;text-decoration: none;}.banner_icon_{$banner->id} {position: absolute;top: 0;left: 0;padding: 5px;color: white;background-color: rgba(0, 0, 0, 0.5);}@media screen and (max-width: {$w_px}px) {.banner_{$banner->id} {width: 100%;}}</style><div class='banner_{$banner->id}'><a href='{$url}' target='_blank'><div class='banner_icon_{$banner->id}'><a href='" . url('/') . "?ref={$user_id}' target='_blank'><img src='" . asset('themes/default/assets/img/logo_w.png') . "' width='16' height='16' alt='" . config('app.name') . "'></a><a href='" . url('/report') . "?banner={$banner->id}' target='_blank'><img src='" . asset('themes/default/assets/img/Alert-icon.png') . "' alt='Report'></a></div></a></div>";
+            $html = "<style>.banner_{$banner->id} {background-image: url('{$banner->img}');height: {$this->getHeight($pxValue)}px;width: {$w_px}px;background-size: cover;background-position: center;position: relative;}.banner_{$banner->id} a {display: block;height: 100%;width: 100%;text-decoration: none;}.banner_icon_{$banner->id} {position: absolute;top: 0;left: 0;padding: 5px;color: white;background-color: rgba(0, 0, 0, 0.5);}@media screen and (max-width: {$w_px}px) {.banner_{$banner->id} {width: 100%;}}</style><div class='banner_{$banner->id}'><a href='{$url}' target='_blank'><div class='banner_icon_{$banner->id}'><a href='" . url('/') . "?ref={$user_id}' target='_blank'><img src='" . theme_asset('img/logo_w.png') . "' width='16' height='16' alt='" . config('app.name') . "'></a><a href='" . url('/report') . "?banner={$banner->id}' target='_blank'><img src='" . theme_asset('img/Alert-icon.png') . "' alt='Report'></a></div></a></div>";
             
             return response('document.write("' . addslashes($html) . '");', 200)
                 ->header('Content-Type', 'application/javascript')
@@ -67,14 +67,14 @@ class AdsServingController extends Controller
             $refUrl = url('/') . "?ref=" . $user_id;
             $h_px = $this->getHeight($pxValue);
             $fallbackMap = [
-                '160x600' => ['w' => 160, 'h' => 600, 'path' => 'themes/default/assets/img/banner/160x600.gif'],
-                '300x250' => ['w' => 300, 'h' => 250, 'path' => 'themes/default/assets/img/banner/300x250.gif'],
-                '468x60' => ['w' => 468, 'h' => 60, 'path' => 'themes/default/assets/img/banner/468x60.gif'],
-                '728x90' => ['w' => 728, 'h' => 90, 'path' => 'themes/default/assets/img/banner/728x90.gif'],
+                '160x600' => ['w' => 160, 'h' => 600, 'path' => 'img/banner/160x600.gif'],
+                '300x250' => ['w' => 300, 'h' => 250, 'path' => 'img/banner/300x250.gif'],
+                '468x60' => ['w' => 468, 'h' => 60, 'path' => 'img/banner/468x60.gif'],
+                '728x90' => ['w' => 728, 'h' => 90, 'path' => 'img/banner/728x90.gif'],
             ];
             $fallbackAssets = [];
             foreach ($fallbackMap as $key => $data) {
-                $fallbackAssets[$key] = ['w' => $data['w'], 'h' => $data['h'], 'src' => asset($data['path'])];
+                $fallbackAssets[$key] = ['w' => $data['w'], 'h' => $data['h'], 'src' => theme_asset($data['path'])];
             }
             $fallbackJson = json_encode($fallbackAssets);
             $pxJson = json_encode($pxValid ? $px : '');
