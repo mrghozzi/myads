@@ -1,7 +1,0 @@
-{
-    "name": "Arabic Encoding Fixer",
-    "slug": "arabic-fixer",
-    "version": "1.0",
-    "author": "MrGhozzi",
-    "description": "Fixes Arabic text mojibake inherited from v3.2.0 latin1 databases. Go to /admin/arabic-fixer to run the fix."
-}
