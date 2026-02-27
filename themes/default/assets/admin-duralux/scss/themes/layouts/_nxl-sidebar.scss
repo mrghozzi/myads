@@ -1,0 +1,43 @@
+/*
+<--!----------------------------------------------------------------!-->
+<--! Content Sidebar !-->
+<--!----------------------------------------------------------------!-->
+*/
+.main-content {
+	.content-sidebar {
+		&.content-sidebar-md {
+			max-width: 300px;
+		}
+		&.content-sidebar-lg {
+			max-width: 350px;
+		}
+		&.content-sidebar-xl {
+			max-width: 400px;
+		}
+		.content-sidebar-body {
+			.nxl-content-sidebar-item {
+				margin: 15px 0;
+				.nav-item {
+					margin: 0 15px 5px 15px;
+					.nav-link {
+						gap: 15px;
+						display: flex;
+						align-items: center;
+						padding: 10px 15px;
+						color: $brand-dark;
+						font-size: $font-13;
+						font-weight: $font-600;
+						border-radius: $radius-sm;
+						transition: all 0.3s ease;
+						&:hover,
+						&.active {
+							color: $darken;
+							background-color: $brand-light;
+							transition: all 0.3s ease;
+						}
+					}
+				}
+			}
+		}
+	}
+}

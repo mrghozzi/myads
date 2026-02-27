@@ -1,0 +1,378 @@
+@extends('theme::layouts.master')
+
+@section('content')
+<!-- SECTION BANNER -->
+<div class="section-banner" style="background: url({{ theme_asset('img/banner/Newsfeed.png') }}) no-repeat 50%;" >
+    <img class="section-banner-icon" src="{{ theme_asset('img/banner/discussion-icon.png') }}">
+    <p class="section-banner-title">{{ __('messages.forum') }}</p>
+</div>
+<!-- /SECTION BANNER -->
+
+<!-- ADS -->
+@include('theme::partials.ads', ['id' => 5])
+
+<div class="section-header">
+    <div class="section-header-info">
+        <h2 class="section-title">{{ $topic->name }}</h2>
+    </div>
+</div>
+
+<div class="section-filters-bar v7">
+    <div class="section-filters-bar-actions">
+        <div class="section-filters-bar-info">
+            <p class="section-filters-bar-title">
+                <a href="{{ route('forum.index') }}">{{ __('messages.forum') }}</a>
+                <span class="separator"></span>
+                <a href="{{ route('forum.category', $topic->cat) }}"><i class="fa {{ $topic->category->icons ?? '' }}" aria-hidden="true"></i>&nbsp;{{ $topic->category->name ?? __('messages.category_fallback') }}</a>
+                <span class="separator"></span>
+                <a href="{{ route('forum.topic', $topic->id) }}">{{ $topic->name }}</a>
+            </p>
+            <div class="section-filters-bar-text small-space">
+                {{ \Carbon\Carbon::createFromTimestamp($status->date)->diffForHumans() }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="grid grid post{{ $status->id }}">
+    <div class="forum-content">
+        <div class="forum-post-header">
+            <p class="forum-post-header-title">{{ __('messages.author') }}</p>
+            <p class="forum-post-header-title">{{ __('messages.Posts') }}</p>
+        </div>
+        <div class="forum-post-list">
+            <div class="forum-post">
+                <!-- FORUM POST META -->
+                <div class="forum-post-meta">
+                    <p class="forum-post-timestamp">{{ date("Y-m-d H:i:s", $status->date) }}</p>
+                    <div class="forum-post-actions">
+                        <p class="forum-post-action">
+                            <!-- WIDGET BOX SETTINGS -->
+                            <div class="widget-box-settings">
+                                <div class="post-settings-wrap" style="position: relative;">
+                                    <div class="post-settings widget-box-post-settings-dropdown-trigger">
+                                        <svg class="post-settings-icon icon-more-dots"><use xlink:href="#svg-more-dots"></use></svg>
+                                    </div>
+                                    <div class="simple-dropdown widget-box-post-settings-dropdown" style="position: absolute; z-index: 9999; top: 30px; right: 9px; opacity: 0; visibility: hidden; transform: translate(0px, -20px); transition: transform 0.3s ease-in-out 0s, opacity 0.3s ease-in-out 0s, visibility 0.3s ease-in-out 0s;">
+                                        @if((Auth::check() && (Auth::id() == $topic->uid || Auth::id() == $status->uid)) || (Auth::check() && Auth::user()->isAdmin()))
+                                            <a class="simple-dropdown-link" href="{{ route('forum.edit', $topic->id) }}"><i class="fa fa-edit" aria-hidden="true"></i>&nbsp;{{ __('messages.edit') }}</a>
+                                            <p class="simple-dropdown-link post_delete{{ $status->id }}" onclick="deletePost({{ $topic->id }})"><i class="fa fa-trash" aria-hidden="true"></i>&nbsp;{{ __('messages.delete') }}</p>
+                                        @endif
+                                        <p class="simple-dropdown-link post_report{{ $topic->id }}" onclick="reportPost({{ $topic->id }}, 2)"><i class="fa fa-flag" aria-hidden="true"></i>&nbsp;{{ __('messages.report') }}</p>
+                                        <p class="simple-dropdown-link author_report{{ $topic->id }}" onclick="reportUser({{ $topic->uid }})"><i class="fa fa-flag" aria-hidden="true"></i>&nbsp;{{ __('messages.report') }} {{ __('messages.author') }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- /WIDGET BOX SETTINGS -->
+                        </p>
+                    </div>
+                </div>
+                <!-- /FORUM POST META -->
+
+                <!-- FORUM POST CONTENT -->
+                <div class="forum-post-content">
+                    @if($topic->user)
+                    <div class="forum-post-user">
+                        <a class="user-avatar no-outline {{ $topic->user->isOnline() ? 'online' : 'offline' }}" href="{{ route('profile.short', $topic->user->id) }}">
+                            <div class="user-avatar-content">
+                                <div class="hexagon-image-68-74" data-src="{{ $topic->user->img ? url($topic->user->img) : theme_asset('img/avatar/01.jpg') }}" style="width: 68px; height: 74px; position: relative;"><canvas style="position: absolute; top: 0px; left: 0px;" width="68" height="74"></canvas></div>
+                            </div>
+                            <div class="user-avatar-progress-border">
+                                <div class="hexagon-border-84-92" style="width: 84px; height: 92px; position: relative;"><canvas style="position: absolute; top: 0px; left: 0px;" width="84" height="92"></canvas></div>
+                            </div>
+                            @if($topic->user->ucheck == 1)
+                            <div class="user-avatar-badge">
+                                <div class="user-avatar-badge-border">
+                                    <div class="hexagon-28-32" style="width: 22px; height: 24px; position: relative;"></div>
+                                </div>
+                                <div class="user-avatar-badge-content">
+                                    <div class="hexagon-dark-22-24" style="width: 16px; height: 18px; position: relative;"></div>
+                                </div>
+                                <p class="user-avatar-badge-text"><i class="fa fa-fw fa-check" ></i></p>
+                            </div>
+                            @endif
+                        </a>
+                        
+                        <p class="forum-post-user-title"><a href="{{ route('profile.short', $topic->user->id) }}">{{ $topic->user->username }}</a></p>
+                        <p class="forum-post-user-text"><a href="{{ route('profile.short', $topic->user->id) }}">@ {{ $topic->user->username }}</a></p>
+                    </div>
+                    @else
+                    <div class="forum-post-user">
+                        <div class="user-avatar no-outline offline">
+                            <div class="user-avatar-content">
+                                <div class="hexagon-image-68-74" data-src="{{ theme_asset('img/avatar/01.jpg') }}" style="width: 68px; height: 74px; position: relative;"><canvas style="position: absolute; top: 0px; left: 0px;" width="68" height="74"></canvas></div>
+                            </div>
+                            <div class="user-avatar-progress-border">
+                                <div class="hexagon-border-84-92" style="width: 84px; height: 92px; position: relative;"><canvas style="position: absolute; top: 0px; left: 0px;" width="84" height="92"></canvas></div>
+                            </div>
+                        </div>
+                        <p class="forum-post-user-title"><span class="bold">{{ __('messages.deleted_user') ?? __('Deleted User') }}</span></p>
+                    </div>
+                    @endif
+
+                    <div class="forum-post-info">
+                        <p class="forum-post-paragraph">
+                            @php
+                                $content = $topic->txt;
+                                // Basic parsing for hashtags
+                                $content = preg_replace('/#(\w+)/', '<a href="'.url('/tag/$1').'">#$1</a>', $content);
+                                // Allow safe HTML tags (strip unsafe ones)
+                                $content = strip_tags($content, '<p><a><b><br><li><ul><font><span><pre><u><s><img><iframe>');
+                            @endphp
+                            {!! nl2br($content) !!}
+                            
+                            @if($topic->imageOption)
+                                <br><img src="{{ asset($topic->imageOption->o_valuer) }}" style="margin-top: 24px; width: 75%; height: auto; border-radius: 12px;">
+                            @endif
+                        </p>
+                    </div>
+                </div>
+                <!-- /FORUM POST CONTENT -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="post-options post{{ $status->id }}">
+    @auth
+    <div class="post-option-wrap" style="position: relative;">
+        <div class="post-option reaction-options-dropdown-trigger" onclick="toggleReactionDropdown(this)">
+            <div id="reaction_image{{ $status->id }}">
+                @php
+                    $myReaction = \App\Models\Like::where('uid', Auth::id())->where('sid', $topic->id)->where('type', 2)->first();
+                    $reactionType = 'like';
+                    if($myReaction) {
+                        $reactionOption = \App\Models\Option::where('o_parent', $myReaction->id)->where('o_type', 'data_reaction')->first();
+                        if($reactionOption) $reactionType = $reactionOption->o_valuer;
+                    }
+                @endphp
+                
+                @if($myReaction)
+                    <img class="reaction-option-image" src="{{ theme_asset('img/reaction/'.$reactionType.'.png') }}" width="30" alt="reaction-{{ $reactionType }}">
+                @else
+                    <svg class="post-option-icon icon-thumbs-up"><use xlink:href="#svg-thumbs-up"></use></svg>
+                @endif
+            </div>
+            <p class="post-option-text reaction_txt{{ $status->id }}" style="{{ $myReaction ? 'color: #1bc8db;' : '' }}">
+                &nbsp;{{ $myReaction ? ucfirst($reactionType) : __('messages.react') }}
+            </p>
+        </div>
+        
+        <div class="reaction-options reaction-options-dropdown" style="position: absolute; z-index: 9999; bottom: 54px; left: -16px; display: none;">
+            @foreach(['like', 'love', 'dislike', 'happy', 'funny', 'wow', 'angry', 'sad'] as $reaction)
+            <div class="reaction-option text-tooltip-tft reaction_2_{{ $topic->id }}" data-title="{{ $reaction }}" onclick="postReaction({{ $topic->id }}, '{{ $reaction }}')">
+                <img class="reaction-option-image" src="{{ theme_asset('img/reaction/'.$reaction.'.png') }}" alt="reaction-{{ $reaction }}">
+            </div>
+            @endforeach
+        </div>
+    </div>
+    
+    <div class="post-option sh_comment_t{{ $status->id }}" onclick="focusComment({{ $topic->id }})">
+        <svg class="post-option-icon icon-comment"><use xlink:href="#svg-comment"></use></svg>
+        <p class="post-option-text">{{ __('messages.comment') }}</p>
+    </div>
+    @endauth
+    
+    <div class="post-option-wrap" style="position: relative;">
+        <div class="post-option reaction-options-dropdown-trigger" onclick="this.nextElementSibling.style.display = this.nextElementSibling.style.display === 'none' ? 'flex' : 'none'">
+            <svg class="post-option-icon icon-share"><use xlink:href="#svg-share"></use></svg>
+            <p class="post-option-text">{{ __('messages.share') }}</p>
+        </div>
+        <div class="reaction-options reaction-options-dropdown" style="position: absolute; z-index: 9999; bottom: 54px; left: -16px; display: none;">
+             @foreach(['facebook', 'twitter', 'linkedin', 'telegram'] as $social)
+                <div class="reaction-option text-tooltip-tft" data-title="{{ $social }}" style="position: relative;">
+                    <a href="javascript:void(0);" onclick="sharePost('{{ $social }}', '{{ route('forum.topic', $topic->id) }}', '{{ $topic->name }}')">
+                        <img class="reaction-option-image" src="{{ theme_asset('img/icons/'.$social.'-icon.png') }}">
+                    </a>
+                </div>
+             @endforeach
+        </div>
+    </div>
+</div>
+
+<div class="post-comment-list comment_2_{{ $topic->id }} post{{ $status->id }}">
+    @include('theme::partials.activity.comments', ['comments' => $topic->comments()->orderBy('id', 'desc')->get(), 'id' => $topic->id, 'type' => 'forum', 'limit' => 100])
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        initHexagons();
+    });
+
+    function loadComments(id) {
+        // Kept for compatibility if needed, but comments are loaded SSR now.
+        // If we want to refresh comments:
+        fetch('{{ route('comment.load') }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ id: id, type: 'forum' })
+        })
+        .then(response => response.text())
+        .then(html => {
+            document.querySelector('.comment_2_' + id).innerHTML = html;
+            initHexagons();
+        });
+    }
+
+    function postComment(id, type) {
+        let text = document.getElementById('txt_comment' + id).value;
+        if (!text.trim()) return;
+
+        fetch('{{ route("comment.store") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({
+                id: id,
+                type: type,
+                comment: text
+            })
+        })
+        .then(response => response.text())
+        .then(html => {
+            document.querySelector('.comment_2_' + id).innerHTML = html;
+            initHexagons();
+        });
+    }
+
+    function focusComment(id) {
+        let el = document.getElementById('txt_comment' + id);
+        if (el) {
+            el.focus();
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }
+
+    function deleteComment(id, type) {
+        if(confirm('{{ __('messages.confirm_delete') }}')) {
+            fetch('{{ route('comment.delete') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ trashid: id, type: type })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.success || data.action === 'deleted') {
+                    document.getElementById('comment_' + id).remove();
+                } else if(data.error) {
+                    alert(data.error);
+                }
+            });
+        }
+    }
+
+    function initHexagons() {
+        if (typeof app !== 'undefined' && app.plugins && app.plugins.createHexagon) {
+            app.plugins.createHexagon({
+                container: '.hexagon-image-30-32',
+                width: 30,
+                height: 32,
+                roundedCorners: true,
+                clip: true
+            });
+            app.plugins.createHexagon({
+                container: '.hexagon-border-40-44',
+                width: 40,
+                height: 44,
+                lineWidth: 3,
+                roundedCorners: true,
+                lineColor: '#e7e8ee'
+            });
+             app.plugins.createHexagon({
+                container: '.hexagon-22-24',
+                width: 22,
+                height: 24,
+                roundedCorners: true,
+                fill: true
+            });
+            app.plugins.createHexagon({
+                container: '.hexagon-dark-16-18',
+                width: 16,
+                height: 18,
+                roundedCorners: true,
+                fill: true,
+                lineColor: '#4e4ac8' // Approximation
+            });
+        }
+    }
+
+    function postReaction(id, reaction) {
+        fetch('{{ route('reaction.toggle') }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ id: id, type: 'forum', reaction: reaction })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.html) {
+                document.getElementById('reaction_image' + {{ $status->id }}).innerHTML = data.html;
+                let textEl = document.querySelector('.reaction_txt' + {{ $status->id }});
+                if (textEl) {
+                    if (data.action === 'added' || data.action === 'updated') {
+                        textEl.style.color = '#1bc8db';
+                        textEl.innerHTML = '&nbsp;' + reaction.charAt(0).toUpperCase() + reaction.slice(1);
+                    } else {
+                        textEl.style.color = '';
+                        textEl.innerHTML = '&nbsp;{{ __('messages.react') }}';
+                    }
+                }
+            }
+        });
+    }
+
+    function deletePost(id) {
+        if(confirm('{{ __('messages.confirm_delete') }}')) {
+            fetch('{{ route('forum.delete') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ id: id })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.success) {
+                    window.location.href = '{{ route('forum.index') }}';
+                }
+            });
+        }
+    }
+
+    function reportPost(id, type) {
+        let reason = prompt('{{ __('messages.report_reason') }}');
+        if(reason) {
+            fetch('{{ route('forum.report') }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ tp_id: id, s_type: type, txt: reason })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert('{{ __('messages.report_sent') }}');
+            });
+        }
+    }
+    
+    function toggleReactionDropdown(element) {
+        let dropdown = element.nextElementSibling;
+        dropdown.style.display = dropdown.style.display === 'none' || dropdown.style.display === '' ? 'flex' : 'none';
+        dropdown.style.opacity = dropdown.style.display === 'flex' ? '1' : '0';
+        dropdown.style.visibility = dropdown.style.display === 'flex' ? 'visible' : 'hidden';
+    }
+</script>
+@endsection

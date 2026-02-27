@@ -1,0 +1,27 @@
+@php
+    $type = 'text'; // Default
+    if ($activity->s_type == 4) {
+        $type = 'image';
+    } elseif ($activity->s_type == 2) {
+        $type = 'topic';
+    } elseif ($activity->s_type == 1) {
+        $type = 'site';
+    } elseif ($activity->s_type == 7867) {
+        $type = 'store';
+    } elseif ($activity->s_type == 5 || $activity->s_type == 'news') { 
+        // Assuming 5 is news, or string 'news'. If unknown, it falls back to text or we can check relation.
+        $type = 'news';
+    }
+    
+    // Check if related content exists before including
+    if (!$activity->related_content) {
+        // If related content is missing, we might want to skip or show error.
+        // For now, we'll try to render, but the partials assume related_content exists.
+        // We can check inside partials or here.
+        // Given the wrapper checked it, we assume it's checked.
+    }
+@endphp
+
+@if($activity->related_content)
+    @include('theme::partials.activity.types.' . $type, ['activity' => $activity, 'detailView' => $detailView ?? false])
+@endif

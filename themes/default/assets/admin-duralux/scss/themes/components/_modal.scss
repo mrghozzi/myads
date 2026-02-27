@@ -1,0 +1,33 @@
+/*
+<--!----------------------------------------------------------------!-->
+<--! Modal SCSS Start !-->
+<--!----------------------------------------------------------------!-->
+*/
+body.modal-open {
+	.nxl-header,
+	.nxl-navigation,
+	.page-header,
+	.nxl-container {
+		filter: blur(3px);
+		transition: all 0.2s linear;
+	}
+}
+.fade-scale {
+	opacity: 0;
+	transform: scale(0.9);
+	transition: all 0.2s linear;
+	&.show {
+		opacity: 1;
+		transform: scale(1);
+		transition: all 0.2s linear;
+	}
+}
+.modal {
+	.modal-content {
+		border-radius: $radius-md;
+	}
+}
+.modal-backdrop {
+	background-color: #022142;
+	transition: all 0.2s linear;
+}

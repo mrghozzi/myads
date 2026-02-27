@@ -1,0 +1,39 @@
+/*
+<--!----------------------------------------------------------------!-->
+<--! Alert !-->
+<--!----------------------------------------------------------------!-->
+*/
+.alert {
+	&.alert-soft-success-message {
+		color: $success;
+		background-color: lighten($success, 52);
+		border: 1px dashed lighten($success, 25);
+		a {
+			color: $success;
+		}
+	}
+	&.alert-soft-warning-message {
+		color: $warning;
+		background-color: lighten($warning, 40);
+		border: 1px dashed lighten($warning, 25);
+		a {
+			color: $warning;
+		}
+	}
+	&.alert-soft-danger-message {
+		color: $danger;
+		background-color: lighten($danger, 35);
+		border: 1px dashed lighten($danger, 28);
+		a {
+			color: $danger;
+		}
+	}
+	&.alert-soft-teal-message {
+		color: $teal;
+		background-color: lighten($teal, 45);
+		border: 1px dashed lighten($teal, 20);
+		a {
+			color: $teal;
+		}
+	}
+}

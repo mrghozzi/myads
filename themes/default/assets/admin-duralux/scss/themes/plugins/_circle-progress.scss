@@ -1,0 +1,19 @@
+/*
+<--!----------------------------------------------------------------!-->
+<--! Circle Progress !-->
+<--!----------------------------------------------------------------!-->
+*/
+.circle-progress-value {
+	stroke: $primary;
+	stroke-width: 3px;
+}
+.circle-progress-circle {
+	stroke: $gray-200;
+	stroke-width: 3px;
+}
+.circle-progress-text {
+	fill: $brand-dark;
+	color: $brand-dark;
+	font-size: $font-13;
+	font-weight: $font-600;
+}

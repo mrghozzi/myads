@@ -1,0 +1,19 @@
+/*
+<--!----------------------------------------------------------------!-->
+<--! Apps Common !-->
+<--!----------------------------------------------------------------!-->
+*/
+.nxl-container {
+	&.apps-container {
+		.nxl-content {
+			&.without-header {
+				.main-content {
+					.content-sidebar,
+					.content-area {
+						height: calc(100vh - 80px);
+					}
+				}
+			}
+		}
+	}
+}

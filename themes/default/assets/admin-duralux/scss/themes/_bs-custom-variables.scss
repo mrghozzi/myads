@@ -1,0 +1,180 @@
+/*
+<--!----------------------------------------------------------------!-->
+<--! Bootstrap Overwrite Variables !-->
+<--!----------------------------------------------------------------!-->
+*
+* In this file 'bootstrap' overwrite variables gose here.
+* This overwrite variables @include on boostrap.scss file.
+* Please check this file @include on boostrap.scss file.
+*
+*/
+
+// Gray Color
+$white: #ffffff;
+$gray-100: #eff0f6;
+$gray-200: #e9ecef;
+$gray-300: #e5e7eb;
+$gray-400: #ced4da;
+$gray-500: #91a1b6;
+$gray-600: #64748b;
+$gray-700: #495057;
+$gray-800: #343a40;
+$gray-900: #212529;
+$black: #000000;
+
+// fusv-enable
+$blue: #3454d1;
+$indigo: #6610f2;
+$purple: #6f42c1;
+$pink: #e83e8c;
+$red: #ea4d4d;
+$orange: #fd7e14;
+$yellow: #ffa21d;
+$green: #17c666;
+$teal: #41b2c4;
+$cyan: #3dc7be;
+$white: #ffffff;
+$secondary: #727981;
+$success: #25b865;
+$warning: #e49e3d;
+$info: #02a0e4;
+$danger: #d13b4c;
+$dark: #283c50; // new added
+$darken: #001327; // new added
+
+// Body
+$body-bg: #f0f2f8;
+$body-color: #4b5563;
+$text-muted: #64748b;
+
+// Colors Map
+$primary: $blue;
+$secondary: $gray-600;
+$success: $green;
+$info: $cyan;
+$warning: $yellow;
+$danger: $red;
+$light: $gray-100;
+$dark: $dark;
+$darken: $darken; // new added
+
+// Theme Colors Map
+$theme-colors: (
+	"primary": $primary,
+	"secondary": $secondary,
+	"success": $success,
+	"info": $info,
+	"warning": $warning,
+	"danger": $danger,
+	"light": $light,
+	"dark": $dark,
+	"darken": $darken,
+);
+
+// Border
+$border-width: 1px;
+$border-widths: (
+	0: 0,
+	1: 1px,
+	2: 2px,
+	3: 3px,
+	4: 4px,
+	5: 5px,
+	6: 6px,
+	7: 7px,
+	8: 8px,
+	9: 9px,
+	10: 10px,
+);
+$border-color: #e5e7eb;
+$border-color-2: #dcdee4;
+$border-radius: 4px;
+$border-radius-lg: 6px;
+$border-radius-sm: 2px;
+$border-none: transparent;
+$border-soft: darken($gray-100, 1);
+$border-normal: darken($gray-100, 2);
+$border-medium: darken($gray-100, 5);
+$border-hard: darken($gray-100, 8);
+$border-contrast: darken($gray-100, 12);
+
+// Forms
+$input-font-size: 0.845rem;
+
+// Buttons + Forms
+$input-btn-padding-y: 0.5rem;
+
+// Navs
+$nav-tabs-link-active-bg: $white;
+
+// Dropdowns
+$dropdown-hover-color: #ebeff5;
+$dropdown-border-color: $border-color;
+$dropdown-border-width: 1px;
+$dropdown-divider-bg: #e5e7eb;
+
+// Cards
+$soft-bg-level: -80%;
+$card-spacer-y: 25px;
+$card-spacer-x: 25px;
+$card-border-width: 1px;
+$card-cap-padding-y: 25px;
+$card-cap-padding-x: 25px;
+
+// Modals
+$modal-inner-padding: 25px;
+$modal-header-padding-y: 25px;
+$modal-header-padding-x: 25px;
+$modal-header-padding: $modal-header-padding-y $modal-header-padding-x;
+
+// Progress bars
+$progress-bg: $body-bg;
+$progress-bar-bg: $primary;
+
+// Offcanvas
+$zindex-offcanvas: 1051;
+$offcanvas-horizontal-width: 400px;
+
+// Font
+$h1-font-size: 36px;
+$h2-font-size: 28px;
+$h3-font-size: 24px;
+$h4-font-size: 20px;
+$h5-font-size: 16px;
+$h6-font-size: 15px;
+
+// Weight
+$font-weight-light: 200;
+$font-weight-lighter: 300;
+$font-weight-normal: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+$font-weight-bolder: 800;
+$font-weight-black: 900;
+$utilities: (
+	"font-weight": (
+		property: font-weight,
+		class: fw,
+		values: (
+			light: $font-weight-light,
+			lighter: $font-weight-lighter,
+			normal: $font-weight-normal,
+			medium: $font-weight-medium,
+			semibold: $font-weight-semibold,
+			bold: $font-weight-bold,
+			bolder: $font-weight-bolder,
+			black: $font-weight-black,
+		),
+	),
+);
+
+// Breadcrumb
+.breadcrumb-item + .breadcrumb-item::before {
+	content: var(--bs-breadcrumb-divider, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' width='14' height='14' stroke='%2364748b' stroke-width='2' fill='none' stroke-linecap='round' stroke-linejoin='round' class='css-i6dzq1'%3E%3Cpolyline points='9 18 15 12 9 6'%3E%3C/polyline%3E%3C/svg%3E")) !important;
+}
+
+// List-Group
+$list-group-border-color: $border-color;
+$list-group-item-padding-y: 20px;
+$list-group-item-padding-x: 25px;

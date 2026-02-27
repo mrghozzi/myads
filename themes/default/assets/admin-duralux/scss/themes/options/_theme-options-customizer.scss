@@ -1,0 +1,152 @@
+/*
+<--!----------------------------------------------------------------!-->
+<--! Customizer CSS !-->
+<--!----------------------------------------------------------------!-->
+*/
+.theme-customizer {
+	top: 0;
+	right: 0;
+	width: 350px;
+	height: 100%;
+	z-index: 1025;
+	position: fixed;
+	background-color: $white;
+	border-left: 1px solid $border-color;
+	transform: translateX(100%);
+	transition: all 0.3s ease;
+	&.theme-customizer-open {
+		transform: translateX(0);
+		transition: all 0.3s ease;
+		box-shadow: $shadow-lg;
+		.customizer-handle {
+			right: 0;
+			left: auto;
+			display: none;
+		}
+	}
+	.customizer-handle {
+		top: 48%;
+		left: -48px;
+		position: absolute;
+		.cutomizer-open-trigger {
+			padding: 15px;
+			color: $white;
+			border: 1px solid $primary;
+			border-radius: 6px 0px 0px 6px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			box-shadow: $shadow-md;
+		}
+		.cutomizer-open-trigger {
+			i {
+				animation-name: spin;
+				animation-duration: 2500ms;
+				animation-iteration-count: infinite;
+				animation-timing-function: linear;
+			}
+			@keyframes spin {
+				from {
+					transform: rotate(0deg);
+				}
+				to {
+					transform: rotate(360deg);
+				}
+			}
+		}
+	}
+	.customizer-sidebar-wrapper {
+		.customizer-sidebar-body {
+			height: calc(100vh - 140px);
+
+			.theme-options-set {
+				border-radius: 5px;
+				.theme-options-items {
+					.single-option {
+						.options-label {
+							overflow: hidden;
+							border-radius: 5px;
+							transition: all 0.5s ease;
+							display: flex;
+							align-items: center;
+							justify-content: center;
+							&:hover {
+								transition: all 0.5s ease;
+								background-color: darken($gray-100, 1);
+							}
+						}
+						input {
+							&:checked {
+								+ .options-label {
+									&:before {
+										top: 0;
+										left: 0;
+										right: 0;
+										bottom: 0;
+										width: 100%;
+										height: 100%;
+										z-index: 9999;
+										display: flex;
+										font-size: 12px;
+										color: $primary;
+										content: "\f272";
+										position: absolute;
+										align-items: center;
+										cursor: not-allowed;
+										font-weight: $font-400;
+										justify-content: center;
+										transition: all 0.5s ease;
+										background-color: darken($gray-100, 1);
+										font-family: bootstrap-icons !important;
+									}
+								}
+							}
+						}
+						&.active {
+							display: block !important;
+							&:before {
+								top: 0;
+								right: 0;
+								bottom: 0;
+								left: 5px;
+								width: 94%;
+								height: 100%;
+								z-index: 9999;
+								display: flex;
+								font-size: 12px;
+								color: $primary;
+								content: "\f272";
+								position: absolute;
+								align-items: center;
+								cursor: not-allowed;
+								font-weight: $font-400;
+								justify-content: center;
+								transition: all 0.5s ease;
+								background-color: darken($gray-100, 1);
+								font-family: bootstrap-icons !important;
+							}
+						}
+					}
+					&.app-theme {
+						.single-option {
+							position: relative;
+							.palette-card {
+								width: 100%;
+								height: 100%;
+								padding: 3px;
+								height: 30px;
+								display: flex;
+								align-items: center;
+								justify-content: center;
+								span {
+									width: 100%;
+									height: 100%;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}

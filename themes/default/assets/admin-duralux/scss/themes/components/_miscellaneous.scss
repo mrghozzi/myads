@@ -1,0 +1,194 @@
+/*
+<--!----------------------------------------------------------------!-->
+<--! Miscellaneous !-->
+<--!----------------------------------------------------------------!-->
+*/
+.img-group {
+	display: flex;
+	align-items: center;
+	justify-content: flex-end;
+	.avatar-image,
+	.avatar-text {
+		overflow: hidden;
+		margin-left: -10px;
+		align-items: center;
+		display: inline-flex;
+		justify-content: center;
+		border-radius: 100%;
+		border: 2px solid $white;
+		transition: all 0.3s ease;
+		&:hover {
+			transition: all 0.3s ease;
+			transform: translateY(-4px) scale(1.07);
+		}
+	}
+}
+/*
+<--!----------------------------------------------------------------!-->
+<--! Pagination !-->
+<--!----------------------------------------------------------------!-->
+*/
+ul.pagination-common-style {
+	li {
+		a {
+			width: 30px;
+			height: 30px;
+			color: $dark;
+			font-size: $font-12;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			border-radius: 100%;
+			transition: all 0.3s ease;
+			border: 1px solid darken($gray-100, 2);
+			&:hover,
+			&.active {
+				color: $white !important;
+				background-color: $primary;
+				transition: all 0.3s ease;
+			}
+		}
+	}
+}
+
+/*
+<--!----------------------------------------------------------------!-->
+<--! Ladda Button CSS !-->
+<--!----------------------------------------------------------------!-->
+*/
+.ladda-button {
+	padding: 15px 25px;
+	font-size: $font-10;
+	font-weight: $font-700;
+	text-transform: $font-uppercase;
+	background-color: $white;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-top: 1px solid $border-color;
+	border-radius: 0 0 $radius-md $radius-md;
+}
+
+/*
+<--!----------------------------------------------------------------!-->
+<--! Password Generator !-->
+<--!----------------------------------------------------------------!-->
+*/
+.generate-pass {
+	.field {
+		.show-pass {
+			width: 45px;
+			position: relative;
+			&:before {
+				top: 13px;
+				left: 16.5px;
+				content: "\e95f";
+				position: absolute;
+				font-family: feather !important;
+			}
+		}
+	}
+	div.progress-bar {
+		display: flex;
+		align-items: center;
+		flex-direction: row;
+		justify-content: space-between;
+		div {
+			width: 23%;
+			height: 4px;
+			border-radius: 25px;
+			background-color: darken($gray-100, 1);
+		}
+	}
+}
+
+/*
+<--!----------------------------------------------------------------!-->
+<--! Card Radio Select !-->
+<--!----------------------------------------------------------------!-->
+*/
+.card-input-element {
+	margin-left: 25px;
+	margin-bottom: -25px;
+}
+.card-input-element + .card {
+	color: $primary;
+	box-shadow: none;
+	border-radius: $radius-sm;
+	border: 1px dashed $border-color-2;
+	transition: all 0.3s ease;
+	.avatar-text {
+		color: $brand-dark;
+		transition: all 0.3s ease;
+	}
+	h6,
+	.text-muted {
+		transition: all 0.3s ease;
+	}
+}
+
+.card-input-element + .card:hover {
+	cursor: pointer;
+}
+
+.card-input-element:checked + .card {
+	border: 1px dashed $success;
+	transition: border 0.3s;
+	.avatar-text {
+		color: $success;
+		border: 1px dashed $success;
+		transition: all 0.3s ease;
+	}
+	h6,
+	.text-muted {
+		color: $success !important;
+		transition: all 0.3s ease;
+	}
+}
+
+.card-input-element:checked + .card::after {
+	content: "\e92b";
+	color: $success;
+	font-size: 24px;
+	font-family: "feather";
+	animation-name: fadeInCheckbox;
+	animation-duration: 0.5s;
+	animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@-webkit-keyframes fadeInCheckbox {
+	from {
+		opacity: 0;
+		-webkit-transform: rotateZ(-20deg);
+	}
+	to {
+		opacity: 1;
+		-webkit-transform: rotateZ(0deg);
+	}
+}
+
+@keyframes fadeInCheckbox {
+	from {
+		opacity: 0;
+		transform: rotateZ(-20deg);
+	}
+	to {
+		opacity: 1;
+		transform: rotateZ(0deg);
+	}
+}
+
+/*
+<--!----------------------------------------------------------------!-->
+<--! File Upload !-->
+<--!----------------------------------------------------------------!-->
+*/
+.custom-file-upload {
+	width: 100%;
+	cursor: pointer;
+	padding: 25px 25px;
+	background: $gray-100;
+	display: inline-block;
+	border-radius: $radius-sm;
+	border: 1px dashed $border-color-2;
+}

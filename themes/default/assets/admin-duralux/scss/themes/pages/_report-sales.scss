@@ -1,0 +1,99 @@
+/*
+<--!----------------------------------------------------------------!-->
+<--! Sales Report !-->
+<--!----------------------------------------------------------------!-->
+*/
+.nxl-container {
+	.nxl-content {
+		.main-content {
+			.sales-pipeline-tabs {
+				.nav-item {
+					.nav-link {
+						padding: 15px 30px;
+						color: $brand-dark;
+						background-color: $white;
+						border-radius: $radius-sm;
+						border: 1px dashed $border-color-2;
+						&.active {
+							color: $black;
+							border: 1px dashed $gray-500;
+						}
+					}
+				}
+			}
+			.upcoming-event-report-lead {
+				.list-group-item {
+					padding-top: 25px;
+					padding-bottom: 26px;
+				}
+			}
+		}
+	}
+}
+
+.goal-prigress {
+	.circle-progress {
+		width: 225px;
+		height: 225px;
+	}
+	.circle-progress-value {
+		stroke-width: 5px;
+		stroke: $primary;
+		stroke-linecap: round;
+	}
+	.circle-progress-circle {
+		stroke: $white;
+		stroke-width: 15px;
+		fill: $bg-soft-primary;
+	}
+	.circle-progress-text {
+		fill: $brand-dark;
+		font-size: $font-13;
+		font-weight: $font-700;
+	}
+}
+
+.sales-progress-1,
+.sales-progress-2,
+.sales-progress-3,
+.sales-progress-4 {
+	.circle-progress-value {
+		stroke-width: 6px;
+		stroke-linecap: round;
+	}
+	.circle-progress-circle {
+		stroke-width: 3px;
+	}
+}
+.sales-progress-1 {
+	.circle-progress-value {
+		stroke: $primary;
+	}
+	.circle-progress-circle {
+		stroke: lighten($primary, 42);
+	}
+}
+.sales-progress-2 {
+	.circle-progress-value {
+		stroke: $success;
+	}
+	.circle-progress-circle {
+		stroke: lighten($success, 45);
+	}
+}
+.sales-progress-3 {
+	.circle-progress-value {
+		stroke: $warning;
+	}
+	.circle-progress-circle {
+		stroke: lighten($warning, 35);
+	}
+}
+.sales-progress-4 {
+	.circle-progress-value {
+		stroke: $danger;
+	}
+	.circle-progress-circle {
+		stroke: lighten($danger, 35);
+	}
+}

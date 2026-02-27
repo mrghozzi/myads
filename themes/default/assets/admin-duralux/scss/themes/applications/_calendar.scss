@@ -1,0 +1,153 @@
+/*
+<--!----------------------------------------------------------------!-->
+<--! Calendar !-->
+<--!----------------------------------------------------------------!-->
+*/
+.nxl-container {
+	&.apps-calendar {
+		.nxl-content {
+			.main-content {
+				#tui-calendar-init {
+					.tui-full-calendar-popup-delete,
+					.tui-full-calendar-popup-edit,
+					.tui-full-calendar-confirm {
+						display: flex;
+						padding: 12px 16px;
+						font-size: $font-10;
+						line-height: normal;
+						align-items: center;
+						letter-spacing: 0.5px;
+						font-weight: $font-500;
+						justify-content: center;
+						text-transform: $font-uppercase;
+						border-radius: 3px;
+						transition: all 0.3s ease;
+					}
+					.tui-full-calendar-popup-edit,
+					.tui-full-calendar-confirm {
+						color: $white;
+						background-color: $primary !important;
+					}
+					.tui-full-calendar-popup-delete {
+						color: $white;
+						background-color: $danger;
+					}
+					.tui-full-calendar-section-button {
+						gap: 10px;
+						display: flex;
+						padding: 15px 25px;
+						align-items: center;
+						justify-content: center;
+					}
+					.tui-full-calendar-section-button-save {
+						height: auto;
+						padding-top: 15px;
+						border-top: 1px solid $border-color;
+					}
+					.tui-full-calendar-confirm,
+					.tui-full-calendar-popup-save {
+						margin: auto;
+						height: auto;
+					}
+					.tui-full-calendar-popup-save {
+						float: initial;
+					}
+					.tui-full-calendar-popup-detail {
+						.tui-full-calendar-content {
+							height: auto;
+							font-size: inherit;
+							line-height: normal;
+						}
+					}
+					.tui-full-calendar-section-detail {
+						.tui-full-calendar-popup-detail-item {
+							margin-bottom: 10px;
+						}
+					}
+					.tui-full-calendar-calendar-dot {
+						width: 7px;
+						height: 7px;
+						border-radius: 25px;
+					}
+					[data-calendar-id="1"] {
+						color: $primary;
+						background-color: rgb(84 132 227 / 15%) !important;
+					}
+					[data-calendar-id="2"] {
+						color: $success;
+						background-color: rgb(37 184 101 / 15%) !important;
+					}
+					[data-calendar-id="3"] {
+						color: $danger;
+						background-color: rgb(209 59 76 / 15%) !important;
+					}
+					[data-calendar-id="4"] {
+						color: $teal;
+						background-color: rgb(23 162 184 / 15%) !important;
+					}
+					[data-calendar-id="5"] {
+						color: $warning;
+						background-color: rgb(228 158 61 / 15%) !important;
+					}
+					[data-calendar-id="6"] {
+						color: $indigo;
+						background-color: rgb(88 86 214 / 15%) !important;
+					}
+					[data-calendar-id="7"] {
+						color: $teal;
+						background-color: rgb(61 199 190 / 15%) !important;
+					}
+					[data-calendar-id="8"] {
+						color: $dark;
+						background-color: rgb(71 94 119 / 15%) !important;
+					}
+					.tui-full-calendar-popup-section {
+						.tui-full-calendar-popup-section-item {
+							&[data-calendar-id="1"],
+							&[data-calendar-id="2"],
+							&[data-calendar-id="3"],
+							&[data-calendar-id="4"],
+							&[data-calendar-id="5"],
+							&[data-calendar-id="6"],
+							&[data-calendar-id="7"],
+							&[data-calendar-id="8"] {
+								background-color: transparent !important;
+							}
+						}
+					}
+					.tui-full-calendar-weekday-grid-date {
+						font-size: $font-12;
+						font-weight: $font-600;
+						font-family: $font-maven-pro;
+					}
+				}
+				.calendar-action-btn {
+					.menu-navi > .move-today,
+					.calendar-dropdown-btn {
+						color: $dark;
+						padding: 12px 15px;
+						line-height: normal;
+						font-size: $font-11;
+						font-weight: $font-700;
+						border-radius: $radius-xs;
+						border: 1px solid $border-color;
+						text-transform: $font-uppercase;
+						background-color: transparent;
+						display: flex;
+						align-items: center;
+						justify-content: center;
+					}
+				}
+				.chalendar-checkbox {
+					width: 129%;
+					height: 40px;
+					top: -10px;
+					left: -25px;
+					right: -25px;
+					z-index: 99;
+					cursor: pointer;
+				}
+			}
+		}
+	}
+}

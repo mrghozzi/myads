@@ -1,0 +1,77 @@
+/*
+<--!----------------------------------------------------------------!-->
+<--! Dropdown SCSS Start !-->
+<--!----------------------------------------------------------------!-->
+*/
+.dropdown-toggle {
+	&.arrow-none {
+		&:after {
+			display: none;
+		}
+	}
+}
+.dropdown-menu {
+	padding: 15px 0;
+	border: 1px solid $border-color;
+	box-shadow: 0 10px 24px 0 rgba(62, 57, 107, 0.18);
+	&[data-popper-placement="bottom-start"],
+	&[data-popper-placement="bottom-end"] {
+		border-radius: 0 0 10px 10px;
+		box-shadow: 0 10px 24px 0 rgba(62, 57, 107, 0.18);
+	}
+	&[data-popper-placement="top-start"],
+	&[data-popper-placement="top-end"] {
+		border-radius: 10px 10px 0 0;
+		box-shadow: 0 -10px 24px 0 rgba(62, 57, 107, 0.18);
+	}
+}
+.nxl-header {
+	.dropdown-menu {
+		animation: 0.4s ease-in-out 0s normal forwards 1 fadein;
+	}
+}
+@keyframes fadein {
+	from {
+		opacity: 0;
+		transform: translate3d(0, 8px, 0);
+	}
+
+	to {
+		opacity: 1;
+		transform: translate3d(0, 0, 0);
+	}
+}
+.dropdown {
+	.dropdown-menu {
+		width: 225px;
+		.dropdown-item {
+			margin: 3px 10px;
+			padding: 10px 15px;
+			color: $brand-dark;
+			font-size: $font-13;
+			font-weight: $font-600;
+			display: flex;
+			align-items: center;
+			border-radius: $radius-sm;
+			transition: all 0.3s ease;
+			width: -webkit-fill-available;
+			&.active,
+			&:active,
+			&:focus,
+			&:hover {
+				color: $darken;
+				background-color: $brand-light;
+				transition: all 0.3s ease;
+				i.bg-gray-500 {
+					background-color: $darken !important;
+					transition: all 0.3s ease;
+				}
+			}
+			i {
+				font-size: 16px;
+				margin-right: 15px;
+			}
+		}
+	}
+}
+// dropdown css end

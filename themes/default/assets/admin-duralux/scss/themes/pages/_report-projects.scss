@@ -1,0 +1,283 @@
+/*
+<--!----------------------------------------------------------------!-->
+<--! Project Report !-->
+<--!----------------------------------------------------------------!-->
+*/
+
+.project-progress-1,
+.project-progress-2,
+.project-progress-3,
+.project-progress-4 {
+	.circle-progress {
+		width: 65px;
+		height: 65px;
+	}
+	.circle-progress-value {
+		stroke-width: 8px;
+		stroke-linecap: round;
+	}
+	.circle-progress-circle {
+		stroke-width: 5px;
+	}
+}
+.team-progress-1,
+.team-progress-2,
+.team-progress-3,
+.team-progress-4 {
+	.circle-progress {
+		width: 50px;
+		height: 50px;
+	}
+	.circle-progress-value {
+		stroke-width: 6px;
+		stroke-linecap: round;
+	}
+	.circle-progress-circle {
+		stroke-width: 3px;
+	}
+	.circle-progress-text {
+		font-size: 24px;
+	}
+}
+.team-progress-1,
+.project-progress-1 {
+	.circle-progress-value {
+		stroke: $danger;
+	}
+}
+.team-progress-2,
+.project-progress-2 {
+	.circle-progress-value {
+		stroke: $primary;
+	}
+}
+.team-progress-3,
+.project-progress-3 {
+	.circle-progress-value {
+		stroke: $warning;
+	}
+}
+.team-progress-4,
+.project-progress-4 {
+	.circle-progress-value {
+		stroke: $success;
+	}
+}
+
+.project-mini-card-badge {
+	position: absolute;
+	top: 45px;
+	left: -30px;
+	transform: rotate(270deg);
+}
+
+.calendar {
+	height: 500px;
+	overflow: hidden;
+	position: relative;
+	text-transform: capitalize;
+	text-align: center;
+	font: 15px/1em inherit;
+	color: $brand-dark;
+	a {
+		color: inherit;
+		text-decoration: none;
+	}
+	header {
+		padding: 25px 15px 20px;
+		border-bottom: 1px solid $border-color;
+		.simple-calendar-btn {
+			display: inline-block;
+			position: absolute;
+			width: 30px;
+			height: 30px;
+			text-align: center;
+			line-height: 30px;
+			color: $brand-dark;
+			border-radius: 50%;
+			border: 1px solid $border-color;
+		}
+		.simple-calendar-btn:hover {
+			color: $primary;
+			background: $gray-100;
+		}
+		.simple-calendar-btn:before {
+			content: "";
+			position: absolute;
+			top: 10px;
+			left: 10px;
+			width: 6px;
+			height: 6px;
+			border-style: solid;
+			border-width: 1px 1px 0 0;
+			transform: rotate(45deg);
+			transform-origin: center center;
+		}
+		.btn-prev {
+			top: 28px;
+			left: 20px;
+			transform: rotate(-180deg);
+		}
+		.btn-next {
+			top: 28px;
+			right: 20px;
+			&:before {
+				transform: rotate(45deg);
+			}
+		}
+		.month {
+			padding: 0;
+			margin: 0;
+			font-size: $font-14;
+			text-transform: $font-uppercase;
+			.year {
+				margin-top: 5px;
+				color: $brand-muted;
+				font-size: $font-12;
+				font-weight: $font-400;
+			}
+		}
+	}
+	table {
+		width: 100%;
+		border-spacing: 0px;
+	}
+	thead {
+		font-size: $font-11;
+		font-weight: $font-700;
+		text-transform: $font-uppercase;
+	}
+	td {
+		padding: 15px 5px;
+	}
+	.day {
+		color: $brand-dark;
+		font-size: $font-12;
+		font-weight: $font-500;
+		position: relative;
+		display: inline-block;
+		width: 2.5em;
+		height: 2.5em;
+		line-height: 2.5em;
+		border-radius: 50%;
+		border: 2px solid transparent;
+		cursor: pointer;
+		&:hover {
+			border: 2px solid $blue;
+		}
+		&.today {
+			background: $blue;
+			color: white;
+			&.has-event:after {
+				background: white;
+			}
+		}
+		&.wrong-month {
+			color: $gray-500;
+		}
+		&.wrong-month:hover {
+			border: 2px solid transparent;
+		}
+		&.has-event {
+			color: $primary;
+			background: $gray-100;
+			&:after {
+				content: "";
+				position: absolute;
+				top: calc(50% + 0.6em);
+				left: calc(50% - 2px);
+				width: 4px;
+				height: 4px;
+				border-radius: 50%;
+				background: $blue;
+			}
+		}
+		&.disabled {
+			cursor: default;
+			&:hover {
+				border: 2px solid transparent;
+			}
+		}
+	}
+	.event-container {
+		display: none;
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		padding: 30px 30px;
+		background: $gray-100;
+		box-sizing: border-box;
+		border-radius: $radius-lg;
+		.event-wrapper {
+			overflow-y: auto;
+			max-height: 100%;
+		}
+		.close {
+			position: absolute;
+			width: 10px;
+			height: 10px;
+			top: 15px;
+			right: 15px;
+			cursor: pointer;
+			&:before,
+			&:after {
+				content: "";
+				position: absolute;
+				top: 0;
+				left: 50%;
+				width: 2px;
+				height: 100%;
+				background-color: $danger;
+			}
+			&:before {
+				transform: rotate(45deg);
+			}
+			&:after {
+				transform: rotate(-45deg);
+			}
+		}
+		.event {
+			position: relative;
+			width: 100%;
+			padding: 1em;
+			margin-bottom: 1em;
+			background: $blue;
+			border-radius: 4px;
+			box-sizing: border-box;
+			box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.12);
+			text-align: left;
+			color: white;
+			&-date {
+				margin-bottom: 1em;
+			}
+			&-hour {
+				float: right;
+			}
+			&-summary {
+				font-weight: 600;
+			}
+		}
+	}
+	.filler {
+		position: absolute;
+		width: 0;
+		height: 0;
+		border-radius: 50%;
+		background: $gray-200;
+		transform: translate(-50%, -50%);
+	}
+}
+
+.project-report-table {
+	.table {
+		tr {
+			td {
+				padding: 18.5px 15px;
+				white-space: nowrap;
+				vertical-align: middle;
+			}
+		}
+	}
+}

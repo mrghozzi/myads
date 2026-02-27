@@ -1,0 +1,67 @@
+/*
+<--!----------------------------------------------------------------!-->
+<--! KnowledgeBase !-->
+<--!----------------------------------------------------------------!-->
+*/
+.nxl-container {
+	.help-center-content-header {
+		height: 650px;
+		min-height: 650px;
+		max-height: 650px;
+		background-image: radial-gradient(circle, $white, #f4f6fb, #e7eef6, #d7e7f0, #c6e0e7);
+		.search-form {
+			width: 100%;
+			margin: auto;
+		}
+	}
+	.nxl-content {
+		.help-center-main-contet-area {
+			.topic-category-section,
+			.topic-tranding-section,
+			.still-question-section {
+				margin-top: 60px;
+			}
+		}
+	}
+}
+.topics-details-offcanvas {
+	width: 100% !important;
+}
+
+/*
+<--!----------------------------------------------------------------!-->
+<--! @media (min-width: 1024px) !-->
+<--!----------------------------------------------------------------!-->
+*/
+@media (min-width: 1024px) {
+	.nxl-container {
+		.help-center-content-header {
+			.search-form {
+				width: 75%;
+			}
+		}
+		.nxl-content {
+			.help-center-main-contet-area {
+				.help-quick-card {
+					margin-top: -200px;
+				}
+				.topic-category-section,
+				.topic-tranding-section,
+				.still-question-section {
+					margin-top: 150px;
+					p.wd-50 {
+						width: 100% !important;
+					}
+				}
+			}
+		}
+		.topics-details-offcanvas {
+			width: 75% !important;
+		}
+	}
+}
+@media (min-width: 1400px) {
+	.topics-details-offcanvas {
+		width: 50% !important;
+	}
+}

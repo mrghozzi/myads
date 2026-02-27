@@ -1,0 +1,43 @@
+/*
+<--!----------------------------------------------------------------!-->
+<--! SweetAlert2 !-->
+<--!----------------------------------------------------------------!-->
+*/
+.swal2-modal {
+	.swal2-title {
+		color: $brand-dark;
+		font-size: $font-24;
+		font-weight: $font-700;
+	}
+	.swal2-content {
+		color: $brand-muted;
+		font-size: 0.8rem;
+	}
+}
+.swal2-container {
+	z-index: 999999 !important;
+	.swal2-title {
+		font-size: 24px !important;
+		font-weight: $font-700 !important;
+	}
+	.swal2-content {
+		color: $brand-muted !important;
+		font-size: $font-13 !important;
+	}
+	.swal2-popup.swal2-toast {
+		padding: 15px 15px;
+		box-shadow: none;
+		background-color: $white;
+		border: 1px solid $border-color;
+		box-shadow: 0 4px 24px 0 rgba(62, 57, 107, 0.18);
+	}
+	.swal2-popup.swal2-toast .swal2-title {
+		color: $dark;
+		margin: auto 15px;
+		font-size: $font-13 !important;
+		font-weight: $font-600 !important;
+	}
+	.swal2-timer-progress-bar {
+		background-color: #a5dc86;
+	}
+}

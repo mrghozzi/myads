@@ -1,0 +1,235 @@
+/*
+<--!----------------------------------------------------------------!-->
+<--! Button SCSS Start !-->
+<--!----------------------------------------------------------------!-->
+*/
+
+@each $color, $value in $theme-colors {
+	.btn-light-#{$color} {
+		color: $value;
+		background: shift-color($value, $soft-bg-level);
+		border-color: shift-color($value, $soft-bg-level);
+		&:hover {
+			color: #fff;
+			background: $value;
+			border-color: $value;
+		}
+		&.focus,
+		&:focus {
+			color: #fff;
+			background: $value;
+			border-color: $value;
+		}
+		&:not(:disabled):not(.disabled).active,
+		&:not(:disabled):not(.disabled):active,
+		.show > &.dropdown-toggle {
+			color: #fff;
+			background: $value;
+			border-color: $value;
+		}
+	}
+
+	.btn-check:active,
+	.btn-check:checked {
+		+ .btn-light-#{$color} {
+			background: $value;
+			color: #fff;
+			border-color: $value;
+		}
+	}
+}
+
+button,
+.btn {
+	i {
+		font-size: 16px;
+	}
+
+	&[class*="btn-light-"] {
+		box-shadow: none;
+	}
+
+	&[class*="btn-outline-"]:not(:hover) {
+		box-shadow: none;
+	}
+
+	&.btn-shadow {
+		box-shadow: 0 6px 7px -1px rgba(80, 86, 175, 0.3);
+	}
+
+	&.btn-sm {
+		i {
+			font-size: 10px;
+		}
+	}
+}
+
+.btn {
+	display: flex;
+	padding: 12px 16px;
+	font-size: $font-10;
+	line-height: normal;
+	align-items: center;
+	justify-content: center;
+	font-weight: $font-700;
+	text-transform: $font-uppercase;
+	letter-spacing: $text-spacing-md;
+	border-radius: 3px;
+	transition: all 0.3s ease;
+	&:hover,
+	&:focus,
+	&:active,
+	&:focus,
+	&.active,
+	&.show,
+	.btn-check:focus + &,
+	.btn-check:checked + &,
+	.btn-check:active + & {
+		&:hover,
+		&:focus,
+		&:active,
+		&:focus {
+			color: $white;
+			outline: none;
+			box-shadow: none;
+			transition: all 0.3s ease;
+		}
+	}
+}
+.btn-light,
+.btn-light-brand {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: $brand-dark;
+	border: 1px solid $border-color-2;
+	&:hover,
+	&:focus,
+	&:active,
+	&:focus,
+	&.show {
+		color: $brand-dark !important;
+		border: 1px solid $gray-400 !important;
+		transition: all 0.3s ease;
+	}
+}
+.btn-icon {
+	color: $dark;
+	display: flex;
+	padding: 11px 11px;
+	align-items: center;
+	justify-content: center;
+	border: 1px solid $border-color-2;
+	border-radius: 3px;
+	transition: all 0.3s ease;
+	&:hover,
+	&:focus,
+	&:active,
+	&:focus,
+	&.show {
+		color: $brand-dark !important;
+		border: 1px solid $gray-400 !important;
+		transition: all 0.3s ease;
+	}
+}
+.btn-close {
+	&:focus,
+	&:active {
+		outline: 0;
+		box-shadow: none;
+	}
+}
+button:focus:not(:focus-visible) {
+	outline: none;
+	box-shadow: none;
+	transition: all 0.3s ease;
+}
+.btn-sm,
+.btn-group-sm > .btn {
+	padding: 7px 15px;
+	font-size: $font-9;
+}
+.btn-md,
+.btn-group-md > .btn {
+	padding: 10px 15px;
+	font-size: $font-10;
+}
+.btn-lg,
+.btn-group-lg > .btn {
+	padding: 15px 20px;
+	font-size: $font-11;
+}
+.btn-xl,
+.btn-group-lg > .btn {
+	padding: 20px 30px;
+	font-size: $font-12;
+}
+.btn-xxl,
+.btn-group-lg > .btn {
+	padding: 25px 35px;
+	font-size: $font-15;
+}
+.btn-primary,
+.btn-primary:hover,
+.btn.bg-soft-primary:focus,
+.btn.bg-soft-primary:hover {
+	color: $white !important;
+	border-color: $primary !important;
+	background-color: $primary !important;
+}
+.btn-secondary,
+.btn-secondary:hover,
+.btn.bg-soft-secondary:focus,
+.btn.bg-soft-secondary:hover {
+	color: $white !important;
+	border-color: $secondary !important;
+	background-color: $secondary !important;
+}
+.btn-success,
+.btn-success:hover,
+.btn.bg-soft-success:focus,
+.btn.bg-soft-success:hover {
+	color: $white !important;
+	border-color: $success !important;
+	background-color: $success !important;
+}
+.btn-danger,
+.btn-danger:hover,
+.btn.bg-soft-danger:focus,
+.btn.bg-soft-danger:hover {
+	color: $white !important;
+	border-color: $danger !important;
+	background-color: $danger !important;
+}
+.btn-info,
+.btn-info:hover,
+.btn.bg-soft-info:focus,
+.btn.bg-soft-info:hover {
+	color: $white !important;
+	border-color: $info !important;
+	background-color: $info !important;
+}
+.btn-warning,
+.btn-warning:hover,
+.btn.bg-soft-warning:focus,
+.btn.bg-soft-warning:hover {
+	color: $white !important;
+	border-color: $warning !important;
+	background-color: $warning !important;
+}
+.btn-teal,
+.btn-teal:hover,
+.btn.bg-soft-teal:focus,
+.btn.bg-soft-teal:hover {
+	color: $white !important;
+	border-color: $teal !important;
+	background-color: $teal !important;
+}
+.btn-indigo,
+.btn-indigo:hover,
+.btn.bg-soft-indigo:focus,
+.btn.bg-soft-indigo:hover {
+	color: $white !important;
+	border-color: $indigo !important;
+	background-color: $indigo !important;
+}

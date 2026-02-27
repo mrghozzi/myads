@@ -1,0 +1,20 @@
+/*
+<--!----------------------------------------------------------------!-->
+<--! Tasks !-->
+<--!----------------------------------------------------------------!-->
+*/
+.nxl-container {
+	&.apps-tasks {
+		.nxl-content {
+			.main-content {
+				.single-task-list {
+					&.task-completed {
+						color: $success !important;
+						background-color: $bg-soft-success;
+						text-decoration: line-through !important;
+					}
+				}
+			}
+		}
+	}
+}

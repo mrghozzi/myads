@@ -1,0 +1,15 @@
+/*
+<--!----------------------------------------------------------------!-->
+<--! Pic Uploader !-->
+<--!----------------------------------------------------------------!-->
+*/
+.upload-button {
+	opacity: 0;
+	transition: all 0.3s ease;
+	&:hover {
+		opacity: 1;
+		visibility: visible;
+		transition: all 0.3s ease;
+		background-color: darken($gray-100, 1);
+	}
+}

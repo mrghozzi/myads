@@ -1,0 +1,97 @@
+/*
+<--!----------------------------------------------------------------!-->
+<--! Authentication SCSS Start !-->
+<--!----------------------------------------------------------------!-->
+*/
+/*auth-minimal*/
+.auth-minimal-wrapper {
+	display: flex;
+	flex-direction: column;
+	min-height: 100vh;
+	.auth-minimal-inner {
+		display: flex;
+		flex-direction: column;
+		min-height: 100vh;
+		padding: 0;
+		.minimal-card-wrapper {
+			width: 100%;
+			max-width: 450px;
+			margin: auto auto;
+		}
+	}
+}
+/*auth-cover*/
+.auth-cover-wrapper {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	.auth-cover-content-inner {
+		float: left;
+		display: flex;
+		flex-direction: column;
+		min-height: 100vh;
+		width: 100%;
+		max-width: calc(100% - 550px);
+		.auth-cover-content-wrapper {
+			display: flex;
+			flex-direction: column;
+			min-height: 100vh;
+			padding: 0;
+			.auth-img {
+				width: 600px;
+				margin: auto auto;
+			}
+		}
+	}
+	.auth-cover-sidebar-inner {
+		float: right;
+		display: flex;
+		flex-direction: column;
+		min-height: 100vh;
+		width: 100%;
+		max-width: 550px;
+		background-color: $white;
+		box-shadow: $card-shadow;
+		.auth-cover-card-wrapper {
+			display: flex;
+			flex-direction: column;
+			min-height: 100vh;
+			padding: 0;
+			.auth-cover-card {
+				width: 100%;
+				max-width: 450px;
+				margin: auto auto;
+			}
+		}
+	}
+}
+/*auth-creative*/
+.auth-creative-wrapper {
+	display: flex;
+	flex-direction: column;
+	min-height: 100vh;
+	.auth-creative-inner {
+		display: flex;
+		flex-direction: column;
+		min-height: 100vh;
+		padding: 0;
+		&:after {
+			top: 0;
+			bottom: 0;
+			width: 50%;
+			content: "";
+			position: fixed;
+			background: $gray-200;
+		}
+		.creative-card-wrapper {
+			width: 100%;
+			max-width: 1000px;
+			margin: auto auto;
+			.creative-card-body {
+				width: 100%;
+				max-width: 450px;
+				margin: auto auto;
+			}
+		}
+	}
+}
