@@ -16,6 +16,7 @@
 /public/build
 /public/hot
 /public/storage
+/public/storage
 /storage/*.key
 /storage/pail
 /vendor
@@ -27,3 +28,4 @@ Thumbs.db
 !/upload/_avatar.png
 !/upload/avatar.png
 !/upload/cover.jpg
+/Documents
