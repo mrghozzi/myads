@@ -1,0 +1,85 @@
+/*
+<--!----------------------------------------------------------------!-->
+<--! Navigation Dark !-->
+<--!----------------------------------------------------------------!-->
+*/
+html {
+	&.app-navigation-dark {
+		.nxl-navigation {
+			background: $navigation-background;
+			.m-header {
+				background: $header-brand-color;
+				border-right: 1px solid $navigation-border-color;
+				border-bottom: 1px solid lighten($header-brand-color, 5);
+				.logo-lg {
+					filter: invert(1);
+				}
+			}
+			.navbar-content {
+				border-right: 1px solid $navigation-border-color;
+				.nxl-caption {
+					color: $navigation-caption;
+				}
+				.nxl-link {
+					color: $navigation-color;
+					&:active,
+					&:focus,
+					&:hover {
+						color: $navigation-active-color;
+						.nxl-micon {
+							i {
+								color: $navigation-active-color;
+							}
+						}
+					}
+				}
+				.nxl-navbar {
+					> .nxl-item {
+						&.active,
+						&:focus,
+						&:hover {
+							> .nxl-link {
+								background-color: $navigation-hover-color;
+							}
+						}
+					}
+				}
+				.nxl-item {
+					&.active,
+					&:focus,
+					&:hover {
+						> .nxl-link {
+							color: $navigation-active-color;
+							background-color: $navigation-hover-color;
+							.nxl-micon {
+								i {
+									color: $navigation-active-color;
+								}
+							}
+						}
+					}
+				}
+				.card {
+					margin: 20px;
+					border-color: $brand-dark;
+					color: rgba(255, 255, 255, 0.6);
+					background: rgba(255, 255, 255, 0.05);
+					box-shadow: 0 0 0 1px rgb(0 0 0 / 15%);
+					.text-dark {
+						color: $white !important;
+					}
+				}
+			}
+		}
+		&.minimenu {
+			.nxl-navigation {
+				&:hover {
+					.navbar-content {
+						background-color: $navigation-background;
+						border-right: 1px solid $navigation-border-color;
+					}
+				}
+			}
+		}
+	}
+}

@@ -1,63 +1,60 @@
-﻿#####################################################################
-##                                                                 ##
-##                        MYads  v3.2.x                            ##
-##                  https://github.com/mrghozzi                    ##
-##                                                                 ##
-##                                                                 ##
-##                       copyright (c) 2025                        ##
-##                                                                 ##
-##                    This script is freeware                      ##
-##                                                                 ##
-#####################################################################
+<IfModule mod_rewrite.c>
+    <IfModule mod_negotiation.c>
+        Options -MultiViews -Indexes
+    </IfModule>
 
-RewriteEngine on
+    RewriteEngine On
 
-RewriteRule ^u/(.*) user.php?u=$1 [NC,L]
-RewriteRule ^e([0-9.]+)  user.php?e=$1 [NC,L]
-RewriteRule ^p([0-9.]+)  user.php?p=$1 [NC,L]
-RewriteRule ^options  user.php?o=$1 [NC,L]
-RewriteRule ^followers/([0-9.]+) user.php?fl=$1 [NC,L]
-RewriteRule ^following/([0-9.]+) user.php?fg=$1 [NC,L]
-RewriteRule ^uFriends/([0-9.]+) user.php?ff=$1 [NC,L]
-RewriteRule ^uPhotos/(.*) user.php?ph=$1 [NC,L]
-RewriteRule ^uBlog/(.*) user.php?blog=$1 [NC,L]
-RewriteRule ^ulinks/(.*) user.php?ulinks=$1 [NC,L]
-RewriteRule ^uforum/(.*) user.php?uforum=$1 [NC,L]
-RewriteRule ^ushop/(.*) user.php?ushop=$1 [NC,L]
-RewriteRule ^history user.php?h=$1 [NC,L]
-RewriteRule ^tag/(.*) portal.php?tag=$1 [NC,L]
-RewriteRule ^portal/all portal.php?all=$1 [NC,L]
-RewriteRule ^cat/(.*) directory.php?cat=$1 [NC,L]
-RewriteRule ^site-(.*) directory.php?dir=$1 [NC,L]
-RewriteRule ^dr(.*) directory.php?s=$1 [NC,L]
-RewriteRule ^add-site.html directory.php?p=$1 [NC,L]
-RewriteRule ^t([0-9.]+) forum.php?t=$1 [NC,L]
-RewriteRule ^f([0-9.]+) forum.php?f=$1 [NC,L]
-RewriteRule ^post forum.php?p=$1 [NC,L]
-RewriteRule ^editor/([0-9.]+) forum.php?e=$1 [NC,L]
-RewriteRule ^message/([0-9.]+) messages.php?m=$1 [NC,L]
-RewriteRule ^notif/([0-9.]+) messages.php?n=$1 [NC,L]
-RewriteRule ^notification messages.php?ntf [NC,L]
-RewriteRule ^download/(.*) store.php?download=$1 [NC,L]
-RewriteRule ^producer/(.*) store.php?producer=$1 [NC,L]
-RewriteRule ^kb/([A-Za-z0-9_]+)$ store.php?kb=$1 [NC,L]
-RewriteRule ^kb/([A-Za-z0-9_]+):(.*)$ store.php?kb=$1&st=$2 [NC,L]
-RewriteRule ^kb store.php?nf [NC,L]
-RewriteRule ^edk/([A-Za-z0-9_]+):(.*)$ store.php?tr=$1&ed=$2 [NC,L]
-RewriteRule ^pgk/([A-Za-z0-9_]+):(.*)$ store.php?pr=$1&pg=$2 [NC,L]
-RewriteRule ^hkd/([A-Za-z0-9_]+):(.*)$ store.php?pp=$1&tt=$2 [NC,L]
-RewriteRule ^edk store.php?nf [NC,L]
-RewriteRule ^forgot-password login?forgot-password [NC,L]
-RewriteRule ^update/(.*) store.php?update=$1 [NC,L]
-RewriteRule ^add_store store.php?add [NC,L]
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteCond %{REQUEST_FILENAME}.php -f
-RewriteRule ^(.*)$ $1.php
-ErrorDocument 401 default
-ErrorDocument 403 default
-ErrorDocument 404 default
-ErrorDocument 405 default
-ErrorDocument 406 default
-ErrorDocument 500 default
-ErrorDocument 501 default
-ErrorDocument 503 default
+    # Redirect Trailing Slashes If Not A Folder...
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_URI} (.+)/$
+    RewriteRule ^ %1 [L,R=301]
+
+    # Handle Authorization Header
+    RewriteCond %{HTTP:Authorization} .
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+    # Block access to sensitive files
+    RewriteRule ^\.env$ - [F,L]
+    RewriteRule ^\.env\..*$ - [F,L]
+    RewriteRule ^composer\.(json|lock)$ - [F,L]
+    RewriteRule ^artisan$ - [F,L]
+    RewriteRule ^phpunit\.xml$ - [F,L]
+
+    # Block access to sensitive directories
+    RewriteRule ^vendor/ - [F,L]
+    RewriteRule ^storage/ - [F,L]
+    RewriteRule ^bootstrap/ - [F,L]
+    RewriteRule ^config/ - [F,L]
+    RewriteRule ^database/ - [F,L]
+    RewriteRule ^app/ - [F,L]
+    RewriteRule ^routes/ - [F,L]
+
+    # Handle Assets - serve from public directory
+    RewriteCond %{REQUEST_URI} \.(css|js|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot|map|webp|mp4|mp3|pdf|zip)$ [NC]
+    RewriteCond %{REQUEST_URI} !public/
+    RewriteCond %{REQUEST_URI} !themes/
+    RewriteCond %{REQUEST_URI} !upload/
+    RewriteCond %{REQUEST_URI} !installer/
+    RewriteRule ^(.*)$ public/$1 [L]
+
+    # Serve installer assets directly
+    RewriteRule ^installer/assets/(.*)$ installer/assets/$1 [L]
+
+    # Send Requests To Front Controller...
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule ^ index.php [L]
+</IfModule>
+
+# Prevent directory listing
+<IfModule mod_autoindex.c>
+    Options -Indexes
+</IfModule>
+
+# Security headers
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-XSS-Protection "1; mode=block"
+</IfModule>

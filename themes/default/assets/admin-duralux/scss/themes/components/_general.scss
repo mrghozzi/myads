@@ -1,0 +1,1165 @@
+/*
+<--!----------------------------------------------------------------!-->
+<--! General SCSS Start !-->
+<--!----------------------------------------------------------------!-->
+*/
+body {
+	line-height: 1.6;
+	color: $brand-body;
+	overflow-x: hidden;
+	font-size: $font-body;
+	scroll-behavior: smooth;
+	font-family: $font-inter;
+	transition: all 0.3s ease;
+	-webkit-font-smoothing: antialiased;
+	background-color: rgba(243, 244, 246);
+}
+
+* {
+	&:focus {
+		outline: none;
+		text-decoration: none;
+	}
+}
+
+a {
+	color: $brand-dark;
+	text-decoration: none;
+	font-weight: $font-600;
+	transition: all 0.3s ease;
+	&:hover {
+		color: $primary;
+		text-decoration: none;
+	}
+
+	&:not([href]) {
+		color: inherit;
+	}
+}
+
+b,
+strong {
+	font-weight: 600;
+}
+
+.c-pointer {
+	cursor: pointer;
+}
+
+.h1,
+.h2,
+.h3,
+.h4,
+.h5,
+.h6,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	color: $brand-dark;
+	font-weight: $font-700;
+}
+
+img {
+	border-radius: $radius-xs;
+}
+
+/*
+<--!----------------------------------------------------------------!-->
+<--! Avatar !-->
+<--!----------------------------------------------------------------!-->
+*/
+.avatar-text,
+.avatar-image {
+	width: 40px;
+	height: 40px;
+	max-width: 40px;
+	max-height: 40px;
+	min-width: 40px;
+	min-height: 40px;
+	overflow: hidden;
+	border-radius: 100%;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-weight: $font-700;
+	background-color: $white;
+	border: 1px solid $border-color-2;
+}
+.avatar-xs {
+	width: 12px;
+	height: 12px;
+	max-width: 12px;
+	max-height: 12px;
+	min-width: 12px;
+	min-height: 12px;
+	* {
+		font-size: $font-8;
+	}
+}
+.avatar-sm {
+	width: 20px;
+	height: 20px;
+	max-width: 20px;
+	max-height: 20px;
+	min-width: 20px;
+	min-height: 20px;
+	* {
+		font-size: $font-10;
+	}
+}
+.avatar-md {
+	width: 30px;
+	height: 30px;
+	max-width: 30px;
+	max-height: 30px;
+	min-width: 30px;
+	min-height: 30px;
+	* {
+		font-size: $font-12;
+	}
+}
+.avatar-lg {
+	width: 50px;
+	height: 50px;
+	max-width: 50px;
+	max-height: 50px;
+	min-width: 50px;
+	min-height: 50px;
+}
+.avatar-xl {
+	width: 65px;
+	height: 65px;
+	max-width: 65px;
+	max-height: 65px;
+	min-width: 65px;
+	min-height: 65px;
+}
+.avatar-xxl {
+	width: 80px;
+	height: 80px;
+	max-width: 80px;
+	max-height: 80px;
+	min-width: 80px;
+	min-height: 80px;
+}
+
+/*
+<--!----------------------------------------------------------------!-->
+<--! Sizing !-->
+<--!----------------------------------------------------------------!-->
+*/
+.font-body {
+	font-size: $font-body;
+}
+.fs-5 {
+	font-size: $font-5;
+}
+.fs-6 {
+	font-size: $font-6;
+}
+.fs-7 {
+	font-size: $font-7;
+}
+.fs-8 {
+	font-size: $font-8;
+}
+.fs-9 {
+	font-size: $font-9;
+}
+.fs-10 {
+	font-size: $font-10;
+}
+.fs-11 {
+	font-size: $font-11;
+}
+.fs-12 {
+	font-size: $font-12;
+}
+.fs-13 {
+	font-size: $font-13;
+}
+.fs-14 {
+	font-size: $font-14;
+}
+.fs-15 {
+	font-size: $font-15;
+}
+.fs-16 {
+	font-size: $font-16;
+}
+.fs-17 {
+	font-size: $font-17;
+}
+.fs-18 {
+	font-size: $font-18;
+}
+.fs-19 {
+	font-size: $font-19;
+}
+.fs-20 {
+	font-size: $font-20;
+}
+.fs-22 {
+	font-size: $font-22;
+}
+.fs-24 {
+	font-size: $font-24;
+}
+.fs-26 {
+	font-size: $font-26;
+}
+.fs-28 {
+	font-size: $font-28;
+}
+.fs-30 {
+	font-size: $font-30;
+}
+/*
+<--!----------------------------------------------------------------!-->
+<--! Family !-->
+<--!----------------------------------------------------------------!-->
+*/
+.font-lato {
+	font-family: $font-lato;
+}
+.font-rubik {
+	font-family: $font-rubik;
+}
+.font-inter {
+	font-family: $font-inter;
+}
+.font-cinzel {
+	font-family: $font-cinzel;
+}
+.font-nunito {
+	font-family: $font-nunito;
+}
+.font-roboto {
+	font-family: $font-roboto;
+}
+.font-ubuntu {
+	font-family: $font-ubuntu;
+}
+.font-poppins {
+	font-family: $font-poppins;
+}
+.font-raleway {
+	font-family: $font-raleway;
+}
+.font-system-ui {
+	font-family: $font-system-ui;
+}
+.font-noto-sans {
+	font-family: $font-noto-sans;
+}
+.font-fira-sans {
+	font-family: $font-fira-sans;
+}
+.font-work-sans {
+	font-family: $font-work-sans;
+}
+.font-open-sans {
+	font-family: $font-open-sans;
+}
+.font-maven-pro {
+	font-family: $font-maven-pro;
+}
+.font-quicksand {
+	font-family: $font-quicksand;
+}
+.font-montserrat {
+	font-family: $font-montserrat;
+}
+.font-josefin-sans {
+	font-family: $font-josefin-sans;
+}
+.font-ibm-plex-sans {
+	font-family: $font-ibm-plex-sans;
+}
+.font-source-sans-pro {
+	font-family: $font-source-sans-pro;
+}
+.font-montserrat-alt {
+	font-family: $font-montserrat-alt;
+}
+.font-roboto-slab {
+	font-family: $font-roboto-slab;
+}
+/*
+<--!----------------------------------------------------------------!-->
+<--! Colors !-->
+<--!----------------------------------------------------------------!-->
+*/
+.text-primary {
+	color: $primary !important;
+}
+.text-success {
+	color: $success !important;
+}
+.text-danger {
+	color: $danger !important;
+}
+.text-info {
+	color: $info !important;
+}
+.text-warning {
+	color: $warning !important;
+}
+.text-teal {
+	color: $teal !important;
+}
+.text-indigo {
+	color: $indigo !important;
+}
+.text-dark {
+	color: $dark !important;
+}
+.text-gray-100 {
+	color: $gray-100 !important;
+}
+.text-gray-200 {
+	color: $gray-200 !important;
+}
+.text-gray-300 {
+	color: $gray-300 !important;
+}
+.text-gray-400 {
+	color: $gray-400 !important;
+}
+.text-gray-500 {
+	color: $gray-500 !important;
+}
+.text-gray-600 {
+	color: $gray-600 !important;
+}
+.text-soft-primary {
+	color: lighten($primary, 35) !important;
+}
+.text-soft-success {
+	color: lighten($success, 35) !important;
+}
+.text-soft-danger {
+	color: lighten($danger, 35) !important;
+}
+.text-soft-info {
+	color: lighten($info, 35) !important;
+}
+.text-soft-warning {
+	color: lighten($warning, 35) !important;
+}
+.text-soft-teal {
+	color: lighten($teal, 35) !important;
+}
+.text-soft-indigo {
+	color: lighten($indigo, 35) !important;
+}
+.text-soft-dark {
+	color: lighten($dark, 35) !important;
+}
+/*
+<--!----------------------------------------------------------------!-->
+<--! Spacing !-->
+<--!----------------------------------------------------------------!-->
+*/
+.text-spacing-1 {
+	letter-spacing: 0.5px;
+}
+.text-spacing-2 {
+	letter-spacing: 1px;
+}
+.text-spacing-3 {
+	letter-spacing: 1.5px;
+}
+.text-spacing-4 {
+	letter-spacing: 2px;
+}
+.text-spacing-5 {
+	letter-spacing: 2.5px;
+}
+/*
+<--!----------------------------------------------------------------!-->
+<--! Background Solid Color !-->
+<--!----------------------------------------------------------------!-->
+*/
+.bg-white {
+	background-color: $white !important;
+}
+.bg-primary {
+	background-color: $primary !important;
+}
+.bg-secondary {
+	background-color: $secondary !important;
+}
+.bg-success {
+	background-color: $success !important;
+}
+.bg-info {
+	background-color: $info !important;
+}
+.bg-danger {
+	background-color: $danger !important;
+}
+.bg-dark {
+	background-color: $dark !important;
+}
+.bg-warning {
+	background-color: $warning !important;
+}
+.bg-black {
+	background-color: $black !important;
+}
+.bg-muted {
+	background-color: $brand-muted !important;
+}
+.bg-light {
+	background-color: $light !important;
+}
+.bg-blue {
+	background-color: $blue !important;
+}
+.bg-teal {
+	background-color: $teal !important;
+}
+.bg-indigo {
+	background-color: $indigo !important;
+}
+.bg-cyan {
+	background-color: $cyan !important;
+}
+.bg-green {
+	background-color: $green !important;
+}
+.bg-red {
+	background-color: $red !important;
+}
+.bg-orange {
+	background-color: $orange !important;
+}
+.bg-darken {
+	background-color: $darken !important;
+}
+.bg-gray-100 {
+	background-color: $gray-100 !important;
+}
+.bg-gray-200 {
+	background-color: $gray-200 !important;
+}
+.bg-gray-300 {
+	background-color: $gray-300 !important;
+}
+.bg-gray-400 {
+	background-color: $gray-400 !important;
+}
+.bg-gray-500 {
+	background-color: $gray-500 !important;
+}
+.bg-gray-600 {
+	background-color: $gray-600 !important;
+}
+.bg-gray-700 {
+	background-color: $gray-700 !important;
+}
+.bg-gray-800 {
+	background-color: $gray-800 !important;
+}
+.bg-gray-900 {
+	background-color: $gray-900 !important;
+}
+
+/*
+<--!----------------------------------------------------------------!-->
+<--! Background Soft Color !-->
+<--!----------------------------------------------------------------!-->
+*/
+.bg-soft-100 {
+	background-color: lighten($gray-100, 1) !important;
+}
+.bg-soft-200 {
+	background-color: lighten($gray-200, 2) !important;
+}
+.bg-soft-300 {
+	background-color: lighten($gray-300, 3) !important;
+}
+.bg-soft-400 {
+	background-color: lighten($gray-400, 4) !important;
+}
+.bg-soft-500 {
+	background-color: lighten($gray-500, 5) !important;
+}
+.bg-soft-primary {
+	background-color: lighten($primary, 44) !important;
+}
+.bg-soft-success {
+	background-color: lighten($success, 50) !important;
+}
+.bg-soft-danger {
+	background-color: lighten($danger, 35) !important;
+}
+.bg-soft-info {
+	background-color: lighten($info, 40) !important;
+}
+.bg-soft-warning {
+	background-color: lighten($warning, 35) !important;
+}
+.bg-soft-teal {
+	background-color: lighten($teal, 40) !important;
+}
+.bg-soft-indigo {
+	background-color: lighten($indigo, 45) !important;
+}
+.bg-soft-dark {
+	background-color: lighten($dark, 70) !important;
+}
+.bg-soft-darken {
+	background-color: lighten($darken, 80) !important;
+}
+/*
+<--!----------------------------------------------------------------!-->
+<--! Border Gray Color !-->
+<--!----------------------------------------------------------------!-->
+*/
+.border-gray-1 {
+	border-color: darken($gray-200, 1) !important;
+}
+.border-gray-2 {
+	border-color: darken($gray-200, 2) !important;
+}
+.border-gray-3 {
+	border-color: darken($gray-200, 3) !important;
+}
+.border-gray-4 {
+	border-color: darken($gray-200, 4) !important;
+}
+.border-gray-5 {
+	border-color: darken($gray-200, 5) !important;
+}
+/*
+<--!----------------------------------------------------------------!-->
+<--! Border Soft Color !-->
+<--!----------------------------------------------------------------!-->
+*/
+.border-soft-primary {
+	border-color: lighten($primary, 40) !important;
+}
+.border-soft-success {
+	border-color: lighten($success, 40) !important;
+}
+.border-soft-danger {
+	border-color: lighten($danger, 32) !important;
+}
+.border-soft-info {
+	border-color: lighten($info, 34) !important;
+}
+.border-soft-warning {
+	border-color: lighten($warning, 28) !important;
+}
+.border-soft-teal {
+	border-color: lighten($teal, 32) !important;
+}
+.border-soft-indigo {
+	border-color: lighten($indigo, 40) !important;
+}
+/*
+<--!----------------------------------------------------------------!-->
+<--! Border Style !-->
+<--!----------------------------------------------------------------!-->
+*/
+.border-dashed {
+	border-style: dashed !important;
+}
+.border-start-dashed {
+	border-left-style: dashed !important;
+}
+.border-end-dashed {
+	border-right-style: dashed !important;
+}
+.border-top-dashed {
+	border-top-style: dashed !important;
+}
+.border-bottom-dashed {
+	border-bottom-style: dashed !important;
+}
+.border-dotted {
+	border-style: dotted !important;
+}
+.border-start-dotted {
+	border-left-style: dotted !important;
+}
+.border-end-dotted {
+	border-right-style: dotted !important;
+}
+.border-top-dotted {
+	border-top-style: dotted !important;
+}
+.border-bottom-dotted {
+	border-bottom-style: dotted !important;
+}
+.border-double {
+	border-style: double !important;
+}
+.border-start-double {
+	border-left-style: double !important;
+}
+.border-end-double {
+	border-right-style: double !important;
+}
+.border-top-double {
+	border-top-style: double !important;
+}
+.border-bottom-double {
+	border-bottom-style: double !important;
+}
+.border-groove {
+	border-style: groove !important;
+}
+.border-start-groove {
+	border-left-style: groove !important;
+}
+.border-end-groove {
+	border-right-style: groove !important;
+}
+.border-top-groove {
+	border-top-style: groove !important;
+}
+.border-bottom-groove {
+	border-bottom-style: groove !important;
+}
+/*
+<--!----------------------------------------------------------------!-->
+<--! Border Color !-->
+<--!----------------------------------------------------------------!-->
+*/
+.border-primary {
+	border-color: $primary !important;
+}
+.border-secondary {
+	border-color: $secondary !important;
+}
+.border-success {
+	border-color: $success !important;
+}
+.border-danger {
+	border-color: $danger !important;
+}
+.border-warning {
+	border-color: $warning !important;
+}
+.border-teal {
+	border-color: $teal !important;
+}
+.border-info {
+	border-color: $info !important;
+}
+.border-indigo {
+	border-color: $indigo !important;
+}
+.border-dark {
+	border-color: $dark !important;
+}
+.border-black {
+	border-color: $black !important;
+}
+/*
+<--!----------------------------------------------------------------!-->
+<--! Width !-->
+<--!----------------------------------------------------------------!-->
+*/
+.wd-1 {
+	width: 1px;
+	max-width: 1px;
+	min-width: 1px;
+}
+.wd-2 {
+	width: 2px;
+	max-width: 2px;
+	min-width: 2px;
+}
+.wd-3 {
+	width: 3px;
+	max-width: 3px;
+	min-width: 3px;
+}
+.wd-4 {
+	width: 4px;
+	max-width: 4px;
+	min-width: 4px;
+}
+.wd-5 {
+	width: 5px;
+	max-width: 5px;
+	min-width: 5px;
+}
+.wd-6 {
+	width: 6px;
+	max-width: 6px;
+	min-width: 6px;
+}
+.wd-7 {
+	width: 7px;
+	max-width: 7px;
+	min-width: 7px;
+}
+.wd-8 {
+	width: 8px;
+	max-width: 8px;
+	min-width: 8px;
+}
+.wd-9 {
+	width: 9px;
+	max-width: 9px;
+	min-width: 9px;
+}
+.wd-10 {
+	width: 10px;
+	max-width: 10px;
+	min-width: 10px;
+}
+.wd-15 {
+	width: 15px;
+	max-width: 15px;
+	min-width: 15px;
+}
+.wd-20 {
+	width: 20px;
+	max-width: 20px;
+	min-width: 20px;
+}
+.wd-30 {
+	width: 30px;
+	max-width: 30px;
+	min-width: 30px;
+}
+.wd-40 {
+	width: 40px;
+	max-width: 40px;
+	min-width: 40px;
+}
+.wd-50 {
+	width: 50px;
+	max-width: 50px;
+	min-width: 50px;
+}
+.wd-60 {
+	width: 60px;
+	max-width: 60px;
+	min-width: 60px;
+}
+.wd-70 {
+	width: 70px;
+	max-width: 70px;
+	min-width: 70px;
+}
+.wd-80 {
+	width: 80px;
+	max-width: 80px;
+	min-width: 80px;
+}
+.wd-90 {
+	width: 90px;
+	max-width: 90px;
+	min-width: 90px;
+}
+.wd-100 {
+	width: 100px;
+	max-width: 100px;
+	min-width: 100px;
+}
+.wd-150 {
+	width: 150px;
+	max-width: 150px;
+	min-width: 150px;
+}
+.wd-200 {
+	width: 200px;
+	max-width: 200px;
+	min-width: 200px;
+}
+.wd-250 {
+	width: 250px;
+	max-width: 250px;
+	min-width: 250px;
+}
+.wd-300 {
+	width: 300px;
+	max-width: 300px;
+	min-width: 300px;
+}
+.wd-350 {
+	width: 350px;
+	max-width: 350px;
+	min-width: 350px;
+}
+.wd-400 {
+	width: 400px;
+	max-width: 400px;
+	min-width: 400px;
+}
+.wd-450 {
+	width: 450px;
+	max-width: 450px;
+	min-width: 450px;
+}
+.wd-500 {
+	width: 500px;
+	max-width: 500px;
+	min-width: 500px;
+}
+/*
+<--!----------------------------------------------------------------!-->
+<--! Height !-->
+<--!----------------------------------------------------------------!-->
+*/
+.ht-1 {
+	height: 1px;
+	max-height: 1px;
+	min-height: 1px;
+}
+.ht-2 {
+	height: 2px;
+	max-height: 2px;
+	min-height: 2px;
+}
+.ht-3 {
+	height: 3px;
+	max-height: 3px;
+	min-height: 3px;
+}
+.ht-4 {
+	height: 4px;
+	max-height: 4px;
+	min-height: 4px;
+}
+.ht-5 {
+	height: 5px;
+	max-height: 5px;
+	min-height: 5px;
+}
+.ht-5 {
+	height: 5px;
+	max-height: 5px;
+	min-height: 5px;
+}
+.ht-6 {
+	height: 6px;
+	max-height: 6px;
+	min-height: 6px;
+}
+.ht-7 {
+	height: 7px;
+	max-height: 7px;
+	min-height: 7px;
+}
+.ht-8 {
+	height: 8px;
+	max-height: 8px;
+	min-height: 8px;
+}
+.ht-9 {
+	height: 9px;
+	max-height: 9px;
+	min-height: 9px;
+}
+.ht-10 {
+	height: 10px;
+	max-height: 10px;
+	min-height: 10px;
+}
+.ht-15 {
+	height: 15px;
+	max-height: 15px;
+	min-height: 15px;
+}
+.ht-20 {
+	height: 20px;
+	max-height: 20px;
+	min-height: 20px;
+}
+.ht-30 {
+	height: 30px;
+	max-height: 30px;
+	min-height: 30px;
+}
+.ht-40 {
+	height: 40px;
+	max-height: 40px;
+	min-height: 40px;
+}
+.ht-50 {
+	height: 50px;
+	max-height: 50px;
+	min-height: 50px;
+}
+.ht-60 {
+	height: 60px;
+	max-height: 60px;
+	min-height: 60px;
+}
+.ht-70 {
+	height: 70px;
+	max-height: 70px;
+	min-height: 70px;
+}
+.ht-80 {
+	height: 80px;
+	max-height: 80px;
+	min-height: 80px;
+}
+.ht-90 {
+	height: 90px;
+	max-height: 90px;
+	min-height: 90px;
+}
+.ht-100 {
+	height: 100px;
+	max-height: 100px;
+	min-height: 100px;
+}
+.ht-150 {
+	height: 150px;
+	max-height: 150px;
+	min-height: 150px;
+}
+.ht-200 {
+	height: 200px;
+	max-height: 200px;
+	min-height: 200px;
+}
+.ht-250 {
+	height: 250px;
+	max-height: 250px;
+	min-height: 250px;
+}
+.ht-300 {
+	height: 300px;
+	max-height: 300px;
+	min-height: 300px;
+}
+.ht-350 {
+	height: 350px;
+	max-height: 350px;
+	min-height: 350px;
+}
+.ht-400 {
+	height: 400px;
+	max-height: 400px;
+	min-height: 400px;
+}
+.ht-450 {
+	height: 450px;
+	max-height: 450px;
+	min-height: 450px;
+}
+.ht-500 {
+	height: 500px;
+	max-height: 500px;
+	min-height: 500px;
+}
+/*
+<--!----------------------------------------------------------------!-->
+<--! Shadows !-->
+<--!----------------------------------------------------------------!-->
+*/
+.shadow-none {
+	box-shadow: $shadow-none;
+}
+.shadow-sm {
+	box-shadow: $shadow-sm;
+}
+.shadow-md {
+	box-shadow: $shadow-md;
+}
+.shadow-lg {
+	box-shadow: $shadow-lg;
+}
+.shadow-xl {
+	box-shadow: $shadow-xl;
+}
+.shadow-xxl {
+	box-shadow: $shadow-xxl;
+}
+
+/*
+<--!----------------------------------------------------------------!-->
+<--! Stretch Height !-->
+<--!----------------------------------------------------------------!-->
+*/
+.stretch {
+	height: 100%;
+	display: flex;
+	align-items: stretch;
+	flex-direction: column;
+	&.stretch-full {
+		height: calc(100% - 24px);
+	}
+	&.stretch-onethird {
+		height: calc(75% - 24px);
+	}
+	&.stretch-half {
+		height: calc(50% - 24px);
+	}
+	&.stretch-quarter {
+		height: calc(25% - 24px);
+	}
+}
+/*
+<--!----------------------------------------------------------------!-->
+<--! Miscellaneous !-->
+<--!----------------------------------------------------------------!-->
+*/
+.tooltip {
+	font-size: $font-10;
+	font-family: inherit;
+	font-weight: $font-500;
+	text-transform: $font-uppercase;
+	.tooltip-inner {
+		padding: 5px 10px;
+		letter-spacing: 0.35px;
+		border-radius: 3px;
+	}
+}
+.popover {
+	border-color: $border-color;
+}
+hr {
+	margin: 25px auto;
+	border-color: $gray-500;
+}
+.dropdown-dividar {
+	margin: 10px auto;
+	border-top: 1px solid $border-color;
+}
+.text-truncate-1-line {
+	width: 100%;
+	max-width: 100%;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	@supports (-webkit-line-clamp: 1) {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: initial;
+		display: -webkit-box !important;
+		-webkit-line-clamp: 1;
+		-webkit-box-orient: vertical;
+	}
+}
+.text-truncate-2-line {
+	width: 100%;
+	max-width: 100%;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	@supports (-webkit-line-clamp: 2) {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: initial;
+		display: -webkit-box !important;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+	}
+}
+.text-truncate-3-line {
+	width: 100%;
+	max-width: 100%;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	@supports (-webkit-line-clamp: 3) {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: initial;
+		display: -webkit-box !important;
+		-webkit-line-clamp: 3;
+		-webkit-box-orient: vertical;
+	}
+}
+.text-truncate-4-line {
+	width: 100%;
+	max-width: 100%;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	@supports (-webkit-line-clamp: 4) {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: initial;
+		display: -webkit-box !important;
+		-webkit-line-clamp: 4;
+		-webkit-box-orient: vertical;
+	}
+}
+.text-truncate-5-line {
+	width: 100%;
+	max-width: 100%;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	@supports (-webkit-line-clamp: 5) {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: initial;
+		display: -webkit-box !important;
+		-webkit-line-clamp: 5;
+		-webkit-box-orient: vertical;
+	}
+}
+/*
+<--!----------------------------------------------------------------!-->
+<--! FullScreen Switcher !-->
+<--!----------------------------------------------------------------!-->
+*/
+body {
+	.full-screen-switcher {
+		a {
+			.maximize {
+				display: block;
+			}
+			.minimize {
+				display: none;
+			}
+		}
+	}
+	&.full-screen-helper {
+		.full-screen-switcher {
+			a {
+				.maximize {
+					display: none;
+				}
+				.minimize {
+					display: block;
+				}
+			}
+		}
+	}
+}
+:not(:root):fullscreen::backdrop {
+	background: transparent;
+}
+/*
+<--!----------------------------------------------------------------!-->
+<--! Scrollbar !-->
+<--!----------------------------------------------------------------!-->
+*/
+::-webkit-scrollbar {
+	width: 5px;
+	height: 5px;
+	border-radius: 15px;
+}
+::-webkit-scrollbar-track {
+	background-color: $white;
+	border-radius: 15px;
+}
+::-webkit-scrollbar-thumb {
+	background-color: $gray-300;
+	border-radius: 15px;
+}
+::-webkit-scrollbar-thumb {
+	&:hover {
+		background-color: $darken;
+		transition: all 0.3s ease;
+	}
+}

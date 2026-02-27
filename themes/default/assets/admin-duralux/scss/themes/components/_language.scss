@@ -1,0 +1,41 @@
+/*
+<--!----------------------------------------------------------------!-->
+<--! Language SCSS Start !-->
+<--!----------------------------------------------------------------!-->
+*/
+#languageSelectModal {
+	.language_select {
+		a {
+			color: $dark;
+			padding: 10px;
+			border-radius: 5px;
+			margin-bottom: 10px;
+			border: 1px dashed $border-color;
+			transition: all 0.3s ease;
+			&::hover {
+				background-color: $brand-light;
+			}
+		}
+		&.active {
+			a {
+				position: relative;
+				&:before {
+					top: 0;
+					left: 0;
+					right: 0;
+					bottom: 0;
+					width: 100%;
+					height: 100%;
+					z-index: 9999;
+					content: "✓";
+					color: $primary;
+					position: absolute;
+					display: flex;
+					align-items: center;
+					justify-content: center;
+					background-color: $brand-light;
+				}
+			}
+		}
+	}
+}

@@ -1,0 +1,44 @@
+/*
+<--!----------------------------------------------------------------!-->
+<--! Search SCSS Start !-->
+<--!----------------------------------------------------------------!-->
+*/
+#searchModal {
+	.search-form {
+		.input-group-text,
+		.search-input-field {
+			border: none;
+			padding: 25px 10px;
+			background: $white;
+			&:focus,
+			&:active {
+				box-shadow: none;
+			}
+		}
+		.input-group-text {
+			.btn-close {
+				opacity: 1;
+				position: relative;
+				background: transparent;
+				&:after {
+					content: "Esc";
+					position: absolute;
+					top: 0.4rem;
+					right: 0.4rem;
+					height: 1.5rem;
+					padding-right: 6px;
+					padding-left: 6px;
+					font-size: $font-11;
+					color: $brand-dark;
+					font-weight: $font-500;
+					text-transform: $font-uppercase;
+					border-radius: $radius-sm;
+					border: 1px solid $border-color;
+					display: flex;
+					align-items: center;
+					justify-content: center;
+				}
+			}
+		}
+	}
+}

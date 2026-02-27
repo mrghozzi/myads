@@ -1,0 +1,86 @@
+/*
+<--!----------------------------------------------------------------!-->
+<--! jQuery-Steps !-->
+<--!----------------------------------------------------------------!-->
+*/
+.wizard {
+	> .content {
+		margin: auto;
+		max-width: 600px;
+		padding: 70px 0px;
+	}
+	> .actions {
+		margin-top: 30px;
+		padding: 25px 25px;
+		border-top: 1px solid $border-color;
+		> ul {
+			width: auto;
+			border-bottom: none;
+			text-align: inherit;
+			display: flex;
+			justify-content: space-between;
+			> li {
+				flex-grow: 0 !important;
+			}
+		}
+	}
+	.steps {
+		transform: translateY(0px);
+		transition: all 0.3s ease;
+		&.sticky {
+			left: 0;
+			right: 0;
+			z-index: 9999;
+			position: fixed;
+			background-color: $white;
+			width: -webkit-fill-available;
+			transform: translateY(-98px);
+			transition: all 0.3s ease;
+
+			a,
+			a:hover,
+			a:active {
+				padding: 22px 25px 20px;
+				transition: all 0.3s ease;
+			}
+		}
+	}
+}
+.wizard > .actions > ul > li,
+.wizard > .steps > ul > li {
+	float: left;
+	flex: 0 0;
+	flex-basis: 0;
+	flex-grow: 1;
+	text-align: center;
+	border-top: 1px solid $border-color;
+	border-right: 1px solid $border-color;
+	&:last-child {
+		border-right: none;
+	}
+}
+
+.wizard > .actions > ul > li {
+	border-right: none;
+}
+
+.wizard > .steps a,
+.wizard > .steps a:active,
+.wizard > .steps a:hover {
+	margin: 0 0;
+	padding: 30px 25px 25px;
+	font-size: $font-11;
+	text-transform: $font-uppercase;
+	letter-spacing: $text-spacing-md;
+}
+
+.tabcontrol ul,
+.wizard ul[role="tablist"] {
+	width: 100%;
+	display: flex;
+	flex-wrap: wrap;
+	padding-left: 0;
+	margin-bottom: 0;
+	list-style: none;
+	border-bottom: 1px solid $border-color;
+}

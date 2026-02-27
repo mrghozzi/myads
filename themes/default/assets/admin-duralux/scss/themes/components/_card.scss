@@ -1,0 +1,210 @@
+/*
+<--!----------------------------------------------------------------!-->
+<--! Card SCSS Start !-->
+<--!----------------------------------------------------------------!-->
+*/
+.card {
+	margin-bottom: 24px;
+	border-radius: $radius-md;
+	border: 1px solid transparent;
+	transition: all 0.3s ease;
+	box-shadow: $card-shadow;
+
+	&:hover {
+		transition: all 0.3s ease;
+
+		.card-footer[class*="bg-"] {
+			box-shadow: none;
+		}
+
+		.card-header-btn {
+			opacity: 1;
+			visibility: visible;
+			transform: translateX(0px);
+			transition: all 0.3s ease;
+		}
+	}
+
+	.card-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		border-bottom: 1px solid $border-color;
+		background-color: transparent;
+
+		.card-title {
+			margin-bottom: 0;
+			color: $brand-dark;
+			font-size: $font-16;
+			font-weight: $font-700;
+
+			+p,
+			+small {
+				margin-top: 10px;
+
+				&:last-child {
+					margin-bottom: 0;
+				}
+			}
+		}
+
+		.card-header-right {
+			right: 10px;
+			top: 10px;
+			float: right;
+			padding: 0;
+			position: absolute;
+
+			@media only screen and (max-width: 575px) {
+				display: none;
+			}
+
+			.dropdown-menu {
+				margin-top: 0;
+
+				li {
+					cursor: pointer;
+
+					a {
+						font-size: 14px;
+						text-transform: capitalize;
+					}
+				}
+			}
+
+			.btn.dropdown-toggle {
+				border: none;
+				background: transparent;
+				box-shadow: none;
+				color: #888;
+
+				i {
+					margin-right: 0;
+				}
+
+				&:after {
+					display: none;
+				}
+
+				&:focus {
+					box-shadow: none;
+					outline: none;
+				}
+			}
+
+			// custom toggler
+			.btn.dropdown-toggle {
+				border: none;
+				background: transparent;
+				box-shadow: none;
+				padding: 0;
+				width: 20px;
+				height: 20px;
+				right: 8px;
+				top: 8px;
+
+				&.mobile-menu span {
+					background-color: #888;
+					height: 2px;
+					border-radius: 5px;
+
+					&:after,
+					&:before {
+						border-radius: 5px;
+						height: 2px;
+						background-color: #888;
+					}
+				}
+			}
+
+			.nav-pills {
+				padding: 0;
+				box-shadow: none;
+				background: transparent;
+			}
+		}
+	}
+
+	.card-footer {
+		color: #283c50;
+		transition: box-shadow 0.2s ease-in-out;
+		border-top: 1px solid $border-color;
+		background-color: transparent;
+	}
+
+	.card-header-action,
+	.card-header-btn {
+		gap: 5px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.card-header-btn {
+		opacity: 0;
+		visibility: hidden;
+		transform: translateX(30px);
+		transition: all 0.3s ease;
+	}
+
+	&.card-expand {
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		z-index: 99999;
+		position: fixed !important;
+		overflow-x: hidden;
+		overflow-y: scroll;
+		border-radius: 0;
+		height: calc(100% - 0px);
+		transition: all 0.3s ease;
+
+		&.card-loading {
+			position: absolute;
+		}
+
+		&.card-expand .card-body {
+			flex: 1 0 0;
+		}
+	}
+
+	.card-loader {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		z-index: 1030;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		border-radius: $radius-md;
+		background: rgba(255, 255, 255, 0.9);
+	}
+
+	&.card-loading .card-header {
+		position: relative;
+		z-index: 1030;
+	}
+
+	&.card-loading,
+	&.card-loading .card-body {
+		position: relative;
+	}
+
+	.spinner-border {
+		--bs-spinner-width: 1rem;
+		--bs-spinner-height: 1rem;
+		--bs-spinner-border-width: 1px;
+	}
+
+	@each $color,
+	$value in $theme-colors {
+		&.bg-#{$color} {
+			box-shadow: 0 10px 10px -1px transparentize($value, 0.7);
+		}
+	}
+}
+
+// Card css end

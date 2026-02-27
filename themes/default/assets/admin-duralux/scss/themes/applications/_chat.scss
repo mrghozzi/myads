@@ -1,0 +1,211 @@
+/*
+<--!----------------------------------------------------------------!-->
+<--! Chat !-->
+<--!----------------------------------------------------------------!-->
+*/
+.chatting-setting {
+	.chatting-setting-tabs {
+		a {
+			&.nav-link {
+				&:hover,
+				&.active {
+					color: $primary;
+					background-color: lighten($primary, 35);
+				}
+			}
+		}
+	}
+}
+.text.typing {
+	.wave {
+		.dot {
+			width: 2px;
+			height: 2px;
+			border-radius: 100%;
+			display: inline-block;
+			background-color: $success;
+			animation: wave 1.3s linear infinite;
+			&:first-of-type {
+				margin-left: 3px;
+			}
+			&:nth-child(2) {
+				-webkit-animation-delay: -1.1s;
+				-moz-animation-delay: -1.1s;
+				-o-animation-delay: -1.1s;
+				animation-delay: -1.1s;
+			}
+			&:nth-child(3) {
+				-webkit-animation-delay: -0.9s;
+				-moz-animation-delay: -0.9s;
+				-o-animation-delay: -0.9s;
+				animation-delay: -0.9s;
+			}
+		}
+	}
+	@-webkit-keyframes wave {
+		0%,
+		100%,
+		60% {
+			-webkit-transform: initial;
+			transform: initial;
+		}
+		30% {
+			-webkit-transform: translateY(-5px);
+			transform: translateY(-5px);
+		}
+	}
+	@-moz-keyframes wave {
+		0%,
+		100%,
+		60% {
+			-moz-transform: initial;
+			transform: initial;
+		}
+		30% {
+			-moz-transform: translateY(-5px);
+			transform: translateY(-5px);
+		}
+	}
+	@-o-keyframes wave {
+		0%,
+		100%,
+		60% {
+			-o-transform: initial;
+			transform: initial;
+		}
+		30% {
+			-o-transform: translateY(-5px);
+			transform: translateY(-5px);
+		}
+	}
+	@keyframes wave {
+		0%,
+		100%,
+		60% {
+			-webkit-transform: initial;
+			-moz-transform: initial;
+			-o-transform: initial;
+			transform: initial;
+		}
+		30% {
+			-webkit-transform: translateY(-5px);
+			-moz-transform: translateY(-5px);
+			-o-transform: translateY(-5px);
+			transform: translateY(-5px);
+		}
+	}
+}
+.calling-modal-screen {
+	.chat-calling-content {
+		--bs-modal-bg: transparent !important;
+		background-image: radial-gradient(circle, $white, #f4f6fb, #e7eef6, #d7e7f0, #c6e0e7);
+		.voice-call-content {
+			height: calc(100% - 170px);
+		}
+		.video-call-content {
+			height: calc(100% - 170px);
+			video {
+				top: 0;
+				left: 0;
+				right: 0;
+				bottom: 0;
+				width: 100%;
+				height: 100%;
+				object-fit: cover;
+				position: absolute;
+			}
+		}
+	}
+	.chat-calling-text-message-sidebar {
+		top: 0;
+		bottom: 0;
+		opacity: 0;
+		right: -50%;
+		width: 0px;
+		max-width: 0px;
+		min-width: 0px;
+		visibility: hidden;
+		background-color: $white;
+		transition: all 0.3s ease;
+		animation: fadeIn 0.5s ease;
+		height: calc(100% - 170px) !important;
+		&.active {
+			right: 0;
+			opacity: 1;
+			width: 400px;
+			max-width: 400px;
+			min-width: 400px;
+			visibility: visible;
+			.in-call-messages-items {
+				height: calc(100% - -25px) !important;
+			}
+		}
+		.in-call-messages-items {
+			height: calc(100% - 135px) !important;
+		}
+	}
+}
+.chat-calling-info {
+	.timetracker,
+	.ringing {
+		display: none;
+		opacity: 0;
+		visibility: hidden;
+		transition: visibility 700ms;
+	}
+	.timetracker.active {
+		display: block;
+		opacity: 1;
+		visibility: visible;
+	}
+	.ringing.active {
+		display: block;
+		opacity: 1;
+		visibility: visible;
+	}
+}
+.animation-infinite {
+	-webkit-animation: animation-infinite 2s infinite;
+	-moz-animation: animation-infinite 2s infinite;
+	-o-animation: animation-infinite 2s infinite;
+	animation: animation-infinite 2s infinite;
+	@-webkit-keyframes animation-infinite {
+		0% {
+			box-shadow: 0 0 0 0 $gray-300;
+		}
+		100% {
+			box-shadow: 0 0 0 25px transparent;
+		}
+	}
+	@-moz-keyframes animation-infinite {
+		0% {
+			box-shadow: 0 0 0 0 $gray-300;
+		}
+		100% {
+			box-shadow: 0 0 0 25px transparent;
+		}
+	}
+	@-o-keyframes animation-infinite {
+		0% {
+			box-shadow: 0 0 0 0 $gray-300;
+		}
+		100% {
+			box-shadow: 0 0 0 25px transparent;
+		}
+	}
+	@keyframes animation-infinite {
+		0% {
+			box-shadow: 0 0 0 0 $gray-300;
+		}
+		100% {
+			box-shadow: 0 0 0 25px transparent;
+		}
+	}
+}
+.calling-receiver-action {
+	.avatar-text {
+		&:hover {
+			color: $white !important;
+		}
+	}
+}

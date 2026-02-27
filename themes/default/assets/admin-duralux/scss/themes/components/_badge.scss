@@ -1,0 +1,18 @@
+/*
+<--!----------------------------------------------------------------!-->
+<--! Badge SCSS Start !-->
+<--!----------------------------------------------------------------!-->
+*/
+.badge {
+	font-size: $font-11;
+	font-weight: $font-600;
+	padding: 5px 6px;
+	border-radius: 3px;
+	@each $color, $value in $theme-colors {
+		&.bg-light-#{$color} {
+			color: $value;
+			background: shift-color($value, $soft-bg-level);
+			border-color: shift-color($value, $soft-bg-level);
+		}
+	}
+}

@@ -1,0 +1,117 @@
+/*
+<--!----------------------------------------------------------------!-->
+<--! Font Family Style Update !-->
+<--!----------------------------------------------------------------!-->
+*/
+html {
+	&.app-font-family-lato {
+		body {
+			font-family: $font-lato;
+		}
+	}
+	&.app-font-family-rubik {
+		body {
+			font-family: $font-rubik;
+		}
+	}
+	&.app-font-family-inter {
+		body {
+			font-family: $font-inter;
+		}
+	}
+	&.app-font-family-cinzel {
+		body {
+			font-family: $font-cinzel;
+		}
+	}
+	&.app-font-family-nunito {
+		body {
+			font-family: $font-nunito;
+		}
+	}
+	&.app-font-family-roboto {
+		body {
+			font-family: $font-roboto;
+		}
+	}
+	&.app-font-family-ubuntu {
+		body {
+			font-family: $font-ubuntu;
+		}
+	}
+	&.app-font-family-poppins {
+		body {
+			font-family: $font-poppins;
+		}
+	}
+	&.app-font-family-raleway {
+		body {
+			font-family: $font-raleway;
+		}
+	}
+	&.app-font-family-system-ui {
+		body {
+			font-family: $font-system-ui;
+		}
+	}
+	&.app-font-family-noto-sans {
+		body {
+			font-family: $font-noto-sans;
+		}
+	}
+	&.app-font-family-fira-sans {
+		body {
+			font-family: $font-fira-sans;
+		}
+	}
+	&.app-font-family-work-sans {
+		body {
+			font-family: $font-work-sans;
+		}
+	}
+	&.app-font-family-open-sans {
+		body {
+			font-family: $font-open-sans;
+		}
+	}
+	&.app-font-family-maven-pro {
+		body {
+			font-family: $font-maven-pro;
+		}
+	}
+	&.app-font-family-quicksand {
+		body {
+			font-family: $font-quicksand;
+		}
+	}
+	&.app-font-family-montserrat {
+		body {
+			font-family: $font-montserrat;
+		}
+	}
+	&.app-font-family-josefin-sans {
+		body {
+			font-family: $font-josefin-sans;
+		}
+	}
+	&.app-font-family-ibm-plex-sans {
+		body {
+			font-family: $font-ibm-plex-sans;
+		}
+	}
+	&.app-font-family-source-sans-pro {
+		body {
+			font-family: $font-source-sans-pro;
+		}
+	}
+	&.app-font-family-montserrat-alt {
+		body {
+			font-family: $font-montserrat-alt;
+		}
+	}
+	&.app-font-family-roboto-slab {
+		body {
+			font-family: $font-roboto-slab;
+		}
+	}
+}

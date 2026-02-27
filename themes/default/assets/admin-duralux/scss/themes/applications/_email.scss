@@ -1,0 +1,102 @@
+/*
+<--!----------------------------------------------------------------!-->
+<--! Email !-->
+<--!----------------------------------------------------------------!-->
+*/
+.nxl-container {
+	&.apps-email {
+		.nxl-content {
+			.main-content {
+				.content-area {
+					.content-area-header {
+						.page-header-left {
+							.action-list-items {
+								display: none;
+								transition: all 0.3s ease;
+							}
+							&.show-action {
+								.action-list-items {
+									gap: 10px;
+									display: flex;
+									transition: all 0.3s ease;
+								}
+							}
+						}
+					}
+					.content-area-body {
+						.single-items {
+							cursor: pointer;
+							padding: 10px 5px;
+							display: flex;
+							align-items: center;
+							background-color: $white;
+							border-bottom: 1px solid $border-color;
+							.item-meta {
+								padding: 12px 25px;
+							}
+							.item-info {
+								cursor: pointer;
+								padding: 12px 30px;
+							}
+							.item-data {
+								padding: 12px 25px 15px 0;
+							}
+						}
+					}
+					.items-details {
+						left: 0;
+						top: 1px;
+						bottom: 0;
+						right: -100%;
+						opacity: 0;
+						z-index: 1025;
+						position: absolute;
+						visibility: hidden;
+						background-color: #f3f4f6;
+						transition: all 0.3s ease;
+						transform: translateX(100%);
+						.items-details-header {
+							height: 74px;
+							padding: 13px 25px;
+							display: flex;
+							align-items: center;
+							justify-content: space-between;
+							background-color: $white;
+							border-bottom: 1px solid $border-color;
+						}
+						.items-details-body {
+							margin: 25px 25px;
+							.accordion {
+								.accordion-item {
+									.accordion-header {
+										.accordion-button {
+											background-color: transparent !important;
+										}
+									}
+								}
+							}
+						}
+						.items-details-footer {
+							background-color: $white;
+						}
+					}
+					&.items-details-active {
+						.items-details {
+							left: 0;
+							top: 1px;
+							right: 0;
+							bottom: 0;
+							opacity: 1;
+							visibility: visible;
+							transition: all 0.3s ease;
+							transform: translateX(0);
+						}
+						.content-area-body {
+							display: none;
+						}
+					}
+				}
+			}
+		}
+	}
+}

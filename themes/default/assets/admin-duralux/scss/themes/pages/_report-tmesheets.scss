@@ -1,0 +1,35 @@
+/*
+<--!----------------------------------------------------------------!-->
+<--! Timesheets Report !-->
+<--!----------------------------------------------------------------!-->
+*/
+.times-progress-chart,
+.tasks-progress-chart,
+.projects-progress-chart {
+	.circle-progress {
+		width: 200px;
+		height: 200px;
+	}
+	.circle-progress-value {
+		stroke-width: 6px;
+		stroke-linecap: round;
+	}
+	.circle-progress-circle {
+		stroke-width: 4px;
+	}
+}
+.times-progress-chart {
+	.circle-progress-value {
+		stroke: $danger;
+	}
+}
+.tasks-progress-chart {
+	.circle-progress-value {
+		stroke: $primary;
+	}
+}
+.projects-progress-chart {
+	.circle-progress-value {
+		stroke: $warning;
+	}
+}

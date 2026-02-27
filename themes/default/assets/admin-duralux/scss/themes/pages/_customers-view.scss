@@ -1,0 +1,25 @@
+/*
+<--!----------------------------------------------------------------!-->
+<--! Customers View !-->
+<--!----------------------------------------------------------------!-->
+*/
+.customers-nav-tabs {
+	margin-bottom: -1px;
+	.nav-item {
+		.nav-link {
+			border: none;
+			padding: 20px 30px;
+			color: $brand-dark;
+			font-weight: $font-600;
+			border-radius: $radius-none;
+			border-bottom: 3px solid transparent;
+			transition: all 0.3s ease;
+			&.active {
+				color: $primary;
+				border-bottom: 3px solid $primary;
+				background-color: $bg-soft-primary;
+				transition: all 0.3s ease;
+			}
+		}
+	}
+}

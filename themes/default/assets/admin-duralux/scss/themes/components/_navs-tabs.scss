@@ -1,0 +1,30 @@
+/*
+<--!----------------------------------------------------------------!-->
+<--! Navs-Tabs !-->
+<--!----------------------------------------------------------------!-->
+*/
+.nav-tabs-wrapper {
+	height: 65px;
+	display: flex;
+	justify-content: space-between;
+	.nav-tabs-custom-style {
+		border-bottom: none;
+		.nav-item {
+			.nav-link {
+				padding: 20px 25px;
+				color: $brand-dark;
+				font-weight: $font-600;
+				border-radius: $radius-none;
+				border-bottom: 3px solid transparent;
+				border-top: none;
+				&.hover,
+				&.active {
+					color: $primary;
+					border-bottom: 3px solid $primary;
+					background-color: $bg-soft-primary;
+					transition: all 0.3s ease;
+				}
+			}
+		}
+	}
+}

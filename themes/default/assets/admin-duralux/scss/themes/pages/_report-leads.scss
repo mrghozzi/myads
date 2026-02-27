@@ -1,0 +1,40 @@
+/*
+<--!----------------------------------------------------------------!-->
+<--! Leads Report !-->
+<--!----------------------------------------------------------------!-->
+*/
+.lead-progress-1,
+.lead-progress-2,
+.lead-progress-3 {
+	.circle-progress-value {
+		stroke-width: 6px;
+		stroke-linecap: round;
+	}
+	.circle-progress-circle {
+		stroke-width: 3px;
+	}
+}
+.lead-progress-1 {
+	.circle-progress-value {
+		stroke: $primary;
+	}
+	.circle-progress-circle {
+		stroke: lighten($primary, 42);
+	}
+}
+.lead-progress-2 {
+	.circle-progress-value {
+		stroke: $success;
+	}
+	.circle-progress-circle {
+		stroke: lighten($success, 45);
+	}
+}
+.lead-progress-3 {
+	.circle-progress-value {
+		stroke: $warning;
+	}
+	.circle-progress-circle {
+		stroke: lighten($warning, 35);
+	}
+}

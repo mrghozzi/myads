@@ -1,0 +1,43 @@
+/*
+<--!----------------------------------------------------------------!-->
+<--! Accordion !-->
+<--!----------------------------------------------------------------!-->
+*/
+.accordion {
+	.accordion-item {
+		background-color: $white;
+		border-color: $border-color;
+		border-radius: $radius-sm;
+		.accordion-header {
+			.accordion-button {
+				z-index: 0;
+				color: $dark;
+				font-size: $font-14;
+				font-weight: $font-700;
+				border-color: $border-color;
+				&:after {
+					color: $dark;
+					width: 10px;
+					height: 10px;
+					background-size: 10px;
+					filter: invert(0);
+				}
+				&:not(.collapsed) {
+					box-shadow: none;
+					background-color: $gray-200;
+					&:after {
+						margin-right: 0 !important;
+					}
+				}
+			}
+		}
+		.accordion-body {
+			color: $brand-body;
+			padding: 25px 25px;
+			border-color: $border-color;
+		}
+		.accordion-footer {
+			border-color: $border-color;
+		}
+	}
+}

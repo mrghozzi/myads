@@ -1,0 +1,149 @@
+/*
+<--!----------------------------------------------------------------!-->
+<--! Widgets Miscellaneous !-->
+<--!----------------------------------------------------------------!-->
+*/
+.times-progress-chart,
+.tasks-progress-chart,
+.projects-progress-chart {
+	.circle-progress {
+		width: 200px;
+		height: 200px;
+	}
+	.circle-progress-value {
+		stroke-width: 6px;
+		stroke-linecap: round;
+	}
+	.circle-progress-circle {
+		stroke-width: 4px;
+	}
+}
+.times-progress-chart {
+	.circle-progress-value {
+		stroke: $danger;
+	}
+}
+.tasks-progress-chart {
+	.circle-progress-value {
+		stroke: $primary;
+	}
+}
+.projects-progress-chart {
+	.circle-progress-value {
+		stroke: $warning;
+	}
+}
+
+.goal-progress-1,
+.goal-progress-2,
+.goal-progress-3,
+.goal-progress-4 {
+	.circle-progress {
+		width: 80px;
+		height: 80px;
+	}
+	.circle-progress-value {
+		stroke-width: 6px;
+		stroke-linecap: round;
+	}
+	.circle-progress-circle {
+		stroke-width: 5px;
+	}
+}
+
+.project-progress-1,
+.project-progress-2,
+.project-progress-3,
+.project-progress-4 {
+	.circle-progress {
+		width: 65px;
+		height: 65px;
+	}
+	.circle-progress-value {
+		stroke-width: 8px;
+		stroke-linecap: round;
+	}
+	.circle-progress-circle {
+		stroke-width: 5px;
+	}
+}
+.team-progress-1,
+.team-progress-2,
+.team-progress-3,
+.team-progress-4 {
+	.circle-progress {
+		width: 50px;
+		height: 50px;
+	}
+	.circle-progress-value {
+		stroke-width: 6px;
+		stroke-linecap: round;
+	}
+	.circle-progress-circle {
+		stroke-width: 3px;
+	}
+	.circle-progress-text {
+		font-size: 24px;
+	}
+}
+
+.team-progress-1,
+.goal-progress-1,
+.project-progress-1 {
+	.circle-progress-value {
+		stroke: $danger;
+	}
+}
+
+.team-progress-2,
+.goal-progress-2,
+.project-progress-2 {
+	.circle-progress-value {
+		stroke: $primary;
+	}
+}
+
+.team-progress-3,
+.goal-progress-3,
+.project-progress-3 {
+	.circle-progress-value {
+		stroke: $warning;
+	}
+}
+
+.team-progress-4,
+.goal-progress-4,
+.project-progress-4 {
+	.circle-progress-value {
+		stroke: $success;
+	}
+}
+
+.project-mini-card-badge {
+	position: absolute;
+	top: 45px;
+	left: -30px;
+	transform: rotate(270deg);
+}
+
+.goal-progress {
+	.circle-progress {
+		width: 195px;
+		height: 195px;
+	}
+	.circle-progress-value {
+		stroke-width: 5px;
+		stroke: $primary;
+		stroke-linecap: round;
+	}
+	.circle-progress-circle {
+		stroke: $white;
+		stroke-width: 10px;
+		fill: $bg-soft-primary;
+	}
+	.circle-progress-text {
+		fill: $brand-dark;
+		font-size: $font-13;
+		font-weight: $font-700;
+	}
+}

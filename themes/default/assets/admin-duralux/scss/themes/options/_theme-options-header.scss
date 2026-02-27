@@ -1,0 +1,73 @@
+/*
+<--!----------------------------------------------------------------!-->
+<--! Header Dark !-->
+<--!----------------------------------------------------------------!-->
+*/
+
+html {
+	&.app-header-dark {
+		.nxl-navigation {
+			.m-header {
+				background: $navigation-background;
+				border-bottom: 1px solid $header-border-color;
+				border-right: 1px solid $navigation-border-color;
+				.logo-lg {
+					filter: invert(1);
+				}
+			}
+		}
+		.nxl-header {
+			color: $white;
+			background: $header-background;
+			border-bottom: 1px solid $header-border-color;
+			.header-wrapper {
+				.hamburger-inner {
+					background-color: $white;
+					&:after,
+					&:before {						
+						background-color: $white;
+					}
+				}
+				.nxl-navigation-toggle {
+					a#menu-mini-button,
+					a#menu-expend-button {
+						color: $white;
+					}			
+				}
+				.nxl-lavel-mega-menu-toggle {
+					a#nxl-lavel-mega-menu-open {
+						color: $white;
+					}
+				}
+				.nxl-head-link {
+					color: $white;
+					&:focus,
+					&:hover,
+					&:active,
+					&.active {
+						color: $primary;
+						background-color: $dark-theme-color-hover !important;
+					}
+				}
+				.nxl-lavel-mega-menu {
+					.nxl-lavel-mega-menu-wrapper {
+						.nxl-lavel-menu {
+							.avatar-image,
+							.avatar-text {
+								border-color: $header-border-color;
+							}
+						}
+						.nxl-mega-menu {
+							.btn-light,
+							.btn-light-brand {
+								color: $white !important;
+								border-color: $header-border-color !important;
+								background-color: $dark-theme-color-hover !important;
+							}
+						}
+					}
+				}				
+			}
+		}
+	}
+}

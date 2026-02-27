@@ -1,0 +1,129 @@
+/*
+<--!----------------------------------------------------------------!-->
+<--! Notes !-->
+<--!----------------------------------------------------------------!-->
+*/
+.nxl-container {
+	&.apps-notes {
+		.nxl-content {
+			.main-content {
+				.note-has-grid {
+					.nav-link {
+						padding: 10px 15px;
+					}
+					.single-note-item {
+						.card {
+							.note-title {
+								font-size: $font-15;
+								font-weight: $font-700;
+							}
+							.side-stick {
+								left: 0;
+								top: 20px;
+								width: 2px;
+								height: 40px;
+								position: absolute;
+								background-color: rgba(82, 95, 127, 0.5);
+							}
+						}
+						&.all-category .point {
+							color: $dark;
+						}
+						&.note-favourite {
+							.favourite-note {
+								color: $warning;
+							}
+						}
+						&.note-tasks,
+						&.note-works,
+						&.note-social,
+						&.note-archive,
+						&.note-priority,
+						&.note-personal,
+						&.note-business,
+						&.note-important {
+							.category {
+								.category-tasks,
+								.category-works,
+								.category-social,
+								.category-archive,
+								.category-priority,
+								.category-personal,
+								.category-business,
+								.category-important {
+									display: flex;
+									align-items: center;
+									justify-content: center;
+								}
+							}
+						}
+						&.note-tasks {
+							.point {
+								color: $danger;
+							}
+							.side-stick {
+								background-color: $danger;
+							}
+						}
+						&.note-works {
+							.point {
+								color: $primary;
+							}
+							.side-stick {
+								background-color: $primary;
+							}
+						}
+						&.note-social {
+							.point {
+								color: $info;
+							}
+							.side-stick {
+								background-color: $info;
+							}
+						}
+						&.note-archive {
+							.point {
+								color: $dark;
+							}
+							.side-stick {
+								background-color: $dark;
+							}
+						}
+						&.note-priority {
+							.point {
+								color: $danger;
+							}
+							.side-stick {
+								background-color: $danger;
+							}
+						}
+						&.note-personal {
+							.point {
+								color: $primary;
+							}
+							.side-stick {
+								background-color: $primary;
+							}
+						}
+						&.note-business {
+							.point {
+								color: $warning;
+							}
+							.side-stick {
+								background-color: $warning;
+							}
+						}
+						&.note-important {
+							.point {
+								color: $success;
+							}
+							.side-stick {
+								background-color: $success;
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+}
