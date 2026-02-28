@@ -42,9 +42,13 @@ class AdminController extends Controller
         $currentVersion = Option::where('name', 'version')->value('o_valuer') ?? '4.0.0';
         $latestVersion = Cache::remember('latest_version', 3600, function () {
             try {
-                $response = Http::timeout(5)->get('https://github.com/mrghozzi/myads_check_updates/raw/main/latest_version.txt');
+                $response = Http::withHeaders([
+                    'User-Agent' => 'MyAds-Updater/1.0',
+                    'Accept'     => 'application/vnd.github.v3+json',
+                ])->timeout(5)->get('https://api.github.com/repos/mrghozzi/myads/releases/latest');
                 if ($response->successful()) {
-                    return trim(strip_tags($response->body()));
+                    $data = $response->json();
+                    return ltrim($data['tag_name'] ?? '', 'v');
                 }
             } catch (\Exception $e) {
                 return null;
