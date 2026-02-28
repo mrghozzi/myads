@@ -287,6 +287,9 @@
     <script src="{{ theme_asset('admin-duralux/vendors/js/vendors.min.js') }}"></script>
     <script src="{{ theme_asset('admin-duralux/js/common-init.min.js') }}"></script>
     <script src="{{ theme_asset('admin-duralux/js/theme-customizer-init.min.js') }}"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    @stack('scripts')
     <script>
         (function() {
             function safeGet(key) {

@@ -39,13 +39,25 @@ class AdminController extends Controller
     public function index()
     {
         // Version Check
-        $currentVersion = Option::where('name', 'version')->value('o_valuer') ?? '4.0.0';
+        $currentVersion = \App\Http\Controllers\AdminUpdatesController::CURRENT_VERSION;
+        
+        // Sync version in DB (optional but good for consistency)
+        try {
+            $versionParts = explode('.', $currentVersion);
+            $versionName = implode('-', $versionParts);
+            $dbVersion = Option::where('o_type', 'version')->first();
+            if ($dbVersion && $dbVersion->o_valuer != $currentVersion) {
+                $dbVersion->update(['o_valuer' => $currentVersion, 'name' => $versionName]);
+            }
+        } catch (\Exception $e) {}
+
         $latestVersion = Cache::remember('latest_version', 3600, function () {
             try {
                 $response = Http::withHeaders([
                     'User-Agent' => 'MyAds-Updater/1.0',
                     'Accept'     => 'application/vnd.github.v3+json',
                 ])->timeout(5)->get('https://api.github.com/repos/mrghozzi/myads/releases/latest');
+                
                 if ($response->successful()) {
                     $data = $response->json();
                     return ltrim($data['tag_name'] ?? '', 'v');
@@ -88,8 +100,36 @@ class AdminController extends Controller
             'last_user' => User::orderBy('id', 'desc')->first(),
             'last_post' => Status::with('user')->orderBy('id', 'desc')->first(),
         ];
+
+        // Chart Data for Dashboard
+        $chartData = [
+            'distribution' => [
+                'labels' => [
+                    __('messages.bannads'),
+                    __('messages.textads'),
+                    __('messages.exvisit'),
+                ],
+                'data' => [
+                    $stats['banners']['total'],
+                    $stats['links']['total'],
+                    $stats['visits']['total'],
+                ],
+            ],
+            'engagement' => [
+                'labels' => [
+                    __('messages.bannads') . ' ' . __('messages.Views'),
+                    __('messages.bannads') . ' ' . __('messages.clicks'),
+                    __('messages.textads') . ' ' . __('messages.clicks'),
+                ],
+                'data' => [
+                    $stats['banners']['views'],
+                    $stats['banners']['clicks'],
+                    $stats['links']['clicks'],
+                ],
+            ],
+        ];
         
-        return view('theme::admin.index', compact('stats', 'currentVersion', 'latestVersion'));
+        return view('theme::admin.index', compact('stats', 'currentVersion', 'latestVersion', 'chartData'));
     }
 
     public function settings()
