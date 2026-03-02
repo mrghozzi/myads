@@ -200,6 +200,7 @@ return array (
   'notifications' => 'Notificaciones',
   'info' => 'Info',
   'notifications_marked_read' => 'Las notificaciones se marcan como leídas cuando se ven.',
+  'mark_all_read' => 'Mark all as read',
   'no_notifications' => 'No hay notificaciones nuevas.',
   'member_profile' => 'Perfil del miembro',
   'edit_profile' => 'Editar perfil',

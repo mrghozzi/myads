@@ -200,6 +200,7 @@ return array (
   'notifications' => 'Benachrichtigungen',
   'info' => 'Info',
   'notifications_marked_read' => 'Benachrichtigungen werden beim Ansehen als gelesen markiert.',
+  'mark_all_read' => 'Mark all as read',
   'no_notifications' => 'Keine neuen Benachrichtigungen.',
   'member_profile' => 'Mitgliederprofil',
   'edit_profile' => 'Profil bearbeiten',

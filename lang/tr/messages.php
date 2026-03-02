@@ -200,6 +200,7 @@ return array (
   'notifications' => 'Bildirimler',
   'info' => 'Bilgi',
   'notifications_marked_read' => 'Bildirimler görüntülendiğinde okundu olarak işaretlenir.',
+  'mark_all_read' => 'Mark all as read',
   'no_notifications' => 'Yeni bildirim yok.',
   'member_profile' => 'Üye Profili',
   'edit_profile' => 'Profili Düzenle',

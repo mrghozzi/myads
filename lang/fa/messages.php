@@ -200,6 +200,7 @@ return array (
   'notifications' => 'اعلان‌ها',
   'info' => 'اطلاعات',
   'notifications_marked_read' => 'اعلان‌ها هنگام مشاهده به عنوان خوانده شده علامت‌گذاری می‌شوند.',
+  'mark_all_read' => 'Mark all as read',
   'no_notifications' => 'اعلان جدیدی وجود ندارد.',
   'member_profile' => 'پروفایل عضو',
   'edit_profile' => 'ویرایش پروفایل',

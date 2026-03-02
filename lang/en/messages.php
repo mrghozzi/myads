@@ -200,6 +200,7 @@ return [
     'notifications' => 'Notifications',
     'info' => 'Info',
     'notifications_marked_read' => 'Notifications are marked as read when viewed.',
+    'mark_all_read' => 'Mark all as read',
     'no_notifications' => 'No new notifications.',
     'member_profile' => 'Member Profile',
     'edit_profile' => 'Edit Profile',

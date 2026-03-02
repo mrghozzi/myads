@@ -36,4 +36,18 @@ class NotificationController extends Controller
 
         return redirect()->route('notifications.index');
     }
+
+    public function markAllAsRead()
+    {
+        $user = Auth::user();
+        Notification::where('uid', $user->id)
+            ->whereIn('state', [0, 3])
+            ->update(['state' => 1]);
+
+        if (request()->ajax()) {
+            return response()->json(['success' => true]);
+        }
+
+        return back()->with('success', __('messages.all_marked_read') ?? 'All notifications marked as read.');
+    }
 }

@@ -78,6 +78,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/messages/{id}/load', [MessageController::class, 'load'])->name('messages.load');
     Route::post('/messages/{id}/send', [MessageController::class, 'send'])->name('messages.send');
     Route::get('/notification', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notification/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.mark_all_read');
     Route::get('/notif/{id}', [NotificationController::class, 'show'])->name('notifications.show');
 });
 

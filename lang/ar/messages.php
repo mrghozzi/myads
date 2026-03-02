@@ -691,6 +691,7 @@ return [
     'write_reply_placeholder' => 'اكتب ردك هنا...',
     'latest_news' => 'أحدث الأخبار',
     'back_to_news' => 'العودة للأخبار',
+    'mark_all_read' => 'Mark all as read',
     'no_notifications' => 'لا توجد إشعارات',
     'member_profile' => 'ملف العضو',
     'edit_profile' => 'تعديل الملف الشخصي',
