@@ -146,7 +146,7 @@
                         <div class="col-md-6 col-lg-3">
                             <div class="text-center p-3 rounded-3" style="background: linear-gradient(135deg, rgba(99,102,241,0.06), rgba(139,92,246,0.06));">
                                 <div class="mb-3" style="width: 56px; height: 56px; border-radius: 50%; margin: 0 auto; overflow: hidden; border: 3px solid rgba(99,102,241,0.2);">
-                                    <img src="{{ $stats['last_user'] ? $stats['last_user']->profile_photo_url : asset('themes/default/assets/images/avatar/1.png') }}" alt="" class="img-fluid" style="width:100%; height:100%; object-fit:cover;">
+                                    <img src="{{ $stats['last_user'] && $stats['last_user']->img ? asset($stats['last_user']->img) : asset('themes/default/assets/admin-duralux/images/avatar/undefined.png') }}" alt="" class="img-fluid" style="width:100%; height:100%; object-fit:cover;">
                                 </div>
                                 <h6 class="mb-1 fw-semibold text-muted" style="font-size: 0.75rem;">{{ __('messages.lastrm') }}</h6>
                                 @if($stats['last_user'])
