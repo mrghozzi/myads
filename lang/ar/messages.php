@@ -873,4 +873,6 @@ return [
     'manage_widgets' => 'إدارة الودجات',
     'visual_editor' => 'مرئي',
     'code_editor' => 'HTML',
+    'updated' => 'تم التحديث',
+    'unknown_user' => 'مستخدم غير معروف',
 ];

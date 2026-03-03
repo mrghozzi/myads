@@ -824,4 +824,6 @@ return [
     'manage_widgets' => 'Manage Widgets',
     'visual_editor' => 'Visual',
     'code_editor' => 'HTML',
+    'updated' => 'Updated',
+    'unknown_user' => 'Unknown User',
 ];

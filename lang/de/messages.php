@@ -752,5 +752,7 @@ return array (
   'zip_open_failed' => 'Update-Paket konnte nicht geöffnet werden.',
   'update_success' => 'System erfolgreich aktualisiert!',
   'update_failed' => 'Update fehlgeschlagen: ',
+  'updated' => 'Aktualisiert',
+  'unknown_user' => 'Unbekannter Benutzer',
 );
 

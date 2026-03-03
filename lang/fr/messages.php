@@ -753,4 +753,6 @@ return array (
   'zip_open_failed' => 'Échec de l\'ouverture du paquet.',
   'update_success' => 'Système mis à jour avec succès !',
   'update_failed' => 'La mise à jour a échoué : ',
+  'updated' => 'Mis à jour',
+  'unknown_user' => 'Utilisateur inconnu',
 );
