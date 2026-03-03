@@ -33,5 +33,6 @@ Thumbs.db
 
 /plugins/*
 /themes/*
+!/themes/default/
 /public/themes/*
 !/public/themes/default/
