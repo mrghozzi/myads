@@ -854,4 +854,23 @@ return [
     'no_products_found' => 'لم يتم العثور على منتجات',
     'products' => 'المنتجات',
     'all' => 'الكل',
+
+    // إدارة الصفحات
+    'page_content' => 'محتوى الصفحة',
+    'page_slug' => 'الرابط المختصر',
+    'slug_hint' => 'أحرف صغيرة وأرقام وشرطات فقط',
+    'page_created' => 'تم إنشاء الصفحة بنجاح',
+    'page_updated' => 'تم تحديث الصفحة بنجاح',
+    'page_deleted' => 'تم حذف الصفحة بنجاح',
+    'published' => 'منشورة',
+    'draft' => 'مسودة',
+    'confirm_delete_page' => 'هل أنت متأكد من حذف هذه الصفحة؟',
+    'show_left_widgets' => 'إظهار الودجات اليسرى',
+    'show_right_widgets' => 'إظهار الودجات اليمنى',
+    'page_left' => 'يسار الصفحة',
+    'page_right' => 'يمين الصفحة',
+    'page_widgets_hint' => 'قم بإدارة الودجات لهذه الصفحة من لوحة الودجات.',
+    'manage_widgets' => 'إدارة الودجات',
+    'visual_editor' => 'مرئي',
+    'code_editor' => 'HTML',
 ];

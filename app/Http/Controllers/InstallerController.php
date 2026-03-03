@@ -407,6 +407,26 @@ class InstallerController extends Controller
             }
 
             // ============================================================
+            // STEP 5.1: Create pages table if missing (v4.1 feature)
+            // ============================================================
+            if (!Schema::hasTable('pages')) {
+                Schema::create('pages', function (Blueprint $tbl) {
+                    $tbl->id();
+                    $tbl->string('title');
+                    $tbl->string('slug')->unique();
+                    $tbl->longText('content')->nullable();
+                    $tbl->enum('status', ['published', 'draft'])->default('published');
+                    $tbl->boolean('widget_left')->default(true);
+                    $tbl->boolean('widget_right')->default(true);
+                    $tbl->text('meta_description')->nullable();
+                    $tbl->text('meta_keywords')->nullable();
+                    $tbl->integer('order')->default(0);
+                    $tbl->timestamps();
+                });
+                $log[] = '✅ Created: pages';
+            }
+
+            // ============================================================
             // STEP 6: Run any pending Laravel migrations
             // ============================================================
             try {

@@ -31,6 +31,7 @@ use App\Models\Emoji;
 use App\Models\Menu;
 use App\Models\Option;
 use App\Models\Knowledgebase;
+use App\Models\Page;
 use App\Services\PluginManager;
 use App\Services\ThemeManager;
 
@@ -949,12 +950,12 @@ class AdminController extends Controller
     }
 
     // Widgets Management
-    public function widgets()
+
+    /**
+     * Get all widget places including dynamic pages.
+     */
+    private function getWidgetPlaces()
     {
-        $widgets = Option::where('o_type', 'box_widget')
-            ->orderBy('o_parent', 'asc')
-            ->orderBy('o_order', 'asc')
-            ->get();
         $places = [
             '1' => 'portal_left',
             '2' => 'portal_right',
@@ -963,8 +964,44 @@ class AdminController extends Controller
             '5' => 'directory_left',
             '6' => 'directory_right',
             '7' => 'profile_left',
-            '8' => 'profile_right'
+            '8' => 'profile_right',
         ];
+
+        // Add dynamic page places (safely handle missing table)
+        if (\Illuminate\Support\Facades\Schema::hasTable('pages')) {
+            $pages = Page::orderBy('id', 'asc')->get();
+            foreach ($pages as $page) {
+                $places[(string) $page->getLeftPlaceId()] = __('messages.page_left') . ': ' . $page->title;
+                $places[(string) $page->getRightPlaceId()] = __('messages.page_right') . ': ' . $page->title;
+            }
+        }
+
+        return $places;
+    }
+
+    /**
+     * Get all allowed place IDs as a comma-separated string.
+     */
+    private function getAllowedPlaceIds($type = 'widget_html')
+    {
+        $places = $this->getWidgetPlaces();
+        $ids = array_keys($places);
+
+        // For non-HTML widgets, exclude profile places (7, 8)
+        if ($type !== 'widget_html') {
+            $ids = array_filter($ids, fn($id) => !in_array((int)$id, [7, 8], true));
+        }
+
+        return $ids;
+    }
+
+    public function widgets()
+    {
+        $widgets = Option::where('o_type', 'box_widget')
+            ->orderBy('o_parent', 'asc')
+            ->orderBy('o_order', 'asc')
+            ->get();
+        $places = $this->getWidgetPlaces();
         return view('theme::admin.widgets', compact('widgets', 'places'));
     }
 
@@ -975,17 +1012,8 @@ class AdminController extends Controller
         if (!in_array($type, $allowedTypes, true)) {
             abort(404);
         }
-        $places = [
-            '1' => 'portal_left',
-            '2' => 'portal_right',
-            '3' => 'forum_left',
-            '4' => 'forum_right',
-            '5' => 'directory_left',
-            '6' => 'directory_right',
-            '7' => 'profile_left',
-            '8' => 'profile_right'
-        ];
-        $allowedPlaceIds = $type === 'widget_html' ? ['1','2','3','4','5','6','7','8'] : ['1','2','3','4','5','6'];
+        $places = $this->getWidgetPlaces();
+        $allowedPlaceIds = array_map('strval', $this->getAllowedPlaceIds($type));
         return view('theme::admin.widgets_form', [
             'mode' => 'create',
             'widget' => null,
@@ -998,17 +1026,8 @@ class AdminController extends Controller
     public function widgetEditForm($id)
     {
         $widget = Option::where('o_type', 'box_widget')->where('id', $id)->firstOrFail();
-        $places = [
-            '1' => 'portal_left',
-            '2' => 'portal_right',
-            '3' => 'forum_left',
-            '4' => 'forum_right',
-            '5' => 'directory_left',
-            '6' => 'directory_right',
-            '7' => 'profile_left',
-            '8' => 'profile_right'
-        ];
-        $allowedPlaceIds = $widget->o_mode === 'widget_html' ? ['1','2','3','4','5','6','7','8'] : ['1','2','3','4','5','6'];
+        $places = $this->getWidgetPlaces();
+        $allowedPlaceIds = array_map('strval', $this->getAllowedPlaceIds($widget->o_mode));
         return view('theme::admin.widgets_form', [
             'mode' => 'edit',
             'widget' => $widget,
@@ -1021,7 +1040,7 @@ class AdminController extends Controller
     public function storeWidget(Request $request)
     {
         $type = $request->input('o_mode');
-        $allowedPlaceIds = $type === 'widget_html' ? '1,2,3,4,5,6,7,8' : '1,2,3,4,5,6';
+        $allowedPlaceIds = implode(',', $this->getAllowedPlaceIds($type));
         $request->validate([
             'name' => 'required|string',
             'o_parent' => 'required|integer|in:' . $allowedPlaceIds,
@@ -1044,7 +1063,7 @@ class AdminController extends Controller
     public function updateWidget(Request $request, $id)
     {
         $widget = Option::where('o_type', 'box_widget')->where('id', $id)->firstOrFail();
-        $allowedPlaceIds = $widget->o_mode === 'widget_html' ? '1,2,3,4,5,6,7,8' : '1,2,3,4,5,6';
+        $allowedPlaceIds = implode(',', $this->getAllowedPlaceIds($widget->o_mode));
         $request->validate([
             'name' => 'required|string',
             'o_parent' => 'required|integer|in:' . $allowedPlaceIds,

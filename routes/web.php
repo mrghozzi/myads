@@ -15,6 +15,7 @@ use App\Http\Controllers\PortalController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AdminPageController;
 use App\Http\Controllers\ReactionController;
 use App\Http\Controllers\CommentController;
 use App\Http\Middleware\AdminMiddleware;
@@ -42,6 +43,9 @@ Route::get('password/reset', [App\Http\Controllers\Auth\ForgotPasswordController
 Route::post('password/email', [App\Http\Controllers\Auth\ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
 Route::get('password/reset/{token}', [App\Http\Controllers\Auth\ResetPasswordController::class, 'showResetForm'])->name('password.reset');
 Route::post('password/reset', [App\Http\Controllers\Auth\ResetPasswordController::class, 'reset'])->name('password.update');
+
+// Dynamic Pages
+Route::get('/page/{slug}', [App\Http\Controllers\PageController::class, 'show'])->name('page.show');
 
 // Legal Pages
 Route::get('/privacy', [App\Http\Controllers\PageController::class, 'privacy'])->name('privacy');
@@ -379,6 +383,15 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/themes', [AdminController::class, 'themes'])->name('admin.themes');
     Route::post('/themes/activate', [AdminController::class, 'activateTheme'])->name('admin.themes.activate');
     Route::get('/sitemap/generate', [\App\Http\Controllers\SitemapController::class, 'generate'])->name('admin.sitemap.generate');
+
+    // Pages
+    Route::get('/pages', [AdminPageController::class, 'index'])->name('admin.pages');
+    Route::get('/pages/create', [AdminPageController::class, 'create'])->name('admin.pages.create');
+    Route::post('/pages', [AdminPageController::class, 'store'])->name('admin.pages.store');
+    Route::get('/pages/{id}/edit', [AdminPageController::class, 'edit'])->name('admin.pages.edit');
+    Route::put('/pages/{id}', [AdminPageController::class, 'update'])->name('admin.pages.update');
+    Route::delete('/pages/{id}', [AdminPageController::class, 'destroy'])->name('admin.pages.delete');
+    Route::post('/pages/generate-slug', [AdminPageController::class, 'generateSlug'])->name('admin.pages.generate_slug');
 });
 
 Route::get('/sitemap.xml', [\App\Http\Controllers\SitemapController::class, 'generate'])->name('sitemap.xml');
