@@ -20,6 +20,9 @@ class Message extends Model
         'us_env', // Sender ID
         'us_rec', // Receiver ID
         'msg',
+        'attachment_path',
+        'attachment_name',
+        'attachment_size',
         'time',
         'state',
     ];
