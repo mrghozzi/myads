@@ -565,18 +565,18 @@ class InstallerController extends Controller
             // ============================================================
             $versionOption = \App\Models\Option::where('o_type', 'version')->first();
             if ($versionOption) {
-                $versionOption->update(['o_valuer' => '4.0.1']);
+                $versionOption->update(['o_valuer' => '4.0.0']);
             } else {
                 \App\Models\Option::create([
                     'name' => 'version',
-                    'o_valuer' => '4.0.1',
+                    'o_valuer' => '4.0.0',
                     'o_type' => 'version',
                     'o_parent' => 0,
                     'o_order' => 0,
                     'o_mode' => '0',
                 ]);
             }
-            $log[] = '✅ Version updated to 4.0.1';
+            $log[] = '✅ Version updated to 4.0.0';
 
             // ============================================================
             // STEP 12: Clear caches
@@ -590,7 +590,7 @@ class InstallerController extends Controller
             }
 
             // Mark as installed
-            File::put(storage_path('installed'), date('Y-m-d H:i:s') . ' (upgraded from v3.x to v4.0.1)');
+            File::put(storage_path('installed'), date('Y-m-d H:i:s') . ' (upgraded from v3.x to v4.0.0)');
 
             return redirect()->route('installer.finish')
                 ->with('success', 'Upgrade completed successfully!')
