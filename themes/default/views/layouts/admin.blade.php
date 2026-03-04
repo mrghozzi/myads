@@ -116,6 +116,8 @@
                         <ul class="nxl-submenu">
                             <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.knowledgebase') }}">{{ __('messages.knowledgebase') }}</a></li>
                             <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.forum_categories') }}">{{ __('messages.forum_cats') }}</a></li>
+                            <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.forum.settings') }}">{{ __('messages.forum_settings') }}</a></li>
+                            <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.forum.moderators') }}">{{ __('messages.forum_moderators') }}</a></li>
                             <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.directory_categories') }}">{{ __('messages.dir_cats') }}</a></li>
                             <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.emojis') }}">{{ __('messages.emojis') }}</a></li>
                             <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.news') }}">{{ __('messages.news_site') }}</a></li>

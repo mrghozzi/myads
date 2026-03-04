@@ -34,6 +34,34 @@
     </div>
 </div>
 
+@php
+    $showForumRoleBadges = (int) ($forumSettings['show_role_badges'] ?? 1) === 1;
+    $topicCategoryId = (int) $topic->cat;
+    $canEditTopic = auth()->check() && (
+        auth()->id() === (int) $topic->uid
+        || auth()->user()->canModerateForum('edit_topics', $topicCategoryId)
+    );
+    $canDeleteTopic = auth()->check() && (
+        auth()->id() === (int) $topic->uid
+        || auth()->user()->canModerateForum('delete_topics', $topicCategoryId)
+    );
+    $canPinTopic = auth()->check() && auth()->user()->canModerateForum('pin_topics', $topicCategoryId);
+    $canLockTopic = auth()->check() && auth()->user()->canModerateForum('lock_topics', $topicCategoryId);
+    $canCommentWhenLocked = auth()->check() && (
+        auth()->id() === (int) $topic->uid
+        || auth()->user()->canModerateForum('lock_topics', $topicCategoryId)
+    );
+@endphp
+
+<div class="section-header" style="margin-top: 12px;">
+    @if($topic->is_pinned)
+        <span class="badge bg-warning text-dark">{{ __('messages.pinned') }}</span>
+    @endif
+    @if($topic->is_locked)
+        <span class="badge bg-secondary">{{ __('messages.locked') }}</span>
+    @endif
+</div>
+
 <div class="grid grid post{{ $status->id }}">
     <div class="forum-content">
         <div class="forum-post-header">
@@ -54,9 +82,27 @@
                                         <svg class="post-settings-icon icon-more-dots"><use xlink:href="#svg-more-dots"></use></svg>
                                     </div>
                                     <div class="simple-dropdown widget-box-post-settings-dropdown" style="position: absolute; z-index: 9999; top: 30px; right: 9px; opacity: 0; visibility: hidden; transform: translate(0px, -20px); transition: transform 0.3s ease-in-out 0s, opacity 0.3s ease-in-out 0s, visibility 0.3s ease-in-out 0s;">
-                                        @if((Auth::check() && (Auth::id() == $topic->uid || Auth::id() == $status->uid)) || (Auth::check() && Auth::user()->isAdmin()))
+                                        @if($canEditTopic)
                                             <a class="simple-dropdown-link" href="{{ route('forum.edit', $topic->id) }}"><i class="fa fa-edit" aria-hidden="true"></i>&nbsp;{{ __('messages.edit') }}</a>
+                                        @endif
+                                        @if($canDeleteTopic)
                                             <p class="simple-dropdown-link post_delete{{ $status->id }}" onclick="deletePost({{ $topic->id }})"><i class="fa fa-trash" aria-hidden="true"></i>&nbsp;{{ __('messages.delete') }}</p>
+                                        @endif
+                                        @if($canPinTopic)
+                                            <form method="POST" action="{{ route('forum.pin', $topic->id) }}">
+                                                @csrf
+                                                <button type="submit" class="simple-dropdown-link" style="width:100%;text-align:left;border:0;background:transparent;">
+                                                    <i class="fa fa-thumb-tack" aria-hidden="true"></i>&nbsp;{{ $topic->is_pinned ? __('messages.unpin_topic') : __('messages.pin_topic') }}
+                                                </button>
+                                            </form>
+                                        @endif
+                                        @if($canLockTopic)
+                                            <form method="POST" action="{{ route('forum.lock', $topic->id) }}">
+                                                @csrf
+                                                <button type="submit" class="simple-dropdown-link" style="width:100%;text-align:left;border:0;background:transparent;">
+                                                    <i class="fa {{ $topic->is_locked ? 'fa-unlock' : 'fa-lock' }}" aria-hidden="true"></i>&nbsp;{{ $topic->is_locked ? __('messages.unlock_topic') : __('messages.lock_topic') }}
+                                                </button>
+                                            </form>
                                         @endif
                                         <p class="simple-dropdown-link post_report{{ $topic->id }}" onclick="reportPost({{ $topic->id }}, 2)"><i class="fa fa-flag" aria-hidden="true"></i>&nbsp;{{ __('messages.report') }}</p>
                                         <p class="simple-dropdown-link author_report{{ $topic->id }}" onclick="reportUser({{ $topic->uid }})"><i class="fa fa-flag" aria-hidden="true"></i>&nbsp;{{ __('messages.report') }} {{ __('messages.author') }}</p>
@@ -94,6 +140,9 @@
                         </a>
                         
                         <p class="forum-post-user-title"><a href="{{ route('profile.short', $topic->user->id) }}">{{ $topic->user->username }}</a></p>
+                        @if($showForumRoleBadges)
+                            <p class="forum-post-user-text">{{ $topic->user->forumRoleLabel($topicCategoryId) }}</p>
+                        @endif
                         <p class="forum-post-user-text"><a href="{{ route('profile.short', $topic->user->id) }}">@ {{ $topic->user->username }}</a></p>
                     </div>
                     @else
@@ -125,6 +174,23 @@
                                 <br><img src="{{ asset($topic->imageOption->o_valuer) }}" style="margin-top: 24px; width: 75%; height: auto; border-radius: 12px;">
                             @endif
                         </p>
+
+                        @if($topic->attachments->isNotEmpty())
+                            <div class="widget-box" style="margin-top: 12px; margin-bottom: 0;">
+                                <div class="widget-box-content">
+                                    <p class="bold" style="margin-bottom: 8px;">{{ __('messages.topic_attachments') }}</p>
+                                    @foreach($topic->attachments as $attachment)
+                                        <p style="margin-bottom: 6px;">
+                                            <a href="{{ route('forum.attachment.download', $attachment->id) }}">
+                                                <i class="fa fa-paperclip" aria-hidden="true"></i>
+                                                {{ $attachment->original_name }}
+                                            </a>
+                                            <span style="color:#7f85a3;font-size:12px;">({{ $attachment->human_size }})</span>
+                                        </p>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endif
                     </div>
                 </div>
                 <!-- /FORUM POST CONTENT -->
@@ -167,10 +233,12 @@
         </div>
     </div>
     
-    <div class="post-option sh_comment_t{{ $status->id }}" onclick="focusComment({{ $topic->id }})">
-        <svg class="post-option-icon icon-comment"><use xlink:href="#svg-comment"></use></svg>
-        <p class="post-option-text">{{ __('messages.comment') }}</p>
-    </div>
+    @if(!$topic->is_locked || $canCommentWhenLocked)
+        <div class="post-option sh_comment_t{{ $status->id }}" onclick="focusComment({{ $topic->id }})">
+            <svg class="post-option-icon icon-comment"><use xlink:href="#svg-comment"></use></svg>
+            <p class="post-option-text">{{ __('messages.comment') }}</p>
+        </div>
+    @endif
     @endauth
     
     <div class="post-option-wrap" style="position: relative;">
@@ -191,7 +259,15 @@
 </div>
 
 <div class="post-comment-list comment_2_{{ $topic->id }} post{{ $status->id }}">
-    @include('theme::partials.activity.comments', ['comments' => $topic->comments()->orderBy('id', 'desc')->get(), 'id' => $topic->id, 'type' => 'forum', 'limit' => 100])
+    @include('theme::partials.activity.comments', [
+        'comments' => $topic->comments()->orderBy('id', 'desc')->get(),
+        'id' => $topic->id,
+        'type' => 'forum',
+        'limit' => 100,
+        'hide_form' => $topic->is_locked && !$canCommentWhenLocked,
+        'locked_topic' => (bool) $topic->is_locked,
+        'forum_category_id' => $topicCategoryId
+    ])
 </div>
 
 <script>
@@ -233,10 +309,25 @@
                 comment: text
             })
         })
-        .then(response => response.text())
+        .then(async response => {
+            const contentType = response.headers.get('content-type') || '';
+            if (contentType.includes('application/json')) {
+                const data = await response.json();
+                if (!response.ok || data.error) {
+                    throw new Error(data.error || '{{ __('messages.error_prefix') }}');
+                }
+                return '';
+            }
+            return response.text();
+        })
         .then(html => {
-            document.querySelector('.comment_2_' + id).innerHTML = html;
-            initHexagons();
+            if (html) {
+                document.querySelector('.comment_2_' + id).innerHTML = html;
+                initHexagons();
+            }
+        })
+        .catch(error => {
+            alert(error.message);
         });
     }
 
@@ -260,7 +351,7 @@
             })
             .then(response => response.json())
             .then(data => {
-                if(data.success || data.action === 'deleted') {
+                if(data.success || data.action === 'deleted' || data.status === 'success') {
                     document.getElementById('comment_' + id).remove();
                 } else if(data.error) {
                     alert(data.error);

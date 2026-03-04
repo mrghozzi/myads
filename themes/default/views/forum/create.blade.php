@@ -15,7 +15,7 @@
             </div>
             <div class="modal-body">
                 <div class="more-grids">
-                    <form method="POST" action="{{ isset($topic) ? route('forum.update', $topic->id) : route('forum.store') }}">
+                    <form method="POST" action="{{ isset($topic) ? route('forum.update', $topic->id) : route('forum.store') }}" enctype="multipart/form-data">
                         @csrf
                         @if(isset($topic))
                             <input type="hidden" name="id" value="{{ $topic->id }}">
@@ -63,6 +63,40 @@
                                     </div>
                                 </div>
                             </div>
+                        @endif
+
+                        @if((int) ($forumSettings['attachments_enabled'] ?? 1) === 1)
+                            <div class="form-row">
+                                <div class="form-item">
+                                    <label for="attachments">{{ __('messages.attachments') }}</label>
+                                    <input
+                                        type="file"
+                                        id="attachments"
+                                        name="attachments[]"
+                                        multiple
+                                        style="width: 100%;"
+                                        accept=".{{ str_replace(',', ',.', $forumSettings['allowed_attachment_extensions'] ?? '') }}"
+                                    >
+                                    <small style="display:block;color:#7f85a3;margin-top:4px;">
+                                        {{ __('messages.max_attachments_per_topic') }}: {{ $forumSettings['max_attachments_per_topic'] ?? 5 }} |
+                                        {{ __('messages.max_attachment_size') }}: {{ $forumSettings['max_attachment_size_kb'] ?? 10240 }} KB
+                                    </small>
+                                </div>
+                            </div>
+
+                            @if(isset($topic) && $topic->attachments && $topic->attachments->isNotEmpty())
+                                <div class="form-row">
+                                    <div class="form-item">
+                                        <p class="bold" style="margin-bottom: 8px;">{{ __('messages.current_attachments') }}</p>
+                                        @foreach($topic->attachments as $attachment)
+                                            <label style="display:block;margin-bottom:6px;">
+                                                <input type="checkbox" name="delete_attachments[]" value="{{ $attachment->id }}">
+                                                {{ __('messages.delete') }}: {{ $attachment->original_name }} ({{ $attachment->human_size }})
+                                            </label>
+                                        @endforeach
+                                    </div>
+                                </div>
+                            @endif
                         @endif
 
                         <hr />

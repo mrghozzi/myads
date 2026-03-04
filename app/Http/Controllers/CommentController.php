@@ -19,6 +19,9 @@ class CommentController extends Controller
         $id = $request->input('id');
         $type = $request->input('type'); // 'forum' or 'directory'
         $limit = $request->input('limit', 5);
+        $hide_form = false;
+        $locked_topic = false;
+        $forum_category_id = null;
 
         if (!$id || !$type) {
             return '';
@@ -26,6 +29,14 @@ class CommentController extends Controller
 
         $comments = [];
         if ($type == 'forum') {
+            $topic = ForumTopic::find($id);
+            if ($topic) {
+                $forum_category_id = (int) $topic->cat;
+                $locked_topic = (bool) $topic->is_locked;
+                $hide_form = $locked_topic
+                    && (!Auth::check() || !$this->canUserCommentLockedTopic(Auth::user(), $topic));
+            }
+
             $comments = ForumComment::where('tid', $id)
                 ->orderBy('id', 'desc')
                 ->limit($limit)
@@ -50,7 +61,7 @@ class CommentController extends Controller
         // If query is DESC, first result is newest.
         // Let's keep it DESC for now.
 
-        return view('theme::partials.activity.comments', compact('comments', 'id', 'type', 'limit'));
+        return view('theme::partials.activity.comments', compact('comments', 'id', 'type', 'limit', 'hide_form', 'locked_topic', 'forum_category_id'));
     }
 
     public function store(Request $request)
@@ -73,6 +84,22 @@ class CommentController extends Controller
         $ownerId = 0;
         $url = '';
         $logo = 'comment';
+        $topic = null;
+
+        if (!in_array($type, ['forum', 'directory', 'store'], true)) {
+            return response()->json(['error' => 'Invalid type'], 400);
+        }
+
+        if ($type === 'forum') {
+            $topic = ForumTopic::find($id);
+            if (!$topic) {
+                return response()->json(['error' => 'Topic not found'], 404);
+            }
+
+            if ($topic->is_locked && !$this->canUserCommentLockedTopic($user, $topic)) {
+                return response()->json(['error' => __('messages.topic_locked_for_comments')], 403);
+            }
+        }
 
         DB::beginTransaction();
         try {
@@ -83,12 +110,9 @@ class CommentController extends Controller
                     'txt' => $text,
                     'date' => $time
                 ]);
-                
-                $topic = ForumTopic::find($id);
-                if ($topic) {
-                    $ownerId = $topic->uid;
-                    $url = "/t" . $id; // Legacy URL format support (Root relative)
-                }
+
+                $ownerId = $topic->uid;
+                $url = "/t" . $id; // Legacy URL format support (Root relative)
 
             } elseif ($type == 'directory') {
                 $comment = Option::create([
@@ -176,51 +200,53 @@ class CommentController extends Controller
             return response()->json(['error' => 'Missing parameters'], 400);
         }
 
+        $comment = null;
+        $dbType = 0;
+
+        if ($type == 'forum') {
+            $comment = ForumComment::find($id);
+            $dbType = 4;
+        } elseif ($type == 'directory') {
+            $comment = Option::where('id', $id)->where('o_type', 'd_coment')->first();
+            $dbType = 44;
+        } elseif ($type == 'store') {
+            $comment = Option::where('id', $id)->where('o_type', 's_coment')->first();
+            $dbType = 444;
+        }
+
+        if (!$comment) {
+            return response()->json(['error' => 'Comment not found'], 404);
+        }
+
+        $ownerId = ($type == 'forum') ? $comment->uid : $comment->o_order;
+        $isOwner = ($ownerId == $uid);
+
+        $canDeleteAsForumModerator = false;
+        if ($type === 'forum' && $comment instanceof ForumComment) {
+            $topic = ForumTopic::find($comment->tid);
+            if ($topic) {
+                $canDeleteAsForumModerator = Auth::user()->canModerateForum('delete_comments', (int) $topic->cat);
+            }
+        }
+
+        if (!($isOwner || Auth::user()->isAdmin() || $canDeleteAsForumModerator)) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
         DB::beginTransaction();
         try {
-            $comment = null;
-            $dbType = 0;
-
-            if ($type == 'forum') {
-                $comment = ForumComment::find($id);
-                $dbType = 4;
-            } elseif ($type == 'directory') {
-                $comment = Option::where('id', $id)->where('o_type', 'd_coment')->first();
-                $dbType = 44;
-            } elseif ($type == 'store') {
-                $comment = Option::where('id', $id)->where('o_type', 's_coment')->first();
-                $dbType = 444;
+            if ($dbType > 0) {
+                $likes = \App\Models\Like::where('sid', $id)->where('type', $dbType)->get();
+                foreach ($likes as $like) {
+                    \App\Models\Option::where('o_parent', $like->id)->where('o_type', 'data_reaction')->delete();
+                    $like->delete();
+                }
             }
 
-            if (!$comment) {
-                return response()->json(['error' => 'Comment not found'], 404);
-            }
+            $comment->delete();
 
-            // Check permission: Owner or Admin
-            // For ForumComment: uid is the owner
-            // For Option (Directory/Store): o_order is the owner (uid)
-            $ownerId = ($type == 'forum') ? $comment->uid : $comment->o_order;
-            $isOwner = ($ownerId == $uid);
-            
-            if ($isOwner || Auth::user()->isAdmin()) {
-                // Delete Reactions associated with this comment
-                if ($dbType > 0) {
-                     $likes = \App\Models\Like::where('sid', $id)->where('type', $dbType)->get();
-                     foreach ($likes as $like) {
-                         \App\Models\Option::where('o_parent', $like->id)->where('o_type', 'data_reaction')->delete();
-                         $like->delete();
-                     }
-                }
-
-                $comment->delete();
-
-                // Deduct points only if owner deleted it (to discourage spam/delete cycles? Or just reverse the point gain)
-                // Original code deducted points if owner deleted.
-                if ($isOwner) {
-                    User::where('id', $uid)->decrement('pts', 2);
-                }
-            } else {
-                 return response()->json(['error' => 'Unauthorized'], 403);
+            if ($isOwner) {
+                User::where('id', $uid)->decrement('pts', 2);
             }
 
             DB::commit();
@@ -229,5 +255,11 @@ class CommentController extends Controller
             DB::rollBack();
             return response()->json(['error' => $e->getMessage()], 500);
         }
+    }
+
+    private function canUserCommentLockedTopic(User $user, ForumTopic $topic): bool
+    {
+        return (int) $user->id === (int) $topic->uid
+            || $user->canModerateForum('lock_topics', (int) $topic->cat);
     }
 }

@@ -97,6 +97,9 @@ Route::post('/post', [ForumController::class, 'store'])->name('forum.store')->mi
 Route::get('/editor/{id}', [ForumController::class, 'edit'])->name('forum.edit')->middleware('auth');
 Route::post('/editor/{id}', [ForumController::class, 'update'])->name('forum.update')->middleware('auth');
 Route::post('/forum/delete', [ForumController::class, 'destroy'])->name('forum.delete')->middleware('auth');
+Route::post('/forum/{topic}/pin', [ForumController::class, 'togglePin'])->name('forum.pin')->middleware('auth');
+Route::post('/forum/{topic}/lock', [ForumController::class, 'toggleLock'])->name('forum.lock')->middleware('auth');
+Route::get('/forum/attachment/{attachment}', [ForumController::class, 'downloadAttachment'])->name('forum.attachment.download');
 Route::post('/forum/report', [AdminController::class, 'storeReport'])->name('forum.report');
 
 // Directory Routes
@@ -305,6 +308,12 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::post('/forum/categories', [AdminController::class, 'storeForumCategory'])->name('admin.forum_categories.store');
     Route::post('/forum/categories/{id}', [AdminController::class, 'updateForumCategory'])->name('admin.forum_categories.update');
     Route::delete('/forum/categories/{id}', [AdminController::class, 'deleteForumCategory'])->name('admin.forum_categories.delete');
+    Route::get('/forum/settings', [AdminController::class, 'forumSettings'])->name('admin.forum.settings');
+    Route::post('/forum/settings', [AdminController::class, 'updateForumSettings'])->name('admin.forum.settings.update');
+    Route::get('/forum/moderators', [AdminController::class, 'forumModerators'])->name('admin.forum.moderators');
+    Route::post('/forum/moderators', [AdminController::class, 'storeForumModerator'])->name('admin.forum.moderators.store');
+    Route::put('/forum/moderators/{id}', [AdminController::class, 'updateForumModerator'])->name('admin.forum.moderators.update');
+    Route::delete('/forum/moderators/{id}', [AdminController::class, 'deleteForumModerator'])->name('admin.forum.moderators.delete');
     
     // Directory Categories
     Route::get('/directory/categories', [AdminController::class, 'directoryCategories'])->name('admin.directory_categories');

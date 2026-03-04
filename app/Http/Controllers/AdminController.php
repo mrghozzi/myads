@@ -15,6 +15,7 @@ use App\Models\Setting;
 use App\Models\State;
 use App\Models\Notification;
 use App\Models\ForumTopic;
+use App\Models\ForumModerator;
 use App\Models\Directory;
 use App\Models\Product;
 
@@ -34,9 +35,18 @@ use App\Models\Knowledgebase;
 use App\Models\Page;
 use App\Services\PluginManager;
 use App\Services\ThemeManager;
+use App\Support\ForumSettings;
 
 class AdminController extends Controller
 {
+    private const FORUM_PERMISSION_KEYS = [
+        'pin_topics',
+        'lock_topics',
+        'edit_topics',
+        'delete_topics',
+        'delete_comments',
+    ];
+
     public function index()
     {
         // Version Check
@@ -602,6 +612,135 @@ class AdminController extends Controller
         return redirect()->back()->with('success', __('category_deleted'));
     }
 
+    public function forumSettings()
+    {
+        $forumSettings = ForumSettings::all();
+        return view('theme::admin.forum_settings', compact('forumSettings'));
+    }
+
+    public function updateForumSettings(Request $request)
+    {
+        $request->validate([
+            'topics_per_page' => 'required|integer|min:1|max:100',
+            'max_attachments_per_topic' => 'required|integer|min:1|max:20',
+            'max_attachment_size_kb' => 'required|integer|min:512|max:51200',
+            'allowed_attachment_extensions' => 'required|string|max:500',
+            'attachments_enabled' => 'nullable|in:1',
+            'show_role_badges' => 'nullable|in:1',
+        ]);
+
+        $values = ForumSettings::normalizeIncoming($request->all());
+        ForumSettings::save($values);
+
+        return redirect()->back()->with('success', __('messages.forum_settings_updated'));
+    }
+
+    public function forumModerators()
+    {
+        $moderators = ForumModerator::with(['user', 'categories'])->orderBy('id', 'desc')->paginate(20);
+        $users = User::orderBy('username', 'asc')->get(['id', 'username', 'email']);
+        $categories = ForumCategory::orderBy('ordercat', 'asc')->get(['id', 'name']);
+        $permissionKeys = $this->forumPermissionKeys();
+
+        return view('theme::admin.forum_moderators', compact('moderators', 'users', 'categories', 'permissionKeys'));
+    }
+
+    public function storeForumModerator(Request $request)
+    {
+        $request->validate([
+            'user_id' => 'required|integer|exists:users,id|unique:forum_moderators,user_id',
+            'is_global' => 'nullable|in:1',
+            'is_active' => 'nullable|in:1',
+            'permissions' => 'nullable|array',
+            'permissions.*' => 'in:' . implode(',', $this->forumPermissionKeys()),
+            'category_ids' => 'nullable|array',
+            'category_ids.*' => 'integer|exists:f_cat,id',
+        ]);
+
+        $isGlobal = $request->has('is_global');
+        $categoryIds = collect($request->input('category_ids', []))
+            ->filter(fn ($id) => is_numeric($id))
+            ->map(fn ($id) => (int) $id)
+            ->unique()
+            ->values();
+
+        if (!$isGlobal && $categoryIds->isEmpty()) {
+            return redirect()->back()->withErrors([
+                'category_ids' => __('messages.forum_moderator_categories_required'),
+            ])->withInput();
+        }
+
+        $permissions = collect($request->input('permissions', []))
+            ->filter(fn ($permission) => in_array($permission, $this->forumPermissionKeys(), true))
+            ->values()
+            ->all();
+
+        $moderator = ForumModerator::create([
+            'user_id' => (int) $request->input('user_id'),
+            'is_global' => $isGlobal ? 1 : 0,
+            'is_active' => $request->has('is_active') ? 1 : 0,
+            'permissions' => $permissions,
+            'created_by' => Auth::id(),
+        ]);
+
+        $moderator->categories()->sync($isGlobal ? [] : $categoryIds->all());
+
+        return redirect()->back()->with('success', __('messages.forum_moderator_created'));
+    }
+
+    public function updateForumModerator(Request $request, $id)
+    {
+        $moderator = ForumModerator::with('categories')->findOrFail($id);
+
+        $request->validate([
+            'user_id' => 'required|integer|exists:users,id|unique:forum_moderators,user_id,' . $moderator->id,
+            'is_global' => 'nullable|in:1',
+            'is_active' => 'nullable|in:1',
+            'permissions' => 'nullable|array',
+            'permissions.*' => 'in:' . implode(',', $this->forumPermissionKeys()),
+            'category_ids' => 'nullable|array',
+            'category_ids.*' => 'integer|exists:f_cat,id',
+        ]);
+
+        $isGlobal = $request->has('is_global');
+        $categoryIds = collect($request->input('category_ids', []))
+            ->filter(fn ($id) => is_numeric($id))
+            ->map(fn ($id) => (int) $id)
+            ->unique()
+            ->values();
+
+        if (!$isGlobal && $categoryIds->isEmpty()) {
+            return redirect()->back()->withErrors([
+                'category_ids' => __('messages.forum_moderator_categories_required'),
+            ])->withInput();
+        }
+
+        $permissions = collect($request->input('permissions', []))
+            ->filter(fn ($permission) => in_array($permission, $this->forumPermissionKeys(), true))
+            ->values()
+            ->all();
+
+        $moderator->update([
+            'user_id' => (int) $request->input('user_id'),
+            'is_global' => $isGlobal ? 1 : 0,
+            'is_active' => $request->has('is_active') ? 1 : 0,
+            'permissions' => $permissions,
+        ]);
+
+        $moderator->categories()->sync($isGlobal ? [] : $categoryIds->all());
+
+        return redirect()->back()->with('success', __('messages.forum_moderator_updated'));
+    }
+
+    public function deleteForumModerator($id)
+    {
+        $moderator = ForumModerator::findOrFail($id);
+        $moderator->categories()->detach();
+        $moderator->delete();
+
+        return redirect()->back()->with('success', __('messages.forum_moderator_deleted'));
+    }
+
     // Directory Categories
     public function directoryCategories()
     {
@@ -993,6 +1132,11 @@ class AdminController extends Controller
         }
 
         return $ids;
+    }
+
+    private function forumPermissionKeys(): array
+    {
+        return self::FORUM_PERMISSION_KEYS;
     }
 
     public function widgets()

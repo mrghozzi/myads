@@ -2,12 +2,19 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\ForumCategory;
-use App\Models\ForumTopic;
-use App\Models\ForumComment;
-use App\Models\Status;
 use App\Models\Emoji;
+use App\Models\ForumAttachment;
+use App\Models\ForumCategory;
+use App\Models\ForumComment;
+use App\Models\ForumTopic;
+use App\Models\Option;
+use App\Models\Status;
+use App\Support\ForumSettings;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 
 class ForumController extends Controller
 {
@@ -20,18 +27,25 @@ class ForumController extends Controller
     public function category($id)
     {
         $category = ForumCategory::findOrFail($id);
+        $settings = ForumSettings::all();
         $time = time();
 
-        $statuses = Status::where('s_type', 2)
+        $statuses = Status::whereIn('s_type', [2, 4])
             ->where('date', '<=', $time)
             ->whereIn('tp_id', function ($query) use ($id) {
                 $query->select('id')
                     ->from('forum')
                     ->where('cat', $id)
                     ->where('statu', 1);
-            })
+            });
+
+        if (Schema::hasColumn('forum', 'is_pinned')) {
+            $statuses->orderByRaw('(SELECT is_pinned FROM forum WHERE forum.id = status.tp_id) DESC');
+        }
+
+        $statuses = $statuses
             ->orderBy('id', 'desc')
-            ->paginate(21);
+            ->paginate((int) $settings['topics_per_page']);
 
         $topicIds = $statuses->pluck('tp_id');
         $topics = ForumTopic::with(['user', 'category'])
@@ -43,7 +57,7 @@ class ForumController extends Controller
             $html = view('theme::partials.ajax.forum_topics', compact('statuses', 'topics'))->render();
             return response()->json([
                 'html' => $html,
-                'next_page_url' => $statuses->nextPageUrl()
+                'next_page_url' => $statuses->nextPageUrl(),
             ]);
         }
 
@@ -52,15 +66,13 @@ class ForumController extends Controller
 
     public function topic($id)
     {
-        // $id is the topic ID
-        $topic = ForumTopic::with(['user', 'comments.user'])->findOrFail($id);
-        
-        // Check Status table to get s_type (2, 4, 100, 7867)
-        $status = \App\Models\Status::where('tp_id', $id)
-                    ->whereIn('s_type', [2, 4, 100, 7867])
-                    ->firstOrFail();
+        $topic = ForumTopic::with(['user', 'category', 'comments.user', 'attachments'])->findOrFail($id);
+        $forumSettings = ForumSettings::all();
 
-        // Redirect if Store Product (7867)
+        $status = Status::where('tp_id', $id)
+            ->whereIn('s_type', [2, 4, 100, 7867])
+            ->firstOrFail();
+
         if ($status->s_type == 7867) {
             $product = \App\Models\Product::withoutGlobalScope('store')->find($id);
             if ($product) {
@@ -68,16 +80,15 @@ class ForumController extends Controller
             }
         }
 
-        // Increment views
-        // $topic->increment('views'); // If 'views' column exists
-
         if ($status->s_type == 100) {
-            return view('theme::forum.post', compact('topic', 'status'));
-        } elseif ($status->s_type == 4) {
-            return view('theme::forum.image', compact('topic', 'status'));
+            return view('theme::forum.post', compact('topic', 'status', 'forumSettings'));
         }
 
-        return view('theme::forum.topic', compact('topic', 'status'));
+        if ($status->s_type == 4) {
+            return view('theme::forum.image', compact('topic', 'status', 'forumSettings'));
+        }
+
+        return view('theme::forum.topic', compact('topic', 'status', 'forumSettings'));
     }
 
     public function create(Request $request)
@@ -88,13 +99,14 @@ class ForumController extends Controller
 
         $categories = ForumCategory::orderBy('ordercat', 'asc')->get();
         $emojis = Emoji::orderBy('id', 'asc')->get();
+        $forumSettings = ForumSettings::all();
         $topic = null;
         $editType = null;
 
         if ($request->filled('e')) {
-            $topic = ForumTopic::findOrFail($request->input('e'));
+            $topic = ForumTopic::with('attachments')->findOrFail($request->input('e'));
 
-            if ($topic->uid != auth()->id() && !auth()->user()->isAdmin()) {
+            if (!$this->canEditTopic($topic, auth()->user())) {
                 abort(403);
             }
 
@@ -102,7 +114,7 @@ class ForumController extends Controller
             $editType = $status?->s_type ?? 2;
         }
 
-        return view('theme::forum.create', compact('categories', 'emojis', 'topic', 'editType'));
+        return view('theme::forum.create', compact('categories', 'emojis', 'topic', 'editType', 'forumSettings'));
     }
 
     public function store(Request $request)
@@ -115,132 +127,404 @@ class ForumController extends Controller
             $request->merge(['type' => 100]);
         }
 
-        $request->validate([
+        $settings = ForumSettings::all();
+
+        $rules = [
             'name' => 'required|string|max:255',
             'txt' => 'required|string',
-            'cat' => 'required|integer',
-            'type' => 'required|in:100,4', // 100=Post, 4=Image
+            'cat' => 'required|integer|exists:f_cat,id',
+            'type' => 'required|in:100,4',
             'img' => 'nullable|image|max:2048',
-        ]);
+        ];
+
+        $rules = array_merge($rules, $this->attachmentValidationRules($settings));
+        $request->validate($rules);
 
         $uid = auth()->id();
+        if (!$uid) {
+            abort(403);
+        }
+
         $time = time();
-        $statu = 1;
 
-        // Image handling
-        $imagePath = null;
-        if ($request->type == 4 && $request->hasFile('img')) {
-            $file = $request->file('img');
-            $filename = time() . '_' . $file->getClientOriginalName();
-            $file->move(public_path('upload'), $filename);
-            $imagePath = 'upload/' . $filename;
-        }
+        DB::beginTransaction();
+        try {
+            $imagePath = null;
+            if ((int) $request->type === 4 && $request->hasFile('img')) {
+                $file = $request->file('img');
+                $filename = time() . '_' . Str::random(12) . '_' . $file->getClientOriginalName();
+                $file->move(public_path('upload'), $filename);
+                $imagePath = 'upload/' . $filename;
+            }
 
-        $topic = ForumTopic::create([
-            'uid' => $uid,
-            'name' => $request->name,
-            'txt' => $request->txt,
-            'cat' => $request->cat,
-            'statu' => $statu,
-        ]);
+            $topicData = [
+                'uid' => $uid,
+                'name' => $request->name,
+                'txt' => $request->txt,
+                'cat' => $request->cat,
+                'statu' => 1,
+            ];
 
-        $status = \App\Models\Status::create([
-            'uid' => $uid,
-            'date' => $time,
-            's_type' => $request->type == 100 ? 2 : 4, // 2 for topic, 4 for image post? Check old code.
-            // Old code: s_type=2 for topic, s_type=4 for image.
-            // Wait, old code says: if($catuss['s_type']==2) $s_type ="forum";
-            // And in create post logic: s_type=2 (topic)
-            // But if image upload: s_type=4.
-            // Let's stick to 2 for standard topics and 4 for image topics.
-            'tp_id' => $topic->id,
-        ]);
-        
-        // If image, store in options
-        if ($imagePath) {
-             \App\Models\Option::create([
-                'name' => $time,
-                'o_valuer' => $imagePath,
-                'o_type' => 'image_post',
-                'o_parent' => $topic->id,
-                'o_order' => $uid,
-                'o_mode' => 'file',
+            if (Schema::hasColumn('forum', 'date')) {
+                $topicData['date'] = $time;
+            }
+            if (Schema::hasColumn('forum', 'reply')) {
+                $topicData['reply'] = 0;
+            }
+            if (Schema::hasColumn('forum', 'vu')) {
+                $topicData['vu'] = 0;
+            }
+
+            $topic = ForumTopic::create($topicData);
+
+            $status = Status::create([
+                'uid' => $uid,
+                'date' => $time,
+                's_type' => (int) $request->type === 4 ? 4 : 2,
+                'tp_id' => $topic->id,
             ]);
-            
-            // Update status type to 4
-            $status->update(['s_type' => 4]);
-        } else {
-            // Standard topic is type 2
-             $status->update(['s_type' => 2]);
-        }
 
-        return redirect()->route('forum.topic', $topic->id);
+            if ($imagePath) {
+                Option::create([
+                    'name' => (string) $time,
+                    'o_valuer' => $imagePath,
+                    'o_type' => 'image_post',
+                    'o_parent' => $topic->id,
+                    'o_order' => $uid,
+                    'o_mode' => 'file',
+                ]);
+
+                $status->update(['s_type' => 4]);
+            }
+
+            $this->storeTopicAttachments($topic, $request, $settings);
+
+            DB::commit();
+            return redirect()->route('forum.topic', $topic->id);
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return back()->withErrors(['forum' => $e->getMessage()])->withInput();
+        }
     }
 
     public function edit($id)
     {
-        $topic = ForumTopic::findOrFail($id);
-        
-        if ($topic->uid != auth()->id() && !auth()->user()->isAdmin()) {
-            return abort(403);
+        $topic = ForumTopic::with('attachments')->findOrFail($id);
+
+        if (!$this->canEditTopic($topic, auth()->user())) {
+            abort(403);
         }
 
         $categories = ForumCategory::orderBy('ordercat', 'asc')->get();
-        return view('theme::forum.edit', compact('topic', 'categories'));
+        $forumSettings = ForumSettings::all();
+        return view('theme::forum.edit', compact('topic', 'categories', 'forumSettings'));
     }
 
     public function update(Request $request, $id)
     {
-        $topic = ForumTopic::findOrFail($id);
-        
-        if ($topic->uid != auth()->id() && !auth()->user()->isAdmin()) {
-            return abort(403);
+        if (!$request->has('cat') && $request->has('categ')) {
+            $request->merge(['cat' => $request->input('categ')]);
         }
 
-        $request->validate([
+        $topic = ForumTopic::with('attachments')->findOrFail($id);
+
+        if (!$this->canEditTopic($topic, auth()->user())) {
+            abort(403);
+        }
+
+        $settings = ForumSettings::all();
+
+        $rules = [
             'name' => 'required|string|max:255',
             'txt' => 'required|string',
-            'cat' => 'required|integer',
-        ]);
+            'cat' => 'required|integer|exists:f_cat,id',
+            'delete_attachments' => 'nullable|array',
+            'delete_attachments.*' => 'integer',
+        ];
 
-        $topic->update([
-            'name' => $request->name,
-            'txt' => $request->txt,
-            'cat' => $request->cat,
-        ]);
+        $rules = array_merge($rules, $this->attachmentValidationRules($settings));
+        $request->validate($rules);
 
-        return redirect()->route('forum.topic', $topic->id);
+        DB::beginTransaction();
+        try {
+            $topic->update([
+                'name' => $request->name,
+                'txt' => $request->txt,
+                'cat' => $request->cat,
+            ]);
+
+            $deleteAttachmentIds = collect($request->input('delete_attachments', []))
+                ->filter(fn ($id) => is_numeric($id))
+                ->map(fn ($id) => (int) $id)
+                ->values();
+
+            if ($deleteAttachmentIds->isNotEmpty()) {
+                $attachmentsToDelete = $topic->attachments()->whereIn('id', $deleteAttachmentIds)->get();
+                $this->deleteTopicAttachments($attachmentsToDelete);
+            }
+
+            $this->storeTopicAttachments($topic, $request, $settings);
+
+            DB::commit();
+            return redirect()->route('forum.topic', $topic->id);
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return back()->withErrors(['forum' => $e->getMessage()])->withInput();
+        }
     }
 
     public function destroy(Request $request)
     {
         $id = $request->input('id');
-        if (!$id) return response()->json(['error' => 'Missing ID'], 400);
+        if (!$id) {
+            return response()->json(['error' => 'Missing ID'], 400);
+        }
 
-        $topic = ForumTopic::find($id);
-        if (!$topic) return response()->json(['error' => 'Not found'], 404);
+        $topic = ForumTopic::with('attachments')->find($id);
+        if (!$topic) {
+            return response()->json(['error' => 'Not found'], 404);
+        }
 
-        if ($topic->uid != auth()->id() && !auth()->user()->isAdmin()) {
+        if (!$this->canDeleteTopic($topic, auth()->user())) {
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
-        // Delete related status
-        \App\Models\Status::where('tp_id', $id)->whereIn('s_type', [2, 4, 100, 7867])->delete();
-        
-        // Delete related options (images, comments if any stored as options)
-        \App\Models\Option::where('o_parent', $id)->whereIn('o_type', ['image_post', 'data_reaction'])->delete();
+        DB::beginTransaction();
+        try {
+            Status::where('tp_id', $id)->whereIn('s_type', [2, 4, 100, 7867])->delete();
 
-        // Delete comments
-        ForumComment::where('tid', $id)->delete();
+            Option::where('o_parent', $id)
+                ->whereIn('o_type', ['image_post', 'data_reaction'])
+                ->delete();
 
-        // Delete topic
-        $topic->delete();
+            ForumComment::where('tid', $id)->delete();
 
-        // If request expects JSON (AJAX or fetch)
-    if ($request->wantsJson() || $request->ajax()) {
-        return response()->json(['success' => true]);
-    }
-        
+            $this->deleteTopicAttachments($topic->attachments);
+
+            $topic->delete();
+
+            DB::commit();
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json(['success' => true]);
+        }
+
         return redirect()->route('forum.index');
+    }
+
+    public function togglePin(Request $request, $topicId)
+    {
+        $topic = ForumTopic::findOrFail($topicId);
+        $user = auth()->user();
+
+        if (!$user || !$user->canModerateForum('pin_topics', (int) $topic->cat)) {
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json(['error' => __('messages.forum_unauthorized')], 403);
+            }
+
+            abort(403);
+        }
+
+        $topic->is_pinned = !$topic->is_pinned;
+        if ($topic->is_pinned) {
+            $topic->pinned_at = time();
+            $topic->pinned_by = $user->id;
+        } else {
+            $topic->pinned_at = null;
+            $topic->pinned_by = null;
+        }
+        $topic->save();
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'is_pinned' => (bool) $topic->is_pinned,
+                'message' => $topic->is_pinned ? __('messages.topic_pinned') : __('messages.topic_unpinned'),
+            ]);
+        }
+
+        return back()->with('success', $topic->is_pinned ? __('messages.topic_pinned') : __('messages.topic_unpinned'));
+    }
+
+    public function toggleLock(Request $request, $topicId)
+    {
+        $topic = ForumTopic::findOrFail($topicId);
+        $user = auth()->user();
+
+        if (!$user || !$user->canModerateForum('lock_topics', (int) $topic->cat)) {
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json(['error' => __('messages.forum_unauthorized')], 403);
+            }
+
+            abort(403);
+        }
+
+        $topic->is_locked = !$topic->is_locked;
+        if ($topic->is_locked) {
+            $topic->locked_at = time();
+            $topic->locked_by = $user->id;
+        } else {
+            $topic->locked_at = null;
+            $topic->locked_by = null;
+        }
+        $topic->save();
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'is_locked' => (bool) $topic->is_locked,
+                'message' => $topic->is_locked ? __('messages.topic_locked') : __('messages.topic_unlocked'),
+            ]);
+        }
+
+        return back()->with('success', $topic->is_locked ? __('messages.topic_locked') : __('messages.topic_unlocked'));
+    }
+
+    public function downloadAttachment(Request $request, $attachmentId)
+    {
+        $attachment = ForumAttachment::findOrFail($attachmentId);
+
+        $relativePath = ltrim((string) $attachment->file_path, '/\\');
+        if ($relativePath === '') {
+            abort(404);
+        }
+
+        $normalizedPath = str_replace(['..', '\\'], ['', '/'], $relativePath);
+        $storageFile = storage_path('app/' . $normalizedPath);
+        $legacyPublicFile = public_path($normalizedPath);
+
+        if (is_file($storageFile)) {
+            $filePath = $storageFile;
+        } elseif (is_file($legacyPublicFile)) {
+            $filePath = $legacyPublicFile;
+        } else {
+            abort(404);
+        }
+
+        $downloadName = trim((string) $attachment->original_name);
+        if ($downloadName === '') {
+            $downloadName = basename($filePath);
+        }
+
+        $mimeType = mime_content_type($filePath) ?: 'application/octet-stream';
+        $wantsInline = $request->boolean('inline');
+        if ($wantsInline && str_starts_with($mimeType, 'image/')) {
+            return response()->file($filePath, ['Content-Type' => $mimeType]);
+        }
+
+        return response()->download($filePath, $downloadName);
+    }
+
+    private function attachmentValidationRules(array $settings): array
+    {
+        if ((int) $settings['attachments_enabled'] !== 1) {
+            return [];
+        }
+
+        $allowed = ForumSettings::allowedExtensions();
+        $mimes = implode(',', $allowed);
+
+        return [
+            'attachments' => 'nullable|array|max:' . (int) $settings['max_attachments_per_topic'],
+            'attachments.*' => 'file|max:' . (int) $settings['max_attachment_size_kb'] . '|mimes:' . $mimes,
+        ];
+    }
+
+    private function storeTopicAttachments(ForumTopic $topic, Request $request, array $settings): void
+    {
+        if ((int) $settings['attachments_enabled'] !== 1 || !$request->hasFile('attachments')) {
+            return;
+        }
+
+        $files = $request->file('attachments', []);
+        if (empty($files)) {
+            return;
+        }
+
+        $currentCount = (int) $topic->attachments()->count();
+        $maxAllowed = (int) $settings['max_attachments_per_topic'];
+        if (($currentCount + count($files)) > $maxAllowed) {
+            throw new \RuntimeException(__('messages.attachments_limit_exceeded'));
+        }
+
+        $destinationPath = storage_path('app/forum_attachments');
+        if (!is_dir($destinationPath) && !mkdir($destinationPath, 0755, true) && !is_dir($destinationPath)) {
+            throw new \RuntimeException('Unable to create forum attachment directory.');
+        }
+
+        $nextSortOrder = (int) ($topic->attachments()->max('sort_order') ?? 0);
+
+        foreach ($files as $index => $file) {
+            $extension = strtolower($file->getClientOriginalExtension() ?: $file->extension() ?: 'bin');
+            $filename = 'topic_' . $topic->id . '_' . time() . '_' . Str::random(12) . '.' . $extension;
+            $file->move($destinationPath, $filename);
+
+            ForumAttachment::create([
+                'topic_id' => $topic->id,
+                'user_id' => (int) auth()->id(),
+                'file_path' => 'forum_attachments/' . $filename,
+                'original_name' => $file->getClientOriginalName(),
+                'mime_type' => $file->getClientMimeType(),
+                'file_size' => (int) $file->getSize(),
+                'sort_order' => $nextSortOrder + $index + 1,
+            ]);
+        }
+    }
+
+    private function deleteTopicAttachments($attachments): void
+    {
+        foreach ($attachments as $attachment) {
+            $relativePath = ltrim((string) $attachment->file_path, '/\\');
+            $normalizedPath = str_replace(['..', '\\'], ['', '/'], $relativePath);
+
+            $storageFile = storage_path('app/' . $normalizedPath);
+            $legacyPublicFile = public_path($normalizedPath);
+
+            if (is_file($storageFile)) {
+                @unlink($storageFile);
+            } elseif (is_file($legacyPublicFile)) {
+                @unlink($legacyPublicFile);
+            }
+
+            $attachment->delete();
+        }
+    }
+
+    private function canEditTopic(ForumTopic $topic, $user): bool
+    {
+        if (!$user) {
+            return false;
+        }
+
+        if ($user->canModerateForum('edit_topics', (int) $topic->cat)) {
+            return true;
+        }
+
+        if ((int) $topic->uid !== (int) $user->id) {
+            return false;
+        }
+
+        return !$topic->is_locked;
+    }
+
+    private function canDeleteTopic(ForumTopic $topic, $user): bool
+    {
+        if (!$user) {
+            return false;
+        }
+
+        if ($user->canModerateForum('delete_topics', (int) $topic->cat)) {
+            return true;
+        }
+
+        if ((int) $topic->uid !== (int) $user->id) {
+            return false;
+        }
+
+        return !$topic->is_locked;
     }
 }

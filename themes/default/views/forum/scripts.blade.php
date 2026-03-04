@@ -143,20 +143,28 @@
                 comment: text
             })
         })
-        .then(response => response.text())
-        .then(html => {
-            // Update the comment list container
-            // For post: comment_100_{{ $status->id }}
-            // For image: comment_4_{{ $status->id }}
-            // But we need to know which one. The type param helps.
-            // Wait, type passed here is 'forum'.
-            // The container class uses s_type (100 or 4).
-            // We can try to select both or use the one available.
-            let container = document.querySelector('.comment_100_' + id) || document.querySelector('.comment_4_' + id);
-            if(container) {
-                container.innerHTML = html;
-                loadHexagons();
+        .then(async response => {
+            const contentType = response.headers.get('content-type') || '';
+            if (contentType.includes('application/json')) {
+                const data = await response.json();
+                if (!response.ok || data.error) {
+                    throw new Error(data.error || '{{ __('messages.error_prefix') }}');
+                }
+                return '';
             }
+            return response.text();
+        })
+        .then(html => {
+            if (html) {
+                let container = document.querySelector('.comment_100_' + id) || document.querySelector('.comment_4_' + id);
+                if(container) {
+                    container.innerHTML = html;
+                    loadHexagons();
+                }
+            }
+        })
+        .catch(error => {
+            alert(error.message);
         });
     }
 
@@ -180,7 +188,7 @@
             })
             .then(response => response.json())
             .then(data => {
-                if(data.success || data.action === 'deleted') {
+                if(data.success || data.action === 'deleted' || data.status === 'success') {
                     let el = document.getElementById('comment_' + id);
                     if(el) el.remove();
                 } else if(data.error) {
