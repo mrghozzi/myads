@@ -923,5 +923,16 @@ return [
     'permission_lock_topics' => 'قفل/فتح المواضيع',
     'permission_edit_topics' => 'تعديل المواضيع',
     'permission_delete_topics' => 'حذف المواضيع',
-    'permission_delete_comments' => 'حذف التعليقات',];
+    'permission_delete_comments' => 'حذف التعليقات',
+    'markdown_bold' => 'عريض',
+    'markdown_italic' => 'مائل',
+    'markdown_quote' => 'اقتباس',
+    'markdown_code' => 'كود',
+    'markdown_link' => 'رابط',
+    'markdown_emoji' => 'إيموجي',
+    'markdown_link_prompt' => 'أدخل الرابط',
+    'markdown_link_label_prompt' => 'نص الرابط',
+    'markdown_link_default_label' => 'رابط',
+    'sending' => 'جارٍ الإرسال...',
+];
 

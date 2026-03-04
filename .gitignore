@@ -36,3 +36,4 @@ Thumbs.db
 !/themes/default/
 /public/themes/*
 !/public/themes/default/
+/tests

@@ -1,6 +1,8 @@
 @extends('theme::layouts.master')
+@include('theme::forum._assets')
 
 @section('content')
+<div class="forum-rdx forum-rdx-topic">
 <!-- ADS -->
 @include('theme::partials.ads', ['id' => 5])
 
@@ -343,7 +345,7 @@
     </div>
 
     <!-- COMMENTS -->
-    <div class="post-comment-list comment_100_{{ $topic->id }}">
+    <div class="post-comment-list post-comment-list-{{ $topic->id }} comment_100_{{ $topic->id }}">
         @include('theme::partials.activity.comments', [
             'comments' => $topic->comments()->orderBy('id', 'desc')->get(),
             'id' => $topic->id,
@@ -357,4 +359,5 @@
 </div>
 
 @include('theme::forum.scripts')
+</div>
 @endsection

@@ -119,7 +119,7 @@ class ForumController extends Controller
 
     public function store(Request $request)
     {
-        if (!$request->has('cat') && $request->has('categ')) {
+        if (!$request->filled('cat') && $request->filled('categ')) {
             $request->merge(['cat' => $request->input('categ')]);
         }
 
@@ -203,6 +203,7 @@ class ForumController extends Controller
             return redirect()->route('forum.topic', $topic->id);
         } catch (\Throwable $e) {
             DB::rollBack();
+            report($e);
             return back()->withErrors(['forum' => $e->getMessage()])->withInput();
         }
     }
@@ -222,11 +223,15 @@ class ForumController extends Controller
 
     public function update(Request $request, $id)
     {
-        if (!$request->has('cat') && $request->has('categ')) {
+        if (!$request->filled('cat') && $request->filled('categ')) {
             $request->merge(['cat' => $request->input('categ')]);
         }
 
         $topic = ForumTopic::with('attachments')->findOrFail($id);
+
+        if (!$request->filled('cat')) {
+            $request->merge(['cat' => (int) $topic->cat]);
+        }
 
         if (!$this->canEditTopic($topic, auth()->user())) {
             abort(403);
@@ -269,6 +274,7 @@ class ForumController extends Controller
             return redirect()->route('forum.topic', $topic->id);
         } catch (\Throwable $e) {
             DB::rollBack();
+            report($e);
             return back()->withErrors(['forum' => $e->getMessage()])->withInput();
         }
     }
@@ -461,15 +467,27 @@ class ForumController extends Controller
         foreach ($files as $index => $file) {
             $extension = strtolower($file->getClientOriginalExtension() ?: $file->extension() ?: 'bin');
             $filename = 'topic_' . $topic->id . '_' . time() . '_' . Str::random(12) . '.' . $extension;
-            $file->move($destinationPath, $filename);
+            $originalName = $file->getClientOriginalName();
+            $mimeType = (string) ($file->getClientMimeType() ?: '');
+            $fileSize = (int) $file->getSize();
+
+            $movedFile = $file->move($destinationPath, $filename);
+
+            // Uploaded tmp file is removed after move; fallback to destination metadata.
+            if ($fileSize <= 0 && is_file($movedFile->getPathname())) {
+                $fileSize = (int) filesize($movedFile->getPathname());
+            }
+            if ($mimeType === '') {
+                $mimeType = (string) ($movedFile->getMimeType() ?: 'application/octet-stream');
+            }
 
             ForumAttachment::create([
                 'topic_id' => $topic->id,
                 'user_id' => (int) auth()->id(),
                 'file_path' => 'forum_attachments/' . $filename,
-                'original_name' => $file->getClientOriginalName(),
-                'mime_type' => $file->getClientMimeType(),
-                'file_size' => (int) $file->getSize(),
+                'original_name' => $originalName,
+                'mime_type' => $mimeType,
+                'file_size' => $fileSize,
                 'sort_order' => $nextSortOrder + $index + 1,
             ]);
         }

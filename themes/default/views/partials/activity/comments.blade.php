@@ -5,15 +5,9 @@
 @foreach($comments as $comment)
     @php
         $user = $type === 'forum' ? $comment->user : \App\Models\User::find($comment->o_order);
-        $text = $type === 'forum' ? $comment->txt : $comment->o_valuer;
+        $rawText = $type === 'forum' ? $comment->txt : $comment->o_valuer;
         $date = $type === 'forum' ? $comment->date : $comment->o_mode;
-
-        $text = nl2br(e($text));
-        $text = preg_replace('/(http|https|ftp|ftps)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/', '<a href="$0" target="_blank">$0</a>', $text);
-        $text = preg_replace('/#(\w+)/', '<a href="'.url('tag/$1').'">#$1</a>', $text);
-        if (preg_match('/\p{Arabic}/u', $text)) {
-            $text = '<div style="text-align: right;">' . $text . '</div>';
-        }
+        $formattedText = \App\Support\ForumCommentFormatter::format($rawText);
 
         $commentReactionType = 0;
         $reactionTypeString = '';
@@ -92,7 +86,7 @@
             </div>
         @endif
 
-        <p class="post-comment-text">
+        <div class="post-comment-text">
             @if($user)
                 <a class="post-comment-text-author" href="{{ route('profile.show', $user->username) }}">{{ $user->username }}</a>
                 @if($type === 'forum' && $showForumRoleBadges)
@@ -103,8 +97,9 @@
             @else
                 <span class="post-comment-text-author">{{ __('messages.deleted_user') }}</span>
             @endif
-            {!! $text !!}
-        </p>
+
+            <div class="forum-rdx-comment-body">{!! $formattedText !!}</div>
+        </div>
 
         <div class="content-actions">
             <div class="content-action">
@@ -156,8 +151,37 @@
                     <div class="form-row">
                         <div class="form-item">
                             <div class="form-input small">
-                                <textarea id="txt_comment{{ $id }}" name="comment_text" placeholder="{{ __('messages.your_comment') }}"></textarea>
-                                <button class="btn" onclick="postComment({{ $id }}, '{{ $type }}')">
+                                <div class="forum-rdx-comment-toolbar">
+                                    <button type="button" class="forum-rdx-tool-btn" data-md-action="bold" data-target="txt_comment{{ $id }}" title="{{ __('messages.markdown_bold') }}">
+                                        <i class="fa fa-bold" aria-hidden="true"></i>
+                                    </button>
+                                    <button type="button" class="forum-rdx-tool-btn" data-md-action="italic" data-target="txt_comment{{ $id }}" title="{{ __('messages.markdown_italic') }}">
+                                        <i class="fa fa-italic" aria-hidden="true"></i>
+                                    </button>
+                                    <button type="button" class="forum-rdx-tool-btn" data-md-action="quote" data-target="txt_comment{{ $id }}" title="{{ __('messages.markdown_quote') }}">
+                                        <i class="fa fa-quote-left" aria-hidden="true"></i>
+                                    </button>
+                                    <button type="button" class="forum-rdx-tool-btn" data-md-action="code" data-target="txt_comment{{ $id }}" title="{{ __('messages.markdown_code') }}">
+                                        <i class="fa fa-code" aria-hidden="true"></i>
+                                    </button>
+                                    <button
+                                        type="button"
+                                        class="forum-rdx-tool-btn"
+                                        data-md-action="link"
+                                        data-target="txt_comment{{ $id }}"
+                                        data-link-prompt="{{ __('messages.markdown_link_prompt') }}"
+                                        data-link-label-prompt="{{ __('messages.markdown_link_label_prompt') }}"
+                                        data-link-default-label="{{ __('messages.markdown_link_default_label') }}"
+                                        title="{{ __('messages.markdown_link') }}"
+                                    >
+                                        <i class="fa fa-link" aria-hidden="true"></i>
+                                    </button>
+                                    <button type="button" class="forum-rdx-tool-btn" data-md-action="emoji" data-target="txt_comment{{ $id }}" title="{{ __('messages.markdown_emoji') }}">
+                                        <i class="fa fa-smile-o" aria-hidden="true"></i>
+                                    </button>
+                                </div>
+                                <textarea id="txt_comment{{ $id }}" name="comment_text" class="forum-rdx-comment-input" data-md-editor="1" placeholder="{{ __('messages.your_comment') }}"></textarea>
+                                <button type="button" class="btn forum-rdx-comment-send" data-comment-submit="{{ $id }}" onclick="postComment({{ $id }}, '{{ $type }}')">
                                     <svg class="interactive-input-icon icon-send-message">
                                         <use xlink:href="#svg-send-message"></use>
                                     </svg>

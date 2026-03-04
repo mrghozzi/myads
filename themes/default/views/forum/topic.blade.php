@@ -1,6 +1,8 @@
 @extends('theme::layouts.master')
+@include('theme::forum._assets')
 
 @section('content')
+<div class="forum-rdx forum-rdx-topic">
 <!-- SECTION BANNER -->
 <div class="section-banner" style="background: url({{ theme_asset('img/banner/Newsfeed.png') }}) no-repeat 50%;" >
     <img class="section-banner-icon" src="{{ theme_asset('img/banner/discussion-icon.png') }}">
@@ -258,7 +260,7 @@
     </div>
 </div>
 
-<div class="post-comment-list comment_2_{{ $topic->id }} post{{ $status->id }}">
+<div class="post-comment-list post-comment-list-{{ $topic->id }} comment_2_{{ $topic->id }} post{{ $status->id }}">
     @include('theme::partials.activity.comments', [
         'comments' => $topic->comments()->orderBy('id', 'desc')->get(),
         'id' => $topic->id,
@@ -274,91 +276,6 @@
     document.addEventListener('DOMContentLoaded', function() {
         initHexagons();
     });
-
-    function loadComments(id) {
-        // Kept for compatibility if needed, but comments are loaded SSR now.
-        // If we want to refresh comments:
-        fetch('{{ route('comment.load') }}', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            },
-            body: JSON.stringify({ id: id, type: 'forum' })
-        })
-        .then(response => response.text())
-        .then(html => {
-            document.querySelector('.comment_2_' + id).innerHTML = html;
-            initHexagons();
-        });
-    }
-
-    function postComment(id, type) {
-        let text = document.getElementById('txt_comment' + id).value;
-        if (!text.trim()) return;
-
-        fetch('{{ route("comment.store") }}', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            },
-            body: JSON.stringify({
-                id: id,
-                type: type,
-                comment: text
-            })
-        })
-        .then(async response => {
-            const contentType = response.headers.get('content-type') || '';
-            if (contentType.includes('application/json')) {
-                const data = await response.json();
-                if (!response.ok || data.error) {
-                    throw new Error(data.error || '{{ __('messages.error_prefix') }}');
-                }
-                return '';
-            }
-            return response.text();
-        })
-        .then(html => {
-            if (html) {
-                document.querySelector('.comment_2_' + id).innerHTML = html;
-                initHexagons();
-            }
-        })
-        .catch(error => {
-            alert(error.message);
-        });
-    }
-
-    function focusComment(id) {
-        let el = document.getElementById('txt_comment' + id);
-        if (el) {
-            el.focus();
-            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-    }
-
-    function deleteComment(id, type) {
-        if(confirm('{{ __('messages.confirm_delete') }}')) {
-            fetch('{{ route('comment.delete') }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify({ trashid: id, type: type })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if(data.success || data.action === 'deleted' || data.status === 'success') {
-                    document.getElementById('comment_' + id).remove();
-                } else if(data.error) {
-                    alert(data.error);
-                }
-            });
-        }
-    }
 
     function initHexagons() {
         if (typeof app !== 'undefined' && app.plugins && app.plugins.createHexagon) {
@@ -466,4 +383,5 @@
         dropdown.style.visibility = dropdown.style.display === 'flex' ? 'visible' : 'hidden';
     }
 </script>
+</div>
 @endsection
