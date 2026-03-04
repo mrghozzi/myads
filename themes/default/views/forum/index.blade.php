@@ -1,6 +1,8 @@
 @extends('theme::layouts.master')
+@include('theme::forum._assets')
 
 @section('content')
+<div class="forum-rdx forum-rdx-index">
 <!-- SECTION BANNER -->
 <div class="section-banner" style="background: url({{ theme_asset('img/banner/Newsfeed.png') }}) no-repeat 50%;">
     <!-- SECTION BANNER ICON -->
@@ -41,7 +43,7 @@
     <!-- /SECTION FILTERS BAR ACTIONS -->
 </div>
 
-<div class="table table-forum">
+<div class="table table-forum table-forum-category">
     <!-- TABLE HEADER -->
     <div class="table-header">
         <div class="table-header-column">
@@ -105,5 +107,6 @@
         @endforeach
     </div>
     <!-- /TABLE BODY -->
+</div>
 </div>
 @endsection

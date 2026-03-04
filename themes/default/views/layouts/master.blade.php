@@ -548,8 +548,10 @@
 
         function postComment(id, type) {
             let token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-            let text = document.getElementById('txt_comment' + id).value;
-            
+            let input = document.getElementById('txt_comment' + id);
+            if (!input) return;
+
+            let text = input.value;
             if (!text.trim()) return;
 
             fetch('{{ route("comment.store") }}', {
@@ -564,15 +566,41 @@
                     comment: text
                 })
             })
-            .then(response => response.text())
+            .then(async response => {
+                const fallbackError = @json(__('messages.error_prefix'));
+                const contentType = response.headers.get('content-type') || '';
+
+                if (contentType.includes('application/json')) {
+                    const data = await response.json();
+                    if (!response.ok || data.error) {
+                        throw new Error(data.error || fallbackError);
+                    }
+
+                    return data.html || '';
+                }
+
+                const html = await response.text();
+                if (!response.ok) {
+                    throw new Error(fallbackError);
+                }
+
+                return html;
+            })
             .then(html => {
                 let el = document.querySelector('.post-comment-list-' + id);
-                if(el) {
+                if (el && html) {
                     el.innerHTML = html;
                     initHexagons();
                 }
+
+                input.value = '';
+                input.dispatchEvent(new Event('input', { bubbles: true }));
+                input.focus();
             })
-            .catch(error => console.error('Error:', error));
+            .catch(error => {
+                console.error('Error:', error);
+                alert(error.message || @json(__('messages.error_prefix')));
+            });
         }
 
         function deleteComment(trashid, type) {

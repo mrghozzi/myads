@@ -15,6 +15,7 @@ use App\Http\Controllers\PortalController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AdminPageController;
 use App\Http\Controllers\ReactionController;
 use App\Http\Controllers\CommentController;
 use App\Http\Middleware\AdminMiddleware;
@@ -42,6 +43,9 @@ Route::get('password/reset', [App\Http\Controllers\Auth\ForgotPasswordController
 Route::post('password/email', [App\Http\Controllers\Auth\ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
 Route::get('password/reset/{token}', [App\Http\Controllers\Auth\ResetPasswordController::class, 'showResetForm'])->name('password.reset');
 Route::post('password/reset', [App\Http\Controllers\Auth\ResetPasswordController::class, 'reset'])->name('password.update');
+
+// Dynamic Pages
+Route::get('/page/{slug}', [App\Http\Controllers\PageController::class, 'show'])->name('page.show');
 
 // Legal Pages
 Route::get('/privacy', [App\Http\Controllers\PageController::class, 'privacy'])->name('privacy');
@@ -74,10 +78,13 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/messages', [MessageController::class, 'index'])->name('messages.index');
     Route::get('/messages/create', [MessageController::class, 'create'])->name('messages.create');
     Route::post('/messages', [MessageController::class, 'store'])->name('messages.store');
+    Route::get('/messages/attachment/{id}', [MessageController::class, 'attachment'])->name('messages.attachment');
     Route::get('/messages/{id}', [MessageController::class, 'show'])->name('messages.show');
+    Route::get('/messages/{id}/history', [MessageController::class, 'history'])->name('messages.history');
     Route::get('/messages/{id}/load', [MessageController::class, 'load'])->name('messages.load');
     Route::post('/messages/{id}/send', [MessageController::class, 'send'])->name('messages.send');
     Route::get('/notification', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notification/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.mark_all_read');
     Route::get('/notif/{id}', [NotificationController::class, 'show'])->name('notifications.show');
 });
 
@@ -90,6 +97,9 @@ Route::post('/post', [ForumController::class, 'store'])->name('forum.store')->mi
 Route::get('/editor/{id}', [ForumController::class, 'edit'])->name('forum.edit')->middleware('auth');
 Route::post('/editor/{id}', [ForumController::class, 'update'])->name('forum.update')->middleware('auth');
 Route::post('/forum/delete', [ForumController::class, 'destroy'])->name('forum.delete')->middleware('auth');
+Route::post('/forum/{topic}/pin', [ForumController::class, 'togglePin'])->name('forum.pin')->middleware('auth');
+Route::post('/forum/{topic}/lock', [ForumController::class, 'toggleLock'])->name('forum.lock')->middleware('auth');
+Route::get('/forum/attachment/{attachment}', [ForumController::class, 'downloadAttachment'])->name('forum.attachment.download');
 Route::post('/forum/report', [AdminController::class, 'storeReport'])->name('forum.report');
 
 // Directory Routes
@@ -298,6 +308,12 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::post('/forum/categories', [AdminController::class, 'storeForumCategory'])->name('admin.forum_categories.store');
     Route::post('/forum/categories/{id}', [AdminController::class, 'updateForumCategory'])->name('admin.forum_categories.update');
     Route::delete('/forum/categories/{id}', [AdminController::class, 'deleteForumCategory'])->name('admin.forum_categories.delete');
+    Route::get('/forum/settings', [AdminController::class, 'forumSettings'])->name('admin.forum.settings');
+    Route::post('/forum/settings', [AdminController::class, 'updateForumSettings'])->name('admin.forum.settings.update');
+    Route::get('/forum/moderators', [AdminController::class, 'forumModerators'])->name('admin.forum.moderators');
+    Route::post('/forum/moderators', [AdminController::class, 'storeForumModerator'])->name('admin.forum.moderators.store');
+    Route::put('/forum/moderators/{id}', [AdminController::class, 'updateForumModerator'])->name('admin.forum.moderators.update');
+    Route::delete('/forum/moderators/{id}', [AdminController::class, 'deleteForumModerator'])->name('admin.forum.moderators.delete');
     
     // Directory Categories
     Route::get('/directory/categories', [AdminController::class, 'directoryCategories'])->name('admin.directory_categories');
@@ -376,6 +392,15 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/themes', [AdminController::class, 'themes'])->name('admin.themes');
     Route::post('/themes/activate', [AdminController::class, 'activateTheme'])->name('admin.themes.activate');
     Route::get('/sitemap/generate', [\App\Http\Controllers\SitemapController::class, 'generate'])->name('admin.sitemap.generate');
+
+    // Pages
+    Route::get('/pages', [AdminPageController::class, 'index'])->name('admin.pages');
+    Route::get('/pages/create', [AdminPageController::class, 'create'])->name('admin.pages.create');
+    Route::post('/pages', [AdminPageController::class, 'store'])->name('admin.pages.store');
+    Route::get('/pages/{id}/edit', [AdminPageController::class, 'edit'])->name('admin.pages.edit');
+    Route::put('/pages/{id}', [AdminPageController::class, 'update'])->name('admin.pages.update');
+    Route::delete('/pages/{id}', [AdminPageController::class, 'destroy'])->name('admin.pages.delete');
+    Route::post('/pages/generate-slug', [AdminPageController::class, 'generateSlug'])->name('admin.pages.generate_slug');
 });
 
 Route::get('/sitemap.xml', [\App\Http\Controllers\SitemapController::class, 'generate'])->name('sitemap.xml');

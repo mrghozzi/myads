@@ -200,6 +200,7 @@ return array (
   'notifications' => 'Notifications',
   'info' => 'Info',
   'notifications_marked_read' => 'Les notifications sont marquées comme lues lors de leur consultation.',
+  'mark_all_read' => 'Mark all as read',
   'no_notifications' => 'Aucune nouvelle notification.',
   'member_profile' => 'Profil du membre',
   'edit_profile' => 'Modifier le profil',
@@ -752,4 +753,6 @@ return array (
   'zip_open_failed' => 'Échec de l\'ouverture du paquet.',
   'update_success' => 'Système mis à jour avec succès !',
   'update_failed' => 'La mise à jour a échoué : ',
+  'updated' => 'Mis à jour',
+  'unknown_user' => 'Utilisateur inconnu',
 );

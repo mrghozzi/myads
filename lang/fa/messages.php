@@ -200,6 +200,7 @@ return array (
   'notifications' => 'اعلان‌ها',
   'info' => 'اطلاعات',
   'notifications_marked_read' => 'اعلان‌ها هنگام مشاهده به عنوان خوانده شده علامت‌گذاری می‌شوند.',
+  'mark_all_read' => 'Mark all as read',
   'no_notifications' => 'اعلان جدیدی وجود ندارد.',
   'member_profile' => 'پروفایل عضو',
   'edit_profile' => 'ویرایش پروفایل',
@@ -752,5 +753,7 @@ return array (
   'zip_open_failed' => 'Failed to open package.',
   'update_success' => 'System updated successfully!',
   'update_failed' => 'Update failed: ',
+  'updated' => 'بروزرسانی شد',
+  'unknown_user' => 'کاربر ناشناس',
 );
 

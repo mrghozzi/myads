@@ -74,6 +74,18 @@
                         </a>
                     </li>
 
+                    <!-- Pages -->
+                    <li class="nxl-item nxl-hasmenu">
+                        <a href="javascript:void(0);" class="nxl-link">
+                            <span class="nxl-micon"><i class="feather-file-text"></i></span>
+                            <span class="nxl-mtext">{{ __('messages.pages') }}</span><span class="nxl-arrow"><i class="feather-chevron-right"></i></span>
+                        </a>
+                        <ul class="nxl-submenu">
+                            <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.pages') }}">{{ __('messages.t_pages') }}</a></li>
+                            <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.pages.create') }}">{{ __('messages.add_page') }}</a></li>
+                        </ul>
+                    </li>
+
                     <!-- Users -->
                     <li class="nxl-item">
                         <a href="{{ route('admin.users') }}" class="nxl-link">
@@ -104,6 +116,8 @@
                         <ul class="nxl-submenu">
                             <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.knowledgebase') }}">{{ __('messages.knowledgebase') }}</a></li>
                             <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.forum_categories') }}">{{ __('messages.forum_cats') }}</a></li>
+                            <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.forum.settings') }}">{{ __('messages.forum_settings') }}</a></li>
+                            <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.forum.moderators') }}">{{ __('messages.forum_moderators') }}</a></li>
                             <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.directory_categories') }}">{{ __('messages.dir_cats') }}</a></li>
                             <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.emojis') }}">{{ __('messages.emojis') }}</a></li>
                             <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.news') }}">{{ __('messages.news_site') }}</a></li>
@@ -287,6 +301,9 @@
     <script src="{{ theme_asset('admin-duralux/vendors/js/vendors.min.js') }}"></script>
     <script src="{{ theme_asset('admin-duralux/js/common-init.min.js') }}"></script>
     <script src="{{ theme_asset('admin-duralux/js/theme-customizer-init.min.js') }}"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    @stack('scripts')
     <script>
         (function() {
             function safeGet(key) {

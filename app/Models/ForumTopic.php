@@ -18,6 +18,22 @@ class ForumTopic extends Model
         'txt',
         'cat',
         'statu',
+        'date',
+        'reply',
+        'vu',
+        'is_pinned',
+        'pinned_at',
+        'pinned_by',
+        'is_locked',
+        'locked_at',
+        'locked_by',
+    ];
+
+    protected $casts = [
+        'is_pinned' => 'boolean',
+        'is_locked' => 'boolean',
+        'pinned_at' => 'integer',
+        'locked_at' => 'integer',
     ];
 
     public function user()
@@ -48,5 +64,20 @@ class ForumTopic extends Model
     public function getImageUrlAttribute()
     {
         return $this->imageOption ? $this->imageOption->o_valuer : null;
+    }
+
+    public function pinnedBy()
+    {
+        return $this->belongsTo(User::class, 'pinned_by');
+    }
+
+    public function lockedBy()
+    {
+        return $this->belongsTo(User::class, 'locked_by');
+    }
+
+    public function attachments()
+    {
+        return $this->hasMany(ForumAttachment::class, 'topic_id')->orderBy('sort_order', 'asc')->orderBy('id', 'asc');
     }
 }

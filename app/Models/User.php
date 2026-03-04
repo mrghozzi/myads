@@ -71,6 +71,75 @@ class User extends Authenticatable
         return $this->online > (time() - 240);
     }
 
+    public function forumRoleLabel(?int $categoryId = null): string
+    {
+        if ($this->isAdmin()) {
+            return __('messages.forum_role_admin');
+        }
+
+        $moderator = $this->getActiveForumModerator();
+        if (!$moderator) {
+            return __('messages.forum_role_member');
+        }
+
+        if ($moderator->is_global) {
+            return __('messages.forum_role_global_moderator');
+        }
+
+        if ($categoryId !== null) {
+            return $moderator->categories->contains('id', $categoryId)
+                ? __('messages.forum_role_section_moderator')
+                : __('messages.forum_role_member');
+        }
+
+        return $moderator->categories->isNotEmpty()
+            ? __('messages.forum_role_section_moderator')
+            : __('messages.forum_role_member');
+    }
+
+    public function canModerateForum(?string $permission = null, ?int $categoryId = null): bool
+    {
+        if ($this->isAdmin()) {
+            return true;
+        }
+
+        $moderator = $this->getActiveForumModerator();
+        if (!$moderator) {
+            return false;
+        }
+
+        if ($permission !== null && !$moderator->hasPermission($permission)) {
+            return false;
+        }
+
+        if ($moderator->is_global) {
+            return true;
+        }
+
+        if ($categoryId === null) {
+            return true;
+        }
+
+        return $moderator->categories->contains('id', $categoryId);
+    }
+
+    private function getActiveForumModerator(): ?ForumModerator
+    {
+        $moderator = $this->relationLoaded('forumModerator')
+            ? $this->getRelation('forumModerator')
+            : $this->forumModerator()->first();
+
+        if (!$moderator || !$moderator->is_active) {
+            return null;
+        }
+
+        if (!$moderator->relationLoaded('categories')) {
+            $moderator->load('categories:id');
+        }
+
+        return $moderator;
+    }
+
     // Relationships
     public function topics()
     {
@@ -95,5 +164,10 @@ class User extends Authenticatable
     public function visits()
     {
         return $this->hasMany(Visit::class, 'uid');
+    }
+
+    public function forumModerator()
+    {
+        return $this->hasOne(ForumModerator::class, 'user_id');
     }
 }

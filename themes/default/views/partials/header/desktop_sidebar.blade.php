@@ -230,11 +230,16 @@
                                         <span class="highlighted">{{ $headerNotificationUnreadCount }}</span>
                                     @endif
                                 </p>
-                                <div class="dropdown-box-header-actions">
+                                <div class="dropdown-box-header-actions" style="display: flex; gap: 10px;">
+                                    @if($headerNotificationUnreadCount > 0)
+                                        <a href="javascript:void(0)" class="dropdown-box-header-action text-primary mark-all-read-btn" style="font-size: 0.8rem;" onclick="markAllNotificationsAsRead(this)">
+                                            <i class="fa fa-check-double"></i> {{ __('messages.mark_all_read') ?? 'Mark all as read' }}
+                                        </a>
+                                    @endif
                                     <a class="dropdown-box-header-action" href="{{ url('/notification') }}">{{ __('messages.notifications') }}</a>
                                 </div>
                             </div>
-                            <div class="dropdown-box-list">
+                            <div class="dropdown-box-list" id="header-notifications-list">
                                 @forelse($headerNotifications as $headerNotif)
                                     <a class="dropdown-box-list-item {{ $headerNotif->state == 0 || $headerNotif->state == 3 ? 'unread' : '' }}" href="{{ route('notifications.show', $headerNotif->id) }}">
                                         <div class="user-status">
@@ -264,6 +269,36 @@
                             <a class="dropdown-box-button secondary" href="{{ url('/notification') }}">{{ __('messages.notifications') }}</a>
                         </div>
                     </div>
+                    <script>
+                        function markAllNotificationsAsRead(btn) {
+                            if (btn) btn.style.pointerEvents = 'none';
+                            fetch('{{ route('notifications.mark_all_read') }}', {
+                                method: 'POST',
+                                headers: {
+                                    'X-Requested-With': 'XMLHttpRequest',
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                    'Content-Type': 'application/json'
+                                }
+                            })
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    // Remove unread badges and highlights
+                                    document.querySelectorAll('#header-notifications-list .unread').forEach(el => el.classList.remove('unread'));
+                                    const trigger = document.querySelector('.action-list-item-icon.icon-notification').parentElement;
+                                    trigger.classList.remove('unread');
+                                    const badge = trigger.querySelector('.header-action-count');
+                                    if (badge) badge.remove();
+                                    
+                                    const headerBadge = document.querySelector('.dropdown-box-header-title .highlighted');
+                                    if (headerBadge) headerBadge.remove();
+                                    
+                                    if (btn) btn.remove();
+                                }
+                            })
+                            .catch(error => console.error('Error marking notifications as read:', error));
+                        }
+                    </script>
                 </div>
             </div>
             

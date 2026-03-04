@@ -407,6 +407,101 @@ class InstallerController extends Controller
             }
 
             // ============================================================
+            // STEP 5.1: Create pages table if missing (v4.1 feature)
+            // ============================================================
+            if (!Schema::hasTable('pages')) {
+                Schema::create('pages', function (Blueprint $tbl) {
+                    $tbl->id();
+                    $tbl->string('title');
+                    $tbl->string('slug')->unique();
+                    $tbl->longText('content')->nullable();
+                    $tbl->enum('status', ['published', 'draft'])->default('published');
+                    $tbl->boolean('widget_left')->default(true);
+                    $tbl->boolean('widget_right')->default(true);
+                    $tbl->text('meta_description')->nullable();
+                    $tbl->text('meta_keywords')->nullable();
+                    $tbl->integer('order')->default(0);
+                    $tbl->timestamps();
+                });
+                $log[] = '✅ Created: pages';
+            }
+
+            // ============================================================
+            // STEP 5.2: Add forum moderation columns & tables (v4.1)
+            // ============================================================
+            if (Schema::hasTable('forum')) {
+                Schema::table('forum', function (Blueprint $tbl) {
+                    if (!Schema::hasColumn('forum', 'is_pinned')) {
+                        $tbl->boolean('is_pinned')->default(false);
+                    }
+                    if (!Schema::hasColumn('forum', 'pinned_at')) {
+                        $tbl->unsignedBigInteger('pinned_at')->nullable();
+                    }
+                    if (!Schema::hasColumn('forum', 'pinned_by')) {
+                        $tbl->unsignedBigInteger('pinned_by')->nullable();
+                    }
+                    if (!Schema::hasColumn('forum', 'is_locked')) {
+                        $tbl->boolean('is_locked')->default(false);
+                    }
+                    if (!Schema::hasColumn('forum', 'locked_at')) {
+                        $tbl->unsignedBigInteger('locked_at')->nullable();
+                    }
+                    if (!Schema::hasColumn('forum', 'locked_by')) {
+                        $tbl->unsignedBigInteger('locked_by')->nullable();
+                    }
+                });
+                $log[] = '✅ Forum table updated with moderation columns';
+            }
+
+            if (!Schema::hasTable('forum_moderators')) {
+                Schema::create('forum_moderators', function (Blueprint $tbl) {
+                    $tbl->id();
+                    $tbl->unsignedBigInteger('user_id')->unique();
+                    $tbl->boolean('is_global')->default(false);
+                    $tbl->text('permissions')->nullable();
+                    $tbl->boolean('is_active')->default(true);
+                    $tbl->unsignedBigInteger('created_by')->nullable();
+                    $tbl->timestamps();
+
+                    $tbl->index('is_global');
+                    $tbl->index('is_active');
+                    $tbl->index('created_by');
+                });
+                $log[] = '✅ Created: forum_moderators';
+            }
+
+            if (!Schema::hasTable('forum_moderator_categories')) {
+                Schema::create('forum_moderator_categories', function (Blueprint $tbl) {
+                    $tbl->id();
+                    $tbl->unsignedBigInteger('moderator_id');
+                    $tbl->unsignedBigInteger('category_id');
+
+                    $tbl->unique(['moderator_id', 'category_id'], 'forum_moderator_category_unique');
+                    $tbl->index('moderator_id');
+                    $tbl->index('category_id');
+                });
+                $log[] = '✅ Created: forum_moderator_categories';
+            }
+
+            if (!Schema::hasTable('forum_attachments')) {
+                Schema::create('forum_attachments', function (Blueprint $tbl) {
+                    $tbl->id();
+                    $tbl->unsignedBigInteger('topic_id');
+                    $tbl->unsignedBigInteger('user_id');
+                    $tbl->string('file_path');
+                    $tbl->string('original_name');
+                    $tbl->string('mime_type')->nullable();
+                    $tbl->unsignedBigInteger('file_size')->default(0);
+                    $tbl->unsignedInteger('sort_order')->default(0);
+                    $tbl->timestamps();
+
+                    $tbl->index('topic_id');
+                    $tbl->index('user_id');
+                });
+                $log[] = '✅ Created: forum_attachments';
+            }
+
+            // ============================================================
             // STEP 6: Run any pending Laravel migrations
             // ============================================================
             try {

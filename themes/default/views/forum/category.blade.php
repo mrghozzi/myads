@@ -1,6 +1,8 @@
 @extends('theme::layouts.master')
+@include('theme::forum._assets')
 
 @section('content')
+<div class="forum-rdx forum-rdx-category">
 <!-- SECTION BANNER -->
 <div class="section-banner" style="background: url({{ theme_asset('img/banner/Newsfeed.png') }}) no-repeat 50%;" >
     <img class="section-banner-icon" src="{{ theme_asset('img/banner/discussion-icon.png') }}"  alt="overview-icon">
@@ -67,23 +69,30 @@
     </div>
     
     <div class="grid-column" >
-        <div id="infinite-scroll-container" style="display: grid; grid-gap: 16px;">
-            <div id="timeline-content" style="display: contents;">
-                @forelse($statuses as $status)
-                    @php
-                        $topic = $topics->get($status->tp_id);
-                        if(!$topic) continue;
-                    @endphp
-                    @include('theme::partials.forum.topic_card', ['topic' => $topic, 'status' => $status])
-                @empty
-                    <div class="widget-box" style="margin-bottom: 0;">
-                        <div class="widget-box-content">
-                            <p class="text-center">{{ __('messages.no_topics_found') }}</p>
+        <div class="forum-rdx-discussion-shell">
+            <div class="forum-rdx-discussion-head">
+                <p>{{ __('messages.topic') }}</p>
+                <p class="text-center">{{ __('messages.stats') }}</p>
+                <p class="text-end">{{ __('messages.options') }}</p>
+            </div>
+            <div id="infinite-scroll-container" class="forum-rdx-discussion-list">
+                <div id="timeline-content" style="display: contents;">
+                    @forelse($statuses as $status)
+                        @php
+                            $topic = $topics->get($status->tp_id);
+                            if(!$topic) continue;
+                        @endphp
+                        @include('theme::partials.forum.topic_card', ['topic' => $topic, 'status' => $status])
+                    @empty
+                        <div class="widget-box" style="margin-bottom: 0;">
+                            <div class="widget-box-content">
+                                <p class="text-center">{{ __('messages.no_topics_found') }}</p>
+                            </div>
                         </div>
-                    </div>
-                @endforelse
-                
-                @include('theme::partials.ajax.infinite_scroll', ['paginator' => $statuses])
+                    @endforelse
+                    
+                    @include('theme::partials.ajax.infinite_scroll', ['paginator' => $statuses])
+                </div>
             </div>
         </div>
     </div>
@@ -91,5 +100,6 @@
     <div class="grid-column" >
         <x-widget-column side="forum_right" />
     </div>
+</div>
 </div>
 @endsection

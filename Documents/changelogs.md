@@ -81,6 +81,9 @@
 * **Improvement**: Comment system with emoji support.
 * **Improvement**: Reaction system (like, love, dislike, etc.).
 * **Improvement**: Forum topics and categories with admin-manageable ordering.
+* **Add**: Forum moderation system (pin, lock topics).
+* **Add**: Global and category-specific forum moderators.
+* **Add**: Forum file attachments support.
 
 ### 🔗 Directory
 * **Improvement**: Site directory with categorized listings.
