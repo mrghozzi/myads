@@ -344,7 +344,7 @@
         </div>
 
         <div class="installer-footer">
-            MyAds v4.0.0 &mdash; &copy; {{ date('Y') }}
+            MyAds v4.0.1 &mdash; &copy; {{ date('Y') }}
         </div>
     </div>
 
