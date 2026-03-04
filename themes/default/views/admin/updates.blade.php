@@ -220,6 +220,7 @@
         </div>
     </div>
 
+    @section('modals')
     {{-- Confirm Update Modal --}}
     @if($updateAvailable && $latestRelease)
     <div class="modal fade" id="confirmUpdateModal" tabindex="-1" aria-labelledby="confirmUpdateModalLabel" aria-hidden="true">
@@ -269,6 +270,7 @@
         </div>
     </div>
     @endif
+    @endsection
 
     <style>
         .changelog-content {
@@ -333,8 +335,16 @@
         }
 
         function startUpdate(btn) {
-            btn.disabled = true;
-            btn.innerHTML = '<span class="spinner-border spinner-border-sm-custom me-1" role="status"></span> {{ __("messages.updating") ?? "Updating..." }}';
+            // Get the form before disabling the button
+            const form = btn.closest('form');
+            if (form) {
+                // Change button state
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm-custom me-1" role="status"></span> {{ __("messages.updating") ?? "Updating..." }}';
+                // Add a small delay to allow the form to submit before disabling
+                setTimeout(() => {
+                    btn.disabled = true;
+                }, 10);
+            }
         }
 
         function showFlash(type, message) {

@@ -1,6 +1,3 @@
-# v4.0.1
-* **Fix**: Arabic language file
-
 # v4.0.0
 > **Major Release** — Complete rewrite from plain PHP to the Laravel framework.
 

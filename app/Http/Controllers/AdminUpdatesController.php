@@ -14,7 +14,7 @@ class AdminUpdatesController extends Controller
     /**
      * Current system version (hardcoded).
      */
-    public const CURRENT_VERSION = '4.0.1';
+    public const CURRENT_VERSION = '4.0.0';
 
     /**
      * GitHub repo for releases.
@@ -140,21 +140,37 @@ class AdminUpdatesController extends Controller
                     __('messages.no_download_url') ?? 'No download package found in the release.');
             }
 
-            // Download the zip file
-            $response = Http::withHeaders([
-                'User-Agent' => 'MyAds-Updater/1.0',
-                'Accept'     => 'application/octet-stream',
-            ])->timeout(120)->get($downloadUrl);
+            $tempZipPath = storage_path('app/myads_update.zip');
 
-            if (!$response->successful()) {
+            // Download the zip file directly to disk using sink
+            try {
+                $response = Http::withoutVerifying()->withHeaders([
+                    'User-Agent' => 'MyAds-Updater/1.0',
+                ])->timeout(300)->withOptions([
+                    'sink' => $tempZipPath,
+                ])->get($downloadUrl);
+
+                if (!$response->successful()) {
+                    if (File::exists($tempZipPath)) {
+                        File::delete($tempZipPath);
+                    }
+                    return redirect()->route('admin.updates')->with('error',
+                        (__('messages.download_failed') ?? 'Failed to download the update package.') . ' (HTTP ' . $response->status() . ')');
+                }
+            } catch (\Exception $e) {
+                if (File::exists($tempZipPath)) {
+                    File::delete($tempZipPath);
+                }
                 return redirect()->route('admin.updates')->with('error',
-                    __('messages.download_failed') ?? 'Failed to download the update package.');
+                    (__('messages.download_failed') ?? 'Failed to download the update package.') . ' Error: ' . $e->getMessage());
             }
 
-            $tempZipPath = storage_path('app/myads_update.zip');
-            File::put($tempZipPath, $response->body());
+            // Extract the zip to a temporary directory first
+            $tempExtractPath = storage_path('app/myads_update_extracted');
+            if (!File::exists($tempExtractPath)) {
+                File::makeDirectory($tempExtractPath, 0755, true);
+            }
 
-            // Extract the zip
             $zip = new \ZipArchive;
             if ($zip->open($tempZipPath) !== true) {
                 File::delete($tempZipPath);
@@ -162,9 +178,33 @@ class AdminUpdatesController extends Controller
                     __('messages.zip_open_failed') ?? 'Failed to open the update package.');
             }
 
-            $extractPath = base_path();
-            $zip->extractTo($extractPath);
+            $zip->extractTo($tempExtractPath);
             $zip->close();
+
+            // GitHub zips contain a root folder (e.g., mrghozzi-myads-2df4a1).
+            // We need to move the contents of that inner folder to the base_path().
+            $directories = File::directories($tempExtractPath);
+            if (count($directories) > 0) {
+                $innerFolder = $directories[0]; // The root folder inside the zip
+                $basePath = base_path();
+
+                // Move all files and folders from the inner folder to the base path
+                foreach (File::allFiles($innerFolder) as $file) {
+                    $relativePath = str_replace($innerFolder . DIRECTORY_SEPARATOR, '', $file->getRealPath());
+                    $targetPath = $basePath . DIRECTORY_SEPARATOR . $relativePath;
+                    
+                    // Create directory if it doesn't exist
+                    $targetDir = dirname($targetPath);
+                    if (!File::exists($targetDir)) {
+                        File::makeDirectory($targetDir, 0755, true);
+                    }
+                    
+                    File::copy($file->getRealPath(), $targetPath);
+                }
+            }
+
+            // Cleanup extraction temp directory
+            File::deleteDirectory($tempExtractPath);
 
             // Run update script if exists
             $updateScript = base_path('requests/update.php');
@@ -207,7 +247,7 @@ class AdminUpdatesController extends Controller
     {
         return Cache::remember('github_latest_release', 3600, function () {
             try {
-                $response = Http::withHeaders([
+                $response = Http::withoutVerifying()->withHeaders([
                     'User-Agent' => 'MyAds-Updater/1.0',
                     'Accept'     => 'application/vnd.github.v3+json',
                 ])->timeout(10)->get(self::GITHUB_API_URL);
