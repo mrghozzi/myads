@@ -28,7 +28,7 @@
             <li>Create storage symlink</li>
             <li>Copy old upload directory if found</li>
             <li>Generate APP_KEY if missing</li>
-            <li>Update version to <strong>4.0.0</strong></li>
+            <li>Update version to <strong>4.0.1</strong></li>
         </ul>
     </div>
 
