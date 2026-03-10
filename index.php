@@ -9,6 +9,11 @@ if (file_exists($maintenance = __DIR__.'/storage/framework/maintenance.php')) {
     require $maintenance;
 }
 
+// Auto-create .env from .env.example if missing (fresh install support)
+if (!file_exists(__DIR__.'/.env') && file_exists(__DIR__.'/.env.example')) {
+    copy(__DIR__.'/.env.example', __DIR__.'/.env');
+}
+
 // Register the Composer autoloader...
 require __DIR__.'/vendor/autoload.php';
 
