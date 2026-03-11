@@ -19,6 +19,7 @@
 /public/storage
 /public/upload
 /storage/*.key
+/storage/installed
 /storage/pail
 Homestead.json
 Homestead.yaml
