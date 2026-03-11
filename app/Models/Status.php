@@ -52,73 +52,90 @@ class Status extends Model
 
     public function getDateFormattedAttribute()
     {
-        return Carbon::createFromTimestamp($this->date)->diffForHumans();
+        try {
+            return Carbon::createFromTimestamp($this->date)->diffForHumans();
+        } catch (\Throwable $e) {
+            return '';
+        }
     }
 
     public function getReactionsCountAttribute()
     {
-        $type = $this->getReactionType();
-        if (!$type) {
+        try {
+            $type = $this->getReactionType();
+            if (!$type) {
+                return 0;
+            }
+
+            return Like::where('sid', $this->tp_id)
+                ->where('type', $type)
+                ->count();
+        } catch (\Throwable $e) {
             return 0;
         }
-
-        return Like::where('sid', $this->tp_id)
-            ->where('type', $type)
-            ->count();
     }
 
     public function getCommentsCountAttribute()
     {
-        if ($this->s_type == 1) {
-            return Option::where('o_parent', $this->tp_id)
-                ->where('o_type', 'd_coment')
-                ->count();
-        }
+        try {
+            if ($this->s_type == 1) {
+                return Option::where('o_parent', $this->tp_id)
+                    ->where('o_type', 'd_coment')
+                    ->count();
+            }
 
-        if (in_array($this->s_type, [2, 4, 100])) {
-            return ForumComment::where('tid', $this->tp_id)->count();
-        }
+            if (in_array($this->s_type, [2, 4, 100])) {
+                return ForumComment::where('tid', $this->tp_id)->count();
+            }
 
-        if ($this->s_type == 7867) {
-            return Option::where('o_parent', $this->tp_id)
-                ->where('o_type', 's_coment')
-                ->count();
-        }
+            if ($this->s_type == 7867) {
+                return Option::where('o_parent', $this->tp_id)
+                    ->where('o_type', 's_coment')
+                    ->count();
+            }
 
-        return 0;
+            return 0;
+        } catch (\Throwable $e) {
+            return 0;
+        }
     }
 
     public function getGroupedReactionsAttribute()
     {
-        $type = $this->getReactionType();
-        if (!$type) {
-            return [];
-        }
-
-        $likes = Like::with('user')
-            ->where('sid', $this->tp_id)
-            ->where('type', $type)
-            ->get();
-
-        if ($likes->isEmpty()) {
-            return [];
-        }
-
-        $options = Option::whereIn('o_parent', $likes->pluck('id'))
-            ->where('o_type', 'data_reaction')
-            ->get()
-            ->keyBy('o_parent');
-
-        $grouped = [];
-        foreach ($likes as $like) {
-            if (!$like->user) {
-                continue;
+        try {
+            $type = $this->getReactionType();
+            if (!$type) {
+                return [];
             }
-            $reaction = $options->get($like->id)->o_valuer ?? 'like';
-            $grouped[$reaction][] = $like->user;
-        }
 
-        return $grouped;
+            $likes = Like::with('user')
+                ->where('sid', $this->tp_id)
+                ->where('type', $type)
+                ->get();
+
+            if ($likes->isEmpty()) {
+                return [];
+            }
+
+            $options = Option::whereIn('o_parent', $likes->pluck('id'))
+                ->where('o_type', 'data_reaction')
+                ->get()
+                ->keyBy('o_parent');
+
+            $grouped = [];
+            foreach ($likes as $like) {
+                if (!$like->user) {
+                    continue;
+                }
+                $option = $options->get($like->id);
+                $reaction = $option ? $option->o_valuer : 'like';
+                $grouped[$reaction][] = $like->user;
+            }
+
+            return $grouped;
+        } catch (\Throwable $e) {
+            return [];
+        }
     }
 
     private function getReactionType()

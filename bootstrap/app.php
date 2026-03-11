@@ -20,6 +20,12 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'admin' => \App\Http\Middleware\AdminMiddleware::class,
         ]);
+
+        // Exclude installer routes from CSRF verification
+        // (session may not persist during fresh install on some hosting)
+        $middleware->validateCsrfTokens(except: [
+            'install/*',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         // Redirect to installer if APP_KEY is missing (fresh install)

@@ -128,6 +128,22 @@ class InstallerController extends Controller
             Artisan::call('migrate', ['--force' => true]);
             $migrateOutput = Artisan::output();
 
+            // Ensure directory table exists (may be missing if migration was recorded but table not created)
+            if (!Schema::hasTable('directory')) {
+                Schema::create('directory', function (Blueprint $tbl) {
+                    $tbl->id();
+                    $tbl->unsignedBigInteger('uid');
+                    $tbl->string('name');
+                    $tbl->string('url');
+                    $tbl->text('txt')->nullable();
+                    $tbl->string('metakeywords')->nullable();
+                    $tbl->unsignedBigInteger('cat')->default(0);
+                    $tbl->integer('vu')->default(0);
+                    $tbl->tinyInteger('statu')->default(1);
+                    $tbl->bigInteger('date')->default(0);
+                });
+            }
+
             try {
                 Artisan::call('db:seed', ['--force' => true]);
             } catch (\Exception $e) {
