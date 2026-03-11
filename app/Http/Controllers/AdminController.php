@@ -62,55 +62,73 @@ class AdminController extends Controller
             }
         } catch (\Exception $e) {}
 
-        $latestVersion = Cache::remember('latest_version', 3600, function () {
-            try {
-                $response = Http::withHeaders([
-                    'User-Agent' => 'MyAds-Updater/1.0',
-                    'Accept'     => 'application/vnd.github.v3+json',
-                ])->timeout(5)->get('https://api.github.com/repos/mrghozzi/myads/releases/latest');
-                
-                if ($response->successful()) {
-                    $data = $response->json();
-                    return ltrim($data['tag_name'] ?? '', 'v');
+        $latestVersion = null;
+        try {
+            $latestVersion = Cache::remember('latest_version', 3600, function () {
+                try {
+                    $response = Http::withHeaders([
+                        'User-Agent' => 'MyAds-Updater/1.0',
+                        'Accept'     => 'application/vnd.github.v3+json',
+                    ])->timeout(5)->get('https://api.github.com/repos/mrghozzi/myads/releases/latest');
+                    
+                    if ($response->successful()) {
+                        $data = $response->json();
+                        return ltrim($data['tag_name'] ?? '', 'v');
+                    }
+                } catch (\Exception $e) {
+                    return null;
                 }
-            } catch (\Exception $e) {
                 return null;
-            }
-            return null;
-        });
+            });
+        } catch (\Throwable $e) {
+            $latestVersion = null;
+        }
 
-        // Stats
-        $stats = [
-            'users' => User::count(),
-            'users_online' => User::where('online', '>', time() - 240)->count(),
-            'posts' => Status::count(),
-            'topics' => ForumTopic::count(),
-            'listings' => Directory::count(),
-            'products' => Product::withoutGlobalScope('store')->where('o_type', 'store')->count(),
-            'banners' => [
-                'total' => Banner::count(),
-                'views' => Banner::sum('vu'),
-                'clicks' => Banner::sum('clik'),
-            ],
-            'links' => [
-                'total' => Link::count(),
-                'clicks' => Link::sum('clik'),
-                // Assuming views might not be tracked separately for links or stored in clik
-                'views' => 0, // Placeholder if column doesn't exist
-            ],
-            'visits' => [
-                'total' => Visit::count(),
-            ],
-            'reactions' => [
-                'total' => \App\Models\Like::count(),
-            ],
-            'followers' => \App\Models\Like::where('type', 1)->count(),
-            'reports' => [
-                'pending' => Report::where('statu', 1)->count(),
-            ],
-            'last_user' => User::orderBy('id', 'desc')->first(),
-            'last_post' => Status::with('user')->orderBy('id', 'desc')->first(),
-        ];
+        // Stats - wrapped in try-catch for fresh installs or restricted hosting
+        try {
+            $stats = [
+                'users' => User::count(),
+                'users_online' => User::where('online', '>', time() - 240)->count(),
+                'posts' => Status::count(),
+                'topics' => ForumTopic::count(),
+                'listings' => Directory::count(),
+                'products' => Product::withoutGlobalScope('store')->where('o_type', 'store')->count(),
+                'banners' => [
+                    'total' => Banner::count(),
+                    'views' => Banner::sum('vu'),
+                    'clicks' => Banner::sum('clik'),
+                ],
+                'links' => [
+                    'total' => Link::count(),
+                    'clicks' => Link::sum('clik'),
+                    'views' => 0,
+                ],
+                'visits' => [
+                    'total' => Visit::count(),
+                ],
+                'reactions' => [
+                    'total' => \App\Models\Like::count(),
+                ],
+                'followers' => \App\Models\Like::where('type', 1)->count(),
+                'reports' => [
+                    'pending' => Report::where('statu', 1)->count(),
+                ],
+                'last_user' => User::orderBy('id', 'desc')->first(),
+                'last_post' => Status::with('user')->orderBy('id', 'desc')->first(),
+            ];
+        } catch (\Throwable $e) {
+            $stats = [
+                'users' => 0, 'users_online' => 0, 'posts' => 0, 'topics' => 0,
+                'listings' => 0, 'products' => 0,
+                'banners' => ['total' => 0, 'views' => 0, 'clicks' => 0],
+                'links' => ['total' => 0, 'clicks' => 0, 'views' => 0],
+                'visits' => ['total' => 0],
+                'reactions' => ['total' => 0],
+                'followers' => 0,
+                'reports' => ['pending' => 0],
+                'last_user' => null, 'last_post' => null,
+            ];
+        }
 
         // Chart Data for Dashboard
         $chartData = [
