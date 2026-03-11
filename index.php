@@ -12,6 +12,23 @@ if (file_exists($maintenance = __DIR__.'/storage/framework/maintenance.php')) {
 // Auto-create .env from .env.example if missing (fresh install support)
 if (!file_exists(__DIR__.'/.env') && file_exists(__DIR__.'/.env.example')) {
     copy(__DIR__.'/.env.example', __DIR__.'/.env');
+    // Remove stale installed marker on fresh install
+    @unlink(__DIR__.'/storage/installed');
+}
+
+// Ensure required storage directories exist (shared hosting may lack them)
+foreach ([
+    __DIR__.'/storage/framework/cache/data',
+    __DIR__.'/storage/framework/sessions',
+    __DIR__.'/storage/framework/views',
+    __DIR__.'/storage/framework/testing',
+    __DIR__.'/storage/logs',
+    __DIR__.'/storage/app/public',
+    __DIR__.'/bootstrap/cache',
+] as $dir) {
+    if (!is_dir($dir)) {
+        @mkdir($dir, 0775, true);
+    }
 }
 
 // Register the Composer autoloader...

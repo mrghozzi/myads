@@ -202,6 +202,9 @@ class InstallerController extends Controller
         // Create installed file to prevent re-installation
         File::put(storage_path('installed'), date('Y-m-d H:i:s'));
 
+        // Disable debug mode after installation for security
+        $this->writeEnv(['APP_DEBUG' => 'false']);
+
         // Clear all caches for fresh start
         try {
             Artisan::call('config:clear');
