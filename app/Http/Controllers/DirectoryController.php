@@ -12,21 +12,29 @@ class DirectoryController extends Controller
 {
     public function index()
     {
-        // Get main categories (where sub = 0)
-        $categories = DirectoryCategory::where('sub', 0)
-            ->where('statu', 1)
-            ->orderBy('ordercat', 'asc')
-            ->get();
+        // Load categories separately so they show even if activities fail
+        try {
+            $categories = DirectoryCategory::where('sub', 0)
+                ->where('statu', 1)
+                ->orderBy('ordercat', 'asc')
+                ->get();
+        } catch (\Throwable $e) {
+            $categories = collect();
+        }
 
-        $activities = Status::where('s_type', 1)
-            ->where('date', '<', time())
-            ->orderBy('date', 'desc')
-            ->paginate(15);
+        try {
+            $activities = Status::where('s_type', 1)
+                ->where('date', '<', time())
+                ->orderBy('date', 'desc')
+                ->paginate(15);
 
-        $directoryIds = $activities->pluck('tp_id')->filter()->unique();
-        $directories = Directory::whereIn('id', $directoryIds)->get()->keyBy('id');
-        foreach ($activities as $activity) {
-            $activity->related_content = $directories->get($activity->tp_id);
+            $directoryIds = $activities->pluck('tp_id')->filter()->unique();
+            $directories = Directory::whereIn('id', $directoryIds)->get()->keyBy('id');
+            foreach ($activities as $activity) {
+                $activity->related_content = $directories->get($activity->tp_id);
+            }
+        } catch (\Throwable $e) {
+            $activities = new \Illuminate\Pagination\LengthAwarePaginator([], 0, 15);
         }
 
         if (request()->ajax()) {
@@ -42,27 +50,31 @@ class DirectoryController extends Controller
 
     public function category($id)
     {
-        $category = DirectoryCategory::findOrFail($id);
-        
-        // Get subcategories
-        $subCategories = DirectoryCategory::where('sub', $id)
-            ->where('statu', 1)
-            ->orderBy('ordercat', 'asc')
-            ->get();
+        try {
+            $category = DirectoryCategory::findOrFail($id);
+            
+            // Get subcategories
+            $subCategories = DirectoryCategory::where('sub', $id)
+                ->where('statu', 1)
+                ->orderBy('ordercat', 'asc')
+                ->get();
 
-        $directoryIds = Directory::where('cat', $id)
-            ->where('statu', 1)
-            ->pluck('id');
+            $directoryIds = Directory::where('cat', $id)
+                ->where('statu', 1)
+                ->pluck('id');
 
-        $activities = Status::where('s_type', 1)
-            ->where('date', '<', time())
-            ->whereIn('tp_id', $directoryIds)
-            ->orderBy('date', 'desc')
-            ->paginate(15);
+            $activities = Status::where('s_type', 1)
+                ->where('date', '<', time())
+                ->whereIn('tp_id', $directoryIds)
+                ->orderBy('date', 'desc')
+                ->paginate(15);
 
-        $directories = Directory::whereIn('id', $directoryIds)->get()->keyBy('id');
-        foreach ($activities as $activity) {
-            $activity->related_content = $directories->get($activity->tp_id);
+            $directories = Directory::whereIn('id', $directoryIds)->get()->keyBy('id');
+            foreach ($activities as $activity) {
+                $activity->related_content = $directories->get($activity->tp_id);
+            }
+        } catch (\Throwable $e) {
+            abort(404);
         }
 
         if (request()->ajax()) {
@@ -78,18 +90,27 @@ class DirectoryController extends Controller
 
     public function show($id)
     {
-        $listing = Directory::findOrFail($id);
-        $activity = Status::where('s_type', 1)
-            ->where('tp_id', $listing->id)
-            ->first();
-
-        if (!$activity) {
-            return abort(404);
+        // Reject non-numeric IDs (prevents /directory/store, /directory/ads etc.)
+        if (!is_numeric($id)) {
+            abort(404);
         }
 
-        $activity->related_content = $listing;
+        try {
+            $listing = Directory::findOrFail($id);
+            $activity = Status::where('s_type', 1)
+                ->where('tp_id', $listing->id)
+                ->first();
 
-        return view('theme::directory.show', compact('listing', 'activity'));
+            if (!$activity) {
+                return abort(404);
+            }
+
+            $activity->related_content = $listing;
+
+            return view('theme::directory.show', compact('listing', 'activity'));
+        } catch (\Throwable $e) {
+            abort(404);
+        }
     }
 
     public function showShort($id)
@@ -169,38 +190,42 @@ class DirectoryController extends Controller
             'tag' => 'nullable|string',
         ]);
 
-        $listing = Directory::create([
-            'uid' => auth()->id(),
-            'name' => $request->name,
-            'url' => $request->url,
-            'cat' => $request->categ,
-            'txt' => $request->txt ?? '',
-            'metakeywords' => $request->tag ?? '',
-            'date' => time(),
-            'statu' => 1,
-            'vu' => 0,
-        ]);
+        try {
+            $listing = Directory::create([
+                'uid' => auth()->id(),
+                'name' => $request->name,
+                'url' => $request->url,
+                'cat' => $request->categ,
+                'txt' => $request->txt ?? '',
+                'metakeywords' => $request->tag ?? '',
+                'date' => time(),
+                'statu' => 1,
+                'vu' => 0,
+            ]);
 
-        // Create Status
-        Status::create([
-            'uid' => auth()->id(),
-            'tp_id' => $listing->id,
-            's_type' => 1,
-            'date' => time(),
-        ]);
+            // Create Status
+            Status::create([
+                'uid' => auth()->id(),
+                'tp_id' => $listing->id,
+                's_type' => 1,
+                'date' => time(),
+            ]);
 
-        // Create Short URL record
-        $hash = hash('crc32', $listing->url . $listing->id);
-        Short::create([
-            'uid' => auth()->id(),
-            'url' => $listing->url,
-            'sho' => $hash,
-            'clik' => 0,
-            'sh_type' => 1,
-            'tp_id' => $listing->id,
-        ]);
+            // Create Short URL record
+            $hash = hash('crc32', $listing->url . $listing->id);
+            Short::create([
+                'uid' => auth()->id(),
+                'url' => $listing->url,
+                'sho' => $hash,
+                'clik' => 0,
+                'sh_type' => 1,
+                'tp_id' => $listing->id,
+            ]);
 
-        return redirect()->route('directory.show', $listing->id)->with('success', __('WebsiteCreated'));
+            return redirect()->route('directory.show', $listing->id)->with('success', __('WebsiteCreated'));
+        } catch (\Throwable $e) {
+            return redirect()->back()->withErrors(['error' => __('messages.error_occurred') . ': ' . $e->getMessage()])->withInput();
+        }
     }
 
     public function edit($id)

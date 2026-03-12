@@ -21,6 +21,7 @@ class Directory extends Model
         'cat',
         'vu',
         'statu',
+        'date',
     ];
 
     public function user()

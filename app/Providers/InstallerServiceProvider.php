@@ -14,12 +14,6 @@ class InstallerServiceProvider extends ServiceProvider
 
     public function boot()
     {
-        // Use array session driver during installation if APP_KEY is empty
-        // This avoids encryption errors when the app hasn't been set up yet
-        if (empty(env('APP_KEY')) || env('APP_KEY') === 'base64:dGhpc0lzQURlZmF1bHRLZXlGb3JJbnN0YWxsYXRpb24=') {
-            config(['session.driver' => 'array']);
-        }
-
         // Always load installer views
         $this->loadViewsFrom(base_path('installer/views'), 'installer');
 
