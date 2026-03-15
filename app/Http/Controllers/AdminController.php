@@ -15,6 +15,7 @@ use App\Models\Setting;
 use App\Models\State;
 use App\Models\Notification;
 use App\Models\ForumTopic;
+use App\Models\ForumModerator;
 use App\Models\Directory;
 use App\Models\Product;
 
@@ -31,65 +32,133 @@ use App\Models\Emoji;
 use App\Models\Menu;
 use App\Models\Option;
 use App\Models\Knowledgebase;
+use App\Models\Page;
 use App\Services\PluginManager;
 use App\Services\ThemeManager;
+use App\Support\ForumSettings;
 
 class AdminController extends Controller
 {
+    private const FORUM_PERMISSION_KEYS = [
+        'pin_topics',
+        'lock_topics',
+        'edit_topics',
+        'delete_topics',
+        'delete_comments',
+    ];
+
     public function index()
     {
         // Version Check
-        $currentVersion = Option::where('name', 'version')->value('o_valuer') ?? '4.0.0';
-        $latestVersion = Cache::remember('latest_version', 3600, function () {
-            try {
-                $response = Http::withHeaders([
-                    'User-Agent' => 'MyAds-Updater/1.0',
-                    'Accept'     => 'application/vnd.github.v3+json',
-                ])->timeout(5)->get('https://api.github.com/repos/mrghozzi/myads/releases/latest');
-                if ($response->successful()) {
-                    $data = $response->json();
-                    return ltrim($data['tag_name'] ?? '', 'v');
-                }
-            } catch (\Exception $e) {
-                return null;
+        $currentVersion = \App\Http\Controllers\AdminUpdatesController::CURRENT_VERSION;
+        
+        // Sync version in DB (optional but good for consistency)
+        try {
+            $versionParts = explode('.', $currentVersion);
+            $versionName = implode('-', $versionParts);
+            $dbVersion = Option::where('o_type', 'version')->first();
+            if ($dbVersion && $dbVersion->o_valuer != $currentVersion) {
+                $dbVersion->update(['o_valuer' => $currentVersion, 'name' => $versionName]);
             }
-            return null;
-        });
+        } catch (\Exception $e) {}
 
-        // Stats
-        $stats = [
-            'users' => User::count(),
-            'users_online' => User::where('online', '>', time() - 240)->count(),
-            'posts' => Status::count(),
-            'topics' => ForumTopic::count(),
-            'listings' => Directory::count(),
-            'products' => Product::withoutGlobalScope('store')->where('o_type', 'store')->count(),
-            'banners' => [
-                'total' => Banner::count(),
-                'views' => Banner::sum('vu'),
-                'clicks' => Banner::sum('clik'),
+        $latestVersion = null;
+        try {
+            $latestVersion = Cache::remember('latest_version', 3600, function () {
+                try {
+                    $response = Http::withHeaders([
+                        'User-Agent' => 'MyAds-Updater/1.0',
+                        'Accept'     => 'application/vnd.github.v3+json',
+                    ])->timeout(5)->get('https://api.github.com/repos/mrghozzi/myads/releases/latest');
+                    
+                    if ($response->successful()) {
+                        $data = $response->json();
+                        return ltrim($data['tag_name'] ?? '', 'v');
+                    }
+                } catch (\Exception $e) {
+                    return null;
+                }
+                return null;
+            });
+        } catch (\Throwable $e) {
+            $latestVersion = null;
+        }
+
+        // Stats - wrapped in try-catch for fresh installs or restricted hosting
+        try {
+            $stats = [
+                'users' => User::count(),
+                'users_online' => User::where('online', '>', time() - 240)->count(),
+                'posts' => Status::count(),
+                'topics' => ForumTopic::count(),
+                'listings' => Directory::count(),
+                'products' => Product::withoutGlobalScope('store')->where('o_type', 'store')->count(),
+                'banners' => [
+                    'total' => Banner::count(),
+                    'views' => Banner::sum('vu'),
+                    'clicks' => Banner::sum('clik'),
+                ],
+                'links' => [
+                    'total' => Link::count(),
+                    'clicks' => Link::sum('clik'),
+                    'views' => 0,
+                ],
+                'visits' => [
+                    'total' => Visit::count(),
+                ],
+                'reactions' => [
+                    'total' => \App\Models\Like::count(),
+                ],
+                'followers' => \App\Models\Like::where('type', 1)->count(),
+                'reports' => [
+                    'pending' => Report::where('statu', 1)->count(),
+                ],
+                'last_user' => User::orderBy('id', 'desc')->first(),
+                'last_post' => Status::with('user')->orderBy('id', 'desc')->first(),
+            ];
+        } catch (\Throwable $e) {
+            $stats = [
+                'users' => 0, 'users_online' => 0, 'posts' => 0, 'topics' => 0,
+                'listings' => 0, 'products' => 0,
+                'banners' => ['total' => 0, 'views' => 0, 'clicks' => 0],
+                'links' => ['total' => 0, 'clicks' => 0, 'views' => 0],
+                'visits' => ['total' => 0],
+                'reactions' => ['total' => 0],
+                'followers' => 0,
+                'reports' => ['pending' => 0],
+                'last_user' => null, 'last_post' => null,
+            ];
+        }
+
+        // Chart Data for Dashboard
+        $chartData = [
+            'distribution' => [
+                'labels' => [
+                    __('messages.bannads'),
+                    __('messages.textads'),
+                    __('messages.exvisit'),
+                ],
+                'data' => [
+                    $stats['banners']['total'],
+                    $stats['links']['total'],
+                    $stats['visits']['total'],
+                ],
             ],
-            'links' => [
-                'total' => Link::count(),
-                'clicks' => Link::sum('clik'),
-                // Assuming views might not be tracked separately for links or stored in clik
-                'views' => 0, // Placeholder if column doesn't exist
+            'engagement' => [
+                'labels' => [
+                    __('messages.bannads') . ' ' . __('messages.Views'),
+                    __('messages.bannads') . ' ' . __('messages.clicks'),
+                    __('messages.textads') . ' ' . __('messages.clicks'),
+                ],
+                'data' => [
+                    $stats['banners']['views'],
+                    $stats['banners']['clicks'],
+                    $stats['links']['clicks'],
+                ],
             ],
-            'visits' => [
-                'total' => Visit::count(),
-            ],
-            'reactions' => [
-                'total' => \App\Models\Like::count(),
-            ],
-            'followers' => \App\Models\Like::where('type', 1)->count(),
-            'reports' => [
-                'pending' => Report::where('statu', 1)->count(),
-            ],
-            'last_user' => User::orderBy('id', 'desc')->first(),
-            'last_post' => Status::with('user')->orderBy('id', 'desc')->first(),
         ];
         
-        return view('theme::admin.index', compact('stats', 'currentVersion', 'latestVersion'));
+        return view('theme::admin.index', compact('stats', 'currentVersion', 'latestVersion', 'chartData'));
     }
 
     public function settings()
@@ -561,6 +630,135 @@ class AdminController extends Controller
         return redirect()->back()->with('success', __('category_deleted'));
     }
 
+    public function forumSettings()
+    {
+        $forumSettings = ForumSettings::all();
+        return view('theme::admin.forum_settings', compact('forumSettings'));
+    }
+
+    public function updateForumSettings(Request $request)
+    {
+        $request->validate([
+            'topics_per_page' => 'required|integer|min:1|max:100',
+            'max_attachments_per_topic' => 'required|integer|min:1|max:20',
+            'max_attachment_size_kb' => 'required|integer|min:512|max:51200',
+            'allowed_attachment_extensions' => 'required|string|max:500',
+            'attachments_enabled' => 'nullable|in:1',
+            'show_role_badges' => 'nullable|in:1',
+        ]);
+
+        $values = ForumSettings::normalizeIncoming($request->all());
+        ForumSettings::save($values);
+
+        return redirect()->back()->with('success', __('messages.forum_settings_updated'));
+    }
+
+    public function forumModerators()
+    {
+        $moderators = ForumModerator::with(['user', 'categories'])->orderBy('id', 'desc')->paginate(20);
+        $users = User::orderBy('username', 'asc')->get(['id', 'username', 'email']);
+        $categories = ForumCategory::orderBy('ordercat', 'asc')->get(['id', 'name']);
+        $permissionKeys = $this->forumPermissionKeys();
+
+        return view('theme::admin.forum_moderators', compact('moderators', 'users', 'categories', 'permissionKeys'));
+    }
+
+    public function storeForumModerator(Request $request)
+    {
+        $request->validate([
+            'user_id' => 'required|integer|exists:users,id|unique:forum_moderators,user_id',
+            'is_global' => 'nullable|in:1',
+            'is_active' => 'nullable|in:1',
+            'permissions' => 'nullable|array',
+            'permissions.*' => 'in:' . implode(',', $this->forumPermissionKeys()),
+            'category_ids' => 'nullable|array',
+            'category_ids.*' => 'integer|exists:f_cat,id',
+        ]);
+
+        $isGlobal = $request->has('is_global');
+        $categoryIds = collect($request->input('category_ids', []))
+            ->filter(fn ($id) => is_numeric($id))
+            ->map(fn ($id) => (int) $id)
+            ->unique()
+            ->values();
+
+        if (!$isGlobal && $categoryIds->isEmpty()) {
+            return redirect()->back()->withErrors([
+                'category_ids' => __('messages.forum_moderator_categories_required'),
+            ])->withInput();
+        }
+
+        $permissions = collect($request->input('permissions', []))
+            ->filter(fn ($permission) => in_array($permission, $this->forumPermissionKeys(), true))
+            ->values()
+            ->all();
+
+        $moderator = ForumModerator::create([
+            'user_id' => (int) $request->input('user_id'),
+            'is_global' => $isGlobal ? 1 : 0,
+            'is_active' => $request->has('is_active') ? 1 : 0,
+            'permissions' => $permissions,
+            'created_by' => Auth::id(),
+        ]);
+
+        $moderator->categories()->sync($isGlobal ? [] : $categoryIds->all());
+
+        return redirect()->back()->with('success', __('messages.forum_moderator_created'));
+    }
+
+    public function updateForumModerator(Request $request, $id)
+    {
+        $moderator = ForumModerator::with('categories')->findOrFail($id);
+
+        $request->validate([
+            'user_id' => 'required|integer|exists:users,id|unique:forum_moderators,user_id,' . $moderator->id,
+            'is_global' => 'nullable|in:1',
+            'is_active' => 'nullable|in:1',
+            'permissions' => 'nullable|array',
+            'permissions.*' => 'in:' . implode(',', $this->forumPermissionKeys()),
+            'category_ids' => 'nullable|array',
+            'category_ids.*' => 'integer|exists:f_cat,id',
+        ]);
+
+        $isGlobal = $request->has('is_global');
+        $categoryIds = collect($request->input('category_ids', []))
+            ->filter(fn ($id) => is_numeric($id))
+            ->map(fn ($id) => (int) $id)
+            ->unique()
+            ->values();
+
+        if (!$isGlobal && $categoryIds->isEmpty()) {
+            return redirect()->back()->withErrors([
+                'category_ids' => __('messages.forum_moderator_categories_required'),
+            ])->withInput();
+        }
+
+        $permissions = collect($request->input('permissions', []))
+            ->filter(fn ($permission) => in_array($permission, $this->forumPermissionKeys(), true))
+            ->values()
+            ->all();
+
+        $moderator->update([
+            'user_id' => (int) $request->input('user_id'),
+            'is_global' => $isGlobal ? 1 : 0,
+            'is_active' => $request->has('is_active') ? 1 : 0,
+            'permissions' => $permissions,
+        ]);
+
+        $moderator->categories()->sync($isGlobal ? [] : $categoryIds->all());
+
+        return redirect()->back()->with('success', __('messages.forum_moderator_updated'));
+    }
+
+    public function deleteForumModerator($id)
+    {
+        $moderator = ForumModerator::findOrFail($id);
+        $moderator->categories()->detach();
+        $moderator->delete();
+
+        return redirect()->back()->with('success', __('messages.forum_moderator_deleted'));
+    }
+
     // Directory Categories
     public function directoryCategories()
     {
@@ -909,12 +1107,12 @@ class AdminController extends Controller
     }
 
     // Widgets Management
-    public function widgets()
+
+    /**
+     * Get all widget places including dynamic pages.
+     */
+    private function getWidgetPlaces()
     {
-        $widgets = Option::where('o_type', 'box_widget')
-            ->orderBy('o_parent', 'asc')
-            ->orderBy('o_order', 'asc')
-            ->get();
         $places = [
             '1' => 'portal_left',
             '2' => 'portal_right',
@@ -923,8 +1121,49 @@ class AdminController extends Controller
             '5' => 'directory_left',
             '6' => 'directory_right',
             '7' => 'profile_left',
-            '8' => 'profile_right'
+            '8' => 'profile_right',
         ];
+
+        // Add dynamic page places (safely handle missing table)
+        if (\Illuminate\Support\Facades\Schema::hasTable('pages')) {
+            $pages = Page::orderBy('id', 'asc')->get();
+            foreach ($pages as $page) {
+                $places[(string) $page->getLeftPlaceId()] = __('messages.page_left') . ': ' . $page->title;
+                $places[(string) $page->getRightPlaceId()] = __('messages.page_right') . ': ' . $page->title;
+            }
+        }
+
+        return $places;
+    }
+
+    /**
+     * Get all allowed place IDs as a comma-separated string.
+     */
+    private function getAllowedPlaceIds($type = 'widget_html')
+    {
+        $places = $this->getWidgetPlaces();
+        $ids = array_keys($places);
+
+        // For non-HTML widgets, exclude profile places (7, 8)
+        if ($type !== 'widget_html') {
+            $ids = array_filter($ids, fn($id) => !in_array((int)$id, [7, 8], true));
+        }
+
+        return $ids;
+    }
+
+    private function forumPermissionKeys(): array
+    {
+        return self::FORUM_PERMISSION_KEYS;
+    }
+
+    public function widgets()
+    {
+        $widgets = Option::where('o_type', 'box_widget')
+            ->orderBy('o_parent', 'asc')
+            ->orderBy('o_order', 'asc')
+            ->get();
+        $places = $this->getWidgetPlaces();
         return view('theme::admin.widgets', compact('widgets', 'places'));
     }
 
@@ -935,17 +1174,8 @@ class AdminController extends Controller
         if (!in_array($type, $allowedTypes, true)) {
             abort(404);
         }
-        $places = [
-            '1' => 'portal_left',
-            '2' => 'portal_right',
-            '3' => 'forum_left',
-            '4' => 'forum_right',
-            '5' => 'directory_left',
-            '6' => 'directory_right',
-            '7' => 'profile_left',
-            '8' => 'profile_right'
-        ];
-        $allowedPlaceIds = $type === 'widget_html' ? ['1','2','3','4','5','6','7','8'] : ['1','2','3','4','5','6'];
+        $places = $this->getWidgetPlaces();
+        $allowedPlaceIds = array_map('strval', $this->getAllowedPlaceIds($type));
         return view('theme::admin.widgets_form', [
             'mode' => 'create',
             'widget' => null,
@@ -958,17 +1188,8 @@ class AdminController extends Controller
     public function widgetEditForm($id)
     {
         $widget = Option::where('o_type', 'box_widget')->where('id', $id)->firstOrFail();
-        $places = [
-            '1' => 'portal_left',
-            '2' => 'portal_right',
-            '3' => 'forum_left',
-            '4' => 'forum_right',
-            '5' => 'directory_left',
-            '6' => 'directory_right',
-            '7' => 'profile_left',
-            '8' => 'profile_right'
-        ];
-        $allowedPlaceIds = $widget->o_mode === 'widget_html' ? ['1','2','3','4','5','6','7','8'] : ['1','2','3','4','5','6'];
+        $places = $this->getWidgetPlaces();
+        $allowedPlaceIds = array_map('strval', $this->getAllowedPlaceIds($widget->o_mode));
         return view('theme::admin.widgets_form', [
             'mode' => 'edit',
             'widget' => $widget,
@@ -981,7 +1202,7 @@ class AdminController extends Controller
     public function storeWidget(Request $request)
     {
         $type = $request->input('o_mode');
-        $allowedPlaceIds = $type === 'widget_html' ? '1,2,3,4,5,6,7,8' : '1,2,3,4,5,6';
+        $allowedPlaceIds = implode(',', $this->getAllowedPlaceIds($type));
         $request->validate([
             'name' => 'required|string',
             'o_parent' => 'required|integer|in:' . $allowedPlaceIds,
@@ -1004,7 +1225,7 @@ class AdminController extends Controller
     public function updateWidget(Request $request, $id)
     {
         $widget = Option::where('o_type', 'box_widget')->where('id', $id)->firstOrFail();
-        $allowedPlaceIds = $widget->o_mode === 'widget_html' ? '1,2,3,4,5,6,7,8' : '1,2,3,4,5,6';
+        $allowedPlaceIds = implode(',', $this->getAllowedPlaceIds($widget->o_mode));
         $request->validate([
             'name' => 'required|string',
             'o_parent' => 'required|integer|in:' . $allowedPlaceIds,

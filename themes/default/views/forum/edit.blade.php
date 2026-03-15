@@ -1,6 +1,8 @@
 @extends('theme::layouts.master')
+@include('theme::forum._assets')
 
 @section('content')
+<div class="forum-rdx forum-rdx-form">
 <!-- SECTION BANNER -->
 <div class="section-banner" style="background: url({{ theme_asset('img/banner/Newsfeed.png') }}) no-repeat 50%;">
     <img class="section-banner-icon" src="{{ theme_asset('img/banner/discussion-icon.png') }}">
@@ -17,12 +19,22 @@
     </div>
 
     <div class="grid-column">
-        <div class="widget-box">
+        <div class="widget-box forum-rdx-form-shell">
             <div class="widget-box-title">
-                <p class="widget-box-title">{{ isset($topic) ? __('messages.edit_topic') : __('messages.w_new_tpc') }}</p>
+                <p class="widget-box-title forum-rdx-form-header">{{ isset($topic) ? __('messages.edit_topic') : __('messages.w_new_tpc') }}</p>
             </div>
             
             <div class="widget-box-content">
+                @if($errors->any())
+                    <div class="alert alert-danger" style="margin-bottom: 12px;">
+                        <ul style="margin: 0; padding-left: 18px;">
+                            @foreach($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
                 <form method="POST" action="{{ isset($topic) ? route('forum.update', $topic->id) : route('forum.store') }}" enctype="multipart/form-data">
                     @csrf
                     @if(isset($topic))
@@ -94,6 +106,41 @@
                     </div>
                     @endif
 
+                    @if((int) ($forumSettings['attachments_enabled'] ?? 1) === 1)
+                    <div class="form-row forum-rdx-attachment-box">
+                        <div class="form-item">
+                            <div class="form-input">
+                                <label for="attachments">{{ __('messages.attachments') }}</label>
+                                <input
+                                    type="file"
+                                    id="attachments"
+                                    name="attachments[]"
+                                    multiple
+                                    accept=".{{ str_replace(',', ',.', $forumSettings['allowed_attachment_extensions'] ?? '') }}"
+                                >
+                                <small style="display:block;color:#7f85a3;margin-top:4px;">
+                                    {{ __('messages.max_attachments_per_topic') }}: {{ $forumSettings['max_attachments_per_topic'] ?? 5 }} |
+                                    {{ __('messages.max_attachment_size') }}: {{ $forumSettings['max_attachment_size_kb'] ?? 10240 }} KB
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+
+                    @if(isset($topic) && $topic->attachments && $topic->attachments->isNotEmpty())
+                    <div class="form-row forum-rdx-attachment-box" style="margin-top: 12px;">
+                        <div class="form-item">
+                            <p class="bold" style="margin-bottom: 8px;">{{ __('messages.current_attachments') }}</p>
+                            @foreach($topic->attachments as $attachment)
+                                <label style="display:block;margin-bottom:6px;">
+                                    <input type="checkbox" name="delete_attachments[]" value="{{ $attachment->id }}">
+                                    {{ __('messages.delete') }}: {{ $attachment->original_name }} ({{ $attachment->human_size }})
+                                </label>
+                            @endforeach
+                        </div>
+                    </div>
+                    @endif
+                    @endif
+
                     <div class="form-row split">
                         <button type="submit" class="button primary">{{ __('messages.spread') }}</button>
                     </div>
@@ -138,4 +185,5 @@
         }
     }
 </script>
+</div>
 @endsection

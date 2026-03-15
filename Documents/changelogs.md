@@ -1,3 +1,29 @@
+# v4.0.1
+> **Patch Release** — Installer resilience & shared hosting compatibility fixes.
+
+### 🔧 Installer & Fresh Install
+* **Fix**: Auto-create `.env` from `.env.example` if missing on fresh install (`index.php`).
+* **Fix**: Auto-create required `storage/` subdirectories on first run (`index.php`).
+* **Fix**: Remove stale `storage/installed` marker during fresh install.
+* **Fix**: Added `storage/installed` to `.gitignore` to prevent shipping with repo.
+* **Fix**: Handle `MissingAppKeyException` gracefully — auto-generates `APP_KEY` and redirects to `/install` (`bootstrap/app.php`).
+* **Fix**: Default `APP_KEY` added to `.env.example` to prevent crash before installer runs.
+* **Fix**: Enable `APP_DEBUG=true` in `.env.example` for error visibility during install; automatically disabled after install completes.
+* **Fix**: Exclude `install/*` routes from CSRF verification to prevent `419 Page Expired` errors during setup (`bootstrap/app.php`).
+* **Fix**: Missing `directory` table creation added to database migrations and `processMigrate()` method.
+
+### 🐛 Bug Fixes
+* **Fix**: `Status` model — null pointer crash in `getGroupedReactionsAttribute()` when reaction option doesn't exist.
+* **Fix**: All `Status` model `$appends` accessors (`date_formatted`, `reactions_count`, `comments_count`, `grouped_reactions`) wrapped in `try-catch` to prevent cascading failures.
+* **Fix**: `PortalController` — replaced `CONVERT(... USING utf8mb4)` raw SQL with standard `LIKE` queries for MySQL compatibility on free hosting.
+* **Fix**: `DirectoryController::index()` — separated categories from activities into independent `try-catch` blocks so categories still display when activities query fails.
+* **Fix**: `DirectoryController::show()` — reject non-numeric IDs with 404 (prevents `/directory/store` and `/directory/ads` from crashing).
+* **Fix**: `DirectoryController::store()` — wrapped in `try-catch` with error message fallback.
+* **Fix**: `DirectoryController::category()` — wrapped in `try-catch` for resilience.
+* **Fix**: `AdminController::index()` — wrapped GitHub API call and stats queries in `try-catch` to prevent dashboard crash on restricted hosting.
+* **Fix**: `Directory` model — added `date` to `$fillable` array (was silently dropped on create).
+* **Fix**: `InstallerController::finish()` — disable `APP_DEBUG` after installation for security.
+
 # v4.0.0
 > **Major Release** — Complete rewrite from plain PHP to the Laravel framework.
 
@@ -81,6 +107,9 @@
 * **Improvement**: Comment system with emoji support.
 * **Improvement**: Reaction system (like, love, dislike, etc.).
 * **Improvement**: Forum topics and categories with admin-manageable ordering.
+* **Add**: Forum moderation system (pin, lock topics).
+* **Add**: Global and category-specific forum moderators.
+* **Add**: Forum file attachments support.
 
 ### 🔗 Directory
 * **Improvement**: Site directory with categorized listings.

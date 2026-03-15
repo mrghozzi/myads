@@ -56,5 +56,5 @@ Since v4.0 is a complete rewrite to Laravel, the upgrade process preserves your 
 2. Upload the v4.0 files, overwriting the old system files. **Keep your `upload/` directory intact to preserve user avatars and attachments!**
 3. Navigate to `http://yourdomain.com/install`.
 4. Provide the **existing database credentials**.
-5. The system will detect the old tables (`users`, `options`, etc.), inject the missing structural tables (`setting`, `menu`, etc.), and run the compatibility migrations.
+5. The system will detect the old tables (`users`, `options`, etc.), inject the missing structural tables (`setting`, `menu`, `forum_moderators`, etc.), and run the compatibility migrations.
 6. Old MD5 user passwords will be supported automatically through Laravel's authentication system (upgraded to Bcrypt upon their next login).

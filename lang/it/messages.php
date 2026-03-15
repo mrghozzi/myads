@@ -200,6 +200,7 @@ return array (
   'notifications' => 'Notifiche',
   'info' => 'Info',
   'notifications_marked_read' => 'Le notifiche vengono contrassegnate come lette quando vengono visualizzate.',
+  'mark_all_read' => 'Mark all as read',
   'no_notifications' => 'Nessuna nuova notifica.',
   'member_profile' => 'Profilo Membro',
   'edit_profile' => 'Modifica Profilo',
@@ -749,4 +750,6 @@ return array (
   'zip_open_failed' => 'Failed to open package.',
   'update_success' => 'System updated successfully!',
   'update_failed' => 'Update failed: ',
+  'updated' => 'Aggiornato',
+  'unknown_user' => 'Utente sconosciuto',
 );

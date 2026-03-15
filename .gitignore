@@ -19,8 +19,8 @@
 /public/storage
 /public/upload
 /storage/*.key
+/storage/installed
 /storage/pail
-/vendor
 Homestead.json
 Homestead.yaml
 Thumbs.db
@@ -33,5 +33,7 @@ Thumbs.db
 
 /plugins/*
 /themes/*
+!/themes/default/
 /public/themes/*
 !/public/themes/default/
+/tests

@@ -198,6 +198,22 @@ return new class extends Migration
             });
         }
 
+        // ── Directory Listings ──────────────────────────────────────
+        if (!Schema::hasTable('directory')) {
+            Schema::create('directory', function (Blueprint $table) {
+                $table->id();
+                $table->unsignedBigInteger('uid');
+                $table->string('name');
+                $table->string('url');
+                $table->text('txt')->nullable();
+                $table->string('metakeywords')->nullable();
+                $table->unsignedBigInteger('cat')->default(0);
+                $table->integer('vu')->default(0);
+                $table->tinyInteger('statu')->default(1);
+                $table->bigInteger('date')->default(0);
+            });
+        }
+
         // ── Referrals ──────────────────────────────────────────────
         if (!Schema::hasTable('referral')) {
             Schema::create('referral', function (Blueprint $table) {

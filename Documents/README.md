@@ -17,7 +17,7 @@ MYADS allows users to exchange various types of traffic:
 The platform includes built-in social features to encourage user retention:
 - **User Profiles:** Customizable profiles with avatars, cover photos, and statistics.
 - **Follow System:** Users can follow each other, creating a personalized feed.
-- **Community Forum:** A space for discussions, tutorials, and support, heavily integrated with a reaction system (Like, Love, Wow, Angry, etc.).
+- **Community Forum:** A space for discussions, tutorials, and support, heavily integrated with a reaction system (Like, Love, Wow, Angry, etc.). Includes a complete moderation system (pin/lock topics, assign moderators per category) and file attachment support.
 - **Private Messaging:** Real-time (AJAX) messaging between members.
 
 ### 3. Marketplace (Store)
