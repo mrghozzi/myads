@@ -194,11 +194,13 @@ class ProfileController extends Controller
             $existing->delete();
             return back()->with('success', __('unfollowed_successfully'));
         } else {
+            $followedAt = time();
+
             Like::create([
                 'uid' => $currentUser->id,
                 'sid' => $targetUser->id,
                 'type' => 1,
-                'date' => time()
+                'time_t' => $followedAt,
             ]);
             return back()->with('success', __('followed_successfully'));
         }

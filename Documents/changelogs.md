@@ -1,3 +1,41 @@
+# v4.1.0
+> **Feature Release** - Notification center refresh, forum topic flow fixes, and test coverage improvements.
+
+### Notifications & Header UX
+* **Improvement**: Redesigned `/notification` into a clearer notification center with a summary card, stronger unread highlighting, and a cleaner notification feed.
+* **Add**: Added a red unread count badge above the notification button in the desktop header.
+* **Add**: Added a red unread count badge above the notification button in the mobile `floaty bar`.
+* **Improvement**: `Mark all as read` now updates visible unread indicators and counters immediately across the header, mobile bar, and notification page.
+* **Improvement**: Reworked notification item rendering into reusable partials so initial page load and AJAX-loaded items share the same markup.
+
+### Notification Loading & AJAX
+* **Improvement**: Replaced classic pagination on `/notification` with infinite scroll loading while scrolling down.
+* **Add**: `GET /notification` now returns JSON for AJAX requests with `html` and `next_page_url`.
+* **Improvement**: `POST /notification/mark-all-read` now returns a clearer AJAX response with `success` and `unread_count`.
+* **Fix**: Preserved existing read behavior so notifications are marked as read only when opened or when `mark all as read` is used.
+
+### Forum Topic Flow Fixes
+* **Fix**: Topic creation now redirects directly to the newly created topic page.
+* **Fix**: Topic update now redirects back to the topic page even when category input is missing, using a safe fallback path.
+* **Fix**: Attachments uploaded during topic updates now remain visible on the topic page.
+* **Fix**: Topic pages now use the standard comment container selector consistently.
+* **Fix**: Forum comment store flow continues to return HTML correctly for AJAX usage without forcing a full page reload.
+
+### Authentication UI
+* **Improvement**: Refined the default theme Blade templates for the login and registration pages.
+* **Add**: Social login buttons for Facebook and Google now appear directly inside the login form when providers are configured.
+* **Add**: Social login buttons were also added to the registration page for a smoother sign-up flow.
+* **Fix**: Social auth actions are now shown conditionally based on available environment configuration instead of rendering empty placeholders.
+* **Improvement**: Social login buttons now adapt their width automatically when only one provider is enabled.
+
+### Profile & Follow System
+* **Fix**: Resolved the profile follow action error on `/profile/{id}/follow` by storing the required `time_t` value in the `like` table instead of attempting to write to a non-existent legacy `date` field.
+
+### Testing & Stability
+* **Add**: Added notification center feature tests covering page rendering, AJAX pagination, and `mark all as read` behavior.
+* **Add**: Added a dedicated feature test to verify profile follow requests create a valid timestamped follow record without database insert errors.
+* **Improvement**: Feature test coverage now includes both forum topic flow fixes and notification center behavior.
+
 # v4.0.1
 > **Patch Release** — Installer resilience & shared hosting compatibility fixes.
 
