@@ -104,18 +104,24 @@
         <hr />
         
         {{-- Social Login --}}
+        @if(env('FACEBOOK_CLIENT_ID') || env('GOOGLE_CLIENT_ID'))
         <div style="text-align: center; margin: 20px 0;">
             <p class="lined-text" style="margin-bottom: 15px;">{{ __('messages.login_with_social') }}</p>
             <div class="social-links" style="display: flex; gap: 10px; justify-content: center;">
-                <a href="{{ route('social.redirect', 'facebook') }}" class="button small facebook" style="background-color: #3b5998; color: white; width: 48%; text-align: center; display: inline-block;">
-                    <i class="fa fa-facebook"></i> Facebook
+                @if(env('FACEBOOK_CLIENT_ID'))
+                <a href="{{ route('social.redirect', 'facebook') }}" class="button small facebook" style="background-color: #3b5998; color: white; {{ env('FACEBOOK_CLIENT_ID') && env('GOOGLE_CLIENT_ID') ? 'width: 48%;' : 'width: 100%;' }} text-align: center; display: inline-block;">
+                    <i class="fa-brands fa-facebook"></i> Facebook
                 </a>
-                <a href="{{ route('social.redirect', 'google') }}" class="button small google" style="background-color: #dd4b39; color: white; width: 48%; text-align: center; display: inline-block;">
-                    <i class="fa fa-google"></i> Google
+                @endif
+                @if(env('GOOGLE_CLIENT_ID'))
+                <a href="{{ route('social.redirect', 'google') }}" class="button small google" style="background-color: #dd4b39; color: white; {{ env('FACEBOOK_CLIENT_ID') && env('GOOGLE_CLIENT_ID') ? 'width: 48%;' : 'width: 100%;' }} text-align: center; display: inline-block;">
+                    <i class="fa-brands fa-google"></i> Google
                 </a>
+                @endif
             </div>
         </div>
         <hr />
+        @endif
 
         <!-- LINED TEXT -->
         <p class="lined-text">{{ __('messages.donthaacc') }}</p>
@@ -123,14 +129,6 @@
         <!-- /LINED TEXT -->
         <a class="button medium tertiary" href="{{ route('register') }}" style="color: #fff; width: 100%; text-align: center; display: block;">{{ __('messages.sign_up') }}</a>
         <hr />
-        
-        {{-- Social Login Placeholder --}}
-        {{-- 
-        <p class="lined-text">Login with your Social Account</p>
-        <div class="social-links">
-             <!-- Social links here -->
-        </div>
-        --}}
     </div>
     <!-- /FORM BOX -->
 </div>
