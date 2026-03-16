@@ -21,6 +21,12 @@
 * **Fix**: Topic pages now use the standard comment container selector consistently.
 * **Fix**: Forum comment store flow continues to return HTML correctly for AJAX usage without forcing a full page reload.
 
+### Forum Sidebar Refresh
+* **Improvement**: Redesigned the forum category sidebar on `/f{id}` so it now follows the stronger card language used in the website directory sidebar while staying consistent with the forum theme.
+* **Improvement**: Forum category cards now show the category icon, title, short description, and a topic count pill, with a clearer active state for the currently opened section.
+* **Improvement**: Sidebar category data is now prepared in the controller instead of querying categories directly inside the Blade view.
+* **Improvement**: Topic counts in the forum sidebar are now precomputed from active topics only, avoiding repeated queries inside the sidebar loop.
+
 ### Authentication UI
 * **Improvement**: Refined the default theme Blade templates for the login and registration pages.
 * **Add**: Social login buttons for Facebook and Google now appear directly inside the login form when providers are configured.
@@ -40,7 +46,8 @@
 ### Testing & Stability
 * **Add**: Added notification center feature tests covering page rendering, AJAX pagination, and `mark all as read` behavior.
 * **Add**: Added a dedicated feature test to verify profile follow requests create a valid timestamped follow record without database insert errors.
-* **Improvement**: Feature test coverage now includes both forum topic flow fixes and notification center behavior.
+* **Add**: Added a dedicated feature test covering the redesigned forum category sidebar, including category ordering, active state, and topic count rendering.
+* **Improvement**: Feature test coverage now includes forum topic flow fixes, forum sidebar rendering, and notification center behavior.
 
 # v4.0.1
 > **Patch Release** — Installer resilience & shared hosting compatibility fixes.
