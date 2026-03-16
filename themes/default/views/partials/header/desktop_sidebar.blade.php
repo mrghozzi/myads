@@ -104,6 +104,7 @@
             $headerMessageUnreadCount = 0;
             $headerNotifications = collect();
             $headerNotificationUnreadCount = 0;
+            $formatNotificationCount = static fn (int $count): string => $count > 99 ? '99+' : (string) $count;
 
             if ($headerUser) {
                 $headerAllMessages = \App\Models\Message::where('us_rec', $headerUser->id)
@@ -213,35 +214,29 @@
                     </div>
                 </div>
                 <div class="action-list-item-wrap">
-                    <a class="action-list-item header-dropdown-trigger {{ $headerNotificationUnreadCount > 0 ? 'unread' : '' }}" href="javascript:void(0)">
+                    <a class="action-list-item header-dropdown-trigger notification-trigger {{ $headerNotificationUnreadCount > 0 ? 'unread' : '' }}" data-notification-trigger href="javascript:void(0)">
                         <svg class="action-list-item-icon icon-notification">
                             <use xlink:href="#svg-notification"></use>
                         </svg>
-                        @if($headerNotificationUnreadCount > 0)
-                            <span class="header-action-count">{{ $headerNotificationUnreadCount }}</span>
-                        @endif
+                        <span class="header-action-count" data-notification-badge @if($headerNotificationUnreadCount === 0) hidden @endif>{{ $headerNotificationUnreadCount > 0 ? $formatNotificationCount($headerNotificationUnreadCount) : '' }}</span>
                     </a>
                     <div class="header-dropdown">
                         <div class="dropdown-box">
                             <div class="dropdown-box-header">
                                 <p class="dropdown-box-header-title">
                                     {{ __('messages.notifications') }}
-                                    @if($headerNotificationUnreadCount > 0)
-                                        <span class="highlighted">{{ $headerNotificationUnreadCount }}</span>
-                                    @endif
+                                    <span class="highlighted" data-notification-highlight @if($headerNotificationUnreadCount === 0) hidden @endif>{{ $headerNotificationUnreadCount > 0 ? $formatNotificationCount($headerNotificationUnreadCount) : '' }}</span>
                                 </p>
                                 <div class="dropdown-box-header-actions" style="display: flex; gap: 10px;">
-                                    @if($headerNotificationUnreadCount > 0)
-                                        <a href="javascript:void(0)" class="dropdown-box-header-action text-primary mark-all-read-btn" style="font-size: 0.8rem;" onclick="markAllNotificationsAsRead(this)">
-                                            <i class="fa fa-check-double"></i> {{ __('messages.mark_all_read') ?? 'Mark all as read' }}
-                                        </a>
-                                    @endif
+                                    <a href="javascript:void(0)" class="dropdown-box-header-action text-primary mark-all-read-btn" data-mark-all-notifications @if($headerNotificationUnreadCount === 0) hidden @endif style="font-size: 0.8rem;" onclick="markAllNotificationsAsRead(this)">
+                                        <i class="fa fa-check-double"></i> {{ __('messages.mark_all_read') ?? 'Mark all as read' }}
+                                    </a>
                                     <a class="dropdown-box-header-action" href="{{ url('/notification') }}">{{ __('messages.notifications') }}</a>
                                 </div>
                             </div>
                             <div class="dropdown-box-list" id="header-notifications-list">
                                 @forelse($headerNotifications as $headerNotif)
-                                    <a class="dropdown-box-list-item {{ $headerNotif->state == 0 || $headerNotif->state == 3 ? 'unread' : '' }}" href="{{ route('notifications.show', $headerNotif->id) }}">
+                                    <a class="dropdown-box-list-item {{ $headerNotif->state == 0 || $headerNotif->state == 3 ? 'unread' : '' }}" @if($headerNotif->state == 0 || $headerNotif->state == 3) data-notification-unread-item @endif href="{{ route('notifications.show', $headerNotif->id) }}">
                                         <div class="user-status">
                                             <div class="user-status-avatar">
                                                 <div class="user-avatar small no-outline">
@@ -270,34 +265,88 @@
                         </div>
                     </div>
                     <script>
-                        function markAllNotificationsAsRead(btn) {
-                            if (btn) btn.style.pointerEvents = 'none';
-                            fetch('{{ route('notifications.mark_all_read') }}', {
-                                method: 'POST',
-                                headers: {
-                                    'X-Requested-With': 'XMLHttpRequest',
-                                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                                    'Content-Type': 'application/json'
+                        (function () {
+                            const markAllRoute = '{{ route('notifications.mark_all_read') }}';
+                            const csrfToken = '{{ csrf_token() }}';
+
+                            function formatNotificationCount(count) {
+                                return count > 99 ? '99+' : String(count);
+                            }
+
+                            window.updateNotificationIndicators = function (count) {
+                                const safeCount = Number.isFinite(count) ? Math.max(0, count) : 0;
+                                const formattedCount = formatNotificationCount(safeCount);
+
+                                document.querySelectorAll('[data-notification-badge]').forEach(function (badge) {
+                                    badge.textContent = safeCount > 0 ? formattedCount : '';
+                                    badge.hidden = safeCount === 0;
+                                });
+
+                                document.querySelectorAll('[data-notification-highlight]').forEach(function (badge) {
+                                    badge.textContent = safeCount > 0 ? formattedCount : '';
+                                    badge.hidden = safeCount === 0;
+                                });
+
+                                document.querySelectorAll('[data-notification-summary-count]').forEach(function (counter) {
+                                    counter.textContent = String(safeCount);
+                                });
+
+                                document.querySelectorAll('[data-notification-trigger]').forEach(function (trigger) {
+                                    trigger.classList.toggle('unread', safeCount > 0);
+                                });
+
+                                document.querySelectorAll('[data-mark-all-notifications]').forEach(function (button) {
+                                    button.hidden = safeCount === 0;
+                                });
+                            };
+
+                            window.markAllNotificationsAsRead = function (btn) {
+                                if (window.__notificationsMarkingAllRead) {
+                                    return;
                                 }
-                            })
-                            .then(response => response.json())
-                            .then(data => {
-                                if (data.success) {
-                                    // Remove unread badges and highlights
-                                    document.querySelectorAll('#header-notifications-list .unread').forEach(el => el.classList.remove('unread'));
-                                    const trigger = document.querySelector('.action-list-item-icon.icon-notification').parentElement;
-                                    trigger.classList.remove('unread');
-                                    const badge = trigger.querySelector('.header-action-count');
-                                    if (badge) badge.remove();
-                                    
-                                    const headerBadge = document.querySelector('.dropdown-box-header-title .highlighted');
-                                    if (headerBadge) headerBadge.remove();
-                                    
-                                    if (btn) btn.remove();
+
+                                window.__notificationsMarkingAllRead = true;
+
+                                if (btn) {
+                                    btn.style.pointerEvents = 'none';
                                 }
-                            })
-                            .catch(error => console.error('Error marking notifications as read:', error));
-                        }
+
+                                fetch(markAllRoute, {
+                                    method: 'POST',
+                                    headers: {
+                                        'X-Requested-With': 'XMLHttpRequest',
+                                        'X-CSRF-TOKEN': csrfToken,
+                                        'Content-Type': 'application/json',
+                                        'Accept': 'application/json'
+                                    }
+                                })
+                                    .then(function (response) {
+                                        return response.json();
+                                    })
+                                    .then(function (data) {
+                                        if (!data.success) {
+                                            return;
+                                        }
+
+                                        document.querySelectorAll('[data-notification-unread-item]').forEach(function (item) {
+                                            item.classList.remove('unread');
+                                            item.removeAttribute('data-notification-unread-item');
+                                        });
+
+                                        window.updateNotificationIndicators(Number(data.unread_count || 0));
+                                    })
+                                    .catch(function (error) {
+                                        console.error('Error marking notifications as read:', error);
+                                    })
+                                    .finally(function () {
+                                        window.__notificationsMarkingAllRead = false;
+
+                                        if (btn) {
+                                            btn.style.pointerEvents = '';
+                                        }
+                                    });
+                            };
+                        })();
                     </script>
                 </div>
             </div>
