@@ -8,93 +8,77 @@
   align-items: flex-start;
   flex-direction: column;
   justify-content: center;
-  min-height: 220px;
-  padding: 44px 58px 46px 236px;
-  background-image: linear-gradient(135deg, rgba(119, 80, 248, 0.94) 0%, rgba(119, 80, 248, 0.82) 46%, rgba(79, 244, 97, 0.24) 100%), url("../img/banner/banner-bg.png");
+  min-height: 184px;
+  padding: 34px 54px 34px 274px;
+  border: 1px solid rgba(119, 80, 248, 0.18);
+  border-radius: 14px;
+  background-color: #17367a;
+  background-image: linear-gradient(90deg, rgba(119, 80, 248, 0.12) 0%, rgba(29, 35, 51, 0.02) 45%, rgba(0, 0, 0, 0) 100%), url("../img/banner/Newsfeed.png");
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
-  box-shadow: 0 24px 50px rgba(0, 0, 0, 0.26);
-  isolation: isolate;
+  box-shadow: 0 18px 34px rgba(0, 0, 0, 0.18);
   overflow: hidden;
-}
-
-.directory-hub-banner::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at top right, rgba(255, 255, 255, 0.14), transparent 34%), linear-gradient(135deg, rgba(255, 255, 255, 0.06), transparent 60%);
-}
-
-.directory-hub-banner::after {
-  content: "";
-  position: absolute;
-  right: -70px;
-  bottom: -110px;
-  width: 260px;
-  height: 260px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.08);
-  filter: blur(18px);
-  pointer-events: none;
 }
 
 .directory-hub-banner .section-banner-icon,
 .directory-hub-banner .directory-hub-banner-copy,
 .directory-hub-banner .section-banner-title,
-.directory-hub-banner .section-banner-text,
-.directory-hub-banner .directory-hero-actions {
+.directory-hub-banner .section-banner-text {
   position: relative;
   z-index: 1;
 }
 
 .directory-hub-banner .directory-hub-banner-copy {
-  width: min(100%, 620px);
+  width: min(100%, 470px);
 }
 
 .directory-hub-banner .section-banner-icon {
+  position: absolute;
   left: 28px;
-  bottom: -4px;
-  width: clamp(136px, 14vw, 176px);
-  max-width: 30%;
-  opacity: 0.96;
+  bottom: 0;
+  width: clamp(148px, 15vw, 184px);
+  max-width: 34%;
+  opacity: 0.98;
+  pointer-events: none;
   filter: drop-shadow(0 14px 24px rgba(0, 0, 0, 0.28));
 }
 
 .directory-hub-banner .section-banner-title {
   max-width: 100%;
-  font-size: clamp(2.2rem, 4vw, 3.25rem);
-  line-height: 0.98;
-  text-shadow: 0 10px 28px rgba(0, 0, 0, 0.18);
+  color: #ffffff;
+  font-size: clamp(2.15rem, 3.3vw, 3.15rem);
+  line-height: 0.92;
+  text-shadow: none;
 }
 
 .directory-hub-banner .section-banner-text {
   max-width: 100%;
-  margin-top: 14px;
-  color: rgba(255, 255, 255, 0.88);
-  font-size: 0.9375rem;
+  margin-top: 10px;
+  color: rgba(255, 255, 255, 0.92);
+  font-family: "Rajdhani", sans-serif;
+  font-size: 1.18rem;
   font-weight: 600;
-  line-height: 1.65;
-  text-shadow: 0 8px 22px rgba(0, 0, 0, 0.12);
+  line-height: 1.25;
+  text-shadow: none;
 }
 
 .directory-detail-banner .section-banner-title {
-  font-size: clamp(2rem, 3.6vw, 3rem);
+  font-size: clamp(1.85rem, 2.8vw, 2.7rem);
+  line-height: 0.98;
 }
 
 .directory-detail-banner .directory-hub-banner-copy {
-  width: min(100%, 700px);
+  width: min(100%, 620px);
 }
 
 .directory-detail-banner .section-banner-text {
-  font-size: 1rem;
+  font-size: 1.02rem;
 }
 
-.directory-hero-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 22px;
+.directory-detail-banner .section-banner-icon {
+  width: clamp(132px, 13vw, 168px);
+  opacity: 0.88;
 }
 
 .directory-hub-grid {
@@ -346,16 +330,18 @@
   gap: 8px;
   min-height: 44px;
   padding: 0 20px;
-  border: 1px solid rgba(119, 80, 248, 0.22);
+  color: #152033;
+  border: 1px solid rgba(79, 244, 97, 0.18);
   border-radius: 999px;
-  background: linear-gradient(180deg, rgba(36, 45, 64, 0.96) 0%, rgba(32, 40, 58, 0.96) 100%);
-  box-shadow: 0 12px 26px rgba(119, 80, 248, 0.16);
+  background: linear-gradient(180deg, #4ff461 0%, #39d94d 100%);
+  box-shadow: 0 14px 28px rgba(79, 244, 97, 0.22);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .directory-visit-button:hover {
   transform: translateY(-1px);
-  box-shadow: 0 18px 30px rgba(119, 80, 248, 0.2);
+  color: #152033;
+  box-shadow: 0 20px 34px rgba(79, 244, 97, 0.28);
 }
 
 .directory-listing-layout {
@@ -763,6 +749,15 @@
   font-weight: 900;
 }
 
+.rtl .directory-hub-banner {
+  padding: 34px 274px 34px 54px;
+}
+
+.rtl .directory-hub-banner .section-banner-icon {
+  left: auto;
+  right: 28px;
+}
+
 @media screen and (max-width: 1365px) {
   .directory-feed-header,
   .directory-detail-hero {
@@ -782,14 +777,14 @@
 
 @media screen and (max-width: 960px) {
   .directory-hub-banner {
-    min-height: 200px;
-    padding: 34px 28px 36px 176px;
+    min-height: 170px;
+    padding: 28px 28px 28px 212px;
   }
 
   .directory-hub-banner .section-banner-icon {
     left: 18px;
     bottom: 0;
-    width: 124px;
+    width: 146px;
   }
 
   .directory-listing-layout,
@@ -807,30 +802,43 @@
     min-width: 0;
     height: 200px;
   }
+
+  .rtl .directory-hub-banner {
+    padding: 28px 212px 28px 28px;
+  }
+
+  .rtl .directory-hub-banner .section-banner-icon {
+    left: auto;
+    right: 18px;
+  }
 }
 
 @media screen and (max-width: 680px) {
   .directory-hub-banner {
-    min-height: 176px;
-    padding: 28px 22px 68px;
-  }
-
-  .directory-hub-banner::after {
-    right: -90px;
-    bottom: -120px;
+    min-height: 148px;
+    padding: 22px 20px;
+    border-radius: 12px;
   }
 
   .directory-hub-banner .section-banner-icon {
     left: auto;
-    right: 18px;
-    bottom: 12px;
-    width: 92px;
-    opacity: 0.22;
+    right: 14px;
+    bottom: 8px;
+    width: 78px;
+    opacity: 0.24;
   }
 
   .directory-hub-banner .section-banner-title,
   .directory-hub-banner .section-banner-text {
-    max-width: 100%;
+    max-width: calc(100% - 78px);
+  }
+
+  .directory-hub-banner .section-banner-title {
+    font-size: clamp(1.6rem, 9vw, 2.2rem);
+  }
+
+  .directory-hub-banner .section-banner-text {
+    font-size: 0.94rem;
   }
 
   .directory-feed-title {
@@ -859,5 +867,15 @@
 
   .directory-detail-cta {
     grid-template-columns: 1fr;
+  }
+
+  .rtl .directory-hub-banner .section-banner-title,
+  .rtl .directory-hub-banner .section-banner-text {
+    max-width: calc(100% - 78px);
+  }
+
+  .rtl .directory-hub-banner .section-banner-icon {
+    right: auto;
+    left: 14px;
   }
 }

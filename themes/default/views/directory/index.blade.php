@@ -8,11 +8,6 @@
         <div class="directory-hub-banner-copy">
             <p class="section-banner-title">{{ __('messages.directory') }}</p>
             <p class="section-banner-text">{{ __('messages.landing_community_directory_desc') }}</p>
-
-            <div class="directory-hero-actions">
-                <a href="{{ route('directory.index') }}" class="button primary">{{ __('messages.directory') }}</a>
-                <a href="{{ route('directory.create') }}" class="button secondary">{{ __('messages.addWebsite') }}</a>
-            </div>
         </div>
     </div>
 
