@@ -31,6 +31,12 @@
 ### Profile & Follow System
 * **Fix**: Resolved the profile follow action error on `/profile/{id}/follow` by storing the required `time_t` value in the `like` table instead of attempting to write to a non-existent legacy `date` field.
 
+### Directory UI Polish
+* **Improvement**: Refined the `default` theme directory banners on `/directory`, `/cat/{id}`, and `/directory/{id}` with a more balanced layout, cleaner content width, and a stronger background treatment based on the existing site theme.
+* **Improvement**: Repositioned the `Visit Site` button inside directory listing cards so it now appears under the title and description instead of competing with the card header.
+* **Improvement**: Redesigned `directory-listing-stats-detail` on the directory detail page into clearer responsive stat tiles for visits, reactions, and comments.
+* **Improvement**: Simplified the directory detail hero so the new stat ribbon becomes the primary visual metrics block without changing directory functionality.
+
 ### Testing & Stability
 * **Add**: Added notification center feature tests covering page rendering, AJAX pagination, and `mark all as read` behavior.
 * **Add**: Added a dedicated feature test to verify profile follow requests create a valid timestamped follow record without database insert errors.
