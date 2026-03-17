@@ -1,6 +1,7 @@
 @php
     $pageLocale = str_replace('_', '-', app()->getLocale());
     $pageDirection = locale_direction();
+    $skipFooterAd = trim($__env->yieldContent('skip_footer_ad')) === '1';
 @endphp
 <!DOCTYPE HTML>
 <html lang="{{ $pageLocale }}" dir="{{ $pageDirection }}" data-dir="{{ $pageDirection }}" class="{{ $pageDirection }}">
@@ -500,6 +501,10 @@
     <div class="content-grid">
         @yield('content')
     </div>
+
+    @unless($skipFooterAd)
+        @include('theme::partials.ads', ['id' => 6])
+    @endunless
 
     <!-- Footer -->
     <footer>

@@ -29,6 +29,8 @@
         </div>
     </div>
 
+    @include('theme::partials.ads', ['id' => 5])
+
     <div class="grid grid-3-6-3 mobile-prefer-content directory-detail-grid">
         <div class="grid-column">
             <div class="widget-box directory-side-card directory-detail-sidebar">
