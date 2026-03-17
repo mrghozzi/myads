@@ -628,6 +628,128 @@
             }
         }
 
+        window.__afterInfiniteScrollRenderCallbacks = window.__afterInfiniteScrollRenderCallbacks || [];
+
+        window.registerAfterInfiniteScrollRender = function(callback) {
+            if (typeof callback !== 'function') {
+                return;
+            }
+
+            window.__afterInfiniteScrollRenderCallbacks.push(callback);
+        };
+
+        window.runAfterInfiniteScrollRender = function(scope) {
+            const targetScope = scope && typeof scope.querySelectorAll === 'function' ? scope : document;
+
+            window.__afterInfiniteScrollRenderCallbacks.forEach(function(callback) {
+                try {
+                    callback(targetScope);
+                } catch (error) {
+                    console.error('afterInfiniteScrollRender callback failed:', error);
+                }
+            });
+        };
+
+        function markActivityDropdowns(scope) {
+            if (!scope || typeof scope.querySelectorAll !== 'function') {
+                return;
+            }
+
+            scope.querySelectorAll('.widget-box-post-settings-dropdown-trigger').forEach(function(trigger) {
+                trigger.dataset.activityDropdownReady = '1';
+            });
+        }
+
+        function initActivityDropdownGroup(scope, selector, containerSelector, options) {
+            if (!scope || typeof scope.querySelectorAll !== 'function') {
+                return;
+            }
+
+            if (!window.app || !app.plugins || typeof app.plugins.createDropdown !== 'function') {
+                return;
+            }
+
+            scope.querySelectorAll(selector).forEach(function(trigger) {
+                if (trigger.dataset.activityDropdownReady === '1') {
+                    return;
+                }
+
+                const container = trigger.parentElement ? trigger.parentElement.querySelector(containerSelector) : null;
+                if (!container) {
+                    return;
+                }
+
+                app.plugins.createDropdown(Object.assign({
+                    triggerElement: trigger,
+                    containerElement: container,
+                }, options));
+
+                trigger.dataset.activityDropdownReady = '1';
+            });
+        }
+
+        function hydrateActivityFeed(scope) {
+            initActivityDropdownGroup(scope, '.widget-box-post-settings-dropdown-trigger', '.widget-box-post-settings-dropdown', {
+                offset: {
+                    top: 30,
+                    right: 9
+                },
+                animation: {
+                    type: 'translate-top',
+                    speed: 0.3,
+                    translateOffset: {
+                        vertical: 20
+                    }
+                }
+            });
+
+            if (typeof window.initHexagons === 'function') {
+                window.initHexagons();
+            }
+        }
+
+        window.hydrateActivityFeed = hydrateActivityFeed;
+
+        function setActivityMenuState(wrap, isOpen) {
+            if (!wrap) {
+                return;
+            }
+
+            const trigger = wrap.querySelector('[data-activity-menu-trigger]');
+            const panel = wrap.querySelector('[data-activity-menu-panel]');
+
+            if (!panel) {
+                return;
+            }
+
+            panel.style.opacity = isOpen ? '1' : '0';
+            panel.style.visibility = isOpen ? 'visible' : 'hidden';
+            panel.style.transform = isOpen ? 'translate(0px, 0px)' : 'translate(0px, 20px)';
+            wrap.dataset.activityMenuOpen = isOpen ? '1' : '0';
+
+            if (trigger) {
+                trigger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+                trigger.classList.toggle('active', isOpen);
+            }
+        }
+
+        function closeActivityMenus(exceptWrap = null) {
+            document.querySelectorAll('[data-activity-menu-wrap]').forEach(function(wrap) {
+                if (exceptWrap && wrap === exceptWrap) {
+                    return;
+                }
+
+                setActivityMenuState(wrap, false);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            markActivityDropdowns(document);
+            window.registerAfterInfiniteScrollRender(function(scope) {
+                hydrateActivityFeed(scope);
+            });
+        });
+
         function focusComment(id) {
             let el = document.getElementById('txt_comment' + id);
             if (el) {
@@ -1043,6 +1165,56 @@
         }
 
         document.addEventListener('click', function(event) {
+            let menuTrigger = event.target.closest('[data-activity-menu-trigger]');
+            if (menuTrigger) {
+                event.preventDefault();
+
+                let menuWrap = menuTrigger.closest('[data-activity-menu-wrap]');
+                if (!menuWrap) {
+                    return;
+                }
+
+                let isOpen = menuWrap.dataset.activityMenuOpen === '1';
+                closeActivityMenus(menuWrap);
+                setActivityMenuState(menuWrap, !isOpen);
+                return;
+            }
+
+            let menuPanel = event.target.closest('[data-activity-menu-panel]');
+            if (menuPanel) {
+                closeActivityMenus();
+                return;
+            }
+
+            if (!event.target.closest('[data-activity-menu-wrap]')) {
+                closeActivityMenus();
+            }
+
+            let commentTrigger = event.target.closest('[data-activity-comment]');
+            if (commentTrigger) {
+                event.preventDefault();
+
+                let id = parseInt(commentTrigger.dataset.commentId || '0', 10);
+                let type = commentTrigger.dataset.commentType;
+                let shouldFocus = commentTrigger.dataset.commentFocus === '1';
+
+                if (!id || !type) {
+                    return;
+                }
+
+                loadComments(id, type)
+                    .then(() => {
+                        commentTrigger.classList.add('active');
+
+                        if (shouldFocus) {
+                            focusComment(id);
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+
+                return;
+            }
+
             let target = event.target.closest('[data-post-action]');
             if (!target) return;
 

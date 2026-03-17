@@ -26,23 +26,6 @@ app.plugins.createDropdown({
 });
 
 app.plugins.createDropdown({
-  trigger: '.reaction-item-dropdown-trigger',
-  container: '.reaction-item-dropdown',
-  triggerEvent: 'hover',
-  offset: {
-    bottom: 38,
-    left: -16
-  },
-  animation: {
-    type: 'translate-bottom',
-    speed: .3,
-    translateOffset: {
-      vertical: 20
-    }
-  }
-});
-
-app.plugins.createDropdown({
   trigger: '.reaction-options-dropdown-trigger',
   container: '.reaction-options-dropdown',
   triggerEvent: 'click',

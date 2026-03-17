@@ -39,8 +39,10 @@ document.addEventListener('DOMContentLoaded', function () {
             if (data.html) {
                 trigger.insertAdjacentHTML('beforebegin', data.html);
 
-                if (typeof window.afterInfiniteScrollRender === 'function') {
-                    window.afterInfiniteScrollRender();
+                if (typeof window.runAfterInfiniteScrollRender === 'function') {
+                    window.runAfterInfiniteScrollRender(container);
+                } else if (typeof window.afterInfiniteScrollRender === 'function') {
+                    window.afterInfiniteScrollRender(container);
                 }
             }
 

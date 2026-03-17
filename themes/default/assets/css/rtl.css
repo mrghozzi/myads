@@ -42,6 +42,11 @@ html[dir="rtl"] .section-header-actions {
     text-align: right;
 }
 
+html[dir="rtl"] .reaction-item-list .reaction-item .reaction-item-dropdown {
+    left: auto;
+    right: -16px;
+}
+
 html[dir="rtl"] input[type="password"],
 html[dir="rtl"] input[type="text"],
 html[dir="rtl"] select,

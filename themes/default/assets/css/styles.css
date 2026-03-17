@@ -12147,10 +12147,37 @@ figure > img {
   border-radius: 50%;
   background-color: #fff;
   margin-left: -6px;
+  position: relative;
+  overflow: visible;
+  z-index: 1;
 }
 
 .reaction-item-list .reaction-item .simple-dropdown .simple-dropdown-text:first-child {
   margin-bottom: 10px;
+}
+
+.reaction-item-list .reaction-item .reaction-item-dropdown {
+  position: absolute;
+  bottom: 38px;
+  left: -16px;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translate(0, 20px);
+  transition: transform .3s ease-in-out, opacity .3s ease-in-out, visibility .3s ease-in-out;
+  z-index: 9999;
+}
+
+.reaction-item-list .reaction-item:hover {
+  z-index: 4;
+}
+
+.reaction-item-list .reaction-item:hover .reaction-item-dropdown,
+.reaction-item-list .reaction-item:focus-within .reaction-item-dropdown {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translate(0, 0);
 }
 
 .reaction-item-list .reaction-item > .reaction-image {
