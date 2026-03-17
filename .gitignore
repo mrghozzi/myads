@@ -37,3 +37,8 @@ Thumbs.db
 /public/themes/*
 !/public/themes/default/
 /tests
+!/tests/
+/tests/*
+!/tests/Feature/
+/tests/Feature/*
+!/tests/Feature/LocaleDirectionRenderingTest.php

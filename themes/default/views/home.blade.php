@@ -24,9 +24,9 @@
     </div>
 
     <div class="grid">
-      <div class="grid grid-3-3-3-3 centered">
+      <div class="grid grid-3-3-3-3 centered home-dashboard-stats">
         <!-- Banner Ads Box -->
-        <div class="stats-box small" style="background: url({{ asset('themes/default/assets/img/graph/stat/01.jpg') }}) no-repeat center;background-size: cover;">
+        <div class="stats-box small home-stat-card" style="--home-stat-bg: url({{ asset('themes/default/assets/img/graph/stat/01.jpg') }}); background: var(--home-stat-bg) no-repeat center; background-size: cover;">
           <div class="stats-box-value-wrap">
             <p class="stats-box-value">{{ $bannerStats['vu'] }}</p>
             <div class="stats-box-diff">
@@ -41,7 +41,7 @@
         </div>
 
         <!-- Text Ads Box -->
-        <div class="stats-box small" style="background: url({{ asset('themes/default/assets/img/graph/stat/02.jpg') }}) no-repeat center;background-size: cover;">
+        <div class="stats-box small home-stat-card" style="--home-stat-bg: url({{ asset('themes/default/assets/img/graph/stat/02.jpg') }}); background: var(--home-stat-bg) no-repeat center; background-size: cover;">
           <div class="stats-box-value-wrap">
             <p class="stats-box-value">{{ $linkStats['clik'] }}</p>
             <div class="stats-box-diff">
@@ -56,7 +56,7 @@
         </div>
 
         <!-- Visits Box -->
-        <div class="stats-box small" style="background: url({{ asset('themes/default/assets/img/graph/stat/03.jpg') }}) no-repeat center;background-size: cover;">
+        <div class="stats-box small home-stat-card" style="--home-stat-bg: url({{ asset('themes/default/assets/img/graph/stat/03.jpg') }}); background: var(--home-stat-bg) no-repeat center; background-size: cover;">
           <div class="stats-box-value-wrap">
             <p class="stats-box-value">{{ $visitStats['vu'] }}</p>
             <div class="stats-box-diff">
@@ -71,7 +71,7 @@
         </div>
 
         <!-- Points Box -->
-        <div class="stats-box small" style="background: url({{ asset('themes/default/assets/img/graph/stat/04.jpg') }}) no-repeat center;background-size: cover;">
+        <div class="stats-box small home-stat-card" style="--home-stat-bg: url({{ asset('themes/default/assets/img/graph/stat/04.jpg') }}); background: var(--home-stat-bg) no-repeat center; background-size: cover;">
           <div class="stats-box-value-wrap">
             <p class="stats-box-value">{{ $user->pts }}</p>
             <div class="stats-box-diff">
@@ -143,7 +143,7 @@
 
       <!-- Points Box -->
       {!! ads_site(2) !!}
-      <div class="widget-box" id="pts" style="background: url({{ asset('themes/default/assets/img/ad_pattern.png') }}) repeat; @if(app()->getLocale()==='ar') direction: rtl; @endif">
+      <div class="widget-box" id="pts" style="background: url({{ asset('themes/default/assets/img/ad_pattern.png') }}) repeat;">
         <p class="widget-box-title">{{ __('messages.Totalpoints') }} {{ $user->pts }} PTS.</p>
         <div class="widget-box-content">
             <p class="switch-option-title">

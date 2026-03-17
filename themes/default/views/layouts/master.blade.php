@@ -1,5 +1,9 @@
+@php
+    $pageLocale = str_replace('_', '-', app()->getLocale());
+    $pageDirection = locale_direction();
+@endphp
 <!DOCTYPE HTML>
-<html lang="{{ $site_settings->lang ?? 'en' }}">
+<html lang="{{ $pageLocale }}" dir="{{ $pageDirection }}" data-dir="{{ $pageDirection }}" class="{{ $pageDirection }}">
 <head>
     <title>@yield('title', $site_settings->titer ?? 'MyAds')</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -60,6 +64,9 @@
     <link id="theme-simplebar" data-theme-link="true" rel="stylesheet" href="{{ theme_asset($css_path . '/simplebar.css') }}">
     <link id="theme-tiny-slider" data-theme-link="true" rel="stylesheet" href="{{ theme_asset($css_path . '/tiny-slider.css') }}">
     <link id="theme-dataTables" data-theme-link="true" rel="stylesheet" href="{{ theme_asset($css_path . '/dataTables.css') }}">
+    @if(is_locale_rtl())
+        <link id="theme-rtl" data-theme-link="true" href="{{ theme_asset($css_path . '/rtl.css') }}" rel="stylesheet" type="text/css" />
+    @endif
     <link href="https://use.fontawesome.com/releases/v6.4.2/css/all.css" rel="stylesheet">
 
     <!-- Fonts -->
@@ -482,7 +489,7 @@
 
     @stack('head')
 </head>
-<body data-theme="{{ $css_path }}">
+<body data-theme="{{ $css_path }}" data-dir="{{ $pageDirection }}" class="{{ $pageDirection }}">
 
     @include('theme::partials.header.nav')
     @include('theme::partials.header.sidemenu')

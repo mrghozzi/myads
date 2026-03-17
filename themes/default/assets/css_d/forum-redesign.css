@@ -58,6 +58,87 @@
   color: var(--rdx-text-muted);
 }
 
+html[dir="ltr"] .forum-rdx-index .table.table-forum-category .table-header-column:first-child,
+html[dir="ltr"] .forum-rdx-index .table.table-forum-category .table-column:first-child {
+  padding-left: 36px;
+}
+
+html[dir="ltr"] .forum-rdx-index .forum-category {
+  justify-content: flex-start;
+  text-align: left;
+}
+
+html[dir="ltr"] .forum-rdx-index .forum-category > a:first-child {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  margin-right: 18px;
+  border-radius: 14px;
+  background: var(--rdx-accent-soft);
+  color: var(--rdx-count-fill);
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+html[dir="ltr"] .forum-rdx-index .forum-category > a:first-child i {
+  font-size: 1.05rem;
+}
+
+html[dir="ltr"] .forum-rdx-index .forum-category .forum-category-info {
+  margin-left: 0;
+  margin-right: 0;
+  min-width: 0;
+}
+
+html[dir="rtl"] .forum-rdx-index .table.table-forum-category .table-header-column:first-child,
+html[dir="rtl"] .forum-rdx-index .table.table-forum-category .table-column:first-child {
+  padding-left: 0;
+  padding-right: 36px;
+}
+
+html[dir="rtl"] .forum-rdx-index .table.table-forum-category .table-header-column:last-child,
+html[dir="rtl"] .forum-rdx-index .table.table-forum-category .table-column:last-child {
+  padding-right: 0;
+  padding-left: 28px;
+}
+
+html[dir="rtl"] .forum-rdx-index .table.table-forum-category .table-header-column.padded-big-left,
+html[dir="rtl"] .forum-rdx-index .table.table-forum-category .table-column.padded-big-left {
+  padding-left: 0;
+  padding-right: 60px;
+}
+
+html[dir="rtl"] .forum-rdx-index .forum-category {
+  justify-content: flex-start;
+  text-align: right;
+}
+
+html[dir="rtl"] .forum-rdx-index .forum-category > a:first-child {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  margin-left: 18px;
+  border-radius: 14px;
+  background: var(--rdx-accent-soft);
+  color: var(--rdx-count-fill);
+  text-decoration: none;
+  flex-shrink: 0;
+}
+
+html[dir="rtl"] .forum-rdx-index .forum-category > a:first-child i {
+  font-size: 1.05rem;
+}
+
+html[dir="rtl"] .forum-rdx-index .forum-category .forum-category-info {
+  margin-left: 0;
+  margin-right: 0;
+  min-width: 0;
+}
+
 .forum-rdx-category .forum-rdx-discussion-head,
 .forum-rdx-discussion-row,
 .forum-rdx-discussion-stat,

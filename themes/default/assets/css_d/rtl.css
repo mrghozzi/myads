@@ -1,0 +1,298 @@
+html[dir="rtl"],
+html[dir="rtl"] body {
+    direction: rtl;
+    text-align: right;
+}
+
+html[dir="rtl"] .text-left {
+    text-align: right !important;
+}
+
+html[dir="rtl"] .text-right {
+    text-align: left !important;
+}
+
+html[dir="rtl"] .float-left {
+    float: right !important;
+}
+
+html[dir="rtl"] .float-right {
+    float: left !important;
+}
+
+html[dir="rtl"] .ml-auto {
+    margin-left: 0 !important;
+    margin-right: auto !important;
+}
+
+html[dir="rtl"] .mr-auto {
+    margin-right: 0 !important;
+    margin-left: auto !important;
+}
+
+html[dir="rtl"] .header,
+html[dir="rtl"] .header .header-actions,
+html[dir="rtl"] .header .header-dropdown,
+html[dir="rtl"] .dropdown-box,
+html[dir="rtl"] .simple-dropdown,
+html[dir="rtl"] .user-status,
+html[dir="rtl"] .section-header,
+html[dir="rtl"] .section-filters-bar,
+html[dir="rtl"] .section-header-actions {
+    text-align: right;
+}
+
+html[dir="rtl"] input[type="password"],
+html[dir="rtl"] input[type="text"],
+html[dir="rtl"] select,
+html[dir="rtl"] textarea {
+    text-align: right;
+}
+
+html[dir="rtl"] .interactive-input input {
+    padding-right: 18px;
+    padding-left: 60px;
+}
+
+html[dir="rtl"] .interactive-input .interactive-input-action,
+html[dir="rtl"] .interactive-input .interactive-input-icon-wrap {
+    right: auto;
+    left: 0;
+}
+
+html[dir="rtl"] .form-input-decorated input[type="text"] {
+    padding-right: 18px;
+    padding-left: 60px;
+}
+
+html[dir="rtl"] .form-input-decorated .form-input-icon {
+    right: auto;
+    left: 20px;
+}
+
+html[dir="rtl"] .form-input label,
+html[dir="rtl"] .form-input.active label,
+html[dir="rtl"] .form-select label {
+    left: auto;
+    right: 12px;
+}
+
+html[dir="rtl"] .form-select select {
+    padding-left: 44px;
+    padding-right: 20px;
+}
+
+html[dir="rtl"] .form-select .form-select-icon {
+    right: auto;
+    left: 20px;
+}
+
+html[dir="rtl"] .checkbox-wrap label {
+    padding-left: 0;
+    padding-right: 34px;
+}
+
+html[dir="rtl"] .checkbox-wrap .checkbox-box {
+    left: auto;
+    right: 0;
+}
+
+html[dir="rtl"] .header .header-actions .header-action-count,
+html[dir="rtl"] .floaty-bar .notification-action-count,
+html[dir="rtl"] .action-list .action-list-item.unread::after {
+    right: auto;
+    left: 4px;
+}
+
+html[dir="rtl"] .header .header-actions .header-action-count,
+html[dir="rtl"] .action-list .action-list-item.unread::after {
+    left: 10px;
+}
+
+html[dir="rtl"] .header .header-actions:first-child {
+    padding-right: 16px;
+}
+
+html[dir="rtl"] .header .header-actions .action-list-item-wrap > .header-dropdown {
+    left: 0;
+    right: auto;
+}
+
+html[dir="rtl"] .header .header-actions .action-list-item-wrap > .header-dropdown .dropdown-box {
+    width: calc(100vw - 32px);
+    max-width: 384px;
+}
+
+html[dir="rtl"] .menu-main .menu-main-item {
+    float: right;
+}
+
+html[dir="rtl"] .menu .menu-item .menu-item-link {
+    padding-left: 16px;
+    padding-right: 62px;
+    text-align: right;
+}
+
+html[dir="rtl"] .menu .menu-item .menu-item-link:hover {
+    padding-left: 16px;
+    padding-right: 70px;
+}
+
+html[dir="rtl"] .menu .menu-item.active .menu-item-link:hover {
+    padding-left: 16px;
+    padding-right: 62px;
+}
+
+html[dir="rtl"] .menu.small .menu-item .menu-item-link,
+html[dir="rtl"] .menu.small .menu-item .menu-item-link:hover,
+html[dir="rtl"] .menu.small .menu-item.active .menu-item-link,
+html[dir="rtl"] .menu.small .menu-item.active .menu-item-link:hover {
+    padding-left: 0;
+    padding-right: 0;
+    text-align: center;
+}
+
+html[dir="rtl"] .menu.small .menu-item.active .menu-item-link,
+html[dir="rtl"] .menu.small .menu-item.active .menu-item-link:hover {
+    box-shadow: -4px 7px 12px 0 rgba(64, 208, 79, 0.2);
+}
+
+html[dir="rtl"] .menu .menu-item .menu-item-link .menu-item-link-icon {
+    left: auto;
+    right: 14px;
+}
+
+html[dir="rtl"] .sidebar.left {
+    left: auto;
+    right: 0;
+}
+
+html[dir="rtl"] .sidebar.navigation-widget.hidden {
+    transform: translate(100%);
+}
+
+html[dir="rtl"] .sidebar.chat-widget.closed {
+    transform: translate(-220px);
+}
+
+html[dir="rtl"] .sidebar.chat-widget.hidden {
+    transform: translate(-100%);
+}
+
+html[dir="rtl"] .sidebar.chat-widget .chat-widget-button,
+html[dir="rtl"] .sidebar.chat-widget .chat-widget-form {
+    left: auto;
+    right: 0;
+}
+
+html[dir="rtl"] .section-banner {
+    padding: 52px 200px 0 60px;
+    text-align: right;
+}
+
+html[dir="rtl"] .section-banner .section-banner-icon {
+    left: auto;
+    right: 0;
+}
+
+html[dir="rtl"] .section-header-actions .section-header-action + .section-header-action {
+    margin-left: 0;
+    margin-right: 32px;
+}
+
+html[dir="rtl"] .section-header-actions .section-header-subsection + .section-header-subsection {
+    margin-left: 0;
+    margin-right: 26px;
+}
+
+html[dir="rtl"] .section-header-actions .section-header-subsection + .section-header-subsection::before {
+    left: auto;
+    right: -13px;
+}
+
+html[dir="rtl"] .meta-line + .meta-line {
+    margin-left: 0;
+    margin-right: 22px;
+}
+
+html[dir="rtl"] .text-sticker .text-sticker-icon,
+html[dir="rtl"] .decorated-text .decorated-text-icon {
+    margin-right: 0;
+    margin-left: 4px;
+}
+
+html[dir="rtl"] .timeline-information {
+    padding-left: 0;
+    padding-right: 28px;
+}
+
+html[dir="rtl"] .timeline-information::before {
+    left: auto;
+    right: 6px;
+}
+
+html[dir="rtl"] .timeline-information::after {
+    left: auto;
+    right: 0;
+}
+
+html[dir="rtl"] .user-short-description.landscape {
+    padding-left: 0;
+    padding-right: 32px;
+}
+
+html[dir="rtl"] .user-short-description.landscape .user-short-description-avatar {
+    left: auto;
+    right: -25px;
+}
+
+html[dir="rtl"] .user-short-description.landscape .user-short-description-text,
+html[dir="rtl"] .user-short-description.landscape .user-short-description-title {
+    text-align: right;
+}
+
+html[dir="rtl"] .post-option .post-option-icon {
+    margin-right: 0;
+    margin-left: 16px;
+}
+
+html[dir="rtl"] .section-pager-bar .section-pager {
+    left: auto;
+    right: 60px;
+}
+
+html[dir="rtl"] .directory-listing .directory-listing-meta .button {
+    margin-left: 0;
+    margin-right: auto;
+}
+
+html[dir="rtl"] .home-dashboard-stats .home-stat-card {
+    position: relative;
+    overflow: hidden;
+    background: none !important;
+}
+
+html[dir="rtl"] .home-dashboard-stats .home-stat-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: var(--home-stat-bg);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    transform: scaleX(-1);
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: 0;
+}
+
+html[dir="rtl"] .home-dashboard-stats .home-stat-card > * {
+    position: relative;
+    z-index: 1;
+}
+
+@media screen and (max-width: 960px) {
+    html[dir="rtl"] .section-banner {
+        padding: 18px 108px 0 28px;
+    }
+}

@@ -1,0 +1,298 @@
+html[dir="rtl"],
+html[dir="rtl"] body {
+    direction: rtl;
+    text-align: right;
+}
+
+html[dir="rtl"] .text-start {
+    text-align: right !important;
+}
+
+html[dir="rtl"] .text-end {
+    text-align: left !important;
+}
+
+html[dir="rtl"] .ms-auto {
+    margin-left: 0 !important;
+    margin-right: auto !important;
+}
+
+html[dir="rtl"] .me-auto {
+    margin-right: 0 !important;
+    margin-left: auto !important;
+}
+
+html[dir="rtl"] .ms-0 {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+html[dir="rtl"] .ms-1 {
+    margin-left: 0 !important;
+    margin-right: 0.25rem !important;
+}
+
+html[dir="rtl"] .ms-2 {
+    margin-left: 0 !important;
+    margin-right: 0.5rem !important;
+}
+
+html[dir="rtl"] .ms-3 {
+    margin-left: 0 !important;
+    margin-right: 1rem !important;
+}
+
+html[dir="rtl"] .ms-4 {
+    margin-left: 0 !important;
+    margin-right: 1.5rem !important;
+}
+
+html[dir="rtl"] .ms-5 {
+    margin-left: 0 !important;
+    margin-right: 3rem !important;
+}
+
+html[dir="rtl"] .me-0 {
+    margin-right: 0 !important;
+    margin-left: 0 !important;
+}
+
+html[dir="rtl"] .me-1 {
+    margin-right: 0 !important;
+    margin-left: 0.25rem !important;
+}
+
+html[dir="rtl"] .me-2 {
+    margin-right: 0 !important;
+    margin-left: 0.5rem !important;
+}
+
+html[dir="rtl"] .me-3 {
+    margin-right: 0 !important;
+    margin-left: 1rem !important;
+}
+
+html[dir="rtl"] .me-4 {
+    margin-right: 0 !important;
+    margin-left: 1.5rem !important;
+}
+
+html[dir="rtl"] .me-5 {
+    margin-right: 0 !important;
+    margin-left: 3rem !important;
+}
+
+html[dir="rtl"] .ps-0 {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+html[dir="rtl"] .ps-1 {
+    padding-left: 0 !important;
+    padding-right: 0.25rem !important;
+}
+
+html[dir="rtl"] .ps-2 {
+    padding-left: 0 !important;
+    padding-right: 0.5rem !important;
+}
+
+html[dir="rtl"] .ps-3 {
+    padding-left: 0 !important;
+    padding-right: 1rem !important;
+}
+
+html[dir="rtl"] .ps-4 {
+    padding-left: 0 !important;
+    padding-right: 1.5rem !important;
+}
+
+html[dir="rtl"] .ps-5 {
+    padding-left: 0 !important;
+    padding-right: 3rem !important;
+}
+
+html[dir="rtl"] .pe-0 {
+    padding-right: 0 !important;
+    padding-left: 0 !important;
+}
+
+html[dir="rtl"] .pe-1 {
+    padding-right: 0 !important;
+    padding-left: 0.25rem !important;
+}
+
+html[dir="rtl"] .pe-2 {
+    padding-right: 0 !important;
+    padding-left: 0.5rem !important;
+}
+
+html[dir="rtl"] .pe-3 {
+    padding-right: 0 !important;
+    padding-left: 1rem !important;
+}
+
+html[dir="rtl"] .pe-4 {
+    padding-right: 0 !important;
+    padding-left: 1.5rem !important;
+}
+
+html[dir="rtl"] .pe-5 {
+    padding-right: 0 !important;
+    padding-left: 3rem !important;
+}
+
+html[dir="rtl"] .nxl-navigation {
+    left: auto;
+    right: 0;
+}
+
+html[dir="rtl"] .nxl-navigation .navbar-content .nxl-micon {
+    margin-right: 0;
+    margin-left: 12px;
+}
+
+html[dir="rtl"] .nxl-navigation .navbar-content .nxl-arrow {
+    float: left;
+}
+
+html[dir="rtl"] .nxl-navigation .navbar-content .nxl-badge {
+    margin-left: 0;
+    margin-right: 8px;
+}
+
+html[dir="rtl"].minimenu .nxl-navigation:not(:hover) .navbar-content .nxl-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+html[dir="rtl"].minimenu .nxl-navigation:not(:hover) .navbar-content .nxl-micon {
+    margin-left: 0;
+}
+
+html[dir="rtl"].minimenu .nxl-navigation:not(:hover) .navbar-content .nxl-caption::before {
+    padding-left: 0;
+    padding-right: 0;
+    justify-content: center;
+}
+
+html[dir="rtl"].minimenu .nxl-navigation:hover .navbar-content {
+    left: auto !important;
+    right: 0 !important;
+    border-right: 0;
+    border-left: 1px solid #e5e7eb;
+}
+
+html[dir="rtl"].minimenu .nxl-navigation:hover .navbar-content .nxl-link {
+    display: block;
+    text-align: right;
+}
+
+html[dir="rtl"] .nxl-header {
+    left: 0;
+    right: 280px;
+}
+
+html[dir="rtl"] .nxl-container {
+    margin-left: 0;
+    margin-right: 280px;
+}
+
+html[dir="rtl"].minimenu .nxl-header {
+    left: 0;
+    right: 100px;
+}
+
+html[dir="rtl"].minimenu .nxl-container {
+    margin-left: 0;
+    margin-right: 100px;
+}
+
+html[dir="rtl"] .page-header {
+    left: 0;
+    right: 280px;
+}
+
+html[dir="rtl"].minimenu .page-header {
+    left: 0;
+    right: 100px;
+}
+
+html[dir="rtl"] .nxl-header .header-wrapper,
+html[dir="rtl"] .page-header,
+html[dir="rtl"] .breadcrumb,
+html[dir="rtl"] .dropdown-menu,
+html[dir="rtl"] .dropdown-item,
+html[dir="rtl"] .nxl-link {
+    direction: rtl;
+    text-align: right;
+}
+
+html[dir="rtl"] .page-header h5 {
+    margin-right: 0;
+    margin-left: 8px;
+    padding-right: 0;
+    padding-left: 10px;
+    border-right: 0;
+    border-left: 1px solid #cdd4e8;
+}
+
+html[dir="rtl"] .breadcrumb-item + .breadcrumb-item::before {
+    transform: rotate(180deg);
+}
+
+html[dir="rtl"] .dropdown-menu-end,
+html[dir="rtl"] .nxl-h-dropdown {
+    right: auto !important;
+    left: 0 !important;
+}
+
+html[dir="rtl"] .nxl-navigation .nxl-arrow i {
+    transform: rotate(180deg);
+}
+
+html[dir="rtl"] .nxl-header .header-wrapper .header-left {
+    flex-direction: row-reverse;
+}
+
+html[dir="rtl"] .nxl-header .header-wrapper .header-right {
+    margin-left: 0 !important;
+    margin-right: auto !important;
+}
+
+@media (max-width: 1199.98px) {
+    html[dir="rtl"] .nxl-container,
+    html[dir="rtl"].minimenu .nxl-container {
+        margin-right: 0;
+    }
+
+    html[dir="rtl"] .page-header,
+    html[dir="rtl"].minimenu .page-header {
+        right: 0;
+    }
+}
+
+@media (max-width: 1024px) {
+    html[dir="rtl"] .nxl-header,
+    html[dir="rtl"].minimenu .nxl-header {
+        left: 0 !important;
+        right: 0 !important;
+    }
+
+    html[dir="rtl"] .nxl-header .nxl-head-link#mobile-collapse {
+        left: auto;
+        right: 15px;
+    }
+
+    html[dir="rtl"] .nxl-navigation {
+        left: auto;
+        right: -280px;
+    }
+
+    html[dir="rtl"] .nxl-navigation.mob-navigation-active {
+        left: auto !important;
+        right: 0 !important;
+    }
+}
