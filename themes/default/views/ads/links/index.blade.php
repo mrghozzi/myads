@@ -83,37 +83,20 @@
               <tr>
                 <td>{{ $link->id }}</td>
                 <td>{!! $bnname !!}<hr />
-                  <a href="{{ route('ads.links.edit', $link->id) }}" class="btn btn-success" ><i class="fa fa-edit "></i></a>
-                  <a href="#" data-toggle="modal" data-target="#ban{{ $link->id }}" class="btn btn-danger" ><i class="fa fa-ban "></i></a></td>
+                  <div style="display: flex; align-items: center; gap: 8px;">
+                      <a href="{{ route('ads.links.edit', $link->id) }}" class="btn btn-success"><i class="fa fa-edit "></i></a>
+                      <form action="{{ route('ads.links.destroy', $link->id) }}" method="POST" onsubmit="return confirm('{{ __('messages.confirm_delete_link') }}');" style="margin: 0;">
+                          @csrf
+                          @method('DELETE')
+                          <button type="submit" class="btn btn-danger" aria-label="{{ __('messages.delete_link') }}" style="display: inline-flex; align-items: center; justify-content: center;">
+                              <i class="fa fa-ban "></i>
+                          </button>
+                      </form>
+                  </div></td>
                 <td><a href="{{ route('legacy.state', ['ty' => 'link', 'id' => $link->id]) }}" class="btn btn-warning" >{{ $vuCount }}</a></td>
                 <td><a href="{{ route('legacy.state', ['ty' => 'clik', 'id' => $link->id]) }}" class="btn btn-primary" >{{ $link->clik }}</a></td>
                 <td>{{ $fgft }}</td>
               </tr>
-              
-              <!-- Modal -->
-              <div class="modal fade" id="ban{{ $link->id }}" data-backdrop="" tabindex="-1" role="dialog">
-                <div class="modal-dialog modal-dialog-centered" role="document">
-                    <div class="modal-content modal-info">
-                        <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                        </div>
-                        <div class="modal-body">
-                            <div class="more-grids">
-                                    <h3>{{ __('messages.delete') }} !</h3>
-                                    <p>{{ __('messages.sure_to_delete') }} {{ $link->id }} ? </p><br />
-                                    <center>
-                                        <form action="{{ route('ads.links.destroy', $link->id) }}" method="POST">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-danger">{{ __('messages.delete') }}</button>
-                                        </form>
-                                    </center>
-                                      <button type="button" class="btn btn-default" data-dismiss="modal">{{ __('messages.close') }}</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-              </div>
               @endforeach
              </tbody>
         </table>

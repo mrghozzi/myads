@@ -176,11 +176,11 @@ Route::get('/download/{hash}', [StoreController::class, 'downloadByHash'])->name
 Route::get('/kb/captcha', [StoreController::class, 'knowledgebaseCaptcha'])->name('kb.captcha');
 Route::post('/kb/store', [StoreController::class, 'knowledgebaseStore'])->name('kb.store');
 Route::post('/kb/approve', [StoreController::class, 'knowledgebaseApprove'])->name('kb.approve');
-Route::get('/kb/{name}:{article}', [StoreController::class, 'knowledgebaseShow'])->name('kb.show')->where('name', '[A-Za-z0-9_]+');
-Route::get('/edk/{name}:{article}', [StoreController::class, 'knowledgebaseEdit'])->name('kb.edit')->where('name', '[A-Za-z0-9_]+');
-Route::get('/pgk/{name}:{article}', [StoreController::class, 'knowledgebasePending'])->name('kb.pending')->where('name', '[A-Za-z0-9_]+');
-Route::get('/hkd/{name}:{article}', [StoreController::class, 'knowledgebaseHistory'])->name('kb.history')->where('name', '[A-Za-z0-9_]+');
-Route::get('/kb/{name}', [StoreController::class, 'knowledgebaseIndex'])->name('kb.index')->where('name', '[A-Za-z0-9_]+');
+Route::get('/kb/{name}:{article}', [StoreController::class, 'knowledgebaseShow'])->name('kb.show')->where('name', '[^/:]+');
+Route::get('/edk/{name}:{article}', [StoreController::class, 'knowledgebaseEdit'])->name('kb.edit')->where('name', '[^/:]+');
+Route::get('/pgk/{name}:{article}', [StoreController::class, 'knowledgebasePending'])->name('kb.pending')->where('name', '[^/:]+');
+Route::get('/hkd/{name}:{article}', [StoreController::class, 'knowledgebaseHistory'])->name('kb.history')->where('name', '[^/:]+');
+Route::get('/kb/{name}', [StoreController::class, 'knowledgebaseIndex'])->name('kb.index')->where('name', '[^/]+');
 Route::middleware(['auth'])->group(function () {
     // Route::get('/store/create', [StoreController::class, 'create'])->name('store.create'); // Moved up to fix conflict
     Route::post('/store/store', [StoreController::class, 'store'])->name('store.store');
