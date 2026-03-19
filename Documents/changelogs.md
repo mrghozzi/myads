@@ -53,6 +53,13 @@
 * **Fix**: Reaction user lists in community posts now open correctly on hover again, with matching positioning fixes for both LTR and RTL layouts.
 * **Improvement**: Infinite scroll rendering now supports registered post-render callbacks instead of a single overwrite-prone hook, keeping directory and activity feed hydration compatible.
 
+### Smart Feed & Ranking
+* **Add**: Introduced a new `Smart Feed` algorithm for `/portal?filter=all` that ranks posts based on weighted signals: recency, views, reactions, and comments.
+* **Improvement**: Post ranking now gives a massive boost to fresh content (especially posts from the last 1-6 hours) using a high-base power decay formula.
+* **Add**: Added `Social Proof` boosts (+10 points) when a user's followed contacts have commented on a post.
+* **Add**: Added `Following` boosts (+20 points) for posts authored by users the viewer follows.
+* **Improvement**: Smart feed results are cached for 5 minutes, significantly improving page load performance while maintaining a dynamic discovery experience.
+
 ### Directory UI Polish
 * **Improvement**: Refined the `default` theme directory banners on `/directory`, `/cat/{id}`, and `/directory/{id}` with a more balanced layout, cleaner content width, and a stronger background treatment based on the existing site theme.
 * **Improvement**: Repositioned the `Visit Site` button inside directory listing cards so it now appears under the title and description instead of competing with the card header.
