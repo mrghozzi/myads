@@ -2,20 +2,29 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Notification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Notification;
 
 class NotificationController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $user = Auth::user();
-        $notifications = Notification::where('uid', $user->id)
-            ->orderBy('time', 'desc')
-            ->paginate(20);
+        $user = $request->user();
+        $notifications = $this->notificationQuery($user->id)->paginate(20);
 
-        return view('theme::notifications.index', compact('notifications'));
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'html' => view('theme::notifications.partials.items', [
+                    'notifications' => $notifications,
+                ])->render(),
+                'next_page_url' => $notifications->nextPageUrl(),
+            ]);
+        }
+
+        $unreadNotificationCount = $this->unreadNotificationCount($user->id);
+
+        return view('theme::notifications.index', compact('notifications', 'unreadNotificationCount'));
     }
 
     public function show($id)
@@ -37,17 +46,33 @@ class NotificationController extends Controller
         return redirect()->route('notifications.index');
     }
 
-    public function markAllAsRead()
+    public function markAllAsRead(Request $request)
     {
-        $user = Auth::user();
+        $user = $request->user();
         Notification::where('uid', $user->id)
             ->whereIn('state', [0, 3])
             ->update(['state' => 1]);
 
-        if (request()->ajax()) {
-            return response()->json(['success' => true]);
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'unread_count' => $this->unreadNotificationCount($user->id),
+            ]);
         }
 
         return back()->with('success', __('messages.all_marked_read') ?? 'All notifications marked as read.');
+    }
+
+    protected function notificationQuery(int $userId)
+    {
+        return Notification::where('uid', $userId)
+            ->orderBy('time', 'desc');
+    }
+
+    protected function unreadNotificationCount(int $userId): int
+    {
+        return Notification::where('uid', $userId)
+            ->whereIn('state', [0, 3])
+            ->count();
     }
 }

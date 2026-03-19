@@ -25,6 +25,7 @@
                     <a href="{{ route('profile.show', $user->username) }}" target="_blank" class="btn btn-info"><i class="feather-user me-2"></i>{{ __('messages.view_profile') }}</a>
                     <a href="{{ route('admin.banners', ['user_id' => $user->id]) }}" class="btn btn-warning"><i class="feather-link me-2"></i>{{ __('messages.Banners') }}</a>
                     <a href="{{ route('admin.links', ['user_id' => $user->id]) }}" class="btn btn-success"><i class="feather-eye me-2"></i>{{ __('messages.Links') }}</a>
+                    <a href="{{ route('admin.smart_ads', ['user_id' => $user->id]) }}" class="btn btn-dark"><i class="feather-target me-2"></i>{{ __('messages.smart_ads') }}</a>
                 </div>
             </div>
         </div>
@@ -68,22 +69,29 @@
                     <div class="row mb-4">
                         <div class="col-md-6">
                             <label class="form-label">{{ __('messages.pts') }}</label>
-                            <input type="number" class="form-control" name="pts" value="{{ $user->pts }}" required>
+                            <input type="number" step="0.01" class="form-control" name="pts" value="{{ $user->pts }}" required>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">{{ __('Exchange Visits PTS') }} (vu)</label>
-                            <input type="number" class="form-control" name="vu" value="{{ $user->vu }}" required>
+                            <input type="number" step="0.01" class="form-control" name="vu" value="{{ $user->vu }}" required>
                         </div>
                     </div>
 
                     <div class="row mb-4">
                         <div class="col-md-6">
                             <label class="form-label">{{ __('Banner Ads PTS') }} (nvu)</label>
-                            <input type="number" class="form-control" name="nvu" value="{{ $user->nvu }}" required>
+                            <input type="number" step="0.01" class="form-control" name="nvu" value="{{ $user->nvu }}" required>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label">{{ __('Text Ads PTS') }} (nlink)</label>
-                            <input type="number" class="form-control" name="nlink" value="{{ $user->nlink }}" required>
+                            <input type="number" step="0.01" class="form-control" name="nlink" value="{{ $user->nlink }}" required>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label">{{ __('messages.smart_ads_credits_admin') }}</label>
+                            <input type="number" step="0.01" class="form-control" name="nsmart" value="{{ $user->nsmart }}" required>
                         </div>
                     </div>
 

@@ -54,3 +54,26 @@ if (!function_exists('ads_site')) {
         return '';
     }
 }
+
+if (!function_exists('locale_direction')) {
+    /**
+     * Resolve the visual direction for the active locale.
+     */
+    function locale_direction(?string $locale = null): string
+    {
+        $locale = $locale ?: app()->getLocale();
+        $normalized = strtolower((string) preg_replace('/[_-].*$/', '', $locale));
+
+        return in_array($normalized, ['ar', 'fa'], true) ? 'rtl' : 'ltr';
+    }
+}
+
+if (!function_exists('is_locale_rtl')) {
+    /**
+     * Determine whether the active locale should render right-to-left.
+     */
+    function is_locale_rtl(?string $locale = null): bool
+    {
+        return locale_direction($locale) === 'rtl';
+    }
+}

@@ -21,6 +21,7 @@
                 <form action="{{ route('ads.banners.update', $banner->id) }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
+                    @php($bannerSizes = \App\Support\BannerSizeCatalog::ordered())
                     <div class="form-group">
                         <label>{{ __('messages.name') }}</label>
                         <input type="text" name="name" class="form-control" value="{{ $banner->name }}" required>
@@ -32,10 +33,9 @@
                     <div class="form-group">
                         <label>{{ __('messages.size') }}</label>
                         <select name="px" class="form-control">
-                            <option value="468x60" {{ $banner->px == '468x60' ? 'selected' : '' }}>468x60</option>
-                            <option value="728x90" {{ $banner->px == '728x90' ? 'selected' : '' }}>728x90</option>
-                            <option value="300x250" {{ $banner->px == '300x250' ? 'selected' : '' }}>300x250</option>
-                            <option value="160x600" {{ $banner->px == '160x600' ? 'selected' : '' }}>160x600</option>
+                            @foreach($bannerSizes as $size)
+                                <option value="{{ $size['value'] }}" {{ $banner->px == $size['value'] ? 'selected' : '' }}>{{ $size['label'] }}</option>
+                            @endforeach
                         </select>
                     </div>
                     <div class="form-group">

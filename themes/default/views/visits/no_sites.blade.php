@@ -1,5 +1,9 @@
+@php
+    $pageLocale = str_replace('_', '-', app()->getLocale());
+    $pageDirection = locale_direction();
+@endphp
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ $pageLocale }}" dir="{{ $pageDirection }}" data-dir="{{ $pageDirection }}" class="{{ $pageDirection }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,9 +14,14 @@
         h1 { color: #333; }
         p { color: #666; }
         a { color: #0099ff; text-decoration: none; }
+        [dir="rtl"] body,
+        [dir="rtl"] .message {
+            direction: rtl;
+            text-align: right;
+        }
     </style>
 </head>
-<body>
+<body data-dir="{{ $pageDirection }}" class="{{ $pageDirection }}">
     <div class="message">
         <h1>{{ __('messages.no_sites_available') }}</h1>
         <p>{{ __('messages.check_back_later') }}</p>

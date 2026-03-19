@@ -21,7 +21,8 @@ app.querySelector('.content-grid', function (el) {
       const chatWidth = sidebar.chat.active ? sidebar.chat.maxWidth : sidebar.chat.minWidth,
             navigationWidth = sidebar.navigation.active ? sidebar.navigation.maxWidth : sidebar.navigation.minWidth,
             availableWidth = document.body.clientWidth - contentGrid.offsetWidth - chatWidth - navigationWidth,
-            offsetX = (availableWidth / 2) + navigationWidth;
+            directionMultiplier = app.isRTL() ? -1 : 1,
+            offsetX = directionMultiplier * ((availableWidth / 2) + navigationWidth);
 
       contentGrid.style.transform = `translate(${offsetX}px, 0)`;
     } else {

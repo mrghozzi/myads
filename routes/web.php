@@ -8,6 +8,7 @@ use App\Http\Controllers\DirectoryController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\AdsController;
 use App\Http\Controllers\AdsServingController;
+use App\Http\Controllers\SmartAdsController;
 use App\Http\Controllers\VisitController;
 use App\Http\Controllers\StoreController;
 use App\Http\Controllers\ProfileController;
@@ -142,6 +143,15 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/ads/links/{id}', [AdsController::class, 'updateLink'])->name('ads.links.update');
     Route::delete('/ads/links/{id}', [AdsController::class, 'destroyLink'])->name('ads.links.destroy');
 
+    // Smart Ads
+    Route::get('/ads/smart', [SmartAdsController::class, 'index'])->name('ads.smart.index');
+    Route::get('/ads/smart/create', [SmartAdsController::class, 'create'])->name('ads.smart.create');
+    Route::post('/ads/smart', [SmartAdsController::class, 'store'])->name('ads.smart.store');
+    Route::get('/ads/smart/code', [SmartAdsController::class, 'code'])->name('ads.smart.code');
+    Route::get('/ads/smart/{id}/edit', [SmartAdsController::class, 'edit'])->name('ads.smart.edit');
+    Route::put('/ads/smart/{id}', [SmartAdsController::class, 'update'])->name('ads.smart.update');
+    Route::delete('/ads/smart/{id}', [SmartAdsController::class, 'destroy'])->name('ads.smart.destroy');
+
     // Referrals
     Route::get('/ads/referrals', [AdsController::class, 'referrals'])->name('ads.referrals');
 
@@ -152,6 +162,7 @@ Route::middleware(['auth'])->group(function () {
 // Ads Serving & Tracking (Legacy Compatibility)
 Route::get('/bn.php', [AdsServingController::class, 'bannerScript'])->name('ads.script');
 Route::get('/link.php', [AdsServingController::class, 'linkScript'])->name('ads.link.script');
+Route::get('/smart.php', [AdsServingController::class, 'smartScript'])->name('ads.smart.script');
 Route::get('/show.php', [AdsServingController::class, 'redirect'])->name('ads.redirect');
 Route::get('/ads/redirect', [AdsServingController::class, 'redirect']); // Alias
 
@@ -176,11 +187,11 @@ Route::get('/download/{hash}', [StoreController::class, 'downloadByHash'])->name
 Route::get('/kb/captcha', [StoreController::class, 'knowledgebaseCaptcha'])->name('kb.captcha');
 Route::post('/kb/store', [StoreController::class, 'knowledgebaseStore'])->name('kb.store');
 Route::post('/kb/approve', [StoreController::class, 'knowledgebaseApprove'])->name('kb.approve');
-Route::get('/kb/{name}:{article}', [StoreController::class, 'knowledgebaseShow'])->name('kb.show')->where('name', '[A-Za-z0-9_]+');
-Route::get('/edk/{name}:{article}', [StoreController::class, 'knowledgebaseEdit'])->name('kb.edit')->where('name', '[A-Za-z0-9_]+');
-Route::get('/pgk/{name}:{article}', [StoreController::class, 'knowledgebasePending'])->name('kb.pending')->where('name', '[A-Za-z0-9_]+');
-Route::get('/hkd/{name}:{article}', [StoreController::class, 'knowledgebaseHistory'])->name('kb.history')->where('name', '[A-Za-z0-9_]+');
-Route::get('/kb/{name}', [StoreController::class, 'knowledgebaseIndex'])->name('kb.index')->where('name', '[A-Za-z0-9_]+');
+Route::get('/kb/{name}:{article}', [StoreController::class, 'knowledgebaseShow'])->name('kb.show')->where('name', '[^/:]+');
+Route::get('/edk/{name}:{article}', [StoreController::class, 'knowledgebaseEdit'])->name('kb.edit')->where('name', '[^/:]+');
+Route::get('/pgk/{name}:{article}', [StoreController::class, 'knowledgebasePending'])->name('kb.pending')->where('name', '[^/:]+');
+Route::get('/hkd/{name}:{article}', [StoreController::class, 'knowledgebaseHistory'])->name('kb.history')->where('name', '[^/:]+');
+Route::get('/kb/{name}', [StoreController::class, 'knowledgebaseIndex'])->name('kb.index')->where('name', '[^/]+');
 Route::middleware(['auth'])->group(function () {
     // Route::get('/store/create', [StoreController::class, 'create'])->name('store.create'); // Moved up to fix conflict
     Route::post('/store/store', [StoreController::class, 'store'])->name('store.store');
@@ -285,6 +296,7 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::delete('/users/{id}', [AdminController::class, 'deleteUser'])->name('admin.users.delete');
     
     // Banners
+    Route::get('/ads', [AdminController::class, 'adsHub'])->name('admin.ads');
     Route::get('/banners', [AdminController::class, 'banners'])->name('admin.banners');
     Route::get('/banners/{id}/edit', [AdminController::class, 'editBanner'])->name('admin.banners.edit');
     Route::post('/banners/{id}', [AdminController::class, 'updateBanner'])->name('admin.banners.update');
@@ -297,6 +309,12 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/links', [AdminController::class, 'links'])->name('admin.links');
     Route::post('/links/{id}', [AdminController::class, 'updateLink'])->name('admin.links.update');
     Route::delete('/links/{id}', [AdminController::class, 'deleteLink'])->name('admin.links.delete');
+
+    // Smart Ads
+    Route::get('/smart-ads', [AdminController::class, 'smartAds'])->name('admin.smart_ads');
+    Route::get('/smart-ads/{id}/edit', [AdminController::class, 'editSmartAd'])->name('admin.smart_ads.edit');
+    Route::post('/smart-ads/{id}', [AdminController::class, 'updateSmartAd'])->name('admin.smart_ads.update');
+    Route::delete('/smart-ads/{id}', [AdminController::class, 'deleteSmartAd'])->name('admin.smart_ads.delete');
     
     // Visits
     Route::get('/visits', [AdminController::class, 'visits'])->name('admin.visits');
@@ -410,6 +428,7 @@ Route::get('/b_list', [AdsController::class, 'indexBanners'])->name('legacy.b_li
 Route::get('/b_code', [AdsController::class, 'codeBanner'])->name('legacy.b_code')->middleware('auth');
 Route::get('/l_list', [AdsController::class, 'indexLinks'])->name('legacy.l_list')->middleware('auth');
 Route::get('/l_code', [AdsController::class, 'codeLink'])->name('legacy.l_code')->middleware('auth');
+Route::get('/s_code', [SmartAdsController::class, 'code'])->name('legacy.s_code')->middleware('auth');
 Route::get('/v_list', [VisitController::class, 'index'])->name('legacy.v_list')->middleware('auth');
 Route::get('/r_code', [AdsController::class, 'referrals'])->name('legacy.r_code')->middleware('auth');
 Route::get('/referral', [AdsController::class, 'referralList'])->name('legacy.referral')->middleware('auth');

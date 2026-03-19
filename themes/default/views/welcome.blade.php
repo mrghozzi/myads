@@ -1,6 +1,7 @@
 @extends('theme::layouts.master')
 
 @section('title', __('messages.welcome_title') . ' - ' . ($site_settings->titer ?? 'MyAds'))
+@section('skip_footer_ad', '1')
 
 @push('head')
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -526,6 +527,8 @@
         </div>
     </section>
 
+    @include('theme::partials.ads', ['id' => 1])
+
     {{-- ===== FEATURES SECTION ===== --}}
     <section class="landing-section">
         <div class="landing-section-header landing-fade-up">
@@ -670,6 +673,8 @@
             </a>
         </div>
     </section>
+
+    @include('theme::partials.ads', ['id' => 6])
 
     {{-- ===== FOOTER ===== --}}
     <div class="landing-footer">

@@ -8,8 +8,10 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Banner;
 use App\Models\Link;
 use App\Models\Visit;
+use App\Models\SmartAd;
 use App\Models\Option;
 use App\Models\Setting;
+use App\Support\SmartAdsSettings;
 
 class HomeController extends Controller
 {
@@ -29,10 +31,16 @@ class HomeController extends Controller
         $visitStats = [
             'vu' => Visit::where('uid', $user->id)->sum('vu'),
         ];
+
+        $smartAdStats = [
+            'impressions' => SmartAd::where('uid', $user->id)->sum('impressions'),
+            'clicks' => SmartAd::where('uid', $user->id)->sum('clicks'),
+            'total' => SmartAd::where('uid', $user->id)->count(),
+        ];
         
         $site_settings = Setting::first();
 
-        return view('theme::home', compact('user', 'bannerStats', 'linkStats', 'visitStats', 'site_settings'));
+        return view('theme::home', compact('user', 'bannerStats', 'linkStats', 'visitStats', 'smartAdStats', 'site_settings'));
     }
 
     public function convertPoints(Request $request)
@@ -63,6 +71,8 @@ class HomeController extends Controller
             $bn_name = "towthbaner";
         } elseif ($type == "exchv") {
             $bn_name = "toexchvisi";
+        } elseif ($type == "smartads") {
+            $bn_name = "tosmartads";
         }
 
         // Insert into options
@@ -104,6 +114,17 @@ class HomeController extends Controller
 
             $msg = str_replace("[le_go]", $le_go, __('phbdv'));
             $msg = str_replace("[le_name]", $points, $msg);
+            return redirect()->route('dashboard')->with('MSG', $msg);
+        } elseif ($type == "smartads") {
+            $le_go = $points / SmartAdsSettings::pointsDivisor();
+            $user->nsmart += $le_go;
+            $user->pts -= $points;
+            $user->save();
+
+            $msg = __('messages.smart_points_converted', [
+                'points' => $points,
+                'credits' => rtrim(rtrim(number_format($le_go, 2, '.', ''), '0'), '.'),
+            ]);
             return redirect()->route('dashboard')->with('MSG', $msg);
         }
 
