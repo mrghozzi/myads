@@ -2,14 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Banner;
+use App\Models\Link;
+use App\Models\State; // Assuming State model exists or using DB table
+use App\Models\User;
+use App\Support\BannerSizeCatalog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
-use App\Models\Banner;
-use App\Models\Link;
-use App\Models\User;
-use App\Models\State; // Assuming State model exists or using DB table
+use Illuminate\Validation\ValidationException;
 
 class AdsController extends Controller
 {
@@ -58,13 +60,14 @@ class AdsController extends Controller
         ]);
 
         $user = Auth::user();
+        $bannerSize = $this->validatedBannerSize($request->input('px'));
 
         Banner::create([
             'uid' => $user->id,
             'name' => $request->name,
             'url' => $request->url,
             'img' => $request->img,
-            'px' => $request->px,
+            'px' => $bannerSize,
             'statu' => 1,
             'vu' => 0,
             'clik' => 0,
@@ -93,12 +96,13 @@ class AdsController extends Controller
             'img' => 'required|string',
             'px' => 'required|string',
         ]);
+        $bannerSize = $this->validatedBannerSize($request->input('px'));
 
         $banner->update([
             'name' => $request->name,
             'url' => $request->url,
             'img' => $request->img,
-            'px' => $request->px,
+            'px' => $bannerSize,
         ]);
 
         return redirect()->route('ads.banners.index')->with('success', 'Banner updated successfully.');
@@ -461,5 +465,18 @@ class AdsController extends Controller
             'visitor_Agent' => $request->server('HTTP_USER_AGENT'),
             'v_ip' => $request->ip(),
         ]);
+    }
+
+    private function validatedBannerSize(null|string|int $value): string
+    {
+        $bannerSize = BannerSizeCatalog::normalize($value);
+
+        if ($bannerSize === null) {
+            throw ValidationException::withMessages([
+                'px' => 'Invalid banner size selected.',
+            ]);
+        }
+
+        return $bannerSize;
     }
 }

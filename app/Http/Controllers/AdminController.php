@@ -35,7 +35,10 @@ use App\Models\Knowledgebase;
 use App\Models\Page;
 use App\Services\PluginManager;
 use App\Services\ThemeManager;
+use App\Support\BannerServingSettings;
+use App\Support\BannerSizeCatalog;
 use App\Support\ForumSettings;
+use Illuminate\Validation\ValidationException;
 
 class AdminController extends Controller
 {
@@ -164,7 +167,9 @@ class AdminController extends Controller
     public function settings()
     {
         $settings = Setting::firstOrFail();
-        return view('theme::admin.settings', compact('settings'));
+        $bannerRepeatWindowMinutes = BannerServingSettings::repeatWindowMinutes();
+
+        return view('theme::admin.settings', compact('settings', 'bannerRepeatWindowMinutes'));
     }
 
     public function updateSettings(Request $request)
@@ -174,9 +179,20 @@ class AdminController extends Controller
         $request->validate([
             'titer' => 'required|string',
             'url' => 'required|url',
+            'banner_repeat_window_minutes' => 'nullable|integer|min:0|max:525600',
         ]);
 
         $settings->update($request->all());
+
+        Option::updateOrCreate(
+            [
+                'o_type' => BannerServingSettings::OPTION_TYPE,
+                'name' => BannerServingSettings::REPEAT_WINDOW_NAME,
+            ],
+            [
+                'o_valuer' => (string) ($request->input('banner_repeat_window_minutes', BannerServingSettings::DEFAULT_REPEAT_WINDOW_MINUTES)),
+            ]
+        );
 
         return redirect()->route('admin.settings')->with('success', __('settings_updated'));
     }
@@ -434,21 +450,22 @@ class AdminController extends Controller
             'name' => 'required|string',
             'url' => 'required|url',
             'img' => 'required|string',
-            'px' => 'required|integer',
+            'px' => 'required|string',
             'statu' => 'required|in:1,2',
         ]);
+        $bannerSize = $this->validatedBannerSize($request->input('px'));
 
         $banner->update([
             'name' => $request->name,
             'url' => $request->url,
             'img' => $request->img,
-            'px' => $request->px,
+            'px' => $bannerSize,
             'statu' => $request->statu,
         ]);
 
         // Notification if status changed
         if ($oldStatus != $request->statu) {
-            $nurl = "b_edit?id=" . $id;
+            $nurl = 'ads/banners/' . $id . '/edit';
             $name = ($request->statu == 1) ? __('your_ad_has_been_activated') : __('your_ad_as_been_blocked');
             
             Notification::create([
@@ -1555,5 +1572,18 @@ class AdminController extends Controller
         }
 
         return redirect()->back()->with('error', __('Theme activation failed.'));
+    }
+
+    private function validatedBannerSize(null|string|int $value): string
+    {
+        $bannerSize = BannerSizeCatalog::normalize($value);
+
+        if ($bannerSize === null) {
+            throw ValidationException::withMessages([
+                'px' => 'Invalid banner size selected.',
+            ]);
+        }
+
+        return $bannerSize;
     }
 }

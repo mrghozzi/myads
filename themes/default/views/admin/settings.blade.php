@@ -95,6 +95,22 @@
                 </div>
             </div>
 
+            <div class="row mb-4">
+                <div class="col-lg-6">
+                    <label class="form-label">Banner repeat window (minutes)</label>
+                    <input
+                        type="number"
+                        min="0"
+                        max="525600"
+                        name="banner_repeat_window_minutes"
+                        class="form-control"
+                        value="{{ old('banner_repeat_window_minutes', $bannerRepeatWindowMinutes) }}"
+                        placeholder="1440"
+                    >
+                    <small class="text-muted">Prevents showing the same banner to the same visitor on the same publisher within this time window. Use 0 to disable.</small>
+                </div>
+            </div>
+
             <div class="mb-4">
                 <label class="form-label">{{ __('messages.admin_email') }}</label>
                 <input type="email" name="a_mail" class="form-control" value="{{ old('a_mail', $settings->a_mail) }}" placeholder="{{ __('messages.admin_email') }}">
