@@ -33,6 +33,7 @@ class UserFactory extends Factory
             'vu' => 0,
             'nvu' => 0,
             'nlink' => 0,
+            'nsmart' => 0,
             'remember_token' => Str::random(10),
         ];
     }

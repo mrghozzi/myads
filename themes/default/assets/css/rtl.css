@@ -281,7 +281,7 @@ html[dir="rtl"] .home-dashboard-stats .home-stat-card::before {
     content: "";
     position: absolute;
     inset: 0;
-    background-image: var(--home-stat-bg);
+    background: var(--home-stat-bg, transparent);
     background-repeat: no-repeat;
     background-position: center;
     background-size: cover;
@@ -294,6 +294,10 @@ html[dir="rtl"] .home-dashboard-stats .home-stat-card::before {
 html[dir="rtl"] .home-dashboard-stats .home-stat-card > * {
     position: relative;
     z-index: 1;
+}
+
+html[dir="rtl"] .home-smart-actions .home-smart-action {
+    text-align: center;
 }
 
 @media screen and (max-width: 960px) {

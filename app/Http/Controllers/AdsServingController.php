@@ -4,11 +4,15 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\BannerImpression;
+use App\Models\SmartAd;
+use App\Models\SmartAdImpression;
 use App\Models\User;
 use App\Models\Banner;
 use App\Models\Link;
+use App\Services\SmartAdGeoResolver;
 use App\Support\BannerServingSettings;
 use App\Support\BannerSizeCatalog;
+use App\Support\SmartAdTargeting;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -212,6 +216,87 @@ class AdsServingController extends Controller
         return $this->javascriptResponse('document.write("' . addslashes($html) . '");');
     }
 
+    // Public: Serve Smart Ads Script (smart.php)
+    public function smartScript(Request $request, SmartAdGeoResolver $geoResolver)
+    {
+        $user_id = $request->query('ID');
+
+        if (!$user_id || !is_numeric($user_id)) {
+            return $this->javascriptResponse('// Invalid User ID');
+        }
+
+        $user = User::find($user_id);
+        if (!$user) {
+            return $this->javascriptResponse('// User not found');
+        }
+
+        $slot = $this->resolveSmartSlot($request);
+        $visitorKey = $this->resolveVisitorKey($request);
+        $countryCode = $geoResolver->resolveCountryCode($request);
+        $deviceType = $this->resolveSmartDeviceType($request);
+        $contextTokens = SmartAdTargeting::buildTopicTokens([(string) $request->query('ctx', '')], 24);
+
+        $user->increment('pts', 1);
+        $user->increment('nsmart', 0.5);
+
+        $smartAd = SmartAd::with('user')
+            ->where('statu', 1)
+            ->where('uid', '!=', (int) $user_id)
+            ->get()
+            ->filter(function (SmartAd $candidate) use ($countryCode, $deviceType) {
+                if (!$candidate->user || (float) $candidate->user->nsmart < 1) {
+                    return false;
+                }
+
+                $targetCountries = $candidate->targetCountries();
+                if ($targetCountries !== [] && !in_array($countryCode, $targetCountries, true)) {
+                    return false;
+                }
+
+                $targetDevices = $candidate->targetDevices();
+                if ($targetDevices !== [] && !in_array($deviceType, $targetDevices, true)) {
+                    return false;
+                }
+
+                return true;
+            })
+            ->map(function (SmartAd $candidate) use ($contextTokens) {
+                return [
+                    'ad' => $candidate,
+                    'score' => $this->scoreSmartAd($candidate, $contextTokens),
+                    'tie' => random_int(0, 100000),
+                ];
+            })
+            ->sort(function (array $left, array $right) {
+                if ($left['score'] === $right['score']) {
+                    return $right['tie'] <=> $left['tie'];
+                }
+
+                return $right['score'] <=> $left['score'];
+            })
+            ->first()['ad'] ?? null;
+
+        if (!$smartAd) {
+            $fallbackHtml = $this->renderSmartFallbackMarkup((int) $user_id, $slot);
+
+            return $this->javascriptResponse('document.write("' . addslashes($fallbackHtml) . '");');
+        }
+
+        $placement = $slot['banner_size'] !== null && $smartAd->displayImage() !== null ? 'banner' : 'native';
+
+        if ($smartAd->user) {
+            $smartAd->user->decrement('nsmart', 1);
+        }
+
+        $smartAd->increment('impressions');
+        $this->logState($user_id, $smartAd->id, 'smart', $request);
+        $this->recordSmartImpression($smartAd->id, (int) $user_id, $visitorKey, $countryCode, $deviceType, $placement);
+
+        $html = $this->renderSmartMarkup($smartAd, (int) $user_id, $placement, $slot['banner_size']);
+
+        return $this->javascriptResponse('document.write("' . addslashes($html) . '");');
+    }
+
     // Public: Redirect/Track (show.php)
     public function redirect(Request $request)
     {
@@ -223,6 +308,10 @@ class AdsServingController extends Controller
             // Check if it's a link click passed via 'type' param
             if ($request->input('type') == 'link') {
                 return $this->handleLinkClick($bannerId, $publisherId, $request);
+            }
+
+            if ($request->input('type') == 'smart') {
+                return $this->handleSmartAdClick($bannerId, $publisherId, $request);
             }
 
             $banner = Banner::find($bannerId);
@@ -264,6 +353,23 @@ class AdsServingController extends Controller
 
             return redirect($link->url);
         }
+        return redirect('/');
+    }
+
+    private function handleSmartAdClick($smartAdId, $publisherId, $request)
+    {
+        $smartAd = SmartAd::find($smartAdId);
+
+        if ($smartAd) {
+            $smartAd->increment('clicks');
+
+            User::where('id', $publisherId)->increment('pts', 2);
+
+            $this->logState($publisherId, $smartAdId, 'smart_click', $request);
+
+            return redirect($smartAd->landing_url);
+        }
+
         return redirect('/');
     }
 
@@ -316,6 +422,46 @@ class AdsServingController extends Controller
 
         try {
             $enabled = Schema::hasTable('banner_impressions');
+        } catch (\Throwable) {
+            $enabled = false;
+        }
+
+        return $enabled;
+    }
+
+    private function recordSmartImpression(
+        int $smartAdId,
+        int $publisherId,
+        string $visitorKey,
+        string $countryCode,
+        string $deviceType,
+        string $placement
+    ): void {
+        if (!$this->smartImpressionsEnabled()) {
+            return;
+        }
+
+        SmartAdImpression::create([
+            'smart_ad_id' => $smartAdId,
+            'publisher_id' => $publisherId,
+            'visitor_key' => $visitorKey,
+            'country_code' => $countryCode,
+            'device_type' => $deviceType,
+            'placement' => $placement,
+            'served_at' => time(),
+        ]);
+    }
+
+    private function smartImpressionsEnabled(): bool
+    {
+        static $enabled;
+
+        if ($enabled !== null) {
+            return $enabled;
+        }
+
+        try {
+            $enabled = Schema::hasTable('smart_ad_impressions');
         } catch (\Throwable) {
             $enabled = false;
         }
@@ -392,9 +538,53 @@ class AdsServingController extends Controller
             'card' => 'calc(100% - 28px)',
             default => 'calc(100% - 32px)',
         };
-        $chipText = htmlspecialchars('Ads by ' . config('app.name'), ENT_QUOTES, 'UTF-8');
+        $chipText = htmlspecialchars(__('messages.ads_by_site', ['site' => config('app.name')]), ENT_QUOTES, 'UTF-8');
+        $reportLabel = htmlspecialchars(__('messages.report'), ENT_QUOTES, 'UTF-8');
 
-        return "<style>.{$class},.{$class} *{box-sizing:border-box;}.{$class}{position:relative;width:{$width}px;height:{$height}px;overflow:hidden;border-radius:{$radius}px;background:#f1f3f4 url('{$banner->img}') center/cover no-repeat;box-shadow:0 1px 3px rgba(18,24,40,.16);font-family:Arial,'Segoe UI',sans-serif;isolation:isolate;}.{$class}__click{position:absolute;inset:0;display:block;z-index:1;text-decoration:none;}.{$class}__chrome{position:absolute;top:0;right:0;z-index:3;display:flex;align-items:stretch;max-width:{$chipMaxWidth};border-radius:0 0 0 {$radius}px;overflow:hidden;box-shadow:0 1px 2px rgba(18,24,40,.18);}.{$class}__label,.{$class}__info{display:inline-flex;align-items:center;justify-content:center;height:{$labelHeight}px;background:rgba(255,255,255,.96);text-decoration:none;line-height:1;}.{$class}__label{max-width:calc(100% - {$infoWidth}px);padding:{$labelPadding};color:#202124;font-size:{$labelFontSize};font-weight:400;letter-spacing:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-inline-end:1px solid #dadce0;}.{$class}__label:hover,.{$class}__info:hover{background:#f8f9fa;text-decoration:none;}.{$class}__info{width:{$infoWidth}px;min-width:{$infoWidth}px;color:#5f6368;}.{$class}__info-mark{display:inline-flex;align-items:center;justify-content:center;width:" . ($profile === 'rail' ? 11 : 13) . "px;height:" . ($profile === 'rail' ? 11 : 13) . "px;border-radius:50%;border:1px solid #5f8def;color:#5f8def;font-size:" . ($profile === 'rail' ? '8px' : '9px') . ";font-weight:700;font-style:normal;font-family:Arial,'Segoe UI',sans-serif;}@media screen and (max-width: {$width}px){.{$class}{width:100%;}}</style><div class='{$class}' data-placement='responsive2' data-size='{$pxValue}' data-profile='{$profile}'><a class='{$class}__click' href='{$clickUrl}' target='_blank' rel='noopener noreferrer' aria-label='{$bannerName}'></a><div class='{$class}__chrome'><a class='{$class}__label' href='{$refUrl}' target='_blank' rel='noopener noreferrer'>{$chipText}</a><a class='{$class}__info' href='{$reportUrl}' target='_blank' rel='noopener noreferrer' aria-label='Report'><span class='{$class}__info-mark'>i</span></a></div></div>";
+        return "<style>.{$class},.{$class} *{box-sizing:border-box;}.{$class}{position:relative;width:{$width}px;height:{$height}px;overflow:hidden;border-radius:{$radius}px;background:#f1f3f4 url('{$banner->img}') center/cover no-repeat;box-shadow:0 1px 3px rgba(18,24,40,.16);font-family:Arial,'Segoe UI',sans-serif;isolation:isolate;}.{$class}__click{position:absolute;inset:0;display:block;z-index:1;text-decoration:none;}.{$class}__chrome{position:absolute;top:0;right:0;z-index:3;display:flex;align-items:stretch;max-width:{$chipMaxWidth};border-radius:0 0 0 {$radius}px;overflow:hidden;box-shadow:0 1px 2px rgba(18,24,40,.18);}.{$class}__label,.{$class}__info{display:inline-flex;align-items:center;justify-content:center;height:{$labelHeight}px;background:rgba(255,255,255,.96);text-decoration:none;line-height:1;}.{$class}__label{max-width:calc(100% - {$infoWidth}px);padding:{$labelPadding};color:#202124;font-size:{$labelFontSize};font-weight:400;letter-spacing:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-inline-end:1px solid #dadce0;}.{$class}__label:hover,.{$class}__info:hover{background:#f8f9fa;text-decoration:none;}.{$class}__info{width:{$infoWidth}px;min-width:{$infoWidth}px;color:#5f6368;}.{$class}__info-mark{display:inline-flex;align-items:center;justify-content:center;width:" . ($profile === 'rail' ? 11 : 13) . "px;height:" . ($profile === 'rail' ? 11 : 13) . "px;border-radius:50%;border:1px solid #5f8def;color:#5f8def;font-size:" . ($profile === 'rail' ? '8px' : '9px') . ";font-weight:700;font-style:normal;font-family:Arial,'Segoe UI',sans-serif;}@media screen and (max-width: {$width}px){.{$class}{width:100%;}}</style><div class='{$class}' data-placement='responsive2' data-size='{$pxValue}' data-profile='{$profile}'><a class='{$class}__click' href='{$clickUrl}' target='_blank' rel='noopener noreferrer' aria-label='{$bannerName}'></a><div class='{$class}__chrome'><a class='{$class}__label' href='{$refUrl}' target='_blank' rel='noopener noreferrer'>{$chipText}</a><a class='{$class}__info' href='{$reportUrl}' target='_blank' rel='noopener noreferrer' aria-label='{$reportLabel}'><span class='{$class}__info-mark'>i</span></a></div></div>";
+    }
+
+    private function renderSmartMarkup(SmartAd $smartAd, int $publisherId, string $placement, ?string $bannerSize = null): string
+    {
+        $viewName = $placement === 'banner'
+            ? 'theme::ads.serving.smart_banner'
+            : 'theme::ads.serving.smart_native';
+
+        $html = view($viewName, [
+            'smartAd' => $smartAd,
+            'publisherId' => $publisherId,
+            'bannerSize' => $bannerSize,
+            'clickUrl' => route('ads.redirect', ['ads' => $smartAd->id, 'vu' => $publisherId, 'type' => 'smart']),
+            'refUrl' => url('/') . '?ref=' . $publisherId,
+            'reportUrl' => url('/report') . '?smart_ad=' . $smartAd->id,
+        ])->render();
+
+        return str_replace(["\r", "\n"], ' ', $html);
+    }
+
+    private function renderSmartFallbackMarkup(int $publisherId, array $slot): string
+    {
+        if ($slot['banner_size'] !== null) {
+            $size = $slot['banner_size'];
+            $fallbackMap = [
+                '160x600' => 'img/banner/160x600.gif',
+                '300x250' => 'img/banner/300x250.gif',
+                '468x60' => 'img/banner/468x60.gif',
+                '728x90' => 'img/banner/728x90.gif',
+            ];
+            $src = theme_asset($fallbackMap[$size] ?? 'img/banner/300x250.gif');
+
+            return "<a href='" . url('/') . "?ref={$publisherId}' target='_blank' rel='noopener noreferrer'><img src='{$src}' width='" . $this->getWidth($size) . "' height='" . $this->getHeight($size) . "' border='0'></a>";
+        }
+
+        $appName = htmlspecialchars((string) config('app.name'), ENT_QUOTES, 'UTF-8');
+        $refUrl = url('/') . '?ref=' . $publisherId;
+        $adsByLabel = htmlspecialchars(__('messages.ads_by_site', ['site' => config('app.name')]), ENT_QUOTES, 'UTF-8');
+        $learnMoreLabel = htmlspecialchars(__('messages.smart_learn_more'), ENT_QUOTES, 'UTF-8');
+        $headline = htmlspecialchars(__('messages.smart_fallback_headline', ['site' => config('app.name')]), ENT_QUOTES, 'UTF-8');
+        $description = htmlspecialchars(__('messages.smart_fallback_description'), ENT_QUOTES, 'UTF-8');
+
+        return "<div style=\"box-sizing:border-box;max-width:420px;border:1px solid #e9edf5;border-radius:16px;background:#fff;padding:16px;font-family:Arial,'Segoe UI',sans-serif;box-shadow:0 12px 28px rgba(94,92,154,.08);\"><div style=\"display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;\"><span style=\"display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;background:#f4f7ff;color:#615dfa;font-size:10px;font-weight:700;text-transform:uppercase;\">{$adsByLabel}</span><a href='{$refUrl}' target='_blank' rel='noopener noreferrer' style='font-size:12px;color:#8f94b5;text-decoration:none;'>{$learnMoreLabel}</a></div><h3 style=\"margin:0 0 8px;color:#3e3f5e;font-size:18px;line-height:1.3;\">{$headline}</h3><p style=\"margin:0;color:#8f94b5;font-size:13px;line-height:1.7;\">{$description}</p></div>";
     }
 
     private function javascriptResponse(string $content)
@@ -517,5 +707,60 @@ class AdsServingController extends Controller
         }
 
         return 'compact';
+    }
+
+    private function resolveSmartSlot(Request $request): array
+    {
+        $width = $this->sanitizePositiveInt($request->query('cw'));
+        $height = $this->sanitizePositiveInt($request->query('ch'));
+        $bannerSize = null;
+
+        if ($width !== null && $width >= 728 && ($height === null || $height >= 90)) {
+            $bannerSize = '728x90';
+        } elseif ($width !== null && $width >= 468 && ($height === null || $height >= 60)) {
+            $bannerSize = '468x60';
+        } elseif ($width !== null && $width >= 300 && ($height === null || $height >= 250)) {
+            $bannerSize = '300x250';
+        } elseif ($width !== null && $width >= 160 && $height !== null && $height >= 600) {
+            $bannerSize = '160x600';
+        }
+
+        return [
+            'width' => $width,
+            'height' => $height,
+            'banner_size' => $bannerSize,
+        ];
+    }
+
+    private function resolveSmartDeviceType(Request $request): string
+    {
+        $requested = SmartAdTargeting::normalizeDeviceTypes([(string) $request->query('dv', '')]);
+
+        if ($requested !== []) {
+            return $requested[0];
+        }
+
+        $userAgent = strtolower((string) $request->userAgent());
+        $isTablet = preg_match('/ipad|tablet|playbook|silk|android(?!.*mobile)/i', $userAgent) === 1;
+        $isMobile = !$isTablet && preg_match('/iphone|ipod|android|mobile/i', $userAgent) === 1;
+
+        if ($isTablet) {
+            return 'tablet';
+        }
+
+        if ($isMobile) {
+            return 'mobile';
+        }
+
+        return 'desktop';
+    }
+
+    private function scoreSmartAd(SmartAd $smartAd, array $contextTokens): int
+    {
+        if ($contextTokens === []) {
+            return 0;
+        }
+
+        return count(array_intersect($smartAd->topicTokens(), $contextTokens));
     }
 }

@@ -21,6 +21,7 @@ use App\Models\Product;
 
 use App\Models\Banner;
 use App\Models\Link;
+use App\Models\SmartAd;
 use App\Models\Visit;
 use App\Models\Status;
 use App\Models\ForumCategory;
@@ -38,6 +39,8 @@ use App\Services\ThemeManager;
 use App\Support\BannerServingSettings;
 use App\Support\BannerSizeCatalog;
 use App\Support\ForumSettings;
+use App\Support\SmartAdsSettings;
+use App\Support\SmartAdTargeting;
 use Illuminate\Validation\ValidationException;
 
 class AdminController extends Controller
@@ -106,6 +109,11 @@ class AdminController extends Controller
                     'clicks' => Link::sum('clik'),
                     'views' => 0,
                 ],
+                'smart_ads' => [
+                    'total' => SmartAd::count(),
+                    'impressions' => SmartAd::sum('impressions'),
+                    'clicks' => SmartAd::sum('clicks'),
+                ],
                 'visits' => [
                     'total' => Visit::count(),
                 ],
@@ -125,6 +133,7 @@ class AdminController extends Controller
                 'listings' => 0, 'products' => 0,
                 'banners' => ['total' => 0, 'views' => 0, 'clicks' => 0],
                 'links' => ['total' => 0, 'clicks' => 0, 'views' => 0],
+                'smart_ads' => ['total' => 0, 'impressions' => 0, 'clicks' => 0],
                 'visits' => ['total' => 0],
                 'reactions' => ['total' => 0],
                 'followers' => 0,
@@ -139,11 +148,13 @@ class AdminController extends Controller
                 'labels' => [
                     __('messages.bannads'),
                     __('messages.textads'),
+                    __('messages.smart_ads'),
                     __('messages.exvisit'),
                 ],
                 'data' => [
                     $stats['banners']['total'],
                     $stats['links']['total'],
+                    $stats['smart_ads']['total'],
                     $stats['visits']['total'],
                 ],
             ],
@@ -152,11 +163,15 @@ class AdminController extends Controller
                     __('messages.bannads') . ' ' . __('messages.Views'),
                     __('messages.bannads') . ' ' . __('messages.clicks'),
                     __('messages.textads') . ' ' . __('messages.clicks'),
+                    __('messages.smart_ads') . ' ' . __('messages.Views'),
+                    __('messages.smart_ads') . ' ' . __('messages.clicks'),
                 ],
                 'data' => [
                     $stats['banners']['views'],
                     $stats['banners']['clicks'],
                     $stats['links']['clicks'],
+                    $stats['smart_ads']['impressions'],
+                    $stats['smart_ads']['clicks'],
                 ],
             ],
         ];
@@ -168,8 +183,9 @@ class AdminController extends Controller
     {
         $settings = Setting::firstOrFail();
         $bannerRepeatWindowMinutes = BannerServingSettings::repeatWindowMinutes();
+        $smartAdsPointsDivisor = SmartAdsSettings::pointsDivisor();
 
-        return view('theme::admin.settings', compact('settings', 'bannerRepeatWindowMinutes'));
+        return view('theme::admin.settings', compact('settings', 'bannerRepeatWindowMinutes', 'smartAdsPointsDivisor'));
     }
 
     public function updateSettings(Request $request)
@@ -180,6 +196,7 @@ class AdminController extends Controller
             'titer' => 'required|string',
             'url' => 'required|url',
             'banner_repeat_window_minutes' => 'nullable|integer|min:0|max:525600',
+            'smart_ads_points_divisor' => 'nullable|numeric|min:0.1|max:1000',
         ]);
 
         $settings->update($request->all());
@@ -191,6 +208,16 @@ class AdminController extends Controller
             ],
             [
                 'o_valuer' => (string) ($request->input('banner_repeat_window_minutes', BannerServingSettings::DEFAULT_REPEAT_WINDOW_MINUTES)),
+            ]
+        );
+
+        Option::updateOrCreate(
+            [
+                'o_type' => SmartAdsSettings::OPTION_TYPE,
+                'name' => SmartAdsSettings::POINTS_DIVISOR_NAME,
+            ],
+            [
+                'o_valuer' => (string) ($request->input('smart_ads_points_divisor', SmartAdsSettings::DEFAULT_POINTS_DIVISOR)),
             ]
         );
 
@@ -371,10 +398,11 @@ class AdminController extends Controller
             'email' => 'required|email|max:255',
             'slug' => 'required|string|max:255',
             'ucheck' => 'required|in:0,1',
-            'pts' => 'required|integer',
-            'vu' => 'required|integer',
-            'nvu' => 'required|integer',
-            'nlink' => 'required|integer',
+            'pts' => 'required|numeric',
+            'vu' => 'required|numeric',
+            'nvu' => 'required|numeric',
+            'nlink' => 'required|numeric',
+            'nsmart' => 'required|numeric',
         ]);
 
         $user->update([
@@ -385,6 +413,7 @@ class AdminController extends Controller
             'vu' => $request->vu,
             'nvu' => $request->nvu,
             'nlink' => $request->nlink,
+            'nsmart' => $request->nsmart,
         ]);
 
         // Update Slug
@@ -433,6 +462,94 @@ class AdminController extends Controller
 
         $banners = $query->paginate(20);
         return view('theme::admin.banners', compact('banners'));
+    }
+
+    public function adsHub(Request $request)
+    {
+        $search = trim((string) $request->query('search', ''));
+
+        $banners = Banner::with('user')
+            ->when($search !== '', function ($query) use ($search) {
+                $query->where('name', 'like', '%' . $search . '%');
+            })
+            ->latest('id')
+            ->limit(8)
+            ->get()
+            ->map(function (Banner $banner) {
+                return (object) [
+                    'type' => 'banner',
+                    'id' => $banner->id,
+                    'name' => $banner->name,
+                    'owner' => $banner->user?->username,
+                    'status' => $banner->statu,
+                    'metric_primary' => $banner->vu,
+                    'metric_secondary' => $banner->clik,
+                    'edit_url' => route('admin.banners.edit', $banner->id),
+                    'badge' => $banner->px,
+                    'created_at' => $banner->created_at,
+                ];
+            });
+
+        $links = Link::with('user')
+            ->when($search !== '', function ($query) use ($search) {
+                $query->where('name', 'like', '%' . $search . '%')
+                    ->orWhere('txt', 'like', '%' . $search . '%');
+            })
+            ->latest('id')
+            ->limit(8)
+            ->get()
+            ->map(function (Link $link) {
+                return (object) [
+                    'type' => 'link',
+                    'id' => $link->id,
+                    'name' => $link->name,
+                    'owner' => $link->user?->username,
+                    'status' => $link->statu,
+                    'metric_primary' => $link->clik,
+                    'metric_secondary' => null,
+                    'edit_url' => route('admin.links'),
+                                'badge' => __('messages.textads'),
+                    'created_at' => $link->created_at,
+                ];
+            });
+
+        $smartAds = SmartAd::with('user')
+            ->when($search !== '', function ($query) use ($search) {
+                $query->where('landing_url', 'like', '%' . $search . '%')
+                    ->orWhere('headline_override', 'like', '%' . $search . '%')
+                    ->orWhere('source_title', 'like', '%' . $search . '%');
+            })
+            ->latest('id')
+            ->limit(8)
+            ->get()
+            ->map(function (SmartAd $smartAd) {
+                return (object) [
+                    'type' => 'smart',
+                    'id' => $smartAd->id,
+                    'name' => $smartAd->displayTitle(),
+                    'owner' => $smartAd->user?->username,
+                    'status' => $smartAd->statu,
+                    'metric_primary' => $smartAd->impressions,
+                    'metric_secondary' => $smartAd->clicks,
+                    'edit_url' => route('admin.smart_ads.edit', $smartAd->id),
+                                'badge' => __('messages.smart_ad'),
+                    'created_at' => $smartAd->created_at,
+                ];
+            });
+
+        $items = $banners
+            ->concat($links)
+            ->concat($smartAds)
+            ->sortByDesc(fn ($item) => optional($item->created_at)->getTimestamp() ?? 0)
+            ->values();
+
+        $summary = [
+            'banners' => Banner::count(),
+            'links' => Link::count(),
+            'smart_ads' => SmartAd::count(),
+        ];
+
+        return view('theme::admin.ads_overview', compact('items', 'summary', 'search'));
     }
 
     public function editBanner($id)
@@ -525,6 +642,12 @@ class AdminController extends Controller
         } elseif ($type == 'clik') {
             $title = __('textads') . ' ' . __('hits');
             $query->where('t_name', 'clik');
+        } elseif ($type == 'smart') {
+            $title = __('messages.smart_ads') . ' ' . __('messages.Views');
+            $query->where('t_name', 'smart');
+        } elseif ($type == 'smart_click') {
+            $title = __('messages.smart_ads') . ' ' . __('messages.clicks');
+            $query->where('t_name', 'smart_click');
         }
 
         if ($request->has('id')) {
@@ -570,6 +693,77 @@ class AdminController extends Controller
         $link->delete();
         
         return redirect()->back()->with('success', __('link_deleted'));
+    }
+
+    public function smartAds(Request $request)
+    {
+        $query = SmartAd::with('user')->orderBy('id', 'desc');
+
+        if ($request->has('user_id')) {
+            $query->where('uid', $request->user_id);
+        }
+
+        if ($request->filled('status')) {
+            $query->where('statu', $request->status);
+        }
+
+        $smartAds = $query->paginate(20);
+
+        return view('theme::admin.smart_ads', compact('smartAds'));
+    }
+
+    public function editSmartAd($id)
+    {
+        $smartAd = SmartAd::with('user')->findOrFail($id);
+
+        return view('theme::admin.smart_ad_edit', [
+            'smartAd' => $smartAd,
+            'deviceOptions' => [
+                'desktop' => __('messages.smart_device_desktop'),
+                'mobile' => __('messages.smart_device_mobile'),
+                'tablet' => __('messages.smart_device_tablet'),
+            ],
+            'targetCountries' => implode(', ', $smartAd->targetCountries()),
+            'selectedDevices' => $smartAd->targetDevices(),
+        ]);
+    }
+
+    public function updateSmartAd(Request $request, $id)
+    {
+        $smartAd = SmartAd::findOrFail($id);
+
+        $validated = $request->validate([
+            'landing_url' => 'required|url|max:2048',
+            'headline_override' => 'nullable|string|max:255',
+            'description_override' => 'nullable|string|max:600',
+            'image' => 'nullable|string|max:2048',
+            'countries' => 'nullable|string|max:1000',
+            'manual_keywords' => 'nullable|string|max:1000',
+            'devices' => 'nullable|array',
+            'devices.*' => 'in:desktop,mobile,tablet',
+            'statu' => 'required|in:0,1,2',
+        ]);
+
+        $smartAd->update([
+            'landing_url' => $validated['landing_url'],
+            'headline_override' => trim((string) ($validated['headline_override'] ?? '')) ?: null,
+            'description_override' => trim((string) ($validated['description_override'] ?? '')) ?: null,
+            'image' => trim((string) ($validated['image'] ?? '')) ?: null,
+            'countries' => SmartAdTargeting::encodeList(SmartAdTargeting::normalizeCountryCodes($validated['countries'] ?? '')),
+            'devices' => SmartAdTargeting::encodeList(SmartAdTargeting::normalizeDeviceTypes($validated['devices'] ?? [])),
+            'manual_keywords' => trim((string) ($validated['manual_keywords'] ?? '')) ?: null,
+            'statu' => (int) $validated['statu'],
+        ]);
+
+        return redirect()->route('admin.smart_ads')->with('success', __('messages.smart_ad_admin_updated'));
+    }
+
+    public function deleteSmartAd($id)
+    {
+        $smartAd = SmartAd::findOrFail($id);
+        $smartAd->delete();
+
+        return redirect()->route('admin.smart_ads')->with('success', __('messages.smart_ad_admin_deleted'));
     }
 
     public function visits()

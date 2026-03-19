@@ -109,6 +109,20 @@
                     >
                     <small class="text-muted">Prevents showing the same banner to the same visitor on the same publisher within this time window. Use 0 to disable.</small>
                 </div>
+                <div class="col-lg-6">
+                    <label class="form-label">{{ __('messages.smart_admin_points_divisor') }}</label>
+                    <input
+                        type="number"
+                        min="0.1"
+                        max="1000"
+                        step="0.1"
+                        name="smart_ads_points_divisor"
+                        class="form-control"
+                        value="{{ old('smart_ads_points_divisor', $smartAdsPointsDivisor) }}"
+                        placeholder="4"
+                    >
+                    <small class="text-muted">{{ __('messages.smart_admin_points_divisor_help') }}</small>
+                </div>
             </div>
 
             <div class="mb-4">

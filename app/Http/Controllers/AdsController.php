@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Banner;
 use App\Models\Link;
+use App\Models\SmartAd;
 use App\Models\State; // Assuming State model exists or using DB table
 use App\Models\User;
 use App\Support\BannerSizeCatalog;
@@ -21,8 +22,9 @@ class AdsController extends Controller
         $user = Auth::user();
         $banners = Banner::where('uid', $user->id)->orderBy('id', 'desc')->limit(5)->get();
         $links = Link::where('uid', $user->id)->orderBy('id', 'desc')->limit(5)->get();
+        $smartAds = SmartAd::where('uid', $user->id)->orderBy('id', 'desc')->limit(5)->get();
         
-        return view('theme::ads.index', compact('banners', 'links'));
+        return view('theme::ads.index', compact('banners', 'links', 'smartAds'));
     }
 
     // List Banners (b_list.php)
@@ -239,7 +241,9 @@ class AdsController extends Controller
             $ty = 'link';
         } elseif ($tyParam === 'vu') {
             $ty = 'banner';
-        } elseif (in_array($tyParam, ['banner', 'link'])) {
+        } elseif ($tyParam === 'smart_click') {
+            $ty = 'smart';
+        } elseif (in_array($tyParam, ['banner', 'link', 'smart'])) {
             $ty = $tyParam;
         } else {
             abort(404);
@@ -255,14 +259,23 @@ class AdsController extends Controller
                 abort(404);
             }
             $itemId = (int) $itemId;
-            $item = $ty === 'banner' ? Banner::find($itemId) : Link::find($itemId);
+            $item = match ($ty) {
+                'banner' => Banner::find($itemId),
+                'link' => Link::find($itemId),
+                'smart' => SmartAd::find($itemId),
+            };
             if (!$item || $item->uid != $user->id) {
                 abort(404);
             }
             $statesQuery->where('pid', $itemId)->where('t_name', $ty2);
             $subtitle = 'N°' . $itemId;
         } elseif ($request->query('st') === 'vu') {
-            $statesQuery->where('sid', $user->id)->where('t_name', $ty2);
+            if ($ty === 'smart') {
+                $ownedSmartAdIds = SmartAd::where('uid', $user->id)->pluck('id');
+                $statesQuery->whereIn('pid', $ownedSmartAdIds)->where('t_name', $ty2);
+            } else {
+                $statesQuery->where('sid', $user->id)->where('t_name', $ty2);
+            }
         } else {
             abort(404);
         }
@@ -270,8 +283,10 @@ class AdsController extends Controller
         $title = match ($ty2) {
             'banner' => __('messages.bannads'),
             'link' => __('messages.textads'),
+            'smart' => __('messages.smart_ads'),
             'vu' => __('messages.bannads') . '<br />' . __('messages.hits'),
             'clik' => __('messages.textads') . '<br />' . __('messages.hits'),
+            'smart_click' => __('messages.smart_ads') . '<br />' . __('messages.hits'),
             default => __('messages.statistics'),
         };
 
@@ -279,6 +294,8 @@ class AdsController extends Controller
         if (!$backUrl) {
             if ($request->query('st') === 'vu') {
                 $backUrl = route('dashboard');
+            } elseif ($ty === 'smart') {
+                $backUrl = route('ads.smart.index');
             } elseif ($ty === 'link') {
                 $backUrl = route('ads.links.index');
             } else {

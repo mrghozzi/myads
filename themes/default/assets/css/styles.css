@@ -5240,6 +5240,58 @@ figure > img {
   margin-right: 2px;
 }
 
+.home-dashboard-stats .home-stat-card--smart {
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 18px 34px rgba(30, 64, 175, 0.26);
+}
+
+.home-dashboard-stats .home-stat-card--smart .stats-box-text {
+  color: rgba(255, 255, 255, 0.84);
+}
+
+.home-smart-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.home-smart-actions .home-smart-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 170px;
+  height: 54px;
+  padding: 0 24px;
+  border: 1px solid transparent;
+  border-radius: 16px;
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.2;
+  white-space: nowrap;
+  transition: background-color .2s ease-in-out, color .2s ease-in-out, border-color .2s ease-in-out, box-shadow .2s ease-in-out, transform .2s ease-in-out;
+}
+
+.home-smart-actions .home-smart-action:hover {
+  color: #fff;
+  transform: translateY(-1px);
+}
+
+@media screen and (max-width: 760px) {
+  .home-smart-actions .home-smart-action {
+    flex: 1 1 calc(50% - 6px);
+    min-width: 0;
+  }
+}
+
+@media screen and (max-width: 520px) {
+  .home-smart-actions .home-smart-action {
+    width: 100%;
+    flex-basis: 100%;
+  }
+}
+
 /*---------------------------------
     79. REACTION STATS
 ---------------------------------*/
