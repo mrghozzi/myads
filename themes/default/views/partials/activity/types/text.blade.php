@@ -179,8 +179,10 @@
     <div class="post-options">
         @auth
             <!-- REACTION OPTION -->
-            <div class="post-option-wrap" style="position: relative;">
-                <div class="post-option reaction-options-dropdown-trigger">
+            <div class="post-option-wrap" style="position: relative;" data-activity-menu-wrap>
+                <div class="post-option"
+                     data-activity-menu-trigger
+                     data-activity-menu-type="reaction">
                     <div id="reaction-btn-{{ $activity->related_content->id }}">
                     @php
                         $myReaction = \App\Models\Like::where('uid', auth()->id())
@@ -205,7 +207,9 @@
                 </div>
 
                 <!-- REACTION OPTIONS DROPDOWN -->
-                <div class="reaction-options reaction-options-dropdown" style="position: absolute; z-index: 9999; bottom: 54px; left: -16px; opacity: 0; visibility: hidden; transform: translate(0px, 20px); transition: transform 0.3s ease-in-out 0s, opacity 0.3s ease-in-out 0s, visibility 0.3s ease-in-out 0s;">
+                <div class="reaction-options reaction-options-dropdown"
+                     data-activity-menu-panel
+                     style="position: absolute; z-index: 9999; bottom: 54px; left: -16px; opacity: 0; visibility: hidden; transform: translate(0px, 20px); transition: transform 0.3s ease-in-out 0s, opacity 0.3s ease-in-out 0s, visibility 0.3s ease-in-out 0s;">
                     @foreach(['like', 'love', 'dislike', 'happy', 'funny', 'wow', 'angry', 'sad'] as $reaction)
                         <div class="reaction-option text-tooltip-tft" data-title="{{ $reaction }}" onclick="toggleReaction({{ $activity->related_content->id }}, 'forum', '{{ $reaction }}')">
                             <img class="reaction-option-image" src="{{ theme_asset('img/reaction/'.$reaction.'.png') }}" alt="reaction-{{ $reaction }}">
@@ -218,7 +222,10 @@
         @endauth
         @auth
             <!-- POST OPTION -->
-            <div class="post-option sh_comment_p{{ $activity->id }}">
+            <div class="post-option"
+                 data-activity-comment
+                 data-comment-id="{{ $activity->related_content->id }}"
+                 data-comment-type="forum">
                 <!-- POST OPTION ICON -->
                 <svg class="post-option-icon icon-comment">
                     <use xlink:href="#svg-comment"></use>
@@ -232,9 +239,11 @@
         @endauth
 
         <!-- POST OPTION -->
-        <div class="post-option-wrap" style="position: relative;">
+        <div class="post-option-wrap" style="position: relative;" data-activity-menu-wrap>
             <!-- POST OPTION -->
-            <div class="post-option reaction-options-dropdown-trigger">
+            <div class="post-option"
+                 data-activity-menu-trigger
+                 data-activity-menu-type="share">
                 <!-- POST OPTION ICON -->
                 <svg class="post-option-icon icon-share">
                     <use xlink:href="#svg-share"></use>
@@ -247,7 +256,9 @@
             <!-- /POST OPTION -->
 
             <!-- REACTION OPTIONS -->
-            <div class="reaction-options reaction-options-dropdown" style="position: absolute; z-index: 9999; bottom: 54px; left: -16px; opacity: 0; visibility: hidden; transform: translate(0px, 20px); transition: transform 0.3s ease-in-out 0s, opacity 0.3s ease-in-out 0s, visibility 0.3s ease-in-out 0s;">
+            <div class="reaction-options reaction-options-dropdown"
+                 data-activity-menu-panel
+                 style="position: absolute; z-index: 9999; bottom: 54px; left: -16px; opacity: 0; visibility: hidden; transform: translate(0px, 20px); transition: transform 0.3s ease-in-out 0s, opacity 0.3s ease-in-out 0s, visibility 0.3s ease-in-out 0s;">
                  <!-- SHARE OPTIONS -->
                  @foreach(['facebook', 'twitter', 'linkedin', 'telegram'] as $social)
                     <div class="reaction-option text-tooltip-tft" data-title="{{ $social }}" style="position: relative;">
@@ -263,12 +274,4 @@
     </div>
     <!-- /POST OPTIONS -->
     <div class="post-comment-list post-comment-list-{{ $activity->related_content->id }}"></div>
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            document.querySelector('.sh_comment_p{{ $activity->id }}').addEventListener('click', function() {
-                loadComments({{ $activity->related_content->id }}, 'forum');
-                this.classList.add('active');
-            });
-        });
-    </script>
 </div>

@@ -88,40 +88,18 @@
                <td>{{ $tims_vu }}</td>
                <td>{{ $fgft }}</td>
                <td>
-                   <a href="{{ route('visits.edit', $site->id) }}" class='btn btn-success' ><i class="fa fa-edit "></i></a>
-                   <a href="#" data-toggle="modal" data-target="#ban{{ $site->id }}" class='btn btn-danger' ><i class="fa fa-ban "></i></a>
+                   <div style="display: flex; align-items: center; gap: 8px;">
+                       <a href="{{ route('visits.edit', $site->id) }}" class='btn btn-success'><i class="fa fa-edit "></i></a>
+                       <form action="{{ route('visits.destroy', $site->id) }}" method="POST" onsubmit="return confirm('{{ __('messages.confirm_delete_visit') }}');" style="margin: 0;">
+                           @csrf
+                           @method('DELETE')
+                           <button type="submit" class="btn btn-danger" aria-label="{{ __('messages.delete_visit') }}" style="display: inline-flex; align-items: center; justify-content: center;">
+                               <i class="fa fa-ban "></i>
+                           </button>
+                       </form>
+                   </div>
                </td>
              </tr>
-             
-             <!-- Modal -->
-             <div class="modal fade" id="ban{{ $site->id }}" aria-hidden="true" data-backdrop="" tabindex="-1" role="dialog">
-                <div class="modal-dialog modal-dialog-centered" role="document">
-                    <div class="modal-content content-grid">
-                        <div class="popup-close-button popup-event-creation-trigger" data-dismiss="modal" aria-label="Close">
-                        <!-- POPUP CLOSE BUTTON ICON -->
-                        <svg class="popup-close-button-icon icon-cross">
-                        <use xlink:href="#svg-cross"></use>
-                        </svg>
-                        <!-- /POPUP CLOSE BUTTON ICON -->
-                        </div>
-                        <p class="popup-box-title"><h2><i class="fa fa-trash "></i>&nbsp;{{ __('messages.delete') }}&nbsp;!</h2></p>
-                        <hr />
-                        <p class="popup-event-text"><b>{{ __('messages.aysywtd') }}&nbsp;<kbd>{{ $site->name }}</kbd>&nbsp;? </b></p>
-                        &nbsp;
-                        <center>
-                            <form action="{{ route('visits.destroy', $site->id) }}" method="POST" style="display:inline;">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="popup-event-button button tertiary popup-event-information-trigger">{{ __('messages.delete') }}</button>
-                            </form>
-                        </center>
-                        &nbsp;
-                        <p class="popup-event-button button  popup-event-information-trigger" class="btn btn-default" data-dismiss="modal">
-                        <span aria-hidden="true">&times;</span>&nbsp;{{ __('messages.close') }}
-                        </p>
-                    </div>
-                </div>
-            </div>
              @endforeach
             </tbody>
         </table>

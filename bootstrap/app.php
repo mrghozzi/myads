@@ -4,6 +4,42 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 
+$envPath = dirname(__DIR__) . '/.env';
+$envExamplePath = dirname(__DIR__) . '/.env.example';
+$installedPath = dirname(__DIR__) . '/storage/installed';
+$envWasCopied = false;
+
+if (! file_exists($envPath) && file_exists($envExamplePath)) {
+    copy($envExamplePath, $envPath);
+    $envWasCopied = true;
+}
+
+if (file_exists($envPath)) {
+    $env = file_get_contents($envPath);
+    $exampleEnv = file_exists($envExamplePath) ? file_get_contents($envExamplePath) : '';
+
+    preg_match('/^APP_KEY=(.*)$/m', $env, $currentKeyMatch);
+    preg_match('/^APP_KEY=(.*)$/m', $exampleEnv, $exampleKeyMatch);
+
+    $currentKey = isset($currentKeyMatch[1]) ? trim($currentKeyMatch[1]) : '';
+    $exampleKey = isset($exampleKeyMatch[1]) ? trim($exampleKeyMatch[1]) : '';
+    $needsFreshKey = $envWasCopied
+        || $currentKey === ''
+        || (! file_exists($installedPath) && $exampleKey !== '' && $currentKey === $exampleKey);
+
+    if ($needsFreshKey) {
+        $key = 'base64:' . base64_encode(random_bytes(32));
+
+        if (preg_match('/^APP_KEY=.*$/m', $env)) {
+            $env = preg_replace('/^APP_KEY=.*$/m', "APP_KEY={$key}", $env);
+        } else {
+            $env = rtrim($env) . PHP_EOL . "APP_KEY={$key}" . PHP_EOL;
+        }
+
+        file_put_contents($envPath, $env);
+    }
+}
+
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
@@ -24,6 +60,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // Exclude installer routes from CSRF verification
         // (session may not persist during fresh install on some hosting)
         $middleware->validateCsrfTokens(except: [
+            'install',
             'install/*',
         ]);
     })

@@ -1,5 +1,11 @@
 <aside class="floaty-bar">
     @auth
+        @php
+            $floatyNotificationUnreadCount = \App\Models\Notification::where('uid', auth()->id())
+                ->whereIn('state', [0, 3])
+                ->count();
+            $formatNotificationCount = static fn (int $count): string => $count > 99 ? '99+' : (string) $count;
+        @endphp
         <div class="bar-actions">
             <div class="progress-stat">
                 <div class="bar-progress-wrap">
@@ -20,13 +26,11 @@
                     </svg>
                     {{-- Badge count here --}}
                 </a>
-                <a class="action-list-item listnotif" href="{{ url('/notification') }}">
+                <a class="action-list-item listnotif notification-trigger {{ $floatyNotificationUnreadCount > 0 ? 'unread' : '' }}" data-notification-trigger href="{{ url('/notification') }}">
                     <svg class="action-list-item-icon icon-notification">
                         <use xlink:href="#svg-notification"></use>
                     </svg>
-                    <div id="count">
-                        {{-- Notif count here --}}
-                    </div>
+                    <span class="notification-action-count" data-notification-badge @if($floatyNotificationUnreadCount === 0) hidden @endif>{{ $floatyNotificationUnreadCount > 0 ? $formatNotificationCount($floatyNotificationUnreadCount) : '' }}</span>
                 </a>
             </div>
             <a class="action-item-wrap" href="{{ url('/e' . auth()->id()) }}">

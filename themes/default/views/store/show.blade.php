@@ -42,6 +42,9 @@
         <p class="section-header-subsection">{{ $product->name }}</p>
     </div>
 </div>
+
+@include('theme::partials.ads', ['id' => 5])
+
 <div class="grid grid post{{ $status ? $status->id : $product->id }}">
     <div class="widget-box no-padding">
         <div class="widget-box-status">

@@ -78,6 +78,11 @@
                                 $previewUrl = $target?->url;
                                 $targetTitle = $target?->name;
                                 $targetUser = $target?->user;
+                            } elseif ($report->s_type == 204) {
+                                $target = \App\Models\SmartAd::find($report->tp_id);
+                                $previewUrl = $target ? route('admin.smart_ads.edit', $target->id) : null;
+                                $targetTitle = $target?->displayTitle();
+                                $targetUser = $target?->user;
                             }
                         @endphp
                         <tr class="{{ $report->statu == 1 ? 'table-warning' : '' }}">

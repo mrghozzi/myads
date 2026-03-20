@@ -30,6 +30,7 @@
 {{-- Determine active tab from ?p= parameter --}}
 @php
     $activeTab = request('p', 'banners');
+    $bannerSizes = \App\Support\BannerSizeCatalog::ordered();
 @endphp
 
 {{-- DIRECT TAB VIEW (when ?p= is specified) --}}
@@ -61,10 +62,9 @@
                     <div class="form-select">
                       <label>{{ __('messages.banner_size') }}</label>
                       <select name="px" required>
-                        <option value="468" {{ old('px') == '468' ? 'selected' : '' }}>468x60 (-1 pts)</option>
-                        <option value="728" {{ old('px') == '728' ? 'selected' : '' }}>728x90 (-1 pts)</option>
-                        <option value="300" {{ old('px') == '300' ? 'selected' : '' }}>300x250 (-1 pts)</option>
-                        <option value="160" {{ old('px') == '160' ? 'selected' : '' }}>160x600 (-1 pts)</option>
+                        @foreach($bannerSizes as $size)
+                          <option value="{{ $size['value'] }}" {{ old('px') == $size['value'] ? 'selected' : '' }}>{{ $size['label'] }} (-1 pts)</option>
+                        @endforeach
                       </select>
                     </div>
                   </div>
@@ -218,10 +218,9 @@
                             <div class="form-select">
                                 <label>{{ __('messages.banner_size') }}</label>
                                 <select name="px" required>
-                                    <option value="468">468x60 (-1 pts)</option>
-                                    <option value="728">728x90 (-1 pts)</option>
-                                    <option value="300">300x250 (-1 pts)</option>
-                                    <option value="160">160x600 (-1 pts)</option>
+                                    @foreach($bannerSizes as $size)
+                                        <option value="{{ $size['value'] }}" {{ old('px') == $size['value'] ? 'selected' : '' }}>{{ $size['label'] }} (-1 pts)</option>
+                                    @endforeach
                                 </select>
                             </div>
                         </div>

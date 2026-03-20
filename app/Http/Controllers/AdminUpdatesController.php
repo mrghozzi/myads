@@ -14,7 +14,7 @@ class AdminUpdatesController extends Controller
     /**
      * Current system version (hardcoded).
      */
-    public const CURRENT_VERSION = '4.0.1';
+    public const CURRENT_VERSION = '4.1.0';
 
     /**
      * GitHub repo for releases.
@@ -147,7 +147,8 @@ class AdminUpdatesController extends Controller
                 $response = Http::withoutVerifying()->withHeaders([
                     'User-Agent' => 'MyAds-Updater/1.0',
                 ])->timeout(300)->withOptions([
-                    'sink' => $tempZipPath,
+                    'sink'            => $tempZipPath,
+                    'allow_redirects' => ['max' => 10],
                 ])->get($downloadUrl);
 
                 if (!$response->successful()) {

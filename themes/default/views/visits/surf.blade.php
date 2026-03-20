@@ -1,5 +1,9 @@
+@php
+    $pageLocale = str_replace('_', '-', app()->getLocale());
+    $pageDirection = locale_direction();
+@endphp
 <!DOCTYPE html>
-<html lang="en">
+<html lang="{{ $pageLocale }}" dir="{{ $pageDirection }}" data-dir="{{ $pageDirection }}" class="{{ $pageDirection }}">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -56,9 +60,21 @@
       height: 100%;
       border: none;
     }
+    [dir="rtl"] body,
+    [dir="rtl"] .traffic-container,
+    [dir="rtl"] .content {
+      direction: rtl;
+    }
+    [dir="rtl"] .header,
+    [dir="rtl"] .site-info {
+      flex-direction: row-reverse;
+    }
+    [dir="rtl"] .header {
+      text-align: right;
+    }
   </style>
 </head>
-<body>
+<body data-dir="{{ $pageDirection }}" class="{{ $pageDirection }}">
   <div class="traffic-container">
     <div class="header">
       <div class="site-info">

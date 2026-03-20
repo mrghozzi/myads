@@ -1,3 +1,132 @@
+# v4.1.0
+> **Feature Release** - Notification center refresh, forum topic flow fixes, and test coverage improvements.
+
+### Installer & Fresh Install
+* **Fix**: Fresh installs from Git now auto-create `.env` before the first full bootstrap so installer requests no longer start with missing environment configuration.
+* **Fix**: Installer bootstrap now generates a unique `APP_KEY` during fresh setup instead of relying on the shared example key.
+* **Fix**: CSRF exclusions now explicitly cover both `install` and `install/*` routes to prevent `419 Page Expired` during setup.
+* **Fix**: Default session and cache fallbacks now use `file` instead of `database`, so `/install` no longer depends on Laravel system tables before migrations run.
+* **Fix**: Legacy upgrades from v3.2.x now repair missing forum schema pieces such as `f_cat.ordercat`, forum moderation tables, and related compatibility columns so `/forum` and new admin forum pages no longer fail with `500` after upgrade.
+
+### Notifications & Header UX
+* **Improvement**: Redesigned `/notification` into a clearer notification center with a summary card, stronger unread highlighting, and a cleaner notification feed.
+* **Add**: Added a red unread count badge above the notification button in the desktop header.
+* **Add**: Added a red unread count badge above the notification button in the mobile `floaty bar`.
+* **Improvement**: `Mark all as read` now updates visible unread indicators and counters immediately across the header, mobile bar, and notification page.
+* **Improvement**: Reworked notification item rendering into reusable partials so initial page load and AJAX-loaded items share the same markup.
+
+### Notification Loading & AJAX
+* **Improvement**: Replaced classic pagination on `/notification` with infinite scroll loading while scrolling down.
+* **Add**: `GET /notification` now returns JSON for AJAX requests with `html` and `next_page_url`.
+* **Improvement**: `POST /notification/mark-all-read` now returns a clearer AJAX response with `success` and `unread_count`.
+* **Fix**: Preserved existing read behavior so notifications are marked as read only when opened or when `mark all as read` is used.
+
+### Forum Topic Flow Fixes
+* **Fix**: Topic creation now redirects directly to the newly created topic page.
+* **Fix**: Topic update now redirects back to the topic page even when category input is missing, using a safe fallback path.
+* **Fix**: Attachments uploaded during topic updates now remain visible on the topic page.
+* **Fix**: Topic pages now use the standard comment container selector consistently.
+* **Fix**: Forum comment store flow continues to return HTML correctly for AJAX usage without forcing a full page reload.
+* **Fix**: Knowledgebase routes now accept legacy store names that contain hyphens, so links مثل `/kb/Web-Designing` no longer return `404`.
+* **Fix**: Legacy listing pages `/b_list`, `/l_list`, and `/v_list` now submit real delete forms directly instead of relying on outdated modal triggers, so ad and visit deletion works again.
+
+### Forum Sidebar Refresh
+* **Improvement**: Redesigned the forum category sidebar on `/f{id}` so it now follows the stronger card language used in the website directory sidebar while staying consistent with the forum theme.
+* **Improvement**: Forum category cards now show the category icon, title, short description, and a topic count pill, with a clearer active state for the currently opened section.
+* **Improvement**: Sidebar category data is now prepared in the controller instead of querying categories directly inside the Blade view.
+* **Improvement**: Topic counts in the forum sidebar are now precomputed from active topics only, avoiding repeated queries inside the sidebar loop.
+
+### Authentication UI
+* **Improvement**: Refined the default theme Blade templates for the login and registration pages.
+* **Add**: Social login buttons for Facebook and Google now appear directly inside the login form when providers are configured.
+* **Add**: Social login buttons were also added to the registration page for a smoother sign-up flow.
+* **Fix**: Social auth actions are now shown conditionally based on available environment configuration instead of rendering empty placeholders.
+* **Improvement**: Social login buttons now adapt their width automatically when only one provider is enabled.
+
+### Profile & Follow System
+* **Fix**: Resolved the profile follow action error on `/profile/{id}/follow` by storing the required `time_t` value in the `like` table instead of attempting to write to a non-existent legacy `date` field.
+
+### Community Feed & AJAX Interaction Fixes
+* **Fix**: Community posts loaded later via infinite scroll now keep their `comment`, `react`, and `share` actions working correctly on `/portal` and profile activity tabs.
+* **Improvement**: Activity comment buttons now use a shared delegated frontend handler instead of per-post inline script blocks, so dynamically injected posts behave like the initial page render.
+* **Improvement**: Activity post `react` and `share` menus now use dedicated activity-menu toggles instead of relying on the global dropdown initializer that only handled the first render reliably.
+* **Fix**: Reaction user lists in community posts now open correctly on hover again, with matching positioning fixes for both LTR and RTL layouts.
+* **Improvement**: Infinite scroll rendering now supports registered post-render callbacks instead of a single overwrite-prone hook, keeping directory and activity feed hydration compatible.
+
+### Smart Feed & Ranking
+* **Add**: Introduced a new `Smart Feed` algorithm for `/portal?filter=all` that ranks posts based on weighted signals: recency, views, reactions, and comments.
+* **Improvement**: Post ranking now gives a massive boost to fresh content (especially posts from the last 1-6 hours) using a high-base power decay formula.
+* **Add**: Added `Social Proof` boosts (+10 points) when a user's followed contacts have commented on a post.
+* **Add**: Added `Following` boosts (+20 points) for posts authored by users the viewer follows.
+* **Improvement**: Smart feed results are cached for 5 minutes, significantly improving page load performance while maintaining a dynamic discovery experience.
+
+### Directory UI Polish
+* **Improvement**: Refined the `default` theme directory banners on `/directory`, `/cat/{id}`, and `/directory/{id}` with a more balanced layout, cleaner content width, and a stronger background treatment based on the existing site theme.
+* **Improvement**: Repositioned the `Visit Site` button inside directory listing cards so it now appears under the title and description instead of competing with the card header.
+* **Improvement**: Redesigned `directory-listing-stats-detail` on the directory detail page into clearer responsive stat tiles for visits, reactions, and comments.
+* **Improvement**: Simplified the directory detail hero so the new stat ribbon becomes the primary visual metrics block without changing directory functionality.
+
+### Site Ads Placement Fixes
+* **Fix**: The `Home Page` ad slot from `/admin/site-ads` now renders on the public landing page `/` instead of remaining defined in admin only.
+* **Fix**: The `Topic` ad slot now appears across supported standalone content detail pages, including forum topics, store product pages, and directory detail pages.
+* **Fix**: The `Footer` ad slot now renders once at the bottom of all public non-admin pages that use the main site layout.
+* **Improvement**: The landing page now overrides footer ad placement so the `Footer` slot appears above the landing footer without duplicating the ad block.
+* **Improvement**: Site ad rendering now uses the shared ad partial consistently for the new placements, preserving the existing hide-when-empty behavior.
+
+### Banner Ads & Serving
+* **Fix**: Banner size values are now normalized to canonical `WxH` formats across storage, edit forms, and ad serving, so legacy values like `468`, `728`, `300`, and `160` continue to work without hiding eligible ads.
+* **Fix**: User and admin banner edit pages now expose the same canonical size options, and banner moderation notifications now redirect to the current `/ads/banners/{id}/edit` flow.
+* **Add**: `bn.php` now records banner impressions and avoids serving the same banner repeatedly to the same visitor on the same publisher during the configured repeat window.
+* **Improvement**: When all matching banners are blocked by the repeat window, banner serving now falls back to the default placement instead of reusing the same advertiser immediately.
+* **Add**: Admin settings now include a configurable banner repeat-window duration for repeat-avoidance behavior.
+
+### Smart Ads
+* **Add**: Introduced a full `Smart Ads` campaign system with dedicated `nsmart` credits, user management pages under `/ads/smart`, a smart embed code page, and a new `smart.php` serving endpoint.
+* **Add**: Smart campaigns now analyze the advertiser landing page to extract headline, description, image, and topic keywords automatically, while also supporting manual country and device targeting.
+* **Add**: Smart ad delivery now supports contextual matching using page metadata and viewport/device signals from the embed code, plus admin-wide management and configurable point-to-credit conversion.
+* **Fix**: Smart ad reporting, `/state` compatibility, and click/impression drill-downs now work through the current smart campaign flow, including `report?smart_ad={id}` support.
+* **Improvement**: Smart Ads translations now follow the active locale across user pages, admin pages, embed output, and all shipped languages instead of falling back to English.
+
+### Ads Code UX & Responsive 2
+* **Improvement**: `/b_code` now defaults to a shorter legacy-style quick snippet while keeping `Advanced Code` for token-aware and responsive delivery.
+* **Add**: Banner `Responsive 2` was added to `/b_code` as an advanced smart placement that detects the slot size and serves the closest legal banner format automatically.
+* **Improvement**: Banner `Responsive 2` now renders with a lighter native-style chrome and a compact `Ads by {site}` label instead of the earlier heavier overlay treatment.
+* **Add**: `/l_code` now includes `Responsive 2` with both direct quick code and smarter width-aware code, plus adaptive compact, stacked, and wide layouts on `link.php`.
+* **Improvement**: `Responsive 2` tabs in both `/b_code` and `/l_code` now carry a visible `beta` badge to signal the new experimental format.
+
+### Home Dashboard Smart Ads Polish
+* **Add**: `/home` now includes a dedicated Smart Ads stats card, summary panel, smart credit balance, and direct shortcuts for list, create, code, and stats actions.
+* **Add**: Point conversion on `/home` now supports converting points into `Smart Ads` credits directly from the existing dashboard form.
+* **Fix**: The Smart Ads stat card now keeps its background correctly in `RTL` mode by using the same mirrored background variable flow as the other dashboard cards.
+* **Improvement**: Smart Ads action buttons on `/home` now match the existing dashboard button palette and sizing, so they stay visually consistent in both `LTR` and `RTL`.
+
+### Locale Direction & RTL/LTR
+* **Add**: Added centralized `locale_direction()` and `is_locale_rtl()` helpers so visual direction now follows the active Laravel locale consistently.
+* **Improvement**: Top-level HTML `lang`, `dir`, `data-dir`, and direction classes now render from the active locale across the public theme, auth layout, admin layout, installer pages, visits pages, and the Laravel welcome page.
+* **Add**: Persian (`fa`) now renders as a full RTL language alongside Arabic.
+* **Fix**: Existing `?lang` switching behavior remains intact while still updating rendered page direction, session locale, and language cookie correctly.
+
+### RTL Interface Polish
+* **Add**: Added dedicated RTL override stylesheets for the default light theme, default dark theme, and the Duralux admin theme.
+* **Fix**: Shared dropdown positioning now mirrors `left/right` offsets correctly in RTL, preventing message and notification dropdowns from being clipped off-screen.
+* **Fix**: Frontend RTL spacing now better aligns section banners, form controls, dropdowns, compact sidebar items, and general left/right utility behavior.
+* **Fix**: `/home` top dashboard stat cards now mirror only their background artwork in RTL without flipping text, numbers, or icons.
+* **Fix**: `/forum` forum category icons and titles now have improved spacing and padding in both RTL and LTR for the redesigned forum tables.
+* **Fix**: Sidebar `content-grid` translation logic now respects RTL so desktop navigation and chat offsets stay visually balanced.
+
+### Admin RTL Polish
+* **Add**: Added Duralux admin RTL shell overrides for header, breadcrumbs, dropdowns, and navigation alignment.
+* **Fix**: Admin header and page container now anchor from the right in RTL, including correct `minimenu` collapsed widths.
+* **Fix**: Admin sidebar collapse and expand behavior now matches LTR more closely in RTL, including toggler visibility and container expansion.
+
+### Testing & Stability
+* **Add**: Added notification center feature tests covering page rendering, AJAX pagination, and `mark all as read` behavior.
+* **Add**: Added a dedicated feature test to verify profile follow requests create a valid timestamped follow record without database insert errors.
+* **Add**: Added a dedicated feature test covering the redesigned forum category sidebar, including category ordering, active state, and topic count rendering.
+* **Add**: Added a dedicated feature test covering `Home Page`, `Topic`, and `Footer` site ad slot rendering across public pages, dashboard pages, and admin pages.
+* **Add**: Added locale direction feature tests covering English, Arabic, Persian, admin pages, installer pages, visits pages, and `?lang` session/cookie persistence.
+* **Improvement**: Feature test coverage now includes forum topic flow fixes, forum sidebar rendering, and notification center behavior.
+
 # v4.0.1
 > **Patch Release** — Installer resilience & shared hosting compatibility fixes.
 

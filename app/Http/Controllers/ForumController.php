@@ -29,6 +29,7 @@ class ForumController extends Controller
         $category = ForumCategory::findOrFail($id);
         $settings = ForumSettings::all();
         $time = time();
+        $sidebarCategories = $this->buildCategorySidebar((int) $category->id);
 
         $statuses = Status::whereIn('s_type', [2, 4])
             ->where('date', '<=', $time)
@@ -61,7 +62,7 @@ class ForumController extends Controller
             ]);
         }
 
-        return view('theme::forum.category', compact('category', 'statuses', 'topics'));
+        return view('theme::forum.category', compact('category', 'statuses', 'topics', 'sidebarCategories'));
     }
 
     public function topic($id)
@@ -423,6 +424,29 @@ class ForumController extends Controller
         }
 
         return response()->download($filePath, $downloadName);
+    }
+
+    private function buildCategorySidebar(int $currentCategoryId)
+    {
+        $topicCounts = ForumTopic::query()
+            ->select('cat', DB::raw('COUNT(*) as topic_count'))
+            ->where('statu', 1)
+            ->groupBy('cat')
+            ->pluck('topic_count', 'cat');
+
+        return ForumCategory::query()
+            ->orderBy('ordercat', 'desc')
+            ->get()
+            ->map(function (ForumCategory $boardCategory) use ($topicCounts, $currentCategoryId) {
+                $description = trim((string) preg_replace('/\s+/', ' ', strip_tags((string) $boardCategory->txt)));
+
+                return [
+                    'category' => $boardCategory,
+                    'topic_count' => (int) ($topicCounts[$boardCategory->id] ?? 0),
+                    'description' => Str::limit($description, 80),
+                    'is_active' => (int) $boardCategory->id === $currentCategoryId,
+                ];
+            });
     }
 
     private function attachmentValidationRules(array $settings): array

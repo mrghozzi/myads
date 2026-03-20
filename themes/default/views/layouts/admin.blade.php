@@ -1,5 +1,9 @@
+@php
+    $pageLocale = str_replace('_', '-', app()->getLocale());
+    $pageDirection = locale_direction();
+@endphp
 <!DOCTYPE html>
-<html lang="zxx">
+<html lang="{{ $pageLocale }}" dir="{{ $pageDirection }}" data-dir="{{ $pageDirection }}" class="{{ $pageDirection }}">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="x-ua-compatible" content="IE=edge">
@@ -36,6 +40,9 @@
     <link rel="stylesheet" type="text/css" href="{{ theme_asset('admin-duralux/css/bootstrap.min.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ theme_asset('admin-duralux/vendors/css/vendors.min.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ theme_asset('admin-duralux/css/theme.min.css') }}">
+    @if(is_locale_rtl())
+        <link rel="stylesheet" type="text/css" href="{{ theme_asset('admin-duralux/css/rtl.css') }}">
+    @endif
     
     <!-- FontAwesome for compatibility -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -51,7 +58,7 @@
         }
     </script>
 </head>
-<body>
+<body data-dir="{{ $pageDirection }}" class="{{ $pageDirection }}">
     <nav class="nxl-navigation">
         <div class="navbar-wrapper">
             <div class="m-header">
@@ -101,8 +108,10 @@
                             <span class="nxl-mtext">{{ __('messages.ads') }}</span><span class="nxl-arrow"><i class="feather-chevron-right"></i></span>
                         </a>
                         <ul class="nxl-submenu">
+                            <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.ads') }}">{{ __('messages.ads') }}</a></li>
                             <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.banners') }}">{{ __('messages.bannads') }}</a></li>
                             <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.links') }}">{{ __('messages.textads') }}</a></li>
+                            <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.smart_ads') }}">{{ __('messages.smart_ads') }}</a></li>
                             <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.visits') }}">{{ __('messages.exvisit') }}</a></li>
                         </ul>
                     </li>

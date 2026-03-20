@@ -25,6 +25,7 @@
             <div class="card-body">
                 <form action="{{ route('admin.banners.update', $banner->id) }}" method="POST">
                     @csrf
+                    @php($bannerSizes = \App\Support\BannerSizeCatalog::ordered())
                     
                     <div class="row mb-4">
                         <div class="col-md-6">
@@ -41,10 +42,9 @@
                         <div class="col-md-6">
                             <label class="form-label">{{ __('Banner size') }}</label>
                             <select class="form-control" name="px" required>
-                                <option value="468" {{ $banner->px == 468 ? 'selected' : '' }}>468x60 (-1 pts)</option>
-                                <option value="728" {{ $banner->px == 728 ? 'selected' : '' }}>728x90 (-1 pts)</option>
-                                <option value="300" {{ $banner->px == 300 ? 'selected' : '' }}>300x250 (-1 pts)</option>
-                                <option value="160" {{ $banner->px == 160 ? 'selected' : '' }}>160x600 (-1 pts)</option>
+                                @foreach($bannerSizes as $size)
+                                    <option value="{{ $size['value'] }}" {{ $banner->px == $size['value'] ? 'selected' : '' }}>{{ $size['label'] }} (-1 pts)</option>
+                                @endforeach
                             </select>
                         </div>
                         <div class="col-md-6">

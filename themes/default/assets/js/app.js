@@ -134,6 +134,38 @@ const app = {
   existsInDOM: function (selector) {
     return document.querySelectorAll(selector).length;
   },
+  isRTL: function () {
+    return document.documentElement.getAttribute('dir') === 'rtl';
+  },
+  normalizeDirectionalOffset: function (offset) {
+    if (!offset || !this.isRTL()) {
+      return offset;
+    }
+
+    const normalizedOffset = Object.assign({}, offset),
+          hasLeft = Object.prototype.hasOwnProperty.call(normalizedOffset, 'left'),
+          hasRight = Object.prototype.hasOwnProperty.call(normalizedOffset, 'right'),
+          previousLeft = normalizedOffset.left,
+          previousRight = normalizedOffset.right;
+
+    if (!hasLeft && !hasRight) {
+      return normalizedOffset;
+    }
+
+    if (hasRight) {
+      normalizedOffset.left = previousRight;
+    } else {
+      delete normalizedOffset.left;
+    }
+
+    if (hasLeft) {
+      normalizedOffset.right = previousLeft;
+    } else {
+      delete normalizedOffset.right;
+    }
+
+    return normalizedOffset;
+  },
   plugins: {
     createTab: function (options) {
       if (app.existsInDOM(options.triggers) && app.existsInDOM(options.elements)) {
@@ -152,7 +184,37 @@ const app = {
     },
     createDropdown: function (options) {
       if (((app.existsInDOM(options.container) || typeof options.containerElement !== 'undefined') && options.controlToggle) || ((app.existsInDOM(options.trigger) || typeof options.triggerElement !== 'undefined') && (app.existsInDOM(options.container) || typeof options.containerElement !== 'undefined'))) {
-        return new XM_Dropdown(options);
+        const normalizedOptions = Object.assign({}, options);
+        let containers = [];
+
+        if (options.offset) {
+          normalizedOptions.offset = app.normalizeDirectionalOffset(options.offset);
+        }
+
+        if (typeof options.containerElement !== 'undefined') {
+          containers = [options.containerElement];
+        } else {
+          containers = Array.from(document.querySelectorAll(options.container));
+        }
+
+        if (normalizedOptions.offset) {
+          const hasLeft = Object.prototype.hasOwnProperty.call(normalizedOptions.offset, 'left'),
+                hasRight = Object.prototype.hasOwnProperty.call(normalizedOptions.offset, 'right');
+
+          if (hasLeft && !hasRight) {
+            containers.forEach(function (container) {
+              container.style.right = 'auto';
+            });
+          }
+
+          if (hasRight && !hasLeft) {
+            containers.forEach(function (container) {
+              container.style.left = 'auto';
+            });
+          }
+        }
+
+        return new XM_Dropdown(normalizedOptions);
       }
     },
     createTooltip: function (options) {

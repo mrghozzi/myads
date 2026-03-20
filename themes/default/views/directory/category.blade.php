@@ -1,84 +1,140 @@
 @extends('theme::layouts.master')
+@include('theme::directory._assets')
 
 @section('content')
-<!-- SECTION BANNER -->
-<div class="section-banner" style="background: url({{ theme_asset('img/banner/Newsfeed.png') }}) no-repeat 50%;" >
-    <img class="section-banner-icon" src="{{ theme_asset('img/banner/newsfeed-icon.png') }}"  alt="overview-icon">
-    <p class="section-banner-title">{{ $category->name }}</p>
-    <p class="section-banner-text">{{ $category->txt }}</p>
-</div>
-
-<div class="section-filters-bar v7">
-    <div class="section-filters-bar-actions">
-        <div class="section-filters-bar-info">
-            <p class="section-filters-bar-title">
-                <a href="{{ url('/directory') }}">{{ __('messages.directory') }}</a>
-                <span class="separator"></span>
-                <a href="{{ url('/cat/' . $category->id) }}">{{ $category->name }}</a>
-            </p>
+<div class="directory-rdx directory-category-shell">
+    <div class="section-banner directory-hub-banner">
+        <img class="section-banner-icon" src="{{ theme_asset('img/banner/newsfeed-icon.png') }}" alt="directory-category-icon">
+        <div class="directory-hub-banner-copy">
+            <p class="section-banner-title">{{ $category->name }}</p>
+            <p class="section-banner-text">{{ $category->txt }}</p>
         </div>
     </div>
-</div>
 
-<div class="grid grid-3-6-3">
-    <!-- LEFT SIDEBAR -->
-    <div class="grid-column">
-        <div class="widget-box">
-            <p class="widget-box-title"><h4>{{ __('messages.board') }}</h4></p>
-            <div class="widget-box-content">
-                <div class="post-peek-list">
-                    <a href="{{ url('/directory') }}" class="btn btn-primary" >&nbsp;<i class="fa fa-home" aria-hidden="true"></i>&nbsp;</a>
-                    <a href="{{ url('/add-site.html') }}" class="btn btn-success" >{{ __('messages.addWebsite') }}&nbsp;<i class="fa fa-plus" aria-hidden="true"></i> </a>
-                </div>
+    <div class="section-filters-bar v7 directory-breadcrumb-bar">
+        <div class="section-filters-bar-actions">
+            <div class="section-filters-bar-info">
+                <p class="section-filters-bar-title">
+                    <a href="{{ route('directory.index') }}">{{ __('messages.directory') }}</a>
+                    <span class="separator"></span>
+                    <a href="{{ route('directory.category.legacy', $category->id) }}">{{ $category->name }}</a>
+                </p>
             </div>
         </div>
-
-        @if($subCategories->count() > 0)
-        <div class="widget-box">
-            <p class="widget-box-title"><h4>{{ __('messages.subcategories') }}</h4></p>
-            <div class="widget-box-content">
-                <div class="post-peek-list">
-                    @foreach($subCategories as $sub)
-                        @php
-                            $subCount = \App\Models\Directory::where('cat', $sub->id)->where('statu', 1)->count();
-                        @endphp
-                        <div class="post-peek">
-                            <p class="post-peek-title">
-                                <a href="{{ url('/cat/' . $sub->id) }}">{{ $sub->name }}
-                                <span class="badge badge-info">{{ $subCount }}</span></a>
-                            </p>
-                        </div>
-                    @endforeach
-                </div>
-            </div>
-        </div>
-        @endif
-
-        @include('theme::partials.widgets', ['place' => 5])
     </div>
 
-    <!-- MAIN CONTENT -->
-    <div class="grid-column">
-        <div id="infinite-scroll-container" style="display: grid; grid-gap: 16px;">
-            <div id="timeline-content" style="display: contents;">
-                @forelse($activities as $activity)
-                    @include('theme::partials.activity.render', ['activity' => $activity])
-                @empty
-                    <div class="widget-box" style="margin-bottom: 0;">
-                        <div class="widget-box-content">
-                            <p class="no-results">{{ __('messages.no_listings_found') }}</p>
+    <div class="grid grid-3-6-3 mobile-prefer-content directory-hub-grid">
+        <div class="grid-column">
+            <div class="widget-box directory-side-card directory-command-card">
+                <p class="widget-box-title">{{ __('messages.board') }}</p>
+
+                <div class="widget-box-content">
+                    <div class="directory-command-list">
+                        <a href="{{ route('directory.index') }}" class="button primary">
+                            <i class="fa fa-home" aria-hidden="true"></i>&nbsp;{{ __('messages.directory') }}
+                        </a>
+
+                        <a href="{{ route('directory.create') }}" class="button secondary">
+                            <i class="fa fa-plus" aria-hidden="true"></i>&nbsp;{{ __('messages.addWebsite') }}
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            @if($categorySummary['subcategories']->isNotEmpty())
+                <div class="widget-box directory-side-card">
+                    <p class="widget-box-title">{{ __('messages.subcategories') }}</p>
+
+                    <div class="widget-box-content">
+                        <div class="directory-category-pill-list directory-category-pill-list-compact">
+                            @foreach($categorySummary['subcategories'] as $subCategory)
+                                <a class="directory-category-pill" href="{{ $subCategory['url'] }}">
+                                    {{ $subCategory['category']->name }}
+                                    <span>{{ $subCategory['listing_count'] }}</span>
+                                </a>
+                            @endforeach
                         </div>
                     </div>
-                @endforelse
-                
-                @include('theme::partials.ajax.infinite_scroll', ['paginator' => $activities])
+                </div>
+            @endif
+
+            <x-widget-column side="directory_left" />
+        </div>
+
+        <div class="grid-column">
+            <div class="widget-box directory-feed-shell directory-category-summary-card">
+                <div class="widget-box-content">
+                    <div class="directory-feed-header">
+                        <div class="directory-feed-copy">
+                            <p class="directory-feed-eyebrow">{{ __('messages.directory') }}</p>
+                            <h2 class="directory-feed-title">{{ $category->name }}</h2>
+                            <p class="directory-feed-text">{{ $category->txt ?: __('messages.landing_community_directory_desc') }}</p>
+                        </div>
+
+                        <div class="directory-feed-summary">
+                            <div class="directory-feed-summary-item">
+                                <span>{{ __('messages.latest_sites') }}</span>
+                                <strong>{{ $categorySummary['listing_count'] }}</strong>
+                            </div>
+
+                            <div class="directory-feed-summary-item">
+                                <span>{{ __('messages.subcategories') }}</span>
+                                <strong>{{ $categorySummary['subcategory_count'] }}</strong>
+                            </div>
+                        </div>
+                    </div>
+
+                    @if($categorySummary['subcategories']->isNotEmpty())
+                        <div class="directory-category-pill-list">
+                            @foreach($categorySummary['subcategories'] as $subCategory)
+                                <a class="directory-category-pill" href="{{ $subCategory['url'] }}">
+                                    {{ $subCategory['category']->name }}
+                                    <span>{{ $subCategory['listing_count'] }}</span>
+                                </a>
+                            @endforeach
+                        </div>
+                    @endif
+                </div>
+            </div>
+
+            <div id="infinite-scroll-container" class="directory-feed-list">
+                <div id="timeline-content" class="directory-feed-items">
+                    @if($cards->isNotEmpty())
+                        @include('theme::directory.partials.feed_items', ['cards' => $cards])
+                    @else
+                        <div class="widget-box directory-empty-card">
+                            <div class="widget-box-content">
+                                <p class="no-results">{{ __('messages.no_listings_found') }}</p>
+                            </div>
+                        </div>
+                    @endif
+
+                    @include('theme::partials.ajax.infinite_scroll', ['paginator' => $activities])
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- RIGHT SIDEBAR -->
-    <div class="grid-column">
-        @include('theme::partials.widgets', ['place' => 6])
+        <div class="grid-column">
+            <div class="widget-box directory-side-card directory-stats-card">
+                <p class="widget-box-title">{{ __('messages.details') }}</p>
+
+                <div class="widget-box-content">
+                    <div class="directory-side-stat-list">
+                        <div class="directory-side-stat-item">
+                            <span>{{ __('messages.latest_sites') }}</span>
+                            <strong>{{ $categorySummary['listing_count'] }}</strong>
+                        </div>
+
+                        <div class="directory-side-stat-item">
+                            <span>{{ __('messages.subcategories') }}</span>
+                            <strong>{{ $categorySummary['subcategory_count'] }}</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <x-widget-column side="directory_right" />
+        </div>
     </div>
 </div>
 @endsection

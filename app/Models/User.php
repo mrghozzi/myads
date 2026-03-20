@@ -27,6 +27,7 @@ class User extends Authenticatable
         'vu',
         'nvu',
         'nlink',
+        'nsmart',
         'sig',
         'email_verified_at',
     ];
@@ -164,6 +165,11 @@ class User extends Authenticatable
     public function visits()
     {
         return $this->hasMany(Visit::class, 'uid');
+    }
+
+    public function smartAds()
+    {
+        return $this->hasMany(SmartAd::class, 'uid');
     }
 
     public function forumModerator()

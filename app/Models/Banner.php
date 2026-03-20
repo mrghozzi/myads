@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Support\BannerSizeCatalog;
 
 class Banner extends Model
 {
@@ -26,5 +27,15 @@ class Banner extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'uid');
+    }
+
+    public function getPxAttribute($value)
+    {
+        return BannerSizeCatalog::normalize($value) ?? $value;
+    }
+
+    public function setPxAttribute($value): void
+    {
+        $this->attributes['px'] = BannerSizeCatalog::normalize($value) ?? $value;
     }
 }

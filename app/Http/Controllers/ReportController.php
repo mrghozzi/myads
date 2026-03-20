@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Link;
 use App\Models\Banner;
+use App\Models\SmartAd;
 use App\Models\Report;
 
 class ReportController extends Controller
@@ -26,6 +27,11 @@ class ReportController extends Controller
             $item = Banner::find($id);
             $type = 'banner'; // s_type 202? need to check old code
             $typeId = 202; 
+        } elseif ($request->has('smart_ad')) {
+            $id = $request->input('smart_ad');
+            $item = SmartAd::find($id);
+            $type = 'smart';
+            $typeId = 204;
         }
 
         // If no valid item found, maybe show generic report or 404

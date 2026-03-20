@@ -1,5 +1,9 @@
+@php
+    $pageLocale = str_replace('_', '-', app()->getLocale());
+    $pageDirection = locale_direction();
+@endphp
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="{{ $pageLocale }}" dir="{{ $pageDirection }}" data-dir="{{ $pageDirection }}" class="{{ $pageDirection }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -304,9 +308,32 @@
             .installer-steps { gap: .15rem; }
             .installer-step { font-size: .65rem; padding: .3rem .5rem; }
         }
+
+        [dir="rtl"] body {
+            direction: rtl;
+            text-align: right;
+        }
+        [dir="rtl"] .installer-actions,
+        [dir="rtl"] .installer-step,
+        [dir="rtl"] .check-item {
+            flex-direction: row-reverse;
+        }
+        [dir="rtl"] .installer-brand,
+        [dir="rtl"] .installer-card,
+        [dir="rtl"] .alert-installer,
+        [dir="rtl"] .update-log {
+            text-align: right;
+        }
+        [dir="rtl"] .form-control {
+            text-align: right;
+        }
+        [dir="rtl"] .ps-3 {
+            padding-left: 0 !important;
+            padding-right: 1rem !important;
+        }
     </style>
 </head>
-<body>
+<body data-dir="{{ $pageDirection }}" class="{{ $pageDirection }}">
     <div class="installer-wrapper">
         <div class="installer-brand">
             <h1><i class="fas fa-ad"></i> MyAds</h1>
