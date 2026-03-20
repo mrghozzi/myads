@@ -177,11 +177,11 @@ html[dir="rtl"] .sidebar.navigation-widget.hidden {
 }
 
 html[dir="rtl"] .sidebar.chat-widget.closed {
-    transform: translate(-220px);
+    transform: translate(220px);
 }
 
 html[dir="rtl"] .sidebar.chat-widget.hidden {
-    transform: translate(-100%);
+    transform: translate(100%);
 }
 
 html[dir="rtl"] .sidebar.chat-widget .chat-widget-button,
@@ -303,5 +303,19 @@ html[dir="rtl"] .home-smart-actions .home-smart-action {
 @media screen and (max-width: 960px) {
     html[dir="rtl"] .section-banner {
         padding: 18px 108px 0 28px;
+    }
+}
+
+/*-------------------------
+    RTL CONTENT GRID FIX
+-------------------------*/
+/* On large screens (>1366px), sidebar.js applies translateX(+Xpx) to content-grid.
+   In RTL, the navigation-widget moves to the RIGHT side, so we need content to shift LEFT.
+   We reset the JS transform via CSS and apply corrected margins. */
+@media screen and (min-width: 1367px) {
+    html[dir="rtl"] .content-grid {
+        transform: none !important;
+        margin-right: 80px !important;
+        margin-left: auto !important;
     }
 }
