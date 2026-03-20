@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 return array (
   'language' => '(Türkçe)',
@@ -846,4 +846,42 @@ return array (
   'smart_admin_badge' => 'Rozet',
   'smart_admin_open' => 'Ac',
   'smart_ads_credits_admin' => 'Akilli reklam kredileri (nsmart)',
+    // Ads Code Strings
+    'your_referral_link' => 'Yönlendirme bağlantınız',
+    'share_your_referral_link' => 'Yönlendirme bağlantınızı paylaşın',
+    'quick_code' => 'Hızlı Kod',
+    'advanced_code' => 'Gelişmiş Kod',
+    'quick_code_desc' => 'Eski biçim gibi kısa bir doğrudan kod parçacığı. Sayısal boyut adlarını kullanır `468`, `728`, `300`, `160`.',
+    'your_quick_banner_code' => 'Hızlı banner kodunuz :label',
+    'advanced_code_desc' => 'Tekrarlardan daha iyi kaçınmak için ziyaretçi belirteci desteğine sahip gelişmiş yükleyici. Duyarlı mod dahil, en doğru davranışı istiyorsanız bunu kullanın.',
+    'recommended_smart_code' => 'Önerilen akıllı kod',
+    'responsive_2_desc' => 'Responsive 2, yuvaya en yakın yasal afiş boyutuna otomatik olarak uyum sağlar ve yerel, hafif bir `Ads by :app` etiketi tutar.',
+    'responsive_2_preview_desc' => 'Önizleme, aynı akıllı yükleyiciyi ve canlı afiş üzerinde görüntülenen aynı `Ads by :app` çipini kullanır.',
+    'your_advanced_promotion_tags' => 'Gelişmiş tanıtım etiketleriniz :label',
+    'your_promotion_tags_size' => 'Tanıtım etiketleriniz :size',
+    'responsive_2_link_desc' => 'Responsive 2, dar kapsayıcılar için daha akıllı bir kart düzeni ekler. Hızlı kod doğrudan kalırken, akıllı kod üst alan genişliğini ölçer ve en iyi yerleşimi otomatik olarak seçer.',
+
+    // Store create/update: ZIP vs External Link
+    'ext_link'          => 'Harici Baglanti',
+    'ext_link_hint'     => 'Dosyaniz icin dogrudan indirme baglantisiniyapistirin',
+    'optional'          => 'Istege bagli',
+    'current'           => 'Mevcut',
+    'nameonly'          => 'Yalnizca harf, rakam, tire ve alt cizgiye izin verilir',
+
+    // Admin product management
+    'edit_product'          => 'Urunu Duzenle',
+    'product_details'       => 'Urun Detaylari',
+    'file_versions'         => 'Dosya Surumleri',
+    'add_new_version'       => 'Yeni Dosya Surumu Ekle',
+    'no_files'              => 'Henuz dosya surumu yok.',
+    'suspended'             => 'Askiya Alindi',
+    'confirm_suspend'       => 'Bu urunu askiya al ve sahibine bildir?',
+    'confirm_unsuspend'     => 'Bu urunun askiya alinmasi kaldirilsin mi?',
+    'suspend'               => 'Askiya Al',
+    'unsuspend'             => 'Askiyi Kaldir',
+    'product_updated'       => 'Urun basariyla guncellendi.',
+    'product_suspended'     => 'Ununuz yonetici tarafindan askiya alindi.',
+    'product_reactivated'   => 'Ununuz yeniden etkinlestirildi.',
+    'product_suspended_ok'  => 'Urun askiya alindi.',
+    'product_unsuspended'   => 'Askiya alma kaldirildi.',
 );

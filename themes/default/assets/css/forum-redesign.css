@@ -593,3 +593,12 @@ html[dir="rtl"] .forum-rdx-index .forum-category .forum-category-info {
     padding: 14px;
   }
 }
+
+/* Fix mobile hidden forum sections 
+   styles.css historically used nth-last-child(3) to hide an old column, but now it hides Categories (1st column) */
+@media screen and (max-width: 960px) {
+  .forum-rdx-index .table.table-forum-category .table-header-column:first-child,
+  .forum-rdx-index .table.table-forum-category .table-column:first-child {
+    display: table-cell !important;
+  }
+}

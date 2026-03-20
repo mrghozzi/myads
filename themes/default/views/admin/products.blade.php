@@ -27,8 +27,14 @@
 
     <div class="row g-4">
         @forelse($products as $product)
+            @php
+                $isSuspended = \App\Models\Option::where('o_type', 'store_status')
+                    ->where('o_parent', $product->id)
+                    ->where('name', 'suspended')
+                    ->exists();
+            @endphp
             <div class="col-xxl-3 col-lg-4 col-sm-6">
-                <div class="card stretch stretch-full border-0 shadow-sm h-100">
+                <div class="card stretch stretch-full border-0 shadow-sm h-100 {{ $isSuspended ? 'border-start border-danger border-3' : '' }}">
                     <div class="card-body p-0" style="height: 200px; display: flex; align-items: center; justify-content: center; background-color: #f8f9fa; border-radius: var(--bs-border-radius) var(--bs-border-radius) 0 0;">
                         <a href="{{ route('store.show', $product->name) }}" class="w-100 h-100 d-flex align-items-center justify-content-center p-3" target="_blank">
                             @if($product->productImage)
@@ -37,8 +43,11 @@
                                 <i class="feather-box fs-1 text-muted"></i>
                             @endif
                         </a>
+                        @if($isSuspended)
+                            <span class="badge bg-danger position-absolute top-0 start-0 m-2">{{ __('messages.suspended') ?? 'Suspended' }}</span>
+                        @endif
                     </div>
-                    <div class="card-footer p-4 d-flex align-items-center justify-content-between bg-white border-top">
+                    <div class="card-footer p-4 d-flex align-items-center justify-content-between bg-white border-top position-relative">
                         <div class="overflow-hidden me-3" style="flex: 1;">
                             <h2 class="fs-14 fw-bold mb-1 text-truncate-1-line" title="{{ $product->name }}">
                                 <a href="{{ route('store.show', $product->name) }}" class="text-dark" target="_blank">{{ $product->name }}</a>
@@ -70,6 +79,12 @@
                                         <span>{{ __('messages.view') ?? 'View' }}</span>
                                     </a>
                                 </li>
+                                <li>
+                                    <a href="{{ route('admin.products.edit', $product->id) }}" class="dropdown-item">
+                                        <i class="feather-edit-2 me-3"></i>
+                                        <span>{{ __('messages.edit') ?? 'Edit' }}</span>
+                                    </a>
+                                </li>
                                 @if($product->user)
                                 <li>
                                     <a href="{{ route('profile.show', $product->user->username) }}" class="dropdown-item" target="_blank">
@@ -79,6 +94,15 @@
                                 </li>
                                 @endif
                                 <li class="dropdown-divider"></li>
+                                <li>
+                                    <form method="POST" action="{{ route('admin.products.suspend', $product->id) }}" onsubmit="return confirm('{{ $isSuspended ? (__('messages.confirm_unsuspend') ?? 'Unsuspend?') : (__('messages.confirm_suspend') ?? 'Suspend and notify owner?') }}')">
+                                        @csrf
+                                        <button type="submit" class="dropdown-item {{ $isSuspended ? 'text-success' : 'text-warning' }}">
+                                            <i class="feather-{{ $isSuspended ? 'check-circle' : 'slash' }} me-3"></i>
+                                            <span>{{ $isSuspended ? (__('messages.unsuspend') ?? 'Unsuspend') : (__('messages.suspend') ?? 'Suspend') }}</span>
+                                        </button>
+                                    </form>
+                                </li>
                                 <li>
                                     <a href="javascript:void(0);" class="dropdown-item text-danger" onclick="confirmDelete('{{ $product->id }}', '{{ addslashes($product->name) }}')">
                                         <i class="feather-trash-2 me-3"></i>

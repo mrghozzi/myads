@@ -306,16 +306,3 @@ html[dir="rtl"] .home-smart-actions .home-smart-action {
     }
 }
 
-/*-------------------------
-    RTL CONTENT GRID FIX
--------------------------*/
-/* On large screens (>1366px), sidebar.js applies translateX(+Xpx) to content-grid.
-   In RTL, the navigation-widget moves to the RIGHT side, so we need content to shift LEFT.
-   We reset the JS transform via CSS and apply corrected margins. */
-@media screen and (min-width: 1367px) {
-    html[dir="rtl"] .content-grid {
-        transform: none !important;
-        margin-right: 80px !important;
-        margin-left: auto !important;
-    }
-}

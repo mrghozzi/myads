@@ -295,30 +295,42 @@ class StoreController extends Controller
         }
 
         $request->validate([
-            'vnbr' => ['required', 'string', 'min:2', 'max:12', 'regex:/^[-a-zA-Z0-9.]+$/'],
-            'desc' => ['required', 'string', 'min:10', 'max:2400'],
+            'vnbr'    => ['required', 'string', 'min:2', 'max:12', 'regex:/^[-a-zA-Z0-9.]+$/'],
+            'desc'    => ['required', 'string', 'min:10', 'max:2400'],
             'linkzip' => ['required', 'string'],
+            'pts'     => ['nullable', 'integer', 'min:0', 'max:999999'],
+            'img'     => ['nullable', 'string'],
         ]);
 
         $fileOption = ProductFile::create([
-            'name' => $request->vnbr,
+            'name'     => $request->vnbr,
             'o_valuer' => $request->desc,
-            'o_type' => 'store_file',
+            'o_type'   => 'store_file',
             'o_parent' => $product->id,
-            'o_order' => 0,
-            'o_mode' => $request->linkzip,
+            'o_order'  => 0,
+            'o_mode'   => $request->linkzip,
         ]);
 
         $hash = hash('crc32', $request->linkzip . $fileOption->id);
 
         Short::create([
-            'uid' => Auth::id(),
-            'url' => $request->linkzip,
-            'sho' => $hash,
-            'clik' => 0,
+            'uid'     => Auth::id(),
+            'url'     => $request->linkzip,
+            'sho'     => $hash,
+            'clik'    => 0,
             'sh_type' => 7867,
-            'tp_id' => $fileOption->id,
+            'tp_id'   => $fileOption->id,
         ]);
+
+        // Optional: update cover image
+        if ($request->filled('img')) {
+            $product->update(['o_mode' => $request->img]);
+        }
+
+        // Optional: update price
+        if ($request->filled('pts')) {
+            $product->update(['o_order' => (int) $request->pts]);
+        }
 
         return redirect()->route('store.update', $product->name)->with('success', __('updated_successfully'));
     }

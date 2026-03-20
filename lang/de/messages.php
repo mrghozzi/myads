@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 return array (
   'language' => '(Deutsch)',
@@ -845,4 +845,42 @@ return array (
   'smart_admin_badge' => 'Kennzeichnung',
   'smart_admin_open' => 'Öffnen',
   'smart_ads_credits_admin' => 'Smart-Ads-Guthaben (nsmart)',
+    // Ads Code Strings
+    'your_referral_link' => 'Ihr Empfehlungslink',
+    'share_your_referral_link' => 'Teilen Sie Ihren Empfehlungslink',
+    'quick_code' => 'Schnellcode',
+    'advanced_code' => 'Erweiterter Code',
+    'quick_code_desc' => 'Kurzes direktes Snippet wie im alten Format. Es verwendet die numerischen Größen-Aliase `468`, `728`, `300`, `160`.',
+    'your_quick_banner_code' => 'Ihr schneller Banner-Code :label',
+    'advanced_code_desc' => 'Erweiterter Loader mit Besucher-Token-Unterstützung zur besseren Vermeidung von Wiederholungen. Verwenden Sie dies, wenn Sie das genaueste Verhalten wünschen, einschließlich des reaktionsschnellen Modus.',
+    'recommended_smart_code' => 'Empfohlener intelligenter Code',
+    'responsive_2_desc' => 'Responsive 2 passt sich automatisch an die nächstgelegene zulässige Bannergröße für den Slot an und hält die Anzeigenumgebung mit einem nativen `Ads by :app`-Label leicht.',
+    'responsive_2_preview_desc' => 'Die Vorschau verwendet denselben intelligenten Loader und denselben leichten `Ads by :app`-Chip oben rechts, der auch auf dem Live-Banner angezeigt wird.',
+    'your_advanced_promotion_tags' => 'Ihre erweiterten Promotion-Tags :label',
+    'your_promotion_tags_size' => 'Ihre Promotion-Tags :size',
+    'responsive_2_link_desc' => 'Responsive 2 fügt ein intelligenteres Kartenlayout für schmale Container hinzu. Der Schnellcode bleibt direkt, während der Smart-Code die Breite des übergeordneten Elements misst und automatisch das beste Layout auswählt.',
+
+    // Store create/update: ZIP vs External Link
+    'ext_link'          => 'Externer Link',
+    'ext_link_hint'     => 'Direkten Download-Link fuer Ihre Datei einfuegen',
+    'optional'          => 'Optional',
+    'current'           => 'Aktuell',
+    'nameonly'          => 'Nur Buchstaben, Zahlen, Bindestriche und Unterstriche erlaubt',
+
+    // Admin product management
+    'edit_product'          => 'Produkt bearbeiten',
+    'product_details'       => 'Produktdetails',
+    'file_versions'         => 'Dateiversionen',
+    'add_new_version'       => 'Neue Dateiversion hinzufuegen',
+    'no_files'              => 'Noch keine Dateiversionen.',
+    'suspended'             => 'Gesperrt',
+    'confirm_suspend'       => 'Dieses Produkt sperren und den Eigentuemer benachrichtigen?',
+    'confirm_unsuspend'     => 'Sperrung dieses Produkts aufheben?',
+    'suspend'               => 'Sperren',
+    'unsuspend'             => 'Entsperren',
+    'product_updated'       => 'Produkt erfolgreich aktualisiert.',
+    'product_suspended'     => 'Ihr Produkt wurde vom Administrator gesperrt.',
+    'product_reactivated'   => 'Ihr Produkt wurde wieder aktiviert.',
+    'product_suspended_ok'  => 'Produkt gesperrt.',
+    'product_unsuspended'   => 'Sperrung aufgehoben.',
 );

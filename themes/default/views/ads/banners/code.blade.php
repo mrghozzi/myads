@@ -34,13 +34,13 @@
 <div class="grid grid">
   <div class="grid-column">
     <div class="widget-box">
-         <p class="widget-box-title">Your referral link</p>
+         <p class="widget-box-title">{{ __('messages.your_referral_link') }}</p>
          <br />
          <blockquote class="widget-box">
          <center><kbd>{{ route('register', ['ref' => $user->id]) }}</kbd></center>
          </blockquote>
          <br />
-         <p class="widget-box-title"><i class="fa fa-share"></i>&nbsp;Share your referral link</p>
+         <p class="widget-box-title"><i class="fa fa-share"></i>&nbsp;{{ __('messages.share_your_referral_link') }}</p>
          <div class="widget-box-content">
             <div class="social-links multiline align-left">
               <a class="social-link small facebook" href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(route('register', ['ref' => $user->id])) }}" target="_blank">
@@ -162,13 +162,13 @@
     <div class="widget-box" style="margin-top: 24px;">
       <div class="widget-box-content">
         <div class="code-mode-switch" style="display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 18px;">
-          <button type="button" class="button secondary" data-code-mode-button="quick" data-active="true">Quick Code</button>
-          <button type="button" class="button tertiary" data-code-mode-button="advanced">Advanced Code</button>
+          <button type="button" class="button secondary" data-code-mode-button="quick" data-active="true">{{ __('messages.quick_code') }}</button>
+          <button type="button" class="button tertiary" data-code-mode-button="advanced">{{ __('messages.advanced_code') }}</button>
         </div>
 
         <div data-code-mode-panel="quick" style="display: block;">
-          <p class="widget-box-title">Quick Code</p>
-          <p style="margin: 8px 0 18px;">Short direct snippet like the old format. It uses the numeric size aliases `468`, `728`, `300`, `160`.</p>
+          <p class="widget-box-title">{{ __('messages.quick_code') }}</p>
+          <p style="margin: 8px 0 18px;">{{ __('messages.quick_code_desc') }}</p>
 
           <div class="tab-box">
             <div class="tab-box-options">
@@ -184,7 +184,7 @@
               @php($embedCode = \App\Support\BannerEmbedCode::buildLegacy(route('ads.script'), $user->id, $tab['value'], $extensions_code ?? ''))
               <div class="tab-box-item" style="display: {{ $index === 0 ? 'block' : 'none' }};">
                 <div class="tab-box-item-content">
-                  <p class="tab-box-item-title">Your quick banner code {{ $tab['label'] }}</p>
+                  <p class="tab-box-item-title">{{ __('messages.your_quick_banner_code', ['label' => $tab['label']]) }}</p>
                   <hr />
                   <div class="well" style="color: black;">
                     <textarea class="form-control" type="text" readonly onclick="this.select(); document.execCommand('copy');">{{ $embedCode }}</textarea>
@@ -200,8 +200,8 @@
         </div>
 
         <div data-code-mode-panel="advanced" style="display: none;">
-          <p class="widget-box-title">Advanced Code</p>
-          <p style="margin: 8px 0 18px;">Advanced loader with visitor token support for stronger repeat-avoidance. Use this if you want the most accurate behavior, including responsive mode.</p>
+          <p class="widget-box-title">{{ __('messages.advanced_code') }}</p>
+          <p style="margin: 8px 0 18px;">{{ __('messages.advanced_code_desc') }}</p>
 
           <div class="tab-box">
             <div class="tab-box-options">
@@ -223,9 +223,9 @@
               <div class="tab-box-item" style="display: {{ $index === 0 ? 'block' : 'none' }};">
                 <div class="tab-box-item-content">
                   @if($tab['value'] === 'responsive2')
-                    <p class="tab-box-item-title">Recommended Smart Code {{ $tab['label'] }} (1 point)</p>
+                    <p class="tab-box-item-title">{{ __('messages.recommended_smart_code') }} {{ $tab['label'] }} (1 {{ __('messages.point') }})</p>
                     <p style="margin: 8px 0 18px; color: #5d6488; line-height: 1.7;">
-                      Responsive 2 auto-fits the closest legal banner size for the slot and keeps the ad chrome light with a native-style `Ads by {{ config('app.name') }}` label.
+                      {{ __('messages.responsive_2_desc', ['app' => config('app.name')]) }}
                     </p>
                     <hr />
                     <div class="well" style="color: black;">
@@ -234,7 +234,7 @@
                     <div class="myads-banner-code-preview myads-banner-code-preview--responsive2">
                       <div class="myads-banner-code-preview__header">
                         <span class="myads-banner-code-preview__pill">Responsive 2</span>
-                        <p class="myads-banner-code-preview__hint">Preview uses the same smart loader and the same lightweight top-right `Ads by {{ config('app.name') }}` chip shown on the live banner.</p>
+                        <p class="myads-banner-code-preview__hint">{{ __('messages.responsive_2_preview_desc', ['app' => config('app.name')]) }}</p>
                       </div>
                       <div class="myads-banner-code-preview__frame">
                         <div class="myads-banner-code-preview__stage">
@@ -243,7 +243,7 @@
                       </div>
                     </div>
                   @else
-                    <p class="tab-box-item-title">Your advanced promotion tags {{ $tab['label'] }} (1 point)</p>
+                    <p class="tab-box-item-title">{{ __('messages.your_advanced_promotion_tags', ['label' => $tab['label']]) }} (1 {{ __('messages.point') }})</p>
                     <hr />
                     <div class="well" style="color: black;">
                       <textarea class="form-control" type="text" readonly onclick="this.select(); document.execCommand('copy');">{{ $embedCode }}</textarea>

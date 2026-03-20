@@ -14,21 +14,21 @@
         [
             'key' => '468x60',
             'label' => '468x60',
-            'title' => 'Your promotion tags 468x60 (1 point)',
+            'title' => __('messages.your_promotion_tags_size', ['size' => '468x60']) . ' (1 ' . __('messages.point') . ')',
             'code' => $fixedCode,
             'preview' => $fixedPreview,
         ],
         [
             'key' => 'responsive',
             'label' => __('messages.responsive'),
-            'title' => 'Your promotion tags Responsive (1 point)',
+            'title' => __('messages.your_promotion_tags_size', ['size' => __('messages.responsive')]) . ' (1 ' . __('messages.point') . ')',
             'code' => $responsiveCode,
             'preview' => $responsivePreview,
         ],
         [
             'key' => 'responsive2',
             'label' => 'Responsive 2',
-            'title' => 'Your promotion tags Responsive 2 (1 point)',
+            'title' => __('messages.your_promotion_tags_size', ['size' => 'Responsive 2']) . ' (1 ' . __('messages.point') . ')',
             'quick_code' => $responsive2QuickCode,
             'smart_code' => $responsive2SmartCode,
             'preview' => $responsive2Preview,
@@ -56,13 +56,13 @@
 <div class="grid grid">
     <div class="grid-column">
         <div class="widget-box">
-            <p class="widget-box-title">Your referral link</p>
+            <p class="widget-box-title">{{ __('messages.your_referral_link') }}</p>
             <br />
             <blockquote class="widget-box">
                 <center><kbd>{{ route('register', ['ref' => $user->id]) }}</kbd></center>
             </blockquote>
             <br />
-            <p class="widget-box-title"><i class="fa fa-share"></i>&nbsp;Share your referral link</p>
+            <p class="widget-box-title"><i class="fa fa-share"></i>&nbsp;{{ __('messages.share_your_referral_link') }}</p>
             <div class="widget-box-content">
                 <div class="social-links multiline align-left">
                     <a class="social-link small facebook" href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(route('register', ['ref' => $user->id])) }}" target="_blank">
@@ -111,17 +111,17 @@
                                 </div>
                             @else
                                 <p class="widget-box-text" style="margin-bottom: 18px;">
-                                    Responsive 2 adds a smarter card layout for narrow containers. The quick code stays direct, while the smart code measures the parent width and chooses the best layout automatically.
+                                    {{ __('messages.responsive_2_link_desc') }}
                                 </p>
 
                                 <div style="display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));">
                                     <div class="well" style="color: black; margin: 0;">
-                                        <p class="widget-box-title" style="margin-bottom: 12px;">Quick Code</p>
+                                        <p class="widget-box-title" style="margin-bottom: 12px;">{{ __('messages.quick_code') }}</p>
                                         <textarea class="form-control" type="text" readonly onclick="this.select(); document.execCommand('copy');">{{ $tab['quick_code'] }}</textarea>
                                     </div>
 
                                     <div class="well" style="color: black; margin: 0;">
-                                        <p class="widget-box-title" style="margin-bottom: 12px;">Recommended Smart Code</p>
+                                        <p class="widget-box-title" style="margin-bottom: 12px;">{{ __('messages.recommended_smart_code') }}</p>
                                         <textarea class="form-control" type="text" readonly onclick="this.select(); document.execCommand('copy');">{{ $tab['smart_code'] }}</textarea>
                                     </div>
                                 </div>

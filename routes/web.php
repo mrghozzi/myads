@@ -397,6 +397,9 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     // Products
     Route::get('/products', [AdminController::class, 'products'])->name('admin.products');
     Route::delete('/products/delete', [AdminController::class, 'deleteProduct'])->name('admin.products.delete');
+    Route::get('/products/{id}/edit', [AdminController::class, 'editProduct'])->name('admin.products.edit');
+    Route::post('/products/{id}', [AdminController::class, 'updateProduct'])->name('admin.products.update');
+    Route::post('/products/{id}/suspend', [AdminController::class, 'suspendProduct'])->name('admin.products.suspend');
 
     // Plugins
     Route::get('/plugins', [AdminController::class, 'plugins'])->name('admin.plugins');

@@ -1,3 +1,27 @@
+# v4.1.1
+> **Patch Release** - Store enhancements, UI, RTL, and translation fixes.
+
+### 🏪 Store & Admin Management
+* **Add**: Product creators can now choose between uploading a ZIP file or providing a direct external download link.
+* **Add**: Optional cover image and price updates on the product edit page (`/store/{name}/update`).
+* **Add**: Full product editing capabilities from the Admin panel (`/admin/products/{id}/edit`).
+* **Add**: Admin product suspension system (suspend/unsuspend) with automatic notifications sent to product owners.
+* **Add**: File version history and download preview in the Admin product edit view.
+
+### 💬 Translations & Localization
+* **Add**: Added new translation keys for Store external links and Admin product management across all 9 languages.
+* **Add**: Fully translated strings for `Responsive 2` embed code formats across all 9 languages.
+* **Fix**: Removed hardcoded English strings from `/b_code` and `/l_code` pages.
+* **Improvement**: Clarified point earning sentences (referrals, exchange visits, ad impressions) in Arabic and English translations.
+
+### 🎨 UI & Responsive Fixes
+* **Fix**: Fixed critical RTL layout bug where `margin-left: auto` caused main content limits to clip beyond the right edge on desktop views.
+* **Fix**: Fixed a bug where `/forum` category sections disappeared completely on mobile devices in both RTL and LTR orientations.
+* **Fix**: Corrected javascript sidebar toggler layout calculation in RTL mode to prevent horizontal sliding content jumps.
+
+### 🐛 Bug Fixes
+* **Fix**: Resolved `500 Internal Server Error` on `/l_code` triggered by an undefined `$responsive2Preview` variable preventing the link codes page from loading.
+
 # v4.1.0
 > **Feature Release** - Notification center refresh, forum topic flow fixes, and test coverage improvements.
 

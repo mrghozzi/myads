@@ -34,6 +34,7 @@ use App\Models\Menu;
 use App\Models\Option;
 use App\Models\Knowledgebase;
 use App\Models\Page;
+use App\Models\ProductFile;
 use App\Services\PluginManager;
 use App\Services\ThemeManager;
 use App\Support\BannerServingSettings;
@@ -1675,6 +1676,135 @@ class AdminController extends Controller
         });
 
         return redirect()->back()->with('success', __('messages.product_deleted') ?? 'Product deleted successfully.');
+    }
+
+    public function editProduct($id)
+    {
+        $product = Product::withoutGlobalScope('store')->where('o_type', 'store')->findOrFail($id);
+        $typeOption = Option::where('o_type', 'store_type')->where('o_parent', $product->id)->first();
+        $files = ProductFile::where('o_parent', $product->id)->orderBy('id', 'desc')->get();
+        $latestFile = $files->first();
+        $topic = null;
+        if ($typeOption && $typeOption->o_order) {
+            $topic = ForumTopic::find($typeOption->o_order);
+        }
+        $storeCategories = Option::where('o_type', 'storecat')->orderBy('id')->get();
+        $isSuspended = Option::where('o_type', 'store_status')
+            ->where('o_parent', $product->id)
+            ->where('name', 'suspended')
+            ->exists();
+
+        return view('theme::admin.product_edit', compact(
+            'product', 'typeOption', 'files', 'latestFile', 'topic', 'storeCategories', 'isSuspended'
+        ));
+    }
+
+    public function updateProduct(Request $request, $id)
+    {
+        $product = Product::withoutGlobalScope('store')->where('o_type', 'store')->findOrFail($id);
+
+        $request->validate([
+            'pname'   => ['required', 'string', 'min:3', 'max:35'],
+            'desc'    => ['required', 'string', 'min:10', 'max:2400'],
+            'img'     => ['nullable', 'string'],
+            'pts'     => ['required', 'integer', 'min:0', 'max:999999'],
+            'cat_s'   => ['nullable', 'string'],
+            'txt'     => ['nullable', 'string'],
+            'vnbr'    => ['nullable', 'string', 'min:2', 'max:12', 'regex:/^[-a-zA-Z0-9.]+$/'],
+            'linkzip' => ['nullable', 'string'],
+        ]);
+
+        // Update product core fields
+        $updateData = [
+            'name'     => $request->pname,
+            'o_valuer' => $request->desc,
+            'o_order'  => (int) $request->pts,
+        ];
+        if ($request->filled('img')) {
+            $updateData['o_mode'] = $request->img;
+        }
+        $product->update($updateData);
+
+        // Update category option
+        if ($request->filled('cat_s')) {
+            $typeOption = Option::where('o_type', 'store_type')->where('o_parent', $product->id)->first();
+            if ($typeOption) {
+                $typeOption->update(['name' => $request->cat_s]);
+            }
+        }
+
+        // Update forum topic body text
+        $typeOption = Option::where('o_type', 'store_type')->where('o_parent', $product->id)->first();
+        if ($typeOption && $typeOption->o_order && $request->filled('txt')) {
+            $topic = ForumTopic::find($typeOption->o_order);
+            if ($topic) {
+                $topic->update(['txt' => $request->txt]);
+            }
+        }
+
+        // Optional: add new file version
+        if ($request->filled('vnbr') && $request->filled('linkzip')) {
+            $fileOption = ProductFile::create([
+                'name'     => $request->vnbr,
+                'o_valuer' => $request->desc,
+                'o_type'   => 'store_file',
+                'o_parent' => $product->id,
+                'o_order'  => 0,
+                'o_mode'   => $request->linkzip,
+            ]);
+            $hash = hash('crc32', $request->linkzip . $fileOption->id);
+            \App\Models\Short::create([
+                'uid'     => Auth::id(),
+                'url'     => $request->linkzip,
+                'sho'     => $hash,
+                'clik'    => 0,
+                'sh_type' => 7867,
+                'tp_id'   => $fileOption->id,
+            ]);
+        }
+
+        return redirect()->route('admin.products')->with('success', __('messages.product_updated') ?? 'Product updated successfully.');
+    }
+
+    public function suspendProduct(Request $request, $id)
+    {
+        $product = Product::withoutGlobalScope('store')->where('o_type', 'store')->findOrFail($id);
+
+        $existing = Option::where('o_type', 'store_status')
+            ->where('o_parent', $product->id)
+            ->where('name', 'suspended')
+            ->first();
+
+        if ($existing) {
+            // Unsuspend
+            $existing->delete();
+            $notifMsg = __('messages.product_reactivated') ?? 'Your product has been reactivated.';
+            $successMsg = __('messages.product_unsuspended') ?? 'Product unsuspended.';
+        } else {
+            // Suspend
+            Option::create([
+                'name'     => 'suspended',
+                'o_valuer' => '1',
+                'o_type'   => 'store_status',
+                'o_parent' => $product->id,
+                'o_order'  => 0,
+                'o_mode'   => time(),
+            ]);
+            $notifMsg = __('messages.product_suspended') ?? 'Your product has been suspended by the admin.';
+            $successMsg = __('messages.product_suspended_ok') ?? 'Product suspended.';
+        }
+
+        // Notify product owner
+        Notification::create([
+            'uid'   => $product->o_parent,
+            'name'  => $notifMsg,
+            'nurl'  => 'store/' . $product->name,
+            'logo'  => 'store',
+            'time'  => time(),
+            'state' => 1,
+        ]);
+
+        return redirect()->route('admin.products')->with('success', $successMsg);
     }
 
     // Plugins Management

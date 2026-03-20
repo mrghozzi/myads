@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 return array (
   'language' => '(Italiano)',
@@ -843,4 +843,42 @@ return array (
   'smart_admin_badge' => 'Badge',
   'smart_admin_open' => 'Apri',
   'smart_ads_credits_admin' => 'Crediti annunci intelligenti (nsmart)',
+    // Ads Code Strings
+    'your_referral_link' => 'Il tuo link di riferimento',
+    'share_your_referral_link' => 'Condividi il tuo link di riferimento',
+    'quick_code' => 'Codice Rapido',
+    'advanced_code' => 'Codice Avanzato',
+    'quick_code_desc' => 'Breve snippet diretto come il vecchio formato. Utilizza gli alias di dimensione numerica `468`, `728`, `300`, `160`.',
+    'your_quick_banner_code' => 'Il tuo codice banner rapido :label',
+    'advanced_code_desc' => 'Caricatore avanzato con supporto per token visitatore per un superamento più forte delle ripetizioni. Usalo se desideri il comportamento più accurato, inclusa la modalità reattiva.',
+    'recommended_smart_code' => 'Codice intelligente consigliato',
+    'responsive_2_desc' => 'Responsive 2 si adatta automaticamente alla dimensione banner consentita più vicina e mantiene un badge leggero, nativo `Ads by :app`.',
+    'responsive_2_preview_desc' => 'L\'anteprima utilizza lo stesso caricatore intelligente e lo stesso badge leggero `Ads by :app` in alto a destra visualizzato sul banner live.',
+    'your_advanced_promotion_tags' => 'I tuoi tag di promozione avanzati :label',
+    'your_promotion_tags_size' => 'I tuoi tag di promozione :size',
+    'responsive_2_link_desc' => 'Responsive 2 aggiunge un layout a schede più intelligente per i contenitori stretti. Il codice rapido rimane diretto, mentre il codice intelligente misura la larghezza del genitore e sceglie automaticamente il layout migliore.',
+
+    // Store create/update: ZIP vs External Link
+    'ext_link'          => 'Link esterno',
+    'ext_link_hint'     => 'Incolla un link di download diretto per il tuo file',
+    'optional'          => 'Opzionale',
+    'current'           => 'Attuale',
+    'nameonly'          => 'Sono consentiti solo lettere, numeri, trattini e underscore',
+
+    // Admin product management
+    'edit_product'          => 'Modifica prodotto',
+    'product_details'       => 'Dettagli prodotto',
+    'file_versions'         => 'Versioni file',
+    'add_new_version'       => 'Aggiungi nuova versione file',
+    'no_files'              => 'Nessuna versione file ancora.',
+    'suspended'             => 'Sospeso',
+    'confirm_suspend'       => 'Sospendere questo prodotto e notificare il proprietario?',
+    'confirm_unsuspend'     => 'Annullare la sospensione di questo prodotto?',
+    'suspend'               => 'Sospendi',
+    'unsuspend'             => 'Riattiva',
+    'product_updated'       => 'Prodotto aggiornato con successo.',
+    'product_suspended'     => 'Il tuo prodotto e stato sospeso dall amministratore.',
+    'product_reactivated'   => 'Il tuo prodotto e stato riattivato.',
+    'product_suspended_ok'  => 'Prodotto sospeso.',
+    'product_unsuspended'   => 'Sospensione rimossa.',
 );

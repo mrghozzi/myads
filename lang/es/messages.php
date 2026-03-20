@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 return array (
   'language' => '(Español)',
@@ -845,4 +845,42 @@ return array (
   'smart_admin_badge' => 'Insignia',
   'smart_admin_open' => 'Abrir',
   'smart_ads_credits_admin' => 'Créditos de anuncios inteligentes (nsmart)',
+    // Ads Code Strings
+    'your_referral_link' => 'Tu enlace de referencia',
+    'share_your_referral_link' => 'Comparte tu enlace de referencia',
+    'quick_code' => 'Código Rápido',
+    'advanced_code' => 'Código Avanzado',
+    'quick_code_desc' => 'Breve fragmento directo como el formato antiguo. Utiliza los alias de tamaño numérico `468`, `728`, `300`, `160`.',
+    'your_quick_banner_code' => 'Su código de banner rápido :label',
+    'advanced_code_desc' => 'Cargador avanzado con soporte de token de visitante para evitar repeticiones de manera más efectiva. Use esto si desea el comportamiento más preciso, incluido el modo de respuesta.',
+    'recommended_smart_code' => 'Código inteligente recomendado',
+    'responsive_2_desc' => 'Responsive 2 se adapta automáticamente al tamaño de banner legal más cercano y mantiene el anuncio ligero con una etiqueta nativa de `Ads by :app`.',
+    'responsive_2_preview_desc' => 'La vista previa utiliza el mismo cargador inteligente y la misma etiqueta de `Ads by :app` en la parte superior derecha que se muestra en el banner en vivo.',
+    'your_advanced_promotion_tags' => 'Sus etiquetas de promoción avanzadas :label',
+    'your_promotion_tags_size' => 'Sus etiquetas de promoción :size',
+    'responsive_2_link_desc' => 'Responsive 2 agrega un diseño de tarjeta más inteligente para contenedores estrechos. El código rápido permanece directo, mientras que el código inteligente mide el ancho primario y elige automáticamente el mejor diseño.',
+
+    // Store create/update: ZIP vs External Link
+    'ext_link'          => 'Enlace externo',
+    'ext_link_hint'     => 'Pegue un enlace de descarga directa de su archivo',
+    'optional'          => 'Opcional',
+    'current'           => 'Actual',
+    'nameonly'          => 'Solo se permiten letras, numeros, guiones y guiones bajos',
+
+    // Admin product management
+    'edit_product'          => 'Editar producto',
+    'product_details'       => 'Detalles del producto',
+    'file_versions'         => 'Versiones del archivo',
+    'add_new_version'       => 'Agregar nueva version del archivo',
+    'no_files'              => 'Aun no hay versiones de archivo.',
+    'suspended'             => 'Suspendido',
+    'confirm_suspend'       => 'Suspender este producto y notificar al propietario?',
+    'confirm_unsuspend'     => 'Cancelar la suspension de este producto?',
+    'suspend'               => 'Suspender',
+    'unsuspend'             => 'Reactivar',
+    'product_updated'       => 'Producto actualizado correctamente.',
+    'product_suspended'     => 'Tu producto ha sido suspendido por el administrador.',
+    'product_reactivated'   => 'Tu producto ha sido reactivado.',
+    'product_suspended_ok'  => 'Producto suspendido.',
+    'product_unsuspended'   => 'Producto reactivado.',
 );

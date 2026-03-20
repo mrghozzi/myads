@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 return array (
   'language' => '(فارسی)',
@@ -846,4 +846,42 @@ return array (
   'smart_admin_badge' => 'نشان',
   'smart_admin_open' => 'باز کردن',
   'smart_ads_credits_admin' => 'اعتبار تبلیغات هوشمند (nsmart)',
+    // Ads Code Strings
+    'your_referral_link' => 'لینک معرفی شما',
+    'share_your_referral_link' => 'لینک معرفی خود را به اشتراک بگذارید',
+    'quick_code' => 'کد سریع',
+    'advanced_code' => 'کد پیشرفته',
+    'quick_code_desc' => 'قطعه کد مستقیم کوتاه مشابه فرمت قدیمی. از نام‌های مستعار اندازه عددی `468`، `728`، `300`، `160` استفاده می‌کند.',
+    'your_quick_banner_code' => 'کد بنر سریع شما :label',
+    'advanced_code_desc' => 'بارگذار پیشرفته با پشتیبانی از نشانه بازدیدکننده برای جلوگیری از تکرار قوی‌تری. از این استفاده کنید اگر دقیق‌ترین رفتار را می‌خواهید، شامل حالت ریسپانسیو.',
+    'recommended_smart_code' => 'کد هوشمند توصیه‌شده',
+    'responsive_2_desc' => 'Responsive 2 بە‌طور خودکار متناسب‌ترین اندازه بنر مجاز را تنظیم می‌کند و برچسب `Ads by :app` را به شکل بومی نگه می‌دارد.',
+    'responsive_2_preview_desc' => 'پیش‌نمایش از همان بارگذار هوشمند و همان برچسب سبک `Ads by :app` استفاده می‌کند که در بنر واقعی در بالا و سمت راست نمایش داده می‌شود.',
+    'your_advanced_promotion_tags' => 'برچسب‌های تبلیغاتی پیشرفته شما :label',
+    'your_promotion_tags_size' => 'برچسب‌های تبلیغاتی شما :size',
+    'responsive_2_link_desc' => 'Responsive 2 یک طرح کارت هوشمندتر برای کانتینرهای باریک اضافه می‌کند. کد سریع به صورت مستقیم باقی می‌ماند، در حالی که کد هوشمند عرض کانتینر والد را اندازه می‌گیرد و به‌طور خودکار بهترین طرح را انتخاب می‌کند.',
+
+    // Store create/update: ZIP vs External Link
+    'ext_link'          => 'پیوند خارجی',
+    'ext_link_hint'     => 'پیوند دانلود مستقیم فایل خود را بچسبانید',
+    'optional'          => 'اختیاری',
+    'current'           => 'فعلی',
+    'nameonly'          => 'فقط حروف، اعداد، خط تیره و زیرخط مجاز است',
+
+    // Admin product management
+    'edit_product'          => 'ویرایش محصول',
+    'product_details'       => 'جزئیات محصول',
+    'file_versions'         => 'نسخه‌های فایل',
+    'add_new_version'       => 'افزودن نسخه جدید فایل',
+    'no_files'              => 'هنوز نسخه‌ای وجود ندارد.',
+    'suspended'             => 'تعلیق شده',
+    'confirm_suspend'       => 'این محصول را تعلیق کنید و به مالک اطلاع دهید؟',
+    'confirm_unsuspend'     => 'تعلیق این محصول لغو شود؟',
+    'suspend'               => 'تعلیق',
+    'unsuspend'             => 'رفع تعلیق',
+    'product_updated'       => 'محصول با موفقیت به‌روزرسانی شد.',
+    'product_suspended'     => 'محصول شما توسط مدیر تعلیق شده است.',
+    'product_reactivated'   => 'محصول شما مجدداً فعال شده است.',
+    'product_suspended_ok'  => 'محصول تعلیق شد.',
+    'product_unsuspended'   => 'تعلیق رفع شد.',
 );

@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 return array (
   'language' => '(Français)',
@@ -846,4 +846,42 @@ return array (
   'smart_admin_badge' => 'Badge',
   'smart_admin_open' => 'Ouvrir',
   'smart_ads_credits_admin' => 'Crédits de publicités intelligentes (nsmart)',
+    // Ads Code Strings
+    'your_referral_link' => 'Votre lien de parrainage',
+    'share_your_referral_link' => 'Partagez votre lien de parrainage',
+    'quick_code' => 'Code Rapide',
+    'advanced_code' => 'Code Avancé',
+    'quick_code_desc' => 'Extrait direct et court comme l\'ancien format. Il utilise les alias de taille numériques `468`, `728`, `300`, `160`.',
+    'your_quick_banner_code' => 'Votre code de bannière rapide :label',
+    'advanced_code_desc' => 'Chargeur avancé avec prise en charge de jeton de visiteur pour un évitement répété plus fort. Utilisez ceci si vous souhaitez le comportement le plus précis, incluant le mode adaptatif.',
+    'recommended_smart_code' => 'Code intelligent recommandé',
+    'responsive_2_desc' => 'Responsive 2 s\'adapte automatiquement à la taille de bannière légale la plus proche et conserve une étiquette native `Ads by :app`.',
+    'responsive_2_preview_desc' => 'L\'aperçu utilise le même chargeur intelligent et la même petite étiquette `Ads by :app` en haut à droite affichée sur la bannière en direct.',
+    'your_advanced_promotion_tags' => 'Vos balises de promotion avancées :label',
+    'your_promotion_tags_size' => 'Vos balises de promotion :size',
+    'responsive_2_link_desc' => 'Responsive 2 ajoute une mise en page de carte plus intelligente pour les conteneurs étroits. Le code rapide reste direct, tandis que le code intelligent mesure la largeur du parent et choisit automatiquement la meilleure disposition.',
+
+    // Store create/update: ZIP vs External Link
+    'ext_link'          => 'Lien externe',
+    'ext_link_hint'     => 'Collez un lien de telechargement direct pour votre fichier',
+    'optional'          => 'Optionnel',
+    'current'           => 'Actuel',
+    'nameonly'          => 'Seuls les lettres, chiffres, tirets et tirets bas sont autorises',
+
+    // Admin product management
+    'edit_product'          => 'Modifier le produit',
+    'product_details'       => 'Details du produit',
+    'file_versions'         => 'Versions du fichier',
+    'add_new_version'       => 'Ajouter une nouvelle version du fichier',
+    'no_files'              => 'Aucune version de fichier pour le moment.',
+    'suspended'             => 'Suspendu',
+    'confirm_suspend'       => 'Suspendre ce produit et notifier le proprietaire ?',
+    'confirm_unsuspend'     => 'Annuler la suspension de ce produit ?',
+    'suspend'               => 'Suspendre',
+    'unsuspend'             => 'Reactiver',
+    'product_updated'       => 'Produit mis a jour avec succes.',
+    'product_suspended'     => 'Votre produit a ete suspendu par l administrateur.',
+    'product_reactivated'   => 'Votre produit a ete reactive.',
+    'product_suspended_ok'  => 'Produit suspendu.',
+    'product_unsuspended'   => 'Suspension levee.',
 );

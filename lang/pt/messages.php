@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 
 return array (
   'language' => '(Português)',
@@ -846,4 +846,42 @@ return array (
   'smart_admin_badge' => 'Selo',
   'smart_admin_open' => 'Abrir',
   'smart_ads_credits_admin' => 'Creditos de anuncios inteligentes (nsmart)',
+    // Ads Code Strings
+    'your_referral_link' => 'Seu link de indicação',
+    'share_your_referral_link' => 'Compartilhe seu link de indicação',
+    'quick_code' => 'Código Rápido',
+    'advanced_code' => 'Código Avançado',
+    'quick_code_desc' => 'Trecho direto curto como o formato antigo. Ele usa os aliases de tamanho numérico `468`, `728`, `300`, `160`.',
+    'your_quick_banner_code' => 'Seu código de banner rápido :label',
+    'advanced_code_desc' => 'Carregador avançado com suporte a token de visitante para maior prevenção de repetição. Use isso se quiser o comportamento mais preciso, incluindo o modo responsivo.',
+    'recommended_smart_code' => 'Código inteligente recomendado',
+    'responsive_2_desc' => 'Responsive 2 se adapta automaticamente ao tamanho de banner legal mais próximo e mantém o anúncio leve com um rótulo nativo de `Ads by :app`.',
+    'responsive_2_preview_desc' => 'A visualização usa o mesmo carregador inteligente e a mesma tag leve de `Ads by :app` no canto superior direito que no banner ativo.',
+    'your_advanced_promotion_tags' => 'Suas tags de promoção avançadas :label',
+    'your_promotion_tags_size' => 'Suas tags de promoção :size',
+    'responsive_2_link_desc' => 'Responsive 2 adiciona um layout de cartão mais inteligente para contêineres estreitos. O código rápido permanece direto, enquanto o código inteligente mede a largura do pai e escolhe automaticamente o melhor layout.',
+
+    // Store create/update: ZIP vs External Link
+    'ext_link'          => 'Link externo',
+    'ext_link_hint'     => 'Cole um link de download direto para o seu arquivo',
+    'optional'          => 'Opcional',
+    'current'           => 'Atual',
+    'nameonly'          => 'Apenas letras, numeros, hifens e sublinhados sao permitidos',
+
+    // Admin product management
+    'edit_product'          => 'Editar produto',
+    'product_details'       => 'Detalhes do produto',
+    'file_versions'         => 'Versoes do arquivo',
+    'add_new_version'       => 'Adicionar nova versao do arquivo',
+    'no_files'              => 'Nenhuma versao de arquivo ainda.',
+    'suspended'             => 'Suspenso',
+    'confirm_suspend'       => 'Suspender este produto e notificar o proprietario?',
+    'confirm_unsuspend'     => 'Cancelar a suspensao deste produto?',
+    'suspend'               => 'Suspender',
+    'unsuspend'             => 'Reativar',
+    'product_updated'       => 'Produto atualizado com sucesso.',
+    'product_suspended'     => 'O seu produto foi suspenso pelo administrador.',
+    'product_reactivated'   => 'O seu produto foi reativado.',
+    'product_suspended_ok'  => 'Produto suspenso.',
+    'product_unsuspended'   => 'Suspensao removida.',
 );

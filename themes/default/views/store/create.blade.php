@@ -98,12 +98,24 @@
                <div class="form-item">
                     <!-- FORM INPUT -->
                     <div class="form-input small active">
-                      <label for="profile-name" style=" background-color: #8e44ad; color: #fff; ">{{ __('messages.file') }}</label>
-                      <input type="file" class="form-control" style=" font-family: calibri; -webkit-border-radius: 5px; border: 1px dashed #fff; text-align: center; background-color: #8e44ad; cursor: pointer; color: #fff; " accept=".zip" name="fzip" id="media" >
-                      <br />
-                       <div class="result">
-                        <input type="text" style="visibility:hidden" value="{{ old('linkzip') }}" name="linkzip" id="text" required>
-                       </div>
+                      <label style=" background-color: #8e44ad; color: #fff; ">{{ __('messages.file') }}</label>
+                      <!-- ZIP / Link Toggle -->
+                      <div style="display:flex;gap:8px;margin-bottom:8px;">
+                        <button type="button" class="button secondary zip-tab-btn active" id="tab_upload" onclick="switchZipTab('upload')" style="flex:1;"><i class="fa fa-upload"></i>&nbsp;{{ __('messages.upload') }}</button>
+                        <button type="button" class="button secondary zip-tab-btn" id="tab_link" onclick="switchZipTab('link')" style="flex:1;"><i class="fa fa-link"></i>&nbsp;{{ __('messages.ext_link') ?? 'External Link' }}</button>
+                      </div>
+                      <div id="zip_upload_area">
+                        <input type="file" class="form-control" style=" font-family: calibri; -webkit-border-radius: 5px; border: 1px dashed #fff; text-align: center; background-color: #8e44ad; cursor: pointer; color: #fff; " accept=".zip" name="fzip" id="media" >
+                        <br />
+                        <div class="result">
+                          <input type="text" style="visibility:hidden" value="{{ old('linkzip') }}" name="linkzip" id="text" required>
+                        </div>
+                      </div>
+                      <div id="zip_link_area" style="display:none;">
+                        <input type="text" class="form-control" id="ext_link_input" placeholder="https://example.com/file.zip" style="margin-top:4px;" >
+                        <input type="text" style="visibility:hidden" value="" name="linkzip" id="text_link" required>
+                        <small style="color:#aaa;">{{ __('messages.ext_link_hint') ?? 'Paste a direct download URL to your file' }}</small>
+                      </div>
                     </div>
                     <!-- /FORM INPUT -->
                   </div>
@@ -160,6 +172,37 @@
 </div>
 
 <script>$('#OpenImgUpload').click(function(){ $('#imgupload').trigger('click'); });</script>
+<script>
+    function switchZipTab(tab) {
+        if (tab === 'upload') {
+            document.getElementById('zip_upload_area').style.display = '';
+            document.getElementById('zip_link_area').style.display = 'none';
+            document.getElementById('tab_upload').classList.add('active');
+            document.getElementById('tab_link').classList.remove('active');
+            // enable upload field, disable link field
+            document.getElementById('text').removeAttribute('disabled');
+            document.getElementById('text_link').setAttribute('disabled', 'disabled');
+        } else {
+            document.getElementById('zip_upload_area').style.display = 'none';
+            document.getElementById('zip_link_area').style.display = '';
+            document.getElementById('tab_upload').classList.remove('active');
+            document.getElementById('tab_link').classList.add('active');
+            // disable upload field, enable link field
+            document.getElementById('text').setAttribute('disabled', 'disabled');
+            document.getElementById('text_link').removeAttribute('disabled');
+            // sync current value
+            document.getElementById('text_link').value = document.getElementById('ext_link_input').value;
+        }
+    }
+    // Init: upload tab is default
+    document.getElementById('text_link').setAttribute('disabled', 'disabled');
+
+    // sync ext_link_input -> hidden text_link
+    document.getElementById('ext_link_input').addEventListener('input', function() {
+        document.getElementById('text_link').value = this.value;
+    });
+</script>
+
 <script>
     $(document).ready(function(){
         var token = $('meta[name="csrf-token"]').attr('content');
