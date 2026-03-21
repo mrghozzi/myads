@@ -319,3 +319,71 @@ html[dir="rtl"] .home-smart-actions .home-smart-action {
         margin-left: auto !important;
     }
 }
+
+/* Profile Header RTL */
+html[dir="rtl"] .profile-header.v2 .profile-header-info .user-short-description {
+  padding: 84px 164px 0 0;
+  left: auto;
+  right: 32px;
+}
+html[dir="rtl"] .profile-header.v2 .profile-header-info .user-short-description .user-short-description-avatar {
+  left: auto;
+  right: 0;
+  margin-left: auto;
+  margin-right: 0;
+}
+html[dir="rtl"] .profile-header.v2 .profile-header-info .user-short-description .user-short-description-avatar.user-short-description-avatar-mobile {
+  margin-left: auto;
+  margin-right: -60px;
+}
+html[dir="rtl"] .profile-header.v2 .profile-header-info .user-stats {
+  right: auto;
+  left: 164px;
+}
+html[dir="rtl"] .profile-header.v2 .profile-header-info .tag-sticker {
+  right: auto;
+  left: 28px;
+}
+html[dir="rtl"] .profile-header .profile-header-info .user-short-description .user-short-description-avatar-mobile {
+  margin-left: auto;
+  margin-right: -60px;
+}
+html[dir="rtl"] .profile-header .profile-header-info .profile-header-social-links-wrap {
+  right: auto;
+  left: 32px;
+}
+html[dir="rtl"] .profile-header .profile-header-info .profile-header-social-links-wrap .slider-controls {
+  left: auto;
+  right: -40px;
+}
+html[dir="rtl"] .profile-header .profile-header-info .user-stats {
+  left: auto;
+  right: 40px;
+}
+html[dir="rtl"] .profile-header .profile-header-info .profile-header-info-actions {
+  right: auto;
+  left: 32px;
+}
+html[dir="rtl"] .profile-header .profile-header-info .profile-header-info-actions .profile-header-info-action {
+  margin-right: 0;
+  margin-left: 16px;
+}
+html[dir="rtl"] .profile-header .profile-header-info .profile-header-info-actions .profile-header-info-action:last-child {
+  margin-left: 0;
+}
+
+@media screen and (max-width: 1365px) {
+  html[dir="rtl"] .profile-header.v2 .profile-header-info .user-short-description .user-short-description-avatar {
+    margin-left: auto;
+    margin-right: -74px;
+    left: auto;
+    right: 50%;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  html[dir="rtl"] .profile-header .profile-header-info .profile-header-social-links-wrap {
+    right: auto;
+    left: auto;
+  }
+}

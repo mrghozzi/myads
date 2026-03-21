@@ -6,21 +6,21 @@
     <div class='blog-card' style='box-sizing: border-box;'>
         <div class='description'>
             <h1 style='color: #000000;'>
-                <a href='{{ route('ads.redirect', ['link' => $link1->id, 'clik' => $publisherId, 'type' => 'link']) }}'>{!! htmlentities($link1Name, ENT_QUOTES, 'UTF-8') !!}</a>
+                <a href='{{ route('ads.redirect', ['link' => $link1->id, 'clik' => $publisherId, 'type' => 'link']) }}' target='_blank' rel='noopener noreferrer'>{!! htmlentities($link1Name, ENT_QUOTES, 'UTF-8') !!}</a>
             </h1>
             <h2>ADS by {{ config('app.name') }}</h2>
             <p style='color: #000000;'>{!! htmlentities($link1Txt, ENT_QUOTES, 'UTF-8') !!}</p>
-            <p class='adstn' style='color: #000000;'>ADS by <a href='{{ url('/') }}?ref={{ $publisherId }}'>{{ config('app.name') }}</a></p>
+            <p class='adstn' style='color: #000000;'>ADS by <a href='{{ url('/') }}?ref={{ $publisherId }}' target='_blank' rel='noopener noreferrer'>{{ config('app.name') }}</a></p>
         </div>
         <div class='description'>
             <h1 style='color: #000000;'>
-                <a href='{{ route('ads.redirect', ['link' => $link2->id, 'clik' => $publisherId, 'type' => 'link']) }}'>{!! htmlentities($link2Name, ENT_QUOTES, 'UTF-8') !!}</a>
+                <a href='{{ route('ads.redirect', ['link' => $link2->id, 'clik' => $publisherId, 'type' => 'link']) }}' target='_blank' rel='noopener noreferrer'>{!! htmlentities($link2Name, ENT_QUOTES, 'UTF-8') !!}</a>
             </h1>
             <h2>ADS by {{ config('app.name') }}</h2>
             <p style='color: #000000;'>{!! htmlentities($link2Txt, ENT_QUOTES, 'UTF-8') !!}</p>
-            <p class='adstn' style='color: #000000;'>ADS by <a href='{{ url('/') }}?ref={{ $publisherId }}'>{{ config('app.name') }}</a></p>
+            <p class='adstn' style='color: #000000;'>ADS by <a href='{{ url('/') }}?ref={{ $publisherId }}' target='_blank' rel='noopener noreferrer'>{{ config('app.name') }}</a></p>
         </div>
-        <a href='{{ url('/report') }}?link={{ $link1->id }}&link2={{ $link2->id }}' target='_blank'>
+        <a href='{{ url('/report') }}?link={{ $link1->id }}&link2={{ $link2->id }}' target='_blank' rel='noopener noreferrer'>
             <img src='{{ asset('themes/default/assets/img/Alert-icon.png') }}' alt='Report'>
         </a>
     </div>

@@ -230,69 +230,41 @@ class AdsServingController extends Controller
             return $this->javascriptResponse('// User not found');
         }
 
+        $publisherId = (int) $user_id;
         $slot = $this->resolveSmartSlot($request);
         $visitorKey = $this->resolveVisitorKey($request);
         $countryCode = $geoResolver->resolveCountryCode($request);
         $deviceType = $this->resolveSmartDeviceType($request);
         $contextTokens = SmartAdTargeting::buildTopicTokens([(string) $request->query('ctx', '')], 24);
 
-        $user->increment('pts', 1);
-        $user->increment('nsmart', 0.5);
+        $smartAd = $this->selectSmartAdCandidate($publisherId, $countryCode, $deviceType, $contextTokens)
+            ?? $this->selectSmartAdCandidate($publisherId, $countryCode, $deviceType, $contextTokens, true);
+        $isSelfFallback = $smartAd !== null && (int) $smartAd->uid === $publisherId;
 
-        $smartAd = SmartAd::with('user')
-            ->where('statu', 1)
-            ->where('uid', '!=', (int) $user_id)
-            ->get()
-            ->filter(function (SmartAd $candidate) use ($countryCode, $deviceType) {
-                if (!$candidate->user || (float) $candidate->user->nsmart < 1) {
-                    return false;
-                }
-
-                $targetCountries = $candidate->targetCountries();
-                if ($targetCountries !== [] && !in_array($countryCode, $targetCountries, true)) {
-                    return false;
-                }
-
-                $targetDevices = $candidate->targetDevices();
-                if ($targetDevices !== [] && !in_array($deviceType, $targetDevices, true)) {
-                    return false;
-                }
-
-                return true;
-            })
-            ->map(function (SmartAd $candidate) use ($contextTokens) {
-                return [
-                    'ad' => $candidate,
-                    'score' => $this->scoreSmartAd($candidate, $contextTokens),
-                    'tie' => random_int(0, 100000),
-                ];
-            })
-            ->sort(function (array $left, array $right) {
-                if ($left['score'] === $right['score']) {
-                    return $right['tie'] <=> $left['tie'];
-                }
-
-                return $right['score'] <=> $left['score'];
-            })
-            ->first()['ad'] ?? null;
+        if (!$isSelfFallback) {
+            $user->increment('pts', 1);
+            $user->increment('nsmart', 0.5);
+        }
 
         if (!$smartAd) {
-            $fallbackHtml = $this->renderSmartFallbackMarkup((int) $user_id, $slot);
+            $fallbackHtml = $this->renderSmartFallbackMarkup($publisherId, $slot);
 
             return $this->javascriptResponse('document.write("' . addslashes($fallbackHtml) . '");');
         }
 
         $placement = $slot['banner_size'] !== null && $smartAd->displayImage() !== null ? 'banner' : 'native';
 
-        if ($smartAd->user) {
+        if (!$isSelfFallback && $smartAd->user) {
             $smartAd->user->decrement('nsmart', 1);
         }
 
-        $smartAd->increment('impressions');
-        $this->logState($user_id, $smartAd->id, 'smart', $request);
-        $this->recordSmartImpression($smartAd->id, (int) $user_id, $visitorKey, $countryCode, $deviceType, $placement);
+        if (!$isSelfFallback) {
+            $smartAd->increment('impressions');
+            $this->logState($publisherId, $smartAd->id, 'smart', $request);
+            $this->recordSmartImpression($smartAd->id, $publisherId, $visitorKey, $countryCode, $deviceType, $placement);
+        }
 
-        $html = $this->renderSmartMarkup($smartAd, (int) $user_id, $placement, $slot['banner_size']);
+        $html = $this->renderSmartMarkup($smartAd, $publisherId, $placement, $slot['banner_size']);
 
         return $this->javascriptResponse('document.write("' . addslashes($html) . '");');
     }
@@ -361,6 +333,10 @@ class AdsServingController extends Controller
         $smartAd = SmartAd::find($smartAdId);
 
         if ($smartAd) {
+            if ((int) $smartAd->uid === (int) $publisherId) {
+                return redirect($smartAd->landing_url);
+            }
+
             $smartAd->increment('clicks');
 
             User::where('id', $publisherId)->increment('pts', 2);
@@ -371,6 +347,66 @@ class AdsServingController extends Controller
         }
 
         return redirect('/');
+    }
+
+    private function selectSmartAdCandidate(
+        int $publisherId,
+        string $countryCode,
+        string $deviceType,
+        array $contextTokens,
+        bool $selfOnly = false
+    ): ?SmartAd {
+        $requiresAdvertiserCredit = !$selfOnly;
+
+        return SmartAd::with('user')
+            ->where('statu', 1)
+            ->where('uid', $selfOnly ? '=' : '!=', $publisherId)
+            ->get()
+            ->filter(function (SmartAd $candidate) use ($countryCode, $deviceType, $requiresAdvertiserCredit) {
+                return $this->matchesSmartAdCandidate($candidate, $countryCode, $deviceType, $requiresAdvertiserCredit);
+            })
+            ->map(function (SmartAd $candidate) use ($contextTokens) {
+                return [
+                    'ad' => $candidate,
+                    'score' => $this->scoreSmartAd($candidate, $contextTokens),
+                    'tie' => random_int(0, 100000),
+                ];
+            })
+            ->sort(function (array $left, array $right) {
+                if ($left['score'] === $right['score']) {
+                    return $right['tie'] <=> $left['tie'];
+                }
+
+                return $right['score'] <=> $left['score'];
+            })
+            ->first()['ad'] ?? null;
+    }
+
+    private function matchesSmartAdCandidate(
+        SmartAd $candidate,
+        string $countryCode,
+        string $deviceType,
+        bool $requiresAdvertiserCredit = true
+    ): bool {
+        if (!$candidate->user) {
+            return false;
+        }
+
+        if ($requiresAdvertiserCredit && (float) $candidate->user->nsmart < 1) {
+            return false;
+        }
+
+        $targetCountries = $candidate->targetCountries();
+        if ($targetCountries !== [] && !in_array($countryCode, $targetCountries, true)) {
+            return false;
+        }
+
+        $targetDevices = $candidate->targetDevices();
+        if ($targetDevices !== [] && !in_array($deviceType, $targetDevices, true)) {
+            return false;
+        }
+
+        return true;
     }
 
     private function logState($sid, $pid, $type, $request)

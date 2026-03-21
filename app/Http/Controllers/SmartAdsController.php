@@ -101,9 +101,15 @@ class SmartAdsController extends Controller
         $user = Auth::user();
         $extensions_code = Option::where('o_type', 'extensions_code')->value('o_valuer');
         $embedCode = SmartAdEmbedCode::build(route('ads.smart.script'), $user->id, $extensions_code ?? '');
-        $previewCode = SmartAdEmbedCode::build(route('ads.smart.script'), $user->id);
+        $previewSmartAd = SmartAd::where('uid', $user->id)
+            ->where('statu', 1)
+            ->latest('id')
+            ->first();
+        $previewMarkup = $previewSmartAd
+            ? $this->renderPreviewMarkup($previewSmartAd, $user->id)
+            : null;
 
-        return view('theme::ads.smart.code', compact('user', 'embedCode', 'previewCode', 'extensions_code'));
+        return view('theme::ads.smart.code', compact('user', 'embedCode', 'previewMarkup', 'previewSmartAd', 'extensions_code'));
     }
 
     private function validatedPayload(Request $request): array
@@ -171,5 +177,22 @@ class SmartAdsController extends Controller
             'mobile' => __('messages.smart_device_mobile'),
             'tablet' => __('messages.smart_device_tablet'),
         ];
+    }
+
+    private function renderPreviewMarkup(SmartAd $smartAd, int $publisherId): string
+    {
+        $placement = $smartAd->displayImage() !== null ? 'banner' : 'native';
+        $viewName = $placement === 'banner'
+            ? 'theme::ads.serving.smart_banner'
+            : 'theme::ads.serving.smart_native';
+
+        return view($viewName, [
+            'smartAd' => $smartAd,
+            'publisherId' => $publisherId,
+            'bannerSize' => $placement === 'banner' ? '728x90' : null,
+            'clickUrl' => route('ads.redirect', ['ads' => $smartAd->id, 'vu' => $publisherId, 'type' => 'smart']),
+            'refUrl' => url('/') . '?ref=' . $publisherId,
+            'reportUrl' => url('/report') . '?smart_ad=' . $smartAd->id,
+        ])->render();
     }
 }

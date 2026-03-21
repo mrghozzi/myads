@@ -24,17 +24,28 @@
                 <div class="well" style="color: black;">
                     <textarea class="form-control" readonly onclick="this.select(); document.execCommand('copy');">{{ $embedCode }}</textarea>
                 </div>
+                <p style="margin: 14px 0 0; color: #5d6488; line-height: 1.7;">{{ __('messages.smart_code_live_behavior_note') }}</p>
             </div>
         </div>
 
         <div class="widget-box" style="margin-top: 24px;">
             <div class="widget-box-content">
                 <p class="widget-box-title">{{ __('messages.preview') }}</p>
-                <div style="margin-top: 16px; padding: 18px; border: 1px solid #e5e7eb; border-radius: 20px; background: linear-gradient(135deg, #f8fbff 0%, #ffffff 100%);">
-                    <div style="max-width: 760px; margin: 0 auto;">
-                        {!! $previewCode !!}
+                @if($previewMarkup)
+                    <div style="margin-top: 10px; color: #64748b; line-height: 1.7;">
+                        {{ $previewSmartAd->displayTitle() }}
                     </div>
-                </div>
+                    <div style="margin-top: 16px; padding: 18px; border: 1px solid #e5e7eb; border-radius: 20px; background: linear-gradient(135deg, #f8fbff 0%, #ffffff 100%);">
+                        <div style="max-width: 760px; margin: 0 auto;">
+                            {!! $previewMarkup !!}
+                        </div>
+                    </div>
+                @else
+                    <div style="margin-top: 16px; padding: 24px; border: 1px dashed #cbd5e1; border-radius: 20px; background: linear-gradient(135deg, #f8fbff 0%, #ffffff 100%); text-align: center;">
+                        <p style="margin: 0 0 8px; font-size: 1rem; font-weight: 700; color: #1f2937;">{{ __('messages.smart_code_preview_empty_title') }}</p>
+                        <p style="margin: 0; color: #64748b; line-height: 1.8;">{{ __('messages.smart_code_preview_empty_desc') }}</p>
+                    </div>
+                @endif
             </div>
         </div>
     </div>

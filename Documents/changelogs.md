@@ -1,3 +1,18 @@
+# v4.1.2
+> **Patch Release** - RTL, Smart Ads, and ad code fixes.
+
+### 🎨 UI & Responsive Fixes
+* **Fix**: Fixed a bug where the profile page (`/u/{username}`) content disappears to the far right on mobile devices when switching to RTL mode.
+
+### Smart Ads & Embed Code
+* **Fix**: Smart Ads code page (`/ads/smart/code`) now shows a direct built-in preview of the latest active owned smart ad instead of relying on the live loader response.
+* **Fix**: Smart ad serving (`smart.php`) now tries eligible ads from other members first, then falls back to the publisher's own smart ad when no external campaign matches.
+* **Fix**: Self-fallback smart ads no longer award points, consume `nsmart`, or record impression/click tracking when the publisher's own ad is shown as a fallback.
+* **Improvement**: Added clearer Smart Ads code page messaging and empty-state translations across all shipped languages.
+
+### Text Ads & Link Code
+* **Fix**: Responsive text ads served from `/l_code` now open ad clicks in a new browser tab.
+
 # v4.1.1
 > **Patch Release** - Store enhancements, UI, RTL, and translation fixes.
 
