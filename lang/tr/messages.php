@@ -887,4 +887,9 @@ return array (
     'product_reactivated'   => 'Ununuz yeniden etkinlestirildi.',
     'product_suspended_ok'  => 'Urun askiya alindi.',
     'product_unsuspended'   => 'Askiya alma kaldirildi.',
+    'publisher'             => 'Publisher',
+    'report_product'        => 'Report product',
+    'report_topic'          => 'Report topic',
+    'report_publisher'      => 'Report publisher',
+    'suggest_edit'          => 'Suggest edit',
 );

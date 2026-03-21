@@ -887,4 +887,9 @@ return array (
     'product_reactivated'   => 'O seu produto foi reativado.',
     'product_suspended_ok'  => 'Produto suspenso.',
     'product_unsuspended'   => 'Suspensao removida.',
+    'publisher'             => 'Publisher',
+    'report_product'        => 'Report product',
+    'report_topic'          => 'Report topic',
+    'report_publisher'      => 'Report publisher',
+    'suggest_edit'          => 'Suggest edit',
 );

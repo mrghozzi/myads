@@ -15,6 +15,13 @@
         <h2 class="section-title">{{ __('messages.market_categories') ?? 'Market Categories' }}</h2>
     </div>
 </div>
+
+@if(session('success'))
+    <div class="alert alert-success" role="alert">
+        <strong><i class="fa fa-check-circle" aria-hidden="true"></i></strong>&nbsp; {{ session('success') }}
+    </div>
+@endif
+
 <div class="grid grid-3-3-3 centered">
     <a class="product-category-box category-all{{ ($category ?? '') === 'script' ? ' active' : '' }}" href="{{ route('store.index', ['category' => 'script']) }}" style="background: url({{ theme_asset('img/banner/script.png') }}) no-repeat 100% 0,linear-gradient(90deg,#615dfa,#8d7aff);">
         <p class="product-category-box-title">{{ __('messages.script') }}</p>

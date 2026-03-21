@@ -886,4 +886,9 @@ return array (
     'product_reactivated'   => 'Ihr Produkt wurde wieder aktiviert.',
     'product_suspended_ok'  => 'Produkt gesperrt.',
     'product_unsuspended'   => 'Sperrung aufgehoben.',
+    'publisher'             => 'Publisher',
+    'report_product'        => 'Report product',
+    'report_topic'          => 'Report topic',
+    'report_publisher'      => 'Report publisher',
+    'suggest_edit'          => 'Suggest edit',
 );

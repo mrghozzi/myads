@@ -83,6 +83,11 @@
                                 $previewUrl = $target ? route('admin.smart_ads.edit', $target->id) : null;
                                 $targetTitle = $target?->displayTitle();
                                 $targetUser = $target?->user;
+                            } elseif ($report->s_type == 205) {
+                                $target = \App\Models\Option::where('o_type', 'knowledgebase')->find($report->tp_id);
+                                $previewUrl = $target ? route('kb.show', ['name' => $target->o_mode, 'article' => $target->name]) : null;
+                                $targetTitle = $target ? __('messages.knowledgebase') . ': ' . $target->name : null;
+                                $targetUser = ($target && (int) $target->o_parent > 0) ? \App\Models\User::find($target->o_parent) : null;
                             }
                         @endphp
                         <tr class="{{ $report->statu == 1 ? 'table-warning' : '' }}">

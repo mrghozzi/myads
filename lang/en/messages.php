@@ -1018,4 +1018,9 @@ return [
     'product_reactivated'   => 'Your product has been reactivated.',
     'product_suspended_ok'  => 'Product suspended.',
     'product_unsuspended'   => 'Product unsuspended.',
+    'publisher'             => 'Publisher',
+    'report_product'        => 'Report product',
+    'report_topic'          => 'Report topic',
+    'report_publisher'      => 'Report publisher',
+    'suggest_edit'          => 'Suggest edit',
 ];

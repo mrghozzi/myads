@@ -21,6 +21,14 @@
 * **Fix**: The product create page keeps the `SCEditor` experience on `textarea#editor1`, preserving rich content submission for the main topic body.
 * **Improvement**: Product update pages now show file version history inside a collapsible card instead of mixing it directly into the edit form.
 
+### Store Product & Knowledgebase Experience
+* **Improvement**: Rebuilt the store product page (`/store/{name}`) into a stronger product shell with clearer hierarchy, publisher summary, stat tiles, and a single actions menu.
+* **Add**: Product pages now support inline reporting for the product and its publisher, while owners and admins can manage the same page from the new actions menu.
+* **Fix**: Deleting a product from its detail page now redirects back to `/store` with a visible success flash, while the existing JSON delete response remains compatible with current JavaScript clients.
+* **Improvement**: Rebuilt the shared knowledgebase experience across `/kb/{name}`, `/kb/{name}:{article}`, `/edk/{name}:{article}`, `/pgk/{name}:{article}`, `/hkd/{name}:{article}`, and `/kb/{name}?st={name}` with a unified product-linked shell and clearer review/editor layouts.
+* **Add**: Knowledgebase topics now support inline reporting for the topic itself and for the current topic publisher, with guest-authored topics hiding publisher report actions automatically.
+* **Add**: Admin reports now recognize a dedicated Knowledgebase report type and link directly back to the current KB topic preview.
+
 # v4.1.1
 > **Patch Release** - Store enhancements, UI, RTL, and translation fixes.
 

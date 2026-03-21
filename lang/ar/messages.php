@@ -1000,4 +1000,9 @@ return [
     'product_reactivated'   => 'تم رفع التعليق عن منتجك.',
     'product_suspended_ok'  => 'تم تعليق المنتج.',
     'product_unsuspended'   => 'تم رفع التعليق عن المنتج.',
+    'publisher'             => 'الناشر',
+    'report_product'        => 'الإبلاغ عن المنتج',
+    'report_topic'          => 'الإبلاغ عن الموضوع',
+    'report_publisher'      => 'الإبلاغ عن الناشر',
+    'suggest_edit'          => 'اقتراح تعديل',
 ];

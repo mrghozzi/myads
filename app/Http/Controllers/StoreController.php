@@ -48,13 +48,29 @@ class StoreController extends Controller
     public function destroy(Request $request)
     {
         $id = $request->input('id');
-        if (!$id) return response()->json(['error' => 'Missing ID'], 400);
+        if (!$id) {
+            if ($request->expectsJson() || $request->wantsJson() || $request->ajax()) {
+                return response()->json(['error' => 'Missing ID'], 400);
+            }
+
+            abort(404);
+        }
 
         $product = Product::withoutGlobalScope('store')->where('o_type', 'store')->find($id);
-        if (!$product) return response()->json(['error' => 'Not found'], 404);
+        if (!$product) {
+            if ($request->expectsJson() || $request->wantsJson() || $request->ajax()) {
+                return response()->json(['error' => 'Not found'], 404);
+            }
+
+            abort(404);
+        }
 
         if ($product->o_parent != auth()->id() && !auth()->user()->isAdmin()) {
-            return response()->json(['error' => 'Unauthorized'], 403);
+            if ($request->expectsJson() || $request->wantsJson() || $request->ajax()) {
+                return response()->json(['error' => 'Unauthorized'], 403);
+            }
+
+            abort(403);
         }
 
         DB::transaction(function () use ($product, $id) {
@@ -68,7 +84,11 @@ class StoreController extends Controller
             $product->delete();
         });
 
-        return response()->json(['success' => true]);
+        if ($request->expectsJson() || $request->wantsJson() || $request->ajax()) {
+            return response()->json(['success' => true]);
+        }
+
+        return redirect()->route('store.index')->with('success', __('messages.product_deleted'));
     }
 
     public function show($name)
@@ -94,7 +114,9 @@ class StoreController extends Controller
             $downloadCount = Short::where('sh_type', 7867)->whereIn('tp_id', $fileIds)->sum('clik');
         }
         $files = ProductFile::where('o_parent', $product->id)->orderBy('id', 'desc')->get();
-        return view('theme::store.show', compact('product', 'status', 'type', 'topic', 'latestFile', 'downloadHash', 'downloadCount', 'files'));
+        $canManageProduct = Auth::check() && (Auth::id() == $product->o_parent || Auth::user()->isAdmin());
+
+        return view('theme::store.show', compact('product', 'status', 'type', 'topic', 'latestFile', 'downloadHash', 'downloadCount', 'files', 'canManageProduct'));
     }
 
     public function create()
@@ -449,6 +471,14 @@ class StoreController extends Controller
             ->selectRaw('name, COUNT(*) as total')
             ->groupBy('name')
             ->pluck('total', 'name');
+        $articleAuthorIds = $articles->pluck('o_parent')
+            ->filter(fn ($id) => (int) $id > 0)
+            ->unique()
+            ->values();
+        $articleAuthors = $articleAuthorIds->isEmpty()
+            ? collect()
+            : User::whereIn('id', $articleAuthorIds)->get()->keyBy('id');
+        $shellData = $this->buildKnowledgebaseShellData($product);
         $articleName = $request->query('st');
         if ($articleName) {
             $exists = Option::where('o_type', 'knowledgebase')
@@ -464,9 +494,10 @@ class StoreController extends Controller
                 'mode' => 'create',
                 'articles' => $articles,
                 'pendingCounts' => $pendingCounts,
+                'articleAuthors' => $articleAuthors,
                 'articleName' => $articleName,
                 'editorText' => old('txt'),
-            ]);
+            ] + $shellData);
         }
 
         return view('theme::store.knowledgebase', [
@@ -474,7 +505,8 @@ class StoreController extends Controller
             'mode' => 'list',
             'articles' => $articles,
             'pendingCounts' => $pendingCounts,
-        ]);
+            'articleAuthors' => $articleAuthors,
+        ] + $shellData);
     }
 
     public function knowledgebaseShow($name, $article)
@@ -490,13 +522,14 @@ class StoreController extends Controller
             ->where('name', $article)
             ->where('o_order', 1)
             ->count();
+        $shellData = $this->buildKnowledgebaseShellData($product, $kbArticle);
 
         return view('theme::store.knowledgebase', [
             'product' => $product,
             'mode' => 'show',
             'article' => $kbArticle,
             'pendingCount' => $pendingCount,
-        ]);
+        ] + $shellData);
     }
 
     public function knowledgebaseEdit($name, $article)
@@ -507,6 +540,7 @@ class StoreController extends Controller
             ->where('name', $article)
             ->where('o_order', 0)
             ->firstOrFail();
+        $shellData = $this->buildKnowledgebaseShellData($product, $kbArticle);
 
         return view('theme::store.knowledgebase', [
             'product' => $product,
@@ -514,7 +548,7 @@ class StoreController extends Controller
             'article' => $kbArticle,
             'articleName' => $kbArticle->name,
             'editorText' => old('txt', $kbArticle->o_valuer),
-        ]);
+        ] + $shellData);
     }
 
     public function knowledgebasePending($name, $article)
@@ -531,7 +565,8 @@ class StoreController extends Controller
             ->where('o_order', 1)
             ->orderBy('id')
             ->get();
-        $isAuthorized = Auth::check() && (Auth::id() == $product->o_parent || Auth::user()->isAdmin() || Auth::id() == $kbArticle->o_parent);
+        $shellData = $this->buildKnowledgebaseShellData($product, $kbArticle);
+        $isAuthorized = $shellData['canManageCurrentArticle'];
 
         return view('theme::store.knowledgebase', [
             'product' => $product,
@@ -539,7 +574,7 @@ class StoreController extends Controller
             'article' => $kbArticle,
             'entries' => $entries,
             'isAuthorized' => $isAuthorized,
-        ]);
+        ] + $shellData);
     }
 
     public function knowledgebaseHistory($name, $article)
@@ -556,7 +591,8 @@ class StoreController extends Controller
             ->where('o_order', 2)
             ->orderBy('id')
             ->get();
-        $isAuthorized = Auth::check() && (Auth::id() == $product->o_parent || Auth::user()->isAdmin() || Auth::id() == $kbArticle->o_parent);
+        $shellData = $this->buildKnowledgebaseShellData($product, $kbArticle);
+        $isAuthorized = $shellData['canManageCurrentArticle'];
 
         return view('theme::store.knowledgebase', [
             'product' => $product,
@@ -564,7 +600,7 @@ class StoreController extends Controller
             'article' => $kbArticle,
             'entries' => $entries,
             'isAuthorized' => $isAuthorized,
-        ]);
+        ] + $shellData);
     }
 
     public function knowledgebaseStore(Request $request)
@@ -693,6 +729,42 @@ class StoreController extends Controller
     <text x="20" y="22" font-family="monospace" font-size="20" fill="black" font-weight="bold">'.$text.'</text>
 </svg>';
         return response($svg, 200)->header('Content-Type', 'image/svg+xml');
+    }
+
+    private function buildKnowledgebaseShellData(Product $product, ?Option $article = null): array
+    {
+        return [
+            'articleTotal' => Option::where('o_type', 'knowledgebase')
+                ->where('o_mode', $product->name)
+                ->where('o_order', 0)
+                ->count(),
+            'pendingTotal' => Option::where('o_type', 'knowledgebase')
+                ->where('o_mode', $product->name)
+                ->where('o_order', 1)
+                ->count(),
+            'articleAuthor' => $this->resolveKnowledgebaseAuthor($article),
+            'canManageCurrentArticle' => $this->canManageKnowledgebase($product, $article),
+        ];
+    }
+
+    private function resolveKnowledgebaseAuthor(?Option $article): ?User
+    {
+        if (!$article || (int) $article->o_parent <= 0) {
+            return null;
+        }
+
+        return User::find($article->o_parent);
+    }
+
+    private function canManageKnowledgebase(Product $product, ?Option $article): bool
+    {
+        if (!Auth::check()) {
+            return false;
+        }
+
+        return Auth::id() == $product->o_parent
+            || Auth::user()->isAdmin()
+            || ($article && Auth::id() == $article->o_parent);
     }
 
     private function processDownload($product)

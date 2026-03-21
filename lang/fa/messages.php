@@ -887,4 +887,9 @@ return array (
     'product_reactivated'   => 'محصول شما مجدداً فعال شده است.',
     'product_suspended_ok'  => 'محصول تعلیق شد.',
     'product_unsuspended'   => 'تعلیق رفع شد.',
+    'publisher'             => 'Publisher',
+    'report_product'        => 'Report product',
+    'report_topic'          => 'Report topic',
+    'report_publisher'      => 'Report publisher',
+    'suggest_edit'          => 'Suggest edit',
 );
