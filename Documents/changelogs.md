@@ -13,6 +13,14 @@
 ### Text Ads & Link Code
 * **Fix**: Responsive text ads served from `/l_code` now open ad clicks in a new browser tab.
 
+### Store Editor & Product Flow
+* **Improvement**: Redesigned the store product create page (`/store/create`) and product update page (`/store/{name}/update`) into a clearer shared editor layout with stronger card hierarchy and a reusable file source picker.
+* **Improvement**: Store file delivery now uses a unified `ZIP Upload / Direct Link` switcher with a single `linkzip` submission contract, clearer upload feedback, and safer reusable frontend logic.
+* **Fix**: Product updates now redirect back to the product detail page after publishing instead of staying on the update form.
+* **Fix**: Product detail pages now surface success flash messages after creating or updating a store product.
+* **Fix**: The product create page keeps the `SCEditor` experience on `textarea#editor1`, preserving rich content submission for the main topic body.
+* **Improvement**: Product update pages now show file version history inside a collapsible card instead of mixing it directly into the edit form.
+
 # v4.1.1
 > **Patch Release** - Store enhancements, UI, RTL, and translation fixes.
 

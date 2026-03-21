@@ -43,6 +43,12 @@
     </div>
 </div>
 
+@if(session('success'))
+    <div class="alert alert-success" role="alert">
+        <strong><i class="fa fa-check-circle" aria-hidden="true"></i></strong>&nbsp; {{ session('success') }}
+    </div>
+@endif
+
 @include('theme::partials.ads', ['id' => 5])
 
 <div class="grid grid post{{ $status ? $status->id : $product->id }}">

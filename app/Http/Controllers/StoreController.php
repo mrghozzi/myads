@@ -332,13 +332,13 @@ class StoreController extends Controller
             $product->update(['o_order' => (int) $request->pts]);
         }
 
-        return redirect()->route('store.update', $product->name)->with('success', __('updated_successfully'));
+        return redirect()->route('store.show', $product->name)->with('success', __('updated_successfully'));
     }
 
     public function uploadZip(Request $request)
     {
         if (!$request->hasFile('fzip')) {
-            return response("<p style=\"color: #ff0000f7;border: 1px dashed #f00;\">".__('zipfile')."</p><input type=\"text\" style=\"visibility:hidden\" name=\"linkzip\" value=\"\" id=\"text\" required>");
+            return response($this->renderZipUploadFragment(null, __('zipfile')));
         }
 
         $request->validate([
@@ -348,7 +348,7 @@ class StoreController extends Controller
         $file = $request->file('fzip');
         $extension = $file->getClientOriginalExtension();
         if (strtolower($extension) !== 'zip') {
-            return response("<p style=\"color: #ff0000f7;border: 1px dashed #f00;\">".__('zipfile')."</p><input type=\"text\" style=\"visibility:hidden\" name=\"linkzip\" value=\"\" id=\"text\" required>");
+            return response($this->renderZipUploadFragment(null, __('zipfile')));
         }
 
         $filename = time() . '_' . Str::random(8) . '.' . $extension;
@@ -359,8 +359,19 @@ class StoreController extends Controller
         $file->move($destinationPath, $filename);
         $relativePath = 'upload/' . $filename;
         $displayName = $file->getClientOriginalName();
-        $html = '<img src="' . theme_asset('img/fzip.png') . '" />&nbsp;' . $displayName . "<br /><input type=\"text\" name=\"linkzip\" style=\"visibility:hidden\" value=\"" . $relativePath . "\" id=\"text\">";
-        return response($html);
+        return response($this->renderZipUploadFragment($relativePath, $displayName));
+    }
+
+    private function renderZipUploadFragment(?string $relativePath, string $displayName): string
+    {
+        if (!$relativePath) {
+            return '<div class="store-source-upload-result is-error" data-upload-error="1"><div><p class="store-source-upload-result__name">' . e($displayName) . '</p></div></div>';
+        }
+
+        return '<div class="store-source-upload-result" data-upload-path="' . e($relativePath) . '" data-upload-name="' . e($displayName) . '">' .
+            '<img src="' . e(theme_asset('img/fzip.png')) . '" alt="' . e(__('messages.file')) . '">' .
+            '<div><p class="store-source-upload-result__name">' . e($displayName) . '</p>' .
+            '<p class="store-source-upload-result__meta">' . e($relativePath) . '</p></div></div>';
     }
 
     public function verifyName(Request $request)
