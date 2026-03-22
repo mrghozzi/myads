@@ -1,4 +1,4 @@
-﻿@extends('theme::layouts.admin')
+@extends('theme::layouts.admin')
 
 @section('title', $mode === 'edit' ? __('messages.e_page') : __('messages.add_page'))
 

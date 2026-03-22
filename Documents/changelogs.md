@@ -4,6 +4,7 @@
 ### 🎨 UI & Responsive Fixes
 * **Fix**: Fixed a bug where the profile page (`/u/{username}`) content disappears to the far right on mobile devices when switching to RTL mode.
 * **Fix**: Resolved an infinite scrolling bug on Community, Directory, Forum, and Profile pages where the loader occasionally stopped fetching older posts.
+* **Fix**: Fixed an AJAX parsing error on infinite scroll and other API endpoints caused by UTF-8 BOM encodings in language files.
 
 ### Smart Ads & Embed Code
 * **Fix**: Smart Ads code page (`/ads/smart/code`) now shows a direct built-in preview of the latest active owned smart ad instead of relying on the live loader response.
