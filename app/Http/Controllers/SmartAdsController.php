@@ -10,6 +10,7 @@ use App\Support\SmartAdEmbedCode;
 use App\Support\SmartAdTargeting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class SmartAdsController extends Controller
 {
@@ -153,21 +154,79 @@ class SmartAdsController extends Controller
 
     private function buildSmartAdAttributes(int $userId, array $payload, array $analysis, ?SmartAd $existing = null): array
     {
+        $image = $this->fitOptionalUrlToCurrentColumnLength('image', ($payload['image'] ?? null) ?: null);
+        $sourceImage = $this->fitOptionalUrlToCurrentColumnLength(
+            'source_image',
+            trim((string) ($analysis['source_image'] ?? '')) ?: ($existing?->source_image ?: null)
+        );
+
         return [
             'uid' => $userId,
             'landing_url' => $payload['landing_url'],
             'headline_override' => ($payload['headline_override'] ?? null) ?: null,
             'description_override' => ($payload['description_override'] ?? null) ?: null,
-            'image' => ($payload['image'] ?? null) ?: null,
+            'image' => $image,
             'countries' => SmartAdTargeting::encodeList($payload['countries']),
             'devices' => SmartAdTargeting::encodeList($payload['devices']),
             'manual_keywords' => trim((string) ($payload['manual_keywords'] ?? '')) ?: null,
             'extracted_keywords' => trim((string) ($analysis['extracted_keywords'] ?? '')) ?: null,
             'source_title' => trim((string) ($analysis['source_title'] ?? '')) ?: ($existing?->source_title ?: null),
             'source_description' => trim((string) ($analysis['source_description'] ?? '')) ?: ($existing?->source_description ?: null),
-            'source_image' => trim((string) ($analysis['source_image'] ?? '')) ?: ($existing?->source_image ?: null),
+            'source_image' => $sourceImage,
             'statu' => $existing?->statu ?? 1,
         ];
+    }
+
+    private function fitOptionalUrlToCurrentColumnLength(string $column, ?string $value): ?string
+    {
+        $value = trim((string) ($value ?? ''));
+
+        if ($value === '') {
+            return null;
+        }
+
+        $maxLength = $this->smartAdsColumnLength($column);
+
+        if ($maxLength !== null && mb_strlen($value, 'UTF-8') > $maxLength) {
+            return null;
+        }
+
+        return $value;
+    }
+
+    private function smartAdsColumnLength(string $column): ?int
+    {
+        static $cache = [];
+
+        if (array_key_exists($column, $cache)) {
+            return $cache[$column];
+        }
+
+        if (!in_array($column, ['landing_url', 'image', 'source_image'], true)) {
+            return $cache[$column] = null;
+        }
+
+        try {
+            if (DB::connection()->getDriverName() !== 'mysql') {
+                return $cache[$column] = null;
+            }
+
+            $definition = DB::selectOne("SHOW COLUMNS FROM `smart_ads` LIKE '{$column}'");
+
+            if (!$definition || !isset($definition->Type)) {
+                return $cache[$column] = null;
+            }
+
+            $type = strtolower((string) $definition->Type);
+
+            if (preg_match('/varchar\((\d+)\)/', $type, $matches) === 1) {
+                return $cache[$column] = (int) $matches[1];
+            }
+        } catch (\Throwable) {
+            return $cache[$column] = null;
+        }
+
+        return $cache[$column] = null;
     }
 
     private function deviceOptions(): array
