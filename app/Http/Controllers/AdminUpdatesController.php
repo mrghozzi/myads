@@ -14,7 +14,7 @@ class AdminUpdatesController extends Controller
     /**
      * Current system version (hardcoded).
      */
-    public const CURRENT_VERSION = '4.1.1';
+    public const CURRENT_VERSION = '4.1.2';
 
     /**
      * GitHub repo for releases.

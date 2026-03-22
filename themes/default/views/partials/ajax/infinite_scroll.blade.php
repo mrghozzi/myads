@@ -49,6 +49,14 @@ document.addEventListener('DOMContentLoaded', function () {
             if (data.next_page_url) {
                 trigger.setAttribute('data-next-page', data.next_page_url);
                 isLoading = false; 
+                
+                // Force IntersectionObserver to re-evaluate visibility
+                // because if the fetched items don't push the trigger 
+                // out of the viewport, the observer won't fire again.
+                observer.unobserve(trigger);
+                setTimeout(() => {
+                    observer.observe(trigger);
+                }, 100);
             } else {
                 observer.unobserve(trigger);
                 trigger.remove();

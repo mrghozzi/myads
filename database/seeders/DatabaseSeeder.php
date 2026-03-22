@@ -72,7 +72,7 @@ class DatabaseSeeder extends Seeder
             if (!DB::table('options')->where('o_type', 'version')->exists()) {
                 DB::table('options')->insert([
                     'name' => 'version',
-                    'o_valuer' => '4.1.1',
+                    'o_valuer' => '4.1.2',
                     'o_type' => 'version',
                     'o_parent' => 0,
                     'o_order' => 0,
