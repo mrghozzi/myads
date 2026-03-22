@@ -11,6 +11,9 @@
     .myads-smart-banner {
         position: relative;
         width: {{ $width }}px;
+        max-width: 100%;
+        margin: 0 auto;
+        display: block;
         height: {{ $height }}px;
         overflow: hidden;
         border-radius: {{ $size === '300x250' ? '16px' : '10px' }};

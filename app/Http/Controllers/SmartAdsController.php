@@ -100,7 +100,7 @@ class SmartAdsController extends Controller
     {
         $user = Auth::user();
         $extensions_code = Option::where('o_type', 'extensions_code')->value('o_valuer');
-        $embedCode = SmartAdEmbedCode::build(route('ads.smart.script'), $user->id, $extensions_code ?? '');
+        $embedCode = SmartAdEmbedCode::build(route('ads.embed.smart'), $user->id, $extensions_code ?? '');
         $previewSmartAd = SmartAd::where('uid', $user->id)
             ->where('statu', 1)
             ->latest('id')

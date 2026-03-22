@@ -3,8 +3,12 @@
 @section('content')
 @php
     $scriptUrl = route('ads.link.script');
-    $fixedCode = \App\Support\LinkEmbedCode::buildDirect($scriptUrl, $user->id, '468x60', $extensions_code ?? '');
-    $responsiveCode = \App\Support\LinkEmbedCode::buildDirect($scriptUrl, $user->id, '510x320', $extensions_code ?? '');
+    $embedScriptUrl = route('ads.embed.link');
+    $fixedCode = \App\Support\LinkEmbedCode::build($embedScriptUrl, $user->id, '468x60', $extensions_code ?? '');
+    $responsiveCode = \App\Support\LinkEmbedCode::build($embedScriptUrl, $user->id, 'responsive', $extensions_code ?? '');
+    $responsive2Code = \App\Support\LinkEmbedCode::build($embedScriptUrl, $user->id, 'responsive2', $extensions_code ?? '');
+    $fixedFallbackCode = \App\Support\LinkEmbedCode::buildDirect($scriptUrl, $user->id, '468x60', $extensions_code ?? '');
+    $responsiveFallbackCode = \App\Support\LinkEmbedCode::buildDirect($scriptUrl, $user->id, '510x320', $extensions_code ?? '');
     $responsive2QuickCode = \App\Support\LinkEmbedCode::buildDirect($scriptUrl, $user->id, 'responsive2', $extensions_code ?? '');
     $responsive2SmartCode = \App\Support\LinkEmbedCode::buildResponsive2Smart($scriptUrl, $user->id, $extensions_code ?? '');
     $fixedPreview = \App\Support\LinkEmbedCode::buildDirect($scriptUrl, $user->id, '468x60');
@@ -16,6 +20,7 @@
             'label' => '468x60',
             'title' => __('messages.your_promotion_tags_size', ['size' => '468x60']) . ' (1 ' . __('messages.point') . ')',
             'code' => $fixedCode,
+            'fallback_code' => $fixedFallbackCode,
             'preview' => $fixedPreview,
         ],
         [
@@ -23,12 +28,14 @@
             'label' => __('messages.responsive'),
             'title' => __('messages.your_promotion_tags_size', ['size' => __('messages.responsive')]) . ' (1 ' . __('messages.point') . ')',
             'code' => $responsiveCode,
+            'fallback_code' => $responsiveFallbackCode,
             'preview' => $responsivePreview,
         ],
         [
             'key' => 'responsive2',
             'label' => 'Responsive 2',
             'title' => __('messages.your_promotion_tags_size', ['size' => 'Responsive 2']) . ' (1 ' . __('messages.point') . ')',
+            'code' => $responsive2Code,
             'quick_code' => $responsive2QuickCode,
             'smart_code' => $responsive2SmartCode,
             'preview' => $responsive2Preview,
@@ -106,6 +113,11 @@
                                     <textarea class="form-control" type="text" readonly onclick="this.select(); document.execCommand('copy');">{{ $tab['code'] }}</textarea>
                                 </div>
 
+                                <div class="well" style="color: black; margin-top: 16px;">
+                                    <p class="widget-box-title" style="margin-bottom: 12px;">{{ __('messages.quick_code') }}</p>
+                                    <textarea class="form-control" type="text" readonly onclick="this.select(); document.execCommand('copy');">{{ $tab['fallback_code'] }}</textarea>
+                                </div>
+
                                 <div class="tab-box-item-paragraph">
                                     <center>{!! $tab['preview'] !!}</center>
                                 </div>
@@ -115,6 +127,11 @@
                                 </p>
 
                                 <div style="display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));">
+                                    <div class="well" style="color: black; margin: 0;">
+                                        <p class="widget-box-title" style="margin-bottom: 12px;">{{ __('messages.recommended_smart_code') }}</p>
+                                        <textarea class="form-control" type="text" readonly onclick="this.select(); document.execCommand('copy');">{{ $tab['code'] }}</textarea>
+                                    </div>
+
                                     <div class="well" style="color: black; margin: 0;">
                                         <p class="widget-box-title" style="margin-bottom: 12px;">{{ __('messages.quick_code') }}</p>
                                         <textarea class="form-control" type="text" readonly onclick="this.select(); document.execCommand('copy');">{{ $tab['quick_code'] }}</textarea>

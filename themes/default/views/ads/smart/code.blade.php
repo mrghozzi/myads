@@ -17,14 +17,27 @@
 
 <div class="grid grid">
     <div class="grid-column">
+        @php
+            $recommendedCode = \App\Support\SmartAdEmbedCode::build(route('ads.embed.smart'), $user->id, $extensions_code ?? '');
+            $compatibleCode = \App\Support\SmartAdEmbedCode::buildInlineLoader(route('ads.smart.script'), $user->id, $extensions_code ?? '');
+        @endphp
         <div class="widget-box">
             <div class="widget-box-content">
                 <p class="widget-box-title">{{ __('messages.smart_code_recommended') }}</p>
                 <p style="margin: 10px 0 18px; color: #5d6488; line-height: 1.7;">{{ __('messages.smart_code_recommended_desc') }}</p>
                 <div class="well" style="color: black;">
-                    <textarea class="form-control" readonly onclick="this.select(); document.execCommand('copy');">{{ $embedCode }}</textarea>
+                    <textarea class="form-control" readonly onclick="this.select(); document.execCommand('copy');">{{ $recommendedCode }}</textarea>
                 </div>
                 <p style="margin: 14px 0 0; color: #5d6488; line-height: 1.7;">{{ __('messages.smart_code_live_behavior_note') }}</p>
+            </div>
+        </div>
+
+        <div class="widget-box" style="margin-top: 24px;">
+            <div class="widget-box-content">
+                <p class="widget-box-title">{{ __('messages.advanced_code') }}</p>
+                <div class="well" style="color: black;">
+                    <textarea class="form-control" readonly onclick="this.select(); document.execCommand('copy');">{{ $compatibleCode }}</textarea>
+                </div>
             </div>
         </div>
 

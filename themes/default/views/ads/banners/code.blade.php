@@ -73,6 +73,8 @@
                 ],
             ]
         );
+        $bannerEmbedUrl = route('ads.embed.banner');
+        $bannerServingUrl = route('ads.script');
     @endphp
 
     <style>
@@ -219,7 +221,8 @@
 
             <div class="tab-box-items">
               @foreach($advancedBannerCodeTabs as $index => $tab)
-              @php($embedCode = \App\Support\BannerEmbedCode::build(route('ads.script'), $user->id, $tab['value'], $extensions_code ?? ''))
+              @php($embedCode = \App\Support\BannerEmbedCode::build($bannerEmbedUrl, $user->id, $tab['value'], $extensions_code ?? ''))
+              @php($compatibleCode = \App\Support\BannerEmbedCode::buildInlineLoader($bannerServingUrl, $user->id, $tab['value'], $extensions_code ?? ''))
               <div class="tab-box-item" style="display: {{ $index === 0 ? 'block' : 'none' }};">
                 <div class="tab-box-item-content">
                   @if($tab['value'] === 'responsive2')
@@ -230,6 +233,10 @@
                     <hr />
                     <div class="well" style="color: black;">
                       <textarea class="form-control" type="text" readonly onclick="this.select(); document.execCommand('copy');">{{ $embedCode }}</textarea>
+                    </div>
+                    <div class="well" style="color: black; margin-top: 16px;">
+                      <p class="widget-box-title" style="margin-bottom: 12px;">{{ __('messages.advanced_code') }}</p>
+                      <textarea class="form-control" type="text" readonly onclick="this.select(); document.execCommand('copy');">{{ $compatibleCode }}</textarea>
                     </div>
                     <div class="myads-banner-code-preview myads-banner-code-preview--responsive2">
                       <div class="myads-banner-code-preview__header">
@@ -247,6 +254,10 @@
                     <hr />
                     <div class="well" style="color: black;">
                       <textarea class="form-control" type="text" readonly onclick="this.select(); document.execCommand('copy');">{{ $embedCode }}</textarea>
+                    </div>
+                    <div class="well" style="color: black; margin-top: 16px;">
+                      <p class="widget-box-title" style="margin-bottom: 12px;">{{ __('messages.advanced_code') }}</p>
+                      <textarea class="form-control" type="text" readonly onclick="this.select(); document.execCommand('copy');">{{ $compatibleCode }}</textarea>
                     </div>
                     <div class="tab-box-item-paragraph">
                       <center>{!! $embedCode !!}</center>

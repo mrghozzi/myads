@@ -23,6 +23,7 @@ class AdsServingController extends Controller
     public function bannerScript(Request $request)
     {
         $user_id = $request->query('ID');
+        $slotId = $this->normalizeSlotId($request->query('slot'));
         ['placement' => $placementMode, 'size' => $pxValue] = $this->resolveBannerPlacement($request);
 
         if (!$user_id || !is_numeric($user_id)) {
@@ -78,33 +79,19 @@ class AdsServingController extends Controller
             // Return JS to display banner (Matches old bn.php output style)
             $html = $this->renderBannerMarkup($banner, (int) $user_id, $pxValue, $placementMode);
 
-            return $this->javascriptResponse('document.write("' . addslashes($html) . '");');
-        } else {
-            $refUrl = url('/') . "?ref=" . $user_id;
-            $w_px = $this->getWidth($pxValue);
-            $h_px = $this->getHeight($pxValue);
-            $fallbackMap = [
-                '160x600' => ['w' => 160, 'h' => 600, 'path' => 'img/banner/160x600.gif'],
-                '300x250' => ['w' => 300, 'h' => 250, 'path' => 'img/banner/300x250.gif'],
-                '468x60' => ['w' => 468, 'h' => 60, 'path' => 'img/banner/468x60.gif'],
-                '728x90' => ['w' => 728, 'h' => 90, 'path' => 'img/banner/728x90.gif'],
-            ];
-            $fallbackAssets = [];
-            foreach ($fallbackMap as $key => $data) {
-                $fallbackAssets[$key] = ['w' => $data['w'], 'h' => $data['h'], 'src' => theme_asset($data['path'])];
-            }
-            $fallbackJson = json_encode($fallbackAssets);
-            $pxJson = json_encode($pxValue);
-            $fallbackValuesJson = json_encode(array_values($fallbackAssets));
-            $js = "(function(){var px={$pxJson};var map={$fallbackJson};var list={$fallbackValuesJson};var w=0,h=0;var size='';if(px&&/^[0-9]+x[0-9]+$/.test(px)&&map[px]){size=px;}if(!size){var frame=window.frameElement;if(frame){w=parseInt(frame.width||frame.clientWidth||frame.offsetWidth||0,10);h=parseInt(frame.height||frame.clientHeight||frame.offsetHeight||0,10);}if((!w||!h)&&document.currentScript&&document.currentScript.parentElement){var r=document.currentScript.parentElement.getBoundingClientRect();w=parseInt(r.width,10)||0;h=parseInt(r.height,10)||0;}}var picked=null;if(size&&map[size]){picked=map[size];}else if(w&&h){for(var key in map){if(map[key].w===w&&map[key].h===h){picked=map[key];break;}}}if(!picked&&map['{$pxValue}']){picked=map['{$pxValue}'];}if(!picked&&list.length){picked=list[0];}if(!picked){picked={w:{$w_px},h:{$h_px},src:''};}var html=\"<a href='{$refUrl}' target='_blank'><img src='\"+picked.src+\"' width='\"+picked.w+\"' height='\"+picked.h+\"' border='0'></a>\";document.write(html);})();";
-            return $this->javascriptResponse($js);
+            return $this->javascriptResponse($this->renderHtmlInsertionScript($html, $slotId));
         }
+
+        $fallbackHtml = $this->renderBannerFallbackMarkup((int) $user_id, $pxValue);
+
+        return $this->javascriptResponse($this->renderHtmlInsertionScript($fallbackHtml, $slotId));
     }
 
     // Public: Serve Link Script (link.php)
     public function linkScript(Request $request)
     {
         $user_id = $request->query('ID');
+        $slotId = $this->normalizeSlotId($request->query('slot'));
         $px = $request->query('px');
         $linkPlacement = $this->normalizeLinkPlacement($px);
 
@@ -213,13 +200,14 @@ class AdsServingController extends Controller
         // Strip newlines to avoid JS errors in document.write
         $html = str_replace(["\r", "\n"], ' ', $html);
         
-        return $this->javascriptResponse('document.write("' . addslashes($html) . '");');
+        return $this->javascriptResponse($this->renderHtmlInsertionScript($html, $slotId));
     }
 
     // Public: Serve Smart Ads Script (smart.php)
     public function smartScript(Request $request, SmartAdGeoResolver $geoResolver)
     {
         $user_id = $request->query('ID');
+        $slotId = $this->normalizeSlotId($request->query('slot'));
 
         if (!$user_id || !is_numeric($user_id)) {
             return $this->javascriptResponse('// Invalid User ID');
@@ -249,7 +237,7 @@ class AdsServingController extends Controller
         if (!$smartAd) {
             $fallbackHtml = $this->renderSmartFallbackMarkup($publisherId, $slot);
 
-            return $this->javascriptResponse('document.write("' . addslashes($fallbackHtml) . '");');
+            return $this->javascriptResponse($this->renderHtmlInsertionScript($fallbackHtml, $slotId));
         }
 
         $placement = $slot['banner_size'] !== null && $smartAd->displayImage() !== null ? 'banner' : 'native';
@@ -266,7 +254,22 @@ class AdsServingController extends Controller
 
         $html = $this->renderSmartMarkup($smartAd, $publisherId, $placement, $slot['banner_size']);
 
-        return $this->javascriptResponse('document.write("' . addslashes($html) . '");');
+        return $this->javascriptResponse($this->renderHtmlInsertionScript($html, $slotId));
+    }
+
+    public function bannerEmbedScript()
+    {
+        return $this->javascriptResponse($this->renderBannerEmbedLoaderScript());
+    }
+
+    public function linkEmbedScript()
+    {
+        return $this->javascriptResponse($this->renderLinkEmbedLoaderScript());
+    }
+
+    public function smartEmbedScript()
+    {
+        return $this->javascriptResponse($this->renderSmartEmbedLoaderScript());
     }
 
     // Public: Redirect/Track (show.php)
@@ -525,7 +528,7 @@ class AdsServingController extends Controller
         $bannerName = htmlspecialchars((string) $banner->name, ENT_QUOTES, 'UTF-8');
         $appName = htmlspecialchars((string) config('app.name'), ENT_QUOTES, 'UTF-8');
 
-        return "<style>.banner_{$bannerId}{background-image:url('{$banner->img}');height:{$height}px;width:{$width}px;background-size:cover;background-position:center;position:relative;overflow:hidden;}.banner_{$bannerId} .banner_click_{$bannerId}{position:absolute;inset:0;display:block;text-decoration:none;z-index:1;}.banner_icon_{$bannerId}{position:absolute;top:0;left:0;display:flex;gap:4px;padding:5px;z-index:2;background-color:rgba(0,0,0,0.5);}.banner_icon_{$bannerId} a{display:inline-flex;align-items:center;justify-content:center;height:auto;width:auto;text-decoration:none;}@media screen and (max-width: {$width}px){.banner_{$bannerId}{width:100%;}}</style><div class='banner_{$bannerId}'><a class='banner_click_{$bannerId}' href='{$clickUrl}' target='_blank' rel='noopener noreferrer' aria-label='{$bannerName}'></a><div class='banner_icon_{$bannerId}'><a href='{$refUrl}' target='_blank' rel='noopener noreferrer'><img src='" . theme_asset('img/logo_w.png') . "' width='16' height='16' alt='{$appName}'></a><a href='{$reportUrl}' target='_blank' rel='noopener noreferrer'><img src='" . theme_asset('img/Alert-icon.png') . "' alt='Report'></a></div></div>";
+        return "<style>.banner_{$bannerId}{background-image:url('{$banner->img}');height:{$height}px;width:{$width}px;max-width:100%;margin:0 auto;display:block;background-size:cover;background-position:center;position:relative;overflow:hidden;}.banner_{$bannerId} .banner_click_{$bannerId}{position:absolute;inset:0;display:block;text-decoration:none;z-index:1;}.banner_icon_{$bannerId}{position:absolute;top:0;left:0;display:flex;gap:4px;padding:5px;z-index:2;background-color:rgba(0,0,0,0.5);}.banner_icon_{$bannerId} a{display:inline-flex;align-items:center;justify-content:center;height:auto;width:auto;text-decoration:none;}@media screen and (max-width: {$width}px){.banner_{$bannerId}{width:100%;}}</style><div class='banner_{$bannerId}'><a class='banner_click_{$bannerId}' href='{$clickUrl}' target='_blank' rel='noopener noreferrer' aria-label='{$bannerName}'></a><div class='banner_icon_{$bannerId}'><a href='{$refUrl}' target='_blank' rel='noopener noreferrer'><img src='" . theme_asset('img/logo_w.png') . "' width='16' height='16' alt='{$appName}'></a><a href='{$reportUrl}' target='_blank' rel='noopener noreferrer'><img src='" . theme_asset('img/Alert-icon.png') . "' alt='Report'></a></div></div>";
     }
 
     private function renderResponsive2BannerMarkup(Banner $banner, int $publisherId, string $pxValue): string
@@ -577,7 +580,7 @@ class AdsServingController extends Controller
         $chipText = htmlspecialchars(__('messages.ads_by_site', ['site' => config('app.name')]), ENT_QUOTES, 'UTF-8');
         $reportLabel = htmlspecialchars(__('messages.report'), ENT_QUOTES, 'UTF-8');
 
-        return "<style>.{$class},.{$class} *{box-sizing:border-box;}.{$class}{position:relative;width:{$width}px;height:{$height}px;overflow:hidden;border-radius:{$radius}px;background:#f1f3f4 url('{$banner->img}') center/cover no-repeat;box-shadow:0 1px 3px rgba(18,24,40,.16);font-family:Arial,'Segoe UI',sans-serif;isolation:isolate;}.{$class}__click{position:absolute;inset:0;display:block;z-index:1;text-decoration:none;}.{$class}__chrome{position:absolute;top:0;right:0;z-index:3;display:flex;align-items:stretch;max-width:{$chipMaxWidth};border-radius:0 0 0 {$radius}px;overflow:hidden;box-shadow:0 1px 2px rgba(18,24,40,.18);}.{$class}__label,.{$class}__info{display:inline-flex;align-items:center;justify-content:center;height:{$labelHeight}px;background:rgba(255,255,255,.96);text-decoration:none;line-height:1;}.{$class}__label{max-width:calc(100% - {$infoWidth}px);padding:{$labelPadding};color:#202124;font-size:{$labelFontSize};font-weight:400;letter-spacing:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-inline-end:1px solid #dadce0;}.{$class}__label:hover,.{$class}__info:hover{background:#f8f9fa;text-decoration:none;}.{$class}__info{width:{$infoWidth}px;min-width:{$infoWidth}px;color:#5f6368;}.{$class}__info-mark{display:inline-flex;align-items:center;justify-content:center;width:" . ($profile === 'rail' ? 11 : 13) . "px;height:" . ($profile === 'rail' ? 11 : 13) . "px;border-radius:50%;border:1px solid #5f8def;color:#5f8def;font-size:" . ($profile === 'rail' ? '8px' : '9px') . ";font-weight:700;font-style:normal;font-family:Arial,'Segoe UI',sans-serif;}@media screen and (max-width: {$width}px){.{$class}{width:100%;}}</style><div class='{$class}' data-placement='responsive2' data-size='{$pxValue}' data-profile='{$profile}'><a class='{$class}__click' href='{$clickUrl}' target='_blank' rel='noopener noreferrer' aria-label='{$bannerName}'></a><div class='{$class}__chrome'><a class='{$class}__label' href='{$refUrl}' target='_blank' rel='noopener noreferrer'>{$chipText}</a><a class='{$class}__info' href='{$reportUrl}' target='_blank' rel='noopener noreferrer' aria-label='{$reportLabel}'><span class='{$class}__info-mark'>i</span></a></div></div>";
+        return "<style>.{$class},.{$class} *{box-sizing:border-box;}.{$class}{position:relative;width:{$width}px;height:{$height}px;max-width:100%;margin:0 auto;display:block;overflow:hidden;border-radius:{$radius}px;background:#f1f3f4 url('{$banner->img}') center/cover no-repeat;box-shadow:0 1px 3px rgba(18,24,40,.16);font-family:Arial,'Segoe UI',sans-serif;isolation:isolate;}.{$class}__click{position:absolute;inset:0;display:block;z-index:1;text-decoration:none;}.{$class}__chrome{position:absolute;top:0;right:0;z-index:3;display:flex;align-items:stretch;max-width:{$chipMaxWidth};border-radius:0 0 0 {$radius}px;overflow:hidden;box-shadow:0 1px 2px rgba(18,24,40,.18);}.{$class}__label,.{$class}__info{display:inline-flex;align-items:center;justify-content:center;height:{$labelHeight}px;background:rgba(255,255,255,.96);text-decoration:none;line-height:1;}.{$class}__label{max-width:calc(100% - {$infoWidth}px);padding:{$labelPadding};color:#202124;font-size:{$labelFontSize};font-weight:400;letter-spacing:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-inline-end:1px solid #dadce0;}.{$class}__label:hover,.{$class}__info:hover{background:#f8f9fa;text-decoration:none;}.{$class}__info{width:{$infoWidth}px;min-width:{$infoWidth}px;color:#5f6368;}.{$class}__info-mark{display:inline-flex;align-items:center;justify-content:center;width:" . ($profile === 'rail' ? 11 : 13) . "px;height:" . ($profile === 'rail' ? 11 : 13) . "px;border-radius:50%;border:1px solid #5f8def;color:#5f8def;font-size:" . ($profile === 'rail' ? '8px' : '9px') . ";font-weight:700;font-style:normal;font-family:Arial,'Segoe UI',sans-serif;}@media screen and (max-width: {$width}px){.{$class}{width:100%;}}</style><div class='{$class}' data-placement='responsive2' data-size='{$pxValue}' data-profile='{$profile}'><a class='{$class}__click' href='{$clickUrl}' target='_blank' rel='noopener noreferrer' aria-label='{$bannerName}'></a><div class='{$class}__chrome'><a class='{$class}__label' href='{$refUrl}' target='_blank' rel='noopener noreferrer'>{$chipText}</a><a class='{$class}__info' href='{$reportUrl}' target='_blank' rel='noopener noreferrer' aria-label='{$reportLabel}'><span class='{$class}__info-mark'>i</span></a></div></div>";
     }
 
     private function renderSmartMarkup(SmartAd $smartAd, int $publisherId, string $placement, ?string $bannerSize = null): string
@@ -598,6 +601,22 @@ class AdsServingController extends Controller
         return str_replace(["\r", "\n"], ' ', $html);
     }
 
+    private function renderBannerFallbackMarkup(int $publisherId, string $size): string
+    {
+        $fallbackMap = [
+            '160x600' => 'img/banner/160x600.gif',
+            '300x250' => 'img/banner/300x250.gif',
+            '468x60' => 'img/banner/468x60.gif',
+            '728x90' => 'img/banner/728x90.gif',
+        ];
+        $src = theme_asset($fallbackMap[$size] ?? 'img/banner/300x250.gif');
+        $width = $this->getWidth($size);
+        $height = $this->getHeight($size);
+        $refUrl = url('/') . '?ref=' . $publisherId;
+
+        return "<div style=\"display:block;width:{$width}px;max-width:100%;margin:0 auto;text-align:center;\"><a href='{$refUrl}' target='_blank' rel='noopener noreferrer'><img src='{$src}' width='{$width}' height='{$height}' border='0' style='display:block;max-width:100%;margin:0 auto;'></a></div>";
+    }
+
     private function renderSmartFallbackMarkup(int $publisherId, array $slot): string
     {
         if ($slot['banner_size'] !== null) {
@@ -610,7 +629,7 @@ class AdsServingController extends Controller
             ];
             $src = theme_asset($fallbackMap[$size] ?? 'img/banner/300x250.gif');
 
-            return "<a href='" . url('/') . "?ref={$publisherId}' target='_blank' rel='noopener noreferrer'><img src='{$src}' width='" . $this->getWidth($size) . "' height='" . $this->getHeight($size) . "' border='0'></a>";
+            return "<div style=\"width:" . $this->getWidth($size) . "px;max-width:100%;margin:0 auto;text-align:center;\"><a href='" . url('/') . "?ref={$publisherId}' target='_blank' rel='noopener noreferrer'><img src='{$src}' width='" . $this->getWidth($size) . "' height='" . $this->getHeight($size) . "' border='0' style='display:block;max-width:100%;margin:0 auto;'></a></div>";
         }
 
         $appName = htmlspecialchars((string) config('app.name'), ENT_QUOTES, 'UTF-8');
@@ -620,7 +639,92 @@ class AdsServingController extends Controller
         $headline = htmlspecialchars(__('messages.smart_fallback_headline', ['site' => config('app.name')]), ENT_QUOTES, 'UTF-8');
         $description = htmlspecialchars(__('messages.smart_fallback_description'), ENT_QUOTES, 'UTF-8');
 
-        return "<div style=\"box-sizing:border-box;max-width:420px;border:1px solid #e9edf5;border-radius:16px;background:#fff;padding:16px;font-family:Arial,'Segoe UI',sans-serif;box-shadow:0 12px 28px rgba(94,92,154,.08);\"><div style=\"display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;\"><span style=\"display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;background:#f4f7ff;color:#615dfa;font-size:10px;font-weight:700;text-transform:uppercase;\">{$adsByLabel}</span><a href='{$refUrl}' target='_blank' rel='noopener noreferrer' style='font-size:12px;color:#8f94b5;text-decoration:none;'>{$learnMoreLabel}</a></div><h3 style=\"margin:0 0 8px;color:#3e3f5e;font-size:18px;line-height:1.3;\">{$headline}</h3><p style=\"margin:0;color:#8f94b5;font-size:13px;line-height:1.7;\">{$description}</p></div>";
+        return "<div style=\"box-sizing:border-box;max-width:420px;margin:0 auto;border:1px solid #e9edf5;border-radius:16px;background:#fff;padding:16px;font-family:Arial,'Segoe UI',sans-serif;box-shadow:0 12px 28px rgba(94,92,154,.08);\"><div style=\"display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;\"><span style=\"display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;background:#f4f7ff;color:#615dfa;font-size:10px;font-weight:700;text-transform:uppercase;\">{$adsByLabel}</span><a href='{$refUrl}' target='_blank' rel='noopener noreferrer' style='font-size:12px;color:#8f94b5;text-decoration:none;'>{$learnMoreLabel}</a></div><h3 style=\"margin:0 0 8px;color:#3e3f5e;font-size:18px;line-height:1.3;\">{$headline}</h3><p style=\"margin:0;color:#8f94b5;font-size:13px;line-height:1.7;\">{$description}</p></div>";
+    }
+
+    private function normalizeSlotId($value): ?string
+    {
+        $normalized = trim((string) ($value ?? ''));
+
+        if ($normalized === '') {
+            return null;
+        }
+
+        return mb_substr($normalized, 0, 180);
+    }
+
+    private function renderHtmlInsertionScript(string $html, ?string $slotId = null): string
+    {
+        $htmlLiteral = $this->toJavaScriptLiteral($html);
+
+        return $this->renderSlotInsertionScript(<<<JS
+var html={$htmlLiteral};
+renderHtml(html);
+JS, $slotId);
+    }
+
+    private function renderSlotInsertionScript(string $body, ?string $slotId = null): string
+    {
+        $slotLiteral = $this->toJavaScriptLiteral($slotId);
+
+        return <<<JS
+(function(d){
+  var slotId={$slotLiteral};
+  function currentScript(){
+    return d.currentScript || document.currentScript || (function(){var scripts=d.getElementsByTagName('script');return scripts[scripts.length-1]||null;})();
+  }
+  function createTarget(anchor){
+    var node=d.createElement('div');
+    node.setAttribute('data-myads-slot','1');
+    if (anchor && anchor.parentNode && String(anchor.parentNode.tagName || '').toLowerCase() !== 'head') {
+      anchor.parentNode.insertBefore(node, anchor);
+      return node;
+    }
+    if (d.body) {
+      d.body.insertBefore(node, d.body.firstChild || null);
+      return node;
+    }
+    return null;
+  }
+  function resolveTarget(){
+    if (slotId) {
+      var byId=d.getElementById(slotId);
+      if (byId) {
+        return byId;
+      }
+    }
+    return createTarget(currentScript());
+  }
+  function renderHtml(html){
+    var target=resolveTarget();
+    if (!target) {
+      return;
+    }
+    target.innerHTML=html;
+  }
+  function boot(){
+{$body}
+  }
+  if (!d.body && (!slotId || !d.getElementById(slotId))) {
+    d.addEventListener('DOMContentLoaded', boot, false);
+    return;
+  }
+  boot();
+})(document);
+JS;
+    }
+
+    private function toJavaScriptLiteral($value): string
+    {
+        return json_encode(
+            $value,
+            JSON_UNESCAPED_SLASHES
+            | JSON_UNESCAPED_UNICODE
+            | JSON_HEX_TAG
+            | JSON_HEX_AMP
+            | JSON_HEX_APOS
+            | JSON_HEX_QUOT
+        );
     }
 
     private function javascriptResponse(string $content)
@@ -630,6 +734,442 @@ class AdsServingController extends Controller
             ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
             ->header('Pragma', 'no-cache')
             ->header('Expires', '0');
+    }
+
+    private function renderBannerEmbedLoaderScript(): string
+    {
+        $bootstrapUrl = route('ads.script');
+
+        return <<<JS
+(function(w,d){
+  var current = d.currentScript || document.currentScript || (function(){var scripts=d.getElementsByTagName('script');return scripts[scripts.length-1]||null;})();
+  function decode(value){
+    try {
+      return decodeURIComponent((value || '').replace(/\\+/g, ' '));
+    } catch (e) {
+      return value || '';
+    }
+  }
+  function getParams(script){
+    var params = {};
+    var src = script && script.src ? script.src : '';
+    var queryIndex = src.indexOf('?');
+    if (queryIndex === -1) {
+      return params;
+    }
+    src.slice(queryIndex + 1).split('&').forEach(function(part){
+      if (!part) {
+        return;
+      }
+      var pairIndex = part.indexOf('=');
+      var key = pairIndex === -1 ? decode(part) : decode(part.slice(0, pairIndex));
+      var value = pairIndex === -1 ? '' : decode(part.slice(pairIndex + 1));
+      params[key] = value;
+    });
+    return params;
+  }
+  function createSlot(script){
+    var slot=d.createElement('div');
+    slot.id='myads-slot-' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+    slot.setAttribute('data-myads-slot','1');
+    if (script && script.parentNode && String(script.parentNode.tagName || '').toLowerCase() !== 'head') {
+      script.parentNode.insertBefore(slot, script);
+      return slot;
+    }
+    if (d.body) {
+      d.body.insertBefore(slot, d.body.firstChild || null);
+      return slot;
+    }
+    return null;
+  }
+  function measureBox(node){
+    var width=0;
+    var height=0;
+    if (node && node.getBoundingClientRect) {
+      var rect=node.getBoundingClientRect();
+      width=Math.round(rect.width || 0);
+      height=Math.round(rect.height || 0);
+    }
+    if ((!width || !height) && node) {
+      width=width || parseInt(node.clientWidth || node.offsetWidth || 0, 10) || 0;
+      height=height || parseInt(node.clientHeight || node.offsetHeight || 0, 10) || 0;
+    }
+    var parent=node && node.parentNode ? node.parentNode : null;
+    if ((!width || !height) && parent && parent.getBoundingClientRect) {
+      var parentRect=parent.getBoundingClientRect();
+      width=width || Math.round(parentRect.width || 0);
+      height=height || Math.round(parentRect.height || 0);
+    }
+    if ((!width || !height) && parent) {
+      width=width || parseInt(parent.clientWidth || parent.offsetWidth || 0, 10) || 0;
+      height=height || parseInt(parent.clientHeight || parent.offsetHeight || 0, 10) || 0;
+    }
+    if (!width) {
+      width=parseInt(w.innerWidth || d.documentElement.clientWidth || 0, 10) || 0;
+    }
+    return {width: width, height: height};
+  }
+  function appendLoader(slot, src){
+    var loader=d.createElement('script');
+    loader.type='text/javascript';
+    loader.src=src;
+    if (slot && slot.parentNode) {
+      slot.parentNode.insertBefore(loader, slot.nextSibling || null);
+      return;
+    }
+    (d.body || d.head || d.documentElement).appendChild(loader);
+  }
+  function boot(){
+  var params = getParams(current);
+  var publisherId = params.ID || params.id || '';
+  var px = params.px || '';
+  if (!publisherId || !px) {
+    return;
+  }
+  var key='myads_banner_vt';
+  var vt='';
+  try {
+    vt = w.localStorage ? (w.localStorage.getItem(key) || '') : '';
+  } catch (e) {}
+  if (!vt) {
+    var cookieMatch = d.cookie.match(new RegExp('(?:^|; )' + key + '=([^;]*)'));
+    if (cookieMatch) {
+      vt = decodeURIComponent(cookieMatch[1]);
+    }
+  }
+  if (!vt) {
+    vt = 'vt-' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+    try {
+      if (w.localStorage) {
+        w.localStorage.setItem(key, vt);
+      }
+    } catch (e) {}
+    try {
+      d.cookie = key + '=' + encodeURIComponent(vt) + '; path=/; max-age=31536000; SameSite=Lax';
+    } catch (e) {}
+  }
+  var slot = createSlot(current);
+  if (!slot) {
+    return;
+  }
+  var metrics = measureBox(slot);
+  if (px === 'responsive') {
+    var width = metrics.width;
+    if (width >= 728) {
+      px = '728x90';
+    } else if (width >= 468) {
+      px = '468x60';
+    } else if (width >= 300) {
+      px = '300x250';
+    } else if (width >= 160) {
+      px = '160x600';
+    } else {
+      px = '300x250';
+    }
+  }
+  var src='{$bootstrapUrl}?ID=' + encodeURIComponent(publisherId) + '&px=' + encodeURIComponent(px);
+  if (px === 'responsive2') {
+    if (metrics.width > 0) {
+      src += '&cw=' + encodeURIComponent(metrics.width);
+    }
+    if (metrics.height > 0) {
+      src += '&ch=' + encodeURIComponent(metrics.height);
+    }
+  }
+  if (vt) {
+    src += '&vt=' + encodeURIComponent(vt);
+  }
+  src += '&slot=' + encodeURIComponent(slot.id);
+  appendLoader(slot, src);
+  }
+  if (d.body) {
+    boot();
+    return;
+  }
+  d.addEventListener('DOMContentLoaded', boot, false);
+})(window,document);
+JS;
+    }
+
+    private function renderLinkEmbedLoaderScript(): string
+    {
+        $bootstrapUrl = route('ads.link.script');
+
+        return <<<JS
+(function(w,d){
+  var current = d.currentScript || document.currentScript || (function(){var scripts=d.getElementsByTagName('script');return scripts[scripts.length-1]||null;})();
+  function decode(value){
+    try {
+      return decodeURIComponent((value || '').replace(/\\+/g, ' '));
+    } catch (e) {
+      return value || '';
+    }
+  }
+  function getParams(script){
+    var params = {};
+    var src = script && script.src ? script.src : '';
+    var queryIndex = src.indexOf('?');
+    if (queryIndex === -1) {
+      return params;
+    }
+    src.slice(queryIndex + 1).split('&').forEach(function(part){
+      if (!part) {
+        return;
+      }
+      var pairIndex = part.indexOf('=');
+      var key = pairIndex === -1 ? decode(part) : decode(part.slice(0, pairIndex));
+      var value = pairIndex === -1 ? '' : decode(part.slice(pairIndex + 1));
+      params[key] = value;
+    });
+    return params;
+  }
+  function createSlot(script){
+    var slot=d.createElement('div');
+    slot.id='myads-slot-' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+    slot.setAttribute('data-myads-slot','1');
+    if (script && script.parentNode && String(script.parentNode.tagName || '').toLowerCase() !== 'head') {
+      script.parentNode.insertBefore(slot, script);
+      return slot;
+    }
+    if (d.body) {
+      d.body.insertBefore(slot, d.body.firstChild || null);
+      return slot;
+    }
+    return null;
+  }
+  function measureBox(node){
+    var width=0;
+    if (node && node.getBoundingClientRect) {
+      width=Math.round(node.getBoundingClientRect().width || 0);
+    }
+    if (!width && node) {
+      width=parseInt(node.clientWidth || node.offsetWidth || 0, 10) || 0;
+    }
+    var parent=node && node.parentNode ? node.parentNode : null;
+    if (!width && parent && parent.getBoundingClientRect) {
+      width=Math.round(parent.getBoundingClientRect().width || 0) || 0;
+    }
+    if (!width && parent) {
+      width=parseInt(parent.clientWidth || parent.offsetWidth || 0, 10) || 0;
+    }
+    if (!width) {
+      width=parseInt(w.innerWidth || d.documentElement.clientWidth || 0, 10) || 0;
+    }
+    return {width: width};
+  }
+  function appendLoader(slot, src){
+    var loader=d.createElement('script');
+    loader.type='text/javascript';
+    loader.src=src;
+    if (slot && slot.parentNode) {
+      slot.parentNode.insertBefore(loader, slot.nextSibling || null);
+      return;
+    }
+    (d.body || d.head || d.documentElement).appendChild(loader);
+  }
+  function boot(){
+  var params = getParams(current);
+  var publisherId = params.ID || params.id || '';
+  var px = params.px || '';
+  if (!publisherId || !px) {
+    return;
+  }
+  var slot = createSlot(current);
+  if (!slot) {
+    return;
+  }
+  var src='{$bootstrapUrl}?ID=' + encodeURIComponent(publisherId) + '&px=' + encodeURIComponent(px);
+  if (px === 'responsive2') {
+    var width = measureBox(slot).width;
+    if (!width) {
+      width = parseInt(w.innerWidth || d.documentElement.clientWidth || 0, 10) || 0;
+    }
+    if (width > 0) {
+      src += '&cw=' + encodeURIComponent(width);
+    }
+  }
+  src += '&slot=' + encodeURIComponent(slot.id);
+  appendLoader(slot, src);
+  }
+  if (d.body) {
+    boot();
+    return;
+  }
+  d.addEventListener('DOMContentLoaded', boot, false);
+})(window,document);
+JS;
+    }
+
+    private function renderSmartEmbedLoaderScript(): string
+    {
+        $bootstrapUrl = route('ads.smart.script');
+
+        return <<<JS
+(function(w,d){
+  var current = d.currentScript || document.currentScript || (function(){var scripts=d.getElementsByTagName('script');return scripts[scripts.length-1]||null;})();
+  function decode(value){
+    try {
+      return decodeURIComponent((value || '').replace(/\\+/g, ' '));
+    } catch (e) {
+      return value || '';
+    }
+  }
+  function getParams(script){
+    var params = {};
+    var src = script && script.src ? script.src : '';
+    var queryIndex = src.indexOf('?');
+    if (queryIndex === -1) {
+      return params;
+    }
+    src.slice(queryIndex + 1).split('&').forEach(function(part){
+      if (!part) {
+        return;
+      }
+      var pairIndex = part.indexOf('=');
+      var key = pairIndex === -1 ? decode(part) : decode(part.slice(0, pairIndex));
+      var value = pairIndex === -1 ? '' : decode(part.slice(pairIndex + 1));
+      params[key] = value;
+    });
+    return params;
+  }
+  function createSlot(script){
+    var slot=d.createElement('div');
+    slot.id='myads-slot-' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+    slot.setAttribute('data-myads-slot','1');
+    if (script && script.parentNode && String(script.parentNode.tagName || '').toLowerCase() !== 'head') {
+      script.parentNode.insertBefore(slot, script);
+      return slot;
+    }
+    if (d.body) {
+      d.body.insertBefore(slot, d.body.firstChild || null);
+      return slot;
+    }
+    return null;
+  }
+  function measureBox(node){
+    var width=0;
+    var height=0;
+    if (node && node.getBoundingClientRect) {
+      var rect=node.getBoundingClientRect();
+      width=Math.round(rect.width || 0);
+      height=Math.round(rect.height || 0);
+    }
+    if ((!width || !height) && node) {
+      width=width || parseInt(node.clientWidth || node.offsetWidth || 0, 10) || 0;
+      height=height || parseInt(node.clientHeight || node.offsetHeight || 0, 10) || 0;
+    }
+    var parent=node && node.parentNode ? node.parentNode : null;
+    if ((!width || !height) && parent && parent.getBoundingClientRect) {
+      var parentRect=parent.getBoundingClientRect();
+      width=width || Math.round(parentRect.width || 0);
+      height=height || Math.round(parentRect.height || 0);
+    }
+    if ((!width || !height) && parent) {
+      width=width || parseInt(parent.clientWidth || parent.offsetWidth || 0, 10) || 0;
+      height=height || parseInt(parent.clientHeight || parent.offsetHeight || 0, 10) || 0;
+    }
+    if (!width) {
+      width=parseInt(w.innerWidth || d.documentElement.clientWidth || 0, 10) || 0;
+    }
+    return {width: width, height: height};
+  }
+  function appendLoader(slot, src){
+    var loader=d.createElement('script');
+    loader.type='text/javascript';
+    loader.src=src;
+    if (slot && slot.parentNode) {
+      slot.parentNode.insertBefore(loader, slot.nextSibling || null);
+      return;
+    }
+    (d.body || d.head || d.documentElement).appendChild(loader);
+  }
+  function boot(){
+  var params = getParams(current);
+  var publisherId = params.ID || params.id || '';
+  if (!publisherId) {
+    return;
+  }
+  var key='myads_smart_vt';
+  var vt='';
+  try {
+    vt = w.localStorage ? (w.localStorage.getItem(key) || '') : '';
+  } catch (e) {}
+  if (!vt) {
+    var cookieMatch = d.cookie.match(new RegExp('(?:^|; )' + key + '=([^;]*)'));
+    if (cookieMatch) {
+      vt = decodeURIComponent(cookieMatch[1]);
+    }
+  }
+  if (!vt) {
+    vt = 'vt-' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+    try {
+      if (w.localStorage) {
+        w.localStorage.setItem(key, vt);
+      }
+    } catch (e) {}
+    try {
+      d.cookie = key + '=' + encodeURIComponent(vt) + '; path=/; max-age=31536000; SameSite=Lax';
+    } catch (e) {}
+  }
+  var slot = createSlot(current);
+  if (!slot) {
+    return;
+  }
+  var metrics = measureBox(slot);
+  var width = metrics.width;
+  var height = metrics.height;
+  var ua = (navigator.userAgent || '').toLowerCase();
+  var isTablet = /(ipad|tablet|playbook|silk)|(android(?!.*mobile))/i.test(ua);
+  var isMobile = !isTablet && /(iphone|ipod|android|mobile)/i.test(ua);
+  var deviceType = isTablet ? 'tablet' : (isMobile ? 'mobile' : 'desktop');
+  function readMeta(name, attr) {
+    var node = d.querySelector('meta[' + attr + '="' + name + '"]');
+    return node ? (node.getAttribute('content') || '') : '';
+  }
+  function normalizeText(value) {
+    return (value || '').replace(/\\s+/g, ' ').trim();
+  }
+  var contextParts = [];
+  contextParts.push(normalizeText(d.title || ''));
+  contextParts.push(normalizeText(readMeta('keywords', 'name')));
+  contextParts.push(normalizeText(readMeta('description', 'name')));
+  contextParts.push(normalizeText(readMeta('og:title', 'property')));
+  contextParts.push(normalizeText(readMeta('og:description', 'property')));
+  var heading = d.querySelector('h1, h2, h3');
+  if (heading) {
+    contextParts.push(normalizeText(heading.textContent || ''));
+  }
+  var article = d.querySelector('article, main, [role="main"], .content, .post, .entry, body');
+  if (article) {
+    contextParts.push(normalizeText((article.textContent || '').slice(0, 320)));
+  }
+  var context = normalizeText(contextParts.filter(Boolean).join(' | ')).slice(0, 500);
+  var src='{$bootstrapUrl}?ID=' + encodeURIComponent(publisherId);
+  if (vt) {
+    src += '&vt=' + encodeURIComponent(vt);
+  }
+  if (width > 0) {
+    src += '&cw=' + encodeURIComponent(width);
+  }
+  if (height > 0) {
+    src += '&ch=' + encodeURIComponent(height);
+  }
+  if (deviceType) {
+    src += '&dv=' + encodeURIComponent(deviceType);
+  }
+  if (context) {
+    src += '&ctx=' + encodeURIComponent(context);
+  }
+  src += '&slot=' + encodeURIComponent(slot.id);
+  appendLoader(slot, src);
+  }
+  if (d.body) {
+    boot();
+    return;
+  }
+  d.addEventListener('DOMContentLoaded', boot, false);
+})(window,document);
+JS;
     }
 
     // Helper for dimensions

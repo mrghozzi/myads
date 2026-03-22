@@ -4,7 +4,10 @@
         box-sizing: border-box;
     }
     .myads-smart-native {
+        display: block;
+        width: 100%;
         max-width: 420px;
+        margin: 0 auto;
         border: 1px solid #e6ecff;
         border-radius: 20px;
         background: #fff;

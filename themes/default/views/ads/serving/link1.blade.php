@@ -1,4 +1,4 @@
-<div>
+<div style="display:block;width:468px;max-width:100%;margin:0 auto;">
     <table width='468' width2='234' height='60' cellspacing='1' cellpadding='0' border='0' bgcolor='#0099ff' style='background-color:#0099ff'>
         <tr>
             <td>

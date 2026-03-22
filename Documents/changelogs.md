@@ -1,3 +1,17 @@
+# v4.1.3
+> **Patch Release** - Embed delivery, XAMPP routing, and Smart Ads reliability fixes.
+
+### Smart Ads & Embed Delivery
+* **Fix**: Root `.htaccess` now preserves dynamic Laravel embed endpoints such as `/embed/smart.js`, `/embed/banner.js`, and `/embed/link.js` under XAMPP and subdirectory installs, preventing Apache `404` errors before requests reach Laravel.
+* **Fix**: Smart, banner, and link short-code loaders now use safer slot-based injection instead of chained `document.write` calls, improving compatibility when ads are embedded on external websites.
+* **Fix**: Legacy ad-serving endpoints (`bn.php`, `link.php`, and `smart.php`) now support safer targeted rendering near the copied embed script without changing their public URLs.
+* **Improvement**: Smart Ads code pages continue to expose the same public snippets while generating more reliable loader behavior behind the scenes.
+
+### Smart Ads Metadata & Display
+* **Fix**: Smart ad analysis now normalizes UTF-8 metadata more safely for Arabic and other non-Latin landing pages that declare charset inside HTML meta tags.
+* **Fix**: Long Smart Ads URL fields and extracted source images are now handled more safely, reducing save-time failures on very long landing-page metadata.
+* **Improvement**: Banner, link, smart, and fallback ad output now keeps centered placement more consistently across third-party websites.
+
 # v4.1.2
 > **Patch Release** - RTL, Smart Ads, and ad code fixes.
 

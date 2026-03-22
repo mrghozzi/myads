@@ -163,6 +163,9 @@ Route::middleware(['auth'])->group(function () {
 Route::get('/bn.php', [AdsServingController::class, 'bannerScript'])->name('ads.script');
 Route::get('/link.php', [AdsServingController::class, 'linkScript'])->name('ads.link.script');
 Route::get('/smart.php', [AdsServingController::class, 'smartScript'])->name('ads.smart.script');
+Route::get('/embed/banner.js', [AdsServingController::class, 'bannerEmbedScript'])->name('ads.embed.banner');
+Route::get('/embed/link.js', [AdsServingController::class, 'linkEmbedScript'])->name('ads.embed.link');
+Route::get('/embed/smart.js', [AdsServingController::class, 'smartEmbedScript'])->name('ads.embed.smart');
 Route::get('/show.php', [AdsServingController::class, 'redirect'])->name('ads.redirect');
 Route::get('/ads/redirect', [AdsServingController::class, 'redirect']); // Alias
 
