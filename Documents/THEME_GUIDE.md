@@ -12,6 +12,8 @@ A standard theme directory looks like this:
 ```text
 themes/
 └── default/
+    ├── theme.json         # Theme metadata (JSON format)
+    ├── screenshot.png     # Theme preview image (recommended)
     ├── css/               # Compiled CSS or raw CSS
     ├── js/                # JS scripts
     ├── img/               # Theme images and icons
@@ -23,7 +25,35 @@ themes/
         ├── profile/       # User profiles
         ├── forum/         # Forum pages
         └── directory/     # Site directory pages
+    └── assets/            # (Optional) Source assets for public distribution
 ```
+
+## Theme Metadata: `theme.json`
+
+Every theme SHOULD have a `theme.json` file in its root directory for proper identification and versioning.
+
+```json
+{
+    "name": "Default Theme",
+    "slug": "default",
+    "version": "1.0.0",
+    "author": "MyAds Core",
+    "description": "The default starter theme for MyAds.",
+    "thumbnail": "screenshot.png",
+    "latest": "https://github.com/mrghozzi/myads-theme-default/releases/latest",
+    "min_myads": "4.2.0"
+}
+```
+
+### Properties:
+- `name`: Display name of the theme.
+- `slug`: Unique identifier (should match the folder name).
+- `version`: Current version string.
+- `author`: Author name.
+- `description`: A brief summary of the theme.
+- `thumbnail`: (Optional) Filename of the preview image. Fallback: `screenshot.png`.
+- `latest`: (Optional) GitHub release URL for automatic update checks and changelog display.
+- `min_myads`: (Optional) Minimum compatible MyAds version (e.g., "4.2.0").
 
 ## How Templates Work
 

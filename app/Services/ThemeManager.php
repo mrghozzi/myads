@@ -6,6 +6,9 @@ use Illuminate\Support\Facades\File;
 use App\Models\Setting;
 use Illuminate\Support\Facades\Log;
 
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Cache;
+
 class ThemeManager
 {
     protected $themePath;
@@ -39,12 +42,22 @@ class ThemeManager
                 if ($themeData) {
                     $themeData['directory'] = basename($directory);
                     $themeData['path'] = $directory;
+                    $themeData['latest_url'] = $themeData['latest'] ?? null;
+                    $themeData['min_myads'] = $themeData['min_myads'] ?? null;
                     
-                    // Add preview image path if exists
-                    $screenshotPath = $directory . '/screenshot.png';
-                    $themeData['screenshot'] = File::exists($screenshotPath) 
-                        ? asset('themes/' . basename($directory) . '/screenshot.png') 
-                        : null;
+                    // Determine thumbnail filename
+                    if (!isset($themeData['thumbnail'])) {
+                        $screenshotPath = $directory . '/screenshot.png';
+                        if (File::exists($screenshotPath)) {
+                            $themeData['thumbnail'] = 'screenshot.png';
+                        }
+                    }
+
+                    if (isset($themeData['thumbnail']) && File::exists($directory . '/' . $themeData['thumbnail'])) {
+                        $themeData['screenshot'] = route('admin.themes.thumbnail', $themeData['slug']);
+                    } else {
+                        $themeData['screenshot'] = null;
+                    }
 
                     $themeData['is_active'] = ($themeData['slug'] === $activeThemeSlug);
                     
@@ -82,13 +95,87 @@ class ThemeManager
             return false;
         }
 
-        $setting = Setting::first();
+        $setting = \App\Models\Setting::first();
         if ($setting) {
             $setting->update(['styles' => $slug]);
             return true;
         }
 
         return false;
+    }
+
+    /**
+     * Check for updates for all themes.
+     */
+    public function checkForUpdates()
+    {
+        return Cache::remember('theme_updates', 3600, function () {
+            $updates = [];
+            $themes = $this->getAllThemes();
+
+            foreach ($themes as $theme) {
+                $updateUrl = $theme['latest_url'] ?? $theme['update_url'] ?? null;
+                
+                if ($updateUrl && filter_var($updateUrl, FILTER_VALIDATE_URL)) {
+                    try {
+                        // Handle GitHub Latest Release URL
+                        if (preg_match('/github\.com\/([^\/]+)\/([^\/]+)\/releases\/latest/i', $updateUrl, $matches)) {
+                            $owner = $matches[1];
+                            $repo = $matches[2];
+                            $apiUrl = "https://api.github.com/repos/{$owner}/{$repo}/releases/latest";
+                            
+                            $response = Http::withHeaders(['User-Agent' => 'MyAds-Theme-Manager'])
+                                           ->timeout(5)
+                                           ->get($apiUrl);
+                            
+                            if ($response->successful()) {
+                                $remoteData = $response->json();
+                                $remoteVersion = ltrim($remoteData['tag_name'], 'v');
+                                
+                                if (version_compare($remoteVersion, $theme['version'], '>')) {
+                                    $updates[$theme['slug']] = [
+                                        'new_version' => $remoteVersion,
+                                        'download_url' => $remoteData['zipball_url'] ?? '',
+                                        'changelog' => $remoteData['body'] ?? '',
+                                        'github_url' => $remoteData['html_url'] ?? '',
+                                    ];
+                                }
+                            }
+                        } else {
+                            // Standard JSON update check
+                            $response = Http::timeout(5)->get($updateUrl);
+                            if ($response->successful()) {
+                                $remoteData = $response->json();
+                                if (isset($remoteData['version']) && version_compare($remoteData['version'], $theme['version'], '>')) {
+                                    $updates[$theme['slug']] = [
+                                        'new_version' => $remoteData['version'],
+                                        'download_url' => $remoteData['download_url'] ?? '',
+                                        'changelog' => $remoteData['changelog'] ?? '',
+                                    ];
+                                }
+                            }
+                        }
+                    } catch (\Exception $e) {
+                        Log::error("Failed to check updates for theme {$theme['slug']}: " . $e->getMessage());
+                    }
+                }
+            }
+            return $updates;
+        });
+    }
+
+    public function delete($slug)
+    {
+        $themeDir = $this->findDirectoryBySlug($slug);
+        if (!$themeDir) return false;
+
+        $activeThemeSlug = \App\Models\Setting::first()->styles ?? 'default';
+        if ($slug === $activeThemeSlug) {
+            return "Cannot delete the active theme. Please switch to another theme first.";
+        }
+
+        $path = $this->themePath . '/' . $themeDir;
+        return File::deleteDirectory($path);
     }
 
     /**

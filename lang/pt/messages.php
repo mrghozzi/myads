@@ -892,4 +892,7 @@ return array (
     'report_topic'          => 'Report topic',
     'report_publisher'      => 'Report publisher',
     'suggest_edit'          => 'Suggest edit',
+    'view_changelog'        => 'Ver o changelog',
+    'changelog'             => 'Registro de alterações',
+    'delete_active_warning' => 'Impossível excluir enquanto estiver ativo. Desative primeiro.',
 );

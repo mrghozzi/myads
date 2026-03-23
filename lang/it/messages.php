@@ -889,4 +889,7 @@ return array (
     'report_topic'          => 'Report topic',
     'report_publisher'      => 'Report publisher',
     'suggest_edit'          => 'Suggest edit',
+    'view_changelog'        => 'Visualizza changelog',
+    'changelog'             => 'Changelog',
+    'delete_active_warning' => 'Impossibile eliminare quando attivo. Disattiva prima.',
 );

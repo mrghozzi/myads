@@ -48,9 +48,13 @@
                             @foreach($plugins as $plugin)
                             <tr>
                                 <td>
-                                    <div class="avatar-text bg-soft-primary text-primary rounded">
-                                        {{ strtoupper(substr($plugin['name'], 0, 1)) }}
-                                    </div>
+                                    @if($plugin['thumbnail'])
+                                        <img src="{{ route('admin.plugins.thumbnail', $plugin['slug']) }}" class="rounded" style="width: 40px; height: 40px; object-fit: cover;" alt="{{ $plugin['name'] }}">
+                                    @else
+                                        <div class="avatar-text bg-soft-primary text-primary rounded">
+                                            {{ strtoupper(substr($plugin['name'], 0, 1)) }}
+                                        </div>
+                                    @endif
                                 </td>
                                 <td>
                                     <div class="fw-bold">{{ $plugin['name'] }}</div>
@@ -107,7 +111,12 @@
                                         </button>
 
                                         @if(isset($updates[$plugin['slug']]))
-                                            <form action="{{ route('admin.plugins.upgrade') }}" method="POST" class="d-inline">
+                                            @if(isset($updates[$plugin['slug']]['changelog']))
+                                                <button type="button" class="btn btn-sm btn-soft-primary" data-bs-toggle="modal" data-bs-target="#changelogModal{{ $loop->index }}" title="{{ __('messages.view_changelog') }}">
+                                                    <i class="feather-info"></i>
+                                                </button>
+                                            @endif
+                                            <form action="{{ route('admin.plugins.upgrade') }}" method="POST" class="d-inline" onsubmit="return confirm('{{ __('messages.confirm_upgrade_plugin') ?? 'Are you sure you want to upgrade this plugin?' }}')">
                                                 @csrf
                                                 <input type="hidden" name="slug" value="{{ $plugin['slug'] }}">
                                                 <button type="submit" class="btn btn-sm btn-soft-info" title="{{ __('messages.update_now') }}">
@@ -191,6 +200,40 @@
             </div>
         </div>
     </div>
+
+    @if(isset($updates[$plugin['slug']]) && isset($updates[$plugin['slug']]['changelog']))
+    <!-- Changelog Modal -->
+    <div class="modal fade" id="changelogModal{{ $loop->index }}" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">{{ __('messages.changelog') ?? 'Changelog' }} - {{ $plugin['name'] }}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="bg-light p-4 rounded border">
+                        <pre style="white-space: pre-wrap; font-family: inherit; margin-bottom: 0;">{{ $updates[$plugin['slug']]['changelog'] }}</pre>
+                    </div>
+                    @if(isset($updates[$plugin['slug']]['github_url']))
+                        <div class="mt-3 text-center">
+                            <a href="{{ $updates[$plugin['slug']]['github_url'] }}" target="_blank" class="btn btn-sm btn-link">
+                                <i class="feather-github me-1"></i> {{ __('messages.view_on_github') ?? 'View on GitHub' }}
+                            </a>
+                        </div>
+                    @endif
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('messages.close') }}</button>
+                    <form action="{{ route('admin.plugins.upgrade') }}" method="POST" class="d-inline">
+                        @csrf
+                        <input type="hidden" name="slug" value="{{ $plugin['slug'] }}">
+                        <button type="submit" class="btn btn-primary">{{ __('messages.update_now') }}</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
     @endforeach
 @endif
 

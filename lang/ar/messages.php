@@ -1005,4 +1005,7 @@ return [
     'report_topic'          => 'الإبلاغ عن الموضوع',
     'report_publisher'      => 'الإبلاغ عن الناشر',
     'suggest_edit'          => 'اقتراح تعديل',
+    'view_changelog'        => 'عرض سجل التغييرات',
+    'changelog'             => 'سجل التغييرات',
+    'delete_active_warning' => 'لا يمكن الحذف أثناء التفعيل. يرجى إلغاء التفعيل أولاً.',
 ];

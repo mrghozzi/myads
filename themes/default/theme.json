@@ -3,5 +3,7 @@
     "slug": "default",
     "version": "1.0.0",
     "author": "MyAds Core",
-    "description": "The default starter theme for MyAds."
+    "description": "The default starter theme for MyAds.",
+    "thumbnail": "screenshot.png",
+    "min_myads": "4.2.0"
 }

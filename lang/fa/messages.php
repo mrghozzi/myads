@@ -892,4 +892,7 @@ return array (
     'report_topic'          => 'Report topic',
     'report_publisher'      => 'Report publisher',
     'suggest_edit'          => 'Suggest edit',
+    'view_changelog'        => 'مشاهده سجل تغییرات',
+    'changelog'             => 'سجل تغییرات',
+    'delete_active_warning' => 'امکان حذف در هنگام فعال بودن وجود ندارد. لطفاً ابتدا غیرفعال کنید.',
 );

@@ -1023,4 +1023,7 @@ return [
     'report_topic'          => 'Report topic',
     'report_publisher'      => 'Report publisher',
     'suggest_edit'          => 'Suggest edit',
+    'view_changelog'        => 'View Changelog',
+    'changelog'             => 'Changelog',
+    'delete_active_warning' => 'Cannot delete while active. Please deactivate first.',
 ];

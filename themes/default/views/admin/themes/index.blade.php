@@ -37,11 +37,17 @@
                             </div>
                         @endif
                         
-                        @if($theme['is_active'])
-                            <div class="position-absolute top-0 end-0 m-2">
+                        <div class="position-absolute top-0 end-0 m-2 d-flex flex-column gap-1 align-items-end">
+                            @if($theme['is_active'])
                                 <span class="badge bg-primary">{{ __('messages.active') }}</span>
-                            </div>
-                        @endif
+                            @endif
+                            @if(isset($updates[$theme['slug']]))
+                                <span class="badge bg-warning text-dark border border-dark">
+                                    <i class="feather-arrow-up-circle me-1"></i>
+                                    {{ __('messages.update_available') ?? 'Update Available' }}
+                                </span>
+                            @endif
+                        </div>
                     </div>
                     
                     <div class="card-body d-flex flex-column">
@@ -53,19 +59,29 @@
                         <div class="mt-3 d-flex justify-content-between align-items-center">
                             <small class="text-muted">{{ __('messages.by') }} {{ $theme['author'] ?? 'Unknown' }}</small>
                             
-                            @if(!$theme['is_active'])
-                                <form action="{{ route('admin.themes.activate') }}" method="POST">
-                                    @csrf
-                                    <input type="hidden" name="slug" value="{{ $theme['slug'] }}">
-                                    <button type="submit" class="btn btn-sm btn-primary">
-                                        {{ __('messages.activate') }}
+                            <div class="d-flex gap-2">
+                                @if(isset($updates[$theme['slug']]))
+                                    @if(isset($updates[$theme['slug']]['changelog']))
+                                        <button type="button" class="btn btn-sm btn-soft-primary" data-bs-toggle="modal" data-bs-target="#themeChangelogModal{{ $loop->index }}" title="{{ __('messages.view_changelog') }}">
+                                            <i class="feather-info"></i>
+                                        </button>
+                                    @endif
+                                @endif
+
+                                @if(!$theme['is_active'])
+                                    <form action="{{ route('admin.themes.activate') }}" method="POST">
+                                        @csrf
+                                        <input type="hidden" name="slug" value="{{ $theme['slug'] }}">
+                                        <button type="submit" class="btn btn-sm btn-primary">
+                                            {{ __('messages.activate') }}
+                                        </button>
+                                    </form>
+                                @else
+                                    <button class="btn btn-sm btn-soft-success" disabled>
+                                        <i class="feather-check me-1"></i> {{ __('messages.Activated') }}
                                     </button>
-                                </form>
-                            @else
-                                <button class="btn btn-sm btn-soft-success" disabled>
-                                    <i class="feather-check me-1"></i> {{ __('messages.Activated') }}
-                                </button>
-                            @endif
+                                @endif
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -74,4 +90,39 @@
         @endif
     </div>
 </div>
+@section('modals')
+@if(!empty($themes))
+    @foreach($themes as $theme)
+        @if(isset($updates[$theme['slug']]) && isset($updates[$theme['slug']]['changelog']))
+        <!-- Changelog Modal -->
+        <div class="modal fade" id="themeChangelogModal{{ $loop->index }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">{{ __('messages.changelog') ?? 'Changelog' }} - {{ $theme['name'] }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="bg-light p-4 rounded border">
+                            <pre style="white-space: pre-wrap; font-family: inherit; margin-bottom: 0;">{{ $updates[$theme['slug']]['changelog'] }}</pre>
+                        </div>
+                        @if(isset($updates[$theme['slug']]['github_url']))
+                            <div class="mt-3 text-center">
+                                <a href="{{ $updates[$theme['slug']]['github_url'] }}" target="_blank" class="btn btn-sm btn-link">
+                                    <i class="feather-github me-1"></i> {{ __('messages.view_on_github') ?? 'View on GitHub' }}
+                                </a>
+                            </div>
+                        @endif
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('messages.close') }}</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endif
+    @endforeach
+@endif
+@endsection
+
 @endsection

@@ -1,12 +1,23 @@
 # v4.2.0
-> **Feature Release** - News posting fixes, portal integration, and image support.
+> **Feature Release** - News fixes, portal integration, and advanced plugin/theme systems.
+
+### 🔌 Plugins & Themes System
+* **Add**: Advanced Plugin & Theme management system with a secure thumbnail delivery route.
+* **Add**: Real-time update checking via GitHub API, featuring version badges and "Update Now" links.
+* **Add**: Interactive **Changelog Modal** that fetches and displays release notes directly from GitHub.
+* **Add**: Support for **Thumbnails** in the admin panel (checks `plugin.json`/`theme.json` or falls back to `screenshot.png`).
+* **Add**: Compatibility locking using the new `min_myads` metadata field to ensure system stability.
+* **Security**: Deletion of active plugins or themes is now restricted to prevent system breakage.
+* **Architecture**: Standardized `plugins/` and `themes/` directory tracking in Git while keeping contents ignored.
+* **Dev Resources**: Created comprehensive `PLUGIN_GUIDE.md` and `THEME_GUIDE.md` for third-party developers.
+* **i18n**: Added new translation keys for plugin/theme management across all 9 supported languages.
 
 ### 📰 News & Community Portal
-* **Fix**: Resolved `500 Internal Server Error` when posting news by fixing missing `statu` and `img` database columns and code handling.
+* **Fix**: Resolved `500 Internal Server Error` when posting news by fixing missing `statu` and `img` database columns.
 * **Add**: News articles are now automatically posted to the Community Portal feed (`/portal`) upon creation.
-* **Improvement**: Updated `FeedService` to include and rank news articles based on recency and engagement.
-* **Add**: News articles in the portal now display their uploaded images dynamically, with a fallback to the default cover.
-* **Improvement**: News articles are now searchable through the community portal search box.
+* **Add**: News articles in the portal now display uploaded images dynamically with a default cover fallback.
+* **Improvement**: Updated `FeedService` to rank current news articles by recency and engagement.
+* **Improvement**: News articles are now searchable via the community portal search bar.
 
 # v4.1.3
 > **Patch Release** - Embed delivery, routing, and Smart Ads reliability fixes.

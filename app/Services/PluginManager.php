@@ -41,6 +41,10 @@ class PluginManager
                     $pluginData['directory'] = basename($directory);
                     $pluginData['path'] = $directory;
                     
+                    $pluginData['thumbnail'] = $pluginData['thumbnail'] ?? null;
+                    $pluginData['latest_url'] = $pluginData['latest'] ?? null;
+                    $pluginData['min_myads'] = $pluginData['min_myads'] ?? null;
+                    
                     // Check status in DB
                     $option = Option::where('name', $pluginData['slug'])
                                   ->where('o_type', 'plugins')
@@ -108,8 +112,19 @@ class PluginManager
 
         $pluginDir = $this->pluginPath . '/' . $dirName;
         
+        // Prevent deletion if active
+        $option = \App\Models\Option::where('name', $slug)
+                      ->where('o_type', 'plugins')
+                      ->first();
+        
+        if ($option && $option->o_valuer == 1) {
+            return "Cannot delete an active plugin. Please deactivate it first.";
+        }
+
         // Remove from DB
-        Option::where('name', $slug)->where('o_type', 'plugins')->delete();
+        if ($option) {
+            $option->delete();
+        }
 
         // Remove files
         return File::deleteDirectory($pluginDir);
@@ -184,17 +199,45 @@ class PluginManager
             $plugins = $this->getAllPlugins();
 
             foreach ($plugins as $plugin) {
-                if (isset($plugin['update_url']) && filter_var($plugin['update_url'], FILTER_VALIDATE_URL)) {
+                $updateUrl = $plugin['latest_url'] ?? $plugin['update_url'] ?? null;
+                
+                if ($updateUrl && filter_var($updateUrl, FILTER_VALIDATE_URL)) {
                     try {
-                        $response = Http::timeout(3)->get($plugin['update_url']);
-                        if ($response->successful()) {
-                            $remoteData = $response->json();
-                            if (isset($remoteData['version']) && version_compare($remoteData['version'], $plugin['version'], '>')) {
-                                $updates[$plugin['slug']] = [
-                                    'new_version' => $remoteData['version'],
-                                    'download_url' => $remoteData['download_url'] ?? '',
-                                    'changelog' => $remoteData['changelog'] ?? '',
-                                ];
+                        // Handle GitHub Latest Release URL
+                        if (preg_match('/github\.com\/([^\/]+)\/([^\/]+)\/releases\/latest/i', $updateUrl, $matches)) {
+                            $owner = $matches[1];
+                            $repo = $matches[2];
+                            $apiUrl = "https://api.github.com/repos/{$owner}/{$repo}/releases/latest";
+                            
+                            $response = Http::withHeaders(['User-Agent' => 'MyAds-Plugin-Manager'])
+                                           ->timeout(5)
+                                           ->get($apiUrl);
+                            
+                            if ($response->successful()) {
+                                $remoteData = $response->json();
+                                $remoteVersion = ltrim($remoteData['tag_name'], 'v');
+                                
+                                if (version_compare($remoteVersion, $plugin['version'], '>')) {
+                                    $updates[$plugin['slug']] = [
+                                        'new_version' => $remoteVersion,
+                                        'download_url' => $remoteData['zipball_url'] ?? '',
+                                        'changelog' => $remoteData['body'] ?? '',
+                                        'github_url' => $remoteData['html_url'] ?? '',
+                                    ];
+                                }
+                            }
+                        } else {
+                            // Standard JSON update check
+                            $response = Http::timeout(5)->get($updateUrl);
+                            if ($response->successful()) {
+                                $remoteData = $response->json();
+                                if (isset($remoteData['version']) && version_compare($remoteData['version'], $plugin['version'], '>')) {
+                                    $updates[$plugin['slug']] = [
+                                        'new_version' => $remoteData['version'],
+                                        'download_url' => $remoteData['download_url'] ?? '',
+                                        'changelog' => $remoteData['changelog'] ?? '',
+                                    ];
+                                }
                             }
                         }
                     } catch (\Exception $e) {

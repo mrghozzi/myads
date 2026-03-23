@@ -890,5 +890,8 @@ return array (
     'report_product'        => 'Report product',
     'report_topic'          => 'Report topic',
     'report_publisher'      => 'Report publisher',
-    'suggest_edit'          => 'Suggest edit',
+    'suggest_edit'          => 'Bearbeitung vorschlagen',
+    'view_changelog'        => 'Änderungsprotokoll anzeigen',
+    'changelog'             => 'Änderungsprotokoll',
+    'delete_active_warning' => 'Kann nicht gelöscht werden, solange es aktiv ist. Bitte zuerst deaktivieren.',
 );

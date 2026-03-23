@@ -32,10 +32,11 @@ Thumbs.db
 /Documents
 
 /plugins/*
+!/plugins/.gitignore
 /themes/*
-!/themes/default/
 /public/themes/*
 !/public/themes/default/
+!/themes/default/
 /tests
 !/tests/
 /tests/*

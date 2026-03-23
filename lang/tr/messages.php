@@ -892,4 +892,7 @@ return array (
     'report_topic'          => 'Report topic',
     'report_publisher'      => 'Report publisher',
     'suggest_edit'          => 'Suggest edit',
+    'view_changelog'        => 'Değişiklik günlüğünü görüntüle',
+    'changelog'             => 'Değişiklik günlüğü',
+    'delete_active_warning' => 'Aktifken silinemez. Lütfen önce devre dışı bırakın.',
 );

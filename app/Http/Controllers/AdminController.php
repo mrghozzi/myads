@@ -1893,12 +1893,44 @@ class AdminController extends Controller
         return redirect()->back()->with('error', $result);
     }
 
+    public function pluginThumbnail($slug, PluginManager $pluginManager)
+    {
+        $plugins = $pluginManager->getAllPlugins();
+        $plugin = collect($plugins)->where('slug', $slug)->first();
+
+        if ($plugin && isset($plugin['thumbnail'])) {
+            $path = $plugin['path'] . '/' . $plugin['thumbnail'];
+            if (File::exists($path)) {
+                return response()->file($path);
+            }
+        }
+
+        abort(404);
+    }
+
     // Themes Management
     public function themes()
     {
         $themeManager = new ThemeManager();
         $themes = $themeManager->getAllThemes();
-        return view('theme::admin.themes.index', compact('themes'));
+        $updates = $themeManager->checkForUpdates();
+        return view('theme::admin.themes.index', compact('themes', 'updates'));
+    }
+
+    public function themeThumbnail($slug)
+    {
+        $themeManager = new ThemeManager();
+        $themes = $themeManager->getAllThemes();
+        $theme = collect($themes)->where('slug', $slug)->first();
+
+        if ($theme && isset($theme['thumbnail'])) {
+            $path = $theme['path'] . '/' . $theme['thumbnail'];
+            if (File::exists($path)) {
+                return response()->file($path);
+            }
+        }
+
+        abort(404);
     }
 
     public function activateTheme(Request $request)
