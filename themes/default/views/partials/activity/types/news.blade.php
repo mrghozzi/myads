@@ -1,7 +1,10 @@
 <div class="post-preview">
+    @php
+        $newsImg = $activity->related_content->img ? asset($activity->related_content->img) : theme_asset('img/cover_news.jpg');
+    @endphp
     <!-- POST PREVIEW IMAGE -->
-    <figure class="post-preview-image liquid" style="background: rgba(0, 0, 0, 0) url({{ theme_asset('img/cover_news.jpg') }}) no-repeat scroll center center / cover;">
-        <img src="{{ theme_asset('img/cover_news.jpg') }}" alt="cover-news" style="display: none;">
+    <figure class="post-preview-image liquid" style="background: rgba(0, 0, 0, 0) url({{ $newsImg }}) no-repeat scroll center center / cover;">
+        <img src="{{ $newsImg }}" alt="cover-news" style="display: none;">
     </figure>
     <!-- /POST PREVIEW IMAGE -->
 

@@ -1,3 +1,13 @@
+# v4.2.0
+> **Feature Release** - News posting fixes, portal integration, and image support.
+
+### 📰 News & Community Portal
+* **Fix**: Resolved `500 Internal Server Error` when posting news by fixing missing `statu` and `img` database columns and code handling.
+* **Add**: News articles are now automatically posted to the Community Portal feed (`/portal`) upon creation.
+* **Improvement**: Updated `FeedService` to include and rank news articles based on recency and engagement.
+* **Add**: News articles in the portal now display their uploaded images dynamically, with a fallback to the default cover.
+* **Improvement**: News articles are now searchable through the community portal search box.
+
 # v4.1.3
 > **Patch Release** - Embed delivery, routing, and Smart Ads reliability fixes.
 

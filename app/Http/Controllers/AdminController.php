@@ -1040,11 +1040,28 @@ class AdminController extends Controller
         ]);
 
         $text = $request->input('text');
+        $img = null;
+        if ($request->hasFile('img')) {
+            $file = $request->file('img');
+            $filename = time() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('upload'), $filename);
+            $img = 'upload/' . $filename;
+        }
         $news = new News();
         $news->name = $request->name;
         $news->text = $text;
-        $news->date = time(); // Old system uses timestamp
+        $news->date = time();
+        $news->img = $img;
+        $news->statu = 1;
         $news->save();
+
+        Status::create([
+            'uid' => auth()->id(),
+            'tp_id' => $news->id,
+            's_type' => 5,
+            'date' => time(),
+            'statu' => 1,
+        ]);
 
         return redirect()->back()->with('success', __('news_created'));
     }

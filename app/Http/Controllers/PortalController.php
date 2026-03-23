@@ -10,6 +10,7 @@ use App\Models\Like;
 use App\Models\ForumTopic;
 use App\Models\Directory;
 use App\Models\Product;
+use App\Models\News;
 
 class PortalController extends Controller
 {
@@ -32,10 +33,17 @@ class PortalController extends Controller
                     ->orWhere('name', 'LIKE', "%{$search}%")
                     ->pluck('id');
 
-                $searchedStatuses = Status::where(function ($q) use ($topicIds, $dirIds) {
+                $newsIds = News::where('text', 'LIKE', "%{$search}%")
+                    ->orWhere('name', 'LIKE', "%{$search}%")
+                    ->pluck('id');
+
+                $searchedStatuses = Status::where(function ($q) use ($topicIds, $dirIds, $newsIds) {
                     $q->whereIn('tp_id', $topicIds)->whereIn('s_type', [2, 4, 100])
                       ->orWhere(function ($q2) use ($dirIds) {
                           $q2->whereIn('tp_id', $dirIds)->where('s_type', 1);
+                      })
+                      ->orWhere(function ($q3) use ($newsIds) {
+                          $q3->whereIn('tp_id', $newsIds)->where('s_type', 5);
                       });
                 })
                 ->orderBy('date', 'desc')
@@ -130,6 +138,10 @@ class PortalController extends Controller
             case 7867:
                 $activity->related_content = Product::withoutGlobalScope('store')->find($activity->tp_id);
                 $activity->type_label = 'Store';
+                break;
+            case 5:
+                $activity->related_content = News::find($activity->tp_id);
+                $activity->type_label = 'News';
                 break;
         }
     }

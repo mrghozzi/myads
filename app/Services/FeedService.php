@@ -79,6 +79,7 @@ class FeedService
         $forumIds = $statuses->whereIn('s_type', [2, 4, 100])->pluck('tp_id')->unique()->values();
         $dirIds   = $statuses->where('s_type', 1)->pluck('tp_id')->unique()->values();
         $shopIds  = $statuses->where('s_type', 7867)->pluck('tp_id')->unique()->values();
+        $newsIds  = $statuses->where('s_type', 5)->pluck('tp_id')->unique()->values();
 
         // --- Forum topics (views + replies) ---
         $forumTopics = $forumIds->isNotEmpty()
@@ -217,6 +218,7 @@ class FeedService
         $isDir   = $s->s_type == 1;
         $isForum = in_array($s->s_type, [2, 4, 100]);
         $isShop  = $s->s_type == 7867;
+        $isNews  = $s->s_type == 5;
 
         // Views
         if ($isForum) {
