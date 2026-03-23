@@ -14,6 +14,12 @@
 * **Improvement**: Smart Native Ad images are now fully responsive, preventing cropping regardless of the uploaded image dimensions.
 * **Improvement**: Banner, link, smart, and fallback ad output now keeps centered placement more consistently across third-party websites.
 
+### Sitemap & SEO Improvements
+* **Improvement**: Completely redesigned to use a **Sitemap Index Protocol** instead of a single giant XML file.
+* **Improvement**: Sitemap is now generated dynamically using XML streaming and database chunking (10,000 URLs per file), which prevents memory exhaustion on large websites and complies with search engine limits.
+* **Add**: Custom dynamic pages (`/page/{slug}`) are now automatically indexed inside their own sub-sitemap.
+* **Fix**: Generating the sitemap via the admin panel automatically purges any leftover static `public/sitemap.xml` file so the high-performance streamed version takes over seamlessly.
+
 # v4.1.2
 > **Patch Release** - RTL, Smart Ads, and ad code fixes.
 

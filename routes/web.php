@@ -427,7 +427,8 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::post('/pages/generate-slug', [AdminPageController::class, 'generateSlug'])->name('admin.pages.generate_slug');
 });
 
-Route::get('/sitemap.xml', [\App\Http\Controllers\SitemapController::class, 'generate'])->name('sitemap.xml');
+Route::get('/sitemap.xml', [\App\Http\Controllers\SitemapController::class, 'index'])->name('sitemap.xml');
+Route::get('/sitemap/{type}/{page}.xml', [\App\Http\Controllers\SitemapController::class, 'section'])->name('sitemap.section');
 
 // Legacy User Routes
 Route::get('/b_list', [AdsController::class, 'indexBanners'])->name('legacy.b_list')->middleware('auth');
