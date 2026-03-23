@@ -20,10 +20,15 @@
         background: linear-gradient(135deg, #0f172a 0%, #1d4ed8 60%, #38bdf8 100%);
         overflow: hidden;
     }
+    .myads-smart-native__media a {
+        display: block;
+        width: 100%;
+        height: 100%;
+    }
     .myads-smart-native__media img {
         width: 100%;
         height: 100%;
-        object-fit: cover;
+        object-fit: contain;
         display: block;
     }
     .myads-smart-native__body {
@@ -49,6 +54,13 @@
         font-size: 20px;
         line-height: 1.3;
         font-weight: 800;
+    }
+    .myads-smart-native__title a {
+        color: inherit;
+        text-decoration: none;
+    }
+    .myads-smart-native__title a:hover {
+        color: #1d4ed8;
     }
     .myads-smart-native__description {
         margin: 0 0 14px;
@@ -89,12 +101,16 @@
 <div class="myads-smart-native" data-placement="smart-native">
     @if($smartAd->displayImage())
         <div class="myads-smart-native__media">
-            <img src="{{ $smartAd->displayImage() }}" alt="{{ $smartAd->displayTitle() }}">
+            <a href="{{ $clickUrl }}" target="_blank" rel="noopener noreferrer">
+                <img src="{{ $smartAd->displayImage() }}" alt="{{ $smartAd->displayTitle() }}">
+            </a>
         </div>
     @endif
     <div class="myads-smart-native__body">
         <span class="myads-smart-native__eyebrow">{{ __('messages.smart_ad') }}</span>
-        <h3 class="myads-smart-native__title">{{ $smartAd->displayTitle() }}</h3>
+        <h3 class="myads-smart-native__title">
+            <a href="{{ $clickUrl }}" target="_blank" rel="noopener noreferrer">{{ $smartAd->displayTitle() }}</a>
+        </h3>
         <p class="myads-smart-native__description">{{ \Illuminate\Support\Str::limit($smartAd->displayDescription(), 190) }}</p>
         <div class="myads-smart-native__actions">
             <a class="myads-smart-native__cta" href="{{ $clickUrl }}" target="_blank" rel="noopener noreferrer">{{ __('messages.smart_native_visit_sponsor') }}</a>

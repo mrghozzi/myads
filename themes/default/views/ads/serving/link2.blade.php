@@ -20,8 +20,8 @@
             <p style='color: #000000;'>{!! htmlentities($link2Txt, ENT_QUOTES, 'UTF-8') !!}</p>
             <p class='adstn' style='color: #000000;'>ADS by <a href='{{ url('/') }}?ref={{ $publisherId }}' target='_blank' rel='noopener noreferrer'>{{ config('app.name') }}</a></p>
         </div>
-        <a href='{{ url('/report') }}?link={{ $link1->id }}&link2={{ $link2->id }}' target='_blank' rel='noopener noreferrer'>
-            <img src='{{ asset('themes/default/assets/img/Alert-icon.png') }}' alt='Report'>
+        <a href='{{ url('/report') }}?link={{ $link1->id }}&link2={{ $link2->id }}' target='_blank' rel='noopener noreferrer' aria-label='Report'>
+            <img src='{{ asset('themes/default/assets/img/Alert-icon.png') }}' alt=''>
         </a>
     </div>
 </div>

@@ -29,8 +29,8 @@
                     </tr>
                     <tr>
                         <td nowrap width='50%' height='11' align='left' bgcolor='#0099ff'>
-                            <a href='{{ url('/report') }}?link={{ $link1->id }}&link2={{ $link2->id }}' target='_blank'>
-                                <img src='{{ asset('themes/default/assets/img/Alert-icon.png') }}' alt='Report'>
+                            <a href='{{ url('/report') }}?link={{ $link1->id }}&link2={{ $link2->id }}' target='_blank' aria-label='Report'>
+                                <img src='{{ asset('themes/default/assets/img/Alert-icon.png') }}' alt=''>
                             </a>
                             <b style='color:#FFFFFF'> | </b>
                             <a class='attribution' href='{{ url('/') }}?ref={{ $publisherId }}' target='_blank' style='color: #ffffff; text-decoration: none; font-family: verdana,arial,sans-serif; font-size: 10px; font-weight: bold;'>{{ config('app.name') }}</a>
