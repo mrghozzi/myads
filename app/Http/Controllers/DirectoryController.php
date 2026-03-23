@@ -36,6 +36,16 @@ class DirectoryController extends Controller
             ]);
         }
 
+        $this->seo([
+            'scope_key' => 'directory_index',
+            'resource_title' => __('messages.seo_directory_title'),
+            'description' => __('messages.seo_directory_description'),
+            'breadcrumbs' => [
+                ['name' => __('messages.home'), 'url' => url('/')],
+                ['name' => __('messages.directory'), 'url' => route('directory.index')],
+            ],
+        ]);
+
         return view('theme::directory.index', compact('categoryBoard', 'directoryStats', 'activities', 'cards'));
     }
 
@@ -60,6 +70,21 @@ class DirectoryController extends Controller
                 'next_page_url' => $activities->nextPageUrl(),
             ]);
         }
+
+        $this->seo([
+            'scope_key' => 'directory_category',
+            'content_type' => 'directory_category',
+            'content_id' => $category->id,
+            'resource_title' => $category->name,
+            'category_name' => $category->name,
+            'description' => trim((string) ($category->txt ?: __('messages.seo_directory_category_description', ['category' => $category->name]))),
+            'keywords' => $category->metakeywords,
+            'breadcrumbs' => [
+                ['name' => __('messages.home'), 'url' => url('/')],
+                ['name' => __('messages.directory'), 'url' => route('directory.index')],
+                ['name' => $category->name, 'url' => route('directory.category.legacy', $category->id)],
+            ],
+        ]);
 
         return view('theme::directory.category', compact('category', 'subCategories', 'activities', 'cards', 'categorySummary'));
     }
@@ -88,6 +113,23 @@ class DirectoryController extends Controller
                 'comments_count' => (int) $metrics['commentCounts']->get($listing->id, 0),
                 'current_reaction' => $metrics['currentReactions']->get($listing->id),
                 'can_manage' => $this->canManageListing($listing),
+            ]);
+
+            $this->seo([
+                'scope_key' => 'directory_show',
+                'content_type' => 'directory',
+                'content_id' => $listing->id,
+                'resource_title' => $listing->name,
+                'category_name' => $listing->category?->name,
+                'description' => trim((string) ($listing->txt ?: __('messages.seo_directory_listing_description', ['title' => $listing->name]))),
+                'keywords' => $listing->metakeywords,
+                'lastmod' => $listing->date,
+                'breadcrumbs' => [
+                    ['name' => __('messages.home'), 'url' => url('/')],
+                    ['name' => __('messages.directory'), 'url' => route('directory.index')],
+                    ['name' => $listing->category?->name ?: __('messages.category_fallback'), 'url' => route('directory.category.legacy', $listing->cat)],
+                    ['name' => $listing->name, 'url' => route('directory.show', $listing->id)],
+                ],
             ]);
 
             return view('theme::directory.show', compact('listing', 'activity', 'detail'));

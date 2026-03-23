@@ -96,11 +96,29 @@ class ProfileController extends Controller
             ]);
         }
 
+        $this->seo([
+            'scope_key' => 'profile_show',
+            'content_type' => 'user',
+            'content_id' => $user->id,
+            'resource_title' => $user->username,
+            'description' => Str::limit(strip_tags((string) $user->sig), 170, '') ?: __('messages.seo_profile_description', ['username' => $user->username]),
+            'image' => $user->img,
+            'username' => $user->username,
+            'breadcrumbs' => [
+                ['name' => __('messages.home'), 'url' => url('/')],
+                ['name' => $user->username, 'url' => route('profile.show', $user->username)],
+            ],
+        ]);
+
         return view('theme::profile.show', compact('user', 'cover', 'isFollowing', 'activities', 'followersCount', 'followingCount', 'postsCount'));
     }
 
     public function followers($username)
     {
+        $this->noindex([
+            'scope_key' => 'profile.followers',
+        ]);
+
         $user = User::where('username', $username)->firstOrFail();
         $followers = Like::where('sid', $user->id)
             ->where('type', 1)
@@ -129,6 +147,10 @@ class ProfileController extends Controller
 
     public function following($username)
     {
+        $this->noindex([
+            'scope_key' => 'profile.following',
+        ]);
+
         $user = User::where('username', $username)->firstOrFail();
         $following = Like::where('uid', $user->id)
             ->where('type', 1)

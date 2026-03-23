@@ -17,6 +17,10 @@ class HomeController extends Controller
 {
     public function index()
     {
+        $this->noindex([
+            'scope_key' => 'dashboard',
+        ]);
+
         $user = Auth::user();
         
         $bannerStats = [

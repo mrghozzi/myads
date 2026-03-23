@@ -5,8 +5,12 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\Facades\Schema;
+use App\Models\SeoSetting;
 use App\Models\Setting;
 use App\Models\Menu;
+use App\Services\RobotsTxtService;
+use App\Services\SeoManager;
+use App\Support\SeoHeadSanitizer;
 use App\Services\PluginManager;
 
 class AppServiceProvider extends ServiceProvider
@@ -16,7 +20,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->singleton(SeoHeadSanitizer::class, fn () => new SeoHeadSanitizer());
+        $this->app->singleton(SeoManager::class, fn ($app) => new SeoManager($app->make(SeoHeadSanitizer::class)));
+        $this->app->singleton(RobotsTxtService::class, fn () => new RobotsTxtService());
     }
 
     /**
@@ -48,6 +54,7 @@ class AppServiceProvider extends ServiceProvider
 
         View::share('site_settings', $setting);
         View::share('site_menus', $menus);
+        View::share('seo_settings', SeoSetting::current());
 
         // Fetch all available languages
         $langDir = base_path('lang');
@@ -73,5 +80,15 @@ class AppServiceProvider extends ServiceProvider
         View::share('available_languages', $availableLanguages);
 
         View::addNamespace('theme', base_path("themes/$theme/views"));
+
+        View::composer('theme::layouts.master', function ($view) {
+            $view->with('seo', app(SeoManager::class)->resolve(request()));
+        });
+
+        try {
+            app(RobotsTxtService::class)->ensureDefaultFile();
+        } catch (\Throwable $e) {
+            // Ignore write failures on restricted hosts.
+        }
     }
 }

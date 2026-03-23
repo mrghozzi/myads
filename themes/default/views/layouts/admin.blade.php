@@ -9,7 +9,8 @@
     <meta http-equiv="x-ua-compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ config('app.name', 'MyAds Admin') }} - {{ __('messages.admin_panel') ?? 'Admin Panel' }}</title>
+    <meta name="robots" content="noindex,nofollow">
+    <title>{{ trim($__env->yieldContent('title')) !== '' ? $__env->yieldContent('title') . ' - ' : '' }}{{ config('app.name', 'MyAds Admin') }} - {{ __('messages.admin_panel') ?? 'Admin Panel' }}</title>
     
     <link rel="shortcut icon" type="image/x-icon" href="{{ theme_asset('admin-duralux/images/favicon.ico') }}">
     <script>
@@ -160,6 +161,11 @@
                             <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.settings') }}">{{ __('messages.settings') }}</a></li>
                             <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.settings.system') }}">{{ __('messages.system_settings') }}</a></li>
                             <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.cookie_notice') }}">{{ __('messages.cookie_notice_settings') }}</a></li>
+                            <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.seo.index') }}">{{ __('messages.seo_dashboard') }}</a></li>
+                            <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.seo.settings') }}">{{ __('messages.seo_settings') }}</a></li>
+                            <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.seo.head') }}">{{ __('messages.seo_head_meta') }}</a></li>
+                            <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.seo.rules') }}">{{ __('messages.seo_rules') }}</a></li>
+                            <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.seo.indexing') }}">{{ __('messages.seo_indexing') }}</a></li>
                             <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.languages') }}">{{ __('messages.languages') }}</a></li>
                             <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.updates') }}">{{ __('messages.updates') }}</a></li>
                         </ul>

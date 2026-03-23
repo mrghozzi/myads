@@ -12,6 +12,16 @@ class NewsController extends Controller
     {
         $news = News::orderBy('id', 'desc')->paginate(10);
 
+        $this->seo([
+            'scope_key' => 'news_index',
+            'resource_title' => __('messages.news'),
+            'description' => __('messages.seo_news_description'),
+            'breadcrumbs' => [
+                ['name' => __('messages.home'), 'url' => url('/')],
+                ['name' => __('messages.news'), 'url' => route('news.index')],
+            ],
+        ]);
+
         if ($request->boolean('ajax') || $request->ajax() || $request->wantsJson()) {
             $items = $news->map(function ($item) {
                 return [
@@ -35,6 +45,23 @@ class NewsController extends Controller
     public function show($id)
     {
         $article = News::findOrFail($id);
+
+        $this->seo([
+            'scope_key' => 'news_show',
+            'content_type' => 'news',
+            'content_id' => $article->id,
+            'resource_title' => $article->name,
+            'description' => Str::limit(trim(preg_replace('/\s+/', ' ', strip_tags((string) $article->text))), 170, ''),
+            'image' => $article->img,
+            'lastmod' => $article->date,
+            'schema_type' => 'Article',
+            'breadcrumbs' => [
+                ['name' => __('messages.home'), 'url' => url('/')],
+                ['name' => __('messages.news'), 'url' => route('news.index')],
+                ['name' => $article->name, 'url' => route('news.show', $article->id)],
+            ],
+        ]);
+
         return view('theme::news.show', compact('article'));
     }
 }

@@ -11,8 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
+        if (!Schema::hasTable('news')) {
+            return;
+        }
+
         Schema::table('news', function (Blueprint $table) {
-            $table->string('img')->nullable()->after('text');
+            if (!Schema::hasColumn('news', 'img')) {
+                $table->string('img')->nullable()->after('text');
+            }
+
+            if (!Schema::hasColumn('news', 'statu')) {
+                $table->integer('statu')->default(1)->after('img');
+            }
         });
     }
 
@@ -21,8 +31,18 @@ return new class extends Migration
      */
     public function down(): void
     {
+        if (!Schema::hasTable('news')) {
+            return;
+        }
+
         Schema::table('news', function (Blueprint $table) {
-            $table->dropColumn('img');
+            if (Schema::hasColumn('news', 'statu')) {
+                $table->dropColumn('statu');
+            }
+
+            if (Schema::hasColumn('news', 'img')) {
+                $table->dropColumn('img');
+            }
         });
     }
 };

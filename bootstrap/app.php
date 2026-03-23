@@ -51,6 +51,7 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\SetLocale::class,
             \App\Http\Middleware\UpdateUserOnline::class,
             \App\Http\Middleware\CheckSystemVersion::class,
+            \App\Http\Middleware\TrackSeoMetrics::class,
         ]);
         
         $middleware->alias([

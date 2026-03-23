@@ -16,9 +16,12 @@ use App\Http\Controllers\PortalController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AdminSeoController;
 use App\Http\Controllers\AdminPageController;
 use App\Http\Controllers\ReactionController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\SeoPublicController;
+use App\Http\Controllers\SitemapController;
 use App\Http\Middleware\AdminMiddleware;
 
 Route::post('/reaction/toggle', [ReactionController::class, 'toggle'])->name('reaction.toggle')->middleware('auth');
@@ -28,6 +31,7 @@ Route::post('/comment/delete', [CommentController::class, 'destroy'])->name('com
 
 Route::post('/status/create', [App\Http\Controllers\StatusController::class, 'create'])->name('status.create')->middleware('auth');
 Route::post('/status/upload-image', [App\Http\Controllers\StatusController::class, 'uploadImage'])->name('status.upload_image')->middleware('auth');
+Route::get('/robots.txt', [SeoPublicController::class, 'robots'])->name('robots.txt');
 
 // Auth Routes
 Route::get('/captcha', [App\Http\Controllers\CaptchaController::class, 'generate'])->name('captcha.generate');
@@ -65,6 +69,16 @@ Route::get('/', function () {
     if (auth()->check()) {
         return redirect()->route('dashboard');
     }
+
+    app(\App\Services\SeoManager::class)->setContext([
+        'scope_key' => 'home',
+        'resource_title' => __('messages.seo_home_title'),
+        'description' => __('messages.seo_home_description'),
+        'breadcrumbs' => [
+            ['name' => __('messages.home'), 'url' => url('/')],
+        ],
+    ]);
+
     return view('theme::welcome');
 })->name('index');
 
@@ -291,6 +305,17 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::post('/settings/system', [AdminController::class, 'updateSystemSettings'])->name('admin.settings.system.update');
     Route::get('/settings/cookie-notice', [AdminController::class, 'cookieNoticeSettings'])->name('admin.cookie_notice');
     Route::post('/settings/cookie-notice', [AdminController::class, 'updateCookieNoticeSettings'])->name('admin.cookie_notice.update');
+    Route::get('/seo', [AdminSeoController::class, 'index'])->name('admin.seo.index');
+    Route::get('/seo/settings', [AdminSeoController::class, 'settings'])->name('admin.seo.settings');
+    Route::post('/seo/settings', [AdminSeoController::class, 'updateSettings'])->name('admin.seo.settings.update');
+    Route::get('/seo/head', [AdminSeoController::class, 'head'])->name('admin.seo.head');
+    Route::post('/seo/head', [AdminSeoController::class, 'updateHead'])->name('admin.seo.head.update');
+    Route::get('/seo/rules', [AdminSeoController::class, 'rules'])->name('admin.seo.rules');
+    Route::post('/seo/rules', [AdminSeoController::class, 'storeRule'])->name('admin.seo.rules.store');
+    Route::put('/seo/rules/{rule}', [AdminSeoController::class, 'updateRule'])->name('admin.seo.rules.update');
+    Route::delete('/seo/rules/{rule}', [AdminSeoController::class, 'destroyRule'])->name('admin.seo.rules.delete');
+    Route::get('/seo/indexing', [AdminSeoController::class, 'indexing'])->name('admin.seo.indexing');
+    Route::post('/seo/indexing', [AdminSeoController::class, 'updateIndexing'])->name('admin.seo.indexing.update');
     
     Route::get('/users', [AdminController::class, 'users'])->name('admin.users');
     Route::get('/users/{id}/edit', [AdminController::class, 'editUser'])->name('admin.users.edit');
@@ -418,7 +443,7 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/themes', [AdminController::class, 'themes'])->name('admin.themes');
     Route::post('/themes/activate', [AdminController::class, 'activateTheme'])->name('admin.themes.activate');
     Route::get('themes/thumbnail/{slug}', [AdminController::class, 'themeThumbnail'])->name('admin.themes.thumbnail');
-    Route::get('/sitemap/generate', [\App\Http\Controllers\SitemapController::class, 'generate'])->name('admin.sitemap.generate');
+    Route::get('/sitemap/generate', [SitemapController::class, 'generate'])->name('admin.sitemap.generate');
 
     // Pages
     Route::get('/pages', [AdminPageController::class, 'index'])->name('admin.pages');
@@ -430,8 +455,8 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::post('/pages/generate-slug', [AdminPageController::class, 'generateSlug'])->name('admin.pages.generate_slug');
 });
 
-Route::get('/sitemap.xml', [\App\Http\Controllers\SitemapController::class, 'index'])->name('sitemap.xml');
-Route::get('/sitemap/{type}/{page}.xml', [\App\Http\Controllers\SitemapController::class, 'section'])->name('sitemap.section');
+Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap.xml');
+Route::get('/sitemap/{type}/{page}.xml', [SitemapController::class, 'section'])->name('sitemap.section');
 
 // Legacy User Routes
 Route::get('/b_list', [AdsController::class, 'indexBanners'])->name('legacy.b_list')->middleware('auth');

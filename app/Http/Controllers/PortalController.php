@@ -20,6 +20,19 @@ class PortalController extends Controller
         $search = $request->query('search', '');
         $user = Auth::user();
 
+        $this->seo([
+            'scope_key' => 'portal',
+            'resource_title' => __('messages.seo_portal_title'),
+            'description' => $search !== ''
+                ? __('messages.seo_portal_search_description')
+                : __('messages.seo_portal_description'),
+            'indexable' => $search === '' && $filter === 'all',
+            'breadcrumbs' => [
+                ['name' => __('messages.home'), 'url' => url('/')],
+                ['name' => __('messages.seo_portal_title'), 'url' => route('portal.index')],
+            ],
+        ]);
+
         // ── Search ───────────────────────────────────────────────
         if (!empty($search)) {
             try {

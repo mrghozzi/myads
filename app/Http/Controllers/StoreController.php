@@ -42,6 +42,16 @@ class StoreController extends Controller
             'plugins' => Option::where('o_type', 'store_type')->where('name', 'plugins')->count(),
         ];
 
+        $this->seo([
+            'scope_key' => 'store_index',
+            'resource_title' => __('messages.store'),
+            'description' => __('messages.seo_store_description'),
+            'breadcrumbs' => [
+                ['name' => __('messages.home'), 'url' => url('/')],
+                ['name' => __('messages.store'), 'url' => route('store.index')],
+            ],
+        ]);
+
         return view('theme::store.index', compact('products', 'user', 'category', 'categoryCounts'));
     }
 
@@ -115,6 +125,21 @@ class StoreController extends Controller
         }
         $files = ProductFile::where('o_parent', $product->id)->orderBy('id', 'desc')->get();
         $canManageProduct = Auth::check() && (Auth::id() == $product->o_parent || Auth::user()->isAdmin());
+
+        $this->seo([
+            'scope_key' => 'store_show',
+            'content_type' => 'product',
+            'content_id' => $product->id,
+            'resource_title' => $product->name,
+            'description' => Str::limit(strip_tags((string) $product->o_valuer), 170, ''),
+            'image' => $product->product_image,
+            'lastmod' => $status?->date,
+            'breadcrumbs' => [
+                ['name' => __('messages.home'), 'url' => url('/')],
+                ['name' => __('messages.store'), 'url' => route('store.index')],
+                ['name' => $product->name, 'url' => route('store.show', $product->name)],
+            ],
+        ]);
 
         return view('theme::store.show', compact('product', 'status', 'type', 'topic', 'latestFile', 'downloadHash', 'downloadCount', 'files', 'canManageProduct'));
     }
@@ -480,6 +505,23 @@ class StoreController extends Controller
             : User::whereIn('id', $articleAuthorIds)->get()->keyBy('id');
         $shellData = $this->buildKnowledgebaseShellData($product);
         $articleName = $request->query('st');
+
+        $this->seo([
+            'scope_key' => 'kb_index',
+            'content_type' => 'product',
+            'content_id' => $product->id,
+            'resource_title' => __('messages.seo_kb_title', ['product' => $product->name]),
+            'description' => Str::limit(strip_tags((string) $product->o_valuer), 170, '') ?: __('messages.seo_kb_description', ['product' => $product->name]),
+            'image' => $product->product_image,
+            'indexable' => !$request->filled('st'),
+            'breadcrumbs' => [
+                ['name' => __('messages.home'), 'url' => url('/')],
+                ['name' => __('messages.store'), 'url' => route('store.index')],
+                ['name' => $product->name, 'url' => route('store.show', $product->name)],
+                ['name' => __('messages.knowledgebase'), 'url' => route('kb.index', $product->name)],
+            ],
+        ]);
+
         if ($articleName) {
             $exists = Option::where('o_type', 'knowledgebase')
                 ->where('o_mode', $product->name)
@@ -523,6 +565,22 @@ class StoreController extends Controller
             ->where('o_order', 1)
             ->count();
         $shellData = $this->buildKnowledgebaseShellData($product, $kbArticle);
+
+        $this->seo([
+            'scope_key' => 'kb_show',
+            'content_type' => 'knowledgebase',
+            'content_id' => $kbArticle->id,
+            'resource_title' => $kbArticle->name,
+            'description' => Str::limit(strip_tags((string) $kbArticle->o_valuer), 170, ''),
+            'image' => $product->product_image,
+            'breadcrumbs' => [
+                ['name' => __('messages.home'), 'url' => url('/')],
+                ['name' => __('messages.store'), 'url' => route('store.index')],
+                ['name' => $product->name, 'url' => route('store.show', $product->name)],
+                ['name' => __('messages.knowledgebase'), 'url' => route('kb.index', $product->name)],
+                ['name' => $kbArticle->name, 'url' => route('kb.show', ['name' => $product->name, 'article' => $kbArticle->name])],
+            ],
+        ]);
 
         return view('theme::store.knowledgebase', [
             'product' => $product,

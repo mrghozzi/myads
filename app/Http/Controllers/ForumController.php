@@ -21,6 +21,17 @@ class ForumController extends Controller
     public function index()
     {
         $categories = ForumCategory::orderBy('ordercat', 'desc')->get();
+
+        $this->seo([
+            'scope_key' => 'forum_index',
+            'resource_title' => __('messages.seo_forum_title'),
+            'description' => __('messages.seo_forum_description'),
+            'breadcrumbs' => [
+                ['name' => __('messages.home'), 'url' => url('/')],
+                ['name' => __('messages.forum'), 'url' => route('forum.index')],
+            ],
+        ]);
+
         return view('theme::forum.index', compact('categories'));
     }
 
@@ -62,6 +73,20 @@ class ForumController extends Controller
             ]);
         }
 
+        $this->seo([
+            'scope_key' => 'forum_category',
+            'content_type' => 'forum_category',
+            'content_id' => $category->id,
+            'resource_title' => $category->name,
+            'category_name' => $category->name,
+            'description' => Str::limit(trim(preg_replace('/\s+/', ' ', strip_tags((string) $category->txt))), 170, '') ?: __('messages.seo_forum_category_description', ['category' => $category->name]),
+            'breadcrumbs' => [
+                ['name' => __('messages.home'), 'url' => url('/')],
+                ['name' => __('messages.forum'), 'url' => route('forum.index')],
+                ['name' => $category->name, 'url' => route('forum.category', $category->id)],
+            ],
+        ]);
+
         return view('theme::forum.category', compact('category', 'statuses', 'topics', 'sidebarCategories'));
     }
 
@@ -81,13 +106,36 @@ class ForumController extends Controller
             }
         }
 
+        $seoContext = [
+            'scope_key' => 'forum_topic',
+            'content_type' => 'forum_topic',
+            'content_id' => $topic->id,
+            'resource_title' => $topic->name,
+            'category_name' => $topic->category?->name,
+            'description' => Str::limit(trim(preg_replace('/\s+/', ' ', strip_tags((string) $topic->txt))), 170, ''),
+            'image' => $topic->image_url,
+            'lastmod' => $topic->date ?: $status->date,
+            'schema_type' => 'DiscussionForumPosting',
+            'author_name' => $topic->user?->username,
+            'breadcrumbs' => [
+                ['name' => __('messages.home'), 'url' => url('/')],
+                ['name' => __('messages.forum'), 'url' => route('forum.index')],
+                ['name' => $topic->category?->name ?: __('messages.category_fallback'), 'url' => route('forum.category', $topic->cat)],
+                ['name' => $topic->name, 'url' => route('forum.topic', $topic->id)],
+            ],
+        ];
+
         if ($status->s_type == 100) {
+            $this->seo($seoContext);
             return view('theme::forum.post', compact('topic', 'status', 'forumSettings'));
         }
 
         if ($status->s_type == 4) {
+            $this->seo($seoContext);
             return view('theme::forum.image', compact('topic', 'status', 'forumSettings'));
         }
+
+        $this->seo($seoContext);
 
         return view('theme::forum.topic', compact('topic', 'status', 'forumSettings'));
     }

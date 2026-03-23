@@ -19,6 +19,15 @@
 * **Improvement**: Updated `FeedService` to rank current news articles by recency and engagement.
 * **Improvement**: News articles are now searchable via the community portal search bar.
 
+### SEO & Indexing Suite
+* **Add**: Introduced a centralized SEO engine for public pages, unifying titles, descriptions, canonical tags, robots directives, Open Graph, Twitter cards, and structured data output.
+* **Add**: Added a full `/admin/seo` suite with Dashboard, Settings, Head Meta, Rules, and Indexing screens for managing and auditing search visibility.
+* **Add**: Added local SEO analytics with charts for page views, unique visitors, bot hits, top scopes, and top content pages.
+* **Add**: Added optional Google Analytics 4 integration through a GA4 Measurement ID with safe injection on public indexable pages only.
+* **Improvement**: `robots.txt` is now managed dynamically from the admin panel instead of blocking indexing site-wide.
+* **Improvement**: `sitemap.xml` now respects `lastmod`, skips `noindex` content, and stays aligned with published public resources.
+* **i18n**: Added SEO translation keys across all 9 supported languages and removed hardcoded SEO admin strings to keep the new suite compatible with multilingual mode.
+
 # v4.1.3
 > **Patch Release** - Embed delivery, routing, and Smart Ads reliability fixes.
 

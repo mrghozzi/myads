@@ -2,15 +2,40 @@
     $pageLocale = str_replace('_', '-', app()->getLocale());
     $pageDirection = locale_direction();
     $skipFooterAd = trim($__env->yieldContent('skip_footer_ad')) === '1';
+    $yieldedTitle = trim($__env->yieldContent('title'));
+    $resolvedTitle = $yieldedTitle !== '' ? $yieldedTitle : trim((string) ($seo->title ?? ''));
+    $resolvedTitle = $resolvedTitle !== '' ? $resolvedTitle : ($site_settings->titer ?? 'MyAds');
 @endphp
 <!DOCTYPE HTML>
 <html lang="{{ $pageLocale }}" dir="{{ $pageDirection }}" data-dir="{{ $pageDirection }}" class="{{ $pageDirection }}">
 <head>
-    <title>@yield('title', $site_settings->titer ?? 'MyAds')</title>
+    <title>{{ $resolvedTitle }}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="generator" content="Myads" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="robots" content="{{ $seo->robots ?? 'index,follow' }}">
+    @if(!empty($seo->description))
+        <meta name="description" content="{{ $seo->description }}">
+    @endif
+    @if(!empty($seo->keywords))
+        <meta name="keywords" content="{{ $seo->keywords }}">
+    @endif
+    @if(!empty($seo->canonical_url))
+        <link rel="canonical" href="{{ $seo->canonical_url }}">
+    @endif
+
+    @if(!empty($seo->og))
+        @foreach($seo->og as $property => $content)
+            <meta property="og:{{ $property }}" content="{{ $content }}">
+        @endforeach
+    @endif
+
+    @if(!empty($seo->twitter))
+        @foreach($seo->twitter as $name => $content)
+            <meta name="twitter:{{ $name }}" content="{{ $content }}">
+        @endforeach
+    @endif
 
     <!-- Favicons -->
     <link rel="apple-touch-icon" sizes="57x57" href="{{ theme_asset('img/apple-icon-57x57.png') }}">
@@ -487,6 +512,18 @@
             }
         }
     </style>
+
+    @if(!empty($seo->head_snippets))
+        @foreach($seo->head_snippets as $snippet)
+            {!! $snippet !!}
+        @endforeach
+    @endif
+
+    @if(!empty($seo->schema_blocks))
+        @foreach($seo->schema_blocks as $schemaBlock)
+            <script type="application/ld+json">{!! json_encode($schemaBlock, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!}</script>
+        @endforeach
+    @endif
 
     @stack('head')
 </head>

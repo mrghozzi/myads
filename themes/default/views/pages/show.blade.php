@@ -3,12 +3,6 @@
 @section('title', $page->title . ' - ' . ($site_settings->titer ?? 'MyAds'))
 
 @push('head')
-@if($page->meta_description)
-<meta name="description" content="{{ $page->meta_description }}">
-@endif
-@if($page->meta_keywords)
-<meta name="keywords" content="{{ $page->meta_keywords }}">
-@endif
 <style>
     .dynamic-page-grid .dynamic-page-column .widget-box {
         border-radius: 16px;
