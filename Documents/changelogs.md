@@ -12,6 +12,12 @@
 * **Dev Resources**: Created comprehensive `PLUGIN_GUIDE.md` and `THEME_GUIDE.md` for third-party developers.
 * **i18n**: Added new translation keys for plugin/theme management across all 9 supported languages.
 
+### 💼 Services & Order Requests
+* **Add**: Introduced a standalone **Order Request System** for website owners to hire service providers (developers, designers, writers).
+* **Add**: Automatic social integration where new order requests are published as interactive cards in the **Community Feed**.
+* **Add**: Dedicated browsing and creation interfaces for order requests, supporting category filtering and budget tracking.
+* **Add**: Direct messaging integration from order request cards to facilitate quick communication between owners and providers.
+
 ### 📰 News & Community Portal
 * **Fix**: Resolved `500 Internal Server Error` when posting news by fixing missing `statu` and `img` database columns.
 * **Add**: News articles are now automatically posted to the Community Portal feed (`/portal`) upon creation.

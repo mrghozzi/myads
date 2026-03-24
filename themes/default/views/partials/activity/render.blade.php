@@ -9,8 +9,9 @@
     } elseif ($activity->s_type == 7867) {
         $type = 'store';
     } elseif ($activity->s_type == 5 || $activity->s_type == 'news') { 
-        // Assuming 5 is news, or string 'news'. If unknown, it falls back to text or we can check relation.
         $type = 'news';
+    } elseif ($activity->s_type == 6) {
+        $type = 'order';
     }
     
     // Check if related content exists before including

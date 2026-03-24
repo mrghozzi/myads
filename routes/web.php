@@ -24,6 +24,7 @@ use App\Http\Controllers\MentionController;
 use App\Http\Controllers\AdminAdminsController;
 use App\Http\Controllers\SeoPublicController;
 use App\Http\Controllers\SitemapController;
+use App\Http\Controllers\OrderRequestController;
 use App\Http\Middleware\AdminMiddleware;
 
 Route::post('/reaction/toggle', [ReactionController::class, 'toggle'])->name('reaction.toggle')->middleware('auth');
@@ -199,6 +200,15 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/visits/{id}', [VisitController::class, 'destroy'])->name('visits.destroy');
     Route::get('/visits/surf', [VisitController::class, 'surf'])->name('visits.surf');
 });
+
+// Order Request Routes
+Route::get('/orders', [OrderRequestController::class, 'index'])->name('orders.index');
+Route::middleware(['auth'])->group(function () {
+    Route::get('/orders/create', [OrderRequestController::class, 'create'])->name('orders.create');
+    Route::post('/orders', [OrderRequestController::class, 'store'])->name('orders.store');
+    Route::delete('/orders/{id}', [OrderRequestController::class, 'destroy'])->name('orders.destroy');
+});
+Route::get('/orders/{id}', [OrderRequestController::class, 'show'])->name('orders.show');
 
 // Store Routes
 Route::get('/store', [StoreController::class, 'index'])->name('store.index');

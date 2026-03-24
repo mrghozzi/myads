@@ -38,6 +38,7 @@
         @endauth
         <li class="menu-item"><a class="menu-item-link text-tooltip-tfr" href="{{ url('/forum') }}"><svg class="menu-item-link-icon icon-forums"><use xlink:href="#svg-forums"></use></svg>{{ __('messages.forum') }}</a></li>
         <li class="menu-item"><a class="menu-item-link text-tooltip-tfr" href="{{ url('/directory') }}"><svg class="menu-item-link-icon icon-list-grid-view"><use xlink:href="#svg-list-grid-view"></use></svg>{{ __('messages.directory') }}</a></li>
+        <li class="menu-item"><a class="menu-item-link text-tooltip-tfr" href="{{ url('/orders') }}"><svg class="menu-item-link-icon icon-list-grid-view"><use xlink:href="#svg-list-grid-view"></use></svg>{{ __('messages.order_requests') }}</a></li>
         <li class="menu-item"><a class="menu-item-link text-tooltip-tfr" href="{{ url('/store') }}"><svg class="menu-item-link-icon icon-marketplace"><use xlink:href="#svg-marketplace"></use></svg>{{ __('messages.store') }}</a></li>
     </ul>
 

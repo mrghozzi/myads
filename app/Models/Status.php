@@ -15,6 +15,7 @@ use App\Models\Product;
 use App\Models\StatusLinkPreview;
 use App\Models\StatusRepost;
 use App\Services\V420SchemaService;
+use App\Models\OrderRequest;
 
 use App\Traits\HasPrivacy;
 
@@ -71,6 +72,11 @@ class Status extends Model
         return $this->hasOne(StatusRepost::class, 'status_id');
     }
 
+    public function orderRequest()
+    {
+        return $this->belongsTo(OrderRequest::class, 'tp_id');
+    }
+
     public function getRelatedContentAttribute()
     {
         if ($this->relationLoaded('forumTopic') && $this->forumTopic) {
@@ -97,6 +103,8 @@ class Status extends Model
             return Product::find($this->tp_id) ?? ForumTopic::find($this->tp_id);
         } elseif ($this->s_type == 5) {
             return News::find($this->tp_id);
+        } elseif ($this->s_type == 6) {
+            return OrderRequest::find($this->tp_id);
         }
         return null;
     }
@@ -142,6 +150,12 @@ class Status extends Model
             if ($this->s_type == 7867) {
                 return Option::where('o_parent', $this->tp_id)
                     ->where('o_type', 's_coment')
+                    ->count();
+            }
+
+            if ($this->s_type == 6) {
+                return Option::where('o_parent', $this->tp_id)
+                    ->where('o_type', 'order_comment')
                     ->count();
             }
 
@@ -253,6 +267,10 @@ class Status extends Model
 
         if ($this->s_type == 7867) {
             return 3;
+        }
+
+        if ($this->s_type == 6) {
+            return 66; // New reaction type for Order Requests
         }
 
         return null;

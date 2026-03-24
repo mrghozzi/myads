@@ -59,6 +59,12 @@ class CommentController extends Controller
                 ->orderBy('id', 'desc')
                 ->limit($limit)
                 ->get();
+        } elseif ($type == 'order') {
+            $comments = Option::where('o_parent', $id)
+                ->where('o_type', 'o_order')
+                ->orderBy('id', 'desc')
+                ->limit($limit)
+                ->get();
         }
 
         // We need to reverse the order for display (oldest first? No, usually newest at bottom, but let's check old code. 
@@ -98,7 +104,7 @@ class CommentController extends Controller
         $logo = 'comment';
         $topic = null;
 
-        if (!in_array($type, ['forum', 'directory', 'store'], true)) {
+        if (!in_array($type, ['forum', 'directory', 'store', 'order'], true)) {
             return response()->json(['error' => 'Invalid type'], 400);
         }
 
@@ -163,6 +169,21 @@ class CommentController extends Controller
                 if ($product) {
                     $ownerId = $product->o_parent; // o_parent is user_id for Product
                     $url = "/store/" . $product->name; // URL format (Root relative)
+                }
+            } elseif ($type == 'order') {
+                $comment = Option::create([
+                    'name' => 'coment_order',
+                    'o_type' => 'o_order',
+                    'o_order' => $uid,
+                    'o_parent' => $id,
+                    'o_valuer' => $text,
+                    'o_mode' => $time
+                ]);
+
+                $orderReq = \App\Models\OrderRequest::find($id);
+                if ($orderReq) {
+                    $ownerId = $orderReq->uid;
+                    $url = "/orders/" . $orderReq->id;
                 }
             }
 
@@ -230,6 +251,9 @@ class CommentController extends Controller
         } elseif ($type == 'store') {
             $comment = Option::where('id', $id)->where('o_type', 's_coment')->first();
             $dbType = 444;
+        } elseif ($type == 'order') {
+            $comment = Option::where('id', $id)->where('o_type', 'o_order')->first();
+            $dbType = 66;
         }
 
         if (!$comment) {
