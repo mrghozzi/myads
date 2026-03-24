@@ -434,4 +434,12 @@ class SitemapController extends Controller
 
         return $this->formatLastmod($value);
     }
+
+    public function robots()
+    {
+        $sitemapUrl = url('/sitemap.xml');
+        $content = "User-agent: *\nAllow: /\n\nSitemap: {$sitemapUrl}";
+
+        return response($content, 200)->header('Content-Type', 'text/plain; charset=UTF-8');
+    }
 }

@@ -1,2 +1,11 @@
 User-agent: *
-Disallow: /
+Allow: /
+Disallow: /admin
+Disallow: /login
+Disallow: /register
+Disallow: /password/reset
+Disallow: /messages
+Disallow: /notification
+Disallow: /profile/edit
+Disallow: /settings
+Sitemap: http://localhost/myads/sitemap.xml
