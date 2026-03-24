@@ -14,6 +14,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 
 class DirectoryController extends Controller
 {
@@ -514,6 +515,50 @@ class DirectoryController extends Controller
                 ];
             })->values(),
         ];
+    }
+
+    public function fetchMetadata(Request $request)
+    {
+        $request->validate(['url' => 'required|url']);
+        $url = $request->input('url');
+
+        try {
+            $response = Http::timeout(5)->withHeaders([
+                'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+            ])->get($url);
+
+            if (!$response->successful()) {
+                return response()->json(['error' => 'Could not fetch URL'], 400);
+            }
+
+            $html = $response->body();
+            $data = [
+                'title' => '',
+                'description' => '',
+                'tags' => ''
+            ];
+
+            // Extract title
+            if (preg_match('/<title>(.*?)<\/title>/is', $html, $matches)) {
+                $data['title'] = html_entity_decode(trim($matches[1]));
+            }
+
+            // Extract description
+            if (preg_match('/<meta name="description" content="(.*?)"/is', $html, $matches)) {
+                $data['description'] = html_entity_decode(trim($matches[1]));
+            } elseif (preg_match('/<meta property="og:description" content="(.*?)"/is', $html, $matches)) {
+                $data['description'] = html_entity_decode(trim($matches[1]));
+            }
+
+            // Extract keywords (tags)
+            if (preg_match('/<meta name="keywords" content="(.*?)"/is', $html, $matches)) {
+                $data['tags'] = html_entity_decode(trim($matches[1]));
+            }
+
+            return response()->json($data);
+        } catch (\Throwable $e) {
+            return response()->json(['error' => 'Error: ' . $e->getMessage()], 500);
+        }
     }
 
     private function canManageListing(?Directory $listing): bool
