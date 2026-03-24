@@ -24,15 +24,18 @@
 * **Add**: Added a full `/admin/seo` suite with Dashboard, Settings, Head Meta, Rules, and Indexing screens for managing and auditing search visibility.
 * **Add**: Added local SEO analytics with charts for page views, unique visitors, bot hits, top scopes, and top content pages.
 * **Add**: Added optional Google Analytics 4 integration through a GA4 Measurement ID with safe injection on public indexable pages only.
-* **Improvement**: `robots.txt` is now managed dynamically from the admin panel instead of blocking indexing site-wide.
-* **Improvement**: `sitemap.xml` now respects `lastmod`, skips `noindex` content, and stays aligned with published public resources.
-* **i18n**: Added SEO translation keys across all 9 supported languages and removed hardcoded SEO admin strings to keep the new suite compatible with multilingual mode.
+* **Improvement**: `robots.txt` is now managed dynamically from the admin panel instead of blocking indexing site-wide, with full support for multi-site `APP_URL` configurations.
+* **Improvement**: `sitemap.xml` now respects `lastmod`, skips `noindex` content, and stays aligned with published public resources using absolute URLs.
+* **Fix**: Resolved `500 Internal Server Error` on the SEO Indexing admin page by naming the dynamic robots route.
+* **i18n**: Added SEO translation keys across all 9 supported languages and removed hardcoded SEO admin strings.
 
 ### Community Feed & Composer
 * **Add**: Expanded `POST /status/create` to support `text`, `link`, `gallery`, and `repost` publishing flows while remaining compatible with legacy `s_type` inputs.
 * **Add**: Added URL preview fetching via `POST /status/link-preview`, optional Directory saves from the same composer flow, and automatic duplicate suppression so generated Directory statuses no longer appear twice in `/portal?filter=all`.
 * **Add**: Added multi-image gallery publishing with support for up to 10 images per post, persisted through `forum_attachments` while preserving legacy `image_post` compatibility.
 * **Add**: Added quote reposts backed by `status_reposts`, repost counters in activity cards, and repost notifications to original authors.
+* **Improvement**: Refactored gallery posts to store attachments in `public/upload/` and decoupled them from forum moderation logic (Pin/Lock).
+* **Improvement**: Redesigned the gallery view (`/t{id}`) into a premium responsive image grid and simplified the editor for non-forum gallery posts.
 * **Improvement**: Reworked `/portal?filter=all` around a hybrid ranking model that blends recency, follows, author affinity, content affinity, social proof, reactions, comments, reposts, capped view boosts, and diversity penalties with a 5-minute cache.
 * **Improvement**: Kept `/portal?filter=me` chronological for followed accounts and the current member while excluding duplicated directory statuses from the ranked feed.
 * **Improvement**: Activity cards now render link previews, galleries, repost embeds, repost counts, and quote repost actions more consistently across supported content types.
@@ -206,8 +209,9 @@
 * **Improvement**: Smart feed results are cached for 5 minutes, significantly improving page load performance while maintaining a dynamic discovery experience.
 
 ### Directory UI Polish
-* **Improvement**: Refined the `default` theme directory banners on `/directory`, `/cat/{id}`, and `/directory/{id}` with a more balanced layout, cleaner content width, and a stronger background treatment based on the existing site theme.
-* **Improvement**: Repositioned the `Visit Site` button inside directory listing cards so it now appears under the title and description instead of competing with the card header.
+* **Improvement**: Refined the `default` theme directory banners on `/directory`, `/cat/{id}`, and `/directory/{id}` with a more balanced layout, cleaner content width, and a stronger background treatment.
+* **Add**: Redesigned the "Add Site" page (`/add-site.html`) with a premium Superdesign look and automated metadata fetching (Title, Description, Tags) via AJAX.
+* **Improvement**: Repositioned the `Visit Site` button inside directory listing cards so it now appears under the title and description.
 * **Improvement**: Redesigned `directory-listing-stats-detail` on the directory detail page into clearer responsive stat tiles for visits, reactions, and comments.
 * **Improvement**: Simplified the directory detail hero so the new stat ribbon becomes the primary visual metrics block without changing directory functionality.
 
@@ -242,6 +246,8 @@
 ### Home Dashboard Smart Ads Polish
 * **Add**: `/home` now includes a dedicated Smart Ads stats card, summary panel, smart credit balance, and direct shortcuts for list, create, code, and stats actions.
 * **Add**: Point conversion on `/home` now supports converting points into `Smart Ads` credits directly from the existing dashboard form.
+* **Add**: Completely redesigned the promotion dashboard (`/ads/promote`) with a vibrant Superdesign gradient hero, card-based layouts, and a dedicated navigation sidebar.
+* **Add**: Introduced the `/promote` URL shortcut as a professional alias for the main promotion hub.
 * **Fix**: The Smart Ads stat card now keeps its background correctly in `RTL` mode by using the same mirrored background variable flow as the other dashboard cards.
 * **Improvement**: Smart Ads action buttons on `/home` now match the existing dashboard button palette and sizing, so they stay visually consistent in both `LTR` and `RTL`.
 

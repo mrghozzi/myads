@@ -176,6 +176,7 @@ Route::middleware(['auth'])->group(function () {
 
     // Promote
     Route::get('/ads/promote', [AdsController::class, 'promote'])->name('ads.promote');
+    Route::get('/promote', [AdsController::class, 'promote']); // Alias
 });
 
 // Ads Serving & Tracking (Legacy Compatibility)
