@@ -48,15 +48,15 @@
                     </a>
                     <hr style="margin: 10px 0; border-top: 1px solid #eee;">
                     <a href="{{ route('ads.promote') }}" class="sidebar-menu-item {{ $activeTab === 'all' ? 'active' : '' }}">
-                        <i class="fa fa-th-large me-3"></i> {{ __('All Methods') }}
+                        <i class="fa fa-th-large me-3"></i> {{ __('messages.all_methods') }}
                     </a>
                 </div>
             </div>
 
             <div class="widget-box shadow-sm mt-4" style="border-radius: 12px; border: none; padding: 20px;">
-                <h6 style="font-weight: 700; margin-bottom: 10px; color: #333;">{{ __('Quick Tip') }}</h6>
+                <h6 style="font-weight: 700; margin-bottom: 10px; color: #333;">{{ __('messages.quick_tip') }}</h6>
                 <p style="font-size: 0.85rem; color: #777; line-height: 1.5;">
-                    {{ __('Promoting your site helps you gain visibility and drive quality traffic from our community.') }}
+                    {{ __('messages.promote_tip_desc') }}
                 </p>
             </div>
         </div>
@@ -70,7 +70,7 @@
                     <h5 class="widget-box-title" style="font-size: 1.25rem; font-weight: 700; color: #615dfa;">
                         <i class="fa fa-image me-2"></i> {{ __('messages.bannads') }}
                     </h5>
-                    <span class="badge" style="background: rgba(97, 93, 250, 0.1); color: #615dfa; padding: 5px 12px; border-radius: 20px; font-weight: 600;">-1 point</span>
+                    <span class="badge" style="background: rgba(97, 93, 250, 0.1); color: #615dfa; padding: 5px 12px; border-radius: 20px; font-weight: 600;">-1 {{ __('messages.point') }}</span>
                 </div>
                 <form method="post" action="{{ route('ads.banners.store') }}" class="form-modern">
                     @csrf
@@ -78,13 +78,13 @@
                         <div class="form-item">
                             <div class="form-input small active shadow-sm">
                                 <label>{{ __('messages.name_ads') }}</label>
-                                <input type="text" name="name" value="{{ old('name') }}" required placeholder="e.g. My Website Banner">
+                                <input type="text" name="name" value="{{ old('name') }}" required placeholder="{{ __('messages.name_ads_placeholder') }}">
                             </div>
                         </div>
                         <div class="form-item">
                             <div class="form-input small active shadow-sm">
                                 <label>{{ __('messages.url_link') }}</label>
-                                <input type="url" name="url" value="{{ old('url') }}" required placeholder="https://example.com">
+                                <input type="url" name="url" value="{{ old('url') }}" required placeholder="{{ __('messages.url_link_placeholder') }}">
                             </div>
                         </div>
                     </div>
@@ -103,7 +103,7 @@
                         <div class="form-item">
                             <div class="form-input small active shadow-sm">
                                 <label>{{ __('messages.image_link') }}</label>
-                                <input type="text" name="img" value="{{ old('img') }}" required placeholder="https://example.com/banner.png">
+                                <input type="text" name="img" value="{{ old('img') }}" required placeholder="{{ __('messages.image_link_placeholder') }}">
                             </div>
                         </div>
                     </div>
@@ -123,7 +123,7 @@
                     <h5 class="widget-box-title" style="font-size: 1.25rem; font-weight: 700; color: #40d4f3;">
                         <i class="fa fa-link me-2"></i> {{ __('messages.textads') }}
                     </h5>
-                    <span class="badge" style="background: rgba(64, 212, 243, 0.1); color: #40d4f3; padding: 5px 12px; border-radius: 20px; font-weight: 600;">-1 point</span>
+                    <span class="badge" style="background: rgba(64, 212, 243, 0.1); color: #40d4f3; padding: 5px 12px; border-radius: 20px; font-weight: 600;">-1 {{ __('messages.point') }}</span>
                 </div>
                 <form method="post" action="{{ route('ads.links.store') }}" class="form-modern">
                     @csrf
@@ -131,13 +131,13 @@
                         <div class="form-item">
                             <div class="form-input small active shadow-sm">
                                 <label>{{ __('messages.name_ads') }}</label>
-                                <input type="text" name="name" value="{{ old('name') }}" required placeholder="e.g. Visit My Blog">
+                                <input type="text" name="name" value="{{ old('name') }}" required placeholder="{{ __('messages.text_ads_placeholder') }}">
                             </div>
                         </div>
                         <div class="form-item">
                             <div class="form-input small active shadow-sm">
                                 <label>{{ __('messages.url_link') }}</label>
-                                <input type="url" name="url" value="{{ old('url') }}" required placeholder="https://example.com">
+                                <input type="url" name="url" value="{{ old('url') }}" required placeholder="{{ __('messages.url_link_placeholder') }}">
                             </div>
                         </div>
                     </div>
@@ -164,7 +164,7 @@
                     <h5 class="widget-box-title" style="font-size: 1.25rem; font-weight: 700; color: #fd4350;">
                         <i class="fa fa-exchange-alt me-2"></i> {{ __('messages.exvisit') }}
                     </h5>
-                    <span class="badge" style="background: rgba(253, 67, 80, 0.1); color: #fd4350; padding: 5px 12px; border-radius: 20px; font-weight: 600;">Dynamic cost</span>
+                    <span class="badge" style="background: rgba(253, 67, 80, 0.1); color: #fd4350; padding: 5px 12px; border-radius: 20px; font-weight: 600;">{{ __('messages.dynamic_cost') }}</span>
                 </div>
                 <form method="post" action="{{ route('visits.store') }}" class="form-modern">
                     @csrf
@@ -172,13 +172,13 @@
                         <div class="form-item">
                             <div class="form-input small active shadow-sm">
                                 <label>{{ __('messages.name_ads') }}</label>
-                                <input type="text" name="name" value="{{ old('name') }}" required placeholder="e.g. Fast Traffic">
+                                <input type="text" name="name" value="{{ old('name') }}" required placeholder="{{ __('messages.exchange_name_placeholder') }}">
                             </div>
                         </div>
                         <div class="form-item">
                             <div class="form-input small active shadow-sm">
                                 <label>{{ __('messages.url_link') }}</label>
-                                <input type="url" name="url" value="{{ old('url') }}" required placeholder="https://example.com">
+                                <input type="url" name="url" value="{{ old('url') }}" required placeholder="{{ __('messages.url_link_placeholder') }}">
                             </div>
                         </div>
                     </div>
@@ -187,10 +187,10 @@
                             <div class="form-select shadow-sm" style="border: 1px solid #eee; border-radius: 8px;">
                                 <label>{{ __('messages.visits_time') }}</label>
                                 <select name="tims" required>
-                                    <option value="1" {{ old('tims') == '1' ? 'selected' : '' }}>10s / -1 pts</option>
-                                    <option value="2" {{ old('tims') == '2' ? 'selected' : '' }}>20s / -2 pts</option>
-                                    <option value="3" {{ old('tims') == '3' ? 'selected' : '' }}>30s / -5 pts</option>
-                                    <option value="4" {{ old('tims') == '4' ? 'selected' : '' }}>60s / -10 pts</option>
+                                    <option value="1" {{ old('tims') == '1' ? 'selected' : '' }}>10s / -1 {{ __('messages.pts_short') }}</option>
+                                    <option value="2" {{ old('tims') == '2' ? 'selected' : '' }}>20s / -2 {{ __('messages.pts_short') }}</option>
+                                    <option value="3" {{ old('tims') == '3' ? 'selected' : '' }}>30s / -5 {{ __('messages.pts_short') }}</option>
+                                    <option value="4" {{ old('tims') == '4' ? 'selected' : '' }}>60s / -10 {{ __('messages.pts_short') }}</option>
                                 </select>
                                 <svg class="form-select-icon icon-small-arrow"><use xlink:href="#svg-small-arrow"></use></svg>
                             </div>
