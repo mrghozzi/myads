@@ -32,6 +32,16 @@ class ReportController extends Controller
             $item = SmartAd::find($id);
             $type = 'smart';
             $typeId = 204;
+        } elseif ($request->has('order')) {
+            $id = $request->input('order');
+            $item = \App\Models\OrderRequest::find($id);
+            $type = 'order';
+            $typeId = 701;
+        } elseif ($request->has('user')) {
+            $id = $request->input('user');
+            $item = \App\Models\User::find($id);
+            $type = 'user';
+            $typeId = 702;
         }
 
         // If no valid item found, maybe show generic report or 404

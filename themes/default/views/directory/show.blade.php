@@ -56,13 +56,52 @@
 
                     <div class="directory-detail-sidebar-meta">
                         @if($detail['owner_url'])
+                            <a class="user-status-avatar" href="{{ $detail['owner_url'] }}" style="margin-inline-end: 12px;">
+                                <div class="user-avatar small no-outline {{ $listing->user->isOnline() ? 'online' : 'offline' }}">
+                                    <div class="user-avatar-content">
+                                        <div class="hexagon-image-30-32" data-src="{{ $detail['owner_avatar'] }}" style="width: 30px; height: 32px; position: relative;">
+                                            <canvas style="position: absolute; top: 0px; left: 0px;" width="30" height="32"></canvas>
+                                        </div>
+                                    </div>
+                                    <div class="user-avatar-progress-border">
+                                        <div class="hexagon-border-40-44" style="width: 40px; height: 44px; position: relative;">
+                                            <canvas style="position: absolute; top: 0px; left: 0px;" width="40" height="44"></canvas>
+                                        </div>
+                                    </div>
+                                    @if($listing->user && $listing->user->isAdmin())
+                                        <div class="user-avatar-badge">
+                                            <div class="user-avatar-badge-border">
+                                                <div class="hexagon-22-24" style="width: 22px; height: 24px; position: relative;">
+                                                    <canvas style="position: absolute; top: 0px; left: 0px;" width="22" height="24"></canvas>
+                                                </div>
+                                            </div>
+                                            <div class="user-avatar-badge-content">
+                                                <div class="hexagon-dark-16-18" style="width: 16px; height: 18px; position: relative;">
+                                                    <canvas style="position: absolute; top: 0px; left: 0px;" width="16" height="18"></canvas>
+                                                </div>
+                                            </div>
+                                            <p class="user-avatar-badge-text"><i class="fa fa-fw fa-check"></i></p>
+                                        </div>
+                                    @endif
+                                </div>
+                            </a>
                             <a class="directory-owner-link" href="{{ $detail['owner_url'] }}">
-                                <img src="{{ $detail['owner_avatar'] }}" alt="{{ $detail['owner_name'] }}">
                                 <span>{{ $detail['owner_name'] }}</span>
                             </a>
                         @else
+                            <div class="user-avatar small no-outline offline" style="margin-inline-end: 12px;">
+                                <div class="user-avatar-content">
+                                    <div class="hexagon-image-30-32" data-src="{{ $detail['owner_avatar'] }}" style="width: 30px; height: 32px; position: relative;">
+                                        <canvas style="position: absolute; top: 0px; left: 0px;" width="30" height="32"></canvas>
+                                    </div>
+                                </div>
+                                <div class="user-avatar-progress-border">
+                                    <div class="hexagon-border-40-44" style="width: 40px; height: 44px; position: relative;">
+                                        <canvas style="position: absolute; top: 0px; left: 0px;" width="40" height="44"></canvas>
+                                    </div>
+                                </div>
+                            </div>
                             <div class="directory-owner-link">
-                                <img src="{{ $detail['owner_avatar'] }}" alt="{{ $detail['owner_name'] }}">
                                 <span>{{ $detail['owner_name'] }}</span>
                             </div>
                         @endif

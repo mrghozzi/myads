@@ -48,6 +48,8 @@ class ReactionController extends Controller
         elseif ($type == 'forum_comment') $dbType = 4;
         elseif ($type == 'directory_comment') $dbType = 44;
         elseif ($type == 'store_comment') $dbType = 444;
+        elseif ($type == 'order') $dbType = 6;
+        elseif ($type == 'order_comment') $dbType = 66;
 
         if ($dbType === 0) {
             return response()->json(['error' => 'Invalid type'], 400);
@@ -217,6 +219,13 @@ class ReactionController extends Controller
                          $postUrl = "/store/" . $product->name . "#comment_" . $postId;
                      }
                 }
+            } elseif ($type == 6) {
+                $postUrl = "/orders/" . $postId;
+            } elseif ($type == 66) {
+                $comment = \App\Models\Option::find($postId);
+                if ($comment) {
+                    $postUrl = "/orders/" . $comment->o_parent . "#comment_" . $postId;
+                }
             }
 
             $message = $user->username . " reacted to your post.";
@@ -260,6 +269,14 @@ class ReactionController extends Controller
             // Store Comment (Option)
             $comment = \App\Models\Option::find($postId);
             return $comment ? $comment->o_order : null; // o_order is uid for comments
+        } elseif ($type == 6) {
+            // Order Request
+            $order = \App\Models\OrderRequest::find($postId);
+            return $order ? $order->uid : null;
+        } elseif ($type == 66) {
+            // Order Comment (Option)
+            $comment = \App\Models\Option::find($postId);
+            return $comment ? $comment->o_order : null;
         }
         return null;
     }

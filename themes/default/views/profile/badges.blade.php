@@ -17,6 +17,17 @@
         border-radius: 16px;
         padding: 18px;
         background: linear-gradient(180deg, #fff 0%, #f9faff 100%);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+    .badge-settings-card:hover {
+        border-color: #615dfa;
+    }
+    .badge-settings-card:has(input:checked) {
+        border-color: #615dfa !important;
+        background: rgba(97, 93, 250, 0.05) !important;
+        box-shadow: 0 0 0 1px #615dfa;
     }
     .badge-settings-icon {
         width: 52px;

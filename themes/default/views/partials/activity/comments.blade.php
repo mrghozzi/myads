@@ -20,6 +20,9 @@
         } elseif ($type === 'store') {
             $commentReactionType = 444;
             $reactionTypeString = 'store_comment';
+        } elseif ($type === 'order') {
+            $commentReactionType = 66;
+            $reactionTypeString = 'order_comment';
         }
 
         $forumCategoryId = $forum_category_id ?? null;
@@ -59,15 +62,21 @@
                     </div>
                 </div>
                 <div class="user-avatar-progress-border">
-                    <div class="hexagon-border-40-44" style="width: 40px; height: 44px; position: relative;"></div>
+                    <div class="hexagon-border-40-44" style="width: 40px; height: 44px; position: relative;">
+                        <canvas style="position: absolute; top: 0px; left: 0px;" width="40" height="44"></canvas>
+                    </div>
                 </div>
                 @if($user->isAdmin())
                     <div class="user-avatar-badge">
                         <div class="user-avatar-badge-border">
-                            <div class="hexagon-22-24" style="width: 22px; height: 24px; position: relative;"></div>
+                            <div class="hexagon-22-24" style="width: 22px; height: 24px; position: relative;">
+                                <canvas style="position: absolute; top: 0px; left: 0px;" width="22" height="24"></canvas>
+                            </div>
                         </div>
                         <div class="user-avatar-badge-content">
-                            <div class="hexagon-dark-16-18" style="width: 16px; height: 18px; position: relative;"></div>
+                            <div class="hexagon-dark-16-18" style="width: 16px; height: 18px; position: relative;">
+                                <canvas style="position: absolute; top: 0px; left: 0px;" width="16" height="18"></canvas>
+                            </div>
                         </div>
                         <p class="user-avatar-badge-text"><i class="fa fa-fw fa-check"></i></p>
                     </div>
@@ -81,7 +90,9 @@
                     </div>
                 </div>
                 <div class="user-avatar-progress-border">
-                    <div class="hexagon-border-40-44" style="width: 40px; height: 44px; position: relative;"></div>
+                    <div class="hexagon-border-40-44" style="width: 40px; height: 44px; position: relative;">
+                        <canvas style="position: absolute; top: 0px; left: 0px;" width="40" height="44"></canvas>
+                    </div>
                 </div>
             </div>
         @endif
@@ -186,7 +197,9 @@
                         </div>
                     </div>
                     <div class="user-avatar-progress-border">
-                        <div class="hexagon-border-40-44" style="width: 40px; height: 44px; position: relative;"></div>
+                        <div class="hexagon-border-40-44" style="width: 40px; height: 44px; position: relative;">
+                            <canvas style="position: absolute; top: 0px; left: 0px;" width="40" height="44"></canvas>
+                        </div>
                     </div>
                 </div>
                 <div class="form">
@@ -238,6 +251,10 @@
 @elseif(($locked_topic ?? false) && $type === 'forum')
     <div class="alert alert-warning" style="margin: 12px 0;">
         {{ __('messages.topic_locked_for_comments') }}
+    </div>
+@elseif(($hide_form ?? false) && $type === 'order')
+    <div class="alert alert-warning" style="margin: 12px 0;">
+        {{ __('messages.order_closed_for_comments') }}
     </div>
 @endif
 

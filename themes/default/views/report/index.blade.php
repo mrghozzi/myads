@@ -30,6 +30,21 @@
                             <h4 style="margin: 0 0 8px;">{{ $item->displayTitle() }}</h4>
                             <p style="margin: 0; color: #64748b;">{{ \Illuminate\Support\Str::limit($item->displayDescription(), 160) }}</p>
                         </div>
+                    @elseif($type == 'order')
+                        <div class="widget-box" style="max-width: 500px; margin: 0 auto; padding: 20px; text-align: start; border: 1px solid #eaeaf5; border-radius: 12px;">
+                            <h3 class="widget-box-title">{{ $item->title }}</h3>
+                            <p class="user-status-text small">{{ \Illuminate\Support\Str::limit($item->description, 200) }}</p>
+                        </div>
+                    @elseif($type == 'user')
+                        <div class="user-short-description" style="max-width: 300px; margin: 0 auto; padding: 20px; border: 1px solid #eaeaf5; border-radius: 12px; background: #fff;">
+                            <div class="user-short-description-avatar user-avatar medium">
+                                <div class="user-avatar-content">
+                                    <div class="hexagon-image-68-74" data-src="{{ $item->img ? asset($item->img) : theme_asset('img/avatar/default.png') }}"></div>
+                                </div>
+                            </div>
+                            <p class="user-short-description-title">{{ $item->username }}</p>
+                            <p class="user-short-description-text">{{ $item->name }}</p>
+                        </div>
                     @endif
                 </div>
 

@@ -60,6 +60,10 @@ class CommentController extends Controller
                 ->limit($limit)
                 ->get();
         } elseif ($type == 'order') {
+            $order = \App\Models\OrderRequest::find($id);
+            if ($order && $order->statu == 0) {
+                $hide_form = true;
+            }
             $comments = Option::where('o_parent', $id)
                 ->where('o_type', 'o_order')
                 ->orderBy('id', 'desc')
@@ -172,6 +176,9 @@ class CommentController extends Controller
                 }
             } elseif ($type == 'order') {
                 $order = \App\Models\OrderRequest::findOrFail($id);
+                if ($order->statu == 0) {
+                    return response()->json(['error' => __('messages.order_closed_for_comments')], 403);
+                }
                 $comment = new \App\Models\Option();
                 $comment->name = 'coment_order'; // Fixed name for order comments
                 $comment->o_valuer = $text; // Comment text

@@ -38,6 +38,17 @@
                                 </button>
                             </form>
                         @endif
+
+                        <div style="margin-top: 20px; border-top: 1px solid #eaeaf5; padding-top: 15px;">
+                            <a href="{{ route('report.index', ['order' => $order->id]) }}" class="button white full" style="margin-bottom: 10px;">
+                                <i class="fa fa-flag"></i>&nbsp;{{ __('messages.report_topic') }}
+                            </a>
+                            @if($order->uid != auth()->id())
+                                <a href="{{ route('report.index', ['user' => $order->uid]) }}" class="button white full">
+                                    <i class="fa fa-user"></i>&nbsp;{{ __('messages.report_publisher') }}
+                                </a>
+                            @endif
+                        </div>
                     </div>
                 @endauth
              </div>
@@ -63,7 +74,8 @@
                         'id' => $order->id,
                         'type' => 'order',
                         'limit' => 100,
-                        'order' => $order
+                        'order' => $order,
+                        'hide_form' => $order->statu == 0
                     ])
                 </div>
             </div>

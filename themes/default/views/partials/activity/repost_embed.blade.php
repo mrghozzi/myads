@@ -49,10 +49,14 @@
                 <a class="user-status-avatar" href="{{ $originalUserProfileUrl }}">
                     <div class="user-avatar small no-outline {{ $originalUserPresence }}">
                         <div class="user-avatar-content">
-                            <div class="hexagon-image-30-32" data-src="{{ $originalUserAvatar }}"></div>
+                            <div class="hexagon-image-30-32" data-src="{{ $originalUserAvatar }}" style="width: 30px; height: 32px; position: relative;">
+                                <canvas style="position: absolute; top: 0px; left: 0px;" width="30" height="32"></canvas>
+                            </div>
                         </div>
                         <div class="user-avatar-progress-border">
-                            <div class="hexagon-border-40-44"></div>
+                            <div class="hexagon-border-40-44" style="width: 40px; height: 44px; position: relative;">
+                                <canvas style="position: absolute; top: 0px; left: 0px;" width="40" height="44"></canvas>
+                            </div>
                         </div>
                     </div>
                 </a>
