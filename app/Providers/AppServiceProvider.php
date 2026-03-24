@@ -10,6 +10,7 @@ use App\Models\Setting;
 use App\Models\Menu;
 use App\Services\RobotsTxtService;
 use App\Services\SeoManager;
+use App\Services\V420SchemaService;
 use App\Support\SeoHeadSanitizer;
 use App\Services\PluginManager;
 
@@ -23,6 +24,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(SeoHeadSanitizer::class, fn () => new SeoHeadSanitizer());
         $this->app->singleton(SeoManager::class, fn ($app) => new SeoManager($app->make(SeoHeadSanitizer::class)));
         $this->app->singleton(RobotsTxtService::class, fn () => new RobotsTxtService());
+        $this->app->singleton(V420SchemaService::class, fn () => new V420SchemaService());
     }
 
     /**

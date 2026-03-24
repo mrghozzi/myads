@@ -1,21 +1,33 @@
 <nav class="section-navigation">
     <div id="section-navigation-slider" class="section-menu">
-        <a class="section-menu-item {{ !request('tab') && request()->routeIs('profile.show') ? 'active' : '' }}" href="{{ route('profile.show', $user->username) }}">
+        <a class="section-menu-item {{ ($selectedTab ?? request('tab', 'timeline')) === 'timeline' ? 'active' : '' }}" href="{{ route('profile.show', $user->username) }}">
             <svg class="section-menu-item-icon icon-timeline"><use xlink:href="#svg-timeline"></use></svg>
             <p class="section-menu-item-text">{{ __('messages.Timeline') }}</p>
         </a>
-        <a class="section-menu-item {{ request('tab') == 'photos' ? 'active' : '' }}" href="{{ route('profile.show', $user->username) }}?tab=photos">
-            <svg class="section-menu-item-icon icon-photos"><use xlink:href="#svg-photos"></use></svg>
-            <p class="section-menu-item-text">{{ __('messages.Photos') }}</p>
-        </a>
-        <a class="section-menu-item {{ request()->routeIs('profile.followers') ? 'active' : '' }}" href="{{ route('profile.followers', $user->username) }}">
-            <svg class="section-menu-item-icon icon-friend"><use xlink:href="#svg-friend"></use></svg>
-            <p class="section-menu-item-text">{{ __('messages.Followers') }}</p>
-        </a>
-        <a class="section-menu-item {{ request()->routeIs('profile.following') ? 'active' : '' }}" href="{{ route('profile.following', $user->username) }}">
-            <svg class="section-menu-item-icon icon-friend"><use xlink:href="#svg-friend"></use></svg>
-            <p class="section-menu-item-text">{{ __('messages.following') }}</p>
-        </a>
+        @if(($canViewAbout ?? true) || ($selectedTab ?? request('tab')) === 'about')
+            <a class="section-menu-item {{ ($selectedTab ?? request('tab')) == 'about' ? 'active' : '' }}" href="{{ route('profile.show', $user->username) }}?tab=about">
+                <svg class="section-menu-item-icon icon-info"><use xlink:href="#svg-info"></use></svg>
+                <p class="section-menu-item-text">{{ __('messages.about_me') }}</p>
+            </a>
+        @endif
+        @if(($canViewPhotos ?? true) || ($selectedTab ?? request('tab')) === 'photos')
+            <a class="section-menu-item {{ ($selectedTab ?? request('tab')) == 'photos' ? 'active' : '' }}" href="{{ route('profile.show', $user->username) }}?tab=photos">
+                <svg class="section-menu-item-icon icon-photos"><use xlink:href="#svg-photos"></use></svg>
+                <p class="section-menu-item-text">{{ __('messages.Photos') }}</p>
+            </a>
+        @endif
+        @if(($canViewFollowers ?? true) || request()->routeIs('profile.followers'))
+            <a class="section-menu-item {{ request()->routeIs('profile.followers') ? 'active' : '' }}" href="{{ route('profile.followers', $user->username) }}">
+                <svg class="section-menu-item-icon icon-friend"><use xlink:href="#svg-friend"></use></svg>
+                <p class="section-menu-item-text">{{ __('messages.Followers') }}</p>
+            </a>
+        @endif
+        @if(($canViewFollowing ?? true) || request()->routeIs('profile.following'))
+            <a class="section-menu-item {{ request()->routeIs('profile.following') ? 'active' : '' }}" href="{{ route('profile.following', $user->username) }}">
+                <svg class="section-menu-item-icon icon-friend"><use xlink:href="#svg-friend"></use></svg>
+                <p class="section-menu-item-text">{{ __('messages.following') }}</p>
+            </a>
+        @endif
         <a class="section-menu-item {{ request('tab') == 'blog' ? 'active' : '' }}" href="{{ route('profile.show', $user->username) }}?tab=blog">
             <svg class="section-menu-item-icon icon-blog-posts"><use xlink:href="#svg-blog-posts"></use></svg>
             <p class="section-menu-item-text">{{ __('messages.Blog') }}</p>

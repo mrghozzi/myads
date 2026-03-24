@@ -40,7 +40,7 @@
                     </svg>
                 </div>
             </a>
-            @if(auth()->user()->isAdmin())
+            @if(auth()->user()->hasAdminAccess())
                 <a class="action-item-wrap" href="{{ route('admin.index') }}">
                     <div class="action-item dark">
                         <svg class="action-item-icon icon-private">

@@ -1,3 +1,24 @@
+@php
+    $activityUser = $activity->user;
+    $activityUserProfileUrl = $activityUser ? route('profile.show', $activityUser->username) : '#';
+    $activityUserName = $activityUser?->username ?? __('messages.unknown_user');
+    $activityUserAvatar = $activityUser?->img ? asset($activityUser->img) : theme_asset('img/avatar/default.png');
+    $activityUserPresence = $activityUser?->isOnline() ? 'online' : 'offline';
+    $activityUserIsAdmin = $activityUser?->isAdmin() ?? false;
+    $formattedText = \App\Support\ContentFormatter::format($activity->related_content->txt ?? '');
+    $repostExcerpt = \Illuminate\Support\Str::limit(
+        strip_tags(
+            $activity->related_content->txt
+            ?? $activity->related_content->o_valuer
+            ?? $activity->related_content->text
+            ?? $activity->related_content->name
+            ?? ''
+                ),
+        80
+    );
+    $repostAuthorName = addslashes($activityUserName);
+@endphp
+
 <div class="widget-box no-padding post{{ $activity->id }}">
     <!-- WIDGET BOX SETTINGS -->
     <div class="widget-box-settings">
@@ -48,13 +69,13 @@
             <!-- USER STATUS -->
             <div class="user-status">
                 <!-- USER STATUS AVATAR -->
-                <a class="user-status-avatar" href="{{ route('profile.show', $activity->user->username) }}">
+                <a class="user-status-avatar" href="{{ $activityUserProfileUrl }}">
                     <!-- USER AVATAR -->
-                    <div class="user-avatar small no-outline {{ $activity->user->isOnline() ? 'online' : 'offline' }}">
+                    <div class="user-avatar small no-outline {{ $activityUserPresence }}">
                         <!-- USER AVATAR CONTENT -->
                         <div class="user-avatar-content">
                             <!-- HEXAGON -->
-                            <div class="hexagon-image-30-32" data-src="{{ $activity->user->img ? asset($activity->user->img) : theme_asset('img/avatar/default.png') }}" style="width: 30px; height: 32px; position: relative;">
+                            <div class="hexagon-image-30-32" data-src="{{ $activityUserAvatar }}" style="width: 30px; height: 32px; position: relative;">
                                 <canvas style="position: absolute; top: 0px; left: 0px;" width="30" height="32"></canvas>
                             </div>
                             <!-- /HEXAGON -->
@@ -69,7 +90,7 @@
                         </div>
                         <!-- /USER AVATAR PROGRESS BORDER -->
 
-                        @if($activity->user->isAdmin())
+                        @if($activityUserIsAdmin)
                             <!-- USER AVATAR BADGE -->
                             <div class="user-avatar-badge">
                                 <!-- USER AVATAR BADGE BORDER -->
@@ -99,7 +120,7 @@
 
                 <!-- USER STATUS TITLE -->
                 <p class="user-status-title medium">
-                    <a class="bold" href="{{ route('profile.show', $activity->user->username) }}">{{ $activity->user->username }}</a>
+                    <a class="bold" href="{{ $activityUserProfileUrl }}">{{ $activityUserName }}</a>
                 </p>
                 <!-- /USER STATUS TITLE -->
 
@@ -121,23 +142,24 @@
             </div>
 
             <!-- WIDGET BOX STATUS TEXT -->
-            <p class="widget-box-status-text post_text{{ $activity->related_content->id }}">
-                <br/>
+            <div class="widget-box-status-text post_text{{ $activity->related_content->id }}">
                 <div class="textpost" id="post_form{{ $activity->related_content->id }}">
-                    @php
-                        $txt = nl2br(e($activity->related_content->txt));
-                        // Convert hashtags (basic implementation)
-                        $txt = preg_replace('/#(\w+)/', '<a href="'.url('tag/$1').'">#$1</a>', $txt);
-                        // Arabic alignment
-                        if (preg_match('/\p{Arabic}/u', $txt)) {
-                            $txt = '<div style="text-align: right;">' . $txt . '</div>';
-                        }
-                    @endphp
-                    {!! $txt !!}
+                    @if(trim(strip_tags($formattedText)) !== '')
+                        {!! $formattedText !!}
+                    @endif
                     <div id="report{{ $activity->related_content->id }}"></div>
                 </div>
-            </p>
+            </div>
             <!-- /WIDGET BOX STATUS TEXT -->
+
+            @if($activity->linkPreviewRecord)
+                @include('theme::partials.activity.link_preview', ['activity' => $activity])
+            @endif
+
+            @if($activity->repostRecord)
+                @include('theme::partials.activity.repost_embed', ['activity' => $activity])
+            @endif
+
             <div id="notif{{ $activity->related_content->id }}"></div>
 
             <!-- CONTENT ACTIONS -->
@@ -166,6 +188,16 @@
                         <!-- /META LINE LINK -->
                     </div>
                     <!-- /META LINE -->
+                </div>
+                <!-- /CONTENT ACTION -->
+
+                <!-- CONTENT ACTION -->
+                <div class="content-action">
+                    <div class="meta-line">
+                        <p class="meta-line-link">
+                            <a href="{{ route('forum.topic', $activity->tp_id) }}">{{ $activity->reposts_count }} {{ __('messages.reposts') }}</a>
+                        </p>
+                    </div>
                 </div>
                 <!-- /CONTENT ACTION -->
             </div>
@@ -267,6 +299,15 @@
                         </a>
                     </div>
                  @endforeach
+                 @auth
+                    <div class="reaction-option text-tooltip-tft" data-title="{{ __('messages.quote_repost') }}" style="position: relative;">
+                        <a href="javascript:void(0);" onclick="openRepostComposer({{ $activity->id }}, '{{ $repostAuthorName }}', '{{ addslashes($repostExcerpt) }}')">
+                            <span style="width: 40px; height: 40px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: #615dfa; color: #fff;">
+                                <i class="fa fa-retweet" aria-hidden="true"></i>
+                            </span>
+                        </a>
+                    </div>
+                 @endauth
             </div>
             <!-- /REACTION OPTIONS -->
         </div>

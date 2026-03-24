@@ -88,7 +88,7 @@
         </div>
 
         <!-- Admin -->
-        @if(auth()->check() && auth()->user()->isAdmin())
+        @if(auth()->check() && auth()->user()->hasAdminAccess())
             <a class="action-item-wrap" href="{{ route('admin.index') }}">
                 <div class="action-item dark" title="Admin CP">
                     <svg class="action-item-icon icon-private"><use xlink:href="#svg-private"></use></svg>

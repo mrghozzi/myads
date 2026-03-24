@@ -8,13 +8,21 @@ use App\Models\Like;
 use App\Models\Notification;
 use App\Models\Option;
 use App\Models\User;
+use App\Services\GamificationService;
+use App\Services\NotificationService;
+use App\Services\PointLedgerService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class ReactionController extends Controller
 {
-    public function toggle(Request $request)
+    public function toggle(
+        Request $request,
+        NotificationService $notifications,
+        PointLedgerService $pointLedger,
+        GamificationService $gamification
+    )
     {
         if (!Auth::check()) {
             return response()->json(['error' => 'Unauthorized'], 401);
@@ -67,7 +75,7 @@ class ReactionController extends Controller
 
                 if ($existingOption && $existingOption->o_valuer == $reaction) {
                     // Same reaction -> Toggle OFF (Remove)
-                    $this->removeReaction($existingLike, $existingOption, $user, $id, $dbType);
+                    $this->removeReaction($existingLike, $existingOption, $user, $id, $dbType, $pointLedger);
                     $result = [
                         'action' => 'removed',
                         'html' => $defaultIcon
@@ -97,7 +105,7 @@ class ReactionController extends Controller
                 }
             } else {
                 // New Reaction -> Toggle ON (Add)
-                $this->addReaction($user, $id, $dbType, $reaction);
+                $this->addReaction($user, $id, $dbType, $reaction, $notifications, $pointLedger, $gamification);
                 $result = [
                     'action' => 'added',
                     'html' => '<img class="reaction-option-image" src="' . theme_asset('img/reaction/' . $reaction . '.png') . '" width="' . $imgSize . '" alt="reaction-' . $reaction . '">'
@@ -113,7 +121,7 @@ class ReactionController extends Controller
         }
     }
 
-    private function removeReaction($like, $option, $user, $postId, $type)
+    private function removeReaction($like, $option, $user, $postId, $type, PointLedgerService $pointLedger)
     {
         $time_t = $like->time_t; // Original reaction time for notification matching
         
@@ -137,15 +145,20 @@ class ReactionController extends Controller
                         ->where('state', 1)
                         ->delete();
 
-            // Deduct Points
-            // Owner -1
-            User::where('id', $ownerId)->decrement('pts', 1);
-            // Reactor -2
-            User::where('id', $user->id)->decrement('pts', 2);
+            $pointLedger->award($ownerId, -1, 'reaction_removed_received', 'reaction_removed_received', 'reaction', (int) $postId);
+            $pointLedger->award($user->id, -2, 'reaction_removed_given', 'reaction_removed_given', 'reaction', (int) $postId);
         }
     }
 
-    private function addReaction($user, $postId, $type, $reaction)
+    private function addReaction(
+        $user,
+        $postId,
+        $type,
+        $reaction,
+        NotificationService $notifications,
+        PointLedgerService $pointLedger,
+        GamificationService $gamification
+    )
     {
         $time = time();
 
@@ -211,21 +224,14 @@ class ReactionController extends Controller
                 $message = $user->username . " reacted to your comment.";
             }
             
-            Notification::create([
-                'uid' => $ownerId,
-                'name' => $message,
-                'nurl' => $postUrl,
-                'logo' => $reaction, // Use reaction name (like, love...)
-                'time' => $time,
-                'state' => 1
-            ]);
+            $notifications->send($ownerId, $message, $postUrl, $reaction, $user->id);
 
-            // Add Points
-            // Owner +1
-            User::where('id', $ownerId)->increment('pts', 1);
-            // Reactor +2
-            User::where('id', $user->id)->increment('pts', 2);
+            $pointLedger->award($ownerId, 1, 'reaction_received', 'reaction_received', 'reaction', (int) $postId);
+            $pointLedger->award($user->id, 2, 'reaction_given', 'reaction_given', 'reaction', (int) $postId);
+            $gamification->recordEvent($ownerId, 'reaction_received');
         }
+
+        $gamification->recordEvent($user->id, 'reaction_given');
     }
 
     private function getPostOwnerId($postId, $type)

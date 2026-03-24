@@ -7,15 +7,7 @@
 
 <div class="grid grid-3-9 mobile-prefer-content">
     <div class="grid-column">
-        <!-- SIDEBAR MENU -->
-        <div class="widget-box">
-            <p class="widget-box-title">{{ __('messages.account_settings') }}</p>
-            <div class="widget-box-content padding-none">
-                <a href="{{ route('profile.edit') }}" class="button primary full" style="border-radius: 0; box-shadow: none;">{{ __('messages.edit_profile') }}</a>
-                <a href="{{ route('profile.history') }}" class="button secondary full" style="border-radius: 0; box-shadow: none;">{{ __('messages.pts_history') ?? 'PTS History' }}</a>
-                <a href="{{ route('profile.show', $user->username) }}" class="button secondary full" style="border-radius: 0; box-shadow: none;">{{ __('messages.view_profile') }}</a>
-            </div>
-        </div>
+        @include('theme::profile.settings_nav')
     </div>
 
     <div class="grid-column">
@@ -101,6 +93,15 @@
                             <div class="form-input small">
                                 <label for="password_confirmation">{{ __('messages.confirm_password') }}</label>
                                 <input type="password" id="password_confirmation" name="password_confirmation">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-item">
+                            <div class="form-textarea active">
+                                <label for="about_me">{{ __('messages.about_me') }}</label>
+                                <textarea id="about_me" name="about_me" rows="6" placeholder="{{ __('messages.about_me_placeholder') }}">{{ old('about_me', $user->sig) }}</textarea>
                             </div>
                         </div>
                     </div>

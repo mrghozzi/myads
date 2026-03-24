@@ -57,21 +57,13 @@ class ForumController extends Controller
 
         $statuses = $statuses
             ->orderBy('id', 'desc')
-            ->paginate((int) $settings['topics_per_page']);
+            ->paginate(20);
 
         $topicIds = $statuses->pluck('tp_id');
         $topics = ForumTopic::with(['user', 'category'])
             ->whereIn('id', $topicIds)
             ->get()
             ->keyBy('id');
-
-        if (request()->ajax()) {
-            $html = view('theme::partials.ajax.forum_topics', compact('statuses', 'topics'))->render();
-            return response()->json([
-                'html' => $html,
-                'next_page_url' => $statuses->nextPageUrl(),
-            ]);
-        }
 
         $this->seo([
             'scope_key' => 'forum_category',

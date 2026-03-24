@@ -1,5 +1,5 @@
 # v4.2.0
-> **Feature Release** - News fixes, portal integration, and advanced plugin/theme systems.
+> **Feature Release** - Community feed overhaul, profile hub privacy, admin ACL, and platform integrations.
 
 ### 🔌 Plugins & Themes System
 * **Add**: Advanced Plugin & Theme management system with a secure thumbnail delivery route.
@@ -27,6 +27,42 @@
 * **Improvement**: `robots.txt` is now managed dynamically from the admin panel instead of blocking indexing site-wide.
 * **Improvement**: `sitemap.xml` now respects `lastmod`, skips `noindex` content, and stays aligned with published public resources.
 * **i18n**: Added SEO translation keys across all 9 supported languages and removed hardcoded SEO admin strings to keep the new suite compatible with multilingual mode.
+
+### Community Feed & Composer
+* **Add**: Expanded `POST /status/create` to support `text`, `link`, `gallery`, and `repost` publishing flows while remaining compatible with legacy `s_type` inputs.
+* **Add**: Added URL preview fetching via `POST /status/link-preview`, optional Directory saves from the same composer flow, and automatic duplicate suppression so generated Directory statuses no longer appear twice in `/portal?filter=all`.
+* **Add**: Added multi-image gallery publishing with support for up to 10 images per post, persisted through `forum_attachments` while preserving legacy `image_post` compatibility.
+* **Add**: Added quote reposts backed by `status_reposts`, repost counters in activity cards, and repost notifications to original authors.
+* **Improvement**: Reworked `/portal?filter=all` around a hybrid ranking model that blends recency, follows, author affinity, content affinity, social proof, reactions, comments, reposts, capped view boosts, and diversity penalties with a 5-minute cache.
+* **Improvement**: Kept `/portal?filter=me` chronological for followed accounts and the current member while excluding duplicated directory statuses from the ranked feed.
+* **Improvement**: Activity cards now render link previews, galleries, repost embeds, repost counts, and quote repost actions more consistently across supported content types.
+
+### Mentions, Notifications & Formatting
+* **Add**: Added server-side `@mentions` extraction and storage through `status_mentions` for both posts and comments, including member notifications without self-notify behavior.
+* **Add**: Added `GET /mentions/users?q=` lookup support for composer/autocomplete integrations and filtered it through member privacy rules.
+* **Improvement**: Unified text formatting for community posts and comments so hashtags, safe links, Markdown, and mentions now flow through shared formatter services instead of Blade regex fragments.
+
+### Profile Hub, Privacy & Gamification
+* **Add**: Added `/settings/privacy` with per-member controls for profile, about, photos, followers, following, points history, direct messages, mentions, reposts, and online status visibility.
+* **Improvement**: Enforced the new privacy rules across profile tabs, SEO profile descriptions, direct messaging, mention delivery, repost delivery, and profile navigation visibility.
+* **Add**: Added badge showcase management via `/settings/badges`, badge display on profile pages, and a refreshed points history ledger on `/history`.
+* **Improvement**: Rebuilt profile `About Me` around `users.sig`, upgraded `/u/{username}?tab=photos`, and refreshed `/history` toward a more profile-hub style layout.
+* **Add**: Introduced `point_transactions`, `badges`, `user_badges`, `badge_showcase`, `quests`, and `quest_progress` with seeded v1 milestones and daily/weekly quests for posts, comments, reactions, reposts, and follow growth.
+
+### Admin ACL & Forum Navigation
+* **Add**: Added `/admin/admins` CRUD for site administrators with full-access and module-scoped permissions backed by `site_admins`.
+* **Improvement**: Centralized admin authorization through `AdminAccessService`, updated `AdminMiddleware`, and wired admin navigation visibility to module-based access rules.
+* **Security**: Locked `user_id=1` as the default super-admin, preventing scoped admins from managing administrators and preventing super-admin removal.
+* **Improvement**: Switched forum category pages `/f{id}` from infinite-scroll loading to standard HTML pagination with 20 topics per page.
+
+### i18n, Recovery & Validation
+* **Fix**: Repaired corrupted v4.2.0 locale entries and ensured the new community, privacy, badge, quest, mention, repost, and admin ACL keys are present across all 9 shipped locales.
+* **Fix**: Added centralized v4.2.0 schema detection with graceful fallback handling so missing upgrade tables such as `site_admins`, `user_privacy_settings`, and `status_link_previews` no longer trigger `500` errors on `/portal`, profile pages, forum topic cards, sidebars, and other authenticated surfaces.
+* **Fix**: Hardened `/portal` activity cards and repost embeds against legacy feed rows whose author account no longer exists, so missing users now fall back to translated placeholders instead of triggering Blade `500` errors.
+* **Fix**: Settings and admin pages that depend on incomplete v4.2.0 tables now render upgrade notices and block writes with friendly translated messages instead of crashing, while public reads continue in compatibility mode where possible.
+* **Add**: Added a dedicated repair migration for the March 23, 2026 social feed extension schema and new fallback-focused feature coverage for incomplete-upgrade scenarios.
+* **Add**: Added feature coverage for social publishing, mention privacy, profile privacy enforcement, badge showcase limits, admin ACL, portal feed deduplication and chronology, forum pagination, and v4.2.0 translation key coverage.
+* **Validation**: Verified updated PHP files with `php -l`, confirmed the new routes during route inspection, and ran the dedicated `V420*` feature test suite successfully.
 
 # v4.1.3
 > **Patch Release** - Embed delivery, routing, and Smart Ads reliability fixes.

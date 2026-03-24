@@ -47,9 +47,9 @@
         <a class="navigation-widget-section-link" href="{{ url('/p' . auth()->id()) }}">{{ __('messages.change_avatar_cover') }}</a>
         <a class="navigation-widget-section-link" href="{{ url('/options') }}">{{ __('messages.options') }}</a>
 
-        @if(auth()->user()->isAdmin())
+        @if(auth()->user()->hasAdminAccess())
             <p class="navigation-widget-section-title">{{ __('messages.mode_admin') }}</p>
-            <a class="navigation-widget-section-link" href="{{ url('/admincp?cont') }}">{{ __('messages.activate') }}</a>
+            <a class="navigation-widget-section-link" href="{{ route('admin.index') }}">{{ __('messages.activate') }}</a>
         @endif
     @endauth
 

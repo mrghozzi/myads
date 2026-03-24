@@ -1,3 +1,24 @@
+@php
+    $activityUser = $activity->user;
+    $activityUserProfileUrl = $activityUser ? route('profile.show', $activityUser->username) : '#';
+    $activityUserName = $activityUser?->username ?? __('messages.unknown_user');
+    $activityUserAvatar = $activityUser?->img ? asset($activityUser->img) : theme_asset('img/avatar/default.png');
+    $activityUserPresence = $activityUser?->isOnline() ? 'online' : 'offline';
+    $activityUserIsAdmin = $activityUser?->isAdmin() ?? false;
+    $formattedText = \App\Support\ContentFormatter::format($activity->related_content->txt ?? '');
+    $repostExcerpt = \Illuminate\Support\Str::limit(
+        strip_tags(
+            $activity->related_content->txt
+            ?? $activity->related_content->o_valuer
+            ?? $activity->related_content->text
+            ?? $activity->related_content->name
+            ?? ''
+        ),
+        80
+    );
+    $repostAuthorName = addslashes($activityUserName);
+@endphp
+
 <div class="widget-box no-padding post{{ $activity->id }}">
     <!-- WIDGET BOX SETTINGS -->
     <div class="widget-box-settings">
@@ -37,17 +58,17 @@
         <div class="widget-box-status-content">
             <!-- USER STATUS -->
             <div class="user-status">
-                <a class="user-status-avatar" href="{{ route('profile.show', $activity->user->username) }}">
-                    <div class="user-avatar small no-outline {{ $activity->user->isOnline() ? 'online' : 'offline' }}">
+                <a class="user-status-avatar" href="{{ $activityUserProfileUrl }}">
+                    <div class="user-avatar small no-outline {{ $activityUserPresence }}">
                         <div class="user-avatar-content">
-                            <div class="hexagon-image-30-32" data-src="{{ $activity->user->img ? asset($activity->user->img) : theme_asset('img/avatar/default.png') }}" style="width: 30px; height: 32px; position: relative;">
+                            <div class="hexagon-image-30-32" data-src="{{ $activityUserAvatar }}" style="width: 30px; height: 32px; position: relative;">
                                 <canvas style="position: absolute; top: 0px; left: 0px;" width="30" height="32"></canvas>
                             </div>
                         </div>
                         <div class="user-avatar-progress-border">
                             <div class="hexagon-border-40-44" style="width: 40px; height: 44px; position: relative;"></div>
                         </div>
-                        @if($activity->user->isAdmin())
+                        @if($activityUserIsAdmin)
                             <div class="user-avatar-badge">
                                 <div class="user-avatar-badge-border">
                                     <div class="hexagon-22-24" style="width: 22px; height: 24px; position: relative;"></div>
@@ -61,7 +82,7 @@
                     </div>
                 </a>
                 <p class="user-status-title medium">
-                    <a class="bold" href="{{ route('profile.show', $activity->user->username) }}">{{ $activity->user->username }}</a>
+                    <a class="bold" href="{{ $activityUserProfileUrl }}">{{ $activityUserName }}</a>
                     &nbsp;{{ __('messages.added_photo') }}
                 </p>
                 <p class="user-status-text small">
@@ -77,31 +98,22 @@
             </div>
 
             <!-- WIDGET BOX STATUS TEXT -->
-            <p class="widget-box-status-text post_text{{ $activity->related_content->id }}">
+            <div class="widget-box-status-text post_text{{ $activity->related_content->id }}">
                 <div class="textpost" id="post_form{{ $activity->related_content->id }}">
-                    @php
-                        $txt = nl2br(e($activity->related_content->txt));
-                        $txt = preg_replace('/#(\w+)/', '<a href="'.url('tag/$1').'">#$1</a>', $txt);
-                        if (preg_match('/\p{Arabic}/u', $txt)) {
-                            $txt = '<div style="text-align: right;">' . $txt . '</div>';
-                        }
-                    @endphp
-                    {!! $txt !!}
+                    @if(trim(strip_tags($formattedText)) !== '')
+                        {!! $formattedText !!}
+                    @endif
                     <div id="report{{ $activity->related_content->id }}"></div>
                 </div>
-            </p>
+            </div>
             <!-- /WIDGET BOX STATUS TEXT -->
 
-            <style> .post-box-picture img { margin-top: 24px; width: 100%; height: auto;   border-radius: 12px; } </style>
-            @php
-                // Assuming image path is stored in o_valuer or similar, need to verify
-                // In tpl_image_stt.php: $catussc['o_valuer'] is the image path
-                // I need to fetch the image option.
-                // For now, I'll assume related_content has an accessor for image_url
-            @endphp
-            <a class="post-box-picture" href="{{ route('forum.topic', $activity->tp_id) }}">
-                <img src="{{ $activity->related_content->image_url ?? theme_asset('img/error_plug.png') }}" alt="{{ Str::limit(strip_tags($activity->related_content->txt), 50) }}">
-            </a>
+            @include('theme::partials.activity.gallery', ['activity' => $activity])
+
+            @if($activity->linkPreviewRecord)
+                @include('theme::partials.activity.link_preview', ['activity' => $activity])
+            @endif
+
             <div id="notif{{ $activity->related_content->id }}"></div>
 
             <!-- CONTENT ACTIONS -->
@@ -116,6 +128,13 @@
                     <div class="meta-line">
                         <p class="meta-line-link">
                             <a href="{{ route('forum.topic', $activity->tp_id) }}">{{ $activity->comments_count }} {{ __('messages.comments') }}</a>
+                        </p>
+                    </div>
+                </div>
+                <div class="content-action">
+                    <div class="meta-line">
+                        <p class="meta-line-link">
+                            <a href="{{ route('forum.topic', $activity->tp_id) }}">{{ $activity->reposts_count }} {{ __('messages.reposts') }}</a>
                         </p>
                     </div>
                 </div>
@@ -201,6 +220,15 @@
                         </a>
                     </div>
                  @endforeach
+                 @auth
+                    <div class="reaction-option text-tooltip-tft" data-title="{{ __('messages.quote_repost') }}" style="position: relative;">
+                        <a href="javascript:void(0);" onclick="openRepostComposer({{ $activity->id }}, '{{ $repostAuthorName }}', '{{ addslashes($repostExcerpt) }}')">
+                            <span style="width: 40px; height: 40px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: #615dfa; color: #fff;">
+                                <i class="fa fa-retweet" aria-hidden="true"></i>
+                            </span>
+                        </a>
+                    </div>
+                 @endauth
             </div>
         </div>
     </div>

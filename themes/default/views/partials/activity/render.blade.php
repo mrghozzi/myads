@@ -25,3 +25,50 @@
 @if($activity->related_content)
     @include('theme::partials.activity.types.' . $type, ['activity' => $activity, 'detailView' => $detailView ?? false])
 @endif
+
+@once
+    @push('scripts')
+        <script>
+            if (typeof window.openRepostComposer !== 'function') {
+                window.openRepostComposer = function (statusId, authorName, excerpt) {
+                    const quote = window.prompt('{{ __('messages.quote_repost_prompt') }}', '');
+                    if (quote === null) {
+                        return;
+                    }
+
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = '{{ route('status.create') }}';
+                    form.style.display = 'none';
+
+                    const token = document.createElement('input');
+                    token.type = 'hidden';
+                    token.name = '_token';
+                    token.value = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+                    const kind = document.createElement('input');
+                    kind.type = 'hidden';
+                    kind.name = 'post_kind';
+                    kind.value = 'repost';
+
+                    const repostId = document.createElement('input');
+                    repostId.type = 'hidden';
+                    repostId.name = 'repost_status_id';
+                    repostId.value = statusId;
+
+                    const text = document.createElement('input');
+                    text.type = 'hidden';
+                    text.name = 'text';
+                    text.value = quote;
+
+                    form.appendChild(token);
+                    form.appendChild(kind);
+                    form.appendChild(repostId);
+                    form.appendChild(text);
+                    document.body.appendChild(form);
+                    form.submit();
+                };
+            }
+        </script>
+    @endpush
+@endonce

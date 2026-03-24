@@ -12,6 +12,9 @@ use App\Models\Like;
 use App\Models\News;
 use App\Models\Option;
 use App\Models\Product;
+use App\Models\StatusLinkPreview;
+use App\Models\StatusRepost;
+use App\Services\V420SchemaService;
 
 class Status extends Model
 {
@@ -29,15 +32,61 @@ class Status extends Model
         'statu',
     ];
 
-    protected $appends = ['date_formatted', 'reactions_count', 'comments_count', 'grouped_reactions'];
+    protected $appends = ['date_formatted', 'reactions_count', 'comments_count', 'grouped_reactions', 'reposts_count', 'post_kind'];
 
     public function user()
     {
         return $this->belongsTo(User::class, 'uid');
     }
 
+    public function forumTopic()
+    {
+        return $this->belongsTo(ForumTopic::class, 'tp_id');
+    }
+
+    public function directoryListing()
+    {
+        return $this->belongsTo(Directory::class, 'tp_id');
+    }
+
+    public function newsItem()
+    {
+        return $this->belongsTo(News::class, 'tp_id');
+    }
+
+    public function productItem()
+    {
+        return $this->belongsTo(Product::class, 'tp_id');
+    }
+
+    public function linkPreviewRecord()
+    {
+        return $this->hasOne(StatusLinkPreview::class, 'status_id');
+    }
+
+    public function repostRecord()
+    {
+        return $this->hasOne(StatusRepost::class, 'status_id');
+    }
+
     public function getRelatedContentAttribute()
     {
+        if ($this->relationLoaded('forumTopic') && $this->forumTopic) {
+            return $this->forumTopic;
+        }
+
+        if ($this->relationLoaded('directoryListing') && $this->directoryListing) {
+            return $this->directoryListing;
+        }
+
+        if ($this->relationLoaded('productItem') && $this->productItem) {
+            return $this->productItem;
+        }
+
+        if ($this->relationLoaded('newsItem') && $this->newsItem) {
+            return $this->newsItem;
+        }
+
         if (in_array($this->s_type, [100, 4, 2])) {
             return ForumTopic::find($this->tp_id);
         } elseif ($this->s_type == 1) {
@@ -136,6 +185,58 @@ class Status extends Model
         } catch (\Throwable $e) {
             return [];
         }
+    }
+
+    public function getRepostsCountAttribute(): int
+    {
+        if (!app(V420SchemaService::class)->supports('reposts')) {
+            return 0;
+        }
+
+        try {
+            return StatusRepost::where('original_status_id', $this->id)->count();
+        } catch (\Throwable $e) {
+            return 0;
+        }
+    }
+
+    public function getPostKindAttribute(): string
+    {
+        $schema = app(V420SchemaService::class);
+
+        if ($schema->supports('reposts')) {
+            try {
+                $hasRepost = $this->relationLoaded('repostRecord')
+                    ? $this->getRelation('repostRecord') !== null
+                    : $this->repostRecord()->exists();
+
+                if ($hasRepost) {
+                    return 'repost';
+                }
+            } catch (\Throwable) {
+                // Keep falling back to other post kinds.
+            }
+        }
+
+        if ($schema->supports('link_previews')) {
+            try {
+                $hasLinkPreview = $this->relationLoaded('linkPreviewRecord')
+                    ? $this->getRelation('linkPreviewRecord') !== null
+                    : $this->linkPreviewRecord()->exists();
+
+                if ($hasLinkPreview) {
+                    return 'link';
+                }
+            } catch (\Throwable) {
+                // Keep falling back to other post kinds.
+            }
+        }
+
+        if ((int) $this->s_type === 4) {
+            return 'gallery';
+        }
+
+        return 'text';
     }
 
     private function getReactionType()

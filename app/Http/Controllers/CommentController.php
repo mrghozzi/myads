@@ -8,6 +8,12 @@ use App\Models\ForumTopic;
 use App\Models\Notification;
 use App\Models\Option;
 use App\Models\User;
+use App\Services\GamificationService;
+use App\Services\MentionService;
+use App\Services\NotificationService;
+use App\Services\PointLedgerService;
+use App\Services\V420SchemaService;
+use App\Support\ContentFormatter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -64,7 +70,13 @@ class CommentController extends Controller
         return view('theme::partials.activity.comments', compact('comments', 'id', 'type', 'limit', 'hide_form', 'locked_topic', 'forum_category_id'));
     }
 
-    public function store(Request $request)
+    public function store(
+        Request $request,
+        NotificationService $notifications,
+        PointLedgerService $pointLedger,
+        MentionService $mentions,
+        GamificationService $gamification
+    )
     {
         if (!Auth::check()) {
             return response()->json(['error' => 'Unauthorized'], 401);
@@ -88,6 +100,13 @@ class CommentController extends Controller
 
         if (!in_array($type, ['forum', 'directory', 'store'], true)) {
             return response()->json(['error' => 'Invalid type'], 400);
+        }
+
+        $schema = app(V420SchemaService::class);
+        if (ContentFormatter::extractMentionUsernames($text) !== [] && !$schema->supports('mentions')) {
+            return response()->json([
+                'error' => $schema->blockedActionMessage('mentions', __('messages.mentions')),
+            ], 409);
         }
 
         if ($type === 'forum') {
@@ -147,21 +166,20 @@ class CommentController extends Controller
                 }
             }
 
-            // Notifications and Points
-            if ($ownerId && $ownerId != $uid) {
-                $message = $user->username . " commented on your posts";
-                Notification::create([
-                    'uid' => $ownerId,
-                    'name' => $message,
-                    'nurl' => $url,
-                    'logo' => $logo,
-                    'time' => $time,
-                    'state' => 1
-                ]);
+            $mentions->createCommentMentions($user, $type, (int) $comment->id, $text, $url);
+            $gamification->recordEvent($uid, 'comment_created');
 
-                // Points: Owner +1, Commenter +2
-                User::where('id', $ownerId)->increment('pts', 1);
-                User::where('id', $uid)->increment('pts', 2);
+            if ($ownerId && $ownerId != $uid) {
+                $notifications->send(
+                    $ownerId,
+                    __('messages.comment_notification', ['user' => $user->username]),
+                    $url,
+                    $logo,
+                    $uid
+                );
+
+                $pointLedger->award($ownerId, 1, 'comment_received', 'comment_received', 'comment', (int) $comment->id);
+                $pointLedger->award($uid, 2, 'comment_created', 'comment_created', 'comment', (int) $comment->id);
             }
 
             DB::commit();
@@ -186,7 +204,7 @@ class CommentController extends Controller
         }
     }
 
-    public function destroy(Request $request)
+    public function destroy(Request $request, PointLedgerService $pointLedger)
     {
         if (!Auth::check()) {
             return response()->json(['error' => 'Unauthorized'], 401);
@@ -246,7 +264,7 @@ class CommentController extends Controller
             $comment->delete();
 
             if ($isOwner) {
-                User::where('id', $uid)->decrement('pts', 2);
+                $pointLedger->award($uid, -2, 'comment_deleted', 'comment_deleted', 'comment', (int) $comment->id);
             }
 
             DB::commit();

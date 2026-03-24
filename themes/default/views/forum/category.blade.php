@@ -48,24 +48,28 @@
                 <p class="text-end">{{ __('messages.options') }}</p>
             </div>
             <div id="infinite-scroll-container" class="forum-rdx-discussion-list">
-                <div id="timeline-content" style="display: contents;">
-                    @forelse($statuses as $status)
-                        @php
-                            $topic = $topics->get($status->tp_id);
-                            if(!$topic) continue;
-                        @endphp
-                        @include('theme::partials.forum.topic_card', ['topic' => $topic, 'status' => $status])
-                    @empty
-                        <div class="widget-box" style="margin-bottom: 0;">
-                            <div class="widget-box-content">
-                                <p class="text-center">{{ __('messages.no_topics_found') }}</p>
-                            </div>
+                @forelse($statuses as $status)
+                    @php
+                        $topic = $topics->get($status->tp_id);
+                        if(!$topic) continue;
+                    @endphp
+                    @include('theme::partials.forum.topic_card', ['topic' => $topic, 'status' => $status])
+                @empty
+                    <div class="widget-box" style="margin-bottom: 0;">
+                        <div class="widget-box-content">
+                            <p class="text-center">{{ __('messages.no_topics_found') }}</p>
                         </div>
-                    @endforelse
-                    
-                    @include('theme::partials.ajax.infinite_scroll', ['paginator' => $statuses])
-                </div>
+                    </div>
+                @endforelse
             </div>
+
+            @if($statuses->hasPages())
+                <div class="widget-box" style="margin-top: 16px;">
+                    <div class="widget-box-content">
+                        {{ $statuses->links('pagination::bootstrap-5') }}
+                    </div>
+                </div>
+            @endif
         </div>
     </div>
     

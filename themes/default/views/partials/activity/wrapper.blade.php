@@ -1,3 +1,12 @@
+@php
+    $activityUser = $activity->user;
+    $activityUserProfileUrl = $activityUser ? route('profile.show', $activityUser->username) : '#';
+    $activityUserName = $activityUser?->username ?? __('messages.unknown_user');
+    $activityUserAvatar = $activityUser?->img ? asset($activityUser->img) : theme_asset('img/avatar/default.png');
+    $activityUserPresence = $activityUser?->isOnline() ? 'online' : 'offline';
+    $activityUserIsAdmin = $activityUser?->isAdmin() ?? false;
+@endphp
+
 <div class="widget-box no-padding">
     <!-- WIDGET BOX SETTINGS -->
     <div class="widget-box-settings">
@@ -35,13 +44,13 @@
             <!-- USER STATUS -->
             <div class="user-status">
                 <!-- USER STATUS AVATAR -->
-                <a class="user-status-avatar" href="{{ $activity->user ? route('profile.show', $activity->user->username) : '#' }}">
+                <a class="user-status-avatar" href="{{ $activityUserProfileUrl }}">
                     <!-- USER AVATAR -->
-                    <div class="user-avatar small no-outline {{ $activity->user->isOnline() ? 'online' : 'offline' }}">
+                    <div class="user-avatar small no-outline {{ $activityUserPresence }}">
                         <!-- USER AVATAR CONTENT -->
                         <div class="user-avatar-content">
                             <!-- HEXAGON -->
-                            <div class="hexagon-image-30-32" data-src="{{ $activity->user->img ? asset($activity->user->img) : theme_asset('img/avatar/default.png') }}"></div>
+                            <div class="hexagon-image-30-32" data-src="{{ $activityUserAvatar }}"></div>
                             <!-- /HEXAGON -->
                         </div>
                         <!-- /USER AVATAR CONTENT -->
@@ -54,7 +63,7 @@
                         </div>
                         <!-- /USER AVATAR PROGRESS BORDER -->
                         
-                        @if($activity->user->isAdmin())
+                        @if($activityUserIsAdmin)
                             <!-- USER AVATAR BADGE -->
                             <div class="user-avatar-badge">
                                 <div class="user-avatar-badge-border">
@@ -74,7 +83,7 @@
 
                 <!-- USER STATUS TITLE -->
                 <p class="user-status-title medium">
-                    <a class="bold" href="{{ $activity->user ? route('profile.show', $activity->user->username) : '#' }}">{{ $activity->user->username ?? __('messages.unknown_user') }}</a>
+                    <a class="bold" href="{{ $activityUserProfileUrl }}">{{ $activityUserName }}</a>
                     
                     @if($activity->s_type == 1 && $activity->related_content)
                         <span class="user-status-title-text">{{ __('messages.added_website') }}</span>

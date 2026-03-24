@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Services\StatusActivityService;
 use App\Models\Status;
 use App\Models\User;
 use App\Models\Like;
@@ -19,6 +20,8 @@ class PortalController extends Controller
         $filter = $request->query('filter', 'all');
         $search = $request->query('search', '');
         $user = Auth::user();
+        $activityService = app(StatusActivityService::class);
+        $hiddenDirectoryStatusIds = $activityService->hiddenDirectoryStatusIds();
 
         $this->seo([
             'scope_key' => 'portal',
@@ -50,7 +53,9 @@ class PortalController extends Controller
                     ->orWhere('name', 'LIKE', "%{$search}%")
                     ->pluck('id');
 
-                $searchedStatuses = Status::where(function ($q) use ($topicIds, $dirIds, $newsIds) {
+                $searchedStatuses = Status::query()
+                ->when(!empty($hiddenDirectoryStatusIds), fn ($query) => $query->whereNotIn('id', $hiddenDirectoryStatusIds))
+                ->where(function ($q) use ($topicIds, $dirIds, $newsIds) {
                     $q->whereIn('tp_id', $topicIds)->whereIn('s_type', [2, 4, 100])
                       ->orWhere(function ($q2) use ($dirIds) {
                           $q2->whereIn('tp_id', $dirIds)->where('s_type', 1);
@@ -62,9 +67,7 @@ class PortalController extends Controller
                 ->orderBy('date', 'desc')
                 ->get();
 
-                foreach ($searchedStatuses as $activity) {
-                    self::attachRelatedContent($activity);
-                }
+                $activityService->decorateMany($searchedStatuses);
 
                 $searchedCommentsForum = \App\Models\ForumComment::where('txt', 'LIKE', "%{$search}%")
                     ->orderBy('date', 'desc')
@@ -95,14 +98,14 @@ class PortalController extends Controller
                 $followingIds[] = $user->id;
                 $followingIds[] = 1;
 
-                $activities = Status::where('date', '<', time())
+                $activities = Status::query()
+                    ->where('date', '<', time())
+                    ->when(!empty($hiddenDirectoryStatusIds), fn ($query) => $query->whereNotIn('id', $hiddenDirectoryStatusIds))
                     ->whereIn('uid', $followingIds)
                     ->orderBy('date', 'desc')
                     ->paginate(20);
 
-                foreach ($activities as $activity) {
-                    self::attachRelatedContent($activity);
-                }
+                $activityService->decorateMany($activities);
             } else {
                 // Smart ranked feed
                 $page       = (int) $request->query('page', 1);
@@ -111,9 +114,7 @@ class PortalController extends Controller
                     $page
                 );
 
-                foreach ($activities as $activity) {
-                    self::attachRelatedContent($activity);
-                }
+                $activityService->decorateMany($activities);
             }
         } catch (\Throwable $e) {
             $activities = new \Illuminate\Pagination\LengthAwarePaginator([], 0, 20);
@@ -128,34 +129,5 @@ class PortalController extends Controller
         }
 
         return view('theme::portal.index', compact('activities', 'filter', 'search'));
-    }
-
-    /**
-     * Attach related_content and type_label to a Status instance.
-     */
-    private static function attachRelatedContent(\App\Models\Status $activity): void
-    {
-        $activity->related_content = null;
-
-        switch ($activity->s_type) {
-            case 1:
-                $activity->related_content = Directory::find($activity->tp_id);
-                $activity->type_label = 'Directory';
-                break;
-            case 2:
-            case 4:
-            case 100:
-                $activity->related_content = ForumTopic::find($activity->tp_id);
-                $activity->type_label = 'Forum';
-                break;
-            case 7867:
-                $activity->related_content = Product::withoutGlobalScope('store')->find($activity->tp_id);
-                $activity->type_label = 'Store';
-                break;
-            case 5:
-                $activity->related_content = News::find($activity->tp_id);
-                $activity->type_label = 'News';
-                break;
-        }
     }
 }

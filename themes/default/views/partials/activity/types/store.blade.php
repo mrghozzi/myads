@@ -1,12 +1,16 @@
 @php
     $status = $activity;
+    $statusUser = $status->user;
+    $statusUserProfileUrl = $statusUser ? route('profile.show', $statusUser->username) : '#';
+    $statusUserName = $statusUser?->username ?? __('messages.unknown_user');
+    $statusUserAvatar = $statusUser?->img ? asset($statusUser->img) : theme_asset('img/avatar/default.png');
+    $statusUserPresence = $statusUser?->isOnline() ? 'online' : 'offline';
+    $statusUserIsAdmin = $statusUser?->isAdmin() ?? false;
     $product = $activity->related_content;
-    $description = \Illuminate\Support\Str::limit($product->o_valuer ?? '', 480);
-    $description = nl2br(e($description));
-    if (preg_match('/\p{Arabic}/u', $description)) {
-        $description = '<div style="text-align: right;">' . $description . '</div>';
-    }
+    $description = \App\Support\ContentFormatter::format(\Illuminate\Support\Str::limit($product->o_valuer ?? '', 480));
     $productImage = $product->product_image ?? theme_asset('img/error_plug.png');
+    $repostExcerpt = \Illuminate\Support\Str::limit(strip_tags($product->name ?? ($product->o_valuer ?? '')), 80);
+    $repostAuthorName = addslashes($statusUserName);
 @endphp
 <div class="widget-box no-padding post{{ $status->id }}">
     <div class="widget-box-settings">
@@ -33,15 +37,15 @@
     <div class="widget-box-status">
         <div class="widget-box-status-content">
             <div class="user-status">
-                <a class="user-status-avatar" href="{{ route('profile.show', $status->user->username) }}">
-                    <div class="user-avatar small no-outline {{ $status->user->isOnline() ? 'online' : 'offline' }}">
+                <a class="user-status-avatar" href="{{ $statusUserProfileUrl }}">
+                    <div class="user-avatar small no-outline {{ $statusUserPresence }}">
                         <div class="user-avatar-content">
-                            <div class="hexagon-image-30-32" data-src="{{ $status->user->img ? asset($status->user->img) : theme_asset('img/avatar/default.png') }}"></div>
+                            <div class="hexagon-image-30-32" data-src="{{ $statusUserAvatar }}"></div>
                         </div>
                         <div class="user-avatar-progress-border">
                             <div class="hexagon-border-40-44"></div>
                         </div>
-                        @if($status->user->isAdmin())
+                        @if($statusUserIsAdmin)
                             <div class="user-avatar-badge">
                                 <div class="user-avatar-badge-border">
                                     <div class="hexagon-22-24"></div>
@@ -55,7 +59,7 @@
                     </div>
                 </a>
                 <p class="user-status-title medium">
-                    <a class="bold" href="{{ route('profile.show', $status->user->username) }}">{{ $status->user->username }}</a>
+                    <a class="bold" href="{{ $statusUserProfileUrl }}">{{ $statusUserName }}</a>
                     &nbsp;{{ __('messages.added_new_product') }}
                 </p>
                 <p class="user-status-text small">
@@ -103,6 +107,13 @@
                     <div class="meta-line">
                         <p class="meta-line-link">
                             <a href="{{ route('store.show', $product->name) }}">{{ $activity->comments_count }} {{ __('messages.comments') }}</a>
+                        </p>
+                    </div>
+                </div>
+                <div class="content-action">
+                    <div class="meta-line">
+                        <p class="meta-line-link">
+                            <a href="{{ route('store.show', $product->name) }}">{{ $activity->reposts_count }} {{ __('messages.reposts') }}</a>
                         </p>
                     </div>
                 </div>
@@ -189,6 +200,15 @@
                         </a>
                     </div>
                 @endforeach
+                @auth
+                    <div class="reaction-option text-tooltip-tft" data-title="{{ __('messages.quote_repost') }}" style="position: relative;">
+                        <a href="javascript:void(0);" onclick="openRepostComposer({{ $activity->id }}, '{{ $repostAuthorName }}', '{{ addslashes($repostExcerpt) }}')">
+                            <span style="width: 40px; height: 40px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: #615dfa; color: #fff;">
+                                <i class="fa fa-retweet" aria-hidden="true"></i>
+                            </span>
+                        </a>
+                    </div>
+                @endauth
             </div>
         </div>
     </div>

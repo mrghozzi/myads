@@ -6,6 +6,8 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use App\Services\AdminAccessService;
+use App\Services\V420SchemaService;
 
 class User extends Authenticatable
 {
@@ -64,7 +66,71 @@ class User extends Authenticatable
     
     public function isAdmin()
     {
-        return $this->id == 1;
+        if ($this->isSuperAdmin()) {
+            return true;
+        }
+
+        if (!app(V420SchemaService::class)->supports('site_admins')) {
+            return false;
+        }
+
+        $entry = $this->relationLoaded('siteAdminEntry')
+            ? $this->getRelation('siteAdminEntry')
+            : $this->siteAdminEntry()->first();
+
+        if (!$entry || !$entry->is_active) {
+            return false;
+        }
+
+        if ($entry->has_full_access) {
+            return true;
+        }
+
+        return in_array('community', (array) $entry->permissions, true);
+    }
+
+    public function hasAdminAccess(): bool
+    {
+        if ($this->isSuperAdmin()) {
+            return true;
+        }
+
+        if (!app(V420SchemaService::class)->supports('site_admins')) {
+            return false;
+        }
+
+        $entry = $this->relationLoaded('siteAdminEntry')
+            ? $this->getRelation('siteAdminEntry')
+            : $this->siteAdminEntry()->first();
+
+        return (bool) ($entry && $entry->is_active);
+    }
+
+    public function isSuperAdmin(): bool
+    {
+        if ((int) $this->id === 1) {
+            return true;
+        }
+
+        if (!app(V420SchemaService::class)->supports('site_admins')) {
+            return false;
+        }
+
+        $entry = $this->relationLoaded('siteAdminEntry')
+            ? $this->getRelation('siteAdminEntry')
+            : $this->siteAdminEntry()->first();
+
+        return (bool) ($entry && $entry->is_active && $entry->is_super);
+    }
+
+    public function canAccessAdminModule(string $module): bool
+    {
+        return app(AdminAccessService::class)->canAccess($this, null, $module);
+    }
+
+    public function canManageAdministrators(): bool
+    {
+        return app(AdminAccessService::class)->canManageAdministrators($this);
     }
 
     public function isOnline()
@@ -175,5 +241,25 @@ class User extends Authenticatable
     public function forumModerator()
     {
         return $this->hasOne(ForumModerator::class, 'user_id');
+    }
+
+    public function siteAdminEntry()
+    {
+        return $this->hasOne(SiteAdmin::class, 'user_id');
+    }
+
+    public function privacySetting()
+    {
+        return $this->hasOne(UserPrivacySetting::class, 'user_id');
+    }
+
+    public function userBadges()
+    {
+        return $this->hasMany(UserBadge::class, 'user_id');
+    }
+
+    public function badgeShowcase()
+    {
+        return $this->hasMany(BadgeShowcase::class, 'user_id')->orderBy('sort_order');
     }
 }

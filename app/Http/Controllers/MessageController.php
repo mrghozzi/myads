@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Message;
 use App\Models\User;
+use App\Services\UserPrivacyService;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Validator;
@@ -325,13 +326,19 @@ class MessageController extends Controller
         ]);
     }
 
-    public function create(Request $request)
+    public function create(Request $request, UserPrivacyService $privacy)
     {
         $recipient = $request->query('recipient');
+        if ($recipient) {
+            $recipientUser = User::where('username', $recipient)->first();
+            if ($recipientUser && !$privacy->canDirectMessage($recipientUser, Auth::user())) {
+                return redirect()->route('messages.index')->withErrors(['recipient' => __('messages.direct_messages_disabled')]);
+            }
+        }
         return view('theme::messages.create', compact('recipient'));
     }
 
-    public function store(Request $request)
+    public function store(Request $request, UserPrivacyService $privacy)
     {
         $request->validate([
             'recipient' => 'required|exists:users,username',
@@ -339,6 +346,9 @@ class MessageController extends Controller
         ]);
 
         $recipient = User::where('username', $request->recipient)->firstOrFail();
+        if (!$privacy->canDirectMessage($recipient, Auth::user())) {
+            return back()->withErrors(['recipient' => __('messages.direct_messages_disabled')])->withInput();
+        }
         
         $message = new Message();
         $message->name = Auth::user()->username ?? Auth::user()->name ?? '';
@@ -352,10 +362,11 @@ class MessageController extends Controller
         return redirect()->route('messages.show', $recipient->id)->with('success', __('message_sent'));
     }
 
-    public function show($id)
+    public function show($id, UserPrivacyService $privacy)
     {
         $user = Auth::user();
         $partner = $this->resolvePartner($id, $user);
+        abort_unless($privacy->canDirectMessage($partner, $user), 403);
 
         [$paged] = $this->buildConversations($user);
         $messages = $this->getRecentConversationMessages($user, $partner);
@@ -442,7 +453,7 @@ class MessageController extends Controller
         return view('theme::messages.partials.conversation', compact('messages', 'partner', 'user'));
     }
 
-    public function send(Request $request, $id)
+    public function send(Request $request, $id, UserPrivacyService $privacy)
     {
         $validator = $this->buildMessageValidator($request);
         if ($validator->fails()) {
@@ -459,6 +470,17 @@ class MessageController extends Controller
 
         $user = Auth::user();
         $partner = $this->resolvePartner($id, $user);
+        if (!$privacy->canDirectMessage($partner, $user)) {
+            if ($this->shouldReturnJson($request)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => __('messages.direct_messages_disabled'),
+                ], 403);
+            }
+
+            return back()->withErrors(['message' => __('messages.direct_messages_disabled')]);
+        }
+
         $text = trim((string) $request->input('message', ''));
 
         try {

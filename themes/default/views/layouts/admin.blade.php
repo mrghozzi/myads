@@ -1,6 +1,22 @@
 @php
     $pageLocale = str_replace('_', '-', app()->getLocale());
     $pageDirection = locale_direction();
+    $adminUser = auth()->user();
+    $canAdmin = fn (?string $module = null): bool => $module === null
+        ? (bool) ($adminUser?->hasAdminAccess())
+        : (bool) ($adminUser?->canAccessAdminModule($module));
+    $canAnyAdminSection = function (array $modules) use ($canAdmin): bool {
+        foreach ($modules as $module) {
+            if ($canAdmin($module)) {
+                return true;
+            }
+        }
+
+        return false;
+    };
+    $accountSettingsUrl = $canAdmin('settings')
+        ? route('admin.settings')
+        : route('profile.edit');
 @endphp
 <!DOCTYPE html>
 <html lang="{{ $pageLocale }}" dir="{{ $pageDirection }}" data-dir="{{ $pageDirection }}" class="{{ $pageDirection }}">
@@ -73,103 +89,127 @@
                     <li class="nxl-item nxl-caption">
                         <label>{{ __('messages.navigation') ?? 'Navigation' }}</label>
                     </li>
-                    
-                    <!-- Dashboard -->
-                    <li class="nxl-item">
-                        <a href="{{ route('admin.index') }}" class="nxl-link">
-                            <span class="nxl-micon"><i class="feather-airplay"></i></span>
-                            <span class="nxl-mtext">{{ __('messages.board') }}</span>
-                        </a>
-                    </li>
 
-                    <!-- Pages -->
-                    <li class="nxl-item nxl-hasmenu">
-                        <a href="javascript:void(0);" class="nxl-link">
-                            <span class="nxl-micon"><i class="feather-file-text"></i></span>
-                            <span class="nxl-mtext">{{ __('messages.pages') }}</span><span class="nxl-arrow"><i class="feather-chevron-right"></i></span>
-                        </a>
-                        <ul class="nxl-submenu">
-                            <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.pages') }}">{{ __('messages.t_pages') }}</a></li>
-                            <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.pages.create') }}">{{ __('messages.add_page') }}</a></li>
-                        </ul>
-                    </li>
+                    @if($canAdmin('dashboard'))
+                        <li class="nxl-item">
+                            <a href="{{ route('admin.index') }}" class="nxl-link">
+                                <span class="nxl-micon"><i class="feather-airplay"></i></span>
+                                <span class="nxl-mtext">{{ __('messages.board') }}</span>
+                            </a>
+                        </li>
+                    @endif
 
-                    <!-- Users -->
-                    <li class="nxl-item">
-                        <a href="{{ route('admin.users') }}" class="nxl-link">
-                            <span class="nxl-micon"><i class="feather-users"></i></span>
-                            <span class="nxl-mtext">{{ __('messages.users') }}</span>
-                        </a>
-                    </li>
-                    
-                    <!-- Ads Group -->
-                    <li class="nxl-item nxl-hasmenu">
-                         <a href="javascript:void(0);" class="nxl-link">
-                            <span class="nxl-micon"><i class="feather-monitor"></i></span>
-                            <span class="nxl-mtext">{{ __('messages.ads') }}</span><span class="nxl-arrow"><i class="feather-chevron-right"></i></span>
-                        </a>
-                        <ul class="nxl-submenu">
-                            <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.ads') }}">{{ __('messages.ads') }}</a></li>
-                            <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.banners') }}">{{ __('messages.bannads') }}</a></li>
-                            <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.links') }}">{{ __('messages.textads') }}</a></li>
-                            <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.smart_ads') }}">{{ __('messages.smart_ads') }}</a></li>
-                            <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.visits') }}">{{ __('messages.exvisit') }}</a></li>
-                        </ul>
-                    </li>
+                    @if($canAdmin('pages'))
+                        <li class="nxl-item nxl-hasmenu">
+                            <a href="javascript:void(0);" class="nxl-link">
+                                <span class="nxl-micon"><i class="feather-file-text"></i></span>
+                                <span class="nxl-mtext">{{ __('messages.pages') }}</span><span class="nxl-arrow"><i class="feather-chevron-right"></i></span>
+                            </a>
+                            <ul class="nxl-submenu">
+                                <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.pages') }}">{{ __('messages.t_pages') }}</a></li>
+                                <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.pages.create') }}">{{ __('messages.add_page') }}</a></li>
+                            </ul>
+                        </li>
+                    @endif
 
-                    <!-- Community Settings -->
-                    <li class="nxl-item nxl-hasmenu">
-                        <a href="javascript:void(0);" class="nxl-link">
-                            <span class="nxl-micon"><i class="feather-settings"></i></span>
-                            <span class="nxl-mtext">{{ __('messages.Comusetting') }}</span><span class="nxl-arrow"><i class="feather-chevron-right"></i></span>
-                        </a>
-                        <ul class="nxl-submenu">
-                            <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.knowledgebase') }}">{{ __('messages.knowledgebase') }}</a></li>
-                            <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.forum_categories') }}">{{ __('messages.forum_cats') }}</a></li>
-                            <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.forum.settings') }}">{{ __('messages.forum_settings') }}</a></li>
-                            <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.forum.moderators') }}">{{ __('messages.forum_moderators') }}</a></li>
-                            <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.directory_categories') }}">{{ __('messages.dir_cats') }}</a></li>
-                            <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.emojis') }}">{{ __('messages.emojis') }}</a></li>
-                            <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.news') }}">{{ __('messages.news_site') }}</a></li>
-                            <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.reports') }}">{{ __('messages.reports') }}</a></li>
-                            <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.products') }}">{{ __('messages.products') ?? 'Products' }}</a></li>
-                        </ul>
-                    </li>
+                    @if($canAdmin('users'))
+                        <li class="nxl-item">
+                            <a href="{{ route('admin.users') }}" class="nxl-link">
+                                <span class="nxl-micon"><i class="feather-users"></i></span>
+                                <span class="nxl-mtext">{{ __('messages.users') }}</span>
+                            </a>
+                        </li>
+                    @endif
 
-                    <!-- Style/Design -->
-                    <li class="nxl-item nxl-hasmenu">
-                        <a href="javascript:void(0);" class="nxl-link">
-                            <span class="nxl-micon"><i class="feather-layout"></i></span>
-                            <span class="nxl-mtext">{{ __('messages.style') }}</span><span class="nxl-arrow"><i class="feather-chevron-right"></i></span>
-                        </a>
-                         <ul class="nxl-submenu">
-                            <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.widgets') }}">{{ __('messages.widgets') }}</a></li>
-                            <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.menus') }}">{{ __('messages.menu') }}</a></li>
-                            <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.site_ads') }}">{{ __('messages.e_ads') }}</a></li>
-                            <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.plugins') }}">{{ __('messages.plugins') }}</a></li>
-                            <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.themes') }}">{{ __('messages.themes') }}</a></li>
-                        </ul>
-                    </li>
+                    @if($canAdmin('ads'))
+                        <li class="nxl-item nxl-hasmenu">
+                             <a href="javascript:void(0);" class="nxl-link">
+                                <span class="nxl-micon"><i class="feather-monitor"></i></span>
+                                <span class="nxl-mtext">{{ __('messages.ads') }}</span><span class="nxl-arrow"><i class="feather-chevron-right"></i></span>
+                            </a>
+                            <ul class="nxl-submenu">
+                                <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.ads') }}">{{ __('messages.ads') }}</a></li>
+                                <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.banners') }}">{{ __('messages.bannads') }}</a></li>
+                                <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.links') }}">{{ __('messages.textads') }}</a></li>
+                                <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.smart_ads') }}">{{ __('messages.smart_ads') }}</a></li>
+                                <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.visits') }}">{{ __('messages.exvisit') }}</a></li>
+                            </ul>
+                        </li>
+                    @endif
 
-                    <!-- Options -->
-                    <li class="nxl-item nxl-hasmenu">
-                        <a href="javascript:void(0);" class="nxl-link">
-                            <span class="nxl-micon"><i class="feather-sliders"></i></span>
-                            <span class="nxl-mtext">{{ __('messages.options') }}</span><span class="nxl-arrow"><i class="feather-chevron-right"></i></span>
-                        </a>
-                        <ul class="nxl-submenu">
-                            <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.settings') }}">{{ __('messages.settings') }}</a></li>
-                            <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.settings.system') }}">{{ __('messages.system_settings') }}</a></li>
-                            <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.cookie_notice') }}">{{ __('messages.cookie_notice_settings') }}</a></li>
-                            <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.seo.index') }}">{{ __('messages.seo_dashboard') }}</a></li>
-                            <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.seo.settings') }}">{{ __('messages.seo_settings') }}</a></li>
-                            <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.seo.head') }}">{{ __('messages.seo_head_meta') }}</a></li>
-                            <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.seo.rules') }}">{{ __('messages.seo_rules') }}</a></li>
-                            <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.seo.indexing') }}">{{ __('messages.seo_indexing') }}</a></li>
-                            <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.languages') }}">{{ __('messages.languages') }}</a></li>
-                            <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.updates') }}">{{ __('messages.updates') }}</a></li>
-                        </ul>
-                    </li>
+                    @if($canAdmin('community'))
+                        <li class="nxl-item nxl-hasmenu">
+                            <a href="javascript:void(0);" class="nxl-link">
+                                <span class="nxl-micon"><i class="feather-settings"></i></span>
+                                <span class="nxl-mtext">{{ __('messages.Comusetting') }}</span><span class="nxl-arrow"><i class="feather-chevron-right"></i></span>
+                            </a>
+                            <ul class="nxl-submenu">
+                                <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.knowledgebase') }}">{{ __('messages.knowledgebase') }}</a></li>
+                                <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.forum_categories') }}">{{ __('messages.forum_cats') }}</a></li>
+                                <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.forum.settings') }}">{{ __('messages.forum_settings') }}</a></li>
+                                <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.forum.moderators') }}">{{ __('messages.forum_moderators') }}</a></li>
+                                <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.directory_categories') }}">{{ __('messages.dir_cats') }}</a></li>
+                                <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.emojis') }}">{{ __('messages.emojis') }}</a></li>
+                                <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.news') }}">{{ __('messages.news_site') }}</a></li>
+                                <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.reports') }}">{{ __('messages.reports') }}</a></li>
+                                <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.products') }}">{{ __('messages.products') ?? 'Products' }}</a></li>
+                            </ul>
+                        </li>
+                    @endif
+
+                    @if($canAnyAdminSection(['design', 'plugins', 'themes']))
+                        <li class="nxl-item nxl-hasmenu">
+                            <a href="javascript:void(0);" class="nxl-link">
+                                <span class="nxl-micon"><i class="feather-layout"></i></span>
+                                <span class="nxl-mtext">{{ __('messages.style') }}</span><span class="nxl-arrow"><i class="feather-chevron-right"></i></span>
+                            </a>
+                             <ul class="nxl-submenu">
+                                @if($canAdmin('design'))
+                                    <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.widgets') }}">{{ __('messages.widgets') }}</a></li>
+                                    <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.menus') }}">{{ __('messages.menu') }}</a></li>
+                                    <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.site_ads') }}">{{ __('messages.e_ads') }}</a></li>
+                                @endif
+                                @if($canAdmin('plugins'))
+                                    <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.plugins') }}">{{ __('messages.plugins') }}</a></li>
+                                @endif
+                                @if($canAdmin('themes'))
+                                    <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.themes') }}">{{ __('messages.themes') }}</a></li>
+                                @endif
+                            </ul>
+                        </li>
+                    @endif
+
+                    @if($canAnyAdminSection(['settings', 'seo', 'languages', 'updates', 'administrators']))
+                        <li class="nxl-item nxl-hasmenu">
+                            <a href="javascript:void(0);" class="nxl-link">
+                                <span class="nxl-micon"><i class="feather-sliders"></i></span>
+                                <span class="nxl-mtext">{{ __('messages.options') }}</span><span class="nxl-arrow"><i class="feather-chevron-right"></i></span>
+                            </a>
+                            <ul class="nxl-submenu">
+                                @if($canAdmin('settings'))
+                                    <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.settings') }}">{{ __('messages.settings') }}</a></li>
+                                    <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.settings.system') }}">{{ __('messages.system_settings') }}</a></li>
+                                    <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.cookie_notice') }}">{{ __('messages.cookie_notice_settings') }}</a></li>
+                                @endif
+                                @if($canAdmin('seo'))
+                                    <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.seo.index') }}">{{ __('messages.seo_dashboard') }}</a></li>
+                                    <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.seo.settings') }}">{{ __('messages.seo_settings') }}</a></li>
+                                    <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.seo.head') }}">{{ __('messages.seo_head_meta') }}</a></li>
+                                    <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.seo.rules') }}">{{ __('messages.seo_rules') }}</a></li>
+                                    <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.seo.indexing') }}">{{ __('messages.seo_indexing') }}</a></li>
+                                @endif
+                                @if($canAdmin('languages'))
+                                    <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.languages') }}">{{ __('messages.languages') }}</a></li>
+                                @endif
+                                @if($canAdmin('updates'))
+                                    <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.updates') }}">{{ __('messages.updates') }}</a></li>
+                                @endif
+                                @if($canAdmin('administrators'))
+                                    <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.admins') }}">{{ __('messages.site_admins') }}</a></li>
+                                @endif
+                            </ul>
+                        </li>
+                    @endif
                     <!-- Hook for Plugins -->
                     {!! \App\Helpers\Hooks::do_action('admin_sidebar_menu') !!}
                 </ul>
@@ -258,14 +298,16 @@
                                 <i class="feather-user"></i>
                                 <span>{{ __('messages.profile_details') ?? 'Profile Details' }}</span>
                             </a>
-                            <a href="{{ route('admin.settings') }}" class="dropdown-item">
+                            <a href="{{ $accountSettingsUrl }}" class="dropdown-item">
                                 <i class="feather-settings"></i>
                                 <span>{{ __('messages.account_settings') ?? 'Account Settings' }}</span>
                             </a>
-                            <a href="{{ route('admin.cookie_notice') }}" class="dropdown-item">
-                                <i class="feather-shield"></i>
-                                <span>{{ __('messages.cookie_notice_settings') ?? 'Cookie Notice' }}</span>
-                            </a>
+                            @if($canAdmin('settings'))
+                                <a href="{{ route('admin.cookie_notice') }}" class="dropdown-item">
+                                    <i class="feather-shield"></i>
+                                    <span>{{ __('messages.cookie_notice_settings') ?? 'Cookie Notice' }}</span>
+                                </a>
+                            @endif
                             <div class="dropdown-divider"></div>
                             <a href="{{ url('/') }}" class="dropdown-item">
                                 <i class="feather-external-link"></i>

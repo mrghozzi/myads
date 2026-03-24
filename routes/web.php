@@ -20,6 +20,8 @@ use App\Http\Controllers\AdminSeoController;
 use App\Http\Controllers\AdminPageController;
 use App\Http\Controllers\ReactionController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\MentionController;
+use App\Http\Controllers\AdminAdminsController;
 use App\Http\Controllers\SeoPublicController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Middleware\AdminMiddleware;
@@ -31,6 +33,8 @@ Route::post('/comment/delete', [CommentController::class, 'destroy'])->name('com
 
 Route::post('/status/create', [App\Http\Controllers\StatusController::class, 'create'])->name('status.create')->middleware('auth');
 Route::post('/status/upload-image', [App\Http\Controllers\StatusController::class, 'uploadImage'])->name('status.upload_image')->middleware('auth');
+Route::post('/status/link-preview', [App\Http\Controllers\StatusController::class, 'linkPreview'])->name('status.link_preview')->middleware('auth');
+Route::get('/mentions/users', [MentionController::class, 'users'])->name('mentions.users')->middleware('auth');
 Route::get('/robots.txt', [SeoPublicController::class, 'robots'])->name('robots.txt');
 
 // Auth Routes
@@ -226,6 +230,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::get('/settings', [ProfileController::class, 'edit'])->name('settings'); // Alias for settings
     Route::get('/history', [ProfileController::class, 'history'])->name('profile.history');
+    Route::get('/settings/privacy', [ProfileController::class, 'privacy'])->name('profile.privacy');
+    Route::post('/settings/privacy', [ProfileController::class, 'updatePrivacy'])->name('profile.privacy.update');
+    Route::get('/settings/badges', [ProfileController::class, 'badges'])->name('profile.badges');
+    Route::post('/settings/badges', [ProfileController::class, 'updateBadges'])->name('profile.badges.update');
     Route::post('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
     Route::post('/profile/{id}/follow', [ProfileController::class, 'toggleFollow'])->name('profile.follow');
 });
@@ -322,6 +330,10 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::put('/users/{id}', [AdminController::class, 'updateUser'])->name('admin.users.update');
     Route::put('/users/{id}/password', [AdminController::class, 'updateUserPassword'])->name('admin.users.password');
     Route::delete('/users/{id}', [AdminController::class, 'deleteUser'])->name('admin.users.delete');
+    Route::get('/admins', [AdminAdminsController::class, 'index'])->name('admin.admins');
+    Route::post('/admins', [AdminAdminsController::class, 'store'])->name('admin.admins.store');
+    Route::put('/admins/{siteAdmin}', [AdminAdminsController::class, 'update'])->name('admin.admins.update');
+    Route::delete('/admins/{siteAdmin}', [AdminAdminsController::class, 'destroy'])->name('admin.admins.delete');
     
     // Banners
     Route::get('/ads', [AdminController::class, 'adsHub'])->name('admin.ads');
