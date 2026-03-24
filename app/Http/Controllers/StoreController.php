@@ -22,7 +22,7 @@ class StoreController extends Controller
     {
         $category = $request->query('category');
 
-        $query = Product::orderBy('id', 'desc');
+        $query = Product::visible()->orderBy('id', 'desc');
 
         if ($category && in_array($category, ['script', 'templates', 'plugins'])) {
             $productIds = Option::where('o_type', 'store_type')
@@ -103,7 +103,7 @@ class StoreController extends Controller
 
     public function show($name)
     {
-        $product = Product::withoutGlobalScope('store')->where('o_type', 'store')->where('name', $name)->firstOrFail();
+        $product = Product::visible()->withoutGlobalScope('store')->where('o_type', 'store')->where('name', $name)->firstOrFail();
         $status = Status::where('s_type', 7867)->where('tp_id', $product->id)->first();
         if ($status) {
             $status->related_content = $product;

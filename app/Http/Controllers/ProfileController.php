@@ -52,7 +52,7 @@ class ProfileController extends Controller
         if ($hideProfileContent) {
             $activities = $this->paginateCollection(collect(), 10, $request->integer('page', 1));
         } else {
-            $query = Status::query()
+            $query = Status::visible()
                 ->where('uid', $user->id)
                 ->where('statu', 1)
                 ->where('date', '<', time())

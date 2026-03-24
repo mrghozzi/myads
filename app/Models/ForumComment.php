@@ -5,9 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+use App\Traits\HasPrivacy;
+
 class ForumComment extends Model
 {
-    use HasFactory;
+    use HasFactory, HasPrivacy;
 
     protected $table = 'f_coment';
     public $timestamps = false;

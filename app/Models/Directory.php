@@ -5,9 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+use App\Traits\HasPrivacy;
+
 class Directory extends Model
 {
-    use HasFactory;
+    use HasFactory, HasPrivacy;
 
     protected $table = 'directory';
     public $timestamps = false;

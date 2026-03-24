@@ -42,7 +42,8 @@ class ForumController extends Controller
         $time = time();
         $sidebarCategories = $this->buildCategorySidebar((int) $category->id);
 
-        $statuses = Status::whereIn('s_type', [2, 4])
+        $statuses = Status::visible()
+            ->whereIn('s_type', [2, 4])
             ->where('date', '<=', $time)
             ->whereIn('tp_id', function ($query) use ($id) {
                 $query->select('id')
@@ -84,7 +85,7 @@ class ForumController extends Controller
 
     public function topic($id)
     {
-        $topic = ForumTopic::with(['user', 'category', 'comments.user', 'attachments'])->findOrFail($id);
+        $topic = ForumTopic::visible()->with(['user', 'category', 'comments.user', 'attachments'])->findOrFail($id);
         $forumSettings = ForumSettings::all();
 
         $status = Status::where('tp_id', $id)
@@ -468,7 +469,8 @@ class ForumController extends Controller
 
     private function buildCategorySidebar(int $currentCategoryId)
     {
-        $topicCounts = ForumTopic::query()
+        $topicCounts = ForumTopic::visible()
+            ->query()
             ->select('cat', DB::raw('COUNT(*) as topic_count'))
             ->where('statu', 1)
             ->groupBy('cat')

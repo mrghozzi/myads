@@ -53,7 +53,7 @@ class PortalController extends Controller
                     ->orWhere('name', 'LIKE', "%{$search}%")
                     ->pluck('id');
 
-                $searchedStatuses = Status::query()
+                $searchedStatuses = Status::visible()
                 ->when(!empty($hiddenDirectoryStatusIds), fn ($query) => $query->whereNotIn('id', $hiddenDirectoryStatusIds))
                 ->where(function ($q) use ($topicIds, $dirIds, $newsIds) {
                     $q->whereIn('tp_id', $topicIds)->whereIn('s_type', [2, 4, 100])
@@ -69,11 +69,13 @@ class PortalController extends Controller
 
                 $activityService->decorateMany($searchedStatuses);
 
-                $searchedCommentsForum = \App\Models\ForumComment::where('txt', 'LIKE', "%{$search}%")
+                $searchedCommentsForum = \App\Models\ForumComment::visible()
+                    ->where('txt', 'LIKE', "%{$search}%")
                     ->orderBy('date', 'desc')
                     ->get();
 
                 $searchedCommentsDir = \App\Models\Option::where('o_type', '=', 'd_coment')
+                    ->visible(null, 'o_order')
                     ->where('o_valuer', 'LIKE', "%{$search}%")
                     ->get();
             } catch (\Throwable $e) {
@@ -98,7 +100,7 @@ class PortalController extends Controller
                 $followingIds[] = $user->id;
                 $followingIds[] = 1;
 
-                $activities = Status::query()
+                $activities = Status::visible()
                     ->where('date', '<', time())
                     ->when(!empty($hiddenDirectoryStatusIds), fn ($query) => $query->whereNotIn('id', $hiddenDirectoryStatusIds))
                     ->whereIn('uid', $followingIds)

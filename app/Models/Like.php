@@ -5,9 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+use App\Traits\HasPrivacy;
+
 class Like extends Model
 {
-    use HasFactory;
+    use HasFactory, HasPrivacy;
 
     protected $table = 'like';
     public $timestamps = false;

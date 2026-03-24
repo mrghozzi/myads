@@ -7,9 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 
+use App\Traits\HasPrivacy;
+
 class Product extends Model
 {
-    use HasFactory;
+    use HasFactory, HasPrivacy;
+
+    protected $authorIdColumn = 'o_parent';
 
     protected $table = 'options';
     public $timestamps = false;

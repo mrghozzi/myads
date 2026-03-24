@@ -16,9 +16,11 @@ use App\Models\StatusLinkPreview;
 use App\Models\StatusRepost;
 use App\Services\V420SchemaService;
 
+use App\Traits\HasPrivacy;
+
 class Status extends Model
 {
-    use HasFactory;
+    use HasFactory, HasPrivacy;
 
     protected $table = 'status';
     public $timestamps = false;

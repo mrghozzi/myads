@@ -61,7 +61,7 @@ class FeedService
                 ->values()
             : collect();
 
-        $statuses = Status::query()
+        $statuses = Status::visible()
             ->where('date', '<', time())
             ->when($hiddenDirectoryStatusIds->isNotEmpty(), fn ($query) => $query->whereNotIn('id', $hiddenDirectoryStatusIds))
             ->orderBy('date', 'desc')

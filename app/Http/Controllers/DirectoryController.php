@@ -96,7 +96,7 @@ class DirectoryController extends Controller
         }
 
         try {
-            $listing = Directory::with(['user', 'category'])->findOrFail($id);
+            $listing = Directory::visible()->with(['user', 'category'])->findOrFail($id);
             $activity = Status::with('user')
                 ->where('s_type', 1)
                 ->where('tp_id', $listing->id)
@@ -318,7 +318,8 @@ class DirectoryController extends Controller
 
     private function buildDirectoryFeed(?int $categoryId = null): array
     {
-        $query = Status::with('user')
+        $query = Status::visible()
+            ->with('user')
             ->where('s_type', 1)
             ->where('date', '<', time())
             ->orderBy('date', 'desc');
