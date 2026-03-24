@@ -10,7 +10,7 @@
                 <p class="section-menu-item-text">{{ __('messages.about_me') }}</p>
             </a>
         @endif
-        @if(($canViewPhotos ?? true) || ($selectedTab ?? request('tab')) === 'photos')
+        @if((($canViewPhotos ?? true) && ($canViewProfileContent ?? true)) || ($selectedTab ?? request('tab')) === 'photos')
             <a class="section-menu-item {{ ($selectedTab ?? request('tab')) == 'photos' ? 'active' : '' }}" href="{{ route('profile.show', $user->username) }}?tab=photos">
                 <svg class="section-menu-item-icon icon-photos"><use xlink:href="#svg-photos"></use></svg>
                 <p class="section-menu-item-text">{{ __('messages.Photos') }}</p>

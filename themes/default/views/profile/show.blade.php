@@ -236,7 +236,11 @@
             <div class="widget-box">
                 <p class="widget-box-title">{{ __('messages.Photos') }}</p>
                 <div class="widget-box-content">
-                    @if(!$canViewPhotos)
+                    @if($profileContentNotice)
+                        <div class="profile-empty-state">
+                            <p>{{ $profileContentNotice }}</p>
+                        </div>
+                    @elseif(!$canViewPhotos)
                         <div class="profile-empty-state">
                             <p>{{ __('messages.section_private') }}</p>
                         </div>
@@ -268,18 +272,26 @@
         @else
             <div id="infinite-scroll-container" style="display: grid; grid-gap: 16px;">
                 <div id="timeline-content" style="display: contents;">
-                    @forelse($activities as $activity)
-                        @include('theme::partials.activity.render', ['activity' => $activity])
-                    @empty
+                    @if($profileContentNotice)
                         <div class="widget-box" style="margin-bottom: 0;">
                             <div class="widget-box-content">
-                                <p class="text-center">{{ __('messages.no_activities') }}</p>
+                                <p class="text-center">{{ $profileContentNotice }}</p>
                             </div>
                         </div>
-                    @endforelse
+                    @else
+                        @forelse($activities as $activity)
+                            @include('theme::partials.activity.render', ['activity' => $activity])
+                        @empty
+                            <div class="widget-box" style="margin-bottom: 0;">
+                                <div class="widget-box-content">
+                                    <p class="text-center">{{ __('messages.no_activities') }}</p>
+                                </div>
+                            </div>
+                        @endforelse
 
-                    @if($activities->hasPages())
-                        @include('theme::partials.ajax.infinite_scroll', ['paginator' => $activities])
+                        @if($activities->hasPages())
+                            @include('theme::partials.ajax.infinite_scroll', ['paginator' => $activities])
+                        @endif
                     @endif
                 </div>
             </div>

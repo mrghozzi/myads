@@ -31,8 +31,7 @@ class ProfileController extends Controller
         $viewer = Auth::user();
         $user = User::where('username', $username)->firstOrFail();
         $privacy = app(UserPrivacyService::class);
-
-        abort_unless($privacy->canViewProfile($user, $viewer), 403);
+        $privacySettings = $privacy->settingsFor($user);
 
         $cover = $this->resolveCover($user);
         $isFollowing = $viewer
@@ -43,40 +42,53 @@ class ProfileController extends Controller
         $followingCount = Like::where('uid', $user->id)->where('type', 1)->count();
         $postsCount = Status::where('uid', $user->id)->count();
         $selectedTab = (string) $request->query('tab', 'timeline');
+        $profileContentTabs = ['timeline', 'blog', 'links', 'forum', 'store', 'photos'];
+        $canViewProfileContent = $privacy->canViewProfile($user, $viewer);
+        $hideProfileContent = in_array($selectedTab, $profileContentTabs, true) && !$canViewProfileContent;
 
         $activityService = app(StatusActivityService::class);
         $hiddenDirectoryStatusIds = $activityService->hiddenDirectoryStatusIds();
 
-        $query = Status::query()
-            ->where('uid', $user->id)
-            ->where('date', '<', time())
-            ->when($selectedTab !== 'links' && !empty($hiddenDirectoryStatusIds), fn ($builder) => $builder->whereNotIn('id', $hiddenDirectoryStatusIds))
-            ->orderBy('date', 'desc');
+        if ($hideProfileContent) {
+            $activities = $this->paginateCollection(collect(), 10, $request->integer('page', 1));
+        } else {
+            $query = Status::query()
+                ->where('uid', $user->id)
+                ->where('date', '<', time())
+                ->when($selectedTab !== 'links' && !empty($hiddenDirectoryStatusIds), fn ($builder) => $builder->whereNotIn('id', $hiddenDirectoryStatusIds))
+                ->orderBy('date', 'desc');
 
-        switch ($selectedTab) {
-            case 'blog':
-                $query->where('s_type', 100);
-                break;
-            case 'links':
-                $query->where('s_type', 1);
-                break;
-            case 'forum':
-                $query->where('s_type', 2);
-                break;
-            case 'store':
-                $query->where('s_type', 7867);
-                break;
-            case 'photos':
-            case 'about':
-                $query->whereRaw('1 = 0');
-                break;
+            switch ($selectedTab) {
+                case 'blog':
+                    $query->where('s_type', 100);
+                    break;
+                case 'links':
+                    $query->where('s_type', 1);
+                    break;
+                case 'forum':
+                    $query->where('s_type', 2);
+                    break;
+                case 'store':
+                    $query->where('s_type', 7867);
+                    break;
+                case 'photos':
+                case 'about':
+                    $query->whereRaw('1 = 0');
+                    break;
+            }
+
+            $activities = $query->paginate(10);
+            $activityService->decorateMany($activities);
         }
 
-        $activities = $query->paginate(10);
-        $activityService->decorateMany($activities);
-
+        $canViewAbout = $privacy->canViewAbout($user, $viewer);
+        $canViewPhotos = $privacy->canViewPhotos($user, $viewer);
         $photoItems = $selectedTab === 'photos'
-            ? $this->paginateCollection($this->photoItemsForUser($user), 18, $request->integer('page', 1))
+            ? $this->paginateCollection(
+                !$hideProfileContent && $canViewPhotos ? $this->photoItemsForUser($user) : collect(),
+                18,
+                $request->integer('page', 1)
+            )
             : $this->paginateCollection(collect(), 18, 1);
 
         $schema = app(V420SchemaService::class);
@@ -100,12 +112,15 @@ class ProfileController extends Controller
                 ->map(fn ($item) => (object) ['badge' => $item->badge, 'sort_order' => 0]);
         }
 
-        $canViewAbout = $privacy->canViewAbout($user, $viewer);
-        $canViewPhotos = $privacy->canViewPhotos($user, $viewer);
         $canViewFollowers = $privacy->canViewFollowers($user, $viewer);
         $canViewFollowing = $privacy->canViewFollowing($user, $viewer);
         $canSendMessage = $viewer && (int) $viewer->id !== (int) $user->id && $privacy->canDirectMessage($user, $viewer);
         $showOnlineStatus = $privacy->shouldShowOnlineStatus($user, $viewer);
+        $profileContentNotice = $hideProfileContent
+            ? ($privacySettings->profile_visibility === UserPrivacyService::VISIBILITY_FOLLOWERS
+                ? __('messages.profile_followers_only_notice')
+                : __('messages.profile_private_notice'))
+            : null;
 
         $this->seo([
             'scope_key' => 'profile_show',
@@ -136,10 +151,12 @@ class ProfileController extends Controller
             'badgeShowcase',
             'canViewAbout',
             'canViewPhotos',
+            'canViewProfileContent',
             'canViewFollowers',
             'canViewFollowing',
             'canSendMessage',
-            'showOnlineStatus'
+            'showOnlineStatus',
+            'profileContentNotice'
         ));
     }
 

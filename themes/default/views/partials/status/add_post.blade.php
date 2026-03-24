@@ -1,19 +1,44 @@
 @auth
 @php
     $categories = \App\Models\DirectoryCategory::where('statu', 1)->orderBy('name', 'ASC')->get();
+    $oldText = (string) old('text', old('txt', ''));
+    $oldLinkUrl = (string) old('link_url', '');
+    $oldPublishMode = (string) old('publish_mode', 'post');
+    $oldPostKind = (string) old('post_kind', 'text');
+    $composerHasOldInput = old('text') !== null
+        || old('txt') !== null
+        || old('link_url') !== null
+        || old('publish_mode') !== null
+        || old('post_kind') !== null
+        || old('directory_name') !== null
+        || old('directory_tags') !== null;
 @endphp
 
 <div class="quick-post" id="social-composer">
-    <div class="quick-post-body">
-        <form class="form" action="{{ route('status.create') }}" method="POST" enctype="multipart/form-data" id="social-composer-form">
-            @csrf
-            <input type="hidden" name="post_kind" id="composer-post-kind" value="text">
-            <input type="hidden" name="repost_status_id" id="composer-repost-status-id" value="">
+    <form class="form" action="{{ route('status.create') }}" method="POST" enctype="multipart/form-data" id="social-composer-form">
+        @csrf
+        <input type="hidden" name="post_kind" id="composer-post-kind" value="{{ $oldPostKind }}">
+        <input type="hidden" name="repost_status_id" id="composer-repost-status-id" value="">
+
+        <div class="quick-post-body">
+            @if($composerHasOldInput && session('error'))
+                <div class="alert alert-danger" role="alert" style="margin-bottom: 16px;">{{ session('error') }}</div>
+            @endif
+
+            @if($errors->any())
+                <div class="alert alert-danger" role="alert" style="margin-bottom: 16px;">
+                    <ul style="margin: 0; padding-inline-start: 20px;">
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
 
             <div class="form-row">
                 <div class="form-item">
                     <div class="form-textarea">
-                        <textarea id="composer-text" name="text" class="quicktext" placeholder="{{ __('messages.whats_on_your_mind', ['username' => auth()->user()->username]) }}"></textarea>
+                        <textarea id="composer-text" name="text" class="quicktext" placeholder="{{ __('messages.whats_on_your_mind', ['username' => auth()->user()->username]) }}">{{ $oldText }}</textarea>
                         <p class="form-textarea-limit-text">{{ __('messages.mentions_hint') }}</p>
                     </div>
                 </div>
@@ -37,19 +62,41 @@
                         <div class="form-item">
                             <div class="form-input small">
                                 <label for="composer-link-url">{{ __('messages.insertlink') }}</label>
-                                <input type="url" id="composer-link-url" name="link_url" placeholder="{{ __('messages.url_placeholder') }}">
+                                <input type="url" id="composer-link-url" name="link_url" value="{{ $oldLinkUrl }}" placeholder="{{ __('messages.url_placeholder') }}">
                             </div>
                         </div>
                     </div>
 
-                    <div id="composer-link-preview" style="display:none; margin-top:16px;"></div>
+                    <div id="composer-link-preview" style="display:none; margin-top: 16px;"></div>
 
-                    <div class="form-row split" style="margin-top: 16px;">
-                        <div class="form-item">
-                            <div class="checkbox-wrap">
-                                <input type="checkbox" id="composer-save-directory" name="save_to_directory" value="1">
-                                <label for="composer-save-directory">{{ __('messages.save_to_directory') }}</label>
-                            </div>
+                    <div id="composer-publish-options" style="display:none; margin-top: 16px;">
+                        <p class="user-status-text small" style="margin-bottom: 10px;">{{ __('messages.smart_link_publish_hint') }}</p>
+                        <div class="composer-choice-grid">
+                            <label class="composer-choice-card" for="composer-publish-post">
+                                <input
+                                    class="composer-choice-input"
+                                    type="radio"
+                                    id="composer-publish-post"
+                                    name="publish_mode"
+                                    value="post"
+                                    {{ $oldPublishMode !== 'directory_only' ? 'checked' : '' }}
+                                >
+                                <span class="composer-choice-title">{{ __('messages.publish_as_post') }}</span>
+                                <span class="composer-choice-text">{{ __('messages.publish_as_post_hint') }}</span>
+                            </label>
+
+                            <label class="composer-choice-card" for="composer-publish-directory-only">
+                                <input
+                                    class="composer-choice-input"
+                                    type="radio"
+                                    id="composer-publish-directory-only"
+                                    name="publish_mode"
+                                    value="directory_only"
+                                    {{ $oldPublishMode === 'directory_only' ? 'checked' : '' }}
+                                >
+                                <span class="composer-choice-title">{{ __('messages.move_to_directory') }}</span>
+                                <span class="composer-choice-text">{{ __('messages.move_to_directory_hint') }}</span>
+                            </label>
                         </div>
                     </div>
 
@@ -58,7 +105,7 @@
                             <div class="form-item">
                                 <div class="form-input small">
                                     <label for="composer-directory-name">{{ __('messages.name') }}</label>
-                                    <input type="text" id="composer-directory-name" name="directory_name" placeholder="{{ __('messages.name_placeholder') }}">
+                                    <input type="text" id="composer-directory-name" name="directory_name" value="{{ old('directory_name', '') }}" placeholder="{{ __('messages.name_placeholder') }}">
                                 </div>
                             </div>
                             <div class="form-item">
@@ -67,7 +114,9 @@
                                     <select id="composer-directory-category" name="directory_category_id">
                                         <option value="0">{{ __('messages.select') }}</option>
                                         @foreach($categories as $category)
-                                            <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                            <option value="{{ $category->id }}" {{ (string) old('directory_category_id', '0') === (string) $category->id ? 'selected' : '' }}>
+                                                {{ $category->name }}
+                                            </option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -77,7 +126,7 @@
                             <div class="form-item">
                                 <div class="form-input small">
                                     <label for="composer-directory-tags">{{ __('messages.tags_placeholder') }}</label>
-                                    <input type="text" id="composer-directory-tags" name="directory_tags" placeholder="{{ __('messages.tags_placeholder') }}">
+                                    <input type="text" id="composer-directory-tags" name="directory_tags" value="{{ old('directory_tags', '') }}" placeholder="{{ __('messages.tags_placeholder') }}">
                                 </div>
                             </div>
                         </div>
@@ -94,29 +143,79 @@
             </div>
 
             <input type="file" id="imgupload" name="fimg" accept=".jpg, .jpeg, .png, .gif, .webp" style="display:none"/>
-        </form>
-    </div>
-
-    <div class="quick-post-footer">
-        <div class="quick-post-footer-actions">
-            <div class="quick-post-footer-action text-tooltip-tft-medium" data-title="{{ __('messages.write_post') }}" id="composer-mode-text" style="position: relative; cursor: pointer;">
-                <i class="fa fa-font" aria-hidden="true"></i>
-            </div>
-            <div class="quick-post-footer-action text-tooltip-tft-medium" data-title="{{ __('messages.insertphoto') }}" id="composer-mode-gallery" style="position: relative; cursor: pointer;">
-                <svg class="quick-post-footer-action-icon icon-camera">
-                    <use xlink:href="#svg-camera"></use>
-                </svg>
-            </div>
-            <div class="quick-post-footer-action text-tooltip-tft-medium" data-title="{{ __('messages.insertlink') }}" id="composer-mode-link" style="position: relative; cursor: pointer;">
-                <i class="fa fa-link"></i>
-            </div>
         </div>
 
-        <div class="quick-post-footer-actions">
-            <p class="button small secondary" id="composer-submit" style="cursor: pointer;">{{ __('messages.spread') }}</p>
+        <div class="quick-post-footer">
+            <div class="quick-post-footer-actions">
+                <button type="button" class="quick-post-footer-action text-tooltip-tft-medium" data-title="{{ __('messages.write_post') }}" id="composer-mode-text" style="position: relative; cursor: pointer; border: 0; background: transparent;">
+                    <i class="fa fa-font" aria-hidden="true"></i>
+                </button>
+                <button type="button" class="quick-post-footer-action text-tooltip-tft-medium" data-title="{{ __('messages.insertphoto') }}" id="composer-mode-gallery" style="position: relative; cursor: pointer; border: 0; background: transparent;">
+                    <svg class="quick-post-footer-action-icon icon-camera">
+                        <use xlink:href="#svg-camera"></use>
+                    </svg>
+                </button>
+                <button type="button" class="quick-post-footer-action text-tooltip-tft-medium" data-title="{{ __('messages.insertlink') }}" id="composer-mode-link" style="position: relative; cursor: pointer; border: 0; background: transparent;">
+                    <i class="fa fa-link"></i>
+                </button>
+            </div>
+
+            <div class="quick-post-footer-actions">
+                <button type="submit" class="button small secondary" id="composer-submit">{{ __('messages.spread') }}</button>
+            </div>
         </div>
-    </div>
+    </form>
 </div>
+
+@push('head')
+    <style>
+        .composer-choice-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+        }
+
+        .composer-choice-card {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            padding: 14px 16px;
+            border: 1px solid #e5e7f2;
+            border-radius: 16px;
+            background: #fff;
+            cursor: pointer;
+            transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease;
+        }
+
+        .composer-choice-card:hover {
+            border-color: #615dfa;
+            box-shadow: 0 12px 28px rgba(97, 93, 250, 0.12);
+            transform: translateY(-1px);
+        }
+
+        .composer-choice-card:has(.composer-choice-input:checked) {
+            border-color: #615dfa;
+            box-shadow: 0 14px 30px rgba(97, 93, 250, 0.16);
+            background: linear-gradient(180deg, #ffffff 0%, #f7f7ff 100%);
+        }
+
+        .composer-choice-input {
+            margin: 0 0 4px;
+        }
+
+        .composer-choice-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1f2337;
+        }
+
+        .composer-choice-text {
+            font-size: 12px;
+            line-height: 1.5;
+            color: #6b7280;
+        }
+    </style>
+@endpush
 
 @push('scripts')
 <script>
@@ -129,44 +228,92 @@
         const postKind = document.getElementById('composer-post-kind');
         const repostStatusId = document.getElementById('composer-repost-status-id');
         const linkBlock = document.getElementById('composer-link-block');
+        const linkInput = document.getElementById('composer-link-url');
+        const linkPreview = document.getElementById('composer-link-preview');
+        const publishOptions = document.getElementById('composer-publish-options');
         const galleryBlock = document.getElementById('composer-gallery-block');
         const galleryInput = document.getElementById('composer-images');
         const galleryGrid = document.getElementById('composer-gallery-grid');
-        const linkInput = document.getElementById('composer-link-url');
-        const linkPreview = document.getElementById('composer-link-preview');
-        const directoryToggle = document.getElementById('composer-save-directory');
         const directoryFields = document.getElementById('composer-directory-fields');
+        const directoryName = document.getElementById('composer-directory-name');
         const repostCard = document.getElementById('composer-repost-card');
         const repostText = document.getElementById('composer-repost-text');
         const composerText = document.getElementById('composer-text');
+        const csrfToken = document.querySelector('meta[name="csrf-token"]');
+        const publishModeInputs = Array.from(form.querySelectorAll('input[name="publish_mode"]'));
+        const postModeInput = document.getElementById('composer-publish-post');
+        const directoryModeInput = document.getElementById('composer-publish-directory-only');
         let previewTimeout = null;
+        let previewRequestId = 0;
+        let lastPreviewUrl = null;
+        let autoDetectedLink = extractFirstUrl(composerText.value);
+        let linkLockedToText = linkInput.value.trim() === '' || linkInput.value.trim() === autoDetectedLink;
+        let manualLinkOpen = @json($oldPostKind === 'link' || $oldLinkUrl !== '');
 
-        function resetToTextMode() {
-            if (galleryInput.files.length === 0 && !repostStatusId.value && !linkInput.value.trim()) {
-                postKind.value = 'text';
-            }
+        function extractFirstUrl(text) {
+            const match = String(text || '').match(/\b((https?:\/\/)?[a-z0-9.-]+\.[a-z]{2,}(\/\S*)?)/i);
+            return match ? match[1] : '';
         }
 
-        function setMode(mode) {
-            if (mode === 'gallery') {
+        function selectedPublishMode() {
+            const current = publishModeInputs.find(function (input) {
+                return input.checked;
+            });
+
+            return current ? current.value : 'post';
+        }
+
+        function setPublishMode(value) {
+            publishModeInputs.forEach(function (input) {
+                input.checked = input.value === value;
+            });
+        }
+
+        function clearLinkPreview() {
+            lastPreviewUrl = null;
+            linkPreview.innerHTML = '';
+            linkPreview.style.display = 'none';
+        }
+
+        function hasResolvedLink() {
+            return linkInput.value.trim() !== '';
+        }
+
+        function syncPostKind() {
+            if ((galleryInput.files || []).length > 0) {
                 postKind.value = 'gallery';
-                galleryBlock.style.display = 'block';
-                linkBlock.style.display = 'none';
-                galleryInput.click();
                 return;
             }
 
-            if (mode === 'link') {
-                postKind.value = repostStatusId.value ? 'repost' : 'link';
-                linkBlock.style.display = 'block';
-                galleryBlock.style.display = 'none';
-                linkInput.focus();
+            if (repostStatusId.value) {
+                postKind.value = 'repost';
                 return;
             }
 
-            resetToTextMode();
-            linkBlock.style.display = linkInput.value.trim() ? 'block' : 'none';
-            galleryBlock.style.display = galleryInput.files.length ? 'block' : 'none';
+            postKind.value = hasResolvedLink() ? 'link' : 'text';
+        }
+
+        function syncDirectoryFields() {
+            const hasLink = hasResolvedLink();
+            publishOptions.style.display = hasLink ? 'block' : 'none';
+
+            if (!hasLink) {
+                setPublishMode('post');
+            }
+
+            directoryFields.style.display = hasLink && selectedPublishMode() === 'directory_only' ? 'block' : 'none';
+        }
+
+        function syncLinkBlockVisibility() {
+            const shouldShow = manualLinkOpen || hasResolvedLink() || autoDetectedLink !== '';
+            linkBlock.style.display = shouldShow ? 'block' : 'none';
+
+            if (!shouldShow) {
+                clearLinkPreview();
+            }
+
+            syncDirectoryFields();
+            syncPostKind();
         }
 
         function renderGallery() {
@@ -174,19 +321,20 @@
             const files = Array.from(galleryInput.files || []);
             if (files.length === 0) {
                 galleryBlock.style.display = 'none';
-                resetToTextMode();
+                syncPostKind();
                 return;
             }
 
             if (files.length > 10) {
-                alert('{{ __('messages.gallery_limit_exceeded') }}');
+                alert(@json(__('messages.gallery_limit_exceeded')));
                 galleryInput.value = '';
                 galleryBlock.style.display = 'none';
+                syncPostKind();
                 return;
             }
 
-            postKind.value = 'gallery';
             galleryBlock.style.display = 'block';
+            postKind.value = 'gallery';
 
             files.forEach(function (file) {
                 const reader = new FileReader();
@@ -214,7 +362,7 @@
 
         function renderLinkPreviewCard(data) {
             linkPreview.innerHTML = `
-                <a href="${data.url}" target="_blank" class="post-preview medium">
+                <a href="${data.url}" target="_blank" rel="noopener noreferrer" class="post-preview medium">
                     <figure class="post-preview-image liquid" style="background: url(${data.image_url || '{{ theme_asset('img/dir_image.png') }}'}) center center / cover no-repeat;"></figure>
                     <div class="post-preview-info fixed-height">
                         <p class="post-preview-title">${data.title || data.domain || data.url}</p>
@@ -224,92 +372,167 @@
                 </a>
             `;
             linkPreview.style.display = 'block';
+
+            if (!directoryName.value.trim()) {
+                directoryName.value = data.title || data.domain || '';
+            }
         }
 
         function fetchLinkPreview() {
             const value = linkInput.value.trim();
-            if (!value) {
-                linkPreview.style.display = 'none';
-                linkPreview.innerHTML = '';
-                directoryFields.style.display = directoryToggle.checked ? 'block' : 'none';
-                resetToTextMode();
+            if (!value || !csrfToken) {
+                clearLinkPreview();
                 return;
             }
 
-            postKind.value = repostStatusId.value ? 'repost' : 'link';
+            if (lastPreviewUrl === value) {
+                return;
+            }
+
+            lastPreviewUrl = value;
+            const requestId = ++previewRequestId;
+
             fetch('{{ route('status.link_preview') }}', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    'X-CSRF-TOKEN': csrfToken.getAttribute('content')
                 },
                 body: JSON.stringify({ link_url: value })
             })
-            .then(response => response.json())
-            .then(data => {
-                renderLinkPreviewCard(data);
-                if (!document.getElementById('composer-directory-name').value) {
-                    document.getElementById('composer-directory-name').value = data.title || data.domain || '';
-                }
+            .then(function (response) {
+                return response.json();
             })
-            .catch(() => {
-                linkPreview.style.display = 'none';
+            .then(function (data) {
+                if (requestId !== previewRequestId) {
+                    return;
+                }
+
+                renderLinkPreviewCard(data);
+            })
+            .catch(function () {
+                if (requestId !== previewRequestId) {
+                    return;
+                }
+
+                clearLinkPreview();
             });
         }
 
-        document.getElementById('composer-mode-text').addEventListener('click', function () {
-            linkBlock.style.display = 'none';
-            galleryBlock.style.display = 'none';
-            galleryInput.value = '';
-            linkInput.value = '';
-            linkPreview.innerHTML = '';
-            linkPreview.style.display = 'none';
-            directoryToggle.checked = false;
-            directoryFields.style.display = 'none';
-            if (!repostStatusId.value) {
-                postKind.value = 'text';
+        function scheduleLinkPreview() {
+            clearTimeout(previewTimeout);
+
+            if (!hasResolvedLink()) {
+                clearLinkPreview();
+                return;
             }
+
+            previewTimeout = setTimeout(fetchLinkPreview, 400);
+        }
+
+        function syncAutoDetectedLink() {
+            const nextDetected = extractFirstUrl(composerText.value);
+            const current = linkInput.value.trim();
+            const shouldReplace = linkLockedToText || current === '' || current === autoDetectedLink;
+
+            autoDetectedLink = nextDetected;
+
+            if (shouldReplace) {
+                linkInput.value = autoDetectedLink;
+                linkLockedToText = true;
+            }
+
+            syncLinkBlockVisibility();
+            scheduleLinkPreview();
+        }
+
+        document.getElementById('composer-mode-text').addEventListener('click', function () {
+            galleryInput.value = '';
+            galleryGrid.innerHTML = '';
+            galleryBlock.style.display = 'none';
+            manualLinkOpen = false;
+
+            if (autoDetectedLink) {
+                linkInput.value = autoDetectedLink;
+                linkLockedToText = true;
+            } else {
+                linkInput.value = '';
+                clearLinkPreview();
+            }
+
+            syncLinkBlockVisibility();
         });
 
         document.getElementById('composer-mode-gallery').addEventListener('click', function () {
-            setMode('gallery');
+            galleryInput.click();
         });
 
         document.getElementById('composer-mode-link').addEventListener('click', function () {
-            setMode('link');
+            manualLinkOpen = true;
+
+            if (!linkInput.value.trim() && autoDetectedLink) {
+                linkInput.value = autoDetectedLink;
+                linkLockedToText = true;
+            }
+
+            syncLinkBlockVisibility();
+            linkInput.focus();
+            scheduleLinkPreview();
         });
 
-        document.getElementById('composer-submit').addEventListener('click', function () {
-            form.submit();
+        galleryInput.addEventListener('change', function () {
+            renderGallery();
+            syncLinkBlockVisibility();
         });
 
-        galleryInput.addEventListener('change', renderGallery);
+        composerText.addEventListener('input', function () {
+            syncAutoDetectedLink();
+        });
 
         linkInput.addEventListener('input', function () {
-            clearTimeout(previewTimeout);
-            previewTimeout = setTimeout(fetchLinkPreview, 500);
+            manualLinkOpen = true;
+            linkLockedToText = this.value.trim() === '' || this.value.trim() === autoDetectedLink;
+            syncLinkBlockVisibility();
+            scheduleLinkPreview();
         });
 
-        directoryToggle.addEventListener('change', function () {
-            directoryFields.style.display = this.checked ? 'block' : 'none';
+        publishModeInputs.forEach(function (input) {
+            input.addEventListener('change', function () {
+                syncDirectoryFields();
+            });
         });
 
         document.getElementById('composer-repost-cancel').addEventListener('click', function () {
             repostStatusId.value = '';
             repostCard.style.display = 'none';
-            repostText.textContent = '{{ __('messages.repost_ready') }}';
-            resetToTextMode();
+            repostText.textContent = @json(__('messages.repost_ready'));
+            syncPostKind();
+        });
+
+        form.addEventListener('submit', function () {
+            if (!hasResolvedLink()) {
+                setPublishMode('post');
+            }
+
+            syncPostKind();
         });
 
         window.openRepostComposer = function (statusId, authorName, excerpt) {
             repostStatusId.value = statusId;
             postKind.value = 'repost';
             repostCard.style.display = 'block';
-            repostText.textContent = (authorName ? authorName + ': ' : '') + (excerpt || '{{ __('messages.repost_ready') }}');
+            repostText.textContent = (authorName ? authorName + ': ' : '') + (excerpt || @json(__('messages.repost_ready')));
             composerText.focus();
             window.scrollTo({ top: form.getBoundingClientRect().top + window.scrollY - 120, behavior: 'smooth' });
         };
+
+        if (hasResolvedLink()) {
+            manualLinkOpen = manualLinkOpen || !autoDetectedLink || linkInput.value.trim() !== autoDetectedLink;
+        }
+
+        renderGallery();
+        syncAutoDetectedLink();
     });
 </script>
 @endpush

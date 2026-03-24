@@ -70,6 +70,11 @@ class StatusController extends Controller
         $legacyType = (int) $request->input('s_type', 100);
         $postKind = (string) $request->input('post_kind', '');
 
+        $request->merge([
+            'directory_category_id' => $this->normalizeDirectoryCategoryId($request->input('directory_category_id')),
+            'publish_mode' => $this->normalizePublishMode($request->input('publish_mode')),
+        ]);
+
         if ($postKind === '' && $request->filled('repost_status_id')) {
             $postKind = 'repost';
         }
@@ -91,6 +96,7 @@ class StatusController extends Controller
             'images' => 'nullable|array|max:10',
             'images.*' => 'image|max:10000',
             'link_url' => 'nullable|string|max:2048',
+            'publish_mode' => 'nullable|in:post,directory_only',
             'save_to_directory' => 'nullable|boolean',
             'directory_name' => 'nullable|string|max:255',
             'directory_category_id' => 'nullable|integer|exists:cat_dir,id',
@@ -101,22 +107,46 @@ class StatusController extends Controller
         $text = trim((string) $request->input('text', $request->input('txt', '')));
         $time = time();
         $statusType = $postKind === 'gallery' ? 4 : 100;
-        $linkUrl = $request->input('link_url');
-
-        if ($postKind === 'text' && !$linkUrl) {
-            $linkUrl = $this->extractFirstUrl($text);
-        }
+        $publishMode = (string) $request->input('publish_mode', 'post');
+        $linkUrl = $this->resolveLinkUrl($request, $text);
+        $legacyDirectorySave = $request->boolean('save_to_directory');
 
         $hasMentions = ContentFormatter::extractMentionUsernames($text) !== [];
 
-        if (($postKind === 'link' || $request->boolean('save_to_directory')) && !$schema->supports('link_previews')) {
+        if (($postKind === 'link' || $legacyDirectorySave || $publishMode === 'directory_only') && !$schema->supports('link_previews')) {
             return back()
                 ->with('error', $schema->blockedActionMessage('link_previews', __('messages.link_previews')))
                 ->withInput();
         }
 
-        if ($postKind === 'text' && $linkUrl && !$schema->supports('link_previews')) {
+        if ($linkUrl && !$schema->supports('link_previews')) {
             $linkUrl = null;
+        }
+
+        if ($publishMode === 'directory_only') {
+            if (!$linkUrl) {
+                return back()
+                    ->with('error', __('messages.directory_only_requires_link'))
+                    ->withInput();
+            }
+
+            if ($this->requestHasGallerySelection($request) || $postKind === 'repost') {
+                return back()
+                    ->with('error', __('messages.directory_only_incompatible_post_type'))
+                    ->withInput();
+            }
+
+            DB::beginTransaction();
+            try {
+                $preview = $linkPreviewService->fetch($linkUrl);
+                [$directory] = $this->createDirectoryEntry($request, $user, $preview, $text, $time);
+
+                DB::commit();
+                return redirect()->route('directory.show', $directory->id);
+            } catch (\Throwable $e) {
+                DB::rollBack();
+                return back()->with('error', $e->getMessage())->withInput();
+            }
         }
 
         if ($postKind === 'repost' && !$schema->supports('reposts')) {
@@ -159,35 +189,8 @@ class StatusController extends Controller
                     'domain' => $preview['domain'],
                 ]);
 
-                if ($request->boolean('save_to_directory')) {
-                    $directory = Directory::create([
-                        'uid' => $user->id,
-                        'name' => $request->input('directory_name') ?: ($preview['title'] ?: $preview['domain']),
-                        'url' => $preview['normalized_url'],
-                        'txt' => $text !== '' ? $text : ($preview['description'] ?? ''),
-                        'metakeywords' => (string) $request->input('directory_tags', ''),
-                        'cat' => (int) $request->input('directory_category_id', 0),
-                        'vu' => 0,
-                        'statu' => 1,
-                        'date' => $time,
-                    ]);
-
-                    $directoryStatus = Status::create([
-                        'uid' => $user->id,
-                        'date' => $time,
-                        's_type' => 1,
-                        'tp_id' => $directory->id,
-                        'statu' => 1,
-                    ]);
-
-                    Short::create([
-                        'uid' => $user->id,
-                        'sho' => hash('crc32', $preview['normalized_url'] . $directory->id),
-                        'url' => $preview['normalized_url'],
-                        'clik' => 0,
-                        'sh_type' => 1,
-                        'tp_id' => $directory->id,
-                    ]);
+                if ($legacyDirectorySave) {
+                    [$directory, $directoryStatus] = $this->createDirectoryEntry($request, $user, $preview, $text, $time);
 
                     $linkPreview->update([
                         'directory_id' => $directory->id,
@@ -393,5 +396,73 @@ class StatusController extends Controller
         }
 
         return $matches[1] ?? null;
+    }
+
+    private function normalizeDirectoryCategoryId(mixed $value): ?int
+    {
+        if ($value === null || $value === '' || $value === '0' || $value === 0) {
+            return null;
+        }
+
+        return is_numeric($value) ? (int) $value : null;
+    }
+
+    private function normalizePublishMode(mixed $value): string
+    {
+        return in_array($value, ['post', 'directory_only'], true) ? (string) $value : 'post';
+    }
+
+    private function resolveLinkUrl(Request $request, string $text): ?string
+    {
+        $value = trim((string) $request->input('link_url', ''));
+
+        if ($value !== '') {
+            return $value;
+        }
+
+        return $this->extractFirstUrl($text);
+    }
+
+    private function requestHasGallerySelection(Request $request): bool
+    {
+        if (!empty($request->file('images', []))) {
+            return true;
+        }
+
+        return is_string($request->input('img')) && trim((string) $request->input('img')) !== '';
+    }
+
+    private function createDirectoryEntry(Request $request, $user, array $preview, string $text, int $time): array
+    {
+        $directory = Directory::create([
+            'uid' => $user->id,
+            'name' => $request->input('directory_name') ?: ($preview['title'] ?: $preview['domain']),
+            'url' => $preview['normalized_url'],
+            'txt' => $text !== '' ? $text : ($preview['description'] ?? ''),
+            'metakeywords' => (string) $request->input('directory_tags', ''),
+            'cat' => (int) ($request->input('directory_category_id') ?? 0),
+            'vu' => 0,
+            'statu' => 1,
+            'date' => $time,
+        ]);
+
+        $directoryStatus = Status::create([
+            'uid' => $user->id,
+            'date' => $time,
+            's_type' => 1,
+            'tp_id' => $directory->id,
+            'statu' => 1,
+        ]);
+
+        Short::create([
+            'uid' => $user->id,
+            'sho' => hash('crc32', $preview['normalized_url'] . $directory->id),
+            'url' => $preview['normalized_url'],
+            'clik' => 0,
+            'sh_type' => 1,
+            'tp_id' => $directory->id,
+        ]);
+
+        return [$directory, $directoryStatus];
     }
 }
