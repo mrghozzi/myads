@@ -54,6 +54,7 @@ class ProfileController extends Controller
         } else {
             $query = Status::query()
                 ->where('uid', $user->id)
+                ->where('statu', 1)
                 ->where('date', '<', time())
                 ->when($selectedTab !== 'links' && !empty($hiddenDirectoryStatusIds), fn ($builder) => $builder->whereNotIn('id', $hiddenDirectoryStatusIds))
                 ->orderBy('date', 'desc');
@@ -137,6 +138,13 @@ class ProfileController extends Controller
                 ['name' => $user->username, 'url' => route('profile.show', $user->username)],
             ],
         ]);
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'html' => view('theme::partials.ajax.activities', compact('activities'))->render(),
+                'next_page_url' => $activities->nextPageUrl(),
+            ]);
+        }
 
         return view('theme::profile.show', compact(
             'user',
