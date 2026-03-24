@@ -470,7 +470,6 @@ class ForumController extends Controller
     private function buildCategorySidebar(int $currentCategoryId)
     {
         $topicCounts = ForumTopic::visible()
-            ->query()
             ->select('cat', DB::raw('COUNT(*) as topic_count'))
             ->where('statu', 1)
             ->groupBy('cat')
