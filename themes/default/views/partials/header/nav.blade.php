@@ -60,6 +60,13 @@
             </a>
         </li>
         <li class="menu-item">
+            <a class="menu-item-link text-tooltip-tfr" href="{{ url('/orders') }}" data-title="{{ __('messages.order_requests') }}">
+                <svg class="menu-item-link-icon icon-status">
+                    <use xlink:href="#svg-status"></use>
+                </svg>
+            </a>
+        </li>
+        <li class="menu-item">
             <a class="menu-item-link text-tooltip-tfr" href="{{ url('/store') }}" data-title="{{ __('messages.store') }}">
                 <svg class="menu-item-link-icon icon-marketplace">
                     <use xlink:href="#svg-marketplace"></use>

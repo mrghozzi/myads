@@ -16,13 +16,27 @@
 
     <!-- MAIN CONTENT -->
     <div class="grid-column">
-        <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+        <div class="section-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 16px;">
             <div class="section-header-info">
                 <h2 class="section-title">{{ __('messages.latest_orders') }}</h2>
             </div>
-            @auth
-            <a href="{{ route('orders.create') }}" class="button primary">{{ __('messages.post_new_order') }}</a>
-            @endauth
+            
+            <div class="section-header-actions" style="display: flex; gap: 16px; align-items: center;">
+                <form action="{{ route('orders.index') }}" method="GET" id="sort-form">
+                    <div class="form-input small">
+                        <select name="sort" onchange="document.getElementById('sort-form').submit()" style="padding: 0 16px; height: 40px; border-radius: 4px; border: 1px solid #dedee9; background-color: #fff; color: #3e3f5e; font-weight: 700;">
+                            <option value="newest" {{ request('sort') == 'newest' ? 'selected' : '' }}>{{ __('messages.most_recent') }}</option>
+                            <option value="active" {{ request('sort') == 'active' ? 'selected' : '' }}>{{ __('messages.most_active') }}</option>
+                            <option value="rated" {{ request('sort') == 'rated' ? 'selected' : '' }}>{{ __('messages.highest_rated') }}</option>
+                            <option value="popular" {{ request('sort') == 'popular' ? 'selected' : '' }}>{{ __('messages.most_active') }} ({{ __('messages.replies') }})</option>
+                        </select>
+                    </div>
+                </form>
+
+                @auth
+                <a href="{{ route('orders.create') }}" class="button primary">{{ __('messages.post_new_order') }}</a>
+                @endauth
+            </div>
         </div>
 
         <div id="orders-container" style="display: grid; grid-gap: 16px;">

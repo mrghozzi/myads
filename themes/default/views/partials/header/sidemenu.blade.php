@@ -36,8 +36,8 @@
         </li>
         <li class="menu-item">
             <a class="menu-item-link text-tooltip-tfr" href="{{ url('/orders') }}">
-                <svg class="menu-item-link-icon icon-list-grid-view">
-                    <use xlink:href="#svg-list-grid-view"></use>
+                <svg class="menu-item-link-icon icon-status">
+                    <use xlink:href="#svg-status"></use>
                 </svg>
                 {{ __('messages.order_requests') }}
             </a>

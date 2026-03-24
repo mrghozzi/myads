@@ -22,12 +22,23 @@
                     <p class="user-short-description-title"><a href="{{ route('profile.show', $order->user->username) }}">{{ $order->user->username }}</a></p>
                     <p class="user-short-description-text">{{ $order->user->isOnline() ? __('messages.online') : __('messages.offline') }}</p>
                 </div>
-                @auth
-                    @if(auth()->id() != $order->uid)
-                        <a href="{{ url('/messages/' . $order->uid) }}" class="button primary full" style="margin-top: 20px;">
-                            <i class="fa fa-envelope"></i>&nbsp;{{ __('messages.send_message') }}
-                        </a>
-                    @endif
+                 @auth
+                    <div class="widget-box-actions" style="margin-top: 20px;">
+                        @if(auth()->id() != $order->uid)
+                            <a href="{{ url('/messages/' . $order->uid) }}" class="button primary full">
+                                <i class="fa fa-envelope"></i>&nbsp;{{ __('messages.send_message') }}
+                            </a>
+                        @endif
+
+                        @if(($order->uid == auth()->id() || auth()->user()->isAdmin()) && $order->statu == 1)
+                            <form action="{{ route('orders.close', $order->id) }}" method="POST" style="margin-top: 10px;">
+                                @csrf
+                                <button type="submit" class="button secondary full" onclick="return confirm('{{ __('messages.confirm_close_order') }}')">
+                                    <i class="fa fa-lock"></i>&nbsp;{{ __('messages.close_order') }}
+                                </button>
+                            </form>
+                        @endif
+                    </div>
                 @endauth
              </div>
         </div>
@@ -51,7 +62,8 @@
                         'comments' => \App\Models\Option::where('o_parent', $order->id)->where('o_type', 'o_order')->orderBy('id', 'desc')->get(),
                         'id' => $order->id,
                         'type' => 'order',
-                        'limit' => 100
+                        'limit' => 100,
+                        'order' => $order
                     ])
                 </div>
             </div>

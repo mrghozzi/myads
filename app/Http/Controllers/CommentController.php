@@ -171,20 +171,29 @@ class CommentController extends Controller
                     $url = "/store/" . $product->name; // URL format (Root relative)
                 }
             } elseif ($type == 'order') {
-                $comment = Option::create([
-                    'name' => 'coment_order',
-                    'o_type' => 'o_order',
-                    'o_order' => $uid,
-                    'o_parent' => $id,
-                    'o_valuer' => $text,
-                    'o_mode' => $time
-                ]);
+                $order = \App\Models\OrderRequest::findOrFail($id);
+                $comment = new \App\Models\Option();
+                $comment->name = 'coment_order'; // Fixed name for order comments
+                $comment->o_valuer = $text; // Comment text
+                $comment->o_type = 'o_order';
+                $comment->o_parent = (int) $id;
+                $comment->o_order = (int) Auth::id();
+                $comment->o_mode = 0; // Default rating
+                $comment->save();
 
-                $orderReq = \App\Models\OrderRequest::find($id);
-                if ($orderReq) {
-                    $ownerId = $orderReq->uid;
-                    $url = "/orders/" . $orderReq->id;
+                // Update last activity
+                $order->update(['last_activity' => time()]);
+
+                // PTS Reward for commenter
+                app(\App\Services\PointLedgerService::class)->award(Auth::user(), 5, 'order_reply', 'points_awarded', 'order_comment', $comment->id);
+                
+                // Reward owner for getting a reply (only if not replying to self)
+                if ($order->uid != Auth::id()) {
+                    app(\App\Services\PointLedgerService::class)->award($order->uid, 2, 'order_received_reply', 'points_awarded', 'order', $order->id);
                 }
+
+                $ownerId = $order->uid;
+                $url = "/orders/" . $order->id;
             }
 
             $mentions->createCommentMentions($user, $type, (int) $comment->id, $text, $url);

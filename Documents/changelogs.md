@@ -17,6 +17,9 @@
 * **Add**: Automatic social integration where new order requests are published as interactive cards in the **Community Feed**.
 * **Add**: Dedicated browsing and creation interfaces for order requests, supporting category filtering and budget tracking.
 * **Add**: Direct messaging integration from order request cards to facilitate quick communication between owners and providers.
+* **Add**: **Engagement Enhancements**: Implemented advanced sorting (Newest, Most Active, Highest Rated), "Best Offer" selection by owners, and a mutual rating system for orders and participants.
+* **Gamification**: Integrated with `PointLedgerService` to award PTS for posting orders, bidding, and winning the "Best Offer" selection.
+* **Management**: Added order closure functionality for owners and site administrators, with automated information notifications.
 
 ### 📰 News & Community Portal
 * **Fix**: Resolved `500 Internal Server Error` when posting news by fixing missing `statu` and `img` database columns.

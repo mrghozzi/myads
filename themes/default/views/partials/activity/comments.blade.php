@@ -94,11 +94,53 @@
                         {{ $user->forumRoleLabel($forumCategoryId ?: null) }}
                     </span>
                 @endif
+                
+                @if($type === 'order' && isset($order))
+                    @if($order->best_offer_id == $comment->id)
+                        <span class="status-type-label" style="background: #23d2e2; color: #fff; padding: 1px 6px; border-radius: 4px; font-size: 9px; margin-inline-start: 8px;">
+                            <i class="fa fa-trophy"></i> {{ __('messages.best_offer') }}
+                        </span>
+                    @endif
+                    
+                    @php $rating = (int) $comment->o_mode; @endphp
+                    @if($rating > 0)
+                        <div class="comment-rating" style="color: #ffc107; font-size: 11px; margin-top: 2px;">
+                            @for($i=1; $i<=5; $i++)
+                                <i class="fa fa-star{{ $i <= $rating ? '' : '-o' }}"></i>
+                            @endfor
+                        </div>
+                    @endif
+                @endif
             @else
                 <span class="post-comment-text-author">{{ __('messages.deleted_user') }}</span>
             @endif
 
             <div class="forum-rdx-comment-body">{!! $formattedText !!}</div>
+
+            @if($type === 'order' && isset($order) && auth()->check() && auth()->id() == $order->uid && $order->statu == 1)
+                <div class="order-comment-actions" style="margin-top: 10px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                    @if($order->best_offer_id != $comment->id)
+                        <form action="{{ route('orders.select_best', $order->id) }}" method="POST">
+                            @csrf
+                            <input type="hidden" name="offer_id" value="{{ $comment->id }}">
+                            <button type="submit" class="button white small" style="padding: 0 12px; height: 28px;">
+                                <i class="fa fa-check"></i> {{ __('messages.select_best_offer') }}
+                            </button>
+                        </form>
+                    @endif
+
+                    <form action="{{ route('orders.rate', $order->id) }}" method="POST" style="display: flex; gap: 5px; align-items: center;">
+                        @csrf
+                        <input type="hidden" name="offer_id" value="{{ $comment->id }}">
+                        <select name="rating" onchange="this.form.submit()" style="height: 28px; border-radius: 4px; border: 1px solid #eaeaf5; font-size: 11px; padding: 0 8px;">
+                            <option value="0">{{ __('messages.rate_offer') }}</option>
+                            @for($i=1; $i<=5; $i++)
+                                <option value="{{ $i }}" {{ $rating == $i ? 'selected' : '' }}>{{ $i }} {{ __('messages.stars') ?? 'Stars' }}</option>
+                            @endfor
+                        </select>
+                    </form>
+                </div>
+            @endif
         </div>
 
         <div class="content-actions">

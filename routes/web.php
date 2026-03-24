@@ -206,6 +206,9 @@ Route::get('/orders', [OrderRequestController::class, 'index'])->name('orders.in
 Route::middleware(['auth'])->group(function () {
     Route::get('/orders/create', [OrderRequestController::class, 'create'])->name('orders.create');
     Route::post('/orders', [OrderRequestController::class, 'store'])->name('orders.store');
+    Route::post('/orders/{id}/select-best', [OrderRequestController::class, 'selectBestOffer'])->name('orders.select_best');
+    Route::post('/orders/{id}/rate', [OrderRequestController::class, 'rateOffer'])->name('orders.rate');
+    Route::post('/orders/{id}/close', [OrderRequestController::class, 'close'])->name('orders.close');
     Route::delete('/orders/{id}', [OrderRequestController::class, 'destroy'])->name('orders.destroy');
 });
 Route::get('/orders/{id}', [OrderRequestController::class, 'show'])->name('orders.show');

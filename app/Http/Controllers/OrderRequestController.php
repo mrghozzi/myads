@@ -10,12 +10,22 @@ use Illuminate\Support\Facades\DB;
 
 class OrderRequestController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $orders = OrderRequest::where('statu', 1)
-            ->with('user')
-            ->orderBy('date', 'desc')
-            ->paginate(15);
+        $sort = $request->input('sort', 'newest');
+        $query = OrderRequest::with('user')->withCount('offers');
+
+        if ($sort === 'active') {
+            $query->orderBy('last_activity', 'desc');
+        } elseif ($sort === 'rated') {
+            $query->orderBy('avg_rating', 'desc');
+        } elseif ($sort === 'popular') {
+            $query->orderBy('offers_count', 'desc');
+        } else {
+            $query->orderBy('date', 'desc');
+        }
+
+        $orders = $query->paginate(15);
 
         $this->seo([
             'scope_key' => 'orders_index',
@@ -44,6 +54,8 @@ class OrderRequestController extends Controller
             'category' => 'nullable|string|max:100',
         ]);
 
+        $ledger = app(\App\Services\PointLedgerService::class);
+
         try {
             DB::beginTransaction();
             
@@ -70,6 +82,9 @@ class OrderRequestController extends Controller
 
             DB::commit();
 
+            // Reward for posting
+            $ledger->award(Auth::user(), 10, 'order_posted', 'points_awarded', 'order', $order->id);
+
             return redirect()->route('orders.index')->with('success', __('messages.order_created_successfully'));
         } catch (\Throwable $e) {
             DB::rollBack();
@@ -95,6 +110,67 @@ class OrderRequestController extends Controller
         return view('theme::orders.show', compact('order'));
     }
 
+    public function rateOffer(Request $request, $id)
+    {
+        $order = OrderRequest::findOrFail($id);
+        if ($order->uid != Auth::id()) {
+            abort(403);
+        }
+
+        $offerId = $request->input('offer_id');
+        $rating = (int) $request->input('rating');
+        
+        $offer = \App\Models\Option::where('id', $offerId)->where('o_parent', $id)->where('o_type', 'o_order')->firstOrFail();
+        $offer->update(['o_mode' => $rating]);
+
+        $avg = $order->offers()->where('o_mode', '>', 0)->avg('o_mode');
+        $order->update(['avg_rating' => $avg ?? 0]);
+
+        return back()->with('success', __('messages.rating_submitted'));
+    }
+
+    public function selectBestOffer(Request $request, $id)
+    {
+        $order = OrderRequest::findOrFail($id);
+        if ($order->uid != Auth::id()) {
+            abort(403);
+        }
+
+        $offerId = $request->input('offer_id');
+        $offer = \App\Models\Option::where('id', $offerId)->where('o_parent', $id)->where('o_type', 'o_order')->firstOrFail();
+
+        $order->update(['best_offer_id' => $offer->id]);
+
+        $winnerId = $offer->o_order;
+        app(\App\Services\PointLedgerService::class)->award($winnerId, 50, 'best_offer_winner', 'points_awarded', 'order_offer', $offer->id);
+
+        return back()->with('success', __('messages.best_offer_selected'));
+    }
+
+    public function close(Request $request, $id)
+    {
+        $order = OrderRequest::findOrFail($id);
+        $user = Auth::user();
+
+        if ($order->uid != $user->id && !$user->isAdmin()) {
+            abort(403);
+        }
+
+        $order->update(['statu' => 0]);
+
+        if ($user->isAdmin() && $order->uid != $user->id) {
+            app(\App\Services\NotificationService::class)->send(
+                $order->uid,
+                __('messages.order_closed_by_admin', ['title' => $order->title]),
+                route('orders.show', $order->id),
+                'info',
+                $user->id
+            );
+        }
+
+        return back()->with('success', __('messages.order_closed_successfully'));
+    }
+
     public function destroy($id)
     {
         $order = OrderRequest::findOrFail($id);
@@ -106,6 +182,7 @@ class OrderRequestController extends Controller
         DB::beginTransaction();
         try {
             Status::where('tp_id', $id)->where('s_type', 6)->delete();
+            \App\Models\Option::where('o_parent', $id)->where('o_type', 'o_order')->delete();
             $order->delete();
             DB::commit();
             return redirect()->route('orders.index')->with('success', __('messages.order_deleted_successfully'));

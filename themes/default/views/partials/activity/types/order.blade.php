@@ -49,7 +49,11 @@
                 </a>
                 <p class="user-status-title medium">
                     <a class="bold" href="{{ $activityUserProfileUrl }}">{{ $activityUserName }}</a>
-                    <span class="status-type-label" style="background: #615dfa; color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 10px; margin-inline-start: 8px;">{{ __('messages.order_request') }}</span>
+                    @if($order->statu == 0)
+                        <span class="status-type-label" style="background: #ff5b5b; color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 10px; margin-inline-start: 8px;">{{ __('messages.closed') }}</span>
+                    @else
+                        <span class="status-type-label" style="background: #615dfa; color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 10px; margin-inline-start: 8px;">{{ __('messages.order_request') }}</span>
+                    @endif
                 </p>
                 <p class="user-status-text small">
                     <i class="fa fa-clock-o"></i>&nbsp;{{ $activity->date_formatted }}
@@ -72,6 +76,11 @@
                         <div class="order-meta-item">
                             <span style="color: #8f919d;">{{ __('messages.category') }}:</span>
                             <span style="font-weight: 600;">{{ $order->category }}</span>
+                        </div>
+                    @endif
+                    @if($order->avg_rating > 0)
+                        <div class="order-meta-item">
+                            <span style="color: #ffc107;"><i class="fa fa-star"></i> {{ number_format($order->avg_rating, 1) }}</span>
                         </div>
                     @endif
                 </div>

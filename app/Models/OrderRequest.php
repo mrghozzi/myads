@@ -20,11 +20,24 @@ class OrderRequest extends Model
         'category',
         'date',
         'statu',
+        'best_offer_id',
+        'last_activity',
+        'avg_rating',
     ];
 
     public function user()
     {
         return $this->belongsTo(User::class, 'uid');
+    }
+
+    public function bestOffer()
+    {
+        return $this->belongsTo(Option::class, 'best_offer_id');
+    }
+
+    public function offers()
+    {
+        return $this->hasMany(Option::class, 'o_parent')->where('o_type', 'o_order');
     }
 
     public function statusRecord()
