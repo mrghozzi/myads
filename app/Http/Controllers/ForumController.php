@@ -260,7 +260,8 @@ class ForumController extends Controller
 
         $categories = ForumCategory::orderBy('ordercat', 'asc')->get();
         $forumSettings = ForumSettings::all();
-        return view('theme::forum.edit', compact('topic', 'categories', 'forumSettings'));
+        $status = Status::where('tp_id', $id)->whereIn('s_type', [2, 4, 100])->first();
+        return view('theme::forum.edit', compact('topic', 'categories', 'forumSettings', 'status'));
     }
 
     public function update(Request $request, $id)
@@ -449,6 +450,8 @@ class ForumController extends Controller
             $filePath = $storageFile;
         } elseif (is_file($legacyPublicFile)) {
             $filePath = $legacyPublicFile;
+        } elseif (is_file(base_path($normalizedPath))) {
+            $filePath = base_path($normalizedPath);
         } else {
             abort(404);
         }
@@ -522,7 +525,7 @@ class ForumController extends Controller
             throw new \RuntimeException(__('messages.attachments_limit_exceeded'));
         }
 
-        $destinationPath = storage_path('app/forum_attachments');
+        $destinationPath = base_path('upload');
         if (!is_dir($destinationPath) && !mkdir($destinationPath, 0755, true) && !is_dir($destinationPath)) {
             throw new \RuntimeException('Unable to create forum attachment directory.');
         }
@@ -549,7 +552,7 @@ class ForumController extends Controller
             ForumAttachment::create([
                 'topic_id' => $topic->id,
                 'user_id' => (int) auth()->id(),
-                'file_path' => 'forum_attachments/' . $filename,
+                'file_path' => 'upload/' . $filename,
                 'original_name' => $originalName,
                 'mime_type' => $mimeType,
                 'file_size' => $fileSize,
@@ -571,6 +574,8 @@ class ForumController extends Controller
                 @unlink($storageFile);
             } elseif (is_file($legacyPublicFile)) {
                 @unlink($legacyPublicFile);
+            } elseif (is_file(base_path($normalizedPath))) {
+                @unlink(base_path($normalizedPath));
             }
 
             $attachment->delete();

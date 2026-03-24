@@ -53,7 +53,7 @@
                             <i class="fa fa-trash" aria-hidden="true"></i>&nbsp;{{ __('messages.delete') }}
                         </p>
                     @endif
-                    @if($canPinTopic)
+                    @if($canPinTopic && $status->s_type != 4)
                         <form method="POST" action="{{ route('forum.pin', $topic->id) }}">
                             @csrf
                             <button type="submit" class="simple-dropdown-link" style="width:100%;text-align:left;border:0;background:transparent;">
@@ -61,7 +61,7 @@
                             </button>
                         </form>
                     @endif
-                    @if($canLockTopic)
+                    @if($canLockTopic && $status->s_type != 4)
                         <form method="POST" action="{{ route('forum.lock', $topic->id) }}">
                             @csrf
                             <button type="submit" class="simple-dropdown-link" style="width:100%;text-align:left;border:0;background:transparent;">
@@ -216,19 +216,27 @@
                 </a>
 
                 @if($topic->attachments->isNotEmpty())
-                    <div class="widget-box" style="margin-bottom: 14px; margin-top: 12px;">
-                        <div class="widget-box-content">
-                            <p class="bold" style="margin-bottom: 8px;">{{ __('messages.topic_attachments') }}</p>
-                            @foreach($topic->attachments as $attachment)
-                                <p style="margin-bottom: 6px;">
-                                    <a href="{{ route('forum.attachment.download', $attachment->id) }}">
-                                        <i class="fa fa-paperclip" aria-hidden="true"></i>
-                                        {{ $attachment->original_name }}
-                                    </a>
-                                    <span style="color:#7f85a3;font-size:12px;">({{ $attachment->human_size }})</span>
-                                </p>
-                            @endforeach
-                        </div>
+                    <div class="picture-item-grid" style="margin-top: 20px; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px;">
+                        @foreach($topic->attachments as $attachment)
+                            @if($attachment->isImage())
+                                <div class="picture-item" style="border-radius: 12px; overflow: hidden; position: relative; padding-bottom: 100%; height: 0;">
+                                    <img src="{{ asset($attachment->file_path) }}" 
+                                         style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; cursor: pointer;"
+                                         onclick="window.open('{{ asset($attachment->file_path) }}', '_blank')"
+                                         alt="{{ $attachment->original_name }}">
+                                </div>
+                            @else
+                                <div class="widget-box" style="margin-bottom: 14px;">
+                                    <div class="widget-box-content">
+                                        <a href="{{ route('forum.attachment.download', $attachment->id) }}">
+                                            <i class="fa fa-paperclip" aria-hidden="true"></i>
+                                            {{ $attachment->original_name }}
+                                        </a>
+                                        <span style="color:#7f85a3;font-size:12px;">({{ $attachment->human_size }})</span>
+                                    </div>
+                                </div>
+                            @endif
+                        @endforeach
                     </div>
                 @endif
 

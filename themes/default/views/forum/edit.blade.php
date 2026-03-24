@@ -6,7 +6,7 @@
 <!-- SECTION BANNER -->
 <div class="section-banner" style="background: url({{ theme_asset('img/banner/Newsfeed.png') }}) no-repeat 50%;">
     <img class="section-banner-icon" src="{{ theme_asset('img/banner/discussion-icon.png') }}">
-    <p class="section-banner-title">{{ isset($topic) ? __('messages.edit_topic') : __('messages.w_new_tpc') }}</p>
+    <p class="section-banner-title">{{ (isset($status) && $status->s_type == 4) ? __('messages.edit_gallery_post') : (isset($topic) ? __('messages.edit_topic') : __('messages.w_new_tpc')) }}</p>
 </div>
 <!-- /SECTION BANNER -->
 
@@ -21,7 +21,7 @@
     <div class="grid-column">
         <div class="widget-box forum-rdx-form-shell">
             <div class="widget-box-title">
-                <p class="widget-box-title forum-rdx-form-header">{{ isset($topic) ? __('messages.edit_topic') : __('messages.w_new_tpc') }}</p>
+                <p class="widget-box-title forum-rdx-form-header">{{ (isset($status) && $status->s_type == 4) ? __('messages.edit_gallery_post') : (isset($topic) ? __('messages.edit_topic') : __('messages.w_new_tpc')) }}</p>
             </div>
             
             <div class="widget-box-content">
@@ -62,6 +62,7 @@
                         </div>
                     </div>
 
+                    @if(!isset($status) || $status->s_type != 4)
                     <div class="form-row split">
                         <div class="form-item">
                             <div class="form-select">
@@ -79,6 +80,9 @@
                             </div>
                         </div>
                     </div>
+                    @else
+                        <input type="hidden" name="cat" value="{{ $topic->cat }}">
+                    @endif
                     
                     @if(!isset($topic))
                     <div class="form-row split">

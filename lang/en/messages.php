@@ -480,6 +480,7 @@ return [
     'addwebsitdir' => 'Addwebsitdir',
     'EditWebsite' => 'EditWebsite',
     'edit_topic' => 'Edit topic',
+    'edit_gallery_post' => 'Edit gallery post',
     'upload_image' => 'Upload image',
     'add_photo' => 'Add photo',
     'latest_post' => 'Latest post',

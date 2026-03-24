@@ -357,14 +357,14 @@ class StatusController extends Controller
     {
         $extension = strtolower($file->getClientOriginalExtension() ?: $file->extension() ?: 'jpg');
         $filename = 'topic_' . $topicId . '_' . time() . '_' . Str::random(12) . '.' . $extension;
-        $destinationPath = storage_path('app/forum_attachments');
+        $destinationPath = base_path('upload');
 
         if (!is_dir($destinationPath) && !mkdir($destinationPath, 0755, true) && !is_dir($destinationPath)) {
             throw new \RuntimeException('Unable to create gallery attachment directory.');
         }
 
         $file->move($destinationPath, $filename);
-        return 'forum_attachments/' . $filename;
+        return 'upload/' . $filename;
     }
 
     private function mimeTypeForPath(string $path): string

@@ -463,6 +463,7 @@ return [
     'addwebsitdir' => 'إضافة موقع للدليل',
     'EditWebsite' => 'تعديل الموقع',
     'edit_topic' => 'تعديل الموضوع',
+    'edit_gallery_post' => 'تعديل منشور الصور',
     'upload_image' => 'رفع صورة',
     'add_photo' => 'إضافة صورة',
     'latest_post' => 'أحدث المقالات',
