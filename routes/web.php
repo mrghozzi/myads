@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\TagController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController;
@@ -485,6 +486,9 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap.xml');
 Route::get('/sitemap/{type}/{page}.xml', [SitemapController::class, 'section'])->name('sitemap.section');
 Route::get('/robots.txt', [SitemapController::class, 'robots'])->name('robots.txt');
+
+// Tags
+Route::get('/tag/{tag}', [TagController::class, 'index'])->name('tag.show');
 
 // Legacy User Routes
 Route::get('/b_list', [AdsController::class, 'indexBanners'])->name('legacy.b_list')->middleware('auth');

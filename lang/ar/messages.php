@@ -140,6 +140,7 @@ return [
     'are_you_sure' => 'هل أنت متأكد؟',
     'loading' => 'جاري التحميل...',
     'error_prefix' => 'خطأ:',
+    'seo_tag_description' => 'تصفح جميع المنشورات والمواضيع التي تحمل الوسم #:tag.',
     'forum_description' => 'مرحباً بك في منتدى مجتمعنا',
     'latest_topic' => 'أحدث موضوع',
     'unknown' => 'غير معروف',
