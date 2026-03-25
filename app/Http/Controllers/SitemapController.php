@@ -27,22 +27,28 @@ class SitemapController extends Controller
 
     public function index()
     {
-        $xml = '<?xml version="1.0" encoding="UTF-8"?>' . PHP_EOL;
-        $xml .= '<?xml-stylesheet type="text/xsl" href="' . e(asset('sitemap.xsl')) . '"?>' . PHP_EOL;
-        $xml .= '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . PHP_EOL;
+        try {
+            $xml = '<?xml version="1.0" encoding="UTF-8"?>' . PHP_EOL;
+            $xml .= '<?xml-stylesheet type="text/xsl" href="' . e(asset('sitemap.xsl')) . '"?>' . PHP_EOL;
+            $xml .= '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . PHP_EOL;
 
-        foreach ($this->sectionIndex() as $type => $pages) {
-            for ($page = 1; $page <= $pages; $page++) {
-                $xml .= '  <sitemap>' . PHP_EOL;
-                $xml .= '    <loc>' . e(url("/sitemap/{$type}/{$page}.xml")) . '</loc>' . PHP_EOL;
-                $xml .= '    <lastmod>' . e(now()->toAtomString()) . '</lastmod>' . PHP_EOL;
-                $xml .= '  </sitemap>' . PHP_EOL;
+            foreach ($this->sectionIndex() as $type => $pages) {
+                for ($i = 1; $i <= $pages; $i++) {
+                    $xml .= '  <sitemap>' . PHP_EOL;
+                    $xml .= '    <loc>' . e(url("sitemap/{$type}/{$i}.xml")) . '</loc>' . PHP_EOL;
+                    $xml .= '    <lastmod>' . date('c') . '</lastmod>' . PHP_EOL;
+                    $xml .= '  </sitemap>' . PHP_EOL;
+                }
             }
+
+            $xml .= '</sitemapindex>';
+
+            return response($xml)->header('Content-Type', 'text/xml');
+        } catch (\Throwable $e) {
+            // Return empty sitemap index on failure instead of 500
+            $xml = '<?xml version="1.0" encoding="UTF-8"?><sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"></sitemapindex>';
+            return response($xml)->header('Content-Type', 'text/xml');
         }
-
-        $xml .= '</sitemapindex>';
-
-        return response($xml, 200)->header('Content-Type', 'application/xml; charset=UTF-8');
     }
 
     public function section($type, $page = 1)
@@ -149,25 +155,38 @@ class SitemapController extends Controller
             $sections['static'] = 1;
         }
 
-        $sectionCounts = [
-            'pages' => $this->publishedPagesQuery()->count(),
-            'news' => $this->publishedNewsQuery()->count(),
-            'topics' => $this->publishedTopicsQuery()->count(),
-            'directory_categories' => $this->publishedDirectoryCategoriesQuery()->count(),
-            'directories' => $this->publishedDirectoriesQuery()->count(),
-            'products' => $this->publishedProductsQuery()->count(),
-            'knowledgebase_indexes' => $this->knowledgebaseIndexesQuery()->count(),
-            'knowledgebases' => $this->publishedKnowledgebaseArticlesQuery()->count(),
-            'users' => $this->publishedUsersQuery()->count(),
-        ];
+        try {
+            $sectionCounts = [
+                'pages' => $this->safeCount($this->publishedPagesQuery()),
+                'news' => $this->safeCount($this->publishedNewsQuery()),
+                'topics' => $this->safeCount($this->publishedTopicsQuery()),
+                'directory_categories' => $this->safeCount($this->publishedDirectoryCategoriesQuery()),
+                'directories' => $this->safeCount($this->publishedDirectoriesQuery()),
+                'products' => $this->safeCount($this->publishedProductsQuery()),
+                'knowledgebase_indexes' => $this->safeCount($this->knowledgebaseIndexesQuery()),
+                'knowledgebases' => $this->safeCount($this->publishedKnowledgebaseArticlesQuery()),
+                'users' => $this->safeCount($this->publishedUsersQuery()),
+            ];
 
-        foreach ($sectionCounts as $type => $count) {
-            if ($count > 0) {
-                $sections[$type] = (int) ceil($count / $this->chunkSize);
+            foreach ($sectionCounts as $type => $count) {
+                if ($count > 0) {
+                    $sections[$type] = (int) ceil($count / $this->chunkSize);
+                }
             }
+        } catch (\Throwable $e) {
+            // Return whatever we have so far
         }
 
         return $sections;
+    }
+
+    private function safeCount($query): int
+    {
+        try {
+            return $query->count();
+        } catch (\Throwable $e) {
+            return 0;
+        }
     }
 
     private function staticEntries(): Collection

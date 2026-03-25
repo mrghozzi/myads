@@ -26,6 +26,7 @@ class AdminAccessService
         'plugins',
         'themes',
         'administrators',
+        'maintenance',
     ];
 
     public function recordFor(User $user): ?SiteAdmin
@@ -85,6 +86,7 @@ class AdminAccessService
             str_starts_with($routeName, 'admin.seo') => 'seo',
             str_starts_with($routeName, 'admin.languages') => 'languages',
             str_starts_with($routeName, 'admin.updates') => 'updates',
+            str_starts_with($routeName, 'admin.maintenance') => 'maintenance',
             str_starts_with($routeName, 'admin.plugins') => 'plugins',
             str_starts_with($routeName, 'admin.themes') => 'themes',
             str_starts_with($routeName, 'admin.widgets'),

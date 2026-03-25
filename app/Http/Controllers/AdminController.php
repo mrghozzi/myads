@@ -1974,7 +1974,68 @@ class AdminController extends Controller
                 'px' => 'Invalid banner size selected.',
             ]);
         }
-
         return $bannerSize;
+    }
+
+    public function maintenance()
+    {
+        return view('theme::admin.maintenance');
+    }
+
+    public function clearCache()
+    {
+        try {
+            \Illuminate\Support\Facades\Artisan::call('config:clear');
+            \Illuminate\Support\Facades\Artisan::call('cache:clear');
+            \Illuminate\Support\Facades\Artisan::call('view:clear');
+            \Illuminate\Support\Facades\Artisan::call('route:clear');
+            
+            return redirect()->back()->with('success', __('Caches cleared successfully.'));
+        } catch (\Throwable $e) {
+            return redirect()->back()->with('error', __('Failed to clear caches: ') . $e->getMessage());
+        }
+    }
+
+    public function runMigrations()
+    {
+        try {
+            \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+            $output = \Illuminate\Support\Facades\Artisan::output();
+            
+            return redirect()->back()->with('success', __('Migrations ran successfully: ') . $output);
+        } catch (\Throwable $e) {
+            return redirect()->back()->with('error', __('Failed to run migrations: ') . $e->getMessage());
+        }
+    }
+
+    public function dbRepair()
+    {
+        try {
+            $tables = DB::getSchemaBuilder()->getTables();
+            $results = [];
+            
+            foreach ($tables as $table) {
+                // $table is an array or object depending on Laravel version, usually has 'name'
+                $tableName = is_array($table) ? ($table['name'] ?? null) : ($table->name ?? null);
+                
+                if (!$tableName) {
+                    // Fallback for older Laravel or raw SQL results
+                    $tableArray = (array) $table;
+                    $tableName = reset($tableArray);
+                }
+
+                if ($tableName) {
+                    // Repair
+                    DB::statement("REPAIR TABLE `{$tableName}`");
+                    // Optimize
+                    DB::statement("OPTIMIZE TABLE `{$tableName}`");
+                    $results[] = $tableName;
+                }
+            }
+            
+            return redirect()->back()->with('success', __('Database maintenance completed for :count tables.', ['count' => count($results)]));
+        } catch (\Throwable $e) {
+            return redirect()->back()->with('error', __('Failed to perform database maintenance: ') . $e->getMessage());
+        }
     }
 }

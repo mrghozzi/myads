@@ -179,7 +179,7 @@
                         </li>
                     @endif
 
-                    @if($canAnyAdminSection(['settings', 'seo', 'languages', 'updates', 'administrators']))
+                    @if($canAnyAdminSection(['settings', 'seo', 'languages', 'updates', 'maintenance', 'administrators']))
                         <li class="nxl-item nxl-hasmenu">
                             <a href="javascript:void(0);" class="nxl-link">
                                 <span class="nxl-micon"><i class="feather-sliders"></i></span>
@@ -203,6 +203,9 @@
                                 @endif
                                 @if($canAdmin('updates'))
                                     <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.updates') }}">{{ __('messages.updates') }}</a></li>
+                                @endif
+                                @if($canAdmin('maintenance'))
+                                    <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.maintenance') }}">{{ __('messages.maintenance') }}</a></li>
                                 @endif
                                 @if($canAdmin('administrators'))
                                     <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.admins') }}">{{ __('messages.site_admins') }}</a></li>

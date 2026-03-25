@@ -19,6 +19,7 @@ class SeoAuditService
     public function __construct(
         private readonly RobotsTxtService $robotsTxt,
         private readonly SeoMetricsService $metrics,
+        private readonly V420SchemaService $schema,
     ) {
     }
 
@@ -29,7 +30,7 @@ class SeoAuditService
         $indexableUrls = $this->indexableUrlCount();
         $missingDescriptions = $this->missingDescriptionsCount();
         $missingOgImages = $this->missingOgImagesCount($settings);
-        $noindexRules = Schema::hasTable('seo_rules')
+        $noindexRules = $this->schema->hasTable('seo_rules')
             ? SeoRule::query()->where('indexable', false)->count()
             : 0;
         $canonicalCoverage = $settings->canonical_mode === 'disabled' ? 0 : $indexableUrls;
@@ -120,13 +121,13 @@ class SeoAuditService
             ],
             'issues' => $issues,
             'summary_cards' => [
-                'users' => User::query()->count(),
-                'posts' => Status::query()->count(),
-                'news' => News::query()->count(),
-                'pages' => Page::query()->published()->count(),
-                'topics' => ForumTopic::query()->where('statu', 1)->count(),
-                'listings' => Directory::query()->where('statu', 1)->count(),
-                'products' => Product::withoutGlobalScope('store')->where('o_type', 'store')->count(),
+                'users' => $this->safeCount(User::query()),
+                'posts' => $this->safeCount(Status::query()),
+                'news' => $this->safeCount(News::query()),
+                'pages' => $this->safeCount(Page::query()->published()),
+                'topics' => $this->safeCount(ForumTopic::query()->where('statu', 1)),
+                'listings' => $this->safeCount(Directory::query()->where('statu', 1)),
+                'products' => $this->safeCount(Product::withoutGlobalScope('store')->where('o_type', 'store')),
                 'indexable_urls' => $indexableUrls,
             ],
             'chart_sets' => $this->metrics->chartSets(),
@@ -140,26 +141,32 @@ class SeoAuditService
         $count = 0;
 
         $count += 8;
-        $count += Page::query()->published()->count();
-        $count += News::query()->where('statu', 1)->count();
-        $count += ForumTopic::query()->where('statu', 1)->count();
-        $count += \App\Models\DirectoryCategory::query()->where('statu', 1)->count();
-        $count += Directory::query()->where('statu', 1)->count();
-        $count += Product::withoutGlobalScope('store')->where('o_type', 'store')->count();
-        $count += Product::withoutGlobalScope('store')
-            ->where('o_type', 'store')
-            ->whereIn('name', Knowledgebase::query()->select('o_mode')->distinct())
-            ->count();
-        $count += Knowledgebase::query()->count();
-        $count += User::query()->count();
-
-        if (Schema::hasTable('seo_rules')) {
-            $count -= SeoRule::query()
-                ->where('indexable', false)
-                ->where(function ($query) {
-                    $query->whereNull('content_type')->orWhereNull('content_id');
-                })
+        $count += $this->safeCount(Page::query()->published());
+        $count += $this->safeCount(News::query()->where('statu', 1));
+        $count += $this->safeCount(ForumTopic::query()->where('statu', 1));
+        $count += $this->safeCount(\App\Models\DirectoryCategory::query()->where('statu', 1));
+        $count += $this->safeCount(Directory::query()->where('statu', 1));
+        $count += $this->safeCount(Product::withoutGlobalScope('store')->where('o_type', 'store'));
+        
+        try {
+            $count += Product::withoutGlobalScope('store')
+                ->where('o_type', 'store')
+                ->whereIn('name', Knowledgebase::query()->select('o_mode')->distinct())
                 ->count();
+        } catch (\Throwable $e) {}
+
+        $count += $this->safeCount(Knowledgebase::query());
+        $count += $this->safeCount(User::query());
+
+        if ($this->schema->hasTable('seo_rules')) {
+            try {
+                $count -= SeoRule::query()
+                    ->where('indexable', false)
+                    ->where(function ($query) {
+                        $query->whereNull('content_type')->orWhereNull('content_id');
+                    })
+                    ->count();
+            } catch (\Throwable $e) {}
         }
 
         return max(0, $count);
@@ -198,8 +205,22 @@ class SeoAuditService
         return News::query()->where(function ($query) {
             $query->whereNull('img')->orWhere('img', '');
         })->count()
-            + Product::withoutGlobalScope('store')->where('o_type', 'store')->where(function ($query) {
+            + $this->safeCount(Product::withoutGlobalScope('store')->where('o_type', 'store')->where(function ($query) {
                 $query->whereNull('o_mode')->orWhere('o_mode', '');
-            })->count();
+            }));
+    }
+
+    private function safeCount($query): int
+    {
+        try {
+            $table = $query->getModel()->getTable();
+            if (!$this->schema->hasTable($table)) {
+                return 0;
+            }
+
+            return $query->count();
+        } catch (\Throwable $e) {
+            return 0;
+        }
     }
 }

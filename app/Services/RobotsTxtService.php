@@ -12,7 +12,7 @@ class RobotsTxtService
         $settings ??= SeoSetting::current();
 
         if (!$settings->allow_indexing) {
-            return "User-agent: *\nDisallow: /\n";
+            return "User-agent: *\nDisallow: /\nSitemap: " . url('/sitemap.xml') . "\n";
         }
 
         $lines = ['User-agent: *'];
@@ -66,7 +66,13 @@ class RobotsTxtService
         }
 
         $contents = trim((string) File::get($path));
-        if ($contents === 'User-agent: *' . PHP_EOL . 'Disallow: /') {
+        $sitemapUrl = url('/sitemap.xml');
+        $sitemapLine = 'Sitemap: ' . $sitemapUrl;
+
+        // If it's the default "Disallow: /" or if the Sitemap line is missing/wrong, update it.
+        if ($contents === 'User-agent: *' . PHP_EOL . 'Disallow: /' || 
+            !str_contains($contents, 'Sitemap:') || 
+            !str_contains($contents, $sitemapUrl)) {
             $this->write();
         }
     }

@@ -481,6 +481,12 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::put('/pages/{id}', [AdminPageController::class, 'update'])->name('admin.pages.update');
     Route::delete('/pages/{id}', [AdminPageController::class, 'destroy'])->name('admin.pages.delete');
     Route::post('/pages/generate-slug', [AdminPageController::class, 'generateSlug'])->name('admin.pages.generate_slug');
+
+    // Maintenance
+    Route::get('/maintenance', [AdminController::class, 'maintenance'])->name('admin.maintenance');
+    Route::post('/maintenance/clear-cache', [AdminController::class, 'clearCache'])->name('admin.maintenance.clear_cache');
+    Route::post('/maintenance/migrate', [AdminController::class, 'runMigrations'])->name('admin.maintenance.migrate');
+    Route::post('/maintenance/db-repair', [AdminController::class, 'dbRepair'])->name('admin.maintenance.db_repair');
 });
 
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap.xml');
