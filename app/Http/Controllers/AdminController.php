@@ -813,7 +813,7 @@ class AdminController extends Controller
             'txt' => 'nullable|string',
         ]);
 
-        ForumCategory::create($request->all());
+        ForumCategory::create($request->only(['name', 'icons', 'ordercat', 'txt']));
 
         return redirect()->back()->with('success', __('category_created'));
     }
@@ -829,7 +829,7 @@ class AdminController extends Controller
             'txt' => 'nullable|string',
         ]);
 
-        $category->update($request->all());
+        $category->update($request->only(['name', 'icons', 'ordercat', 'txt']));
 
         return redirect()->back()->with('success', __('category_updated'));
     }

@@ -64,6 +64,13 @@
 * **Improvement**: Rebuilt profile `About Me` around `users.sig`, upgraded `/u/{username}?tab=photos`, and refreshed `/history` toward a more profile-hub style layout.
 * **Add**: Introduced `point_transactions`, `badges`, `user_badges`, `badge_showcase`, `quests`, and `quest_progress` with seeded v1 milestones and daily/weekly quests for posts, comments, reactions, reposts, and follow growth.
 
+### 🏛️ Forum & Category Management
+* **Fix**: Resolved `500 Internal Server Error` when updating forum categories by refactoring `AdminController.php` to use a secure whitelisted input flow for model updates.
+* **Add**: Integrated a premium searchable **FontAwesome 6 Icon Picker** in the forum category admin panel, replacing the legacy static dropdown with a dynamic, real-time preview component.
+* **Add**: Massive expansion of the available icon set, featuring over **250+ curated FontAwesome 6 icons** across categories like Places, Transport, Digital, and Brands (including user-requested icons like PlayStation, Bilibili, and Satellite).
+* **Improvement**: Standardized the icon selector to follow the **Duralux Admin** design pattern (hstack, gap-3), providing interactive previews and better alignment inside the selection box.
+* **i18n**: Added missing `select_icon` translation keys for all supported locales to ensure a localized interface for the new icon picker.
+
 ### Admin ACL & Forum Navigation
 * **Add**: Added `/admin/admins` CRUD for site administrators with full-access and module-scoped permissions backed by `site_admins`.
 * **Improvement**: Centralized admin authorization through `AdminAccessService`, updated `AdminMiddleware`, and wired admin navigation visibility to module-based access rules.

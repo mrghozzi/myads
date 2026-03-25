@@ -280,6 +280,7 @@ return [
     'category_deleted' => 'Category deleted successfully',
     'add_category' => 'Add Category',
     'edit_category' => 'Edit Category',
+    'select_icon' => 'Select Icon',
     'delete_category' => 'Delete Category',
     'confirm_delete_category' => 'Are you sure you want to delete this category?',
     'icons' => 'Icons',
