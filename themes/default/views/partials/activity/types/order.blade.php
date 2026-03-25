@@ -24,13 +24,9 @@
                 </p>
                 @auth
                     @if(auth()->id() == $activity->uid || auth()->user()->isAdmin())
-                        <form action="{{ route('orders.destroy', $order->id) }}" method="POST" onsubmit="return confirm('{{ __('messages.confirm_delete') }}')">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="simple-dropdown-link" style="background: none; border: none; width: 100%; text-align: right; color: #ff5b5b;">
-                                <i class="fa fa-trash" aria-hidden="true"></i>&nbsp;{{ __('messages.delete') }}
-                            </button>
-                        </form>
+                        <p class="simple-dropdown-link" onclick="deletePost({{ $order->id }}, 6, '.post{{ $activity->id }}')" style="color: #ff5b5b; cursor: pointer;">
+                            <i class="fa fa-trash" aria-hidden="true"></i>&nbsp;{{ __('messages.delete') }}
+                        </p>
                     @endif
                 @endauth
             </div>

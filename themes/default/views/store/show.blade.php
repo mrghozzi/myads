@@ -148,13 +148,9 @@
                                     <a class="simple-dropdown-link" href="{{ route('store.update', $product->name) }}">
                                         <i class="fa fa-edit" aria-hidden="true"></i>&nbsp;{{ __('messages.edit_product') }}
                                     </a>
-                                    <form method="POST" action="{{ route('store.delete') }}" onsubmit="return confirm('{{ __('messages.delete_product_confirm') }}');">
-                                        @csrf
-                                        <input type="hidden" name="id" value="{{ $product->id }}">
-                                        <button type="submit" class="simple-dropdown-link store-dropdown-button">
-                                            <i class="fa fa-trash" aria-hidden="true"></i>&nbsp;{{ __('messages.delete') }}
-                                        </button>
-                                    </form>
+                                    <p class="simple-dropdown-link store-dropdown-button" onclick="deletePost({{ $product->id }}, 7867, '.store-detail-page')">
+                                        <i class="fa fa-trash" aria-hidden="true"></i>&nbsp;{{ __('messages.delete') }}
+                                    </p>
                                 @elseif(auth()->check())
                                     <button type="button" class="simple-dropdown-link store-dropdown-button" onclick="reportPost({{ $product->id }}, 7867, '{{ $reportKey }}')">
                                         <i class="fa fa-flag" aria-hidden="true"></i>&nbsp;{{ __('messages.report_product') }}

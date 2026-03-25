@@ -7,7 +7,7 @@
     $activityUserIsAdmin = $activityUser?->isAdmin() ?? false;
 @endphp
 
-<div class="widget-box no-padding">
+<div class="widget-box no-padding post{{ $activity->id }}">
     <!-- WIDGET BOX SETTINGS -->
     <div class="widget-box-settings">
         <!-- POST SETTINGS WRAP -->
@@ -26,7 +26,9 @@
             <div class="simple-dropdown widget-box-post-settings-dropdown" style="position: absolute; z-index: 9999; top: 30px; right: 9px; opacity: 0; visibility: hidden; transform: translate(0px, -20px); transition: transform 0.3s ease-in-out 0s, opacity 0.3s ease-in-out 0s, visibility 0.3s ease-in-out 0s;">
                 @auth
                     @if(auth()->id() == $activity->uid || auth()->user()->isAdmin())
-                        <p class="simple-dropdown-link"><i class="fa fa-trash" aria-hidden="true"></i>&nbsp;{{ __('messages.delete') }}</p>
+                        <p class="simple-dropdown-link post_delete{{ $activity->id }}" onclick="deletePost({{ $activity->tp_id }}, {{ $activity->s_type }}, '.post{{ $activity->id }}')" style="cursor: pointer;">
+                            <i class="fa fa-trash" aria-hidden="true"></i>&nbsp;{{ __('messages.delete') }}
+                        </p>
                     @endif
                     <p class="simple-dropdown-link"><i class="fa fa-flag" aria-hidden="true"></i>&nbsp;{{ __('messages.report') }}</p>
                 @endauth

@@ -1,4 +1,4 @@
-<section class="widget-box directory-detail-shell">
+<section class="widget-box directory-detail-shell post{{ $card['listing']->id }}">
     <div class="widget-box-settings">
         @include('theme::directory.partials.site_action_menu', ['card' => $card])
     </div>

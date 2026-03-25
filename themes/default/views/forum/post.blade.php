@@ -49,7 +49,7 @@
                         </a>
                     @endif
                     @if($canDeleteTopic)
-                        <p class="simple-dropdown-link post_delete{{ $status->id }}" onclick="deletePost({{ $topic->id }})">
+                        <p class="simple-dropdown-link post_delete{{ $status->id }}" onclick="deletePost({{ $topic->id }}, 100)">
                             <i class="fa fa-trash" aria-hidden="true"></i>&nbsp;{{ __('messages.delete') }}
                         </p>
                     @endif

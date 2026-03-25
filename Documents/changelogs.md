@@ -48,6 +48,9 @@
 * **Improvement**: Reworked `/portal?filter=all` around a hybrid ranking model that blends recency, follows, author affinity, content affinity, social proof, reactions, comments, reposts, capped view boosts, and diversity penalties with a 5-minute cache.
 * **Improvement**: Kept `/portal?filter=me` chronological for followed accounts and the current member while excluding duplicated directory statuses from the ranked feed.
 * **Improvement**: Activity cards now render link previews, galleries, repost embeds, repost counts, and quote repost actions more consistently across supported content types.
+* **Standardization**: Unified post and comment deletion into a single, robust 'in-place' confirmation system across all platform modules (Forum, Store, Directory, Orders).
+* **UI/UX**: Replaced inconsistent native browser confirmation dialogs with premium theme-integrated confirmation boxes that replace content in-place for a seamless experience.
+* **Architecture**: Centralized deletion logic in `master.blade.php` with support for type-specific API routing and dynamic container targeting.
 
 ### Mentions, Notifications & Formatting
 * **Add**: Added server-side `@mentions` extraction and storage through `status_mentions` for both posts and comments, including member notifications without self-notify behavior.

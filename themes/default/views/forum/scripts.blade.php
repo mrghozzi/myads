@@ -73,24 +73,7 @@
         });
     }
 
-    function deletePost(id) {
-        if(confirm('{{ __('messages.confirm_delete') }}')) {
-            fetch('{{ route('forum.delete') }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify({ id: id })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if(data.success) {
-                    window.location.href = '{{ route('forum.index') }}';
-                }
-            });
-        }
-    }
+    /* deletePost is handled globally in master.blade.php */
 
     function reportPost(id, type) {
         let reason = prompt('{{ __('messages.report_reason') }}');

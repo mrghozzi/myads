@@ -11,7 +11,7 @@
                 <i class="fa fa-edit" aria-hidden="true"></i>&nbsp;{{ __('messages.edit') }}
             </a>
 
-            <p class="simple-dropdown-link" onclick="deletePost({{ $card['listing']->id }}, 1)">
+            <p class="simple-dropdown-link" onclick="deletePost({{ $card['listing']->id }}, 1, '.post{{ $activity?->id ?? $card['listing']->id }}')">
                 <i class="fa fa-trash" aria-hidden="true"></i>&nbsp;{{ __('messages.delete') }}
             </p>
         @endif

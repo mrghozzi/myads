@@ -24,7 +24,7 @@
                 @auth
                     @if(auth()->id() == $status->uid || auth()->user()->isAdmin())
                         <p class="simple-dropdown-link post_edit{{ $status->id }}" onclick="postEdit({{ $status->tp_id }}, 7867, '{{ $product->name }}')"><i class="fa fa-edit" aria-hidden="true"></i>&nbsp;{{ __('messages.edit') }}</p>
-                        <p class="simple-dropdown-link post_delete{{ $status->id }}" onclick="deletePost({{ $status->tp_id }}, 7867)"><i class="fa fa-trash" aria-hidden="true"></i>&nbsp;{{ __('messages.delete') }}</p>
+                        <p class="simple-dropdown-link post_delete{{ $status->id }}" onclick="deletePost({{ $status->tp_id }}, 7867, '.post{{ $status->id }}')"><i class="fa fa-trash" aria-hidden="true"></i>&nbsp;{{ __('messages.delete') }}</p>
                     @endif
                     <p class="simple-dropdown-link post_report{{ $status->id }}" onclick="reportPost({{ $status->tp_id }}, 7867, {{ $product->id }})"><i class="fa fa-flag" aria-hidden="true"></i>&nbsp;{{ __('messages.report') }}</p>
                     <p class="simple-dropdown-link author_report{{ $status->id }}" onclick="reportUser({{ $status->uid }}, {{ $product->id }})"><i class="fa fa-flag" aria-hidden="true"></i>&nbsp;{{ __('messages.report_author') }}</p>

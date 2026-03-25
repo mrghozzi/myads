@@ -1,8 +1,8 @@
 # Manual & Overview
 
-Welcome to the **MYADS v4.0** documentation!
+Welcome to the **MYADS v4.2.0** documentation!
 
-MYADS is an advanced PHP script designed for social networking and exchanging ads between website owners. Originally built with plain PHP, version 4.0 has been completely rewritten from scratch using the robust **Laravel Framework (v10+)**.
+MYADS is an advanced PHP script designed for social networking and exchanging ads between website owners. Originally built with plain PHP, version 4.0 has been completely rewritten from scratch using the robust **Laravel Framework (v10+, PHP 8.2+)**.
 
 ## Core Concepts
 
@@ -19,6 +19,8 @@ The platform includes built-in social features to encourage user retention:
 - **Follow System:** Users can follow each other, creating a personalized feed.
 - **Community Forum:** A space for discussions, tutorials, and support, heavily integrated with a reaction system (Like, Love, Wow, Angry, etc.). Includes a complete moderation system (pin/lock topics, assign moderators per category) and file attachment support.
 - **Private Messaging:** Real-time (AJAX) messaging between members.
+- **Order Request System:** A standalone module for hiring service providers (developers, designers, writers) directly from the community feed with integrated bids and ratings.
+- **Standardized Deletion UI:** A robust, theme-integrated 'in-place' confirmation system for all user content (posts, comments, products, orders).
 
 ### 3. Marketplace (Store)
 The built-in store allows users to upload and share (or sell for PTS):

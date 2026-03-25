@@ -88,7 +88,9 @@
                                             <a class="simple-dropdown-link" href="{{ route('forum.edit', $topic->id) }}"><i class="fa fa-edit" aria-hidden="true"></i>&nbsp;{{ __('messages.edit') }}</a>
                                         @endif
                                         @if($canDeleteTopic)
-                                            <p class="simple-dropdown-link post_delete{{ $status->id }}" onclick="deletePost({{ $topic->id }})"><i class="fa fa-trash" aria-hidden="true"></i>&nbsp;{{ __('messages.delete') }}</p>
+                                            <p class="simple-dropdown-link" onclick="deletePost({{ $topic->id }}, 2, '#post_form{{ $topic->id }}')">
+                <i class="fa fa-trash" aria-hidden="true"></i>&nbsp;{{ __('messages.delete') }}
+            </p>
                                         @endif
                                         @if($canPinTopic)
                                             <form method="POST" action="{{ route('forum.pin', $topic->id) }}">
@@ -339,24 +341,7 @@
         });
     }
 
-    function deletePost(id) {
-        if(confirm('{{ __('messages.confirm_delete') }}')) {
-            fetch('{{ route('forum.delete') }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify({ id: id })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if(data.success) {
-                    window.location.href = '{{ route('forum.index') }}';
-                }
-            });
-        }
-    }
+     /* deletePost is handled globally in master.blade.php */
 
     function reportPost(id, type) {
         let reason = prompt('{{ __('messages.report_reason') }}');

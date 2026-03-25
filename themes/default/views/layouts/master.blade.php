@@ -858,41 +858,56 @@
             .catch(error => console.error('Error:', error));
         }
 
-        function deletePost(id, type) {
-            if (!confirm('{{ __('messages.confirm_delete') }}')) return;
+        function deletePost(id, type, containerSelector) {
+            console.log("deletePost called with ID:", id, "Type:", type, "Selector:", containerSelector);
+            showConfirmModal('{{ __('messages.confirm_delete') }}', function() {
+                let url = '';
+                let method = 'POST';
+                let body = { id: id };
 
-            let url = '';
-            if (type == 'forum' || type == 2 || type == 4 || type == 100) {
-                url = '{{ route("forum.delete") }}';
-            } else if (type == 'store' || type == 7867) {
-                url = '{{ route("store.delete") }}';
-            } else if (type == 'directory' || type == 1) {
-                url = '{{ route("directory.delete") }}';
-            }
-
-            if (!url) {
-                console.error('Unknown post type:', type);
-                return;
-            }
-
-            fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': getCsrfToken()
-                },
-                body: JSON.stringify({ id: id })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    window.location.reload();
-                } else {
-                    alert('Error: ' + (data.error || 'Unknown error'));
+                if (type == 'forum' || type == 2 || type == 4 || type == 100) {
+                    url = '{{ route("forum.delete") }}';
+                } else if (type == 'store' || type == 7867) {
+                    url = '{{ route("store.delete") }}';
+                } else if (type == 'directory' || type == 1) {
+                    url = '{{ route("directory.delete") }}';
+                } else if (type == 'order' || type == 6) {
+                    url = '{{ route("orders.destroy", ":id") }}'.replace(':id', id);
+                    method = 'DELETE';
+                    body = {};
                 }
-            })
-            .catch(error => console.error('Error:', error));
+
+                if (!url) {
+                    console.error('Unknown post type:', type);
+                    return;
+                }
+
+                fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': getCsrfToken()
+                    },
+                    body: method === 'DELETE' ? null : JSON.stringify(body)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        if (containerSelector) {
+                            const el = document.querySelector(containerSelector);
+                            if (el) {
+                                el.remove();
+                                return;
+                            }
+                        }
+                        window.location.reload();
+                    } else {
+                        alert('Error: ' + (data.error || 'Unknown error'));
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            }, id, containerSelector);
         }
 
         function buildReportForm(containerId, title) {
@@ -1117,31 +1132,94 @@
         }
 
         function deleteComment(trashid, type) {
-            if(!confirm('{{ __("messages.are_you_sure") }}')) return;
-            
-            let token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-            
-            fetch('{{ route("comment.delete") }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': token
-                },
-                body: JSON.stringify({
-                    trashid: trashid,
-                    type: type
+            showConfirmModal('{{ __("messages.confirm_delete") }}', function() {
+                let token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                fetch('{{ route("comment.delete") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': token
+                    },
+                    body: JSON.stringify({
+                        trashid: trashid,
+                        type: type
+                    })
                 })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    document.querySelector('.coment' + trashid).remove();
-                } else {
-                    alert('Error: ' + data.error);
-                }
-            })
-            .catch(error => console.error('Error:', error));
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        let el = document.querySelector('.coment' + trashid);
+                        if (el) el.remove();
+                    } else {
+                        alert('Error: ' + data.error);
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            }, trashid); // Uses default prefix post_form but wait, comments use .comentid
         }
+
+        let pendingConfirmCallback = null;
+        let confirmPopup = null;
+
+        function showConfirmModal(body, callback, targetId, containerSelector) {
+            console.log("showConfirmModal triggered for targetId:", targetId, "Selector:", containerSelector);
+            
+            // Try in-place confirmation first
+            let container = null;
+            if (containerSelector) {
+                container = document.querySelector(containerSelector);
+                // Special case for our post_form as its often nested
+                if (container && container.querySelector('.textpost')) {
+                    const inner = container.querySelector('.textpost');
+                    if(inner.id.includes('post_form')) container = inner;
+                }
+            } else if (targetId) {
+                container = document.getElementById('post_form' + targetId) || document.querySelector('.coment' + targetId);
+            }
+
+            if (container) {
+                const originalContent = container.innerHTML;
+                const confirmHtml = `
+                    <div class="confirmation-box" style="padding: 20px; border: 1px solid #615dfa; border-radius: 12px; background: rgba(97, 93, 250, 0.05); text-align: center; margin: 10px 0;">
+                        <p style="font-weight: 700; margin-bottom: 15px; color: #3e3f5e;">${body}</p>
+                        <div style="display: flex; gap: 10px; justify-content: center;">
+                            <button type="button" class="button primary small" id="inline-confirm-yes">${@json(__('messages.delete'))}</button>
+                            <button type="button" class="button white small" id="inline-confirm-no">${@json(__('messages.cancel'))}</button>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML = confirmHtml;
+                
+                container.querySelector('#inline-confirm-yes').onclick = function() {
+                    callback();
+                };
+                
+                container.querySelector('#inline-confirm-no').onclick = function() {
+                    container.innerHTML = originalContent;
+                };
+                
+                return;
+            }
+
+            // Fallback to confirm()
+            if (confirm(body)) {
+                callback();
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const confirmBtn = document.getElementById('confirm-popup-confirm-button');
+            if (confirmBtn) {
+                confirmBtn.addEventListener('click', function() {
+                    console.log("Confirm button clicked in popup");
+                    if (pendingConfirmCallback) {
+                        pendingConfirmCallback();
+                        pendingConfirmCallback = null;
+                    }
+                    if (confirmPopup) confirmPopup.hide();
+                });
+            }
+        });
 
         function getCsrfToken() {
             let tokenMeta = document.querySelector('meta[name="csrf-token"]');
@@ -1149,33 +1227,33 @@
         }
 
         function deletePostByUrl(url, id, containerSelector) {
-            if (!confirm('{{ __('messages.confirm_delete') }}')) return;
-
-            fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'X-CSRF-TOKEN': getCsrfToken()
-                },
-                body: JSON.stringify({ id: id })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    if (containerSelector) {
-                        let container = document.querySelector(containerSelector);
-                        if (container) {
-                            container.remove();
-                            return;
+            showConfirmModal('{{ __('messages.confirm_delete') }}', function() {
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': getCsrfToken()
+                    },
+                    body: JSON.stringify({ id: id })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        if (containerSelector) {
+                            let container = document.querySelector(containerSelector);
+                            if (container) {
+                                container.remove();
+                                return;
+                            }
                         }
+                        window.location.reload();
+                    } else if (data.error) {
+                        alert(data.error);
                     }
-                    window.location.reload();
-                } else if (data.error) {
-                    alert(data.error);
-                }
-            })
-            .catch(error => console.error('Error:', error));
+                })
+                .catch(error => console.error('Error:', error));
+            }, id, containerSelector);
         }
 
         function reportPostByUrl(url, id, type) {
@@ -1282,6 +1360,28 @@
         });
     </script>
     
+    <!-- Deletion Confirmation Popup (Vikinger Style) -->
+    <div id="confirm-popup" class="xm-popup-container">
+        <div class="xm-popup-overlay"></div>
+        <div class="popup-box">
+            <div class="popup-box-header">
+                <p class="popup-box-header-title text-header">{{ __('messages.confirm') }}</p>
+                <div class="popup-box-header-close-button popup-close-trigger">
+                    <svg class="popup-box-header-close-button-icon icon-cross">
+                        <use xlink:href="#svg-cross"></use>
+                    </svg>
+                </div>
+            </div>
+            <div class="popup-box-body">
+                <p class="popup-box-body-text" style="color: #3e3f5e; line-height: 1.6;">{{ __('messages.confirm_delete') }}</p>
+            </div>
+            <div class="popup-box-actions" style="padding: 20px; display: flex; gap: 12px; justify-content: flex-end; border-top: 1px solid #eaeaf5;">
+                <button type="button" class="button white small popup-close-trigger">{{ __('messages.cancel') }}</button>
+                <button type="button" class="button primary small" id="confirm-popup-confirm-button">{{ __('messages.delete') }}</button>
+            </div>
+        </div>
+    </div>
+
     @include('theme::partials._cookie_consent')
 
     @stack('scripts')
