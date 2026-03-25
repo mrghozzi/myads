@@ -440,6 +440,7 @@ return [
     'delete_plugin_warning' => 'Delete plugin warning',
     'create' => 'Create',
     'settings_site' => 'Site Settings',
+    'seo' => 'SEO',
     'maintenance' => 'System Maintenance',
     'clear_cache' => 'Clear Cache',
     'clear_cache_desc' => 'Clears configuration, route, view, and application caches.',

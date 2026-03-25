@@ -37,6 +37,8 @@
 * **Improvement**: `robots.txt` is now managed dynamically from the admin panel instead of blocking indexing site-wide, with full support for multi-site `APP_URL` configurations.
 * **Improvement**: `sitemap.xml` now respects `lastmod`, skips `noindex` content, and stays aligned with published public resources using absolute URLs.
 * **Fix**: Resolved `500 Internal Server Error` on the SEO Indexing admin page by naming the dynamic robots route.
+* **Fix**: Hardened `SitemapController` and `SeoAuditService` with robust `try-catch` blocks and `V420SchemaService` to prevent 500 errors during database instability or incomplete upgrades.
+* **Improvement**: Standardized `RobotsTxtService` for consistent, dynamic sitemap URL generation across all server environments.
 * **i18n**: Added SEO translation keys across all 9 supported languages and removed hardcoded SEO admin strings.
 
 ### Community Feed & Composer
@@ -74,11 +76,15 @@
 * **Add**: Massive expansion of the available icon set, featuring over **250+ curated FontAwesome 6 icons** across categories like Places, Transport, Digital, and Brands (including user-requested icons like PlayStation, Bilibili, and Satellite).
 * **Improvement**: Standardized the icon selector to follow the **Duralux Admin** design pattern (hstack, gap-3), providing interactive previews and better alignment inside the selection box.
 * **i18n**: Added missing `select_icon` translation keys for all supported locales to ensure a localized interface for the new icon picker.
+* **Add**: Dedicated **SEO Sidebar Section**, moving all search-related tools (Dashboard, Settings, Head Meta, Rules, Indexing) into a standalone menu for better organization.
 
 ### Admin ACL & Forum Navigation
 * **Add**: Added `/admin/admins` CRUD for site administrators with full-access and module-scoped permissions backed by `site_admins`.
 * **Improvement**: Centralized admin authorization through `AdminAccessService`, updated `AdminMiddleware`, and wired admin navigation visibility to module-based access rules.
 * **Security**: Locked `user_id=1` as the default super-admin, preventing scoped admins from managing administrators and preventing super-admin removal.
+* **Add**: Permanent **Admin Maintenance Dashboard** (`/admin/maintenance`) for cache clearing, database migrations, and table optimization (Repair & Optimize) directly from the browser.
+* **Add**: Integrated "System Maintenance" link into the admin sidebar under the "Options" menu for quick system recovery.
+* **Delete**: Safely removed the temporary `maintenance.php` web utility after successful integration into the secure admin panel.
 * **Improvement**: Switched forum category pages `/f{id}` from infinite-scroll loading to standard HTML pagination with 20 topics per page.
 
 ### i18n, Recovery & Validation
@@ -86,6 +92,8 @@
 * **Fix**: Added centralized v4.2.0 schema detection with graceful fallback handling so missing upgrade tables such as `site_admins`, `user_privacy_settings`, and `status_link_previews` no longer trigger `500` errors on `/portal`, profile pages, forum topic cards, sidebars, and other authenticated surfaces.
 * **Fix**: Hardened `/portal` activity cards and repost embeds against legacy feed rows whose author account no longer exists, so missing users now fall back to translated placeholders instead of triggering Blade `500` errors.
 * **Fix**: Settings and admin pages that depend on incomplete v4.2.0 tables now render upgrade notices and block writes with friendly translated messages instead of crashing, while public reads continue in compatibility mode where possible.
+* **Fix**: Resolved a critical syntax error in `AdminController@validatedBannerSize` that caused 500 errors across several admin panel surfaces.
+* **Add**: Manual `.env` loader in `bootstrap/app.php` to ensure correct configuration loading in restrictive hosting environments.
 * **Add**: Added a dedicated repair migration for the March 23, 2026 social feed extension schema and new fallback-focused feature coverage for incomplete-upgrade scenarios.
 * **Add**: Added feature coverage for social publishing, mention privacy, profile privacy enforcement, badge showcase limits, admin ACL, portal feed deduplication and chronology, forum pagination, and v4.2.0 translation key coverage.
 * **Validation**: Verified updated PHP files with `php -l`, confirmed the new routes during route inspection, and ran the dedicated `V420*` feature test suite successfully.

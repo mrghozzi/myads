@@ -179,7 +179,23 @@
                         </li>
                     @endif
 
-                    @if($canAnyAdminSection(['settings', 'seo', 'languages', 'updates', 'maintenance', 'administrators']))
+                    @if($canAdmin('seo'))
+                        <li class="nxl-item nxl-hasmenu">
+                            <a href="javascript:void(0);" class="nxl-link">
+                                <span class="nxl-micon"><i class="feather-search"></i></span>
+                                <span class="nxl-mtext">{{ __('messages.seo') ?? 'SEO' }}</span><span class="nxl-arrow"><i class="feather-chevron-right"></i></span>
+                            </a>
+                            <ul class="nxl-submenu">
+                                <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.seo.index') }}">{{ __('messages.seo_dashboard') }}</a></li>
+                                <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.seo.settings') }}">{{ __('messages.seo_settings') }}</a></li>
+                                <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.seo.head') }}">{{ __('messages.seo_head_meta') }}</a></li>
+                                <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.seo.rules') }}">{{ __('messages.seo_rules') }}</a></li>
+                                <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.seo.indexing') }}">{{ __('messages.seo_indexing') }}</a></li>
+                            </ul>
+                        </li>
+                    @endif
+
+                    @if($canAnyAdminSection(['settings', 'languages', 'updates', 'maintenance', 'administrators']))
                         <li class="nxl-item nxl-hasmenu">
                             <a href="javascript:void(0);" class="nxl-link">
                                 <span class="nxl-micon"><i class="feather-sliders"></i></span>
@@ -190,13 +206,6 @@
                                     <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.settings') }}">{{ __('messages.settings') }}</a></li>
                                     <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.settings.system') }}">{{ __('messages.system_settings') }}</a></li>
                                     <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.cookie_notice') }}">{{ __('messages.cookie_notice_settings') }}</a></li>
-                                @endif
-                                @if($canAdmin('seo'))
-                                    <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.seo.index') }}">{{ __('messages.seo_dashboard') }}</a></li>
-                                    <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.seo.settings') }}">{{ __('messages.seo_settings') }}</a></li>
-                                    <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.seo.head') }}">{{ __('messages.seo_head_meta') }}</a></li>
-                                    <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.seo.rules') }}">{{ __('messages.seo_rules') }}</a></li>
-                                    <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.seo.indexing') }}">{{ __('messages.seo_indexing') }}</a></li>
                                 @endif
                                 @if($canAdmin('languages'))
                                     <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.languages') }}">{{ __('messages.languages') }}</a></li>
