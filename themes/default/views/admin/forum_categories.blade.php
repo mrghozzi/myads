@@ -93,6 +93,14 @@
                             <input type="number" name="ordercat" class="form-control" value="0" required>
                         </div>
                     </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ __('messages.visibility') }}</label>
+                        <select name="visibility" class="form-select" required>
+                            <option value="0">{{ __('messages.everyone') }}</option>
+                            <option value="1">{{ __('messages.members_only') }}</option>
+                            <option value="2">{{ __('messages.mods_only') }}</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('messages.cancel') }}</button>
@@ -132,6 +140,14 @@
                             <input type="number" name="ordercat" class="form-control" value="{{ $category->ordercat }}" required>
                         </div>
                     </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ __('messages.visibility') }}</label>
+                        <select name="visibility" class="form-select" required>
+                            <option value="0" {{ $category->visibility == 0 ? 'selected' : '' }}>{{ __('messages.everyone') }}</option>
+                            <option value="1" {{ $category->visibility == 1 ? 'selected' : '' }}>{{ __('messages.members_only') }}</option>
+                            <option value="2" {{ $category->visibility == 2 ? 'selected' : '' }}>{{ __('messages.mods_only') }}</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('messages.cancel') }}</button>
@@ -156,13 +172,37 @@
                 </div>
                 <h4>{{ __('messages.confirm_delete_category') }}</h4>
                 <p class="text-muted">{{ $category->name }}</p>
-            </div>
-            <div class="modal-footer justify-content-center">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('messages.cancel') }}</button>
-                <form action="{{ route('admin.forum_categories.delete', $category->id) }}" method="POST" class="d-inline">
+
+                @php
+                    $topicCount = \App\Models\ForumTopic::where('cat', $category->id)->count();
+                @endphp
+
+                <form action="{{ route('admin.forum_categories.delete', $category->id) }}" method="POST">
                     @csrf
                     @method('DELETE')
-                    <button type="submit" class="btn btn-danger">{{ __('messages.delete') }}</button>
+
+                    @if($topicCount > 0)
+                        <div class="alert alert-warning text-start mb-4">
+                            <i class="feather-alert-triangle me-2"></i>
+                            {{ __('messages.category_not_empty') }} ({{ $topicCount }} {{ __('messages.topics') }})
+                        </div>
+                        <div class="mb-4 text-start">
+                            <label class="form-label fw-bold">{{ __('messages.move_topics_to') }}</label>
+                            <select name="move_to_id" class="form-select" required>
+                                <option value="">{{ __('messages.select_category') }}</option>
+                                @foreach($allCategories as $target)
+                                    @if($target->id != $category->id)
+                                        <option value="{{ $target->id }}">{{ $target->name }}</option>
+                                    @endif
+                                @endforeach
+                            </select>
+                        </div>
+                    @endif
+
+                    <div class="modal-footer justify-content-center p-0 border-0">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('messages.cancel') }}</button>
+                        <button type="submit" class="btn btn-danger">{{ __('messages.delete') }}</button>
+                    </div>
                 </form>
             </div>
         </div>

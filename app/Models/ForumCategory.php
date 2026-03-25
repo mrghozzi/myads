@@ -17,5 +17,11 @@ class ForumCategory extends Model
         'icons',
         'txt',
         'ordercat',
+        'visibility',
     ];
+
+    public function topics()
+    {
+        return $this->hasMany(ForumTopic::class, 'cat');
+    }
 }

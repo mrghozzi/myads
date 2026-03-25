@@ -20,7 +20,18 @@ class ForumController extends Controller
 {
     public function index()
     {
-        $categories = ForumCategory::orderBy('ordercat', 'desc')->get();
+        $categories = ForumCategory::where(function($query) {
+                $user = auth()->user();
+                $query->where('visibility', 0); // Everyone
+                if ($user) {
+                    $query->orWhere('visibility', 1); // Members
+                    if ($user->canModerateForum()) {
+                        $query->orWhere('visibility', 2); // Mods
+                    }
+                }
+            })
+            ->orderBy('ordercat', 'desc')
+            ->get();
 
         $this->seo([
             'scope_key' => 'forum_index',
@@ -38,6 +49,15 @@ class ForumController extends Controller
     public function category($id)
     {
         $category = ForumCategory::findOrFail($id);
+
+        $user = auth()->user();
+        if ($category->visibility == 1 && !$user) {
+            abort(403);
+        }
+        if ($category->visibility == 2 && (!$user || !$user->canModerateForum())) {
+            abort(403);
+        }
+
         $settings = ForumSettings::all();
         $time = time();
         $sidebarCategories = $this->buildCategorySidebar((int) $category->id);
@@ -86,6 +106,18 @@ class ForumController extends Controller
     public function topic($id)
     {
         $topic = ForumTopic::visible()->with(['user', 'category', 'comments.user', 'attachments'])->findOrFail($id);
+        
+        $category = $topic->category;
+        if ($category) {
+            $user = auth()->user();
+            if ($category->visibility == 1 && !$user) {
+                abort(403);
+            }
+            if ($category->visibility == 2 && (!$user || !$user->canModerateForum())) {
+                abort(403);
+            }
+        }
+
         $forumSettings = ForumSettings::all();
 
         $status = Status::where('tp_id', $id)
@@ -479,6 +511,16 @@ class ForumController extends Controller
             ->pluck('topic_count', 'cat');
 
         return ForumCategory::query()
+            ->where(function($query) {
+                $user = auth()->user();
+                $query->where('visibility', 0);
+                if ($user) {
+                    $query->orWhere('visibility', 1);
+                    if ($user->canModerateForum()) {
+                        $query->orWhere('visibility', 2);
+                    }
+                }
+            })
             ->orderBy('ordercat', 'desc')
             ->get()
             ->map(function (ForumCategory $boardCategory) use ($topicCounts, $currentCategoryId) {

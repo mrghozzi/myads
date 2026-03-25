@@ -801,7 +801,8 @@ class AdminController extends Controller
     public function forumCategories()
     {
         $categories = ForumCategory::orderBy('ordercat', 'asc')->paginate(20);
-        return view('theme::admin.forum_categories', compact('categories'));
+        $allCategories = ForumCategory::orderBy('ordercat', 'asc')->get();
+        return view('theme::admin.forum_categories', compact('categories', 'allCategories'));
     }
 
     public function storeForumCategory(Request $request)
@@ -810,12 +811,13 @@ class AdminController extends Controller
             'name' => 'required|string',
             'icons' => 'required|string',
             'ordercat' => 'required|integer',
+            'visibility' => 'required|integer|in:0,1,2',
             'txt' => 'nullable|string',
         ]);
 
-        ForumCategory::create($request->only(['name', 'icons', 'ordercat', 'txt']));
+        ForumCategory::create($request->only(['name', 'icons', 'ordercat', 'visibility', 'txt']));
 
-        return redirect()->back()->with('success', __('category_created'));
+        return redirect()->back()->with('success', __('messages.category_created'));
     }
 
     public function updateForumCategory(Request $request, $id)
@@ -826,20 +828,36 @@ class AdminController extends Controller
             'name' => 'required|string',
             'icons' => 'required|string',
             'ordercat' => 'required|integer',
+            'visibility' => 'required|integer|in:0,1,2',
             'txt' => 'nullable|string',
         ]);
 
-        $category->update($request->only(['name', 'icons', 'ordercat', 'txt']));
+        $category->update($request->only(['name', 'icons', 'ordercat', 'visibility', 'txt']));
 
-        return redirect()->back()->with('success', __('category_updated'));
+        return redirect()->back()->with('success', __('messages.category_updated'));
     }
 
-    public function deleteForumCategory($id)
+    public function deleteForumCategory(Request $request, $id)
     {
         $category = ForumCategory::findOrFail($id);
+        
+        $topicCount = ForumTopic::where('cat', $id)->count();
+        
+        if ($topicCount > 0) {
+            $request->validate([
+                'move_to_id' => 'required|integer|exists:f_cat,id|different:id',
+            ], [
+                'move_to_id.required' => __('messages.category_not_empty'),
+                'move_to_id.different' => __('messages.select_target_category'),
+            ]);
+
+            $moveToId = $request->input('move_to_id');
+            ForumTopic::where('cat', $id)->update(['cat' => $moveToId]);
+        }
+
         $category->delete();
         
-        return redirect()->back()->with('success', __('category_deleted'));
+        return redirect()->back()->with('success', __('messages.category_deleted'));
     }
 
     public function forumSettings()
