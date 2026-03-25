@@ -480,7 +480,11 @@ php artisan storage:link
 
 ## 18. Common Tasks Quick Reference
 
+### Common Tasks Quick Reference
+
 | Task | How |
+|------|-----|
+| Add a new widget type | Update `$allowedTypes` in `AdminController@widgetForm` and `storeWidget` validation → add option to `themes/default/views/admin/widgets.blade.php` → add case in `resources/views/components/widget-column.blade.php` → create partial in `themes/default/views/partials/widgets/` |
 |------|-----|
 | Add a new page | Create controller method → add route in `web.php` → create Blade in `themes/default/views/` → add translation keys to all 9 locales |
 | Add admin section | Add routes under `admin` prefix → create admin Blade in `themes/default/views/admin/` → update `AdminAccessService` module list if ACL-gated |

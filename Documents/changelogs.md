@@ -87,6 +87,15 @@
 * **Delete**: Safely removed the temporary `maintenance.php` web utility after successful integration into the secure admin panel.
 * **Improvement**: Switched forum category pages `/f{id}` from infinite-scroll loading to standard HTML pagination with 20 topics per page.
 
+### 🧩 Portal Widgets
+* **Add**: Expanded the platform's widget system with new dynamic components for the Community Portal and Member Profiles.
+* **Add**: **Latest Orders**: A new sidebar widget that fetches and displays the 5 most recent service requests from the marketplace with live categorization and budget tracking.
+* **Add**: **Badge Showcase**: A personalized widget for authenticated members that renders their manually selected and showcased achievements directly in the sidebar.
+* **Add**: **Daily Quests**: An interactive gamification widget that tracks and displays real-time progress for daily milestones (Posts, Comments, Reactions, Visits) with visual progress bars.
+* **Standardization**: Unified the Portal Sidebar widget ecosystem, ensuring all "Latest Content" blocks (Topics, News, Products, Sites, Orders) follow a consistent design pattern and localized title management.
+* **Improvement**: Updated the Admin Widget management interface to support the new v4.2.0 widget types and unified the selection dropdown with localized labels.
+* **i18n**: Added comprehensive translation keys for all new widget labels and states in both English and Arabic.
+
 ### i18n, Recovery & Validation
 * **Fix**: Repaired corrupted v4.2.0 locale entries and ensured the new community, privacy, badge, quest, mention, repost, and admin ACL keys are present across all 9 shipped locales.
 * **Fix**: Added centralized v4.2.0 schema detection with graceful fallback handling so missing upgrade tables such as `site_admins`, `user_privacy_settings`, and `status_link_previews` no longer trigger `500` errors on `/portal`, profile pages, forum topic cards, sidebars, and other authenticated surfaces.

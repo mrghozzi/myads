@@ -51,6 +51,9 @@
                     <option value="widget_points_leaderboard">{{ __('messages.points') ?? 'Points' }}</option>
                     <option value="widget_store_latest">{{ __('messages.latest_products') ?? 'Latest Products' }}</option>
                     <option value="widget_directory_latest">{{ __('messages.latest_sites') ?? 'Latest Sites' }}</option>
+                    <option value="widget_orders_latest">{{ __('messages.latest_orders') ?? 'Latest Orders' }}</option>
+                    <option value="widget_badges_showcase">{{ __('messages.badges') ?? 'Badges' }}</option>
+                    <option value="widget_quests_daily">{{ __('messages.daily_quests') ?? 'Daily Quests' }}</option>
                 </select>
             </div>
             <div class="col-lg-8">

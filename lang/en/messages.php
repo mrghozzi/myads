@@ -1447,4 +1447,11 @@ return [
     'rating_submitted' => 'Rating submitted successfully!',
     'order_closed_successfully' => 'Order closed successfully.',
     'order_closed_by_admin' => 'Your order ":title" has been closed by an administrator.',
+    'view_all_orders' => 'View All Orders',
+    'your_badges' => 'Your Badges',
+    'manage_badges' => 'Manage Badges',
+    'daily_quests' => 'Daily Quests',
+    'view_points_history' => 'View Points History',
+    'login_to_start_quests' => 'Login to start earning points from daily quests!',
+    'no_active_quests' => 'No active quests today.',
 ];

@@ -1429,4 +1429,10 @@ return [
     'rating_submitted' => 'تم إرسال التقييم بنجاح!',
     'order_closed_successfully' => 'تم إغلاق الطلب بنجاح.',
     'order_closed_by_admin' => 'تم إغلاق طلبك ":title" بواسطة المدير.',
+    'view_all_orders' => 'عرض كافة الطلبات',
+    'your_badges' => 'شاراتك المتاحة',
+    'daily_quests' => 'المهمات اليومية',
+    'view_points_history' => 'عرض سجل النقاط',
+    'login_to_start_quests' => 'سجل الدخول لبدء كسب النقاط من المهمات اليومية!',
+    'no_active_quests' => 'لا توجد مهمات نشطة اليوم.',
 ];

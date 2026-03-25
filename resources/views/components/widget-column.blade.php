@@ -24,6 +24,15 @@
         @case('widget_directory_latest')
             @include('theme::partials.widgets.widget_directory_latest', ['widget' => $widget])
             @break
+        @case('widget_orders_latest')
+            @include('theme::partials.widgets.widget_orders_latest', ['widget' => $widget])
+            @break
+        @case('widget_badges_showcase')
+            @include('theme::partials.widgets.widget_badges_showcase', ['widget' => $widget])
+            @break
+        @case('widget_quests_daily')
+            @include('theme::partials.widgets.widget_quests_daily', ['widget' => $widget])
+            @break
         @default
             <!-- Unknown widget mode: {{ $widget->o_mode }} -->
     @endswitch
