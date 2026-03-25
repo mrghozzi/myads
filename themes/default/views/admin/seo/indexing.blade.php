@@ -28,8 +28,16 @@
             <div class="seo-stat">
                 <div class="label">{{ __('messages.seo_sitemap_url') }}</div>
                 <div class="value" style="font-size: 1.05rem;">/sitemap.xml</div>
-                <div class="mt-3">
-                    <a href="{{ route('sitemap.xml') }}" target="_blank" class="btn btn-outline-primary btn-sm">{{ __('messages.seo_preview_sitemap') }}</a>
+                <div class="mt-3 hstack gap-2">
+                    <a href="{{ route('sitemap.xml') }}" target="_blank" class="btn btn-outline-primary btn-sm">
+                        <i class="feather-eye me-1"></i>{{ __('messages.seo_preview_sitemap') }}
+                    </a>
+                    <form action="{{ route('admin.sitemap.generate') }}" method="POST" class="d-inline">
+                        @csrf
+                        <button type="submit" class="btn btn-soft-secondary btn-sm">
+                            <i class="feather-refresh-cw me-1"></i>{{ __('messages.seo_refresh_sitemap') }}
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>

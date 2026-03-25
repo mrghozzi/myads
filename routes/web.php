@@ -471,7 +471,7 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/themes', [AdminController::class, 'themes'])->name('admin.themes');
     Route::post('/themes/activate', [AdminController::class, 'activateTheme'])->name('admin.themes.activate');
     Route::get('themes/thumbnail/{slug}', [AdminController::class, 'themeThumbnail'])->name('admin.themes.thumbnail');
-    Route::get('/sitemap/generate', [SitemapController::class, 'generate'])->name('admin.sitemap.generate');
+    Route::match(['get', 'post'], '/sitemap/generate', [SitemapController::class, 'generate'])->name('admin.sitemap.generate');
 
     // Pages
     Route::get('/pages', [AdminPageController::class, 'index'])->name('admin.pages');

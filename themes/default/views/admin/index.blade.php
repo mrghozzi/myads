@@ -246,11 +246,14 @@
                         </a>
                         
                         <div class="btn-group w-100" role="group">
-                            <a href="{{ route('admin.sitemap.generate') }}" class="btn px-3 py-2" style="background: linear-gradient(135deg, #10b981, #059669); color: #fff; border: none; border-radius: 10px 0 0 10px;">
-                                <i class="feather-map me-1"></i> {{ __('messages.Sitemap') }}
-                            </a>
-                            <a href="{{ url('/sitemap.xml') }}" target="_blank" class="btn px-3 py-2" style="background: #1e293b; color: #fff; border: none; border-radius: 0 10px 10px 0;">
-                                <i class="feather-external-link"></i> XML
+                            <form action="{{ route('admin.sitemap.generate') }}" method="POST" class="w-75">
+                                @csrf
+                                <button type="submit" class="btn w-100 px-3 py-2" style="background: linear-gradient(135deg, #10b981, #059669); color: #fff; border: none; border-radius: 10px 0 0 10px;">
+                                    <i class="feather-refresh-cw me-1"></i> {{ __('messages.seo_refresh_sitemap') }}
+                                </button>
+                            </form>
+                            <a href="{{ url('/sitemap.xml') }}" target="_blank" class="btn w-25 px-3 py-2" style="background: #1e293b; color: #fff; border: none; border-radius: 0 10px 10px 0;">
+                                <i class="feather-external-link"></i>
                             </a>
                         </div>
 

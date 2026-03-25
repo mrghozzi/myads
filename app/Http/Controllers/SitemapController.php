@@ -28,6 +28,7 @@ class SitemapController extends Controller
     public function index()
     {
         $xml = '<?xml version="1.0" encoding="UTF-8"?>' . PHP_EOL;
+        $xml .= '<?xml-stylesheet type="text/xsl" href="' . e(asset('sitemap.xsl')) . '"?>' . PHP_EOL;
         $xml .= '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . PHP_EOL;
 
         foreach ($this->sectionIndex() as $type => $pages) {
@@ -55,6 +56,7 @@ class SitemapController extends Controller
 
         return response()->stream(function () use ($type, $offset) {
             echo '<?xml version="1.0" encoding="UTF-8"?>' . PHP_EOL;
+            echo '<?xml-stylesheet type="text/xsl" href="' . e(asset('sitemap.xsl')) . '"?>' . PHP_EOL;
             echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . PHP_EOL;
 
             match ($type) {

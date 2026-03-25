@@ -68,6 +68,22 @@
                 </div>
             </div>
         @endforeach
+        <div class="col-xl-2 col-md-4 col-sm-6">
+            <div class="seo-stat">
+                <div class="label">{{ __('messages.seo_sitemap_status') }}</div>
+                <div class="mt-2">
+                    <span class="seo-pill ok">
+                        <i class="feather-map"></i>
+                        {{ __('messages.seo_health_healthy') }}
+                    </span>
+                </div>
+                <div class="seo-form-note mt-3">
+                    <a href="{{ route('sitemap.xml') }}" target="_blank" class="text-decoration-none">
+                        {{ __('messages.seo_preview_sitemap') }} <i class="feather-external-link ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="row g-3 mb-4">

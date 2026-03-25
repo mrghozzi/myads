@@ -31,7 +31,7 @@
     RewriteRule ^routes/ - [F,L]
 
     # Handle Assets - serve from public directory
-    RewriteCond %{REQUEST_URI} \.(css|js|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot|map|webp|mp4|mp3|pdf|zip)$ [NC]
+    RewriteCond %{REQUEST_URI} \.(css|js|xsl|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot|map|webp|mp4|mp3|pdf|zip)$ [NC]
     # Keep Laravel embed/*.js endpoints dynamic so they reach the router under
     # both /embed/*.js and subdirectory installs such as /myads/embed/*.js.
     RewriteCond %{REQUEST_URI} !(^|/)embed/(banner|link|smart)\.js$ [NC]
