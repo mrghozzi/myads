@@ -40,7 +40,7 @@ class ProfileController extends Controller
 
         $followersCount = Like::where('sid', $user->id)->where('type', 1)->count();
         $followingCount = Like::where('uid', $user->id)->where('type', 1)->count();
-        $postsCount = Status::where('uid', $user->id)->count();
+        $postsCount = Status::where('uid', $user->id)->where('s_type', '!=', 5)->count();
         $selectedTab = (string) $request->query('tab', 'timeline');
         $profileContentTabs = ['timeline', 'blog', 'links', 'forum', 'store', 'photos'];
         $canViewProfileContent = $privacy->canViewProfile($user, $viewer);
@@ -56,6 +56,7 @@ class ProfileController extends Controller
                 ->where('uid', $user->id)
                 ->where('statu', 1)
                 ->where('date', '<', time())
+                ->where('s_type', '!=', 5)
                 ->when($selectedTab !== 'links' && !empty($hiddenDirectoryStatusIds), fn ($builder) => $builder->whereNotIn('id', $hiddenDirectoryStatusIds))
                 ->orderBy('date', 'desc');
 
@@ -188,7 +189,7 @@ class ProfileController extends Controller
 
         $followersCount = Like::where('sid', $user->id)->where('type', 1)->count();
         $followingCount = Like::where('uid', $user->id)->where('type', 1)->count();
-        $postsCount = Status::where('uid', $user->id)->count();
+        $postsCount = Status::where('uid', $user->id)->where('s_type', '!=', 5)->count();
 
         return view('theme::profile.followers', compact('user', 'followers', 'cover', 'isFollowing', 'followersCount', 'followingCount', 'postsCount'));
     }
@@ -213,7 +214,7 @@ class ProfileController extends Controller
 
         $followersCount = Like::where('sid', $user->id)->where('type', 1)->count();
         $followingCount = Like::where('uid', $user->id)->where('type', 1)->count();
-        $postsCount = Status::where('uid', $user->id)->count();
+        $postsCount = Status::where('uid', $user->id)->where('s_type', '!=', 5)->count();
 
         return view('theme::profile.following', compact('user', 'following', 'cover', 'isFollowing', 'followersCount', 'followingCount', 'postsCount'));
     }

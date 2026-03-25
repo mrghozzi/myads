@@ -22,6 +22,7 @@
 * **Management**: Added order closure functionality for owners and site administrators, with automated information notifications.
 
 ### 📰 News & Community Portal
+* **Fix**: Resolved an issue where news posts appeared on the profile page of the admin who created them; news now strictly appears only in the Community Portal feed (`/portal`).
 * **Fix**: Resolved `500 Internal Server Error` when posting news by fixing missing `statu` and `img` database columns.
 * **Add**: News articles are now automatically posted to the Community Portal feed (`/portal`) upon creation.
 * **Add**: News articles in the portal now display uploaded images dynamically with a default cover fallback.
