@@ -24,7 +24,7 @@ if (!function_exists('theme_asset')) {
                     $theme = $setting->styles;
                 }
             }
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             // Fallback to default
         }
 
@@ -48,7 +48,7 @@ if (!function_exists('ads_site')) {
                     return $ad->code_ads;
                 }
             }
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return '';
         }
         return '';

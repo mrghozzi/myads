@@ -62,19 +62,27 @@ class SeoSetting extends Model
 
     public static function current(): self
     {
-        if (!Schema::hasTable('seo_settings')) {
+        try {
+            if (!Schema::hasTable('seo_settings')) {
+                return new static(static::defaults());
+            }
+
+            return static::query()->first() ?? new static(static::defaults());
+        } catch (\Throwable $e) {
             return new static(static::defaults());
         }
-
-        return static::query()->first() ?? new static(static::defaults());
     }
 
     public static function currentPersisted(): self
     {
-        if (!Schema::hasTable('seo_settings')) {
+        try {
+            if (!Schema::hasTable('seo_settings')) {
+                return new static(static::defaults());
+            }
+
+            return static::query()->first() ?? static::query()->create(static::defaults());
+        } catch (\Throwable $e) {
             return new static(static::defaults());
         }
-
-        return static::query()->first() ?? static::query()->create(static::defaults());
     }
 }

@@ -38,6 +38,17 @@ if (file_exists($envPath)) {
 
         file_put_contents($envPath, $env);
     }
+    
+    // Manually load the environment variables early to ensure they are available
+    // if automatic discovery in Application::configure fails in this environment
+    if (file_exists($envPath)) {
+        try {
+            $dotenv = \Dotenv\Dotenv::createImmutable(dirname(__DIR__));
+            $dotenv->load();
+        } catch (\Throwable $e) {
+            // Silently ignore if loader fails
+        }
+    }
 }
 
 return Application::configure(basePath: dirname(__DIR__))

@@ -50,13 +50,17 @@ class AppServiceProvider extends ServiceProvider
             if (Schema::hasTable('menu')) {
                 $menus = Menu::all();
             }
-        } catch (\Exception $e) {
-            // Fallback to default if DB connection fails or table missing
+        } catch (\Throwable $e) {
+            // Fallback to default
         }
 
         View::share('site_settings', $setting);
         View::share('site_menus', $menus);
-        View::share('seo_settings', SeoSetting::current());
+        try {
+            View::share('seo_settings', SeoSetting::current());
+        } catch (\Throwable $e) {
+            View::share('seo_settings', new SeoSetting(SeoSetting::defaults()));
+        }
 
         // Fetch all available languages
         $langDir = base_path('lang');
