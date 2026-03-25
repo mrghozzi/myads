@@ -49,3 +49,4 @@ Thumbs.db
 !/tests/Feature/LegacyAdsListDeleteActionsTest.php
 !/tests/Feature/LocaleDirectionRenderingTest.php
 !/tests/Feature/SiteAdPlacementTest.php
+~/.pi/
