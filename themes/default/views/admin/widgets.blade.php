@@ -46,6 +46,11 @@
                     <option value="widget_html">{{ __('messages.html_code') ?? 'Html code' }}</option>
                     <option value="widget_members">{{ __('messages.suggest_members') ?? 'Suggest Members' }}</option>
                     <option value="widget_stats_box">{{ __('messages.stats_box') ?? 'Stats Box' }}</option>
+                    <option value="widget_forum_latest">{{ __('messages.latest_topic') ?? 'Latest Topics' }}</option>
+                    <option value="widget_news_latest">{{ __('messages.latest_news') ?? 'Latest News' }}</option>
+                    <option value="widget_points_leaderboard">{{ __('messages.points') ?? 'Points' }}</option>
+                    <option value="widget_store_latest">{{ __('messages.latest_products') ?? 'Latest Products' }}</option>
+                    <option value="widget_directory_latest">{{ __('messages.latest_sites') ?? 'Latest Sites' }}</option>
                 </select>
             </div>
             <div class="col-lg-8">
