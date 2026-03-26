@@ -36,6 +36,10 @@ Route::post('/comment/delete', [CommentController::class, 'destroy'])->name('com
 Route::post('/status/create', [App\Http\Controllers\StatusController::class, 'create'])->name('status.create')->middleware('auth');
 Route::post('/status/upload-image', [App\Http\Controllers\StatusController::class, 'uploadImage'])->name('status.upload_image')->middleware('auth');
 Route::post('/status/link-preview', [App\Http\Controllers\StatusController::class, 'linkPreview'])->name('status.link_preview')->middleware('auth');
+Route::post('/status/gallery/add-images/{topicId}', [App\Http\Controllers\StatusController::class, 'addGalleryImages'])->name('status.gallery.add_images')->middleware('auth');
+Route::post('/status/gallery/delete-image/{attachmentId}', [App\Http\Controllers\StatusController::class, 'deleteGalleryImage'])->name('status.gallery.delete_image')->middleware('auth');
+Route::post('/status/gallery/clear/{topicId}', [App\Http\Controllers\StatusController::class, 'clearGallery'])->name('status.gallery.clear')->middleware('auth');
+Route::post('/status/gallery/reorder/{topicId}', [App\Http\Controllers\StatusController::class, 'reorderGalleryImages'])->name('status.gallery.reorder')->middleware('auth');
 Route::get('/mentions/users', [MentionController::class, 'users'])->name('mentions.users')->middleware('auth');
 Route::get('/robots.txt', [SeoPublicController::class, 'robots'])->name('robots.txt');
 

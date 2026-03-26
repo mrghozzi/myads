@@ -320,7 +320,7 @@ class ForumController extends Controller
         $rules = [
             'name' => 'required|string|max:255',
             'txt' => 'required|string',
-            'cat' => 'required|integer|exists:f_cat,id',
+            'cat' => ((int) $topic->cat === 0) ? 'required|integer' : 'required|integer|exists:f_cat,id',
             'delete_attachments' => 'nullable|array',
             'delete_attachments.*' => 'integer',
         ];

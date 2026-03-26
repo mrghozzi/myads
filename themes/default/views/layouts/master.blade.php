@@ -1013,7 +1013,7 @@
         }
 
         function postEdit(id, type, extra) {
-             if (type == 100) {
+             if (type == 100 || type == 4) {
                  let container = document.getElementById('post_form' + id);
                  if (!container) return;
                  
@@ -1024,14 +1024,16 @@
                  let html = `
                     <form onsubmit="event.preventDefault(); savePost(${id}, ${type}, this);">
                         <textarea class="form-control" name="txt" style="width:100%; height:100px;">${currentText.trim()}</textarea>
-                        <button type="submit" class="btn btn-sm btn-primary mt-2">{{ __('messages.save') }}</button>
-                        <button type="button" class="btn btn-sm btn-secondary mt-2" onclick="cancelEdit(${id});">{{ __('messages.cancel') }}</button>
+                        <div class="mt-2">
+                            <button type="submit" class="button primary small" style="display:inline-block;">{{ __('messages.save') }}</button>
+                            <button type="button" class="button white small" style="display:inline-block;" onclick="cancelEdit(${id});">{{ __('messages.cancel') }}</button>
+                        </div>
                     </form>
                  `;
                  
                  container.dataset.originalContent = container.innerHTML;
                  container.innerHTML = html;
-             } else if (type == 2 || type == 4) {
+             } else if (type == 2) {
                  window.location.href = '{{ url("editor") }}/' + id;
              } else if (type == 1) {
                  window.location.href = '{{ url("directory") }}/' + id + '/edit';
@@ -1062,7 +1064,11 @@
                 if(response.ok) {
                     window.location.reload();
                 } else {
-                    alert('Error saving post');
+                    response.json().then(data => {
+                        alert('Error: ' + (data.message || 'Error saving post'));
+                    }).catch(() => {
+                        alert('Error saving post');
+                    });
                 }
             });
         }

@@ -432,6 +432,157 @@ class StatusController extends Controller
         return is_string($request->input('img')) && trim((string) $request->input('img')) !== '';
     }
 
+    public function addGalleryImages(Request $request, int $topicId)
+    {
+        $user = Auth::user();
+        $topic = ForumTopic::findOrFail($topicId);
+
+        if ($topic->uid !== $user->id && !$user->isAdmin()) {
+            return response()->json(['success' => false, 'message' => __('messages.unauthorized')], 403);
+        }
+
+        $request->validate([
+            'images' => 'required|array|max:10',
+            'images.*' => 'image|max:10000',
+        ]);
+
+        $currentCount = ForumAttachment::where('topic_id', $topicId)->count();
+        if ($currentCount + count($request->file('images')) > 10) {
+            return response()->json(['success' => false, 'message' => __('messages.gallery_limit_exceeded')], 422);
+        }
+
+        DB::beginTransaction();
+        try {
+            $this->storeGalleryAssets($topic, $request, $user->id);
+            $this->syncStatusType($topicId);
+            DB::commit();
+            return response()->json(['success' => true]);
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
+    }
+
+    public function deleteGalleryImage(Request $request, int $attachmentId)
+    {
+        $user = Auth::user();
+        $attachment = ForumAttachment::findOrFail($attachmentId);
+        $topicId = $attachment->topic_id;
+        $topic = ForumTopic::findOrFail($topicId);
+
+        if ($topic->uid !== $user->id && !$user->isAdmin()) {
+            return response()->json(['success' => false, 'message' => __('messages.unauthorized')], 403);
+        }
+
+        DB::beginTransaction();
+        try {
+            $this->deleteAttachmentFile($attachment);
+            $attachment->delete();
+
+            $this->syncStatusType($topicId);
+
+            DB::commit();
+            return response()->json(['success' => true]);
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
+    }
+
+    public function clearGallery(Request $request, int $topicId)
+    {
+        $user = Auth::user();
+        $topic = ForumTopic::findOrFail($topicId);
+
+        if ($topic->uid !== $user->id && !$user->isAdmin()) {
+            return response()->json(['success' => false, 'message' => __('messages.unauthorized')], 403);
+        }
+
+        DB::beginTransaction();
+        try {
+            $attachments = ForumAttachment::where('topic_id', $topicId)->get();
+            foreach ($attachments as $attachment) {
+                $this->deleteAttachmentFile($attachment);
+                $attachment->delete();
+            }
+
+            $this->syncStatusType($topicId);
+
+            DB::commit();
+            return response()->json(['success' => true]);
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
+    }
+
+    public function reorderGalleryImages(Request $request, int $topicId)
+    {
+        $user = Auth::user();
+        $topic = ForumTopic::findOrFail($topicId);
+
+        if ($topic->uid !== $user->id && !$user->isAdmin()) {
+            return response()->json(['success' => false, 'message' => __('messages.unauthorized')], 403);
+        }
+
+        $request->validate([
+            'order' => 'required|array',
+            'order.*' => 'integer',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            foreach ($request->input('order') as $index => $attachmentId) {
+                ForumAttachment::where('id', $attachmentId)
+                    ->where('topic_id', $topicId)
+                    ->update(['sort_order' => $index]);
+            }
+
+            $this->syncStatusType($topicId);
+
+            DB::commit();
+            return response()->json(['success' => true]);
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+        }
+    }
+
+    private function deleteAttachmentFile(ForumAttachment $attachment): void
+    {
+        $path = public_path($attachment->file_path);
+        if (file_exists($path)) {
+            @unlink($path);
+        }
+    }
+
+    private function syncStatusType(int $topicId): void
+    {
+        $attachments = ForumAttachment::where('topic_id', $topicId)->get();
+        $status = Status::where('tp_id', $topicId)->first();
+
+        if (!$status) return;
+
+        if ($attachments->isEmpty()) {
+            $status->update(['s_type' => 100]);
+            Option::where('o_parent', $topicId)->where('o_type', 'image_post')->delete();
+        } else {
+            $status->update(['s_type' => 4]);
+            
+            // Ensure Option record matches the first attachment
+            $firstAttachment = $attachments->sortBy('sort_order')->first();
+            Option::updateOrCreate(
+                ['o_parent' => $topicId, 'o_type' => 'image_post'],
+                [
+                    'name' => (string) time(),
+                    'o_valuer' => $firstAttachment->file_path,
+                    'o_order' => $firstAttachment->user_id,
+                    'o_mode' => 'file',
+                ]
+            );
+        }
+    }
+
     private function createDirectoryEntry(Request $request, $user, array $preview, string $text, int $time): array
     {
         $directory = Directory::create([

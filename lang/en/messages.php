@@ -1478,4 +1478,10 @@ return [
     'login_to_start_quests' => 'Login to start earning points from daily quests!',
     'no_active_quests' => 'No active quests today.',
     'all_quests' => 'All Quests',
+    'gallery_limit_exceeded' => 'Gallery limit exceeded (max 10 images)',
+    'gallery_requires_images' => 'Gallery post requires at least one image',
+    'confirm_delete_image' => 'Are you sure you want to delete this image?',
+    'confirm_clear_gallery' => 'Are you sure you want to clear all images? The post will convert to a text post.',
+    'clear_gallery' => 'Clear Gallery',
+    'add_photos' => 'Add Photos',
 ];

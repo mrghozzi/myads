@@ -1460,4 +1460,10 @@ return [
     'completed' => 'مكتمل',
     'earn_pts' => 'اربح :pts PTS',
     'all_quests' => 'جميع المهمات',
+    'gallery_limit_exceeded' => 'لا يمكن إضافة أكثر من 10 صور',
+    'gallery_requires_images' => 'منشور الصور يتطلب صورة واحدة على الأقل',
+    'confirm_delete_image' => 'هل أنت متأكد من حذف هذه الصورة؟',
+    'confirm_clear_gallery' => 'هل أنت متأكد من حذف جميع الصور؟ سيتحول المنشور إلى منشور نصي.',
+    'clear_gallery' => 'مسح المعرض',
+    'add_photos' => 'إضافة صور',
 ];

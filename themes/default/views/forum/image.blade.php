@@ -44,16 +44,27 @@
                 <!-- SIMPLE DROPDOWN -->
                 <div class="simple-dropdown widget-box-post-settings-dropdown" style="position: absolute; z-index: 9999; top: 30px; right: 9px; opacity: 0; visibility: hidden; transform: translate(0px, -20px); transition: transform 0.3s ease-in-out 0s, opacity 0.3s ease-in-out 0s, visibility 0.3s ease-in-out 0s;">
                     @if($canEditTopic)
-                        <a class="simple-dropdown-link" href="{{ route('forum.edit', $topic->id) }}">
-                            <i class="fa fa-edit" aria-hidden="true"></i>&nbsp;{{ __('messages.edit') }}
-                        </a>
+                        @if((int) $topic->cat === 0)
+                            <p class="simple-dropdown-link" onclick="postEdit({{ $topic->id }}, {{ $status->s_type }})">
+                                <i class="fa fa-edit" aria-hidden="true"></i>&nbsp;{{ __('messages.edit') }}
+                            </p>
+                        @else
+                            <a class="simple-dropdown-link" href="{{ route('forum.edit', $topic->id) }}">
+                                <i class="fa fa-edit" aria-hidden="true"></i>&nbsp;{{ __('messages.edit') }}
+                            </a>
+                        @endif
                     @endif
                     @if($canDeleteTopic)
                         <p class="simple-dropdown-link post_delete{{ $status->id }}" onclick="deletePost({{ $topic->id }}, 2)">
                             <i class="fa fa-trash" aria-hidden="true"></i>&nbsp;{{ __('messages.delete') }}
                         </p>
+                        @if($status->s_type == 4)
+                            <p class="simple-dropdown-link" onclick="clearGallery({{ $topic->id }})">
+                                <i class="fa fa-images" aria-hidden="true"></i>&nbsp;{{ __('messages.clear_gallery') }}
+                            </p>
+                        @endif
                     @endif
-                    @if($canPinTopic && $status->s_type != 4)
+                    @if($canPinTopic && $topic->cat > 0)
                         <form method="POST" action="{{ route('forum.pin', $topic->id) }}">
                             @csrf
                             <button type="submit" class="simple-dropdown-link" style="width:100%;text-align:left;border:0;background:transparent;">
@@ -61,7 +72,7 @@
                             </button>
                         </form>
                     @endif
-                    @if($canLockTopic && $status->s_type != 4)
+                    @if($canLockTopic && $topic->cat > 0)
                         <form method="POST" action="{{ route('forum.lock', $topic->id) }}">
                             @csrf
                             <button type="submit" class="simple-dropdown-link" style="width:100%;text-align:left;border:0;background:transparent;">
@@ -215,28 +226,48 @@
                     @endif
                 </a>
 
-                @if($topic->attachments->isNotEmpty())
-                    <div class="picture-item-grid" style="margin-top: 20px; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px;">
-                        @foreach($topic->attachments as $attachment)
+                @if($topic->attachments->isNotEmpty() || $canEditTopic)
+                    <div class="picture-item-grid" style="margin-top: 20px; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px;">
+                        @foreach($topic->attachments->sortBy('sort_order') as $attachment)
                             @if($attachment->isImage())
-                                <div class="picture-item" style="border-radius: 12px; overflow: hidden; position: relative; padding-bottom: 100%; height: 0;">
+                                <div class="picture-item attachment-item" data-id="{{ $attachment->id }}" id="attachment-{{ $attachment->id }}" style="border-radius: 12px; overflow: hidden; position: relative; padding-bottom: 100%; height: 0; background: #eee; cursor: move;">
                                     <img src="{{ asset($attachment->file_path) }}" 
-                                         style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; cursor: pointer;"
-                                         onclick="window.open('{{ asset($attachment->file_path) }}', '_blank')"
+                                         style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;"
                                          alt="{{ $attachment->original_name }}">
+                                    
+                                    @if($canEditTopic)
+                                        <div class="delete-photo-btn" onclick="deleteGalleryImage({{ $attachment->id }}, this)" 
+                                             style="position: absolute; top: 8px; right: 8px; background: rgba(220, 53, 69, 0.9); color: white; border-radius: 50%; width: 24px; height: 24px; text-align: center; cursor: pointer; z-index: 10; line-height: 24px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                                            <i class="fa fa-times" style="font-size: 14px;"></i>
+                                        </div>
+                                    @endif
                                 </div>
                             @else
-                                <div class="widget-box" style="margin-bottom: 14px;">
+                                <div class="widget-box" id="attachment-{{ $attachment->id }}" style="margin-bottom: 14px; position: relative;">
                                     <div class="widget-box-content">
                                         <a href="{{ route('forum.attachment.download', $attachment->id) }}">
                                             <i class="fa fa-paperclip" aria-hidden="true"></i>
                                             {{ $attachment->original_name }}
                                         </a>
                                         <span style="color:#7f85a3;font-size:12px;">({{ $attachment->human_size }})</span>
+                                        @if($canEditTopic)
+                                            <i class="fa fa-times text-danger" onclick="deleteGalleryImage({{ $attachment->id }}, this)" style="cursor: pointer; margin-left: 10px;"></i>
+                                        @endif
                                     </div>
                                 </div>
                             @endif
                         @endforeach
+
+                        @if($canEditTopic && $topic->attachments->count() < 10)
+                            <div class="picture-item add-photo-item" style="border: 2px dashed #ddd; border-radius: 12px; position: relative; padding-bottom: 100%; height: 0; background: #fafafa; transition: all 0.3s;">
+                                <label for="add-photos-input" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; color: #aaa;">
+                                    <i class="fa fa-plus fa-2x"></i>
+                                    <span class="small">{{ __('messages.add_photos') }}</span>
+                                    <span class="small" style="font-size: 10px;">({{ $topic->attachments->count() }}/10)</span>
+                                </label>
+                                <input type="file" id="add-photos-input" multiple accept="image/*" style="display: none;" onchange="uploadGalleryImages(this, {{ $topic->id }})">
+                            </div>
+                        @endif
                     </div>
                 @endif
 
@@ -379,4 +410,152 @@
 
 @include('theme::forum.scripts')
 </div>
+    <!-- GALLERY MANAGEMENT SCRIPTS -->
+    <script>
+        function deleteGalleryImage(attachmentId, btn) {
+            if (!confirm('{{ __("messages.confirm_delete_image") }}')) return;
+
+            const icon = btn.querySelector('i');
+            const originalClass = icon.className;
+            icon.className = 'fa fa-spinner fa-spin';
+
+            fetch('{{ route("status.gallery.delete_image", ":id") }}'.replace(':id', attachmentId), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': getCsrfToken()
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert(data.message || 'Error deleting image');
+                    icon.className = originalClass;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error deleting image');
+                icon.className = originalClass;
+            });
+        }
+
+        function clearGallery(topicId) {
+            if (!confirm('{{ __("messages.confirm_clear_gallery") }}')) return;
+
+            fetch('{{ route("status.gallery.clear", ":id") }}'.replace(':id', topicId), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': getCsrfToken()
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert(data.message || 'Error clearing gallery');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error clearing gallery');
+            });
+        }
+
+        function uploadGalleryImages(input, topicId) {
+            if (!input.files || input.files.length === 0) return;
+
+            const formData = new FormData();
+            for (let i = 0; i < input.files.length; i++) {
+                formData.append('images[]', input.files[i]);
+            }
+
+            const label = document.querySelector('label[for="add-photos-input"]');
+            const originalHTML = label.innerHTML;
+            label.innerHTML = '<i class="fa fa-spinner fa-spin fa-2x"></i><span class="small">Uploading...</span>';
+
+            fetch('{{ route("status.gallery.add_images", ":id") }}'.replace(':id', topicId), {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': getCsrfToken()
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert(data.message || 'Error uploading images');
+                    label.innerHTML = originalHTML;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error uploading images');
+                label.innerHTML = originalHTML;
+            });
+        }
+
+        // REORDERING LOGIC
+        function initGallerySortable() {
+            if (typeof jQuery === 'undefined' || typeof jQuery.fn.sortable === 'undefined') {
+                return;
+            }
+
+            const grid = jQuery('.picture-item-grid');
+            if (grid.length === 0) return;
+
+            grid.sortable({
+                items: '.attachment-item',
+                placeholder: 'picture-item-placeholder',
+                update: function(event, ui) {
+                    const order = [];
+                    grid.find('.attachment-item').each(function() {
+                        order.push(jQuery(this).data('id'));
+                    });
+
+                    fetch('{{ route("status.gallery.reorder", $topic->id) }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': getCsrfToken()
+                        },
+                        body: JSON.stringify({ order: order })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (!data.success) {
+                            alert(data.message || 'Error reordering images');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            @if($canEditTopic)
+                initGallerySortable();
+            @endif
+        });
+    </script>
+    @if($canEditTopic)
+        <script src="{{ theme_asset('admin-duralux/vendors/js/jquery-ui.min.js') }}"></script>
+        <style>
+            .picture-item-placeholder {
+                border: 2px dashed #615dfa;
+                border-radius: 12px;
+                background: rgba(97, 93, 250, 0.05);
+                height: 0;
+                padding-bottom: 100%;
+            }
+        </style>
+    @endif
 @endsection

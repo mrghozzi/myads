@@ -41,6 +41,7 @@
                         <input type="hidden" name="id" value="{{ $topic->id }}">
                     @endif
 
+                    @if((int) ($topic->cat ?? 0) > 0)
                     <div class="form-row split">
                         <div class="form-item">
                             <div class="form-input social-input small active">
@@ -52,6 +53,9 @@
                             </div>
                         </div>
                     </div>
+                    @else
+                        <input type="hidden" name="name" value="{{ $topic->name ?? 'text' }}">
+                    @endif
 
                     <div class="form-row">
                         <div class="form-item">
@@ -62,7 +66,7 @@
                         </div>
                     </div>
 
-                    @if(!isset($status) || $status->s_type != 4)
+                    @if((int) ($topic->cat ?? 0) > 0 && (!isset($status) || $status->s_type != 4))
                     <div class="form-row split">
                         <div class="form-item">
                             <div class="form-select">
@@ -81,7 +85,7 @@
                         </div>
                     </div>
                     @else
-                        <input type="hidden" name="cat" value="{{ $topic->cat }}">
+                        <input type="hidden" name="cat" value="{{ $topic->cat ?? 0 }}">
                     @endif
                     
                     @if(!isset($topic))

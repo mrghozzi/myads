@@ -44,16 +44,22 @@
                 <!-- SIMPLE DROPDOWN -->
                 <div class="simple-dropdown widget-box-post-settings-dropdown" style="position: absolute; z-index: 9999; top: 30px; right: 9px; opacity: 0; visibility: hidden; transform: translate(0px, -20px); transition: transform 0.3s ease-in-out 0s, opacity 0.3s ease-in-out 0s, visibility 0.3s ease-in-out 0s;">
                     @if($canEditTopic)
-                        <a class="simple-dropdown-link" href="{{ route('forum.edit', $topic->id) }}">
-                            <i class="fa fa-edit" aria-hidden="true"></i>&nbsp;{{ __('messages.edit') }}
-                        </a>
+                        @if((int) $topic->cat === 0)
+                            <p class="simple-dropdown-link" onclick="postEdit({{ $topic->id }}, {{ $status->s_type }})">
+                                <i class="fa fa-edit" aria-hidden="true"></i>&nbsp;{{ __('messages.edit') }}
+                            </p>
+                        @else
+                            <a class="simple-dropdown-link" href="{{ route('forum.edit', $topic->id) }}">
+                                <i class="fa fa-edit" aria-hidden="true"></i>&nbsp;{{ __('messages.edit') }}
+                            </a>
+                        @endif
                     @endif
                     @if($canDeleteTopic)
                         <p class="simple-dropdown-link post_delete{{ $status->id }}" onclick="deletePost({{ $topic->id }}, 100)">
                             <i class="fa fa-trash" aria-hidden="true"></i>&nbsp;{{ __('messages.delete') }}
                         </p>
                     @endif
-                    @if($canPinTopic)
+                    @if($canPinTopic && $topic->cat > 0)
                         <form method="POST" action="{{ route('forum.pin', $topic->id) }}">
                             @csrf
                             <button type="submit" class="simple-dropdown-link" style="width:100%;text-align:left;border:0;background:transparent;">
@@ -61,7 +67,7 @@
                             </button>
                         </form>
                     @endif
-                    @if($canLockTopic)
+                    @if($canLockTopic && $topic->cat > 0)
                         <form method="POST" action="{{ route('forum.lock', $topic->id) }}">
                             @csrf
                             <button type="submit" class="simple-dropdown-link" style="width:100%;text-align:left;border:0;background:transparent;">
