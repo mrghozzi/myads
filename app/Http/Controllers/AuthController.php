@@ -131,6 +131,7 @@ class AuthController extends Controller
             // Try standard Laravel check first (Bcrypt)
             if (Hash::check($request->input('password'), $user->pass)) {
                 Auth::login($user, $request->boolean('remember'));
+                app(\App\Services\GamificationService::class)->recordEvent($user->id, 'login');
                 $request->session()->regenerate();
                 return redirect()->intended('/');
             }
@@ -143,6 +144,8 @@ class AuthController extends Controller
                 $user->pass = Hash::make($request->input('password'));
                 $user->save();
                 
+                app(\App\Services\GamificationService::class)->recordEvent($user->id, 'login');
+
                 $request->session()->regenerate();
                 return redirect()->intended('/');
             }

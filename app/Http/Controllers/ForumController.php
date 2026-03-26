@@ -9,6 +9,7 @@ use App\Models\ForumComment;
 use App\Models\ForumTopic;
 use App\Models\Option;
 use App\Models\Status;
+use App\Services\GamificationService;
 use App\Support\ForumSettings;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -272,6 +273,8 @@ class ForumController extends Controller
             }
 
             $this->storeTopicAttachments($topic, $request, $settings);
+
+            GamificationService::recordEvent('forum_topic_created', auth()->user());
 
             DB::commit();
             return redirect()->route('forum.topic', $topic->id);

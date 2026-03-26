@@ -189,4 +189,39 @@ class GamificationService
             }))
             ->count();
     }
+
+    public function repairQuestData(): void
+    {
+        if (!$this->schema->supports('quests')) {
+            return;
+        }
+
+        $map = [
+            // Legacy Quests
+            'daily_first_post'              => 'svg-status',
+            'daily_three_comments'          => 'svg-comment',
+            'daily_five_reactions_given'    => 'svg-thumbs-up',
+            'daily_five_visit_exchanges'    => 'svg-timeline',
+            'weekly_three_reposts'          => 'svg-share',
+            'weekly_ten_reactions_received' => 'svg-thumbs-up',
+
+            // New Premium Quests
+            'new-connections'               => 'svg-members',
+            'forum-starter'                 => 'svg-forum',
+            'web-explorer'                  => 'svg-list-grid-view',
+            'tool-collector'                => 'svg-marketplace',
+            'service-helper'                => 'svg-ticket',
+        ];
+
+        foreach ($map as $slug => $icon) {
+            DB::table('quests')->where('slug', $slug)->update(['icon' => $icon]);
+        }
+
+        // Fix zero or negative target counts
+        DB::table('quests')->where('target_count', '<=', 0)->update(['target_count' => 1]);
+        
+        // Ensure first-post is at least 1 (legacy safety)
+        DB::table('quests')->where('slug', 'daily_first_post')->where('target_count', '<=', 0)->update(['target_count' => 1]);
+    }
 }
+

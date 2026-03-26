@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use App\Models\User;
+use App\Services\GamificationService;
 use Illuminate\Support\Facades\Hash;
 
 class InstallerController extends Controller
@@ -149,6 +150,8 @@ class InstallerController extends Controller
             } catch (\Exception $e) {
                 // Seeder may fail if data exists, that's OK
             }
+
+            app(GamificationService::class)->repairQuestData();
 
             // Try artisan storage:link first, fallback to manual symlink
             $this->createStorageLink();
@@ -607,6 +610,8 @@ class InstallerController extends Controller
             } catch (\Exception $e) {
                 // Non-critical
             }
+
+            app(GamificationService::class)->repairQuestData();
 
             // Mark as installed
             File::put(storage_path('installed'), date('Y-m-d H:i:s') . ' (upgraded from v3.x to v4.2.0)');

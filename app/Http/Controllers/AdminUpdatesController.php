@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Artisan;
 use App\Models\Option;
+use App\Services\GamificationService;
 
 class AdminUpdatesController extends Controller
 {
@@ -15,6 +16,11 @@ class AdminUpdatesController extends Controller
      * Current system version (hardcoded).
      */
     public const CURRENT_VERSION = '4.2.0';
+
+    public function __construct(
+        private readonly GamificationService $gamification
+    ) {
+    }
 
     /**
      * GitHub repo for releases.
@@ -218,6 +224,8 @@ class AdminUpdatesController extends Controller
             Artisan::call('cache:clear');
             Artisan::call('view:clear');
             Artisan::call('config:clear');
+
+            $this->gamification->repairQuestData();
 
             // Clean up
             File::delete($tempZipPath);

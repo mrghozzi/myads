@@ -9,12 +9,20 @@
             </a>
         </li>
         @auth
-            <li class="menu-item active">
+            <li class="menu-item {{ Request::is('home') ? 'active' : '' }}">
                 <a class="menu-item-link text-tooltip-tfr" href="{{ url('/home') }}">
                     <svg class="menu-item-link-icon icon-overview">
                         <use xlink:href="#svg-overview"></use>
                     </svg>
                     {{ __('messages.board') }}
+                </a>
+            </li>
+            <li class="menu-item {{ Request::is('quests') ? 'active' : '' }}">
+                <a class="menu-item-link text-tooltip-tfr" href="{{ url('/quests') }}">
+                    <svg class="menu-item-link-icon icon-quests">
+                        <use xlink:href="#svg-quests"></use>
+                    </svg>
+                    {{ __('messages.quests') }}
                 </a>
             </li>
         @endauth

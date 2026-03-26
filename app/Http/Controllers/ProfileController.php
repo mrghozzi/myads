@@ -265,6 +265,7 @@ class ProfileController extends Controller
         ]);
 
         app(GamificationService::class)->refreshBadges($targetUser->id);
+        app(GamificationService::class)->recordEvent($currentUser->id, 'follow_created');
 
         return back()->with('success', __('followed_successfully'));
     }

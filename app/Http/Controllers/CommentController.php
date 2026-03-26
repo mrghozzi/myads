@@ -201,6 +201,8 @@ class CommentController extends Controller
 
                 $ownerId = $order->uid;
                 $url = "/orders/" . $order->id;
+                
+                app(\App\Services\GamificationService::class)->recordEvent($uid, 'order_offer_created');
             }
 
             $mentions->createCommentMentions($user, $type, (int) $comment->id, $text, $url);

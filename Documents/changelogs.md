@@ -66,6 +66,14 @@
 * **Add**: Added badge showcase management via `/settings/badges`, badge display on profile pages, and a refreshed points history ledger on `/history`.
 * **Improvement**: Rebuilt profile `About Me` around `users.sig`, upgraded `/u/{username}?tab=photos`, and refreshed `/history` toward a more profile-hub style layout.
 * **Add**: Introduced `point_transactions`, `badges`, `user_badges`, `badge_showcase`, `quests`, and `quest_progress` with seeded v1 milestones and daily/weekly quests for posts, comments, reactions, reposts, and follow growth.
+### 🏆 Premium Quests & Gamification
+*   **Add**: Introduced a new **Premium Quests Page** (`/quests`) with a high-fidelity "Vikinger" design, featuring fluid animations and entrance effects.
+*   **Add**: Implemented 5 brand-new repeatable quests: **New Connections** (Follows), **Forum Starter** (Topics), **Web Explorer** (Directory), **Tool Collector** (Store), and **Service Helper** (Order Bids).
+*   **Improvement**: Enhanced the **Daily Quests Sidebar Widget** with a prominent "All Quests" button and a direct "History" link for improved user navigation.
+*   **Architecture**: Integrated quest event hooks across `ProfileController`, `ForumController`, `StoreController`, `DirectoryController`, `AuthController`, and `CommentController`.
+*   **Maintenance**: Built a centralized `repairQuestData` service and a dedicated migration (`2026_03_26_040000_fix_legacy_quest_icons.php`) to permanently correct icon mappings and target counts.
+*   **Automation**: Quest data repair is now automatically triggered during **System Installations**, **Dashboard Updates**, and through the **Admin Maintenance** "Repair Database" tool.
+*   **i18n**: Fully localized all new quest strings and widget actions across all **9 supported languages**.
 
 ### 🏛️ Forum & Category Management
 * **Add**: Introduced **Forum Category Visibility Controls**, allowing administrators to restrict access to specific categories and their topics based on user roles (Everyone, Registered Members, or Moderators/Admins only).

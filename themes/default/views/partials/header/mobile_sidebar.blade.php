@@ -34,7 +34,8 @@
     <ul class="menu">
         <li class="menu-item"><a class="menu-item-link text-tooltip-tfr" href="{{ url('/portal') }}"><svg class="menu-item-link-icon icon-newsfeed"><use xlink:href="#svg-newsfeed"></use></svg>{{ __('messages.community') }}</a></li>
         @auth
-        <li class="menu-item active"><a class="menu-item-link text-tooltip-tfr" href="{{ url('/home') }}"><svg class="menu-item-link-icon icon-overview"><use xlink:href="#svg-overview"></use></svg>{{ __('messages.board') }}</a></li>
+        <li class="menu-item {{ Request::is('home') ? 'active' : '' }}"><a class="menu-item-link text-tooltip-tfr" href="{{ url('/home') }}"><svg class="menu-item-link-icon icon-overview"><use xlink:href="#svg-overview"></use></svg>{{ __('messages.board') }}</a></li>
+        <li class="menu-item {{ Request::is('quests') ? 'active' : '' }}"><a class="menu-item-link text-tooltip-tfr" href="{{ url('/quests') }}"><svg class="menu-item-link-icon icon-quests"><use xlink:href="#svg-quests"></use></svg>{{ __('messages.quests') }}</a></li>
         @endauth
         <li class="menu-item"><a class="menu-item-link text-tooltip-tfr" href="{{ url('/forum') }}"><svg class="menu-item-link-icon icon-forums"><use xlink:href="#svg-forums"></use></svg>{{ __('messages.forum') }}</a></li>
         <li class="menu-item"><a class="menu-item-link text-tooltip-tfr" href="{{ url('/directory') }}"><svg class="menu-item-link-icon icon-list-grid-view"><use xlink:href="#svg-list-grid-view"></use></svg>{{ __('messages.directory') }}</a></li>

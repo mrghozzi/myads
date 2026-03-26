@@ -43,7 +43,10 @@
                     <p class="text-center">{{ __('messages.no_active_quests') ?? 'No active quests today.' }}</p>
                 @endforelse
             </div>
-            <a class="widget-box-button button small white" href="{{ route('profile.show', ['username' => auth()->user()->username, 'tab' => 'history']) }}" style="margin-top: 8px;">{{ __('messages.view_points_history') ?? 'View Points History' }}</a>
+            <div class="quest-footer" style="display: flex; gap: 8px; margin-top: 16px;">
+                <a class="button small primary" href="/quests" style="flex: 1; text-align: center; font-size: 11px; padding: 0 12px; height: 32px; line-height: 32px;">{{ __('messages.all_quests') ?? 'All Quests' }}</a>
+                <a class="button small white" href="{{ route('profile.show', ['username' => auth()->user()->username, 'tab' => 'history']) }}" style="flex: 1; text-align: center; font-size: 11px; padding: 0 12px; height: 32px; line-height: 32px;">{{ __('messages.history') ?? 'History' }}</a>
+            </div>
         @else
             <p class="text-center" style="font-size: 13px; color: #8f919d;">{{ __('messages.login_to_start_quests') ?? 'Login to start earning points from daily quests!' }}</p>
             <a class="widget-box-button button small primary" href="{{ route('login') }}" style="margin-top: 16px;">{{ __('messages.login') }}</a>

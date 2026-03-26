@@ -225,6 +225,8 @@ class DirectoryController extends Controller
                 'tp_id' => $listing->id,
             ]);
 
+            app(\App\Services\GamificationService::class)->recordEvent(auth()->id(), 'directory_submission_created');
+
             return redirect()->route('directory.show', $listing->id)->with('success', __('WebsiteCreated'));
         } catch (\Throwable $e) {
             return redirect()->back()

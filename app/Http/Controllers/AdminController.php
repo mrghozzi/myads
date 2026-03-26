@@ -35,6 +35,7 @@ use App\Models\Option;
 use App\Models\Knowledgebase;
 use App\Models\Page;
 use App\Models\ProductFile;
+use App\Services\GamificationService;
 use App\Services\PluginManager;
 use App\Services\ThemeManager;
 use App\Support\BannerServingSettings;
@@ -53,6 +54,11 @@ class AdminController extends Controller
         'delete_topics',
         'delete_comments',
     ];
+
+    public function __construct(
+        private readonly GamificationService $gamification
+    ) {
+    }
 
     public function index()
     {
@@ -2002,6 +2008,8 @@ class AdminController extends Controller
             \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
             $output = \Illuminate\Support\Facades\Artisan::output();
             
+            $this->gamification->repairQuestData();
+            
             return redirect()->back()->with('success', __('Migrations ran successfully: ') . $output);
         } catch (\Throwable $e) {
             return redirect()->back()->with('error', __('Failed to run migrations: ') . $e->getMessage());
@@ -2032,6 +2040,8 @@ class AdminController extends Controller
                     $results[] = $tableName;
                 }
             }
+            
+            $this->gamification->repairQuestData();
             
             return redirect()->back()->with('success', __('Database maintenance completed for :count tables.', ['count' => count($results)]));
         } catch (\Throwable $e) {

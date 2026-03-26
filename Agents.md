@@ -241,6 +241,7 @@ myads/
 | `/t{id}` | `/t42` | Forum topic |
 | `/u/{username}` | `/u/john` | User profile |
 | `/dr{id}` | `/dr5` | Directory listing (short) |
+| `/quests` | `/quests` | Premium Quests Hub |
 | `/cat/{id}` | `/cat/12` | Directory category (legacy alias) |
 | `/kb/{name}:{article}` | `/kb/MyScript:setup` | Knowledgebase article |
 | `/e{id}`, `/p{id}` | `/e1` | Legacy profile redirects |
@@ -536,4 +537,4 @@ If in doubt, update it. An outdated `Agents.md` causes future agents to make wro
 
 ---
 
-*Last updated: 2026-03-25 — MYADS v4.2.0*
+*Last updated: 2026-03-26 — MYADS v4.2.0*

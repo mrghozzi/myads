@@ -856,6 +856,8 @@ class StoreController extends Controller
             abort(404, 'File missing from storage');
         }
 
+        app(\App\Services\GamificationService::class)->recordEvent(Auth::id(), 'product_downloaded');
+
         return redirect($short->url);
     }
 }

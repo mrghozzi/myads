@@ -90,6 +90,7 @@ Route::get('/', function () {
 
 Route::get('/home', [HomeController::class, 'index'])->name('dashboard')->middleware('auth');
 Route::post('/home', [HomeController::class, 'convertPoints'])->name('dashboard.convert')->middleware('auth');
+Route::get('/quests', [App\Http\Controllers\QuestController::class, 'index'])->name('quests.index')->middleware('auth');
 
 // Portal Routes
 Route::get('/portal', [PortalController::class, 'index'])->name('portal.index');
