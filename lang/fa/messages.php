@@ -147,6 +147,7 @@ return array (
   'replies' => 'پاسخ‌ها',
   'author' => 'نویسنده',
   'no_topics_found' => 'موضوعی در این دسته یافت نشد.',
+  'read_more' => 'بیشتر بخوانید',
   'by' => 'توسط',
   'leave_reply' => 'ارسال پاسخ',
   'write_reply_placeholder' => 'پاسخ خود را اینجا بنویسید...',

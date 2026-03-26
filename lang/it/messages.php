@@ -147,6 +147,7 @@ return array (
   'replies' => 'Risposte',
   'author' => 'Autore',
   'no_topics_found' => 'Nessun argomento trovato in questa categoria.',
+  'read_more' => 'Leggi di più',
   'by' => 'By',
   'leave_reply' => 'Lascia una risposta',
   'write_reply_placeholder' => 'Scrivi qui la tua risposta...',

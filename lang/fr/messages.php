@@ -157,6 +157,7 @@ return array (
   'replies' => 'Réponses',
   'author' => 'Auteur',
   'no_topics_found' => 'Aucun sujet trouvé dans cette catégorie.',
+  'read_more' => 'Lire la suite',
   'by' => 'Par',
   'leave_reply' => 'Laisser une réponse',
   'write_reply_placeholder' => 'Écrivez votre réponse ici...',

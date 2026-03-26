@@ -163,6 +163,7 @@ return array (
   'replies' => 'Respuestas',
   'author' => 'Autor',
   'no_topics_found' => 'No se encontraron temas en esta categoría.',
+  'read_more' => 'Leer más',
   'by' => 'Por',
   'leave_reply' => 'Deja una respuesta',
   'write_reply_placeholder' => 'Escribe tu respuesta aquí...',

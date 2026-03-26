@@ -147,6 +147,7 @@ return array (
   'replies' => 'Yanıtlar',
   'author' => 'Yazar',
   'no_topics_found' => 'Bu kategoride konu bulunamadı.',
+  'read_more' => 'Devamını oku',
   'by' => 'Tarafından',
   'leave_reply' => 'Yanıt Bırakın',
   'write_reply_placeholder' => 'Yanıtınızı buraya yazın...',

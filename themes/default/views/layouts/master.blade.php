@@ -90,6 +90,7 @@
     <link id="theme-simplebar" data-theme-link="true" rel="stylesheet" href="{{ theme_asset($css_path . '/simplebar.css') }}">
     <link id="theme-tiny-slider" data-theme-link="true" rel="stylesheet" href="{{ theme_asset($css_path . '/tiny-slider.css') }}">
     <link id="theme-dataTables" data-theme-link="true" rel="stylesheet" href="{{ theme_asset($css_path . '/dataTables.css') }}">
+    <link id="theme-forum-activity-super" data-theme-link="true" rel="stylesheet" href="{{ theme_asset($css_path . '/forum-activity-superdesign.css') }}">
     @if(is_locale_rtl())
         <link id="theme-rtl" data-theme-link="true" href="{{ theme_asset($css_path . '/rtl.css') }}" rel="stylesheet" type="text/css" />
     @endif

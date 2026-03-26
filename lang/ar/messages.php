@@ -151,6 +151,7 @@ return [
     'replies' => 'الردود',
     'author' => 'الكاتب',
     'no_topics_found' => 'لا توجد مواضيع في هذا القسم.',
+    'read_more' => 'اقرأ المزيد',
     'by' => 'بواسطة',
     'leave_reply' => 'اترك رداً',
     'write_reply_placeholder' => 'اكتب ردك هنا...',

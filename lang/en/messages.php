@@ -151,6 +151,7 @@ return [
     'replies' => 'Replies',
     'author' => 'Author',
     'no_topics_found' => 'No topics found in this category.',
+    'read_more' => 'Read More',
     'by' => 'By',
     'leave_reply' => 'Leave a Reply',
     'write_reply_placeholder' => 'Write your reply here...',
