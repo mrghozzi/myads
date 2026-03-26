@@ -18,13 +18,55 @@ use App\Services\V420SchemaService;
 use App\Models\OrderRequest;
 
 use App\Traits\HasPrivacy;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\Builder;
+use App\Models\User;
 
 class Status extends Model
 {
-    use HasFactory, HasPrivacy;
+    use HasFactory;
+    use HasPrivacy {
+        scopeVisible as scopePrivacyVisible;
+    }
 
     protected $table = 'status';
     public $timestamps = false;
+
+    /**
+     * Override scopeVisible to handle suspended product activity.
+     */
+    public function scopeVisible(Builder $query, ?User $viewer = null, ?string $column = null): Builder
+    {
+        $viewer = $viewer ?? Auth::user();
+        
+        // 1. Apply privacy filters from Trait
+        $query->privacyVisible($viewer, $column);
+
+        // 2. If Admin, they see everything (overrides trait filters)
+        if ($viewer && $viewer->isAdmin()) {
+            return $query;
+        }
+
+        // 3. AND hide if linked to a suspended product (unless owner)
+        $authorIdColumn = $column ?? $this->getAuthorIdColumn();
+
+        $query->where(function ($q) use ($viewer, $authorIdColumn) {
+            $q->where(function ($inner) {
+                // Not a store update OR not suspended
+                $inner->where('s_type', '!=', 7867)
+                      ->orWhereDoesntHave('productItem.statusOptions', function ($sub) {
+                          $sub->where('name', 'suspended');
+                      });
+            });
+
+            // OR viewer is the owner
+            if ($viewer) {
+                $q->orWhere($authorIdColumn, $viewer->id);
+            }
+        });
+
+        return $query;
+    }
 
     protected $fillable = [
         'uid',

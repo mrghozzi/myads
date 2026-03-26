@@ -368,9 +368,10 @@ pages/         → Static pages (privacy, terms, custom)
 
 ### Product Suspension System
 - **Mechanism:** Uses `Option` records with `o_type = 'store_status'` and `name = 'suspended'`.
-- **Visibility:** `Product::visible()` scope is overridden to integrate suspension logic—hidden from the public, but visible to owners and admins.
+- **Visibility:** `Product::visible()` and `Status::visible()` scopes are overridden to integrate suspension logic—hidden from the public, but visible to owners and admins.
+- **Sitemap:** `SitemapController` respects product visibility, automatically excluding suspended products from the public XML index.
 - **Enforcement:** `StoreController` blocks unauthorized viewing and downloading of suspended products.
-- **UI:** Includes a high-visibility suspension notice on the product page and status badges in the store listing.
+- **UI:** Includes a high-visibility suspension notice on the product page, status badges in the store listing, and "Suspended" badges on community activity cards.
 
 ---
 

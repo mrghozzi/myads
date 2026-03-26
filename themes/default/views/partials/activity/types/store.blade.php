@@ -103,6 +103,11 @@
                                 {{ $product->type->name }}
                             @endif
                         </p>
+                        @if($product->is_suspended)
+                            <div class="mb-2">
+                                <span class="badge bg-danger">{{ __('messages.suspended') }}</span>
+                            </div>
+                        @endif
                         <p class="product-preview-text">{!! $description !!}</p>
                     </div>
                 </div>

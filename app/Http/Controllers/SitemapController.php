@@ -332,14 +332,15 @@ class SitemapController extends Controller
 
     private function publishedProductsQuery(): Builder
     {
-        $query = Product::withoutGlobalScope('store')->where('o_type', 'store');
+        $query = Product::visible()->withoutGlobalScope('store')->where('o_type', 'store');
 
         return $this->applyScopeFilters($query, 'store_show', 'product');
     }
 
     private function knowledgebaseIndexesQuery(): Builder
     {
-        $query = Product::withoutGlobalScope('store')
+        $query = Product::visible()
+            ->withoutGlobalScope('store')
             ->where('o_type', 'store')
             ->whereIn('name', Knowledgebase::query()->select('o_mode')->distinct());
 
