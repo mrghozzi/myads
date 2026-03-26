@@ -68,7 +68,11 @@
                 </a>
                 <p class="user-status-title medium">
                     <a class="bold" href="{{ $statusUserProfileUrl }}">{{ $statusUserName }}</a>
-                    &nbsp;{{ __('messages.added_new_product') }}
+                    &nbsp;@if(isset($status->txt) && $status->txt == 'update')
+                        {{ __('messages.updated_product') }}
+                    @else
+                        {{ __('messages.added_new_product') }}
+                    @endif
                 </p>
                 <p class="user-status-text small">
                     <i class="fa fa-clock-o"></i>&nbsp;{{ __('messages.ago') }}&nbsp; {{ \Carbon\Carbon::createFromTimestamp($status->date)->diffForHumans() }}

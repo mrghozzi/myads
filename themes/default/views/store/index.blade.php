@@ -84,6 +84,9 @@
                 @else
                     <p class="text-sticker">{{ __('messages.free') }}</p>
                 @endif
+                @if($product->is_suspended)
+                    <p class="text-sticker" style="background-color: #f34141; color: #fff; margin-left: 5px;">{{ __('messages.suspended') }}</p>
+                @endif
                 <p class="product-preview-title"><a href="{{ route('store.show', $product->name) }}">{{ $product->name }}</a></p>
                 <p class="product-preview-category digital">
                     @if($product->type)

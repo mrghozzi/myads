@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 
 use App\Traits\HasPrivacy;
+use Illuminate\Support\Facades\Auth;
+use App\Models\Like;
 
 class Product extends Model
 {
@@ -50,6 +52,81 @@ class Product extends Model
     public function type()
     {
         return $this->hasOne(ProductType::class, 'o_parent', 'id');
+    }
+
+    /**
+     * Relationship to status options (for suspension check).
+     */
+    public function statusOptions()
+    {
+        return $this->hasMany(Option::class, 'o_parent', 'id')->where('o_type', 'store_status');
+    }
+
+    /**
+     * Check if product is suspended.
+     */
+    public function getIsSuspendedAttribute()
+    {
+        return $this->statusOptions()->where('name', 'suspended')->exists();
+    }
+
+    /**
+     * Override scopeVisible to handle suspension.
+     */
+    public function scopeVisible(Builder $query, ?User $viewer = null, ?string $column = null): Builder
+    {
+        $viewer = $viewer ?? Auth::user();
+        $authorIdColumn = $column ?? $this->getAuthorIdColumn();
+
+        // 1. If viewer is Admin, they see everything (including suspended)
+        if ($viewer && $viewer->isAdmin()) {
+            return $query;
+        }
+
+        return $query->where(function ($q) use ($viewer, $authorIdColumn) {
+            // 2. Original HasPrivacy-like logic for products
+            $q->where(function ($inner) use ($viewer, $authorIdColumn) {
+                // Owner can always see their own content
+                if ($viewer) {
+                    $inner->orWhere($authorIdColumn, $viewer->id);
+                }
+
+                // Public profile visibility
+                $inner->orWhereIn($authorIdColumn, function ($sub) {
+                    $sub->select('user_id')
+                        ->from('user_privacy_settings')
+                        ->where('profile_visibility', 'public');
+                });
+
+                // Followers visibility
+                if ($viewer) {
+                    $followingIds = Like::where('uid', $viewer->id)
+                        ->where('type', 1)
+                        ->pluck('sid');
+                    if ($followingIds->isNotEmpty()) {
+                        $inner->orWhere(function ($q2) use ($authorIdColumn, $followingIds) {
+                            $q2->whereIn($authorIdColumn, $followingIds)
+                               ->whereIn($authorIdColumn, function ($sub) {
+                                   $sub->select('user_id')
+                                       ->from('user_privacy_settings')
+                                       ->where('profile_visibility', 'followers');
+                               });
+                        });
+                    }
+                }
+            });
+
+            // 3. AND it must NOT be suspended (unless owner)
+            $q->where(function ($s) use ($viewer, $authorIdColumn) {
+                $s->whereDoesntHave('statusOptions', function ($sub) {
+                    $sub->where('name', 'suspended');
+                });
+
+                if ($viewer) {
+                    $s->orWhere($authorIdColumn, $viewer->id);
+                }
+            });
+        });
     }
 
     public function getProductImageAttribute()

@@ -56,6 +56,12 @@
 
 @include('theme::partials.ads', ['id' => 5])
 
+@if($isSuspended)
+    <div class="alert alert-danger" role="alert">
+        <strong><i class="fa fa-exclamation-triangle" aria-hidden="true"></i></strong>&nbsp; {{ __('messages.product_suspended_notice') }}
+    </div>
+@endif
+
 <div class="store-detail-page post{{ $status ? $status->id : $product->id }}">
     <div class="widget-box store-shell-card no-padding">
         <div class="store-hero">

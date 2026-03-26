@@ -129,6 +129,14 @@
 * **Add**: Added feature coverage for social publishing, mention privacy, profile privacy enforcement, badge showcase limits, admin ACL, portal feed deduplication and chronology, forum pagination, and v4.2.0 translation key coverage.
 * **Validation**: Verified updated PHP files with `php -l`, confirmed the new routes during route inspection, and ran the dedicated `V420*` feature test suite successfully.
 
+### 🛒 Store & Product Management
+* **Add**: Introduced a robust **Product Suspension System**. Administrators can now suspend specific products, hiding them from the public store index and search results while maintaining access for owners and admins.
+* **Add**: High-visibility **Suspension Notice** displayed on the product page for owners and administrators to clearly identify the product status.
+* **Add**: **Status Badges** for suspended products in store preview cards for an improved administrative workflow.
+* **Add**: **Automated Update Notifications**. The system now automatically publishes a community feed post whenever a product owner updates their product version, increasing visibility for new releases.
+* **i18n**: Added comprehensive translation keys for product suspension and update labels across all 9 supported languages.
+* **Architecture**: Overrode the `visible` scope in the `Product` model to seamlessly integrate with `HasPrivacy` while enforcing new suspension visibility rules.
+
 # v4.1.3
 > **Patch Release** - Embed delivery, routing, and Smart Ads reliability fixes.
 

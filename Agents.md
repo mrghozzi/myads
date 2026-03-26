@@ -366,6 +366,12 @@ pages/         → Static pages (privacy, terms, custom)
 - **Review System:** Side-by-side AJAX preview for historical/pending versions using a `340px 1fr` grid (`.kb-review-layout`).
  - **Security:** Strict HTML sanitization on the client side to prevent XSS.
 
+### Product Suspension System
+- **Mechanism:** Uses `Option` records with `o_type = 'store_status'` and `name = 'suspended'`.
+- **Visibility:** `Product::visible()` scope is overridden to integrate suspension logic—hidden from the public, but visible to owners and admins.
+- **Enforcement:** `StoreController` blocks unauthorized viewing and downloading of suspended products.
+- **UI:** Includes a high-visibility suspension notice on the product page and status badges in the store listing.
+
 ---
 
 ## 14. Environment Configuration

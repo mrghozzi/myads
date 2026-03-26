@@ -126,6 +126,12 @@ class StoreController extends Controller
         $files = ProductFile::where('o_parent', $product->id)->orderBy('id', 'desc')->get();
         $canManageProduct = Auth::check() && (Auth::id() == $product->o_parent || Auth::user()->isAdmin());
 
+        // [v4.2.0] Check if suspended
+        $isSuspended = $product->is_suspended;
+        if ($isSuspended && !$canManageProduct) {
+            abort(403, __('messages.product_suspended_notice'));
+        }
+
         $this->seo([
             'scope_key' => 'store_show',
             'content_type' => 'product',
@@ -141,7 +147,7 @@ class StoreController extends Controller
             ],
         ]);
 
-        return view('theme::store.show', compact('product', 'status', 'type', 'topic', 'latestFile', 'downloadHash', 'downloadCount', 'files', 'canManageProduct'));
+        return view('theme::store.show', compact('product', 'status', 'type', 'topic', 'latestFile', 'downloadHash', 'downloadCount', 'files', 'canManageProduct', 'isSuspended'));
     }
 
     public function create()
@@ -236,6 +242,12 @@ class StoreController extends Controller
         $product = Product::findOrFail($id);
         $user = Auth::user();
 
+        // [v4.2.0] Block download if suspended
+        $canManage = $user->id == $product->o_parent || $user->isAdmin();
+        if ($product->is_suspended && !$canManage) {
+            return redirect()->back()->with('error', __('messages.product_suspended_notice'));
+        }
+
         if ($user->id == $product->o_parent) {
             return $this->processDownload($product);
         }
@@ -286,6 +298,12 @@ class StoreController extends Controller
         $fileOption = ProductFile::where('id', $short->tp_id)->firstOrFail();
         $product = Product::withoutGlobalScope('store')->where('o_type', 'store')->where('id', $fileOption->o_parent)->firstOrFail();
         $user = Auth::user();
+
+        // [v4.2.0] Block download if suspended
+        $canManage = $user->id == $product->o_parent || $user->isAdmin();
+        if ($product->is_suspended && !$canManage) {
+            return redirect()->route('store.show', $product->name)->with('error', __('messages.product_suspended_notice'));
+        }
 
         if ($user->id != $product->o_parent) {
             $price = $product->o_order;
@@ -378,6 +396,15 @@ class StoreController extends Controller
         if ($request->filled('pts')) {
             $product->update(['o_order' => (int) $request->pts]);
         }
+
+        // [v4.2.0] Trigger community status update
+        \App\Models\Status::create([
+            'uid'    => Auth::id(),
+            'date'   => time(),
+            's_type' => 7867,
+            'tp_id'  => $product->id,
+            'txt'    => 'update',
+        ]);
 
         return redirect()->route('store.show', $product->name)->with('success', __('updated_successfully'));
     }
