@@ -77,6 +77,14 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
+        // Force the application to use our themed error views
+        $exceptions->render(function (\Symfony\Component\HttpKernel\Exception\HttpExceptionInterface $e) {
+            $code = $e->getStatusCode();
+            if (view()->exists("theme::errors.{$code}")) {
+                return response()->view("theme::errors.{$code}", [], $code);
+            }
+        });
+
         // Redirect to installer if APP_KEY is missing (fresh install)
         $exceptions->renderable(function (\Illuminate\Encryption\MissingAppKeyException $e) {
             // Auto-generate APP_KEY and redirect to installer
