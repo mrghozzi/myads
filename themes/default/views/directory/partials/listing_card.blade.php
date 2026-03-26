@@ -51,8 +51,11 @@
             </div>
 
             <div class="directory-listing-layout">
+                @once
+                    @include('theme::partials.directory.lazy_image_script')
+                @endonce
                 <a class="directory-listing-media" href="{{ $card['visit_url'] }}" target="_blank" rel="noopener">
-                    <img src="{{ theme_asset('img/dir_image.png') }}" alt="{{ $card['title'] }}">
+                    <img src="{{ $card['listing']->prominent_image ?: theme_asset('img/dir_image.png') }}" data-lazy-fetch-url="{{ route('directory.image.fetch', $card['listing']->id) }}" alt="{{ $card['title'] }}">
                 </a>
 
                 <div class="directory-listing-content">

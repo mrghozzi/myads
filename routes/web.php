@@ -141,6 +141,7 @@ Route::get('/directory/category/{id}', [DirectoryController::class, 'category'])
 Route::get('/cat/{id}', [DirectoryController::class, 'category'])->name('directory.category.legacy');
 Route::get('/add-site.html', [DirectoryController::class, 'create'])->name('directory.create');
 Route::post('/directory/fetch-metadata', [DirectoryController::class, 'fetchMetadata'])->name('directory.fetch_metadata')->middleware('auth');
+Route::get('/directory/image/{id}', [DirectoryController::class, 'fetchImage'])->name('directory.image.fetch');
 
 // News Routes
 Route::get('/news', [NewsController::class, 'index'])->name('news.index');

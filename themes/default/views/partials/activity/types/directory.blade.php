@@ -33,9 +33,37 @@
             </div>
             
             <div class="widget-box-status-text">
-                <p class="widget-box-status-text-title">{{ $site->name }}</p>
-                <p class="widget-box-status-text">{{ $site->txt ?? '' }}</p>
-                <a href="{{ $site->url }}" target="_blank" class="button primary small">{{ __('messages.visit_site') }}</a>
+                @php
+                    $siteExcerpt = \Illuminate\Support\Str::limit($site->txt ?? '', 180);
+                    $siteBanner = $site->prominent_image ?: theme_asset('img/dir_image.png');
+                @endphp
+                @once
+                    @include('theme::partials.directory.lazy_image_script')
+                @endonce
+                <a class="activity-super" href="{{ $site->url }}" target="_blank">
+                    <div class="activity-super-banner" style="background-image: url({{ $siteBanner }});" data-lazy-fetch-url="{{ route('directory.image.fetch', $site->id) }}">
+                        <span class="activity-super-category">
+                            <i class="fa {{ $site->category->icon ?? 'fa-globe' }}" aria-hidden="true"></i>
+                            {{ $site->category->name ?? '' }}
+                        </span>
+                    </div>
+                    <div class="activity-super-content">
+                        <h3 class="activity-super-title">{{ $site->name }}</h3>
+                        <p class="activity-super-excerpt">{{ $siteExcerpt }}</p>
+                        <div class="activity-super-footer">
+                            <div class="activity-super-stats">
+                                <div class="activity-super-stat">
+                                    <i class="fa fa-eye"></i>
+                                    {{ $site->vu }}
+                                </div>
+                            </div>
+                            <span class="activity-super-more">
+                                {{ __('messages.visit_site') }}
+                                <i class="fa fa-external-link"></i>
+                            </span>
+                        </div>
+                    </div>
+                </a>
             </div>
         </div>
     </div>

@@ -5,9 +5,12 @@
 
     <div class="widget-box-content">
         <div class="directory-detail-hero">
+            @once
+                @include('theme::partials.directory.lazy_image_script')
+            @endonce
             <div class="directory-detail-brand">
                 <div class="directory-detail-media">
-                    <img src="{{ theme_asset('img/dir_image.png') }}" alt="{{ $card['title'] }}">
+                    <img src="{{ $card['listing']->prominent_image ?: theme_asset('img/dir_image.png') }}" data-lazy-fetch-url="{{ route('directory.image.fetch', $card['listing']->id) }}" alt="{{ $card['title'] }}">
                 </div>
 
                 <div class="directory-detail-copy">

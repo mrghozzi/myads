@@ -563,6 +563,30 @@ class DirectoryController extends Controller
         }
     }
 
+    public function fetchImage($id)
+    {
+        $listing = Directory::findOrFail($id);
+        
+        $preview = app(\App\Services\LinkPreviewService::class)->fetch($listing->url);
+        $newUrl = null;
+        
+        if (isset($preview['status_code']) && $preview['status_code'] >= 400) {
+            $newUrl = theme_asset('img/dir_link.png');
+        } else {
+            $newUrl = $preview['image_url'] ?? null;
+        }
+
+        if ($newUrl !== $listing->prominent_image_url) {
+            $listing->update(['prominent_image_url' => $newUrl]);
+            // Also update cache to stay in sync if accessor used it
+            cache()->put('directory_image_' . $listing->id, $newUrl, 86400);
+        }
+
+        return response()->json([
+            'image_url' => $newUrl
+        ]);
+    }
+
     private function canManageListing(?Directory $listing): bool
     {
         if (!$listing || !Auth::check()) {

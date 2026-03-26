@@ -20,12 +20,15 @@ class LinkPreviewService
             'image_url' => null,
             'site_name' => $domain,
             'domain' => $domain,
+            'status_code' => 0,
         ];
 
         try {
             $response = Http::timeout(10)
                 ->withHeaders(['User-Agent' => 'MyAds-LinkPreview/4.2'])
                 ->get($normalized);
+
+            $fallback['status_code'] = $response->status();
 
             if (!$response->successful()) {
                 return $fallback;

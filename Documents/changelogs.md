@@ -137,6 +137,14 @@
 * **i18n**: Added comprehensive translation keys for product suspension and update labels across all 9 supported languages.
 * **Architecture**: Overrode the `visible` scope in the `Product` model to seamlessly integrate with `HasPrivacy` while enforcing new suspension visibility rules.
 
+### 🖼️ Community Feed & Directory Modernization
+* **Add**: Introduced a premium **"Superdesign"** card layout for directory and forum activities, featuring high-fidelity visuals, shadow depth, and localized RTL support.
+* **Add**: Implemented a **Persistent Image System** that stores website banners in the database, providing returning users with an instant visual experience without waiting for background fetches.
+* **Add**: Introduced **Asynchronous Lazy Loading** for directory images using the **Intersection Observer API** and a dedicated AJAX endpoint, significantly reducing initial page load times and bandwidth.
+* **Improvement**: Implemented a **"Stale-While-Revalidate"** logic for directory images; the system displays the stored image immediately while revalidating and updating it in the background if a change is detected.
+* **Add**: Enhanced **Broken Link Detection** with automatic 404 status persistence, displaying a specialized alert icon and preventing redundant external fetches for dead links.
+* **Standardization**: Unified directory image fallbacks and placeholders across the Community Feed, Website Directory, and Member Profiles.
+
 # v4.1.3
 > **Patch Release** - Embed delivery, routing, and Smart Ads reliability fixes.
 

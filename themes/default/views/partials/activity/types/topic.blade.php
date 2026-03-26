@@ -78,28 +78,28 @@
                         $topicExcerpt = \Illuminate\Support\Str::limit($topicExcerpt, 180);
                         $topicBanner = $activity->related_content->image_url ? asset($activity->related_content->image_url) : theme_asset('img/background_topic.jpg');
                     @endphp
-                    <a class="forum-activity-super" href="{{ route('forum.topic', $activity->tp_id) }}">
-                        <div class="forum-activity-super-banner" style="background-image: url({{ $topicBanner }});">
-                            <span class="forum-activity-super-category">
+                    <a class="activity-super" href="{{ route('forum.topic', $activity->tp_id) }}">
+                        <div class="activity-super-banner" style="background-image: url({{ $topicBanner }});">
+                            <span class="activity-super-category">
                                 <i class="fa {{ $activity->related_content->category->icon ?? 'fa-folder' }}" aria-hidden="true"></i>
                                 {{ $activity->related_content->category->name ?? '' }}
                             </span>
                         </div>
-                        <div class="forum-activity-super-content">
-                            <h3 class="forum-activity-super-title">{{ $activity->related_content->name }}</h3>
-                            <p class="forum-activity-super-excerpt">{{ $topicExcerpt }}</p>
-                            <div class="forum-activity-super-footer">
-                                <div class="forum-activity-super-stats">
-                                    <div class="forum-activity-super-stat">
+                        <div class="activity-super-content">
+                            <h3 class="activity-super-title">{{ $activity->related_content->name }}</h3>
+                            <p class="activity-super-excerpt">{{ $topicExcerpt }}</p>
+                            <div class="activity-super-footer">
+                                <div class="activity-super-stats">
+                                    <div class="activity-super-stat">
                                         <i class="fa fa-eye"></i>
                                         {{ $activity->related_content->vu }}
                                     </div>
-                                    <div class="forum-activity-super-stat">
+                                    <div class="activity-super-stat">
                                         <i class="fa fa-comment"></i>
                                         {{ $activity->comments_count }}
                                     </div>
                                 </div>
-                                <span class="forum-activity-super-more">
+                                <span class="activity-super-more">
                                     {{ __('messages.read_more') }}
                                     <i class="fa fa-arrow-right"></i>
                                 </span>

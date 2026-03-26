@@ -133,13 +133,35 @@
             </p>
             <div id="notif{{ $activity->related_content->id }}"></div>
 
-            <a class="video-status small" href="{{ $shortUrl }}" style="background-color: #efeff9;" target="_blank">
-                <figure class="video-status-image liquid">
-                    <img class="video-status-image" src="{{ theme_asset('img/dir_image.png') }}">
-                </figure>
-                <div class="video-status-info" style="background-color: #efeff9;">
-                    <p class="video-status-title"><span class="bold">{{ $activity->related_content->name }}</span></p>
-                    <p class="video-status-text">{{ $domain }}</p>
+            @php
+                $siteExcerpt = \Illuminate\Support\Str::limit($activity->related_content->txt ?? '', 180);
+                $siteBanner = $activity->related_content->prominent_image ?: theme_asset('img/dir_image.png');
+            @endphp
+            @once
+                @include('theme::partials.directory.lazy_image_script')
+            @endonce
+            <a class="activity-super" href="{{ $shortUrl }}" target="_blank">
+                <div class="activity-super-banner" style="background-image: url({{ $siteBanner }});" data-lazy-fetch-url="{{ route('directory.image.fetch', $activity->related_content->id) }}">
+                    <span class="activity-super-category">
+                        <i class="fa {{ $activity->related_content->category->icon ?? 'fa-globe' }}" aria-hidden="true"></i>
+                        {{ $activity->related_content->category->name ?? '' }}
+                    </span>
+                </div>
+                <div class="activity-super-content">
+                    <h3 class="activity-super-title">{{ $activity->related_content->name }}</h3>
+                    <p class="activity-super-excerpt">{{ $siteExcerpt }}</p>
+                    <div class="activity-super-footer">
+                        <div class="activity-super-stats">
+                            <div class="activity-super-stat">
+                                <i class="fa fa-eye"></i>
+                                {{ $activity->related_content->vu }}
+                            </div>
+                        </div>
+                        <span class="activity-super-more">
+                            {{ __('messages.visit_site') }}
+                            <i class="fa fa-external-link"></i>
+                        </span>
+                    </div>
                 </div>
             </a>
 
