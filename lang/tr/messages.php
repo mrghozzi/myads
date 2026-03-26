@@ -260,6 +260,7 @@ return array (
   'manage_ads' => 'Reklamları Yönet',
   'Comusetting' => 'Topluluk Ayarları',
   'knowledgebase' => 'Bilgi Tabanı',
+  'edit_with_stackedit' => 'StackEdit ile Düzenle',
   'forum_cats' => 'Forum Kategorileri',
   'dir_cats' => 'Rehber Kategorileri',
   'news_site' => 'Site Haberleri',

@@ -558,7 +558,12 @@ class StoreController extends Controller
             ->where('o_mode', $product->name)
             ->where('name', $article)
             ->where('o_order', 0)
-            ->firstOrFail();
+            ->first();
+
+        if (!$kbArticle) {
+            return redirect()->route('kb.index', ['name' => $product->name, 'st' => $article]);
+        }
+
         $pendingCount = Option::where('o_type', 'knowledgebase')
             ->where('o_mode', $product->name)
             ->where('name', $article)
@@ -597,7 +602,12 @@ class StoreController extends Controller
             ->where('o_mode', $product->name)
             ->where('name', $article)
             ->where('o_order', 0)
-            ->firstOrFail();
+            ->first();
+
+        if (!$kbArticle) {
+            return redirect()->route('kb.index', ['name' => $product->name, 'st' => $article]);
+        }
+
         $shellData = $this->buildKnowledgebaseShellData($product, $kbArticle);
 
         return view('theme::store.knowledgebase', [

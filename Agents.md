@@ -23,7 +23,7 @@ MYADS is a community platform where website owners:
 1. **Exchange advertising** — banner ads, text/link ads, visit exchange (surf-to-earn), and Smart Ads (contextual/native).
 2. **Socialize** — profiles, follow system, community feed (posts, galleries, link previews, quote reposts, @mentions), private messaging, reactions, comments.
 3. **Forum** — categories with visibility controls, topics, moderation (pin/lock), attachments, moderator roles.
-4. **Marketplace (Store)** — upload/download scripts, plugins, templates (PTS-based pricing). Knowledgebase per product.
+4. **Marketplace (Store)** — upload/download scripts, plugins, templates (PTS-based pricing). Wiki-style Knowledgebase per product with Markdown support.
 5. **Web Directory** — submit/browse categorized website listings.
 6. **Order Requests** — hire service providers with bids, ratings, "Best Offer" selection.
 7. **News** — admin-published articles posted to community feed.
@@ -40,7 +40,7 @@ MYADS is a community platform where website owners:
 | ORM | Eloquent (40+ models) |
 | Auth | Laravel Auth + Sanctum (API), Social OAuth via Socialite (Google, Facebook) |
 | Templates | Blade (theme-namespaced as `theme::`) |
-| CSS/JS | Bootstrap 5, FontAwesome 6, SCEditor (forum WYSIWYG), custom vanilla JS |
+| CSS/JS | Bootstrap 5, FontAwesome 6, SCEditor (forum), StackEdit (Wiki MDL), custom vanilla JS |
 | DB | MySQL/MariaDB via PDO |
 | Caching | File-based (configurable) |
 | Sessions | File-based (configurable) |
@@ -184,7 +184,7 @@ myads/
 | `DirectoryCategory` | `directory_cat` | Directory categories |
 | `Product` | `product` | Store products |
 | `ProductFile` | `product_files` | Store file versions |
-| `Knowledgebase` | `knowledgebase` | KB articles per product |
+| `Knowledgebase` | `knowledgebase` | Wiki-style articles per product (Markdown-based) |
 | `Message` | `message` | Private messages |
 | `Notification` | `notification` | User notifications |
 | `News` | `news` | News articles |
@@ -243,7 +243,8 @@ myads/
 | `/dr{id}` | `/dr5` | Directory listing (short) |
 | `/quests` | `/quests` | Premium Quests Hub |
 | `/cat/{id}` | `/cat/12` | Directory category (legacy alias) |
-| `/kb/{name}:{article}` | `/kb/MyScript:setup` | Knowledgebase article |
+| `/kb/{name}:{article}` | `/kb/MyScript:setup` | Wiki article (redirects to create if missing) |
+| `/kb/{name}?st={article}` | `/kb/MyScript?st=setup` | Wiki-style create/find article |
 | `/e{id}`, `/p{id}` | `/e1` | Legacy profile redirects |
 
 ### Middleware Groups
@@ -356,6 +357,14 @@ pages/         → Static pages (privacy, terms, custom)
 - Modern embed scripts: `/embed/banner.js`, `/embed/link.js`, `/embed/smart.js`
 - Slot-based injection (not `document.write`)
 - Repeat-window avoidance for banners
+
+### Wiki/Markdown System (v4.2.0)
+- **Engine:** Client-side rendering using `marked.js` and `DOMPurify`.
+- **Editor:** Integrated **StackEdit** for premium Markdown editing experience.
+- **Missing Pages:** Wiki-style redirection for non-existent pages (auto-prompts creation).
+- **Storage:** Raw Markdown stored in `options.o_valuer`.
+- **Review System:** Side-by-side AJAX preview for historical/pending versions using a `340px 1fr` grid (`.kb-review-layout`).
+ - **Security:** Strict HTML sanitization on the client side to prevent XSS.
 
 ---
 

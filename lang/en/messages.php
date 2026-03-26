@@ -264,6 +264,7 @@ return [
     'manage_ads' => 'Manage Ads',
     'Comusetting' => 'Community Settings',
     'knowledgebase' => 'Knowledge Base',
+    'edit_with_stackedit' => 'Edit with StackEdit',
     'forum_cats' => 'Forum Categories',
     'dir_cats' => 'Directory Categories',
     'emojis' => 'Emojis',

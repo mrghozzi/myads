@@ -260,6 +260,7 @@ return array (
   'manage_ads' => 'مدیریت تبلیغات',
   'Comusetting' => 'تنظیمات جامعه',
   'knowledgebase' => 'پایگاه دانش',
+  'edit_with_stackedit' => 'ویرایش با StackEdit',
   'forum_cats' => 'دسته‌بندی‌های انجمن',
   'dir_cats' => 'دسته‌بندی‌های دایرکتوری',
   'news_site' => 'اخبار سایت',

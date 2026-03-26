@@ -60,6 +60,15 @@
 * **UI/UX**: Replaced inconsistent native browser confirmation dialogs with premium theme-integrated confirmation boxes that replace content in-place for a seamless experience.
 * **Architecture**: Centralized deletion logic in `master.blade.php` with support for type-specific API routing and dynamic container targeting.
 
+### 📚 Wiki & Markdown Knowledgebase
+* **Feature**: Transformed the legacy Knowledgebase into a collaborative **Wiki-style system** with a dedicated creation flow for missing articles.
+* **Add**: Integrated **StackEdit** for a premium, Markdown-first editing experience with real-time preview and full-screen support.
+* **Add**: Implemented a high-performance **AJAX Preview System** that allows side-by-side review of historical and pending article versions.
+* **Improvement**: Optimized the Wiki layout for **RTL (Right-to-Left)** languages, ensuring the preview area and sidebar are correctly aligned.
+* **Architecture**: Integrated `marked.js` and `DOMPurify` for secure client-side Markdown rendering and XSS prevention.
+* **Fix**: Resolved UI issues where the site header overlapped with the StackEdit editor using dynamic JavaScript-based positioning.
+* **i18n**: Added new translation keys for the StackEdit editor across all 9 supported languages.
+
 ### Mentions, Notifications & Formatting
 * **Add**: Added server-side `@mentions` extraction and storage through `status_mentions` for both posts and comments, including member notifications without self-notify behavior.
 * **Add**: Added `GET /mentions/users?q=` lookup support for composer/autocomplete integrations and filtered it through member privacy rules.

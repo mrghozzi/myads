@@ -276,6 +276,7 @@ return array (
   'manage_ads' => 'Anzeigen verwalten',
   'Comusetting' => 'Community-Einstellungen',
   'knowledgebase' => 'Wissensdatenbank',
+  'edit_with_stackedit' => 'Mit StackEdit bearbeiten',
   'forum_cats' => 'Forum-Kategorien',
   'dir_cats' => 'Verzeichnis-Kategorien',
   'news_site' => 'Site-News',

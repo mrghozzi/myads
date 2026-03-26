@@ -192,7 +192,12 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">{{ __('messages.content') }}</label>
-                        <textarea name="o_valuer" rows="10" class="form-control" required></textarea>
+                        <div class="stackedit-tools mb-2">
+                            <button type="button" class="btn btn-sm btn-outline-primary open-stackedit" data-target="#admin-kb-add-content">
+                                <i class="feather-edit me-1"></i> {{ __('messages.edit_with_stackedit') ?? 'Edit with StackEdit' }}
+                            </button>
+                        </div>
+                        <textarea name="o_valuer" id="admin-kb-add-content" rows="10" class="form-control" required></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -228,9 +233,7 @@
             </div>
             <div class="modal-body">
                 <span class="badge bg-soft-primary mb-3">{{ $article->o_mode }}</span>
-                <div class="article-content">
-                    {!! nl2br(e($article->o_valuer)) !!}
-                </div>
+                <div class="article-content markdown-content" id="admin-kb-view-{{ $article->id }}">{!! $article->o_valuer !!}</div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('messages.close') }}</button>
@@ -261,7 +264,12 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">{{ __('messages.content') }}</label>
-                        <textarea name="o_valuer" rows="10" class="form-control" required>{{ $article->o_valuer }}</textarea>
+                        <div class="stackedit-tools mb-2">
+                            <button type="button" class="btn btn-sm btn-outline-primary open-stackedit" data-target="#admin-kb-edit-content-{{ $article->id }}">
+                                <i class="feather-edit me-1"></i> {{ __('messages.edit_with_stackedit') ?? 'Edit with StackEdit' }}
+                            </button>
+                        </div>
+                        <textarea name="o_valuer" id="admin-kb-edit-content-{{ $article->id }}" rows="10" class="form-control" required>{{ $article->o_valuer }}</textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -300,4 +308,81 @@
     </div>
 </div>
 @endforeach
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify/dist/purify.min.js"></script>
+<script src="https://unpkg.com/stackedit-js@1.0.7/docs/lib/stackedit.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Markdown Rendering
+        function renderMarkdown() {
+            document.querySelectorAll('.markdown-content').forEach(el => {
+                if (!el.getAttribute('data-rendered')) {
+                    el.innerHTML = DOMPurify.sanitize(marked.parse(el.innerText || el.innerHTML));
+                    el.setAttribute('data-rendered', 'true');
+                    el.style.display = 'block';
+                }
+            });
+        }
+        renderMarkdown();
+
+        // Re-render when modal is shown (for View modal)
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('shown.bs.modal', function () {
+                renderMarkdown();
+            });
+        });
+
+        // StackEdit Integration
+        const stackedit = new Stackedit();
+        document.querySelectorAll('.open-stackedit').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const targetId = this.getAttribute('data-target');
+                const textarea = document.querySelector(targetId);
+                const modal = this.closest('.modal-content');
+                const nameInput = modal.querySelector('input[name="name"]');
+                const articleName = nameInput ? nameInput.value : 'Article Content';
+                
+                stackedit.openFile({
+                    name: articleName,
+                    content: {
+                        text: textarea.value
+                    }
+                });
+
+                // Fix for header overlap - position editor below the fixed header
+                const adjustIframe = () => {
+                    const iframe = document.querySelector('iframe[src*="stackedit.io"]');
+                    if (iframe) {
+                        const header = document.querySelector('.header, .nxl-header');
+                        if (header) {
+                            const headerHeight = header.offsetHeight;
+                            iframe.style.top = headerHeight + 'px';
+                            iframe.style.height = `calc(100% - ${headerHeight}px)`;
+                        }
+                    } else {
+                        // Keep checking until iframe is injected
+                        setTimeout(adjustIframe, 50);
+                    }
+                };
+                adjustIframe();
+
+                // Set up listener for this specific textarea
+                stackedit.off('fileChange');
+                stackedit.on('fileChange', (file) => {
+                    textarea.value = file.content.text;
+                });
+            });
+        });
+    });
+</script>
+<style>
+    .markdown-content { display: none; }
+    .markdown-content h1, .markdown-content h2, .markdown-content h3 { margin-top: 1rem; margin-bottom: 0.5rem; }
+    .markdown-content p { margin-bottom: 0.75rem; }
+    .markdown-content pre { background: #f8f9fa; padding: 1rem; border-radius: 5px; overflow-x: auto; margin-bottom: 1rem; }
+    .modal-body .markdown-content { color: #333; line-height: 1.6; }
+</style>
+@endpush
 @endsection

@@ -264,6 +264,7 @@ return [
     'manage_ads' => 'إدارة الإعلانات',
     'Comusetting' => 'إعدادات المجتمع',
     'knowledgebase' => 'قاعدة المعرفة',
+    'edit_with_stackedit' => 'التحرير باستخدام StackEdit',
     'forum_cats' => 'أقسام المنتدى',
     'dir_cats' => 'أقسام الدليل',
     'news_site' => 'أخبار الموقع',

@@ -480,7 +480,7 @@
     }
 
     .kb-review-layout {
-        grid-template-columns: minmax(0, 1.45fr) minmax(320px, 1fr);
+        grid-template-columns: 340px minmax(0, 1fr);
     }
 
     .kb-editor-layout {
