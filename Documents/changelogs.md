@@ -1,6 +1,13 @@
 # v4.2.0
 > **Feature Release** - Community feed overhaul, profile hub privacy, admin ACL, and platform integrations.
 
+### 🗺️ Sitemap & Privacy
+* **Add**: Implemented a comprehensive **Sitemap Privacy Suite** that enforces author privacy and forum visibility rules across the search engine index.
+* **Add**: Integrated `visible()` scope for Topics and Users, ensuring "Private" and "Followers-only" content is excluded from guest crawlers.
+* **Add**: Added a dedicated **Forum Category Section** to the sitemap to improve SEO discoverability for public boards.
+* **Add**: Automated exclusion of restricted forum topics belonging to members-only or moderator-only categories.
+* **Improvement**: Hardened `SitemapController` with schema-safe queries and robust date parsing for legacy timestamps.
+
 ### 👥 Users & Admin Roles
 * **Fix**: Resolved an issue in the Admin Panel (`/admin/users`) where verified users (`ucheck`) were incorrectly displayed as Admins in the Role column and filter.
 * **Add**: Introduced sortable columns in the Admin Users table (Username, Role, Connection Status, Points) with persistent sorting via pagination.

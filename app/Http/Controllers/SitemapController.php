@@ -81,6 +81,13 @@ class SitemapController extends Controller
                     'daily',
                     '0.7'
                 ),
+                'forum_categories' => $this->streamModelEntries(
+                    $this->publishedForumCategoriesQuery()->offset($offset)->limit($this->chunkSize)->get(),
+                    fn (\App\Models\ForumCategory $category) => route('forum.category', $category->id),
+                    fn () => null,
+                    'weekly',
+                    '0.6'
+                ),
                 'topics' => $this->streamModelEntries(
                     $this->publishedTopicsQuery()->offset($offset)->limit($this->chunkSize)->get(),
                     fn (ForumTopic $topic) => route('forum.topic', $topic->id),
@@ -159,6 +166,7 @@ class SitemapController extends Controller
             $sectionCounts = [
                 'pages' => $this->safeCount($this->publishedPagesQuery()),
                 'news' => $this->safeCount($this->publishedNewsQuery()),
+                'forum_categories' => $this->safeCount($this->publishedForumCategoriesQuery()),
                 'topics' => $this->safeCount($this->publishedTopicsQuery()),
                 'directory_categories' => $this->safeCount($this->publishedDirectoryCategoriesQuery()),
                 'directories' => $this->safeCount($this->publishedDirectoriesQuery()),
@@ -309,9 +317,26 @@ class SitemapController extends Controller
         return $this->applyScopeFilters($query, 'news_show', 'news');
     }
 
+    private function publishedForumCategoriesQuery(): Builder
+    {
+        $query = \App\Models\ForumCategory::query()->where('visibility', 0);
+
+        return $this->applyScopeFilters($query, 'forum_index', 'forum_category');
+    }
+
     private function publishedTopicsQuery(): Builder
     {
-        $query = ForumTopic::query()->where('statu', 1);
+        $query = ForumTopic::query()
+            ->where('statu', 1)
+            ->visible(); // Respect author privacy
+
+        // Filter by category visibility
+        $query->where(function ($q) {
+            $q->where('cat', 0) // Home/Uncategorized topics (implicitly public)
+              ->orWhereHas('category', function ($sub) {
+                  $sub->where('visibility', 0); // Public forum sections
+              });
+        });
 
         return $this->applyScopeFilters($query, 'forum_topic', 'forum_topic');
     }
@@ -356,7 +381,12 @@ class SitemapController extends Controller
 
     private function publishedUsersQuery(): Builder
     {
-        $query = User::query();
+        $query = User::query()
+            ->whereIn('id', function ($sub) {
+                $sub->select('user_id')
+                    ->from('user_privacy_settings')
+                    ->where('profile_visibility', 'public');
+            });
 
         return $this->applyScopeFilters($query, 'profile_show', 'user');
     }
@@ -430,7 +460,11 @@ class SitemapController extends Controller
         }
 
         if (is_string($value) && trim($value) !== '') {
-            return Carbon::parse($value)->toAtomString();
+            try {
+                return Carbon::parse($value)->toAtomString();
+            } catch (\Throwable $e) {
+                return null;
+            }
         }
 
         return null;
