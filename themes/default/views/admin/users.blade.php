@@ -109,10 +109,38 @@
                                             <label class="custom-control-label" for="checkAllUsers"></label>
                                         </div>
                                     </th>
-                                    <th>{{ __('messages.User') }}</th>
-                                    <th>{{ __('messages.Role') }}</th>
-                                    <th>{{ __('messages.status') }}</th>
-                                    <th>{{ __('messages.Points') }}</th>
+                                    <th>
+                                        <a href="{{ request()->fullUrlWithQuery(['sort' => 'username', 'direction' => request('sort') === 'username' && request('direction') === 'asc' ? 'desc' : 'asc']) }}" class="text-dark">
+                                            {{ __('messages.User') }}
+                                            @if(request('sort') === 'username')
+                                                <i class="bi bi-arrow-{{ request('direction') === 'asc' ? 'up' : 'down' }} ms-1"></i>
+                                            @endif
+                                        </a>
+                                    </th>
+                                    <th>
+                                        <a href="{{ request()->fullUrlWithQuery(['sort' => 'role', 'direction' => request('sort') === 'role' && request('direction') === 'asc' ? 'desc' : 'asc']) }}" class="text-dark">
+                                            {{ __('messages.Role') }}
+                                            @if(request('sort') === 'role')
+                                                <i class="bi bi-arrow-{{ request('direction') === 'asc' ? 'up' : 'down' }} ms-1"></i>
+                                            @endif
+                                        </a>
+                                    </th>
+                                    <th>
+                                        <a href="{{ request()->fullUrlWithQuery(['sort' => 'online', 'direction' => request('sort') === 'online' && request('direction') === 'asc' ? 'desc' : 'asc']) }}" class="text-dark">
+                                            {{ __('messages.status') }}
+                                            @if(request('sort') === 'online')
+                                                <i class="bi bi-arrow-{{ request('direction') === 'asc' ? 'up' : 'down' }} ms-1"></i>
+                                            @endif
+                                        </a>
+                                    </th>
+                                    <th>
+                                        <a href="{{ request()->fullUrlWithQuery(['sort' => 'pts', 'direction' => request('sort') === 'pts' && request('direction') === 'asc' ? 'desc' : 'asc']) }}" class="text-dark">
+                                            {{ __('messages.Points') }}
+                                            @if(request('sort') === 'pts')
+                                                <i class="bi bi-arrow-{{ request('direction') === 'asc' ? 'up' : 'down' }} ms-1"></i>
+                                            @endif
+                                        </a>
+                                    </th>
                                     <th class="text-end">{{ __('messages.actions') }}</th>
                                 </tr>
                             </thead>
@@ -131,13 +159,18 @@
                                                 <img src="{{ $user->img ? asset($user->img) : asset('themes/default/assets/images/avatar/1.png') }}" alt="" class="img-fluid">
                                             </div>
                                             <div>
-                                                <span class="text-truncate-1-line fw-bold text-dark">{{ $user->username }}</span>
+                                                <span class="text-truncate-1-line fw-bold text-dark">
+                                                    {{ $user->username }}
+                                                    @if($user->ucheck == 1)
+                                                        <i class="bi bi-patch-check-fill text-primary" title="{{ __('messages.verified') ?? 'Verified' }}"></i>
+                                                    @endif
+                                                </span>
                                                 <small class="fs-12 fw-normal text-muted">{{ $user->email }}</small>
                                             </div>
                                         </a>
                                     </td>
                                     <td>
-                                        @if($user->ucheck == 1)
+                                        @if($user->isAdmin())
                                             <span class="badge bg-soft-primary text-primary">{{ __('messages.Admin') }}</span>
                                         @else
                                             <span class="badge bg-soft-secondary text-secondary">{{ __('messages.Member') }}</span>

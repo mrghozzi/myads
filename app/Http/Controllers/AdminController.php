@@ -342,7 +342,30 @@ class AdminController extends Controller
 
     public function users(Request $request)
     {
-        $query = User::orderBy('id', 'desc');
+        $query = User::select('users.*');
+
+        // Handle Sorting
+        $sort = $request->input('sort', 'id');
+        $direction = $request->input('direction', 'desc');
+        
+        $allowedSorts = ['id', 'username', 'online', 'pts', 'role'];
+        if (!in_array($sort, $allowedSorts)) {
+            $sort = 'id';
+        }
+        $direction = strtolower($direction) === 'asc' ? 'asc' : 'desc';
+
+        if ($sort === 'role') {
+            if (app(\App\Services\V420SchemaService::class)->supports('site_admins')) {
+                // Sort by role (super admin first, then site admins, then members)
+                $query->orderByRaw('users.id = 1 DESC')
+                      ->leftJoin('site_admins', 'users.id', '=', 'site_admins.user_id')
+                      ->orderByRaw('site_admins.id IS NOT NULL DESC');
+            } else {
+                $query->orderByRaw('users.id = 1 DESC');
+            }
+        } else {
+            $query->orderBy('users.' . $sort, $direction);
+        }
 
         if ($request->has('search')) {
             $search = $request->search;
@@ -352,12 +375,20 @@ class AdminController extends Controller
             });
         }
 
-        if ($request->has('role')) {
+        if ($request->has('role') && $request->role != '') {
             // Filter by Role (Admin or Member)
             if ($request->role == 'admin') {
-                $query->where('ucheck', 1);
+                $query->where(function($q) {
+                    $q->where('id', 1);
+                    if (app(\App\Services\V420SchemaService::class)->supports('site_admins')) {
+                        $q->orWhereHas('siteAdminEntry');
+                    }
+                });
             } elseif ($request->role == 'member') {
-                $query->where('ucheck', '!=', 1);
+                $query->where('id', '!=', 1);
+                if (app(\App\Services\V420SchemaService::class)->supports('site_admins')) {
+                    $query->whereDoesntHave('siteAdminEntry');
+                }
             }
         }
 
@@ -379,7 +410,7 @@ class AdminController extends Controller
             }
         }
 
-        $users = $query->paginate(20);
+        $users = $query->paginate(20)->appends($request->except('page'));
         return view('theme::admin.users', compact('users'));
     }
 

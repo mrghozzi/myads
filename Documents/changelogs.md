@@ -1,6 +1,11 @@
 # v4.2.0
 > **Feature Release** - Community feed overhaul, profile hub privacy, admin ACL, and platform integrations.
 
+### 👥 Users & Admin Roles
+* **Fix**: Resolved an issue in the Admin Panel (`/admin/users`) where verified users (`ucheck`) were incorrectly displayed as Admins in the Role column and filter.
+* **Add**: Introduced sortable columns in the Admin Users table (Username, Role, Connection Status, Points) with persistent sorting via pagination.
+* **Add**: Added a visual verification badge (<i class="bi bi-patch-check-fill"></i>) next to verified usernames in the Admin Users list.
+
 ### 🔌 Plugins & Themes System
 * **Add**: Advanced Plugin & Theme management system with a secure thumbnail delivery route.
 * **Add**: Real-time update checking via GitHub API, featuring version badges and "Update Now" links.
