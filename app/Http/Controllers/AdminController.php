@@ -247,7 +247,7 @@ class AdminController extends Controller
             ->toArray();
 
         // Ensure common types exist even if 0
-        $commonReactions = ['like', 'love', 'funny', 'wow', 'sad', 'angry', 'dislike'];
+        $commonReactions = ['like', 'love', 'funny', 'wow', 'sad', 'angry', 'dislike', 'happy'];
         foreach ($commonReactions as $cr) {
             if (!isset($reactionsSummary[$cr])) {
                 $reactionsSummary[$cr] = 0;

@@ -171,9 +171,9 @@
                         'angry' => 'angry.png',
                         'happy' => 'happy.png'
                     ];
-                    // Reorder to match visual flow: like, love, dislike, funny, wow, sad, angry
+                    // Reorder to match visual flow: like, love, dislike, happy, funny, wow, sad, angry
                     $orderedReactions = [];
-                    foreach(['like', 'love', 'dislike', 'funny', 'wow', 'sad', 'angry'] as $key) {
+                    foreach(['like', 'love', 'dislike', 'happy', 'funny', 'wow', 'sad', 'angry'] as $key) {
                         if(isset($reactionsSummary[$key])) $orderedReactions[$key] = $reactionsSummary[$key];
                     }
                 @endphp
