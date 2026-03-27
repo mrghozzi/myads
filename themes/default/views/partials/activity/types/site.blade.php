@@ -13,7 +13,7 @@
     $repostAuthorName = addslashes($activityUserName);
 @endphp
 
-<div class="widget-box no-padding post{{ $activity->id }}">
+<div class="widget-box no-padding activity-post-card post{{ $activity->id }}">
     <div class="widget-box-settings">
         <div class="post-settings-wrap" style="position: relative;">
             <div class="post-settings widget-box-post-settings-dropdown-trigger">

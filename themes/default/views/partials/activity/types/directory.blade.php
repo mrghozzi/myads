@@ -7,7 +7,7 @@
     $statusUserPresence = $statusUser?->isOnline() ? 'online' : 'offline';
     $site = $activity->related_content;
 @endphp
-<div class="widget-box no-padding post{{ $status->id }}">
+<div class="widget-box no-padding activity-post-card post{{ $status->id }}">
     <div class="widget-box-status">
         <div class="widget-box-status-content">
             <div class="user-status">

@@ -1,4 +1,4 @@
-<div class="post-preview">
+<div class="post-preview activity-post-card">
     @php
         $newsImg = $activity->related_content->img ? asset($activity->related_content->img) : theme_asset('img/cover_news.jpg');
     @endphp

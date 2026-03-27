@@ -12,7 +12,7 @@
     $repostExcerpt = \Illuminate\Support\Str::limit(strip_tags($product->name ?? ($product->o_valuer ?? '')), 80);
     $repostAuthorName = addslashes($statusUserName);
 @endphp
-<div class="widget-box no-padding post{{ $status->id }}">
+<div class="widget-box no-padding activity-post-card post{{ $status->id }}">
     <div class="widget-box-settings">
         <div class="post-settings-wrap" style="position: relative;">
             <div class="post-settings widget-box-post-settings-dropdown-trigger">

@@ -344,6 +344,27 @@ html[dir="rtl"] .profile-header.v2 .profile-header-info .tag-sticker {
   right: auto;
   left: 28px;
 }
+html[dir="rtl"] .activity-post-card .widget-box-settings {
+  right: auto;
+  left: 19px;
+}
+html[dir="rtl"] .activity-post-card .widget-box-status .tag-sticker {
+  right: auto;
+  left: 68px;
+}
+html[dir="rtl"] .activity-post-card .widget-box-post-settings-dropdown {
+  right: auto !important;
+  left: 9px;
+}
+html[dir="rtl"] .activity-post-card .user-status {
+  padding-left: 0;
+  padding-right: 52px;
+}
+html[dir="rtl"] .activity-post-card .user-status .user-status-avatar,
+html[dir="rtl"] .activity-post-card .user-status .user-status-activity {
+  left: auto;
+  right: 0;
+}
 html[dir="rtl"] .profile-header .profile-header-info .user-short-description .user-short-description-avatar-mobile {
   margin-left: auto;
   margin-right: -60px;
