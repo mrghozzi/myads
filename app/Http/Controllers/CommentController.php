@@ -65,7 +65,7 @@ class CommentController extends Controller
                 $hide_form = true;
             }
             $comments = Option::where('o_parent', $id)
-                ->where('o_type', 'o_order')
+                ->where('o_type', 'order_comment')
                 ->orderBy('id', 'desc')
                 ->limit($limit)
                 ->get();
@@ -182,7 +182,7 @@ class CommentController extends Controller
                 $comment = new \App\Models\Option();
                 $comment->name = 'coment_order'; // Fixed name for order comments
                 $comment->o_valuer = $text; // Comment text
-                $comment->o_type = 'o_order';
+                $comment->o_type = 'order_comment';
                 $comment->o_parent = (int) $id;
                 $comment->o_order = (int) Auth::id();
                 $comment->o_mode = 0; // Default rating
@@ -277,7 +277,7 @@ class CommentController extends Controller
             $comment = Option::where('id', $id)->where('o_type', 's_coment')->first();
             $dbType = 444;
         } elseif ($type == 'order') {
-            $comment = Option::where('id', $id)->where('o_type', 'o_order')->first();
+            $comment = Option::where('id', $id)->where('o_type', 'order_comment')->first();
             $dbType = 66;
         }
 

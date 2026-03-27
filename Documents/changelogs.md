@@ -36,7 +36,13 @@
 * **Improvement**: Rebuilt the **Badge Showcase** on member profiles to support the new dynamic icons and localized badge names.
 * **Architecture**: Hardened `GamificationService` with silent error handling and automatic activity triggers across Store, Directory, Orders, and Forum modules.
 * **i18n**: Fully localized all badge titles, descriptions, and hub interfaces across all 9 supported languages.
-* **Fix**: Resolved an issue where the **Highly Rated** badge was not being awarded due to an incorrect database query in `GamificationService`.
+* **Fix**: Resolved an issue where the **Highly Rated** badge was not- Fix: Corrected misspelled `v_visited` and implemented surfing progress recording in `GamificationService`.
+
+### [Order Requests]
+- Fix: Added error and validation feedback to order creation page for better debugging.
+- Fix: Corrected reaction type in `Status` model to align with `ReactionController` (Type 6).
+- Fix: Separated order social comments (`order_comment`) from bids (`o_order`) in `CommentController` to fix broken counters.
+- Fix: (Systemic) Database encoding transition to `utf8mb4` to support Arabic content.
 * **Fix**: Resolved progress tracking for the **Active Surfer** badge by implementing visit recording and correcting a typo in the criteria query.
 * **UI/UX**: Implemented a modern "Badges Hub" header with dynamic gradients, RTL support, and mobile-responsive layouts.
 

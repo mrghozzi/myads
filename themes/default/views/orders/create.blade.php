@@ -14,6 +14,22 @@
         <div class="widget-box">
             <p class="widget-box-title">{{ __('messages.order_details') }}</p>
             <div class="widget-box-content">
+                @if($errors->any())
+                    <div class="alert alert-danger" style="margin-bottom: 20px; border-radius: 12px; padding: 15px; background: rgba(233, 75, 95, 0.1); border: 1px solid rgba(233, 75, 95, 0.2); color: #e94b5f;">
+                        <ul style="margin: 0; padding-left: 20px;">
+                            @foreach($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
+                @if(session('errMSG'))
+                    <div class="alert alert-danger" style="margin-bottom: 20px; border-radius: 12px; padding: 15px; background: rgba(233, 75, 95, 0.1); border: 1px solid rgba(233, 75, 95, 0.2); color: #e94b5f;">
+                        {{ session('errMSG') }}
+                    </div>
+                @endif
+
                 <form class="form" action="{{ route('orders.store') }}" method="POST">
                     @csrf
                     <div class="row">

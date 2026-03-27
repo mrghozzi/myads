@@ -312,7 +312,7 @@ class Status extends Model
         }
 
         if ($this->s_type == 6) {
-            return 66; // New reaction type for Order Requests
+            return 6; // Fixed: Use type 6 for Order Requests as per ReactionController
         }
 
         return null;
