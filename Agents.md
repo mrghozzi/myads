@@ -324,6 +324,7 @@ pages/         → Static pages (privacy, terms, custom)
 
 - **Login:** Email or username (auto-detected)
 - **Social:** Google and Facebook OAuth via Socialite (optional, config-based)
+- **Registration defaults:** Standard signups start with avatar `upload/avatar.png` and cover `upload/cover.jpg`. Social signups keep the provider avatar but also start with cover `upload/cover.jpg`.
 - **Hashing:** Bcrypt (with legacy MD5 auto-upgrade on login)
 - **Admin:** `user_id=1` is **permanent super-admin** (cannot be removed)
 - **Admin ACL:** `site_admins` table with module-scoped permissions, managed via `/admin/admins`

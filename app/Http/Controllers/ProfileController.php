@@ -537,8 +537,13 @@ class ProfileController extends Controller
     private function resolveCover(User $user): string
     {
         $coverOption = Option::where('o_type', 'user')->where('o_order', $user->id)->first();
-        $cover = $coverOption ? $coverOption->o_mode : 'upload/cover.jpg';
-        return $cover === '0' ? 'upload/cover.jpg' : $cover;
+        $cover = trim((string) ($coverOption?->o_mode ?? ''));
+
+        if ($cover === '' || $cover === '0') {
+            return 'upload/cover.jpg';
+        }
+
+        return $cover;
     }
 
     private function photoItemsForUser(User $user): Collection

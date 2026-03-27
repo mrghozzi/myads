@@ -8,4 +8,4 @@ Disallow: /messages
 Disallow: /notification
 Disallow: /profile/edit
 Disallow: /settings
-Sitemap: http://localhost/myads/sitemap.xml
+Sitemap: http://localhost/sitemap.xml

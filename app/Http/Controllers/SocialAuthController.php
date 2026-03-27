@@ -125,7 +125,7 @@ class SocialAuthController extends Controller
                 'o_type' => 'user',
                 'o_parent' => 0,
                 'o_order' => $user->id,
-                'o_mode' => '0',
+                'o_mode' => 'upload/cover.jpg',
             ]);
 
             // Store Social Link in Options

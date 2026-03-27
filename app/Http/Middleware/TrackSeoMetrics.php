@@ -21,14 +21,22 @@ class TrackSeoMetrics
         /** @var Response $response */
         $response = $next($request);
 
-        $this->seoManager->resolve($request);
+        if ($request->is('install') || $request->is('install/*') || $request->is('up')) {
+            return $response;
+        }
 
-        $this->metrics->record(
-            request: $request,
-            response: $response,
-            context: $this->seoManager->context(),
-            scopeKey: $this->seoManager->context()['scope_key'] ?? null
-        );
+        try {
+            $this->seoManager->resolve($request);
+
+            $this->metrics->record(
+                request: $request,
+                response: $response,
+                context: $this->seoManager->context(),
+                scopeKey: $this->seoManager->context()['scope_key'] ?? null
+            );
+        } catch (\Throwable) {
+            // Silence SEO tracking errors if DB is not ready
+        }
 
         return $response;
     }

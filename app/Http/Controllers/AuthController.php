@@ -69,6 +69,7 @@ class AuthController extends Controller
             'username' => $request->username,
             'email' => $request->email,
             'pass' => Hash::make($request->password),
+            'img' => 'upload/avatar.png',
             'pts' => 10, // Bonus points
             'vu' => 10,
             'nvu' => 10,
@@ -95,7 +96,7 @@ class AuthController extends Controller
             'o_type' => 'user',
             'o_parent' => 0, // Legacy uses $dptdk (0)
             'o_order' => $user->id, // UID
-            'o_mode' => '0',
+            'o_mode' => 'upload/cover.jpg',
         ]);
 
         // Referral Logic
