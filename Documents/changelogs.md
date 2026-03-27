@@ -1,6 +1,17 @@
 # v4.2.0
 > **Feature Release** - Community feed overhaul, profile hub privacy, admin ACL, and platform integrations.
 
+### 📊 Admin Analytics & Charts (Community Stats)
+* **Add**: Introduced a new **Community Stats Charts** section in the Admin Dashboard (`/admin`).
+* **Add**: **30-Day Activity Visualization**: Two new interactive line charts (Chart.js) visualizing trends over the last 30 days.
+    *   **Posts Chart**: Tracks new content by type — **Text Posts**, **Link Posts**, **Gallery Posts**, **Forum Topics**, **Store Products**, **Order Requests**, and **News Articles**.
+    *   **Engagement Chart**: Tracks community interactions — **Forum Comments**, **Store Comments**, **Order Comments**, **Directory Comments**, **Forum Reactions**, **Store Reactions**, and **New Member Follows**.
+* **Add**: **Reaction Counters Widget**: A new horizontal stats bar below the charts showing total counts for all 8 reaction types: `Like`, `Love`, `Dislike`, `Funny`, `Wow`, `Sad`, `Angry`, and `Happy`.
+* **Add**: Support for the **Dislike** reaction type in both timeline charts and total counters.
+* **i18n**: Added comprehensive translation keys for all 15+ new chart labels and categories across Arabic and English.
+* **Architecture**: Implemented a performant backend query logic in `AdminController.index` using `DB::raw` and `FROM_UNIXTIME` for grouped daily stats across disparate tables (`status`, `f_coment`, `options`, `like`).
+* **UI/UX**: Refined chart containers with fixed heights (`350px`) to prevent layout jumping and ensure consistency with the Duralux admin theme.
+
 ### Security Suite
 * **Add**: Introduced a dedicated **Security** admin area at `/admin/security` with a new ACL module, Duralux sidebar entry, main settings page, IP ban management, member session audit log, and admin password confirmation flow.
 * **Add**: Added centralized `SecuritySettings` backed by `options` (`o_type = security_settings`) for link/domain blacklists, cooldowns, registration caps, login throttling, admin reconfirmation, private message encryption, and public member IDs.

@@ -183,7 +183,78 @@ class AdminController extends Controller
             ],
         ];
         
-        return view('theme::admin.index', compact('stats', 'currentVersion', 'latestVersion', 'chartData'));
+        // --- Community Statistics Charts ---
+        $days = 30;
+        $labels = [];
+        for ($i = $days - 1; $i >= 0; $i--) {
+            $labels[] = now()->subDays($i)->format('M d');
+        }
+
+        $startDate = now()->subDays($days)->startOfDay()->timestamp;
+
+        // Posts by type
+        $postTypesRaw = Status::where('date', '>=', $startDate)
+            ->whereIn('s_type', [100, 2, 4, 10, 7867, 6, 5])
+            ->select(DB::raw('FROM_UNIXTIME(date, "%b %d") as day'), 's_type', DB::raw('count(*) as count'))
+            ->groupBy('day', 's_type')
+            ->get();
+
+        $postTypes = ['100' => [], '2' => [], '4' => [], '10' => [], '7867' => [], '6' => [], '5' => []];
+        foreach($postTypesRaw as $row) {
+            $postTypes[$row->s_type][$row->day] = $row->count;
+        }
+
+        // Comments (Forum + Options-based)
+        $forumComments = \App\Models\ForumComment::where('date', '>=', $startDate)->select(DB::raw('FROM_UNIXTIME(date, "%b %d") as day'), DB::raw('count(*) as count'))->groupBy('day')->pluck('count', 'day');
+        $otherComments = Option::whereIn('o_type', ['d_coment', 's_coment', 'order_comment'])->where('o_order', '>=', $startDate)->select(DB::raw('FROM_UNIXTIME(o_order, "%b %d") as day'), DB::raw('count(*) as count'))->groupBy('day')->pluck('count', 'day');
+        
+        // Reactions
+        $reactionsData = \App\Models\Like::where('time_t', '>=', $startDate)->whereIn('type', [2, 3, 22, 6, 1])->select(DB::raw('FROM_UNIXTIME(time_t, "%b %d") as day'), DB::raw('count(*) as count'))->groupBy('day')->pluck('count', 'day');
+
+        $communityChartData = [
+            'labels' => $labels,
+            'posts' => [
+                'text' => array_map(fn($l) => $postTypes['100'][$l] ?? 0, $labels),
+                'link' => array_map(fn($l) => $postTypes['2'][$l] ?? 0, $labels),
+                'gallery' => array_map(fn($l) => $postTypes['4'][$l] ?? 0, $labels),
+                'forum' => array_map(fn($l) => ($postTypes['10'][$l] ?? 0), $labels), // 10 = New Topic
+                'store' => array_map(fn($l) => $postTypes['7867'][$l] ?? 0, $labels),
+                'orders' => array_map(fn($l) => $postTypes['6'][$l] ?? 0, $labels),
+                'news' => array_map(fn($l) => $postTypes['5'][$l] ?? 0, $labels),
+            ],
+            'comments' => [
+                'total' => array_map(fn($l) => ($forumComments[$l] ?? 0) + ($otherComments[$l] ?? 0), $labels),
+                'forum' => array_map(fn($l) => $forumComments[$l] ?? 0, $labels),
+                'store' => array_map(fn($l) => Option::where('o_type', 's_coment')->where('o_order', '>=', $startDate)->where(DB::raw('FROM_UNIXTIME(o_order, "%b %d")'), $l)->count(), $labels),
+                'orders' => array_map(fn($l) => Option::where('o_type', 'order_comment')->where('o_order', '>=', $startDate)->where(DB::raw('FROM_UNIXTIME(o_order, "%b %d")'), $l)->count(), $labels),
+                'directory' => array_map(fn($l) => Option::where('o_type', 'd_coment')->where('o_order', '>=', $startDate)->where(DB::raw('FROM_UNIXTIME(o_order, "%b %d")'), $l)->count(), $labels),
+            ],
+            'reactions' => [
+                'total' => array_map(fn($l) => $reactionsData[$l] ?? 0, $labels),
+                'forum' => array_map(fn($l) => \App\Models\Like::where('type', 2)->where('time_t', '>=', $startDate)->where(DB::raw('FROM_UNIXTIME(time_t, "%b %d")'), $l)->count(), $labels),
+                'store' => array_map(fn($l) => \App\Models\Like::where('type', 3)->where('time_t', '>=', $startDate)->where(DB::raw('FROM_UNIXTIME(time_t, "%b %d")'), $l)->count(), $labels),
+                'directory' => array_map(fn($l) => \App\Models\Like::where('type', 22)->where('time_t', '>=', $startDate)->where(DB::raw('FROM_UNIXTIME(time_t, "%b %d")'), $l)->count(), $labels),
+                'orders' => array_map(fn($l) => \App\Models\Like::where('type', 6)->where('time_t', '>=', $startDate)->where(DB::raw('FROM_UNIXTIME(time_t, "%b %d")'), $l)->count(), $labels),
+                'follows' => array_map(fn($l) => \App\Models\Like::where('type', 1)->where('time_t', '>=', $startDate)->where(DB::raw('FROM_UNIXTIME(time_t, "%b %d")'), $l)->count(), $labels),
+            ],
+        ];
+
+        $reactionsSummary = Option::where('o_type', 'data_reaction')
+            ->select('o_valuer as type', DB::raw('count(*) as count'))
+            ->groupBy('o_valuer')
+            ->get()
+            ->pluck('count', 'type')
+            ->toArray();
+
+        // Ensure common types exist even if 0
+        $commonReactions = ['like', 'love', 'funny', 'wow', 'sad', 'angry', 'dislike'];
+        foreach ($commonReactions as $cr) {
+            if (!isset($reactionsSummary[$cr])) {
+                $reactionsSummary[$cr] = 0;
+            }
+        }
+
+        return view('theme::admin.index', compact('stats', 'currentVersion', 'latestVersion', 'chartData', 'communityChartData', 'reactionsSummary'));
     }
 
     public function settings()

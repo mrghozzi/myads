@@ -132,6 +132,67 @@
         </div>
     </div>
 
+    <!-- ═══════════════════ COMMUNITY CHARTS ═══════════════════ -->
+    <div class="row g-3 mb-4">
+        <div class="col-xl-6">
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 14px;">
+                <div class="card-header border-0 bg-transparent pt-4 pb-0 px-4">
+                    <h6 class="fw-bold text-dark mb-0"><i class="feather-edit-3 me-2" style="color: #6366f1;"></i> {{ __('messages.Posts') }} (30 {{ __('messages.days') ?? 'days' }})</h6>
+                </div>
+                <div class="card-body" style="height: 350px;">
+                    <canvas id="postsCommunityChart"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-6">
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 14px;">
+                <div class="card-header border-0 bg-transparent pt-4 pb-0 px-4">
+                    <h6 class="fw-bold text-dark mb-0"><i class="feather-message-circle me-2" style="color: #10b981;"></i> {{ __('messages.comments') ?? 'Comments' }} & {{ __('messages.allreactions') }} (30 {{ __('messages.days') ?? 'days' }})</h6>
+                </div>
+                <div class="card-body" style="height: 350px;">
+                    <canvas id="engagementCommunityChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════ REACTION COUNTERS ═══════════════════ -->
+    <div class="card border-0 shadow-sm mb-4" style="border-radius: 14px; overflow: hidden;">
+        <div class="card-body p-0">
+            <div class="d-flex align-items-center justify-content-around flex-wrap py-4 px-2 bg-white">
+                @php
+                    $reactionIcons = [
+                        'like' => 'like.png',
+                        'love' => 'love.png',
+                        'dislike' => 'dislike.png',
+                        'funny' => 'funny.png',
+                        'wow' => 'wow.png',
+                        'sad' => 'sad.png',
+                        'angry' => 'angry.png',
+                        'happy' => 'happy.png'
+                    ];
+                    // Reorder to match visual flow: like, love, dislike, funny, wow, sad, angry
+                    $orderedReactions = [];
+                    foreach(['like', 'love', 'dislike', 'funny', 'wow', 'sad', 'angry'] as $key) {
+                        if(isset($reactionsSummary[$key])) $orderedReactions[$key] = $reactionsSummary[$key];
+                    }
+                @endphp
+                @foreach($orderedReactions as $type => $count)
+                    <div class="text-center px-3 py-2">
+                        <div class="mb-2">
+                            <img src="{{ theme_asset('img/reaction/' . $reactionIcons[$type]) }}" alt="{{ $type }}" style="width: 42px; height: 42px; object-fit: contain;">
+                        </div>
+                        <h5 class="fw-bold mb-0 text-dark">{{ number_format($count) }}</h5>
+                        <small class="text-uppercase text-muted fw-semibold" style="font-size: 0.65rem; letter-spacing: 0.5px;">{{ $type }}</small>
+                    </div>
+                    @if(!$loop->last)
+                        <div class="vr d-none d-md-block opacity-10" style="height: 40px; margin-top: 10px;"></div>
+                    @endif
+                @endforeach
+            </div>
+        </div>
+    </div>
+
     <!-- ═══════════════════ ACTIVITY & ACTIONS ROW ═══════════════════ -->
     <div class="row g-3 mb-4">
         <!-- Activity Stats (Left Column) -->
@@ -442,6 +503,195 @@ document.addEventListener('DOMContentLoaded', function() {
                         },
                         border: { display: false }
                     }
+                }
+            }
+        });
+    }
+
+    // ── Community: Posts ──
+    var postsCommunityCtx = document.getElementById('postsCommunityChart');
+    if (postsCommunityCtx) {
+        new Chart(postsCommunityCtx, {
+            type: 'line',
+            data: {
+                labels: {!! json_encode($communityChartData['labels']) !!},
+                datasets: [
+                    {
+                        label: '{{ __('messages.post_text') ?? 'Text Posts' }}',
+                        data: {!! json_encode($communityChartData['posts']['text']) !!},
+                        borderColor: '#6366f1',
+                        backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 3,
+                        pointRadius: 3,
+                        pointHoverRadius: 6
+                    },
+                    {
+                        label: '{{ __('messages.post_link') ?? 'Link Posts' }}',
+                        data: {!! json_encode($communityChartData['posts']['link']) !!},
+                        borderColor: '#f59e0b',
+                        backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 3,
+                        pointRadius: 3,
+                        pointHoverRadius: 6
+                    },
+                    {
+                        label: '{{ __('messages.post_gallery') ?? 'Gallery Posts' }}',
+                        data: {!! json_encode($communityChartData['posts']['gallery']) !!},
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 3,
+                        pointRadius: 3,
+                        pointHoverRadius: 6
+                    },
+                    {
+                        label: '{{ __('messages.forum_posts') ?? 'Forum Topics' }}',
+                        data: {!! json_encode($communityChartData['posts']['forum']) !!},
+                        borderColor: '#8b5cf6',
+                        backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 3,
+                        pointRadius: 3,
+                        pointHoverRadius: 6
+                    },
+                    {
+                        label: '{{ __('messages.store_posts') ?? 'Store Products' }}',
+                        data: {!! json_encode($communityChartData['posts']['store']) !!},
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 3,
+                        pointRadius: 3,
+                        pointHoverRadius: 6
+                    },
+                    {
+                        label: '{{ __('messages.order_posts') ?? 'Order Requests' }}',
+                        data: {!! json_encode($communityChartData['posts']['orders']) !!},
+                        borderColor: '#f43f5e',
+                        backgroundColor: 'rgba(244, 63, 94, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 3,
+                        pointRadius: 3,
+                        pointHoverRadius: 6
+                    },
+                    {
+                        label: '{{ __('messages.news_posts') ?? 'News Articles' }}',
+                        data: {!! json_encode($communityChartData['posts']['news']) !!},
+                        borderColor: '#94a3b8',
+                        backgroundColor: 'rgba(148, 163, 184, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 3,
+                        pointRadius: 3,
+                        pointHoverRadius: 6
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom', labels: { color: textColor, font: { size: 12 } } },
+                    tooltip: { mode: 'index', intersect: false }
+                },
+                scales: {
+                    x: { grid: { display: false }, ticks: { color: textColor, font: { size: 10 } } },
+                    y: { grid: { color: gridColor }, ticks: { color: textColor, font: { size: 10 } } }
+                }
+            }
+        });
+    }
+
+    // ── Community: Comments & Reactions ──
+    var engCommunityCtx = document.getElementById('engagementCommunityChart');
+    if (engCommunityCtx) {
+        new Chart(engCommunityCtx, {
+            type: 'line',
+            data: {
+                labels: {!! json_encode($communityChartData['labels']) !!},
+                datasets: [
+                    // Comments
+                    {
+                        label: '{{ __('messages.forum_comments') ?? 'Forum Comments' }}',
+                        data: {!! json_encode($communityChartData['comments']['forum']) !!},
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.05)',
+                        fill: false,
+                        tension: 0.4,
+                        borderWidth: 2,
+                        pointRadius: 2
+                    },
+                    {
+                        label: '{{ __('messages.store_comments') ?? 'Store Comments' }}',
+                        data: {!! json_encode($communityChartData['comments']['store']) !!},
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.05)',
+                        fill: false,
+                        tension: 0.4,
+                        borderWidth: 2,
+                        pointRadius: 2
+                    },
+                    {
+                        label: '{{ __('messages.order_comments') ?? 'Order Comments' }}',
+                        data: {!! json_encode($communityChartData['comments']['orders']) !!},
+                        borderColor: '#f43f5e',
+                        backgroundColor: 'rgba(244, 63, 94, 0.05)',
+                        fill: false,
+                        tension: 0.4,
+                        borderWidth: 2,
+                        pointRadius: 2
+                    },
+                    // Reactions
+                    {
+                        label: '{{ __('messages.forum_reactions') ?? 'Forum Reactions' }}',
+                        data: {!! json_encode($communityChartData['reactions']['forum']) !!},
+                        borderColor: '#8b5cf6',
+                        borderDash: [5, 5],
+                        fill: false,
+                        tension: 0.4,
+                        borderWidth: 2,
+                        pointRadius: 2
+                    },
+                    {
+                        label: '{{ __('messages.store_reactions') ?? 'Store Reactions' }}',
+                        data: {!! json_encode($communityChartData['reactions']['store']) !!},
+                        borderColor: '#06b6d4',
+                        borderDash: [5, 5],
+                        fill: false,
+                        tension: 0.4,
+                        borderWidth: 2,
+                        pointRadius: 2
+                    },
+                    {
+                        label: '{{ __('messages.follows_count') ?? 'New Follows' }}',
+                        data: {!! json_encode($communityChartData['reactions']['follows']) !!},
+                        borderColor: '#f59e0b',
+                        backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 2,
+                        pointRadius: 2
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom', labels: { color: textColor, font: { size: 12 } } },
+                    tooltip: { mode: 'index', intersect: false }
+                },
+                scales: {
+                    x: { grid: { display: false }, ticks: { color: textColor, font: { size: 10 } } },
+                    y: { grid: { color: gridColor }, ticks: { color: textColor, font: { size: 10 } } }
                 }
             }
         });
