@@ -127,7 +127,7 @@
         </div>
 
         <div class="grid-column">
-            @include('theme::directory.partials.detail_hero', ['card' => $detail])
+            @include('theme::directory.partials.detail_hero', ['card' => $detail, 'activity' => $activity])
 
             <div class="widget-box directory-detail-copy-card">
                 <p class="widget-box-title">{{ __('messages.desc') }}</p>

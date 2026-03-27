@@ -16,6 +16,10 @@
             </p>
         @endif
 
+        @if(!empty($activity))
+            @include('theme::partials.activity.promotion_link', ['activity' => $activity])
+        @endif
+
         @auth
             <p class="simple-dropdown-link" onclick="reportPost({{ $card['listing']->id }}, 1, {{ $card['listing']->id }})">
                 <i class="fa fa-flag" aria-hidden="true"></i>&nbsp;{{ __('messages.report') }}

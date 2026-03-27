@@ -64,6 +64,7 @@
                             </p>
                         @endif
                     @endif
+                    @include('theme::partials.activity.promotion_link', ['activity' => $status])
                     @if($canPinTopic && $topic->cat > 0)
                         <form method="POST" action="{{ route('forum.pin', $topic->id) }}">
                             @csrf

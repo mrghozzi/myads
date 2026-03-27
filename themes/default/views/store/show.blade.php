@@ -150,6 +150,9 @@
                                 <button type="button" class="simple-dropdown-link store-dropdown-button" onclick="navigator.clipboard.writeText('{{ route('store.show', $product->name) }}'); alert('{{ __('messages.link_copied') }}');">
                                     <i class="fa fa-link" aria-hidden="true"></i>&nbsp;{{ __('messages.copy_link') }}
                                 </button>
+                                @if($status)
+                                    @include('theme::partials.activity.promotion_link', ['activity' => $status])
+                                @endif
                                 @if($canManageProduct)
                                     <a class="simple-dropdown-link" href="{{ route('store.update', $product->name) }}">
                                         <i class="fa fa-edit" aria-hidden="true"></i>&nbsp;{{ __('messages.edit_product') }}
