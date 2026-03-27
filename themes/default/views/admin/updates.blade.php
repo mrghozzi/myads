@@ -32,6 +32,16 @@
             <div>{{ session('info') }}</div>
         </div>
     @endif
+    @if($errors->any())
+        <div class="alert alert-danger mb-4" role="alert">
+            <div class="fw-bold mb-2">{{ __('messages.warning') ?? 'Warning' }}</div>
+            <ul class="mb-0 ps-3">
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
 
     <div class="row">
         {{-- Version Status Card --}}
@@ -129,6 +139,57 @@
 
         {{-- Release Details --}}
         <div class="col-xxl-8 col-lg-7 col-12">
+            <div class="card stretch stretch-full mb-4">
+                <div class="card-header d-flex align-items-center justify-content-between">
+                    <h5 class="card-title fs-14 mb-0">
+                        <i class="feather-shield me-2 {{ $preflightReport->isSafe() ? 'text-success' : 'text-danger' }}"></i>
+                        {{ __('messages.update_preflight_title') ?? 'Update Safety Check' }}
+                    </h5>
+                    <span class="badge {{ $preflightReport->isSafe() ? 'bg-soft-success text-success' : 'bg-soft-danger text-danger' }}">
+                        {{ $preflightReport->isSafe()
+                            ? (__("messages.update_preflight_passed") ?? 'Passed')
+                            : (__("messages.update_preflight_failed") ?? 'Blocked') }}
+                    </span>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted fs-13 mb-3">
+                        {{ __('messages.update_preflight_description') ?? 'The updater checks your database connection, file permissions, and pending migrations before it allows any release to be applied.' }}
+                    </p>
+
+                    <div class="table-responsive">
+                        <table class="table table-sm align-middle mb-0">
+                            <tbody>
+                                @foreach($preflightReport->checks as $check)
+                                    <tr>
+                                        <td class="fw-medium" style="width: 34%;">
+                                            {{ $check['title'] }}
+                                        </td>
+                                        <td>
+                                            <span class="badge {{ $check['status'] === 'passed' ? 'bg-soft-success text-success' : 'bg-soft-danger text-danger' }} me-2">
+                                                {{ strtoupper($check['status']) }}
+                                            </span>
+                                            <span class="text-muted">{{ $check['detail'] }}</span>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+
+                    @if(!$preflightReport->isSafe())
+                        <div class="alert alert-soft-danger mt-4 mb-0">
+                            <div class="d-flex align-items-start gap-2">
+                                <i class="feather-alert-octagon mt-1"></i>
+                                <div class="fs-12">
+                                    <strong>{{ __('messages.update_preflight_failed') ?? 'Update blocked' }}</strong>
+                                    <div class="mt-1">{{ __('messages.update_blocked_preflight', ['details' => implode(' ', $preflightReport->failureMessages())]) ?? 'Resolve the safety issues before updating.' }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+                </div>
+            </div>
+
             @if($updateAvailable && $latestRelease)
                 {{-- Update Available Card --}}
                 <div class="card stretch stretch-full mb-4" id="update-card">
@@ -186,7 +247,7 @@
 
                         {{-- Update Button --}}
                         <div class="d-flex gap-3">
-                            <button type="button" class="btn btn-primary px-4 py-2 fw-bold" data-bs-toggle="modal" data-bs-target="#confirmUpdateModal">
+                            <button type="button" class="btn btn-primary px-4 py-2 fw-bold" data-bs-toggle="modal" data-bs-target="#confirmUpdateModal" @disabled(!$preflightReport->isSafe())>
                                 <i class="feather-download me-2"></i>
                                 {{ __('messages.update_now') ?? 'Update Now' }}
                             </button>
@@ -253,6 +314,21 @@
                             </div>
                         </div>
                     </div>
+
+                    <div class="mt-3">
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" value="1" id="backup_ack_database" name="backup_ack_database" form="update-form" {{ old('backup_ack_database') ? 'checked' : '' }}>
+                            <label class="form-check-label" for="backup_ack_database">
+                                {{ __('messages.backup_ack_database') ?? 'I have created a backup of the database.' }}
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="1" id="backup_ack_files" name="backup_ack_files" form="update-form" {{ old('backup_ack_files') ? 'checked' : '' }}>
+                            <label class="form-check-label" for="backup_ack_files">
+                                {{ __('messages.backup_ack_files') ?? 'I have created a backup of the files.' }}
+                            </label>
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer border-0 pt-0">
                     <button type="button" class="btn btn-light" data-bs-dismiss="modal">
@@ -260,7 +336,7 @@
                     </button>
                     <form action="{{ route('admin.updates.process') }}" method="POST" id="update-form">
                         @csrf
-                        <button type="submit" class="btn btn-primary fw-bold" id="btn-update" onclick="startUpdate(this)">
+                        <button type="submit" class="btn btn-primary fw-bold" id="btn-update" onclick="startUpdate(this)" @disabled(!$preflightReport->isSafe())>
                             <i class="feather-download me-1"></i>
                             {{ __('messages.yes_update') ?? 'Yes, Update Now' }}
                         </button>

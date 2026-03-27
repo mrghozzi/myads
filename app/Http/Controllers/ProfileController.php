@@ -219,9 +219,10 @@ class ProfileController extends Controller
         return view('theme::profile.following', compact('user', 'following', 'cover', 'isFollowing', 'followersCount', 'followingCount', 'postsCount'));
     }
 
-    public function showById(int $id)
+    public function showById(string $id)
     {
-        $user = User::findOrFail($id);
+        $user = User::resolvePublicIdentifier($id);
+        abort_if(!$user, 404);
         $option = Option::where('o_type', 'user')->where('o_order', $user->id)->first();
 
         if (!$option) {
@@ -233,6 +234,11 @@ class ProfileController extends Controller
                 'o_order' => $user->id,
                 'o_mode' => 'upload/cover.jpg',
             ]);
+        }
+
+        $canonicalIdentifier = $user->publicRouteIdentifier();
+        if ($user->usesPublicMemberIds() && $id !== $canonicalIdentifier) {
+            return redirect()->route('profile.short', $canonicalIdentifier);
         }
 
         return redirect()->route('profile.show', $user->username);

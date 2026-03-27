@@ -2,17 +2,21 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\View;
-use Illuminate\Support\Facades\Schema;
+use App\Models\Menu;
 use App\Models\SeoSetting;
 use App\Models\Setting;
-use App\Models\Menu;
+use App\Services\Contracts\UrlSafetyInspectorInterface;
+use App\Services\LocalUrlSafetyInspector;
 use App\Services\RobotsTxtService;
+use App\Services\SecurityPolicyService;
+use App\Services\SecuritySessionService;
+use App\Services\SecurityThrottleService;
 use App\Services\SeoManager;
 use App\Services\V420SchemaService;
 use App\Support\SeoHeadSanitizer;
-use App\Services\PluginManager;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\View;
+use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -25,6 +29,14 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton(SeoManager::class, fn ($app) => new SeoManager($app->make(SeoHeadSanitizer::class)));
         $this->app->singleton(RobotsTxtService::class, fn () => new RobotsTxtService());
         $this->app->singleton(V420SchemaService::class, fn () => new V420SchemaService());
+        $this->app->singleton(UrlSafetyInspectorInterface::class, fn () => new LocalUrlSafetyInspector());
+        $this->app->singleton(SecurityPolicyService::class, fn ($app) => new SecurityPolicyService(
+            $app->make(UrlSafetyInspectorInterface::class)
+        ));
+        $this->app->singleton(SecurityThrottleService::class, fn () => new SecurityThrottleService());
+        $this->app->singleton(SecuritySessionService::class, fn ($app) => new SecuritySessionService(
+            $app->make(V420SchemaService::class)
+        ));
     }
 
     /**

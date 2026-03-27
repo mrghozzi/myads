@@ -57,7 +57,7 @@
                 <div class="widget-box-content">
                     @forelse($statuses as $status)
                         <div class="user-status">
-                             <a class="user-status-avatar" href="{{ route('profile.short', $status->uid) }}">
+                                            <a class="user-status-avatar" href="{{ route('profile.short', $status->user?->publicRouteIdentifier() ?? $status->uid) }}">
                                 <div class="user-avatar small no-outline">
                                     <div class="user-avatar-content">
                                         <div class="hexagon-image-30-32" data-src="{{ $status->user->img ? url($status->user->img) : theme_asset('img/avatar/01.jpg') }}"></div>
@@ -65,7 +65,7 @@
                                 </div>
                             </a>
                             <p class="user-status-title">
-                                <a class="bold" href="{{ route('profile.short', $status->uid) }}">{{ $status->user->username ?? __('messages.unknown') }}</a>
+                                            <a class="bold" href="{{ route('profile.short', $status->user?->publicRouteIdentifier() ?? $status->uid) }}">{{ $status->user->username ?? __('messages.unknown') }}</a>
                             </p>
                             <p class="user-status-text small">{!! \App\Support\ContentFormatter::linkifyHashtags(Str::limit($status->txt ?: $status->statu, 150)) !!}</p>
                             <p class="user-status-timestamp small">{{ $status->date_formatted }}</p>

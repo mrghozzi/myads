@@ -7,6 +7,7 @@ use App\Models\Link;
 use App\Models\SmartAd;
 use App\Models\State; // Assuming State model exists or using DB table
 use App\Models\User;
+use App\Services\SecurityPolicyService;
 use App\Support\BannerSizeCatalog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -52,7 +53,7 @@ class AdsController extends Controller
     }
 
     // Store Banner
-    public function storeBanner(Request $request)
+    public function storeBanner(Request $request, SecurityPolicyService $securityPolicy)
     {
         $request->validate([
             'name' => 'required|string|max:255',
@@ -63,6 +64,14 @@ class AdsController extends Controller
 
         $user = Auth::user();
         $bannerSize = $this->validatedBannerSize($request->input('px'));
+
+        if ($violation = $securityPolicy->urlViolation((string) $request->input('url'), 'ads')) {
+            return back()->withErrors(['url' => $violation])->withInput();
+        }
+
+        if ($violation = $securityPolicy->urlViolation((string) $request->input('img'), 'ads', true)) {
+            return back()->withErrors(['img' => $violation])->withInput();
+        }
 
         Banner::create([
             'uid' => $user->id,
@@ -87,7 +96,7 @@ class AdsController extends Controller
     }
 
     // Update Banner
-    public function updateBanner(Request $request, $id)
+    public function updateBanner(Request $request, $id, SecurityPolicyService $securityPolicy)
     {
         $user = Auth::user();
         $banner = Banner::where('id', $id)->where('uid', $user->id)->firstOrFail();
@@ -99,6 +108,14 @@ class AdsController extends Controller
             'px' => 'required|string',
         ]);
         $bannerSize = $this->validatedBannerSize($request->input('px'));
+
+        if ($violation = $securityPolicy->urlViolation((string) $request->input('url'), 'ads')) {
+            return back()->withErrors(['url' => $violation])->withInput();
+        }
+
+        if ($violation = $securityPolicy->urlViolation((string) $request->input('img'), 'ads', true)) {
+            return back()->withErrors(['img' => $violation])->withInput();
+        }
 
         $banner->update([
             'name' => $request->name,
@@ -134,7 +151,7 @@ class AdsController extends Controller
     }
 
     // Store Link
-    public function storeLink(Request $request)
+    public function storeLink(Request $request, SecurityPolicyService $securityPolicy)
     {
         $request->validate([
             'name' => 'required|string|max:255',
@@ -143,6 +160,14 @@ class AdsController extends Controller
         ]);
 
         $user = Auth::user();
+
+        if ($violation = $securityPolicy->urlViolation((string) $request->input('url'), 'ads')) {
+            return back()->withErrors(['url' => $violation])->withInput();
+        }
+
+        if ($violation = $securityPolicy->textViolation((string) $request->input('txt'), 'ads')) {
+            return back()->withErrors(['txt' => $violation])->withInput();
+        }
 
         Link::create([
             'uid' => $user->id,
@@ -165,7 +190,7 @@ class AdsController extends Controller
     }
 
     // Update Link
-    public function updateLink(Request $request, $id)
+    public function updateLink(Request $request, $id, SecurityPolicyService $securityPolicy)
     {
         $user = Auth::user();
         $link = Link::where('id', $id)->where('uid', $user->id)->firstOrFail();
@@ -175,6 +200,14 @@ class AdsController extends Controller
             'url' => 'required|url',
             'txt' => 'required|string',
         ]);
+
+        if ($violation = $securityPolicy->urlViolation((string) $request->input('url'), 'ads')) {
+            return back()->withErrors(['url' => $violation])->withInput();
+        }
+
+        if ($violation = $securityPolicy->textViolation((string) $request->input('txt'), 'ads')) {
+            return back()->withErrors(['txt' => $violation])->withInput();
+        }
 
         $link->update([
             'name' => $request->name,

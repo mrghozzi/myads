@@ -4,6 +4,8 @@
     $oldestId = $messages->first()->id_msg ?? 0;
     $latestId = $messages->last()->id_msg ?? 0;
     $hasOlder = isset($hasOlderMessages) ? (bool) $hasOlderMessages : false;
+    $hasPreviousState = (bool) ($hasPreviousConversationMessage ?? false);
+    $previousEncryptedState = $hasPreviousState ? (bool) ($precedingMessageEncrypted ?? false) : null;
 @endphp
 
 @if(!$itemsOnly)
@@ -12,6 +14,8 @@
     @forelse($messages as $message)
         @php
             $isMine = (int) $message->us_env === (int) $authId;
+            $isEncryptedPayload = method_exists($message, 'isEncryptedPayload') ? $message->isEncryptedPayload() : false;
+            $showEncryptionNotice = $isEncryptedPayload && $hasPreviousState && $previousEncryptedState === false;
             $text = trim((string) ($message->text ?? ''));
             $hasText = $text !== '';
             $attachmentPath = $message->attachment_path ?? null;
@@ -29,6 +33,11 @@
                 ? $messageDateTime->format('Y-m-d g:i A')
                 : $messageDateTime->format('g:i A');
         @endphp
+        @if($showEncryptionNotice)
+            <div class="messages-encryption-notice" role="note">
+                <span>{{ __('messages.private_messages_encryption_notice') }}</span>
+            </div>
+        @endif
         <article class="messages-bubble-row {{ $isMine ? 'is-me' : '' }}" data-message-id="{{ $message->id_msg }}">
             @unless($isMine)
                 <div class="messages-bubble-avatar">
@@ -95,6 +104,10 @@
                 <span class="messages-bubble-time">{{ $messageTimeLabel }}</span>
             </div>
         </article>
+        @php
+            $previousEncryptedState = $isEncryptedPayload;
+            $hasPreviousState = true;
+        @endphp
     @empty
         @if(!$itemsOnly)
             <p class="messages-empty-thread">{{ __('messages.no_messages') }}</p>

@@ -44,7 +44,7 @@
                         src="{{ $topic->user->img ? url($topic->user->img) : theme_asset('img/avatar/01.jpg') }}"
                         alt="{{ $topic->user->username }}"
                     >
-                    <a class="forum-rdx-discussion-username" href="{{ route('profile.short', $topic->user->id) }}">
+            <a class="forum-rdx-discussion-username" href="{{ route('profile.short', $topic->user->publicRouteIdentifier()) }}">
                         {{ $topic->user->username }}
                     </a>
                 </span>

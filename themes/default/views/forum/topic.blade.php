@@ -123,7 +123,7 @@
                 <div class="forum-post-content">
                     @if($topic->user)
                     <div class="forum-post-user">
-                        <a class="user-avatar no-outline {{ $topic->user->isOnline() ? 'online' : 'offline' }}" href="{{ route('profile.short', $topic->user->id) }}">
+                        <a class="user-avatar no-outline {{ $topic->user->isOnline() ? 'online' : 'offline' }}" href="{{ route('profile.short', $topic->user->publicRouteIdentifier()) }}">
                             <div class="user-avatar-content">
                                 <div class="hexagon-image-68-74" data-src="{{ $topic->user->img ? url($topic->user->img) : theme_asset('img/avatar/01.jpg') }}" style="width: 68px; height: 74px; position: relative;"><canvas style="position: absolute; top: 0px; left: 0px;" width="68" height="74"></canvas></div>
                             </div>
@@ -143,11 +143,11 @@
                             @endif
                         </a>
                         
-                        <p class="forum-post-user-title"><a href="{{ route('profile.short', $topic->user->id) }}">{{ $topic->user->username }}</a></p>
+                                <p class="forum-post-user-title"><a href="{{ route('profile.short', $topic->user->publicRouteIdentifier()) }}">{{ $topic->user->username }}</a></p>
                         @if($showForumRoleBadges)
                             <p class="forum-post-user-text">{{ $topic->user->forumRoleLabel($topicCategoryId) }}</p>
                         @endif
-                        <p class="forum-post-user-text"><a href="{{ route('profile.short', $topic->user->id) }}">@ {{ $topic->user->username }}</a></p>
+                                <p class="forum-post-user-text"><a href="{{ route('profile.short', $topic->user->publicRouteIdentifier()) }}">@ {{ $topic->user->username }}</a></p>
                     </div>
                     @else
                     <div class="forum-post-user">

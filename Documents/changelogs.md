@@ -1,6 +1,25 @@
 # v4.2.0
 > **Feature Release** - Community feed overhaul, profile hub privacy, admin ACL, and platform integrations.
 
+### Security Suite
+* **Add**: Introduced a dedicated **Security** admin area at `/admin/security` with a new ACL module, Duralux sidebar entry, main settings page, IP ban management, member session audit log, and admin password confirmation flow.
+* **Add**: Added centralized `SecuritySettings` backed by `options` (`o_type = security_settings`) for link/domain blacklists, cooldowns, registration caps, login throttling, admin reconfirmation, private message encryption, and public member IDs.
+* **Add**: Added `SecurityPolicyService`, `LocalUrlSafetyInspector`, and `SecurityThrottleService` to enforce local URL safety rules and per-member cooldowns across registration, login, posts, comments, forum topics, private messages, link previews, and banner/link/smart/visit ads.
+* **Add**: Added global `BlockBannedIp` and `TrackMemberSecuritySession` middleware plus the `security_ip_bans` and `security_member_sessions` tables for whole-site IP blocking and revocable member session tracking.
+* **Add**: Added `users.public_uid` with backward-compatible public shortcut routing so `/u/id/{id}` can redirect toward canonical public IDs when enabled.
+* **Add**: Added optional at-rest encryption for newly created private messages using `enc:` payloads and Laravel `Crypt`, while keeping legacy plaintext messages readable.
+* **Improvement**: Private message URLs now use encrypted conversation identifiers on `messages/{id}` while legacy numeric links remain compatible.
+* **Improvement**: Mixed legacy/private-message threads now show a lightweight in-thread notice when newer encrypted messages begin, so both participants can clearly distinguish the encrypted section.
+* **Fix**: Header and sidebar avatar/profile shortcuts now respect `public_member_ids_enabled` and switch to public short-profile identifiers immediately.
+* **i18n**: Added security/admin translation keys across all 9 supported languages.
+* **Tests**: Added `SecuritySuiteFeatureTest` covering security ACL access, admin password confirmation middleware, private message encryption, and public profile shortcut identifiers.
+
+### Update Safety & Backups
+* **Add**: Introduced a hard safety layer for test execution using `.env.testing`, `database/testing.sqlite`, and `TestingSafetyGuard` so automated tests can no longer touch the live MySQL database.
+* **Add**: Added `php artisan myads:update:preflight` and `UpdateSafetyService` to verify the active database connection, writable update paths, pending migrations, and destructive operations before any upgrade is allowed to continue.
+* **Improvement**: The admin updater now blocks execution unless the operator confirms that both the database and files were backed up, and it runs maintenance mode plus `migrate --force` / `optimize:clear` only after safety checks pass.
+* **Docs**: Added a dedicated Git upgrade guide and strengthened installation/upgrade documentation with explicit backup requirements and warnings against `migrate:fresh`, `db:wipe`, and non-isolated test runs.
+
 ### 🗺️ Sitemap & Privacy
 * **Add**: Implemented a comprehensive **Sitemap Privacy Suite** that enforces author privacy and forum visibility rules across the search engine index.
 * **Add**: Integrated `visible()` scope for Topics and Users, ensuring "Private" and "Followers-only" content is excluded from guest crawlers.

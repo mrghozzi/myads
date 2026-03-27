@@ -1,5 +1,9 @@
 @extends('theme::layouts.master')
 
+@php
+    $partnerConversationRouteKey = $partnerConversationRouteKey ?? ($partner ? \App\Models\Message::encodeConversationRouteKey(auth()->id(), $partner) : null);
+@endphp
+
 @push('head')
 <style>
   .messages-shell {
@@ -525,6 +529,28 @@
     padding: 8px 0;
   }
 
+  .messages-encryption-notice {
+    flex: 0 0 100%;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 2px;
+  }
+
+  .messages-encryption-notice span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    max-width: 100%;
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(97, 93, 250, 0.12);
+    background: rgba(97, 93, 250, 0.08);
+    color: var(--msg-muted);
+    font-size: 0.74rem;
+    font-weight: 700;
+    text-align: center;
+  }
+
   .messages-chat-compose {
     border-top: 1px solid var(--msg-border);
     padding: 16px 22px;
@@ -843,6 +869,7 @@
                     @php
                         $partnerItem = $conversation['user'];
                         $lastMessage = $conversation['message'];
+                        $partnerItemConversationRouteKey = \App\Models\Message::encodeConversationRouteKey(auth()->id(), $partnerItem);
                         $isActive = $partner && $partner->id === $partnerItem->id;
                         $previewSource = trim(strip_tags((string) ($lastMessage->text ?? '')));
                         if ($previewSource === '' && !empty($lastMessage->attachment_path)) {
@@ -852,7 +879,7 @@
                     @endphp
                     <a
                         class="messages-conversation {{ $isActive ? 'is-active' : '' }} {{ $conversation['unread'] ? 'is-unread' : '' }}"
-                        href="{{ route('messages.show', $partnerItem->id) }}"
+                        href="{{ route('messages.show', $partnerItemConversationRouteKey) }}"
                         data-name="{{ \Illuminate\Support\Str::lower($partnerItem->username) }}"
                         data-message="{{ \Illuminate\Support\Str::lower(strip_tags($lastMessage->text)) }}"
                     >
@@ -893,7 +920,7 @@
             @if($partner)
                 <header class="messages-chat-header">
                     <div class="messages-chat-identity">
-                        <a href="{{ route('profile.show', $partner->username) }}">
+                        <a href="{{ route('profile.short', $partner->publicRouteIdentifier()) }}">
                             <div class="user-avatar small no-outline {{ $partner->isOnline() ? 'online' : 'offline' }}">
                                 <div class="user-avatar-content">
                                     <div class="hexagon-image-30-32" data-src="{{ $partner->img ? asset($partner->img) : theme_asset('img/avatar/01.jpg') }}"></div>
@@ -924,7 +951,7 @@
                     </div>
 
                     <div class="messages-chat-actions">
-                        <a href="{{ route('messages.index', ['id' => $partner->id, 'mark_all_read' => 1]) }}">{{ __('messages.mark_all_read') }}</a>
+                        <a href="{{ route('messages.index', ['id' => $partnerConversationRouteKey, 'mark_all_read' => 1]) }}">{{ __('messages.mark_all_read') }}</a>
                         <a href="{{ route('settings') }}">{{ __('messages.account_settings') }}</a>
                     </div>
                 </header>
@@ -934,7 +961,9 @@
                         'messages' => $messages,
                         'partner' => $partner,
                         'user' => auth()->user(),
-                        'hasOlderMessages' => $hasOlderMessages ?? false
+                        'hasOlderMessages' => $hasOlderMessages ?? false,
+                        'hasPreviousConversationMessage' => $hasPreviousConversationMessage ?? false,
+                        'precedingMessageEncrypted' => $precedingMessageEncrypted ?? false,
                     ])
                 </div>
 
@@ -1028,9 +1057,9 @@
     const emojiPanel = document.getElementById('emoji_panel');
     const emojiSearchInput = document.getElementById('emoji_search');
     const emojiGrid = document.getElementById('emoji_grid');
-    const sendUrl = '{{ $partner ? route('messages.send', $partner->id) : '' }}';
-    const loadUrl = '{{ $partner ? route('messages.load', $partner->id) : '' }}';
-    const historyUrl = '{{ $partner ? route('messages.history', $partner->id) : '' }}';
+    const sendUrl = '{{ $partnerConversationRouteKey ? route('messages.send', $partnerConversationRouteKey) : '' }}';
+    const loadUrl = '{{ $partnerConversationRouteKey ? route('messages.load', $partnerConversationRouteKey) : '' }}';
+    const historyUrl = '{{ $partnerConversationRouteKey ? route('messages.history', $partnerConversationRouteKey) : '' }}';
     const historyTopThreshold = 32;
     const maxAttachmentBytes = 5 * 1024 * 1024;
     let refreshTimer = null;

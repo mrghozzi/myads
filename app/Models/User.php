@@ -8,10 +8,14 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use App\Services\AdminAccessService;
 use App\Services\V420SchemaService;
+use App\Support\SecuritySettings;
+use Illuminate\Support\Str;
 
 class User extends Authenticatable
 {
     use HasFactory, Notifiable;
+
+    private static ?bool $publicUidColumnAvailable = null;
 
     protected $table = 'users';
     protected $primaryKey = 'id';
@@ -19,6 +23,7 @@ class User extends Authenticatable
 
     protected $fillable = [
         'username',
+        'public_uid',
         'email',
         'pass',
         'img',
@@ -42,6 +47,21 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    protected static function booted(): void
+    {
+        static::creating(function (self $user): void {
+            if (!self::supportsPublicUidColumn()) {
+                return;
+            }
+
+            if (trim((string) $user->public_uid) !== '') {
+                return;
+            }
+
+            $user->public_uid = self::generatePublicUid();
+        });
+    }
 
     public function getAuthPassword()
     {
@@ -131,6 +151,39 @@ class User extends Authenticatable
     public function canManageAdministrators(): bool
     {
         return app(AdminAccessService::class)->canManageAdministrators($this);
+    }
+
+    public function publicRouteIdentifier(): string
+    {
+        if ($this->usesPublicMemberIds() && trim((string) $this->public_uid) !== '') {
+            return (string) $this->public_uid;
+        }
+
+        return (string) $this->getKey();
+    }
+
+    public function usesPublicMemberIds(): bool
+    {
+        return self::supportsPublicUidColumn()
+            && (bool) SecuritySettings::get('public_member_ids_enabled', 0);
+    }
+
+    public static function resolvePublicIdentifier(string|int $identifier): ?self
+    {
+        $value = trim((string) $identifier);
+        if ($value === '') {
+            return null;
+        }
+
+        if (ctype_digit($value)) {
+            return self::find((int) $value);
+        }
+
+        if (!self::supportsPublicUidColumn()) {
+            return null;
+        }
+
+        return self::where('public_uid', strtoupper($value))->first();
     }
 
     public function isOnline()
@@ -261,5 +314,23 @@ class User extends Authenticatable
     public function badgeShowcase()
     {
         return $this->hasMany(BadgeShowcase::class, 'user_id')->orderBy('sort_order');
+    }
+
+    public static function generatePublicUid(): string
+    {
+        do {
+            $candidate = strtoupper(Str::random(12));
+        } while (self::query()->where('public_uid', $candidate)->exists());
+
+        return $candidate;
+    }
+
+    private static function supportsPublicUidColumn(): bool
+    {
+        if (self::$publicUidColumnAvailable !== null) {
+            return self::$publicUidColumnAvailable;
+        }
+
+        return self::$publicUidColumnAvailable = app(V420SchemaService::class)->hasColumn('users', 'public_uid');
     }
 }

@@ -10,6 +10,8 @@ use App\Models\ForumTopic;
 use App\Models\Option;
 use App\Models\Status;
 use App\Services\GamificationService;
+use App\Services\SecurityPolicyService;
+use App\Services\SecurityThrottleService;
 use App\Support\ForumSettings;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -192,7 +194,11 @@ class ForumController extends Controller
         return view('theme::forum.create', compact('categories', 'emojis', 'topic', 'editType', 'forumSettings'));
     }
 
-    public function store(Request $request)
+    public function store(
+        Request $request,
+        SecurityPolicyService $securityPolicy,
+        SecurityThrottleService $securityThrottle
+    )
     {
         if (!$request->filled('cat') && $request->filled('categ')) {
             $request->merge(['cat' => $request->input('categ')]);
@@ -218,6 +224,15 @@ class ForumController extends Controller
         $uid = auth()->id();
         if (!$uid) {
             abort(403);
+        }
+
+        if ($cooldownMessage = $securityThrottle->actionMessage($uid, 'forum_topic')) {
+            return back()->withErrors(['forum' => $cooldownMessage])->withInput();
+        }
+
+        $contentToInspect = trim((string) $request->input('name') . "\n" . (string) $request->input('txt'));
+        if ($violation = $securityPolicy->textViolation($contentToInspect, 'posts')) {
+            return back()->withErrors(['forum' => $violation])->withInput();
         }
 
         $time = time();
@@ -278,6 +293,7 @@ class ForumController extends Controller
             app(GamificationService::class)->recordEvent($uid, 'forum_topic_created');
 
             DB::commit();
+            $securityThrottle->hitAction($uid, 'forum_topic');
             return redirect()->route('forum.topic', $topic->id);
         } catch (\Throwable $e) {
             DB::rollBack();
@@ -300,7 +316,7 @@ class ForumController extends Controller
         return view('theme::forum.edit', compact('topic', 'categories', 'forumSettings', 'status'));
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, $id, SecurityPolicyService $securityPolicy)
     {
         if (!$request->filled('cat') && $request->filled('categ')) {
             $request->merge(['cat' => $request->input('categ')]);
@@ -328,6 +344,11 @@ class ForumController extends Controller
 
         $rules = array_merge($rules, $this->attachmentValidationRules($settings));
         $request->validate($rules);
+
+        $contentToInspect = trim((string) $request->input('name') . "\n" . (string) $request->input('txt'));
+        if ($violation = $securityPolicy->textViolation($contentToInspect, 'posts')) {
+            return back()->withErrors(['forum' => $violation])->withInput();
+        }
 
         DB::beginTransaction();
         try {

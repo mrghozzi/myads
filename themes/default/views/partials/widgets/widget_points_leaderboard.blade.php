@@ -8,7 +8,7 @@
 
             @foreach($topUsers as $index => $user)
                 <div class="user-status request-small">
-                    <a class="user-status-avatar" href="{{ route('profile.short', $user->id) }}">
+                <a class="user-status-avatar" href="{{ route('profile.short', $user->publicRouteIdentifier()) }}">
                         <div class="user-avatar small no-outline {{ $user->isOnline() ? 'online' : '' }}">
                             <div class="user-avatar-content">
                                 <div class="hexagon-image-30-32" data-src="{{ $user->img ? url($user->img) : theme_asset('img/avatar/01.jpg') }}"></div>
@@ -25,7 +25,7 @@
                         </div>
                     </a>
                     <p class="user-status-title">
-                        <a class="bold" href="{{ route('profile.short', $user->id) }}">{{ Str::limit($user->username, 15) }}</a>
+                        <a class="bold" href="{{ route('profile.short', $user->publicRouteIdentifier()) }}">{{ Str::limit($user->username, 15) }}</a>
                     </p>
                     <p class="user-status-text small">
                         {{ number_format($user->pts) }} {{ __('messages.pts') }}

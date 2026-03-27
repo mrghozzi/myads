@@ -14,6 +14,8 @@ use App\Services\GamificationService;
 use App\Services\LinkPreviewService;
 use App\Services\MentionService;
 use App\Services\NotificationService;
+use App\Services\SecurityPolicyService;
+use App\Services\SecurityThrottleService;
 use App\Services\UserPrivacyService;
 use App\Services\V420SchemaService;
 use App\Support\ContentFormatter;
@@ -48,11 +50,21 @@ class StatusController extends Controller
             . '<input type="text" name="img" style="visibility:hidden" value="' . e($relativePath) . '">';
     }
 
-    public function linkPreview(Request $request, LinkPreviewService $linkPreviewService)
+    public function linkPreview(
+        Request $request,
+        LinkPreviewService $linkPreviewService,
+        SecurityPolicyService $securityPolicy
+    )
     {
         $request->validate([
             'link_url' => 'required|string|max:2048',
         ]);
+
+        if ($violation = $securityPolicy->urlViolation($request->input('link_url'), 'posts')) {
+            return response()->json([
+                'message' => $violation,
+            ], 422);
+        }
 
         return response()->json($linkPreviewService->fetch($request->input('link_url')));
     }
@@ -63,7 +75,9 @@ class StatusController extends Controller
         MentionService $mentions,
         NotificationService $notifications,
         UserPrivacyService $privacy,
-        GamificationService $gamification
+        GamificationService $gamification,
+        SecurityPolicyService $securityPolicy,
+        SecurityThrottleService $securityThrottle
     ) {
         $user = Auth::user();
         $schema = app(V420SchemaService::class);
@@ -80,7 +94,7 @@ class StatusController extends Controller
         }
 
         if ($postKind === '' && $legacyType === 1) {
-            return $this->createLegacyDirectoryPost($request, $user);
+            return $this->createLegacyDirectoryPost($request, $user, $securityPolicy, $securityThrottle);
         }
 
         if ($postKind === '') {
@@ -110,6 +124,18 @@ class StatusController extends Controller
         $publishMode = (string) $request->input('publish_mode', 'post');
         $linkUrl = $this->resolveLinkUrl($request, $text);
         $legacyDirectorySave = $request->boolean('save_to_directory');
+
+        if ($cooldownMessage = $securityThrottle->actionMessage($user, 'post')) {
+            return back()->with('error', $cooldownMessage)->withInput();
+        }
+
+        if ($violation = $securityPolicy->textViolation($text, 'posts')) {
+            return back()->with('error', $violation)->withInput();
+        }
+
+        if ($violation = $securityPolicy->urlViolation($linkUrl, 'posts')) {
+            return back()->with('error', $violation)->withInput();
+        }
 
         $hasMentions = ContentFormatter::extractMentionUsernames($text) !== [];
 
@@ -142,6 +168,7 @@ class StatusController extends Controller
                 [$directory] = $this->createDirectoryEntry($request, $user, $preview, $text, $time);
 
                 DB::commit();
+                $securityThrottle->hitAction($user, 'post');
                 return redirect()->route('directory.show', $directory->id);
             } catch (\Throwable $e) {
                 DB::rollBack();
@@ -234,6 +261,7 @@ class StatusController extends Controller
             }
 
             DB::commit();
+            $securityThrottle->hitAction($user, 'post');
             return redirect()->route('forum.topic', $topic->id);
         } catch (\Throwable $e) {
             DB::rollBack();
@@ -241,13 +269,30 @@ class StatusController extends Controller
         }
     }
 
-    private function createLegacyDirectoryPost(Request $request, $user)
+    private function createLegacyDirectoryPost(
+        Request $request,
+        $user,
+        SecurityPolicyService $securityPolicy,
+        SecurityThrottleService $securityThrottle
+    )
     {
         $request->validate([
             'name' => 'required|string|max:255',
             'url' => 'required|url',
             'categ' => 'required|integer',
         ]);
+
+        if ($cooldownMessage = $securityThrottle->actionMessage($user, 'post')) {
+            return back()->with('error', $cooldownMessage)->withInput();
+        }
+
+        if ($violation = $securityPolicy->textViolation((string) $request->input('txt', ''), 'posts')) {
+            return back()->with('error', $violation)->withInput();
+        }
+
+        if ($violation = $securityPolicy->urlViolation((string) $request->input('url'), 'posts')) {
+            return back()->with('error', $violation)->withInput();
+        }
 
         DB::beginTransaction();
         try {
@@ -282,6 +327,7 @@ class StatusController extends Controller
             ]);
 
             DB::commit();
+            $securityThrottle->hitAction($user, 'post');
             return redirect()->route('directory.show.short', $dir->id);
         } catch (\Throwable $e) {
             DB::rollBack();

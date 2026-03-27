@@ -114,7 +114,7 @@
                 @endif
 
                 @if($canSendMessage)
-                    <a class="profile-header-info-action button primary" href="{{ route('messages.show', $user->id) }}">
+                    <a class="profile-header-info-action button primary" href="{{ route('messages.show', \App\Models\Message::encodeConversationRouteKey(auth()->id(), $user)) }}">
                         <span class="hide-text-mobile">{{ __('messages.send_message') }}</span>&nbsp;<i class="fa fa-envelope" aria-hidden="true"></i>
                     </a>
                 @endif

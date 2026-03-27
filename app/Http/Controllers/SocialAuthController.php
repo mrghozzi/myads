@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Models\Option;
+use App\Services\SecurityPolicyService;
+use App\Services\SecuritySessionService;
+use App\Services\SecurityThrottleService;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
@@ -32,7 +35,12 @@ class SocialAuthController extends Controller
         }
     }
 
-    public function callback($provider)
+    public function callback(
+        $provider,
+        SecurityPolicyService $securityPolicy,
+        SecurityThrottleService $securityThrottle,
+        SecuritySessionService $securitySessions
+    )
     {
         // Check if provider is configured
         $clientId = config("services.{$provider}.client_id");
@@ -57,8 +65,22 @@ class SocialAuthController extends Controller
         if ($user) {
             // User exists, log them in
             Auth::login($user);
+            request()->session()->regenerate();
+            $securitySessions->trackLogin(request(), $user, 'social_' . $provider);
             return redirect()->route('dashboard');
         } else {
+            if (!$securityThrottle->canRegisterFromIp(request()->ip())) {
+                return redirect()->route('login')->withErrors([
+                    'email' => $securityThrottle->registrationLimitMessage(request()->ip()),
+                ]);
+            }
+
+            if ($emailViolation = $securityPolicy->emailViolation($email)) {
+                return redirect()->route('login')->withErrors([
+                    'email' => $emailViolation,
+                ]);
+            }
+
             // Register new user
             $username = $socialUser->getName() ?? explode('@', $email)[0];
             $username = str_replace(' ', '', $username);
@@ -68,6 +90,12 @@ class SocialAuthController extends Controller
             $counter = 1;
             while (User::where('username', $username)->exists()) {
                 $username = $baseUsername . $counter++;
+            }
+
+            if ($usernameViolation = $securityPolicy->usernameViolation($username)) {
+                return redirect()->route('login')->withErrors([
+                    'email' => $usernameViolation,
+                ]);
             }
 
             $user = User::create([
@@ -111,6 +139,9 @@ class SocialAuthController extends Controller
             ]);
 
             Auth::login($user);
+            request()->session()->regenerate();
+            $securityThrottle->hitRegistrationFromIp(request()->ip());
+            $securitySessions->trackLogin(request(), $user, 'social_' . $provider);
             return redirect()->route('dashboard');
         }
     }

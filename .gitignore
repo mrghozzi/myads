@@ -30,6 +30,8 @@ Thumbs.db
 !/upload/avatar.png
 !/upload/cover.jpg
 /Documents
+!/Documents/
+!/Documents/UPGRADE.md
 
 /plugins/*
 !/plugins/.gitignore
@@ -49,4 +51,5 @@ Thumbs.db
 !/tests/Feature/LegacyAdsListDeleteActionsTest.php
 !/tests/Feature/LocaleDirectionRenderingTest.php
 !/tests/Feature/SiteAdPlacementTest.php
+!/tests/Feature/UpdateSafetyFeatureTest.php
 ~/.pi/

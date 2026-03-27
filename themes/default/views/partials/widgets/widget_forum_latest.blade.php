@@ -8,7 +8,7 @@
 
             @foreach($topics as $topic)
                 <div class="user-status request-small">
-                    <a class="user-status-avatar" href="{{ $topic->user ? route('profile.short', $topic->user->id) : '#' }}">
+                <a class="user-status-avatar" href="{{ $topic->user ? route('profile.short', $topic->user->publicRouteIdentifier()) : '#' }}">
                         <div class="user-avatar small no-outline {{ ($topic->user?->isOnline()) ? 'online' : '' }}">
                             <div class="user-avatar-content">
                                 <div class="hexagon-image-30-32" data-src="{{ ($topic->user?->img) ? url($topic->user->img) : theme_asset('img/avatar/01.jpg') }}"></div>

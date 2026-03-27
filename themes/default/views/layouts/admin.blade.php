@@ -195,6 +195,20 @@
                         </li>
                     @endif
 
+                    @if($canAdmin('security'))
+                        <li class="nxl-item nxl-hasmenu">
+                            <a href="javascript:void(0);" class="nxl-link">
+                                <span class="nxl-micon"><i class="feather-shield"></i></span>
+                                <span class="nxl-mtext">{{ __('messages.security_title') }}</span><span class="nxl-arrow"><i class="feather-chevron-right"></i></span>
+                            </a>
+                            <ul class="nxl-submenu">
+                                <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.security.index') }}">{{ __('messages.security_settings_title') }}</a></li>
+                                <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.security.ip-bans') }}">{{ __('messages.security_ip_bans_title') }}</a></li>
+                                <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.security.sessions') }}">{{ __('messages.security_member_sessions_title') }}</a></li>
+                            </ul>
+                        </li>
+                    @endif
+
                     @if($canAnyAdminSection(['settings', 'languages', 'updates', 'maintenance', 'administrators']))
                         <li class="nxl-item nxl-hasmenu">
                             <a href="javascript:void(0);" class="nxl-link">

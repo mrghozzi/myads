@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Option;
 use App\Models\Setting;
 use App\Models\SmartAd;
+use App\Services\SecurityPolicyService;
 use App\Services\SmartAdAnalyzer;
 use App\Support\SmartAdEmbedCode;
 use App\Support\SmartAdTargeting;
@@ -36,10 +37,15 @@ class SmartAdsController extends Controller
         ]);
     }
 
-    public function store(Request $request, SmartAdAnalyzer $analyzer)
+    public function store(Request $request, SmartAdAnalyzer $analyzer, SecurityPolicyService $securityPolicy)
     {
         $user = Auth::user();
         $payload = $this->validatedPayload($request);
+
+        if ($violation = $this->smartAdViolation($payload, $securityPolicy)) {
+            return back()->withErrors(['landing_url' => $violation])->withInput();
+        }
+
         ['analysis' => $analysis, 'warning' => $warning] = $this->analyzeDestination($payload['landing_url'], $analyzer);
 
         SmartAd::create($this->buildSmartAdAttributes($user->id, $payload, $analysis));
@@ -69,11 +75,16 @@ class SmartAdsController extends Controller
         ]);
     }
 
-    public function update(Request $request, int $id, SmartAdAnalyzer $analyzer)
+    public function update(Request $request, int $id, SmartAdAnalyzer $analyzer, SecurityPolicyService $securityPolicy)
     {
         $user = Auth::user();
         $smartAd = SmartAd::where('uid', $user->id)->findOrFail($id);
         $payload = $this->validatedPayload($request);
+
+        if ($violation = $this->smartAdViolation($payload, $securityPolicy)) {
+            return back()->withErrors(['landing_url' => $violation])->withInput();
+        }
+
         ['analysis' => $analysis, 'warning' => $warning] = $this->analyzeDestination($payload['landing_url'], $analyzer);
 
         $smartAd->update($this->buildSmartAdAttributes($user->id, $payload, $analysis, $smartAd));
@@ -236,6 +247,25 @@ class SmartAdsController extends Controller
             'mobile' => __('messages.smart_device_mobile'),
             'tablet' => __('messages.smart_device_tablet'),
         ];
+    }
+
+    private function smartAdViolation(array $payload, SecurityPolicyService $securityPolicy): ?string
+    {
+        $text = trim(
+            (string) ($payload['headline_override'] ?? '') . "\n"
+            . (string) ($payload['description_override'] ?? '') . "\n"
+            . (string) ($payload['manual_keywords'] ?? '')
+        );
+
+        if ($violation = $securityPolicy->textViolation($text, 'ads')) {
+            return $violation;
+        }
+
+        if ($violation = $securityPolicy->urlViolation((string) ($payload['landing_url'] ?? ''), 'ads')) {
+            return $violation;
+        }
+
+        return $securityPolicy->urlViolation((string) ($payload['image'] ?? ''), 'ads', true);
     }
 
     private function renderPreviewMarkup(SmartAd $smartAd, int $publisherId): string

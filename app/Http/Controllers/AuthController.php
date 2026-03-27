@@ -10,6 +10,9 @@ use App\Models\User;
 use Illuminate\Support\Facades\Cookie;
 use App\Models\Referral;
 use App\Models\Option;
+use App\Services\SecurityPolicyService;
+use App\Services\SecuritySessionService;
+use App\Services\SecurityThrottleService;
 
 class AuthController extends Controller
 {
@@ -23,7 +26,12 @@ class AuthController extends Controller
         return view('theme::auth.register');
     }
 
-    public function register(Request $request)
+    public function register(
+        Request $request,
+        SecurityPolicyService $securityPolicy,
+        SecurityThrottleService $securityThrottle,
+        SecuritySessionService $securitySessions
+    )
     {
         $request->validate([
             'username' => ['required', 'string', 'max:255', 'unique:users'],
@@ -39,6 +47,20 @@ class AuthController extends Controller
             'agree_terms.required' => __('messages.agree_terms_required'),
             'agree_terms.accepted' => __('messages.agree_terms_required'),
         ]);
+
+        if (!$securityThrottle->canRegisterFromIp($request->ip())) {
+            return back()->withErrors([
+                'email' => $securityThrottle->registrationLimitMessage($request->ip()),
+            ])->withInput();
+        }
+
+        if ($usernameViolation = $securityPolicy->usernameViolation((string) $request->input('username'))) {
+            return back()->withErrors(['username' => $usernameViolation])->withInput();
+        }
+
+        if ($emailViolation = $securityPolicy->emailViolation((string) $request->input('email'))) {
+            return back()->withErrors(['email' => $emailViolation])->withInput();
+        }
 
         // Clear captcha after use
         session()->forget('captcha_result');
@@ -111,11 +133,18 @@ class AuthController extends Controller
         }
 
         Auth::login($user);
+        $request->session()->regenerate();
+        $securityThrottle->hitRegistrationFromIp($request->ip());
+        $securitySessions->trackLogin($request, $user, 'register');
 
         return redirect()->route('dashboard');
     }
 
-    public function login(Request $request)
+    public function login(
+        Request $request,
+        SecurityThrottleService $securityThrottle,
+        SecuritySessionService $securitySessions
+    )
     {
         $request->validate([
             'username' => ['required', 'string'],
@@ -123,6 +152,12 @@ class AuthController extends Controller
         ]);
 
         $input = $request->input('username');
+
+        if ($securityThrottle->tooManyLoginAttempts($input, $request->ip())) {
+            return back()->withErrors([
+                'username' => $securityThrottle->loginMessage($input, $request->ip()),
+            ])->onlyInput('username');
+        }
 
         // Query both username and email columns (like the old system)
         $user = User::where('username', $input)->orWhere('email', $input)->first();
@@ -133,6 +168,8 @@ class AuthController extends Controller
                 Auth::login($user, $request->boolean('remember'));
                 app(\App\Services\GamificationService::class)->recordEvent($user->id, 'login');
                 $request->session()->regenerate();
+                $securityThrottle->clearLoginAttempts($input, $request->ip());
+                $securitySessions->trackLogin($request, $user, 'login');
                 return redirect()->intended('/');
             }
             
@@ -147,17 +184,22 @@ class AuthController extends Controller
                 app(\App\Services\GamificationService::class)->recordEvent($user->id, 'login');
 
                 $request->session()->regenerate();
+                $securityThrottle->clearLoginAttempts($input, $request->ip());
+                $securitySessions->trackLogin($request, $user, 'login');
                 return redirect()->intended('/');
             }
         }
+
+        $securityThrottle->hitLoginAttempt($input, $request->ip());
 
         return back()->withErrors([
             'username' => __('messages.login_error') ?? 'The provided credentials do not match our records.',
         ])->onlyInput('username');
     }
 
-    public function logout(Request $request)
+    public function logout(Request $request, SecuritySessionService $securitySessions)
     {
+        $securitySessions->markLogout($request, Auth::user());
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();

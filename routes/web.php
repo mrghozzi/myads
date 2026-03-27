@@ -23,6 +23,7 @@ use App\Http\Controllers\ReactionController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\MentionController;
 use App\Http\Controllers\AdminAdminsController;
+use App\Http\Controllers\AdminSecurityController;
 use App\Http\Controllers\SeoPublicController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\OrderRequestController;
@@ -329,6 +330,10 @@ Route::post('/report', [App\Http\Controllers\ReportController::class, 'store'])-
 
 // Admin Routes
 Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
+    Route::get('/confirm-password', [AdminSecurityController::class, 'showConfirmPasswordForm'])->name('admin.confirm-password.form');
+    Route::post('/confirm-password', [AdminSecurityController::class, 'confirmPassword'])->name('admin.confirm-password.store');
+
+    Route::middleware(['admin.password.confirm'])->group(function () {
     Route::get('/', [AdminController::class, 'index'])->name('admin.index');
     Route::get('/settings', [AdminController::class, 'settings'])->name('admin.settings');
     Route::post('/settings', [AdminController::class, 'updateSettings'])->name('admin.settings.update');
@@ -494,6 +499,16 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::post('/maintenance/clear-cache', [AdminController::class, 'clearCache'])->name('admin.maintenance.clear_cache');
     Route::post('/maintenance/migrate', [AdminController::class, 'runMigrations'])->name('admin.maintenance.migrate');
     Route::post('/maintenance/db-repair', [AdminController::class, 'dbRepair'])->name('admin.maintenance.db_repair');
+
+    // Security
+    Route::get('/security', [AdminSecurityController::class, 'index'])->name('admin.security.index');
+    Route::post('/security', [AdminSecurityController::class, 'update'])->name('admin.security.update');
+    Route::get('/security/ip-bans', [AdminSecurityController::class, 'ipBans'])->name('admin.security.ip-bans');
+    Route::post('/security/ip-bans', [AdminSecurityController::class, 'storeIpBan'])->name('admin.security.ip-bans.store');
+    Route::delete('/security/ip-bans/{id}', [AdminSecurityController::class, 'destroyIpBan'])->name('admin.security.ip-bans.delete');
+    Route::get('/security/sessions', [AdminSecurityController::class, 'sessions'])->name('admin.security.sessions');
+    Route::post('/security/sessions/{id}/revoke', [AdminSecurityController::class, 'revokeSession'])->name('admin.security.sessions.revoke');
+    });
 });
 
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap.xml');

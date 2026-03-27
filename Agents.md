@@ -56,6 +56,7 @@ MYADS is a community platform where website owners:
 ```
 myads/
 ├── app/
+│   ├── Console/Commands/  # Artisan commands such as update safety preflight
 │   ├── Helpers/           # Hooks.php (WordPress-like action/filter system)
 │   ├── helpers.php         # Global helpers: theme_asset(), ads_site(), locale_direction(), is_locale_rtl()
 │   ├── Http/
@@ -224,6 +225,8 @@ myads/
 | `SmartAdAnalyzer` | Analyzes landing pages for Smart Ads metadata |
 | `SmartAdGeoResolver` | Geo-targeting for Smart Ads |
 | `V420SchemaService` | Graceful fallback detection for incomplete v4.2.0 upgrades |
+| `TestingSafetyGuard` | Hard-fails tests unless they are using the isolated SQLite testing database |
+| `UpdateSafetyService` | Preflight safety checks for updates: DB connection, writable paths, pending migrations, destructive migration detection |
 
 ---
 
@@ -409,7 +412,8 @@ MAIL_HOST=smtp.example.com
 
 - **Framework:** PHPUnit 11
 - **Location:** `tests/Feature/` (26 test files), `tests/Concerns/`
-- **Run:** `php artisan test` or `composer test`
+- **Run:** `php artisan test --env=testing` or `composer test`
+- **Isolation:** Tests must run only against `.env.testing` with `sqlite` and `database/testing.sqlite`. Never point tests at a MySQL/MariaDB site database.
 - **Coverage areas:** Installer flow, forum features, banner/link/smart ads, store, SEO, locale/RTL, notifications, profile/follow, directory, v4.2.0 features (community, privacy, ACL, translations, upgrade fallbacks)
 
 ---
@@ -434,7 +438,10 @@ composer dev
 # Run tests
 composer test
 # or
-php artisan test
+php artisan test --env=testing
+
+# Run update safety preflight before upgrading
+php artisan myads:update:preflight
 
 # Generate sitemap
 # Via admin panel or: GET /admin/sitemap/generate
@@ -455,43 +462,46 @@ php artisan storage:link
 4. **Always use `theme::` namespace** for view references in controllers (e.g., `view('theme::home')`).
 5. **Always wrap new DB queries in try-catch** if they reference tables that may not exist on older installs (follow `V420SchemaService` pattern).
 6. **Never use `document.write`** in ad serving — use slot-based injection.
+7. **Never run tests or destructive DB commands against a live site database.** Any `php artisan test`, `migrate:fresh`, `db:wipe`, or similar command requires a verified isolated test database first.
+8. **Release migrations must be non-destructive in `up()`.** Table drops, column drops, truncates, and destructive raw SQL belong only in explicit manual recovery paths, never in normal upgrade migrations.
+9. **Codex incident note (2026-03-27):** A previous non-isolated test run rebuilt a real MYADS database. Future agents must treat DB isolation and backup requirements as hard safety gates, not suggestions.
 
 ### Code Conventions
 
-7. **Translations:** Never hardcode English strings in Blade views or controllers. Use `__('messages.key_name')`. Add keys to ALL 9 language files.
-8. **RTL:** Always test UI changes in both LTR and RTL. Use `locale_direction()` helper. Add RTL overrides when needed.
-9. **Routes:** Name all routes. Follow existing naming convention: `module.action` (e.g., `forum.create`, `admin.users.edit`).
-10. **Models:** Place in `app/Models/`. Define `$fillable` or `$guarded`. Specify `$table` name explicitly (many use legacy table names like `f_topic`, `f_cat`).
-11. **Services:** Business logic goes in `app/Services/`, not controllers. Controllers should be thin.
-12. **Support classes:** Value objects, formatters, settings bags go in `app/Support/`.
-13. **Middleware:** Registered in `bootstrap/app.php`. Admin routes use `['auth', 'admin']`.
-14. **Admin views:** Follow Duralux design patterns (card-based, `hstack`, `gap-3`).
-15. **Blade partials:** Reuse existing partials. Activity cards: `partials/activity/`. Forum: `partials/forum/`.
+10. **Translations:** Never hardcode English strings in Blade views or controllers. Use `__('messages.key_name')`. Add keys to ALL 9 language files.
+11. **RTL:** Always test UI changes in both LTR and RTL. Use `locale_direction()` helper. Add RTL overrides when needed.
+12. **Routes:** Name all routes. Follow existing naming convention: `module.action` (e.g., `forum.create`, `admin.users.edit`).
+13. **Models:** Place in `app/Models/`. Define `$fillable` or `$guarded`. Specify `$table` name explicitly (many use legacy table names like `f_topic`, `f_cat`).
+14. **Services:** Business logic goes in `app/Services/`, not controllers. Controllers should be thin.
+15. **Support classes:** Value objects, formatters, settings bags go in `app/Support/`.
+16. **Middleware:** Registered in `bootstrap/app.php`. Admin routes use `['auth', 'admin']`.
+17. **Admin views:** Follow Duralux design patterns (card-based, `hstack`, `gap-3`).
+18. **Blade partials:** Reuse existing partials. Activity cards: `partials/activity/`. Forum: `partials/forum/`.
 
 ### Migration Conventions
 
-16. **Migration filenames:** Use date prefix format `YYYY_MM_DD_HHMMSS_description.php`.
-17. **Never modify existing migrations** — create new ones for schema changes.
-18. **Repair migrations:** For upgrade-safe schema changes, use `Schema::hasTable()` / `Schema::hasColumn()` checks.
+19. **Migration filenames:** Use date prefix format `YYYY_MM_DD_HHMMSS_description.php`.
+20. **Never modify existing migrations** — create new ones for schema changes.
+21. **Repair migrations:** For upgrade-safe schema changes, use `Schema::hasTable()` / `Schema::hasColumn()` checks.
 
 ### Plugin/Theme Development
 
-19. **Plugins** must have `plugin.json` and a `boot.php` entry point.
-20. **Themes** must have `theme.json` and follow the view directory structure of `themes/default/views/`.
-21. **Hooks:** Use `add_action()` / `add_filter()` from `App\Helpers\Hooks` — never monkey-patch core files.
+22. **Plugins** must have `plugin.json` and a `boot.php` entry point.
+23. **Themes** must have `theme.json` and follow the view directory structure of `themes/default/views/`.
+24. **Hooks:** Use `add_action()` / `add_filter()` from `App\Helpers\Hooks` — never monkey-patch core files.
 
 ### Testing
 
-22. **Write feature tests** for new features in `tests/Feature/`.
-23. **Use `SeedsSiteSettings` trait** when tests need the `setting` table seeded.
-24. **Validate PHP syntax** after edits: `php -l <file>`.
+25. **Write feature tests** for new features in `tests/Feature/`.
+26. **Use `SeedsSiteSettings` trait** when tests need the `setting` table seeded.
+27. **Validate PHP syntax** after edits: `php -l <file>`.
 
 ### Security
 
-25. **Sanitize all user input.** Use Laravel validation and Blade `{{ }}` escaping.
-26. **Admin routes** must always be in the `admin` prefix group with `AdminMiddleware`.
-27. **File uploads:** Validate MIME types, limit sizes, store in `public/upload/`.
-28. **CSRF:** Never disable CSRF except for installer routes and ad serving endpoints.
+28. **Sanitize all user input.** Use Laravel validation and Blade `{{ }}` escaping.
+29. **Admin routes** must always be in the `admin` prefix group with `AdminMiddleware`.
+30. **File uploads:** Validate MIME types, limit sizes, store in `public/upload/`.
+31. **CSRF:** Never disable CSRF except for installer routes and ad serving endpoints.
 
 ---
 
@@ -521,6 +531,7 @@ php artisan storage:link
 |----------|------|
 | Project Overview | `Documents/README.md` |
 | Installation Guide | `Documents/INSTALLATION.md` |
+| Upgrade Guide | `Documents/UPGRADE.md` |
 | System Requirements | `Documents/SYSTEM_REQUIREMENTS.md` |
 | API Documentation | `Documents/API_DOCS.md` |
 | Theme Guide | `Documents/THEME_GUIDE.md` |
@@ -529,6 +540,30 @@ php artisan storage:link
 | Security Policy | `SECURITY.md` |
 
 ---
+
+---
+
+## 19A. Security Suite Update (2026-03-27)
+
+- **Controllers:** Added `AdminSecurityController` for `/admin/security`, `/admin/security/ip-bans`, `/admin/security/sessions`, and `/admin/confirm-password`.
+- **Models:** Added `SecurityIpBan` (`security_ip_bans`) and `SecurityMemberSession` (`security_member_sessions`). `User` now supports `public_uid` for public shortcut links, and `Message` supports optional encrypted storage for new private messages.
+- **Services & Support:** Added `SecuritySettings`, `SecurityPolicyService`, `SecurityThrottleService`, `SecuritySessionService`, `LocalUrlSafetyInspector`, and `UrlSafetyInspectorInterface`.
+- **Middleware:** Added `BlockBannedIp`, `TrackMemberSecuritySession`, and `RequireAdminPasswordConfirmation`. Global web middleware now includes IP blocking and member session tracking.
+- **Routes & ACL:** Added admin ACL module `security`, Duralux admin navigation for Security, admin password confirmation routes, IP ban routes, and session revoke routes. Public shortcut route `/u/id/{id}` now supports canonical redirects toward `public_uid` when enabled.
+- **Schema:** Added migration `2026_03_27_120000_add_security_suite_tables.php` creating `security_ip_bans`, `security_member_sessions`, and `users.public_uid` with upgrade-safe guards.
+- **Security Behavior:** Centralized link/domain safety now applies to registration, login throttling, posts, comments, forum topics, private messages, banner/link/smart/visit ads, and link previews. Private messages can be stored as `enc:` payloads using Laravel `Crypt`, `/messages/{id}` now prefers opaque encrypted conversation identifiers while still accepting legacy numeric IDs, and mixed legacy/encrypted threads display a lightweight separator when encrypted replies begin.
+- **Public Profile Shortcuts:** Header and sidebar avatar/profile shortcuts now consistently use `route('profile.short', $user->publicRouteIdentifier())`, so enabling public member IDs updates those public-facing links immediately.
+- **Testing:** Added `tests/Feature/SecuritySuiteFeatureTest.php` covering ACL for the security module, admin password confirmation middleware behavior, private message encryption, and `public_uid` shortcut routing.
+
+---
+
+## 19B. Update Safety & Testing Isolation (2026-03-27)
+
+- **Commands:** Added `myads:update:preflight` to validate database connectivity, writable paths, pending migrations, and destructive migration patterns before upgrades.
+- **Services & Support:** Added `TestingSafetyGuard`, `UpdateSafetyService`, and `UpdatePreflightReport`.
+- **Testing Isolation:** Added tracked `.env.testing`, switched automated tests to `database/testing.sqlite`, and hard-failed the test bootstrap if the environment is not isolated from the live database.
+- **Updater Safety:** `/admin/updates` now blocks execution unless the operator confirms database and file backups and the preflight report passes.
+- **Documentation:** Added `Documents/UPGRADE.md` and strengthened backup warnings in the installation guide.
 
 ---
 
@@ -553,4 +588,4 @@ If in doubt, update it. An outdated `Agents.md` causes future agents to make wro
 
 ---
 
-*Last updated: 2026-03-26 — MYADS v4.2.0*
+*Last updated: 2026-03-27 — MYADS v4.2.0*

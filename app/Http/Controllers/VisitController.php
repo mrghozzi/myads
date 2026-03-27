@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use App\Models\Visit;
 use App\Models\User;
+use App\Services\SecurityPolicyService;
 
 class VisitController extends Controller
 {
@@ -32,7 +33,7 @@ class VisitController extends Controller
     }
 
     // Management: Store Site
-    public function store(Request $request)
+    public function store(Request $request, SecurityPolicyService $securityPolicy)
     {
         $request->validate([
             'name' => 'required|string|max:255',
@@ -41,6 +42,10 @@ class VisitController extends Controller
         ]);
 
         $user = Auth::user();
+
+        if ($violation = $securityPolicy->urlViolation((string) $request->input('url'), 'ads')) {
+            return back()->withErrors(['url' => $violation])->withInput();
+        }
 
         Visit::create([
             'uid' => $user->id,
@@ -63,7 +68,7 @@ class VisitController extends Controller
     }
 
     // Management: Update Site
-    public function update(Request $request, $id)
+    public function update(Request $request, $id, SecurityPolicyService $securityPolicy)
     {
         $user = Auth::user();
         $site = Visit::where('id', $id)->where('uid', $user->id)->firstOrFail();
@@ -73,6 +78,10 @@ class VisitController extends Controller
             'url' => 'required|url',
             'tims' => 'required|in:1,2,3,4',
         ]);
+
+        if ($violation = $securityPolicy->urlViolation((string) $request->input('url'), 'ads')) {
+            return back()->withErrors(['url' => $violation])->withInput();
+        }
 
         $site->update([
             'name' => $request->name,

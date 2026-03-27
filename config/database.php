@@ -2,6 +2,21 @@
 
 use Illuminate\Support\Str;
 
+$defaultConnection = env('DB_CONNECTION', 'sqlite');
+$sqliteDatabase = env('DB_DATABASE', database_path('database.sqlite'));
+
+if (is_string($sqliteDatabase) && $sqliteDatabase !== ':memory:') {
+    $normalizedSqliteDatabase = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $sqliteDatabase);
+    $isAbsoluteSqlitePath = str_starts_with($normalizedSqliteDatabase, DIRECTORY_SEPARATOR)
+        || preg_match('/^[A-Za-z]:[\\\\\\/]/', $normalizedSqliteDatabase) === 1;
+
+    if (! $isAbsoluteSqlitePath) {
+        $sqliteDatabase = str_contains($normalizedSqliteDatabase, 'database'.DIRECTORY_SEPARATOR)
+            ? base_path($normalizedSqliteDatabase)
+            : database_path($normalizedSqliteDatabase);
+    }
+}
+
 return [
 
     /*
@@ -16,7 +31,7 @@ return [
     |
     */
 
-    'default' => env('DB_CONNECTION', 'sqlite'),
+    'default' => $defaultConnection,
 
     /*
     |--------------------------------------------------------------------------
@@ -34,7 +49,7 @@ return [
         'sqlite' => [
             'driver' => 'sqlite',
             'url' => env('DB_URL'),
-            'database' => env('DB_DATABASE', database_path('database.sqlite')),
+            'database' => $sqliteDatabase,
             'prefix' => '',
             'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
             'busy_timeout' => null,

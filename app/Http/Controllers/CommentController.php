@@ -12,6 +12,8 @@ use App\Services\GamificationService;
 use App\Services\MentionService;
 use App\Services\NotificationService;
 use App\Services\PointLedgerService;
+use App\Services\SecurityPolicyService;
+use App\Services\SecurityThrottleService;
 use App\Services\V420SchemaService;
 use App\Support\ContentFormatter;
 use Illuminate\Http\Request;
@@ -85,7 +87,9 @@ class CommentController extends Controller
         NotificationService $notifications,
         PointLedgerService $pointLedger,
         MentionService $mentions,
-        GamificationService $gamification
+        GamificationService $gamification,
+        SecurityPolicyService $securityPolicy,
+        SecurityThrottleService $securityThrottle
     )
     {
         if (!Auth::check()) {
@@ -100,6 +104,14 @@ class CommentController extends Controller
 
         if (!$id || !$type || !$text) {
             return response()->json(['error' => 'Missing parameters'], 400);
+        }
+
+        if ($violation = $securityPolicy->textViolation((string) $text, 'comments')) {
+            return response()->json(['error' => $violation], 422);
+        }
+
+        if ($cooldownMessage = $securityThrottle->actionMessage($user, 'comment')) {
+            return response()->json(['error' => $cooldownMessage], 429);
         }
 
         $time = time();
@@ -225,6 +237,7 @@ class CommentController extends Controller
             }
 
             DB::commit();
+            $securityThrottle->hitAction($user, 'comment');
             
             // Return the single comment view for appending
             // Or reload the list. Old code returns the list/form logic or just appends?

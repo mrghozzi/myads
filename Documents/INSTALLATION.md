@@ -58,3 +58,30 @@ Since v4.0 is a complete rewrite to Laravel, the upgrade process preserves your 
 4. Provide the **existing database credentials**.
 5. The system will detect the old tables (`users`, `options`, etc.), inject the missing structural tables (`setting`, `menu`, `forum_moderators`, etc.), and run the compatibility migrations.
 6. Old MD5 user passwords will be supported automatically through Laravel's authentication system (upgraded to Bcrypt upon their next login).
+
+## Updating an existing MYADS installation from Git
+
+1. **Create a full backup first.** Export your database and keep a copy of your project files before touching the codebase.
+2. Pull the new release files:
+   ```bash
+   git pull
+   composer install --no-dev --optimize-autoloader
+   ```
+3. Run the built-in update safety check:
+   ```bash
+   php artisan myads:update:preflight
+   ```
+4. If the preflight check passes, enable maintenance mode and apply the schema changes:
+   ```bash
+   php artisan down
+   php artisan migrate --force
+   php artisan optimize:clear
+   php artisan up
+   ```
+5. Verify the site in the browser and keep the backup until you confirm everything is healthy.
+
+### Critical safety warning
+
+- Never run `php artisan migrate:fresh`, `php artisan db:wipe`, or `php artisan test` against your live site database.
+- The supported upgrade path is additive only: `git pull` + `php artisan myads:update:preflight` + `php artisan migrate --force`.
+- If you are unsure, stop and take a new backup before continuing.

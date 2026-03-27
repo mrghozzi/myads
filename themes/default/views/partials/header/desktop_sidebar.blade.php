@@ -187,8 +187,9 @@
                                     @php
                                         $headerPartner = $headerConversation['user'];
                                         $headerLastMessage = $headerConversation['message'];
+                                        $headerConversationRouteKey = \App\Models\Message::encodeConversationRouteKey($headerUser->id, $headerPartner);
                                     @endphp
-                                    <a class="dropdown-box-list-item {{ $headerConversation['unread'] ? 'unread' : '' }}" href="{{ route('messages.show', $headerPartner->id) }}">
+                                    <a class="dropdown-box-list-item {{ $headerConversation['unread'] ? 'unread' : '' }}" href="{{ route('messages.show', $headerConversationRouteKey) }}">
                                         <div class="user-status">
                                             <div class="user-status-avatar">
                                                 <div class="user-avatar small no-outline {{ $headerPartner->isOnline() ? 'online' : 'offline' }}">
@@ -359,7 +360,7 @@
                 </div>
                 <div class="dropdown-navigation header-settings-dropdown">
                     <p class="dropdown-navigation-category">{{ __('messages.account') }}</p>
-                    <a class="dropdown-navigation-link" href="{{ route('profile.show', auth()->user()->username) }}">{{ __('messages.member_profile') }}</a>
+                    <a class="dropdown-navigation-link" href="{{ route('profile.short', auth()->user()->publicRouteIdentifier()) }}">{{ __('messages.member_profile') }}</a>
                     <a class="dropdown-navigation-link" href="{{ route('profile.edit') }}">{{ __('messages.edit_profile') }}</a>
                     <a class="dropdown-navigation-link" href="{{ route('settings') }}">{{ __('messages.account_settings') }}</a>
                     

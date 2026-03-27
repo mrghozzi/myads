@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Artisan;
 use App\Models\Option;
 use App\Services\GamificationService;
+use App\Services\UpdateSafetyService;
 
 class AdminUpdatesController extends Controller
 {
@@ -18,7 +19,8 @@ class AdminUpdatesController extends Controller
     public const CURRENT_VERSION = '4.2.0';
 
     public function __construct(
-        private readonly GamificationService $gamification
+        private readonly GamificationService $gamification,
+        private readonly UpdateSafetyService $updateSafety
     ) {
     }
 
@@ -43,6 +45,7 @@ class AdminUpdatesController extends Controller
     public function index(Request $request)
     {
         $currentVersion = self::CURRENT_VERSION;
+        $preflightReport = $this->updateSafety->run();
 
         // Sync version in DB
         $this->syncVersionInDb($currentVersion);
@@ -74,7 +77,8 @@ class AdminUpdatesController extends Controller
             'currentVersion',
             'latestVersion',
             'updateAvailable',
-            'latestRelease'
+            'latestRelease',
+            'preflightReport'
         ));
     }
 
@@ -122,6 +126,26 @@ class AdminUpdatesController extends Controller
      */
     public function update(Request $request)
     {
+        $request->validate([
+            'backup_ack_database' => ['accepted'],
+            'backup_ack_files' => ['accepted'],
+        ], [
+            'backup_ack_database.accepted' => __('messages.backup_ack_database_required'),
+            'backup_ack_files.accepted' => __('messages.backup_ack_files_required'),
+        ]);
+
+        $environmentReport = $this->updateSafety->run();
+
+        if (! $environmentReport->isSafe()) {
+            return redirect()->route('admin.updates')->with('error', __('messages.update_blocked_preflight', [
+                'details' => implode(' ', $environmentReport->failureMessages()),
+            ]));
+        }
+
+        $tempZipPath = storage_path('app/myads_update.zip');
+        $tempExtractPath = storage_path('app/myads_update_extracted');
+        $maintenanceModeEnabled = false;
+
         try {
             // Fetch release data
             $releaseData = $this->fetchLatestRelease();
@@ -145,8 +169,6 @@ class AdminUpdatesController extends Controller
                 return redirect()->route('admin.updates')->with('error',
                     __('messages.no_download_url') ?? 'No download package found in the release.');
             }
-
-            $tempZipPath = storage_path('app/myads_update.zip');
 
             // Download the zip file directly to disk using sink
             try {
@@ -173,14 +195,11 @@ class AdminUpdatesController extends Controller
             }
 
             // Extract the zip to a temporary directory first
-            $tempExtractPath = storage_path('app/myads_update_extracted');
-            if (!File::exists($tempExtractPath)) {
-                File::makeDirectory($tempExtractPath, 0755, true);
-            }
+            File::deleteDirectory($tempExtractPath);
+            File::makeDirectory($tempExtractPath, 0755, true);
 
             $zip = new \ZipArchive;
             if ($zip->open($tempZipPath) !== true) {
-                File::delete($tempZipPath);
                 return redirect()->route('admin.updates')->with('error',
                     __('messages.zip_open_failed') ?? 'Failed to open the update package.');
             }
@@ -191,27 +210,36 @@ class AdminUpdatesController extends Controller
             // GitHub zips contain a root folder (e.g., mrghozzi-myads-2df4a1).
             // We need to move the contents of that inner folder to the base_path().
             $directories = File::directories($tempExtractPath);
-            if (count($directories) > 0) {
-                $innerFolder = $directories[0]; // The root folder inside the zip
-                $basePath = base_path();
+            $innerFolder = count($directories) > 0 ? $directories[0] : $tempExtractPath;
 
-                // Move all files and folders from the inner folder to the base path
-                foreach (File::allFiles($innerFolder) as $file) {
-                    $relativePath = str_replace($innerFolder . DIRECTORY_SEPARATOR, '', $file->getRealPath());
-                    $targetPath = $basePath . DIRECTORY_SEPARATOR . $relativePath;
-                    
-                    // Create directory if it doesn't exist
-                    $targetDir = dirname($targetPath);
-                    if (!File::exists($targetDir)) {
-                        File::makeDirectory($targetDir, 0755, true);
-                    }
-                    
-                    File::copy($file->getRealPath(), $targetPath);
-                }
+            $releaseReport = $this->updateSafety->run([
+                $innerFolder . DIRECTORY_SEPARATOR . 'database' . DIRECTORY_SEPARATOR . 'migrations',
+            ]);
+
+            if (! $releaseReport->isSafe()) {
+                return redirect()->route('admin.updates')->with('error', __('messages.update_blocked_preflight', [
+                    'details' => implode(' ', $releaseReport->failureMessages()),
+                ]));
             }
 
-            // Cleanup extraction temp directory
-            File::deleteDirectory($tempExtractPath);
+            Artisan::call('down');
+            $maintenanceModeEnabled = true;
+
+            $basePath = base_path();
+
+            // Move all files and folders from the inner folder to the base path
+            foreach (File::allFiles($innerFolder) as $file) {
+                $relativePath = str_replace($innerFolder . DIRECTORY_SEPARATOR, '', $file->getRealPath());
+                $targetPath = $basePath . DIRECTORY_SEPARATOR . $relativePath;
+
+                // Create directory if it doesn't exist
+                $targetDir = dirname($targetPath);
+                if (!File::exists($targetDir)) {
+                    File::makeDirectory($targetDir, 0755, true);
+                }
+
+                File::copy($file->getRealPath(), $targetPath);
+            }
 
             // Run update script if exists
             $updateScript = base_path('requests/update.php');
@@ -221,14 +249,9 @@ class AdminUpdatesController extends Controller
 
             // Run migrations and clear caches
             Artisan::call('migrate', ['--force' => true]);
-            Artisan::call('cache:clear');
-            Artisan::call('view:clear');
-            Artisan::call('config:clear');
+            Artisan::call('optimize:clear');
 
             $this->gamification->repairQuestData();
-
-            // Clean up
-            File::delete($tempZipPath);
 
             // Clear version cache
             Cache::forget('github_latest_release');
@@ -238,14 +261,24 @@ class AdminUpdatesController extends Controller
                 __('messages.update_success') ?? 'System updated successfully to v' . $latestVersion . '!');
 
         } catch (\Exception $e) {
-            // Clean up on failure
-            $tempZipPath = storage_path('app/myads_update.zip');
+            return redirect()->route('admin.updates')->with('error',
+                (__('messages.update_failed') ?? 'Update failed: ') . $e->getMessage());
+        } finally {
             if (File::exists($tempZipPath)) {
                 File::delete($tempZipPath);
             }
 
-            return redirect()->route('admin.updates')->with('error',
-                (__('messages.update_failed') ?? 'Update failed: ') . $e->getMessage());
+            if (File::exists($tempExtractPath)) {
+                File::deleteDirectory($tempExtractPath);
+            }
+
+            if ($maintenanceModeEnabled) {
+                try {
+                    Artisan::call('up');
+                } catch (\Throwable) {
+                    // Best effort: do not mask the original update result.
+                }
+            }
         }
     }
 

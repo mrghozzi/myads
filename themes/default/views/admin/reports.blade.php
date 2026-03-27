@@ -60,7 +60,7 @@
                                 $targetUser = $target?->user;
                             } elseif ($report->s_type == 99) {
                                 $target = \App\Models\User::find($report->tp_id);
-                                $previewUrl = $target ? route('profile.short', $target->id) : null;
+                                                $previewUrl = $target ? route('profile.short', $target->publicRouteIdentifier()) : null;
                                 $targetTitle = $target?->username;
                                 $targetUser = $target;
                             } elseif ($report->s_type == 201) {

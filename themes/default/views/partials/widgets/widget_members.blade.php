@@ -26,7 +26,7 @@
                 @endphp
                 <div class="user-status request-small">
                     <!-- USER STATUS AVATAR -->
-                    <a class="user-status-avatar" href="{{ route('profile.short', $user->id) }}">
+                <a class="user-status-avatar" href="{{ route('profile.short', $user->publicRouteIdentifier()) }}">
                         <!-- USER AVATAR -->
                         <div class="user-avatar small no-outline {{ $isOnline ? 'online' : '' }}">
                             <!-- USER AVATAR CONTENT -->
@@ -76,7 +76,7 @@
                     <!-- /USER STATUS AVATAR -->
 
                     <!-- USER STATUS TITLE -->
-                    <p class="user-status-title"><a class="bold" href="{{ route('profile.short', $user->id) }}">{{ Str::limit($user->username, 15) }}</a></p>
+                    <p class="user-status-title"><a class="bold" href="{{ route('profile.short', $user->publicRouteIdentifier()) }}">{{ Str::limit($user->username, 15) }}</a></p>
                     <!-- /USER STATUS TITLE -->
 
                     <!-- USER STATUS TEXT -->

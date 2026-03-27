@@ -15,9 +15,12 @@ class V420SchemaService
         'point_history' => ['point_transactions'],
         'badges' => ['badges', 'user_badges', 'badge_showcase'],
         'quests' => ['quests', 'quest_progress'],
+        'security_ip_bans' => ['security_ip_bans'],
+        'security_sessions' => ['security_member_sessions'],
     ];
 
     private array $tableCache = [];
+    private array $columnCache = [];
     private array $featureCache = [];
 
     public function hasTable(string $table): bool
@@ -47,6 +50,21 @@ class V420SchemaService
         }
 
         return $this->featureCache[$feature] = true;
+    }
+
+    public function hasColumn(string $table, string $column): bool
+    {
+        $key = $table . '.' . $column;
+
+        if (array_key_exists($key, $this->columnCache)) {
+            return $this->columnCache[$key];
+        }
+
+        try {
+            return $this->columnCache[$key] = Schema::hasColumn($table, $column);
+        } catch (\Throwable) {
+            return $this->columnCache[$key] = false;
+        }
     }
 
     public function missingTablesFor(string|array $featureOrTables): array

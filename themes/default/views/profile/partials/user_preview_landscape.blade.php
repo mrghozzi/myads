@@ -30,7 +30,7 @@
         <!-- USER SHORT DESCRIPTION -->
         <div class="user-short-description landscape tiny">
             <!-- USER SHORT DESCRIPTION AVATAR -->
-            <a class="user-short-description-avatar user-avatar small {{ $targetUser->isOnline() ? 'online' : 'offline' }}" href="{{ route('profile.show', $targetUser->username) }}">
+            <a class="user-short-description-avatar user-avatar small {{ $targetUser->isOnline() ? 'online' : 'offline' }}" href="{{ route('profile.short', $targetUser->publicRouteIdentifier()) }}">
                 <div class="user-avatar-border">
                     <div class="hexagon-50-56" style="width: 50px; height: 56px; position: relative;"><canvas width="50" height="56"></canvas></div>
                 </div>
@@ -55,7 +55,7 @@
             <!-- /USER SHORT DESCRIPTION AVATAR -->
             
             <!-- USER SHORT DESCRIPTION TITLE -->
-            <p class="user-short-description-title"><a href="{{ route('profile.show', $targetUser->username) }}">{{ $targetUser->username }}</a></p>
+            <p class="user-short-description-title"><a href="{{ route('profile.short', $targetUser->publicRouteIdentifier()) }}">{{ $targetUser->username }}</a></p>
             <!-- /USER SHORT DESCRIPTION TITLE -->
             
             <!-- USER SHORT DESCRIPTION TEXT -->
@@ -111,7 +111,7 @@
             @endif
             <!-- MESSAGE BUTTON -->
             @if(Auth::check())
-            <a class="profile-header-info-action button primary" href="{{ route('messages.index', ['user' => $targetUser->id]) }}">
+            <a class="profile-header-info-action button primary" href="{{ route('messages.show', \App\Models\Message::encodeConversationRouteKey(auth()->id(), $targetUser)) }}">
                 <svg class="button-icon icon-comment"><use xlink:href="#svg-comment"></use></svg>
             </a>
             @endif

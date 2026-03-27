@@ -1,6 +1,6 @@
 <nav id="navigation-widget-small" class="navigation-widget navigation-widget-desktop closed sidebar left delayed">
     @auth
-        <a class="user-avatar small no-outline {{ auth()->user()->isOnline() ? 'online' : 'offline' }}" href="{{ url('/u/' . auth()->id()) }}">
+        <a class="user-avatar small no-outline {{ auth()->user()->isOnline() ? 'online' : 'offline' }}" href="{{ route('profile.short', auth()->user()->publicRouteIdentifier()) }}">
     @else
         <a class="user-avatar small" href="{{ route('login') }}">
     @endauth
