@@ -561,6 +561,12 @@
     <script src="{{ theme_asset('js/xm_tab.min.js') }}"></script>
     <script src="{{ theme_asset('js/xm_tooltip.min.js') }}"></script>
     <script src="{{ theme_asset('js/global.hexagons.js') }}"></script>
+    <script>
+        // Mark all hexagon elements initialized by global.hexagons.js so initHexagons() skips them
+        document.querySelectorAll('.hexagon-image-30-32, .hexagon-border-40-44, .hexagon-22-24, .hexagon-dark-16-18').forEach(function(el) {
+            el.dataset.hexInit = '1';
+        });
+    </script>
     <script src="{{ theme_asset('js/global.tooltips.js') }}"></script>
     <script src="{{ theme_asset('js/header.js') }}"></script>
     <script src="{{ theme_asset('js/sidebar.js') }}"></script>
@@ -631,39 +637,55 @@
             }
         });
 
-        function initHexagons() {
-            if (typeof app !== 'undefined' && app.plugins && app.plugins.createHexagon) {
-                app.plugins.createHexagon({
-                    container: '.hexagon-image-30-32',
-                    width: 30,
-                    height: 32,
-                    roundedCorners: true,
-                    clip: true
-                });
-                app.plugins.createHexagon({
-                    container: '.hexagon-border-40-44',
-                    width: 40,
-                    height: 44,
-                    lineWidth: 3,
-                    roundedCorners: true,
-                    lineColor: '#e7e8ee'
-                });
-                 app.plugins.createHexagon({
-                    container: '.hexagon-22-24',
-                    width: 22,
-                    height: 24,
-                    roundedCorners: true,
-                    fill: true
-                });
-                app.plugins.createHexagon({
-                    container: '.hexagon-dark-16-18',
-                    width: 16,
-                    height: 18,
-                    roundedCorners: true,
-                    fill: true,
-                    lineColor: '#4e4ac8' // Approximation
-                });
+        function initHexagons(scope) {
+            if (typeof app === 'undefined' || !app.plugins || !app.plugins.createHexagon) {
+                return;
             }
+
+            var searchRoot = (scope && typeof scope.querySelectorAll === 'function') ? scope : document;
+
+            var hexConfigs = [
+                {
+                    selector: '.hexagon-image-30-32',
+                    opts: { width: 30, height: 32, roundedCorners: true, roundedCornerRadius: 1, clip: true }
+                },
+                {
+                    selector: '.hexagon-border-40-44',
+                    opts: { width: 40, height: 44, lineWidth: 3, roundedCorners: true, roundedCornerRadius: 1, lineColor: '#e7e8ee' }
+                },
+                {
+                    selector: '.hexagon-22-24',
+                    opts: { width: 22, height: 24, roundedCorners: true, roundedCornerRadius: 1, lineColor: '#fff', fill: true }
+                },
+                {
+                    selector: '.hexagon-dark-16-18',
+                    opts: { width: 16, height: 18, roundedCorners: true, roundedCornerRadius: 1, fill: true, lineColor: '#4e4ac8' }
+                }
+            ];
+
+            hexConfigs.forEach(function(cfg) {
+                var elements = searchRoot.querySelectorAll(cfg.selector);
+                elements.forEach(function(el) {
+                    // Skip already-initialized elements
+                    if (el.dataset.hexInit === '1') {
+                        return;
+                    }
+                    // Remove any pre-existing empty canvas from server-rendered HTML
+                    // so XM_Hexagon creates a fresh one with the image drawn on it
+                    var existingCanvas = el.querySelector('canvas');
+                    if (existingCanvas) {
+                        existingCanvas.remove();
+                    }
+                    el.dataset.hexInit = '1';
+                    try {
+                        app.plugins.createHexagon(Object.assign({}, cfg.opts, {
+                            containerElement: el
+                        }));
+                    } catch (e) {
+                        // silently ignore
+                    }
+                });
+            });
         }
 
         window.__afterInfiniteScrollRenderCallbacks = window.__afterInfiniteScrollRenderCallbacks || [];
@@ -742,7 +764,7 @@
             });
 
             if (typeof window.initHexagons === 'function') {
-                window.initHexagons();
+                window.initHexagons(scope);
             }
         }
 
