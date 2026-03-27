@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Directory;
 use App\Models\News;
+use App\Models\OrderRequest;
 use App\Models\Product;
 use App\Models\Status;
 use App\Models\StatusLinkPreview;
@@ -67,6 +68,10 @@ class StatusActivityService
             case 5:
                 $activity->related_content = News::find($activity->tp_id);
                 $activity->type_label = 'News';
+                break;
+            case 6:
+                $activity->related_content = OrderRequest::find($activity->tp_id);
+                $activity->type_label = 'Order';
                 break;
         }
 

@@ -24,9 +24,11 @@ use App\Http\Controllers\CommentController;
 use App\Http\Controllers\MentionController;
 use App\Http\Controllers\AdminAdminsController;
 use App\Http\Controllers\AdminSecurityController;
+use App\Http\Controllers\AdminStatusPromotionController;
 use App\Http\Controllers\SeoPublicController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\OrderRequestController;
+use App\Http\Controllers\StatusPromotionController;
 use App\Http\Middleware\AdminMiddleware;
 
 Route::post('/reaction/toggle', [ReactionController::class, 'toggle'])->name('reaction.toggle')->middleware('auth');
@@ -183,6 +185,12 @@ Route::middleware(['auth'])->group(function () {
 
     // Referrals
     Route::get('/ads/referrals', [AdsController::class, 'referrals'])->name('ads.referrals');
+
+    // Post Promotions
+    Route::get('/ads/posts', [StatusPromotionController::class, 'index'])->name('ads.posts.index');
+    Route::get('/ads/posts/{status}/promote', [StatusPromotionController::class, 'create'])->name('ads.posts.create');
+    Route::post('/ads/posts/{status}/quote', [StatusPromotionController::class, 'quote'])->name('ads.posts.quote');
+    Route::post('/ads/posts/{status}/promote', [StatusPromotionController::class, 'store'])->name('ads.posts.store');
 
     // Promote
     Route::get('/ads/promote', [AdsController::class, 'promote'])->name('ads.promote');
@@ -365,6 +373,10 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     
     // Banners
     Route::get('/ads', [AdminController::class, 'adsHub'])->name('admin.ads');
+    Route::get('/ads/posts', [AdminStatusPromotionController::class, 'index'])->name('admin.ads.posts.index');
+    Route::get('/ads/posts/settings', [AdminStatusPromotionController::class, 'settings'])->name('admin.ads.posts.settings');
+    Route::post('/ads/posts/settings', [AdminStatusPromotionController::class, 'updateSettings'])->name('admin.ads.posts.settings.update');
+    Route::post('/ads/posts/{promotion}/status', [AdminStatusPromotionController::class, 'updateStatus'])->name('admin.ads.posts.status');
     Route::get('/banners', [AdminController::class, 'banners'])->name('admin.banners');
     Route::get('/banners/{id}/edit', [AdminController::class, 'editBanner'])->name('admin.banners.edit');
     Route::post('/banners/{id}', [AdminController::class, 'updateBanner'])->name('admin.banners.update');

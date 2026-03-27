@@ -45,6 +45,7 @@
                         <p class="simple-dropdown-link post_delete{{ $activity->id }}" onclick="deletePost({{ $activity->tp_id }}, 100, '.post{{ $activity->id }}')"><i class="fa fa-trash" aria-hidden="true"></i>&nbsp;{{ __('messages.delete') }}</p>
                         <!-- /SIMPLE DROPDOWN LINK -->
                     @endif
+                    @include('theme::partials.activity.promotion_link', ['activity' => $activity])
                     <!-- SIMPLE DROPDOWN LINK -->
                     <p class="simple-dropdown-link post_report{{ $activity->id }}" onclick="reportPost({{ $activity->tp_id }}, 100, {{ $activity->related_content->id }})"><i class="fa fa-flag" aria-hidden="true"></i>&nbsp;{{ __('messages.report') }}</p>
                     <!-- /SIMPLE DROPDOWN LINK -->
@@ -132,6 +133,8 @@
                 <!-- /USER STATUS TEXT -->
             </div>
             <!-- /USER STATUS -->
+
+            @include('theme::partials.activity.promotion_badge', ['activity' => $activity])
 
             <div class="tag-sticker">
                 <!-- TAG STICKER ICON -->

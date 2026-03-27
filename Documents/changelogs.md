@@ -31,6 +31,19 @@
 * **Improvement**: The admin updater now blocks execution unless the operator confirms that both the database and files were backed up, and it runs maintenance mode plus `migrate --force` / `optimize:clear` only after safety checks pass.
 * **Docs**: Added a dedicated Git upgrade guide and strengthened installation/upgrade documentation with explicit backup requirements and warnings against `migrate:fresh`, `db:wipe`, and non-isolated test runs.
 
+### Promoted Community Posts
+* **Add**: Introduced a full **Promoted Posts** system for community activity, allowing members to promote eligible posts they own from `/portal` using `PTS`.
+* **Add**: Added a dedicated member flow from the post settings menu to `/ads/posts/{status}/promote`, including campaign setup, smart quote preview, points affordability checks, and launch confirmation.
+* **Add**: Added `status_promotions`, `StatusPromotion`, `StatusPromotionService`, `StatusPromotionPricingService`, and `StatusPromotionSettings` to support campaign storage, smart pricing, delivery pacing, progress tracking, and admin-configurable limits.
+* **Add**: Added member and admin management pages for promoted posts, including `/ads/posts`, `/admin/ads/posts`, and `/admin/ads/posts/settings`, with integration into the existing ads ACL module.
+* **Add**: Promoted posts now appear inside `/portal?filter=all` alongside organic activity with a visible **Ad** label, pacing controls, non-adjacent insertion rules, and per-viewer cooldown protection.
+* **Improvement**: Added support for promotion objectives based on views, comments, reactions, or campaign duration in days, with smart `PTS` pricing and delivery-cap calculations.
+* **Improvement**: Added campaign progress monitoring for members and administrators, including `active`, `completed`, `expired`, `paused`, and `budget_capped` statuses plus owner notifications for campaign milestones.
+* **Fix**: Resolved AJAX quote loading on the promoted-post setup page so campaign pricing works correctly even when MYADS is installed in a subdirectory such as `/myads`.
+* **Fix**: Resolved infinite-scroll loading on `/portal` so additional community posts continue loading correctly when follow-up pagination URLs are generated from subdirectory or mixed-base paths.
+* **i18n**: Added promoted-post translation coverage across all 9 supported languages for member flows, admin settings, statuses, notifications, and pricing labels.
+* **Tests**: Added feature coverage for promoted-post purchase rules, quote validation, feed injection, budget-capped campaigns, admin settings, member dashboards, and portal follow-up page loading.
+
 ### 🗺️ Sitemap & Privacy
 * **Add**: Implemented a comprehensive **Sitemap Privacy Suite** that enforces author privacy and forum visibility rules across the search engine index.
 * **Add**: Integrated `visible()` scope for Topics and Users, ensuring "Private" and "Followers-only" content is excluded from guest crawlers.

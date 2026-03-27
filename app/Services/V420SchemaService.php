@@ -17,6 +17,7 @@ class V420SchemaService
         'quests' => ['quests', 'quest_progress'],
         'security_ip_bans' => ['security_ip_bans'],
         'security_sessions' => ['security_member_sessions'],
+        'post_promotions' => ['status_promotions'],
     ];
 
     private array $tableCache = [];

@@ -60,7 +60,7 @@ myads/
 │   ├── Helpers/           # Hooks.php (WordPress-like action/filter system)
 │   ├── helpers.php         # Global helpers: theme_asset(), ads_site(), locale_direction(), is_locale_rtl()
 │   ├── Http/
-│   │   ├── Controllers/    # 37 controllers (see §5)
+│   │   ├── Controllers/    # 39 controllers (see §5)
 │   │   └── Middleware/     # AdminMiddleware, SetLocale, UpdateUserOnline, CheckSystemVersion, InstallerGuard, TrackSeoMetrics
 │   ├── Models/             # 40+ Eloquent models (see §6)
 │   ├── Providers/          # AppServiceProvider, ThemeServiceProvider, PluginServiceProvider, InstallerServiceProvider
@@ -71,7 +71,7 @@ myads/
 ├── bootstrap/
 ├── config/                 # Standard Laravel config (app, auth, cache, database, etc.)
 ├── database/
-│   ├── migrations/         # 27 migration files (chronological, prefixed by date)
+│   ├── migrations/         # 28 migration files (chronological, prefixed by date)
 │   ├── seeders/            # DatabaseSeeder.php
 │   └── factories/
 ├── Documents/              # Project documentation (README, API_DOCS, changelogs, guides)
@@ -100,7 +100,7 @@ myads/
 │   └── console.php
 ├── storage/
 ├── tests/
-│   ├── Feature/            # 26 feature tests
+│   ├── Feature/            # 27 feature tests
 │   ├── Unit/
 │   └── Concerns/           # SeedsSiteSettings trait
 ├── themes/
@@ -136,6 +136,7 @@ myads/
 | `DirectoryController` | Web directory CRUD, categories, metadata fetch |
 | `StoreController` | Store products, knowledgebase, downloads |
 | `AdsController` | Banner/link ad management, embed codes, promote, referrals |
+| `StatusPromotionController` | Member promoted-post campaigns: create quote, purchase, dashboard |
 | `SmartAdsController` | Smart ads CRUD, embed code |
 | `AdsServingController` | Public ad serving endpoints (`bn.php`, `link.php`, `smart.php`, embed scripts) |
 | `VisitController` | Visit exchange system |
@@ -151,6 +152,7 @@ myads/
 | `AdminAdminsController` | Admin ACL management |
 | `AdminSeoController` | SEO suite admin |
 | `AdminPageController` | Custom pages admin CRUD |
+| `AdminStatusPromotionController` | Admin monitoring and settings for promoted community posts |
 | `AdminUpdatesController` | System update management |
 | `SitemapController` | Dynamic sitemap generation |
 | `SeoPublicController` | Public robots.txt |
@@ -167,6 +169,7 @@ myads/
 | `Setting` | `setting` | Single-row site settings (name, description, theme slug, etc.) |
 | `Option` | `options` | Key-value config store (plugins active state, misc settings) |
 | `Status` | `status` | Community feed posts |
+| `StatusPromotion` | `status_promotions` | Paid promoted-post campaigns shown inside the community feed |
 | `StatusLinkPreview` | `status_link_previews` | Link previews for posts |
 | `StatusMention` | `status_mentions` | @mention records |
 | `StatusRepost` | `status_reposts` | Quote repost records |
@@ -217,6 +220,8 @@ myads/
 | `LinkPreviewService` | Fetches URL metadata for link posts |
 | `NotificationService` | Creates and manages notifications |
 | `StatusActivityService` | Status/activity card rendering logic |
+| `StatusPromotionPricingService` | Smart PTS pricing, delivery caps, and duration estimates for promoted posts |
+| `StatusPromotionService` | Campaign creation, feed injection, pacing, progress tracking, and admin actions for promoted posts |
 | `PluginManager` | Discovers, activates, manages plugins |
 | `ThemeManager` | Theme discovery and management |
 | `SeoManager` | Centralized SEO context (titles, OG, structured data) |
@@ -249,6 +254,10 @@ myads/
 | `/kb/{name}:{article}` | `/kb/MyScript:setup` | Wiki article (redirects to create if missing) |
 | `/kb/{name}?st={article}` | `/kb/MyScript?st=setup` | Wiki-style create/find article |
 | `/e{id}`, `/p{id}` | `/e1` | Legacy profile redirects |
+| `/ads/posts` | `/ads/posts` | Member promoted-post campaigns dashboard |
+| `/ads/posts/{status}/promote` | `/ads/posts/55/promote` | Member promoted-post setup and purchase page |
+| `/admin/ads/posts` | `/admin/ads/posts` | Admin monitoring for all promoted-post campaigns |
+| `/admin/ads/posts/settings` | `/admin/ads/posts/settings` | Admin pricing and delivery settings for promoted posts |
 
 ### Middleware Groups
 - **`auth`** — Standard Laravel auth
@@ -280,6 +289,7 @@ forum/         → Forum pages
 directory/     → Directory pages
 store/         → Store pages
 ads/           → Ad management views + serving views
+ads/posts/     → Member promoted-post setup + dashboard
 profile/       → Profile, settings, privacy, badges, history
 messages/      → Private messaging
 notifications/ → Notification center
@@ -355,12 +365,20 @@ pages/         → Static pages (privacy, terms, custom)
 ### Schema Compatibility
 - `V420SchemaService` — graceful fallback when upgrade tables are missing
 - Controllers/views degrade gracefully with translated upgrade notices instead of 500 errors
+- Promoted posts use the `post_promotions` feature flag, which currently checks for the `status_promotions` table before exposing member/admin UI
 
 ### Ad Serving
 - Legacy endpoints preserved: `bn.php`, `link.php`, `smart.php`
 - Modern embed scripts: `/embed/banner.js`, `/embed/link.js`, `/embed/smart.js`
 - Slot-based injection (not `document.write`)
 - Repeat-window avoidance for banners
+
+### Promoted Post System
+- Community owners can promote supported `status` types `1, 2, 4, 100, 7867, 6`; admin/news posts are excluded.
+- Campaign settings are stored in `options` using `o_type = status_promotion_settings` and normalized through `StatusPromotionSettings`.
+- Creation flow: owner opens `Promote` from the post card, requests a smart quote, then buys the campaign with PTS through `PointLedgerService` using `description_key = post_promotion_purchase`.
+- Feed delivery is applied only to `/portal?filter=all` after the organic smart-feed page is built. Promoted posts never appear as the first card, never adjacent, respect a cooldown per viewer, and are labeled as `Ad`.
+- Progress logic: `views` uses promoted-feed impressions, `comments`/`reactions` use deltas from campaign baselines, and `days` uses elapsed campaign days. Final states are `completed`, `expired`, or `budget_capped`.
 
 ### Wiki/Markdown System (v4.2.0)
 - **Engine:** Client-side rendering using `marked.js` and `DOMPurify`.
@@ -516,6 +534,7 @@ php artisan storage:link
 |------|-----|
 | Add a new page | Create controller method → add route in `web.php` → create Blade in `themes/default/views/` → add translation keys to all 9 locales |
 | Add admin section | Add routes under `admin` prefix → create admin Blade in `themes/default/views/admin/` → update `AdminAccessService` module list if ACL-gated |
+| Add promoted-post pricing or delivery rule | Update `app/Support/StatusPromotionSettings.php` defaults/normalization → adjust `app/Services/StatusPromotionPricingService.php` and `app/Services/StatusPromotionService.php` → cover the change in `tests/Feature/StatusPromotionFeatureTest.php` |
 | Add translation key | Edit `lang/{locale}/messages.php` in ALL 9 directories |
 | Create migration | `php artisan make:migration description` → use `Schema::hasTable()` guards for safety |
 | Add new model | `php artisan make:model Name` → specify `$table`, `$fillable` → place in `app/Models/` |
@@ -589,4 +608,4 @@ If in doubt, update it. An outdated `Agents.md` causes future agents to make wro
 
 ---
 
-*Last updated: 2026-03-27 — MYADS v4.2.0*
+*Last updated: 2026-03-27 — MYADS v4.2.0 (promoted community posts system documented)*

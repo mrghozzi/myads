@@ -41,7 +41,21 @@ class FeedService
         });
 
         $total = $ranked->count();
-        $items = $ranked->forPage($page, $perPage)->values();
+        $organicItems = $ranked->forPage($page, $perPage)->values();
+        $items = $organicItems;
+
+        $request = request();
+        if (
+            (string) $request->query('filter', 'all') === 'all'
+            && trim((string) $request->query('search', '')) === ''
+        ) {
+            $items = app(StatusPromotionService::class)->injectIntoFeed(
+                $organicItems,
+                $userId,
+                $page,
+                $perPage
+            );
+        }
 
         return new LengthAwarePaginator($items, $total, $perPage, $page, [
             'path' => request()->url(),

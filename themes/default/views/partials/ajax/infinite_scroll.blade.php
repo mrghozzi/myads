@@ -10,6 +10,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const container = document.getElementById('infinite-scroll-container');
     let trigger = document.getElementById('infinite-scroll-trigger');
     let isLoading = false;
+    const expiredMessage = @json(__('messages.error_419_text'));
+    const genericErrorMessage = @json(__('messages.error_500_text'));
 
     if (!container || !trigger) return;
 
@@ -21,20 +23,57 @@ document.addEventListener('DOMContentLoaded', function () {
 
     observer.observe(trigger);
 
+    function normalizeNextPageUrl(url) {
+        if (!url) {
+            return '';
+        }
+
+        try {
+            const resolvedUrl = new URL(url, window.location.href);
+            return window.location.pathname + resolvedUrl.search;
+        } catch (error) {
+            return url;
+        }
+    }
+
+    async function readPayload(response) {
+        const responseText = await response.text();
+        const normalizedText = (responseText || '').replace(/^\uFEFF/, '').trim();
+
+        if (!normalizedText) {
+            return {};
+        }
+
+        try {
+            return JSON.parse(normalizedText);
+        } catch (error) {
+            throw new Error(response.status === 419 ? expiredMessage : genericErrorMessage);
+        }
+    }
+
     function loadMore() {
         if (isLoading) return;
-        const url = trigger.getAttribute('data-next-page');
+        const url = normalizeNextPageUrl(trigger.getAttribute('data-next-page'));
         if (!url) return;
 
         isLoading = true;
         
         fetch(url, {
+            credentials: 'same-origin',
             headers: {
                 'X-Requested-With': 'XMLHttpRequest',
                 'Accept': 'application/json'
             }
         })
-        .then(response => response.json())
+        .then(async (response) => {
+            const data = await readPayload(response);
+
+            if (!response.ok) {
+                throw new Error(data.message || (response.status === 419 ? expiredMessage : genericErrorMessage));
+            }
+
+            return data;
+        })
         .then(data => {
             if (data.html) {
                 trigger.insertAdjacentHTML('beforebegin', data.html);
@@ -47,7 +86,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             if (data.next_page_url) {
-                trigger.setAttribute('data-next-page', data.next_page_url);
+                trigger.setAttribute('data-next-page', normalizeNextPageUrl(data.next_page_url));
                 isLoading = false; 
                 
                 // Force IntersectionObserver to re-evaluate visibility

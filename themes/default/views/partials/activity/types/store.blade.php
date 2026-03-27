@@ -26,6 +26,7 @@
                         <p class="simple-dropdown-link post_edit{{ $status->id }}" onclick="postEdit({{ $status->tp_id }}, 7867, '{{ $product->name }}')"><i class="fa fa-edit" aria-hidden="true"></i>&nbsp;{{ __('messages.edit') }}</p>
                         <p class="simple-dropdown-link post_delete{{ $status->id }}" onclick="deletePost({{ $status->tp_id }}, 7867, '.post{{ $status->id }}')"><i class="fa fa-trash" aria-hidden="true"></i>&nbsp;{{ __('messages.delete') }}</p>
                     @endif
+                    @include('theme::partials.activity.promotion_link', ['activity' => $activity])
                     <p class="simple-dropdown-link post_report{{ $status->id }}" onclick="reportPost({{ $status->tp_id }}, 7867, {{ $product->id }})"><i class="fa fa-flag" aria-hidden="true"></i>&nbsp;{{ __('messages.report') }}</p>
                     <p class="simple-dropdown-link author_report{{ $status->id }}" onclick="reportUser({{ $status->uid }}, {{ $product->id }})"><i class="fa fa-flag" aria-hidden="true"></i>&nbsp;{{ __('messages.report_author') }}</p>
                 @endauth
@@ -78,6 +79,7 @@
                     <i class="fa fa-clock-o"></i>&nbsp;{{ __('messages.ago') }}&nbsp; {{ \Carbon\Carbon::createFromTimestamp($status->date)->diffForHumans() }}
                 </p>
             </div>
+            @include('theme::partials.activity.promotion_badge', ['activity' => $activity])
             <div class="tag-sticker">
                 <svg class="tag-sticker-icon icon-shopping-bag">
                     <use xlink:href="#svg-shopping-bag"></use>

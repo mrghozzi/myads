@@ -12,6 +12,7 @@ use App\Models\Like;
 use App\Models\News;
 use App\Models\Option;
 use App\Models\Product;
+use App\Models\StatusPromotion;
 use App\Models\StatusLinkPreview;
 use App\Models\StatusRepost;
 use App\Services\V420SchemaService;
@@ -117,6 +118,33 @@ class Status extends Model
     public function orderRequest()
     {
         return $this->belongsTo(OrderRequest::class, 'tp_id');
+    }
+
+    public function promotions()
+    {
+        return $this->hasMany(StatusPromotion::class, 'status_id');
+    }
+
+    public function activePromotion()
+    {
+        return $this->hasOne(StatusPromotion::class, 'status_id')
+            ->where('status', StatusPromotion::STATUS_ACTIVE);
+    }
+
+    public function supportsPromotion(): bool
+    {
+        return in_array((int) $this->s_type, [1, 2, 4, 100, 7867, 6], true);
+    }
+
+    public function promotionDestinationUrl(): string
+    {
+        return match ((int) $this->s_type) {
+            1 => route('directory.show', $this->tp_id),
+            2, 4, 100 => route('forum.topic', $this->tp_id),
+            7867 => route('store.show', $this->related_content->name ?? optional($this->productItem)->name ?? $this->tp_id),
+            6 => route('orders.show', $this->tp_id),
+            default => route('portal.index'),
+        };
     }
 
     public function getRelatedContentAttribute()

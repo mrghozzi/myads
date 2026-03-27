@@ -25,6 +25,9 @@
     <a href="{{ route('ads.promote') }}" class="ads-nav-item" style="display: flex; align-items: center; gap: 8px; padding: 12px 22px; background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%); color: #fff; border-radius: 12px; font-weight: 700; font-size: 0.9rem; text-decoration: none; box-shadow: 0 4px 15px rgba(245,158,11,0.25); transition: all 0.3s ease;">
         <i class="fa fa-bullhorn"></i> {{ __('messages.promote_your_site') }}
     </a>
+    <a href="{{ route('ads.posts.index') }}" class="ads-nav-item" style="display: flex; align-items: center; gap: 8px; padding: 12px 22px; background: linear-gradient(135deg, #1d4ed8 0%, #38bdf8 100%); color: #fff; border-radius: 12px; font-weight: 700; font-size: 0.9rem; text-decoration: none; box-shadow: 0 4px 15px rgba(29,78,216,0.25); transition: all 0.3s ease;">
+        <i class="fa fa-rocket"></i> {{ __('messages.status_promotions_title') }}
+    </a>
 </div>
 
 {{-- Stats Overview Cards --}}

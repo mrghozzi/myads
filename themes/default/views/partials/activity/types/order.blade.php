@@ -24,6 +24,7 @@
                 </p>
                 @auth
                     @if(auth()->id() == $activity->uid || auth()->user()->isAdmin())
+                        @include('theme::partials.activity.promotion_link', ['activity' => $activity])
                         <p class="simple-dropdown-link" onclick="deletePost({{ $order->id }}, 6, '.post{{ $activity->id }}')" style="color: #ff5b5b; cursor: pointer;">
                             <i class="fa fa-trash" aria-hidden="true"></i>&nbsp;{{ __('messages.delete') }}
                         </p>
@@ -73,6 +74,8 @@
                     <i class="fa fa-clock-o"></i>&nbsp;{{ $activity->date_formatted }}
                 </p>
             </div>
+
+            @include('theme::partials.activity.promotion_badge', ['activity' => $activity])
 
             <div class="order-card-content" style="margin-top: 16px;">
                 <h2 class="order-card-title" style="font-size: 18px; font-weight: 700; margin-bottom: 8px;">
