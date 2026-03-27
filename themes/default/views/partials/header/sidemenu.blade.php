@@ -25,6 +25,14 @@
                     {{ __('messages.quests') }}
                 </a>
             </li>
+            <li class="menu-item {{ Request::is('badges') ? 'active' : '' }}">
+                <a class="menu-item-link text-tooltip-tfr" href="{{ route('badges.all') }}">
+                    <svg class="menu-item-link-icon icon-badges">
+                        <use xlink:href="#svg-badges"></use>
+                    </svg>
+                    {{ __('messages.badges') }}
+                </a>
+            </li>
         @endauth
         <li class="menu-item">
             <a class="menu-item-link text-tooltip-tfr" href="{{ url('/forum') }}">

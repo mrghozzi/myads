@@ -227,6 +227,8 @@ class StoreController extends Controller
                 'tp_id' => $product->id,
             ]);
 
+            app(\App\Services\GamificationService::class)->recordEvent($user->id, 'product_created');
+
             return redirect()->route('store.show', $product->name)->with('success', __('product_added_successfully'));
         });
     }
@@ -744,6 +746,8 @@ class StoreController extends Controller
                 'o_order' => $status,
                 'o_mode' => $product->name,
             ]);
+
+            app(\App\Services\GamificationService::class)->recordEvent($userId, 'kb_article_created');
         });
 
         return redirect()->route('kb.show', ['name' => $product->name, 'article' => $articleName]);

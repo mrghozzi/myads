@@ -74,7 +74,11 @@
                                 @if($badge)
                                     <label class="badge-settings-card">
                                         <div class="badge-settings-icon">
-                                            <i class="fa fa-trophy" aria-hidden="true"></i>
+                                            @if($badge->icon && str_starts_with($badge->icon, 'fa-'))
+                                                <i class="fa {{ $badge->icon }}" aria-hidden="true"></i>
+                                            @else
+                                                <i class="fa fa-trophy" aria-hidden="true"></i>
+                                            @endif
                                         </div>
                                         <p class="user-status-title">{{ __('messages.' . $badge->name_key) }}</p>
                                         <p class="user-status-text small">{{ __('messages.' . $badge->description_key) }}</p>

@@ -24,6 +24,26 @@
 * **Dev Resources**: Created comprehensive `PLUGIN_GUIDE.md` and `THEME_GUIDE.md` for third-party developers.
 * **i18n**: Added new translation keys for plugin/theme management across all 9 supported languages.
 
+### 🏆 Gamification & Badges
+* **Add**: Introduced a new **Badges Hub** (`/badges`) featuring a premium responsive grid for browsing all community achievements.
+* **Add**: Implemented 12 brand-new unlockable badges across various categories:
+    * **Community Activity**: `Night Owl` (late-night posting), `Social Butterfly` (follow count), `Point Millionaire` (wealth milestone).
+    * **Marketplace & Directory**: `Marketplace Collector` (store additions), `Directory Guru` (site listings), `Knowledge Contributor` (wiki articles).
+    * **Orders System**: `Order Pioneer` (first request), `Best Helper` (winning offers), `Top Bidder` (participation), `Highly Rated` (5-star feedback).
+    * **Forum**: `Forum Veteran` (topic count), `Helpful Member` (replies), `Topic Starter` (diversity), `Expert Moderator` (moderation actions).
+* **Add**: Integrated **Visual Progress Tracking** with animated progress bars and status tags (Locked/Unlocked) for every badge.
+* **Add**: Enhanced **Badge Icons** using a curated set of FontAwesome 6 icons specifically matched to each achievement.
+* **Improvement**: Rebuilt the **Badge Showcase** on member profiles to support the new dynamic icons and localized badge names.
+* **Architecture**: Hardened `GamificationService` with silent error handling and automatic activity triggers across Store, Directory, Orders, and Forum modules.
+* **i18n**: Fully localized all badge titles, descriptions, and hub interfaces across all 9 supported languages.
+* **UI/UX**: Implemented a modern "Badges Hub" header with dynamic gradients, RTL support, and mobile-responsive layouts.
+
+### 🌐 Localization & i18n
+* **Improvement**: Conducted a full synchronization of all translation files with the English master (`lang/en/messages.php`).
+* **Fix**: Repaired missing or broken translation keys for Arabic, German, Spanish, Persian, French, Italian, Portuguese, and Turkish.
+* **i18n**: Standardized the localization architecture, ensuring consistent PHP array formatting across all language packs.
+* **Fix**: Corrected RTL layout issues in the Badges Hub and Profile sections for better alignment in Arabic and Persian modes.
+
 ### 💼 Services & Order Requests
 * **Add**: Introduced a standalone **Order Request System** for website owners to hire service providers (developers, designers, writers).
 * **Add**: Automatic social integration where new order requests are published as interactive cards in the **Community Feed**.

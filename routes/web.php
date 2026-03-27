@@ -98,6 +98,7 @@ Route::get('/quests', [App\Http\Controllers\QuestController::class, 'index'])->n
 
 // Portal Routes
 Route::get('/portal', [PortalController::class, 'index'])->name('portal.index');
+Route::get('/badges', [ProfileController::class, 'allBadges'])->name('badges.all');
 
 // Message Routes
 Route::middleware(['auth'])->group(function () {

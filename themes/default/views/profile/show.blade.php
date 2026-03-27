@@ -202,7 +202,11 @@
                             @if($badge)
                                 <div class="profile-hub-badge-card">
                                     <div class="profile-hub-badge-icon">
-                                        <i class="fa fa-trophy" aria-hidden="true"></i>
+                                        @if($badge->icon && str_starts_with($badge->icon, 'fa-'))
+                                            <i class="fa {{ $badge->icon }}" aria-hidden="true"></i>
+                                        @else
+                                            <i class="fa fa-trophy" aria-hidden="true"></i>
+                                        @endif
                                     </div>
                                     <p class="user-status-title" style="font-size: 14px;">{{ __('messages.' . $badge->name_key) }}</p>
                                 </div>

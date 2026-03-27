@@ -207,6 +207,9 @@ class CommentController extends Controller
 
             $mentions->createCommentMentions($user, $type, (int) $comment->id, $text, $url);
             $gamification->recordEvent($uid, 'comment_created');
+            if ($type === 'forum') {
+                $gamification->recordEvent($uid, 'forum_reply_created');
+            }
 
             if ($ownerId && $ownerId != $uid) {
                 $notifications->send(
@@ -239,6 +242,10 @@ class CommentController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
+            \Log::error('Comment Store Error: ' . $e->getMessage(), [
+                'exception' => $e,
+                'request' => $request->all()
+            ]);
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }

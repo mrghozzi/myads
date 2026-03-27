@@ -274,7 +274,8 @@ class ForumController extends Controller
 
             $this->storeTopicAttachments($topic, $request, $settings);
 
-            GamificationService::recordEvent('forum_topic_created', auth()->user());
+            // GamificationService::recordEvent('forum_topic_created', auth()->user());
+            app(GamificationService::class)->recordEvent($uid, 'forum_topic_created');
 
             DB::commit();
             return redirect()->route('forum.topic', $topic->id);
@@ -417,9 +418,23 @@ class ForumController extends Controller
         if ($topic->is_pinned) {
             $topic->pinned_at = time();
             $topic->pinned_by = $user->id;
+            
+            // Record as option for badge tracking
+            Option::create([
+                'name' => 'forum_pin',
+                'o_type' => 'forum_pin',
+                'o_parent' => $topic->id,
+                'o_order' => $user->id,
+                'o_valuer' => '1',
+                'o_mode' => (string) time()
+            ]);
+
+            app(GamificationService::class)->recordEvent($user->id, 'moderation_action_performed');
         } else {
             $topic->pinned_at = null;
             $topic->pinned_by = null;
+            // Optionally remove the option record if unpinned? 
+            // Badges usually track lifetime actions, so we keep it.
         }
         $topic->save();
 
@@ -451,6 +466,18 @@ class ForumController extends Controller
         if ($topic->is_locked) {
             $topic->locked_at = time();
             $topic->locked_by = $user->id;
+
+            // Record as option for badge tracking
+            Option::create([
+                'name' => 'forum_lock',
+                'o_type' => 'forum_lock',
+                'o_parent' => $topic->id,
+                'o_order' => $user->id,
+                'o_valuer' => '1',
+                'o_mode' => (string) time()
+            ]);
+
+            app(GamificationService::class)->recordEvent($user->id, 'moderation_action_performed');
         } else {
             $topic->locked_at = null;
             $topic->locked_by = null;

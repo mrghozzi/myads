@@ -85,6 +85,8 @@ class OrderRequestController extends Controller
             // Reward for posting
             $ledger->award(Auth::user(), 10, 'order_posted', 'points_awarded', 'order', $order->id);
 
+            app(\App\Services\GamificationService::class)->recordEvent(Auth::id(), 'order_request_created');
+
             return redirect()->route('orders.index')->with('success', __('messages.order_created_successfully'));
         } catch (\Throwable $e) {
             DB::rollBack();
@@ -112,21 +114,30 @@ class OrderRequestController extends Controller
 
     public function rateOffer(Request $request, $id)
     {
-        $order = OrderRequest::findOrFail($id);
-        if ($order->uid != Auth::id()) {
-            abort(403);
+        try {
+            $order = OrderRequest::findOrFail($id);
+            if ($order->uid != Auth::id()) {
+                abort(403);
+            }
+
+            $offerId = $request->input('offer_id');
+            $rating = (int) $request->input('rating');
+            
+            $offer = \App\Models\Option::where('id', $offerId)->where('o_parent', $id)->where('o_type', 'o_order')->firstOrFail();
+            $offer->update(['o_mode' => $rating]);
+
+            if ($rating === 5) {
+                app(\App\Services\GamificationService::class)->recordEvent($offer->o_order, 'five_star_rating_received');
+            }
+
+            $avg = $order->offers()->where('o_mode', '>', 0)->avg('o_mode');
+            $order->update(['avg_rating' => $avg ?? 0]);
+
+            return back()->with('success', __('messages.rating_submitted'));
+        } catch (\Throwable $e) {
+            \Log::error('Order Rate Error: ' . $e->getMessage());
+            return back()->with('errMSG', $e->getMessage());
         }
-
-        $offerId = $request->input('offer_id');
-        $rating = (int) $request->input('rating');
-        
-        $offer = \App\Models\Option::where('id', $offerId)->where('o_parent', $id)->where('o_type', 'o_order')->firstOrFail();
-        $offer->update(['o_mode' => $rating]);
-
-        $avg = $order->offers()->where('o_mode', '>', 0)->avg('o_mode');
-        $order->update(['avg_rating' => $avg ?? 0]);
-
-        return back()->with('success', __('messages.rating_submitted'));
     }
 
     public function selectBestOffer(Request $request, $id)
@@ -143,6 +154,8 @@ class OrderRequestController extends Controller
 
         $winnerId = $offer->o_order;
         app(\App\Services\PointLedgerService::class)->award($winnerId, 50, 'best_offer_winner', 'points_awarded', 'order_offer', $offer->id);
+
+        app(\App\Services\GamificationService::class)->recordEvent($winnerId, 'best_offer_selected');
 
         return back()->with('success', __('messages.best_offer_selected'));
     }

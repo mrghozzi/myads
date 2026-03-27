@@ -136,7 +136,10 @@ class VisitController extends Controller
         // UPDATE users SET vu=vu-:ivu WHERE id=:id
         DB::table('users')->where('id', $site->uid)->decrement('vu', $cost);
 
+        app(\App\Services\GamificationService::class)->recordEvent($user->id, 'visit_exchange_completed');
+
         // 4. Show View
         return view('theme::visits.surf', compact('site', 'duration'));
+
     }
 }

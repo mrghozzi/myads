@@ -447,6 +447,36 @@ class ProfileController extends Controller
         return redirect()->route('profile.badges')->with('success', __('messages.badge_showcase_saved'));
     }
 
+    public function allBadges()
+    {
+        $user = Auth::user();
+        $schema = app(V420SchemaService::class);
+        $featureAvailable = $schema->supports('badges');
+        $upgradeNotice = $schema->notice('badges', __('messages.badges'));
+
+        if (!$featureAvailable) {
+            return view('theme::profile.all_badges', [
+                'badges' => collect(),
+                'user' => $user,
+                'featureAvailable' => false,
+                'upgradeNotice' => $upgradeNotice
+            ]);
+        }
+
+        $allBadges = Badge::where('is_active', true)->orderBy('sort_order')->get();
+        $userBadges = $user ? UserBadge::where('user_id', $user->id)->get()->keyBy('badge_id') : collect();
+
+        $badges = $allBadges->map(function ($badge) use ($userBadges) {
+            $userBadge = $userBadges->get($badge->id);
+            $badge->is_unlocked = $userBadge && $userBadge->unlocked_at !== null;
+            $badge->progress = $userBadge ? $userBadge->progress : 0;
+            $badge->unlocked_at = $userBadge ? $userBadge->unlocked_at : null;
+            return $badge;
+        });
+
+        return view('theme::profile.all_badges', compact('user', 'badges', 'featureAvailable', 'upgradeNotice'));
+    }
+
     public function update(Request $request)
     {
         $user = Auth::user();

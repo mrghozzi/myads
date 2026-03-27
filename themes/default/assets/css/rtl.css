@@ -300,6 +300,24 @@ html[dir="rtl"] .home-smart-actions .home-smart-action {
     text-align: center;
 }
 
+html[dir="rtl"] .badges-hub-header {
+    text-align: right;
+    background: linear-gradient(-135deg, #615dfa 0%, #3e3f5e 100%) !important;
+}
+
+html[dir="rtl"][data-theme="css_d"] .badges-hub-header {
+    background: linear-gradient(-135deg, #615dfa 0%, #1f2637 100%) !important;
+}
+
+html[dir="rtl"] .badges-hub-header::after {
+    right: auto;
+    left: -50px;
+}
+
+html[dir="rtl"] .content-grid {
+    margin-right: 0 !important;
+}
+
 @media screen and (max-width: 960px) {
     html[dir="rtl"] .section-banner {
         padding: 18px 108px 0 28px;

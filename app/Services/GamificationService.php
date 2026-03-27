@@ -9,6 +9,8 @@ use App\Models\Like;
 use App\Models\Option;
 use App\Models\Quest;
 use App\Models\QuestProgress;
+use App\Models\OrderRequest;
+use App\Models\Product;
 use App\Models\Status;
 use App\Models\StatusLinkPreview;
 use App\Models\StatusRepost;
@@ -27,116 +29,127 @@ class GamificationService
 
     public function recordEvent(int $userId, string $eventKey, int $count = 1): void
     {
-        if ($userId <= 0) {
-            return;
-        }
-
-        $user = User::find($userId);
-        if (!$user) {
-            return;
-        }
-
-        $quests = $this->schema->supports('quests')
-            ? Quest::where('is_active', true)
-                ->where('event_key', $eventKey)
-                ->get()
-            : collect();
-
-        foreach ($quests as $quest) {
-            $periodKey = $this->periodKeyFor($quest->period);
-            $progress = QuestProgress::firstOrCreate(
-                [
-                    'user_id' => $userId,
-                    'quest_id' => $quest->id,
-                    'period_key' => $periodKey,
-                ],
-                [
-                    'progress' => 0,
-                ]
-            );
-
-            if ($progress->completed_at) {
-                continue;
+        try {
+            if ($userId <= 0) {
+                return;
             }
 
-            $progress->progress += $count;
-            if ($progress->progress >= (int) $quest->target_count) {
-                $progress->progress = (int) $quest->target_count;
-                $progress->completed_at = now();
+            $user = User::find($userId);
+            if (!$user) {
+                return;
             }
-            $progress->save();
 
-            if ($progress->completed_at && !$progress->rewarded_at) {
-                $this->pointLedger->award(
-                    $userId,
-                    (float) $quest->reward_points,
-                    'quest_reward',
-                    $quest->slug,
-                    'quest',
-                    $quest->id
+            $quests = $this->schema->supports('quests')
+                ? Quest::where('is_active', true)
+                    ->where('event_key', $eventKey)
+                    ->get()
+                : collect();
+
+            foreach ($quests as $quest) {
+                $periodKey = $this->periodKeyFor($quest->period);
+                $progress = QuestProgress::firstOrCreate(
+                    [
+                        'user_id' => $userId,
+                        'quest_id' => $quest->id,
+                        'period_key' => $periodKey,
+                    ],
+                    [
+                        'progress' => 0,
+                    ]
                 );
-                $progress->rewarded_at = now();
+
+                if ($progress->completed_at) {
+                    continue;
+                }
+
+                $progress->progress += $count;
+                if ($progress->progress >= (int) $quest->target_count) {
+                    $progress->progress = (int) $quest->target_count;
+                    $progress->completed_at = now();
+                }
                 $progress->save();
 
-                $this->notifications->send(
-                    $userId,
-                    __('messages.quest_completed_notification', ['quest' => __('messages.' . $quest->name_key)]),
-                    '/history',
-                    'notification'
-                );
-            }
-        }
+                if ($progress->completed_at && !$progress->rewarded_at) {
+                    $this->pointLedger->award(
+                        $userId,
+                        (float) $quest->reward_points,
+                        'quest_reward',
+                        $quest->slug,
+                        'quest',
+                        $quest->id
+                    );
+                    $progress->rewarded_at = now();
+                    $progress->save();
 
-        $this->refreshBadges($userId);
+                    $this->notifications->send(
+                        $userId,
+                        __('messages.quest_completed_notification', ['quest' => __('messages.' . $quest->name_key)]),
+                        '/history',
+                        'notification'
+                    );
+                }
+            }
+
+            $this->refreshBadges($userId);
+        } catch (\Throwable $e) {
+            \Log::error('Gamification recordEvent Error: ' . $e->getMessage(), [
+                'userId' => $userId,
+                'eventKey' => $eventKey
+            ]);
+        }
     }
 
     public function refreshBadges(int $userId): void
     {
-        if (!$this->schema->supports('badges')) {
-            return;
-        }
-
-        $user = User::find($userId);
-        if (!$user) {
-            return;
-        }
-
-        $badges = Badge::where('is_active', true)->orderBy('sort_order')->get();
-        foreach ($badges as $badge) {
-            $progress = $this->progressForBadge($user, $badge);
-
-            $userBadge = UserBadge::firstOrNew([
-                'user_id' => $userId,
-                'badge_id' => $badge->id,
-            ]);
-
-            $alreadyUnlocked = $userBadge->exists && $userBadge->unlocked_at !== null;
-
-            $userBadge->progress = min((int) $badge->criteria_target, $progress);
-
-            if ($progress >= (int) $badge->criteria_target && !$alreadyUnlocked) {
-                $userBadge->unlocked_at = now();
+        try {
+            if (!$this->schema->supports('badges')) {
+                return;
             }
 
-            $userBadge->save();
-
-            if (!$alreadyUnlocked && $userBadge->unlocked_at) {
-                $this->pointLedger->award(
-                    $userId,
-                    (float) $badge->points_reward,
-                    'badge_reward',
-                    $badge->slug,
-                    'badge',
-                    $badge->id
-                );
-
-                $this->notifications->send(
-                    $userId,
-                    __('messages.badge_unlocked_notification', ['badge' => __('messages.' . $badge->name_key)]),
-                    '/settings/badges',
-                    'notification'
-                );
+            $user = User::find($userId);
+            if (!$user) {
+                return;
             }
+
+            $badges = Badge::where('is_active', true)->orderBy('sort_order')->get();
+            foreach ($badges as $badge) {
+                $progress = $this->progressForBadge($user, $badge);
+
+                $userBadge = UserBadge::firstOrNew([
+                    'user_id' => $userId,
+                    'badge_id' => $badge->id,
+                ]);
+
+                $alreadyUnlocked = $userBadge->exists && $userBadge->unlocked_at !== null;
+
+                $userBadge->progress = min((int) $badge->criteria_target, $progress);
+
+                if ($progress >= (int) $badge->criteria_target && !$alreadyUnlocked) {
+                    $userBadge->unlocked_at = now();
+                }
+
+                $userBadge->save();
+
+                if (!$alreadyUnlocked && $userBadge->unlocked_at) {
+                    $this->pointLedger->award(
+                        $userId,
+                        (float) $badge->points_reward,
+                        'badge_reward',
+                        $badge->slug,
+                        'badge',
+                        $badge->id
+                    );
+
+                    $this->notifications->send(
+                        $userId,
+                        __('messages.badge_unlocked_notification', ['badge' => __('messages.' . $badge->name_key)]),
+                        '/settings/badges',
+                        'notification'
+                    );
+                }
+            }
+        } catch (\Throwable $e) {
+            \Log::error('Gamification refreshBadges Error: ' . $e->getMessage(), ['userId' => $userId]);
         }
     }
 
@@ -161,8 +174,43 @@ class GamificationService
                 : 0,
             'reactions_received' => $this->reactionsReceived($user),
             'followers_count' => Like::where('sid', $user->id)->where('type', 1)->count(),
+            'following_count' => Like::where('uid', $user->id)->where('type', 1)->count(),
+            'product_count' => Option::where('o_parent', $user->id)->where('o_type', 'store')->count(),
+            'directory_count' => Directory::where('uid', $user->id)->count(),
+            'visit_exchanges' => Option::where('o_order', $user->id)->where('o_type', 'v_visted')->count(),
+            'points_balance' => (int) $user->pts,
+            'ads_count' => DB::table('banner')->where('uid', $user->id)->count() + DB::table('link')->where('uid', $user->id)->count(),
+            'kb_articles' => Option::where('o_parent', $user->id)->where('o_type', 'knowledgebase')->where('o_order', 0)->count(),
+            'night_posts' => $this->countNightPosts($user->id),
+            'order_requests_count' => OrderRequest::where('uid', $user->id)->count(),
+            'order_bids_count' => Option::where('o_order', $user->id)->where('o_type', 'o_order')->count(),
+            'best_offers_won' => OrderRequest::whereIn('best_offer_id', function($query) use ($user) {
+                $query->select('id')->from('options')->where('o_type', 'o_order')->where('o_order', $user->id);
+            })->count(),
+            'five_star_ratings' => Option::where('o_order', $user->id)
+                ->where('o_type', 'o_rating')
+                ->where('o_valuer', '5')
+                ->count(),
+            'forum_topics_count' => DB::table('forum')->where('uid', $user->id)->count(),
+            'forum_replies_count' => ForumComment::where('uid', $user->id)->count(),
+            'unique_categories_topics' => DB::table('forum')->where('uid', $user->id)->distinct('cat')->count('cat'),
+            'moderation_actions_count' => Option::where('o_order', $user->id)
+                ->whereIn('o_type', ['forum_pin', 'forum_lock'])
+                ->count(),
             default => 0,
         };
+    }
+
+    private function countNightPosts(int $userId): int
+    {
+        return Status::where('uid', $userId)
+            ->whereIn('s_type', [100, 4])
+            ->get()
+            ->filter(function ($status) {
+                $hour = date('G', (int) $status->date);
+                return $hour >= 0 && $hour < 5;
+            })
+            ->count();
     }
 
     private function reactionsReceived(User $user): int
