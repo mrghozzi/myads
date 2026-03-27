@@ -90,6 +90,16 @@ class GamificationService
                 }
             }
 
+            if ($eventKey === 'visit_exchange_completed') {
+                Option::create([
+                    'name' => 'Visit Exchange',
+                    'o_valuer' => '1',
+                    'o_type' => 'v_visited',
+                    'o_order' => $userId,
+                    'o_mode' => time(),
+                ]);
+            }
+
             $this->refreshBadges($userId);
         } catch (\Throwable $e) {
             \Log::error('Gamification recordEvent Error: ' . $e->getMessage(), [
@@ -177,7 +187,7 @@ class GamificationService
             'following_count' => Like::where('uid', $user->id)->where('type', 1)->count(),
             'product_count' => Option::where('o_parent', $user->id)->where('o_type', 'store')->count(),
             'directory_count' => Directory::where('uid', $user->id)->count(),
-            'visit_exchanges' => Option::where('o_order', $user->id)->where('o_type', 'v_visted')->count(),
+            'visit_exchanges' => Option::where('o_order', $user->id)->where('o_type', 'v_visited')->count(),
             'points_balance' => (int) $user->pts,
             'ads_count' => DB::table('banner')->where('uid', $user->id)->count() + DB::table('link')->where('uid', $user->id)->count(),
             'kb_articles' => Option::where('o_parent', $user->id)->where('o_type', 'knowledgebase')->where('o_order', 0)->count(),
@@ -188,8 +198,8 @@ class GamificationService
                 $query->select('id')->from('options')->where('o_type', 'o_order')->where('o_order', $user->id);
             })->count(),
             'five_star_ratings' => Option::where('o_order', $user->id)
-                ->where('o_type', 'o_rating')
-                ->where('o_valuer', '5')
+                ->where('o_type', 'o_order')
+                ->where('o_mode', 5)
                 ->count(),
             'forum_topics_count' => DB::table('forum')->where('uid', $user->id)->count(),
             'forum_replies_count' => ForumComment::where('uid', $user->id)->count(),
