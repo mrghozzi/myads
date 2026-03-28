@@ -189,7 +189,7 @@
 @if(!isset($hide_form) || !$hide_form)
     <div class="comment_form{{ $id }}">
         @auth
-            <div class="post-comment-form">
+            <div class="post-comment-form forum-rdx-comment-form-shell">
                 <div class="user-avatar small no-outline {{ auth()->user()->isOnline() ? 'online' : 'offline' }}">
                     <div class="user-avatar-content">
                         <div class="hexagon-image-30-32" data-src="{{ auth()->user()->img ? asset(auth()->user()->img) : theme_asset('img/avatar/01.jpg') }}" style="width: 30px; height: 32px; position: relative;">
@@ -202,11 +202,11 @@
                         </div>
                     </div>
                 </div>
-                <div class="form">
+                <div class="form forum-rdx-comment-form-main">
                     <div class="form-row">
                         <div class="form-item">
-                            <div class="form-input small">
-                                <div class="forum-rdx-comment-toolbar">
+                            <div class="form-input small forum-rdx-comment-composer">
+                                <div class="forum-rdx-comment-toolbar" aria-label="{{ __('messages.comment') }}">
                                     <button type="button" class="forum-rdx-tool-btn" data-md-action="bold" data-target="txt_comment{{ $id }}" title="{{ __('messages.markdown_bold') }}">
                                         <i class="fa fa-bold" aria-hidden="true"></i>
                                     </button>
@@ -236,11 +236,13 @@
                                     </button>
                                 </div>
                                 <textarea id="txt_comment{{ $id }}" name="comment_text" class="forum-rdx-comment-input" data-md-editor="1" placeholder="{{ __('messages.your_comment') }}"></textarea>
-                                <button type="button" class="btn forum-rdx-comment-send" data-comment-submit="{{ $id }}" onclick="postComment({{ $id }}, '{{ $type }}')">
-                                    <svg class="interactive-input-icon icon-send-message">
-                                        <use xlink:href="#svg-send-message"></use>
-                                    </svg>
-                                </button>
+                                <div class="forum-rdx-comment-footer">
+                                    <button type="button" class="btn forum-rdx-comment-send" data-comment-submit="{{ $id }}" onclick="postComment({{ $id }}, '{{ $type }}')">
+                                        <svg class="interactive-input-icon icon-send-message">
+                                            <use xlink:href="#svg-send-message"></use>
+                                        </svg>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>

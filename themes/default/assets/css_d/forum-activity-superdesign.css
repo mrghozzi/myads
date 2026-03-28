@@ -155,3 +155,212 @@
 [dir="rtl"] .activity-super:hover .activity-super-more i {
   transform: scaleX(-1) translateX(4px);
 }
+
+/* Shared Comment Composer */
+.forum-rdx-comment-form-shell {
+  --comment-surface: #1d2333;
+  --comment-surface-alt: #232a3b;
+  --comment-border: #30384b;
+  --comment-text: #ffffff;
+  --comment-text-muted: #9aa4bf;
+  --comment-accent: #4ff461;
+  --comment-accent-strong: #39d74c;
+  --comment-accent-ring: rgba(79, 244, 97, 0.16);
+  --comment-shadow: 0 18px 36px rgba(0, 0, 0, 0.22);
+
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 22px 24px;
+  border-radius: 16px;
+  background: linear-gradient(180deg, #1d2333 0%, #22293b 100%);
+  box-shadow: var(--comment-shadow);
+}
+
+.forum-rdx-comment-form-shell .user-avatar {
+  position: relative;
+  top: auto;
+  left: auto;
+  flex-shrink: 0;
+  margin-top: 6px;
+}
+
+.forum-rdx-comment-form-shell .form {
+  min-width: 0;
+  flex: 1;
+}
+
+.forum-rdx-comment-form-shell .form-row,
+.forum-rdx-comment-form-shell .form-item {
+  margin: 0;
+}
+
+.forum-rdx-comment-form-shell .forum-rdx-comment-form-main {
+  width: 100%;
+}
+
+.forum-rdx-comment-form-shell .forum-rdx-comment-composer {
+  padding: 14px 16px;
+  border: 1px solid var(--comment-border);
+  border-radius: 16px;
+  background: linear-gradient(180deg, rgba(33, 40, 59, 0.98) 0%, rgba(28, 35, 51, 0.98) 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
+  transition: border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease, transform 0.18s ease;
+}
+
+.forum-rdx-comment-form-shell .forum-rdx-comment-composer:focus-within {
+  border-color: rgba(79, 244, 97, 0.3);
+  background: linear-gradient(180deg, rgba(36, 44, 64, 0.98) 0%, rgba(31, 39, 57, 0.98) 100%);
+  box-shadow:
+    0 0 0 4px rgba(79, 244, 97, 0.08),
+    0 20px 40px rgba(0, 0, 0, 0.24);
+  transform: translateY(-1px);
+}
+
+.forum-rdx-comment-form-shell .forum-rdx-comment-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(48, 56, 75, 0.96);
+}
+
+.forum-rdx-comment-form-shell .forum-rdx-tool-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  border: 1px solid var(--comment-border);
+  background: rgba(29, 35, 51, 0.78);
+  color: var(--comment-text-muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.14);
+  transition: border-color 0.15s ease, color 0.15s ease, background-color 0.15s ease, transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.forum-rdx-comment-form-shell .forum-rdx-tool-btn:hover,
+.forum-rdx-comment-form-shell .forum-rdx-tool-btn:focus-visible {
+  outline: 0;
+  border-color: rgba(79, 244, 97, 0.28);
+  color: var(--comment-accent);
+  background: rgba(79, 244, 97, 0.08);
+  box-shadow: 0 10px 18px rgba(0, 0, 0, 0.2);
+  transform: translateY(-1px);
+}
+
+.forum-rdx-comment-form-shell .forum-rdx-comment-input {
+  min-height: 98px;
+  max-height: 280px;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  resize: vertical;
+  color: var(--comment-text);
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.7;
+}
+
+.forum-rdx-comment-form-shell .forum-rdx-comment-input::placeholder {
+  color: #95a0be;
+  font-weight: 600;
+}
+
+.forum-rdx-comment-form-shell .forum-rdx-comment-input:focus {
+  outline: 0;
+}
+
+.forum-rdx-comment-form-shell .forum-rdx-comment-footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-top: 14px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(48, 56, 75, 0.9);
+}
+
+.forum-rdx-comment-form-shell .forum-rdx-comment-send {
+  min-width: 42px;
+  width: 42px;
+  height: 42px;
+  padding: 0;
+  border: 0;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--comment-accent) 0%, var(--comment-accent-strong) 100%);
+  color: #12201a;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 12px 24px rgba(79, 244, 97, 0.22);
+  transition: opacity 0.15s ease, transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+}
+
+.forum-rdx-comment-form-shell .forum-rdx-comment-send:hover,
+.forum-rdx-comment-form-shell .forum-rdx-comment-send:focus-visible {
+  outline: 0;
+  transform: translateY(-1px);
+  filter: brightness(1.03);
+  box-shadow:
+    0 0 0 4px var(--comment-accent-ring),
+    0 18px 30px rgba(79, 244, 97, 0.24);
+}
+
+.forum-rdx-comment-form-shell .forum-rdx-comment-send .interactive-input-icon {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+}
+
+@media screen and (max-width: 640px) {
+  .forum-rdx-comment-form-shell {
+    gap: 12px;
+    padding: 16px;
+  }
+
+  .forum-rdx-comment-form-shell .forum-rdx-comment-composer {
+    padding: 12px;
+    border-radius: 14px;
+  }
+
+  .forum-rdx-comment-form-shell .forum-rdx-comment-toolbar {
+    gap: 6px;
+    margin-bottom: 8px;
+    padding-bottom: 10px;
+  }
+
+  .forum-rdx-comment-form-shell .forum-rdx-tool-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 9px;
+  }
+
+  .forum-rdx-comment-form-shell .forum-rdx-comment-input {
+    min-height: 88px;
+    font-size: 0.85rem;
+  }
+
+  .forum-rdx-comment-form-shell .forum-rdx-comment-footer {
+    margin-top: 12px;
+    padding-top: 8px;
+  }
+
+  .forum-rdx-comment-form-shell .forum-rdx-comment-send {
+    min-width: 40px;
+    width: 40px;
+    height: 40px;
+    border-radius: 11px;
+  }
+}
+
+html[dir="rtl"] .forum-rdx-comment-form-shell {
+  direction: rtl;
+}
+
+html[dir="rtl"] .forum-rdx-comment-form-shell .forum-rdx-comment-footer {
+  justify-content: flex-start;
+}
