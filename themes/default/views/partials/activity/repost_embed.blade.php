@@ -4,7 +4,7 @@
     $originalUser = $original?->user;
     $originalUserProfileUrl = $originalUser ? route('profile.show', $originalUser->username) : '#';
     $originalUserName = $originalUser?->username ?? __('messages.unknown_user');
-    $originalUserAvatar = $originalUser?->img ? asset($originalUser->img) : theme_asset('img/avatar/default.png');
+    $originalUserAvatar = $originalUser ? $originalUser->avatarUrl() : asset('upload/_avatar.png');
     $originalUserPresence = $originalUser?->isOnline() ? 'online' : 'offline';
     $originalUrl = null;
     $originalTitle = null;

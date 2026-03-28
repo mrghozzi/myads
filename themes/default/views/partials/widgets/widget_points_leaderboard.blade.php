@@ -11,7 +11,7 @@
                 <a class="user-status-avatar" href="{{ route('profile.short', $user->publicRouteIdentifier()) }}">
                         <div class="user-avatar small no-outline {{ $user->isOnline() ? 'online' : '' }}">
                             <div class="user-avatar-content">
-                                <div class="hexagon-image-30-32" data-src="{{ $user->img ? url($user->img) : theme_asset('img/avatar/01.jpg') }}"></div>
+                                <div class="hexagon-image-30-32" data-src="{{ $user->avatarUrl() }}"></div>
                             </div>
                             <div class="user-avatar-progress-border">
                                 <div class="hexagon-border-40-44"></div>

@@ -2,7 +2,7 @@
     $activityUser = $activity->user;
     $activityUserProfileUrl = $activityUser ? route('profile.show', $activityUser->username) : '#';
     $activityUserName = $activityUser?->username ?? __('messages.unknown_user');
-    $activityUserAvatar = $activityUser?->img ? asset($activityUser->img) : theme_asset('img/avatar/default.png');
+    $activityUserAvatar = $activityUser ? $activityUser->avatarUrl() : asset('upload/_avatar.png');
     $activityUserPresence = $activityUser?->isOnline() ? 'online' : 'offline';
     $activityUserIsAdmin = $activityUser?->isAdmin() ?? false;
     $formattedText = \App\Support\ContentFormatter::format(\Illuminate\Support\Str::limit($activity->related_content->txt ?? '', 1600));

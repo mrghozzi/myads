@@ -32,7 +32,7 @@
                             <!-- USER AVATAR CONTENT -->
                             <div class="user-avatar-content">
                                 <!-- HEXAGON -->
-                                <div class="hexagon-image-30-32" data-src="{{ $user->img ? url($user->img) : theme_asset('img/avatar/01.jpg') }}"></div>
+                                <div class="hexagon-image-30-32" data-src="{{ $user->avatarUrl() }}"></div>
                                 <!-- /HEXAGON -->
                             </div>
                             <!-- /USER AVATAR CONTENT -->

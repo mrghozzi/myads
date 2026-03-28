@@ -35,7 +35,7 @@
                             <a class="user-status-avatar" href="{{ route('forum.topic', $topic->id) }}">
                                 <div class="user-avatar small no-outline">
                                     <div class="user-avatar-content">
-                                        <div class="hexagon-image-30-32" data-src="{{ $topic->user->img ? url($topic->user->img) : theme_asset('img/avatar/01.jpg') }}"></div>
+                                        <div class="hexagon-image-30-32" data-src="{{ $topic->user ? $topic->user->avatarUrl() : asset('upload/_avatar.png') }}"></div>
                                     </div>
                                 </div>
                             </a>
@@ -60,7 +60,7 @@
                                             <a class="user-status-avatar" href="{{ route('profile.short', $status->user?->publicRouteIdentifier() ?? $status->uid) }}">
                                 <div class="user-avatar small no-outline">
                                     <div class="user-avatar-content">
-                                        <div class="hexagon-image-30-32" data-src="{{ $status->user->img ? url($status->user->img) : theme_asset('img/avatar/01.jpg') }}"></div>
+                                        <div class="hexagon-image-30-32" data-src="{{ $status->user ? $status->user->avatarUrl() : asset('upload/_avatar.png') }}"></div>
                                     </div>
                                 </div>
                             </a>

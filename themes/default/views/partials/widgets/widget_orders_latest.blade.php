@@ -15,7 +15,7 @@
                     <a class="user-status-avatar" href="{{ route('profile.show', $order->user->username) }}">
                         <div class="user-avatar small no-outline">
                             <div class="user-avatar-content">
-                                <div class="hexagon-image-30-32" data-src="{{ $order->user->img ? asset($order->user->img) : theme_asset('img/avatar/01.jpg') }}"></div>
+                                <div class="hexagon-image-30-32" data-src="{{ $order->user ? $order->user->avatarUrl() : asset('upload/_avatar.png') }}"></div>
                             </div>
                         </div>
                     </a>

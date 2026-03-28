@@ -35,7 +35,7 @@
                     <div class="hexagon-50-56" style="width: 50px; height: 56px; position: relative;"><canvas width="50" height="56"></canvas></div>
                 </div>
                 <div class="user-avatar-content">
-                    <div class="hexagon-image-30-32" data-src="{{ $targetUser->img ? asset($targetUser->img) : theme_asset('img/avatar/default.png') }}"><canvas width="30" height="32"></canvas></div>
+                    <div class="hexagon-image-30-32" data-src="{{ $targetUser->avatarUrl() }}"><canvas width="30" height="32"></canvas></div>
                 </div>
                 <div class="user-avatar-progress-border">
                     <div class="hexagon-border-40-44" style="width: 40px; height: 44px; position: relative;"><canvas width="40" height="44" style="position: absolute; top: 0px; left: 0px;"></canvas></div>

@@ -69,7 +69,7 @@
         @php
             $latestFile = \App\Models\ProductFile::where('o_parent', $product->id)->orderBy('id', 'desc')->first();
             $owner = $product->user;
-            $ownerAvatar = $owner && $owner->img ? ( \Illuminate\Support\Str::startsWith($owner->img, ['http://', 'https://']) ? $owner->img : asset($owner->img) ) : theme_asset('img/avatar/default.png');
+            $ownerAvatar = $owner ? $owner->avatarUrl() : asset('upload/_avatar.png');
             $productImage = $product->product_image ?? theme_asset('img/error_plug.png');
         @endphp
         <div class="product-preview">

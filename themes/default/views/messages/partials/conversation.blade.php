@@ -41,7 +41,7 @@
         <article class="messages-bubble-row {{ $isMine ? 'is-me' : '' }}" data-message-id="{{ $message->id_msg }}">
             @unless($isMine)
                 <div class="messages-bubble-avatar">
-                    <img src="{{ $partner->img ? asset($partner->img) : theme_asset('img/avatar/01.jpg') }}" alt="{{ $partner->username }}">
+                    <img src="{{ $partner ? $partner->avatarUrl() : asset('upload/_avatar.png') }}" alt="{{ $partner->username ?? __('messages.unknown_user') }}">
                 </div>
             @endunless
 

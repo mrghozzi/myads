@@ -3,7 +3,7 @@
     $statusUser = $status->user;
     $statusUserProfileUrl = $statusUser ? route('profile.show', $statusUser->username) : '#';
     $statusUserName = $statusUser?->username ?? __('messages.unknown_user');
-    $statusUserAvatar = $statusUser?->img ? asset($statusUser->img) : theme_asset('img/avatar/default.png');
+    $statusUserAvatar = $statusUser ? $statusUser->avatarUrl() : asset('upload/_avatar.png');
     $statusUserPresence = $statusUser?->isOnline() ? 'online' : 'offline';
     $statusUserIsAdmin = $statusUser?->isAdmin() ?? false;
     $product = $activity->related_content;

@@ -57,7 +57,7 @@
         @if($user)
             <a class="user-avatar small no-outline {{ $user->isOnline() ? 'online' : 'offline' }}" href="{{ route('profile.show', $user->username) }}">
                 <div class="user-avatar-content">
-                    <div class="hexagon-image-30-32" data-src="{{ $user->img ? asset($user->img) : theme_asset('img/avatar/default.png') }}" style="width: 30px; height: 32px; position: relative;">
+                    <div class="hexagon-image-30-32" data-src="{{ $user->avatarUrl() }}" style="width: 30px; height: 32px; position: relative;">
                         <canvas style="position: absolute; top: 0px; left: 0px;" width="30" height="32"></canvas>
                     </div>
                 </div>
@@ -85,7 +85,7 @@
         @else
             <div class="user-avatar small no-outline offline">
                 <div class="user-avatar-content">
-                    <div class="hexagon-image-30-32" data-src="{{ theme_asset('img/avatar/default.png') }}" style="width: 30px; height: 32px; position: relative;">
+                    <div class="hexagon-image-30-32" data-src="{{ asset('upload/_avatar.png') }}" style="width: 30px; height: 32px; position: relative;">
                         <canvas style="position: absolute; top: 0px; left: 0px;" width="30" height="32"></canvas>
                     </div>
                 </div>
@@ -192,7 +192,7 @@
             <div class="post-comment-form forum-rdx-comment-form-shell">
                 <div class="user-avatar small no-outline {{ auth()->user()->isOnline() ? 'online' : 'offline' }}">
                     <div class="user-avatar-content">
-                        <div class="hexagon-image-30-32" data-src="{{ auth()->user()->img ? asset(auth()->user()->img) : theme_asset('img/avatar/01.jpg') }}" style="width: 30px; height: 32px; position: relative;">
+                        <div class="hexagon-image-30-32" data-src="{{ auth()->user()->avatarUrl() }}" style="width: 30px; height: 32px; position: relative;">
                             <canvas style="position: absolute; top: 0px; left: 0px;" width="30" height="32"></canvas>
                         </div>
                     </div>

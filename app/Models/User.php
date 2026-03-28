@@ -83,6 +83,19 @@ class User extends Authenticatable
     {
         return $this->img;
     }
+
+    public function avatarUrl(): string
+    {
+        if (!$this->img) {
+            return asset('upload/avatar.png');
+        }
+
+        if (Str::startsWith($this->img, ['http://', 'https://'])) {
+            return $this->img;
+        }
+
+        return asset($this->img);
+    }
     
     public function isAdmin()
     {

@@ -885,7 +885,7 @@
                     >
                         <div class="user-avatar small no-outline {{ $partnerItem->isOnline() ? 'online' : 'offline' }}">
                             <div class="user-avatar-content">
-                                <div class="hexagon-image-30-32" data-src="{{ $partnerItem->img ? asset($partnerItem->img) : theme_asset('img/avatar/01.jpg') }}"></div>
+                                <div class="hexagon-image-30-32" data-src="{{ $partnerItem->avatarUrl() }}"></div>
                             </div>
                             <div class="user-avatar-progress-border">
                                 <div class="hexagon-border-40-44"></div>
@@ -923,7 +923,7 @@
                         <a href="{{ route('profile.short', $partner->publicRouteIdentifier()) }}">
                             <div class="user-avatar small no-outline {{ $partner->isOnline() ? 'online' : 'offline' }}">
                                 <div class="user-avatar-content">
-                                    <div class="hexagon-image-30-32" data-src="{{ $partner->img ? asset($partner->img) : theme_asset('img/avatar/01.jpg') }}"></div>
+                                    <div class="hexagon-image-30-32" data-src="{{ $partner->avatarUrl() }}"></div>
                                 </div>
                                 <div class="user-avatar-progress-border">
                                     <div class="hexagon-border-40-44"></div>

@@ -113,7 +113,7 @@
                             <!-- USER AVATAR CONTENT -->
                             <div class="user-avatar-content">
                                 <!-- HEXAGON -->
-                                <div class="hexagon-image-30-32" data-src="{{ $topic->user->img ? asset($topic->user->img) : theme_asset('img/avatar/default.png') }}" style="width: 30px; height: 32px; position: relative;">
+                                <div class="hexagon-image-30-32" data-src="{{ $topic->user ? $topic->user->avatarUrl() : asset('upload/_avatar.png') }}" style="width: 30px; height: 32px; position: relative;">
                                     <canvas style="position: absolute; top: 0px; left: 0px;" width="30" height="32"></canvas>
                                 </div>
                                 <!-- /HEXAGON -->

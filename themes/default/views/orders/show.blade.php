@@ -16,7 +16,7 @@
                 <div class="user-short-description">
                     <a class="user-short-description-avatar user-avatar medium {{ $order->user->isOnline() ? 'online' : 'offline' }}" href="{{ route('profile.show', $order->user->username) }}">
                         <div class="user-avatar-content">
-                            <div class="hexagon-image-68-74" data-src="{{ $order->user->img ? asset($order->user->img) : theme_asset('img/avatar/default.png') }}"></div>
+                            <div class="hexagon-image-68-74" data-src="{{ $order->user ? $order->user->avatarUrl() : asset('upload/_avatar.png') }}"></div>
                         </div>
                     </a>
                     <p class="user-short-description-title"><a href="{{ route('profile.show', $order->user->username) }}">{{ $order->user->username }}</a></p>

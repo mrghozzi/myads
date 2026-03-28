@@ -38,22 +38,22 @@
 
         <p class="forum-rdx-discussion-meta">
             @if($topic->user)
-                <span class="forum-rdx-discussion-user">
-                    <img
-                        class="forum-rdx-discussion-avatar"
-                        src="{{ $topic->user->img ? url($topic->user->img) : theme_asset('img/avatar/01.jpg') }}"
-                        alt="{{ $topic->user->username }}"
-                    >
-            <a class="forum-rdx-discussion-username" href="{{ route('profile.short', $topic->user->publicRouteIdentifier()) }}">
+                <img
+                    class="forum-rdx-discussion-avatar"
+                    src="{{ $topic->user ? $topic->user->avatarUrl() : asset('upload/_avatar.png') }}"
+                    alt="{{ $topic->user->username ?? __('messages.unknown_user') }}"
+                >
+                @if($topic->user)
+                    <a class="forum-rdx-discussion-username" href="{{ route('profile.short', $topic->user->publicRouteIdentifier()) }}">
                         {{ $topic->user->username }}
                     </a>
-                </span>
+                @else
+                    <span class="forum-rdx-discussion-username">{{ __('messages.deleted_user') }}</span>
+                @endif
+            </span>
                 @if($showForumRoleBadges)
                     <span class="forum-rdx-discussion-role">{{ $topic->user->forumRoleLabel($topicCategoryId) }}</span>
                 @endif
-            @else
-                <span>{{ __('messages.deleted_user') }}</span>
-            @endif
 
             <span>&middot;</span>
             <span>{{ $status->date ? \Carbon\Carbon::createFromTimestamp($status->date)->diffForHumans() : '' }}</span>

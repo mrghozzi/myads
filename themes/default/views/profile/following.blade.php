@@ -13,7 +13,7 @@
                     <div class="hexagon-148-164" style="width: 148px; height: 164px; position: relative;"><canvas style="position: absolute; top: 0px; left: 0px;" width="148" height="164"></canvas></div>
                 </div>
                 <div class="user-avatar-content">
-                    <div class="hexagon-image-100-110" data-src="{{ $user->img ? asset($user->img) : theme_asset('img/avatar/default.png') }}" style="width: 100px; height: 110px; position: relative;"><canvas style="position: absolute; top: 0px; left: 0px;" width="100" height="110"></canvas></div>
+                    <div class="hexagon-image-100-110" data-src="{{ $user->avatarUrl() }}" style="width: 100px; height: 110px; position: relative;"><canvas style="position: absolute; top: 0px; left: 0px;" width="100" height="110"></canvas></div>
                 </div>
                 <div class="user-avatar-progress-border">
                     <div class="hexagon-border-124-136" style="width: 124px; height: 136px; position: relative;"><canvas style="position: absolute; top: 0px; left: 0px;" width="124" height="136"></canvas></div>

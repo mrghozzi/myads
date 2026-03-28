@@ -39,7 +39,7 @@
                         <div class="user-short-description" style="max-width: 300px; margin: 0 auto; padding: 20px; border: 1px solid #eaeaf5; border-radius: 12px; background: #fff;">
                             <div class="user-short-description-avatar user-avatar medium">
                                 <div class="user-avatar-content">
-                                    <div class="hexagon-image-68-74" data-src="{{ $item->img ? asset($item->img) : theme_asset('img/avatar/default.png') }}"></div>
+                                    <div class="hexagon-image-68-74" data-src="{{ $item->avatarUrl() }}"></div>
                                 </div>
                             </div>
                             <p class="user-short-description-title">{{ $item->username }}</p>
