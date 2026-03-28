@@ -66,6 +66,16 @@
                                             <i class="feather-info"></i>
                                         </button>
                                     @endif
+
+                                    @if(!empty($updates[$theme['slug']]['download_url']))
+                                        <form action="{{ route('admin.themes.upgrade') }}" method="POST" class="d-inline" onsubmit="return confirm('{{ __('messages.confirm_upgrade_theme') }}')">
+                                            @csrf
+                                            <input type="hidden" name="slug" value="{{ $theme['slug'] }}">
+                                            <button type="submit" class="btn btn-sm btn-soft-info" title="{{ __('messages.update_now') }}">
+                                                <i class="feather-download-cloud"></i>
+                                            </button>
+                                        </form>
+                                    @endif
                                 @endif
 
                                 @if(!$theme['is_active'])
@@ -116,6 +126,13 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('messages.close') }}</button>
+                        @if(!empty($updates[$theme['slug']]['download_url']))
+                            <form action="{{ route('admin.themes.upgrade') }}" method="POST" class="d-inline">
+                                @csrf
+                                <input type="hidden" name="slug" value="{{ $theme['slug'] }}">
+                                <button type="submit" class="btn btn-primary">{{ __('messages.update_now') }}</button>
+                            </form>
+                        @endif
                     </div>
                 </div>
             </div>

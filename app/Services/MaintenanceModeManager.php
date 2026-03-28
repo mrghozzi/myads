@@ -78,7 +78,7 @@ class MaintenanceModeManager
         $now = time();
 
         $message = $current['message'];
-        if (in_array($source, ['plugin_activation', 'plugin_deactivation', 'plugin_upload', 'plugin_upgrade', 'theme_activation', 'clear_cache', 'run_migrations', 'db_repair', 'manual_update'])) {
+        if (in_array($source, ['plugin_activation', 'plugin_deactivation', 'plugin_upload', 'plugin_upgrade', 'theme_activation', 'theme_upgrade', 'clear_cache', 'run_migrations', 'db_repair', 'manual_update'])) {
             $message = __('messages.maintenance_auto_message');
         }
 

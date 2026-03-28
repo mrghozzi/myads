@@ -2,20 +2,21 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Facades\File;
 use App\Models\Setting;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
-
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
 
 class ThemeManager
 {
     protected $themePath;
+    protected ExtensionPackageUpgrader $packageUpgrader;
 
-    public function __construct()
+    public function __construct(?ExtensionPackageUpgrader $packageUpgrader = null)
     {
         $this->themePath = base_path('themes');
+        $this->packageUpgrader = $packageUpgrader ?? app(ExtensionPackageUpgrader::class);
     }
 
     /**
@@ -30,7 +31,7 @@ class ThemeManager
             File::makeDirectory($this->themePath, 0755, true);
         }
 
-        $directories = File::directories($this->themePath);
+        $directories = $this->themeDirectories();
         $activeThemeSlug = $this->getActiveThemeSlug();
 
         foreach ($directories as $directory) {
@@ -178,6 +179,30 @@ class ThemeManager
         return File::deleteDirectory($path);
     }
 
+    public function upgrade($slug)
+    {
+        $directory = $this->findDirectoryBySlug($slug);
+        if (!$directory) {
+            return __('messages.extension_not_installed');
+        }
+
+        $updates = $this->checkForUpdates();
+        if (!isset($updates[$slug]) || empty($updates[$slug]['download_url'])) {
+            return __('messages.extension_no_update_available');
+        }
+
+        return $this->packageUpgrader->upgradeFromDownload(
+            type: 'theme',
+            slug: $slug,
+            downloadUrl: $updates[$slug]['download_url'],
+            extensionsPath: $this->themePath,
+            metadataFile: 'theme.json',
+            cacheKey: 'theme_updates',
+            currentVersion: \App\Http\Controllers\AdminUpdatesController::CURRENT_VERSION,
+            existingDirectory: $directory
+        );
+    }
+
     /**
      * Find theme directory name by slug.
      *
@@ -186,7 +211,7 @@ class ThemeManager
      */
     protected function findDirectoryBySlug($slug)
     {
-        $directories = File::directories($this->themePath);
+        $directories = $this->themeDirectories();
         
         foreach ($directories as $directory) {
             $jsonFile = $directory . '/theme.json';
@@ -199,5 +224,16 @@ class ThemeManager
         }
         
         return null;
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    protected function themeDirectories(): array
+    {
+        return array_values(array_filter(
+            File::directories($this->themePath),
+            fn (string $directory): bool => ! str_starts_with(basename($directory), '.')
+        ));
     }
 }

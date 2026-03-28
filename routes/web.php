@@ -487,13 +487,13 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::post('/plugins/deactivate', [AdminController::class, 'deactivatePlugin'])->name('admin.plugins.deactivate');
     Route::post('/plugins/delete', [AdminController::class, 'deletePlugin'])->name('admin.plugins.delete');
     Route::post('/plugins/upload', [AdminController::class, 'uploadPlugin'])->name('admin.plugins.upload');
-    Route::get('plugins/upgrade', [AdminController::class, 'upgradePlugin'])->name('admin.plugins.upgrade');
-    Route::post('plugins/upgrade', [AdminController::class, 'upgradePlugin']);
+    Route::post('plugins/upgrade', [AdminController::class, 'upgradePlugin'])->name('admin.plugins.upgrade');
     Route::get('plugins/thumbnail/{slug}', [AdminController::class, 'pluginThumbnail'])->name('admin.plugins.thumbnail');
 
     // Themes
     Route::get('/themes', [AdminController::class, 'themes'])->name('admin.themes');
     Route::post('/themes/activate', [AdminController::class, 'activateTheme'])->name('admin.themes.activate');
+    Route::post('/themes/upgrade', [AdminController::class, 'upgradeTheme'])->name('admin.themes.upgrade');
     Route::get('themes/thumbnail/{slug}', [AdminController::class, 'themeThumbnail'])->name('admin.themes.thumbnail');
     Route::match(['get', 'post'], '/sitemap/generate', [SitemapController::class, 'generate'])->name('admin.sitemap.generate');
 

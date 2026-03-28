@@ -110,13 +110,13 @@
                                             <i class="feather-trash-2"></i>
                                         </button>
 
-                                        @if(isset($updates[$plugin['slug']]))
+                                        @if(isset($updates[$plugin['slug']]) && !empty($updates[$plugin['slug']]['download_url']))
                                             @if(isset($updates[$plugin['slug']]['changelog']))
                                                 <button type="button" class="btn btn-sm btn-soft-primary" data-bs-toggle="modal" data-bs-target="#changelogModal{{ $loop->index }}" title="{{ __('messages.view_changelog') }}">
                                                     <i class="feather-info"></i>
                                                 </button>
                                             @endif
-                                            <form action="{{ route('admin.plugins.upgrade') }}" method="POST" class="d-inline" onsubmit="return confirm('{{ __('messages.confirm_upgrade_plugin') ?? 'Are you sure you want to upgrade this plugin?' }}')">
+                                            <form action="{{ route('admin.plugins.upgrade') }}" method="POST" class="d-inline" onsubmit="return confirm('{{ __('messages.confirm_upgrade_plugin') }}')">
                                                 @csrf
                                                 <input type="hidden" name="slug" value="{{ $plugin['slug'] }}">
                                                 <button type="submit" class="btn btn-sm btn-soft-info" title="{{ __('messages.update_now') }}">
@@ -224,11 +224,13 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('messages.close') }}</button>
-                    <form action="{{ route('admin.plugins.upgrade') }}" method="POST" class="d-inline">
-                        @csrf
-                        <input type="hidden" name="slug" value="{{ $plugin['slug'] }}">
-                        <button type="submit" class="btn btn-primary">{{ __('messages.update_now') }}</button>
-                    </form>
+                    @if(!empty($updates[$plugin['slug']]['download_url']))
+                        <form action="{{ route('admin.plugins.upgrade') }}" method="POST" class="d-inline">
+                            @csrf
+                            <input type="hidden" name="slug" value="{{ $plugin['slug'] }}">
+                            <button type="submit" class="btn btn-primary">{{ __('messages.update_now') }}</button>
+                        </form>
+                    @endif
                 </div>
             </div>
         </div>

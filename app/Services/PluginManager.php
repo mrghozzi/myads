@@ -2,21 +2,22 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Facades\File;
 use App\Models\Option;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
-use ZipArchive;
-
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
+use ZipArchive;
 
 class PluginManager
 {
     protected $pluginPath;
+    protected ExtensionPackageUpgrader $packageUpgrader;
 
-    public function __construct()
+    public function __construct(?ExtensionPackageUpgrader $packageUpgrader = null)
     {
         $this->pluginPath = base_path('plugins');
+        $this->packageUpgrader = $packageUpgrader ?? app(ExtensionPackageUpgrader::class);
     }
 
     /**
@@ -31,7 +32,7 @@ class PluginManager
             File::makeDirectory($this->pluginPath, 0755, true);
         }
 
-        $directories = File::directories($this->pluginPath);
+        $directories = $this->pluginDirectories();
 
         foreach ($directories as $directory) {
             $jsonFile = $directory . '/plugin.json';
@@ -257,36 +258,26 @@ class PluginManager
      */
     public function upgrade($slug)
     {
+        $directory = $this->findDirectoryBySlug($slug);
+        if (!$directory) {
+            return __('messages.extension_not_installed');
+        }
+
         $updates = $this->checkForUpdates();
         if (!isset($updates[$slug]) || empty($updates[$slug]['download_url'])) {
-            return "No update available.";
+            return __('messages.extension_no_update_available');
         }
 
-        $downloadUrl = $updates[$slug]['download_url'];
-        
-        // Download ZIP
-        try {
-            $tempZip = storage_path('app/temp_plugins/update_' . $slug . '.zip');
-            if (!File::exists(dirname($tempZip))) {
-                File::makeDirectory(dirname($tempZip), 0755, true);
-            }
-            
-            File::put($tempZip, Http::get($downloadUrl)->body());
-            
-            // Install (overwrite)
-            $zip = new ZipArchive;
-            if ($zip->open($tempZip) === TRUE) {
-                $targetPath = $this->pluginPath . '/' . $this->findDirectoryBySlug($slug);
-                $zip->extractTo($targetPath);
-                $zip->close();
-                File::delete($tempZip);
-                return true;
-            }
-        } catch (\Exception $e) {
-            return "Update failed: " . $e->getMessage();
-        }
-
-        return "Failed to process update package.";
+        return $this->packageUpgrader->upgradeFromDownload(
+            type: 'plugin',
+            slug: $slug,
+            downloadUrl: $updates[$slug]['download_url'],
+            extensionsPath: $this->pluginPath,
+            metadataFile: 'plugin.json',
+            cacheKey: 'plugin_updates',
+            currentVersion: \App\Http\Controllers\AdminUpdatesController::CURRENT_VERSION,
+            existingDirectory: $directory
+        );
     }
 
     /**
@@ -334,7 +325,7 @@ class PluginManager
         }
 
         // Fallback: scan all
-        $directories = File::directories($this->pluginPath);
+        $directories = $this->pluginDirectories();
         foreach ($directories as $directory) {
             $jsonFile = $directory . '/plugin.json';
             if (File::exists($jsonFile)) {
@@ -345,5 +336,16 @@ class PluginManager
             }
         }
         return null;
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    protected function pluginDirectories(): array
+    {
+        return array_values(array_filter(
+            File::directories($this->pluginPath),
+            fn (string $directory): bool => ! str_starts_with(basename($directory), '.')
+        ));
     }
 }

@@ -2518,7 +2518,7 @@ class AdminController extends Controller
 
             if ($result === true) {
                 $this->maintenanceMode->disable(Auth::user(), 'plugin_upgrade_success');
-                return redirect()->back()->with('success', __('Plugin upgraded successfully'));
+                return redirect()->back()->with('success', __('messages.plugin_upgraded_successfully'));
             }
 
             $this->maintenanceMode->disable(Auth::user(), 'plugin_upgrade_failed');
@@ -2545,17 +2545,15 @@ class AdminController extends Controller
     }
 
     // Themes Management
-    public function themes()
+    public function themes(ThemeManager $themeManager)
     {
-        $themeManager = new ThemeManager();
         $themes = $themeManager->getAllThemes();
         $updates = $themeManager->checkForUpdates();
         return view('theme::admin.themes.index', compact('themes', 'updates'));
     }
 
-    public function themeThumbnail($slug)
+    public function themeThumbnail($slug, ThemeManager $themeManager)
     {
-        $themeManager = new ThemeManager();
         $themes = $themeManager->getAllThemes();
         $theme = collect($themes)->where('slug', $slug)->first();
 
@@ -2569,7 +2567,7 @@ class AdminController extends Controller
         abort(404);
     }
 
-    public function activateTheme(Request $request)
+    public function activateTheme(Request $request, ThemeManager $themeManager)
     {
         $request->validate([
             'slug' => 'required|string'
@@ -2577,7 +2575,6 @@ class AdminController extends Controller
 
         $this->maintenanceMode->enable(Auth::user(), 'theme_activation');
         try {
-            $themeManager = new ThemeManager();
             if ($themeManager->activate($request->slug)) {
                 $this->maintenanceMode->disable(Auth::user(), 'theme_activation_success');
                 return redirect()->back()->with('success', __('Theme activated successfully.'));
@@ -2587,6 +2584,27 @@ class AdminController extends Controller
             return redirect()->back()->with('error', __('Theme activation failed.'));
         } catch (\Throwable $e) {
             $this->maintenanceMode->disable(Auth::user(), 'theme_activation_error');
+            return redirect()->back()->with('error', __('Error: ') . $e->getMessage());
+        }
+    }
+
+    public function upgradeTheme(Request $request, ThemeManager $themeManager)
+    {
+        $request->validate(['slug' => 'required|string']);
+
+        $this->maintenanceMode->enable(Auth::user(), 'theme_upgrade');
+        try {
+            $result = $themeManager->upgrade($request->slug);
+
+            if ($result === true) {
+                $this->maintenanceMode->disable(Auth::user(), 'theme_upgrade_success');
+                return redirect()->back()->with('success', __('messages.theme_upgraded_successfully'));
+            }
+
+            $this->maintenanceMode->disable(Auth::user(), 'theme_upgrade_failed');
+            return redirect()->back()->with('error', $result);
+        } catch (\Throwable $e) {
+            $this->maintenanceMode->disable(Auth::user(), 'theme_upgrade_error');
             return redirect()->back()->with('error', __('Error: ') . $e->getMessage());
         }
     }
