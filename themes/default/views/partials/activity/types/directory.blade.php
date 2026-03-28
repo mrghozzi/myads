@@ -40,7 +40,7 @@
                 @once
                     @include('theme::partials.directory.lazy_image_script')
                 @endonce
-                <a class="activity-super" href="{{ $site->url }}" target="_blank">
+                <a class="activity-super mt-3" href="{{ $site->url }}" target="_blank">
                     <div class="activity-super-banner" style="background-image: url({{ $siteBanner }});" data-lazy-fetch-url="{{ route('directory.image.fetch', $site->id) }}">
                         <span class="activity-super-category">
                             <i class="fa {{ $site->category->icon ?? 'fa-globe' }}" aria-hidden="true"></i>
