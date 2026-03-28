@@ -1,16 +1,16 @@
 @extends('theme::layouts.admin')
 
-@section('title', __('messages.links'))
+@section('title', __('messages.textads'))
 
 @section('content')
 <div class="page-header">
     <div class="page-header-left d-flex align-items-center">
         <div class="page-header-title">
-            <h5 class="m-b-10">{{ __('messages.links') }}</h5>
+            <h5 class="m-b-10">{{ __('messages.textads') }}</h5>
         </div>
         <ul class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{ route('admin.index') }}">{{ __('messages.dashboard') ?? 'Dashboard' }}</a></li>
-            <li class="breadcrumb-item">{{ __('messages.links') }}</li>
+            <li class="breadcrumb-item">{{ __('messages.textads') }}</li>
         </ul>
     </div>
     <div class="page-header-right ms-auto">
@@ -22,28 +22,24 @@
                 </a>
             </div>
             <div class="d-flex align-items-center gap-2 page-header-right-items-wrapper">
-                
-                <div class="dropdown">
-                    <a class="btn btn-icon btn-light-brand" data-bs-toggle="dropdown" data-bs-offset="0, 12" data-bs-auto-close="outside">
-                        <i class="feather-filter"></i>
-                    </a>
-                    <div class="dropdown-menu dropdown-menu-end" style="min-width: 260px;">
-                        <div class="dropdown-header fw-bold text-uppercase fs-11 text-muted">{{ __('messages.Filter') }}</div>
-                        <a href="{{ route('admin.links') }}" class="dropdown-item {{ !request('user_id') ? 'active' : '' }}" {{ !request('user_id') ? 'aria-current="true"' : '' }}>
-                            <i class="feather-list me-3"></i>
-                            <span>{{ __('messages.all_links') ?? 'All Links' }}</span>
-                        </a>
-                        @if(request('user_id'))
-                            <div class="dropdown-divider"></div>
-                            <div class="dropdown-header fw-bold text-uppercase fs-11 text-muted">{{ __('messages.current_user') ?? 'Current User' }}</div>
-                            <div class="dropdown-item active">
-                                <i class="feather-user me-3"></i>
-                                <span>User ID: {{ request('user_id') }}</span>
-                            </div>
-                        @endif
-                    </div>
-                </div>
-
+                <a href="{{ route('ads.links.code') }}" class="btn btn-icon btn-light-brand" data-bs-toggle="tooltip" title="{{ __('messages.codes') }}">
+                    <i class="feather-code"></i>
+                </a>
+                <a href="{{ route('admin.stats', ['ty' => 'clik']) }}" class="btn btn-icon btn-light-brand" data-bs-toggle="tooltip" title="{{ __('messages.Stats') }}">
+                    <i class="feather-bar-chart-2"></i>
+                </a>
+                @include('theme::admin.partials.inventory_filter_dropdown', [
+                    'action' => route('admin.links'),
+                    'resetUrl' => route('admin.links', ['reset_filters' => 1]),
+                    'preferenceKey' => 'links',
+                    'filterState' => $filterState,
+                    'filterFields' => $filterFields,
+                    'resultsCount' => $resultsCount,
+                ])
+                <a href="{{ route('ads.links.create') }}" class="btn btn-primary">
+                    <i class="feather-plus me-2"></i>
+                    <span>{{ __('messages.add') }}</span>
+                </a>
             </div>
         </div>
         <div class="d-md-none d-flex align-items-center">
@@ -54,10 +50,18 @@
     </div>
 </div>
 
+@if(session('success'))
+    <div class="alert alert-success">{{ session('success') }}</div>
+@endif
+
 <div class="main-content">
     <div class="row">
         <div class="col-lg-12">
             <div class="card stretch stretch-full">
+                <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <h5 class="card-title mb-0">{{ __('messages.textads') }}</h5>
+                    <span class="badge bg-soft-primary text-primary">{{ __('messages.results_count', ['count' => $resultsCount]) }}</span>
+                </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
                         <table class="table table-hover mb-0">

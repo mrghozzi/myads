@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 return [
     'Activated' => 'Attivato',
@@ -1633,4 +1633,23 @@ return [
     'status_promotion_limit_min' => 'Minimum',
     'status_promotion_limit_max' => 'Maximum',
     'status_promotion_quote_failed' => 'Could not calculate the quote right now.',
+    'advanced_filter' => 'Advanced Filter',
+    'filter_logic' => 'Filter Logic',
+    'filter_logic_and' => 'Match all filters (AND)',
+    'filter_logic_or' => 'Match any filter (OR)',
+    'apply_filter' => 'Apply Filter',
+    'reset_filter' => 'Reset',
+    'results_count' => ':count results',
+    'save_as_default_filter' => 'Save as my default filter',
+    'filter_keyword' => 'Keyword',
+    'filter_id_min' => 'ID Min',
+    'filter_id_max' => 'ID Max',
+    'filter_clicks_min' => 'Clicks Min',
+    'filter_clicks_max' => 'Clicks Max',
+    'filter_impressions_min' => 'Impressions Min',
+    'filter_impressions_max' => 'Impressions Max',
+    'filter_views_min' => 'Views Min',
+    'filter_views_max' => 'Views Max',
+    'code_unavailable' => 'Code is not available for this section',
+    'created' => 'Created',
 ];

@@ -12,6 +12,17 @@
 * **Architecture**: Implemented a performant backend query logic in `AdminController.index` using `DB::raw` and `FROM_UNIXTIME` for grouped daily stats across disparate tables (`status`, `f_coment`, `options`, `like`).
 * **UI/UX**: Refined chart containers with fixed heights (`350px`) to prevent layout jumping and ensure consistency with the Duralux admin theme.
 
+### 🔍 Advanced Inventory Filters
+* **Add**: Implemented a new **Advanced Filter System** for admin inventory pages: `/admin/banners`, `/admin/links`, `/admin/smart-ads`, and `/admin/visits`.
+* **Add**: Multiple filter fields based on data type (text, date, number, dropdown select) for comprehensive search capabilities.
+* **Add**: Support for **AND/OR logic** to combine filters, allowing for more precise data retrieval.
+* **Add**: "Apply Filter" and "Reset" buttons for easy management of filter settings.
+* **Add**: Display of **results count** after filtering to provide immediate feedback on search outcomes.
+* **Add**: User preference saving for filter settings, ensuring that preferred filters are retained across sessions.
+* **Improvement**: Standardized UI components, CSS styles, JavaScript functionality, data structure, and responsive behavior across all affected admin inventory pages.
+* **i18n**: Added new translation keys for all filter-related labels and messages across all 9 supported languages.
+* **Tests**: Added `AdminInventoryFiltersTest` to cover functional testing of the new filter system, including saved preferences and AND/OR logic.
+
 ### Security Suite
 * **Add**: Introduced a dedicated **Security** admin area at `/admin/security` with a new ACL module, Duralux sidebar entry, main settings page, IP ban management, member session audit log, and admin password confirmation flow.
 * **Add**: Added centralized `SecuritySettings` backed by `options` (`o_type = security_settings`) for link/domain blacklists, cooldowns, registration caps, login throttling, admin reconfirmation, private message encryption, and public member IDs.

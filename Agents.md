@@ -380,6 +380,11 @@ pages/         → Static pages (privacy, terms, custom)
 - Feed delivery is applied only to `/portal?filter=all` after the organic smart-feed page is built. Promoted posts never appear as the first card, never adjacent, respect a cooldown per viewer, and are labeled as `Ad`.
 - Progress logic: `views` uses promoted-feed impressions, `comments`/`reactions` use deltas from campaign baselines, and `days` uses elapsed campaign days. Final states are `completed`, `expired`, or `budget_capped`.
 
+### Admin Inventory Filters
+- Admin inventory pages for `/admin/banners`, `/admin/links`, `/admin/smart-ads`, and `/admin/visits` use the same toolbar pattern with icon actions and a Bootstrap dropdown filter panel.
+- Advanced filter preferences are stored in `options` using `o_type = 'admin_inventory_filters'`, `name = '{page-key}'`, and `o_parent = {admin_user_id}` with a JSON payload in `o_valuer`.
+- Filter logic supports both `AND` and `OR` matching and auto-loads saved preferences when the admin revisits a supported inventory page without query parameters.
+
 ### Wiki/Markdown System (v4.2.0)
 - **Engine:** Client-side rendering using `marked.js` and `DOMPurify`.
 - **Editor:** Integrated **StackEdit** for premium Markdown editing experience.

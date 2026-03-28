@@ -28,28 +28,14 @@
                 <a href="{{ route('admin.stats', ['ty' => 'banner', 'st' => 'vu']) }}" class="btn btn-icon btn-light-brand" data-bs-toggle="tooltip" title="{{ __('messages.Stats') }}">
                     <i class="feather-bar-chart-2"></i>
                 </a>
-                
-                <div class="dropdown">
-                    <a class="btn btn-icon btn-light-brand" data-bs-toggle="dropdown" data-bs-offset="0, 12" data-bs-auto-close="outside">
-                        <i class="feather-filter"></i>
-                    </a>
-                    <div class="dropdown-menu dropdown-menu-end" style="min-width: 260px;">
-                        <div class="dropdown-header fw-bold text-uppercase fs-11 text-muted">{{ __('messages.Filter') }}</div>
-                        <a href="{{ route('admin.banners') }}" class="dropdown-item {{ !request('user_id') ? 'active' : '' }}" {{ !request('user_id') ? 'aria-current="true"' : '' }}>
-                            <i class="feather-list me-3"></i>
-                            <span>{{ __('messages.all_banners') ?? 'All Banners' }}</span>
-                        </a>
-                        @if(request('user_id'))
-                            <div class="dropdown-divider"></div>
-                            <div class="dropdown-header fw-bold text-uppercase fs-11 text-muted">{{ __('messages.current_user') ?? 'Current User' }}</div>
-                            <div class="dropdown-item active">
-                                <i class="feather-user me-3"></i>
-                                <span>{{ __('messages.user_id_label') ?? 'User ID:' }} {{ request('user_id') }}</span>
-                            </div>
-                        @endif
-                    </div>
-                </div>
-
+                @include('theme::admin.partials.inventory_filter_dropdown', [
+                    'action' => route('admin.banners'),
+                    'resetUrl' => route('admin.banners', ['reset_filters' => 1]),
+                    'preferenceKey' => 'banners',
+                    'filterState' => $filterState,
+                    'filterFields' => $filterFields,
+                    'resultsCount' => $resultsCount,
+                ])
                 <a href="{{ route('ads.promote', ['p' => 'banners']) }}" class="btn btn-primary">
                     <i class="feather-plus me-2"></i>
                     <span>{{ __('messages.add') }}</span>
@@ -64,10 +50,18 @@
     </div>
 </div>
 
+@if(session('success'))
+    <div class="alert alert-success">{{ session('success') }}</div>
+@endif
+
 <div class="main-content">
     <div class="row">
         <div class="col-lg-12">
             <div class="card stretch stretch-full">
+                <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <h5 class="card-title mb-0">{{ __('messages.bannads') }}</h5>
+                    <span class="badge bg-soft-primary text-primary">{{ __('messages.results_count', ['count' => $resultsCount]) }}</span>
+                </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
                         <table class="table table-hover mb-0">

@@ -1,16 +1,16 @@
 @extends('theme::layouts.admin')
 
-@section('title', __('messages.visits'))
+@section('title', __('messages.exvisit'))
 
 @section('content')
 <div class="page-header">
     <div class="page-header-left d-flex align-items-center">
         <div class="page-header-title">
-            <h5 class="m-b-10">{{ __('messages.visits') }}</h5>
+            <h5 class="m-b-10">{{ __('messages.exvisit') }}</h5>
         </div>
         <ul class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{ route('admin.index') }}">{{ __('messages.dashboard') ?? 'Dashboard' }}</a></li>
-            <li class="breadcrumb-item">{{ __('messages.visits') }}</li>
+            <li class="breadcrumb-item">{{ __('messages.exvisit') }}</li>
         </ul>
     </div>
     <div class="page-header-right ms-auto">
@@ -22,28 +22,24 @@
                 </a>
             </div>
             <div class="d-flex align-items-center gap-2 page-header-right-items-wrapper">
-                
-                <div class="dropdown">
-                    <a class="btn btn-icon btn-light-brand" data-bs-toggle="dropdown" data-bs-offset="0, 12" data-bs-auto-close="outside">
-                        <i class="feather-filter"></i>
-                    </a>
-                    <div class="dropdown-menu dropdown-menu-end" style="min-width: 260px;">
-                        <div class="dropdown-header fw-bold text-uppercase fs-11 text-muted">{{ __('messages.Filter') }}</div>
-                        <a href="{{ route('admin.visits') }}" class="dropdown-item {{ !request('user_id') ? 'active' : '' }}" {{ !request('user_id') ? 'aria-current="true"' : '' }}>
-                            <i class="feather-list me-3"></i>
-                            <span>{{ __('messages.all_visits') ?? 'All Visits' }}</span>
-                        </a>
-                        @if(request('user_id'))
-                            <div class="dropdown-divider"></div>
-                            <div class="dropdown-header fw-bold text-uppercase fs-11 text-muted">{{ __('messages.current_user') ?? 'Current User' }}</div>
-                            <div class="dropdown-item active">
-                                <i class="feather-user me-3"></i>
-                                <span>User ID: {{ request('user_id') }}</span>
-                            </div>
-                        @endif
-                    </div>
-                </div>
-
+                <a href="javascript:void(0);" class="btn btn-icon btn-light-brand disabled" data-bs-toggle="tooltip" title="{{ __('messages.code_unavailable') }}" aria-disabled="true">
+                    <i class="feather-code"></i>
+                </a>
+                <a href="{{ route('admin.visits', ['logic' => 'and', 'views_min' => 1]) }}" class="btn btn-icon btn-light-brand" data-bs-toggle="tooltip" title="{{ __('messages.Stats') }}">
+                    <i class="feather-bar-chart-2"></i>
+                </a>
+                @include('theme::admin.partials.inventory_filter_dropdown', [
+                    'action' => route('admin.visits'),
+                    'resetUrl' => route('admin.visits', ['reset_filters' => 1]),
+                    'preferenceKey' => 'visits',
+                    'filterState' => $filterState,
+                    'filterFields' => $filterFields,
+                    'resultsCount' => $resultsCount,
+                ])
+                <a href="{{ route('visits.create') }}" class="btn btn-primary">
+                    <i class="feather-plus me-2"></i>
+                    <span>{{ __('messages.add') }}</span>
+                </a>
             </div>
         </div>
         <div class="d-md-none d-flex align-items-center">
@@ -54,10 +50,18 @@
     </div>
 </div>
 
+@if(session('success'))
+    <div class="alert alert-success">{{ session('success') }}</div>
+@endif
+
 <div class="main-content">
     <div class="row">
         <div class="col-lg-12">
             <div class="card stretch stretch-full">
+                <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <h5 class="card-title mb-0">{{ __('messages.exvisit') }}</h5>
+                    <span class="badge bg-soft-primary text-primary">{{ __('messages.results_count', ['count' => $resultsCount]) }}</span>
+                </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
                         <table class="table table-hover mb-0">
@@ -68,6 +72,7 @@
                                     <th>{{ __('messages.name') }}</th>
                                     <th>{{ __('messages.views') }}</th>
                                     <th>{{ __('messages.date') }}</th>
+                                    <th>{{ __('messages.status') }}</th>
                                     <th class="text-end">{{ __('messages.actions') }}</th>
                                 </tr>
                             </thead>
@@ -102,6 +107,13 @@
                                     </td>
                                     <td>
                                         <span class="text-muted">{{ date('Y-m-d H:i', $visit->tims) }}</span>
+                                    </td>
+                                    <td>
+                                        @if($visit->statu == 1)
+                                            <span class="badge bg-soft-success text-success">{{ __('messages.active') }}</span>
+                                        @else
+                                            <span class="badge bg-soft-danger text-danger">{{ __('messages.inactive') }}</span>
+                                        @endif
                                     </td>
                                     <td>
                                         <div class="hstack gap-2 justify-content-end">

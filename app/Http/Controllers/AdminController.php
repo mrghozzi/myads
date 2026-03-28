@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 use App\Models\User;
 use App\Models\Setting;
@@ -47,6 +48,8 @@ use Illuminate\Validation\ValidationException;
 
 class AdminController extends Controller
 {
+    private const ADMIN_INVENTORY_FILTER_OPTION_TYPE = 'admin_inventory_filters';
+
     private const FORUM_PERMISSION_KEYS = [
         'pin_topics',
         'lock_topics',
@@ -563,14 +566,33 @@ class AdminController extends Controller
 
     public function banners(Request $request)
     {
-        $query = Banner::with('user')->orderBy('id', 'desc');
-        
-        if ($request->has('user_id')) {
-            $query->where('uid', $request->user_id);
-        }
+        $filterState = $this->resolveAdminInventoryFilterState($request, 'banners', [
+            'logic' => 'and',
+            'keyword' => '',
+            'username' => '',
+            'user_id' => '',
+            'status' => '',
+            'id_min' => '',
+            'id_max' => '',
+            'views_min' => '',
+            'views_max' => '',
+            'clicks_min' => '',
+            'clicks_max' => '',
+            'size' => '',
+        ]);
 
-        $banners = $query->paginate(20);
-        return view('theme::admin.banners', compact('banners'));
+        $query = Banner::with('user')->orderBy('id', 'desc');
+
+        $this->applyAdminInventoryFilters($query, $filterState, $this->bannerFilterCallbacks());
+
+        $banners = $query->paginate(20)->withQueryString();
+
+        return view('theme::admin.banners', [
+            'banners' => $banners,
+            'filterState' => $filterState,
+            'filterFields' => $this->bannerFilterFields(),
+            'resultsCount' => $banners->total(),
+        ]);
     }
 
     public function adsHub(Request $request)
@@ -771,14 +793,30 @@ class AdminController extends Controller
 
     public function links(Request $request)
     {
-        $query = Link::with('user')->orderBy('id', 'desc');
-        
-        if ($request->has('user_id')) {
-            $query->where('uid', $request->user_id);
-        }
+        $filterState = $this->resolveAdminInventoryFilterState($request, 'links', [
+            'logic' => 'and',
+            'keyword' => '',
+            'username' => '',
+            'user_id' => '',
+            'status' => '',
+            'id_min' => '',
+            'id_max' => '',
+            'clicks_min' => '',
+            'clicks_max' => '',
+        ]);
 
-        $links = $query->paginate(20);
-        return view('theme::admin.links', compact('links'));
+        $query = Link::with('user')->orderBy('id', 'desc');
+
+        $this->applyAdminInventoryFilters($query, $filterState, $this->linkFilterCallbacks());
+
+        $links = $query->paginate(20)->withQueryString();
+
+        return view('theme::admin.links', [
+            'links' => $links,
+            'filterState' => $filterState,
+            'filterFields' => $this->linkFilterFields(),
+            'resultsCount' => $links->total(),
+        ]);
     }
 
     public function updateLink(Request $request, $id)
@@ -806,19 +844,32 @@ class AdminController extends Controller
 
     public function smartAds(Request $request)
     {
+        $filterState = $this->resolveAdminInventoryFilterState($request, 'smart_ads', [
+            'logic' => 'and',
+            'keyword' => '',
+            'username' => '',
+            'user_id' => '',
+            'status' => '',
+            'created_from' => '',
+            'created_to' => '',
+            'impressions_min' => '',
+            'impressions_max' => '',
+            'clicks_min' => '',
+            'clicks_max' => '',
+        ]);
+
         $query = SmartAd::with('user')->orderBy('id', 'desc');
 
-        if ($request->has('user_id')) {
-            $query->where('uid', $request->user_id);
-        }
+        $this->applyAdminInventoryFilters($query, $filterState, $this->smartAdFilterCallbacks());
 
-        if ($request->filled('status')) {
-            $query->where('statu', $request->status);
-        }
+        $smartAds = $query->paginate(20)->withQueryString();
 
-        $smartAds = $query->paginate(20);
-
-        return view('theme::admin.smart_ads', compact('smartAds'));
+        return view('theme::admin.smart_ads', [
+            'smartAds' => $smartAds,
+            'filterState' => $filterState,
+            'filterFields' => $this->smartAdFilterFields(),
+            'resultsCount' => $smartAds->total(),
+        ]);
     }
 
     public function editSmartAd($id)
@@ -875,10 +926,34 @@ class AdminController extends Controller
         return redirect()->route('admin.smart_ads')->with('success', __('messages.smart_ad_admin_deleted'));
     }
 
-    public function visits()
+    public function visits(Request $request)
     {
-        $visits = Visit::with('user')->orderBy('id', 'desc')->paginate(20);
-        return view('theme::admin.visits', compact('visits'));
+        $filterState = $this->resolveAdminInventoryFilterState($request, 'visits', [
+            'logic' => 'and',
+            'keyword' => '',
+            'username' => '',
+            'user_id' => '',
+            'status' => '',
+            'date_from' => '',
+            'date_to' => '',
+            'id_min' => '',
+            'id_max' => '',
+            'views_min' => '',
+            'views_max' => '',
+        ]);
+
+        $query = Visit::with('user')->orderBy('id', 'desc');
+
+        $this->applyAdminInventoryFilters($query, $filterState, $this->visitFilterCallbacks());
+
+        $visits = $query->paginate(20)->withQueryString();
+
+        return view('theme::admin.visits', [
+            'visits' => $visits,
+            'filterState' => $filterState,
+            'filterFields' => $this->visitFilterFields(),
+            'resultsCount' => $visits->total(),
+        ]);
     }
 
     public function updateVisit(Request $request, $id)
@@ -903,6 +978,409 @@ class AdminController extends Controller
         $visit->delete();
         
         return redirect()->back()->with('success', __('visit_deleted'));
+    }
+
+    private function resolveAdminInventoryFilterState(Request $request, string $page, array $defaults): array
+    {
+        if ($request->boolean('reset_filters')) {
+            $this->forgetAdminInventoryFilterPreference($page);
+
+            return $defaults;
+        }
+
+        $queryParams = $request->query();
+        $filterKeys = array_keys($defaults);
+        $hasExplicitFilters = collect($filterKeys)->contains(
+            fn (string $key) => array_key_exists($key, $queryParams)
+        );
+
+        if (!$hasExplicitFilters) {
+            return $this->normalizeAdminInventoryFilterState(
+                array_merge($defaults, $this->loadAdminInventoryFilterPreference($page)),
+                $defaults
+            );
+        }
+
+        $state = $defaults;
+
+        foreach ($filterKeys as $key) {
+            if (array_key_exists($key, $queryParams)) {
+                $state[$key] = $this->normalizeAdminInventoryFilterValue($queryParams[$key]);
+            }
+        }
+
+        $state = $this->normalizeAdminInventoryFilterState($state, $defaults);
+
+        if ($request->boolean('save_preference')) {
+            $this->storeAdminInventoryFilterPreference($page, $state);
+        }
+
+        return $state;
+    }
+
+    private function normalizeAdminInventoryFilterState(array $state, array $defaults): array
+    {
+        $normalized = $defaults;
+
+        foreach ($defaults as $key => $defaultValue) {
+            $normalized[$key] = array_key_exists($key, $state)
+                ? $this->normalizeAdminInventoryFilterValue($state[$key])
+                : $defaultValue;
+        }
+
+        $normalized['logic'] = in_array($normalized['logic'], ['and', 'or'], true)
+            ? $normalized['logic']
+            : 'and';
+
+        return $normalized;
+    }
+
+    private function normalizeAdminInventoryFilterValue(mixed $value): mixed
+    {
+        if (is_array($value)) {
+            return array_map(fn ($item) => $this->normalizeAdminInventoryFilterValue($item), $value);
+        }
+
+        return is_string($value) ? trim($value) : $value;
+    }
+
+    private function storeAdminInventoryFilterPreference(string $page, array $state): void
+    {
+        if (!$this->adminInventoryHasActiveFilters($state)) {
+            $this->forgetAdminInventoryFilterPreference($page);
+
+            return;
+        }
+
+        try {
+            Option::updateOrCreate(
+                [
+                    'o_type' => self::ADMIN_INVENTORY_FILTER_OPTION_TYPE,
+                    'name' => $page,
+                    'o_parent' => (int) Auth::id(),
+                ],
+                [
+                    'o_valuer' => json_encode($state, JSON_UNESCAPED_UNICODE),
+                    'o_order' => (int) Auth::id(),
+                    'o_mode' => 'inventory',
+                ]
+            );
+        } catch (\Throwable) {
+        }
+    }
+
+    private function loadAdminInventoryFilterPreference(string $page): array
+    {
+        try {
+            $row = Option::query()
+                ->where('o_type', self::ADMIN_INVENTORY_FILTER_OPTION_TYPE)
+                ->where('name', $page)
+                ->where('o_parent', (int) Auth::id())
+                ->first();
+
+            $decoded = json_decode((string) ($row?->o_valuer ?? ''), true);
+
+            return is_array($decoded) ? $decoded : [];
+        } catch (\Throwable) {
+            return [];
+        }
+    }
+
+    private function forgetAdminInventoryFilterPreference(string $page): void
+    {
+        try {
+            Option::query()
+                ->where('o_type', self::ADMIN_INVENTORY_FILTER_OPTION_TYPE)
+                ->where('name', $page)
+                ->where('o_parent', (int) Auth::id())
+                ->delete();
+        } catch (\Throwable) {
+        }
+    }
+
+    private function adminInventoryHasActiveFilters(array $state): bool
+    {
+        foreach ($state as $key => $value) {
+            if ($key !== 'logic' && $this->adminInventoryFilterHasValue($value)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function adminInventoryFilterHasValue(mixed $value): bool
+    {
+        if (is_array($value)) {
+            return collect($value)->contains(fn ($item) => $this->adminInventoryFilterHasValue($item));
+        }
+
+        return !($value === null || $value === '');
+    }
+
+    private function applyAdminInventoryFilters(\Illuminate\Database\Eloquent\Builder $query, array $state, array $callbacks): void
+    {
+        $activeFilters = [];
+
+        foreach ($callbacks as $key => $callback) {
+            $value = $state[$key] ?? null;
+
+            if ($this->adminInventoryFilterHasValue($value)) {
+                $activeFilters[] = [$callback, $value];
+            }
+        }
+
+        if ($activeFilters === []) {
+            return;
+        }
+
+        if (($state['logic'] ?? 'and') === 'or') {
+            $query->where(function ($outerQuery) use ($activeFilters) {
+                foreach ($activeFilters as [$callback, $value]) {
+                    $outerQuery->orWhere(function ($nestedQuery) use ($callback, $value) {
+                        $callback($nestedQuery, $value);
+                    });
+                }
+            });
+
+            return;
+        }
+
+        foreach ($activeFilters as [$callback, $value]) {
+            $query->where(function ($nestedQuery) use ($callback, $value) {
+                $callback($nestedQuery, $value);
+            });
+        }
+    }
+
+    private function parseAdminInventoryDate(?string $value, bool $endOfDay = false): ?Carbon
+    {
+        if (!$this->adminInventoryFilterHasValue($value)) {
+            return null;
+        }
+
+        try {
+            $date = Carbon::parse((string) $value);
+
+            return $endOfDay ? $date->endOfDay() : $date->startOfDay();
+        } catch (\Throwable) {
+            return null;
+        }
+    }
+
+    private function linkFilterCallbacks(): array
+    {
+        return [
+            'keyword' => function ($query, string $value): void {
+                $query->where(function ($nestedQuery) use ($value) {
+                    $nestedQuery->where('name', 'like', '%' . $value . '%')
+                        ->orWhere('url', 'like', '%' . $value . '%')
+                        ->orWhere('txt', 'like', '%' . $value . '%');
+                });
+            },
+            'username' => function ($query, string $value): void {
+                $query->whereHas('user', function ($userQuery) use ($value) {
+                    $userQuery->where('username', 'like', '%' . $value . '%');
+                });
+            },
+            'user_id' => fn ($query, string $value): mixed => $query->where('uid', (int) $value),
+            'status' => fn ($query, string $value): mixed => $query->where('statu', (int) $value),
+            'id_min' => fn ($query, string $value): mixed => $query->where('id', '>=', (int) $value),
+            'id_max' => fn ($query, string $value): mixed => $query->where('id', '<=', (int) $value),
+            'clicks_min' => fn ($query, string $value): mixed => $query->where('clik', '>=', (int) $value),
+            'clicks_max' => fn ($query, string $value): mixed => $query->where('clik', '<=', (int) $value),
+        ];
+    }
+
+    private function bannerFilterCallbacks(): array
+    {
+        return [
+            'keyword' => function ($query, string $value): void {
+                $query->where(function ($nestedQuery) use ($value) {
+                    $nestedQuery->where('name', 'like', '%' . $value . '%')
+                        ->orWhere('url', 'like', '%' . $value . '%')
+                        ->orWhere('img', 'like', '%' . $value . '%')
+                        ->orWhere('px', 'like', '%' . $value . '%');
+                });
+            },
+            'username' => function ($query, string $value): void {
+                $query->whereHas('user', function ($userQuery) use ($value) {
+                    $userQuery->where('username', 'like', '%' . $value . '%');
+                });
+            },
+            'user_id' => fn ($query, string $value): mixed => $query->where('uid', (int) $value),
+            'status' => fn ($query, string $value): mixed => $query->where('statu', (int) $value),
+            'id_min' => fn ($query, string $value): mixed => $query->where('id', '>=', (int) $value),
+            'id_max' => fn ($query, string $value): mixed => $query->where('id', '<=', (int) $value),
+            'views_min' => fn ($query, string $value): mixed => $query->where('vu', '>=', (int) $value),
+            'views_max' => fn ($query, string $value): mixed => $query->where('vu', '<=', (int) $value),
+            'clicks_min' => fn ($query, string $value): mixed => $query->where('clik', '>=', (int) $value),
+            'clicks_max' => fn ($query, string $value): mixed => $query->where('clik', '<=', (int) $value),
+            'size' => fn ($query, string $value): mixed => $query->where('px', $value),
+        ];
+    }
+
+    private function smartAdFilterCallbacks(): array
+    {
+        return [
+            'keyword' => function ($query, string $value): void {
+                $query->where(function ($nestedQuery) use ($value) {
+                    $nestedQuery->where('landing_url', 'like', '%' . $value . '%')
+                        ->orWhere('headline_override', 'like', '%' . $value . '%')
+                        ->orWhere('source_title', 'like', '%' . $value . '%')
+                        ->orWhere('source_description', 'like', '%' . $value . '%')
+                        ->orWhere('manual_keywords', 'like', '%' . $value . '%');
+                });
+            },
+            'username' => function ($query, string $value): void {
+                $query->whereHas('user', function ($userQuery) use ($value) {
+                    $userQuery->where('username', 'like', '%' . $value . '%');
+                });
+            },
+            'user_id' => fn ($query, string $value): mixed => $query->where('uid', (int) $value),
+            'status' => fn ($query, string $value): mixed => $query->where('statu', (int) $value),
+            'created_from' => function ($query, string $value): void {
+                $from = $this->parseAdminInventoryDate($value);
+
+                if ($from) {
+                    $query->where('created_at', '>=', $from);
+                }
+            },
+            'created_to' => function ($query, string $value): void {
+                $to = $this->parseAdminInventoryDate($value, true);
+
+                if ($to) {
+                    $query->where('created_at', '<=', $to);
+                }
+            },
+            'impressions_min' => fn ($query, string $value): mixed => $query->where('impressions', '>=', (int) $value),
+            'impressions_max' => fn ($query, string $value): mixed => $query->where('impressions', '<=', (int) $value),
+            'clicks_min' => fn ($query, string $value): mixed => $query->where('clicks', '>=', (int) $value),
+            'clicks_max' => fn ($query, string $value): mixed => $query->where('clicks', '<=', (int) $value),
+        ];
+    }
+
+    private function visitFilterCallbacks(): array
+    {
+        return [
+            'keyword' => function ($query, string $value): void {
+                $query->where(function ($nestedQuery) use ($value) {
+                    $nestedQuery->where('name', 'like', '%' . $value . '%')
+                        ->orWhere('url', 'like', '%' . $value . '%');
+                });
+            },
+            'username' => function ($query, string $value): void {
+                $query->whereHas('user', function ($userQuery) use ($value) {
+                    $userQuery->where('username', 'like', '%' . $value . '%');
+                });
+            },
+            'user_id' => fn ($query, string $value): mixed => $query->where('uid', (int) $value),
+            'status' => fn ($query, string $value): mixed => $query->where('statu', (int) $value),
+            'date_from' => function ($query, string $value): void {
+                $from = $this->parseAdminInventoryDate($value);
+
+                if ($from) {
+                    $query->where('tims', '>=', $from->timestamp);
+                }
+            },
+            'date_to' => function ($query, string $value): void {
+                $to = $this->parseAdminInventoryDate($value, true);
+
+                if ($to) {
+                    $query->where('tims', '<=', $to->timestamp);
+                }
+            },
+            'id_min' => fn ($query, string $value): mixed => $query->where('id', '>=', (int) $value),
+            'id_max' => fn ($query, string $value): mixed => $query->where('id', '<=', (int) $value),
+            'views_min' => fn ($query, string $value): mixed => $query->where('vu', '>=', (int) $value),
+            'views_max' => fn ($query, string $value): mixed => $query->where('vu', '<=', (int) $value),
+        ];
+    }
+
+    private function linkFilterFields(): array
+    {
+        return [
+            ['name' => 'keyword', 'type' => 'text', 'label' => __('messages.filter_keyword')],
+            ['name' => 'username', 'type' => 'text', 'label' => __('messages.username')],
+            ['name' => 'user_id', 'type' => 'number', 'label' => __('messages.user_id_label'), 'min' => 1],
+            ['name' => 'status', 'type' => 'select', 'label' => __('messages.status'), 'options' => [
+                '' => __('messages.all'),
+                '1' => __('messages.active'),
+                '2' => __('messages.inactive'),
+            ]],
+            ['name' => 'id_min', 'type' => 'number', 'label' => __('messages.filter_id_min'), 'min' => 1],
+            ['name' => 'id_max', 'type' => 'number', 'label' => __('messages.filter_id_max'), 'min' => 1],
+            ['name' => 'clicks_min', 'type' => 'number', 'label' => __('messages.filter_clicks_min'), 'min' => 0],
+            ['name' => 'clicks_max', 'type' => 'number', 'label' => __('messages.filter_clicks_max'), 'min' => 0],
+        ];
+    }
+
+    private function bannerFilterFields(): array
+    {
+        return [
+            ['name' => 'keyword', 'type' => 'text', 'label' => __('messages.filter_keyword')],
+            ['name' => 'username', 'type' => 'text', 'label' => __('messages.username')],
+            ['name' => 'user_id', 'type' => 'number', 'label' => __('messages.user_id_label'), 'min' => 1],
+            ['name' => 'status', 'type' => 'select', 'label' => __('messages.status'), 'options' => [
+                '' => __('messages.all'),
+                '1' => 'ON',
+                '2' => 'OFF',
+            ]],
+            ['name' => 'id_min', 'type' => 'number', 'label' => __('messages.filter_id_min'), 'min' => 1],
+            ['name' => 'id_max', 'type' => 'number', 'label' => __('messages.filter_id_max'), 'min' => 1],
+            ['name' => 'views_min', 'type' => 'number', 'label' => __('messages.filter_views_min'), 'min' => 0],
+            ['name' => 'views_max', 'type' => 'number', 'label' => __('messages.filter_views_max'), 'min' => 0],
+            ['name' => 'clicks_min', 'type' => 'number', 'label' => __('messages.filter_clicks_min'), 'min' => 0],
+            ['name' => 'clicks_max', 'type' => 'number', 'label' => __('messages.filter_clicks_max'), 'min' => 0],
+            ['name' => 'size', 'type' => 'select', 'label' => __('messages.size'), 'options' => [
+                '' => __('messages.all'),
+                '728x90' => '728x90',
+                '468x60' => '468x60',
+                '300x250' => '300x250',
+                '160x600' => '160x600',
+            ]],
+        ];
+    }
+
+    private function smartAdFilterFields(): array
+    {
+        return [
+            ['name' => 'keyword', 'type' => 'text', 'label' => __('messages.filter_keyword')],
+            ['name' => 'username', 'type' => 'text', 'label' => __('messages.username')],
+            ['name' => 'user_id', 'type' => 'number', 'label' => __('messages.user_id_label'), 'min' => 1],
+            ['name' => 'status', 'type' => 'select', 'label' => __('messages.status'), 'options' => [
+                '' => __('messages.all'),
+                '1' => __('messages.active'),
+                '0' => __('messages.smart_status_paused'),
+                '2' => __('messages.smart_status_blocked'),
+            ]],
+            ['name' => 'created_from', 'type' => 'date', 'label' => __('messages.created') . ' ' . __('messages.from')],
+            ['name' => 'created_to', 'type' => 'date', 'label' => __('messages.created') . ' ' . __('messages.to')],
+            ['name' => 'impressions_min', 'type' => 'number', 'label' => __('messages.filter_impressions_min'), 'min' => 0],
+            ['name' => 'impressions_max', 'type' => 'number', 'label' => __('messages.filter_impressions_max'), 'min' => 0],
+            ['name' => 'clicks_min', 'type' => 'number', 'label' => __('messages.filter_clicks_min'), 'min' => 0],
+            ['name' => 'clicks_max', 'type' => 'number', 'label' => __('messages.filter_clicks_max'), 'min' => 0],
+        ];
+    }
+
+    private function visitFilterFields(): array
+    {
+        return [
+            ['name' => 'keyword', 'type' => 'text', 'label' => __('messages.filter_keyword')],
+            ['name' => 'username', 'type' => 'text', 'label' => __('messages.username')],
+            ['name' => 'user_id', 'type' => 'number', 'label' => __('messages.user_id_label'), 'min' => 1],
+            ['name' => 'status', 'type' => 'select', 'label' => __('messages.status'), 'options' => [
+                '' => __('messages.all'),
+                '1' => __('messages.active'),
+                '2' => __('messages.inactive'),
+            ]],
+            ['name' => 'date_from', 'type' => 'date', 'label' => __('messages.date') . ' ' . __('messages.from')],
+            ['name' => 'date_to', 'type' => 'date', 'label' => __('messages.date') . ' ' . __('messages.to')],
+            ['name' => 'id_min', 'type' => 'number', 'label' => __('messages.filter_id_min'), 'min' => 1],
+            ['name' => 'id_max', 'type' => 'number', 'label' => __('messages.filter_id_max'), 'min' => 1],
+            ['name' => 'views_min', 'type' => 'number', 'label' => __('messages.filter_views_min'), 'min' => 0],
+            ['name' => 'views_max', 'type' => 'number', 'label' => __('messages.filter_views_max'), 'min' => 0],
+        ];
     }
 
     // Forum Categories
