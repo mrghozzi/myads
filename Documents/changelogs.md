@@ -170,7 +170,7 @@
 * **Improvement**: Rebuilt profile `About Me` around `users.sig`, upgraded `/u/{username}?tab=photos`, and refreshed `/history` toward a more profile-hub style layout.
 * **Add**: Introduced `point_transactions`, `badges`, `user_badges`, `badge_showcase`, `quests`, and `quest_progress` with seeded v1 milestones and daily/weekly quests for posts, comments, reactions, reposts, and follow growth.
 ### 🏆 Premium Quests & Gamification
-*   **Add**: Introduced a new **Premium Quests Page** (`/quests`) with a high-fidelity "Vikinger" design, featuring fluid animations and entrance effects.
+*   **Add**: Introduced a new **Premium Quests Page** (`/quests`) with a high-fidelity "MyAds_Default_Theme" design, featuring fluid animations and entrance effects.
 *   **Add**: Implemented 5 brand-new repeatable quests: **New Connections** (Follows), **Forum Starter** (Topics), **Web Explorer** (Directory), **Tool Collector** (Store), and **Service Helper** (Order Bids).
 *   **Improvement**: Enhanced the **Daily Quests Sidebar Widget** with a prominent "All Quests" button and a direct "History" link for improved user navigation.
 *   **Architecture**: Integrated quest event hooks across `ProfileController`, `ForumController`, `StoreController`, `DirectoryController`, `AuthController`, and `CommentController`.

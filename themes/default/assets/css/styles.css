@@ -1286,13 +1286,13 @@ textarea::placeholder {
   height: 12px;
 }
 
-.icon-logo-vikinger {
+.icon-logo-MyAds_Default_Theme {
   fill: #fff;
   width: 42px;
   height: 60px;
 }
 
-.icon-logo-vikinger.small {
+.icon-logo-MyAds_Default_Theme.small {
   width: 28px;
   height: 40px;
 }
@@ -8424,7 +8424,7 @@ figure > img {
 .error-section {
   width: 100%;
   height: 100%;
-  background: url("../img/landing/404-bg.png") no-repeat left top, url("../img/landing/vikinger-logo.png") right 40px top 40px no-repeat, url("../img/landing/dot-texture.png") repeat left top, #fff;
+  background: url("../img/landing/404-bg.png") no-repeat left top, url("../img/landing/MyAds_Default_Theme-logo.png") right 40px top 40px no-repeat, url("../img/landing/dot-texture.png") repeat left top, #fff;
   background-size: contain, auto, auto;
   position: fixed;
   top: 0;

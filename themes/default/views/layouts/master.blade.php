@@ -746,7 +746,7 @@
                     containerElement: container,
                 }, options));
 
-                // Manual click fallback for some versions of Vikinger/Duralux templates
+                // Manual click fallback for some versions of MyAds_Default_Theme/Duralux templates
                 // where the plugin might fail to bind properly to dynamic elements
                 trigger.addEventListener('click', function(e) {
                      // Check if it's already being handled by the plugin (active class)
@@ -1443,7 +1443,7 @@
         });
     </script>
     
-    <!-- Deletion Confirmation Popup (Vikinger Style) -->
+    <!-- Deletion Confirmation Popup (MyAds_Default_Theme Style) -->
     <div id="confirm-popup" class="xm-popup-container">
         <div class="xm-popup-overlay"></div>
         <div class="popup-box">

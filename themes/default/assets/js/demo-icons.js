@@ -49,8 +49,8 @@ app.querySelector('.icon-demo-list', function (lists) {
       className: 'cross'
     },
     {
-      name: 'Logo Vikinger',
-      className: 'logo-vikinger'
+      name: 'Logo MyAds_Default_Theme',
+      className: 'logo-MyAds_Default_Theme'
     },
     {
       name: 'Grid',
