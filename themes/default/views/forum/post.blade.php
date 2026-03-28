@@ -211,6 +211,14 @@
                 </div>
                 <!-- /WIDGET BOX STATUS TEXT -->
 
+                @if($status->linkPreviewRecord)
+                    @include('theme::partials.activity.link_preview', ['activity' => $status])
+                @endif
+
+                @if($status->repostRecord)
+                    @include('theme::partials.activity.repost_embed', ['activity' => $status])
+                @endif
+
                 @if($topic->attachments->isNotEmpty())
                     <div class="widget-box" style="margin-bottom: 14px;">
                         <div class="widget-box-content">
