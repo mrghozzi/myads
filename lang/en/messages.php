@@ -1756,6 +1756,7 @@ return [
     'update_failed_maintenance_kept' => 'Update failed and maintenance mode remains enabled. Error: :error',
     'maintenance_settings_saved' => 'Maintenance settings saved successfully.',
     'maintenance_default_message' => 'We are performing scheduled maintenance right now. Please check back again shortly.',
+    'maintenance_auto_message' => 'The system is currently undergoing an automated maintenance operation (updates or system optimization). We will be back online in a few moments.',
     'maintenance_settings_title' => 'Maintenance Mode Settings',
     'maintenance_settings_description' => 'Control public access during updates, maintenance windows, and urgent recovery work.',
     'maintenance_status_enabled' => 'Maintenance enabled',

@@ -1694,6 +1694,7 @@ return [
     'update_failed_maintenance_kept' => 'فشلت عملية التحديث وتم الإبقاء على وضع الصيانة مفعلاً. الخطأ: :error',
     'maintenance_settings_saved' => 'تم حفظ إعدادات وضع الصيانة بنجاح.',
     'maintenance_default_message' => 'نُجري حالياً صيانة مجدولة للموقع. يرجى المحاولة مرة أخرى بعد قليل.',
+    'maintenance_auto_message' => 'النظام يخضع حالياً لعملية صيانة تلقائية (تحديثات أو تحسين للنظام). سنعود للعمل خلال لحظات قليلة.',
     'maintenance_settings_title' => 'إعدادات وضع الصيانة',
     'maintenance_settings_description' => 'تحكم في إتاحة الموقع للعامة أثناء التحديثات وفترات الصيانة وحالات الاستعادة الطارئة.',
     'maintenance_status_enabled' => 'وضع الصيانة مفعل',

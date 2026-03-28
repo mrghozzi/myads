@@ -245,6 +245,8 @@ class InstallerController extends Controller
     public function processUpdate(Request $request)
     {
         $log = [];
+        $maintenance = app(\App\Services\MaintenanceModeManager::class);
+        $maintenance->enable(null, 'manual_update');
 
         try {
             // ============================================================
@@ -616,11 +618,15 @@ class InstallerController extends Controller
             // Mark as installed
             File::put(storage_path('installed'), date('Y-m-d H:i:s') . ' (upgraded from v3.x to v4.2.0)');
 
+            $maintenance->disable(null, 'manual_update_success');
+
             return redirect()->route('installer.finish')
                 ->with('success', 'Upgrade completed successfully!')
                 ->with('log', $log);
 
         } catch (\Exception $e) {
+            $maintenance->disable(null, 'manual_update_failed');
+
             return back()
                 ->with('error', 'Update failed: ' . $e->getMessage())
                 ->with('log', $log);

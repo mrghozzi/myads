@@ -2442,22 +2442,36 @@ class AdminController extends Controller
     {
         $request->validate(['slug' => 'required|string']);
         
-        if ($pluginManager->activate($request->slug)) {
-            return redirect()->back()->with('success', __('Plugin activated successfully'));
+        $this->maintenanceMode->enable(Auth::user(), 'plugin_activation');
+        try {
+            if ($pluginManager->activate($request->slug)) {
+                $this->maintenanceMode->disable(Auth::user(), 'plugin_activation_success');
+                return redirect()->back()->with('success', __('Plugin activated successfully'));
+            }
+            $this->maintenanceMode->disable(Auth::user(), 'plugin_activation_failed');
+            return redirect()->back()->with('error', __('Failed to activate plugin'));
+        } catch (\Throwable $e) {
+            $this->maintenanceMode->disable(Auth::user(), 'plugin_activation_error');
+            return redirect()->back()->with('error', __('Error: ') . $e->getMessage());
         }
-        
-        return redirect()->back()->with('error', __('Failed to activate plugin'));
     }
 
     public function deactivatePlugin(Request $request, PluginManager $pluginManager)
     {
         $request->validate(['slug' => 'required|string']);
         
-        if ($pluginManager->deactivate($request->slug)) {
-            return redirect()->back()->with('success', __('Plugin deactivated successfully'));
+        $this->maintenanceMode->enable(Auth::user(), 'plugin_deactivation');
+        try {
+            if ($pluginManager->deactivate($request->slug)) {
+                $this->maintenanceMode->disable(Auth::user(), 'plugin_deactivation_success');
+                return redirect()->back()->with('success', __('Plugin deactivated successfully'));
+            }
+            $this->maintenanceMode->disable(Auth::user(), 'plugin_deactivation_failed');
+            return redirect()->back()->with('error', __('Failed to deactivate plugin'));
+        } catch (\Throwable $e) {
+            $this->maintenanceMode->disable(Auth::user(), 'plugin_deactivation_error');
+            return redirect()->back()->with('error', __('Error: ') . $e->getMessage());
         }
-        
-        return redirect()->back()->with('error', __('Failed to deactivate plugin'));
     }
 
     public function deletePlugin(Request $request, PluginManager $pluginManager)
@@ -2477,26 +2491,42 @@ class AdminController extends Controller
             'plugin_zip' => 'required|file|mimes:zip',
         ]);
 
-        $result = $pluginManager->install($request->file('plugin_zip'));
+        $this->maintenanceMode->enable(Auth::user(), 'plugin_upload');
+        try {
+            $result = $pluginManager->install($request->file('plugin_zip'));
 
-        if ($result === true) {
-            return redirect()->back()->with('success', __('Plugin installed successfully'));
+            if ($result === true) {
+                $this->maintenanceMode->disable(Auth::user(), 'plugin_upload_success');
+                return redirect()->back()->with('success', __('Plugin installed successfully'));
+            }
+
+            $this->maintenanceMode->disable(Auth::user(), 'plugin_upload_failed');
+            return redirect()->back()->with('error', $result);
+        } catch (\Throwable $e) {
+            $this->maintenanceMode->disable(Auth::user(), 'plugin_upload_error');
+            return redirect()->back()->with('error', __('Error: ') . $e->getMessage());
         }
-
-        return redirect()->back()->with('error', $result);
     }
 
     public function upgradePlugin(Request $request, PluginManager $pluginManager)
     {
         $request->validate(['slug' => 'required|string']);
 
-        $result = $pluginManager->upgrade($request->slug);
+        $this->maintenanceMode->enable(Auth::user(), 'plugin_upgrade');
+        try {
+            $result = $pluginManager->upgrade($request->slug);
 
-        if ($result === true) {
-            return redirect()->back()->with('success', __('Plugin upgraded successfully'));
+            if ($result === true) {
+                $this->maintenanceMode->disable(Auth::user(), 'plugin_upgrade_success');
+                return redirect()->back()->with('success', __('Plugin upgraded successfully'));
+            }
+
+            $this->maintenanceMode->disable(Auth::user(), 'plugin_upgrade_failed');
+            return redirect()->back()->with('error', $result);
+        } catch (\Throwable $e) {
+            $this->maintenanceMode->disable(Auth::user(), 'plugin_upgrade_error');
+            return redirect()->back()->with('error', __('Error: ') . $e->getMessage());
         }
-
-        return redirect()->back()->with('error', $result);
     }
 
     public function pluginThumbnail($slug, PluginManager $pluginManager)
@@ -2545,12 +2575,20 @@ class AdminController extends Controller
             'slug' => 'required|string'
         ]);
 
-        $themeManager = new ThemeManager();
-        if ($themeManager->activate($request->slug)) {
-            return redirect()->back()->with('success', __('Theme activated successfully.'));
-        }
+        $this->maintenanceMode->enable(Auth::user(), 'theme_activation');
+        try {
+            $themeManager = new ThemeManager();
+            if ($themeManager->activate($request->slug)) {
+                $this->maintenanceMode->disable(Auth::user(), 'theme_activation_success');
+                return redirect()->back()->with('success', __('Theme activated successfully.'));
+            }
 
-        return redirect()->back()->with('error', __('Theme activation failed.'));
+            $this->maintenanceMode->disable(Auth::user(), 'theme_activation_failed');
+            return redirect()->back()->with('error', __('Theme activation failed.'));
+        } catch (\Throwable $e) {
+            $this->maintenanceMode->disable(Auth::user(), 'theme_activation_error');
+            return redirect()->back()->with('error', __('Error: ') . $e->getMessage());
+        }
     }
 
     private function validatedBannerSize(null|string|int $value): string
@@ -2596,34 +2634,41 @@ class AdminController extends Controller
 
     public function clearCache()
     {
+        $this->maintenanceMode->enable(Auth::user(), 'clear_cache');
         try {
             \Illuminate\Support\Facades\Artisan::call('config:clear');
             \Illuminate\Support\Facades\Artisan::call('cache:clear');
             \Illuminate\Support\Facades\Artisan::call('view:clear');
             \Illuminate\Support\Facades\Artisan::call('route:clear');
             
+            $this->maintenanceMode->disable(Auth::user(), 'clear_cache_success');
             return redirect()->back()->with('success', __('Caches cleared successfully.'));
         } catch (\Throwable $e) {
+            $this->maintenanceMode->disable(Auth::user(), 'clear_cache_error');
             return redirect()->back()->with('error', __('Failed to clear caches: ') . $e->getMessage());
         }
     }
 
     public function runMigrations()
     {
+        $this->maintenanceMode->enable(Auth::user(), 'run_migrations');
         try {
             \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
             $output = \Illuminate\Support\Facades\Artisan::output();
             
             $this->gamification->repairQuestData();
             
+            $this->maintenanceMode->disable(Auth::user(), 'run_migrations_success');
             return redirect()->back()->with('success', __('Migrations ran successfully: ') . $output);
         } catch (\Throwable $e) {
+            $this->maintenanceMode->disable(Auth::user(), 'run_migrations_error');
             return redirect()->back()->with('error', __('Failed to run migrations: ') . $e->getMessage());
         }
     }
 
     public function dbRepair()
     {
+        $this->maintenanceMode->enable(Auth::user(), 'db_repair');
         try {
             $tables = DB::getSchemaBuilder()->getTables();
             $results = [];
@@ -2649,8 +2694,10 @@ class AdminController extends Controller
             
             $this->gamification->repairQuestData();
             
+            $this->maintenanceMode->disable(Auth::user(), 'db_repair_success');
             return redirect()->back()->with('success', __('Database maintenance completed for :count tables.', ['count' => count($results)]));
         } catch (\Throwable $e) {
+            $this->maintenanceMode->disable(Auth::user(), 'db_repair_error');
             return redirect()->back()->with('error', __('Failed to perform database maintenance: ') . $e->getMessage());
         }
     }

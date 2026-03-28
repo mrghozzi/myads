@@ -734,34 +734,88 @@
                     return;
                 }
 
+                // Add a visual indicator for debugging if needed, or just proceed
                 const container = trigger.parentElement ? trigger.parentElement.querySelector(containerSelector) : null;
                 if (!container) {
                     return;
                 }
 
+                // Initialize the dropdown
                 app.plugins.createDropdown(Object.assign({
                     triggerElement: trigger,
                     containerElement: container,
                 }, options));
+
+                // Manual click fallback for some versions of Vikinger/Duralux templates
+                // where the plugin might fail to bind properly to dynamic elements
+                trigger.addEventListener('click', function(e) {
+                     // Check if it's already being handled by the plugin (active class)
+                     // If not, we might need to force it, but let's try to let the plugin work first.
+                });
 
                 trigger.dataset.activityDropdownReady = '1';
             });
         }
 
         function hydrateActivityFeed(scope) {
-            initActivityDropdownGroup(scope, '.widget-box-post-settings-dropdown-trigger', '.widget-box-post-settings-dropdown', {
-                offset: {
-                    top: 30,
-                    right: 9
-                },
-                animation: {
-                    type: 'translate-top',
-                    speed: 0.3,
-                    translateOffset: {
-                        vertical: 20
-                    }
+            // Re-bind click event for dynamic dropdowns as a fallback
+            if (scope && typeof scope.querySelectorAll === 'function') {
+                scope.querySelectorAll('.widget-box-post-settings-dropdown-trigger').forEach(function(trigger) {
+                    if (trigger.dataset.fallbackInit === '1') return;
+                    
+                    trigger.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        const dropdown = this.parentElement ? this.parentElement.querySelector('.widget-box-post-settings-dropdown') : null;
+                        if (!dropdown) return;
+                        
+                        const isOpen = this.classList.contains('active');
+                        
+                        // Close all others
+                        document.querySelectorAll('.widget-box-post-settings-dropdown-trigger.active').forEach(t => {
+                            if (t !== this) {
+                                t.classList.remove('active');
+                                const d = t.parentElement ? t.parentElement.querySelector('.widget-box-post-settings-dropdown') : null;
+                                if (d) {
+                                    d.style.opacity = '0';
+                                    d.style.visibility = 'hidden';
+                                    d.style.transform = 'translate(0px, -20px)';
+                                }
+                            }
+                        });
+
+                        if (isOpen) {
+                            this.classList.remove('active');
+                            dropdown.style.opacity = '0';
+                            dropdown.style.visibility = 'hidden';
+                            dropdown.style.transform = 'translate(0px, -20px)';
+                        } else {
+                            this.classList.add('active');
+                            dropdown.style.opacity = '1';
+                            dropdown.style.visibility = 'visible';
+                            dropdown.style.transform = 'translate(0px, 0px)';
+                        }
+                    });
+                    
+                    trigger.dataset.fallbackInit = '1';
+                });
+                
+                // Close when clicking outside
+                if (scope === document) {
+                    document.addEventListener('click', function(e) {
+                        if (!e.target.closest('.post-settings-wrap')) {
+                            document.querySelectorAll('.widget-box-post-settings-dropdown-trigger.active').forEach(t => {
+                                t.classList.remove('active');
+                                const d = t.parentElement ? t.parentElement.querySelector('.widget-box-post-settings-dropdown') : null;
+                                if (d) {
+                                    d.style.opacity = '0';
+                                    d.style.visibility = 'hidden';
+                                    d.style.transform = 'translate(0px, -20px)';
+                                }
+                            });
+                        }
+                    });
                 }
-            });
+            }
 
             if (typeof window.initHexagons === 'function') {
                 window.initHexagons(scope);
@@ -804,7 +858,7 @@
         }
 
         document.addEventListener('DOMContentLoaded', function() {
-            markActivityDropdowns(document);
+            hydrateActivityFeed(document);
             window.registerAfterInfiniteScrollRender(function(scope) {
                 hydrateActivityFeed(scope);
             });

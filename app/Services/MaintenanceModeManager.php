@@ -77,10 +77,16 @@ class MaintenanceModeManager
         $current = $this->settings();
         $now = time();
 
+        $message = $current['message'];
+        if (in_array($source, ['plugin_activation', 'plugin_deactivation', 'plugin_upload', 'plugin_upgrade', 'theme_activation', 'clear_cache', 'run_migrations', 'db_repair', 'manual_update'])) {
+            $message = __('messages.maintenance_auto_message');
+        }
+
         MaintenanceSettings::save([
             'enabled' => 1,
             'enabled_at' => $now,
             'enabled_by' => (int) ($actor?->getKey() ?? 0),
+            'message' => $message,
             'last_changed_at' => $now,
             'last_changed_by' => (int) ($actor?->getKey() ?? 0),
             'last_source' => $source,
@@ -101,12 +107,19 @@ class MaintenanceModeManager
         $current = $this->settings();
         $now = time();
 
-        MaintenanceSettings::save([
+        // If it was an auto-maintenance, restore the original message
+        $payload = [
             'enabled' => 0,
             'last_changed_at' => $now,
             'last_changed_by' => (int) ($actor?->getKey() ?? 0),
             'last_source' => $source,
-        ]);
+        ];
+
+        if (str_contains($source, '_success') || str_contains($source, '_failed') || str_contains($source, '_error')) {
+            $payload['message'] = (string) \App\Models\Option::where('o_type', 'maintenance_settings')->where('name', 'message')->first()?->o_valuer;
+        }
+
+        MaintenanceSettings::save($payload);
 
         Log::channel(self::LOG_CHANNEL)->notice('Maintenance mode disabled.', [
             'actor_id' => (int) ($actor?->getKey() ?? 0),
