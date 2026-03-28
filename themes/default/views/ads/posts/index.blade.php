@@ -47,7 +47,17 @@
                     <div style="text-align: end;">
                         <div style="font-size: 1.7rem; font-weight: 800; color: #1d4ed8;">{{ $promotion->charged_pts }}</div>
                         <div style="font-size: .8rem; color: #6b7280;">{{ __('messages.status_promotion_pts_label') }}</div>
-                        <div style="margin-top: 10px; display: inline-flex; padding: 6px 12px; border-radius: 999px; background: #f8fafc; color: #334155; font-size: .78rem; font-weight: 700;">
+                        @php
+                            $statusColors = [
+                                \App\Models\StatusPromotion::STATUS_ACTIVE => ['bg' => 'rgba(34, 197, 94, 0.1)', 'color' => '#15803d'],
+                                \App\Models\StatusPromotion::STATUS_PAUSED => ['bg' => 'rgba(249, 115, 22, 0.1)', 'color' => '#c2410c'],
+                                \App\Models\StatusPromotion::STATUS_COMPLETED => ['bg' => 'rgba(239, 68, 68, 0.1)', 'color' => '#b91c1c'],
+                                \App\Models\StatusPromotion::STATUS_EXPIRED => ['bg' => 'rgba(239, 68, 68, 0.1)', 'color' => '#b91c1c'],
+                                \App\Models\StatusPromotion::STATUS_BUDGET_CAPPED => ['bg' => 'rgba(239, 68, 68, 0.1)', 'color' => '#b91c1c'],
+                            ];
+                            $currentColor = $statusColors[$promotion->status] ?? ['bg' => '#f8fafc', 'color' => '#334155'];
+                        @endphp
+                        <div style="margin-top: 10px; display: inline-flex; padding: 6px 12px; border-radius: 999px; background: {{ $currentColor['bg'] }}; color: {{ $currentColor['color'] }}; font-size: .78rem; font-weight: 700;">
                             {{ __($statusKey) }}
                         </div>
                     </div>

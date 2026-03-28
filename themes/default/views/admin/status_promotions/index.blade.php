@@ -88,7 +88,19 @@
                                             <div class="progress-bar" role="progressbar" style="width: {{ $promotion->progressPercentage($statusModel) }}%;"></div>
                                         </div>
                                     </td>
-                                    <td><span class="badge bg-secondary">{{ __('messages.status_promotion_status_' . $promotion->status) }}</span></td>
+                                    <td>
+                                        @php
+                                            $statusBadgeColors = [
+                                                \App\Models\StatusPromotion::STATUS_ACTIVE => 'bg-success-subtle text-success-emphasis',
+                                                \App\Models\StatusPromotion::STATUS_PAUSED => 'bg-warning-subtle text-warning-emphasis',
+                                                \App\Models\StatusPromotion::STATUS_COMPLETED => 'bg-danger-subtle text-danger-emphasis',
+                                                \App\Models\StatusPromotion::STATUS_EXPIRED => 'bg-danger-subtle text-danger-emphasis',
+                                                \App\Models\StatusPromotion::STATUS_BUDGET_CAPPED => 'bg-danger-subtle text-danger-emphasis',
+                                            ];
+                                            $badgeClass = $statusBadgeColors[$promotion->status] ?? 'bg-secondary';
+                                        @endphp
+                                        <span class="badge {{ $badgeClass }}">{{ __('messages.status_promotion_status_' . $promotion->status) }}</span>
+                                    </td>
                                     <td>
                                         <div class="hstack gap-2">
                                             @if($promotion->status === \App\Models\StatusPromotion::STATUS_ACTIVE)
