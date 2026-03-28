@@ -318,6 +318,17 @@ html[dir="rtl"] .content-grid {
     margin-right: 0 !important;
 }
 
+html[dir="rtl"] .xm-tooltip {
+    left: auto !important;
+    right: 100% !important;
+    margin-right: 4px !important;
+    margin-left: 0 !important;
+}
+
+html[dir="rtl"] .xm-tooltip::before {
+    display: none !important;
+}
+
 @media screen and (max-width: 960px) {
     html[dir="rtl"] .section-banner {
         padding: 18px 108px 0 28px;

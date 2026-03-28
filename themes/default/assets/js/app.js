@@ -219,7 +219,17 @@ const app = {
     },
     createTooltip: function (options) {
       if (app.existsInDOM(options.container)) {
-        return new XM_Tooltip(options);
+        const normalizedOptions = Object.assign({}, options);
+
+        if (app.isRTL()) {
+          if (options.direction === 'right') {
+            normalizedOptions.direction = 'left';
+          } else if (options.direction === 'left') {
+            normalizedOptions.direction = 'right';
+          }
+        }
+
+        return new XM_Tooltip(normalizedOptions);
       }
     },
     createSlider: function (options) {
