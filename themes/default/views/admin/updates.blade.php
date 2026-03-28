@@ -1,6 +1,9 @@
 @extends('theme::layouts.admin')
 
 @section('content')
+    @php
+        $maintenanceEnabled = !empty($maintenanceSettings['enabled']);
+    @endphp
     <div class="page-header">
         <div class="page-header-left d-flex align-items-center">
             <div class="page-header-title">
@@ -96,6 +99,28 @@
                         <i class="feather-refresh-cw me-1"></i>
                         {{ __('messages.check_for_updates') ?? 'Check for Updates' }}
                     </button>
+                </div>
+            </div>
+
+            <div class="card stretch stretch-full mb-4 maintenance-update-card {{ $maintenanceEnabled ? 'maintenance-update-active' : 'maintenance-update-idle' }}">
+                <div class="card-body">
+                    <div class="d-flex align-items-start gap-3">
+                        <div class="maintenance-update-icon">
+                            <i class="feather-tool"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="d-flex align-items-center gap-2 flex-wrap mb-2">
+                                <span class="badge {{ $maintenanceEnabled ? 'bg-soft-danger text-danger' : 'bg-soft-warning text-warning' }}">
+                                    {{ $maintenanceEnabled ? __('messages.maintenance_status_enabled') : __('messages.maintenance_status_disabled') }}
+                                </span>
+                                <span class="small text-muted">{{ __('messages.maintenance_update_auto_notice') }}</span>
+                            </div>
+                            <h6 class="fw-bold mb-2">{{ __('messages.maintenance_update_title') }}</h6>
+                            <p class="text-muted fs-12 mb-0">
+                                {{ $maintenanceEnabled ? __('messages.maintenance_update_active_notice') : __('messages.maintenance_update_inactive_notice') }}
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -245,6 +270,14 @@
                             </div>
                         </div>
 
+                        <div class="alert alert-soft-info d-flex align-items-start gap-3 mb-4">
+                            <i class="feather-shield fs-4 mt-1"></i>
+                            <div>
+                                <strong>{{ __('messages.maintenance_update_title') }}:</strong>
+                                {{ __('messages.maintenance_update_auto_activate') }}
+                            </div>
+                        </div>
+
                         {{-- Update Button --}}
                         <div class="d-flex gap-3">
                             <button type="button" class="btn btn-primary px-4 py-2 fw-bold" data-bs-toggle="modal" data-bs-target="#confirmUpdateModal" @disabled(!$preflightReport->isSafe())>
@@ -366,6 +399,27 @@
             width: 1rem;
             height: 1rem;
             border-width: 0.15em;
+        }
+        .maintenance-update-card {
+            border: 1px solid rgba(97, 93, 250, 0.12);
+        }
+        .maintenance-update-active {
+            background: linear-gradient(135deg, rgba(255, 92, 120, 0.08), rgba(97, 93, 250, 0.05));
+        }
+        .maintenance-update-idle {
+            background: linear-gradient(135deg, rgba(255, 171, 0, 0.08), rgba(35, 210, 226, 0.05));
+        }
+        .maintenance-update-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(97, 93, 250, 0.12);
+            color: #615dfa;
+            font-size: 20px;
+            flex-shrink: 0;
         }
     </style>
 

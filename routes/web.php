@@ -508,6 +508,7 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
 
     // Maintenance
     Route::get('/maintenance', [AdminController::class, 'maintenance'])->name('admin.maintenance');
+    Route::post('/maintenance/settings', [AdminController::class, 'updateMaintenanceSettings'])->name('admin.maintenance.settings.update');
     Route::post('/maintenance/clear-cache', [AdminController::class, 'clearCache'])->name('admin.maintenance.clear_cache');
     Route::post('/maintenance/migrate', [AdminController::class, 'runMigrations'])->name('admin.maintenance.migrate');
     Route::post('/maintenance/db-repair', [AdminController::class, 'dbRepair'])->name('admin.maintenance.db_repair');

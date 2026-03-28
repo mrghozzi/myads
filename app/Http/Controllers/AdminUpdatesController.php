@@ -5,10 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Artisan;
 use App\Models\Option;
-use App\Services\GamificationService;
+use App\Services\MaintenanceModeManager;
+use App\Services\ReleaseUpdateService;
 use App\Services\UpdateSafetyService;
 
 class AdminUpdatesController extends Controller
@@ -19,8 +18,9 @@ class AdminUpdatesController extends Controller
     public const CURRENT_VERSION = '4.2.0';
 
     public function __construct(
-        private readonly GamificationService $gamification,
-        private readonly UpdateSafetyService $updateSafety
+        private readonly UpdateSafetyService $updateSafety,
+        private readonly MaintenanceModeManager $maintenanceMode,
+        private readonly ReleaseUpdateService $releaseUpdate
     ) {
     }
 
@@ -46,6 +46,7 @@ class AdminUpdatesController extends Controller
     {
         $currentVersion = self::CURRENT_VERSION;
         $preflightReport = $this->updateSafety->run();
+        $maintenanceSettings = $this->maintenanceMode->settings();
 
         // Sync version in DB
         $this->syncVersionInDb($currentVersion);
@@ -78,7 +79,8 @@ class AdminUpdatesController extends Controller
             'latestVersion',
             'updateAvailable',
             'latestRelease',
-            'preflightReport'
+            'preflightReport',
+            'maintenanceSettings'
         ));
     }
 
@@ -142,143 +144,33 @@ class AdminUpdatesController extends Controller
             ]));
         }
 
-        $tempZipPath = storage_path('app/myads_update.zip');
-        $tempExtractPath = storage_path('app/myads_update_extracted');
-        $maintenanceModeEnabled = false;
+        $releaseData = $this->fetchLatestRelease();
+
+        if (! $releaseData) {
+            return redirect()->route('admin.updates')->with('error', __('messages.update_fetch_failed'));
+        }
+
+        $latestVersion = ltrim((string) ($releaseData['tag_name'] ?? ''), 'v');
+        if (! version_compare($latestVersion, self::CURRENT_VERSION, '>')) {
+            return redirect()->route('admin.updates')->with('info', __('messages.already_up_to_date'));
+        }
 
         try {
-            // Fetch release data
-            $releaseData = $this->fetchLatestRelease();
+            $this->maintenanceMode->enable($request->user(), 'admin_update_start');
+            $appliedVersion = $this->releaseUpdate->applyLatestRelease(self::CURRENT_VERSION, $releaseData);
+            $this->maintenanceMode->disable($request->user(), 'admin_update_success');
 
-            if (!$releaseData) {
-                return redirect()->route('admin.updates')->with('error',
-                    __('messages.update_fetch_failed') ?? 'Could not fetch release information from GitHub.');
+            return redirect()->route('admin.updates')->with('success', __('messages.update_success', [
+                'version' => $appliedVersion,
+            ]));
+        } catch (\Throwable $exception) {
+            if (! $this->maintenanceMode->isEnabled()) {
+                $this->maintenanceMode->enable($request->user(), 'admin_update_failure_recovery');
             }
 
-            $latestVersion = ltrim($releaseData['tag_name'] ?? '', 'v');
-
-            if (!version_compare($latestVersion, self::CURRENT_VERSION, '>')) {
-                return redirect()->route('admin.updates')->with('info',
-                    __('messages.already_up_to_date') ?? 'Your system is already up to date.');
-            }
-
-            // Get the download URL (prefer asset zip, fallback to zipball)
-            $downloadUrl = $this->getAssetDownloadUrl($releaseData);
-
-            if (!$downloadUrl) {
-                return redirect()->route('admin.updates')->with('error',
-                    __('messages.no_download_url') ?? 'No download package found in the release.');
-            }
-
-            // Download the zip file directly to disk using sink
-            try {
-                $response = Http::withoutVerifying()->withHeaders([
-                    'User-Agent' => 'MyAds-Updater/1.0',
-                ])->timeout(300)->withOptions([
-                    'sink'            => $tempZipPath,
-                    'allow_redirects' => ['max' => 10],
-                ])->get($downloadUrl);
-
-                if (!$response->successful()) {
-                    if (File::exists($tempZipPath)) {
-                        File::delete($tempZipPath);
-                    }
-                    return redirect()->route('admin.updates')->with('error',
-                        (__('messages.download_failed') ?? 'Failed to download the update package.') . ' (HTTP ' . $response->status() . ')');
-                }
-            } catch (\Exception $e) {
-                if (File::exists($tempZipPath)) {
-                    File::delete($tempZipPath);
-                }
-                return redirect()->route('admin.updates')->with('error',
-                    (__('messages.download_failed') ?? 'Failed to download the update package.') . ' Error: ' . $e->getMessage());
-            }
-
-            // Extract the zip to a temporary directory first
-            File::deleteDirectory($tempExtractPath);
-            File::makeDirectory($tempExtractPath, 0755, true);
-
-            $zip = new \ZipArchive;
-            if ($zip->open($tempZipPath) !== true) {
-                return redirect()->route('admin.updates')->with('error',
-                    __('messages.zip_open_failed') ?? 'Failed to open the update package.');
-            }
-
-            $zip->extractTo($tempExtractPath);
-            $zip->close();
-
-            // GitHub zips contain a root folder (e.g., mrghozzi-myads-2df4a1).
-            // We need to move the contents of that inner folder to the base_path().
-            $directories = File::directories($tempExtractPath);
-            $innerFolder = count($directories) > 0 ? $directories[0] : $tempExtractPath;
-
-            $releaseReport = $this->updateSafety->run([
-                $innerFolder . DIRECTORY_SEPARATOR . 'database' . DIRECTORY_SEPARATOR . 'migrations',
-            ]);
-
-            if (! $releaseReport->isSafe()) {
-                return redirect()->route('admin.updates')->with('error', __('messages.update_blocked_preflight', [
-                    'details' => implode(' ', $releaseReport->failureMessages()),
-                ]));
-            }
-
-            Artisan::call('down');
-            $maintenanceModeEnabled = true;
-
-            $basePath = base_path();
-
-            // Move all files and folders from the inner folder to the base path
-            foreach (File::allFiles($innerFolder) as $file) {
-                $relativePath = str_replace($innerFolder . DIRECTORY_SEPARATOR, '', $file->getRealPath());
-                $targetPath = $basePath . DIRECTORY_SEPARATOR . $relativePath;
-
-                // Create directory if it doesn't exist
-                $targetDir = dirname($targetPath);
-                if (!File::exists($targetDir)) {
-                    File::makeDirectory($targetDir, 0755, true);
-                }
-
-                File::copy($file->getRealPath(), $targetPath);
-            }
-
-            // Run update script if exists
-            $updateScript = base_path('requests/update.php');
-            if (File::exists($updateScript)) {
-                include_once $updateScript;
-            }
-
-            // Run migrations and clear caches
-            Artisan::call('migrate', ['--force' => true]);
-            Artisan::call('optimize:clear');
-
-            $this->gamification->repairQuestData();
-
-            // Clear version cache
-            Cache::forget('github_latest_release');
-            Cache::forget('system_version_checked');
-
-            return redirect()->route('admin.updates')->with('success',
-                __('messages.update_success') ?? 'System updated successfully to v' . $latestVersion . '!');
-
-        } catch (\Exception $e) {
-            return redirect()->route('admin.updates')->with('error',
-                (__('messages.update_failed') ?? 'Update failed: ') . $e->getMessage());
-        } finally {
-            if (File::exists($tempZipPath)) {
-                File::delete($tempZipPath);
-            }
-
-            if (File::exists($tempExtractPath)) {
-                File::deleteDirectory($tempExtractPath);
-            }
-
-            if ($maintenanceModeEnabled) {
-                try {
-                    Artisan::call('up');
-                } catch (\Throwable) {
-                    // Best effort: do not mask the original update result.
-                }
-            }
+            return redirect()->route('admin.updates')->with('error', __('messages.update_failed_maintenance_kept', [
+                'error' => $exception->getMessage(),
+            ]));
         }
     }
 

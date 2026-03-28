@@ -37,6 +37,7 @@ use App\Models\Knowledgebase;
 use App\Models\Page;
 use App\Models\ProductFile;
 use App\Services\GamificationService;
+use App\Services\MaintenanceModeManager;
 use App\Services\PluginManager;
 use App\Services\ThemeManager;
 use App\Support\BannerServingSettings;
@@ -59,7 +60,8 @@ class AdminController extends Controller
     ];
 
     public function __construct(
-        private readonly GamificationService $gamification
+        private readonly GamificationService $gamification,
+        private readonly MaintenanceModeManager $maintenanceMode
     ) {
     }
 
@@ -2565,7 +2567,31 @@ class AdminController extends Controller
 
     public function maintenance()
     {
-        return view('theme::admin.maintenance');
+        $maintenanceSettings = $this->maintenanceMode->settings();
+        $maintenanceUsers = User::query()->whereIn('id', array_filter([
+            $maintenanceSettings['enabled_by'] ?? 0,
+            $maintenanceSettings['last_changed_by'] ?? 0,
+        ]))->get()->keyBy('id');
+
+        return view('theme::admin.maintenance', compact('maintenanceSettings', 'maintenanceUsers'));
+    }
+
+    public function updateMaintenanceSettings(Request $request)
+    {
+        $validated = $request->validate([
+            'maintenance_enabled' => ['nullable', 'boolean'],
+            'maintenance_message' => ['nullable', 'string', 'max:5000'],
+            'maintenance_logo' => ['nullable', 'file', 'mimes:jpg,jpeg,png,webp,gif,svg', 'max:2048'],
+            'remove_maintenance_logo' => ['nullable', 'boolean'],
+        ]);
+
+        $this->maintenanceMode->saveAdminSettings([
+            'enabled' => $request->boolean('maintenance_enabled'),
+            'message' => $validated['maintenance_message'] ?? '',
+            'remove_logo' => $request->boolean('remove_maintenance_logo'),
+        ], $request->file('maintenance_logo'), $request->user());
+
+        return redirect()->route('admin.maintenance')->with('success', __('messages.maintenance_settings_saved'));
     }
 
     public function clearCache()

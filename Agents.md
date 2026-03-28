@@ -148,7 +148,7 @@ myads/
 | `ReportController` | Content reporting |
 | `TagController` | Tag/hashtag pages |
 | `PageController` | Static pages (privacy, terms, custom) |
-| `AdminController` | **Main admin controller** — users, ads, forum, directory, store, widgets, menus, plugins, themes, settings, news, reports, emojis, knowledgebase |
+| `AdminController` | **Main admin controller** — users, ads, forum, directory, store, widgets, menus, plugins, themes, settings, news, reports, emojis, knowledgebase, maintenance mode settings |
 | `AdminAdminsController` | Admin ACL management |
 | `AdminSeoController` | SEO suite admin |
 | `AdminPageController` | Custom pages admin CRUD |
@@ -229,6 +229,8 @@ myads/
 | `RobotsTxtService` | Dynamic robots.txt generation |
 | `SmartAdAnalyzer` | Analyzes landing pages for Smart Ads metadata |
 | `SmartAdGeoResolver` | Geo-targeting for Smart Ads |
+| `MaintenanceModeManager` | Stores maintenance state, uploads the maintenance logo, handles emergency bypass, and writes maintenance logs |
+| `ReleaseUpdateService` | Applies downloaded release packages, runs migrations, clears caches, and centralizes updater file replacement |
 | `V420SchemaService` | Graceful fallback detection for incomplete v4.2.0 upgrades |
 | `TestingSafetyGuard` | Hard-fails tests unless they are using the isolated SQLite testing database |
 | `UpdateSafetyService` | Preflight safety checks for updates: DB connection, writable paths, pending migrations, destructive migration detection |
@@ -258,11 +260,13 @@ myads/
 | `/ads/posts/{status}/promote` | `/ads/posts/55/promote` | Member promoted-post setup and purchase page |
 | `/admin/ads/posts` | `/admin/ads/posts` | Admin monitoring for all promoted-post campaigns |
 | `/admin/ads/posts/settings` | `/admin/ads/posts/settings` | Admin pricing and delivery settings for promoted posts |
+| `/admin/maintenance` | `/admin/maintenance` | Admin maintenance dashboard, toggle, message, and logo settings |
+| `/admin/maintenance/settings` | `/admin/maintenance/settings` | Persists maintenance mode configuration from the admin panel |
 
 ### Middleware Groups
 - **`auth`** — Standard Laravel auth
 - **`admin`** — `AdminMiddleware` (checks `AdminAccessService`)
-- **Global middleware** — `SetLocale`, `UpdateUserOnline`, `CheckSystemVersion`, `InstallerGuard`, `TrackSeoMetrics`
+- **Global middleware** — `SetLocale`, `CheckForMaintenanceMode`, `UpdateUserOnline`, `CheckSystemVersion`, `InstallerGuard`, `TrackSeoMetrics`
 
 ### Admin Routes
 All under `/admin` prefix with `['auth', 'admin']` middleware.
@@ -400,6 +404,13 @@ pages/         → Static pages (privacy, terms, custom)
 - **Enforcement:** `StoreController` blocks unauthorized viewing and downloading of suspended products.
 - **UI:** Includes a high-visibility suspension notice on the product page, status badges in the store listing, and "Suspended" badges on community activity cards.
 
+### Maintenance Mode System
+- **Storage:** Uses `options` rows with `o_type = 'maintenance_settings'` to persist the enabled flag, custom visitor message, custom logo path, timestamps, and actor IDs.
+- **Enforcement:** `CheckForMaintenanceMode` runs in the global web stack after locale setup and returns a themed `503 Service Unavailable` response with a `Retry-After` header for non-admin traffic.
+- **Bypass Rules:** Full admin users can browse the site normally during maintenance; developers can bypass with `MAINTENANCE_EMERGENCY_TOKEN` through a signed cookie, query string, or request header.
+- **Updater Integration:** `/admin/updates` automatically enables maintenance before applying a release, disables it after a successful update, and leaves it enabled when the update fails.
+- **Logging & Assets:** All maintenance toggles are written to the application log, and optional maintenance logos are uploaded under `public/upload/maintenance/`.
+
 ---
 
 ## 14. Environment Configuration
@@ -409,6 +420,8 @@ Key `.env` variables:
 APP_NAME=myads
 APP_URL=http://localhost
 APP_LOCALE=en
+APP_MAINTENANCE_DRIVER=file
+MAINTENANCE_EMERGENCY_TOKEN=
 
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
@@ -613,4 +626,4 @@ If in doubt, update it. An outdated `Agents.md` causes future agents to make wro
 
 ---
 
-*Last updated: 2026-03-27 — MYADS v4.2.0 (promoted community posts system documented)*
+*Last updated: 2026-03-28 — MYADS v4.2.0 (maintenance mode system documented)*
