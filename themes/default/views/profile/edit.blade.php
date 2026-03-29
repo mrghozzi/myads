@@ -13,7 +13,7 @@
     <div class="grid-column">
         <div class="widget-box">
             <p class="widget-box-title">{{ __('messages.edit_profile') }}</p>
-            <div class="widget-box-content">
+            <div class="widget-box-content" style="padding: 32px;">
                 <form action="{{ route('profile.update') }}" method="POST" enctype="multipart/form-data" class="form">
                     @csrf
                     
@@ -22,14 +22,22 @@
                         $cover = $coverOption && $coverOption->o_mode != '0' ? $coverOption->o_mode : 'upload/cover.jpg';
                     @endphp
 
-                    <!-- USER PREVIEW -->
-                    <div class="user-preview small fixed-height">
-                        <figure class="user-preview-cover liquid" style="background: url({{ asset($cover) }}) center center / cover no-repeat;">
+                    <!-- SUPERDESIGN USER PREVIEW -->
+                    <div class="user-preview small fixed-height" style="margin-bottom: 40px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: 0 4px 12px rgba(0,0,0,0.05); overflow: visible;">
+                        <figure class="user-preview-cover liquid" style="background: url({{ asset($cover) }}) center center / cover no-repeat; position: relative; border-top-left-radius: 12px; border-top-right-radius: 12px;">
+                            
+                            <!-- Cover Edit Button -->
+                            <div id="CoverUpload" style="position: absolute; top: 16px; right: 16px; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px); color: #fff; padding: 8px 16px; border-radius: 20px; display: flex; align-items: center; gap: 8px; cursor: pointer; transition: all 0.3s ease; border: 1px solid rgba(255,255,255,0.2); font-size: 13px; font-weight: 600; z-index: 10;" onmouseover="this.style.background='rgba(0,0,0,0.8)'" onmouseout="this.style.background='rgba(0,0,0,0.6)'">
+                                <svg class="icon-camera" style="width: 16px; height: 16px; fill: currentColor;"><use xlink:href="#svg-camera"></use></svg>
+                                <span>{{ __('messages.cover') }}</span>
+                            </div>
+                            
                             <img id="cover-preview" src="{{ asset($cover) }}" alt="cover-preview" style="display: none;">
                         </figure>
+                        
                         <div class="user-preview-info">
                             <div class="user-short-description small">
-                                <div class="user-short-description-avatar user-avatar">
+                                <div class="user-short-description-avatar user-avatar" style="position: relative;">
                                     <div class="user-avatar-border">
                                         <div class="hexagon-100-110" style="width: 100px; height: 110px; position: relative;"><canvas style="position: absolute; top: 0px; left: 0px;" width="100" height="110"></canvas></div>
                                     </div>
@@ -39,76 +47,88 @@
                                     <div class="user-avatar-progress-border">
                                         <div class="hexagon-border-84-92" style="width: 84px; height: 92px; position: relative;"><canvas style="position: absolute; top: 0px; left: 0px;" width="84" height="92"></canvas></div>
                                     </div>
+                                    
+                                    <!-- Avatar Edit Button -->
+                                    <div id="AvatarUpload" style="position: absolute; bottom: -5px; right: -5px; width: 36px; height: 36px; background: var(--primary-color, #23d2e2); border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; color: #fff; box-shadow: 0 0 0 4px var(--widget-box-bg, #fff); z-index: 20; transition: transform 0.2s ease;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+                                        <svg class="icon-camera" style="width: 16px; height: 16px; fill: currentColor;"><use xlink:href="#svg-camera"></use></svg>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <!-- /USER PREVIEW -->
+                    <!-- /SUPERDESIGN USER PREVIEW -->
+                    
+                    <!-- HIDDEN UPLOADS -->
+                    <input type="file" id="Avatarload" name="avatar" accept=".jpg, .jpeg, .png, .gif" style="display:none">
+                    <input type="file" id="Coverload" name="cover" accept=".jpg, .jpeg, .png, .gif" style="display:none">
 
-                    <!-- UPLOAD BOXES -->
-                    <div class="grid grid-3-3-3 centered" style="margin-bottom: 32px;">
-                        <div class="upload-box" id="AvatarUpload" style="cursor: pointer;">
-                            <svg class="upload-box-icon icon-members">
-                                <use xlink:href="#svg-members"></use>
-                            </svg>
-                            <p class="upload-box-title">{{ __('messages.avatar') }}</p>
-                            <p class="upload-box-text">110x110px min</p>
-                        </div>
-                        <input type="file" id="Avatarload" name="avatar" accept=".jpg, .jpeg, .png, .gif" style="display:none">
+                    <!-- SECTIONS -->
+                    <div style="padding: 0;">
                         
-                        <div class="upload-box" id="CoverUpload" style="cursor: pointer;">
-                            <svg class="upload-box-icon icon-photos">
-                                <use xlink:href="#svg-photos"></use>
-                            </svg>
-                            <p class="upload-box-title">{{ __('messages.cover') }}</p>
-                            <p class="upload-box-text">1184x300px min</p>
+                        <div class="section-header" style="margin-bottom: 24px;">
+                            <h4 style="font-size: 16px; font-weight: 700; margin: 0; color: var(--text-color, #3e3f5e);">{{ __('messages.account_details') ?? 'Account Details' }}</h4>
+                            <p style="color: var(--text-color-alt, #8f91ac); font-size: 13px; margin-top: 4px;">{{ __('messages.update_account_info') ?? 'Update your basic account information' }}</p>
                         </div>
-                        <input type="file" id="Coverload" name="cover" accept=".jpg, .jpeg, .png, .gif" style="display:none">
-                    </div>
-                    <!-- /UPLOAD BOXES -->
 
-                    <div class="form-row split">
-                        <div class="form-item">
-                            <div class="form-input small active">
-                                <label for="username">{{ __('messages.username') }}</label>
-                                <input type="text" id="username" value="{{ $user->username }}" disabled>
+                        <div class="form-row split">
+                            <div class="form-item">
+                                <div class="form-input small active">
+                                    <label for="username">{{ __('messages.username') }}</label>
+                                    <input type="text" id="username" value="{{ $user->username }}" disabled style="background: var(--dark-light-color, rgba(0,0,0,0.03)); opacity: 0.7; color: var(--text-color); border-radius: 12px;">
+                                </div>
+                            </div>
+                            <div class="form-item">
+                                <div class="form-input small {{ $user->email ? 'active' : '' }}">
+                                    <label for="email">{{ __('messages.email') }}</label>
+                                    <input type="text" inputmode="email" id="email" name="email" value="{{ $user->email }}" required style="border-radius: 12px;">
+                                </div>
                             </div>
                         </div>
-                        <div class="form-item">
-                            <div class="form-input small {{ $user->email ? 'active' : '' }}">
-                                <label for="email">{{ __('messages.email') }}</label>
-                                <input type="email" id="email" name="email" value="{{ $user->email }}" required>
-                            </div>
-                        </div>
-                    </div>
 
-                    <div class="form-row split">
-                        <div class="form-item">
-                            <div class="form-input small">
-                                <label for="password">{{ __('messages.new_password') }}</label>
-                                <input type="password" id="password" name="password" placeholder="{{ __('messages.leave_blank_to_keep') }}">
-                            </div>
-                        </div>
-                        <div class="form-item">
-                            <div class="form-input small">
-                                <label for="password_confirmation">{{ __('messages.confirm_password') }}</label>
-                                <input type="password" id="password_confirmation" name="password_confirmation">
-                            </div>
-                        </div>
-                    </div>
+                        <hr style="border: none; border-top: 1px solid var(--border-color, #ebebeb); margin: 32px 0;">
 
-                    <div class="form-row">
-                        <div class="form-item">
-                            <div class="form-textarea active">
-                                <label for="about_me">{{ __('messages.about_me') }}</label>
-                                <textarea id="about_me" name="about_me" rows="6" placeholder="{{ __('messages.about_me_placeholder') }}">{{ old('about_me', $user->sig) }}</textarea>
+                        <div class="section-header" style="margin-bottom: 24px;">
+                            <h4 style="font-size: 16px; font-weight: 700; margin: 0; color: var(--text-color, #3e3f5e);">{{ __('messages.security') ?? 'Security' }}</h4>
+                            <p style="color: var(--text-color-alt, #8f91ac); font-size: 13px; margin-top: 4px;">{{ __('messages.leave_blank_to_keep') }}</p>
+                        </div>
+
+                        <div class="form-row split">
+                            <div class="form-item">
+                                <div class="form-input small">
+                                    <label for="password">{{ __('messages.new_password') }}</label>
+                                    <input type="password" id="password" name="password" style="border-radius: 12px;">
+                                </div>
+                            </div>
+                            <div class="form-item">
+                                <div class="form-input small">
+                                    <label for="password_confirmation">{{ __('messages.confirm_password') }}</label>
+                                    <input type="password" id="password_confirmation" name="password_confirmation" style="border-radius: 12px;">
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="form-row">
-                        <div class="form-item">
-                            <button type="submit" class="button primary">{{ __('messages.save_changes') }}</button>
+                        <hr style="border: none; border-top: 1px solid var(--border-color, #ebebeb); margin: 32px 0;">
+
+                        <div class="section-header" style="margin-bottom: 24px;">
+                            <h4 style="font-size: 16px; font-weight: 700; margin: 0; color: var(--text-color, #3e3f5e);">{{ __('messages.about_me') }}</h4>
+                            <p style="color: var(--text-color-alt, #8f91ac); font-size: 13px; margin-top: 4px;">{{ __('messages.about_me_placeholder') }}</p>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-item">
+                                <div class="form-textarea active">
+                                    <label for="about_me">{{ __('messages.about_me') }}</label>
+                                    <textarea id="about_me" name="about_me" rows="6" placeholder="{{ __('messages.about_me_placeholder') }}" style="border-radius: 12px; resize: vertical; padding-top: 16px;">{{ old('about_me', $user->sig) }}</textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-row" style="margin-top: 32px; display: flex; justify-content: flex-end;">
+                            <div class="form-item" style="min-width: 200px;">
+                                <button type="submit" class="button primary" style="width: 100%; border-radius: 12px; padding: 12px 24px; font-weight: 700; font-size: 14px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); transition: all 0.3s ease;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+                                    {{ __('messages.save_changes') }}
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </form>
