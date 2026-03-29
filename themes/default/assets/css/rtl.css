@@ -423,3 +423,27 @@ html[dir="rtl"] .profile-header .profile-header-info .profile-header-info-action
     left: auto;
   }
 }
+
+/* Store Category Boxes RTL Flip */
+html[dir="rtl"] .product-category-box {
+    position: relative;
+    overflow: hidden;
+    background: none !important;
+    padding: 26px 28px 0 0 !important;
+}
+
+html[dir="rtl"] .product-category-box::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--bg);
+    transform: scaleX(-1);
+    z-index: 0;
+    pointer-events: none;
+}
+
+html[dir="rtl"] .product-category-box > * {
+    position: relative;
+    z-index: 1;
+}
+
