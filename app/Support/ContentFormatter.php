@@ -33,7 +33,7 @@ class ContentFormatter
             ->all();
     }
 
-    private static function linkifyHashtags(string $text): string
+    public static function linkifyHashtags(string $text): string
     {
         return (string) preg_replace_callback(
             '/(^|[\s(>])#([\p{L}\p{N}_]{1,60})/u',
@@ -46,7 +46,7 @@ class ContentFormatter
         );
     }
 
-    private static function linkifyMentions(string $text): string
+    public static function linkifyMentions(string $text): string
     {
         return (string) preg_replace_callback(
             '/(^|[\s(>])@([A-Za-z0-9_]{2,30})/u',
