@@ -75,6 +75,46 @@ class SiteAdPlacementTest extends TestCase
             ->assertDontSee(self::HOME_SLOT_CODE, false);
     }
 
+    public function test_forum_category_page_with_topics_renders_successfully(): void
+    {
+        $this->seedSiteAds();
+
+        $author = User::factory()->create([
+            'username' => 'forum-author',
+        ]);
+
+        $category = ForumCategory::create([
+            'name' => 'Support Board',
+            'icons' => 'fa-comments',
+            'txt' => 'Forum category description',
+            'ordercat' => 1,
+            'visibility' => 0,
+        ]);
+
+        $topic = ForumTopic::create([
+            'uid' => $author->id,
+            'name' => 'Rendered Topic',
+            'txt' => 'Topic body for category rendering.',
+            'cat' => $category->id,
+            'statu' => 1,
+            'date' => time(),
+            'reply' => 0,
+            'vu' => 0,
+        ]);
+
+        Status::create([
+            'uid' => $author->id,
+            'tp_id' => $topic->id,
+            's_type' => 2,
+            'date' => time(),
+            'statu' => 1,
+        ]);
+
+        $this->actingAs($author)->get('/f' . $category->id)
+            ->assertOk()
+            ->assertSee('Rendered Topic');
+    }
+
     public function test_directory_and_store_detail_pages_render_topic_and_footer_slots(): void
     {
         $this->seedSiteAds();
