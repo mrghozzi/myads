@@ -37,7 +37,7 @@
                         
                         <div class="user-preview-info">
                             <div class="user-short-description small">
-                                <div class="user-short-description-avatar user-avatar" style="position: relative;">
+                                <div class="user-short-description-avatar user-avatar">
                                     <div class="user-avatar-border">
                                         <div class="hexagon-100-110" style="width: 100px; height: 110px; position: relative;"><canvas style="position: absolute; top: 0px; left: 0px;" width="100" height="110"></canvas></div>
                                     </div>
@@ -49,8 +49,8 @@
                                     </div>
                                     
                                     <!-- Avatar Edit Button -->
-                                    <div id="AvatarUpload" style="position: absolute; bottom: -5px; right: -5px; width: 36px; height: 36px; background: var(--primary-color, #23d2e2); border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; color: #fff; box-shadow: 0 0 0 4px var(--widget-box-bg, #fff); z-index: 20; transition: transform 0.2s ease;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
-                                        <svg class="icon-camera" style="width: 16px; height: 16px; fill: currentColor;"><use xlink:href="#svg-camera"></use></svg>
+                                    <div id="AvatarUpload" style="position: absolute; bottom: 0px; right: 0px; width: 32px; height: 32px; background: var(--primary-color, #23d2e2); border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; color: #fff; box-shadow: 0 0 0 3px var(--widget-box-bg, #fff); z-index: 20; transition: transform 0.2s ease;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+                                        <svg class="icon-camera" style="width: 14px; height: 14px; fill: currentColor;"><use xlink:href="#svg-camera"></use></svg>
                                     </div>
                                 </div>
                             </div>
