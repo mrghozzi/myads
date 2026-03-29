@@ -40,6 +40,7 @@ return [
     'Stats' => 'إحصائيات',
     'Statu' => 'الحالة',
     'Timeline' => 'يومياتي',
+    'cat_s' => 'الأقسام',
     'Totalpoints' => 'إجمالي النقاط',
     'Unverified' => 'غير موثق',
     'Up_post' => 'أعلى المشاركة:',

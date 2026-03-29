@@ -61,6 +61,7 @@ class DirectoryController extends Controller
 
             ['activities' => $activities, 'cards' => $cards] = $this->buildDirectoryFeed((int) $id);
             $categorySummary = $this->buildCategorySummary($category, $subCategories);
+            $categoryBoard = $this->buildDirectoryBoard();
         } catch (\Throwable $e) {
             abort(404);
         }
@@ -87,7 +88,7 @@ class DirectoryController extends Controller
             ],
         ]);
 
-        return view('theme::directory.category', compact('category', 'subCategories', 'activities', 'cards', 'categorySummary'));
+        return view('theme::directory.category', compact('category', 'subCategories', 'activities', 'cards', 'categorySummary', 'categoryBoard'));
     }
 
     public function show($id)

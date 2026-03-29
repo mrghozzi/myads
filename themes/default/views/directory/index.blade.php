@@ -11,6 +11,8 @@
         </div>
     </div>
 
+    @include('theme::directory.partials.mobile_filters')
+
     <div class="grid grid-3-6-3 mobile-prefer-content directory-hub-grid">
         <div class="grid-column">
             <div class="widget-box directory-side-card directory-command-card">
