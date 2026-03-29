@@ -44,17 +44,13 @@
         </li>
         <li class="menu-item {{ Request::is('directory*', 'dr*', 'cat*', 'add-site*') ? 'active' : '' }}">
             <a class="menu-item-link text-tooltip-tfr" href="{{ url('/directory') }}">
-                <svg class="menu-item-link-icon icon-directory">
-                    <use xlink:href="#svg-directory"></use>
-                </svg>
+                @include('theme::partials.header.menu_icon', ['icon' => 'directory'])
                 {{ __('messages.directory') }}
             </a>
         </li>
         <li class="menu-item {{ Request::is('orders*') ? 'active' : '' }}">
             <a class="menu-item-link text-tooltip-tfr" href="{{ url('/orders') }}">
-                <svg class="menu-item-link-icon icon-orders">
-                    <use xlink:href="#svg-orders"></use>
-                </svg>
+                @include('theme::partials.header.menu_icon', ['icon' => 'orders'])
                 {{ __('messages.order_requests') }}
             </a>
         </li>
@@ -68,18 +64,14 @@
         </li>
         <li class="menu-item {{ Request::is('news*') ? 'active' : '' }}">
             <a class="menu-item-link text-tooltip-tfr" href="{{ url('/news') }}">
-                <svg class="menu-item-link-icon icon-news">
-                    <use xlink:href="#svg-news"></use>
-                </svg>
+                @include('theme::partials.header.menu_icon', ['icon' => 'news'])
                 {{ __('messages.news') }}
             </a>
         </li>
         @auth
         <li class="menu-item {{ Request::is('ads*', 'promote*') ? 'active' : '' }}">
             <a class="menu-item-link text-tooltip-tfr" href="{{ route('ads.index') }}">
-                <svg class="menu-item-link-icon icon-megaphone">
-                    <use xlink:href="#svg-megaphone"></use>
-                </svg>
+                @include('theme::partials.header.menu_icon', ['icon' => 'megaphone'])
                 {{ __('messages.advertising') }}
             </a>
         </li>

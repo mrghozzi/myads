@@ -527,8 +527,36 @@
     @endif
 
     @stack('head')
+    <style>
+        .menu-fallback-icon {
+            width: 20px;
+            height: 20px;
+        }
+
+        body[data-theme="css"] .menu-fallback-icon {
+            fill: #adafca;
+        }
+
+        body[data-theme="css_d"] .menu-fallback-icon {
+            fill: #616a82;
+        }
+
+        .menu .menu-item .menu-item-link:hover .menu-fallback-icon {
+            fill: #23d2e2;
+        }
+
+        body[data-theme="css_d"] .menu .menu-item .menu-item-link:hover .menu-fallback-icon {
+            fill: #4ff461;
+        }
+
+        .menu .menu-item.active .menu-item-link .menu-fallback-icon,
+        .menu .menu-item.active .menu-item-link:hover .menu-fallback-icon {
+            fill: #fff;
+        }
+    </style>
 </head>
 <body data-theme="{{ $css_path }}" data-dir="{{ $pageDirection }}" class="{{ $pageDirection }}">
+    @include('theme::partials.header.menu_icon_symbols')
 
     @include('theme::partials.header.nav')
     @include('theme::partials.header.sidemenu')
