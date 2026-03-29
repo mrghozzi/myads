@@ -2877,6 +2877,8 @@ figure > img {
 
 .action-list .action-list-item .action-list-item-icon {
   fill: #616a82;
+  width: 20px;
+  height: 20px;
   transition: fill .3s ease-in-out;
 }
 
@@ -2894,11 +2896,15 @@ figure > img {
 }
 
 .action-item .action-item-icon {
-  fill: #adafca;
+  fill: #616a82;
+  width: 20px;
+  height: 20px;
 }
 
 .action-item.dark .action-item-icon {
   fill: #fff;
+  width: 20px;
+  height: 20px;
 }
 
 /*-----------------------------

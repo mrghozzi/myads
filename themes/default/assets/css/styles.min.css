@@ -1321,6 +1321,9 @@ textarea::placeholder {
 .icon-delete,
 .icon-directory,
 .icon-orders,
+.icon-send-message,
+.icon-settings,
+.icon-cross-thin,
 .icon-news,
 .icon-newsfeed,
 .icon-overview,
@@ -2712,6 +2715,8 @@ figure > img {
 
 .action-list .action-list-item .action-list-item-icon {
   fill: #adafca;
+  width: 20px;
+  height: 20px;
   transition: fill .3s ease-in-out;
 }
 
@@ -2730,10 +2735,14 @@ figure > img {
 
 .action-item .action-item-icon {
   fill: #adafca;
+  width: 20px;
+  height: 20px;
 }
 
 .action-item.dark .action-item-icon {
   fill: #fff;
+  width: 20px;
+  height: 20px;
 }
 
 /*-----------------------------
