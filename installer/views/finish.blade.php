@@ -18,7 +18,7 @@
             <i class="fas fa-check-circle"></i>
         </div>
         <h2>Installation Complete!</h2>
-        <p class="subtitle">MyAds v4.2.0 has been successfully installed.</p>
+        <p class="subtitle">MyAds v{{ \App\Support\SystemVersion::CURRENT }} has been successfully installed.</p>
 
         @if(session('log'))
             <div class="update-log text-start">

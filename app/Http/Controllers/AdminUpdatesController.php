@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Support\SystemVersion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Cache;
@@ -13,9 +14,9 @@ use App\Services\UpdateSafetyService;
 class AdminUpdatesController extends Controller
 {
     /**
-     * Current system version (hardcoded).
+     * Current system version.
      */
-    public const CURRENT_VERSION = '4.2.0';
+    public const CURRENT_VERSION = SystemVersion::CURRENT;
 
     public function __construct(
         private readonly UpdateSafetyService $updateSafety,

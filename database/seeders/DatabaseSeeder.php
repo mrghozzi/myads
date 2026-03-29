@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Support\SystemVersion;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -71,8 +72,8 @@ class DatabaseSeeder extends Seeder
             // Default version
             if (!DB::table('options')->where('o_type', 'version')->exists()) {
                 DB::table('options')->insert([
-                    'name' => 'version',
-                    'o_valuer' => '4.1.3',
+                    'name' => SystemVersion::name(),
+                    'o_valuer' => SystemVersion::CURRENT,
                     'o_type' => 'version',
                     'o_parent' => 0,
                     'o_order' => 0,

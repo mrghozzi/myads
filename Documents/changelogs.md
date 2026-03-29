@@ -1,3 +1,13 @@
+# v4.2.1
+> **Patch Release** - Version consistency, installer metadata fixes, and update flow polish.
+
+### Version Metadata & Update Flow
+* **Fix**: Centralized the MYADS runtime version in one support class so the updater, installer, middleware, and seed data all use the same source of truth.
+* **Fix**: Corrected version writes that could previously store inconsistent values like `4.0.0` or `4.1.3` inside the `options` table.
+* **Fix**: Updated installer and upgrade UI copy so fresh installs and upgrades now consistently display `v4.2.1`.
+* **Improvement**: Version-check caching is now scoped to the active version number, so patch upgrades do not wait on a stale cache key before syncing the database version.
+* **Tests**: Refreshed maintenance/update coverage to validate the new version baseline and update flow behavior.
+
 # v4.2.0
 > **Feature Release** - Community feed overhaul, profile hub privacy, admin ACL, and platform integrations.
 

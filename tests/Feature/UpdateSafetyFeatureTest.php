@@ -30,9 +30,14 @@ class UpdateSafetyFeatureTest extends TestCase
         config()->set('database.connections.mysql.driver', 'mysql');
         config()->set('database.connections.mysql.database', 'myads2');
 
-        $this->expectException(\RuntimeException::class);
-
-        app(TestingSafetyGuard::class)->ensureIsolated();
+        try {
+            app(TestingSafetyGuard::class)->ensureIsolated();
+            $this->fail('Expected the testing safety guard to reject a non-isolated database connection.');
+        } catch (\RuntimeException $exception) {
+            $this->assertStringContainsString('myads2', $exception->getMessage());
+        } finally {
+            config()->set('database.default', 'sqlite');
+        }
     }
 
     public function test_update_safety_service_accepts_safe_pending_migrations(): void
@@ -201,8 +206,8 @@ PHP);
 
         Http::fake([
             'https://api.github.com/repos/mrghozzi/myads/releases/latest' => Http::response([
-                'tag_name' => 'v4.2.1',
-                'name' => 'v4.2.1',
+                'tag_name' => 'v4.2.2',
+                'name' => 'v4.2.2',
                 'body' => 'Test release',
                 'assets' => [
                     [

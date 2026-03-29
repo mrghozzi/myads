@@ -1,4 +1,4 @@
-# Agents.md — MYADS v4.2.0
+# Agents.md — MYADS v4.2.1
 
 > **Purpose:** This file gives AI coding agents a fast, comprehensive understanding of the MYADS project — its architecture, conventions, key files, and rules — so they can work effectively from a fresh chat context.
 
@@ -6,7 +6,7 @@
 
 ## 1. Project Identity
 
-- **Name:** MYADS v4.2.0
+- **Name:** MYADS v4.2.1
 - **Type:** Social network + ad exchange platform for website owners
 - **Framework:** Laravel 12 (PHP 8.2+)
 - **Database:** MySQL 5.7+ / MariaDB 10.3+
@@ -65,7 +65,7 @@ myads/
 │   ├── Models/             # 40+ Eloquent models (see §6)
 │   ├── Providers/          # AppServiceProvider, ThemeServiceProvider, PluginServiceProvider, InstallerServiceProvider
 │   ├── Services/           # Business logic services (see §7)
-│   ├── Support/            # Value objects, formatters, embed code generators
+│   ├── Support/            # Value objects, formatters, settings bags, version metadata, embed code generators
 │   ├── Traits/             # HasPrivacy
 │   └── View/Components/    # WidgetColumn
 ├── bootstrap/
@@ -411,6 +411,13 @@ pages/         → Static pages (privacy, terms, custom)
 - **Updater Integration:** `/admin/updates` automatically enables maintenance before applying a release, disables it after a successful update, and leaves it enabled when the update fails.
 - **Logging & Assets:** All maintenance toggles are written to the application log, and optional maintenance logos are uploaded under `public/upload/maintenance/`.
 
+### Version Metadata & Release Consistency (v4.2.1)
+- **Single Source of Truth:** `App\Support\SystemVersion` now owns the current application version through `CURRENT`, `name()`, and `tag()`.
+- **Runtime Sync:** `AdminUpdatesController::CURRENT_VERSION` now proxies to `SystemVersion::CURRENT`, keeping updater, installer, middleware, and extension compatibility checks aligned.
+- **Database Versioning:** `CheckSystemVersion`, `DatabaseSeeder`, and the installer upgrade flow now persist version metadata from `SystemVersion` instead of hardcoded release strings.
+- **Cache Safety:** Version-sync caching is scoped per version key (`system_version_checked_{version-name}`) so post-upgrade requests do not wait on stale cache state before the `options` table is corrected.
+- **Installer UI:** Installer update and finish screens display the active runtime version from `SystemVersion`, reducing patch-release drift.
+
 ---
 
 ## 14. Environment Configuration
@@ -451,7 +458,7 @@ MAIL_HOST=smtp.example.com
 - **Location:** `tests/Feature/` (26 test files), `tests/Concerns/`
 - **Run:** `php artisan test --env=testing` or `composer test`
 - **Isolation:** Tests must run only against `.env.testing` with `sqlite` and `database/testing.sqlite`. Never point tests at a MySQL/MariaDB site database.
-- **Coverage areas:** Installer flow, forum features, banner/link/smart ads, store, SEO, locale/RTL, notifications, profile/follow, directory, v4.2.0 features (community, privacy, ACL, translations, upgrade fallbacks)
+- **Coverage areas:** Installer flow, forum features, banner/link/smart ads, store, SEO, locale/RTL, notifications, profile/follow, directory, maintenance/update safety, and v4.2.x features (community, privacy, ACL, translations, upgrade fallbacks)
 
 ---
 
@@ -510,7 +517,7 @@ php artisan storage:link
 12. **Routes:** Name all routes. Follow existing naming convention: `module.action` (e.g., `forum.create`, `admin.users.edit`).
 13. **Models:** Place in `app/Models/`. Define `$fillable` or `$guarded`. Specify `$table` name explicitly (many use legacy table names like `f_topic`, `f_cat`).
 14. **Services:** Business logic goes in `app/Services/`, not controllers. Controllers should be thin.
-15. **Support classes:** Value objects, formatters, settings bags go in `app/Support/`.
+15. **Support classes:** Value objects, formatters, settings bags, and shared version metadata go in `app/Support/`.
 16. **Middleware:** Registered in `bootstrap/app.php`. Admin routes use `['auth', 'admin']`.
 17. **Admin views:** Follow Duralux design patterns (card-based, `hstack`, `gap-3`).
 18. **Blade partials:** Reuse existing partials. Activity cards: `partials/activity/`. Forum: `partials/forum/`.
@@ -553,6 +560,7 @@ php artisan storage:link
 | Add a new page | Create controller method → add route in `web.php` → create Blade in `themes/default/views/` → add translation keys to all 9 locales |
 | Add admin section | Add routes under `admin` prefix → create admin Blade in `themes/default/views/admin/` → update `AdminAccessService` module list if ACL-gated |
 | Add promoted-post pricing or delivery rule | Update `app/Support/StatusPromotionSettings.php` defaults/normalization → adjust `app/Services/StatusPromotionPricingService.php` and `app/Services/StatusPromotionService.php` → cover the change in `tests/Feature/StatusPromotionFeatureTest.php` |
+| Update current release version | Update `app/Support/SystemVersion.php` first -> verify installer/updater/version-sync surfaces -> refresh relevant tests and docs (`Documents/changelogs.md`, `Agents.md`) |
 | Add translation key | Edit `lang/{locale}/messages.php` in ALL 9 directories |
 | Create migration | `php artisan make:migration description` → use `Schema::hasTable()` guards for safety |
 | Add new model | `php artisan make:model Name` → specify `$table`, `$fillable` → place in `app/Models/` |
@@ -605,6 +613,15 @@ php artisan storage:link
 
 ---
 
+## 19C. Version Metadata Consistency (2026-03-29)
+
+- **Support:** Added `App\Support\SystemVersion` as the canonical release-version helper for runtime metadata.
+- **Updater & Installer:** `AdminUpdatesController`, `InstallerController`, installer views, and `DatabaseSeeder` now derive current version strings from `SystemVersion`.
+- **Middleware:** `CheckSystemVersion` now syncs the `options` table using the canonical version value and a version-scoped cache key.
+- **Testing:** Maintenance/update safety tests were refreshed around the new `4.2.1` baseline and next-release simulation values.
+
+---
+
 ## 20. Maintaining This File
 
 > **⚠️ RULE: This `Agents.md` file MUST be kept up to date.**
@@ -626,4 +643,4 @@ If in doubt, update it. An outdated `Agents.md` causes future agents to make wro
 
 ---
 
-*Last updated: 2026-03-28 — MYADS v4.2.0 (maintenance mode system documented)*
+*Last updated: 2026-03-29 — MYADS v4.2.1 (version metadata consistency documented)*

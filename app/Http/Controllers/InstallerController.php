@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use App\Models\User;
 use App\Services\GamificationService;
+use App\Support\SystemVersion;
 use Illuminate\Support\Facades\Hash;
 
 class InstallerController extends Controller
@@ -589,18 +590,21 @@ class InstallerController extends Controller
             // ============================================================
             $versionOption = \App\Models\Option::where('o_type', 'version')->first();
             if ($versionOption) {
-                $versionOption->update(['o_valuer' => '4.2.0']);
+                $versionOption->update([
+                    'name' => SystemVersion::name(),
+                    'o_valuer' => SystemVersion::CURRENT,
+                ]);
             } else {
                 \App\Models\Option::create([
-                    'name' => 'version',
-                    'o_valuer' => '4.2.0',
+                    'name' => SystemVersion::name(),
+                    'o_valuer' => SystemVersion::CURRENT,
                     'o_type' => 'version',
                     'o_parent' => 0,
                     'o_order' => 0,
                     'o_mode' => '0',
                 ]);
             }
-            $log[] = '✅ Version updated to 4.2.0';
+            $log[] = '✅ Version updated to ' . SystemVersion::CURRENT;
 
             // ============================================================
             // STEP 12: Clear caches
@@ -616,7 +620,7 @@ class InstallerController extends Controller
             app(GamificationService::class)->repairQuestData();
 
             // Mark as installed
-            File::put(storage_path('installed'), date('Y-m-d H:i:s') . ' (upgraded from v3.x to v4.2.0)');
+            File::put(storage_path('installed'), date('Y-m-d H:i:s') . ' (upgraded from v3.x to v' . SystemVersion::CURRENT . ')');
 
             $maintenance->disable(null, 'manual_update_success');
 

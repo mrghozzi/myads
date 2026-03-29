@@ -87,6 +87,7 @@ class ReleaseUpdateService
 
             Cache::forget('github_latest_release');
             Cache::forget('system_version_checked');
+            Cache::forget('system_version_checked_' . str_replace('.', '-', $currentVersion));
 
             return $latestVersion;
         } finally {

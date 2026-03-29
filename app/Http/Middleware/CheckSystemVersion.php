@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Support\SystemVersion;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,17 +18,14 @@ class CheckSystemVersion
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // Define current code version
-        $myads_generation = "4";
-        $myads_Version = "0";
-        $myads_Update = "0";
-        $stversion = "{$myads_generation}.{$myads_Version}.{$myads_Update}";
-        $version_name = "{$myads_generation}-{$myads_Version}-{$myads_Update}";
+        $stversion = SystemVersion::CURRENT;
+        $version_name = SystemVersion::name();
+        $cacheKey = 'system_version_checked_' . $version_name;
 
         // Use cache to avoid hitting DB on every request (e.g., check once per hour or session)
         // But for development/first run, we want it to run.
         // Let's cache the "checked" status for 60 minutes.
-        if (!Cache::has('system_version_checked')) {
+        if (!Cache::has($cacheKey)) {
             try {
                 // Check DB version
                 $option = Option::where('o_type', 'version')->first();
@@ -51,7 +49,7 @@ class CheckSystemVersion
                     ]);
                 }
                 
-                Cache::put('system_version_checked', true, 60 * 60); // Cache for 1 hour
+                Cache::put($cacheKey, true, 60 * 60); // Cache for 1 hour
 
             } catch (\Exception $e) {
                 // Ignore DB errors (e.g. during migration)
