@@ -10,6 +10,8 @@
 </div>
 <!-- /SECTION BANNER -->
 
+@include('theme::forum.partials.mobile_filters', ['categories_list' => $sidebarCategories])
+
 <div class="grid grid-3-6-3 mobile-prefer-content" >
     <div class="grid-column" >
         <div class="forum-sidebar-stack">

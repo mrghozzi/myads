@@ -796,3 +796,98 @@ html[dir="rtl"] .forum-rdx .post-comment-form .forum-rdx-comment-footer,
 html[dir="rtl"] .forum-rdx-comment-form-shell .forum-rdx-comment-footer {
   justify-content: flex-start;
 }
+
+/* Mobile Forum Navigation */
+.forum-mobile-nav-shell {
+  display: none;
+  margin-bottom: 24px;
+}
+
+@media screen and (max-width: 960px) {
+  .forum-mobile-nav-shell {
+    display: block;
+    margin-top: 24px;
+  }
+
+  .forum-mobile-filters-card {
+    padding: 0;
+  }
+
+  .forum-mobile-filters-card .widget-box-content {
+    padding: 16px;
+  }
+
+  .forum-mobile-nav-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .forum-mobile-add-btn {
+    width: 100%;
+    justify-content: center;
+    height: 46px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 0.875rem;
+    box-shadow: none;
+  }
+
+  .forum-mobile-category-dropdown {
+    position: relative;
+    width: 100%;
+  }
+
+  .forum-cat-select {
+    width: 100%;
+    height: 46px;
+    padding: 0 40px 0 16px;
+    border: 1px solid var(--rdx-border);
+    border-radius: 10px;
+    background-color: var(--rdx-surface-alt);
+    color: var(--rdx-text);
+    font-size: 0.875rem;
+    font-weight: 700;
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .forum-cat-select:focus {
+    border-color: var(--rdx-violet);
+    background-color: var(--rdx-surface);
+    outline: none;
+  }
+
+  .forum-mobile-category-dropdown .select-arrow {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: var(--rdx-text-muted);
+    font-size: 0.75rem;
+    transition: color 0.2s ease;
+  }
+
+  .forum-cat-select:focus + .select-arrow {
+    color: var(--rdx-violet);
+  }
+
+  /* RTL Support */
+  .rtl .forum-cat-select {
+    padding: 0 16px 0 40px;
+  }
+
+  .rtl .forum-mobile-category-dropdown .select-arrow {
+    right: auto;
+    left: 16px;
+  }
+}
+
+@media screen and (min-width: 681px) and (max-width: 960px) {
+  .forum-mobile-nav-actions {
+    flex-direction: row;
+  }
+}
