@@ -7,6 +7,8 @@
 * **Fix**: Updated installer and upgrade UI copy so fresh installs and upgrades now consistently display `v4.2.1`.
 * **Improvement**: Version-check caching is now scoped to the active version number, so patch upgrades do not wait on a stale cache key before syncing the database version.
 * **Tests**: Refreshed maintenance/update coverage to validate the new version baseline and update flow behavior.
+* **Fix**: Resolved missing sidebar icons for `Directory`, `Order Requests`, `News`, and `Advertising` on some `v4.2.1` sites after Git-based uploads where older asset caches or stale `svg-loader.js` files were still being served.
+* **Improvement**: Added theme-level fallback symbols and styling for the affected sidebar icons so they now render consistently in both Light and Dark modes even when public theme assets are not fully refreshed yet.
 
 # v4.2.0
 > **Feature Release** - Community feed overhaul, profile hub privacy, admin ACL, and platform integrations.
