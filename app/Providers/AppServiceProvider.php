@@ -102,11 +102,5 @@ class AppServiceProvider extends ServiceProvider
         View::composer('theme::layouts.master', function ($view) {
             $view->with('seo', app(SeoManager::class)->resolve(request()));
         });
-
-        try {
-            app(RobotsTxtService::class)->ensureDefaultFile();
-        } catch (\Throwable $e) {
-            // Ignore write failures on restricted hosts.
-        }
     }
 }

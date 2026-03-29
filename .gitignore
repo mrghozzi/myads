@@ -46,6 +46,7 @@ Thumbs.db
 !/tests/Unit/
 /tests/Feature/*
 !/tests/Unit/.gitkeep
+!/tests/Feature/SeoSystemTest.php
 !/tests/Feature/KnowledgebaseRouteCompatibilityTest.php
 !/tests/Feature/LegacyForumUpgradeRepairTest.php
 !/tests/Feature/LegacyAdsListDeleteActionsTest.php

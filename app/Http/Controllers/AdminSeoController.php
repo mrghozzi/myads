@@ -198,8 +198,6 @@ class AdminSeoController extends Controller
             'robots_extra' => $this->nullableString($validated['robots_extra'] ?? null),
         ])->save();
 
-        $this->robotsTxt->write($settings);
-
         return redirect()
             ->route('admin.seo.indexing')
             ->with('success', $this->message('seo_flash_indexing_updated', 'Indexing controls and robots.txt were updated successfully.'));

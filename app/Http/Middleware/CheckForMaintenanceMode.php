@@ -72,7 +72,10 @@ class CheckForMaintenanceMode
             'logout',
             'password.*',
             'social.*',
-            'captcha.generate'
+            'captcha.generate',
+            'robots.txt',
+            'sitemap.xml',
+            'sitemap.section'
         ) || $request->is('install', 'install/*');
     }
 }
