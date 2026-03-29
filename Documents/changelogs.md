@@ -10,6 +10,12 @@
 * **Fix**: Resolved missing sidebar icons for `Directory`, `Order Requests`, `News`, and `Advertising` on some `v4.2.1` sites after Git-based uploads where older asset caches or stale `svg-loader.js` files were still being served.
 * **Improvement**: Added theme-level fallback symbols and styling for the affected sidebar icons so they now render consistently in both Light and Dark modes even when public theme assets are not fully refreshed yet.
 
+### 🎨 UI & Responsive Fixes
+* **Improvement**: Overhauled the profile editing page (`/profile/edit`) with a modern "Superdesign" layout, featuring unified float-label inputs, rounded styling, and categorized sections.
+* **Improvement**: Refined the avatar and cover photo upload mechanics on the profile editor to display as native floating action buttons over the preview layout instead of generic separate boxes.
+* **Fix**: Resolved an alignment and styling issue mapping over `input[type="email"]` fields in the default theme that caused them to appear unstyled globally; they now use consistent `inputmode="email"` mapping to inherit the platform's standard input styling.
+* **Fix**: Fixed a visual bug in the password fields where placeholder text explicitly overlapped with floating active labels.
+
 # v4.2.0
 > **Feature Release** - Community feed overhaul, profile hub privacy, admin ACL, and platform integrations.
 
