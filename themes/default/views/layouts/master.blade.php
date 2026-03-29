@@ -611,7 +611,7 @@
         }
 
         document.addEventListener('DOMContentLoaded', function() {
-            const toggle = document.querySelector('.theme-toggle');
+            const toggles = document.querySelectorAll('.theme-toggle');
             const initialMode = window.__themeMode === 'css_d' ? 'css_d' : 'css';
             applyThemeLinks(initialMode);
             requestAnimationFrame(function() {
@@ -620,15 +620,33 @@
             setTimeout(function() {
                 applyThemeLinks(initialMode);
             }, 200);
-            if (toggle) {
+            
+            toggles.forEach(function(toggle) {
                 toggle.classList.toggle('is-dark', initialMode === 'css_d');
                 toggle.setAttribute('aria-pressed', initialMode === 'css_d' ? 'true' : 'false');
                 toggle.addEventListener('click', function(event) {
                     event.preventDefault();
-                    const nextMode = document.body.dataset.theme === 'css_d' ? 'css' : 'css_d';
+                    const currentMode = document.body.dataset.theme;
+                    const nextMode = currentMode === 'css_d' ? 'css' : 'css_d';
                     setThemeMode(nextMode);
+                    
+                    // Update all toggles to reflect the new state
+                    const isNextDark = nextMode === 'css_d';
+                    document.querySelectorAll('.theme-toggle').forEach(t => {
+                        t.classList.toggle('is-dark', isNextDark);
+                        t.setAttribute('aria-pressed', isNextDark ? 'true' : 'false');
+                        t.setAttribute('title', isNextDark ? 'Light Mode' : 'Dark Mode');
+                        
+                        // If it's the mobile sidebar, we might want to update the text labels too
+                        const label = t.parentElement ? t.parentElement.querySelector('span') : null;
+                        if (label && (label.textContent === 'Light Mode' || label.textContent === 'Dark Mode' || label.textContent === 'الوضع الفاتح' || label.textContent === 'الوضع الداكن')) {
+                            const lightText = '{{ __("messages.light_mode") }}';
+                            const darkText = '{{ __("messages.dark_mode") }}';
+                            label.textContent = isNextDark ? lightText : darkText;
+                        }
+                    });
                 });
-            }
+            });
         });
 
         window.addEventListener('storage', function(event) {
