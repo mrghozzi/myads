@@ -20,6 +20,12 @@ class ForumCategory extends Model
         'visibility',
     ];
 
+    public function setTxtAttribute($value): void
+    {
+        // Legacy schemas may keep f_cat.txt as NOT NULL, so normalize empty input.
+        $this->attributes['txt'] = $value === null ? '' : (string) $value;
+    }
+
     public function topics()
     {
         return $this->hasMany(ForumTopic::class, 'cat');

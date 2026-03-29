@@ -16,6 +16,50 @@ class LegacyForumUpgradeRepairTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_forum_category_description_can_be_left_empty_when_saved_from_admin(): void
+    {
+        Setting::create([
+            'titer' => 'MyAds',
+            'url' => 'https://example.test',
+            'styles' => 'default',
+            'lang' => 'en',
+            'timezone' => 'UTC',
+        ]);
+
+        $admin = User::factory()->create([
+            'id' => 1,
+            'username' => 'admin-user',
+            'email' => 'admin@example.com',
+        ]);
+
+        $this->actingAs($admin)->post('/admin/forum/categories', [
+            'name' => 'Optional Description',
+            'icons' => 'fa-comments',
+            'ordercat' => 1,
+            'visibility' => 0,
+            'txt' => '',
+        ])->assertRedirect();
+
+        $category = ForumCategory::query()->firstOrFail();
+
+        $this->assertSame('', $category->txt);
+
+        $this->actingAs($admin)->post('/admin/forum/categories/' . $category->id, [
+            'name' => 'Optional Description Updated',
+            'icons' => 'fa-comments',
+            'ordercat' => 2,
+            'visibility' => 1,
+            'txt' => '',
+        ])->assertRedirect();
+
+        $category->refresh();
+
+        $this->assertSame('', $category->txt);
+        $this->assertSame('Optional Description Updated', $category->name);
+        $this->assertSame(2, (int) $category->ordercat);
+        $this->assertSame(1, (int) $category->visibility);
+    }
+
     public function test_legacy_forum_schema_is_repaired_and_forum_pages_render(): void
     {
         $this->replaceForumSchemaWithLegacyStructures();
