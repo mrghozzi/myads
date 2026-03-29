@@ -58,10 +58,18 @@
                 {{ __('messages.order_requests') }}
             </a>
         </li>
+        <li class="menu-item {{ Request::is('store*', 'kb*', 'download*') ? 'active' : '' }}">
+            <a class="menu-item-link text-tooltip-tfr" href="{{ url('/store') }}">
+                <svg class="menu-item-link-icon icon-marketplace">
+                    <use xlink:href="#svg-marketplace"></use>
+                </svg>
+                {{ __('messages.store') }}
+            </a>
+        </li>
         <li class="menu-item {{ Request::is('news*') ? 'active' : '' }}">
             <a class="menu-item-link text-tooltip-tfr" href="{{ url('/news') }}">
-                <svg class="menu-item-link-icon icon-newsfeed">
-                    <use xlink:href="#svg-newsfeed"></use>
+                <svg class="menu-item-link-icon icon-blog-posts">
+                    <use xlink:href="#svg-blog-posts"></use>
                 </svg>
                 {{ __('messages.news') }}
             </a>
@@ -84,14 +92,7 @@
             </a>
         </li>
         @endauth
-        <li class="menu-item {{ Request::is('store*', 'kb*', 'download*') ? 'active' : '' }}">
-            <a class="menu-item-link text-tooltip-tfr" href="{{ url('/store') }}">
-                <svg class="menu-item-link-icon icon-marketplace">
-                    <use xlink:href="#svg-marketplace"></use>
-                </svg>
-                {{ __('messages.store') }}
-            </a>
-        </li>
+
     </ul>
     <ul class="menu">
         @foreach($site_menus as $menu)

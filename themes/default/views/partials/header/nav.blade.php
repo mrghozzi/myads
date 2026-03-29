@@ -44,6 +44,20 @@
                     </svg>
                 </a>
             </li>
+            <li class="menu-item {{ Request::is('quests*') ? 'active' : '' }}">
+                <a class="menu-item-link text-tooltip-tfr" href="{{ url('/quests') }}" data-title="{{ __('messages.quests') }}">
+                    <svg class="menu-item-link-icon icon-quests">
+                        <use xlink:href="#svg-quests"></use>
+                    </svg>
+                </a>
+            </li>
+            <li class="menu-item {{ Request::is('badges*') ? 'active' : '' }}">
+                <a class="menu-item-link text-tooltip-tfr" href="{{ route('badges.all') }}" data-title="{{ __('messages.badges') }}">
+                    <svg class="menu-item-link-icon icon-badges">
+                        <use xlink:href="#svg-badges"></use>
+                    </svg>
+                </a>
+            </li>
         @endauth
         <li class="menu-item {{ Request::is('forum*', 'f*', 't*', 'post*', 'editor*') ? 'active' : '' }}">
             <a class="menu-item-link text-tooltip-tfr" href="{{ url('/forum') }}" data-title="{{ __('messages.forum') }}">
@@ -73,5 +87,29 @@
                 </svg>
             </a>
         </li>
+        <li class="menu-item {{ Request::is('news*') ? 'active' : '' }}">
+            <a class="menu-item-link text-tooltip-tfr" href="{{ url('/news') }}" data-title="{{ __('messages.news') }}">
+                <svg class="menu-item-link-icon icon-blog-posts">
+                    <use xlink:href="#svg-blog-posts"></use>
+                </svg>
+            </a>
+        </li>
+        @auth
+            <li class="menu-item {{ Request::is('ads*', 'promote*') ? 'active' : '' }}">
+                <a class="menu-item-link text-tooltip-tfr" href="{{ route('ads.index') }}" data-title="{{ __('messages.advertising') }}">
+                    <svg class="menu-item-link-icon icon-revenue">
+                        <use xlink:href="#svg-revenue"></use>
+                    </svg>
+                </a>
+            </li>
+            <li class="menu-item {{ Request::is('visits*') ? 'active' : '' }}">
+                <a class="menu-item-link text-tooltip-tfr" href="{{ route('visits.index') }}" data-title="{{ __('messages.exvisit') }}">
+                    <svg class="menu-item-link-icon icon-timeline">
+                        <use xlink:href="#svg-timeline"></use>
+                    </svg>
+                </a>
+            </li>
+        @endauth
+
     </ul>
 </nav>
