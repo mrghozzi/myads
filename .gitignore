@@ -50,6 +50,7 @@ Thumbs.db
 !/tests/Feature/LegacyForumUpgradeRepairTest.php
 !/tests/Feature/LegacyAdsListDeleteActionsTest.php
 !/tests/Feature/LocaleDirectionRenderingTest.php
+!/tests/Feature/ComposerRenderingTest.php
 !/tests/Feature/SiteAdPlacementTest.php
 !/tests/Feature/UpdateSafetyFeatureTest.php
 ~/.pi/
