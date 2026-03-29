@@ -1524,7 +1524,8 @@ textarea::placeholder {
 .icon-earnings,
 .icon-wallet,
 .icon-item,
-.icon-revenue {
+.icon-revenue,
+.icon-megaphone {
   fill: #616a82;
   width: 20px;
   height: 20px;

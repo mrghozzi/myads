@@ -1358,7 +1358,8 @@ textarea::placeholder {
 .icon-earnings,
 .icon-wallet,
 .icon-item,
-.icon-revenue {
+.icon-revenue,
+.icon-megaphone {
   fill: #adafca;
   width: 20px;
   height: 20px;

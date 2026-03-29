@@ -77,18 +77,10 @@
         @auth
         <li class="menu-item {{ Request::is('ads*', 'promote*') ? 'active' : '' }}">
             <a class="menu-item-link text-tooltip-tfr" href="{{ route('ads.index') }}">
-                <svg class="menu-item-link-icon icon-revenue">
-                    <use xlink:href="#svg-revenue"></use>
+                <svg class="menu-item-link-icon icon-megaphone">
+                    <use xlink:href="#svg-megaphone"></use>
                 </svg>
                 {{ __('messages.advertising') }}
-            </a>
-        </li>
-        <li class="menu-item {{ Request::is('visits*') ? 'active' : '' }}">
-            <a class="menu-item-link text-tooltip-tfr" href="{{ route('visits.index') }}">
-                <svg class="menu-item-link-icon icon-timeline">
-                    <use xlink:href="#svg-timeline"></use>
-                </svg>
-                {{ __('messages.exvisit') }}
             </a>
         </li>
         @endauth

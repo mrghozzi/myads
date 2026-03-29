@@ -726,6 +726,14 @@ const svgWrap = document.createElement('div'),
   </svg>
   <!-- /SVG EARNINGS -->
 
+  <!-- SVG MEGAPHONE -->
+  <svg style="display: none;">
+    <symbol id="svg-megaphone" viewBox="0 0 20 20" preserveAspectRatio="xMinYMin meet">
+      <path d="M18,0c-0.553,0-1,0.448-1,1v1.07C14.833,3.196,11.636,4,8,4H4C1.791,4,0,5.791,0,8c0,1.862,1.278,3.413,3,3.858V16c0,2.209,1.791,4,4,4h1c1.654,0,3-1.346,3-3v-1.101c0.659-0.025,1.33-0.067,2-0.127V17c0,0.553,0.447,1,1,1h1c0.553,0,1-0.447,1-1v-2.07c0.693-0.135,1.361-0.297,2-0.487V16c0,0.553,0.447,1,1,1s1-0.447,1-1V1C20,0.448,19.553,0,18,0zM9,17c0,0.551-0.449,1-1,1H7c-1.103,0-2-0.897-2-2v-3.816C5.322,12.061,5.657,12,6,12h2h1V17zM17,12.484c-2.369,0.989-5.49,1.516-9,1.516H6c-1.103,0-2-0.897-2-2s0.897-2,2-2h2c3.51,0,6.631-0.527,9-1.516V12.484z"/>
+    </symbol>
+  </svg>
+  <!-- /SVG MEGAPHONE -->
+
   <!-- SVG REVENUE -->
   <svg style="display: none;">
     <symbol id="svg-revenue" viewBox="0 0 20 20" preserveAspectRatio="xMinYMin meet">

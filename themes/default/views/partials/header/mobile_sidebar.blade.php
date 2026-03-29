@@ -44,8 +44,7 @@
         <li class="menu-item {{ Request::is('store*', 'kb*', 'download*') ? 'active' : '' }}"><a class="menu-item-link text-tooltip-tfr" href="{{ url('/store') }}"><svg class="menu-item-link-icon icon-marketplace"><use xlink:href="#svg-marketplace"></use></svg>{{ __('messages.store') }}</a></li>
         <li class="menu-item {{ Request::is('news*') ? 'active' : '' }}"><a class="menu-item-link text-tooltip-tfr" href="{{ url('/news') }}"><svg class="menu-item-link-icon icon-blog-posts"><use xlink:href="#svg-blog-posts"></use></svg>{{ __('messages.news') }}</a></li>
         @auth
-        <li class="menu-item {{ Request::is('ads*', 'promote*') ? 'active' : '' }}"><a class="menu-item-link text-tooltip-tfr" href="{{ route('ads.index') }}"><svg class="menu-item-link-icon icon-revenue"><use xlink:href="#svg-revenue"></use></svg>{{ __('messages.advertising') }}</a></li>
-        <li class="menu-item {{ Request::is('visits*') ? 'active' : '' }}"><a class="menu-item-link text-tooltip-tfr" href="{{ route('visits.index') }}"><svg class="menu-item-link-icon icon-timeline"><use xlink:href="#svg-timeline"></use></svg>{{ __('messages.exvisit') }}</a></li>
+        <li class="menu-item {{ Request::is('ads*', 'promote*') ? 'active' : '' }}"><a class="menu-item-link text-tooltip-tfr" href="{{ route('ads.index') }}"><svg class="menu-item-link-icon icon-megaphone"><use xlink:href="#svg-megaphone"></use></svg>{{ __('messages.advertising') }}</a></li>
         @endauth
 
     </ul>
