@@ -44,16 +44,16 @@
         </li>
         <li class="menu-item {{ Request::is('directory*', 'dr*', 'cat*', 'add-site*') ? 'active' : '' }}">
             <a class="menu-item-link text-tooltip-tfr" href="{{ url('/directory') }}">
-                <svg class="menu-item-link-icon icon-list-grid-view">
-                    <use xlink:href="#svg-list-grid-view"></use>
+                <svg class="menu-item-link-icon icon-directory">
+                    <use xlink:href="#svg-directory"></use>
                 </svg>
                 {{ __('messages.directory') }}
             </a>
         </li>
         <li class="menu-item {{ Request::is('orders*') ? 'active' : '' }}">
             <a class="menu-item-link text-tooltip-tfr" href="{{ url('/orders') }}">
-                <svg class="menu-item-link-icon icon-status">
-                    <use xlink:href="#svg-status"></use>
+                <svg class="menu-item-link-icon icon-orders">
+                    <use xlink:href="#svg-orders"></use>
                 </svg>
                 {{ __('messages.order_requests') }}
             </a>
@@ -68,8 +68,8 @@
         </li>
         <li class="menu-item {{ Request::is('news*') ? 'active' : '' }}">
             <a class="menu-item-link text-tooltip-tfr" href="{{ url('/news') }}">
-                <svg class="menu-item-link-icon icon-blog-posts">
-                    <use xlink:href="#svg-blog-posts"></use>
+                <svg class="menu-item-link-icon icon-news">
+                    <use xlink:href="#svg-news"></use>
                 </svg>
                 {{ __('messages.news') }}
             </a>
