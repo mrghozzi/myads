@@ -242,7 +242,7 @@
                                             <div class="user-status-avatar">
                                                 <div class="user-avatar small no-outline">
                                                     <div class="user-avatar-content">
-                                                        <div class="hexagon-image-30-32" data-src="{{ asset('upload/_avatar.png') }}"></div>
+                                                        <div class="hexagon-image-30-32" data-src="{{ theme_asset('img/notif.png') }}"></div>
                                                     </div>
                                                     <div class="user-avatar-progress-border">
                                                         <div class="hexagon-border-40-44"></div>
