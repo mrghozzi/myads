@@ -359,21 +359,68 @@
                     </svg>
                 </div>
                 <div class="dropdown-navigation header-settings-dropdown">
-                    <p class="dropdown-navigation-category">{{ __('messages.account') }}</p>
-                    <a class="dropdown-navigation-link" href="{{ route('profile.short', auth()->user()->publicRouteIdentifier()) }}">{{ __('messages.member_profile') }}</a>
-                    <a class="dropdown-navigation-link" href="{{ route('profile.edit') }}">{{ __('messages.edit_profile') }}</a>
-                    <a class="dropdown-navigation-link" href="{{ route('settings') }}">{{ __('messages.account_settings') }}</a>
-                    
-                    <p class="dropdown-navigation-category">{{ __('messages.ads') }}</p>
-                    <a class="dropdown-navigation-link" href="{{ route('ads.banners.index') }}">{{ __('messages.list') }} {{ __('messages.bannads') }}</a>
-                    <a class="dropdown-navigation-link" href="{{ route('ads.links.index') }}">{{ __('messages.list') }} {{ __('messages.textads') }}</a>
-                    <a class="dropdown-navigation-link" href="{{ route('visits.index') }}">{{ __('messages.list') }} {{ __('messages.exvisit') }}</a>
-                    <a class="dropdown-navigation-link" href="{{ route('ads.referrals') }}">{{ __('messages.list') }} {{ __('messages.referal') }}</a>
+                    <!-- User Summary -->
+                    <div class="dropdown-navigation-user-summary" style="padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); margin-bottom: 10px; display: flex; align-items: center; gap: 12px;">
+                        <div class="user-avatar small no-outline">
+                            <div class="user-avatar-content">
+                                <div class="hexagon-image-30-32" data-src="{{ auth()->user()->avatarUrl() }}"></div>
+                            </div>
+                        </div>
+                        <div class="user-info">
+                            <p class="user-name" style="font-size: 0.875rem; font-weight: 700; color: #fff; margin-bottom: 2px;">{{ auth()->user()->username }}</p>
+                            <p class="user-pts" style="font-size: 0.75rem; font-weight: 600; color: #4ff461; display: flex; align-items: center; gap: 4px;">
+                                <i class="fa-solid fa-coins"></i> {{ auth()->user()->pts }} PTS
+                            </p>
+                        </div>
+                    </div>
 
-                    <form action="{{ route('logout') }}" method="POST">
-                        @csrf
-                        <button type="submit" class="dropdown-navigation-button button small secondary" style="width: 100%; border: none; cursor: pointer;">{{ __('messages.logout') }}</button>
-                    </form>
+                    <p class="dropdown-navigation-category">{{ __('messages.account_summary') }}</p>
+                    <a class="dropdown-navigation-link" href="{{ route('profile.show', auth()->user()->username) }}">
+                        <i class="fa-solid fa-user dropdown-navigation-link-icon" style="width: 20px;"></i> {{ __('messages.member_profile') }}
+                    </a>
+                    <a class="dropdown-navigation-link" href="{{ route('profile.edit') }}">
+                        <i class="fa-solid fa-user-pen dropdown-navigation-link-icon" style="width: 20px;"></i> {{ __('messages.edit_profile') }}
+                    </a>
+                    <a class="dropdown-navigation-link" href="{{ route('profile.history') }}">
+                        <i class="fa-solid fa-calculator dropdown-navigation-link-icon" style="width: 20px;"></i> {{ __('messages.points_history') }}
+                    </a>
+                    
+                    <p class="dropdown-navigation-category">{{ __('messages.market_categories') }}</p>
+                    <a class="dropdown-navigation-link" href="{{ route('store.index') }}">
+                        <i class="fa-solid fa-shop dropdown-navigation-link-icon" style="width: 20px;"></i> {{ __('messages.store') }}
+                    </a>
+                    <a class="dropdown-navigation-link" href="{{ route('orders.index') }}">
+                        <i class="fa-solid fa-cart-shopping dropdown-navigation-link-icon" style="width: 20px;"></i> {{ __('messages.my_orders') }}
+                    </a>
+
+                    <p class="dropdown-navigation-category">{{ __('messages.advertising') }}</p>
+                    <a class="dropdown-navigation-link" href="{{ route('ads.banners.index') }}">
+                        <i class="fa-solid fa-image dropdown-navigation-link-icon" style="width: 20px;"></i> {{ __('messages.bannads') }}
+                    </a>
+                    <a class="dropdown-navigation-link" href="{{ route('ads.links.index') }}">
+                        <i class="fa-solid fa-link dropdown-navigation-link-icon" style="width: 20px;"></i> {{ __('messages.textads') }}
+                    </a>
+                    <a class="dropdown-navigation-link" href="{{ route('ads.smart.index') }}">
+                        <i class="fa-solid fa-wand-magic-sparkles dropdown-navigation-link-icon" style="width: 20px;"></i> {{ __('messages.smart_ads') }}
+                    </a>
+                    <a class="dropdown-navigation-link" href="{{ route('visits.index') }}">
+                        <i class="fa-solid fa-eye dropdown-navigation-link-icon" style="width: 20px;"></i> {{ __('messages.exvisit') }}
+                    </a>
+                    <a class="dropdown-navigation-link" href="{{ route('ads.posts.index') }}">
+                        <i class="fa-solid fa-bullhorn dropdown-navigation-link-icon" style="width: 20px;"></i> {{ __('messages.promoted_posts') }}
+                    </a>
+                    <a class="dropdown-navigation-link" href="{{ route('ads.referrals') }}">
+                        <i class="fa-solid fa-users dropdown-navigation-link-icon" style="width: 20px;"></i> {{ __('messages.referal') }}
+                    </a>
+
+                    <div style="padding: 10px; margin-top: 10px; border-top: 1px solid rgba(255,255,255,0.05);">
+                        <form action="{{ route('logout') }}" method="POST">
+                            @csrf
+                            <button type="submit" class="dropdown-navigation-button button small secondary" style="width: 100%; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                                <i class="fa-solid fa-power-off"></i> {{ __('messages.logout') }}
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
