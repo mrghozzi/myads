@@ -35,7 +35,7 @@
                     <div class="row">
                         <div class="col-12">
                             <div class="form-item">
-                                <div class="form-input small">
+                                <div class="form-input small active">
                                     <label for="order-title">{{ __('messages.title') }}</label>
                                     <input type="text" id="order-title" name="title" value="{{ old('title') }}" required>
                                 </div>
@@ -46,7 +46,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-item">
-                                <div class="form-input small">
+                                <div class="form-input small active">
                                     <label for="order-category">{{ __('messages.category') }}</label>
                                     <input type="text" id="order-category" name="category" placeholder="e.g. Programming, SEO, Design" value="{{ old('category') }}">
                                 </div>
@@ -54,7 +54,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-item">
-                                <div class="form-input small">
+                                <div class="form-input small active">
                                     <label for="order-budget">{{ __('messages.budget') }}</label>
                                     <input type="text" id="order-budget" name="budget" placeholder="e.g. $50 or 1000 PTS" value="{{ old('budget') }}">
                                 </div>
@@ -65,7 +65,7 @@
                     <div class="row">
                         <div class="col-12">
                             <div class="form-item">
-                                <div class="form-input small">
+                                <div class="form-input small active">
                                     <label for="order-description">{{ __('messages.description') }}</label>
                                     <textarea id="order-description" name="description" style="height: 200px;" required>{{ old('description') }}</textarea>
                                 </div>

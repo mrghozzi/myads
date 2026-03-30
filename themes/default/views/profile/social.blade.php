@@ -35,14 +35,14 @@
 
                     <div class="form-row split">
                         <div class="form-item">
-                            <div class="form-input small {{ isset($links['facebook']) ? 'active' : '' }}">
+                            <div class="form-input small active">
                                 <label for="facebook">{{ __('messages.facebook') ?? 'Facebook' }}</label>
                                 <input type="text" id="facebook" name="facebook" value="{{ old('facebook', $links['facebook'] ?? '') }}" placeholder="@username" style="border-radius: 12px; padding-left: 45px;">
                                 <i class="fab fa-facebook-f" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #1877f2; font-size: 18px;"></i>
                             </div>
                         </div>
                         <div class="form-item">
-                            <div class="form-input small {{ isset($links['twitter']) ? 'active' : '' }}">
+                            <div class="form-input small active">
                                 <label for="twitter">{{ __('messages.twitter') ?? 'Twitter (X)' }}</label>
                                 <input type="text" id="twitter" name="twitter" value="{{ old('twitter', $links['twitter'] ?? '') }}" placeholder="@username" style="border-radius: 12px; padding-left: 45px;">
                                 <i class="fab fa-x-twitter" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #000; font-size: 18px;"></i>
@@ -52,14 +52,14 @@
 
                     <div class="form-row split" style="margin-top: 24px;">
                         <div class="form-item">
-                            <div class="form-input small {{ isset($links['vkontakte']) ? 'active' : '' }}">
+                            <div class="form-input small active">
                                 <label for="vkontakte">{{ __('messages.vkontakte') ?? 'Vkontakte' }}</label>
                                 <input type="text" id="vkontakte" name="vkontakte" value="{{ old('vkontakte', $links['vkontakte'] ?? '') }}" placeholder="id123 or username" style="border-radius: 12px; padding-left: 45px;">
                                 <i class="fab fa-vk" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #0077ff; font-size: 18px;"></i>
                             </div>
                         </div>
                         <div class="form-item">
-                            <div class="form-input small {{ isset($links['linkedin']) ? 'active' : '' }}">
+                            <div class="form-input small active">
                                 <label for="linkedin">{{ __('messages.linkedin') ?? 'LinkedIn' }}</label>
                                 <input type="text" id="linkedin" name="linkedin" value="{{ old('linkedin', $links['linkedin'] ?? '') }}" placeholder="username" style="border-radius: 12px; padding-left: 45px;">
                                 <i class="fab fa-linkedin-in" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #0077b5; font-size: 18px;"></i>
@@ -69,14 +69,14 @@
 
                     <div class="form-row split" style="margin-top: 24px;">
                         <div class="form-item">
-                            <div class="form-input small {{ isset($links['instagram']) ? 'active' : '' }}">
+                            <div class="form-input small active">
                                 <label for="instagram">{{ __('messages.instagram') ?? 'Instagram' }}</label>
                                 <input type="text" id="instagram" name="instagram" value="{{ old('instagram', $links['instagram'] ?? '') }}" placeholder="@username" style="border-radius: 12px; padding-left: 45px;">
                                 <i class="fab fa-instagram" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #e4405f; font-size: 18px;"></i>
                             </div>
                         </div>
                         <div class="form-item">
-                            <div class="form-input small {{ isset($links['youtube']) ? 'active' : '' }}">
+                            <div class="form-input small active">
                                 <label for="youtube">{{ __('messages.youtube') ?? 'YouTube' }}</label>
                                 <input type="text" id="youtube" name="youtube" value="{{ old('youtube', $links['youtube'] ?? '') }}" placeholder="@channel" style="border-radius: 12px; padding-left: 45px;">
                                 <i class="fab fa-youtube" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #ff0000; font-size: 18px;"></i>
@@ -86,14 +86,14 @@
 
                     <div class="form-row split" style="margin-top: 24px;">
                         <div class="form-item">
-                            <div class="form-input small {{ isset($links['threads']) ? 'active' : '' }}">
+                            <div class="form-input small active">
                                 <label for="threads">{{ __('messages.threads') ?? 'Threads' }}</label>
                                 <input type="text" id="threads" name="threads" value="{{ old('threads', $links['threads'] ?? '') }}" placeholder="@username" style="border-radius: 12px; padding-left: 45px;">
                                 <i class="fab fa-threads" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #000; font-size: 18px;"></i>
                             </div>
                         </div>
                         <div class="form-item">
-                            <div class="form-input small {{ isset($links['reddit']) ? 'active' : '' }}">
+                            <div class="form-input small active">
                                 <label for="reddit">{{ __('messages.reddit') ?? 'Reddit' }}</label>
                                 <input type="text" id="reddit" name="reddit" value="{{ old('reddit', $links['reddit'] ?? '') }}" placeholder="username" style="border-radius: 12px; padding-left: 45px;">
                                 <i class="fab fa-reddit-alien" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #ff4500; font-size: 18px;"></i>
@@ -103,14 +103,14 @@
 
                     <div class="form-row split" style="margin-top: 24px;">
                         <div class="form-item">
-                            <div class="form-input small {{ isset($links['github']) ? 'active' : '' }}">
+                            <div class="form-input small active">
                                 <label for="github">{{ __('messages.github') ?? 'GitHub' }}</label>
                                 <input type="text" id="github" name="github" value="{{ old('github', $links['github'] ?? '') }}" placeholder="username" style="border-radius: 12px; padding-left: 45px;">
                                 <i class="fab fa-github" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #333; font-size: 18px;"></i>
                             </div>
                         </div>
                         <div class="form-item">
-                            <div class="form-input small {{ isset($links['adstn']) ? 'active' : '' }}">
+                            <div class="form-input small active">
                                 <label for="adstn">{{ __('messages.adstn') ?? 'ADStn' }}</label>
                                 <input type="text" id="adstn" name="adstn" value="{{ old('adstn', $links['adstn'] ?? '') }}" placeholder="username" style="border-radius: 12px; padding-left: 45px;">
                                 <i class="fa-brands fa-buysellads" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: rgb(84, 56, 163); font-size: 18px;"></i>

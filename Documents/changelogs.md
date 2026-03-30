@@ -10,6 +10,7 @@
 * **i18n**: Fully localized platform names and social settings labels across all **9 supported languages**.
 
 ### 🎨 UI & UX Modernization
+* **Improvement**: Standardized the **Floating Label** behavior across the **Social Links** settings (`/settings/social`), **Registration** (Verification Code), and **Order Request** creation pages (`/orders/create`) by enforcing the `active` class on themed form inputs for a more consistent and polished UI.
 * **Improvement**: Overhauled the **Forum Categories** admin interface (`/admin/forum/categories`) with a "Superdesign" aesthetic, featuring glassmorphic headers, modern card layouts, and refined CRUD modals.
 * **Improvement**: Modernized the **Directory Categories** admin interface (`/admin/directory/categories`) with a matching glassmorphic design, hierarchical visual cues, and improved table layouts.
 * **Improvement**: Redesigned the **Plugins** admin page (`/admin/plugins`) into a modern extension hub with a hero header, live stats, responsive management cards, reusable changelog/delete modals, and lazy-loaded previews while preserving the existing activation, upload, update, and delete workflows.

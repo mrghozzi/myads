@@ -86,7 +86,7 @@
             <!-- Captcha -->
             <div class="form-row">
                 <div class="form-item">
-                    <div class="form-input">
+                    <div class="form-input active">
                         <label for="capt">{{ __('messages.verification_code') }}</label>
                         <div style="display: flex; gap: 10px; align-items: center;">
                             <img src="{{ route('captcha.generate') }}" id="captcha-img" style="cursor: pointer; border-radius: 4px;" title="Click to refresh" onclick="document.getElementById('captcha-img').src='{{ route('captcha.generate') }}?'+Math.random()">
