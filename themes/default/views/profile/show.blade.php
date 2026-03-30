@@ -217,6 +217,56 @@
             </div>
         @endif
 
+        @if(!empty($socialLinks))
+            <div class="widget-box" style="margin-top: 16px;">
+                <p class="widget-box-title">{{ __('messages.social_links') }}</p>
+                <div class="widget-box-content">
+                    <div style="display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; padding: 10px 0;">
+                        @foreach($socialLinks as $platform => $url)
+                            <a href="{{ $url }}" target="_blank" rel="noopener noreferrer" class="social-link-icon-box" title="{{ __('messages.' . $platform) ?? ucfirst($platform) }}" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border-radius: 12px; font-size: 20px; transition: all 0.3s ease; background: var(--section-banner-bg, #f0f2f5); color: var(--text-color, #333); border: 1px solid var(--border-color, #eee);">
+                                @php
+                                    $iconClass = match($platform) {
+                                        'facebook' => 'fab fa-facebook-f',
+                                        'twitter' => 'fab fa-x-twitter',
+                                        'vkontakte' => 'fab fa-vk',
+                                        'linkedin' => 'fab fa-linkedin-in',
+                                        'instagram' => 'fab fa-instagram',
+                                        'youtube' => 'fab fa-youtube',
+                                        'threads' => 'fab fa-threads',
+                                        'reddit' => 'fab fa-reddit-alien',
+                                        'github' => 'fab fa-github',
+                                        'adstn' => 'fa-brands fa-buysellads',
+                                        default => 'fa fa-link',
+                                    };
+                                    $iconColor = match($platform) {
+                                        'facebook' => '#1877f2',
+                                        'twitter' => '#000000',
+                                        'vkontakte' => '#0077ff',
+                                        'linkedin' => '#0077b5',
+                                        'instagram' => '#e4405f',
+                                        'youtube' => '#ff0000',
+                                        'threads' => '#000000',
+                                        'reddit' => '#ff4500',
+                                        'github' => '#333333',
+                                        'adstn' => 'rgb(84, 56, 163)',
+                                        default => 'var(--primary-color)',
+                                    };
+                                @endphp
+                                <i class="{{ $iconClass }}" style="color: {{ $iconColor }};"></i>
+                            </a>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+            <style>
+                .social-link-icon-box:hover {
+                    transform: translateY(-4px);
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+                    border-color: var(--primary-color) !important;
+                }
+            </style>
+        @endif
+
         <x-widget-column side="profile_left" />
     </div>
 

@@ -140,6 +140,9 @@ class ProfileController extends Controller
             ],
         ]);
 
+        $socialOption = Option::where('o_type', 'user_social_links')->where('o_parent', $user->id)->first();
+        $socialLinks = $socialOption ? json_decode($socialOption->o_valuer, true) : [];
+
         if ($request->ajax() || $request->wantsJson()) {
             return response()->json([
                 'html' => view('theme::partials.ajax.activities', compact('activities'))->render(),
@@ -158,6 +161,7 @@ class ProfileController extends Controller
             'selectedTab',
             'photoItems',
             'badgeShowcase',
+            'socialLinks',
             'canViewAbout',
             'canViewPhotos',
             'canViewProfileContent',
@@ -481,6 +485,120 @@ class ProfileController extends Controller
         });
 
         return view('theme::profile.all_badges', compact('user', 'badges', 'featureAvailable', 'upgradeNotice'));
+    }
+
+    public function social()
+    {
+        $user = Auth::user();
+        $option = Option::where('o_type', 'user_social_links')->where('o_parent', $user->id)->first();
+        $links = $option ? json_decode($option->o_valuer, true) : [];
+        
+        return view('theme::profile.social', compact('user', 'links'));
+    }
+
+    public function updateSocial(Request $request)
+    {
+        $user = Auth::user();
+        $platforms = ['facebook', 'twitter', 'vkontakte', 'linkedin', 'instagram', 'youtube', 'threads', 'reddit', 'github', 'adstn'];
+        $links = [];
+
+        foreach ($platforms as $platform) {
+            $value = trim((string) $request->input($platform));
+            if ($value !== '') {
+                $normalized = $this->normalizeSocialLink($platform, $value);
+                if (!$normalized) {
+                    return back()->with('error', __('messages.invalid_social_link', ['platform' => __('messages.' . $platform)]))->withInput();
+                }
+                $links[$platform] = $normalized;
+            }
+        }
+
+        Option::updateOrCreate(
+            ['o_type' => 'user_social_links', 'o_parent' => $user->id],
+            ['o_valuer' => json_encode($links), 'name' => $user->username, 'o_order' => $user->id]
+        );
+
+        return redirect()->route('profile.social')->with('success', __('messages.social_links_updated'));
+    }
+
+    private function normalizeSocialLink(string $platform, string $value): ?string
+    {
+        // Remove @ if handle
+        $handle = ltrim($value, '@');
+        
+        // Patterns and base URLs
+        $config = [
+            'facebook' => [
+                'base' => 'https://www.facebook.com/',
+                'pattern' => '/(?:facebook\.com|fb\.com)\/(?:profile\.php\?id=)?([a-zA-Z0-9\.]+)/i'
+            ],
+            'twitter' => [
+                'base' => 'https://x.com/',
+                'pattern' => '/(?:twitter\.com|x\.com)\/([a-zA-Z0-9_]+)/i'
+            ],
+            'vkontakte' => [
+                'base' => 'https://vk.com/',
+                'pattern' => '/vk\.com\/([a-zA-Z0-9_\.]+)/i'
+            ],
+            'linkedin' => [
+                'base' => 'https://www.linkedin.com/in/',
+                'pattern' => '/linkedin\.com\/(?:in|company)\/([a-zA-Z0-9\-\_]+)/i'
+            ],
+            'instagram' => [
+                'base' => 'https://www.instagram.com/',
+                'pattern' => '/instagram\.com\/([a-zA-Z0-9_\.]+)/i'
+            ],
+            'youtube' => [
+                'base' => 'https://www.youtube.com/',
+                'pattern' => '/youtube\.com\/(?:@|c\/|user\/|channel\/)?([a-zA-Z0-9\-\_]+)/i'
+            ],
+            'threads' => [
+                'base' => 'https://www.threads.net/@',
+                'pattern' => '/threads\.net\/@?([a-zA-Z0-9_\.]+)/i'
+            ],
+            'reddit' => [
+                'base' => 'https://www.reddit.com/user/',
+                'pattern' => '/reddit\.com\/user\/([a-zA-Z0-9_\-]+)/i'
+            ],
+            'github' => [
+                'base' => 'https://github.com/',
+                'pattern' => '/github\.com\/([a-zA-Z0-9_\-]+)/i'
+            ],
+            'adstn' => [
+                'base' => 'https://www.adstn.ovh/u/',
+                'pattern' => '/adstn\.ovh\/u\/([a-zA-Z0-9_\-]+)/i'
+            ],
+        ];
+
+        if (!isset($config[$platform])) {
+            return null;
+        }
+
+        // If it's a URL, extract the handle/id and rebuild
+        if (filter_var($value, FILTER_VALIDATE_URL)) {
+            if (preg_match($config[$platform]['pattern'], $value, $matches)) {
+                $id = $matches[1];
+                // Special case for YouTube @
+                if ($platform === 'youtube' && !str_contains($value, 'channel/')) {
+                    return 'https://www.youtube.com/@' . ltrim($id, '@');
+                }
+                return $config[$platform]['base'] . $id;
+            }
+            return null; // URL didn't match the platform
+        }
+
+        // It's just a handle
+        if (preg_match('/^[a-zA-Z0-9\._\-]+$/', $handle)) {
+            if ($platform === 'youtube') {
+                return 'https://www.youtube.com/@' . $handle;
+            }
+            if ($platform === 'threads' && !str_starts_with($handle, '@')) {
+                return $config[$platform]['base'] . $handle;
+            }
+            return $config[$platform]['base'] . $handle;
+        }
+
+        return null;
     }
 
     public function update(Request $request)
