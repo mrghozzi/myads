@@ -2469,13 +2469,13 @@ class AdminController extends Controller
         try {
             if ($pluginManager->activate($request->slug)) {
                 $this->maintenanceMode->disable(Auth::user(), 'plugin_activation_success');
-                return redirect()->back()->with('success', __('Plugin activated successfully'));
+                return redirect()->back()->with('success', __('messages.plugin_activated_successfully'));
             }
             $this->maintenanceMode->disable(Auth::user(), 'plugin_activation_failed');
-            return redirect()->back()->with('error', __('Failed to activate plugin'));
+            return redirect()->back()->with('error', __('messages.plugin_activation_failed'));
         } catch (\Throwable $e) {
             $this->maintenanceMode->disable(Auth::user(), 'plugin_activation_error');
-            return redirect()->back()->with('error', __('Error: ') . $e->getMessage());
+            return redirect()->back()->with('error', __('messages.error_prefix') . $e->getMessage());
         }
     }
 
@@ -2487,25 +2487,27 @@ class AdminController extends Controller
         try {
             if ($pluginManager->deactivate($request->slug)) {
                 $this->maintenanceMode->disable(Auth::user(), 'plugin_deactivation_success');
-                return redirect()->back()->with('success', __('Plugin deactivated successfully'));
+                return redirect()->back()->with('success', __('messages.plugin_deactivated_successfully'));
             }
             $this->maintenanceMode->disable(Auth::user(), 'plugin_deactivation_failed');
-            return redirect()->back()->with('error', __('Failed to deactivate plugin'));
+            return redirect()->back()->with('error', __('messages.plugin_deactivation_failed'));
         } catch (\Throwable $e) {
             $this->maintenanceMode->disable(Auth::user(), 'plugin_deactivation_error');
-            return redirect()->back()->with('error', __('Error: ') . $e->getMessage());
+            return redirect()->back()->with('error', __('messages.error_prefix') . $e->getMessage());
         }
     }
 
     public function deletePlugin(Request $request, PluginManager $pluginManager)
     {
         $request->validate(['slug' => 'required|string']);
-        
-        if ($pluginManager->delete($request->slug)) {
-            return redirect()->back()->with('success', __('Plugin deleted successfully'));
+
+        $result = $pluginManager->delete($request->slug);
+
+        if ($result === true) {
+            return redirect()->back()->with('success', __('messages.plugin_deleted_successfully'));
         }
-        
-        return redirect()->back()->with('error', __('Failed to delete plugin'));
+
+        return redirect()->back()->with('error', is_string($result) ? $result : __('messages.plugin_delete_failed'));
     }
 
     public function uploadPlugin(Request $request, PluginManager $pluginManager)
@@ -2520,14 +2522,14 @@ class AdminController extends Controller
 
             if ($result === true) {
                 $this->maintenanceMode->disable(Auth::user(), 'plugin_upload_success');
-                return redirect()->back()->with('success', __('Plugin installed successfully'));
+                return redirect()->back()->with('success', __('messages.plugin_installed_successfully'));
             }
 
             $this->maintenanceMode->disable(Auth::user(), 'plugin_upload_failed');
             return redirect()->back()->with('error', $result);
         } catch (\Throwable $e) {
             $this->maintenanceMode->disable(Auth::user(), 'plugin_upload_error');
-            return redirect()->back()->with('error', __('Error: ') . $e->getMessage());
+            return redirect()->back()->with('error', __('messages.error_prefix') . $e->getMessage());
         }
     }
 
@@ -2548,7 +2550,7 @@ class AdminController extends Controller
             return redirect()->back()->with('error', $result);
         } catch (\Throwable $e) {
             $this->maintenanceMode->disable(Auth::user(), 'plugin_upgrade_error');
-            return redirect()->back()->with('error', __('Error: ') . $e->getMessage());
+            return redirect()->back()->with('error', __('messages.error_prefix') . $e->getMessage());
         }
     }
 
@@ -2600,14 +2602,14 @@ class AdminController extends Controller
         try {
             if ($themeManager->activate($request->slug)) {
                 $this->maintenanceMode->disable(Auth::user(), 'theme_activation_success');
-                return redirect()->back()->with('success', __('Theme activated successfully.'));
+                return redirect()->back()->with('success', __('messages.theme_activated_successfully'));
             }
 
             $this->maintenanceMode->disable(Auth::user(), 'theme_activation_failed');
-            return redirect()->back()->with('error', __('Theme activation failed.'));
+            return redirect()->back()->with('error', __('messages.theme_activation_failed'));
         } catch (\Throwable $e) {
             $this->maintenanceMode->disable(Auth::user(), 'theme_activation_error');
-            return redirect()->back()->with('error', __('Error: ') . $e->getMessage());
+            return redirect()->back()->with('error', __('messages.error_prefix') . $e->getMessage());
         }
     }
 
@@ -2628,7 +2630,7 @@ class AdminController extends Controller
             return redirect()->back()->with('error', $result);
         } catch (\Throwable $e) {
             $this->maintenanceMode->disable(Auth::user(), 'theme_upgrade_error');
-            return redirect()->back()->with('error', __('Error: ') . $e->getMessage());
+            return redirect()->back()->with('error', __('messages.error_prefix') . $e->getMessage());
         }
     }
 

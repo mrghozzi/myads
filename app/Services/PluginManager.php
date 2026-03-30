@@ -119,7 +119,7 @@ class PluginManager
                       ->first();
         
         if ($option && $option->o_valuer == 1) {
-            return "Cannot delete an active plugin. Please deactivate it first.";
+            return __('messages.plugin_delete_active_forbidden');
         }
 
         // Remove from DB
@@ -164,13 +164,13 @@ class PluginManager
 
             if (!$pluginJsonPath) {
                 File::deleteDirectory($tempExtractPath);
-                return "Invalid plugin structure: plugin.json not found.";
+                return __('messages.plugin_zip_structure_invalid');
             }
 
             $pluginData = json_decode(File::get($pluginJsonPath), true);
             if (!$pluginData || !isset($pluginData['slug'])) {
                 File::deleteDirectory($tempExtractPath);
-                return "Invalid plugin.json: Slug is required.";
+                return __('messages.plugin_manifest_slug_required');
             }
 
             // Move to plugins directory
@@ -178,7 +178,7 @@ class PluginManager
             
             if (File::exists($targetPath)) {
                 File::deleteDirectory($tempExtractPath);
-                return "Plugin already exists.";
+                return __('messages.plugin_already_exists');
             }
 
             File::moveDirectory($rootFolder, $targetPath);
@@ -186,7 +186,7 @@ class PluginManager
 
             return true;
         }
-        return "Failed to open ZIP file.";
+        return __('messages.plugin_zip_open_failed');
     }
 
     /**

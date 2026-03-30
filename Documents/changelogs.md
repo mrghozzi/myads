@@ -1,5 +1,5 @@
 # v4.2.2
-> **Corrective Release** - User Social Links, stability fixes for categories, and localization polish.
+> **Corrective Release** - User Social Links, admin extensions redesign, stability fixes, and localization polish.
 
 ### 🔗 User Social Links
 * **Add**: Introduced a new **Social Links** section in the user settings (`/settings/social`).
@@ -12,17 +12,22 @@
 ### 🎨 UI & UX Modernization
 * **Improvement**: Overhauled the **Forum Categories** admin interface (`/admin/forum/categories`) with a "Superdesign" aesthetic, featuring glassmorphic headers, modern card layouts, and refined CRUD modals.
 * **Improvement**: Modernized the **Directory Categories** admin interface (`/admin/directory/categories`) with a matching glassmorphic design, hierarchical visual cues, and improved table layouts.
+* **Improvement**: Redesigned the **Plugins** admin page (`/admin/plugins`) into a modern extension hub with a hero header, live stats, responsive management cards, reusable changelog/delete modals, and lazy-loaded previews while preserving the existing activation, upload, update, and delete workflows.
+* **Improvement**: Redesigned the **Themes** admin page (`/admin/themes`) with the same Duralux-aligned visual system, including a hero header, status chips, richer preview cards, clearer activation/update actions, and responsive gallery behavior.
 * **Improvement**: Enhanced the visual hierarchy of the **Add Category** buttons on management pages, using high-contrast "pop" colors (Warning/Primary) to distinguish them from the background.
-* **i18n**: Added missing translation keys for category lists, descriptions, and placeholder text across all **9 supported languages**.
+* **Architecture**: Introduced shared admin partials for the new extension management shell so Plugins and Themes stay visually consistent without duplicating modal logic or heavy page markup.
+* **i18n**: Added missing translation keys for category lists, descriptions, placeholder text, plugin/theme management labels, extension stats, modal content, and action feedback across all **9 supported languages**.
 
 ### 🛡️ Core Stability & Database
 * **Fix**: Resolved `Integrity constraint violation` when creating or updating Forum and Directory categories without a description by enforcing default empty strings in `AdminController`.
 * **Fix**: Created a repair migration to make `txt` and `metakeywords` columns `nullable` for `f_cat` and `directory_cat` tables.
 * **Refactor**: Simplified `storeNews` logic in the Admin panel to remove redundant input handling.
 * **Fix**: Standardized translation key usage in `deleteDirectoryCategory`.
+* **Fix**: Corrected the plugin deletion flow so success is only reported when deletion actually returns `true`; active or blocked plugins now surface a translated error message instead of a false success notice.
 
 ### 🌍 Localization & UX
 * **Improvement**: Replaced technical placeholders (`confirm_suspend`) with descriptive, human-readable confirmation messages across all **9 supported languages**.
+* **Improvement**: Removed remaining visible English fallback copy from the Plugins and Themes admin pages so extension management now follows the active locale more consistently.
 * **Policy**: Updated technical documentation (`Agents.md`) with new safety guidelines for AI agents regarding terminal command execution.
 
 # v4.2.1
