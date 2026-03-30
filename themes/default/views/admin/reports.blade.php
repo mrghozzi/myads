@@ -132,7 +132,11 @@
                                                 </div>
 
                                                 <div class="reports-hub__person">
-                                                    <span class="reports-hub__person-avatar">{{ $reporterInitial }}</span>
+                                                    @if($reporter && $reporter->img)
+                                                        <img src="{{ $reporter->avatarUrl() }}" alt="{{ $reporter->username }}" class="reports-hub__person-avatar" style="object-fit: cover; border: none; padding: 0;">
+                                                    @else
+                                                        <span class="reports-hub__person-avatar">{{ $reporterInitial }}</span>
+                                                    @endif
                                                     <div class="min-w-0">
                                                         @if($reporter)
                                                             <p class="reports-hub__person-name">{{ $reporter->username }}</p>
