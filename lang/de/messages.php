@@ -1753,4 +1753,6 @@ return [
     'your_referral_link' => 'Ihr Empfehlungslink',
     'yshbv' => 'Ihre Seiten wurden angesehen',
     'zip_open_failed' => 'Update-Paket konnte nicht geÃ¶ffnet werden.',
+    'important' => 'Wichtig',
+    'updating' => 'Wird aktualisiert...',
 ];

@@ -1753,4 +1753,6 @@ return [
     'your_referral_link' => 'Tu enlace de referencia',
     'yshbv' => 'Tus sitios han sido vistos',
     'zip_open_failed' => 'Error al abrir el paquete de actualización.',
+    'important' => 'Importante',
+    'updating' => 'Actualizando...',
 ];

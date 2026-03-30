@@ -1753,4 +1753,6 @@ return [
     'your_referral_link' => 'Your referral link',
     'yshbv' => 'Your sites have been viewed',
     'zip_open_failed' => 'Failed to open the update package.',
+    'important' => 'Important',
+    'updating' => 'Updating...',
 ];

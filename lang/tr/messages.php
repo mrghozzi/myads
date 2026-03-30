@@ -1753,4 +1753,6 @@ return [
     'your_referral_link' => 'Yönlendirme bağlantınız',
     'yshbv' => 'Siteleriniz görüntülendi',
     'zip_open_failed' => 'Failed to open package.',
+    'important' => 'Önemli',
+    'updating' => 'Güncelleniyor...',
 ];

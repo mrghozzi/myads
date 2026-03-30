@@ -1753,4 +1753,6 @@ return [
     'your_referral_link' => 'Seu link de indicação',
     'yshbv' => 'Seus sites foram visualizados',
     'zip_open_failed' => 'Failed to open package.',
+    'important' => 'Importante',
+    'updating' => 'Atualizando...',
 ];
