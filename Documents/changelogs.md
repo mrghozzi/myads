@@ -9,6 +9,12 @@
 * **Improvement**: Integrated the social links widget into the member profile hub, positioned elegantly below the badges section.
 * **i18n**: Fully localized platform names and social settings labels across all **9 supported languages**.
 
+### 🎨 UI & UX Modernization
+* **Improvement**: Overhauled the **Forum Categories** admin interface (`/admin/forum/categories`) with a "Superdesign" aesthetic, featuring glassmorphic headers, modern card layouts, and refined CRUD modals.
+* **Improvement**: Modernized the **Directory Categories** admin interface (`/admin/directory/categories`) with a matching glassmorphic design, hierarchical visual cues, and improved table layouts.
+* **Improvement**: Enhanced the visual hierarchy of the **Add Category** buttons on management pages, using high-contrast "pop" colors (Warning/Primary) to distinguish them from the background.
+* **i18n**: Added missing translation keys for category lists, descriptions, and placeholder text across all **9 supported languages**.
+
 ### 🛡️ Core Stability & Database
 * **Fix**: Resolved `Integrity constraint violation` when creating or updating Forum and Directory categories without a description by enforcing default empty strings in `AdminController`.
 * **Fix**: Created a repair migration to make `txt` and `metakeywords` columns `nullable` for `f_cat` and `directory_cat` tables.

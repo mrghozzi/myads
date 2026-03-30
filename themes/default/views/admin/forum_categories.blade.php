@@ -3,63 +3,111 @@
 @section('title', __('messages.forum_categories'))
 
 @section('content')
-<!-- Header -->
-<div class="row g-0 align-items-center border-bottom help-center-content-header mb-5 pb-5">
-    <div class="col-lg-6 offset-lg-3 text-center">
-        <h2 class="fw-bolder mb-2 text-dark">{{ __('messages.forum_categories') }}</h2>
-        <p class="text-muted">{{ __('messages.forum_categories_desc') ?? 'Manage your forum categories here.' }}</p>
-        <div class="mt-4">
-             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
-                <i class="feather-plus me-2"></i> {{ __('messages.add_category') }}
-            </button>
+<!-- Superdesign Header -->
+<div class="row g-0 align-items-center mb-5">
+    <div class="col-12 px-4">
+        <div class="card border-0 shadow-lg overflow-hidden position-relative" style="border-radius: 24px; background: linear-gradient(135deg, #6366f1 0%, #4338ca 100%);">
+            <!-- Decorative Elements -->
+            <div class="position-absolute top-0 end-0 p-5 opacity-10">
+                <i class="fa-solid fa-comments" style="font-size: 160px; transform: rotate(-15deg);"></i>
+            </div>
+            
+            <div class="card-body p-5 position-relative z-index-1">
+                <div class="row align-items-center">
+                    <div class="col-lg-7 text-white">
+                        <h1 class="display-5 fw-black mb-2 animate__animated animate__fadeIn">
+                            {{ __('messages.forum_categories') }}
+                        </h1>
+                        <p class="lead opacity-80 mb-0 animate__animated animate__fadeIn animate__delay-1s">
+                            {{ __('messages.forum_categories_desc') }}
+                        </p>
+                    </div>
+                    <div class="col-lg-5 text-lg-end mt-4 mt-lg-0 animate__animated animate__fadeInRight">
+                        <button type="button" class="btn btn-warning btn-lg fw-bold shadow-sm px-4 py-3 hover-scale" data-bs-toggle="modal" data-bs-target="#addCategoryModal" style="border-radius: 16px; color: #1e293b;">
+                            <i class="feather-plus-circle me-2"></i> {{ __('messages.add_category') }}
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
 <div class="main-content container-lg px-4">
-    <div class="card">
-        <div class="card-body">
+    <!-- Modern Category List -->
+    <div class="card border-0 shadow-sm mb-5" style="border-radius: 20px; backdrop-filter: blur(10px); background: rgba(var(--nxl-white-rgb), 0.8);">
+        <div class="card-header border-0 bg-transparent py-4 ps-4 pe-4 d-flex align-items-center justify-content-between">
+            <h5 class="fw-bold mb-0">{{ __('messages.category_list') }}</h5>
+            <span class="badge bg-soft-primary text-primary rounded-pill px-3 py-2 fw-bold">
+                {{ $categories->total() }} {{ __('messages.total') }}
+            </span>
+        </div>
+        <div class="card-body px-0">
             <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead>
+                <table class="table table-borderless align-middle mb-0">
+                    <thead class="text-uppercase fs-11 fw-bold text-muted bg-soft-light">
                         <tr>
-                            <th>#ID</th>
-                            <th>{{ __('messages.name') }}</th>
-                            <th>{{ __('messages.icon') }}</th>
-                            <th>{{ __('messages.order') }}</th>
-                            <th class="text-end">{{ __('messages.actions') }}</th>
+                            <th class="ps-4 py-3">#ID</th>
+                            <th class="py-3">{{ __('messages.category') }}</th>
+                            <th class="py-3">{{ __('messages.visibility') }}</th>
+                            <th class="py-3">{{ __('messages.order') }}</th>
+                            <th class="text-end pe-4 py-3">{{ __('messages.actions') }}</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="fs-13">
                         @foreach($categories as $category)
-                        <tr>
-                            <td>{{ $category->id }}</td>
+                        <tr class="hover-bg-light transition-all border-bottom border-soft-light">
+                            <td class="ps-4">
+                                <span class="fw-bold text-muted">#{{ $category->id }}</span>
+                            </td>
                             <td>
-                                <div class="fw-bold">{{ $category->name }}</div>
-                                @if($category->txt)
-                                <small class="text-muted">{{ Str::limit($category->txt, 50) }}</small>
+                                <div class="d-flex align-items-center">
+                                    <div class="category-icon-box me-3 shadow-sm bg-gradient-brand">
+                                        <i class="fa {{ $category->icons }}"></i>
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold text-dark fs-14 mb-1">{{ $category->name }}</div>
+                                        @if($category->txt)
+                                        <div class="text-muted small opacity-80" title="{{ $category->txt }}">
+                                            {{ Str::limit($category->txt, 40) }}
+                                        </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                @if($category->visibility == 0)
+                                    <span class="badge bg-soft-success text-success rounded-pill px-3"><i class="feather-eye me-1"></i> {{ __('messages.everyone') }}</span>
+                                @elseif($category->visibility == 1)
+                                    <span class="badge bg-soft-warning text-warning rounded-pill px-3"><i class="feather-users me-1"></i> {{ __('messages.members_only') }}</span>
+                                @else
+                                    <span class="badge bg-soft-danger text-danger rounded-pill px-3"><i class="feather-shield me-1"></i> {{ __('messages.mods_only') }}</span>
                                 @endif
                             </td>
                             <td>
-                                <i class="fa {{ $category->icons }} fs-4"></i>
-                                <span class="ms-2 text-muted small">{{ $category->icons }}</span>
+                                <span class="badge bg-light text-dark fw-bold rounded-pill px-3">{{ $category->ordercat }}</span>
                             </td>
-                            <td>{{ $category->ordercat }}</td>
-                            <td class="text-end">
-                                <button class="btn btn-sm btn-icon btn-light-primary" data-bs-toggle="modal" data-bs-target="#editCategoryModal{{ $category->id }}">
-                                    <i class="feather-edit-3"></i>
-                                </button>
-                                <button class="btn btn-sm btn-icon btn-light-danger" data-bs-toggle="modal" data-bs-target="#deleteCategoryModal{{ $category->id }}">
-                                    <i class="feather-trash-2"></i>
-                                </button>
+                            <td class="text-end pe-4">
+                                <div class="btn-group">
+                                    <button class="btn btn-sm btn-icon btn-glass btn-light-primary hover-scale-11" data-bs-toggle="modal" data-bs-target="#editCategoryModal{{ $category->id }}" title="{{ __('messages.edit') }}">
+                                        <i class="feather-edit-2"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-icon btn-glass btn-light-danger ms-2 hover-scale-11" data-bs-toggle="modal" data-bs-target="#deleteCategoryModal{{ $category->id }}" title="{{ __('messages.delete') }}">
+                                        <i class="feather-trash-2"></i>
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                         @endforeach
                     </tbody>
                 </table>
             </div>
+        </div>
+        @if($categories->hasPages())
+        <div class="card-footer bg-transparent border-0 pb-4">
             {{ $categories->links('pagination::bootstrap-5') }}
         </div>
+        @endif
     </div>
 </div>
 @endsection
@@ -68,43 +116,43 @@
 <!-- Add Category Modal -->
 <div class="modal fade" id="addCategoryModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">{{ __('messages.new_category') }}</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
+            <div class="modal-header border-0 pb-0 pt-4 px-4">
+                <h5 class="modal-title fw-bold fs-18 text-dark">{{ __('messages.new_category') }}</h5>
+                <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form action="{{ route('admin.forum_categories.store') }}" method="POST">
                 @csrf
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label">{{ __('messages.name') }}</label>
-                        <input type="text" name="name" class="form-control" required>
+                <div class="modal-body p-4">
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-muted small text-uppercase mb-2">{{ __('messages.name') }}</label>
+                        <input type="text" name="name" class="form-control form-control-lg border-soft-light bg-light" placeholder="{{ __('messages.enter_category_name') }}" style="border-radius: 12px;" required>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">{{ __('messages.desc') }}</label>
-                        <textarea name="txt" class="form-control" rows="3"></textarea>
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-muted small text-uppercase mb-2">{{ __('messages.desc') }}</label>
+                        <textarea name="txt" class="form-control border-soft-light bg-light" rows="3" placeholder="{{ __('messages.brief_description') }}" style="border-radius: 12px;"></textarea>
                     </div>
                     <div class="row">
-                        <div class="col-md-6 mb-3 icon-picker-field">
+                        <div class="col-md-6 mb-4 icon-picker-field">
                             @include('theme::admin.partials.icon_picker')
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">{{ __('messages.order') }}</label>
-                            <input type="number" name="ordercat" class="form-control" value="0" required>
+                        <div class="col-md-6 mb-4">
+                            <label class="form-label fw-bold text-muted small text-uppercase mb-2">{{ __('messages.order') }}</label>
+                            <input type="number" name="ordercat" class="form-control form-control-lg border-soft-light bg-light" value="0" style="border-radius: 12px;" required>
                         </div>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">{{ __('messages.visibility') }}</label>
-                        <select name="visibility" class="form-select" required>
+                    <div class="mb-2">
+                        <label class="form-label fw-bold text-muted small text-uppercase mb-2">{{ __('messages.visibility') }}</label>
+                        <select name="visibility" class="form-select form-select-lg border-soft-light bg-light" style="border-radius: 12px;" required>
                             <option value="0">{{ __('messages.everyone') }}</option>
                             <option value="1">{{ __('messages.members_only') }}</option>
                             <option value="2">{{ __('messages.mods_only') }}</option>
                         </select>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('messages.cancel') }}</button>
-                    <button type="submit" class="btn btn-primary">{{ __('messages.save') }}</button>
+                <div class="modal-footer border-0 pt-0 pb-4 px-4">
+                    <button type="button" class="btn btn-light fw-bold px-4 py-2" data-bs-dismiss="modal" style="border-radius: 10px;">{{ __('messages.cancel') }}</button>
+                    <button type="submit" class="btn btn-primary fw-bold px-4 py-2 shadow-sm" style="border-radius: 10px;">{{ __('messages.save') }}</button>
                 </div>
             </form>
         </div>
@@ -115,43 +163,43 @@
 <!-- Edit Category Modal -->
 <div class="modal fade" id="editCategoryModal{{ $category->id }}" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">{{ __('messages.edit_category') }}</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
+            <div class="modal-header border-0 pb-0 pt-4 px-4">
+                <h5 class="modal-title fw-bold fs-18 text-dark">{{ __('messages.edit_category') }}</h5>
+                <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <form action="{{ route('admin.forum_categories.update', $category->id) }}" method="POST">
                 @csrf
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label class="form-label">{{ __('messages.name') }}</label>
-                        <input type="text" name="name" class="form-control" value="{{ $category->name }}" required>
+                <div class="modal-body p-4">
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-muted small text-uppercase mb-2">{{ __('messages.name') }}</label>
+                        <input type="text" name="name" class="form-control form-control-lg border-soft-light bg-light" value="{{ $category->name }}" style="border-radius: 12px;" required>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">{{ __('messages.desc') }}</label>
-                        <textarea name="txt" class="form-control" rows="3">{{ $category->txt }}</textarea>
+                    <div class="mb-4">
+                        <label class="form-label fw-bold text-muted small text-uppercase mb-2">{{ __('messages.desc') }}</label>
+                        <textarea name="txt" class="form-control border-soft-light bg-light" rows="3" style="border-radius: 12px;">{{ $category->txt }}</textarea>
                     </div>
                     <div class="row">
-                        <div class="col-md-6 mb-3 icon-picker-field">
+                        <div class="col-md-6 mb-4 icon-picker-field">
                             @include('theme::admin.partials.icon_picker', ['selectedIcon' => $category->icons])
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">{{ __('messages.order') }}</label>
-                            <input type="number" name="ordercat" class="form-control" value="{{ $category->ordercat }}" required>
+                        <div class="col-md-6 mb-4">
+                            <label class="form-label fw-bold text-muted small text-uppercase mb-2">{{ __('messages.order') }}</label>
+                            <input type="number" name="ordercat" class="form-control form-control-lg border-soft-light bg-light" value="{{ $category->ordercat }}" style="border-radius: 12px;" required>
                         </div>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">{{ __('messages.visibility') }}</label>
-                        <select name="visibility" class="form-select" required>
+                    <div class="mb-2">
+                        <label class="form-label fw-bold text-muted small text-uppercase mb-2">{{ __('messages.visibility') }}</label>
+                        <select name="visibility" class="form-select form-select-lg border-soft-light bg-light" style="border-radius: 12px;" required>
                             <option value="0" {{ $category->visibility == 0 ? 'selected' : '' }}>{{ __('messages.everyone') }}</option>
                             <option value="1" {{ $category->visibility == 1 ? 'selected' : '' }}>{{ __('messages.members_only') }}</option>
                             <option value="2" {{ $category->visibility == 2 ? 'selected' : '' }}>{{ __('messages.mods_only') }}</option>
                         </select>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('messages.cancel') }}</button>
-                    <button type="submit" class="btn btn-primary">{{ __('messages.update') }}</button>
+                <div class="modal-footer border-0 pt-0 pb-4 px-4">
+                    <button type="button" class="btn btn-light fw-bold px-4 py-2" data-bs-dismiss="modal" style="border-radius: 10px;">{{ __('messages.cancel') }}</button>
+                    <button type="submit" class="btn btn-primary fw-bold px-4 py-2 shadow-sm" style="border-radius: 10px;">{{ __('messages.update') }}</button>
                 </div>
             </form>
         </div>
@@ -161,17 +209,17 @@
 <!-- Delete Category Modal -->
 <div class="modal fade" id="deleteCategoryModal{{ $category->id }}" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">{{ __('messages.delete_category') }}</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
+            <div class="modal-header border-0 pb-0 pt-4 px-4">
+                <h5 class="modal-title fw-bold fs-18 text-dark">{{ __('messages.delete_category') }}</h5>
+                <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <div class="modal-body text-center">
-                <div class="avatar-text avatar-xl bg-soft-danger text-danger rounded-circle mb-3 mx-auto">
+            <div class="modal-body text-center p-4">
+                <div class="avatar-text avatar-xl bg-soft-danger text-danger rounded-circle mb-3 mx-auto shadow-sm" style="width: 80px; height: 80px; display: flex; align-items: center; justify-content: center; font-size: 32px;">
                     <i class="feather-trash-2"></i>
                 </div>
-                <h4>{{ __('messages.confirm_delete_category') }}</h4>
-                <p class="text-muted">{{ $category->name }}</p>
+                <h4 class="fw-bold text-dark mb-2">{{ __('messages.confirm_delete_category') }}</h4>
+                <p class="text-muted mb-4">{{ $category->name }}</p>
 
                 @php
                     $topicCount = \App\Models\ForumTopic::where('cat', $category->id)->count();
@@ -182,13 +230,18 @@
                     @method('DELETE')
 
                     @if($topicCount > 0)
-                        <div class="alert alert-warning text-start mb-4">
-                            <i class="feather-alert-triangle me-2"></i>
-                            {{ __('messages.category_not_empty') }} ({{ $topicCount }} {{ __('messages.topics') }})
+                        <div class="alert alert-soft-warning border-0 rounded-4 text-start mb-4 p-3">
+                            <div class="d-flex border-start border-warning border-4 ps-3">
+                                <i class="feather-alert-triangle text-warning me-3 fs-20 mt-1"></i>
+                                <div>
+                                    <div class="fw-bold text-warning">{{ __('messages.category_not_empty') }}</div>
+                                    <div class="small opacity-80">({{ $topicCount }} {{ __('messages.topics') }})</div>
+                                </div>
+                            </div>
                         </div>
                         <div class="mb-4 text-start">
-                            <label class="form-label fw-bold">{{ __('messages.move_topics_to') }}</label>
-                            <select name="move_to_id" class="form-select" required>
+                            <label class="form-label fw-bold text-muted small text-uppercase mb-2">{{ __('messages.move_topics_to') }}</label>
+                            <select name="move_to_id" class="form-select form-select-lg border-soft-light bg-light" style="border-radius: 12px;" required>
                                 <option value="">{{ __('messages.select_category') }}</option>
                                 @foreach($allCategories as $target)
                                     @if($target->id != $category->id)
@@ -199,9 +252,9 @@
                         </div>
                     @endif
 
-                    <div class="modal-footer justify-content-center p-0 border-0">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('messages.cancel') }}</button>
-                        <button type="submit" class="btn btn-danger">{{ __('messages.delete') }}</button>
+                    <div class="modal-footer border-0 justify-content-center p-0">
+                        <button type="button" class="btn btn-light fw-bold px-4 py-2" data-bs-dismiss="modal" style="border-radius: 10px;">{{ __('messages.cancel') }}</button>
+                        <button type="submit" class="btn btn-danger fw-bold px-4 py-2 shadow-sm ms-2" style="border-radius: 10px;">{{ __('messages.delete') }}</button>
                     </div>
                 </form>
             </div>
@@ -465,6 +518,41 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 </script>
 <style>
+    .category-icon-box {
+        width: 48px;
+        height: 48px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        color: #fff;
+    }
+    .bg-gradient-brand {
+        background: linear-gradient(135deg, #6366f1 0%, #4338ca 100%);
+    }
+    .hover-scale-11:hover {
+        transform: scale(1.1);
+    }
+    .hover-scale:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important;
+    }
+    .btn-glass {
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(5px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    .transition-all {
+        transition: all 0.3s ease;
+    }
+    .fw-black {
+        font-weight: 900;
+    }
+    .opacity-10 { opacity: 0.1; }
+    .opacity-80 { opacity: 0.8; }
+    .z-index-1 { z-index: 1; }
+    
     #addCategoryModal .modal-body,
     [id^="editCategoryModal"] .modal-body {
         overflow: visible;
