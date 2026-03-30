@@ -1804,4 +1804,6 @@ return [
     'update_available' => 'Update available',
     'upload_plugin_info' => 'Upload a ZIP package that includes a valid plugin structure and manifest.',
     'view_changelog' => 'View changelog',
+    'reports_desc' => 'Review member reports, inspect the flagged target, and clear moderation items without leaving the queue.',
+    'reviewed' => 'Reviewed',
 ];

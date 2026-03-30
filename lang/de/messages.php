@@ -1804,4 +1804,6 @@ return [
     'update_available' => 'Update verfuegbar',
     'upload_plugin_info' => 'Lade ein ZIP-Paket mit gueltiger Plugin-Struktur und Manifestdatei hoch.',
     'view_changelog' => 'Changelog anzeigen',
+    'reports_desc' => 'Pruefe Mitgliedermeldungen, kontrolliere das gemeldete Ziel und erledige Moderationsfaelle direkt in der Queue.',
+    'reviewed' => 'Geprueft',
 ];

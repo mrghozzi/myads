@@ -1797,4 +1797,6 @@ return [
     'update_available' => 'Actualizacion disponible',
     'upload_plugin_info' => 'Sube un archivo ZIP que incluya una estructura de plugin valida y su manifiesto.',
     'view_changelog' => 'Ver cambios',
+    'reports_desc' => 'Revisa los reportes de los miembros, inspecciona el objetivo marcado y resuelve elementos de moderacion sin salir de la cola.',
+    'reviewed' => 'Revisado',
 ];

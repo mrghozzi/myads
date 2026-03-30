@@ -1795,4 +1795,6 @@ return [
     'update_available' => 'Mise a jour disponible',
     'upload_plugin_info' => 'Televersez une archive ZIP contenant une structure de plugin valide et son manifeste.',
     'view_changelog' => 'Voir le changelog',
+    'reports_desc' => 'Examinez les signalements des membres, inspectez la cible signalee et traitez la moderation sans quitter la file.',
+    'reviewed' => 'Traite',
 ];

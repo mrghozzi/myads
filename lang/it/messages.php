@@ -1804,4 +1804,6 @@ return [
     'update_available' => 'Aggiornamento disponibile',
     'upload_plugin_info' => 'Carica un archivio ZIP con una struttura plugin valida e il relativo manifest.',
     'view_changelog' => 'Vedi changelog',
+    'reports_desc' => 'Controlla le segnalazioni dei membri, ispeziona l\'elemento segnalato e gestisci la moderazione senza uscire dalla coda.',
+    'reviewed' => 'Revisionato',
 ];

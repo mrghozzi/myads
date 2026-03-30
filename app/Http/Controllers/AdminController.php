@@ -30,6 +30,7 @@ use App\Models\DirectoryCategory;
 use App\Models\News;
 use App\Models\Ad;
 use App\Models\Report;
+use App\Models\OrderRequest;
 use App\Models\Emoji;
 use App\Models\Menu;
 use App\Models\Option;
@@ -1866,7 +1867,210 @@ class AdminController extends Controller
         }
 
         $reports = Report::with('reporter')->orderBy('id', 'desc')->paginate(20);
-        return view('theme::admin.reports', compact('reports'));
+        $reportItems = $this->buildAdminReportItems($reports->getCollection());
+        $reportStats = [
+            'total' => Report::query()->count(),
+            'pending' => Report::query()->where('statu', 1)->count(),
+            'reviewed' => Report::query()->where('statu', '!=', 1)->count(),
+        ];
+
+        return view('theme::admin.reports', compact('reports', 'reportItems', 'reportStats'));
+    }
+
+    /**
+     * @param \Illuminate\Support\Collection<int, \App\Models\Report> $reports
+     * @return \Illuminate\Support\Collection<int, array<string, mixed>>
+     */
+    private function buildAdminReportItems($reports)
+    {
+        $directoryIds = $reports->where('s_type', 1)->pluck('tp_id')->filter()->unique()->values();
+        $forumTopicIds = $reports->filter(fn (Report $report) => in_array((int) $report->s_type, [2, 4, 100], true))
+            ->pluck('tp_id')->filter()->unique()->values();
+        $newsIds = $reports->filter(fn (Report $report) => in_array((int) $report->s_type, [3, 5], true))
+            ->pluck('tp_id')->filter()->unique()->values();
+        $productIds = $reports->where('s_type', 7867)->pluck('tp_id')->filter()->unique()->values();
+        $userIds = $reports->filter(fn (Report $report) => in_array((int) $report->s_type, [99, 702], true))
+            ->pluck('tp_id')->filter()->unique()->values();
+        $linkIds = $reports->where('s_type', 201)->pluck('tp_id')->filter()->unique()->values();
+        $bannerIds = $reports->where('s_type', 202)->pluck('tp_id')->filter()->unique()->values();
+        $visitIds = $reports->where('s_type', 203)->pluck('tp_id')->filter()->unique()->values();
+        $smartAdIds = $reports->where('s_type', 204)->pluck('tp_id')->filter()->unique()->values();
+        $knowledgebaseIds = $reports->where('s_type', 205)->pluck('tp_id')->filter()->unique()->values();
+        $orderIds = $reports->filter(fn (Report $report) => in_array((int) $report->s_type, [6, 701], true))
+            ->pluck('tp_id')->filter()->unique()->values();
+
+        $directories = Directory::with('user')->whereIn('id', $directoryIds)->get()->keyBy('id');
+        $forumTopics = ForumTopic::with('user')->whereIn('id', $forumTopicIds)->get()->keyBy('id');
+        $newsItems = News::whereIn('id', $newsIds)->get()->keyBy('id');
+        $products = Product::withoutGlobalScope('store')->with('user')->whereIn('id', $productIds)->get()->keyBy('id');
+        $users = User::whereIn('id', $userIds)->get()->keyBy('id');
+        $links = Link::with('user')->whereIn('id', $linkIds)->get()->keyBy('id');
+        $banners = Banner::with('user')->whereIn('id', $bannerIds)->get()->keyBy('id');
+        $visits = Visit::with('user')->whereIn('id', $visitIds)->get()->keyBy('id');
+        $smartAds = SmartAd::with('user')->whereIn('id', $smartAdIds)->get()->keyBy('id');
+        $knowledgebaseItems = Option::query()
+            ->where('o_type', 'knowledgebase')
+            ->whereIn('id', $knowledgebaseIds)
+            ->get()
+            ->keyBy('id');
+        $knowledgebaseOwnerIds = $knowledgebaseItems->pluck('o_parent')
+            ->filter(fn ($value) => (int) $value > 0)
+            ->unique()
+            ->values();
+        $knowledgebaseOwners = User::whereIn('id', $knowledgebaseOwnerIds)->get()->keyBy('id');
+        $orders = OrderRequest::with('user')->whereIn('id', $orderIds)->get()->keyBy('id');
+
+        return $reports->map(function (Report $report) use (
+            $directories,
+            $forumTopics,
+            $newsItems,
+            $products,
+            $users,
+            $links,
+            $banners,
+            $visits,
+            $smartAds,
+            $knowledgebaseItems,
+            $knowledgebaseOwners,
+            $orders
+        ) {
+            $target = null;
+            $targetUser = null;
+            $targetTitle = null;
+            $targetLabel = null;
+            $targetIcon = 'feather-flag';
+            $previewUrl = null;
+            $previewLabel = __('messages.preview');
+
+            switch ((int) $report->s_type) {
+                case 1:
+                    $target = $directories->get($report->tp_id);
+                    $targetUser = $target?->user;
+                    $targetTitle = $target?->name;
+                    $targetLabel = __('messages.directory');
+                    $targetIcon = 'feather-globe';
+                    $previewUrl = $target ? route('directory.show.short', $target->id) : null;
+                    break;
+
+                case 2:
+                case 4:
+                case 100:
+                    $target = $forumTopics->get($report->tp_id);
+                    $targetUser = $target?->user;
+                    $targetTitle = $target?->name;
+                    $targetLabel = __('messages.forum');
+                    $targetIcon = 'feather-message-square';
+                    $previewUrl = $target ? route('forum.topic', $target->id) : null;
+                    break;
+
+                case 3:
+                case 5:
+                    $target = $newsItems->get($report->tp_id);
+                    $targetTitle = $target?->name;
+                    $targetLabel = __('messages.news');
+                    $targetIcon = 'feather-file-text';
+                    $previewUrl = $target ? route('news.show', $target->id) : null;
+                    break;
+
+                case 6:
+                case 701:
+                    $target = $orders->get($report->tp_id);
+                    $targetUser = $target?->user;
+                    $targetTitle = $target?->title;
+                    $targetLabel = __('messages.order_request');
+                    $targetIcon = 'feather-briefcase';
+                    $previewUrl = $target ? route('orders.show', $target->id) : null;
+                    break;
+
+                case 99:
+                case 702:
+                    $target = $users->get($report->tp_id);
+                    $targetUser = $target;
+                    $targetTitle = $target?->username;
+                    $targetLabel = __('messages.user');
+                    $targetIcon = 'feather-user';
+                    $previewUrl = $target ? route('profile.show', $target->username) : null;
+                    $previewLabel = __('messages.view_profile');
+                    break;
+
+                case 201:
+                    $target = $links->get($report->tp_id);
+                    $targetUser = $target?->user;
+                    $targetTitle = $target?->name;
+                    $targetLabel = __('messages.links');
+                    $targetIcon = 'feather-link';
+                    $previewUrl = $target?->url;
+                    break;
+
+                case 202:
+                    $target = $banners->get($report->tp_id);
+                    $targetUser = $target?->user;
+                    $targetTitle = $target?->name;
+                    $targetLabel = __('messages.bannads');
+                    $targetIcon = 'feather-image';
+                    $previewUrl = $target ? route('admin.banners.edit', $target->id) : null;
+                    $previewLabel = __('messages.view_reported');
+                    break;
+
+                case 203:
+                    $target = $visits->get($report->tp_id);
+                    $targetUser = $target?->user;
+                    $targetTitle = $target?->name;
+                    $targetLabel = __('messages.visits');
+                    $targetIcon = 'feather-navigation';
+                    $previewUrl = $target?->url;
+                    break;
+
+                case 204:
+                    $target = $smartAds->get($report->tp_id);
+                    $targetUser = $target?->user;
+                    $targetTitle = $target?->displayTitle();
+                    $targetLabel = __('messages.smart_ads');
+                    $targetIcon = 'feather-layout';
+                    $previewUrl = $target ? route('admin.smart_ads.edit', $target->id) : null;
+                    $previewLabel = __('messages.view_reported');
+                    break;
+
+                case 205:
+                    $target = $knowledgebaseItems->get($report->tp_id);
+                    $targetUser = ($target && (int) $target->o_parent > 0) ? $knowledgebaseOwners->get((int) $target->o_parent) : null;
+                    $targetTitle = $target ? $target->name : null;
+                    $targetLabel = __('messages.knowledgebase');
+                    $targetIcon = 'feather-book-open';
+                    $previewUrl = $target ? route('kb.show', ['name' => $target->o_mode, 'article' => $target->name]) : null;
+                    break;
+
+                case 7867:
+                    $target = $products->get($report->tp_id);
+                    $targetUser = $target?->user;
+                    $targetTitle = $target?->name;
+                    $targetLabel = __('messages.store');
+                    $targetIcon = 'feather-shopping-bag';
+                    $previewUrl = $target ? route('store.show', $target->name) : null;
+                    break;
+            }
+
+            return [
+                'id' => $report->id,
+                'reason' => $report->txt,
+                'is_pending' => (int) $report->statu === 1,
+                'status_label' => (int) $report->statu === 1 ? __('messages.pending') : __('messages.reviewed'),
+                'status_modifier' => (int) $report->statu === 1 ? 'pending' : 'reviewed',
+                'reporter' => $report->reporter,
+                'reporter_profile_url' => $report->reporter ? route('profile.show', $report->reporter->username) : null,
+                'reporter_message_url' => $report->reporter ? route('messages.create', ['recipient' => $report->reporter->username]) : null,
+                'target_missing' => !$target,
+                'target_title' => $targetTitle,
+                'target_label' => $targetLabel,
+                'target_icon' => $targetIcon,
+                'preview_url' => $previewUrl,
+                'preview_label' => $previewLabel,
+                'target_user' => $targetUser,
+                'target_user_profile_url' => $targetUser ? route('profile.show', $targetUser->username) : null,
+                'target_user_message_url' => $targetUser ? route('messages.create', ['recipient' => $targetUser->username]) : null,
+                'target_user_admin_url' => $targetUser ? route('admin.users.edit', $targetUser->id) : null,
+            ];
+        })->values();
     }
 
     public function storeReport(Request $request)

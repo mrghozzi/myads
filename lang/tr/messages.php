@@ -1804,4 +1804,6 @@ return [
     'update_available' => 'Guncelleme mevcut',
     'upload_plugin_info' => 'Gecerli eklenti yapisi ve bildirimi iceren bir ZIP paketi yukleyin.',
     'view_changelog' => 'Degisiklik kaydini gor',
+    'reports_desc' => 'Uye bildirimlerini inceleyin, bildirilen hedefi kontrol edin ve kuyruktan cikmadan moderasyon islemlerini tamamlayin.',
+    'reviewed' => 'Incelendi',
 ];

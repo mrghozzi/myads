@@ -1804,4 +1804,6 @@ return [
     'update_available' => 'Atualizacao disponivel',
     'upload_plugin_info' => 'Envie um pacote ZIP com uma estrutura de plugin valida e seu manifesto.',
     'view_changelog' => 'Ver changelog',
+    'reports_desc' => 'Revise os relatos dos membros, inspecione o alvo sinalizado e conclua a moderacao sem sair da fila.',
+    'reviewed' => 'Revisado',
 ];

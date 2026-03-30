@@ -14,9 +14,10 @@
 * **Improvement**: Modernized the **Directory Categories** admin interface (`/admin/directory/categories`) with a matching glassmorphic design, hierarchical visual cues, and improved table layouts.
 * **Improvement**: Redesigned the **Plugins** admin page (`/admin/plugins`) into a modern extension hub with a hero header, live stats, responsive management cards, reusable changelog/delete modals, and lazy-loaded previews while preserving the existing activation, upload, update, and delete workflows.
 * **Improvement**: Redesigned the **Themes** admin page (`/admin/themes`) with the same Duralux-aligned visual system, including a hero header, status chips, richer preview cards, clearer activation/update actions, and responsive gallery behavior.
+* **Improvement**: Redesigned the **Reports** admin page (`/admin/reports`) into a dedicated moderation hub with a hero header, moderation stats, modern report cards, clearer reporter/target actions, and a responsive review queue while preserving the existing review and delete flows.
 * **Improvement**: Enhanced the visual hierarchy of the **Add Category** buttons on management pages, using high-contrast "pop" colors (Warning/Primary) to distinguish them from the background.
-* **Architecture**: Introduced shared admin partials for the new extension management shell so Plugins and Themes stay visually consistent without duplicating modal logic or heavy page markup.
-* **i18n**: Added missing translation keys for category lists, descriptions, placeholder text, plugin/theme management labels, extension stats, modal content, and action feedback across all **9 supported languages**.
+* **Architecture**: Introduced shared admin partials for the new extension management shell and report-specific moderation styles so Plugins, Themes, and Reports stay visually consistent without duplicating heavy UI markup.
+* **i18n**: Added missing translation keys for category lists, descriptions, placeholder text, plugin/theme management labels, report moderation copy, extension stats, modal content, and action feedback across all **9 supported languages**.
 
 ### 🛡️ Core Stability & Database
 * **Fix**: Resolved `Integrity constraint violation` when creating or updating Forum and Directory categories without a description by enforcing default empty strings in `AdminController`.
@@ -24,10 +25,13 @@
 * **Refactor**: Simplified `storeNews` logic in the Admin panel to remove redundant input handling.
 * **Fix**: Standardized translation key usage in `deleteDirectoryCategory`.
 * **Fix**: Corrected the plugin deletion flow so success is only reported when deletion actually returns `true`; active or blocked plugins now surface a translated error message instead of a false success notice.
+* **Fix**: Resolved the **Reported Content Removed** false state on `/admin/reports` for **Order Requests** and reported request publishers by unifying report type handling for both current and legacy report flows (`6/99` and `701/702`).
+* **Improvement**: Refactored admin report target resolution into a centralized controller path, reducing scattered per-row lookup logic and improving consistency for Directory, Forum, News, Store, Knowledgebase, Ads, Orders, and User reports.
 
 ### 🌍 Localization & UX
 * **Improvement**: Replaced technical placeholders (`confirm_suspend`) with descriptive, human-readable confirmation messages across all **9 supported languages**.
 * **Improvement**: Removed remaining visible English fallback copy from the Plugins and Themes admin pages so extension management now follows the active locale more consistently.
+* **Improvement**: Added localized moderation copy for the redesigned Reports admin experience, including queue descriptions and reviewed-state labels across all **9 supported languages**.
 * **Policy**: Updated technical documentation (`Agents.md`) with new safety guidelines for AI agents regarding terminal command execution.
 
 # v4.2.1
