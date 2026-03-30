@@ -17,12 +17,12 @@ return new class extends Migration
 
         Schema::table('cat_dir', function (Blueprint $table) {
             $table->text('txt')->nullable()->change();
-            $table->string('metakeywords')->nullable()->change();
+            $table->text('metakeywords')->nullable()->change();
         });
 
         Schema::table('directory', function (Blueprint $table) {
             $table->text('txt')->nullable()->change();
-            $table->string('metakeywords')->nullable()->change();
+            $table->text('metakeywords')->nullable()->change();
         });
     }
 
