@@ -552,6 +552,8 @@ php artisan storage:link
 29. **Admin routes** must always be in the `admin` prefix group with `AdminMiddleware`.
 30. **File uploads:** Validate MIME types, limit sizes, store in `public/upload/`.
 31. **CSRF:** Never disable CSRF except for installer routes and ad serving endpoints.
+32. **PHP Commands:** Agents must not execute PHP commands directly (e.g., `php artisan migrate`, `php artisan tinker`). These commands often fail or time out in the background and can be destructive if misconfigured.
+33. **Task Completion:** After finishing code changes, the agent must provide a summary of recommendations, manual actions required (like running migrations), or general notes, rather than executing terminal commands for deployment or maintenance.
 
 ---
 

@@ -1,5 +1,5 @@
 # v4.2.2
-> **Feature Release** - User Social Links, expanded platform integrations, and branding updates.
+> **Corrective Release** - User Social Links, stability fixes for categories, and localization polish.
 
 ### 🔗 User Social Links
 * **Add**: Introduced a new **Social Links** section in the user settings (`/settings/social`).
@@ -8,6 +8,16 @@
 * **Add**: Smart URL normalization engine that clean-validates handles and URLs into standardized profile links.
 * **Improvement**: Integrated the social links widget into the member profile hub, positioned elegantly below the badges section.
 * **i18n**: Fully localized platform names and social settings labels across all **9 supported languages**.
+
+### 🛡️ Core Stability & Database
+* **Fix**: Resolved `Integrity constraint violation` when creating or updating Forum and Directory categories without a description by enforcing default empty strings in `AdminController`.
+* **Fix**: Created a repair migration to make `txt` and `metakeywords` columns `nullable` for `f_cat` and `directory_cat` tables.
+* **Refactor**: Simplified `storeNews` logic in the Admin panel to remove redundant input handling.
+* **Fix**: Standardized translation key usage in `deleteDirectoryCategory`.
+
+### 🌍 Localization & UX
+* **Improvement**: Replaced technical placeholders (`confirm_suspend`) with descriptive, human-readable confirmation messages across all **9 supported languages**.
+* **Policy**: Updated technical documentation (`Agents.md`) with new safety guidelines for AI agents regarding terminal command execution.
 
 # v4.2.1
 > **Patch Release** - Version consistency, installer metadata fixes, and update flow polish.

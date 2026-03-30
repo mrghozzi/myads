@@ -1403,7 +1403,13 @@ class AdminController extends Controller
             'txt' => 'nullable|string',
         ]);
 
-        ForumCategory::create($request->only(['name', 'icons', 'ordercat', 'visibility', 'txt']));
+        ForumCategory::create([
+            'name' => $request->name,
+            'icons' => $request->icons,
+            'ordercat' => $request->ordercat,
+            'visibility' => $request->visibility,
+            'txt' => $request->input('txt') ?? '',
+        ]);
 
         return redirect()->back()->with('success', __('messages.category_created'));
     }
@@ -1420,7 +1426,13 @@ class AdminController extends Controller
             'txt' => 'nullable|string',
         ]);
 
-        $category->update($request->only(['name', 'icons', 'ordercat', 'visibility', 'txt']));
+        $category->update([
+            'name' => $request->name,
+            'icons' => $request->icons,
+            'ordercat' => $request->ordercat,
+            'visibility' => $request->visibility,
+            'txt' => $request->input('txt') ?? '',
+        ]);
 
         return redirect()->back()->with('success', __('messages.category_updated'));
     }
@@ -1596,9 +1608,16 @@ class AdminController extends Controller
             'metakeywords' => 'nullable|string',
         ]);
 
-        DirectoryCategory::create($request->all());
+        DirectoryCategory::create([
+            'name' => $request->name,
+            'sub' => (int) $request->sub,
+            'ordercat' => (int) $request->ordercat,
+            'statu' => (int) ($request->statu ?? 1),
+            'txt' => $request->input('txt') ?? '',
+            'metakeywords' => $request->input('metakeywords') ?? '',
+        ]);
 
-        return redirect()->back()->with('success', __('category_created'));
+        return redirect()->back()->with('success', __('messages.category_created'));
     }
 
     public function updateDirectoryCategory(Request $request, $id)
@@ -1614,9 +1633,16 @@ class AdminController extends Controller
             'metakeywords' => 'nullable|string',
         ]);
 
-        $category->update($request->all());
+        $category->update([
+            'name' => $request->name,
+            'sub' => (int) $request->sub,
+            'ordercat' => (int) $request->ordercat,
+            'statu' => (int) ($request->statu ?? 1),
+            'txt' => $request->input('txt') ?? '',
+            'metakeywords' => $request->input('metakeywords') ?? '',
+        ]);
 
-        return redirect()->back()->with('success', __('category_updated'));
+        return redirect()->back()->with('success', __('messages.category_updated'));
     }
 
     public function deleteDirectoryCategory($id)
@@ -1624,7 +1650,7 @@ class AdminController extends Controller
         $category = DirectoryCategory::findOrFail($id);
         $category->delete();
         
-        return redirect()->back()->with('success', __('category_deleted'));
+        return redirect()->back()->with('success', __('messages.category_deleted'));
     }
 
     // News Management
@@ -1637,9 +1663,6 @@ class AdminController extends Controller
 
     public function storeNews(Request $request)
     {
-        if (!$request->has('text') && $request->has('txt')) {
-            $request->merge(['text' => $request->input('txt')]);
-        }
         $request->validate([
             'name' => 'required|string',
             'text' => 'required|string',
@@ -1664,7 +1687,7 @@ class AdminController extends Controller
         Status::create([
             'uid' => auth()->id(),
             'tp_id' => $news->id,
-            's_type' => 5,
+            's_type' => 5, // News
             'date' => time(),
             'statu' => 1,
         ]);
