@@ -1,4 +1,4 @@
-# Agents.md — MYADS v4.2.1
+# Agents.md — MYADS v4.2.2
 
 > **Purpose:** This file gives AI coding agents a fast, comprehensive understanding of the MYADS project — its architecture, conventions, key files, and rules — so they can work effectively from a fresh chat context.
 
@@ -6,7 +6,7 @@
 
 ## 1. Project Identity
 
-- **Name:** MYADS v4.2.1
+- **Name:** MYADS v4.2.2
 - **Type:** Social network + ad exchange platform for website owners
 - **Framework:** Laravel 12 (PHP 8.2+)
 - **Database:** MySQL 5.7+ / MariaDB 10.3+
@@ -29,6 +29,7 @@ MYADS is a community platform where website owners:
 7. **News** — admin-published articles posted to community feed.
 8. **Gamification** — points (PTS), badges, quests, point transactions ledger.
 9. **SEO Suite** — centralized SEO engine, admin SEO dashboard, dynamic robots.txt, sitemap index, GA4 integration.
+10. **Social Links** — managed user social media presence across 10+ platforms with branded icons and smart URL validation.
 
 ---
 
@@ -418,6 +419,11 @@ pages/         → Static pages (privacy, terms, custom)
 - **Cache Safety:** Version-sync caching is scoped per version key (`system_version_checked_{version-name}`) so post-upgrade requests do not wait on stale cache state before the `options` table is corrected.
 - **Installer UI:** Installer update and finish screens display the active runtime version from `SystemVersion`, reducing patch-release drift.
 
+### User Social Links System (v4.2.2)
+- **Storage:** Uses JSON-encoded records in the `options` table with `o_type = 'user_social_links'`.
+- **Validation:** `ProfileController@normalizeSocialLink` performs smart validation and normalization for 10 platforms (Facebook, Twitter, Vkontakte, LinkedIn, Instagram, YouTube, Threads, Reddit, GitHub, ADStn), converting raw handles or malformed URLs into clean, canonical profile links.
+- **Display:** Icons are rendered with brand-specific secondary colors and FontAwesome icons, opening in new tabs for a seamless profile experience.
+
 ---
 
 ## 14. Environment Configuration
@@ -622,6 +628,16 @@ php artisan storage:link
 
 ---
 
+## 19D. Social Links & v4.2.2 Release (2026-03-30)
+
+- **Controllers:** Expanded `ProfileController` with `social()`, `updateSocial()`, and `normalizeSocialLink()` for platform-wide social presence management.
+- **Features:** Added a new **Social Links** settings page (`/settings/social`) and a dedicated profile widget below the badges section.
+- **Integrations:** Added specialized brand colors and icons for 10 platforms, including a high-fidelity integration for the **ADStn** community system.
+- **i18n:** Fully localized platform names and social settings strings across all 9 supported locales.
+- **Version:** Officially bumped runtime and documentation to **v4.2.2**.
+
+---
+
 ## 20. Maintaining This File
 
 > **⚠️ RULE: This `Agents.md` file MUST be kept up to date.**
@@ -638,9 +654,10 @@ Whenever you make changes that affect any of the following, **update this file a
 - Changing the **directory structure**
 - Adding new **rules or coding conventions**
 - Updating the **project version**
+- Adding or expanding **Social Links** platform support
 
 If in doubt, update it. An outdated `Agents.md` causes future agents to make wrong assumptions and waste time. Keeping it accurate is as important as keeping the code itself correct.
 
 ---
 
-*Last updated: 2026-03-29 — MYADS v4.2.1 (version metadata consistency documented)*
+*Last updated: 2026-03-30 — MYADS v4.2.2 (Social Links feature implemented)*

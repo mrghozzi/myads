@@ -1,3 +1,14 @@
+# v4.2.2
+> **Feature Release** - User Social Links, expanded platform integrations, and branding updates.
+
+### 🔗 User Social Links
+* **Add**: Introduced a new **Social Links** section in the user settings (`/settings/social`).
+* **Add**: Support for **10 major platforms**: Facebook, Twitter (X), Vkontakte, LinkedIn, Instagram, YouTube, Threads, Reddit, GitHub, and **ADStn**.
+* **Add**: Brand-specific icons and colors for every platform, including a high-fidelity integration for the ADStn community platform.
+* **Add**: Smart URL normalization engine that clean-validates handles and URLs into standardized profile links.
+* **Improvement**: Integrated the social links widget into the member profile hub, positioned elegantly below the badges section.
+* **i18n**: Fully localized platform names and social settings labels across all **9 supported languages**.
+
 # v4.2.1
 > **Patch Release** - Version consistency, installer metadata fixes, and update flow polish.
 
