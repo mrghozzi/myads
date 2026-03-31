@@ -55,3 +55,4 @@ Thumbs.db
 !/tests/Feature/SiteAdPlacementTest.php
 !/tests/Feature/UpdateSafetyFeatureTest.php
 ~/.pi/
+Documents/development_suggestions.md
