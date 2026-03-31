@@ -1,6 +1,31 @@
 # v4.2.2
 > **Corrective Release** - User Social Links, admin extensions redesign, stability fixes, and localization polish.
 
+### ✍️ Content Editing Modernization
+*   **Editor**: Replaced the legacy `sceditor` with `StackEdit` for all rich content editing fields in the following areas:
+    *   **Admin News**: `/admin/news` (create and edit news articles).
+    *   **Store Product Creation**: `/store/create` (main product body/description).
+    *   **Store Product Update**: `/store/{name}/update` (new version description/release notes).
+    *   **Admin Product Edit**: `/admin/products/{id}/edit` (main product body/description).
+*   **Editor**: Enhanced public news display (`/news/{id}`) to now correctly render Markdown content using `marked.js` and `DOMPurify`, ensuring new StackEdit-generated content is beautifully displayed.
+*   **Editor**: Enhanced store product display (`/store/{name}`) to correctly render Markdown for main product details (`o_valuer`) and product file descriptions (in versions tab) using `marked.js` and `DOMPurify`.
+
+### ⚡ Inline Editing for Store
+*   **Add**: Introduced inline editing functionality for the main product **Topic Body** directly from the `/store/{name}` public page.
+    *   **Access**: Available to product publishers and site administrators.
+    *   **Editor**: Utilizes `StackEdit` for a seamless Markdown editing experience.
+    *   **UX**: Features AJAX-based saving with real-time feedback (`Saving...`, `Saved!`) without page reload.
+    *   **UI**: "Edit Topic" button integrated into the product's action menu for quick access.
+*   **Add**: Introduced inline editing functionality for the main product **Details (Description)** (`o_valuer`) directly from the `/store/{name}` public page.
+    *   **Access**: Available to product publishers and site administrators.
+    *   **Editor**: Utilizes `StackEdit` for a seamless Markdown editing experience.
+    *   **UX**: Features AJAX-based saving with real-time feedback (`Saving...`, `Saved!`) without page reload.
+    *   **UI**: "Edit Product" button integrated into the Details tab for direct content modification.
+*   **Fix**: Improved topic retrieval logic in `StoreController` for the `/store/{name}` page to ensure the associated forum topic is correctly fetched, enabling the inline editing functionality where applicable.
+
+### 🌍 Localization & i18n
+*   **Add**: Added new translation keys (`saving`, `saved`, `topic_updated`) across all 9 supported languages to support the new inline editing features.
+
 ### 🔗 User Social Links
 * **Add**: Introduced a new **Social Links** section in the user settings (`/settings/social`).
 * **Add**: Support for **10 major platforms**: Facebook, Twitter (X), Vkontakte, LinkedIn, Instagram, YouTube, Threads, Reddit, GitHub, and **ADStn**.

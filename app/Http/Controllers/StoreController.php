@@ -113,6 +113,12 @@ class StoreController extends Controller
         if ($type && $type->o_order) {
             $topic = ForumTopic::find($type->o_order);
         }
+        
+        // Fallback: If no topic linked via o_order, try finding by name or related content
+        if (!$topic) {
+            $topic = ForumTopic::where('name', $product->name)->first();
+        }
+        
         $latestFile = ProductFile::where('o_parent', $product->id)->orderBy('id', 'desc')->first();
         $downloadHash = null;
         if ($latestFile) {
@@ -352,6 +358,53 @@ class StoreController extends Controller
         }
         $files = ProductFile::where('o_parent', $product->id)->orderBy('id', 'desc')->get();
         return view('theme::store.update', compact('product', 'files'));
+    }
+
+    /**
+     * Update the main product topic body text (inline from /store/{name}).
+     */
+    public function updateTopic(Request $request, $name)
+    {
+        $product = Product::withoutGlobalScope('store')->where('o_type', 'store')->where('name', $name)->firstOrFail();
+
+        if (!Auth::check() || (Auth::id() != $product->o_parent && !Auth::user()->isAdmin())) {
+            return response()->json(['success' => false, 'message' => __('messages.unauthorized')], 403);
+        }
+
+        $request->validate([
+            'txt' => ['required', 'string', 'min:10'],
+        ]);
+
+        $type = Option::where('o_type', 'store_type')->where('o_parent', $product->id)->first();
+
+        if ($type && $type->o_order) {
+            $topic = ForumTopic::find($type->o_order);
+            if ($topic) {
+                $topic->update(['txt' => $request->input('txt')]);
+            }
+        }
+
+        return response()->json(['success' => true, 'message' => __('messages.updated_successfully') ?? 'Updated successfully']);
+    }
+
+    /**
+     * Update the main product details (o_valuer) (inline from /store/{name}).
+     */
+    public function updateDetails(Request $request, $name)
+    {
+        $product = Product::withoutGlobalScope('store')->where('o_type', 'store')->where('name', $name)->firstOrFail();
+
+        if (!Auth::check() || (Auth::id() != $product->o_parent && !Auth::user()->isAdmin())) {
+            return response()->json(['success' => false, 'message' => __('messages.unauthorized')], 403);
+        }
+
+        $request->validate([
+            'txt' => ['required', 'string', 'min:10'],
+        ]);
+
+        $product->update(['o_valuer' => $request->input('txt')]);
+
+        return response()->json(['success' => true, 'message' => __('messages.updated_successfully') ?? 'Updated successfully']);
     }
 
     public function storeUpdate(Request $request, $name)

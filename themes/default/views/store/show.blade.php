@@ -157,6 +157,11 @@
                                     <a class="simple-dropdown-link" href="{{ route('store.update', $product->name) }}">
                                         <i class="fa fa-edit" aria-hidden="true"></i>&nbsp;{{ __('messages.edit_product') }}
                                     </a>
+                                    @if($topic)
+                                    <button type="button" class="simple-dropdown-link store-dropdown-button" id="trigger-topic-edit-from-menu">
+                                        <i class="fa fa-pencil-square" aria-hidden="true"></i>&nbsp;{{ __('messages.edit_topic') }}
+                                    </button>
+                                    @endif
                                     <p class="simple-dropdown-link store-dropdown-button" onclick="deletePost({{ $product->id }}, 7867, '.store-detail-page')">
                                         <i class="fa fa-trash" aria-hidden="true"></i>&nbsp;{{ __('messages.delete') }}
                                     </p>
@@ -244,6 +249,11 @@
                 <div class="tab-box-option active" data-tab="desc-tab">
                     <p class="tab-box-option-title">{{ __('messages.details') }}</p>
                 </div>
+                @if($topic)
+                <div class="tab-box-option" data-tab="topic-tab">
+                    <p class="tab-box-option-title">{{ __('messages.topic') }}</p>
+                </div>
+                @endif
                 <div class="tab-box-option" data-tab="comments-tab">
                     <p class="tab-box-option-title">{{ __('messages.comments') }} <span class="highlighted">{{ $commentCount }}</span></p>
                 </div>
@@ -253,10 +263,90 @@
             </div>
             <div class="tab-box-items">
                 <div class="tab-box-item" id="desc-tab" style="display: block; transition: none 0s ease 0s;">
-                    <div class="tab-box-item-content store-rich-text markdown-content">
-                        {!! $product->o_valuer !!}
+                    <div class="tab-box-item-content store-rich-text">
+                        @if($canManageProduct)
+                        <div class="store-details-toolbar">
+                            <button type="button" class="button secondary small" id="store-edit-details-btn">
+                                <i class="fa fa-pencil-square" aria-hidden="true"></i>&nbsp; {{ __('messages.edit_product') }}
+                            </button>
+                            <button type="button" class="button primary small" id="store-save-details-btn" style="display:none;">
+                                <i class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp; {{ __('messages.save') }}
+                            </button>
+                            <button type="button" class="button white small" id="store-cancel-details-btn" style="display:none;">
+                                <i class="fa fa-times" aria-hidden="true"></i>&nbsp; {{ __('messages.cancel') }}
+                            </button>
+                            <span id="store-details-saving" style="display:none;color:#8f91ac;font-size:.85rem;margin-inline-start:10px;">
+                                <i class="fa fa-spinner fa-spin"></i>&nbsp; {{ __('messages.saving') }}
+                            </span>
+                            <span id="store-details-saved" style="display:none;color:#4ff461;font-size:.85rem;margin-inline-start:10px;">
+                                <i class="fa fa-check-circle"></i>&nbsp; {{ __('messages.saved') }}
+                            </span>
+                        </div>
+                        @endif
+
+                        {{-- Read-only view --}}
+                        <div id="store-details-display" class="markdown-content">
+                            {!! $product->o_valuer !!}
+                        </div>
+
+                        {{-- Editor (hidden by default) --}}
+                        @if($canManageProduct)
+                        <div id="store-details-editor" style="display:none;">
+                            <div class="stackedit-tools mb-2">
+                                <button type="button" class="button secondary small open-stackedit-details">
+                                    <i class="fa fa-pencil-square" aria-hidden="true"></i>&nbsp; {{ __('messages.edit_with_stackedit') }}
+                                </button>
+                            </div>
+                            <textarea id="store-details-textarea" rows="15" class="form-control" style="width:100%;padding:10px;">{{ $product->o_valuer }}</textarea>
+                        </div>
+                        @endif
                     </div>
                 </div>
+
+                {{-- Topic Tab --}}
+                @if($topic)
+                <div class="tab-box-item" id="topic-tab" style="display: none; transition: none 0s ease 0s;">
+                    <div class="tab-box-item-content">
+                        @if($canManageProduct)
+                        <div class="store-topic-toolbar">
+                            <button type="button" class="button secondary small" id="store-edit-topic-btn">
+                                <i class="fa fa-pencil-square" aria-hidden="true"></i>&nbsp; {{ __('messages.edit_topic') }}
+                            </button>
+                            <button type="button" class="button primary small" id="store-save-topic-btn" style="display:none;">
+                                <i class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp; {{ __('messages.save') }}
+                            </button>
+                            <button type="button" class="button white small" id="store-cancel-topic-btn" style="display:none;">
+                                <i class="fa fa-times" aria-hidden="true"></i>&nbsp; {{ __('messages.cancel') }}
+                            </button>
+                            <span id="store-topic-saving" style="display:none;color:#8f91ac;font-size:.85rem;margin-inline-start:10px;">
+                                <i class="fa fa-spinner fa-spin"></i>&nbsp; {{ __('messages.saving') ?? 'Saving...' }}
+                            </span>
+                            <span id="store-topic-saved" style="display:none;color:#4ff461;font-size:.85rem;margin-inline-start:10px;">
+                                <i class="fa fa-check-circle"></i>&nbsp; {{ __('messages.saved') ?? 'Saved!' }}
+                            </span>
+                        </div>
+                        @endif
+
+                        {{-- Read-only view --}}
+                        <div id="store-topic-display" class="store-rich-text markdown-content">
+                            {!! $topic->txt !!}
+                        </div>
+
+                        {{-- Editor (hidden by default) --}}
+                        @if($canManageProduct)
+                        <div id="store-topic-editor" style="display:none;">
+                            <div class="stackedit-tools mb-2">
+                                <button type="button" class="button secondary small open-stackedit-topic">
+                                    <i class="fa fa-pencil-square" aria-hidden="true"></i>&nbsp; {{ __('messages.edit_with_stackedit') ?? 'Edit with StackEdit' }}
+                                </button>
+                            </div>
+                            <textarea id="store-topic-textarea" rows="15" class="form-control" style="width:100%;padding:10px;">{{ $topic->txt }}</textarea>
+                        </div>
+                        @endif
+                    </div>
+                </div>
+                @endif
+
                 <div class="tab-box-item" id="comments-tab" style="display: none; transition: none 0s ease 0s;">
                     <div class="tab-box-item-content">
                         <div class="post-comment-list post-comment-list-{{ $product->id }}"></div>
@@ -349,23 +439,305 @@
 
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/dompurify/dist/purify.min.js"></script>
+<script src="https://unpkg.com/stackedit-js@1.0.7/docs/lib/stackedit.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        document.querySelectorAll('.markdown-content').forEach(el => {
-            if (!el.getAttribute('data-rendered')) {
-                try {
-                    const rawContent = el.innerHTML;
-                    el.innerHTML = DOMPurify.sanitize(marked.parse(el.innerText || rawContent));
-                    el.setAttribute('data-rendered', 'true');
-                    el.style.display = 'block';
-                } catch (e) {
-                    console.error('Error rendering markdown:', e);
+        // Markdown rendering
+        function renderAllMarkdown() {
+            document.querySelectorAll('.markdown-content').forEach(el => {
+                if (!el.getAttribute('data-rendered')) {
+                    try {
+                        const rawContent = el.innerHTML;
+                        el.innerHTML = DOMPurify.sanitize(marked.parse(el.innerText || rawContent));
+                        el.setAttribute('data-rendered', 'true');
+                        el.style.display = 'block';
+                    } catch (e) {
+                        console.error('Error rendering markdown:', e);
+                    }
                 }
+            });
+        }
+        renderAllMarkdown();
+
+        // ── Topic inline editing ──
+        const editBtn   = document.getElementById('store-edit-topic-btn');
+        const saveBtn   = document.getElementById('store-save-topic-btn');
+        const cancelBtn = document.getElementById('store-cancel-topic-btn');
+        const savingEl  = document.getElementById('store-topic-saving');
+        const savedEl   = document.getElementById('store-topic-saved');
+        const display   = document.getElementById('store-topic-display');
+        const editor    = document.getElementById('store-topic-editor');
+        const textarea  = document.getElementById('store-topic-textarea');
+
+        if (editBtn && textarea) {
+            let originalValue = textarea.value;
+
+            // Trigger from menu
+            const menuTrigger = document.getElementById('trigger-topic-edit-from-menu');
+            if (menuTrigger) {
+                menuTrigger.addEventListener('click', function() {
+                    const topicTab = document.querySelector('[data-tab="topic-tab"]');
+                    if (topicTab) {
+                        topicTab.click(); // Switch to tab
+                        editBtn.click(); // Open editor
+                    }
+                });
             }
-        });
+
+            // Enter edit mode
+            editBtn.addEventListener('click', function() {
+                originalValue = textarea.value;
+                display.style.display = 'none';
+                editor.style.display = 'block';
+                editBtn.style.display = 'none';
+                saveBtn.style.display = '';
+                cancelBtn.style.display = '';
+                savedEl.style.display = 'none';
+            });
+
+            // Cancel edit
+            cancelBtn.addEventListener('click', function() {
+                textarea.value = originalValue;
+                editor.style.display = 'none';
+                display.style.display = '';
+                display.removeAttribute('data-rendered');
+                display.innerHTML = originalValue;
+                renderAllMarkdown();
+                editBtn.style.display = '';
+                saveBtn.style.display = 'none';
+                cancelBtn.style.display = 'none';
+            });
+
+            // Save via AJAX
+            saveBtn.addEventListener('click', function() {
+                saveBtn.disabled = true;
+                savingEl.style.display = '';
+                savedEl.style.display = 'none';
+
+                const csrfToken = document.querySelector('meta[name="csrf-token"]');
+                fetch("{{ route('store.update.topic', $product->name) }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken ? csrfToken.content : '',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ txt: textarea.value })
+                })
+                .then(r => r.json())
+                .then(data => {
+                    savingEl.style.display = 'none';
+                    saveBtn.disabled = false;
+                    if (data.success) {
+                        originalValue = textarea.value;
+                        // Update display
+                        display.removeAttribute('data-rendered');
+                        display.innerHTML = textarea.value;
+                        renderAllMarkdown();
+                        // Switch back to view mode
+                        editor.style.display = 'none';
+                        display.style.display = '';
+                        editBtn.style.display = '';
+                        saveBtn.style.display = 'none';
+                        cancelBtn.style.display = 'none';
+                        savedEl.style.display = '';
+                        setTimeout(() => { savedEl.style.display = 'none'; }, 3000);
+                    } else {
+                        alert(data.message || 'Error');
+                    }
+                })
+                .catch(() => {
+                    savingEl.style.display = 'none';
+                    saveBtn.disabled = false;
+                    alert('Network error');
+                });
+            });
+
+            // StackEdit integration for topic editor
+            const stackeditBtn = document.querySelector('.open-stackedit-topic');
+            if (stackeditBtn) {
+                stackeditBtn.addEventListener('click', function() {
+                    const stackedit = new Stackedit();
+                    stackedit.openFile({
+                        name: '{{ $product->name }}',
+                        content: { text: textarea.value }
+                    });
+                    const adjustIframe = () => {
+                        const iframe = document.querySelector('iframe[src*="stackedit.io"]');
+                        if (iframe) {
+                            const header = document.querySelector('.header, .nxl-header');
+                            if (header) {
+                                const hh = header.offsetHeight;
+                                iframe.style.top = hh + 'px';
+                                iframe.style.height = `calc(100% - ${hh}px)`;
+                            } else {
+                                iframe.style.top = '80px';
+                                iframe.style.height = 'calc(100% - 80px)';
+                            }
+                        } else {
+                            setTimeout(adjustIframe, 50);
+                        }
+                    };
+                    adjustIframe();
+                    stackedit.on('fileChange', (file) => {
+                        textarea.value = file.content.text;
+                    });
+                });
+            }
+        }
+
+        // ── Details inline editing ──
+        const editDetailsBtn   = document.getElementById('store-edit-details-btn');
+        const saveDetailsBtn   = document.getElementById('store-save-details-btn');
+        const cancelDetailsBtn = document.getElementById('store-cancel-details-btn');
+        const savingDetailsEl  = document.getElementById('store-details-saving');
+        const savedDetailsEl   = document.getElementById('store-details-saved');
+        const displayDetails   = document.getElementById('store-details-display');
+        const editorDetails    = document.getElementById('store-details-editor');
+        const textareaDetails  = document.getElementById('store-details-textarea');
+
+        if (editDetailsBtn && textareaDetails) {
+            let originalDetailsValue = textareaDetails.value;
+
+            // Enter edit mode
+            editDetailsBtn.addEventListener('click', function() {
+                originalDetailsValue = textareaDetails.value;
+                displayDetails.style.display = 'none';
+                editorDetails.style.display = 'block';
+                editDetailsBtn.style.display = 'none';
+                saveDetailsBtn.style.display = '';
+                cancelDetailsBtn.style.display = '';
+                savedDetailsEl.style.display = 'none';
+            });
+
+            // Cancel edit
+            cancelDetailsBtn.addEventListener('click', function() {
+                textareaDetails.value = originalDetailsValue;
+                editorDetails.style.display = 'none';
+                displayDetails.style.display = '';
+                displayDetails.removeAttribute('data-rendered');
+                displayDetails.innerHTML = originalDetailsValue;
+                renderAllMarkdown();
+                editDetailsBtn.style.display = '';
+                saveDetailsBtn.style.display = 'none';
+                cancelDetailsBtn.style.display = 'none';
+            });
+
+            // Save via AJAX
+            saveDetailsBtn.addEventListener('click', function() {
+                saveDetailsBtn.disabled = true;
+                savingDetailsEl.style.display = '';
+                savedDetailsEl.style.display = 'none';
+
+                const csrfToken = document.querySelector('meta[name="csrf-token"]');
+                fetch("{{ route('store.update.details', $product->name) }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken ? csrfToken.content : '',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ txt: textareaDetails.value })
+                })
+                .then(r => r.json())
+                .then(data => {
+                    savingDetailsEl.style.display = 'none';
+                    saveDetailsBtn.disabled = false;
+                    if (data.success) {
+                        originalDetailsValue = textareaDetails.value;
+                        // Update display
+                        displayDetails.removeAttribute('data-rendered');
+                        displayDetails.innerHTML = textareaDetails.value;
+                        renderAllMarkdown();
+                        // Switch back to view mode
+                        editorDetails.style.display = 'none';
+                        displayDetails.style.display = '';
+                        editDetailsBtn.style.display = '';
+                        saveDetailsBtn.style.display = 'none';
+                        cancelDetailsBtn.style.display = 'none';
+                        savedDetailsEl.style.display = '';
+                        setTimeout(() => { savedDetailsEl.style.display = 'none'; }, 3000);
+                    } else {
+                        alert(data.message || 'Error');
+                    }
+                })
+                .catch(() => {
+                    savingDetailsEl.style.display = 'none';
+                    saveDetailsBtn.disabled = false;
+                    alert('Network error');
+                });
+            });
+
+            // StackEdit integration for details editor
+            const stackeditDetailsBtn = document.querySelector('.open-stackedit-details');
+            if (stackeditDetailsBtn) {
+                stackeditDetailsBtn.addEventListener('click', function() {
+                    const stackedit = new Stackedit();
+                    stackedit.openFile({
+                        name: '{{ $product->name }}',
+                        content: { text: textareaDetails.value }
+                    });
+                    const adjustIframe = () => {
+                        const iframe = document.querySelector('iframe[src*="stackedit.io"]');
+                        if (iframe) {
+                            const header = document.querySelector('.header, .nxl-header');
+                            if (header) {
+                                const hh = header.offsetHeight;
+                                iframe.style.top = hh + 'px';
+                                iframe.style.height = `calc(100% - ${hh}px)`;
+                            } else {
+                                iframe.style.top = '80px';
+                                iframe.style.height = 'calc(100% - 80px)';
+                            }
+                        } else {
+                            setTimeout(adjustIframe, 50);
+                        }
+                    };
+                    adjustIframe();
+                    stackedit.on('fileChange', (file) => {
+                        textareaDetails.value = file.content.text;
+                    });
+                });
+            }
+        }
     });
 </script>
 <style>
     .markdown-content { display: none; }
+    .store-topic-toolbar {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 8px;
+        padding: 0 0 16px;
+        border-bottom: 1px solid rgba(140, 146, 182, 0.16);
+        margin-bottom: 16px;
+    }
+    #store-topic-editor, #store-details-editor { margin-top: 4px; }
+    #store-topic-editor textarea, #store-details-editor textarea {
+        font-family: Consolas, Monaco, 'Courier New', monospace;
+        font-size: 0.92rem;
+        line-height: 1.7;
+        border-radius: 12px;
+        border: 1px solid rgba(140, 146, 182, 0.24);
+        background: rgba(97, 93, 250, 0.03);
+    }
+    body[data-theme="css_d"] #store-topic-editor textarea,
+    body[data-theme="css_d"] #store-details-editor textarea {
+        background: rgba(97, 93, 250, 0.08);
+        border-color: rgba(140, 146, 182, 0.18);
+        color: #e8e8e8;
+    }
+    .store-details-toolbar {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 8px;
+        padding: 0 0 16px;
+        border-bottom: 1px solid rgba(140, 146, 182, 0.16);
+        margin-bottom: 16px;
+    }
 </style>
 @endsection
