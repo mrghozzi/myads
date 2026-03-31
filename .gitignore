@@ -56,3 +56,4 @@ Thumbs.db
 !/tests/Feature/UpdateSafetyFeatureTest.php
 ~/.pi/
 Documents/development_suggestions.md
+/wiki/

@@ -62,9 +62,14 @@
 
                         <div class="form-row">
                             <div class="form-item">
-                                <div class="form-input small full">
-                                    <label for="upd-desc">{{ __('messages.desc') }}</label>
-                                    <textarea id="upd-desc" name="desc" minlength="10" maxlength="2400" required>{{ old('desc') }}</textarea>
+                                <div class="form-input small full" style="padding: 10px;">
+                                    <label for="upd-desc" style="display:block;margin-bottom:10px;font-weight:bold;">{{ __('messages.desc') }}</label>
+                                    <div class="stackedit-tools mb-2" style="margin-bottom:10px;">
+                                        <button type="button" class="button secondary small open-stackedit" data-target="#upd-desc">
+                                            <i class="fa fa-pencil-square" aria-hidden="true"></i>&nbsp; {{ __('messages.edit_with_stackedit') ?? 'Edit with StackEdit' }}
+                                        </button>
+                                    </div>
+                                    <textarea id="upd-desc" name="desc" minlength="10" maxlength="2400" style="width:100%;padding:10px;" required>{{ old('desc') }}</textarea>
                                 </div>
                             </div>
                         </div>
@@ -249,5 +254,49 @@
 
         syncUpdateSummary();
     });
+</script>
+
+<script src="https://unpkg.com/stackedit-js@1.0.7/docs/lib/stackedit.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const stackedit = new Stackedit();
+    document.querySelectorAll('.open-stackedit').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const targetId = this.getAttribute('data-target');
+            const textarea = document.querySelector(targetId);
+            const articleName = '{{ $product->name }} Update Notes';
+            
+            stackedit.openFile({
+                name: articleName,
+                content: {
+                    text: textarea.value
+                }
+            });
+
+            const adjustIframe = () => {
+                const iframe = document.querySelector('iframe[src*="stackedit.io"]');
+                if (iframe) {
+                    const header = document.querySelector('.header, .nxl-header');
+                    if (header) {
+                        const headerHeight = header.offsetHeight;
+                        iframe.style.top = headerHeight + 'px';
+                        iframe.style.height = `calc(100% - ${headerHeight}px)`;
+                    } else {
+                        iframe.style.top = '80px';
+                        iframe.style.height = 'calc(100% - 80px)';
+                    }
+                } else {
+                    setTimeout(adjustIframe, 50);
+                }
+            };
+            adjustIframe();
+
+            stackedit.off('fileChange');
+            stackedit.on('fileChange', (file) => {
+                textarea.value = file.content.text;
+            });
+        });
+    });
+});
 </script>
 @endsection

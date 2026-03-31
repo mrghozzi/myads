@@ -7,9 +7,6 @@
 
 @include('theme::store.partials.editor-assets')
 
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sceditor@3/minified/themes/default.min.css" />
-<script src="https://cdn.jsdelivr.net/npm/sceditor@3/minified/sceditor.min.js"></script>
-
 <div class="section-banner" style="background: url({{ theme_asset('img/banner/Newsfeed.png') }}) no-repeat 50%;">
     <img class="section-banner-icon" src="{{ theme_asset('img/banner/marketplace-icon.png') }}">
     <p class="section-banner-title"><span><i class="fa fa-cart-plus" aria-hidden="true"></i></span>&nbsp;{{ __('messages.add_product') }}</p>
@@ -127,9 +124,14 @@
 
                         <div class="form-row">
                             <div class="form-item">
-                                <div class="form-input">
-                                    <label for="editor1">{{ __('messages.topic') }}</label>
-                                    <textarea name="txt" id="editor1" rows="15" required>{{ old('txt') }}</textarea>
+                                <div class="form-input" style="padding: 10px;">
+                                    <label for="editor1" style="display:block;margin-bottom:10px;font-weight:bold;">{{ __('messages.topic') }}</label>
+                                    <div class="stackedit-tools mb-2" style="margin-bottom:10px;">
+                                        <button type="button" class="button secondary small open-stackedit" data-target="#editor1">
+                                            <i class="fa fa-pencil-square" aria-hidden="true"></i>&nbsp; {{ __('messages.edit_with_stackedit') ?? 'Edit with StackEdit' }}
+                                        </button>
+                                    </div>
+                                    <textarea name="txt" id="editor1" rows="15" style="width:100%;padding:10px;" required>{{ old('txt') }}</textarea>
                                 </div>
                             </div>
                         </div>
@@ -291,28 +293,49 @@
     });
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/sceditor@3/minified/formats/xhtml.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sceditor@3/minified/jquery.sceditor.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sceditor@3/languages/{{ app()->getLocale() }}.js"></script>
+<script src="https://unpkg.com/stackedit-js@1.0.7/docs/lib/stackedit.min.js"></script>
 
 <script>
-    var textarea = document.getElementById('editor1');
-    sceditor.create(textarea, {
-        format: 'xhtml',
-        locale: '{{ app()->getLocale() }}',
-        emoticons: {
-            dropdown: {
-                @php $c = 1; @endphp
-                @foreach($emojis as $emoji)
-                    @if($c == 11)
-                        }, more: {
-                    @endif
-                    '{{ $emoji->name }}': '{{ theme_asset($emoji->img) }}',
-                    @php $c++; @endphp
-                @endforeach
-            }
-        },
-        style: 'https://cdn.jsdelivr.net/npm/sceditor@3/minified/themes/content/default.min.css'
+document.addEventListener('DOMContentLoaded', function() {
+    const stackedit = new Stackedit();
+    document.querySelectorAll('.open-stackedit').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const targetId = this.getAttribute('data-target');
+            const textarea = document.querySelector(targetId);
+            const nameInput = document.getElementById('store-name');
+            const articleName = nameInput && nameInput.value ? nameInput.value : 'Product Content';
+            
+            stackedit.openFile({
+                name: articleName,
+                content: {
+                    text: textarea.value
+                }
+            });
+
+            const adjustIframe = () => {
+                const iframe = document.querySelector('iframe[src*="stackedit.io"]');
+                if (iframe) {
+                    const header = document.querySelector('.header, .nxl-header');
+                    if (header) {
+                        const headerHeight = header.offsetHeight;
+                        iframe.style.top = headerHeight + 'px';
+                        iframe.style.height = `calc(100% - ${headerHeight}px)`;
+                    } else {
+                        iframe.style.top = '80px';
+                        iframe.style.height = 'calc(100% - 80px)';
+                    }
+                } else {
+                    setTimeout(adjustIframe, 50);
+                }
+            };
+            adjustIframe();
+
+            stackedit.off('fileChange');
+            stackedit.on('fileChange', (file) => {
+                textarea.value = file.content.text;
+            });
+        });
     });
+});
 </script>
 @endsection

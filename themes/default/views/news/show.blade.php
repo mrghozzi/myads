@@ -208,6 +208,8 @@
             font-size: 1.35rem;
         }
     }
+    
+    .markdown-content { display: none; }
 </style>
 @endpush
 
@@ -250,7 +252,7 @@
                     </time>
                 </div>
                 <h1 class="news-article-title">{{ $article->name }}</h1>
-                <div class="news-article-content">
+                <div class="news-article-content markdown-content">
                     {!! $article->text !!}
                 </div>
             </div>
@@ -258,3 +260,24 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify/dist/purify.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.markdown-content').forEach(el => {
+            if (!el.getAttribute('data-rendered')) {
+                try {
+                    const rawContent = el.innerHTML;
+                    el.innerHTML = DOMPurify.sanitize(marked.parse(el.innerText || rawContent));
+                    el.setAttribute('data-rendered', 'true');
+                    el.style.display = 'block';
+                } catch (e) {
+                    console.error('Error rendering markdown:', e);
+                }
+            }
+        });
+    });
+</script>
+@endpush

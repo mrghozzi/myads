@@ -253,8 +253,8 @@
             </div>
             <div class="tab-box-items">
                 <div class="tab-box-item" id="desc-tab" style="display: block; transition: none 0s ease 0s;">
-                    <div class="tab-box-item-content store-rich-text">
-                        <p class="tab-box-item-paragraph">{!! nl2br(e($product->o_valuer)) !!}</p>
+                    <div class="tab-box-item-content store-rich-text markdown-content">
+                        {!! $product->o_valuer !!}
                     </div>
                 </div>
                 <div class="tab-box-item" id="comments-tab" style="display: none; transition: none 0s ease 0s;">
@@ -306,7 +306,7 @@
                                                 </center>
                                             </td>
                                             @if($canManageProduct)
-                                                <td>{!! $file->o_valuer !!}</td>
+                                                <td class="markdown-content">{!! $file->o_valuer !!}</td>
                                             @endif
                                         </tr>
                                     @empty
@@ -346,4 +346,26 @@
         });
     });
 </script>
+
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify/dist/purify.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.markdown-content').forEach(el => {
+            if (!el.getAttribute('data-rendered')) {
+                try {
+                    const rawContent = el.innerHTML;
+                    el.innerHTML = DOMPurify.sanitize(marked.parse(el.innerText || rawContent));
+                    el.setAttribute('data-rendered', 'true');
+                    el.style.display = 'block';
+                } catch (e) {
+                    console.error('Error rendering markdown:', e);
+                }
+            }
+        });
+    });
+</script>
+<style>
+    .markdown-content { display: none; }
+</style>
 @endsection

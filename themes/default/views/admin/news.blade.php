@@ -7,11 +7,6 @@
     $dropdownEmojis = ($emojis ?? collect())->take(10);
     $moreEmojis = ($emojis ?? collect())->slice(10);
 @endphp
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sceditor@3/minified/themes/default.min.css" />
-<script src="https://cdn.jsdelivr.net/npm/sceditor@3/minified/sceditor.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sceditor@3/minified/formats/xhtml.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sceditor@3/minified/jquery.sceditor.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sceditor@3/languages/{{ app()->getLocale() }}.js"></script>
 
 <div class="page-header">
     <div class="page-header-left d-flex align-items-center">
@@ -109,10 +104,15 @@
                         <label class="form-label">{{ __('messages.title') }}</label>
                         <input type="text" name="name" class="form-control" required>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">{{ __('messages.content') }}</label>
-                        <textarea id="news-editor-add" name="text" class="form-control" rows="6" data-sceditor required></textarea>
-                    </div>
+                        <div class="mb-3">
+                            <label class="form-label">{{ __('messages.content') }}</label>
+                            <div class="stackedit-tools mb-2">
+                                <button type="button" class="btn btn-sm btn-outline-primary open-stackedit" data-target="#news-editor-add">
+                                    <i class="feather-edit me-1"></i> {{ __('messages.edit_with_stackedit') ?? 'Edit with StackEdit' }}
+                                </button>
+                            </div>
+                            <textarea id="news-editor-add" name="text" class="form-control" rows="10" required></textarea>
+                        </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ __('messages.cancel') }}</button>
@@ -140,7 +140,12 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label">{{ __('messages.content') }}</label>
-                            <textarea id="news-editor-{{ $item->id }}" name="text" class="form-control" rows="6" data-sceditor required>{{ $item->text }}</textarea>
+                            <div class="stackedit-tools mb-2">
+                                <button type="button" class="btn btn-sm btn-outline-primary open-stackedit" data-target="#news-editor-{{ $item->id }}">
+                                    <i class="feather-edit me-1"></i> {{ __('messages.edit_with_stackedit') ?? 'Edit with StackEdit' }}
+                                </button>
+                            </div>
+                            <textarea id="news-editor-{{ $item->id }}" name="text" class="form-control" rows="10" required>{{ $item->text }}</textarea>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -175,29 +180,48 @@
     </div>
 @endforeach
 
+<script src="https://unpkg.com/stackedit-js@1.0.7/docs/lib/stackedit.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    if (typeof sceditor === 'undefined') {
-        return;
-    }
-    var emoticons = {
-        dropdown: {
-            @foreach($dropdownEmojis as $emoji)
-                '{{ $emoji->name }}': '{{ asset($emoji->img) }}',
-            @endforeach
-        }@if($moreEmojis->isNotEmpty()),
-        more: {
-            @foreach($moreEmojis as $emoji)
-                '{{ $emoji->name }}': '{{ asset($emoji->img) }}',
-            @endforeach
-        }@endif
-    };
-    document.querySelectorAll('[data-sceditor]').forEach(function(textarea) {
-        sceditor.create(textarea, {
-            format: 'xhtml',
-            locale: '{{ app()->getLocale() }}',
-            emoticons: emoticons,
-            style: 'https://cdn.jsdelivr.net/npm/sceditor@3/minified/themes/content/default.min.css'
+    // StackEdit Integration
+    const stackedit = new Stackedit();
+    document.querySelectorAll('.open-stackedit').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const targetId = this.getAttribute('data-target');
+            const textarea = document.querySelector(targetId);
+            const modal = this.closest('.modal-content');
+            const nameInput = modal.querySelector('input[name="name"]');
+            const articleName = nameInput ? nameInput.value : 'News Content';
+            
+            stackedit.openFile({
+                name: articleName,
+                content: {
+                    text: textarea.value
+                }
+            });
+
+            // Fix for header overlap - position editor below the fixed header
+            const adjustIframe = () => {
+                const iframe = document.querySelector('iframe[src*="stackedit.io"]');
+                if (iframe) {
+                    const header = document.querySelector('.header, .nxl-header');
+                    if (header) {
+                        const headerHeight = header.offsetHeight;
+                        iframe.style.top = headerHeight + 'px';
+                        iframe.style.height = `calc(100% - ${headerHeight}px)`;
+                    }
+                } else {
+                    // Keep checking until iframe is injected
+                    setTimeout(adjustIframe, 50);
+                }
+            };
+            adjustIframe();
+
+            // Set up listener for this specific textarea
+            stackedit.off('fileChange');
+            stackedit.on('fileChange', (file) => {
+                textarea.value = file.content.text;
+            });
         });
     });
 });

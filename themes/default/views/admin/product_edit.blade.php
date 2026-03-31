@@ -1,10 +1,6 @@
 @extends('theme::layouts.admin')
 
 @section('content')
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sceditor@3/minified/themes/default.min.css" />
-<script src="https://cdn.jsdelivr.net/npm/sceditor@3/minified/sceditor.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sceditor@3/minified/formats/xhtml.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sceditor@3/minified/jquery.sceditor.min.js"></script>
 
 <div class="d-flex justify-content-between align-items-center mb-4">
     <div>
@@ -100,7 +96,12 @@
                     @if($topic)
                     <div class="mb-3">
                         <label class="form-label">{{ __('messages.topic') ?? 'Product Body / Description Text' }}</label>
-                        <textarea name="txt" id="admin_product_txt" rows="10">{{ old('txt', $topic->txt) }}</textarea>
+                        <div class="stackedit-tools mb-2">
+                            <button type="button" class="btn btn-sm btn-outline-primary open-stackedit" data-target="#admin_product_txt">
+                                <i class="feather-edit me-1"></i> {{ __('messages.edit_with_stackedit') ?? 'Edit with StackEdit' }}
+                            </button>
+                        </div>
+                        <textarea name="txt" id="admin_product_txt" rows="10" class="form-control">{{ old('txt', $topic->txt) }}</textarea>
                     </div>
                     @endif
 
@@ -181,13 +182,45 @@
 </div>
 
 @if($topic)
+<script src="https://unpkg.com/stackedit-js@1.0.7/docs/lib/stackedit.min.js"></script>
 <script>
-$(document).ready(function() {
-    var textarea = document.getElementById('admin_product_txt');
-    if (textarea && typeof sceditor !== 'undefined') {
-        sceditor.create(textarea, {
-            format: 'xhtml',
-            style: 'https://cdn.jsdelivr.net/npm/sceditor@3/minified/themes/content/default.min.css'
+document.addEventListener('DOMContentLoaded', function() {
+    const stackedit = new Stackedit();
+    const btn = document.querySelector('.open-stackedit[data-target="#admin_product_txt"]');
+    if (btn) {
+        btn.addEventListener('click', function() {
+            const textarea = document.getElementById('admin_product_txt');
+            const articleName = '{{ $product->name }}';
+            
+            stackedit.openFile({
+                name: articleName,
+                content: {
+                    text: textarea.value
+                }
+            });
+
+            const adjustIframe = () => {
+                const iframe = document.querySelector('iframe[src*="stackedit.io"]');
+                if (iframe) {
+                    const header = document.querySelector('.header, .nxl-header');
+                    if (header) {
+                        const headerHeight = header.offsetHeight;
+                        iframe.style.top = headerHeight + 'px';
+                        iframe.style.height = `calc(100% - ${headerHeight}px)`;
+                    } else {
+                        iframe.style.top = '80px';
+                        iframe.style.height = 'calc(100% - 80px)';
+                    }
+                } else {
+                    setTimeout(adjustIframe, 50);
+                }
+            };
+            adjustIframe();
+
+            stackedit.off('fileChange');
+            stackedit.on('fileChange', (file) => {
+                textarea.value = file.content.text;
+            });
         });
     }
 });
