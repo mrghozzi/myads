@@ -3,117 +3,165 @@
 @section('title', __('messages.languages'))
 
 @section('content')
-<!-- Header -->
-<div class="row g-0 align-items-center border-bottom help-center-content-header mb-5 pb-5">
-    <div class="col-lg-6 offset-lg-3 text-center">
-        <h2 class="fw-bolder mb-2 text-dark">{{ __('messages.languages') }}</h2>
-        <p class="text-muted">{{ __('messages.languages_desc') ?? 'Manage your platform languages and translations.' }}</p>
-        <div class="mt-4">
-             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addLanguageModal">
-                <i class="feather-plus me-2"></i> {{ __('messages.new_language') }}
-            </button>
+@php
+    $visibleLanguages = collect($languages->items());
+    $readyCount = $visibleLanguages->where('has_folder', true)->count();
+    $missingCount = $visibleLanguages->where('has_folder', false)->count();
+@endphp
+
+<div class="admin-page">
+    <section class="admin-hero">
+        <div class="admin-hero__content">
+            <ul class="admin-breadcrumb">
+                <li><a href="{{ route('admin.index') }}">{{ __('messages.dashboard') ?? 'Dashboard' }}</a></li>
+                <li>{{ __('messages.languages') }}</li>
+            </ul>
+            <div class="admin-hero__eyebrow">{{ __('messages.options') }}</div>
+            <h1 class="admin-hero__title">{{ __('messages.languages') }}</h1>
+            <p class="admin-hero__copy">{{ __('messages.languages') }} / {{ __('messages.folder_ready') }} / {{ __('messages.missing_folder') }}</p>
+
+            <div class="admin-stat-strip">
+                <div class="admin-stat-card">
+                    <span class="admin-stat-label">{{ __('messages.languages') }}</span>
+                    <span class="admin-stat-value">{{ number_format($languages->total()) }}</span>
+                </div>
+                <div class="admin-stat-card">
+                    <span class="admin-stat-label">{{ __('messages.folder_ready') }}</span>
+                    <span class="admin-stat-value">{{ number_format($readyCount) }}</span>
+                </div>
+                <div class="admin-stat-card">
+                    <span class="admin-stat-label">{{ __('messages.missing_folder') }}</span>
+                    <span class="admin-stat-value">{{ number_format($missingCount) }}</span>
+                </div>
+            </div>
         </div>
-    </div>
-</div>
 
-<div class="main-content container-lg px-4">
-    <div class="card">
-        <div class="card-body">
-            @if(session('success'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        <div class="admin-hero__actions">
+            <div class="admin-toolbar-card justify-content-between">
+                <div>
+                    <span class="admin-panel__eyebrow">{{ __('messages.new_language') }}</span>
+                    <div class="admin-muted">{{ __('messages.languages') }}</div>
+                </div>
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addLanguageModal">
+                    <i class="feather-plus me-2"></i>{{ __('messages.new_language') }}
+                </button>
             </div>
-            @endif
-            @if(session('errors'))
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                {{ $errors->first() }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-            @endif
+        </div>
+    </section>
 
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            {{ session('success') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
+    @if(session('errors'))
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{ $errors->first() }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
+    <section class="admin-panel">
+        <div class="admin-panel__header">
+            <div>
+                <span class="admin-panel__eyebrow">{{ __('messages.languages') }}</span>
+                <h2 class="admin-panel__title">{{ __('messages.languages') }}</h2>
+            </div>
+            <div class="admin-chip-list">
+                <span class="admin-chip"><i class="feather-check-circle"></i>{{ $readyCount }}</span>
+                <span class="admin-chip"><i class="feather-alert-triangle"></i>{{ $missingCount }}</span>
+            </div>
+        </div>
+
+        <div class="admin-panel__body">
             @if($languages->isEmpty())
-                <div class="text-center py-5">
-                    <div class="avatar-text avatar-xl bg-soft-primary text-primary rounded-circle mb-3 mx-auto">
-                        <i class="feather-globe"></i>
-                    </div>
-                    <h4>{{ __('messages.no_languages_found') ?? 'No languages found' }}</h4>
-                    <p class="text-muted">{{ __('messages.no_languages_desc') ?? 'Start by adding your first language.' }}</p>
-                    <button type="button" class="btn btn-sm btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#addLanguageModal">
+                <div class="admin-empty-state">
+                    <span class="admin-avatar-circle"><i class="feather-globe"></i></span>
+                    <h4>{{ __('messages.no_languages_found') }}</h4>
+                    <p class="admin-muted mb-0">{{ __('messages.no_languages_desc') }}</p>
+                    <button type="button" class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#addLanguageModal">
                         {{ __('messages.new_language') }}
                     </button>
                 </div>
             @else
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle">
-                        <thead class="bg-light">
+                <div class="admin-table-wrap">
+                    <table class="table table-hover align-middle admin-table admin-table-cardify">
+                        <thead>
                             <tr>
-                                <th style="width: 50px;">#</th>
+                                <th style="width: 60px;">#</th>
                                 <th>{{ __('messages.name') }}</th>
                                 <th>{{ __('messages.code') }}</th>
                                 <th>{{ __('messages.status') }}</th>
-                                <th class="text-end" style="min-width: 150px;">{{ __('messages.actions') }}</th>
+                                <th class="text-end">{{ __('messages.actions') }}</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach($languages as $language)
-                            <tr>
-                                <td>
-                                    <div class="avatar-text bg-soft-primary text-primary rounded">
-                                        {{ strtoupper(substr($language->o_valuer, 0, 2)) }}
-                                    </div>
-                                </td>
-                                <td>
-                                    <div class="fw-bold">{{ $language->name }}</div>
-                                    <small class="text-muted">{{ __('messages.language_name') ?? 'Language Name' }}</small>
-                                </td>
-                                <td>
-                                    <span class="badge bg-light text-dark border">{{ $language->o_valuer }}</span>
-                                </td>
-                                <td>
-                                    @if($language->has_folder)
-                                        <span class="badge bg-soft-success text-success"><i class="feather-check-circle me-1"></i> {{ __('messages.folder_ready') ?? 'Ready' }}</span>
-                                    @else
-                                        <span class="badge bg-soft-danger text-danger"><i class="feather-alert-triangle me-1"></i> {{ __('messages.missing_folder') ?? 'Folder Missing' }}</span>
-                                    @endif
-                                </td>
-                                <td class="text-end">
-                                    <div class="d-flex justify-content-end gap-2">
-                                        <a href="{{ route('admin.languages.terms', $language->id) }}" class="btn btn-sm btn-soft-primary" title="{{ __('messages.edit_terms') ?? 'Edit Terms' }}">
-                                            <i class="feather-edit-3"></i>
-                                        </a>
-
+                                <tr>
+                                    <td data-label="#">
+                                        <span class="admin-avatar-circle" style="height: 44px; width: 44px; border-radius: 14px;">
+                                            {{ strtoupper(substr($language->o_valuer, 0, 2)) }}
+                                        </span>
+                                    </td>
+                                    <td data-label="{{ __('messages.name') }}">
+                                        <div class="admin-section-stack gap-1">
+                                            <strong>{{ $language->name }}</strong>
+                                            <span class="admin-muted">{{ __('messages.language_name') ?? 'Language Name' }}</span>
+                                        </div>
+                                    </td>
+                                    <td data-label="{{ __('messages.code') }}">
+                                        <span class="badge bg-light text-dark border">{{ $language->o_valuer }}</span>
+                                    </td>
+                                    <td data-label="{{ __('messages.status') }}">
                                         @if($language->has_folder)
-                                        <a href="{{ route('admin.languages.export', $language->id) }}" class="btn btn-sm btn-soft-info" title="{{ __('messages.export') ?? 'Export (.zip)' }}">
-                                            <i class="feather-download"></i>
-                                        </a>
+                                            <span class="badge bg-soft-success text-success"><i class="feather-check-circle me-1"></i>{{ __('messages.folder_ready') }}</span>
+                                        @else
+                                            <span class="badge bg-soft-danger text-danger"><i class="feather-alert-triangle me-1"></i>{{ __('messages.missing_folder') }}</span>
                                         @endif
-                                        
-                                        @if($language->o_valuer !== 'en')
-                                        <button type="button" class="btn btn-sm btn-soft-danger" data-bs-toggle="modal" data-bs-target="#deleteLangModal{{ $language->id }}" title="{{ __('messages.delete') }}">
-                                            <i class="feather-trash-2"></i>
-                                        </button>
-                                        @endif
-                                    </div>
-                                </td>
-                            </tr>
+                                    </td>
+                                    <td data-label="{{ __('messages.actions') }}" class="text-end">
+                                        <div class="admin-action-cluster">
+                                            <a href="{{ route('admin.languages.terms', $language->id) }}" class="btn btn-sm btn-light admin-icon-btn" title="{{ __('messages.edit_terms') ?? 'Edit Terms' }}">
+                                                <i class="feather-edit-3 text-primary"></i>
+                                            </a>
+                                            @if($language->has_folder)
+                                                <a href="{{ route('admin.languages.export', $language->id) }}" class="btn btn-sm btn-light admin-icon-btn" title="{{ __('messages.export') ?? 'Export (.zip)' }}">
+                                                    <i class="feather-download text-info"></i>
+                                                </a>
+                                            @endif
+                                            @if($language->o_valuer !== 'en')
+                                                <button
+                                                    type="button"
+                                                    class="btn btn-sm btn-light admin-icon-btn language-delete-trigger"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#deleteLanguageModal"
+                                                    data-id="{{ $language->id }}"
+                                                    data-name="{{ $language->name }}"
+                                                    data-code="{{ $language->o_valuer }}"
+                                                >
+                                                    <i class="feather-trash-2 text-danger"></i>
+                                                </button>
+                                            @endif
+                                        </div>
+                                    </td>
+                                </tr>
                             @endforeach
                         </tbody>
                     </table>
                 </div>
-                
-                <div class="mt-4">
+
+                <div class="d-flex justify-content-end mt-4">
                     {{ $languages->links() }}
                 </div>
             @endif
         </div>
-    </div>
+    </section>
 </div>
-
 @endsection
 
 @section('modals')
-<!-- Add Language Modal -->
 <div class="modal fade" id="addLanguageModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -125,18 +173,18 @@
                 @csrf
                 <div class="modal-body">
                     <div class="alert alert-info mb-4">
-                        <i class="feather-info me-2"></i> {{ __('messages.add_language_info') ?? 'Adding a language will copy the default English terms to a new folder so you can start translating them.' }}
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label class="form-label">{{ __('messages.name') }} <span class="text-danger">*</span></label>
-                        <input type="text" name="name" class="form-control" placeholder="e.g. French" required>
+                        <i class="feather-info me-2"></i>{{ __('messages.add_language_info') ?? 'Adding a language will copy the default English terms to a new folder so you can start translating them.' }}
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">{{ __('messages.code') }} <span class="text-danger">*</span></label>
+                        <label class="admin-form-label">{{ __('messages.name') }} <span class="text-danger">*</span></label>
+                        <input type="text" name="name" class="form-control" placeholder="e.g. French" required>
+                    </div>
+
+                    <div class="mb-0">
+                        <label class="admin-form-label">{{ __('messages.code') }} <span class="text-danger">*</span></label>
                         <input type="text" name="o_valuer" class="form-control" placeholder="e.g. fr" required>
-                        <div class="form-text">{{ __('messages.code_format_info') ?? 'Must be standard ISO code (en, ar, fr, es, etc.) without spaces.' }}</div>
+                        <div class="admin-form-note">{{ __('messages.code_format_info') ?? 'Must be standard ISO code (en, ar, fr, es, etc.) without spaces.' }}</div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -148,40 +196,58 @@
     </div>
 </div>
 
-@if(!$languages->isEmpty())
-    @foreach($languages as $language)
-    @if($language->o_valuer !== 'en')
-    <!-- Delete Language Modal -->
-    <div class="modal fade" id="deleteLangModal{{ $language->id }}" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">{{ __('messages.delete_language') }}</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<div class="modal fade" id="deleteLanguageModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">{{ __('messages.delete_language') }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <div class="admin-modal-icon is-danger">
+                    <i class="feather-trash-2"></i>
                 </div>
-                <div class="modal-body text-center">
-                    <div class="avatar-text avatar-xl bg-soft-danger text-danger rounded-circle mb-3 mx-auto">
-                        <i class="feather-trash-2"></i>
-                    </div>
-                    <h4>{{ __('messages.confirm_delete_language') }}</h4>
-                    <p class="text-muted">{{ $language->name }} ({{ $language->o_valuer }})</p>
-                    <div class="alert alert-warning mt-3">
-                        <i class="feather-alert-triangle me-2"></i>
-                        {{ __('messages.delete_language_warning') ?? 'This action cannot be undone. All language files and data will be physically removed from the server permanently.' }}
-                    </div>
+                <h4>{{ __('messages.confirm_delete_language') }}</h4>
+                <p class="text-muted mb-3" id="deleteLanguageName"></p>
+                <div class="alert alert-warning mb-0">
+                    <i class="feather-alert-triangle me-2"></i>{{ __('messages.delete_language_warning') ?? 'This action cannot be undone. All language files and data will be physically removed from the server permanently.' }}
                 </div>
-                <div class="modal-footer justify-content-center">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('messages.cancel') }}</button>
-                    <form action="{{ route('admin.languages.delete', $language->id) }}" method="POST" class="d-inline">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="btn btn-danger">{{ __('messages.delete') }}</button>
-                    </form>
-                </div>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('messages.cancel') }}</button>
+                <form action="" method="POST" id="deleteLanguageForm" class="d-inline">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-danger">{{ __('messages.delete') }}</button>
+                </form>
             </div>
         </div>
     </div>
-    @endif
-    @endforeach
-@endif
+</div>
 @endsection
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const deleteModal = document.getElementById('deleteLanguageModal');
+        const deleteForm = document.getElementById('deleteLanguageForm');
+        const deleteName = document.getElementById('deleteLanguageName');
+
+        if (deleteModal) {
+            deleteModal.addEventListener('show.bs.modal', function (event) {
+                const trigger = event.relatedTarget;
+                if (!trigger) {
+                    return;
+                }
+
+                const languageId = trigger.getAttribute('data-id');
+                const languageName = trigger.getAttribute('data-name') || '';
+                const languageCode = trigger.getAttribute('data-code') || '';
+
+                deleteForm.setAttribute('action', "{{ route('admin.languages.delete', ['id' => '__ID__']) }}".replace('__ID__', languageId));
+                deleteName.textContent = languageName + (languageCode ? ' (' + languageCode + ')' : '');
+            });
+        }
+    });
+</script>
+@endpush

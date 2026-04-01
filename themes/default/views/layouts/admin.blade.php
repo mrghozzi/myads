@@ -60,6 +60,7 @@
     @if(is_locale_rtl())
         <link rel="stylesheet" type="text/css" href="{{ theme_asset('admin-duralux/css/rtl.css') }}">
     @endif
+    <link rel="stylesheet" type="text/css" href="{{ theme_asset('admin-duralux/css/admin-redesign.css') }}">
     
     <!-- FontAwesome for compatibility -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -75,7 +76,7 @@
         }
     </script>
 </head>
-<body data-dir="{{ $pageDirection }}" class="{{ $pageDirection }}">
+<body data-dir="{{ $pageDirection }}" class="{{ $pageDirection }} admin-premium-shell">
     <nav class="nxl-navigation">
         <div class="navbar-wrapper">
             <div class="m-header">

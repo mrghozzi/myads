@@ -1,42 +1,110 @@
 @extends('theme::layouts.admin')
 
-@section('content')
-    @php
-        $maintenanceEnabled = !empty($maintenanceSettings['enabled']);
-    @endphp
-    <div class="page-header">
-        <div class="page-header-left d-flex align-items-center">
-            <div class="page-header-title">
-                <h5 class="m-b-10">{{ __('messages.updates_myads') ?? 'System Updates' }}</h5>
-            </div>
-            <ul class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{{ route('admin.index') }}">{{ __('messages.admin_panel') ?? 'Admin' }}</a></li>
-                <li class="breadcrumb-item">{{ __('messages.updates') ?? 'Updates' }}</li>
-            </ul>
-        </div>
-    </div>
+@section('title', __('messages.updates_myads'))
 
-    {{-- Flash Messages --}}
+@section('content')
+@php
+    $maintenanceEnabled = !empty($maintenanceSettings['enabled']);
+    $preflightChecks = collect($preflightReport->checks ?? []);
+    $failedChecks = $preflightChecks->where('status', '!=', 'passed')->count();
+    $passedChecks = $preflightChecks->where('status', 'passed')->count();
+@endphp
+
+<div class="admin-page">
+    <section class="admin-hero">
+        <div class="admin-hero__content">
+            <ul class="admin-breadcrumb">
+                <li><a href="{{ route('admin.index') }}">{{ __('messages.admin_panel') ?? 'Admin' }}</a></li>
+                <li>{{ __('messages.updates') }}</li>
+            </ul>
+            <div class="admin-hero__eyebrow">{{ __('messages.updates_myads') ?? 'System Updates' }}</div>
+            <h1 class="admin-hero__title" id="status-title">
+                @if($updateAvailable)
+                    {{ __('messages.new_version_available') ?? 'Update Available!' }}
+                @else
+                    {{ __('messages.system_up_to_date') ?? 'System is Up to Date' }}
+                @endif
+            </h1>
+            <p class="admin-hero__copy" id="status-subtitle">
+                @if($updateAvailable)
+                    {{ __('messages.update_available_desc') ?? 'A new version is available for download.' }}
+                @else
+                    {{ __('messages.up_to_date_desc') ?? 'You are running the latest version of MyAds.' }}
+                @endif
+            </p>
+
+            <div class="admin-stat-strip" id="version-display">
+                <div class="admin-stat-card">
+                    <span class="admin-stat-label">{{ __('messages.installed') ?? 'Installed' }}</span>
+                    <span class="admin-stat-value">v{{ $currentVersion }}</span>
+                </div>
+                <div class="admin-stat-card">
+                    <span class="admin-stat-label">{{ __('messages.latest') ?? 'Latest' }}</span>
+                    <span class="admin-stat-value">{{ $latestVersion ? 'v' . $latestVersion : '--' }}</span>
+                </div>
+                <div class="admin-stat-card">
+                    <span class="admin-stat-label">{{ __('messages.update_preflight_title') }}</span>
+                    <span class="admin-stat-value">{{ $passedChecks }}/{{ $preflightChecks->count() }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="admin-hero__actions">
+            <div class="admin-toolbar-card">
+                <div class="d-flex align-items-center gap-3 w-100">
+                    <div class="admin-modal-icon {{ $updateAvailable ? 'is-primary' : 'is-primary' }} mb-0" id="status-icon">
+                        <i class="feather-{{ $updateAvailable ? 'arrow-up-circle' : 'check-circle' }}"></i>
+                    </div>
+                    <div>
+                        <span class="admin-panel__eyebrow">{{ __('messages.current_version') ?? 'Version' }}</span>
+                        <div class="admin-panel__title mb-1">v{{ $currentVersion }}</div>
+                        <div class="admin-muted">
+                            @if($latestVersion)
+                                v{{ $latestVersion }}
+                            @else
+                                {{ __('messages.check_for_updates') }}
+                            @endif
+                        </div>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-outline-primary w-100 mt-3" id="btn-check-update" onclick="checkForUpdates()">
+                    <i class="feather-refresh-cw me-1"></i>{{ __('messages.check_for_updates') }}
+                </button>
+            </div>
+
+            <div class="admin-chip-list">
+                <span class="admin-chip">
+                    <i class="feather-shield"></i>
+                    {{ $preflightReport->isSafe() ? __('messages.update_preflight_passed') : __('messages.update_preflight_failed') }}
+                </span>
+                <span class="admin-chip">
+                    <i class="feather-tool"></i>
+                    {{ $maintenanceEnabled ? __('messages.maintenance_status_enabled') : __('messages.maintenance_status_disabled') }}
+                </span>
+            </div>
+        </div>
+    </section>
+
     @if(session('success'))
-        <div class="alert alert-success d-flex align-items-center mb-4" role="alert">
+        <div class="alert alert-success d-flex align-items-center mb-0" role="alert">
             <i class="feather-check-circle fs-4 me-2"></i>
             <div>{{ session('success') }}</div>
         </div>
     @endif
     @if(session('error'))
-        <div class="alert alert-danger d-flex align-items-center mb-4" role="alert">
+        <div class="alert alert-danger d-flex align-items-center mb-0" role="alert">
             <i class="feather-alert-circle fs-4 me-2"></i>
             <div>{{ session('error') }}</div>
         </div>
     @endif
     @if(session('info'))
-        <div class="alert alert-info d-flex align-items-center mb-4" role="alert">
+        <div class="alert alert-info d-flex align-items-center mb-0" role="alert">
             <i class="feather-info fs-4 me-2"></i>
             <div>{{ session('info') }}</div>
         </div>
     @endif
     @if($errors->any())
-        <div class="alert alert-danger mb-4" role="alert">
+        <div class="alert alert-danger mb-0" role="alert">
             <div class="fw-bold mb-2">{{ __('messages.warning') ?? 'Warning' }}</div>
             <ul class="mb-0 ps-3">
                 @foreach($errors->all() as $error)
@@ -46,111 +114,159 @@
         </div>
     @endif
 
-    <div class="row">
-        {{-- Version Status Card --}}
-        <div class="col-xxl-4 col-lg-5 col-12">
-            <div class="card stretch stretch-full mb-4">
-                <div class="card-body d-flex flex-column align-items-center text-center py-5">
-                    <div class="mb-4" id="status-icon">
-                        @if($updateAvailable)
-                            <div class="wd-80 ht-80 rounded-circle d-flex align-items-center justify-content-center" style="background: rgba(255, 171, 0, 0.12);">
-                                <i class="feather-arrow-up-circle" style="font-size: 40px; color: #ffab00;"></i>
-                            </div>
-                        @else
-                            <div class="wd-80 ht-80 rounded-circle d-flex align-items-center justify-content-center" style="background: rgba(0, 200, 83, 0.12);">
-                                <i class="feather-check-circle" style="font-size: 40px; color: #00c853;"></i>
-                            </div>
-                        @endif
+    <div class="admin-workspace-grid">
+        <div class="admin-section-stack">
+            <section class="admin-panel">
+                <div class="admin-panel__header">
+                    <div>
+                        <span class="admin-panel__eyebrow">{{ __('messages.update_preflight_title') }}</span>
+                        <h2 class="admin-panel__title">{{ __('messages.update_preflight_title') }}</h2>
                     </div>
-
-                    <h4 class="fw-bold mb-2" id="status-title">
-                        @if($updateAvailable)
-                            {{ __('messages.new_version_available') ?? 'Update Available!' }}
-                        @else
-                            {{ __('messages.system_up_to_date') ?? 'System is Up to Date' }}
-                        @endif
-                    </h4>
-
-                    <p class="text-muted fs-13 mb-4" id="status-subtitle">
-                        @if($updateAvailable)
-                            {{ __('messages.update_available_desc') ?? 'A new version is available for download.' }}
-                        @else
-                            {{ __('messages.up_to_date_desc') ?? 'You are running the latest version of MyAds.' }}
-                        @endif
-                    </p>
-
-                    {{-- Version Comparison --}}
-                    <div class="d-flex align-items-center gap-3 mb-4" id="version-display">
-                        <div class="text-center">
-                            <span class="badge bg-soft-primary text-primary px-3 py-2 fs-13 fw-bold">v{{ $currentVersion }}</span>
-                            <small class="d-block text-muted mt-1 fs-11">{{ __('messages.installed') ?? 'Installed' }}</small>
-                        </div>
-                        @if($latestVersion)
-                            <i class="feather-arrow-right text-muted"></i>
-                            <div class="text-center">
-                                <span class="badge {{ $updateAvailable ? 'bg-soft-warning text-warning' : 'bg-soft-success text-success' }} px-3 py-2 fs-13 fw-bold">v{{ $latestVersion }}</span>
-                                <small class="d-block text-muted mt-1 fs-11">{{ __('messages.latest') ?? 'Latest' }}</small>
-                            </div>
-                        @endif
-                    </div>
-
-                    {{-- Check for Updates Button --}}
-                    <button type="button" class="btn btn-outline-primary btn-sm px-4" id="btn-check-update" onclick="checkForUpdates()">
-                        <i class="feather-refresh-cw me-1"></i>
-                        {{ __('messages.check_for_updates') ?? 'Check for Updates' }}
-                    </button>
+                    <span class="badge {{ $preflightReport->isSafe() ? 'bg-soft-success text-success' : 'bg-soft-danger text-danger' }}">
+                        {{ $preflightReport->isSafe() ? __('messages.update_preflight_passed') : __('messages.update_preflight_failed') }}
+                    </span>
                 </div>
-            </div>
+                <div class="admin-panel__body">
+                    <p class="admin-panel__copy">{{ __('messages.update_preflight_description') }}</p>
 
-            <div class="card stretch stretch-full mb-4 maintenance-update-card {{ $maintenanceEnabled ? 'maintenance-update-active' : 'maintenance-update-idle' }}">
-                <div class="card-body">
-                    <div class="d-flex align-items-start gap-3">
-                        <div class="maintenance-update-icon">
-                            <i class="feather-tool"></i>
-                        </div>
-                        <div class="flex-grow-1">
-                            <div class="d-flex align-items-center gap-2 flex-wrap mb-2">
-                                <span class="badge {{ $maintenanceEnabled ? 'bg-soft-danger text-danger' : 'bg-soft-warning text-warning' }}">
-                                    {{ $maintenanceEnabled ? __('messages.maintenance_status_enabled') : __('messages.maintenance_status_disabled') }}
+                    <div class="admin-check-list">
+                        @foreach($preflightReport->checks as $check)
+                            <div class="admin-check-item">
+                                <span class="admin-check-item__icon {{ $check['status'] === 'passed' ? 'is-passed' : 'is-failed' }}">
+                                    <i class="feather-{{ $check['status'] === 'passed' ? 'check' : 'alert-circle' }}"></i>
                                 </span>
-                                <span class="small text-muted">{{ __('messages.maintenance_update_auto_notice') }}</span>
+                                <div>
+                                    <span class="admin-check-item__title">{{ $check['title'] }}</span>
+                                    <span class="admin-check-item__detail">{{ $check['detail'] }}</span>
+                                </div>
                             </div>
-                            <h6 class="fw-bold mb-2">{{ __('messages.maintenance_update_title') }}</h6>
-                            <p class="text-muted fs-12 mb-0">
-                                {{ $maintenanceEnabled ? __('messages.maintenance_update_active_notice') : __('messages.maintenance_update_inactive_notice') }}
-                            </p>
+                        @endforeach
+                    </div>
+
+                    @if(!$preflightReport->isSafe())
+                        <div class="admin-status-banner is-danger mt-4">
+                            <i class="feather-alert-octagon"></i>
+                            <div>
+                                <strong>{{ __('messages.update_preflight_failed') }}</strong>
+                                <div class="mt-1">{{ __('messages.update_blocked_preflight', ['details' => implode(' ', $preflightReport->failureMessages())]) }}</div>
+                            </div>
+                        </div>
+                    @endif
+                </div>
+            </section>
+
+            @if($updateAvailable && $latestRelease)
+                <section class="admin-panel" id="update-card">
+                    <div class="admin-panel__header">
+                        <div>
+                            <span class="admin-panel__eyebrow">{{ __('messages.available_updates') ?? __('messages.updates') }}</span>
+                            <h2 class="admin-panel__title">{{ $latestRelease['name'] ?: $latestRelease['tag'] }}</h2>
+                        </div>
+                        @if($latestRelease['published_at'])
+                            <span class="admin-chip"><i class="feather-calendar"></i>{{ \Carbon\Carbon::parse($latestRelease['published_at'])->format('M d, Y') }}</span>
+                        @endif
+                    </div>
+                    <div class="admin-panel__body">
+                        <div class="admin-metric-inline mb-4">
+                            <span class="admin-metric-pill"><i class="feather-tag"></i>{{ $latestRelease['tag'] }}</span>
+                            @if($latestRelease['download_size'])
+                                <span class="admin-metric-pill"><i class="feather-hard-drive"></i>{{ number_format($latestRelease['download_size'] / 1024 / 1024, 2) }} MB</span>
+                            @endif
+                            @if($latestRelease['html_url'])
+                                <a href="{{ $latestRelease['html_url'] }}" target="_blank" class="admin-metric-pill text-decoration-none">
+                                    <i class="feather-external-link"></i>{{ __('messages.view_on_github') ?? 'View on GitHub' }}
+                                </a>
+                            @endif
+                        </div>
+
+                        @if($latestRelease['body'])
+                            <div class="mb-4">
+                                <div class="admin-panel__eyebrow">{{ __('messages.release_notes') }}</div>
+                                <div class="admin-release-notes">{!! nl2br(e($latestRelease['body'])) !!}</div>
+                            </div>
+                        @endif
+
+                        <div class="admin-status-banner is-warning mb-3">
+                            <i class="feather-alert-triangle"></i>
+                            <div>
+                                <strong>{{ __('messages.important') ?? 'Important' }}</strong>
+                                <div>{{ __('messages.backup_warning') ?? 'Please create a full backup of your database and files before proceeding with the update. This action cannot be undone.' }}</div>
+                            </div>
+                        </div>
+
+                        <div class="admin-surface-soft mb-4">
+                            <div class="admin-panel__eyebrow">{{ __('messages.maintenance_update_title') }}</div>
+                            <div class="admin-muted">{{ __('messages.maintenance_update_auto_activate') }}</div>
+                        </div>
+
+                        <div class="d-flex flex-wrap gap-3">
+                            <button type="button" class="btn btn-primary px-4" data-bs-toggle="modal" data-bs-target="#confirmUpdateModal" @disabled(!$preflightReport->isSafe())>
+                                <i class="feather-download me-2"></i>{{ __('messages.update_now') }}
+                            </button>
+                            @if($latestRelease['html_url'])
+                                <a href="{{ $latestRelease['html_url'] }}" target="_blank" class="btn btn-outline-secondary px-4">
+                                    <i class="feather-github me-2"></i>{{ __('messages.release_page') ?? 'Release Page' }}
+                                </a>
+                            @endif
                         </div>
                     </div>
-                </div>
-            </div>
+                </section>
+            @else
+                <section class="admin-panel" id="no-update-card">
+                    <div class="admin-panel__body">
+                        <div class="admin-empty-state py-4">
+                            <div class="admin-modal-icon is-primary">
+                                <i class="feather-shield"></i>
+                            </div>
+                            <h4>{{ __('messages.all_good') ?? 'Everything looks good!' }}</h4>
+                            <p class="admin-muted mb-0">{{ __('messages.no_updates_desc') }}</p>
+                            <a href="https://github.com/mrghozzi/myads/releases" target="_blank" class="btn btn-outline-primary btn-sm mt-2">
+                                <i class="feather-github me-1"></i>{{ __('messages.view_all_releases') ?? 'View All Releases' }}
+                            </a>
+                        </div>
+                    </div>
+                </section>
+            @endif
+        </div>
 
-            {{-- System Info Card --}}
-            <div class="card stretch stretch-full mb-4">
-                <div class="card-header">
-                    <h5 class="card-title fs-14">{{ __('messages.system_info') ?? 'System Information' }}</h5>
+        <aside class="admin-section-stack">
+            <section class="admin-note-card {{ $maintenanceEnabled ? '' : '' }}">
+                <span class="admin-note-label">{{ __('messages.maintenance_update_title') }}</span>
+                <span class="admin-note-copy">{{ $maintenanceEnabled ? __('messages.maintenance_update_active_notice') : __('messages.maintenance_update_inactive_notice') }}</span>
+                <div class="admin-chip-list mt-3">
+                    <span class="admin-chip"><i class="feather-tool"></i>{{ $maintenanceEnabled ? __('messages.maintenance_status_enabled') : __('messages.maintenance_status_disabled') }}</span>
                 </div>
-                <div class="card-body p-0">
-                    <table class="table table-hover mb-0">
+            </section>
+
+            <section class="admin-panel">
+                <div class="admin-panel__header">
+                    <div>
+                        <span class="admin-panel__eyebrow">{{ __('messages.system_info') }}</span>
+                        <h2 class="admin-panel__title">{{ __('messages.system_info') }}</h2>
+                    </div>
+                </div>
+                <div class="admin-panel__body">
+                    <table class="table admin-kv-table mb-0">
                         <tbody>
                             <tr>
-                                <td class="fw-medium text-muted ps-3">{{ __('messages.script_name') ?? 'Script' }}</td>
-                                <td class="text-end pe-3 fw-bold">MyAds</td>
+                                <td class="fw-medium text-muted">{{ __('messages.script_name') ?? 'Script' }}</td>
+                                <td class="text-end fw-bold">MyAds</td>
                             </tr>
                             <tr>
-                                <td class="fw-medium text-muted ps-3">{{ __('messages.current_version') ?? 'Version' }}</td>
-                                <td class="text-end pe-3 fw-bold">v{{ $currentVersion }}</td>
+                                <td class="fw-medium text-muted">{{ __('messages.current_version') ?? 'Version' }}</td>
+                                <td class="text-end fw-bold">v{{ $currentVersion }}</td>
                             </tr>
                             <tr>
-                                <td class="fw-medium text-muted ps-3">PHP</td>
-                                <td class="text-end pe-3 fw-bold">{{ phpversion() }}</td>
+                                <td class="fw-medium text-muted">PHP</td>
+                                <td class="text-end fw-bold">{{ phpversion() }}</td>
                             </tr>
                             <tr>
-                                <td class="fw-medium text-muted ps-3">Laravel</td>
-                                <td class="text-end pe-3 fw-bold">{{ app()->version() }}</td>
+                                <td class="fw-medium text-muted">Laravel</td>
+                                <td class="text-end fw-bold">{{ app()->version() }}</td>
                             </tr>
                             <tr>
-                                <td class="fw-medium text-muted ps-3">{{ __('messages.github_repo') ?? 'Repository' }}</td>
-                                <td class="text-end pe-3">
+                                <td class="fw-medium text-muted">{{ __('messages.github_repo') ?? 'Repository' }}</td>
+                                <td class="text-end">
                                     <a href="https://github.com/mrghozzi/myads" target="_blank" class="text-primary fs-12">
                                         <i class="feather-github me-1"></i>mrghozzi/myads
                                     </a>
@@ -159,348 +275,146 @@
                         </tbody>
                     </table>
                 </div>
-            </div>
-        </div>
-
-        {{-- Release Details --}}
-        <div class="col-xxl-8 col-lg-7 col-12">
-            <div class="card stretch stretch-full mb-4">
-                <div class="card-header d-flex align-items-center justify-content-between">
-                    <h5 class="card-title fs-14 mb-0">
-                        <i class="feather-shield me-2 {{ $preflightReport->isSafe() ? 'text-success' : 'text-danger' }}"></i>
-                        {{ __('messages.update_preflight_title') ?? 'Update Safety Check' }}
-                    </h5>
-                    <span class="badge {{ $preflightReport->isSafe() ? 'bg-soft-success text-success' : 'bg-soft-danger text-danger' }}">
-                        {{ $preflightReport->isSafe()
-                            ? (__("messages.update_preflight_passed") ?? 'Passed')
-                            : (__("messages.update_preflight_failed") ?? 'Blocked') }}
-                    </span>
-                </div>
-                <div class="card-body">
-                    <p class="text-muted fs-13 mb-3">
-                        {{ __('messages.update_preflight_description') ?? 'The updater checks your database connection, file permissions, and pending migrations before it allows any release to be applied.' }}
-                    </p>
-
-                    <div class="table-responsive">
-                        <table class="table table-sm align-middle mb-0">
-                            <tbody>
-                                @foreach($preflightReport->checks as $check)
-                                    <tr>
-                                        <td class="fw-medium" style="width: 34%;">
-                                            {{ $check['title'] }}
-                                        </td>
-                                        <td>
-                                            <span class="badge {{ $check['status'] === 'passed' ? 'bg-soft-success text-success' : 'bg-soft-danger text-danger' }} me-2">
-                                                {{ strtoupper($check['status']) }}
-                                            </span>
-                                            <span class="text-muted">{{ $check['detail'] }}</span>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-
-                    @if(!$preflightReport->isSafe())
-                        <div class="alert alert-soft-danger mt-4 mb-0">
-                            <div class="d-flex align-items-start gap-2">
-                                <i class="feather-alert-octagon mt-1"></i>
-                                <div class="fs-12">
-                                    <strong>{{ __('messages.update_preflight_failed') ?? 'Update blocked' }}</strong>
-                                    <div class="mt-1">{{ __('messages.update_blocked_preflight', ['details' => implode(' ', $preflightReport->failureMessages())]) ?? 'Resolve the safety issues before updating.' }}</div>
-                                </div>
-                            </div>
-                        </div>
-                    @endif
-                </div>
-            </div>
-
-            @if($updateAvailable && $latestRelease)
-                {{-- Update Available Card --}}
-                <div class="card stretch stretch-full mb-4" id="update-card">
-                    <div class="card-header d-flex align-items-center justify-content-between">
-                        <h5 class="card-title fs-14">
-                            <i class="feather-package me-2 text-warning"></i>
-                            {{ $latestRelease['name'] ?: $latestRelease['tag'] }}
-                        </h5>
-                        @if($latestRelease['published_at'])
-                            <span class="badge bg-soft-secondary text-secondary fs-11">
-                                <i class="feather-calendar me-1"></i>
-                                {{ \Carbon\Carbon::parse($latestRelease['published_at'])->format('M d, Y') }}
-                            </span>
-                        @endif
-                    </div>
-                    <div class="card-body">
-                        {{-- Release Meta --}}
-                        <div class="d-flex flex-wrap gap-3 mb-4">
-                            <span class="badge bg-soft-warning text-warning px-3 py-2">
-                                <i class="feather-tag me-1"></i>{{ $latestRelease['tag'] }}
-                            </span>
-                            @if($latestRelease['download_size'])
-                                <span class="badge bg-soft-info text-info px-3 py-2">
-                                    <i class="feather-hard-drive me-1"></i>{{ number_format($latestRelease['download_size'] / 1024 / 1024, 2) }} MB
-                                </span>
-                            @endif
-                            @if($latestRelease['html_url'])
-                                <a href="{{ $latestRelease['html_url'] }}" target="_blank" class="badge bg-soft-primary text-primary px-3 py-2 text-decoration-none">
-                                    <i class="feather-external-link me-1"></i>{{ __('messages.view_on_github') ?? 'View on GitHub' }}
-                                </a>
-                            @endif
-                        </div>
-
-                        {{-- Changelog / Release Notes --}}
-                        @if($latestRelease['body'])
-                            <div class="mb-4">
-                                <h6 class="fw-bold mb-3">
-                                    <i class="feather-file-text me-1"></i>
-                                    {{ __('messages.release_notes') ?? 'Release Notes' }}
-                                </h6>
-                                <div class="changelog-content p-3 rounded-3" style="background: var(--bs-body-bg); border: 1px solid var(--bs-border-color);">
-                                    {!! nl2br(e($latestRelease['body'])) !!}
-                                </div>
-                            </div>
-                        @endif
-
-                        {{-- Backup Warning --}}
-                        <div class="alert alert-soft-warning d-flex align-items-start gap-3 mb-4">
-                            <i class="feather-alert-triangle fs-4 mt-1"></i>
-                            <div>
-                                <strong>{{ __('messages.important') ?? 'Important' }}:</strong>
-                                {{ __('messages.backup_warning') ?? 'Please create a full backup of your database and files before proceeding with the update. This action cannot be undone.' }}
-                            </div>
-                        </div>
-
-                        <div class="alert alert-soft-info d-flex align-items-start gap-3 mb-4">
-                            <i class="feather-shield fs-4 mt-1"></i>
-                            <div>
-                                <strong>{{ __('messages.maintenance_update_title') }}:</strong>
-                                {{ __('messages.maintenance_update_auto_activate') }}
-                            </div>
-                        </div>
-
-                        {{-- Update Button --}}
-                        <div class="d-flex gap-3">
-                            <button type="button" class="btn btn-primary px-4 py-2 fw-bold" data-bs-toggle="modal" data-bs-target="#confirmUpdateModal" @disabled(!$preflightReport->isSafe())>
-                                <i class="feather-download me-2"></i>
-                                {{ __('messages.update_now') ?? 'Update Now' }}
-                            </button>
-                            @if($latestRelease['html_url'])
-                                <a href="{{ $latestRelease['html_url'] }}" target="_blank" class="btn btn-outline-secondary px-4 py-2">
-                                    <i class="feather-github me-2"></i>
-                                    {{ __('messages.release_page') ?? 'Release Page' }}
-                                </a>
-                            @endif
-                        </div>
-                    </div>
-                </div>
-            @else
-                {{-- No Updates Card --}}
-                <div class="card stretch stretch-full mb-4" id="no-update-card">
-                    <div class="card-body d-flex flex-column align-items-center justify-content-center text-center py-5">
-                        <div class="wd-100 ht-100 rounded-circle d-flex align-items-center justify-content-center mb-4" style="background: rgba(0, 200, 83, 0.08);">
-                            <i class="feather-shield" style="font-size: 48px; color: #00c853;"></i>
-                        </div>
-                        <h4 class="fw-bold mb-2">{{ __('messages.all_good') ?? 'Everything looks good!' }}</h4>
-                        <p class="text-muted fs-13 mb-3" style="max-width: 400px;">
-                            {{ __('messages.no_updates_desc') ?? 'Your MyAds installation is running the latest version. We will check for updates automatically, or you can check manually anytime.' }}
-                        </p>
-                        <a href="https://github.com/mrghozzi/myads/releases" target="_blank" class="btn btn-outline-primary btn-sm">
-                            <i class="feather-github me-1"></i>
-                            {{ __('messages.view_all_releases') ?? 'View All Releases' }}
-                        </a>
-                    </div>
-                </div>
-            @endif
-        </div>
+            </section>
+        </aside>
     </div>
+</div>
+@endsection
 
-    @section('modals')
-    {{-- Confirm Update Modal --}}
-    @if($updateAvailable && $latestRelease)
+@section('modals')
+@if($updateAvailable && $latestRelease)
     <div class="modal fade" id="confirmUpdateModal" tabindex="-1" aria-labelledby="confirmUpdateModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header border-0 pb-0">
+                <div class="modal-header">
                     <h5 class="modal-title fw-bold" id="confirmUpdateModalLabel">
-                        <i class="feather-alert-triangle text-warning me-2"></i>
-                        {{ __('messages.confirm_update') ?? 'Confirm Update' }}
+                        <i class="feather-alert-triangle text-warning me-2"></i>{{ __('messages.confirm_update') }}
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body pt-2">
+                <div class="modal-body">
                     <p class="text-muted mb-3">
-                        {{ __('messages.confirm_update_desc') ?? 'You are about to update your system from' }}
+                        {{ __('messages.confirm_update_desc') }}
                         <strong>v{{ $currentVersion }}</strong>
                         {{ __('messages.to') ?? 'to' }}
                         <strong>v{{ $latestVersion }}</strong>.
                     </p>
-                    <div class="alert alert-soft-danger mb-0">
-                        <div class="d-flex align-items-start gap-2">
-                            <i class="feather-alert-circle mt-1"></i>
-                            <div class="fs-12">
-                                <strong>{{ __('messages.before_updating') ?? 'Before updating' }}:</strong>
-                                <ul class="mb-0 mt-1 ps-3">
-                                    <li>{{ __('messages.backup_database') ?? 'Backup your database' }}</li>
-                                    <li>{{ __('messages.backup_files') ?? 'Backup your files (especially modified theme files)' }}</li>
-                                    <li>{{ __('messages.ensure_no_users') ?? 'Ensure no other users are actively using the system' }}</li>
-                                </ul>
-                            </div>
+
+                    <div class="admin-status-banner is-danger mb-3">
+                        <i class="feather-alert-circle"></i>
+                        <div>
+                            <strong>{{ __('messages.before_updating') ?? 'Before updating' }}</strong>
+                            <ul class="mb-0 mt-2 ps-3">
+                                <li>{{ __('messages.backup_database') ?? 'Backup your database' }}</li>
+                                <li>{{ __('messages.backup_files') ?? 'Backup your files (especially modified theme files)' }}</li>
+                                <li>{{ __('messages.ensure_no_users') }}</li>
+                            </ul>
                         </div>
                     </div>
 
-                    <div class="mt-3">
-                        <div class="form-check mb-2">
-                            <input class="form-check-input" type="checkbox" value="1" id="backup_ack_database" name="backup_ack_database" form="update-form" {{ old('backup_ack_database') ? 'checked' : '' }}>
-                            <label class="form-check-label" for="backup_ack_database">
-                                {{ __('messages.backup_ack_database') ?? 'I have created a backup of the database.' }}
-                            </label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="checkbox" value="1" id="backup_ack_files" name="backup_ack_files" form="update-form" {{ old('backup_ack_files') ? 'checked' : '' }}>
-                            <label class="form-check-label" for="backup_ack_files">
-                                {{ __('messages.backup_ack_files') ?? 'I have created a backup of the files.' }}
-                            </label>
-                        </div>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" value="1" id="backup_ack_database" name="backup_ack_database" form="update-form" {{ old('backup_ack_database') ? 'checked' : '' }}>
+                        <label class="form-check-label" for="backup_ack_database">
+                            {{ __('messages.backup_ack_database') ?? 'I have created a backup of the database.' }}
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="1" id="backup_ack_files" name="backup_ack_files" form="update-form" {{ old('backup_ack_files') ? 'checked' : '' }}>
+                        <label class="form-check-label" for="backup_ack_files">
+                            {{ __('messages.backup_ack_files') ?? 'I have created a backup of the files.' }}
+                        </label>
                     </div>
                 </div>
-                <div class="modal-footer border-0 pt-0">
-                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">
-                        {{ __('messages.cancel') ?? 'Cancel' }}
-                    </button>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ __('messages.cancel') ?? 'Cancel' }}</button>
                     <form action="{{ route('admin.updates.process') }}" method="POST" id="update-form">
                         @csrf
                         <button type="submit" class="btn btn-primary fw-bold" id="btn-update" onclick="startUpdate(this)" @disabled(!$preflightReport->isSafe())>
-                            <i class="feather-download me-1"></i>
-                            {{ __('messages.yes_update') ?? 'Yes, Update Now' }}
+                            <i class="feather-download me-1"></i>{{ __('messages.yes_update') }}
                         </button>
                     </form>
                 </div>
             </div>
         </div>
     </div>
-    @endif
-    @endsection
-
-    <style>
-        .changelog-content {
-            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
-            font-size: 13px;
-            line-height: 1.7;
-            white-space: pre-wrap;
-            word-break: break-word;
-            max-height: 400px;
-            overflow-y: auto;
-        }
-        .wd-80 { width: 80px; }
-        .ht-80 { height: 80px; }
-        .wd-100 { width: 100px; }
-        .ht-100 { height: 100px; }
-        .spinner-border-sm-custom {
-            width: 1rem;
-            height: 1rem;
-            border-width: 0.15em;
-        }
-        .maintenance-update-card {
-            border: 1px solid rgba(97, 93, 250, 0.12);
-        }
-        .maintenance-update-active {
-            background: linear-gradient(135deg, rgba(255, 92, 120, 0.08), rgba(97, 93, 250, 0.05));
-        }
-        .maintenance-update-idle {
-            background: linear-gradient(135deg, rgba(255, 171, 0, 0.08), rgba(35, 210, 226, 0.05));
-        }
-        .maintenance-update-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(97, 93, 250, 0.12);
-            color: #615dfa;
-            font-size: 20px;
-            flex-shrink: 0;
-        }
-    </style>
-
-    <script>
-        function checkForUpdates() {
-            const btn = document.getElementById('btn-check-update');
-            const originalHtml = btn.innerHTML;
-            
-            btn.disabled = true;
-            btn.innerHTML = '<span class="spinner-border spinner-border-sm-custom me-1" role="status"></span> {{ __("messages.checking") ?? "Checking..." }}';
-
-            fetch('{{ route("admin.updates.check") }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                    'Accept': 'application/json'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                btn.disabled = false;
-                btn.innerHTML = originalHtml;
-
-                if (!data.success) {
-                    showFlash('danger', '<i class="feather-wifi-off me-2"></i>' + (data.message || '{{ __("messages.update_check_failed") ?? "Could not connect to GitHub." }}'));
-                    return;
-                }
-
-                if (data.updateAvailable) {
-                    showFlash('warning', '<i class="feather-arrow-up-circle me-2"></i>{{ __("messages.new_update_found") ?? "A new update" }} <strong>v' + data.latestVersion + '</strong> {{ __("messages.is_available") ?? "is available!" }}');
-                    // Reload to show full release details
-                    setTimeout(() => location.reload(), 1500);
-                } else {
-                    showFlash('success', '<i class="feather-check-circle me-2"></i>{{ __("messages.system_up_to_date") ?? "Your system is up to date!" }} (v' + data.currentVersion + ')');
-                }
-            })
-            .catch(error => {
-                btn.disabled = false;
-                btn.innerHTML = originalHtml;
-                showFlash('danger', '<i class="feather-alert-circle me-2"></i>{{ __("messages.connection_error") ?? "Connection error. Please try again." }}');
-            });
-        }
-
-        function startUpdate(btn) {
-            // Get the form before disabling the button
-            const form = btn.closest('form');
-            if (form) {
-                // Change button state
-                btn.innerHTML = '<span class="spinner-border spinner-border-sm-custom me-1" role="status"></span> {{ __("messages.updating") ?? "Updating..." }}';
-                // Add a small delay to allow the form to submit before disabling
-                setTimeout(() => {
-                    btn.disabled = true;
-                }, 10);
-            }
-        }
-
-        function showFlash(type, message) {
-            const container = document.querySelector('.main-content');
-            const existing = container.querySelector('.dynamic-alert');
-            if (existing) existing.remove();
-
-            const alertDiv = document.createElement('div');
-            alertDiv.className = 'alert alert-' + type + ' d-flex align-items-center mb-4 dynamic-alert';
-            alertDiv.setAttribute('role', 'alert');
-            alertDiv.innerHTML = '<div>' + message + '</div>';
-            
-            // Insert after the page-header
-            const pageHeader = container.querySelector('.page-header');
-            if (pageHeader) {
-                pageHeader.after(alertDiv);
-            } else {
-                container.prepend(alertDiv);
-            }
-
-            // Auto-dismiss after 5 seconds
-            setTimeout(() => {
-                alertDiv.style.transition = 'opacity 0.5s';
-                alertDiv.style.opacity = '0';
-                setTimeout(() => alertDiv.remove(), 500);
-            }, 5000);
-        }
-    </script>
+@endif
 @endsection
+
+@push('scripts')
+<script>
+    function checkForUpdates() {
+        const btn = document.getElementById('btn-check-update');
+        const originalHtml = btn.innerHTML;
+
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status"></span> {{ __("messages.checking") ?? "Checking..." }}';
+
+        fetch('{{ route("admin.updates.check") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Accept': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            btn.disabled = false;
+            btn.innerHTML = originalHtml;
+
+            if (!data.success) {
+                showFlash('danger', '<i class="feather-wifi-off me-2"></i>' + (data.message || '{{ __("messages.update_check_failed") ?? "Could not connect to GitHub." }}'));
+                return;
+            }
+
+            if (data.updateAvailable) {
+                showFlash('warning', '<i class="feather-arrow-up-circle me-2"></i>{{ __("messages.new_update_found") ?? "A new update" }} <strong>v' + data.latestVersion + '</strong> {{ __("messages.is_available") ?? "is available!" }}');
+                setTimeout(() => location.reload(), 1500);
+            } else {
+                showFlash('success', '<i class="feather-check-circle me-2"></i>{{ __("messages.system_up_to_date") ?? "Your system is up to date!" }} (v' + data.currentVersion + ')');
+            }
+        })
+        .catch(() => {
+            btn.disabled = false;
+            btn.innerHTML = originalHtml;
+            showFlash('danger', '<i class="feather-alert-circle me-2"></i>{{ __("messages.connection_error") ?? "Connection error. Please try again." }}');
+        });
+    }
+
+    function startUpdate(btn) {
+        const form = btn.closest('form');
+        if (form) {
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status"></span> {{ __("messages.updating") ?? "Updating..." }}';
+            setTimeout(() => {
+                btn.disabled = true;
+            }, 10);
+        }
+    }
+
+    function showFlash(type, message) {
+        const container = document.querySelector('.admin-page');
+        const existing = container.querySelector('.dynamic-alert');
+        if (existing) {
+            existing.remove();
+        }
+
+        const alertDiv = document.createElement('div');
+        alertDiv.className = 'alert alert-' + type + ' d-flex align-items-center dynamic-alert';
+        alertDiv.setAttribute('role', 'alert');
+        alertDiv.innerHTML = '<div>' + message + '</div>';
+
+        const hero = container.querySelector('.admin-hero');
+        if (hero) {
+            hero.insertAdjacentElement('afterend', alertDiv);
+        } else {
+            container.prepend(alertDiv);
+        }
+
+        setTimeout(() => {
+            alertDiv.style.transition = 'opacity 0.5s';
+            alertDiv.style.opacity = '0';
+            setTimeout(() => alertDiv.remove(), 500);
+        }, 5000);
+    }
+</script>
+@endpush
