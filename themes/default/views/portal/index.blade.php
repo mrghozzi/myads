@@ -1,5 +1,69 @@
 @extends('theme::layouts.master')
 
+@push('head')
+<style>
+    /* News Markdown Preview Styling */
+    .news-preview-content.markdown-news-preview {
+        color: #8f91ac;
+        font-size: 0.875rem;
+        line-height: 1.6;
+        word-wrap: break-word;
+    }
+
+    [data-theme="css_d"] .news-preview-content.markdown-news-preview {
+        color: #9aa4bf;
+    }
+
+    .news-preview-content.markdown-news-preview p {
+        margin-bottom: 0.6rem;
+    }
+
+    .news-preview-content.markdown-news-preview h1,
+    .news-preview-content.markdown-news-preview h2,
+    .news-preview-content.markdown-news-preview h3,
+    .news-preview-content.markdown-news-preview h4,
+    .news-preview-content.markdown-news-preview h5,
+    .news-preview-content.markdown-news-preview h6 {
+        font-size: 1rem;
+        margin: 0.8rem 0 0.4rem;
+        color: inherit;
+        font-weight: 700;
+    }
+
+    .news-preview-content.markdown-news-preview ul,
+    .news-preview-content.markdown-news-preview ol {
+        margin-bottom: 0.6rem;
+        padding-inline-start: 1.2rem;
+    }
+
+    .news-preview-content.markdown-news-preview li {
+        margin-bottom: 0.2rem;
+    }
+
+    .news-preview-content.markdown-news-preview img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 6px;
+        margin: 0.5rem 0;
+        display: block;
+    }
+
+    .news-preview-content.markdown-news-preview a {
+        color: #615dfa;
+        text-decoration: none;
+        font-weight: 700;
+    }
+
+    .news-preview-content.markdown-news-preview blockquote {
+        border-inline-start: 3px solid #615dfa;
+        padding-inline-start: 10px;
+        margin: 0.5rem 0;
+        font-style: italic;
+        background: rgba(97, 93, 250, 0.05);
+    }
+</style>
+@endpush
+
 @section('content')
 <!-- SECTION BANNER -->
 <div class="section-banner" style="background: url({{ theme_asset('img/banner/Newsfeed.png') }}) no-repeat 50%;" >
@@ -137,4 +201,41 @@
         <x-widget-column side="portal_right" />
     </div>
 </div>
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify/dist/purify.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        function renderNewsMarkdown(container) {
+            const scope = container || document;
+            scope.querySelectorAll('.markdown-news-preview').forEach(el => {
+                if (!el.getAttribute('data-rendered')) {
+                    try {
+                        const rawContent = el.innerHTML;
+                        const markdownText = el.innerText || rawContent;
+                        let html = marked.parse(markdownText.trim());
+                        
+                        // Safely handle hashtags within the Markdown content
+                        const tagUrl = "{{ url('tag') }}";
+                        html = html.replace(/(^|\s)#(\w+)/g, `$1<a href="${tagUrl}/$2">#$2</a>`);
+                        
+                        el.innerHTML = DOMPurify.sanitize(html);
+                        el.setAttribute('data-rendered', 'true');
+                    } catch (e) {
+                        console.error('Error rendering news markdown:', e);
+                    }
+                }
+            });
+        }
+
+        // Initial render
+        renderNewsMarkdown();
+
+        // Handle Infinite Scroll
+        window.afterInfiniteScrollRender = function(container) {
+            renderNewsMarkdown(container);
+        };
+    });
+</script>
+@endpush
 @endsection

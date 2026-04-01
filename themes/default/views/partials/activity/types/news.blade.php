@@ -3,9 +3,11 @@
         $newsImg = $activity->related_content->img ? asset($activity->related_content->img) : theme_asset('img/cover_news.jpg');
     @endphp
     <!-- POST PREVIEW IMAGE -->
-    <figure class="post-preview-image liquid" style="background: rgba(0, 0, 0, 0) url({{ $newsImg }}) no-repeat scroll center center / cover;">
-        <img src="{{ $newsImg }}" alt="cover-news" style="display: none;">
-    </figure>
+    <a href="{{ route('news.show', $activity->related_content->id) }}">
+        <figure class="post-preview-image liquid" style="background: rgba(0, 0, 0, 0) url({{ $newsImg }}) no-repeat scroll center center / cover;">
+            <img src="{{ $newsImg }}" alt="cover-news" style="display: none;">
+        </figure>
+    </a>
     <!-- /POST PREVIEW IMAGE -->
 
     <!-- POST PREVIEW INFO -->
@@ -17,7 +19,11 @@
             <!-- /POST PREVIEW TIMESTAMP -->
 
             <!-- POST PREVIEW TITLE -->
-            <p class="post-preview-title">{{ $activity->related_content->name }}</p>
+            <p class="post-preview-title">
+                <a href="{{ route('news.show', $activity->related_content->id) }}">
+                    {{ $activity->related_content->name }}
+                </a>
+            </p>
             <!-- /POST PREVIEW TITLE -->
         </div>
         <!-- /POST PREVIEW INFO TOP -->
@@ -25,13 +31,9 @@
         <!-- POST PREVIEW INFO BOTTOM -->
         <div class="post-preview-info-bottom">
             <!-- POST PREVIEW TEXT -->
-            <p class="post-preview-text">
-                @php
-                    $txt = $activity->related_content->text;
-                    $txt = preg_replace('/#(\w+)/', '<a href="'.url('tag/$1').'">#$1</a>', $txt);
-                @endphp
-                {!! $txt !!}
-            </p>
+            <div class="post-preview-text news-preview-content markdown-news-preview" data-news-id="{{ $activity->related_content->id }}">
+                {!! $activity->related_content->text !!}
+            </div>
             <!-- /POST PREVIEW TEXT -->
         </div>
         <!-- /POST PREVIEW INFO BOTTOM -->
