@@ -26,7 +26,7 @@
 @endphp
 
 <div class="grid grid post{{ $status->id }}">
-    <div class="widget-box no-padding post{{ $status->id }}">
+    <div class="widget-box no-padding activity-post-card post{{ $status->id }}">
         <!-- WIDGET BOX SETTINGS -->
         <div class="widget-box-settings">
             <!-- POST SETTINGS WRAP -->
