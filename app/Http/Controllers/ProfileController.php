@@ -499,7 +499,7 @@ class ProfileController extends Controller
     public function updateSocial(Request $request)
     {
         $user = Auth::user();
-        $platforms = ['facebook', 'twitter', 'vkontakte', 'linkedin', 'instagram', 'youtube', 'threads', 'reddit', 'github', 'adstn'];
+        $platforms = ['facebook', 'twitter', 'vkontakte', 'linkedin', 'instagram', 'youtube', 'threads', 'reddit', 'github', 'adstn', 'tiktok', 'discord'];
         $links = [];
 
         foreach ($platforms as $platform) {
@@ -567,6 +567,14 @@ class ProfileController extends Controller
             'adstn' => [
                 'base' => 'https://www.adstn.ovh/u/',
                 'pattern' => '/adstn\.ovh\/u\/([a-zA-Z0-9_\-]+)/i'
+            ],
+            'tiktok' => [
+                'base' => 'https://www.tiktok.com/@',
+                'pattern' => '/tiktok\.com\/@([a-zA-Z0-9_\.]+)/i'
+            ],
+            'discord' => [
+                'base' => 'https://discord.com/users/',
+                'pattern' => '/discord\.com\/users\/([0-9]+)/i'
             ],
         ];
 

@@ -245,6 +245,8 @@ return [
     'reddit' => 'Reddit',
     'github' => 'GitHub',
     'adstn' => 'ADStn',
+    'tiktok' => 'TikTok',
+    'discord' => 'Discord',
     'badge_unlocked_notification' => 'Vous avez débloqué le badge :badge.',
     'badges' => 'Badges',
     'badges_hub' => 'Centre des Badges',

@@ -118,6 +118,23 @@
                         </div>
                     </div>
 
+                    <div class="form-row split" style="margin-top: 24px;">
+                        <div class="form-item">
+                            <div class="form-input small active">
+                                <label for="tiktok">{{ __('messages.tiktok') ?? 'TikTok' }}</label>
+                                <input type="text" id="tiktok" name="tiktok" value="{{ old('tiktok', $links['tiktok'] ?? '') }}" placeholder="@username" style="border-radius: 12px; padding-left: 45px;">
+                                <i class="fab fa-tiktok" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #000; font-size: 18px;"></i>
+                            </div>
+                        </div>
+                        <div class="form-item">
+                            <div class="form-input small active">
+                                <label for="discord">{{ __('messages.discord') ?? 'Discord' }}</label>
+                                <input type="text" id="discord" name="discord" value="{{ old('discord', $links['discord'] ?? '') }}" placeholder="username or link" style="border-radius: 12px; padding-left: 45px;">
+                                <i class="fab fa-discord" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #5865F2; font-size: 18px;"></i>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="form-row" style="margin-top: 40px; display: flex; justify-content: center;">
                         <div class="form-item" style="min-width: 200px;">
                             <button type="submit" class="button primary" style="width: 100%; border-radius: 12px; padding: 12px 24px; font-weight: 700; font-size: 14px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); transition: all 0.3s ease;">

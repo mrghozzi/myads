@@ -245,6 +245,8 @@ return [
     'reddit' => 'Reddit',
     'github' => 'GitHub',
     'adstn' => 'ADStn',
+    'tiktok' => 'TikTok',
+    'discord' => 'Discord',
     'badge_unlocked_notification' => ':badge rozetini açtın.',
     'badges' => 'Badges',
     'badges_hub' => 'Rozet Merkezi',

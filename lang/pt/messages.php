@@ -245,6 +245,8 @@ return [
     'reddit' => 'Reddit',
     'github' => 'GitHub',
     'adstn' => 'ADStn',
+    'tiktok' => 'TikTok',
+    'discord' => 'Discord',
     'badge_unlocked_notification' => 'Você desbloqueou o emblema :badge.',
     'badges' => 'Badges',
     'badges_hub' => 'Centro de Emblemas',

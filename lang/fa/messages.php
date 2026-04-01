@@ -245,6 +245,8 @@ return [
     'reddit' => 'ردیت (Reddit)',
     'github' => 'گیت‌هاب (GitHub)',
     'adstn' => 'ADStn',
+    'tiktok' => 'تیک‌تاک',
+    'discord' => 'دیسکورد',
     'badge_unlocked_notification' => 'شما نشان :badge را باز کردید.',
     'badges' => 'الشارات',
     'badges_hub' => 'مرکز نشان‌ها',

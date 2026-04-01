@@ -244,6 +244,8 @@ return [
     'reddit' => 'ريديت (Reddit)',
     'github' => 'جيت هاب (GitHub)',
     'adstn' => 'ADStn',
+    'tiktok' => 'تيك توك',
+    'discord' => 'ديسكورد',
     'badge_unlocked_notification' => 'لقد فتحت شارة :badge.',
     'badges' => 'الشارات',
     'badges_hub' => 'مركز الشارات',
