@@ -1,5 +1,19 @@
 # v4.2.3
-> **Work in Progress** - New features and improvements.
+> **Corrective Release** — User slug synchronization, RTL post layout fixes, and UI consistency.
+
+### 🔐 Users & Admin Management
+* **Fix**: Resolved an issue where updating a member's slug (username) in the admin panel would break their public profile URL; the system now correctly synchronizes the `username` field in the `users` table with the unique `options` identifier.
+* **Fix**: Corrected the slug update redirect in the admin panel to ensure administrators are returned to the correct user entry after a successful name change.
+
+### 🎨 UI & RTL Modernization
+* **Fix**: Overhauled the **RTL layout** for community activity posts and forum topics to ensure visual consistency in Arabic and Persian locales.
+    * **Avatar Position**: Moved the user's avatar to the right side of the post header.
+    * **Action Icons**: Relocated the settings dropdown (three dots) and the post-category sticker (globe, blog, gallery icons) to the left side.
+    * **Padding & Spacing**: Implemented specialized padding rules to ensure post metadata and usernames correctly clear both the avatar and the action icons.
+* **Architecture**: Introduced the `activity-post-card` hook across `wrapper.blade.php`, `forum/post.blade.php`, and `forum/image.blade.php` to centralize RTL layout logic and prevent layout drift in future updates.
+
+### 🛡️ Core Stability
+* **Fix**: Resolved layout clipping on forum topic pages in RTL mode where long titles could overlap with the absolutely positioned action icons.
 
 # v4.2.2
 > **Corrective Release** - User Social Links, admin extensions redesign, stability fixes, and localization polish.
