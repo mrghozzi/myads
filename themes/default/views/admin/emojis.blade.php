@@ -42,12 +42,12 @@
         </div>
     @endif
 
-    <div class="admin-workspace-grid">
+    <div class="admin-section-stack">
         <section class="admin-panel">
             <div class="admin-panel__header">
                 <div>
                     <span class="admin-panel__eyebrow">{{ __('messages.add_emoji') }}</span>
-                    <h2 class="admin-panel__title">{{ __('messages.emoji_shortcut') }}</h2>
+                    <h2 class="admin-panel__title">{{ __('messages.add_emoji') }}</h2>
                 </div>
             </div>
             <div class="admin-panel__body">
@@ -71,6 +71,12 @@
         </section>
 
         <section class="admin-panel">
+            <div class="admin-panel__header">
+                <div>
+                    <span class="admin-panel__eyebrow">{{ __('messages.emojis') }}</span>
+                    <h2 class="admin-panel__title">{{ __('messages.emojis') }}</h2>
+                </div>
+            </div>
             <div class="admin-panel__body">
                 <div class="admin-table-wrap">
                     <table class="table table-hover align-middle admin-table admin-table-cardify">
