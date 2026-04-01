@@ -106,7 +106,7 @@
                     <a class="btn btn-light admin-icon-btn" data-bs-toggle="dropdown" data-bs-offset="0,12" data-bs-auto-close="outside">
                         <i class="feather-filter"></i>
                     </a>
-                    <div class="dropdown-menu dropdown-menu-end p-2" style="min-width: 280px;">
+                    <div class="dropdown-menu dropdown-menu-end p-2 admin-filter-dropdown-menu" style="min-width: 280px; max-width: min(92vw, 280px);">
                         <div class="dropdown-header fw-bold text-uppercase fs-11 text-muted">{{ __('messages.Role') }}</div>
                         <a href="{{ request()->fullUrlWithQuery(['role' => null]) }}" class="dropdown-item {{ !request('role') ? 'active' : '' }}">
                             <i class="feather-users me-3"></i>

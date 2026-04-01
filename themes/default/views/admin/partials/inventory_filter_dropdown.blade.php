@@ -12,7 +12,7 @@
             <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary">{{ $activeFilterCount }}</span>
         @endif
     </a>
-    <div class="dropdown-menu dropdown-menu-end p-0" style="min-width: 360px; max-width: min(92vw, 360px);">
+    <div class="dropdown-menu dropdown-menu-end p-0 admin-filter-dropdown-menu" style="min-width: 360px; max-width: min(92vw, 360px);">
         <div class="p-3 border-bottom">
             <div class="d-flex align-items-start justify-content-between gap-3">
                 <div>

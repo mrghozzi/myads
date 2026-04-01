@@ -51,7 +51,7 @@ body.admin-premium-shell .admin-hero {
     justify-content: space-between;
     padding: 1.75rem;
     position: relative;
-    overflow: hidden;
+    overflow: visible;
 }
 
 html.app-skin-dark body.admin-premium-shell .admin-hero {
@@ -223,6 +223,7 @@ body.admin-premium-shell .admin-toolbar-card {
     background: rgba(255, 255, 255, 0.72);
     border: 1px solid rgba(255, 255, 255, 0.65);
     border-radius: calc(var(--admin-premium-radius) - 8px);
+    overflow: visible;
     padding: 0.85rem;
     width: 100%;
 }
@@ -242,6 +243,27 @@ body.admin-premium-shell .admin-toolbar-card .form-select {
 body.admin-premium-shell .admin-toolbar-card .form-control,
 body.admin-premium-shell .admin-toolbar-card .form-select {
     min-height: 46px;
+}
+
+body.admin-premium-shell .admin-hero__actions,
+body.admin-premium-shell .admin-toolbar-row,
+body.admin-premium-shell .admin-toolbar-card .dropdown {
+    overflow: visible;
+}
+
+body.admin-premium-shell .admin-filter-dropdown-menu {
+    border: 1px solid var(--admin-premium-border);
+    border-radius: 20px;
+    box-shadow: var(--admin-premium-shadow);
+    margin-top: 0.75rem;
+    max-height: min(75vh, 34rem);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    z-index: 1085;
+}
+
+html.app-skin-dark body.admin-premium-shell .admin-filter-dropdown-menu {
+    background: var(--admin-premium-surface);
 }
 
 body.admin-premium-shell .admin-chip-list,
