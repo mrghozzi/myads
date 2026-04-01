@@ -15,6 +15,23 @@
 ### 🛡️ Core Stability
 * **Fix**: Resolved layout clipping on forum topic pages in RTL mode where long titles could overlap with the absolutely positioned action icons.
 
+### Admin Premium Refresh
+* **Improvement**: Expanded the Duralux-aligned "premium admin" redesign across a wide set of management pages, including users, pages, ads monitoring, banners, links, smart ads, visits, knowledgebase, forum settings/moderators, emojis, products, menus, site ads, SEO, Security, Settings, Maintenance, Admins, Plugins, Themes, Reports, and category management screens.
+* **Improvement**: Standardized admin pages around shared `admin-hero`, `admin-panel`, `admin-suite-nav`, `admin-control-grid`, `admin-action-tiles`, and `admin-form-workspace` patterns through the shared `admin-redesign.css` layer while preserving all existing routes, form contracts, filters, and AJAX flows.
+* **Fix**: Added an explicit `admin_shell_header_mode` contract in the admin layout so pages with custom hero headers can suppress the lightweight shell header instead of rendering duplicated top sections.
+* **Fix**: Migrated remaining legacy `page-header` screens and suite pages toward the new hero contract, improving placement on desktop/mobile and preventing awkward stacked headers inside the admin shell.
+
+### Ads, Inventory & Moderation Polish
+* **Fix**: Resolved dropdown clipping on shared `Filter` controls for `/admin/users`, `/admin/banners`, `/admin/links`, `/admin/smart-ads`, and `/admin/visits` so the full filter panel now renders correctly inside the redesigned admin hero.
+* **Fix**: Resolved a `500 Internal Server Error` on `/admin/ads/posts` caused by an undefined status badge variable in the promoted-posts monitoring view.
+* **Improvement**: Added stronger, high-contrast visual status badges for promoted-post campaign states on `/admin/ads/posts` so `active`, `paused`, `completed`, `expired`, and `budget_capped` campaigns are easier to scan against the admin background.
+* **Add**: Added admin-side editing for visit ads directly from the `/admin/visits` table through an inline modal flow, preserving the existing update route and field contract.
+
+### Translation Workspace & Localization
+* **Improvement**: Rebuilt `/admin/languages/{id}/terms` into a dedicated translation workspace with a sticky search/filter toolbar, progress counters, accordion-based term cards, multiline auto-growing textareas, and a separate extra-keys section so long strings remain readable without horizontal expansion.
+* **Add**: Added translation-workspace UI labels, counters, and status copy across all 9 supported language packs to support the new admin translation flow.
+* **Fix**: Corrected mojibake/encoding issues in the Arabic and Persian language files for the newly added translation-workspace keys.
+
 # v4.2.2
 > **Corrective Release** - User Social Links, admin extensions redesign, stability fixes, and localization polish.
 

@@ -1399,6 +1399,363 @@ body.admin-premium-shell .maintenance-live-preview {
     border-radius: var(--admin-premium-radius);
 }
 
+body.admin-premium-shell .translation-workspace__form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+body.admin-premium-shell .translation-toolbar-panel {
+    position: sticky;
+    top: 1rem;
+    z-index: 12;
+}
+
+body.admin-premium-shell .translation-toolbar {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr) minmax(260px, 0.9fr);
+}
+
+body.admin-premium-shell .translation-toolbar__search,
+body.admin-premium-shell .translation-toolbar__filters,
+body.admin-premium-shell .translation-toolbar__meta {
+    min-width: 0;
+}
+
+body.admin-premium-shell .translation-toolbar__search .position-relative {
+    position: relative;
+}
+
+body.admin-premium-shell .translation-toolbar__search-icon {
+    color: var(--admin-premium-muted);
+    left: 1rem;
+    pointer-events: none;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+body.admin-premium-shell .translation-toolbar__search .form-control {
+    min-height: 50px;
+    padding-inline-start: 2.9rem;
+}
+
+body.admin-premium-shell .translation-filter-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.65rem;
+}
+
+body.admin-premium-shell .translation-filter-btn {
+    align-items: center;
+    background: var(--admin-premium-surface-alt);
+    border: 1px solid var(--admin-premium-border);
+    border-radius: 999px;
+    color: var(--admin-premium-muted);
+    display: inline-flex;
+    font-size: 0.84rem;
+    font-weight: 700;
+    justify-content: center;
+    min-height: 42px;
+    padding: 0.65rem 0.95rem;
+    transition: all 0.2s ease;
+}
+
+body.admin-premium-shell .translation-filter-btn:hover {
+    border-color: var(--admin-premium-border-strong);
+    color: var(--admin-premium-text);
+}
+
+body.admin-premium-shell .translation-filter-btn.is-active {
+    background: linear-gradient(135deg, var(--admin-premium-accent), #7c78ff);
+    border-color: transparent;
+    box-shadow: 0 16px 30px rgba(97, 93, 250, 0.2);
+    color: #fff;
+}
+
+body.admin-premium-shell .translation-toolbar__meta {
+    display: grid;
+    gap: 0.85rem;
+}
+
+body.admin-premium-shell .translation-progress,
+body.admin-premium-shell .translation-toolbar__result {
+    background: var(--admin-premium-surface-alt);
+    border: 1px solid var(--admin-premium-border);
+    border-radius: 20px;
+    padding: 0.95rem 1rem;
+}
+
+body.admin-premium-shell .translation-progress__meta {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-bottom: 0.65rem;
+}
+
+body.admin-premium-shell .translation-progress__label,
+body.admin-premium-shell .translation-toolbar__result-label,
+body.admin-premium-shell .translation-card__label {
+    color: var(--admin-premium-muted);
+    display: inline-block;
+    font-size: 0.77rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+body.admin-premium-shell .translation-progress__value,
+body.admin-premium-shell .translation-toolbar__result strong {
+    color: var(--admin-premium-text);
+    font-size: 1rem;
+    font-weight: 800;
+}
+
+body.admin-premium-shell .translation-progress .progress {
+    background: rgba(148, 163, 184, 0.18);
+    border-radius: 999px;
+    height: 0.7rem;
+    overflow: hidden;
+}
+
+body.admin-premium-shell .translation-progress .progress-bar {
+    background: linear-gradient(90deg, var(--admin-premium-accent), #8b87ff);
+    border-radius: inherit;
+}
+
+body.admin-premium-shell .translation-toolbar__result {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    gap: 0.75rem;
+}
+
+body.admin-premium-shell .translation-accordion {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+body.admin-premium-shell .translation-card {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.95));
+    border: 1px solid var(--admin-premium-border);
+    border-radius: 24px;
+    box-shadow: var(--admin-premium-shadow-soft);
+    overflow: hidden;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+html.app-skin-dark body.admin-premium-shell .translation-card {
+    background: linear-gradient(180deg, rgba(35, 38, 59, 0.98), rgba(27, 30, 47, 0.96));
+}
+
+body.admin-premium-shell .translation-card[open],
+body.admin-premium-shell .translation-card.is-search-match {
+    border-color: var(--admin-premium-border-strong);
+    box-shadow: var(--admin-premium-shadow);
+}
+
+body.admin-premium-shell .translation-card__summary {
+    align-items: flex-start;
+    cursor: pointer;
+    display: flex;
+    gap: 1rem;
+    justify-content: space-between;
+    list-style: none;
+    padding: 1.2rem 1.3rem;
+}
+
+body.admin-premium-shell .translation-card__summary::-webkit-details-marker {
+    display: none;
+}
+
+body.admin-premium-shell .translation-card__summary-main,
+body.admin-premium-shell .translation-card__summary-meta {
+    min-width: 0;
+}
+
+body.admin-premium-shell .translation-card__summary-main {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    gap: 0.45rem;
+}
+
+body.admin-premium-shell .translation-card__summary-meta {
+    align-items: center;
+    display: inline-flex;
+    flex-shrink: 0;
+    gap: 0.75rem;
+}
+
+body.admin-premium-shell .translation-card__key,
+body.admin-premium-shell .translation-card__preview,
+body.admin-premium-shell .translation-source__content,
+body.admin-premium-shell .translation-textarea {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+body.admin-premium-shell .translation-card__key {
+    color: var(--admin-premium-text);
+    font-family: Consolas, Monaco, monospace;
+    font-size: 0.93rem;
+    font-weight: 800;
+    line-height: 1.65;
+}
+
+body.admin-premium-shell .translation-card__preview {
+    color: var(--admin-premium-muted);
+    font-size: 0.93rem;
+    line-height: 1.7;
+}
+
+body.admin-premium-shell .translation-card__chevron {
+    align-items: center;
+    background: var(--admin-premium-surface-alt);
+    border: 1px solid var(--admin-premium-border);
+    border-radius: 999px;
+    color: var(--admin-premium-muted);
+    display: inline-flex;
+    height: 38px;
+    justify-content: center;
+    transition: transform 0.2s ease;
+    width: 38px;
+}
+
+body.admin-premium-shell .translation-card[open] .translation-card__chevron {
+    transform: rotate(180deg);
+}
+
+body.admin-premium-shell .translation-card__body {
+    border-top: 1px solid var(--admin-premium-border);
+    padding: 0 1.3rem 1.3rem;
+}
+
+body.admin-premium-shell .translation-card__grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.15fr);
+    padding-top: 1rem;
+}
+
+body.admin-premium-shell .translation-source {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+body.admin-premium-shell .translation-source__content {
+    background: var(--admin-premium-surface-alt);
+    border: 1px solid var(--admin-premium-border);
+    border-radius: 20px;
+    color: var(--admin-premium-text);
+    line-height: 1.8;
+    min-height: 180px;
+    padding: 1rem 1.05rem;
+    white-space: pre-wrap;
+}
+
+body.admin-premium-shell .translation-source__content--warning {
+    background: var(--admin-premium-warning-soft);
+    border-color: rgba(245, 158, 11, 0.24);
+    color: #b45309;
+}
+
+html.app-skin-dark body.admin-premium-shell .translation-source__content--warning {
+    color: #fbbf24;
+}
+
+body.admin-premium-shell .translation-textarea {
+    background: var(--admin-premium-surface);
+    border: 1px solid var(--admin-premium-border);
+    border-radius: 20px;
+    color: var(--admin-premium-text);
+    line-height: 1.8;
+    min-height: 180px;
+    resize: vertical;
+}
+
+body.admin-premium-shell .translation-textarea:focus {
+    border-color: rgba(97, 93, 250, 0.4);
+    box-shadow: 0 0 0 0.25rem rgba(97, 93, 250, 0.12);
+}
+
+body.admin-premium-shell .translation-status {
+    align-items: center;
+    border-radius: 999px;
+    display: inline-flex;
+    font-size: 0.76rem;
+    font-weight: 800;
+    gap: 0.45rem;
+    min-height: 34px;
+    padding: 0.45rem 0.8rem;
+}
+
+body.admin-premium-shell .translation-status::before {
+    border-radius: 999px;
+    content: "";
+    display: inline-block;
+    height: 0.55rem;
+    width: 0.55rem;
+}
+
+body.admin-premium-shell .translation-status--translated {
+    background: var(--admin-premium-success-soft);
+    color: #15803d;
+}
+
+body.admin-premium-shell .translation-status--translated::before {
+    background: #16a34a;
+}
+
+body.admin-premium-shell .translation-status--missing {
+    background: var(--admin-premium-warning-soft);
+    color: #b45309;
+}
+
+body.admin-premium-shell .translation-status--missing::before {
+    background: #f59e0b;
+}
+
+body.admin-premium-shell .translation-status--extra {
+    background: var(--admin-premium-accent-soft);
+    color: var(--admin-premium-accent);
+}
+
+body.admin-premium-shell .translation-status--extra::before {
+    background: var(--admin-premium-accent);
+}
+
+body.admin-premium-shell .translation-empty-state {
+    align-items: center;
+    background: var(--admin-premium-surface);
+    border: 1px dashed var(--admin-premium-border-strong);
+    border-radius: var(--admin-premium-radius);
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    padding: 2rem 1.5rem;
+    text-align: center;
+}
+
+body.admin-premium-shell .translation-empty-state.is-inline {
+    background: var(--admin-premium-surface-alt);
+    border-style: solid;
+}
+
+@media (max-width: 1199.98px) {
+    body.admin-premium-shell .translation-toolbar {
+        grid-template-columns: 1fr;
+    }
+
+    body.admin-premium-shell .translation-toolbar__meta {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
 @media (max-width: 991.98px) {
     body.admin-premium-shell .page-header {
         padding: 1.2rem;
@@ -1420,6 +1777,14 @@ body.admin-premium-shell .maintenance-live-preview {
 
     body.admin-premium-shell .admin-shell-header {
         padding: 0;
+    }
+
+    body.admin-premium-shell .translation-toolbar-panel {
+        position: static;
+    }
+
+    body.admin-premium-shell .translation-card__grid {
+        grid-template-columns: 1fr;
     }
 }
 
@@ -1452,6 +1817,23 @@ body.admin-premium-shell .maintenance-live-preview {
         box-shadow: none;
         justify-content: flex-start;
         padding: 0;
+    }
+
+    body.admin-premium-shell .translation-toolbar__meta {
+        grid-template-columns: 1fr;
+    }
+
+    body.admin-premium-shell .translation-card__summary {
+        flex-direction: column;
+    }
+
+    body.admin-premium-shell .translation-card__summary-meta {
+        justify-content: space-between;
+        width: 100%;
+    }
+
+    body.admin-premium-shell .translation-filter-btn {
+        flex: 1 1 100%;
     }
 }
 
