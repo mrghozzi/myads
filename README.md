@@ -95,7 +95,7 @@ We have reached **100% Feature Parity** with the legacy version. Continuous impr
 - 🔹 **API:** Full REST API for mobile apps (Internal Alpha).
 - 🔹 **Real-time:** WebSocket support for notifications.
 - 🔹 **Payment Gateways:** Integration with PayPal/Stripe for store.
-- 🔹 **Smart Ads:** Auto-Rotation to optimize CTR.
+- ✅ **Smart Ads:** Auto-Rotation to optimize CTR.
 
 ---
 
