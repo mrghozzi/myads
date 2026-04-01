@@ -1,6 +1,7 @@
 @extends('theme::layouts.admin')
 
 @section('title', __('messages.maintenance'))
+@section('admin_shell_header_mode', 'hidden')
 
 @section('content')
 @php
@@ -10,17 +11,26 @@
     $enabledBy = $maintenanceUsers->get((int) ($maintenanceSettings['enabled_by'] ?? 0));
     $lastChangedBy = $maintenanceUsers->get((int) ($maintenanceSettings['last_changed_by'] ?? 0));
 @endphp
-<div class="page-header">
-    <div class="page-header-left d-flex align-items-center">
-        <div class="page-header-title">
-            <h5 class="m-b-10">{{ __('messages.maintenance') }}</h5>
-        </div>
-        <ul class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ route('admin.index') }}">{{ __('messages.dashboard') ?? 'Dashboard' }}</a></li>
-            <li class="breadcrumb-item">{{ __('messages.maintenance') }}</li>
+<div class="admin-page">
+<section class="admin-hero">
+    <div class="admin-hero__content">
+        <ul class="admin-breadcrumb">
+            <li><a href="{{ route('admin.index') }}">{{ __('messages.dashboard') ?? 'Dashboard' }}</a></li>
+            <li>{{ __('messages.maintenance') }}</li>
         </ul>
+        <div class="admin-hero__eyebrow">{{ __('messages.maintenance') }}</div>
+        <h1 class="admin-hero__title">{{ __('messages.maintenance') }}</h1>
+        <p class="admin-hero__copy">{{ __('messages.maintenance_settings_description') }}</p>
     </div>
-</div>
+    <div class="admin-hero__actions">
+        <div class="admin-summary-grid w-100">
+            <div class="admin-summary-card">
+                <span class="admin-summary-label">{{ __('messages.status') }}</span>
+                <span class="admin-summary-value">{{ $isEnabled ? __('messages.maintenance_status_enabled') : __('messages.maintenance_status_disabled') }}</span>
+            </div>
+        </div>
+    </div>
+</section>
 
 @if(session('success'))
     <div class="alert alert-success alert-dismissible fade show shadow-sm mb-4" role="alert">
@@ -273,4 +283,5 @@
         .maintenance-live-preview { padding: 22px; }
     }
 </style>
+</div>
 @endsection

@@ -1,6 +1,7 @@
 @extends('theme::layouts.admin')
 
 @section('title', __('messages.plugins'))
+@section('admin_shell_header_mode', 'hidden')
 
 @php
     $pluginCount = count($plugins);

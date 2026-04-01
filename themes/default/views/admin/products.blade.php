@@ -1,15 +1,21 @@
 @extends('theme::layouts.admin')
 
+@section('title', __('messages.manage_products') ?? 'Manage Products')
+@section('admin_shell_header_mode', 'hidden')
+
 @section('content')
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h4 class="fw-bolder mb-1">{{ __('messages.manage_products') ?? 'Manage Products' }}</h4>
-            <div class="fs-12 text-muted">{{ __('messages.total_products') ?? 'Total Products' }}: {{ $products->total() }}</div>
+    <div class="admin-page">
+    <section class="admin-hero">
+        <div class="admin-hero__content">
+            <ul class="admin-breadcrumb">
+                <li><a href="{{ route('admin.index') }}">{{ __('messages.dashboard') ?? 'Dashboard' }}</a></li>
+                <li>{{ __('messages.products') ?? 'Products' }}</li>
+            </ul>
+            <div class="admin-hero__eyebrow">{{ __('messages.products') ?? 'Products' }}</div>
+            <h1 class="admin-hero__title">{{ __('messages.manage_products') ?? 'Manage Products' }}</h1>
+            <p class="admin-hero__copy">{{ __('messages.total_products') ?? 'Total Products' }}: {{ $products->total() }}</p>
         </div>
-        <div>
-            <!-- Header actions if any -->
-        </div>
-    </div>
+    </section>
 
     @if(session('success'))
         <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -165,4 +171,5 @@
             }
         }
     </script>
+    </div>
 @endsection

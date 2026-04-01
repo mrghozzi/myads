@@ -3,32 +3,28 @@
 @section('title', __('messages.settings_site'))
 
 @section('content')
-<div class="page-header">
-    <div class="page-header-left d-flex align-items-center">
-        <div class="page-header-title">
-            <h5 class="m-b-10">{{ __('messages.settings_site') }}</h5>
+<div class="admin-page">
+    <section class="admin-hero">
+        <div class="admin-hero__content">
+            <ul class="admin-breadcrumb">
+                <li><a href="{{ route('admin.index') }}">{{ __('messages.dashboard') ?? 'Dashboard' }}</a></li>
+                <li>{{ __('messages.settings_site') }}</li>
+            </ul>
+            <div class="admin-hero__eyebrow">{{ __('messages.options') }}</div>
+            <h1 class="admin-hero__title">{{ __('messages.settings_site') }}</h1>
+            <p class="admin-hero__copy">{{ __('messages.site_name') }} / {{ __('messages.url_link') }} / {{ __('messages.language_default') }}</p>
         </div>
-        <ul class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ route('admin.index') }}">{{ __('messages.dashboard') ?? 'Dashboard' }}</a></li>
-            <li class="breadcrumb-item">{{ __('messages.settings_site') }}</li>
-        </ul>
-    </div>
-</div>
+    </section>
 
-<div class="card stretch stretch-full">
-    <div class="card-header">
-        <h5 class="card-title">{{ __('messages.settings_site') }}</h5>
-    </div>
-    <div class="card-body">
-        @if(session('success'))
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show mb-0" role="alert">
             {{ session('success') }}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
-        @endif
+    @endif
 
-        @if($errors->any())
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+    @if($errors->any())
+        <div class="alert alert-danger alert-dismissible fade show mb-0" role="alert">
             <ul class="mb-0">
                 @foreach($errors->all() as $error)
                     <li>{{ $error }}</li>
@@ -36,13 +32,13 @@
             </ul>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
-        @endif
+    @endif
 
-        <form action="{{ route('admin.settings.update') }}" method="POST">
-            @csrf
-            
-            <div class="row mb-4">
-                <div class="col-lg-6 mb-4 mb-lg-0">
+    <section class="admin-panel">
+        <div class="admin-panel__body">
+            <form action="{{ route('admin.settings.update') }}" method="POST" class="row g-4">
+                @csrf
+                <div class="col-lg-6">
                     <label class="form-label">{{ __('messages.site_name') }} <span class="text-danger">*</span></label>
                     <input type="text" name="titer" class="form-control" value="{{ old('titer', $settings->titer) }}" placeholder="{{ __('messages.site_name') }}">
                 </div>
@@ -50,15 +46,11 @@
                     <label class="form-label">{{ __('messages.url_link') }} <span class="text-danger">*</span></label>
                     <input type="url" name="url" class="form-control" value="{{ old('url', $settings->url) }}" placeholder="{{ __('messages.url_link') }}">
                 </div>
-            </div>
-
-            <div class="mb-4">
-                <label class="form-label">{{ __('messages.desc') }}</label>
-                <textarea rows="6" name="description" class="form-control" placeholder="{{ __('messages.desc') }}">{{ old('description', $settings->description) }}</textarea>
-            </div>
-
-            <div class="row mb-4">
-                <div class="col-lg-6 mb-4 mb-lg-0">
+                <div class="col-12">
+                    <label class="form-label">{{ __('messages.desc') }}</label>
+                    <textarea rows="6" name="description" class="form-control" placeholder="{{ __('messages.desc') }}">{{ old('description', $settings->description) }}</textarea>
+                </div>
+                <div class="col-lg-6">
                     <label class="form-label">{{ __('messages.template') }}</label>
                     <input type="text" name="styles" class="form-control" value="{{ old('styles', $settings->styles) }}" placeholder="{{ __('messages.template') }}">
                 </div>
@@ -66,10 +58,7 @@
                     <label class="form-label">{{ __('messages.language_default') }}</label>
                     <input type="text" name="lang" class="form-control" value="{{ old('lang', $settings->lang) }}" placeholder="{{ __('messages.language_default') }}">
                 </div>
-            </div>
-
-            <div class="row mb-4">
-                <div class="col-lg-6 mb-4 mb-lg-0">
+                <div class="col-lg-6">
                     <label class="form-label">{{ __('messages.educational_links') }}</label>
                     <select name="e_links" class="form-select">
                         <option value="1" {{ old('e_links', $settings->e_links) == 1 ? 'selected' : '' }}>{{ __('messages.activate') }}</option>
@@ -93,45 +82,25 @@
                         <option value="Asia/Dubai">(GMT+04:00) Abu Dhabi, Muscat</option>
                     </select>
                 </div>
-            </div>
-
-            <div class="row mb-4">
                 <div class="col-lg-6">
                     <label class="form-label">Banner repeat window (minutes)</label>
-                    <input
-                        type="number"
-                        min="0"
-                        max="525600"
-                        name="banner_repeat_window_minutes"
-                        class="form-control"
-                        value="{{ old('banner_repeat_window_minutes', $bannerRepeatWindowMinutes) }}"
-                        placeholder="1440"
-                    >
+                    <input type="number" min="0" max="525600" name="banner_repeat_window_minutes" class="form-control" value="{{ old('banner_repeat_window_minutes', $bannerRepeatWindowMinutes) }}" placeholder="1440">
                     <small class="text-muted">Prevents showing the same banner to the same visitor on the same publisher within this time window. Use 0 to disable.</small>
                 </div>
                 <div class="col-lg-6">
                     <label class="form-label">{{ __('messages.smart_admin_points_divisor') }}</label>
-                    <input
-                        type="number"
-                        min="0.1"
-                        max="1000"
-                        step="0.1"
-                        name="smart_ads_points_divisor"
-                        class="form-control"
-                        value="{{ old('smart_ads_points_divisor', $smartAdsPointsDivisor) }}"
-                        placeholder="4"
-                    >
+                    <input type="number" min="0.1" max="1000" step="0.1" name="smart_ads_points_divisor" class="form-control" value="{{ old('smart_ads_points_divisor', $smartAdsPointsDivisor) }}" placeholder="4">
                     <small class="text-muted">{{ __('messages.smart_admin_points_divisor_help') }}</small>
                 </div>
-            </div>
-
-            <div class="mb-4">
-                <label class="form-label">{{ __('messages.admin_email') }}</label>
-                <input type="email" name="a_mail" class="form-control" value="{{ old('a_mail', $settings->a_mail) }}" placeholder="{{ __('messages.admin_email') }}">
-            </div>
-
-            <button type="submit" class="btn btn-primary w-100">{{ __('messages.edit') }}</button>
-        </form>
-    </div>
+                <div class="col-12">
+                    <label class="form-label">{{ __('messages.admin_email') }}</label>
+                    <input type="email" name="a_mail" class="form-control" value="{{ old('a_mail', $settings->a_mail) }}" placeholder="{{ __('messages.admin_email') }}">
+                </div>
+                <div class="col-12 d-flex justify-content-end">
+                    <button type="submit" class="btn btn-primary">{{ __('messages.edit') }}</button>
+                </div>
+            </form>
+        </div>
+    </section>
 </div>
 @endsection

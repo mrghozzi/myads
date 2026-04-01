@@ -1,24 +1,31 @@
 @extends('theme::layouts.admin')
 
 @section('content')
-<div class="d-flex flex-column gap-4">
-    <div class="card border-0 shadow-sm">
-        <div class="card-body d-flex flex-wrap justify-content-between align-items-center gap-3">
-            <div>
-                <h3 class="mb-1">{{ __('messages.status_promotions_title') }}</h3>
-                <p class="text-muted mb-0">{{ __('messages.status_promotions_admin_help') }}</p>
-            </div>
-            <a href="{{ route('admin.ads.posts.settings') }}" class="btn btn-primary">{{ __('messages.status_promotion_settings_title') }}</a>
+<div class="admin-page">
+    <section class="admin-hero">
+        <div class="admin-hero__content">
+            <ul class="admin-breadcrumb">
+                <li><a href="{{ route('admin.index') }}">{{ __('messages.dashboard') ?? 'Dashboard' }}</a></li>
+                <li>{{ __('messages.status_promotions_title') }}</li>
+            </ul>
+            <div class="admin-hero__eyebrow">{{ __('messages.ads') }}</div>
+            <h1 class="admin-hero__title">{{ __('messages.status_promotions_title') }}</h1>
+            <p class="admin-hero__copy">{{ __('messages.status_promotions_admin_help') }}</p>
         </div>
-    </div>
+        <div class="admin-hero__actions">
+            <div class="admin-toolbar-card w-100">
+                <a href="{{ route('admin.ads.posts.settings') }}" class="btn btn-primary w-100">{{ __('messages.status_promotion_settings_title') }}</a>
+            </div>
+        </div>
+    </section>
 
     @if(!empty($upgradeNotice))
         @include('theme::partials.upgrade_notice', ['upgradeNotice' => $upgradeNotice])
     @endif
 
     @if($featureAvailable)
-        <div class="card border-0 shadow-sm">
-            <div class="card-body">
+        <section class="admin-panel">
+            <div class="admin-panel__body">
                 <form class="row g-3" method="GET" action="{{ route('admin.ads.posts.index') }}">
                     <div class="col-lg-5">
                         <label class="form-label">{{ __('messages.search') }}</label>
@@ -47,13 +54,13 @@
                     </div>
                 </form>
             </div>
-        </div>
+        </section>
 
-        <div class="card border-0 shadow-sm">
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
-                        <thead class="table-light">
+        <section class="admin-panel">
+            <div class="admin-panel__body p-0">
+                <div class="admin-table-wrap">
+                    <table class="table table-hover align-middle mb-0 admin-table admin-table-cardify">
+                        <thead>
                             <tr>
                                 <th>#</th>
                                 <th>{{ __('messages.user') }}</th>
@@ -67,28 +74,26 @@
                         </thead>
                         <tbody>
                             @forelse($promotions as $promotion)
-                                @php
-                                    $statusModel = $promotion->promotedStatus;
-                                @endphp
+                                @php($statusModel = $promotion->promotedStatus)
                                 <tr>
-                                    <td>#{{ $promotion->id }}</td>
-                                    <td>{{ $promotion->user->username ?? ('#' . $promotion->user_id) }}</td>
-                                    <td>
+                                    <td data-label="#">#{{ $promotion->id }}</td>
+                                    <td data-label="{{ __('messages.user') }}">{{ $promotion->user->username ?? ('#' . $promotion->user_id) }}</td>
+                                    <td data-label="{{ __('messages.posts') }}">
                                         @if($statusModel)
                                             <a href="{{ $statusModel->promotionDestinationUrl() }}">{{ __('messages.status_promotion_view_post') }}</a>
                                         @else
                                             #{{ $promotion->status_id }}
                                         @endif
                                     </td>
-                                    <td>{{ __('messages.status_promotion_objective_' . $promotion->objective) }}<br><small class="text-muted">{{ $promotion->target_quantity }}</small></td>
-                                    <td>{{ $promotion->charged_pts }}</td>
-                                    <td>
+                                    <td data-label="{{ __('messages.status_promotion_objective_label') }}">{{ __('messages.status_promotion_objective_' . $promotion->objective) }}<br><small class="text-muted">{{ $promotion->target_quantity }}</small></td>
+                                    <td data-label="{{ __('messages.status_promotion_pts_label') }}">{{ $promotion->charged_pts }}</td>
+                                    <td data-label="{{ __('messages.status_promotion_progress') }}">
                                         <div class="fw-semibold">{{ $promotion->currentProgressValue($statusModel) }} / {{ $promotion->target_quantity }}</div>
                                         <div class="progress mt-2" style="height: 8px;">
                                             <div class="progress-bar" role="progressbar" style="width: {{ $promotion->progressPercentage($statusModel) }}%;"></div>
                                         </div>
                                     </td>
-                                    <td>
+                                    <td data-label="{{ __('messages.status') }}">
                                         @php
                                             $statusBadgeColors = [
                                                 \App\Models\StatusPromotion::STATUS_ACTIVE => 'bg-success-subtle text-success-emphasis',
@@ -101,8 +106,8 @@
                                         @endphp
                                         <span class="badge {{ $badgeClass }}">{{ __('messages.status_promotion_status_' . $promotion->status) }}</span>
                                     </td>
-                                    <td>
-                                        <div class="hstack gap-2">
+                                    <td data-label="{{ __('messages.actions') }}">
+                                        <div class="admin-action-cluster">
                                             @if($promotion->status === \App\Models\StatusPromotion::STATUS_ACTIVE)
                                                 <form method="POST" action="{{ route('admin.ads.posts.status', $promotion->id) }}">
                                                     @csrf
@@ -136,11 +141,9 @@
                     </table>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <div>
-            {{ $promotions->links() }}
-        </div>
+        <div>{{ $promotions->links() }}</div>
     @endif
 </div>
 @endsection

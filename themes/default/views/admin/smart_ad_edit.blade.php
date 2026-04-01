@@ -1,20 +1,37 @@
 @extends('theme::layouts.admin')
 
 @section('title', __('messages.smart_edit_title', ['id' => $smartAd->id]))
+@section('admin_shell_header_mode', 'hidden')
 
 @section('content')
-<div class="page-header">
-    <div class="page-header-left d-flex align-items-center">
-        <div class="page-header-title">
-            <h5 class="m-b-10">{{ __('messages.smart_edit_title', ['id' => $smartAd->id]) }}</h5>
+<div class="admin-page">
+    <section class="admin-hero">
+        <div class="admin-hero__content">
+            <ul class="admin-breadcrumb">
+                <li><a href="{{ route('admin.index') }}">{{ __('messages.dashboard') ?? 'Dashboard' }}</a></li>
+                <li><a href="{{ route('admin.smart_ads') }}">{{ __('messages.smart_ads') }}</a></li>
+                <li>{{ __('messages.edit') }}</li>
+            </ul>
+            <div class="admin-hero__eyebrow">{{ __('messages.smart_ads') }}</div>
+            <h1 class="admin-hero__title">{{ __('messages.smart_edit_title', ['id' => $smartAd->id]) }}</h1>
+            <p class="admin-hero__copy">{{ $smartAd->displayTitle() }}</p>
         </div>
-        <ul class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ route('admin.index') }}">{{ __('messages.dashboard') ?? 'Dashboard' }}</a></li>
-            <li class="breadcrumb-item"><a href="{{ route('admin.smart_ads') }}">{{ __('messages.smart_ads') }}</a></li>
-            <li class="breadcrumb-item">{{ __('messages.edit') }}</li>
-        </ul>
-    </div>
-</div>
+        <div class="admin-hero__actions">
+            <div class="admin-toolbar-card w-100">
+                <a href="{{ route('admin.smart_ads') }}" class="btn btn-light w-100">{{ __('messages.back') }}</a>
+            </div>
+            <div class="admin-summary-grid w-100">
+                <div class="admin-summary-card">
+                    <span class="admin-summary-label">{{ __('messages.smart_impressions_label') }}</span>
+                    <span class="admin-summary-value">{{ number_format($smartAd->impressions) }}</span>
+                </div>
+                <div class="admin-summary-card">
+                    <span class="admin-summary-label">{{ __('messages.smart_clicks_label') }}</span>
+                    <span class="admin-summary-value">{{ number_format($smartAd->clicks) }}</span>
+                </div>
+            </div>
+        </div>
+    </section>
 
 @if($errors->any())
     <div class="alert alert-danger">
@@ -113,5 +130,6 @@
             </div>
         </div>
     </div>
+</div>
 </div>
 @endsection

@@ -1,6 +1,7 @@
 @extends('theme::layouts.admin')
 
 @section('title', $mode === 'edit' ? __('messages.e_page') : __('messages.add_page'))
+@section('admin_shell_header_mode', 'hidden')
 
 @section('content')
 <div class="pages-editor-shell">

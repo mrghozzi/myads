@@ -1,54 +1,45 @@
 @extends('theme::layouts.admin')
 
 @section('title', __('messages.bannads'))
+@section('admin_shell_header_mode', 'hidden')
 
 @section('content')
-<div class="page-header">
-    <div class="page-header-left d-flex align-items-center">
-        <div class="page-header-title">
-            <h5 class="m-b-10">{{ __('messages.bannads') }}</h5>
+<div class="admin-page">
+    <section class="admin-hero">
+        <div class="admin-hero__content">
+            <ul class="admin-breadcrumb">
+                <li><a href="{{ route('admin.index') }}">{{ __('messages.dashboard') ?? 'Dashboard' }}</a></li>
+                <li>{{ __('messages.bannads') }}</li>
+            </ul>
+            <div class="admin-hero__eyebrow">{{ __('messages.ads') }}</div>
+            <h1 class="admin-hero__title">{{ __('messages.bannads') }}</h1>
+            <p class="admin-hero__copy">{{ __('messages.codes') }} / {{ __('messages.Stats') }}</p>
         </div>
-        <ul class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ route('admin.index') }}">{{ __('messages.dashboard') ?? 'Dashboard' }}</a></li>
-            <li class="breadcrumb-item">{{ __('messages.bannads') }}</li>
-        </ul>
-    </div>
-    <div class="page-header-right ms-auto">
-        <div class="page-header-right-items">
-            <div class="d-flex d-md-none">
-                <a href="javascript:void(0)" class="page-header-right-close-toggle">
-                    <i class="feather-arrow-left me-2"></i>
-                    <span>{{ __('messages.back') ?? 'Back' }}</span>
-                </a>
-            </div>
-            <div class="d-flex align-items-center gap-2 page-header-right-items-wrapper">
-                <a href="{{ route('ads.banners.code') }}" class="btn btn-icon btn-light-brand" data-bs-toggle="tooltip" title="{{ __('messages.codes') }}">
-                    <i class="feather-code"></i>
-                </a>
-                <a href="{{ route('admin.stats', ['ty' => 'banner', 'st' => 'vu']) }}" class="btn btn-icon btn-light-brand" data-bs-toggle="tooltip" title="{{ __('messages.Stats') }}">
-                    <i class="feather-bar-chart-2"></i>
-                </a>
-                @include('theme::admin.partials.inventory_filter_dropdown', [
-                    'action' => route('admin.banners'),
-                    'resetUrl' => route('admin.banners', ['reset_filters' => 1]),
-                    'preferenceKey' => 'banners',
-                    'filterState' => $filterState,
-                    'filterFields' => $filterFields,
-                    'resultsCount' => $resultsCount,
-                ])
-                <a href="{{ route('ads.promote', ['p' => 'banners']) }}" class="btn btn-primary">
-                    <i class="feather-plus me-2"></i>
-                    <span>{{ __('messages.add') }}</span>
-                </a>
+        <div class="admin-hero__actions">
+            <div class="admin-toolbar-card">
+                <div class="admin-toolbar-row w-100">
+                    <a href="{{ route('ads.banners.code') }}" class="btn btn-icon btn-light-brand" data-bs-toggle="tooltip" title="{{ __('messages.codes') }}">
+                        <i class="feather-code"></i>
+                    </a>
+                    <a href="{{ route('admin.stats', ['ty' => 'banner', 'st' => 'vu']) }}" class="btn btn-icon btn-light-brand" data-bs-toggle="tooltip" title="{{ __('messages.Stats') }}">
+                        <i class="feather-bar-chart-2"></i>
+                    </a>
+                    @include('theme::admin.partials.inventory_filter_dropdown', [
+                        'action' => route('admin.banners'),
+                        'resetUrl' => route('admin.banners', ['reset_filters' => 1]),
+                        'preferenceKey' => 'banners',
+                        'filterState' => $filterState,
+                        'filterFields' => $filterFields,
+                        'resultsCount' => $resultsCount,
+                    ])
+                    <a href="{{ route('ads.promote', ['p' => 'banners']) }}" class="btn btn-primary ms-auto">
+                        <i class="feather-plus me-2"></i>
+                        <span>{{ __('messages.add') }}</span>
+                    </a>
+                </div>
             </div>
         </div>
-        <div class="d-md-none d-flex align-items-center">
-            <a href="javascript:void(0)" class="page-header-right-open-toggle">
-                <i class="feather-align-right fs-20"></i>
-            </a>
-        </div>
-    </div>
-</div>
+    </section>
 
 @if(session('success'))
     <div class="alert alert-success">{{ session('success') }}</div>
@@ -137,6 +128,7 @@
             </div>
         </div>
     </div>
+</div>
 </div>
 @endsection
 

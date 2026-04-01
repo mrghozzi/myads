@@ -18,14 +18,10 @@
     ];
 @endphp
 
-<div class="card stretch stretch-full mb-4">
-    <div class="card-body">
-        <div class="d-flex flex-wrap gap-2">
-            @foreach($securityNavItems as $item)
-                <a href="{{ route($item['route']) }}" class="btn {{ $item['active'] ? 'btn-primary' : 'btn-light' }}">
-                    {{ $item['label'] }}
-                </a>
-            @endforeach
-        </div>
-    </div>
+<div class="admin-suite-nav">
+    @foreach($securityNavItems as $item)
+        <a href="{{ route($item['route']) }}" class="admin-suite-nav__link {{ $item['active'] ? 'is-active' : '' }}">
+            {{ $item['label'] }}
+        </a>
+    @endforeach
 </div>

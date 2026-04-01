@@ -1,6 +1,7 @@
 @extends('theme::layouts.admin')
 
 @section('title', __('messages.edit_terms') ?? 'Edit Terms')
+@section('admin_shell_header_mode', 'hidden')
 
 @section('content')
 <!-- Header -->

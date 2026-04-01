@@ -1,18 +1,43 @@
 @extends('theme::layouts.admin')
 
 @section('title', __('messages.seo_dashboard'))
+@section('admin_shell_header_mode', 'hidden')
 
 @section('content')
 <div class="seo-shell">
-    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
-        <div>
-            <h3 class="mb-1">{{ __('messages.seo_dashboard') }}</h3>
-            <p class="text-muted mb-0">{{ __('messages.seo_dashboard_intro') }}</p>
+    <section class="admin-hero">
+        <div class="admin-hero__content">
+            <ul class="admin-breadcrumb">
+                <li><a href="{{ route('admin.index') }}">{{ __('messages.dashboard') }}</a></li>
+                <li>{{ __('messages.seo_dashboard') }}</li>
+            </ul>
+            <div class="admin-hero__eyebrow">{{ __('messages.seo_nav_dashboard') }}</div>
+            <h1 class="admin-hero__title">{{ __('messages.seo_dashboard') }}</h1>
+            <p class="admin-hero__copy">{{ __('messages.seo_dashboard_intro') }}</p>
         </div>
-        <a href="{{ route('sitemap.xml') }}" target="_blank" class="btn btn-outline-primary">
-            <i class="feather-external-link me-2"></i>{{ __('messages.seo_open_sitemap') }}
-        </a>
-    </div>
+        <div class="admin-hero__actions">
+            <div class="admin-toolbar-card">
+                <div class="admin-toolbar-row w-100">
+                    <a href="{{ route('sitemap.xml') }}" target="_blank" class="btn btn-outline-primary">
+                        <i class="feather-external-link me-2"></i>{{ __('messages.seo_open_sitemap') }}
+                    </a>
+                    <a href="{{ route('robots.txt') }}" target="_blank" class="btn btn-light">
+                        <i class="feather-shield me-2"></i>{{ __('messages.seo_open') }}
+                    </a>
+                </div>
+            </div>
+            <div class="admin-summary-grid w-100">
+                <div class="admin-summary-card">
+                    <span class="admin-summary-label">{{ __('messages.seo_score') }}</span>
+                    <span class="admin-summary-value">{{ $dashboard['score'] }}/100</span>
+                </div>
+                <div class="admin-summary-card">
+                    <span class="admin-summary-label">{{ __('messages.seo_indexable_urls') }}</span>
+                    <span class="admin-summary-value">{{ number_format($dashboard['summary_cards']['indexable_urls']) }}</span>
+                </div>
+            </div>
+        </div>
+    </section>
 
     @include('theme::admin.seo.partials.nav')
     @include('theme::admin.seo.partials.alerts')

@@ -2,6 +2,7 @@
     $pageLocale = str_replace('_', '-', app()->getLocale());
     $pageDirection = locale_direction();
     $adminUser = auth()->user();
+    $adminShellHeaderMode = trim($__env->yieldContent('admin_shell_header_mode', 'default'));
     $canAdmin = fn (?string $module = null): bool => $module === null
         ? (bool) ($adminUser?->hasAdminAccess())
         : (bool) ($adminUser?->canAccessAdminModule($module));
@@ -358,17 +359,19 @@
 
     <main class="nxl-container">
         <div class="nxl-content">
-            <div class="page-header">
-                <div class="page-header-left d-flex align-items-center">
-                    <div class="page-header-title">
-                        <h5 class="m-b-10">{{ __('messages.admin_panel') ?? 'Admin Panel' }}</h5>
+            @if($adminShellHeaderMode !== 'hidden')
+                <div class="page-header admin-shell-header">
+                    <div class="page-header-left d-flex align-items-center">
+                        <div class="page-header-title">
+                            <h5 class="m-b-10">{{ __('messages.admin_panel') ?? 'Admin Panel' }}</h5>
+                        </div>
+                        <ul class="breadcrumb">
+                            <li class="breadcrumb-item"><a href="{{ route('admin.index') }}">{{ __('messages.home') ?? 'Home' }}</a></li>
+                            <li class="breadcrumb-item">{{ __('messages.dashboard') ?? 'Dashboard' }}</li>
+                        </ul>
                     </div>
-                    <ul class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ route('admin.index') }}">{{ __('messages.home') ?? 'Home' }}</a></li>
-                        <li class="breadcrumb-item">{{ __('messages.dashboard') ?? 'Dashboard' }}</li>
-                    </ul>
                 </div>
-            </div>
+            @endif
             
             <div class="main-content">
                 @yield('content')

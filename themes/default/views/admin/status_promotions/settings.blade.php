@@ -1,32 +1,39 @@
 @extends('theme::layouts.admin')
 
 @section('content')
-<div class="d-flex flex-column gap-4">
-    <div class="card border-0 shadow-sm">
-        <div class="card-body d-flex flex-wrap justify-content-between align-items-center gap-3">
-            <div>
-                <h3 class="mb-1">{{ __('messages.status_promotion_settings_title') }}</h3>
-                <p class="text-muted mb-0">{{ __('messages.status_promotion_settings_help') }}</p>
-            </div>
-            <a href="{{ route('admin.ads.posts.index') }}" class="btn btn-light">{{ __('messages.back') }}</a>
+<div class="admin-page">
+    <section class="admin-hero">
+        <div class="admin-hero__content">
+            <ul class="admin-breadcrumb">
+                <li><a href="{{ route('admin.index') }}">{{ __('messages.dashboard') ?? 'Dashboard' }}</a></li>
+                <li><a href="{{ route('admin.ads.posts.index') }}">{{ __('messages.status_promotions_title') }}</a></li>
+                <li>{{ __('messages.status_promotion_settings_title') }}</li>
+            </ul>
+            <div class="admin-hero__eyebrow">{{ __('messages.ads') }}</div>
+            <h1 class="admin-hero__title">{{ __('messages.status_promotion_settings_title') }}</h1>
+            <p class="admin-hero__copy">{{ __('messages.status_promotion_settings_help') }}</p>
         </div>
-    </div>
+        <div class="admin-hero__actions">
+            <div class="admin-toolbar-card w-100">
+                <a href="{{ route('admin.ads.posts.index') }}" class="btn btn-light w-100">{{ __('messages.back') }}</a>
+            </div>
+        </div>
+    </section>
 
     @if(!empty($upgradeNotice))
         @include('theme::partials.upgrade_notice', ['upgradeNotice' => $upgradeNotice])
     @endif
 
     @if($featureAvailable)
-        <form method="POST" action="{{ route('admin.ads.posts.settings.update') }}" class="d-flex flex-column gap-4">
+        <form method="POST" action="{{ route('admin.ads.posts.settings.update') }}" class="admin-form-workspace">
             @csrf
 
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
+            <section class="admin-panel">
+                <div class="admin-panel__body">
                     <div class="form-check form-switch mb-4">
                         <input class="form-check-input" type="checkbox" id="enabled" name="enabled" value="1" @checked($settings['enabled'])>
                         <label class="form-check-label fw-semibold" for="enabled">{{ __('messages.status_promotion_enable_system') }}</label>
                     </div>
-
                     <div class="row g-3">
                         <div class="col-lg-3">
                             <label class="form-label">{{ __('messages.status_promotion_objective_views') }}</label>
@@ -46,11 +53,16 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </section>
 
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <h5 class="mb-3">{{ __('messages.status_promotion_delivery_settings') }}</h5>
+            <section class="admin-panel">
+                <div class="admin-panel__header">
+                    <div>
+                        <span class="admin-panel__eyebrow">{{ __('messages.status_promotion_delivery_settings') }}</span>
+                        <h2 class="admin-panel__title">{{ __('messages.status_promotion_limits_title') }}</h2>
+                    </div>
+                </div>
+                <div class="admin-panel__body">
                     <div class="row g-3">
                         <div class="col-lg-4">
                             <label class="form-label">{{ __('messages.status_promotion_estimated_views_per_reaction') }}</label>
@@ -76,14 +88,6 @@
                             <label class="form-label">{{ __('messages.status_promotion_cooldown_setting') }}</label>
                             <input type="number" min="0" name="viewer_repeat_cooldown_hours" class="form-control" value="{{ $settings['viewer_repeat_cooldown_hours'] }}">
                         </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <h5 class="mb-3">{{ __('messages.status_promotion_limits_title') }}</h5>
-                    <div class="row g-3">
                         @foreach(['views', 'reactions', 'comments', 'days'] as $objective)
                             <div class="col-lg-3">
                                 <label class="form-label">{{ __('messages.status_promotion_limit_min') }} {{ __('messages.status_promotion_objective_' . $objective) }}</label>
@@ -96,18 +100,14 @@
                         @endforeach
                     </div>
                 </div>
-            </div>
+            </section>
 
-            <div class="card border-0 shadow-sm">
-                <div class="card-body">
-                    <h5 class="mb-3">{{ __('messages.status_promotion_smart_pricing_summary') }}</h5>
+            <section class="admin-panel">
+                <div class="admin-panel__body d-flex justify-content-between align-items-center gap-3 flex-wrap">
                     <p class="text-muted mb-0">{{ __('messages.status_promotion_smart_pricing_help') }}</p>
+                    <button type="submit" class="btn btn-primary">{{ __('messages.save_changes') }}</button>
                 </div>
-            </div>
-
-            <div>
-                <button type="submit" class="btn btn-primary">{{ __('messages.save_changes') }}</button>
-            </div>
+            </section>
         </form>
     @endif
 </div>

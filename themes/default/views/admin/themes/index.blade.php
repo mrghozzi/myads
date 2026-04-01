@@ -1,6 +1,7 @@
 @extends('theme::layouts.admin')
 
 @section('title', __('messages.themes'))
+@section('admin_shell_header_mode', 'hidden')
 
 @php
     $themeCount = count($themes);

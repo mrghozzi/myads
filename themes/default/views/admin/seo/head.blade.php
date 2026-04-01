@@ -1,13 +1,34 @@
 @extends('theme::layouts.admin')
 
 @section('title', __('messages.seo_head_meta'))
+@section('admin_shell_header_mode', 'hidden')
 
 @section('content')
 <div class="seo-shell">
-    <div class="mb-4">
-        <h3 class="mb-1">{{ __('messages.seo_head_management') }}</h3>
-        <p class="text-muted mb-0">{!! __('messages.seo_head_intro') !!}</p>
-    </div>
+    <section class="admin-hero">
+        <div class="admin-hero__content">
+            <ul class="admin-breadcrumb">
+                <li><a href="{{ route('admin.index') }}">{{ __('messages.dashboard') }}</a></li>
+                <li><a href="{{ route('admin.seo.index') }}">{{ __('messages.seo_dashboard') }}</a></li>
+                <li>{{ __('messages.seo_head_meta') }}</li>
+            </ul>
+            <div class="admin-hero__eyebrow">{{ __('messages.seo_head_meta') }}</div>
+            <h1 class="admin-hero__title">{{ __('messages.seo_head_management') }}</h1>
+            <p class="admin-hero__copy">{{ strip_tags(__('messages.seo_head_intro')) }}</p>
+        </div>
+        <div class="admin-hero__actions">
+            <div class="admin-toolbar-card">
+                <div class="admin-toolbar-row w-100">
+                    <a href="{{ route('admin.seo.index') }}" class="btn btn-light">
+                        <i class="feather-activity me-2"></i>{{ __('messages.seo_nav_dashboard') }}
+                    </a>
+                    <a href="{{ route('robots.txt') }}" target="_blank" class="btn btn-outline-primary">
+                        <i class="feather-shield me-2"></i>{{ __('messages.seo_open') }}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
 
     @include('theme::admin.seo.partials.nav')
     @include('theme::admin.seo.partials.alerts')

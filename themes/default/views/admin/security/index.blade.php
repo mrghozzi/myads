@@ -1,6 +1,7 @@
 @extends('theme::layouts.admin')
 
 @section('title', __('messages.security_settings_title'))
+@section('admin_shell_header_mode', 'hidden')
 
 @php
     $toggleFields = [
@@ -17,17 +18,30 @@
 @endphp
 
 @section('content')
-<div class="page-header">
-    <div class="page-header-left d-flex align-items-center">
-        <div class="page-header-title">
-            <h5 class="m-b-10">{{ __('messages.security_settings_title') }}</h5>
-        </div>
-        <ul class="breadcrumb">
-            <li class="breadcrumb-item"><a href="{{ route('admin.index') }}">{{ __('messages.dashboard') }}</a></li>
-            <li class="breadcrumb-item">{{ __('messages.security_title') }}</li>
+<div class="admin-suite-shell">
+<section class="admin-hero">
+    <div class="admin-hero__content">
+        <ul class="admin-breadcrumb">
+            <li><a href="{{ route('admin.index') }}">{{ __('messages.dashboard') }}</a></li>
+            <li>{{ __('messages.security_title') }}</li>
         </ul>
+        <div class="admin-hero__eyebrow">{{ __('messages.security_title') }}</div>
+        <h1 class="admin-hero__title">{{ __('messages.security_settings_title') }}</h1>
+        <p class="admin-hero__copy">{{ __('messages.security_link_protection_section') }} / {{ __('messages.security_accounts_section') }}</p>
     </div>
-</div>
+    <div class="admin-hero__actions">
+        <div class="admin-summary-grid w-100">
+            <div class="admin-summary-card">
+                <span class="admin-summary-label">{{ __('messages.security_ip_bans_title') }}</span>
+                <span class="admin-summary-value">{{ $ipBansAvailable ? __('messages.enabled') : __('messages.disabled') }}</span>
+            </div>
+            <div class="admin-summary-card">
+                <span class="admin-summary-label">{{ __('messages.security_member_sessions_title') }}</span>
+                <span class="admin-summary-value">{{ $sessionsAvailable ? __('messages.enabled') : __('messages.disabled') }}</span>
+            </div>
+        </div>
+    </div>
+</section>
 
 @include('theme::admin.security.partials.nav')
 
@@ -232,4 +246,5 @@
         <button type="submit" class="btn btn-primary">{{ __('messages.save_changes') }}</button>
     </div>
 </form>
+</div>
 @endsection

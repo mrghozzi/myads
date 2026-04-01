@@ -1,6 +1,47 @@
 @extends('theme::layouts.admin')
 
 @section('content')
+    <div class="admin-page">
+    <section class="admin-hero">
+        <div class="admin-hero__content">
+            <ul class="admin-breadcrumb">
+                <li>{{ __('messages.dashboard') ?? 'Dashboard' }}</li>
+            </ul>
+            <div class="admin-hero__eyebrow">{{ __('messages.admin_panel') ?? 'Admin Panel' }}</div>
+            <h1 class="admin-hero__title">{{ __('messages.dashboard') ?? 'Dashboard' }}</h1>
+            <p class="admin-hero__copy">{{ __('messages.statistics') }} / {{ __('messages.users') }} / {{ __('messages.ads') }}</p>
+            <div class="admin-stat-strip">
+                <div class="admin-stat-card">
+                    <span class="admin-stat-label">{{ __('messages.users') }}</span>
+                    <span class="admin-stat-value">{{ number_format($stats['users']) }}</span>
+                </div>
+                <div class="admin-stat-card">
+                    <span class="admin-stat-label">{{ __('messages.Posts') ?? 'Posts' }}</span>
+                    <span class="admin-stat-value">{{ number_format($stats['posts']) }}</span>
+                </div>
+                <div class="admin-stat-card">
+                    <span class="admin-stat-label">{{ __('messages.bannads') }}</span>
+                    <span class="admin-stat-value">{{ number_format($stats['banners']['total']) }}</span>
+                </div>
+                <div class="admin-stat-card">
+                    <span class="admin-stat-label">{{ __('messages.exvisit') }}</span>
+                    <span class="admin-stat-value">{{ number_format($stats['visits']['total']) }}</span>
+                </div>
+            </div>
+        </div>
+        <div class="admin-hero__actions">
+            <div class="admin-summary-grid w-100">
+                <div class="admin-summary-card">
+                    <span class="admin-summary-label">{{ __('messages.online') }}</span>
+                    <span class="admin-summary-value">{{ number_format($stats['users_online']) }}</span>
+                </div>
+                <div class="admin-summary-card">
+                    <span class="admin-summary-label">{{ __('messages.textads') }}</span>
+                    <span class="admin-summary-value">{{ number_format($stats['links']['total']) }}</span>
+                </div>
+            </div>
+        </div>
+    </section>
     <!-- Update Alert -->
     @if($latestVersion && version_compare($latestVersion, $currentVersion, '>'))
     <div class="alert alert-warning d-flex align-items-center justify-content-between mb-4 border-0 shadow-sm" role="alert" style="border-radius: 12px; background: linear-gradient(135deg, #fff3cd 0%, #ffeeba 100%);">
@@ -370,6 +411,7 @@
                 </div>
             </div>
         </div>
+    </div>
     </div>
 @endsection
 

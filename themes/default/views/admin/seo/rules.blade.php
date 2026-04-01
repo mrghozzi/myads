@@ -1,13 +1,37 @@
 @extends('theme::layouts.admin')
 
 @section('title', __('messages.seo_rules'))
+@section('admin_shell_header_mode', 'hidden')
 
 @section('content')
 <div class="seo-shell">
-    <div class="mb-4">
-        <h3 class="mb-1">{{ __('messages.seo_rules') }}</h3>
-        <p class="text-muted mb-0">{{ __('messages.seo_rules_intro') }}</p>
-    </div>
+    <section class="admin-hero">
+        <div class="admin-hero__content">
+            <ul class="admin-breadcrumb">
+                <li><a href="{{ route('admin.index') }}">{{ __('messages.dashboard') }}</a></li>
+                <li><a href="{{ route('admin.seo.index') }}">{{ __('messages.seo_dashboard') }}</a></li>
+                <li>{{ __('messages.seo_rules') }}</li>
+            </ul>
+            <div class="admin-hero__eyebrow">{{ __('messages.seo_nav_rules') }}</div>
+            <h1 class="admin-hero__title">{{ __('messages.seo_rules') }}</h1>
+            <p class="admin-hero__copy">{{ __('messages.seo_rules_intro') }}</p>
+        </div>
+        <div class="admin-hero__actions">
+            <div class="admin-toolbar-card">
+                <div class="admin-toolbar-row w-100">
+                    <a href="{{ route('admin.seo.index') }}" class="btn btn-light">
+                        <i class="feather-activity me-2"></i>{{ __('messages.seo_nav_dashboard') }}
+                    </a>
+                </div>
+            </div>
+            <div class="admin-summary-grid w-100">
+                <div class="admin-summary-card">
+                    <span class="admin-summary-label">{{ __('messages.seo_existing_rules') }}</span>
+                    <span class="admin-summary-value">{{ $rules->count() }}</span>
+                </div>
+            </div>
+        </div>
+    </section>
 
     @include('theme::admin.seo.partials.nav')
     @include('theme::admin.seo.partials.alerts')

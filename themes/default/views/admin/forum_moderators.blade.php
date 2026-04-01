@@ -3,6 +3,18 @@
 @section('title', __('messages.forum_moderators'))
 
 @section('content')
+<div class="admin-page">
+    <section class="admin-hero">
+        <div class="admin-hero__content">
+            <ul class="admin-breadcrumb">
+                <li><a href="{{ route('admin.index') }}">{{ __('messages.dashboard') ?? 'Dashboard' }}</a></li>
+                <li>{{ __('messages.forum_moderators') }}</li>
+            </ul>
+            <div class="admin-hero__eyebrow">{{ __('messages.forum_moderators') }}</div>
+            <h1 class="admin-hero__title">{{ __('messages.forum_moderators') }}</h1>
+            <p class="admin-hero__copy">{{ __('messages.forum_moderators_desc') }}</p>
+        </div>
+    </section>
 <div class="row g-3">
     <div class="col-12">
         <div class="card border-0 shadow-sm">
@@ -169,6 +181,7 @@
             </div>
         </div>
     </div>
+</div>
 </div>
 @endsection
 

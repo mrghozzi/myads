@@ -1,37 +1,46 @@
 @extends('theme::layouts.admin')
 
+@section('title', __('messages.edit_product') ?? 'Edit Product')
+@section('admin_shell_header_mode', 'hidden')
+
 @section('content')
 
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-        <h4 class="fw-bolder mb-1">
-            <a href="{{ route('admin.products') }}" class="text-muted me-2"><i class="feather-arrow-left"></i></a>
-            {{ __('messages.edit_product') ?? 'Edit Product' }}: <span class="text-primary">{{ $product->name }}</span>
-        </h4>
-        <div class="fs-12 text-muted">
-            ID: {{ $product->id }}
-            @if($isSuspended)
-                &nbsp;<span class="badge bg-danger">{{ __('messages.suspended') ?? 'Suspended' }}</span>
-            @else
-                &nbsp;<span class="badge bg-success">{{ __('messages.active') ?? 'Active' }}</span>
-            @endif
+<div class="admin-page">
+
+<section class="admin-hero">
+    <div class="admin-hero__content">
+        <ul class="admin-breadcrumb">
+            <li><a href="{{ route('admin.index') }}">{{ __('messages.dashboard') ?? 'Dashboard' }}</a></li>
+            <li><a href="{{ route('admin.products') }}">{{ __('messages.products') ?? 'Products' }}</a></li>
+            <li>{{ __('messages.edit') }}</li>
+        </ul>
+        <div class="admin-hero__eyebrow">{{ __('messages.products') ?? 'Products' }}</div>
+        <h1 class="admin-hero__title">{{ __('messages.edit_product') ?? 'Edit Product' }}</h1>
+        <p class="admin-hero__copy">{{ $product->name }} / ID: {{ $product->id }}</p>
+    </div>
+    <div class="admin-hero__actions">
+        <div class="admin-toolbar-card">
+            <div class="admin-toolbar-row w-100">
+                <form method="POST" action="{{ route('admin.products.suspend', $product->id) }}" onsubmit="return confirm('{{ $isSuspended ? (__('messages.confirm_unsuspend') ?? 'Unsuspend this product?') : (__('messages.confirm_suspend') ?? 'Suspend this product and notify the owner?') }}')">
+                    @csrf
+                    <button type="submit" class="btn {{ $isSuspended ? 'btn-success' : 'btn-warning' }} btn-sm">
+                        <i class="feather-{{ $isSuspended ? 'check-circle' : 'slash' }} me-1"></i>
+                        {{ $isSuspended ? (__('messages.unsuspend') ?? 'Unsuspend') : (__('messages.suspend') ?? 'Suspend') }}
+                    </button>
+                </form>
+                <a href="{{ route('store.show', $product->name) }}" target="_blank" class="btn btn-outline-secondary btn-sm">
+                    <i class="feather-eye me-1"></i>{{ __('messages.view') ?? 'View' }}
+                </a>
+            </div>
+        </div>
+        <div class="admin-summary-grid w-100">
+            <div class="admin-summary-card">
+                <span class="admin-summary-label">{{ __('messages.status') }}</span>
+                <span class="admin-summary-value">{{ $isSuspended ? (__('messages.suspended') ?? 'Suspended') : (__('messages.active') ?? 'Active') }}</span>
+            </div>
         </div>
     </div>
-    <div class="d-flex gap-2">
-        {{-- Suspend / Unsuspend --}}
-        <form method="POST" action="{{ route('admin.products.suspend', $product->id) }}" onsubmit="return confirm('{{ $isSuspended ? (__('messages.confirm_unsuspend') ?? 'Unsuspend this product?') : (__('messages.confirm_suspend') ?? 'Suspend this product and notify the owner?') }}')">
-            @csrf
-            <button type="submit" class="btn {{ $isSuspended ? 'btn-success' : 'btn-warning' }} btn-sm">
-                <i class="feather-{{ $isSuspended ? 'check-circle' : 'slash' }} me-1"></i>
-                {{ $isSuspended ? (__('messages.unsuspend') ?? 'Unsuspend') : (__('messages.suspend') ?? 'Suspend') }}
-            </button>
-        </form>
-        {{-- View Product --}}
-        <a href="{{ route('store.show', $product->name) }}" target="_blank" class="btn btn-outline-secondary btn-sm">
-            <i class="feather-eye me-1"></i>{{ __('messages.view') ?? 'View' }}
-        </a>
-    </div>
-</div>
+</section>
 
 @if(session('success'))
     <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -226,4 +235,5 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 @endif
+</div>
 @endsection
