@@ -2,64 +2,168 @@
 
 @push('head')
 <style>
-    /* News Markdown Preview Styling */
-    .news-preview-content.markdown-news-preview {
-        color: #8f91ac;
-        font-size: 0.875rem;
-        line-height: 1.6;
-        word-wrap: break-word;
+    .news-page {
+        --news-card-bg: #ffffff;
+        --news-soft: #f6f7ff;
+        --news-text: #3e3f5e;
+        --news-muted: #8f91ac;
+        --news-border: #eaeaf5;
+        --news-accent: #615dfa;
+        --news-shadow: 0 14px 30px rgba(97, 93, 250, 0.08);
     }
 
-    [data-theme="css_d"] .news-preview-content.markdown-news-preview {
-        color: #9aa4bf;
+    [data-theme="css_d"] .news-page {
+        --news-card-bg: #1d2333;
+        --news-soft: #22293d;
+        --news-text: #ffffff;
+        --news-muted: #9aa4bf;
+        --news-border: #2f3749;
+        --news-accent: #7750f8;
+        --news-shadow: 0 14px 30px rgba(0, 0, 0, 0.3);
     }
 
-    .news-preview-content.markdown-news-preview p {
-        margin-bottom: 0.6rem;
+    /* News Card Design */
+    .news-page .news-card {
+        position: relative;
+        overflow: hidden;
+        border: 1px solid var(--news-border);
+        border-radius: 16px;
+        background: linear-gradient(180deg, var(--news-card-bg) 0%, var(--news-soft) 100%);
+        box-shadow: var(--news-shadow);
+        transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
     }
 
-    .news-preview-content.markdown-news-preview h1,
-    .news-preview-content.markdown-news-preview h2,
-    .news-preview-content.markdown-news-preview h3,
-    .news-preview-content.markdown-news-preview h4,
-    .news-preview-content.markdown-news-preview h5,
-    .news-preview-content.markdown-news-preview h6 {
-        font-size: 1rem;
-        margin: 0.8rem 0 0.4rem;
-        color: inherit;
+    .news-page .news-card::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 4px;
+        height: 100%;
+        background: linear-gradient(180deg, var(--news-accent), #23d2e2);
+        opacity: 0.65;
+        transition: opacity 0.25s ease;
+    }
+
+    .news-page .news-card:hover {
+        transform: translateY(-4px);
+        border-color: rgba(97, 93, 250, 0.35);
+        box-shadow: 0 18px 36px rgba(97, 93, 250, 0.14);
+    }
+
+    .news-page .news-card:hover::before {
+        opacity: 1;
+    }
+
+    .news-page .news-card-inner {
+        padding: 22px 24px 18px;
+    }
+
+    .news-page .news-card-meta {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 14px;
+        flex-wrap: wrap;
+    }
+
+    .news-page .news-card-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.72rem;
         font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        border-radius: 999px;
+        padding: 5px 10px;
+        background: rgba(97, 93, 250, 0.12);
+        color: var(--news-accent);
     }
 
-    .news-preview-content.markdown-news-preview ul,
-    .news-preview-content.markdown-news-preview ol {
-        margin-bottom: 0.6rem;
-        padding-inline-start: 1.2rem;
+    .news-page .news-card-date {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.78rem;
+        font-weight: 700;
+        color: var(--news-muted);
     }
 
-    .news-preview-content.markdown-news-preview li {
-        margin-bottom: 0.2rem;
+    .news-page .news-card-title {
+        margin: 0 0 12px;
+        line-height: 1.35;
+        font-size: 1.45rem;
     }
 
-    .news-preview-content.markdown-news-preview img {
-        max-width: 100%;
-        height: auto;
-        border-radius: 6px;
-        margin: 0.5rem 0;
-        display: block;
+    .news-page .news-card-title a {
+        color: var(--news-text);
+        transition: color 0.2s ease;
     }
 
-    .news-preview-content.markdown-news-preview a {
-        color: #615dfa;
+    .news-page .news-card-title a:hover {
+        color: var(--news-accent);
         text-decoration: none;
-        font-weight: 700;
     }
 
-    .news-preview-content.markdown-news-preview blockquote {
-        border-inline-start: 3px solid #615dfa;
-        padding-inline-start: 10px;
-        margin: 0.5rem 0;
-        font-style: italic;
-        background: rgba(97, 93, 250, 0.05);
+    .news-page .news-card-excerpt {
+        margin: 0;
+        color: var(--news-muted);
+        line-height: 1.8;
+        font-size: 0.96rem;
+    }
+
+    .news-page .news-card-footer {
+        margin-top: 18px;
+        padding-top: 14px;
+        border-top: 1px dashed var(--news-border);
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .news-page .news-card-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--news-text);
+        font-size: 0.78rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+    }
+
+    .news-page .news-card-link:hover {
+        color: var(--news-accent);
+        text-decoration: none;
+    }
+
+    .news-page .news-card-link i {
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        background: rgba(97, 93, 250, 0.12);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease;
+    }
+
+    .news-page .news-card-link:hover i {
+        transform: translateX(2px);
+        background: var(--news-accent);
+        color: #fff;
+    }
+
+    html[dir="rtl"] .news-page .news-card-link:hover i {
+        transform: translateX(-2px);
+    }
+
+    /* News Markdown Preview Layout Inside Card */
+    .news-preview-content.markdown-news-preview {
+        max-height: 160px;
+        overflow: hidden;
+        position: relative;
     }
 </style>
 @endpush
@@ -72,7 +176,7 @@
     <p class="section-banner-text">{{ __('messages.latest_updates') }}</p>
 </div>
 
-<div class="grid grid-3-6-3 mobile-prefer-content">
+<div class="grid grid-3-6-3 mobile-prefer-content news-page">
     <!-- LEFT SIDEBAR -->
     <div class="grid-column">
         <x-widget-column side="portal_left" />
