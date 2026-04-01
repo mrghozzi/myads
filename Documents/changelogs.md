@@ -60,6 +60,12 @@
 * **Improvement**: Added localized moderation copy for the redesigned Reports admin experience, including queue descriptions and reviewed-state labels across all **9 supported languages**.
 * **Policy**: Updated technical documentation (`Agents.md`) with new safety guidelines for AI agents regarding terminal command execution.
 
+### 🛠️ Metadata & Encoding
+* **Fix**: Implemented robust character encoding detection and conversion in `LinkPreviewService` to resolve "strange symbols" (mojibake) in community link previews, especially for sites missing charset headers or using legacy encodings (Windows-1256, ISO-8859-6).
+* **Improvement**: `LinkPreviewService` now explicitly hints UTF-8 to `DOMDocument` using pseudo-XML declarations, preventing default fallback to Latin-1 for Arabic content.
+* **Refactor**: Unified website metadata extraction in `DirectoryController` (`fetchMetadata`) by integrating the improved `LinkPreviewService`, ensuring consistent title, description, and keyword retrieval while reducing code duplication.
+* **Add**: Added keyword (meta keywords) extraction support to `LinkPreviewService` to maintain feature parity across discovery modules.
+
 # v4.2.1
 > **Patch Release** - Version consistency, installer metadata fixes, and update flow polish.
 
