@@ -1739,6 +1739,7 @@ return [
     'visibility_private' => 'Only me',
     'visibility_public' => 'Public',
     'visit_deleted' => 'Besuch erfolgreich gelÃ¶scht',
+    'visit_updated' => 'Besuch erfolgreich aktualisiert',
     'visit_site' => 'Seite besuchen',
     'visit_website' => 'Website besuchen',
     'visits' => 'Besuche',

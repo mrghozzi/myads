@@ -1741,6 +1741,7 @@ return [
     'visibility_private' => 'أنا فقط',
     'visibility_public' => 'عام',
     'visit_deleted' => 'بازدید با موفقیت حذف شد',
+    'visit_updated' => 'بازدید با موفقیت به‌روزرسانی شد',
     'visit_site' => 'بازدید از سایت',
     'visit_website' => 'بازدید از سایت',
     'visits' => 'بازدیدها',

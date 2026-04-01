@@ -1741,6 +1741,7 @@ return [
     'visibility_private' => 'Only me',
     'visibility_public' => 'Public',
     'visit_deleted' => 'Ziyaret başarıyla silindi',
+    'visit_updated' => 'Ziyaret başarıyla güncellendi',
     'visit_site' => 'Siteyi ziyaret et',
     'visit_website' => 'Web sitesini ziyaret et',
     'visits' => 'Ziyaretler',

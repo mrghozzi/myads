@@ -965,16 +965,16 @@ class AdminController extends Controller
     {
         $visit = Visit::findOrFail($id);
         
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string',
             'url' => 'required|url',
             'tims' => 'required|in:1,2,3,4',
             'statu' => 'required|in:1,2',
         ]);
 
-        $visit->update($request->all());
+        $visit->update($validated);
 
-        return redirect()->back()->with('success', __('visit_updated'));
+        return redirect()->back()->with('success', __('messages.visit_updated'));
     }
 
     public function deleteVisit($id)
@@ -982,7 +982,7 @@ class AdminController extends Controller
         $visit = Visit::findOrFail($id);
         $visit->delete();
         
-        return redirect()->back()->with('success', __('visit_deleted'));
+        return redirect()->back()->with('success', __('messages.visit_deleted'));
     }
 
     private function resolveAdminInventoryFilterState(Request $request, string $page, array $defaults): array

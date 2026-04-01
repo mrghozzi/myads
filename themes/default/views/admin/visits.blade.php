@@ -3,6 +3,15 @@
 @section('title', __('messages.exvisit'))
 @section('admin_shell_header_mode', 'hidden')
 
+@php
+    $visitDurationOptions = [
+        1 => '10 ' . __('messages.seconds') . ' (1 ' . __('messages.point') . ')',
+        2 => '20 ' . __('messages.seconds') . ' (2 ' . __('messages.points') . ')',
+        3 => '30 ' . __('messages.seconds') . ' (5 ' . __('messages.points') . ')',
+        4 => '60 ' . __('messages.seconds') . ' (10 ' . __('messages.points') . ')',
+    ];
+@endphp
+
 @section('content')
 <div class="admin-page">
     <section class="admin-hero">
@@ -43,6 +52,20 @@
 
 @if(session('success'))
     <div class="alert alert-success">{{ session('success') }}</div>
+@endif
+
+@if(session('error'))
+    <div class="alert alert-danger">{{ session('error') }}</div>
+@endif
+
+@if($errors->any())
+    <div class="alert alert-danger">
+        <ul class="mb-0">
+            @foreach($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
+    </div>
 @endif
 
 <div class="main-content">
@@ -108,6 +131,9 @@
                                     </td>
                                     <td>
                                         <div class="hstack gap-2 justify-content-end">
+                                            <a href="javascript:void(0);" class="avatar-text avatar-md bg-soft-success text-success" data-bs-toggle="modal" data-bs-target="#editModal{{ $visit->id }}">
+                                                <i class="feather-edit-3"></i>
+                                            </a>
                                             <a href="javascript:void(0);" class="avatar-text avatar-md bg-soft-danger text-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ $visit->id }}">
                                                 <i class="feather-trash-2"></i>
                                             </a>
@@ -131,6 +157,50 @@
 
 @section('modals')
 @foreach($visits as $visit)
+<!-- Edit Modal -->
+<div class="modal fade" id="editModal{{ $visit->id }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">{{ __('messages.edit') }} {{ __('messages.exvisit') }} #{{ $visit->id }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ route('admin.visits.update', $visit->id) }}" method="POST">
+                @csrf
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">{{ __('messages.name') }}</label>
+                        <input type="text" name="name" class="form-control" value="{{ $visit->name }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ __('messages.url') }}</label>
+                        <input type="url" name="url" class="form-control" value="{{ $visit->url }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ __('messages.duration') }}</label>
+                        <select name="tims" class="form-select" required>
+                            @foreach($visitDurationOptions as $durationValue => $durationLabel)
+                                <option value="{{ $durationValue }}" {{ (int) $visit->tims === (int) $durationValue ? 'selected' : '' }}>{{ $durationLabel }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="mb-0">
+                        <label class="form-label">{{ __('messages.status') }}</label>
+                        <select name="statu" class="form-select" required>
+                            <option value="1" {{ (int) $visit->statu === 1 ? 'selected' : '' }}>{{ __('messages.active') }}</option>
+                            <option value="2" {{ (int) $visit->statu === 2 ? 'selected' : '' }}>{{ __('messages.inactive') }}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('messages.cancel') }}</button>
+                    <button type="submit" class="btn btn-primary">{{ __('messages.save_changes') }}</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <!-- Delete Modal -->
 <div class="modal fade" id="deleteModal{{ $visit->id }}" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">

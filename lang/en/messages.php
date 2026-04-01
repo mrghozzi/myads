@@ -1730,6 +1730,7 @@ return [
     'visibility_private' => 'Only me',
     'visibility_public' => 'Public',
     'visit_deleted' => 'Visit deleted successfully',
+    'visit_updated' => 'Visit updated successfully',
     'visit_site' => 'Visit site',
     'visit_website' => 'Visit website',
     'visits' => 'Visits',

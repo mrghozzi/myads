@@ -1732,6 +1732,7 @@ return [
     'visibility_private' => 'أنا فقط',
     'visibility_public' => 'عام',
     'visit_deleted' => 'تم حذف الزيارة بنجاح',
+    'visit_updated' => 'تم تحديث الزيارة بنجاح',
     'visit_site' => 'زيارة الموقع',
     'visit_website' => 'زيارة الموقع',
     'visits' => 'الزيارات',

@@ -1734,6 +1734,7 @@ return [
     'visibility_private' => 'Only me',
     'visibility_public' => 'Public',
     'visit_deleted' => 'Visita eliminada con éxito',
+    'visit_updated' => 'Visita actualizada con éxito',
     'visit_site' => 'Visitar sitio',
     'visit_website' => 'Visitar sitio web',
     'visits' => 'Visitas',
