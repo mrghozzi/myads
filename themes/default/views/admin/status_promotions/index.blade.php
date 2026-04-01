@@ -1,5 +1,15 @@
 @extends('theme::layouts.admin')
 
+@php
+    $statusBadgeColors = [
+        \App\Models\StatusPromotion::STATUS_ACTIVE => 'status-promotion-badge status-promotion-badge--active',
+        \App\Models\StatusPromotion::STATUS_PAUSED => 'status-promotion-badge status-promotion-badge--paused',
+        \App\Models\StatusPromotion::STATUS_COMPLETED => 'status-promotion-badge status-promotion-badge--completed',
+        \App\Models\StatusPromotion::STATUS_EXPIRED => 'status-promotion-badge status-promotion-badge--expired',
+        \App\Models\StatusPromotion::STATUS_BUDGET_CAPPED => 'status-promotion-badge status-promotion-badge--budget-capped',
+    ];
+@endphp
+
 @section('content')
 <div class="admin-page">
     <section class="admin-hero">
@@ -94,17 +104,7 @@
                                         </div>
                                     </td>
                                     <td data-label="{{ __('messages.status') }}">
-                                        @php
-                                            $statusBadgeColors = [
-                                                \App\Models\StatusPromotion::STATUS_ACTIVE => 'bg-success-subtle text-success-emphasis',
-                                                \App\Models\StatusPromotion::STATUS_PAUSED => 'bg-warning-subtle text-warning-emphasis',
-                                                \App\Models\StatusPromotion::STATUS_COMPLETED => 'bg-danger-subtle text-danger-emphasis',
-                                                \App\Models\StatusPromotion::STATUS_EXPIRED => 'bg-danger-subtle text-danger-emphasis',
-                                                \App\Models\StatusPromotion::STATUS_BUDGET_CAPPED => 'bg-danger-subtle text-danger-emphasis',
-                                            ];
-                                            $badgeClass = $statusBadgeColors[$promotion->status] ?? 'bg-secondary';
-                                        @endphp
-                                        <span class="badge {{ $badgeClass }}">{{ __('messages.status_promotion_status_' . $promotion->status) }}</span>
+                                        <span class="{{ $statusBadgeColors[$promotion->status] ?? 'status-promotion-badge' }}">{{ __('messages.status_promotion_status_' . $promotion->status) }}</span>
                                     </td>
                                     <td data-label="{{ __('messages.actions') }}">
                                         <div class="admin-action-cluster">

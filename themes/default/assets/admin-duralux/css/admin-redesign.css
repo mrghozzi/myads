@@ -294,6 +294,55 @@ body.admin-premium-shell .admin-pill i {
     color: var(--admin-premium-accent);
 }
 
+body.admin-premium-shell .status-promotion-badge {
+    align-items: center;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    box-shadow: 0 12px 24px rgba(15, 23, 42, 0.12);
+    color: #fff;
+    display: inline-flex;
+    font-size: 0.78rem;
+    font-weight: 800;
+    gap: 0.45rem;
+    letter-spacing: 0.03em;
+    padding: 0.5rem 0.85rem;
+    text-transform: uppercase;
+}
+
+body.admin-premium-shell .status-promotion-badge::before {
+    background: rgba(255, 255, 255, 0.92);
+    border-radius: 999px;
+    content: "";
+    display: inline-block;
+    height: 0.48rem;
+    width: 0.48rem;
+}
+
+body.admin-premium-shell .status-promotion-badge--active {
+    background: linear-gradient(135deg, #16a34a, #22c55e);
+    border-color: rgba(22, 163, 74, 0.35);
+}
+
+body.admin-premium-shell .status-promotion-badge--paused {
+    background: linear-gradient(135deg, #d97706, #f59e0b);
+    border-color: rgba(217, 119, 6, 0.35);
+}
+
+body.admin-premium-shell .status-promotion-badge--completed {
+    background: linear-gradient(135deg, #2563eb, #3b82f6);
+    border-color: rgba(37, 99, 235, 0.35);
+}
+
+body.admin-premium-shell .status-promotion-badge--expired {
+    background: linear-gradient(135deg, #dc2626, #ef4444);
+    border-color: rgba(220, 38, 38, 0.35);
+}
+
+body.admin-premium-shell .status-promotion-badge--budget-capped {
+    background: linear-gradient(135deg, #7c3aed, #8b5cf6);
+    border-color: rgba(124, 58, 237, 0.35);
+}
+
 body.admin-premium-shell .admin-panel__header,
 body.admin-premium-shell .admin-panel__footer {
     align-items: center;
