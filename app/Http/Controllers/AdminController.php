@@ -520,8 +520,11 @@ class AdminController extends Controller
             'nsmart' => 'required|numeric',
         ]);
 
+        // slugify input to ensure URL safety
+        $slug = Str::slug($request->slug);
+
         $user->update([
-            'username' => $request->username,
+            'username' => $slug, // Synchronize username with slug to fix profile link inconsistency
             'email' => $request->email,
             'ucheck' => $request->ucheck,
             'pts' => $request->pts,
@@ -531,12 +534,11 @@ class AdminController extends Controller
             'nsmart' => $request->nsmart,
         ]);
 
-        // Update Slug
-        $slug = Str::slug($request->slug);
+        // Update Slug Option
         Option::updateOrCreate(
             ['o_type' => 'user', 'o_order' => $id],
             [
-                'name' => $request->username,
+                'name' => $slug,
                 'o_valuer' => $slug
             ]
         );

@@ -43,11 +43,11 @@
                     
                     <div class="row mb-4">
                         <div class="col-md-6">
-                            <label class="form-label">{{ __('messages.username') }}</label>
+                            <label class="form-label">{{ __('messages.username') }} <span class="text-muted small">({{ __('Login Identity') }})</span></label>
                             <input type="text" class="form-control" name="username" value="{{ $user->username }}" required>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label">{{ __('User Slug') }}</label>
+                            <label class="form-label">{{ __('User Slug') }} <span class="text-muted small">({{ __('Profile URL Handle') }})</span></label>
                             <input type="text" class="form-control" name="slug" value="{{ $slug }}" required>
                         </div>
                     </div>
