@@ -1,4 +1,4 @@
-# MYADS v4.0 (Laravel Edition)
+# MYADS v4.2.2 (Laravel Edition)
 
 ***Advanced PHP Script*** for social networking and exchanging ads between website owners, now powered by **Laravel**.
 
@@ -6,20 +6,19 @@
 
 * **Program name:** [MYADS](https://github.com/mrghozzi/myads)
 * **Author:** [mrghozzi](https://github.com/mrghozzi "mrghozzi")
-* **Framework:** Laravel 10+
+* **Framework:** Laravel 12
 
 ---
 
 ## 🚀 Features
 
 ### 👤 Members
-- **Ad Exchange:** Exchange of visits, **text ads**, and **advertising banners**.
-- **Social Network:** Personal profile system, Follow system, and Private messaging.
-- **Marketplace:** A **store** for downloading scripts, plugins, and templates.
-- **Community:** **Forum** for communication and **Knowledge base** for guides.
-- **Tools:** Web Directory and Notification system (live via AJAX).
-- **Analytics:** Detailed analytics for ads (Impressions, Clicks, Geo-targeting).
-- **UI/UX:** **Modern Landing Page** with smooth animations, **Dark/Light mode** support, Verified memberships (blue tick).
+- **Ad Exchange:** Native **Smart Ads**, visits exchange, text ads, and advertising banners.
+- **Social presence:** Integrated **Social Links Hub** supporting 10+ platforms and **verified memberships**.
+- **Marketplace:** Digital **Store** for scripts, plugins, and templates with PTS-based pricing.
+- **Community:** **Forum** with visibility controls, **Wiki-style Knowledgebase**, and private messaging.
+- **UI/UX:** Glassmorphic **Superdesign** modules with smooth animations and **Dark/Light mode**.
+- **Analytics:** Detailed tracking for impressions, clicks, and geo-targeting.
 
 ### 🛠 Administrator
 - **Duralux Dashboard:** Modern, responsive admin panel with detailed statistics and dark mode support.
@@ -92,10 +91,13 @@ We have reached **100% Feature Parity** with the legacy version. Continuous impr
 - ✅ **Social Login:** Integration with Facebook/Google (via Socialite).
 - ✅ **Compliance:** Full GDPR Cookie Notice & Legal Agreement Manager.
 - ✅ **New UI:** Redesigned Landing Page and Admin Dashboard.
+- ✅ **Smart Ads:** Contextual Native Ads with Auto-Rotation.
+- ✅ **Social Hub:** Integrated Social Links System for member profiles.
+- ✅ **Security Suite:** IP Bans, Session Audit Log, and at-rest PM Encryption.
+- ✅ **SEO Engine:** Centralized SEO dashboard, dynamic sitemaps, and GA4.
 - 🔹 **API:** Full REST API for mobile apps (Internal Alpha).
-- 🔹 **Real-time:** WebSocket support for notifications.
+- 🔹 **Real-time:** WebSocket support for live notifications.
 - 🔹 **Payment Gateways:** Integration with PayPal/Stripe for store.
-- ✅ **Smart Ads:** Auto-Rotation to optimize CTR.
 
 ---
 
