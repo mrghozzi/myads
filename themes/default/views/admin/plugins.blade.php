@@ -185,6 +185,8 @@
                                         data-name="{{ $plugin['name'] }}"
                                         data-identifier="{{ $plugin['slug'] }}"
                                         data-warning="{{ __('messages.delete_plugin_warning') }}"
+                                        data-is-active="{{ $plugin['is_active'] ? '1' : '0' }}"
+                                        data-active-error="{{ __('messages.plugin_delete_active_forbidden') }}"
                                         title="{{ __('messages.delete') }}"
                                     >
                                         <i class="feather-trash-2"></i>

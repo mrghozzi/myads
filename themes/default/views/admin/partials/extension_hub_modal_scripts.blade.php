@@ -117,7 +117,34 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             if (warningNode) {
-                warningNode.textContent = trigger.getAttribute('data-warning') || warningNode.getAttribute('data-default-text') || '';
+                var isActive = trigger.getAttribute('data-is-active') === '1';
+                var activeError = trigger.getAttribute('data-active-error') || '';
+                var defaultWarning = trigger.getAttribute('data-warning') || warningNode.getAttribute('data-default-text') || '';
+                
+                warningNode.textContent = isActive ? activeError : defaultWarning;
+
+                // Adjust modal for active plugins
+                var confirmTitle = deleteModal.querySelector('h4.fw-bold.text-dark');
+                var deleteForm = deleteModal.querySelector('[data-extension-delete-form]');
+                var iconContainer = deleteModal.querySelector('.avatar-xl');
+
+                if (isActive) {
+                    if (confirmTitle) confirmTitle.style.display = 'none';
+                    if (deleteForm) deleteForm.style.display = 'none';
+                    if (iconContainer) {
+                        iconContainer.classList.remove('bg-soft-danger', 'text-danger');
+                        iconContainer.classList.add('bg-soft-warning', 'text-warning');
+                        iconContainer.querySelector('i').className = 'feather-alert-triangle';
+                    }
+                } else {
+                    if (confirmTitle) confirmTitle.style.display = 'block';
+                    if (deleteForm) deleteForm.style.display = 'inline-block';
+                    if (iconContainer) {
+                        iconContainer.classList.add('bg-soft-danger', 'text-danger');
+                        iconContainer.classList.remove('bg-soft-warning', 'text-warning');
+                        iconContainer.querySelector('i').className = 'feather-trash-2';
+                    }
+                }
             }
         });
     }
