@@ -1,3 +1,6 @@
+# v4.2.3
+> **Work in Progress** - New features and improvements.
+
 # v4.2.2
 > **Corrective Release** - User Social Links, admin extensions redesign, stability fixes, and localization polish.
 
