@@ -53,4 +53,24 @@ namespace {
             return url("themes/{$activeTheme}/assets/{$path}");
         }
     }
+
+    // Global Helper for Admin Assets
+    if (!function_exists('admin_asset')) {
+        function admin_asset($path)
+        {
+            $adminTheme = 'default';
+            try {
+                if (\Illuminate\Support\Facades\Schema::hasTable('options')) {
+                    $adminThemeOpt = \App\Models\Option::where('o_type', 'admin_settings')->where('name', 'theme')->first();
+                    if ($adminThemeOpt && !empty($adminThemeOpt->o_valuer)) {
+                        $adminTheme = $adminThemeOpt->o_valuer;
+                    }
+                }
+            } catch (\Throwable $e) {
+                // Fallback to default
+            }
+
+            return url("admin_themes/{$adminTheme}/assets/{$path}");
+        }
+    }
 }

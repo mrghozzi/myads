@@ -66,6 +66,18 @@ class AppServiceProvider extends ServiceProvider
             // Fallback to default
         }
 
+        $adminTheme = 'default';
+        try {
+            if (Schema::hasTable('options')) {
+                $adminThemeOpt = \App\Models\Option::where('o_type', 'admin_settings')->where('name', 'theme')->first();
+                if ($adminThemeOpt && !empty($adminThemeOpt->o_valuer)) {
+                    $adminTheme = $adminThemeOpt->o_valuer;
+                }
+            }
+        } catch (\Throwable $e) {
+            // Fallback to default
+        }
+
         View::share('site_settings', $setting);
         View::share('site_menus', $menus);
         try {
@@ -98,6 +110,7 @@ class AppServiceProvider extends ServiceProvider
         View::share('available_languages', $availableLanguages);
 
         View::addNamespace('theme', base_path("themes/$theme/views"));
+        View::addNamespace('admin', base_path("admin_themes/$adminTheme/views"));
 
         View::composer('theme::layouts.master', function ($view) {
             $view->with('seo', app(SeoManager::class)->resolve(request()));

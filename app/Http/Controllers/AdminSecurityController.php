@@ -31,7 +31,7 @@ class AdminSecurityController extends Controller
             $this->schema->notice('security_sessions', __('messages.security_member_sessions_title')),
         ]));
 
-        return view('theme::admin.security.index', compact(
+        return view('admin::admin.security.index', compact(
             'settings',
             'ipBansAvailable',
             'sessionsAvailable',
@@ -98,7 +98,7 @@ class AdminSecurityController extends Controller
                 'query' => $request->query(),
             ]);
 
-        return view('theme::admin.security.ip_bans', compact(
+        return view('admin::admin.security.ip_bans', compact(
             'bans',
             'featureAvailable',
             'upgradeNotice',
@@ -181,7 +181,7 @@ class AdminSecurityController extends Controller
                 'query' => $request->query(),
             ]);
 
-        return view('theme::admin.security.sessions', compact(
+        return view('admin::admin.security.sessions', compact(
             'sessions',
             'featureAvailable',
             'upgradeNotice',
@@ -216,7 +216,7 @@ class AdminSecurityController extends Controller
 
     public function showConfirmPasswordForm()
     {
-        return view('theme::admin.security.confirm_password');
+        return view('admin::admin.security.confirm_password');
     }
 
     public function confirmPassword(Request $request)

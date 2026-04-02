@@ -32,7 +32,7 @@ class AdminAdminsController extends Controller
         $users = User::orderBy('username')->get();
         $permissionModules = AdminAccessService::MODULES;
 
-        return view('theme::admin.admins', compact('admins', 'users', 'permissionModules', 'featureAvailable', 'upgradeNotice'));
+        return view('admin::admin.admins', compact('admins', 'users', 'permissionModules', 'featureAvailable', 'upgradeNotice'));
     }
 
     public function store(Request $request)

@@ -42,7 +42,7 @@ class AdminSeoController extends Controller
             ->values()
             ->all();
 
-        return view('theme::admin.seo.index', [
+        return view('admin::admin.seo.index', [
             'dashboard' => $dashboard,
             'chartWindow' => (string) request('days', '30'),
         ]);
@@ -50,7 +50,7 @@ class AdminSeoController extends Controller
 
     public function settings()
     {
-        return view('theme::admin.seo.settings', [
+        return view('admin::admin.seo.settings', [
             'settings' => SeoSetting::currentPersisted(),
             'canonicalModes' => $this->canonicalModes(),
             'twitterCards' => $this->twitterCards(),
@@ -98,7 +98,7 @@ class AdminSeoController extends Controller
     {
         $settings = SeoSetting::currentPersisted();
 
-        return view('theme::admin.seo.head', [
+        return view('admin::admin.seo.head', [
             'settings' => $settings,
             'sanitizedPreview' => $this->headSanitizer->sanitize($settings->head_snippets),
         ]);
@@ -128,7 +128,7 @@ class AdminSeoController extends Controller
 
     public function rules()
     {
-        return view('theme::admin.seo.rules', [
+        return view('admin::admin.seo.rules', [
             'settings' => SeoSetting::currentPersisted(),
             'rules' => SeoRule::query()
                 ->orderBy('scope_key')
@@ -174,7 +174,7 @@ class AdminSeoController extends Controller
         $settings = SeoSetting::currentPersisted();
         $dashboard = $this->audit->dashboard();
 
-        return view('theme::admin.seo.indexing', [
+        return view('admin::admin.seo.indexing', [
             'settings' => $settings,
             'dashboard' => $dashboard,
             'robotsPreview' => $this->robotsTxt->render($settings),

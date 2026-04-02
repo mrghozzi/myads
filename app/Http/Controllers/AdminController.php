@@ -262,7 +262,7 @@ class AdminController extends Controller
             }
         }
 
-        return view('theme::admin.index', compact('stats', 'currentVersion', 'latestVersion', 'chartData', 'communityChartData', 'reactionsSummary'));
+        return view('admin::admin.index', compact('stats', 'currentVersion', 'latestVersion', 'chartData', 'communityChartData', 'reactionsSummary'));
     }
 
     public function settings()
@@ -270,8 +270,9 @@ class AdminController extends Controller
         $settings = Setting::firstOrFail();
         $bannerRepeatWindowMinutes = BannerServingSettings::repeatWindowMinutes();
         $smartAdsPointsDivisor = SmartAdsSettings::pointsDivisor();
+        $adminTheme = Option::where('o_type', 'admin_settings')->where('name', 'theme')->value('o_valuer') ?? 'default';
 
-        return view('theme::admin.settings', compact('settings', 'bannerRepeatWindowMinutes', 'smartAdsPointsDivisor'));
+        return view('admin::admin.settings', compact('settings', 'bannerRepeatWindowMinutes', 'smartAdsPointsDivisor', 'adminTheme'));
     }
 
     public function updateSettings(Request $request)
@@ -283,9 +284,15 @@ class AdminController extends Controller
             'url' => 'required|url',
             'banner_repeat_window_minutes' => 'nullable|integer|min:0|max:525600',
             'smart_ads_points_divisor' => 'nullable|numeric|min:0.1|max:1000',
+            'admin_theme' => 'nullable|string',
         ]);
 
-        $settings->update($request->all());
+        $settings->update($request->except('admin_theme'));
+
+        Option::updateOrCreate(
+            ['o_type' => 'admin_settings', 'name' => 'theme'],
+            ['o_valuer' => $request->input('admin_theme', 'default')]
+        );
 
         Option::updateOrCreate(
             [
@@ -312,7 +319,7 @@ class AdminController extends Controller
 
     public function systemSettings()
     {
-        return view('theme::admin.system_settings');
+        return view('admin::admin.system_settings');
     }
 
     public function updateSystemSettings(Request $request)
@@ -349,7 +356,7 @@ class AdminController extends Controller
             'btn_text' => $options->has('btn_text') ? $options['btn_text']->o_valuer : '#ffffff',
         ];
 
-        return view('theme::admin.cookie_notice', compact('cookieSettings'));
+        return view('admin::admin.cookie_notice', compact('cookieSettings'));
     }
 
     public function updateCookieNoticeSettings(Request $request)
@@ -490,7 +497,7 @@ class AdminController extends Controller
         }
 
         $users = $query->paginate(20)->appends($request->except('page'));
-        return view('theme::admin.users', compact('users'));
+        return view('admin::admin.users', compact('users'));
     }
 
     public function editUser($id)
@@ -503,7 +510,7 @@ class AdminController extends Controller
                             ->first();
         $slug = $slugOption ? $slugOption->o_valuer : '';
 
-        return view('theme::admin.user_edit', compact('user', 'slug'));
+        return view('admin::admin.user_edit', compact('user', 'slug'));
     }
 
     public function updateUser(Request $request, $id)
@@ -594,7 +601,7 @@ class AdminController extends Controller
 
         $banners = $query->paginate(20)->withQueryString();
 
-        return view('theme::admin.banners', [
+        return view('admin::admin.banners', [
             'banners' => $banners,
             'filterState' => $filterState,
             'filterFields' => $this->bannerFilterFields(),
@@ -687,13 +694,13 @@ class AdminController extends Controller
             'smart_ads' => SmartAd::count(),
         ];
 
-        return view('theme::admin.ads_overview', compact('items', 'summary', 'search'));
+        return view('admin::admin.ads_overview', compact('items', 'summary', 'search'));
     }
 
     public function editBanner($id)
     {
         $banner = Banner::findOrFail($id);
-        return view('theme::admin.banner_edit', compact('banner'));
+        return view('admin::admin.banner_edit', compact('banner'));
     }
 
     public function updateBanner(Request $request, $id)
@@ -795,7 +802,7 @@ class AdminController extends Controller
         }
 
         $stats = $query->paginate(20);
-        return view('theme::admin.stats', compact('stats', 'title'));
+        return view('admin::admin.stats', compact('stats', 'title'));
     }
 
     public function links(Request $request)
@@ -818,7 +825,7 @@ class AdminController extends Controller
 
         $links = $query->paginate(20)->withQueryString();
 
-        return view('theme::admin.links', [
+        return view('admin::admin.links', [
             'links' => $links,
             'filterState' => $filterState,
             'filterFields' => $this->linkFilterFields(),
@@ -871,7 +878,7 @@ class AdminController extends Controller
 
         $smartAds = $query->paginate(20)->withQueryString();
 
-        return view('theme::admin.smart_ads', [
+        return view('admin::admin.smart_ads', [
             'smartAds' => $smartAds,
             'filterState' => $filterState,
             'filterFields' => $this->smartAdFilterFields(),
@@ -883,7 +890,7 @@ class AdminController extends Controller
     {
         $smartAd = SmartAd::with('user')->findOrFail($id);
 
-        return view('theme::admin.smart_ad_edit', [
+        return view('admin::admin.smart_ad_edit', [
             'smartAd' => $smartAd,
             'deviceOptions' => [
                 'desktop' => __('messages.smart_device_desktop'),
@@ -955,7 +962,7 @@ class AdminController extends Controller
 
         $visits = $query->paginate(20)->withQueryString();
 
-        return view('theme::admin.visits', [
+        return view('admin::admin.visits', [
             'visits' => $visits,
             'filterState' => $filterState,
             'filterFields' => $this->visitFilterFields(),
@@ -1395,7 +1402,7 @@ class AdminController extends Controller
     {
         $categories = ForumCategory::orderBy('ordercat', 'asc')->paginate(20);
         $allCategories = ForumCategory::orderBy('ordercat', 'asc')->get();
-        return view('theme::admin.forum_categories', compact('categories', 'allCategories'));
+        return view('admin::admin.forum_categories', compact('categories', 'allCategories'));
     }
 
     public function storeForumCategory(Request $request)
@@ -1468,7 +1475,7 @@ class AdminController extends Controller
     public function forumSettings()
     {
         $forumSettings = ForumSettings::all();
-        return view('theme::admin.forum_settings', compact('forumSettings'));
+        return view('admin::admin.forum_settings', compact('forumSettings'));
     }
 
     public function updateForumSettings(Request $request)
@@ -1495,7 +1502,7 @@ class AdminController extends Controller
         $categories = ForumCategory::orderBy('ordercat', 'asc')->get(['id', 'name']);
         $permissionKeys = $this->forumPermissionKeys();
 
-        return view('theme::admin.forum_moderators', compact('moderators', 'users', 'categories', 'permissionKeys'));
+        return view('admin::admin.forum_moderators', compact('moderators', 'users', 'categories', 'permissionKeys'));
     }
 
     public function storeForumModerator(Request $request)
@@ -1599,7 +1606,7 @@ class AdminController extends Controller
     {
         $categories = DirectoryCategory::with('parent')->orderBy('sub', 'asc')->orderBy('ordercat', 'asc')->paginate(20);
         $parents = DirectoryCategory::where('sub', 0)->get();
-        return view('theme::admin.directory_categories', compact('categories', 'parents'));
+        return view('admin::admin.directory_categories', compact('categories', 'parents'));
     }
 
     public function storeDirectoryCategory(Request $request)
@@ -1663,7 +1670,7 @@ class AdminController extends Controller
     {
         $news = News::orderBy('id', 'desc')->get();
         $emojis = Emoji::orderBy('id', 'asc')->get();
-        return view('theme::admin.news', compact('news', 'emojis'));
+        return view('admin::admin.news', compact('news', 'emojis'));
     }
 
     public function storeNews(Request $request)
@@ -1762,7 +1769,7 @@ class AdminController extends Controller
                   ->paginate(20);
         }
 
-        return view('theme::admin.knowledgebase', compact('categories', 'latestArticles', 'totalArticles', 'searchResults'));
+        return view('admin::admin.knowledgebase', compact('categories', 'latestArticles', 'totalArticles', 'searchResults'));
     }
 
     public function storeKnowledgebase(Request $request)
@@ -1815,7 +1822,7 @@ class AdminController extends Controller
             6 => 'Footer'
         ];
         
-        return view('theme::admin.site_ads', compact('ads', 'names'));
+        return view('admin::admin.site_ads', compact('ads', 'names'));
     }
 
     public function updateSiteAd(Request $request, $id)
@@ -1878,7 +1885,7 @@ class AdminController extends Controller
             'reviewed' => Report::query()->where('statu', '!=', 1)->count(),
         ];
 
-        return view('theme::admin.reports', compact('reports', 'reportItems', 'reportStats'));
+        return view('admin::admin.reports', compact('reports', 'reportItems', 'reportStats'));
     }
 
     /**
@@ -2108,7 +2115,7 @@ class AdminController extends Controller
     public function emojis()
     {
         $emojis = Emoji::orderBy('id', 'desc')->paginate(20);
-        return view('theme::admin.emojis', compact('emojis'));
+        return view('admin::admin.emojis', compact('emojis'));
     }
 
     public function storeEmoji(Request $request)
@@ -2135,7 +2142,7 @@ class AdminController extends Controller
     public function menus()
     {
         $menus = Menu::orderBy('id_m', 'desc')->paginate(20);
-        return view('theme::admin.menus', compact('menus'));
+        return view('admin::admin.menus', compact('menus'));
     }
 
     public function storeMenu(Request $request)
@@ -2230,7 +2237,7 @@ class AdminController extends Controller
             ->orderBy('o_order', 'asc')
             ->get();
         $places = $this->getWidgetPlaces();
-        return view('theme::admin.widgets', compact('widgets', 'places'));
+        return view('admin::admin.widgets', compact('widgets', 'places'));
     }
 
     public function widgetForm(Request $request)
@@ -2242,7 +2249,7 @@ class AdminController extends Controller
         }
         $places = $this->getWidgetPlaces();
         $allowedPlaceIds = array_map('strval', $this->getAllowedPlaceIds($type));
-        return view('theme::admin.widgets_form', [
+        return view('admin::admin.widgets_form', [
             'mode' => 'create',
             'widget' => null,
             'type' => $type,
@@ -2256,7 +2263,7 @@ class AdminController extends Controller
         $widget = Option::where('o_type', 'box_widget')->where('id', $id)->firstOrFail();
         $places = $this->getWidgetPlaces();
         $allowedPlaceIds = array_map('strval', $this->getAllowedPlaceIds($widget->o_mode));
-        return view('theme::admin.widgets_form', [
+        return view('admin::admin.widgets_form', [
             'mode' => 'edit',
             'widget' => $widget,
             'type' => $widget->o_mode,
@@ -2372,7 +2379,7 @@ class AdminController extends Controller
             $lang->has_folder = File::exists(base_path("lang/{$lang->o_valuer}"));
         }
         
-        return view('theme::admin.languages', compact('languages'));
+        return view('admin::admin.languages', compact('languages'));
     }
 
     public function storeLanguage(Request $request)
@@ -2445,7 +2452,7 @@ class AdminController extends Controller
             $defaultTerms = require $defaultPath;
         }
 
-        return view('theme::admin.language_terms', compact('language', 'terms', 'defaultTerms'));
+        return view('admin::admin.language_terms', compact('language', 'terms', 'defaultTerms'));
     }
 
     public function updateLanguageTerms(Request $request, $id)
@@ -2507,7 +2514,7 @@ class AdminController extends Controller
             ->orderBy('id', 'desc')
             ->paginate(20);
             
-        return view('theme::admin.products', compact('products'));
+        return view('admin::admin.products', compact('products'));
     }
 
     public function deleteProduct(Request $request)
@@ -2551,7 +2558,7 @@ class AdminController extends Controller
             ->where('name', 'suspended')
             ->exists();
 
-        return view('theme::admin.product_edit', compact(
+        return view('admin::admin.product_edit', compact(
             'product', 'typeOption', 'files', 'latestFile', 'topic', 'storeCategories', 'isSuspended'
         ));
     }
@@ -2673,7 +2680,7 @@ class AdminController extends Controller
         $updates = $pluginManager->checkForUpdates();
         $marketplaceCatalog = $marketplace->catalog('plugins');
 
-        return view('theme::admin.plugins', compact('plugins', 'updates', 'marketplaceCatalog'));
+        return view('admin::admin.plugins', compact('plugins', 'updates', 'marketplaceCatalog'));
     }
 
     public function activatePlugin(Request $request, PluginManager $pluginManager)
@@ -2791,7 +2798,7 @@ class AdminController extends Controller
         $updates = $themeManager->checkForUpdates();
         $marketplaceCatalog = $marketplace->catalog('themes');
 
-        return view('theme::admin.themes.index', compact('themes', 'updates', 'marketplaceCatalog'));
+        return view('admin::admin.themes.index', compact('themes', 'updates', 'marketplaceCatalog'));
     }
 
     public function themeThumbnail($slug, ThemeManager $themeManager)
@@ -2871,7 +2878,7 @@ class AdminController extends Controller
             $maintenanceSettings['last_changed_by'] ?? 0,
         ]))->get()->keyBy('id');
 
-        return view('theme::admin.maintenance', compact('maintenanceSettings', 'maintenanceUsers'));
+        return view('admin::admin.maintenance', compact('maintenanceSettings', 'maintenanceUsers'));
     }
 
     public function updateMaintenanceSettings(Request $request)

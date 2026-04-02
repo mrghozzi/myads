@@ -15,7 +15,7 @@ class AdminPageController extends Controller
     public function index()
     {
         $pages = Page::orderBy('order', 'asc')->orderBy('id', 'desc')->get();
-        return view('theme::admin.pages', compact('pages'));
+        return view('admin::admin.pages', compact('pages'));
     }
 
     /**
@@ -23,7 +23,7 @@ class AdminPageController extends Controller
      */
     public function create()
     {
-        return view('theme::admin.pages_form', [
+        return view('admin::admin.pages_form', [
             'mode' => 'create',
             'page' => null,
         ]);
@@ -79,7 +79,7 @@ class AdminPageController extends Controller
             ->orderBy('o_order', 'asc')
             ->get();
 
-        return view('theme::admin.pages_form', [
+        return view('admin::admin.pages_form', [
             'mode' => 'edit',
             'page' => $page,
             'leftWidgets' => $leftWidgets,

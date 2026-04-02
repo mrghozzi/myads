@@ -28,7 +28,7 @@ class AdminStatusPromotionController extends Controller
             ? $this->promotionService->adminPromotions($search, $status, $objective)
             : new LengthAwarePaginator([], 0, 20);
 
-        return view('theme::admin.status_promotions.index', compact(
+        return view('admin::admin.status_promotions.index', compact(
             'promotions',
             'featureAvailable',
             'upgradeNotice',
@@ -44,7 +44,7 @@ class AdminStatusPromotionController extends Controller
         $upgradeNotice = $this->schema->notice('post_promotions', __('messages.status_promotions_title'));
         $settings = StatusPromotionSettings::all();
 
-        return view('theme::admin.status_promotions.settings', compact(
+        return view('admin::admin.status_promotions.settings', compact(
             'featureAvailable',
             'upgradeNotice',
             'settings'

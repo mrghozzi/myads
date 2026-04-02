@@ -75,7 +75,7 @@ class AdminUpdatesController extends Controller
             ];
         }
 
-        return view('theme::admin.updates', compact(
+        return view('admin::admin.updates', compact(
             'currentVersion',
             'latestVersion',
             'updateAvailable',
