@@ -1,4 +1,4 @@
-# MYADS v4.2.2 (Laravel Edition)
+# MYADS v4.2.4 (Laravel Edition)
 
 ***Advanced PHP Script*** for social networking and exchanging ads between website owners, now powered by **Laravel**.
 
