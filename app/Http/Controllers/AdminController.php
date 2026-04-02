@@ -287,7 +287,7 @@ class AdminController extends Controller
             'admin_theme' => 'nullable|string',
         ]);
 
-        $settings->update($request->except('admin_theme'));
+        $settings->update($request->except(['admin_theme', 'lang']));
 
         Option::updateOrCreate(
             ['o_type' => 'admin_settings', 'name' => 'theme'],
@@ -2374,12 +2374,22 @@ class AdminController extends Controller
         }
 
         $languages = Option::where('o_type', 'languages')->orderBy('id', 'desc')->paginate(20);
+        $defaultLang = Setting::first()->lang ?? 'en';
         
         foreach ($languages as $lang) {
             $lang->has_folder = File::exists(base_path("lang/{$lang->o_valuer}"));
         }
         
-        return view('admin::admin.languages', compact('languages'));
+        return view('admin::admin.languages', compact('languages', 'defaultLang'));
+    }
+
+    public function setDefaultLanguage($id)
+    {
+        $language = Option::where('o_type', 'languages')->findOrFail($id);
+        $settings = Setting::firstOrFail();
+        $settings->update(['lang' => $language->o_valuer]);
+
+        return redirect()->back()->with('success', __('messages.default_language_updated') ?? 'Default language updated successfully');
     }
 
     public function storeLanguage(Request $request)

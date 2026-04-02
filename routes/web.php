@@ -432,6 +432,7 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     // Languages
     Route::get('/languages', [AdminController::class, 'languages'])->name('admin.languages');
     Route::post('/languages', [AdminController::class, 'storeLanguage'])->name('admin.languages.store');
+    Route::post('/languages/set-default/{id}', [AdminController::class, 'setDefaultLanguage'])->name('admin.languages.set_default');
     Route::post('/languages/{id}', [AdminController::class, 'updateLanguage'])->name('admin.languages.update');
     Route::delete('/languages/{id}', [AdminController::class, 'deleteLanguage'])->name('admin.languages.delete');
     Route::get('/languages/{id}/terms', [AdminController::class, 'editLanguageTerms'])->name('admin.languages.terms');

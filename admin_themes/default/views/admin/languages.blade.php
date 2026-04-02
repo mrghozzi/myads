@@ -94,6 +94,7 @@
                                 <th>{{ __('messages.name') }}</th>
                                 <th>{{ __('messages.code') }}</th>
                                 <th>{{ __('messages.status') }}</th>
+                                <th class="text-center">{{ __('messages.default') ?? 'Default' }}</th>
                                 <th class="text-end">{{ __('messages.actions') }}</th>
                             </tr>
                         </thead>
@@ -119,6 +120,20 @@
                                             <span class="badge bg-soft-success text-success"><i class="feather-check-circle me-1"></i>{{ __('messages.folder_ready') }}</span>
                                         @else
                                             <span class="badge bg-soft-danger text-danger"><i class="feather-alert-triangle me-1"></i>{{ __('messages.missing_folder') }}</span>
+                                        @endif
+                                    </td>
+                                    <td data-label="{{ __('messages.default') ?? 'Default' }}" class="text-center">
+                                        @if($language->o_valuer === $defaultLang)
+                                            <span class="badge bg-primary text-white" title="{{ __('messages.language_default') }}">
+                                                <i class="feather-star me-1"></i>{{ __('messages.default') ?? 'Default' }}
+                                            </span>
+                                        @else
+                                            <form action="{{ route('admin.languages.set_default', $language->id) }}" method="POST" class="d-inline">
+                                                @csrf
+                                                <button type="submit" class="btn btn-sm btn-outline-secondary" title="{{ __('messages.set_as_default') ?? 'Set as Default' }}">
+                                                    <i class="feather-star"></i>
+                                                </button>
+                                            </form>
                                         @endif
                                     </td>
                                     <td data-label="{{ __('messages.actions') }}" class="text-end">

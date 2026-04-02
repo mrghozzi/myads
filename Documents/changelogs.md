@@ -14,6 +14,17 @@
 * **Helper**: Introduced the `admin_asset()` helper to manage admin-specific CSS, JS, and image assets, ensuring they are served from the independent `admin_themes/` repository.
 * **Cleanup**: Migrated 39+ controllers to use the new `admin::` namespace and purged legacy admin templates from the default public theme, resulting in a cleaner and more modular codebase.
 
+### 🌍 Internationalization & Localization
+* **Architecture**: Relocated the **Default Language** setting from the General Settings page to the dedicated **Languages** management interface, providing a more contextual workflow.
+* **Feature**: Added a "Set as Default" one-click action for all installed languages, allowing administrators to switch the site's primary locale without manually entering ISO codes.
+* **UI**: Introduced a visual "Default" indicator (Star badge) in the languages table to clearly identify the active site-wide locale.
+* **i18n**: Added new translation strings for `default`, `set_as_default`, and success notifications across shared language packs.
+
+### 🧹 Feature Purge & Cleanup
+* **Removal**: Permanently removed the **Educational Links** (روابط تعليمية) feature from the entire platform to streamline the user and admin experience.
+* **Cleanup**: Purged `e_links` logic and help-center icon triggers from the User Dashboard, Forum, Visit Exchange, and Ads management screens.
+* **Database**: Updated the `Setting` model to exclude legacy `e_links` data while maintaining schema compatibility.
+
 # v4.2.3
 > **Corrective Release** — User slug synchronization, RTL post layout fixes, and UI consistency.
 

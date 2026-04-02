@@ -12,7 +12,7 @@
             </ul>
             <div class="admin-hero__eyebrow">{{ __('messages.options') }}</div>
             <h1 class="admin-hero__title">{{ __('messages.settings_site') }}</h1>
-            <p class="admin-hero__copy">{{ __('messages.site_name') }} / {{ __('messages.url_link') }} / {{ __('messages.language_default') }}</p>
+            <p class="admin-hero__copy">{{ __('messages.site_name') }} / {{ __('messages.url_link') }}</p>
         </div>
     </section>
 
@@ -53,10 +53,6 @@
                 <div class="col-lg-6">
                     <label class="form-label">{{ __('messages.admin_theme') ?? 'Admin Theme' }}</label>
                     <input type="text" name="admin_theme" class="form-control" value="{{ old('admin_theme', $adminTheme) }}" placeholder="{{ __('messages.admin_theme') ?? 'Admin Theme' }}">
-                </div>
-                <div class="col-lg-6">
-                    <label class="form-label">{{ __('messages.language_default') }}</label>
-                    <input type="text" name="lang" class="form-control" value="{{ old('lang', $settings->lang) }}" placeholder="{{ __('messages.language_default') }}">
                 </div>
                 <div class="col-lg-6">
                     <label class="form-label">{{ __('messages.timezone') }}</label>
