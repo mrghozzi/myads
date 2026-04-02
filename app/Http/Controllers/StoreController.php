@@ -20,9 +20,23 @@ use App\Support\StoreCategoryCatalog;
 
 class StoreController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request, ?string $script = null, ?string $category = null)
     {
-        $category = StoreCategoryCatalog::normalize($request->query('category'));
+        $category = StoreCategoryCatalog::normalize($category ?? $request->query('category'));
+        $scriptName = $script ?? $request->query('script');
+        $scriptId = null;
+
+        // Resolve script name to product ID for filtering
+        if ($scriptName && $scriptName !== 'all') {
+            $scriptProduct = Product::withoutGlobalScope('store')
+                ->where('o_type', 'store')
+                ->where('name', $scriptName)
+                ->first();
+            
+            if ($scriptProduct) {
+                $scriptId = $scriptProduct->id;
+            }
+        }
 
         $query = Product::visible()->orderBy('id', 'desc');
 
@@ -31,35 +45,60 @@ class StoreController extends Controller
             $category = null;
         }
 
-        if ($categoryNames !== []) {
-            $productIds = Option::where('o_type', 'store_type')
-                ->whereIn('name', $categoryNames)
-                ->pluck('o_parent')
-                ->toArray();
+        if ($categoryNames !== [] || $scriptId !== null) {
+            $typeQuery = Option::where('o_type', 'store_type');
+            
+            if ($categoryNames !== []) {
+                $typeQuery->whereIn('name', $categoryNames);
+            }
+            
+            if ($scriptId !== null) {
+                $typeQuery->where('o_mode', (string) $scriptId);
+            }
+            
+            $productIds = $typeQuery->pluck('o_parent')->toArray();
             $query->whereIn('id', $productIds);
         }
 
-        $products = $query->paginate(12)->appends(['category' => $category]);
+        $products = $query->paginate(12)->appends(['category' => $category, 'script' => $scriptName]);
         $user = Auth::user();
 
-        // Count products per category
+        // Count products per category (optionally filtered by script)
+        $countQuery = function(array $names) use ($scriptId) {
+            $q = Option::where('o_type', 'store_type')->whereIn('name', $names);
+            if ($scriptId) {
+                $q->where('o_mode', (string) $scriptId);
+            }
+            return $q->count();
+        };
+
         $categoryCounts = [
-            'script' => Option::where('o_type', 'store_type')->where('name', 'script')->count(),
-            'themes' => Option::where('o_type', 'store_type')->whereIn('name', StoreCategoryCatalog::namesForFilter('themes'))->count(),
-            'plugins' => Option::where('o_type', 'store_type')->where('name', 'plugins')->count(),
+            'script' => $countQuery(['script']),
+            'themes' => $countQuery(StoreCategoryCatalog::namesForFilter('themes')),
+            'plugins' => $countQuery(['plugins']),
         ];
 
         $this->seo([
             'scope_key' => 'store_index',
-            'resource_title' => __('messages.store'),
+            'resource_title' => $scriptName && $scriptName !== 'all' ? __('messages.store') . ' - ' . $scriptName : __('messages.store'),
             'description' => __('messages.seo_store_description'),
             'breadcrumbs' => [
                 ['name' => __('messages.home'), 'url' => url('/')],
                 ['name' => __('messages.store'), 'url' => route('store.index')],
             ],
         ]);
+        
+        if ($scriptName && $scriptName !== 'all') {
+             app(\App\Services\SeoManager::class)->setContext([
+                'breadcrumbs' => [
+                    ['name' => __('messages.home'), 'url' => url('/')],
+                    ['name' => __('messages.store'), 'url' => route('store.index')],
+                    ['name' => $scriptName, 'url' => route('store.script_category', ['script' => $scriptName, 'category' => 'all'])],
+                ],
+            ]);
+        }
 
-        return view('theme::store.index', compact('products', 'user', 'category', 'categoryCounts'));
+        return view('theme::store.index', compact('products', 'user', 'category', 'categoryCounts', 'scriptName'));
     }
 
     public function destroy(Request $request)
@@ -111,6 +150,13 @@ class StoreController extends Controller
     public function show($name)
     {
         $product = Product::visible()->withoutGlobalScope('store')->where('o_type', 'store')->where('name', $name)->firstOrFail();
+        
+        // If the product is a "script", we treat /store/{name} as the "Script Store" index
+        $type = Option::where('o_type', 'store_type')->where('o_parent', $product->id)->first();
+        if ($type && $type->name === StoreCategoryCatalog::SCRIPT) {
+            return $this->index(request(), $name);
+        }
+
         $status = Status::where('s_type', 7867)->where('tp_id', $product->id)->first();
         if ($status) {
             $status->related_content = $product;

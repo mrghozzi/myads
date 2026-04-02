@@ -97,10 +97,9 @@ class RemoteExtensionMarketplaceService
 
     private function browseUrl(string $type): string
     {
-        return match ($type) {
-            'plugins' => rtrim(self::BASE_URL, '/') . '/store?category=plugins',
-            default => rtrim(self::BASE_URL, '/') . '/store?category=themes',
-        };
+        $normalizedType = $this->normalizeType($type);
+        
+        return rtrim(self::BASE_URL, '/') . '/store/myads/' . $normalizedType;
     }
 
     private function normalizeType(string $type): string

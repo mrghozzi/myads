@@ -232,6 +232,7 @@ Route::get('/orders/{id}', [OrderRequestController::class, 'show'])->name('order
 
 // Store Routes
 Route::get('/store', [StoreController::class, 'index'])->name('store.index');
+Route::get('/store/{script}/{category}', [StoreController::class, 'index'])->name('store.script_category');
 Route::middleware(['auth'])->group(function () {
     Route::get('/store/create', [StoreController::class, 'create'])->name('store.create');
 });

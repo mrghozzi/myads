@@ -23,17 +23,27 @@
 @endif
 
 <div class="grid grid-3-3-3 centered">
-    <a class="product-category-box category-all{{ ($category ?? '') === 'script' ? ' active' : '' }}" href="{{ route('store.index', ['category' => 'script']) }}" style="--bg: url({{ theme_asset('img/banner/script.png') }}) no-repeat 100% 0, linear-gradient(90deg, #615dfa, #8d7aff); background: var(--bg);">
+    @php
+        $isScriptSpecific = isset($scriptName) && $scriptName !== 'all';
+    @endphp
+    
+    <a class="product-category-box category-all{{ ($category ?? '') === 'script' ? ' active' : '' }}" 
+       href="{{ $isScriptSpecific ? route('store.script_category', [$scriptName, 'script']) : route('store.index', ['category' => 'script']) }}" 
+       style="--bg: url({{ theme_asset('img/banner/script.png') }}) no-repeat 100% 0, linear-gradient(90deg, #615dfa, #8d7aff); background: var(--bg);">
         <p class="product-category-box-title">{{ __('messages.script') }}</p>
         <p class="product-category-box-text">{{ $categoryCounts['script'] ?? 0 }} {{ __('messages.products') ?? 'Products' }}</p>
         <p class="product-category-box-tag">{{ $categoryCounts['script'] ?? 0 }}</p>
     </a>
-    <a class="product-category-box category-featured{{ ($category ?? '') === 'themes' ? ' active' : '' }}" href="{{ route('store.index', ['category' => 'themes']) }}" style="--bg: url({{ theme_asset('img/banner/templates.png') }}) no-repeat 100% 0, linear-gradient(90deg, #417ae1, #5aafff); background: var(--bg);">
+    <a class="product-category-box category-featured{{ ($category ?? '') === 'themes' ? ' active' : '' }}" 
+       href="{{ $isScriptSpecific ? route('store.script_category', [$scriptName, 'themes']) : route('store.index', ['category' => 'themes']) }}" 
+       style="--bg: url({{ theme_asset('img/banner/templates.png') }}) no-repeat 100% 0, linear-gradient(90deg, #417ae1, #5aafff); background: var(--bg);">
         <p class="product-category-box-title">{{ __('messages.themes') }}</p>
         <p class="product-category-box-text">{{ $categoryCounts['themes'] ?? 0 }} {{ __('messages.products') ?? 'Products' }}</p>
         <p class="product-category-box-tag">{{ $categoryCounts['themes'] ?? 0 }}</p>
     </a>
-    <a class="product-category-box category-digital{{ ($category ?? '') === 'plugins' ? ' active' : '' }}" href="{{ route('store.index', ['category' => 'plugins']) }}" style="--bg: url({{ theme_asset('img/banner/plugins.png') }}) no-repeat 100% 0, linear-gradient(90deg, #2ebfef, #4ce4ff); background: var(--bg);">
+    <a class="product-category-box category-digital{{ ($category ?? '') === 'plugins' ? ' active' : '' }}" 
+       href="{{ $isScriptSpecific ? route('store.script_category', [$scriptName, 'plugins']) : route('store.index', ['category' => 'plugins']) }}" 
+       style="--bg: url({{ theme_asset('img/banner/plugins.png') }}) no-repeat 100% 0, linear-gradient(90deg, #2ebfef, #4ce4ff); background: var(--bg);">
         <p class="product-category-box-title">{{ __('messages.plugins') }}</p>
         <p class="product-category-box-text">{{ $categoryCounts['plugins'] ?? 0 }} {{ __('messages.products') ?? 'Products' }}</p>
         <p class="product-category-box-tag">{{ $categoryCounts['plugins'] ?? 0 }}</p>
