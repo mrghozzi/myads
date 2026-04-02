@@ -11,8 +11,12 @@
 
 <div class="section-header">
     <div class="section-header-info">
-        <p class="section-pretitle">{{ __('messages.search_what_you_want') ?? 'Search what you want!' }}</p>
-        <h2 class="section-title">{{ __('messages.market_categories') ?? 'Market Categories' }}</h2>
+        <p class="section-pretitle">
+            <a href="{{ route('store.index') }}" style="color: inherit;">{{ __('messages.search_what_you_want') ?? 'Search what you want!' }}</a>
+        </p>
+        <h2 class="section-title">
+            <a href="{{ route('store.index') }}" style="color: inherit;">{{ __('messages.market_categories') ?? 'Market Categories' }}</a>
+        </h2>
     </div>
 </div>
 
@@ -52,18 +56,33 @@
 
 <div class="section-header">
     <div class="section-header-info">
-        <p class="section-pretitle">{{ __('messages.see_whats_new') ?? "See what's new!" }}</p>
+        @php
+            $pretitleUrl = $isScriptSpecific ? route('store.script_category', [$scriptName, 'all']) : route('store.index');
+            $titleUrl = $isScriptSpecific 
+                ? ($category ? route('store.script_category', [$scriptName, $category]) : route('store.script_category', [$scriptName, 'all']))
+                : ($category ? route('store.index', ['category' => $category]) : route('store.index'));
+        @endphp
+        <p class="section-pretitle">
+            <a href="{{ $pretitleUrl }}" style="color: inherit;">{{ __('messages.see_whats_new') ?? "See what's new!" }}</a>
+        </p>
         <h2 class="section-title">
-            @if($category ?? false)
-                {{ __('messages.' . $category) }}
-            @else
-                {{ __('messages.latest_items') ?? 'Latest Items' }}
-            @endif
+            <a href="{{ $titleUrl }}" style="color: inherit;">
+                @if($category ?? false)
+                    {{ __('messages.' . $category) }}
+                @else
+                    {{ __('messages.latest_items') ?? 'Latest Items' }}
+                @endif
+            </a>
         </h2>
     </div>
     <div class="section-header-actions">
         @if($category ?? false)
-            <a class="button white small" role="button" href="{{ route('store.index') }}">&nbsp;<i class="fa fa-th" aria-hidden="true"></i>&nbsp;{{ __('messages.all') ?? 'All' }}&nbsp;</a>&nbsp;
+            @php
+                $allUrl = (isset($scriptName) && $scriptName !== 'all') 
+                    ? route('store.script_category', ['script' => $scriptName, 'category' => 'all'])
+                    : route('store.index');
+            @endphp
+            <a class="button white small" role="button" href="{{ $allUrl }}">&nbsp;<i class="fa fa-th" aria-hidden="true"></i>&nbsp;{{ __('messages.all') ?? 'All' }}&nbsp;</a>&nbsp;
         @endif
         @auth
             <a class="button secondary" role="button" href="{{ route('store.create') }}">&nbsp;&nbsp;<i class="fa fa-plus" aria-hidden="true"></i>&nbsp;{{ __('messages.add_product') }}&nbsp;&nbsp;</a>
@@ -81,6 +100,17 @@
             $owner = $product->user;
             $ownerAvatar = $owner ? $owner->avatarUrl() : asset('upload/_avatar.png');
             $productImage = $product->product_image ?? theme_asset('img/error_plug.png');
+            $prodScript = $product->associated_script_name;
+            $catName = $product->type ? $product->type->name : null;
+            $categoryLink = '#';
+            if ($catName) {
+                // Determine context: current browser context vs product's own script context
+                $targetScript = $isScriptSpecific ? $scriptName : $prodScript;
+                
+                $categoryLink = $targetScript 
+                    ? route('store.script_category', [$targetScript, $catName])
+                    : route('store.index', ['category' => $catName]);
+            }
         @endphp
         <div class="product-preview">
             <a href="{{ route('store.show', $product->name) }}">
@@ -99,8 +129,8 @@
                 @endif
                 <p class="product-preview-title"><a href="{{ route('store.show', $product->name) }}">{{ $product->name }}</a></p>
                 <p class="product-preview-category digital">
-                    @if($product->type)
-                        <a href="#">{{ $product->type->name }}</a>
+                    @if($catName)
+                        <a href="{{ $categoryLink }}">{{ $catName }}</a>
                     @endif
                 </p>
                 <p class="product-preview-text">{{ $product->o_valuer }}</p>

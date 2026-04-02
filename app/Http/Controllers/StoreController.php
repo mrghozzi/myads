@@ -150,13 +150,6 @@ class StoreController extends Controller
     public function show($name)
     {
         $product = Product::visible()->withoutGlobalScope('store')->where('o_type', 'store')->where('name', $name)->firstOrFail();
-        
-        // If the product is a "script", we treat /store/{name} as the "Script Store" index
-        $type = Option::where('o_type', 'store_type')->where('o_parent', $product->id)->first();
-        if ($type && $type->name === StoreCategoryCatalog::SCRIPT) {
-            return $this->index(request(), $name);
-        }
-
         $status = Status::where('s_type', 7867)->where('tp_id', $product->id)->first();
         if ($status) {
             $status->related_content = $product;

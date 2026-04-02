@@ -157,4 +157,18 @@ class Product extends Model
     {
         return $this->type ? $this->type->name : '';
     }
+
+    /**
+     * Get the name of the script this product is associated with.
+     */
+    public function getAssociatedScriptNameAttribute(): ?string
+    {
+        if ($this->type && $this->type->o_mode) {
+            // Using Option model directly to bypass any scopes on Product
+            return Option::where('o_type', 'store')
+                ->where('id', $this->type->o_mode)
+                ->value('name');
+        }
+        return null;
+    }
 }
