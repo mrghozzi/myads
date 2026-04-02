@@ -34,10 +34,6 @@
 <div class="section-filters-bar v6">
       <!-- SECTION FILTERS BAR ACTIONS -->
       <div class="section-filters-bar-actions" >
-      @if(isset($site_settings->e_links) && $site_settings->e_links == 1)
-      <a href="https://github.com/mrghozzi/myads/wiki/{{ __('messages.list') }}&nbsp;{{ __('messages.textads') }}" class="button primary " target="_blank">&nbsp;<b><i class="fa fa-question-circle" aria-hidden="true"></i></b></a>
-      &nbsp;
-      @endif
       <a class="button tertiary " href="{{ route('legacy.state', ['ty' => 'link', 'st' => 'vu']) }}">&nbsp;<i class="fa fa-line-chart" aria-hidden="true"></i>&nbsp;</a>
       </div>
       <p class="text-sticker">

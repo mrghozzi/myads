@@ -59,13 +59,6 @@
                     <input type="text" name="lang" class="form-control" value="{{ old('lang', $settings->lang) }}" placeholder="{{ __('messages.language_default') }}">
                 </div>
                 <div class="col-lg-6">
-                    <label class="form-label">{{ __('messages.educational_links') }}</label>
-                    <select name="e_links" class="form-select">
-                        <option value="1" {{ old('e_links', $settings->e_links) == 1 ? 'selected' : '' }}>{{ __('messages.activate') }}</option>
-                        <option value="0" {{ old('e_links', $settings->e_links) == 0 ? 'selected' : '' }}>{{ __('messages.close') }}</option>
-                    </select>
-                </div>
-                <div class="col-lg-6">
                     <label class="form-label">{{ __('messages.timezone') }}</label>
                     <select name="timezone" class="form-select">
                         <option value="{{ $settings->timezone }}">{{ $settings->timezone }}</option>

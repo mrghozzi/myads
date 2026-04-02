@@ -461,8 +461,7 @@ return [
     'edit_website' => 'تعديل الموقع',
     'edit_widget' => 'تعديل أداة',
     'edit_with_stackedit' => 'التحرير باستخدام StackEdit',
-    'educational_links' => 'روابط تعليمية',
-    'email' => 'البريد الإلكتروني',
+        'email' => 'البريد الإلكتروني',
     'emoji_created' => 'تمت إضافة الملصق بنجاح.',
     'emoji_deleted' => 'تم حذف الملصق بنجاح.',
     'emoji_icon' => 'الأيقونة',
@@ -1821,3 +1820,4 @@ return [
     'no_marketplace_items' => 'لا توجد عناصر متاحة في السوق.',
     'others' => 'أخرى',
 ];
+

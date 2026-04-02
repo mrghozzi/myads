@@ -23,7 +23,6 @@ class Setting extends Model
         'close_text',
         'a_mail',
         'a_not',
-        'e_links',
         'facebook',
         'twitter',
         'linkedin',

@@ -111,9 +111,6 @@
             {{ __('messages.And') }}&nbsp;{{ $bannerStats['clik'] }}&nbsp;{{ __('messages.Clik_ads') }}
         </p>
         <p class="stats-decoration-text">
-            @if(isset($site_settings->e_links) && $site_settings->e_links == 1)
-              <a href="https://github.com/mrghozzi/myads/wiki/Banners Ads" class="button primary padded" target="_blank" >&nbsp;<b><i class="fa fa-question-circle" aria-hidden="true"></i></b></a>&nbsp;
-            @endif
             <a class="button tertiary padded" href="{{ url('/state?ty=banner&st=vu') }}" >&nbsp;<i class="fa fa-line-chart" aria-hidden="true"></i>&nbsp;</a>&nbsp;
             <a href="{{ url('/b_list') }}" class="button secondary padded" >{{ __('messages.list') }}&nbsp;{{ __('messages.bannads') }}</a>&nbsp;
             <a class="button padded" href="{{ url('/b_code') }}" >&nbsp;<i class="fa fa-code" aria-hidden="true"></i>&nbsp;</a>
@@ -128,9 +125,6 @@
             {{ __('messages.your') }}&nbsp;{{ $linkStats['clik'] }}&nbsp;{{ __('messages.Clik_ads') }}
         </p>
         <p class="stats-decoration-text">
-            @if(isset($site_settings->e_links) && $site_settings->e_links == 1)
-              <a href="https://github.com/mrghozzi/myads/wiki/Text Ads" class="button primary padded" target="_blank" >&nbsp;<b><i class="fa fa-question-circle" aria-hidden="true"></i></b></a>&nbsp;
-            @endif
             <a class="button tertiary padded" href="{{ url('/state?ty=link&st=vu') }}" >&nbsp;<i class="fa fa-line-chart" aria-hidden="true"></i>&nbsp;</a>&nbsp;
             <a href="{{ url('/l_list') }}" class="button secondary padded" >{{ __('messages.list') }}&nbsp;{{ __('messages.textads') }}</a>&nbsp;
             <a class="button padded" href="{{ url('/l_code') }}" >&nbsp;<i class="fa fa-code" aria-hidden="true"></i>&nbsp;</a>
@@ -192,9 +186,6 @@
             {{ __('messages.yshbv') }}&nbsp;:&nbsp;{{ $visitStats['vu'] }}
         </p>
         <p class="stats-decoration-text">
-            @if(isset($site_settings->e_links) && $site_settings->e_links == 1)
-              <a href="https://github.com/mrghozzi/myads/wiki/Exchange" class="button primary padded" target="_blank" >&nbsp;<b><i class="fa fa-question-circle" aria-hidden="true"></i></b></a>&nbsp;
-            @endif
             <a href="{{ url('/v_list') }}" class="button secondary padded" >{{ __('messages.list') }}&nbsp;{{ __('messages.exvisit') }}</a>&nbsp;
             <a class="button padded" href="javascript:void(0);" onclick="window.open('{{ url('/visits?id=' . $user->id) }}');">
               <i class="fa fa-exchange nav_icon"></i>&nbsp;{{ __('messages.exvisit') }}
@@ -208,9 +199,6 @@
         <p class="widget-box-title">{{ __('messages.Totalpoints') }} {{ $user->pts }} PTS.</p>
         <div class="widget-box-content">
             <p class="switch-option-title">
-                @if(isset($site_settings->e_links) && $site_settings->e_links == 1)
-                <a href="https://github.com/mrghozzi/myads/wiki/pts" class="button primary padded" target="_blank" >&nbsp;<b><i class="fa fa-question-circle" aria-hidden="true"></i></b></a>
-                @endif
                 <a class="button secondary padded" href="{{ url('/referral') }}" ><i class="fa fa-list" aria-hidden="true"></i>&nbsp;{{ __('messages.list') }}&nbsp;{{ __('messages.referal') }}</a>
                 <a class="button padded" href="{{ url('/r_code') }}" ><i class="fa fa-users"></i>&nbsp;{{ __('messages.referal') }}</a>
             </p>

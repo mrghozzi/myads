@@ -465,8 +465,7 @@ return [
     'edit_website' => 'ویرایش وب‌سایت',
     'edit_widget' => 'ویرایش ابزارک',
     'edit_with_stackedit' => 'ویرایش با StackEdit',
-    'educational_links' => 'لینک‌های آموزشی',
-    'email' => 'آدرس ایمیل',
+        'email' => 'آدرس ایمیل',
     'emoji_created' => 'ایموجی با موفقیت ایجاد شد',
     'emoji_deleted' => 'ایموجی با موفقیت حذف شد',
     'emoji_icon' => 'آدرس آیکون ایموجی',
@@ -1833,3 +1832,4 @@ return [
     'no_marketplace_items' => 'No marketplace items found.',
     'others' => 'Others',
 ];
+

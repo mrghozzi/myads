@@ -463,8 +463,7 @@ return [
     'edit_website' => 'Website bearbeiten',
     'edit_widget' => 'Widget bearbeiten',
     'edit_with_stackedit' => 'Mit StackEdit bearbeiten',
-    'educational_links' => 'Bildungslinks',
-    'email' => 'E-Mail-Adresse',
+        'email' => 'E-Mail-Adresse',
     'emoji_created' => 'Emoji erfolgreich erstellt',
     'emoji_deleted' => 'Emoji erfolgreich gelÃ¶scht',
     'emoji_icon' => 'Emoji-Icon-URL',
@@ -1831,3 +1830,4 @@ return [
     'no_marketplace_items' => 'No marketplace items found.',
     'others' => 'Others',
 ];
+

@@ -465,8 +465,7 @@ return [
     'edit_website' => 'Web sitesini düzenle',
     'edit_widget' => 'Bileşeni Düzenle',
     'edit_with_stackedit' => 'StackEdit ile Düzenle',
-    'educational_links' => 'Eğitici bağlantılar',
-    'email' => 'E-posta adresi',
+        'email' => 'E-posta adresi',
     'emoji_created' => 'Emoji başarıyla oluşturuldu',
     'emoji_deleted' => 'Emoji başarıyla silindi',
     'emoji_icon' => 'Emoji ?kon URL',
@@ -1833,3 +1832,4 @@ return [
     'no_marketplace_items' => 'No marketplace items found.',
     'others' => 'Others',
 ];
+

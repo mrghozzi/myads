@@ -460,8 +460,7 @@ return [
     'edit_website' => 'Edit website',
     'edit_widget' => 'Edit Widget',
     'edit_with_stackedit' => 'Edit with StackEdit',
-    'educational_links' => 'Educational links',
-    'email' => 'E-mail address',
+        'email' => 'E-mail address',
     'emoji_created' => 'Emoji created successfully',
     'emoji_deleted' => 'Emoji deleted successfully',
     'emoji_icon' => 'Emoji Icon URL',
@@ -1821,3 +1820,4 @@ return [
     'no_marketplace_items' => 'No marketplace items found.',
     'others' => 'Others',
 ];
+
