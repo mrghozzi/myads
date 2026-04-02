@@ -48,6 +48,7 @@ class DatabaseSeeder extends Seeder
             $storeCategories = [
                 ['name' => 'script', 'o_valuer' => '0', 'o_type' => 'storecat', 'o_parent' => 0, 'o_order' => 0, 'o_mode' => 'script'],
                 ['name' => 'plugins', 'o_valuer' => '0', 'o_type' => 'storecat', 'o_parent' => 0, 'o_order' => 0, 'o_mode' => 'plugins'],
+                ['name' => 'themes', 'o_valuer' => '0', 'o_type' => 'storecat', 'o_parent' => 0, 'o_order' => 0, 'o_mode' => 'themes'],
                 ['name' => 'templates', 'o_valuer' => '0', 'o_type' => 'storecat', 'o_parent' => 0, 'o_order' => 0, 'o_mode' => 'templates'],
             ];
 

@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use App\Models\Product;
 use App\Models\ProductFile;
 use App\Models\Short;
@@ -15,18 +16,24 @@ use App\Models\User;
 use App\Models\Status;
 use App\Models\ForumTopic;
 use App\Models\Emoji;
+use App\Support\StoreCategoryCatalog;
 
 class StoreController extends Controller
 {
     public function index(Request $request)
     {
-        $category = $request->query('category');
+        $category = StoreCategoryCatalog::normalize($request->query('category'));
 
         $query = Product::visible()->orderBy('id', 'desc');
 
-        if ($category && in_array($category, ['script', 'templates', 'plugins'])) {
+        $categoryNames = StoreCategoryCatalog::namesForFilter($category);
+        if ($category !== null && $categoryNames === []) {
+            $category = null;
+        }
+
+        if ($categoryNames !== []) {
             $productIds = Option::where('o_type', 'store_type')
-                ->where('name', $category)
+                ->whereIn('name', $categoryNames)
                 ->pluck('o_parent')
                 ->toArray();
             $query->whereIn('id', $productIds);
@@ -38,7 +45,7 @@ class StoreController extends Controller
         // Count products per category
         $categoryCounts = [
             'script' => Option::where('o_type', 'store_type')->where('name', 'script')->count(),
-            'templates' => Option::where('o_type', 'store_type')->where('name', 'templates')->count(),
+            'themes' => Option::where('o_type', 'store_type')->whereIn('name', StoreCategoryCatalog::namesForFilter('themes'))->count(),
             'plugins' => Option::where('o_type', 'store_type')->where('name', 'plugins')->count(),
         ];
 
@@ -158,7 +165,7 @@ class StoreController extends Controller
 
     public function create()
     {
-        $storeCategories = Option::where('o_type', 'storecat')->orderBy('id')->get();
+        $storeCategories = $this->storeCategoryOptions();
         $emojis = Emoji::all();
         return view('theme::store.create', compact('storeCategories', 'emojis'));
     }
@@ -170,7 +177,7 @@ class StoreController extends Controller
             'desc' => ['required', 'string', 'min:10', 'max:2400'],
             'vnbr' => ['required', 'string', 'min:2', 'max:12', 'regex:/^[-a-zA-Z0-9.]+$/'],
             'pts' => ['required', 'integer', 'min:0', 'max:999999'],
-            'cat_s' => ['required', 'string'],
+            'cat_s' => ['required', 'string', Rule::in(StoreCategoryCatalog::acceptedInputValues())],
             'sc_cat' => ['required', 'string'],
             'txt' => ['required', 'string', 'min:10'],
             'linkzip' => ['required', 'string'],
@@ -198,7 +205,7 @@ class StoreController extends Controller
             ]);
 
             Option::create([
-                'name' => $request->cat_s,
+                'name' => StoreCategoryCatalog::normalize($request->cat_s) ?? $request->cat_s,
                 'o_valuer' => '',
                 'o_type' => 'store_type',
                 'o_parent' => $product->id,
@@ -527,21 +534,21 @@ class StoreController extends Controller
 
     public function loadCategories(Request $request)
     {
-        $cat = $request->input('cat_s');
-        $storeCategories = Option::where('o_type', 'storecat')->orderBy('id')->get();
+        $cat = StoreCategoryCatalog::normalize($request->input('cat_s'));
+        $storeCategories = $this->storeCategoryOptions();
 
-        $html = '<label for="cat_s">'.__('categories').'</label>';
+        $html = '<label for="cat_s">'.__('messages.category').'</label>';
         $html .= '<select class="form-control cat_s" id="cat_s" name="cat_s" required>';
-        $html .= '<option value="">-- Select a categorie --</option>';
+        $html .= '<option value="">-- ' . e(__('messages.select')) . ' --</option>';
         foreach ($storeCategories as $category) {
             $selected = $cat === $category->name ? ' selected' : '';
-            $html .= '<option value="'.$category->name.'"'.$selected.'>'.__($category->name).'</option>';
+            $html .= '<option value="'.$category->name.'"'.$selected.'>'.e(__('messages.' . $category->name)).'</option>';
         }
         $html .= '</select>';
 
-        if ($cat === 'plugins' || $cat === 'templates') {
+        if ($cat === StoreCategoryCatalog::PLUGINS || $cat === StoreCategoryCatalog::THEMES) {
             $html .= '<br /><select class="form-control" name="sc_cat" required>';
-            $html .= '<option value="">-- Select a Script --</option>';
+            $html .= '<option value="">-- ' . e(__('messages.script')) . ' --</option>';
             $scriptType = Option::where('o_type', 'store_type')->where('name', 'script')->orderBy('id')->get();
             foreach ($scriptType as $script) {
                 $nameOption = Option::where('id', $script->o_parent)->first();
@@ -549,14 +556,14 @@ class StoreController extends Controller
                     $html .= '<option value="'.$script->o_parent.'">'.$nameOption->name.'</option>';
                 }
             }
-            $html .= '<option value="others">'.__('others').'</option>';
+            $html .= '<option value="others">' . e(__('messages.others')) . '</option>';
             $html .= '</select>';
-        } elseif ($cat === 'script') {
+        } elseif ($cat === StoreCategoryCatalog::SCRIPT) {
             $html .= '<br /><select class="form-control" name="sc_cat" required>';
-            $html .= '<option value="">-- Select a categorie --</option>';
+            $html .= '<option value="">-- ' . e(__('messages.select')) . ' --</option>';
             $scriptCats = Option::where('o_type', 'scriptcat')->orderBy('id')->get();
             foreach ($scriptCats as $scriptCat) {
-                $html .= '<option value="'.$scriptCat->name.'">'.__($scriptCat->name).'</option>';
+                $html .= '<option value="'.$scriptCat->name.'">'.e($scriptCat->name).'</option>';
             }
             $html .= '</select>';
         }
@@ -953,5 +960,13 @@ class StoreController extends Controller
         app(\App\Services\GamificationService::class)->recordEvent(Auth::id(), 'product_downloaded');
 
         return redirect($short->url);
+    }
+
+    private function storeCategoryOptions()
+    {
+        return Option::where('o_type', 'storecat')
+            ->whereIn('name', StoreCategoryCatalog::selectable())
+            ->orderBy('id')
+            ->get();
     }
 }

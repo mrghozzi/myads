@@ -54,6 +54,9 @@ Thumbs.db
 !/tests/Feature/ComposerRenderingTest.php
 !/tests/Feature/SiteAdPlacementTest.php
 !/tests/Feature/UpdateSafetyFeatureTest.php
+!/tests/Feature/AdminExtensionsUiTest.php
+!/tests/Feature/MarketplaceExtensionFeedTest.php
+!/tests/Feature/StoreEditorPagesTest.php
 ~/.pi/
 Documents/development_suggestions.md
 /wiki/

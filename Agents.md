@@ -1,4 +1,4 @@
-# Agents.md — MYADS v4.2.3
+# Agents.md — MYADS v4.2.4
 
 > **Purpose:** This file gives AI coding agents a fast, comprehensive understanding of the MYADS project — its architecture, conventions, key files, and rules — so they can work effectively from a fresh chat context.
 
@@ -6,7 +6,7 @@
 
 ## 1. Project Identity
 
-- **Name:** MYADS v4.2.3
+- **Name:** MYADS v4.2.4
 - **Type:** Social network + ad exchange platform for website owners
 - **Framework:** Laravel 12 (PHP 8.2+)
 - **Database:** MySQL 5.7+ / MariaDB 10.3+
@@ -642,9 +642,16 @@ php artisan storage:link
 
 ## 19E. Version 4.2.3 Update Cycle (Started 2026-04-01)
 
+- **Focus:** Performance optimizations, community-requested UI polish, and corrective bug fixes.
+- **Changes:** Refined RTL layout logic, synchronized user slugs in the admin panel, and finalized the v4.2.3 corrective baseline.
+
+---
+
+## 19F. Version 4.2.4 Update Cycle (Started 2026-04-02)
+
 - **Status:** Work in Progress.
-- **Initial Changes:** Bumped canonical `SystemVersion::CURRENT`, initialized `changelogs.md`, and refreshed `Agents.md` roadmap.
-- **Focus:** Performance optimizations and community-requested UI polish.
+- **Initial Changes:** Bumped canonical `SystemVersion::CURRENT` and migrated Marketplace Extensions feeds from the corrective v4.2.3 branch to the v4.2.4 feature cycle.
+- **Focus:** Marketplace integration, remote extension catalogs, and automated package manifest parsing.
 
 ---
 
@@ -670,4 +677,4 @@ If in doubt, update it. An outdated `Agents.md` causes future agents to make wro
 
 ---
 
-*Last updated: 2026-04-01 — MYADS v4.2.3 (Initialized v4.2.3 Update cycle)*
+*Last updated: 2026-04-02 — MYADS v4.2.4 (Initialized v4.2.4 Update cycle)*

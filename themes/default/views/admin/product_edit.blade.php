@@ -4,6 +4,7 @@
 @section('admin_shell_header_mode', 'hidden')
 
 @section('content')
+@php($selectedStoreCategory = \App\Support\StoreCategoryCatalog::normalize(optional($typeOption)->name))
 
 <div class="admin-page">
 
@@ -81,12 +82,12 @@
                     </div>
                     {{-- Category --}}
                     <div class="mb-3">
-                        <label class="form-label">{{ __('messages.categories') ?? 'Category' }}</label>
+                        <label class="form-label">{{ __('messages.category') ?? 'Category' }}</label>
                         <select name="cat_s" class="form-select">
                             <option value="">-- {{ __('messages.select') ?? 'Select' }} --</option>
                             @foreach($storeCategories as $cat)
-                                <option value="{{ $cat->name }}" {{ ($typeOption && $typeOption->name === $cat->name) ? 'selected' : '' }}>
-                                    {{ __($cat->name) }}
+                                <option value="{{ $cat->name }}" {{ $selectedStoreCategory === $cat->name ? 'selected' : '' }}>
+                                    {{ __('messages.' . $cat->name) }}
                                 </option>
                             @endforeach
                         </select>

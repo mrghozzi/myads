@@ -1811,4 +1811,12 @@ return [
     'translation_terms_admin_help' => 'راجع النص الإنجليزي الافتراضي ثم اكتب الترجمة داخل حقول قابلة للقراءة بدون الحاجة إلى التمرير الأفقي.',
     'translation_total_terms' => 'إجمالي المصطلحات',
     'translation_translated' => 'مترجم',
+    'marketplace' => 'السوق',
+    'marketplace_extensions_desc' => 'تصفح الامتدادات البعيدة من السوق وافتح صفحة كل منتج داخل المتجر.',
+    'marketplace_unavailable' => 'السوق غير متاح حالياً.',
+    'marketplace_unavailable_help' => 'تعذر تحميل كتالوج السوق البعيد. ما زال بإمكانك إدارة الامتدادات المثبتة بشكل طبيعي.',
+    'open_in_store' => 'فتح في المتجر',
+    'browse_store' => 'تصفح المتجر',
+    'no_marketplace_items' => 'لا توجد عناصر متاحة في السوق.',
+    'others' => 'أخرى',
 ];

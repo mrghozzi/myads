@@ -80,154 +80,177 @@
                 </span>
             </div>
 
-            @if(empty($plugins))
-                <div class="extension-hub__empty">
-                    <div class="extension-hub__empty-icon">
+            <ul class="nav extension-hub__tabs mb-4" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link extension-hub__tab active" data-bs-toggle="tab" data-bs-target="#plugins-installed-tab" type="button" role="tab" aria-selected="true">
                         <i class="feather-box"></i>
-                    </div>
-                    <h3 class="extension-hub__section-title mb-2">{{ __('messages.no_plugins_found') }}</h3>
-                    <p class="extension-hub__section-subtitle mb-4">{{ __('messages.no_plugins_desc') }}</p>
-                    <button type="button" class="btn btn-primary px-4 py-2 fw-bold" data-bs-toggle="modal" data-bs-target="#uploadPluginModal">
-                        <i class="feather-upload me-2"></i>{{ __('messages.upload_first_plugin') }}
+                        <span>{{ __('messages.plugins') }}</span>
                     </button>
-                </div>
-            @else
-                <div class="row g-4">
-                    @foreach($plugins as $plugin)
-                        @php
-                            $pluginUpdate = $updates[$plugin['slug']] ?? null;
-                            $pluginThumbnail = !empty($plugin['thumbnail']) ? route('admin.plugins.thumbnail', $plugin['slug']) : null;
-                            $pluginAuthor = $plugin['author'] ?? __('messages.unknown');
-                            $pluginDescription = trim((string) ($plugin['description'] ?? ''));
-                        @endphp
-                        <div class="col-12 col-xxl-6">
-                            <article class="extension-hub__list-card d-flex flex-column">
-                                <div class="extension-hub__card-head">
-                                    <div class="extension-hub__thumbnail">
-                                        @if($pluginThumbnail)
-                                            <img src="{{ $pluginThumbnail }}" alt="{{ $plugin['name'] }}" loading="lazy">
-                                        @else
-                                            {{ strtoupper(substr($plugin['name'], 0, 1)) }}
-                                        @endif
-                                    </div>
-                                    <div class="flex-grow-1 min-w-0">
-                                        <div class="extension-hub__badge-stack mb-2">
-                                            @if($plugin['is_active'])
-                                                <span class="extension-hub__status-badge extension-hub__status-badge--active">
-                                                    <i class="feather-check-circle"></i>
-                                                    {{ __('messages.active') }}
-                                                </span>
-                                            @else
-                                                <span class="extension-hub__status-badge extension-hub__status-badge--inactive">
-                                                    <i class="feather-minus-circle"></i>
-                                                    {{ __('messages.inactive') }}
-                                                </span>
-                                            @endif
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link extension-hub__tab" data-bs-toggle="tab" data-bs-target="#plugins-marketplace-tab" type="button" role="tab" aria-selected="false">
+                        <i class="feather-shopping-bag"></i>
+                        <span>{{ __('messages.marketplace') }}</span>
+                    </button>
+                </li>
+            </ul>
 
-                                            @if($pluginUpdate)
-                                                <span class="extension-hub__update-badge">
-                                                    <i class="feather-arrow-up-circle"></i>
-                                                    {{ __('messages.update_available') }}: {{ $pluginUpdate['new_version'] }}
+            <div class="tab-content">
+                <div class="tab-pane fade show active" id="plugins-installed-tab" role="tabpanel">
+                    @if(empty($plugins))
+                        <div class="extension-hub__empty">
+                            <div class="extension-hub__empty-icon">
+                                <i class="feather-box"></i>
+                            </div>
+                            <h3 class="extension-hub__section-title mb-2">{{ __('messages.no_plugins_found') }}</h3>
+                            <p class="extension-hub__section-subtitle mb-4">{{ __('messages.no_plugins_desc') }}</p>
+                            <button type="button" class="btn btn-primary px-4 py-2 fw-bold" data-bs-toggle="modal" data-bs-target="#uploadPluginModal">
+                                <i class="feather-upload me-2"></i>{{ __('messages.upload_first_plugin') }}
+                            </button>
+                        </div>
+                    @else
+                        <div class="row g-4">
+                            @foreach($plugins as $plugin)
+                                @php
+                                    $pluginUpdate = $updates[$plugin['slug']] ?? null;
+                                    $pluginThumbnail = !empty($plugin['thumbnail']) ? route('admin.plugins.thumbnail', $plugin['slug']) : null;
+                                    $pluginAuthor = $plugin['author'] ?? __('messages.unknown');
+                                    $pluginDescription = trim((string) ($plugin['description'] ?? ''));
+                                @endphp
+                                <div class="col-12 col-xxl-6">
+                                    <article class="extension-hub__list-card d-flex flex-column">
+                                        <div class="extension-hub__card-head">
+                                            <div class="extension-hub__thumbnail">
+                                                @if($pluginThumbnail)
+                                                    <img src="{{ $pluginThumbnail }}" alt="{{ $plugin['name'] }}" loading="lazy">
+                                                @else
+                                                    {{ strtoupper(substr($plugin['name'], 0, 1)) }}
+                                                @endif
+                                            </div>
+                                            <div class="flex-grow-1 min-w-0">
+                                                <div class="extension-hub__badge-stack mb-2">
+                                                    @if($plugin['is_active'])
+                                                        <span class="extension-hub__status-badge extension-hub__status-badge--active">
+                                                            <i class="feather-check-circle"></i>
+                                                            {{ __('messages.active') }}
+                                                        </span>
+                                                    @else
+                                                        <span class="extension-hub__status-badge extension-hub__status-badge--inactive">
+                                                            <i class="feather-minus-circle"></i>
+                                                            {{ __('messages.inactive') }}
+                                                        </span>
+                                                    @endif
+
+                                                    @if($pluginUpdate)
+                                                        <span class="extension-hub__update-badge">
+                                                            <i class="feather-arrow-up-circle"></i>
+                                                            {{ __('messages.update_available') }}: {{ $pluginUpdate['new_version'] }}
+                                                        </span>
+                                                    @endif
+                                                </div>
+
+                                                <h3 class="extension-hub__card-title">{{ $plugin['name'] }}</h3>
+                                                <div class="extension-hub__slug">{{ $plugin['slug'] }}</div>
+                                                <p class="extension-hub__card-description">{{ $pluginDescription !== '' ? $pluginDescription : '-' }}</p>
+                                            </div>
+                                        </div>
+
+                                        <div class="extension-hub__token-row">
+                                            <span class="extension-hub__token">
+                                                <i class="feather-tag"></i>
+                                                {{ __('messages.version') }}: {{ $plugin['version'] ?? '1.0' }}
+                                            </span>
+                                            <span class="extension-hub__token">
+                                                <i class="feather-user"></i>
+                                                {{ __('messages.author') }}: {{ $pluginAuthor }}
+                                            </span>
+                                            @if(!empty($plugin['min_myads']))
+                                                <span class="extension-hub__token">
+                                                    <i class="feather-shield"></i>
+                                                    {{ __('messages.requires_myads') }}: {{ $plugin['min_myads'] }}
                                                 </span>
                                             @endif
                                         </div>
 
-                                        <h3 class="extension-hub__card-title">{{ $plugin['name'] }}</h3>
-                                        <div class="extension-hub__slug">{{ $plugin['slug'] }}</div>
-                                        <p class="extension-hub__card-description">{{ $pluginDescription !== '' ? $pluginDescription : '-' }}</p>
-                                    </div>
-                                </div>
+                                        <div class="extension-hub__actions">
+                                            @if($plugin['is_active'])
+                                                <form action="{{ route('admin.plugins.deactivate') }}" method="POST">
+                                                    @csrf
+                                                    <input type="hidden" name="slug" value="{{ $plugin['slug'] }}">
+                                                    <button type="submit" class="btn-extension-glass btn-extension-glass--warning" title="{{ __('messages.deactivate') }}">
+                                                        <i class="feather-pause"></i>
+                                                        <span>{{ __('messages.deactivate') }}</span>
+                                                    </button>
+                                                </form>
+                                            @else
+                                                <form action="{{ route('admin.plugins.activate') }}" method="POST">
+                                                    @csrf
+                                                    <input type="hidden" name="slug" value="{{ $plugin['slug'] }}">
+                                                    <button type="submit" class="btn-extension-glass btn-extension-glass--success" title="{{ __('messages.activate') }}">
+                                                        <i class="feather-play"></i>
+                                                        <span>{{ __('messages.activate') }}</span>
+                                                    </button>
+                                                </form>
+                                            @endif
 
-                                <div class="extension-hub__token-row">
-                                    <span class="extension-hub__token">
-                                        <i class="feather-tag"></i>
-                                        {{ __('messages.version') }}: {{ $plugin['version'] ?? '1.0' }}
-                                    </span>
-                                    <span class="extension-hub__token">
-                                        <i class="feather-user"></i>
-                                        {{ __('messages.author') }}: {{ $pluginAuthor }}
-                                    </span>
-                                    @if(!empty($plugin['min_myads']))
-                                        <span class="extension-hub__token">
-                                            <i class="feather-shield"></i>
-                                            {{ __('messages.requires_myads') }}: {{ $plugin['min_myads'] }}
-                                        </span>
-                                    @endif
-                                </div>
-
-                                <div class="extension-hub__actions">
-                                    @if($plugin['is_active'])
-                                        <form action="{{ route('admin.plugins.deactivate') }}" method="POST">
-                                            @csrf
-                                            <input type="hidden" name="slug" value="{{ $plugin['slug'] }}">
-                                            <button type="submit" class="btn-extension-glass btn-extension-glass--warning" title="{{ __('messages.deactivate') }}">
-                                                <i class="feather-pause"></i>
-                                                <span>{{ __('messages.deactivate') }}</span>
+                                            <button
+                                                type="button"
+                                                class="btn-extension-glass btn-extension-glass--danger"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#extensionDeleteModal"
+                                                data-action="{{ route('admin.plugins.delete') }}"
+                                                data-slug="{{ $plugin['slug'] }}"
+                                                data-name="{{ $plugin['name'] }}"
+                                                data-identifier="{{ $plugin['slug'] }}"
+                                                data-warning="{{ __('messages.delete_plugin_warning') }}"
+                                                data-is-active="{{ $plugin['is_active'] ? '1' : '0' }}"
+                                                data-active-error="{{ __('messages.plugin_delete_active_forbidden') }}"
+                                                title="{{ __('messages.delete') }}"
+                                            >
+                                                <i class="feather-trash-2"></i>
+                                                <span>{{ __('messages.delete') }}</span>
                                             </button>
-                                        </form>
-                                    @else
-                                        <form action="{{ route('admin.plugins.activate') }}" method="POST">
-                                            @csrf
-                                            <input type="hidden" name="slug" value="{{ $plugin['slug'] }}">
-                                            <button type="submit" class="btn-extension-glass btn-extension-glass--success" title="{{ __('messages.activate') }}">
-                                                <i class="feather-play"></i>
-                                                <span>{{ __('messages.activate') }}</span>
-                                            </button>
-                                        </form>
-                                    @endif
 
-                                    <button
-                                        type="button"
-                                        class="btn-extension-glass btn-extension-glass--danger"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#extensionDeleteModal"
-                                        data-action="{{ route('admin.plugins.delete') }}"
-                                        data-slug="{{ $plugin['slug'] }}"
-                                        data-name="{{ $plugin['name'] }}"
-                                        data-identifier="{{ $plugin['slug'] }}"
-                                        data-warning="{{ __('messages.delete_plugin_warning') }}"
-                                        data-is-active="{{ $plugin['is_active'] ? '1' : '0' }}"
-                                        data-active-error="{{ __('messages.plugin_delete_active_forbidden') }}"
-                                        title="{{ __('messages.delete') }}"
-                                    >
-                                        <i class="feather-trash-2"></i>
-                                        <span>{{ __('messages.delete') }}</span>
-                                    </button>
+                                            @if($pluginUpdate && !empty($pluginUpdate['changelog']))
+                                                <button
+                                                    type="button"
+                                                    class="btn-extension-glass btn-extension-glass--muted"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#extensionChangelogModal"
+                                                    data-name="{{ $plugin['name'] }}"
+                                                    data-slug="{{ $plugin['slug'] }}"
+                                                    data-changelog="{{ base64_encode($pluginUpdate['changelog']) }}"
+                                                    data-github-url="{{ $pluginUpdate['github_url'] ?? '' }}"
+                                                    data-upgrade-action="{{ !empty($pluginUpdate['download_url']) ? route('admin.plugins.upgrade') : '' }}"
+                                                    title="{{ __('messages.view_changelog') }}"
+                                                >
+                                                    <i class="feather-info"></i>
+                                                    <span>{{ __('messages.view_changelog') }}</span>
+                                                </button>
+                                            @endif
 
-                                    @if($pluginUpdate && !empty($pluginUpdate['changelog']))
-                                        <button
-                                            type="button"
-                                            class="btn-extension-glass btn-extension-glass--muted"
-                                            data-bs-toggle="modal"
-                                            data-bs-target="#extensionChangelogModal"
-                                            data-name="{{ $plugin['name'] }}"
-                                            data-slug="{{ $plugin['slug'] }}"
-                                            data-changelog="{{ base64_encode($pluginUpdate['changelog']) }}"
-                                            data-github-url="{{ $pluginUpdate['github_url'] ?? '' }}"
-                                            data-upgrade-action="{{ !empty($pluginUpdate['download_url']) ? route('admin.plugins.upgrade') : '' }}"
-                                            title="{{ __('messages.view_changelog') }}"
-                                        >
-                                            <i class="feather-info"></i>
-                                            <span>{{ __('messages.view_changelog') }}</span>
-                                        </button>
-                                    @endif
-
-                                    @if($pluginUpdate && !empty($pluginUpdate['download_url']))
-                                        <form action="{{ route('admin.plugins.upgrade') }}" method="POST">
-                                            @csrf
-                                            <input type="hidden" name="slug" value="{{ $plugin['slug'] }}">
-                                            <button type="submit" class="btn-extension-glass btn-extension-glass--primary" title="{{ __('messages.update_now') }}">
-                                                <i class="feather-download-cloud"></i>
-                                                <span>{{ __('messages.update_now') }}</span>
-                                            </button>
-                                        </form>
-                                    @endif
+                                            @if($pluginUpdate && !empty($pluginUpdate['download_url']))
+                                                <form action="{{ route('admin.plugins.upgrade') }}" method="POST">
+                                                    @csrf
+                                                    <input type="hidden" name="slug" value="{{ $plugin['slug'] }}">
+                                                    <button type="submit" class="btn-extension-glass btn-extension-glass--primary" title="{{ __('messages.update_now') }}">
+                                                        <i class="feather-download-cloud"></i>
+                                                        <span>{{ __('messages.update_now') }}</span>
+                                                    </button>
+                                                </form>
+                                            @endif
+                                        </div>
+                                    </article>
                                 </div>
-                            </article>
+                            @endforeach
                         </div>
-                    @endforeach
+                    @endif
                 </div>
-            @endif
+
+                <div class="tab-pane fade" id="plugins-marketplace-tab" role="tabpanel">
+                    @include('theme::admin.partials.extension_marketplace_panel', ['marketplaceCatalog' => $marketplaceCatalog])
+                </div>
+            </div>
         </div>
     </section>
 </div>

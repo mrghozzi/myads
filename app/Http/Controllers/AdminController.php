@@ -40,12 +40,14 @@ use App\Models\ProductFile;
 use App\Services\GamificationService;
 use App\Services\MaintenanceModeManager;
 use App\Services\PluginManager;
+use App\Services\RemoteExtensionMarketplaceService;
 use App\Services\ThemeManager;
 use App\Support\BannerServingSettings;
 use App\Support\BannerSizeCatalog;
 use App\Support\ForumSettings;
 use App\Support\SmartAdsSettings;
 use App\Support\SmartAdTargeting;
+use App\Support\StoreCategoryCatalog;
 use Illuminate\Validation\ValidationException;
 
 class AdminController extends Controller
@@ -2540,7 +2542,10 @@ class AdminController extends Controller
         if ($typeOption && $typeOption->o_order) {
             $topic = ForumTopic::find($typeOption->o_order);
         }
-        $storeCategories = Option::where('o_type', 'storecat')->orderBy('id')->get();
+        $storeCategories = Option::where('o_type', 'storecat')
+            ->whereIn('name', StoreCategoryCatalog::selectable())
+            ->orderBy('id')
+            ->get();
         $isSuspended = Option::where('o_type', 'store_status')
             ->where('o_parent', $product->id)
             ->where('name', 'suspended')
@@ -2560,7 +2565,7 @@ class AdminController extends Controller
             'desc'    => ['required', 'string', 'min:10', 'max:2400'],
             'img'     => ['nullable', 'string'],
             'pts'     => ['required', 'integer', 'min:0', 'max:999999'],
-            'cat_s'   => ['nullable', 'string'],
+            'cat_s'   => ['nullable', 'string', \Illuminate\Validation\Rule::in(StoreCategoryCatalog::acceptedInputValues())],
             'txt'     => ['nullable', 'string'],
             'vnbr'    => ['nullable', 'string', 'min:2', 'max:12', 'regex:/^[-a-zA-Z0-9.]+$/'],
             'linkzip' => ['nullable', 'string'],
@@ -2581,7 +2586,9 @@ class AdminController extends Controller
         if ($request->filled('cat_s')) {
             $typeOption = Option::where('o_type', 'store_type')->where('o_parent', $product->id)->first();
             if ($typeOption) {
-                $typeOption->update(['name' => $request->cat_s]);
+                $typeOption->update([
+                    'name' => StoreCategoryCatalog::normalize($request->cat_s) ?? $request->cat_s,
+                ]);
             }
         }
 
@@ -2660,11 +2667,13 @@ class AdminController extends Controller
     }
 
     // Plugins Management
-    public function plugins(PluginManager $pluginManager)
+    public function plugins(PluginManager $pluginManager, RemoteExtensionMarketplaceService $marketplace)
     {
         $plugins = $pluginManager->getAllPlugins();
         $updates = $pluginManager->checkForUpdates();
-        return view('theme::admin.plugins', compact('plugins', 'updates'));
+        $marketplaceCatalog = $marketplace->catalog('plugins');
+
+        return view('theme::admin.plugins', compact('plugins', 'updates', 'marketplaceCatalog'));
     }
 
     public function activatePlugin(Request $request, PluginManager $pluginManager)
@@ -2776,11 +2785,13 @@ class AdminController extends Controller
     }
 
     // Themes Management
-    public function themes(ThemeManager $themeManager)
+    public function themes(ThemeManager $themeManager, RemoteExtensionMarketplaceService $marketplace)
     {
         $themes = $themeManager->getAllThemes();
         $updates = $themeManager->checkForUpdates();
-        return view('theme::admin.themes.index', compact('themes', 'updates'));
+        $marketplaceCatalog = $marketplace->catalog('themes');
+
+        return view('theme::admin.themes.index', compact('themes', 'updates', 'marketplaceCatalog'));
     }
 
     public function themeThumbnail($slug, ThemeManager $themeManager)

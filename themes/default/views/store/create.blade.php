@@ -3,6 +3,7 @@
 @section('content')
 @php
     $createLinkzipValue = old('linkzip', '');
+    $selectedStoreCategory = \App\Support\StoreCategoryCatalog::normalize(old('cat_s'));
 @endphp
 
 @include('theme::store.partials.editor-assets')
@@ -112,9 +113,9 @@
                                     <label for="cat_s">{{ __('messages.cat') }}</label>
                                     <div id="storecat">
                                         <select class="form-control cat_s" id="cat_s" name="cat_s" required>
-                                            <option value="">-- Select a categorie --</option>
+                                            <option value="">-- {{ __('messages.select') }} --</option>
                                             @foreach($storeCategories as $category)
-                                                <option value="{{ $category->name }}" @selected(old('cat_s') === $category->name)>{{ __($category->name) }}</option>
+                                                <option value="{{ $category->name }}" @selected($selectedStoreCategory === $category->name)>{{ __('messages.' . $category->name) }}</option>
                                             @endforeach
                                         </select>
                                     </div>
@@ -174,7 +175,7 @@
                             </div>
                             <div class="store-editor-summary-item">
                                 <span>{{ __('messages.cat') }}</span>
-                                <strong data-store-create-category>{{ old('cat_s') ? __(old('cat_s')) : '--' }}</strong>
+                                <strong data-store-create-category>{{ $selectedStoreCategory ? __('messages.' . $selectedStoreCategory) : '--' }}</strong>
                             </div>
                             <div class="store-editor-summary-item">
                                 <span>{{ __('messages.file') }}</span>

@@ -1,3 +1,12 @@
+# v4.2.4 (2026-04-02)
+> **Feature Release** — Public extension catalogs, ZIP manifest parsing, and remote marketplace browsing.
+
+### Marketplace Extensions
+* **Add**: Added public marketplace extension feeds at `/api/marketplace/extensions/plugins` and `/api/marketplace/extensions/themes` so MYADS sites can expose remote plugin and theme catalogs in JSON.
+* **Add**: Added ZIP manifest parsing for marketplace extensions, reading `plugin.json` or `theme.json` from the latest store package and caching the generated catalog for faster responses.
+* **Add**: Added a new `Marketplace` tab to `/admin/plugins` and `/admin/themes` with browse-only cards that open remote product pages on `https://www.adstn.ovh` without changing local install or upgrade behavior.
+* **Improvement**: Added the official `themes` store category while keeping legacy `templates` products readable for compatibility and merge logic in the marketplace theme feed.
+
 # v4.2.3
 > **Corrective Release** — User slug synchronization, RTL post layout fixes, and UI consistency.
 

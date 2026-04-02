@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AdsServingController;
 use App\Http\Controllers\ForumController;
+use App\Http\Controllers\MarketplaceExtensionFeedController;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,6 +26,8 @@ Route::post('/register', [AuthController::class, 'register']);
 // Legacy Ad Serving Endpoints (API version)
 Route::get('/banner', [AdsServingController::class, 'bannerScript']);
 Route::get('/link', [AdsServingController::class, 'linkScript']);
+Route::get('/marketplace/extensions/plugins', [MarketplaceExtensionFeedController::class, 'plugins'])->name('api.marketplace.extensions.plugins');
+Route::get('/marketplace/extensions/themes', [MarketplaceExtensionFeedController::class, 'themes'])->name('api.marketplace.extensions.themes');
 
 // Protected Routes (Require Sanctum)
 Route::middleware('auth:sanctum')->group(function () {
