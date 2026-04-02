@@ -115,6 +115,7 @@ return [
     'admin_module_updates' => 'Updates',
     'admin_module_users' => 'Users',
     'admin_panel' => 'Admin-Bereich',
+    'admin_theme' => 'Admin-Theme',
     'admin_removed_successfully' => 'Administrator removed successfully.',
     'admin_updated_successfully' => 'Administrator updated successfully.',
     'administrator' => 'Administrator',

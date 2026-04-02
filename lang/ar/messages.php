@@ -114,6 +114,7 @@ return [
     'admin_module_updates' => 'التحديثات',
     'admin_module_users' => 'الأعضاء',
     'admin_panel' => 'لوحة التحكم',
+    'admin_theme' => 'قالب لوحة الإدارة',
     'admin_removed_successfully' => 'تم حذف المدير بنجاح.',
     'admin_updated_successfully' => 'تم تحديث المدير بنجاح.',
     'administrator' => 'المديرون',

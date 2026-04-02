@@ -7,6 +7,13 @@
 * **Add**: Added a new `Marketplace` tab to `/admin/plugins` and `/admin/themes` with browse-only cards that open remote product pages on `https://www.adstn.ovh` without changing local install or upgrade behavior.
 * **Improvement**: Added the official `themes` store category while keeping legacy `templates` products readable for compatibility and merge logic in the marketplace theme feed.
 
+### 🎨 Admin Panel Architecture (Super-Independence)
+* **Feature**: Decoupled the **Admin Panel Templates** from the primary public theme. Admin templates now reside in a dedicated root-level `admin_themes/` directory, ensuring that future admin panel redesigns do not affect the public site design.
+* **Architecture**: Introduced a new `admin::` view namespace in `AppServiceProvider` that dynamically resolves templates based on the active admin theme stored in the `options` table.
+* **Add**: Added a dedicated **Admin Theme** setting in `/admin/settings`, allowing administrators to switch admin panel designs independently from the main site theme.
+* **Helper**: Introduced the `admin_asset()` helper to manage admin-specific CSS, JS, and image assets, ensuring they are served from the independent `admin_themes/` repository.
+* **Cleanup**: Migrated 39+ controllers to use the new `admin::` namespace and purged legacy admin templates from the default public theme, resulting in a cleaner and more modular codebase.
+
 # v4.2.3
 > **Corrective Release** — User slug synchronization, RTL post layout fixes, and UI consistency.
 

@@ -115,6 +115,7 @@ return [
     'admin_module_updates' => 'التحدیثات',
     'admin_module_users' => 'الأعضاء',
     'admin_panel' => 'پنل مدیریت',
+    'admin_theme' => 'قالب مدیریت',
     'admin_removed_successfully' => 'مدیر با موفقیت حذف شد.',
     'admin_updated_successfully' => 'اطلاعات مدیر با موفقیت بروزرسانی شد.',
     'administrator' => 'مدیر',
