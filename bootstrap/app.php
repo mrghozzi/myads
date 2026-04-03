@@ -104,6 +104,16 @@ return Application::configure(basePath: dirname(__DIR__))
             }
         });
 
+        $exceptions->render(function (\Throwable $e) {
+            if (! \App\Support\DatabaseExceptionClassifier::shouldRenderServiceUnavailable($e)) {
+                return null;
+            }
+
+            return response()
+                ->view('errors.database-unavailable', [], 503)
+                ->header('Retry-After', '300');
+        });
+
         // Redirect to installer if APP_KEY is missing (fresh install)
         $exceptions->renderable(function (\Illuminate\Encryption\MissingAppKeyException $e) {
             if ($isTestingContext) {
