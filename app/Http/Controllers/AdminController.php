@@ -1833,16 +1833,21 @@ class AdminController extends Controller
             'code_ads' => 'nullable',
         ]);
 
-        $code = $request->input("code_ads.$id");
-        if ($code === null) {
-            $code = $request->input('code_ads');
+        $allCodes = $request->input('code_ads');
+        
+        // If it's an array (from the current view), we extract ONLY our ID
+        if (is_array($allCodes)) {
+            $code = $allCodes[$id] ?? null;
+        } else {
+            // Fallback for legacy calls where code_ads might be a single string
+            $code = $allCodes;
         }
 
         $ad->update([
-            'code_ads' => $code
+            'code_ads' => $code ?? ''
         ]);
 
-        return redirect()->back()->with('success', __('ad_updated'));
+        return redirect()->back()->with('success', __('messages.ad_updated') ?? 'Ad Updated');
     }
 
     public function updateSiteAds(Request $request)
@@ -1853,16 +1858,25 @@ class AdminController extends Controller
         ]);
 
         $codes = $request->input('code_ads', []);
-        foreach ($codes as $id => $code) {
-            if (!is_numeric($id)) {
-                continue;
+        
+        try {
+            foreach ($codes as $id => $code) {
+                if (!is_numeric($id)) {
+                    continue;
+                }
+
+                // Ensure $code is a string (cast null to empty string)
+                $codeToSave = is_array($code) ? json_encode($code) : ($code ?? '');
+
+                Ad::where('id', $id)->update([
+                    'code_ads' => $codeToSave,
+                ]);
             }
-            Ad::where('id', $id)->update([
-                'code_ads' => $code,
-            ]);
+        } catch (\Exception $e) {
+            return redirect()->back()->withErrors([__('messages.error') . ': ' . $e->getMessage()]);
         }
 
-        return redirect()->back()->with('success', __('ad_updated'));
+        return redirect()->back()->with('success', __('messages.ad_updated') ?? 'Ads Updated');
     }
 
     // Reports Management
