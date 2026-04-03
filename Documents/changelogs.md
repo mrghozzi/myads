@@ -24,6 +24,17 @@
 * **Removal**: Permanently removed the **Educational Links** (روابط تعليمية) feature from the entire platform to streamline the user and admin experience.
 * **Cleanup**: Purged `e_links` logic and help-center icon triggers from the User Dashboard, Forum, Visit Exchange, and Ads management screens.
 * **Database**: Updated the `Setting` model to exclude legacy `e_links` data while maintaining schema compatibility.
+### 🛡️ Admin Management & Fixes
+* **Fix**: Resolved a critical synchronization bug in the **User Edit** form (`/admin/users/{id}/edit`) where updating the "User Slug" would unintentionally overwrite the "Username".
+* **Improvement**: Decoupled **Username** and **User Slug** updates in the admin panel, allowing administrators to manage login identities and profile handles independently.
+* **Security**: Added robust unique validation for `username` and `email` during admin-side user updates to prevent accidental account conflicts.
+* **Fix**: Resolved `500 Internal Server Error` in the **Arabic Fixer** plugin after the admin template decoupling by correcting the layout namespace reference.
+* **Fix**: Corrected database table name mapping in the Arabic Fixer service to resolve failed character-fix operations on forum comments.
+
+### 📢 Site Ads & Inventory Reliability
+* **Fix**: Resolved `500 Internal Server Error` and potential data corruption on the **Site Ads** management page (`/admin/site-ads`) when using the "Save All" feature.
+* **Fix**: Standardized individual ad saving logic to prevent cross-contamination between different ad slots (e.g., Header vs Footer) during update operations.
+* **Stability**: Implemented strict non-null enforcement for ad code fields, preventing SQL integrity violations when clearing ad content.
 
 # v4.2.3
 > **Corrective Release** — User slug synchronization, RTL post layout fixes, and UI consistency.

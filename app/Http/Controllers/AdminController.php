@@ -518,8 +518,8 @@ class AdminController extends Controller
         $user = User::findOrFail($id);
         
         $request->validate([
-            'username' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
+            'username' => 'required|string|max:255|unique:users,username,' . $id,
+            'email' => 'required|email|max:255|unique:users,email,' . $id,
             'slug' => 'required|string|max:255',
             'ucheck' => 'required|in:0,1',
             'pts' => 'required|numeric',
@@ -529,11 +529,11 @@ class AdminController extends Controller
             'nsmart' => 'required|numeric',
         ]);
 
-        // slugify input to ensure URL safety
+        // slugify input to ensure URL safety for the slug handle
         $slug = Str::slug($request->slug);
 
         $user->update([
-            'username' => $slug, // Synchronize username with slug to fix profile link inconsistency
+            'username' => $request->username,
             'email' => $request->email,
             'ucheck' => $request->ucheck,
             'pts' => $request->pts,
@@ -543,11 +543,11 @@ class AdminController extends Controller
             'nsmart' => $request->nsmart,
         ]);
 
-        // Update Slug Option
+        // Update Slug Option independently
         Option::updateOrCreate(
             ['o_type' => 'user', 'o_order' => $id],
             [
-                'name' => $slug,
+                'name' => $request->username,
                 'o_valuer' => $slug
             ]
         );
