@@ -527,6 +527,21 @@
     @endif
 
     @stack('head')
+    <?php
+        if (class_exists(\MyAds\Plugins\SupportChat\Services\SupportChatService::class)) {
+            try {
+                $supportChatPayload = app(\MyAds\Plugins\SupportChat\Services\SupportChatService::class)->widgetPayload(request());
+                if (!empty($supportChatPayload['should_render'])) {
+                    echo view('support_chat::partials.widget_head', $supportChatPayload)->render();
+                }
+            } catch (\Throwable $supportChatException) {
+                \Illuminate\Support\Facades\Log::warning('Support chat head inline injection failed.', [
+                    'reason' => $supportChatException->getMessage(),
+                ]);
+            }
+        }
+        \App\Helpers\Hooks::do_action('theme_master_head_end');
+    ?>
     <style>
         .menu-fallback-icon {
             width: 20px;
@@ -1514,5 +1529,20 @@
     @include('theme::partials._cookie_consent')
 
     @stack('scripts')
+    <?php
+        if (class_exists(\MyAds\Plugins\SupportChat\Services\SupportChatService::class)) {
+            try {
+                $supportChatPayload = app(\MyAds\Plugins\SupportChat\Services\SupportChatService::class)->widgetPayload(request());
+                if (!empty($supportChatPayload['should_render'])) {
+                    echo view('support_chat::partials.widget', $supportChatPayload)->render();
+                }
+            } catch (\Throwable $supportChatException) {
+                \Illuminate\Support\Facades\Log::warning('Support chat body inline injection failed.', [
+                    'reason' => $supportChatException->getMessage(),
+                ]);
+            }
+        }
+        \App\Helpers\Hooks::do_action('theme_master_before_body_close');
+    ?>
 </body>
 </html>
