@@ -520,6 +520,7 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::post('/maintenance/clear-cache', [AdminController::class, 'clearCache'])->name('admin.maintenance.clear_cache');
     Route::post('/maintenance/migrate', [AdminController::class, 'runMigrations'])->name('admin.maintenance.migrate');
     Route::post('/maintenance/db-repair', [AdminController::class, 'dbRepair'])->name('admin.maintenance.db_repair');
+    Route::post('/maintenance/repair-orphaned', [AdminController::class, 'repairOrphanedRecords'])->name('admin.maintenance.repair_orphaned');
 
     // Security
     Route::get('/security', [AdminSecurityController::class, 'index'])->name('admin.security.index');

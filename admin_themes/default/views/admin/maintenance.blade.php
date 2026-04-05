@@ -199,7 +199,7 @@
 </div>
 
 <div class="row g-4">
-    <div class="col-md-4">
+    <div class="col-md-3">
         <div class="card h-100 shadow-sm border-0 transition-hover">
             <div class="card-body text-center p-4">
                 <div class="avatar avatar-lg bg-soft-primary text-primary mb-3 mx-auto">
@@ -217,7 +217,7 @@
         </div>
     </div>
 
-    <div class="col-md-4">
+    <div class="col-md-3">
         <div class="card h-100 shadow-sm border-0 transition-hover">
             <div class="card-body text-center p-4">
                 <div class="avatar avatar-lg bg-soft-success text-success mb-3 mx-auto">
@@ -235,7 +235,7 @@
         </div>
     </div>
 
-    <div class="col-md-4">
+    <div class="col-md-3">
         <div class="card h-100 shadow-sm border-0 transition-hover">
             <div class="card-body text-center p-4">
                 <div class="avatar avatar-lg bg-soft-info text-info mb-3 mx-auto">
@@ -252,12 +252,31 @@
             </div>
         </div>
     </div>
+
+    <div class="col-md-3">
+        <div class="card h-100 shadow-sm border-0 transition-hover">
+            <div class="card-body text-center p-4">
+                <div class="avatar avatar-lg bg-soft-warning text-warning mb-3 mx-auto">
+                    <i class="fa-solid fa-link-slash fs-2"></i>
+                </div>
+                <h5 class="card-title fw-bold">{{ __('messages.repair_orphaned_records') }}</h5>
+                <p class="text-muted small mb-4">{{ __('messages.repair_orphaned_records_desc') }}</p>
+                <form action="{{ route('admin.maintenance.repair_orphaned') }}" method="POST">
+                    @csrf
+                    <button type="submit" class="btn btn-outline-warning w-100 mt-auto">
+                        <i class="fa-solid fa-scissors me-2"></i> {{ __('messages.execute') }}
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 
 <style>
     .bg-soft-primary { background-color: rgba(97, 93, 250, 0.1); }
     .bg-soft-success { background-color: rgba(30, 197, 137, 0.1); }
     .bg-soft-info { background-color: rgba(0, 204, 255, 0.1); }
+    .bg-soft-warning { background-color: rgba(255, 193, 7, 0.1); }
     .bg-soft-danger { background-color: rgba(255, 92, 120, 0.1); }
     .transition-hover:hover { transform: translateY(-5px); transition: all 0.3s ease; }
     .avatar-lg { width: 64px; height: 64px; display: flex; align-items: center; justify-content: center; border-radius: 12px; }

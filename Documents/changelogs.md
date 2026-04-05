@@ -42,6 +42,14 @@
 * **Change**: Removed banner repeat-window and Smart Ads divisor controls from `/admin/settings` so general site settings stay focused on site-wide metadata.
 * **Fix**: Resolved a `500 Internal Server Error` on `/b_code` by stabilizing the banner code page variable bootstrapping after the new ad-branding integration.
 
+### 👥 User Deletion & Data Integrity
+* **Fix**: Resolved `500 Internal Server Error` on `/u/{username}/followers` and `/u/{username}/following` pages when a deleted member still had follow records in the database.
+* **Fix**: Follower and following counts on profile pages no longer include deleted members, ensuring accurate statistics.
+* **Fix**: The `deleteUser()` admin action now performs full cleanup of orphaned data: follow/reaction records (`like` table), user options (slug, social links, point history), notifications, statuses, and messages.
+* **Add**: Added a null-safety guard to the `user_preview_landscape` partial to gracefully skip rendering for deleted users as a defense-in-depth layer.
+* **Add**: Added a new **Repair Orphaned Records** tool to the `/admin/maintenance` page, allowing administrators to clean up follow and reaction records linked to previously deleted members.
+* **i18n**: Added translation keys for the orphaned records repair feature across all **9 supported languages**.
+
 # v4.2.3
 > **Corrective Release** — User slug synchronization, RTL post layout fixes, and UI consistency.
 

@@ -38,8 +38,8 @@ class ProfileController extends Controller
             ? Like::where('uid', $viewer->id)->where('sid', $user->id)->where('type', 1)->exists()
             : false;
 
-        $followersCount = Like::where('sid', $user->id)->where('type', 1)->count();
-        $followingCount = Like::where('uid', $user->id)->where('type', 1)->count();
+        $followersCount = Like::where('sid', $user->id)->where('type', 1)->whereHas('user')->count();
+        $followingCount = Like::where('uid', $user->id)->where('type', 1)->whereHas('targetUser')->count();
         $postsCount = Status::where('uid', $user->id)->where('s_type', '!=', 5)->count();
         $selectedTab = (string) $request->query('tab', 'timeline');
         $profileContentTabs = ['timeline', 'blog', 'links', 'forum', 'store', 'photos'];
@@ -183,6 +183,7 @@ class ProfileController extends Controller
 
         $followers = Like::where('sid', $user->id)
             ->where('type', 1)
+            ->whereHas('user')
             ->with('user')
             ->paginate(20);
 
@@ -191,8 +192,8 @@ class ProfileController extends Controller
             ? Like::where('uid', $viewer->id)->where('sid', $user->id)->where('type', 1)->exists()
             : false;
 
-        $followersCount = Like::where('sid', $user->id)->where('type', 1)->count();
-        $followingCount = Like::where('uid', $user->id)->where('type', 1)->count();
+        $followersCount = Like::where('sid', $user->id)->where('type', 1)->whereHas('user')->count();
+        $followingCount = Like::where('uid', $user->id)->where('type', 1)->whereHas('targetUser')->count();
         $postsCount = Status::where('uid', $user->id)->where('s_type', '!=', 5)->count();
 
         return view('theme::profile.followers', compact('user', 'followers', 'cover', 'isFollowing', 'followersCount', 'followingCount', 'postsCount'));
@@ -208,6 +209,7 @@ class ProfileController extends Controller
 
         $following = Like::where('uid', $user->id)
             ->where('type', 1)
+            ->whereHas('targetUser')
             ->with('targetUser')
             ->paginate(20);
 
@@ -216,8 +218,8 @@ class ProfileController extends Controller
             ? Like::where('uid', $viewer->id)->where('sid', $user->id)->where('type', 1)->exists()
             : false;
 
-        $followersCount = Like::where('sid', $user->id)->where('type', 1)->count();
-        $followingCount = Like::where('uid', $user->id)->where('type', 1)->count();
+        $followersCount = Like::where('sid', $user->id)->where('type', 1)->whereHas('user')->count();
+        $followingCount = Like::where('uid', $user->id)->where('type', 1)->whereHas('targetUser')->count();
         $postsCount = Status::where('uid', $user->id)->where('s_type', '!=', 5)->count();
 
         return view('theme::profile.following', compact('user', 'following', 'cover', 'isFollowing', 'followersCount', 'followingCount', 'postsCount'));

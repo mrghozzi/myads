@@ -19,6 +19,8 @@ use App\Models\ForumTopic;
 use App\Models\ForumModerator;
 use App\Models\Directory;
 use App\Models\Product;
+use App\Models\Like;
+use App\Models\Message;
 
 use App\Models\Banner;
 use App\Models\Link;
@@ -604,6 +606,29 @@ class AdminController extends Controller
     public function deleteUser($id)
     {
         $user = User::findOrFail($id);
+
+        // Clean up follow relationships (like records) where this user is follower or followed
+        Like::where('uid', $id)->where('type', 1)->delete();
+        Like::where('sid', $id)->where('type', 1)->delete();
+
+        // Clean up other reactions/likes by or for this user
+        Like::where('uid', $id)->delete();
+        Like::where('sid', $id)->delete();
+
+        // Clean up related options (user slug, social links, point history, etc.)
+        Option::where('o_type', 'user')->where('o_order', $id)->delete();
+        Option::where('o_type', 'user_social_links')->where('o_parent', $id)->delete();
+        Option::where('o_type', 'hest_pts')->where('o_parent', $id)->delete();
+
+        // Clean up notifications
+        Notification::where('uid', $id)->delete();
+
+        // Clean up statuses
+        Status::where('uid', $id)->delete();
+
+        // Clean up messages
+        Message::where('uid', $id)->orWhere('rid', $id)->delete();
+
         $user->delete();
         
         return redirect()->route('admin.users')->with('success', __('User deleted successfully'));
@@ -3021,6 +3046,29 @@ class AdminController extends Controller
         } catch (\Throwable $e) {
             $this->maintenanceMode->disable(Auth::user(), 'db_repair_error');
             return redirect()->back()->with('error', __('Failed to perform database maintenance: ') . $e->getMessage());
+        }
+    }
+    public function repairOrphanedRecords()
+    {
+        $this->maintenanceMode->enable(Auth::user(), 'repair_orphaned_records');
+        try {
+            $userIds = User::pluck('id')->toArray();
+
+            // Clean up follow records referencing deleted users
+            $deletedFollowerRecords = Like::where('type', 1)->whereNotIn('uid', $userIds)->delete();
+            $deletedFollowedRecords = Like::where('type', 1)->whereNotIn('sid', $userIds)->delete();
+
+            // Clean up other orphaned like/reaction records
+            $deletedOtherUid = Like::whereNotIn('uid', $userIds)->delete();
+            $deletedOtherSid = Like::whereNotIn('sid', $userIds)->delete();
+
+            $totalCleaned = $deletedFollowerRecords + $deletedFollowedRecords + $deletedOtherUid + $deletedOtherSid;
+
+            $this->maintenanceMode->disable(Auth::user(), 'repair_orphaned_records_success');
+            return redirect()->back()->with('success', __('messages.orphaned_records_repaired', ['count' => $totalCleaned]));
+        } catch (\Throwable $e) {
+            $this->maintenanceMode->disable(Auth::user(), 'repair_orphaned_records_error');
+            return redirect()->back()->with('error', __('messages.orphaned_records_repair_failed') . ': ' . $e->getMessage());
         }
     }
 }

@@ -1,3 +1,6 @@
+@if(!$targetUser)
+    @php return; @endphp
+@endif
 @php
     // Fetch Cover Photo from Options for this specific user
     $coverOption = \App\Models\Option::where('o_type', 'user')->where('o_order', $targetUser->id)->first();
