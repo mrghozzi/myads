@@ -371,6 +371,7 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::put('/users/{id}', [AdminController::class, 'updateUser'])->name('admin.users.update');
     Route::put('/users/{id}/password', [AdminController::class, 'updateUserPassword'])->name('admin.users.password');
     Route::delete('/users/{id}', [AdminController::class, 'deleteUser'])->name('admin.users.delete');
+    Route::delete('/users/bulk/delete', [AdminController::class, 'bulkDeleteUsers'])->name('admin.users.bulk_delete');
     Route::get('/admins', [AdminAdminsController::class, 'index'])->name('admin.admins');
     Route::post('/admins', [AdminAdminsController::class, 'store'])->name('admin.admins.store');
     Route::put('/admins/{siteAdmin}', [AdminAdminsController::class, 'update'])->name('admin.admins.update');

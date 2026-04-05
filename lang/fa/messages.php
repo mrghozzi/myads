@@ -1851,5 +1851,8 @@ return [
     'banner_repeat_window_title' => 'Banner repeat window (minutes)',
     'banner_repeat_window_help' => 'Prevents showing the same banner to the same visitor on the same publisher within this time window. Use 0 to disable.',
     'others' => 'Others',
+    'delete_selected' => 'حذف انتخاب‌شده‌ها',
+    'selected_users_count' => 'تعداد کاربران انتخاب‌شده',
+    'bulk_delete_warning' => 'این عمل به طور دائمی تمام کاربران انتخاب‌شده و داده‌های مرتبط با آن‌ها را حذف خواهد کرد.',
 ];
 

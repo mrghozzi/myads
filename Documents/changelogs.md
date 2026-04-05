@@ -43,14 +43,18 @@
 * **Fix**: Resolved a `500 Internal Server Error` on `/b_code` by stabilizing the banner code page variable bootstrapping after the new ad-branding integration.
 
 ### 👥 User Deletion & Data Integrity
+* **Feature**: Added **Bulk User Deletion** to the admin users management page (`/admin/users`), allowing administrators to select multiple members and permanently delete them in a single action.
+* **Improvement**: Added a reactive deletion confirmation modal that dynamically displays the total count of selected users to prevent accidental bulk deletions.
+* **Fix**: Resolved a critical SQL `Column not found` error (`uid`, `rid`) in the `deleteUser()` action that previously triggered a `500 Internal Server Error` during both individual and bulk user deletions.
 * **Fix**: Resolved `500 Internal Server Error` on `/u/{username}/followers` and `/u/{username}/following` pages when a deleted member still had follow records in the database.
 * **Fix**: Follower and following counts on profile pages no longer include deleted members, ensuring accurate statistics.
-* **Fix**: The `deleteUser()` admin action now performs full cleanup of orphaned data: follow/reaction records (`like` table), user options (slug, social links, point history), notifications, statuses, and messages.
+* **Fix**: The `deleteUser()` and bulk delete admin actions now perform full cleanup of orphaned data: follow/reaction records, user options (slug, social links, point history), notifications, statuses, and messages.
+* **Security**: Enforced hard-coded protection logic inside the centralized `performUserDeletion` service to secure the super-admin account (ID 1) from being deleted during single or bulk operations.
 * **Add**: Added a null-safety guard to the `user_preview_landscape` partial to gracefully skip rendering for deleted users as a defense-in-depth layer.
 * **Add**: Added a new **Repair Orphaned Records** tool to the `/admin/maintenance` page, allowing administrators to clean up follow and reaction records linked to previously deleted members.
-* **Add**: Added a new **Repair Orphaned Content** tool to the `/admin/maintenance` page, allowing administrators to clean up orphaned comments and reactions linked to deleted posts, forum topics, directory listings, store products, and order requests across all content types (13-step deep cleanup).
-* **Add**: Added a new **Repair Orphaned Stats** tool to the `/admin/maintenance` page, allowing administrators to clean up orphaned view and click statistics from the `state` table for deleted ads (banners, links, and smart ads).
-* **i18n**: Added translation keys for the orphaned records and content repair features across all **9 supported languages**.
+* **Add**: Added a new **Repair Orphaned Content** tool to the `/admin/maintenance` page, allowing administrators to clean up orphaned comments and reactions linked to deleted posts, forum topics, directory listings, store products, and order requests across all content types.
+* **Add**: Added a new **Repair Orphaned Stats** tool to the `/admin/maintenance` page, allowing administrators to clean up orphaned view and click statistics from the `state` table for deleted ads.
+* **i18n**: Added translation keys for the bulk deletion interface (`delete_selected`, `selected_users_count`, `bulk_delete_warning`) and orphaned records tools across all **9 supported languages**.
 
 # v4.2.3
 > **Corrective Release** — User slug synchronization, RTL post layout fixes, and UI consistency.

@@ -1849,5 +1849,8 @@ return [
     'banner_repeat_window_title' => 'Banner repeat window (minutes)',
     'banner_repeat_window_help' => 'Prevents showing the same banner to the same visitor on the same publisher within this time window. Use 0 to disable.',
     'others' => 'Others',
+    'delete_selected' => 'Ausgewählte löschen',
+    'selected_users_count' => 'Anzahl der ausgewählten Benutzer',
+    'bulk_delete_warning' => 'Diese Aktion löscht alle ausgewählten Benutzer und deren zugehörige Daten dauerhaft.',
 ];
 

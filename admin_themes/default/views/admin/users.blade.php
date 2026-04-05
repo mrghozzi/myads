@@ -154,6 +154,17 @@
                         </a>
                     </div>
                 </div>
+
+                <button 
+                    type="button" 
+                    id="bulkDeleteBtn" 
+                    class="btn btn-danger admin-icon-btn d-none ms-2" 
+                    title="{{ __('messages.delete_selected') ?? 'Delete Selected' }}"
+                    data-bs-toggle="modal"
+                    data-bs-target="#bulkDeleteModal"
+                >
+                    <i class="feather-trash-2"></i>
+                </button>
             </div>
 
             @if(!empty($activeFilters))
@@ -241,7 +252,7 @@
                             <tr>
                                 <td data-label="#">
                                     <div class="custom-control custom-checkbox ms-1">
-                                        <input type="checkbox" class="custom-control-input checkbox" id="checkBox_{{ $user->id }}">
+                                        <input type="checkbox" class="custom-control-input checkbox" id="checkBox_{{ $user->id }}" value="{{ $user->id }}" {{ (int)$user->id === 1 ? 'disabled' : '' }}>
                                         <label class="custom-control-label" for="checkBox_{{ $user->id }}"></label>
                                     </div>
                                 </td>
@@ -378,21 +389,102 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="bulkDeleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">{{ __('messages.delete_selected') ?? 'Delete Selected' }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <div class="admin-modal-icon is-danger">
+                    <i class="feather-trash-2"></i>
+                </div>
+                <h4>{{ __('messages.are_you_sure') }}</h4>
+                <p class="text-muted mb-0">
+                    {{ __('messages.selected_users_count') ?? 'Selected users count' }}:
+                    <strong id="bulkDeleteCount">0</strong>
+                </p>
+                <div class="alert alert-warning mt-3 mb-0 text-start">
+                    <i class="feather-alert-triangle me-2"></i>
+                    {{ __('messages.bulk_delete_warning') ?? 'This action will permanently delete all selected users and their associated data.' }}
+                </div>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('messages.cancel') }}</button>
+                <form action="{{ route('admin.users.bulk_delete') }}" method="POST" id="bulkDeleteForm" class="d-inline">
+                    @csrf
+                    @method('DELETE')
+                    <div id="bulkDeleteIdsContainer"></div>
+                    <button type="submit" class="btn btn-danger">{{ __('messages.delete') }}</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @push('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const checkAll = document.getElementById('checkAllUsers');
-        const checkboxes = document.querySelectorAll('.checkbox');
+        const checkboxes = document.querySelectorAll('.checkbox:not(:disabled)');
         const deleteModal = document.getElementById('deleteUserModal');
         const deleteForm = document.getElementById('deleteUserModalForm');
         const deleteText = document.getElementById('deleteUserModalText');
+
+        const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
+        const bulkDeleteModal = document.getElementById('bulkDeleteModal');
+        const bulkDeleteForm = document.getElementById('bulkDeleteForm');
+        const bulkDeleteCount = document.getElementById('bulkDeleteCount');
+        const bulkDeleteIdsContainer = document.getElementById('bulkDeleteIdsContainer');
+
+        function updateBulkDeleteVisibility() {
+            const checkedCount = document.querySelectorAll('.checkbox:checked:not(:disabled)').length;
+            if (checkedCount > 0) {
+                bulkDeleteBtn.classList.remove('d-none');
+            } else {
+                bulkDeleteBtn.classList.add('d-none');
+            }
+        }
 
         if (checkAll) {
             checkAll.addEventListener('change', function () {
                 checkboxes.forEach(function (checkbox) {
                     checkbox.checked = checkAll.checked;
+                });
+                updateBulkDeleteVisibility();
+            });
+        }
+
+        checkboxes.forEach(function (checkbox) {
+            checkbox.addEventListener('change', function() {
+                updateBulkDeleteVisibility();
+                
+                if (checkAll) {
+                    const allChecked = Array.from(checkboxes).every(c => c.checked);
+                    const someChecked = Array.from(checkboxes).some(c => c.checked);
+                    checkAll.checked = allChecked;
+                    checkAll.indeterminate = someChecked && !allChecked;
+                }
+            });
+        });
+
+        if (bulkDeleteModal) {
+            bulkDeleteModal.addEventListener('show.bs.modal', function () {
+                const checkedCheckboxes = document.querySelectorAll('.checkbox:checked:not(:disabled)');
+                const count = checkedCheckboxes.length;
+                
+                bulkDeleteCount.textContent = count;
+                bulkDeleteIdsContainer.innerHTML = '';
+                
+                checkedCheckboxes.forEach(cb => {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = 'ids[]';
+                    input.value = cb.value;
+                    bulkDeleteIdsContainer.appendChild(input);
                 });
             });
         }

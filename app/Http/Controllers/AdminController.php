@@ -606,7 +606,45 @@ class AdminController extends Controller
 
     public function deleteUser($id)
     {
-        $user = User::findOrFail($id);
+        $this->performUserDeletion($id);
+        
+        return redirect()->route('admin.users')->with('success', __('User deleted successfully'));
+    }
+
+    public function bulkDeleteUsers(Request $request)
+    {
+        $ids = $request->input('ids');
+
+        if (!$ids || !is_array($ids)) {
+            return redirect()->back()->with('error', __('messages.no_selection') ?? 'No users selected');
+        }
+
+        // Filter out super-admin (ID 1) for safety
+        $ids = array_filter($ids, fn($id) => (int)$id !== 1);
+
+        if (empty($ids)) {
+            return redirect()->back()->with('error', __('messages.action_not_allowed') ?? 'Action not allowed');
+        }
+
+        foreach ($ids as $id) {
+            $this->performUserDeletion($id);
+        }
+
+        return redirect()->route('admin.users')->with('success', __('messages.users_deleted_successfully') ?? 'Selected users deleted successfully');
+    }
+
+    /**
+     * Internal helper to clean up all related data and delete a user.
+     * 
+     * @param int $id
+     * @return void
+     */
+    private function performUserDeletion($id)
+    {
+        $user = User::find($id);
+        if (!$user || (int)$id === 1) {
+            return;
+        }
 
         // Clean up follow relationships (like records) where this user is follower or followed
         Like::where('uid', $id)->where('type', 1)->delete();
@@ -628,11 +666,9 @@ class AdminController extends Controller
         Status::where('uid', $id)->delete();
 
         // Clean up messages
-        Message::where('uid', $id)->orWhere('rid', $id)->delete();
+        Message::where('us_env', $id)->orWhere('us_rec', $id)->delete();
 
         $user->delete();
-        
-        return redirect()->route('admin.users')->with('success', __('User deleted successfully'));
     }
 
     public function banners(Request $request)
