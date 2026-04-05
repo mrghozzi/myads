@@ -3175,4 +3175,45 @@ class AdminController extends Controller
             return redirect()->back()->with('error', __('messages.orphaned_content_repair_failed') . ': ' . $e->getMessage());
         }
     }
+
+    public function repairOrphanedStats()
+    {
+        $this->maintenanceMode->enable(Auth::user(), 'repair_orphaned_stats');
+        try {
+            $totalCleaned = 0;
+
+            // 1. Orphaned banner stats (banner or vu)
+            $bannerIds = DB::table('banner')->pluck('id')->toArray();
+            if (!empty($bannerIds)) {
+                $totalCleaned += State::whereIn('t_name', ['banner', 'vu'])->whereNotIn('pid', $bannerIds)->delete();
+            } else {
+                $totalCleaned += State::whereIn('t_name', ['banner', 'vu'])->count();
+                State::whereIn('t_name', ['banner', 'vu'])->delete();
+            }
+
+            // 2. Orphaned link stats (link or clik)
+            $linkIds = DB::table('link')->pluck('id')->toArray();
+            if (!empty($linkIds)) {
+                $totalCleaned += State::whereIn('t_name', ['link', 'clik'])->whereNotIn('pid', $linkIds)->delete();
+            } else {
+                $totalCleaned += State::whereIn('t_name', ['link', 'clik'])->count();
+                State::whereIn('t_name', ['link', 'clik'])->delete();
+            }
+
+            // 3. Orphaned smart ad stats (smart or smart_click)
+            $smartAdIds = DB::table('smart_ads')->pluck('id')->toArray();
+            if (!empty($smartAdIds)) {
+                $totalCleaned += State::whereIn('t_name', ['smart', 'smart_click'])->whereNotIn('pid', $smartAdIds)->delete();
+            } else {
+                $totalCleaned += State::whereIn('t_name', ['smart', 'smart_click'])->count();
+                State::whereIn('t_name', ['smart', 'smart_click'])->delete();
+            }
+
+            $this->maintenanceMode->disable(Auth::user(), 'repair_orphaned_stats_success');
+            return redirect()->back()->with('success', __('messages.orphaned_stats_repaired', ['count' => $totalCleaned]));
+        } catch (\Throwable $e) {
+            $this->maintenanceMode->disable(Auth::user(), 'repair_orphaned_stats_error');
+            return redirect()->back()->with('error', __('messages.orphaned_stats_repair_failed') . ': ' . $e->getMessage());
+        }
+    }
 }

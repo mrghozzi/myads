@@ -522,6 +522,7 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::post('/maintenance/db-repair', [AdminController::class, 'dbRepair'])->name('admin.maintenance.db_repair');
     Route::post('/maintenance/repair-orphaned', [AdminController::class, 'repairOrphanedRecords'])->name('admin.maintenance.repair_orphaned');
     Route::post('/maintenance/repair-orphaned-content', [AdminController::class, 'repairOrphanedContent'])->name('admin.maintenance.repair_orphaned_content');
+    Route::post('/maintenance/repair-orphaned-stats', [AdminController::class, 'repairOrphanedStats'])->name('admin.maintenance.repair_orphaned_stats');
 
     // Security
     Route::get('/security', [AdminSecurityController::class, 'index'])->name('admin.security.index');
