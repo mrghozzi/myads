@@ -378,6 +378,8 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     
     // Banners
     Route::get('/ads', [AdminController::class, 'adsHub'])->name('admin.ads');
+    Route::get('/ads/settings', [AdminController::class, 'adsSettings'])->name('admin.ads.settings');
+    Route::post('/ads/settings', [AdminController::class, 'updateAdsSettings'])->name('admin.ads.settings.update');
     Route::get('/ads/posts', [AdminStatusPromotionController::class, 'index'])->name('admin.ads.posts.index');
     Route::get('/ads/posts/settings', [AdminStatusPromotionController::class, 'settings'])->name('admin.ads.posts.settings');
     Route::post('/ads/posts/settings', [AdminStatusPromotionController::class, 'updateSettings'])->name('admin.ads.posts.settings.update');

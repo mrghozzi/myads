@@ -1830,6 +1830,14 @@ return [
     'open_in_store' => 'Open in Store',
     'browse_store' => 'Browse Store',
     'no_marketplace_items' => 'No marketplace items found.',
+    'ads_settings_title' => 'Ads Settings',
+    'ads_settings_intro' => 'Control the ad brand label and shared delivery settings for banner, link, and smart ads.',
+    'ads_settings_save' => 'Save Ads Settings',
+    'ads_settings_saved' => 'Ads settings saved successfully.',
+    'ads_brand_name' => 'Ads brand name',
+    'ads_brand_name_help' => 'This name appears inside banner, link, and smart ad branding instead of APP_NAME from the environment file.',
+    'banner_repeat_window_title' => 'Banner repeat window (minutes)',
+    'banner_repeat_window_help' => 'Prevents showing the same banner to the same visitor on the same publisher within this time window. Use 0 to disable.',
     'others' => 'Others',
 ];
 

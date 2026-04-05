@@ -1,3 +1,4 @@
+@php($adsBrandName = \App\Support\AdsSettings::brandName())
 <div style="display:block;width:468px;max-width:100%;margin:0 auto;">
     <table width='468' width2='234' height='60' cellspacing='1' cellpadding='0' border='0' bgcolor='#0099ff' style='background-color:#0099ff'>
         <tr>
@@ -33,10 +34,10 @@
                                 <img src='{{ asset('themes/default/assets/img/Alert-icon.png') }}' alt=''>
                             </a>
                             <b style='color:#FFFFFF'> | </b>
-                            <a class='attribution' href='{{ url('/') }}?ref={{ $publisherId }}' target='_blank' style='color: #ffffff; text-decoration: none; font-family: verdana,arial,sans-serif; font-size: 10px; font-weight: bold;'>{{ config('app.name') }}</a>
+                            <a class='attribution' href='{{ url('/') }}?ref={{ $publisherId }}' target='_blank' style='color: #ffffff; text-decoration: none; font-family: verdana,arial,sans-serif; font-size: 10px; font-weight: bold;'>{{ $adsBrandName }}</a>
                         </td>
                         <td nowrap width='50%' height='11' align='right' bgcolor='#0099ff'>
-                            <a class='attribution' href='{{ url('/') }}?ref={{ $publisherId }}' target='_blank' style='color: #ffffff; text-decoration: none; font-family: verdana,arial,sans-serif; font-size: 10px; font-weight: bold;'>{{ __('messages.Ads_by') }} {{ config('app.name') }}</a>
+                            <a class='attribution' href='{{ url('/') }}?ref={{ $publisherId }}' target='_blank' style='color: #ffffff; text-decoration: none; font-family: verdana,arial,sans-serif; font-size: 10px; font-weight: bold;'>{{ __('messages.Ads_by') }} {{ $adsBrandName }}</a>
                         </td>
                     </tr>
                 </table>

@@ -115,7 +115,7 @@
         <div class="myads-smart-native__actions">
             <a class="myads-smart-native__cta" href="{{ $clickUrl }}" target="_blank" rel="noopener noreferrer">{{ __('messages.smart_native_visit_sponsor') }}</a>
             <span class="myads-smart-native__links">
-                <a class="myads-smart-native__link" href="{{ $refUrl }}" target="_blank" rel="noopener noreferrer">{{ __('messages.ads_by_site', ['site' => config('app.name')]) }}</a>
+                <a class="myads-smart-native__link" href="{{ $refUrl }}" target="_blank" rel="noopener noreferrer">{{ __('messages.ads_by_site', ['site' => $adsBrandName ?? \App\Support\AdsSettings::brandName()]) }}</a>
                 <a class="myads-smart-native__link" href="{{ $reportUrl }}" target="_blank" rel="noopener noreferrer">{{ __('messages.report') }}</a>
             </span>
         </div>

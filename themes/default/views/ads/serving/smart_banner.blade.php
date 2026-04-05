@@ -101,7 +101,7 @@
     <a class="myads-smart-banner__click" href="{{ $clickUrl }}" target="_blank" rel="noopener noreferrer" aria-label="{{ $smartAd->displayTitle() }}"></a>
     <div class="myads-smart-banner__image"></div>
     <div class="myads-smart-banner__chip">
-        <a class="myads-smart-banner__brand" href="{{ $refUrl }}" target="_blank" rel="noopener noreferrer">{{ __('messages.ads_by_site', ['site' => config('app.name')]) }}</a>
+        <a class="myads-smart-banner__brand" href="{{ $refUrl }}" target="_blank" rel="noopener noreferrer">{{ __('messages.ads_by_site', ['site' => $adsBrandName ?? \App\Support\AdsSettings::brandName()]) }}</a>
         <a class="myads-smart-banner__info" href="{{ $reportUrl }}" target="_blank" rel="noopener noreferrer" aria-label="{{ __('messages.report') }}">i</a>
     </div>
     <div class="myads-smart-banner__meta">

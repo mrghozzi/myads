@@ -42,6 +42,7 @@ use App\Services\MaintenanceModeManager;
 use App\Services\PluginManager;
 use App\Services\RemoteExtensionMarketplaceService;
 use App\Services\ThemeManager;
+use App\Support\AdsSettings;
 use App\Support\BannerServingSettings;
 use App\Support\BannerSizeCatalog;
 use App\Support\ForumSettings;
@@ -268,11 +269,9 @@ class AdminController extends Controller
     public function settings()
     {
         $settings = Setting::firstOrFail();
-        $bannerRepeatWindowMinutes = BannerServingSettings::repeatWindowMinutes();
-        $smartAdsPointsDivisor = SmartAdsSettings::pointsDivisor();
         $adminTheme = Option::where('o_type', 'admin_settings')->where('name', 'theme')->value('o_valuer') ?? 'default';
 
-        return view('admin::admin.settings', compact('settings', 'bannerRepeatWindowMinutes', 'smartAdsPointsDivisor', 'adminTheme'));
+        return view('admin::admin.settings', compact('settings', 'adminTheme'));
     }
 
     public function updateSettings(Request $request)
@@ -282,8 +281,6 @@ class AdminController extends Controller
         $request->validate([
             'titer' => 'required|string',
             'url' => 'required|url',
-            'banner_repeat_window_minutes' => 'nullable|integer|min:0|max:525600',
-            'smart_ads_points_divisor' => 'nullable|numeric|min:0.1|max:1000',
             'admin_theme' => 'nullable|string',
         ]);
 
@@ -294,13 +291,47 @@ class AdminController extends Controller
             ['o_valuer' => $request->input('admin_theme', 'default')]
         );
 
+        return redirect()->route('admin.settings')->with('success', __('settings_updated'));
+    }
+
+    public function adsSettings()
+    {
+        $adsBrandName = AdsSettings::brandName();
+        $bannerRepeatWindowMinutes = BannerServingSettings::repeatWindowMinutes();
+        $smartAdsPointsDivisor = SmartAdsSettings::pointsDivisor();
+
+        return view('admin::admin.ads_settings', compact(
+            'adsBrandName',
+            'bannerRepeatWindowMinutes',
+            'smartAdsPointsDivisor'
+        ));
+    }
+
+    public function updateAdsSettings(Request $request)
+    {
+        $validated = $request->validate([
+            'ads_brand_name' => 'required|string|max:255',
+            'banner_repeat_window_minutes' => 'nullable|integer|min:0|max:525600',
+            'smart_ads_points_divisor' => 'nullable|numeric|min:0.1|max:1000',
+        ]);
+
+        Option::updateOrCreate(
+            [
+                'o_type' => AdsSettings::OPTION_TYPE,
+                'name' => AdsSettings::BRAND_NAME,
+            ],
+            [
+                'o_valuer' => trim((string) $validated['ads_brand_name']),
+            ]
+        );
+
         Option::updateOrCreate(
             [
                 'o_type' => BannerServingSettings::OPTION_TYPE,
                 'name' => BannerServingSettings::REPEAT_WINDOW_NAME,
             ],
             [
-                'o_valuer' => (string) ($request->input('banner_repeat_window_minutes', BannerServingSettings::DEFAULT_REPEAT_WINDOW_MINUTES)),
+                'o_valuer' => (string) ($validated['banner_repeat_window_minutes'] ?? BannerServingSettings::DEFAULT_REPEAT_WINDOW_MINUTES),
             ]
         );
 
@@ -310,11 +341,11 @@ class AdminController extends Controller
                 'name' => SmartAdsSettings::POINTS_DIVISOR_NAME,
             ],
             [
-                'o_valuer' => (string) ($request->input('smart_ads_points_divisor', SmartAdsSettings::DEFAULT_POINTS_DIVISOR)),
+                'o_valuer' => (string) ($validated['smart_ads_points_divisor'] ?? SmartAdsSettings::DEFAULT_POINTS_DIVISOR),
             ]
         );
 
-        return redirect()->route('admin.settings')->with('success', __('settings_updated'));
+        return redirect()->route('admin.ads.settings')->with('success', __('messages.ads_settings_saved'));
     }
 
     public function systemSettings()

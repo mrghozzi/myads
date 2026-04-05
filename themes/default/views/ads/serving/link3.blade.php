@@ -1,5 +1,6 @@
 @php
     $layout = in_array($linkLayout ?? 'stacked', ['wide', 'stacked', 'compact'], true) ? $linkLayout : 'stacked';
+    $adsBrandName = \App\Support\AdsSettings::brandName();
 @endphp
 <style>
 .myads-link-smart,
@@ -254,7 +255,7 @@
     <div class="myads-link-smart__header">
         <span class="myads-link-smart__badge">
             <span class="myads-link-smart__badge-dot"></span>
-            {{ config('app.name') }}
+            {{ $adsBrandName }}
         </span>
         <a class="myads-link-smart__report" href="{{ url('/report') }}?link={{ $link1->id }}&link2={{ $link2->id }}" target="_blank" rel="noopener noreferrer">
             <img src="{{ asset('themes/default/assets/img/Alert-icon.png') }}" alt="">
@@ -274,7 +275,7 @@
                 </h3>
                 <p class="myads-link-smart__text">{!! htmlentities($link1Txt, ENT_QUOTES, 'UTF-8') !!}</p>
                 <div class="myads-link-smart__meta">
-                    <span class="myads-link-smart__byline">Ads by <a href="{{ url('/') }}?ref={{ $publisherId }}" target="_blank" rel="noopener noreferrer">{{ config('app.name') }}</a></span>
+                    <span class="myads-link-smart__byline">Ads by <a href="{{ url('/') }}?ref={{ $publisherId }}" target="_blank" rel="noopener noreferrer">{{ $adsBrandName }}</a></span>
                     <a class="myads-link-smart__cta" href="{{ route('ads.redirect', ['link' => $link1->id, 'clik' => $publisherId, 'type' => 'link']) }}" target="_blank" rel="noopener noreferrer">
                         Open Ad
                         <span class="myads-link-smart__cta-arrow">></span>
@@ -292,7 +293,7 @@
                 </h3>
                 <p class="myads-link-smart__text">{!! htmlentities($link2Txt, ENT_QUOTES, 'UTF-8') !!}</p>
                 <div class="myads-link-smart__meta">
-                    <span class="myads-link-smart__byline">Ads by <a href="{{ url('/') }}?ref={{ $publisherId }}" target="_blank" rel="noopener noreferrer">{{ config('app.name') }}</a></span>
+                    <span class="myads-link-smart__byline">Ads by <a href="{{ url('/') }}?ref={{ $publisherId }}" target="_blank" rel="noopener noreferrer">{{ $adsBrandName }}</a></span>
                     <a class="myads-link-smart__cta" href="{{ route('ads.redirect', ['link' => $link2->id, 'clik' => $publisherId, 'type' => 'link']) }}" target="_blank" rel="noopener noreferrer">
                         Open Ad
                         <span class="myads-link-smart__cta-arrow">></span>
@@ -303,6 +304,6 @@
     </div>
 
     <div class="myads-link-smart__footer">
-        <a class="myads-link-smart__footer-link" href="{{ url('/') }}?ref={{ $publisherId }}" target="_blank" rel="noopener noreferrer">Ads by {{ config('app.name') }}</a>
+        <a class="myads-link-smart__footer-link" href="{{ url('/') }}?ref={{ $publisherId }}" target="_blank" rel="noopener noreferrer">Ads by {{ $adsBrandName }}</a>
     </div>
 </div>

@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Models\Banner;
 use App\Models\Link;
 use App\Services\SmartAdGeoResolver;
+use App\Support\AdsSettings;
 use App\Support\BannerServingSettings;
 use App\Support\BannerSizeCatalog;
 use App\Support\SmartAdTargeting;
@@ -526,7 +527,7 @@ class AdsServingController extends Controller
         $refUrl = url('/') . '?ref=' . $publisherId;
         $reportUrl = url('/report') . '?banner=' . $bannerId;
         $bannerName = htmlspecialchars((string) $banner->name, ENT_QUOTES, 'UTF-8');
-        $appName = htmlspecialchars((string) config('app.name'), ENT_QUOTES, 'UTF-8');
+        $appName = htmlspecialchars(AdsSettings::brandName(), ENT_QUOTES, 'UTF-8');
 
         return "<style>.banner_{$bannerId}{background-image:url('{$banner->img}');height:{$height}px;width:{$width}px;max-width:100%;margin:0 auto;display:block;background-size:cover;background-position:center;position:relative;overflow:hidden;}.banner_{$bannerId} .banner_click_{$bannerId}{position:absolute;inset:0;display:block;text-decoration:none;z-index:1;}.banner_icon_{$bannerId}{position:absolute;top:0;left:0;display:flex;gap:4px;padding:5px;z-index:2;background-color:rgba(0,0,0,0.5);}.banner_icon_{$bannerId} a{display:inline-flex;align-items:center;justify-content:center;height:auto;width:auto;text-decoration:none;}@media screen and (max-width: {$width}px){.banner_{$bannerId}{width:100%;}}</style><div class='banner_{$bannerId}'><a class='banner_click_{$bannerId}' href='{$clickUrl}' target='_blank' rel='noopener noreferrer' aria-label='{$bannerName}'></a><div class='banner_icon_{$bannerId}'><a href='{$refUrl}' target='_blank' rel='noopener noreferrer'><img src='" . theme_asset('img/logo_w.png') . "' width='16' height='16' alt='{$appName}'></a><a href='{$reportUrl}' target='_blank' rel='noopener noreferrer' aria-label='Report'><img src='" . theme_asset('img/Alert-icon.png') . "' alt=''></a></div></div>";
     }
@@ -540,7 +541,7 @@ class AdsServingController extends Controller
         $refUrl = url('/') . '?ref=' . $publisherId;
         $reportUrl = url('/report') . '?banner=' . $bannerId;
         $bannerName = htmlspecialchars((string) $banner->name, ENT_QUOTES, 'UTF-8');
-        $appName = htmlspecialchars((string) config('app.name'), ENT_QUOTES, 'UTF-8');
+        $appName = htmlspecialchars(AdsSettings::brandName(), ENT_QUOTES, 'UTF-8');
         $profile = match ($pxValue) {
             '160x600' => 'rail',
             '300x250' => 'card',
@@ -577,7 +578,7 @@ class AdsServingController extends Controller
             'card' => 'calc(100% - 28px)',
             default => 'calc(100% - 32px)',
         };
-        $chipText = htmlspecialchars(__('messages.ads_by_site', ['site' => config('app.name')]), ENT_QUOTES, 'UTF-8');
+        $chipText = htmlspecialchars(__('messages.ads_by_site', ['site' => AdsSettings::brandName()]), ENT_QUOTES, 'UTF-8');
         $reportLabel = htmlspecialchars(__('messages.report'), ENT_QUOTES, 'UTF-8');
 
         return "<style>.{$class},.{$class} *{box-sizing:border-box;}.{$class}{position:relative;width:{$width}px;height:{$height}px;max-width:100%;margin:0 auto;display:block;overflow:hidden;border-radius:{$radius}px;background:#f1f3f4 url('{$banner->img}') center/cover no-repeat;box-shadow:0 1px 3px rgba(18,24,40,.16);font-family:Arial,'Segoe UI',sans-serif;isolation:isolate;}.{$class}__click{position:absolute;inset:0;display:block;z-index:1;text-decoration:none;}.{$class}__chrome{position:absolute;top:0;right:0;z-index:3;display:flex;align-items:stretch;max-width:{$chipMaxWidth};border-radius:0 0 0 {$radius}px;overflow:hidden;box-shadow:0 1px 2px rgba(18,24,40,.18);}.{$class}__label,.{$class}__info{display:inline-flex;align-items:center;justify-content:center;height:{$labelHeight}px;background:rgba(255,255,255,.96);text-decoration:none;line-height:1;}.{$class}__label{max-width:calc(100% - {$infoWidth}px);padding:{$labelPadding};color:#202124;font-size:{$labelFontSize};font-weight:400;letter-spacing:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-inline-end:1px solid #dadce0;}.{$class}__label:hover,.{$class}__info:hover{background:#f8f9fa;text-decoration:none;}.{$class}__info{width:{$infoWidth}px;min-width:{$infoWidth}px;color:#5f6368;}.{$class}__info-mark{display:inline-flex;align-items:center;justify-content:center;width:" . ($profile === 'rail' ? 11 : 13) . "px;height:" . ($profile === 'rail' ? 11 : 13) . "px;border-radius:50%;border:1px solid #5f8def;color:#5f8def;font-size:" . ($profile === 'rail' ? '8px' : '9px') . ";font-weight:700;font-style:normal;font-family:Arial,'Segoe UI',sans-serif;}@media screen and (max-width: {$width}px){.{$class}{width:100%;}}</style><div class='{$class}' data-placement='responsive2' data-size='{$pxValue}' data-profile='{$profile}'><a class='{$class}__click' href='{$clickUrl}' target='_blank' rel='noopener noreferrer' aria-label='{$bannerName}'></a><div class='{$class}__chrome'><a class='{$class}__label' href='{$refUrl}' target='_blank' rel='noopener noreferrer'>{$chipText}</a><a class='{$class}__info' href='{$reportUrl}' target='_blank' rel='noopener noreferrer' aria-label='{$reportLabel}'><span class='{$class}__info-mark'>i</span></a></div></div>";
@@ -593,6 +594,7 @@ class AdsServingController extends Controller
             'smartAd' => $smartAd,
             'publisherId' => $publisherId,
             'bannerSize' => $bannerSize,
+            'adsBrandName' => AdsSettings::brandName(),
             'clickUrl' => route('ads.redirect', ['ads' => $smartAd->id, 'vu' => $publisherId, 'type' => 'smart']),
             'refUrl' => url('/') . '?ref=' . $publisherId,
             'reportUrl' => url('/report') . '?smart_ad=' . $smartAd->id,
@@ -632,11 +634,11 @@ class AdsServingController extends Controller
             return "<div style=\"width:" . $this->getWidth($size) . "px;max-width:100%;margin:0 auto;text-align:center;\"><a href='" . url('/') . "?ref={$publisherId}' target='_blank' rel='noopener noreferrer'><img src='{$src}' width='" . $this->getWidth($size) . "' height='" . $this->getHeight($size) . "' border='0' style='display:block;max-width:100%;margin:0 auto;'></a></div>";
         }
 
-        $appName = htmlspecialchars((string) config('app.name'), ENT_QUOTES, 'UTF-8');
+        $appName = htmlspecialchars(AdsSettings::brandName(), ENT_QUOTES, 'UTF-8');
         $refUrl = url('/') . '?ref=' . $publisherId;
-        $adsByLabel = htmlspecialchars(__('messages.ads_by_site', ['site' => config('app.name')]), ENT_QUOTES, 'UTF-8');
+        $adsByLabel = htmlspecialchars(__('messages.ads_by_site', ['site' => AdsSettings::brandName()]), ENT_QUOTES, 'UTF-8');
         $learnMoreLabel = htmlspecialchars(__('messages.smart_learn_more'), ENT_QUOTES, 'UTF-8');
-        $headline = htmlspecialchars(__('messages.smart_fallback_headline', ['site' => config('app.name')]), ENT_QUOTES, 'UTF-8');
+        $headline = htmlspecialchars(__('messages.smart_fallback_headline', ['site' => AdsSettings::brandName()]), ENT_QUOTES, 'UTF-8');
         $description = htmlspecialchars(__('messages.smart_fallback_description'), ENT_QUOTES, 'UTF-8');
 
         return "<div style=\"box-sizing:border-box;max-width:420px;margin:0 auto;border:1px solid #e9edf5;border-radius:16px;background:#fff;padding:16px;font-family:Arial,'Segoe UI',sans-serif;box-shadow:0 12px 28px rgba(94,92,154,.08);\"><div style=\"display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;\"><span style=\"display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;background:#f4f7ff;color:#615dfa;font-size:10px;font-weight:700;text-transform:uppercase;\">{$adsByLabel}</span><a href='{$refUrl}' target='_blank' rel='noopener noreferrer' style='font-size:12px;color:#8f94b5;text-decoration:none;'>{$learnMoreLabel}</a></div><h3 style=\"margin:0 0 8px;color:#3e3f5e;font-size:18px;line-height:1.3;\">{$headline}</h3><p style=\"margin:0;color:#8f94b5;font-size:13px;line-height:1.7;\">{$description}</p></div>";

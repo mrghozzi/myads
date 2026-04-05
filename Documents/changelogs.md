@@ -1,4 +1,4 @@
-# v4.2.4 (2026-04-02)
+# v4.2.4
 > **Feature Release** — Public extension catalogs, ZIP manifest parsing, and remote marketplace browsing.
 
 ### Marketplace Extensions
@@ -35,6 +35,12 @@
 * **Fix**: Resolved `500 Internal Server Error` and potential data corruption on the **Site Ads** management page (`/admin/site-ads`) when using the "Save All" feature.
 * **Fix**: Standardized individual ad saving logic to prevent cross-contamination between different ad slots (e.g., Header vs Footer) during update operations.
 * **Stability**: Implemented strict non-null enforcement for ad code fields, preventing SQL integrity violations when clearing ad content.
+
+### Ads Settings & Branding
+* **Add**: Added a dedicated `/admin/ads/settings` page for shared ad-delivery configuration, including the ad brand name, banner repeat window, and Smart Ads points divisor.
+* **Change**: Ad branding for banner, link, and smart ads now reads from database-backed ad settings instead of `APP_NAME` in `.env`, with graceful fallback to the site title and runtime config when needed.
+* **Change**: Removed banner repeat-window and Smart Ads divisor controls from `/admin/settings` so general site settings stay focused on site-wide metadata.
+* **Fix**: Resolved a `500 Internal Server Error` on `/b_code` by stabilizing the banner code page variable bootstrapping after the new ad-branding integration.
 
 # v4.2.3
 > **Corrective Release** — User slug synchronization, RTL post layout fixes, and UI consistency.

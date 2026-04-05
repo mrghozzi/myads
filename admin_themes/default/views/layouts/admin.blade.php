@@ -131,6 +131,7 @@
                             </a>
                             <ul class="nxl-submenu">
                                 <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.ads') }}">{{ __('messages.ads') }}</a></li>
+                                <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.ads.settings') }}">{{ __('messages.ads_settings_title') }}</a></li>
                                 <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.ads.posts.index') }}">{{ __('messages.status_promotions_title') }}</a></li>
                                 <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.ads.posts.settings') }}">{{ __('messages.status_promotion_settings_title') }}</a></li>
                                 <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.banners') }}">{{ __('messages.bannads') }}</a></li>

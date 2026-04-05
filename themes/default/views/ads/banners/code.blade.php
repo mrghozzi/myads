@@ -1,6 +1,25 @@
 @extends('theme::layouts.master')
 
 @section('content')
+@php
+    $adsBrandName = \App\Support\AdsSettings::brandName();
+    $quickBannerCodeTabs = \App\Support\BannerSizeCatalog::ordered();
+    $advancedBannerCodeTabs = array_merge(
+        $quickBannerCodeTabs,
+        [
+            [
+                'value' => 'responsive2',
+                'label' => 'Responsive 2',
+            ],
+            [
+                'value' => 'responsive',
+                'label' => __('messages.responsive'),
+            ],
+        ]
+    );
+    $bannerEmbedUrl = route('ads.embed.banner');
+    $bannerServingUrl = route('ads.script');
+@endphp
 <div class="grid grid change-on-desktop" >
        <div class="achievement-box secondary" style="background: url({{ theme_asset('img/banner/03.jpg') }}) no-repeat 50%; background-size: cover " >
           <!-- ACHIEVEMENT BOX INFO WRAP -->
@@ -47,36 +66,16 @@
                 <i class="fa-brands fa-facebook-f" style="color: #ffffff;"></i>
               </a>
 
-              <a class="social-link small" href="https://twitter.com/intent/tweet?text={{ urlencode(config('app.name')) }}&url={{ urlencode(route('register', ['ref' => $user->id])) }}" style="background-color: #011a24;" target="_blank">
+              <a class="social-link small" href="https://twitter.com/intent/tweet?text={{ urlencode($adsBrandName) }}&url={{ urlencode(route('register', ['ref' => $user->id])) }}" style="background-color: #011a24;" target="_blank">
                 <i class="fa-brands fa-x-twitter" style="color: #ffffff;"></i>
               </a>
 
-              <a class="social-link small youtube" href="https://telegram.me/share/url?url={{ urlencode(route('register', ['ref' => $user->id])) }}&text={{ urlencode(config('app.name')) }}" style="background-color: #0088cc;" target="_blank">
+              <a class="social-link small youtube" href="https://telegram.me/share/url?url={{ urlencode(route('register', ['ref' => $user->id])) }}&text={{ urlencode($adsBrandName) }}" style="background-color: #0088cc;" target="_blank">
                 <i class="fa-brands fa-telegram" style="color: #ffffff;"></i>
               </a>
            </div>
         </div>
     </div>
-
-    @php
-        $quickBannerCodeTabs = \App\Support\BannerSizeCatalog::ordered();
-        $advancedBannerCodeTabs = array_merge(
-            $quickBannerCodeTabs,
-            [
-                [
-                    'value' => 'responsive2',
-                    'label' => 'Responsive 2',
-                ],
-                [
-                    'value' => 'responsive',
-                    'label' => __('messages.responsive'),
-                ],
-            ]
-        );
-        $bannerEmbedUrl = route('ads.embed.banner');
-        $bannerServingUrl = route('ads.script');
-    @endphp
-
     <style>
       .myads-banner-code-preview,
       .myads-banner-code-preview * {
@@ -228,7 +227,7 @@
                   @if($tab['value'] === 'responsive2')
                     <p class="tab-box-item-title">{{ __('messages.recommended_smart_code') }} {{ $tab['label'] }} (1 {{ __('messages.point') }})</p>
                     <p style="margin: 8px 0 18px; color: #5d6488; line-height: 1.7;">
-                      {{ __('messages.responsive_2_desc', ['app' => config('app.name')]) }}
+                      {{ __('messages.responsive_2_desc', ['app' => $adsBrandName]) }}
                     </p>
                     <hr />
                     <div class="well" style="color: black;">
@@ -241,7 +240,7 @@
                     <div class="myads-banner-code-preview myads-banner-code-preview--responsive2">
                       <div class="myads-banner-code-preview__header">
                         <span class="myads-banner-code-preview__pill">Responsive 2</span>
-                        <p class="myads-banner-code-preview__hint">{{ __('messages.responsive_2_preview_desc', ['app' => config('app.name')]) }}</p>
+                        <p class="myads-banner-code-preview__hint">{{ __('messages.responsive_2_preview_desc', ['app' => $adsBrandName]) }}</p>
                       </div>
                       <div class="myads-banner-code-preview__frame">
                         <div class="myads-banner-code-preview__stage">

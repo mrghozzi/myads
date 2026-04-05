@@ -2,6 +2,7 @@
 
 @section('content')
 @php
+    $adsBrandName = \App\Support\AdsSettings::brandName();
     $scriptUrl = route('ads.link.script');
     $embedScriptUrl = route('ads.embed.link');
     $fixedCode = \App\Support\LinkEmbedCode::build($embedScriptUrl, $user->id, '468x60', $extensions_code ?? '');
@@ -76,11 +77,11 @@
                         <i class="fa-brands fa-facebook-f" style="color: #ffffff;"></i>
                     </a>
 
-                    <a class="social-link small" href="https://twitter.com/intent/tweet?text={{ urlencode(config('app.name')) }}&url={{ urlencode(route('register', ['ref' => $user->id])) }}" style="background-color: #011a24;" target="_blank">
+                    <a class="social-link small" href="https://twitter.com/intent/tweet?text={{ urlencode($adsBrandName) }}&url={{ urlencode(route('register', ['ref' => $user->id])) }}" style="background-color: #011a24;" target="_blank">
                         <i class="fa-brands fa-x-twitter" style="color: #ffffff;"></i>
                     </a>
 
-                    <a class="social-link small youtube" href="https://telegram.me/share/url?url={{ urlencode(route('register', ['ref' => $user->id])) }}&text={{ urlencode(config('app.name')) }}" style="background-color: #0088cc;" target="_blank">
+                    <a class="social-link small youtube" href="https://telegram.me/share/url?url={{ urlencode(route('register', ['ref' => $user->id])) }}&text={{ urlencode($adsBrandName) }}" style="background-color: #0088cc;" target="_blank">
                         <i class="fa-brands fa-telegram" style="color: #ffffff;"></i>
                     </a>
                 </div>
