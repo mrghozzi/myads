@@ -1852,5 +1852,7 @@ return [
     'delete_selected' => 'Ausgewählte löschen',
     'selected_users_count' => 'Anzahl der ausgewählten Benutzer',
     'bulk_delete_warning' => 'Diese Aktion löscht alle ausgewählten Benutzer und deren zugehörige Daten dauerhaft.',
+    'selected_items_count' => 'Ausgewählte Elemente: :count',
+    'bulk_delete_items_warning' => 'Alle ausgewählten Elemente werden endgültig gelöscht. Diese Aktion kann nicht rückgängig gemacht werden.',
 ];
 

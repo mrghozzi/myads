@@ -32,6 +32,10 @@
                         'filterFields' => $filterFields,
                         'resultsCount' => $resultsCount,
                     ])
+                    <button class="btn btn-danger ms-2 d-none" id="bulkDeleteBtn" data-bs-toggle="modal" data-bs-target="#bulkDeleteModal">
+                        <i class="feather-trash-2 me-2"></i>
+                        <span>{{ __('messages.delete_selected') }}</span>
+                    </button>
                     <a href="{{ route('ads.links.create') }}" class="btn btn-primary ms-auto">
                         <i class="feather-plus me-2"></i>
                         <span>{{ __('messages.add') }}</span>
@@ -58,6 +62,11 @@
                         <table class="table table-hover mb-0">
                             <thead>
                                 <tr>
+                                    <th class="wd-30">
+                                        <div class="form-check form-check-md">
+                                            <input class="form-check-input" type="checkbox" id="checkAll">
+                                        </div>
+                                    </th>
                                     <th>#ID</th>
                                     <th>{{ __('messages.user') }}</th>
                                     <th>{{ __('messages.name') }}</th>
@@ -69,6 +78,11 @@
                             <tbody>
                                 @foreach($links as $link)
                                 <tr>
+                                    <td data-label="#">
+                                        <div class="form-check form-check-md">
+                                            <input class="form-check-input row-checkbox" type="checkbox" value="{{ $link->id }}">
+                                        </div>
+                                    </td>
                                     <td>
                                         <span class="fw-bold">#{{ $link->id }}</span>
                                     </td>
@@ -86,12 +100,12 @@
                                             <span class="text-muted">{{ __('messages.unknown') ?? 'Unknown' }}</span>
                                         @endif
                                     </td>
-                                    <td>
-                                        <div class="fw-bold">{{ $link->name }}</div>
-                                        <div class="small">
-                                            <a href="{{ $link->url }}" target="_blank" class="text-primary">{{ Str::limit($link->url, 30) }}</a>
+                                    <td style="max-width: 300px;">
+                                        <div class="fw-bold text-truncate" title="{{ $link->name }}">{{ $link->name }}</div>
+                                        <div class="small text-truncate" title="{{ $link->url }}">
+                                            <a href="{{ $link->url }}" target="_blank" class="text-primary">{{ $link->url }}</a>
                                         </div>
-                                        <div class="small text-muted">{{ Str::limit($link->txt, 50) }}</div>
+                                        <div class="small text-muted text-truncate" title="{{ $link->txt }}">{{ $link->txt }}</div>
                                     </td>
                                     <td>
                                         <span class="badge bg-soft-primary text-primary">{{ $link->clik }}</span>
@@ -198,4 +212,77 @@
     </div>
 </div>
 @endforeach
+
+<div class="modal fade" id="bulkDeleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">{{ __('messages.delete_selected') }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <div class="avatar-text avatar-xl bg-soft-danger text-danger rounded-circle mb-3 mx-auto">
+                    <i class="feather-trash-2"></i>
+                </div>
+                <h4>{!! __('messages.selected_items_count', ['count' => '<span id="bulkDeleteCount" class="fw-bold text-dark">0</span>']) !!}</h4>
+                <p class="text-muted">{{ __('messages.bulk_delete_items_warning') }}</p>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('messages.close') }}</button>
+                <form action="{{ route('admin.links.bulk_delete') }}" method="POST" id="bulkDeleteForm" class="d-inline">
+                    @csrf
+                    @method('DELETE')
+                    <div id="bulkDeleteInputs"></div>
+                    <button type="submit" class="btn btn-danger">{{ __('messages.delete') }}</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const checkAll = document.getElementById('checkAll');
+    const checkboxes = document.querySelectorAll('.row-checkbox');
+    const bulkDeleteBtn = document.getElementById('bulkDeleteBtn');
+    const bulkDeleteCount = document.getElementById('bulkDeleteCount');
+    const bulkDeleteInputs = document.getElementById('bulkDeleteInputs');
+
+    function updateBulkDeleteButton() {
+        const selected = Array.from(checkboxes).filter(cb => cb.checked);
+        if (selected.length > 0) {
+            bulkDeleteBtn.classList.remove('d-none');
+            bulkDeleteCount.innerHTML = selected.length;
+            
+            bulkDeleteInputs.innerHTML = '';
+            selected.forEach(cb => {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = 'ids[]';
+                input.value = cb.value;
+                bulkDeleteInputs.appendChild(input);
+            });
+        } else {
+            bulkDeleteBtn.classList.add('d-none');
+        }
+        
+        if (checkAll) {
+            checkAll.checked = selected.length === checkboxes.length && checkboxes.length > 0;
+        }
+    }
+
+    if (checkAll) {
+        checkAll.addEventListener('change', function () {
+            checkboxes.forEach(cb => cb.checked = this.checked);
+            updateBulkDeleteButton();
+        });
+    }
+
+    checkboxes.forEach(cb => {
+        cb.addEventListener('change', updateBulkDeleteButton);
+    });
+});
+</script>
+@endpush

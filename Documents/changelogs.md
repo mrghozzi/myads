@@ -32,6 +32,9 @@
 * **Fix**: Corrected database table name mapping in the Arabic Fixer service to resolve failed character-fix operations on forum comments.
 
 ### 📢 Site Ads & Inventory Reliability
+* **Feature**: Added **Bulk Deletion** capabilities for Site Ads and Visits (`/admin/banners`, `/admin/links`, `/admin/smart-ads`, and `/admin/visits`), allowing administrators to select multiple records and permanently delete them in a single action.
+* **Improvement**: Integrated a reactive deletion confirmation modal across all ad inventories that dynamically displays the total count of selected items to prevent accidental bulk deletions.
+* **Improvement**: Refactored the underlying deletion logic for banners, text ads, smart ads, and visits to ensure that the system automatically sends an unread, localized system notification to the ad owner whenever the administration deletes their ad (during both individual and bulk operations).
 * **Fix**: Resolved `500 Internal Server Error` and potential data corruption on the **Site Ads** management page (`/admin/site-ads`) when using the "Save All" feature.
 * **Fix**: Standardized individual ad saving logic to prevent cross-contamination between different ad slots (e.g., Header vs Footer) during update operations.
 * **Stability**: Implemented strict non-null enforcement for ad code fields, preventing SQL integrity violations when clearing ad content.

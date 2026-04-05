@@ -1854,5 +1854,7 @@ return [
     'delete_selected' => 'Seçilenleri Sil',
     'selected_users_count' => 'Seçilen kullanıcı sayısı',
     'bulk_delete_warning' => 'Bu işlem, seçilen tüm kullanıcıları ve bunlarla ilişkili verileri kalıcı olarak silecektir.',
+    'selected_items_count' => 'Seçilen öğeler: :count',
+    'bulk_delete_items_warning' => 'Seçilen tüm öğeler kalıcı olarak silinecek. Bu işlem geri alınamaz.',
 ];
 

@@ -389,6 +389,7 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/banners/{id}/edit', [AdminController::class, 'editBanner'])->name('admin.banners.edit');
     Route::post('/banners/{id}', [AdminController::class, 'updateBanner'])->name('admin.banners.update');
     Route::delete('/banners/{id}', [AdminController::class, 'deleteBanner'])->name('admin.banners.delete');
+    Route::delete('/banners/bulk/delete', [AdminController::class, 'bulkDeleteBanners'])->name('admin.banners.bulk_delete');
     
     // Stats
     Route::get('/stats', [AdminController::class, 'stats'])->name('admin.stats');
@@ -397,17 +398,20 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/links', [AdminController::class, 'links'])->name('admin.links');
     Route::post('/links/{id}', [AdminController::class, 'updateLink'])->name('admin.links.update');
     Route::delete('/links/{id}', [AdminController::class, 'deleteLink'])->name('admin.links.delete');
+    Route::delete('/links/bulk/delete', [AdminController::class, 'bulkDeleteLinks'])->name('admin.links.bulk_delete');
 
     // Smart Ads
     Route::get('/smart-ads', [AdminController::class, 'smartAds'])->name('admin.smart_ads');
     Route::get('/smart-ads/{id}/edit', [AdminController::class, 'editSmartAd'])->name('admin.smart_ads.edit');
     Route::post('/smart-ads/{id}', [AdminController::class, 'updateSmartAd'])->name('admin.smart_ads.update');
     Route::delete('/smart-ads/{id}', [AdminController::class, 'deleteSmartAd'])->name('admin.smart_ads.delete');
+    Route::delete('/smart-ads/bulk/delete', [AdminController::class, 'bulkDeleteSmartAds'])->name('admin.smart_ads.bulk_delete');
     
     // Visits
     Route::get('/visits', [AdminController::class, 'visits'])->name('admin.visits');
     Route::post('/visits/{id}', [AdminController::class, 'updateVisit'])->name('admin.visits.update');
     Route::delete('/visits/{id}', [AdminController::class, 'deleteVisit'])->name('admin.visits.delete');
+    Route::delete('/visits/bulk/delete', [AdminController::class, 'bulkDeleteVisits'])->name('admin.visits.bulk_delete');
     
     // Forum Categories
     Route::get('/forum/categories', [AdminController::class, 'forumCategories'])->name('admin.forum_categories');

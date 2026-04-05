@@ -1845,5 +1845,7 @@ return [
     'delete_selected' => 'Delete Selected',
     'selected_users_count' => 'Selected users count',
     'bulk_delete_warning' => 'This action will permanently delete all selected users and their associated data.',
+    'selected_items_count' => 'Selected items: :count',
+    'bulk_delete_items_warning' => 'All selected items will be permanently deleted. This action cannot be undone.',
 ];
 

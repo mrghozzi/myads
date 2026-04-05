@@ -1854,5 +1854,7 @@ return [
     'delete_selected' => 'Excluir selecionados',
     'selected_users_count' => 'Número de usuários selecionados',
     'bulk_delete_warning' => 'Esta ação excluirá permanentemente todos os usuários selecionados e seus dados associados.',
+    'selected_items_count' => 'Itens selecionados: :count',
+    'bulk_delete_items_warning' => 'Todos os itens selecionados serão excluídos permanentemente. Essa ação não pode ser desfeita.',
 ];
 

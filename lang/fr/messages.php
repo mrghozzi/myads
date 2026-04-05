@@ -1845,5 +1845,7 @@ return [
     'delete_selected' => 'Supprimer la sélection',
     'selected_users_count' => 'Nombre d\'utilisateurs sélectionnés',
     'bulk_delete_warning' => 'Cette action supprimera définitivement tous les utilisateurs sélectionnés et leurs données associées.',
+    'selected_items_count' => 'Éléments sélectionnés: :count',
+    'bulk_delete_items_warning' => 'Tous les éléments sélectionnés seront définitivement supprimés. Cette action est irréversible.',
 ];
 

@@ -838,22 +838,45 @@ class AdminController extends Controller
 
     public function deleteBanner($id)
     {
-        $banner = Banner::findOrFail($id);
-        
-        // Notification
-        $nurl = "b_list";
-        Notification::create([
-            'uid' => $banner->uid,
-            'name' => __('your_ad_has_been_deleted'),
-            'nurl' => $nurl,
-            'logo' => 'delete',
-            'time' => time(),
-            'state' => 1
-        ]);
-
-        $banner->delete();
+        $this->performBannerDeletion($id);
         
         return redirect()->route('admin.banners')->with('success', __('banner_deleted'));
+    }
+
+    public function bulkDeleteBanners(Request $request)
+    {
+        $ids = $request->input('ids');
+
+        if (!$ids || !is_array($ids)) {
+            return redirect()->back()->with('error', __('messages.no_selection') ?? 'No items selected');
+        }
+
+        foreach ($ids as $id) {
+            $this->performBannerDeletion($id);
+        }
+
+        return redirect()->route('admin.banners')->with('success', __('banner_deleted'));
+    }
+
+    private function performBannerDeletion($id)
+    {
+        $banner = Banner::find($id);
+        if (!$banner) {
+            return;
+        }
+        
+        if ($banner->uid && $banner->uid !== auth()->id()) {
+            Notification::create([
+                'uid' => $banner->uid,
+                'name' => __('your_ad_has_been_deleted'),
+                'nurl' => 'b_list',
+                'logo' => 'delete',
+                'time' => time(),
+                'state' => 0
+            ]);
+        }
+
+        $banner->delete();
     }
 
     public function stats(Request $request)
@@ -943,10 +966,44 @@ class AdminController extends Controller
 
     public function deleteLink($id)
     {
-        $link = Link::findOrFail($id);
-        $link->delete();
-        
+        $this->performLinkDeletion($id);
         return redirect()->back()->with('success', __('link_deleted'));
+    }
+
+    public function bulkDeleteLinks(Request $request)
+    {
+        $ids = $request->input('ids');
+
+        if (!$ids || !is_array($ids)) {
+            return redirect()->back()->with('error', __('messages.no_selection') ?? 'No items selected');
+        }
+
+        foreach ($ids as $id) {
+            $this->performLinkDeletion($id);
+        }
+
+        return redirect()->back()->with('success', __('link_deleted'));
+    }
+
+    private function performLinkDeletion($id)
+    {
+        $link = Link::find($id);
+        if (!$link) {
+            return;
+        }
+
+        if ($link->uid && $link->uid !== auth()->id()) {
+            Notification::create([
+                'uid' => $link->uid,
+                'name' => __('your_ad_has_been_deleted'),
+                'nurl' => 'links', // using basic url
+                'logo' => 'delete',
+                'time' => time(),
+                'state' => 0
+            ]);
+        }
+
+        $link->delete();
     }
 
     public function smartAds(Request $request)
@@ -1027,10 +1084,44 @@ class AdminController extends Controller
 
     public function deleteSmartAd($id)
     {
-        $smartAd = SmartAd::findOrFail($id);
-        $smartAd->delete();
+        $this->performSmartAdDeletion($id);
+        return redirect()->route('admin.smart_ads')->with('success', __('messages.smart_ad_admin_deleted'));
+    }
+
+    public function bulkDeleteSmartAds(Request $request)
+    {
+        $ids = $request->input('ids');
+
+        if (!$ids || !is_array($ids)) {
+            return redirect()->back()->with('error', __('messages.no_selection') ?? 'No items selected');
+        }
+
+        foreach ($ids as $id) {
+            $this->performSmartAdDeletion($id);
+        }
 
         return redirect()->route('admin.smart_ads')->with('success', __('messages.smart_ad_admin_deleted'));
+    }
+
+    private function performSmartAdDeletion($id)
+    {
+        $smartAd = SmartAd::find($id);
+        if (!$smartAd) {
+            return;
+        }
+
+        if ($smartAd->uid && $smartAd->uid !== auth()->id()) {
+            Notification::create([
+                'uid' => $smartAd->uid,
+                'name' => __('your_ad_has_been_deleted'),
+                'nurl' => 'smart', // using basic smart ad code
+                'logo' => 'delete',
+                'time' => time(),
+                'state' => 0
+            ]);
+        }
+
+        $smartAd->delete();
     }
 
     public function visits(Request $request)
@@ -1081,10 +1172,44 @@ class AdminController extends Controller
 
     public function deleteVisit($id)
     {
-        $visit = Visit::findOrFail($id);
-        $visit->delete();
-        
+        $this->performVisitDeletion($id);
         return redirect()->back()->with('success', __('messages.visit_deleted'));
+    }
+
+    public function bulkDeleteVisits(Request $request)
+    {
+        $ids = $request->input('ids');
+
+        if (!$ids || !is_array($ids)) {
+            return redirect()->back()->with('error', __('messages.no_selection') ?? 'No items selected');
+        }
+
+        foreach ($ids as $id) {
+            $this->performVisitDeletion($id);
+        }
+
+        return redirect()->back()->with('success', __('messages.visit_deleted'));
+    }
+
+    private function performVisitDeletion($id)
+    {
+        $visit = Visit::find($id);
+        if (!$visit) {
+            return;
+        }
+
+        if ($visit->uid && $visit->uid !== auth()->id()) {
+            Notification::create([
+                'uid' => $visit->uid,
+                'name' => __('your_ad_has_been_deleted'),
+                'nurl' => 'visit', // using basic visit url
+                'logo' => 'delete',
+                'time' => time(),
+                'state' => 0
+            ]);
+        }
+
+        $visit->delete();
     }
 
     private function resolveAdminInventoryFilterState(Request $request, string $page, array $defaults): array
