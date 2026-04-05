@@ -48,7 +48,8 @@
 * **Fix**: The `deleteUser()` admin action now performs full cleanup of orphaned data: follow/reaction records (`like` table), user options (slug, social links, point history), notifications, statuses, and messages.
 * **Add**: Added a null-safety guard to the `user_preview_landscape` partial to gracefully skip rendering for deleted users as a defense-in-depth layer.
 * **Add**: Added a new **Repair Orphaned Records** tool to the `/admin/maintenance` page, allowing administrators to clean up follow and reaction records linked to previously deleted members.
-* **i18n**: Added translation keys for the orphaned records repair feature across all **9 supported languages**.
+* **Add**: Added a new **Repair Orphaned Content** tool to the `/admin/maintenance` page, allowing administrators to clean up orphaned comments and reactions linked to deleted posts, forum topics, directory listings, store products, and order requests across all content types (13-step deep cleanup).
+* **i18n**: Added translation keys for the orphaned records and content repair features across all **9 supported languages**.
 
 # v4.2.3
 > **Corrective Release** — User slug synchronization, RTL post layout fixes, and UI consistency.

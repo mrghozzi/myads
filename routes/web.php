@@ -521,6 +521,7 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::post('/maintenance/migrate', [AdminController::class, 'runMigrations'])->name('admin.maintenance.migrate');
     Route::post('/maintenance/db-repair', [AdminController::class, 'dbRepair'])->name('admin.maintenance.db_repair');
     Route::post('/maintenance/repair-orphaned', [AdminController::class, 'repairOrphanedRecords'])->name('admin.maintenance.repair_orphaned');
+    Route::post('/maintenance/repair-orphaned-content', [AdminController::class, 'repairOrphanedContent'])->name('admin.maintenance.repair_orphaned_content');
 
     // Security
     Route::get('/security', [AdminSecurityController::class, 'index'])->name('admin.security.index');

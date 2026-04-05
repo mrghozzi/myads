@@ -21,6 +21,9 @@ use App\Models\Directory;
 use App\Models\Product;
 use App\Models\Like;
 use App\Models\Message;
+use App\Models\ForumComment;
+use App\Models\Option;
+use App\Models\OrderRequest;
 
 use App\Models\Banner;
 use App\Models\Link;
@@ -32,10 +35,8 @@ use App\Models\DirectoryCategory;
 use App\Models\News;
 use App\Models\Ad;
 use App\Models\Report;
-use App\Models\OrderRequest;
 use App\Models\Emoji;
 use App\Models\Menu;
-use App\Models\Option;
 use App\Models\Knowledgebase;
 use App\Models\Page;
 use App\Models\ProductFile;
@@ -3069,6 +3070,109 @@ class AdminController extends Controller
         } catch (\Throwable $e) {
             $this->maintenanceMode->disable(Auth::user(), 'repair_orphaned_records_error');
             return redirect()->back()->with('error', __('messages.orphaned_records_repair_failed') . ': ' . $e->getMessage());
+        }
+    }
+
+    public function repairOrphanedContent()
+    {
+        $this->maintenanceMode->enable(Auth::user(), 'repair_orphaned_content');
+        try {
+            $totalCleaned = 0;
+
+            // 1. Orphaned forum comments (topic deleted)
+            $forumTopicIds = DB::table('forum')->pluck('id')->toArray();
+            if (!empty($forumTopicIds)) {
+                $totalCleaned += ForumComment::whereNotIn('tid', $forumTopicIds)->delete();
+            } else {
+                $totalCleaned += ForumComment::count();
+                ForumComment::query()->delete();
+            }
+
+            // 2. Orphaned directory comments (directory listing deleted)
+            $directoryIds = DB::table('directory')->pluck('id')->toArray();
+            $totalCleaned += Option::where('o_type', 'd_coment')
+                ->when(!empty($directoryIds), fn($q) => $q->whereNotIn('o_parent', $directoryIds))
+                ->when(empty($directoryIds), fn($q) => $q)
+                ->delete();
+
+            // 3. Orphaned store comments (product deleted)
+            $productIds = DB::table('product')->pluck('id')->toArray();
+            $totalCleaned += Option::where('o_type', 's_coment')
+                ->when(!empty($productIds), fn($q) => $q->whereNotIn('o_parent', $productIds))
+                ->when(empty($productIds), fn($q) => $q)
+                ->delete();
+
+            // 4. Orphaned order comments (order request deleted)
+            $orderIds = DB::table('order_requests')->pluck('id')->toArray();
+            $totalCleaned += Option::where('o_type', 'order_comment')
+                ->when(!empty($orderIds), fn($q) => $q->whereNotIn('o_parent', $orderIds))
+                ->when(empty($orderIds), fn($q) => $q)
+                ->delete();
+
+            // 5. Orphaned reactions on forum topics (type 2)
+            $totalCleaned += Like::where('type', 2)
+                ->when(!empty($forumTopicIds), fn($q) => $q->whereNotIn('sid', $forumTopicIds))
+                ->when(empty($forumTopicIds), fn($q) => $q)
+                ->delete();
+
+            // 6. Orphaned reactions on directory (type 22)
+            $totalCleaned += Like::where('type', 22)
+                ->when(!empty($directoryIds), fn($q) => $q->whereNotIn('sid', $directoryIds))
+                ->when(empty($directoryIds), fn($q) => $q)
+                ->delete();
+
+            // 7. Orphaned reactions on store products (type 3)
+            $totalCleaned += Like::where('type', 3)
+                ->when(!empty($productIds), fn($q) => $q->whereNotIn('sid', $productIds))
+                ->when(empty($productIds), fn($q) => $q)
+                ->delete();
+
+            // 8. Orphaned reactions on order requests (type 6)
+            $totalCleaned += Like::where('type', 6)
+                ->when(!empty($orderIds), fn($q) => $q->whereNotIn('sid', $orderIds))
+                ->when(empty($orderIds), fn($q) => $q)
+                ->delete();
+
+            // 9. Orphaned reactions on forum comments (type 4)
+            $commentIds = DB::table('f_coment')->pluck('id')->toArray();
+            $totalCleaned += Like::where('type', 4)
+                ->when(!empty($commentIds), fn($q) => $q->whereNotIn('sid', $commentIds))
+                ->when(empty($commentIds), fn($q) => $q)
+                ->delete();
+
+            // 10. Orphaned reactions on directory comments (type 44)
+            $dirCommentIds = Option::where('o_type', 'd_coment')->pluck('id')->toArray();
+            $totalCleaned += Like::where('type', 44)
+                ->when(!empty($dirCommentIds), fn($q) => $q->whereNotIn('sid', $dirCommentIds))
+                ->when(empty($dirCommentIds), fn($q) => $q)
+                ->delete();
+
+            // 11. Orphaned reactions on store comments (type 444)
+            $storeCommentIds = Option::where('o_type', 's_coment')->pluck('id')->toArray();
+            $totalCleaned += Like::where('type', 444)
+                ->when(!empty($storeCommentIds), fn($q) => $q->whereNotIn('sid', $storeCommentIds))
+                ->when(empty($storeCommentIds), fn($q) => $q)
+                ->delete();
+
+            // 12. Orphaned reactions on order comments (type 66)
+            $orderCommentIds = Option::where('o_type', 'order_comment')->pluck('id')->toArray();
+            $totalCleaned += Like::where('type', 66)
+                ->when(!empty($orderCommentIds), fn($q) => $q->whereNotIn('sid', $orderCommentIds))
+                ->when(empty($orderCommentIds), fn($q) => $q)
+                ->delete();
+
+            // 13. Orphaned reaction data (data_reaction where like record deleted)
+            $likeIds = Like::pluck('id')->toArray();
+            $totalCleaned += Option::where('o_type', 'data_reaction')
+                ->when(!empty($likeIds), fn($q) => $q->whereNotIn('o_parent', $likeIds))
+                ->when(empty($likeIds), fn($q) => $q)
+                ->delete();
+
+            $this->maintenanceMode->disable(Auth::user(), 'repair_orphaned_content_success');
+            return redirect()->back()->with('success', __('messages.orphaned_content_repaired', ['count' => $totalCleaned]));
+        } catch (\Throwable $e) {
+            $this->maintenanceMode->disable(Auth::user(), 'repair_orphaned_content_error');
+            return redirect()->back()->with('error', __('messages.orphaned_content_repair_failed') . ': ' . $e->getMessage());
         }
     }
 }
