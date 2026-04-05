@@ -3096,7 +3096,7 @@ class AdminController extends Controller
                 ->delete();
 
             // 3. Orphaned store comments (product deleted)
-            $productIds = DB::table('product')->pluck('id')->toArray();
+            $productIds = DB::table('options')->where('o_type', 'store')->pluck('id')->toArray();
             $totalCleaned += Option::where('o_type', 's_coment')
                 ->when(!empty($productIds), fn($q) => $q->whereNotIn('o_parent', $productIds))
                 ->when(empty($productIds), fn($q) => $q)
