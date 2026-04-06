@@ -211,6 +211,18 @@
                                                 <span>{{ __('messages.delete') }}</span>
                                             </button>
 
+                                            <button
+                                                type="button"
+                                                class="btn-extension-glass btn-extension-glass--primary"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#pluginDetailsModal"
+                                                data-slug="{{ $plugin['slug'] }}"
+                                                title="{{ __('messages.details') ?? 'Details' }}"
+                                            >
+                                                <i class="feather-info"></i>
+                                                <span>{{ __('messages.details') ?? 'Details' }}</span>
+                                            </button>
+
                                             @if($pluginUpdate && !empty($pluginUpdate['changelog']))
                                                 <button
                                                     type="button"
@@ -288,8 +300,238 @@
 
 @php($showExtensionDeleteModal = true)
 @include('admin::admin.partials.extension_hub_modal_scripts')
+
+<div class="modal fade" id="pluginDetailsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 20px; overflow: hidden;">
+            <div class="modal-header border-0 pb-0 pt-3 px-4 position-absolute top-0 end-0" style="z-index: 1051;">
+                <button type="button" class="btn-close shadow-none bg-white rounded-circle p-2" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="plugin-details-thumbnail-wrapper" style="height: 300px; background: #eee; position: relative;">
+                <img id="plugin-modal-thumbnail" src="" alt="" style="width: 100%; height: 100%; object-fit: cover;">
+                <div style="position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(0,0,0,0.85)); padding: 25px 30px; color: white;">
+                    <h2 class="fw-bold mb-1" id="plugin-modal-title"></h2>
+                    <p class="mb-0 opacity-75 fs-14" id="plugin-modal-slug-label"></p>
+                </div>
+            </div>
+            <div class="modal-body p-0">
+                <div class="row g-0 flex-nowrap h-100">
+                    <!-- Main Content (Tabs) -->
+                    <div class="col-md-8 p-4 order-1 scrollable-content">
+                        <ul class="nav nav-pills plugin-modal-tabs mb-4 gap-2" role="tablist">
+                            <li class="nav-item">
+                                <button class="nav-link active fw-bold px-4 rounded-pill" data-bs-toggle="tab" data-bs-target="#plugin-tab-description">{{ __('messages.description') ?? 'Description' }}</button>
+                            </li>
+                            <li class="nav-item">
+                                <button class="nav-link fw-bold px-4 rounded-pill" data-bs-toggle="tab" data-bs-target="#plugin-tab-changelog" id="plugin-btn-changelog">{{ __('messages.changelog') ?? 'Changelog' }}</button>
+                            </li>
+                            <li class="nav-item">
+                                <button class="nav-link fw-bold px-4 rounded-pill" data-bs-toggle="tab" data-bs-target="#plugin-tab-screenshots" id="plugin-btn-screenshots">{{ __('messages.screenshots') ?? 'Screenshots' }}</button>
+                            </li>
+                        </ul>
+                        <div class="tab-content" id="plugin-modal-tab-content">
+                            <div class="tab-pane fade show active" id="plugin-tab-description">
+                                <div class="plugin-markdown-content p-2" id="plugin-content-description"></div>
+                            </div>
+                            <div class="tab-pane fade" id="plugin-tab-changelog">
+                                <div class="plugin-markdown-content p-2" id="plugin-content-changelog"></div>
+                            </div>
+                            <div class="tab-pane fade" id="plugin-tab-screenshots">
+                                <div class="plugin-markdown-content p-2" id="plugin-content-screenshots"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sidebar (Metadata) -->
+                    <div class="col-md-4 p-4 order-2" id="plugin-modal-sidebar" style="background: #f8f9fa; border-inline-start: 1px solid #dee2e6;">
+                        <div class="d-grid gap-4">
+                            <div>
+                                <label class="text-muted small text-uppercase fw-extrabold d-block mb-1" style="letter-spacing: 0.5px; font-size: 11px;">{{ __('messages.version') ?? 'Version' }}</label>
+                                <span class="fw-bold fs-15 text-dark" id="plugin-modal-version"></span>
+                            </div>
+                            <div>
+                                <label class="text-muted small text-uppercase fw-extrabold d-block mb-1" style="letter-spacing: 0.5px; font-size: 11px;">{{ __('messages.author') ?? 'Author' }}</label>
+                                <span class="fw-bold fs-15 text-dark" id="plugin-modal-author-name"></span>
+                            </div>
+                            <div>
+                                <label class="text-muted small text-uppercase fw-extrabold d-block mb-1" style="letter-spacing: 0.5px; font-size: 11px;">{{ __('messages.requires_myads') ?? 'Required MyAds' }}</label>
+                                <span class="fw-bold fs-15 text-primary" id="plugin-modal-min-myads"></span>
+                            </div>
+                            <hr class="my-0 opacity-10">
+                            <div id="plugin-modal-adstn-wrap">
+                                <a href="" target="_blank" class="btn btn-soft-primary btn-sm w-100 text-start d-flex align-items-center justify-content-between py-2 fw-bold" id="plugin-modal-adstn-link">
+                                    <span>{{ __('messages.adstn_page') ?? 'ADStn Page' }} »</span>
+                                    <i class="feather-external-link"></i>
+                                </a>
+                            </div>
+                            <div id="plugin-modal-website-wrap">
+                                <a href="" target="_blank" class="btn btn-soft-secondary btn-sm w-100 text-start d-flex align-items-center justify-content-between py-2 fw-bold" id="plugin-modal-website-link">
+                                    <span>{{ __('messages.plugin_website') ?? 'Plugin Website' }} »</span>
+                                    <i class="feather-globe"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify/dist/purify.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var pluginDetailsModal = document.getElementById('pluginDetailsModal');
+    if (pluginDetailsModal) {
+        pluginDetailsModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget;
+            var slug = button.getAttribute('data-slug');
+            
+            // Reset content
+            document.getElementById('plugin-modal-thumbnail').src = '';
+            document.getElementById('plugin-modal-title').textContent = '';
+            document.getElementById('plugin-modal-slug-label').textContent = '';
+            document.getElementById('plugin-content-description').innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary" role="status"></div></div>';
+            document.getElementById('plugin-content-changelog').innerHTML = '';
+            document.getElementById('plugin-content-screenshots').innerHTML = '';
+            
+            // Hide tabs by default
+            document.getElementById('plugin-btn-changelog').closest('li').classList.add('d-none');
+            document.getElementById('plugin-btn-screenshots').closest('li').classList.add('d-none');
+            
+            // Activate first tab
+            const firstTab = document.querySelector('.plugin-modal-tabs button[data-bs-target="#plugin-tab-description"]');
+            if (firstTab) {
+                const tab = new bootstrap.Tab(firstTab);
+                tab.show();
+            }
+            
+            // Fetch data
+            fetch('{{ url("admin/plugins/details") }}/' + slug)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        alert(data.error);
+                        return;
+                    }
+                    
+                    document.getElementById('plugin-modal-thumbnail').src = data.thumbnail || '{{ admin_asset("admin-duralux/images/logo-abbr.png") }}';
+                    document.getElementById('plugin-modal-title').textContent = data.name;
+                    document.getElementById('plugin-modal-slug-label').textContent = data.slug;
+                    document.getElementById('plugin-modal-version').textContent = data.version;
+                    
+                    // Author
+                    var authorHtml = data.author;
+                    if (data.author_url) {
+                        authorHtml = '<a href="' + data.author_url + '" target="_blank" class="text-primary text-decoration-none">' + data.author + '</a>';
+                    }
+                    document.getElementById('plugin-modal-author-name').innerHTML = authorHtml;
+                    
+                    document.getElementById('plugin-modal-min-myads').textContent = data.min_myads || '-';
+                    
+                    // Links
+                    var adstnLink = document.getElementById('plugin-modal-adstn-link');
+                    if (data.ADStn_url) {
+                        adstnLink.closest('div').classList.remove('d-none');
+                        adstnLink.href = 'https://www.adstn.ovh/store/' + data.ADStn_url;
+                    } else {
+                        adstnLink.closest('div').classList.add('d-none');
+                    }
+                    
+                    var websiteLink = document.getElementById('plugin-modal-website-link');
+                    if (data.siteweb) {
+                        websiteLink.closest('div').classList.remove('d-none');
+                        websiteLink.href = data.siteweb;
+                    } else {
+                        websiteLink.closest('div').classList.add('d-none');
+                    }
+                    
+                    // Markdown contents - using marked and DOMPurify for security
+                    var readme = data.readme || data.description || '';
+                    document.getElementById('plugin-content-description').innerHTML = readme ? DOMPurify.sanitize(marked.parse(readme)) : '-';
+                    
+                    if (data.changelogs) {
+                        document.getElementById('plugin-btn-changelog').closest('li').classList.remove('d-none');
+                        document.getElementById('plugin-content-changelog').innerHTML = DOMPurify.sanitize(marked.parse(data.changelogs));
+                    }
+                    
+                    if (data.screenshots) {
+                        document.getElementById('plugin-btn-screenshots').closest('li').classList.remove('d-none');
+                        document.getElementById('plugin-content-screenshots').innerHTML = DOMPurify.sanitize(marked.parse(data.screenshots));
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    document.getElementById('plugin-content-description').innerHTML = '<div class="alert alert-danger">Error loading plugin details.</div>';
+                });
+        });
+    }
+});
+</script>
+<style>
+    .plugin-markdown-content {
+        line-height: 1.6;
+        font-size: 15px;
+        color: #444;
+    }
+    .plugin-markdown-content h1, .plugin-markdown-content h2, .plugin-markdown-content h3 {
+        margin-top: 1.5rem;
+        margin-bottom: 1rem;
+        font-weight: 700;
+        color: #222;
+    }
+    .plugin-markdown-content img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 8px;
+        margin: 1rem 0;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+    .plugin-markdown-content code {
+        background: #f1f3f5;
+        padding: 2px 5px;
+        border-radius: 4px;
+        color: #e83e8c;
+    }
+    .plugin-markdown-content pre {
+        background: #f8f9fa;
+        padding: 1.25rem;
+        border-radius: 10px;
+        overflow-x: auto;
+        border: 1px solid #eee;
+    }
+    .plugin-modal-tabs .nav-link {
+        color: #6e7985;
+        background: transparent;
+        border: none;
+        transition: all 0.2s ease;
+    }
+    .plugin-modal-tabs .nav-link.active {
+        background: var(--extension-hub-accent, #615dfa) !important;
+        color: white !important;
+        box-shadow: 0 4px 10px rgba(97, 93, 250, 0.2);
+    }
+    .btn-soft-primary {
+        background: #eef2ff;
+        color: #615dfa;
+        border: none;
+    }
+    .btn-soft-primary:hover {
+        background: #e0e7ff;
+        color: #4f46e5;
+    }
+    .btn-soft-secondary {
+        background: #f1f5f9;
+        color: #475569;
+        border: none;
+    }
+    .btn-soft-secondary:hover {
+        background: #e2e8f0;
+        color: #1e293b;
+    }
+</style>
 @include('admin::admin.partials.extension_hub_styles')
 @endpush

@@ -502,6 +502,7 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::post('/plugins/upload', [AdminController::class, 'uploadPlugin'])->name('admin.plugins.upload');
     Route::post('plugins/upgrade', [AdminController::class, 'upgradePlugin'])->name('admin.plugins.upgrade');
     Route::get('plugins/thumbnail/{slug}', [AdminController::class, 'pluginThumbnail'])->name('admin.plugins.thumbnail');
+    Route::get('plugins/details/{slug}', [AdminController::class, 'pluginDetails'])->name('admin.plugins.details');
 
     // Themes
     Route::get('/themes', [AdminController::class, 'themes'])->name('admin.themes');

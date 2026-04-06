@@ -3033,6 +3033,47 @@ class AdminController extends Controller
         abort(404);
     }
 
+    public function pluginDetails($slug, PluginManager $pluginManager)
+    {
+        $plugins = $pluginManager->getAllPlugins();
+        $plugin = collect($plugins)->where('slug', $slug)->first();
+
+        if (!$plugin) {
+            return response()->json(['error' => 'Plugin not found'], 404);
+        }
+
+        $path = $plugin['path'];
+        $data = [
+            'name' => $plugin['name'] ?? '',
+            'slug' => $plugin['slug'] ?? '',
+            'version' => $plugin['version'] ?? '1.0.0',
+            'author' => $plugin['author'] ?? '',
+            'author_url' => $plugin['author_url'] ?? null,
+            'min_myads' => $plugin['min_myads'] ?? null,
+            'ADStn_url' => $plugin['ADStn_url'] ?? null,
+            'siteweb' => $plugin['siteweb'] ?? null,
+            'thumbnail' => !empty($plugin['thumbnail']) ? route('admin.plugins.thumbnail', $plugin['slug']) : null,
+            'description' => $plugin['description'] ?? '',
+            'readme' => null,
+            'changelogs' => null,
+            'screenshots' => null,
+        ];
+
+        if (File::exists($path . '/README.md')) {
+            $data['readme'] = File::get($path . '/README.md');
+        }
+
+        if (File::exists($path . '/changelogs.md')) {
+            $data['changelogs'] = File::get($path . '/changelogs.md');
+        }
+
+        if (File::exists($path . '/screenshots.md')) {
+            $data['screenshots'] = File::get($path . '/screenshots.md');
+        }
+
+        return response()->json($data);
+    }
+
     // Themes Management
     public function themes(ThemeManager $themeManager, RemoteExtensionMarketplaceService $marketplace)
     {
