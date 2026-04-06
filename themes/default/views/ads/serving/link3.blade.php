@@ -258,7 +258,7 @@
             {{ $adsBrandName }}
         </span>
         <a class="myads-link-smart__report" href="{{ url('/report') }}?link={{ $link1->id }}&link2={{ $link2->id }}" target="_blank" rel="noopener noreferrer">
-            <img src="{{ asset('themes/default/assets/img/Alert-icon.png') }}" alt="">
+            <img src="{{ asset('themes/default/assets/img/Alert-icon.png') }}" width="16" height="16" alt="Report link icon">
             Report
         </a>
     </div>

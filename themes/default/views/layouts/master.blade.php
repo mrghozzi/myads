@@ -62,26 +62,7 @@
         $css_path = $mode == 'css_d' ? 'css_d' : 'css';
     @endphp
     <script>
-        (function() {
-            function readCookie(name) {
-                const match = document.cookie.match(new RegExp('(?:^|; )' + name + '=([^;]*)'));
-                return match ? decodeURIComponent(match[1]) : null;
-            }
-            function readStoredMode() {
-                try {
-                    const value = localStorage.getItem('themeMode');
-                    if (value === 'css' || value === 'css_d') {
-                        return value;
-                    }
-                } catch (e) {
-                }
-                const cookieMode = readCookie('modedark');
-                return cookieMode === 'css' || cookieMode === 'css_d' ? cookieMode : null;
-            }
-            const mode = readStoredMode() || '{{ $css_path }}';
-            document.documentElement.dataset.theme = mode;
-            window.__themeMode = mode;
-        })();
+        (function(){function r(n){const m=document.cookie.match(new RegExp('(?:^|; )'+n+'=([^;]*)'));return m?decodeURIComponent(m[1]):null}function s(){try{const v=localStorage.getItem('themeMode');if(v==='css'||v==='css_d')return v}catch(e){}const c=r('modedark');return c==='css'||c==='css_d'?c:null}const o=s()||'{{ $css_path }}';document.documentElement.dataset.theme=o;window.__themeMode=o;})();
     </script>
     <style id="critical-css">
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;border:none;outline:none}
@@ -638,18 +619,15 @@
     <script src="{{ theme_asset('js/xm_tab.min.js') }}" defer></script>
     <script src="{{ theme_asset('js/xm_tooltip.min.js') }}" defer></script>
     <script src="{{ theme_asset('js/global.hexagons.js') }}" defer></script>
-    <script>
-        // Mark all hexagon elements initialized by global.hexagons.js so initHexagons() skips them
-        document.querySelectorAll('.hexagon-image-30-32, .hexagon-border-40-44, .hexagon-22-24, .hexagon-dark-16-18').forEach(function(el) {
-            el.dataset.hexInit = '1';
-        });
-    </script>
+    <script>document.querySelectorAll('.hexagon-image-30-32, .hexagon-border-40-44, .hexagon-22-24, .hexagon-dark-16-18').forEach(function(el){el.dataset.hexInit='1';});</script>
     <script src="{{ theme_asset('js/global.tooltips.js') }}" defer></script>
     <script src="{{ theme_asset('js/header.js') }}" defer></script>
     <script src="{{ theme_asset('js/sidebar.js') }}" defer></script>
     <script src="{{ theme_asset('js/content.js') }}" defer></script>
     <script src="{{ theme_asset('js/form.utils.js') }}" defer></script>
     <script src="{{ theme_asset('js/svg-loader.js') }}" defer></script>
+
+    <script>
 
     <script>
         function applyThemeLinks(mode) {
@@ -1456,6 +1434,7 @@
             })
             .catch(error => console.error('Error:', error));
         }
+    </script>
 
         document.addEventListener('click', function(event) {
             let menuTrigger = event.target.closest('[data-activity-menu-trigger]');

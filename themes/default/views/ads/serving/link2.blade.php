@@ -22,7 +22,7 @@
             <p class='adstn' style='color: #000000;'>ADS by <a href='{{ url('/') }}?ref={{ $publisherId }}' target='_blank' rel='noopener noreferrer'>{{ $adsBrandName }}</a></p>
         </div>
         <a href='{{ url('/report') }}?link={{ $link1->id }}&link2={{ $link2->id }}' target='_blank' rel='noopener noreferrer' aria-label='Report'>
-            <img src='{{ asset('themes/default/assets/img/Alert-icon.png') }}' alt=''>
+            <img src='{{ asset('themes/default/assets/img/Alert-icon.png') }}' width="16" height="16" alt='Report link icon'>
         </a>
     </div>
 </div>

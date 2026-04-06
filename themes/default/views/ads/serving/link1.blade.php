@@ -31,7 +31,7 @@
                     <tr>
                         <td nowrap width='50%' height='11' align='left' bgcolor='#0099ff'>
                             <a href='{{ url('/report') }}?link={{ $link1->id }}&link2={{ $link2->id }}' target='_blank' aria-label='Report'>
-                                <img src='{{ asset('themes/default/assets/img/Alert-icon.png') }}' alt=''>
+                                <img src='{{ asset('themes/default/assets/img/Alert-icon.png') }}' width="12" height="12" alt='Report link icon'>
                             </a>
                             <b style='color:#FFFFFF'> | </b>
                             <a class='attribution' href='{{ url('/') }}?ref={{ $publisherId }}' target='_blank' style='color: #ffffff; text-decoration: none; font-family: verdana,arial,sans-serif; font-size: 10px; font-weight: bold;'>{{ $adsBrandName }}</a>

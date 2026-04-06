@@ -4437,9 +4437,10 @@ figure > img {
 }
 
 .page-loader .page-loader-decoration .icon-logo {
+  width: 40px !important;
+  height: 40px !important;
+  display: block;
   fill: #fff;
-  width: 36px;
-  height: 52px;
 }
 
 .page-loader .page-loader-info .page-loader-info-title,
@@ -14997,6 +14998,9 @@ figure > img {
 }
 
 .header .header-brand .logo {
+  width: 40px;
+  height: 40px;
+  display: block;
   margin-left: 26px;
 }
 
