@@ -2,7 +2,7 @@
 @php
     $currentUser = auth()->user();
     $categories = \App\Models\DirectoryCategory::where('statu', 1)->orderBy('name', 'ASC')->get();
-    $oldText = (string) old('text', old('txt', ''));
+    $oldText = (string) old('text', old('txt', request('text', '')));
     $oldLinkUrl = (string) old('link_url', '');
     $oldPublishMode = (string) old('publish_mode', 'post');
     $oldPostKind = (string) old('post_kind', 'text');

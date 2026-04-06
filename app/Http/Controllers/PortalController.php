@@ -132,4 +132,21 @@ class PortalController extends Controller
 
         return view('theme::portal.index', compact('activities', 'filter', 'search'));
     }
+
+    public function share(Request $request)
+    {
+        $this->seo([
+            'scope_key' => 'share',
+            'resource_title' => __('messages.share_to_community') ?? 'Share to Community',
+            'description' => __('messages.share_page_description') ?? 'Share content with the MYADS community.',
+            'indexable' => false,
+            'breadcrumbs' => [
+                ['name' => __('messages.home'), 'url' => url('/')],
+                ['name' => __('messages.community'), 'url' => route('portal.index')],
+                ['name' => __('messages.share') ?? 'Share', 'url' => route('portal.share')],
+            ],
+        ]);
+
+        return view('theme::portal.share');
+    }
 }
