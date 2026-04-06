@@ -19,9 +19,13 @@
     } catch (\Exception $e) {
         // DB not ready yet (fresh install) — skip cookie banner
     }
+
+    // Performance Optimization: Check for consent status in PHP to avoid LCP delay
+    $consentStatus = $_COOKIE['cookie_consent_status'] ?? null;
+    $shouldRender = ($cookieEnabled == '1' && !$consentStatus);
 @endphp
 
-@if($cookieEnabled == '1')
+@if($shouldRender)
 <style>
     .cookie-notice-banner {
         position: fixed;
@@ -29,9 +33,15 @@
         background-color: {{ $cookieBgColor }};
         color: {{ $cookieTextColor }};
         padding: 20px;
-        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-        display: none; /* Hidden by default until JS checks consent */
+        box-shadow: 0 -12px 30px rgba(0, 0, 0, 0.25);
         box-sizing: border-box;
+        opacity: 1;
+        transition: opacity 0.3s ease, transform 0.3s ease;
+        /* Render visible by default for LCP optimization */
+        display: flex; 
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
     }
     
     .cookie-notice-banner.position-bottom {
@@ -40,10 +50,6 @@
         right: 0;
         width: 100%;
         text-align: center;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
     }
 
     .cookie-notice-banner.position-top {
@@ -52,25 +58,23 @@
         right: 0;
         width: 100%;
         text-align: center;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
     }
 
     .cookie-notice-banner.position-bottom_left {
         bottom: 20px;
         left: 20px;
         max-width: 400px;
-        border-radius: 8px;
+        border-radius: 12px;
+        display: block;
     }
 
     .cookie-notice-banner.position-bottom_right {
         bottom: 20px;
         right: 20px;
         max-width: 400px;
-        border-radius: 8px;
+        border-radius: 12px;
+        display: block;
     }
 
     .cookie-content {
@@ -78,48 +82,51 @@
     }
 
     .cookie-content h5 {
-        margin: 0 0 10px 0;
-        font-weight: 600;
+        margin: 0 0 8px 0;
+        font-size: 1rem;
+        font-weight: 700;
         color: {{ $cookieTextColor }};
     }
 
     .cookie-content p {
         margin: 0;
         font-size: 14px;
-        line-height: 1.5;
-        opacity: 0.9;
+        line-height: 1.6;
+        opacity: 0.85;
     }
 
     .cookie-actions {
         display: flex;
-        gap: 10px;
+        gap: 12px;
         flex-wrap: wrap;
         justify-content: center;
     }
 
     .cookie-btn {
-        padding: 8px 16px;
+        padding: 10px 24px;
         border: none;
-        border-radius: 4px;
+        border-radius: 8px;
         cursor: pointer;
         font-size: 14px;
-        font-weight: 500;
-        transition: opacity 0.2s;
+        font-weight: 700;
+        transition: all 0.2s ease;
     }
 
     .cookie-btn:hover {
-        opacity: 0.8;
+        opacity: 0.9;
+        transform: translateY(-1px);
     }
 
     .cookie-btn-primary {
         background-color: {{ $cookieBtnBg }};
         color: {{ $cookieBtnText }};
+        box-shadow: 0 4px 12px rgba(97, 93, 250, 0.25);
     }
 
     .cookie-btn-secondary {
         background-color: transparent;
         color: {{ $cookieTextColor }};
-        border: 1px solid {{ $cookieTextColor }};
+        border: 1px solid rgba(255, 255, 255, 0.3);
     }
     
     @media (min-width: 768px) {
@@ -127,11 +134,12 @@
             flex-direction: row;
             justify-content: space-between;
             text-align: left;
+            padding: 24px 40px;
         }
         
         .cookie-notice-banner.position-bottom .cookie-content, .cookie-notice-banner.position-top .cookie-content {
             margin-bottom: 0;
-            margin-right: 30px;
+            margin-right: 40px;
         }
     }
 </style>
@@ -148,39 +156,36 @@
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Check if cookie consent has already been given or rejected
-        var consentStatus = localStorage.getItem('cookie_consent_status');
-        
-        if (!consentStatus) {
-            // If no status, show the banner
-            var banner = document.getElementById('cookieNoticeBanner');
-            if (banner) {
-                // Determine whether it needs display block or flex based on classes
-                if (banner.classList.contains('position-bottom') || banner.classList.contains('position-top')) {
-                    banner.style.display = 'flex';
-                } else {
-                    banner.style.display = 'block';
-                }
-            }
+    (function() {
+        var banner = document.getElementById('cookieNoticeBanner');
+        if (!banner) return;
+
+        // Immediate check for localStorage as a fallback to cookie detection
+        var status = localStorage.getItem('cookie_consent_status');
+        if (status) {
+            banner.style.display = 'none';
         }
 
-        // Accept Button Handler
-        document.getElementById('cookieAcceptBtn')?.addEventListener('click', function() {
-            localStorage.setItem('cookie_consent_status', 'accepted');
-            // Alternatively standard cookie:
-            document.cookie = "cookie_consent_status=accepted; max-age=" + (60*60*24*365) + "; path=/";
+        function setConsent(status) {
+            localStorage.setItem('cookie_consent_status', status);
+            // Set cookie so PHP can detect it on the next page load
+            var date = new Date();
+            date.setTime(date.getTime() + (365 * 24 * 60 * 60 * 1000));
+            document.cookie = "cookie_consent_status=" + status + "; expires=" + date.toUTCString() + "; path=/; SameSite=Lax";
             
-            document.getElementById('cookieNoticeBanner').style.display = 'none';
+            banner.style.opacity = '0';
+            setTimeout(function() {
+                banner.style.display = 'none';
+            }, 300);
+        }
+
+        document.getElementById('cookieAcceptBtn')?.addEventListener('click', function() {
+            setConsent('accepted');
         });
 
-        // Reject Button Handler
         document.getElementById('cookieRejectBtn')?.addEventListener('click', function() {
-            localStorage.setItem('cookie_consent_status', 'rejected');
-            document.cookie = "cookie_consent_status=rejected; max-age=" + (60*60*24*365) + "; path=/";
-            
-            document.getElementById('cookieNoticeBanner').style.display = 'none';
+            setConsent('rejected');
         });
-    });
+    })();
 </script>
 @endif

@@ -2,7 +2,12 @@
     <div class="header-actions">
         <div class="header-brand">
             <div class="logo">
-                <a href="{{ url('/') }}"><img src="{{ theme_asset('img/logo_w.png') }}" width="40" alt="logo"></a>
+                <a href="{{ url('/') }}">
+                    <picture>
+                        <source srcset="{{ theme_asset('img/logo_w.webp') }}" type="image/webp">
+                        <img src="{{ theme_asset('img/logo_w.png') }}" width="40" height="40" alt="logo">
+                    </picture>
+                </a>
             </div>
             <h1 class="header-brand-text">{{ $site_settings->titer ?? 'MyAds' }}</h1>
         </div>

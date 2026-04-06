@@ -1,6 +1,9 @@
 <div class="page-loader">
     <div class="page-loader-decoration">
-        <img src="{{ asset('themes/default/assets/img/logo_w.png') }}" width="40" />
+        <picture>
+            <source srcset="{{ theme_asset('img/logo_w.webp') }}" type="image/webp">
+            <img src="{{ theme_asset('img/logo_w.png') }}" width="40" height="40" />
+        </picture>
     </div>
     <div class="page-loader-info">
         <p class="page-loader-info-title">{{ $site_settings->titer ?? 'MyAds' }}</p>

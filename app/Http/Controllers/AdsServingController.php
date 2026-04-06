@@ -854,35 +854,49 @@ JS;
   if (!slot) {
     return;
   }
-  var metrics = measureBox(slot);
-  if (px === 'responsive') {
-    var width = metrics.width;
-    if (width >= 728) {
-      px = '728x90';
-    } else if (width >= 468) {
-      px = '468x60';
-    } else if (width >= 300) {
-      px = '300x250';
-    } else if (width >= 160) {
-      px = '160x600';
+  
+  function initiate() {
+    var metrics = measureBox(slot);
+    if (px === 'responsive') {
+      var width = metrics.width;
+      if (width >= 728) {
+        px = '728x90';
+      } else if (width >= 468) {
+        px = '468x60';
+      } else if (width >= 300) {
+        px = '300x250';
+      } else if (width >= 160) {
+        px = '160x600';
+      } else {
+        px = '300x250';
+      }
+    }
+    var src='{$bootstrapUrl}?ID=' + encodeURIComponent(publisherId) + '&px=' + encodeURIComponent(px);
+    if (px === 'responsive2') {
+      if (metrics.width > 0) {
+        src += '&cw=' + encodeURIComponent(metrics.width);
+      }
+      if (metrics.height > 0) {
+        src += '&ch=' + encodeURIComponent(metrics.height);
+      }
+    }
+    if (vt) {
+      src += '&vt=' + encodeURIComponent(vt);
+    }
+    src += '&slot=' + encodeURIComponent(slot.id);
+    appendLoader(slot, src);
+  }
+
+  // Avoid forced reflow by deferring measurement
+  if (px === 'responsive' || px === 'responsive2') {
+    if (w.requestAnimationFrame) {
+      w.requestAnimationFrame(initiate);
     } else {
-      px = '300x250';
+      setTimeout(initiate, 16);
     }
+  } else {
+    initiate();
   }
-  var src='{$bootstrapUrl}?ID=' + encodeURIComponent(publisherId) + '&px=' + encodeURIComponent(px);
-  if (px === 'responsive2') {
-    if (metrics.width > 0) {
-      src += '&cw=' + encodeURIComponent(metrics.width);
-    }
-    if (metrics.height > 0) {
-      src += '&ch=' + encodeURIComponent(metrics.height);
-    }
-  }
-  if (vt) {
-    src += '&vt=' + encodeURIComponent(vt);
-  }
-  src += '&slot=' + encodeURIComponent(slot.id);
-  appendLoader(slot, src);
   }
   if (d.body) {
     boot();
@@ -980,18 +994,33 @@ JS;
   if (!slot) {
     return;
   }
-  var src='{$bootstrapUrl}?ID=' + encodeURIComponent(publisherId) + '&px=' + encodeURIComponent(px);
-  if (px === 'responsive2') {
-    var width = measureBox(slot).width;
-    if (!width) {
-      width = parseInt(w.innerWidth || d.documentElement.clientWidth || 0, 10) || 0;
+  
+  function initiate() {
+    var src='{$bootstrapUrl}?ID=' + encodeURIComponent(publisherId) + '&px=' + encodeURIComponent(px);
+    if (px === 'responsive2') {
+      var metrics = measureBox(slot);
+      var width = metrics.width;
+      if (!width) {
+        width = parseInt(w.innerWidth || d.documentElement.clientWidth || 0, 10) || 0;
+      }
+      if (width > 0) {
+        src += '&cw=' + encodeURIComponent(width);
+      }
     }
-    if (width > 0) {
-      src += '&cw=' + encodeURIComponent(width);
-    }
+    src += '&slot=' + encodeURIComponent(slot.id);
+    appendLoader(slot, src);
   }
-  src += '&slot=' + encodeURIComponent(slot.id);
-  appendLoader(slot, src);
+
+  // Avoid forced reflow by deferring measurement for responsive slots
+  if (px === 'responsive2' || px === 'responsive') {
+    if (w.requestAnimationFrame) {
+      w.requestAnimationFrame(initiate);
+    } else {
+      setTimeout(initiate, 16);
+    }
+  } else {
+    initiate();
+  }
   }
   if (d.body) {
     boot();
@@ -1117,53 +1146,63 @@ JS;
   if (!slot) {
     return;
   }
-  var metrics = measureBox(slot);
-  var width = metrics.width;
-  var height = metrics.height;
-  var ua = (navigator.userAgent || '').toLowerCase();
-  var isTablet = /(ipad|tablet|playbook|silk)|(android(?!.*mobile))/i.test(ua);
-  var isMobile = !isTablet && /(iphone|ipod|android|mobile)/i.test(ua);
-  var deviceType = isTablet ? 'tablet' : (isMobile ? 'mobile' : 'desktop');
-  function readMeta(name, attr) {
-    var node = d.querySelector('meta[' + attr + '="' + name + '"]');
-    return node ? (node.getAttribute('content') || '') : '';
+
+  function initiate() {
+    var metrics = measureBox(slot);
+    var width = metrics.width;
+    var height = metrics.height;
+    var ua = (navigator.userAgent || '').toLowerCase();
+    var isTablet = /(ipad|tablet|playbook|silk)|(android(?!.*mobile))/i.test(ua);
+    var isMobile = !isTablet && /(iphone|ipod|android|mobile)/i.test(ua);
+    var deviceType = isTablet ? 'tablet' : (isMobile ? 'mobile' : 'desktop');
+    function readMeta(name, attr) {
+      var node = d.querySelector('meta[' + attr + '="' + name + '"]');
+      return node ? (node.getAttribute('content') || '') : '';
+    }
+    function normalizeText(value) {
+      return (value || '').replace(/\\s+/g, ' ').trim();
+    }
+    var contextParts = [];
+    contextParts.push(normalizeText(d.title || ''));
+    contextParts.push(normalizeText(readMeta('keywords', 'name')));
+    contextParts.push(normalizeText(readMeta('description', 'name')));
+    contextParts.push(normalizeText(readMeta('og:title', 'property')));
+    contextParts.push(normalizeText(readMeta('og:description', 'property')));
+    var heading = d.querySelector('h1, h2, h3');
+    if (heading) {
+      contextParts.push(normalizeText(heading.textContent || ''));
+    }
+    var article = d.querySelector('article, main, [role="main"], .content, .post, .entry, body');
+    if (article) {
+      contextParts.push(normalizeText((article.textContent || '').slice(0, 320)));
+    }
+    var context = normalizeText(contextParts.filter(Boolean).join(' | ')).slice(0, 500);
+    var src='{$bootstrapUrl}?ID=' + encodeURIComponent(publisherId);
+    if (vt) {
+      src += '&vt=' + encodeURIComponent(vt);
+    }
+    if (width > 0) {
+      src += '&cw=' + encodeURIComponent(width);
+    }
+    if (height > 0) {
+      src += '&ch=' + encodeURIComponent(height);
+    }
+    if (deviceType) {
+      src += '&dv=' + encodeURIComponent(deviceType);
+    }
+    if (context) {
+      src += '&ctx=' + encodeURIComponent(context);
+    }
+    src += '&slot=' + encodeURIComponent(slot.id);
+    appendLoader(slot, src);
   }
-  function normalizeText(value) {
-    return (value || '').replace(/\\s+/g, ' ').trim();
+
+  // Defer measurement to next frame to avoid forced layout thrashing
+  if (w.requestAnimationFrame) {
+    w.requestAnimationFrame(initiate);
+  } else {
+    setTimeout(initiate, 16);
   }
-  var contextParts = [];
-  contextParts.push(normalizeText(d.title || ''));
-  contextParts.push(normalizeText(readMeta('keywords', 'name')));
-  contextParts.push(normalizeText(readMeta('description', 'name')));
-  contextParts.push(normalizeText(readMeta('og:title', 'property')));
-  contextParts.push(normalizeText(readMeta('og:description', 'property')));
-  var heading = d.querySelector('h1, h2, h3');
-  if (heading) {
-    contextParts.push(normalizeText(heading.textContent || ''));
-  }
-  var article = d.querySelector('article, main, [role="main"], .content, .post, .entry, body');
-  if (article) {
-    contextParts.push(normalizeText((article.textContent || '').slice(0, 320)));
-  }
-  var context = normalizeText(contextParts.filter(Boolean).join(' | ')).slice(0, 500);
-  var src='{$bootstrapUrl}?ID=' + encodeURIComponent(publisherId);
-  if (vt) {
-    src += '&vt=' + encodeURIComponent(vt);
-  }
-  if (width > 0) {
-    src += '&cw=' + encodeURIComponent(width);
-  }
-  if (height > 0) {
-    src += '&ch=' + encodeURIComponent(height);
-  }
-  if (deviceType) {
-    src += '&dv=' + encodeURIComponent(deviceType);
-  }
-  if (context) {
-    src += '&ctx=' + encodeURIComponent(context);
-  }
-  src += '&slot=' + encodeURIComponent(slot.id);
-  appendLoader(slot, src);
   }
   if (d.body) {
     boot();

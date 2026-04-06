@@ -15,7 +15,7 @@
         @if($galleryImages->count() === 1)
             <div class="picture-collage-row">
                 <a class="picture-collage-item" href="{{ route('forum.topic', $activity->tp_id) }}">
-                    <img class="photo-preview" src="{{ $galleryImages->first() }}" alt="gallery-image">
+                    <img class="photo-preview" src="{{ $galleryImages->first() }}" alt="gallery-image" loading="lazy">
                 </a>
             </div>
         @else
@@ -23,7 +23,7 @@
                 <div class="picture-collage-row{{ $chunk->count() === 1 ? ' medium' : '' }}">
                     @foreach($chunk as $imageUrl)
                         <a class="picture-collage-item" href="{{ route('forum.topic', $activity->tp_id) }}">
-                            <img class="photo-preview" src="{{ $imageUrl }}" alt="gallery-image">
+                            <img class="photo-preview" src="{{ $imageUrl }}" alt="gallery-image" loading="lazy">
                         </a>
                     @endforeach
                 </div>

@@ -310,6 +310,12 @@
 <script src="https://cdn.jsdelivr.net/npm/dompurify/dist/purify.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        const renderer = new marked.Renderer();
+        renderer.image = function(href, title, text) {
+            return `<img src="${href}" alt="${text}" title="${title || ''}" loading="lazy" style="max-width:100%;height:auto;border-radius:12px;">`;
+        };
+        marked.setOptions({ renderer: renderer });
+
         function renderNewsMarkdown(container) {
             const scope = container || document;
             scope.querySelectorAll('.markdown-news-preview').forEach(el => {

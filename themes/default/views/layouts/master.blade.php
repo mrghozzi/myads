@@ -83,28 +83,60 @@
             window.__themeMode = mode;
         })();
     </script>
-    <link id="theme-bootstrap" data-theme-link="true" href="{{ theme_asset($css_path . '/bootstrap.min.css') }}" rel='stylesheet' type='text/css' />
-    <link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap4.min.css" rel='stylesheet' type='text/css' />
-    <link id="theme-styles" data-theme-link="true" href="{{ theme_asset($css_path . '/styles.min.css') }}" rel='stylesheet' type='text/css' />
-    <link id="theme-prestyle" data-theme-link="true" href="{{ theme_asset($css_path . '/prestyle.css') }}" rel='stylesheet' type='text/css' />
-    <link id="theme-simplebar" data-theme-link="true" rel="stylesheet" href="{{ theme_asset($css_path . '/simplebar.css') }}">
-    <link id="theme-tiny-slider" data-theme-link="true" rel="stylesheet" href="{{ theme_asset($css_path . '/tiny-slider.css') }}">
-    <link id="theme-dataTables" data-theme-link="true" rel="stylesheet" href="{{ theme_asset($css_path . '/dataTables.css') }}">
-    <link id="theme-forum-activity-super" data-theme-link="true" rel="stylesheet" href="{{ theme_asset($css_path . '/forum-activity-superdesign.css') }}">
+    <link id="theme-bootstrap" data-theme-link="true" href="{{ theme_asset($css_path . '/bootstrap.min.css') }}" rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link id="theme-styles" data-theme-link="true" href="{{ theme_asset($css_path . '/styles.min.css') }}" rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link id="theme-prestyle" data-theme-link="true" href="{{ theme_asset($css_path . '/prestyle.css') }}" rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    
+    <!-- Deferred CSS -->
+    <link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap4.min.css" rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link id="theme-simplebar" data-theme-link="true" rel="preload" as="style" href="{{ theme_asset($css_path . '/simplebar.css') }}" onload="this.onload=null;this.rel='stylesheet'">
+    <link id="theme-tiny-slider" data-theme-link="true" rel="preload" as="style" href="{{ theme_asset($css_path . '/tiny-slider.css') }}" onload="this.onload=null;this.rel='stylesheet'">
+    <link id="theme-dataTables" data-theme-link="true" rel="preload" as="style" href="{{ theme_asset($css_path . '/dataTables.css') }}" onload="this.onload=null;this.rel='stylesheet'">
+    <link id="theme-forum-activity-super" data-theme-link="true" rel="preload" as="style" href="{{ theme_asset($css_path . '/forum-activity-superdesign.css') }}" onload="this.onload=null;this.rel='stylesheet'">
+    
+    <noscript>
+        <link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css">
+        <link id="theme-simplebar" data-theme-link="true" rel="stylesheet" href="{{ theme_asset($css_path . '/simplebar.css') }}">
+        <link id="theme-tiny-slider" data-theme-link="true" rel="stylesheet" href="{{ theme_asset($css_path . '/tiny-slider.css') }}">
+        <link id="theme-dataTables" data-theme-link="true" rel="stylesheet" href="{{ theme_asset($css_path . '/dataTables.css') }}">
+        <link id="theme-forum-activity-super" data-theme-link="true" rel="stylesheet" href="{{ theme_asset($css_path . '/forum-activity-superdesign.css') }}">
+    </noscript>
+
     @if(is_locale_rtl())
         <link id="theme-rtl" data-theme-link="true" href="{{ theme_asset($css_path . '/rtl.css') }}" rel="stylesheet" type="text/css" />
     @endif
-    <link href="https://use.fontawesome.com/releases/v6.4.2/css/all.css" rel="stylesheet">
 
-    <!-- Fonts -->
-    <link href='//fonts.googleapis.com/css?family=Comfortaa:400,700,300' rel='stylesheet' type='text/css'>
-    <link href='//fonts.googleapis.com/css?family=Muli:400,300,300italic,400italic' rel='stylesheet' type='text/css'>
-    <link href='http://fonts.googleapis.com/css?family=Open+Sans:100,200,300,400,500,600,700,800,900' rel='stylesheet' type='text/css'>
-    <link href='//fonts.googleapis.com/css?family=Sanchez:400,400italic' rel='stylesheet' type='text/css'>
-    <link href='//fonts.googleapis.com/css?family=Open+Sans:400,300,300italic,400italic,600,600italic,700,700italic,800,800italic' rel='stylesheet' type='text/css'>
+    <!-- FontAwesome Overrides for Performance (font-display: swap) -->
+    <style>
+        @font-face {
+            font-family: 'Font Awesome 6 Free';
+            font-style: normal;
+            font-weight: 900;
+            font-display: swap;
+            src: url('https://use.fontawesome.com/releases/v6.4.2/webfonts/fa-solid-900.woff2') format('woff2');
+        }
+        @font-face {
+            font-family: 'FontAwesome';
+            font-style: normal;
+            font-weight: normal;
+            font-display: swap;
+            src: url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/fonts/fontawesome-webfont.woff2?v=4.7.0') format('woff2');
+        }
+    </style>
 
-    <!-- JS -->
-    <script type="text/javascript" src="{{ theme_asset('js/jquery-3.6.0.min.js') }}"></script>
+    <link href="https://use.fontawesome.com/releases/v6.4.2/css/all.css" rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link href="https://use.fontawesome.com/releases/v6.4.2/css/all.css" rel="stylesheet"></noscript>
+
+    <!-- Resource Hints & Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+    <link rel="dns-prefetch" href="https://use.fontawesome.com">
+    <link rel="dns-prefetch" href="https://cdn.datatables.net">
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/fonts/fontawesome-webfont.woff2?v=4.7.0" as="font" type="font/woff2" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;700&family=Inter:wght@300;400;500;600;700;800;900&family=Muli:ital,wght@0,300;0,400;1,300;1,400&family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,600;1,700;1,800&family=Sanchez:ital,wght@0,400;1,400&family=Rajdhani:wght@400;500;600;700&family=Titillium+Web:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700&display=swap" rel="stylesheet">
 
     <style>
         /* Fix for header dropdown interaction */
@@ -593,29 +625,30 @@
     </footer>
 
     <!-- Scripts -->
-    <script src="{{ theme_asset('js/app.js') }}"></script>
-    <script src="{{ theme_asset('js/simplebar.min.js') }}"></script>
-    <script src="{{ theme_asset('js/tiny-slider.min.js') }}"></script>
-    <script src="{{ theme_asset('js/xm_accordion.min.js') }}"></script>
-    <script src="{{ theme_asset('js/xm_dropdown.min.js') }}"></script>
-    <script src="{{ theme_asset('js/xm_hexagon.min.js') }}"></script>
-    <script src="{{ theme_asset('js/xm_popup.min.js') }}"></script>
-    <script src="{{ theme_asset('js/xm_progressBar.min.js') }}"></script>
-    <script src="{{ theme_asset('js/xm_tab.min.js') }}"></script>
-    <script src="{{ theme_asset('js/xm_tooltip.min.js') }}"></script>
-    <script src="{{ theme_asset('js/global.hexagons.js') }}"></script>
+    <script src="{{ theme_asset('js/app.js') }}" defer></script>
+    <!-- Modern JavaScript Libraries (Optimized for performance) -->
+    <script src="https://unpkg.com/simplebar@6.3.0/dist/simplebar.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tiny-slider/2.9.4/min/tiny-slider.js" defer></script>
+    <script src="{{ theme_asset('js/xm_accordion.min.js') }}" defer></script>
+    <script src="{{ theme_asset('js/xm_dropdown.min.js') }}" defer></script>
+    <script src="{{ theme_asset('js/xm_hexagon.min.js') }}" defer></script>
+    <script src="{{ theme_asset('js/xm_popup.min.js') }}" defer></script>
+    <script src="{{ theme_asset('js/xm_progressBar.min.js') }}" defer></script>
+    <script src="{{ theme_asset('js/xm_tab.min.js') }}" defer></script>
+    <script src="{{ theme_asset('js/xm_tooltip.min.js') }}" defer></script>
+    <script src="{{ theme_asset('js/global.hexagons.js') }}" defer></script>
     <script>
         // Mark all hexagon elements initialized by global.hexagons.js so initHexagons() skips them
         document.querySelectorAll('.hexagon-image-30-32, .hexagon-border-40-44, .hexagon-22-24, .hexagon-dark-16-18').forEach(function(el) {
             el.dataset.hexInit = '1';
         });
     </script>
-    <script src="{{ theme_asset('js/global.tooltips.js') }}"></script>
-    <script src="{{ theme_asset('js/header.js') }}"></script>
-    <script src="{{ theme_asset('js/sidebar.js') }}"></script>
-    <script src="{{ theme_asset('js/content.js') }}"></script>
-    <script src="{{ theme_asset('js/form.utils.js') }}"></script>
-    <script src="{{ theme_asset('js/svg-loader.js') }}"></script>
+    <script src="{{ theme_asset('js/global.tooltips.js') }}" defer></script>
+    <script src="{{ theme_asset('js/header.js') }}" defer></script>
+    <script src="{{ theme_asset('js/sidebar.js') }}" defer></script>
+    <script src="{{ theme_asset('js/content.js') }}" defer></script>
+    <script src="{{ theme_asset('js/form.utils.js') }}" defer></script>
+    <script src="{{ theme_asset('js/svg-loader.js') }}" defer></script>
 
     <script>
         function applyThemeLinks(mode) {
@@ -1529,6 +1562,7 @@
     @include('theme::partials._cookie_consent')
 
     @stack('scripts')
+    <script type="text/javascript" src="{{ theme_asset('js/jquery-3.6.0.min.js') }}" defer></script>
     <?php
         if (class_exists(\MyAds\Plugins\SupportChat\Services\SupportChatService::class)) {
             try {
