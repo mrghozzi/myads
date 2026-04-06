@@ -83,27 +83,29 @@
             window.__themeMode = mode;
         })();
     </script>
-    <link id="theme-bootstrap" data-theme-link="true" href="{{ theme_asset($css_path . '/bootstrap.min.css') }}" rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <link id="theme-styles" data-theme-link="true" href="{{ theme_asset($css_path . '/styles.min.css') }}" rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <link id="theme-prestyle" data-theme-link="true" href="{{ theme_asset($css_path . '/prestyle.css') }}" rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <style id="critical-css">
+        *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;border:none;outline:none}
+        *::before,*::after{display:block}
+        body{background-color:#f8faff;font-family:"Inter",sans-serif;overflow-x:hidden}
+        .header{display:flex;justify-content:space-between;align-items:center;width:100%;height:80px;background-color:#615dfa;position:fixed;top:0;left:0;z-index:10000}
+        .header .header-actions{display:flex;align-items:center}
+        .content-grid{width:100%;max-width:1184px;margin:0 auto;padding:112px 16px 100px;position:relative}
+        @media screen and (max-width: 680px){.header{height:60px}.content-grid{padding-top:80px}}
+    </style>
+
+    <link id="theme-bootstrap" data-theme-link="true" href="{{ theme_asset($css_path . '/bootstrap.min.css') }}" rel="stylesheet" media="print" onload="this.media='all'">
+    <link id="theme-styles" data-theme-link="true" href="{{ theme_asset($css_path . '/styles.min.css') }}" rel="stylesheet" media="print" onload="this.media='all'">
+    <link id="theme-prestyle" data-theme-link="true" href="{{ theme_asset($css_path . '/prestyle.css') }}" rel="stylesheet" media="print" onload="this.media='all'">
     
     <!-- Deferred CSS -->
-    <link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap4.min.css" rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <link id="theme-simplebar" data-theme-link="true" rel="preload" as="style" href="{{ theme_asset($css_path . '/simplebar.css') }}" onload="this.onload=null;this.rel='stylesheet'">
-    <link id="theme-tiny-slider" data-theme-link="true" rel="preload" as="style" href="{{ theme_asset($css_path . '/tiny-slider.css') }}" onload="this.onload=null;this.rel='stylesheet'">
-    <link id="theme-dataTables" data-theme-link="true" rel="preload" as="style" href="{{ theme_asset($css_path . '/dataTables.css') }}" onload="this.onload=null;this.rel='stylesheet'">
-    <link id="theme-forum-activity-super" data-theme-link="true" rel="preload" as="style" href="{{ theme_asset($css_path . '/forum-activity-superdesign.css') }}" onload="this.onload=null;this.rel='stylesheet'">
+    <link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap4.min.css" rel="stylesheet" media="print" onload="this.media='all'">
+    <link id="theme-simplebar" data-theme-link="true" rel="stylesheet" href="{{ theme_asset($css_path . '/simplebar.css') }}" media="print" onload="this.media='all'">
+    <link id="theme-tiny-slider" data-theme-link="true" rel="stylesheet" href="{{ theme_asset($css_path . '/tiny-slider.css') }}" media="print" onload="this.media='all'">
+    <link id="theme-dataTables" data-theme-link="true" rel="stylesheet" href="{{ theme_asset($css_path . '/dataTables.css') }}" media="print" onload="this.media='all'">
+    <link id="theme-forum-activity-super" data-theme-link="true" rel="stylesheet" href="{{ theme_asset($css_path . '/forum-activity-superdesign.css') }}" media="print" onload="this.media='all'">
     
-    <noscript>
-        <link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css">
-        <link id="theme-simplebar" data-theme-link="true" rel="stylesheet" href="{{ theme_asset($css_path . '/simplebar.css') }}">
-        <link id="theme-tiny-slider" data-theme-link="true" rel="stylesheet" href="{{ theme_asset($css_path . '/tiny-slider.css') }}">
-        <link id="theme-dataTables" data-theme-link="true" rel="stylesheet" href="{{ theme_asset($css_path . '/dataTables.css') }}">
-        <link id="theme-forum-activity-super" data-theme-link="true" rel="stylesheet" href="{{ theme_asset($css_path . '/forum-activity-superdesign.css') }}">
-    </noscript>
-
     @if(is_locale_rtl())
-        <link id="theme-rtl" data-theme-link="true" href="{{ theme_asset($css_path . '/rtl.css') }}" rel="stylesheet" type="text/css" />
+        <link id="theme-rtl" data-theme-link="true" href="{{ theme_asset($css_path . '/rtl.css') }}" rel="stylesheet" type="text/css" media="print" onload="this.media='all'" />
     @endif
 
     <!-- FontAwesome Overrides for Performance (font-display: swap) -->
@@ -124,7 +126,7 @@
         }
     </style>
 
-    <link href="https://use.fontawesome.com/releases/v6.4.2/css/all.css" rel="preload" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <link href="https://use.fontawesome.com/releases/v6.4.2/css/all.css" rel="stylesheet" media="print" onload="this.media='all'">
     <noscript><link href="https://use.fontawesome.com/releases/v6.4.2/css/all.css" rel="stylesheet"></noscript>
 
     <!-- Resource Hints & Fonts -->
