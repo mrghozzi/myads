@@ -52,6 +52,10 @@
 * **Fix**: Resolved missing image dimensions for `Alert-icon.png` in ad serving templates, ensuring stable ad delivery.
 * **Fix**: Resolved a critical layout regression where misplaced script tags caused raw JavaScript to render as text and broke the theme toggle functionality.
 
+### 🛡️ Security & Privacy
+* **Feature**: Implemented strict enforcement of **Public Member IDs** for user profiles. When enabled in `/admin/security`, access to profiles via internal numeric IDs (e.g., `/u/1` or `/u/id/1`) is automatically blocked with a **404 Not Found** error, ensuring that internal identifiers are never exposed to the public.
+* **Feature**: Implemented strict enforcement of **Encrypted Conversation Keys** for private messages. When "Private message encryption" is enabled, access to conversations via numeric message IDs (e.g., `/messages/123`) is strictly disabled, forcing the use of secure, system-generated hash keys to prevent ID-enumeration and metadata discovery.
+
 ### 📢 Site Ads & Inventory Reliability
 * **Feature**: Added **Bulk Deletion** capabilities for Site Ads and Visits (`/admin/banners`, `/admin/links`, `/admin/smart-ads`, and `/admin/visits`), allowing administrators to select multiple records and permanently delete them in a single action.
 * **Improvement**: Integrated a reactive deletion confirmation modal across all ad inventories that dynamically displays the total count of selected items to prevent accidental bulk deletions.

@@ -180,6 +180,11 @@ class MessageController extends Controller
             return $partner;
         }
 
+        // Check if encryption is enabled. If so, we do NOT allow ID-based fallback.
+        if ((bool) \App\Support\SecuritySettings::get('private_message_encryption_enabled', 0)) {
+            abort(404);
+        }
+
         $message = Message::whereKey($id)
             ->where(function ($query) use ($user) {
                 $query->where('us_rec', $user->id)

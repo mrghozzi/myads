@@ -188,8 +188,19 @@ class User extends Authenticatable
             return null;
         }
 
+        $publicEnabled = (bool) SecuritySettings::get('public_member_ids_enabled', 0);
+
         if (ctype_digit($value)) {
-            return self::find((int) $value);
+            if (!$publicEnabled) {
+                // Only allow finding by numeric ID if public IDs are NOT enabled
+                $user = self::find((int) $value);
+                if ($user) {
+                    return $user;
+                }
+            }
+            // If public IDs are enabled, we do NOT allow resolving by numeric ID 
+            // even if the ID exists. We fall through to check public_uid 
+            // in case the public_uid itself is numeric.
         }
 
         if (!self::supportsPublicUidColumn()) {

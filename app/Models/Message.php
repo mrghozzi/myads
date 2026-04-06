@@ -114,7 +114,13 @@ class Message extends Model
         }
 
         if (ctype_digit($normalized)) {
-            return (int) $normalized;
+            $encryptionEnabled = (bool) SecuritySettings::get('private_message_encryption_enabled', 0);
+            if (!$encryptionEnabled) {
+                return (int) $normalized;
+            }
+            // If encryption is enabled, we don't allow numeric IDs directly.
+            // We return null and let it fail unless it's a valid encrypted key.
+            return null;
         }
 
         $expectedViewerId = $viewer instanceof User ? (int) $viewer->getKey() : ($viewer !== null ? (int) $viewer : null);
