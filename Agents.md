@@ -30,6 +30,7 @@ MYADS is a community platform where website owners:
 8. **Gamification** — points (PTS), badges, quests, point transactions ledger.
 9. **SEO Suite** — centralized SEO engine, admin SEO dashboard, dynamic robots.txt, sitemap index, GA4 integration.
 10. **Social Links** — managed user social media presence across 10+ platforms with branded icons and smart URL validation.
+11. **External Share API** — a dedicated `/share` endpoint for third-party websites to pre-fill post composer text, documented at `/developer`.
 
 ---
 
@@ -263,6 +264,8 @@ myads/
 | `/admin/ads/posts/settings` | `/admin/ads/posts/settings` | Admin pricing and delivery settings for promoted posts |
 | `/admin/maintenance` | `/admin/maintenance` | Admin maintenance dashboard, toggle, message, and logo settings |
 | `/admin/maintenance/settings` | `/admin/maintenance/settings` | Persists maintenance mode configuration from the admin panel |
+| `/share` | `/share?text={content}` | External share endpoint (requires auth) |
+| `/developer` | `/developer` | Public developer documentation for Share API |
 
 ### Middleware Groups
 - **`auth`** — Standard Laravel auth
@@ -423,6 +426,11 @@ pages/         → Static pages (privacy, terms, custom)
 - **Storage:** Uses JSON-encoded records in the `options` table with `o_type = 'user_social_links'`.
 - **Validation:** `ProfileController@normalizeSocialLink` performs smart validation and normalization for 10 platforms (Facebook, Twitter, Vkontakte, LinkedIn, Instagram, YouTube, Threads, Reddit, GitHub, ADStn), converting raw handles or malformed URLs into clean, canonical profile links.
 - **Display:** Icons are rendered with brand-specific secondary colors and FontAwesome icons, opening in new tabs for a seamless profile experience.
+
+### External Share API
+- **Endpoint:** `/share?text=...` takes a URL-encoded string.
+- **Process:** Checks for authentication (redirects if guests), then pre-fills the `add_post.blade.php` composer using the `text` parameter as a fallback when no session (`old`) input exists.
+- **Documentation:** A public `/developer` page provides HTML/JS implementation guides, localized across all 9 languages.
 
 ---
 
@@ -652,6 +660,7 @@ php artisan storage:link
 - **Status:** Work in Progress.
 - **Initial Changes:** Bumped canonical `SystemVersion::CURRENT` and migrated Marketplace Extensions feeds from the corrective v4.2.3 branch to the v4.2.4 feature cycle.
 - **Focus:** Marketplace integration, remote extension catalogs, and automated package manifest parsing.
+- **Add:** **External Share API (`/share`)** and **Developer Documentation (`/developer`)** implemented with full localization and post composer pre-filling capability.
 
 ---
 
@@ -677,4 +686,4 @@ If in doubt, update it. An outdated `Agents.md` causes future agents to make wro
 
 ---
 
-*Last updated: 2026-04-02 — MYADS v4.2.4 (Initialized v4.2.4 Update cycle)*
+*Last updated: 2026-04-06 — MYADS v4.2.4 (External Sharing & Developer Docs)*

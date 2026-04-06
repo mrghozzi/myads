@@ -1,6 +1,6 @@
 # System Requirements
 
-To run MYADS v4.2.1 efficiently, your server must meet the following hardware and software requirements.
+To run MYADS v4.2.4 efficiently, your server must meet the following hardware and software requirements.
 
 ## Server Environment
 

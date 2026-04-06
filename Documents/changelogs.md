@@ -1,11 +1,10 @@
-# v4.2.4
-> **Feature Release** — Public extension catalogs, ZIP manifest parsing, and remote marketplace browsing.
+### 📤 External Sharing & Developer Tools
+* **Feature**: Introduced the **External Share API** (`/share`), allowing third-party websites to integrate a "Share on MYADS" button.
+* **Add**: Added support for the `text` query parameter on `/share`, which automatically pre-fills the community post composer with the provided content (including links, hashtags, and mentions).
+* **Feature**: Added a dedicated **Developer Documentation** page (`/developer`) with technical guides, HTML/JS code examples, and best practices for site owners to integrate MYADS sharing.
+* **i18n**: Fully localized the sharing interface and developer documentation across all **9 supported languages**, including specialized Arabic terminology for "External Share API".
+* **Improvement**: Enhanced the core post composer (`add_post.blade.php`) with a fallback mechanism that prioritizes URL parameters when no old form input is present.
 
-### Marketplace Extensions
-* **Add**: Added public marketplace extension feeds at `/api/marketplace/extensions/plugins` and `/api/marketplace/extensions/themes` so MYADS sites can expose remote plugin and theme catalogs in JSON.
-* **Add**: Added ZIP manifest parsing for marketplace extensions, reading `plugin.json` or `theme.json` from the latest store package and caching the generated catalog for faster responses.
-* **Add**: Added a new `Marketplace` tab to `/admin/plugins` and `/admin/themes` with browse-only cards that open remote product pages on `https://www.adstn.ovh` without changing local install or upgrade behavior.
-* **Improvement**: Added the official `themes` store category while keeping legacy `templates` products readable for compatibility and merge logic in the marketplace theme feed.
 
 ### 🎨 Admin Panel Architecture (Super-Independence)
 * **Feature**: Decoupled the **Admin Panel Templates** from the primary public theme. Admin templates now reside in a dedicated root-level `admin_themes/` directory, ensuring that future admin panel redesigns do not affect the public site design.

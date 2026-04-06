@@ -102,6 +102,7 @@ Route::get('/quests', [App\Http\Controllers\QuestController::class, 'index'])->n
 // Portal Routes
 Route::get('/portal', [PortalController::class, 'index'])->name('portal.index');
 Route::get('/share', [PortalController::class, 'share'])->name('portal.share')->middleware('auth');
+Route::get('/developer', [PortalController::class, 'developer'])->name('portal.developer');
 Route::get('/badges', [ProfileController::class, 'allBadges'])->name('badges.all');
 
 // Message Routes

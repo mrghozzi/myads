@@ -59,9 +59,20 @@ Submit a new site to the Web Directory.
 }
 ```
 
-### Response Format
+### 4. External Share API (Public) `GET /share`
+Allows third-party websites to pre-fill the MYADS post composer.
 
-All API responses follow a consistent JSON format:
+**Query Parameters:**
+- `text`: URL-encoded string containing the content to share.
+
+**Response:**
+Redirects to the login page (if not authenticated) or directly to the `/share` page with the pre-filled post composer.
+
+## Developer Documentation
+A full guide on implementing the Share API is available on-site at `/developer`.
+
+### Response Format
+All REST API responses follow a consistent JSON format:
 ```json
 {
     "success": true,
