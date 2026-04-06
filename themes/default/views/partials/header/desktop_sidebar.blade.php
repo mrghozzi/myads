@@ -39,12 +39,12 @@
         <div class="interactive-input dark">
             <input type="text" id="search-main" name="search" placeholder="{{ __('messages.search_placeholder') }}">
             <div class="interactive-input-icon-wrap">
-                <svg class="interactive-input-icon icon-magnifying-glass">
+                <svg class="interactive-input-icon icon-magnifying-glass" width="20" height="20">
                     <use xlink:href="#svg-magnifying-glass"></use>
                 </svg>
             </div>
             <div class="interactive-input-action">
-                <svg class="interactive-input-action-icon icon-cross-thin">
+                <svg class="interactive-input-action-icon icon-cross-thin" width="20" height="20">
                     <use xlink:href="#svg-cross-thin"></use>
                 </svg>
             </div>

@@ -992,6 +992,8 @@ textarea::placeholder {
 
 .interactive-input .interactive-input-icon-wrap .interactive-input-icon {
   fill: #adafca;
+  width: 20px;
+  height: 20px;
   opacity: .6;
   transition: fill .2s ease-in-out, opacity .2s ease-in-out;
 }
@@ -1019,6 +1021,8 @@ textarea::placeholder {
 
 .interactive-input .interactive-input-action .interactive-input-action-icon {
   fill: #adafca;
+  width: 20px;
+  height: 20px;
   opacity: .6;
   pointer-events: none;
   transition: fill .2s ease-in, opacity .2s ease-in;
@@ -14855,6 +14859,7 @@ figure > img {
 }
 
 .header .header-actions.search-bar {
+  flex: 0 0 30%;
   width: 30%;
 }
 
