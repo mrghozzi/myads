@@ -18,16 +18,21 @@ app.querySelector('.content-grid', function (el) {
 
   const updateGridPosition = function (contentGrid) {
     if (window.innerWidth > breakpointWidth) {
-      const isRTL = document.documentElement.getAttribute('dir') === 'rtl',
-            chatWidth = sidebar.chat.active ? sidebar.chat.maxWidth : sidebar.chat.minWidth,
+      const isRTL = document.documentElement.getAttribute('dir') === 'rtl';
+
+      if (!isRTL) {
+        contentGrid.style.transform = 'translate(0, 0)';
+        return;
+      }
+
+      const chatWidth = sidebar.chat.active ? sidebar.chat.maxWidth : sidebar.chat.minWidth,
             navigationWidth = sidebar.navigation.active ? sidebar.navigation.maxWidth : sidebar.navigation.minWidth,
             availableWidth = document.body.clientWidth - contentGrid.offsetWidth - chatWidth - navigationWidth,
-            absOffsetX = Math.abs((availableWidth / 2) + navigationWidth),
-            offsetX = isRTL ? -absOffsetX : absOffsetX;
+            offsetX = -Math.abs((availableWidth / 2) + navigationWidth);
 
       contentGrid.style.transform = `translate(${offsetX}px, 0)`;
     } else {
-      contentGrid.style.transform = `translate(0, 0)`;
+      contentGrid.style.transform = 'translate(0, 0)';
     }
   };
 

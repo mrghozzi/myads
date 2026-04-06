@@ -1,3 +1,12 @@
+# v4.2.4
+> **Feature Release** — Public extension catalogs, ZIP manifest parsing, and remote marketplace browsing.
+
+### Marketplace Extensions
+* **Add**: Added public marketplace extension feeds at `/api/marketplace/extensions/plugins` and `/api/marketplace/extensions/themes` so MYADS sites can expose remote plugin and theme catalogs in JSON.
+* **Add**: Added ZIP manifest parsing for marketplace extensions, reading `plugin.json` or `theme.json` from the latest store package and caching the generated catalog for faster responses.
+* **Add**: Added a new `Marketplace` tab to `/admin/plugins` and `/admin/themes` with browse-only cards that open remote product pages on `https://www.adstn.ovh` without changing local install or upgrade behavior.
+* **Improvement**: Added the official `themes` store category while keeping legacy `templates` products readable for compatibility and merge logic in the marketplace theme feed.
+
 ### 📤 External Sharing & Developer Tools
 * **Feature**: Introduced the **External Share API** (`/share`), allowing third-party websites to integrate a "Share on MYADS" button.
 * **Add**: Added support for the `text` query parameter on `/share`, which automatically pre-fills the community post composer with the provided content (including links, hashtags, and mentions).
@@ -50,6 +59,8 @@
 * **Architecture**: Added persistent resource hints (`preconnect`, `dns-prefetch`) for FontAwesome and DataTables CDNs to accelerate external asset resolution.
 * **Fix**: Resolved missing image dimensions for `Alert-icon.png` in ad serving templates, ensuring stable ad delivery.
 * **Fix**: Resolved a critical layout regression where misplaced script tags caused raw JavaScript to render as text and broke the theme toggle functionality.
+* **Fix**: Corrected a shared `content-grid` positioning regression that caused public pages to appear visually pushed to the right in desktop `LTR` mode by neutralizing the sidebar translation offset when the active locale is not RTL.
+* **Fix**: Corrected dark-mode `RTL` desktop alignment so the main page container stays centered instead of inheriting a forced right-side offset from the dark RTL override stylesheet.
 
 ### 🛡️ Security & Privacy
 * **Feature**: Implemented strict enforcement of **Public Member IDs** for user profiles. When enabled in `/admin/security`, access to profiles via internal numeric IDs (e.g., `/u/1` or `/u/id/1`) is automatically blocked with a **404 Not Found** error, ensuring that internal identifiers are never exposed to the public.

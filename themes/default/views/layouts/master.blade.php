@@ -89,6 +89,25 @@
         <link id="theme-rtl" data-theme-link="true" href="{{ theme_asset($css_path . '/rtl.css') }}" rel="stylesheet" type="text/css" media="print" onload="this.media='all'" />
     @endif
 
+    <style>
+        html[dir="ltr"] body .content-grid {
+            width: min(100%, 1184px);
+            margin-left: auto !important;
+            margin-right: auto !important;
+        }
+
+        html[dir="ltr"] body .content-grid.full {
+            width: 100%;
+            max-width: 100%;
+        }
+
+        html[dir="ltr"] body .content-grid.medium {
+            width: min(100%, 784px);
+            margin-left: auto !important;
+            margin-right: auto !important;
+        }
+    </style>
+
     <!-- FontAwesome Overrides for Performance (font-display: swap) -->
     <style>
         @font-face {
