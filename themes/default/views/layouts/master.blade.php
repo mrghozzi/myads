@@ -628,8 +628,6 @@
     <script src="{{ theme_asset('js/svg-loader.js') }}" defer></script>
 
     <script>
-
-    <script>
         function applyThemeLinks(mode) {
             document.body.dataset.theme = mode;
             document.documentElement.dataset.theme = mode;
@@ -1434,7 +1432,6 @@
             })
             .catch(error => console.error('Error:', error));
         }
-    </script>
 
         document.addEventListener('click', function(event) {
             let menuTrigger = event.target.closest('[data-activity-menu-trigger]');

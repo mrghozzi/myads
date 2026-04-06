@@ -41,6 +41,17 @@
 * **Fix**: Resolved `500 Internal Server Error` in the **Arabic Fixer** plugin after the admin template decoupling by correcting the layout namespace reference.
 * **Fix**: Corrected database table name mapping in the Arabic Fixer service to resolve failed character-fix operations on forum comments.
 
+### ⚡ Performance & Core Web Vitals
+* **Optimization**: Consolidated Google Fonts into a single HTTP/2 request and purged redundant `@import` rules to reduce font-loading latency.
+* **Optimization**: Implemented **Critical CSS inlining** for the header and layout grid, improving First Contentful Paint (FCP).
+* **Speed**: Leveraged the `media="print"` technique for non-critical stylesheets to prevent render-blocking and unblock the browser's main thread.
+* **Payload**: Reduced the initial page weight by minifying `styles.min.css` and critical inline theme-selection scripts in `master.blade.php`.
+* **Deferral**: Migrated **jQuery** and secondary UI plugins to the document footer with `defer` attributes, ensuring the visual page renders before heavy script execution.
+* **Stability (CLS)**: Eliminated **Cumulative Layout Shift** (CLS) by enforcing explicit dimensions for the header search bar, SVG icons, and site logos in both HTML and CSS.
+* **Architecture**: Added persistent resource hints (`preconnect`, `dns-prefetch`) for FontAwesome and DataTables CDNs to accelerate external asset resolution.
+* **Fix**: Resolved missing image dimensions for `Alert-icon.png` in ad serving templates, ensuring stable ad delivery.
+* **Fix**: Resolved a critical layout regression where misplaced script tags caused raw JavaScript to render as text and broke the theme toggle functionality.
+
 ### 📢 Site Ads & Inventory Reliability
 * **Feature**: Added **Bulk Deletion** capabilities for Site Ads and Visits (`/admin/banners`, `/admin/links`, `/admin/smart-ads`, and `/admin/visits`), allowing administrators to select multiple records and permanently delete them in a single action.
 * **Improvement**: Integrated a reactive deletion confirmation modal across all ad inventories that dynamically displays the total count of selected items to prevent accidental bulk deletions.
