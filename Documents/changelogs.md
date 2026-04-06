@@ -14,6 +14,16 @@
 * **Helper**: Introduced the `admin_asset()` helper to manage admin-specific CSS, JS, and image assets, ensuring they are served from the independent `admin_themes/` repository.
 * **Cleanup**: Migrated 39+ controllers to use the new `admin::` namespace and purged legacy admin templates from the default public theme, resulting in a cleaner and more modular codebase.
 
+### 🔌 Plugins Management
+* **Feature**: Introduced a new **Plugin Details Modal** in the admin panel (`/admin/plugins`), allowing administrators to view comprehensive plugin documentation and metadata without leaving the dashboard.
+* **Add**: Support for local documentation files:
+    * `README.md`: Rendered as the main plugin description.
+    * `changelogs.md`: Displayed in a dedicated "Changelog" tab.
+    * `screenshots.md`: Displayed in a "Screenshots" tab.
+* **Improvement**: Dynamic tab visibility: The "Changelog" and "Screenshots" tabs are now automatically hidden if the corresponding files are missing.
+* **Architecture**: Integrated `marked.js` and `DOMPurify` for secure client-side Markdown rendering of local plugin documentation.
+* **i18n**: Added new translation keys for plugin documentation labels (`screenshots`, `requires_myads`, `adstn_page`, `plugin_website`) across all supported languages.
+
 ### 🌍 Internationalization & Localization
 * **Architecture**: Relocated the **Default Language** setting from the General Settings page to the dedicated **Languages** management interface, providing a more contextual workflow.
 * **Feature**: Added a "Set as Default" one-click action for all installed languages, allowing administrators to switch the site's primary locale without manually entering ISO codes.

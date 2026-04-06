@@ -18,7 +18,10 @@ plugins/
     ├── views/              # Blade views specific to the plugin
     ├── css/                # Embedded static resources
     ├── thumbnail.png       # Optional: Plugin thumbnail image
-    └── install.sql         # Optional: Executed on installation/activation
+    ├── install.sql         # Optional: Executed on installation/activation
+    ├── README.md           # Optional: Core documentation (rendered in admin)
+    ├── changelogs.md       # Optional: Release history (rendered in admin)
+    └── screenshots.md      # Optional: Visual previews (rendered in admin)
 ```
 
 ## The `config.json` File
@@ -32,7 +35,10 @@ Every plugin MUST have a `plugin.json` file in its root directory. This tells th
     "description": "Automatically comment on new topics.",
     "version": "1.0.0",
     "author": "mrghozzi",
+    "author_url": "https://github.com/mrghozzi",
     "thumbnail": "thumbnail.png",
+    "siteweb": "https://www.example.com",
+    "ADStn_url": "auto-commenter",
     "latest": "https://github.com/mrghozzi/auto-commenter/releases/latest",
     "min_myads": "4.2.0"
 }
@@ -43,7 +49,10 @@ Every plugin MUST have a `plugin.json` file in its root directory. This tells th
 - `slug`: Unique identifier (should match the folder name).
 - `version`: Current version string.
 - `author`: Author name.
+- `author_url`: (Optional) URL to the author's profile.
 - `thumbnail`: (Optional) Filename of the thumbnail image in the plugin root.
+- `siteweb`: (Optional) Official website for the plugin.
+- `ADStn_url`: (Optional) Slug for the product on the ADStn marketplace.
 - `latest`: (Optional) GitHub release URL for automatic update checks and changelog display.
 - `min_myads`: (Optional) Minimum compatible MyAds version (e.g., "4.2.0").
 
