@@ -233,23 +233,8 @@ Route::middleware(['auth'])->group(function () {
 Route::get('/orders/{id}', [OrderRequestController::class, 'show'])->name('orders.show');
 
 // Store Routes
-Route::get('/store', [StoreController::class, 'index'])->name('store.index');
-Route::get('/store/{script}/{category}', [StoreController::class, 'index'])->name('store.script_category');
 Route::middleware(['auth'])->group(function () {
     Route::get('/store/create', [StoreController::class, 'create'])->name('store.create');
-});
-Route::get('/store/{name}', [StoreController::class, 'show'])->name('store.show');
-Route::get('/download/{hash}', [StoreController::class, 'downloadByHash'])->name('store.download.hash');
-Route::get('/kb/captcha', [StoreController::class, 'knowledgebaseCaptcha'])->name('kb.captcha');
-Route::post('/kb/store', [StoreController::class, 'knowledgebaseStore'])->name('kb.store');
-Route::post('/kb/approve', [StoreController::class, 'knowledgebaseApprove'])->name('kb.approve');
-Route::get('/kb/{name}:{article}', [StoreController::class, 'knowledgebaseShow'])->name('kb.show')->where('name', '[^/:]+');
-Route::get('/edk/{name}:{article}', [StoreController::class, 'knowledgebaseEdit'])->name('kb.edit')->where('name', '[^/:]+');
-Route::get('/pgk/{name}:{article}', [StoreController::class, 'knowledgebasePending'])->name('kb.pending')->where('name', '[^/:]+');
-Route::get('/hkd/{name}:{article}', [StoreController::class, 'knowledgebaseHistory'])->name('kb.history')->where('name', '[^/:]+');
-Route::get('/kb/{name}', [StoreController::class, 'knowledgebaseIndex'])->name('kb.index')->where('name', '[^/]+');
-Route::middleware(['auth'])->group(function () {
-    // Route::get('/store/create', [StoreController::class, 'create'])->name('store.create'); // Moved up to fix conflict
     Route::post('/store/store', [StoreController::class, 'store'])->name('store.store');
     Route::post('/store/delete', [StoreController::class, 'destroy'])->name('store.delete');
     Route::get('/store/{name}/update', [StoreController::class, 'update'])->name('store.update');
@@ -261,6 +246,21 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/store/verify-name', [StoreController::class, 'verifyName'])->name('store.verify_name');
     Route::post('/store/categories', [StoreController::class, 'loadCategories'])->name('store.categories');
 });
+
+Route::get('/store', [StoreController::class, 'index'])->name('store.index');
+Route::get('/store/{script}/{category}', [StoreController::class, 'index'])->name('store.script_category');
+Route::get('/store/{name}', [StoreController::class, 'show'])->name('store.show');
+Route::get('/download/{hash}', [StoreController::class, 'downloadByHash'])->name('store.download.hash');
+Route::get('/kb/captcha', [StoreController::class, 'knowledgebaseCaptcha'])->name('kb.captcha');
+Route::post('/kb/store', [StoreController::class, 'knowledgebaseStore'])->name('kb.store');
+Route::post('/kb/approve', [StoreController::class, 'knowledgebaseApprove'])->name('kb.approve');
+Route::get('/kb/{name}:{article}', [StoreController::class, 'knowledgebaseShow'])->name('kb.show')->where('name', '[^/:]+');
+Route::get('/edk/{name}:{article}', [StoreController::class, 'knowledgebaseEdit'])->name('kb.edit')->where('name', '[^/:]+');
+Route::get('/pgk/{name}:{article}', [StoreController::class, 'knowledgebasePending'])->name('kb.pending')->where('name', '[^/:]+');
+Route::get('/hkd/{name}:{article}', [StoreController::class, 'knowledgebaseHistory'])->name('kb.history')->where('name', '[^/:]+');
+Route::get('/kb/{name}', [StoreController::class, 'knowledgebaseIndex'])->name('kb.index')->where('name', '[^/]+');
+
+
 
 // Profile Routes
 Route::middleware(['auth'])->group(function () {

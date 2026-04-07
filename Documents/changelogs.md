@@ -2,7 +2,8 @@
 > **Work in Progress** — Maintenance, performance tuning, and community-requested refinements.
 
 ### 🛠️ Maintenance & Polish
-* **Start**: Commenced the v4.2.5 update cycle with system-wide version synchronization.
+* **Fix**: Resolved a routing conflict where the product update page (`/store/{name}/update`) was being incorrectly intercepted by the store filtering route, ensuring the update form renders correctly for all products.
+
 
 ---
 
