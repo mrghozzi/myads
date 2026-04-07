@@ -135,6 +135,92 @@ class StoreEditorPagesTest extends TestCase
             ->assertSee(__('product_added_successfully'));
     }
 
+    public function test_store_categories_endpoint_returns_script_product_subcategory_select_for_themes(): void
+    {
+        $this->seedThemeSetting();
+        $user = User::factory()->create();
+        $scriptProduct = $this->createScriptProduct($user, 'theme-base-script');
+
+        $response = $this->actingAs($user)->post(route('store.categories'), [
+            'cat_s' => 'themes',
+        ]);
+
+        $response->assertOk()
+            ->assertSee('name="sc_cat"', false)
+            ->assertSee('value="' . $scriptProduct->id . '"', false)
+            ->assertSee('theme-base-script', false)
+            ->assertSee('value="others"', false);
+    }
+
+    public function test_store_categories_endpoint_returns_script_category_select_for_scripts(): void
+    {
+        $this->seedThemeSetting();
+        $user = User::factory()->create();
+
+        Option::create([
+            'name' => 'CMS',
+            'o_valuer' => '0',
+            'o_type' => 'scriptcat',
+            'o_parent' => 0,
+            'o_order' => 0,
+            'o_mode' => '0',
+        ]);
+
+        Option::create([
+            'name' => 'Forum',
+            'o_valuer' => '0',
+            'o_type' => 'scriptcat',
+            'o_parent' => 0,
+            'o_order' => 0,
+            'o_mode' => '0',
+        ]);
+
+        $response = $this->actingAs($user)->post(route('store.categories'), [
+            'cat_s' => 'script',
+        ]);
+
+        $response->assertOk()
+            ->assertSee('name="sc_cat"', false)
+            ->assertSee('value="CMS"', false)
+            ->assertSee('value="Forum"', false);
+    }
+
+    public function test_store_create_page_renders_old_subcategory_selection(): void
+    {
+        $this->seedThemeSetting();
+        $user = User::factory()->create();
+        $scriptProduct = $this->createScriptProduct($user, 'restored-script-product');
+
+        $response = $this
+            ->withSession([
+                '_old_input' => [
+                    'cat_s' => 'themes',
+                    'sc_cat' => (string) $scriptProduct->id,
+                ],
+            ])
+            ->actingAs($user)
+            ->get(route('store.create'));
+
+        $response->assertOk()
+            ->assertSee('name="sc_cat"', false)
+            ->assertSee('value="themes" selected', false)
+            ->assertSee('value="' . $scriptProduct->id . '" selected', false);
+    }
+
+    public function test_store_categories_endpoint_keeps_others_option_when_no_scripts_exist(): void
+    {
+        $this->seedThemeSetting();
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->post(route('store.categories'), [
+            'cat_s' => 'plugins',
+        ]);
+
+        $response->assertOk()
+            ->assertSee('name="sc_cat"', false)
+            ->assertSee('value="others"', false);
+    }
+
     private function seedThemeSetting(): void
     {
         Setting::create([
@@ -168,5 +254,21 @@ class StoreEditorPagesTest extends TestCase
             'o_order' => 15,
             'o_mode' => 'upload/product-cover.png',
         ]);
+    }
+
+    private function createScriptProduct(User $owner, string $name): Product
+    {
+        $product = $this->createStoreProduct($owner, $name);
+
+        Option::create([
+            'name' => 'script',
+            'o_valuer' => '',
+            'o_type' => 'store_type',
+            'o_parent' => $product->id,
+            'o_order' => 0,
+            'o_mode' => 'others',
+        ]);
+
+        return $product;
     }
 }

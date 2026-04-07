@@ -669,6 +669,7 @@ php artisan storage:link
 - **Status:** Work in Progress.
 - **Initial Changes:** Bumped canonical `SystemVersion::CURRENT` to v4.2.5 and initialized the new release cycle.
 - **Focus:** Maintenance, performance tuning, and community-requested refinements.
+- **Fix (2026-04-07):** Resolved a script race condition on the Store creation page that prevented dynamic category loading when jQuery was deferred; moved the AJAX handler to the global scope with safety retries for consistent theme interaction.
 
 ---
 

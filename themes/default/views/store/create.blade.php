@@ -3,7 +3,6 @@
 @section('content')
 @php
     $createLinkzipValue = old('linkzip', '');
-    $selectedStoreCategory = \App\Support\StoreCategoryCatalog::normalize(old('cat_s'));
 @endphp
 
 @include('theme::store.partials.editor-assets')
@@ -109,16 +108,8 @@
 
                         <div class="form-row">
                             <div class="form-item">
-                                <div class="form-input small active">
-                                    <label for="cat_s">{{ __('messages.cat') }}</label>
-                                    <div id="storecat">
-                                        <select class="form-control cat_s" id="cat_s" name="cat_s" required>
-                                            <option value="">-- {{ __('messages.select') }} --</option>
-                                            @foreach($storeCategories as $category)
-                                                <option value="{{ $category->name }}" @selected($selectedStoreCategory === $category->name)>{{ __('messages.' . $category->name) }}</option>
-                                            @endforeach
-                                        </select>
-                                    </div>
+                                <div id="storecat">
+                                    @include('theme::store.partials.category-selector')
                                 </div>
                             </div>
                         </div>
@@ -208,6 +199,52 @@
 </script>
 
 <script>
+    window.triggerCategoryUpdate = function (selectElement) {
+        if (typeof jQuery === 'undefined') {
+            console.warn("jQuery is not yet loaded, retrying in 100ms...");
+            setTimeout(function() { window.triggerCategoryUpdate(selectElement); }, 100);
+            return;
+        }
+
+        var $ = jQuery;
+        var token = $('meta[name="csrf-token"]').attr('content');
+        var cat_s = $(selectElement).val();
+        var sc_cat = $('#sc_cat').val() || '';
+        
+        console.log("triggerCategoryUpdate running for: " + cat_s);
+
+        if (!cat_s) {
+            $("#storecat").html($("#storecat").attr('data-original') || $("#storecat").html());
+            return;
+        }
+
+        // Store original markup for error recovery if not already stored
+        if (!$("#storecat").attr('data-original')) {
+            $("#storecat").attr('data-original', $("#storecat").html());
+        }
+
+        $("#storecat").html("<div class='progress'><div class='progress-bar progress-bar-striped active' role='progressbar' aria-valuenow='100' aria-valuemin='0' aria-valuemax='100' style='width:100%'> Uploading </div> </div> ");
+
+        $.ajax({
+            type: "POST",
+            url: "{{ route('store.categories') }}",
+            data: { cat_s: cat_s, sc_cat: sc_cat, _token: token },
+            cache: false,
+            success: function (html) {
+                console.log("AJAX Success for " + cat_s);
+                $("#storecat").html(html);
+                if (typeof syncCreateSummary === 'function') syncCreateSummary();
+            },
+            error: function (xhr, status, error) {
+                console.error("AJAX Error: " + error);
+                $("#storecat").html($("#storecat").attr('data-original'));
+                if (typeof syncCreateSummary === 'function') syncCreateSummary();
+            }
+        });
+    };
+</script>
+
+<script>
     function syncCreateSummary() {
         var version = document.getElementById('store-version');
         var price = document.getElementById('store-price');
@@ -267,21 +304,8 @@
             });
         });
 
-        $(document).on('change', '#cat_s', function () {
-            $("#storecat").html("<div class='progress'><div class='progress-bar progress-bar-striped active' role='progressbar' aria-valuenow='100' aria-valuemin='0' aria-valuemax='100' style='width:100%'> Uploading </div> </div> ");
-            var cat_s = $(this).val();
+        // window.triggerCategoryUpdate is now defined globally above to avoid race conditions with deferred jQuery.
 
-            $.ajax({
-                type: "POST",
-                url: "{{ route('store.categories') }}",
-                data: { cat_s: cat_s, _token: token },
-                cache: false,
-                success: function (html) {
-                    $("#storecat").html(html);
-                    syncCreateSummary();
-                }
-            });
-        });
 
         $('#store-version, #store-price').on('input', syncCreateSummary);
         document.addEventListener('click', function (event) {

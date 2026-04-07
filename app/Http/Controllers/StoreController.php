@@ -204,9 +204,12 @@ class StoreController extends Controller
 
     public function create()
     {
-        $storeCategories = $this->storeCategoryOptions();
         $emojis = Emoji::all();
-        return view('theme::store.create', compact('storeCategories', 'emojis'));
+
+        return view('theme::store.create', array_merge(
+            $this->buildStoreCategorySelectorViewData(old('cat_s'), old('sc_cat')),
+            compact('emojis')
+        ));
     }
 
     public function store(Request $request)
@@ -573,41 +576,13 @@ class StoreController extends Controller
 
     public function loadCategories(Request $request)
     {
-        $cat = StoreCategoryCatalog::normalize($request->input('cat_s'));
-        $storeCategories = $this->storeCategoryOptions();
-
-        $html = '<label for="cat_s">'.__('messages.category').'</label>';
-        $html .= '<select class="form-control cat_s" id="cat_s" name="cat_s" required>';
-        $html .= '<option value="">-- ' . e(__('messages.select')) . ' --</option>';
-        foreach ($storeCategories as $category) {
-            $selected = $cat === $category->name ? ' selected' : '';
-            $html .= '<option value="'.$category->name.'"'.$selected.'>'.e(__('messages.' . $category->name)).'</option>';
-        }
-        $html .= '</select>';
-
-        if ($cat === StoreCategoryCatalog::PLUGINS || $cat === StoreCategoryCatalog::THEMES) {
-            $html .= '<br /><select class="form-control" name="sc_cat" required>';
-            $html .= '<option value="">-- ' . e(__('messages.script')) . ' --</option>';
-            $scriptType = Option::where('o_type', 'store_type')->where('name', 'script')->orderBy('id')->get();
-            foreach ($scriptType as $script) {
-                $nameOption = Option::where('id', $script->o_parent)->first();
-                if ($nameOption) {
-                    $html .= '<option value="'.$script->o_parent.'">'.$nameOption->name.'</option>';
-                }
-            }
-            $html .= '<option value="others">' . e(__('messages.others')) . '</option>';
-            $html .= '</select>';
-        } elseif ($cat === StoreCategoryCatalog::SCRIPT) {
-            $html .= '<br /><select class="form-control" name="sc_cat" required>';
-            $html .= '<option value="">-- ' . e(__('messages.select')) . ' --</option>';
-            $scriptCats = Option::where('o_type', 'scriptcat')->orderBy('id')->get();
-            foreach ($scriptCats as $scriptCat) {
-                $html .= '<option value="'.$scriptCat->name.'">'.e($scriptCat->name).'</option>';
-            }
-            $html .= '</select>';
-        }
-
-        return response($html);
+        return response()->view(
+            'theme::store.partials.category-selector',
+            $this->buildStoreCategorySelectorViewData(
+                $request->input('cat_s'),
+                $request->input('sc_cat')
+            )
+        );
     }
 
     public function knowledgebaseIndex(Request $request, $name)
@@ -1007,5 +982,74 @@ class StoreController extends Controller
             ->whereIn('name', StoreCategoryCatalog::selectable())
             ->orderBy('id')
             ->get();
+    }
+
+    private function buildStoreCategorySelectorViewData(?string $selectedCategory = null, ?string $selectedSubCategory = null): array
+    {
+        $selectedStoreCategory = StoreCategoryCatalog::normalize($selectedCategory);
+        $selectedStoreSubcategory = trim((string) $selectedSubCategory);
+        $selectedStoreSubcategory = $selectedStoreSubcategory !== '' ? $selectedStoreSubcategory : null;
+
+        return [
+            'storeCategories' => $this->storeCategoryOptions(),
+            'selectedStoreCategory' => $selectedStoreCategory,
+            'selectedStoreSubcategory' => $selectedStoreSubcategory,
+            'scriptProductOptions' => $this->scriptProductOptions($selectedStoreCategory),
+            'scriptCategoryOptions' => $this->scriptCategoryOptions($selectedStoreCategory),
+        ];
+    }
+
+    private function scriptProductOptions(?string $selectedCategory)
+    {
+        if ($selectedCategory !== StoreCategoryCatalog::PLUGINS && $selectedCategory !== StoreCategoryCatalog::THEMES) {
+            return collect();
+        }
+
+        $scriptTypes = Option::where('o_type', 'store_type')
+            ->where('name', StoreCategoryCatalog::SCRIPT)
+            ->orderBy('id')
+            ->get(['o_parent']);
+
+        if ($scriptTypes->isEmpty()) {
+            return collect();
+        }
+
+        $scriptProducts = Product::withoutGlobalScope('store')
+            ->where('o_type', 'store')
+            ->whereIn('id', $scriptTypes->pluck('o_parent')->unique()->values())
+            ->pluck('name', 'id');
+
+        return $scriptTypes
+            ->map(function (Option $scriptType) use ($scriptProducts) {
+                $label = $scriptProducts->get((int) $scriptType->o_parent);
+
+                if (!is_string($label) || $label === '') {
+                    return null;
+                }
+
+                return [
+                    'value' => (string) $scriptType->o_parent,
+                    'label' => $label,
+                ];
+            })
+            ->filter()
+            ->values();
+    }
+
+    private function scriptCategoryOptions(?string $selectedCategory)
+    {
+        if ($selectedCategory !== StoreCategoryCatalog::SCRIPT) {
+            return collect();
+        }
+
+        return Option::where('o_type', 'scriptcat')
+            ->orderBy('id')
+            ->get(['name'])
+            ->map(function (Option $scriptCategory) {
+                return [
+                    'value' => $scriptCategory->name,
+                    'label' => $scriptCategory->name,
+                ];
+            });
     }
 }
