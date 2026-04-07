@@ -1,3 +1,11 @@
+# v4.2.5
+> **Work in Progress** — Maintenance, performance tuning, and community-requested refinements.
+
+### 🛠️ Maintenance & Polish
+* **Start**: Commenced the v4.2.5 update cycle with system-wide version synchronization.
+
+---
+
 # v4.2.4
 > **Feature Release** — Public extension catalogs, ZIP manifest parsing, and remote marketplace browsing.
 
