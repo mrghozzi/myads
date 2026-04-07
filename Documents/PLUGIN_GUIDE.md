@@ -40,7 +40,7 @@ Every plugin MUST have a `plugin.json` file in its root directory. This tells th
     "siteweb": "https://www.example.com",
     "ADStn_url": "auto-commenter",
     "latest": "https://github.com/mrghozzi/auto-commenter/releases/latest",
-    "min_myads": "4.2.0"
+    "min_myads": "4.2.5"
 }
 ```
 

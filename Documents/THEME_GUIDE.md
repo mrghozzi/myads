@@ -41,7 +41,7 @@ Every theme SHOULD have a `theme.json` file in its root directory for proper ide
     "description": "The default starter theme for MyAds.",
     "thumbnail": "screenshot.png",
     "latest": "https://github.com/mrghozzi/myads-theme-default/releases/latest",
-    "min_myads": "4.2.0"
+    "min_myads": "4.2.5"
 }
 ```
 

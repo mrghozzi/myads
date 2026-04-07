@@ -1,6 +1,6 @@
 # Manual & Overview
 
-Welcome to the **MYADS v4.2.1** documentation!
+Welcome to the **MYADS v4.2.5** documentation!
 
 MYADS is an advanced PHP script designed for social networking and exchanging ads between website owners. Originally built with plain PHP, version 4.0 has been completely rewritten from scratch using the robust **Laravel Framework (v10+, PHP 8.2+)**.
 
