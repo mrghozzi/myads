@@ -29,7 +29,7 @@ MYADS is a community platform where website owners:
 7. **News** — admin-published articles posted to community feed.
 8. **Gamification** — points (PTS), badges, quests, point transactions ledger.
 9. **SEO Suite** — centralized SEO engine, admin SEO dashboard, dynamic robots.txt, sitemap index, GA4 integration.
-10. **Social Links** — managed user social media presence across 10+ platforms with branded icons and smart URL validation.
+10. **Social Links** — managed user social media presence across 12 platforms with branded icons and smart URL validation.
 11. **External Share API** — a dedicated `/share` endpoint for third-party websites to pre-fill post composer text, documented at `/developer`.
 
 ---
@@ -422,9 +422,9 @@ pages/         → Static pages (privacy, terms, custom)
 - **Cache Safety:** Version-sync caching is scoped per version key (`system_version_checked_{version-name}`) so post-upgrade requests do not wait on stale cache state before the `options` table is corrected.
 - **Installer UI:** Installer update and finish screens display the active runtime version from `SystemVersion`, reducing patch-release drift.
 
-### User Social Links System (v4.2.2)
+### User Social Links System (v4.2.2+)
 - **Storage:** Uses JSON-encoded records in the `options` table with `o_type = 'user_social_links'`.
-- **Validation:** `ProfileController@normalizeSocialLink` performs smart validation and normalization for 10 platforms (Facebook, Twitter, Vkontakte, LinkedIn, Instagram, YouTube, Threads, Reddit, GitHub, ADStn), converting raw handles or malformed URLs into clean, canonical profile links.
+- **Validation:** `ProfileController@normalizeSocialLink` performs smart validation and normalization for 12 platforms (Facebook, Twitter, Vkontakte, LinkedIn, Instagram, YouTube, Threads, Reddit, GitHub, ADStn, TikTok, Discord), converting raw handles or malformed URLs into clean, canonical profile links. Discord specifically supports server invite links.
 - **Display:** Icons are rendered with brand-specific secondary colors and FontAwesome icons, opening in new tabs for a seamless profile experience.
 
 ### External Share API
@@ -671,6 +671,7 @@ php artisan storage:link
 - **Focus:** Maintenance, performance tuning, and community-requested refinements.
 - **Fix (2026-04-07):** Resolved a script race condition on the Store creation page that prevented dynamic category loading when jQuery was deferred; moved the AJAX handler to the global scope with safety retries for consistent theme interaction.
 - **Fix (2026-04-07):** Resolved a critical `500 Internal Server Error` on the **Admin Product Edit** page caused by nested parentheses in a Blade `@php` directive; refactored template to use stable `@php ... @endphp` blocks.
+- **Refinement (2026-04-07):** Updated the **Discord** social link normalization to accept server invite links (`discord.gg/code` or `discord.com/invite/code`) instead of just user IDs. Added missing TikTok and Discord icons to the profile social widget and synchronized German translations for all 12 platforms.
 
 ---
 

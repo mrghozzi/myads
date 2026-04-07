@@ -575,8 +575,8 @@ class ProfileController extends Controller
                 'pattern' => '/tiktok\.com\/@([a-zA-Z0-9_\.]+)/i'
             ],
             'discord' => [
-                'base' => 'https://discord.com/users/',
-                'pattern' => '/discord\.com\/users\/([0-9]+)/i'
+                'base' => 'https://discord.gg/',
+                'pattern' => '/(?:discord\.gg\/|discord\.com\/invite\/)([a-zA-Z0-9\._\-]+)/i'
             ],
         ];
 

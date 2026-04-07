@@ -236,6 +236,8 @@
                                         'reddit' => 'fab fa-reddit-alien',
                                         'github' => 'fab fa-github',
                                         'adstn' => 'fa-brands fa-buysellads',
+                                        'tiktok' => 'fab fa-tiktok',
+                                        'discord' => 'fab fa-discord',
                                         default => 'fa fa-link',
                                     };
                                     $iconColor = match($platform) {
@@ -249,6 +251,8 @@
                                         'reddit' => '#ff4500',
                                         'github' => '#333333',
                                         'adstn' => 'rgb(84, 56, 163)',
+                                        'tiktok' => '#000000',
+                                        'discord' => '#5865F2',
                                         default => 'var(--primary-color)',
                                     };
                                 @endphp
