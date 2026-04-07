@@ -3,7 +3,9 @@
 @section('title', __('messages.edit_banner'))
 
 @section('content')
-@php($bannerSizes = \App\Support\BannerSizeCatalog::ordered())
+@php
+    $bannerSizes = \App\Support\BannerSizeCatalog::ordered();
+@endphp
 
 <div class="admin-page">
     <section class="admin-hero">

@@ -2,6 +2,8 @@
 > **Work in Progress** — Maintenance, performance tuning, and community-requested refinements.
 
 ### 🛠️ Maintenance & Polish
+* **Fix**: Resolved a critical `500 Internal Server Error` on the **Admin Product Edit** page (`/admin/products/{id}/edit`) caused by nested parentheses in a Blade `@php` directive that mis-parsed during compilation; refactored the template to use stable `@php ... @endphp` blocks.
+* **Fix**: Resolved a potential `ParseError` on the **Admin Banner Edit** page (`/admin/banners/{id}/edit`) by standardizing the `@php` block syntax for better consistency and compilation reliability.
 * **Fix**: Resolved a 404 error on Marketplace API endpoints (`/api/marketplace/extensions/plugins` and `/api/marketplace/extensions/themes`) by correctly registering the `api.php` route file in the application bootstrap configuration.
 * **Fix**: Resolved a routing conflict where the product update page (`/store/{name}/update`) was being incorrectly intercepted by the store filtering route, ensuring the update form renders correctly for all products.
 * **Fix**: Resolved a script race condition on the Store creation page (`/store/create`) that prevented the dynamic AJAX loading of subcategories when jQuery was deferred; refactored the category change handler to the global scope with safety retries to ensure consistent theme interaction.

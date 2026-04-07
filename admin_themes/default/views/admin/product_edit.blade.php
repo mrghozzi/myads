@@ -4,7 +4,9 @@
 @section('admin_shell_header_mode', 'hidden')
 
 @section('content')
-@php($selectedStoreCategory = \App\Support\StoreCategoryCatalog::normalize(optional($typeOption)->name))
+@php
+    $selectedStoreCategory = \App\Support\StoreCategoryCatalog::normalize(optional($typeOption)->name);
+@endphp
 
 <div class="admin-page">
 
