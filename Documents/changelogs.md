@@ -2,6 +2,7 @@
 > **Work in Progress** — Maintenance, performance tuning, and community-requested refinements.
 
 ### 🛠️ Maintenance & Polish
+* **Fix**: Resolved a 404 error on Marketplace API endpoints (`/api/marketplace/extensions/plugins` and `/api/marketplace/extensions/themes`) by correctly registering the `api.php` route file in the application bootstrap configuration.
 * **Fix**: Resolved a routing conflict where the product update page (`/store/{name}/update`) was being incorrectly intercepted by the store filtering route, ensuring the update form renders correctly for all products.
 
 
