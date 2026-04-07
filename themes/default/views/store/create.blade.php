@@ -193,8 +193,14 @@
 </div>
 
 <script>
-    $('#OpenImgUpload').click(function () {
-        $('#imgupload').trigger('click');
+    document.addEventListener('DOMContentLoaded', function() {
+        var openImgUpload = document.getElementById('OpenImgUpload');
+        var imguploadInput = document.getElementById('imgupload');
+        if (openImgUpload && imguploadInput) {
+            openImgUpload.addEventListener('click', function () {
+                imguploadInput.click();
+            });
+        }
     });
 </script>
 
@@ -267,55 +273,62 @@
         document.querySelector('[data-store-create-source]').textContent = sourceText;
     }
 
-    $(document).ready(function () {
-        var token = $('meta[name="csrf-token"]').attr('content');
+    function initStoreReady() {
+        if (typeof jQuery === 'undefined') {
+            setTimeout(initStoreReady, 50);
+            return;
+        }
 
-        $('#imgupload').change(function () {
-            $("#showImgUpload").html("<div class='progress'><div class='progress-bar progress-bar-striped active' role='progressbar' aria-valuenow='100' aria-valuemin='0' aria-valuemax='100' style='width:100%'> Uploading </div> </div> ");
-            var file = this.files[0];
-            var form = new FormData();
-            form.append('fimg', file);
-            form.append('_token', token);
-            $.ajax({
-                url: "{{ route('status.upload_image') }}",
-                type: "POST",
-                cache: false,
-                contentType: false,
-                processData: false,
-                data: form,
-                success: function (response) {
-                    $('#showImgUpload').html(response);
+        var $ = jQuery;
+        $(document).ready(function () {
+            var token = $('meta[name="csrf-token"]').attr('content');
+
+            $('#imgupload').change(function () {
+                $("#showImgUpload").html("<div class='progress'><div class='progress-bar progress-bar-striped active' role='progressbar' aria-valuenow='100' aria-valuemin='0' aria-valuemax='100' style='width:100%'> Uploading </div> </div> ");
+                var file = this.files[0];
+                var form = new FormData();
+                form.append('fimg', file);
+                form.append('_token', token);
+                $.ajax({
+                    url: "{{ route('status.upload_image') }}",
+                    type: "POST",
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    data: form,
+                    success: function (response) {
+                        $('#showImgUpload').html(response);
+                    }
+                });
+            });
+
+            $('.sname').change(function () {
+                $("#msg_name").html("<div class='progress'><div class='progress-bar progress-bar-striped active' role='progressbar' aria-valuenow='100' aria-valuemin='0' aria-valuemax='100' style='width:100%'>{{ __('messages.review') }}</div> </div> ");
+                var sname = $(this).val();
+
+                $.ajax({
+                    type: "POST",
+                    url: "{{ route('store.verify_name') }}",
+                    data: { sname: sname, _token: token },
+                    cache: false,
+                    success: function (html) {
+                        $("#msg_name").html(html);
+                    }
+                });
+            });
+
+            $('#store-version, #store-price').on('input', syncCreateSummary);
+            document.addEventListener('click', function (event) {
+                if (event.target.closest('[data-store-source-tab]')) {
+                    window.setTimeout(syncCreateSummary, 0);
                 }
             });
+
+            syncCreateSummary();
         });
+    }
 
-        $('.sname').change(function () {
-            $("#msg_name").html("<div class='progress'><div class='progress-bar progress-bar-striped active' role='progressbar' aria-valuenow='100' aria-valuemin='0' aria-valuemax='100' style='width:100%'>{{ __('messages.review') }}</div> </div> ");
-            var sname = $(this).val();
-
-            $.ajax({
-                type: "POST",
-                url: "{{ route('store.verify_name') }}",
-                data: { sname: sname, _token: token },
-                cache: false,
-                success: function (html) {
-                    $("#msg_name").html(html);
-                }
-            });
-        });
-
-        // window.triggerCategoryUpdate is now defined globally above to avoid race conditions with deferred jQuery.
-
-
-        $('#store-version, #store-price').on('input', syncCreateSummary);
-        document.addEventListener('click', function (event) {
-            if (event.target.closest('[data-store-source-tab]')) {
-                window.setTimeout(syncCreateSummary, 0);
-            }
-        });
-
-        syncCreateSummary();
-    });
+    initStoreReady();
 </script>
 
 <script src="https://unpkg.com/stackedit-js@1.0.7/docs/lib/stackedit.min.js"></script>

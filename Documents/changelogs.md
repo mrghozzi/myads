@@ -6,7 +6,7 @@
 * **Fix**: Resolved a potential `ParseError` on the **Admin Banner Edit** page (`/admin/banners/{id}/edit`) by standardizing the `@php` block syntax for better consistency and compilation reliability.
 * **Fix**: Resolved a 404 error on Marketplace API endpoints (`/api/marketplace/extensions/plugins` and `/api/marketplace/extensions/themes`) by correctly registering the `api.php` route file in the application bootstrap configuration.
 * **Fix**: Resolved a routing conflict where the product update page (`/store/{name}/update`) was being incorrectly intercepted by the store filtering route, ensuring the update form renders correctly for all products.
-* **Fix**: Resolved a script race condition on the Store creation page (`/store/create`) that prevented the dynamic AJAX loading of subcategories when jQuery was deferred; refactored the category change handler to the global scope with safety retries to ensure consistent theme interaction.
+* **Fix**: Resolved a script race condition on the Store creation page (`/store/create`) that prevented the "Upload Image" button from triggering and blocked the dynamic AJAX loading of subcategories when jQuery was deferred; refactored the image upload and category handlers to the global scope with safety retries to ensure consistent theme interaction.
 
 
 ---
