@@ -33,6 +33,9 @@
         @case('widget_quests_daily')
             @include('theme::partials.widgets.widget_quests_daily', ['widget' => $widget])
             @break
+        @case('widget_landing_footer')
+            @include('theme::partials.widgets.widget_landing_footer', ['widget' => $widget])
+            @break
         @default
             <!-- Unknown widget mode: {{ $widget->o_mode }} -->
     @endswitch

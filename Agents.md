@@ -434,13 +434,13 @@ pages/         → Static pages (privacy, terms, custom)
 - **UI**: Uses "Superdesign" aesthetics with glassmorphism, device icons, and localized metadata.
 - **Safety**: Uses `V420SchemaService` for database-compatibility checks and ensures a confirmation step before revocation.
 
-### Landing Page Statistics (v4.2.5)
-- **Overhaul**: The statistics section on `welcome.blade.php` has been refactored to show high-value community metrics:
-    - **Total Members**: Counts all registered users.
-    - **Active Ads**: Aggregates running campaigns across Banners, Links, Smart Ads, and Visits.
-    - **Total Posts**: Consolidated count from Status, Forum, News, Directory, Store, and Orders.
-    - **Engagement**: Combined total of all comments and reactions platform-wide.
 - **Implementation**: Logic is centralized in a try-catch block within the Blade template to ensure front-page stability.
+- **Footer Navigation**: Integrated links to Sitemap, Developers, Privacy, and Terms with "Powered by" branding and dynamic versioning.
+
+### Widget System Upgrades (v4.2.5)
+- **New Widget**: `widget_landing_footer` allows administrators to inject the stylized landing footer into any sidebar.
+- **Styling**: Standardized on `widget-box` with theme-aware CSS for Light/Dark modes.
+- **Flexibility**: Removed legacy restrictions in `AdminController@getAllowedPlaceIds`, allowing all widget types (HTML, Stats, Forum, Footer, etc.) to be placed in Profile sidebars (`profile_left`, `profile_right`).
 
 ### External Share API
 - **Endpoint:** `/share?text=...` takes a URL-encoded string.

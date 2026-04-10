@@ -50,6 +50,7 @@
                         <option value="widget_orders_latest">{{ __('messages.latest_orders') ?? 'Latest Orders' }}</option>
                         <option value="widget_badges_showcase">{{ __('messages.badges') ?? 'Badges' }}</option>
                         <option value="widget_quests_daily">{{ __('messages.daily_quests') ?? 'Daily Quests' }}</option>
+                        <option value="widget_landing_footer">{{ __('messages.landing_footer') ?? 'Landing Footer' }}</option>
                     </select>
                 </div>
             </div>

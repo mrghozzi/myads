@@ -2447,14 +2447,7 @@ class AdminController extends Controller
     private function getAllowedPlaceIds($type = 'widget_html')
     {
         $places = $this->getWidgetPlaces();
-        $ids = array_keys($places);
-
-        // For non-HTML widgets, exclude profile places (7, 8)
-        if ($type !== 'widget_html') {
-            $ids = array_filter($ids, fn($id) => !in_array((int)$id, [7, 8], true));
-        }
-
-        return $ids;
+        return array_keys($places);
     }
 
     private function forumPermissionKeys(): array
@@ -2475,7 +2468,7 @@ class AdminController extends Controller
     public function widgetForm(Request $request)
     {
         $type = $request->get('type');
-        $allowedTypes = ['widget_html', 'widget_members', 'widget_stats_box', 'widget_forum_latest', 'widget_news_latest', 'widget_points_leaderboard', 'widget_store_latest', 'widget_directory_latest', 'widget_orders_latest', 'widget_badges_showcase', 'widget_quests_daily'];
+        $allowedTypes = ['widget_html', 'widget_members', 'widget_stats_box', 'widget_forum_latest', 'widget_news_latest', 'widget_points_leaderboard', 'widget_store_latest', 'widget_directory_latest', 'widget_orders_latest', 'widget_badges_showcase', 'widget_quests_daily', 'widget_landing_footer'];
         if (!in_array($type, $allowedTypes, true)) {
             abort(404);
         }
@@ -2513,7 +2506,7 @@ class AdminController extends Controller
             'o_parent' => 'required|integer|in:' . $allowedPlaceIds,
             'o_order' => 'required|integer',
             'o_valuer' => 'nullable|string', // Content
-            'o_mode' => 'required|in:widget_html,widget_members,widget_stats_box,widget_forum_latest,widget_news_latest,widget_points_leaderboard,widget_store_latest,widget_directory_latest,widget_orders_latest,widget_badges_showcase,widget_quests_daily',
+            'o_mode' => 'required|in:widget_html,widget_members,widget_stats_box,widget_forum_latest,widget_news_latest,widget_points_leaderboard,widget_store_latest,widget_directory_latest,widget_orders_latest,widget_badges_showcase,widget_quests_daily,widget_landing_footer',
         ]);
 
         $data = $request->only(['name', 'o_parent', 'o_order', 'o_valuer', 'o_mode']);

@@ -16,6 +16,11 @@
 * **Fix**: Resolved a script race condition on the Store creation page (`/store/create`) that prevented the "Upload Image" button from triggering and blocked the dynamic AJAX loading of subcategories when jQuery was deferred; refactored the image upload and category handlers to the global scope with safety retries to ensure consistent theme interaction.
 * **Refactor**: Overhauled the **Landing Page Statistics** on `welcome.blade.php` to provide a high-impact overview of platform growth, replacing legacy counters with accurate, real-time metrics for **Total Members**, **Active Ads**, **Total Posts**, and **Engagement** (Consolidated Comments + Reactions).
 * **i18n**: Enhanced localization for landing page statistics, providing branded and clear labels for the new community metrics in both Arabic and English.
+* **Feature**: Modernized the **Landing Page Footer** with interactive navigation links for **Sitemap**, **Developers**, **Privacy Policy**, and **Terms & Conditions**, featuring stylized FontAwesome icons and hover animations.
+* **Branding**: Integrated a dynamic "Powered by MyAds SEO Engine" attribution in the footer with automatic version tagging through `SystemVersion::tag()`.
+* **Add**: Introduced a new **Landing Footer Widget** (`widget_landing_footer`) that allows administrators to replicate the landing page's stylized footer in any sidebar (Portal, Forum, Profile, etc.) via the admin panel.
+* **Architecture**: Standardized the new footer widget around the `widget-box` design system, featuring theme-aware color palettes for both Light and Dark modes.
+* **Improvement**: Enhanced the **Widget System Flexibility** by removing legacy placement restrictions, allowing all widget types to be added to **Profile Sidebars** (`profile_left` and `profile_right`) for greater customization.
 
 
 ---
