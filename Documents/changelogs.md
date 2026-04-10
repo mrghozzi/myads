@@ -21,6 +21,8 @@
 * **Add**: Introduced a new **Landing Footer Widget** (`widget_landing_footer`) that allows administrators to replicate the landing page's stylized footer in any sidebar (Portal, Forum, Profile, etc.) via the admin panel.
 * **Architecture**: Standardized the new footer widget around the `widget-box` design system, featuring theme-aware color palettes for both Light and Dark modes.
 * **Improvement**: Enhanced the **Widget System Flexibility** by removing legacy placement restrictions, allowing all widget types to be added to **Profile Sidebars** (`profile_left` and `profile_right`) for greater customization.
+* **Fix**: Resolved an issue where the **Reaction Counters** were failing to display in the Admin Dashboard (`/admin`) due to incorrect asset path resolution; updated the template to correctly source icons from the public theme directory via `theme_asset()`.
+* **Improvement**: Hardened the **Reaction Summary Logic** in the dashboard to provide a consistent engagement overview by automatically counting legacy or uncharacterized reactions as standard "likes."
 
 
 ---

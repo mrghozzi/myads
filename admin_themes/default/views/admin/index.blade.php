@@ -221,7 +221,7 @@
                 @foreach($orderedReactions as $type => $count)
                     <div class="text-center px-3 py-2">
                         <div class="mb-2">
-                            <img src="{{ admin_asset('img/reaction/' . $reactionIcons[$type]) }}" alt="{{ $type }}" style="width: 42px; height: 42px; object-fit: contain;">
+                            <img src="{{ theme_asset('img/reaction/' . $reactionIcons[$type]) }}" alt="{{ $type }}" style="width: 42px; height: 42px; object-fit: contain;">
                         </div>
                         <h5 class="fw-bold mb-0 text-dark">{{ number_format($count) }}</h5>
                         <small class="text-uppercase text-muted fw-semibold" style="font-size: 0.65rem; letter-spacing: 0.5px;">{{ $type }}</small>

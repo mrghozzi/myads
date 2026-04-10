@@ -251,14 +251,25 @@ class AdminController extends Controller
             ],
         ];
 
-        $reactionsSummary = Option::where('o_type', 'data_reaction')
+        // Fetch detailed reaction summary (like, love, etc.)
+        // We look in options for 'data_reaction' but fallback to 'like' for any Like entry that doesn't have an option record
+        $detailedReactions = Option::where('o_type', 'data_reaction')
             ->select('o_valuer as type', DB::raw('count(*) as count'))
             ->groupBy('o_valuer')
-            ->get()
             ->pluck('count', 'type')
             ->toArray();
 
-        // Ensure common types exist even if 0
+        // Count total actual reactions (excluding follows which are type=1)
+        $totalActualReactions = \App\Models\Like::where('type', '!=', 1)->count();
+        $totalRegisteredInOptions = array_sum($detailedReactions);
+        
+        // Difference goes to 'like' (fallback)
+        $likeFallback = max(0, $totalActualReactions - $totalRegisteredInOptions);
+        
+        $reactionsSummary = $detailedReactions;
+        $reactionsSummary['like'] = ($reactionsSummary['like'] ?? 0) + $likeFallback;
+
+        // Ensure common types exist even if 0 for the view to render them
         $commonReactions = ['like', 'love', 'funny', 'wow', 'sad', 'angry', 'dislike', 'happy'];
         foreach ($commonReactions as $cr) {
             if (!isset($reactionsSummary[$cr])) {
