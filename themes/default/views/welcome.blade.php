@@ -562,38 +562,47 @@
     {{-- ===== STATS SECTION ===== --}}
     @php
         try {
-            $totalUsers = \App\Models\User::count();
-            $totalBanners = \Illuminate\Support\Facades\Schema::hasTable('banner') ? \DB::table('banner')->count() : 0;
-            $totalLinks = \Illuminate\Support\Facades\Schema::hasTable('link') ? \DB::table('link')->count() : 0;
-            $totalVisits = \Illuminate\Support\Facades\Schema::hasTable('visit') ? \DB::table('visit')->count() : 0;
-            $totalAds = $totalBanners + $totalLinks + $totalVisits;
-            $totalSites = \Illuminate\Support\Facades\Schema::hasTable('site') ? \DB::table('site')->count() : $totalVisits;
-            $totalPoints = \App\Models\User::sum('pts');
+            $activeMembers = \App\Models\User::count();
+
+            $activeAds = (\Illuminate\Support\Facades\Schema::hasTable('banner') ? \DB::table('banner')->where('statu', 1)->count() : 0)
+                + (\Illuminate\Support\Facades\Schema::hasTable('link') ? \DB::table('link')->where('statu', 1)->count() : 0)
+                + (\Illuminate\Support\Facades\Schema::hasTable('smart_ads') ? \DB::table('smart_ads')->where('statu', 1)->count() : 0)
+                + (\Illuminate\Support\Facades\Schema::hasTable('visit') ? \DB::table('visit')->where('statu', 1)->count() : 0);
+
+            $totalPosts = \App\Models\Status::where('statu', 1)->count()
+                + \App\Models\ForumTopic::where('statu', 1)->count()
+                + \App\Models\News::count()
+                + \App\Models\Directory::where('statu', 1)->count()
+                + \App\Models\Product::count()
+                + \App\Models\OrderRequest::count();
+
+            $totalEngagement = \App\Models\ForumComment::count()
+                + \App\Models\Option::whereIn('o_type', ['d_coment', 's_coment', 'order_comment'])->count()
+                + \App\Models\Like::where('type', '!=', 1)->count();
         } catch (\Exception $e) {
-            // Fallback if database is disconnected
-            $totalUsers = 0;
-            $totalAds = 0;
-            $totalSites = 0;
-            $totalPoints = 0;
+            $activeMembers = 0;
+            $activeAds = 0;
+            $totalPosts = 0;
+            $totalEngagement = 0;
         }
     @endphp
     <section class="landing-stats">
         <div class="landing-stats-inner">
             <div class="landing-stat-item landing-fade-up">
-                <span class="landing-stat-number" data-count="{{ $totalUsers }}"><span>{{ number_format($totalUsers) }}</span></span>
+                <span class="landing-stat-number" data-count="{{ $activeMembers }}"><span>{{ number_format($activeMembers) }}</span></span>
                 <span class="landing-stat-label">{{ __('messages.landing_stats_members') }}</span>
             </div>
             <div class="landing-stat-item landing-fade-up">
-                <span class="landing-stat-number" data-count="{{ $totalSites }}"><span>{{ number_format($totalSites) }}</span></span>
-                <span class="landing-stat-label">{{ __('messages.landing_stats_sites') }}</span>
-            </div>
-            <div class="landing-stat-item landing-fade-up">
-                <span class="landing-stat-number" data-count="{{ $totalAds }}"><span>{{ number_format($totalAds) }}</span></span>
+                <span class="landing-stat-number" data-count="{{ $activeAds }}"><span>{{ number_format($activeAds) }}</span></span>
                 <span class="landing-stat-label">{{ __('messages.landing_stats_ads') }}</span>
             </div>
             <div class="landing-stat-item landing-fade-up">
-                <span class="landing-stat-number" data-count="{{ $totalPoints }}"><span>{{ number_format($totalPoints) }}</span></span>
-                <span class="landing-stat-label">{{ __('messages.landing_stats_points') }}</span>
+                <span class="landing-stat-number" data-count="{{ $totalPosts }}"><span>{{ number_format($totalPosts) }}</span></span>
+                <span class="landing-stat-label">{{ __('messages.landing_stats_posts') }}</span>
+            </div>
+            <div class="landing-stat-item landing-fade-up">
+                <span class="landing-stat-number" data-count="{{ $totalEngagement }}"><span>{{ number_format($totalEngagement) }}</span></span>
+                <span class="landing-stat-label">{{ __('messages.landing_stats_interaction') }}</span>
             </div>
         </div>
     </section>

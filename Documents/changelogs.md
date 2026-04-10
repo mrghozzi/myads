@@ -14,6 +14,8 @@
 * **Fix**: Resolved a 404 error on Marketplace API endpoints (`/api/marketplace/extensions/plugins` and `/api/marketplace/extensions/themes`) by correctly registering the `api.php` route file in the application bootstrap configuration.
 * **Fix**: Resolved a routing conflict where the product update page (`/store/{name}/update`) was being incorrectly intercepted by the store filtering route, ensuring the update form renders correctly for all products.
 * **Fix**: Resolved a script race condition on the Store creation page (`/store/create`) that prevented the "Upload Image" button from triggering and blocked the dynamic AJAX loading of subcategories when jQuery was deferred; refactored the image upload and category handlers to the global scope with safety retries to ensure consistent theme interaction.
+* **Refactor**: Overhauled the **Landing Page Statistics** on `welcome.blade.php` to provide a high-impact overview of platform growth, replacing legacy counters with accurate, real-time metrics for **Total Members**, **Active Ads**, **Total Posts**, and **Engagement** (Consolidated Comments + Reactions).
+* **i18n**: Enhanced localization for landing page statistics, providing branded and clear labels for the new community metrics in both Arabic and English.
 
 
 ---

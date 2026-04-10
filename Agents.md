@@ -434,6 +434,14 @@ pages/         → Static pages (privacy, terms, custom)
 - **UI**: Uses "Superdesign" aesthetics with glassmorphism, device icons, and localized metadata.
 - **Safety**: Uses `V420SchemaService` for database-compatibility checks and ensures a confirmation step before revocation.
 
+### Landing Page Statistics (v4.2.5)
+- **Overhaul**: The statistics section on `welcome.blade.php` has been refactored to show high-value community metrics:
+    - **Total Members**: Counts all registered users.
+    - **Active Ads**: Aggregates running campaigns across Banners, Links, Smart Ads, and Visits.
+    - **Total Posts**: Consolidated count from Status, Forum, News, Directory, Store, and Orders.
+    - **Engagement**: Combined total of all comments and reactions platform-wide.
+- **Implementation**: Logic is centralized in a try-catch block within the Blade template to ensure front-page stability.
+
 ### External Share API
 - **Endpoint:** `/share?text=...` takes a URL-encoded string.
 - **Process:** Checks for authentication (redirects if guests), then pre-fills the `add_post.blade.php` composer using the `text` parameter as a fallback when no session (`old`) input exists.
