@@ -1,5 +1,12 @@
 # v4.2.5
-> **Work in Progress** — Maintenance, performance tuning, and community-requested refinements.
+> **Feature Release** — Member session monitoring, security refinements, and maintenance polish.
+
+### 🛡️ Privacy & Security
+* **Feature**: Introduced **Member Session Monitoring** (`/settings/sessions`), allowing members to track and manage their active login sessions across all their devices and browsers.
+* **Add**: Support for **Remote Session Revocation**, enabling users to instantly end sessions on other devices or log out from the current device with a confirmation safety check.
+* **UI**: Implemented a premium "Superdesign" sessions dashboard featuring glassmorphism headers, device-aware icons (Laptop, Mobile, Tablet), and comprehensive session metadata (IP Address, Last Activity, Start Time).
+* **i18n**: Fully localized the session management interface, device types, and security notifications across all **9 supported languages**.
+* **Architecture**: Integrated session monitoring with `V420SchemaService` to ensure graceful fallback on non-upgraded databases and utilized `SecuritySessionService` for secure revocation logic.
 
 ### 🛠️ Maintenance & Polish
 * **Fix**: Resolved a critical `500 Internal Server Error` on the **Admin Product Edit** page (`/admin/products/{id}/edit`) caused by nested parentheses in a Blade `@php` directive that mis-parsed during compilation; refactored the template to use stable `@php ... @endphp` blocks.

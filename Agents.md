@@ -31,6 +31,7 @@ MYADS is a community platform where website owners:
 9. **SEO Suite** — centralized SEO engine, admin SEO dashboard, dynamic robots.txt, sitemap index, GA4 integration.
 10. **Social Links** — managed user social media presence across 12 platforms with branded icons and smart URL validation.
 11. **External Share API** — a dedicated `/share` endpoint for third-party websites to pre-fill post composer text, documented at `/developer`.
+12. **Session Monitoring** — view and manage active member sessions across devices with remote revocation.
 
 ---
 
@@ -142,7 +143,7 @@ myads/
 | `SmartAdsController` | Smart ads CRUD, embed code |
 | `AdsServingController` | Public ad serving endpoints (`bn.php`, `link.php`, `smart.php`, embed scripts) |
 | `VisitController` | Visit exchange system |
-| `ProfileController` | Profile view/edit, follow, privacy, badges, history |
+| `ProfileController` | Profile view/edit, follow, privacy, sessions/revocation, badges, history |
 | `MessageController` | Private messaging |
 | `NotificationController` | Notification center, mark-all-read |
 | `OrderRequestController` | Order requests CRUD, bidding, rating |
@@ -427,6 +428,12 @@ pages/         → Static pages (privacy, terms, custom)
 - **Validation:** `ProfileController@normalizeSocialLink` performs smart validation and normalization for 12 platforms (Facebook, Twitter, Vkontakte, LinkedIn, Instagram, YouTube, Threads, Reddit, GitHub, ADStn, TikTok, Discord), converting raw handles or malformed URLs into clean, canonical profile links. Discord specifically supports server invite links.
 - **Display:** Icons are rendered with brand-specific secondary colors and FontAwesome icons, opening in new tabs for a seamless profile experience.
 
+### Member Session Monitoring System (v4.2.5)
+- **Feature**: Member-facing dashboard at `/settings/sessions` to view active login sessions.
+- **revocation**: Supports remote session revocation via `SecuritySessionService`, allowing users to end other devices' sessions instantly.
+- **UI**: Uses "Superdesign" aesthetics with glassmorphism, device icons, and localized metadata.
+- **Safety**: Uses `V420SchemaService` for database-compatibility checks and ensures a confirmation step before revocation.
+
 ### External Share API
 - **Endpoint:** `/share?text=...` takes a URL-encoded string.
 - **Process:** Checks for authentication (redirects if guests), then pre-fills the `add_post.blade.php` composer using the `text` parameter as a fallback when no session (`old`) input exists.
@@ -668,7 +675,8 @@ php artisan storage:link
 
 - **Status:** Work in Progress.
 - **Initial Changes:** Bumped canonical `SystemVersion::CURRENT` to v4.2.5 and initialized the new release cycle.
-- **Focus:** Maintenance, performance tuning, and community-requested refinements.
+- **Focus:** Member session monitoring, security refinements, and maintenance polish.
+- **Feature (2026-04-10):** Introduced **Member Session Monitoring** (`/settings/sessions`), allowing members to track and manage their active login sessions with remote revocation. Implemented with "Superdesign" aesthetics and full localization across all 9 languages.
 - **Fix (2026-04-07):** Resolved a script race condition on the Store creation page that prevented dynamic category loading when jQuery was deferred; moved the AJAX handler to the global scope with safety retries for consistent theme interaction.
 - **Fix (2026-04-07):** Resolved a critical `500 Internal Server Error` on the **Admin Product Edit** page caused by nested parentheses in a Blade `@php` directive; refactored template to use stable `@php ... @endphp` blocks.
 - **Refinement (2026-04-07):** Updated the **Discord** social link normalization to accept server invite links (`discord.gg/code` or `discord.com/invite/code`) instead of just user IDs. Added missing TikTok and Discord icons to the profile social widget and synchronized German translations for all 12 platforms.
@@ -697,4 +705,4 @@ If in doubt, update it. An outdated `Agents.md` causes future agents to make wro
 
 ---
 
-*Last updated: 2026-04-07 — MYADS v4.2.5 (Maintenance & Polish Cycle)*
+*Last updated: 2026-04-10 — MYADS v4.2.5 (Feature & Maintenance Cycle)*

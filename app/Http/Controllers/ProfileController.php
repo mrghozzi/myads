@@ -13,7 +13,9 @@ use App\Models\Product;
 use App\Models\Status;
 use App\Models\User;
 use App\Models\UserBadge;
+use App\Models\SecurityMemberSession;
 use App\Services\GamificationService;
+use App\Services\SecuritySessionService;
 use App\Services\StatusActivityService;
 use App\Services\UserPrivacyService;
 use App\Services\V420SchemaService;
@@ -521,6 +523,85 @@ class ProfileController extends Controller
         );
 
         return redirect()->route('profile.social')->with('success', __('messages.social_links_updated'));
+    }
+
+    public function sessions(Request $request)
+    {
+        $user = Auth::user();
+        $schema = app(V420SchemaService::class);
+        $sessionService = app(SecuritySessionService::class);
+        
+        $featureAvailable = $schema->supports('security_sessions');
+        $upgradeNotice = $schema->notice('security_sessions', __('messages.security_member_sessions_title'));
+
+        $sessions = $featureAvailable
+            ? SecurityMemberSession::query()
+                ->where('user_id', $user->id)
+                ->orderByDesc('last_seen_at')
+                ->get()
+                ->map(function ($session) use ($request) {
+                    $session->is_current = (string) $session->session_id === (string) $request->session()->getId();
+                    $session->device_type = $this->resolveDeviceType($session->user_agent);
+                    $session->browser = $this->resolveBrowser($session->user_agent);
+                    return $session;
+                })
+            : collect();
+
+        return view('theme::profile.sessions', compact('user', 'sessions', 'featureAvailable', 'upgradeNotice'));
+    }
+
+    public function revokeSession(Request $request, int $id)
+    {
+        $user = Auth::user();
+        $schema = app(V420SchemaService::class);
+        $sessionService = app(SecuritySessionService::class);
+
+        if (!$schema->supports('security_sessions')) {
+            return back()->with('error', $schema->blockedActionMessage('security_sessions', __('messages.security_member_sessions_title')));
+        }
+
+        $session = SecurityMemberSession::query()
+            ->where('user_id', $user->id)
+            ->findOrFail($id);
+
+        $isCurrent = (string) $session->session_id === (string) $request->session()->getId();
+        
+        $sessionService->revoke($session, $user);
+
+        if ($isCurrent) {
+            $sessionService->markLogout($request, $user);
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            return redirect()->route('login')
+                ->with('success', __('messages.session_revoked_current'));
+        }
+
+        return back()->with('success', __('messages.session_revoked_success'));
+    }
+
+    private function resolveDeviceType(string $userAgent): string
+    {
+        $ua = strtolower($userAgent);
+        if (str_contains($ua, 'mobile') || str_contains($ua, 'android') || str_contains($ua, 'iphone')) {
+            return 'mobile';
+        }
+        if (str_contains($ua, 'tablet') || str_contains($ua, 'ipad')) {
+            return 'tablet';
+        }
+        return 'desktop';
+    }
+
+    private function resolveBrowser(string $userAgent): string
+    {
+        $ua = strtolower($userAgent);
+        if (str_contains($ua, 'edg')) return 'Edge';
+        if (str_contains($ua, 'chrome')) return 'Chrome';
+        if (str_contains($ua, 'safari') && !str_contains($ua, 'chrome')) return 'Safari';
+        if (str_contains($ua, 'firefox')) return 'Firefox';
+        if (str_contains($ua, 'opera') || str_contains($ua, 'opr')) return 'Opera';
+        return 'Unknown';
     }
 
     private function normalizeSocialLink(string $platform, string $value): ?string

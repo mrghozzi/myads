@@ -273,6 +273,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/settings/badges', [ProfileController::class, 'updateBadges'])->name('profile.badges.update');
     Route::get('/settings/social', [ProfileController::class, 'social'])->name('profile.social');
     Route::post('/settings/social', [ProfileController::class, 'updateSocial'])->name('profile.social.update');
+    Route::get('/settings/sessions', [ProfileController::class, 'sessions'])->name('profile.sessions');
+    Route::post('/settings/sessions/{id}/revoke', [ProfileController::class, 'revokeSession'])->name('profile.sessions.revoke');
     Route::post('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
     Route::post('/profile/{id}/follow', [ProfileController::class, 'toggleFollow'])->name('profile.follow');
 });
