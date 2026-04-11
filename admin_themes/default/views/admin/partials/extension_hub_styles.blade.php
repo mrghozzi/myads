@@ -548,6 +548,67 @@
         color: inherit;
     }
 
+    .extension-markdown-content {
+        line-height: 1.6;
+        font-size: 15px;
+        color: #444;
+    }
+    .extension-markdown-content h1, .extension-markdown-content h2, .extension-markdown-content h3 {
+        margin-top: 1.5rem;
+        margin-bottom: 1rem;
+        font-weight: 700;
+        color: #222;
+    }
+    .extension-markdown-content img {
+        max-width: 100%;
+        height: auto;
+        border-radius: 8px;
+        margin: 1rem 0;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+    .extension-markdown-content code {
+        background: rgba(var(--extension-hub-accent-rgb), 0.08);
+        padding: 2px 5px;
+        border-radius: 4px;
+        color: var(--extension-hub-accent);
+    }
+    .extension-markdown-content pre {
+        background: #f8f9fa;
+        padding: 1.25rem;
+        border-radius: 10px;
+        overflow-x: auto;
+        border: 1px solid #eee;
+    }
+    .extension-markdown-content pre code {
+        background: transparent;
+        padding: 0;
+        color: inherit;
+    }
+    .extension-markdown-content blockquote {
+        border-left: 4px solid var(--extension-hub-accent);
+        padding-left: 1rem;
+        margin-left: 0;
+        font-style: italic;
+        color: #64748b;
+    }
+    .extension-markdown-content ul, .extension-markdown-content ol {
+        margin-bottom: 1rem;
+        padding-left: 1.5rem;
+    }
+
+    html.app-skin-dark .extension-markdown-content {
+        color: #cbd5e1;
+    }
+    html.app-skin-dark .extension-markdown-content h1, 
+    html.app-skin-dark .extension-markdown-content h2, 
+    html.app-skin-dark .extension-markdown-content h3 {
+        color: #f8fafc;
+    }
+    html.app-skin-dark .extension-markdown-content pre {
+        background: #0f172a;
+        border-color: #334155;
+    }
+
     html.app-skin-dark .extension-hub__stat,
     html.app-skin-dark .extension-hub__surface {
         background: rgba(18, 26, 44, 0.82);
@@ -619,6 +680,42 @@
     html[dir="rtl"] .extension-hub__hero-icon {
         right: auto;
         left: 1.5rem;
+    }
+
+    /* Plugin Modal Tabs & Soft Buttons */
+    .plugin-modal-tabs .nav-link {
+        color: #6e7985;
+        background: transparent;
+        border: none;
+        transition: all 0.2s ease;
+    }
+    .plugin-modal-tabs .nav-link.active {
+        background: var(--extension-hub-accent, #6366f1) !important;
+        color: white !important;
+        box-shadow: 0 4px 10px rgba(var(--extension-hub-accent-rgb), 0.2);
+    }
+    .btn-soft-primary {
+        background: rgba(var(--extension-hub-accent-rgb), 0.1);
+        color: var(--extension-hub-accent);
+        border: none;
+    }
+    .btn-soft-primary:hover {
+        background: rgba(var(--extension-hub-accent-rgb), 0.15);
+        color: var(--extension-hub-accent-strong);
+    }
+    .btn-soft-secondary {
+        background: #f1f5f9;
+        color: #475569;
+        border: none;
+    }
+    .btn-soft-secondary:hover {
+        background: #e2e8f0;
+        color: #1e293b;
+    }
+
+    html.app-skin-dark .btn-soft-secondary {
+        background: #1e293b;
+        color: #cbd5e1;
     }
 
     @media (max-width: 1199.98px) {

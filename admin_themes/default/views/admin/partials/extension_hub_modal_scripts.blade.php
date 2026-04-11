@@ -44,9 +44,7 @@
                 <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body p-4">
-                <div class="bg-light p-4 rounded border">
-                    <pre class="extension-hub__modal-pre" data-extension-changelog-content></pre>
-                </div>
+                <div class="bg-light p-4 rounded border extension-markdown-content" data-extension-changelog-content></div>
                 <div class="mt-3 text-center d-none" data-extension-changelog-github-wrap>
                     <a href="#" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-link" data-extension-changelog-github>
                         <i class="feather-github me-1"></i> {{ __('messages.view_on_github') }}
@@ -66,6 +64,8 @@
 </div>
 
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify/dist/purify.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     function decodeBase64Utf8(value) {
@@ -169,7 +169,8 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             if (contentNode) {
-                contentNode.textContent = decodeBase64Utf8(trigger.getAttribute('data-changelog') || '');
+                const rawChangelog = decodeBase64Utf8(trigger.getAttribute('data-changelog') || '');
+                contentNode.innerHTML = rawChangelog ? DOMPurify.sanitize(marked.parse(rawChangelog)) : '-';
             }
 
             var githubUrl = trigger.getAttribute('data-github-url') || '';

@@ -182,7 +182,7 @@
                         @if($latestRelease['body'])
                             <div class="mb-4">
                                 <div class="admin-panel__eyebrow">{{ __('messages.release_notes') }}</div>
-                                <div class="admin-release-notes">{!! nl2br(e($latestRelease['body'])) !!}</div>
+                                <div class="admin-release-notes markdown-content" style="display: none;">{{ $latestRelease['body'] }}</div>
                             </div>
                         @endif
 
@@ -341,7 +341,24 @@
 @endsection
 
 @push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify/dist/purify.min.js"></script>
 <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Markdown Rendering
+        function renderMarkdown() {
+            document.querySelectorAll('.markdown-content').forEach(el => {
+                if (!el.getAttribute('data-rendered')) {
+                    const rawContent = el.innerText || el.innerHTML;
+                    el.innerHTML = DOMPurify.sanitize(marked.parse(rawContent));
+                    el.setAttribute('data-rendered', 'true');
+                    el.style.display = 'block';
+                }
+            });
+        }
+        renderMarkdown();
+    });
+
     function checkForUpdates() {
         const btn = document.getElementById('btn-check-update');
         const originalHtml = btn.innerHTML;
@@ -417,4 +434,19 @@
         }, 5000);
     }
 </script>
+<style>
+    .markdown-content h1, .markdown-content h2, .markdown-content h3 { margin-top: 1.25rem; margin-bottom: 0.75rem; font-weight: 700; color: var(--vz-heading-color); }
+    .markdown-content h1 { font-size: 1.5rem; }
+    .markdown-content h2 { font-size: 1.25rem; }
+    .markdown-content h3 { font-size: 1.1rem; }
+    .markdown-content p { margin-bottom: 1rem; line-height: 1.6; }
+    .markdown-content ul, .markdown-content ol { margin-bottom: 1rem; padding-left: 1.5rem; }
+    .markdown-content li { margin-bottom: 0.5rem; }
+    .markdown-content code { background: rgba(var(--vz-primary-rgb), 0.1); color: var(--vz-primary); padding: 0.2rem 0.4rem; border-radius: 4px; font-size: 85%; }
+    .markdown-content pre { background: var(--vz-light); padding: 1rem; border-radius: 6px; overflow-x: auto; margin-bottom: 1rem; border: 1px solid var(--vz-border-color); }
+    .markdown-content pre code { background: transparent; color: inherit; padding: 0; }
+    .markdown-content blockquote { border-left: 4px solid var(--vz-primary); padding-left: 1rem; margin-left: 0; font-style: italic; color: var(--vz-muted); }
+    .markdown-content img { max-width: 100%; height: auto; border-radius: 6px; }
+    .markdown-content hr { margin: 1.5rem 0; border-top: 1px solid var(--vz-border-color); opacity: 1; }
+</style>
 @endpush

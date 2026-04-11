@@ -331,13 +331,13 @@
                         </ul>
                         <div class="tab-content" id="plugin-modal-tab-content">
                             <div class="tab-pane fade show active" id="plugin-tab-description">
-                                <div class="plugin-markdown-content p-2" id="plugin-content-description"></div>
+                                <div class="extension-markdown-content p-2" id="plugin-content-description"></div>
                             </div>
                             <div class="tab-pane fade" id="plugin-tab-changelog">
-                                <div class="plugin-markdown-content p-2" id="plugin-content-changelog"></div>
+                                <div class="extension-markdown-content p-2" id="plugin-content-changelog"></div>
                             </div>
                             <div class="tab-pane fade" id="plugin-tab-screenshots">
-                                <div class="plugin-markdown-content p-2" id="plugin-content-screenshots"></div>
+                                <div class="extension-markdown-content p-2" id="plugin-content-screenshots"></div>
                             </div>
                         </div>
                     </div>
@@ -380,8 +380,6 @@
 @endsection
 
 @push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/dompurify/dist/purify.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     var pluginDetailsModal = document.getElementById('pluginDetailsModal');
@@ -471,67 +469,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 </script>
-<style>
-    .plugin-markdown-content {
-        line-height: 1.6;
-        font-size: 15px;
-        color: #444;
-    }
-    .plugin-markdown-content h1, .plugin-markdown-content h2, .plugin-markdown-content h3 {
-        margin-top: 1.5rem;
-        margin-bottom: 1rem;
-        font-weight: 700;
-        color: #222;
-    }
-    .plugin-markdown-content img {
-        max-width: 100%;
-        height: auto;
-        border-radius: 8px;
-        margin: 1rem 0;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    }
-    .plugin-markdown-content code {
-        background: #f1f3f5;
-        padding: 2px 5px;
-        border-radius: 4px;
-        color: #e83e8c;
-    }
-    .plugin-markdown-content pre {
-        background: #f8f9fa;
-        padding: 1.25rem;
-        border-radius: 10px;
-        overflow-x: auto;
-        border: 1px solid #eee;
-    }
-    .plugin-modal-tabs .nav-link {
-        color: #6e7985;
-        background: transparent;
-        border: none;
-        transition: all 0.2s ease;
-    }
-    .plugin-modal-tabs .nav-link.active {
-        background: var(--extension-hub-accent, #615dfa) !important;
-        color: white !important;
-        box-shadow: 0 4px 10px rgba(97, 93, 250, 0.2);
-    }
-    .btn-soft-primary {
-        background: #eef2ff;
-        color: #615dfa;
-        border: none;
-    }
-    .btn-soft-primary:hover {
-        background: #e0e7ff;
-        color: #4f46e5;
-    }
-    .btn-soft-secondary {
-        background: #f1f5f9;
-        color: #475569;
-        border: none;
-    }
-    .btn-soft-secondary:hover {
-        background: #e2e8f0;
-        color: #1e293b;
-    }
 </style>
 @include('admin::admin.partials.extension_hub_styles')
 @endpush
