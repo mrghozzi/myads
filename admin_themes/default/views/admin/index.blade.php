@@ -348,15 +348,16 @@
                         </a>
                         
                         <div class="btn-group w-100" role="group">
+                            @php $is_rtl = is_locale_rtl(); @endphp
+                            <a href="{{ url('/sitemap.xml') }}" target="_blank" class="btn w-25 px-3 py-2" style="background: #1e293b; color: #fff; border: none; border-radius: {{ $is_rtl ? '0 10px 10px 0' : '10px 0 0 10px' }};">
+                                <i class="feather-external-link"></i>
+                            </a>
                             <form action="{{ route('admin.sitemap.generate') }}" method="POST" class="w-75">
                                 @csrf
-                                <button type="submit" class="btn w-100 px-3 py-2" style="background: linear-gradient(135deg, #10b981, #059669); color: #fff; border: none; border-radius: 10px 0 0 10px;">
+                                <button type="submit" class="btn w-100 px-3 py-2" style="background: linear-gradient(135deg, #10b981, #059669); color: #fff; border: none; border-radius: {{ $is_rtl ? '10px 0 0 10px' : '0 10px 10px 0' }};">
                                     <i class="feather-refresh-cw me-1"></i> {{ __('messages.seo_refresh_sitemap') }}
                                 </button>
                             </form>
-                            <a href="{{ url('/sitemap.xml') }}" target="_blank" class="btn w-25 px-3 py-2" style="background: #1e293b; color: #fff; border: none; border-radius: 0 10px 10px 0;">
-                                <i class="feather-external-link"></i>
-                            </a>
                         </div>
 
                         <a href="https://github.com/mrghozzi/myads/wiki/changelogs" target="_blank" class="btn px-3 py-2" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; border: none; border-radius: 10px;">
