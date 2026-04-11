@@ -23,6 +23,8 @@
 * **Improvement**: Enhanced the **Widget System Flexibility** by removing legacy placement restrictions, allowing all widget types to be added to **Profile Sidebars** (`profile_left` and `profile_right`) for greater customization.
 * **Fix**: Resolved an issue where the **Reaction Counters** were failing to display in the Admin Dashboard (`/admin`) due to incorrect asset path resolution; updated the template to correctly source icons from the public theme directory via `theme_asset()`.
 * **Improvement**: Hardened the **Reaction Summary Logic** in the dashboard to provide a consistent engagement overview by automatically counting legacy or uncharacterized reactions as standard "likes."
+* **Fix**: Resolved an issue where the **Admin Dropdown Menus** (User profile and Language Switcher) were being cut off on the left side of the screen in RTL mode; implemented high-priority specificity overrides in `rtl.css` to ensure correct left-alignment and rightward expansion in Arabic and Persian locales.
+* **UI**: Enhanced the RTL header experience by stabilizing dropdown positioning across the premium admin layout.
 
 
 ---

@@ -243,8 +243,8 @@ html[dir="rtl"] .breadcrumb-item + .breadcrumb-item::before {
     transform: rotate(180deg);
 }
 
-html[dir="rtl"] .dropdown-menu-end,
-html[dir="rtl"] .nxl-h-dropdown {
+html[dir="rtl"] .nxl-header .header-wrapper .nxl-h-dropdown.dropdown-menu-end,
+html[dir="rtl"] .nxl-header .header-wrapper .nxl-h-item .nxl-h-dropdown {
     right: auto !important;
     left: 0 !important;
 }
