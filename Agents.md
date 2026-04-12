@@ -1,4 +1,4 @@
-# Agents.md — MYADS v4.2.5
+# Agents.md — MYADS v4.3.0
 
 > **Purpose:** This file gives AI coding agents a fast, comprehensive understanding of the MYADS project — its architecture, conventions, key files, and rules — so they can work effectively from a fresh chat context.
 
@@ -6,7 +6,7 @@
 
 ## 1. Project Identity
 
-- **Name:** MYADS v4.2.5
+- **Name:** MYADS v4.3.0
 - **Type:** Social network + ad exchange platform for website owners
 - **Framework:** Laravel 12 (PHP 8.2+)
 - **Database:** MySQL 5.7+ / MariaDB 10.3+
@@ -691,6 +691,14 @@ php artisan storage:link
 
 ---
 
+## 19H. Version 4.3.0 Strategic Update Cycle (Started 2026-04-12)
+
+- **Status:** Initializing.
+- **Focus:** Strategic platform advancements and major feature foundations.
+- **Initial Changes:** Bumped canonical `SystemVersion::CURRENT` to v4.3.0 and migrated documentation to the new version baseline.
+
+---
+
 ## 20. Maintaining This File
 
 > **⚠️ RULE: This `Agents.md` file MUST be kept up to date.**
@@ -713,4 +721,4 @@ If in doubt, update it. An outdated `Agents.md` causes future agents to make wro
 
 ---
 
-*Last updated: 2026-04-10 — MYADS v4.2.5 (Feature & Maintenance Cycle)*
+*Last updated: 2026-04-12 — MYADS v4.3.0 (Strategic Update Cycle)*
