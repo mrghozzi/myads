@@ -197,7 +197,7 @@ class CommentController extends Controller
                 $comment->o_type = 'order_comment';
                 $comment->o_parent = (int) $id;
                 $comment->o_order = (int) Auth::id();
-                $comment->o_mode = 0; // Default rating
+                $comment->o_mode = $time;
                 $comment->save();
 
                 // Update last activity

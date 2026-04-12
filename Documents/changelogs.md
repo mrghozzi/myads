@@ -1,9 +1,12 @@
 # v4.3.0
 > **Strategic Release** — Preparing major platform advancements and core infrastructure updates.
 
-### 🚀 Strategic Advancements
-* **Initialization**: Formally initialized the v4.3.0 development cycle, setting the foundation for upcoming major features.
-* **Versioning**: Centralized system versioning across core support classes, documentation, and metadata files.
+### Community Feed Intelligence
+* **Refactor**: Rebuilt the `/portal?filter=all` ranking pipeline around configurable community-feed settings, shifting priority toward freshness, followed authors, member affinity, and recent momentum instead of static historical totals.
+* **Add**: Introduced recent-trend rescue logic so older posts only return to the front of the community feed when they cross configurable recent engagement thresholds for comments, reactions, or reposts.
+* **Add**: Added a dedicated admin page at `/admin/community/feed/settings` to tune freshness, personalization, trend windows, rescue thresholds, diversity penalties, candidate-pool limits, and cache TTL without touching code.
+* **ACL**: Mapped the new community feed settings routes into the `community` admin-permission module so delegated community administrators can manage the ranking configuration safely.
+* **Compatibility**: Order-request comments now store their creation timestamp in `options.o_mode`, allowing legacy community content to participate in recent-trend calculations without schema changes.
 
 ---
 

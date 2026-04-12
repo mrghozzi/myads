@@ -23,6 +23,7 @@ use App\Http\Controllers\ReactionController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\MentionController;
 use App\Http\Controllers\AdminAdminsController;
+use App\Http\Controllers\AdminCommunityFeedController;
 use App\Http\Controllers\AdminSecurityController;
 use App\Http\Controllers\AdminStatusPromotionController;
 use App\Http\Controllers\SeoPublicController;
@@ -422,6 +423,8 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::post('/forum/categories', [AdminController::class, 'storeForumCategory'])->name('admin.forum_categories.store');
     Route::post('/forum/categories/{id}', [AdminController::class, 'updateForumCategory'])->name('admin.forum_categories.update');
     Route::delete('/forum/categories/{id}', [AdminController::class, 'deleteForumCategory'])->name('admin.forum_categories.delete');
+    Route::get('/community/feed/settings', [AdminCommunityFeedController::class, 'settings'])->name('admin.community.feed.settings');
+    Route::post('/community/feed/settings', [AdminCommunityFeedController::class, 'updateSettings'])->name('admin.community.feed.settings.update');
     Route::get('/forum/settings', [AdminController::class, 'forumSettings'])->name('admin.forum.settings');
     Route::post('/forum/settings', [AdminController::class, 'updateForumSettings'])->name('admin.forum.settings.update');
     Route::get('/forum/moderators', [AdminController::class, 'forumModerators'])->name('admin.forum.moderators');

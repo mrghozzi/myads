@@ -119,6 +119,12 @@ class PortalController extends Controller
                 $activityService->decorateMany($activities);
             }
         } catch (\Throwable $e) {
+            \Log::error('Portal feed render failed', [
+                'filter' => $filter,
+                'search' => $search,
+                'user_id' => $user?->id,
+                'message' => $e->getMessage(),
+            ]);
             $activities = new \Illuminate\Pagination\LengthAwarePaginator([], 0, 20);
         }
 
