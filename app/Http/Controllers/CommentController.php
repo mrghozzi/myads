@@ -7,7 +7,9 @@ use App\Models\ForumComment;
 use App\Models\ForumTopic;
 use App\Models\Notification;
 use App\Models\Option;
+use App\Models\Status;
 use App\Models\User;
+use App\Services\KnowledgebaseCommunityService;
 use App\Services\GamificationService;
 use App\Services\MentionService;
 use App\Services\NotificationService;
@@ -58,6 +60,12 @@ class CommentController extends Controller
         } elseif ($type == 'store') {
             $comments = Option::where('o_parent', $id)
                 ->where('o_type', 's_coment')
+                ->orderBy('id', 'desc')
+                ->limit($limit)
+                ->get();
+        } elseif ($type == 'knowledgebase') {
+            $comments = Option::where('o_parent', $id)
+                ->where('o_type', KnowledgebaseCommunityService::COMMENT_OPTION_TYPE)
                 ->orderBy('id', 'desc')
                 ->limit($limit)
                 ->get();
@@ -120,7 +128,7 @@ class CommentController extends Controller
         $logo = 'comment';
         $topic = null;
 
-        if (!in_array($type, ['forum', 'directory', 'store', 'order'], true)) {
+        if (!in_array($type, ['forum', 'directory', 'store', 'knowledgebase', 'order'], true)) {
             return response()->json(['error' => 'Invalid type'], 400);
         }
 
@@ -186,6 +194,28 @@ class CommentController extends Controller
                     $ownerId = $product->o_parent; // o_parent is user_id for Product
                     $url = "/store/" . $product->name; // URL format (Root relative)
                 }
+            } elseif ($type == 'knowledgebase') {
+                $status = Status::query()
+                    ->where('id', $id)
+                    ->where('s_type', KnowledgebaseCommunityService::STATUS_TYPE)
+                    ->firstOrFail();
+
+                $article = Option::query()
+                    ->where('id', $status->tp_id)
+                    ->where('o_type', 'knowledgebase')
+                    ->firstOrFail();
+
+                $comment = Option::create([
+                    'name' => 'coment_kb',
+                    'o_type' => KnowledgebaseCommunityService::COMMENT_OPTION_TYPE,
+                    'o_order' => $uid,
+                    'o_parent' => $status->id,
+                    'o_valuer' => $text,
+                    'o_mode' => $time,
+                ]);
+
+                $ownerId = $status->uid;
+                $url = route('kb.show', ['name' => $article->o_mode, 'article' => $article->name]);
             } elseif ($type == 'order') {
                 $order = \App\Models\OrderRequest::findOrFail($id);
                 if ($order->statu == 0) {
@@ -289,6 +319,9 @@ class CommentController extends Controller
         } elseif ($type == 'store') {
             $comment = Option::where('id', $id)->where('o_type', 's_coment')->first();
             $dbType = 444;
+        } elseif ($type == 'knowledgebase') {
+            $comment = Option::where('id', $id)->where('o_type', KnowledgebaseCommunityService::COMMENT_OPTION_TYPE)->first();
+            $dbType = KnowledgebaseCommunityService::COMMENT_REACTION_TYPE;
         } elseif ($type == 'order') {
             $comment = Option::where('id', $id)->where('o_type', 'order_comment')->first();
             $dbType = 66;

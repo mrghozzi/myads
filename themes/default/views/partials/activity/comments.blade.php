@@ -20,6 +20,9 @@
         } elseif ($type === 'store') {
             $commentReactionType = 444;
             $reactionTypeString = 'store_comment';
+        } elseif ($type === 'knowledgebase') {
+            $commentReactionType = \App\Services\KnowledgebaseCommunityService::COMMENT_REACTION_TYPE;
+            $reactionTypeString = 'kb_comment';
         } elseif ($type === 'order') {
             $commentReactionType = 66;
             $reactionTypeString = 'order_comment';

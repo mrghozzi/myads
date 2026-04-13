@@ -16,6 +16,7 @@ use App\Models\StatusPromotion;
 use App\Models\StatusLinkPreview;
 use App\Models\StatusRepost;
 use App\Services\V420SchemaService;
+use App\Services\KnowledgebaseCommunityService;
 use App\Models\OrderRequest;
 
 use App\Traits\HasPrivacy;
@@ -105,6 +106,11 @@ class Status extends Model
         return $this->belongsTo(Product::class, 'tp_id');
     }
 
+    public function knowledgebaseItem()
+    {
+        return $this->belongsTo(Option::class, 'tp_id')->where('o_type', 'knowledgebase');
+    }
+
     public function linkPreviewRecord()
     {
         return $this->hasOne(StatusLinkPreview::class, 'status_id');
@@ -143,6 +149,10 @@ class Status extends Model
             2, 4, 100 => route('forum.topic', $this->tp_id),
             7867 => route('store.show', $this->related_content->name ?? optional($this->productItem)->name ?? $this->tp_id),
             6 => route('orders.show', $this->tp_id),
+            KnowledgebaseCommunityService::STATUS_TYPE => route('kb.show', [
+                'name' => $this->related_content->o_mode ?? $this->tp_id,
+                'article' => $this->related_content->name ?? $this->tp_id,
+            ]),
             default => route('portal.index'),
         };
     }
@@ -161,6 +171,10 @@ class Status extends Model
             return $this->productItem;
         }
 
+        if ($this->relationLoaded('knowledgebaseItem') && $this->knowledgebaseItem) {
+            return $this->knowledgebaseItem;
+        }
+
         if ($this->relationLoaded('newsItem') && $this->newsItem) {
             return $this->newsItem;
         }
@@ -175,6 +189,11 @@ class Status extends Model
             return News::find($this->tp_id);
         } elseif ($this->s_type == 6) {
             return OrderRequest::find($this->tp_id);
+        } elseif ((int) $this->s_type === KnowledgebaseCommunityService::STATUS_TYPE) {
+            return Option::query()
+                ->where('id', $this->tp_id)
+                ->where('o_type', 'knowledgebase')
+                ->first();
         }
         return null;
     }
@@ -196,7 +215,7 @@ class Status extends Model
                 return 0;
             }
 
-            return Like::where('sid', $this->tp_id)
+            return Like::where('sid', $this->interactionSubjectId())
                 ->where('type', $type)
                 ->count();
         } catch (\Throwable $e) {
@@ -229,6 +248,12 @@ class Status extends Model
                     ->count();
             }
 
+            if ((int) $this->s_type === KnowledgebaseCommunityService::STATUS_TYPE) {
+                return Option::where('o_parent', $this->id)
+                    ->where('o_type', KnowledgebaseCommunityService::COMMENT_OPTION_TYPE)
+                    ->count();
+            }
+
             return 0;
         } catch (\Throwable $e) {
             return 0;
@@ -244,7 +269,7 @@ class Status extends Model
             }
 
             $likes = Like::with('user')
-                ->where('sid', $this->tp_id)
+                ->where('sid', $this->interactionSubjectId())
                 ->where('type', $type)
                 ->get();
 
@@ -343,6 +368,19 @@ class Status extends Model
             return 6; // Fixed: Use type 6 for Order Requests as per ReactionController
         }
 
+        if ((int) $this->s_type === KnowledgebaseCommunityService::STATUS_TYPE) {
+            return KnowledgebaseCommunityService::REACTION_TYPE;
+        }
+
         return null;
+    }
+
+    private function interactionSubjectId(): int
+    {
+        if ((int) $this->s_type === KnowledgebaseCommunityService::STATUS_TYPE) {
+            return (int) $this->id;
+        }
+
+        return (int) $this->tp_id;
     }
 }

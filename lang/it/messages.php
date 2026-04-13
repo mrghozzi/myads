@@ -1912,7 +1912,8 @@ return [
     'share_page_hint' => 'Il tuo post sara visibile a tutti nel feed della community.',
     'share_redirect_hint' => 'Dopo la condivisione, verrai reindirizzato al tuo nuovo post.',
     'share_externally' => 'Condividi all esterno',
-    'knowledgebase_share_to_community_hint' => 'Apre il composer della community con questo argomento pronto per la revisione prima della pubblicazione.',
+    'knowledgebase_share_to_community_hint' => 'Pubblica questo argomento direttamente nella community non appena viene salvato.',
+    'knowledgebase_published_to_community' => 'L\'argomento della knowledgebase e stato pubblicato nella community.',
     'knowledgebase_share_post_heading' => 'Argomento della knowledgebase: :topic per :product',
     'knowledgebase_share_post_summary' => 'Riepilogo: :summary',
 ];

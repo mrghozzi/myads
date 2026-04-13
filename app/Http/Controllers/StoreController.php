@@ -16,6 +16,7 @@ use App\Models\User;
 use App\Models\Status;
 use App\Models\ForumTopic;
 use App\Models\Emoji;
+use App\Services\KnowledgebaseCommunityService;
 use App\Support\StoreCategoryCatalog;
 
 class StoreController extends Controller
@@ -810,7 +811,7 @@ class StoreController extends Controller
         $isOwner = Auth::check() && (Auth::id() == $product->o_parent || Auth::user()->isAdmin() || ($existing && Auth::id() == $existing->o_parent));
         $status = $existing && !$isOwner ? 1 : 0;
 
-        DB::transaction(function () use ($product, $articleName, $request, $status, $userId) {
+        $article = DB::transaction(function () use ($product, $articleName, $request, $status, $userId) {
             if ($status === 0) {
                 Option::where('o_type', 'knowledgebase')
                     ->where('o_mode', $product->name)
@@ -819,7 +820,7 @@ class StoreController extends Controller
                     ->update(['o_order' => 2]);
             }
 
-            Option::create([
+            $article = Option::create([
                 'name' => $articleName,
                 'o_valuer' => $request->input('txt'),
                 'o_type' => 'knowledgebase',
@@ -829,15 +830,60 @@ class StoreController extends Controller
             ]);
 
             app(\App\Services\GamificationService::class)->recordEvent($userId, 'kb_article_created');
+
+            return $article;
         });
 
         if ($shareToCommunity && !$hasPublishedArticle && $status === 0) {
-            return redirect()->route('portal.share', [
-                'text' => $this->buildKnowledgebaseCommunityShareText($product, $articleName, $request->input('txt')),
-            ]);
+            app(KnowledgebaseCommunityService::class)->publish($product, $article, Auth::user());
+
+            return redirect()
+                ->route('kb.show', ['name' => $product->name, 'article' => $articleName])
+                ->with('success', __('messages.knowledgebase_published_to_community'));
         }
 
         return redirect()->route('kb.show', ['name' => $product->name, 'article' => $articleName]);
+    }
+
+    public function knowledgebasePublishToCommunity(Request $request)
+    {
+        $request->validate([
+            'store' => 'required|string',
+            'article' => 'required|string',
+        ]);
+
+        $product = Product::withoutGlobalScope('store')
+            ->where('o_type', 'store')
+            ->where('name', $request->input('store'))
+            ->firstOrFail();
+
+        $article = $this->findPublishedKnowledgebaseArticle($product, $request->input('article'));
+
+        app(KnowledgebaseCommunityService::class)->publish($product, $article, $request->user());
+
+        return redirect()
+            ->route('kb.show', ['name' => $product->name, 'article' => $article->name])
+            ->with('success', __('messages.knowledgebase_published_to_community'));
+    }
+
+    public function knowledgebaseDeleteCommunityPost(Request $request)
+    {
+        $request->validate([
+            'id' => 'required|integer',
+        ]);
+
+        $status = Status::query()
+            ->where('id', $request->input('id'))
+            ->where('s_type', KnowledgebaseCommunityService::STATUS_TYPE)
+            ->firstOrFail();
+
+        if ((int) $status->uid !== (int) Auth::id() && !Auth::user()->isAdmin()) {
+            return response()->json(['error' => __('messages.unauthorized')], 403);
+        }
+
+        app(KnowledgebaseCommunityService::class)->deletePublishedStatus($status);
+
+        return response()->json(['success' => true]);
     }
 
     public function knowledgebaseApprove(Request $request)
@@ -930,7 +976,10 @@ class StoreController extends Controller
                 ->count(),
             'articleAuthor' => $this->resolveKnowledgebaseAuthor($article),
             'canManageCurrentArticle' => $this->canManageKnowledgebase($product, $article),
-            'knowledgebaseCommunityShareUrl' => $article ? $this->buildKnowledgebaseCommunityShareUrl($product, $article) : null,
+            'knowledgebaseCommunityPublishAction' => $article ? route('kb.community.publish') : null,
+            'knowledgebaseCommunityPublishPayload' => $article
+                ? ['store' => $product->name, 'article' => $article->name]
+                : null,
             'knowledgebaseExternalShareUrl' => $article
                 ? route('kb.show', ['name' => $product->name, 'article' => $article->name])
                 : null,
@@ -938,44 +987,6 @@ class StoreController extends Controller
                 ? trim($article->name . ' - ' . $product->name)
                 : null,
         ];
-    }
-
-    private function buildKnowledgebaseCommunityShareUrl(Product $product, Option $article): ?string
-    {
-        if (!Auth::check() || (int) $article->o_order !== 0) {
-            return null;
-        }
-
-        return route('portal.share', [
-            'text' => $this->buildKnowledgebaseCommunityShareText($product, $article->name, (string) $article->o_valuer),
-        ]);
-    }
-
-    private function buildKnowledgebaseCommunityShareText(Product $product, string $articleName, string $content): string
-    {
-        $summary = $this->summarizeKnowledgebaseShareContent($content);
-        $lines = [
-            __('messages.knowledgebase_share_post_heading', [
-                'topic' => $articleName,
-                'product' => $product->name,
-            ]),
-        ];
-
-        if ($summary !== '') {
-            $lines[] = __('messages.knowledgebase_share_post_summary', ['summary' => $summary]);
-        }
-
-        $lines[] = route('kb.show', ['name' => $product->name, 'article' => $articleName]);
-
-        return implode("\n", $lines);
-    }
-
-    private function summarizeKnowledgebaseShareContent(string $content): string
-    {
-        $plainText = html_entity_decode(strip_tags($content), ENT_QUOTES | ENT_HTML5, 'UTF-8');
-        $plainText = trim((string) preg_replace('/\s+/u', ' ', $plainText));
-
-        return Str::limit($plainText, 220, '...');
     }
 
     private function resolveKnowledgebaseAuthor(?Option $article): ?User
@@ -996,6 +1007,16 @@ class StoreController extends Controller
         return Auth::id() == $product->o_parent
             || Auth::user()->isAdmin()
             || ($article && Auth::id() == $article->o_parent);
+    }
+
+    private function findPublishedKnowledgebaseArticle(Product $product, string $articleName): Option
+    {
+        return Option::query()
+            ->where('o_type', 'knowledgebase')
+            ->where('o_mode', $product->name)
+            ->where('name', $articleName)
+            ->where('o_order', 0)
+            ->firstOrFail();
     }
 
     private function processDownload($product)

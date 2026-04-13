@@ -7,11 +7,14 @@ use App\Models\ForumTopic;
 use App\Models\Like;
 use App\Models\Option;
 use App\Models\OrderRequest;
+use App\Models\Product;
 use App\Models\SiteAdmin;
 use App\Models\Status;
 use App\Models\User;
 use App\Models\UserPrivacySetting;
 use App\Services\FeedService;
+use App\Services\KnowledgebaseCommunityService;
+use App\Services\StatusActivityService;
 use App\Support\CommunityFeedSettings;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\Request;
@@ -250,6 +253,73 @@ class CommunityFeedFeatureTest extends TestCase
         $this->assertGreaterThan(0, (int) $comment->o_mode);
     }
 
+    public function test_knowledgebase_community_posts_rank_and_render_inside_the_portal_feed(): void
+    {
+        $publisher = User::factory()->create(['username' => 'kbpublisher']);
+        $productOwner = User::factory()->create(['username' => 'kbowner']);
+
+        $this->ensurePublicPrivacy($publisher);
+
+        $product = Product::create([
+            'name' => 'kb-feed-product',
+            'o_valuer' => 'Knowledgebase-enabled product for feed coverage.',
+            'o_type' => 'store',
+            'o_parent' => $productOwner->id,
+            'o_order' => 0,
+            'o_mode' => 'upload/product-cover.png',
+        ]);
+
+        $article = Option::create([
+            'name' => 'deployment-guide',
+            'o_valuer' => 'Deploy safely with recent knowledgebase community coverage.',
+            'o_type' => 'knowledgebase',
+            'o_parent' => $publisher->id,
+            'o_order' => 0,
+            'o_mode' => $product->name,
+        ]);
+
+        $status = Status::create([
+            'uid' => $publisher->id,
+            'tp_id' => $article->id,
+            's_type' => KnowledgebaseCommunityService::STATUS_TYPE,
+            'date' => time() - 60,
+            'statu' => 1,
+        ]);
+
+        $reactor = User::factory()->create(['username' => 'kbreactor']);
+        Like::create([
+            'uid' => $reactor->id,
+            'sid' => $status->id,
+            'type' => KnowledgebaseCommunityService::REACTION_TYPE,
+            'time_t' => time() - 30,
+        ]);
+
+        Option::create([
+            'name' => 'coment_kb',
+            'o_type' => KnowledgebaseCommunityService::COMMENT_OPTION_TYPE,
+            'o_order' => $reactor->id,
+            'o_parent' => $status->id,
+            'o_valuer' => 'Useful deployment checklist.',
+            'o_mode' => time() - 20,
+        ]);
+
+        $ids = $this->rankedStatusIds(null);
+
+        $this->assertContains($status->id, $ids);
+
+        $decorated = app(StatusActivityService::class)->decorate(Status::query()->findOrFail($status->id));
+
+        $this->assertSame($article->id, $decorated->related_content?->id);
+        $this->assertSame($product->name, $decorated->related_content?->productItem?->name);
+
+        $response = $this->get(route('portal.index', ['filter' => 'all']));
+
+        $response->assertOk()
+            ->assertSee($article->name)
+            ->assertSee($product->name)
+            ->assertSee(__('messages.knowledgebase'));
+    }
+
     private function rankedStatusIds(?int $userId): array
     {
         $request = Request::create('/portal', 'GET', ['filter' => 'all']);
@@ -262,21 +332,7 @@ class CommunityFeedFeatureTest extends TestCase
 
     private function createForumStatus(User $user, string $text, int $date, int $views = 0): Status
     {
-        UserPrivacySetting::firstOrCreate(
-            ['user_id' => $user->id],
-            [
-                'profile_visibility' => 'public',
-                'about_visibility' => 'public',
-                'photos_visibility' => 'public',
-                'followers_visibility' => 'public',
-                'following_visibility' => 'public',
-                'points_history_visibility' => 'public',
-                'allow_direct_messages' => true,
-                'allow_mentions' => true,
-                'allow_reposts' => true,
-                'show_online_status' => true,
-            ]
-        );
+        $this->ensurePublicPrivacy($user);
 
         $topic = ForumTopic::create([
             'uid' => $user->id,
@@ -327,5 +383,24 @@ class CommunityFeedFeatureTest extends TestCase
                 'date' => $time,
             ]);
         }
+    }
+
+    private function ensurePublicPrivacy(User $user): void
+    {
+        UserPrivacySetting::firstOrCreate(
+            ['user_id' => $user->id],
+            [
+                'profile_visibility' => 'public',
+                'about_visibility' => 'public',
+                'photos_visibility' => 'public',
+                'followers_visibility' => 'public',
+                'following_visibility' => 'public',
+                'points_history_visibility' => 'public',
+                'allow_direct_messages' => true,
+                'allow_mentions' => true,
+                'allow_reposts' => true,
+                'show_online_status' => true,
+            ]
+        );
     }
 }

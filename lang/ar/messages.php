@@ -1947,7 +1947,8 @@ return [
     'community_feed_settings_cache_ttl' => 'مدة الكاش (ثوانٍ)',
     'telegram' => 'تيليجرام',
     'share_externally' => 'مشاركة خارجية',
-    'knowledgebase_share_to_community_hint' => 'افتح محرر المجتمع مع هذا الموضوع مجهزًا للمراجعة قبل النشر.',
+    'knowledgebase_share_to_community_hint' => 'انشر هذا الموضوع مباشرة في المجتمع فور حفظه.',
+    'knowledgebase_published_to_community' => 'تم نشر موضوع قاعدة المعرفة في المجتمع.',
     'knowledgebase_share_post_heading' => 'موضوع قاعدة المعرفة: :topic لمنتج :product',
     'knowledgebase_share_post_summary' => 'الملخص: :summary',
 ];

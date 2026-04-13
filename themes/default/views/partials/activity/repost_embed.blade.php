@@ -15,12 +15,13 @@
         $originalUrl = match ((int) $original->s_type) {
             1 => route('directory.show', $original->tp_id),
             7867 => route('store.show', $original->related_content->name),
+            205 => route('kb.show', ['name' => $original->related_content->o_mode, 'article' => $original->related_content->name]),
             5 => route('news.show', $original->tp_id),
             default => route('forum.topic', $original->tp_id),
         };
 
         $originalTitle = match ((int) $original->s_type) {
-            1, 2, 5, 7867 => $original->related_content->name ?? null,
+            1, 2, 5, 7867, 205 => $original->related_content->name ?? null,
             default => null,
         };
 
@@ -29,11 +30,13 @@
             2 => $original->related_content->category->name ?? null,
             5 => __('messages.news'),
             7867 => ($original->related_content->type->name ?? null),
+            205 => optional($original->related_content->productItem)->name,
             default => null,
         };
 
         $bodySource = match ((int) $original->s_type) {
             7867 => $original->related_content->o_valuer ?? '',
+            205 => $original->related_content->o_valuer ?? '',
             5 => $original->related_content->text ?? '',
             default => $original->related_content->txt ?? '',
         };

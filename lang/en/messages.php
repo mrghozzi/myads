@@ -1947,7 +1947,8 @@ return [
     'community_feed_settings_cache_ttl' => 'Cache TTL (seconds)',
     'telegram' => 'Telegram',
     'share_externally' => 'Share Externally',
-    'knowledgebase_share_to_community_hint' => 'Open the community composer with this topic ready for review before posting.',
+    'knowledgebase_share_to_community_hint' => 'Publish this topic directly to the community as soon as it is saved.',
+    'knowledgebase_published_to_community' => 'Knowledgebase topic published to the community.',
     'knowledgebase_share_post_heading' => 'Knowledgebase topic: :topic for :product',
     'knowledgebase_share_post_summary' => 'Summary: :summary',
 ];

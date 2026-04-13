@@ -255,6 +255,8 @@ Route::get('/download/{hash}', [StoreController::class, 'downloadByHash'])->name
 Route::get('/kb/captcha', [StoreController::class, 'knowledgebaseCaptcha'])->name('kb.captcha');
 Route::post('/kb/store', [StoreController::class, 'knowledgebaseStore'])->name('kb.store');
 Route::post('/kb/approve', [StoreController::class, 'knowledgebaseApprove'])->name('kb.approve');
+Route::post('/kb/community/publish', [StoreController::class, 'knowledgebasePublishToCommunity'])->name('kb.community.publish')->middleware('auth');
+Route::post('/kb/community/delete', [StoreController::class, 'knowledgebaseDeleteCommunityPost'])->name('kb.community.delete')->middleware('auth');
 Route::get('/kb/{name}:{article}', [StoreController::class, 'knowledgebaseShow'])->name('kb.show')->where('name', '[^/:]+');
 Route::get('/edk/{name}:{article}', [StoreController::class, 'knowledgebaseEdit'])->name('kb.edit')->where('name', '[^/:]+');
 Route::get('/pgk/{name}:{article}', [StoreController::class, 'knowledgebasePending'])->name('kb.pending')->where('name', '[^/:]+');

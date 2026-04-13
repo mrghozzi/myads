@@ -4,11 +4,14 @@ namespace App\Services;
 
 use App\Models\Directory;
 use App\Models\News;
+use App\Models\Option;
 use App\Models\OrderRequest;
 use App\Models\Product;
 use App\Models\Status;
 use App\Models\StatusLinkPreview;
 use App\Models\ForumTopic;
+use App\Models\User;
+use App\Services\KnowledgebaseCommunityService;
 
 class StatusActivityService
 {
@@ -73,6 +76,10 @@ class StatusActivityService
                 $activity->related_content = OrderRequest::find($activity->tp_id);
                 $activity->type_label = 'Order';
                 break;
+            case KnowledgebaseCommunityService::STATUS_TYPE:
+                $activity->related_content = $this->hydrateKnowledgebaseArticle($activity->tp_id);
+                $activity->type_label = 'Knowledgebase';
+                break;
         }
 
         if ($this->schema->supports('reposts') && $activity->repostRecord) {
@@ -88,6 +95,30 @@ class StatusActivityService
         }
 
         return $activity;
+    }
+
+    private function hydrateKnowledgebaseArticle(int $articleId): ?Option
+    {
+        $article = Option::query()
+            ->where('id', $articleId)
+            ->where('o_type', 'knowledgebase')
+            ->first();
+
+        if (!$article) {
+            return null;
+        }
+
+        $product = Product::withoutGlobalScope('store')
+            ->where('o_type', 'store')
+            ->where('name', $article->o_mode)
+            ->first();
+
+        $author = (int) $article->o_parent > 0 ? User::find((int) $article->o_parent) : null;
+
+        $article->setRelation('productItem', $product);
+        $article->setRelation('authorUser', $author);
+
+        return $article;
     }
 
     public function decorateMany(iterable $activities): void

@@ -8,6 +8,8 @@
         $type = 'site';
     } elseif ($activity->s_type == 7867) {
         $type = 'store';
+    } elseif ($activity->s_type == 205) {
+        $type = 'knowledgebase';
     } elseif ($activity->s_type == 5 || $activity->s_type == 'news') { 
         $type = 'news';
     } elseif ($activity->s_type == 6) {

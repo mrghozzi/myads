@@ -1903,7 +1903,8 @@ return [
     'share_page_hint' => 'Votre publication sera visible par tous dans le fil de la communaute.',
     'share_redirect_hint' => 'Apres le partage, vous serez redirige vers votre nouvelle publication.',
     'share_externally' => 'Partager en externe',
-    'knowledgebase_share_to_community_hint' => 'Ouvre le composeur de la communaute avec ce sujet pret a etre relu avant publication.',
+    'knowledgebase_share_to_community_hint' => 'Publiez ce sujet directement dans la communaute des qu\'il est enregistre.',
+    'knowledgebase_published_to_community' => 'Le sujet de la base de connaissances a ete publie dans la communaute.',
     'knowledgebase_share_post_heading' => 'Sujet de la base de connaissances : :topic pour :product',
     'knowledgebase_share_post_summary' => 'Resume : :summary',
 ];

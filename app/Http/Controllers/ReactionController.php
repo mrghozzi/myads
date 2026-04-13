@@ -7,8 +7,10 @@ use App\Models\ForumTopic;
 use App\Models\Like;
 use App\Models\Notification;
 use App\Models\Option;
+use App\Models\Status;
 use App\Models\User;
 use App\Services\GamificationService;
+use App\Services\KnowledgebaseCommunityService;
 use App\Services\NotificationService;
 use App\Services\PointLedgerService;
 use Illuminate\Http\Request;
@@ -45,9 +47,11 @@ class ReactionController extends Controller
         if ($type == 'forum') $dbType = 2;
         elseif ($type == 'directory') $dbType = 22;
         elseif ($type == 'store') $dbType = 3;
+        elseif ($type == 'knowledgebase') $dbType = KnowledgebaseCommunityService::REACTION_TYPE;
         elseif ($type == 'forum_comment') $dbType = 4;
         elseif ($type == 'directory_comment') $dbType = 44;
         elseif ($type == 'store_comment') $dbType = 444;
+        elseif ($type == 'kb_comment') $dbType = KnowledgebaseCommunityService::COMMENT_REACTION_TYPE;
         elseif ($type == 'order') $dbType = 6;
         elseif ($type == 'order_comment') $dbType = 66;
 
@@ -62,7 +66,7 @@ class ReactionController extends Controller
                             ->first();
 
         // Determine size and icon based on type
-        $isComment = in_array($dbType, [4, 44, 444]);
+        $isComment = in_array($dbType, [4, 44, 444, KnowledgebaseCommunityService::COMMENT_REACTION_TYPE], true);
         $imgSize = $isComment ? 16 : 30;
         $defaultIcon = $isComment ? '<i class="fa fa-thumbs-up" aria-hidden="true"></i>' : '<svg class="post-option-icon icon-thumbs-up"><use xlink:href="#svg-thumbs-up"></use></svg>';
 
@@ -221,6 +225,19 @@ class ReactionController extends Controller
                 }
             } elseif ($type == 6) {
                 $postUrl = "/orders/" . $postId;
+            } elseif ($type == KnowledgebaseCommunityService::REACTION_TYPE) {
+                $status = Status::find($postId);
+                $article = $status?->related_content;
+                if ($status && $article) {
+                    $postUrl = route('kb.show', ['name' => $article->o_mode, 'article' => $article->name]);
+                }
+            } elseif ($type == KnowledgebaseCommunityService::COMMENT_REACTION_TYPE) {
+                $comment = Option::find($postId);
+                $status = $comment ? Status::find($comment->o_parent) : null;
+                $article = $status?->related_content;
+                if ($status && $article) {
+                    $postUrl = route('kb.show', ['name' => $article->o_mode, 'article' => $article->name]) . "#comment_" . $postId;
+                }
             } elseif ($type == 66) {
                 $comment = \App\Models\Option::find($postId);
                 if ($comment) {
@@ -229,7 +246,7 @@ class ReactionController extends Controller
             }
 
             $message = $user->username . " reacted to your post.";
-            if (in_array($type, [4, 44, 444])) {
+            if (in_array($type, [4, 44, 444, KnowledgebaseCommunityService::COMMENT_REACTION_TYPE], true)) {
                 $message = $user->username . " reacted to your comment.";
             }
             
@@ -273,6 +290,12 @@ class ReactionController extends Controller
             // Order Request
             $order = \App\Models\OrderRequest::find($postId);
             return $order ? $order->uid : null;
+        } elseif ($type == KnowledgebaseCommunityService::REACTION_TYPE) {
+            $status = Status::find($postId);
+            return $status ? $status->uid : null;
+        } elseif ($type == KnowledgebaseCommunityService::COMMENT_REACTION_TYPE) {
+            $comment = \App\Models\Option::find($postId);
+            return $comment ? $comment->o_order : null;
         } elseif ($type == 66) {
             // Order Comment (Option)
             $comment = \App\Models\Option::find($postId);

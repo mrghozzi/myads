@@ -43,6 +43,10 @@
 </div>
 
 <div class="knowledgebase-page">
+    @if(session('success'))
+        <div class="alert alert-success" style="margin-bottom: 24px;">{{ session('success') }}</div>
+    @endif
+
     <div class="widget-box kb-shell-card no-padding">
         <div class="kb-hero">
             <div class="kb-hero__main">
@@ -271,9 +275,16 @@
                         <div class="kb-action-menu" data-activity-menu-wrap>
                             <button type="button" class="kb-action-menu__trigger" data-activity-menu-trigger data-activity-menu-type="actions" aria-expanded="false"><i class="fa fa-ellipsis-h" aria-hidden="true"></i></button>
                             <div class="simple-dropdown kb-action-menu__panel" data-activity-menu-panel>
-                                @if($knowledgebaseCommunityShareUrl)
-                                    <a class="simple-dropdown-link" href="{{ $knowledgebaseCommunityShareUrl }}"><i class="fa fa-bullhorn" aria-hidden="true"></i>&nbsp;{{ __('messages.share_to_community') }}</a>
-                                @endif
+                                @auth
+                                    @if($knowledgebaseCommunityPublishAction && $knowledgebaseCommunityPublishPayload)
+                                        <form method="POST" action="{{ $knowledgebaseCommunityPublishAction }}">
+                                            @csrf
+                                            <input type="hidden" name="store" value="{{ $knowledgebaseCommunityPublishPayload['store'] }}">
+                                            <input type="hidden" name="article" value="{{ $knowledgebaseCommunityPublishPayload['article'] }}">
+                                            <button type="submit" class="simple-dropdown-link store-dropdown-button"><i class="fa fa-bullhorn" aria-hidden="true"></i>&nbsp;{{ __('messages.share_to_community') }}</button>
+                                        </form>
+                                    @endif
+                                @endauth
                                 <button type="button" class="simple-dropdown-link store-dropdown-button" onclick="navigator.clipboard.writeText('{{ route('kb.show', ['name' => $product->name, 'article' => $article->name]) }}'); alert('{{ __('messages.link_copied') }}');"><i class="fa fa-link" aria-hidden="true"></i>&nbsp;{{ __('messages.copy_link') }}</button>
                                 <a class="simple-dropdown-link" href="{{ route('store.show', $product->name) }}"><i class="fa fa-shopping-basket" aria-hidden="true"></i>&nbsp;{{ __('messages.preview') }}</a>
                                 @if($canReportTopic)
@@ -297,9 +308,16 @@
                         <div class="kb-meta-row"><span>{{ __('messages.publisher') }}</span><strong>{{ $articleAuthor ? $articleAuthor->username : __('messages.guest') }}</strong></div>
                     </div>
                     <div class="kb-side-card__actions">
-                        @if($knowledgebaseCommunityShareUrl)
-                            <a class="button primary" href="{{ $knowledgebaseCommunityShareUrl }}"><i class="fa fa-bullhorn" aria-hidden="true"></i>&nbsp;{{ __('messages.share_to_community') }}</a>
-                        @endif
+                        @auth
+                            @if($knowledgebaseCommunityPublishAction && $knowledgebaseCommunityPublishPayload)
+                                <form method="POST" action="{{ $knowledgebaseCommunityPublishAction }}" style="width: 100%;">
+                                    @csrf
+                                    <input type="hidden" name="store" value="{{ $knowledgebaseCommunityPublishPayload['store'] }}">
+                                    <input type="hidden" name="article" value="{{ $knowledgebaseCommunityPublishPayload['article'] }}">
+                                    <button class="button primary" type="submit" style="width: 100%;"><i class="fa fa-bullhorn" aria-hidden="true"></i>&nbsp;{{ __('messages.share_to_community') }}</button>
+                                </form>
+                            @endif
+                        @endauth
                         <a class="button secondary" href="{{ route('kb.edit', ['name' => $product->name, 'article' => $article->name]) }}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i>&nbsp;{{ $canManageCurrentArticle ? __('messages.edit_topic') : __('messages.suggest_edit') }}</a>
                         <a class="button tertiary" href="{{ route('kb.pending', ['name' => $product->name, 'article' => $article->name]) }}"><i class="fa fa-hourglass-half" aria-hidden="true"></i>&nbsp;{{ __('messages.pending') }}</a>
                         <a class="button tertiary" href="{{ route('kb.history', ['name' => $product->name, 'article' => $article->name]) }}"><i class="fa fa-history" aria-hidden="true"></i>&nbsp;{{ __('messages.history') }}</a>

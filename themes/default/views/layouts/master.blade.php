@@ -1036,6 +1036,8 @@
                     url = '{{ route("forum.delete") }}';
                 } else if (type == 'store' || type == 7867) {
                     url = '{{ route("store.delete") }}';
+                } else if (type == 'knowledgebase' || type == 205) {
+                    url = '{{ route("kb.community.delete") }}';
                 } else if (type == 'directory' || type == 1) {
                     url = '{{ route("directory.delete") }}';
                 } else if (type == 'order' || type == 6) {

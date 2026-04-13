@@ -6,7 +6,10 @@ use App\Models\Option;
 use App\Models\Product;
 use App\Models\Report;
 use App\Models\Setting;
+use App\Models\Status;
+use App\Models\Like;
 use App\Models\User;
+use App\Services\KnowledgebaseCommunityService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -107,39 +110,45 @@ class StoreProductKnowledgebaseUiTest extends TestCase
             ->assertDontSee(__('messages.report_publisher'));
     }
 
-    public function test_knowledgebase_store_redirects_to_share_composer_when_requested_for_a_new_topic(): void
+    public function test_knowledgebase_store_creates_community_status_when_requested_for_a_new_topic(): void
     {
         $this->seedThemeSetting();
         $this->createAdmin();
         $owner = User::factory()->create();
         $product = $this->createStoreProduct($owner, 'kb-share-product');
-        $body = 'This article explains how to install the package correctly on a fresh MYADS site.';
 
         $response = $this->withSession(['kb_captcha' => '9'])
             ->actingAs($owner)
             ->post(route('kb.store'), [
                 'store' => $product->name,
                 'name' => 'install-guide',
-                'txt' => $body,
+                'txt' => 'This article explains how to install the package correctly on a fresh MYADS site.',
                 'capt' => '9',
                 'share_to_community' => '1',
             ]);
 
-        $location = (string) $response->headers->get('Location');
-        $query = $this->parseRedirectQuery($location);
+        $response->assertRedirect(route('kb.show', ['name' => $product->name, 'article' => 'install-guide']));
+        $response->assertSessionHas('success', __('messages.knowledgebase_published_to_community'));
 
-        $response->assertRedirect();
-        $this->assertSame(parse_url(route('portal.share'), PHP_URL_PATH), parse_url($location, PHP_URL_PATH));
-        $this->assertSame($body, $this->extractShareSummary($query['text'] ?? ''));
-        $this->assertStringContainsString('install-guide', $query['text'] ?? '');
-        $this->assertStringContainsString($product->name, $query['text'] ?? '');
-        $this->assertStringContainsString(route('kb.show', ['name' => $product->name, 'article' => 'install-guide']), $query['text'] ?? '');
+        $article = Option::query()
+            ->where('o_type', 'knowledgebase')
+            ->where('o_mode', $product->name)
+            ->where('name', 'install-guide')
+            ->where('o_order', 0)
+            ->first();
+
+        $this->assertNotNull($article);
         $this->assertDatabaseHas('options', [
             'o_type' => 'knowledgebase',
             'o_mode' => $product->name,
             'name' => 'install-guide',
             'o_order' => 0,
             'o_parent' => $owner->id,
+        ]);
+        $this->assertDatabaseHas('status', [
+            'uid' => $owner->id,
+            'tp_id' => $article->id,
+            's_type' => KnowledgebaseCommunityService::STATUS_TYPE,
         ]);
     }
 
@@ -159,9 +168,14 @@ class StoreProductKnowledgebaseUiTest extends TestCase
                 'capt' => '12',
             ])
             ->assertRedirect(route('kb.show', ['name' => $product->name, 'article' => 'release-notes']));
+
+        $this->assertDatabaseMissing('status', [
+            'uid' => $owner->id,
+            's_type' => KnowledgebaseCommunityService::STATUS_TYPE,
+        ]);
     }
 
-    public function test_knowledgebase_store_does_not_redirect_guests_to_share_composer_even_if_toggle_is_sent(): void
+    public function test_knowledgebase_store_does_not_create_community_post_for_guests_even_if_toggle_is_sent(): void
     {
         $this->seedThemeSetting();
         $this->createAdmin();
@@ -177,13 +191,13 @@ class StoreProductKnowledgebaseUiTest extends TestCase
                 'share_to_community' => '1',
             ]);
 
-        $location = (string) $response->headers->get('Location');
-
         $response->assertRedirect(route('kb.show', ['name' => $product->name, 'article' => 'guest-start']));
-        $this->assertSame(parse_url(route('kb.show', ['name' => $product->name, 'article' => 'guest-start']), PHP_URL_PATH), parse_url($location, PHP_URL_PATH));
+        $this->assertDatabaseMissing('status', [
+            's_type' => KnowledgebaseCommunityService::STATUS_TYPE,
+        ]);
     }
 
-    public function test_knowledgebase_store_does_not_share_pending_suggestions_to_the_community(): void
+    public function test_knowledgebase_store_does_not_create_community_post_for_pending_suggestions(): void
     {
         $this->seedThemeSetting();
         $this->createAdmin();
@@ -202,10 +216,7 @@ class StoreProductKnowledgebaseUiTest extends TestCase
                 'share_to_community' => '1',
             ]);
 
-        $location = (string) $response->headers->get('Location');
-
         $response->assertRedirect(route('kb.show', ['name' => $product->name, 'article' => 'update-guide']));
-        $this->assertSame(parse_url(route('kb.show', ['name' => $product->name, 'article' => 'update-guide']), PHP_URL_PATH), parse_url($location, PHP_URL_PATH));
         $this->assertDatabaseHas('options', [
             'o_type' => 'knowledgebase',
             'o_mode' => $product->name,
@@ -213,9 +224,13 @@ class StoreProductKnowledgebaseUiTest extends TestCase
             'o_order' => 1,
             'o_parent' => $viewer->id,
         ]);
+        $this->assertDatabaseMissing('status', [
+            'uid' => $viewer->id,
+            's_type' => KnowledgebaseCommunityService::STATUS_TYPE,
+        ]);
     }
 
-    public function test_knowledgebase_show_exposes_community_and_external_share_actions_for_authenticated_users(): void
+    public function test_knowledgebase_show_exposes_direct_community_publish_and_external_share_actions_for_authenticated_users(): void
     {
         $this->seedThemeSetting();
         $this->createAdmin();
@@ -229,7 +244,8 @@ class StoreProductKnowledgebaseUiTest extends TestCase
             ->assertOk()
             ->assertSee(__('messages.share_to_community'))
             ->assertSee(__('messages.share_externally'))
-            ->assertSee(route('portal.share'), false)
+            ->assertSee(route('kb.community.publish'), false)
+            ->assertDontSee(route('portal.share'), false)
             ->assertSee(__('messages.facebook'))
             ->assertSee(__('messages.twitter'))
             ->assertSee(__('messages.linkedin'))
@@ -238,7 +254,7 @@ class StoreProductKnowledgebaseUiTest extends TestCase
             ->assertSee("sharePost('telegram'", false);
     }
 
-    public function test_knowledgebase_show_hides_community_share_action_for_guests_but_keeps_external_share_actions(): void
+    public function test_knowledgebase_show_hides_community_publish_action_for_guests_but_keeps_external_share_actions(): void
     {
         $this->seedThemeSetting();
         $this->createAdmin();
@@ -250,8 +266,157 @@ class StoreProductKnowledgebaseUiTest extends TestCase
             ->assertOk()
             ->assertDontSee(__('messages.share_to_community'))
             ->assertSee(__('messages.share_externally'))
-            ->assertDontSee(route('portal.share'), false)
+            ->assertDontSee(route('kb.community.publish'), false)
             ->assertSee("sharePost('facebook'", false);
+    }
+
+    public function test_manual_knowledgebase_publish_creates_a_new_community_status_each_time(): void
+    {
+        $this->seedThemeSetting();
+        $this->createAdmin();
+        $owner = User::factory()->create();
+        $viewer = User::factory()->create();
+        $product = $this->createStoreProduct($owner, 'kb-republish-product');
+        $article = $this->createKnowledgebaseArticle($product, 'launch-guide', $owner->id);
+
+        $this->actingAs($viewer)
+            ->post(route('kb.community.publish'), [
+                'store' => $product->name,
+                'article' => $article->name,
+            ])
+            ->assertRedirect(route('kb.show', ['name' => $product->name, 'article' => $article->name]))
+            ->assertSessionHas('success', __('messages.knowledgebase_published_to_community'));
+
+        $this->actingAs($viewer)
+            ->post(route('kb.community.publish'), [
+                'store' => $product->name,
+                'article' => $article->name,
+            ])
+            ->assertRedirect(route('kb.show', ['name' => $product->name, 'article' => $article->name]));
+
+        $this->assertSame(2, Status::query()
+            ->where('uid', $viewer->id)
+            ->where('tp_id', $article->id)
+            ->where('s_type', KnowledgebaseCommunityService::STATUS_TYPE)
+            ->count());
+    }
+
+    public function test_knowledgebase_community_post_supports_reactions_comments_and_comment_deletion(): void
+    {
+        $this->seedThemeSetting();
+        $this->createAdmin();
+        $owner = User::factory()->create();
+        $viewer = User::factory()->create();
+        $product = $this->createStoreProduct($owner, 'kb-interaction-product');
+        $article = $this->createKnowledgebaseArticle($product, 'guide', $owner->id);
+        $status = $this->createKnowledgebaseCommunityStatus($article, $viewer);
+
+        $this->actingAs($viewer)
+            ->postJson(route('reaction.toggle'), [
+                'id' => $status->id,
+                'type' => 'knowledgebase',
+                'reaction' => 'like',
+            ])
+            ->assertOk();
+
+        $this->assertDatabaseHas('like', [
+            'uid' => $viewer->id,
+            'sid' => $status->id,
+            'type' => KnowledgebaseCommunityService::REACTION_TYPE,
+        ]);
+
+        $this->actingAs($viewer)
+            ->post(route('comment.store'), [
+                'id' => $status->id,
+                'type' => 'knowledgebase',
+                'comment' => 'Helpful guide for launch day.',
+            ])
+            ->assertOk()
+            ->assertSee('Helpful guide for launch day.');
+
+        $comment = Option::query()
+            ->where('o_type', KnowledgebaseCommunityService::COMMENT_OPTION_TYPE)
+            ->where('o_parent', $status->id)
+            ->first();
+
+        $this->assertNotNull($comment);
+
+        $this->actingAs($viewer)
+            ->postJson(route('comment.delete'), [
+                'trashid' => $comment->id,
+                'type' => 'knowledgebase',
+            ])
+            ->assertOk()
+            ->assertJson(['status' => 'success']);
+
+        $this->assertDatabaseMissing('options', [
+            'id' => $comment->id,
+            'o_type' => KnowledgebaseCommunityService::COMMENT_OPTION_TYPE,
+        ]);
+    }
+
+    public function test_deleting_knowledgebase_community_post_removes_only_the_status_and_its_interactions(): void
+    {
+        $this->seedThemeSetting();
+        $this->createAdmin();
+        $owner = User::factory()->create();
+        $viewer = User::factory()->create();
+        $reactor = User::factory()->create();
+        $product = $this->createStoreProduct($owner, 'kb-delete-status-product');
+        $article = $this->createKnowledgebaseArticle($product, 'delete-guide', $owner->id);
+        $status = $this->createKnowledgebaseCommunityStatus($article, $viewer);
+        $secondStatus = $this->createKnowledgebaseCommunityStatus($article, $owner);
+
+        $postLike = Like::create([
+            'uid' => $reactor->id,
+            'sid' => $status->id,
+            'type' => KnowledgebaseCommunityService::REACTION_TYPE,
+            'time_t' => time(),
+        ]);
+        Option::create([
+            'name' => 'like',
+            'o_type' => 'data_reaction',
+            'o_order' => $reactor->id,
+            'o_parent' => $postLike->id,
+            'o_valuer' => 'like',
+            'o_mode' => time(),
+        ]);
+
+        $comment = Option::create([
+            'name' => 'coment_kb',
+            'o_type' => KnowledgebaseCommunityService::COMMENT_OPTION_TYPE,
+            'o_order' => $reactor->id,
+            'o_parent' => $status->id,
+            'o_valuer' => 'Please add more deployment notes.',
+            'o_mode' => time(),
+        ]);
+
+        $commentLike = Like::create([
+            'uid' => $owner->id,
+            'sid' => $comment->id,
+            'type' => KnowledgebaseCommunityService::COMMENT_REACTION_TYPE,
+            'time_t' => time(),
+        ]);
+        Option::create([
+            'name' => 'love',
+            'o_type' => 'data_reaction',
+            'o_order' => $owner->id,
+            'o_parent' => $commentLike->id,
+            'o_valuer' => 'love',
+            'o_mode' => time(),
+        ]);
+
+        $this->actingAs($viewer)
+            ->postJson(route('kb.community.delete'), ['id' => $status->id])
+            ->assertOk()
+            ->assertJson(['success' => true]);
+
+        $this->assertDatabaseMissing('status', ['id' => $status->id]);
+        $this->assertDatabaseMissing('options', ['id' => $comment->id]);
+        $this->assertDatabaseMissing('like', ['id' => $postLike->id]);
+        $this->assertDatabaseMissing('like', ['id' => $commentLike->id]);
+        $this->assertDatabaseHas('options', ['id' => $article->id, 'o_type' => 'knowledgebase']);
+        $this->assertDatabaseHas('status', ['id' => $secondStatus->id]);
     }
 
     public function test_admin_reports_page_understands_knowledgebase_report_type(): void
@@ -324,24 +489,14 @@ class StoreProductKnowledgebaseUiTest extends TestCase
         ]);
     }
 
-    private function parseRedirectQuery(string $location): array
+    private function createKnowledgebaseCommunityStatus(Option $article, User $publisher): Status
     {
-        $query = [];
-        parse_str((string) parse_url($location, PHP_URL_QUERY), $query);
-
-        return $query;
-    }
-
-    private function extractShareSummary(string $shareText): string
-    {
-        $parts = preg_split("/\r\n|\n|\r/", $shareText) ?: [];
-
-        foreach ($parts as $line) {
-            if (str_starts_with($line, 'Summary: ')) {
-                return substr($line, strlen('Summary: '));
-            }
-        }
-
-        return '';
+        return Status::create([
+            'uid' => $publisher->id,
+            'tp_id' => $article->id,
+            's_type' => KnowledgebaseCommunityService::STATUS_TYPE,
+            'date' => time(),
+            'statu' => 1,
+        ]);
     }
 }

@@ -1912,7 +1912,8 @@ return [
     'share_page_hint' => 'Gonderiniz topluluk akisinda herkes tarafindan gorulecek.',
     'share_redirect_hint' => 'Paylastiktan sonra yeni gonderinize yonlendirileceksiniz.',
     'share_externally' => 'Harici paylas',
-    'knowledgebase_share_to_community_hint' => 'Bu konuyu, yayinlamadan once gozden gecirmeniz icin topluluk olusturucusunda hazir acar.',
+    'knowledgebase_share_to_community_hint' => 'Bu konuyu kaydedilir kaydedilmez dogrudan toplulukta yayinla.',
+    'knowledgebase_published_to_community' => 'Bilgi bankasi konusu toplulukta yayinlandi.',
     'knowledgebase_share_post_heading' => 'Bilgi bankasi konusu: :topic, urun: :product',
     'knowledgebase_share_post_summary' => 'Ozet: :summary',
 ];

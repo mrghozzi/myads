@@ -1912,7 +1912,8 @@ return [
     'share_page_hint' => 'Sua publicacao ficara visivel para todos no feed da comunidade.',
     'share_redirect_hint' => 'Depois de compartilhar, voce sera redirecionado para sua nova publicacao.',
     'share_externally' => 'Compartilhar externamente',
-    'knowledgebase_share_to_community_hint' => 'Abre o compositor da comunidade com este topico pronto para revisao antes da publicacao.',
+    'knowledgebase_share_to_community_hint' => 'Publique este topico diretamente na comunidade assim que ele for salvo.',
+    'knowledgebase_published_to_community' => 'O topico da base de conhecimento foi publicado na comunidade.',
     'knowledgebase_share_post_heading' => 'Topico da base de conhecimento: :topic para :product',
     'knowledgebase_share_post_summary' => 'Resumo: :summary',
 ];

@@ -1912,7 +1912,8 @@ return [
     'share_page_hint' => 'پست شما براي همه در خوراک جامعه قابل مشاهده خواهد بود.',
     'share_redirect_hint' => 'پس از اشتراک، به پست جديد خود هدايت مي‌شويد.',
     'share_externally' => 'اشتراک گذاری خارجی',
-    'knowledgebase_share_to_community_hint' => 'ويرايشگر جامعه را با اين موضوع آماده براي بازبيني پيش از انتشار باز مي‌کند.',
+    'knowledgebase_share_to_community_hint' => 'اين موضوع را بلافاصله پس از ذخيره شدن، مستقيماً در جامعه منتشر کن.',
+    'knowledgebase_published_to_community' => 'موضوع پايگاه دانش در جامعه منتشر شد.',
     'knowledgebase_share_post_heading' => 'موضوع پايگاه دانش: :topic براي :product',
     'knowledgebase_share_post_summary' => 'خلاصه: :summary',
 ];

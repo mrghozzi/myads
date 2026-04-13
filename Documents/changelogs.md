@@ -9,11 +9,12 @@
 * **Compatibility**: Order-request comments now store their creation timestamp in `options.o_mode`, allowing legacy community content to participate in recent-trend calculations without schema changes.
 
 ### Knowledgebase Sharing & Community Publishing
-* **Feature**: Added a new **Share to Community** option to the Knowledgebase topic creation flow (`/kb/{product}`), allowing signed-in members to save a new article and immediately open the `/share` composer with a ready-to-review community post.
-* **Add**: Introduced localized Knowledgebase share text generation that automatically builds a post from the **topic title**, **product name**, a short **plain-text summary**, and the public Knowledgebase article URL.
-* **UI**: Enhanced the Knowledgebase topic page (`/kb/{product}:{topic}`) with a dedicated **Share to Community** action plus an **External Share** row for Facebook, Twitter (X), LinkedIn, and Telegram.
-* **Compatibility**: Community sharing is only offered for published Knowledgebase articles (`o_order = 0`), while guest submissions and pending suggestions continue to follow the existing review-safe redirect behavior.
-* **i18n**: Added the new Knowledgebase sharing labels and composer hints across all **9 supported languages**.
+* **Feature**: Replaced the old `/share` hand-off for Knowledgebase topics with a new native **community post type** for published KB articles, stored as `status.s_type = 205`.
+* **Add**: Added direct Knowledgebase publishing from both the topic creation flow (`/kb/{product}`) and the live topic page (`/kb/{product}:{topic}`), creating a fresh community post each time without overwriting previous shares.
+* **Community**: Enabled full feed interactions for Knowledgebase posts, including reactions, inline comments, quote reposts, copy-link actions, and external sharing while keeping KB comments/reactions isolated per community post instance.
+* **UI**: Introduced a dedicated Knowledgebase activity card in the portal feed using a Superdesign-guided compact layout, with strong product/topic metadata and clear CTA routing back to the article.
+* **Compatibility**: Direct community publishing is limited to published Knowledgebase articles (`o_order = 0`); guest submissions and pending suggestions continue to save safely without generating community posts.
+* **i18n**: Updated the Knowledgebase community-publishing hints and success messages across all **9 supported languages**.
 
 ---
 

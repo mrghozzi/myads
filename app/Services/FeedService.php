@@ -11,6 +11,7 @@ use App\Models\OrderRequest;
 use App\Models\Status;
 use App\Models\StatusLinkPreview;
 use App\Models\StatusRepost;
+use App\Services\KnowledgebaseCommunityService;
 use App\Support\CommunityFeedSettings;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
@@ -184,6 +185,10 @@ class FeedService
             $recentActivity['recent_comments']['store'] ?? collect(),
             $recentActivity['recent_reactions']['store'] ?? collect()
         );
+        $knowledgebaseStatusIds = self::mergedMapKeys(
+            $recentActivity['recent_comments']['knowledgebase'] ?? collect(),
+            $recentActivity['recent_reactions']['knowledgebase'] ?? collect()
+        );
         $orderIds = self::mergedMapKeys(
             $recentActivity['recent_comments']['order'] ?? collect(),
             $recentActivity['recent_reactions']['order'] ?? collect()
@@ -219,6 +224,16 @@ class FeedService
                     ->where('date', '>=', $rescueCutoff)
                     ->where('s_type', 7867)
                     ->whereIn('tp_id', $storeIds->all())
+                    ->get()
+            );
+        }
+
+        if ($knowledgebaseStatusIds->isNotEmpty()) {
+            $candidates = $candidates->merge(
+                self::baseVisibleStatusQuery($hiddenDirectoryStatusIds, $now)
+                    ->where('date', '>=', $rescueCutoff)
+                    ->where('s_type', KnowledgebaseCommunityService::STATUS_TYPE)
+                    ->whereIn('id', $knowledgebaseStatusIds->all())
                     ->get()
             );
         }
@@ -277,6 +292,7 @@ class FeedService
         $forumIds = $statuses->whereIn('s_type', self::FORUM_STATUS_TYPES)->pluck('tp_id')->unique()->values();
         $directoryIds = $statuses->where('s_type', 1)->pluck('tp_id')->unique()->values();
         $storeIds = $statuses->where('s_type', 7867)->pluck('tp_id')->unique()->values();
+        $knowledgebaseStatusIds = $statuses->where('s_type', KnowledgebaseCommunityService::STATUS_TYPE)->pluck('id')->unique()->values();
         $orderIds = $statuses->where('s_type', 6)->pluck('tp_id')->unique()->values();
         $statusIds = $statuses->pluck('id')->unique()->values();
 
@@ -298,12 +314,14 @@ class FeedService
                 'forum' => self::countMapForIds(Like::query()->where('type', 2), 'sid', $forumIds),
                 'directory' => self::countMapForIds(Like::query()->where('type', 22), 'sid', $directoryIds),
                 'store' => self::countMapForIds(Like::query()->where('type', 3), 'sid', $storeIds),
+                'knowledgebase' => self::countMapForIds(Like::query()->where('type', KnowledgebaseCommunityService::REACTION_TYPE), 'sid', $knowledgebaseStatusIds),
                 'order' => self::countMapForIds(Like::query()->where('type', 6), 'sid', $orderIds),
             ],
             'total_comments' => [
                 'forum' => self::countMapForIds(ForumComment::query(), 'tid', $forumIds),
                 'directory' => self::countMapForIds(Option::query()->where('o_type', 'd_coment'), 'o_parent', $directoryIds),
                 'store' => self::countMapForIds(Option::query()->where('o_type', 's_coment'), 'o_parent', $storeIds),
+                'knowledgebase' => self::countMapForIds(Option::query()->where('o_type', KnowledgebaseCommunityService::COMMENT_OPTION_TYPE), 'o_parent', $knowledgebaseStatusIds),
                 'order' => self::countMapForIds(Option::query()->where('o_type', 'order_comment'), 'o_parent', $orderIds),
             ],
             'total_reposts' => $schema->supports('reposts')
@@ -325,12 +343,14 @@ class FeedService
             'forum' => self::groupedCount(ForumComment::query()->where('date', '>=', $trendCutoff), 'tid'),
             'directory' => self::groupedCount(self::recentOptionQuery('d_coment', $trendCutoff), 'o_parent'),
             'store' => self::groupedCount(self::recentOptionQuery('s_coment', $trendCutoff), 'o_parent'),
+            'knowledgebase' => self::groupedCount(self::recentOptionQuery(KnowledgebaseCommunityService::COMMENT_OPTION_TYPE, $trendCutoff), 'o_parent'),
             'order' => self::groupedCount(self::recentOptionQuery('order_comment', $trendCutoff), 'o_parent'),
         ];
         $rapidComments = [
             'forum' => self::groupedCount(ForumComment::query()->where('date', '>=', $rapidCutoff), 'tid'),
             'directory' => self::groupedCount(self::recentOptionQuery('d_coment', $rapidCutoff), 'o_parent'),
             'store' => self::groupedCount(self::recentOptionQuery('s_coment', $rapidCutoff), 'o_parent'),
+            'knowledgebase' => self::groupedCount(self::recentOptionQuery(KnowledgebaseCommunityService::COMMENT_OPTION_TYPE, $rapidCutoff), 'o_parent'),
             'order' => self::groupedCount(self::recentOptionQuery('order_comment', $rapidCutoff), 'o_parent'),
         ];
 
@@ -338,12 +358,14 @@ class FeedService
             'forum' => self::groupedCount(self::recentReactionQuery(2, $trendCutoff), 'sid'),
             'directory' => self::groupedCount(self::recentReactionQuery(22, $trendCutoff), 'sid'),
             'store' => self::groupedCount(self::recentReactionQuery(3, $trendCutoff), 'sid'),
+            'knowledgebase' => self::groupedCount(self::recentReactionQuery(KnowledgebaseCommunityService::REACTION_TYPE, $trendCutoff), 'sid'),
             'order' => self::groupedCount(self::recentReactionQuery(6, $trendCutoff), 'sid'),
         ];
         $rapidReactions = [
             'forum' => self::groupedCount(self::recentReactionQuery(2, $rapidCutoff), 'sid'),
             'directory' => self::groupedCount(self::recentReactionQuery(22, $rapidCutoff), 'sid'),
             'store' => self::groupedCount(self::recentReactionQuery(3, $rapidCutoff), 'sid'),
+            'knowledgebase' => self::groupedCount(self::recentReactionQuery(KnowledgebaseCommunityService::REACTION_TYPE, $rapidCutoff), 'sid'),
             'order' => self::groupedCount(self::recentReactionQuery(6, $rapidCutoff), 'sid'),
         ];
 
@@ -364,6 +386,7 @@ class FeedService
             'forum' => collect(),
             'directory' => collect(),
             'store' => collect(),
+            'knowledgebase' => collect(),
             'order' => collect(),
             'status' => collect(),
         ];
@@ -401,6 +424,18 @@ class FeedService
                     ->merge(
                         Like::query()
                             ->where('type', 3)
+                            ->where('time_t', '>=', $trendCutoff)
+                            ->whereIn('uid', $followingIds)
+                            ->pluck('sid')
+                    )
+            );
+            $socialProof['knowledgebase'] = self::idSet(
+                self::recentOptionQuery(KnowledgebaseCommunityService::COMMENT_OPTION_TYPE, $trendCutoff)
+                    ->whereIn('o_order', $followingIds)
+                    ->pluck('o_parent')
+                    ->merge(
+                        Like::query()
+                            ->where('type', KnowledgebaseCommunityService::REACTION_TYPE)
                             ->where('time_t', '>=', $trendCutoff)
                             ->whereIn('uid', $followingIds)
                             ->pluck('sid')
@@ -610,6 +645,10 @@ class FeedService
             ->merge(Option::where('o_order', $userId)->where('o_type', 's_coment')->pluck('o_parent'))
             ->unique()
             ->values();
+        $knowledgebaseStatusIds = Like::where('uid', $userId)->where('type', KnowledgebaseCommunityService::REACTION_TYPE)->pluck('sid')
+            ->merge(Option::where('o_order', $userId)->where('o_type', KnowledgebaseCommunityService::COMMENT_OPTION_TYPE)->pluck('o_parent'))
+            ->unique()
+            ->values();
         $orderIds = Like::where('uid', $userId)->where('type', 6)->pluck('sid')
             ->merge(Option::where('o_order', $userId)->where('o_type', 'order_comment')->pluck('o_parent'))
             ->unique()
@@ -621,6 +660,7 @@ class FeedService
         return ForumTopic::whereIn('id', $forumTopicIds)->pluck('uid')
             ->merge(Directory::whereIn('id', $directoryIds)->pluck('uid'))
             ->merge(Option::where('o_type', 'store')->whereIn('id', $storeIds)->pluck('o_parent'))
+            ->merge(Status::whereIn('id', $knowledgebaseStatusIds)->pluck('uid'))
             ->merge(OrderRequest::whereIn('id', $orderIds)->pluck('uid'))
             ->merge(Status::whereIn('id', $repostedStatusIds)->pluck('uid'))
             ->map(static fn ($id) => (int) $id)
@@ -643,6 +683,8 @@ class FeedService
                 + Option::where('o_order', $userId)->where('o_type', 'd_coment')->count(),
             'store' => Like::where('uid', $userId)->where('type', 3)->count()
                 + Option::where('o_order', $userId)->where('o_type', 's_coment')->count(),
+            'knowledgebase' => Like::where('uid', $userId)->where('type', KnowledgebaseCommunityService::REACTION_TYPE)->count()
+                + Option::where('o_order', $userId)->where('o_type', KnowledgebaseCommunityService::COMMENT_OPTION_TYPE)->count(),
             'order' => Like::where('uid', $userId)->where('type', 6)->count()
                 + Option::where('o_order', $userId)->where('o_type', 'order_comment')->count(),
         ])->filter(static fn ($count) => (int) $count > 0)->all();
@@ -655,6 +697,7 @@ class FeedService
             7867 => 'store',
             6 => 'order',
             5 => 'news',
+            KnowledgebaseCommunityService::STATUS_TYPE => 'knowledgebase',
             default => 'forum',
         };
     }
@@ -672,7 +715,7 @@ class FeedService
     {
         $group = self::typeGroup((int) $status->s_type);
 
-        return (int) (($metricMap[$group] ?? collect())->get($status->tp_id) ?? 0);
+        return (int) (($metricMap[$group] ?? collect())->get(self::metricSubjectIdForStatus($status)) ?? 0);
     }
 
     private static function hasSocialProof(Status $status, array $socialProof): bool
@@ -680,7 +723,16 @@ class FeedService
         $group = self::typeGroup((int) $status->s_type);
 
         return (bool) (($socialProof['status'] ?? collect())->has($status->id)
-            || ($socialProof[$group] ?? collect())->has($status->tp_id));
+            || ($socialProof[$group] ?? collect())->has(self::metricSubjectIdForStatus($status)));
+    }
+
+    private static function metricSubjectIdForStatus(Status $status): int
+    {
+        if ((int) $status->s_type === KnowledgebaseCommunityService::STATUS_TYPE) {
+            return (int) $status->id;
+        }
+
+        return (int) $status->tp_id;
     }
 
     private static function groupedCount($query, string $column): Collection
