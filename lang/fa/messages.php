@@ -1905,5 +1905,15 @@ return [
     'community_feed_settings_cache_section' => 'Cache',
     'community_feed_settings_cache_help' => 'Control how long personalized feed results stay cached before being recalculated.',
     'community_feed_settings_cache_ttl' => 'Cache TTL (seconds)',
+    'telegram' => 'تلگرام',
+    'share_to_community' => 'اشتراک در جامعه',
+    'share_page_description' => 'محتوا را با جامعه MYADS به اشتراک بگذارید.',
+    'share_with_community' => 'محتوا را در سراسر شبکه منتشر کنید',
+    'share_page_hint' => 'پست شما براي همه در خوراک جامعه قابل مشاهده خواهد بود.',
+    'share_redirect_hint' => 'پس از اشتراک، به پست جديد خود هدايت مي‌شويد.',
+    'share_externally' => 'اشتراک گذاری خارجی',
+    'knowledgebase_share_to_community_hint' => 'ويرايشگر جامعه را با اين موضوع آماده براي بازبيني پيش از انتشار باز مي‌کند.',
+    'knowledgebase_share_post_heading' => 'موضوع پايگاه دانش: :topic براي :product',
+    'knowledgebase_share_post_summary' => 'خلاصه: :summary',
 ];
 

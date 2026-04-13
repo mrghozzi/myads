@@ -8,6 +8,13 @@
 * **ACL**: Mapped the new community feed settings routes into the `community` admin-permission module so delegated community administrators can manage the ranking configuration safely.
 * **Compatibility**: Order-request comments now store their creation timestamp in `options.o_mode`, allowing legacy community content to participate in recent-trend calculations without schema changes.
 
+### Knowledgebase Sharing & Community Publishing
+* **Feature**: Added a new **Share to Community** option to the Knowledgebase topic creation flow (`/kb/{product}`), allowing signed-in members to save a new article and immediately open the `/share` composer with a ready-to-review community post.
+* **Add**: Introduced localized Knowledgebase share text generation that automatically builds a post from the **topic title**, **product name**, a short **plain-text summary**, and the public Knowledgebase article URL.
+* **UI**: Enhanced the Knowledgebase topic page (`/kb/{product}:{topic}`) with a dedicated **Share to Community** action plus an **External Share** row for Facebook, Twitter (X), LinkedIn, and Telegram.
+* **Compatibility**: Community sharing is only offered for published Knowledgebase articles (`o_order = 0`), while guest submissions and pending suggestions continue to follow the existing review-safe redirect behavior.
+* **i18n**: Added the new Knowledgebase sharing labels and composer hints across all **9 supported languages**.
+
 ---
 
 # v4.2.5

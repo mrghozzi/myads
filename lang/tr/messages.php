@@ -1905,5 +1905,15 @@ return [
     'community_feed_settings_cache_section' => 'Cache',
     'community_feed_settings_cache_help' => 'Control how long personalized feed results stay cached before being recalculated.',
     'community_feed_settings_cache_ttl' => 'Cache TTL (seconds)',
+    'telegram' => 'Telegram',
+    'share_to_community' => 'Topluluga paylas',
+    'share_page_description' => 'Icerigi MYADS topluluguyla paylasin.',
+    'share_with_community' => 'Icerigi ag genelinde yay',
+    'share_page_hint' => 'Gonderiniz topluluk akisinda herkes tarafindan gorulecek.',
+    'share_redirect_hint' => 'Paylastiktan sonra yeni gonderinize yonlendirileceksiniz.',
+    'share_externally' => 'Harici paylas',
+    'knowledgebase_share_to_community_hint' => 'Bu konuyu, yayinlamadan once gozden gecirmeniz icin topluluk olusturucusunda hazir acar.',
+    'knowledgebase_share_post_heading' => 'Bilgi bankasi konusu: :topic, urun: :product',
+    'knowledgebase_share_post_summary' => 'Ozet: :summary',
 ];
 

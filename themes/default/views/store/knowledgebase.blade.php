@@ -11,6 +11,11 @@
     $currentTopicPendingCount = $currentArticle
         ? \App\Models\Option::where('o_type', 'knowledgebase')->where('o_mode', $product->name)->where('name', $currentArticle->name)->where('o_order', 1)->count()
         : 0;
+    $knowledgebaseExternalShareUrl = $knowledgebaseExternalShareUrl
+        ?? ($currentArticle ? route('kb.show', ['name' => $product->name, 'article' => $currentArticle->name]) : null);
+    $knowledgebaseExternalShareTitle = $knowledgebaseExternalShareTitle
+        ?? ($currentArticle ? trim($currentArticle->name . ' - ' . $product->name) : $product->name);
+    $knowledgebaseSocialPlatforms = ['facebook', 'twitter', 'linkedin', 'telegram'];
     $shellTitle = $currentArticle ? $currentArticle->name : $product->name;
     $shellSummary = $currentArticle
         ? \Illuminate\Support\Str::limit(strip_tags($currentArticle->o_valuer), 240)
@@ -207,6 +212,17 @@
                             <div class="form-item"><img src="{{ route('kb.captcha') }}" id="kb-captcha" alt="captcha" style="height: 30px; cursor: pointer;"></div>
                             <div class="form-item"><div class="form-input"><input type="text" name="capt" required></div></div>
                         </div>
+                        @if($mode === 'create' && auth()->check())
+                            <div class="form-row">
+                                <div class="form-item">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="kb-share-to-community" name="share_to_community" value="1" {{ old('share_to_community') ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="kb-share-to-community">{{ __('messages.share_to_community') }}</label>
+                                    </div>
+                                    <p style="margin: 10px 0 0; font-size: 12px; color: var(--store-shell-muted);">{{ __('messages.knowledgebase_share_to_community_hint') }}</p>
+                                </div>
+                            </div>
+                        @endif
                         <div class="form-row">
                             <div class="form-item"><button class="button primary" type="submit">{{ __('messages.save') }}</button></div>
                         </div>
@@ -255,6 +271,9 @@
                         <div class="kb-action-menu" data-activity-menu-wrap>
                             <button type="button" class="kb-action-menu__trigger" data-activity-menu-trigger data-activity-menu-type="actions" aria-expanded="false"><i class="fa fa-ellipsis-h" aria-hidden="true"></i></button>
                             <div class="simple-dropdown kb-action-menu__panel" data-activity-menu-panel>
+                                @if($knowledgebaseCommunityShareUrl)
+                                    <a class="simple-dropdown-link" href="{{ $knowledgebaseCommunityShareUrl }}"><i class="fa fa-bullhorn" aria-hidden="true"></i>&nbsp;{{ __('messages.share_to_community') }}</a>
+                                @endif
                                 <button type="button" class="simple-dropdown-link store-dropdown-button" onclick="navigator.clipboard.writeText('{{ route('kb.show', ['name' => $product->name, 'article' => $article->name]) }}'); alert('{{ __('messages.link_copied') }}');"><i class="fa fa-link" aria-hidden="true"></i>&nbsp;{{ __('messages.copy_link') }}</button>
                                 <a class="simple-dropdown-link" href="{{ route('store.show', $product->name) }}"><i class="fa fa-shopping-basket" aria-hidden="true"></i>&nbsp;{{ __('messages.preview') }}</a>
                                 @if($canReportTopic)
@@ -278,11 +297,36 @@
                         <div class="kb-meta-row"><span>{{ __('messages.publisher') }}</span><strong>{{ $articleAuthor ? $articleAuthor->username : __('messages.guest') }}</strong></div>
                     </div>
                     <div class="kb-side-card__actions">
+                        @if($knowledgebaseCommunityShareUrl)
+                            <a class="button primary" href="{{ $knowledgebaseCommunityShareUrl }}"><i class="fa fa-bullhorn" aria-hidden="true"></i>&nbsp;{{ __('messages.share_to_community') }}</a>
+                        @endif
                         <a class="button secondary" href="{{ route('kb.edit', ['name' => $product->name, 'article' => $article->name]) }}"><i class="fa fa-pencil-square-o" aria-hidden="true"></i>&nbsp;{{ $canManageCurrentArticle ? __('messages.edit_topic') : __('messages.suggest_edit') }}</a>
                         <a class="button tertiary" href="{{ route('kb.pending', ['name' => $product->name, 'article' => $article->name]) }}"><i class="fa fa-hourglass-half" aria-hidden="true"></i>&nbsp;{{ __('messages.pending') }}</a>
                         <a class="button tertiary" href="{{ route('kb.history', ['name' => $product->name, 'article' => $article->name]) }}"><i class="fa fa-history" aria-hidden="true"></i>&nbsp;{{ __('messages.history') }}</a>
                         <a class="button white" href="{{ route('store.show', $product->name) }}"><i class="fa fa-shopping-basket" aria-hidden="true"></i>&nbsp;{{ $product->name }}</a>
                     </div>
+                    @if($knowledgebaseExternalShareUrl)
+                        <div style="margin-top: 18px; border-top: 1px solid var(--store-shell-border, rgba(143, 145, 172, 0.18)); padding-top: 18px;">
+                            <p style="margin: 0 0 12px; font-size: 12px; font-weight: 700; color: var(--store-shell-muted); text-transform: uppercase; letter-spacing: 0.08em;">{{ __('messages.share_externally') }}</p>
+                            <div class="d-flex flex-wrap gap-2">
+                                @foreach($knowledgebaseSocialPlatforms as $social)
+                                    <a
+                                        class="button white small"
+                                        href="javascript:void(0);"
+                                        style="display: inline-flex; align-items: center; gap: 8px;"
+                                        onclick="sharePost('{{ $social }}', {{ Illuminate\Support\Js::from($knowledgebaseExternalShareUrl) }}, {{ Illuminate\Support\Js::from($knowledgebaseExternalShareTitle) }}); return false;"
+                                    >
+                                        <img
+                                            src="{{ theme_asset('img/icons/' . $social . '-icon.png') }}"
+                                            alt="{{ __('messages.' . $social) }}"
+                                            style="width: 16px; height: 16px; object-fit: contain;"
+                                        >
+                                        <span>{{ __('messages.' . $social) }}</span>
+                                    </a>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>

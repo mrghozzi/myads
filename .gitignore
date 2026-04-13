@@ -58,6 +58,7 @@ Thumbs.db
 !/tests/Feature/MarketplaceExtensionFeedTest.php
 !/tests/Feature/StoreEditorPagesTest.php
 !/tests/Feature/CommunityFeedFeatureTest.php
+!/tests/Feature/StoreProductKnowledgebaseUiTest.php
 ~/.pi/
 Documents/development_suggestions.md
 /wiki/

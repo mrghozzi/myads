@@ -1905,5 +1905,15 @@ return [
     'community_feed_settings_cache_section' => 'Cache',
     'community_feed_settings_cache_help' => 'Control how long personalized feed results stay cached before being recalculated.',
     'community_feed_settings_cache_ttl' => 'Cache TTL (seconds)',
+    'telegram' => 'Telegram',
+    'share_to_community' => 'Compartilhar na comunidade',
+    'share_page_description' => 'Compartilhe conteudo com a comunidade MYADS.',
+    'share_with_community' => 'Espalhe conteudo pela rede',
+    'share_page_hint' => 'Sua publicacao ficara visivel para todos no feed da comunidade.',
+    'share_redirect_hint' => 'Depois de compartilhar, voce sera redirecionado para sua nova publicacao.',
+    'share_externally' => 'Compartilhar externamente',
+    'knowledgebase_share_to_community_hint' => 'Abre o compositor da comunidade com este topico pronto para revisao antes da publicacao.',
+    'knowledgebase_share_post_heading' => 'Topico da base de conhecimento: :topic para :product',
+    'knowledgebase_share_post_summary' => 'Resumo: :summary',
 ];
 

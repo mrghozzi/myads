@@ -781,6 +781,7 @@ class StoreController extends Controller
             'name' => 'nullable|string|max:150',
             'txt' => 'required|string|min:10',
             'capt' => 'required|string',
+            'share_to_community' => 'nullable|boolean',
         ]);
 
         $captcha = session('kb_captcha');
@@ -795,6 +796,12 @@ class StoreController extends Controller
             return redirect()->back()->withInput()->with('kb_error', __('please_enter_name'));
         }
         $userId = Auth::id() ?? 0;
+        $shareToCommunity = Auth::check() && $request->boolean('share_to_community');
+        $hasPublishedArticle = Option::where('o_type', 'knowledgebase')
+            ->where('o_mode', $product->name)
+            ->where('name', $articleName)
+            ->where('o_order', 0)
+            ->exists();
         $existing = Option::where('o_type', 'knowledgebase')
             ->where('o_mode', $product->name)
             ->where('name', $articleName)
@@ -823,6 +830,12 @@ class StoreController extends Controller
 
             app(\App\Services\GamificationService::class)->recordEvent($userId, 'kb_article_created');
         });
+
+        if ($shareToCommunity && !$hasPublishedArticle && $status === 0) {
+            return redirect()->route('portal.share', [
+                'text' => $this->buildKnowledgebaseCommunityShareText($product, $articleName, $request->input('txt')),
+            ]);
+        }
 
         return redirect()->route('kb.show', ['name' => $product->name, 'article' => $articleName]);
     }
@@ -917,7 +930,52 @@ class StoreController extends Controller
                 ->count(),
             'articleAuthor' => $this->resolveKnowledgebaseAuthor($article),
             'canManageCurrentArticle' => $this->canManageKnowledgebase($product, $article),
+            'knowledgebaseCommunityShareUrl' => $article ? $this->buildKnowledgebaseCommunityShareUrl($product, $article) : null,
+            'knowledgebaseExternalShareUrl' => $article
+                ? route('kb.show', ['name' => $product->name, 'article' => $article->name])
+                : null,
+            'knowledgebaseExternalShareTitle' => $article
+                ? trim($article->name . ' - ' . $product->name)
+                : null,
         ];
+    }
+
+    private function buildKnowledgebaseCommunityShareUrl(Product $product, Option $article): ?string
+    {
+        if (!Auth::check() || (int) $article->o_order !== 0) {
+            return null;
+        }
+
+        return route('portal.share', [
+            'text' => $this->buildKnowledgebaseCommunityShareText($product, $article->name, (string) $article->o_valuer),
+        ]);
+    }
+
+    private function buildKnowledgebaseCommunityShareText(Product $product, string $articleName, string $content): string
+    {
+        $summary = $this->summarizeKnowledgebaseShareContent($content);
+        $lines = [
+            __('messages.knowledgebase_share_post_heading', [
+                'topic' => $articleName,
+                'product' => $product->name,
+            ]),
+        ];
+
+        if ($summary !== '') {
+            $lines[] = __('messages.knowledgebase_share_post_summary', ['summary' => $summary]);
+        }
+
+        $lines[] = route('kb.show', ['name' => $product->name, 'article' => $articleName]);
+
+        return implode("\n", $lines);
+    }
+
+    private function summarizeKnowledgebaseShareContent(string $content): string
+    {
+        $plainText = html_entity_decode(strip_tags($content), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $plainText = trim((string) preg_replace('/\s+/u', ' ', $plainText));
+
+        return Str::limit($plainText, 220, '...');
     }
 
     private function resolveKnowledgebaseAuthor(?Option $article): ?User

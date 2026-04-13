@@ -1945,4 +1945,9 @@ return [
     'community_feed_settings_cache_section' => 'الكاش',
     'community_feed_settings_cache_help' => 'تحكم في مدة تخزين نتائج الخلاصة الشخصية قبل إعادة احتسابها.',
     'community_feed_settings_cache_ttl' => 'مدة الكاش (ثوانٍ)',
+    'telegram' => 'تيليجرام',
+    'share_externally' => 'مشاركة خارجية',
+    'knowledgebase_share_to_community_hint' => 'افتح محرر المجتمع مع هذا الموضوع مجهزًا للمراجعة قبل النشر.',
+    'knowledgebase_share_post_heading' => 'موضوع قاعدة المعرفة: :topic لمنتج :product',
+    'knowledgebase_share_post_summary' => 'الملخص: :summary',
 ];

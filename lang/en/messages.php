@@ -1945,4 +1945,9 @@ return [
     'community_feed_settings_cache_section' => 'Cache',
     'community_feed_settings_cache_help' => 'Control how long personalized feed results stay cached before being recalculated.',
     'community_feed_settings_cache_ttl' => 'Cache TTL (seconds)',
+    'telegram' => 'Telegram',
+    'share_externally' => 'Share Externally',
+    'knowledgebase_share_to_community_hint' => 'Open the community composer with this topic ready for review before posting.',
+    'knowledgebase_share_post_heading' => 'Knowledgebase topic: :topic for :product',
+    'knowledgebase_share_post_summary' => 'Summary: :summary',
 ];
