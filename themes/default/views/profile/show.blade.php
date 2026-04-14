@@ -45,6 +45,14 @@
             </a>
 
             <p class="user-short-description-title"><a href="{{ route('profile.show', $user->username) }}">{{ $user->username }}</a></p>
+            @if(!empty($subscriptionProfileBadge))
+                <div style="margin-top: 10px;">
+                    <span class="badge" style="display: inline-flex; align-items: center; gap: 6px; background: {{ $subscriptionProfileBadge['color'] ?? '#615dfa' }}; color: #fff; border-radius: 999px; padding: 7px 14px; font-size: 12px; font-weight: 700;">
+                        <i class="fa fa-crown" aria-hidden="true"></i>
+                        {{ $subscriptionProfileBadge['label'] }}
+                    </span>
+                </div>
+            @endif
             <p class="user-short-description-text">
                 @if($showOnlineStatus)
                     {{ __('messages.lastcontact') }} {{ \Carbon\Carbon::createFromTimestamp($user->online)->diffForHumans() }}

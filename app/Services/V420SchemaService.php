@@ -18,6 +18,13 @@ class V420SchemaService
         'security_ip_bans' => ['security_ip_bans'],
         'security_sessions' => ['security_member_sessions'],
         'post_promotions' => ['status_promotions'],
+        'subscriptions_billing' => [
+            'subscription_plans',
+            'member_subscriptions',
+            'billing_orders',
+            'billing_transactions',
+            'billing_currencies',
+        ],
     ];
 
     private array $tableCache = [];

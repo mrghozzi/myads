@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Status;
+use App\Services\Billing\SubscriptionEntitlementService;
 use App\Support\StatusPromotionSettings;
 use Carbon\Carbon;
 use Illuminate\Validation\ValidationException;
@@ -10,7 +11,8 @@ use Illuminate\Validation\ValidationException;
 class StatusPromotionPricingService
 {
     public function __construct(
-        private readonly V420SchemaService $schema
+        private readonly V420SchemaService $schema,
+        private readonly SubscriptionEntitlementService $entitlements
     ) {
     }
 
@@ -49,11 +51,17 @@ class StatusPromotionPricingService
             'days' => (int) max(1, ceil($targetQuantity * (float) $settings['price_per_day_pts'] * $smartFactor)),
         };
 
+        $discountPct = $this->entitlements->activeDiscountPercentageForUserId((int) $status->uid);
+        if ($discountPct > 0) {
+            $chargedPts = (int) max(1, ceil($chargedPts * (1 - ($discountPct / 100))));
+        }
+
         return [
             'objective' => $objective,
             'target_quantity' => $targetQuantity,
             'smart_factor' => round($smartFactor, 2),
             'charged_pts' => $chargedPts,
+            'subscription_discount_pct' => $discountPct,
             'delivery_cap_impressions' => $deliveryCap,
             'estimated_duration_days' => $durationDays,
             'starts_at' => Carbon::now(),

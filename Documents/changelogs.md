@@ -1,6 +1,16 @@
 # v4.3.0
 > **Strategic Release** — Preparing major platform advancements and core infrastructure updates.
 
+### Paid Subscriptions & Billing
+* **Feature**: Added an optional paid-subscriptions and billing system that administrators can enable or disable from `/admin/billing/settings` without affecting historical records.
+* **Add**: Introduced a full billing workspace in `/admin/billing` for plans, orders, transactions, currencies, gateways, and system-wide billing settings with ACL support through the new `billing` admin module.
+* **Add**: Added member-facing billing pages at `/plans`, `/settings/billing`, and `/billing/orders/{order}` for plan discovery, subscription history, hosted checkout follow-up, and secure bank-transfer receipt uploads.
+* **Payments**: The first billing release supports `Stripe`, `PayPal`, and `Bank Transfer`, using hosted external checkout flows for cards and provider-managed payment pages while avoiding collection of personal payment data inside MYADS.
+* **Privacy**: Billing records now store only minimal payment metadata, external references, currency snapshots, and review notes while keeping gateway secrets encrypted and masked in the admin UI.
+* **UX**: Active subscription badges can now appear on member profile pages, and billing navigation is injected into both the Duralux admin sidebar and the member settings navigation when the feature is available.
+* **Compatibility**: Integrated the new billing surfaces with `V420SchemaService` so incomplete upgrades degrade gracefully with notices instead of fatal errors.
+* **Tests**: Added feature-test coverage for billing availability, bank-transfer upload and approval/rejection flows, queued-vs-extended subscriptions, admin ACL enforcement, and incomplete-upgrade fallback behavior.
+
 ### Community Feed Intelligence
 * **Refactor**: Rebuilt the `/portal?filter=all` ranking pipeline around configurable community-feed settings, shifting priority toward freshness, followed authors, member affinity, and recent momentum instead of static historical totals.
 * **Add**: Introduced recent-trend rescue logic so older posts only return to the front of the community feed when they cross configurable recent engagement thresholds for comments, reactions, or reposts.

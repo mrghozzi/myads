@@ -19,6 +19,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AdminSeoController;
 use App\Http\Controllers\AdminPageController;
+use App\Http\Controllers\AdminBillingController;
 use App\Http\Controllers\ReactionController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\MentionController;
@@ -26,6 +27,7 @@ use App\Http\Controllers\AdminAdminsController;
 use App\Http\Controllers\AdminCommunityFeedController;
 use App\Http\Controllers\AdminSecurityController;
 use App\Http\Controllers\AdminStatusPromotionController;
+use App\Http\Controllers\BillingController;
 use App\Http\Controllers\SeoPublicController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\OrderRequestController;
@@ -99,6 +101,7 @@ Route::get('/', function () {
 Route::get('/home', [HomeController::class, 'index'])->name('dashboard')->middleware('auth');
 Route::post('/home', [HomeController::class, 'convertPoints'])->name('dashboard.convert')->middleware('auth');
 Route::get('/quests', [App\Http\Controllers\QuestController::class, 'index'])->name('quests.index')->middleware('auth');
+Route::get('/plans', [BillingController::class, 'plans'])->name('billing.plans');
 
 // Portal Routes
 Route::get('/portal', [PortalController::class, 'index'])->name('portal.index');
@@ -119,7 +122,14 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/notification', [NotificationController::class, 'index'])->name('notifications.index');
     Route::post('/notification/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.mark_all_read');
     Route::get('/notif/{id}', [NotificationController::class, 'show'])->name('notifications.show');
+    Route::get('/settings/billing', [BillingController::class, 'dashboard'])->name('billing.dashboard');
+    Route::post('/plans/{plan}/purchase', [BillingController::class, 'purchase'])->name('billing.purchase');
+    Route::get('/billing/orders/{order}', [BillingController::class, 'showOrder'])->name('billing.orders.show');
+    Route::post('/billing/orders/{order}/receipt', [BillingController::class, 'uploadReceipt'])->name('billing.orders.receipt.update');
+    Route::get('/billing/return/{gateway}/{order}', [BillingController::class, 'handleReturn'])->name('billing.return');
 });
+
+Route::post('/billing/webhook/{gateway}', [BillingController::class, 'handleWebhook'])->name('billing.webhook');
 
 // Forum Routes
 Route::get('/forum', [ForumController::class, 'index'])->name('forum.index');
@@ -519,6 +529,27 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::post('/themes/upgrade', [AdminController::class, 'upgradeTheme'])->name('admin.themes.upgrade');
     Route::get('themes/thumbnail/{slug}', [AdminController::class, 'themeThumbnail'])->name('admin.themes.thumbnail');
     Route::match(['get', 'post'], '/sitemap/generate', [SitemapController::class, 'generate'])->name('admin.sitemap.generate');
+
+    // Billing
+    Route::prefix('billing')->group(function () {
+        Route::get('/', [AdminBillingController::class, 'overview'])->name('admin.billing.overview');
+        Route::get('/settings', [AdminBillingController::class, 'settings'])->name('admin.billing.settings');
+        Route::post('/settings', [AdminBillingController::class, 'updateSettings'])->name('admin.billing.settings.update');
+        Route::get('/plans', [AdminBillingController::class, 'plans'])->name('admin.billing.plans');
+        Route::post('/plans', [AdminBillingController::class, 'storePlan'])->name('admin.billing.plans.store');
+        Route::post('/plans/{plan}', [AdminBillingController::class, 'updatePlan'])->name('admin.billing.plans.update');
+        Route::get('/orders', [AdminBillingController::class, 'orders'])->name('admin.billing.orders');
+        Route::get('/orders/{order}', [AdminBillingController::class, 'showOrder'])->name('admin.billing.orders.show');
+        Route::post('/orders/{order}/review', [AdminBillingController::class, 'reviewOrder'])->name('admin.billing.orders.review');
+        Route::get('/transactions', [AdminBillingController::class, 'transactions'])->name('admin.billing.transactions');
+        Route::get('/currencies', [AdminBillingController::class, 'currencies'])->name('admin.billing.currencies');
+        Route::post('/currencies', [AdminBillingController::class, 'storeCurrency'])->name('admin.billing.currencies.store');
+        Route::post('/currencies/{currency}', [AdminBillingController::class, 'updateCurrency'])->name('admin.billing.currencies.update');
+        Route::delete('/currencies/{currency}', [AdminBillingController::class, 'deleteCurrency'])->name('admin.billing.currencies.delete');
+        Route::post('/currencies/{currency}/base', [AdminBillingController::class, 'setBaseCurrency'])->name('admin.billing.currencies.base');
+        Route::get('/gateways', [AdminBillingController::class, 'gateways'])->name('admin.billing.gateways');
+        Route::post('/gateways/{gateway}', [AdminBillingController::class, 'updateGateway'])->name('admin.billing.gateways.update');
+    });
 
     // Pages
     Route::get('/pages', [AdminPageController::class, 'index'])->name('admin.pages');

@@ -14,6 +14,7 @@ use App\Models\Status;
 use App\Models\User;
 use App\Models\UserBadge;
 use App\Models\SecurityMemberSession;
+use App\Services\Billing\SubscriptionEntitlementService;
 use App\Services\GamificationService;
 use App\Services\SecuritySessionService;
 use App\Services\StatusActivityService;
@@ -144,6 +145,7 @@ class ProfileController extends Controller
 
         $socialOption = Option::where('o_type', 'user_social_links')->where('o_parent', $user->id)->first();
         $socialLinks = $socialOption ? json_decode($socialOption->o_valuer, true) : [];
+        $subscriptionProfileBadge = app(SubscriptionEntitlementService::class)->activeProfileBadgeForUserId($user->id);
 
         if ($request->ajax() || $request->wantsJson()) {
             return response()->json([
@@ -164,6 +166,7 @@ class ProfileController extends Controller
             'photoItems',
             'badgeShowcase',
             'socialLinks',
+            'subscriptionProfileBadge',
             'canViewAbout',
             'canViewPhotos',
             'canViewProfileContent',

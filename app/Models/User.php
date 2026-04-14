@@ -340,6 +340,16 @@ class User extends Authenticatable
         return $this->hasMany(BadgeShowcase::class, 'user_id')->orderBy('sort_order');
     }
 
+    public function billingOrders()
+    {
+        return $this->hasMany(BillingOrder::class, 'user_id');
+    }
+
+    public function memberSubscriptions()
+    {
+        return $this->hasMany(MemberSubscription::class, 'user_id');
+    }
+
     public static function generatePublicUid(): string
     {
         do {

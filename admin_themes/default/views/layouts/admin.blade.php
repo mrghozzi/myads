@@ -215,6 +215,15 @@
                         </li>
                     @endif
 
+                    @if($canAdmin('billing'))
+                        <li class="nxl-item">
+                            <a href="{{ route('admin.billing.overview') }}" class="nxl-link">
+                                <span class="nxl-micon"><i class="feather-credit-card"></i></span>
+                                <span class="nxl-mtext">{{ __('messages.billing_feature_title') }}</span>
+                            </a>
+                        </li>
+                    @endif
+
                     @if($canAnyAdminSection(['settings', 'languages', 'updates', 'maintenance', 'administrators']))
                         <li class="nxl-item nxl-hasmenu">
                             <a href="javascript:void(0);" class="nxl-link">
@@ -382,7 +391,7 @@
 
         <footer class="footer d-flex flex-wrap justify-content-between align-items-center gap-2">
              <p class="fs-11 text-muted fw-medium text-uppercase mb-0 copyright">
-                <span>Copyright © {{ date('Y') }} {{ config('app.name') }}. {{ __('messages.all_rights_reserved') ?? 'All rights reserved.' }}</span>
+                <span>Copyright &copy; {{ date('Y') }} {{ config('app.name') }}. {{ __('messages.all_rights_reserved') ?? 'All rights reserved.' }}</span>
             </p>
             <p class="fs-11 text-muted fw-medium mb-0">
                 <span class="badge bg-light text-dark border">{{ \App\Support\SystemVersion::tag() }}</span>
