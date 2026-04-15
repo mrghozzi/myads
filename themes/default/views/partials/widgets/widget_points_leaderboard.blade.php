@@ -14,7 +14,7 @@
                                 <div class="hexagon-image-30-32" data-src="{{ $user->avatarUrl() }}"></div>
                             </div>
                             <div class="user-avatar-progress-border">
-                                <div class="hexagon-border-40-44"></div>
+                                <div class="hexagon-border-40-44" data-line-color="{{ $user->profileBadgeColor() }}"></div>
                             </div>
                             <div class="user-avatar-badge" style="width: 20px; height: 20px; top: -5px; right: -5px;">
                                 <div class="user-avatar-badge-content">

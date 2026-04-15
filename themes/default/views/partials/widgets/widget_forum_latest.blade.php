@@ -14,7 +14,7 @@
                                 <div class="hexagon-image-30-32" data-src="{{ $topic->user ? $topic->user->avatarUrl() : asset('upload/_avatar.png') }}"></div>
                             </div>
                             <div class="user-avatar-progress-border">
-                                <div class="hexagon-border-40-44"></div>
+                                <div class="hexagon-border-40-44" data-line-color="{{ $topic->user ? $topic->user->profileBadgeColor() : '' }}"></div>
                             </div>
                         </div>
                     </a>

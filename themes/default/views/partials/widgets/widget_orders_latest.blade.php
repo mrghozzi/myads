@@ -17,6 +17,9 @@
                             <div class="user-avatar-content">
                                 <div class="hexagon-image-30-32" data-src="{{ $order->user ? $order->user->avatarUrl() : asset('upload/_avatar.png') }}"></div>
                             </div>
+                            <div class="user-avatar-progress-border">
+                                <div class="hexagon-border-40-44" data-line-color="{{ $order->user ? $order->user->profileBadgeColor() : '' }}"></div>
+                            </div>
                         </div>
                     </a>
                     <p class="user-status-title"><a class="bold" href="{{ route('orders.show', $order->id) }}">{{ \Illuminate\Support\Str::limit($order->title, 40) }}</a></p>
