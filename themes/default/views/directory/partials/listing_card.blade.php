@@ -19,7 +19,7 @@
                                     <div class="hexagon-image-30-32" data-src="{{ $card['owner_avatar'] }}"></div>
                                 </div>
                                 <div class="user-avatar-progress-border">
-                                    <div class="hexagon-border-40-44"></div>
+                                    <div class="hexagon-border-40-44" data-line-color="{{ $card['owner'] ? $card['owner']->profileBadgeColor() : '' }}"></div>
                                 </div>
                             </div>
                         </a>
@@ -30,7 +30,7 @@
                                     <div class="hexagon-image-30-32" data-src="{{ $card['owner_avatar'] }}"></div>
                                 </div>
                                 <div class="user-avatar-progress-border">
-                                    <div class="hexagon-border-40-44"></div>
+                                    <div class="hexagon-border-40-44" data-line-color="{{ $listing->user ? $listing->user->profileBadgeColor() : '' }}"></div>
                                 </div>
                             </div>
                         </div>
