@@ -888,7 +888,7 @@
                                 <div class="hexagon-image-30-32" data-src="{{ $partnerItem->avatarUrl() }}"></div>
                             </div>
                             <div class="user-avatar-progress-border">
-                                <div class="hexagon-border-40-44"></div>
+                                <div class="hexagon-border-40-44" data-line-color="{{ $partnerItem->profileBadgeColor() }}"></div>
                             </div>
                         </div>
 
@@ -926,7 +926,7 @@
                                     <div class="hexagon-image-30-32" data-src="{{ $partner->avatarUrl() }}"></div>
                                 </div>
                                 <div class="user-avatar-progress-border">
-                                    <div class="hexagon-border-40-44"></div>
+                                    <div class="hexagon-border-40-44" data-line-color="{{ $partner->profileBadgeColor() }}"></div>
                                 </div>
                                 @if($partner->ucheck == 1)
                                     <div class="user-avatar-badge">
