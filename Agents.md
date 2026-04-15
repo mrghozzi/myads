@@ -32,6 +32,7 @@ MYADS is a community platform where website owners:
 10. **Social Links** — managed user social media presence across 12 platforms with branded icons and smart URL validation.
 11. **External Share API** — a dedicated `/share` endpoint for third-party websites to pre-fill post composer text, documented at `/developer`.
 12. **Session Monitoring** — view and manage active member sessions across devices with remote revocation.
+13. **Admin Notifications** — centralized header alerts for billing, reports, and system/extension updates with permission-based visibility.
 
 ---
 
@@ -253,6 +254,7 @@ myads/
 | `V420SchemaService` | Graceful fallback detection for incomplete v4.2.0 upgrades, including the `subscriptions_billing` feature set |
 | `TestingSafetyGuard` | Hard-fails tests unless they are using the isolated SQLite testing database |
 | `UpdateSafetyService` | Preflight safety checks for updates: DB connection, writable paths, pending migrations, destructive migration detection |
+| `AdminNotificationService` | Aggregates pending admin tasks (billing, reports, updates) with permission-aware filtering |
 
 ---
 
@@ -419,6 +421,13 @@ admin/billing/ → Billing hub, plans, orders, transactions, currencies, gateway
 - **Entitlements:** Plans can grant `bonus_pts`, `bonus_nvu`, `bonus_nlink`, `bonus_nsmart`, `profile_badge_label`, `profile_badge_color`, and `status_promotion_discount_pct`
 - **Privacy Rule:** Persist only minimal payment metadata (`external ids`, `amount`, `currency`, `exchange snapshot`, sanitized `meta`); never store bank/card identity data inside MYADS
 - **UI Integration:** Billing appears in the Duralux admin sidebar, in `profile.settings_nav`, and active subscription badges can surface on public profile pages
+
+### Admin Notification System
+- **Implementation:** Centralized in `App\Services\Admin\AdminNotificationService` and injected into the admin layout via `AdminNotificationComposer`.
+- **Alert Types:** Highlights pending **Billing Orders** (manual review/receipts), **Community Reports**, **System Updates**, **Plugin Updates**, and **Theme Updates**.
+- **Permission Awareness:** Automatically filters alerts based on the logged-in admin's authorized modules (e.g., billing notifications are hidden if the admin lack `billing` access).
+- **Performance:** External update checks for the system and extensions are cached for 1 hour to prevent dashboard latency.
+- **UI:** Interactive dropdown in the dashboard header with a dynamic red badge, category icons, and deep links to management modules.
 
 ### Ad Serving
 - Legacy endpoints preserved: `bn.php`, `link.php`, `smart.php`
@@ -752,6 +761,8 @@ php artisan storage:link
 - **Routes & ACL:** Added member billing routes (`/plans`, `/settings/billing`, `/billing/orders/{order}`, returns, webhooks) and admin billing routes under `/admin/billing/*`, plus the `billing` admin ACL module.
 - **UI:** Added member billing views under `themes/default/views/billing/` and admin billing views under `admin_themes/default/views/admin/billing/`.
 - **Testing:** Added `tests/Feature/BillingFeatureTest.php` covering billing visibility, bank-transfer review flows, subscription extension/queueing, ACL, and incomplete-upgrade fallback.
+- **Feature (2026-04-15):** Fully localized the **User Edit** page in the admin panel and added a manual **Subscription Management** section for assigning or cancelling plans directly from the dashboard.
+- **Feature (2026-04-15):** Introduced the centralized **Admin Notification System** in the dashboard header, providing permission-aware alerts for billing, reports, and system/extension updates.
 
 ---
 
@@ -777,4 +788,4 @@ If in doubt, update it. An outdated `Agents.md` causes future agents to make wro
 
 ---
 
-*Last updated: 2026-04-15 — MYADS v4.3.0 (Billing system documented and synced)*
+*Last updated: 2026-04-15 — MYADS v4.3.0 (Admin Notifications and User Subscription Management synced)*

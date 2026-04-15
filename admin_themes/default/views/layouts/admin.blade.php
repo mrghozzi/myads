@@ -288,6 +288,53 @@
                         </a>
                     </div>
 
+                    {{-- Admin Notifications --}}
+                    @php
+                        $adminNotifications = $adminNotifications ?? [];
+                        $totalNotifications = collect($adminNotifications)->sum('count');
+                    @endphp
+                    <div class="dropdown nxl-h-item me-3">
+                        <a href="javascript:void(0);" class="nxl-head-link me-0" data-bs-toggle="dropdown" role="button" data-bs-auto-close="true">
+                            <i class="feather-bell"></i>
+                            @if($totalNotifications > 0)
+                                <span class="badge bg-danger nxl-h-badge position-absolute top-0 start-100 translate-middle rounded-pill" style="font-size: 8px; padding: 3px 5px; margin-top: 10px; margin-left: -10px;">{{ $totalNotifications }}</span>
+                            @endif
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end nxl-h-dropdown nxl-notifications-menu" style="min-width: 320px;">
+                            <div class="dropdown-header d-flex align-items-center justify-content-between">
+                                <h6 class="text-dark mb-0 fw-bold">{{ __('messages.admin_notifications') }}</h6>
+                                @if($totalNotifications > 0)
+                                    <span class="badge bg-soft-danger text-danger rounded-pill fs-10 px-2">{{ $totalNotifications }}</span>
+                                @endif
+                            </div>
+                            <div class="dropdown-divider m-0"></div>
+                            <div class="dropdown-body py-2">
+                                @if(count($adminNotifications) > 0)
+                                    @foreach($adminNotifications as $notif)
+                                        <a class="dropdown-item d-flex align-items-center py-2 px-3" href="{{ $notif['url'] }}">
+                                            <div class="avatar-text bg-soft-primary text-primary me-3 flex-shrink-0" style="width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border-radius: 8px;">
+                                                <i class="{{ $notif['icon'] }} fs-14"></i>
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <span class="d-block fs-13 fw-semibold text-dark">{{ $notif['label'] }}</span>
+                                                @if(isset($notif['module']))
+                                                    <small class="text-muted fs-11" style="opacity: 0.7;">{{ __('messages.admin_module_' . $notif['module']) }}</small>
+                                                @endif
+                                            </div>
+                                        </a>
+                                    @endforeach
+                                @else
+                                    <div class="p-4 text-center">
+                                        <div class="avatar-text bg-soft-light text-muted mx-auto mb-3" style="width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 50%;">
+                                            <i class="feather-bell-off fs-18"></i>
+                                        </div>
+                                        <span class="text-muted fs-12 d-block">{{ __('messages.no_new_notifications') }}</span>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+
                     {{-- Language Switcher --}}
                     <div class="dropdown nxl-h-item me-3">
                         <a href="javascript:void(0);" class="nxl-head-link me-0" data-bs-toggle="dropdown" role="button" data-bs-auto-close="true">

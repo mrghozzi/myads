@@ -112,6 +112,8 @@ class AppServiceProvider extends ServiceProvider
         View::addNamespace('theme', base_path("themes/$theme/views"));
         View::addNamespace('admin', base_path("admin_themes/$adminTheme/views"));
 
+        View::composer('admin::layouts.admin', \App\Http\View\Composers\AdminNotificationComposer::class);
+
         View::composer('theme::layouts.master', function ($view) {
             $view->with('seo', app(SeoManager::class)->resolve(request()));
         });
