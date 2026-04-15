@@ -2118,4 +2118,8 @@ return [
     'billing_status_failed' => 'Failed',
     'billing_status_cancelled' => 'Cancelled',
     'billing_settings_saved' => 'Billing settings were saved successfully.',
+    'amount' => 'Amount',
+    'plan' => 'Plan',
+    'view_all' => 'View All',
+    'configure' => 'Configure',
 ];

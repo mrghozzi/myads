@@ -2117,4 +2117,8 @@ return [
     'billing_status_failed' => 'فاشل',
     'billing_status_cancelled' => 'ملغي',
     'billing_settings_saved' => 'تم حفظ إعدادات الفوترة بنجاح.',
+    'amount' => 'المبلغ',
+    'plan' => 'الخطة',
+    'view_all' => 'عرض الكل',
+    'configure' => 'إعداد',
 ];

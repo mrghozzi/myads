@@ -2119,4 +2119,8 @@ return [
     'billing_status_failed' => 'Fallito',
     'billing_status_cancelled' => 'Annullato',
     'billing_settings_saved' => 'Le impostazioni di fatturazione sono state salvate con successo.',
+    'amount' => 'Importo',
+    'plan' => 'Piano',
+    'view_all' => 'Vedi tutto',
+    'configure' => 'Configura',
 ];

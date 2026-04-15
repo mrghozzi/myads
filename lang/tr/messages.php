@@ -2119,4 +2119,8 @@ return [
     'billing_status_failed' => 'Başarısız',
     'billing_status_cancelled' => 'İptal Edildi',
     'billing_settings_saved' => 'Faturalandırma ayarları başarıyla kaydedildi.',
+    'amount' => 'Tutar',
+    'plan' => 'Plan',
+    'view_all' => 'Hepsini Gör',
+    'configure' => 'Yapılandır',
 ];

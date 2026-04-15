@@ -2119,4 +2119,8 @@ return [
     'billing_status_failed' => 'Échec',
     'billing_status_cancelled' => 'Annulé',
     'billing_settings_saved' => 'Les paramètres de facturation ont été enregistrés avec succès.',
+    'amount' => 'Montant',
+    'plan' => 'Plan',
+    'view_all' => 'Voir tout',
+    'configure' => 'Configurer',
 ];

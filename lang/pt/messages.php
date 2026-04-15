@@ -2119,4 +2119,8 @@ return [
     'billing_status_failed' => 'Falhou',
     'billing_status_cancelled' => 'Cancelado',
     'billing_settings_saved' => 'As configurações de faturação foram guardadas com sucesso.',
+    'amount' => 'Quantia',
+    'plan' => 'Plano',
+    'view_all' => 'Ver tudo',
+    'configure' => 'Configurar',
 ];

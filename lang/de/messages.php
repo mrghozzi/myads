@@ -2119,4 +2119,8 @@ return [
     'billing_status_failed' => 'Fehlgeschlagen',
     'billing_status_cancelled' => 'Storniert',
     'billing_settings_saved' => 'Die Abrechnungseinstellungen wurden erfolgreich gespeichert.',
+    'amount' => 'Betrag',
+    'plan' => 'Plan',
+    'view_all' => 'Alles anzeigen',
+    'configure' => 'Konfigurieren',
 ];

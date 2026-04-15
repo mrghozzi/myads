@@ -2119,4 +2119,8 @@ return [
     'billing_status_failed' => 'ناموفق',
     'billing_status_cancelled' => 'لغو شده',
     'billing_settings_saved' => 'تنظیمات صورتحساب با موفقیت ذخیره شد.',
+    'amount' => 'مبلغ',
+    'plan' => 'طرح',
+    'view_all' => 'مشاهده همه',
+    'configure' => 'پیکربندی',
 ];
