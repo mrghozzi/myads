@@ -125,6 +125,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/settings/billing', [BillingController::class, 'dashboard'])->name('billing.dashboard');
     Route::post('/plans/{plan}/purchase', [BillingController::class, 'purchase'])->name('billing.purchase');
     Route::get('/billing/orders/{order}', [BillingController::class, 'showOrder'])->name('billing.orders.show');
+    Route::get('/billing/orders/{order}/receipt', [BillingController::class, 'showReceipt'])->name('billing.orders.receipt.show');
     Route::post('/billing/orders/{order}/receipt', [BillingController::class, 'uploadReceipt'])->name('billing.orders.receipt.update');
     Route::get('/billing/return/{gateway}/{order}', [BillingController::class, 'handleReturn'])->name('billing.return');
 });

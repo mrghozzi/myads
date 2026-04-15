@@ -82,11 +82,13 @@
             </div>
         @endif
 
-        @if($order->receipt_path)
+        @php($receiptUrl = $order->receiptUrl())
+
+        @if($receiptUrl)
             <div class="widget-box" style="margin-bottom: 20px;">
                 <div class="widget-box-content" style="padding: 28px;">
                     <p class="widget-box-title" style="margin-bottom: 16px;">{{ __('messages.billing_receipt_current_title') }}</p>
-                    <img src="{{ asset($order->receipt_path) }}" alt="{{ __('messages.billing_receipt_title') }}" class="img-fluid rounded" style="margin-bottom: 16px;">
+                    <img src="{{ $receiptUrl }}" alt="{{ __('messages.billing_receipt_title') }}" class="img-fluid rounded" style="margin-bottom: 16px;">
                     @if($order->receipt_note)
                         <p class="user-status-text">{{ __('messages.billing_receipt_note_label') }}: {{ $order->receipt_note }}</p>
                     @endif

@@ -100,4 +100,11 @@ class BillingOrder extends Model
 
         return Str::headline(str_replace('_', ' ', (string) $this->gateway));
     }
+
+    public function receiptUrl(): ?string
+    {
+        return filled($this->receipt_path)
+            ? route('billing.orders.receipt.show', $this->id)
+            : null;
+    }
 }

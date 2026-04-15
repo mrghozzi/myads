@@ -78,8 +78,9 @@
                         </div>
                     </div>
                 </section>
+                @php($receiptUrl = $order->receiptUrl())
 
-                @if($order->receipt_path)
+                @if($receiptUrl)
                     <section class="admin-panel mt-3">
                         <div class="admin-panel__header">
                             <div>
@@ -89,7 +90,7 @@
                         </div>
                         <div class="admin-panel__body">
                             <div class="mb-3">
-                                <img src="{{ asset($order->receipt_path) }}" alt="{{ __('messages.billing_receipt_title') }}" class="img-fluid rounded border">
+                                <img src="{{ $receiptUrl }}" alt="{{ __('messages.billing_receipt_title') }}" class="img-fluid rounded border">
                             </div>
                             @if($order->receipt_note)
                                 <div class="text-muted small">{{ __('messages.billing_receipt_note_label') }}</div>

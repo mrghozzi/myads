@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\BillingOrder;
 use App\Models\BillingTransaction;
+use App\Services\AdminAccessService;
 use App\Services\Billing\BillingCurrencyService;
 use App\Services\Billing\BillingGatewayRegistry;
 use App\Services\Billing\SubscriptionEntitlementService;
@@ -20,6 +21,7 @@ class BillingController extends Controller
 {
     public function __construct(
         private readonly V420SchemaService $schema,
+        private readonly AdminAccessService $adminAccess,
         private readonly BillingGatewayRegistry $gateways,
         private readonly BillingCurrencyService $currencies,
         private readonly SubscriptionPlanService $plans,
@@ -197,9 +199,9 @@ class BillingController extends Controller
                 ->with('error', __('messages.billing_receipt_upload_unavailable'));
         }
 
-        $uploadDirectory = public_path('upload/billing/receipts');
+        $uploadDirectory = storage_path(str_replace('/', DIRECTORY_SEPARATOR, 'app/private/billing/receipts'));
         if (!is_dir($uploadDirectory)) {
-            mkdir($uploadDirectory, 0775, true);
+            mkdir($uploadDirectory, 0755, true);
         }
 
         $extension = $request->file('receipt')->getClientOriginalExtension();
@@ -208,12 +210,35 @@ class BillingController extends Controller
 
         $this->lifecycle->uploadReceipt(
             $orderModel,
-            'upload/billing/receipts/' . $filename,
+            'private/billing/receipts/' . $filename,
             $validated['receipt_note'] ?? null
         );
 
         return redirect()->route('billing.orders.show', $order)
             ->with('success', __('messages.billing_receipt_uploaded'));
+    }
+
+    public function showReceipt(Request $request, int $order)
+    {
+        abort_unless($this->schema->supports('subscriptions_billing'), 404);
+
+        $orderModel = BillingOrder::query()->findOrFail($order);
+        $user = $request->user();
+        $canViewOwnReceipt = (int) $orderModel->user_id === (int) $user->id;
+        $canViewAsBillingAdmin = $this->adminAccess->canAccess($user, null, 'billing');
+
+        abort_if(!$canViewOwnReceipt && !$canViewAsBillingAdmin, 404);
+
+        $filePath = $this->resolveReceiptFilePath($orderModel);
+        abort_if($filePath === null, 404);
+
+        $mimeType = mime_content_type($filePath) ?: 'application/octet-stream';
+
+        return response()->file($filePath, [
+            'Content-Type' => $mimeType,
+            'Cache-Control' => 'private, no-store, max-age=0',
+            'X-Robots-Tag' => 'noindex, nofollow, noimageindex',
+        ]);
     }
 
     public function handleReturn(Request $request, string $gateway, int $order)
@@ -323,5 +348,77 @@ class BillingController extends Controller
             'path' => request()->url(),
             'query' => request()->query(),
         ]);
+    }
+
+    private function resolveReceiptFilePath(BillingOrder $order): ?string
+    {
+        $relativePath = $this->normalizeReceiptPath((string) $order->receipt_path);
+        if ($relativePath === null) {
+            return null;
+        }
+
+        $storagePath = storage_path('app/' . str_replace('/', DIRECTORY_SEPARATOR, $relativePath));
+        if (is_file($storagePath)) {
+            return $storagePath;
+        }
+
+        $legacyRootPath = base_path(str_replace('/', DIRECTORY_SEPARATOR, $relativePath));
+        $legacyPublicPath = public_path(str_replace('/', DIRECTORY_SEPARATOR, $relativePath));
+        $sourcePath = is_file($legacyRootPath)
+            ? $legacyRootPath
+            : (is_file($legacyPublicPath) ? $legacyPublicPath : null);
+
+        if ($sourcePath === null) {
+            return null;
+        }
+
+        $protectedRelativePath = $this->protectedReceiptRelativePath($relativePath);
+        $protectedStoragePath = storage_path('app/' . str_replace('/', DIRECTORY_SEPARATOR, $protectedRelativePath));
+        $protectedDirectory = dirname($protectedStoragePath);
+
+        if (!is_dir($protectedDirectory) && !@mkdir($protectedDirectory, 0755, true) && !is_dir($protectedDirectory)) {
+            return null;
+        }
+
+        if (!is_file($protectedStoragePath) && !@copy($sourcePath, $protectedStoragePath)) {
+            return null;
+        }
+
+        if (is_file($protectedStoragePath)) {
+            if ($order->receipt_path !== $protectedRelativePath) {
+                $order->forceFill([
+                    'receipt_path' => $protectedRelativePath,
+                ])->save();
+            }
+
+            if (is_file($legacyRootPath)) {
+                @unlink($legacyRootPath);
+            }
+
+            if (is_file($legacyPublicPath)) {
+                @unlink($legacyPublicPath);
+            }
+
+            return $protectedStoragePath;
+        }
+
+        return null;
+    }
+
+    private function normalizeReceiptPath(string $path): ?string
+    {
+        $normalized = trim(str_replace('\\', '/', $path), '/');
+        $normalized = str_replace('..', '', $normalized);
+
+        return $normalized !== '' ? $normalized : null;
+    }
+
+    private function protectedReceiptRelativePath(string $relativePath): string
+    {
+        if (str_starts_with($relativePath, 'private/')) {
+            return $relativePath;
+        }
+
+        return 'private/billing/receipts/' . basename($relativePath);
     }
 }
