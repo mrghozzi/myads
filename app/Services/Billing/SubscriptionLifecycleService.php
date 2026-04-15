@@ -391,6 +391,51 @@ class SubscriptionLifecycleService
         }
     }
 
+    public function grantManualSubscription(User $user, SubscriptionPlan $plan): MemberSubscription
+    {
+        return DB::transaction(function () use ($user, $plan): MemberSubscription {
+            $this->cancelAllSubscriptions($user);
+            
+            $planSnapshot = $this->plans->planSnapshot($plan);
+            $planName = (string) ($planSnapshot['name'] ?? __('messages.billing_subscription_plan'));
+
+            $subscription = MemberSubscription::query()->create([
+                'user_id' => (int) $user->id,
+                'subscription_plan_id' => (int) $plan->id,
+                'status' => MemberSubscription::STATUS_ACTIVE,
+                'plan_name' => $planName,
+                'plan_snapshot' => $planSnapshot,
+                'entitlements_snapshot' => (array) ($planSnapshot['entitlements'] ?? []),
+                'starts_at' => now(),
+                'ends_at' => $this->calculateEndsAt($planSnapshot, now()),
+                'activated_at' => now(),
+                'meta' => [
+                    'source' => 'admin_manual_grant',
+                    'granted_by' => auth()->id(),
+                ],
+            ]);
+
+            $this->entitlements->applyActivationBenefits($user, $subscription);
+
+            return $subscription;
+        });
+    }
+
+    public function cancelAllSubscriptions(User|int $user): void
+    {
+        $userId = $user instanceof User ? (int) $user->id : (int) $user;
+
+        DB::transaction(function () use ($userId): void {
+            MemberSubscription::query()
+                ->where('user_id', $userId)
+                ->whereIn('status', [MemberSubscription::STATUS_ACTIVE, MemberSubscription::STATUS_QUEUED])
+                ->update([
+                    'status' => MemberSubscription::STATUS_CANCELLED,
+                    'completed_at' => now(),
+                ]);
+        });
+    }
+
     public function logTransaction(BillingOrder $order, array $payload): BillingTransaction
     {
         return BillingTransaction::query()->create([

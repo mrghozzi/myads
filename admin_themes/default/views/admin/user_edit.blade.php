@@ -128,6 +128,45 @@
                             <label class="admin-form-label">{{ __('messages.text_ads_pts') }} (nlink)</label>
                             <input type="number" step="0.01" class="form-control" name="nlink" value="{{ $user->nlink }}" required>
                         </div>
+                        @if($billingEnabled)
+                        <div class="admin-form-grid__full mt-4">
+                            <h5 class="admin-form-label border-bottom pb-2">{{ __('messages.subscription_management') }}</h5>
+                        </div>
+                        <div class="admin-form-grid__full">
+                            <label class="admin-form-label">{{ __('messages.current_subscription') }}</label>
+                            <div class="mb-3">
+                                @if($activeSubscription)
+                                    <span class="badge bg-success">{{ $activeSubscription->plan_name }}</span>
+                                    <small class="text-muted ms-2">({{ __('messages.ends_at') }}: {{ $activeSubscription->ends_at ? $activeSubscription->ends_at->format('Y-m-d') : __('messages.lifetime') }})</small>
+                                @else
+                                    <span class="badge bg-secondary">{{ __('messages.no_active_subscription') }}</span>
+                                @endif
+                            </div>
+                        </div>
+                        <div class="admin-form-grid__full">
+                            <label class="admin-form-label">{{ __('messages.select_plan') }}</label>
+                            <select class="form-select" name="subscription_plan_id">
+                                <option value="0">{{ __('messages.none_cancel') }}</option>
+                                @foreach($subscriptionPlans as $plan)
+                                    <option value="{{ $plan->id }}" {{ ($activeSubscription && $activeSubscription->subscription_plan_id == $plan->id) ? 'selected' : '' }}>
+                                        {{ $plan->name }} ({{ $plan->duration_days ?: '∞' }} {{ __('messages.days') }})
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                        @endif
+
+                        <div class="admin-form-grid__full mt-3 mb-3">
+                            <div class="form-check form-switch p-0">
+                                <div class="d-flex align-items-center gap-2">
+                                    <input class="form-check-input ms-0" type="checkbox" name="notify_user" id="notify_user" value="1">
+                                    <label class="form-check-label" for="notify_user">
+                                        {{ __('messages.notify_user') }}
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="admin-form-grid__full">
                             <label class="admin-form-label">{{ __('messages.smart_ads_credits_admin') }}</label>
                             <input type="number" step="0.01" class="form-control" name="nsmart" value="{{ $user->nsmart }}" required>

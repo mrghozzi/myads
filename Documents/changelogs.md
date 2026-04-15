@@ -26,6 +26,12 @@
 * **Compatibility**: Direct community publishing is limited to published Knowledgebase articles (`o_order = 0`); guest submissions and pending suggestions continue to save safely without generating community posts.
 * **i18n**: Updated the Knowledgebase community-publishing hints and success messages across all **9 supported languages**.
 
+### User Management & Localization
+* **i18n**: Fully localized the **User Edit** page (`/admin/users/{id}/edit`) in the admin panel, replacing all hardcoded English strings with translation keys across all **9 supported languages**.
+* **Feature**: Added a dedicated **Subscription Management** section to the User Edit page (visible when billing is enabled), allowing administrators to manually grant, change, or cancel member subscriptions directly from the dashboard.
+* **Notifications**: Introduced a **Notify user of changes** toggle in the User Edit form, enabling administrators to send internal system notifications to members whenever their account details or subscription status are modified.
+* **Add**: Added new translation keys for manual subscription grants, cancellation actions, and administrator update notifications in both Arabic and English.
+
 ---
 
 # v4.2.5

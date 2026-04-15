@@ -53,6 +53,11 @@ use App\Support\SmartAdsSettings;
 use App\Support\SmartAdTargeting;
 use App\Support\StoreCategoryCatalog;
 use Illuminate\Validation\ValidationException;
+use App\Support\SubscriptionSettings;
+use App\Services\Billing\SubscriptionPlanService;
+use App\Services\Billing\SubscriptionLifecycleService;
+use App\Services\Billing\SubscriptionEntitlementService;
+use App\Services\NotificationService;
 
 class AdminController extends Controller
 {
@@ -68,7 +73,11 @@ class AdminController extends Controller
 
     public function __construct(
         private readonly GamificationService $gamification,
-        private readonly MaintenanceModeManager $maintenanceMode
+        private readonly MaintenanceModeManager $maintenanceMode,
+        private readonly SubscriptionPlanService $plans,
+        private readonly SubscriptionLifecycleService $subscriptions,
+        private readonly SubscriptionEntitlementService $entitlements,
+        private readonly NotificationService $notifications
     ) {
     }
 
@@ -555,7 +564,11 @@ class AdminController extends Controller
                             ->first();
         $slug = $slugOption ? $slugOption->o_valuer : '';
 
-        return view('admin::admin.user_edit', compact('user', 'slug'));
+        $billingEnabled = SubscriptionSettings::isEnabled();
+        $subscriptionPlans = $billingEnabled ? $this->plans->activePlans() : collect();
+        $activeSubscription = $billingEnabled ? $this->entitlements->activeSubscriptionFor($user) : null;
+
+        return view('admin::admin.user_edit', compact('user', 'slug', 'billingEnabled', 'subscriptionPlans', 'activeSubscription'));
     }
 
     public function updateUser(Request $request, $id)
@@ -572,6 +585,8 @@ class AdminController extends Controller
             'nvu' => 'required|numeric',
             'nlink' => 'required|numeric',
             'nsmart' => 'required|numeric',
+            'subscription_plan_id' => 'nullable|integer',
+            'notify_user' => 'nullable|boolean',
         ]);
 
         // slugify input to ensure URL safety for the slug handle
@@ -596,6 +611,35 @@ class AdminController extends Controller
                 'o_valuer' => $slug
             ]
         );
+
+        // Handle Subscription Change
+        $subscriptionChanged = false;
+        if (SubscriptionSettings::isEnabled() && $request->has('subscription_plan_id')) {
+            $newPlanId = (int) $request->subscription_plan_id;
+            $currentSub = $this->entitlements->activeSubscriptionFor($user);
+            $currentPlanId = $currentSub ? (int) $currentSub->subscription_plan_id : 0;
+
+            if ($newPlanId !== $currentPlanId) {
+                if ($newPlanId === 0) {
+                    $this->subscriptions->cancelAllSubscriptions($user);
+                } else {
+                    $plan = $this->plans->find($newPlanId, true);
+                    if ($plan) {
+                        $this->subscriptions->grantManualSubscription($user, $plan);
+                    }
+                }
+                $subscriptionChanged = true;
+            }
+        }
+
+        // Handle Notifications
+        if ($request->boolean('notify_user')) {
+            $msg = __('messages.notification_admin_update');
+            if ($subscriptionChanged) {
+                $msg = __('messages.notification_subscription_update');
+            }
+            $this->notifications->send($user, $msg);
+        }
 
         return redirect()->back()->with('success', __('messages.user_updated_successfully'));
     }
