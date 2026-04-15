@@ -83,6 +83,13 @@ class SubscriptionEntitlementService
         $label = trim((string) ($entitlements['profile_badge_label'] ?? ''));
 
         if ($label === '') {
+            // Hardcoded fallback for Super Admin (ID=1) to ensure they show a premium badge
+            if ($userId === 1) {
+                return [
+                    'label' => 'Super Admin',
+                    'color' => '#fbbf24', // Gold
+                ];
+            }
             return null;
         }
 
