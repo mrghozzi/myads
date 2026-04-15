@@ -110,7 +110,7 @@
                     <a href="{{ route('orders.show', $order->id) }}" class="button secondary small">{{ __('messages.view_details') }}</a>
                     @auth
                         @if(auth()->id() != $order->uid)
-                            <a href="{{ url('/messages/' . $order->uid) }}" class="button primary small">
+                            <a href="{{ url('/messages/' . \App\Models\Message::encodeConversationRouteKey(auth()->user(), $order->uid)) }}" class="button primary small">
                                 <i class="fa fa-envelope"></i>&nbsp;{{ __('messages.contact_client') }}
                             </a>
                         @endif

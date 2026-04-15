@@ -25,7 +25,7 @@
                  @auth
                     <div class="widget-box-actions" style="margin-top: 20px;">
                         @if(auth()->id() != $order->uid)
-                            <a href="{{ url('/messages/' . $order->uid) }}" class="button primary full">
+                            <a href="{{ url('/messages/' . \App\Models\Message::encodeConversationRouteKey(auth()->user(), $order->uid)) }}" class="button primary full">
                                 <i class="fa fa-envelope"></i>&nbsp;{{ __('messages.send_message') }}
                             </a>
                         @endif

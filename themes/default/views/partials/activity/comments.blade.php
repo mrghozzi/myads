@@ -153,6 +153,10 @@
                             @endfor
                         </select>
                     </form>
+
+                    <a href="{{ url('/messages/' . \App\Models\Message::encodeConversationRouteKey(auth()->user(), $user->id)) }}" class="button primary small" style="padding: 0 12px; height: 28px;">
+                        <i class="fa fa-envelope"></i> {{ __('messages.contact_offer_owner') }}
+                    </a>
                 </div>
             @endif
         </div>

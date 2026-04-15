@@ -380,6 +380,7 @@ return [
     'connection_status' => 'Connection Status',
     'contact' => 'Contact Info',
     'contact_client' => 'Contact Client',
+    'contact_offer_owner' => 'Contact Offer Owner',
     'content' => 'Content',
     'conversation_starter' => 'Conversation Starter',
     'cookie_accept_all' => 'Accept All',

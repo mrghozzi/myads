@@ -382,6 +382,7 @@ return [
     'connection_status' => 'حالة الإتصال',
     'contact' => 'معلومات الاتصال',
     'contact_client' => 'تواصل مع صاحب الطلب',
+    'contact_offer_owner' => 'تواصل مع صاحب العرض',
     'content' => 'المحتوى',
     'conversation_starter' => 'صانع الحوار',
     'cookie_accept_all' => 'قبول الكل',
