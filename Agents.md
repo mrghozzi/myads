@@ -58,6 +58,10 @@ MYADS is a community platform where website owners:
 
 ```
 myads/
+├── admin_themes/           # Admin-only themes (Duralux lives here)
+│   └── default/
+│       ├── assets/         # Admin CSS, JS, images
+│       └── views/          # Admin Blade templates via `admin::`
 ├── app/
 │   ├── Console/Commands/  # Artisan commands such as update safety preflight
 │   ├── Helpers/           # Hooks.php (WordPress-like action/filter system)
@@ -147,12 +151,14 @@ myads/
 | `MessageController` | Private messaging |
 | `NotificationController` | Notification center, mark-all-read |
 | `OrderRequestController` | Order requests CRUD, bidding, rating |
+| `BillingController` | Member paid plans catalog, billing dashboard, purchases, receipts, returns, webhooks |
 | `NewsController` | Public news pages |
 | `ReportController` | Content reporting |
 | `TagController` | Tag/hashtag pages |
 | `PageController` | Static pages (privacy, terms, custom) |
 | `AdminController` | **Main admin controller** — users, ads, forum, directory, store, widgets, menus, plugins, themes, settings, news, reports, emojis, knowledgebase, maintenance mode settings |
 | `AdminAdminsController` | Admin ACL management |
+| `AdminBillingController` | Admin billing hub: settings, plans, orders, transactions, currencies, gateways |
 | `AdminSeoController` | SEO suite admin |
 | `AdminPageController` | Custom pages admin CRUD |
 | `AdminStatusPromotionController` | Admin monitoring and settings for promoted community posts |
@@ -203,6 +209,11 @@ myads/
 | `PointTransaction` | `point_transactions` | Points ledger |
 | `Quest` / `QuestProgress` | `quests` / `quest_progress` | Daily/weekly quests |
 | `OrderRequest` | `order_requests` | Service order requests |
+| `SubscriptionPlan` | `subscription_plans` | Paid plan catalog with pricing, duration, bullets, and entitlements |
+| `MemberSubscription` | `member_subscriptions` | Active/queued/expired member subscription lifecycle records |
+| `BillingOrder` | `billing_orders` | Subscription checkout orders and manual-review state |
+| `BillingTransaction` | `billing_transactions` | Minimal payment event log per order |
+| `BillingCurrency` | `billing_currencies` | Billing currencies, base-currency flag, and manual exchange rates |
 | `SiteAdmin` | `site_admins` | Admin ACL (module-scoped permissions) |
 | `UserPrivacySetting` | `user_privacy_settings` | Per-member privacy controls |
 | `SeoSetting` / `SeoRule` / `SeoDailyMetric` | `seo_settings` / `seo_rules` / `seo_daily_metrics` | SEO engine |
@@ -223,8 +234,13 @@ myads/
 | `LinkPreviewService` | Fetches URL metadata for link posts |
 | `NotificationService` | Creates and manages notifications |
 | `StatusActivityService` | Status/activity card rendering logic |
-| `StatusPromotionPricingService` | Smart PTS pricing, delivery caps, and duration estimates for promoted posts |
+| `StatusPromotionPricingService` | Smart PTS pricing, delivery caps, duration estimates, and active-subscription discount support for promoted posts |
 | `StatusPromotionService` | Campaign creation, feed injection, pacing, progress tracking, and admin actions for promoted posts |
+| `BillingGatewayRegistry` | Resolves enabled payment gateways and prepares admin/member gateway definitions |
+| `BillingCurrencyService` | Base currency, conversions, supported currency filtering, and currency CRUD helpers |
+| `SubscriptionPlanService` | Plan CRUD, search/pagination, snapshots, and entitlement normalization |
+| `SubscriptionLifecycleService` | Order creation, receipt upload, payment completion, manual bank-transfer review, and active/queued subscription transitions |
+| `SubscriptionEntitlementService` | Applies subscription entitlements (PTS, ad credits, profile badge, promotion discount) |
 | `PluginManager` | Discovers, activates, manages plugins |
 | `ThemeManager` | Theme discovery and management |
 | `SeoManager` | Centralized SEO context (titles, OG, structured data) |
@@ -234,7 +250,7 @@ myads/
 | `SmartAdGeoResolver` | Geo-targeting for Smart Ads |
 | `MaintenanceModeManager` | Stores maintenance state, uploads the maintenance logo, handles emergency bypass, and writes maintenance logs |
 | `ReleaseUpdateService` | Applies downloaded release packages, runs migrations, clears caches, and centralizes updater file replacement |
-| `V420SchemaService` | Graceful fallback detection for incomplete v4.2.0 upgrades |
+| `V420SchemaService` | Graceful fallback detection for incomplete v4.2.0 upgrades, including the `subscriptions_billing` feature set |
 | `TestingSafetyGuard` | Hard-fails tests unless they are using the isolated SQLite testing database |
 | `UpdateSafetyService` | Preflight safety checks for updates: DB connection, writable paths, pending migrations, destructive migration detection |
 
@@ -265,6 +281,13 @@ myads/
 | `/admin/ads/posts/settings` | `/admin/ads/posts/settings` | Admin pricing and delivery settings for promoted posts |
 | `/admin/maintenance` | `/admin/maintenance` | Admin maintenance dashboard, toggle, message, and logo settings |
 | `/admin/maintenance/settings` | `/admin/maintenance/settings` | Persists maintenance mode configuration from the admin panel |
+| `/plans` | `/plans` | Public/member paid plans catalog (hidden when billing is disabled) |
+| `/settings/billing` | `/settings/billing` | Member billing dashboard and subscription history |
+| `/billing/orders/{order}` | `/billing/orders/15` | Member order details and bank-transfer receipt upload |
+| `/billing/return/{gateway}/{order}` | `/billing/return/stripe/15` | Hosted checkout return handler |
+| `/billing/webhook/{gateway}` | `/billing/webhook/paypal` | Payment gateway webhook endpoint |
+| `/admin/billing` | `/admin/billing` | Admin billing overview and financial hub |
+| `/admin/billing/gateways` | `/admin/billing/gateways` | Admin gateway configuration for Stripe, PayPal, and Bank Transfer |
 | `/share` | `/share?text={content}` | External share endpoint (requires auth) |
 | `/developer` | `/developer` | Public developer documentation for Share API |
 
@@ -281,9 +304,10 @@ All under `/admin` prefix with `['auth', 'admin']` middleware.
 ## 9. Theme & View System
 
 ### View Namespacing
-All views use `theme::` namespace. Example:
+Public/member views use `theme::`, while admin views use `admin::`. Examples:
 ```blade
 return view('theme::home', $data);
+return view('admin::admin.billing.overview', $data);
 @include('theme::partials.header.nav')
 ```
 
@@ -306,6 +330,13 @@ orders/        → Order requests
 news/          → News pages
 visits/        → Visit exchange
 pages/         → Static pages (privacy, terms, custom)
+billing/       → Member billing catalog, dashboard, order details
+```
+
+### Admin Theme Directory (`admin_themes/default/views/`)
+```
+layouts/       → admin shell layout (`admin::layouts.admin`)
+admin/billing/ → Billing hub, plans, orders, transactions, currencies, gateways
 ```
 
 ### Theme Assets Helper
@@ -346,9 +377,9 @@ pages/         → Static pages (privacy, terms, custom)
 - **Registration defaults:** Standard signups start with avatar `upload/avatar.png` and cover `upload/cover.jpg`. Social signups keep the provider avatar but also start with cover `upload/cover.jpg`.
 - **Hashing:** Bcrypt (with legacy MD5 auto-upgrade on login)
 - **Admin:** `user_id=1` is **permanent super-admin** (cannot be removed)
-- **Admin ACL:** `site_admins` table with module-scoped permissions, managed via `/admin/admins`
+- **Admin ACL:** `site_admins` table with module-scoped permissions, managed via `/admin/admins`. Current module list includes `billing`.
 - **CAPTCHA:** On registration
-- **CSRF:** Laravel middleware on all forms (installer routes excluded)
+- **CSRF:** Laravel middleware on all forms (installer routes excluded). Billing webhooks are isolated exceptions via `billing/webhook/*`.
 - **API Auth:** Sanctum bearer tokens
 
 ---
@@ -375,6 +406,19 @@ pages/         → Static pages (privacy, terms, custom)
 - `V420SchemaService` — graceful fallback when upgrade tables are missing
 - Controllers/views degrade gracefully with translated upgrade notices instead of 500 errors
 - Promoted posts use the `post_promotions` feature flag, which currently checks for the `status_promotions` table before exposing member/admin UI
+- Paid subscriptions use the `subscriptions_billing` feature flag, which requires `subscription_plans`, `member_subscriptions`, `billing_orders`, `billing_transactions`, and `billing_currencies`
+
+### Paid Subscriptions & Billing (v4.3.0)
+- **Feature Toggle:** System-wide billing state is stored in `options` via `App\Support\SubscriptionSettings` (`o_type = subscription_settings`) and can be enabled/disabled from `/admin/billing/settings`
+- **Gateway Config:** Per-gateway settings live in `options` via `App\Support\SubscriptionGatewaySettings` (`o_type = subscription_gateway_settings`); secrets are encrypted with Laravel `Crypt` and masked in admin
+- **Supported Gateways:** First-party billing release supports `Stripe`, `PayPal`, and `Bank Transfer` only
+- **Routes:** Member flows use `/plans`, `/settings/billing`, `/billing/orders/{order}`, `/billing/return/{gateway}/{order}`, and `/billing/webhook/{gateway}`; admin flows live under `/admin/billing/*`
+- **Hosted Checkout Rule:** `Stripe` and `PayPal` must use hosted external checkout only; MYADS must not collect card data or personal payment data directly
+- **Manual Review Flow:** `Bank Transfer` orders move through `pending_receipt` → `pending_review` → `paid`/`rejected`, with receipt uploads stored under `public/upload/billing/receipts/`
+- **Subscription Logic:** Same-plan repurchase extends the active subscription, while a different paid plan is queued to start after the current active subscription ends
+- **Entitlements:** Plans can grant `bonus_pts`, `bonus_nvu`, `bonus_nlink`, `bonus_nsmart`, `profile_badge_label`, `profile_badge_color`, and `status_promotion_discount_pct`
+- **Privacy Rule:** Persist only minimal payment metadata (`external ids`, `amount`, `currency`, `exchange snapshot`, sanitized `meta`); never store bank/card identity data inside MYADS
+- **UI Integration:** Billing appears in the Duralux admin sidebar, in `profile.settings_nav`, and active subscription badges can surface on public profile pages
 
 ### Ad Serving
 - Legacy endpoints preserved: `bn.php`, `link.php`, `smart.php`
@@ -484,10 +528,10 @@ MAIL_HOST=smtp.example.com
 ## 15. Testing
 
 - **Framework:** PHPUnit 11
-- **Location:** `tests/Feature/` (26 test files), `tests/Concerns/`
+- **Location:** `tests/Feature/` (40+ feature tests, including `BillingFeatureTest.php`), `tests/Concerns/`
 - **Run:** `php artisan test --env=testing` or `composer test`
 - **Isolation:** Tests must run only against `.env.testing` with `sqlite` and `database/testing.sqlite`. Never point tests at a MySQL/MariaDB site database.
-- **Coverage areas:** Installer flow, forum features, banner/link/smart ads, store, SEO, locale/RTL, notifications, profile/follow, directory, maintenance/update safety, and v4.2.x features (community, privacy, ACL, translations, upgrade fallbacks)
+- **Coverage areas:** Installer flow, forum features, banner/link/smart ads, store, SEO, locale/RTL, notifications, profile/follow, directory, maintenance/update safety, paid subscriptions/billing, and v4.2.x+ features (community, privacy, ACL, translations, upgrade fallbacks)
 
 ---
 
@@ -589,13 +633,15 @@ php artisan storage:link
 | Add a new widget type | Update `$allowedTypes` in `AdminController@widgetForm` and `storeWidget` validation → add option to `themes/default/views/admin/widgets.blade.php` → add case in `resources/views/components/widget-column.blade.php` → create partial in `themes/default/views/partials/widgets/` |
 |------|-----|
 | Add a new page | Create controller method → add route in `web.php` → create Blade in `themes/default/views/` → add translation keys to all 9 locales |
-| Add admin section | Add routes under `admin` prefix → create admin Blade in `themes/default/views/admin/` → update `AdminAccessService` module list if ACL-gated |
+| Add admin section | Add routes under `admin` prefix → create admin Blade in `admin_themes/default/views/admin/` → update `AdminAccessService` module list if ACL-gated |
 | Add promoted-post pricing or delivery rule | Update `app/Support/StatusPromotionSettings.php` defaults/normalization → adjust `app/Services/StatusPromotionPricingService.php` and `app/Services/StatusPromotionService.php` → cover the change in `tests/Feature/StatusPromotionFeatureTest.php` |
+| Extend billing system | Update `app/Support/SubscriptionSettings.php` / `SubscriptionGatewaySettings.php` as needed → keep controllers thin → implement logic in `app/Services/Billing/` → add translations in all locales → cover with `tests/Feature/BillingFeatureTest.php` |
+| Add billing gateway | Implement `app/Services/Billing/Gateways/BillingGatewayInterface` → register it in `BillingGatewayRegistry` → add admin form fields in `admin_themes/default/views/admin/billing/gateways.blade.php` → update developer docs |
 | Update current release version | Update `app/Support/SystemVersion.php` first -> verify installer/updater/version-sync surfaces -> refresh relevant tests and docs (`Documents/changelogs.md`, `Agents.md`) |
 | Add translation key | Edit `lang/{locale}/messages.php` in ALL 9 directories |
 | Create migration | `php artisan make:migration description` → use `Schema::hasTable()` guards for safety |
 | Add new model | `php artisan make:model Name` → specify `$table`, `$fillable` → place in `app/Models/` |
-| Modify theme | Edit files in `themes/default/views/` and `themes/default/assets/` |
+| Modify theme | Edit public theme files in `themes/default/views/` / `themes/default/assets/`; edit admin UI in `admin_themes/default/views/` / `admin_themes/default/assets/` |
 | Create plugin | Make folder in `plugins/`, add `plugin.json` + `boot.php`, activate from admin |
 | Test changes | `php artisan test --filter=TestName` |
 | Check RTL | Switch locale to `ar` or `fa` via `?lang=ar` |
@@ -613,6 +659,7 @@ php artisan storage:link
 | API Documentation | `Documents/API_DOCS.md` |
 | Theme Guide | `Documents/THEME_GUIDE.md` |
 | Plugin Guide | `Documents/PLUGIN_GUIDE.md` |
+| Billing Developer Guide | `Documents/PAID_SUBSCRIPTIONS_GUIDE.md` |
 | Changelog | `Documents/changelogs.md` |
 | Security Policy | `SECURITY.md` |
 
@@ -693,9 +740,18 @@ php artisan storage:link
 
 ## 19H. Version 4.3.0 Strategic Update Cycle (Started 2026-04-12)
 
-- **Status:** Initializing.
+- **Status:** In Progress.
 - **Focus:** Strategic platform advancements and major feature foundations.
 - **Initial Changes:** Bumped canonical `SystemVersion::CURRENT` to v4.3.0 and migrated documentation to the new version baseline.
+- **Feature (2026-04-14):** Added an optional paid subscriptions and billing system with admin control over plans, currencies, prices, supported gateways, and system enable/disable state.
+- **Controllers:** Added `BillingController` and `AdminBillingController`.
+- **Models:** Added `SubscriptionPlan`, `MemberSubscription`, `BillingOrder`, `BillingTransaction`, and `BillingCurrency`.
+- **Services & Support:** Added `BillingGatewayRegistry`, `BillingCurrencyService`, `SubscriptionPlanService`, `SubscriptionLifecycleService`, `SubscriptionEntitlementService`, `SubscriptionSettings`, and `SubscriptionGatewaySettings`.
+- **Gateways:** Implemented hosted-checkout support for `Stripe`, `PayPal`, and `Bank Transfer` through `BillingGatewayInterface`.
+- **Schema:** Added migration `2026_04_14_130000_create_billing_subscription_tables.php` and connected it to `V420SchemaService` through the `subscriptions_billing` feature key.
+- **Routes & ACL:** Added member billing routes (`/plans`, `/settings/billing`, `/billing/orders/{order}`, returns, webhooks) and admin billing routes under `/admin/billing/*`, plus the `billing` admin ACL module.
+- **UI:** Added member billing views under `themes/default/views/billing/` and admin billing views under `admin_themes/default/views/admin/billing/`.
+- **Testing:** Added `tests/Feature/BillingFeatureTest.php` covering billing visibility, bank-transfer review flows, subscription extension/queueing, ACL, and incomplete-upgrade fallback.
 
 ---
 
@@ -721,4 +777,4 @@ If in doubt, update it. An outdated `Agents.md` causes future agents to make wro
 
 ---
 
-*Last updated: 2026-04-12 — MYADS v4.3.0 (Strategic Update Cycle)*
+*Last updated: 2026-04-15 — MYADS v4.3.0 (Billing system documented and synced)*
