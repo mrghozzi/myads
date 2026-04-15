@@ -7,6 +7,7 @@ use App\Models\BillingTransaction;
 use App\Models\MemberSubscription;
 use App\Models\SubscriptionPlan;
 use App\Models\User;
+use App\Services\NotificationService;
 use App\Services\V420SchemaService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -18,7 +19,8 @@ class SubscriptionLifecycleService
         private readonly BillingCurrencyService $currencies,
         private readonly BillingGatewayRegistry $gateways,
         private readonly SubscriptionPlanService $plans,
-        private readonly SubscriptionEntitlementService $entitlements
+        private readonly SubscriptionEntitlementService $entitlements,
+        private readonly NotificationService $notifications
     ) {
     }
 
@@ -131,6 +133,18 @@ class SubscriptionLifecycleService
 
                 $model->meta = array_merge((array) $model->meta, (array) ($payload['meta'] ?? []));
                 $model->save();
+
+                if ($nextStatus === BillingOrder::STATUS_REJECTED) {
+                    $this->notifications->send(
+                        (int) $model->user_id,
+                        __('messages.billing_notification_rejected', [
+                            'order' => $model->order_number,
+                            'reason' => $payload['meta']['admin_note'] ?? $model->admin_note ?? __('messages.rejected'),
+                        ]),
+                        route('billing.orders.show', $model->id),
+                        'credit-card'
+                    );
+                }
             }
 
             $this->logTransaction($model, [
@@ -186,6 +200,16 @@ class SubscriptionLifecycleService
             if ($alreadyPaid) {
                 return $model->refresh();
             }
+
+            $this->notifications->send(
+                (int) $model->user_id,
+                __('messages.billing_notification_paid', [
+                    'order' => $model->order_number,
+                    'plan' => (string) ($model->plan_snapshot['name'] ?? __('messages.billing_subscription_plan')),
+                ]),
+                route('billing.orders.show', $model->id),
+                'credit-card'
+            );
 
             $this->syncUserSubscriptions((int) $model->user_id);
 
@@ -259,6 +283,15 @@ class SubscriptionLifecycleService
             'receipt_path' => $receiptPath,
             'receipt_note' => $note,
         ])->save();
+
+        $this->notifications->send(
+            (int) $order->user_id,
+            __('messages.billing_notification_receipt_uploaded', [
+                'order' => $order->order_number,
+            ]),
+            route('billing.orders.show', $order->id),
+            'credit-card'
+        );
 
         $this->logTransaction($order, [
             'gateway' => $order->gateway,
@@ -338,6 +371,15 @@ class SubscriptionLifecycleService
                             'status' => MemberSubscription::STATUS_EXPIRED,
                             'completed_at' => $activeSubscription->completed_at ?: $activeSubscription->ends_at,
                         ])->save();
+
+                        $this->notifications->send(
+                            $userId,
+                            __('messages.billing_notification_expired', [
+                                'plan' => $activeSubscription->plan_name ?: __('messages.billing_subscription_plan'),
+                            ]),
+                            route('billing.dashboard'),
+                            'credit-card'
+                        );
                     }
                 }
 
@@ -369,6 +411,15 @@ class SubscriptionLifecycleService
                             'activated_at' => $queued->activated_at ?: $now,
                             'ends_at' => $queued->ends_at ?: $this->calculateEndsAt((array) $queued->plan_snapshot, $startsAt),
                         ])->save();
+
+                        $this->notifications->send(
+                            $userId,
+                            __('messages.billing_notification_activated', [
+                                'plan' => $queued->plan_name ?: __('messages.billing_subscription_plan'),
+                            ]),
+                            route('billing.dashboard'),
+                            'credit-card'
+                        );
 
                         $this->entitlements->applyActivationBenefits($userId, $queued);
                         $active = $queued->refresh();
@@ -417,6 +468,15 @@ class SubscriptionLifecycleService
 
             $this->entitlements->applyActivationBenefits($user, $subscription);
 
+            $this->notifications->send(
+                $user,
+                __('messages.billing_notification_granted', [
+                    'plan' => $subscription->plan_name ?: __('messages.billing_subscription_plan'),
+                ]),
+                route('billing.dashboard'),
+                'credit-card'
+            );
+
             return $subscription;
         });
     }
@@ -425,15 +485,32 @@ class SubscriptionLifecycleService
     {
         $userId = $user instanceof User ? (int) $user->id : (int) $user;
 
-        DB::transaction(function () use ($userId): void {
-            MemberSubscription::query()
-                ->where('user_id', $userId)
-                ->whereIn('status', [MemberSubscription::STATUS_ACTIVE, MemberSubscription::STATUS_QUEUED])
-                ->update([
-                    'status' => MemberSubscription::STATUS_CANCELLED,
-                    'completed_at' => now(),
-                ]);
-        });
+        try {
+            DB::transaction(function () use ($userId): void {
+                $subscriptions = MemberSubscription::query()
+                    ->where('user_id', $userId)
+                    ->whereIn('status', [MemberSubscription::STATUS_ACTIVE, MemberSubscription::STATUS_QUEUED])
+                    ->get();
+
+                foreach ($subscriptions as $sub) {
+                    $sub->forceFill([
+                        'status' => MemberSubscription::STATUS_CANCELLED,
+                        'completed_at' => now(),
+                    ])->save();
+
+                    $this->notifications->send(
+                        $userId,
+                        __('messages.billing_notification_cancelled', [
+                            'plan' => $sub->plan_name ?: __('messages.billing_subscription_plan'),
+                        ]),
+                        route('billing.dashboard'),
+                        'credit-card'
+                    );
+                }
+            });
+        } catch (\Throwable) {
+            // Silence
+        }
     }
 
     public function logTransaction(BillingOrder $order, array $payload): BillingTransaction
