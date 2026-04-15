@@ -45,22 +45,161 @@
             </a>
 
             <p class="user-short-description-title"><a href="{{ route('profile.show', $user->username) }}">{{ $user->username }}</a></p>
-            @if(!empty($subscriptionProfileBadge))
-                <div style="margin-top: 10px;">
-                    <span class="badge" style="display: inline-flex; align-items: center; gap: 6px; background: {{ $subscriptionProfileBadge['color'] ?? '#615dfa' }}; color: #fff; border-radius: 999px; padding: 7px 14px; font-size: 12px; font-weight: 700;">
-                        <i class="fa fa-crown" aria-hidden="true"></i>
-                        {{ $subscriptionProfileBadge['label'] }}
-                    </span>
-                </div>
-            @endif
             <p class="user-short-description-text">
                 @if($showOnlineStatus)
                     {{ __('messages.lastcontact') }} {{ \Carbon\Carbon::createFromTimestamp($user->online)->diffForHumans() }}
                 @else
-                    {{ __('messages.online_status_hidden') }}
                 @endif
             </p>
         </div>
+
+        @if(!empty($subscriptionProfileBadge))
+        <div class="profile-header-social-links-wrap superdesign-wrap">
+            <span class="premium-badge" style="background-color: {{ $subscriptionProfileBadge['color'] ?? '#615dfa' }};">
+                <i class="fa fa-crown" aria-hidden="true"></i>
+                {{ $subscriptionProfileBadge['label'] }}
+            </span>
+
+            <div class="social-links-slider-wrapper" style="position: relative; z-index: 2; margin-left: 5px;">
+                <div id="profile-header-social-links-slider" class="profile-header-social-links">
+                    @foreach($socialLinks as $platform => $url)
+                        @php
+                            $iconClass = match($platform) {
+                                'facebook' => 'fab fa-facebook-f',
+                                'twitter' => 'fab fa-x-twitter',
+                                'vkontakte' => 'fab fa-vk',
+                                'linkedin' => 'fab fa-linkedin-in',
+                                'instagram' => 'fab fa-instagram',
+                                'youtube' => 'fab fa-youtube',
+                                'threads' => 'fab fa-threads',
+                                'reddit' => 'fab fa-reddit-alien',
+                                'github' => 'fab fa-github',
+                                'adstn' => 'fa-brands fa-buysellads',
+                                'tiktok' => 'fab fa-tiktok',
+                                'discord' => 'fab fa-discord',
+                                default => 'fa fa-link',
+                            };
+                            $platformColor = match($platform) {
+                                'facebook' => '#1877f2',
+                                'twitter' => '#000000',
+                                'instagram' => '#e4405f',
+                                'youtube' => '#ff0000',
+                                'linkedin' => '#0077b5',
+                                'discord' => '#5865F2',
+                                'tiktok' => '#fe2c55',
+                                'github' => '#24292e',
+                                default => '#615dfa'
+                            };
+                        @endphp
+                        <a class="super-social-link" href="{{ $url }}" target="_blank" data-platform="{{ $platform }}" style="--hover-color: {{ $platformColor }};">
+                            <i class="{{ $iconClass }}"></i>
+                        </a>
+                    @endforeach
+                </div>
+
+                <div id="profile-header-social-links-slider-controls" class="slider-controls" style="position: absolute; top: 50%; left: -22px; width: calc(100% + 44px); transform: translateY(-50%); display: flex; justify-content: space-between; z-index: 10; pointer-events: none;">
+                    <div class="slider-control left" style="pointer-events: auto;">
+                        <svg class="slider-control-icon icon-small-arrow">
+                            <use xlink:href="#svg-small-arrow"></use>
+                        </svg>
+                    </div>
+                    <div class="slider-control right" style="pointer-events: auto;">
+                        <svg class="slider-control-icon icon-small-arrow">
+                            <use xlink:href="#svg-small-arrow"></use>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endif
+
+        <style>
+            .superdesign-wrap {
+                background: rgba(255, 255, 255, 0.05);
+                backdrop-filter: blur(8px);
+                -webkit-backdrop-filter: blur(8px);
+                border-radius: 50px;
+                padding: 4px 12px;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+                display: flex;
+                align-items: center;
+                overflow: visible !important;
+                width: auto !important;
+                height: auto !important;
+                min-height: 48px;
+            }
+
+            html[dir="ltr"] .superdesign-wrap .slider-controls {
+                display: none !important;
+            }
+
+            .premium-badge {
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                color: #fff;
+                border-radius: 50px;
+                padding: 6px 16px;
+                font-size: 11px;
+                font-weight: 800;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0) 100%);
+                margin-right: 6px;
+                white-space: nowrap;
+                transition: transform 0.3s ease;
+                z-index: 3;
+            }
+            .premium-badge:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+            }
+
+            .super-social-link {
+                width: 32px;
+                height: 32px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 50%;
+                background: rgba(255, 255, 255, 0.1);
+                color: #fff;
+                margin: 4px;
+                font-size: 14px;
+                transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                border: 1px solid rgba(255, 255, 255, 0.05);
+            }
+
+            .super-social-link:hover {
+                background: var(--hover-color);
+                color: #fff;
+                transform: scale(1.2) translateY(-3px);
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+                z-index: 10;
+            }
+
+            /* Dark mode adjustments */
+            .dark-mode .superdesign-wrap {
+                background: rgba(0, 0, 0, 0.2);
+                border-color: rgba(255, 255, 255, 0.05);
+            }
+
+            @media screen and (max-width: 991px) {
+                .profile-header-social-links-wrap.superdesign-wrap {
+                    position: static !important;
+                    width: max-content !important;
+                    margin: 16px auto 0 !important;
+                    display: flex !important;
+                    justify-content: center !important;
+                    left: auto !important;
+                    right: auto !important;
+                    transform: none !important;
+                }
+            }
+        </style>
 
         <div class="user-stats">
             <div class="user-stat big">
