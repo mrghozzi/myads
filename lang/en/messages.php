@@ -1872,7 +1872,6 @@ return [
     'bulk_delete_warning' => 'This action will permanently delete all selected users and their associated data.',
     'selected_items_count' => 'Selected items: :count',
     'bulk_delete_items_warning' => 'All selected items will be permanently deleted. This action cannot be undone.',
-    'share' => 'Share',
     'share_to_community' => 'Share to Community',
     'share_page_description' => 'Share content with the MYADS community.',
     'share_with_community' => 'Spread content across the network',
