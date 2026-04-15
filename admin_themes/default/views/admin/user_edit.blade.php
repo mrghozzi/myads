@@ -39,7 +39,7 @@
                     <span class="admin-summary-meta">PTS</span>
                 </div>
                 <div class="admin-summary-card">
-                    <span class="admin-summary-label">{{ __('Exchange Visits PTS') }}</span>
+                    <span class="admin-summary-label">{{ __('messages.exchange_visits_pts') }}</span>
                     <span class="admin-summary-value">{{ number_format((float) $user->vu, 2) }}</span>
                     <span class="admin-summary-meta">VU</span>
                 </div>
@@ -55,7 +55,7 @@
             <div class="admin-link-grid w-100">
                 <a href="{{ route('admin.users') }}" class="btn btn-primary admin-block-link">
                     <i class="feather-users"></i>
-                    <span>{{ __('List Users') }}</span>
+                    <span>{{ __('messages.list_users') }}</span>
                 </a>
                 <a href="{{ route('profile.show', $user->username) }}" target="_blank" class="btn btn-info admin-block-link text-white">
                     <i class="feather-user"></i>
@@ -82,7 +82,7 @@
             <div class="admin-panel__header">
                 <div>
                     <span class="admin-panel__eyebrow">{{ __('messages.edit_user') }}</span>
-                    <h2 class="admin-panel__title">{{ __('Edit User Details') }}</h2>
+                    <h2 class="admin-panel__title">{{ __('messages.edit_user_details') }}</h2>
                 </div>
             </div>
             <div class="admin-panel__body">
@@ -94,19 +94,19 @@
                         <div>
                             <label class="admin-form-label">{{ __('messages.username') }}</label>
                             <input type="text" class="form-control" name="username" value="{{ $user->username }}" required>
-                            <span class="admin-form-note">{{ __('Login Identity') }}</span>
+                            <span class="admin-form-note">{{ __('messages.login_identity') }}</span>
                         </div>
                         <div>
-                            <label class="admin-form-label">{{ __('User Slug') }}</label>
+                            <label class="admin-form-label">{{ __('messages.user_slug') }}</label>
                             <input type="text" class="form-control" name="slug" value="{{ $slug }}" required>
-                            <span class="admin-form-note">{{ __('Profile URL Handle') }}</span>
+                            <span class="admin-form-note">{{ __('messages.profile_url_handle') }}</span>
                         </div>
                         <div>
                             <label class="admin-form-label">{{ __('messages.email') }}</label>
                             <input type="email" class="form-control" name="email" value="{{ $user->email }}" required>
                         </div>
                         <div>
-                            <label class="admin-form-label">{{ __('Verified Account') }}</label>
+                            <label class="admin-form-label">{{ __('messages.verified_account') }}</label>
                             <select class="form-select" name="ucheck">
                                 <option value="0" {{ $user->ucheck == 0 ? 'selected' : '' }}>{{ __('messages.No') }}</option>
                                 <option value="1" {{ $user->ucheck == 1 ? 'selected' : '' }}>{{ __('messages.Yes') }}</option>
@@ -117,15 +117,15 @@
                             <input type="number" step="0.01" class="form-control" name="pts" value="{{ $user->pts }}" required>
                         </div>
                         <div>
-                            <label class="admin-form-label">{{ __('Exchange Visits PTS') }} (vu)</label>
+                            <label class="admin-form-label">{{ __('messages.exchange_visits_pts') }} (vu)</label>
                             <input type="number" step="0.01" class="form-control" name="vu" value="{{ $user->vu }}" required>
                         </div>
                         <div>
-                            <label class="admin-form-label">{{ __('Banner Ads PTS') }} (nvu)</label>
+                            <label class="admin-form-label">{{ __('messages.banner_ads_pts') }} (nvu)</label>
                             <input type="number" step="0.01" class="form-control" name="nvu" value="{{ $user->nvu }}" required>
                         </div>
                         <div>
-                            <label class="admin-form-label">{{ __('Text Ads PTS') }} (nlink)</label>
+                            <label class="admin-form-label">{{ __('messages.text_ads_pts') }} (nlink)</label>
                             <input type="number" step="0.01" class="form-control" name="nlink" value="{{ $user->nlink }}" required>
                         </div>
                         <div class="admin-form-grid__full">
@@ -135,7 +135,7 @@
                     </div>
 
                     <div class="d-flex flex-wrap gap-3">
-                        <button type="submit" class="btn btn-primary">{{ __('Update User') }}</button>
+                        <button type="submit" class="btn btn-primary">{{ __('messages.update_user') }}</button>
                         <a href="{{ route('admin.users') }}" class="btn btn-light">{{ __('messages.back') ?? 'Back' }}</a>
                     </div>
                 </form>
@@ -147,7 +147,7 @@
                 <div class="admin-panel__header">
                     <div>
                         <span class="admin-panel__eyebrow">{{ __('messages.new_password') }}</span>
-                        <h2 class="admin-panel__title">{{ __('Change Password') }}</h2>
+                        <h2 class="admin-panel__title">{{ __('messages.change_password') }}</h2>
                     </div>
                 </div>
                 <div class="admin-panel__body">
@@ -158,10 +158,10 @@
                         <div>
                             <label class="admin-form-label">{{ __('messages.new_password') }}</label>
                             <input type="password" class="form-control" name="password" required minlength="8" autocomplete="new-password">
-                            <span class="admin-form-note">{{ __('Minimum 8 characters') }}</span>
+                            <span class="admin-form-note">{{ __('messages.min_8_chars') }}</span>
                         </div>
 
-                        <button type="submit" class="btn btn-warning text-dark">{{ __('Update Password') }}</button>
+                        <button type="submit" class="btn btn-warning text-dark">{{ __('messages.update_password') }}</button>
                     </form>
                 </div>
             </section>

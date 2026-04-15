@@ -597,7 +597,7 @@ class AdminController extends Controller
             ]
         );
 
-        return redirect()->back()->with('success', __('User updated successfully'));
+        return redirect()->back()->with('success', __('messages.user_updated_successfully'));
     }
 
     public function updateUserPassword(Request $request, $id)
@@ -612,14 +612,14 @@ class AdminController extends Controller
             'pass' => Hash::make($request->password)
         ]);
 
-        return redirect()->back()->with('success', __('Password updated successfully'));
+        return redirect()->back()->with('success', __('messages.password_updated_successfully'));
     }
 
     public function deleteUser($id)
     {
         $this->performUserDeletion($id);
         
-        return redirect()->route('admin.users')->with('success', __('User deleted successfully'));
+        return redirect()->route('admin.users')->with('success', __('messages.user_deleted_successfully'));
     }
 
     public function bulkDeleteUsers(Request $request)
