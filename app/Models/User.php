@@ -367,4 +367,19 @@ class User extends Authenticatable
 
         return self::$publicUidColumnAvailable = app(V420SchemaService::class)->hasColumn('users', 'public_uid');
     }
+
+    public function profileBadgeColor(): string
+    {
+        return \Illuminate\Support\Facades\Cache::remember(
+            "user_{$this->id}_profile_badge_color_v1",
+            now()->addMinutes(60),
+            function () {
+                if (class_exists(\App\Services\Billing\SubscriptionEntitlementService::class)) {
+                    $badge = app(\App\Services\Billing\SubscriptionEntitlementService::class)->activeProfileBadgeForUserId($this->id);
+                    return $badge['color'] ?? '';
+                }
+                return '';
+            }
+        );
+    }
 }

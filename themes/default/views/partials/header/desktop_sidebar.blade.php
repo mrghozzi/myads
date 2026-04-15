@@ -202,7 +202,7 @@
                                                         <div class="hexagon-image-30-32" data-src="{{ $headerPartner->avatarUrl() }}"></div>
                                                     </div>
                                                     <div class="user-avatar-progress-border">
-                                                        <div class="hexagon-border-40-44"></div>
+                                                        <div class="hexagon-border-40-44" data-line-color="{{ $headerPartner->profileBadgeColor() }}"></div>
                                                     </div>
                                                 </div>
                                             </div>

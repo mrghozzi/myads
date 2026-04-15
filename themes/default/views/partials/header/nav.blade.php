@@ -11,7 +11,7 @@
         </div>
         <div class="user-avatar-progress"></div>
         <div class="user-avatar-progress-border">
-            <div class="hexagon-border-40-44"></div>
+            <div class="hexagon-border-40-44" data-line-color="{{ auth()->user()->profileBadgeColor() }}"></div>
         </div>
 
         @if(auth()->user()->ucheck == 1)

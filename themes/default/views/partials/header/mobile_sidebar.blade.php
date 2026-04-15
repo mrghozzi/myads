@@ -12,7 +12,7 @@
                         <div class="hexagon-image-30-32" data-src="{{ auth()->user()->img ? url(auth()->user()->img) : theme_asset('img/avatar.jpg') }}"></div>
                     </div>
                     <div class="user-avatar-progress-border">
-                        <div class="hexagon-border-40-44"></div>
+                        <div class="hexagon-border-40-44" data-line-color="{{ auth()->user()->profileBadgeColor() }}"></div>
                     </div>
                 </a>
                 <p class="navigation-widget-info-title"><a href="{{ route('profile.short', auth()->user()->publicRouteIdentifier()) }}">{{ auth()->user()->username }}</a></p>

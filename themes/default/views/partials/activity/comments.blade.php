@@ -65,7 +65,7 @@
                     </div>
                 </div>
                 <div class="user-avatar-progress-border">
-                    <div class="hexagon-border-40-44" style="width: 40px; height: 44px; position: relative;">
+                    <div class="hexagon-border-40-44" data-line-color="{{ $user->profileBadgeColor() }}" style="width: 40px; height: 44px; position: relative;">
                         <canvas style="position: absolute; top: 0px; left: 0px;" width="40" height="44"></canvas>
                     </div>
                 </div>
@@ -200,7 +200,7 @@
                         </div>
                     </div>
                     <div class="user-avatar-progress-border">
-                        <div class="hexagon-border-40-44" style="width: 40px; height: 44px; position: relative;">
+                        <div class="hexagon-border-40-44" data-line-color="{{ auth()->user()->profileBadgeColor() }}" style="width: 40px; height: 44px; position: relative;">
                             <canvas style="position: absolute; top: 0px; left: 0px;" width="40" height="44"></canvas>
                         </div>
                     </div>

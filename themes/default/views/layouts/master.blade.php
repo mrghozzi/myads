@@ -768,15 +768,69 @@
                     }
                     el.dataset.hexInit = '1';
                     try {
-                        app.plugins.createHexagon(Object.assign({}, cfg.opts, {
+                        var overrideColor = el.getAttribute('data-line-color');
+                        var options = Object.assign({}, cfg.opts, {
                             containerElement: el
-                        }));
+                        });
+                        if (overrideColor) {
+                            options.lineColor = overrideColor;
+                        }
+                        app.plugins.createHexagon(options);
                     } catch (e) {
                         // silently ignore
                     }
                 });
             });
         }
+
+        /**
+         * Re-color hexagon borders that carry a data-line-color attribute.
+         * global.hexagons.js draws ALL borders gray in a single batch call,
+         * so this function runs AFTER that to repaint the ones that should
+         * reflect the user's active subscription badge color.
+         */
+        function recolorBadgeHexagons(scope) {
+            if (typeof app === 'undefined' || !app.plugins || !app.plugins.createHexagon) {
+                return;
+            }
+
+            var root = (scope && typeof scope.querySelectorAll === 'function') ? scope : document;
+
+            var sizeMap = {
+                'hexagon-border-40-44':  { width: 40,  height: 44,  lineWidth: 3, roundedCorners: true, roundedCornerRadius: 1 },
+                'hexagon-border-84-92':  { width: 84,  height: 92,  lineWidth: 5, roundedCorners: true, roundedCornerRadius: 3 },
+                'hexagon-border-100-110':{ width: 100, height: 110, lineWidth: 6, roundedCorners: true },
+                'hexagon-border-124-136':{ width: 124, height: 136, lineWidth: 8, roundedCorners: true }
+            };
+
+            root.querySelectorAll('[data-line-color]').forEach(function(el) {
+                var color = el.getAttribute('data-line-color');
+                if (!color || !color.trim()) return;
+
+                var cfg = null;
+                for (var cls in sizeMap) {
+                    if (el.classList.contains(cls)) { cfg = sizeMap[cls]; break; }
+                }
+                if (!cfg) return;
+
+                // Remove existing gray canvases drawn by global.hexagons.js
+                el.querySelectorAll('canvas').forEach(function(c) { c.remove(); });
+
+                try {
+                    app.plugins.createHexagon(Object.assign({}, cfg, {
+                        containerElement: el,
+                        lineColor: color.trim()
+                    }));
+                } catch (e) {
+                    // silently ignore
+                }
+            });
+        }
+
+        // Run once after all deferred scripts (global.hexagons.js) have executed
+        document.addEventListener('DOMContentLoaded', function() {
+            recolorBadgeHexagons(document);
+        });
 
         window.__afterInfiniteScrollRenderCallbacks = window.__afterInfiniteScrollRenderCallbacks || [];
 
@@ -951,6 +1005,7 @@
             hydrateActivityFeed(document);
             window.registerAfterInfiniteScrollRender(function(scope) {
                 hydrateActivityFeed(scope);
+                recolorBadgeHexagons(scope);
             });
         });
 
