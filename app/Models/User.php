@@ -370,6 +370,10 @@ class User extends Authenticatable
 
     public function profileBadgeColor(): string
     {
+        if (!\App\Support\SubscriptionSettings::isEnabled()) {
+            return '#e7e8ee';
+        }
+
         // For super-admin (ID=1), we can use a shorter cache or a manual override if needed
         $cacheTime = $this->id === 1 ? 5 : 60;
 

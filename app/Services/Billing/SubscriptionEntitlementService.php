@@ -18,7 +18,7 @@ class SubscriptionEntitlementService
 
     public function activeSubscriptionFor(User|int $user): ?MemberSubscription
     {
-        if (!$this->schema->supports('subscriptions_billing')) {
+        if (!$this->schema->supports('subscriptions_billing') || !\App\Support\SubscriptionSettings::isEnabled()) {
             return null;
         }
 
@@ -84,7 +84,7 @@ class SubscriptionEntitlementService
 
         if ($label === '') {
             // Hardcoded fallback for Super Admin (ID=1) to ensure they show a premium badge
-            if ($userId === 1) {
+            if ($userId === 1 && \App\Support\SubscriptionSettings::isEnabled()) {
                 return [
                     'label' => 'Super Admin',
                     'color' => '#fbbf24', // Gold
