@@ -16,7 +16,7 @@
                     <div class="hexagon-image-100-110" data-src="{{ $user->avatarUrl() }}" style="width: 100px; height: 110px; position: relative;"><canvas style="position: absolute; top: 0px; left: 0px;" width="100" height="110"></canvas></div>
                 </div>
                 <div class="user-avatar-progress-border">
-                    <div class="hexagon-border-124-136" style="width: 124px; height: 136px; position: relative;"><canvas style="position: absolute; top: 0px; left: 0px;" width="124" height="136"></canvas></div>
+                    <div class="hexagon-border-124-136" data-line-color="{{ $user->profileBadgeColor() }}" style="width: 124px; height: 136px; position: relative;"><canvas style="position: absolute; top: 0px; left: 0px;" width="124" height="136"></canvas></div>
                 </div>
                 @if($user->ucheck == 1)
                 <div class="user-avatar-badge">

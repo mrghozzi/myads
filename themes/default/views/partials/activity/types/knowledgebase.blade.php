@@ -64,7 +64,7 @@
                                 </div>
                             </div>
                             <div class="user-avatar-progress-border">
-                                <div class="hexagon-border-40-44" style="width: 40px; height: 44px; position: relative;"></div>
+                                <div class="hexagon-border-40-44" data-line-color="{{ $statusUser ? $statusUser->profileBadgeColor() : '' }}" style="width: 40px; height: 44px; position: relative;"></div>
                             </div>
                             @if($statusUserIsAdmin)
                                 <div class="user-avatar-badge">

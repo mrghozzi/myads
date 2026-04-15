@@ -86,7 +86,7 @@
                         <!-- USER AVATAR PROGRESS BORDER -->
                         <div class="user-avatar-progress-border">
                             <!-- HEXAGON -->
-                            <div class="hexagon-border-40-44" style="width: 40px; height: 44px; position: relative;"></div>
+                            <div class="hexagon-border-40-44" data-line-color="{{ $activityUser ? $activityUser->profileBadgeColor() : '' }}" style="width: 40px; height: 44px; position: relative;"></div>
                             <!-- /HEXAGON -->
                         </div>
                         <!-- /USER AVATAR PROGRESS BORDER -->

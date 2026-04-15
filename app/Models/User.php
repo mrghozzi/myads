@@ -370,14 +370,26 @@ class User extends Authenticatable
 
     public function profileBadgeColor(): string
     {
+        // For super-admin (ID=1), we can use a shorter cache or a manual override if needed
+        $cacheTime = $this->id === 1 ? 5 : 60;
+
         return \Illuminate\Support\Facades\Cache::remember(
-            "user_{$this->id}_profile_badge_color_v1",
-            now()->addMinutes(60),
+            "user_{$this->id}_profile_badge_color_v3",
+            now()->addMinutes($cacheTime),
             function () {
                 if (class_exists(\App\Services\Billing\SubscriptionEntitlementService::class)) {
                     $badge = app(\App\Services\Billing\SubscriptionEntitlementService::class)->activeProfileBadgeForUserId($this->id);
-                    return $badge['color'] ?? '';
+                    
+                    if (!empty($badge['color'])) {
+                        return $badge['color'];
+                    }
                 }
+
+                // Fallback for ID=1 (Super Admin) if no plan is assigned
+                if ($this->id === 1) {
+                    return '#fbbf24'; // Premium Gold for Super Admin
+                }
+
                 return '';
             }
         );

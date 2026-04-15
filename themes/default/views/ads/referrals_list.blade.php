@@ -55,7 +55,7 @@
                                                 <div class="hexagon-image-30-32" data-src="{{ $user->avatar ? asset($user->avatar) : theme_asset('img/avatar.png') }}" style="width: 30px; height: 32px; position: relative;"></div>
                                             </div>
                                             <div class="user-avatar-progress-border">
-                                                <div class="hexagon-border-40-44" style="width: 40px; height: 44px; position: relative;"></div>
+                                                <div class="hexagon-border-40-44" data-line-color="{{ $user->profileBadgeColor() }}" style="width: 40px; height: 44px; position: relative;"></div>
                                             </div>
                                             @if($user->ucheck == 1)
                                             <div class="user-avatar-badge">
