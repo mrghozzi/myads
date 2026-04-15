@@ -314,8 +314,16 @@ html[dir="rtl"] .badges-hub-header::after {
     left: -50px;
 }
 
-html[dir="rtl"] .content-grid {
-    margin-right: 0 !important;
+/*-------------------------
+    RTL CONTENT GRID FIX
+-------------------------*/
+/* In light-mode RTL on large screens, keep the page container centered. */
+@media screen and (min-width: 1367px) {
+    html[dir="rtl"] .content-grid {
+        transform: none !important;
+        margin-right: auto !important;
+        margin-left: auto !important;
+    }
 }
 
 html[dir="rtl"] .xm-tooltip {
