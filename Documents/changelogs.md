@@ -34,7 +34,7 @@
 
 ### Admin Notifications
 * **Feature**: Introduced a centralized **Admin Notification System** in the dashboard header to alert the administration team about critical events.
-* **Real-time Alerts**: Provides dynamic notifications for **New Billing Orders** (pending reviews/receipts), **New Content Reports**, **System Updates**, **Plugin Updates**, and **Theme Updates**.
+* **Real-time Alerts**: Provides dynamic notifications for **New Billing Orders** (pending reviews), **New Content Reports**, **System Updates**, **Plugin Updates**, and **Theme Updates**.
 * **ACL Integrated**: Notifications are fully permission-aware; administrators only see alerts for modules they are authorized to manage (Billing, Community, Updates, Plugins, Themes).
 * **UI**: Implemented a premium notification dropdown with a live count badge, category-specific icons, and direct-action routing to relevant management pages.
 * **i18n**: Fully localized all notification labels and module descriptions across all **9 supported languages**, including specialized Arabic terminology.

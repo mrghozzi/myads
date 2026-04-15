@@ -424,7 +424,7 @@ admin/billing/ → Billing hub, plans, orders, transactions, currencies, gateway
 
 ### Admin Notification System
 - **Implementation:** Centralized in `App\Services\Admin\AdminNotificationService` and injected into the admin layout via `AdminNotificationComposer`.
-- **Alert Types:** Highlights pending **Billing Orders** (manual review/receipts), **Community Reports**, **System Updates**, **Plugin Updates**, and **Theme Updates**.
+- **Alert Types:** Highlights pending **Billing Orders** (manual review), **Community Reports**, **System Updates**, **Plugin Updates**, and **Theme Updates**.
 - **Permission Awareness:** Automatically filters alerts based on the logged-in admin's authorized modules (e.g., billing notifications are hidden if the admin lack `billing` access).
 - **Performance:** External update checks for the system and extensions are cached for 1 hour to prevent dashboard latency.
 - **UI:** Interactive dropdown in the dashboard header with a dynamic red badge, category icons, and deep links to management modules.

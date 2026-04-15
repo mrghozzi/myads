@@ -33,10 +33,7 @@ class AdminNotificationService
 
         // 1. Billing Orders (if enabled and user has access)
         if (SubscriptionSettings::isEnabled() && $this->adminAccess->canAccess($user, null, 'billing')) {
-            $billingCount = BillingOrder::whereIn('status', [
-                BillingOrder::STATUS_PENDING_RECEIPT,
-                BillingOrder::STATUS_PENDING_REVIEW
-            ])->count();
+            $billingCount = BillingOrder::where('status', BillingOrder::STATUS_PENDING_REVIEW)->count();
 
             if ($billingCount > 0) {
                 $notifications[] = [
