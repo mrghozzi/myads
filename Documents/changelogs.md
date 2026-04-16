@@ -44,6 +44,14 @@
 * **Architecture**: Centrally managed via `AdminNotificationService` and injected through `AdminNotificationComposer` for consistent header state across all admin views.
 * **Performance**: Integrated 1-hour caching for external update checks to ensure optimal dashboard performance.
 
+### Store Responsiveness & UX Tuning
+* **UI**: Completely overhauled the Store Product page (`/store/{name}`) responsiveness, ensuring a premium experience across all mobile viewports (320px to 768px).
+* **Fix**: Resolved a massive horizontal overflow ("ghost width") issue that caused the page content to shift and scroll incorrectly in both LTR and RTL orientations.
+* **Fix**: Implemented strict viewport constraints on the `html` and `body` elements to prevent background elements from pushing out the page boundaries.
+* **RTL**: Corrected internal layout alignment for the "Publisher" card and statistics grid in RTL mode, ensuring avatars and labels follow the correct right-to-left flow.
+* **Improvement**: Refined the global header search bar to progressively shrink and hide on smaller screens, preventing overlap with site branding and navigation icons.
+* **UX**: Unified grid and flex behaviors in the store shell to handle long titles and metadata through automated wrapping and word-breaking safety rules.
+
 ---
 
 # v4.2.5

@@ -339,7 +339,7 @@ html[dir="rtl"] .xm-tooltip::before {
 
 @media screen and (max-width: 960px) {
     html[dir="rtl"] .section-banner {
-        padding: 18px 108px 0 28px;
+        padding: 40px 20px 0 20px;
     }
 }
 

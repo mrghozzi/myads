@@ -38,7 +38,11 @@
     .store-detail-page,
     .knowledgebase-page {
         display: grid;
+        grid-template-columns: minmax(0, 1fr);
         gap: 24px;
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
     }
 
     .store-shell-card,
@@ -60,8 +64,12 @@
         grid-template-columns: minmax(0, 1.8fr) 320px;
         gap: 24px;
         padding: 28px;
-        border-radius: 24px;
+        border-radius: 20px;
         background: var(--store-shell-bg);
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        overflow: hidden;
     }
 
     .store-hero__main,
@@ -76,7 +84,7 @@
         flex-shrink: 0;
         width: 220px;
         min-width: 220px;
-        border-radius: 24px;
+        border-radius: 20px;
         overflow: hidden;
         background: var(--store-shell-soft-strong);
         border: 1px solid rgba(255, 255, 255, 0.14);
@@ -138,7 +146,7 @@
         color: var(--store-shell-title);
         font-size: 2rem;
         font-weight: 900;
-        line-height: 1.08;
+        line-height: 1.15;
     }
 
     .store-subtitle,
@@ -170,8 +178,9 @@
     .kb-stat-grid {
         margin-top: 20px;
         display: grid;
-        grid-template-columns: repeat(4, minmax(0, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
         gap: 12px;
+        width: 100%;
     }
 
     .store-stat-card,
@@ -220,6 +229,8 @@
         background: var(--store-shell-surface);
         border: 1px solid var(--store-shell-border);
         box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+        min-width: 0;
+        overflow: hidden;
     }
 
     .store-aside-card__header,
@@ -337,6 +348,9 @@
     .kb-form-card,
     .kb-helper-card {
         background: var(--store-shell-surface);
+        min-width: 0;
+        max-width: 100%;
+        overflow: hidden;
     }
 
     .store-content-card .widget-box-content,
@@ -349,9 +363,10 @@
 
     .store-tabs .tab-box-options {
         display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 12px;
+        grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+        gap: 8px;
         background: transparent;
+        width: 100%;
     }
 
     .store-tabs .tab-box-option {
@@ -385,6 +400,8 @@
         color: var(--store-shell-text);
         font-size: 0.96rem;
         line-height: 1.82;
+        overflow-wrap: anywhere;
+        word-break: break-word;
     }
 
     .store-rich-text img,
@@ -545,43 +562,102 @@
         .kb-topic-layout,
         .kb-review-layout,
         .kb-editor-layout {
-            grid-template-columns: 1fr;
+            grid-template-columns: 1fr !important;
+            padding: 20px;
         }
 
         .store-aside,
         .kb-aside {
             order: -1;
-        }
-    }
-
-    @media screen and (max-width: 760px) {
-        .store-hero,
-        .kb-hero,
-        .kb-topic-card {
-            padding: 20px;
+            width: 100%;
         }
 
         .store-hero__main,
         .kb-hero__main {
             flex-direction: column;
+            align-items: center;
         }
 
         .store-hero__media,
         .kb-hero__media {
             width: 100%;
             min-width: 0;
+            max-width: 380px;
+        }
+
+        .store-hero__content {
+            width: 100%;
+            text-align: center;
+            align-items: center;
+        }
+
+        .store-badge-row,
+        .kb-badge-row,
+        .store-stat-grid,
+        .kb-stat-grid,
+        .store-inline-actions,
+        .kb-inline-actions {
+            justify-content: center;
+        }
+
+        .store-title,
+        .kb-title {
+            font-size: 1.75rem;
+            text-align: center;
+        }
+
+        .store-subtitle,
+        .kb-subtitle {
+            text-align: center;
+        }
+    }
+
+    @media screen and (max-width: 768px) {
+        .store-hero,
+        .kb-hero,
+        .kb-topic-card {
+            padding: 16px;
         }
 
         .store-stat-grid,
-        .kb-stat-grid,
+        .kb-stat-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
         .store-tabs .tab-box-options {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .section-header {
+            flex-direction: column;
+            align-items: flex-start !important;
+            gap: 15px;
+            padding: 20px 16px !important;
+        }
+
+        .section-header-actions {
+            flex-wrap: wrap;
+            justify-content: flex-start;
+            gap: 10px;
+            line-height: 1.4;
+        }
+
+        .section-header-subsection {
+            margin: 0 !important;
+        }
+
+        .section-header-subsection + .section-header-subsection::before {
+            margin: 0 8px;
         }
     }
 
     @media screen and (max-width: 540px) {
         .store-stat-grid,
-        .kb-stat-grid,
+        .kb-stat-grid {
+            grid-template-columns: 1fr;
+        }
+
         .store-tabs .tab-box-options {
             grid-template-columns: 1fr;
         }
@@ -592,5 +668,64 @@
             flex-direction: column;
             align-items: stretch;
         }
+        
+        .store-hero__media {
+            max-width: 100%;
+        }
+
+        .store-title, .kb-title {
+            font-size: 1.5rem;
+        }
+
+        .store-hero {
+            padding: 16px !important;
+        }
+    }
+
+    @media screen and (max-width: 380px) {
+        .store-stat-grid,
+        .kb-stat-grid,
+        .store-tabs .tab-box-options {
+            grid-template-columns: 1fr;
+        }
+
+        .store-hero__media {
+            height: 180px;
+        }
+
+        .store-hero__media img {
+            min-height: 180px;
+        }
+    }
+
+    /* RTL specific overrides for Store Detail Page */
+    html[dir="rtl"] .store-stat-card span,
+    html[dir="rtl"] .kb-stat-card span {
+        text-align: right;
+    }
+
+    html[dir="rtl"] .store-stat-card strong,
+    html[dir="rtl"] .kb-stat-card strong {
+        text-align: right;
+    }
+
+    html[dir="rtl"] .store-aside-card__header {
+        flex-direction: row-reverse;
+    }
+
+    html[dir="rtl"] .store-aside-card__title,
+    html[dir="rtl"] .kb-aside-card__title {
+        text-align: right;
+    }
+
+    html[dir="rtl"] .user-status .user-status-avatar {
+        left: auto;
+        right: 0;
+    }
+
+    html[dir="rtl"] .user-status .user-status-title {
+        padding-right: 50px;
+        padding-left: 0;
+        text-align: right;
     }
 </style>
