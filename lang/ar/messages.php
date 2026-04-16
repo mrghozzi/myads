@@ -2163,4 +2163,11 @@ return [
     'notify_user' => 'إخطار العضو بالتغييرات',
     'notification_admin_update' => 'قام أحد المسؤولين بتحديث تفاصيل حسابك.',
     'notification_subscription_update' => 'قام أحد المسؤولين بتحديث حالة اشتراكك.',
+    'billing_verified_badge_field' => 'شارة حساب موثق',
+    'billing_extra_included_benefits_field' => 'مزايا متضمنة إضافية',
+    'billing_extra_included_benefits_placeholder' => 'ميزة واحدة في كل سطر',
+    'billing_extra_included_benefits_help' => 'كل سطر سيظهر للعضو كميزة متضمنة.',
+    'billing_plan_active_benefits_title' => 'المزايا المستمرة أثناء الاشتراك',
+    'billing_plan_one_time_bonuses_title' => 'مكافآت الشراء لمرة واحدة',
+    'billing_verified_badge_benefit' => 'شارة حساب موثق',
 ];

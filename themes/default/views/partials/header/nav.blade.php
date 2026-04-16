@@ -14,7 +14,7 @@
             <div class="hexagon-border-40-44" data-line-color="{{ auth()->user()->profileBadgeColor() }}"></div>
         </div>
 
-        @if(auth()->user()->ucheck == 1)
+        @if(auth()->user()->hasVerifiedBadge())
             <div class="user-avatar-badge">
                 <div class="user-avatar-badge-border">
                     <div class="hexagon-22-24"></div>

@@ -394,7 +394,7 @@ class AdminBillingController extends Controller
 
     private function validatePlan(Request $request): array
     {
-        return $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string|max:150',
             'description' => 'nullable|string|max:5000',
             'duration_days' => 'nullable|integer|min:1|max:3650',
@@ -408,12 +408,18 @@ class AdminBillingController extends Controller
             'marketing_bullets_text' => 'nullable|string|max:5000',
             'profile_badge_label' => 'nullable|string|max:100',
             'profile_badge_color' => 'nullable|string|max:20',
+            'subscription_verified_badge' => 'nullable|boolean',
             'bonus_pts' => 'nullable|numeric|min:0|max:999999',
             'bonus_nvu' => 'nullable|numeric|min:0|max:999999',
             'bonus_nlink' => 'nullable|numeric|min:0|max:999999',
             'bonus_nsmart' => 'nullable|numeric|min:0|max:999999',
             'status_promotion_discount_pct' => 'nullable|numeric|min:0|max:95',
+            'extra_included_benefits_text' => 'nullable|string|max:5000',
         ]);
+
+        $validated['extra_included_benefits'] = $validated['extra_included_benefits_text'] ?? '';
+
+        return $validated;
     }
 
     private function validateCurrency(Request $request, ?int $ignoreId): array

@@ -18,7 +18,7 @@
                 <div class="user-avatar-progress-border">
                     <div class="hexagon-border-124-136" data-line-color="{{ $user->profileBadgeColor() }}" style="width: 124px; height: 136px; position: relative;"><canvas style="position: absolute; top: 0px; left: 0px;" width="124" height="136"></canvas></div>
                 </div>
-                @if($user->ucheck == 1)
+                @if($user->hasVerifiedBadge())
                 <div class="user-avatar-badge">
                     <div class="user-avatar-badge-border">
                         <div class="hexagon-40-44" style="width: 22px; height: 24px; position: relative;"></div>

@@ -5,6 +5,9 @@
 * **Feature**: Added an optional paid-subscriptions and billing system that administrators can enable or disable from `/admin/billing/settings` without affecting historical records.
 * **Add**: Introduced a full billing workspace in `/admin/billing` for plans, orders, transactions, currencies, gateways, and system-wide billing settings with ACL support through the new `billing` admin module.
 * **Add**: Added member-facing billing pages at `/plans`, `/settings/billing`, and `/billing/orders/{order}` for plan discovery, subscription history, hosted checkout follow-up, and secure bank-transfer receipt uploads.
+* **Fix**: Standardized subscription purchase bonuses (`PTS`, banner/link/smart credits) so they are granted exactly once per paid order, including queued-plan purchases, without being re-applied again on later activation.
+* **Fix**: Removed duplicate subscription-bonus history rows on upgraded installations by stopping the legacy `hest_pts` mirror for billing bonuses when `point_transactions` is available, while keeping fallback compatibility for incomplete upgrades.
+* **Add**: Expanded plan entitlements with a subscription-scoped **Verified Badge** and an **Extra Included Benefits** list that administrators can manage directly from `/admin/billing/plans`.
 * **Payments**: The first billing release supports `Stripe`, `PayPal`, and `Bank Transfer`, using hosted external checkout flows for cards and provider-managed payment pages while avoiding collection of personal payment data inside MYADS.
 * **Privacy**: Billing records now store only minimal payment metadata, external references, currency snapshots, and review notes while keeping gateway secrets encrypted and masked in the admin UI.
 * **UX**: Active subscription badges can now appear on member profile pages, and billing navigation is injected into both the Duralux admin sidebar and the member settings navigation when the feature is available.

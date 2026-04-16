@@ -268,6 +268,14 @@ class SubscriptionLifecycleService
             $model->member_subscription_id = (int) $subscription->id;
             $model->save();
 
+            $user = User::query()->findOrFail($model->user_id);
+            $this->entitlements->grantPurchaseBenefits(
+                $user,
+                (array) ($planSnapshot['entitlements'] ?? []),
+                (int) $model->id,
+                $planName
+            );
+
             if ($status === MemberSubscription::STATUS_ACTIVE) {
                 $this->entitlements->applyActivationBenefits((int) $model->user_id, $subscription);
             }
@@ -371,6 +379,8 @@ class SubscriptionLifecycleService
                             'status' => MemberSubscription::STATUS_EXPIRED,
                             'completed_at' => $activeSubscription->completed_at ?: $activeSubscription->ends_at,
                         ])->save();
+
+                        $this->entitlements->forgetUserBadgeCaches($userId);
 
                         $this->notifications->send(
                             $userId,
@@ -497,6 +507,8 @@ class SubscriptionLifecycleService
                         'status' => MemberSubscription::STATUS_CANCELLED,
                         'completed_at' => now(),
                     ])->save();
+
+                    $this->entitlements->forgetUserBadgeCaches($userId);
 
                     $this->notifications->send(
                         $userId,

@@ -326,6 +326,14 @@ class ProfileController extends Controller
                 });
         }
 
+        $mirroredSubscriptionBonusEntries = $ledgerHistory
+            ->filter(fn ($item) => (string) $item->description_key === 'subscription_bonus_pts')
+            ->map(fn ($item) => [
+                'amount' => round((float) $item->amount, 2),
+                'created_at_ts' => (int) $item->created_at_ts,
+            ])
+            ->values();
+
         $history = $ledgerHistory
             ->merge(
                 Option::where('o_type', 'hest_pts')
@@ -341,6 +349,16 @@ class ProfileController extends Controller
                             'created_at_ts' => is_numeric($item->o_mode) ? (int) $item->o_mode : time(),
                             'is_legacy' => true,
                         ];
+                    })
+                    ->reject(function (object $item) use ($mirroredSubscriptionBonusEntries) {
+                        if ((string) $item->description_key !== 'subscription_bonus_pts' || $mirroredSubscriptionBonusEntries->isEmpty()) {
+                            return false;
+                        }
+
+                        return $mirroredSubscriptionBonusEntries->contains(function (array $mirror) use ($item) {
+                            return abs($mirror['amount'] - round((float) $item->amount, 2)) < 0.01
+                                && abs($mirror['created_at_ts'] - (int) $item->created_at_ts) <= 5;
+                        });
                     })
             )
             ->sortByDesc('created_at_ts')

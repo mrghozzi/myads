@@ -370,10 +370,6 @@ class User extends Authenticatable
 
     public function profileBadgeColor(): string
     {
-        if (!\App\Support\SubscriptionSettings::isEnabled()) {
-            return '#e7e8ee';
-        }
-
         // For super-admin (ID=1), we can use a shorter cache or a manual override if needed
         $cacheTime = $this->id === 1 ? 5 : 60;
 
@@ -397,5 +393,28 @@ class User extends Authenticatable
                 return '';
             }
         );
+    }
+
+    public function hasSubscriptionVerifiedBadge(): bool
+    {
+        $cacheTime = $this->id === 1 ? 5 : 60;
+
+        return \Illuminate\Support\Facades\Cache::remember(
+            "user_{$this->id}_verified_badge_v1",
+            now()->addMinutes($cacheTime),
+            function () {
+                if (class_exists(\App\Services\Billing\SubscriptionEntitlementService::class)) {
+                    return app(\App\Services\Billing\SubscriptionEntitlementService::class)
+                        ->hasSubscriptionVerifiedBadgeForUserId((int) $this->id);
+                }
+
+                return false;
+            }
+        );
+    }
+
+    public function hasVerifiedBadge(): bool
+    {
+        return (int) $this->ucheck === 1 || $this->hasSubscriptionVerifiedBadge();
     }
 }

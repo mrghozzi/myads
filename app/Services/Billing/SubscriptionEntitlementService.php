@@ -18,7 +18,7 @@ class SubscriptionEntitlementService
 
     public function activeSubscriptionFor(User|int $user): ?MemberSubscription
     {
-        if (!$this->schema->supports('subscriptions_billing') || !\App\Support\SubscriptionSettings::isEnabled()) {
+        if (!$this->schema->supports('subscriptions_billing')) {
             return null;
         }
 
@@ -62,11 +62,13 @@ class SubscriptionEntitlementService
         return array_merge([
             'profile_badge_label' => '',
             'profile_badge_color' => '#615dfa',
+            'subscription_verified_badge' => false,
             'bonus_pts' => 0,
             'bonus_nvu' => 0,
             'bonus_nlink' => 0,
             'bonus_nsmart' => 0,
             'status_promotion_discount_pct' => 0,
+            'extra_included_benefits' => [],
         ], (array) ($subscription?->entitlements_snapshot ?? []));
     }
 
@@ -99,6 +101,58 @@ class SubscriptionEntitlementService
         ];
     }
 
+    public function hasSubscriptionVerifiedBadgeForUserId(int $userId): bool
+    {
+        $entitlements = $this->entitlementsForSubscription($this->activeSubscriptionFor($userId));
+
+        return (bool) ($entitlements['subscription_verified_badge'] ?? false);
+    }
+
+    public function memberBenefitLines(array $entitlements): array
+    {
+        $normalized = array_merge($this->entitlementsForSubscription(null), $entitlements);
+        $benefits = [];
+
+        if (trim((string) ($normalized['profile_badge_label'] ?? '')) !== '') {
+            $benefits[] = __('messages.billing_profile_badge_benefit', [
+                'label' => $normalized['profile_badge_label'],
+            ]);
+        }
+
+        if (!empty($normalized['subscription_verified_badge'])) {
+            $benefits[] = __('messages.billing_verified_badge_benefit');
+        }
+
+        if ((float) ($normalized['bonus_pts'] ?? 0) > 0) {
+            $benefits[] = __('messages.billing_bonus_pts_benefit', ['amount' => $normalized['bonus_pts']]);
+        }
+
+        if ((float) ($normalized['bonus_nvu'] ?? 0) > 0) {
+            $benefits[] = __('messages.billing_bonus_nvu_benefit', ['amount' => $normalized['bonus_nvu']]);
+        }
+
+        if ((float) ($normalized['bonus_nlink'] ?? 0) > 0) {
+            $benefits[] = __('messages.billing_bonus_nlink_benefit', ['amount' => $normalized['bonus_nlink']]);
+        }
+
+        if ((float) ($normalized['bonus_nsmart'] ?? 0) > 0) {
+            $benefits[] = __('messages.billing_bonus_nsmart_benefit', ['amount' => $normalized['bonus_nsmart']]);
+        }
+
+        if ((float) ($normalized['status_promotion_discount_pct'] ?? 0) > 0) {
+            $benefits[] = __('messages.billing_discount_benefit', ['amount' => $normalized['status_promotion_discount_pct']]);
+        }
+
+        foreach ((array) ($normalized['extra_included_benefits'] ?? []) as $benefit) {
+            $benefit = trim((string) $benefit);
+            if ($benefit !== '') {
+                $benefits[] = $benefit;
+            }
+        }
+
+        return $benefits;
+    }
+
     public function applyActivationBenefits(User|int $user, MemberSubscription $subscription): void
     {
         if (!$this->schema->supports('subscriptions_billing')) {
@@ -109,7 +163,7 @@ class SubscriptionEntitlementService
             return;
         }
 
-        DB::transaction(function () use ($user, $subscription): void {
+        DB::transaction(function () use ($subscription): void {
             /** @var MemberSubscription $locked */
             $locked = MemberSubscription::query()->lockForUpdate()->findOrFail($subscription->id);
 
@@ -117,21 +171,12 @@ class SubscriptionEntitlementService
                 return;
             }
 
-            $userModel = $user instanceof User
-                ? User::query()->lockForUpdate()->findOrFail($user->id)
-                : User::query()->lockForUpdate()->findOrFail((int) $user);
-
-            $this->grantPurchaseBenefits(
-                $userModel,
-                $this->entitlementsForSubscription($locked),
-                $locked->id,
-                (string) ($locked->plan_name ?: data_get($locked->plan_snapshot, 'name', __('messages.billing_subscription_plan')))
-            );
-
             $locked->forceFill([
                 'benefits_applied_at' => now(),
             ])->save();
         });
+
+        $this->forgetUserBadgeCaches($user instanceof User ? (int) $user->id : (int) $user);
     }
 
     public function grantPurchaseBenefits(User|int $user, array $entitlements, int $referenceId, string $planName): void
@@ -147,10 +192,10 @@ class SubscriptionEntitlementService
                 $bonusPts,
                 'subscription_bonus',
                 'subscription_bonus_pts',
-                'member_subscription',
+                'billing_order',
                 $referenceId,
                 ['plan_name' => $planName],
-                true
+                !$this->schema->supports('point_history')
             );
         }
 
@@ -158,5 +203,11 @@ class SubscriptionEntitlementService
         $userModel->nlink = (float) $userModel->nlink + max(0, (float) ($entitlements['bonus_nlink'] ?? 0));
         $userModel->nsmart = (float) $userModel->nsmart + max(0, (float) ($entitlements['bonus_nsmart'] ?? 0));
         $userModel->save();
+    }
+
+    public function forgetUserBadgeCaches(int $userId): void
+    {
+        \Illuminate\Support\Facades\Cache::forget("user_{$userId}_profile_badge_color_v3");
+        \Illuminate\Support\Facades\Cache::forget("user_{$userId}_verified_badge_v1");
     }
 }

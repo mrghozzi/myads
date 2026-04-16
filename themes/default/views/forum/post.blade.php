@@ -128,7 +128,7 @@
                             </div>
                             <!-- /USER AVATAR PROGRESS BORDER -->
 
-                            @if($topic->user->ucheck == 1)
+                            @if($topic->user->hasVerifiedBadge())
                             <!-- USER AVATAR BADGE -->
                             <div class="user-avatar-badge">
                                 <!-- USER AVATAR BADGE BORDER -->

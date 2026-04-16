@@ -3,6 +3,9 @@
 @section('title', __('messages.billing_plans_title'))
 
 @section('content')
+@php
+    $extraIncludedBenefitsText = old('extra_included_benefits_text', implode(PHP_EOL, (array) ($entitlementDefaults['extra_included_benefits'] ?? [])));
+@endphp
 <div class="admin-page">
     <section class="admin-hero">
         <div class="admin-hero__content">
@@ -171,6 +174,9 @@
                         </div>
                         <div class="admin-panel__body">
                             <div class="row g-3">
+                                <div class="col-12">
+                                    <div class="small text-uppercase fw-semibold text-muted">{{ __('messages.billing_plan_active_benefits_title') }}</div>
+                                </div>
                                 <div class="col-md-6">
                                     <label class="form-label">{{ __('messages.billing_badge_label_field') }}</label>
                                     <input type="text" name="profile_badge_label" class="form-control" value="{{ old('profile_badge_label', $entitlementDefaults['profile_badge_label'] ?? '') }}">
@@ -180,12 +186,22 @@
                                     <input type="text" name="profile_badge_color" class="form-control" value="{{ old('profile_badge_color', $entitlementDefaults['profile_badge_color'] ?? '#615dfa') }}">
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label">{{ __('messages.billing_bonus_pts_field') }}</label>
-                                    <input type="number" step="0.01" name="bonus_pts" class="form-control" value="{{ old('bonus_pts', $entitlementDefaults['bonus_pts'] ?? 0) }}">
-                                </div>
-                                <div class="col-md-6">
                                     <label class="form-label">{{ __('messages.billing_discount_field') }}</label>
                                     <input type="number" step="0.01" name="status_promotion_discount_pct" class="form-control" value="{{ old('status_promotion_discount_pct', $entitlementDefaults['status_promotion_discount_pct'] ?? 0) }}">
+                                </div>
+                                <div class="col-12">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="subscription_verified_badge" id="subscription_verified_badge" value="1" @checked(old('subscription_verified_badge', $entitlementDefaults['subscription_verified_badge'] ?? false))>
+                                        <label class="form-check-label" for="subscription_verified_badge">{{ __('messages.billing_verified_badge_field') }}</label>
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label">{{ __('messages.billing_extra_included_benefits_field') }}</label>
+                                    <textarea name="extra_included_benefits_text" class="form-control" rows="4" placeholder="{{ __('messages.billing_extra_included_benefits_placeholder') }}">{{ $extraIncludedBenefitsText }}</textarea>
+                                    <div class="form-text">{{ __('messages.billing_extra_included_benefits_help') }}</div>
+                                </div>
+                                <div class="col-12 pt-2">
+                                    <div class="small text-uppercase fw-semibold text-muted">{{ __('messages.billing_plan_one_time_bonuses_title') }}</div>
                                 </div>
                                 <div class="col-md-4">
                                     <label class="form-label">{{ __('messages.billing_bonus_nvu_field') }}</label>
@@ -198,6 +214,10 @@
                                 <div class="col-md-4">
                                     <label class="form-label">{{ __('messages.billing_bonus_nsmart_field') }}</label>
                                     <input type="number" step="0.01" name="bonus_nsmart" class="form-control" value="{{ old('bonus_nsmart', $entitlementDefaults['bonus_nsmart'] ?? 0) }}">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">{{ __('messages.billing_bonus_pts_field') }}</label>
+                                    <input type="number" step="0.01" name="bonus_pts" class="form-control" value="{{ old('bonus_pts', $entitlementDefaults['bonus_pts'] ?? 0) }}">
                                 </div>
                             </div>
                         </div>

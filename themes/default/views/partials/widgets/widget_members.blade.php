@@ -45,7 +45,7 @@
                             </div>
                             <!-- /USER AVATAR PROGRESS BORDER -->
 
-                            @if($user->ucheck == 1)
+                            @if($user->hasVerifiedBadge())
                                 <!-- USER AVATAR BADGE -->
                                 <div class="user-avatar-badge">
                                     <!-- USER AVATAR BADGE BORDER -->

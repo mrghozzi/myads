@@ -1,6 +1,9 @@
 @extends('theme::layouts.master')
 
 @section('content')
+@php
+    $entitlementService = app(\App\Services\Billing\SubscriptionEntitlementService::class);
+@endphp
 <div class="section-banner">
     <div class="section-banner-icon" style="display: flex; align-items: center; justify-content: center;">
         <i class="fa fa-wallet" style="font-size: 28px; color: #fff;"></i>
@@ -44,6 +47,7 @@
                 <div class="widget-box-content" style="padding: 28px;">
                     <p class="widget-box-title" style="margin-bottom: 16px;">{{ __('messages.billing_current_subscription_title') }}</p>
                     @if($currentSubscription)
+                        @php($currentBenefits = $entitlementService->memberBenefitLines((array) ($currentSubscription->entitlements_snapshot ?? [])))
                         <div style="display: grid; gap: 10px;">
                             <div style="display: flex; justify-content: space-between; gap: 12px; align-items: center;">
                                 <p class="user-status-title" style="font-size: 22px;">{{ $currentSubscription->plan_name }}</p>
@@ -51,6 +55,16 @@
                             </div>
                             <p class="user-status-text">{{ __('messages.billing_starts_at_label') }}: {{ optional($currentSubscription->starts_at)->format('Y-m-d H:i') ?: '-' }}</p>
                             <p class="user-status-text">{{ __('messages.billing_ends_at_label') }}: {{ optional($currentSubscription->ends_at)->format('Y-m-d H:i') ?: __('messages.billing_lifetime') }}</p>
+                            @if(!empty($currentBenefits))
+                                <div style="margin-top: 8px;">
+                                    <p class="widget-box-title" style="font-size: 15px; margin-bottom: 10px;">{{ __('messages.billing_plan_benefits_title') }}</p>
+                                    <ul style="padding-left: 18px; margin: 0; display: grid; gap: 8px;">
+                                        @foreach($currentBenefits as $benefit)
+                                            <li>{{ $benefit }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            @endif
                         </div>
                     @else
                         <p class="user-status-text">{{ __('messages.billing_no_active_subscription') }}</p>
@@ -62,6 +76,7 @@
                 <div class="widget-box-content" style="padding: 28px;">
                     <p class="widget-box-title" style="margin-bottom: 16px;">{{ __('messages.billing_queued_subscription_title') }}</p>
                     @if($queuedSubscription)
+                        @php($queuedBenefits = $entitlementService->memberBenefitLines((array) ($queuedSubscription->entitlements_snapshot ?? [])))
                         <div style="display: grid; gap: 10px;">
                             <div style="display: flex; justify-content: space-between; gap: 12px; align-items: center;">
                                 <p class="user-status-title" style="font-size: 22px;">{{ $queuedSubscription->plan_name }}</p>
@@ -69,6 +84,16 @@
                             </div>
                             <p class="user-status-text">{{ __('messages.billing_starts_at_label') }}: {{ optional($queuedSubscription->starts_at)->format('Y-m-d H:i') ?: '-' }}</p>
                             <p class="user-status-text">{{ __('messages.billing_ends_at_label') }}: {{ optional($queuedSubscription->ends_at)->format('Y-m-d H:i') ?: __('messages.billing_lifetime') }}</p>
+                            @if(!empty($queuedBenefits))
+                                <div style="margin-top: 8px;">
+                                    <p class="widget-box-title" style="font-size: 15px; margin-bottom: 10px;">{{ __('messages.billing_plan_benefits_title') }}</p>
+                                    <ul style="padding-left: 18px; margin: 0; display: grid; gap: 8px;">
+                                        @foreach($queuedBenefits as $benefit)
+                                            <li>{{ $benefit }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            @endif
                         </div>
                     @else
                         <p class="user-status-text">{{ __('messages.billing_no_queued_subscription') }}</p>

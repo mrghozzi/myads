@@ -4,6 +4,7 @@
 @php
     $enabledGateways = collect($gatewayDefinitions)->filter(fn ($gateway) => !empty($gateway['config']['enabled']))->values();
     $baseCurrencyCode = \App\Support\SubscriptionSettings::get('base_currency_code', 'USD');
+    $entitlementService = app(\App\Services\Billing\SubscriptionEntitlementService::class);
 @endphp
 
 <div class="section-banner">
@@ -57,21 +58,7 @@
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); gap: 20px;">
         @forelse($plans as $plan)
             @php
-                $entitlements = array_merge([
-                    'profile_badge_label' => '',
-                    'bonus_pts' => 0,
-                    'bonus_nvu' => 0,
-                    'bonus_nlink' => 0,
-                    'bonus_nsmart' => 0,
-                    'status_promotion_discount_pct' => 0,
-                ], (array) ($plan->entitlements ?? []));
-                $benefits = [];
-                if(trim((string) ($entitlements['profile_badge_label'] ?? '')) !== '') $benefits[] = __('messages.billing_profile_badge_benefit', ['label' => $entitlements['profile_badge_label']]);
-                if((float) ($entitlements['bonus_pts'] ?? 0) > 0) $benefits[] = __('messages.billing_bonus_pts_benefit', ['amount' => $entitlements['bonus_pts']]);
-                if((float) ($entitlements['bonus_nvu'] ?? 0) > 0) $benefits[] = __('messages.billing_bonus_nvu_benefit', ['amount' => $entitlements['bonus_nvu']]);
-                if((float) ($entitlements['bonus_nlink'] ?? 0) > 0) $benefits[] = __('messages.billing_bonus_nlink_benefit', ['amount' => $entitlements['bonus_nlink']]);
-                if((float) ($entitlements['bonus_nsmart'] ?? 0) > 0) $benefits[] = __('messages.billing_bonus_nsmart_benefit', ['amount' => $entitlements['bonus_nsmart']]);
-                if((float) ($entitlements['status_promotion_discount_pct'] ?? 0) > 0) $benefits[] = __('messages.billing_discount_benefit', ['amount' => $entitlements['status_promotion_discount_pct']]);
+                $benefits = $entitlementService->memberBenefitLines((array) ($plan->entitlements ?? []));
             @endphp
             <div class="widget-box" style="overflow: hidden; border-top: 4px solid {{ $plan->accent_color ?: '#615dfa' }};">
                 <div class="widget-box-content" style="padding: 28px;">

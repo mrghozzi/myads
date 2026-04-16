@@ -2163,4 +2163,11 @@ return [
     'notify_user' => 'Notify user of changes',
     'notification_admin_update' => 'An administrator has updated your account details.',
     'notification_subscription_update' => 'An administrator has updated your subscription status.',
+    'billing_verified_badge_field' => 'Verified account badge',
+    'billing_extra_included_benefits_field' => 'Extra included benefits',
+    'billing_extra_included_benefits_placeholder' => 'One benefit per line',
+    'billing_extra_included_benefits_help' => 'Each line is shown to members as an included benefit.',
+    'billing_plan_active_benefits_title' => 'Active subscription benefits',
+    'billing_plan_one_time_bonuses_title' => 'One-time purchase bonuses',
+    'billing_verified_badge_benefit' => 'Verified account badge',
 ];

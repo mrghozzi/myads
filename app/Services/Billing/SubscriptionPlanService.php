@@ -12,11 +12,13 @@ class SubscriptionPlanService
     public const ENTITLEMENT_KEYS = [
         'profile_badge_label',
         'profile_badge_color',
+        'subscription_verified_badge',
         'bonus_pts',
         'bonus_nvu',
         'bonus_nlink',
         'bonus_nsmart',
         'status_promotion_discount_pct',
+        'extra_included_benefits',
     ];
 
     public function __construct(
@@ -113,11 +115,13 @@ class SubscriptionPlanService
         return [
             'profile_badge_label' => '',
             'profile_badge_color' => '#615dfa',
+            'subscription_verified_badge' => false,
             'bonus_pts' => 0,
             'bonus_nvu' => 0,
             'bonus_nlink' => 0,
             'bonus_nsmart' => 0,
             'status_promotion_discount_pct' => 0,
+            'extra_included_benefits' => [],
         ];
     }
 
@@ -145,9 +149,12 @@ class SubscriptionPlanService
 
         foreach (self::ENTITLEMENT_KEYS as $key) {
             $submitted = $values[$key] ?? $defaults[$key] ?? $entitlements[$key];
-            $entitlements[$key] = in_array($key, ['profile_badge_label', 'profile_badge_color'], true)
-                ? trim((string) $submitted)
-                : max(0, round((float) $submitted, 2));
+            $entitlements[$key] = match (true) {
+                in_array($key, ['profile_badge_label', 'profile_badge_color'], true) => trim((string) $submitted),
+                $key === 'subscription_verified_badge' => !empty($submitted),
+                $key === 'extra_included_benefits' => $this->normalizeBulletList($submitted),
+                default => max(0, round((float) $submitted, 2)),
+            };
         }
 
         return [

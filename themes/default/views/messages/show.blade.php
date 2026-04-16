@@ -928,7 +928,7 @@
                                 <div class="user-avatar-progress-border">
                                     <div class="hexagon-border-40-44" data-line-color="{{ $partner->profileBadgeColor() }}"></div>
                                 </div>
-                                @if($partner->ucheck == 1)
+                                @if($partner->hasVerifiedBadge())
                                     <div class="user-avatar-badge">
                                         <div class="user-avatar-badge-border">
                                             <div class="hexagon-22-24"></div>
