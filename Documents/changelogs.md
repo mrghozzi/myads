@@ -52,6 +52,10 @@
 * **Improvement**: Refined the global header search bar to progressively shrink and hide on smaller screens, preventing overlap with site branding and navigation icons.
 * **UX**: Unified grid and flex behaviors in the store shell to handle long titles and metadata through automated wrapping and word-breaking safety rules.
 
+### SEO & Analytics
+* **Fix**: Improved Google Analytics 4 (GA4) injection reliability by implementing case-insensitive measurement ID validation and automatic whitespace trimming.
+* **Improvement**: Standardized GA4 Measurement ID storage to always use uppercase, ensuring consistent script rendering across public pages.
+
 ---
 
 # v4.2.5

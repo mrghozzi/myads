@@ -86,7 +86,7 @@ class AdminSeoController extends Controller
             'default_og_image' => $this->nullableString($validated['default_og_image'] ?? null),
             'default_twitter_card' => $validated['default_twitter_card'],
             'ga4_enabled' => $request->boolean('ga4_enabled'),
-            'ga4_measurement_id' => $this->nullableString($validated['ga4_measurement_id'] ?? null),
+            'ga4_measurement_id' => isset($validated['ga4_measurement_id']) ? strtoupper(trim($validated['ga4_measurement_id'])) : null,
         ])->save();
 
         return redirect()

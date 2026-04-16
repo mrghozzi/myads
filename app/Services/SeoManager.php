@@ -374,7 +374,7 @@ class SeoManager
             $snippets[] = $sanitized;
         }
 
-        if ($indexable && $settings->ga4_enabled && preg_match('/^G-[A-Z0-9]+$/', (string) $settings->ga4_measurement_id)) {
+        if ($indexable && $settings->ga4_enabled && preg_match('/^G-[A-Z0-9]+$/i', trim((string) $settings->ga4_measurement_id))) {
             $measurementId = trim((string) $settings->ga4_measurement_id);
             $snippets[] = '<script async src="https://www.googletagmanager.com/gtag/js?id=' . e($measurementId) . '"></script>';
             $snippets[] = '<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag("js",new Date());gtag("config","' . e($measurementId) . '");</script>';
