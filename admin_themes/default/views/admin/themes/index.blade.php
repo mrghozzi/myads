@@ -227,7 +227,8 @@
                 </div>
 
                 <div class="tab-pane fade" id="themes-marketplace-tab" role="tabpanel">
-                    @include('admin::admin.partials.extension_marketplace_panel', ['marketplaceCatalog' => $marketplaceCatalog])
+                    @include('admin::admin.partials.extension_marketplace_panel', ['marketplaceCatalog' => $marketplaceCatalog, 'installedSlugs' => $installedSlugs])
+
                 </div>
             </div>
         </div>

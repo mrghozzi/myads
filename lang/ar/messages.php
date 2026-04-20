@@ -1841,6 +1841,10 @@ return [
     'plugin_delete_failed' => 'فشل حذف الإضافة.',
     'plugin_deleted_successfully' => 'تم حذف الإضافة بنجاح.',
     'plugin_installed_successfully' => 'تم تثبيت الإضافة بنجاح.',
+    'theme_installed_successfully' => 'تم تثبيت القالب بنجاح.',
+    'extension_already_exists' => 'هذه الإضافة مثبتة بالفعل.',
+    'invalid_url' => 'الرابط المقدم غير صالح.',
+
     'plugin_manifest_slug_required' => 'ملف تعريف الإضافة غير صالح: الحقل slug مطلوب.',
     'plugin_zip_open_failed' => 'تعذر فتح ملف ZIP المرفوع.',
     'plugin_zip_structure_invalid' => 'بنية حزمة الإضافة غير صالحة: تعذر العثور على الملف plugin.json.',

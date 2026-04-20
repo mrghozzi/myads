@@ -84,16 +84,48 @@
                     </div>
 
                     <div class="extension-hub__actions">
-                        <a
-                            href="{{ $item['product_url'] }}"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            class="btn-extension-glass btn-extension-glass--primary"
-                        >
-                            <i class="feather-external-link"></i>
-                            <span>{{ __('messages.open_in_store') }}</span>
-                        </a>
+                        @if(in_array($marketSlug, $installedSlugs ?? []))
+                            <button class="btn btn-extension-glass btn-extension-glass--secondary opacity-50" disabled>
+                                <i class="feather-check-circle"></i>
+                                <span>{{ __('messages.installed') }}</span>
+                            </button>
+                        @else
+                            @if(!empty($item['download_url']))
+                                <form action="{{ route('admin.' . ($item['category'] === 'templates' ? 'themes' : 'plugins') . '.install_marketplace') }}" method="POST" class="d-inline">
+                                    @csrf
+                                    <input type="hidden" name="slug" value="{{ $marketSlug }}">
+                                    <input type="hidden" name="download_url" value="{{ $item['download_url'] }}">
+                                    <button type="submit" class="btn-extension-glass btn-extension-glass--primary">
+                                        <i class="feather-download"></i>
+                                        <span>{{ __('messages.install_now') }}</span>
+                                    </button>
+                                </form>
+                            @else
+                                <a href="{{ $item['product_url'] }}" target="_blank" rel="noopener noreferrer" class="btn-extension-glass btn-extension-glass--primary">
+                                    <i class="feather-external-link"></i>
+                                    <span>{{ __('messages.open_in_store') }}</span>
+                                </a>
+                            @endif
+                        @endif
+
+                        @if(($item['category'] ?? '') === 'plugins')
+                            <button
+                                type="button"
+                                class="btn-extension-glass btn-extension-glass--secondary marketplace-details-btn"
+                                data-name="{{ $marketName !== '' ? $marketName : $marketSlug }}"
+                                data-slug="{{ $marketSlug }}"
+                                data-description="{{ $marketDescription }}"
+                                data-version="{{ $item['version'] ?? '1.0.0' }}"
+                                data-author="{{ $item['author'] ?? '' }}"
+                                data-thumbnail="{{ $marketImage }}"
+                                data-is-market="1"
+                            >
+                                <i class="feather-info"></i>
+                                <span>{{ __('messages.details') }}</span>
+                            </button>
+                        @endif
                     </div>
+
                 </article>
             </div>
         @endforeach

@@ -2975,8 +2975,10 @@ class AdminController extends Controller
         $plugins = $pluginManager->getAllPlugins();
         $updates = $pluginManager->checkForUpdates();
         $marketplaceCatalog = $marketplace->catalog('plugins');
+        $installedSlugs = collect($plugins)->pluck('slug')->toArray();
 
-        return view('admin::admin.plugins', compact('plugins', 'updates', 'marketplaceCatalog'));
+        return view('admin::admin.plugins', compact('plugins', 'updates', 'marketplaceCatalog', 'installedSlugs'));
+
     }
 
     public function activatePlugin(Request $request, PluginManager $pluginManager)
@@ -3072,6 +3074,31 @@ class AdminController extends Controller
         }
     }
 
+    public function installPluginFromMarketplace(Request $request, PluginManager $pluginManager)
+    {
+        $request->validate([
+            'slug' => 'required|string',
+            'download_url' => 'required|url',
+        ]);
+
+        $this->maintenanceMode->enable(Auth::user(), 'plugin_marketplace_install');
+        try {
+            $result = $pluginManager->installFromMarketplace($request->slug, $request->download_url);
+
+            if ($result === true) {
+                $this->maintenanceMode->disable(Auth::user(), 'plugin_marketplace_install_success');
+                return redirect()->route('admin.plugins')->with('success', __('messages.plugin_installed_successfully') ?? 'Plugin installed successfully.');
+            }
+
+            $this->maintenanceMode->disable(Auth::user(), 'plugin_marketplace_install_failed');
+            return redirect()->route('admin.plugins')->with('error', is_string($result) ? $result : 'Failed to install plugin.');
+        } catch (\Throwable $e) {
+            $this->maintenanceMode->disable(Auth::user(), 'plugin_marketplace_install_error');
+            return redirect()->route('admin.plugins')->with('error', __('messages.error_prefix') . $e->getMessage());
+        }
+    }
+
+
     public function pluginThumbnail($slug, PluginManager $pluginManager)
     {
         $plugins = $pluginManager->getAllPlugins();
@@ -3134,9 +3161,11 @@ class AdminController extends Controller
         $themes = $themeManager->getAllThemes();
         $updates = $themeManager->checkForUpdates();
         $marketplaceCatalog = $marketplace->catalog('themes');
+        $installedSlugs = collect($themes)->pluck('slug')->toArray();
 
-        return view('admin::admin.themes.index', compact('themes', 'updates', 'marketplaceCatalog'));
+        return view('admin::admin.themes.index', compact('themes', 'updates', 'marketplaceCatalog', 'installedSlugs'));
     }
+
 
     public function themeThumbnail($slug, ThemeManager $themeManager)
     {
@@ -3194,6 +3223,31 @@ class AdminController extends Controller
             return redirect()->back()->with('error', __('messages.error_prefix') . $e->getMessage());
         }
     }
+
+    public function installThemeFromMarketplace(Request $request, ThemeManager $themeManager)
+    {
+        $request->validate([
+            'slug' => 'required|string',
+            'download_url' => 'required|url',
+        ]);
+
+        $this->maintenanceMode->enable(Auth::user(), 'theme_marketplace_install');
+        try {
+            $result = $themeManager->installFromMarketplace($request->slug, $request->download_url);
+
+            if ($result === true) {
+                $this->maintenanceMode->disable(Auth::user(), 'theme_marketplace_install_success');
+                return redirect()->route('admin.themes')->with('success', __('messages.theme_installed_successfully') ?? 'Theme installed successfully.');
+            }
+
+            $this->maintenanceMode->disable(Auth::user(), 'theme_marketplace_install_failed');
+            return redirect()->route('admin.themes')->with('error', is_string($result) ? $result : 'Failed to install theme.');
+        } catch (\Throwable $e) {
+            $this->maintenanceMode->disable(Auth::user(), 'theme_marketplace_install_error');
+            return redirect()->route('admin.themes')->with('error', __('messages.error_prefix') . $e->getMessage());
+        }
+    }
+
 
     private function validatedBannerSize(null|string|int $value): string
     {

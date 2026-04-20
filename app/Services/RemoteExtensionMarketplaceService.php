@@ -75,8 +75,10 @@ class RemoteExtensionMarketplaceService
                     'min_myads' => trim((string) ($item['min_myads'] ?? '')),
                     'product_url' => $productUrl,
                     'image_url' => $this->isHttpUrl($imageUrl) ? $imageUrl : '',
+                    'download_url' => trim((string) ($item['download_url'] ?? '')),
                     'category' => $category,
                 ];
+
             }
 
             return [

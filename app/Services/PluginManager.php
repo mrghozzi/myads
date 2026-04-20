@@ -281,7 +281,29 @@ class PluginManager
     }
 
     /**
+     * Install a plugin from a marketplace URL.
+     *
+     * @param string $slug
+     * @param string $downloadUrl
+     * @return bool|string
+     */
+    public function installFromMarketplace($slug, $downloadUrl)
+    {
+        return $this->packageUpgrader->upgradeFromDownload(
+            type: 'plugin',
+            slug: $slug,
+            downloadUrl: $downloadUrl,
+            extensionsPath: $this->pluginPath,
+            metadataFile: 'plugin.json',
+            cacheKey: 'plugin_updates',
+            currentVersion: \App\Http\Controllers\AdminUpdatesController::CURRENT_VERSION,
+            mustExist: false
+        );
+    }
+
+    /**
      * Boot active plugins.
+
      * Should be called in AppServiceProvider or a dedicated PluginServiceProvider.
      */
     public function boot()

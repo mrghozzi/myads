@@ -19,7 +19,8 @@ class ExtensionPackageUpgrader
         string $metadataFile,
         string $cacheKey,
         string $currentVersion,
-        ?string $existingDirectory = null
+        ?string $existingDirectory = null,
+        bool $mustExist = true
     ): bool|string {
         $existingDirectory = $existingDirectory ?: $slug;
         $extensionsPath = rtrim($extensionsPath, DIRECTORY_SEPARATOR);
@@ -33,13 +34,23 @@ class ExtensionPackageUpgrader
         $backedUp = false;
 
         try {
-            if (! File::exists($currentPath)) {
+            // Safety: Validate URL
+            if (!filter_var($downloadUrl, FILTER_VALIDATE_URL)) {
+                return __('messages.invalid_url') ?? 'Invalid download URL';
+            }
+
+            if ($mustExist && ! File::exists($currentPath)) {
                 return __('messages.extension_not_installed');
             }
 
-            if ($currentPath !== $targetPath && File::exists($targetPath)) {
+            if ($mustExist && $currentPath !== $targetPath && File::exists($targetPath)) {
                 return __('messages.extension_target_conflict', ['slug' => $slug]);
             }
+
+            if (!$mustExist && File::exists($targetPath)) {
+                return __('messages.extension_already_exists') ?? 'Extension already exists';
+            }
+
 
             File::makeDirectory($tempExtractPath, 0755, true);
             File::makeDirectory(dirname($stagedPath), 0755, true);
@@ -71,13 +82,15 @@ class ExtensionPackageUpgrader
                 throw new RuntimeException(__('messages.extension_package_invalid', ['file' => $metadataFile]));
             }
 
-            if (! File::moveDirectory($currentPath, $backupPath)) {
-                return __('messages.extension_upgrade_failed_message', [
-                    'message' => __('messages.extension_rollback_failed'),
-                ]);
+            if ($mustExist) {
+                if (! File::moveDirectory($currentPath, $backupPath)) {
+                    return __('messages.extension_upgrade_failed_message', [
+                        'message' => __('messages.extension_rollback_failed'),
+                    ]);
+                }
+                $backedUp = true;
             }
 
-            $backedUp = true;
 
             if (File::exists($targetPath) && ! File::deleteDirectory($targetPath)) {
                 throw new RuntimeException(__('messages.extension_target_conflict', ['slug' => $slug]));

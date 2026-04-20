@@ -260,7 +260,8 @@
                 </div>
 
                 <div class="tab-pane fade" id="plugins-marketplace-tab" role="tabpanel">
-                    @include('admin::admin.partials.extension_marketplace_panel', ['marketplaceCatalog' => $marketplaceCatalog])
+                    @include('admin::admin.partials.extension_marketplace_panel', ['marketplaceCatalog' => $marketplaceCatalog, 'installedSlugs' => $installedSlugs])
+
                 </div>
             </div>
         </div>
@@ -407,8 +408,33 @@ document.addEventListener('DOMContentLoaded', function () {
                 tab.show();
             }
             
-            // Fetch data
+            var isMarket = button.getAttribute('data-is-market');
+            
+            if (isMarket) {
+                // Populate from data attributes
+                var name = button.getAttribute('data-name');
+                var description = button.getAttribute('data-description');
+                var version = button.getAttribute('data-version');
+                var author = button.getAttribute('data-author');
+                var thumbnail = button.getAttribute('data-thumbnail');
+
+                document.getElementById('plugin-modal-thumbnail').src = thumbnail || '{{ admin_asset("admin-duralux/images/logo-abbr.png") }}';
+                document.getElementById('plugin-modal-title').textContent = name;
+                document.getElementById('plugin-modal-slug-label').textContent = slug;
+                document.getElementById('plugin-modal-version').textContent = version;
+                document.getElementById('plugin-modal-author-name').textContent = author;
+                document.getElementById('plugin-modal-min-myads').textContent = '-';
+                
+                document.getElementById('plugin-modal-adstn-link').closest('div').classList.add('d-none');
+                document.getElementById('plugin-modal-website-link').closest('div').classList.add('d-none');
+                
+                document.getElementById('plugin-content-description').innerHTML = description ? DOMPurify.sanitize(marked.parse(description)) : '-';
+                return;
+            }
+
+            // Fetch data (for local plugins)
             fetch('{{ url("admin/plugins/details") }}/' + slug)
+
                 .then(response => response.json())
                 .then(data => {
                     if (data.error) {

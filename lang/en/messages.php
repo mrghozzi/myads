@@ -1840,6 +1840,10 @@ return [
     'plugin_delete_failed' => 'Failed to delete the plugin.',
     'plugin_deleted_successfully' => 'Plugin deleted successfully.',
     'plugin_installed_successfully' => 'Plugin installed successfully.',
+    'theme_installed_successfully' => 'Theme installed successfully.',
+    'extension_already_exists' => 'This extension is already installed.',
+    'invalid_url' => 'The provided URL is invalid.',
+
     'plugin_manifest_slug_required' => 'Invalid plugin manifest: the slug field is required.',
     'plugin_zip_open_failed' => 'Failed to open the uploaded ZIP file.',
     'plugin_zip_structure_invalid' => 'Invalid plugin package structure: plugin.json was not found.',

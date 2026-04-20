@@ -203,8 +203,23 @@ class ThemeManager
         );
     }
 
+    public function installFromMarketplace($slug, $downloadUrl)
+    {
+        return $this->packageUpgrader->upgradeFromDownload(
+            type: 'theme',
+            slug: $slug,
+            downloadUrl: $downloadUrl,
+            extensionsPath: $this->themePath,
+            metadataFile: 'theme.json',
+            cacheKey: 'theme_updates',
+            currentVersion: \App\Http\Controllers\AdminUpdatesController::CURRENT_VERSION,
+            mustExist: false
+        );
+    }
+
     /**
      * Find theme directory name by slug.
+
      *
      * @param string $slug
      * @return string|null

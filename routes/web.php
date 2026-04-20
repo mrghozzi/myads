@@ -542,6 +542,8 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::post('/plugins/delete', [AdminController::class, 'deletePlugin'])->name('admin.plugins.delete');
     Route::post('/plugins/upload', [AdminController::class, 'uploadPlugin'])->name('admin.plugins.upload');
     Route::post('plugins/upgrade', [AdminController::class, 'upgradePlugin'])->name('admin.plugins.upgrade');
+    Route::post('plugins/install-marketplace', [AdminController::class, 'installPluginFromMarketplace'])->name('admin.plugins.install_marketplace');
+
     Route::get('plugins/thumbnail/{slug}', [AdminController::class, 'pluginThumbnail'])->name('admin.plugins.thumbnail');
     Route::get('plugins/details/{slug}', [AdminController::class, 'pluginDetails'])->name('admin.plugins.details');
 
@@ -549,6 +551,8 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/themes', [AdminController::class, 'themes'])->name('admin.themes');
     Route::post('/themes/activate', [AdminController::class, 'activateTheme'])->name('admin.themes.activate');
     Route::post('/themes/upgrade', [AdminController::class, 'upgradeTheme'])->name('admin.themes.upgrade');
+    Route::post('/themes/install-marketplace', [AdminController::class, 'installThemeFromMarketplace'])->name('admin.themes.install_marketplace');
+
     Route::get('themes/thumbnail/{slug}', [AdminController::class, 'themeThumbnail'])->name('admin.themes.thumbnail');
     Route::match(['get', 'post'], '/sitemap/generate', [SitemapController::class, 'generate'])->name('admin.sitemap.generate');
 
