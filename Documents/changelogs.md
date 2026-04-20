@@ -18,7 +18,9 @@
 * **Feature**: Added dedicated **Specialized Groups** at `/groups`, allowing MYADS members to build focused communities for niches such as WordPress site owners, SaaS builders, and SEO experts.
 * **Add**: Introduced group shells with `public` and `private by request` privacy modes, member roles (`owner`, `moderator`, `member`), membership requests, approvals, and lightweight moderation tools.
 * **Community**: Group posts and group discussions now reuse the existing community `Status` + `ForumTopic` pipeline, so feed cards, comments, reactions, moderation, and visibility stay consistent with the rest of MYADS.
+* **Enforcement**: Fully integrated the group feature toggle; when disabled, group-related menu items, portal filters, and posts are automatically hidden platform-wide.
 * **Portal**: Added `/portal?filter=groups` for signed-in members to browse posts from their own groups, while public-group posts can still surface inside the main community feed.
+* **Widgets**: Introduced dedicated group widget locations (`Groups Left` and `Groups Right`) and enforced widget isolation to ensure group pages display only group-specific sidebar content.
 * **UX**: Group pages now use the shared post composer for `text`, `link`, and `gallery` publishing, while keeping group discussions as a separate focused flow for topic creation.
 * **Privacy**: Private groups expose only the header, description, and rules to non-members; posts, discussions, comments, and reactions remain locked behind active membership.
 * **Admin**: Added `/admin/groups` and `/admin/groups/settings` so community administrators can review group status, toggle featured groups, and control creation policy (`all_members`, `approval`, `paid_plan`).
@@ -42,7 +44,7 @@
 * **i18n**: Updated the Knowledgebase community-publishing hints and success messages across all **9 supported languages**.
 
 ### User Management & Localization
-* **i18n**: Fully localized the **User Edit** page (`/admin/users/{id}/edit`) in the admin panel, replacing all hardcoded English strings with translation keys across all **9 supported languages**.
+* **i18n**: Fully localized the **User Edit** page (`/admin/users/{id}/edit`) and **Widget Management** labels across all **9 supported languages**, replacing English fallbacks with dynamic translation keys for global administrators.
 * **Feature**: Added a dedicated **Subscription Management** section to the User Edit page (visible when billing is enabled), allowing administrators to manually grant, change, or cancel member subscriptions directly from the dashboard.
 * **Notifications**: Introduced a **Notify user of changes** toggle in the User Edit form, enabling administrators to send internal system notifications to members whenever their account details or subscription status are modified.
 * **Add**: Added new translation keys for manual subscription grants, cancellation actions, and administrator update notifications in both Arabic and English.
@@ -67,6 +69,10 @@
 ### SEO & Analytics
 * **Fix**: Improved Google Analytics 4 (GA4) injection reliability by implementing case-insensitive measurement ID validation and automatic whitespace trimming.
 * **Improvement**: Standardized GA4 Measurement ID storage to always use uppercase, ensuring consistent script rendering across public pages.
+
+### UX & Gamification Tuning
+* **Fix**: Resolved an icon-rendering issue where **Badge Icons** appeared as broken character boxes; implemented a robust auto-prefixing logic to handle FontAwesome icon names across all showcase and hub surfaces.
+* **Widgets**: Refined the `Badge Showcase` widget visibility and rendering logic to improve member engagement and ensure correct content display.
 
 ---
 
