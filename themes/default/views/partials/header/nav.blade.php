@@ -68,7 +68,9 @@
         </li>
         <li class="menu-item {{ Request::is('groups*') ? 'active' : '' }}">
             <a class="menu-item-link text-tooltip-tfr" href="{{ route('groups.index') }}" data-title="{{ __('messages.groups_title') }}">
-                <i class="fa fa-users" aria-hidden="true"></i>
+                <svg class="menu-item-link-icon icon-group">
+                    <use xlink:href="#svg-group"></use>
+                </svg>
             </a>
         </li>
         <li class="menu-item {{ Request::is('directory*', 'dr*', 'cat*', 'add-site*') ? 'active' : '' }}">
