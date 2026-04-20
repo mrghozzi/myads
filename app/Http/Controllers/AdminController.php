@@ -2474,15 +2474,21 @@ class AdminController extends Controller
     private function getWidgetPlaces()
     {
         $places = [
-            '1' => 'portal_left',
-            '2' => 'portal_right',
-            '3' => 'forum_left',
-            '4' => 'forum_right',
-            '5' => 'directory_left',
-            '6' => 'directory_right',
-            '7' => 'profile_left',
-            '8' => 'profile_right',
+            '1' => __('messages.portal_left'),
+            '2' => __('messages.portal_right'),
+            '3' => __('messages.forum_left'),
+            '4' => __('messages.forum_right'),
+            '5' => __('messages.directory_left'),
+            '6' => __('messages.directory_right'),
+            '7' => __('messages.profile_left'),
+            '8' => __('messages.profile_right'),
         ];
+
+        // Add group places if enabled
+        if (\App\Support\GroupSettings::isEnabled()) {
+            $places['9'] = __('messages.groups_left');
+            $places['10'] = __('messages.groups_right');
+        }
 
         // Add dynamic page places (safely handle missing table)
         if (\Illuminate\Support\Facades\Schema::hasTable('pages')) {

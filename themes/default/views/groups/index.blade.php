@@ -195,7 +195,7 @@
 
     <div class="grid grid-3-6-3 mobile-prefer-content">
         <div class="grid-column">
-            <x-widget-column side="portal_left" />
+            <x-widget-column side="groups_left" />
         </div>
 
         <div class="grid-column">
@@ -301,7 +301,7 @@
         </div>
 
         <div class="grid-column">
-            <x-widget-column side="portal_right" />
+            <x-widget-column side="groups_right" />
         </div>
     </div>
 </div>

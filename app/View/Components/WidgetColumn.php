@@ -30,6 +30,8 @@ class WidgetColumn extends Component
             'directory_right' => 6,
             'profile_left' => 7,
             'profile_right' => 8,
+            'groups_left' => 9,
+            'groups_right' => 10,
         ];
 
         // Resolve the mapped ID or use the side value directly if it's already an integer
