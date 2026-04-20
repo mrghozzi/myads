@@ -2288,4 +2288,5 @@ return [
     'profile_right' => 'Profile Right',
     'page_left' => 'Page Left',
     'page_right' => 'Page Right',
+    'users_and_billing' => 'Users & Billing',
 ];

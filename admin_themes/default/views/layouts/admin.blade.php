@@ -114,11 +114,48 @@
                         </li>
                     @endif
 
+                    <li class="nxl-item nxl-caption">
+                        <label>{{ __('messages.users_and_billing') ?? 'Users & Billing' }}</label>
+                    </li>
+
                     @if($canAdmin('users'))
                         <li class="nxl-item">
                             <a href="{{ route('admin.users') }}" class="nxl-link">
                                 <span class="nxl-micon"><i class="feather-users"></i></span>
                                 <span class="nxl-mtext">{{ __('messages.users') }}</span>
+                            </a>
+                        </li>
+                    @endif
+
+                    @if($canAdmin('community'))
+                        <li class="nxl-item">
+                            <a href="{{ route('admin.groups.index') }}" class="nxl-link">
+                                <span class="nxl-micon"><i class="feather-user-plus"></i></span>
+                                <span class="nxl-mtext">{{ __('messages.admin_groups_title') }}</span>
+                            </a>
+                        </li>
+                        <li class="nxl-item">
+                            <a href="{{ route('admin.groups.settings') }}" class="nxl-link">
+                                <span class="nxl-micon"><i class="feather-settings"></i></span>
+                                <span class="nxl-mtext">{{ __('messages.admin_groups_settings_title') }}</span>
+                            </a>
+                        </li>
+                    @endif
+
+                    @if($canAdmin('billing'))
+                        <li class="nxl-item">
+                            <a href="{{ route('admin.billing.overview') }}" class="nxl-link">
+                                <span class="nxl-micon"><i class="feather-credit-card"></i></span>
+                                <span class="nxl-mtext">{{ __('messages.billing_feature_title') }}</span>
+                            </a>
+                        </li>
+                    @endif
+
+                    @if($canAdmin('administrators'))
+                        <li class="nxl-item">
+                            <a href="{{ route('admin.admins') }}" class="nxl-link">
+                                <span class="nxl-micon"><i class="feather-user-check"></i></span>
+                                <span class="nxl-mtext">{{ __('messages.site_admins') }}</span>
                             </a>
                         </li>
                     @endif
@@ -151,8 +188,6 @@
                             <ul class="nxl-submenu">
                                 <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.knowledgebase') }}">{{ __('messages.knowledgebase') }}</a></li>
                                 <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.forum_categories') }}">{{ __('messages.forum_cats') }}</a></li>
-                                <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.groups.index') }}">{{ __('messages.admin_groups_title') }}</a></li>
-                                <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.groups.settings') }}">{{ __('messages.admin_groups_settings_title') }}</a></li>
                                 <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.community.feed.settings') }}">{{ __('messages.community_feed_settings_title') }}</a></li>
                                 <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.forum.settings') }}">{{ __('messages.forum_settings') }}</a></li>
                                 <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.forum.moderators') }}">{{ __('messages.forum_moderators') }}</a></li>
@@ -217,14 +252,7 @@
                         </li>
                     @endif
 
-                    @if($canAdmin('billing'))
-                        <li class="nxl-item">
-                            <a href="{{ route('admin.billing.overview') }}" class="nxl-link">
-                                <span class="nxl-micon"><i class="feather-credit-card"></i></span>
-                                <span class="nxl-mtext">{{ __('messages.billing_feature_title') }}</span>
-                            </a>
-                        </li>
-                    @endif
+
 
                     @if($canAnyAdminSection(['settings', 'languages', 'updates', 'maintenance', 'administrators']))
                         <li class="nxl-item nxl-hasmenu">
@@ -247,9 +275,7 @@
                                 @if($canAdmin('maintenance'))
                                     <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.maintenance') }}">{{ __('messages.maintenance') }}</a></li>
                                 @endif
-                                @if($canAdmin('administrators'))
-                                    <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.admins') }}">{{ __('messages.site_admins') }}</a></li>
-                                @endif
+
                             </ul>
                         </li>
                     @endif

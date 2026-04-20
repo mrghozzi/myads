@@ -2288,4 +2288,5 @@ return [
     'profile_right' => 'يمين الملف الشخصي',
     'page_left' => 'يسار الصفحة',
     'page_right' => 'يمين الصفحة',
+    'users_and_billing' => 'الأعضاء والفواتير',
 ];
