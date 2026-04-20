@@ -2243,4 +2243,5 @@ return [
     'profile_right' => 'Derecha de Perfil',
     'page_left' => 'Izquierda de Página',
     'page_right' => 'Derecha de Página',
+    'new_groups_pending' => ':count nuevos grupos pendientes de revisión',
 ];

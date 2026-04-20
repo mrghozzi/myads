@@ -2243,4 +2243,5 @@ return [
     'profile_right' => 'Droite du Profil',
     'page_left' => 'Gauche de la Page',
     'page_right' => 'Droite de la Page',
+    'new_groups_pending' => ':count nouveaux groupes en attente de révision',
 ];

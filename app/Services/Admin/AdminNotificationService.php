@@ -3,6 +3,7 @@
 namespace App\Services\Admin;
 
 use App\Models\BillingOrder;
+use App\Models\Group;
 use App\Models\Report;
 use App\Models\User;
 use App\Services\AdminAccessService;
@@ -57,6 +58,19 @@ class AdminNotificationService
                     'label' => __('messages.new_reports', ['count' => $reportCount]),
                     'icon' => 'feather-alert-triangle',
                     'url' => route('admin.reports'),
+                    'module' => 'community'
+                ];
+            }
+
+            // Groups Pending Review
+            $groupCount = Group::where('status', Group::STATUS_PENDING_REVIEW)->count();
+            if ($groupCount > 0) {
+                $notifications[] = [
+                    'id' => 'groups',
+                    'count' => $groupCount,
+                    'label' => __('messages.new_groups_pending', ['count' => $groupCount]),
+                    'icon' => 'feather-users',
+                    'url' => route('admin.groups.index'),
                     'module' => 'community'
                 ];
             }

@@ -116,6 +116,7 @@ return [
     'admin_notifications' => 'Admin Notifications',
     'new_billing_orders' => ':count New billing orders',
     'new_reports' => ':count New reports',
+    'new_groups_pending' => ':count New groups pending review',
     'new_system_update' => 'System update available',
     'new_plugin_updates' => ':count Plugin updates available',
     'new_theme_updates' => ':count Theme updates available',

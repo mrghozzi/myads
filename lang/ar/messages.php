@@ -116,6 +116,7 @@ return [
     'admin_notifications' => 'إشعارات الإدارة',
     'new_billing_orders' => ':count طلبات خطط جديدة',
     'new_reports' => ':count تقارير جديدة',
+    'new_groups_pending' => ':count مجموعات بانتظار المراجعة',
     'new_system_update' => 'تحديث جديد للنظام متاح',
     'new_plugin_updates' => ':count تحديثات للإضافات متاحة',
     'new_theme_updates' => ':count تحديثات للقوالب متاحة',
