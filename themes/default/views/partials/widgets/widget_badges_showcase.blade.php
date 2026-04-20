@@ -16,7 +16,13 @@
             @foreach($showcaseBadges as $item)
                 @if($item->badge)
                 <div class="badge-item" title="{{ __('messages.' . $item->badge->name_key) }}: {{ __('messages.' . $item->badge->description_key) }}" style="width: 40px; height: 40px; border-radius: 8px; background: {{ $item->badge->color ?? '#615dfa' }}; display: grid; place-items: center; color: #fff; font-size: 18px;">
-                    <i class="{{ $item->badge->icon ?? 'fa fa-trophy' }}" aria-hidden="true"></i>
+                    @if($item->badge->icon && str_contains($item->badge->icon, ' '))
+                        <i class="{{ $item->badge->icon }}" aria-hidden="true"></i>
+                    @elseif($item->badge->icon && str_starts_with($item->badge->icon, 'fa-'))
+                        <i class="fa {{ $item->badge->icon }}" aria-hidden="true"></i>
+                    @else
+                        <i class="fa fa-trophy" aria-hidden="true"></i>
+                    @endif
                 </div>
                 @endif
             @endforeach

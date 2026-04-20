@@ -74,8 +74,12 @@
                                 @if($badge)
                                     <label class="badge-settings-card">
                                         <div class="badge-settings-icon">
-                                            @if($badge->icon && str_starts_with($badge->icon, 'fa-'))
+                                            @if($badge->icon && str_contains($badge->icon, ' '))
+                                                <i class="{{ $badge->icon }}" aria-hidden="true"></i>
+                                            @elseif($badge->icon && str_starts_with($badge->icon, 'fa-'))
                                                 <i class="fa {{ $badge->icon }}" aria-hidden="true"></i>
+                                            @elseif($badge->icon && str_starts_with($badge->icon, 'svg-'))
+                                                <svg class="icon {{ $badge->icon }}"><use xlink:href="#{{ $badge->icon }}"></use></svg>
                                             @else
                                                 <i class="fa fa-trophy" aria-hidden="true"></i>
                                             @endif

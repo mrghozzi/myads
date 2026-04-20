@@ -187,7 +187,9 @@
             <div class="badge-icon-wrap">
                 <div class="badge-icon-bg"></div>
                 <div class="badge-icon-main">
-                    @if($badge->icon && str_starts_with($badge->icon, 'fa-'))
+                    @if($badge->icon && str_contains($badge->icon, ' '))
+                        <i class="{{ $badge->icon }}"></i>
+                    @elseif($badge->icon && str_starts_with($badge->icon, 'fa-'))
                         <i class="fa {{ $badge->icon }}"></i>
                     @elseif($badge->icon && str_starts_with($badge->icon, 'svg-'))
                         <svg class="icon {{ $badge->icon }}"><use xlink:href="#{{ $badge->icon }}"></use></svg>
