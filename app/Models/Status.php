@@ -43,15 +43,19 @@ class Status extends Model
     {
         $viewer = $viewer ?? Auth::user();
 
+        $schema = app(V420SchemaService::class);
+        $groupsEnabled = \App\Support\GroupSettings::isEnabled();
+
         if ($viewer && $viewer->isAdmin()) {
+            if (!$groupsEnabled && $schema->hasColumn($this->getTable(), 'group_id')) {
+                $query->whereNull('group_id');
+            }
             return $query;
         }
 
         $authorIdColumn = $column ?? $this->getAuthorIdColumn();
-        $schema = app(V420SchemaService::class);
         $groupAccess = app(GroupAccessService::class);
-        $hasGroupColumn = $schema->supports('groups') && $schema->hasColumn($this->getTable(), 'group_id');
-        $groupsEnabled = \App\Support\GroupSettings::isEnabled();
+        $hasGroupColumn = $schema->hasColumn($this->getTable(), 'group_id');
         $visibleGroupIds = ($hasGroupColumn && $groupsEnabled) ? $groupAccess->visibleGroupIdsFor($viewer) : [];
 
         $query->where(function (Builder $visibilityQuery) use ($viewer, $column, $authorIdColumn, $hasGroupColumn, $visibleGroupIds, $groupsEnabled) {
