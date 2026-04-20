@@ -74,6 +74,14 @@
 * **Fix**: Resolved an icon-rendering issue where **Badge Icons** appeared as broken character boxes; implemented a robust auto-prefixing logic to handle FontAwesome icon names across all showcase and hub surfaces.
 * **Widgets**: Refined the `Badge Showcase` widget visibility and rendering logic to improve member engagement and ensure correct content display.
 
+### Extension Management & Marketplace
+* **Feature**: Enabled direct installation of Plugins and Themes from the marketplace at `https://www.adstn.ovh`, allowing administrators to browse and install extensions with a single click from `/admin/plugins` and `/admin/themes`.
+* **Security**: Implemented a URL safety pre-check for marketplace downloads to ensure only valid and secure packages are retrieved.
+* **Architecture**: Enhanced the `ExtensionPackageUpgrader` to support fresh installations (skipping folder existence checks for new extensions) while maintaining existing upgrade behavior for installed ones.
+* **UX**: Marketplace extensions now display an "Installed" label and disabled status once present on the system, preventing redundant downloads.
+* **Add**: Introduced a new **Details Modal** for marketplace items, allowing administrators to view metadata (Author, Version, Description) before installation.
+* **i18n**: Added comprehensive translation keys for successful marketplace installations and safety-check errors in both English and Arabic.
+
 ---
 
 # v4.2.5
