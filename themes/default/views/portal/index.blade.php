@@ -165,6 +165,67 @@
         overflow: hidden;
         position: relative;
     }
+
+    /* Superdesign Tabs Enhancement */
+    .news-page .simple-tab-items {
+        display: flex;
+        gap: 8px;
+        border-bottom: 1px solid var(--news-border);
+        padding-bottom: 0;
+        margin: 24px 0;
+        overflow-x: auto;
+        scrollbar-width: none;
+        align-items: center;
+    }
+
+    .news-page .simple-tab-items::-webkit-scrollbar {
+        display: none;
+    }
+
+    .news-page .simple-tab-item {
+        height: auto;
+        padding: 12px 24px;
+        color: var(--news-muted);
+        font-size: 0.94rem;
+        font-weight: 800;
+        opacity: 0.8;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        border-bottom: 4px solid transparent;
+        margin-right: 0 !important; /* Override legacy margin-right */
+        white-space: nowrap;
+        border-radius: 12px 12px 0 0;
+    }
+
+    .news-page .simple-tab-item:hover {
+        color: var(--news-accent);
+        opacity: 1;
+        background: rgba(97, 93, 250, 0.06);
+    }
+
+    .news-page .simple-tab-item.active {
+        color: var(--news-text);
+        opacity: 1;
+        background: linear-gradient(180deg, rgba(97, 93, 250, 0.04) 0%, rgba(97, 93, 250, 0.01) 100%);
+        border-bottom-color: var(--news-accent);
+    }
+
+    .news-page .simple-tab-item.active::after {
+        content: "";
+        position: absolute;
+        bottom: -4px;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: linear-gradient(90deg, var(--news-accent), #23d2e2);
+        border-radius: 4px 4px 0 0;
+        box-shadow: 0 -2px 10px rgba(97, 93, 250, 0.25);
+    }
+
+    html[dir="rtl"] .news-page .simple-tab-item {
+        margin-left: 0 !important;
+    }
 </style>
 @endpush
 
