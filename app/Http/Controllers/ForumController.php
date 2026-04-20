@@ -258,7 +258,7 @@ class ForumController extends Controller
             if ((int) $request->type === 4 && $request->hasFile('img')) {
                 $file = $request->file('img');
                 $filename = time() . '_' . Str::random(12) . '_' . $file->getClientOriginalName();
-                $file->move(public_path('upload'), $filename);
+                $file->move(base_path('upload'), $filename);
                 $imagePath = 'upload/' . $filename;
             }
 

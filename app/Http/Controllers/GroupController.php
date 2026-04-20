@@ -333,7 +333,7 @@ class GroupController extends Controller
             if ($statusType === 4 && $request->hasFile('img')) {
                 $file = $request->file('img');
                 $filename = 'group_topic_' . $topic->id . '_' . time() . '_' . Str::random(10) . '.' . ($file->getClientOriginalExtension() ?: 'jpg');
-                $file->move(public_path('upload'), $filename);
+                $file->move(base_path('upload'), $filename);
 
                 Option::create([
                     'name' => (string) $time,

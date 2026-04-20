@@ -1958,7 +1958,7 @@ class AdminController extends Controller
         if ($request->hasFile('img')) {
             $file = $request->file('img');
             $filename = time() . '.' . $file->getClientOriginalExtension();
-            $file->move(public_path('upload'), $filename);
+            $file->move(base_path('upload'), $filename);
             $img = 'upload/' . $filename;
         }
         $news = new News();

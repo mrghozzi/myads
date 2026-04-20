@@ -162,7 +162,7 @@ class MaintenanceModeManager
 
     private function storeLogo(UploadedFile $logo, ?string $existingPath = null): string
     {
-        $directory = public_path('upload/maintenance');
+        $directory = base_path('upload/maintenance');
         if (! File::exists($directory)) {
             File::makeDirectory($directory, 0755, true);
         }
@@ -183,7 +183,7 @@ class MaintenanceModeManager
             return;
         }
 
-        $absolutePath = public_path(str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $relativePath));
+        $absolutePath = base_path(str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $relativePath));
         if (File::exists($absolutePath)) {
             File::delete($absolutePath);
         }
