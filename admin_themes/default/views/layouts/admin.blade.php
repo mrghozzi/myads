@@ -137,7 +137,7 @@
                     @if($canAdmin('community'))
                         <li class="nxl-item nxl-hasmenu">
                             <a href="javascript:void(0);" class="nxl-link">
-                                <span class="nxl-micon"><i class="feather-settings"></i></span>
+                                <span class="nxl-micon"><i class="feather-users"></i></span>
                                 <span class="nxl-mtext">{{ __('messages.Comusetting') }}</span><span class="nxl-arrow"><i class="feather-chevron-right"></i></span>
                             </a>
                             <ul class="nxl-submenu">
@@ -242,7 +242,7 @@
                     @if($canAdmin('users'))
                         <li class="nxl-item">
                             <a href="{{ route('admin.users') }}" class="nxl-link">
-                                <span class="nxl-micon"><i class="feather-users"></i></span>
+                                <span class="nxl-micon"><i class="feather-user"></i></span>
                                 <span class="nxl-mtext">{{ __('messages.users') }}</span>
                             </a>
                         </li>
