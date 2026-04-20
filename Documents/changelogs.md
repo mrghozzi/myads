@@ -14,6 +14,18 @@
 * **Compatibility**: Integrated the new billing surfaces with `V420SchemaService` so incomplete upgrades degrade gracefully with notices instead of fatal errors.
 * **Tests**: Added feature-test coverage for billing availability, bank-transfer upload and approval/rejection flows, queued-vs-extended subscriptions, admin ACL enforcement, and incomplete-upgrade fallback behavior.
 
+### Specialized Groups
+* **Feature**: Added dedicated **Specialized Groups** at `/groups`, allowing MYADS members to build focused communities for niches such as WordPress site owners, SaaS builders, and SEO experts.
+* **Add**: Introduced group shells with `public` and `private by request` privacy modes, member roles (`owner`, `moderator`, `member`), membership requests, approvals, and lightweight moderation tools.
+* **Community**: Group posts and group discussions now reuse the existing community `Status` + `ForumTopic` pipeline, so feed cards, comments, reactions, moderation, and visibility stay consistent with the rest of MYADS.
+* **Portal**: Added `/portal?filter=groups` for signed-in members to browse posts from their own groups, while public-group posts can still surface inside the main community feed.
+* **UX**: Group pages now use the shared post composer for `text`, `link`, and `gallery` publishing, while keeping group discussions as a separate focused flow for topic creation.
+* **Privacy**: Private groups expose only the header, description, and rules to non-members; posts, discussions, comments, and reactions remain locked behind active membership.
+* **Admin**: Added `/admin/groups` and `/admin/groups/settings` so community administrators can review group status, toggle featured groups, and control creation policy (`all_members`, `approval`, `paid_plan`).
+* **SEO**: Only active public groups are indexable and included in the sitemap; private groups are automatically rendered as `noindex`.
+* **i18n**: Added group-management translations across all 9 supported languages for member and admin surfaces.
+* **Tests**: Added regression coverage for public/private visibility, join flows, creation policies, group feed publishing, portal filtering, forum isolation, sitemap exposure, and translation completeness.
+
 ### Community Feed Intelligence
 * **Refactor**: Rebuilt the `/portal?filter=all` ranking pipeline around configurable community-feed settings, shifting priority toward freshness, followed authors, member affinity, and recent momentum instead of static historical totals.
 * **Add**: Introduced recent-trend rescue logic so older posts only return to the front of the community feed when they cross configurable recent engagement thresholds for comments, reactions, or reposts.

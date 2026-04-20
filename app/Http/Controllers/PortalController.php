@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Services\GroupAccessService;
 use App\Services\StatusActivityService;
 use App\Models\Status;
 use App\Models\User;
@@ -41,8 +42,10 @@ class PortalController extends Controller
             try {
                 $searchedUsers = User::where('username', 'LIKE', "%{$search}%")->get();
 
-                $topicIds = ForumTopic::where('txt', 'LIKE', "%{$search}%")
-                    ->orWhere('name', 'LIKE', "%{$search}%")
+                $topicIds = ForumTopic::visible($user)->where(function ($query) use ($search) {
+                        $query->where('txt', 'LIKE', "%{$search}%")
+                            ->orWhere('name', 'LIKE', "%{$search}%");
+                    })
                     ->pluck('id');
 
                 $dirIds = Directory::where('txt', 'LIKE', "%{$search}%")
@@ -70,6 +73,7 @@ class PortalController extends Controller
                 $activityService->decorateMany($searchedStatuses);
 
                 $searchedCommentsForum = \App\Models\ForumComment::visible()
+                    ->whereHas('topic', fn ($query) => $query->visible($user))
                     ->where('txt', 'LIKE', "%{$search}%")
                     ->orderBy('date', 'desc')
                     ->get();
@@ -101,9 +105,19 @@ class PortalController extends Controller
                 $followingIds[] = 1;
 
                 $activities = Status::visible()
-                    ->where('date', '<', time())
+                    ->where('date', '<=', time())
                     ->when(!empty($hiddenDirectoryStatusIds), fn ($query) => $query->whereNotIn('id', $hiddenDirectoryStatusIds))
                     ->whereIn('uid', $followingIds)
+                    ->orderBy('date', 'desc')
+                    ->paginate(20);
+
+                $activityService->decorateMany($activities);
+            } elseif ($user && $filter === 'groups') {
+                $activities = Status::visible($user)
+                    ->where('date', '<=', time())
+                    ->whereNotNull('group_id')
+                    ->when(!empty($hiddenDirectoryStatusIds), fn ($query) => $query->whereNotIn('id', $hiddenDirectoryStatusIds))
+                    ->tap(fn ($query) => app(GroupAccessService::class)->applyMyGroupsScope($query, $user))
                     ->orderBy('date', 'desc')
                     ->paginate(20);
 

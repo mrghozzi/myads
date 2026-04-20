@@ -64,6 +64,12 @@
                 <p class="user-status-text small">
                     <i class="fa fa-clock-o"></i>&nbsp;{{ __('messages.ago') }}&nbsp; {{ $activity->date_formatted }}
                 </p>
+
+                @if($activity->group)
+                    <div style="margin-top:8px;">
+                        @include('theme::partials.groups.badge', ['groupBadge' => $activity->group])
+                    </div>
+                @endif
             </div>
 
             @include('theme::partials.activity.promotion_badge', ['activity' => $activity])
@@ -84,8 +90,13 @@
                     <a class="activity-super" href="{{ route('forum.topic', $activity->tp_id) }}">
                         <div class="activity-super-banner" style="background-image: url({{ $topicBanner }});">
                             <span class="activity-super-category">
-                                <i class="fa {{ $activity->related_content->category->icon ?? 'fa-folder' }}" aria-hidden="true"></i>
-                                {{ $activity->related_content->category->name ?? '' }}
+                                @if($activity->group)
+                                    <i class="fa fa-users" aria-hidden="true"></i>
+                                    {{ $activity->group->name }}
+                                @else
+                                    <i class="fa {{ $activity->related_content->category->icon ?? 'fa-folder' }}" aria-hidden="true"></i>
+                                    {{ $activity->related_content->category->name ?? '' }}
+                                @endif
                             </span>
                         </div>
                         <div class="activity-super-content">
@@ -214,6 +225,7 @@
                     </div>
                  @endforeach
                  @auth
+                    @if((int) ($activity->group_id ?? 0) === 0)
                     <div class="reaction-option text-tooltip-tft" data-title="{{ __('messages.quote_repost') }}" style="position: relative;">
                         <a href="javascript:void(0);" onclick="openRepostComposer({{ $activity->id }}, '{{ $repostAuthorName }}', '{{ addslashes($repostExcerpt) }}')">
                             <span style="width: 40px; height: 40px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: #615dfa; color: #fff;">
@@ -221,6 +233,7 @@
                             </span>
                         </a>
                     </div>
+                    @endif
                  @endauth
             </div>
         </div>

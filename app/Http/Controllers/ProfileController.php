@@ -58,7 +58,7 @@ class ProfileController extends Controller
             $query = Status::visible()
                 ->where('uid', $user->id)
                 ->where('statu', 1)
-                ->where('date', '<', time())
+                ->where('date', '<=', time())
                 ->where('s_type', '!=', 5)
                 ->when($selectedTab !== 'links' && !empty($hiddenDirectoryStatusIds), fn ($builder) => $builder->whereNotIn('id', $hiddenDirectoryStatusIds))
                 ->orderBy('date', 'desc');

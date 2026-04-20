@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Directory;
+use App\Models\ForumComment;
 use App\Models\ForumTopic;
 use App\Models\Like;
 use App\Models\Notification;
@@ -10,6 +11,7 @@ use App\Models\Option;
 use App\Models\Status;
 use App\Models\User;
 use App\Services\GamificationService;
+use App\Services\GroupAccessService;
 use App\Services\KnowledgebaseCommunityService;
 use App\Services\NotificationService;
 use App\Services\PointLedgerService;
@@ -57,6 +59,10 @@ class ReactionController extends Controller
 
         if ($dbType === 0) {
             return response()->json(['error' => 'Invalid type'], 400);
+        }
+
+        if (!$this->canReactToTarget($type, (int) $id, $user)) {
+            return response()->json(['error' => __('messages.forum_unauthorized')], 403);
         }
 
         // Find existing like
@@ -302,5 +308,39 @@ class ReactionController extends Controller
             return $comment ? $comment->o_order : null;
         }
         return null;
+    }
+
+    private function canReactToTarget(string $type, int $id, User $user): bool
+    {
+        if ($type === 'forum') {
+            $topic = ForumTopic::find($id);
+            if (!$topic) {
+                return false;
+            }
+
+            if ((int) $topic->group_id > 0) {
+                return app(GroupAccessService::class)->canPostToGroup($topic->group()->first(), $user);
+            }
+
+            return true;
+        }
+
+        if ($type === 'forum_comment') {
+            $comment = ForumComment::find($id);
+            if (!$comment) {
+                return false;
+            }
+
+            $topic = ForumTopic::find($comment->tid);
+            if (!$topic) {
+                return false;
+            }
+
+            if ((int) $topic->group_id > 0) {
+                return app(GroupAccessService::class)->canPostToGroup($topic->group()->first(), $user);
+            }
+        }
+
+        return true;
     }
 }

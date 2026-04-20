@@ -5,12 +5,15 @@ namespace App\Http\Controllers;
 use App\Models\Directory;
 use App\Models\ForumAttachment;
 use App\Models\ForumTopic;
+use App\Models\Group;
 use App\Models\Option;
 use App\Models\Short;
 use App\Models\Status;
 use App\Models\StatusLinkPreview;
 use App\Models\StatusRepost;
 use App\Services\GamificationService;
+use App\Services\GroupAccessService;
+use App\Services\GroupMembershipService;
 use App\Services\LinkPreviewService;
 use App\Services\MentionService;
 use App\Services\NotificationService;
@@ -83,6 +86,7 @@ class StatusController extends Controller
         $schema = app(V420SchemaService::class);
         $legacyType = (int) $request->input('s_type', 100);
         $postKind = (string) $request->input('post_kind', '');
+        $group = null;
 
         $request->merge([
             'directory_category_id' => $this->normalizeDirectoryCategoryId($request->input('directory_category_id')),
@@ -104,7 +108,7 @@ class StatusController extends Controller
             };
         }
 
-        $request->validate([
+        $rules = [
             'text' => 'nullable|string|max:10000',
             'txt' => 'nullable|string|max:10000',
             'images' => 'nullable|array|max:10',
@@ -116,7 +120,13 @@ class StatusController extends Controller
             'directory_category_id' => 'nullable|integer|exists:cat_dir,id',
             'directory_tags' => 'nullable|string|max:255',
             'repost_status_id' => 'nullable|integer|exists:status,id',
-        ]);
+        ];
+
+        if ($schema->supports('groups')) {
+            $rules['group_id'] = 'nullable|integer|exists:groups,id';
+        }
+
+        $request->validate($rules);
 
         $text = trim((string) $request->input('text', $request->input('txt', '')));
         $time = time();
@@ -124,6 +134,11 @@ class StatusController extends Controller
         $publishMode = (string) $request->input('publish_mode', 'post');
         $linkUrl = $this->resolveLinkUrl($request, $text);
         $legacyDirectorySave = $request->boolean('save_to_directory');
+
+        if ($schema->supports('groups') && $request->filled('group_id')) {
+            $group = Group::findOrFail((int) $request->input('group_id'));
+            app(GroupAccessService::class)->ensureCanPostToGroup($group, $user);
+        }
 
         if ($cooldownMessage = $securityThrottle->actionMessage($user, 'post')) {
             return back()->with('error', $cooldownMessage)->withInput();
@@ -150,6 +165,12 @@ class StatusController extends Controller
         }
 
         if ($publishMode === 'directory_only') {
+            if ($group) {
+                return back()
+                    ->with('error', __('messages.groups_directory_publish_disabled'))
+                    ->withInput();
+            }
+
             if (!$linkUrl) {
                 return back()
                     ->with('error', __('messages.directory_only_requires_link'))
@@ -176,9 +197,21 @@ class StatusController extends Controller
             }
         }
 
+        if ($group && ($legacyDirectorySave || $publishMode === 'directory_only')) {
+            return back()
+                ->with('error', __('messages.groups_directory_publish_disabled'))
+                ->withInput();
+        }
+
         if ($postKind === 'repost' && !$schema->supports('reposts')) {
             return back()
                 ->with('error', $schema->blockedActionMessage('reposts', __('messages.reposts')))
+                ->withInput();
+        }
+
+        if ($group && $postKind === 'repost') {
+            return back()
+                ->with('error', __('messages.groups_reposts_disabled'))
                 ->withInput();
         }
 
@@ -190,9 +223,10 @@ class StatusController extends Controller
 
         DB::beginTransaction();
         try {
-            $topic = $this->createForumTopic($user->id, $text, $postKind, $time);
+            $topic = $this->createForumTopic($user->id, $text, $postKind, $time, $group?->id);
             $status = Status::create([
                 'uid' => $user->id,
+                'group_id' => $group?->id,
                 'date' => $time,
                 's_type' => $statusType,
                 'tp_id' => $topic->id,
@@ -262,6 +296,14 @@ class StatusController extends Controller
 
             DB::commit();
             $securityThrottle->hitAction($user, 'post');
+            if ($group) {
+                app(GroupMembershipService::class)->touchActivity($group, $time);
+
+                return redirect()
+                    ->route('groups.show', ['group' => $group->slug, 'tab' => 'feed'])
+                    ->with('success', __('messages.groups_post_created'));
+            }
+
             return redirect()->route('forum.topic', $topic->id);
         } catch (\Throwable $e) {
             DB::rollBack();
@@ -335,13 +377,14 @@ class StatusController extends Controller
         }
     }
 
-    private function createForumTopic(int $userId, string $text, string $postKind, int $time): ForumTopic
+    private function createForumTopic(int $userId, string $text, string $postKind, int $time, ?int $groupId = null): ForumTopic
     {
         return ForumTopic::create([
             'uid' => $userId,
             'name' => $postKind,
             'txt' => $text,
             'cat' => 0,
+            'group_id' => $groupId,
             'statu' => 1,
             'date' => $time,
             'reply' => 0,

@@ -113,7 +113,7 @@ class FeedService
     private static function baseVisibleStatusQuery(Collection $hiddenDirectoryStatusIds, int $now)
     {
         return Status::visible()
-            ->where('date', '<', $now)
+            ->where('date', '<=', $now)
             ->when(
                 $hiddenDirectoryStatusIds->isNotEmpty(),
                 fn ($query) => $query->whereNotIn('id', $hiddenDirectoryStatusIds->all())

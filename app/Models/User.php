@@ -350,6 +350,16 @@ class User extends Authenticatable
         return $this->hasMany(MemberSubscription::class, 'user_id');
     }
 
+    public function groupsOwned()
+    {
+        return $this->hasMany(Group::class, 'owner_id');
+    }
+
+    public function groupMemberships()
+    {
+        return $this->hasMany(GroupMembership::class, 'user_id');
+    }
+
     public static function generatePublicUid(): string
     {
         do {

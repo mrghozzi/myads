@@ -36,7 +36,7 @@ class StatusActivityService
 
     public function decorate(Status $activity): Status
     {
-        $relations = ['user'];
+        $relations = ['user', 'group'];
 
         if ($this->schema->supports('link_previews')) {
             $relations[] = 'linkPreviewRecord';

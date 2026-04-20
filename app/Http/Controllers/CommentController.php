@@ -11,6 +11,7 @@ use App\Models\Status;
 use App\Models\User;
 use App\Services\KnowledgebaseCommunityService;
 use App\Services\GamificationService;
+use App\Services\GroupAccessService;
 use App\Services\MentionService;
 use App\Services\NotificationService;
 use App\Services\PointLedgerService;
@@ -41,6 +42,10 @@ class CommentController extends Controller
         if ($type == 'forum') {
             $topic = ForumTopic::find($id);
             if ($topic) {
+                if ((int) $topic->group_id > 0 && !app(GroupAccessService::class)->canViewGroupContent($topic->group()->first(), Auth::user())) {
+                    return '';
+                }
+
                 $forum_category_id = (int) $topic->cat;
                 $locked_topic = (bool) $topic->is_locked;
                 $hide_form = $locked_topic
@@ -143,6 +148,14 @@ class CommentController extends Controller
             $topic = ForumTopic::find($id);
             if (!$topic) {
                 return response()->json(['error' => 'Topic not found'], 404);
+            }
+
+            if ((int) $topic->group_id > 0) {
+                try {
+                    app(GroupAccessService::class)->ensureCanInteractWithTopic($topic, $user);
+                } catch (\Throwable) {
+                    return response()->json(['error' => __('messages.forum_unauthorized')], 403);
+                }
             }
 
             if ($topic->is_locked && !$this->canUserCommentLockedTopic($user, $topic)) {
@@ -338,7 +351,11 @@ class CommentController extends Controller
         if ($type === 'forum' && $comment instanceof ForumComment) {
             $topic = ForumTopic::find($comment->tid);
             if ($topic) {
-                $canDeleteAsForumModerator = Auth::user()->canModerateForum('delete_comments', (int) $topic->cat);
+                if ((int) $topic->group_id > 0) {
+                    $canDeleteAsForumModerator = app(GroupAccessService::class)->canManageGroup($topic->group()->first(), Auth::user());
+                } else {
+                    $canDeleteAsForumModerator = Auth::user()->canModerateForum('delete_comments', (int) $topic->cat);
+                }
             }
         }
 
@@ -372,6 +389,11 @@ class CommentController extends Controller
 
     private function canUserCommentLockedTopic(User $user, ForumTopic $topic): bool
     {
+        if ((int) $topic->group_id > 0) {
+            return (int) $user->id === (int) $topic->uid
+                || app(GroupAccessService::class)->canManageGroup($topic->group()->first(), $user);
+        }
+
         return (int) $user->id === (int) $topic->uid
             || $user->canModerateForum('lock_topics', (int) $topic->cat);
     }

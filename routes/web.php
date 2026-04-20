@@ -17,6 +17,7 @@ use App\Http\Controllers\PortalController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AdminGroupController;
 use App\Http\Controllers\AdminSeoController;
 use App\Http\Controllers\AdminPageController;
 use App\Http\Controllers\AdminBillingController;
@@ -28,6 +29,7 @@ use App\Http\Controllers\AdminCommunityFeedController;
 use App\Http\Controllers\AdminSecurityController;
 use App\Http\Controllers\AdminStatusPromotionController;
 use App\Http\Controllers\BillingController;
+use App\Http\Controllers\GroupController;
 use App\Http\Controllers\SeoPublicController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\OrderRequestController;
@@ -108,6 +110,20 @@ Route::get('/portal', [PortalController::class, 'index'])->name('portal.index');
 Route::get('/share', [PortalController::class, 'share'])->name('portal.share')->middleware('auth');
 Route::get('/developer', [PortalController::class, 'developer'])->name('portal.developer');
 Route::get('/badges', [ProfileController::class, 'allBadges'])->name('badges.all');
+
+// Groups Routes
+Route::get('/groups', [GroupController::class, 'index'])->name('groups.index');
+Route::middleware(['auth'])->group(function () {
+    Route::get('/groups/create', [GroupController::class, 'create'])->name('groups.create');
+    Route::post('/groups', [GroupController::class, 'store'])->name('groups.store');
+    Route::post('/groups/{group}/join', [GroupController::class, 'join'])->name('groups.join');
+    Route::post('/groups/{group}/leave', [GroupController::class, 'leave'])->name('groups.leave');
+    Route::post('/groups/{group}/discussions', [GroupController::class, 'storeDiscussion'])->name('groups.discussions.store');
+    Route::post('/groups/{group}/members/{membership}/approve', [GroupController::class, 'approveMembership'])->name('groups.members.approve');
+    Route::post('/groups/{group}/members/{membership}/reject', [GroupController::class, 'rejectMembership'])->name('groups.members.reject');
+    Route::post('/groups/{group}/members/{membership}/role', [GroupController::class, 'updateRole'])->name('groups.members.role');
+});
+Route::get('/groups/{group:slug}', [GroupController::class, 'show'])->name('groups.show');
 
 // Message Routes
 Route::middleware(['auth'])->group(function () {
@@ -438,6 +454,11 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::delete('/forum/categories/{id}', [AdminController::class, 'deleteForumCategory'])->name('admin.forum_categories.delete');
     Route::get('/community/feed/settings', [AdminCommunityFeedController::class, 'settings'])->name('admin.community.feed.settings');
     Route::post('/community/feed/settings', [AdminCommunityFeedController::class, 'updateSettings'])->name('admin.community.feed.settings.update');
+    Route::get('/groups', [AdminGroupController::class, 'index'])->name('admin.groups.index');
+    Route::post('/groups/{group}/status', [AdminGroupController::class, 'updateStatus'])->name('admin.groups.status');
+    Route::post('/groups/{group}/feature', [AdminGroupController::class, 'toggleFeatured'])->name('admin.groups.feature');
+    Route::get('/groups/settings', [AdminGroupController::class, 'settings'])->name('admin.groups.settings');
+    Route::post('/groups/settings', [AdminGroupController::class, 'updateSettings'])->name('admin.groups.settings.update');
     Route::get('/forum/settings', [AdminController::class, 'forumSettings'])->name('admin.forum.settings');
     Route::post('/forum/settings', [AdminController::class, 'updateForumSettings'])->name('admin.forum.settings.update');
     Route::get('/forum/moderators', [AdminController::class, 'forumModerators'])->name('admin.forum.moderators');

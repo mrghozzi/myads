@@ -18,6 +18,7 @@ class V420SchemaService
         'security_ip_bans' => ['security_ip_bans'],
         'security_sessions' => ['security_member_sessions'],
         'post_promotions' => ['status_promotions'],
+        'groups' => ['groups', 'group_memberships'],
         'subscriptions_billing' => [
             'subscription_plans',
             'member_subscriptions',

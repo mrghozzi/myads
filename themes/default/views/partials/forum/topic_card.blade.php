@@ -1,16 +1,21 @@
 @php
     $viewer = auth()->user();
     $topicCategoryId = (int) $topic->cat;
+    $group = $topic->group;
+    $groupAccess = app(\App\Services\GroupAccessService::class);
+    $canManageGroupTopic = $group && auth()->check() ? $groupAccess->canManageGroup($group, auth()->user()) : false;
     $canEditTopic = auth()->check() && (
         (int) auth()->id() === (int) $topic->uid
+        || $canManageGroupTopic
         || $viewer->canModerateForum('edit_topics', $topicCategoryId)
     );
     $canDeleteTopic = auth()->check() && (
         (int) auth()->id() === (int) $topic->uid
+        || $canManageGroupTopic
         || $viewer->canModerateForum('delete_topics', $topicCategoryId)
     );
-    $canPinTopic = auth()->check() && $viewer->canModerateForum('pin_topics', $topicCategoryId);
-    $canLockTopic = auth()->check() && $viewer->canModerateForum('lock_topics', $topicCategoryId);
+    $canPinTopic = auth()->check() && ($canManageGroupTopic || $viewer->canModerateForum('pin_topics', $topicCategoryId));
+    $canLockTopic = auth()->check() && ($canManageGroupTopic || $viewer->canModerateForum('lock_topics', $topicCategoryId));
     $showForumRoleBadges = (int) \App\Support\ForumSettings::get('show_role_badges', 1) === 1;
 
     $reactionsCount = \App\Models\Like::where('sid', $topic->id)->where('type', 2)->count();
@@ -60,12 +65,20 @@
 
             <span>&middot;</span>
             <span>{{ $status->date ? \Carbon\Carbon::createFromTimestamp($status->date)->diffForHumans() : '' }}</span>
-            <span>&middot;</span>
-            <span>
-                <i class="fa {{ optional($topic->category)->icons }}" aria-hidden="true"></i>
-                {{ optional($topic->category)->name }}
-            </span>
+            @unless($group)
+                <span>&middot;</span>
+                <span>
+                    <i class="fa {{ optional($topic->category)->icons }}" aria-hidden="true"></i>
+                    {{ optional($topic->category)->name }}
+                </span>
+            @endunless
         </p>
+
+        @if($group)
+            <div class="forum-rdx-discussion-meta" style="margin-top: 10px;">
+                @include('theme::partials.groups.badge', ['groupBadge' => $group])
+            </div>
+        @endif
         <div id="report{{ $topic->id }}"></div>
         <div id="notif{{ $topic->id }}"></div>
     </div>

@@ -23,10 +23,17 @@
     <div class="section-filters-bar-actions">
         <div class="section-filters-bar-info">
             <p class="section-filters-bar-title">
-                <a href="{{ route('forum.index') }}">{{ __('messages.forum') }}</a>
-                <span class="separator"></span>
-                <a href="{{ route('forum.category', $topic->cat) }}"><i class="fa {{ $topic->category->icons ?? '' }}" aria-hidden="true"></i>&nbsp;{{ $topic->category->name ?? __('messages.category_fallback') }}</a>
-                <span class="separator"></span>
+                @if(!empty($group))
+                    <a href="{{ route('groups.index') }}">{{ __('messages.groups_title') }}</a>
+                    <span class="separator"></span>
+                    <a href="{{ route('groups.show', $group) }}"><i class="fa fa-users" aria-hidden="true"></i>&nbsp;{{ $group->name }}</a>
+                    <span class="separator"></span>
+                @else
+                    <a href="{{ route('forum.index') }}">{{ __('messages.forum') }}</a>
+                    <span class="separator"></span>
+                    <a href="{{ route('forum.category', $topic->cat) }}"><i class="fa {{ $topic->category->icons ?? '' }}" aria-hidden="true"></i>&nbsp;{{ $topic->category->name ?? __('messages.category_fallback') }}</a>
+                    <span class="separator"></span>
+                @endif
                 <a href="{{ route('forum.topic', $topic->id) }}">{{ $topic->name }}</a>
             </p>
             <div class="section-filters-bar-text small-space">
@@ -37,25 +44,34 @@
 </div>
 
 @php
+    $group = $group ?? null;
     $showForumRoleBadges = (int) ($forumSettings['show_role_badges'] ?? 1) === 1;
     $topicCategoryId = (int) $topic->cat;
+    $groupAccess = app(\App\Services\GroupAccessService::class);
+    $canManageGroupTopic = $group && auth()->check() ? $groupAccess->canManageGroup($group, auth()->user()) : false;
     $canEditTopic = auth()->check() && (
         auth()->id() === (int) $topic->uid
+        || $canManageGroupTopic
         || auth()->user()->canModerateForum('edit_topics', $topicCategoryId)
     );
     $canDeleteTopic = auth()->check() && (
         auth()->id() === (int) $topic->uid
+        || $canManageGroupTopic
         || auth()->user()->canModerateForum('delete_topics', $topicCategoryId)
     );
-    $canPinTopic = auth()->check() && auth()->user()->canModerateForum('pin_topics', $topicCategoryId);
-    $canLockTopic = auth()->check() && auth()->user()->canModerateForum('lock_topics', $topicCategoryId);
+    $canPinTopic = auth()->check() && ($canManageGroupTopic || auth()->user()->canModerateForum('pin_topics', $topicCategoryId));
+    $canLockTopic = auth()->check() && ($canManageGroupTopic || auth()->user()->canModerateForum('lock_topics', $topicCategoryId));
     $canCommentWhenLocked = auth()->check() && (
         auth()->id() === (int) $topic->uid
+        || $canManageGroupTopic
         || auth()->user()->canModerateForum('lock_topics', $topicCategoryId)
     );
 @endphp
 
 <div class="section-header" style="margin-top: 12px;">
+    @if($group)
+        @include('theme::partials.groups.badge', ['groupBadge' => $group])
+    @endif
     @if($topic->is_pinned)
         <span class="badge bg-warning text-dark">{{ __('messages.pinned') }}</span>
     @endif

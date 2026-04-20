@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use App\Models\Directory;
 use App\Models\ForumComment;
 use App\Models\ForumTopic;
+use App\Models\Group;
 use App\Models\Like;
 use App\Models\News;
 use App\Models\Option;
@@ -15,6 +16,7 @@ use App\Models\Product;
 use App\Models\StatusPromotion;
 use App\Models\StatusLinkPreview;
 use App\Models\StatusRepost;
+use App\Services\GroupAccessService;
 use App\Services\V420SchemaService;
 use App\Services\KnowledgebaseCommunityService;
 use App\Models\OrderRequest;
@@ -40,30 +42,41 @@ class Status extends Model
     public function scopeVisible(Builder $query, ?User $viewer = null, ?string $column = null): Builder
     {
         $viewer = $viewer ?? Auth::user();
-        
-        // 1. Apply privacy filters from Trait
-        $query->privacyVisible($viewer, $column);
 
-        // 2. If Admin, they see everything (overrides trait filters)
         if ($viewer && $viewer->isAdmin()) {
             return $query;
         }
 
-        // 3. AND hide if linked to a suspended product (unless owner)
         $authorIdColumn = $column ?? $this->getAuthorIdColumn();
+        $schema = app(V420SchemaService::class);
+        $groupAccess = app(GroupAccessService::class);
+        $hasGroupColumn = $schema->supports('groups') && $schema->hasColumn($this->getTable(), 'group_id');
+        $visibleGroupIds = $hasGroupColumn ? $groupAccess->visibleGroupIdsFor($viewer) : [];
 
-        $query->where(function ($q) use ($viewer, $authorIdColumn) {
-            $q->where(function ($inner) {
-                // Not a store update OR not suspended
-                $inner->where('s_type', '!=', 7867)
-                      ->orWhereDoesntHave('productItem.statusOptions', function ($sub) {
-                          $sub->where('name', 'suspended');
-                      });
+        $query->where(function (Builder $visibilityQuery) use ($viewer, $column, $authorIdColumn, $hasGroupColumn, $visibleGroupIds) {
+            $visibilityQuery->where(function (Builder $ungroupedQuery) use ($viewer, $column, $authorIdColumn, $hasGroupColumn) {
+                if ($hasGroupColumn) {
+                    $ungroupedQuery->whereNull('group_id');
+                }
+
+                $ungroupedQuery->privacyVisible($viewer, $column);
+
+                $ungroupedQuery->where(function ($q) use ($viewer, $authorIdColumn) {
+                    $q->where(function ($inner) {
+                        $inner->where('s_type', '!=', 7867)
+                            ->orWhereDoesntHave('productItem.statusOptions', function ($sub) {
+                                $sub->where('name', 'suspended');
+                            });
+                    });
+
+                    if ($viewer) {
+                        $q->orWhere($authorIdColumn, $viewer->id);
+                    }
+                });
             });
 
-            // OR viewer is the owner
-            if ($viewer) {
-                $q->orWhere($authorIdColumn, $viewer->id);
+            if ($visibleGroupIds !== []) {
+                $visibilityQuery->orWhereIn('group_id', $visibleGroupIds);
             }
         });
 
@@ -73,6 +86,7 @@ class Status extends Model
     protected $fillable = [
         'uid',
         'tp_id',
+        'group_id',
         's_type',
         'date',
         'txt',
@@ -89,6 +103,11 @@ class Status extends Model
     public function forumTopic()
     {
         return $this->belongsTo(ForumTopic::class, 'tp_id');
+    }
+
+    public function group()
+    {
+        return $this->belongsTo(Group::class, 'group_id');
     }
 
     public function directoryListing()

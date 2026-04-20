@@ -131,6 +131,12 @@
                     {{-- Assuming Suggestion logic needs to be migrated later --}}
                 </p>
                 <!-- /USER STATUS TEXT -->
+
+                @if($activity->group)
+                    <div style="margin-top:8px;">
+                        @include('theme::partials.groups.badge', ['groupBadge' => $activity->group])
+                    </div>
+                @endif
             </div>
             <!-- /USER STATUS -->
 
@@ -303,6 +309,7 @@
                     </div>
                  @endforeach
                  @auth
+                    @if((int) ($activity->group_id ?? 0) === 0)
                     <div class="reaction-option text-tooltip-tft" data-title="{{ __('messages.quote_repost') }}" style="position: relative;">
                         <a href="javascript:void(0);" onclick="openRepostComposer({{ $activity->id }}, '{{ $repostAuthorName }}', '{{ addslashes($repostExcerpt) }}')">
                             <span style="width: 40px; height: 40px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: #615dfa; color: #fff;">
@@ -310,6 +317,7 @@
                             </span>
                         </a>
                     </div>
+                    @endif
                  @endauth
             </div>
             <!-- /REACTION OPTIONS -->

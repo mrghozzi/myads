@@ -7,23 +7,35 @@
 @include('theme::partials.ads', ['id' => 5])
 
 @php
+    $group = $group ?? null;
     $showForumRoleBadges = (int) ($forumSettings['show_role_badges'] ?? 1) === 1;
     $topicCategoryId = (int) $topic->cat;
+    $groupAccess = app(\App\Services\GroupAccessService::class);
+    $canManageGroupTopic = $group && auth()->check() ? $groupAccess->canManageGroup($group, auth()->user()) : false;
     $canEditTopic = auth()->check() && (
         auth()->id() === (int) $topic->uid
+        || $canManageGroupTopic
         || auth()->user()->canModerateForum('edit_topics', $topicCategoryId)
     );
     $canDeleteTopic = auth()->check() && (
         auth()->id() === (int) $topic->uid
+        || $canManageGroupTopic
         || auth()->user()->canModerateForum('delete_topics', $topicCategoryId)
     );
-    $canPinTopic = auth()->check() && auth()->user()->canModerateForum('pin_topics', $topicCategoryId);
-    $canLockTopic = auth()->check() && auth()->user()->canModerateForum('lock_topics', $topicCategoryId);
+    $canPinTopic = auth()->check() && ($canManageGroupTopic || auth()->user()->canModerateForum('pin_topics', $topicCategoryId));
+    $canLockTopic = auth()->check() && ($canManageGroupTopic || auth()->user()->canModerateForum('lock_topics', $topicCategoryId));
     $canCommentWhenLocked = auth()->check() && (
         auth()->id() === (int) $topic->uid
+        || $canManageGroupTopic
         || auth()->user()->canModerateForum('lock_topics', $topicCategoryId)
     );
 @endphp
+
+@if($group)
+    <div class="section-header" style="margin-bottom:12px;">
+        @include('theme::partials.groups.badge', ['groupBadge' => $group])
+    </div>
+@endif
 
 <div class="grid grid post{{ $status->id }}">
     <div class="widget-box no-padding activity-post-card post{{ $status->id }}">

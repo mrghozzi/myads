@@ -1,12 +1,35 @@
 @auth
 @php
     $currentUser = auth()->user();
-    $categories = \App\Models\DirectoryCategory::where('statu', 1)->orderBy('name', 'ASC')->get();
+    $composerContext = $composerContext ?? [];
+    $composerGroup = $composerContext['group'] ?? null;
+    $composerGroupId = (int) ($composerContext['group_id'] ?? ($composerGroup->id ?? 0));
+    $isGroupComposer = $composerGroupId > 0;
+    $allowedKinds = array_values(array_unique((array) ($composerContext['allowedKinds'] ?? ['text', 'gallery', 'link', 'repost'])));
+    $allowGallery = in_array('gallery', $allowedKinds, true);
+    $allowLink = in_array('link', $allowedKinds, true);
+    $allowRepost = in_array('repost', $allowedKinds, true) && !$isGroupComposer;
+    $disableDirectoryOnly = $isGroupComposer || !empty($composerContext['disableDirectoryOnly']);
+    $categories = $disableDirectoryOnly
+        ? collect()
+        : \App\Models\DirectoryCategory::where('statu', 1)->orderBy('name', 'ASC')->get();
     $oldText = (string) old('text', old('txt', request('text', '')));
     $oldLinkUrl = (string) old('link_url', '');
-    $oldPublishMode = (string) old('publish_mode', 'post');
+    $oldPublishMode = $disableDirectoryOnly ? 'post' : (string) old('publish_mode', 'post');
     $oldPostKind = (string) old('post_kind', 'text');
-    $oldRepostStatusId = (string) old('repost_status_id', '');
+    if (!in_array($oldPostKind, array_filter([
+        'text',
+        $allowGallery ? 'gallery' : null,
+        $allowLink ? 'link' : null,
+        $allowRepost ? 'repost' : null,
+    ]), true)) {
+        $oldPostKind = 'text';
+    }
+    $oldRepostStatusId = $allowRepost ? (string) old('repost_status_id', '') : '';
+    $composerPlaceholder = $isGroupComposer
+        ? __($composerContext['placeholderKey'] ?? 'messages.groups_post_placeholder')
+        : __('messages.whats_on_your_mind', ['username' => $currentUser->username]);
+    $composerSubmitLabel = __($composerContext['submitLabelKey'] ?? ($isGroupComposer ? 'messages.groups_publish_post' : 'messages.spread'));
     $composerHasOldInput = old('text') !== null
         || old('txt') !== null
         || old('link_url') !== null
@@ -14,7 +37,8 @@
         || old('post_kind') !== null
         || old('directory_name') !== null
         || old('directory_tags') !== null
-        || old('repost_status_id') !== null;
+        || old('repost_status_id') !== null
+        || old('group_id') !== null;
 @endphp
 
 <div class="quick-post composer-refresh" id="social-composer">
@@ -22,6 +46,9 @@
         @csrf
         <input type="hidden" name="post_kind" id="composer-post-kind" value="{{ $oldPostKind }}">
         <input type="hidden" name="repost_status_id" id="composer-repost-status-id" value="{{ $oldRepostStatusId }}">
+        @if($isGroupComposer)
+            <input type="hidden" name="group_id" value="{{ $composerGroupId }}">
+        @endif
 
         <div class="quick-post-body composer-refresh__body">
             @if($composerHasOldInput && session('error'))
@@ -38,7 +65,7 @@
                 </div>
             @endif
 
-            <div class="composer-refresh__surface">
+            <div class="composer-refresh__surface{{ $isGroupComposer ? ' composer-refresh__surface--group' : '' }}">
                 <div class="composer-refresh__header">
                     <a class="composer-refresh__identity" href="{{ route('profile.show', $currentUser->username) }}">
                         <img class="composer-refresh__avatar" src="{{ $currentUser->avatarUrl() }}" alt="{{ $currentUser->username }}">
@@ -50,133 +77,150 @@
                     </button>
                 </div>
 
+                @if($composerGroup)
+                    <div class="composer-refresh__context">
+                        @include('theme::partials.groups.badge', ['groupBadge' => $composerGroup])
+                        <p class="composer-refresh__context-copy">{{ __('messages.groups_share_with_group') }}</p>
+                    </div>
+                @endif
+
                 <div class="composer-refresh__editor" id="composer-editor-shell">
                     <textarea
                         id="composer-text"
                         name="text"
                         class="quicktext composer-refresh__textarea"
-                        placeholder="{{ __('messages.whats_on_your_mind', ['username' => $currentUser->username]) }}"
+                        placeholder="{{ $composerPlaceholder }}"
                     >{{ $oldText }}</textarea>
                 </div>
 
                 <p class="composer-refresh__hint">{{ __('messages.mentions_hint') }}</p>
             </div>
 
-            <div id="composer-repost-card" class="widget-box composer-refresh__panel composer-refresh__panel--repost" style="display:none;">
-                <div class="widget-box-content composer-refresh__panel-content">
-                    <div class="composer-refresh__panel-row">
-                        <div class="composer-refresh__panel-copy">
-                            <p class="composer-refresh__panel-title">{{ __('messages.quote_repost') }}</p>
-                            <p id="composer-repost-text" class="composer-refresh__panel-text">{{ __('messages.repost_ready') }}</p>
-                        </div>
+            @if($allowRepost)
+                <div id="composer-repost-card" class="widget-box composer-refresh__panel composer-refresh__panel--repost" style="display:none;">
+                    <div class="widget-box-content composer-refresh__panel-content">
+                        <div class="composer-refresh__panel-row">
+                            <div class="composer-refresh__panel-copy">
+                                <p class="composer-refresh__panel-title">{{ __('messages.quote_repost') }}</p>
+                                <p id="composer-repost-text" class="composer-refresh__panel-text">{{ __('messages.repost_ready') }}</p>
+                            </div>
 
-                        <button type="button" id="composer-repost-cancel" class="composer-refresh__ghost-button">
-                            {{ __('messages.cancel') }}
-                        </button>
+                            <button type="button" id="composer-repost-cancel" class="composer-refresh__ghost-button">
+                                {{ __('messages.cancel') }}
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
+            @endif
 
-            <div id="composer-link-block" class="widget-box composer-refresh__panel composer-refresh__panel--link" style="display:none;">
-                <div class="widget-box-content composer-refresh__panel-content">
-                    <div class="composer-refresh__field">
-                        <label class="composer-refresh__label" for="composer-link-url">{{ __('messages.insertlink') }}</label>
-                        <input
-                            type="url"
-                            id="composer-link-url"
-                            name="link_url"
-                            class="composer-refresh__control"
-                            value="{{ $oldLinkUrl }}"
-                            placeholder="{{ __('messages.url_placeholder') }}"
-                        >
-                    </div>
-
-                    <div id="composer-link-preview" class="composer-refresh__preview" style="display:none;"></div>
-
-                    <div id="composer-publish-options" class="composer-refresh__options" style="display:none;">
-                        <p class="composer-refresh__section-hint">{{ __('messages.smart_link_publish_hint') }}</p>
-
-                        <div class="composer-choice-grid">
-                            <label class="composer-choice-card" for="composer-publish-post">
-                                <input
-                                    class="composer-choice-input"
-                                    type="radio"
-                                    id="composer-publish-post"
-                                    name="publish_mode"
-                                    value="post"
-                                    {{ $oldPublishMode !== 'directory_only' ? 'checked' : '' }}
-                                >
-                                <span class="composer-choice-title">{{ __('messages.publish_as_post') }}</span>
-                                <span class="composer-choice-text">{{ __('messages.publish_as_post_hint') }}</span>
-                            </label>
-
-                            <label class="composer-choice-card" for="composer-publish-directory-only">
-                                <input
-                                    class="composer-choice-input"
-                                    type="radio"
-                                    id="composer-publish-directory-only"
-                                    name="publish_mode"
-                                    value="directory_only"
-                                    {{ $oldPublishMode === 'directory_only' ? 'checked' : '' }}
-                                >
-                                <span class="composer-choice-title">{{ __('messages.move_to_directory') }}</span>
-                                <span class="composer-choice-text">{{ __('messages.move_to_directory_hint') }}</span>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div id="composer-directory-fields" class="composer-refresh__directory-grid" style="display:none;">
+            @if($allowLink)
+                <div id="composer-link-block" class="widget-box composer-refresh__panel composer-refresh__panel--link" style="display:none;">
+                    <div class="widget-box-content composer-refresh__panel-content">
                         <div class="composer-refresh__field">
-                            <label class="composer-refresh__label" for="composer-directory-name">{{ __('messages.name') }}</label>
+                            <label class="composer-refresh__label" for="composer-link-url">{{ __('messages.insertlink') }}</label>
                             <input
-                                type="text"
-                                id="composer-directory-name"
-                                name="directory_name"
+                                type="url"
+                                id="composer-link-url"
+                                name="link_url"
                                 class="composer-refresh__control"
-                                value="{{ old('directory_name', '') }}"
-                                placeholder="{{ __('messages.name_placeholder') }}"
+                                value="{{ $oldLinkUrl }}"
+                                placeholder="{{ __('messages.url_placeholder') }}"
                             >
                         </div>
 
-                        <div class="composer-refresh__field">
-                            <label class="composer-refresh__label" for="composer-directory-category">{{ __('messages.directory') }}</label>
-                            <select id="composer-directory-category" name="directory_category_id" class="composer-refresh__control composer-refresh__control--select">
-                                <option value="0">{{ __('messages.select') }}</option>
-                                @foreach($categories as $category)
-                                    <option value="{{ $category->id }}" {{ (string) old('directory_category_id', '0') === (string) $category->id ? 'selected' : '' }}>
-                                        {{ $category->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
+                        <div id="composer-link-preview" class="composer-refresh__preview" style="display:none;"></div>
 
-                        <div class="composer-refresh__field composer-refresh__field--full">
-                            <label class="composer-refresh__label" for="composer-directory-tags">{{ __('messages.tags_placeholder') }}</label>
-                            <input
-                                type="text"
-                                id="composer-directory-tags"
-                                name="directory_tags"
-                                class="composer-refresh__control"
-                                value="{{ old('directory_tags', '') }}"
-                                placeholder="{{ __('messages.tags_placeholder') }}"
-                            >
-                        </div>
+                        @unless($disableDirectoryOnly)
+                            <div id="composer-publish-options" class="composer-refresh__options" style="display:none;">
+                                <p class="composer-refresh__section-hint">{{ __('messages.smart_link_publish_hint') }}</p>
+
+                                <div class="composer-choice-grid">
+                                    <label class="composer-choice-card" for="composer-publish-post">
+                                        <input
+                                            class="composer-choice-input"
+                                            type="radio"
+                                            id="composer-publish-post"
+                                            name="publish_mode"
+                                            value="post"
+                                            {{ $oldPublishMode !== 'directory_only' ? 'checked' : '' }}
+                                        >
+                                        <span class="composer-choice-title">{{ __('messages.publish_as_post') }}</span>
+                                        <span class="composer-choice-text">{{ __('messages.publish_as_post_hint') }}</span>
+                                    </label>
+
+                                    <label class="composer-choice-card" for="composer-publish-directory-only">
+                                        <input
+                                            class="composer-choice-input"
+                                            type="radio"
+                                            id="composer-publish-directory-only"
+                                            name="publish_mode"
+                                            value="directory_only"
+                                            {{ $oldPublishMode === 'directory_only' ? 'checked' : '' }}
+                                        >
+                                        <span class="composer-choice-title">{{ __('messages.move_to_directory') }}</span>
+                                        <span class="composer-choice-text">{{ __('messages.move_to_directory_hint') }}</span>
+                                    </label>
+                                </div>
+                            </div>
+                        @endunless
+
+                        @unless($disableDirectoryOnly)
+                            <div id="composer-directory-fields" class="composer-refresh__directory-grid" style="display:none;">
+                                <div class="composer-refresh__field">
+                                    <label class="composer-refresh__label" for="composer-directory-name">{{ __('messages.name') }}</label>
+                                    <input
+                                        type="text"
+                                        id="composer-directory-name"
+                                        name="directory_name"
+                                        class="composer-refresh__control"
+                                        value="{{ old('directory_name', '') }}"
+                                        placeholder="{{ __('messages.name_placeholder') }}"
+                                    >
+                                </div>
+
+                                <div class="composer-refresh__field">
+                                    <label class="composer-refresh__label" for="composer-directory-category">{{ __('messages.directory') }}</label>
+                                    <select id="composer-directory-category" name="directory_category_id" class="composer-refresh__control composer-refresh__control--select">
+                                        <option value="0">{{ __('messages.select') }}</option>
+                                        @foreach($categories as $category)
+                                            <option value="{{ $category->id }}" {{ (string) old('directory_category_id', '0') === (string) $category->id ? 'selected' : '' }}>
+                                                {{ $category->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <div class="composer-refresh__field composer-refresh__field--full">
+                                    <label class="composer-refresh__label" for="composer-directory-tags">{{ __('messages.tags_placeholder') }}</label>
+                                    <input
+                                        type="text"
+                                        id="composer-directory-tags"
+                                        name="directory_tags"
+                                        class="composer-refresh__control"
+                                        value="{{ old('directory_tags', '') }}"
+                                        placeholder="{{ __('messages.tags_placeholder') }}"
+                                    >
+                                </div>
+                            </div>
+                        @endunless
                     </div>
                 </div>
-            </div>
+            @endif
 
-            <div id="composer-gallery-block" class="widget-box composer-refresh__panel composer-refresh__panel--gallery" style="display:none;">
-                <div class="widget-box-content composer-refresh__panel-content">
-                    <input type="file" id="composer-images" name="images[]" accept=".jpg,.jpeg,.png,.gif,.webp" multiple style="display:none">
-                    <div class="composer-refresh__gallery-toolbar" id="composer-gallery-toolbar" style="display:none;">
-                        <button type="button" class="composer-refresh__ghost-button composer-refresh__ghost-button--danger" id="composer-gallery-clear">
-                            {{ __('messages.delete') }} {{ __('messages.all') }}
-                        </button>
+            @if($allowGallery)
+                <div id="composer-gallery-block" class="widget-box composer-refresh__panel composer-refresh__panel--gallery" style="display:none;">
+                    <div class="widget-box-content composer-refresh__panel-content">
+                        <input type="file" id="composer-images" name="images[]" accept=".jpg,.jpeg,.png,.gif,.webp" multiple style="display:none">
+                        <div class="composer-refresh__gallery-toolbar" id="composer-gallery-toolbar" style="display:none;">
+                            <button type="button" class="composer-refresh__ghost-button composer-refresh__ghost-button--danger" id="composer-gallery-clear">
+                                {{ __('messages.delete') }} {{ __('messages.all') }}
+                            </button>
+                        </div>
+                        <div id="composer-gallery-grid" class="composer-refresh__gallery-grid"></div>
+                        <p class="composer-refresh__section-hint composer-refresh__section-hint--gallery">{{ __('messages.gallery_limit_hint') }}</p>
                     </div>
-                    <div id="composer-gallery-grid" class="composer-refresh__gallery-grid"></div>
-                    <p class="composer-refresh__section-hint composer-refresh__section-hint--gallery">{{ __('messages.gallery_limit_hint') }}</p>
                 </div>
-            </div>
+            @endif
 
             <input type="file" id="imgupload" name="fimg" accept=".jpg, .jpeg, .png, .gif, .webp" style="display:none"/>
         </div>
@@ -188,22 +232,26 @@
                     <span class="composer-refresh__tool-label">{{ __('messages.write_post') }}</span>
                 </button>
 
-                <button type="button" class="quick-post-footer-action composer-refresh__tool" data-title="{{ __('messages.insertphoto') }}" id="composer-mode-gallery" aria-pressed="false">
-                    <svg class="quick-post-footer-action-icon icon-camera" aria-hidden="true">
-                        <use xlink:href="#svg-camera"></use>
-                    </svg>
-                    <span class="composer-refresh__tool-label">{{ __('messages.insertphoto') }}</span>
-                </button>
+                @if($allowGallery)
+                    <button type="button" class="quick-post-footer-action composer-refresh__tool" data-title="{{ __('messages.insertphoto') }}" id="composer-mode-gallery" aria-pressed="false">
+                        <svg class="quick-post-footer-action-icon icon-camera" aria-hidden="true">
+                            <use xlink:href="#svg-camera"></use>
+                        </svg>
+                        <span class="composer-refresh__tool-label">{{ __('messages.insertphoto') }}</span>
+                    </button>
+                @endif
 
-                <button type="button" class="quick-post-footer-action composer-refresh__tool" data-title="{{ __('messages.insertlink') }}" id="composer-mode-link" aria-pressed="false">
-                    <i class="fa fa-link" aria-hidden="true"></i>
-                    <span class="composer-refresh__tool-label">{{ __('messages.insertlink') }}</span>
-                </button>
+                @if($allowLink)
+                    <button type="button" class="quick-post-footer-action composer-refresh__tool" data-title="{{ __('messages.insertlink') }}" id="composer-mode-link" aria-pressed="false">
+                        <i class="fa fa-link" aria-hidden="true"></i>
+                        <span class="composer-refresh__tool-label">{{ __('messages.insertlink') }}</span>
+                    </button>
+                @endif
             </div>
 
             <div class="quick-post-footer-actions composer-refresh__submit-wrap">
                 <button type="submit" class="button small secondary composer-refresh__submit" id="composer-submit">
-                    {{ __('messages.spread') }}
+                    {{ $composerSubmitLabel }}
                 </button>
             </div>
         </div>
@@ -282,6 +330,10 @@
             border: 1px solid var(--composer-border);
         }
 
+        #social-composer.composer-refresh .composer-refresh__surface--group {
+            border-color: rgba(35, 210, 226, 0.22);
+        }
+
         #social-composer.composer-refresh .composer-refresh__header {
             display: flex;
             align-items: center;
@@ -301,6 +353,26 @@
 
         #social-composer.composer-refresh .composer-refresh__identity:hover {
             text-decoration: none;
+        }
+
+        #social-composer.composer-refresh .composer-refresh__context {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 14px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+            padding: 12px 14px;
+            border-radius: 18px;
+            background: var(--composer-subtle-bg);
+            border: 1px solid var(--composer-border);
+        }
+
+        #social-composer.composer-refresh .composer-refresh__context-copy {
+            margin: 0;
+            color: var(--composer-helper);
+            font-size: 0.82rem;
+            font-weight: 700;
         }
 
         #social-composer.composer-refresh .composer-refresh__avatar {
@@ -843,13 +915,15 @@
         const modeTextButton = document.getElementById('composer-mode-text');
         const modeGalleryButton = document.getElementById('composer-mode-gallery');
         const modeLinkButton = document.getElementById('composer-mode-link');
+        const repostCancelButton = document.getElementById('composer-repost-cancel');
         const csrfToken = document.querySelector('meta[name="csrf-token"]');
         const publishModeInputs = Array.from(form.querySelectorAll('input[name="publish_mode"]'));
+        const repostEnabled = @json($allowRepost);
         let previewTimeout = null;
         let previewRequestId = 0;
         let lastPreviewUrl = null;
         let autoDetectedLink = extractFirstUrl(composerText.value);
-        let linkLockedToText = linkInput.value.trim() === '' || linkInput.value.trim() === autoDetectedLink;
+        let linkLockedToText = !linkInput || linkInput.value.trim() === '' || linkInput.value.trim() === autoDetectedLink;
         let manualLinkOpen = @json($oldPostKind === 'link' || $oldLinkUrl !== '' || $oldPublishMode === 'directory_only');
         let selectedGalleryFiles = [];
 
@@ -859,6 +933,10 @@
         }
 
         function selectedPublishMode() {
+            if (publishModeInputs.length === 0) {
+                return 'post';
+            }
+
             const current = publishModeInputs.find(function (input) {
                 return input.checked;
             });
@@ -867,6 +945,10 @@
         }
 
         function setPublishMode(value) {
+            if (publishModeInputs.length === 0) {
+                return;
+            }
+
             publishModeInputs.forEach(function (input) {
                 input.checked = input.value === value;
             });
@@ -896,7 +978,7 @@
         }
 
         function syncToolStates() {
-            const hasGallery = (galleryInput.files || []).length > 0;
+            const hasGallery = galleryInput ? (galleryInput.files || []).length > 0 : false;
             const linkActive = manualLinkOpen || hasResolvedLink() || autoDetectedLink !== '';
             const textActive = !hasGallery && !linkActive;
 
@@ -906,26 +988,30 @@
 
             composerRoot.classList.toggle('has-gallery', hasGallery);
             composerRoot.classList.toggle('has-link', linkActive);
-            composerRoot.classList.toggle('has-repost', repostStatusId.value !== '');
+            composerRoot.classList.toggle('has-repost', repostEnabled && repostStatusId && repostStatusId.value !== '');
         }
 
         function clearLinkPreview() {
+            if (!linkPreview) {
+                return;
+            }
+
             lastPreviewUrl = null;
             linkPreview.innerHTML = '';
             linkPreview.style.display = 'none';
         }
 
         function hasResolvedLink() {
-            return linkInput.value.trim() !== '';
+            return !!linkInput && linkInput.value.trim() !== '';
         }
 
         function syncPostKind() {
-            if ((galleryInput.files || []).length > 0) {
+            if (galleryInput && (galleryInput.files || []).length > 0) {
                 postKind.value = 'gallery';
                 return;
             }
 
-            if (repostStatusId.value) {
+            if (repostEnabled && repostStatusId && repostStatusId.value) {
                 postKind.value = 'repost';
                 return;
             }
@@ -935,16 +1021,27 @@
 
         function syncDirectoryFields() {
             const hasLink = hasResolvedLink();
-            publishOptions.style.display = hasLink ? 'block' : 'none';
+            if (publishOptions) {
+                publishOptions.style.display = hasLink ? 'block' : 'none';
+            }
 
             if (!hasLink) {
                 setPublishMode('post');
             }
 
-            directoryFields.style.display = hasLink && selectedPublishMode() === 'directory_only' ? 'grid' : 'none';
+            if (directoryFields) {
+                directoryFields.style.display = hasLink && selectedPublishMode() === 'directory_only' ? 'grid' : 'none';
+            }
         }
 
         function syncLinkBlockVisibility() {
+            if (!linkBlock || !linkInput) {
+                syncDirectoryFields();
+                syncPostKind();
+                syncToolStates();
+                return;
+            }
+
             const shouldShow = manualLinkOpen || hasResolvedLink() || autoDetectedLink !== '';
             linkBlock.style.display = shouldShow ? 'block' : 'none';
 
@@ -958,7 +1055,7 @@
         }
 
         function syncGalleryInputFiles() {
-            if (typeof DataTransfer === 'undefined') {
+            if (!galleryInput || typeof DataTransfer === 'undefined') {
                 return;
             }
 
@@ -972,6 +1069,10 @@
         }
 
         function clearGallerySelection() {
+            if (!galleryInput || !galleryGrid || !galleryToolbar || !galleryBlock) {
+                return;
+            }
+
             selectedGalleryFiles = [];
             galleryInput.value = '';
             galleryGrid.innerHTML = '';
@@ -997,6 +1098,10 @@
         }
 
         function renderGallery() {
+            if (!galleryInput || !galleryGrid || !galleryToolbar || !galleryBlock) {
+                return;
+            }
+
             galleryGrid.innerHTML = '';
             const files = selectedGalleryFiles;
 
@@ -1044,6 +1149,10 @@
         }
 
         function renderLinkPreviewCard(data) {
+            if (!linkPreview) {
+                return;
+            }
+
             linkPreview.innerHTML = `
                 <a href="${data.url}" target="_blank" rel="noopener noreferrer" class="post-preview medium">
                     <figure class="post-preview-image liquid" style="background: url(${data.image_url || '{{ theme_asset('img/dir_image.png') }}'}) center center / cover no-repeat;"></figure>
@@ -1056,12 +1165,16 @@
             `;
             linkPreview.style.display = 'block';
 
-            if (!directoryName.value.trim()) {
+            if (directoryName && !directoryName.value.trim()) {
                 directoryName.value = data.title || data.domain || '';
             }
         }
 
         function fetchLinkPreview() {
+            if (!linkInput) {
+                return;
+            }
+
             const value = linkInput.value.trim();
             if (!value || !csrfToken) {
                 clearLinkPreview();
@@ -1115,6 +1228,12 @@
         }
 
         function syncAutoDetectedLink() {
+            if (!linkInput) {
+                syncPostKind();
+                syncToolStates();
+                return;
+            }
+
             const nextDetected = extractFirstUrl(composerText.value);
             const current = linkInput.value.trim();
             const shouldReplace = linkLockedToText || current === '' || current === autoDetectedLink;
@@ -1136,59 +1255,73 @@
             });
         }
 
-        modeTextButton.addEventListener('click', function () {
-            clearGallerySelection();
-            manualLinkOpen = false;
+        if (modeTextButton) {
+            modeTextButton.addEventListener('click', function () {
+                clearGallerySelection();
+                manualLinkOpen = false;
 
-            if (autoDetectedLink) {
-                linkInput.value = autoDetectedLink;
-                linkLockedToText = true;
-            } else {
-                linkInput.value = '';
-                clearLinkPreview();
-            }
+                if (linkInput) {
+                    if (autoDetectedLink) {
+                        linkInput.value = autoDetectedLink;
+                        linkLockedToText = true;
+                    } else {
+                        linkInput.value = '';
+                        clearLinkPreview();
+                    }
+                }
 
-            syncLinkBlockVisibility();
-            composerText.focus();
-        });
+                syncLinkBlockVisibility();
+                composerText.focus();
+            });
+        }
 
-        modeGalleryButton.addEventListener('click', function () {
-            galleryInput.click();
-        });
+        if (modeGalleryButton && galleryInput) {
+            modeGalleryButton.addEventListener('click', function () {
+                galleryInput.click();
+            });
+        }
 
-        modeLinkButton.addEventListener('click', function () {
-            manualLinkOpen = true;
+        if (modeLinkButton && linkInput) {
+            modeLinkButton.addEventListener('click', function () {
+                manualLinkOpen = true;
 
-            if (!linkInput.value.trim() && autoDetectedLink) {
-                linkInput.value = autoDetectedLink;
-                linkLockedToText = true;
-            }
+                if (!linkInput.value.trim() && autoDetectedLink) {
+                    linkInput.value = autoDetectedLink;
+                    linkLockedToText = true;
+                }
 
-            syncLinkBlockVisibility();
-            linkInput.focus();
-        });
+                syncLinkBlockVisibility();
+                linkInput.focus();
+            });
+        }
 
-        galleryInput.addEventListener('change', function () {
-            selectedGalleryFiles = Array.from(galleryInput.files || []);
-            renderGallery();
-            syncLinkBlockVisibility();
-        });
+        if (galleryInput) {
+            galleryInput.addEventListener('change', function () {
+                selectedGalleryFiles = Array.from(galleryInput.files || []);
+                renderGallery();
+                syncLinkBlockVisibility();
+            });
+        }
 
-        galleryClearButton.addEventListener('click', function () {
-            clearGallerySelection();
-            syncLinkBlockVisibility();
-        });
+        if (galleryClearButton) {
+            galleryClearButton.addEventListener('click', function () {
+                clearGallerySelection();
+                syncLinkBlockVisibility();
+            });
+        }
 
         composerText.addEventListener('input', function () {
             syncAutoDetectedLink();
         });
 
-        linkInput.addEventListener('input', function () {
-            manualLinkOpen = true;
-            linkLockedToText = this.value.trim() === '' || this.value.trim() === autoDetectedLink;
-            syncLinkBlockVisibility();
-            scheduleLinkPreview();
-        });
+        if (linkInput) {
+            linkInput.addEventListener('input', function () {
+                manualLinkOpen = true;
+                linkLockedToText = this.value.trim() === '' || this.value.trim() === autoDetectedLink;
+                syncLinkBlockVisibility();
+                scheduleLinkPreview();
+            });
+        }
 
         publishModeInputs.forEach(function (input) {
             input.addEventListener('change', function () {
@@ -1197,13 +1330,15 @@
             });
         });
 
-        document.getElementById('composer-repost-cancel').addEventListener('click', function () {
-            repostStatusId.value = '';
-            repostCard.style.display = 'none';
-            repostText.textContent = @json(__('messages.repost_ready'));
-            syncPostKind();
-            syncToolStates();
-        });
+        if (repostCancelButton && repostStatusId && repostCard && repostText) {
+            repostCancelButton.addEventListener('click', function () {
+                repostStatusId.value = '';
+                repostCard.style.display = 'none';
+                repostText.textContent = @json(__('messages.repost_ready'));
+                syncPostKind();
+                syncToolStates();
+            });
+        }
 
         form.addEventListener('submit', function () {
             if (!hasResolvedLink()) {
@@ -1214,6 +1349,10 @@
         });
 
         window.openRepostComposer = function (statusId, authorName, excerpt) {
+            if (!repostEnabled || !repostStatusId || !repostCard || !repostText) {
+                return;
+            }
+
             repostStatusId.value = statusId;
             postKind.value = 'repost';
             repostCard.style.display = 'block';
@@ -1223,7 +1362,7 @@
             window.scrollTo({ top: form.getBoundingClientRect().top + window.scrollY - 120, behavior: 'smooth' });
         };
 
-        if (repostStatusId.value) {
+        if (repostEnabled && repostStatusId && repostCard && repostStatusId.value) {
             repostCard.style.display = 'block';
         }
 

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Directory;
 use App\Models\DirectoryCategory;
 use App\Models\ForumTopic;
+use App\Models\Group;
 use App\Models\Knowledgebase;
 use App\Models\News;
 use App\Models\Page;
@@ -16,6 +17,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Schema;
+use App\Support\GroupSettings;
 
 class SitemapController extends Controller
 {
@@ -137,6 +139,13 @@ class SitemapController extends Controller
                     'weekly',
                     '0.5'
                 ),
+                'groups' => $this->streamModelEntries(
+                    $this->publishedGroupsQuery()->offset($offset)->limit($this->chunkSize)->get(),
+                    fn (Group $group) => route('groups.show', $group),
+                    fn (Group $group) => $group->updated_at,
+                    'daily',
+                    '0.7'
+                ),
                 default => abort(404),
             };
 
@@ -174,6 +183,7 @@ class SitemapController extends Controller
                 'knowledgebase_indexes' => $this->safeCount($this->knowledgebaseIndexesQuery()),
                 'knowledgebases' => $this->safeCount($this->publishedKnowledgebaseArticlesQuery()),
                 'users' => $this->safeCount($this->publishedUsersQuery()),
+                'groups' => $this->safeCount($this->publishedGroupsQuery()),
             ];
 
             foreach ($sectionCounts as $type => $count) {
@@ -259,6 +269,16 @@ class SitemapController extends Controller
             ],
         ]);
 
+        if (Schema::hasTable('groups') && GroupSettings::isEnabled()) {
+            $entries->push([
+                'scope_key' => 'groups_index',
+                'loc' => route('groups.index'),
+                'lastmod' => $this->latestTimestamp(Group::query()->where('status', Group::STATUS_ACTIVE)->where('privacy', Group::PRIVACY_PUBLIC), 'updated_at') ?? $defaultLastmod,
+                'changefreq' => 'daily',
+                'priority' => '0.8',
+            ]);
+        }
+
         return $entries
             ->reject(fn (array $entry) => $this->scopeDisabled($entry['scope_key']))
             ->values();
@@ -328,6 +348,7 @@ class SitemapController extends Controller
     {
         $query = ForumTopic::query()
             ->where('statu', 1)
+            ->whereNull('group_id')
             ->visible(); // Respect author privacy
 
         // Filter by category visibility
@@ -339,6 +360,19 @@ class SitemapController extends Controller
         });
 
         return $this->applyScopeFilters($query, 'forum_topic', 'forum_topic');
+    }
+
+    private function publishedGroupsQuery(): Builder
+    {
+        if (!Schema::hasTable('groups') || !GroupSettings::isEnabled()) {
+            return Group::query()->whereRaw('1 = 0');
+        }
+
+        $query = Group::query()
+            ->where('status', Group::STATUS_ACTIVE)
+            ->where('privacy', Group::PRIVACY_PUBLIC);
+
+        return $this->applyScopeFilters($query, 'group_show', 'group');
     }
 
     private function publishedDirectoryCategoriesQuery(): Builder

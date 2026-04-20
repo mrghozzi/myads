@@ -42,6 +42,12 @@
                 {{ __('messages.forum') }}
             </a>
         </li>
+        <li class="menu-item {{ Request::is('groups*') ? 'active' : '' }}">
+            <a class="menu-item-link text-tooltip-tfr" href="{{ route('groups.index') }}">
+                <i class="fa fa-users" aria-hidden="true"></i>
+                {{ __('messages.groups_title') }}
+            </a>
+        </li>
         <li class="menu-item {{ Request::is('directory*', 'dr*', 'cat*', 'add-site*') ? 'active' : '' }}">
             <a class="menu-item-link text-tooltip-tfr" href="{{ url('/directory') }}">
                 @include('theme::partials.header.menu_icon', ['icon' => 'directory'])

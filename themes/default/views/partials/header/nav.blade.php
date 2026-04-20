@@ -66,6 +66,11 @@
                 </svg>
             </a>
         </li>
+        <li class="menu-item {{ Request::is('groups*') ? 'active' : '' }}">
+            <a class="menu-item-link text-tooltip-tfr" href="{{ route('groups.index') }}" data-title="{{ __('messages.groups_title') }}">
+                <i class="fa fa-users" aria-hidden="true"></i>
+            </a>
+        </li>
         <li class="menu-item {{ Request::is('directory*', 'dr*', 'cat*', 'add-site*') ? 'active' : '' }}">
             <a class="menu-item-link text-tooltip-tfr" href="{{ url('/directory') }}" data-title="{{ __('messages.directory') }}">
                 @include('theme::partials.header.menu_icon', ['icon' => 'directory'])

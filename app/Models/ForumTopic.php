@@ -3,13 +3,19 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
+use App\Services\GroupAccessService;
+use App\Services\V420SchemaService;
 use App\Traits\HasPrivacy;
 
 class ForumTopic extends Model
 {
-    use HasFactory, HasPrivacy;
+    use HasFactory, HasPrivacy {
+        scopeVisible as scopePrivacyVisible;
+    }
 
     protected $table = 'forum';
     public $timestamps = false;
@@ -19,6 +25,7 @@ class ForumTopic extends Model
         'name',
         'txt',
         'cat',
+        'group_id',
         'statu',
         'date',
         'reply',
@@ -34,9 +41,42 @@ class ForumTopic extends Model
     protected $casts = [
         'is_pinned' => 'boolean',
         'is_locked' => 'boolean',
+        'group_id' => 'integer',
         'pinned_at' => 'integer',
         'locked_at' => 'integer',
     ];
+
+    public function scopeVisible(Builder $query, ?User $viewer = null, ?string $column = null): Builder
+    {
+        $viewer = $viewer ?? Auth::user();
+
+        if ($viewer && $viewer->isAdmin()) {
+            return $query;
+        }
+
+        $schema = app(V420SchemaService::class);
+        $groupAccess = app(GroupAccessService::class);
+        $hasGroupColumn = $schema->hasColumn($this->getTable(), 'group_id');
+        $visibleGroupIds = $hasGroupColumn && $groupAccess->featureEnabled()
+            ? $groupAccess->visibleGroupIdsFor($viewer)
+            : [];
+
+        $query->where(function (Builder $visibilityQuery) use ($viewer, $column, $hasGroupColumn, $visibleGroupIds) {
+            $visibilityQuery->where(function (Builder $ungroupedQuery) use ($viewer, $column, $hasGroupColumn) {
+                if ($hasGroupColumn) {
+                    $ungroupedQuery->whereNull('group_id');
+                }
+
+                $ungroupedQuery->privacyVisible($viewer, $column);
+            });
+
+            if ($visibleGroupIds !== []) {
+                $visibilityQuery->orWhereIn('group_id', $visibleGroupIds);
+            }
+        });
+
+        return $query;
+    }
 
     public function user()
     {
@@ -46,6 +86,11 @@ class ForumTopic extends Model
     public function category()
     {
         return $this->belongsTo(ForumCategory::class, 'cat');
+    }
+
+    public function group()
+    {
+        return $this->belongsTo(Group::class, 'group_id');
     }
 
     public function comments()

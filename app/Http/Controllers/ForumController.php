@@ -10,6 +10,8 @@ use App\Models\ForumTopic;
 use App\Models\Option;
 use App\Models\Status;
 use App\Services\GamificationService;
+use App\Services\GroupAccessService;
+use App\Services\GroupMembershipService;
 use App\Services\SecurityPolicyService;
 use App\Services\SecurityThrottleService;
 use App\Support\ForumSettings;
@@ -72,6 +74,7 @@ class ForumController extends Controller
                 $query->select('id')
                     ->from('forum')
                     ->where('cat', $id)
+                    ->whereNull('group_id')
                     ->where('statu', 1);
             });
 
@@ -108,10 +111,15 @@ class ForumController extends Controller
 
     public function topic($id)
     {
-        $topic = ForumTopic::visible()->with(['user', 'category', 'comments.user', 'attachments'])->findOrFail($id);
-        
+        $topic = ForumTopic::visible()->with(['user', 'category', 'group', 'comments.user', 'attachments'])->findOrFail($id);
+
+        $group = $topic->group;
+        if ($group) {
+            app(GroupAccessService::class)->ensureCanViewGroupContent($group, auth()->user());
+        }
+
         $category = $topic->category;
-        if ($category) {
+        if (!$group && $category) {
             $user = auth()->user();
             if ($category->visibility == 1 && !$user) {
                 abort(403);
@@ -139,33 +147,40 @@ class ForumController extends Controller
             'content_type' => 'forum_topic',
             'content_id' => $topic->id,
             'resource_title' => $topic->name,
-            'category_name' => $topic->category?->name,
+            'category_name' => $group?->name ?: $topic->category?->name,
             'description' => Str::limit(trim(preg_replace('/\s+/', ' ', strip_tags((string) $topic->txt))), 170, ''),
             'image' => $topic->image_url,
             'lastmod' => $topic->date ?: $status->date,
             'schema_type' => 'DiscussionForumPosting',
             'author_name' => $topic->user?->username,
-            'breadcrumbs' => [
-                ['name' => __('messages.home'), 'url' => url('/')],
-                ['name' => __('messages.forum'), 'url' => route('forum.index')],
-                ['name' => $topic->category?->name ?: __('messages.category_fallback'), 'url' => route('forum.category', $topic->cat)],
-                ['name' => $topic->name, 'url' => route('forum.topic', $topic->id)],
-            ],
+            'breadcrumbs' => $group
+                ? [
+                    ['name' => __('messages.home'), 'url' => url('/')],
+                    ['name' => __('messages.groups_title'), 'url' => route('groups.index')],
+                    ['name' => $group->name, 'url' => route('groups.show', $group)],
+                    ['name' => $topic->name, 'url' => route('forum.topic', $topic->id)],
+                ]
+                : [
+                    ['name' => __('messages.home'), 'url' => url('/')],
+                    ['name' => __('messages.forum'), 'url' => route('forum.index')],
+                    ['name' => $topic->category?->name ?: __('messages.category_fallback'), 'url' => route('forum.category', $topic->cat)],
+                    ['name' => $topic->name, 'url' => route('forum.topic', $topic->id)],
+                ],
         ];
 
         if ($status->s_type == 100) {
             $this->seo($seoContext);
-            return view('theme::forum.post', compact('topic', 'status', 'forumSettings'));
+            return view('theme::forum.post', compact('topic', 'status', 'forumSettings', 'group'));
         }
 
         if ($status->s_type == 4) {
             $this->seo($seoContext);
-            return view('theme::forum.image', compact('topic', 'status', 'forumSettings'));
+            return view('theme::forum.image', compact('topic', 'status', 'forumSettings', 'group'));
         }
 
         $this->seo($seoContext);
 
-        return view('theme::forum.topic', compact('topic', 'status', 'forumSettings'));
+        return view('theme::forum.topic', compact('topic', 'status', 'forumSettings', 'group'));
     }
 
     public function create(Request $request)
@@ -397,6 +412,7 @@ class ForumController extends Controller
 
         DB::beginTransaction();
         try {
+            $groupId = (int) ($topic->group_id ?? 0);
             Status::where('tp_id', $id)->whereIn('s_type', [2, 4, 100, 7867])->delete();
 
             Option::where('o_parent', $id)
@@ -410,6 +426,12 @@ class ForumController extends Controller
             $topic->delete();
 
             DB::commit();
+            if ($groupId > 0) {
+                $group = \App\Models\Group::find($groupId);
+                if ($group) {
+                    app(GroupMembershipService::class)->syncCounts($group);
+                }
+            }
         } catch (\Throwable $e) {
             DB::rollBack();
             return response()->json(['error' => $e->getMessage()], 500);
@@ -427,7 +449,7 @@ class ForumController extends Controller
         $topic = ForumTopic::findOrFail($topicId);
         $user = auth()->user();
 
-        if (!$user || !$user->canModerateForum('pin_topics', (int) $topic->cat)) {
+        if (!$user || !$this->canPinOrLockTopic($topic, $user, 'pin_topics')) {
             if ($request->wantsJson() || $request->ajax()) {
                 return response()->json(['error' => __('messages.forum_unauthorized')], 403);
             }
@@ -475,7 +497,7 @@ class ForumController extends Controller
         $topic = ForumTopic::findOrFail($topicId);
         $user = auth()->user();
 
-        if (!$user || !$user->canModerateForum('lock_topics', (int) $topic->cat)) {
+        if (!$user || !$this->canPinOrLockTopic($topic, $user, 'lock_topics')) {
             if ($request->wantsJson() || $request->ajax()) {
                 return response()->json(['error' => __('messages.forum_unauthorized')], 403);
             }
@@ -558,6 +580,7 @@ class ForumController extends Controller
         $topicCounts = ForumTopic::visible()
             ->select('cat', DB::raw('COUNT(*) as topic_count'))
             ->where('statu', 1)
+            ->whereNull('group_id')
             ->groupBy('cat')
             ->pluck('topic_count', 'cat');
 
@@ -681,6 +704,19 @@ class ForumController extends Controller
             return false;
         }
 
+        if ((int) $topic->group_id > 0) {
+            $group = $topic->group()->first();
+            if ($group && app(GroupAccessService::class)->canManageGroup($group, $user)) {
+                return true;
+            }
+
+            if ((int) $topic->uid !== (int) $user->id) {
+                return false;
+            }
+
+            return !$topic->is_locked;
+        }
+
         if ($user->canModerateForum('edit_topics', (int) $topic->cat)) {
             return true;
         }
@@ -698,6 +734,19 @@ class ForumController extends Controller
             return false;
         }
 
+        if ((int) $topic->group_id > 0) {
+            $group = $topic->group()->first();
+            if ($group && app(GroupAccessService::class)->canManageGroup($group, $user)) {
+                return true;
+            }
+
+            if ((int) $topic->uid !== (int) $user->id) {
+                return false;
+            }
+
+            return !$topic->is_locked;
+        }
+
         if ($user->canModerateForum('delete_topics', (int) $topic->cat)) {
             return true;
         }
@@ -707,5 +756,18 @@ class ForumController extends Controller
         }
 
         return !$topic->is_locked;
+    }
+
+    private function canPinOrLockTopic(ForumTopic $topic, $user, string $forumPermission): bool
+    {
+        if ((int) $topic->group_id > 0) {
+            $group = $topic->group()->first();
+
+            return $group
+                ? app(GroupAccessService::class)->canManageGroup($group, $user)
+                : false;
+        }
+
+        return $user->canModerateForum($forumPermission, (int) $topic->cat);
     }
 }
