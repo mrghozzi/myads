@@ -51,9 +51,10 @@ class Status extends Model
         $schema = app(V420SchemaService::class);
         $groupAccess = app(GroupAccessService::class);
         $hasGroupColumn = $schema->supports('groups') && $schema->hasColumn($this->getTable(), 'group_id');
-        $visibleGroupIds = $hasGroupColumn ? $groupAccess->visibleGroupIdsFor($viewer) : [];
+        $groupsEnabled = \App\Support\GroupSettings::isEnabled();
+        $visibleGroupIds = ($hasGroupColumn && $groupsEnabled) ? $groupAccess->visibleGroupIdsFor($viewer) : [];
 
-        $query->where(function (Builder $visibilityQuery) use ($viewer, $column, $authorIdColumn, $hasGroupColumn, $visibleGroupIds) {
+        $query->where(function (Builder $visibilityQuery) use ($viewer, $column, $authorIdColumn, $hasGroupColumn, $visibleGroupIds, $groupsEnabled) {
             $visibilityQuery->where(function (Builder $ungroupedQuery) use ($viewer, $column, $authorIdColumn, $hasGroupColumn) {
                 if ($hasGroupColumn) {
                     $ungroupedQuery->whereNull('group_id');
@@ -75,7 +76,7 @@ class Status extends Model
                 });
             });
 
-            if ($visibleGroupIds !== []) {
+            if ($groupsEnabled && $visibleGroupIds !== []) {
                 $visibilityQuery->orWhereIn('group_id', $visibleGroupIds);
             }
         });

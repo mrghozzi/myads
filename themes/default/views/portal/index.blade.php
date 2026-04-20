@@ -286,7 +286,9 @@
             <div class="simple-tab-items">
                 <a href="{{ route('portal.index', ['filter' => 'all']) }}" class="simple-tab-item {{ $filter == 'all' ? 'active' : '' }}">{{ __('messages.all_updates') }}</a>
                 <a href="{{ route('portal.index', ['filter' => 'me']) }}" class="simple-tab-item {{ $filter == 'me' ? 'active' : '' }}">{{ __('messages.following') }}</a>
+                @if(\App\Support\GroupSettings::isEnabled())
                 <a href="{{ route('portal.index', ['filter' => 'groups']) }}" class="simple-tab-item {{ $filter == 'groups' ? 'active' : '' }}">{{ __('messages.groups_title') }}</a>
+                @endif
             </div>
             @endauth
 

@@ -66,6 +66,7 @@
                 </svg>
             </a>
         </li>
+        @if(\App\Support\GroupSettings::isEnabled())
         <li class="menu-item {{ Request::is('groups*') ? 'active' : '' }}">
             <a class="menu-item-link text-tooltip-tfr" href="{{ route('groups.index') }}" data-title="{{ __('messages.groups_title') }}">
                 <svg class="menu-item-link-icon icon-group">
@@ -73,6 +74,7 @@
                 </svg>
             </a>
         </li>
+        @endif
         <li class="menu-item {{ Request::is('directory*', 'dr*', 'cat*', 'add-site*') ? 'active' : '' }}">
             <a class="menu-item-link text-tooltip-tfr" href="{{ url('/directory') }}" data-title="{{ __('messages.directory') }}">
                 @include('theme::partials.header.menu_icon', ['icon' => 'directory'])

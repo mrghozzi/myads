@@ -113,11 +113,15 @@ class PortalController extends Controller
 
                 $activityService->decorateMany($activities);
             } elseif ($user && $filter === 'groups') {
+                if (!\App\Support\GroupSettings::isEnabled()) {
+                    return redirect()->route('portal.index');
+                }
+
                 $activities = Status::visible($user)
                     ->where('date', '<=', time())
                     ->whereNotNull('group_id')
                     ->when(!empty($hiddenDirectoryStatusIds), fn ($query) => $query->whereNotIn('id', $hiddenDirectoryStatusIds))
-                    ->tap(fn ($query) => app(GroupAccessService::class)->applyMyGroupsScope($query, $user))
+                    ->tap(fn ($query) => app(\App\Services\GroupAccessService::class)->applyMyGroupsScope($query, $user))
                     ->orderBy('date', 'desc')
                     ->paginate(20);
 
