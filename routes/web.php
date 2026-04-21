@@ -475,6 +475,11 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/groups', [AdminGroupController::class, 'index'])->name('admin.groups.index');
     Route::post('/groups/{group}/status', [AdminGroupController::class, 'updateStatus'])->name('admin.groups.status');
     Route::post('/groups/{group}/feature', [AdminGroupController::class, 'toggleFeatured'])->name('admin.groups.feature');
+    Route::get('/groups/{group}/edit', [AdminGroupController::class, 'edit'])->name('admin.groups.edit');
+    Route::match(['put', 'patch'], '/groups/{group}', [AdminGroupController::class, 'update'])->name('admin.groups.update');
+    Route::get('/groups/{group}/members', [AdminGroupController::class, 'members'])->name('admin.groups.members');
+    Route::post('/groups/{group}/members/{membership}/role', [AdminGroupController::class, 'updateMemberRole'])->name('admin.groups.members.role');
+    Route::delete('/groups/{group}/members/{membership}', [AdminGroupController::class, 'removeMember'])->name('admin.groups.members.delete');
     Route::get('/groups/settings', [AdminGroupController::class, 'settings'])->name('admin.groups.settings');
     Route::post('/groups/settings', [AdminGroupController::class, 'updateSettings'])->name('admin.groups.settings.update');
     Route::get('/forum/settings', [AdminController::class, 'forumSettings'])->name('admin.forum.settings');

@@ -11,7 +11,9 @@ use Illuminate\Http\Request;
 class AdminGroupController extends Controller
 {
     public function __construct(
-        private readonly V420SchemaService $schema
+        private readonly V420SchemaService $schema,
+        private readonly \App\Services\GroupMembershipService $memberships,
+        private readonly \App\Services\GroupAccessService $access
     ) {
     }
 
@@ -116,5 +118,84 @@ class AdminGroupController extends Controller
         GroupSettings::save($validated);
 
         return back()->with('success', __('messages.admin_groups_settings_saved'));
+    }
+
+    public function edit(Group $group)
+    {
+        $this->noindex([
+            'scope_key' => 'admin_groups_edit',
+            'resource_title' => __('messages.groups_edit_title') . ' - ' . $group->name,
+            'description' => __('messages.admin_groups_description'),
+        ]);
+
+        return view('admin::admin.groups.edit', compact('group'));
+    }
+
+    public function update(Request $request, Group $group)
+    {
+        $oldOwnerId = $group->owner_id;
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:120',
+            'short_description' => 'nullable|string|max:280',
+            'description' => 'nullable|string|max:10000',
+            'rules_markdown' => 'nullable|string|max:15000',
+            'privacy' => 'required|in:public,private_request',
+            'owner_id' => 'required|exists:users,id',
+        ]);
+
+        $group->update($validated);
+
+        if ((int) $oldOwnerId !== (int) $group->owner_id) {
+            $newOwner = \App\Models\User::find($group->owner_id);
+            // Ensure new owner is at least a member
+            $this->memberships->join($group, $newOwner);
+            // Transfer role
+            $this->memberships->transferOwnership($group, $newOwner, \App\Models\User::find($oldOwnerId));
+        }
+
+        return back()->with('success', __('messages.admin_groups_updated'));
+    }
+
+    public function members(Group $group)
+    {
+        $members = $group->memberships()
+            ->with('user')
+            ->orderByRaw("FIELD(role, 'owner', 'moderator', 'member')")
+            ->paginate(50);
+
+        $this->noindex([
+            'scope_key' => 'admin_groups_members',
+            'resource_title' => __('messages.members') . ' - ' . $group->name,
+            'description' => __('messages.admin_groups_description'),
+        ]);
+
+        return view('admin::admin.groups.members', compact('group', 'members'));
+    }
+
+    public function updateMemberRole(Request $request, Group $group, \App\Models\GroupMembership $membership)
+    {
+        $validated = $request->validate([
+            'role' => 'required|in:moderator,member',
+        ]);
+
+        try {
+            $this->memberships->updateRole($membership, (string) $validated['role'], \Illuminate\Support\Facades\Auth::user());
+        } catch (\Throwable $e) {
+            return back()->with('error', $e->getMessage());
+        }
+
+        return back()->with('success', __('messages.groups_member_role_updated'));
+    }
+
+    public function removeMember(Group $group, \App\Models\GroupMembership $membership)
+    {
+        if ($membership->role === 'owner') {
+            return back()->with('error', 'Cannot remove owner. Transfer ownership first.');
+        }
+
+        $membership->delete();
+
+        return back()->with('success', __('messages.groups_member_removed'));
     }
 }

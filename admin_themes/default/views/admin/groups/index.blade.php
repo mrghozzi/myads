@@ -131,6 +131,15 @@
                                     </td>
                                     <td data-label="{{ __('messages.actions') }}" class="text-end">
                                         <div class="admin-action-cluster">
+                                            <a class="btn btn-sm btn-outline-secondary admin-icon-btn" href="{{ route('groups.show', $group) }}" target="_blank" title="{{ __('messages.view') }}">
+                                                <i class="feather-eye"></i>
+                                            </a>
+                                            <a class="btn btn-sm btn-outline-primary admin-icon-btn" href="{{ route('admin.groups.edit', $group) }}" title="{{ __('messages.Settings') }}">
+                                                <i class="feather-edit"></i>
+                                            </a>
+                                            <a class="btn btn-sm btn-outline-info admin-icon-btn" href="{{ route('admin.groups.members', $group) }}" title="{{ __('messages.members') }}">
+                                                <i class="feather-users"></i>
+                                            </a>
                                             <form method="POST" action="{{ route('admin.groups.status', $group) }}" class="d-inline-block">
                                                 @csrf
                                                 <select name="status" class="form-select form-select-sm d-inline-block w-auto" onchange="this.form.submit()">
@@ -141,7 +150,7 @@
                                                     @endforeach
                                                 </select>
                                             </form>
-                                            <form method="POST" action="{{ route('admin.groups.feature', $group) }}" class="d-inline-block ms-2">
+                                            <form method="POST" action="{{ route('admin.groups.feature', $group) }}" class="d-inline-block">
                                                 @csrf
                                                 <button class="btn btn-sm {{ $group->is_featured ? 'btn-primary' : 'btn-outline-primary' }} admin-icon-btn" type="submit" title="{{ $group->is_featured ? __('messages.groups_unfeature') : __('messages.groups_feature') }}">
                                                     <i class="feather-star"></i>
