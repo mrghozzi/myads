@@ -82,6 +82,12 @@
                         <label class="form-label">{{ __('messages.price_pts') ?? 'Price (Points)' }} <span class="text-danger">*</span></label>
                         <input type="number" name="pts" class="form-control" value="{{ old('pts', $product->o_order) }}" required min="0" max="999999">
                     </div>
+                    {{-- Seller --}}
+                    <div class="mb-3">
+                        <label class="form-label">{{ __('messages.seller_id') ?? 'Seller ID' }} <span class="text-danger">*</span></label>
+                        <input type="number" name="owner_id" class="form-control" value="{{ old('owner_id', $product->o_parent) }}" required>
+                        <small class="text-muted">{{ __('messages.seller_id_help') ?? 'Enter the numeric ID of the user who should own this product.' }}</small>
+                    </div>
                     {{-- Category --}}
                     <div class="mb-3">
                         <label class="form-label">{{ __('messages.category') ?? 'Category' }}</label>
@@ -100,7 +106,7 @@
                         <input type="text" name="img" class="form-control" value="{{ old('img', $product->o_mode) }}" placeholder="https://...">
                         @if($product->o_mode)
                             <div class="mt-2">
-                                <img src="{{ $product->o_mode }}" style="max-height:80px;max-width:200px;border-radius:6px;border:1px solid #dee2e6;" alt="cover">
+                                <img src="{{ $product->product_image }}" style="max-height:80px;max-width:200px;border-radius:6px;border:1px solid #dee2e6;" alt="cover">
                             </div>
                         @endif
                     </div>
@@ -180,7 +186,7 @@
         <div class="card border-0 shadow-sm mt-4">
             <div class="card-header bg-white fw-semibold">{{ __('messages.seller') ?? 'Seller' }}</div>
             <div class="card-body d-flex align-items-center gap-3">
-                <img src="{{ $product->user->img ?? admin_asset('img/profile.png') }}" class="rounded-circle" width="40" height="40" alt="">
+                <img src="{{ $product->user->avatarUrl() }}" class="rounded-circle" width="40" height="40" alt="">
                 <div>
                     <div class="fw-semibold">{{ $product->user->username }}</div>
                     <a href="{{ route('admin.users.edit', $product->user->id) }}" class="fs-11 text-muted text-decoration-none">

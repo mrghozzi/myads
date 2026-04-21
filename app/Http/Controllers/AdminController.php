@@ -2877,16 +2877,21 @@ class AdminController extends Controller
             'img'     => ['nullable', 'string'],
             'pts'     => ['required', 'integer', 'min:0', 'max:999999'],
             'cat_s'   => ['nullable', 'string', \Illuminate\Validation\Rule::in(StoreCategoryCatalog::acceptedInputValues())],
+            'owner_id'=> ['required', 'integer', 'exists:users,id'],
             'txt'     => ['nullable', 'string'],
             'vnbr'    => ['nullable', 'string', 'min:2', 'max:12', 'regex:/^[-a-zA-Z0-9.]+$/'],
             'linkzip' => ['nullable', 'string'],
         ]);
+
+        $oldOwnerId = (int) $product->o_parent;
+        $newOwnerId = (int) $request->owner_id;
 
         // Update product core fields
         $updateData = [
             'name'     => $request->pname,
             'o_valuer' => $request->desc,
             'o_order'  => (int) $request->pts,
+            'o_parent' => $newOwnerId,
         ];
         if ($request->filled('img')) {
             $updateData['o_mode'] = $request->img;
@@ -2931,6 +2936,19 @@ class AdminController extends Controller
                 'sh_type' => 7867,
                 'tp_id'   => $fileOption->id,
             ]);
+        }
+
+        // Handle Owner Change Notifications
+        if ($oldOwnerId !== $newOwnerId) {
+            $oldOwner = User::find($oldOwnerId);
+            $newOwner = User::find($newOwnerId);
+
+            if ($oldOwner) {
+                $this->notifications->send($oldOwner, __('messages.product_seller_change_old', ['product' => $product->name]));
+            }
+            if ($newOwner) {
+                $this->notifications->send($newOwner, __('messages.product_seller_change_new', ['product' => $product->name]));
+            }
         }
 
         return redirect()->route('admin.products')->with('success', __('messages.product_updated') ?? 'Product updated successfully.');
