@@ -72,6 +72,11 @@ class PortalController extends Controller
 
                 $activityService->decorateMany($searchedStatuses);
 
+                $searchedGroups = \App\Models\Group::where('name', 'LIKE', "%{$search}%")
+                    ->orWhere('description', 'LIKE', "%{$search}%")
+                    ->where('status', \App\Models\Group::STATUS_ACTIVE)
+                    ->get();
+
                 $searchedCommentsForum = \App\Models\ForumComment::visible()
                     ->whereHas('topic', fn ($query) => $query->visible($user))
                     ->where('txt', 'LIKE', "%{$search}%")
@@ -85,13 +90,14 @@ class PortalController extends Controller
             } catch (\Throwable $e) {
                 $searchedUsers        = collect();
                 $searchedStatuses     = collect();
+                $searchedGroups       = collect();
                 $searchedCommentsForum = collect();
                 $searchedCommentsDir  = collect();
             }
 
             return view('theme::portal.index', compact(
                 'filter', 'search',
-                'searchedUsers', 'searchedStatuses',
+                'searchedUsers', 'searchedStatuses', 'searchedGroups',
                 'searchedCommentsForum', 'searchedCommentsDir'
             ));
         }

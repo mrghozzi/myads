@@ -90,4 +90,20 @@ class Group extends Model
     {
         return (string) $this->privacy === self::PRIVACY_PUBLIC;
     }
+
+    public function avatarUrl(): string
+    {
+        if ($this->avatar_path) {
+            return asset($this->avatar_path);
+        }
+        return asset('themes/default/assets/img/avatar/01.jpg');
+    }
+
+    public function coverUrl(): string
+    {
+        if ($this->cover_path) {
+            return asset($this->cover_path);
+        }
+        return asset('themes/default/assets/img/cover/01.jpg');
+    }
 }
