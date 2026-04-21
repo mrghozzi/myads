@@ -14,6 +14,17 @@
 * **Compatibility**: Integrated the new billing surfaces with `V420SchemaService` so incomplete upgrades degrade gracefully with notices instead of fatal errors.
 * **Tests**: Added feature-test coverage for billing availability, bank-transfer upload and approval/rejection flows, queued-vs-extended subscriptions, admin ACL enforcement, and incomplete-upgrade fallback behavior.
 
+### Services Marketplace / Orders
+* **Feature**: Rebuilt `/orders` as a professional services marketplace with a Superdesign-guided member experience for discovery, request publishing, offer comparison, award flow, delivery tracking, and post-completion ratings.
+* **Add**: Introduced first-class `order_offers` and `order_contracts` tables, separating structured provider offers from the generic comment system while preserving existing order URLs and community-feed integration.
+* **Workflow**: Standardized the order lifecycle around `open`, `awarded`, `in_progress`, `delivered`, `completed`, `cancelled`, and `closed`, with a derived `under_review` UI state for open requests that already received active offers.
+* **Member UX**: Rebuilt `/orders`, `/orders/create`, `/orders/{order}`, `/orders/mine`, and `/orders/offers` with searchable discovery cards, organized budget and delivery metadata, structured offer cards, and role-aware workflow actions.
+* **Admin**: Added `/admin/orders` for community administrators, including review dashboards and moderation actions for closing or cancelling service requests without introducing a separate ACL module.
+* **Compatibility**: Added migration and backfill support to promote legacy offer metadata from `options` and old order-comment flows into the new marketplace tables, and to snapshot `OrderContract` records for previously awarded requests.
+* **Community**: Creating an order still publishes a community `Status` with `s_type = 6`, but feed engagement, latest-order widgets, and recent-trend calculations now use `order_offers` instead of legacy order comments.
+* **Gamification**: Moved offer, award, and rating signals to the new marketplace domain so points, badge progress, and provider reputation are updated from structured offers and completed contracts rather than the old "Best Offer" comment path.
+* **Tests**: Added workflow coverage for offer submission, award/start/deliver/complete transitions, admin access to `/admin/orders`, and recent-trend timestamps for marketplace offers.
+
 ### Specialized Groups
 * **Feature**: Added dedicated **Specialized Groups** at `/groups`, allowing MYADS members to build focused communities for niches such as WordPress site owners, SaaS builders, and SEO experts.
 * **Add**: Introduced group shells with `public` and `private by request` privacy modes, member roles (`owner`, `moderator`, `member`), membership requests, approvals, and lightweight moderation tools.

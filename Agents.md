@@ -25,7 +25,7 @@ MYADS is a community platform where website owners:
 3. **Forum** — categories with visibility controls, topics, moderation (pin/lock), attachments, moderator roles.
 4. **Marketplace (Store)** — upload/download scripts, plugins, templates (PTS-based pricing). Wiki-style Knowledgebase per product with Markdown support.
 5. **Web Directory** — submit/browse categorized website listings.
-6. **Order Requests** — hire service providers with bids, ratings, "Best Offer" selection.
+6. **Services Marketplace** — publish service requests, receive structured provider offers, award a provider, track delivery workflow, and exchange completion ratings.
 7. **News** — admin-published articles posted to community feed.
 8. **Gamification** — points (PTS), badges, quests, point transactions ledger.
 9. **SEO Suite** — centralized SEO engine, admin SEO dashboard, dynamic robots.txt, sitemap index, GA4 integration.
@@ -68,7 +68,7 @@ myads/
 │   ├── Helpers/           # Hooks.php (WordPress-like action/filter system)
 │   ├── helpers.php         # Global helpers: theme_asset(), ads_site(), locale_direction(), is_locale_rtl()
 │   ├── Http/
-│   │   ├── Controllers/    # 39 controllers (see §5)
+│   │   ├── Controllers/    # 45 controllers (see §5)
 │   │   └── Middleware/     # AdminMiddleware, SetLocale, UpdateUserOnline, CheckSystemVersion, InstallerGuard, TrackSeoMetrics
 │   ├── Models/             # 40+ Eloquent models (see §6)
 │   ├── Providers/          # AppServiceProvider, ThemeServiceProvider, PluginServiceProvider, InstallerServiceProvider
@@ -79,7 +79,7 @@ myads/
 ├── bootstrap/
 ├── config/                 # Standard Laravel config (app, auth, cache, database, etc.)
 ├── database/
-│   ├── migrations/         # 28 migration files (chronological, prefixed by date)
+│   ├── migrations/         # 43 migration files (chronological, prefixed by date)
 │   ├── seeders/            # DatabaseSeeder.php
 │   └── factories/
 ├── Documents/              # Project documentation (README, API_DOCS, changelogs, guides)
@@ -108,7 +108,7 @@ myads/
 │   └── console.php
 ├── storage/
 ├── tests/
-│   ├── Feature/            # 27 feature tests
+│   ├── Feature/            # 47 feature tests
 │   ├── Unit/
 │   └── Concerns/           # SeedsSiteSettings trait
 ├── themes/
@@ -151,7 +151,8 @@ myads/
 | `ProfileController` | Profile view/edit, follow, privacy, sessions/revocation, badges, history |
 | `MessageController` | Private messaging |
 | `NotificationController` | Notification center, mark-all-read |
-| `OrderRequestController` | Order requests CRUD, bidding, rating |
+| `OrderRequestController` | Marketplace request discovery, CRUD, workflow actions, and completion ratings |
+| `OrderOfferController` | Structured marketplace offer create/update/withdraw flows |
 | `BillingController` | Member paid plans catalog, billing dashboard, purchases, receipts, returns, webhooks |
 | `NewsController` | Public news pages |
 | `ReportController` | Content reporting |
@@ -160,6 +161,7 @@ myads/
 | `AdminController` | **Main admin controller** — users, ads, forum, directory, store, widgets, menus, plugins, themes, settings, news, reports, emojis, knowledgebase, maintenance mode settings |
 | `AdminAdminsController` | Admin ACL management |
 | `AdminBillingController` | Admin billing hub: settings, plans, orders, transactions, currencies, gateways |
+| `AdminOrderController` | Admin marketplace dashboard and moderation actions for service requests |
 | `AdminSeoController` | SEO suite admin |
 | `AdminPageController` | Custom pages admin CRUD |
 | `AdminStatusPromotionController` | Admin monitoring and settings for promoted community posts |
@@ -209,7 +211,9 @@ myads/
 | `Badge` / `UserBadge` / `BadgeShowcase` | `badges` / `user_badges` / `badge_showcase` | Gamification badges |
 | `PointTransaction` | `point_transactions` | Points ledger |
 | `Quest` / `QuestProgress` | `quests` / `quest_progress` | Daily/weekly quests |
-| `OrderRequest` | `order_requests` | Service order requests |
+| `OrderRequest` | `order_requests` | Service marketplace requests with budget, delivery, workflow, and awarded-offer tracking |
+| `OrderOffer` | `order_offers` | Structured provider offers attached to service requests |
+| `OrderContract` | `order_contracts` | Awarded-offer snapshots that drive execution and completion state |
 | `SubscriptionPlan` | `subscription_plans` | Paid plan catalog with pricing, duration, bullets, and entitlements |
 | `MemberSubscription` | `member_subscriptions` | Active/queued/expired member subscription lifecycle records |
 | `BillingOrder` | `billing_orders` | Subscription checkout orders and manual-review state |
@@ -237,6 +241,9 @@ myads/
 | `StatusActivityService` | Status/activity card rendering logic |
 | `StatusPromotionPricingService` | Smart PTS pricing, delivery caps, duration estimates, and active-subscription discount support for promoted posts |
 | `StatusPromotionService` | Campaign creation, feed injection, pacing, progress tracking, and admin actions for promoted posts |
+| `OrderOfferService` | Validates and persists structured marketplace offers, including legacy compatibility mapping |
+| `OrderContractService` | Freezes awarded-offer snapshots into executable marketplace contracts |
+| `OrderWorkflowService` | Enforces marketplace authorization and transitions for award, start, delivery, completion, close, and cancellation |
 | `BillingGatewayRegistry` | Resolves enabled payment gateways and prepares admin/member gateway definitions |
 | `BillingCurrencyService` | Base currency, conversions, supported currency filtering, and currency CRUD helpers |
 | `SubscriptionPlanService` | Plan CRUD, search/pagination, snapshots, and entitlement normalization |
@@ -286,10 +293,15 @@ myads/
 | `/plans` | `/plans` | Public/member paid plans catalog (hidden when billing is disabled) |
 | `/settings/billing` | `/settings/billing` | Member billing dashboard and subscription history |
 | `/billing/orders/{order}` | `/billing/orders/15` | Member order details and bank-transfer receipt upload |
+| `/orders` | `/orders?status=open` | Service marketplace discovery and filtering |
+| `/orders/mine` | `/orders/mine` | Member dashboard for owned service requests |
+| `/orders/offers` | `/orders/offers` | Provider dashboard for submitted marketplace offers |
+| `/orders/{order}` | `/orders/44` | Service marketplace request detail and workflow page |
 | `/billing/return/{gateway}/{order}` | `/billing/return/stripe/15` | Hosted checkout return handler |
 | `/billing/webhook/{gateway}` | `/billing/webhook/paypal` | Payment gateway webhook endpoint |
 | `/admin/billing` | `/admin/billing` | Admin billing overview and financial hub |
 | `/admin/billing/gateways` | `/admin/billing/gateways` | Admin gateway configuration for Stripe, PayPal, and Bank Transfer |
+| `/admin/orders` | `/admin/orders` | Admin marketplace moderation dashboard under the `community` ACL scope |
 | `/share` | `/share?text={content}` | External share endpoint (requires auth) |
 | `/developer` | `/developer` | Public developer documentation for Share API |
 
@@ -297,6 +309,11 @@ myads/
 - **`auth`** — Standard Laravel auth
 - **`admin`** — `AdminMiddleware` (checks `AdminAccessService`)
 - **Global middleware** — `SetLocale`, `CheckForMaintenanceMode`, `UpdateUserOnline`, `CheckSystemVersion`, `InstallerGuard`, `TrackSeoMetrics`
+
+### Orders Workflow Routes
+- Member offer CRUD uses `/orders/{order}/offers` and `/orders/offers/{offer}`.
+- Member workflow actions use `/orders/{order}/award`, `/start`, `/deliver`, `/complete`, `/cancel`, and `/close`.
+- Legacy compatibility aliases remain available at `/orders/{order}/select-best` and `/orders/{order}/rate-offer`.
 
 ### Admin Routes
 All under `/admin` prefix with `['auth', 'admin']` middleware.
@@ -328,7 +345,7 @@ ads/posts/     → Member promoted-post setup + dashboard
 profile/       → Profile, settings, privacy, badges, history
 messages/      → Private messaging
 notifications/ → Notification center
-orders/        → Order requests
+orders/        → Service marketplace discovery, request form, detail, mine, offers, and shared partials
 news/          → News pages
 visits/        → Visit exchange
 pages/         → Static pages (privacy, terms, custom)
@@ -339,6 +356,7 @@ billing/       → Member billing catalog, dashboard, order details
 ```
 layouts/       → admin shell layout (`admin::layouts.admin`)
 admin/billing/ → Billing hub, plans, orders, transactions, currencies, gateways
+admin/orders/  → Marketplace moderation dashboard and request detail views
 ```
 
 ### Theme Assets Helper
@@ -421,6 +439,17 @@ admin/billing/ → Billing hub, plans, orders, transactions, currencies, gateway
 - **Entitlements:** Plans can grant `bonus_pts`, `bonus_nvu`, `bonus_nlink`, `bonus_nsmart`, `profile_badge_label`, `profile_badge_color`, and `status_promotion_discount_pct`
 - **Privacy Rule:** Persist only minimal payment metadata (`external ids`, `amount`, `currency`, `exchange snapshot`, sanitized `meta`); never store bank/card identity data inside MYADS
 - **UI Integration:** Billing appears in the Duralux admin sidebar, in `profile.settings_nav`, and active subscription badges can surface on public profile pages
+
+### Order Marketplace (v4.3.0)
+- **Primary Domain:** `OrderRequest` remains the main service-request entity and still publishes community feed posts through `Status` type `6`.
+- **Offer/Contract Split:** Structured provider bids now live in `order_offers`, while awarded work is snapshotted into `order_contracts` so `/orders` no longer depends on `CommentController` for offer management.
+- **Workflow States:** Requests move through `open`, `awarded`, `in_progress`, `delivered`, `completed`, `cancelled`, and `closed`; `under_review` is a derived UI state when an open request already has active offers.
+- **Member Surfaces:** Discovery and workflow pages live at `/orders`, `/orders/create`, `/orders/{order}`, `/orders/mine`, and `/orders/offers`, with offer CRUD and lifecycle actions mapped to dedicated routes.
+- **Admin Surface:** `/admin/orders` provides moderation and oversight for the marketplace and is protected by the existing `community` admin ACL scope through `AdminAccessService`.
+- **Compatibility:** `OrderMarketplaceBackfill` migrates legacy offer data from `options` / old order-comment metadata into the new marketplace tables and can generate `OrderContract` snapshots for previously awarded requests.
+- **Categories:** Request categories are normalized through `App\Support\OrderCategoryOptions`, using `options`-backed values with an `Uncategorized` fallback.
+- **Community & Gamification:** Feed ranking, latest-order widgets, badge progress, and recent-trend metrics now read marketplace engagement from `order_offers`; ratings are finalized after contract completion only.
+- **Commercial Scope:** v4.3.0 keeps agreement and execution tracking inside MYADS without adding internal payments, escrow, attachments, milestones, or disputes.
 
 ### Admin Notification System
 - **Implementation:** Centralized in `App\Services\Admin\AdminNotificationService` and injected into the admin layout via `AdminNotificationComposer`.
@@ -763,6 +792,12 @@ php artisan storage:link
 - **Testing:** Added `tests/Feature/BillingFeatureTest.php` covering billing visibility, bank-transfer review flows, subscription extension/queueing, ACL, and incomplete-upgrade fallback.
 - **Feature (2026-04-15):** Fully localized the **User Edit** page in the admin panel and added a manual **Subscription Management** section for assigning or cancelling plans directly from the dashboard.
 - **Feature (2026-04-15):** Introduced the centralized **Admin Notification System** in the dashboard header, providing permission-aware alerts for billing, reports, and system/extension updates.
+- **Feature (2026-04-21):** Rebuilt `/orders` into a professional services marketplace with structured offers, awarded-contract snapshots, dedicated member dashboards, and a new `/admin/orders` moderation workspace.
+- **Controllers:** Added `OrderOfferController` and `AdminOrderController`, and refactored `OrderRequestController` around marketplace workflow actions.
+- **Models & Services:** Added `OrderOffer`, `OrderContract`, `OrderOfferService`, `OrderContractService`, `OrderWorkflowService`, `OrderCategoryOptions`, and `OrderMarketplaceBackfill`.
+- **Schema & UI:** Added migration `2026_04_21_000000_create_order_marketplace_tables.php`, rebuilt the member order views under `themes/default/views/orders/`, and added admin order views under `admin_themes/default/views/admin/orders/`.
+- **Community Integration:** Order activity cards, latest-order widgets, feed trend calculations, and badge/reputation tracking now use `order_offers` instead of legacy order-comment storage.
+- **Testing:** Added `tests/Feature/OrderMarketplaceWorkflowTest.php` and updated order-related feed and badge tests for the new marketplace domain.
 
 ---
 
@@ -788,4 +823,4 @@ If in doubt, update it. An outdated `Agents.md` causes future agents to make wro
 
 ---
 
-*Last updated: 2026-04-15 — MYADS v4.3.0 (Admin Notifications and User Subscription Management synced)*
+*Last updated: 2026-04-21 — MYADS v4.3.0 (Services Marketplace / Orders docs synced)*
