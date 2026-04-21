@@ -240,10 +240,10 @@
                     @endif
                 </div>
 
-                <p class="user-short-description-title" style="color: #fff;">
+                <p class="user-short-description-title" style="color: var(--group-shell-text);">
                     {{ $group->name }}
                 </p>
-                <p class="user-short-description-text" style="color: rgba(255,255,255,0.8);">
+                <p class="user-short-description-text" style="color: var(--group-shell-muted);">
                     <i class="fa {{ $group->privacy === \App\Models\Group::PRIVACY_PUBLIC ? 'fa-globe' : 'fa-lock' }}" aria-hidden="true"></i>
                     {{ $group->privacy === \App\Models\Group::PRIVACY_PUBLIC ? __('messages.groups_public') : __('messages.groups_private') }}
                 </p>
