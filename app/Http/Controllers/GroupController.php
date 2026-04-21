@@ -17,6 +17,7 @@ use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 class GroupController extends Controller
@@ -361,6 +362,33 @@ class GroupController extends Controller
         }
 
         return back()->with('success', __('messages.groups_role_updated'));
+    }
+
+    public function transferOwnership(Request $request, Group $group, GroupMembership $membership)
+    {
+        $this->ensureFeatureEnabled();
+        $this->ensureMembershipBelongsToGroup($group, $membership);
+
+        $request->validate([
+            'password' => 'required|string',
+        ]);
+
+        $user = Auth::user();
+        $isCorrect = Hash::check($request->password, $user->getAuthPassword()) || $user->pass === md5($request->password);
+
+        if (!$isCorrect) {
+            return back()->with('error', __('messages.invalid_password'));
+        }
+
+        try {
+            $this->memberships->transferOwnership($group, $membership->user, Auth::user());
+        } catch (\Throwable $e) {
+            return back()->with('error', $e->getMessage());
+        }
+
+        return redirect()
+            ->route('groups.show', $group)
+            ->with('success', __('messages.groups_transfer_success'));
     }
 
     public function storeDiscussion(

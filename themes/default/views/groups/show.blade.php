@@ -470,15 +470,44 @@
                                         </div>
                                     </div>
                                     @if($canManageGroup && $member->role !== \App\Models\GroupMembership::ROLE_OWNER)
-                                        <form method="POST" action="{{ route('groups.members.role', [$group, $member]) }}">
-                                            @csrf
-                                            <select name="role" onchange="this.form.submit()">
-                                                <option value="member" {{ $member->role === 'member' ? 'selected' : '' }}>{{ __('messages.groups_role_member') }}</option>
-                                                <option value="moderator" {{ $member->role === 'moderator' ? 'selected' : '' }}>{{ __('messages.groups_role_moderator') }}</option>
-                                            </select>
-                                        </form>
+                                        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+                                            <form method="POST" action="{{ route('groups.members.role', [$group, $member]) }}">
+                                                @csrf
+                                                <select name="role" onchange="this.form.submit()" style="padding: 4px 8px; border-radius: 8px; border: 1px solid var(--group-shell-border); background: var(--group-shell-bg); color: var(--group-shell-text);">
+                                                    <option value="member" {{ $member->role === 'member' ? 'selected' : '' }}>{{ __('messages.groups_role_member') }}</option>
+                                                    <option value="moderator" {{ $member->role === 'moderator' ? 'selected' : '' }}>{{ __('messages.groups_role_moderator') }}</option>
+                                                </select>
+                                            </form>
+
+                                            @if($group->owner_id === Auth::id())
+                                                <button class="button secondary" type="button" 
+                                                        style="padding: 8px 12px; font-size: 0.85rem;" 
+                                                        title="{{ __('messages.groups_transfer_ownership') }}"
+                                                        onclick="toggleTransferForm({{ $member->id }})">
+                                                    <i class="fa fa-right-left" aria-hidden="true"></i>
+                                                </button>
+                                            @endif
+                                        </div>
                                     @endif
                                 </article>
+
+                                @if($group->owner_id === Auth::id() && $member->role !== \App\Models\GroupMembership::ROLE_OWNER)
+                                    <div id="transfer-form-{{ $member->id }}" style="display: none; padding: 15px; background: var(--group-shell-soft); border-radius: 12px; margin-top: -10px; margin-bottom: 12px; border: 1px dashed var(--group-shell-accent);">
+                                        <form method="POST" action="{{ route('groups.transfer', [$group, $member]) }}">
+                                            @csrf
+                                            <p style="font-size: 0.85rem; margin-bottom: 10px; color: var(--group-shell-text);">
+                                                {{ __('messages.groups_transfer_confirm') }} <strong>{{ $member->user?->username }}</strong>
+                                            </p>
+                                            <div style="margin-bottom: 15px;">
+                                                <input type="password" name="password" required placeholder="{{ __('messages.password') }}" style="width: 100%; padding: 12px 15px; border-radius: 12px; border: 1px solid var(--group-shell-border); background: var(--group-shell-bg); color: var(--group-shell-text);">
+                                            </div>
+                                            <div style="display: flex; gap: 10px;">
+                                                <button type="submit" class="button secondary" style="flex: 1; background: var(--group-shell-accent); border-color: var(--group-shell-accent); color: #fff; padding: 10px; font-weight: 700;">{{ __('messages.confirm') }}</button>
+                                                <button type="button" class="button secondary" onclick="toggleTransferForm({{ $member->id }})" style="flex: 1; padding: 10px; font-weight: 700;">{{ __('messages.cancel') }}</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                @endif
                             @empty
                                 <p class="group-show__empty">{{ __('messages.groups_members_empty') }}</p>
                             @endforelse
@@ -551,5 +580,12 @@
             initHexagons();
         }
     });
+
+    function toggleTransferForm(memberId) {
+        const form = document.getElementById('transfer-form-' + memberId);
+        if (form) {
+            form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        }
+    }
 </script>
 @endpush

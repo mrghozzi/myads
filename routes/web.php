@@ -124,6 +124,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/groups/{group}/members/{membership}/approve', [GroupController::class, 'approveMembership'])->name('groups.members.approve');
     Route::post('/groups/{group}/members/{membership}/reject', [GroupController::class, 'rejectMembership'])->name('groups.members.reject');
     Route::post('/groups/{group}/members/{membership}/role', [GroupController::class, 'updateRole'])->name('groups.members.role');
+    Route::post('/groups/{group}/members/{membership}/transfer', [GroupController::class, 'transferOwnership'])->name('groups.transfer');
     Route::get('/groups/{group:slug}/edit', [GroupController::class, 'edit'])->name('groups.edit');
     Route::match(['put', 'patch'], '/groups/{group:slug}', [GroupController::class, 'update'])->name('groups.update');
 });

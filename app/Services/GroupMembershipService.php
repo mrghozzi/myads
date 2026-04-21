@@ -163,6 +163,35 @@ class GroupMembershipService
         return $membership->fresh(['group', 'user']);
     }
 
+    public function transferOwnership(Group $group, User $newOwner, User $actor): void
+    {
+        if (!$this->access->isOwner($group, $actor) && !$actor->isAdmin()) {
+            abort(403);
+        }
+
+        $newOwnerMembership = $this->access->membership($group, $newOwner);
+        if (!$newOwnerMembership || $newOwnerMembership->status !== GroupMembership::STATUS_ACTIVE) {
+            throw new \RuntimeException(__('messages.groups_transfer_target_not_member'));
+        }
+
+        DB::transaction(function () use ($group, $newOwner) {
+            // Demote old owner to member
+            GroupMembership::query()
+                ->where('group_id', $group->id)
+                ->where('user_id', $group->owner_id)
+                ->update(['role' => GroupMembership::ROLE_MEMBER]);
+
+            // Promote new owner
+            GroupMembership::query()
+                ->where('group_id', $group->id)
+                ->where('user_id', $newOwner->id)
+                ->update(['role' => GroupMembership::ROLE_OWNER]);
+
+            // Update group record
+            $group->update(['owner_id' => $newOwner->id]);
+        });
+    }
+
     public function syncCounts(Group $group): void
     {
         $schema = app(V420SchemaService::class);
