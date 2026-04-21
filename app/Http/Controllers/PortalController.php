@@ -72,10 +72,13 @@ class PortalController extends Controller
 
                 $activityService->decorateMany($searchedStatuses);
 
-                $searchedGroups = \App\Models\Group::where('name', 'LIKE', "%{$search}%")
-                    ->orWhere('description', 'LIKE', "%{$search}%")
-                    ->where('status', \App\Models\Group::STATUS_ACTIVE)
-                    ->get();
+                $searchedGroups = collect();
+                if (\App\Support\GroupSettings::isEnabled()) {
+                    $searchedGroups = \App\Models\Group::where('name', 'LIKE', "%{$search}%")
+                        ->orWhere('description', 'LIKE', "%{$search}%")
+                        ->where('status', \App\Models\Group::STATUS_ACTIVE)
+                        ->get();
+                }
 
                 $searchedCommentsForum = \App\Models\ForumComment::visible()
                     ->whereHas('topic', fn ($query) => $query->visible($user))
