@@ -2244,4 +2244,8 @@ return [
     'page_left' => 'Page Left',
     'page_right' => 'Page Right',
     'new_groups_pending' => ':count neue Gruppen warten auf Überprüfung',
+    'overview' => 'Übersicht',
+    'feed' => 'Feed',
+    'discussions' => 'Diskussionen',
+    'sort' => 'Sortieren',
 ];

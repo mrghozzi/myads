@@ -2392,5 +2392,10 @@ return [
     'profile_right' => 'يمين الملف الشخصي',
     'page_left' => 'يسار الصفحة',
     'page_right' => 'يمين الصفحة',
+    'new_groups_pending' => ':count مجموعات جديدة بانتظار المراجعة',
     'users_and_billing' => 'الأعضاء والفواتير',
+    'overview' => 'نظرة عامة',
+    'feed' => 'الخلاصة',
+    'discussions' => 'المناقشات',
+    'sort' => 'ترتيب',
 ];

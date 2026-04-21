@@ -2243,4 +2243,9 @@ return [
     'profile_right' => 'Profil Sağı',
     'page_left' => 'Sayfa Solu',
     'page_right' => 'Sayfa Sağı',
+    'new_groups_pending' => ':count yeni grup inceleme bekliyor',
+    'overview' => 'Genel Bakış',
+    'feed' => 'Akış',
+    'discussions' => 'Tartışmalar',
+    'sort' => 'Sırala',
 ];

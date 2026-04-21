@@ -2243,4 +2243,9 @@ return [
     'profile_right' => 'Destra Profilo',
     'page_left' => 'Sinistra Pagina',
     'page_right' => 'Destra Pagina',
+    'new_groups_pending' => ':count nuovi gruppi in attesa di revisione',
+    'overview' => 'Panoramica',
+    'feed' => 'Feed',
+    'discussions' => 'Discussioni',
+    'sort' => 'Ordina',
 ];

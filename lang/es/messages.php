@@ -2244,4 +2244,8 @@ return [
     'page_left' => 'Izquierda de Página',
     'page_right' => 'Derecha de Página',
     'new_groups_pending' => ':count nuevos grupos pendientes de revisión',
+    'overview' => 'Resumen',
+    'feed' => 'Feed',
+    'discussions' => 'Discusiones',
+    'sort' => 'Ordenar',
 ];

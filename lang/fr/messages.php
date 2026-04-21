@@ -2244,4 +2244,8 @@ return [
     'page_left' => 'Gauche de la Page',
     'page_right' => 'Droite de la Page',
     'new_groups_pending' => ':count nouveaux groupes en attente de révision',
+    'overview' => 'Aperçu',
+    'feed' => 'Flux',
+    'discussions' => 'Discussions',
+    'sort' => 'Trier',
 ];

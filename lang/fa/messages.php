@@ -2243,4 +2243,9 @@ return [
     'profile_right' => 'راست پروفایل',
     'page_left' => 'چپ صفحه',
     'page_right' => 'راست صفحه',
+    'new_groups_pending' => ':count گروه جدید در انتظار بررسی',
+    'overview' => 'نمای کلی',
+    'feed' => 'فید',
+    'discussions' => 'بحث‌ها',
+    'sort' => 'مرتب‌سازی',
 ];

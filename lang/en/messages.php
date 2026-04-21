@@ -2392,5 +2392,10 @@ return [
     'profile_right' => 'Profile Right',
     'page_left' => 'Page Left',
     'page_right' => 'Page Right',
+    'new_groups_pending' => ':count new groups pending review',
     'users_and_billing' => 'Users & Billing',
+    'overview' => 'Overview',
+    'feed' => 'Feed',
+    'discussions' => 'Discussions',
+    'sort' => 'Sort',
 ];
