@@ -1,6 +1,9 @@
 @php
-    $latestOrders = \App\Models\OrderRequest::where('statu', 1)
+    $latestOrders = \App\Models\OrderRequest::query()
         ->with('user')
+        ->withCount([
+            'offers as offers_count' => fn ($query) => $query->marketplaceVisible(),
+        ])
         ->orderBy('date', 'desc')
         ->limit(5)
         ->get();
@@ -22,15 +25,16 @@
                             </div>
                         </div>
                     </a>
-                    <p class="user-status-title"><a class="bold" href="{{ route('orders.show', $order->id) }}">{{ \Illuminate\Support\Str::limit($order->title, 40) }}</a></p>
-                    <p class="user-status-text small">{{ $order->category }} @if($order->budget) • {{ $order->budget }} @endif</p>
+                    <p class="user-status-title"><a class="bold" href="{{ route('orders.show', $order) }}">{{ \Illuminate\Support\Str::limit($order->title, 40) }}</a></p>
+                    <p class="user-status-text small">{{ $order->displayCategory() }} | {{ $order->displayBudget() }}</p>
+                    <p class="user-status-text small">{{ __('messages.offers') }}: {{ $order->offers_count }}</p>
                     <p class="user-status-timestamp">{{ \Carbon\Carbon::createFromTimestamp($order->date)->diffForHumans() }}</p>
                 </div>
             @empty
-                <p class="text-center">{{ __('messages.no_orders_found') ?? 'No orders found.' }}</p>
+                <p class="text-center">{{ __('messages.no_orders_found') }}</p>
             @endforelse
         </div>
         
-        <a class="widget-box-button button small white" href="{{ route('orders.index') }}">{{ __('messages.view_all_orders') ?? 'View All Orders' }}</a>
+        <a class="widget-box-button button small white" href="{{ route('orders.index') }}">{{ __('messages.view_all_orders') }}</a>
     </div>
 </div>

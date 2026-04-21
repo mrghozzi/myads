@@ -394,7 +394,7 @@
                     <a class="dropdown-navigation-link" href="{{ route('store.index') }}">
                         <i class="fa-solid fa-shop dropdown-navigation-link-icon" style="width: 20px;"></i> {{ __('messages.store') }}
                     </a>
-                    <a class="dropdown-navigation-link" href="{{ route('orders.index') }}">
+                    <a class="dropdown-navigation-link" href="{{ route('orders.mine') }}">
                         <i class="fa-solid fa-cart-shopping dropdown-navigation-link-icon" style="width: 20px;"></i> {{ __('messages.my_orders') }}
                     </a>
 

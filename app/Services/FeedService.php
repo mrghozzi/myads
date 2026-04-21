@@ -7,6 +7,7 @@ use App\Models\ForumComment;
 use App\Models\ForumTopic;
 use App\Models\Like;
 use App\Models\Option;
+use App\Models\OrderOffer;
 use App\Models\OrderRequest;
 use App\Models\Status;
 use App\Models\StatusLinkPreview;
@@ -322,7 +323,7 @@ class FeedService
                 'directory' => self::countMapForIds(Option::query()->where('o_type', 'd_coment'), 'o_parent', $directoryIds),
                 'store' => self::countMapForIds(Option::query()->where('o_type', 's_coment'), 'o_parent', $storeIds),
                 'knowledgebase' => self::countMapForIds(Option::query()->where('o_type', KnowledgebaseCommunityService::COMMENT_OPTION_TYPE), 'o_parent', $knowledgebaseStatusIds),
-                'order' => self::countMapForIds(Option::query()->where('o_type', 'order_comment'), 'o_parent', $orderIds),
+                'order' => self::countMapForIds(OrderOffer::query()->marketplaceVisible(), 'order_request_id', $orderIds),
             ],
             'total_reposts' => $schema->supports('reposts')
                 ? self::countMapForIds(StatusRepost::query(), 'original_status_id', $statusIds)
@@ -344,14 +345,14 @@ class FeedService
             'directory' => self::groupedCount(self::recentOptionQuery('d_coment', $trendCutoff), 'o_parent'),
             'store' => self::groupedCount(self::recentOptionQuery('s_coment', $trendCutoff), 'o_parent'),
             'knowledgebase' => self::groupedCount(self::recentOptionQuery(KnowledgebaseCommunityService::COMMENT_OPTION_TYPE, $trendCutoff), 'o_parent'),
-            'order' => self::groupedCount(self::recentOptionQuery('order_comment', $trendCutoff), 'o_parent'),
+            'order' => self::groupedCount(self::recentOrderOfferQuery($trendCutoff), 'order_request_id'),
         ];
         $rapidComments = [
             'forum' => self::groupedCount(ForumComment::query()->where('date', '>=', $rapidCutoff), 'tid'),
             'directory' => self::groupedCount(self::recentOptionQuery('d_coment', $rapidCutoff), 'o_parent'),
             'store' => self::groupedCount(self::recentOptionQuery('s_coment', $rapidCutoff), 'o_parent'),
             'knowledgebase' => self::groupedCount(self::recentOptionQuery(KnowledgebaseCommunityService::COMMENT_OPTION_TYPE, $rapidCutoff), 'o_parent'),
-            'order' => self::groupedCount(self::recentOptionQuery('order_comment', $rapidCutoff), 'o_parent'),
+            'order' => self::groupedCount(self::recentOrderOfferQuery($rapidCutoff), 'order_request_id'),
         ];
 
         $recentReactions = [
@@ -442,9 +443,9 @@ class FeedService
                     )
             );
             $socialProof['order'] = self::idSet(
-                self::recentOptionQuery('order_comment', $trendCutoff)
-                    ->whereIn('o_order', $followingIds)
-                    ->pluck('o_parent')
+                self::recentOrderOfferQuery($trendCutoff)
+                    ->whereIn('user_id', $followingIds)
+                    ->pluck('order_request_id')
                     ->merge(
                         Like::query()
                             ->where('type', 6)
@@ -650,7 +651,7 @@ class FeedService
             ->unique()
             ->values();
         $orderIds = Like::where('uid', $userId)->where('type', 6)->pluck('sid')
-            ->merge(Option::where('o_order', $userId)->where('o_type', 'order_comment')->pluck('o_parent'))
+            ->merge(OrderOffer::where('user_id', $userId)->pluck('order_request_id'))
             ->unique()
             ->values();
         $repostedStatusIds = $schema->supports('reposts')
@@ -686,7 +687,7 @@ class FeedService
             'knowledgebase' => Like::where('uid', $userId)->where('type', KnowledgebaseCommunityService::REACTION_TYPE)->count()
                 + Option::where('o_order', $userId)->where('o_type', KnowledgebaseCommunityService::COMMENT_OPTION_TYPE)->count(),
             'order' => Like::where('uid', $userId)->where('type', 6)->count()
-                + Option::where('o_order', $userId)->where('o_type', 'order_comment')->count(),
+                + OrderOffer::where('user_id', $userId)->count(),
         ])->filter(static fn ($count) => (int) $count > 0)->all();
     }
 
@@ -759,6 +760,13 @@ class FeedService
             ->where('o_type', $type)
             ->where('o_mode', '>', 0)
             ->where('o_mode', '>=', $cutoff);
+    }
+
+    private static function recentOrderOfferQuery(int $cutoff)
+    {
+        return OrderOffer::query()
+            ->marketplaceVisible()
+            ->where('created_at', '>=', date('Y-m-d H:i:s', $cutoff));
     }
 
     private static function recentReactionQuery(int $type, int $cutoff)

@@ -20,6 +20,7 @@ use App\Services\GroupAccessService;
 use App\Services\V420SchemaService;
 use App\Services\KnowledgebaseCommunityService;
 use App\Models\OrderRequest;
+use App\Models\OrderOffer;
 
 use App\Traits\HasPrivacy;
 use Illuminate\Support\Facades\Auth;
@@ -267,8 +268,8 @@ class Status extends Model
             }
 
             if ($this->s_type == 6) {
-                return Option::where('o_parent', $this->tp_id)
-                    ->where('o_type', 'order_comment')
+                return OrderOffer::where('order_request_id', $this->tp_id)
+                    ->marketplaceVisible()
                     ->count();
             }
 

@@ -73,7 +73,15 @@ class StatusActivityService
                 $activity->type_label = 'News';
                 break;
             case 6:
-                $activity->related_content = OrderRequest::find($activity->tp_id);
+                $activity->related_content = OrderRequest::with([
+                    'user',
+                    'awardedOffer.user',
+                    'contract.provider',
+                ])
+                    ->withCount([
+                        'offers as offers_count' => fn ($query) => $query->marketplaceVisible(),
+                    ])
+                    ->find($activity->tp_id);
                 $activity->type_label = 'Order';
                 break;
             case KnowledgebaseCommunityService::STATUS_TYPE:

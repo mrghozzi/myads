@@ -227,7 +227,15 @@ class AdminController extends Controller
 
         // Comments (Forum + Options-based)
         $forumComments = \App\Models\ForumComment::where('date', '>=', $startDate)->select(DB::raw('FROM_UNIXTIME(date, "%b %d") as day'), DB::raw('count(*) as count'))->groupBy('day')->pluck('count', 'day');
-        $otherComments = Option::whereIn('o_type', ['d_coment', 's_coment', 'order_comment'])->where('o_order', '>=', $startDate)->select(DB::raw('FROM_UNIXTIME(o_order, "%b %d") as day'), DB::raw('count(*) as count'))->groupBy('day')->pluck('count', 'day');
+        $otherComments = Option::whereIn('o_type', ['d_coment', 's_coment'])->where('o_order', '>=', $startDate)->select(DB::raw('FROM_UNIXTIME(o_order, "%b %d") as day'), DB::raw('count(*) as count'))->groupBy('day')->pluck('count', 'day');
+        $orderOffers = app(\App\Services\V420SchemaService::class)->hasTable('order_offers')
+            ? \App\Models\OrderOffer::query()
+                ->where('status', '!=', \App\Models\OrderOffer::STATUS_WITHDRAWN)
+                ->where('created_at', '>=', date('Y-m-d H:i:s', $startDate))
+                ->select(DB::raw('DATE_FORMAT(created_at, "%b %d") as day'), DB::raw('count(*) as count'))
+                ->groupBy('day')
+                ->pluck('count', 'day')
+            : collect();
         
         // Reactions
         $reactionsData = \App\Models\Like::where('time_t', '>=', $startDate)->whereIn('type', [2, 3, 22, 6, 1])->select(DB::raw('FROM_UNIXTIME(time_t, "%b %d") as day'), DB::raw('count(*) as count'))->groupBy('day')->pluck('count', 'day');
@@ -244,10 +252,10 @@ class AdminController extends Controller
                 'news' => array_map(fn($l) => $postTypes['5'][$l] ?? 0, $labels),
             ],
             'comments' => [
-                'total' => array_map(fn($l) => ($forumComments[$l] ?? 0) + ($otherComments[$l] ?? 0), $labels),
+                'total' => array_map(fn($l) => ($forumComments[$l] ?? 0) + ($otherComments[$l] ?? 0) + ($orderOffers[$l] ?? 0), $labels),
                 'forum' => array_map(fn($l) => $forumComments[$l] ?? 0, $labels),
                 'store' => array_map(fn($l) => Option::where('o_type', 's_coment')->where('o_order', '>=', $startDate)->where(DB::raw('FROM_UNIXTIME(o_order, "%b %d")'), $l)->count(), $labels),
-                'orders' => array_map(fn($l) => Option::where('o_type', 'order_comment')->where('o_order', '>=', $startDate)->where(DB::raw('FROM_UNIXTIME(o_order, "%b %d")'), $l)->count(), $labels),
+                'orders' => array_map(fn($l) => $orderOffers[$l] ?? 0, $labels),
                 'directory' => array_map(fn($l) => Option::where('o_type', 'd_coment')->where('o_order', '>=', $startDate)->where(DB::raw('FROM_UNIXTIME(o_order, "%b %d")'), $l)->count(), $labels),
             ],
             'reactions' => [

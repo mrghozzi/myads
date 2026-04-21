@@ -7,6 +7,8 @@ use App\Models\Directory;
 use App\Models\ForumComment;
 use App\Models\Like;
 use App\Models\Option;
+use App\Models\OrderContract;
+use App\Models\OrderOffer;
 use App\Models\Quest;
 use App\Models\QuestProgress;
 use App\Models\OrderRequest;
@@ -193,14 +195,20 @@ class GamificationService
             'kb_articles' => Option::where('o_parent', $user->id)->where('o_type', 'knowledgebase')->where('o_order', 0)->count(),
             'night_posts' => $this->countNightPosts($user->id),
             'order_requests_count' => OrderRequest::where('uid', $user->id)->count(),
-            'order_bids_count' => Option::where('o_order', $user->id)->where('o_type', 'o_order')->count(),
-            'best_offers_won' => OrderRequest::whereIn('best_offer_id', function($query) use ($user) {
-                $query->select('id')->from('options')->where('o_type', 'o_order')->where('o_order', $user->id);
-            })->count(),
-            'five_star_ratings' => Option::where('o_order', $user->id)
-                ->where('o_type', 'o_order')
-                ->where('o_mode', 5)
-                ->count(),
+            'order_bids_count' => $this->schema->hasTable('order_offers')
+                ? OrderOffer::where('user_id', $user->id)->where('status', '!=', OrderOffer::STATUS_WITHDRAWN)->count()
+                : Option::where('o_order', $user->id)->where('o_type', 'o_order')->count(),
+            'best_offers_won' => $this->schema->hasTable('order_contracts')
+                ? OrderContract::where('provider_user_id', $user->id)->count()
+                : OrderRequest::whereIn('best_offer_id', function ($query) use ($user) {
+                    $query->select('id')->from('options')->where('o_type', 'o_order')->where('o_order', $user->id);
+                })->count(),
+            'five_star_ratings' => $this->schema->hasTable('order_offers')
+                ? OrderOffer::where('user_id', $user->id)->where('client_rating', 5)->count()
+                : Option::where('o_order', $user->id)
+                    ->where('o_type', 'o_order')
+                    ->where('o_mode', 5)
+                    ->count(),
             'forum_topics_count' => DB::table('forum')->where('uid', $user->id)->count(),
             'forum_replies_count' => ForumComment::where('uid', $user->id)->count(),
             'unique_categories_topics' => DB::table('forum')->where('uid', $user->id)->distinct('cat')->count('cat'),
@@ -282,4 +290,3 @@ class GamificationService
         DB::table('quests')->where('slug', 'daily_first_post')->where('target_count', '<=', 0)->update(['target_count' => 1]);
     }
 }
-

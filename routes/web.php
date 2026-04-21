@@ -33,6 +33,8 @@ use App\Http\Controllers\GroupController;
 use App\Http\Controllers\SeoPublicController;
 use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\OrderRequestController;
+use App\Http\Controllers\OrderOfferController;
+use App\Http\Controllers\AdminOrderController;
 use App\Http\Controllers\StatusPromotionController;
 use App\Http\Middleware\AdminMiddleware;
 
@@ -251,14 +253,27 @@ Route::middleware(['auth'])->group(function () {
 // Order Request Routes
 Route::get('/orders', [OrderRequestController::class, 'index'])->name('orders.index');
 Route::middleware(['auth'])->group(function () {
+    Route::get('/orders/mine', [OrderRequestController::class, 'mine'])->name('orders.mine');
+    Route::get('/orders/offers', [OrderRequestController::class, 'offers'])->name('orders.offers');
     Route::get('/orders/create', [OrderRequestController::class, 'create'])->name('orders.create');
     Route::post('/orders', [OrderRequestController::class, 'store'])->name('orders.store');
-    Route::post('/orders/{id}/select-best', [OrderRequestController::class, 'selectBestOffer'])->name('orders.select_best');
-    Route::post('/orders/{id}/rate', [OrderRequestController::class, 'rateOffer'])->name('orders.rate');
-    Route::post('/orders/{id}/close', [OrderRequestController::class, 'close'])->name('orders.close');
-    Route::delete('/orders/{id}', [OrderRequestController::class, 'destroy'])->name('orders.destroy');
+    Route::get('/orders/{order}/edit', [OrderRequestController::class, 'edit'])->name('orders.edit');
+    Route::match(['put', 'patch'], '/orders/{order}', [OrderRequestController::class, 'update'])->name('orders.update');
+    Route::post('/orders/{order}/offers', [OrderOfferController::class, 'store'])->name('orders.offers.store');
+    Route::match(['put', 'patch'], '/orders/offers/{offer}', [OrderOfferController::class, 'update'])->name('orders.offers.update');
+    Route::delete('/orders/offers/{offer}', [OrderOfferController::class, 'destroy'])->name('orders.offers.destroy');
+    Route::post('/orders/{order}/award', [OrderRequestController::class, 'award'])->name('orders.award');
+    Route::post('/orders/{order}/start', [OrderRequestController::class, 'start'])->name('orders.start');
+    Route::post('/orders/{order}/deliver', [OrderRequestController::class, 'deliver'])->name('orders.deliver');
+    Route::post('/orders/{order}/complete', [OrderRequestController::class, 'complete'])->name('orders.complete');
+    Route::post('/orders/{order}/cancel', [OrderRequestController::class, 'cancel'])->name('orders.cancel');
+    Route::post('/orders/{order}/rate', [OrderRequestController::class, 'rate'])->name('orders.rate');
+    Route::post('/orders/{order}/rate-offer', [OrderRequestController::class, 'rate'])->name('orders.rate_offer');
+    Route::post('/orders/{order}/select-best', [OrderRequestController::class, 'award'])->name('orders.select_best');
+    Route::post('/orders/{order}/close', [OrderRequestController::class, 'close'])->name('orders.close');
+    Route::delete('/orders/{order}', [OrderRequestController::class, 'destroy'])->name('orders.destroy');
 });
-Route::get('/orders/{id}', [OrderRequestController::class, 'show'])->name('orders.show');
+Route::get('/orders/{order}', [OrderRequestController::class, 'show'])->name('orders.show');
 
 // Store Routes
 Route::middleware(['auth'])->group(function () {
@@ -575,6 +590,13 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
         Route::post('/currencies/{currency}/base', [AdminBillingController::class, 'setBaseCurrency'])->name('admin.billing.currencies.base');
         Route::get('/gateways', [AdminBillingController::class, 'gateways'])->name('admin.billing.gateways');
         Route::post('/gateways/{gateway}', [AdminBillingController::class, 'updateGateway'])->name('admin.billing.gateways.update');
+    });
+
+    Route::prefix('orders')->group(function () {
+        Route::get('/', [AdminOrderController::class, 'index'])->name('admin.orders.index');
+        Route::get('/{order}', [AdminOrderController::class, 'show'])->name('admin.orders.show');
+        Route::post('/{order}/close', [AdminOrderController::class, 'close'])->name('admin.orders.close');
+        Route::post('/{order}/cancel', [AdminOrderController::class, 'cancel'])->name('admin.orders.cancel');
     });
 
     // Pages

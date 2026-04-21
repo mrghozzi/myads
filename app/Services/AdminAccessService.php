@@ -100,6 +100,7 @@ class AdminAccessService
             str_starts_with($routeName, 'admin.cookie_notice') => 'settings',
             str_starts_with($routeName, 'admin.community.feed') => 'community',
             str_starts_with($routeName, 'admin.groups') => 'community',
+            str_starts_with($routeName, 'admin.orders') => 'community',
             str_starts_with($routeName, 'admin.banners'),
             str_starts_with($routeName, 'admin.links'),
             str_starts_with($routeName, 'admin.smart_ads'),

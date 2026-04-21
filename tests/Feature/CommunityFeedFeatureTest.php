@@ -6,6 +6,7 @@ use App\Models\ForumComment;
 use App\Models\ForumTopic;
 use App\Models\Like;
 use App\Models\Option;
+use App\Models\OrderOffer;
 use App\Models\OrderRequest;
 use App\Models\Product;
 use App\Models\SiteAdmin;
@@ -217,7 +218,7 @@ class CommunityFeedFeatureTest extends TestCase
             ->assertRedirect('/');
     }
 
-    public function test_order_comments_store_timestamp_for_recent_trend_tracking(): void
+    public function test_order_offers_store_created_at_for_recent_trend_tracking(): void
     {
         $owner = User::factory()->create(['username' => 'orderowner']);
         $commenter = User::factory()->create(['username' => 'ordercommenter']);
@@ -236,21 +237,22 @@ class CommunityFeedFeatureTest extends TestCase
         ]);
 
         $this->actingAs($commenter)
-            ->post(route('comment.store'), [
-                'id' => $order->id,
-                'type' => 'order',
-                'comment' => 'I can help with this today.',
+            ->post(route('orders.offers.store', $order), [
+                'pricing_model' => 'fixed',
+                'quoted_amount' => 150,
+                'currency_code' => 'USD',
+                'delivery_days' => 3,
+                'message' => 'I can help with this today.',
             ])
-            ->assertOk();
+            ->assertRedirect(route('orders.show', $order));
 
-        $comment = Option::query()
-            ->where('o_type', 'order_comment')
-            ->where('o_parent', $order->id)
+        $offer = OrderOffer::query()
+            ->where('order_request_id', $order->id)
             ->first();
 
-        $this->assertNotNull($comment);
-        $this->assertSame($commenter->id, (int) $comment->o_order);
-        $this->assertGreaterThan(0, (int) $comment->o_mode);
+        $this->assertNotNull($offer);
+        $this->assertSame($commenter->id, (int) $offer->user_id);
+        $this->assertNotNull($offer->created_at);
     }
 
     public function test_knowledgebase_community_posts_rank_and_render_inside_the_portal_feed(): void
