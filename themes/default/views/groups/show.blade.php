@@ -276,6 +276,13 @@
 
                     <div class="group-show__actions">
                         @auth
+                            @if($canManageGroup)
+                                <a href="{{ route('groups.edit', $group) }}" class="button primary">
+                                    <i class="fa fa-cog" aria-hidden="true" style="margin-inline-end: 8px;"></i>
+                                    {{ __('messages.groups_edit_title') }}
+                                </a>
+                            @endif
+
                             @if($membership?->status === \App\Models\GroupMembership::STATUS_ACTIVE)
                                 @if($membership->role !== \App\Models\GroupMembership::ROLE_OWNER)
                                     <form method="POST" action="{{ route('groups.leave', $group) }}">
@@ -306,6 +313,12 @@
                         <span>{{ __('messages.' . $tabLabel) }}</span>
                     </a>
                 @endforeach
+                @if($canManageGroup)
+                    <a class="group-show__tab" href="{{ route('groups.edit', $group) }}">
+                        <i class="fa fa-cog" aria-hidden="true"></i>
+                        <span>{{ __('messages.Settings') }}</span>
+                    </a>
+                @endif
             </div>
 
             @if(!$canViewContent)

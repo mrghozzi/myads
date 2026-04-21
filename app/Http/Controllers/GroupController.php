@@ -116,6 +116,78 @@ class GroupController extends Controller
             ->with('success', $message);
     }
 
+    public function edit(Group $group)
+    {
+        $this->ensureFeatureEnabled();
+
+        $user = Auth::user();
+        if (!$this->access->canManageGroup($group, $user)) {
+            abort(403);
+        }
+
+        $this->noindex([
+            'scope_key' => 'groups_edit',
+            'resource_title' => __('messages.groups_edit_title'),
+            'description' => __('messages.groups_edit_description'),
+            'breadcrumbs' => [
+                ['name' => __('messages.home'), 'url' => url('/')],
+                ['name' => __('messages.groups_title'), 'url' => route('groups.index')],
+                ['name' => $group->name, 'url' => route('groups.show', $group)],
+                ['name' => __('messages.Settings'), 'url' => route('groups.edit', $group)],
+            ],
+        ]);
+
+        return view('theme::groups.edit', compact('group'));
+    }
+
+    public function update(Request $request, Group $group)
+    {
+        $this->ensureFeatureEnabled();
+
+        $user = Auth::user();
+        if (!$this->access->canManageGroup($group, $user)) {
+            abort(403);
+        }
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:120',
+            'slug' => 'nullable|string|max:140|unique:groups,slug,' . $group->id,
+            'privacy' => 'required|in:public,private_request',
+            'short_description' => 'nullable|string|max:280',
+            'description' => 'nullable|string|max:10000',
+            'rules_markdown' => 'nullable|string|max:15000',
+            'avatar' => 'nullable|image|max:4096',
+            'cover' => 'nullable|image|max:4096',
+        ]);
+
+        if ($request->hasFile('avatar')) {
+            $file = $request->file('avatar');
+            $filename = 'group_avatar_' . $group->id . '_' . time() . '.' . ($file->getClientOriginalExtension() ?: 'jpg');
+            $file->move(base_path('upload'), $filename);
+            $group->avatar_path = 'upload/' . $filename;
+        }
+
+        if ($request->hasFile('cover')) {
+            $file = $request->file('cover');
+            $filename = 'group_cover_' . $group->id . '_' . time() . '.' . ($file->getClientOriginalExtension() ?: 'jpg');
+            $file->move(base_path('upload'), $filename);
+            $group->cover_path = 'upload/' . $filename;
+        }
+
+        $group->update([
+            'name' => $validated['name'],
+            'slug' => $validated['slug'] ?: $group->slug,
+            'privacy' => $validated['privacy'],
+            'short_description' => $validated['short_description'],
+            'description' => $validated['description'],
+            'rules_markdown' => $validated['rules_markdown'],
+        ]);
+
+        return redirect()
+            ->route('groups.show', $group)
+            ->with('success', __('messages.groups_updated_success'));
+    }
+
     public function show(Request $request, Group $group, StatusActivityService $activityService)
     {
         $this->ensureFeatureEnabled();
