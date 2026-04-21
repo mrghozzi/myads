@@ -135,6 +135,7 @@ class AdminGroupController extends Controller
     public function update(Request $request, Group $group)
     {
         $oldOwnerId = $group->owner_id;
+        $newOwnerId = (int) $request->input('owner_id');
 
         $validated = $request->validate([
             'name' => 'required|string|max:120',
@@ -145,14 +146,19 @@ class AdminGroupController extends Controller
             'owner_id' => 'required|exists:users,id',
         ]);
 
-        $group->update($validated);
+        // Remove owner_id from validated to update it separately via transferOwnership if needed
+        $attributes = collect($validated)->except('owner_id')->toArray();
+        $group->update($attributes);
 
-        if ((int) $oldOwnerId !== (int) $group->owner_id) {
-            $newOwner = \App\Models\User::find($group->owner_id);
+        if ($oldOwnerId !== $newOwnerId) {
+            $newOwner = \App\Models\User::find($newOwnerId);
+            $oldOwner = \App\Models\User::find($oldOwnerId);
+            
             // Ensure new owner is at least a member
             $this->memberships->join($group, $newOwner);
-            // Transfer role
-            $this->memberships->transferOwnership($group, $newOwner, \App\Models\User::find($oldOwnerId));
+            
+            // transferOwnership will update group->owner_id and sync roles
+            $this->memberships->transferOwnership($group, $newOwner, \Illuminate\Support\Facades\Auth::user());
 
             // Notify old owner (new owner is already notified inside transferOwnership)
             $this->notifications->send(
