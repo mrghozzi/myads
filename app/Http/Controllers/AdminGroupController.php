@@ -153,6 +153,20 @@ class AdminGroupController extends Controller
             $this->memberships->join($group, $newOwner);
             // Transfer role
             $this->memberships->transferOwnership($group, $newOwner, \App\Models\User::find($oldOwnerId));
+
+            // Notify old owner (new owner is already notified inside transferOwnership)
+            $this->notifications->send(
+                $oldOwnerId,
+                __('messages.groups_notification_ownership_lost', ['group' => $group->name]),
+                route('groups.show', $group)
+            );
+        } else {
+            // Settings changed but owner didn't change, notify current owner
+            $this->notifications->send(
+                $group->owner_id,
+                __('messages.groups_notification_settings_updated_by_admin', ['group' => $group->name]),
+                route('groups.show', $group)
+            );
         }
 
         return back()->with('success', __('messages.admin_groups_updated'));

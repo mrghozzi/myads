@@ -2391,6 +2391,8 @@ return [
     'groups_no_actions_owner' => 'No actions for owner',
     'admin_groups_owner_id_hint' => 'Change this to transfer ownership to another user ID.',
     'groups_notification_removed' => 'You have been removed from group ":group".',
+    'groups_notification_ownership_lost' => 'The ownership of group ":group" has been transferred from you by an administrator.',
+    'groups_notification_settings_updated_by_admin' => 'An administrator has updated the settings of your group ":group".',
     'groups_member_removed_success' => 'Member removed from group successfully.',
     'slug' => 'Slug',
     'total_records' => 'Total Records',

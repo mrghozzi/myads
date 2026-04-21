@@ -2391,6 +2391,8 @@ return [
     'groups_no_actions_owner' => 'لا توجد إجراءات للمالك',
     'admin_groups_owner_id_hint' => 'قم بتغيير هذا المعرف لنقل ملكية المجموعة لمستخدم آخر.',
     'groups_notification_removed' => 'تمت إزالتك من مجموعة ":group".',
+    'groups_notification_ownership_lost' => 'تم نقل ملكية مجموعة ":group" منك لمستخدم آخر من قبل الإدارة.',
+    'groups_notification_settings_updated_by_admin' => 'قام أحد المسؤولين بتحديث إعدادات مجموعتك ":group".',
     'groups_member_removed_success' => 'تم حذف العضو من المجموعة بنجاح.',
     'slug' => 'الرابط الدائم',
     'total_records' => 'إجمالي السجلات',
