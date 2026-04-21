@@ -46,7 +46,7 @@
                 <div class="mb-3">
                     <label class="form-label">{{ __('messages.owner') }} (User ID)</label>
                     <input type="number" name="owner_id" class="form-control" value="{{ old('owner_id', $group->owner_id) }}" required>
-                    <small class="text-muted">Change this to transfer ownership to another user ID.</small>
+                    <small class="text-muted">{{ __('messages.admin_groups_owner_id_hint') }}</small>
                 </div>
 
                 <div class="mb-3">

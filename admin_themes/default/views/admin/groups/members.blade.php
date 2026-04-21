@@ -87,7 +87,7 @@
                                             </form>
                                         </div>
                                     @else
-                                        <span class="text-muted small">No actions for owner</span>
+                                        <span class="text-muted small">{{ __('messages.groups_no_actions_owner') }}</span>
                                     @endif
                                 </td>
                             </tr>
