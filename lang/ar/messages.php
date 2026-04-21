@@ -646,6 +646,8 @@ return [
     'groups_transfer_success' => 'تم نقل ملكية المجموعة بنجاح.',
     'groups_transfer_target_not_member' => 'المستخدم المختار يجب أن يكون عضواً نشطاً في المجموعة.',
     'groups_owner_cannot_leave' => 'لا يمكن لمالك المجموعة مغادرتها. يجب نقل الملكية أولاً أو حذف المجموعة.',
+    'groups_notification_role_updated' => 'تم تحديث رتبتك في مجموعة ":group" لتصبح ":role".',
+    'groups_notification_ownership_transferred' => 'لقد أصبحت الآن مالك مجموعة ":group". مبروك!',
     'general_settings' => 'الإعدادات العامة',
     'back_to_group' => 'العودة للمجموعة',
     'save_changes' => 'حفظ التغييرات',

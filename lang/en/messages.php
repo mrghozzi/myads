@@ -644,6 +644,8 @@ return [
     'groups_transfer_success' => 'Group ownership transferred successfully.',
     'groups_transfer_target_not_member' => 'The selected user must be an active member of the group.',
     'groups_owner_cannot_leave' => 'Group owner cannot leave the group. You must transfer ownership first or delete the group.',
+    'groups_notification_role_updated' => 'Your role in group ":group" has been updated to ":role".',
+    'groups_notification_ownership_transferred' => 'You are now the owner of the group ":group". Congratulations!',
     'general_settings' => 'General Settings',
     'back_to_group' => 'Back to Group',
     'save_changes' => 'Save Changes',

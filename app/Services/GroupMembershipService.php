@@ -7,13 +7,15 @@ use App\Models\GroupMembership;
 use App\Models\Status;
 use App\Models\User;
 use Illuminate\Support\Carbon;
+use App\Services\NotificationService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class GroupMembershipService
 {
     public function __construct(
-        private readonly GroupAccessService $access
+        protected GroupAccessService $access,
+        protected NotificationService $notifications
     ) {
     }
 
@@ -160,6 +162,15 @@ class GroupMembershipService
 
         $membership->update(['role' => $role]);
 
+        $this->notifications->send(
+            $membership->user_id,
+            __('messages.groups_notification_role_updated', [
+                'group' => $membership->group->name,
+                'role' => __('messages.groups_role_' . $role)
+            ]),
+            route('groups.show', $membership->group)
+        );
+
         return $membership->fresh(['group', 'user']);
     }
 
@@ -190,6 +201,12 @@ class GroupMembershipService
             // Update group record
             $group->update(['owner_id' => $newOwner->id]);
         });
+
+        $this->notifications->send(
+            $newOwner->id,
+            __('messages.groups_notification_ownership_transferred', ['group' => $group->name]),
+            route('groups.show', $group)
+        );
     }
 
     public function syncCounts(Group $group): void
