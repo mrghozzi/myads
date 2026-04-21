@@ -226,13 +226,22 @@
                     <div class="user-avatar-content">
                         <div class="hexagon-image-100-110" data-src="{{ asset($avatar) }}" style="width: 100px; height: 110px; position: relative;"><canvas style="position: absolute; top: 0px; left: 0px;" width="100" height="110"></canvas></div>
                     </div>
+
+                    @if($group->is_featured)
+                        <div class="user-avatar-badge">
+                            <div class="user-avatar-badge-border">
+                                <div class="hexagon-40-44" style="width: 22px; height: 24px; position: relative;"></div>
+                            </div>
+                            <div class="user-avatar-badge-content">
+                                <div class="hexagon-dark-32-34" style="width: 16px; height: 18px; position: relative;"></div>
+                            </div>
+                            <p class="user-avatar-badge-text"><i class="fa fa-star" style="color: #ffc107; font-size: 10px;"></i></p>
+                        </div>
+                    @endif
                 </div>
 
                 <p class="user-short-description-title" style="color: #fff;">
                     {{ $group->name }}
-                    @if($group->is_featured)
-                        <i class="fa fa-star" aria-hidden="true" style="color: #ffc107; font-size: 0.8em; margin-inline-start: 5px;" title="{{ __('messages.groups_featured') }}"></i>
-                    @endif
                 </p>
                 <p class="user-short-description-text" style="color: rgba(255,255,255,0.8);">
                     <i class="fa {{ $group->privacy === \App\Models\Group::PRIVACY_PUBLIC ? 'fa-globe' : 'fa-lock' }}" aria-hidden="true"></i>
@@ -326,13 +335,7 @@
             @if(!$canViewContent)
                 <div class="group-show__panel">
                     <h2 class="group-show__panel-title">{{ __('messages.groups_private_shell_title') }}</h2>
-                    <p class="group-show__description">{{ $group->description ?: __('messages.groups_private_shell_description') }}</p>
-
-                    @if(trim((string) $group->rules_markdown) !== '')
-                        <hr>
-                        <h3 class="group-show__panel-title">{{ __('messages.groups_rules') }}</h3>
-                        <div class="group-show__discussion-text">{!! nl2br(e($group->rules_markdown)) !!}</div>
-                    @endif
+                    <p class="group-show__description">{{ __('messages.groups_private_shell_description') }}</p>
                 </div>
             @else
                 @if(in_array($tab, ['overview', 'feed'], true) && $canPostToGroup)
@@ -352,16 +355,6 @@
                 @endif
 
                 @if($tab === 'overview')
-                    <section class="group-show__panel">
-                        <h2 class="group-show__panel-title">{{ __('messages.about') }}</h2>
-                        <p class="group-show__description">{{ $group->description ?: __('messages.groups_no_description') }}</p>
-                    </section>
-
-                    <section class="group-show__panel">
-                        <h2 class="group-show__panel-title">{{ __('messages.groups_rules') }}</h2>
-                        <div class="group-show__discussion-text">{!! trim((string) $group->rules_markdown) !== '' ? nl2br(e($group->rules_markdown)) : e(__('messages.groups_rules_empty')) !!}</div>
-                    </section>
-
                     <section class="group-show__panel">
                         <h2 class="group-show__panel-title">{{ __('messages.groups_latest_feed') }}</h2>
                         <div class="group-show__list">
@@ -531,6 +524,20 @@
         </div>
 
         <div class="grid-column">
+            <div class="widget-box">
+                <p class="widget-box-title">{{ __('messages.about') }}</p>
+                <div class="widget-box-content">
+                    <p class="group-show__description">{{ $group->description ?: __('messages.groups_no_description') }}</p>
+                </div>
+            </div>
+
+            <div class="widget-box">
+                <p class="widget-box-title">{{ __('messages.groups_rules') }}</p>
+                <div class="widget-box-content">
+                    <div class="group-show__discussion-text">{!! trim((string) $group->rules_markdown) !== '' ? nl2br(e($group->rules_markdown)) : e(__('messages.groups_rules_empty')) !!}</div>
+                </div>
+            </div>
+
             <x-widget-column side="groups_right" />
         </div>
     </div>
