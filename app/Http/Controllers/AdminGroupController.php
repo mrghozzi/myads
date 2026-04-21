@@ -13,7 +13,8 @@ class AdminGroupController extends Controller
     public function __construct(
         private readonly V420SchemaService $schema,
         private readonly \App\Services\GroupMembershipService $memberships,
-        private readonly \App\Services\GroupAccessService $access
+        private readonly \App\Services\GroupAccessService $access,
+        private readonly \App\Services\NotificationService $notifications
     ) {
     }
 
@@ -194,8 +195,15 @@ class AdminGroupController extends Controller
             return back()->with('error', 'Cannot remove owner. Transfer ownership first.');
         }
 
+        $userId = $membership->user_id;
         $membership->delete();
 
-        return back()->with('success', __('messages.groups_member_removed'));
+        $this->notifications->send(
+            $userId,
+            __('messages.groups_notification_removed', ['group' => $group->name]),
+            route('groups.index')
+        );
+
+        return back()->with('success', __('messages.groups_member_removed_success'));
     }
 }
