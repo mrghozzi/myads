@@ -96,7 +96,7 @@ class Group extends Model
         if ($this->avatar_path) {
             return asset($this->avatar_path);
         }
-        return asset('themes/default/assets/img/avatar/01.jpg');
+        return asset('upload/group.png');
     }
 
     public function coverUrl(): string

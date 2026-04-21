@@ -291,13 +291,13 @@
                                 <div class="user-short-description small">
                                     <a class="user-short-description-avatar user-avatar" href="{{ route('groups.show', $sGroup) }}">
                                         <div class="user-avatar-border">
-                                            <div class="hexagon-100-110" style="width: 100px; height: 110px; position: relative;"><canvas style="position: absolute; top: 0px; left: 0px;" width="100" height="110"></canvas></div>
+                                            <div class="hexagon-100-110"></div>
                                         </div>
                                         <div class="user-avatar-content">
-                                            <div class="hexagon-image-68-74" data-src="{{ $sGroup->avatarUrl() }}" style="width: 68px; height: 74px; position: relative;"><canvas style="position: absolute; top: 0px; left: 0px;" width="68" height="74"></canvas></div>
+                                            <div class="hexagon-image-68-74" data-src="{{ $sGroup->avatarUrl() }}"></div>
                                         </div>
                                         <div class="user-avatar-progress-border">
-                                            <div class="hexagon-border-84-92" style="width: 84px; height: 92px; position: relative;"><canvas style="position: absolute; top: 0px; left: 0px;" width="84" height="92"></canvas></div>
+                                            <div class="hexagon-border-84-92"></div>
                                         </div>
                                     </a>
                                     <p class="user-short-description-title"><a href="{{ route('groups.show', $sGroup) }}">{{ $sGroup->name }}</a></p>
