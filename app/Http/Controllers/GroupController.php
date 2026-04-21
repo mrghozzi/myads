@@ -274,7 +274,7 @@ class GroupController extends Controller
         }
 
         $cover = $group->cover_path ?: 'upload/cover.jpg';
-        $avatar = $group->avatar_path ?: 'upload/avatar.png';
+        $avatar = $group->avatar_path ?: 'upload/group.png';
 
         return view('theme::groups.show', compact(
             'group',
