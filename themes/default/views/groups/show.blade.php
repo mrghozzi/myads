@@ -24,23 +24,9 @@
         --group-shell-shadow: 0 22px 44px rgba(0, 0, 0, 0.28);
     }
 
-    .group-show__hero,
-    .group-show__panel,
-    .group-show__composer {
-        border-radius: 24px;
-        border: 1px solid var(--group-shell-border);
-        background: linear-gradient(180deg, var(--group-shell-bg) 0%, var(--group-shell-soft) 100%);
-        box-shadow: var(--group-shell-shadow);
-    }
-
     .group-show__hero {
         overflow: hidden;
         margin-bottom: 18px;
-    }
-
-    .group-show__cover {
-        min-height: 170px;
-        background: linear-gradient(135deg, rgba(255,107,61,0.92), rgba(35,210,226,0.92));
     }
 
     .group-show__hero-body {
@@ -226,6 +212,102 @@
 
 @section('content')
 <div class="group-show">
+    <div class="profile-header">
+        <figure class="profile-header-cover liquid" style="background: rgba(0, 0, 0, 0) url({{ asset($cover) }}) no-repeat scroll center center / cover;">
+            <img src="{{ asset($cover) }}" alt="cover-{{ $group->slug }}" style="display: none;">
+        </figure>
+
+        <div class="profile-header-info">
+            <div class="user-short-description big">
+                <div class="user-short-description-avatar user-avatar big">
+                    <div class="user-avatar-border">
+                        <div class="hexagon-148-164" style="width: 148px; height: 164px; position: relative;"><canvas style="position: absolute; top: 0px; left: 0px;" width="148" height="164"></canvas></div>
+                    </div>
+                    <div class="user-avatar-content">
+                        <div class="hexagon-image-100-110" data-src="{{ asset($avatar) }}" style="width: 100px; height: 110px; position: relative;"><canvas style="position: absolute; top: 0px; left: 0px;" width="100" height="110"></canvas></div>
+                    </div>
+                </div>
+
+                <p class="user-short-description-title" style="color: #fff;">
+                    {{ $group->name }}
+                    @if($group->is_featured)
+                        <i class="fa fa-star" aria-hidden="true" style="color: #ffc107; font-size: 0.8em; margin-inline-start: 5px;" title="{{ __('messages.groups_featured') }}"></i>
+                    @endif
+                </p>
+                <p class="user-short-description-text" style="color: rgba(255,255,255,0.8);">
+                    <i class="fa {{ $group->privacy === \App\Models\Group::PRIVACY_PUBLIC ? 'fa-globe' : 'fa-lock' }}" aria-hidden="true"></i>
+                    {{ $group->privacy === \App\Models\Group::PRIVACY_PUBLIC ? __('messages.groups_public') : __('messages.groups_private') }}
+                </p>
+            </div>
+
+            <div class="user-stats">
+                <div class="user-stat big">
+                    <p class="user-stat-title">{{ $group->members_count }}</p>
+                    <p class="user-stat-text">{{ __('messages.members') }}</p>
+                </div>
+                <div class="user-stat big">
+                    <p class="user-stat-title">{{ $group->posts_count }}</p>
+                    <p class="user-stat-text">{{ __('messages.posts') }}</p>
+                </div>
+                <div class="user-stat big">
+                    <p class="user-stat-title">{{ $group->owner?->username ?? __('messages.unknown_user') }}</p>
+                    <p class="user-stat-text">{{ __('messages.author') }}</p>
+                </div>
+            </div>
+
+            <div class="profile-header-info-actions">
+                @auth
+                    @if($canManageGroup)
+                        <a class="profile-header-info-action button secondary" href="{{ route('groups.edit', $group) }}" style="color: #fff;">
+                            <i class="fa fa-cog" aria-hidden="true"></i>
+                        </a>
+                    @endif
+
+                    @if($membership?->status === \App\Models\GroupMembership::STATUS_ACTIVE)
+                        @if($membership->role !== \App\Models\GroupMembership::ROLE_OWNER)
+                            <form method="POST" action="{{ route('groups.leave', $group) }}" style="display: inline;">
+                                @csrf
+                                <button class="profile-header-info-action button secondary" type="submit">{{ __('messages.groups_leave') }}</button>
+                            </form>
+                        @endif
+                    @elseif($membership?->status === \App\Models\GroupMembership::STATUS_PENDING)
+                        <button class="profile-header-info-action button secondary disabled" type="button">{{ __('messages.groups_request_pending') }}</button>
+                    @elseif($group->status === \App\Models\Group::STATUS_ACTIVE)
+                        <form method="POST" action="{{ route('groups.join', $group) }}" style="display: inline;">
+                            @csrf
+                            <button class="profile-header-info-action button secondary" type="submit" style="color: #fff;">
+                                {{ $group->privacy === \App\Models\Group::PRIVACY_PUBLIC ? __('messages.groups_join_now') : __('messages.groups_request_join') }}
+                            </button>
+                        </form>
+                    @endif
+                @else
+                    <a href="{{ route('login') }}" class="profile-header-info-action button secondary" style="color: #fff;">{{ __('messages.groups_join_now') }}</a>
+                @endauth
+            </div>
+        </div>
+    </div>
+
+    <nav class="section-navigation">
+        <div id="section-navigation-slider" class="section-menu">
+            <a class="section-menu-item {{ $tab === 'overview' ? 'active' : '' }}" href="{{ route('groups.show', [$group, 'tab' => 'overview']) }}">
+                <svg class="section-menu-item-icon icon-timeline"><use xlink:href="#svg-timeline"></use></svg>
+                <p class="section-menu-item-text">{{ __('messages.overview') }}</p>
+            </a>
+            <a class="section-menu-item {{ $tab === 'feed' ? 'active' : '' }}" href="{{ route('groups.show', [$group, 'tab' => 'feed']) }}">
+                <svg class="section-menu-item-icon icon-blog-posts"><use xlink:href="#svg-blog-posts"></use></svg>
+                <p class="section-menu-item-text">{{ __('messages.feed') }}</p>
+            </a>
+            <a class="section-menu-item {{ $tab === 'discussions' ? 'active' : '' }}" href="{{ route('groups.show', [$group, 'tab' => 'discussions']) }}">
+                <svg class="section-menu-item-icon icon-forum"><use xlink:href="#svg-forum"></use></svg>
+                <p class="section-menu-item-text">{{ __('messages.discussions') }}</p>
+            </a>
+            <a class="section-menu-item {{ $tab === 'members' ? 'active' : '' }}" href="{{ route('groups.show', [$group, 'tab' => 'members']) }}">
+                <svg class="section-menu-item-icon icon-friend"><use xlink:href="#svg-friend"></use></svg>
+                <p class="section-menu-item-text">{{ __('messages.members') }}</p>
+            </a>
+        </div>
+    </nav>
+
     <div class="grid grid-3-6-3 mobile-prefer-content">
         <div class="grid-column">
             <x-widget-column side="groups_left" />
@@ -240,86 +322,6 @@
                 <div class="alert alert-danger">{{ session('error') }}</div>
             @endif
 
-            <section class="group-show__hero">
-                <div class="group-show__cover">
-                    <span class="group-show__eyebrow"><i class="fa fa-users" aria-hidden="true"></i>{{ __('messages.groups_title') }}</span>
-                </div>
-                <div class="group-show__hero-body">
-                    <span class="group-show__privacy">
-                        <i class="fa {{ $group->privacy === \App\Models\Group::PRIVACY_PUBLIC ? 'fa-globe' : 'fa-lock' }}" aria-hidden="true"></i>
-                        {{ $group->privacy === \App\Models\Group::PRIVACY_PUBLIC ? __('messages.groups_public') : __('messages.groups_private') }}
-                    </span>
-
-                    @if($group->is_featured)
-                        <span class="group-show__privacy" style="margin-inline-start:8px;">
-                            <i class="fa fa-star" aria-hidden="true"></i>{{ __('messages.groups_featured') }}
-                        </span>
-                    @endif
-
-                    <h1 class="group-show__title">{{ $group->name }}</h1>
-                    <p class="group-show__description">{{ $group->short_description ?: __('messages.groups_no_description') }}</p>
-
-                    <div class="group-show__stats">
-                        <div class="group-show__stat">
-                            <span class="group-show__stat-value">{{ $group->members_count }}</span>
-                            <span class="group-show__stat-label">{{ __('messages.members') }}</span>
-                        </div>
-                        <div class="group-show__stat">
-                            <span class="group-show__stat-value">{{ $group->posts_count }}</span>
-                            <span class="group-show__stat-label">{{ __('messages.posts') }}</span>
-                        </div>
-                        <div class="group-show__stat">
-                            <span class="group-show__stat-value">{{ $group->owner?->username ?? __('messages.unknown_user') }}</span>
-                            <span class="group-show__stat-label">{{ __('messages.author') }}</span>
-                        </div>
-                    </div>
-
-                    <div class="group-show__actions">
-                        @auth
-                            @if($canManageGroup)
-                                <a href="{{ route('groups.edit', $group) }}" class="button primary">
-                                    <i class="fa fa-cog" aria-hidden="true" style="margin-inline-end: 8px;"></i>
-                                    {{ __('messages.groups_edit_title') }}
-                                </a>
-                            @endif
-
-                            @if($membership?->status === \App\Models\GroupMembership::STATUS_ACTIVE)
-                                @if($membership->role !== \App\Models\GroupMembership::ROLE_OWNER)
-                                    <form method="POST" action="{{ route('groups.leave', $group) }}">
-                                        @csrf
-                                        <button class="button secondary" type="submit">{{ __('messages.groups_leave') }}</button>
-                                    </form>
-                                @endif
-                            @elseif($membership?->status === \App\Models\GroupMembership::STATUS_PENDING)
-                                <button class="button secondary disabled" type="button">{{ __('messages.groups_request_pending') }}</button>
-                            @elseif($group->status === \App\Models\Group::STATUS_ACTIVE)
-                                <form method="POST" action="{{ route('groups.join', $group) }}">
-                                    @csrf
-                                    <button class="button secondary" type="submit">
-                                        {{ $group->privacy === \App\Models\Group::PRIVACY_PUBLIC ? __('messages.groups_join_now') : __('messages.groups_request_join') }}
-                                    </button>
-                                </form>
-                            @endif
-                        @else
-                            <a class="button secondary" href="{{ route('login') }}">{{ __('messages.login') }}</a>
-                        @endauth
-                    </div>
-                </div>
-            </section>
-
-            <div class="group-show__tabs">
-                @foreach(['overview' => 'groups_tab_overview', 'feed' => 'groups_tab_feed', 'discussions' => 'groups_tab_discussions', 'members' => 'groups_tab_members'] as $tabKey => $tabLabel)
-                    <a class="group-show__tab {{ $tab === $tabKey ? 'is-active' : '' }}" href="{{ route('groups.show', ['group' => $group, 'tab' => $tabKey]) }}">
-                        <span>{{ __('messages.' . $tabLabel) }}</span>
-                    </a>
-                @endforeach
-                @if($canManageGroup)
-                    <a class="group-show__tab" href="{{ route('groups.edit', $group) }}">
-                        <i class="fa fa-cog" aria-hidden="true"></i>
-                        <span>{{ __('messages.Settings') }}</span>
-                    </a>
-                @endif
-            </div>
 
             @if(!$canViewContent)
                 <div class="group-show__panel">
@@ -534,3 +536,13 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof initHexagons === 'function') {
+            initHexagons();
+        }
+    });
+</script>
+@endpush

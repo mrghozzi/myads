@@ -273,6 +273,9 @@ class GroupController extends Controller
             ]);
         }
 
+        $cover = $group->cover_path ?: 'upload/cover.jpg';
+        $avatar = $group->avatar_path ?: 'upload/avatar.png';
+
         return view('theme::groups.show', compact(
             'group',
             'tab',
@@ -283,7 +286,9 @@ class GroupController extends Controller
             'activities',
             'discussions',
             'members',
-            'pendingMemberships'
+            'pendingMemberships',
+            'cover',
+            'avatar'
         ));
     }
 
