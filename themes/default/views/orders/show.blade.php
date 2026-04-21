@@ -12,12 +12,30 @@
 <div class="grid grid-3-6-3 mobile-prefer-content">
     <div class="grid-column">
         <aside class="orders-panel">
-            <p class="orders-kicker">{{ __('messages.client_info') }}</p>
-            <div class="user-short-description" style="margin-top: 14px;">
-                <a class="user-short-description-avatar user-avatar medium {{ $order->user->isOnline() ? 'online' : 'offline' }}" href="{{ route('profile.show', $order->user->username) }}">
-                    <div class="user-avatar-content">
-                        <div class="hexagon-image-68-74" data-src="{{ $order->user->avatarUrl() }}"></div>
+            <p class="orders-kicker" style="margin-bottom: 20px;">{{ __('messages.client_info') }}</p>
+            <div class="user-short-description orders-owner-card">
+                <a class="user-avatar medium {{ $order->user->isOnline() ? 'online' : 'offline' }}" href="{{ route('profile.show', $order->user->username) }}">
+                    <div class="user-avatar-border">
+                        <div class="hexagon-120-132" style="width: 70px; height: 77px; position: relative;"></div>
                     </div>
+                    <div class="user-avatar-content">
+                        <div class="hexagon-image-82-90" data-src="{{ $order->user->avatarUrl() }}" style="width: 48px; height: 53px; position: relative;"></div>
+                    </div>
+                    <div class="user-avatar-progress-border">
+                        <div class="hexagon-border-100-110" data-line-color="{{ $order->user->profileBadgeColor() }}" style="width: 58px; height: 64px; position: relative;"></div>
+                    </div>
+
+                    @if($order->user->hasVerifiedBadge())
+                        <div class="user-avatar-badge">
+                            <div class="user-avatar-badge-border">
+                                <div class="hexagon-22-24" style="width: 22px; height: 24px; position: relative;"></div>
+                            </div>
+                            <div class="user-avatar-badge-content">
+                                <div class="hexagon-dark-16-18" style="width: 16px; height: 18px; position: relative;"></div>
+                            </div>
+                            <p class="user-avatar-badge-text"><i class="fa fa-fw fa-check"></i></p>
+                        </div>
+                    @endif
                 </a>
                 <p class="user-short-description-title"><a href="{{ route('profile.show', $order->user->username) }}">{{ $order->user->username }}</a></p>
                 <p class="user-short-description-text">{{ $order->user->isOnline() ? __('messages.online') : __('messages.offline') }}</p>

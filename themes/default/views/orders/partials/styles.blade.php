@@ -316,6 +316,27 @@
         background: rgba(255, 255, 255, 0.08);
     }
 
+    .orders-owner-card {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        position: relative;
+    }
+
+    .orders-owner-card .user-avatar {
+        position: relative !important;
+        top: 0 !important;
+        left: 0 !important;
+        margin: 0 auto 16px !important;
+    }
+
+    body[dir="rtl"] .orders-owner-card .user-avatar {
+        left: auto !important;
+        right: 0 !important;
+        margin: 0 auto 16px !important;
+    }
+
     @media (max-width: 768px) {
         .orders-filters,
         .orders-form-grid,

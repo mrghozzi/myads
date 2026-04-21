@@ -16,6 +16,8 @@
 
 ### Services Marketplace / Orders
 * **Feature**: Rebuilt `/orders` as a professional services marketplace with a Superdesign-guided member experience for discovery, request publishing, offer comparison, award flow, delivery tracking, and post-completion ratings.
+* **Fix**: Standardized owner avatar look in service marketplace requests.
+* **Fix**: Fixed profile picture overlap in order detail sidebar.
 * **Add**: Introduced first-class `order_offers` and `order_contracts` tables, separating structured provider offers from the generic comment system while preserving existing order URLs and community-feed integration.
 * **Workflow**: Standardized the order lifecycle around `open`, `awarded`, `in_progress`, `delivered`, `completed`, `cancelled`, and `closed`, with a derived `under_review` UI state for open requests that already received active offers.
 * **Member UX**: Rebuilt `/orders`, `/orders/create`, `/orders/{order}`, `/orders/mine`, and `/orders/offers` with searchable discovery cards, organized budget and delivery metadata, structured offer cards, and role-aware workflow actions.
