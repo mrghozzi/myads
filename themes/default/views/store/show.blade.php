@@ -5,14 +5,14 @@
     $productImage = $product->product_image ?? theme_asset('img/error_plug.png');
     $commentCount = \App\Models\Option::where('o_type', 's_coment')->where('o_parent', $product->id)->count();
     $categoryName = $type ? $type->name : '';
-    $categoryLabel = $categoryName ? __($categoryName) : '';
+    $categoryLabel = $categoryName ? (__('messages.' . $categoryName) ?? $categoryName) : '';
     $subCategoryLabel = '';
     if ($type && $type->o_mode) {
         if (is_numeric($type->o_mode)) {
             $subCategory = \App\Models\Option::find($type->o_mode);
             $subCategoryLabel = $subCategory ? $subCategory->name : '';
         } else {
-            $subCategoryLabel = __($type->o_mode);
+            $subCategoryLabel = \Illuminate\Support\Facades\Lang::has('messages.' . $type->o_mode) ? __('messages.' . $type->o_mode) : $type->o_mode;
         }
     }
     $owner = $product->user;

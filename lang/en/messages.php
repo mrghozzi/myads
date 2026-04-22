@@ -2437,4 +2437,12 @@ return [
     'script' => 'Script',
     'others' => 'Others',
     'product_details' => 'Product Details',
+    'blogs' => 'Blogs',
+    'cms' => 'CMS',
+    'forums' => 'Forums',
+    'socialnetwor' => 'Social Network',
+    'admanager' => 'Ad Manager',
+    'games' => 'Games',
+    'ecommerce' => 'E-commerce',
+    'educational' => 'Educational',
 ];

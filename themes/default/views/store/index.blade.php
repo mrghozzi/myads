@@ -104,7 +104,6 @@
             $catName = $product->type ? $product->type->name : null;
             $categoryLink = '#';
             if ($catName) {
-                // Determine context: current browser context vs product's own script context
                 $targetScript = $isScriptSpecific ? $scriptName : $prodScript;
                 
                 $categoryLink = $targetScript 
@@ -130,7 +129,7 @@
                 <p class="product-preview-title"><a href="{{ route('store.show', $product->name) }}">{{ $product->name }}</a></p>
                 <p class="product-preview-category digital">
                     @if($catName)
-                        <a href="{{ $categoryLink }}">{{ $catName }}</a>
+                        <a href="{{ $categoryLink }}">{{ __('messages.' . $catName) ?? $catName }}</a>
                     @endif
                 </p>
                 <p class="product-preview-text">{{ $product->o_valuer }}</p>

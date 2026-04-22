@@ -25,7 +25,7 @@
             <option value="">-- {{ __('messages.select') }} --</option>
             @foreach($scriptProductOptions as $scriptProduct)
                 <option value="{{ $scriptProduct['value'] }}" @selected((string) $selectedStoreSubcategory === (string) $scriptProduct['value'])>
-                    {{ $scriptProduct['label'] }}
+                    {{ \Illuminate\Support\Facades\Lang::has('messages.' . $scriptProduct['label']) ? __('messages.' . $scriptProduct['label']) : $scriptProduct['label'] }}
                 </option>
             @endforeach
             <option value="others" @selected($selectedStoreSubcategory === 'others')>{{ __('messages.others') }}</option>

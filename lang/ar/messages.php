@@ -2437,4 +2437,12 @@ return [
     'script' => 'السكريبت',
     'others' => 'أخرى',
     'product_details' => 'تفاصيل المنتج',
+    'blogs' => 'مدونات',
+    'cms' => 'أنظمة إدارة المحتوى (CMS)',
+    'forums' => 'منتديات',
+    'socialnetwor' => 'شبكات اجتماعية',
+    'admanager' => 'إدارة الإعلانات',
+    'games' => 'ألعاب',
+    'ecommerce' => 'تجارة إلكترونية',
+    'educational' => 'تعليمي',
 ];
