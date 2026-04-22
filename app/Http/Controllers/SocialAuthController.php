@@ -67,7 +67,11 @@ class SocialAuthController extends Controller
                     return redirect()->route('login')->with('error', 'Invalid state');
                 }
 
-                $response = \Illuminate\Support\Facades\Http::post('https://www.adstn.ovh/oauth/token', [
+                $response = \Illuminate\Support\Facades\Http::withHeaders([
+                    'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36',
+                    'Accept' => 'application/json',
+                    'X-Requested-With' => 'XMLHttpRequest',
+                ])->post('https://www.adstn.ovh/oauth/token', [
                     'grant_type' => 'authorization_code',
                     'client_id' => $clientId,
                     'client_secret' => config("services.{$provider}.client_secret"),
@@ -76,27 +80,55 @@ class SocialAuthController extends Controller
                 ]);
 
                 if (!$response->successful()) {
-                    return redirect()->route('login')->with('error', 'Token exchange failed: ' . $response->body());
+                    $body = $response->body();
+                    if (str_contains($body, 'aes.js') || str_contains($body, '__test')) {
+                        return redirect()->route('login')->with('error', __('messages.adstn_bot_protection'));
+                    }
+                    return redirect()->route('login')->with('error', 'Token exchange failed: ' . $body);
                 }
 
                 $tokens = $response->json();
-                $accessToken = $tokens['access_token'];
+                $accessToken = $tokens['access_token'] ?? null;
+
+                if (!$accessToken) {
+                    $body = $response->body();
+                    if (str_contains($body, 'aes.js') || str_contains($body, '__test')) {
+                        return redirect()->route('login')->with('error', __('messages.adstn_bot_protection'));
+                    }
+                    return redirect()->route('login')->with('error', 'Access token missing in response. Body: ' . $body);
+                }
 
                 // Get Identity
                 $identityResponse = \Illuminate\Support\Facades\Http::withToken($accessToken)
+                    ->withHeaders([
+                        'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36',
+                        'Accept' => 'application/json',
+                        'X-Requested-With' => 'XMLHttpRequest',
+                    ])
                     ->get('https://www.adstn.ovh/api/developer/v1/me');
                 
                 if (!$identityResponse->successful()) {
                     return redirect()->route('login')->with('error', 'Failed to fetch user identity');
                 }
 
-                $identity = $identityResponse->json('data');
+                $identityData = $identityResponse->json();
+                $identity = $identityData['data'] ?? $identityData;
+
+                if (!$identity || !is_array($identity)) {
+                    return redirect()->route('login')->with('error', 'Invalid identity data received');
+                }
 
                 // Get Profile (for avatar)
                 $profileResponse = \Illuminate\Support\Facades\Http::withToken($accessToken)
+                    ->withHeaders([
+                        'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36',
+                        'Accept' => 'application/json',
+                        'X-Requested-With' => 'XMLHttpRequest',
+                    ])
                     ->get('https://www.adstn.ovh/api/developer/v1/me/profile');
                 
-                $profile = $profileResponse->successful() ? $profileResponse->json('data') : [];
+                $profileData = $profileResponse->successful() ? $profileResponse->json() : [];
+                $profile = $profileData['data'] ?? $profileData;
 
                 // Normalize to a social user object or similar data structure
                 $socialUser = new class($identity, $profile) {
@@ -106,9 +138,9 @@ class SocialAuthController extends Controller
                         $this->identity = $identity;
                         $this->profile = $profile;
                     }
-                    public function getId() { return $this->identity['id']; }
-                    public function getEmail() { return $this->identity['email']; }
-                    public function getName() { return $this->identity['username']; }
+                    public function getId() { return $this->identity['id'] ?? null; }
+                    public function getEmail() { return $this->identity['email'] ?? null; }
+                    public function getName() { return $this->identity['username'] ?? null; }
                     public function getAvatar() { return $this->profile['avatar'] ?? 'upload/avatar.png'; }
                 };
             } else {

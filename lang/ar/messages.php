@@ -296,6 +296,7 @@ return [
     'privacy_policy' => 'سياسة الخصوصية',
     'terms' => 'الشروط والأحكام',
     'terms_conditions' => 'الشروط والأحكام',
+    'adstn_bot_protection' => 'خادم ADStn محمي بنظام حماية ضد البوتات (aes.js). يرجى التواصل مع مدير الموقع لاستثناء الـ API من هذه الحماية.',
     'plugin_website' => 'موقع الإضافة',
     'badge_unlocked_notification' => 'لقد فتحت شارة :badge.',
     'badges' => 'الشارات',
