@@ -1,5 +1,5 @@
 @php
-    $developerApp = $app ?? null;
+    $developerApp = (isset($app) && $app instanceof \App\Models\DeveloperApp) ? $app : null;
     $selectedScopes = old('requested_scopes', $developerApp ? ($developerApp->requested_scopes ?? []) : []);
     if (!is_array($selectedScopes)) {
         $selectedScopes = [];
