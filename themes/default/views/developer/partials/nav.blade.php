@@ -13,5 +13,9 @@
             <span><i class="fa fa-plus-circle me-2"></i>{{ __('messages.create_app') }}</span>
             <i class="fa fa-chevron-right"></i>
         </a>
+        <a href="{{ route('developer.guides') }}" class="dev-nav-link {{ ($active ?? '') === 'guides' ? 'is-active' : '' }}">
+            <span><i class="fa fa-book me-2"></i>{{ __('messages.dev_guides') ?? 'Documentation' }}</span>
+            <i class="fa fa-chevron-right"></i>
+        </a>
     </div>
 </div>

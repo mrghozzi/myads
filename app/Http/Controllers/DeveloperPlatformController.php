@@ -164,4 +164,9 @@ class DeveloperPlatformController extends Controller
 
         return back()->with('success', __('messages.dev_app_secret_rotated'));
     }
+
+    public function guides()
+    {
+        return view('theme::developer.guides');
+    }
 }

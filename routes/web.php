@@ -114,6 +114,7 @@ Route::get('/share', [PortalController::class, 'share'])->name('portal.share')->
 // Developer Platform
 Route::prefix('developer')->group(function () {
     Route::get('/', [App\Http\Controllers\DeveloperPlatformController::class, 'index'])->name('developer.index');
+    Route::get('/guides', [App\Http\Controllers\DeveloperPlatformController::class, 'guides'])->name('developer.guides');
     Route::get('/apps', [App\Http\Controllers\DeveloperPlatformController::class, 'apps'])->name('developer.apps.index');
     Route::get('/apps/create', [App\Http\Controllers\DeveloperPlatformController::class, 'create'])->name('developer.apps.create');
     Route::post('/apps', [App\Http\Controllers\DeveloperPlatformController::class, 'store'])->name('developer.apps.store');
