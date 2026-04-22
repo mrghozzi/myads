@@ -2432,4 +2432,9 @@ return [
     'downloads' => 'Downloads',
     'version_number' => 'Version Number',
     'file_link' => 'File Link',
+    'category' => 'Category',
+    'subcategories' => 'Sub Categories',
+    'script' => 'Script',
+    'others' => 'Others',
+    'product_details' => 'Product Details',
 ];

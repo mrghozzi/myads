@@ -113,15 +113,84 @@ function toggleFileVersion(id) {
                     {{-- Category --}}
                     <div class="mb-3">
                         <label class="form-label">{{ __('messages.category') ?? 'Category' }}</label>
-                        <select name="cat_s" class="form-select">
-                            <option value="">-- {{ __('messages.select') ?? 'Select' }} --</option>
-                            @foreach($storeCategories as $cat)
-                                <option value="{{ $cat->name }}" {{ $selectedStoreCategory === $cat->name ? 'selected' : '' }}>
-                                    {{ __('messages.' . $cat->name) }}
-                                </option>
-                            @endforeach
-                        </select>
+                        <div id="store-category-container">
+                            <select name="cat_s" id="cat_s" class="form-select mb-3" onchange="updateSubCategories(this.value)">
+                                <option value="">-- {{ __('messages.select') ?? 'Select' }} --</option>
+                                @foreach($storeCategories as $cat)
+                                    <option value="{{ $cat->name }}" {{ $selectedStoreCategory === $cat->name ? 'selected' : '' }}>
+                                        {{ __('messages.' . $cat->name) ?? $cat->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+
+                            <div id="sub-category-wrapper">
+                                @if($selectedStoreCategory === \App\Support\StoreCategoryCatalog::PLUGINS || $selectedStoreCategory === \App\Support\StoreCategoryCatalog::THEMES)
+                                    <label class="form-label fs-12 text-muted">{{ __('messages.script') ?? 'Script' }}</label>
+                                    <select name="sc_cat" id="sc_cat" class="form-select">
+                                        <option value="">-- {{ __('messages.select') ?? 'Select' }} --</option>
+                                        @foreach($scriptProductOptions as $id => $name)
+                                            <option value="{{ $id }}" {{ (string)$selectedStoreSubcategory === (string)$id ? 'selected' : '' }}>
+                                                {{ $name }}
+                                            </option>
+                                        @endforeach
+                                        <option value="others" {{ $selectedStoreSubcategory === 'others' ? 'selected' : '' }}>{{ __('messages.others') ?? 'Others' }}</option>
+                                    </select>
+                                @elseif($selectedStoreCategory === \App\Support\StoreCategoryCatalog::SCRIPT)
+                                    <label class="form-label fs-12 text-muted">{{ __('messages.subcategories') ?? 'Sub Category' }}</label>
+                                    <select name="sc_cat" id="sc_cat" class="form-select">
+                                        <option value="">-- {{ __('messages.select') ?? 'Select' }} --</option>
+                                        @foreach($scriptCategoryOptions as $scriptCategory)
+                                            <option value="{{ $scriptCategory->name }}" {{ (string)$selectedStoreSubcategory === (string)$scriptCategory->name ? 'selected' : '' }}>
+                                                {{ __('messages.' . $scriptCategory->name) ?? $scriptCategory->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                @endif
+                            </div>
+                        </div>
                     </div>
+
+                    <script>
+                    function updateSubCategories(category) {
+                        const wrapper = document.getElementById('sub-category-wrapper');
+                        wrapper.innerHTML = '<div class="text-center p-2"><div class="spinner-border spinner-border-sm text-primary"></div></div>';
+                        
+                        fetch("{{ route('store.categories') }}", {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            },
+                            body: 'cat_s=' + encodeURIComponent(category) + '&sc_cat={{ $selectedStoreSubcategory }}'
+                        })
+                        .then(response => response.text())
+                        .then(html => {
+                            // Extract only the part we need or wrap it
+                            const temp = document.createElement('div');
+                            temp.innerHTML = html;
+                            
+                            // The partial returns multiple form-select divs
+                            // We want to extract anything that isn't the first select (cat_s)
+                            const selects = temp.querySelectorAll('select');
+                            let subHtml = '';
+                            selects.forEach(select => {
+                                if (select.id !== 'cat_s') {
+                                    const label = select.parentElement.querySelector('label');
+                                    subHtml += '<div class="mt-2">';
+                                    if (label) subHtml += '<label class="form-label fs-12 text-muted">' + label.innerHTML + '</label>';
+                                    select.className = 'form-select'; // Use Bootstrap class
+                                    subHtml += select.outerHTML;
+                                    subHtml += '</div>';
+                                }
+                            });
+                            wrapper.innerHTML = subHtml;
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            wrapper.innerHTML = '';
+                        });
+                    }
+                    </script>
                     {{-- Cover Image --}}
                     <div class="mb-3">
                         <label class="form-label">{{ __('messages.img') ?? 'Cover Image URL' }}</label>

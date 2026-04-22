@@ -2432,4 +2432,9 @@ return [
     'downloads' => 'تحميل',
     'version_number' => 'رقم النسخة',
     'file_link' => 'رابط الملف',
+    'category' => 'التصنيف',
+    'subcategories' => 'الأقسام الفرعية',
+    'script' => 'السكريبت',
+    'others' => 'أخرى',
+    'product_details' => 'تفاصيل المنتج',
 ];

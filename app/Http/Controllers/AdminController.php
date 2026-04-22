@@ -2864,8 +2864,20 @@ class AdminController extends Controller
             ->where('name', 'suspended')
             ->exists();
 
+        $selectedStoreCategory = StoreCategoryCatalog::normalize(optional($typeOption)->name);
+        $selectedStoreSubcategory = optional($typeOption)->o_mode;
+
+        $scriptCategoryOptions = Option::where('o_type', 'scriptcat')->orderBy('id')->get();
+        $scriptProductOptions = Product::withoutGlobalScope('store')
+            ->where('o_type', 'store')
+            ->whereIn('id', function($query) {
+                $query->select('o_parent')->from('options')->where('o_type', 'store_type')->where('name', StoreCategoryCatalog::SCRIPT);
+            })
+            ->pluck('name', 'id');
+
         return view('admin::admin.product_edit', compact(
-            'product', 'typeOption', 'files', 'latestFile', 'topic', 'storeCategories', 'isSuspended'
+            'product', 'typeOption', 'files', 'latestFile', 'topic', 'storeCategories', 'isSuspended',
+            'selectedStoreCategory', 'selectedStoreSubcategory', 'scriptCategoryOptions', 'scriptProductOptions'
         ));
     }
 
@@ -2879,6 +2891,7 @@ class AdminController extends Controller
             'img'     => ['nullable', 'string'],
             'pts'     => ['required', 'integer', 'min:0', 'max:999999'],
             'cat_s'   => ['nullable', 'string', \Illuminate\Validation\Rule::in(StoreCategoryCatalog::acceptedInputValues())],
+            'sc_cat'  => ['nullable', 'string'],
             'owner_id'=> ['required', 'integer', 'exists:users,id'],
             'txt'     => ['nullable', 'string'],
             'vnbr'    => ['nullable', 'string', 'min:2', 'max:12', 'regex:/^[-a-zA-Z0-9.]+$/'],
@@ -2910,6 +2923,7 @@ class AdminController extends Controller
             if ($typeOption) {
                 $typeOption->update([
                     'name' => StoreCategoryCatalog::normalize($request->cat_s) ?? $request->cat_s,
+                    'o_mode' => $request->sc_cat,
                 ]);
             }
         }
