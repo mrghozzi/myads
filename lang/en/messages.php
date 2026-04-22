@@ -478,7 +478,7 @@ return [
     'directory_reactions' => 'Directory Reactions',
     'disabled' => 'Disabled',
     'documentation_category' => 'Documentation category',
-    'donthaacc' => 'Don\\',
+    'donthaacc' => 'Don\'t have an account?',
     'download' => 'Download',
     'download_failed' => 'Failed to download the update package.',
     'draft' => 'Draft',

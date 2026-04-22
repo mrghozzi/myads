@@ -13,7 +13,7 @@
                 <div class="form-item">
                     <div class="form-input">
                         <label for="email">{{ __('messages.email') }}</label>
-                        <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ $email ?? old('email') }}" required autocomplete="email" autofocus>
+                        <input id="email" type="text" class="@error('email') is-invalid @enderror" name="email" value="{{ $email ?? old('email') }}" required autocomplete="email" autofocus>
                     </div>
                     @error('email')
                         <span class="invalid-feedback" role="alert">
@@ -27,7 +27,7 @@
                 <div class="form-item">
                     <div class="form-input">
                         <label for="password">{{ __('messages.password') }}</label>
-                        <input id="password" type="password" class="form-control @error('password') is-invalid @enderror" name="password" required autocomplete="new-password">
+                        <input id="password" type="password" class="@error('password') is-invalid @enderror" name="password" required autocomplete="new-password">
                     </div>
                     @error('password')
                         <span class="invalid-feedback" role="alert">
@@ -41,7 +41,7 @@
                 <div class="form-item">
                     <div class="form-input">
                         <label for="password-confirm">{{ __('messages.confirm_password') }}</label>
-                        <input id="password-confirm" type="password" class="form-control" name="password_confirmation" required autocomplete="new-password">
+                        <input id="password-confirm" type="password" class="" name="password_confirmation" required autocomplete="new-password">
                     </div>
                 </div>
             </div>

@@ -32,7 +32,7 @@
                     <!-- FORM INPUT -->
                     <div class="form-input">
                         <label for="register-email">{{ __('messages.email') }}</label>
-                        <input type="email" id="register-email" name="email" value="{{ old('email') }}" required>
+                        <input type="text" id="register-email" name="email" value="{{ old('email') }}" required>
                     </div>
                     <!-- /FORM INPUT -->
                 </div>
