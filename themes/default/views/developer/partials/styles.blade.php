@@ -638,10 +638,17 @@
 
     .dev-form-actions {
         display: flex;
-        justify-content: space-between;
+        gap: 14px;
+        margin-top: 24px;
+    }
+
+    .dev-form-actions .button {
+        flex: 1;
+        margin: 0 !important;
+        justify-content: center;
+        min-height: 48px;
+        display: inline-flex;
         align-items: center;
-        gap: 12px;
-        flex-wrap: wrap;
     }
 
     .dev-divider {
