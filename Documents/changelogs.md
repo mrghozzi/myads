@@ -23,7 +23,7 @@
 * **Member UX**: Rebuilt `/orders`, `/orders/create`, `/orders/{order}`, `/orders/mine`, and `/orders/offers` with searchable discovery cards, organized budget and delivery metadata, structured offer cards, and role-aware workflow actions.
 * **Admin**: Added `/admin/orders` for community administrators, including review dashboards and moderation actions for closing or cancelling service requests without introducing a separate ACL module.
 * **Compatibility**: Added migration and backfill support to promote legacy offer metadata from `options` and old order-comment flows into the new marketplace tables, and to snapshot `OrderContract` records for previously awarded requests.
-* **Community**: Creating an order still publishes a community `Status` with `s_type = 6`, but feed engagement, latest-order widgets, and recent-trend calculations now use `order_offers` instead of legacy order comments.
+* **Community**: Creating an order still publishes a community `Status` with `s_type = 6`, but feed engagement, latest-order widgets, and recent-trend calculations now use `order_offers` instead of legacy order-comment storage.
 * **Gamification**: Moved offer, award, and rating signals to the new marketplace domain so points, badge progress, and provider reputation are updated from structured offers and completed contracts rather than the old "Best Offer" comment path.
 * **Tests**: Added workflow coverage for offer submission, award/start/deliver/complete transitions, admin access to `/admin/orders`, and recent-trend timestamps for marketplace offers.
 
@@ -94,6 +94,15 @@
 * **UX**: Marketplace extensions now display an "Installed" label and disabled status once present on the system, preventing redundant downloads.
 * **Add**: Introduced a new **Details Modal** for marketplace items, allowing administrators to view metadata (Author, Version, Description) before installation.
 * **i18n**: Added comprehensive translation keys for successful marketplace installations and safety-check errors in both English and Arabic.
+
+### Store & Admin Product Management
+* **Feature**: Completely overhauled the **Admin Product Edit** page (`/admin/products/{id}/edit`) with a premium, collapsible interface for file versions, allowing independent management of version numbers, external links, and release descriptions for each version.
+* **Add**: Implemented administrative **Ownership Transfer** for products; changing the product owner now automatically triggers system notifications to both the previous and new sellers, ensuring clear communication of asset transfers.
+* **Add**: Integrated dynamic **Sub-category Selection** via AJAX in the admin product edit view, matching the member storefront experience and allowing for precise script/template categorization directly from the dashboard.
+* **Fix**: Standardized the **Store Localization Engine** across all public and member views (`index`, `show`, `create`), ensuring that categories, sub-categories, and technical types are consistently translated from `lang/{locale}/messages.php`.
+* **Fix**: Resolved dark-mode UI inconsistencies in the product version management rows, ensuring high-fidelity visual contrast for version metadata in both Light and Dark modes.
+* **Fix**: Corrected the **Store Action Menu** positioning and overflow rules in RTL mode to prevent the menu from being clipped at the edges of the product header.
+* **UX**: Improved the administrative feedback loop by implementing a direct redirect back to the product edit page with clear status messages after successful updates or ownership changes.
 
 ---
 

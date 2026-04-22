@@ -230,7 +230,7 @@
         border: 1px solid var(--store-shell-border);
         box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
         min-width: 0;
-        overflow: hidden;
+        overflow: visible;
     }
 
     .store-aside-card__header,
@@ -709,8 +709,13 @@
         text-align: right;
     }
 
+    html[dir="rtl"] .store-action-menu__panel {
+        inset-inline-end: 0;
+        inset-inline-start: auto;
+    }
+
     html[dir="rtl"] .store-aside-card__header {
-        flex-direction: row-reverse;
+        flex-direction: row; /* Ensure default RTL flow */
     }
 
     html[dir="rtl"] .store-aside-card__title,

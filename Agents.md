@@ -801,6 +801,15 @@ php artisan storage:link
 
 ---
 
+## 19I. Version 4.3.0 Strategic Update Cycle (Continued 2026-04-22)
+
+- **Feature:** Overhauled **Admin Product Management** (`/admin/products/{id}/edit`) with a premium collapsible version interface and dynamic AJAX sub-category selection.
+- **Implementation:** Added product ownership transfer logic with automated notifications to old and new sellers via `AdminController@updateProduct`.
+- **Localization:** Standardized the `messages.` translation pattern across all Store views (`index`, `show`, `create`, `show`) and the category-selector partial.
+- **Fix:** Corrected RTL alignment and overflow clipping for the `store-action-menu` in `page-shell-styles.blade.php`.
+
+---
+
 ## 20. Maintaining This File
 
 > **⚠️ RULE: This `Agents.md` file MUST be kept up to date.**
