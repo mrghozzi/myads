@@ -120,7 +120,7 @@
 <div class="dev-guide-header">
     <p class="dev-kicker">{{ __('messages.dev_integration_guide') }}</p>
     <h1 class="dev-title" style="font-size: 2rem; margin-bottom: 12px;">{{ __('messages.dev_getting_started') }}</h1>
-    <p class="dev-summary-copy" style="max-width: 700px;">{{ __('messages.dev_guides_intro') }}</p>
+    <p class="dev-summary-copy" style="max-width: 700px;">{{ __('messages.dev_guides_intro', ['site' => $site_settings->titer ?? 'MYADS']) }}</p>
 </div>
 
 <div class="grid grid-3-9 mobile-prefer-content">

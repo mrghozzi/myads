@@ -12,7 +12,7 @@
         <i class="fa fa-crown" style="font-size: 28px; color: #fff;"></i>
     </div>
     <p class="section-banner-title">{{ __('messages.billing_plans_title') }}</p>
-    <p class="section-banner-text">{{ __('messages.billing_plans_description') }}</p>
+    <p class="section-banner-text">{{ __('messages.billing_plans_description', ['site' => $site_settings->titer ?? 'MYADS']) }}</p>
 </div>
 
 <div class="content-grid">

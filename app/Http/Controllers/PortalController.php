@@ -171,7 +171,7 @@ class PortalController extends Controller
         $this->seo([
             'scope_key' => 'share',
             'resource_title' => __('messages.share_to_community') ?? 'Share to Community',
-            'description' => __('messages.share_page_description') ?? 'Share content with the MYADS community.',
+            'description' => __('messages.share_page_description', ['site' => \App\Models\Setting::first()->titer ?? 'MYADS']) ?? 'Share content with the ' . (\App\Models\Setting::first()->titer ?? 'MYADS') . ' community.',
             'indexable' => false,
             'breadcrumbs' => [
                 ['name' => __('messages.home'), 'url' => url('/')],

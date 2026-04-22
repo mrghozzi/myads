@@ -16,7 +16,7 @@
         <i class="fa fa-cubes" style="font-size: 26px; color: #fff;"></i>
     </div>
     <p class="section-banner-title">{{ __('messages.my_apps') }}</p>
-    <p class="section-banner-text">{{ __('messages.dev_platform_desc') }}</p>
+    <p class="section-banner-text">{{ __('messages.dev_platform_desc', ['site' => $site_settings->titer ?? 'MYADS']) }}</p>
 </div>
 
 <div class="grid grid-3-9 mobile-prefer-content">

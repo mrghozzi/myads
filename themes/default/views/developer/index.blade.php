@@ -18,7 +18,7 @@
         <i class="fa fa-code-branch" style="font-size: 26px; color: #fff;"></i>
     </div>
     <p class="section-banner-title">{{ __('messages.dev_platform') }}</p>
-    <p class="section-banner-text">{{ __('messages.dev_platform_desc') }}</p>
+    <p class="section-banner-text">{{ __('messages.dev_platform_desc', ['site' => $site_settings->titer ?? 'MYADS']) }}</p>
 </div>
 
 <div class="grid grid-3-6-3 mobile-prefer-content">
@@ -122,7 +122,7 @@
                             </div>
                             <span class="dev-mini-chip">1</span>
                         </div>
-                        <p class="dev-card-copy" style="margin-top: 12px;">{{ __('messages.dev_oauth_desc') }}</p>
+                        <p class="dev-card-copy" style="margin-top: 12px;">{{ __('messages.dev_oauth_desc', ['site' => $site_settings->titer ?? 'MYADS']) }}</p>
 
                         <div class="dev-code-block">
                             <div class="dev-code-toolbar">
@@ -151,7 +151,7 @@
                             </div>
                             <span class="dev-mini-chip">2</span>
                         </div>
-                        <p class="dev-card-copy" style="margin-top: 12px;">{{ __('messages.dev_widgets_desc') }}</p>
+                        <p class="dev-card-copy" style="margin-top: 12px;">{{ __('messages.dev_widgets_desc', ['site' => $site_settings->titer ?? 'MYADS']) }}</p>
 
                         <ul class="dev-list-reset" style="margin-top: 18px;">
                             <li>

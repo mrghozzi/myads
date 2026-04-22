@@ -79,7 +79,7 @@
 <div class="section-banner" style="background: url({{ theme_asset('img/banner/Newsfeed.png') }}) no-repeat 50%;" >
     <img class="section-banner-icon" src="{{ theme_asset('img/banner/newsfeed-icon.png') }}"  alt="docs-icon">
     <p class="section-banner-title">{{ __('messages.developer_docs') }}</p>
-    <p class="section-banner-text">{{ __('messages.developer_page_description') }}</p>
+    <p class="section-banner-text">{{ __('messages.developer_page_description', ['site' => $site_settings->titer ?? 'MYADS']) }}</p>
 </div>
 
 <div class="docs-container news-page">
@@ -89,7 +89,7 @@
             {{ __('messages.share_api') }}
         </h2>
         <p style="margin-bottom: 16px;">
-            {{ __('messages.share_api_intro') ?? 'The External Share API allows you to integrate a "Share on MYADS" button on your website. When users click this button, they will be redirected to MYADS with a post composer pre-filled with your content.' }}
+            {{ __('messages.share_api_intro', ['site' => $site_settings->titer ?? 'MYADS']) ?? 'The External Share API allows you to integrate a "Share on '.($site_settings->titer ?? 'MYADS').'" button on your website. When users click this button, they will be redirected to '.($site_settings->titer ?? 'MYADS').' with a post composer pre-filled with your content.' }}
         </p>
         
         <div class="docs-item">
@@ -131,7 +131,7 @@
             <p style="margin-bottom: 10px;">{{ __('messages.example_html_desc') ?? 'The simplest way to integrate sharing is a standard anchor tag.' }}</p>
             <div class="code-block">
                 <code>&lt;a href="{{ url('/') }}/share?text=Check out this site! {{ url('/') }}" target="_blank"&gt;
-    Share on MYADS
+    Share on {{ $site_settings->titer ?? 'MYADS' }}
 &lt;/a&gt;</code>
             </div>
         </div>
@@ -147,7 +147,7 @@
 }
 
 // Usage
-shareOnMyAds("I love using MYADS! #Social #AdExchange");</code>
+shareOnMyAds("I love using {{ $site_settings->titer ?? 'MYADS' }}! #Social #AdExchange");</code>
             </div>
         </div>
     </div>

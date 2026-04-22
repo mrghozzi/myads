@@ -21,7 +21,7 @@
                     </div>
 
                     <p class="text-center mb-4">
-                        @lang('messages.app_wants_access', ['app' => '<strong>'.$app->name.'</strong>'])
+                        @lang('messages.app_wants_access', ['app' => '<strong>'.$app->name.'</strong>', 'site' => $site_settings->titer ?? 'MYADS'])
                     </p>
 
                     <div class="bg-light rounded p-3 mb-4">
