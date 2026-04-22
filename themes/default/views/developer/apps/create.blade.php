@@ -1,65 +1,97 @@
-@extends('theme::layouts.app')
+@extends('theme::layouts.master')
 
 @section('title', __('messages.create_app'))
 
+@push('head')
+    @include('theme::developer.partials.styles')
+@endpush
+
 @section('content')
-<div class="container py-4">
-    <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="card shadow-sm border-0">
-                <div class="card-header bg-white border-bottom p-4">
-                    <h1 class="h4 fw-bold mb-0">@lang('messages.create_app')</h1>
+<div class="section-banner">
+    <div class="section-banner-icon" style="display: flex; align-items: center; justify-content: center;">
+        <i class="fa fa-plus-circle" style="font-size: 26px; color: #fff;"></i>
+    </div>
+    <p class="section-banner-title">{{ __('messages.create_app') }}</p>
+    <p class="section-banner-text">{{ __('messages.dev_create_help') }}</p>
+</div>
+
+<div class="grid grid-3-6-3 mobile-prefer-content">
+    <div class="grid-column">
+        <div class="dev-side-stack">
+            @include('theme::developer.partials.nav', ['active' => 'create'])
+            @include('theme::developer.partials.platform_rules')
+        </div>
+    </div>
+
+    <div class="grid-column">
+        @if($errors->any())
+            <div class="dev-note dev-note--danger">
+                <strong>{{ __('messages.save') }}</strong>
+                <div class="dev-card-copy">
+                    @foreach($errors->all() as $error)
+                        <div>{{ $error }}</div>
+                    @endforeach
                 </div>
-                <div class="card-body p-4">
-                    <form action="{{ route('developer.apps.store') }}" method="POST">
-                        @csrf
-                        
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">@lang('messages.app_name') <span class="text-danger">*</span></label>
-                            <input type="text" name="name" class="form-control @error('name') is-invalid @enderror" value="{{ old('name') }}" required>
-                            @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                        </div>
+            </div>
+        @endif
 
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">@lang('messages.domain') <span class="text-danger">*</span></label>
-                            <input type="url" name="domain" class="form-control @error('domain') is-invalid @enderror" placeholder="https://example.com" value="{{ old('domain') }}" required>
-                            @error('domain') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                        </div>
+        <div class="widget-box dev-panel">
+            <p class="widget-box-title">{{ __('messages.create_app') }}</p>
+            <div class="widget-box-content" style="padding: 32px;">
+                <form action="{{ route('developer.apps.store') }}" method="POST" class="dev-form-layout">
+                    @csrf
 
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">@lang('messages.description') <span class="text-danger">*</span></label>
-                            <textarea name="description" rows="3" class="form-control @error('description') is-invalid @enderror" required>{{ old('description') }}</textarea>
-                            @error('description') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                        </div>
+                    @include('theme::developer.partials.form_fields', [
+                        'scopes' => $scopes,
+                        'scopeInputPrefix' => 'developer_create_scope',
+                    ])
 
-                        <div class="mb-4">
-                            <label class="form-label fw-bold">@lang('messages.redirect_uris') <span class="text-danger">*</span></label>
-                            <textarea name="redirect_uris" rows="2" class="form-control @error('redirect_uris') is-invalid @enderror" placeholder="https://example.com/callback, https://example.com/auth" required>{{ old('redirect_uris') }}</textarea>
-                            <div class="form-text">@lang('messages.redirect_uris_help')</div>
-                            @error('redirect_uris') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                        </div>
+                    <div class="dev-form-actions">
+                        <a href="{{ route('developer.apps.index') }}" class="button secondary">{{ __('messages.cancel') }}</a>
+                        <button type="submit" class="button primary">{{ __('messages.save') }}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
-                        <h5 class="fw-bold mb-3 border-bottom pb-2">@lang('messages.requested_scopes')</h5>
-                        <div class="row mb-4">
-                            @foreach($scopes as $scopeId => $scope)
-                                <div class="col-md-6 mb-2">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="requested_scopes[]" value="{{ $scopeId }}" id="scope_{{ str_replace('.', '_', $scopeId) }}" @if(is_array(old('requested_scopes')) && in_array($scopeId, old('requested_scopes'))) checked @endif>
-                                        <label class="form-check-label" for="scope_{{ str_replace('.', '_', $scopeId) }}">
-                                            <strong>@lang($scope['name'])</strong>
-                                            @if($scope['is_sensitive']) <span class="badge bg-danger ms-1">@lang('messages.sensitive')</span> @endif
-                                            <div class="small text-muted">@lang($scope['description'])</div>
-                                        </label>
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
+    <div class="grid-column">
+        <div class="dev-side-stack">
+            <div class="widget-box dev-panel">
+                <p class="widget-box-title">{{ __('messages.information') }}</p>
+                <div class="widget-box-content" style="padding: 28px;">
+                    <p class="dev-card-copy">{{ __('messages.dev_create_help') }}</p>
+                    <ul class="dev-list-reset" style="margin-top: 18px;">
+                        <li>
+                            <i class="fa fa-check-circle"></i>
+                            <span>{{ __('messages.dev_https_hint') }}</span>
+                        </li>
+                        <li>
+                            <i class="fa fa-check-circle"></i>
+                            <span>{{ __('messages.dev_scopes_help') }}</span>
+                        </li>
+                        <li>
+                            <i class="fa fa-check-circle"></i>
+                            <span>{{ __('messages.submit_for_review') }}</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
 
-                        <div class="d-flex justify-content-between align-items-center">
-                            <a href="{{ route('developer.apps.index') }}" class="btn btn-light">@lang('messages.cancel')</a>
-                            <button type="submit" class="btn btn-primary px-4">@lang('messages.save')</button>
-                        </div>
-                    </form>
+            <div class="widget-box dev-panel">
+                <p class="widget-box-title">{{ __('messages.dev_docs') }}</p>
+                <div class="widget-box-content" style="padding: 28px;">
+                    <p class="dev-card-copy">{{ __('messages.dev_widgets_desc') }}</p>
+                    <div class="dev-chip-row" style="margin-top: 18px;">
+                        <span class="dev-chip">
+                            <i class="fa fa-user-shield"></i>
+                            OAuth 2.0
+                        </span>
+                        <span class="dev-chip">
+                            <i class="fa fa-share-nodes"></i>
+                            Share API
+                        </span>
+                    </div>
                 </div>
             </div>
         </div>

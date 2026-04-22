@@ -7,6 +7,7 @@ use App\Models\Option;
 class DeveloperPlatformSettings
 {
     private const PREFIX = 'dev_platform_';
+    private const TYPE = 'developer_platform';
 
     public function isEnabled(): bool
     {
@@ -41,14 +42,22 @@ class DeveloperPlatformSettings
 
     public function get(string $key, $default = null)
     {
-        $option = Option::where('name', self::PREFIX . $key)->first();
-        return $option ? $option->o_valuer : $default;
+        $option = Option::where('o_type', self::TYPE)
+            ->where('name', $key)
+            ->first();
+
+        if ($option) {
+            return $option->o_valuer;
+        }
+
+        $legacyOption = Option::where('name', self::PREFIX . $key)->first();
+        return $legacyOption ? $legacyOption->o_valuer : $default;
     }
 
     public function set(string $key, $value): void
     {
         Option::updateOrCreate(
-            ['name' => self::PREFIX . $key],
+            ['o_type' => self::TYPE, 'name' => $key],
             ['o_valuer' => is_array($value) ? json_encode($value) : $value]
         );
     }

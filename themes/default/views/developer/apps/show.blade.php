@@ -1,131 +1,205 @@
-@extends('theme::layouts.app')
+@extends('theme::layouts.master')
 
-@section('title', $app->name)
+@section('title', $app->name . ' - ' . __('messages.dev_platform'))
+
+@push('head')
+    @include('theme::developer.partials.styles')
+@endpush
 
 @section('content')
-<div class="container py-4">
-    <div class="row mb-4 align-items-center">
-        <div class="col">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-1">
-                    <li class="breadcrumb-item"><a href="{{ route('developer.index') }}">@lang('messages.dev_platform')</a></li>
-                    <li class="breadcrumb-item"><a href="{{ route('developer.apps.index') }}">@lang('messages.my_apps')</a></li>
-                    <li class="breadcrumb-item active">{{ $app->name }}</li>
-                </ol>
-            </nav>
-            <h1 class="h3 fw-bold mb-0">{{ $app->name }}</h1>
-        </div>
-        <div class="col-auto">
-            <span class="badge bg-{{ $app->status === 'active' ? 'success' : ($app->status === 'draft' ? 'secondary' : 'warning') }} fs-6 px-3 py-2">
-                @lang('messages.app_status_' . $app->status)
-            </span>
+@php
+    $redirectUriCount = count($app->redirect_uris ?? []);
+    $requestedScopeCount = count($app->requested_scopes ?? []);
+@endphp
+
+<div class="section-banner">
+    <div class="section-banner-icon" style="display: flex; align-items: center; justify-content: center;">
+        <i class="fa fa-cube" style="font-size: 26px; color: #fff;"></i>
+    </div>
+    <p class="section-banner-title">{{ $app->name }}</p>
+    <p class="section-banner-text">{{ parse_url($app->domain, PHP_URL_HOST) ?: $app->domain }}</p>
+</div>
+
+<div class="grid grid-3-6-3 mobile-prefer-content">
+    <div class="grid-column">
+        <div class="dev-side-stack">
+            @include('theme::developer.partials.nav', ['active' => 'apps'])
+            @include('theme::developer.partials.platform_rules')
         </div>
     </div>
 
-    @if (session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
-    @endif
-
-    @if ($app->status === 'draft')
-        <div class="alert alert-info d-flex justify-content-between align-items-center">
-            <div>
-                <i class="fas fa-info-circle me-2"></i> @lang('messages.app_draft_notice')
+    <div class="grid-column">
+        @if(session('success'))
+            <div class="alert alert-success" role="alert" style="margin-bottom: 20px;">
+                {{ session('success') }}
             </div>
-            <form action="{{ route('developer.apps.submit', $app->id) }}" method="POST">
-                @csrf
-                <button type="submit" class="btn btn-primary btn-sm">@lang('messages.submit_for_review')</button>
-            </form>
-        </div>
-    @endif
+        @endif
 
-    <div class="row">
-        <div class="col-lg-8">
-            <div class="card shadow-sm border-0 mb-4">
-                <div class="card-header bg-white border-bottom p-4">
-                    <h5 class="fw-bold mb-0">@lang('messages.app_settings')</h5>
+        <div class="widget-box dev-panel" style="margin-bottom: 20px;">
+            <div class="widget-box-content" style="padding: 28px;">
+                <div class="dev-summary-head">
+                    <div>
+                        <p class="dev-kicker">{{ __('messages.app_specifications') }}</p>
+                        <h2 class="dev-section-title">{{ $app->name }}</h2>
+                        <p class="dev-summary-copy" style="margin-top: 8px;">{{ $app->description }}</p>
+                    </div>
+                    @include('theme::developer.partials.status_badge', ['status' => $app->status])
                 </div>
-                <div class="card-body p-4">
-                    <form action="{{ route('developer.apps.update', $app->id) }}" method="POST">
-                        @csrf
-                        @method('PUT')
-                        
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">@lang('messages.app_name') <span class="text-danger">*</span></label>
-                            <input type="text" name="name" class="form-control @error('name') is-invalid @enderror" value="{{ old('name', $app->name) }}" required>
-                            @error('name') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                        </div>
 
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">@lang('messages.domain') <span class="text-danger">*</span></label>
-                            <input type="url" name="domain" class="form-control @error('domain') is-invalid @enderror" value="{{ old('domain', $app->domain) }}" required>
-                            @error('domain') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">@lang('messages.description') <span class="text-danger">*</span></label>
-                            <textarea name="description" rows="3" class="form-control @error('description') is-invalid @enderror" required>{{ old('description', $app->description) }}</textarea>
-                            @error('description') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                        </div>
-
-                        <div class="mb-4">
-                            <label class="form-label fw-bold">@lang('messages.redirect_uris') <span class="text-danger">*</span></label>
-                            <textarea name="redirect_uris" rows="2" class="form-control @error('redirect_uris') is-invalid @enderror" required>{{ old('redirect_uris', implode(', ', $app->redirect_uris ?? [])) }}</textarea>
-                            <div class="form-text">@lang('messages.redirect_uris_help')</div>
-                            @error('redirect_uris') <div class="invalid-feedback">{{ $message }}</div> @enderror
-                        </div>
-
-                        <h5 class="fw-bold mb-3 border-bottom pb-2">@lang('messages.requested_scopes')</h5>
-                        <div class="row mb-4">
-                            @foreach($scopes as $scopeId => $scope)
-                                <div class="col-md-6 mb-2">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="requested_scopes[]" value="{{ $scopeId }}" id="scope_{{ str_replace('.', '_', $scopeId) }}" @if(is_array($app->requested_scopes) && in_array($scopeId, $app->requested_scopes)) checked @endif>
-                                        <label class="form-check-label" for="scope_{{ str_replace('.', '_', $scopeId) }}">
-                                            <strong>@lang($scope['name'])</strong>
-                                            @if($scope['is_sensitive']) <span class="badge bg-danger ms-1">@lang('messages.sensitive')</span> @endif
-                                            <div class="small text-muted">@lang($scope['description'])</div>
-                                        </label>
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-
-                        <button type="submit" class="btn btn-primary">@lang('messages.save_changes')</button>
-                    </form>
+                <div class="dev-stat-grid" style="margin-top: 20px;">
+                    <div class="dev-stat-card">
+                        <span>{{ __('messages.current_status') }}</span>
+                        <strong>{{ __('messages.app_status_' . $app->status) }}</strong>
+                    </div>
+                    <div class="dev-stat-card">
+                        <span>{{ __('messages.redirect_uris') }}</span>
+                        <strong>{{ $redirectUriCount }}</strong>
+                    </div>
+                    <div class="dev-stat-card">
+                        <span>{{ __('messages.requested_scopes') }}</span>
+                        <strong>{{ $requestedScopeCount }}</strong>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="col-lg-4">
-            <div class="card shadow-sm border-0 mb-4">
-                <div class="card-header bg-white border-bottom p-4">
-                    <h5 class="fw-bold mb-0">@lang('messages.api_credentials')</h5>
+        @if($app->status === 'draft')
+            <div class="dev-note dev-note--info">
+                <strong>{{ __('messages.app_draft_notice') }}</strong>
+                <div class="dev-inline-actions">
+                    <form action="{{ route('developer.apps.submit', $app->id) }}" method="POST">
+                        @csrf
+                        <button type="submit" class="button primary">{{ __('messages.submit_for_review') }}</button>
+                    </form>
                 </div>
-                <div class="card-body p-4">
-                    <div class="mb-3">
-                        <label class="form-label text-muted small fw-bold text-uppercase mb-1">Client ID</label>
-                        <div class="input-group">
-                            <input type="text" class="form-control font-monospace" value="{{ $app->client_id }}" readonly id="clientIdInput">
-                            <button class="btn btn-outline-secondary" type="button" onclick="navigator.clipboard.writeText(document.getElementById('clientIdInput').value)"><i class="fas fa-copy"></i></button>
-                        </div>
+            </div>
+        @elseif($app->status === 'pending_review')
+            <div class="dev-note dev-note--warning">
+                <strong>{{ __('messages.app_status_pending_review') }}</strong>
+                <p>{{ __('messages.dev_pending_notice') }}</p>
+            </div>
+        @endif
+
+        @if($errors->any())
+            <div class="dev-note dev-note--danger">
+                <strong>{{ __('messages.save_changes') }}</strong>
+                <div class="dev-card-copy">
+                    @foreach($errors->all() as $error)
+                        <div>{{ $error }}</div>
+                    @endforeach
+                </div>
+            </div>
+        @endif
+
+        <div class="widget-box dev-panel">
+            <p class="widget-box-title">{{ __('messages.app_settings') }}</p>
+            <div class="widget-box-content" style="padding: 32px;">
+                <form action="{{ route('developer.apps.update', $app->id) }}" method="POST" class="dev-form-layout">
+                    @csrf
+                    @method('PUT')
+
+                    @include('theme::developer.partials.form_fields', [
+                        'app' => $app,
+                        'scopes' => $scopes,
+                        'scopeInputPrefix' => 'developer_show_scope',
+                    ])
+
+                    <div class="dev-form-actions">
+                        <a href="{{ route('developer.apps.index') }}" class="button secondary">{{ __('messages.my_apps') }}</a>
+                        <button type="submit" class="button primary">{{ __('messages.save_changes') }}</button>
                     </div>
-                    
-                    <div class="mb-3">
-                        <label class="form-label text-muted small fw-bold text-uppercase mb-1">Client Secret</label>
-                        <div class="input-group">
-                            <input type="password" class="form-control font-monospace" value="{{ $app->client_secret }}" readonly id="clientSecretInput">
-                            <button class="btn btn-outline-secondary" type="button" onclick="const input = document.getElementById('clientSecretInput'); input.type = input.type === 'password' ? 'text' : 'password';"><i class="fas fa-eye"></i></button>
-                            <button class="btn btn-outline-secondary" type="button" onclick="navigator.clipboard.writeText(document.getElementById('clientSecretInput').value)"><i class="fas fa-copy"></i></button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid-column">
+        <div class="dev-side-stack">
+            <div class="widget-box dev-panel">
+                <p class="widget-box-title">{{ __('messages.api_credentials') }}</p>
+                <div class="widget-box-content" style="padding: 28px;">
+                    <p class="dev-card-copy">{{ __('messages.dev_credentials_help') }}</p>
+
+                    <div class="dev-credential-field" style="margin-top: 18px;">
+                        <label for="developer-client-id">{{ __('messages.client_id') }}</label>
+                        <div class="dev-credential-input">
+                            <input id="developer-client-id" type="text" class="form-control dev-control" value="{{ $app->client_id }}" readonly>
+                            <button type="button" class="dev-inline-icon-btn js-dev-copy" data-copy-target="#developer-client-id">
+                                <i class="fa fa-copy"></i>
+                            </button>
                         </div>
                     </div>
 
-                    <form action="{{ route('developer.apps.rotate_secret', $app->id) }}" method="POST" onsubmit="return confirm('@lang('messages.rotate_secret_confirm')')">
+                    <div class="dev-credential-field" style="margin-top: 18px;">
+                        <label for="developer-client-secret">Client Secret</label>
+                        <div class="dev-credential-input">
+                            <input id="developer-client-secret" type="password" class="form-control dev-control" value="{{ $app->client_secret }}" readonly>
+                            <button type="button" class="dev-inline-icon-btn js-dev-toggle-secret" data-target="#developer-client-secret">
+                                <i class="fa fa-eye"></i>
+                            </button>
+                            <button type="button" class="dev-inline-icon-btn js-dev-copy" data-copy-target="#developer-client-secret">
+                                <i class="fa fa-copy"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <form action="{{ route('developer.apps.rotate_secret', $app->id) }}" method="POST" style="margin-top: 18px;" onsubmit="return confirm('@lang('messages.rotate_secret_confirm')')">
                         @csrf
-                        <button type="submit" class="btn btn-outline-danger btn-sm w-100"><i class="fas fa-sync-alt me-1"></i> @lang('messages.rotate_secret')</button>
+                        <button type="submit" class="button secondary">{{ __('messages.rotate_secret') }}</button>
                     </form>
+                </div>
+            </div>
+
+            <div class="widget-box dev-panel">
+                <p class="widget-box-title">{{ __('messages.take_action') }}</p>
+                <div class="widget-box-content" style="padding: 28px;">
+                    <div class="dev-rule-list">
+                        <div class="dev-rule-item">
+                            <strong>{{ __('messages.current_status') }}</strong>
+                            <span class="dev-rule-value">{{ __('messages.app_status_' . $app->status) }}</span>
+                        </div>
+                        <div class="dev-rule-item">
+                            <strong>{{ __('messages.domain') }}</strong>
+                            <span class="dev-rule-value">{{ $app->domain }}</span>
+                        </div>
+                        @if($app->status === 'draft')
+                            <div class="dev-rule-item">
+                                <strong>{{ __('messages.submit_for_review') }}</strong>
+                                <span class="dev-rule-value">{{ __('messages.dev_create_help') }}</span>
+                            </div>
+                        @endif
+                    </div>
+
+                    @if($app->status === 'draft')
+                        <form action="{{ route('developer.apps.submit', $app->id) }}" method="POST" style="margin-top: 18px;">
+                            @csrf
+                            <button type="submit" class="button primary">{{ __('messages.submit_for_review') }}</button>
+                        </form>
+                    @endif
+                </div>
+            </div>
+
+            <div class="widget-box dev-panel">
+                <p class="widget-box-title">{{ __('messages.app_about') }}</p>
+                <div class="widget-box-content" style="padding: 28px;">
+                    <p class="dev-card-copy">{{ $app->description }}</p>
+                    <div class="dev-chip-row" style="margin-top: 18px;">
+                        <span class="dev-chip">
+                            <i class="fa fa-link"></i>
+                            {{ $redirectUriCount }} {{ __('messages.redirect_uris') }}
+                        </span>
+                        <span class="dev-chip">
+                            <i class="fa fa-shield-halved"></i>
+                            {{ $requestedScopeCount }} {{ __('messages.requested_scopes') }}
+                        </span>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 @endsection
+
+@push('scripts')
+    @include('theme::developer.partials.scripts')
+@endpush
