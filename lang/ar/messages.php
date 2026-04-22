@@ -2589,7 +2589,7 @@ return [
     'information' => 'معلومات',
     'filter' => 'تصفية',
     'dev_guides' => 'دليل المطورين',
-    'dev_guides_intro' => 'أتقن عملية دمج MYADS في نظامك الرقمي من خلال تعليمات خطوة بخطوة ونماذج برمجية.',
+    'dev_guides_intro' => 'أتقن عملية دمج :site في نظامك الرقمي من خلال تعليمات خطوة بخطوة ونماذج برمجية.',
     'dev_getting_started' => 'ابدأ الاستخدام',
     'dev_integration_guide' => 'دليل الدمج',
     'dev_step_1_title' => 'أنشئ تطبيقك',
