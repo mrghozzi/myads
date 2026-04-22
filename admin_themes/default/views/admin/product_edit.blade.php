@@ -11,10 +11,26 @@
 <div class="admin-page">
 <style>
     .cursor-pointer { cursor: pointer; }
-    .bg-light:hover { background-color: rgba(0,0,0,0.05); transition: background 0.2s; }
+    .file-version-header:hover { background-color: rgba(128, 128, 128, 0.1); transition: background 0.2s; }
     .collapse-icon { transition: transform 0.2s ease; }
-    [aria-expanded="true"] .collapse-icon { transform: rotate(90deg); }
+    .collapse-icon.rotated { transform: rotate(90deg); }
+    [data-bs-theme="dark"] .bg-white { background-color: transparent !important; }
+    .file-version-content { background-color: rgba(128, 128, 128, 0.03); }
 </style>
+
+<script>
+function toggleFileVersion(id) {
+    const el = document.getElementById('file-version-' + id);
+    const icon = document.getElementById('icon-' + id);
+    if (el.style.display === 'none') {
+        el.style.display = 'block';
+        icon.classList.add('rotated');
+    } else {
+        el.style.display = 'none';
+        icon.classList.remove('rotated');
+    }
+}
+</script>
 
 <section class="admin-hero">
     <div class="admin-hero__content">
@@ -158,10 +174,10 @@
             <div class="card-header bg-white fw-semibold">{{ __('messages.file_versions') ?? 'File Versions' }}</div>
             <div class="card-body p-0">
                 @forelse($files as $file)
-                    <div class="border-bottom">
-                        <div class="p-3 bg-light cursor-pointer d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#file-version-{{ $file->id }}">
+                    <div class="border-bottom border-light">
+                        <div class="p-3 cursor-pointer d-flex justify-content-between align-items-center file-version-header" onclick="toggleFileVersion({{ $file->id }})">
                             <div class="fw-semibold fs-13">
-                                <i class="feather-chevron-right me-2 text-muted collapse-icon"></i>
+                                <i class="feather-chevron-right me-2 text-muted collapse-icon" id="icon-{{ $file->id }}"></i>
                                 {{ $file->name }}
                             </div>
                             <span class="badge bg-soft-primary text-primary fs-11">
@@ -169,8 +185,8 @@
                             </span>
                         </div>
                         
-                        <div class="collapse" id="file-version-{{ $file->id }}">
-                            <div class="p-3 border-top bg-white">
+                        <div id="file-version-{{ $file->id }}" style="display: none;" class="file-version-content">
+                            <div class="p-3 border-top border-light">
                                 <div class="mb-3">
                                     <label class="form-label fs-11 fw-bold text-uppercase text-muted mb-1">{{ __('messages.version_number') ?? 'Version Number' }}</label>
                                     <input type="text" name="existing_files[{{ $file->id }}][vnbr]" class="form-control form-control-sm mb-3" value="{{ $file->name }}">
