@@ -137,18 +137,23 @@
         <hr />
         
         {{-- Social Login --}}
-        @if(env('FACEBOOK_CLIENT_ID') || env('GOOGLE_CLIENT_ID'))
+        @if(env('FACEBOOK_CLIENT_ID') || env('GOOGLE_CLIENT_ID') || env('ADSTN_CLIENT_ID'))
         <div style="text-align: center; margin: 20px 0;">
             <p class="lined-text" style="margin-bottom: 15px;">{{ __('messages.login_with_social') }}</p>
             <div class="social-links" style="display: flex; gap: 10px; justify-content: center;">
                 @if(env('FACEBOOK_CLIENT_ID'))
-                <a href="{{ route('social.redirect', 'facebook') }}" class="button small facebook" style="background-color: #3b5998; color: white; {{ env('FACEBOOK_CLIENT_ID') && env('GOOGLE_CLIENT_ID') ? 'width: 48%;' : 'width: 100%;' }} text-align: center; display: inline-block;">
+                <a href="{{ route('social.redirect', 'facebook') }}" class="button small facebook" style="background-color: #3b5998; color: white; flex: 1; text-align: center; display: inline-block;">
                     <i class="fa-brands fa-facebook"></i> Facebook
                 </a>
                 @endif
                 @if(env('GOOGLE_CLIENT_ID'))
-                <a href="{{ route('social.redirect', 'google') }}" class="button small google" style="background-color: #dd4b39; color: white; {{ env('FACEBOOK_CLIENT_ID') && env('GOOGLE_CLIENT_ID') ? 'width: 48%;' : 'width: 100%;' }} text-align: center; display: inline-block;">
+                <a href="{{ route('social.redirect', 'google') }}" class="button small google" style="background-color: #dd4b39; color: white; flex: 1; text-align: center; display: inline-block;">
                     <i class="fa-brands fa-google"></i> Google
+                </a>
+                @endif
+                @if(env('ADSTN_CLIENT_ID'))
+                <a href="{{ route('social.redirect', 'adstn') }}" class="button small adstn" style="background-color: rgb(84, 56, 163); color: white; flex: 1; text-align: center; display: inline-block;">
+                    <i class="fa-brands fa-buysellads"></i> ADStn
                 </a>
                 @endif
             </div>

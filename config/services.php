@@ -47,4 +47,10 @@ return [
         'redirect' => env('GOOGLE_REDIRECT_URI'),
     ],
 
+    'adstn' => [
+        'client_id' => env('ADSTN_CLIENT_ID'),
+        'client_secret' => env('ADSTN_CLIENT_SECRET'),
+        'redirect' => '/login/adstn/callback',
+    ],
+
 ];

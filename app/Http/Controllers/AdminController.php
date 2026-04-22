@@ -391,6 +391,7 @@ class AdminController extends Controller
         $data = $request->only([
             'FACEBOOK_CLIENT_ID', 'FACEBOOK_CLIENT_SECRET',
             'GOOGLE_CLIENT_ID', 'GOOGLE_CLIENT_SECRET',
+            'ADSTN_CLIENT_ID', 'ADSTN_CLIENT_SECRET',
             'MAIL_HOST', 'MAIL_PORT', 'MAIL_USERNAME', 'MAIL_PASSWORD', 'MAIL_ENCRYPTION', 'MAIL_FROM_ADDRESS'
         ]);
 

@@ -47,6 +47,13 @@
                     <label class="form-label">{{ __('messages.facebook_client_secret') ?? 'Facebook Client Secret' }}</label>
                     <input type="password" name="FACEBOOK_CLIENT_SECRET" class="form-control" value="{{ env('FACEBOOK_CLIENT_SECRET') }}" placeholder="{{ __('messages.enter_facebook_app_secret') ?? 'Enter Facebook App Secret' }}">
                 </div>
+                <div class="col-12 mt-2">
+                    <div class="alert alert-info py-2 px-3 mb-0" style="font-size: 0.85rem;">
+                        <strong>{{ __('messages.redirect_uri') }}:</strong> 
+                        <code>{{ route('social.callback', 'facebook') }}</code>
+                        <div class="mt-1 text-muted">{{ __('messages.redirect_uri_hint') }}</div>
+                    </div>
+                </div>
                 <div class="col-12"><hr class="my-0"></div>
                 <div class="col-12"><h3 class="h5 mb-0 text-primary"><i class="feather-chrome me-2"></i>{{ __('messages.google_login') ?? 'Google Login' }}</h3></div>
                 <div class="col-lg-6">
@@ -56,6 +63,30 @@
                 <div class="col-lg-6">
                     <label class="form-label">{{ __('messages.google_client_secret') ?? 'Google Client Secret' }}</label>
                     <input type="password" name="GOOGLE_CLIENT_SECRET" class="form-control" value="{{ env('GOOGLE_CLIENT_SECRET') }}" placeholder="{{ __('messages.enter_google_client_secret') ?? 'Enter Google Client Secret' }}">
+                </div>
+                <div class="col-12 mt-2">
+                    <div class="alert alert-info py-2 px-3 mb-0" style="font-size: 0.85rem;">
+                        <strong>{{ __('messages.redirect_uri') }}:</strong> 
+                        <code>{{ route('social.callback', 'google') }}</code>
+                        <div class="mt-1 text-muted">{{ __('messages.redirect_uri_hint') }}</div>
+                    </div>
+                </div>
+                <div class="col-12"><hr class="my-0"></div>
+                <div class="col-12"><h3 class="h5 mb-0 text-primary"><i class="fa-brands fa-buysellads me-2"></i>{{ __('messages.adstn_login') ?? 'ADStn Login' }}</h3></div>
+                <div class="col-lg-6">
+                    <label class="form-label">{{ __('messages.adstn_client_id') ?? 'ADStn Client ID' }}</label>
+                    <input type="text" name="ADSTN_CLIENT_ID" class="form-control" value="{{ env('ADSTN_CLIENT_ID') }}" placeholder="{{ __('messages.enter_adstn_client_id') ?? 'Enter ADStn Client ID' }}">
+                </div>
+                <div class="col-lg-6">
+                    <label class="form-label">{{ __('messages.adstn_client_secret') ?? 'ADStn Client Secret' }}</label>
+                    <input type="password" name="ADSTN_CLIENT_SECRET" class="form-control" value="{{ env('ADSTN_CLIENT_SECRET') }}" placeholder="{{ __('messages.enter_adstn_client_secret') ?? 'Enter ADStn Client Secret' }}">
+                </div>
+                <div class="col-12 mt-2">
+                    <div class="alert alert-info py-2 px-3 mb-0" style="font-size: 0.85rem;">
+                        <strong>{{ __('messages.redirect_uri') }}:</strong> 
+                        <code>{{ route('social.callback', 'adstn') }}</code>
+                        <div class="mt-1 text-muted">{{ __('messages.redirect_uri_hint') }}</div>
+                    </div>
                 </div>
                 <div class="col-12"><hr class="my-0"></div>
                 <div class="col-12"><h3 class="h5 mb-0 text-primary"><i class="feather-mail me-2"></i>{{ __('messages.smtp_settings') ?? 'SMTP Settings' }}</h3></div>

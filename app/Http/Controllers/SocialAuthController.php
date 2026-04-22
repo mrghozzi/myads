@@ -18,7 +18,7 @@ class SocialAuthController extends Controller
     public function redirect($provider)
     {
         // Check if provider is supported
-        if (!in_array($provider, ['facebook', 'google'])) {
+        if (!in_array($provider, ['facebook', 'google', 'adstn'])) {
             return redirect()->route('login')->with('error', 'Provider not supported');
         }
 
@@ -29,6 +29,18 @@ class SocialAuthController extends Controller
         }
 
         try {
+            if ($provider === 'adstn') {
+                $state = Str::random(40);
+                request()->session()->put('state', $state);
+                $query = http_build_query([
+                    'client_id' => $clientId,
+                    'redirect_uri' => route('social.callback', 'adstn'),
+                    'response_type' => 'code',
+                    'scope' => 'user.identity.read user.profile.read',
+                    'state' => $state,
+                ]);
+                return redirect('https://www.adstn.ovh/oauth/authorize?' . $query);
+            }
             return Socialite::driver($provider)->redirect();
         } catch (\Exception $e) {
             return redirect()->route('login')->with('error', 'Could not redirect to provider: ' . $e->getMessage());
@@ -49,7 +61,59 @@ class SocialAuthController extends Controller
         }
 
         try {
-            $socialUser = Socialite::driver($provider)->user();
+            if ($provider === 'adstn') {
+                $state = request()->session()->pull('state');
+                if (!$state || $state !== request('state')) {
+                    return redirect()->route('login')->with('error', 'Invalid state');
+                }
+
+                $response = \Illuminate\Support\Facades\Http::post('https://www.adstn.ovh/oauth/token', [
+                    'grant_type' => 'authorization_code',
+                    'client_id' => $clientId,
+                    'client_secret' => config("services.{$provider}.client_secret"),
+                    'code' => request('code'),
+                    'redirect_uri' => route('social.callback', 'adstn'),
+                ]);
+
+                if (!$response->successful()) {
+                    return redirect()->route('login')->with('error', 'Token exchange failed: ' . $response->body());
+                }
+
+                $tokens = $response->json();
+                $accessToken = $tokens['access_token'];
+
+                // Get Identity
+                $identityResponse = \Illuminate\Support\Facades\Http::withToken($accessToken)
+                    ->get('https://www.adstn.ovh/api/developer/v1/me');
+                
+                if (!$identityResponse->successful()) {
+                    return redirect()->route('login')->with('error', 'Failed to fetch user identity');
+                }
+
+                $identity = $identityResponse->json('data');
+
+                // Get Profile (for avatar)
+                $profileResponse = \Illuminate\Support\Facades\Http::withToken($accessToken)
+                    ->get('https://www.adstn.ovh/api/developer/v1/me/profile');
+                
+                $profile = $profileResponse->successful() ? $profileResponse->json('data') : [];
+
+                // Normalize to a social user object or similar data structure
+                $socialUser = new class($identity, $profile) {
+                    public $identity;
+                    public $profile;
+                    public function __construct($identity, $profile) {
+                        $this->identity = $identity;
+                        $this->profile = $profile;
+                    }
+                    public function getId() { return $this->identity['id']; }
+                    public function getEmail() { return $this->identity['email']; }
+                    public function getName() { return $this->identity['username']; }
+                    public function getAvatar() { return $this->profile['avatar'] ?? 'upload/avatar.png'; }
+                };
+            } else {
+                $socialUser = Socialite::driver($provider)->user();
+            }
         } catch (\Exception $e) {
             return redirect()->route('login')->with('error', 'Login failed: ' . $e->getMessage());
         }
