@@ -9,6 +9,10 @@
 @endphp
 
 <div class="admin-page">
+<style>
+    .cursor-pointer { cursor: pointer; }
+    .bg-light-soft:hover { background-color: rgba(0,0,0,0.03); transition: background 0.2s; }
+</style>
 
 <section class="admin-hero">
     <div class="admin-hero__content">
