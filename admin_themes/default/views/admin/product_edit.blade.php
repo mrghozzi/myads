@@ -11,7 +11,9 @@
 <div class="admin-page">
 <style>
     .cursor-pointer { cursor: pointer; }
-    .bg-light-soft:hover { background-color: rgba(0,0,0,0.03); transition: background 0.2s; }
+    .bg-light:hover { background-color: rgba(0,0,0,0.05); transition: background 0.2s; }
+    .collapse-icon { transition: transform 0.2s ease; }
+    [aria-expanded="true"] .collapse-icon { transform: rotate(90deg); }
 </style>
 
 <section class="admin-hero">
@@ -157,35 +159,34 @@
             <div class="card-body p-0">
                 @forelse($files as $file)
                     <div class="border-bottom">
-                        <div class="p-3 bg-light-soft d-flex justify-content-between align-items-center cursor-pointer" data-bs-toggle="collapse" data-bs-target="#file-version-{{ $file->id }}" aria-expanded="false">
-                            <div class="d-flex align-items-center gap-2">
-                                <i class="feather-chevron-down fs-12 text-muted"></i>
-                                <span class="fw-semibold fs-13">{{ $file->name }}</span>
+                        <div class="p-3 bg-light cursor-pointer d-flex justify-content-between align-items-center" data-bs-toggle="collapse" data-bs-target="#file-version-{{ $file->id }}">
+                            <div class="fw-semibold fs-13">
+                                <i class="feather-chevron-right me-2 text-muted collapse-icon"></i>
+                                {{ $file->name }}
                             </div>
-                            <span class="text-muted fs-11">
+                            <span class="badge bg-soft-primary text-primary fs-11">
                                 <i class="feather-download me-1"></i>{{ $file->shortLink->clik ?? 0 }}
                             </span>
                         </div>
                         
                         <div class="collapse" id="file-version-{{ $file->id }}">
-                            <div class="p-3 pt-0 bg-light-soft">
-                                <div class="mb-3 border-top pt-3">
-                                    <div class="mb-3">
-                                        <label class="fs-11 fw-semibold text-muted mb-1">{{ __('messages.version_number') ?? 'Version Number' }}</label>
-                                        <input type="text" name="existing_files[{{ $file->id }}][vnbr]" class="form-control form-control-sm mb-2" value="{{ $file->name }}" placeholder="v2.0">
-                                        
-                                        <label class="fs-11 fw-semibold text-muted mb-1">{{ __('messages.file_link') ?? 'File Link' }}</label>
-                                        <input type="text" name="existing_files[{{ $file->id }}][link]" class="form-control form-control-sm mb-2" value="{{ $file->o_mode }}" placeholder="URL">
-                                        
-                                        <label class="fs-11 fw-semibold text-muted mb-1">{{ __('messages.description') ?? 'Description' }}</label>
-                                        <textarea name="existing_files[{{ $file->id }}][desc]" class="form-control form-control-sm" rows="2" placeholder="{{ __('messages.version_description') ?? 'Version Description' }}">{{ $file->o_valuer }}</textarea>
-                                    </div>
-                                    <div class="d-flex gap-2">
-                                        @php $isUrl = filter_var($file->o_mode, FILTER_VALIDATE_URL); @endphp
-                                        <a href="{{ $isUrl ? $file->o_mode : url($file->o_mode) }}" target="_blank" class="btn btn-link btn-sm p-0 fs-11 text-decoration-none">
-                                            <i class="feather-external-link me-1"></i>{{ __('messages.test_link') ?? 'Test Link' }}
-                                        </a>
-                                    </div>
+                            <div class="p-3 border-top bg-white">
+                                <div class="mb-3">
+                                    <label class="form-label fs-11 fw-bold text-uppercase text-muted mb-1">{{ __('messages.version_number') ?? 'Version Number' }}</label>
+                                    <input type="text" name="existing_files[{{ $file->id }}][vnbr]" class="form-control form-control-sm mb-3" value="{{ $file->name }}">
+                                    
+                                    <label class="form-label fs-11 fw-bold text-uppercase text-muted mb-1">{{ __('messages.file_link') ?? 'File Link' }}</label>
+                                    <input type="text" name="existing_files[{{ $file->id }}][link]" class="form-control form-control-sm mb-3" value="{{ $file->o_mode }}">
+                                    
+                                    <label class="form-label fs-11 fw-bold text-uppercase text-muted mb-1">{{ __('messages.description') ?? 'Description' }}</label>
+                                    <textarea name="existing_files[{{ $file->id }}][desc]" class="form-control form-control-sm mb-3" rows="3">{{ $file->o_valuer }}</textarea>
+                                </div>
+                                
+                                <div class="d-flex align-items-center justify-content-between">
+                                    @php $isUrl = filter_var($file->o_mode, FILTER_VALIDATE_URL); @endphp
+                                    <a href="{{ $isUrl ? $file->o_mode : url($file->o_mode) }}" target="_blank" class="btn btn-soft-info btn-sm fs-11">
+                                        <i class="feather-external-link me-1"></i>{{ __('messages.test_link') ?? 'Test Link' }}
+                                    </a>
                                 </div>
                             </div>
                         </div>
