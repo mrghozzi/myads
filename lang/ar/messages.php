@@ -2426,4 +2426,8 @@ return [
     'seller_id_help' => 'أدخل الرقم التعريفي (ID) للعضو الذي سيصبح المالك الجديد لهذا المنتج.',
     'product_seller_change_old' => 'تم نقل ملكية منتجك ":product" إلى مستخدم آخر من قبل الإدارة.',
     'product_seller_change_new' => 'تم منحك ملكية منتج جديد ":product" من قبل الإدارة.',
+    'product_updated_notification' => 'قام أحد المسؤولين بتحديث تفاصيل منتجك ":product".',
+    'test_link' => 'تجربة الرابط',
+    'version_description' => 'وصف النسخة',
+    'downloads' => 'تحميل',
 ];

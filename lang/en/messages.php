@@ -2426,4 +2426,8 @@ return [
     'seller_id_help' => 'Enter the numeric ID (ID) of the user who will become the new owner of this product.',
     'product_seller_change_old' => 'The ownership of your product ":product" has been transferred to another user by an administrator.',
     'product_seller_change_new' => 'You have been granted ownership of a new product ":product" by an administrator.',
+    'product_updated_notification' => 'An administrator has updated the details of your product ":product".',
+    'test_link' => 'Test Link',
+    'version_description' => 'Version Description',
+    'downloads' => 'Downloads',
 ];

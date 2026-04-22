@@ -40,6 +40,8 @@ use App\Models\Menu;
 use App\Models\Knowledgebase;
 use App\Models\Page;
 use App\Models\ProductFile;
+use App\Models\Short;
+
 use App\Services\GamificationService;
 use App\Services\MaintenanceModeManager;
 use App\Services\PluginManager;
@@ -2881,6 +2883,10 @@ class AdminController extends Controller
             'txt'     => ['nullable', 'string'],
             'vnbr'    => ['nullable', 'string', 'min:2', 'max:12', 'regex:/^[-a-zA-Z0-9.]+$/'],
             'linkzip' => ['nullable', 'string'],
+            'existing_files' => ['nullable', 'array'],
+            'existing_files.*.vnbr' => ['required_with:existing_files', 'string', 'min:2', 'max:12', 'regex:/^[-a-zA-Z0-9.]+$/'],
+            'existing_files.*.link' => ['required_with:existing_files', 'string'],
+            'existing_files.*.desc' => ['nullable', 'string', 'max:2400'],
         ]);
 
         $oldOwnerId = (int) $product->o_parent;
@@ -2917,6 +2923,26 @@ class AdminController extends Controller
             }
         }
 
+        // Update existing file versions
+        if ($request->has('existing_files')) {
+            foreach ($request->existing_files as $fileId => $fileData) {
+                $file = ProductFile::where('o_parent', $product->id)->find($fileId);
+                if ($file) {
+                    $file->update([
+                        'name'     => $fileData['vnbr'],
+                        'o_mode'   => $fileData['link'],
+                        'o_valuer' => $fileData['desc'] ?? '',
+                    ]);
+                    
+                    // Update associated Short link if link changed
+                    $short = Short::where('tp_id', $file->id)->where('sh_type', 7867)->first();
+                    if ($short) {
+                        $short->update(['url' => $fileData['link']]);
+                    }
+                }
+            }
+        }
+
         // Optional: add new file version
         if ($request->filled('vnbr') && $request->filled('linkzip')) {
             $fileOption = ProductFile::create([
@@ -2948,6 +2974,12 @@ class AdminController extends Controller
             }
             if ($newOwner) {
                 $this->notifications->send($newOwner, __('messages.product_seller_change_new', ['product' => $product->name]));
+            }
+        } else {
+            // General update notification to the current seller
+            $seller = User::find($newOwnerId);
+            if ($seller) {
+                $this->notifications->send($seller, __('messages.product_updated_notification', ['product' => $product->name]));
             }
         }
 

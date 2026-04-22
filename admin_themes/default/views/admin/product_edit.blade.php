@@ -58,14 +58,14 @@
     </div>
 @endif
 
-<div class="row g-4">
-    {{-- Edit Form --}}
-    <div class="col-lg-8">
-        <div class="card border-0 shadow-sm">
-            <div class="card-header bg-white fw-semibold">{{ __('messages.product_details') ?? 'Product Details' }}</div>
-            <div class="card-body">
-                <form method="POST" action="{{ route('admin.products.update', $product->id) }}">
-                    @csrf
+<form method="POST" action="{{ route('admin.products.update', $product->id) }}">
+    @csrf
+    <div class="row g-4">
+        {{-- Edit Form --}}
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white fw-semibold">{{ __('messages.product_details') ?? 'Product Details' }}</div>
+                <div class="card-body">
                     {{-- Product Name --}}
                     <div class="mb-3">
                         <label class="form-label">{{ __('messages.titer') ?? 'Name' }} <span class="text-danger">*</span></label>
@@ -142,7 +142,6 @@
                         </button>
                         <a href="{{ route('admin.products') }}" class="btn btn-outline-secondary ms-2">{{ __('messages.cancel') ?? 'Cancel' }}</a>
                     </div>
-                </form>
             </div>
         </div>
     </div>
@@ -153,24 +152,39 @@
             <div class="card-header bg-white fw-semibold">{{ __('messages.file_versions') ?? 'File Versions' }}</div>
             <div class="card-body p-0">
                 @forelse($files as $file)
-                    @php
-                        $fileHash = hash('crc32', $file->o_mode . $file->id);
-                        $isUrl = filter_var($file->o_mode, FILTER_VALIDATE_URL);
-                    @endphp
-                    <div class="d-flex align-items-center gap-3 p-3 border-bottom">
-                        <div class="flex-grow-1 overflow-hidden">
-                            <div class="fw-semibold fs-13">{{ $file->name }}</div>
-                            <div class="fs-11 text-muted text-truncate">
-                                @if($isUrl)
-                                    <i class="feather-link me-1"></i><a href="{{ $file->o_mode }}" target="_blank" class="text-muted">{{ $file->o_mode }}</a>
-                                @else
-                                    <i class="feather-file me-1"></i><a href="{{ url($file->o_mode) }}" target="_blank" class="text-muted">{{ $file->o_mode }}</a>
-                                @endif
+                    <div class="border-bottom">
+                        <div class="p-3 bg-light-soft d-flex justify-content-between align-items-center cursor-pointer" data-bs-toggle="collapse" data-bs-target="#file-version-{{ $file->id }}" aria-expanded="false">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="feather-chevron-down fs-12 text-muted"></i>
+                                <span class="fw-semibold fs-13">{{ $file->name }}</span>
+                            </div>
+                            <span class="text-muted fs-11">
+                                <i class="feather-download me-1"></i>{{ $file->shortLink->clik ?? 0 }}
+                            </span>
+                        </div>
+                        
+                        <div class="collapse" id="file-version-{{ $file->id }}">
+                            <div class="p-3 pt-0 bg-light-soft">
+                                <div class="mb-3 border-top pt-3">
+                                    <div class="mb-3">
+                                        <label class="fs-11 fw-semibold text-muted mb-1">{{ __('messages.version_number') ?? 'Version Number' }}</label>
+                                        <input type="text" name="existing_files[{{ $file->id }}][vnbr]" class="form-control form-control-sm mb-2" value="{{ $file->name }}" placeholder="v2.0">
+                                        
+                                        <label class="fs-11 fw-semibold text-muted mb-1">{{ __('messages.file_link') ?? 'File Link' }}</label>
+                                        <input type="text" name="existing_files[{{ $file->id }}][link]" class="form-control form-control-sm mb-2" value="{{ $file->o_mode }}" placeholder="URL">
+                                        
+                                        <label class="fs-11 fw-semibold text-muted mb-1">{{ __('messages.description') ?? 'Description' }}</label>
+                                        <textarea name="existing_files[{{ $file->id }}][desc]" class="form-control form-control-sm" rows="2" placeholder="{{ __('messages.version_description') ?? 'Version Description' }}">{{ $file->o_valuer }}</textarea>
+                                    </div>
+                                    <div class="d-flex gap-2">
+                                        @php $isUrl = filter_var($file->o_mode, FILTER_VALIDATE_URL); @endphp
+                                        <a href="{{ $isUrl ? $file->o_mode : url($file->o_mode) }}" target="_blank" class="btn btn-link btn-sm p-0 fs-11 text-decoration-none">
+                                            <i class="feather-external-link me-1"></i>{{ __('messages.test_link') ?? 'Test Link' }}
+                                        </a>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <a href="{{ route('store.download.hash', $fileHash) }}" class="btn btn-sm btn-outline-primary" title="{{ __('messages.download') ?? 'Download' }}">
-                            <i class="feather-download"></i>
-                        </a>
                     </div>
                 @empty
                     <div class="p-4 text-center text-muted">
@@ -198,6 +212,7 @@
         @endif
     </div>
 </div>
+</form>
 
 @if($topic)
 <script src="https://unpkg.com/stackedit-js@1.0.7/docs/lib/stackedit.min.js"></script>

@@ -15,4 +15,9 @@ class ProductFile extends Option
             $builder->where('o_type', 'store_file');
         });
     }
+
+    public function shortLink()
+    {
+        return $this->hasOne(Short::class, 'tp_id', 'id')->where('sh_type', 7867);
+    }
 }
