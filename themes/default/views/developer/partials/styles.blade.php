@@ -460,18 +460,35 @@
 
     .dev-scope-card {
         position: relative;
-        display: flex;
-        gap: 14px;
         padding: 18px;
         border-radius: 20px;
         background: var(--dev-surface);
         border: 1px solid var(--dev-border);
         min-height: 100%;
+        text-align: start;
     }
 
-    .dev-scope-card .form-check-input {
-        margin-top: 4px;
-        flex-shrink: 0;
+    .dev-scope-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 8px;
+    }
+
+    .dev-check-input {
+        appearance: checkbox !important;
+        -webkit-appearance: checkbox !important;
+        width: 18px !important;
+        height: 18px !important;
+        margin: 0 !important;
+        margin-inline-end: 12px !important;
+        flex-shrink: 0 !important;
+        cursor: pointer;
+        position: relative !important;
+        z-index: 5;
+    }
+
+    .dev-scope-copy {
+        min-width: 0;
     }
 
     .dev-scope-label {
@@ -481,7 +498,9 @@
         color: var(--dev-title);
         font-size: 0.92rem;
         font-weight: 800;
-        margin-bottom: 6px;
+        margin-bottom: 0 !important;
+        line-height: 1.3;
+        cursor: pointer;
     }
 
     .dev-scope-card code {

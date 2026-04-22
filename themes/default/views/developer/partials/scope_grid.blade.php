@@ -61,22 +61,24 @@
         @endphp
 
         <div class="dev-scope-card">
-            <input
-                class="form-check-input"
-                type="checkbox"
-                name="requested_scopes[]"
-                value="{{ $scopeId }}"
-                id="{{ $scopeInputPrefix }}_{{ str_replace('.', '_', $scopeId) }}"
-                @checked(in_array($scopeId, $selectedScopes, true))
-            >
             <div class="dev-scope-copy">
-                <label class="dev-scope-label" for="{{ $scopeInputPrefix }}_{{ str_replace('.', '_', $scopeId) }}">
-                    <span>{{ $scopeLabel }}</span>
-                    @if(!empty($scope['is_sensitive']))
-                        <span class="badge bg-danger">{{ __('messages.sensitive') }}</span>
-                    @endif
-                </label>
-                <div>{{ $scopeDescription }}</div>
+                <div class="dev-scope-header">
+                    <input
+                        class="dev-check-input"
+                        type="checkbox"
+                        name="requested_scopes[]"
+                        value="{{ $scopeId }}"
+                        id="{{ $scopeInputPrefix }}_{{ str_replace('.', '_', $scopeId) }}"
+                        @checked(in_array($scopeId, $selectedScopes, true))
+                    >
+                    <label class="dev-scope-label" for="{{ $scopeInputPrefix }}_{{ str_replace('.', '_', $scopeId) }}">
+                        <span>{{ $scopeLabel }}</span>
+                        @if(!empty($scope['is_sensitive']))
+                            <span class="badge bg-danger">{{ __('messages.sensitive') }}</span>
+                        @endif
+                    </label>
+                </div>
+                <div class="dev-scope-description">{{ $scopeDescription }}</div>
                 <code>{{ $scopeId }}</code>
             </div>
         </div>
