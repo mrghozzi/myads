@@ -2430,4 +2430,6 @@ return [
     'test_link' => 'تجربة الرابط',
     'version_description' => 'وصف النسخة',
     'downloads' => 'تحميل',
+    'version_number' => 'رقم النسخة',
+    'file_link' => 'رابط الملف',
 ];

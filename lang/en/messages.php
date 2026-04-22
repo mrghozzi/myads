@@ -2430,4 +2430,6 @@ return [
     'test_link' => 'Test Link',
     'version_description' => 'Version Description',
     'downloads' => 'Downloads',
+    'version_number' => 'Version Number',
+    'file_link' => 'File Link',
 ];

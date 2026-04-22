@@ -2983,7 +2983,7 @@ class AdminController extends Controller
             }
         }
 
-        return redirect()->route('admin.products')->with('success', __('messages.product_updated') ?? 'Product updated successfully.');
+        return redirect()->back()->with('success', __('messages.product_updated') ?? 'Product updated successfully.');
     }
 
     public function suspendProduct(Request $request, $id)
