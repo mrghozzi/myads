@@ -34,26 +34,11 @@ class AdminExtensionsUiTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-
         $this->tempPath = storage_path('app/testing-admin-extensions');
         File::deleteDirectory($this->tempPath);
         File::makeDirectory($this->tempPath, 0755, true);
-
-        Cache::forget('plugin_updates');
-        Cache::forget('theme_updates');
-        Cache::forget('remote_extension_marketplace_plugins');
-        Cache::forget('remote_extension_marketplace_themes');
-
-        Http::fake([
-            'https://www.adstn.ovh/api/marketplace/extensions/plugins' => Http::response([
-                'type' => 'plugins',
-                'items' => [],
-            ]),
-            'https://www.adstn.ovh/api/marketplace/extensions/themes' => Http::response([
-                'type' => 'themes',
-                'items' => [],
-            ]),
-        ]);
+        \Illuminate\Support\Facades\Cache::flush();
+        Http::preventStrayRequests();
     }
 
     protected function tearDown(): void
@@ -101,6 +86,7 @@ class AdminExtensionsUiTest extends TestCase
             ],
         ], 3600);
 
+        Http::fake(['https://www.adstn.ovh/api/marketplace/extensions/*' => Http::response(['items' => []])]);
         $response = $this->actingAs($admin)->get(route('admin.plugins'));
 
         $response->assertOk()
@@ -136,6 +122,7 @@ class AdminExtensionsUiTest extends TestCase
             ],
         ], 3600);
 
+        Http::fake(['https://www.adstn.ovh/api/marketplace/extensions/*' => Http::response(['items' => []])]);
         $response = $this->actingAs($admin)->get(route('admin.themes'));
 
         $response->assertOk()
@@ -159,12 +146,13 @@ class AdminExtensionsUiTest extends TestCase
                 'items' => [[
                     'name' => 'Marketplace Plugin',
                     'slug' => 'marketplace-plugin',
-                    'version' => '2.1.0',
-                    'author' => 'Remote Seller',
-                    'description' => 'Marketplace plugin description.',
+                    'version' => '1.0.0',
+                    'author' => 'Test Author',
+                    'description' => 'Test Description',
                     'min_myads' => '4.2.3',
                     'product_url' => 'https://www.adstn.ovh/store/marketplace-plugin',
                     'image_url' => 'https://www.adstn.ovh/upload/marketplace-plugin.png',
+                    'download_url' => 'https://downloads.test/marketplace-plugin.zip',
                     'category' => 'plugins',
                 ]],
             ]),
@@ -178,11 +166,20 @@ class AdminExtensionsUiTest extends TestCase
 
         $response = $this->actingAs($admin)->get(route('admin.plugins'));
 
+        Http::assertSent(function (\Illuminate\Http\Client\Request $request) {
+            return str_contains($request->url(), 'adstn.ovh/api/marketplace/extensions/plugins');
+        });
+
         $response->assertOk()
             ->assertSee(__('messages.marketplace'))
             ->assertSee('Marketplace Plugin')
-            ->assertSee(__('messages.open_in_store'))
-            ->assertSee('https://www.adstn.ovh/store/marketplace-plugin', false);
+            ->assertSee(__('messages.details'))
+            ->assertSee('data-bs-toggle="modal"', false)
+            ->assertSee('data-bs-target="#pluginDetailsModal"', false)
+            ->assertSee('data-min-myads="4.2.3"', false)
+            ->assertSee(__('messages.install_now'))
+            ->assertSee('marketplace-plugin')
+            ->assertSee('https://downloads.test/marketplace-plugin.zip', false);
     }
 
     public function test_admin_themes_page_keeps_working_when_remote_marketplace_feed_fails(): void

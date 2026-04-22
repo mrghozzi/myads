@@ -90,6 +90,45 @@ class MarketplaceExtensionFeedTest extends TestCase
         $this->assertSame(route('store.show', 'valid-plugin-product'), $items[0]['product_url']);
     }
 
+    public function test_plugins_feed_includes_download_url_only_for_free_products(): void
+    {
+        $owner = $this->createPublicOwner();
+
+        // Free product (o_order = 0)
+        $freeProduct = $this->createStoreProduct($owner, 'free-plugin', 'plugins');
+        $freeProduct->update(['o_order' => 0]);
+        $this->attachZip($freeProduct, 'free-plugin.zip', 'plugin.json', [
+            'name' => 'Free Plugin',
+            'slug' => 'free-plugin',
+            'version' => '1.0.0',
+            'author' => 'Tests',
+            'description' => 'Free',
+            'min_myads' => '4.2.0',
+        ]);
+
+        // Paid product (o_order > 0)
+        $paidProduct = $this->createStoreProduct($owner, 'paid-plugin', 'plugins');
+        $paidProduct->update(['o_order' => 500]);
+        $this->attachZip($paidProduct, 'paid-plugin.zip', 'plugin.json', [
+            'name' => 'Paid Plugin',
+            'slug' => 'paid-plugin',
+            'version' => '1.0.0',
+            'author' => 'Tests',
+            'description' => 'Paid',
+            'min_myads' => '4.2.0',
+        ]);
+
+        $response = $this->getJson(route('api.marketplace.extensions.plugins'));
+
+        $response->assertOk();
+        $items = collect($response->json('items'))->keyBy('slug');
+
+        $this->assertNotEmpty($items['free-plugin']['download_url']);
+        $this->assertStringContainsString('free-plugin.zip', $items['free-plugin']['download_url']);
+        
+        $this->assertEmpty($items['paid-plugin']['download_url']);
+    }
+
     public function test_themes_feed_merges_themes_and_legacy_templates_and_prefers_themes_category(): void
     {
         $owner = $this->createPublicOwner();

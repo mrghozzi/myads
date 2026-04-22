@@ -112,12 +112,18 @@
                             <button
                                 type="button"
                                 class="btn-extension-glass btn-extension-glass--secondary marketplace-details-btn"
+                                @if(!empty($detailsModalId))
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#{{ $detailsModalId }}"
+                                @endif
                                 data-name="{{ $marketName !== '' ? $marketName : $marketSlug }}"
                                 data-slug="{{ $marketSlug }}"
                                 data-description="{{ $marketDescription }}"
                                 data-version="{{ $item['version'] ?? '1.0.0' }}"
                                 data-author="{{ $item['author'] ?? '' }}"
                                 data-thumbnail="{{ $marketImage }}"
+                                data-min-myads="{{ $item['min_myads'] ?? '' }}"
+                                data-product-url="{{ $item['product_url'] ?? '' }}"
                                 data-is-market="1"
                             >
                                 <i class="feather-info"></i>

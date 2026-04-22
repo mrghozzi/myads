@@ -260,8 +260,11 @@
                 </div>
 
                 <div class="tab-pane fade" id="plugins-marketplace-tab" role="tabpanel">
-                    @include('admin::admin.partials.extension_marketplace_panel', ['marketplaceCatalog' => $marketplaceCatalog, 'installedSlugs' => $installedSlugs])
-
+                    @include('admin::admin.partials.extension_marketplace_panel', [
+                        'marketplaceCatalog' => $marketplaceCatalog, 
+                        'installedSlugs' => $installedSlugs,
+                        'detailsModalId' => 'pluginDetailsModal'
+                    ])
                 </div>
             </div>
         </div>
@@ -396,6 +399,12 @@ document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('plugin-content-description').innerHTML = '<div class="text-center py-5"><div class="spinner-border text-primary" role="status"></div></div>';
             document.getElementById('plugin-content-changelog').innerHTML = '';
             document.getElementById('plugin-content-screenshots').innerHTML = '';
+
+            document.getElementById('plugin-modal-version').textContent = '';
+            document.getElementById('plugin-modal-author-name').textContent = '';
+            document.getElementById('plugin-modal-min-myads').textContent = '';
+            document.getElementById('plugin-modal-adstn-link').closest('div').classList.add('d-none');
+            document.getElementById('plugin-modal-website-link').closest('div').classList.add('d-none');
             
             // Hide tabs by default
             document.getElementById('plugin-btn-changelog').closest('li').classList.add('d-none');
@@ -417,15 +426,24 @@ document.addEventListener('DOMContentLoaded', function () {
                 var version = button.getAttribute('data-version');
                 var author = button.getAttribute('data-author');
                 var thumbnail = button.getAttribute('data-thumbnail');
+                var minMyAds = button.getAttribute('data-min-myads');
+                var productUrl = button.getAttribute('data-product-url');
 
                 document.getElementById('plugin-modal-thumbnail').src = thumbnail || '{{ admin_asset("admin-duralux/images/logo-abbr.png") }}';
                 document.getElementById('plugin-modal-title').textContent = name;
                 document.getElementById('plugin-modal-slug-label').textContent = slug;
                 document.getElementById('plugin-modal-version').textContent = version;
                 document.getElementById('plugin-modal-author-name').textContent = author;
-                document.getElementById('plugin-modal-min-myads').textContent = '-';
+                document.getElementById('plugin-modal-min-myads').textContent = minMyAds || '-';
                 
-                document.getElementById('plugin-modal-adstn-link').closest('div').classList.add('d-none');
+                // Sidebar & Links Reset
+                var adstnLink = document.getElementById('plugin-modal-adstn-link');
+                if (productUrl) {
+                    adstnLink.closest('div').classList.remove('d-none');
+                    adstnLink.href = productUrl;
+                } else {
+                    adstnLink.closest('div').classList.add('d-none');
+                }
                 document.getElementById('plugin-modal-website-link').closest('div').classList.add('d-none');
                 
                 document.getElementById('plugin-content-description').innerHTML = description ? DOMPurify.sanitize(marked.parse(description)) : '-';

@@ -89,6 +89,16 @@ class ExtensionMarketplaceCatalogService
                     continue;
                 }
 
+                $downloadUrl = '';
+                if ($product->o_order <= 0) {
+                    $fileMode = (string) $latestFile->o_mode;
+                    if (str_starts_with($fileMode, 'http://') || str_starts_with($fileMode, 'https://')) {
+                        $downloadUrl = $fileMode;
+                    } elseif (str_starts_with($fileMode, 'upload/')) {
+                        $downloadUrl = asset($fileMode);
+                    }
+                }
+
                 $item = [
                     'name' => $metadata['name'],
                     'slug' => $metadata['slug'],
@@ -98,6 +108,7 @@ class ExtensionMarketplaceCatalogService
                     'min_myads' => $metadata['min_myads'],
                     'product_url' => route('store.show', $product->name),
                     'image_url' => (string) ($product->product_image ?? ''),
+                    'download_url' => $downloadUrl,
                     'category' => (string) $typeRow->name,
                     '_priority' => (string) $this->categoryPriority((string) $typeRow->name),
                     '_product_id' => (string) $product->id,

@@ -4,6 +4,7 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class RemoteExtensionMarketplaceService
 {
@@ -44,11 +45,13 @@ class RemoteExtensionMarketplaceService
             ])->timeout(10)->get($this->feedUrl($type));
 
             if (! $response->successful()) {
+                Log::error("Marketplace feed failed: " . $response->status() . " for " . $this->feedUrl($type));
                 return $fallback;
             }
 
             $payload = $response->json();
             if (! is_array($payload) || ! isset($payload['items']) || ! is_array($payload['items'])) {
+                Log::error("Marketplace feed invalid payload: " . json_encode($payload));
                 return $fallback;
             }
 
@@ -66,6 +69,8 @@ class RemoteExtensionMarketplaceService
                 $imageUrl = trim((string) ($item['image_url'] ?? ''));
                 $category = $this->normalizeCategory((string) ($item['category'] ?? ''));
 
+                $downloadUrl = trim((string) ($item['download_url'] ?? ''));
+
                 $items[] = [
                     'name' => trim((string) ($item['name'] ?? '')),
                     'slug' => trim((string) ($item['slug'] ?? '')),
@@ -75,7 +80,7 @@ class RemoteExtensionMarketplaceService
                     'min_myads' => trim((string) ($item['min_myads'] ?? '')),
                     'product_url' => $productUrl,
                     'image_url' => $this->isHttpUrl($imageUrl) ? $imageUrl : '',
-                    'download_url' => trim((string) ($item['download_url'] ?? '')),
+                    'download_url' => $this->isHttpUrl($downloadUrl) ? $downloadUrl : '',
                     'category' => $category,
                 ];
 
@@ -87,7 +92,8 @@ class RemoteExtensionMarketplaceService
                 'error' => null,
                 'browse_url' => $browseUrl,
             ];
-        } catch (\Throwable) {
+        } catch (\Throwable $e) {
+            Log::error("Marketplace feed exception: " . $e->getMessage());
             return $fallback;
         }
     }
