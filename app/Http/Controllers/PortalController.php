@@ -182,19 +182,4 @@ class PortalController extends Controller
 
         return view('theme::portal.share');
     }
-
-    public function developer(Request $request)
-    {
-        $this->seo([
-            'scope_key' => 'developer',
-            'resource_title' => __('messages.developer_docs') ?? 'Developer Documentation',
-            'description' => __('messages.developer_page_description') ?? 'Learn how to integrate MYADS sharing into your external website.',
-            'breadcrumbs' => [
-                ['name' => __('messages.home'), 'url' => url('/')],
-                ['name' => __('messages.developer') ?? 'Developer', 'url' => route('portal.developer')],
-            ],
-        ]);
-
-        return view('theme::pages.developer');
-    }
 }

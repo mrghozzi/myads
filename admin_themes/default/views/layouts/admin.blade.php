@@ -194,6 +194,18 @@
                         </li>
                     @endif
 
+                    @if($canAdmin('developers'))
+                        <li class="nxl-item nxl-hasmenu">
+                            <a href="javascript:void(0);" class="nxl-link">
+                                <span class="nxl-micon"><i class="feather-code"></i></span>
+                                <span class="nxl-mtext">{{ __('messages.developers') }}</span><span class="nxl-arrow"><i class="feather-chevron-right"></i></span>
+                            </a>
+                            <ul class="nxl-submenu">
+                                <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.developers') }}">{{ __('messages.manage_apps') }}</a></li>
+                                <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.developers.settings') }}">{{ __('messages.dev_platform_settings') }}</a></li>
+                            </ul>
+                        </li>
+                    @endif
                     @if($canAdmin('security'))
                         <li class="nxl-item nxl-hasmenu">
                             <a href="javascript:void(0);" class="nxl-link">

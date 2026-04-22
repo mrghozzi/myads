@@ -110,7 +110,28 @@ Route::get('/plans', [BillingController::class, 'plans'])->name('billing.plans')
 // Portal Routes
 Route::get('/portal', [PortalController::class, 'index'])->name('portal.index');
 Route::get('/share', [PortalController::class, 'share'])->name('portal.share')->middleware('auth');
-Route::get('/developer', [PortalController::class, 'developer'])->name('portal.developer');
+
+// Developer Platform
+Route::prefix('developer')->group(function () {
+    Route::get('/', [App\Http\Controllers\DeveloperPlatformController::class, 'index'])->name('developer.index');
+    Route::get('/apps', [App\Http\Controllers\DeveloperPlatformController::class, 'apps'])->name('developer.apps.index');
+    Route::get('/apps/create', [App\Http\Controllers\DeveloperPlatformController::class, 'create'])->name('developer.apps.create');
+    Route::post('/apps', [App\Http\Controllers\DeveloperPlatformController::class, 'store'])->name('developer.apps.store');
+    Route::get('/apps/{app}', [App\Http\Controllers\DeveloperPlatformController::class, 'show'])->name('developer.apps.show');
+    Route::put('/apps/{app}', [App\Http\Controllers\DeveloperPlatformController::class, 'update'])->name('developer.apps.update');
+    Route::post('/apps/{app}/rotate-secret', [App\Http\Controllers\DeveloperPlatformController::class, 'rotateSecret'])->name('developer.apps.rotate_secret');
+    Route::post('/apps/{app}/submit', [App\Http\Controllers\DeveloperPlatformController::class, 'submit'])->name('developer.apps.submit');
+});
+
+// OAuth
+Route::get('/oauth/authorize', [App\Http\Controllers\OAuthController::class, 'authorizeRequest'])->name('oauth.authorize');
+Route::post('/oauth/authorize', [App\Http\Controllers\OAuthController::class, 'authorizeResponse'])->name('oauth.authorize.post');
+Route::post('/oauth/token', [App\Http\Controllers\OAuthController::class, 'token'])->name('oauth.token');
+
+// Developer Embed Widgets
+Route::get('/embed/developer/{app}/follow.js', [App\Http\Controllers\DeveloperWidgetController::class, 'follow'])->name('developer.widget.follow');
+Route::get('/embed/developer/{app}/profile.js', [App\Http\Controllers\DeveloperWidgetController::class, 'profile'])->name('developer.widget.profile');
+Route::get('/embed/developer/{app}/content.js', [App\Http\Controllers\DeveloperWidgetController::class, 'content'])->name('developer.widget.content');
 Route::get('/badges', [ProfileController::class, 'allBadges'])->name('badges.all');
 
 // Groups Routes
@@ -323,6 +344,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/settings/social', [ProfileController::class, 'updateSocial'])->name('profile.social.update');
     Route::get('/settings/sessions', [ProfileController::class, 'sessions'])->name('profile.sessions');
     Route::post('/settings/sessions/{id}/revoke', [ProfileController::class, 'revokeSession'])->name('profile.sessions.revoke');
+    Route::get('/settings/apps', [ProfileController::class, 'authorizedApps'])->name('profile.apps');
+    Route::post('/settings/apps/{authorization}/revoke', [ProfileController::class, 'revokeAuthorizedApp'])->name('profile.apps.revoke');
     Route::post('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
     Route::post('/profile/{id}/follow', [ProfileController::class, 'toggleFollow'])->name('profile.follow');
 });
@@ -615,6 +638,15 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::put('/pages/{id}', [AdminPageController::class, 'update'])->name('admin.pages.update');
     Route::delete('/pages/{id}', [AdminPageController::class, 'destroy'])->name('admin.pages.delete');
     Route::post('/pages/generate-slug', [AdminPageController::class, 'generateSlug'])->name('admin.pages.generate_slug');
+
+    // Developers
+    Route::prefix('developers')->group(function () {
+        Route::get('/', [App\Http\Controllers\AdminDeveloperController::class, 'index'])->name('admin.developers');
+        Route::get('/settings', [App\Http\Controllers\AdminDeveloperController::class, 'settings'])->name('admin.developers.settings');
+        Route::post('/settings', [App\Http\Controllers\AdminDeveloperController::class, 'updateSettings'])->name('admin.developers.settings.update');
+        Route::get('/{app}', [App\Http\Controllers\AdminDeveloperController::class, 'show'])->name('admin.developers.show');
+        Route::post('/{app}/status', [App\Http\Controllers\AdminDeveloperController::class, 'updateStatus'])->name('admin.developers.status');
+    });
 
     // Maintenance
     Route::get('/maintenance', [AdminController::class, 'maintenance'])->name('admin.maintenance');

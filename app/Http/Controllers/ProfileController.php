@@ -828,4 +828,29 @@ class ProfileController extends Controller
             ]
         );
     }
+
+    public function authorizedApps()
+    {
+        $user = Auth::user();
+        $authorizations = \App\Models\DeveloperAuthorization::where('user_id', $user->id)
+            ->with('app')
+            ->get();
+
+        return view('theme::profile.authorized_apps', compact('user', 'authorizations'));
+    }
+
+    public function revokeAuthorizedApp(Request $request, int $id)
+    {
+        $user = Auth::user();
+        $authorization = \App\Models\DeveloperAuthorization::where('user_id', $user->id)->findOrFail($id);
+
+        // Revoke tokens
+        \App\Models\DeveloperAccessToken::where('user_id', $user->id)
+            ->where('developer_app_id', $authorization->developer_app_id)
+            ->update(['revoked' => true]);
+
+        $authorization->delete();
+
+        return back()->with('success', __('messages.app_access_revoked'));
+    }
 }

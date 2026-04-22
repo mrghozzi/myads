@@ -104,6 +104,18 @@
 * **Fix**: Corrected the **Store Action Menu** positioning and overflow rules in RTL mode to prevent the menu from being clipped at the edges of the product header.
 * **UX**: Improved the administrative feedback loop by implementing a direct redirect back to the product edit page with clear status messages after successful updates or ownership changes.
 
+### Developer Platform
+* **Feature**: Introduced the **Developer Platform (v1)**, allowing third-party website owners to build integrations and applications powered by MYADS.
+* **OAuth 2.0**: Implemented a secure **OAuth 2.0 Authorization Code** flow for confidential web applications, including `client_id`, `client_secret`, and redirect URI validation.
+* **Member UX**: Added a dedicated **My Applications** dashboard at `/developer/apps` for members to create, manage, and monitor their applications.
+* **Developer Docs**: Overhauled the `/developer` page into a full documentation hub with guides for OAuth, Client Credentials, and Application Management.
+* **Admin Moderation**: Introduced a new **Developer Management** workspace at `/admin/developers`, allowing administrators to review application requests, manage active apps, and revoke credentials.
+* **Eligibility Rules**: Added platform-wide **Developer Eligibility Rules** manageable from `/admin/developers/settings`, including requirements for account age, follower count, and active paid plans.
+* **Superdesign**: Completely redesigned the developer-related admin views (`/admin/developers`, `/admin/developers/settings`, `/admin/developers/show`) with the premium Duralux aesthetic, featuring high-fidelity stats, glassmorphic headers, and responsive layouts.
+* **Fix**: Resolved a critical `500 Internal Server Error` on the **Community Portal** (`/portal`) and landing page footer caused by a legacy route name reference (`portal.developer`).
+* **i18n**: Added comprehensive translation keys for the entire developer platform, OAuth states, application moderation, and eligibility rules across all **9 supported languages**.
+* **Architecture**: Integrated the developer platform with the existing `Option` settings engine and `AdminNotificationService` for real-time moderation alerts.
+
 ---
 
 # v4.2.5

@@ -76,6 +76,21 @@ class AdminNotificationService
             }
         }
 
+        // Developer Apps Pending Review
+        if ($this->adminAccess->canAccess($user, null, 'developers')) {
+            $developerAppCount = \App\Models\DeveloperApp::where('status', 'pending_review')->count();
+            if ($developerAppCount > 0) {
+                $notifications[] = [
+                    'id' => 'developer_apps',
+                    'count' => $developerAppCount,
+                    'label' => __('messages.new_developer_apps_pending', ['count' => $developerAppCount]),
+                    'icon' => 'feather-box',
+                    'url' => route('admin.developers'),
+                    'module' => 'developers'
+                ];
+            }
+        }
+
         // 3. System Updates (if user has access to updates module)
         if ($this->adminAccess->canAccess($user, null, 'updates')) {
             $currentVersion = SystemVersion::CURRENT;

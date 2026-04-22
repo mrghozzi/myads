@@ -29,6 +29,7 @@ class AdminAccessService
         'maintenance',
         'security',
         'billing',
+        'developers',
     ];
 
     public function recordFor(User $user): ?SiteAdmin
@@ -113,6 +114,7 @@ class AdminAccessService
             str_starts_with($routeName, 'admin.news'),
             str_starts_with($routeName, 'admin.reports'),
             str_starts_with($routeName, 'admin.products') => 'community',
+            str_starts_with($routeName, 'admin.developers') => 'developers',
             default => null,
         };
     }

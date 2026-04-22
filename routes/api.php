@@ -41,3 +41,17 @@ Route::middleware('auth:sanctum')->group(function () {
     
     // Add other endpoints here
 });
+
+// Developer Platform API v1
+Route::prefix('developer/v1')->group(function () {
+    Route::get('/me', [App\Http\Controllers\DeveloperApiController::class, 'me'])->name('api.developer.me');
+    Route::get('/me/profile', [App\Http\Controllers\DeveloperApiController::class, 'myProfile'])->name('api.developer.me.profile');
+    
+    Route::get('/owner/profile', [App\Http\Controllers\DeveloperApiController::class, 'ownerProfile'])->name('api.developer.owner.profile');
+    Route::get('/owner/content', [App\Http\Controllers\DeveloperApiController::class, 'ownerContent'])->name('api.developer.owner.content');
+    
+    Route::post('/owner/follow', [App\Http\Controllers\DeveloperApiController::class, 'ownerFollow'])->name('api.developer.owner.follow');
+    
+    // Route::get('/owner/messages', [App\Http\Controllers\DeveloperApiController::class, 'ownerMessagesRead'])->name('api.developer.owner.messages.read'); // Not implemented yet
+    Route::post('/owner/messages', [App\Http\Controllers\DeveloperApiController::class, 'ownerMessages'])->name('api.developer.owner.messages');
+});

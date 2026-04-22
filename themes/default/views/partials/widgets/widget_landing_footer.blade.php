@@ -9,7 +9,7 @@
                 <i class="fa-solid fa-sitemap"></i>
                 {{ __('messages.sitemap') }}
             </a>
-            <a href="{{ route('portal.developer') }}">
+            <a href="{{ route('developer.index') }}">
                 <i class="fa-solid fa-code"></i>
                 {{ __('messages.developers') }}
             </a>
