@@ -89,6 +89,11 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin.password.confirm' => \App\Http\Middleware\RequireAdminPasswordConfirmation::class,
         ]);
 
+        $middleware->redirectTo(
+            guests: '/login',
+            users: '/home'
+        );
+
         // Exclude installer routes from CSRF verification
         // (session may not persist during fresh install on some hosting)
         $middleware->validateCsrfTokens(except: [
