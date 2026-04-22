@@ -91,6 +91,41 @@
             </div>
         @endif
 
+        <div class="widget-box dev-panel" style="margin-bottom: 20px;">
+            <p class="widget-box-title">{{ __('messages.api_credentials') }}</p>
+            <div class="widget-box-content" style="padding: 28px;">
+                <p class="dev-card-copy">{{ __('messages.dev_credentials_help') }}</p>
+
+                <div class="dev-credential-field" style="margin-top: 18px;">
+                    <label for="developer-client-id">{{ __('messages.client_id') }}</label>
+                    <div class="dev-credential-input">
+                        <input id="developer-client-id" type="text" class="form-control dev-control" value="{{ $app->client_id }}" readonly>
+                        <button type="button" class="js-dev-copy dev-inline-icon-btn" data-copy-target="#developer-client-id">
+                            <i class="fa fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="dev-credential-field" style="margin-top: 18px;">
+                    <label for="developer-client-secret">Client Secret</label>
+                    <div class="dev-credential-input">
+                        <input id="developer-client-secret" type="password" class="form-control dev-control" value="{{ $app->client_secret }}" readonly>
+                        <button type="button" class="js-dev-toggle-secret dev-inline-icon-btn" data-target="#developer-client-secret">
+                            <i class="fa fa-eye"></i>
+                        </button>
+                        <button type="button" class="js-dev-copy dev-inline-icon-btn" data-copy-target="#developer-client-secret">
+                            <i class="fa fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <form action="{{ route('developer.apps.rotate_secret', $app->id) }}" method="POST" style="margin-top: 18px;" onsubmit="return confirm('@lang('messages.rotate_secret_confirm')')">
+                    @csrf
+                    <button type="submit" class="button secondary">{{ __('messages.rotate_secret') }}</button>
+                </form>
+            </div>
+        </div>
+
         <div class="widget-box dev-panel">
             <p class="widget-box-title">{{ __('messages.app_settings') }}</p>
             <div class="widget-box-content" style="padding: 32px;">
@@ -115,40 +150,6 @@
 
     <div class="grid-column">
         <div class="dev-side-stack">
-            <div class="widget-box dev-panel">
-                <p class="widget-box-title">{{ __('messages.api_credentials') }}</p>
-                <div class="widget-box-content" style="padding: 28px;">
-                    <p class="dev-card-copy">{{ __('messages.dev_credentials_help') }}</p>
-
-                    <div class="dev-credential-field" style="margin-top: 18px;">
-                        <label for="developer-client-id">{{ __('messages.client_id') }}</label>
-                        <div class="dev-credential-input">
-                            <input id="developer-client-id" type="text" class="form-control dev-control" value="{{ $app->client_id }}" readonly>
-                            <button type="button" class="dev-inline-icon-btn js-dev-copy" data-copy-target="#developer-client-id">
-                                <i class="fa fa-copy"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="dev-credential-field" style="margin-top: 18px;">
-                        <label for="developer-client-secret">Client Secret</label>
-                        <div class="dev-credential-input">
-                            <input id="developer-client-secret" type="password" class="form-control dev-control" value="{{ $app->client_secret }}" readonly>
-                            <button type="button" class="dev-inline-icon-btn js-dev-toggle-secret" data-target="#developer-client-secret">
-                                <i class="fa fa-eye"></i>
-                            </button>
-                            <button type="button" class="dev-inline-icon-btn js-dev-copy" data-copy-target="#developer-client-secret">
-                                <i class="fa fa-copy"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <form action="{{ route('developer.apps.rotate_secret', $app->id) }}" method="POST" style="margin-top: 18px;" onsubmit="return confirm('@lang('messages.rotate_secret_confirm')')">
-                        @csrf
-                        <button type="submit" class="button secondary">{{ __('messages.rotate_secret') }}</button>
-                    </form>
-                </div>
-            </div>
 
             <div class="widget-box dev-panel">
                 <p class="widget-box-title">{{ __('messages.take_action') }}</p>
