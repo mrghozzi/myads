@@ -10,6 +10,7 @@
         <a href="{{ route('profile.privacy') }}" class="button {{ request()->routeIs('profile.privacy') ? 'primary' : 'secondary' }} full" style="border-radius: 0; box-shadow: none;">{{ __('messages.privacy_settings') }}</a>
         <a href="{{ route('profile.social') }}" class="button {{ request()->routeIs('profile.social') ? 'primary' : 'secondary' }} full" style="border-radius: 0; box-shadow: none;">{{ __('messages.social_links') }}</a>
         <a href="{{ route('profile.sessions') }}" class="button {{ request()->routeIs('profile.sessions') ? 'primary' : 'secondary' }} full" style="border-radius: 0; box-shadow: none;">{{ __('messages.active_sessions') }}</a>
+        <a href="{{ route('profile.apps') }}" class="button {{ request()->routeIs('profile.apps') ? 'primary' : 'secondary' }} full" style="border-radius: 0; box-shadow: none;">{{ __('messages.authorized_apps') }}</a>
         @if($showBillingLink)
             <a href="{{ route('billing.dashboard') }}" class="button {{ request()->routeIs('billing.*') ? 'primary' : 'secondary' }} full" style="border-radius: 0; box-shadow: none;">{{ __('messages.billing_feature_title') }}</a>
         @endif
