@@ -61,7 +61,7 @@
 
         @if(method_exists($relationshipItems, 'hasPages') && $relationshipItems->hasPages())
             <div class="profile-relationships-pagination">
-                {{ $relationshipItems->links() }}
+                {{ $relationshipItems->onEachSide(1)->links('pagination::bootstrap-5') }}
             </div>
         @endif
     </div>

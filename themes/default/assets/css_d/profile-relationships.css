@@ -270,7 +270,77 @@
 }
 
 .profile-relationships-pagination {
+  display: flex;
+  justify-content: center;
   margin-top: 32px;
+}
+
+.profile-relationships-pagination nav {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.profile-relationships-pagination .pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 0;
+  padding: 12px 14px;
+  border: 1px solid #2f3749;
+  border-radius: 18px;
+  background: linear-gradient(180deg, #242b3d 0%, #1f2535 100%);
+  box-shadow: 0 18px 34px rgba(0, 0, 0, 0.16);
+}
+
+.profile-relationships-pagination .page-item {
+  margin: 0;
+}
+
+.profile-relationships-pagination .page-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 42px;
+  height: 42px;
+  padding: 0 14px;
+  border: 1px solid #2f3749;
+  border-radius: 14px;
+  background: #1d2333;
+  color: #d7ddf1;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  line-height: 1;
+  box-shadow: none;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease, color 0.2s ease;
+}
+
+.profile-relationships-pagination .page-link:focus {
+  box-shadow: 0 0 0 0.2rem rgba(97, 93, 250, 0.24);
+}
+
+.profile-relationships-pagination .page-item:not(.active):not(.disabled) .page-link:hover {
+  transform: translateY(-1px);
+  border-color: rgba(97, 93, 250, 0.38);
+  background: #293249;
+  color: #fff;
+}
+
+.profile-relationships-pagination .page-item.active .page-link,
+.profile-relationships-pagination .page-item.active .page-link:hover {
+  border-color: transparent;
+  background: #615dfa;
+  color: #fff;
+  box-shadow: 0 16px 26px rgba(97, 93, 250, 0.28);
+}
+
+.profile-relationships-pagination .page-item.disabled .page-link {
+  border-color: transparent;
+  background: transparent;
+  color: #9aa4bf;
+  opacity: 0.68;
 }
 
 @media screen and (max-width: 1200px) {
@@ -314,5 +384,23 @@
 
   .profile-relationship-card {
     padding: 22px 20px;
+  }
+
+  .profile-relationships-pagination {
+    margin-top: 24px;
+  }
+
+  .profile-relationships-pagination .pagination {
+    width: 100%;
+    padding: 10px;
+    gap: 8px;
+    border-radius: 16px;
+  }
+
+  .profile-relationships-pagination .page-link {
+    min-width: 38px;
+    height: 38px;
+    padding: 0 12px;
+    font-size: 0.75rem;
   }
 }
