@@ -412,43 +412,7 @@
     padding: 18px 44px;
 }
 
-/* --- Footer --- */
-.landing-footer {
-    background: #1a1a2e;
-    padding: 60px 20px;
-    text-align: center;
-    border-top: 1px solid rgba(255,255,255,0.05);
-}
-.landing-footer-links {
-    margin-bottom: 25px;
-    display: flex;
-    justify-content: center;
-    gap: 30px;
-    flex-wrap: wrap;
-}
-.landing-footer-links a {
-    color: rgba(255,255,255,0.5);
-    text-decoration: none;
-    font-size: 0.95rem;
-    font-weight: 500;
-    transition: all 0.3s ease;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-}
-.landing-footer-links a:hover {
-    color: #fff;
-    transform: translateY(-2px);
-}
-.landing-footer-links a i {
-    font-size: 0.85rem;
-    opacity: 0.7;
-}
-.landing-footer p {
-    color: rgba(255,255,255,0.3);
-    font-size: 0.85rem;
-    margin-top: 10px;
-}
+
 
 /* --- Responsive --- */
 @media (max-width: 768px) {
@@ -711,31 +675,7 @@
 
     @include('theme::partials.ads', ['id' => 6])
 
-    {{-- ===== FOOTER ===== --}}
-    <div class="landing-footer">
-        <div class="landing-footer-links landing-fade-up">
-            <a href="{{ route('sitemap.xml') }}">
-                <i class="fa-solid fa-sitemap"></i>
-                {{ __('messages.sitemap') }}
-            </a>
-            <a href="{{ route('developer.index') }}">
-                <i class="fa-solid fa-code"></i>
-                {{ __('messages.developers') }}
-            </a>
-            <a href="{{ route('privacy') }}">
-                <i class="fa-solid fa-shield-halved"></i>
-                {{ __('messages.privacy_policy') }}
-            </a>
-            <a href="{{ route('terms') }}">
-                <i class="fa-solid fa-file-contract"></i>
-                {{ __('messages.terms_conditions') }}
-            </a>
-        </div>
-        <p class="landing-fade-up">&copy; {{ date('Y') }} {{ $site_settings->titer ?? 'MyAds' }}. {{ __('messages.all_rights_reserved') }}</p>
-        <p class="landing-fade-up" style="opacity: 0.5; margin-top: 8px; font-size: 0.75rem; letter-spacing: 0.02em;">
-            Powered by <strong>MyAds SEO Engine</strong> | {{ \App\Support\SystemVersion::tag() }}
-        </p>
-    </div>
+    @include('theme::partials.footer')
 
 </div>
 @endsection

@@ -61,6 +61,7 @@
 * **Feature**: Added a dedicated **Subscription Management** section to the User Edit page (visible when billing is enabled), allowing administrators to manually grant, change, or cancel member subscriptions directly from the dashboard.
 * **Notifications**: Introduced a **Notify user of changes** toggle in the User Edit form, enabling administrators to send internal system notifications to members whenever their account details or subscription status are modified.
 * **Add**: Added new translation keys for manual subscription grants, cancellation actions, and administrator update notifications in both Arabic and English.
+* **Fix**: Resolved visual styling inconsistencies in the registration and password reset forms by updating email input types and removing conflicting CSS classes to match the custom theme.
 
 ### Admin Notifications
 * **Feature**: Introduced a centralized **Admin Notification System** in the dashboard header to alert the administration team about critical events.
@@ -70,6 +71,13 @@
 * **i18n**: Fully localized all notification labels and module descriptions across all **9 supported languages**, including specialized Arabic terminology.
 * **Architecture**: Centrally managed via `AdminNotificationService` and injected through `AdminNotificationComposer` for consistent header state across all admin views.
 * **Performance**: Integrated 1-hour caching for external update checks to ensure optimal dashboard performance.
+
+### Security & Hardening
+* **Audit**: Completed a comprehensive security audit of v4.3.0 modules, including OAuth 2.0, Billing, Marketplace, and Groups.
+* **Fix**: Resolved a critical functional bug in the OAuth 2.0 flow where the hashed authorization code was being incorrectly sent in the redirect URI; refactored to securely send the plain code while maintaining hashed storage for exchange verification.
+* **Add**: Hardened the **Redirect URI Validation** for developer applications, enforcing strict string matching against registered URIs to prevent authorization code leakage.
+* **Add**: Implemented **Admin Password Confirmation** for high-risk security actions in the dashboard, manageable via a configurable TTL (Time-To-Live).
+* **Fix**: Updated **phpseclib/phpseclib** from `3.0.50` to `3.0.51` to ensure the latest security patches and cryptographic stability.
 
 ### Store Responsiveness & UX Tuning
 * **UI**: Completely overhauled the Store Product page (`/store/{name}`) responsiveness, ensuring a premium experience across all mobile viewports (320px to 768px).
@@ -107,13 +115,16 @@
 ### Developer Platform
 * **Feature**: Introduced the **Developer Platform (v1)**, allowing third-party website owners to build integrations and applications powered by MYADS.
 * **OAuth 2.0**: Implemented a secure **OAuth 2.0 Authorization Code** flow for confidential web applications, including `client_id`, `client_secret`, and redirect URI validation.
-* **Member UX**: Added a dedicated **My Applications** dashboard at `/developer/apps` for members to create, manage, and monitor their applications.
+* **Member UX**: Redesigned the **Authorized Applications** settings page (`/settings/apps`) to align with the platform's standard settings layout, featuring hex-avatars, glassmorphic headers, and modern widget boxes.
+* **Add**: Added a dedicated **My Applications** dashboard at `/developer/apps` for members to create, manage, and monitor their applications.
 * **Developer Docs**: Overhauled the `/developer` page into a full documentation hub with guides for OAuth, Client Credentials, and Application Management.
 * **Admin Moderation**: Introduced a new **Developer Management** workspace at `/admin/developers`, allowing administrators to review application requests, manage active apps, and revoke credentials.
 * **Eligibility Rules**: Added platform-wide **Developer Eligibility Rules** manageable from `/admin/developers/settings`, including requirements for account age, follower count, and active paid plans.
 * **Superdesign**: Completely redesigned the developer-related admin views (`/admin/developers`, `/admin/developers/settings`, `/admin/developers/show`) with the premium Duralux aesthetic, featuring high-fidelity stats, glassmorphic headers, and responsive layouts.
+* **RTL**: Fixed visual layout overlap between checkboxes and labels in the Developer App creation form for RTL languages (Arabic, Persian).
 * **Fix**: Resolved a critical `500 Internal Server Error` on the **Community Portal** (`/portal`) and landing page footer caused by a legacy route name reference (`portal.developer`).
-* **i18n**: Added comprehensive translation keys for the entire developer platform, OAuth states, application moderation, and eligibility rules across all **9 supported languages**.
+* **Fix**: Resolved a Blade compilation error where the `requested_scopes` identifier was incorrectly interpreted as a class name during app creation.
+* **i18n**: Fully localized the developer platform across all **9 supported languages**, ensuring site names and platform descriptions are dynamically retrieved from system settings.
 * **Architecture**: Integrated the developer platform with the existing `Option` settings engine and `AdminNotificationService` for real-time moderation alerts.
 
 ---

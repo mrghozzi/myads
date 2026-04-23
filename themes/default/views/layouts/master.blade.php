@@ -620,10 +620,12 @@
         @include('theme::partials.ads', ['id' => 6])
     @endunless
 
-    <!-- Footer -->
-    <footer>
-        <!-- Place footer content here if any -->
-    </footer>
+
+
+    <!-- Global Footer -->
+    @if(Request::is('store*', 'forum*', 'f*', 't*', 'home', 'news*', 'ads*', 'groups*', 'badges*', 'quests*', 'settings*'))
+        @include('theme::partials.footer')
+    @endif
 
     <!-- Scripts -->
     <script src="{{ theme_asset('js/app.js') }}" defer></script>
