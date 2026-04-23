@@ -4,6 +4,10 @@
 ### OAuth 2.0 & Integrations
 * **Fix**: Resolved "Page Expired" (419) error during the **ADStn OAuth token exchange** flow. The `/oauth/token` endpoint is now excluded from CSRF verification in `bootstrap/app.php`, allowing server-to-server POST requests for access token retrieval without a session-based CSRF token.
 
+### Marketplace & Extensions
+* **Fix**: Resolved an issue where marketplace extension downloads (plugins/themes) via the API were not being tracked in the download counter by transitioning to tracked download routes.
+* **UX**: Enabled guest downloads for free products in the store to support automated extension installers and improve public accessibility for free resources.
+
 ---
 
 # v4.3.0

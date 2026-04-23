@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Option;
 use App\Models\Product;
 use App\Models\ProductFile;
+use App\Models\Short;
 use App\Support\StoreCategoryCatalog;
 use Illuminate\Support\Facades\Cache;
 
@@ -73,6 +74,12 @@ class ExtensionMarketplaceCatalogService
                 ->groupBy('o_parent')
                 ->map(static fn ($files) => $files->first());
 
+            $shortLinks = Short::query()
+                ->where('sh_type', 7867)
+                ->whereIn('tp_id', $latestFiles->pluck('id'))
+                ->get()
+                ->keyBy('tp_id');
+
             $metadataFile = $type === 'plugins' ? 'plugin.json' : 'theme.json';
             $itemsBySlug = [];
 
@@ -91,11 +98,9 @@ class ExtensionMarketplaceCatalogService
 
                 $downloadUrl = '';
                 if ($product->o_order <= 0) {
-                    $fileMode = (string) $latestFile->o_mode;
-                    if (str_starts_with($fileMode, 'http://') || str_starts_with($fileMode, 'https://')) {
-                        $downloadUrl = $fileMode;
-                    } elseif (str_starts_with($fileMode, 'upload/')) {
-                        $downloadUrl = asset($fileMode);
+                    $shortLink = $shortLinks->get($latestFile->id);
+                    if ($shortLink) {
+                        $downloadUrl = route('store.download.hash', $shortLink->sho);
                     }
                 }
 

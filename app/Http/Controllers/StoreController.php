@@ -348,24 +348,24 @@ class StoreController extends Controller
 
     public function downloadByHash(Request $request, $hash)
     {
-        if (!Auth::check()) {
-            return redirect()->route('login');
-        }
-
         $short = Short::where('sho', $hash)->where('sh_type', 7867)->firstOrFail();
         $fileOption = ProductFile::where('id', $short->tp_id)->firstOrFail();
         $product = Product::withoutGlobalScope('store')->where('o_type', 'store')->where('id', $fileOption->o_parent)->firstOrFail();
         $user = Auth::user();
 
         // [v4.2.0] Block download if suspended
-        $canManage = $user->id == $product->o_parent || $user->isAdmin();
+        $canManage = $user && ($user->id == $product->o_parent || $user->isAdmin());
         if ($product->is_suspended && !$canManage) {
             return redirect()->route('store.show', $product->name)->with('error', __('messages.product_suspended_notice'));
         }
 
-        if ($user->id != $product->o_parent) {
-            $price = $product->o_order;
-            if ($price > 0) {
+        if ($product->o_order > 0) {
+            if (!Auth::check()) {
+                return redirect()->route('login');
+            }
+
+            if ($user->id != $product->o_parent) {
+                $price = $product->o_order;
                 if ($user->pts < $price) {
                     return redirect()->back()->with('error', __('not_enough_points'));
                 }
@@ -1050,7 +1050,7 @@ class StoreController extends Controller
             abort(404, 'File missing from storage');
         }
 
-        app(\App\Services\GamificationService::class)->recordEvent(Auth::id(), 'product_downloaded');
+        app(\App\Services\GamificationService::class)->recordEvent((int) Auth::id(), 'product_downloaded');
 
         return redirect($short->url);
     }
