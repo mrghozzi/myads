@@ -48,7 +48,7 @@ MYADS is a community platform where website owners:
 | DB | MySQL/MariaDB via PDO |
 | Caching | File-based (configurable) |
 | Sessions | File-based (configurable) |
-| Mail | SMTP (configurable) |
+| Mail | SMTP (database-configurable via `MailConfigServiceProvider`) |
 | Dev tools | PHPUnit 11, Faker, Pint, Pail |
 
 **Key composer packages:** `laravel/framework`, `laravel/socialite`, `laravel/tinker`
@@ -71,7 +71,7 @@ myads/
 │   │   ├── Controllers/    # 45 controllers (see §5)
 │   │   └── Middleware/     # AdminMiddleware, SetLocale, UpdateUserOnline, CheckSystemVersion, InstallerGuard, TrackSeoMetrics
 │   ├── Models/             # 40+ Eloquent models (see §6)
-│   ├── Providers/          # AppServiceProvider, ThemeServiceProvider, PluginServiceProvider, InstallerServiceProvider
+│   ├── Providers/          # AppServiceProvider, ThemeServiceProvider, PluginServiceProvider, InstallerServiceProvider, MailConfigServiceProvider
 │   ├── Services/           # Business logic services (see §7)
 │   ├── Support/            # Value objects, formatters, settings bags, version metadata, embed code generators
 │   ├── Traits/             # HasPrivacy
@@ -79,7 +79,7 @@ myads/
 ├── bootstrap/
 ├── config/                 # Standard Laravel config (app, auth, cache, database, etc.)
 ├── database/
-│   ├── migrations/         # 43 migration files (chronological, prefixed by date)
+│   ├── migrations/         # 44 migration files (chronological, prefixed by date)
 │   ├── seeders/            # DatabaseSeeder.php
 │   └── factories/
 ├── Documents/              # Project documentation (README, API_DOCS, changelogs, guides)
@@ -164,6 +164,7 @@ myads/
 | `AdminOrderController` | Admin marketplace dashboard and moderation actions for service requests |
 | `AdminSeoController` | SEO suite admin |
 | `AdminPageController` | Custom pages admin CRUD |
+| `AdminMailSettingsController` | Database-driven mail configuration admin page (`/admin/settings/mail`) |
 | `AdminStatusPromotionController` | Admin monitoring and settings for promoted community posts |
 | `AdminUpdatesController` | System update management |
 | `SitemapController` | Dynamic sitemap generation |
@@ -221,6 +222,7 @@ myads/
 | `BillingCurrency` | `billing_currencies` | Billing currencies, base-currency flag, and manual exchange rates |
 | `SiteAdmin` | `site_admins` | Admin ACL (module-scoped permissions) |
 | `UserPrivacySetting` | `user_privacy_settings` | Per-member privacy controls |
+| `MailSetting` | `mail_settings` | Singleton mail configuration (mailer, host, port, credentials, encryption, sender info) with encrypted password |
 | `SeoSetting` / `SeoRule` / `SeoDailyMetric` | `seo_settings` / `seo_rules` / `seo_daily_metrics` | SEO engine |
 
 ---
@@ -262,6 +264,7 @@ myads/
 | `TestingSafetyGuard` | Hard-fails tests unless they are using the isolated SQLite testing database |
 | `UpdateSafetyService` | Preflight safety checks for updates: DB connection, writable paths, pending migrations, destructive migration detection |
 | `AdminNotificationService` | Aggregates pending admin tasks (billing, reports, updates) with permission-aware filtering |
+| `MailConfigServiceProvider` | Boots early to override `config('mail.*')` from the `mail_settings` database table at runtime, with graceful fallback |
 
 ---
 
@@ -302,6 +305,7 @@ myads/
 | `/admin/billing` | `/admin/billing` | Admin billing overview and financial hub |
 | `/admin/billing/gateways` | `/admin/billing/gateways` | Admin gateway configuration for Stripe, PayPal, and Bank Transfer |
 | `/admin/orders` | `/admin/orders` | Admin marketplace moderation dashboard under the `community` ACL scope |
+| `/admin/settings/mail` | `/admin/settings/mail` | Database-driven mail configuration (SMTP, sendmail, log, array) |
 | `/share` | `/share?text={content}` | External share endpoint (requires auth) |
 | `/developer` | `/developer` | Public developer documentation for Share API |
 
@@ -357,6 +361,7 @@ billing/       → Member billing catalog, dashboard, order details
 layouts/       → admin shell layout (`admin::layouts.admin`)
 admin/billing/ → Billing hub, plans, orders, transactions, currencies, gateways
 admin/orders/  → Marketplace moderation dashboard and request detail views
+admin/mail_settings.blade.php → Database-driven mail configuration form
 ```
 
 ### Theme Assets Helper

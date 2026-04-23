@@ -1,5 +1,14 @@
 # v4.3.1
-> **Maintenance Release** — OAuth stability and CSRF refinements.
+> **Maintenance Release** — OAuth stability, CSRF refinements, and admin mail configuration.
+
+### Mail Settings (Database-Driven)
+* **Feature**: Migrated mail configuration from the static `.env` file to a dedicated **database-driven** management page at `/admin/settings/mail`, enabling runtime mail configuration changes without server file edits.
+* **Add**: Created the `mail_settings` singleton table storing `mail_mailer`, `mail_host`, `mail_port`, `mail_username`, `mail_password` (encrypted via `Crypt`), `mail_encryption`, `mail_from_address`, and `mail_from_name`.
+* **Add**: Introduced `MailConfigServiceProvider` that boots early and overrides Laravel's `config('mail.*')` from the database at runtime, with graceful fallback to `config/mail.php` defaults when the table is missing or empty.
+* **Add**: Built a Duralux-themed admin form with JS-driven SMTP section toggle (show/hide based on selected mail driver), password-keep-on-blank logic, and conditional SMTP field validation.
+* **Cleanup**: Removed legacy SMTP fields from `/admin/settings/system` and the corresponding `.env`-writing logic from `AdminController::updateSystemSettings()`, replacing them with a redirect link to the new dedicated page.
+* **Security**: Mail password is stored encrypted in the database using Laravel `Crypt` and is never displayed in the admin form; submitting a blank password preserves the existing stored value.
+* **i18n**: Added 18 mail settings translation keys across all **9 supported languages**, with full Arabic and Persian translations.
 
 ### OAuth 2.0 & Integrations
 * **Fix**: Resolved "Page Expired" (419) error during the **ADStn OAuth token exchange** flow. The `/oauth/token` endpoint is now excluded from CSRF verification in `bootstrap/app.php`, allowing server-to-server POST requests for access token retrieval without a session-based CSRF token.

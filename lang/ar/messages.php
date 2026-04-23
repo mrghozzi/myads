@@ -2612,4 +2612,23 @@ return [
     'dev_step_3_desc' => 'استخدم نماذجنا البرمجية الشاملة للربط مع الخلفية البرمجية أو تضمين الأدوات التفاعلية مباشرة في موقعك.',
     'dev_code_examples' => 'نماذج برمجية',
     'dev_all_languages' => 'كافة اللغات',
+
+    // Mail Settings
+    'mail_settings_title' => 'إعدادات البريد',
+    'mail_settings_desc' => 'ضبط إعدادات تسليم البريد. جميع التغييرات تُحفظ في قاعدة البيانات وتُطبَّق وقت التشغيل.',
+    'mail_settings_db_notice' => 'هذه الصفحة تحفظ إعدادات البريد في قاعدة البيانات — لن يُعدَّل ملف .env.',
+    'mail_mailer' => 'نظام الإرسال',
+    'mail_host' => 'خادم البريد',
+    'mail_port' => 'منفذ البريد',
+    'mail_username' => 'اسم المستخدم',
+    'mail_password' => 'كلمة المرور',
+    'mail_password_hint' => 'اتركه فارغاً للإبقاء على كلمة المرور الحالية',
+    'mail_encryption' => 'التشفير',
+    'mail_encryption_none' => 'بدون تشفير',
+    'mail_from_address' => 'عنوان المرسل',
+    'mail_from_name' => 'اسم المرسل',
+    'mail_smtp_settings' => 'إعدادات SMTP',
+    'mail_sender_info' => 'معلومات المرسل',
+    'mail_settings_saved' => 'تم حفظ إعدادات البريد بنجاح.',
+    'social_login_config' => 'إعدادات تسجيل الدخول الاجتماعي',
 ];

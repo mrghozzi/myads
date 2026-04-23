@@ -36,6 +36,7 @@ use App\Http\Controllers\OrderRequestController;
 use App\Http\Controllers\OrderOfferController;
 use App\Http\Controllers\AdminOrderController;
 use App\Http\Controllers\StatusPromotionController;
+use App\Http\Controllers\AdminMailSettingsController;
 use App\Http\Middleware\AdminMiddleware;
 
 Route::post('/reaction/toggle', [ReactionController::class, 'toggle'])->name('reaction.toggle')->middleware('auth');
@@ -430,6 +431,8 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::post('/settings', [AdminController::class, 'updateSettings'])->name('admin.settings.update');
     Route::get('/settings/system', [AdminController::class, 'systemSettings'])->name('admin.settings.system');
     Route::post('/settings/system', [AdminController::class, 'updateSystemSettings'])->name('admin.settings.system.update');
+    Route::get('/settings/mail', [AdminMailSettingsController::class, 'index'])->name('admin.settings.mail');
+    Route::post('/settings/mail', [AdminMailSettingsController::class, 'update'])->name('admin.settings.mail.update');
     Route::get('/settings/cookie-notice', [AdminController::class, 'cookieNoticeSettings'])->name('admin.cookie_notice');
     Route::post('/settings/cookie-notice', [AdminController::class, 'updateCookieNoticeSettings'])->name('admin.cookie_notice.update');
     Route::get('/seo', [AdminSeoController::class, 'index'])->name('admin.seo.index');

@@ -2248,4 +2248,23 @@ return [
     'feed' => 'فید',
     'discussions' => 'بحث‌ها',
     'sort' => 'مرتب‌سازی',
+
+    // Mail Settings
+    'mail_settings_title' => 'تنظیمات ایمیل',
+    'mail_settings_desc' => 'پیکربندی تنظیمات ارسال ایمیل. تمام تغییرات در پایگاه داده ذخیره شده و در زمان اجرا اعمال می‌شوند.',
+    'mail_settings_db_notice' => 'این صفحه تنظیمات ایمیل را در پایگاه داده ذخیره می‌کند — فایل .env تغییر نمی‌کند.',
+    'mail_mailer' => 'درایور ایمیل',
+    'mail_host' => 'سرور ایمیل',
+    'mail_port' => 'پورت ایمیل',
+    'mail_username' => 'نام کاربری',
+    'mail_password' => 'رمز عبور',
+    'mail_password_hint' => 'برای حفظ رمز عبور فعلی خالی بگذارید',
+    'mail_encryption' => 'رمزنگاری',
+    'mail_encryption_none' => 'بدون رمزنگاری',
+    'mail_from_address' => 'آدرس فرستنده',
+    'mail_from_name' => 'نام فرستنده',
+    'mail_smtp_settings' => 'پیکربندی SMTP',
+    'mail_sender_info' => 'اطلاعات فرستنده',
+    'mail_settings_saved' => 'تنظیمات ایمیل با موفقیت ذخیره شد.',
+    'social_login_config' => 'پیکربندی ورود اجتماعی',
 ];

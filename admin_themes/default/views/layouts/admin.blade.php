@@ -232,6 +232,7 @@
                                 @if($canAdmin('settings'))
                                     <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.settings') }}">{{ __('messages.settings') }}</a></li>
                                     <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.settings.system') }}">{{ __('messages.system_settings') }}</a></li>
+                                    <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.settings.mail') }}">{{ __('messages.mail_settings_title') }}</a></li>
                                     <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.cookie_notice') }}">{{ __('messages.cookie_notice_settings') }}</a></li>
                                 @endif
                                 @if($canAdmin('languages'))

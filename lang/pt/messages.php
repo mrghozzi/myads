@@ -2248,4 +2248,23 @@ return [
     'feed' => 'Feed',
     'discussions' => 'Discussões',
     'sort' => 'Ordenar',
+
+    // Mail Settings
+    'mail_settings_title' => 'Mail Settings',
+    'mail_settings_desc' => 'Configure your mail delivery settings. All changes are stored in the database and applied at runtime.',
+    'mail_settings_db_notice' => 'This page stores mail configuration in the database — your .env file is not modified.',
+    'mail_mailer' => 'Mail Driver',
+    'mail_host' => 'Mail Host',
+    'mail_port' => 'Mail Port',
+    'mail_username' => 'Mail Username',
+    'mail_password' => 'Mail Password',
+    'mail_password_hint' => 'Leave blank to keep current password',
+    'mail_encryption' => 'Encryption',
+    'mail_encryption_none' => 'None',
+    'mail_from_address' => 'From Address',
+    'mail_from_name' => 'From Name',
+    'mail_smtp_settings' => 'SMTP Configuration',
+    'mail_sender_info' => 'Sender Information',
+    'mail_settings_saved' => 'Mail settings saved successfully.',
+    'social_login_config' => 'Social Login Configuration',
 ];

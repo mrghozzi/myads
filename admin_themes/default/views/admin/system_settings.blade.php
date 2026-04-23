@@ -12,7 +12,7 @@
             </ul>
             <div class="admin-hero__eyebrow">{{ __('messages.options') }}</div>
             <h1 class="admin-hero__title">{{ __('messages.system_settings') }}</h1>
-            <p class="admin-hero__copy">{{ __('messages.social_mail_config') ?? 'Social Login & Mail Configuration' }}</p>
+            <p class="admin-hero__copy">{{ __('messages.social_login_config') ?? 'Social Login Configuration' }}</p>
         </div>
     </section>
 
@@ -89,34 +89,12 @@
                     </div>
                 </div>
                 <div class="col-12"><hr class="my-0"></div>
-                <div class="col-12"><h3 class="h5 mb-0 text-primary"><i class="feather-mail me-2"></i>{{ __('messages.smtp_settings') ?? 'SMTP Settings' }}</h3></div>
-                <div class="col-lg-6">
-                    <label class="form-label">{{ __('messages.mail_host') ?? 'Mail Host' }}</label>
-                    <input type="text" name="MAIL_HOST" class="form-control" value="{{ env('MAIL_HOST') }}" placeholder="smtp.mailtrap.io">
-                </div>
-                <div class="col-lg-6">
-                    <label class="form-label">{{ __('messages.mail_port') ?? 'Mail Port' }}</label>
-                    <input type="text" name="MAIL_PORT" class="form-control" value="{{ env('MAIL_PORT') }}" placeholder="587">
-                </div>
-                <div class="col-lg-6">
-                    <label class="form-label">{{ __('messages.mail_username') ?? 'Mail Username' }}</label>
-                    <input type="text" name="MAIL_USERNAME" class="form-control" value="{{ env('MAIL_USERNAME') }}" placeholder="{{ __('messages.username') ?? 'Username' }}">
-                </div>
-                <div class="col-lg-6">
-                    <label class="form-label">{{ __('messages.mail_password') ?? 'Mail Password' }}</label>
-                    <input type="password" name="MAIL_PASSWORD" class="form-control" value="{{ env('MAIL_PASSWORD') }}" placeholder="{{ __('messages.password') ?? 'Password' }}">
-                </div>
-                <div class="col-lg-6">
-                    <label class="form-label">{{ __('messages.mail_encryption') ?? 'Mail Encryption' }}</label>
-                    <select name="MAIL_ENCRYPTION" class="form-select">
-                        <option value="null" {{ env('MAIL_ENCRYPTION') == 'null' ? 'selected' : '' }}>{{ __('messages.none') ?? 'None' }}</option>
-                        <option value="tls" {{ env('MAIL_ENCRYPTION') == 'tls' ? 'selected' : '' }}>TLS</option>
-                        <option value="ssl" {{ env('MAIL_ENCRYPTION') == 'ssl' ? 'selected' : '' }}>SSL</option>
-                    </select>
-                </div>
-                <div class="col-lg-6">
-                    <label class="form-label">{{ __('messages.mail_from_address') ?? 'Mail From Address' }}</label>
-                    <input type="email" name="MAIL_FROM_ADDRESS" class="form-control" value="{{ env('MAIL_FROM_ADDRESS') }}" placeholder="hello@example.com">
+                <div class="col-12">
+                    <div class="alert alert-info mb-0">
+                        <i class="feather-mail me-2"></i>
+                        {{ __('messages.mail_settings_title') }}:
+                        <a href="{{ route('admin.settings.mail') }}" class="fw-bold">{{ route('admin.settings.mail') }}</a>
+                    </div>
                 </div>
                 <div class="col-12">
                     <div class="alert alert-warning mb-0">
