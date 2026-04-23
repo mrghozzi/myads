@@ -23,6 +23,13 @@
         </div>
     @endif
 
+    @if(session('error'))
+        <div class="alert alert-danger alert-dismissible fade show mb-0" role="alert">
+            {{ session('error') }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
     @if($errors->any())
         <div class="alert alert-danger alert-dismissible fade show mb-0" role="alert">
             <ul class="mb-0">
@@ -116,6 +123,27 @@
 
                 <div class="col-12 d-flex justify-content-end">
                     <button type="submit" class="btn btn-primary">{{ __('messages.save') }}</button>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    {{-- Test Email Section --}}
+    <section class="admin-panel mt-4">
+        <div class="admin-panel__body">
+            <h3 class="h5 mb-3 text-primary"><i class="feather-send me-2"></i>{{ __('messages.mail_test_title') }}</h3>
+            <form action="{{ route('admin.settings.mail.test') }}" method="POST" class="row g-3 align-items-end">
+                @csrf
+                <div class="col-lg-6">
+                    <label class="form-label" for="test_email">{{ __('messages.mail_test_recipient') }}</label>
+                    <input type="email" name="test_email" id="test_email" class="form-control"
+                           value="{{ old('test_email', auth()->user()->email ?? '') }}"
+                           placeholder="test@example.com" required>
+                </div>
+                <div class="col-lg-6">
+                    <button type="submit" class="btn btn-outline-primary">
+                        <i class="feather-send me-1"></i>{{ __('messages.mail_test_send') }}
+                    </button>
                 </div>
             </form>
         </div>

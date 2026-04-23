@@ -2267,4 +2267,14 @@ return [
     'mail_sender_info' => 'Sender Information',
     'mail_settings_saved' => 'Mail settings saved successfully.',
     'social_login_config' => 'Social Login Configuration',
+    'mail_send_failed' => 'Unable to send email. Please contact the site administrator.',
+
+    // Mail Test
+    'mail_test_title' => 'Test Email',
+    'mail_test_recipient' => 'Recipient Email',
+    'mail_test_send' => 'Send Test Email',
+    'mail_test_sent' => 'Test email sent successfully to :email.',
+    'mail_test_failed' => 'Failed to send test email. Please check your SMTP settings.',
+    'mail_test_subject' => 'Test Email — :site',
+    'mail_test_body' => 'This is a test email from :site. If you received this, your mail configuration is working correctly.',
 ];

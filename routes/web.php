@@ -433,6 +433,7 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::post('/settings/system', [AdminController::class, 'updateSystemSettings'])->name('admin.settings.system.update');
     Route::get('/settings/mail', [AdminMailSettingsController::class, 'index'])->name('admin.settings.mail');
     Route::post('/settings/mail', [AdminMailSettingsController::class, 'update'])->name('admin.settings.mail.update');
+    Route::post('/settings/mail/test', [AdminMailSettingsController::class, 'test'])->name('admin.settings.mail.test');
     Route::get('/settings/cookie-notice', [AdminController::class, 'cookieNoticeSettings'])->name('admin.cookie_notice');
     Route::post('/settings/cookie-notice', [AdminController::class, 'updateCookieNoticeSettings'])->name('admin.cookie_notice.update');
     Route::get('/seo', [AdminSeoController::class, 'index'])->name('admin.seo.index');

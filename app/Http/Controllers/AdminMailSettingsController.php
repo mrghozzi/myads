@@ -6,6 +6,8 @@ use App\Models\MailSetting;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 
 class AdminMailSettingsController extends Controller
 {
@@ -62,5 +64,43 @@ class AdminMailSettingsController extends Controller
         return redirect()
             ->route('admin.settings.mail')
             ->with('success', __('messages.mail_settings_saved'));
+    }
+
+    /**
+     * Send a test email to verify SMTP configuration.
+     */
+    public function test(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'test_email' => 'required|email|max:255',
+        ]);
+
+        $testEmail = $request->input('test_email');
+
+        try {
+            Mail::raw(
+                __('messages.mail_test_body', [
+                    'site' => config('app.name', 'MYADS'),
+                    'default' => 'This is a test email from your site. If you received this, your mail configuration is working correctly.',
+                ]),
+                function ($message) use ($testEmail) {
+                    $message->to($testEmail)
+                            ->subject(__('messages.mail_test_subject', [
+                                'site' => config('app.name', 'MYADS'),
+                                'default' => 'Test Email',
+                            ]));
+                }
+            );
+
+            return redirect()
+                ->route('admin.settings.mail')
+                ->with('success', __('messages.mail_test_sent', ['email' => $testEmail]));
+        } catch (\Throwable $e) {
+            Log::error('Mail test failed: ' . $e->getMessage());
+
+            return redirect()
+                ->route('admin.settings.mail')
+                ->with('error', __('messages.mail_test_failed') . ' — ' . $e->getMessage());
+        }
     }
 }

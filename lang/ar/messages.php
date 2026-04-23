@@ -2631,4 +2631,14 @@ return [
     'mail_sender_info' => 'معلومات المرسل',
     'mail_settings_saved' => 'تم حفظ إعدادات البريد بنجاح.',
     'social_login_config' => 'إعدادات تسجيل الدخول الاجتماعي',
+    'mail_send_failed' => 'تعذّر إرسال البريد الإلكتروني. يرجى التواصل مع إدارة الموقع.',
+
+    // Mail Test
+    'mail_test_title' => 'اختبار البريد',
+    'mail_test_recipient' => 'البريد المستلم',
+    'mail_test_send' => 'إرسال بريد تجريبي',
+    'mail_test_sent' => 'تم إرسال البريد التجريبي بنجاح إلى :email.',
+    'mail_test_failed' => 'فشل إرسال البريد التجريبي. يرجى مراجعة إعدادات SMTP.',
+    'mail_test_subject' => 'بريد تجريبي — :site',
+    'mail_test_body' => 'هذا بريد تجريبي من :site. إذا وصلتك هذه الرسالة، فإعدادات البريد تعمل بشكل صحيح.',
 ];

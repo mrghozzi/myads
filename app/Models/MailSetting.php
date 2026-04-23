@@ -49,8 +49,11 @@ class MailSetting extends Model
 
         try {
             return Crypt::decryptString($value);
+        } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
+            // Encrypted with a different APP_KEY or corrupted — return raw value
+            // as it may be plain-text from an older migration or manual DB entry
+            return $value;
         } catch (\Throwable $e) {
-            // Corrupted or legacy plain-text value — return null for safety
             return null;
         }
     }
