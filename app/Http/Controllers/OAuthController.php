@@ -76,9 +76,9 @@ class OAuthController extends Controller
         $requestedScopes = explode(' ', $request->scope);
         $validScopes = array_intersect($requestedScopes, $app->requested_scopes);
 
-        $authCode = $this->oauthService->generateAuthorizationCode($app, auth()->user(), $request->redirect_uri, $validScopes);
+        $authData = $this->oauthService->generateAuthorizationCode($app, auth()->user(), $request->redirect_uri, $validScopes);
 
-        $redirect = $request->redirect_uri . '?code=' . urlencode($authCode->code) . '&state=' . urlencode($request->state);
+        $redirect = $request->redirect_uri . '?code=' . urlencode($authData['plain_code']) . '&state=' . urlencode($request->state);
         return redirect($redirect);
     }
 

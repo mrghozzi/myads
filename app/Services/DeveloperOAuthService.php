@@ -16,19 +16,24 @@ class DeveloperOAuthService
     /**
      * Generate an authorization code for the user and app.
      */
-    public function generateAuthorizationCode(DeveloperApp $app, User $user, string $redirectUri, array $scopes): DeveloperAuthorizationCode
+    public function generateAuthorizationCode(DeveloperApp $app, User $user, string $redirectUri, array $scopes): array
     {
-        $code = Str::random(40);
+        $plainCode = Str::random(40);
 
-        return DeveloperAuthorizationCode::create([
+        $record = DeveloperAuthorizationCode::create([
             'developer_app_id' => $app->id,
             'user_id' => $user->id,
-            'code' => hash('sha256', $code), // Store hashed
+            'code' => hash('sha256', $plainCode), // Store hashed
             'redirect_uri' => $redirectUri,
             'scopes' => $scopes,
             'expires_at' => now()->addMinutes(10), // Short lived
             'used' => false,
         ]);
+
+        return [
+            'record' => $record,
+            'plain_code' => $plainCode,
+        ];
     }
 
     /**
