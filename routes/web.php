@@ -350,6 +350,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/settings/sessions/{id}/revoke', [ProfileController::class, 'revokeSession'])->name('profile.sessions.revoke');
     Route::get('/settings/apps', [ProfileController::class, 'authorizedApps'])->name('profile.apps');
     Route::post('/settings/apps/{authorization}/revoke', [ProfileController::class, 'revokeAuthorizedApp'])->name('profile.apps.revoke');
+    Route::get('/settings/notification', [ProfileController::class, 'notificationSettings'])->name('profile.notifications');
+    Route::post('/settings/notification', [ProfileController::class, 'updateNotificationSettings'])->name('profile.notifications.update');
     Route::post('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
     Route::post('/profile/{id}/follow', [ProfileController::class, 'toggleFollow'])->name('profile.follow');
 });

@@ -335,6 +335,11 @@ class User extends Authenticatable
         return $this->hasOne(UserPrivacySetting::class, 'user_id');
     }
 
+    public function notificationSetting()
+    {
+        return $this->hasOne(UserNotificationSetting::class, 'user_id');
+    }
+
     public function userBadges()
     {
         return $this->hasMany(UserBadge::class, 'user_id');

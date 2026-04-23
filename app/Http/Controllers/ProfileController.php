@@ -14,6 +14,7 @@ use App\Models\Status;
 use App\Models\User;
 use App\Models\UserBadge;
 use App\Models\SecurityMemberSession;
+use App\Models\UserNotificationSetting;
 use App\Services\Billing\SubscriptionEntitlementService;
 use App\Services\GamificationService;
 use App\Services\SecuritySessionService;
@@ -626,6 +627,41 @@ class ProfileController extends Controller
         }
 
         return back()->with('success', __('messages.session_revoked_success'));
+    }
+
+    public function notificationSettings()
+    {
+        $user = Auth::user();
+        $settings = $user->notificationSetting ?? new UserNotificationSetting();
+        
+        return view('theme::profile.notification', compact('user', 'settings'));
+    }
+
+    public function updateNotificationSettings(Request $request)
+    {
+        $user = Auth::user();
+        $fields = [
+            'email_new_follower',
+            'email_new_comment',
+            'email_new_message',
+            'email_mention',
+            'email_repost',
+            'email_reaction',
+            'email_forum_reply',
+            'email_marketplace_update',
+        ];
+
+        $data = [];
+        foreach ($fields as $field) {
+            $data[$field] = $request->boolean($field);
+        }
+
+        $user->notificationSetting()->updateOrCreate(
+            ['user_id' => $user->id],
+            $data
+        );
+
+        return redirect()->route('profile.notifications')->with('success', __('messages.notification_settings_updated'));
     }
 
     private function resolveDeviceType(string $userAgent): string
