@@ -1,0 +1,315 @@
+.profile-relationships-summary {
+  overflow: hidden;
+}
+
+.profile-relationships-summary__top {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.profile-relationships-summary__identity {
+  min-width: 0;
+}
+
+.profile-relationships-summary__user-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.profile-relationships-summary__user-link:hover {
+  color: #615dfa;
+  text-decoration: none;
+}
+
+.profile-relationships-summary__meta {
+  margin-top: 4px;
+  color: #8f91ac;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.5em;
+}
+
+.profile-relationships-summary__highlight {
+  margin-top: 20px;
+  padding: 20px;
+  border: 1px solid rgba(97, 93, 250, 0.12);
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(97, 93, 250, 0.14), rgba(35, 210, 226, 0.08));
+}
+
+.profile-relationships-summary__highlight-value {
+  font-size: 2rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.profile-relationships-summary__highlight-label {
+  margin-top: 8px;
+  color: #3e3f5e;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.profile-relationships-summary__stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.profile-relationships-summary__stat {
+  display: grid;
+  gap: 6px;
+  padding: 14px 16px;
+  border: 1px solid #eaedf6;
+  border-radius: 16px;
+  background: #f8faff;
+  color: inherit;
+  text-decoration: none;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.profile-relationships-summary__stat:hover {
+  transform: translateY(-2px);
+  border-color: rgba(97, 93, 250, 0.2);
+  box-shadow: 0 16px 28px rgba(94, 92, 154, 0.08);
+  text-decoration: none;
+}
+
+.profile-relationships-summary__stat.is-active {
+  border-color: transparent;
+  background: #615dfa;
+  box-shadow: 0 18px 34px rgba(97, 93, 250, 0.2);
+}
+
+.profile-relationships-summary__stat.is-active .profile-relationships-summary__stat-value,
+.profile-relationships-summary__stat.is-active .profile-relationships-summary__stat-label {
+  color: #fff;
+}
+
+.profile-relationships-summary__stat-value {
+  font-size: 1rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.profile-relationships-summary__stat-label {
+  color: #8f91ac;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.profile-relationships-summary__footer {
+  margin-top: 20px;
+}
+
+.profile-relationships-summary__footer .button {
+  width: 100%;
+}
+
+.profile-relationships-section-header {
+  align-items: center;
+  gap: 16px;
+}
+
+.profile-relationships-section-caption {
+  margin-top: 10px;
+  color: #8f91ac;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.profile-relationships-count {
+  min-width: 108px;
+  padding: 14px 18px;
+  border: 1px solid #eaedf6;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 18px 34px rgba(94, 92, 154, 0.08);
+  text-align: center;
+}
+
+.profile-relationships-count__value {
+  font-size: 1.625rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.profile-relationships-count__label {
+  margin-top: 6px;
+  color: #8f91ac;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.profile-relationships-list {
+  display: grid;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.profile-relationship-card {
+  padding: 24px 28px;
+  border: 1px solid transparent;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.profile-relationship-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(97, 93, 250, 0.16);
+  box-shadow: 0 22px 40px rgba(94, 92, 154, 0.1);
+}
+
+.profile-relationship-card__body {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.profile-relationship-card__user {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex: 1;
+  min-width: 0;
+}
+
+.profile-relationship-card__content {
+  min-width: 0;
+}
+
+.profile-relationship-card__title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.profile-relationship-card__name {
+  min-width: 0;
+}
+
+.profile-relationship-card__name a {
+  color: #3e3f5e;
+  font-size: 1rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.profile-relationship-card__name a:hover {
+  color: #615dfa;
+  text-decoration: none;
+}
+
+.profile-relationship-card__meta {
+  margin-top: 4px;
+  color: #8f91ac;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.5em;
+}
+
+.profile-relationship-card__timestamp {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 12px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: #f5f7ff;
+  color: #615dfa;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1.2em;
+}
+
+.profile-relationship-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.profile-relationship-card__action-form {
+  margin: 0;
+}
+
+.profile-relationship-card__action.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 146px;
+  white-space: nowrap;
+}
+
+.profile-relationships-empty {
+  padding: 32px 28px;
+}
+
+.profile-relationships-empty__icon {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 18px;
+  border-radius: 18px;
+  display: grid;
+  place-items: center;
+  background: rgba(97, 93, 250, 0.12);
+  color: #615dfa;
+  font-size: 1.25rem;
+}
+
+.profile-relationships-pagination {
+  margin-top: 32px;
+}
+
+@media screen and (max-width: 1200px) {
+  .profile-relationship-card__action.button {
+    min-width: 132px;
+  }
+}
+
+@media screen and (max-width: 960px) {
+  .profile-relationships-section-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .profile-relationships-count {
+    min-width: 0;
+    width: 100%;
+    text-align: left;
+  }
+
+  .profile-relationship-card__body {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .profile-relationship-card__actions {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .profile-relationship-card__action-form,
+  .profile-relationship-card__action.button {
+    width: 100%;
+  }
+}
+
+@media screen and (max-width: 680px) {
+  .profile-relationships-summary__stats {
+    grid-template-columns: 100%;
+  }
+
+  .profile-relationship-card {
+    padding: 22px 20px;
+  }
+}

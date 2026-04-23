@@ -200,8 +200,21 @@ class ProfileController extends Controller
         $followersCount = Like::where('sid', $user->id)->where('type', 1)->whereHas('user')->count();
         $followingCount = Like::where('uid', $user->id)->where('type', 1)->whereHas('targetUser')->count();
         $postsCount = Status::where('uid', $user->id)->where('s_type', '!=', 5)->count();
+        $viewerFollowingIds = $this->viewerFollowingIds(
+            $viewer,
+            $followers->getCollection()->pluck('user')->filter()
+        );
 
-        return view('theme::profile.followers', compact('user', 'followers', 'cover', 'isFollowing', 'followersCount', 'followingCount', 'postsCount'));
+        return view('theme::profile.followers', compact(
+            'user',
+            'followers',
+            'cover',
+            'isFollowing',
+            'followersCount',
+            'followingCount',
+            'postsCount',
+            'viewerFollowingIds'
+        ));
     }
 
     public function following(string $username)
@@ -226,8 +239,21 @@ class ProfileController extends Controller
         $followersCount = Like::where('sid', $user->id)->where('type', 1)->whereHas('user')->count();
         $followingCount = Like::where('uid', $user->id)->where('type', 1)->whereHas('targetUser')->count();
         $postsCount = Status::where('uid', $user->id)->where('s_type', '!=', 5)->count();
+        $viewerFollowingIds = $this->viewerFollowingIds(
+            $viewer,
+            $following->getCollection()->pluck('targetUser')->filter()
+        );
 
-        return view('theme::profile.following', compact('user', 'following', 'cover', 'isFollowing', 'followersCount', 'followingCount', 'postsCount'));
+        return view('theme::profile.following', compact(
+            'user',
+            'following',
+            'cover',
+            'isFollowing',
+            'followersCount',
+            'followingCount',
+            'postsCount',
+            'viewerFollowingIds'
+        ));
     }
 
     public function showById(string $id)
@@ -774,6 +800,31 @@ class ProfileController extends Controller
         }
 
         return $cover;
+    }
+
+    private function viewerFollowingIds(?User $viewer, Collection $users): array
+    {
+        if (!$viewer) {
+            return [];
+        }
+
+        $userIds = $users
+            ->pluck('id')
+            ->filter()
+            ->map(fn ($id) => (int) $id)
+            ->unique()
+            ->values();
+
+        if ($userIds->isEmpty()) {
+            return [];
+        }
+
+        return Like::where('uid', $viewer->id)
+            ->where('type', 1)
+            ->whereIn('sid', $userIds)
+            ->pluck('sid')
+            ->map(fn ($id) => (int) $id)
+            ->all();
     }
 
     private function photoItemsForUser(User $user): Collection
