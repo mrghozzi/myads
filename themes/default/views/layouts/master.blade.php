@@ -623,7 +623,7 @@
 
 
     <!-- Global Footer -->
-    @if(Request::is('store*', 'forum*', 'f*', 't*', 'home', 'news*', 'ads*', 'groups*', 'badges*', 'quests*', 'settings*'))
+    @if(Request::is('store*', 'forum*', 'f*', 't*', 'home', 'news*', 'ads*', 'groups*', 'badges*', 'quests*', 'settings*', 'kb*', 'edk*', 'pgk*', 'hkd*', 'u/*', 'profile/edit', 'history'))
         @include('theme::partials.footer')
     @endif
 
