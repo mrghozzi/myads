@@ -1,4 +1,4 @@
-# Agents.md — MYADS v4.3.0
+# Agents.md — MYADS v4.3.1
 
 > **Purpose:** This file gives AI coding agents a fast, comprehensive understanding of the MYADS project — its architecture, conventions, key files, and rules — so they can work effectively from a fresh chat context.
 
@@ -6,7 +6,7 @@
 
 ## 1. Project Identity
 
-- **Name:** MYADS v4.3.0
+- **Name:** MYADS v4.3.1
 - **Type:** Social network + ad exchange platform for website owners
 - **Framework:** Laravel 12 (PHP 8.2+)
 - **Database:** MySQL 5.7+ / MariaDB 10.3+
@@ -809,6 +809,12 @@ php artisan storage:link
 - **Superdesign:** Redesigned all developer-related admin views (`/admin/developers`, `/admin/developers/settings`, `/admin/developers/show`) using the Duralux "superdesign" aesthetic.
 - **Localization:** Standardized the `messages.` translation pattern across all Store views and added comprehensive bilingal support (AR/EN) for the Developer Platform.
 - **Fix:** Resolved 500 errors on `/portal` and landing page footer by correcting legacy route name references.
+
+---
+
+## 19J. Version 4.3.1 Maintenance Cycle (2026-04-23)
+
+- **Fix:** Resolved "Page Expired" (419) error during **ADStn OAuth token exchange** by excluding `/oauth/token` from CSRF verification in `bootstrap/app.php`. This enables successful server-to-server POST requests for access token retrieval.
 
 ---
 

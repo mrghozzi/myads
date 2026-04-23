@@ -1,3 +1,11 @@
+# v4.3.1
+> **Maintenance Release** — OAuth stability and CSRF refinements.
+
+### OAuth 2.0 & Integrations
+* **Fix**: Resolved "Page Expired" (419) error during the **ADStn OAuth token exchange** flow. The `/oauth/token` endpoint is now excluded from CSRF verification in `bootstrap/app.php`, allowing server-to-server POST requests for access token retrieval without a session-based CSRF token.
+
+---
+
 # v4.3.0
 > **Strategic Release** — Preparing major platform advancements and core infrastructure updates.
 

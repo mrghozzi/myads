@@ -100,6 +100,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'install',
             'install/*',
             'billing/webhook/*',
+            'oauth/token',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
