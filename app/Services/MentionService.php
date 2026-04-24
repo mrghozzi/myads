@@ -51,8 +51,9 @@ class MentionService
                 $mentionedUser->id,
                 __('messages.mention_notification_post', ['user' => $author->username]),
                 $url,
-                'comment',
-                $author->id
+                'at',
+                $author->id,
+                'mention'
             );
         }
     }
@@ -93,8 +94,9 @@ class MentionService
                 $mentionedUser->id,
                 __('messages.mention_notification_comment', ['user' => $author->username]),
                 $url,
-                'comment',
-                $author->id
+                'at',
+                $author->id,
+                'mention'
             );
         }
     }

@@ -267,12 +267,20 @@ class CommentController extends Controller
             }
 
             if ($ownerId && $ownerId != $uid) {
+                $notifType = 'new_comment';
+                if ($type === 'forum') {
+                    $notifType = 'forum_reply';
+                } elseif ($type === 'order') {
+                    $notifType = 'marketplace_update';
+                }
+
                 $notifications->send(
                     $ownerId,
                     __('messages.comment_notification', ['user' => $user->username]),
                     $url,
                     $logo,
-                    $uid
+                    $uid,
+                    $notifType
                 );
 
                 $pointLedger->award($ownerId, 1, 'comment_received', 'comment_received', 'comment', (int) $comment->id);

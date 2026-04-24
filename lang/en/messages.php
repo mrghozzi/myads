@@ -2659,4 +2659,11 @@ return [
     'notif_forum_reply_hint' => 'Get an email when someone replies to forum topics you are involved in.',
     'notif_marketplace_update' => 'Marketplace Updates',
     'notif_marketplace_update_hint' => 'Get an email about updates to your service requests or offers.',
+    'follow_notification' => ':user followed you.',
+    'message_notification' => ':user sent you a new message.',
+    'comment_notification' => ':user commented on your content.',
+    'mention_notification_post' => ':user mentioned you in a post.',
+    'mention_notification_comment' => ':user mentioned you in a comment.',
+    'repost_notification' => ':user reposted your content.',
+    'reaction_notification' => ':user reacted to your post.',
 ];

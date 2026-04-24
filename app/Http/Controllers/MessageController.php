@@ -395,7 +395,8 @@ class MessageController extends Controller
         Request $request,
         UserPrivacyService $privacy,
         SecurityPolicyService $securityPolicy,
-        SecurityThrottleService $securityThrottle
+        SecurityThrottleService $securityThrottle,
+        \App\Services\NotificationService $notifications
     )
     {
         $request->validate([
@@ -427,6 +428,15 @@ class MessageController extends Controller
         $message->state = 3;
         $message->save();
         $securityThrottle->hitAction($user, 'private_message');
+
+        $notifications->send(
+            $recipient,
+            __('messages.message_notification', ['user' => $user->username]),
+            route('messages.show', $this->conversationRouteKey($user, $recipient), false),
+            'envelope',
+            $user->id,
+            'new_message'
+        );
 
         return redirect()->route('messages.show', $this->conversationRouteKey($user, $recipient))
             ->with('success', __('message_sent'));
@@ -538,7 +548,8 @@ class MessageController extends Controller
         $id,
         UserPrivacyService $privacy,
         SecurityPolicyService $securityPolicy,
-        SecurityThrottleService $securityThrottle
+        SecurityThrottleService $securityThrottle,
+        \App\Services\NotificationService $notifications
     )
     {
         $validator = $this->buildMessageValidator($request);
@@ -618,6 +629,15 @@ class MessageController extends Controller
         $message->state = 3;
         $message->save();
         $securityThrottle->hitAction($user, 'private_message');
+
+        $notifications->send(
+            $partner,
+            __('messages.message_notification', ['user' => $user->username]),
+            route('messages.show', $this->conversationRouteKey($user, $partner), false),
+            'envelope',
+            $user->id,
+            'new_message'
+        );
 
         if (!$this->shouldReturnJson($request)) {
             return redirect()->route('messages.show', $this->conversationRouteKey($user, $partner));

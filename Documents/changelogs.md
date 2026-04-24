@@ -17,6 +17,15 @@
 * **Fix**: Resolved an issue where marketplace extension downloads (plugins/themes) via the API were not being tracked in the download counter by transitioning to tracked download routes.
 * **UX**: Enabled guest downloads for free products in the store to support automated extension installers and improve public accessibility for free resources.
 
+### Notifications & Email Preferences
+* **Feature**: Added a dedicated **Email Notification Settings** page (`/settings/notification`) allowing members to toggle email alerts for specific events such as new messages, comments, follows, mentions, reposts, reactions, forum replies, and marketplace updates.
+* **Architecture**: Introduced `UserNotificationSetting` model and `user_notification_settings` table to persist fine-grained member email preferences.
+* **Architecture**: Centralized notification dispatching through `NotificationService` to automatically evaluate member opt-in rules before dispatching any `SystemNotificationMail`.
+* **Fix**: Resolved `500 Internal Server Error` during member follow actions caused by a missing namespace for the injected `NotificationService` in `ProfileController`.
+* **Fix**: Resolved `500 Internal Server Error` (Data too long for column 'nurl') that prevented new message notifications from being saved—and blocked the subsequent email dispatch—by altering the `notif` table's `nurl` column to `TEXT` to accommodate the long encrypted URLs.
+* **Security**: System email notifications for new private messages now strictly generate encrypted URL keys (`/messages/{key}`) instead of predictable numeric IDs when private message encryption is enabled in `/admin/security`.
+* **i18n**: Fully localized the notification settings interface and event descriptions across all 9 supported languages.
+
 ---
 
 # v4.3.0

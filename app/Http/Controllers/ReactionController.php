@@ -251,12 +251,12 @@ class ReactionController extends Controller
                 }
             }
 
-            $message = $user->username . " reacted to your post.";
+            $message = __('messages.reaction_notification', ['user' => $user->username]);
             if (in_array($type, [4, 44, 444, KnowledgebaseCommunityService::COMMENT_REACTION_TYPE], true)) {
-                $message = $user->username . " reacted to your comment.";
+                $message = __('messages.reaction_notification', ['user' => $user->username]); // Fallback to same key, or we can add reaction_comment_notification later
             }
             
-            $notifications->send($ownerId, $message, $postUrl, $reaction, $user->id);
+            $notifications->send($ownerId, $message, $postUrl, $reaction, $user->id, 'reaction');
 
             $pointLedger->award($ownerId, 1, 'reaction_received', 'reaction_received', 'reaction', (int) $postId);
             $pointLedger->award($user->id, 2, 'reaction_given', 'reaction_given', 'reaction', (int) $postId);

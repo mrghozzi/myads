@@ -2660,4 +2660,11 @@ return [
     'notif_forum_reply_hint' => 'تلقي بريد إلكتروني عندما يرد شخص ما على مواضيع المنتدى التي تشارك فيها.',
     'notif_marketplace_update' => 'تحديثات المتجر والخدمات',
     'notif_marketplace_update_hint' => 'تلقي بريد إلكتروني حول التحديثات المتعلقة بطلبات خدماتك أو عروضك.',
+    'follow_notification' => 'قام :user بمتابعتك.',
+    'message_notification' => 'قام :user بإرسال رسالة جديدة لك.',
+    'comment_notification' => 'قام :user بالتعليق على محتواك.',
+    'mention_notification_post' => 'قام :user بالإشارة إليك في منشور.',
+    'mention_notification_comment' => 'قام :user بالإشارة إليك في تعليق.',
+    'repost_notification' => 'قام :user بإعادة مشاركة محتواك.',
+    'reaction_notification' => 'قام :user بالتفاعل مع منشورك.',
 ];

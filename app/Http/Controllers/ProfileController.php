@@ -282,7 +282,7 @@ class ProfileController extends Controller
         return redirect()->route('profile.show', $user->username);
     }
 
-    public function toggleFollow(Request $request, int $id)
+    public function toggleFollow(Request $request, int $id, \App\Services\NotificationService $notifications)
     {
         $targetUser = User::findOrFail($id);
         $currentUser = Auth::user();
@@ -307,6 +307,15 @@ class ProfileController extends Controller
             'type' => 1,
             'time_t' => time(),
         ]);
+
+        $notifications->send(
+            $targetUser,
+            __('messages.follow_notification', ['user' => $currentUser->username]),
+            "/u/" . $currentUser->username,
+            'user-plus',
+            $currentUser->id,
+            'new_follower'
+        );
 
         app(GamificationService::class)->refreshBadges($targetUser->id);
         app(GamificationService::class)->recordEvent($currentUser->id, 'follow_created');

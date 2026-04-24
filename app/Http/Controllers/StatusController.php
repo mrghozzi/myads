@@ -275,13 +275,14 @@ class StatusController extends Controller
                 ]);
 
                 if ($originalOwner) {
-                    $notifications->send(
-                        $originalOwner->id,
-                        __('messages.repost_notification', ['user' => $user->username]),
-                        '/t' . $topic->id,
-                        'share',
-                        $user->id
-                    );
+                        $notifications->send(
+                            $originalOwner->id,
+                            __('messages.repost_notification', ['user' => $user->username]),
+                            '/t' . $topic->id,
+                            'share',
+                            $user->id,
+                            'repost'
+                        );
                 }
             }
 
