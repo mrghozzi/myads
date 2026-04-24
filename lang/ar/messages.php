@@ -2667,4 +2667,6 @@ return [
     'mention_notification_comment' => 'قام :user بالإشارة إليك في تعليق.',
     'repost_notification' => 'قام :user بإعادة مشاركة محتواك.',
     'reaction_notification' => 'قام :user بالتفاعل مع منشورك.',
+    'unsubscribe' => 'إلغاء الاشتراك',
+    'email_unsubscribe_hint' => 'إذا كنت لا ترغب في تلقي هذه الرسائل الإلكترونية بعد الآن، يمكنك إلغاء الاشتراك في أي وقت.',
 ];

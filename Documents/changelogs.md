@@ -24,6 +24,7 @@
 * **Fix**: Resolved `500 Internal Server Error` during member follow actions caused by a missing namespace for the injected `NotificationService` in `ProfileController`.
 * **Fix**: Resolved `500 Internal Server Error` (Data too long for column 'nurl') that prevented new message notifications from being saved—and blocked the subsequent email dispatch—by altering the `notif` table's `nurl` column to `TEXT` to accommodate the long encrypted URLs.
 * **Security**: System email notifications for new private messages now strictly generate encrypted URL keys (`/messages/{key}`) instead of predictable numeric IDs when private message encryption is enabled in `/admin/security`.
+* **UX**: Added an **Unsubscribe** link to the footer of all system notification emails, leading directly to the member's notification settings page.
 * **i18n**: Fully localized the notification settings interface and event descriptions across all 9 supported languages.
 
 ---

@@ -27,7 +27,8 @@ class NotificationService
         string $url = '',
         string $logo = 'notification',
         ?int $excludeUserId = null,
-        ?string $type = null
+        ?string $type = null,
+        bool $storeInDb = true
     ): ?Notification {
         $user = $recipient instanceof User ? $recipient : User::find($recipient);
         
@@ -41,15 +42,19 @@ class NotificationService
             return null;
         }
 
-        // 1. Create Database Notification
-        $notification = Notification::create([
-            'uid' => $recipientId,
-            'name' => $message,
-            'nurl' => $url,
-            'logo' => $logo ?: 'notification',
-            'time' => time(),
-            'state' => 0,
-        ]);
+        $notification = null;
+
+        // 1. Create Database Notification (if enabled)
+        if ($storeInDb) {
+            $notification = Notification::create([
+                'uid' => $recipientId,
+                'name' => $message,
+                'nurl' => $url,
+                'logo' => $logo ?: 'notification',
+                'time' => time(),
+                'state' => 0,
+            ]);
+        }
 
         // 2. Handle Email Notification
         try {

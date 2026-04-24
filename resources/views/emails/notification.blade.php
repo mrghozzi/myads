@@ -166,7 +166,12 @@
                     <a href="{{ $fullActionUrl }}" class="raw-url">{{ $fullActionUrl }}</a>
                     
                     <p style="margin-top: 20px; font-size: 12px;">&copy; {{ date('Y') }} {{ $siteName }}. {{ __('All rights reserved.') }}</p>
-                    <p style="font-size: 11px;">{{ __('To change your email settings, visit') }} <a href="{{ route('profile.notifications') }}" style="color: #475569;">{{ __('Notification Settings') }}</a></p>
+                    <p style="font-size: 11px; margin-top: 15px; color: #64748b;">
+                        {{ __('messages.email_unsubscribe_hint') }}
+                    </p>
+                    <p style="font-size: 11px;">
+                        <a href="{{ route('profile.notifications') }}" style="color: #3b82f6; text-decoration: underline;">{{ __('messages.unsubscribe') }}</a>
+                    </p>
                 </td>
             </tr>
         </table>

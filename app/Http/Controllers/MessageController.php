@@ -435,7 +435,8 @@ class MessageController extends Controller
             route('messages.show', $this->conversationRouteKey($user, $recipient), false),
             'envelope',
             $user->id,
-            'new_message'
+            'new_message',
+            false
         );
 
         return redirect()->route('messages.show', $this->conversationRouteKey($user, $recipient))
@@ -636,7 +637,8 @@ class MessageController extends Controller
             route('messages.show', $this->conversationRouteKey($user, $partner), false),
             'envelope',
             $user->id,
-            'new_message'
+            'new_message',
+            false
         );
 
         if (!$this->shouldReturnJson($request)) {

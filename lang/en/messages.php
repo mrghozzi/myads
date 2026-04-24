@@ -2666,4 +2666,6 @@ return [
     'mention_notification_comment' => ':user mentioned you in a comment.',
     'repost_notification' => ':user reposted your content.',
     'reaction_notification' => ':user reacted to your post.',
+    'unsubscribe' => 'Unsubscribe',
+    'email_unsubscribe_hint' => 'If you no longer wish to receive these emails, you can unsubscribe at any time.',
 ];
