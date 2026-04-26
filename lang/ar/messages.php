@@ -2726,4 +2726,6 @@ return [
     'order_active_contract' => 'العقد النشط',
     'provider' => 'المزود',
     'image' => 'صورة',
+    'joined' => 'انضم في',
+    'published_at' => 'نُشر في',
 ];

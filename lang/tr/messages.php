@@ -2334,4 +2334,6 @@ return [
     'order_active_contract' => 'Active Contract',
     'provider' => 'Provider',
     'image' => 'Image',
+    'joined' => 'Joined',
+    'published_at' => 'Published at',
 ];
