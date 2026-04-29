@@ -803,14 +803,7 @@
     padding: 28px;
   }
 
-  .messages-rails-pagination .pagination {
-    margin: 0;
-  }
 
-  .messages-rails-pagination .pagination li a,
-  .messages-rails-pagination .pagination li span {
-    border-radius: 8px;
-  }
 
   @media (max-width: 1200px) {
     .messages-board {
@@ -910,8 +903,8 @@
             </div>
 
             @if($conversations->hasPages())
-                <div class="messages-rail-footer messages-rails-pagination">
-                    {{ $conversations->links() }}
+                <div class="messages-rail-footer d-flex justify-content-center">
+                    {{ $conversations->links('pagination::bootstrap-4') }}
                 </div>
             @endif
         </aside>
