@@ -576,6 +576,9 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/updates', [App\Http\Controllers\AdminUpdatesController::class, 'index'])->name('admin.updates');
     Route::post('/updates', [App\Http\Controllers\AdminUpdatesController::class, 'update'])->name('admin.updates.process');
     Route::post('/updates/check', [App\Http\Controllers\AdminUpdatesController::class, 'checkUpdate'])->name('admin.updates.check');
+    Route::post('/updates/{token}/step', [App\Http\Controllers\AdminUpdatesController::class, 'step'])->name('admin.updates.step');
+    Route::get('/updates/{token}/status', [App\Http\Controllers\AdminUpdatesController::class, 'status'])->name('admin.updates.status');
+    Route::post('/updates/{token}/cancel', [App\Http\Controllers\AdminUpdatesController::class, 'cancel'])->name('admin.updates.cancel');
 
     // Menus
     Route::get('/menus', [AdminController::class, 'menus'])->name('admin.menus');

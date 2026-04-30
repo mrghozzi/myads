@@ -10,6 +10,11 @@
 * **Security**: Mail password is stored encrypted in the database using Laravel `Crypt` and is never displayed in the admin form; submitting a blank password preserves the existing stored value.
 * **i18n**: Added 18 mail settings translation keys across all **9 supported languages**, with full Arabic and Persian translations.
 
+### Staged Admin Updates
+* **Feature**: Reworked `/admin/updates` into a staged AJAX updater with visible progress for download, extraction, package safety checks, maintenance mode, file installation, database migration, and cleanup.
+* **Reliability**: Each update stage now runs as a separate request and stores session state in `options`, reducing pressure on weak/shared hosting while preserving maintenance-mode recovery on failure.
+* **Safety**: Release packages are extracted into isolated storage, checked for unsafe ZIP paths, and scanned for destructive migrations before any live files are copied.
+
 ### OAuth 2.0 & Integrations
 * **Fix**: Resolved "Page Expired" (419) error during the **ADStn OAuth token exchange** flow. The `/oauth/token` endpoint is now excluded from CSRF verification in `bootstrap/app.php`, allowing server-to-server POST requests for access token retrieval without a session-based CSRF token.
 

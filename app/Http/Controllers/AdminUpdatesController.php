@@ -48,6 +48,7 @@ class AdminUpdatesController extends Controller
         $currentVersion = self::CURRENT_VERSION;
         $preflightReport = $this->updateSafety->run();
         $maintenanceSettings = $this->maintenanceMode->settings();
+        $activeUpdateSession = $this->releaseUpdate->activeSessionForResponse();
 
         // Sync version in DB
         $this->syncVersionInDb($currentVersion);
@@ -81,7 +82,8 @@ class AdminUpdatesController extends Controller
             'updateAvailable',
             'latestRelease',
             'preflightReport',
-            'maintenanceSettings'
+            'maintenanceSettings',
+            'activeUpdateSession'
         ));
     }
 
@@ -125,7 +127,7 @@ class AdminUpdatesController extends Controller
     }
 
     /**
-     * Process the update: download, extract, migrate.
+     * Start a staged update session.
      */
     public function update(Request $request)
     {
@@ -140,7 +142,7 @@ class AdminUpdatesController extends Controller
         $environmentReport = $this->updateSafety->run();
 
         if (! $environmentReport->isSafe()) {
-            return redirect()->route('admin.updates')->with('error', __('messages.update_blocked_preflight', [
+            return $this->updateErrorResponse($request, __('messages.update_blocked_preflight', [
                 'details' => implode(' ', $environmentReport->failureMessages()),
             ]));
         }
@@ -148,30 +150,60 @@ class AdminUpdatesController extends Controller
         $releaseData = $this->fetchLatestRelease();
 
         if (! $releaseData) {
-            return redirect()->route('admin.updates')->with('error', __('messages.update_fetch_failed'));
+            return $this->updateErrorResponse($request, __('messages.update_fetch_failed'));
         }
 
         $latestVersion = ltrim((string) ($releaseData['tag_name'] ?? ''), 'v');
         if (! version_compare($latestVersion, self::CURRENT_VERSION, '>')) {
-            return redirect()->route('admin.updates')->with('info', __('messages.already_up_to_date'));
+            return $this->updateErrorResponse($request, __('messages.already_up_to_date'), 409, 'info');
         }
 
         try {
-            $this->maintenanceMode->enable($request->user(), 'admin_update_start');
-            $appliedVersion = $this->releaseUpdate->applyLatestRelease(self::CURRENT_VERSION, $releaseData);
-            $this->maintenanceMode->disable($request->user(), 'admin_update_success');
+            $session = $this->releaseUpdate->startSession(self::CURRENT_VERSION, $releaseData, $request->user());
 
-            return redirect()->route('admin.updates')->with('success', __('messages.update_success', [
-                'version' => $appliedVersion,
-            ]));
-        } catch (\Throwable $exception) {
-            if (! $this->maintenanceMode->isEnabled()) {
-                $this->maintenanceMode->enable($request->user(), 'admin_update_failure_recovery');
+            if (! $request->expectsJson()) {
+                return redirect()->route('admin.updates')->with('info', __('messages.update_session_started'));
             }
 
-            return redirect()->route('admin.updates')->with('error', __('messages.update_failed_maintenance_kept', [
-                'error' => $exception->getMessage(),
-            ]));
+            return $this->sessionResponse($session);
+        } catch (\Throwable $exception) {
+            return $this->updateErrorResponse($request, $exception->getMessage(), 409);
+        }
+    }
+
+    public function step(Request $request, string $token)
+    {
+        try {
+            return $this->sessionResponse($this->releaseUpdate->runNextStep($token, $request->user()));
+        } catch (\Throwable $exception) {
+            return response()->json([
+                'success' => false,
+                'message' => $exception->getMessage(),
+            ], 422);
+        }
+    }
+
+    public function status(Request $request, string $token)
+    {
+        try {
+            return $this->sessionResponse($this->releaseUpdate->status($token));
+        } catch (\Throwable $exception) {
+            return response()->json([
+                'success' => false,
+                'message' => $exception->getMessage(),
+            ], 404);
+        }
+    }
+
+    public function cancel(Request $request, string $token)
+    {
+        try {
+            return $this->sessionResponse($this->releaseUpdate->cancelSession($token, $request->user()));
+        } catch (\Throwable $exception) {
+            return response()->json([
+                'success' => false,
+                'message' => $exception->getMessage(),
+            ], 422);
         }
     }
 
@@ -195,6 +227,46 @@ class AdminUpdatesController extends Controller
             }
             return null;
         });
+    }
+
+    private function sessionResponse(array $session)
+    {
+        $token = (string) ($session['token'] ?? '');
+
+        return response()->json([
+            'success' => true,
+            'message' => $this->sessionMessage($session),
+            'session' => $session,
+            'routes' => [
+                'step' => route('admin.updates.step', $token),
+                'status' => route('admin.updates.status', $token),
+                'cancel' => route('admin.updates.cancel', $token),
+            ],
+        ]);
+    }
+
+    private function updateErrorResponse(Request $request, string $message, int $status = 422, string $flashKey = 'error')
+    {
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => false,
+                'message' => $message,
+            ], $status);
+        }
+
+        return redirect()->route('admin.updates')->with($flashKey, $message);
+    }
+
+    private function sessionMessage(array $session): string
+    {
+        return match ((string) ($session['status'] ?? 'pending')) {
+            'completed' => __('messages.update_success', [
+                'version' => (string) ($session['target_version'] ?? ''),
+            ]),
+            'failed' => (string) ($session['error'] ?? __('messages.update_failed')),
+            'cancelled' => __('messages.update_session_cancelled'),
+            default => (string) ($session['detail'] ?? __('messages.update_session_started')),
+        };
     }
 
     /**
