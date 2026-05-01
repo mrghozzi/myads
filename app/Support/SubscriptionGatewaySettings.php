@@ -33,13 +33,24 @@ class SubscriptionGatewaySettings
             'note' => '',
             'supported_currencies' => ['USD'],
         ],
+        'lemon_squeezy' => [
+            'enabled' => 0,
+            'mode' => 'sandbox',
+            'store_id' => '',
+            'variant_id' => '',
+            'api_key' => '',
+            'webhook_secret' => '',
+            'supported_currencies' => ['USD'],
+        ],
     ];
 
     public const SECRET_FIELDS = [
         'stripe' => ['secret_key', 'webhook_secret'],
         'paypal' => ['secret_key'],
         'bank_transfer' => [],
+        'lemon_squeezy' => ['api_key', 'webhook_secret'],
     ];
+
 
     private static ?array $cached = null;
 
@@ -238,7 +249,7 @@ class SubscriptionGatewaySettings
             return str_repeat('*', $length);
         }
 
-        return mb_substr($value, 0, 4) . str_repeat('*', max(4, $length - 8)) . mb_substr($value, -4);
+        return mb_substr($value, 0, 4) . '***' . mb_substr($value, -4);
     }
 
     private static function normalizeGateway(string $gateway): string

@@ -627,6 +627,7 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
         Route::get('/orders', [AdminBillingController::class, 'orders'])->name('admin.billing.orders');
         Route::get('/orders/{order}', [AdminBillingController::class, 'showOrder'])->name('admin.billing.orders.show');
         Route::post('/orders/{order}/review', [AdminBillingController::class, 'reviewOrder'])->name('admin.billing.orders.review');
+        Route::post('/orders/{order}/simulate-lemon-squeezy', [AdminBillingController::class, 'simulateLemonSqueezy'])->name('admin.billing.orders.simulate_lemon_squeezy');
         Route::get('/transactions', [AdminBillingController::class, 'transactions'])->name('admin.billing.transactions');
         Route::get('/currencies', [AdminBillingController::class, 'currencies'])->name('admin.billing.currencies');
         Route::post('/currencies', [AdminBillingController::class, 'storeCurrency'])->name('admin.billing.currencies.store');

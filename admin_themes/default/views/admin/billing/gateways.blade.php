@@ -111,6 +111,35 @@
                                         <label class="form-label">{{ __('messages.billing_bank_note_label') }}</label>
                                         <textarea name="note" class="form-control" rows="4">{{ old('note', $config['note'] ?? '') }}</textarea>
                                     </div>
+                                @elseif($gateway['key'] === 'lemon_squeezy')
+                                    <div class="col-md-6">
+                                        <label class="form-label">{{ __('messages.billing_store_id_label') }}</label>
+                                        <input type="text" name="store_id" class="form-control" value="{{ old('store_id', $config['store_id'] ?? '') }}">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">{{ __('messages.billing_variant_id_label') }}</label>
+                                        <input type="text" name="variant_id" class="form-control" value="{{ old('variant_id', $config['variant_id'] ?? '') }}">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">{{ __('messages.billing_api_key_label') }}</label>
+                                        <input type="password" name="api_key" class="form-control" value="">
+                                        <div class="form-text">
+                                            {{ __('messages.billing_leave_blank_to_keep_secret') }}
+                                            @if(!empty($config['api_key']))
+                                                {{ __('messages.billing_secret_current_masked', ['value' => $config['api_key']]) }}
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">{{ __('messages.billing_webhook_secret_label') }}</label>
+                                        <input type="password" name="webhook_secret" class="form-control" value="">
+                                        <div class="form-text">
+                                            {{ __('messages.billing_leave_blank_to_keep_secret') }}
+                                            @if(!empty($config['webhook_secret']))
+                                                {{ __('messages.billing_secret_current_masked', ['value' => $config['webhook_secret']]) }}
+                                            @endif
+                                        </div>
+                                    </div>
                                 @endif
 
                                 <div class="col-12">

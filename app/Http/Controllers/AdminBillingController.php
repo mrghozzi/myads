@@ -254,6 +254,36 @@ class AdminBillingController extends Controller
             ->with('success', __('messages.billing_order_review_saved'));
     }
 
+    public function simulateLemonSqueezy(Request $request, int $order): RedirectResponse
+    {
+        if (!$this->schema->supports('subscriptions_billing')) {
+            return redirect()->route('admin.billing.orders')
+                ->with('error', $this->schema->blockedActionMessage('subscriptions_billing', __('messages.billing_orders_title')));
+        }
+
+        $orderModel = BillingOrder::query()->findOrFail($order);
+
+        if ($orderModel->gateway !== 'lemon_squeezy' || $orderModel->status !== BillingOrder::STATUS_PENDING_CHECKOUT) {
+            return redirect()->route('admin.billing.orders.show', $orderModel->id)
+                ->with('error', 'This order cannot be synced manually.');
+        }
+
+        $this->lifecycle->completePaidOrder($orderModel, [
+            'status' => BillingOrder::STATUS_PAID,
+            'external_transaction_id' => 'simulated_local_sync_' . time(),
+            'gateway_checkout_reference' => $orderModel->gateway_checkout_reference,
+            'amount' => $orderModel->base_amount,
+            'currency_code' => $orderModel->currency_code,
+            'meta' => [
+                'simulated' => true,
+                'lemon_squeezy_status' => 'paid',
+            ]
+        ]);
+
+        return redirect()->route('admin.billing.orders.show', $orderModel->id)
+            ->with('success', 'تم محاكاة نجاح الدفع وتغيير حالة الطلب إلى مدفوع للاختبار المحلي.');
+    }
+
     public function transactions(Request $request)
     {
         $featureAvailable = $this->schema->supports('subscriptions_billing');
@@ -468,6 +498,13 @@ class AdminBillingController extends Controller
                 ...$baseRules,
                 'instructions' => 'nullable|string|max:10000',
                 'note' => 'nullable|string|max:3000',
+            ],
+            'lemon_squeezy' => [
+                ...$baseRules,
+                'store_id' => 'nullable|string|max:255',
+                'variant_id' => 'nullable|string|max:255',
+                'api_key' => 'nullable|string|max:5000',
+                'webhook_secret' => 'nullable|string|max:1000',
             ],
             default => abort(404),
         };

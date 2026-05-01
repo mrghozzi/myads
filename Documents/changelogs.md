@@ -18,6 +18,16 @@
 * **Security**: Mail password is stored encrypted in the database using Laravel `Crypt` and is never displayed in the admin form; submitting a blank password preserves the existing stored value.
 * **i18n**: Added 18 mail settings translation keys across all **9 supported languages**, with full Arabic and Persian translations.
 
+### Billing & Payment Gateways
+* **Feature**: Integrated **Lemon Squeezy** as a fully supported payment gateway for the subscription and paid plans system, processing checkout sessions via `JSON:API`.
+* **Feature**: Added dynamic gateway configuration for Lemon Squeezy in the admin panel (`/admin/billing/gateways`), supporting Store ID, Variant ID, API Key, and Webhook Secret setup.
+* **Feature**: Implemented HMAC SHA256 Webhook verification (`order_created`) to securely complete checkout lifecycles asynchronously.
+* **Feature**: Introduced a dedicated "Local Development Sync Tool" in the admin order details page to simulate Lemon Squeezy Webhooks and instantly approve orders when testing locally.
+* **Fix**: Restructured the Lemon Squeezy return URL flow to lookup checkout sessions directly via local database reference, bypassing Lemon Squeezy's lack of dynamic `redirect_url` tokens.
+* **Fix**: Expanded the max validation length for API keys in gateway settings to 5,000 characters to safely accommodate extremely long Lemon Squeezy Bearer tokens without triggering validation 404 errors.
+* **Fix**: Updated API key masking logic in `SubscriptionGatewaySettings` to use a fixed-length mask (`***`) instead of repeating characters, preventing severe CSS overflow issues in the admin panel.
+* **i18n**: Added English and Arabic translation keys for Lemon Squeezy integration UI.
+
 ### Staged Admin Updates
 * **Feature**: Reworked `/admin/updates` into a staged AJAX updater with visible progress for download, extraction, package safety checks, maintenance mode, file installation, database migration, and cleanup.
 * **Reliability**: Each update stage now runs as a separate request and stores session state in `options`, reducing pressure on weak/shared hosting while preserving maintenance-mode recovery on failure.

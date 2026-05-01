@@ -4,6 +4,7 @@ namespace App\Services\Billing;
 
 use App\Services\Billing\Gateways\BankTransferGateway;
 use App\Services\Billing\Gateways\BillingGatewayInterface;
+use App\Services\Billing\Gateways\LemonSqueezyGateway;
 use App\Services\Billing\Gateways\PayPalGateway;
 use App\Services\Billing\Gateways\StripeGateway;
 use App\Support\SubscriptionGatewaySettings;
@@ -14,7 +15,8 @@ class BillingGatewayRegistry
     public function __construct(
         private readonly StripeGateway $stripe,
         private readonly PayPalGateway $paypal,
-        private readonly BankTransferGateway $bankTransfer
+        private readonly BankTransferGateway $bankTransfer,
+        private readonly LemonSqueezyGateway $lemonSqueezy
     ) {
     }
 
@@ -27,6 +29,7 @@ class BillingGatewayRegistry
             'stripe' => $this->stripe,
             'paypal' => $this->paypal,
             'bank_transfer' => $this->bankTransfer,
+            'lemon_squeezy' => $this->lemonSqueezy,
         ];
     }
 

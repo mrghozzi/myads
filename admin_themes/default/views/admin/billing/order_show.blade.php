@@ -146,6 +146,24 @@
             </div>
 
             <div class="col-xl-5">
+                @if($order->gateway === 'lemon_squeezy' && $order->status === \App\Models\BillingOrder::STATUS_PENDING_CHECKOUT)
+                    <section class="admin-panel mb-3 border-primary">
+                        <div class="admin-panel__header">
+                            <div>
+                                <span class="admin-panel__eyebrow text-primary">أدوات التطوير</span>
+                                <h2 class="admin-panel__title">محاكاة إتمام الدفع</h2>
+                            </div>
+                        </div>
+                        <div class="admin-panel__body">
+                            <p class="text-muted small">بما أنك تقوم بتجربة النظام محلياً، فلن تصل إشعارات الـ Webhook التلقائية. استخدم هذا الزر لمحاكاة استلام الدفع وتحويل حالة الطلب إلى "مدفوع".</p>
+                            <form action="{{ route('admin.billing.orders.simulate_lemon_squeezy', $order->id) }}" method="POST">
+                                @csrf
+                                <button type="submit" class="btn btn-outline-primary w-100">تأكيد الدفع (محاكاة محلية)</button>
+                            </form>
+                        </div>
+                    </section>
+                @endif
+
                 @if($order->gateway === 'bank_transfer')
                     <section class="admin-panel">
                         <div class="admin-panel__header">
