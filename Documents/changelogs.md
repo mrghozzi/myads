@@ -1,6 +1,14 @@
 # v4.3.1
 > **Maintenance Release** — OAuth stability, CSRF refinements, and admin mail configuration.
 
+### Messages System Rebuild
+* **Feature**: Completely rebuilt the messages module interface into a responsive, modern, and unified layout (`_page.blade.php`, `messages.css`), optimizing readability for both desktop and mobile views.
+* **Feature**: Replaced traditional page-by-page links with a seamless **AJAX Infinite Scroll** for the sidebar conversation list (`messages-app.js`).
+* **Feature**: Added a dynamic **Smart Merge** logic during background auto-refresh to push new incoming messages to the top while preserving the user's scrolled conversation history, ensuring uninterrupted navigation.
+* **Feature**: Integrated an audio notification (`pop.wav`) that plays automatically when a new message toast is received, with proactive preloading to minimize browser autoplay restrictions.
+* **Feature**: Upgraded the Emoji Picker into a fully responsive, theme-aware, grid-based popup. Expanded the library to include hundreds of emojis across all standard categories, and implemented a strict, curated flags filter in accordance with platform policies.
+* **Fix**: Resolved a duplicated names issue in the infinite scroll sidebar by explicitly utilizing the unique `data-name` attributes to deduplicate DOM elements, bypassing encryption key inconsistencies during AJAX re-renders.
+
 ### Mail Settings (Database-Driven)
 * **Feature**: Migrated mail configuration from the static `.env` file to a dedicated **database-driven** management page at `/admin/settings/mail`, enabling runtime mail configuration changes without server file edits.
 * **Add**: Created the `mail_settings` singleton table storing `mail_mailer`, `mail_host`, `mail_port`, `mail_username`, `mail_password` (encrypted via `Crypt`), `mail_encryption`, `mail_from_address`, and `mail_from_name`.

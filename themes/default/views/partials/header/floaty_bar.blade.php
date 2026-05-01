@@ -4,6 +4,7 @@
             $floatyNotificationUnreadCount = \App\Models\Notification::where('uid', auth()->id())
                 ->whereIn('state', [0, 3])
                 ->count();
+            $floatyMessageUnreadCount = app(\App\Services\MessageConversationService::class)->unreadConversationCount(auth()->user());
             $formatNotificationCount = static fn (int $count): string => $count > 99 ? '99+' : (string) $count;
         @endphp
         <div class="bar-actions">
@@ -20,11 +21,11 @@
                         <use xlink:href="#svg-newsfeed"></use>
                     </svg>
                 </a>
-                <a class="action-list-item" href="{{ url('/messages') }}">
+                <a class="action-list-item {{ $floatyMessageUnreadCount > 0 ? 'unread' : '' }}" data-message-action-trigger href="{{ url('/messages') }}">
                     <svg class="action-list-item-icon icon-messages">
                         <use xlink:href="#svg-messages"></use>
                     </svg>
-                    {{-- Badge count here --}}
+                    <span class="notification-action-count" data-message-unread-count @if($floatyMessageUnreadCount === 0) hidden @endif>{{ $floatyMessageUnreadCount > 0 ? $formatNotificationCount($floatyMessageUnreadCount) : '' }}</span>
                 </a>
                 <a class="action-list-item listnotif notification-trigger {{ $floatyNotificationUnreadCount > 0 ? 'unread' : '' }}" data-notification-trigger href="{{ url('/notification') }}">
                     <svg class="action-list-item-icon icon-notification">

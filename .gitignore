@@ -60,6 +60,7 @@ Thumbs.db
 !/tests/Feature/StoreEditorPagesTest.php
 !/tests/Feature/CommunityFeedFeatureTest.php
 !/tests/Feature/StoreProductKnowledgebaseUiTest.php
+!/tests/Feature/MessagesRealtimeFeatureTest.php
 ~/.pi/
 Documents/development_suggestions.md
 /wiki/

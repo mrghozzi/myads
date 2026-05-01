@@ -2,216 +2,424 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use App\Models\Message;
 use App\Models\User;
+use App\Services\MessageConversationService;
+use App\Services\NotificationService;
 use App\Services\SecurityPolicyService;
 use App\Services\SecurityThrottleService;
 use App\Services\UserPrivacyService;
-use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
 class MessageController extends Controller
 {
-    private const CONVERSATION_PAGE_SIZE = 25;
     private const MAX_ATTACHMENT_SIZE_KB = 5120;
     private const ATTACHMENT_MIME_TYPES = 'jpg,jpeg,png,gif,webp,pdf,zip,rar,7z,doc,docx,xls,xlsx,ppt,pptx,txt,csv';
 
     private ?bool $messageAttachmentColumnsReady = null;
 
-    private function buildConversations($user)
+    public function __construct(private readonly MessageConversationService $conversations)
     {
-        $allMessages = Message::where('us_rec', $user->id)
-            ->orWhere('us_env', $user->id)
-            ->orderBy('time', 'desc')
-            ->get();
+    }
 
-        $partnerIds = [];
-        foreach ($allMessages as $message) {
-            $partnerId = $message->us_env == $user->id ? $message->us_rec : $message->us_env;
-            if (!in_array($partnerId, $partnerIds, true)) {
-                $partnerIds[] = $partnerId;
+    public function index(Request $request)
+    {
+        $user = $request->user();
+
+        if ($request->boolean('mark_all_read')) {
+            $this->conversations->markAllAsRead($user);
+
+            $query = [];
+            $requestedId = $request->query('id', $request->query('user'));
+            if ($requestedId) {
+                $query['id'] = $requestedId;
+            }
+
+            return redirect()->route('messages.index', $query);
+        }
+
+        $partner = null;
+        $requestedId = $request->query('id', $request->query('user'));
+        if ($requestedId) {
+            $partner = $this->conversations->resolvePartner($requestedId, $user);
+        }
+
+        return view('theme::messages.index', $this->buildPageData($user, $partner));
+    }
+
+    public function create(Request $request, UserPrivacyService $privacy)
+    {
+        $recipient = $request->query('recipient');
+        if ($recipient) {
+            $recipientUser = User::where('username', $recipient)->first();
+            if ($recipientUser && !$privacy->canDirectMessage($recipientUser, Auth::user())) {
+                return redirect()->route('messages.index')->withErrors(['recipient' => __('messages.direct_messages_disabled')]);
             }
         }
 
-        $partners = User::whereIn('id', $partnerIds)->get()->keyBy('id');
-        $unreadPartnerIds = Message::where('us_rec', $user->id)
-            ->where('state', '!=', 0)
-            ->groupBy('us_env')
-            ->pluck('us_env')
-            ->all();
-        $unreadMap = array_flip($unreadPartnerIds);
+        return view('theme::messages.create', compact('recipient'));
+    }
 
-        $conversations = [];
-        $added = [];
-        foreach ($allMessages as $message) {
-            $partnerId = $message->us_env == $user->id ? $message->us_rec : $message->us_env;
-            if (isset($added[$partnerId])) {
-                continue;
+    public function store(
+        Request $request,
+        UserPrivacyService $privacy,
+        SecurityPolicyService $securityPolicy,
+        SecurityThrottleService $securityThrottle,
+        NotificationService $notifications
+    ) {
+        $request->validate([
+            'recipient' => 'required|exists:users,username',
+            'message' => 'required|string|max:2000',
+        ]);
+
+        $user = $request->user();
+        $recipient = User::where('username', $request->recipient)->firstOrFail();
+        if (!$privacy->canDirectMessage($recipient, $user)) {
+            return back()->withErrors(['recipient' => __('messages.direct_messages_disabled')])->withInput();
+        }
+
+        $text = trim((string) $request->input('message'));
+        if ($violation = $securityPolicy->textViolation($text, 'messages')) {
+            return back()->withErrors(['message' => $violation])->withInput();
+        }
+
+        if ($cooldownMessage = $securityThrottle->actionMessage($user, 'private_message')) {
+            return back()->withErrors(['message' => $cooldownMessage])->withInput();
+        }
+
+        $message = $this->createMessage($user, $recipient, $text);
+        $securityThrottle->hitAction($user, 'private_message');
+        $this->sendMessageNotification($notifications, $recipient, $user, $message);
+
+        return redirect()->route('messages.show', $this->conversations->conversationRouteKey($user, $recipient));
+    }
+
+    public function show($id, UserPrivacyService $privacy)
+    {
+        $user = Auth::user();
+        $partner = $this->conversations->resolvePartner($id, $user);
+        abort_unless($privacy->canDirectMessage($partner, $user), 403);
+
+        return view('theme::messages.index', $this->buildPageData($user, $partner));
+    }
+
+    public function history(Request $request, $id)
+    {
+        $user = $request->user();
+        $partner = $this->conversations->resolvePartner($id, $user);
+        $beforeId = (int) $request->query('before_id', 0);
+        $limit = max(1, min(50, (int) $request->query('limit', MessageConversationService::PAGE_SIZE)));
+
+        if ($beforeId <= 0) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid before_id',
+            ], 422);
+        }
+
+        $messages = $this->conversations->olderMessages($user, $partner, $beforeId, $limit);
+        $oldestId = $messages->first()->id_msg ?? $beforeId;
+        $hasMore = $messages->isNotEmpty()
+            ? $this->conversations->hasOlderMessages($user, $partner, $oldestId)
+            : false;
+        $boundaryContext = $this->conversations->boundaryContext($user, $partner, $messages);
+
+        return response()->json([
+            'success' => true,
+            'html' => $this->renderConversation($messages, $partner, $user, true, $boundaryContext),
+            'oldest_id' => $oldestId,
+            'has_more' => $hasMore,
+            'count' => $messages->count(),
+        ]);
+    }
+
+    public function load(Request $request, $id)
+    {
+        $user = $request->user();
+        $partner = $this->conversations->resolvePartner($id, $user);
+
+        if ($request->has('after_id')) {
+            $afterId = (int) $request->query('after_id', 0);
+            $messages = $this->conversations->newerMessages($user, $partner, $afterId);
+            if ($messages->isNotEmpty()) {
+                $this->conversations->markConversationAsRead($user, $partner);
             }
-            $partner = $partners->get($partnerId);
-            if (!$partner) {
-                continue;
-            }
-            $added[$partnerId] = true;
-            $conversations[] = [
-                'user' => $partner,
-                'message' => $message,
-                'unread' => isset($unreadMap[$partnerId]),
-            ];
+
+            $boundaryContext = $this->conversations->boundaryContext($user, $partner, $messages);
+
+            return response()->json([
+                'success' => true,
+                'html' => $this->renderConversation($messages, $partner, $user, true, $boundaryContext),
+                'latest_id' => $messages->isNotEmpty() ? $messages->last()->id_msg : $afterId,
+                'count' => $messages->count(),
+            ]);
         }
 
-        $perPage = 9;
-        $page = LengthAwarePaginator::resolveCurrentPage();
-        $collection = collect($conversations);
-        $paged = new LengthAwarePaginator(
-            $collection->forPage($page, $perPage)->values(),
-            $collection->count(),
-            $perPage,
-            $page,
-            ['path' => LengthAwarePaginator::resolveCurrentPath()]
-        );
+        $messages = $this->conversations->recentMessages($user, $partner);
+        $this->conversations->markConversationAsRead($user, $partner);
+        $boundaryContext = $this->conversations->boundaryContext($user, $partner, $messages);
 
-        return [$paged, $conversations];
+        return view('theme::messages.partials.conversation', [
+            'messages' => $messages,
+            'partner' => $partner,
+            'user' => $user,
+            ...$boundaryContext,
+        ]);
     }
 
-    private function conversationQuery($user, $partner)
+    public function updates(Request $request)
     {
-        return Message::where(function ($query) use ($user, $partner) {
-            $query->where('us_env', $user->id)
-                ->where('us_rec', $partner->id);
-        })->orWhere(function ($query) use ($user, $partner) {
-            $query->where('us_env', $partner->id)
-                ->where('us_rec', $user->id);
-        });
-    }
+        $user = $request->user();
+        $conversationKey = trim((string) $request->query('conversation', ''));
+        $afterId = (int) $request->query('after_id', 0);
+        $toastAfterId = (int) $request->query('toast_after_id', $afterId);
 
-    private function getRecentConversationMessages($user, $partner, $limit = self::CONVERSATION_PAGE_SIZE)
-    {
-        return $this->conversationQuery($user, $partner)
-            ->orderBy('id_msg', 'desc')
-            ->limit($limit)
-            ->get()
-            ->sortBy('id_msg')
-            ->values();
-    }
+        $partner = $conversationKey !== ''
+            ? $this->conversations->resolvePartner($conversationKey, $user)
+            : null;
 
-    private function getOlderConversationMessages($user, $partner, $beforeId, $limit = self::CONVERSATION_PAGE_SIZE)
-    {
-        return $this->conversationQuery($user, $partner)
-            ->where('id_msg', '<', $beforeId)
-            ->orderBy('id_msg', 'desc')
-            ->limit($limit)
-            ->get()
-            ->sortBy('id_msg')
-            ->values();
-    }
+        $activeMessages = collect();
+        $activeThreadHtml = '';
+        $latestId = $afterId;
 
-    private function getNewerConversationMessages($user, $partner, $afterId)
-    {
-        return $this->conversationQuery($user, $partner)
-            ->where('id_msg', '>', $afterId)
-            ->orderBy('id_msg', 'asc')
-            ->get();
-    }
-
-    private function hasOlderConversationMessages($user, $partner, $oldestId)
-    {
-        if (!$oldestId) {
-            return false;
-        }
-
-        return $this->conversationQuery($user, $partner)
-            ->where('id_msg', '<', $oldestId)
-            ->exists();
-    }
-
-    private function getConversationMessageBefore($user, $partner, $beforeId): ?Message
-    {
-        if (!$beforeId) {
-            return null;
-        }
-
-        return $this->conversationQuery($user, $partner)
-            ->where('id_msg', '<', $beforeId)
-            ->orderBy('id_msg', 'desc')
-            ->first();
-    }
-
-    private function conversationBoundaryContext($user, $partner, $messages): array
-    {
-        $firstMessage = $messages->first();
-        if (!$firstMessage) {
-            return [
-                'hasPreviousConversationMessage' => false,
-                'precedingMessageEncrypted' => false,
-            ];
-        }
-
-        $previousMessage = $this->getConversationMessageBefore($user, $partner, $firstMessage->id_msg);
-
-        return [
-            'hasPreviousConversationMessage' => $previousMessage !== null,
-            'precedingMessageEncrypted' => $previousMessage?->isEncryptedPayload() ?? false,
-        ];
-    }
-
-    private function conversationRouteKey($user, $partner): string
-    {
-        return Message::encodeConversationRouteKey($user, $partner);
-    }
-
-    private function markConversationAsRead($user, $partner)
-    {
-        Message::where('us_env', $partner->id)
-            ->where('us_rec', $user->id)
-            ->where('state', '!=', 0)
-            ->update(['state' => 0]);
-    }
-
-    private function resolvePartner($id, $user)
-    {
-        $partnerId = Message::decodeConversationRouteKey($id, $user);
-        $partner = $partnerId ? User::find($partnerId) : null;
         if ($partner) {
-            return $partner;
+            $activeMessages = $this->conversations->newerMessages($user, $partner, $afterId);
+            if ($activeMessages->isNotEmpty()) {
+                $this->conversations->markConversationAsRead($user, $partner);
+                $latestId = (int) $activeMessages->last()->id_msg;
+            }
+
+            $boundaryContext = $this->conversations->boundaryContext($user, $partner, $activeMessages);
+            $activeThreadHtml = $this->renderConversation($activeMessages, $partner, $user, true, $boundaryContext);
         }
 
-        // Check if encryption is enabled. If so, we do NOT allow ID-based fallback.
-        if ((bool) \App\Support\SecuritySettings::get('private_message_encryption_enabled', 0)) {
-            abort(404);
+        [$paged] = $this->conversations->paginatedConversations($user);
+
+        return response()->json([
+            'success' => true,
+            'unread_count' => $this->conversations->unreadConversationCount($user),
+            'latest_id' => $latestId,
+            'latest_global_id' => $this->conversations->latestVisibleMessageId($user),
+            'conversations_html' => view('theme::messages.partials.conversations', [
+                'conversations' => $paged,
+                'partner' => $partner,
+            ])->render(),
+            'active_thread' => [
+                'html' => $activeThreadHtml,
+                'count' => $activeMessages->count(),
+                'latest_id' => $latestId,
+            ],
+            'toast' => $this->conversations->latestIncomingToast($user, $toastAfterId),
+        ]);
+    }
+
+    public function conversations(Request $request)
+    {
+        $user = $request->user();
+        $conversationKey = trim((string) $request->query('conversation', ''));
+
+        $partner = $conversationKey !== ''
+            ? $this->conversations->resolvePartner($conversationKey, $user)
+            : null;
+
+        [$paged] = $this->conversations->paginatedConversations($user);
+
+        return response()->json([
+            'success' => true,
+            'html' => view('theme::messages.partials.conversations', [
+                'conversations' => $paged,
+                'partner' => $partner,
+            ])->render(),
+            'has_more' => $paged->hasMorePages(),
+        ]);
+    }
+
+    public function send(
+        Request $request,
+        $id,
+        UserPrivacyService $privacy,
+        SecurityPolicyService $securityPolicy,
+        SecurityThrottleService $securityThrottle,
+        NotificationService $notifications
+    ) {
+        $validator = $this->buildMessageValidator($request);
+        if ($validator->fails()) {
+            return $this->validationErrorResponse($request, $validator);
         }
+
+        $user = $request->user();
+        $partner = $this->conversations->resolvePartner($id, $user);
+        if (!$privacy->canDirectMessage($partner, $user)) {
+            return $this->messageErrorResponse($request, __('messages.direct_messages_disabled'), 403);
+        }
+
+        $text = trim((string) $request->input('message', ''));
+        if ($violation = $securityPolicy->textViolation($text, 'messages')) {
+            return $this->messageErrorResponse($request, $violation, 422);
+        }
+
+        if ($cooldownMessage = $securityThrottle->actionMessage($user, 'private_message')) {
+            return $this->messageErrorResponse($request, $cooldownMessage, 429);
+        }
+
+        try {
+            [$attachmentPath, $attachmentName, $attachmentSize] = $this->storeMessageAttachment($request);
+        } catch (\Throwable) {
+            return $this->messageErrorResponse($request, __('messages.upload_failed'), 500, 'attachment');
+        }
+
+        $message = $this->createMessage($user, $partner, $text, $attachmentPath, $attachmentName, $attachmentSize);
+        $securityThrottle->hitAction($user, 'private_message');
+        $this->sendMessageNotification($notifications, $partner, $user, $message);
+
+        if (!$this->shouldReturnJson($request)) {
+            return redirect()->route('messages.show', $this->conversations->conversationRouteKey($user, $partner));
+        }
+
+        $messageCollection = collect([$message]);
+        $boundaryContext = $this->conversations->boundaryContext($user, $partner, $messageCollection);
+
+        return response()->json([
+            'success' => true,
+            'html' => $this->renderConversation($messageCollection, $partner, $user, true, $boundaryContext),
+            'latest_id' => $message->id_msg,
+            'latest_global_id' => $this->conversations->latestVisibleMessageId($user),
+        ]);
+    }
+
+    public function attachment(Request $request, $id)
+    {
+        $user = $request->user();
 
         $message = Message::whereKey($id)
             ->where(function ($query) use ($user) {
-                $query->where('us_rec', $user->id)
-                    ->orWhere('us_env', $user->id);
+                $query->where('us_env', $user->id)
+                    ->orWhere('us_rec', $user->id);
             })
             ->firstOrFail();
 
-        $partnerId = $message->us_env == $user->id ? $message->us_rec : $message->us_env;
-        return User::findOrFail($partnerId);
-    }
-
-    private function shouldReturnJson(Request $request): bool
-    {
-        return $request->expectsJson() || $request->ajax() || $request->wantsJson();
-    }
-
-    private function supportsMessageAttachments(): bool
-    {
-        if ($this->messageAttachmentColumnsReady !== null) {
-            return $this->messageAttachmentColumnsReady;
+        $relativePath = ltrim((string) $message->attachment_path, '/\\');
+        if ($relativePath === '') {
+            abort(404);
         }
 
-        $this->messageAttachmentColumnsReady = Schema::hasColumn('messages', 'attachment_path')
-            && Schema::hasColumn('messages', 'attachment_name')
-            && Schema::hasColumn('messages', 'attachment_size');
+        $normalizedPath = str_replace(['..', '\\'], ['', '/'], $relativePath);
+        $storageFile = storage_path('app/' . $normalizedPath);
+        $legacyPublicFile = public_path($normalizedPath);
 
-        return $this->messageAttachmentColumnsReady;
+        if (is_file($storageFile)) {
+            $filePath = $storageFile;
+        } elseif (is_file($legacyPublicFile)) {
+            $filePath = $legacyPublicFile;
+        } else {
+            abort(404);
+        }
+
+        $downloadName = trim((string) $message->attachment_name);
+        if ($downloadName === '') {
+            $downloadName = basename($filePath);
+        }
+
+        $mimeType = mime_content_type($filePath) ?: 'application/octet-stream';
+        if ($request->boolean('download')) {
+            return response()->download($filePath, $downloadName);
+        }
+
+        if ($request->boolean('inline') || str_starts_with($mimeType, 'image/')) {
+            return response()->file($filePath, [
+                'Content-Type' => $mimeType,
+            ]);
+        }
+
+        return response()->download($filePath, $downloadName);
+    }
+
+    private function buildPageData(User $user, ?User $partner = null): array
+    {
+        [$paged, $summaries] = $this->conversations->paginatedConversations($user);
+        $partner ??= $summaries[0]['user'] ?? null;
+
+        $messages = collect();
+        if ($partner) {
+            $messages = $this->conversations->recentMessages($user, $partner);
+            $this->conversations->markConversationAsRead($user, $partner);
+        }
+
+        $boundaryContext = $partner
+            ? $this->conversations->boundaryContext($user, $partner, $messages)
+            : [
+                'hasPreviousConversationMessage' => false,
+                'precedingMessageEncrypted' => false,
+            ];
+
+        return [
+            'conversations' => $paged,
+            'partner' => $partner,
+            'messages' => $messages,
+            'hasOlderMessages' => $partner && $messages->isNotEmpty()
+                ? $this->conversations->hasOlderMessages($user, $partner, $messages->first()->id_msg)
+                : false,
+            'partnerConversationRouteKey' => $partner ? $this->conversations->conversationRouteKey($user, $partner) : null,
+            'latestGlobalMessageId' => $this->conversations->latestVisibleMessageId($user),
+            'unreadConversationCount' => $this->conversations->unreadConversationCount($user),
+            ...$boundaryContext,
+        ];
+    }
+
+    private function renderConversation($messages, ?User $partner, User $user, bool $itemsOnly = false, array $context = []): string
+    {
+        return view('theme::messages.partials.conversation', array_merge([
+            'messages' => $messages,
+            'partner' => $partner,
+            'user' => $user,
+            'itemsOnly' => $itemsOnly,
+        ], $context))->render();
+    }
+
+    private function createMessage(
+        User $sender,
+        User $recipient,
+        string $text,
+        ?string $attachmentPath = null,
+        ?string $attachmentName = null,
+        ?int $attachmentSize = null
+    ): Message {
+        $message = new Message();
+        $message->name = $sender->username ?? $sender->name ?? '';
+        $message->us_env = $sender->id;
+        $message->us_rec = $recipient->id;
+        $message->text = $text;
+        if ($this->supportsMessageAttachments()) {
+            $message->attachment_path = $attachmentPath;
+            $message->attachment_name = $attachmentName;
+            $message->attachment_size = $attachmentSize;
+        }
+        $message->time = time();
+        $message->state = 3;
+        $message->save();
+
+        return $message;
+    }
+
+    private function sendMessageNotification(
+        NotificationService $notifications,
+        User $recipient,
+        User $sender,
+        Message $message
+    ): void {
+        $notifications->send(
+            $recipient,
+            __('messages.message_notification', ['user' => $sender->username]),
+            route('messages.show', $this->conversations->conversationRouteKey($recipient, $sender), false),
+            'envelope',
+            $sender->id,
+            'new_message',
+            false
+        );
     }
 
     private function buildMessageValidator(Request $request)
@@ -273,392 +481,46 @@ class MessageController extends Controller
         ];
     }
 
-    public function attachment(Request $request, $id)
+    private function supportsMessageAttachments(): bool
     {
-        $user = Auth::user();
-
-        $message = Message::whereKey($id)
-            ->where(function ($query) use ($user) {
-                $query->where('us_env', $user->id)
-                    ->orWhere('us_rec', $user->id);
-            })
-            ->firstOrFail();
-
-        $relativePath = ltrim((string) $message->attachment_path, '/\\');
-        if ($relativePath === '') {
-            abort(404);
+        if ($this->messageAttachmentColumnsReady !== null) {
+            return $this->messageAttachmentColumnsReady;
         }
 
-        // Prevent traversal if the DB value is tampered with.
-        $normalizedPath = str_replace(['..', '\\'], ['', '/'], $relativePath);
-        $storageFile = storage_path('app/' . $normalizedPath);
-        $legacyPublicFile = public_path($normalizedPath);
+        $this->messageAttachmentColumnsReady = Schema::hasColumn('messages', 'attachment_path')
+            && Schema::hasColumn('messages', 'attachment_name')
+            && Schema::hasColumn('messages', 'attachment_size');
 
-        if (is_file($storageFile)) {
-            $filePath = $storageFile;
-        } elseif (is_file($legacyPublicFile)) {
-            $filePath = $legacyPublicFile;
-        } else {
-            abort(404);
-        }
-
-        $downloadName = trim((string) $message->attachment_name);
-        if ($downloadName === '') {
-            $downloadName = basename($filePath);
-        }
-
-        $mimeType = mime_content_type($filePath) ?: 'application/octet-stream';
-        $forceDownload = $request->boolean('download');
-        $wantsInline = $request->boolean('inline');
-        $isImage = str_starts_with($mimeType, 'image/');
-
-        if ($forceDownload) {
-            return response()->download($filePath, $downloadName);
-        }
-
-        if ($wantsInline || $isImage) {
-            return response()->file($filePath, [
-                'Content-Type' => $mimeType,
-            ]);
-        }
-
-        return response()->download($filePath, $downloadName);
+        return $this->messageAttachmentColumnsReady;
     }
 
-    public function index()
+    private function shouldReturnJson(Request $request): bool
     {
-        $user = Auth::user();
-
-        if (request()->boolean('mark_all_read')) {
-            Message::where('us_rec', $user->id)
-                ->where('state', '!=', 0)
-                ->update(['state' => 0]);
-
-            $query = [];
-            $requestedId = request()->query('id', request()->query('user'));
-            if ($requestedId) {
-                $query['id'] = $requestedId;
-            }
-
-            return redirect()->route('messages.index', $query);
-        }
-
-        [$paged, $conversations] = $this->buildConversations($user);
-
-        $partner = null;
-        $messages = collect();
-        $requestedId = request()->query('id', request()->query('user'));
-        if ($requestedId) {
-            $partner = $this->resolvePartner($requestedId, $user);
-        } elseif (!empty($conversations)) {
-            $partner = $conversations[0]['user'];
-        }
-
-        if ($partner) {
-            $messages = $this->getRecentConversationMessages($user, $partner);
-            $this->markConversationAsRead($user, $partner);
-        }
-
-        $boundaryContext = $partner
-            ? $this->conversationBoundaryContext($user, $partner, $messages)
-            : [
-                'hasPreviousConversationMessage' => false,
-                'precedingMessageEncrypted' => false,
-            ];
-
-        return view('theme::messages.index', [
-            'conversations' => $paged,
-            'partner' => $partner,
-            'messages' => $messages,
-            'hasOlderMessages' => $partner && $messages->isNotEmpty()
-                ? $this->hasOlderConversationMessages($user, $partner, $messages->first()->id_msg)
-                : false,
-            'partnerConversationRouteKey' => $partner ? $this->conversationRouteKey($user, $partner) : null,
-            'hasPreviousConversationMessage' => $boundaryContext['hasPreviousConversationMessage'],
-            'precedingMessageEncrypted' => $boundaryContext['precedingMessageEncrypted'],
-        ]);
+        return $request->expectsJson() || $request->ajax() || $request->wantsJson();
     }
 
-    public function create(Request $request, UserPrivacyService $privacy)
+    private function validationErrorResponse(Request $request, $validator)
     {
-        $recipient = $request->query('recipient');
-        if ($recipient) {
-            $recipientUser = User::where('username', $recipient)->first();
-            if ($recipientUser && !$privacy->canDirectMessage($recipientUser, Auth::user())) {
-                return redirect()->route('messages.index')->withErrors(['recipient' => __('messages.direct_messages_disabled')]);
-            }
-        }
-        return view('theme::messages.create', compact('recipient'));
-    }
-
-    public function store(
-        Request $request,
-        UserPrivacyService $privacy,
-        SecurityPolicyService $securityPolicy,
-        SecurityThrottleService $securityThrottle,
-        \App\Services\NotificationService $notifications
-    )
-    {
-        $request->validate([
-            'recipient' => 'required|exists:users,username',
-            'message' => 'required|string|max:2000',
-        ]);
-
-        $user = Auth::user();
-        $recipient = User::where('username', $request->recipient)->firstOrFail();
-        if (!$privacy->canDirectMessage($recipient, $user)) {
-            return back()->withErrors(['recipient' => __('messages.direct_messages_disabled')])->withInput();
-        }
-
-        $text = trim((string) $request->input('message'));
-        if ($violation = $securityPolicy->textViolation($text, 'messages')) {
-            return back()->withErrors(['message' => $violation])->withInput();
-        }
-
-        if ($cooldownMessage = $securityThrottle->actionMessage($user, 'private_message')) {
-            return back()->withErrors(['message' => $cooldownMessage])->withInput();
-        }
-        
-        $message = new Message();
-        $message->name = $user->username ?? $user->name ?? '';
-        $message->us_env = $user->id;
-        $message->us_rec = $recipient->id;
-        $message->text = $text;
-        $message->time = time();
-        $message->state = 3;
-        $message->save();
-        $securityThrottle->hitAction($user, 'private_message');
-
-        $notifications->send(
-            $recipient,
-            __('messages.message_notification', ['user' => $user->username]),
-            route('messages.show', $this->conversationRouteKey($user, $recipient), false),
-            'envelope',
-            $user->id,
-            'new_message',
-            false
-        );
-
-        return redirect()->route('messages.show', $this->conversationRouteKey($user, $recipient))
-            ->with('success', __('message_sent'));
-    }
-
-    public function show($id, UserPrivacyService $privacy)
-    {
-        $user = Auth::user();
-        $partner = $this->resolvePartner($id, $user);
-        abort_unless($privacy->canDirectMessage($partner, $user), 403);
-
-        [$paged] = $this->buildConversations($user);
-        $messages = $this->getRecentConversationMessages($user, $partner);
-        $this->markConversationAsRead($user, $partner);
-        $boundaryContext = $this->conversationBoundaryContext($user, $partner, $messages);
-
-        return view('theme::messages.show', [
-            'partner' => $partner,
-            'messages' => $messages,
-            'conversations' => $paged,
-            'hasOlderMessages' => $messages->isNotEmpty()
-                ? $this->hasOlderConversationMessages($user, $partner, $messages->first()->id_msg)
-                : false,
-            'partnerConversationRouteKey' => $this->conversationRouteKey($user, $partner),
-            'hasPreviousConversationMessage' => $boundaryContext['hasPreviousConversationMessage'],
-            'precedingMessageEncrypted' => $boundaryContext['precedingMessageEncrypted'],
-        ]);
-    }
-
-    public function history(Request $request, $id)
-    {
-        $user = Auth::user();
-        $partner = $this->resolvePartner($id, $user);
-
-        $beforeId = (int) $request->query('before_id', 0);
-        $limit = (int) $request->query('limit', self::CONVERSATION_PAGE_SIZE);
-        $limit = max(1, min(50, $limit));
-
-        if ($beforeId <= 0) {
+        if ($this->shouldReturnJson($request)) {
             return response()->json([
                 'success' => false,
-                'message' => 'Invalid before_id',
+                'message' => $validator->errors()->first(),
+                'errors' => $validator->errors(),
             ], 422);
         }
 
-        $messages = $this->getOlderConversationMessages($user, $partner, $beforeId, $limit);
-        $oldestId = $messages->first()->id_msg ?? $beforeId;
-        $hasMore = $messages->isNotEmpty()
-            ? $this->hasOlderConversationMessages($user, $partner, $oldestId)
-            : false;
-        $boundaryContext = $this->conversationBoundaryContext($user, $partner, $messages);
-
-        $html = view('theme::messages.partials.conversation', [
-            'messages' => $messages,
-            'partner' => $partner,
-            'user' => $user,
-            'itemsOnly' => true,
-            'hasPreviousConversationMessage' => $boundaryContext['hasPreviousConversationMessage'],
-            'precedingMessageEncrypted' => $boundaryContext['precedingMessageEncrypted'],
-        ])->render();
-
-        return response()->json([
-            'success' => true,
-            'html' => $html,
-            'oldest_id' => $oldestId,
-            'has_more' => $hasMore,
-            'count' => $messages->count(),
-        ]);
+        return back()->withErrors($validator)->withInput();
     }
 
-    public function load(Request $request, $id)
+    private function messageErrorResponse(Request $request, string $message, int $status, string $field = 'message')
     {
-        $user = Auth::user();
-        $partner = $this->resolvePartner($id, $user);
-
-        $afterId = (int) $request->query('after_id', 0);
-        if ($request->has('after_id')) {
-            $messages = $this->getNewerConversationMessages($user, $partner, $afterId);
-            if ($messages->isNotEmpty()) {
-                $this->markConversationAsRead($user, $partner);
-            }
-            $boundaryContext = $this->conversationBoundaryContext($user, $partner, $messages);
-
-            $html = view('theme::messages.partials.conversation', [
-                'messages' => $messages,
-                'partner' => $partner,
-                'user' => $user,
-                'itemsOnly' => true,
-                'hasPreviousConversationMessage' => $boundaryContext['hasPreviousConversationMessage'],
-                'precedingMessageEncrypted' => $boundaryContext['precedingMessageEncrypted'],
-            ])->render();
-
+        if ($this->shouldReturnJson($request)) {
             return response()->json([
-                'success' => true,
-                'html' => $html,
-                'latest_id' => $messages->isNotEmpty() ? $messages->last()->id_msg : $afterId,
-                'count' => $messages->count(),
-            ]);
+                'success' => false,
+                'message' => $message,
+            ], $status);
         }
 
-        $messages = $this->getRecentConversationMessages($user, $partner);
-        $this->markConversationAsRead($user, $partner);
-
-        return view('theme::messages.partials.conversation', compact('messages', 'partner', 'user'));
-    }
-
-    public function send(
-        Request $request,
-        $id,
-        UserPrivacyService $privacy,
-        SecurityPolicyService $securityPolicy,
-        SecurityThrottleService $securityThrottle,
-        \App\Services\NotificationService $notifications
-    )
-    {
-        $validator = $this->buildMessageValidator($request);
-        if ($validator->fails()) {
-            if ($this->shouldReturnJson($request)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => $validator->errors()->first(),
-                    'errors' => $validator->errors(),
-                ], 422);
-            }
-
-            return back()->withErrors($validator)->withInput();
-        }
-
-        $user = Auth::user();
-        $partner = $this->resolvePartner($id, $user);
-        if (!$privacy->canDirectMessage($partner, $user)) {
-            if ($this->shouldReturnJson($request)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => __('messages.direct_messages_disabled'),
-                ], 403);
-            }
-
-            return back()->withErrors(['message' => __('messages.direct_messages_disabled')]);
-        }
-
-        $text = trim((string) $request->input('message', ''));
-
-        if ($violation = $securityPolicy->textViolation($text, 'messages')) {
-            if ($this->shouldReturnJson($request)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => $violation,
-                ], 422);
-            }
-
-            return back()->withErrors(['message' => $violation])->withInput();
-        }
-
-        if ($cooldownMessage = $securityThrottle->actionMessage($user, 'private_message')) {
-            if ($this->shouldReturnJson($request)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => $cooldownMessage,
-                ], 429);
-            }
-
-            return back()->withErrors(['message' => $cooldownMessage])->withInput();
-        }
-
-        try {
-            [$attachmentPath, $attachmentName, $attachmentSize] = $this->storeMessageAttachment($request);
-        } catch (\Throwable $e) {
-            if ($this->shouldReturnJson($request)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => __('messages.upload_failed'),
-                ], 500);
-            }
-
-            return back()->withErrors(['attachment' => __('messages.upload_failed')])->withInput();
-        }
-
-        $message = new Message();
-        $message->name = $user->username ?? $user->name ?? '';
-        $message->us_env = $user->id;
-        $message->us_rec = $partner->id;
-        $message->text = $text;
-        if ($this->supportsMessageAttachments()) {
-            $message->attachment_path = $attachmentPath;
-            $message->attachment_name = $attachmentName;
-            $message->attachment_size = $attachmentSize;
-        }
-        $message->time = time();
-        $message->state = 3;
-        $message->save();
-        $securityThrottle->hitAction($user, 'private_message');
-
-        $notifications->send(
-            $partner,
-            __('messages.message_notification', ['user' => $user->username]),
-            route('messages.show', $this->conversationRouteKey($user, $partner), false),
-            'envelope',
-            $user->id,
-            'new_message',
-            false
-        );
-
-        if (!$this->shouldReturnJson($request)) {
-            return redirect()->route('messages.show', $this->conversationRouteKey($user, $partner));
-        }
-        $boundaryContext = $this->conversationBoundaryContext($user, $partner, collect([$message]));
-
-        $html = view('theme::messages.partials.conversation', [
-            'messages' => collect([$message]),
-            'partner' => $partner,
-            'user' => $user,
-            'itemsOnly' => true,
-            'hasPreviousConversationMessage' => $boundaryContext['hasPreviousConversationMessage'],
-            'precedingMessageEncrypted' => $boundaryContext['precedingMessageEncrypted'],
-        ])->render();
-
-        return response()->json([
-            'success' => true,
-            'html' => $html,
-            'latest_id' => $message->id_msg,
-        ]);
+        return back()->withErrors([$field => $message])->withInput();
     }
 }

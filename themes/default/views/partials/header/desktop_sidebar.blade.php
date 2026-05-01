@@ -112,48 +112,9 @@
             $formatNotificationCount = static fn (int $count): string => $count > 99 ? '99+' : (string) $count;
 
             if ($headerUser) {
-                $headerAllMessages = \App\Models\Message::where('us_rec', $headerUser->id)
-                    ->orWhere('us_env', $headerUser->id)
-                    ->orderBy('time', 'desc')
-                    ->get();
-
-                $headerPartnerIds = [];
-                foreach ($headerAllMessages as $headerMessage) {
-                    $headerPartnerId = $headerMessage->us_env == $headerUser->id ? $headerMessage->us_rec : $headerMessage->us_env;
-                    if (!in_array($headerPartnerId, $headerPartnerIds, true)) {
-                        $headerPartnerIds[] = $headerPartnerId;
-                    }
-                }
-
-                $headerPartners = \App\Models\User::whereIn('id', $headerPartnerIds)->get()->keyBy('id');
-                $headerUnreadPartnerIds = \App\Models\Message::where('us_rec', $headerUser->id)
-                    ->where('state', '!=', 0)
-                    ->groupBy('us_env')
-                    ->pluck('us_env')
-                    ->all();
-                $headerMessageUnreadCount = count($headerUnreadPartnerIds);
-                $headerUnreadMap = array_flip($headerUnreadPartnerIds);
-
-                $headerConversations = [];
-                $headerAdded = [];
-                foreach ($headerAllMessages as $headerMessage) {
-                    $headerPartnerId = $headerMessage->us_env == $headerUser->id ? $headerMessage->us_rec : $headerMessage->us_env;
-                    if (isset($headerAdded[$headerPartnerId])) {
-                        continue;
-                    }
-                    $headerPartner = $headerPartners->get($headerPartnerId);
-                    if (!$headerPartner) {
-                        continue;
-                    }
-                    $headerAdded[$headerPartnerId] = true;
-                    $headerConversations[] = [
-                        'user' => $headerPartner,
-                        'message' => $headerMessage,
-                        'unread' => isset($headerUnreadMap[$headerPartnerId]),
-                    ];
-                }
-
-                $headerMessages = collect($headerConversations)->take(5);
+                $headerMessageService = app(\App\Services\MessageConversationService::class);
+                $headerMessages = collect($headerMessageService->conversationSummaries($headerUser))->take(5);
+                $headerMessageUnreadCount = $headerMessageService->unreadConversationCount($headerUser);
                 $headerNotifications = \App\Models\Notification::where('uid', $headerUser->id)
                     ->orderBy('time', 'desc')
                     ->limit(5)
@@ -166,22 +127,18 @@
         <div class="header-actions">
             <div class="action-list dark">
                 <div class="action-list-item-wrap">
-                    <a class="action-list-item header-dropdown-trigger {{ $headerMessageUnreadCount > 0 ? 'unread' : '' }}" href="javascript:void(0)">
+                    <a class="action-list-item header-dropdown-trigger {{ $headerMessageUnreadCount > 0 ? 'unread' : '' }}" data-message-action-trigger href="javascript:void(0)">
                         <svg class="action-list-item-icon icon-messages">
                             <use xlink:href="#svg-messages"></use>
                         </svg>
-                        @if($headerMessageUnreadCount > 0)
-                            <span class="header-action-count">{{ $headerMessageUnreadCount }}</span>
-                        @endif
+                        <span class="header-action-count" data-message-unread-count @if($headerMessageUnreadCount === 0) hidden @endif>{{ $headerMessageUnreadCount > 0 ? $formatNotificationCount($headerMessageUnreadCount) : '' }}</span>
                     </a>
                     <div class="header-dropdown">
                         <div class="dropdown-box">
                             <div class="dropdown-box-header">
                                 <p class="dropdown-box-header-title">
                                     {{ __('messages.msgs') }}
-                                    @if($headerMessageUnreadCount > 0)
-                                        <span class="highlighted">{{ $headerMessageUnreadCount }}</span>
-                                    @endif
+                                    <span class="highlighted" data-message-unread-count @if($headerMessageUnreadCount === 0) hidden @endif>{{ $headerMessageUnreadCount > 0 ? $formatNotificationCount($headerMessageUnreadCount) : '' }}</span>
                                 </p>
                                 <div class="dropdown-box-header-actions">
                                     <a class="dropdown-box-header-action" href="{{ url('/messages') }}">{{ __('messages.msgs') }}</a>

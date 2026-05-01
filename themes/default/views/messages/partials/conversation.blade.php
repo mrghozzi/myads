@@ -9,7 +9,7 @@
 @endphp
 
 @if(!$itemsOnly)
-<div class="messages-thread" data-oldest-id="{{ $oldestId }}" data-latest-id="{{ $latestId }}" data-has-older="{{ $hasOlder ? 1 : 0 }}">
+<div class="messages-thread" data-thread data-oldest-id="{{ $oldestId }}" data-latest-id="{{ $latestId }}" data-has-older="{{ $hasOlder ? 1 : 0 }}">
 @endif
     @forelse($messages as $message)
         @php
@@ -28,20 +28,21 @@
             $attachmentInlineUrl = route('messages.attachment', ['id' => $message->id_msg, 'inline' => 1]);
             $attachmentDownloadUrl = route('messages.attachment', ['id' => $message->id_msg, 'download' => 1]);
             $messageDateTime = \Carbon\Carbon::createFromTimestamp($message->time);
-            $showFullDateTime = $messageDateTime->lt(\Carbon\Carbon::now()->subDay());
-            $messageTimeLabel = $showFullDateTime
+            $messageTimeLabel = $messageDateTime->lt(\Carbon\Carbon::now()->subDay())
                 ? $messageDateTime->format('Y-m-d g:i A')
                 : $messageDateTime->format('g:i A');
         @endphp
+
         @if($showEncryptionNotice)
-            <div class="messages-encryption-notice" role="note">
-                <span>{{ __('messages.private_messages_encryption_notice') }}</span>
+            <div class="messages-encryption-notice" role="note" data-thread-item>
+                <span><i class="fa fa-lock" aria-hidden="true"></i>{{ __('messages.private_messages_encryption_notice') }}</span>
             </div>
         @endif
-        <article class="messages-bubble-row {{ $isMine ? 'is-me' : '' }}" data-message-id="{{ $message->id_msg }}">
+
+        <article class="messages-bubble-row {{ $isMine ? 'is-me' : 'is-them' }}" data-thread-item data-message-id="{{ $message->id_msg }}">
             @unless($isMine)
                 <div class="messages-bubble-avatar">
-                    <img src="{{ $partner ? $partner->avatarUrl() : asset('upload/_avatar.png') }}" alt="{{ $partner->username ?? __('messages.unknown_user') }}">
+                    <img src="{{ $partner ? $partner->avatarUrl() : asset('upload/avatar.png') }}" alt="{{ $partner->username ?? __('messages.unknown_user') }}">
                 </div>
             @endunless
 
@@ -52,58 +53,37 @@
 
                 @if(!empty($attachmentPath))
                     @if($isImageAttachment)
-                        <a
-                            class="messages-image-attachment {{ $isMine ? 'is-me' : '' }}"
-                            href="{{ $attachmentInlineUrl }}"
-                            target="_blank"
-                            rel="noopener"
-                        >
+                        <a class="messages-image-attachment {{ $isMine ? 'is-me' : '' }}" href="{{ $attachmentInlineUrl }}" target="_blank" rel="noopener">
                             <img src="{{ $attachmentInlineUrl }}" alt="{{ $attachmentLabel }}" loading="lazy">
                         </a>
-
-                        <a
-                            class="messages-image-meta {{ $isMine ? 'is-me' : '' }}"
-                            href="{{ $attachmentDownloadUrl }}"
-                            target="_blank"
-                            rel="noopener"
-                        >
+                        <a class="messages-image-meta {{ $isMine ? 'is-me' : '' }}" href="{{ $attachmentDownloadUrl }}" target="_blank" rel="noopener">
                             <i class="fa fa-image" aria-hidden="true"></i>
-                            <span class="messages-image-meta-name">{{ $attachmentLabel }}</span>
+                            <span class="messages-attachment-name">{{ $attachmentLabel }}</span>
                             @if($attachmentSize > 0)
-                                <span class="messages-image-meta-size">{{ number_format($attachmentSize / 1024, 1) }} KB</span>
+                                <span class="messages-attachment-size">{{ number_format($attachmentSize / 1024, 1) }} KB</span>
                             @endif
                         </a>
                     @else
-                        <a
-                            class="messages-file-attachment {{ $isMine ? 'is-me' : '' }}"
-                            href="{{ $attachmentDownloadUrl }}"
-                            target="_blank"
-                            rel="noopener"
-                        >
-                            <span class="messages-file-attachment-icon">
-                                <i aria-hidden="true" class="fa fa-file"></i>
-                            </span>
-
-                            <span class="messages-file-attachment-meta">
-                                <span class="messages-file-attachment-name">{{ $attachmentLabel }}</span>
-                                <span class="messages-file-attachment-sub">
-                                    <span class="messages-file-attachment-ext">{{ $attachmentExtension ? strtoupper($attachmentExtension) : __('messages.file') }}</span>
+                        <a class="messages-file-attachment {{ $isMine ? 'is-me' : '' }}" href="{{ $attachmentDownloadUrl }}" target="_blank" rel="noopener">
+                            <span class="messages-file-icon"><i class="fa fa-file" aria-hidden="true"></i></span>
+                            <span class="messages-file-meta">
+                                <span class="messages-attachment-name">{{ $attachmentLabel }}</span>
+                                <span class="messages-file-sub">
+                                    <span>{{ $attachmentExtension ? strtoupper($attachmentExtension) : __('messages.file') }}</span>
                                     @if($attachmentSize > 0)
-                                        <span class="messages-file-attachment-size">{{ number_format($attachmentSize / 1024, 1) }} KB</span>
+                                        <span>{{ number_format($attachmentSize / 1024, 1) }} KB</span>
                                     @endif
                                 </span>
                             </span>
-
-                            <span class="messages-file-attachment-action">
-                                <i class="fa fa-download" aria-hidden="true"></i>
-                            </span>
+                            <span class="messages-file-download"><i class="fa fa-download" aria-hidden="true"></i></span>
                         </a>
                     @endif
                 @endif
 
-                <span class="messages-bubble-time">{{ $messageTimeLabel }}</span>
+                <time class="messages-bubble-time">{{ $messageTimeLabel }}</time>
             </div>
         </article>
+
         @php
             $previousEncryptedState = $isEncryptedPayload;
             $hasPreviousState = true;

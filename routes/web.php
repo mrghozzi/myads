@@ -161,6 +161,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/messages/create', [MessageController::class, 'create'])->name('messages.create');
     Route::post('/messages', [MessageController::class, 'store'])->name('messages.store');
     Route::get('/messages/attachment/{id}', [MessageController::class, 'attachment'])->name('messages.attachment');
+    Route::get('/messages/updates', [MessageController::class, 'updates'])->name('messages.updates');
+    Route::get('/messages/conversations', [MessageController::class, 'conversations'])->name('messages.conversations');
     Route::get('/messages/{id}', [MessageController::class, 'show'])->name('messages.show');
     Route::get('/messages/{id}/history', [MessageController::class, 'history'])->name('messages.history');
     Route::get('/messages/{id}/load', [MessageController::class, 'load'])->name('messages.load');
