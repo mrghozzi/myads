@@ -2778,4 +2778,11 @@ return [
     'image' => 'Image',
     'joined' => 'Joined',
     'published_at' => 'Published at',
+    'ip_visibility_title' => 'IP Visibility in Stats',
+    'ip_visibility_help' => 'Choose who can see visitor IP addresses in the statistics pages.',
+    'ip_visibility_everyone' => 'Everyone',
+    'ip_visibility_paid_all' => 'All Paid Members',
+    'ip_visibility_plan' => 'Only Plan:',
+    'ip_visibility_admins' => 'Admins Only',
+    'ip_visibility_none' => 'No One',
 ];

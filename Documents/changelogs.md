@@ -18,6 +18,12 @@
 * **Security**: Mail password is stored encrypted in the database using Laravel `Crypt` and is never displayed in the admin form; submitting a blank password preserves the existing stored value.
 * **i18n**: Added 18 mail settings translation keys across all **9 supported languages**, with full Arabic and Persian translations.
 
+### Performance & Statistics
+* **Performance**: Replaced full-dataset retrieval with a server-side **Pagination system** (`paginate(50)`) across all statistics pages (`/state`). This eliminates the significant loading latency for users with large traffic datasets while maintaining full accessibility to historical data via modern Bootstrap 5 navigation links.
+* **Feature**: Introduced a granular **IP Visibility Control** system in the Ads Settings admin dashboard. Administrators can now restrict the visibility of visitor IP addresses in statistics to: Everyone, All Paid Members, specific Subscription Plans, Administrators Only, or disable it entirely for privacy.
+* **Refactor**: Globally enforced **Bootstrap 5 pagination** styling via `AppServiceProvider` to ensure visual consistency across all paginated modules, including the newly updated statistics and messages modules.
+* **i18n**: Added **IP visibility translation keys** to English and Arabic to support the new admin configuration options.
+
 ### Billing & Payment Gateways
 * **Feature**: Integrated **Lemon Squeezy** as a fully supported payment gateway for the subscription and paid plans system, processing checkout sessions via `JSON:API`.
 * **Feature**: Added dynamic gateway configuration for Lemon Squeezy in the admin panel (`/admin/billing/gateways`), supporting Store ID, Variant ID, API Key, and Webhook Secret setup.

@@ -2779,4 +2779,11 @@ return [
     'image' => 'صورة',
     'joined' => 'انضم في',
     'published_at' => 'نُشر في',
+    'ip_visibility_title' => 'ظهور الآيبي في الإحصائيات',
+    'ip_visibility_help' => 'اختر من يمكنه رؤية عناوين الآيبي للزوار في صفحات الإحصائيات.',
+    'ip_visibility_everyone' => 'الجميع',
+    'ip_visibility_paid_all' => 'جميع أصحاب العضويات المدفوعة',
+    'ip_visibility_plan' => 'أصحاب خطة:',
+    'ip_visibility_admins' => 'المديرون فقط',
+    'ip_visibility_none' => 'لا أحد',
 ];

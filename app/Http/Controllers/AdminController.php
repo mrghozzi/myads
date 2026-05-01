@@ -332,11 +332,15 @@ class AdminController extends Controller
         $adsBrandName = AdsSettings::brandName();
         $bannerRepeatWindowMinutes = BannerServingSettings::repeatWindowMinutes();
         $smartAdsPointsDivisor = SmartAdsSettings::pointsDivisor();
+        $ipVisibility = AdsSettings::ipVisibility();
+        $plans = $this->plans->activePlans();
 
         return view('admin::admin.ads_settings', compact(
             'adsBrandName',
             'bannerRepeatWindowMinutes',
-            'smartAdsPointsDivisor'
+            'smartAdsPointsDivisor',
+            'ipVisibility',
+            'plans'
         ));
     }
 
@@ -346,6 +350,7 @@ class AdminController extends Controller
             'ads_brand_name' => 'required|string|max:255',
             'banner_repeat_window_minutes' => 'nullable|integer|min:0|max:525600',
             'smart_ads_points_divisor' => 'nullable|numeric|min:0.1|max:1000',
+            'ip_visibility' => 'required|string',
         ]);
 
         Option::updateOrCreate(
@@ -375,6 +380,16 @@ class AdminController extends Controller
             ],
             [
                 'o_valuer' => (string) ($validated['smart_ads_points_divisor'] ?? SmartAdsSettings::DEFAULT_POINTS_DIVISOR),
+            ]
+        );
+
+        Option::updateOrCreate(
+            [
+                'o_type' => AdsSettings::OPTION_TYPE,
+                'name' => AdsSettings::IP_VISIBILITY,
+            ],
+            [
+                'o_valuer' => $validated['ip_visibility'],
             ]
         );
 

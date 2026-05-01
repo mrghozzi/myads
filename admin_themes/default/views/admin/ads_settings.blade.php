@@ -54,6 +54,21 @@
                     <input type="number" min="0.1" max="1000" step="0.1" name="smart_ads_points_divisor" class="form-control" value="{{ old('smart_ads_points_divisor', $smartAdsPointsDivisor) }}" placeholder="4">
                     <small class="text-muted">{{ __('messages.smart_admin_points_divisor_help') }}</small>
                 </div>
+                <div class="col-12">
+                    <label class="form-label">{{ __('messages.ip_visibility_title') ?? 'IP Visibility in Stats' }}</label>
+                    <select name="ip_visibility" class="form-select">
+                        <option value="everyone" {{ $ipVisibility === 'everyone' ? 'selected' : '' }}>{{ __('messages.ip_visibility_everyone') ?? 'Everyone' }}</option>
+                        <option value="paid_all" {{ $ipVisibility === 'paid_all' ? 'selected' : '' }}>{{ __('messages.ip_visibility_paid_all') ?? 'All Paid Members' }}</option>
+                        @foreach($plans as $plan)
+                            <option value="plan_{{ $plan->id }}" {{ $ipVisibility === "plan_{$plan->id}" ? 'selected' : '' }}>
+                                {{ __('messages.ip_visibility_plan') ?? 'Only Plan:' }} {{ $plan->name }}
+                            </option>
+                        @endforeach
+                        <option value="admins" {{ $ipVisibility === 'admins' ? 'selected' : '' }}>{{ __('messages.ip_visibility_admins') ?? 'Admins Only' }}</option>
+                        <option value="none" {{ $ipVisibility === 'none' ? 'selected' : '' }}>{{ __('messages.ip_visibility_none') ?? 'No One' }}</option>
+                    </select>
+                    <small class="text-muted">{{ __('messages.ip_visibility_help') ?? 'Choose who can see visitor IP addresses in the statistics pages.' }}</small>
+                </div>
                 <div class="col-12 d-flex justify-content-end">
                     <button type="submit" class="btn btn-primary">{{ __('messages.ads_settings_save') }}</button>
                 </div>

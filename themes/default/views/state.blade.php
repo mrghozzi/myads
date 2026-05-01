@@ -42,7 +42,9 @@
                    <th>{{ __('messages.time') ?? 'Time' }}</th>
                    <th>{{ __('messages.browser') ?? 'Browser' }}</th>
                    <th>{{ __('messages.platform') ?? 'Platform' }}</th>
-                   <th>{{ __('messages.ip') ?? 'Ip' }}</th>
+                   @if(\App\Support\AdsSettings::canSeeIp(Auth::user()))
+                       <th>{{ __('messages.ip') ?? 'Ip' }}</th>
+                   @endif
                   </tr>
                  </thead>
                  <tbody>
@@ -65,13 +67,15 @@
                                 {{ $state->browser['version'] }}
                             </td>
                             <td>{{ $state->browser['platform'] }}</td>
-                            <td>
-                                <a class="btn btn-primary" href="http://ip.is-best.net/?ip={{ $state->v_ip }}" target="_blank"><i class="fa-solid fa-file-invoice fa-bounce"></i></a>
-                            </td>
+                            @if(\App\Support\AdsSettings::canSeeIp(Auth::user()))
+                                <td>
+                                    <a class="btn btn-primary" href="http://ip.is-best.net/?ip={{ $state->v_ip }}" target="_blank"><i class="fa-solid fa-file-invoice fa-bounce"></i></a>
+                                </td>
+                            @endif
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="text-center">{{ __('messages.no_data') }}</td>
+                            <td colspan="{{ \App\Support\AdsSettings::canSeeIp(Auth::user()) ? 6 : 5 }}" class="text-center">{{ __('messages.no_data') }}</td>
                         </tr>
                     @endforelse
                  </tbody>
