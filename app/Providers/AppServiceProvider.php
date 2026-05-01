@@ -47,6 +47,8 @@ class AppServiceProvider extends ServiceProvider
         // Fix for shared hosting with 1000-byte max key length (utf8mb4)
         Schema::defaultStringLength(191);
 
+        \Illuminate\Pagination\Paginator::useBootstrapFive();
+
         $theme = 'default';
         $menus = [];
         $setting = null;

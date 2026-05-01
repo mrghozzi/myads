@@ -336,7 +336,7 @@ class AdsController extends Controller
             }
         }
 
-        $states = $statesQuery->orderBy('id', 'desc')->get();
+        $states = $statesQuery->orderBy('id', 'desc')->paginate(50)->withQueryString();
 
         if (!$subtitle && is_numeric($request->query('st'))) {
             $subtitle = '@' . (User::find($request->query('st'))->username ?? '');

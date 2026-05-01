@@ -76,6 +76,9 @@
                     @endforelse
                  </tbody>
              </table>
+             <div class="pagination-wrapper mt-4">
+                 {!! $states->links() !!}
+             </div>
         </div>
     </div>
 </div>
