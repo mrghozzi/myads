@@ -139,6 +139,10 @@
                                                 {{ __('messages.billing_secret_current_masked', ['value' => $config['webhook_secret']]) }}
                                             @endif
                                         </div>
+                                        <div class="mt-2 p-2 bg-light rounded border">
+                                            <div class="small fw-semibold mb-1 text-muted">رابط الـ Webhook (ضعه في لوحة Lemon Squeezy):</div>
+                                            <code class="user-select-all d-block text-break">{{ route('billing.webhook', ['gateway' => 'lemon_squeezy']) }}</code>
+                                        </div>
                                     </div>
                                 @endif
 
