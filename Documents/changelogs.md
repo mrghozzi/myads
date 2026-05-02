@@ -1,3 +1,8 @@
+# v4.3.2
+> **Development** — Preparing for the next release cycle.
+
+---
+
 # v4.3.1
 > **Maintenance Release** — OAuth stability, CSRF refinements, and admin mail configuration.
 
