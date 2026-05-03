@@ -61,8 +61,13 @@
                         </select>
                     </div>
                     <div class="col-md-6">
-                        <label class="form-label">{{ __('Image Link') }}</label>
+                        <label class="form-label">{{ __('Image Link') }} (Version A)</label>
                         <input type="text" class="form-control" name="img" value="{{ $banner->img }}" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">{{ __('Image Link') }} (Version B - Optional)</label>
+                        <input type="text" class="form-control" name="img_b" value="{{ $banner->img_b }}">
+                        <small class="text-muted">A/B Testing: Provide a second image for optimization.</small>
                     </div>
                     <div class="col-md-6">
                         <label class="form-label">{{ __('messages.Statu') }}</label>
@@ -106,9 +111,18 @@
                 </div>
             </div>
             <div class="admin-panel__body">
-                <div class="admin-preview-card text-center">
-                    <img src="{{ $banner->img }}" alt="{{ $banner->name }}" class="img-fluid rounded">
+                <div class="admin-preview-card text-center mb-4">
+                    <h6>Version A</h6>
+                    <img src="{{ $banner->img }}" alt="{{ $banner->name }}" class="img-fluid rounded mb-2">
+                    <div class="small text-muted">Views: {{ $banner->vu_a }} | Clicks: {{ $banner->clik_a }}</div>
                 </div>
+                @if($banner->img_b)
+                <div class="admin-preview-card text-center">
+                    <h6>Version B</h6>
+                    <img src="{{ $banner->img_b }}" alt="{{ $banner->name }}" class="img-fluid rounded mb-2">
+                    <div class="small text-muted">Views: {{ $banner->vu_b }} | Clicks: {{ $banner->clik_b }}</div>
+                </div>
+                @endif
             </div>
         </aside>
     </div>

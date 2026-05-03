@@ -7,7 +7,7 @@
     <div class='blog-card' style='box-sizing: border-box;'>
         <div class='description'>
             <h1 style='color: #000000;'>
-                <a href='{{ route('ads.redirect', ['link' => $link1->id, 'clik' => $publisherId, 'type' => 'link']) }}' target='_blank' rel='noopener noreferrer'>{!! htmlentities($link1Name, ENT_QUOTES, 'UTF-8') !!}</a>
+                <a href='{{ $link1ClickUrl }}' target='_blank' rel='noopener noreferrer'>{!! htmlentities($link1Name, ENT_QUOTES, 'UTF-8') !!}</a>
             </h1>
             <h2>ADS by {{ $adsBrandName }}</h2>
             <p style='color: #000000;'>{!! htmlentities($link1Txt, ENT_QUOTES, 'UTF-8') !!}</p>
@@ -15,7 +15,7 @@
         </div>
         <div class='description'>
             <h1 style='color: #000000;'>
-                <a href='{{ route('ads.redirect', ['link' => $link2->id, 'clik' => $publisherId, 'type' => 'link']) }}' target='_blank' rel='noopener noreferrer'>{!! htmlentities($link2Name, ENT_QUOTES, 'UTF-8') !!}</a>
+                <a href='{{ $link2ClickUrl }}' target='_blank' rel='noopener noreferrer'>{!! htmlentities($link2Name, ENT_QUOTES, 'UTF-8') !!}</a>
             </h1>
             <h2>ADS by {{ $adsBrandName }}</h2>
             <p style='color: #000000;'>{!! htmlentities($link2Txt, ENT_QUOTES, 'UTF-8') !!}</p>

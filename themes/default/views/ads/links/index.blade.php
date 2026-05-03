@@ -65,6 +65,7 @@
                <th>{{ __('messages.name') ?? 'Name' }}</th>
                <th>{{ __('messages.Vu') ?? 'Vu' }}</th>
                <th>{{ __('messages.Clik') ?? 'Clik' }}</th>
+               <th>{{ __('Performance') }}</th>
                <th>{{ __('messages.Statu') ?? 'Statu' }}</th>
               </tr>
              </thead>
@@ -91,6 +92,9 @@
                   </div></td>
                 <td><a href="{{ route('legacy.state', ['ty' => 'link', 'id' => $link->id]) }}" class="btn btn-warning" >{{ $vuCount }}</a></td>
                 <td><a href="{{ route('legacy.state', ['ty' => 'clik', 'id' => $link->id]) }}" class="btn btn-primary" >{{ $link->clik }}</a></td>
+                <td>
+                    @include('theme::partials.ads.mini_heatmap', ['heatmap' => $link->heatmap])
+                </td>
                 <td>{{ $fgft }}</td>
               </tr>
               @endforeach

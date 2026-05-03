@@ -40,8 +40,13 @@
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label>{{ __('messages.img') }}</label>
+                                <label>{{ __('messages.img') }} (Version A)</label>
                                 <input type="text" name="img" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label>{{ __('messages.img') }} (Version B - Optional)</label>
+                                <input type="text" name="img_b" class="form-control">
+                                <small class="text-muted">A/B Testing: Provide a second image to automatically serve the best performing version.</small>
                             </div>
                         </div>
                         <div>

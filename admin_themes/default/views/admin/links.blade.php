@@ -108,8 +108,14 @@
                                         <div class="small text-muted text-truncate" title="{{ $link->txt }}">{{ $link->txt }}</div>
                                     </td>
                                     <td>
-                                        <span class="badge bg-soft-primary text-primary">{{ $link->clik }}</span>
-                                    </td>
+                                         <span class="badge bg-soft-primary text-primary">{{ $link->clik }}</span>
+                                         @if($link->name_b || $link->txt_b)
+                                         <div class="mt-1 small">
+                                             <span class="text-success">A: {{ $link->clik_a }}</span> | 
+                                             <span class="text-info">B: {{ $link->clik_b }}</span>
+                                         </div>
+                                         @endif
+                                     </td>
                                     <td>
                                         @if($link->statu == 1)
                                             <span class="badge bg-soft-success text-success">{{ __('messages.active') }}</span>
@@ -157,16 +163,25 @@
                 @csrf
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label class="form-label">{{ __('messages.name') }}</label>
+                        <label class="form-label">{{ __('messages.name') }} (Version A)</label>
                         <input type="text" name="name" value="{{ $link->name }}" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ __('messages.name') }} (Version B - Optional)</label>
+                        <input type="text" name="name_b" value="{{ $link->name_b }}" class="form-control">
                     </div>
                     <div class="mb-3">
                         <label class="form-label">{{ __('messages.url') }}</label>
                         <input type="text" name="url" value="{{ $link->url }}" class="form-control" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">{{ __('messages.desc') }}</label>
-                        <textarea name="txt" rows="3" class="form-control">{{ $link->txt }}</textarea>
+                        <label class="form-label">{{ __('messages.desc') }} (Version A)</label>
+                        <textarea name="txt" rows="3" class="form-control" required>{{ $link->txt }}</textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ __('messages.desc') }} (Version B - Optional)</label>
+                        <textarea name="txt_b" rows="3" class="form-control">{{ $link->txt_b }}</textarea>
+                        <small class="text-muted">A/B Testing: Provide a second title/description to automatically serve the best performing version.</small>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">{{ __('messages.status') }}</label>

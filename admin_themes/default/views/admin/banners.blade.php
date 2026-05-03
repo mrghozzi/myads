@@ -108,9 +108,21 @@
                                     </td>
                                     <td>
                                         <a href="{{ route('admin.stats', ['ty' => 'banner', 'id' => $banner->id]) }}" class="badge bg-soft-warning text-warning">{{ $banner->vu }}</a>
+                                        @if($banner->img_b)
+                                        <div class="mt-1 small">
+                                            <span class="text-success">A: {{ $banner->vu_a }}</span> | 
+                                            <span class="text-info">B: {{ $banner->vu_b }}</span>
+                                        </div>
+                                        @endif
                                     </td>
                                     <td>
                                         <a href="{{ route('admin.stats', ['ty' => 'vu', 'id' => $banner->id]) }}" class="badge bg-soft-primary text-primary">{{ $banner->clik }}</a>
+                                        @if($banner->img_b)
+                                        <div class="mt-1 small">
+                                            <span class="text-success">A: {{ $banner->clik_a }}</span> | 
+                                            <span class="text-info">B: {{ $banner->clik_b }}</span>
+                                        </div>
+                                        @endif
                                     </td>
                                     <td><span class="badge bg-light text-dark">{{ $banner->px }}</span></td>
                                     <td>

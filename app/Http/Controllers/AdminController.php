@@ -891,6 +891,7 @@ class AdminController extends Controller
             'name' => 'required|string',
             'url' => 'required|url',
             'img' => 'required|string',
+            'img_b' => 'nullable|string',
             'px' => 'required|string',
             'statu' => 'required|in:1,2',
             'countries' => 'nullable|string|max:1000',
@@ -903,6 +904,7 @@ class AdminController extends Controller
             'name' => $request->name,
             'url' => $request->url,
             'img' => $request->img,
+            'img_b' => $request->img_b,
             'px' => $bannerSize,
             'statu' => $request->statu,
             'countries' => SmartAdTargeting::encodeList(SmartAdTargeting::normalizeCountryCodes($request->input('countries') ?? '')),
@@ -1047,7 +1049,10 @@ class AdminController extends Controller
         
         $request->validate([
             'name' => 'required|string',
+            'name_b' => 'nullable|string',
             'url' => 'required|url',
+            'txt' => 'required|string',
+            'txt_b' => 'nullable|string',
             'statu' => 'required|in:0,1,2',
             'countries' => 'nullable|string|max:1000',
             'devices' => 'nullable|array',
@@ -1056,8 +1061,10 @@ class AdminController extends Controller
 
         $link->update([
             'name' => $request->name,
+            'name_b' => $request->name_b,
             'url' => $request->url,
             'txt' => $request->txt,
+            'txt_b' => $request->txt_b,
             'statu' => $request->statu,
             'countries' => SmartAdTargeting::encodeList(SmartAdTargeting::normalizeCountryCodes($request->input('countries') ?? '')),
             'devices' => SmartAdTargeting::encodeList(SmartAdTargeting::normalizeDeviceTypes($request->input('devices') ?? [])),

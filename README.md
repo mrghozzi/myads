@@ -18,7 +18,8 @@ MYADS combines ad exchange, community, marketplace, directory, forum, and admin 
 
 Core areas include:
 
-- Banner ads, text ads, visit exchange, and Smart Ads
+- Banner ads, text ads, visit exchange, and Smart Ads with **Geo-Targeting** and **A/B Testing**
+- Ad analytics with **Hourly Click Heatmaps**
 - Community feed, reactions, comments, reposts, mentions, and messaging
 - Forum with moderation tools and attachments
 - Store and product knowledgebase
@@ -35,7 +36,8 @@ Core areas include:
 
 ### Member Features
 
-- Ad exchange tools for banners, text ads, visit exchange, and Smart Ads
+- Ad exchange tools for banners, text ads, visit exchange, and Smart Ads with **Geo-Targeting**
+- **A/B Testing** optimization and **Performance Heatmaps** for advertisers
 - Social profiles with follows, badges, privacy controls, and social links
 - Community feed with comments, reactions, reposts, and mentions
 - Forum participation with categories, topics, and attachments

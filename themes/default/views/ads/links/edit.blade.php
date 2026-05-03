@@ -24,16 +24,25 @@
                     <div class="grid grid-6-6" style="gap: 18px;">
                         <div>
                             <div class="form-group">
-                                <label>{{ __('messages.name') }}</label>
+                                <label>{{ __('messages.name') }} (Version A)</label>
                                 <input type="text" name="name" class="form-control" value="{{ $link->name }}" required>
+                            </div>
+                            <div class="form-group">
+                                <label>{{ __('messages.name') }} (Version B - Optional)</label>
+                                <input type="text" name="name_b" class="form-control" value="{{ $link->name_b }}">
                             </div>
                             <div class="form-group">
                                 <label>{{ __('messages.url') }}</label>
                                 <input type="url" name="url" class="form-control" value="{{ $link->url }}" required>
                             </div>
                             <div class="form-group">
-                                <label>{{ __('messages.desc') }}</label>
+                                <label>{{ __('messages.desc') }} (Version A)</label>
                                 <textarea name="txt" class="form-control" rows="3" required>{{ $link->txt }}</textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>{{ __('messages.desc') }} (Version B - Optional)</label>
+                                <textarea name="txt_b" class="form-control" rows="3">{{ $link->txt_b }}</textarea>
+                                <small class="text-muted">A/B Testing: Provide a second title/description to automatically serve the best performing version.</small>
                             </div>
                         </div>
                         <div>

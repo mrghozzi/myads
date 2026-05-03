@@ -5,8 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Banner;
 use App\Models\Link;
 use App\Models\SmartAd;
-use App\Models\State; // Assuming State model exists or using DB table
+use App\Models\State;
 use App\Models\User;
+use App\Services\AdStatsService;
 use App\Services\SecurityPolicyService;
 use App\Support\BannerSizeCatalog;
 use Illuminate\Http\Request;
@@ -29,19 +30,29 @@ class AdsController extends Controller
     }
 
     // List Banners (b_list.php)
-    public function indexBanners()
+    public function indexBanners(AdStatsService $statsService)
     {
         $user = Auth::user();
         $banners = Banner::where('uid', $user->id)->orderBy('id', 'desc')->get();
+        
+        foreach($banners as $banner) {
+            $banner->heatmap = $statsService->getHourlyHeatmap($banner->id, 'banner');
+        }
+
         $site_settings = \App\Models\Setting::first();
         return view('theme::ads.banners.index', compact('banners', 'user', 'site_settings'));
     }
 
     // List Links (l_list.php)
-    public function indexLinks()
+    public function indexLinks(AdStatsService $statsService)
     {
         $user = Auth::user();
         $links = Link::where('uid', $user->id)->orderBy('id', 'desc')->get();
+        
+        foreach($links as $link) {
+            $link->heatmap = $statsService->getHourlyHeatmap($link->id, 'link');
+        }
+
         $site_settings = \App\Models\Setting::first();
         return view('theme::ads.links.index', compact('links', 'user', 'site_settings'));
     }
@@ -63,6 +74,7 @@ class AdsController extends Controller
             'name' => 'required|string|max:255',
             'url' => 'required|url',
             'img' => 'required|string', // URL string
+            'img_b' => 'nullable|string', // Alternative Image URL
             'px' => 'required|string', // Size
             'countries' => 'nullable|string|max:1000',
             'devices' => 'nullable|array',
@@ -85,12 +97,17 @@ class AdsController extends Controller
             'name' => $request->name,
             'url' => $request->url,
             'img' => $request->img,
+            'img_b' => $request->img_b,
             'px' => $bannerSize,
             'countries' => \App\Support\SmartAdTargeting::encodeList(\App\Support\SmartAdTargeting::normalizeCountryCodes($request->input('countries') ?? '')),
             'devices' => \App\Support\SmartAdTargeting::encodeList(\App\Support\SmartAdTargeting::normalizeDeviceTypes($request->input('devices') ?? [])),
             'statu' => 1,
             'vu' => 0,
             'clik' => 0,
+            'vu_a' => 0,
+            'clik_a' => 0,
+            'vu_b' => 0,
+            'clik_b' => 0,
         ]);
 
         return redirect()->route('ads.banners.index')->with('success', 'Banner added successfully.');
@@ -119,6 +136,7 @@ class AdsController extends Controller
             'name' => 'required|string|max:255',
             'url' => 'required|url',
             'img' => 'required|string',
+            'img_b' => 'nullable|string',
             'px' => 'required|string',
             'countries' => 'nullable|string|max:1000',
             'devices' => 'nullable|array',
@@ -134,10 +152,15 @@ class AdsController extends Controller
             return back()->withErrors(['img' => $violation])->withInput();
         }
 
+        if ($request->input('img_b') && ($violation = $securityPolicy->urlViolation((string) $request->input('img_b'), 'ads', true))) {
+            return back()->withErrors(['img_b' => $violation])->withInput();
+        }
+
         $banner->update([
             'name' => $request->name,
             'url' => $request->url,
             'img' => $request->img,
+            'img_b' => $request->img_b,
             'px' => $bannerSize,
             'countries' => \App\Support\SmartAdTargeting::encodeList(\App\Support\SmartAdTargeting::normalizeCountryCodes($request->input('countries') ?? '')),
             'devices' => \App\Support\SmartAdTargeting::encodeList(\App\Support\SmartAdTargeting::normalizeDeviceTypes($request->input('devices') ?? [])),
@@ -178,8 +201,10 @@ class AdsController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
+            'name_b' => 'nullable|string|max:255',
             'url' => 'required|url',
             'txt' => 'required|string',
+            'txt_b' => 'nullable|string',
             'countries' => 'nullable|string|max:1000',
             'devices' => 'nullable|array',
             'devices.*' => 'in:desktop,mobile,tablet',
@@ -195,15 +220,25 @@ class AdsController extends Controller
             return back()->withErrors(['txt' => $violation])->withInput();
         }
 
+        if ($request->input('txt_b') && ($violation = $securityPolicy->textViolation((string) $request->input('txt_b'), 'ads'))) {
+            return back()->withErrors(['txt_b' => $violation])->withInput();
+        }
+
         Link::create([
             'uid' => $user->id,
             'name' => $request->name,
+            'name_b' => $request->name_b,
             'url' => $request->url,
             'txt' => $request->txt,
+            'txt_b' => $request->txt_b,
             'countries' => \App\Support\SmartAdTargeting::encodeList(\App\Support\SmartAdTargeting::normalizeCountryCodes($request->input('countries') ?? '')),
             'devices' => \App\Support\SmartAdTargeting::encodeList(\App\Support\SmartAdTargeting::normalizeDeviceTypes($request->input('devices') ?? [])),
             'statu' => 1,
             'clik' => 0,
+            'vu_a' => 0,
+            'clik_a' => 0,
+            'vu_b' => 0,
+            'clik_b' => 0,
         ]);
 
         return redirect()->route('ads.links.index')->with('success', 'Link added successfully.');
@@ -230,8 +265,10 @@ class AdsController extends Controller
 
         $request->validate([
             'name' => 'required|string|max:255',
+            'name_b' => 'nullable|string|max:255',
             'url' => 'required|url',
             'txt' => 'required|string',
+            'txt_b' => 'nullable|string',
             'countries' => 'nullable|string|max:1000',
             'devices' => 'nullable|array',
             'devices.*' => 'in:desktop,mobile,tablet',
@@ -245,10 +282,16 @@ class AdsController extends Controller
             return back()->withErrors(['txt' => $violation])->withInput();
         }
 
+        if ($request->input('txt_b') && ($violation = $securityPolicy->textViolation((string) $request->input('txt_b'), 'ads'))) {
+            return back()->withErrors(['txt_b' => $violation])->withInput();
+        }
+
         $link->update([
             'name' => $request->name,
+            'name_b' => $request->name_b,
             'url' => $request->url,
             'txt' => $request->txt,
+            'txt_b' => $request->txt_b,
             'countries' => \App\Support\SmartAdTargeting::encodeList(\App\Support\SmartAdTargeting::normalizeCountryCodes($request->input('countries') ?? '')),
             'devices' => \App\Support\SmartAdTargeting::encodeList(\App\Support\SmartAdTargeting::normalizeDeviceTypes($request->input('devices') ?? [])),
         ]);

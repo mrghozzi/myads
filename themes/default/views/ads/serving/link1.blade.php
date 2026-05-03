@@ -10,7 +10,7 @@
                                 <tr>
                                     <td style='cursor:pointer' width='229' height='41' align='center' valign='top'>
                                         <font style='font-size:11px; font-family:verdana,arial,sans-serif; line-height:14px; text-decoration:underline;color:#660066' color='#660066'>
-                                            <a class='ad' target='_blank' href='{{ route('ads.redirect', ['link' => $link1->id, 'clik' => $publisherId, 'type' => 'link']) }}'>
+                                            <a class='ad' target='_blank' href='{{ $link1ClickUrl }}'>
                                                 <b style='color: #000000;'>{!! htmlentities($link1Name, ENT_QUOTES, 'UTF-8') !!}</b>
                                             </a>
                                         </font><br>
@@ -18,7 +18,7 @@
                                     </td>
                                     <td style='cursor:pointer' width='229' height='41' align='center' valign='top'>
                                         <font style='font-size:11px; font-family:verdana,arial,sans-serif; line-height:14px; text-decoration:underline;color:#660066' color='#660066'>
-                                            <a class='ad' target='_blank' href='{{ route('ads.redirect', ['link' => $link2->id, 'clik' => $publisherId, 'type' => 'link']) }}'>
+                                            <a class='ad' target='_blank' href='{{ $link2ClickUrl }}'>
                                                 <b style='color: #000000;'>{!! htmlentities($link2Name, ENT_QUOTES, 'UTF-8') !!}</b>
                                             </a>
                                         </font><br>

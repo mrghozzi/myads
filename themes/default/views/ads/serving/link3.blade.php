@@ -271,12 +271,12 @@
                     <span class="myads-link-smart__index">01</span>
                 </div>
                 <h3 class="myads-link-smart__title">
-                    <a href="{{ route('ads.redirect', ['link' => $link1->id, 'clik' => $publisherId, 'type' => 'link']) }}" target="_blank" rel="noopener noreferrer">{!! htmlentities($link1Name, ENT_QUOTES, 'UTF-8') !!}</a>
+                    <a href="{{ $link1ClickUrl }}" target="_blank" rel="noopener noreferrer">{!! htmlentities($link1Name, ENT_QUOTES, 'UTF-8') !!}</a>
                 </h3>
                 <p class="myads-link-smart__text">{!! htmlentities($link1Txt, ENT_QUOTES, 'UTF-8') !!}</p>
                 <div class="myads-link-smart__meta">
                     <span class="myads-link-smart__byline">Ads by <a href="{{ url('/') }}?ref={{ $publisherId }}" target="_blank" rel="noopener noreferrer">{{ $adsBrandName }}</a></span>
-                    <a class="myads-link-smart__cta" href="{{ route('ads.redirect', ['link' => $link1->id, 'clik' => $publisherId, 'type' => 'link']) }}" target="_blank" rel="noopener noreferrer">
+                    <a class="myads-link-smart__cta" href="{{ $link1ClickUrl }}" target="_blank" rel="noopener noreferrer">
                         Open Ad
                         <span class="myads-link-smart__cta-arrow">></span>
                     </a>
@@ -289,12 +289,12 @@
                     <span class="myads-link-smart__index">02</span>
                 </div>
                 <h3 class="myads-link-smart__title">
-                    <a href="{{ route('ads.redirect', ['link' => $link2->id, 'clik' => $publisherId, 'type' => 'link']) }}" target="_blank" rel="noopener noreferrer">{!! htmlentities($link2Name, ENT_QUOTES, 'UTF-8') !!}</a>
+                    <a href="{{ $link2ClickUrl }}" target="_blank" rel="noopener noreferrer">{!! htmlentities($link2Name, ENT_QUOTES, 'UTF-8') !!}</a>
                 </h3>
                 <p class="myads-link-smart__text">{!! htmlentities($link2Txt, ENT_QUOTES, 'UTF-8') !!}</p>
                 <div class="myads-link-smart__meta">
                     <span class="myads-link-smart__byline">Ads by <a href="{{ url('/') }}?ref={{ $publisherId }}" target="_blank" rel="noopener noreferrer">{{ $adsBrandName }}</a></span>
-                    <a class="myads-link-smart__cta" href="{{ route('ads.redirect', ['link' => $link2->id, 'clik' => $publisherId, 'type' => 'link']) }}" target="_blank" rel="noopener noreferrer">
+                    <a class="myads-link-smart__cta" href="{{ $link2ClickUrl }}" target="_blank" rel="noopener noreferrer">
                         Open Ad
                         <span class="myads-link-smart__cta-arrow">></span>
                     </a>

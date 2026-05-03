@@ -264,6 +264,8 @@ myads/
 | `TestingSafetyGuard` | Hard-fails tests unless they are using the isolated SQLite testing database |
 | `UpdateSafetyService` | Preflight safety checks for updates: DB connection, writable paths, pending migrations, destructive migration detection |
 | `AdminNotificationService` | Aggregates pending admin tasks (billing, reports, updates) with permission-aware filtering |
+| `AdStatsService` | Generates hourly click heatmaps for ad performance analytics |
+| `AdGeoService` | (WIP) Resolves member location for country-based ad targeting |
 | `MailConfigServiceProvider` | Boots early to override `config('mail.*')` from the `mail_settings` database table at runtime, with graceful fallback |
 
 ---
@@ -664,6 +666,7 @@ php artisan storage:link
 31. **CSRF:** Never disable CSRF except for installer routes and ad serving endpoints.
 32. **PHP Commands:** Agents must not execute PHP commands directly (e.g., `php artisan migrate`, `php artisan tinker`). These commands often fail or time out in the background and can be destructive if misconfigured.
 33. **Task Completion:** After finishing code changes, the agent must provide a summary of recommendations, manual actions required (like running migrations), or general notes, rather than executing terminal commands for deployment or maintenance.
+34. **Changelog Documentation Rule:** When updating `Documents/changelogs.md`, **NEVER** mention modifications made to any plugin (inside `plugins/`) or any theme except for the primary `themes/default/` theme. Public changelogs should remain focused on core platform changes only.
 
 ---
 

@@ -52,10 +52,6 @@ class AdsServingController extends Controller
             ->whereIn('px', BannerSizeCatalog::queryCandidates($pxValue))
             ->whereHas('user', function ($query) use ($user_id) {
                 $query->where('nvu', '>=', 1)->where('id', '!=', $user_id);
-            })
-            ->get()
-            ->filter(function (Banner $candidate) use ($countryCode, $deviceType) {
-                return $this->matchesAdCandidate($candidate, $countryCode, $deviceType);
             });
 
         if ($repeatWindowSeconds > 0 && $this->bannerImpressionsEnabled()) {
@@ -70,9 +66,12 @@ class AdsServingController extends Controller
             });
         }
 
-        $banner = $bannerQuery instanceof \Illuminate\Support\Collection 
-            ? $bannerQuery->random() 
-            : $bannerQuery->inRandomOrder()->first();
+        $candidates = $bannerQuery->get()->filter(function (Banner $candidate) use ($countryCode, $deviceType) {
+            return $this->matchesAdCandidate($candidate, $countryCode, $deviceType);
+        });
+
+        $banner = $candidates->count() > 0 ? $candidates->random() : null;
+
 
         if ($banner) {
             // Deduct from Advertiser
@@ -80,14 +79,18 @@ class AdsServingController extends Controller
             if ($advertiser) {
                 $advertiser->decrement('nvu', 1);
             }
-            $banner->increment('vu');
+
+            // A/B Testing: Determine version to serve
+            $abVersion = $banner->getAbVersionToServe();
+            $banner->increment($abVersion === 'b' ? 'vu_b' : 'vu_a');
+            $banner->increment('vu'); // Total impressions
 
             // Log State
             $this->logState($user_id, $banner->id, 'banner', $request);
-            $this->recordBannerImpression($banner->id, (int) $user_id, $visitorKey);
+            $this->recordBannerImpression($banner->id, (int) $user_id, $visitorKey, $abVersion);
 
             // Return JS to display banner (Matches old bn.php output style)
-            $html = $this->renderBannerMarkup($banner, (int) $user_id, $pxValue, $placementMode);
+            $html = $this->renderBannerMarkup($banner, (int) $user_id, $pxValue, $placementMode, $abVersion);
 
             return $this->javascriptResponse($this->renderHtmlInsertionScript($html, $slotId));
         }
@@ -123,15 +126,16 @@ class AdsServingController extends Controller
 
         // 2. Select First Link ($ab)
         // Logic: Link from user who has nlink >= 1 and NOT same user
-        $link1 = Link::where('statu', 1)
+        $candidates1 = Link::where('statu', 1)
             ->whereHas('user', function ($query) use ($user_id) {
                 $query->where('nlink', '>=', 1)->where('id', '!=', $user_id);
             })
             ->get()
             ->filter(function (Link $candidate) use ($countryCode, $deviceType) {
                 return $this->matchesAdCandidate($candidate, $countryCode, $deviceType);
-            })
-            ->random();
+            });
+
+        $link1 = $candidates1->count() > 0 ? $candidates1->random() : null;
 
         if (!$link1) {
              return $this->javascriptResponse('// No ads available');
@@ -140,7 +144,7 @@ class AdsServingController extends Controller
         // 3. Select Second Link ($ab2)
         // Logic: Link from user who has nlink >= 1, NOT same user as publisher, AND NOT same user as first link owner
         // AND NOT the same link as first link.
-        $link2 = Link::where('statu', 1)
+        $candidates2 = Link::where('statu', 1)
             ->where('id', '!=', ($link1 ? $link1->id : 0))
             ->whereHas('user', function ($query) use ($user_id, $link1) {
                 $query->where('nlink', '>=', 1)
@@ -150,8 +154,9 @@ class AdsServingController extends Controller
             ->get()
             ->filter(function (Link $candidate) use ($countryCode, $deviceType) {
                 return $this->matchesAdCandidate($candidate, $countryCode, $deviceType);
-            })
-            ->random();
+            });
+
+        $link2 = $candidates2->count() > 0 ? $candidates2->random() : null;
 
         // If no second link found, what does old code do?
         // "if ($num_rows = $results2->fetchColumn() == 0) { } else { ... }"
@@ -163,7 +168,7 @@ class AdsServingController extends Controller
         // or just duplicate link1 if really nothing else.
         if (!$link2) {
              // Fallback: Try finding any other link not equal to link1, even from same user
-             $link2 = Link::where('statu', 1)
+             $candidates3 = Link::where('statu', 1)
                 ->where('id', '!=', ($link1 ? $link1->id : 0))
                 ->whereHas('user', function ($query) use ($user_id) {
                     $query->where('nlink', '>=', 1)->where('id', '!=', $user_id);
@@ -171,8 +176,8 @@ class AdsServingController extends Controller
                 ->get()
                 ->filter(function (Link $candidate) use ($countryCode, $deviceType) {
                     return $this->matchesAdCandidate($candidate, $countryCode, $deviceType);
-                })
-                ->random();
+                });
+             $link2 = $candidates3->count() > 0 ? $candidates3->random() : null;
              
              // If still nothing, use link1 again
              if (!$link2) {
@@ -180,12 +185,13 @@ class AdsServingController extends Controller
              }
         }
 
-        // 4. Log Stats (state table)
-        // Log for Link 1
+        // 4. Log Stats (state table) & A/B Selection
+        $abVersion1 = $link1->getAbVersionToServe();
+        $link1->increment($abVersion1 === 'b' ? 'vu_b' : 'vu_a');
         $this->logState($user_id, $link1->id, 'link', $request);
         
-        // Log for Link 2 (if distinct or just log again)
-        // Old code: Logs stats for both.
+        $abVersion2 = $link2->getAbVersionToServe();
+        $link2->increment($abVersion2 === 'b' ? 'vu_b' : 'vu_a');
         if ($link2->id != $link1->id) {
             $this->logState($user_id, $link2->id, 'link', $request);
         }
@@ -203,10 +209,13 @@ class AdsServingController extends Controller
         // Publisher ID for references
         $publisherId = $user_id;
 
-        $link1Name = $this->normalizeText($link1->name);
-        $link1Txt = $this->normalizeText($link1->txt);
-        $link2Name = $this->normalizeText($link2->name);
-        $link2Txt = $this->normalizeText($link2->txt);
+        $link1Name = $this->normalizeText($abVersion1 === 'b' && $link1->name_b ? $link1->name_b : $link1->name);
+        $link1Txt = $this->normalizeText($abVersion1 === 'b' && $link1->txt_b ? $link1->txt_b : $link1->txt);
+        $link2Name = $this->normalizeText($abVersion2 === 'b' && $link2->name_b ? $link2->name_b : $link2->name);
+        $link2Txt = $this->normalizeText($abVersion2 === 'b' && $link2->txt_b ? $link2->txt_b : $link2->txt);
+
+        $link1ClickUrl = route('ads.redirect', ['link' => $link1->id, 'clik' => $publisherId, 'v' => $abVersion1]);
+        $link2ClickUrl = route('ads.redirect', ['link' => $link2->id, 'clik' => $publisherId, 'v' => $abVersion2]);
 
         $html = view($viewName, array_merge(compact(
             'link1',
@@ -216,7 +225,9 @@ class AdsServingController extends Controller
             'link1Name',
             'link1Txt',
             'link2Name',
-            'link2Txt'
+            'link2Txt',
+            'link1ClickUrl',
+            'link2ClickUrl'
         ), $viewData))->render();
         
         // Strip newlines to avoid JS errors in document.write
@@ -313,6 +324,8 @@ class AdsServingController extends Controller
 
             $banner = Banner::find($bannerId);
             if ($banner) {
+                $version = $request->input('v', 'a');
+                $banner->increment($version === 'b' ? 'clik_b' : 'clik_a');
                 $banner->increment('clik');
                 
                 // Reward Publisher (Matches show.php logic?)
@@ -339,6 +352,8 @@ class AdsServingController extends Controller
     {
         $link = Link::find($linkId);
         if ($link) {
+            $version = $request->input('v', 'a');
+            $link->increment($version === 'b' ? 'clik_b' : 'clik_a');
             $link->increment('clik');
 
             // Reward Publisher
@@ -481,7 +496,7 @@ class AdsServingController extends Controller
         return 'fp:' . hash('sha256', $request->ip() . '|' . ($request->userAgent() ?? ''));
     }
 
-    private function recordBannerImpression(int $bannerId, int $publisherId, string $visitorKey): void
+    private function recordBannerImpression(int $bannerId, int $publisherId, string $visitorKey, string $version = 'a'): void
     {
         if (!$this->bannerImpressionsEnabled()) {
             return;
@@ -552,35 +567,37 @@ class AdsServingController extends Controller
         return $enabled;
     }
 
-    private function renderBannerMarkup(Banner $banner, int $publisherId, string $pxValue, string $placementMode = 'fixed'): string
+    private function renderBannerMarkup(Banner $banner, int $publisherId, string $pxValue, string $placementMode = 'fixed', string $version = 'a'): string
     {
         if ($placementMode === 'responsive2') {
-            return $this->renderResponsive2BannerMarkup($banner, $publisherId, $pxValue);
+            return $this->renderResponsive2BannerMarkup($banner, $publisherId, $pxValue, $version);
         }
 
-        return $this->renderClassicBannerMarkup($banner, $publisherId, $pxValue);
+        return $this->renderClassicBannerMarkup($banner, $publisherId, $pxValue, $version);
     }
 
-    private function renderClassicBannerMarkup(Banner $banner, int $publisherId, string $pxValue): string
+    private function renderClassicBannerMarkup(Banner $banner, int $publisherId, string $pxValue, string $version = 'a'): string
     {
         $width = $this->getWidth($pxValue);
         $height = $this->getHeight($pxValue);
         $bannerId = (int) $banner->id;
-        $clickUrl = route('ads.redirect', ['ads' => $bannerId, 'vu' => $publisherId]);
+        $imgUrl = ($version === 'b' && $banner->img_b) ? $banner->img_b : $banner->img;
+        $clickUrl = route('ads.redirect', ['ads' => $bannerId, 'vu' => $publisherId, 'v' => $version]);
         $refUrl = url('/') . '?ref=' . $publisherId;
         $reportUrl = url('/report') . '?banner=' . $bannerId;
         $bannerName = htmlspecialchars((string) $banner->name, ENT_QUOTES, 'UTF-8');
         $appName = htmlspecialchars(AdsSettings::brandName(), ENT_QUOTES, 'UTF-8');
 
-        return "<style>.banner_{$bannerId}{background-image:url('{$banner->img}');height:{$height}px;width:{$width}px;max-width:100%;margin:0 auto;display:block;background-size:cover;background-position:center;position:relative;overflow:hidden;}.banner_{$bannerId} .banner_click_{$bannerId}{position:absolute;inset:0;display:block;text-decoration:none;z-index:1;}.banner_icon_{$bannerId}{position:absolute;top:0;left:0;display:flex;gap:4px;padding:5px;z-index:2;background-color:rgba(0,0,0,0.5);}.banner_icon_{$bannerId} a{display:inline-flex;align-items:center;justify-content:center;height:auto;width:auto;text-decoration:none;}@media screen and (max-width: {$width}px){.banner_{$bannerId}{width:100%;}}</style><div class='banner_{$bannerId}'><a class='banner_click_{$bannerId}' href='{$clickUrl}' target='_blank' rel='noopener noreferrer' aria-label='{$bannerName}'></a><div class='banner_icon_{$bannerId}'><a href='{$refUrl}' target='_blank' rel='noopener noreferrer'><img src='" . theme_asset('img/logo_w.png') . "' width='16' height='16' alt='{$appName}'></a><a href='{$reportUrl}' target='_blank' rel='noopener noreferrer' aria-label='Report'><img src='" . theme_asset('img/Alert-icon.png') . "' alt=''></a></div></div>";
+        return "<style>.banner_{$bannerId}{background-image:url('{$imgUrl}');height:{$height}px;width:{$width}px;max-width:100%;margin:0 auto;display:block;background-size:cover;background-position:center;position:relative;overflow:hidden;}.banner_{$bannerId} .banner_click_{$bannerId}{position:absolute;inset:0;display:block;text-decoration:none;z-index:1;}.banner_icon_{$bannerId}{position:absolute;top:0;left:0;display:flex;gap:4px;padding:5px;z-index:2;background-color:rgba(0,0,0,0.5);}.banner_icon_{$bannerId} a{display:inline-flex;align-items:center;justify-content:center;height:auto;width:auto;text-decoration:none;}@media screen and (max-width: {$width}px){.banner_{$bannerId}{width:100%;}}</style><div class='banner_{$bannerId}'><a class='banner_click_{$bannerId}' href='{$clickUrl}' target='_blank' rel='noopener noreferrer' aria-label='{$bannerName}'></a><div class='banner_icon_{$bannerId}'><a href='{$refUrl}' target='_blank' rel='noopener noreferrer'><img src='" . theme_asset('img/logo_w.png') . "' width='16' height='16' alt='{$appName}'></a><a href='{$reportUrl}' target='_blank' rel='noopener noreferrer' aria-label='Report'><img src='" . theme_asset('img/Alert-icon.png') . "' alt=''></a></div></div>";
     }
 
-    private function renderResponsive2BannerMarkup(Banner $banner, int $publisherId, string $pxValue): string
+    private function renderResponsive2BannerMarkup(Banner $banner, int $publisherId, string $pxValue, string $version = 'a'): string
     {
         $width = $this->getWidth($pxValue);
         $height = $this->getHeight($pxValue);
         $bannerId = (int) $banner->id;
-        $clickUrl = route('ads.redirect', ['ads' => $bannerId, 'vu' => $publisherId]);
+        $imgUrl = ($version === 'b' && $banner->img_b) ? $banner->img_b : $banner->img;
+        $clickUrl = route('ads.redirect', ['ads' => $bannerId, 'vu' => $publisherId, 'v' => $version]);
         $refUrl = url('/') . '?ref=' . $publisherId;
         $reportUrl = url('/report') . '?banner=' . $bannerId;
         $bannerName = htmlspecialchars((string) $banner->name, ENT_QUOTES, 'UTF-8');
@@ -624,7 +641,7 @@ class AdsServingController extends Controller
         $chipText = htmlspecialchars(__('messages.ads_by_site', ['site' => AdsSettings::brandName()]), ENT_QUOTES, 'UTF-8');
         $reportLabel = htmlspecialchars(__('messages.report'), ENT_QUOTES, 'UTF-8');
 
-        return "<style>.{$class},.{$class} *{box-sizing:border-box;}.{$class}{position:relative;width:{$width}px;height:{$height}px;max-width:100%;margin:0 auto;display:block;overflow:hidden;border-radius:{$radius}px;background:#f1f3f4 url('{$banner->img}') center/cover no-repeat;box-shadow:0 1px 3px rgba(18,24,40,.16);font-family:Arial,'Segoe UI',sans-serif;isolation:isolate;}.{$class}__click{position:absolute;inset:0;display:block;z-index:1;text-decoration:none;}.{$class}__chrome{position:absolute;top:0;right:0;z-index:3;display:flex;align-items:stretch;max-width:{$chipMaxWidth};border-radius:0 0 0 {$radius}px;overflow:hidden;box-shadow:0 1px 2px rgba(18,24,40,.18);}.{$class}__label,.{$class}__info{display:inline-flex;align-items:center;justify-content:center;height:{$labelHeight}px;background:rgba(255,255,255,.96);text-decoration:none;line-height:1;}.{$class}__label{max-width:calc(100% - {$infoWidth}px);padding:{$labelPadding};color:#202124;font-size:{$labelFontSize};font-weight:400;letter-spacing:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-inline-end:1px solid #dadce0;}.{$class}__label:hover,.{$class}__info:hover{background:#f8f9fa;text-decoration:none;}.{$class}__info{width:{$infoWidth}px;min-width:{$infoWidth}px;color:#5f6368;}.{$class}__info-mark{display:inline-flex;align-items:center;justify-content:center;width:" . ($profile === 'rail' ? 11 : 13) . "px;height:" . ($profile === 'rail' ? 11 : 13) . "px;border-radius:50%;border:1px solid #5f8def;color:#5f8def;font-size:" . ($profile === 'rail' ? '8px' : '9px') . ";font-weight:700;font-style:normal;font-family:Arial,'Segoe UI',sans-serif;}@media screen and (max-width: {$width}px){.{$class}{width:100%;}}</style><div class='{$class}' data-placement='responsive2' data-size='{$pxValue}' data-profile='{$profile}'><a class='{$class}__click' href='{$clickUrl}' target='_blank' rel='noopener noreferrer' aria-label='{$bannerName}'></a><div class='{$class}__chrome'><a class='{$class}__label' href='{$refUrl}' target='_blank' rel='noopener noreferrer'>{$chipText}</a><a class='{$class}__info' href='{$reportUrl}' target='_blank' rel='noopener noreferrer' aria-label='{$reportLabel}'><span class='{$class}__info-mark'>i</span></a></div></div>";
+        return "<style>.{$class},.{$class} *{box-sizing:border-box;}.{$class}{position:relative;width:{$width}px;height:{$height}px;max-width:100%;margin:0 auto;display:block;overflow:hidden;border-radius:{$radius}px;background:#f1f3f4 url('{$imgUrl}') center/cover no-repeat;box-shadow:0 1px 3px rgba(18,24,40,.16);font-family:Arial,'Segoe UI',sans-serif;isolation:isolate;}.{$class}__click{position:absolute;inset:0;display:block;z-index:1;text-decoration:none;}.{$class}__chrome{position:absolute;top:0;right:0;z-index:3;display:flex;align-items:stretch;max-width:{$chipMaxWidth};border-radius:0 0 0 {$radius}px;overflow:hidden;box-shadow:0 1px 2px rgba(18,24,40,.18);}.{$class}__label,.{$class}__info{display:inline-flex;align-items:center;justify-content:center;height:{$labelHeight}px;background:rgba(255,255,255,.96);text-decoration:none;line-height:1;}.{$class}__label{max-width:calc(100% - {$infoWidth}px);padding:{$labelPadding};color:#202124;font-size:{$labelFontSize};font-weight:400;letter-spacing:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-inline-end:1px solid #dadce0;}.{$class}__label:hover,.{$class}__info:hover{background:#f8f9fa;text-decoration:none;}.{$class}__info{width:{$infoWidth}px;min-width:{$infoWidth}px;color:#5f6368;}.{$class}__info-mark{display:inline-flex;align-items:center;justify-content:center;width:" . ($profile === 'rail' ? 11 : 13) . "px;height:" . ($profile === 'rail' ? 11 : 13) . "px;border-radius:50%;border:1px solid #5f8def;color:#5f8def;font-size:" . ($profile === 'rail' ? '8px' : '9px') . ";font-weight:700;font-style:normal;font-family:Arial,'Segoe UI',sans-serif;}@media screen and (max-width: {$width}px){.{$class}{width:100%;}}</style><div class='{$class}' data-placement='responsive2' data-size='{$pxValue}' data-profile='{$profile}'><a class='{$class}__click' href='{$clickUrl}' target='_blank' rel='noopener noreferrer' aria-label='{$bannerName}'></a><div class='{$class}__chrome'><a class='{$class}__label' href='{$refUrl}' target='_blank' rel='noopener noreferrer'>{$chipText}</a><a class='{$class}__info' href='{$reportUrl}' target='_blank' rel='noopener noreferrer' aria-label='{$reportLabel}'><span class='{$class}__info-mark'>i</span></a></div></div>";
     }
 
     private function renderSmartMarkup(SmartAd $smartAd, int $publisherId, string $placement, ?string $bannerSize = null): string

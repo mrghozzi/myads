@@ -1,5 +1,13 @@
 # v4.3.2
-> **Development** — Preparing for the next release cycle.
+> **Feature Release** — Ad targeting, performance heatmaps, and A/B optimization.
+
+### Ad Exchange & Analytics
+* **Feature**: Introduced **Ad Geo-Targeting**, allowing advertisers to restrict their banner and text/link ads to specific countries via a new multi-select country picker in the ad creation and edit forms.
+* **Feature**: Implemented **Hourly Click Heatmaps** for ads. Advertisers can now visualize click distribution across a 24-hour cycle via an interactive, theme-aware mini-heatmap on their ad management dashboard.
+* **Feature**: Added **A/B Testing** for Banners and Links using a smart **Epsilon-Greedy (80/20)** optimization algorithm. Advertisers can provide an alternative "Version B" (image/text), and the system automatically serves the better-performing version more frequently based on real-time CTR.
+* **Fix**: Resolved critical `500 Internal Server Error` in `AdsServingController` (bn.php / link.php) caused by incorrect collection handling and empty result sets during ad selection.
+* **Architecture**: Introduced `AdStatsService` to aggregate hourly click data and `AdGeoService` (placeholder) for future geo-resolution expansions.
+* **UI**: Enhanced ad list tables with a new **Performance** column and Tooltip-enabled heatmaps that adapt to both Light and Dark modes.
 
 ---
 
