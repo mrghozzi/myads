@@ -50,6 +50,7 @@
 ### Staged Admin Updates
 * **Feature**: Reworked `/admin/updates` into a staged AJAX updater with visible progress for download, extraction, package safety checks, maintenance mode, file installation, database migration, and cleanup.
 * **Reliability**: Each update stage now runs as a separate request and stores session state in `options`, reducing pressure on weak/shared hosting while preserving maintenance-mode recovery on failure.
+* **Fix**: Added automatic recovery for interrupted `/admin/updates` sessions so pending, stale download, and safe pre-maintenance stages resume when the administrator returns after a network drop or closed browser.
 * **Safety**: Release packages are extracted into isolated storage, checked for unsafe ZIP paths, and scanned for destructive migrations before any live files are copied.
 
 ### OAuth 2.0 & Integrations

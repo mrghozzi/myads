@@ -439,6 +439,7 @@
     let currentUpdateSession = updateConfig.initialSession || null;
     let currentUpdateRoutes = currentUpdateSession ? routesForToken(currentUpdateSession.token) : null;
     let updateLoopRunning = false;
+    let updateRecoveryTimer = null;
 
     document.addEventListener('DOMContentLoaded', function () {
         // Markdown Rendering
@@ -473,12 +474,18 @@
 
         if (currentUpdateSession) {
             renderUpdateSession(currentUpdateSession);
-            if (currentUpdateSession.status === 'pending') {
-                setTimeout(runUpdateLoop, 700);
-            } else if (currentUpdateSession.status === 'running') {
-                setTimeout(pollUpdateStatus, 1200);
-            }
+            scheduleUpdateRecovery(700);
         }
+
+        window.addEventListener('online', function () {
+            scheduleUpdateRecovery(500);
+        });
+
+        document.addEventListener('visibilitychange', function () {
+            if (!document.hidden) {
+                scheduleUpdateRecovery(500);
+            }
+        });
     });
 
     function checkForUpdates() {
@@ -621,6 +628,7 @@
             }
 
             if (currentUpdateSession.status === 'failed') {
+                setUpdateControlsLocked(false);
                 showFlash('danger', '<i class="feather-alert-circle me-2"></i>' + escapeHtml(currentUpdateSession.error || updateConfig.labels.failed));
                 return;
             }
@@ -634,6 +642,7 @@
             setTimeout(runUpdateLoop, 700);
         } catch (error) {
             showFlash('danger', '<i class="feather-alert-circle me-2"></i>' + escapeHtml(error.message || updateConfig.labels.connectionError));
+            scheduleUpdateRecovery(3000);
         } finally {
             updateLoopRunning = false;
         }
@@ -661,13 +670,56 @@
             currentUpdateRoutes = data.routes || currentUpdateRoutes;
             renderUpdateSession(currentUpdateSession);
 
-            if (currentUpdateSession.status === 'running') {
+            if (currentUpdateSession.status === 'running' && !currentUpdateSession.is_stale && !currentUpdateSession.can_auto_resume) {
                 setTimeout(pollUpdateStatus, 1500);
-            } else if (currentUpdateSession.status === 'pending') {
-                setTimeout(runUpdateLoop, 700);
+            } else if (currentUpdateSession.status === 'pending' || currentUpdateSession.can_auto_resume) {
+                scheduleUpdateRecovery(700);
             }
         } catch (error) {
             showFlash('danger', '<i class="feather-alert-circle me-2"></i>' + escapeHtml(error.message || updateConfig.labels.connectionError));
+            scheduleUpdateRecovery(5000);
+        }
+    }
+
+    function scheduleUpdateRecovery(delay) {
+        if (!currentUpdateSession || !currentUpdateRoutes) {
+            return;
+        }
+
+        if (['completed', 'cancelled'].includes(currentUpdateSession.status)) {
+            return;
+        }
+
+        if (updateRecoveryTimer) {
+            clearTimeout(updateRecoveryTimer);
+        }
+
+        updateRecoveryTimer = setTimeout(function () {
+            updateRecoveryTimer = null;
+            resumeUpdateSession();
+        }, delay);
+    }
+
+    function resumeUpdateSession() {
+        if (!currentUpdateSession || !currentUpdateRoutes || updateLoopRunning) {
+            return;
+        }
+
+        if (['completed', 'cancelled'].includes(currentUpdateSession.status)) {
+            return;
+        }
+
+        if (currentUpdateSession.status === 'running' && !currentUpdateSession.is_stale && !currentUpdateSession.can_auto_resume) {
+            pollUpdateStatus();
+            return;
+        }
+
+        if (currentUpdateSession.status === 'failed' && !currentUpdateSession.can_auto_resume) {
+            return;
+        }
+
+        if (currentUpdateSession.status === 'pending' || currentUpdateSession.can_auto_resume || currentUpdateSession.is_stale) {
+            runUpdateLoop();
         }
     }
 

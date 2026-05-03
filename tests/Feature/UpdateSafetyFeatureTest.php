@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Option;
 use App\Models\User;
 use App\Services\TestingSafetyGuard;
 use App\Services\UpdateSafetyService;
@@ -296,6 +297,107 @@ PHP);
         }
     }
 
+    public function test_admin_update_status_exposes_stale_running_session_for_resume(): void
+    {
+        $this->seedSiteSettings();
+
+        $admin = User::factory()->create([
+            'id' => 1,
+            'username' => 'rootstaleresume',
+        ]);
+
+        [$zipPath, $releaseRoot] = $this->makeReleaseZip('stale-resume-release', [
+            'myads-release/storage/app/stale-resume-marker.txt' => 'stale',
+        ]);
+
+        Http::fake([
+            'https://api.github.com/repos/mrghozzi/myads/releases/latest' => Http::response($this->releasePayload($zipPath), 200),
+            'https://downloads.example.test/myads-update.zip' => Http::response(file_get_contents($zipPath), 200, [
+                'Content-Type' => 'application/zip',
+            ]),
+        ]);
+
+        try {
+            $response = $this->actingAs($admin)->postJson(route('admin.updates.process'), [
+                'backup_ack_database' => '1',
+                'backup_ack_files' => '1',
+            ]);
+
+            $response->assertOk()->assertJsonPath('session.status', 'pending');
+            $token = $response->json('session.token');
+
+            $this->makeUpdateSessionStale($token, 'download');
+
+            $this->actingAs($admin)
+                ->getJson(route('admin.updates.status', $token))
+                ->assertOk()
+                ->assertJsonPath('session.status', 'running')
+                ->assertJsonPath('session.is_stale', true)
+                ->assertJsonPath('session.can_retry', true)
+                ->assertJsonPath('session.can_auto_resume', true);
+
+            $this->actingAs($admin)
+                ->postJson(route('admin.updates.step', $token))
+                ->assertOk()
+                ->assertJsonPath('session.status', 'pending')
+                ->assertJsonPath('session.current_stage', 'extract');
+        } finally {
+            File::delete($zipPath);
+            File::deleteDirectory($releaseRoot);
+            File::deleteDirectory(storage_path('app/myads_updates'));
+            File::delete(storage_path('app/stale-resume-marker.txt'));
+        }
+    }
+
+    public function test_admin_update_failed_download_can_auto_resume_after_connection_loss(): void
+    {
+        $this->seedSiteSettings();
+
+        $admin = User::factory()->create([
+            'id' => 1,
+            'username' => 'rootdownloadresume',
+        ]);
+
+        [$zipPath, $releaseRoot] = $this->makeReleaseZip('download-resume-release', [
+            'myads-release/storage/app/download-resume-marker.txt' => 'download',
+        ]);
+
+        Http::fake([
+            'https://api.github.com/repos/mrghozzi/myads/releases/latest' => Http::response($this->releasePayload($zipPath), 200),
+            'https://downloads.example.test/myads-update.zip' => Http::sequence()
+                ->push('', 500)
+                ->push(file_get_contents($zipPath), 200, ['Content-Type' => 'application/zip']),
+        ]);
+
+        try {
+            $response = $this->actingAs($admin)->postJson(route('admin.updates.process'), [
+                'backup_ack_database' => '1',
+                'backup_ack_files' => '1',
+            ]);
+
+            $response->assertOk()->assertJsonPath('session.status', 'pending');
+            $token = $response->json('session.token');
+
+            $failed = $this->actingAs($admin)->postJson(route('admin.updates.step', $token));
+
+            $failed->assertOk()
+                ->assertJsonPath('session.status', 'failed')
+                ->assertJsonPath('session.current_stage', 'download')
+                ->assertJsonPath('session.can_auto_resume', true);
+
+            $this->actingAs($admin)
+                ->postJson(route('admin.updates.step', $token))
+                ->assertOk()
+                ->assertJsonPath('session.status', 'pending')
+                ->assertJsonPath('session.current_stage', 'extract');
+        } finally {
+            File::delete($zipPath);
+            File::deleteDirectory($releaseRoot);
+            File::deleteDirectory(storage_path('app/myads_updates'));
+            File::delete(storage_path('app/download-resume-marker.txt'));
+        }
+    }
+
     public function test_admin_updates_page_contains_staged_progress_ui(): void
     {
         $this->seedSiteSettings();
@@ -373,5 +475,41 @@ PHP);
                 ],
             ],
         ];
+    }
+
+    private function makeUpdateSessionStale(string $token, string $stage): void
+    {
+        $row = Option::query()
+            ->where('o_type', 'system_update_session')
+            ->where('name', $token)
+            ->firstOrFail();
+
+        $session = json_decode((string) $row->o_valuer, true);
+        $this->assertIsArray($session);
+
+        $session['status'] = 'running';
+        $session['current_stage'] = $stage;
+        $session['stage_percent'] = 35;
+        $session['detail'] = 'Simulated interrupted request';
+        $session['updated_at'] = time() - 3600;
+
+        foreach ($session['stages'] as &$item) {
+            if (($item['key'] ?? '') !== $stage) {
+                continue;
+            }
+
+            $item['status'] = 'running';
+            $item['percent'] = 35;
+            $item['detail'] = 'Simulated interrupted request';
+            $item['started_at'] = time() - 3700;
+            $item['finished_at'] = null;
+            $item['error'] = null;
+        }
+        unset($item);
+
+        $row->o_valuer = json_encode($session, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        $row->o_mode = 'running';
+        $row->o_order = (int) $session['updated_at'];
+        $row->save();
     }
 }

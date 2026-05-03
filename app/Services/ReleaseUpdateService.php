@@ -96,6 +96,8 @@ class ReleaseUpdateService
 
     public function runNextStep(string $token, ?User $actor): array
     {
+        $this->prepareLongRunningRequest();
+
         $session = $this->loadSession($token);
 
         if (in_array($session['status'] ?? '', ['completed', 'cancelled'], true)) {
@@ -696,6 +698,7 @@ class ReleaseUpdateService
     private function formatSession(array $session): array
     {
         $currentStage = (string) ($session['current_stage'] ?? 'initialize');
+        $isStale = ($session['status'] ?? '') === 'running' && $this->isRunningSessionStale($session);
         $stages = array_map(function (array $stage): array {
             $key = (string) ($stage['key'] ?? '');
             $definition = self::STAGES[$key] ?? ['label' => $key, 'icon' => 'circle'];
@@ -709,12 +712,29 @@ class ReleaseUpdateService
         $session['stages'] = $stages;
         $session['stage_label'] = __(self::STAGES[$currentStage]['label'] ?? $currentStage);
         $session['percent'] = $this->overallPercent($session);
-        $session['can_retry'] = ($session['status'] ?? '') === 'failed';
+        $session['is_stale'] = $isStale;
+        $session['can_retry'] = ($session['status'] ?? '') === 'failed' || $isStale;
+        $session['can_auto_resume'] = $this->canAutoResume($session, $isStale);
         $session['can_cancel'] = $this->canCancel($session);
+
+        if ($isStale) {
+            $session['detail'] = __('messages.update_session_stale_retry');
+        }
 
         unset($session['release_data'], $session['download_url'], $session['paths']);
 
         return $session;
+    }
+
+    private function prepareLongRunningRequest(): void
+    {
+        if (function_exists('ignore_user_abort')) {
+            @ignore_user_abort(true);
+        }
+
+        if (function_exists('set_time_limit')) {
+            @set_time_limit(0);
+        }
     }
 
     private function overallPercent(array $session): int
@@ -767,6 +787,53 @@ class ReleaseUpdateService
         }
 
         return true;
+    }
+
+    private function canAutoResume(array $session, bool $isStale = false): bool
+    {
+        $status = (string) ($session['status'] ?? 'pending');
+
+        if (in_array($status, ['completed', 'cancelled'], true)) {
+            return false;
+        }
+
+        if ($status === 'pending') {
+            return true;
+        }
+
+        $stage = (string) ($session['current_stage'] ?? 'download');
+
+        if ($isStale) {
+            return $this->stageRunsBeforeMaintenance($stage);
+        }
+
+        if ($status !== 'failed' || ! empty($session['maintenance_started'])) {
+            return false;
+        }
+
+        return $stage === 'download' && $this->stageStatus($session, $stage) === 'failed';
+    }
+
+    private function stageRunsBeforeMaintenance(string $stage): bool
+    {
+        $stages = array_keys(self::STAGES);
+        $stageIndex = array_search($stage, $stages, true);
+        $maintenanceIndex = array_search('enable_maintenance', $stages, true);
+
+        return $stageIndex !== false
+            && $maintenanceIndex !== false
+            && $stageIndex < $maintenanceIndex;
+    }
+
+    private function stageStatus(array $session, string $stage): ?string
+    {
+        foreach ($session['stages'] ?? [] as $item) {
+            if (($item['key'] ?? '') === $stage) {
+                return (string) ($item['status'] ?? '');
+            }
+        }
+
+        return null;
     }
 
     private function isRunningSessionStale(array $session): bool
