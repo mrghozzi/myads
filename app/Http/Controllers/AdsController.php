@@ -49,7 +49,11 @@ class AdsController extends Controller
     // Create Banner Form
     public function createBanner()
     {
-        return view('theme::ads.banners.create');
+        return view('theme::ads.banners.create', [
+            'deviceOptions' => $this->deviceOptions(),
+            'targetCountries' => '',
+            'selectedDevices' => [],
+        ]);
     }
 
     // Store Banner
@@ -60,6 +64,9 @@ class AdsController extends Controller
             'url' => 'required|url',
             'img' => 'required|string', // URL string
             'px' => 'required|string', // Size
+            'countries' => 'nullable|string|max:1000',
+            'devices' => 'nullable|array',
+            'devices.*' => 'in:desktop,mobile,tablet',
         ]);
 
         $user = Auth::user();
@@ -79,6 +86,8 @@ class AdsController extends Controller
             'url' => $request->url,
             'img' => $request->img,
             'px' => $bannerSize,
+            'countries' => \App\Support\SmartAdTargeting::encodeList(\App\Support\SmartAdTargeting::normalizeCountryCodes($request->input('countries') ?? '')),
+            'devices' => \App\Support\SmartAdTargeting::encodeList(\App\Support\SmartAdTargeting::normalizeDeviceTypes($request->input('devices') ?? [])),
             'statu' => 1,
             'vu' => 0,
             'clik' => 0,
@@ -92,7 +101,12 @@ class AdsController extends Controller
     {
         $user = Auth::user();
         $banner = Banner::where('id', $id)->where('uid', $user->id)->firstOrFail();
-        return view('theme::ads.banners.edit', compact('banner'));
+        return view('theme::ads.banners.edit', [
+            'banner' => $banner,
+            'deviceOptions' => $this->deviceOptions(),
+            'targetCountries' => implode(', ', $banner->targetCountries()),
+            'selectedDevices' => $banner->targetDevices(),
+        ]);
     }
 
     // Update Banner
@@ -106,6 +120,9 @@ class AdsController extends Controller
             'url' => 'required|url',
             'img' => 'required|string',
             'px' => 'required|string',
+            'countries' => 'nullable|string|max:1000',
+            'devices' => 'nullable|array',
+            'devices.*' => 'in:desktop,mobile,tablet',
         ]);
         $bannerSize = $this->validatedBannerSize($request->input('px'));
 
@@ -122,6 +139,8 @@ class AdsController extends Controller
             'url' => $request->url,
             'img' => $request->img,
             'px' => $bannerSize,
+            'countries' => \App\Support\SmartAdTargeting::encodeList(\App\Support\SmartAdTargeting::normalizeCountryCodes($request->input('countries') ?? '')),
+            'devices' => \App\Support\SmartAdTargeting::encodeList(\App\Support\SmartAdTargeting::normalizeDeviceTypes($request->input('devices') ?? [])),
         ]);
 
         return redirect()->route('ads.banners.index')->with('success', 'Banner updated successfully.');
@@ -147,7 +166,11 @@ class AdsController extends Controller
     // Create Link Form
     public function createLink()
     {
-        return view('theme::ads.links.create');
+        return view('theme::ads.links.create', [
+            'deviceOptions' => $this->deviceOptions(),
+            'targetCountries' => '',
+            'selectedDevices' => [],
+        ]);
     }
 
     // Store Link
@@ -157,6 +180,9 @@ class AdsController extends Controller
             'name' => 'required|string|max:255',
             'url' => 'required|url',
             'txt' => 'required|string',
+            'countries' => 'nullable|string|max:1000',
+            'devices' => 'nullable|array',
+            'devices.*' => 'in:desktop,mobile,tablet',
         ]);
 
         $user = Auth::user();
@@ -174,6 +200,8 @@ class AdsController extends Controller
             'name' => $request->name,
             'url' => $request->url,
             'txt' => $request->txt,
+            'countries' => \App\Support\SmartAdTargeting::encodeList(\App\Support\SmartAdTargeting::normalizeCountryCodes($request->input('countries') ?? '')),
+            'devices' => \App\Support\SmartAdTargeting::encodeList(\App\Support\SmartAdTargeting::normalizeDeviceTypes($request->input('devices') ?? [])),
             'statu' => 1,
             'clik' => 0,
         ]);
@@ -186,7 +214,12 @@ class AdsController extends Controller
     {
         $user = Auth::user();
         $link = Link::where('id', $id)->where('uid', $user->id)->firstOrFail();
-        return view('theme::ads.links.edit', compact('link'));
+        return view('theme::ads.links.edit', [
+            'link' => $link,
+            'deviceOptions' => $this->deviceOptions(),
+            'targetCountries' => implode(', ', $link->targetCountries()),
+            'selectedDevices' => $link->targetDevices(),
+        ]);
     }
 
     // Update Link
@@ -199,6 +232,9 @@ class AdsController extends Controller
             'name' => 'required|string|max:255',
             'url' => 'required|url',
             'txt' => 'required|string',
+            'countries' => 'nullable|string|max:1000',
+            'devices' => 'nullable|array',
+            'devices.*' => 'in:desktop,mobile,tablet',
         ]);
 
         if ($violation = $securityPolicy->urlViolation((string) $request->input('url'), 'ads')) {
@@ -213,6 +249,8 @@ class AdsController extends Controller
             'name' => $request->name,
             'url' => $request->url,
             'txt' => $request->txt,
+            'countries' => \App\Support\SmartAdTargeting::encodeList(\App\Support\SmartAdTargeting::normalizeCountryCodes($request->input('countries') ?? '')),
+            'devices' => \App\Support\SmartAdTargeting::encodeList(\App\Support\SmartAdTargeting::normalizeDeviceTypes($request->input('devices') ?? [])),
         ]);
 
         return redirect()->route('ads.links.index')->with('success', 'Link updated successfully.');
@@ -528,5 +566,14 @@ class AdsController extends Controller
         }
 
         return $bannerSize;
+    }
+
+    private function deviceOptions(): array
+    {
+        return [
+            'desktop' => __('messages.smart_device_desktop'),
+            'mobile' => __('messages.smart_device_mobile'),
+            'tablet' => __('messages.smart_device_tablet'),
+        ];
     }
 }

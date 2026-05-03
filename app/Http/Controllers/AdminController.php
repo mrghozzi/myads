@@ -779,6 +779,7 @@ class AdminController extends Controller
             'filterState' => $filterState,
             'filterFields' => $this->bannerFilterFields(),
             'resultsCount' => $banners->total(),
+            'deviceOptions' => $this->deviceOptions(),
         ]);
     }
 
@@ -873,7 +874,12 @@ class AdminController extends Controller
     public function editBanner($id)
     {
         $banner = Banner::findOrFail($id);
-        return view('admin::admin.banner_edit', compact('banner'));
+        return view('admin::admin.banner_edit', [
+            'banner' => $banner,
+            'deviceOptions' => $this->deviceOptions(),
+            'targetCountries' => implode(', ', $banner->targetCountries()),
+            'selectedDevices' => $banner->targetDevices(),
+        ]);
     }
 
     public function updateBanner(Request $request, $id)
@@ -887,6 +893,9 @@ class AdminController extends Controller
             'img' => 'required|string',
             'px' => 'required|string',
             'statu' => 'required|in:1,2',
+            'countries' => 'nullable|string|max:1000',
+            'devices' => 'nullable|array',
+            'devices.*' => 'in:desktop,mobile,tablet',
         ]);
         $bannerSize = $this->validatedBannerSize($request->input('px'));
 
@@ -896,6 +905,8 @@ class AdminController extends Controller
             'img' => $request->img,
             'px' => $bannerSize,
             'statu' => $request->statu,
+            'countries' => SmartAdTargeting::encodeList(SmartAdTargeting::normalizeCountryCodes($request->input('countries') ?? '')),
+            'devices' => SmartAdTargeting::encodeList(SmartAdTargeting::normalizeDeviceTypes($request->input('devices') ?? [])),
         ]);
 
         // Notification if status changed
@@ -1026,6 +1037,7 @@ class AdminController extends Controller
             'filterState' => $filterState,
             'filterFields' => $this->linkFilterFields(),
             'resultsCount' => $links->total(),
+            'deviceOptions' => $this->deviceOptions(),
         ]);
     }
 
@@ -1036,10 +1048,20 @@ class AdminController extends Controller
         $request->validate([
             'name' => 'required|string',
             'url' => 'required|url',
-            'statu' => 'required|in:1,2',
+            'statu' => 'required|in:0,1,2',
+            'countries' => 'nullable|string|max:1000',
+            'devices' => 'nullable|array',
+            'devices.*' => 'in:desktop,mobile,tablet',
         ]);
 
-        $link->update($request->all());
+        $link->update([
+            'name' => $request->name,
+            'url' => $request->url,
+            'txt' => $request->txt,
+            'statu' => $request->statu,
+            'countries' => SmartAdTargeting::encodeList(SmartAdTargeting::normalizeCountryCodes($request->input('countries') ?? '')),
+            'devices' => SmartAdTargeting::encodeList(SmartAdTargeting::normalizeDeviceTypes($request->input('devices') ?? [])),
+        ]);
 
         return redirect()->back()->with('success', __('link_updated'));
     }
@@ -1122,11 +1144,7 @@ class AdminController extends Controller
 
         return view('admin::admin.smart_ad_edit', [
             'smartAd' => $smartAd,
-            'deviceOptions' => [
-                'desktop' => __('messages.smart_device_desktop'),
-                'mobile' => __('messages.smart_device_mobile'),
-                'tablet' => __('messages.smart_device_tablet'),
-            ],
+            'deviceOptions' => $this->deviceOptions(),
             'targetCountries' => implode(', ', $smartAd->targetCountries()),
             'selectedDevices' => $smartAd->targetDevices(),
         ]);
@@ -3612,5 +3630,14 @@ class AdminController extends Controller
             $this->maintenanceMode->disable(Auth::user(), 'repair_orphaned_stats_error');
             return redirect()->back()->with('error', __('messages.orphaned_stats_repair_failed') . ': ' . $e->getMessage());
         }
+    }
+
+    private function deviceOptions(): array
+    {
+        return [
+            'desktop' => __('messages.smart_device_desktop'),
+            'mobile' => __('messages.smart_device_mobile'),
+            'tablet' => __('messages.smart_device_tablet'),
+        ];
     }
 }

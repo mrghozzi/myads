@@ -22,6 +22,8 @@ class Banner extends Model
         'url',
         'img',
         'px',
+        'countries',
+        'devices',
     ];
 
     public function user()
@@ -37,5 +39,15 @@ class Banner extends Model
     public function setPxAttribute($value): void
     {
         $this->attributes['px'] = BannerSizeCatalog::normalize($value) ?? $value;
+    }
+
+    public function targetCountries(): array
+    {
+        return \App\Support\SmartAdTargeting::normalizeCountryCodes($this->countries);
+    }
+
+    public function targetDevices(): array
+    {
+        return \App\Support\SmartAdTargeting::normalizeDeviceTypes($this->devices);
     }
 }

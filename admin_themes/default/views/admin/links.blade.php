@@ -175,6 +175,24 @@
                             <option value="0" {{ $link->statu == 0 ? 'selected' : '' }}>{{ __('messages.inactive') }}</option>
                         </select>
                     </div>
+                    <hr>
+                    <h6 class="mb-3">{{ __('Targeting') }}</h6>
+                    <div class="mb-3">
+                        <label class="form-label">{{ __('messages.smart_form_target_countries') }}</label>
+                        <input type="text" name="countries" class="form-control" value="{{ implode(', ', $link->targetCountries()) }}" placeholder="{{ __('messages.smart_form_countries_placeholder') }}">
+                        <small class="text-muted">{{ __('messages.smart_form_target_countries_help') }}</small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ __('messages.smart_form_target_devices') }}</label>
+                        <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 5px;">
+                            @foreach($deviceOptions as $value => $label)
+                                <label style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border: 1px solid #e5e7eb; border-radius: 8px; background: #fff; font-size: 13px;">
+                                    <input type="checkbox" name="devices[]" value="{{ $value }}" {{ in_array($value, $link->targetDevices(), true) ? 'checked' : '' }}>
+                                    <span>{{ $label }}</span>
+                                </label>
+                            @endforeach
+                        </div>
+                    </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('messages.cancel') }}</button>

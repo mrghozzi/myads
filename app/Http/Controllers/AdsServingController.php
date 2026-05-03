@@ -21,7 +21,7 @@ use Illuminate\Support\Facades\Schema;
 class AdsServingController extends Controller
 {
     // Public: Serve Banner Script (bn.php)
-    public function bannerScript(Request $request)
+    public function bannerScript(Request $request, SmartAdGeoResolver $geoResolver)
     {
         $user_id = $request->query('ID');
         $slotId = $this->normalizeSlotId($request->query('slot'));
@@ -45,10 +45,17 @@ class AdsServingController extends Controller
         $visitorKey = $this->resolveVisitorKey($request);
         $repeatWindowSeconds = BannerServingSettings::repeatWindowMinutes() * 60;
 
+        $countryCode = $geoResolver->resolveCountryCode($request);
+        $deviceType = $this->resolveSmartDeviceType($request);
+
         $bannerQuery = Banner::where('statu', 1)
             ->whereIn('px', BannerSizeCatalog::queryCandidates($pxValue))
             ->whereHas('user', function ($query) use ($user_id) {
                 $query->where('nvu', '>=', 1)->where('id', '!=', $user_id);
+            })
+            ->get()
+            ->filter(function (Banner $candidate) use ($countryCode, $deviceType) {
+                return $this->matchesAdCandidate($candidate, $countryCode, $deviceType);
             });
 
         if ($repeatWindowSeconds > 0 && $this->bannerImpressionsEnabled()) {
@@ -63,7 +70,9 @@ class AdsServingController extends Controller
             });
         }
 
-        $banner = $bannerQuery->inRandomOrder()->first();
+        $banner = $bannerQuery instanceof \Illuminate\Support\Collection 
+            ? $bannerQuery->random() 
+            : $bannerQuery->inRandomOrder()->first();
 
         if ($banner) {
             // Deduct from Advertiser
@@ -89,7 +98,7 @@ class AdsServingController extends Controller
     }
 
     // Public: Serve Link Script (link.php)
-    public function linkScript(Request $request)
+    public function linkScript(Request $request, SmartAdGeoResolver $geoResolver)
     {
         $user_id = $request->query('ID');
         $slotId = $this->normalizeSlotId($request->query('slot'));
@@ -109,14 +118,20 @@ class AdsServingController extends Controller
         $user->increment('pts', 1);
         // Note: old link.php does NOT increment nlink here, only pts. It increments nlink on CLICK (in show.php/AdsController::redirect).
         
+        $countryCode = $geoResolver->resolveCountryCode($request);
+        $deviceType = $this->resolveSmartDeviceType($request);
+
         // 2. Select First Link ($ab)
         // Logic: Link from user who has nlink >= 1 and NOT same user
         $link1 = Link::where('statu', 1)
             ->whereHas('user', function ($query) use ($user_id) {
                 $query->where('nlink', '>=', 1)->where('id', '!=', $user_id);
             })
-            ->inRandomOrder()
-            ->first();
+            ->get()
+            ->filter(function (Link $candidate) use ($countryCode, $deviceType) {
+                return $this->matchesAdCandidate($candidate, $countryCode, $deviceType);
+            })
+            ->random();
 
         if (!$link1) {
              return $this->javascriptResponse('// No ads available');
@@ -126,14 +141,17 @@ class AdsServingController extends Controller
         // Logic: Link from user who has nlink >= 1, NOT same user as publisher, AND NOT same user as first link owner
         // AND NOT the same link as first link.
         $link2 = Link::where('statu', 1)
-            ->where('id', '!=', $link1->id)
+            ->where('id', '!=', ($link1 ? $link1->id : 0))
             ->whereHas('user', function ($query) use ($user_id, $link1) {
                 $query->where('nlink', '>=', 1)
                       ->where('id', '!=', $user_id)
-                      ->where('id', '!=', $link1->uid);
+                      ->where('id', '!=', ($link1 ? $link1->uid : 0));
             })
-            ->inRandomOrder()
-            ->first();
+            ->get()
+            ->filter(function (Link $candidate) use ($countryCode, $deviceType) {
+                return $this->matchesAdCandidate($candidate, $countryCode, $deviceType);
+            })
+            ->random();
 
         // If no second link found, what does old code do?
         // "if ($num_rows = $results2->fetchColumn() == 0) { } else { ... }"
@@ -146,12 +164,15 @@ class AdsServingController extends Controller
         if (!$link2) {
              // Fallback: Try finding any other link not equal to link1, even from same user
              $link2 = Link::where('statu', 1)
-                ->where('id', '!=', $link1->id)
+                ->where('id', '!=', ($link1 ? $link1->id : 0))
                 ->whereHas('user', function ($query) use ($user_id) {
                     $query->where('nlink', '>=', 1)->where('id', '!=', $user_id);
                 })
-                ->inRandomOrder()
-                ->first();
+                ->get()
+                ->filter(function (Link $candidate) use ($countryCode, $deviceType) {
+                    return $this->matchesAdCandidate($candidate, $countryCode, $deviceType);
+                })
+                ->random();
              
              // If still nothing, use link1 again
              if (!$link2) {
@@ -384,6 +405,28 @@ class AdsServingController extends Controller
                 return $right['score'] <=> $left['score'];
             })
             ->first()['ad'] ?? null;
+    }
+
+    private function matchesAdCandidate(
+        Banner|Link $candidate,
+        string $countryCode,
+        string $deviceType
+    ): bool {
+        if (!$candidate->user) {
+            return false;
+        }
+
+        $targetCountries = $candidate->targetCountries();
+        if ($targetCountries !== [] && !in_array($countryCode, $targetCountries, true)) {
+            return false;
+        }
+
+        $targetDevices = $candidate->targetDevices();
+        if ($targetDevices !== [] && !in_array($deviceType, $targetDevices, true)) {
+            return false;
+        }
+
+        return true;
     }
 
     private function matchesSmartAdCandidate(

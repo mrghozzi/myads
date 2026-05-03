@@ -19,10 +19,22 @@ class Link extends Model
         'url',
         'name',
         'txt',
+        'countries',
+        'devices',
     ];
 
     public function user()
     {
         return $this->belongsTo(User::class, 'uid');
+    }
+
+    public function targetCountries(): array
+    {
+        return \App\Support\SmartAdTargeting::normalizeCountryCodes($this->countries);
+    }
+
+    public function targetDevices(): array
+    {
+        return \App\Support\SmartAdTargeting::normalizeDeviceTypes($this->devices);
     }
 }
