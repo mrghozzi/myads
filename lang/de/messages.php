@@ -844,6 +844,7 @@ return [
     'no_plugins_found' => 'Keine Plugins gefunden',
     'no_post' => 'Keine Artikel',
     'no_products_found' => 'Keine Produkte gefunden',
+    'no_results' => 'Keine Ergebnisse gefunden',
     'no_results_found' => 'Keine Ergebnisse gefunden',
     'no_sites' => 'Keine Seiten',
     'no_sites_available' => 'Keine Seiten zum Surfen verfÃ¼gbar.',

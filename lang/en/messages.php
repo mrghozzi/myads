@@ -121,6 +121,7 @@ return [
     'new_plugin_updates' => ':count Plugin updates available',
     'new_theme_updates' => ':count Theme updates available',
     'no_new_notifications' => 'No new notifications',
+    'no_results' => 'No results found',
     'manage_sessions' => 'Manage Sessions',
     'active_sessions' => 'Active Sessions',
     'current_session' => 'Current Session',

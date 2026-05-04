@@ -844,6 +844,7 @@ return [
     'no_plugins_found' => 'Eklenti bulunamad?',
     'no_post' => 'Makale yok',
     'no_products_found' => 'Ürün bulunamadı',
+    'no_results' => 'Sonuç bulunamadı',
     'no_results_found' => 'Sonuç bulunamadı',
     'no_sites' => 'Site yok',
     'no_sites_available' => 'Sörf için site bulunamadı.',

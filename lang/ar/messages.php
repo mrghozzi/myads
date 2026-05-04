@@ -121,6 +121,7 @@ return [
     'new_plugin_updates' => ':count تحديثات للإضافات متاحة',
     'new_theme_updates' => ':count تحديثات للقوالب متاحة',
     'no_new_notifications' => 'لا توجد إشعارات جديدة',
+    'no_results' => 'لا توجد نتائج',
     'manage_sessions' => 'إدارة الجلسات',
     'active_sessions' => 'الجلسات النشطة',
     'current_session' => 'الجلسة الحالية',
