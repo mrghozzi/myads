@@ -37,6 +37,7 @@ use App\Http\Controllers\OrderOfferController;
 use App\Http\Controllers\AdminOrderController;
 use App\Http\Controllers\StatusPromotionController;
 use App\Http\Controllers\AdminMailSettingsController;
+use App\Http\Controllers\Auth\TwoFactorController;
 use App\Http\Middleware\AdminMiddleware;
 
 Route::post('/reaction/toggle', [ReactionController::class, 'toggle'])->name('reaction.toggle')->middleware('auth');
@@ -71,6 +72,15 @@ Route::middleware('guest')->group(function () {
     Route::post('password/reset', [App\Http\Controllers\Auth\ResetPasswordController::class, 'reset'])->name('password.update');
 });
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+// 2FA Routes
+Route::get('/two-factor-challenge', [TwoFactorController::class, 'showChallenge'])->name('two-factor.challenge');
+Route::post('/two-factor-challenge', [TwoFactorController::class, 'verify']);
+Route::post('/two-factor-challenge/resend', [TwoFactorController::class, 'resend'])->name('two-factor.resend');
+
+// 2FA Management
+Route::post('/settings/2fa/enable', [ProfileController::class, 'enableTwoFactor'])->name('profile.2fa.enable')->middleware('auth');
+Route::post('/settings/2fa/disable', [ProfileController::class, 'disableTwoFactor'])->name('profile.2fa.disable')->middleware('auth');
 
 // Dynamic Pages
 Route::get('/page/{slug}', [App\Http\Controllers\PageController::class, 'show'])->name('page.show');

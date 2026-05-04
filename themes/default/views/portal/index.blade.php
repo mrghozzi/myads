@@ -309,12 +309,21 @@
                 </div>
             @endif
 
-            <!-- Posts Search Results -->
-            @if(isset($searchedStatuses) && $searchedStatuses->count() > 0)
-                <h3 style="margin-bottom: 16px;">{{ __('messages.posts') }}</h3>
-                <div style="display: grid; grid-gap: 16px; margin-bottom: 32px;">
-                    @foreach($searchedStatuses as $activity)
-                        @include('theme::partials.activity.render', ['activity' => $activity])
+            <!-- Products Search Results -->
+            @if(isset($searchedProducts) && $searchedProducts->count() > 0)
+                <h3 style="margin-bottom: 16px;">{{ __('messages.products') }}</h3>
+                <div class="grid grid-3-3-3-3 centered" style="margin-bottom: 32px;">
+                    @foreach($searchedProducts as $product)
+                        <div class="product-preview">
+                            <a href="{{ route('store.show', $product->name) }}">
+                                <figure class="product-preview-image liquid" style="background: rgba(0, 0, 0, 0) url({{ $product->product_image ?? theme_asset('img/error_plug.png') }}) no-repeat scroll center center / cover;">
+                                </figure>
+                            </a>
+                            <div class="product-preview-info">
+                                <p class="product-preview-title"><a href="{{ route('store.show', $product->name) }}">{{ $product->name }}</a></p>
+                                <p class="product-preview-text">{{ \Illuminate\Support\Str::limit($product->o_valuer, 60) }}</p>
+                            </div>
+                        </div>
                     @endforeach
                 </div>
             @endif
@@ -360,8 +369,10 @@
             @if(
                 (!isset($searchedUsers) || $searchedUsers->count() == 0) &&
                 (!isset($searchedStatuses) || $searchedStatuses->count() == 0) &&
+                (!isset($searchedGroups) || $searchedGroups->count() == 0) &&
                 (!isset($searchedCommentsForum) || $searchedCommentsForum->count() == 0) &&
-                (!isset($searchedCommentsDir) || $searchedCommentsDir->count() == 0)
+                (!isset($searchedCommentsDir) || $searchedCommentsDir->count() == 0) &&
+                (!isset($searchedProducts) || $searchedProducts->count() == 0)
             )
                 <div class="widget-box">
                     <div class="widget-box-content">

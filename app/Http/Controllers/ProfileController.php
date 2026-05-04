@@ -459,6 +459,39 @@ class ProfileController extends Controller
         return redirect()->route('profile.privacy')->with('success', __('messages.privacy_settings_saved'));
     }
 
+    public function enableTwoFactor(Request $request)
+    {
+        $user = Auth::user();
+        if ($user->hasTwoFactorEnabled()) {
+            return back()->with('error', 'Two-factor authentication is already enabled.');
+        }
+
+        // Generate recovery codes
+        $recoveryCodes = [];
+        for ($i = 0; $i < 8; $i++) {
+            $recoveryCodes[] = Str::upper(Str::random(10));
+        }
+
+        $user->two_factor_secret = encrypt(Str::random(32));
+        $user->two_factor_recovery_codes = json_encode($recoveryCodes);
+        $user->two_factor_type = 'email';
+        $user->two_factor_confirmed_at = now();
+        $user->save();
+
+        return back()->with('success', __('messages.two_factor_enabled') ?? 'Two-factor authentication has been enabled.');
+    }
+
+    public function disableTwoFactor(Request $request)
+    {
+        $user = Auth::user();
+        $user->two_factor_secret = null;
+        $user->two_factor_recovery_codes = null;
+        $user->two_factor_confirmed_at = null;
+        $user->save();
+
+        return back()->with('success', __('messages.two_factor_disabled') ?? 'Two-factor authentication has been disabled.');
+    }
+
     public function badges()
     {
         $user = Auth::user();

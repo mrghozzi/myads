@@ -1,5 +1,12 @@
 # v4.3.2
-> **Feature Release** — Ad targeting, performance heatmaps, and A/B optimization.
+> **Feature Release** — Two-Factor Authentication, Search Performance, and Smart Archiving.
+
+### Security & Performance
+* **Feature**: Implemented **Two-Factor Authentication (2FA)** via email. Members can now enable an extra layer of security from their Privacy Settings, requiring a unique verification code sent to their email during login.
+* **Feature**: Added **Recovery Codes** for 2FA, allowing members to regain access to their accounts if they lose access to their email.
+* **Performance**: Upgraded global search on the Community Portal to use **MySQL FULLTEXT** indexing with `MATCH AGAINST` (Boolean Mode), significantly improving search speed and relevance across posts, forum topics, directory listings, products, and news.
+* **Performance**: Introduced a **Smart Archiving** system for ad impressions. High-volume tracking data is now automatically moved to dedicated archive tables after 30 days via a daily Artisan task (`myads:archive-impressions`), keeping the active serving tables lean and fast.
+* **i18n**: Fully localized the 2FA interface, recovery codes, and security hints across all **9 supported languages**, ensuring a consistent security experience for all members.
 
 ### Ad Exchange & Analytics
 * **Feature**: Introduced **Ad Geo-Targeting**, allowing advertisers to restrict their banner and text/link ads to specific countries via a new multi-select country picker in the ad creation and edit forms.

@@ -233,6 +233,52 @@
                             </div>
                         </div>
 
+                        <div class="form-row" style="margin-top: 32px; border-top: 1px solid #e7e9f6; padding-top: 32px;">
+                            <div class="form-item">
+                                <p class="widget-box-title" style="margin-bottom: 16px;">{{ __('messages.account_security') ?? 'Account Security' }}</p>
+                                <div class="privacy-switch-card" style="width: 100%;">
+                                    <div class="privacy-switch-card__meta">
+                                        <div class="privacy-switch-card__icon">
+                                            <i class="fa fa-shield-alt" aria-hidden="true"></i>
+                                        </div>
+                                        <div class="privacy-switch-card__body">
+                                            <label class="privacy-switch-card__title">{{ __('messages.two_factor_auth') ?? 'Two-Factor Authentication' }}</label>
+                                            <p class="privacy-switch-card__hint">
+                                                @if($user->hasTwoFactorEnabled())
+                                                    <span style="color: #339966; font-weight: 700;">{{ __('messages.enabled') ?? 'Enabled' }}</span> - {{ __('messages.two_factor_enabled_hint') ?? 'Your account is protected with an additional layer of security.' }}
+                                                @else
+                                                    <span style="color: #f34141; font-weight: 700;">{{ __('messages.disabled') ?? 'Disabled' }}</span> - {{ __('messages.two_factor_disabled_hint') ?? 'Enable two-factor authentication to add an extra layer of security to your account.' }}
+                                                @endif
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div class="privacy-switch-control">
+                                        @if($user->hasTwoFactorEnabled())
+                                            <button type="button" class="button white" onclick="event.preventDefault(); if(confirm('{{ __('messages.confirm_disable_2fa') ?? 'Are you sure you want to disable two-factor authentication?' }}')) document.getElementById('disable-2fa-form').submit();">
+                                                {{ __('messages.disable') ?? 'Disable' }}
+                                            </button>
+                                        @else
+                                            <button type="button" class="button primary" onclick="event.preventDefault(); document.getElementById('enable-2fa-form').submit();">
+                                                {{ __('messages.enable') ?? 'Enable' }}
+                                            </button>
+                                        @endif
+                                    </div>
+                                </div>
+
+                                @if($user->hasTwoFactorEnabled() && $user->two_factor_recovery_codes)
+                                    <div class="widget-box-content" style="margin-top: 16px; background: #f8f9ff; border-radius: 12px; padding: 16px;">
+                                        <p style="font-weight: 700; font-size: 14px; margin-bottom: 8px;">{{ __('messages.recovery_codes') ?? 'Recovery Codes' }}</p>
+                                        <p style="font-size: 12px; color: #8f91a3; margin-bottom: 12px;">{{ __('messages.recovery_codes_hint') ?? 'Store these recovery codes in a secure place. They can be used to access your account if you lose access to your email.' }}</p>
+                                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;">
+                                            @foreach(json_decode($user->two_factor_recovery_codes, true) as $code)
+                                                <code style="background: #ffffff; padding: 4px 8px; border-radius: 4px; font-family: monospace; font-size: 13px; text-align: center; border: 1px solid #e7e9f6;">{{ $code }}</code>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+
                         <div class="form-row">
                             <div class="form-item">
                                 <button type="submit" class="button primary" {{ !($featureAvailable ?? true) ? 'disabled' : '' }}>{{ __('messages.save_changes') }}</button>
@@ -244,4 +290,12 @@
         </div>
     </div>
 </div>
+
+<form id="enable-2fa-form" action="{{ route('profile.2fa.enable') }}" method="POST" style="display: none;">
+    @csrf
+</form>
+
+<form id="disable-2fa-form" action="{{ route('profile.2fa.disable') }}" method="POST" style="display: none;">
+    @csrf
+</form>
 @endsection

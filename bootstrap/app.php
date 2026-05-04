@@ -82,6 +82,7 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\TrackMemberSecuritySession::class,
             \App\Http\Middleware\CheckSystemVersion::class,
             \App\Http\Middleware\TrackSeoMetrics::class,
+            \App\Http\Middleware\TwoFactorMiddleware::class,
         ]);
         
         $middleware->alias([

@@ -12,3 +12,5 @@ Schedule::call(function () {
     (new \App\Http\Controllers\SitemapController())->generate();
 })->daily();
 
+Schedule::command('myads:archive-impressions')->daily();
+

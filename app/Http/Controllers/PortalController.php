@@ -40,20 +40,17 @@ class PortalController extends Controller
         // ── Search ───────────────────────────────────────────────
         if (!empty($search)) {
             try {
+                // User search still uses LIKE as it's typically short and indexed by B-tree
                 $searchedUsers = User::where('username', 'LIKE', "%{$search}%")->get();
 
-                $topicIds = ForumTopic::visible($user)->where(function ($query) use ($search) {
-                        $query->where('txt', 'LIKE', "%{$search}%")
-                            ->orWhere('name', 'LIKE', "%{$search}%");
-                    })
+                $topicIds = ForumTopic::visible($user)
+                    ->whereRaw("MATCH(name, txt) AGAINST(? IN BOOLEAN MODE)", [$search])
                     ->pluck('id');
 
-                $dirIds = Directory::where('txt', 'LIKE', "%{$search}%")
-                    ->orWhere('name', 'LIKE', "%{$search}%")
+                $dirIds = Directory::whereRaw("MATCH(name, txt) AGAINST(? IN BOOLEAN MODE)", [$search])
                     ->pluck('id');
 
-                $newsIds = News::where('text', 'LIKE', "%{$search}%")
-                    ->orWhere('name', 'LIKE', "%{$search}%")
+                $newsIds = News::whereRaw("MATCH(name, text) AGAINST(? IN BOOLEAN MODE)", [$search])
                     ->pluck('id');
 
                 $searchedStatuses = Status::visible()
@@ -74,34 +71,40 @@ class PortalController extends Controller
 
                 $searchedGroups = collect();
                 if (\App\Support\GroupSettings::isEnabled()) {
-                    $searchedGroups = \App\Models\Group::where('name', 'LIKE', "%{$search}%")
-                        ->orWhere('description', 'LIKE', "%{$search}%")
-                        ->where('status', \App\Models\Group::STATUS_ACTIVE)
+                    $searchedGroups = \App\Models\Group::where('status', \App\Models\Group::STATUS_ACTIVE)
+                        ->whereRaw("MATCH(name, description) AGAINST(? IN BOOLEAN MODE)", [$search])
                         ->get();
                 }
 
                 $searchedCommentsForum = \App\Models\ForumComment::visible()
                     ->whereHas('topic', fn ($query) => $query->visible($user))
-                    ->where('txt', 'LIKE', "%{$search}%")
+                    ->whereRaw("MATCH(txt) AGAINST(? IN BOOLEAN MODE)", [$search])
                     ->orderBy('date', 'desc')
                     ->get();
 
                 $searchedCommentsDir = \App\Models\Option::where('o_type', '=', 'd_coment')
                     ->visible(null, 'o_order')
-                    ->where('o_valuer', 'LIKE', "%{$search}%")
+                    ->whereRaw("MATCH(o_valuer) AGAINST(? IN BOOLEAN MODE)", [$search])
                     ->get();
+
+                $searchedProducts = Product::visible()
+                    ->whereRaw("MATCH(name, o_valuer) AGAINST(? IN BOOLEAN MODE)", [$search])
+                    ->get();
+
             } catch (\Throwable $e) {
-                $searchedUsers        = collect();
-                $searchedStatuses     = collect();
-                $searchedGroups       = collect();
+                \Log::error('Search failed: ' . $e->getMessage());
+                $searchedUsers         = collect();
+                $searchedStatuses      = collect();
+                $searchedGroups        = collect();
                 $searchedCommentsForum = collect();
-                $searchedCommentsDir  = collect();
+                $searchedCommentsDir   = collect();
+                $searchedProducts      = collect();
             }
 
             return view('theme::portal.index', compact(
                 'filter', 'search',
                 'searchedUsers', 'searchedStatuses', 'searchedGroups',
-                'searchedCommentsForum', 'searchedCommentsDir'
+                'searchedCommentsForum', 'searchedCommentsDir', 'searchedProducts'
             ));
         }
 
