@@ -157,7 +157,7 @@ myads/
 | `NewsController` | Public news pages |
 | `ReportController` | Content reporting |
 | `TagController` | Tag/hashtag pages |
-| `PageController` | Static pages (privacy, terms, custom) |
+| `PageController` | Static pages (privacy, terms, refund, custom) |
 | `AdminController` | **Main admin controller** — users, ads, forum, directory, store, widgets, menus, plugins, themes, settings, news, reports, emojis, knowledgebase, maintenance mode settings |
 | `AdminAdminsController` | Admin ACL management |
 | `AdminBillingController` | Admin billing hub: settings, plans, orders, transactions, currencies, gateways |
@@ -305,11 +305,12 @@ myads/
 | `/billing/return/{gateway}/{order}` | `/billing/return/stripe/15` | Hosted checkout return handler |
 | `/billing/webhook/{gateway}` | `/billing/webhook/paypal` | Payment gateway webhook endpoint |
 | `/admin/billing` | `/admin/billing` | Admin billing overview and financial hub |
-| `/admin/billing/gateways` | `/admin/billing/gateways` | Admin gateway configuration for Stripe, PayPal, and Bank Transfer |
+| `/admin/billing/gateways` | `/admin/billing/gateways` | Admin gateway configuration for Stripe, PayPal, Bank Transfer, Lemon Squeezy, and Paddle |
 | `/admin/orders` | `/admin/orders` | Admin marketplace moderation dashboard under the `community` ACL scope |
 | `/admin/settings/mail` | `/admin/settings/mail` | Database-driven mail configuration (SMTP, sendmail, log, array) |
 | `/share` | `/share?text={content}` | External share endpoint (requires auth) |
 | `/developer` | `/developer` | Public developer documentation for Share API |
+| `/refund` | `/refund` | Refund policy legal page |
 
 ### Middleware Groups
 - **`auth`** — Standard Laravel auth
@@ -354,7 +355,7 @@ notifications/ → Notification center
 orders/        → Service marketplace discovery, request form, detail, mine, offers, and shared partials
 news/          → News pages
 visits/        → Visit exchange
-pages/         → Static pages (privacy, terms, custom)
+pages/         → Static pages (privacy, terms, refund, custom)
 billing/       → Member billing catalog, dashboard, order details
 ```
 
@@ -438,7 +439,7 @@ admin/mail_settings.blade.php → Database-driven mail configuration form
 ### Paid Subscriptions & Billing (v4.3.0)
 - **Feature Toggle:** System-wide billing state is stored in `options` via `App\Support\SubscriptionSettings` (`o_type = subscription_settings`) and can be enabled/disabled from `/admin/billing/settings`
 - **Gateway Config:** Per-gateway settings live in `options` via `App\Support\SubscriptionGatewaySettings` (`o_type = subscription_gateway_settings`); secrets are encrypted with Laravel `Crypt` and masked in admin
-- **Supported Gateways:** First-party billing release supports `Stripe`, `PayPal`, and `Bank Transfer` only
+- **Supported Gateways:** First-party billing release supports `Stripe`, `PayPal`, `Bank Transfer`, `Lemon Squeezy`, and `Paddle`
 - **Routes:** Member flows use `/plans`, `/settings/billing`, `/billing/orders/{order}`, `/billing/return/{gateway}/{order}`, and `/billing/webhook/{gateway}`; admin flows live under `/admin/billing/*`
 - **Hosted Checkout Rule:** `Stripe` and `PayPal` must use hosted external checkout only; MYADS must not collect card data or personal payment data directly
 - **Manual Review Flow:** `Bank Transfer` orders move through `pending_receipt` → `pending_review` → `paid`/`rejected`, with receipt uploads stored under `public/upload/billing/receipts/`
@@ -826,6 +827,20 @@ php artisan storage:link
 
 ---
 
+## 19K. Version 4.3.2 Update Cycle (Continued 2026-05-05)
+
+- **Feature:** Integrated **Paddle** as a fully supported payment gateway, adding `PaddleGateway` to the billing gateway registry alongside Stripe, PayPal, Bank Transfer, and Lemon Squeezy.
+- **Implementation:** Added `app/Services/Billing/Gateways/PaddleGateway.php` using Paddle's Transactions API for hosted checkout, return verification, and webhook processing.
+- **Webhook:** Paddle webhook signature verification uses HMAC SHA256 with `Paddle-Signature` header parsing (`ts=...;h1=...`) and a 5-minute replay-attack tolerance.
+- **Config:** Extended `SubscriptionGatewaySettings::DEFAULTS` and `SECRET_FIELDS` with `paddle` gateway (api_key, price_id, webhook_secret, mode).
+- **Admin UI:** Added Paddle configuration section to `/admin/billing/gateways` with API Key, Price ID, Webhook Secret, and Sandbox/Live mode controls.
+- **Feature:** Added a new **Refund Policy** legal page at `/refund`, handled by `PageController@refund` with dedicated SEO configuration.
+- **View:** Created `themes/default/views/pages/refund.blade.php` with an amber/orange accent design, dark mode support, and 8 content sections.
+- **Footer:** Integrated a Refund Policy link in `footer.blade.php` with `fa-solid fa-rotate-left` icon.
+- **i18n:** Added Paddle translation keys (EN/AR) and 22 refund policy translation keys across all 9 supported languages.
+
+---
+
 ## 20. Maintaining This File
 
 > **⚠️ RULE: This `Agents.md` file MUST be kept up to date.**
@@ -848,4 +863,4 @@ If in doubt, update it. An outdated `Agents.md` causes future agents to make wro
 
 ---
 
-*Last updated: 2026-04-21 — MYADS v4.3.0 (Services Marketplace / Orders docs synced)*
+*Last updated: 2026-05-05 — MYADS v4.3.2 (Paddle gateway + Refund Policy page)*

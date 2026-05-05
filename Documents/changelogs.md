@@ -1,5 +1,5 @@
 # v4.3.2
-> **Feature Release** — Two-Factor Authentication, Search Performance, and Smart Archiving.
+> **Feature Release** — Two-Factor Authentication, Search Performance, Smart Archiving, Paddle Billing, and Legal Pages.
 
 ### Security & Performance
 * **Feature**: Implemented **Two-Factor Authentication (2FA)** via email. Members can now enable an extra layer of security from their Privacy Settings, requiring a unique verification code sent to their email during login.
@@ -15,6 +15,22 @@
 * **Fix**: Resolved critical `500 Internal Server Error` in `AdsServingController` (bn.php / link.php) caused by incorrect collection handling and empty result sets during ad selection.
 * **Architecture**: Introduced `AdStatsService` to aggregate hourly click data and `AdGeoService` (placeholder) for future geo-resolution expansions.
 * **UI**: Enhanced ad list tables with a new **Performance** column and Tooltip-enabled heatmaps that adapt to both Light and Dark modes.
+
+### Billing & Payment Gateways
+* **Feature**: Integrated **Paddle** as a fully supported payment gateway for the subscription and paid plans system, using Paddle's Transactions API for hosted checkout sessions.
+* **Feature**: Added dynamic gateway configuration for Paddle in the admin panel (`/admin/billing/gateways`), supporting API Key, Price ID, Webhook Secret, and Sandbox/Live mode switching.
+* **Feature**: Implemented Paddle webhook signature verification (`Paddle-Signature` header with `ts=...;h1=...` format) using HMAC SHA256, with a 5-minute replay-attack tolerance window.
+* **Feature**: Supports `transaction.completed`, `transaction.payment_failed`, and `transaction.updated` webhook event types for asynchronous order lifecycle updates.
+* **Architecture**: Added `PaddleGateway` class extending `AbstractBillingGateway` and registered it in `BillingGatewayRegistry` alongside Stripe, PayPal, Bank Transfer, and Lemon Squeezy.
+* **Architecture**: Paddle API Key and Webhook Secret are stored encrypted using `SubscriptionGatewaySettings` with `SECRET_FIELDS` configuration, consistent with existing gateway security patterns.
+* **i18n**: Added Paddle-specific translation keys (`billing_gateway_paddle`, `billing_paddle_price_id_label`, `billing_paddle_price_id_help`, `billing_paddle_webhook_hint`) across English and Arabic.
+
+### Legal Pages
+* **Feature**: Added a new **Refund Policy** page (`/refund`) as a dedicated legal page, following the same architectural pattern as Privacy and Terms pages.
+* **Add**: Created `refund()` method in `PageController` with full SEO support (meta tags, descriptions, breadcrumbs).
+* **Add**: Created `refund.blade.php` view with a distinct amber/orange accent theme, dark mode support, and responsive layout.
+* **Add**: Integrated a **Refund Policy** link in the site footer with a dedicated icon (`fa-solid fa-rotate-left`).
+* **i18n**: Added 22 refund policy translation keys (`refund_policy`, `refund_intro`, `refund_eligibility`, `refund_process`, `refund_timeframe`, `refund_partial`, `refund_disputes`, `refund_changes`, `refund_contact`, and their descriptions) across all **9 supported languages**.
 
 ---
 
