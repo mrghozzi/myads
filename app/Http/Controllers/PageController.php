@@ -37,6 +37,21 @@ class PageController extends Controller
         return view('theme::pages.terms');
     }
 
+    public function refund()
+    {
+        $this->seo([
+            'scope_key' => 'refund_page',
+            'resource_title' => __('messages.refund_policy'),
+            'description' => __('messages.seo_refund_description'),
+            'breadcrumbs' => [
+                ['name' => __('messages.home'), 'url' => url('/')],
+                ['name' => __('messages.refund_policy'), 'url' => route('refund')],
+            ],
+        ]);
+
+        return view('theme::pages.refund');
+    }
+
     /**
      * Display a dynamic page by its slug.
      */

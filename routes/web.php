@@ -88,6 +88,7 @@ Route::get('/page/{slug}', [App\Http\Controllers\PageController::class, 'show'])
 // Legal Pages
 Route::get('/privacy', [App\Http\Controllers\PageController::class, 'privacy'])->name('privacy');
 Route::get('/terms', [App\Http\Controllers\PageController::class, 'terms'])->name('terms');
+Route::get('/refund', [App\Http\Controllers\PageController::class, 'refund'])->name('refund');
 
 Route::get('/', function () {
     // Redirect to installer if DB tables are missing (e.g. fresh install with stale installed marker)

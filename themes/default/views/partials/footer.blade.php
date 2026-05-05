@@ -102,6 +102,10 @@
             <i class="fa-solid fa-file-contract"></i>
             {{ __('messages.terms_conditions') }}
         </a>
+        <a href="{{ route('refund') }}">
+            <i class="fa-solid fa-rotate-left"></i>
+            {{ __('messages.refund_policy') }}
+        </a>
     </div>
     <p class="footer-fade-up">&copy; {{ date('Y') }} {{ $site_settings->titer ?? 'MyAds' }}. {{ __('messages.all_rights_reserved') }}</p>
     <p class="footer-fade-up site-footer-brand">
