@@ -144,6 +144,38 @@
                                             <code class="user-select-all d-block text-break">{{ route('billing.webhook', ['gateway' => 'lemon_squeezy']) }}</code>
                                         </div>
                                     </div>
+                                @elseif($gateway['key'] === 'paddle')
+                                    <div class="col-md-6">
+                                        <label class="form-label">{{ __('messages.billing_api_key_label') }}</label>
+                                        <input type="password" name="api_key" class="form-control" value="">
+                                        <div class="form-text">
+                                            {{ __('messages.billing_leave_blank_to_keep_secret') }}
+                                            @if(!empty($config['api_key']))
+                                                {{ __('messages.billing_secret_current_masked', ['value' => $config['api_key']]) }}
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">{{ __('messages.billing_paddle_price_id_label') }}</label>
+                                        <input type="text" name="price_id" class="form-control" value="{{ old('price_id', $config['price_id'] ?? '') }}">
+                                        <div class="form-text">
+                                            {{ __('messages.billing_paddle_price_id_help') }}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">{{ __('messages.billing_webhook_secret_label') }}</label>
+                                        <input type="password" name="webhook_secret" class="form-control" value="">
+                                        <div class="form-text">
+                                            {{ __('messages.billing_leave_blank_to_keep_secret') }}
+                                            @if(!empty($config['webhook_secret']))
+                                                {{ __('messages.billing_secret_current_masked', ['value' => $config['webhook_secret']]) }}
+                                            @endif
+                                        </div>
+                                        <div class="mt-2 p-2 bg-light rounded border">
+                                            <div class="small fw-semibold mb-1 text-muted">Webhook URL ({{ __('messages.billing_paddle_webhook_hint') }}):</div>
+                                            <code class="user-select-all d-block text-break">{{ route('billing.webhook', ['gateway' => 'paddle']) }}</code>
+                                        </div>
+                                    </div>
                                 @endif
 
                                 <div class="col-12">

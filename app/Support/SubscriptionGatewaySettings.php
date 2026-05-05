@@ -42,6 +42,14 @@ class SubscriptionGatewaySettings
             'webhook_secret' => '',
             'supported_currencies' => ['USD'],
         ],
+        'paddle' => [
+            'enabled' => 0,
+            'mode' => 'sandbox',
+            'api_key' => '',
+            'price_id' => '',
+            'webhook_secret' => '',
+            'supported_currencies' => ['USD'],
+        ],
     ];
 
     public const SECRET_FIELDS = [
@@ -49,6 +57,7 @@ class SubscriptionGatewaySettings
         'paypal' => ['secret_key'],
         'bank_transfer' => [],
         'lemon_squeezy' => ['api_key', 'webhook_secret'],
+        'paddle' => ['api_key', 'webhook_secret'],
     ];
 
 

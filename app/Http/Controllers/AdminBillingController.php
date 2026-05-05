@@ -506,6 +506,13 @@ class AdminBillingController extends Controller
                 'api_key' => 'nullable|string|max:5000',
                 'webhook_secret' => 'nullable|string|max:1000',
             ],
+            'paddle' => [
+                ...$baseRules,
+                'mode' => 'required|in:sandbox,live',
+                'api_key' => 'nullable|string|max:5000',
+                'price_id' => 'nullable|string|max:255',
+                'webhook_secret' => 'nullable|string|max:1000',
+            ],
             default => abort(404),
         };
 
