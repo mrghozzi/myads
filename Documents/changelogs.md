@@ -32,6 +32,15 @@
 * **Add**: Integrated a **Refund Policy** link in the site footer with a dedicated icon (`fa-solid fa-rotate-left`).
 * **i18n**: Added 22 refund policy translation keys (`refund_policy`, `refund_intro`, `refund_eligibility`, `refund_process`, `refund_timeframe`, `refund_partial`, `refund_disputes`, `refund_changes`, `refund_contact`, and their descriptions) across all **9 supported languages**.
 
+### Media Management
+* **Feature**: Introduced a comprehensive **Media Manager** for administrators at `/admin/media`, allowing full oversight of files within the `upload/` and `public/upload/` directories.
+* **Feature**: Implemented recursive file scanning with advanced filtering by type (Images, Videos, Archives, Audio, etc.) and real-time name/path search.
+* **Feature**: Added an **Image Preview** system using a Bootstrap 5 modal, providing a quick look at image assets with integrated download and rename actions.
+* **Feature**: Secure file system operations including renaming with path sanitization and permanent deletion of obsolete media assets.
+* **Architecture**: Created `AdminMediaController` to centralize media logic, ensuring file operations are restricted to permitted upload paths.
+* **UI/UX**: Integrated custom file type icons and responsive action menus using the `admin-duralux` theme design system.
+* **i18n**: Added comprehensive translation keys for the Media Manager interface across English and Arabic language files.
+
 ---
 
 # v4.3.1

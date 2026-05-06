@@ -244,6 +244,7 @@
                                 @if($canAdmin('maintenance'))
                                     <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.maintenance') }}">{{ __('messages.maintenance') }}</a></li>
                                 @endif
+                                <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.media') }}">{{ __('messages.media_manager') }}</a></li>
 
                             </ul>
                         </li>

@@ -684,6 +684,11 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::post('/maintenance/repair-orphaned-content', [AdminController::class, 'repairOrphanedContent'])->name('admin.maintenance.repair_orphaned_content');
     Route::post('/maintenance/repair-orphaned-stats', [AdminController::class, 'repairOrphanedStats'])->name('admin.maintenance.repair_orphaned_stats');
 
+    // Media Manager
+    Route::get('/media', [App\Http\Controllers\AdminMediaController::class, 'index'])->name('admin.media');
+    Route::post('/media/rename', [App\Http\Controllers\AdminMediaController::class, 'rename'])->name('admin.media.rename');
+    Route::post('/media/delete', [App\Http\Controllers\AdminMediaController::class, 'destroy'])->name('admin.media.delete');
+
     // Security
     Route::get('/security', [AdminSecurityController::class, 'index'])->name('admin.security.index');
     Route::post('/security', [AdminSecurityController::class, 'update'])->name('admin.security.update');

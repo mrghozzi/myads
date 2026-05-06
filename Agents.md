@@ -33,6 +33,7 @@ MYADS is a community platform where website owners:
 11. **External Share API** — a dedicated `/share` endpoint for third-party websites to pre-fill post composer text, documented at `/developer`.
 12. **Session Monitoring** — view and manage active member sessions across devices with remote revocation.
 13. **Admin Notifications** — centralized header alerts for billing, reports, and system/extension updates with permission-based visibility.
+14. **Media Manager** — administrative hub for monitoring, renaming, previewing, and securely deleting uploaded media files.
 
 ---
 
@@ -167,6 +168,7 @@ myads/
 | `AdminMailSettingsController` | Database-driven mail configuration admin page (`/admin/settings/mail`) |
 | `AdminStatusPromotionController` | Admin monitoring and settings for promoted community posts |
 | `AdminUpdatesController` | System update management |
+| `AdminMediaController` | **Media Manager** — monitor, rename, and delete uploaded files |
 | `SitemapController` | Dynamic sitemap generation |
 | `SeoPublicController` | Public robots.txt |
 | `CaptchaController` | CAPTCHA image generation |
@@ -308,6 +310,7 @@ myads/
 | `/admin/billing/gateways` | `/admin/billing/gateways` | Admin gateway configuration for Stripe, PayPal, Bank Transfer, Lemon Squeezy, and Paddle |
 | `/admin/orders` | `/admin/orders` | Admin marketplace moderation dashboard under the `community` ACL scope |
 | `/admin/settings/mail` | `/admin/settings/mail` | Database-driven mail configuration (SMTP, sendmail, log, array) |
+| `/admin/media` | `/admin/media` | Admin Media Manager dashboard and file operations |
 | `/share` | `/share?text={content}` | External share endpoint (requires auth) |
 | `/developer` | `/developer` | Public developer documentation for Share API |
 | `/refund` | `/refund` | Refund policy legal page |
@@ -364,6 +367,7 @@ billing/       → Member billing catalog, dashboard, order details
 layouts/       → admin shell layout (`admin::layouts.admin`)
 admin/billing/ → Billing hub, plans, orders, transactions, currencies, gateways
 admin/orders/  → Marketplace moderation dashboard and request detail views
+admin/media/   → Media Manager dashboard and modals
 admin/mail_settings.blade.php → Database-driven mail configuration form
 ```
 
