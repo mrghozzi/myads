@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class AdminMediaController extends Controller
 {
@@ -72,7 +73,26 @@ class AdminMediaController extends Controller
             });
         }
 
-        return view('admin::admin.media.index', compact('files'));
+        // Pagination
+        $perPage = 15;
+        $currentPage = $request->input('page', 1);
+        $offset = ($currentPage - 1) * $perPage;
+        
+        $totalFiles = count($files);
+        $pagedFiles = array_slice($files, $offset, $perPage);
+        
+        $paginatedFiles = new LengthAwarePaginator(
+            $pagedFiles, 
+            $totalFiles, 
+            $perPage, 
+            $currentPage, 
+            ['path' => $request->url(), 'query' => $request->query()]
+        );
+
+        return view('admin::admin.media.index', [
+            'files' => $paginatedFiles,
+            'total_count' => $totalFiles
+        ]);
     }
 
     public function rename(Request $request)

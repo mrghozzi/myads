@@ -18,7 +18,7 @@
             <div class="admin-summary-grid w-100">
                 <div class="admin-summary-card">
                     <span class="admin-summary-label">{{ __('messages.total_files') ?? 'Total Files' }}</span>
-                    <span class="admin-summary-value">{{ count($files) }}</span>
+                    <span class="admin-summary-value">{{ $total_count ?? $files->total() }}</span>
                 </div>
             </div>
         </div>
@@ -157,6 +157,13 @@
                 </table>
             </div>
         </div>
+        @if($files->hasPages())
+            <div class="card-footer bg-white border-0 py-4">
+                <div class="d-flex justify-content-center">
+                    {{ $files->links('pagination::bootstrap-5') }}
+                </div>
+            </div>
+        @endif
     </div>
 </div>
 
