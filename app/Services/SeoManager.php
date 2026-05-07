@@ -169,7 +169,7 @@ class SeoManager
             $indexable = false;
         }
 
-        $allowedQuery = ['lang', 'page'];
+        $allowedQuery = ['lang', 'page', 'category', 'script', 'status'];
         $queryKeys = array_keys($request->query());
         $hasNonCanonicalQuery = collect($queryKeys)->contains(
             static fn (string $key) => !in_array($key, $allowedQuery, true)

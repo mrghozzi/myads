@@ -41,6 +41,9 @@
 * **UI/UX**: Integrated custom file type icons and responsive action menus using the `admin-duralux` theme design system.
 * **i18n**: Added comprehensive translation keys for the Media Manager interface across English and Arabic language files.
 
+### Maintenance
+* **Chore**: Updated **phpseclib/phpseclib** from `3.0.51` to `3.0.52` to ensure the latest security patches and cryptographic stability.
+
 ---
 
 # v4.3.1
