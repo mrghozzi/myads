@@ -3226,6 +3226,35 @@ class AdminController extends Controller
         abort(404);
     }
 
+    public function pluginAsset($slug, Request $request, PluginManager $pluginManager)
+    {
+        $plugins = $pluginManager->getAllPlugins();
+        $plugin = collect($plugins)->where('slug', $slug)->first();
+
+        if ($plugin) {
+            $assetPath = $request->query('path');
+            if (!$assetPath) abort(404);
+
+            $fullPath = $plugin['path'] . '/' . ltrim($assetPath, './');
+            
+            // Security: Prevent directory traversal
+            if (Str::contains($assetPath, '..') || Str::startsWith($assetPath, '/')) {
+                abort(403);
+            }
+
+            if (File::exists($fullPath) && !File::isDirectory($fullPath)) {
+                $extension = strtolower(File::extension($fullPath));
+                $allowedExtensions = ['png', 'jpg', 'jpeg', 'gif', 'svg', 'webp'];
+                
+                if (in_array($extension, $allowedExtensions)) {
+                    return response()->file($fullPath);
+                }
+            }
+        }
+
+        abort(404);
+    }
+
     public function pluginDetails($slug, PluginManager $pluginManager)
     {
         $plugins = $pluginManager->getAllPlugins();
@@ -3253,7 +3282,17 @@ class AdminController extends Controller
         ];
 
         if (File::exists($path . '/README.md')) {
-            $data['readme'] = File::get($path . '/README.md');
+            $readme = File::get($path . '/README.md');
+            
+            // Rewrite relative image paths
+            $readme = preg_replace_callback('/!\[([^\]]*)\]\((?!https?:\/\/|ftp:\/\/|mailto:)([^\)]+)\)/i', function($matches) use ($slug) {
+                $alt = $matches[1];
+                $assetPath = $matches[2];
+                $url = route('admin.plugins.asset', ['slug' => $slug, 'path' => $assetPath]);
+                return "![$alt]($url)";
+            }, $readme);
+
+            $data['readme'] = $readme;
         }
 
         if (File::exists($path . '/changelogs.md')) {
@@ -3261,7 +3300,18 @@ class AdminController extends Controller
         }
 
         if (File::exists($path . '/screenshots.md')) {
-            $data['screenshots'] = File::get($path . '/screenshots.md');
+            $screenshots = File::get($path . '/screenshots.md');
+            
+            // Rewrite relative image paths to use the plugin asset route
+            // Matches ![alt](./path/to/img.png) or ![alt](path/to/img.png)
+            $screenshots = preg_replace_callback('/!\[([^\]]*)\]\((?!https?:\/\/|ftp:\/\/|mailto:)([^\)]+)\)/i', function($matches) use ($slug) {
+                $alt = $matches[1];
+                $assetPath = $matches[2];
+                $url = route('admin.plugins.asset', ['slug' => $slug, 'path' => $assetPath]);
+                return "![$alt]($url)";
+            }, $screenshots);
+
+            $data['screenshots'] = $screenshots;
         }
 
         return response()->json($data);

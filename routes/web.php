@@ -616,6 +616,7 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::post('plugins/install-marketplace', [AdminController::class, 'installPluginFromMarketplace'])->name('admin.plugins.install_marketplace');
 
     Route::get('plugins/thumbnail/{slug}', [AdminController::class, 'pluginThumbnail'])->name('admin.plugins.thumbnail');
+    Route::get('plugins/asset/{slug}', [AdminController::class, 'pluginAsset'])->name('admin.plugins.asset');
     Route::get('plugins/details/{slug}', [AdminController::class, 'pluginDetails'])->name('admin.plugins.details');
 
     // Themes

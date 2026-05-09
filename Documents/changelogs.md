@@ -1,5 +1,5 @@
 # v4.3.2
-> **Feature Release** — Two-Factor Authentication, Search Performance, Smart Archiving, Paddle Billing, and Legal Pages.
+> **Feature Release** — Plugin Documentation Hub, Two-Factor Authentication, Search Performance, Smart Archiving, Paddle Billing, and Legal Pages.
 
 ### Security & Performance
 * **Feature**: Implemented **Two-Factor Authentication (2FA)** via email. Members can now enable an extra layer of security from their Privacy Settings, requiring a unique verification code sent to their email during login.
@@ -40,6 +40,11 @@
 * **Architecture**: Created `AdminMediaController` to centralize media logic, ensuring file operations are restricted to permitted upload paths.
 * **UI/UX**: Integrated custom file type icons and responsive action menus using the `admin-duralux` theme design system.
 * **i18n**: Added comprehensive translation keys for the Media Manager interface across English and Arabic language files.
+
+### Plugin System & Documentation Hub
+* **Feature**: Enhanced the **Plugin Documentation Hub** with automatic image support. The system now securely serves plugin-internal assets (images, webp, etc.) and automatically rewrites relative Markdown image paths to valid platform URLs, resolving documentation display issues.
+* **Architecture**: Added `admin.plugins.asset` route and `pluginAsset()` method to `AdminController` to safely serve assets from outside the web root with extension validation and directory traversal protection.
+* **Architecture**: Implemented `preg_replace_callback` logic in `pluginDetails()` to dynamically process and link internal extension screenshots within `README.md` and `screenshots.md`.
 
 ### Maintenance
 * **Chore**: Updated **phpseclib/phpseclib** from `3.0.51` to `3.0.52` to ensure the latest security patches and cryptographic stability.

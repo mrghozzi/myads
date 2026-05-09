@@ -842,6 +842,8 @@ php artisan storage:link
 - **View:** Created `themes/default/views/pages/refund.blade.php` with an amber/orange accent design, dark mode support, and 8 content sections.
 - **Footer:** Integrated a Refund Policy link in `footer.blade.php` with `fa-solid fa-rotate-left` icon.
 - **i18n:** Added Paddle translation keys (EN/AR) and 22 refund policy translation keys across all 9 supported languages.
+- **Plugin System:** Enhanced the **Plugin Documentation Hub** with a secure asset serving mechanism. Added `AdminController@pluginAsset` and the `admin.plugins.asset` route to serve internal extension images (png, webp, etc.) from outside the web root.
+- **Markdown:** Implemented an automatic URL rewriter in `AdminController@pluginDetails` that converts relative Markdown image paths into platform-safe asset URLs, resolving 404 display issues for extension documentation.
 
 ---
 
@@ -867,4 +869,4 @@ If in doubt, update it. An outdated `Agents.md` causes future agents to make wro
 
 ---
 
-*Last updated: 2026-05-05 — MYADS v4.3.2 (Paddle gateway + Refund Policy page)*
+*Last updated: 2026-05-09 — MYADS v4.3.2 (Plugin Documentation Hub improvements)*
