@@ -844,6 +844,8 @@ php artisan storage:link
 - **i18n:** Added Paddle translation keys (EN/AR) and 22 refund policy translation keys across all 9 supported languages.
 - **Plugin System:** Enhanced the **Plugin Documentation Hub** with a secure asset serving mechanism. Added `AdminController@pluginAsset` and the `admin.plugins.asset` route to serve internal extension images (png, webp, etc.) from outside the web root.
 - **Markdown:** Implemented an automatic URL rewriter in `AdminController@pluginDetails` that converts relative Markdown image paths into platform-safe asset URLs, resolving 404 display issues for extension documentation.
+- **Fix (2026-05-10)**: Resolved a critical **500 Internal Server Error** on the **Admin Product Edit** page (`/admin/products/{id}/edit`) by refactoring Blade directives and ensuring consistent variable extraction.
+- **Fix (2026-05-10)**: Fixed the dynamic sub-category selector in the **Store Creation** page, ensuring correct AJAX-driven selection for script types and parent scripts.
 
 ---
 
@@ -869,4 +871,4 @@ If in doubt, update it. An outdated `Agents.md` causes future agents to make wro
 
 ---
 
-*Last updated: 2026-05-09 — MYADS v4.3.2 (Plugin Documentation Hub improvements)*
+*Last updated: 2026-05-10 — MYADS v4.3.2 (Store & Marketplace refinements)*

@@ -46,7 +46,14 @@
 * **Architecture**: Added `admin.plugins.asset` route and `pluginAsset()` method to `AdminController` to safely serve assets from outside the web root with extension validation and directory traversal protection.
 * **Architecture**: Implemented `preg_replace_callback` logic in `pluginDetails()` to dynamically process and link internal extension screenshots within `README.md` and `screenshots.md`.
 
+### Store & Marketplace
+* **Fix**: Resolved an issue in the **Store Creation** page (`/store/create`) where the dynamic sub-category selector (AJAX) failed to load or incorrectly nested within existing input wrappers, preventing the selection of script types or parent scripts for plugins.
+* **Fix**: Resolved a critical **500 Internal Server Error** on the **Admin Product Edit** page (`/admin/products/{id}/edit`) caused by nested parentheses and syntax inconsistencies in the Blade template's `@php` blocks and variable extraction.
+* **UI**: Standardized the product edit form layout to ensure consistent label positioning and responsive behavior for all product types (Scripts, Plugins, Templates).
+
 ### Maintenance
+* **Chore**: Updated **postcss** from `8.5.6` to `8.5.14` to resolve transitive dependency vulnerabilities in the build pipeline.
+* **Chore**: Updated **axios** from `1.15.0` to `1.15.2` for improved request handling stability in the community feed.
 * **Chore**: Updated **phpseclib/phpseclib** from `3.0.51` to `3.0.52` to ensure the latest security patches and cryptographic stability.
 
 ---
