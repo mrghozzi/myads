@@ -11,6 +11,26 @@
 
 @section('content')
 <div class="main-content container-lg px-4">
+    @if(session('success'))
+        <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm mb-4" role="alert" style="border-radius: 12px;">
+            <div class="d-flex align-items-center">
+                <i class="feather-check-circle me-3 fs-18"></i>
+                <div>{{ session('success') }}</div>
+            </div>
+            <button type="button" class="btn-close shadow-none" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
+    @if(session('error'))
+        <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm mb-4" role="alert" style="border-radius: 12px;">
+            <div class="d-flex align-items-center">
+                <i class="feather-alert-octagon me-3 fs-18"></i>
+                <div>{{ session('error') }}</div>
+            </div>
+            <button type="button" class="btn-close shadow-none" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    @endif
+
     <section class="extension-hub extension-hub--plugins">
         <div class="row g-0 align-items-center mb-4">
             <div class="col-12">

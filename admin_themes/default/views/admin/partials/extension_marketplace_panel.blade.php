@@ -91,7 +91,7 @@
                             </button>
                         @else
                             @if(!empty($item['download_url']))
-                                <form action="{{ route('admin.' . ($item['category'] === 'templates' ? 'themes' : 'plugins') . '.install_marketplace') }}" method="POST" class="d-inline">
+                                <form action="{{ route('admin.' . (($marketplaceCatalog['type'] ?? $item['category'] ?? '') === 'plugins' ? 'plugins' : 'themes') . '.install_marketplace') }}" method="POST" class="d-inline">
                                     @csrf
                                     <input type="hidden" name="slug" value="{{ $marketSlug }}">
                                     <input type="hidden" name="download_url" value="{{ $item['download_url'] }}">

@@ -78,7 +78,7 @@ class MaintenanceModeManager
         $now = time();
 
         $message = $current['message'];
-        if (in_array($source, ['plugin_activation', 'plugin_deactivation', 'plugin_upload', 'plugin_upgrade', 'theme_activation', 'theme_upgrade', 'clear_cache', 'run_migrations', 'db_repair', 'manual_update'])) {
+        if (in_array($source, ['plugin_activation', 'plugin_deactivation', 'plugin_upload', 'plugin_upgrade', 'plugin_marketplace_install', 'theme_activation', 'theme_upgrade', 'theme_marketplace_install', 'clear_cache', 'run_migrations', 'db_repair', 'manual_update'])) {
             $message = __('messages.maintenance_auto_message');
         }
 
@@ -115,7 +115,7 @@ class MaintenanceModeManager
             'last_source' => $source,
         ];
 
-        if (str_contains($source, '_success') || str_contains($source, '_failed') || str_contains($source, '_error')) {
+        if (str_contains($source, '_success') || str_contains($source, '_failed') || str_contains($source, '_error') || str_contains($source, '_cancel')) {
             $payload['message'] = (string) \App\Models\Option::where('o_type', 'maintenance_settings')->where('name', 'message')->first()?->o_valuer;
         }
 
