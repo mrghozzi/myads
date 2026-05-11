@@ -462,6 +462,8 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::delete('/seo/rules/{rule}', [AdminSeoController::class, 'destroyRule'])->name('admin.seo.rules.delete');
     Route::get('/seo/indexing', [AdminSeoController::class, 'indexing'])->name('admin.seo.indexing');
     Route::post('/seo/indexing', [AdminSeoController::class, 'updateIndexing'])->name('admin.seo.indexing.update');
+    Route::get('/seo/ads-files', [AdminSeoController::class, 'adsFiles'])->name('admin.seo.ads_files');
+    Route::post('/seo/ads-files', [AdminSeoController::class, 'updateAdsFiles'])->name('admin.seo.ads_files.update');
     
     Route::get('/users', [AdminController::class, 'users'])->name('admin.users');
     Route::get('/users/{id}/edit', [AdminController::class, 'editUser'])->name('admin.users.edit');

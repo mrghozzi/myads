@@ -14,4 +14,7 @@
     <a href="{{ route('admin.seo.indexing') }}" class="{{ request()->routeIs('admin.seo.indexing') ? 'active' : '' }}">
         <i class="feather-search"></i> {{ __('messages.seo_indexing') }}
     </a>
+    <a href="{{ route('admin.seo.ads_files') }}" class="{{ request()->routeIs('admin.seo.ads_files') ? 'active' : '' }}">
+        <i class="feather-file-text"></i> {{ __('messages.seo_ads_files') }}
+    </a>
 </div>

@@ -203,6 +203,59 @@ class AdminSeoController extends Controller
             ->with('success', $this->message('seo_flash_indexing_updated', 'Indexing controls and robots.txt were updated successfully.'));
     }
 
+    public function adsFiles()
+    {
+        $adsTxtPath = public_path('ads.txt');
+        $appAdsTxtPath = public_path('app-ads.txt');
+        
+        // Fallback to base path if public path files don't exist
+        $adsTxt = '';
+        if (file_exists($adsTxtPath)) {
+            $adsTxt = file_get_contents($adsTxtPath);
+        } elseif (file_exists(base_path('ads.txt'))) {
+            $adsTxt = file_get_contents(base_path('ads.txt'));
+        }
+
+        $appAdsTxt = '';
+        if (file_exists($appAdsTxtPath)) {
+            $appAdsTxt = file_get_contents($appAdsTxtPath);
+        } elseif (file_exists(base_path('app-ads.txt'))) {
+            $appAdsTxt = file_get_contents(base_path('app-ads.txt'));
+        }
+
+        return view('admin::admin.seo.ads_files', [
+            'adsTxt' => $adsTxt,
+            'appAdsTxt' => $appAdsTxt,
+        ]);
+    }
+
+    public function updateAdsFiles(Request $request)
+    {
+        $validated = $request->validate([
+            'ads_txt' => ['nullable', 'string', 'max:50000'],
+            'app_ads_txt' => ['nullable', 'string', 'max:50000'],
+        ]);
+
+        $adsTxt = $validated['ads_txt'] ?? '';
+        $appAdsTxt = $validated['app_ads_txt'] ?? '';
+
+        try {
+            // Save to public directory
+            file_put_contents(public_path('ads.txt'), $adsTxt);
+            file_put_contents(public_path('app-ads.txt'), $appAdsTxt);
+            
+            // Also save to root directory for compatibility with root-based installs
+            @file_put_contents(base_path('ads.txt'), $adsTxt);
+            @file_put_contents(base_path('app-ads.txt'), $appAdsTxt);
+        } catch (\Exception $e) {
+            return back()->with('error', 'Could not write to files. Please check permissions for public/ and root folders.');
+        }
+
+        return redirect()
+            ->route('admin.seo.ads_files')
+            ->with('success', $this->message('seo_flash_ads_files_updated', 'Ads files updated successfully.'));
+    }
+
     private function fillRuleFromRequest(SeoRule $rule, Request $request): void
     {
         $validated = $request->validate([

@@ -190,6 +190,7 @@
                                 <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.seo.head') }}">{{ __('messages.seo_head_meta') }}</a></li>
                                 <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.seo.rules') }}">{{ __('messages.seo_rules') }}</a></li>
                                 <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.seo.indexing') }}">{{ __('messages.seo_indexing') }}</a></li>
+                                <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.seo.ads_files') }}">{{ __('messages.seo_ads_files') }}</a></li>
                             </ul>
                         </li>
                     @endif

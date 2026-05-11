@@ -2859,4 +2859,11 @@ return [
     'enabled' => 'مفعّل',
     'disable' => 'تعطيل',
     'disabled' => 'معطّل',
+    'seo_ads_files' => 'ملفات الإعلانات (ads.txt)',
+    'seo_ads_files_heading' => 'إدارة ملفات ads.txt و app-ads.txt',
+    'seo_ads_files_intro' => 'قم بإدارة ملفات تفويض الإعلانات الخاصة بك مباشرة في المجلد الرئيسي للموقع.',
+    'seo_ads_txt_help' => 'ملف البائعين الرقميين المعتمدين لمخزون الويب.',
+    'seo_app_ads_txt_help' => 'ملف البائعين الرقميين المعتمدين لمخزون تطبيقات الجوال.',
+    'seo_save_ads_files' => 'حفظ ملفات الإعلانات',
+    'seo_flash_ads_files_updated' => 'تم تحديث ملفات الإعلانات بنجاح.',
 ];

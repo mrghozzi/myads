@@ -2856,4 +2856,11 @@ return [
     'enabled' => 'Enabled',
     'disable' => 'Disable',
     'disabled' => 'Disabled',
+    'seo_ads_files' => 'Ads Files (ads.txt)',
+    'seo_ads_files_heading' => 'Ads.txt & App-Ads.txt Management',
+    'seo_ads_files_intro' => 'Manage your advertising authorization files directly in the root directory.',
+    'seo_ads_txt_help' => 'Authorized Digital Sellers file for web inventory.',
+    'seo_app_ads_txt_help' => 'Authorized Digital Sellers file for mobile app inventory.',
+    'seo_save_ads_files' => 'Save Ads Files',
+    'seo_flash_ads_files_updated' => 'Ads files updated successfully.',
 ];
