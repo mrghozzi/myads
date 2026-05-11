@@ -1,5 +1,5 @@
 # v4.3.2
-> **Feature Release** — Plugin Documentation Hub, Two-Factor Authentication, Search Performance, Smart Archiving, Paddle Billing, and Legal Pages.
+> **Feature Release** — Plugin Documentation Hub, Two-Factor Authentication, Ads.txt Management, Search Performance, Smart Archiving, Paddle Billing, and Legal Pages.
 
 ### Security & Performance
 * **Feature**: Implemented **Two-Factor Authentication (2FA)** via email. Members can now enable an extra layer of security from their Privacy Settings, requiring a unique verification code sent to their email during login.
@@ -45,6 +45,12 @@
 * **Feature**: Enhanced the **Plugin Documentation Hub** with automatic image support. The system now securely serves plugin-internal assets (images, webp, etc.) and automatically rewrites relative Markdown image paths to valid platform URLs, resolving documentation display issues.
 * **Architecture**: Added `admin.plugins.asset` route and `pluginAsset()` method to `AdminController` to safely serve assets from outside the web root with extension validation and directory traversal protection.
 * **Architecture**: Implemented `preg_replace_callback` logic in `pluginDetails()` to dynamically process and link internal extension screenshots within `README.md` and `screenshots.md`.
+
+### SEO & Ad Authorization
+* **Feature**: Added **Ads.txt and App-Ads.txt Management** to the admin panel. Administrators can now create and edit these authorization files directly via a new interface under the SEO section.
+* **Architecture**: Implemented dual-directory saving (root and `public/`) for `ads.txt` and `app-ads.txt` to ensure maximum compatibility across various hosting and web server configurations.
+* **Architecture**: Updated the project's root `.htaccess` to explicitly whitelist `.txt` and `.xml` files, ensuring they are correctly served from the `public/` directory in root-based installations.
+* **i18n**: Added comprehensive translation keys for the Ads files management interface and help hints across English and Arabic.
 
 ### Store & Marketplace
 * **Fix**: Resolved an issue in the **Store Creation** page (`/store/create`) where the dynamic sub-category selector (AJAX) failed to load or incorrectly nested within existing input wrappers, preventing the selection of script types or parent scripts for plugins.
