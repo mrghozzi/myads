@@ -55,6 +55,8 @@ class NewsController extends Controller
             'image' => $article->img,
             'lastmod' => $article->date,
             'schema_type' => 'Article',
+            'author_name' => config('app.name', 'MyAds'),
+            'author_url' => url('/'),
             'breadcrumbs' => [
                 ['name' => __('messages.home'), 'url' => url('/')],
                 ['name' => __('messages.news'), 'url' => route('news.index')],

@@ -1,5 +1,21 @@
 # v4.3.3
-> **Under Development**
+> **Maintenance Release** — SEO structured data fixes, maintenance mode stability, and performance refinements.
+
+### SEO & Structured Data
+* **Feature**: Implemented **JSON-LD Structured Data Fixes** across the platform to resolve Google Search Console warnings.
+* **Fix**: Added missing `url` fields to `WebSite`, `Article`, and `DiscussionForumPosting` schema blocks, ensuring better visibility and valid rich results in search engines.
+* **Feature**: Introduced the **ProfilePage** schema type for member profiles, enhancing the representation of user identities in search results.
+* **Improvement**: Enhanced `author` objects in schema blocks with `url` properties, correctly linking content to member profiles or the site's main organization.
+* **Architecture**: Updated `SeoManager` to support dynamic `author_url` and `author_name` context variables for more precise schema generation.
+
+### Maintenance & Stability
+* **Fix**: Resolved a critical **503 Service Unavailable** error that occurred during the login process, preventing unintended maintenance mode loops.
+* **Fix**: Hardened the system version check middleware to prevent false-positive maintenance triggers during session transitions.
+* **Architecture**: Improved maintenance mode bypass logic to ensure emergency access is always available for authorized administrators.
+
+### Core Performance
+* **Optimization**: Refined the `SeoManager` token resolution logic to reduce redundant metadata fetching on high-traffic pages.
+* **Chore**: Verified system-wide translation key coverage for the newly introduced SEO and maintenance states.
 
 ---
 

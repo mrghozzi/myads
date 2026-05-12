@@ -138,6 +138,7 @@ class ProfileController extends Controller
                 : __('messages.seo_profile_description', ['username' => $user->username]),
             'image' => $user->img,
             'username' => $user->username,
+            'author_name' => $user->username,
             'breadcrumbs' => [
                 ['name' => __('messages.home'), 'url' => url('/')],
                 ['name' => $user->username, 'url' => route('profile.show', $user->username)],

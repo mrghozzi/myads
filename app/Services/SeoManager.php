@@ -419,18 +419,21 @@ class SeoManager
                 '@type' => 'Article',
                 'headline' => $title,
                 'description' => $description,
+                'url' => $canonicalUrl,
                 'image' => $image ? [$image] : null,
                 'datePublished' => $lastmod,
                 'dateModified' => $lastmod,
                 'mainEntityOfPage' => $canonicalUrl,
-                'author' => [
+                'author' => array_filter([
+                    '@type' => 'Organization',
+                    'name' => (string) ($context['author_name'] ?? $tokens['site']),
+                    'url' => (string) ($context['author_url'] ?? url('/')),
+                ]),
+                'publisher' => array_filter([
                     '@type' => 'Organization',
                     'name' => $tokens['site'],
-                ],
-                'publisher' => [
-                    '@type' => 'Organization',
-                    'name' => $tokens['site'],
-                ],
+                    'url' => url('/'),
+                ]),
             ]);
         } elseif ($schemaType === 'DiscussionForumPosting') {
             $blocks[] = array_filter([
@@ -441,11 +444,25 @@ class SeoManager
                 'datePublished' => $lastmod,
                 'dateModified' => $lastmod,
                 'mainEntityOfPage' => $canonicalUrl,
-                'author' => [
+                'url' => $canonicalUrl,
+                'author' => array_filter([
                     '@type' => 'Person',
                     'name' => (string) ($context['author_name'] ?? $tokens['site']),
-                ],
+                    'url' => (string) ($context['author_url'] ?? null) ?: null,
+                ]),
                 'image' => $image ? [$image] : null,
+            ]);
+        } elseif ($schemaType === 'ProfilePage') {
+            $blocks[] = array_filter([
+                '@context' => 'https://schema.org',
+                '@type' => 'ProfilePage',
+                'mainEntity' => array_filter([
+                    '@type' => 'Person',
+                    'name' => (string) ($context['author_name'] ?? $title),
+                    'url' => $canonicalUrl,
+                    'image' => $image,
+                ]),
+                'url' => $canonicalUrl,
             ]);
         } else {
             $blocks[] = array_filter([
@@ -511,6 +528,7 @@ class SeoManager
             'home' => 'WebSite',
             'news_show' => 'Article',
             'forum_topic' => 'DiscussionForumPosting',
+            'profile_show' => 'ProfilePage',
             default => 'WebPage',
         };
     }

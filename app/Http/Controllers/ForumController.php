@@ -153,6 +153,7 @@ class ForumController extends Controller
             'lastmod' => $topic->date ?: $status->date,
             'schema_type' => 'DiscussionForumPosting',
             'author_name' => $topic->user?->username,
+            'author_url' => $topic->user ? route('profile.show', $topic->user->username) : null,
             'breadcrumbs' => $group
                 ? [
                     ['name' => __('messages.home'), 'url' => url('/')],
