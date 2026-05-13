@@ -618,6 +618,32 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::post('plugins/install-marketplace', [AdminController::class, 'installPluginFromMarketplace'])->name('admin.plugins.install_marketplace');
 
     Route::get('plugins/thumbnail/{slug}', [AdminController::class, 'pluginThumbnail'])->name('admin.plugins.thumbnail');
+
+    // New Storage & System Settings
+    Route::get('/settings/upload', [AdminController::class, 'fileUploadSettings'])->name('admin.settings.upload');
+    Route::post('/settings/upload', [AdminController::class, 'updateFileUploadSettings'])->name('admin.settings.upload.update');
+    
+    Route::get('/settings/amazon-s3', [AdminController::class, 'amazonS3Settings'])->name('admin.settings.amazon_s3');
+    Route::post('/settings/amazon-s3', [AdminController::class, 'updateAmazonS3Settings'])->name('admin.settings.amazon_s3.update');
+    Route::post('/settings/amazon-s3/test', [AdminController::class, 'testAmazonS3Connection'])->name('admin.settings.amazon_s3.test');
+    Route::post('/settings/amazon-s3/upload', [AdminController::class, 'uploadFilesToAmazonS3'])->name('admin.settings.amazon_s3.upload');
+    
+    Route::get('/settings/ftp', [AdminController::class, 'ftpSettings'])->name('admin.settings.ftp');
+    Route::post('/settings/ftp', [AdminController::class, 'updateFtpSettings'])->name('admin.settings.ftp.update');
+    Route::post('/settings/ftp/test', [AdminController::class, 'testFtpConnection'])->name('admin.settings.ftp.test');
+    
+    Route::get('/settings/google-cloud', [AdminController::class, 'googleCloudSettings'])->name('admin.settings.google_cloud');
+    Route::post('/settings/google-cloud', [AdminController::class, 'updateGoogleCloudSettings'])->name('admin.settings.google_cloud.update');
+    Route::post('/settings/google-cloud/test', [AdminController::class, 'testGoogleCloudConnection'])->name('admin.settings.google_cloud.test');
+    
+    Route::get('/settings/digitalocean', [AdminController::class, 'digitaloceanSettings'])->name('admin.settings.digitalocean');
+    Route::post('/settings/digitalocean', [AdminController::class, 'updateDigitaloceanSettings'])->name('admin.settings.digitalocean.update');
+    Route::post('/settings/digitalocean/test', [AdminController::class, 'testDigitaloceanConnection'])->name('admin.settings.digitalocean.test');
+    Route::post('/settings/digitalocean/upload', [AdminController::class, 'uploadFilesToDigitalocean'])->name('admin.settings.digitalocean.upload');
+    
+    Route::get('/settings/ffmpeg', [AdminController::class, 'ffmpegSettings'])->name('admin.settings.ffmpeg');
+    Route::post('/settings/ffmpeg', [AdminController::class, 'updateFfmpegSettings'])->name('admin.settings.ffmpeg.update');
+    Route::post('/settings/ffmpeg/debug', [AdminController::class, 'debugFfmpeg'])->name('admin.settings.ffmpeg.debug');
     Route::get('plugins/asset/{slug}', [AdminController::class, 'pluginAsset'])->name('admin.plugins.asset');
     Route::get('plugins/details/{slug}', [AdminController::class, 'pluginDetails'])->name('admin.plugins.details');
 

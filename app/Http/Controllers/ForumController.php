@@ -68,7 +68,7 @@ class ForumController extends Controller
         $sidebarCategories = $this->buildCategorySidebar((int) $category->id);
 
         $statuses = Status::visible()
-            ->whereIn('s_type', [2, 4])
+            ->whereIn('s_type', [2, 4, 10, 11, 12, 13, 14])
             ->where('date', '<=', $time)
             ->whereIn('tp_id', function ($query) use ($id) {
                 $query->select('id')
@@ -132,7 +132,7 @@ class ForumController extends Controller
         $forumSettings = ForumSettings::all();
 
         $status = Status::where('tp_id', $id)
-            ->whereIn('s_type', [2, 4, 100, 7867])
+            ->whereIn('s_type', [2, 4, 100, 7867, 10, 11, 12, 13, 14])
             ->firstOrFail();
 
         if ($status->s_type == 7867) {
@@ -169,7 +169,7 @@ class ForumController extends Controller
                 ],
         ];
 
-        if ($status->s_type == 100) {
+        if (in_array($status->s_type, [100, 10, 11, 12, 13, 14])) {
             $this->seo($seoContext);
             return view('theme::forum.post', compact('topic', 'status', 'forumSettings', 'group'));
         }
@@ -203,7 +203,7 @@ class ForumController extends Controller
                 abort(403);
             }
 
-            $status = Status::where('tp_id', $topic->id)->whereIn('s_type', [2, 7867])->first();
+            $status = Status::where('tp_id', $topic->id)->whereIn('s_type', [2, 7867, 10, 11, 12, 13, 14])->first();
             $editType = $status?->s_type ?? 2;
         }
 
@@ -328,7 +328,7 @@ class ForumController extends Controller
 
         $categories = ForumCategory::orderBy('ordercat', 'asc')->get();
         $forumSettings = ForumSettings::all();
-        $status = Status::where('tp_id', $id)->whereIn('s_type', [2, 4, 100])->first();
+        $status = Status::where('tp_id', $id)->whereIn('s_type', [2, 4, 100, 10, 11, 12, 13, 14])->first();
         return view('theme::forum.edit', compact('topic', 'categories', 'forumSettings', 'status'));
     }
 
@@ -414,7 +414,7 @@ class ForumController extends Controller
         DB::beginTransaction();
         try {
             $groupId = (int) ($topic->group_id ?? 0);
-            Status::where('tp_id', $id)->whereIn('s_type', [2, 4, 100, 7867])->delete();
+            Status::where('tp_id', $id)->whereIn('s_type', [2, 4, 100, 7867, 10, 11, 12, 13, 14])->delete();
 
             Option::where('o_parent', $id)
                 ->whereIn('o_type', ['image_post', 'data_reaction'])

@@ -251,6 +251,35 @@
                         </li>
                     @endif
 
+                    @if($canAdmin('settings'))
+                    <li class="nxl-item nxl-caption">
+                        <label>{{ __('messages.storage_and_upload') ?? 'Storage & Upload' }}</label>
+                    </li>
+                    <li class="nxl-item nxl-hasmenu">
+                        <a href="javascript:void(0);" class="nxl-link">
+                            <span class="nxl-micon"><i class="feather-upload-cloud"></i></span>
+                            <span class="nxl-mtext">{{ __('messages.file_upload_sharing') }}</span><span class="nxl-arrow"><i class="feather-chevron-right"></i></span>
+                        </a>
+                        <ul class="nxl-submenu">
+                            <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.settings.upload') }}">{{ __('messages.file_upload_config') }}</a></li>
+                            <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.settings.ffmpeg') }}">{{ __('messages.ffmpeg_config') }}</a></li>
+                        </ul>
+                    </li>
+
+                    <li class="nxl-item nxl-hasmenu">
+                        <a href="javascript:void(0);" class="nxl-link">
+                            <span class="nxl-micon"><i class="feather-database"></i></span>
+                            <span class="nxl-mtext">{{ __('messages.cloud_storage') ?? 'Cloud Storage' }}</span><span class="nxl-arrow"><i class="feather-chevron-right"></i></span>
+                        </a>
+                        <ul class="nxl-submenu">
+                            <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.settings.amazon_s3') }}">Amazon S3</a></li>
+                            <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.settings.digitalocean') }}">DigitalOcean</a></li>
+                            <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.settings.google_cloud') }}">Google Cloud</a></li>
+                            <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.settings.ftp') }}">FTP</a></li>
+                        </ul>
+                    </li>
+                    @endif
+
                     <li class="nxl-item nxl-caption">
                         <label>{{ __('messages.users_and_billing') ?? 'Users & Billing' }}</label>
                     </li>

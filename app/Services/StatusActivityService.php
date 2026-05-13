@@ -60,9 +60,21 @@ class StatusActivityService
                 break;
             case 2:
             case 4:
+            case 10:
+            case 11:
+            case 12:
+            case 13:
+            case 14:
             case 100:
                 $activity->related_content = ForumTopic::with(['attachments', 'imageOption'])->find($activity->tp_id);
-                $activity->type_label = 'Forum';
+                $activity->type_label = match((int) $activity->s_type) {
+                    10 => 'Video',
+                    11 => 'Audio',
+                    12 => 'File',
+                    13 => 'Music',
+                    14 => 'Reels',
+                    default => 'Forum',
+                };
                 break;
             case 7867:
                 $activity->related_content = Product::withoutGlobalScope('store')->find($activity->tp_id);

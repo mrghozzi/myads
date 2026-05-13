@@ -217,7 +217,7 @@ class GroupController extends Controller
             $activities = Status::visible($user)
                 ->with(['group'])
                 ->where('group_id', $group->id)
-                ->whereIn('s_type', [100, 4])
+                ->whereIn('s_type', [100, 4, 10, 11, 12, 13, 14])
                 ->whereHas('forumTopic', function ($query) {
                     $query->whereIn('name', $this->reservedFeedTopicNames());
                 })
@@ -492,7 +492,7 @@ class GroupController extends Controller
 
     private function reservedFeedTopicNames(): array
     {
-        return ['text', 'link', 'gallery'];
+        return ['text', 'link', 'gallery', 'video', 'audio', 'file', 'music', 'reels'];
     }
 
     private function emptyPaginator(string $pageName, int $perPage): LengthAwarePaginator

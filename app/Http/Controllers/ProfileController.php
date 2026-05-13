@@ -72,7 +72,7 @@ class ProfileController extends Controller
                     $query->where('s_type', 1);
                     break;
                 case 'forum':
-                    $query->where('s_type', 2);
+                    $query->whereIn('s_type', [2, 10, 11, 12, 13, 14]);
                     break;
                 case 'store':
                     $query->where('s_type', 7867);

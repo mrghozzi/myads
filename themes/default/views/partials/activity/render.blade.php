@@ -14,6 +14,16 @@
         $type = 'news';
     } elseif ($activity->s_type == 6) {
         $type = 'order';
+    } elseif ($activity->s_type == 10) {
+        $type = 'video';
+    } elseif ($activity->s_type == 11) {
+        $type = 'audio';
+    } elseif ($activity->s_type == 12) {
+        $type = 'file';
+    } elseif ($activity->s_type == 13) {
+        $type = 'audio'; // Music uses same player as audio
+    } elseif ($activity->s_type == 14) {
+        $type = 'video'; // Reels uses same player as video
     }
     
     // Check if related content exists before including

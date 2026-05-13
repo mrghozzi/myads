@@ -22,6 +22,11 @@
         $allowGallery ? 'gallery' : null,
         $allowLink ? 'link' : null,
         $allowRepost ? 'repost' : null,
+        'video',
+        'audio',
+        'file',
+        'music',
+        'reels',
     ]), true)) {
         $oldPostKind = 'text';
     }
@@ -222,6 +227,27 @@
                 </div>
             @endif
 
+            <div id="composer-video-block" class="widget-box composer-refresh__panel" style="display:none;">
+                <div class="widget-box-content composer-refresh__panel-content">
+                    <input type="file" id="composer-videos" name="videos[]" accept="video/*" multiple style="display:none">
+                    <div id="composer-video-preview" class="composer-refresh__preview"></div>
+                </div>
+            </div>
+
+            <div id="composer-audio-block" class="widget-box composer-refresh__panel" style="display:none;">
+                <div class="widget-box-content composer-refresh__panel-content">
+                    <input type="file" id="composer-audios" name="audios[]" accept="audio/*" multiple style="display:none">
+                    <div id="composer-audio-preview" class="composer-refresh__preview"></div>
+                </div>
+            </div>
+
+            <div id="composer-file-block" class="widget-box composer-refresh__panel" style="display:none;">
+                <div class="widget-box-content composer-refresh__panel-content">
+                    <input type="file" id="composer-files" name="files[]" multiple style="display:none">
+                    <div id="composer-file-list" class="composer-refresh__preview"></div>
+                </div>
+            </div>
+
             <input type="file" id="imgupload" name="fimg" accept=".jpg, .jpeg, .png, .gif, .webp" style="display:none"/>
         </div>
 
@@ -237,9 +263,34 @@
                         <svg class="quick-post-footer-action-icon icon-camera" aria-hidden="true">
                             <use xlink:href="#svg-camera"></use>
                         </svg>
-                        <span class="composer-refresh__tool-label">{{ __('messages.insertphoto') }}</span>
+                        <span class="composer-refresh__tool-label">{{ __('messages.upload_photos') ?? 'Upload Photos' }}</span>
                     </button>
                 @endif
+
+                <button type="button" class="quick-post-footer-action composer-refresh__tool" data-title="{{ __('messages.upload_video') }}" id="composer-mode-video" aria-pressed="false">
+                    <i class="fa fa-video-camera" aria-hidden="true" style="color: #615dfa;"></i>
+                    <span class="composer-refresh__tool-label">{{ __('messages.upload_video') }}</span>
+                </button>
+
+                <button type="button" class="quick-post-footer-action composer-refresh__tool" data-title="{{ __('messages.record_audio') }}" id="composer-mode-audio" aria-pressed="false">
+                    <i class="fa fa-microphone" aria-hidden="true" style="color: #ff5e3a;"></i>
+                    <span class="composer-refresh__tool-label">{{ __('messages.record_audio') }}</span>
+                </button>
+
+                <button type="button" class="quick-post-footer-action composer-refresh__tool" data-title="{{ __('messages.upload_music') }}" id="composer-mode-music" aria-pressed="false">
+                    <i class="fa fa-music" aria-hidden="true" style="color: #00d7d2;"></i>
+                    <span class="composer-refresh__tool-label">{{ __('messages.upload_music') }}</span>
+                </button>
+
+                <button type="button" class="quick-post-footer-action composer-refresh__tool" data-title="{{ __('messages.upload_files') }}" id="composer-mode-file" aria-pressed="false">
+                    <i class="fa fa-file-text" aria-hidden="true" style="color: #4b4b4b;"></i>
+                    <span class="composer-refresh__tool-label">{{ __('messages.upload_files') }}</span>
+                </button>
+
+                <button type="button" class="quick-post-footer-action composer-refresh__tool" data-title="{{ __('messages.upload_reels') }}" id="composer-mode-reels" aria-pressed="false">
+                    <i class="fa fa-film" aria-hidden="true" style="color: #ffb100;"></i>
+                    <span class="composer-refresh__tool-label">{{ __('messages.upload_reels') }}</span>
+                </button>
 
                 @if($allowLink)
                     <button type="button" class="quick-post-footer-action composer-refresh__tool" data-title="{{ __('messages.insertlink') }}" id="composer-mode-link" aria-pressed="false">
@@ -247,6 +298,11 @@
                         <span class="composer-refresh__tool-label">{{ __('messages.insertlink') }}</span>
                     </button>
                 @endif
+
+                <button type="button" class="quick-post-footer-action composer-refresh__tool disabled" data-title="{{ __('messages.create_poll') }}">
+                    <i class="fa fa-tasks" aria-hidden="true" style="color: #3b5998;"></i>
+                    <span class="composer-refresh__tool-label">{{ __('messages.create_poll') }}</span>
+                </button>
             </div>
 
             <div class="quick-post-footer-actions composer-refresh__submit-wrap">
@@ -775,8 +831,9 @@
 
         #social-composer.composer-refresh .composer-refresh__toolbar {
             flex: 1 1 auto;
-            flex-wrap: nowrap;
+            flex-wrap: wrap;
             min-width: 0;
+            gap: 10px;
         }
 
         #social-composer.composer-refresh .composer-refresh__toolbar .quick-post-footer-action {
@@ -785,18 +842,47 @@
 
         #social-composer.composer-refresh .composer-refresh__tool {
             display: inline-flex;
-            flex: 1 1 0;
+            flex: 0 1 auto;
             align-items: center;
             justify-content: center;
             min-width: 0;
             gap: 8px;
             min-height: 42px;
-            padding: 0 14px;
+            padding: 0 16px;
             border: 1px solid var(--composer-border);
             border-radius: 999px;
             background: var(--composer-tool-bg);
             color: var(--composer-muted);
             transition: background-color .2s ease, color .2s ease, border-color .2s ease, transform .2s ease, box-shadow .2s ease;
+        }
+
+        #social-composer.composer-refresh .composer-refresh__tool.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            filter: grayscale(1);
+        }
+
+        #social-composer.composer-refresh .composer-refresh__preview {
+            padding: 15px;
+            background: var(--composer-preview-bg);
+            border-radius: 12px;
+            margin-bottom: 15px;
+        }
+
+        #social-composer.composer-refresh .composer-refresh__preview-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: var(--composer-surface);
+            border: 1px solid var(--composer-border);
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        #social-composer.composer-refresh .composer-refresh__preview-item i {
+            color: #615dfa;
         }
 
         #social-composer.composer-refresh .composer-refresh__tool:hover {
@@ -915,6 +1001,24 @@
         const modeTextButton = document.getElementById('composer-mode-text');
         const modeGalleryButton = document.getElementById('composer-mode-gallery');
         const modeLinkButton = document.getElementById('composer-mode-link');
+        const modeVideoButton = document.getElementById('composer-mode-video');
+        const modeAudioButton = document.getElementById('composer-mode-audio');
+        const modeMusicButton = document.getElementById('composer-mode-music');
+        const modeFileButton = document.getElementById('composer-mode-file');
+        const modeReelsButton = document.getElementById('composer-mode-reels');
+
+        const videoBlock = document.getElementById('composer-video-block');
+        const videoInput = document.getElementById('composer-videos');
+        const videoPreview = document.getElementById('composer-video-preview');
+
+        const audioBlock = document.getElementById('composer-audio-block');
+        const audioInput = document.getElementById('composer-audios');
+        const audioPreview = document.getElementById('composer-audio-preview');
+
+        const fileBlock = document.getElementById('composer-file-block');
+        const fileInput = document.getElementById('composer-files');
+        const fileList = document.getElementById('composer-file-list');
+
         const repostCancelButton = document.getElementById('composer-repost-cancel');
         const csrfToken = document.querySelector('meta[name="csrf-token"]');
         const publishModeInputs = Array.from(form.querySelectorAll('input[name="publish_mode"]'));
@@ -979,14 +1083,26 @@
 
         function syncToolStates() {
             const hasGallery = galleryInput ? (galleryInput.files || []).length > 0 : false;
+            const hasVideo = videoInput ? (videoInput.files || []).length > 0 : false;
+            const hasAudio = audioInput ? (audioInput.files || []).length > 0 : false;
+            const hasFiles = fileInput ? (fileInput.files || []).length > 0 : false;
+
             const linkActive = manualLinkOpen || hasResolvedLink() || autoDetectedLink !== '';
-            const textActive = !hasGallery && !linkActive;
+            const textActive = !hasGallery && !hasVideo && !hasAudio && !hasFiles && !linkActive;
 
             toggleTool(modeTextButton, textActive);
             toggleTool(modeGalleryButton, hasGallery);
+            toggleTool(modeVideoButton, hasVideo || (postKind.value === 'reels'));
+            toggleTool(modeAudioButton, hasAudio && (postKind.value === 'audio'));
+            toggleTool(modeMusicButton, hasAudio && (postKind.value === 'music'));
+            toggleTool(modeFileButton, hasFiles);
+            toggleTool(modeReelsButton, hasVideo && (postKind.value === 'reels'));
             toggleTool(modeLinkButton, linkActive);
 
             composerRoot.classList.toggle('has-gallery', hasGallery);
+            composerRoot.classList.toggle('has-video', hasVideo);
+            composerRoot.classList.toggle('has-audio', hasAudio);
+            composerRoot.classList.toggle('has-files', hasFiles);
             composerRoot.classList.toggle('has-link', linkActive);
             composerRoot.classList.toggle('has-repost', repostEnabled && repostStatusId && repostStatusId.value !== '');
         }
@@ -1008,6 +1124,25 @@
         function syncPostKind() {
             if (galleryInput && (galleryInput.files || []).length > 0) {
                 postKind.value = 'gallery';
+                return;
+            }
+
+            if (videoInput && (videoInput.files || []).length > 0) {
+                if (postKind.value !== 'reels') {
+                    postKind.value = 'video';
+                }
+                return;
+            }
+
+            if (audioInput && (audioInput.files || []).length > 0) {
+                if (postKind.value !== 'music') {
+                    postKind.value = 'audio';
+                }
+                return;
+            }
+
+            if (fileInput && (fileInput.files || []).length > 0) {
+                postKind.value = 'file';
                 return;
             }
 
@@ -1255,9 +1390,32 @@
             });
         }
 
+        function clearMediaSelections(exclude) {
+            if (exclude !== 'gallery') clearGallerySelection();
+            
+            if (videoInput && exclude !== 'video' && exclude !== 'reels') {
+                videoInput.value = '';
+                videoPreview.innerHTML = '';
+                videoBlock.style.display = 'none';
+            }
+            if (audioInput && exclude !== 'audio' && exclude !== 'music') {
+                audioInput.value = '';
+                audioPreview.innerHTML = '';
+                audioBlock.style.display = 'none';
+            }
+            if (fileInput && exclude !== 'file') {
+                fileInput.value = '';
+                fileList.innerHTML = '';
+                fileBlock.style.display = 'none';
+            }
+            
+            syncPostKind();
+            syncToolStates();
+        }
+
         if (modeTextButton) {
             modeTextButton.addEventListener('click', function () {
-                clearGallerySelection();
+                clearMediaSelections();
                 manualLinkOpen = false;
 
                 if (linkInput) {
@@ -1277,7 +1435,93 @@
 
         if (modeGalleryButton && galleryInput) {
             modeGalleryButton.addEventListener('click', function () {
+                clearMediaSelections('gallery');
                 galleryInput.click();
+            });
+        }
+
+        if (modeVideoButton && videoInput) {
+            modeVideoButton.addEventListener('click', function () {
+                clearMediaSelections('video');
+                postKind.value = 'video';
+                videoInput.click();
+            });
+        }
+
+        if (modeAudioButton && audioInput) {
+            modeAudioButton.addEventListener('click', function () {
+                clearMediaSelections('audio');
+                postKind.value = 'audio';
+                audioInput.click();
+            });
+        }
+
+        if (modeMusicButton && audioInput) {
+            modeMusicButton.addEventListener('click', function () {
+                clearMediaSelections('music');
+                postKind.value = 'music';
+                audioInput.click();
+            });
+        }
+
+        if (modeFileButton && fileInput) {
+            modeFileButton.addEventListener('click', function () {
+                clearMediaSelections('file');
+                postKind.value = 'file';
+                fileInput.click();
+            });
+        }
+
+        if (modeReelsButton && videoInput) {
+            modeReelsButton.addEventListener('click', function () {
+                clearMediaSelections('reels');
+                postKind.value = 'reels';
+                videoInput.click();
+            });
+        }
+
+        if (videoInput) {
+            videoInput.addEventListener('change', function () {
+                if (this.files && this.files[0]) {
+                    const currentKind = postKind.value;
+                    clearMediaSelections(currentKind === 'reels' ? 'reels' : 'video');
+                    if (currentKind === 'reels') postKind.value = 'reels'; else postKind.value = 'video';
+                    
+                    videoBlock.style.display = 'block';
+                    videoPreview.innerHTML = `<div class="composer-refresh__preview-item"><i class="fa fa-film"></i> ${this.files[0].name}</div>`;
+                    syncToolStates();
+                }
+            });
+        }
+
+        if (audioInput) {
+            audioInput.addEventListener('change', function () {
+                if (this.files && this.files[0]) {
+                    const currentKind = postKind.value;
+                    clearMediaSelections(currentKind === 'music' ? 'music' : 'audio');
+                    if (currentKind === 'music') postKind.value = 'music'; else postKind.value = 'audio';
+                    
+                    audioBlock.style.display = 'block';
+                    audioPreview.innerHTML = `<div class="composer-refresh__preview-item"><i class="fa fa-microphone"></i> ${this.files[0].name}</div>`;
+                    syncToolStates();
+                }
+            });
+        }
+
+        if (fileInput) {
+            fileInput.addEventListener('change', function () {
+                if (this.files && this.files.length > 0) {
+                    clearMediaSelections('file');
+                    postKind.value = 'file';
+                    
+                    fileBlock.style.display = 'block';
+                    let html = '';
+                    Array.from(this.files).forEach(f => {
+                        html += `<div class="composer-refresh__preview-item"><i class="fa fa-file"></i> ${f.name}</div>`;
+                    });
+                    fileList.innerHTML = html;
+                    syncToolStates();
+                }
             });
         }
 
@@ -1297,6 +1541,7 @@
 
         if (galleryInput) {
             galleryInput.addEventListener('change', function () {
+                clearMediaSelections('gallery');
                 selectedGalleryFiles = Array.from(galleryInput.files || []);
                 renderGallery();
                 syncLinkBlockVisibility();
@@ -1341,7 +1586,7 @@
         }
 
         form.addEventListener('submit', function () {
-            if (!hasResolvedLink()) {
+            if (!hasResolvedLink() && postKind.value === 'link') {
                 setPublishMode('post');
             }
 

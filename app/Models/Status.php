@@ -162,9 +162,15 @@ class Status extends Model
             ->where('status', StatusPromotion::STATUS_ACTIVE);
     }
 
+    const TYPE_VIDEO = 10;
+    const TYPE_AUDIO = 11;
+    const TYPE_FILE = 12;
+    const TYPE_MUSIC = 13;
+    const TYPE_REELS = 14;
+
     public function supportsPromotion(): bool
     {
-        return in_array((int) $this->s_type, [1, 2, 4, 100, 7867, 6], true);
+        return in_array((int) $this->s_type, [1, 2, 4, 100, 7867, 6, 10, 11, 12, 13, 14], true);
     }
 
     public function promotionDestinationUrl(): string
@@ -204,7 +210,7 @@ class Status extends Model
             return $this->newsItem;
         }
 
-        if (in_array($this->s_type, [100, 4, 2])) {
+        if (in_array($this->s_type, [100, 4, 2, 10, 11, 12, 13, 14])) {
             return ForumTopic::find($this->tp_id);
         } elseif ($this->s_type == 1) {
             return Directory::find($this->tp_id);
@@ -372,6 +378,26 @@ class Status extends Model
             return 'gallery';
         }
 
+        if ((int) $this->s_type === self::TYPE_VIDEO) {
+            return 'video';
+        }
+
+        if ((int) $this->s_type === self::TYPE_AUDIO) {
+            return 'audio';
+        }
+
+        if ((int) $this->s_type === self::TYPE_FILE) {
+            return 'file';
+        }
+
+        if ((int) $this->s_type === self::TYPE_MUSIC) {
+            return 'music';
+        }
+
+        if ((int) $this->s_type === self::TYPE_REELS) {
+            return 'reels';
+        }
+
         return 'text';
     }
 
@@ -381,7 +407,7 @@ class Status extends Model
             return 22;
         }
 
-        if (in_array($this->s_type, [2, 4, 100])) {
+        if (in_array($this->s_type, [2, 4, 100, 10, 11, 12, 13, 14])) {
             return 2;
         }
 

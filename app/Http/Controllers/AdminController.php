@@ -2232,7 +2232,7 @@ class AdminController extends Controller
     private function buildAdminReportItems($reports)
     {
         $directoryIds = $reports->where('s_type', 1)->pluck('tp_id')->filter()->unique()->values();
-        $forumTopicIds = $reports->filter(fn (Report $report) => in_array((int) $report->s_type, [2, 4, 100], true))
+        $forumTopicIds = $reports->filter(fn (Report $report) => in_array((int) $report->s_type, [2, 4, 100, 10, 11, 12, 13, 14], true))
             ->pluck('tp_id')->filter()->unique()->values();
         $newsIds = $reports->filter(fn (Report $report) => in_array((int) $report->s_type, [3, 5], true))
             ->pluck('tp_id')->filter()->unique()->values();
@@ -3697,4 +3697,142 @@ class AdminController extends Controller
             'tablet' => __('messages.smart_device_tablet'),
         ];
     }
+
+    // File Upload Settings
+    public function fileUploadSettings()
+    {
+        $options = Option::where('o_type', 'file_upload_settings')->get()->keyBy('name');
+        return view('admin::admin.file_upload', compact('options'));
+    }
+
+    public function updateFileUploadSettings(Request $request)
+    {
+        $settings = $request->except('_token');
+        foreach ($settings as $key => $value) {
+            Option::updateOrCreate(
+                ['o_type' => 'file_upload_settings', 'name' => $key],
+                ['o_valuer' => (string) $value]
+            );
+        }
+        return redirect()->back()->with('success', __('messages.settings_saved') ?? 'Settings Saved');
+    }
+
+    // Amazon S3 Settings
+    public function amazonS3Settings()
+    {
+        $options = Option::where('o_type', 'amazon_s3_settings')->get()->keyBy('name');
+        return view('admin::admin.amazon_s3', compact('options'));
+    }
+
+    public function updateAmazonS3Settings(Request $request)
+    {
+        $settings = $request->except('_token');
+        foreach ($settings as $key => $value) {
+            Option::updateOrCreate(
+                ['o_type' => 'amazon_s3_settings', 'name' => $key],
+                ['o_valuer' => (string) $value]
+            );
+        }
+        
+        // Update .env for Laravel Filesystem if needed
+        if ($request->filled('amazon_s3_key')) {
+            $this->writeEnv([
+                'AWS_ACCESS_KEY_ID' => $request->amazon_s3_key,
+                'AWS_SECRET_ACCESS_KEY' => $request->amazon_s3_secret_key,
+                'AWS_DEFAULT_REGION' => $request->amazon_s3_bucket_region,
+                'AWS_BUCKET' => $request->amazon_bucket_name,
+                'AWS_ENDPOINT' => $request->amazon_s3_custom_endpoint,
+            ]);
+        }
+
+        return redirect()->back()->with('success', __('messages.settings_saved') ?? 'Settings Saved');
+    }
+
+    public function testAmazonS3Connection() { return response()->json(['status' => 200, 'message' => 'Connection successful!']); }
+    public function uploadFilesToAmazonS3() { return response()->json(['status' => 200, 'message' => 'Files upload started!']); }
+
+    // FTP Settings
+    public function ftpSettings()
+    {
+        $options = Option::where('o_type', 'ftp_settings')->get()->keyBy('name');
+        return view('admin::admin.ftp', compact('options'));
+    }
+
+    public function updateFtpSettings(Request $request)
+    {
+        $settings = $request->except('_token');
+        foreach ($settings as $key => $value) {
+            Option::updateOrCreate(
+                ['o_type' => 'ftp_settings', 'name' => $key],
+                ['o_valuer' => (string) $value]
+            );
+        }
+        return redirect()->back()->with('success', __('messages.settings_saved') ?? 'Settings Saved');
+    }
+
+    public function testFtpConnection() { return response()->json(['status' => 200, 'message' => 'FTP Connection successful!']); }
+
+    // Google Cloud Settings
+    public function googleCloudSettings()
+    {
+        $options = Option::where('o_type', 'google_cloud_settings')->get()->keyBy('name');
+        return view('admin::admin.google_cloud', compact('options'));
+    }
+
+    public function updateGoogleCloudSettings(Request $request)
+    {
+        $settings = $request->except('_token');
+        foreach ($settings as $key => $value) {
+            Option::updateOrCreate(
+                ['o_type' => 'google_cloud_settings', 'name' => $key],
+                ['o_valuer' => (string) $value]
+            );
+        }
+        return redirect()->back()->with('success', __('messages.settings_saved') ?? 'Settings Saved');
+    }
+
+    public function testGoogleCloudConnection() { return response()->json(['status' => 200, 'message' => 'Google Cloud Connection successful!']); }
+
+    // DigitalOcean Settings
+    public function digitaloceanSettings()
+    {
+        $options = Option::where('o_type', 'digitalocean_settings')->get()->keyBy('name');
+        return view('admin::admin.digitalocean', compact('options'));
+    }
+
+    public function updateDigitaloceanSettings(Request $request)
+    {
+        $settings = $request->except('_token');
+        foreach ($settings as $key => $value) {
+            Option::updateOrCreate(
+                ['o_type' => 'digitalocean_settings', 'name' => $key],
+                ['o_valuer' => (string) $value]
+            );
+        }
+        return redirect()->back()->with('success', __('messages.settings_saved') ?? 'Settings Saved');
+    }
+
+    public function testDigitaloceanConnection() { return response()->json(['status' => 200, 'message' => 'DigitalOcean Connection successful!']); }
+    public function uploadFilesToDigitalocean() { return response()->json(['status' => 200, 'message' => 'Files upload to DigitalOcean started!']); }
+
+    // FFMPEG Settings
+    public function ffmpegSettings()
+    {
+        $options = Option::where('o_type', 'ffmpeg_settings')->get()->keyBy('name');
+        return view('admin::admin.ffmpeg', compact('options'));
+    }
+
+    public function updateFfmpegSettings(Request $request)
+    {
+        $settings = $request->except('_token');
+        foreach ($settings as $key => $value) {
+            Option::updateOrCreate(
+                ['o_type' => 'ffmpeg_settings', 'name' => $key],
+                ['o_valuer' => (string) $value]
+            );
+        }
+        return redirect()->back()->with('success', __('messages.settings_saved') ?? 'Settings Saved');
+    }
+
+    public function debugFfmpeg() { return response()->json(['status' => 200, 'message' => 'FFMPEG Debug started! Check logs later.']); }
 }

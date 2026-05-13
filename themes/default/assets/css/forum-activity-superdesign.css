@@ -512,3 +512,12 @@ html[dir="rtl"] .forum-rdx-comment-form-shell {
 html[dir="rtl"] .forum-rdx-comment-form-shell .forum-rdx-comment-footer {
   justify-content: flex-start;
 }
+
+/* File icon theme adjustment */
+body[data-theme="css"] .tag-sticker .fa-download {
+  color: #000 !important;
+}
+body[data-theme="css_d"] .tag-sticker .fa-download {
+  color: #fff !important;
+}
+

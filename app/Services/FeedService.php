@@ -20,7 +20,7 @@ use Illuminate\Support\Facades\Cache;
 
 class FeedService
 {
-    private const FORUM_STATUS_TYPES = [2, 4, 100];
+    private const FORUM_STATUS_TYPES = [2, 4, 100, 10, 11, 12, 13, 14];
     private const CACHE_VERSION = 'community-feed-v2';
 
     public static function getRankedFeed(?int $userId, int $page = 1, int $perPage = 20): LengthAwarePaginator

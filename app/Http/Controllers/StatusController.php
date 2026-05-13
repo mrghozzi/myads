@@ -104,6 +104,11 @@ class StatusController extends Controller
         if ($postKind === '') {
             $postKind = match ($legacyType) {
                 4 => 'gallery',
+                10 => 'video',
+                11 => 'audio',
+                12 => 'file',
+                13 => 'music',
+                14 => 'reels',
                 default => 'text',
             };
         }
@@ -113,8 +118,15 @@ class StatusController extends Controller
             'txt' => 'nullable|string|max:10000',
             'images' => 'nullable|array|max:10',
             'images.*' => 'image|max:10000',
+            'videos' => 'nullable|array|max:1',
+            'videos.*' => 'file|mimes:mp4,webm,ogg,mov|max:100000',
+            'audios' => 'nullable|array|max:1',
+            'audios.*' => 'file|mimes:mp3,wav,ogg,m4a|max:20000',
+            'files' => 'nullable|array|max:5',
+            'files.*' => 'file|max:50000',
             'link_url' => 'nullable|string|max:2048',
             'publish_mode' => 'nullable|in:post,directory_only',
+            'post_kind' => 'nullable|string|in:text,gallery,link,repost,video,audio,file,music,reels',
             'save_to_directory' => 'nullable|boolean',
             'directory_name' => 'nullable|string|max:255',
             'directory_category_id' => 'nullable|integer|exists:cat_dir,id',
@@ -130,7 +142,16 @@ class StatusController extends Controller
 
         $text = trim((string) $request->input('text', $request->input('txt', '')));
         $time = time();
-        $statusType = $postKind === 'gallery' ? 4 : 100;
+        $postKind = (string) $request->input('post_kind', 'text');
+        $statusType = match ($postKind) {
+            'gallery' => 4,
+            'video' => Status::TYPE_VIDEO,
+            'audio' => Status::TYPE_AUDIO,
+            'file' => Status::TYPE_FILE,
+            'music' => Status::TYPE_MUSIC,
+            'reels' => Status::TYPE_REELS,
+            default => 100,
+        };
         $publishMode = (string) $request->input('publish_mode', 'post');
         $linkUrl = $this->resolveLinkUrl($request, $text);
         $legacyDirectorySave = $request->boolean('save_to_directory');
@@ -235,6 +256,10 @@ class StatusController extends Controller
 
             if ($postKind === 'gallery') {
                 $this->storeGalleryAssets($topic, $request, $user->id);
+            }
+
+            if (in_array($postKind, ['video', 'audio', 'file', 'music', 'reels'])) {
+                $this->storeMediaAssets($topic, $request, $user->id, $postKind);
             }
 
             if ($linkUrl) {
@@ -443,18 +468,59 @@ class StatusController extends Controller
         }
     }
 
-    private function storeGalleryFile($file, int $topicId, int $userId): string
+    private function storeMediaAssets(ForumTopic $topic, Request $request, int $userId, string $kind): void
     {
-        $extension = strtolower($file->getClientOriginalExtension() ?: $file->extension() ?: 'jpg');
-        $filename = 'topic_' . $topicId . '_' . time() . '_' . Str::random(12) . '.' . $extension;
+        $inputName = match ($kind) {
+            'video', 'reels' => 'videos',
+            'audio', 'music' => 'audios',
+            'file' => 'files',
+            default => 'files',
+        };
+
+        $uploadedFiles = $request->file($inputName, []);
+        if ($uploadedFiles instanceof \Illuminate\Http\UploadedFile) {
+            $uploadedFiles = [$uploadedFiles];
+        }
+        
+        if (empty($uploadedFiles)) {
+            return;
+        }
+
+        $paths = [];
+        foreach ($uploadedFiles as $file) {
+            $paths[] = $this->storeMediaFile($file, $topic->id, $userId, $kind);
+        }
+
+        foreach ($paths as $index => $path) {
+            ForumAttachment::create([
+                'topic_id' => $topic->id,
+                'user_id' => $userId,
+                'file_path' => $path,
+                'original_name' => basename($path),
+                'mime_type' => $this->mimeTypeForPath($path),
+                'file_size' => $this->fileSizeForPath($path),
+                'sort_order' => $index + 1,
+            ]);
+        }
+    }
+
+    private function storeMediaFile($file, int $topicId, int $userId, string $kind): string
+    {
+        $extension = strtolower($file->getClientOriginalExtension() ?: $file->extension() ?: 'bin');
+        $filename = $kind . '_' . $topicId . '_' . time() . '_' . Str::random(12) . '.' . $extension;
         $destinationPath = base_path('upload');
 
         if (!is_dir($destinationPath) && !mkdir($destinationPath, 0755, true) && !is_dir($destinationPath)) {
-            throw new \RuntimeException('Unable to create gallery attachment directory.');
+            throw new \RuntimeException('Unable to create media attachment directory.');
         }
 
         $file->move($destinationPath, $filename);
         return 'upload/' . $filename;
+    }
+
+    private function storeGalleryFile($file, int $topicId, int $userId): string
+    {
+        return $this->storeMediaFile($file, $topicId, $userId, 'topic');
     }
 
     private function mimeTypeForPath(string $path): string

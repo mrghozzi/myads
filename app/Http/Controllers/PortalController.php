@@ -56,7 +56,7 @@ class PortalController extends Controller
                 $searchedStatuses = Status::visible()
                 ->when(!empty($hiddenDirectoryStatusIds), fn ($query) => $query->whereNotIn('id', $hiddenDirectoryStatusIds))
                 ->where(function ($q) use ($topicIds, $dirIds, $newsIds) {
-                    $q->whereIn('tp_id', $topicIds)->whereIn('s_type', [2, 4, 100])
+                    $q->whereIn('tp_id', $topicIds)->whereIn('s_type', [2, 4, 100, 10, 11, 12, 13, 14])
                       ->orWhere(function ($q2) use ($dirIds) {
                           $q2->whereIn('tp_id', $dirIds)->where('s_type', 1);
                       })

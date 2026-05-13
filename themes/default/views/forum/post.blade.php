@@ -201,9 +201,13 @@
 
                 <div class="tag-sticker">
                     <!-- TAG STICKER ICON -->
-                    <svg class="tag-sticker-icon icon-blog-posts">
-                        <use xlink:href="#svg-blog-posts"></use>
-                    </svg>
+                    @if($status->post_kind === 'file')
+                        <i class="fa-solid fa-download" style="font-size: 14px;"></i>
+                    @else
+                        <svg class="tag-sticker-icon icon-{{ (int) $status->s_type === 14 ? 'streams' : ($status->post_kind === 'video' ? 'videos' : (in_array((int) $status->s_type, [11, 13]) ? 'play' : 'blog-posts')) }}">
+                            <use xlink:href="#svg-{{ (int) $status->s_type === 14 ? 'streams' : ($status->post_kind === 'video' ? 'videos' : (in_array((int) $status->s_type, [11, 13]) ? 'play' : 'blog-posts')) }}"></use>
+                        </svg>
+                    @endif
                     <!-- /TAG STICKER ICON -->
                 </div>
 
@@ -218,6 +222,45 @@
                             $content = strip_tags($content, '<p><a><b><br><li><ul><font><span><pre><u><s><img><iframe>');
                         @endphp
                         {!! nl2br($content) !!}
+
+                        @if(in_array((int) $status->s_type, [10, 14]))
+                            @php $video = $topic->attachments->first(); @endphp
+                            @if($video)
+                                <div class="post-video-wrapper" style="margin-top: 20px; border-radius: 12px; overflow: hidden; background: #000;">
+                                    <video controls style="width: 100%; max-height: 500px; display: block;">
+                                        <source src="{{ asset($video->file_path) }}" type="{{ $video->mime_type }}">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                </div>
+                            @endif
+                        @elseif(in_array((int) $status->s_type, [11, 13]))
+                            @php $audio = $topic->attachments->first(); @endphp
+                            @if($audio)
+                                <div class="post-audio-wrapper" style="margin-top: 20px; border-radius: 12px; padding: 15px; background: var(--section-background-color);">
+                                    <audio controls style="width: 100%;">
+                                        <source src="{{ asset($audio->file_path) }}" type="{{ $audio->mime_type }}">
+                                        Your browser does not support the audio element.
+                                    </audio>
+                                </div>
+                            @endif
+                        @elseif((int) $status->s_type === 12)
+                             @php $file = $topic->attachments->first(); @endphp
+                             @if($file)
+                                <div class="post-file-wrapper" style="margin-top: 20px; border-radius: 12px; padding: 20px; background: var(--section-background-color); border: 1px solid var(--border-color);">
+                                    <div style="display: flex; align-items: center; gap: 15px;">
+                                        <div style="font-size: 24px; color: #615dfa;"><i class="fa fa-file"></i></div>
+                                        <div style="flex-grow: 1;">
+                                            <div class="bold" style="font-size: 14px;">{{ $file->original_name }}</div>
+                                            <div style="font-size: 12px; color: #7f85a3;">{{ $file->human_size }}</div>
+                                        </div>
+                                        <a href="{{ route('forum.attachment.download', $file->id) }}" class="button small primary">
+                                            <i class="fa fa-download"></i>&nbsp;{{ __('messages.download') }}
+                                        </a>
+                                    </div>
+                                </div>
+                             @endif
+                        @endif
+
                         <div id="report{{ $topic->id }}"></div>
                     </div>
                 </div>
