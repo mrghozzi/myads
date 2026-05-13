@@ -614,18 +614,9 @@ html[dir="rtl"] .forum-rdx-comment-form-shell .forum-rdx-comment-footer {
   height: 34px;
 }
 
-/* Dark Mode Adjustments for Audio */
-body[data-theme="css_d"] .post-audio-wrapper {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%);
-  border-color: rgba(255, 255, 255, 0.08);
-}
-
 /* File icon theme adjustment */
 body[data-theme="css"] .tag-sticker .fa-download {
   color: #000 !important;
-}
-body[data-theme="css_d"] .tag-sticker .fa-download {
-  color: #fff !important;
 }
 
 /* File Post Stylized */
@@ -677,10 +668,5 @@ body[data-theme="css_d"] .tag-sticker .fa-download {
   margin: 2px 0 0;
   font-size: 0.72rem;
   color: var(--rdx-text-muted, #8f91ac);
-}
-
-body[data-theme="css_d"] .post-file-item {
-  background: rgba(255, 255, 255, 0.04);
-  border-color: rgba(255, 255, 255, 0.08);
 }
 
