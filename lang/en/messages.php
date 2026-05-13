@@ -2966,4 +2966,8 @@ return [
     'digitalocean_secret' => 'Digitalocean Secret',
     'digitalocean_bucket_region' => 'Digitalocean bucket region',
     'upload_files_to_digitalocean' => 'Upload Files To Digitalocean',
+    'Audio' => 'Audio',
+    'Videos' => 'Videos',
+    'Files' => 'Files',
+    'Reels' => 'Reels',
 ];

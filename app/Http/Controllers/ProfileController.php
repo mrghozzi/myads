@@ -72,7 +72,19 @@ class ProfileController extends Controller
                     $query->where('s_type', 1);
                     break;
                 case 'forum':
-                    $query->whereIn('s_type', [2, 10, 11, 12, 13, 14]);
+                    $query->where('s_type', 2);
+                    break;
+                case 'videos':
+                    $query->where('s_type', 10);
+                    break;
+                case 'audios':
+                    $query->whereIn('s_type', [11, 13]);
+                    break;
+                case 'files':
+                    $query->where('s_type', 12);
+                    break;
+                case 'reels':
+                    $query->where('s_type', 14);
                     break;
                 case 'store':
                     $query->where('s_type', 7867);

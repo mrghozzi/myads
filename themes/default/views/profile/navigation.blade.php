@@ -1,4 +1,10 @@
-<nav class="section-navigation">
+<nav class="section-navigation" dir="ltr">
+    <style>
+        .section-menu-item-icon {
+            width: 20px !important;
+            height: 20px !important;
+        }
+    </style>
     <div id="section-navigation-slider" class="section-menu">
         <a class="section-menu-item {{ ($selectedTab ?? request('tab', 'timeline')) === 'timeline' ? 'active' : '' }}" href="{{ route('profile.show', $user->username) }}">
             <svg class="section-menu-item-icon icon-timeline"><use xlink:href="#svg-timeline"></use></svg>
@@ -16,6 +22,22 @@
                 <p class="section-menu-item-text">{{ __('messages.Photos') }}</p>
             </a>
         @endif
+        <a class="section-menu-item {{ request('tab') == 'videos' ? 'active' : '' }}" href="{{ route('profile.show', $user->username) }}?tab=videos">
+            <svg class="section-menu-item-icon icon-videos" width="20" height="20"><use xlink:href="#svg-videos"></use></svg>
+            <p class="section-menu-item-text">{{ __('messages.Videos') }}</p>
+        </a>
+        <a class="section-menu-item {{ request('tab') == 'audios' ? 'active' : '' }}" href="{{ route('profile.show', $user->username) }}?tab=audios">
+            <svg class="section-menu-item-icon icon-play" width="20" height="20"><use xlink:href="#svg-play"></use></svg>
+            <p class="section-menu-item-text">{{ __('messages.Audio') }}</p>
+        </a>
+        <a class="section-menu-item {{ request('tab') == 'files' ? 'active' : '' }}" href="{{ route('profile.show', $user->username) }}?tab=files">
+            <svg class="section-menu-item-icon icon-files" width="20" height="20"><use xlink:href="#svg-file-custom"></use></svg>
+            <p class="section-menu-item-text">{{ __('messages.Files') }}</p>
+        </a>
+        <a class="section-menu-item {{ request('tab') == 'reels' ? 'active' : '' }}" href="{{ route('profile.show', $user->username) }}?tab=reels">
+            <svg class="section-menu-item-icon icon-reels" width="20" height="20"><use xlink:href="#svg-streams"></use></svg>
+            <p class="section-menu-item-text">{{ __('messages.Reels') }}</p>
+        </a>
         @if(($canViewFollowers ?? true) || request()->routeIs('profile.followers'))
             <a class="section-menu-item {{ request()->routeIs('profile.followers') ? 'active' : '' }}" href="{{ route('profile.followers', $user->username) }}">
                 <svg class="section-menu-item-icon icon-friend"><use xlink:href="#svg-friend"></use></svg>

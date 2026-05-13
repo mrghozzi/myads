@@ -20,4 +20,7 @@
     <symbol id="svg-file-custom" viewBox="0 0 20 20" preserveAspectRatio="xMinYMin meet">
         <path d="M14 2H6C4.895 2 4 2.895 4 4v12c0 1.105 0.895 2 2 2h8c1.105 0 2-0.895 2-2V4c0-1.105-0.895-2-2-2zM6 4h8v2H6V4zm8 12H6v-2h8v2zm0-3H6v-2h8v2zm0-3H6V8h8v2z" fill="currentColor"/>
     </symbol>
+    <symbol id="svg-videos" viewBox="0 0 20 20" preserveAspectRatio="xMinYMin meet">
+        <path d="M16 4H4c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zM8 12.5v-5l4 2.5-4 2.5z" fill="currentColor"/>
+    </symbol>
 </svg>

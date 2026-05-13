@@ -1625,6 +1625,7 @@ app.plugins.createSlider({
   fixedWidth: 122,
   nav: false,
   loop: false,
+  textDirection: 'ltr',
   controlsContainer: '#section-navigation-slider-controls'
 });
 

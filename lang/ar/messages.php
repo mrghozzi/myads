@@ -2969,4 +2969,8 @@ return [
     'digitalocean_secret' => 'سر Digitalocean',
     'digitalocean_bucket_region' => 'منطقة Digitalocean bucket',
     'upload_files_to_digitalocean' => 'رفع الملفات إلى Digitalocean',
+    'Audio' => 'صوتيات',
+    'Videos' => 'فيديوهات',
+    'Files' => 'ملفات',
+    'Reels' => 'ريلز',
 ];
