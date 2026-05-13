@@ -4,6 +4,7 @@
     $activityUserName = $activityUser?->username ?? __('messages.unknown_user');
     $activityUserAvatar = $activityUser ? $activityUser->avatarUrl() : asset('upload/_avatar.png');
     $activityUserPresence = $activityUser?->isOnline() ? 'online' : 'offline';
+    $activityUserIsAdmin = $activityUser?->isAdmin() ?? false;
     $formattedText = \App\Support\ContentFormatter::format($activity->related_content->txt ?? '');
     $repostExcerpt = \Illuminate\Support\Str::limit(strip_tags($activity->related_content->txt ?? ''), 80);
     $repostAuthorName = addslashes($activityUserName);
@@ -34,18 +35,58 @@
         <div class="widget-box-status-content">
             <div class="user-status">
                 <a class="user-status-avatar" href="{{ $activityUserProfileUrl }}">
+                    <!-- USER AVATAR -->
                     <div class="user-avatar small no-outline {{ $activityUserPresence }}">
+                        <!-- USER AVATAR CONTENT -->
                         <div class="user-avatar-content">
-                            <div class="hexagon-image-30-32" data-src="{{ $activityUserAvatar }}"></div>
+                            <!-- HEXAGON -->
+                            <div class="hexagon-image-30-32" data-src="{{ $activityUserAvatar }}" style="width: 30px; height: 32px; position: relative;">
+                                <canvas style="position: absolute; top: 0px; left: 0px;" width="30" height="32"></canvas>
+                            </div>
+                            <!-- /HEXAGON -->
                         </div>
+                        <!-- /USER AVATAR CONTENT -->
+
+                        <!-- USER AVATAR PROGRESS BORDER -->
+                        <div class="user-avatar-progress-border">
+                            <!-- HEXAGON -->
+                            <div class="hexagon-border-40-44" data-line-color="{{ $activityUser ? $activityUser->profileBadgeColor() : '' }}" style="width: 40px; height: 44px; position: relative;"></div>
+                            <!-- /HEXAGON -->
+                        </div>
+                        <!-- /USER AVATAR PROGRESS BORDER -->
+
+                        @if($activityUserIsAdmin)
+                            <!-- USER AVATAR BADGE -->
+                            <div class="user-avatar-badge">
+                                <!-- USER AVATAR BADGE BORDER -->
+                                <div class="user-avatar-badge-border">
+                                    <!-- HEXAGON -->
+                                    <div class="hexagon-22-24" style="width: 22px; height: 24px; position: relative;"></div>
+                                    <!-- /HEXAGON -->
+                                </div>
+                                <!-- /USER AVATAR BADGE BORDER -->
+                                <!-- USER AVATAR BADGE CONTENT -->
+                                <div class="user-avatar-badge-content">
+                                    <!-- HEXAGON -->
+                                    <div class="hexagon-dark-16-18" style="width: 16px; height: 18px; position: relative;"></div>
+                                    <!-- /HEXAGON -->
+                                </div>
+                                <!-- /USER AVATAR BADGE CONTENT -->
+                                <!-- USER AVATAR BADGE TEXT -->
+                                <p class="user-avatar-badge-text"><i class="fa fa-fw fa-check"></i></p>
+                                <!-- /USER AVATAR BADGE TEXT -->
+                            </div>
+                            <!-- /USER AVATAR BADGE -->
+                        @endif
                     </div>
+                    <!-- /USER AVATAR -->
                 </a>
                 <p class="user-status-title medium">
                     <a class="bold" href="{{ $activityUserProfileUrl }}">{{ $activityUserName }}</a>
                     &nbsp;{{ __('messages.added_files') ?? 'shared files' }}
                 </p>
                 <p class="user-status-text small">
-                    <i class="fa fa-clock-o"></i>&nbsp;{{ $activity->date_formatted }}
+                    <i class="fa fa-clock-o"></i>&nbsp;{{ __('messages.ago') }}&nbsp;{{ $activity->date_formatted }}
                 </p>
             </div>
 
