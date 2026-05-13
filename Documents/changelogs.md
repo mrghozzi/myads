@@ -1,5 +1,18 @@
 # v4.3.3
-> **Maintenance Release** — SEO structured data fixes, maintenance mode stability, and performance refinements.
+> **Maintenance & Feature Release** — Multimedia posts, enhanced activity stickers, SEO structured data fixes, and system stability.
+
+### Multimedia Community Posts
+* **Feature**: Introduced **Multimedia Post Types** to the community feed, allowing members to publish **Video**, **Audio**, **Files**, **Music**, and **Reels** directly.
+* **Architecture**: Implemented a dedicated media storage and validation engine in `StatusController`, supporting secure uploads to `upload/` with mime-type protection.
+* **UI**: Added premium **Activity Feed Partials** for media content, featuring HTML5 players for video/audio and a structured list view for downloadable file attachments.
+* **UI**: Enhanced all community activity cards with a dynamic **Tag-Sticker UI** system, providing clear content-type indicators with curated icons and theme-aware styling.
+* **Customization**:
+    * **Video/Reels**: Specialized icons (`icon-videos` and `icon-streams`) for clear content differentiation.
+    * **Audio/Music**: New `icon-play` sticker for media-rich posts.
+    * **Files**: Integrated a FontAwesome-based `fa-download` sticker for file attachments.
+* **Theme Support**: Implemented **Theme-Aware Coloring** for media stickers; the file download icon automatically switches between Black (Light Mode) and White (Dark Mode) for optimal contrast.
+* **Fix**: Resolved a critical 500 error in `StatusController` where media posts were incorrectly saved as standard text posts due to uninitialized type variables.
+* **Fix**: Resolved a 404 error during media post submission by standardizing the redirect logic to the newly created forum topics.
 
 ### SEO & Structured Data
 * **Feature**: Implemented **JSON-LD Structured Data Fixes** across the platform to resolve Google Search Console warnings.
@@ -15,7 +28,7 @@
 
 ### Core Performance
 * **Optimization**: Refined the `SeoManager` token resolution logic to reduce redundant metadata fetching on high-traffic pages.
-* **Chore**: Verified system-wide translation key coverage for the newly introduced SEO and maintenance states.
+* **Chore**: Verified system-wide translation key coverage for the newly introduced media types, SEO, and maintenance states.
 
 ---
 

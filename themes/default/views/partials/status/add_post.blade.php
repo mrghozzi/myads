@@ -252,7 +252,7 @@
         </div>
 
         <div class="quick-post-footer composer-refresh__footer">
-            <div class="quick-post-footer-actions composer-refresh__toolbar">
+            <div class="quick-post-footer-actions composer-refresh__toolbar" id="composer-toolbar">
                 <button type="button" class="quick-post-footer-action composer-refresh__tool" data-title="{{ __('messages.write_post') }}" id="composer-mode-text" aria-pressed="false">
                     <i class="fa fa-font" aria-hidden="true"></i>
                     <span class="composer-refresh__tool-label">{{ __('messages.write_post') }}</span>
@@ -277,31 +277,36 @@
                     <span class="composer-refresh__tool-label">{{ __('messages.record_audio') }}</span>
                 </button>
 
-                <button type="button" class="quick-post-footer-action composer-refresh__tool" data-title="{{ __('messages.upload_music') }}" id="composer-mode-music" aria-pressed="false">
+                <button type="button" class="quick-post-footer-action composer-refresh__tool composer-refresh__tool--extra" data-title="{{ __('messages.upload_music') }}" id="composer-mode-music" aria-pressed="false">
                     <i class="fa fa-music" aria-hidden="true" style="color: #00d7d2;"></i>
                     <span class="composer-refresh__tool-label">{{ __('messages.upload_music') }}</span>
                 </button>
 
-                <button type="button" class="quick-post-footer-action composer-refresh__tool" data-title="{{ __('messages.upload_files') }}" id="composer-mode-file" aria-pressed="false">
+                <button type="button" class="quick-post-footer-action composer-refresh__tool composer-refresh__tool--extra" data-title="{{ __('messages.upload_files') }}" id="composer-mode-file" aria-pressed="false">
                     <i class="fa fa-file-text" aria-hidden="true" style="color: #4b4b4b;"></i>
                     <span class="composer-refresh__tool-label">{{ __('messages.upload_files') }}</span>
                 </button>
 
-                <button type="button" class="quick-post-footer-action composer-refresh__tool" data-title="{{ __('messages.upload_reels') }}" id="composer-mode-reels" aria-pressed="false">
+                <button type="button" class="quick-post-footer-action composer-refresh__tool composer-refresh__tool--extra" data-title="{{ __('messages.upload_reels') }}" id="composer-mode-reels" aria-pressed="false">
                     <i class="fa fa-film" aria-hidden="true" style="color: #ffb100;"></i>
                     <span class="composer-refresh__tool-label">{{ __('messages.upload_reels') }}</span>
                 </button>
 
                 @if($allowLink)
-                    <button type="button" class="quick-post-footer-action composer-refresh__tool" data-title="{{ __('messages.insertlink') }}" id="composer-mode-link" aria-pressed="false">
+                    <button type="button" class="quick-post-footer-action composer-refresh__tool composer-refresh__tool--extra" data-title="{{ __('messages.insertlink') }}" id="composer-mode-link" aria-pressed="false">
                         <i class="fa fa-link" aria-hidden="true"></i>
                         <span class="composer-refresh__tool-label">{{ __('messages.insertlink') }}</span>
                     </button>
                 @endif
 
-                <button type="button" class="quick-post-footer-action composer-refresh__tool disabled" data-title="{{ __('messages.create_poll') }}">
+                <button type="button" class="quick-post-footer-action composer-refresh__tool composer-refresh__tool--extra disabled" data-title="{{ __('messages.create_poll') }}">
                     <i class="fa fa-tasks" aria-hidden="true" style="color: #3b5998;"></i>
                     <span class="composer-refresh__tool-label">{{ __('messages.create_poll') }}</span>
+                </button>
+
+                <button type="button" class="quick-post-footer-action composer-refresh__tool" id="composer-more-toggle">
+                    <i class="fa fa-plus" aria-hidden="true"></i>
+                    <span class="composer-refresh__tool-label">{{ __('messages.more') }}</span>
                 </button>
             </div>
 
@@ -831,9 +836,18 @@
 
         #social-composer.composer-refresh .composer-refresh__toolbar {
             flex: 1 1 auto;
-            flex-wrap: wrap;
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
             min-width: 0;
-            gap: 10px;
+        }
+
+        #social-composer.composer-refresh .composer-refresh__tool--extra {
+            display: none !important;
+        }
+
+        #social-composer.composer-refresh .composer-refresh__toolbar.is-expanded .composer-refresh__tool--extra {
+            display: inline-flex !important;
         }
 
         #social-composer.composer-refresh .composer-refresh__toolbar .quick-post-footer-action {
@@ -846,9 +860,9 @@
             align-items: center;
             justify-content: center;
             min-width: 0;
-            gap: 8px;
-            min-height: 42px;
-            padding: 0 16px;
+            gap: 6px;
+            min-height: 36px;
+            padding: 0 12px;
             border: 1px solid var(--composer-border);
             border-radius: 999px;
             background: var(--composer-tool-bg);
@@ -911,7 +925,7 @@
             min-width: 0;
             overflow: hidden;
             text-overflow: ellipsis;
-            font-size: .82rem;
+            font-size: .78rem;
             font-weight: 700;
             letter-spacing: .03em;
             text-transform: uppercase;
@@ -960,13 +974,8 @@
                 width: 100%;
             }
 
-            #social-composer.composer-refresh .composer-refresh__tool,
-            #social-composer.composer-refresh .composer-refresh__submit {
-                width: 100%;
-            }
-
             #social-composer.composer-refresh .composer-refresh__tool {
-                justify-content: flex-start;
+                justify-content: center;
             }
         }
     </style>
@@ -1006,6 +1015,8 @@
         const modeMusicButton = document.getElementById('composer-mode-music');
         const modeFileButton = document.getElementById('composer-mode-file');
         const modeReelsButton = document.getElementById('composer-mode-reels');
+        const moreToggle = document.getElementById('composer-more-toggle');
+        const toolbar = document.getElementById('composer-toolbar');
 
         const videoBlock = document.getElementById('composer-video-block');
         const videoInput = document.getElementById('composer-videos');
@@ -1574,6 +1585,22 @@
                 syncDirectoryFields();
             });
         });
+
+        if (moreToggle && toolbar) {
+            moreToggle.addEventListener('click', function () {
+                const isExpanded = toolbar.classList.toggle('is-expanded');
+                const label = moreToggle.querySelector('.composer-refresh__tool-label');
+                const icon = moreToggle.querySelector('i');
+                
+                if (label) {
+                    label.textContent = isExpanded ? @json(__('messages.less') ?? 'Less') : @json(__('messages.more') ?? 'More');
+                }
+                
+                if (icon) {
+                    icon.className = isExpanded ? 'fa fa-minus' : 'fa fa-plus';
+                }
+            });
+        }
 
         if (repostCancelButton && repostStatusId && repostCard && repostText) {
             repostCancelButton.addEventListener('click', function () {

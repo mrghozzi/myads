@@ -1,4 +1,4 @@
-# MYADS v4.3.2
+# MYADS v4.3.3
 
 Advanced Laravel-based social networking and ad exchange platform for website owners.
 
@@ -20,7 +20,7 @@ Core areas include:
 
 - Banner ads, text ads, visit exchange, and Smart Ads with **Geo-Targeting** and **A/B Testing**
 - Ad analytics with **Hourly Click Heatmaps**
-- Community feed, reactions, comments, reposts, mentions, and messaging
+- Community feed with **Multimedia Posts** (Video, Audio, Music, Files, Reels), reactions, comments, reposts, mentions, and messaging
 - Forum with moderation tools and attachments
 - Store and product knowledgebase
 - Web directory
@@ -39,7 +39,7 @@ Core areas include:
 - Ad exchange tools for banners, text ads, visit exchange, and Smart Ads with **Geo-Targeting**
 - **A/B Testing** optimization and **Performance Heatmaps** for advertisers
 - Social profiles with follows, badges, privacy controls, and social links
-- Community feed with comments, reactions, reposts, and mentions
+- Community feed with **Multimedia Posts** (Video, Audio, Music, Files, Reels), comments, reactions, reposts, and mentions
 - Forum participation with categories, topics, and attachments
 - Marketplace and knowledgebase access
 - Session monitoring and device revocation

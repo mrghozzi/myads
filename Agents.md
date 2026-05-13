@@ -34,6 +34,7 @@ MYADS is a community platform where website owners:
 12. **Session Monitoring** — view and manage active member sessions across devices with remote revocation.
 13. **Admin Notifications** — centralized header alerts for billing, reports, and system/extension updates with permission-based visibility.
 14. **Media Manager** — administrative hub for monitoring, renaming, previewing, and securely deleting uploaded media files.
+15. **Multimedia Posts** — community feed support for Video, Audio, Files, Music, and Reels with dedicated players and tag-sticker indicators.
 
 ---
 
@@ -137,7 +138,7 @@ myads/
 | `ForgotPasswordController` / `ResetPasswordController` | Password reset flow |
 | `HomeController` | Dashboard (`/home`), point conversion |
 | `PortalController` | Community feed (`/portal`), smart feed algorithm |
-| `StatusController` | Create posts (text, link, gallery, repost), image upload, link preview |
+| `StatusController` | Create posts (text, link, gallery, repost, multimedia: video, audio, file, music, reels), image upload, link preview |
 | `CommentController` | Load, store, delete comments |
 | `ReactionController` | Toggle reactions |
 | `MentionController` | `@mention` user lookup |
@@ -343,7 +344,7 @@ return view('admin::admin.billing.overview', $data);
 ### View Directory (themes/default/views/)
 ```
 layouts/       → master.blade.php (public), admin.blade.php, app.blade.php
-partials/      → header/, activity/, ajax/, forum/, status/, widgets/
+partials/      → header/, activity/ (types/), ajax/, forum/, status/, widgets/
 admin/         → All admin panel views (Duralux theme)
 auth/          → login, register, password reset
 portal/        → Community feed
@@ -798,6 +799,17 @@ php artisan storage:link
 - **Controllers:** Added `BillingController` and `AdminBillingController`.
 - **Models:** Added `SubscriptionPlan`, `MemberSubscription`, `BillingOrder`, `BillingTransaction`, and `BillingCurrency`.
 - **Services & Support:** Added `BillingGatewayRegistry`, `BillingCurrencyService`, `SubscriptionPlanService`, `SubscriptionLifecycleService`, `SubscriptionEntitlementService`, `SubscriptionSettings`, and `SubscriptionGatewaySettings`.
+
+---
+
+## 19L. Version 4.3.3 Update Cycle (Started 2026-05-10)
+
+- **Status:** In Progress.
+- **Focus:** Multimedia integration, SEO structured data, and platform stability.
+- **Feature (2026-05-13):** Introduced **Multimedia Community Posts**, enabling direct publishing of Video, Audio, Music, Files, and Reels.
+- **UI/UX (2026-05-13):** Implemented the **Tag-Sticker Icon System** for activity cards, with dynamic icon mapping (`play`, `videos`, `streams`, `fa-download`) and theme-aware contrast adjustments.
+- **SEO (2026-05-12):** Deployed JSON-LD fixes for Google Search Console compliance, including ProfilePage schema and author URL integration.
+- **Stability (2026-05-12):** Resolved critical 503 maintenance mode loops and hardened system version middleware.
 - **Gateways:** Implemented hosted-checkout support for `Stripe`, `PayPal`, and `Bank Transfer` through `BillingGatewayInterface`.
 - **Schema:** Added migration `2026_04_14_130000_create_billing_subscription_tables.php` and connected it to `V420SchemaService` through the `subscriptions_billing` feature key.
 - **Routes & ACL:** Added member billing routes (`/plans`, `/settings/billing`, `/billing/orders/{order}`, returns, webhooks) and admin billing routes under `/admin/billing/*`, plus the `billing` admin ACL module.
