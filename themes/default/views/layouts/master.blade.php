@@ -83,6 +83,8 @@
     <link id="theme-simplebar" data-theme-link="true" rel="stylesheet" href="{{ theme_asset($css_path . '/simplebar.css') }}" media="print" onload="this.media='all'">
     <link id="theme-tiny-slider" data-theme-link="true" rel="stylesheet" href="{{ theme_asset($css_path . '/tiny-slider.css') }}" media="print" onload="this.media='all'">
     <link id="theme-dataTables" data-theme-link="true" rel="stylesheet" href="{{ theme_asset($css_path . '/dataTables.css') }}" media="print" onload="this.media='all'">
+    <!-- Plyr Player -->
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
     <link id="theme-forum-activity-super" data-theme-link="true" rel="stylesheet" href="{{ theme_asset($css_path . '/forum-activity-superdesign.css') }}" media="print" onload="this.media='all'">
     
     @if(is_locale_rtl())
@@ -1617,6 +1619,7 @@
     @include('theme::partials._cookie_consent')
 
     @stack('scripts')
+    <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
     <script type="text/javascript" src="{{ theme_asset('js/jquery-3.6.0.min.js') }}" defer></script>
     <?php
         if (class_exists(\MyAds\Plugins\SupportChat\Services\SupportChatService::class)) {

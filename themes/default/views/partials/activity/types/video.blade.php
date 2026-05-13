@@ -72,11 +72,21 @@
 
             @if($video)
                 <div class="post-video-wrapper">
-                    <video controls preload="metadata">
+                    <div class="video-watermark">
+                        <img src="{{ theme_asset('img/logo_w.webp') }}" alt="Watermark">
+                    </div>
+                    <video class="js-plyr" controls preload="metadata">
                         <source src="{{ asset($video->file_path) }}" type="{{ $video->mime_type }}">
                         Your browser does not support the video tag.
                     </video>
                 </div>
+                <script>
+                    if (typeof Plyr !== 'undefined') {
+                        new Plyr('.post{{ $activity->id }} .js-plyr', {
+                            controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'captions', 'settings', 'pip', 'airplay', 'fullscreen'],
+                        });
+                    }
+                </script>
             @endif
 
             @if($activity->linkPreviewRecord)

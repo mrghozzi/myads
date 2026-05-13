@@ -74,11 +74,18 @@
                     </div>
                     <div class="audio-player-info">
                         <p class="audio-player-title">{{ $audio->original_name }}</p>
-                        <audio controls class="audio-player-controls" preload="metadata">
+                        <audio class="js-plyr-audio" controls preload="metadata">
                             <source src="{{ asset($audio->file_path) }}" type="{{ $audio->mime_type }}">
                         </audio>
                     </div>
                 </div>
+                <script>
+                    if (typeof Plyr !== 'undefined') {
+                        new Plyr('.post{{ $activity->id }} .js-plyr-audio', {
+                            controls: ['play', 'progress', 'current-time', 'mute', 'volume'],
+                        });
+                    }
+                </script>
             @endif
         </div>
     </div>

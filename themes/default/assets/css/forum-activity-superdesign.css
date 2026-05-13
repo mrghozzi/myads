@@ -522,6 +522,10 @@ html[dir="rtl"] .forum-rdx-comment-form-shell .forum-rdx-comment-footer {
   box-shadow: 0 12px 24px rgba(0,0,0,0.15);
   position: relative;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  /* Plyr Theming */
+  --plyr-color-main: #615dfa;
+  --plyr-video-control-background-hover: rgba(97, 93, 250, 0.7);
+  --plyr-audio-control-background-hover: rgba(97, 93, 250, 0.1);
 }
 
 .post-video-wrapper:hover {
@@ -529,11 +533,30 @@ html[dir="rtl"] .forum-rdx-comment-form-shell .forum-rdx-comment-footer {
   box-shadow: 0 16px 32px rgba(0,0,0,0.2);
 }
 
+.video-watermark {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  z-index: 10;
+  pointer-events: none;
+  opacity: 0.6;
+  transition: opacity 0.3s ease;
+}
+
+.post-video-wrapper:hover .video-watermark {
+  opacity: 0.9;
+}
+
+.video-watermark img {
+  height: 24px;
+  width: auto;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+}
+
 .post-video-wrapper video {
   width: 100%;
   max-height: 520px;
   display: block;
-  cursor: pointer;
 }
 
 /* Audio Player Stylized */
@@ -548,6 +571,8 @@ html[dir="rtl"] .forum-rdx-comment-form-shell .forum-rdx-comment-footer {
   gap: 16px;
   box-shadow: 0 8px 16px rgba(94, 92, 154, 0.04);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  /* Plyr Audio Theming */
+  --plyr-color-main: #615dfa;
 }
 
 .post-audio-wrapper:hover {
