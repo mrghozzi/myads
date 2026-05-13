@@ -63,17 +63,17 @@
             </div>
 
             @if($attachments->count() > 0)
-                <div class="post-files-list" style="margin-top: 15px; display: grid; gap: 10px;">
+                <div class="post-files-list" style="margin-top: 18px; display: grid; gap: 10px;">
                     @foreach($attachments as $file)
-                        <div class="post-file-item" style="display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 12px; background: var(--composer-subtle-bg, #f5f7ff); border: 1px solid var(--composer-border, #e7eaf5);">
-                            <div style="width: 40px; height: 40px; border-radius: 8px; background: #615dfa; display: flex; align-items: center; justify-content: center; color: #fff;">
+                        <div class="post-file-item">
+                            <div class="file-item-icon">
                                 <i class="fa fa-file-text" aria-hidden="true"></i>
                             </div>
-                            <div style="flex: 1; min-width: 0;">
-                                <p style="margin: 0; font-weight: 700; font-size: 0.85rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ $file->original_name }}</p>
-                                <p style="margin: 2px 0 0; font-size: 0.75rem; color: var(--composer-muted);">{{ round($file->file_size / 1024, 1) }} KB</p>
+                            <div class="file-item-info">
+                                <p class="file-item-name">{{ $file->original_name }}</p>
+                                <p class="file-item-size">{{ round($file->file_size / 1024, 1) }} KB</p>
                             </div>
-                            <a href="{{ asset($file->file_path) }}" download class="button small primary" style="padding: 0 12px; height: 32px; min-width: auto;">
+                            <a href="{{ asset($file->file_path) }}" download class="button small primary" style="padding: 0 12px; height: 32px; min-width: auto; border-radius: 8px;">
                                 <i class="fa fa-download" aria-hidden="true"></i>
                             </a>
                         </div>

@@ -68,17 +68,15 @@
             </div>
 
             @if($audio)
-                <div class="post-audio-wrapper" style="margin-top: 20px; padding: 15px; border-radius: 12px; background: var(--composer-subtle-bg, #f5f7ff); border: 1px solid var(--composer-border, #e7eaf5);">
-                    <div style="display: flex; align-items: center; gap: 15px;">
-                        <div style="width: 48px; height: 48px; border-radius: 50%; background: #615dfa; display: flex; align-items: center; justify-content: center; color: #fff;">
-                            <i class="fa fa-microphone" aria-hidden="true" style="font-size: 20px;"></i>
-                        </div>
-                        <div style="flex: 1;">
-                            <p style="margin: 0; font-weight: 700; font-size: 0.9rem;">{{ $audio->original_name }}</p>
-                            <audio controls style="width: 100%; height: 32px; margin-top: 8px;">
-                                <source src="{{ asset($audio->file_path) }}" type="{{ $audio->mime_type }}">
-                            </audio>
-                        </div>
+                <div class="post-audio-wrapper">
+                    <div class="audio-player-icon">
+                        <i class="fa fa-{{ (int) $activity->s_type === 13 ? 'music' : 'microphone' }}" aria-hidden="true"></i>
+                    </div>
+                    <div class="audio-player-info">
+                        <p class="audio-player-title">{{ $audio->original_name }}</p>
+                        <audio controls class="audio-player-controls" preload="metadata">
+                            <source src="{{ asset($audio->file_path) }}" type="{{ $audio->mime_type }}">
+                        </audio>
                     </div>
                 </div>
             @endif

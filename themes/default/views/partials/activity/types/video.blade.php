@@ -71,8 +71,8 @@
             </div>
 
             @if($video)
-                <div class="post-video-wrapper" style="margin-top: 20px; border-radius: 12px; overflow: hidden; background: #000;">
-                    <video controls style="width: 100%; max-height: 500px; display: block;">
+                <div class="post-video-wrapper">
+                    <video controls preload="metadata">
                         <source src="{{ asset($video->file_path) }}" type="{{ $video->mime_type }}">
                         Your browser does not support the video tag.
                     </video>
