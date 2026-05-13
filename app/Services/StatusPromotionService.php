@@ -16,7 +16,7 @@ use Illuminate\Validation\ValidationException;
 
 class StatusPromotionService
 {
-    public const PROMOTABLE_STATUS_TYPES = [1, 2, 4, 100, 7867, 6];
+    public const PROMOTABLE_STATUS_TYPES = [1, 2, 4, 100, 7867, 6, 10, 11, 12, 13, 14];
 
     public function __construct(
         private readonly V420SchemaService $schema,

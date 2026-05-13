@@ -1089,7 +1089,7 @@
                 let method = 'POST';
                 let body = { id: id };
 
-                if (type == 'forum' || type == 2 || type == 4 || type == 100) {
+                if (type == 'forum' || type == 2 || type == 4 || type == 100 || type == 10 || type == 11 || type == 12 || type == 13 || type == 14) {
                     url = '{{ route("forum.delete") }}';
                 } else if (type == 'store' || type == 7867) {
                     url = '{{ route("store.delete") }}';
@@ -1239,7 +1239,7 @@
         }
 
         function postEdit(id, type, extra) {
-             if (type == 100 || type == 4) {
+             if (type == 100 || type == 4 || type == 10 || type == 11 || type == 12 || type == 13 || type == 14) {
                  let container = document.getElementById('post_form' + id);
                  if (!container) return;
                  

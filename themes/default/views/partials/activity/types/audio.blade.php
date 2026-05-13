@@ -60,9 +60,10 @@
                 </svg>
             </div>
 
-            <div class="widget-box-status-text">
-                <div class="textpost">
+            <div class="widget-box-status-text post_text{{ $activity->related_content->id }}">
+                <div class="textpost" id="post_form{{ $activity->related_content->id }}">
                     {!! $formattedText !!}
+                    <div id="report{{ $activity->related_content->id }}"></div>
                 </div>
             </div>
 

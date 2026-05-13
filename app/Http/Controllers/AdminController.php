@@ -2303,11 +2303,29 @@ class AdminController extends Controller
                 case 2:
                 case 4:
                 case 100:
+                case 10:
+                case 11:
+                case 12:
+                case 13:
+                case 14:
                     $target = $forumTopics->get($report->tp_id);
                     $targetUser = $target?->user;
                     $targetTitle = $target?->name;
-                    $targetLabel = __('messages.forum');
-                    $targetIcon = 'feather-message-square';
+                    $targetLabel = match((int) $report->s_type) {
+                        10 => __('messages.video'),
+                        11 => __('messages.audio'),
+                        12 => __('messages.file'),
+                        13 => __('messages.music'),
+                        14 => __('messages.reels'),
+                        default => __('messages.forum'),
+                    };
+                    $targetIcon = match((int) $report->s_type) {
+                        10 => 'feather-video',
+                        11, 13 => 'feather-music',
+                        12 => 'feather-file',
+                        14 => 'feather-play-circle',
+                        default => 'feather-message-square',
+                    };
                     $previewUrl = $target ? route('forum.topic', $target->id) : null;
                     break;
 

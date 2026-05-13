@@ -127,4 +127,10 @@ class ForumTopic extends Model
     {
         return $this->hasMany(ForumAttachment::class, 'topic_id')->orderBy('sort_order', 'asc')->orderBy('id', 'asc');
     }
+
+    public function supportsPromotion(): bool
+    {
+        // Topic must be public (not in a group) to be promoted in the global feed
+        return (int) ($this->group_id ?? 0) === 0;
+    }
 }
