@@ -17,6 +17,7 @@
 ### SEO & Structured Data
 * **Feature**: Implemented **JSON-LD Structured Data Fixes** across the platform to resolve Google Search Console warnings.
 * **Fix**: Added missing `url` fields to `WebSite`, `Article`, and `DiscussionForumPosting` schema blocks, ensuring better visibility and valid rich results in search engines.
+* **Fix**: Resolved "Alternative page with proper canonical tag" issues in Google Search Console by synchronizing the allowed query parameters (`category`, `script`, etc.) between indexing logic and canonical URL generation.
 * **Feature**: Introduced the **ProfilePage** schema type for member profiles, enhancing the representation of user identities in search results.
 * **Improvement**: Enhanced `author` objects in schema blocks with `url` properties, correctly linking content to member profiles or the site's main organization.
 * **Architecture**: Updated `SeoManager` to support dynamic `author_url` and `author_name` context variables for more precise schema generation.

@@ -36,6 +36,11 @@ class SeoManager
         'terms_page' => 'Terms Page',
     ];
 
+    /**
+     * Query parameters that are preserved in canonical URLs and don't trigger noindex.
+     */
+    private const ALLOWED_QUERY_PARAMS = ['lang', 'page', 'category', 'script', 'status'];
+
     private array $context = [];
 
     private ?SeoPayload $payload = null;
@@ -169,10 +174,9 @@ class SeoManager
             $indexable = false;
         }
 
-        $allowedQuery = ['lang', 'page', 'category', 'script', 'status'];
         $queryKeys = array_keys($request->query());
         $hasNonCanonicalQuery = collect($queryKeys)->contains(
-            static fn (string $key) => !in_array($key, $allowedQuery, true)
+            static fn (string $key) => !in_array($key, self::ALLOWED_QUERY_PARAMS, true)
         );
 
         if ($hasNonCanonicalQuery) {
@@ -285,7 +289,7 @@ class SeoManager
             return null;
         }
 
-        $query = Arr::only($request->query(), ['lang', 'page']);
+        $query = Arr::only($request->query(), self::ALLOWED_QUERY_PARAMS);
         $currentUrl = $request->url();
 
         if ($query === []) {
