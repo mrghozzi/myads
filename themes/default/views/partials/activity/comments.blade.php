@@ -167,6 +167,16 @@
                     <p class="meta-line-timestamp">{{ \Carbon\Carbon::createFromTimestamp((int) $date)->diffForHumans() }}</p>
                 </div>
 
+                @auth
+                    @if($user && auth()->id() !== $user->id)
+                        <div class="meta-line">
+                            <a class="meta-line-timestamp reply-comment-btn" href="javascript:void(0);" onclick="replyToComment('{{ $user->username }}', {{ $id }})" title="{{ __('messages.reply') }}">
+                                <i class="fa fa-reply" aria-hidden="true"></i> {{ __('messages.reply') }}
+                            </a>
+                        </div>
+                    @endif
+                @endauth
+
                 @if($canDeleteComment)
                     <div class="meta-line trash_comment{{ $comment->id }}">
                         <a class="meta-line-timestamp" href="javascript:void(0);" onclick="deleteComment({{ $comment->id }}, '{{ $type }}')">
@@ -272,3 +282,21 @@
 </p>
 
 <script src="{{ theme_asset('js/global.hexagons.js') }}"></script>
+
+<script>
+    if (typeof window.replyToComment !== 'function') {
+        window.replyToComment = function(username, postId) {
+            const textarea = document.getElementById('txt_comment' + postId);
+            if (textarea) {
+                const mention = '@' + username + ' ';
+                if (!textarea.value.includes(mention)) {
+                    textarea.value = mention + textarea.value;
+                }
+                
+                // Focus and Scroll
+                textarea.focus();
+                textarea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        };
+    }
+</script>

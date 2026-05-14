@@ -1,5 +1,5 @@
 # v4.3.3
-> **Maintenance & Feature Release** — Multimedia posts, enhanced activity stickers, SEO structured data fixes, admin moderation tools, and system stability.
+> **Maintenance & Feature Release** — Multimedia posts, comment replies, enhanced activity stickers, SEO structured data fixes, admin moderation tools, and system stability.
 
 ### Multimedia Community Posts
 * **Feature**: Introduced **Multimedia Post Types** to the community feed, allowing members to publish **Video**, **Audio**, **Files**, **Music**, and **Reels** directly.
@@ -35,6 +35,12 @@
 * **Feature**: Introduced the **Admin Comment Management** dashboard, allowing administrators to monitor, manage, and delete forum comments from a centralized hub.
 * **Feature**: Implemented the **Admin Reaction Log** to track member interactions (likes, follows, etc.) across all content types with direct links to target content.
 * **UI**: Enhanced the Reaction Log with specialized icons to distinguish between social "Follow" actions and emoji-based content engagement.
+
+### Community Engagement
+* **Feature**: Introduced a **Comment Reply** system across all content types (Community Feed, Forum, Store, Directory, Orders, etc.) using a shared partial architecture.
+* **UX**: Added a dedicated **Reply** button to every comment, facilitating faster community interaction.
+* **Automation**: Clicking "Reply" automatically pre-fills the comment composer with the author's `@username` and triggers the browser's focus on the input area.
+* **UX**: Implemented **Smooth-Scroll** logic to ensure the comment box is centered and visible immediately after clicking a reply action.
 
 ---
 
