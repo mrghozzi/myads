@@ -1,5 +1,5 @@
 # v4.3.3
-> **Maintenance & Feature Release** — Multimedia posts, enhanced activity stickers, SEO structured data fixes, and system stability.
+> **Maintenance & Feature Release** — Multimedia posts, enhanced activity stickers, SEO structured data fixes, admin moderation tools, and system stability.
 
 ### Multimedia Community Posts
 * **Feature**: Introduced **Multimedia Post Types** to the community feed, allowing members to publish **Video**, **Audio**, **Files**, **Music**, and **Reels** directly.
@@ -30,6 +30,11 @@
 ### Core Performance
 * **Optimization**: Refined the `SeoManager` token resolution logic to reduce redundant metadata fetching on high-traffic pages.
 * **Chore**: Verified system-wide translation key coverage for the newly introduced media types, SEO, and maintenance states.
+
+### Administration & Moderation
+* **Feature**: Introduced the **Admin Comment Management** dashboard, allowing administrators to monitor, manage, and delete forum comments from a centralized hub.
+* **Feature**: Implemented the **Admin Reaction Log** to track member interactions (likes, follows, etc.) across all content types with direct links to target content.
+* **UI**: Enhanced the Reaction Log with specialized icons to distinguish between social "Follow" actions and emoji-based content engagement.
 
 ---
 
