@@ -35,6 +35,8 @@ use App\Http\Controllers\SitemapController;
 use App\Http\Controllers\OrderRequestController;
 use App\Http\Controllers\OrderOfferController;
 use App\Http\Controllers\AdminOrderController;
+use App\Http\Controllers\AdminCommentController;
+use App\Http\Controllers\AdminReactionController;
 use App\Http\Controllers\StatusPromotionController;
 use App\Http\Controllers\AdminMailSettingsController;
 use App\Http\Controllers\Auth\TwoFactorController;
@@ -535,6 +537,14 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::post('/forum/moderators', [AdminController::class, 'storeForumModerator'])->name('admin.forum.moderators.store');
     Route::put('/forum/moderators/{id}', [AdminController::class, 'updateForumModerator'])->name('admin.forum.moderators.update');
     Route::delete('/forum/moderators/{id}', [AdminController::class, 'deleteForumModerator'])->name('admin.forum.moderators.delete');
+    
+    // Comments Management
+    Route::get('/comments', [AdminCommentController::class, 'index'])->name('admin.comments.index');
+    Route::delete('/comments/{id}', [AdminCommentController::class, 'destroy'])->name('admin.comments.delete');
+    
+    // Reactions Management
+    Route::get('/reactions', [AdminReactionController::class, 'index'])->name('admin.reactions.index');
+    Route::delete('/reactions/{id}', [AdminReactionController::class, 'destroy'])->name('admin.reactions.delete');
     
     // Directory Categories
     Route::get('/directory/categories', [AdminController::class, 'directoryCategories'])->name('admin.directory_categories');
