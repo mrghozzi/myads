@@ -2409,4 +2409,12 @@ return [
 
     'enable' => 'Enable',
     'disable' => 'Disable',
+    'Reels' => 'Reels',
+    'search_results_for_tag' => 'Résultats de recherche pour',
+    'tag_insights' => 'Statistiques du tag',
+    'total_posts' => 'Total des messages',
+    'total_topics' => 'Total des sujets',
+    'tag_footer_note' => 'Explorez les contenus et discussions tendances associés à ce hashtag au sein de la communauté.',
+    'no_results_found_tag' => 'Soyez le premier à publier quelque chose avec ce tag !',
+    'no_topics_tag_desc' => 'Aucune discussion de forum trouvée pour ce hashtag.',
 ];

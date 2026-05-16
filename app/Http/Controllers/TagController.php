@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ForumTopic;
 use App\Models\Status;
+use App\Services\StatusActivityService;
 use Illuminate\Http\Request;
 
 class TagController extends Controller
@@ -31,6 +32,8 @@ class TagController extends Controller
             })
             ->orderBy('date', 'desc')
             ->paginate(15, ['*'], 'statuses_page');
+
+        app(StatusActivityService::class)->decorateMany($statuses);
 
         $this->seo([
             'scope_key' => 'tag_show',

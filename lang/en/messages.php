@@ -2982,4 +2982,11 @@ return [
     'Videos' => 'Videos',
     'Files' => 'Files',
     'Reels' => 'Reels',
+    'search_results_for_tag' => 'Search results for',
+    'tag_insights' => 'Tag Insights',
+    'total_posts' => 'Total Posts',
+    'total_topics' => 'Total Topics',
+    'tag_footer_note' => 'Explore trending content and discussions associated with this hashtag across the community.',
+    'no_results_found_tag' => 'Be the first to post something with this tag!',
+    'no_topics_tag_desc' => 'No forum discussions found for this hashtag.',
 ];
