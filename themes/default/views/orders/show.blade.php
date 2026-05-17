@@ -158,31 +158,31 @@
                                     <label class="orders-filter-label" for="pricing_model">{{ __('messages.pricing') }}</label>
                                     <select class="orders-filter-select" name="pricing_model" id="pricing_model">
                                         @foreach(['fixed', 'hourly', 'negotiable'] as $pricingModel)
-                                            <option value="{{ $pricingModel }}" @selected(old('pricing_model', $viewerOffer->pricing_model ?? 'fixed') === $pricingModel)>{{ __('messages.order_pricing_model_' . $pricingModel) }}</option>
+                                            <option value="{{ $pricingModel }}" @selected(old('pricing_model', $viewerOffer?->pricing_model ?? 'fixed') === $pricingModel)>{{ __('messages.order_pricing_model_' . $pricingModel) }}</option>
                                         @endforeach
                                     </select>
                                 </div>
                                 <div class="orders-filter-field">
                                     <label class="orders-filter-label" for="quoted_amount">{{ __('messages.price') }}</label>
-                                    <input class="orders-filter-input" type="number" step="0.01" min="0" id="quoted_amount" name="quoted_amount" value="{{ old('quoted_amount', $viewerOffer->quoted_amount) }}">
+                                    <input class="orders-filter-input" type="number" step="0.01" min="0" id="quoted_amount" name="quoted_amount" value="{{ old('quoted_amount', $viewerOffer?->quoted_amount) }}">
                                 </div>
                                 <div class="orders-filter-field">
                                     <label class="orders-filter-label" for="currency_code">{{ __('messages.currency') }}</label>
                                     <select class="orders-filter-select" name="currency_code" id="currency_code">
                                         @foreach($currencies as $currencyCode => $currencyLabel)
-                                            <option value="{{ $currencyCode }}" @selected(old('currency_code', $viewerOffer->currency_code ?? $order->budget_currency ?? 'USD') === $currencyCode)>{{ $currencyLabel }}</option>
+                                            <option value="{{ $currencyCode }}" @selected(old('currency_code', $viewerOffer?->currency_code ?? $order->budget_currency ?? 'USD') === $currencyCode)>{{ $currencyLabel }}</option>
                                         @endforeach
                                     </select>
                                 </div>
                                 <div class="orders-filter-field">
                                     <label class="orders-filter-label" for="delivery_days">{{ __('messages.delivery') }}</label>
-                                    <input class="orders-filter-input" type="number" min="1" max="365" id="delivery_days" name="delivery_days" value="{{ old('delivery_days', $viewerOffer->delivery_days) }}">
+                                    <input class="orders-filter-input" type="number" min="1" max="365" id="delivery_days" name="delivery_days" value="{{ old('delivery_days', $viewerOffer?->delivery_days) }}">
                                 </div>
                             </div>
 
                             <div class="orders-filter-field">
                                 <label class="orders-filter-label" for="message">{{ __('messages.description') }}</label>
-                                <textarea class="orders-textarea" name="message" id="message" required>{{ old('message', $viewerOffer->message) }}</textarea>
+                                <textarea class="orders-textarea" name="message" id="message" required>{{ old('message', $viewerOffer?->message) }}</textarea>
                             </div>
 
                             <div class="orders-detail-actions">
