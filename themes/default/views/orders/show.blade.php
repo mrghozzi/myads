@@ -133,6 +133,19 @@
                             <div class="orders-summary-value">{{ $order->contract->displayStatus() }}</div>
                         </div>
                     </div>
+
+                    @if($order->contract->delivery_note && (
+                        (int) auth()->id() === (int) $order->uid || 
+                        (int) auth()->id() === (int) $order->contract->provider_user_id || 
+                        (auth()->check() && auth()->user()->isAdmin())
+                    ))
+                        <div style="margin-top: 20px; padding: 15px; background: rgba(63, 154, 229, 0.05); border: 1px dashed #3f9ae5; border-radius: 8px;">
+                            <h4 style="font-size: 14px; font-weight: 700; color: #3f9ae5; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">
+                                <i class="fa fa-fw fa-box-open"></i> {{ __('messages.notes') }} ({{ __('messages.delivery') }})
+                            </h4>
+                            <p style="margin: 0; font-size: 14px; color: #3e3f5e; line-height: 1.6; white-space: pre-wrap;">{!! nl2br(e($order->contract->delivery_note)) !!}</p>
+                        </div>
+                    @endif
                 @endif
             </section>
 

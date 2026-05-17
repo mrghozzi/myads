@@ -22,6 +22,11 @@
 * **Improvement**: Enhanced `author` objects in schema blocks with `url` properties, correctly linking content to member profiles or the site's main organization.
 * **Architecture**: Updated `SeoManager` to support dynamic `author_url` and `author_name` context variables for more precise schema generation.
 
+### Marketplace & Services
+* **Fix**: Resolved a critical **500 Internal Server Error** on the order request detail page (`/orders/{id}`) that occurred when a logged-in member who had not yet submitted an offer viewed another user's open order. Fixed by utilizing the PHP 8.0+ nullsafe operator (`?->`) inside the Blade view to handle uninitialized `$viewerOffer` variables.
+* **Feature**: Introduced a **Secure Delivery Notes** visualization card on the order contract details screen, letting clients and providers easily view the submission notes for completed or delivered work.
+* **Security**: Hardened the delivery notes visualization with a strict privacy check, ensuring notes (which may contain sensitive links or credentials) are only visible to the Client (order creator), the Provider (awarded user), or system Administrators.
+
 ### Maintenance & Stability
 * **Fix**: Resolved a critical PHP **Array-to-String Conversion Error** in the Billing Dashboard and Member Active Sessions views by replacing manual array rendering of `$upgradeNotice` with the structured `upgrade_notice` partial.
 * **Fix**: Hardened the admin notification aggregator (`AdminNotificationService`) to check database schema compatibility using `V420SchemaService` before querying `billing_orders` or `groups`, preventing system-wide 500 errors on incomplete upgrades or database maintenance.
