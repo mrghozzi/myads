@@ -32,8 +32,10 @@ class AdminNotificationService
     {
         $notifications = [];
 
+        $schema = app(\App\Services\V420SchemaService::class);
+
         // 1. Billing Orders (if enabled and user has access)
-        if (SubscriptionSettings::isEnabled() && $this->adminAccess->canAccess($user, null, 'billing')) {
+        if ($schema->supports('subscriptions_billing') && SubscriptionSettings::isEnabled() && $this->adminAccess->canAccess($user, null, 'billing')) {
             $billingCount = BillingOrder::where('status', BillingOrder::STATUS_PENDING_REVIEW)->count();
 
             if ($billingCount > 0) {
@@ -63,16 +65,18 @@ class AdminNotificationService
             }
 
             // Groups Pending Review
-            $groupCount = Group::where('status', Group::STATUS_PENDING_REVIEW)->count();
-            if ($groupCount > 0) {
-                $notifications[] = [
-                    'id' => 'groups',
-                    'count' => $groupCount,
-                    'label' => __('messages.new_groups_pending', ['count' => $groupCount]),
-                    'icon' => 'feather-users',
-                    'url' => route('admin.groups.index'),
-                    'module' => 'community'
-                ];
+            if ($schema->supports('groups')) {
+                $groupCount = Group::where('status', Group::STATUS_PENDING_REVIEW)->count();
+                if ($groupCount > 0) {
+                    $notifications[] = [
+                        'id' => 'groups',
+                        'count' => $groupCount,
+                        'label' => __('messages.new_groups_pending', ['count' => $groupCount]),
+                        'icon' => 'feather-users',
+                        'url' => route('admin.groups.index'),
+                        'module' => 'community'
+                    ];
+                }
             }
         }
 

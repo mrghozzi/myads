@@ -137,11 +137,17 @@ class DeveloperApiController extends Controller
             return $this->errorResponse('Cannot follow yourself', 400);
         }
 
-        $existing = \App\Models\Like::where('user1', $user->id)->where('user2', $owner->id)->first();
+        $existing = \App\Models\Like::where('uid', $user->id)
+            ->where('sid', $owner->id)
+            ->where('type', 1)
+            ->first();
+            
         if (!$existing) {
             \App\Models\Like::create([
-                'user1' => $user->id,
-                'user2' => $owner->id,
+                'uid' => $user->id,
+                'sid' => $owner->id,
+                'type' => 1,
+                'time_t' => time()
             ]);
             // Increment follower counts etc if needed
             // This is a simplified version, should ideally use the existing follow logic if decoupled

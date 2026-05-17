@@ -20,8 +20,8 @@
     <div class="grid-column">
         @include('theme::billing.partials.alerts')
 
-        @if($upgradeNotice)
-            <div class="alert alert-warning" role="alert" style="margin-bottom: 20px;">{!! $upgradeNotice !!}</div>
+        @if(!empty($upgradeNotice))
+            @include('theme::partials.upgrade_notice', ['upgradeNotice' => $upgradeNotice])
         @endif
 
         @if(!$systemEnabled)

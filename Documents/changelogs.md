@@ -23,9 +23,12 @@
 * **Architecture**: Updated `SeoManager` to support dynamic `author_url` and `author_name` context variables for more precise schema generation.
 
 ### Maintenance & Stability
+* **Fix**: Resolved a critical PHP **Array-to-String Conversion Error** in the Billing Dashboard and Member Active Sessions views by replacing manual array rendering of `$upgradeNotice` with the structured `upgrade_notice` partial.
+* **Fix**: Hardened the admin notification aggregator (`AdminNotificationService`) to check database schema compatibility using `V420SchemaService` before querying `billing_orders` or `groups`, preventing system-wide 500 errors on incomplete upgrades or database maintenance.
 * **Fix**: Resolved a critical **503 Service Unavailable** error that occurred during the login process, preventing unintended maintenance mode loops.
 * **Fix**: Hardened the system version check middleware to prevent false-positive maintenance triggers during session transitions.
 * **Architecture**: Improved maintenance mode bypass logic to ensure emergency access is always available for authorized administrators.
+* **Test**: Upgraded `BillingFeatureTest` suite reliability by correctly aligning simulated activation timelines for queued subscriptions and correcting scoped admin user ID allocation, ensuring a 100% green test pass rate.
 
 ### Core Performance
 * **Optimization**: Refined the `SeoManager` token resolution logic to reduce redundant metadata fetching on high-traffic pages.

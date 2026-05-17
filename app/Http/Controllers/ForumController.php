@@ -84,13 +84,27 @@ class ForumController extends Controller
 
         $statuses = $statuses
             ->orderBy('id', 'desc')
-            ->paginate(20);
+            ->paginate($settings['topics_per_page']);
 
         $topicIds = $statuses->pluck('tp_id');
         $topics = ForumTopic::with(['user', 'category'])
             ->whereIn('id', $topicIds)
             ->get()
             ->keyBy('id');
+
+        if (request()->ajax() || request()->wantsJson()) {
+            $html = '';
+            foreach ($statuses as $status) {
+                $topic = $topics->get($status->tp_id);
+                if ($topic) {
+                    $html .= view('theme::partials.forum.topic_card', compact('topic', 'status'))->render();
+                }
+            }
+            return response()->json([
+                'html' => $html,
+                'next_page_url' => $statuses->nextPageUrl(),
+            ]);
+        }
 
         $this->seo([
             'scope_key' => 'forum_category',

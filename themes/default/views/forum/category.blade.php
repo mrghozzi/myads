@@ -65,13 +65,7 @@
                 @endforelse
             </div>
 
-            @if($statuses->hasPages())
-                <div class="widget-box" style="margin-top: 16px;">
-                    <div class="widget-box-content">
-                        {{ $statuses->links('pagination::bootstrap-5') }}
-                    </div>
-                </div>
-            @endif
+            @include('theme::partials.ajax.infinite_scroll', ['paginator' => $statuses])
         </div>
     </div>
     

@@ -24,10 +24,8 @@
                 <i class="fa-solid fa-shield-halved" style="position: absolute; right: 40px; bottom: -20px; font-size: 120px; color: rgba(255,255,255,0.1); transform: rotate(-15deg);"></i>
             </div>
 
-            @if($upgradeNotice)
-                <div class="alert alert-warning" style="border-radius: 12px; margin-bottom: 20px;">
-                    {!! $upgradeNotice !!}
-                </div>
+            @if(!empty($upgradeNotice))
+                @include('theme::partials.upgrade_notice', ['upgradeNotice' => $upgradeNotice])
             @endif
 
             <div class="sessions-container" style="display: grid; gap: 20px;">

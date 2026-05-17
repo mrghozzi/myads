@@ -16,11 +16,13 @@ class AdStatsService
      */
     public function getHourlyHeatmap($adId, $type)
     {
-        // We aggregate all clicks and group them by hour of day (0-23)
-        // Since r_date is a Unix timestamp, we use MySQL HOUR(FROM_UNIXTIME(r_date))
-        
+        $isSqlite = DB::connection()->getDriverName() === 'sqlite';
+        $hourExpr = $isSqlite
+            ? 'cast(strftime(\'%H\', datetime(r_date, \'unixepoch\')) as integer) as hour'
+            : 'HOUR(FROM_UNIXTIME(r_date)) as hour';
+
         $stats = DB::table('state')
-            ->select(DB::raw('HOUR(FROM_UNIXTIME(r_date)) as hour'), DB::raw('count(*) as count'))
+            ->select(DB::raw($hourExpr), DB::raw('count(*) as count'))
             ->where('pid', $adId)
             ->where('t_name', $type)
             ->groupBy('hour')
@@ -45,8 +47,13 @@ class AdStatsService
      */
     public function getWeeklyHeatmap($adId, $type)
     {
+        $isSqlite = DB::connection()->getDriverName() === 'sqlite';
+        $dayExpr = $isSqlite
+            ? '(cast(strftime(\'%w\', datetime(r_date, \'unixepoch\')) as integer) + 1) as day'
+            : 'DAYOFWEEK(FROM_UNIXTIME(r_date)) as day';
+
         $stats = DB::table('state')
-            ->select(DB::raw('DAYOFWEEK(FROM_UNIXTIME(r_date)) as day'), DB::raw('count(*) as count'))
+            ->select(DB::raw($dayExpr), DB::raw('count(*) as count'))
             ->where('pid', $adId)
             ->where('t_name', $type)
             ->groupBy('day')

@@ -78,4 +78,13 @@ class Hooks
         }
         return $value;
     }
+
+    /**
+     * Reset all registered actions and filters.
+     */
+    public static function reset(): void
+    {
+        static::$actions = [];
+        static::$filters = [];
+    }
 }

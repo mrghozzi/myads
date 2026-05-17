@@ -43,7 +43,7 @@ class DeveloperEligibilityService
         // Check followers count
         $minFollowers = $this->settings->getMinFollowersCount();
         if ($minFollowers > 0) {
-            $followersCount = \App\Models\Like::where('user2', $user->id)->count();
+            $followersCount = \App\Models\Like::where('sid', $user->id)->count();
             if ($followersCount < $minFollowers) {
                 return ['eligible' => false, 'reason' => 'min_followers_count', 'required_followers' => $minFollowers];
             }

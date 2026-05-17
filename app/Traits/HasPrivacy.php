@@ -27,17 +27,21 @@ trait HasPrivacy
             return $query;
         }
 
+        if (!app(\App\Services\V420SchemaService::class)->supports('privacy')) {
+            return $query;
+        }
+
         return $query->where(function (Builder $q) use ($viewer, $authorIdColumn) {
             // 2. Owner can always see their own content.
             if ($viewer) {
                 $q->orWhere($authorIdColumn, $viewer->id);
             }
 
-            // 3. Content is visible if author has 'public' profile visibility.
-            $q->orWhereIn($authorIdColumn, function ($sub) {
+            // 3. Content is visible if author has 'public' profile visibility or has no explicit privacy row (falls back to public).
+            $q->orWhereNotIn($authorIdColumn, function ($sub) {
                 $sub->select('user_id')
                     ->from('user_privacy_settings')
-                    ->where('profile_visibility', 'public');
+                    ->where('profile_visibility', '!=', 'public');
             });
 
             // 4. Content is visible if author has 'followers' visibility AND viewer follows author.
