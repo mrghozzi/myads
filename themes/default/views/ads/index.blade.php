@@ -22,6 +22,9 @@
     <a href="{{ route('ads.smart.index') }}" class="ads-nav-item" style="display: flex; align-items: center; gap: 8px; padding: 12px 22px; background: linear-gradient(135deg, #0f172a 0%, #1d4ed8 55%, #38bdf8 100%); color: #fff; border-radius: 12px; font-weight: 700; font-size: 0.9rem; text-decoration: none; box-shadow: 0 4px 15px rgba(29,78,216,0.28); transition: all 0.3s ease;">
         <i class="fa fa-crosshairs"></i> {{ __('messages.smart_ads') }}
     </a>
+    <a href="{{ route('ads.custom.index') }}" class="ads-nav-item" style="display: flex; align-items: center; gap: 8px; padding: 12px 22px; background: linear-gradient(135deg, #0f766e 0%, #14b8a6 100%); color: #fff; border-radius: 12px; font-weight: 700; font-size: 0.9rem; text-decoration: none; box-shadow: 0 4px 15px rgba(20,184,166,0.25); transition: all 0.3s ease;">
+        <i class="fa fa-handshake"></i> {{ __('messages.custom_ads') }}
+    </a>
     <a href="{{ route('ads.promote') }}" class="ads-nav-item" style="display: flex; align-items: center; gap: 8px; padding: 12px 22px; background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%); color: #fff; border-radius: 12px; font-weight: 700; font-size: 0.9rem; text-decoration: none; box-shadow: 0 4px 15px rgba(245,158,11,0.25); transition: all 0.3s ease;">
         <i class="fa fa-bullhorn"></i> {{ __('messages.promote_your_site') }}
     </a>

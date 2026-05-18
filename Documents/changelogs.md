@@ -14,6 +14,17 @@
 * **Fix**: Resolved a critical 500 error in `StatusController` where media posts were incorrectly saved as standard text posts due to uninitialized type variables.
 * **Fix**: Resolved a 404 error during media post submission by standardizing the redirect logic to the newly created forum topics.
 
+### Custom Member Ads
+* **Feature**: Introduced **Custom Ads**, a new member-to-member advertising module under `/ads/custom`, separate from Banner, Link, and Smart Ads while reusing safe embed and tracking patterns.
+* **Feature**: Members can create custom ad placements, choose supported formats (Banner, Text Ad, or Native Card), configure size, colors, marketplace visibility, and generate a placement embed code for their own websites.
+* **Feature**: Added a discoverable **Custom Ads Marketplace** where advertisers can request deals for public placements, plus private invitation flows where publishers can invite specific members to advertise.
+* **Payments**: Added two agreement types: `pts_daily`, which reserves advertiser PTS and releases daily publisher payouts only when impressions exist, and `external`, which records external deal terms without storing payment credentials or processing funds.
+* **Analytics**: Added independent custom ad event tracking for impressions and clicks, including visitor key, referrer, device, country, hourly heatmap data, daily summaries, CTR, and payout status.
+* **Embed**: Added public serving routes for custom placements: `/embed/custom.js`, `/ads/custom/serve`, and `/ads/custom/click/{token}`, with graceful fallback behavior while migrations are missing during upgrades.
+* **Admin**: Added `/admin/ads/custom` management for placements, deals, creative review, pause/resume/cancel/complete actions, and global custom ads settings such as service toggle, marketplace toggle, review requirement, PTS limits, and max deal duration.
+* **Automation**: Added the scheduled `myads:custom-ads-settle` Artisan command to release daily PTS payouts and refund remaining reserved balances when deals are cancelled or completed.
+* **i18n & Tests**: Added custom ads translation keys across all supported languages and feature coverage for placement ownership, deal requests, PTS reservation, external agreements, serving, clicks, payouts, refunds, and permission checks.
+
 ### SEO & Structured Data
 * **Feature**: Implemented **JSON-LD Structured Data Fixes** across the platform to resolve Google Search Console warnings.
 * **Fix**: Added missing `url` fields to `WebSite`, `Article`, and `DiscussionForumPosting` schema blocks, ensuring better visibility and valid rich results in search engines.

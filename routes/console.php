@@ -13,4 +13,4 @@ Schedule::call(function () {
 })->daily();
 
 Schedule::command('myads:archive-impressions')->daily();
-
+Schedule::command('myads:custom-ads-settle')->dailyAt('00:20');

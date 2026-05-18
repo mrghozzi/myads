@@ -20,7 +20,7 @@
 ## 2. What This Project Does
 
 MYADS is a community platform where website owners:
-1. **Exchange advertising** — banner ads, text/link ads, visit exchange (surf-to-earn), and Smart Ads (contextual/native).
+1. **Exchange advertising** — banner ads, text/link ads, visit exchange (surf-to-earn), Smart Ads (contextual/native), and Custom Ads (member-to-member placements/deals).
 2. **Socialize** — profiles, follow system, community feed (posts, galleries, link previews, quote reposts, @mentions), private messaging, reactions, comments.
 3. **Forum** — categories with visibility controls, topics, moderation (pin/lock), attachments, moderator roles.
 4. **Marketplace (Store)** — upload/download scripts, plugins, templates (PTS-based pricing). Wiki-style Knowledgebase per product with Markdown support.
@@ -35,6 +35,7 @@ MYADS is a community platform where website owners:
 13. **Admin Notifications** — centralized header alerts for billing, reports, and system/extension updates with permission-based visibility.
 14. **Media Manager** — administrative hub for monitoring, renaming, previewing, and securely deleting uploaded media files.
 15. **Multimedia Posts** — community feed support for Video, Audio, Files, Music, and Reels with dedicated players and tag-sticker indicators.
+16. **Custom Member Ads** — members create embeddable ad spaces, negotiate direct deals, track impressions/clicks, and settle daily PTS payouts or record external agreements.
 
 ---
 
@@ -70,9 +71,9 @@ myads/
 │   ├── Helpers/           # Hooks.php (WordPress-like action/filter system)
 │   ├── helpers.php         # Global helpers: theme_asset(), ads_site(), locale_direction(), is_locale_rtl()
 │   ├── Http/
-│   │   ├── Controllers/    # 45 controllers (see §5)
+│   │   ├── Controllers/    # 50+ controllers (see §5)
 │   │   └── Middleware/     # AdminMiddleware, SetLocale, UpdateUserOnline, CheckSystemVersion, InstallerGuard, TrackSeoMetrics
-│   ├── Models/             # 40+ Eloquent models (see §6)
+│   ├── Models/             # 50+ Eloquent models (see §6)
 │   ├── Providers/          # AppServiceProvider, ThemeServiceProvider, PluginServiceProvider, InstallerServiceProvider, MailConfigServiceProvider
 │   ├── Services/           # Business logic services (see §7)
 │   ├── Support/            # Value objects, formatters, settings bags, version metadata, embed code generators
@@ -149,6 +150,8 @@ myads/
 | `StatusPromotionController` | Member promoted-post campaigns: create quote, purchase, dashboard |
 | `SmartAdsController` | Smart ads CRUD, embed code |
 | `AdsServingController` | Public ad serving endpoints (`bn.php`, `link.php`, `smart.php`, embed scripts) |
+| `CustomAdsController` | Member custom ad placements, marketplace requests, private invites, deal lifecycle, code, and analytics views |
+| `CustomAdsServingController` | Public custom ad embed, serving, impression/click tracking, and click redirects |
 | `VisitController` | Visit exchange system |
 | `ProfileController` | Profile view/edit, follow, privacy, sessions/revocation, badges, history |
 | `MessageController` | Private messaging |
@@ -168,6 +171,7 @@ myads/
 | `AdminPageController` | Custom pages admin CRUD |
 | `AdminMailSettingsController` | Database-driven mail configuration admin page (`/admin/settings/mail`) |
 | `AdminStatusPromotionController` | Admin monitoring and settings for promoted community posts |
+| `AdminCustomAdsController` | Admin custom ads dashboard, settings, creative review, and placement/deal moderation |
 | `AdminUpdatesController` | System update management |
 | `AdminMediaController` | **Media Manager** — monitor, rename, and delete uploaded files |
 | `SitemapController` | Dynamic sitemap generation |
@@ -199,6 +203,11 @@ myads/
 | `Link` | `link` | Text/link ads |
 | `SmartAd` | `smart_ads` | Smart ad campaigns |
 | `SmartAdImpression` | `smart_ad_impressions` | Smart ad tracking |
+| `CustomAdPlacement` | `custom_ad_placements` | Publisher-owned custom ad space with format, size, visibility, styling, and embed key |
+| `CustomAdDeal` | `custom_ad_deals` | Publisher/advertiser agreement with source, status, payment type, PTS reservation, dates, and counters |
+| `CustomAdCreative` | `custom_ad_creatives` | Approved/pending/rejected ready-made banner/text/native creative attached to a custom ad deal |
+| `CustomAdEvent` | `custom_ad_events` | Independent custom ad impression/click log with visitor key, referrer, country, device, and timestamp |
+| `CustomAdPayout` | `custom_ad_payouts` | Daily PTS payout and refund ledger for custom ad deals |
 | `Visit` | `visit` | Visit exchange entries |
 | `Directory` | `directory` | Website directory listings |
 | `DirectoryCategory` | `directory_cat` | Directory categories |
@@ -269,6 +278,9 @@ myads/
 | `AdminNotificationService` | Aggregates pending admin tasks (billing, reports, updates) with permission-aware filtering |
 | `AdStatsService` | Generates hourly click heatmaps for ad performance analytics |
 | `AdGeoService` | (WIP) Resolves member location for country-based ad targeting |
+| `CustomAdServingService` | Selects active custom ad deals, renders safe banner/text/native markup, and records impressions/clicks |
+| `CustomAdSettlementService` | Accepts/rejects/cancels custom ad deals, reserves/refunds PTS, and releases daily publisher payouts |
+| `CustomAdAnalyticsService` | Aggregates custom ad summaries, daily/hourly series, referrers, countries, devices, and CTR |
 | `MailConfigServiceProvider` | Boots early to override `config('mail.*')` from the `mail_settings` database table at runtime, with graceful fallback |
 
 ---
@@ -294,8 +306,16 @@ myads/
 | `/e{id}`, `/p{id}` | `/e1` | Legacy profile redirects |
 | `/ads/posts` | `/ads/posts` | Member promoted-post campaigns dashboard |
 | `/ads/posts/{status}/promote` | `/ads/posts/55/promote` | Member promoted-post setup and purchase page |
+| `/ads/custom` | `/ads/custom` | Member custom ads dashboard for placements and deals |
+| `/ads/custom/marketplace` | `/ads/custom/marketplace` | Discoverable custom ad placement marketplace |
+| `/ads/custom/placements/{placement}/code` | `/ads/custom/placements/15/code` | Owner-only embed code and placement analytics |
+| `/embed/custom.js` | `/embed/custom.js` | Public custom ad loader script |
+| `/ads/custom/serve` | `/ads/custom/serve?placement=cap_x` | Public custom ad serving endpoint |
+| `/ads/custom/click/{token}` | `/ads/custom/click/abc` | Custom ad click tracking and redirect endpoint |
 | `/admin/ads/posts` | `/admin/ads/posts` | Admin monitoring for all promoted-post campaigns |
 | `/admin/ads/posts/settings` | `/admin/ads/posts/settings` | Admin pricing and delivery settings for promoted posts |
+| `/admin/ads/custom` | `/admin/ads/custom` | Admin custom ads placements/deals dashboard |
+| `/admin/ads/custom/settings` | `/admin/ads/custom/settings` | Admin custom ads service, marketplace, review, and PTS limit settings |
 | `/admin/maintenance` | `/admin/maintenance` | Admin maintenance dashboard, toggle, message, and logo settings |
 | `/admin/maintenance/settings` | `/admin/maintenance/settings` | Persists maintenance mode configuration from the admin panel |
 | `/plans` | `/plans` | Public/member paid plans catalog (hidden when billing is disabled) |
@@ -353,6 +373,7 @@ directory/     → Directory pages
 store/         → Store pages
 ads/           → Ad management views + serving views
 ads/posts/     → Member promoted-post setup + dashboard
+ads/custom/    → Member custom ads dashboard, placement forms, marketplace, deal forms, code, and analytics
 profile/       → Profile, settings, privacy, badges, history
 messages/      → Private messaging
 notifications/ → Notification center
@@ -368,6 +389,7 @@ billing/       → Member billing catalog, dashboard, order details
 layouts/       → admin shell layout (`admin::layouts.admin`)
 admin/billing/ → Billing hub, plans, orders, transactions, currencies, gateways
 admin/orders/  → Marketplace moderation dashboard and request detail views
+admin/custom_ads/ → Custom ads admin dashboard and settings
 admin/media/   → Media Manager dashboard and modals
 admin/mail_settings.blade.php → Database-driven mail configuration form
 ```
@@ -410,7 +432,7 @@ admin/mail_settings.blade.php → Database-driven mail configuration form
 - **Registration defaults:** Standard signups start with avatar `upload/avatar.png` and cover `upload/cover.jpg`. Social signups keep the provider avatar but also start with cover `upload/cover.jpg`.
 - **Hashing:** Bcrypt (with legacy MD5 auto-upgrade on login)
 - **Admin:** `user_id=1` is **permanent super-admin** (cannot be removed)
-- **Admin ACL:** `site_admins` table with module-scoped permissions, managed via `/admin/admins`. Current module list includes `billing`.
+- **Admin ACL:** `site_admins` table with module-scoped permissions, managed via `/admin/admins`. Current module list includes `ads`, `community`, `security`, `billing`, `developers`, and other admin areas in `AdminAccessService::MODULES`.
 - **CAPTCHA:** On registration
 - **CSRF:** Laravel middleware on all forms (installer routes excluded). Billing webhooks are isolated exceptions via `billing/webhook/*`.
 - **API Auth:** Sanctum bearer tokens
@@ -422,7 +444,7 @@ admin/mail_settings.blade.php → Database-driven mail configuration form
 ### Points System (PTS)
 - Central virtual currency for the platform
 - Earned by: posting, commenting, reactions, referrals, visit exchange, quest completion
-- Spent on: ad credits (banner, link, smart), store purchases
+- Spent on: ad credits (banner, link, smart), store purchases, and accepted Custom Ads `pts_daily` deals
 - Tracked via `PointLedgerService` and `point_transactions` table
 
 ### Smart Feed Algorithm (FeedService)
@@ -473,9 +495,20 @@ admin/mail_settings.blade.php → Database-driven mail configuration form
 
 ### Ad Serving
 - Legacy endpoints preserved: `bn.php`, `link.php`, `smart.php`
-- Modern embed scripts: `/embed/banner.js`, `/embed/link.js`, `/embed/smart.js`
+- Modern embed scripts: `/embed/banner.js`, `/embed/link.js`, `/embed/smart.js`, `/embed/custom.js`
 - Slot-based injection (not `document.write`)
 - Repeat-window avoidance for banners
+- Custom Ads serving uses `/ads/custom/serve` and `/ads/custom/click/{token}` with its own analytics tables; public serving degrades gracefully while custom ad tables are missing during upgrades.
+
+### Custom Ads (v4.3.3)
+- **Member Surfaces:** `/ads/custom` for the dashboard, `/ads/custom/placements/create` and edit routes for publisher spaces, `/ads/custom/marketplace` for public discovery, request/invite routes for deals, and owner-only placement code/analytics pages.
+- **Formats:** v1 supports safe ready-made Banner, Text Ad, and Native Card creatives only. Do not add custom HTML creatives without a separate XSS/security design.
+- **Deal Types:** `pts_daily` reserves the advertiser's total PTS at acceptance, pays the publisher one daily amount only when impressions exist for that day, and refunds unpaid balance on cancellation/completion. `external` stores amount, currency, and notes only; MYADS does not process payment or store bank/card data.
+- **Services:** Business logic is in `app/Services/CustomAds/`; controllers should stay thin and delegate serving, settlement, and analytics behavior there.
+- **Settings:** Admin settings use `App\Support\CustomAdsSettings` with `options.o_type = custom_ads_settings` for service enablement, marketplace enablement, required review, min PTS, and max duration.
+- **Admin & ACL:** Admin routes live under `/admin/ads/custom` and map to the existing `ads` ACL module through `AdminAccessService`.
+- **Settlement:** Scheduled command `myads:custom-ads-settle` runs daily from `routes/console.php` and settles the previous day by default.
+- **Tracking:** `CustomAdEvent` records impressions/clicks independently from legacy `state`, banner, link, and smart ad tables.
 
 ### Promoted Post System
 - Community owners can promote supported `status` types `1, 2, 4, 100, 7867, 6`; admin/news posts are excluded.
@@ -687,6 +720,7 @@ php artisan storage:link
 | Add a new page | Create controller method → add route in `web.php` → create Blade in `themes/default/views/` → add translation keys to all 9 locales |
 | Add admin section | Add routes under `admin` prefix → create admin Blade in `admin_themes/default/views/admin/` → update `AdminAccessService` module list if ACL-gated |
 | Add promoted-post pricing or delivery rule | Update `app/Support/StatusPromotionSettings.php` defaults/normalization → adjust `app/Services/StatusPromotionPricingService.php` and `app/Services/StatusPromotionService.php` → cover the change in `tests/Feature/StatusPromotionFeatureTest.php` |
+| Extend Custom Ads | Update `app/Support/CustomAdsSettings.php` if settings change → keep controllers thin → implement behavior in `app/Services/CustomAds/` → update member/admin Blade views and all locale files → cover with `tests/Feature/CustomAdsFeatureTest.php` |
 | Extend billing system | Update `app/Support/SubscriptionSettings.php` / `SubscriptionGatewaySettings.php` as needed → keep controllers thin → implement logic in `app/Services/Billing/` → add translations in all locales → cover with `tests/Feature/BillingFeatureTest.php` |
 | Add billing gateway | Implement `app/Services/Billing/Gateways/BillingGatewayInterface` → register it in `BillingGatewayRegistry` → add admin form fields in `admin_themes/default/views/admin/billing/gateways.blade.php` → update developer docs |
 | Update current release version | Update `app/Support/SystemVersion.php` first -> verify installer/updater/version-sync surfaces -> refresh relevant tests and docs (`Documents/changelogs.md`, `Agents.md`) |
@@ -805,7 +839,7 @@ php artisan storage:link
 ## 19L. Version 4.3.3 Update Cycle (Started 2026-05-10)
 
 - **Status:** In Progress.
-- **Focus:** Multimedia integration, SEO structured data, and platform stability.
+- **Focus:** Multimedia integration, Custom Member Ads, SEO structured data, and platform stability.
 - **Feature (2026-05-13):** Introduced **Multimedia Community Posts**, enabling direct publishing of Video, Audio, Music, Files, and Reels.
 - **UI/UX (2026-05-13):** Implemented the **Tag-Sticker Icon System** for activity cards, with dynamic icon mapping (`play`, `videos`, `streams`, `fa-download`) and theme-aware contrast adjustments.
 - **SEO (2026-05-12):** Deployed JSON-LD fixes for Google Search Console compliance, including ProfilePage schema and author URL integration.
@@ -823,6 +857,12 @@ php artisan storage:link
 - **Schema & UI:** Added migration `2026_04_21_000000_create_order_marketplace_tables.php`, rebuilt the member order views under `themes/default/views/orders/`, and added admin order views under `admin_themes/default/views/admin/orders/`.
 - **Community Integration:** Order activity cards, latest-order widgets, feed trend calculations, and badge/reputation tracking now use `order_offers` instead of legacy order-comment storage.
 - **Testing:** Added `tests/Feature/OrderMarketplaceWorkflowTest.php` and updated order-related feed and badge tests for the new marketplace domain.
+- **Feature (2026-05-18):** Added **Custom Member Ads**, allowing publishers to create embeddable ad placements, advertisers to request or accept private deals, and both sides to track independent impressions/clicks/CTR analytics.
+- **Controllers:** Added `CustomAdsController`, `CustomAdsServingController`, and `AdminCustomAdsController`.
+- **Models & Services:** Added `CustomAdPlacement`, `CustomAdDeal`, `CustomAdCreative`, `CustomAdEvent`, `CustomAdPayout`, plus `CustomAdServingService`, `CustomAdSettlementService`, `CustomAdAnalyticsService`, and `CustomAdsSettings`.
+- **Routes & Admin:** Added member routes under `/ads/custom`, public embed/serve/click routes (`/embed/custom.js`, `/ads/custom/serve`, `/ads/custom/click/{token}`), and admin routes under `/admin/ads/custom` mapped to the `ads` ACL module.
+- **Payments:** `pts_daily` deals reserve advertiser PTS and release daily publisher payouts only after impressions; `external` deals record amount/currency/notes without payment processing or payment data storage.
+- **Testing:** Added `tests/Feature/CustomAdsFeatureTest.php` for placement ownership, deal requests, PTS reservation, external agreements, serving/click tracking, payouts, refunds, and permissions.
 
 ---
 
@@ -883,4 +923,4 @@ If in doubt, update it. An outdated `Agents.md` causes future agents to make wro
 
 ---
 
-*Last updated: 2026-05-10 — MYADS v4.3.2 (Store & Marketplace refinements)*
+*Last updated: 2026-05-19 — MYADS v4.3.3 (Custom Member Ads documentation)*

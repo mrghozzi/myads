@@ -44,6 +44,25 @@ class AdsSettings
         return trim((string) config('app.name', 'MyAds')) ?: 'MyAds';
     }
 
+    public static function servingBrandName(): string
+    {
+        try {
+            if (Schema::hasTable('options')) {
+                $stored = trim((string) Option::where('o_type', self::OPTION_TYPE)
+                    ->where('name', self::BRAND_NAME)
+                    ->value('o_valuer'));
+
+                if ($stored !== '') {
+                    return $stored;
+                }
+            }
+        } catch (\Throwable) {
+            // Fall through to config fallback for incomplete installs.
+        }
+
+        return trim((string) config('app.name', 'MyAds')) ?: 'MyAds';
+    }
+
     public static function ipVisibility(): string
     {
         try {

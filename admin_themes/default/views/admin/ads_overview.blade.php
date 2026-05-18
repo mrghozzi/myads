@@ -26,6 +26,10 @@
                     <span class="admin-stat-label">{{ __('messages.smart_ads') }}</span>
                     <span class="admin-stat-value">{{ number_format($summary['smart_ads']) }}</span>
                 </div>
+                <div class="admin-stat-card">
+                    <span class="admin-stat-label">{{ __('messages.custom_ads') }}</span>
+                    <span class="admin-stat-value">{{ number_format($summary['custom_ads'] ?? 0) }}</span>
+                </div>
             </div>
         </div>
 
@@ -51,6 +55,11 @@
                     <span class="admin-action-tile__icon"><i class="feather-monitor"></i></span>
                     <strong>{{ __('messages.smart_ads') }}</strong>
                     <span class="text-muted">{{ __('messages.smart_admin_recent_inventory') }}</span>
+                </a>
+                <a href="{{ route('admin.custom_ads.index') }}" class="admin-action-tile text-decoration-none">
+                    <span class="admin-action-tile__icon"><i class="feather-layout"></i></span>
+                    <strong>{{ __('messages.custom_ads') }}</strong>
+                    <span class="text-muted">{{ __('messages.custom_ads_admin_subtitle') }}</span>
                 </a>
             </div>
         </div>

@@ -18,8 +18,9 @@ MYADS combines ad exchange, community, marketplace, directory, forum, and admin 
 
 Core areas include:
 
-- Banner ads, text ads, visit exchange, and Smart Ads with **Geo-Targeting** and **A/B Testing**
+- Banner ads, text ads, visit exchange, Smart Ads with **Geo-Targeting** and **A/B Testing**, and **Custom Member Ads**
 - Ad analytics with **Hourly Click Heatmaps**
+- Member-to-member custom ad placements with embed codes, deal requests, PTS settlement, and external agreement tracking
 - Community feed with **Multimedia Posts** (Video, Audio, Music, Files, Reels), reactions, comments, reposts, mentions, and messaging
 - Forum with moderation tools and attachments
 - Store and product knowledgebase
@@ -36,8 +37,9 @@ Core areas include:
 
 ### Member Features
 
-- Ad exchange tools for banners, text ads, visit exchange, and Smart Ads with **Geo-Targeting**
+- Ad exchange tools for banners, text ads, visit exchange, Smart Ads with **Geo-Targeting**, and Custom Ads
 - **A/B Testing** optimization and **Performance Heatmaps** for advertisers
+- Custom ad spaces that members can publish in the marketplace, invite advertisers into, or monetize with daily PTS deals
 - Social profiles with follows, badges, privacy controls, and social links
 - Community feed with **Multimedia Posts** (Video, Audio, Music, Files, Reels), comments, reactions, reposts, and mentions
 - Forum participation with categories, topics, and attachments
@@ -53,6 +55,7 @@ Core areas include:
 - SEO dashboard and indexing tools
 - Maintenance mode and updater workflows
 - Security dashboard for IP bans and member sessions
+- Custom Ads administration for placements, deals, creative review, settlement limits, and marketplace settings
 - Billing workspace for:
   - paid plans
   - currencies
@@ -61,6 +64,31 @@ Core areas include:
   - Stripe
   - PayPal
   - Bank Transfer
+  - Lemon Squeezy
+  - Paddle
+
+---
+
+## Custom Member Ads
+
+MYADS includes a member-to-member Custom Ads module at `/ads/custom`.
+
+Current Custom Ads capabilities:
+
+- Publishers create ad placements and generate safe embed code for their own websites
+- Supported v1 formats: Banner, Text Ad, and Native Card
+- Advertisers can request public marketplace placements
+- Publishers can send private invitations to specific members
+- `pts_daily` deals reserve advertiser PTS and release publisher payouts daily only when impressions exist
+- `external` deals record amount, currency, and notes without processing payment or storing bank/card data
+- Independent analytics track impressions, clicks, CTR, referrers, devices, countries, hourly heatmaps, and payout state
+- Admins can review creatives, pause/resume/cancel/complete deals, and configure service limits
+
+Public embed endpoints:
+
+- `/embed/custom.js`
+- `/ads/custom/serve`
+- `/ads/custom/click/{token}`
 
 ---
 
@@ -72,7 +100,7 @@ Current billing capabilities:
 
 - Paid plans with durations, pricing, highlights, and entitlements
 - Manual currency management with a base currency and exchange-rate snapshots
-- Hosted checkout via `Stripe` and `PayPal`
+- Hosted checkout via `Stripe`, `PayPal`, `Lemon Squeezy`, and `Paddle`
 - Manual review flow for `Bank Transfer`
 - Subscription extension for same-plan repurchase
 - Queued subscriptions for different-plan upgrades
@@ -141,7 +169,8 @@ Project documentation is available in `Documents/`:
 
 - Always back up files and database before any upgrade.
 - Read `Documents/UPGRADE.md` before applying a new release.
-- Billing features depend on the new billing tables, so incomplete upgrades will surface fallback notices through `V420SchemaService`.
+- Billing features depend on the billing tables, so incomplete upgrades will surface fallback notices through `V420SchemaService`.
+- Custom Ads require the `custom_ad_*` tables; the public embed/serve endpoints degrade gracefully until migrations are applied.
 
 ---
 
@@ -150,6 +179,8 @@ Project documentation is available in `Documents/`:
 - Public views use `theme::`
 - Admin views use `admin::`
 - Admin UI lives in `admin_themes/`
+- Custom Ads logic lives under `app/Services/CustomAds/`
+- Custom Ads settings live in `options` through `App\Support\CustomAdsSettings`
 - Billing logic lives under `app/Services/Billing/`
 - Billing settings live in `options` through:
   - `App\Support\SubscriptionSettings`
@@ -164,6 +195,8 @@ Project documentation is available in `Documents/`:
 - Never run destructive test or migration commands against a live site database
 - Billing coverage lives in:
   - `tests/Feature/BillingFeatureTest.php`
+- Custom Ads coverage lives in:
+  - `tests/Feature/CustomAdsFeatureTest.php`
 
 ---
 
@@ -173,6 +206,7 @@ Current platform direction includes:
 
 - Continued platform polish for v4.3.x
 - Expansion of billing and monetization tooling
+- More Custom Ads targeting, reporting, and moderation capabilities
 - More API coverage
 - More real-time and marketplace capabilities
 
@@ -181,4 +215,3 @@ Current platform direction includes:
 ## License
 
 MYADS is open-source software licensed under the [MIT License](https://opensource.org/licenses/MIT).
-

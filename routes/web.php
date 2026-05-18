@@ -9,6 +9,8 @@ use App\Http\Controllers\DirectoryController;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\AdsController;
 use App\Http\Controllers\AdsServingController;
+use App\Http\Controllers\CustomAdsController;
+use App\Http\Controllers\CustomAdsServingController;
 use App\Http\Controllers\SmartAdsController;
 use App\Http\Controllers\VisitController;
 use App\Http\Controllers\StoreController;
@@ -28,6 +30,7 @@ use App\Http\Controllers\AdminAdminsController;
 use App\Http\Controllers\AdminCommunityFeedController;
 use App\Http\Controllers\AdminSecurityController;
 use App\Http\Controllers\AdminStatusPromotionController;
+use App\Http\Controllers\AdminCustomAdsController;
 use App\Http\Controllers\BillingController;
 use App\Http\Controllers\GroupController;
 use App\Http\Controllers\SeoPublicController;
@@ -258,6 +261,25 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/ads/smart/{id}', [SmartAdsController::class, 'update'])->name('ads.smart.update');
     Route::delete('/ads/smart/{id}', [SmartAdsController::class, 'destroy'])->name('ads.smart.destroy');
 
+    // Custom Member-to-Member Ads
+    Route::get('/ads/custom', [CustomAdsController::class, 'index'])->name('ads.custom.index');
+    Route::get('/ads/custom/marketplace', [CustomAdsController::class, 'marketplace'])->name('ads.custom.marketplace');
+    Route::get('/ads/custom/placements/create', [CustomAdsController::class, 'createPlacement'])->name('ads.custom.placements.create');
+    Route::post('/ads/custom/placements', [CustomAdsController::class, 'storePlacement'])->name('ads.custom.placements.store');
+    Route::get('/ads/custom/placements/{placement}/edit', [CustomAdsController::class, 'editPlacement'])->name('ads.custom.placements.edit');
+    Route::put('/ads/custom/placements/{placement}', [CustomAdsController::class, 'updatePlacement'])->name('ads.custom.placements.update');
+    Route::get('/ads/custom/placements/{placement}/code', [CustomAdsController::class, 'code'])->name('ads.custom.placements.code');
+    Route::get('/ads/custom/placements/{placement}/request', [CustomAdsController::class, 'requestDeal'])->name('ads.custom.placements.request');
+    Route::post('/ads/custom/placements/{placement}/request', [CustomAdsController::class, 'storeRequest'])->name('ads.custom.placements.request.store');
+    Route::get('/ads/custom/placements/{placement}/invite', [CustomAdsController::class, 'inviteDeal'])->name('ads.custom.placements.invite');
+    Route::post('/ads/custom/placements/{placement}/invite', [CustomAdsController::class, 'storeInvite'])->name('ads.custom.placements.invite.store');
+    Route::get('/ads/custom/deals/{deal}', [CustomAdsController::class, 'showDeal'])->name('ads.custom.deals.show');
+    Route::post('/ads/custom/deals/{deal}/accept', [CustomAdsController::class, 'accept'])->name('ads.custom.deals.accept');
+    Route::post('/ads/custom/deals/{deal}/reject', [CustomAdsController::class, 'reject'])->name('ads.custom.deals.reject');
+    Route::post('/ads/custom/deals/{deal}/cancel', [CustomAdsController::class, 'cancel'])->name('ads.custom.deals.cancel');
+    Route::post('/ads/custom/deals/{deal}/pause', [CustomAdsController::class, 'pause'])->name('ads.custom.deals.pause');
+    Route::post('/ads/custom/deals/{deal}/resume', [CustomAdsController::class, 'resume'])->name('ads.custom.deals.resume');
+
     // Referrals
     Route::get('/ads/referrals', [AdsController::class, 'referrals'])->name('ads.referrals');
 
@@ -279,6 +301,9 @@ Route::get('/smart.php', [AdsServingController::class, 'smartScript'])->name('ad
 Route::get('/embed/banner.js', [AdsServingController::class, 'bannerEmbedScript'])->name('ads.embed.banner');
 Route::get('/embed/link.js', [AdsServingController::class, 'linkEmbedScript'])->name('ads.embed.link');
 Route::get('/embed/smart.js', [AdsServingController::class, 'smartEmbedScript'])->name('ads.embed.smart');
+Route::get('/embed/custom.js', [CustomAdsServingController::class, 'embed'])->name('ads.custom.embed');
+Route::get('/ads/custom/serve', [CustomAdsServingController::class, 'serve'])->name('ads.custom.serve');
+Route::get('/ads/custom/click/{token}', [CustomAdsServingController::class, 'click'])->name('ads.custom.click');
 Route::get('/show.php', [AdsServingController::class, 'redirect'])->name('ads.redirect');
 Route::get('/ads/redirect', [AdsServingController::class, 'redirect']); // Alias
 
@@ -482,6 +507,11 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/ads', [AdminController::class, 'adsHub'])->name('admin.ads');
     Route::get('/ads/settings', [AdminController::class, 'adsSettings'])->name('admin.ads.settings');
     Route::post('/ads/settings', [AdminController::class, 'updateAdsSettings'])->name('admin.ads.settings.update');
+    Route::get('/ads/custom', [AdminCustomAdsController::class, 'index'])->name('admin.custom_ads.index');
+    Route::get('/ads/custom/settings', [AdminCustomAdsController::class, 'settings'])->name('admin.custom_ads.settings');
+    Route::post('/ads/custom/settings', [AdminCustomAdsController::class, 'updateSettings'])->name('admin.custom_ads.settings.update');
+    Route::post('/ads/custom/deals/{deal}/status', [AdminCustomAdsController::class, 'updateDealStatus'])->name('admin.custom_ads.deals.status');
+    Route::post('/ads/custom/placements/{placement}/status', [AdminCustomAdsController::class, 'updatePlacementStatus'])->name('admin.custom_ads.placements.status');
     Route::get('/ads/posts', [AdminStatusPromotionController::class, 'index'])->name('admin.ads.posts.index');
     Route::get('/ads/posts/settings', [AdminStatusPromotionController::class, 'settings'])->name('admin.ads.posts.settings');
     Route::post('/ads/posts/settings', [AdminStatusPromotionController::class, 'updateSettings'])->name('admin.ads.posts.settings.update');

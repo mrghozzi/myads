@@ -28,6 +28,7 @@ use App\Models\OrderRequest;
 use App\Models\Banner;
 use App\Models\Link;
 use App\Models\SmartAd;
+use App\Models\CustomAdPlacement;
 use App\Models\Visit;
 use App\Models\Status;
 use App\Models\ForumCategory;
@@ -350,7 +351,7 @@ class AdminController extends Controller
             'ads_brand_name' => 'required|string|max:255',
             'banner_repeat_window_minutes' => 'nullable|integer|min:0|max:525600',
             'smart_ads_points_divisor' => 'nullable|numeric|min:0.1|max:1000',
-            'ip_visibility' => 'required|string',
+            'ip_visibility' => 'nullable|string',
         ]);
 
         Option::updateOrCreate(
@@ -389,7 +390,7 @@ class AdminController extends Controller
                 'name' => AdsSettings::IP_VISIBILITY,
             ],
             [
-                'o_valuer' => $validated['ip_visibility'],
+                'o_valuer' => $validated['ip_visibility'] ?? AdsSettings::ipVisibility(),
             ]
         );
 
@@ -856,9 +857,33 @@ class AdminController extends Controller
                 ];
             });
 
+        $customAds = CustomAdPlacement::with('user')
+            ->when($search !== '', function ($query) use ($search) {
+                $query->where('name', 'like', '%' . $search . '%')
+                    ->orWhere('placement_key', 'like', '%' . $search . '%');
+            })
+            ->latest('id')
+            ->limit(8)
+            ->get()
+            ->map(function (CustomAdPlacement $placement) {
+                return (object) [
+                    'type' => 'custom',
+                    'id' => $placement->id,
+                    'name' => $placement->name,
+                    'owner' => $placement->user?->username,
+                    'status' => $placement->status === CustomAdPlacement::STATUS_ACTIVE ? 1 : 0,
+                    'metric_primary' => $placement->impressions,
+                    'metric_secondary' => $placement->clicks,
+                    'edit_url' => route('admin.custom_ads.index', ['search' => $placement->placement_key]),
+                    'badge' => __('messages.custom_ads'),
+                    'created_at' => $placement->created_at,
+                ];
+            });
+
         $items = $banners
             ->concat($links)
             ->concat($smartAds)
+            ->concat($customAds)
             ->sortByDesc(fn ($item) => optional($item->created_at)->getTimestamp() ?? 0)
             ->values();
 
@@ -866,6 +891,7 @@ class AdminController extends Controller
             'banners' => Banner::count(),
             'links' => Link::count(),
             'smart_ads' => SmartAd::count(),
+            'custom_ads' => CustomAdPlacement::count(),
         ];
 
         return view('admin::admin.ads_overview', compact('items', 'summary', 'search'));

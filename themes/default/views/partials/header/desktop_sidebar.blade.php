@@ -365,6 +365,9 @@
                     <a class="dropdown-navigation-link" href="{{ route('ads.smart.index') }}">
                         <i class="fa-solid fa-wand-magic-sparkles dropdown-navigation-link-icon" style="width: 20px;"></i> {{ __('messages.smart_ads') }}
                     </a>
+                    <a class="dropdown-navigation-link" href="{{ route('ads.custom.index') }}">
+                        <i class="fa-solid fa-handshake dropdown-navigation-link-icon" style="width: 20px;"></i> {{ __('messages.custom_ads') }}
+                    </a>
                     <a class="dropdown-navigation-link" href="{{ route('visits.index') }}">
                         <i class="fa-solid fa-eye dropdown-navigation-link-icon" style="width: 20px;"></i> {{ __('messages.exvisit') }}
                     </a>

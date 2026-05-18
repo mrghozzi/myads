@@ -106,6 +106,7 @@ class AdminAccessService
             str_starts_with($routeName, 'admin.links'),
             str_starts_with($routeName, 'admin.smart_ads'),
             str_starts_with($routeName, 'admin.visits'),
+            str_starts_with($routeName, 'admin.custom_ads'),
             str_starts_with($routeName, 'admin.ads') => 'ads',
             str_starts_with($routeName, 'admin.forum'),
             str_starts_with($routeName, 'admin.directory'),
