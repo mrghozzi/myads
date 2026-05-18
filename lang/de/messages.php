@@ -2512,6 +2512,8 @@ return [
     'custom_ad_pts_reserved' => 'Custom ad PTS reserved',
     'custom_ad_daily_payout' => 'Custom ad daily payout',
     'custom_ad_pts_refund' => 'Custom ad PTS refund',
+    'custom_ads_max_duration' => 'Maximale Dauer: :days Tage',
+    'custom_ads_deals' => 'Werbe-Deals',
     'day' => 'day',
     'accept' => 'Accept',
     'reject' => 'Reject',

@@ -3095,6 +3095,8 @@ return [
     'custom_ad_pts_reserved' => 'حجز نقاط إعلان مخصص',
     'custom_ad_daily_payout' => 'دفعة يومية لإعلان مخصص',
     'custom_ad_pts_refund' => 'استرداد نقاط إعلان مخصص',
+    'custom_ads_max_duration' => 'الحد الأقصى للمدة: :days يوم',
+    'custom_ads_deals' => 'صفقات الإعلانات مخصصة',
     'day' => 'يوم',
     'accept' => 'قبول',
     'reject' => 'رفض',
