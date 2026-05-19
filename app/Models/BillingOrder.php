@@ -88,6 +88,9 @@ class BillingOrder extends Model
             'stripe' => 'messages.billing_gateway_stripe',
             'paypal' => 'messages.billing_gateway_paypal',
             'bank_transfer' => 'messages.billing_gateway_bank_transfer',
+            'lemon_squeezy' => 'messages.billing_gateway_lemon_squeezy',
+            'paddle' => 'messages.billing_gateway_paddle',
+            'tabby' => 'messages.billing_gateway_tabby',
             default => null,
         };
 

@@ -513,6 +513,14 @@ class AdminBillingController extends Controller
                 'price_id' => 'nullable|string|max:255',
                 'webhook_secret' => 'nullable|string|max:1000',
             ],
+            'tabby' => [
+                ...$baseRules,
+                'region' => 'required|in:UAE,KSA',
+                'public_key' => 'nullable|string|max:255',
+                'secret_key' => 'nullable|string|max:500',
+                'merchant_code' => 'nullable|string|max:255',
+                'webhook_secret' => 'nullable|string|max:500',
+            ],
             default => abort(404),
         };
 

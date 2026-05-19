@@ -8,6 +8,7 @@ use App\Services\Billing\Gateways\LemonSqueezyGateway;
 use App\Services\Billing\Gateways\PaddleGateway;
 use App\Services\Billing\Gateways\PayPalGateway;
 use App\Services\Billing\Gateways\StripeGateway;
+use App\Services\Billing\Gateways\TabbyGateway;
 use App\Support\SubscriptionGatewaySettings;
 use Illuminate\Support\Collection;
 
@@ -18,7 +19,8 @@ class BillingGatewayRegistry
         private readonly PayPalGateway $paypal,
         private readonly BankTransferGateway $bankTransfer,
         private readonly LemonSqueezyGateway $lemonSqueezy,
-        private readonly PaddleGateway $paddle
+        private readonly PaddleGateway $paddle,
+        private readonly TabbyGateway $tabby
     ) {
     }
 
@@ -33,6 +35,7 @@ class BillingGatewayRegistry
             'bank_transfer' => $this->bankTransfer,
             'lemon_squeezy' => $this->lemonSqueezy,
             'paddle' => $this->paddle,
+            'tabby' => $this->tabby,
         ];
     }
 

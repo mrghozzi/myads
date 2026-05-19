@@ -128,6 +128,11 @@
                                         @endforeach
                                     </select>
                                 </div>
+                                <div class="tabby-phone-container" style="display: none;">
+                                    <label class="form-label">{{ __('messages.billing_phone_number') }} <span style="color: red;">*</span></label>
+                                    <input type="text" name="phone_number" class="form-input billing-phone-input" placeholder="+966500000000" value="{{ old('phone_number') }}">
+                                    <p class="user-status-text" style="font-size: 12px; margin-top: 4px; color: var(--text-color-light);">{{ __('messages.billing_tabby_phone_help') }}</p>
+                                </div>
                                 <button type="submit" class="button primary">{{ __('messages.billing_purchase_now') }}</button>
                             </form>
                         @else
@@ -160,6 +165,8 @@
         forms.forEach(function (form) {
             const gatewaySelect = form.querySelector('.billing-gateway-select');
             const currencySelect = form.querySelector('.billing-currency-select');
+            const tabbyPhoneContainer = form.querySelector('.tabby-phone-container');
+            const phoneInput = form.querySelector('.billing-phone-input');
             if (!gatewaySelect || !currencySelect) {
                 return;
             }
@@ -194,8 +201,23 @@
                 }
             };
 
-            gatewaySelect.addEventListener('change', syncCurrencies);
+            const toggleTabbyPhone = function () {
+                if (!tabbyPhoneContainer || !phoneInput) return;
+                if (gatewaySelect.value === 'tabby') {
+                    tabbyPhoneContainer.style.display = 'block';
+                    phoneInput.setAttribute('required', 'required');
+                } else {
+                    tabbyPhoneContainer.style.display = 'none';
+                    phoneInput.removeAttribute('required');
+                }
+            };
+
+            gatewaySelect.addEventListener('change', function () {
+                syncCurrencies();
+                toggleTabbyPhone();
+            });
             syncCurrencies();
+            toggleTabbyPhone();
         });
     });
 </script>

@@ -50,6 +50,15 @@ class SubscriptionGatewaySettings
             'webhook_secret' => '',
             'supported_currencies' => ['USD'],
         ],
+        'tabby' => [
+            'enabled' => 0,
+            'public_key' => '',
+            'secret_key' => '',
+            'merchant_code' => '',
+            'webhook_secret' => '',
+            'region' => 'UAE',
+            'supported_currencies' => ['AED', 'SAR', 'KWD', 'BHD', 'OMR', 'QAR'],
+        ],
     ];
 
     public const SECRET_FIELDS = [
@@ -58,6 +67,7 @@ class SubscriptionGatewaySettings
         'bank_transfer' => [],
         'lemon_squeezy' => ['api_key', 'webhook_secret'],
         'paddle' => ['api_key', 'webhook_secret'],
+        'tabby' => ['secret_key', 'webhook_secret'],
     ];
 
 

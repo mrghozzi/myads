@@ -176,6 +176,46 @@
                                             <code class="user-select-all d-block text-break">{{ route('billing.webhook', ['gateway' => 'paddle']) }}</code>
                                         </div>
                                     </div>
+                                @elseif($gateway['key'] === 'tabby')
+                                    <div class="col-md-4">
+                                        <label class="form-label">{{ __('messages.billing_tabby_region_label') }}</label>
+                                        <select name="region" class="form-select">
+                                            <option value="UAE" @selected(($config['region'] ?? 'UAE') === 'UAE')>{{ __('messages.billing_tabby_region_uae') }}</option>
+                                            <option value="KSA" @selected(($config['region'] ?? 'UAE') === 'KSA')>{{ __('messages.billing_tabby_region_ksa') }}</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">{{ __('messages.billing_tabby_public_key_label') }}</label>
+                                        <input type="text" name="public_key" class="form-control" value="{{ old('public_key', $config['public_key'] ?? '') }}">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">{{ __('messages.billing_tabby_merchant_code_label') }}</label>
+                                        <input type="text" name="merchant_code" class="form-control" value="{{ old('merchant_code', $config['merchant_code'] ?? '') }}">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">{{ __('messages.billing_secret_key_label') }}</label>
+                                        <input type="password" name="secret_key" class="form-control" value="">
+                                        <div class="form-text">
+                                            {{ __('messages.billing_leave_blank_to_keep_secret') }}
+                                            @if(!empty($config['secret_key']))
+                                                {{ __('messages.billing_secret_current_masked', ['value' => $config['secret_key']]) }}
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">{{ __('messages.billing_webhook_secret_label') }}</label>
+                                        <input type="password" name="webhook_secret" class="form-control" value="">
+                                        <div class="form-text">
+                                            {{ __('messages.billing_leave_blank_to_keep_secret') }}
+                                            @if(!empty($config['webhook_secret']))
+                                                {{ __('messages.billing_secret_current_masked', ['value' => $config['webhook_secret']]) }}
+                                            @endif
+                                        </div>
+                                        <div class="mt-2 p-2 bg-light rounded border">
+                                            <div class="small fw-semibold mb-1 text-muted">رابط الـ Webhook (ضعه في لوحة Tabby مع رأس X-Tabby-Signature):</div>
+                                            <code class="user-select-all d-block text-break">{{ route('billing.webhook', ['gateway' => 'tabby']) }}</code>
+                                        </div>
+                                    </div>
                                 @endif
 
                                 <div class="col-12">

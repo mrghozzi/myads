@@ -126,6 +126,7 @@ class BillingController extends Controller
         $validated = $request->validate([
             'gateway' => 'required|string|in:' . implode(',', $enabledGatewayKeys),
             'currency_code' => 'required|string|max:10',
+            'phone_number' => 'required_if:gateway,tabby|nullable|string|max:30',
         ]);
 
         $planModel = $this->plans->find($plan, true);
@@ -145,6 +146,10 @@ class BillingController extends Controller
 
         try {
             $order = $this->lifecycle->createOrder(auth()->user(), $planModel, (string) $validated['gateway'], (string) $currency->code);
+            if ($validated['gateway'] === 'tabby') {
+                $order->meta = array_merge((array) $order->meta, ['phone_number' => $validated['phone_number']]);
+                $order->save();
+            }
             $checkoutPayload = $gateway->createCheckout($order);
             $order = $this->lifecycle->attachGatewayCheckout($order, $checkoutPayload);
         } catch (ValidationException $exception) {
