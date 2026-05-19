@@ -274,6 +274,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/ads/custom/placements/{placement}/invite', [CustomAdsController::class, 'inviteDeal'])->name('ads.custom.placements.invite');
     Route::post('/ads/custom/placements/{placement}/invite', [CustomAdsController::class, 'storeInvite'])->name('ads.custom.placements.invite.store');
     Route::get('/ads/custom/deals/{deal}', [CustomAdsController::class, 'showDeal'])->name('ads.custom.deals.show');
+    Route::get('/ads/custom/deals/{deal}/edit', [CustomAdsController::class, 'editDeal'])->name('ads.custom.deals.edit');
+    Route::put('/ads/custom/deals/{deal}', [CustomAdsController::class, 'updateDeal'])->name('ads.custom.deals.update');
     Route::post('/ads/custom/deals/{deal}/accept', [CustomAdsController::class, 'accept'])->name('ads.custom.deals.accept');
     Route::post('/ads/custom/deals/{deal}/reject', [CustomAdsController::class, 'reject'])->name('ads.custom.deals.reject');
     Route::post('/ads/custom/deals/{deal}/cancel', [CustomAdsController::class, 'cancel'])->name('ads.custom.deals.cancel');

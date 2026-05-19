@@ -21,6 +21,9 @@
         @if($canAccept)
             <form method="POST" action="{{ route('ads.custom.deals.accept', $deal) }}">@csrf<button class="button secondary" type="submit">{{ __('messages.accept') }}</button></form>
             <form method="POST" action="{{ route('ads.custom.deals.reject', $deal) }}">@csrf<button class="button tertiary" type="submit">{{ __('messages.reject') }}</button></form>
+            @if($deal->status === \App\Models\CustomAdDeal::STATUS_INVITED && (int) $deal->advertiser_id === (int) $viewer->id)
+                <a href="{{ route('ads.custom.deals.edit', $deal) }}" class="button secondary">{{ __('messages.edit') }}</a>
+            @endif
         @endif
         @if($isPublisher && $deal->status === \App\Models\CustomAdDeal::STATUS_ACTIVE)
             <form method="POST" action="{{ route('ads.custom.deals.pause', $deal) }}">@csrf<button class="button tertiary" type="submit">{{ __('messages.pause') }}</button></form>
@@ -87,14 +90,22 @@
 
     <div class="widget-box">
         <p class="widget-box-title">{{ __('messages.custom_ads_creative') }}</p>
-        <div class="custom-ads-preview">
-            <div class="custom-ads-pills" style="margin-bottom: 10px;">
-                <span class="custom-ads-pill">{{ $deal->creative?->status }}</span>
-                <span class="custom-ads-pill">{{ __('messages.custom_ads_format_' . ($deal->creative?->format ?: 'banner')) }}</span>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+            <div class="custom-ads-preview">
+                <div class="custom-ads-pills" style="margin-bottom: 10px;">
+                    <span class="custom-ads-pill">{{ $deal->creative?->status }}</span>
+                    <span class="custom-ads-pill">{{ __('messages.custom_ads_format_' . ($deal->creative?->format ?: 'banner')) }}</span>
+                </div>
+                <h4>{{ $deal->creative?->headline }}</h4>
+                <p class="custom-ads-muted">{{ $deal->creative?->body }}</p>
+                <a href="{{ $deal->creative?->target_url }}" target="_blank" rel="noopener noreferrer">{{ $deal->creative?->target_url }}</a>
             </div>
-            <h4>{{ $deal->creative?->headline }}</h4>
-            <p class="custom-ads-muted">{{ $deal->creative?->body }}</p>
-            <a href="{{ $deal->creative?->target_url }}" target="_blank" rel="noopener noreferrer">{{ $deal->creative?->target_url }}</a>
+            <div>
+                <p class="custom-ads-muted" style="margin-bottom: 8px; font-weight: 700;">{{ __('messages.custom_ads_live_preview') }}</p>
+                <div style="border: 1px solid #edf0f7; border-radius: 8px; padding: 10px; background: #fafafa; display: flex; justify-content: center; align-items: center; min-height: 120px;">
+                    {!! app(\App\Services\CustomAds\CustomAdServingService::class)->renderMarkup($deal->placement, $deal->creative) !!}
+                </div>
+            </div>
         </div>
     </div>
 

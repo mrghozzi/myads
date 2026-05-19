@@ -28,47 +28,59 @@ class CustomAdSettlementService
             ]);
         }
 
-        return DB::transaction(function () use ($deal) {
+        return DB::transaction(function () use ($deal, $actor) {
             $deal = CustomAdDeal::query()->lockForUpdate()->findOrFail($deal->id);
 
-            if ($deal->payment_type === CustomAdDeal::PAYMENT_PTS_DAILY && (float) $deal->reserved_pts <= 0) {
-                $advertiser = User::query()->lockForUpdate()->findOrFail($deal->advertiser_id);
-                $total = round((float) $deal->total_pts, 2);
+            $isModifiedInviteAccept = ($deal->source === CustomAdDeal::SOURCE_INVITE && $deal->status === CustomAdDeal::STATUS_PENDING);
 
-                if ($total <= 0) {
-                    throw ValidationException::withMessages([
-                        'total_pts' => __('messages.custom_ads_pts_required'),
-                    ]);
+            if (!$isModifiedInviteAccept) {
+                if ($deal->payment_type === CustomAdDeal::PAYMENT_PTS_DAILY && (float) $deal->reserved_pts <= 0) {
+                    $advertiser = User::query()->lockForUpdate()->findOrFail($deal->advertiser_id);
+                    $total = round((float) $deal->total_pts, 2);
+
+                    if ($total <= 0) {
+                        throw ValidationException::withMessages([
+                            'total_pts' => __('messages.custom_ads_pts_required'),
+                        ]);
+                    }
+
+                    if ((float) $advertiser->pts < $total) {
+                        throw ValidationException::withMessages([
+                            'total_pts' => __('messages.custom_ads_insufficient_pts'),
+                        ]);
+                    }
+
+                    $this->ledger->award(
+                        $advertiser,
+                        -$total,
+                        'custom_ad_pts_reserved',
+                        'custom_ad_pts_reserved',
+                        'custom_ad_deal',
+                        $deal->id,
+                        ['placement_id' => $deal->placement_id]
+                    );
+
+                    $deal->reserved_pts = $total;
                 }
 
-                if ((float) $advertiser->pts < $total) {
-                    throw ValidationException::withMessages([
-                        'total_pts' => __('messages.custom_ads_insufficient_pts'),
-                    ]);
-                }
-
-                $this->ledger->award(
-                    $advertiser,
-                    -$total,
-                    'custom_ad_pts_reserved',
-                    'custom_ad_pts_reserved',
-                    'custom_ad_deal',
-                    $deal->id,
-                    ['placement_id' => $deal->placement_id]
-                );
-
-                $deal->reserved_pts = $total;
+                $deal->status = CustomAdDeal::STATUS_ACTIVE;
+                $deal->accepted_at = now();
+            } else {
+                $deal->status = CustomAdDeal::STATUS_INVITED;
             }
 
-            $deal->status = CustomAdDeal::STATUS_ACTIVE;
-            $deal->accepted_at = now();
             $deal->save();
 
             $isPublisher = (int) $actor->id === (int) $deal->publisher_id;
             $recipientId = $isPublisher ? $deal->advertiser_id : $deal->publisher_id;
-            $messageKey = $isPublisher
-                ? 'messages.custom_ads_request_accepted_notification'
-                : 'messages.custom_ads_invite_accepted_notification';
+
+            if ($isModifiedInviteAccept) {
+                $messageKey = 'messages.custom_ads_modifications_approved_notification';
+            } else {
+                $messageKey = $isPublisher
+                    ? 'messages.custom_ads_request_accepted_notification'
+                    : 'messages.custom_ads_invite_accepted_notification';
+            }
 
             $this->notificationService->send(
                 $recipientId,
@@ -89,9 +101,27 @@ class CustomAdSettlementService
             ]);
         }
 
+        $isModifiedInviteReject = ($deal->source === CustomAdDeal::SOURCE_INVITE && $deal->status === CustomAdDeal::STATUS_PENDING);
+
         $deal->status = CustomAdDeal::STATUS_REJECTED;
         $deal->cancelled_at = now();
         $deal->save();
+
+        $isPublisher = (int) $actor->id === (int) $deal->publisher_id;
+        $recipientId = $isPublisher ? $deal->advertiser_id : $deal->publisher_id;
+
+        if ($isModifiedInviteReject) {
+            $messageKey = 'messages.custom_ads_modifications_rejected_notification';
+        } else {
+            $messageKey = 'messages.custom_ads_deal_rejected_notification';
+        }
+
+        $this->notificationService->send(
+            $recipientId,
+            __($messageKey, ['user' => $actor->username]),
+            route('ads.custom.deals.show', $deal),
+            'shopping-bag'
+        );
 
         return $deal->fresh(['placement.user', 'advertiser', 'publisher', 'creative']);
     }

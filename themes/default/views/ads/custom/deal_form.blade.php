@@ -5,14 +5,23 @@
 
 @php
     $isInvite = $source === \App\Models\CustomAdDeal::SOURCE_INVITE;
-    $action = $isInvite
-        ? route('ads.custom.placements.invite.store', $placement)
-        : route('ads.custom.placements.request.store', $placement);
+    $isEdit = $isEdit ?? false;
+    $action = $isEdit
+        ? route('ads.custom.deals.update', $deal)
+        : ($isInvite
+            ? route('ads.custom.placements.invite.store', $placement)
+            : route('ads.custom.placements.request.store', $placement));
 @endphp
 
 <div class="section-banner" style="background: linear-gradient(135deg, #0f766e 0%, #0ea5e9 100%);">
     <img class="section-banner-icon" src="{{ theme_asset('img/banner/banner_ads.png') }}" alt="custom-deal">
-    <p class="section-banner-title">{{ $isInvite ? __('messages.custom_ads_invite') : __('messages.custom_ads_request_deal') }}</p>
+    <p class="section-banner-title">
+        @if($isEdit)
+            {{ __('messages.edit') }} #{{ $deal->id }}
+        @else
+            {{ $isInvite ? __('messages.custom_ads_invite') : __('messages.custom_ads_request_deal') }}
+        @endif
+    </p>
     <p class="section-banner-text">{{ $placement->name }}</p>
 </div>
 
@@ -34,8 +43,11 @@
     <div class="widget-box">
         <form method="POST" action="{{ $action }}">
             @csrf
+            @if($isEdit)
+                @method('PUT')
+            @endif
 
-            @if($isInvite)
+            @if($isInvite && !$isEdit)
                 <div class="form-item" style="margin-bottom: 18px;">
                     <label class="rl-label">{{ __('messages.custom_ads_advertiser_lookup') }}</label>
                     <input type="text" name="advertiser" value="{{ old('advertiser') }}" required placeholder="username@example.com">
@@ -132,8 +144,8 @@
             </div>
 
             <div class="custom-ads-actions" style="margin-top: 22px;">
-                <button type="submit" class="button secondary">{{ $isInvite ? __('messages.custom_ads_send_invite') : __('messages.custom_ads_send_request') }}</button>
-                <a href="{{ route('ads.custom.index') }}" class="button tertiary">{{ __('messages.cancel') }}</a>
+                <button type="submit" class="button secondary">{{ $isEdit ? __('messages.save') : ($isInvite ? __('messages.custom_ads_send_invite') : __('messages.custom_ads_send_request')) }}</button>
+                <a href="{{ $isEdit ? route('ads.custom.deals.show', $deal) : route('ads.custom.index') }}" class="button tertiary">{{ __('messages.cancel') }}</a>
             </div>
         </form>
     </div>

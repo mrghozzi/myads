@@ -242,6 +242,79 @@ class CustomAdsController extends Controller
         ]);
     }
 
+    public function editDeal(CustomAdDeal $deal)
+    {
+        $this->ensureEnabled();
+        abort_unless((int) $deal->advertiser_id === (int) Auth::id(), 403);
+        abort_unless($deal->status === CustomAdDeal::STATUS_INVITED, 403);
+
+        $deal->load(['placement.user', 'creative']);
+
+        return view('theme::ads.custom.deal_form', [
+            'placement' => $deal->placement,
+            'deal' => $deal,
+            'creative' => $deal->creative,
+            'source' => $deal->source,
+            'maxDurationDays' => CustomAdsSettings::maxDurationDays(),
+            'isEdit' => true,
+        ]);
+    }
+
+    public function updateDeal(
+        Request $request,
+        CustomAdDeal $deal,
+        SecurityPolicyService $securityPolicy,
+        NotificationService $notificationService
+    ) {
+        $this->ensureEnabled();
+        abort_unless((int) $deal->advertiser_id === (int) Auth::id(), 403);
+        abort_unless($deal->status === CustomAdDeal::STATUS_INVITED, 403);
+
+        $deal->load('advertiser');
+        $request->merge(['advertiser' => $deal->advertiser->username]);
+
+        $payload = $this->validatedDeal($request, $deal->placement, CustomAdDeal::SOURCE_INVITE);
+        $creativePayload = $this->validatedCreative($request, $deal->placement);
+
+        if ($violation = $securityPolicy->urlViolation((string) $creativePayload['target_url'], 'ads')) {
+            throw ValidationException::withMessages(['target_url' => $violation]);
+        }
+
+        if (!empty($creativePayload['image_url']) && ($violation = $securityPolicy->urlViolation((string) $creativePayload['image_url'], 'ads', true))) {
+            throw ValidationException::withMessages(['image_url' => $violation]);
+        }
+
+        $text = implode(' ', array_filter([
+            $creativePayload['headline'] ?? '',
+            $creativePayload['body'] ?? '',
+            $payload['terms'] ?? '',
+        ]));
+
+        if ($violation = $securityPolicy->textViolation($text, 'ads')) {
+            throw ValidationException::withMessages(['headline' => $violation]);
+        }
+
+        $deal->update(array_merge($payload, [
+            'status' => CustomAdDeal::STATUS_PENDING,
+        ]));
+
+        $deal->creative->update(array_merge($creativePayload, [
+            'status' => CustomAdsSettings::requireReview()
+                ? CustomAdCreative::STATUS_PENDING
+                : CustomAdCreative::STATUS_APPROVED,
+        ]));
+
+        $notificationService->send(
+            $deal->publisher_id,
+            __('messages.custom_ads_deal_modified_notification', ['user' => Auth::user()->username]),
+            route('ads.custom.deals.show', $deal),
+            'shopping-bag'
+        );
+
+        return redirect()->route('ads.custom.deals.show', $deal)
+            ->with('success', __('messages.custom_ads_deal_updated'));
+    }
+
     public function accept(CustomAdDeal $deal, CustomAdSettlementService $settlement)
     {
         $settlement->accept($deal, Auth::user());

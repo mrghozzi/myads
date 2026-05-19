@@ -3103,4 +3103,10 @@ return [
     'custom_ads_invite_notification' => ':user invited you to a custom ad deal.',
     'custom_ads_request_accepted_notification' => ':user accepted your custom ad deal request.',
     'custom_ads_invite_accepted_notification' => ':user accepted your custom ad deal invite.',
+    'custom_ads_live_preview' => 'Live Preview',
+    'custom_ads_deal_modified_notification' => ':user modified the custom ad deal terms.',
+    'custom_ads_modifications_approved_notification' => 'Publisher approved your modifications. Please accept the deal to start the campaign.',
+    'custom_ads_modifications_rejected_notification' => 'Publisher rejected your custom ad deal modifications.',
+    'custom_ads_deal_rejected_notification' => ':user rejected the custom ad deal.',
+    'custom_ads_deal_updated' => 'Deal details updated successfully.',
 ];

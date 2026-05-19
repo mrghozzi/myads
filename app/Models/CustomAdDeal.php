@@ -127,11 +127,11 @@ class CustomAdDeal extends Model
             return false;
         }
 
-        if ((string) $this->source === self::SOURCE_INVITE) {
-            return (int) $this->advertiser_id === (int) $user->id;
+        if ((string) $this->status === self::STATUS_PENDING) {
+            return (int) $this->publisher_id === (int) $user->id;
         }
 
-        return (int) $this->publisher_id === (int) $user->id;
+        return (int) $this->advertiser_id === (int) $user->id;
     }
 
     public function canBeManagedBy(User $user): bool
