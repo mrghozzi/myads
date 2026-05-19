@@ -82,6 +82,10 @@
                                                 {{ __('messages.billing_secret_current_masked', ['value' => $config['webhook_secret']]) }}
                                             @endif
                                         </div>
+                                        <div class="mt-2 p-2 bg-light rounded border">
+                                            <div class="small fw-semibold mb-1 text-muted">{{ __('messages.billing_webhook_url_label') }} ({{ __('messages.billing_stripe_webhook_hint') }}):</div>
+                                            <code class="user-select-all d-block text-break">{{ route('billing.webhook', ['gateway' => 'stripe']) }}</code>
+                                        </div>
                                     </div>
                                 @elseif($gateway['key'] === 'paypal')
                                     <div class="col-md-6">
@@ -101,6 +105,10 @@
                                     <div class="col-md-6">
                                         <label class="form-label">{{ __('messages.billing_webhook_id_label') }}</label>
                                         <input type="text" name="webhook_id" class="form-control" value="{{ old('webhook_id', $config['webhook_id'] ?? '') }}">
+                                        <div class="mt-2 p-2 bg-light rounded border">
+                                            <div class="small fw-semibold mb-1 text-muted">{{ __('messages.billing_webhook_url_label') }} ({{ __('messages.billing_paypal_webhook_hint') }}):</div>
+                                            <code class="user-select-all d-block text-break">{{ route('billing.webhook', ['gateway' => 'paypal']) }}</code>
+                                        </div>
                                     </div>
                                 @elseif($gateway['key'] === 'bank_transfer')
                                     <div class="col-12">
@@ -140,7 +148,7 @@
                                             @endif
                                         </div>
                                         <div class="mt-2 p-2 bg-light rounded border">
-                                            <div class="small fw-semibold mb-1 text-muted">رابط الـ Webhook (ضعه في لوحة Lemon Squeezy):</div>
+                                            <div class="small fw-semibold mb-1 text-muted">{{ __('messages.billing_webhook_url_label') }} ({{ __('messages.billing_lemon_squeezy_webhook_hint') }}):</div>
                                             <code class="user-select-all d-block text-break">{{ route('billing.webhook', ['gateway' => 'lemon_squeezy']) }}</code>
                                         </div>
                                     </div>
@@ -212,7 +220,7 @@
                                             @endif
                                         </div>
                                         <div class="mt-2 p-2 bg-light rounded border">
-                                            <div class="small fw-semibold mb-1 text-muted">رابط الـ Webhook (ضعه في لوحة Tabby مع رأس X-Tabby-Signature):</div>
+                                            <div class="small fw-semibold mb-1 text-muted">{{ __('messages.billing_webhook_url_label') }} ({{ __('messages.billing_tabby_webhook_hint') }}):</div>
                                             <code class="user-select-all d-block text-break">{{ route('billing.webhook', ['gateway' => 'tabby']) }}</code>
                                         </div>
                                     </div>

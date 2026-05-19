@@ -466,7 +466,7 @@ admin/mail_settings.blade.php → Database-driven mail configuration form
 ### Paid Subscriptions & Billing (v4.3.0)
 - **Feature Toggle:** System-wide billing state is stored in `options` via `App\Support\SubscriptionSettings` (`o_type = subscription_settings`) and can be enabled/disabled from `/admin/billing/settings`
 - **Gateway Config:** Per-gateway settings live in `options` via `App\Support\SubscriptionGatewaySettings` (`o_type = subscription_gateway_settings`); secrets are encrypted with Laravel `Crypt` and masked in admin
-- **Supported Gateways:** First-party billing release supports `Stripe`, `PayPal`, `Bank Transfer`, `Lemon Squeezy`, and `Paddle`
+- **Supported Gateways:** First-party billing release supports `Stripe`, `PayPal`, `Bank Transfer`, `Lemon Squeezy`, `Paddle`, and `Tabby`
 - **Routes:** Member flows use `/plans`, `/settings/billing`, `/billing/orders/{order}`, `/billing/return/{gateway}/{order}`, and `/billing/webhook/{gateway}`; admin flows live under `/admin/billing/*`
 - **Hosted Checkout Rule:** `Stripe` and `PayPal` must use hosted external checkout only; MYADS must not collect card data or personal payment data directly
 - **Manual Review Flow:** `Bank Transfer` orders move through `pending_receipt` → `pending_review` → `paid`/`rejected`, with receipt uploads stored under `public/upload/billing/receipts/`
@@ -863,6 +863,9 @@ php artisan storage:link
 - **Routes & Admin:** Added member routes under `/ads/custom`, public embed/serve/click routes (`/embed/custom.js`, `/ads/custom/serve`, `/ads/custom/click/{token}`), and admin routes under `/admin/ads/custom` mapped to the `ads` ACL module.
 - **Payments:** `pts_daily` deals reserve advertiser PTS and release daily publisher payouts only after impressions; `external` deals record amount/currency/notes without payment processing or payment data storage.
 - **Testing:** Added `tests/Feature/CustomAdsFeatureTest.php` for placement ownership, deal requests, PTS reservation, external agreements, serving/click tracking, payouts, refunds, and permissions.
+- **Feature (2026-05-19):** Integrated the **Tabby** payment gateway, supporting checkout redirection, region selection (UAE/KSA), phone number validation during checkout, and Timing-Safe webhook verification.
+- **UI/UX (2026-05-19):** Enhanced `/admin/billing/gateways` by adding Webhook URL copy/display sections for Stripe and PayPal, matching other gateways.
+- **i18n & Tests (2026-05-19):** Fully localized Tabby config inputs, validation errors, and Stripe/PayPal webhook URL instructions. Added tests in `BillingFeatureTest` to verify checkout validation, session creation, redirects, and signature-verified webhook parsing.
 
 ---
 
@@ -923,4 +926,4 @@ If in doubt, update it. An outdated `Agents.md` causes future agents to make wro
 
 ---
 
-*Last updated: 2026-05-19 — MYADS v4.3.3 (Custom Member Ads documentation)*
+*Last updated: 2026-05-19 — MYADS v4.3.3 (Tabby payment integration)*

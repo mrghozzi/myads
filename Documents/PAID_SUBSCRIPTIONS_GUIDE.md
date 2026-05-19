@@ -22,13 +22,16 @@ Members can:
 ## 2. Core Design Rules
 
 - The billing system is optional and can be disabled globally.
-- The current release supports only:
+- The current release supports:
   - `Stripe`
   - `PayPal`
   - `Bank Transfer`
+  - `Lemon Squeezy`
+  - `Paddle`
+  - `Tabby`
 - There is no `auto-renew` in the current release.
 - MYADS must not store card data or sensitive payment identity data.
-- `Stripe` and `PayPal` must use hosted checkout only.
+- `Stripe`, `PayPal`, `Lemon Squeezy`, `Paddle`, and `Tabby` must use hosted checkout or checkout redirect flows only.
 - `Bank Transfer` uses plain-text instructions plus a receipt image upload.
 - Any code that depends on the new billing tables must follow the project compatibility pattern:
   - `try/catch`
@@ -64,6 +67,9 @@ Members can:
 - `app/Services/Billing/Gateways/StripeGateway.php`
 - `app/Services/Billing/Gateways/PayPalGateway.php`
 - `app/Services/Billing/Gateways/BankTransferGateway.php`
+- `app/Services/Billing/Gateways/LemonSqueezyGateway.php`
+- `app/Services/Billing/Gateways/PaddleGateway.php`
+- `app/Services/Billing/Gateways/TabbyGateway.php`
 
 ### Support / Settings
 

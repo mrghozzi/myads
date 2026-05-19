@@ -1,5 +1,13 @@
 # v4.3.3
-> **Maintenance & Feature Release** — Multimedia posts, comment replies, enhanced activity stickers, SEO structured data fixes, admin moderation tools, and system stability.
+> **Maintenance & Feature Release** — Tabby payment gateway integration, admin webhook configuration hints, multimedia posts, comment replies, enhanced activity stickers, SEO structured data fixes, admin moderation tools, and system stability.
+
+### Paid Subscriptions & Billing
+* **Feature**: Integrated **Tabby** as a fully supported payment gateway for the subscription and paid plans system, processing checkout sessions via their Checkout API.
+* **Feature**: Added dynamic gateway configuration for Tabby in the admin panel (`/admin/billing/gateways`), supporting Region selection (UAE vs. KSA), Public Key, Secret Key, Merchant Code, and Webhook Secret setup.
+* **Feature**: Implemented automatic validation on the plan selection screen requiring members to provide their phone number when checking out using Tabby.
+* **Feature**: Implemented Timing-Safe Webhook signature verification for Tabby payments to securely capture authorized funds and activate paid member subscriptions asynchronously.
+* **UX**: Added Webhook URL display helper and instruction blocks for **Stripe** and **PayPal** in the admin gateways configuration page, matching existing patterns for Lemon Squeezy, Paddle, and Tabby.
+* **i18n & Tests**: Fully localized the Tabby payment option, phone validation messages, and Webhook URL helper/hint strings in English and Arabic. Added unit and feature test coverage for checkout redirects, validation rules, return redirects, and webhook payload parsing.
 
 ### Multimedia Community Posts
 * **Feature**: Introduced **Multimedia Post Types** to the community feed, allowing members to publish **Video**, **Audio**, **Files**, **Music**, and **Reels** directly.
