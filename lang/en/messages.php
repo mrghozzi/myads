@@ -3099,4 +3099,8 @@ return [
     'reject' => 'Reject',
     'start_date' => 'Start date',
     'end_date' => 'End date',
+    'custom_ads_request_notification' => ':user sent you a custom ad deal request.',
+    'custom_ads_invite_notification' => ':user invited you to a custom ad deal.',
+    'custom_ads_request_accepted_notification' => ':user accepted your custom ad deal request.',
+    'custom_ads_invite_accepted_notification' => ':user accepted your custom ad deal invite.',
 ];

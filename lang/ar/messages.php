@@ -3102,4 +3102,8 @@ return [
     'reject' => 'رفض',
     'start_date' => 'تاريخ البداية',
     'end_date' => 'تاريخ النهاية',
+    'custom_ads_request_notification' => 'أرسل لك :user طلب صفقة إعلان مخصص.',
+    'custom_ads_invite_notification' => 'دعاك :user لصفقة إعلان مخصص.',
+    'custom_ads_request_accepted_notification' => 'وافق :user على طلب صفقة الإعلان المخصص الخاص بك.',
+    'custom_ads_invite_accepted_notification' => 'وافق :user على دعوة صفقة الإعلان المخصص الخاصة بك.',
 ];

@@ -7,6 +7,7 @@ use App\Models\CustomAdEvent;
 use App\Models\CustomAdPayout;
 use App\Models\User;
 use App\Services\PointLedgerService;
+use App\Services\NotificationService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -14,7 +15,8 @@ use Illuminate\Validation\ValidationException;
 class CustomAdSettlementService
 {
     public function __construct(
-        private readonly PointLedgerService $ledger
+        private readonly PointLedgerService $ledger,
+        private readonly NotificationService $notificationService
     ) {
     }
 
@@ -61,6 +63,19 @@ class CustomAdSettlementService
             $deal->status = CustomAdDeal::STATUS_ACTIVE;
             $deal->accepted_at = now();
             $deal->save();
+
+            $isPublisher = (int) $actor->id === (int) $deal->publisher_id;
+            $recipientId = $isPublisher ? $deal->advertiser_id : $deal->publisher_id;
+            $messageKey = $isPublisher
+                ? 'messages.custom_ads_request_accepted_notification'
+                : 'messages.custom_ads_invite_accepted_notification';
+
+            $this->notificationService->send(
+                $recipientId,
+                __($messageKey, ['user' => $actor->username]),
+                route('ads.custom.deals.show', $deal),
+                'shopping-bag'
+            );
 
             return $deal->fresh(['placement.user', 'advertiser', 'publisher', 'creative']);
         });

@@ -8,6 +8,7 @@ use App\Models\CustomAdPlacement;
 use App\Models\User;
 use App\Services\CustomAds\CustomAdAnalyticsService;
 use App\Services\CustomAds\CustomAdSettlementService;
+use App\Services\NotificationService;
 use App\Services\SecurityPolicyService;
 use App\Support\CustomAdsSettings;
 use Carbon\Carbon;
@@ -164,13 +165,20 @@ class CustomAdsController extends Controller
         ]);
     }
 
-    public function storeRequest(Request $request, CustomAdPlacement $placement, SecurityPolicyService $securityPolicy)
+    public function storeRequest(Request $request, CustomAdPlacement $placement, SecurityPolicyService $securityPolicy, NotificationService $notificationService)
     {
         $this->ensureEnabled();
         abort_unless($placement->is_public && $placement->isActive(), 404);
         abort_if((int) $placement->user_id === (int) Auth::id(), 403);
 
         $deal = $this->createDeal($request, $placement, CustomAdDeal::SOURCE_REQUEST, Auth::user(), $securityPolicy);
+
+        $notificationService->send(
+            $placement->user_id,
+            __('messages.custom_ads_request_notification', ['user' => Auth::user()->username]),
+            route('ads.custom.deals.show', $deal),
+            'shopping-bag'
+        );
 
         return redirect()->route('ads.custom.deals.show', $deal)
             ->with('success', __('messages.custom_ads_request_sent'));
@@ -199,12 +207,19 @@ class CustomAdsController extends Controller
         ]);
     }
 
-    public function storeInvite(Request $request, CustomAdPlacement $placement, SecurityPolicyService $securityPolicy)
+    public function storeInvite(Request $request, CustomAdPlacement $placement, SecurityPolicyService $securityPolicy, NotificationService $notificationService)
     {
         $this->authorizePlacementOwner($placement);
 
         $advertiser = $this->resolveAdvertiser((string) $request->input('advertiser'));
         $deal = $this->createDeal($request, $placement, CustomAdDeal::SOURCE_INVITE, $advertiser, $securityPolicy);
+
+        $notificationService->send(
+            $advertiser->id,
+            __('messages.custom_ads_invite_notification', ['user' => Auth::user()->username]),
+            route('ads.custom.deals.show', $deal),
+            'shopping-bag'
+        );
 
         return redirect()->route('ads.custom.deals.show', $deal)
             ->with('success', __('messages.custom_ads_invite_sent'));
