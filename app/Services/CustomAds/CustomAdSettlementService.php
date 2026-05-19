@@ -31,9 +31,9 @@ class CustomAdSettlementService
         return DB::transaction(function () use ($deal, $actor) {
             $deal = CustomAdDeal::query()->lockForUpdate()->findOrFail($deal->id);
 
-            $isModifiedInviteAccept = ($deal->source === CustomAdDeal::SOURCE_INVITE && $deal->status === CustomAdDeal::STATUS_PENDING);
+            $isPublisherAcceptPending = ($deal->status === CustomAdDeal::STATUS_PENDING);
 
-            if (!$isModifiedInviteAccept) {
+            if (!$isPublisherAcceptPending) {
                 if ($deal->payment_type === CustomAdDeal::PAYMENT_PTS_DAILY && (float) $deal->reserved_pts <= 0) {
                     $advertiser = User::query()->lockForUpdate()->findOrFail($deal->advertiser_id);
                     $total = round((float) $deal->total_pts, 2);
@@ -74,12 +74,16 @@ class CustomAdSettlementService
             $isPublisher = (int) $actor->id === (int) $deal->publisher_id;
             $recipientId = $isPublisher ? $deal->advertiser_id : $deal->publisher_id;
 
-            if ($isModifiedInviteAccept) {
-                $messageKey = 'messages.custom_ads_modifications_approved_notification';
+            if ($isPublisherAcceptPending) {
+                if ($deal->source === CustomAdDeal::SOURCE_INVITE) {
+                    $messageKey = 'messages.custom_ads_modifications_approved_notification';
+                } else {
+                    $messageKey = 'messages.custom_ads_request_approved_notification';
+                }
             } else {
-                $messageKey = $isPublisher
-                    ? 'messages.custom_ads_request_accepted_notification'
-                    : 'messages.custom_ads_invite_accepted_notification';
+                $messageKey = $deal->source === CustomAdDeal::SOURCE_INVITE
+                    ? 'messages.custom_ads_invite_accepted_notification'
+                    : 'messages.custom_ads_request_accepted_notification';
             }
 
             $this->notificationService->send(

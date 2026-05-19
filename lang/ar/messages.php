@@ -3110,6 +3110,8 @@ return [
     'custom_ads_deal_modified_notification' => 'قام :user بتعديل شروط صفقة الإعلان المخصص.',
     'custom_ads_modifications_approved_notification' => 'وافق الناشر على تعديلاتك. يرجى قبول الصفقة لبدء الحملة الإعلانية.',
     'custom_ads_modifications_rejected_notification' => 'رفض الناشر تعديلات صفقة الإعلان المخصص الخاصة بك.',
+    'custom_ads_request_approved_notification' => 'وافق الناشر على طلب صفقة الإعلان المخصص الخاص بك. يرجى قبول الصفقة لبدء الحملة الإعلانية.',
     'custom_ads_deal_rejected_notification' => 'رفض :user صفقة الإعلان المخصص.',
     'custom_ads_deal_updated' => 'تم تحديث تفاصيل الصفقة بنجاح.',
+    'custom_ads_no_creative' => 'لا توجد تفاصيل إعلان متاحة لهذه الصفقة.',
 ];

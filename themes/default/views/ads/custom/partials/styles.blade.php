@@ -2,7 +2,8 @@
 <style>
     .custom-ads-shell { display: grid; gap: 22px; }
     .custom-ads-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin: 22px 0; }
-    .custom-ads-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .custom-ads-actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .custom-ads-actions form { display: inline-flex; margin: 0; padding: 0; }
     .custom-ads-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; }
     .custom-ads-card { padding: 20px; border: 1px solid #edf0f7; border-radius: 8px; background: #fff; }
     .custom-ads-card h4 { margin: 0 0 8px; color: #3e3f5e; font-size: 1rem; font-weight: 800; }

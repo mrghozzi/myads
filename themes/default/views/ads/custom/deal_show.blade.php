@@ -91,21 +91,27 @@
     <div class="widget-box">
         <p class="widget-box-title">{{ __('messages.custom_ads_creative') }}</p>
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
-            <div class="custom-ads-preview">
-                <div class="custom-ads-pills" style="margin-bottom: 10px;">
-                    <span class="custom-ads-pill">{{ $deal->creative?->status }}</span>
-                    <span class="custom-ads-pill">{{ __('messages.custom_ads_format_' . ($deal->creative?->format ?: 'banner')) }}</span>
+            @if($deal->creative)
+                <div class="custom-ads-preview">
+                    <div class="custom-ads-pills" style="margin-bottom: 10px;">
+                        <span class="custom-ads-pill">{{ $deal->creative->status }}</span>
+                        <span class="custom-ads-pill">{{ __('messages.custom_ads_format_' . ($deal->creative->format ?: 'banner')) }}</span>
+                    </div>
+                    <h4>{{ $deal->creative->headline }}</h4>
+                    <p class="custom-ads-muted">{{ $deal->creative->body }}</p>
+                    <a href="{{ $deal->creative->target_url }}" target="_blank" rel="noopener noreferrer">{{ $deal->creative->target_url }}</a>
                 </div>
-                <h4>{{ $deal->creative?->headline }}</h4>
-                <p class="custom-ads-muted">{{ $deal->creative?->body }}</p>
-                <a href="{{ $deal->creative?->target_url }}" target="_blank" rel="noopener noreferrer">{{ $deal->creative?->target_url }}</a>
-            </div>
-            <div>
-                <p class="custom-ads-muted" style="margin-bottom: 8px; font-weight: 700;">{{ __('messages.custom_ads_live_preview') }}</p>
-                <div style="border: 1px solid #edf0f7; border-radius: 8px; padding: 10px; background: #fafafa; display: flex; justify-content: center; align-items: center; min-height: 120px;">
-                    {!! app(\App\Services\CustomAds\CustomAdServingService::class)->renderMarkup($deal->placement, $deal->creative) !!}
+                <div>
+                    <p class="custom-ads-muted" style="margin-bottom: 8px; font-weight: 700;">{{ __('messages.custom_ads_live_preview') }}</p>
+                    <div style="border: 1px solid #edf0f7; border-radius: 8px; padding: 10px; background: #fafafa; display: flex; justify-content: center; align-items: center; min-height: 120px;">
+                        {!! app(\App\Services\CustomAds\CustomAdServingService::class)->renderMarkup($deal->placement, $deal->creative) !!}
+                    </div>
                 </div>
-            </div>
+            @else
+                <div class="custom-ads-preview" style="grid-column: 1 / -1; display: flex; justify-content: center; align-items: center; min-height: 120px; border: 1px dashed #edf0f7; border-radius: 8px;">
+                    <span class="custom-ads-muted">{{ __('messages.custom_ads_no_creative') ?? 'No creative details available for this deal.' }}</span>
+                </div>
+            @endif
         </div>
     </div>
 

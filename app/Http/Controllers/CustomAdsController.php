@@ -294,15 +294,17 @@ class CustomAdsController extends Controller
             throw ValidationException::withMessages(['headline' => $violation]);
         }
 
-        $deal->update(array_merge($payload, [
-            'status' => CustomAdDeal::STATUS_PENDING,
-        ]));
+        \Illuminate\Support\Facades\DB::transaction(function () use ($deal, $payload, $creativePayload) {
+            $deal->update(array_merge($payload, [
+                'status' => CustomAdDeal::STATUS_PENDING,
+            ]));
 
-        $deal->creative->update(array_merge($creativePayload, [
-            'status' => CustomAdsSettings::requireReview()
-                ? CustomAdCreative::STATUS_PENDING
-                : CustomAdCreative::STATUS_APPROVED,
-        ]));
+            $deal->creative->update(array_merge($creativePayload, [
+                'status' => CustomAdsSettings::requireReview()
+                    ? CustomAdCreative::STATUS_PENDING
+                    : CustomAdCreative::STATUS_APPROVED,
+            ]));
+        });
 
         $notificationService->send(
             $deal->publisher_id,
@@ -390,23 +392,25 @@ class CustomAdsController extends Controller
             ? CustomAdDeal::STATUS_INVITED
             : CustomAdDeal::STATUS_PENDING;
 
-        $deal = CustomAdDeal::create(array_merge($payload, [
-            'placement_id' => $placement->id,
-            'publisher_id' => $publisherId,
-            'advertiser_id' => $advertiser->id,
-            'initiated_by_id' => Auth::id(),
-            'source' => $source,
-            'status' => $status,
-        ]));
+        return \Illuminate\Support\Facades\DB::transaction(function () use ($payload, $creativePayload, $placement, $publisherId, $advertiser, $source, $status) {
+            $deal = CustomAdDeal::create(array_merge($payload, [
+                'placement_id' => $placement->id,
+                'publisher_id' => $publisherId,
+                'advertiser_id' => $advertiser->id,
+                'initiated_by_id' => Auth::id(),
+                'source' => $source,
+                'status' => $status,
+            ]));
 
-        $deal->creative()->create(array_merge($creativePayload, [
-            'format' => $placement->format,
-            'status' => CustomAdsSettings::requireReview()
-                ? CustomAdCreative::STATUS_PENDING
-                : CustomAdCreative::STATUS_APPROVED,
-        ]));
+            $deal->creative()->create(array_merge($creativePayload, [
+                'format' => $placement->format,
+                'status' => CustomAdsSettings::requireReview()
+                    ? CustomAdCreative::STATUS_PENDING
+                    : CustomAdCreative::STATUS_APPROVED,
+            ]));
 
-        return $deal->fresh(['placement.user', 'advertiser', 'publisher', 'creative']);
+            return $deal->fresh(['placement.user', 'advertiser', 'publisher', 'creative']);
+        });
     }
 
     private function validatedPlacement(Request $request): array
