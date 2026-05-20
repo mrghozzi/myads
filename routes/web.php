@@ -106,7 +106,7 @@ Route::get('/', function () {
     }
 
     if (auth()->check()) {
-        return redirect()->route('dashboard');
+        return redirect()->route('portal.index');
     }
 
     app(\App\Services\SeoManager::class)->setContext([

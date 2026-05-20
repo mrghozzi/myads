@@ -92,7 +92,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->redirectTo(
             guests: '/login',
-            users: '/home'
+            users: '/portal'
         );
 
         // Exclude installer routes from CSRF verification
