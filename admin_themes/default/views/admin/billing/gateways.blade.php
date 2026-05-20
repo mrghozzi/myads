@@ -32,7 +32,11 @@
     @if($featureAvailable)
         <div class="d-grid gap-3 mt-4">
             @foreach($gatewayDefinitions as $gateway)
-                @php $config = $gateway['config']; @endphp
+                @php
+                    $config = $gateway['config'];
+                    $setupGuideKey = 'messages.billing_gateway_setup_' . $gateway['key'];
+                    $setupGuide = __($setupGuideKey);
+                @endphp
                 <form action="{{ route('admin.billing.gateways.update', $gateway['key']) }}" method="POST">
                     @csrf
                     <section class="admin-panel">
@@ -58,6 +62,18 @@
                             </div>
                         </div>
                         <div class="admin-panel__body">
+                            @if($setupGuide !== $setupGuideKey)
+                                <div class="alert alert-info py-3 small mb-4">
+                                    <div class="d-flex gap-2">
+                                        <i class="feather-info mt-1"></i>
+                                        <div>
+                                            <div class="fw-semibold mb-1">{{ __('messages.billing_gateway_setup_title') }}</div>
+                                            <div class="lh-base">{{ $setupGuide }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endif
+
                             <div class="row g-3">
                                 @if($gateway['supports_mode'])
                                     <div class="col-md-4">
