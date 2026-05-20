@@ -39,7 +39,18 @@
                         <div class="admin-panel__header">
                             <div>
                                 <span class="admin-panel__eyebrow">{{ __('messages.billing_gateways_tab') }}</span>
-                                <h2 class="admin-panel__title">{{ $gateway['label'] }}</h2>
+                                <h2 class="admin-panel__title d-inline-flex align-items-center flex-wrap gap-2">
+                                    <span>{{ $gateway['label'] }}</span>
+                                    @if(in_array($gateway['key'], ['tabby', 'flouci'], true))
+                                        <span class="badge bg-warning text-dark" style="font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">{{ __('messages.billing_gateway_beta') }}</span>
+                                    @endif
+                                    @if($gateway['key'] === 'tabby')
+                                        <span class="badge bg-light text-secondary border" style="font-size: 0.75rem; font-weight: normal;">{{ __('messages.billing_gateway_tabby_restriction') }}</span>
+                                    @endif
+                                    @if($gateway['key'] === 'flouci')
+                                        <span class="badge bg-light text-secondary border" style="font-size: 0.75rem; font-weight: normal;">{{ __('messages.billing_gateway_flouci_restriction') }}</span>
+                                    @endif
+                                </h2>
                             </div>
                             <div class="form-check form-switch">
                                 <input class="form-check-input" type="checkbox" name="enabled" id="enabled_{{ $gateway['key'] }}" value="1" @checked(!empty($config['enabled']))>
@@ -222,6 +233,27 @@
                                         <div class="mt-2 p-2 bg-light rounded border">
                                             <div class="small fw-semibold mb-1 text-muted">{{ __('messages.billing_webhook_url_label') }} ({{ __('messages.billing_tabby_webhook_hint') }}):</div>
                                             <code class="user-select-all d-block text-break">{{ route('billing.webhook', ['gateway' => 'tabby']) }}</code>
+                                        </div>
+                                    </div>
+                                @elseif($gateway['key'] === 'flouci')
+                                    <div class="col-md-6">
+                                        <label class="form-label">{{ __('messages.billing_publishable_key_label') }}</label>
+                                        <input type="text" name="public_key" class="form-control" value="{{ old('public_key', $config['public_key'] ?? '') }}">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">{{ __('messages.billing_secret_key_label') }}</label>
+                                        <input type="password" name="secret_key" class="form-control" value="">
+                                        <div class="form-text">
+                                            {{ __('messages.billing_leave_blank_to_keep_secret') }}
+                                            @if(!empty($config['secret_key']))
+                                                {{ __('messages.billing_secret_current_masked', ['value' => $config['secret_key']]) }}
+                                            @endif
+                                        </div>
+                                    </div>
+                                    <div class="col-12 mt-2">
+                                        <div class="p-2 bg-light rounded border">
+                                            <div class="small fw-semibold mb-1 text-muted">{{ __('messages.billing_webhook_url_label') }} ({{ __('messages.billing_flouci_webhook_hint') }}):</div>
+                                            <code class="user-select-all d-block text-break">{{ route('billing.webhook', ['gateway' => 'flouci']) }}</code>
                                         </div>
                                     </div>
                                 @endif

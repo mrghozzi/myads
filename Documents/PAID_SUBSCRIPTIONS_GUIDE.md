@@ -28,10 +28,11 @@ Members can:
   - `Bank Transfer`
   - `Lemon Squeezy`
   - `Paddle`
-  - `Tabby`
+  - `Tabby` (Beta flag, UAE & KSA local currencies only, phone number validation required)
+  - `Flouci` (Beta flag, Tunisia TND only, three-decimal currency conversion in millimes)
 - There is no `auto-renew` in the current release.
 - MYADS must not store card data or sensitive payment identity data.
-- `Stripe`, `PayPal`, `Lemon Squeezy`, `Paddle`, and `Tabby` must use hosted checkout or checkout redirect flows only.
+- `Stripe`, `PayPal`, `Lemon Squeezy`, `Paddle`, `Tabby`, and `Flouci` must use hosted checkout or checkout redirect flows only.
 - `Bank Transfer` uses plain-text instructions plus a receipt image upload.
 - Any code that depends on the new billing tables must follow the project compatibility pattern:
   - `try/catch`
@@ -70,6 +71,7 @@ Members can:
 - `app/Services/Billing/Gateways/LemonSqueezyGateway.php`
 - `app/Services/Billing/Gateways/PaddleGateway.php`
 - `app/Services/Billing/Gateways/TabbyGateway.php`
+- `app/Services/Billing/Gateways/FlouciGateway.php`
 
 ### Support / Settings
 
@@ -452,9 +454,10 @@ This matters because MYADS supports installations that may be partially upgraded
 
 ## 16. Tests
 
-Current reference:
+Current references:
 
 - `tests/Feature/BillingFeatureTest.php`
+- `tests/Feature/FlouciGatewayTest.php`
 
 It currently covers:
 

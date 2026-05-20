@@ -59,6 +59,12 @@ class SubscriptionGatewaySettings
             'region' => 'UAE',
             'supported_currencies' => ['AED', 'SAR', 'KWD', 'BHD', 'OMR', 'QAR'],
         ],
+        'flouci' => [
+            'enabled' => 0,
+            'public_key' => '',
+            'secret_key' => '',
+            'supported_currencies' => ['TND'],
+        ],
     ];
 
     public const SECRET_FIELDS = [
@@ -68,6 +74,7 @@ class SubscriptionGatewaySettings
         'lemon_squeezy' => ['api_key', 'webhook_secret'],
         'paddle' => ['api_key', 'webhook_secret'],
         'tabby' => ['secret_key', 'webhook_secret'],
+        'flouci' => ['secret_key'],
     ];
 
 

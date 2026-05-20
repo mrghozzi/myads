@@ -4,6 +4,7 @@ namespace App\Services\Billing;
 
 use App\Services\Billing\Gateways\BankTransferGateway;
 use App\Services\Billing\Gateways\BillingGatewayInterface;
+use App\Services\Billing\Gateways\FlouciGateway;
 use App\Services\Billing\Gateways\LemonSqueezyGateway;
 use App\Services\Billing\Gateways\PaddleGateway;
 use App\Services\Billing\Gateways\PayPalGateway;
@@ -20,7 +21,8 @@ class BillingGatewayRegistry
         private readonly BankTransferGateway $bankTransfer,
         private readonly LemonSqueezyGateway $lemonSqueezy,
         private readonly PaddleGateway $paddle,
-        private readonly TabbyGateway $tabby
+        private readonly TabbyGateway $tabby,
+        private readonly FlouciGateway $flouci
     ) {
     }
 
@@ -36,6 +38,7 @@ class BillingGatewayRegistry
             'lemon_squeezy' => $this->lemonSqueezy,
             'paddle' => $this->paddle,
             'tabby' => $this->tabby,
+            'flouci' => $this->flouci,
         ];
     }
 

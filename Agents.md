@@ -328,7 +328,7 @@ myads/
 | `/billing/return/{gateway}/{order}` | `/billing/return/stripe/15` | Hosted checkout return handler |
 | `/billing/webhook/{gateway}` | `/billing/webhook/paypal` | Payment gateway webhook endpoint |
 | `/admin/billing` | `/admin/billing` | Admin billing overview and financial hub |
-| `/admin/billing/gateways` | `/admin/billing/gateways` | Admin gateway configuration for Stripe, PayPal, Bank Transfer, Lemon Squeezy, and Paddle |
+| `/admin/billing/gateways` | `/admin/billing/gateways` | Admin gateway configuration for Stripe, PayPal, Bank Transfer, Lemon Squeezy, Paddle, Tabby, and Flouci |
 | `/admin/orders` | `/admin/orders` | Admin marketplace moderation dashboard under the `community` ACL scope |
 | `/admin/settings/mail` | `/admin/settings/mail` | Database-driven mail configuration (SMTP, sendmail, log, array) |
 | `/admin/media` | `/admin/media` | Admin Media Manager dashboard and file operations |
@@ -869,6 +869,9 @@ php artisan storage:link
 - **Fix (2026-05-20):** Resolved an issue where Knowledgebase community feed posts displayed the publisher as "Guest" (زائر) instead of the correct author. Restructured `StatusActivityService` and `Status` accessors to preserve and dynamically hydrate Eloquent relations.
 - **Search (2026-05-20):** Integrated full-text search support for Knowledgebase articles within the community portal search (`/portal?search={text}`), rendering matching results via the activity rendering view.
 - **Testing (2026-05-20):** Added new unit and feature tests to `StoreProductKnowledgebaseUiTest.php` verifying relation hydration and portal search index functionality.
+- **Feature (2026-05-20):** Integrated **Flouci** payment gateway, supporting checkout redirection, three-decimal currency conversion (millimes) for Tunisian Dinars, server-side callback/webhook verification, and translation keys (EN/AR).
+- **UI/UX (2026-05-20):** Added `Beta` badges next to Tabby and Flouci headings on the admin gateways dashboard, alongside geographic and currency restriction alerts (Tabby for KSA/UAE in local currencies, Flouci for Tunisia in TND only). Added Webhook URL copy/display sections for Flouci.
+- **Testing (2026-05-20):** Created `FlouciGatewayTest` verifying redirect behavior, return validations, and webhook notifications.
 
 ---
 
@@ -929,4 +932,4 @@ If in doubt, update it. An outdated `Agents.md` causes future agents to make wro
 
 ---
 
-*Last updated: 2026-05-20 — MYADS v4.3.3 (Knowledgebase publisher and portal search)*
+*Last updated: 2026-05-20 — MYADS v4.3.3 (Knowledgebase publisher, portal search, and Flouci gateway integration)*

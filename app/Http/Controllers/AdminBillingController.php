@@ -521,6 +521,11 @@ class AdminBillingController extends Controller
                 'merchant_code' => 'nullable|string|max:255',
                 'webhook_secret' => 'nullable|string|max:500',
             ],
+            'flouci' => [
+                ...$baseRules,
+                'public_key' => 'nullable|string|max:255',
+                'secret_key' => 'nullable|string|max:500',
+            ],
             default => abort(404),
         };
 
