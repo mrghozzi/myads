@@ -104,7 +104,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'oauth/token',
         ]);
     })
-    ->withExceptions(function (Exceptions $exceptions): void {
+    ->withExceptions(function (Exceptions $exceptions) use ($isTestingContext): void {
         // Force the application to use our themed error views
         $exceptions->render(function (\Symfony\Component\HttpKernel\Exception\HttpExceptionInterface $e) {
             $code = $e->getStatusCode();
@@ -124,7 +124,7 @@ return Application::configure(basePath: dirname(__DIR__))
         });
 
         // Redirect to installer if APP_KEY is missing (fresh install)
-        $exceptions->renderable(function (\Illuminate\Encryption\MissingAppKeyException $e) {
+        $exceptions->renderable(function (\Illuminate\Encryption\MissingAppKeyException $e) use ($isTestingContext) {
             if ($isTestingContext) {
                 throw $e;
             }
