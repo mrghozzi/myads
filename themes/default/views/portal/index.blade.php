@@ -248,6 +248,16 @@
         @if(!empty($search))
             <h2 class="section-title" style="margin-bottom: 24px;">{{ __('messages.search') }}: "{{ $search }}"</h2>
 
+            <!-- Community Updates Search Results -->
+            @if(isset($searchedStatuses) && $searchedStatuses->count() > 0)
+                <h3 style="margin-bottom: 16px;">{{ __('messages.activities') }}</h3>
+                <div style="display: grid; grid-gap: 16px; margin-bottom: 32px;">
+                    @foreach($searchedStatuses as $activity)
+                        @include('theme::partials.activity.render', ['activity' => $activity])
+                    @endforeach
+                </div>
+            @endif
+
             <!-- Users Search Results -->
             @if(isset($searchedUsers) && $searchedUsers->count() > 0)
                 <h3 style="margin-bottom: 16px;">{{ __('messages.members') }}</h3>

@@ -1,5 +1,5 @@
 # v4.3.3
-> **Maintenance & Feature Release** — Tabby payment gateway integration, admin webhook configuration hints, multimedia posts, comment replies, enhanced activity stickers, SEO structured data fixes, admin moderation tools, and system stability.
+> **Maintenance & Feature Release** — Tabby payment gateway integration, admin webhook configuration hints, multimedia posts, comment replies, enhanced activity stickers, SEO structured data fixes, admin moderation tools, knowledgebase publisher fixes, portal search integration, and system stability.
 
 ### Paid Subscriptions & Billing
 * **Feature**: Integrated **Tabby** as a fully supported payment gateway for the subscription and paid plans system, processing checkout sessions via their Checkout API.
@@ -68,6 +68,10 @@
 * **UX**: Added a dedicated **Reply** button to every comment, facilitating faster community interaction.
 * **Automation**: Clicking "Reply" automatically pre-fills the comment composer with the author's `@username` and triggers the browser's focus on the input area.
 * **UX**: Implemented **Smooth-Scroll** logic to ensure the comment box is centered and visible immediately after clicking a reply action.
+
+### Knowledgebase & Community Search
+* **Fix**: Resolved an issue where Knowledgebase community feed posts showed the publisher's name as "Guest" (زائر) instead of the correct author. Enforced relations preservation in `StatusActivityService` and dynamic hydration of author and product models in the `Status` model's `related_content` accessor.
+* **Feature**: Added full-text search support for Knowledgebase articles within the community portal search (`/portal?search={text}`). Matching articles and their associated feed cards are now returned and correctly rendered in the search results layout.
 
 ---
 

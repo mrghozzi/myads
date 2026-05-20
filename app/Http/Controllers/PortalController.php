@@ -13,6 +13,8 @@ use App\Models\ForumTopic;
 use App\Models\Directory;
 use App\Models\Product;
 use App\Models\News;
+use App\Models\Option;
+use App\Services\KnowledgebaseCommunityService;
 
 class PortalController extends Controller
 {
@@ -53,15 +55,23 @@ class PortalController extends Controller
                 $newsIds = News::whereRaw("MATCH(name, text) AGAINST(? IN BOOLEAN MODE)", [$search])
                     ->pluck('id');
 
+                $kbIds = Option::where('o_type', 'knowledgebase')
+                    ->where('o_order', 0)
+                    ->whereRaw("MATCH(name, o_valuer) AGAINST(? IN BOOLEAN MODE)", [$search])
+                    ->pluck('id');
+
                 $searchedStatuses = Status::visible()
                 ->when(!empty($hiddenDirectoryStatusIds), fn ($query) => $query->whereNotIn('id', $hiddenDirectoryStatusIds))
-                ->where(function ($q) use ($topicIds, $dirIds, $newsIds) {
+                ->where(function ($q) use ($topicIds, $dirIds, $newsIds, $kbIds) {
                     $q->whereIn('tp_id', $topicIds)->whereIn('s_type', [2, 4, 100, 10, 11, 12, 13, 14])
                       ->orWhere(function ($q2) use ($dirIds) {
                           $q2->whereIn('tp_id', $dirIds)->where('s_type', 1);
                       })
                       ->orWhere(function ($q3) use ($newsIds) {
                           $q3->whereIn('tp_id', $newsIds)->where('s_type', 5);
+                      })
+                      ->orWhere(function ($q4) use ($kbIds) {
+                          $q4->whereIn('tp_id', $kbIds)->where('s_type', KnowledgebaseCommunityService::STATUS_TYPE);
                       });
                 })
                 ->orderBy('date', 'desc')

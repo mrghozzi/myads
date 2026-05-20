@@ -221,10 +221,20 @@ class Status extends Model
         } elseif ($this->s_type == 6) {
             return OrderRequest::find($this->tp_id);
         } elseif ((int) $this->s_type === KnowledgebaseCommunityService::STATUS_TYPE) {
-            return Option::query()
+            $article = Option::query()
                 ->where('id', $this->tp_id)
                 ->where('o_type', 'knowledgebase')
                 ->first();
+            if ($article) {
+                $product = Product::withoutGlobalScope('store')
+                    ->where('o_type', 'store')
+                    ->where('name', $article->o_mode)
+                    ->first();
+                $author = (int) $article->o_parent > 0 ? User::find((int) $article->o_parent) : null;
+                $article->setRelation('productItem', $product);
+                $article->setRelation('authorUser', $author);
+            }
+            return $article;
         }
         return null;
     }

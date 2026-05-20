@@ -55,7 +55,9 @@ class StatusActivityService
 
         switch ((int) $activity->s_type) {
             case 1:
-                $activity->related_content = Directory::find($activity->tp_id);
+                $directory = Directory::find($activity->tp_id);
+                $activity->setRelation('directoryListing', $directory);
+                $activity->related_content = $directory;
                 $activity->type_label = 'Directory';
                 break;
             case 2:
@@ -66,7 +68,9 @@ class StatusActivityService
             case 13:
             case 14:
             case 100:
-                $activity->related_content = ForumTopic::with(['attachments', 'imageOption'])->find($activity->tp_id);
+                $topic = ForumTopic::with(['attachments', 'imageOption'])->find($activity->tp_id);
+                $activity->setRelation('forumTopic', $topic);
+                $activity->related_content = $topic;
                 $activity->type_label = match((int) $activity->s_type) {
                     10 => 'Video',
                     11 => 'Audio',
@@ -77,15 +81,19 @@ class StatusActivityService
                 };
                 break;
             case 7867:
-                $activity->related_content = Product::withoutGlobalScope('store')->find($activity->tp_id);
+                $product = Product::withoutGlobalScope('store')->find($activity->tp_id);
+                $activity->setRelation('productItem', $product);
+                $activity->related_content = $product;
                 $activity->type_label = 'Store';
                 break;
             case 5:
-                $activity->related_content = News::find($activity->tp_id);
+                $news = News::find($activity->tp_id);
+                $activity->setRelation('newsItem', $news);
+                $activity->related_content = $news;
                 $activity->type_label = 'News';
                 break;
             case 6:
-                $activity->related_content = OrderRequest::with([
+                $order = OrderRequest::with([
                     'user',
                     'awardedOffer.user',
                     'contract.provider',
@@ -94,10 +102,14 @@ class StatusActivityService
                         'offers as offers_count' => fn ($query) => $query->marketplaceVisible(),
                     ])
                     ->find($activity->tp_id);
+                $activity->setRelation('orderRequest', $order);
+                $activity->related_content = $order;
                 $activity->type_label = 'Order';
                 break;
             case KnowledgebaseCommunityService::STATUS_TYPE:
-                $activity->related_content = $this->hydrateKnowledgebaseArticle($activity->tp_id);
+                $article = $this->hydrateKnowledgebaseArticle($activity->tp_id);
+                $activity->setRelation('knowledgebaseItem', $article);
+                $activity->related_content = $article;
                 $activity->type_label = 'Knowledgebase';
                 break;
         }

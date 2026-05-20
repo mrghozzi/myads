@@ -866,6 +866,9 @@ php artisan storage:link
 - **Feature (2026-05-19):** Integrated the **Tabby** payment gateway, supporting checkout redirection, region selection (UAE/KSA), phone number validation during checkout, and Timing-Safe webhook verification.
 - **UI/UX (2026-05-19):** Enhanced `/admin/billing/gateways` by adding Webhook URL copy/display sections for Stripe and PayPal, matching other gateways.
 - **i18n & Tests (2026-05-19):** Fully localized Tabby config inputs, validation errors, and Stripe/PayPal webhook URL instructions. Added tests in `BillingFeatureTest` to verify checkout validation, session creation, redirects, and signature-verified webhook parsing.
+- **Fix (2026-05-20):** Resolved an issue where Knowledgebase community feed posts displayed the publisher as "Guest" (زائر) instead of the correct author. Restructured `StatusActivityService` and `Status` accessors to preserve and dynamically hydrate Eloquent relations.
+- **Search (2026-05-20):** Integrated full-text search support for Knowledgebase articles within the community portal search (`/portal?search={text}`), rendering matching results via the activity rendering view.
+- **Testing (2026-05-20):** Added new unit and feature tests to `StoreProductKnowledgebaseUiTest.php` verifying relation hydration and portal search index functionality.
 
 ---
 
@@ -926,4 +929,4 @@ If in doubt, update it. An outdated `Agents.md` causes future agents to make wro
 
 ---
 
-*Last updated: 2026-05-19 — MYADS v4.3.3 (Tabby payment integration)*
+*Last updated: 2026-05-20 — MYADS v4.3.3 (Knowledgebase publisher and portal search)*

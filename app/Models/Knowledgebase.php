@@ -19,6 +19,7 @@ class Knowledgebase extends Model
         'o_type',    // 'knowledgebase'
         'o_mode',    // Category
         'o_order',   // Order
+        'o_parent',  // Publisher ID
     ];
 
     protected static function booted()
@@ -31,6 +32,9 @@ class Knowledgebase extends Model
             $model->o_type = 'knowledgebase';
             if (!isset($model->o_order)) {
                 $model->o_order = 0;
+            }
+            if (!isset($model->o_parent) || (int) $model->o_parent === 0) {
+                $model->o_parent = auth()->id() ?? 1;
             }
         });
     }

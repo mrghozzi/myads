@@ -445,6 +445,55 @@ class StoreProductKnowledgebaseUiTest extends TestCase
             ->assertSee($author->username);
     }
 
+    public function test_knowledgebase_publisher_name_renders_correctly_on_feed(): void
+    {
+        $this->seedThemeSetting();
+        $this->createAdmin();
+        $owner = User::factory()->create();
+        $author = User::factory()->create(['username' => 'kb_author_user']);
+        $product = $this->createStoreProduct($owner, 'test-product');
+        $article = $this->createKnowledgebaseArticle($product, 'setup-guide', $author->id);
+        $status = $this->createKnowledgebaseCommunityStatus($article, $author);
+
+        $decoratedStatus = app(\App\Services\StatusActivityService::class)->decorate($status);
+        
+        $this->assertNotNull($decoratedStatus->knowledgebaseItem);
+        $this->assertEquals('kb_author_user', $decoratedStatus->knowledgebaseItem->authorUser->username);
+
+        $viewHtml = view('theme::partials.activity.render', ['activity' => $decoratedStatus])->render();
+        
+        $this->assertStringContainsString('kb_author_user', $viewHtml);
+        $this->assertStringNotContainsString('Guest', $viewHtml);
+        $this->assertStringNotContainsString('زائر', $viewHtml);
+    }
+
+    public function test_knowledgebase_search_finds_article_on_portal(): void
+    {
+        $this->seedThemeSetting();
+        $this->createAdmin();
+        $owner = User::factory()->create();
+        $author = User::factory()->create(['username' => 'search_author']);
+        $product = $this->createStoreProduct($owner, 'search-product');
+        $article = Option::create([
+            'name' => 'UniqueSearchTermHere',
+            'o_valuer' => 'Some guide body content description',
+            'o_type' => 'knowledgebase',
+            'o_parent' => $author->id,
+            'o_order' => 0,
+            'o_mode' => $product->name,
+        ]);
+        $status = $this->createKnowledgebaseCommunityStatus($article, $author);
+
+        $this->assertDatabaseHas('options', ['name' => 'UniqueSearchTermHere', 'o_type' => 'knowledgebase']);
+
+        $response = $this->actingAs($author)
+            ->get(route('portal.index', ['search' => 'UniqueSearchTermHere']));
+
+        $response->assertOk();
+        $response->assertSee('UniqueSearchTermHere');
+        $response->assertSee('search_author');
+    }
+
     private function seedThemeSetting(): void
     {
         Setting::create([
