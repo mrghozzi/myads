@@ -47,12 +47,15 @@
 * **Security**: Hardened the delivery notes visualization with a strict privacy check, ensuring notes (which may contain sensitive links or credentials) are only visible to the Client (order creator), the Provider (awarded user), or system Administrators.
 
 ### Maintenance & Stability
+* **Improvement**: Updated the routing behavior so that logged-in users visiting the root path (`/`) or guest-only routes (such as `/login` or `/register`) are redirected directly to the Community Feed (`/portal`) instead of the default Home Dashboard (`/home`).
+* **Fix**: Resolved a scope issue in `bootstrap/app.php` where the `$isTestingContext` variable was accessed inside exception-handling closures without being imported via `use ($isTestingContext)`.
 * **Fix**: Resolved a critical PHP **Array-to-String Conversion Error** in the Billing Dashboard and Member Active Sessions views by replacing manual array rendering of `$upgradeNotice` with the structured `upgrade_notice` partial.
 * **Fix**: Hardened the admin notification aggregator (`AdminNotificationService`) to check database schema compatibility using `V420SchemaService` before querying `billing_orders` or `groups`, preventing system-wide 500 errors on incomplete upgrades or database maintenance.
 * **Fix**: Resolved a critical **503 Service Unavailable** error that occurred during the login process, preventing unintended maintenance mode loops.
 * **Fix**: Hardened the system version check middleware to prevent false-positive maintenance triggers during session transitions.
 * **Architecture**: Improved maintenance mode bypass logic to ensure emergency access is always available for authorized administrators.
 * **Test**: Upgraded `BillingFeatureTest` suite reliability by correctly aligning simulated activation timelines for queued subscriptions and correcting scoped admin user ID allocation, ensuring a 100% green test pass rate.
+* **Test**: Added feature test coverage in `MainRouteRedirectTest` to verify that guests see the welcome page and logged-in users are correctly redirected to `/portal` on root/guest paths.
 
 ### Core Performance
 * **Optimization**: Refined the `SeoManager` token resolution logic to reduce redundant metadata fetching on high-traffic pages.
