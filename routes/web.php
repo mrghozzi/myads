@@ -192,6 +192,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/billing/orders/{order}/receipt', [BillingController::class, 'showReceipt'])->name('billing.orders.receipt.show');
     Route::post('/billing/orders/{order}/receipt', [BillingController::class, 'uploadReceipt'])->name('billing.orders.receipt.update');
     Route::get('/billing/return/{gateway}/{order}', [BillingController::class, 'handleReturn'])->name('billing.return');
+    Route::get('/billing/apple-pay/simulate/{order}', [BillingController::class, 'simulateApplePay'])->name('billing.apple_pay.simulate');
 });
 
 Route::post('/billing/webhook/{gateway}', [BillingController::class, 'handleWebhook'])->name('billing.webhook');

@@ -321,6 +321,7 @@ myads/
 | `/plans` | `/plans` | Public/member paid plans catalog (hidden when billing is disabled) |
 | `/settings/billing` | `/settings/billing` | Member billing dashboard and subscription history |
 | `/billing/orders/{order}` | `/billing/orders/15` | Member order details and bank-transfer receipt upload |
+| `/billing/apple-pay/simulate/{order}` | `/billing/apple-pay/simulate/15` | Premium Apple Pay FaceID simulation checkout screen |
 | `/orders` | `/orders?status=open` | Service marketplace discovery and filtering |
 | `/orders/mine` | `/orders/mine` | Member dashboard for owned service requests |
 | `/orders/offers` | `/orders/offers` | Provider dashboard for submitted marketplace offers |
@@ -328,7 +329,7 @@ myads/
 | `/billing/return/{gateway}/{order}` | `/billing/return/stripe/15` | Hosted checkout return handler |
 | `/billing/webhook/{gateway}` | `/billing/webhook/paypal` | Payment gateway webhook endpoint |
 | `/admin/billing` | `/admin/billing` | Admin billing overview and financial hub |
-| `/admin/billing/gateways` | `/admin/billing/gateways` | Admin gateway configuration for Stripe, PayPal, Bank Transfer, Lemon Squeezy, Paddle, Tabby, and Flouci |
+| `/admin/billing/gateways` | `/admin/billing/gateways` | Admin gateway configuration for Stripe, PayPal, Bank Transfer, Lemon Squeezy, Paddle, Tabby, Flouci, and Apple Pay |
 | `/admin/orders` | `/admin/orders` | Admin marketplace moderation dashboard under the `community` ACL scope |
 | `/admin/settings/mail` | `/admin/settings/mail` | Database-driven mail configuration (SMTP, sendmail, log, array) |
 | `/admin/media` | `/admin/media` | Admin Media Manager dashboard and file operations |
@@ -466,7 +467,7 @@ admin/mail_settings.blade.php → Database-driven mail configuration form
 ### Paid Subscriptions & Billing (v4.3.0)
 - **Feature Toggle:** System-wide billing state is stored in `options` via `App\Support\SubscriptionSettings` (`o_type = subscription_settings`) and can be enabled/disabled from `/admin/billing/settings`
 - **Gateway Config:** Per-gateway settings live in `options` via `App\Support\SubscriptionGatewaySettings` (`o_type = subscription_gateway_settings`); secrets are encrypted with Laravel `Crypt` and masked in admin
-- **Supported Gateways:** First-party billing release supports `Stripe`, `PayPal`, `Bank Transfer`, `Lemon Squeezy`, `Paddle`, and `Tabby`
+- **Supported Gateways:** First-party billing release supports `Stripe`, `PayPal`, `Bank Transfer`, `Lemon Squeezy`, `Paddle`, `Tabby`, `Flouci`, and `Apple Pay`
 - **Routes:** Member flows use `/plans`, `/settings/billing`, `/billing/orders/{order}`, `/billing/return/{gateway}/{order}`, and `/billing/webhook/{gateway}`; admin flows live under `/admin/billing/*`
 - **Hosted Checkout Rule:** `Stripe` and `PayPal` must use hosted external checkout only; MYADS must not collect card data or personal payment data directly
 - **Manual Review Flow:** `Bank Transfer` orders move through `pending_receipt` → `pending_review` → `paid`/`rejected`, with receipt uploads stored under `public/upload/billing/receipts/`

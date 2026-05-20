@@ -65,6 +65,12 @@ class SubscriptionGatewaySettings
             'secret_key' => '',
             'supported_currencies' => ['TND'],
         ],
+        'apple_pay' => [
+            'enabled' => 0,
+            'mode' => 'sandbox',
+            'merchant_id' => '',
+            'supported_currencies' => ['USD', 'EUR', 'AED', 'SAR'],
+        ],
     ];
 
     public const SECRET_FIELDS = [
@@ -75,6 +81,7 @@ class SubscriptionGatewaySettings
         'paddle' => ['api_key', 'webhook_secret'],
         'tabby' => ['secret_key', 'webhook_secret'],
         'flouci' => ['secret_key'],
+        'apple_pay' => [],
     ];
 
 

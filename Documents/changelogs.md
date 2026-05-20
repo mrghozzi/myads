@@ -1,18 +1,21 @@
 # v4.3.3
-> **Maintenance & Feature Release** — Tabby and Flouci payment gateway integrations, beta flags & geographical restrictions, admin webhook configuration hints, multimedia posts, comment replies, enhanced activity stickers, SEO structured data fixes, admin moderation tools, knowledgebase publisher fixes, portal search integration, and system stability.
+> **Maintenance & Feature Release** — Apple Pay, Tabby, and Flouci payment gateway integrations, beta flags & geographical restrictions, admin webhook configuration hints, multimedia posts, comment replies, enhanced activity stickers, SEO structured data fixes, admin moderation tools, knowledgebase publisher fixes, portal search integration, and system stability.
 
 ### Paid Subscriptions & Billing
+* **Feature**: Integrated **Apple Pay** as a fully supported payment gateway for the subscription and paid plans system, processing checkout sessions via standard Laravel billing structures.
 * **Feature**: Integrated **Tabby** as a fully supported payment gateway for the subscription and paid plans system, processing checkout sessions via their Checkout API.
 * **Feature**: Integrated **Flouci** as a fully supported Tunisian payment gateway for the subscription and paid plans system, processing checkout sessions via their Generate Payment API.
+* **Feature**: Added dynamic gateway configuration for Apple Pay in the admin panel (`/admin/billing/gateways`), supporting Sandbox/Live mode, Merchant ID setup, and multi-select dynamic currency selection (USD, EUR, AED, SAR).
 * **Feature**: Added dynamic gateway configuration for Tabby in the admin panel (`/admin/billing/gateways`), supporting Region selection (UAE vs. KSA), Public Key, Secret Key, Merchant Code, and Webhook Secret setup.
 * **Feature**: Added dynamic gateway configuration for Flouci in the admin panel (`/admin/billing/gateways`), supporting Public Key and Secret Key setup.
 * **Feature**: Implemented automatic validation on the plan selection screen requiring members to provide their phone number when checking out using Tabby.
 * **Feature**: Implemented Timing-Safe Webhook signature verification for Tabby payments to securely capture authorized funds and activate paid member subscriptions asynchronously.
 * **Feature**: Implemented automatic conversion for Tunisian Dinar (TND) using three decimal places (millimes) when interacting with the Flouci API.
 * **Feature**: Implemented server-side callback and webhook verification for Flouci transactions.
+* **UX**: Developed a premium, glassmorphic **Apple Pay Simulation Screen** (`/billing/apple-pay/simulate/{order}`) that features a simulated mobile FaceID overlay and double-click processing interaction, providing a high-fidelity checkout simulation before redirecting to the return handler.
 * **UX**: Added `Beta` badges next to Tabby and Flouci titles in the admin gateways dashboard, alongside geographic and currency restriction alerts (Tabby for KSA/UAE in local currencies, Flouci for Tunisia in TND only).
 * **UX**: Added Webhook URL display helper and instruction blocks for **Stripe**, **PayPal**, and **Flouci** in the admin gateways configuration page, matching existing patterns for Lemon Squeezy, Paddle, and Tabby.
-* **i18n & Tests**: Fully localized the Tabby and Flouci payment options, validation messages, and Webhook URL helper/hint strings in English and Arabic. Added unit and feature test coverage for checkout redirects, validation rules, return redirects, and webhook payload parsing.
+* **i18n & Tests**: Fully localized Apple Pay, Tabby, and Flouci payment options, configuration inputs, validation messages, and simulation notice strings in English and Arabic. Added unit and feature test coverage for checkout redirects, validation rules, return redirects, and checkout simulations.
 
 ### Multimedia Community Posts
 * **Feature**: Introduced **Multimedia Post Types** to the community feed, allowing members to publish **Video**, **Audio**, **Files**, **Music**, and **Reels** directly.

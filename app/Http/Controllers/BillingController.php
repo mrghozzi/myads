@@ -426,4 +426,27 @@ class BillingController extends Controller
 
         return 'private/billing/receipts/' . basename($relativePath);
     }
+
+    public function simulateApplePay(int $order)
+    {
+        abort_unless($this->schema->supports('subscriptions_billing'), 404);
+
+        $orderModel = BillingOrder::query()
+            ->where('user_id', auth()->id())
+            ->with('plan')
+            ->findOrFail($order);
+
+        if ($orderModel->gateway !== 'apple_pay') {
+            return redirect()->route('billing.orders.show', $order)
+                ->with('error', __('messages.billing_invalid_return_state'));
+        }
+
+        return view('theme::billing.apple_pay_simulate', [
+            'order' => $orderModel,
+            'returnUrl' => route('billing.return', [
+                'gateway' => 'apple_pay',
+                'order' => $orderModel->id,
+            ]),
+        ]);
+    }
 }

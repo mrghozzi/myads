@@ -30,9 +30,10 @@ Members can:
   - `Paddle`
   - `Tabby` (Beta flag, UAE & KSA local currencies only, phone number validation required)
   - `Flouci` (Beta flag, Tunisia TND only, three-decimal currency conversion in millimes)
+  - `Apple Pay` (Premium mobile simulation with high-fidelity glassmorphic FaceID double-click overlay flow)
 - There is no `auto-renew` in the current release.
 - MYADS must not store card data or sensitive payment identity data.
-- `Stripe`, `PayPal`, `Lemon Squeezy`, `Paddle`, `Tabby`, and `Flouci` must use hosted checkout or checkout redirect flows only.
+- `Stripe`, `PayPal`, `Lemon Squeezy`, `Paddle`, `Tabby`, `Flouci`, and `Apple Pay` must use hosted checkout or checkout redirect/simulation flows only.
 - `Bank Transfer` uses plain-text instructions plus a receipt image upload.
 - Any code that depends on the new billing tables must follow the project compatibility pattern:
   - `try/catch`
@@ -72,6 +73,7 @@ Members can:
 - `app/Services/Billing/Gateways/PaddleGateway.php`
 - `app/Services/Billing/Gateways/TabbyGateway.php`
 - `app/Services/Billing/Gateways/FlouciGateway.php`
+- `app/Services/Billing/Gateways/ApplePayGateway.php`
 
 ### Support / Settings
 
@@ -85,6 +87,7 @@ Members can:
 - `themes/default/views/billing/plans.blade.php`
 - `themes/default/views/billing/dashboard.blade.php`
 - `themes/default/views/billing/order.blade.php`
+- `themes/default/views/billing/apple_pay_simulate.blade.php`
 - `themes/default/views/billing/partials/*`
 
 #### Admin views
@@ -215,6 +218,7 @@ Each gateway has its own stored payload, for example:
 - `supported_currencies`
 - provider keys and secrets
 - `instructions` and `note` for bank transfer
+- For `Apple Pay`: `enabled` (boolean), `mode` (`sandbox` / `live`), `merchant_id` (string), `supported_currencies` (array of supported currency codes: `USD`, `EUR`, `AED`, `SAR`)
 
 Important notes:
 
@@ -230,6 +234,7 @@ Important notes:
 - `GET /settings/billing` -> `billing.dashboard`
 - `POST /plans/{plan}/purchase` -> `billing.purchase`
 - `GET /billing/orders/{order}` -> `billing.orders.show`
+- `GET /billing/apple-pay/simulate/{order}` -> `billing.apple_pay.simulate`
 - `POST /billing/orders/{order}/receipt` -> `billing.orders.receipt.update`
 - `GET /billing/return/{gateway}/{order}` -> `billing.return`
 - `POST /billing/webhook/{gateway}` -> `billing.webhook`
@@ -301,6 +306,20 @@ All admin billing routes live under `/admin/billing/*`:
 4. The admin either:
    - approves it -> order becomes `paid` and the subscription is activated
    - rejects it -> order becomes `rejected` with `admin_note` and `rejected_at`
+
+### 8.3 Apple Pay Simulated purchase
+
+1. The member selects a plan, gateway (Apple Pay), and currency on `/plans`.
+2. `BillingController@purchase` validates:
+   - System is enabled
+   - Apple Pay gateway is enabled
+   - Selected currency is supported by Apple Pay (`USD`, `EUR`, `AED`, `SAR`)
+3. `SubscriptionLifecycleService::createOrder()` creates a `billing_orders` row.
+4. The member is redirected to `/billing/apple-pay/simulate/{order}`.
+5. The screen presents a premium FaceID overlay:
+   - Clicking "Pay with Apple Pay" initiates the payment modal sheet.
+   - The user must **double-click** the side button inside the simulated overlay to run the Mock FaceID scanning and transaction processing.
+6. Upon successful simulation, the script redirects the user back to the gateway return handler with successful mock payload parameters `status=success` and `transaction_id=ap_sim_[timestamp]`, activating the subscription.
 
 ## 9. Subscription Lifecycle Logic
 

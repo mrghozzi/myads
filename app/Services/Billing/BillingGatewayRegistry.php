@@ -2,6 +2,7 @@
 
 namespace App\Services\Billing;
 
+use App\Services\Billing\Gateways\ApplePayGateway;
 use App\Services\Billing\Gateways\BankTransferGateway;
 use App\Services\Billing\Gateways\BillingGatewayInterface;
 use App\Services\Billing\Gateways\FlouciGateway;
@@ -22,7 +23,8 @@ class BillingGatewayRegistry
         private readonly LemonSqueezyGateway $lemonSqueezy,
         private readonly PaddleGateway $paddle,
         private readonly TabbyGateway $tabby,
-        private readonly FlouciGateway $flouci
+        private readonly FlouciGateway $flouci,
+        private readonly ApplePayGateway $applePay
     ) {
     }
 
@@ -39,6 +41,7 @@ class BillingGatewayRegistry
             'paddle' => $this->paddle,
             'tabby' => $this->tabby,
             'flouci' => $this->flouci,
+            'apple_pay' => $this->applePay,
         ];
     }
 

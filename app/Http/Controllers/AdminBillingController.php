@@ -526,6 +526,11 @@ class AdminBillingController extends Controller
                 'public_key' => 'nullable|string|max:255',
                 'secret_key' => 'nullable|string|max:500',
             ],
+            'apple_pay' => [
+                ...$baseRules,
+                'mode' => 'required|in:sandbox,live',
+                'merchant_id' => 'nullable|string|max:255',
+            ],
             default => abort(404),
         };
 

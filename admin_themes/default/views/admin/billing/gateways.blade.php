@@ -41,7 +41,7 @@
                                 <span class="admin-panel__eyebrow">{{ __('messages.billing_gateways_tab') }}</span>
                                 <h2 class="admin-panel__title d-inline-flex align-items-center flex-wrap gap-2">
                                     <span>{{ $gateway['label'] }}</span>
-                                    @if(in_array($gateway['key'], ['tabby', 'flouci'], true))
+                                    @if(in_array($gateway['key'], ['tabby', 'flouci', 'apple_pay'], true))
                                         <span class="badge bg-warning text-dark" style="font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">{{ __('messages.billing_gateway_beta') }}</span>
                                     @endif
                                     @if($gateway['key'] === 'tabby')
@@ -255,6 +255,12 @@
                                             <div class="small fw-semibold mb-1 text-muted">{{ __('messages.billing_webhook_url_label') }} ({{ __('messages.billing_flouci_webhook_hint') }}):</div>
                                             <code class="user-select-all d-block text-break">{{ route('billing.webhook', ['gateway' => 'flouci']) }}</code>
                                         </div>
+                                    </div>
+                                @elseif($gateway['key'] === 'apple_pay')
+                                    <div class="col-md-6">
+                                        <label class="form-label">{{ __('messages.billing_apple_merchant_id_label') }}</label>
+                                        <input type="text" name="merchant_id" class="form-control" value="{{ old('merchant_id', $config['merchant_id'] ?? '') }}">
+                                        <div class="form-text">{{ __('messages.billing_apple_merchant_id_help') }}</div>
                                     </div>
                                 @endif
 
