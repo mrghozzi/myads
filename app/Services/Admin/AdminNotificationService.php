@@ -147,6 +147,6 @@ class AdminNotificationService
             }
         }
 
-        return $notifications;
+        return \App\Helpers\Hooks::apply_filters('admin_notifications', $notifications, $user);
     }
 }
