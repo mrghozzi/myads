@@ -45,6 +45,7 @@ class PluginServiceProvider extends ServiceProvider
         if (app()->environment('testing')) {
             $activePlugins[] = 'arabic-fixer';
             $activePlugins[] = 'groq-adstn-publisher';
+            $activePlugins[] = 'monetization';
         }
                              
         if (empty($activePlugins)) {
@@ -67,11 +68,13 @@ class PluginServiceProvider extends ServiceProvider
             } else if (app()->environment('testing')) {
                 $activeDirs[] = 'arabic-fixer';
                 $activeDirs[] = 'groq-adstn-publisher';
+                $activeDirs[] = 'monetization';
             }
         } catch (\Exception $e) {
             if (app()->environment('testing')) {
                 $activeDirs[] = 'arabic-fixer';
                 $activeDirs[] = 'groq-adstn-publisher';
+                $activeDirs[] = 'monetization';
             } else {
                 return;
             }

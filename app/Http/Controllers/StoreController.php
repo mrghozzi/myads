@@ -185,6 +185,31 @@ class StoreController extends Controller
             abort(403, __('messages.product_suspended_notice'));
         }
 
+        // Fetch license if purchased
+        $license = null;
+        if (Auth::check()) {
+            $license = DB::table('product_licenses')
+                ->where('user_id', Auth::id())
+                ->where('product_id', $product->id)
+                ->first();
+
+            // If the user is the owner/creator of the product, auto-generate a free license if they don't have one
+            if (!$license && Auth::id() == $product->o_parent) {
+                $licenseKey = 'ADSTN-' . implode('-', str_split(strtoupper(Str::random(16)), 4));
+                DB::table('product_licenses')->insert([
+                    'user_id' => Auth::id(),
+                    'product_id' => $product->id,
+                    'license_key' => $licenseKey,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+                $license = DB::table('product_licenses')
+                    ->where('user_id', Auth::id())
+                    ->where('product_id', $product->id)
+                    ->first();
+            }
+        }
+
         $this->seo([
             'scope_key' => 'store_show',
             'content_type' => 'product',
@@ -200,7 +225,7 @@ class StoreController extends Controller
             ],
         ]);
 
-        return view('theme::store.show', compact('product', 'status', 'type', 'topic', 'latestFile', 'downloadHash', 'downloadCount', 'files', 'canManageProduct', 'isSuspended'));
+        return view('theme::store.show', compact('product', 'status', 'type', 'topic', 'latestFile', 'downloadHash', 'downloadCount', 'files', 'canManageProduct', 'isSuspended', 'license'));
     }
 
     public function create()
@@ -306,17 +331,81 @@ class StoreController extends Controller
             return redirect()->back()->with('error', __('messages.product_suspended_notice'));
         }
 
-        if ($user->id == $product->o_parent) {
+        if ($this->ensureLicense($user, $product)) {
             return $this->processDownload($product);
         }
 
-        $price = $product->o_order;
-        if ($price > 0) {
-            if ($user->pts < $price) {
-                return redirect()->back()->with('error', __('not_enough_points'));
-            }
+        return redirect()->back()->with('error', __('not_enough_points'));
+    }
 
-            DB::transaction(function () use ($user, $product, $price) {
+    public function downloadByHash(Request $request, $hash)
+    {
+        $short = Short::where('sho', $hash)->where('sh_type', 7867)->firstOrFail();
+        $fileOption = ProductFile::where('id', $short->tp_id)->firstOrFail();
+        $product = Product::withoutGlobalScope('store')->where('o_type', 'store')->where('id', $fileOption->o_parent)->firstOrFail();
+        $user = Auth::user();
+
+        // [v4.2.0] Block download if suspended
+        $canManage = $user && ($user->id == $product->o_parent || $user->isAdmin());
+        if ($product->is_suspended && !$canManage) {
+            return redirect()->route('store.show', $product->name)->with('error', __('messages.product_suspended_notice'));
+        }
+
+        if ($product->o_order > 0 && !Auth::check()) {
+            return redirect()->route('login');
+        }
+
+        if ($this->ensureLicense($user, $product)) {
+            return $this->deliverShort($short);
+        }
+
+        return redirect()->back()->with('error', __('not_enough_points'));
+    }
+
+    /**
+     * Ensure a product license exists for the user. Deducts points and generates key if necessary.
+     */
+    private function ensureLicense($user, $product)
+    {
+        if (!$user) {
+            return true; // guest can download free files
+        }
+
+        if ($user->id == $product->o_parent) {
+            // Auto-generate free license for the owner if not exists
+            $alreadyPurchased = DB::table('product_licenses')
+                ->where('user_id', $user->id)
+                ->where('product_id', $product->id)
+                ->exists();
+            if (!$alreadyPurchased) {
+                $licenseKey = 'ADSTN-' . implode('-', str_split(strtoupper(Str::random(16)), 4));
+                DB::table('product_licenses')->insert([
+                    'user_id' => $user->id,
+                    'product_id' => $product->id,
+                    'license_key' => $licenseKey,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]);
+            }
+            return true; // owner doesn't need points deduction
+        }
+
+        $alreadyPurchased = DB::table('product_licenses')
+            ->where('user_id', $user->id)
+            ->where('product_id', $product->id)
+            ->exists();
+
+        if ($alreadyPurchased) {
+            return true;
+        }
+
+        $price = $product->o_order;
+        if ($price > 0 && $user->pts < $price) {
+            return false;
+        }
+
+        DB::transaction(function () use ($user, $product, $price) {
+            if ($price > 0) {
                 $user->decrement('pts', $price);
                 $seller = User::find($product->o_parent);
                 if ($seller) {
@@ -340,64 +429,20 @@ class StoreController extends Controller
                         'o_mode' => time(),
                     ]);
                 }
-            });
-        }
-
-        return $this->processDownload($product);
-    }
-
-    public function downloadByHash(Request $request, $hash)
-    {
-        $short = Short::where('sho', $hash)->where('sh_type', 7867)->firstOrFail();
-        $fileOption = ProductFile::where('id', $short->tp_id)->firstOrFail();
-        $product = Product::withoutGlobalScope('store')->where('o_type', 'store')->where('id', $fileOption->o_parent)->firstOrFail();
-        $user = Auth::user();
-
-        // [v4.2.0] Block download if suspended
-        $canManage = $user && ($user->id == $product->o_parent || $user->isAdmin());
-        if ($product->is_suspended && !$canManage) {
-            return redirect()->route('store.show', $product->name)->with('error', __('messages.product_suspended_notice'));
-        }
-
-        if ($product->o_order > 0) {
-            if (!Auth::check()) {
-                return redirect()->route('login');
             }
 
-            if ($user->id != $product->o_parent) {
-                $price = $product->o_order;
-                if ($user->pts < $price) {
-                    return redirect()->back()->with('error', __('not_enough_points'));
-                }
-                DB::transaction(function () use ($user, $product, $price) {
-                    $user->decrement('pts', $price);
-                    $seller = User::find($product->o_parent);
-                    if ($seller) {
-                        $seller->increment('pts', $price);
-                    }
-                    Option::create([
-                        'name' => 'Store',
-                        'o_valuer' => "-$price",
-                        'o_type' => 'hest_pts',
-                        'o_parent' => $user->id,
-                        'o_order' => $product->o_parent,
-                        'o_mode' => time(),
-                    ]);
-                    if ($seller) {
-                        Option::create([
-                            'name' => 'Store',
-                            'o_valuer' => "$price",
-                            'o_type' => 'hest_pts',
-                            'o_parent' => $seller->id,
-                            'o_order' => $user->id,
-                            'o_mode' => time(),
-                        ]);
-                    }
-                });
-            }
-        }
+            // Generate license key: ADSTN-XXXX-XXXX-XXXX
+            $licenseKey = 'ADSTN-' . implode('-', str_split(strtoupper(Str::random(16)), 4));
+            DB::table('product_licenses')->insert([
+                'user_id' => $user->id,
+                'product_id' => $product->id,
+                'license_key' => $licenseKey,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        });
 
-        return $this->deliverShort($short);
+        return true;
     }
 
     public function update($name)

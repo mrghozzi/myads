@@ -22,12 +22,14 @@ use App\Http\Controllers\MarketplaceExtensionFeedController;
 // Public Routes
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
+Route::post('/license/verify', [App\Http\Controllers\LicenseApiController::class, 'verify'])->name('api.license.verify');
 
 // Legacy Ad Serving Endpoints (API version)
 Route::get('/banner', [AdsServingController::class, 'bannerScript']);
 Route::get('/link', [AdsServingController::class, 'linkScript']);
-Route::get('/marketplace/extensions/plugins', [MarketplaceExtensionFeedController::class, 'plugins'])->name('api.marketplace.extensions.plugins');
+Route::match(['GET', 'POST'], '/marketplace/extensions/plugins', [MarketplaceExtensionFeedController::class, 'plugins'])->name('api.marketplace.extensions.plugins');
 Route::get('/marketplace/extensions/themes', [MarketplaceExtensionFeedController::class, 'themes'])->name('api.marketplace.extensions.themes');
+Route::get('/marketplace/extensions/download', [MarketplaceExtensionFeedController::class, 'download'])->name('api.marketplace.extensions.download');
 
 // Protected Routes (Require Sanctum)
 Route::middleware('auth:sanctum')->group(function () {

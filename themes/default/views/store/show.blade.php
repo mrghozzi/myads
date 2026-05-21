@@ -239,6 +239,22 @@
                     </div>
                     <div id="report{{ $reportKey }}" class="store-inline-report"></div>
                 </div>
+                @if($license)
+                <div class="store-aside-card" style="margin-top: 15px; border: 2px solid #615dfa; background: #fafafd; border-radius: 12px; padding: 16px;">
+                    <p class="store-aside-card__label" style="color: #615dfa; font-weight: bold; margin-bottom: 8px;">
+                        <i class="fa fa-key"></i>&nbsp;{{ __('messages.license_key_label') }}
+                    </p>
+                    <div style="display: flex; align-items: center; justify-content: space-between; background: #fff; border: 1px solid #e1e1f0; border-radius: 6px; padding: 8px 12px; font-family: monospace; font-size: 13px; font-weight: bold; color: #3e3f5e; letter-spacing: 0.5px;">
+                        <span id="license-key-val">{{ $license->license_key }}</span>
+                        <button type="button" onclick="navigator.clipboard.writeText('{{ $license->license_key }}'); alert('{{ __('messages.license_key_copied') }}');" style="background: none; border: none; cursor: pointer; color: #8f91ac; padding: 0 4px;" title="Copy">
+                            <i class="fa fa-copy"></i>
+                        </button>
+                    </div>
+                    <p style="font-size: 11px; color: #8f91ac; margin-top: 8px; line-height: 1.4; margin-bottom: 0;">
+                        {{ __('messages.license_key_hint') }}
+                    </p>
+                </div>
+                @endif
             </div>
         </div>
     </div>

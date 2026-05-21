@@ -45,6 +45,7 @@ class PluginManager
                     $pluginData['thumbnail'] = $pluginData['thumbnail'] ?? null;
                     $pluginData['latest_url'] = $pluginData['latest'] ?? null;
                     $pluginData['min_myads'] = $pluginData['min_myads'] ?? null;
+                    $pluginData['ADStn_url'] = $pluginData['ADStn_url'] ?? null;
                     
                     // Check status in DB
                     $option = Option::where('name', $pluginData['slug'])
@@ -200,6 +201,46 @@ class PluginManager
             $plugins = $this->getAllPlugins();
 
             foreach ($plugins as $plugin) {
+                $adstnProduct = $plugin['ADStn_url'] ?? null;
+                if ($adstnProduct) {
+                    try {
+                        $adstnUrl = filter_var($adstnProduct, FILTER_VALIDATE_URL)
+                            ? $adstnProduct
+                            : 'https://www.adstn.ovh/api/marketplace/extensions/plugins';
+
+                        $remoteSlug = filter_var($adstnProduct, FILTER_VALIDATE_URL)
+                            ? $plugin['slug']
+                            : $adstnProduct;
+
+                        $licenseKeyOption = Option::where('o_type', 'plugin_license')
+                            ->where('name', $plugin['slug'] . '_key')
+                            ->first();
+                        $licenseKey = $licenseKeyOption ? $licenseKeyOption->o_valuer : '';
+
+                        $response = Http::timeout(10)->post($adstnUrl, [
+                            'slug'        => $remoteSlug,
+                            'version'     => $plugin['version'],
+                            'license_key' => $licenseKey,
+                            'domain'      => request()->getHost(),
+                        ]);
+
+                        if ($response->successful()) {
+                            $remoteData = $response->json();
+                            $remoteVersion = $remoteData['version'] ?? null;
+                            if ($remoteVersion && version_compare($remoteVersion, $plugin['version'], '>')) {
+                                $updates[$plugin['slug']] = [
+                                    'new_version' => $remoteVersion,
+                                    'download_url' => $remoteData['download_url'] ?? '',
+                                    'changelog' => $remoteData['changelog'] ?? '',
+                                ];
+                            }
+                        }
+                    } catch (\Exception $e) {
+                        Log::error("Failed to check ADStn updates for plugin {$plugin['slug']}: " . $e->getMessage());
+                    }
+                    continue;
+                }
+
                 $updateUrl = $plugin['latest_url'] ?? $plugin['update_url'] ?? null;
                 
                 if ($updateUrl && filter_var($updateUrl, FILTER_VALIDATE_URL)) {
@@ -268,10 +309,35 @@ class PluginManager
             return __('messages.extension_no_update_available');
         }
 
+        $downloadUrl = $updates[$slug]['download_url'];
+
+        // Secure download URL parameters if ADStn plugin
+        $pluginDir = $this->pluginPath . '/' . $directory;
+        $jsonFile = $pluginDir . '/plugin.json';
+        if (File::exists($jsonFile)) {
+            $pluginData = json_decode(File::get($jsonFile), true);
+            if ($pluginData && !empty($pluginData['ADStn_url'])) {
+                $licenseKeyOption = Option::where('o_type', 'plugin_license')
+                    ->where('name', $slug . '_key')
+                    ->first();
+                $licenseKey = $licenseKeyOption ? $licenseKeyOption->o_valuer : '';
+                $domain = request()->getHost();
+
+                if (!str_contains($downloadUrl, 'license_key=')) {
+                    $separator = str_contains($downloadUrl, '?') ? '&' : '?';
+                    $downloadUrl .= $separator . http_build_query([
+                        'license_key' => $licenseKey,
+                        'domain'      => $domain,
+                        'slug'        => $slug
+                    ]);
+                }
+            }
+        }
+
         return $this->packageUpgrader->upgradeFromDownload(
             type: 'plugin',
             slug: $slug,
-            downloadUrl: $updates[$slug]['download_url'],
+            downloadUrl: $downloadUrl,
             extensionsPath: $this->pluginPath,
             metadataFile: 'plugin.json',
             cacheKey: 'plugin_updates',

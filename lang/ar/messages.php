@@ -3147,4 +3147,7 @@ return [
     'custom_ads_deal_rejected_notification' => 'رفض :user صفقة الإعلان المخصص.',
     'custom_ads_deal_updated' => 'تم تحديث تفاصيل الصفقة بنجاح.',
     'custom_ads_no_creative' => 'لا توجد تفاصيل إعلان متاحة لهذه الصفقة.',
+    'license_key_label' => 'كود الترخيص الخاص بك',
+    'license_key_hint' => 'استخدم هذا الكود لتفعيل الإضافة في لوحة تحكم موقعك.',
+    'license_key_copied' => 'تم نسخ كود الترخيص بنجاح!',
 ];

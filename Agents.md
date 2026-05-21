@@ -1,4 +1,4 @@
-# Agents.md — MYADS v4.3.3
+# Agents.md — MYADS v4.3.4
 
 > **Purpose:** This file gives AI coding agents a fast, comprehensive understanding of the MYADS project — its architecture, conventions, key files, and rules — so they can work effectively from a fresh chat context.
 
@@ -6,7 +6,7 @@
 
 ## 1. Project Identity
 
-- **Name:** MYADS v4.3.3
+- **Name:** MYADS v4.3.4
 - **Type:** Social network + ad exchange platform for website owners
 - **Framework:** Laravel 12 (PHP 8.2+)
 - **Database:** MySQL 5.7+ / MariaDB 10.3+
@@ -146,6 +146,8 @@ myads/
 | `ForumController` | Forum index, categories, topics, CRUD, moderation |
 | `DirectoryController` | Web directory CRUD, categories, metadata fetch |
 | `StoreController` | Store products, knowledgebase, downloads |
+| `LicenseApiController` | Verification endpoint for paid plugins |
+| `MarketplaceExtensionFeedController` | Marketplace extension discovery feed and secure auto-update checker/download handlers |
 | `AdsController` | Banner/link ad management, embed codes, promote, referrals |
 | `StatusPromotionController` | Member promoted-post campaigns: create quote, purchase, dashboard |
 | `SmartAdsController` | Smart ads CRUD, embed code |
@@ -213,6 +215,7 @@ myads/
 | `DirectoryCategory` | `directory_cat` | Directory categories |
 | `Product` | `product` | Store products |
 | `ProductFile` | `product_files` | Store file versions |
+| `ProductLicense` | `product_licenses` | Binds purchased products to license keys and active client domains |
 | `Knowledgebase` | `knowledgebase` | Wiki-style articles per product (Markdown-based) |
 | `Message` | `message` | Private messages |
 | `Notification` | `notification` | User notifications |
@@ -333,6 +336,10 @@ myads/
 | `/admin/orders` | `/admin/orders` | Admin marketplace moderation dashboard under the `community` ACL scope |
 | `/admin/settings/mail` | `/admin/settings/mail` | Database-driven mail configuration (SMTP, sendmail, log, array) |
 | `/admin/media` | `/admin/media` | Admin Media Manager dashboard and file operations |
+| `/api/license/verify` | `/api/license/verify` | Verification endpoint for paid plugins |
+| `/api/marketplace/extensions/plugins` | `/api/marketplace/extensions/plugins` | Marketplace plugin feed & auto-update check endpoint |
+| `/api/marketplace/extensions/themes` | `/api/marketplace/extensions/themes` | Marketplace themes discovery feed endpoint |
+| `/api/marketplace/extensions/download` | `/api/marketplace/extensions/download` | Secure plugin and extension zip package download endpoint |
 | `/share` | `/share?text={content}` | External share endpoint (requires auth) |
 | `/developer` | `/developer` | Public developer documentation for Share API |
 | `/refund` | `/refund` | Refund policy legal page |
@@ -423,6 +430,7 @@ admin/mail_settings.blade.php → Database-driven mail configuration form
 - **Hooks:** WordPress-like `add_action()` / `add_filter()` via `App\Helpers\Hooks`
 - **Admin:** Upload ZIP, activate/deactivate, GitHub update checks, changelog modal
 - **Safety:** Active plugins cannot be deleted; compatibility locking via `min_myads`
+- **Licensing:** Standard protocol for paid plugins utilizing the `product_licenses` table and the `/api/license/verify` core API endpoint for domain-bound verification.
 
 ---
 
@@ -911,6 +919,16 @@ php artisan storage:link
 
 ---
 
+## 19M. Version 4.3.4 Strategic Update Cycle (Started 2026-05-21)
+
+- **Status:** Complete.
+- **Focus:** Paid plugin licensing, domain verification API, store product keys, and developer guides.
+- **Feature (2026-05-21):** Implemented product licensing scheme (`product_licenses` table) and verification endpoint (`/api/license/verify`).
+- **Integration (2026-05-21):** Integrated license keys with `StoreController` download flows. Added license card to store sidebar in `show.blade.php`.
+- **Documentation (2026-05-21):** Documented paid plugin conventions in `PLUGIN_GUIDE.md` and updated `changelogs.md`.
+
+---
+
 ## 20. Maintaining This File
 
 > **⚠️ RULE: This `Agents.md` file MUST be kept up to date.**
@@ -933,4 +951,4 @@ If in doubt, update it. An outdated `Agents.md` causes future agents to make wro
 
 ---
 
-*Last updated: 2026-05-20 — MYADS v4.3.3 (Knowledgebase publisher, portal search, and Flouci gateway integration)*
+*Last updated: 2026-05-21 — MYADS v4.3.4 (Paid plugin licensing, domain verification, and store integration)*

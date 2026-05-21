@@ -1,3 +1,16 @@
+# v4.3.4
+> **Feature Release** — Paid Plugin Licensing & Verification Protocol, Store Product License Key Integration, Plugin Auto-Update APIs, and Developer Architecture Guides.
+
+### Paid Plugin Licensing & Auto-Update Protocol
+* **Feature**: Implemented a robust **Product Licensing Database Scheme** (`product_licenses` table) to bind product purchases to client domain hostnames.
+* **Feature**: Added a public verification endpoint `/api/license/verify` enabling client sites to remotely validate license keys and check domain ownership status.
+* **Feature**: Modified `StoreController` download flows (`download` and `downloadByHash`) to generate a unique license key on the first purchase or download of a digital product, ensuring customers pay only once and obtain their keys instantly.
+* **Feature**: Enhanced the core plugin management engine to support **Paid Plugin Secure Auto-Updates** and file delivery APIs. Clients can now remotely verify updates via `/api/marketplace/extensions/plugins` and securely fetch their packages through `/api/marketplace/extensions/download` with validation checking of keys and domains.
+* **UI**: Added a custom, styled **License Key Display Card** to the sidebar of purchased items in the store detail view (`/store/{name}`), allowing users to easily view and copy their licensing keys.
+* **Documentation**: Updated `Documents/PLUGIN_GUIDE.md` to establish the reusable design conventions and standards for paid plugins.
+
+---
+
 # v4.3.3
 > **Maintenance & Feature Release** — Apple Pay, Tabby, and Flouci payment gateway integrations, beta flags & geographical restrictions, admin webhook configuration hints, multimedia posts, comment replies, enhanced activity stickers, SEO structured data fixes, admin moderation tools, knowledgebase publisher fixes, portal search integration, and system stability.
 

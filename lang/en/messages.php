@@ -3144,4 +3144,7 @@ return [
     'custom_ads_deal_rejected_notification' => ':user rejected the custom ad deal.',
     'custom_ads_deal_updated' => 'Deal details updated successfully.',
     'custom_ads_no_creative' => 'No creative details available for this deal.',
+    'license_key_label' => 'Your License Key',
+    'license_key_hint' => 'Use this code to activate the plugin in your site admin panel.',
+    'license_key_copied' => 'License key copied successfully!',
 ];
