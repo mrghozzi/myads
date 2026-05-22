@@ -95,7 +95,14 @@
                     </a>
                     <div class="product-preview-info">
                         @if($product->o_order > 0)
-                            <p class="text-sticker"><span class="highlighted">{{ $product->o_order }}</span> {{ __('messages.points') }}</p>
+                            @if($product->sale && $product->sale->is_active)
+                                <p class="text-sticker" style="background-color: #f34141; color: #fff;">
+                                    <span style="text-decoration: line-through; opacity: 0.7; margin: 0 4px;">{{ $product->o_order }}</span>
+                                    <span style="font-weight: bold; margin: 0 4px;">{{ $product->sale->sale_price }}</span> {{ __('messages.points') }}
+                                </p>
+                            @else
+                                <p class="text-sticker"><span class="highlighted">{{ $product->o_order }}</span> {{ __('messages.points') }}</p>
+                            @endif
                         @else
                             <p class="text-sticker">{{ __('messages.free') }}</p>
                         @endif
