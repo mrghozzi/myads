@@ -411,7 +411,7 @@ class Status extends Model
         return 'text';
     }
 
-    private function getReactionType()
+    public function getReactionType()
     {
         if ($this->s_type == 1) {
             return 22;
@@ -436,7 +436,7 @@ class Status extends Model
         return null;
     }
 
-    private function interactionSubjectId(): int
+    public function interactionSubjectId(): int
     {
         if ((int) $this->s_type === KnowledgebaseCommunityService::STATUS_TYPE) {
             return (int) $this->id;

@@ -8,6 +8,14 @@
                 {{ __('messages.community') }}
             </a>
         </li>
+        <li class="menu-item {{ Request::is('reels*') ? 'active' : '' }}">
+            <a class="menu-item-link text-tooltip-tfr" href="{{ url('/reels') }}">
+                <svg class="menu-item-link-icon icon-videos">
+                    <use xlink:href="#svg-videos"></use>
+                </svg>
+                {{ __('messages.reels') ?? 'Reels' }}
+            </a>
+        </li>
         @auth
             <li class="menu-item {{ Request::is('home*') ? 'active' : '' }}">
                 <a class="menu-item-link text-tooltip-tfr" href="{{ url('/home') }}">

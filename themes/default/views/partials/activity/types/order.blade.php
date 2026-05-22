@@ -7,6 +7,8 @@
     $activityUserAvatar = $activityUser ? $activityUser->avatarUrl() : asset('upload/_avatar.png');
     $activityUserPresence = $activityUser?->isOnline() ? 'online' : 'offline';
     $activityUserIsAdmin = $activityUser?->isAdmin() ?? false;
+    $activityUserHasVerifiedBadge = $activityUser?->hasVerifiedBadge() ?? false;
+    $statusUserHasVerifiedBadge = $statusUser?->hasVerifiedBadge() ?? false;
     $orderUrl = $order ? route('orders.show', $order) : '#';
     $offersCount = $order?->offers_count ?? $status->comments_count ?? 0;
     $reportKey = 'orderfeed' . $status->id;
@@ -89,7 +91,7 @@
                                 </div>
                             </div>
 
-                            @if($activityUserIsAdmin)
+                            @if($activityUserHasVerifiedBadge)
                                 <div class="user-avatar-badge">
                                     <div class="user-avatar-badge-border">
                                         <div class="hexagon-22-24" style="width: 22px; height: 24px; position: relative;">

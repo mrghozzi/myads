@@ -6,6 +6,8 @@
     $statusUserAvatar = $statusUser ? $statusUser->avatarUrl() : asset('upload/_avatar.png');
     $statusUserPresence = $statusUser?->isOnline() ? 'online' : 'offline';
     $statusUserIsAdmin = $statusUser?->isAdmin() ?? false;
+    $activityUserHasVerifiedBadge = $activityUser?->hasVerifiedBadge() ?? false;
+    $statusUserHasVerifiedBadge = $statusUser?->hasVerifiedBadge() ?? false;
     $article = $status->related_content;
     $product = $article?->productItem;
     $articleAuthor = $article?->authorUser;
@@ -66,7 +68,7 @@
                             <div class="user-avatar-progress-border">
                                 <div class="hexagon-border-40-44" data-line-color="{{ $statusUser ? $statusUser->profileBadgeColor() : '' }}" style="width: 40px; height: 44px; position: relative;"></div>
                             </div>
-                            @if($statusUserIsAdmin)
+                            @if($statusUserHasVerifiedBadge)
                                 <div class="user-avatar-badge">
                                     <div class="user-avatar-badge-border">
                                         <div class="hexagon-22-24" style="width: 22px; height: 24px; position: relative;"></div>

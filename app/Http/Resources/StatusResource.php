@@ -32,6 +32,18 @@ class StatusResource extends JsonResource
             }
         }
 
+        $hasSaved = false;
+        $savedCount = \Illuminate\Support\Facades\DB::table('saved_statuses')
+            ->where('status_id', $this->id)
+            ->count();
+
+        if ($user) {
+            $hasSaved = \Illuminate\Support\Facades\DB::table('saved_statuses')
+                ->where('user_id', $user->id)
+                ->where('status_id', $this->id)
+                ->exists();
+        }
+
         return [
             'id' => $this->id,
             'user' => new UserResource($this->whenLoaded('user')),
@@ -47,6 +59,11 @@ class StatusResource extends JsonResource
             'has_liked' => $hasLiked,
             'user_reaction' => $userReaction,
             'grouped_reactions' => collect($groupedReactions)->map(fn($users) => count($users))->toArray(),
+            'interaction_subject_id' => $this->interactionSubjectId(),
+            'reaction_type' => $this->getReactionType(),
+            'has_saved' => $hasSaved,
+            'saved_count' => $savedCount,
+            'permalink' => method_exists($this->resource, 'promotionDestinationUrl') ? $this->promotionDestinationUrl() : url('/portal'),
             'display_title' => $this->getDisplayTitle(),
             'display_content' => $this->getDisplayContent(),
             'display_image' => $this->getDisplayImage(),

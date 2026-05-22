@@ -20,7 +20,7 @@ class UserResource extends JsonResource
             'name' => $this->name,
             'avatar' => $this->avatar ? asset('upload/' . $this->avatar) : asset('assets/images/default-avatar.png'),
             'pts' => $this->pts,
-            'verified' => $this->verified,
+            'verified' => $this->hasVerifiedBadge(),
             'created_at' => $this->created_at ? $this->created_at->toIso8601String() : null,
         ];
     }

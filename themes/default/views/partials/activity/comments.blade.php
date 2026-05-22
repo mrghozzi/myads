@@ -69,8 +69,8 @@
                         <canvas style="position: absolute; top: 0px; left: 0px;" width="40" height="44"></canvas>
                     </div>
                 </div>
-                @if($user->isAdmin())
-                    <div class="user-avatar-badge">
+                @if($user->hasVerifiedBadge())
+                        <div class="user-avatar-badge">
                         <div class="user-avatar-badge-border">
                             <div class="hexagon-22-24" style="width: 22px; height: 24px; position: relative;">
                                 <canvas style="position: absolute; top: 0px; left: 0px;" width="22" height="24"></canvas>

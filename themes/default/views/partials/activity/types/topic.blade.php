@@ -5,6 +5,8 @@
     $activityUserAvatar = $activityUser ? $activityUser->avatarUrl() : asset('upload/_avatar.png');
     $activityUserPresence = $activityUser?->isOnline() ? 'online' : 'offline';
     $activityUserIsAdmin = $activityUser?->isAdmin() ?? false;
+    $activityUserHasVerifiedBadge = $activityUser?->hasVerifiedBadge() ?? false;
+    $statusUserHasVerifiedBadge = $statusUser?->hasVerifiedBadge() ?? false;
     $repostExcerpt = \Illuminate\Support\Str::limit(strip_tags($activity->related_content->name ?? ''), 80);
     $repostAuthorName = addslashes($activityUserName);
 @endphp
@@ -45,7 +47,7 @@
                         <div class="user-avatar-progress-border">
                             <div class="hexagon-border-40-44" data-line-color="{{ $activityUser ? $activityUser->profileBadgeColor() : '' }}" style="width: 40px; height: 44px; position: relative;"></div>
                         </div>
-                        @if($activityUserIsAdmin)
+                        @if($activityUserHasVerifiedBadge)
                             <div class="user-avatar-badge">
                                 <div class="user-avatar-badge-border">
                                     <div class="hexagon-22-24" style="width: 22px; height: 24px; position: relative;"></div>

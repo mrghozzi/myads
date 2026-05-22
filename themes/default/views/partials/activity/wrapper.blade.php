@@ -5,6 +5,8 @@
     $activityUserAvatar = $activityUser ? $activityUser->avatarUrl() : asset('upload/_avatar.png');
     $activityUserPresence = $activityUser?->isOnline() ? 'online' : 'offline';
     $activityUserIsAdmin = $activityUser?->isAdmin() ?? false;
+    $activityUserHasVerifiedBadge = $activityUser?->hasVerifiedBadge() ?? false;
+    $statusUserHasVerifiedBadge = $statusUser?->hasVerifiedBadge() ?? false;
 @endphp
 
 <div class="widget-box no-padding activity-post-card post{{ $activity->id }}">
@@ -65,7 +67,7 @@
                         </div>
                         <!-- /USER AVATAR PROGRESS BORDER -->
                         
-                        @if($activityUserIsAdmin)
+                        @if($activityUserHasVerifiedBadge)
                             <!-- USER AVATAR BADGE -->
                             <div class="user-avatar-badge">
                                 <div class="user-avatar-badge-border">

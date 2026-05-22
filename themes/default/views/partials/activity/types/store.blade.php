@@ -6,6 +6,8 @@
     $statusUserAvatar = $statusUser ? $statusUser->avatarUrl() : asset('upload/_avatar.png');
     $statusUserPresence = $statusUser?->isOnline() ? 'online' : 'offline';
     $statusUserIsAdmin = $statusUser?->isAdmin() ?? false;
+    $activityUserHasVerifiedBadge = $activityUser?->hasVerifiedBadge() ?? false;
+    $statusUserHasVerifiedBadge = $statusUser?->hasVerifiedBadge() ?? false;
     $product = $activity->related_content;
     $description = \App\Support\ContentFormatter::format(\Illuminate\Support\Str::limit($product->o_valuer ?? '', 480));
     $productImage = $product->product_image ?? theme_asset('img/error_plug.png');
@@ -50,7 +52,7 @@
                                 <canvas style="position: absolute; top: 0px; left: 0px;" width="40" height="44"></canvas>
                             </div>
                         </div>
-                        @if($statusUserIsAdmin)
+                        @if($statusUserHasVerifiedBadge)
                             <div class="user-avatar-badge">
                                 <div class="user-avatar-badge-border">
                                     <div class="hexagon-22-24" style="width: 22px; height: 24px; position: relative;">
