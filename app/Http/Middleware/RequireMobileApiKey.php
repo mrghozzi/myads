@@ -27,7 +27,7 @@ class RequireMobileApiKey
         }
 
         $validKeyOption = Option::where('o_type', 'mobile_api')->where('name', 'api_key')->first();
-        $validKey = $validKeyOption ? $validKeyOption->o_value : null;
+        $validKey = $validKeyOption ? $validKeyOption->o_valuer : null;
 
         if (empty($validKey)) {
             return response()->json(['error' => 'API is currently disabled by administrator.'], 403);
