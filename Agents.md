@@ -72,7 +72,7 @@ myads/
 │   ├── helpers.php         # Global helpers: theme_asset(), ads_site(), locale_direction(), is_locale_rtl()
 │   ├── Http/
 │   │   ├── Controllers/    # 50+ controllers (see §5)
-│   │   └── Middleware/     # AdminMiddleware, SetLocale, UpdateUserOnline, CheckSystemVersion, InstallerGuard, TrackSeoMetrics
+│   │   └── Middleware/     # AdminMiddleware, SetLocale, UpdateUserOnline, CheckSystemVersion, InstallerGuard, TrackSeoMetrics, RequireMobileApiKey
 │   ├── Models/             # 50+ Eloquent models (see §6)
 │   ├── Providers/          # AppServiceProvider, ThemeServiceProvider, PluginServiceProvider, InstallerServiceProvider, MailConfigServiceProvider
 │   ├── Services/           # Business logic services (see §7)
@@ -187,7 +187,7 @@ myads/
 
 | Model | Table | Purpose |
 |-------|-------|---------|
-| `User` | `users` | Members. `id=1` is super-admin. Has `pts` (points), ad credits (`nbanner`, `nlink`, `nsmart`), verified status |
+| `User` | `users` | Members. `id=1` is super-admin. Has `pts` (points), ad credits, verified status, and uses `HasApiTokens` for API authentication |
 | `Setting` | `setting` | Single-row site settings (name, description, theme slug, etc.) |
 | `Option` | `options` | Key-value config store (plugins active state, misc settings) |
 | `Status` | `status` | Community feed posts |

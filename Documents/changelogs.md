@@ -27,6 +27,9 @@
 ### Bug Fixes & UI Polish
 * **Theme / UI**: Fixed a major layout bug in Light Mode where community posts containing videos or Reels would stretch beyond the screen boundaries. This was resolved by restoring the missing CSS layout properties in `styles.min.css`.
 * **Theme / UI**: Added robust overflow protections (`min-width: 0 !important`) to community feed post containers (`.activity-post-card`, `.widget-box-status-content`) in `forum-activity-superdesign.css` across both Light and Dark themes to prevent media content from breaking flex bounds.
+* **API / Security**: Fixed a critical `500 Internal Server Error` during Mobile App API login caused by the missing `HasApiTokens` trait in the `User` model, restoring secure token generation capabilities.
+* **API / Middleware**: Fixed a typo (`o_valuer` -> `o_value`) in `RequireMobileApiKey` middleware that could have caused validation failures during API key authentication.
+* **API / Database**: Provided explicit schema definitions and migration guidelines for `personal_access_tokens` to support free hosting environments where terminal execution for Sanctum installation is restricted.
 
 ---
 

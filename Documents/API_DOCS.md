@@ -13,9 +13,15 @@ MYADS supports two methods of authentication depending on the use case:
 ### A. Internal API Tokens (Sanctum)
 Best for first-party companion apps (e.g., mobile apps). Users provide credentials directly to the app.
 
-**Endpoint:** `POST /api/login`  
-**Payload:** `{"identity": "username_or_email", "password": "..."}`  
-**Header:** `Authorization: Bearer {token}`
+**Security Requirements:**
+All mobile API requests require a two-layer authentication:
+1. `x-api-key`: A global API key managed by the admin to prevent unauthorized client access.
+2. `Authorization`: The user's Sanctum Bearer Token for identity.
+
+**Login Endpoint:** `POST /api/login`  
+**Payload:** `{"login": "username_or_email", "password": "..."}`  
+**Header (Login):** `x-api-key: {YOUR_GLOBAL_API_KEY}`  
+**Header (Subsequent Requests):** `Authorization: Bearer {token}` along with `x-api-key: {YOUR_GLOBAL_API_KEY}`
 
 ### B. OAuth2 Authorization (Third-Party)
 Best for third-party websites and integrations. Users authorize your app via the MYADS OAuth screen without sharing their password.
