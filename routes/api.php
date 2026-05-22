@@ -20,8 +20,8 @@ use App\Http\Controllers\MarketplaceExtensionFeedController;
 */
 
 // Public Routes
-Route::post('/login', [AuthController::class, 'login']);
-Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [\App\Http\Controllers\Api\AuthController::class, 'login']);
+Route::post('/register', [\App\Http\Controllers\Api\AuthController::class, 'register']);
 Route::post('/license/verify', [App\Http\Controllers\LicenseApiController::class, 'verify'])->name('api.license.verify');
 
 // Legacy Ad Serving Endpoints (API version)
@@ -33,6 +33,7 @@ Route::get('/marketplace/extensions/download', [MarketplaceExtensionFeedControll
 
 // Protected Routes (Require Sanctum)
 Route::middleware(['api.key', 'auth:sanctum'])->group(function () {
+    Route::post('/logout', [\App\Http\Controllers\Api\AuthController::class, 'logout']);
     Route::get('/user', function (Request $request) {
         return new App\Http\Resources\UserResource($request->user());
     });
