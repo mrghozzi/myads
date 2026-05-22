@@ -25,7 +25,7 @@ Best for third-party websites and integrations. Users authorize your app via the
 
 ---
 
-## 2. Developer Platform
+## 4. Developer Platform
 
 To build third-party integrations, you must first register your application in the **Developer Platform**.
 

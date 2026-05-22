@@ -32,9 +32,9 @@ Route::get('/marketplace/extensions/themes', [MarketplaceExtensionFeedController
 Route::get('/marketplace/extensions/download', [MarketplaceExtensionFeedController::class, 'download'])->name('api.marketplace.extensions.download');
 
 // Protected Routes (Require Sanctum)
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['api.key', 'auth:sanctum'])->group(function () {
     Route::get('/user', function (Request $request) {
-        return $request->user();
+        return new App\Http\Resources\UserResource($request->user());
     });
 
     // Forum API

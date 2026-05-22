@@ -399,7 +399,22 @@ class AdminController extends Controller
 
     public function systemSettings()
     {
-        return view('admin::admin.system_settings');
+        $mobileApiKeyOption = Option::where('o_type', 'mobile_api')->where('name', 'api_key')->first();
+        $mobileApiKey = $mobileApiKeyOption ? $mobileApiKeyOption->o_valuer : null;
+
+        return view('admin::admin.system_settings', compact('mobileApiKey'));
+    }
+
+    public function generateApiKey(Request $request)
+    {
+        $newKey = bin2hex(random_bytes(32));
+
+        Option::updateOrCreate(
+            ['o_type' => 'mobile_api', 'name' => 'api_key'],
+            ['o_valuer' => $newKey]
+        );
+
+        return redirect()->route('admin.settings.system')->with('success', __('Mobile API Key generated successfully.'));
     }
 
     public function updateSystemSettings(Request $request)

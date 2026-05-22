@@ -487,6 +487,7 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::post('/settings', [AdminController::class, 'updateSettings'])->name('admin.settings.update');
     Route::get('/settings/system', [AdminController::class, 'systemSettings'])->name('admin.settings.system');
     Route::post('/settings/system', [AdminController::class, 'updateSystemSettings'])->name('admin.settings.system.update');
+    Route::post('/settings/api-key/generate', [AdminController::class, 'generateApiKey'])->name('admin.settings.api_key.generate');
     Route::get('/settings/mail', [AdminMailSettingsController::class, 'index'])->name('admin.settings.mail');
     Route::post('/settings/mail', [AdminMailSettingsController::class, 'update'])->name('admin.settings.mail.update');
     Route::post('/settings/mail/test', [AdminMailSettingsController::class, 'test'])->name('admin.settings.mail.test');

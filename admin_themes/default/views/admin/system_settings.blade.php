@@ -89,6 +89,26 @@
                     </div>
                 </div>
                 <div class="col-12"><hr class="my-0"></div>
+                <div class="col-12 d-flex justify-content-between align-items-center">
+                    <h3 class="h5 mb-0 text-primary"><i class="feather-smartphone me-2"></i>{{ __('Mobile App API Key') }}</h3>
+                </div>
+                <div class="col-12">
+                    <div class="alert alert-secondary py-3 px-3 mb-0">
+                        <div class="d-flex align-items-center mb-2">
+                            <strong class="me-2">{{ __('Current API Key') }}:</strong>
+                            @if($mobileApiKey)
+                                <code class="fs-6 px-2 py-1 bg-dark text-white rounded user-select-all">{{ $mobileApiKey }}</code>
+                            @else
+                                <span class="badge bg-danger">{{ __('Not Generated') }}</span>
+                            @endif
+                        </div>
+                        <p class="text-muted small mb-3">{{ __('Copy this key and paste it into the .env file of your Android/Mobile application source code (e.g. MOBILE_API_KEY=...). This protects your API from unauthorized access.') }}</p>
+                        <button type="button" class="btn btn-sm btn-{{ $mobileApiKey ? 'warning' : 'primary' }}" onclick="document.getElementById('generate-api-key-form').submit();">
+                            <i class="feather-refresh-cw me-1"></i>{{ $mobileApiKey ? __('Regenerate API Key') : __('Generate API Key') }}
+                        </button>
+                    </div>
+                </div>
+                <div class="col-12"><hr class="my-0"></div>
                 <div class="col-12">
                     <div class="alert alert-info mb-0">
                         <i class="feather-mail me-2"></i>
@@ -107,5 +127,10 @@
             </form>
         </div>
     </section>
+
+    <!-- Hidden form for API Key Generation -->
+    <form id="generate-api-key-form" action="{{ route('admin.settings.api_key.generate') }}" method="POST" style="display: none;">
+        @csrf
+    </form>
 </div>
 @endsection

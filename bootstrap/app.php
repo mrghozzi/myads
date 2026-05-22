@@ -88,6 +88,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'admin' => \App\Http\Middleware\AdminMiddleware::class,
             'admin.password.confirm' => \App\Http\Middleware\RequireAdminPasswordConfirmation::class,
+            'api.key' => \App\Http\Middleware\RequireMobileApiKey::class,
         ]);
 
         $middleware->redirectTo(
