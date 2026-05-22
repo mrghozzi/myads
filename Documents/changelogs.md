@@ -8,6 +8,9 @@
 * **Feature**: Implemented **Phase 1** protected endpoints in `routes/api.php` for community feed retrieval (`/api/portal/feed`), status creation/deletion, comments, and reaction toggles.
 * **Feature**: Implemented **Phase 2** protected endpoints focusing on user socialization: fetching profile stats, loading a user's statuses, unified follow/unfollow toggle, querying active conversations, retrieving message history, sending private messages, and marking conversations as read.
 * **Feature**: Implemented **Phase 4** protected endpoints covering Forums and Store: fetching forum categories, topics, and replies, as well as paginated store products and details, expanding the API scope to cover community discussions and digital marketplace assets.
+* **Feature**: Achieved **Community Feed Parity** in the Mobile App by mapping diverse content types (Videos, Files, Products, Site Directories, Service Requests) directly into dynamic HTML formatting using `display_content`, `display_title`, and `display_image` via `StatusResource`.
+* **Feature**: Upgraded Mobile App reactions logic in `ReactionController` to accept explicit reaction names (`Like`, `Love`, `Haha`, `Wow`, `Sad`, `Angry`), mirroring the web platform's multiple reaction system instead of generic binary toggles.
+* **Feature**: Implemented full `PostDetailsScreen` routing and state in the Flutter app to fetch comments, post new comments, and render interactive native share sheets using `share_plus`.
 * **Security**: Introduced a two-layer API authentication mechanism requiring a globally managed `API_KEY` (generated securely from the Admin panel by Super Admins) in addition to the user's `Sanctum Bearer Token`. This mitigates unauthorized third-party scraping and prevents 500 errors by forcing strict `application/json` accept headers at the middleware level (`RequireMobileApiKey`).
 
 ### Store Discount Codes & Sales System

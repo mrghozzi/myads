@@ -133,7 +133,7 @@ Allows any website to pre-fill the MYADS post composer.
 These endpoints are designed for the first-party mobile application and require Sanctum Bearer Token authentication.
 
 ### Community Feed & Statuses
-- `GET /api/portal/feed`: Retrieves the community feed (paginated). Optional query parameter `filter` (`all` or `me`).
+- `GET /api/portal/feed`: Retrieves the community feed (paginated). Optional query parameter `filter` (`all` or `me`). Returns a collection of `StatusResource` which includes `display_content`, `display_title`, and `display_image` properties containing pre-rendered HTML/attributes for diverse post types (Files, Products, Services, Videos, Reels).
 - `POST /api/statuses`: Create a new status.
   *Payload:* `{"text": "Hello world!"}`
 - `DELETE /api/statuses/{status_id}`: Delete a status (requires ownership or admin rights).
@@ -143,7 +143,7 @@ These endpoints are designed for the first-party mobile application and require 
 - `POST /api/statuses/{status_id}/comments`: Post a new comment.
   *Payload:* `{"text": "My comment"}`
 - `POST /api/reactions/toggle`: Toggle a reaction on a subject.
-  *Payload:* `{"subject_id": 123, "type": 2}`
+  *Payload:* `{"subject_id": 123, "type": 2, "reaction": "Like"}` *(Supported reactions: Like, Love, Haha, Wow, Sad, Angry)*
 
 ### Profile & Follow (Phase 2)
 - `GET /api/profile/{identifier}`: Retrieve user profile details and stats.
