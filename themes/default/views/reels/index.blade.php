@@ -206,6 +206,40 @@
         height: 16px;
         fill: currentColor;
     }
+
+    /* Mute and Progress */
+    .reel-mute-toggle {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        z-index: 100;
+        width: 36px;
+        height: 36px;
+        background: rgba(0,0,0,0.5);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        backdrop-filter: blur(4px);
+    }
+
+    .reel-progress {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background: rgba(255, 255, 255, 0.3);
+        z-index: 100;
+    }
+
+    .reel-progress-filled {
+        height: 100%;
+        width: 0%;
+        background: #23d2e2;
+        transition: width 0.1s linear;
+    }
 </style>
 
 <div class="grid" style="padding-top: 20px;">
@@ -272,10 +306,11 @@ document.addEventListener('DOMContentLoaded', function() {
             videoObserver.unobserve(item);
             videoObserver.observe(item);
             
-            // Add click to play/pause
             const video = item.querySelector('.reel-video');
-            if(video && !item.dataset.boundClick) {
-                item.dataset.boundClick = 'true';
+            if(video && !item.dataset.boundEvents) {
+                item.dataset.boundEvents = 'true';
+                
+                // Add click to play/pause
                 video.addEventListener('click', () => {
                     if (video.paused) {
                         video.play();
@@ -285,6 +320,42 @@ document.addEventListener('DOMContentLoaded', function() {
                         item.classList.add('is-paused');
                     }
                 });
+
+                // Progress Bar Update
+                const progressBar = item.querySelector('.reel-progress-filled');
+                video.addEventListener('timeupdate', () => {
+                    if (video.duration) {
+                        const percent = (video.currentTime / video.duration) * 100;
+                        progressBar.style.width = percent + '%';
+                    }
+                });
+
+                // Mute Toggle Logic
+                const muteBtn = item.querySelector('.reel-mute-toggle');
+                if (muteBtn) {
+                    muteBtn.addEventListener('click', (e) => {
+                        e.stopPropagation(); // Prevent play/pause toggle
+                        
+                        // Toggle global mute state for all reels
+                        const isMuted = !video.muted;
+                        
+                        document.querySelectorAll('.reel-video').forEach(v => {
+                            v.muted = isMuted;
+                        });
+
+                        document.querySelectorAll('.reel-item').forEach(el => {
+                            const iconMute = el.querySelector('.icon-mute');
+                            const iconUnmute = el.querySelector('.icon-unmute');
+                            if (isMuted) {
+                                iconMute.style.display = 'block';
+                                iconUnmute.style.display = 'none';
+                            } else {
+                                iconMute.style.display = 'none';
+                                iconUnmute.style.display = 'block';
+                            }
+                        });
+                    });
+                }
             }
         });
     }
