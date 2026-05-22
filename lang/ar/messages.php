@@ -3205,4 +3205,5 @@ return [
     'all_discount_codes' => 'جميع أكواد الخصم',
     'creator' => 'المنشئ',
     'total_coupons' => 'إجمالي الكوبونات',
+    'purchase' => 'شراء',
 ];

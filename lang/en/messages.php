@@ -3202,4 +3202,5 @@ return [
     'all_discount_codes' => 'All Discount Codes',
     'creator' => 'Creator',
     'total_coupons' => 'Total Coupons',
+    'purchase' => 'Purchase',
 ];

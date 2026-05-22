@@ -117,7 +117,7 @@
                                     </a>
                                 @endif
                             @else
-                                <button type="button" class="button secondary" style="color: #fff;" data-bs-toggle="modal" data-bs-target="#purchaseModal">
+                                <button type="button" class="button secondary" style="color: #fff;" onclick="document.getElementById('inline-purchase-panel').style.display = document.getElementById('inline-purchase-panel').style.display === 'none' ? 'block' : 'none';">
                                     <i class="fa fa-shopping-cart"></i>&nbsp;{{ __('messages.purchase') }}
                                 </button>
                             @endif
@@ -130,6 +130,39 @@
                             <i class="fa fa-database" aria-hidden="true"></i>&nbsp;{{ __('messages.knowledgebase') }}
                         </a>
                     </div>
+                    @if(auth()->check() && !$license && $product->o_order > 0)
+                        <div id="inline-purchase-panel" style="display: none; margin-top: 20px; background: #1d2333; border: 1px solid #2f3749; border-radius: 12px; padding: 20px; text-align: left;">
+                            <h4 style="margin-top: 0; color: #fff;">{{ __('messages.confirm_purchase') ?? 'Confirm Purchase' }}</h4>
+                            <div class="price-breakdown-box" style="background: #21283b; border-radius: 8px; padding: 16px; margin-bottom: 20px; margin-top: 15px;">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                                    <span style="color: #9aa4bf;">{{ __('messages.price') ?? 'Price' }}</span>
+                                    <strong style="color: #fff;" id="base-price-display">{{ $product->current_price }} PTS</strong>
+                                </div>
+                                <div id="discount-row" style="display: none; justify-content: space-between; margin-bottom: 10px; color: #2ecc71;">
+                                    <span>{{ __('messages.discount') ?? 'Discount' }}</span>
+                                    <strong id="discount-amount-display">-0 PTS</strong>
+                                </div>
+                                <hr style="border-top: 1px solid #2f3749; margin: 12px 0; background: none;">
+                                <div style="display: flex; justify-content: space-between; font-size: 16px; font-weight: 700;">
+                                    <span style="color: #fff;">{{ __('messages.total') ?? 'Total' }}</span>
+                                    <strong style="color: #4f46e5;" id="final-price-display">{{ $product->current_price }} PTS</strong>
+                                </div>
+                            </div>
+                            <div class="promo-code-section" style="margin-bottom: 20px;">
+                                <label style="display: block; font-size: 13px; font-weight: 600; color: #9aa4bf; margin-bottom: 8px;">{{ __('messages.discount_code') ?? 'Promo Code' }}</label>
+                                <div style="display: flex; gap: 8px;">
+                                    <input type="text" id="coupon-code-input" class="form-control" placeholder="{{ __('messages.enter_promo_code') ?? 'Enter code...' }}" style="background: #181f29; border: 1px solid #2f3749; color: #fff; border-radius: 6px; padding: 10px 14px; flex-grow: 1;">
+                                    <button type="button" id="apply-coupon-btn" class="button primary" style="padding: 10px 20px; border-radius: 6px; white-space: nowrap;">{{ __('messages.apply') ?? 'Apply' }}</button>
+                                </div>
+                                <div id="coupon-feedback" style="margin-top: 8px; font-size: 13px; font-weight: 600; display: none;"></div>
+                            </div>
+                            <div id="purchase-error" class="alert alert-danger" style="display: none; font-size: 14px; padding: 12px; margin-bottom: 20px;"></div>
+                            <div style="display: flex; justify-content: flex-end; gap: 10px;">
+                                <button type="button" class="button secondary" onclick="document.getElementById('inline-purchase-panel').style.display='none'" style="padding: 10px 20px; border-radius: 6px; background: #2f3749; color: #fff; border: none; cursor: pointer;">{{ __('messages.cancel') ?? 'Cancel' }}</button>
+                                <button type="button" id="confirm-purchase-btn" class="button primary" style="padding: 10px 24px; border-radius: 6px; background: #4f46e5; border: none; cursor: pointer;">{{ __('messages.confirm_purchase') ?? 'Confirm Purchase' }}</button>
+                            </div>
+                        </div>
+                    @endif
                 </div>
             </div>
 
@@ -765,59 +798,6 @@
 </style>
 
 @if(auth()->check() && !$license && $product->o_order > 0)
-<!-- Purchase Modal -->
-<div class="modal fade" id="purchaseModal" tabindex="-1" aria-labelledby="purchaseModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content" style="background: #1d2333; color: #fff; border: 1px solid #2f3749; border-radius: 12px; overflow: hidden; font-family: 'Inter', sans-serif;">
-            <div class="modal-header" style="border-bottom: 1px solid #2f3749; padding: 20px;">
-                <h5 class="modal-title" id="purchaseModalLabel" style="font-weight: 700; color: #fff; margin: 0;">{{ __('messages.confirm_purchase') ?? 'Confirm Purchase' }}</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" style="filter: invert(1) grayscale(1) brightness(2); background: none; border: none; font-size: 1.5rem; color: #fff; line-height: 1;">&times;</button>
-            </div>
-            <div class="modal-body" style="padding: 24px;">
-                <div class="product-purchase-preview" style="display: flex; gap: 15px; margin-bottom: 20px; align-items: center; background: #21283b; padding: 12px; border-radius: 8px;">
-                    <img src="{{ $productImage }}" alt="{{ $product->name }}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 6px;">
-                    <div>
-                        <h4 style="font-size: 16px; margin: 0; font-weight: 600; color: #fff;">{{ $product->name }}</h4>
-                        <p style="margin: 5px 0 0 0; color: #9aa4bf; font-size: 14px;">{{ $categoryLabel }}</p>
-                    </div>
-                </div>
-
-                <div class="price-breakdown-box" style="background: #21283b; border-radius: 8px; padding: 16px; margin-bottom: 20px;">
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
-                        <span style="color: #9aa4bf;">{{ __('messages.price') ?? 'Price' }}</span>
-                        <strong style="color: #fff;" id="base-price-display">{{ $product->current_price }} PTS</strong>
-                    </div>
-                    <div id="discount-row" style="display: none; justify-content: space-between; margin-bottom: 10px; color: #2ecc71;">
-                        <span>{{ __('messages.discount') ?? 'Discount' }}</span>
-                        <strong id="discount-amount-display">-0 PTS</strong>
-                    </div>
-                    <hr style="border-top: 1px solid #2f3749; margin: 12px 0; background: none;">
-                    <div style="display: flex; justify-content: space-between; font-size: 16px; font-weight: 700;">
-                        <span style="color: #fff;">{{ __('messages.total') ?? 'Total' }}</span>
-                        <strong style="color: #4f46e5;" id="final-price-display">{{ $product->current_price }} PTS</strong>
-                    </div>
-                </div>
-
-                <!-- Promo Code Form -->
-                <div class="promo-code-section" style="margin-bottom: 20px;">
-                    <label style="display: block; font-size: 13px; font-weight: 600; color: #9aa4bf; margin-bottom: 8px;">{{ __('messages.discount_code') ?? 'Promo Code' }}</label>
-                    <div style="display: flex; gap: 8px;">
-                        <input type="text" id="coupon-code-input" class="form-control" placeholder="{{ __('messages.enter_promo_code') ?? 'Enter code...' }}" style="background: #181f29; border: 1px solid #2f3749; color: #fff; border-radius: 6px; padding: 10px 14px; flex-grow: 1;">
-                        <button type="button" id="apply-coupon-btn" class="button primary" style="padding: 10px 20px; border-radius: 6px; white-space: nowrap;">{{ __('messages.apply') ?? 'Apply' }}</button>
-                    </div>
-                    <div id="coupon-feedback" style="margin-top: 8px; font-size: 13px; font-weight: 600; display: none;"></div>
-                </div>
-
-                <div id="purchase-error" class="alert alert-danger" style="display: none; font-size: 14px; padding: 12px; margin-bottom: 0;"></div>
-            </div>
-            <div class="modal-footer" style="border-top: 1px solid #2f3749; padding: 16px 20px; display: flex; justify-content: flex-end; gap: 10px;">
-                <button type="button" class="button secondary" data-bs-dismiss="modal" style="padding: 10px 20px; border-radius: 6px; background: #2f3749; color: #fff; border: none; cursor: pointer;">{{ __('messages.cancel') ?? 'Cancel' }}</button>
-                <button type="button" id="confirm-purchase-btn" class="button primary" style="padding: 10px 24px; border-radius: 6px; background: #4f46e5; border: none; cursor: pointer;">{{ __('messages.confirm_purchase') ?? 'Confirm Purchase' }}</button>
-            </div>
-        </div>
-    </div>
-</div>
-
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const applyCouponBtn = document.getElementById('apply-coupon-btn');
