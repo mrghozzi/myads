@@ -4,6 +4,7 @@ namespace App\Http\Resources;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Str;
 
 class StatusResource extends JsonResource
 {
@@ -52,17 +53,30 @@ class StatusResource extends JsonResource
             'media' => $this->getMedia(),
             'gallery' => $this->getGallery(),
             'attachments' => $this->getAttachments(),
+            'activity_card' => $this->getActivityCard(),
             'related_content' => $this->related_content,
             'repost_record' => $this->whenLoaded('repostRecord'),
             'link_preview' => $this->whenLoaded('linkPreviewRecord'),
         ];
     }
 
+    /**
+     * Get a meaningful display title — suppressed for text/media posts
+     * where ForumTopic.name is just the post content, not a title.
+     */
     protected function getDisplayTitle()
     {
         $content = $this->related_content;
         if (!$content) return null;
-        
+
+        $sType = (int) $this->s_type;
+
+        // Text/media posts don't have meaningful separate titles.
+        // The ForumTopic.name for these is the post text itself, not a title.
+        if (in_array($sType, [2, 4, 10, 11, 12, 13, 14, 100])) {
+            return null;
+        }
+
         return $content->title ?? $content->name ?? null;
     }
 
@@ -201,5 +215,169 @@ class StatusResource extends JsonResource
             'size' => (int) $a->file_size,
         ])->values()->toArray();
     }
+
+    /**
+     * Build a structured activity card for rich content types
+     * (Store, Directory, Knowledgebase, Order).
+     *
+     * Returns null for text/media posts — those use display_content, media, gallery instead.
+     */
+    protected function getActivityCard(): ?array
+    {
+        $sType = (int) $this->s_type;
+        $content = $this->related_content;
+
+        if (!$content) return null;
+
+        return match ($sType) {
+            7867 => $this->buildStoreCard($content),
+            1    => $this->buildDirectoryCard($content),
+            205  => $this->buildKnowledgebaseCard($content),
+            6    => $this->buildOrderCard($content),
+            default => null,
+        };
+    }
+
+    /**
+     * Store product activity card.
+     */
+    private function buildStoreCard($product): array
+    {
+        $isFree = (int) ($product->o_order ?? 0) <= 0;
+        $currentPrice = null;
+        $originalPrice = null;
+
+        if (!$isFree) {
+            $originalPrice = (string) $product->o_order;
+            if ($product->sale && $product->sale->is_active) {
+                $currentPrice = (string) $product->sale->sale_price;
+            } else {
+                $currentPrice = $originalPrice;
+                $originalPrice = null; // No sale, no strikethrough
+            }
+        }
+
+        $badges = [];
+        if ($product->type && $product->type->name) {
+            $badges[] = ['label' => $product->type->name, 'tone' => 'primary'];
+        }
+        if ($product->is_suspended ?? false) {
+            $badges[] = ['label' => 'Suspended', 'tone' => 'danger'];
+        }
+
+        return [
+            'kind'         => 'store',
+            'title'        => $product->name,
+            'description'  => Str::limit($product->o_valuer ?? '', 240),
+            'image_url'    => $product->product_image ?? null,
+            'primary_url'  => route('store.show', $product->name),
+            'external_url' => null,
+            'cta_label'    => __('messages.preview'),
+            'badges'       => $badges,
+            'meta'         => [],
+            'price'        => [
+                'current'  => $currentPrice,
+                'original' => $originalPrice,
+                'is_free'  => $isFree,
+            ],
+        ];
+    }
+
+    /**
+     * Directory listing activity card.
+     */
+    private function buildDirectoryCard($listing): array
+    {
+        $badges = [];
+        if ($listing->category) {
+            $badges[] = [
+                'label' => $listing->category->name,
+                'tone'  => 'primary',
+            ];
+        }
+
+        $imageUrl = $listing->prominent_image ?: null;
+
+        return [
+            'kind'         => 'directory',
+            'title'        => $listing->name,
+            'description'  => Str::limit($listing->txt ?? '', 240),
+            'image_url'    => $imageUrl,
+            'primary_url'  => route('directory.show', $listing->id),
+            'external_url' => $listing->url ?? null,
+            'cta_label'    => __('messages.visit_site'),
+            'badges'       => $badges,
+            'meta'         => [
+                ['icon' => 'eye', 'label' => (string) ($listing->vu ?? 0)],
+            ],
+            'price'        => null,
+        ];
+    }
+
+    /**
+     * Knowledgebase article activity card.
+     */
+    private function buildKnowledgebaseCard($article): array
+    {
+        $product = $article->productItem ?? null;
+        $author = $article->authorUser ?? null;
+        $productSlug = $product->name ?? $article->o_mode ?? '';
+        $productName = $productSlug !== '' ? $productSlug : __('messages.knowledgebase');
+
+        $knowledgebaseUrl = ($productSlug !== '' && $article->name)
+            ? route('kb.show', ['name' => $productSlug, 'article' => $article->name])
+            : '#';
+
+        // Clean markdown from summary
+        $rawSummary = html_entity_decode(strip_tags((string) ($article->o_valuer ?? '')), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $rawSummary = trim((string) preg_replace('/[#>*_`~\[\]\(\)\r\n]+/u', ' ', $rawSummary));
+        $summary = Str::limit((string) preg_replace('/\s+/u', ' ', $rawSummary), 240);
+
+        return [
+            'kind'         => 'knowledgebase',
+            'title'        => $article->name ?? '',
+            'description'  => $summary,
+            'image_url'    => null,
+            'primary_url'  => $knowledgebaseUrl,
+            'external_url' => null,
+            'cta_label'    => __('messages.preview'),
+            'badges'       => [
+                ['label' => __('messages.knowledgebase'), 'tone' => 'primary'],
+                ['label' => $productName, 'tone' => 'neutral'],
+                ['label' => __('messages.published'), 'tone' => 'success'],
+            ],
+            'meta'         => [
+                ['icon' => 'user', 'label' => $author->username ?? __('messages.guest')],
+            ],
+            'price'        => null,
+        ];
+    }
+
+    /**
+     * Order request activity card.
+     */
+    private function buildOrderCard($order): array
+    {
+        $offersCount = $order->offers_count ?? 0;
+
+        return [
+            'kind'         => 'order',
+            'title'        => $order->title ?? '',
+            'description'  => Str::limit(trim(strip_tags($order->description ?? '')), 240),
+            'image_url'    => null,
+            'primary_url'  => route('orders.show', $order),
+            'external_url' => null,
+            'cta_label'    => __('messages.view_details'),
+            'badges'       => [
+                ['label' => $order->displayCategory(), 'tone' => 'primary'],
+                ['label' => $order->displayBudget(), 'tone' => 'neutral'],
+                ['label' => __('messages.offers') . ': ' . $offersCount, 'tone' => 'neutral'],
+                ['label' => $order->displayWorkflowStatus(), 'tone' => 'warning'],
+            ],
+            'meta'         => [],
+            'price'        => null,
+        ];
+    }
 }
+
 
