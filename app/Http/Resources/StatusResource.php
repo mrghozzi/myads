@@ -49,6 +49,9 @@ class StatusResource extends JsonResource
             'display_title' => $this->getDisplayTitle(),
             'display_content' => $this->getDisplayContent(),
             'display_image' => $this->getDisplayImage(),
+            'media' => $this->getMedia(),
+            'gallery' => $this->getGallery(),
+            'attachments' => $this->getAttachments(),
             'related_content' => $this->related_content,
             'repost_record' => $this->whenLoaded('repostRecord'),
             'link_preview' => $this->whenLoaded('linkPreviewRecord'),
@@ -76,20 +79,127 @@ class StatusResource extends JsonResource
         $content = $this->related_content;
         if (!$content) return null;
 
-        if (isset($content->screenshot)) {
+        // Directory listing screenshot
+        if (isset($content->screenshot) && $content->screenshot) {
             return asset('upload/' . $content->screenshot);
         }
-        if (isset($content->icon)) {
+
+        // Store product icon
+        if (isset($content->icon) && $content->icon) {
             return asset('upload/store/' . $content->icon);
         }
         
+        // Forum topic image via imageOption relation
         if (isset($content->image_url) && $content->image_url) {
-             return asset('upload/forum/' . $content->image_url);
+            return asset($content->image_url);
         }
+
+        // First image attachment
         if (isset($content->attachments) && $content->attachments && $content->attachments->count() > 0) {
-             return asset('upload/forum/' . $content->attachments->first()->name);
+            $firstImage = $content->attachments->first(fn($a) => str_starts_with((string) ($a->mime_type ?? ''), 'image/'));
+            if ($firstImage) {
+                return asset($firstImage->file_path);
+            }
         }
 
         return null;
     }
+
+    /**
+     * Get the primary media for multimedia posts (video, audio, reels, music).
+     */
+    protected function getMedia(): ?array
+    {
+        $sType = (int) $this->s_type;
+        $content = $this->related_content;
+
+        if (!$content) return null;
+
+        // Map s_type to media type
+        $mediaType = match ($sType) {
+            10 => 'video',
+            11 => 'audio',
+            12 => 'file',
+            13 => 'music',
+            14 => 'reels',
+            4  => 'image',
+            default => null,
+        };
+
+        if (!$mediaType) return null;
+
+        // For multimedia posts, the first attachment is the media file
+        if (in_array($sType, [10, 11, 12, 13, 14]) && isset($content->attachments) && $content->attachments->count() > 0) {
+            $attachment = $content->attachments->first();
+            return [
+                'type' => $mediaType,
+                'url' => asset($attachment->file_path),
+                'mime_type' => $attachment->mime_type,
+                'name' => $attachment->original_name,
+                'size' => (int) $attachment->file_size,
+            ];
+        }
+
+        // For image posts, return the image URL
+        if ($sType === 4) {
+            $imageUrl = $this->getDisplayImage();
+            if ($imageUrl) {
+                return [
+                    'type' => 'image',
+                    'url' => $imageUrl,
+                    'mime_type' => 'image/jpeg',
+                    'name' => null,
+                    'size' => 0,
+                ];
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Get the gallery (multiple image URLs) for image posts.
+     */
+    protected function getGallery(): array
+    {
+        $content = $this->related_content;
+        if (!$content) return [];
+
+        $gallery = [];
+
+        // Collect image attachments
+        if (isset($content->attachments) && $content->attachments) {
+            foreach ($content->attachments as $attachment) {
+                if (str_starts_with((string) ($attachment->mime_type ?? ''), 'image/')) {
+                    $gallery[] = asset($attachment->file_path);
+                }
+            }
+        }
+
+        // Fallback to imageOption if no image attachments
+        if (empty($gallery) && isset($content->image_url) && $content->image_url) {
+            $gallery[] = asset($content->image_url);
+        }
+
+        return $gallery;
+    }
+
+    /**
+     * Get all attachments as a structured array.
+     */
+    protected function getAttachments(): array
+    {
+        $content = $this->related_content;
+        if (!$content || !isset($content->attachments) || !$content->attachments) {
+            return [];
+        }
+
+        return $content->attachments->map(fn($a) => [
+            'url' => asset($a->file_path),
+            'mime_type' => $a->mime_type,
+            'name' => $a->original_name,
+            'size' => (int) $a->file_size,
+        ])->values()->toArray();
+    }
 }
+

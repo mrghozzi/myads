@@ -33,7 +33,18 @@
 * **API / Security**: Fixed a critical `500 Internal Server Error` during Mobile App API login caused by the missing `HasApiTokens` trait in the `User` model, restoring secure token generation capabilities.
 * **API / Database**: Provided explicit schema definitions and migration guidelines for `personal_access_tokens` to support free hosting environments where terminal execution for Sanctum installation is restricted.
 
+### Mobile App Multimedia Support
+* **Feature**: Overhauled `StatusResource` API output to include three new structured fields — `media` (primary media object with `type`, `url`, `mime_type`, `name`, `size`), `gallery` (array of image URLs for multi-image posts), and `attachments` (array of all file attachments with full metadata) — enabling the Flutter app to render all multimedia post types.
+* **Fix**: Corrected broken image path construction in `StatusResource::getDisplayImage()` which was incorrectly prepending `upload/forum/` to `image_url` and attachment paths that already contained full relative paths, causing 404 errors in the mobile app.
+* **Fix**: Added `StatusActivityService::decorateMany()` call to `Api\ProfileController::statuses()` to properly hydrate `related_content` and attachment data for profile feed posts, matching the portal feed behavior.
+* **Feature**: Created `AttachmentModel` in Flutter (`core/models/attachment_model.dart`) with type detection helpers (`isImage`, `isVideo`, `isAudio`) and human-readable file size formatting.
+* **Feature**: Extended `StatusModel` in Flutter with `MediaInfo` class and new fields (`media`, `gallery`, `attachments`) to parse the enriched API response.
+* **Feature**: Implemented full multimedia rendering in `PostCard` widget including: video/reels player cards with play overlay and aspect ratio detection (16:9 for video, 9:16 for reels), audio/music player cards with waveform visualization and accent-colored UI, smart image gallery grid (2-up, 1+row layouts with "+N" overflow indicator), and file attachment cards with download icons and human-readable sizes.
+* **Feature**: Added color-coded media type badges (Video 🔵, Audio 🟢, Reels 🟣, Music 🟠, File 🔘) to post cards for quick content-type identification.
+* **Dependency**: Added `url_launcher` package to Flutter app for opening media files in external applications.
+
 ---
+
 
 # v4.3.3
 > **Maintenance & Feature Release** — Apple Pay, Tabby, and Flouci payment gateway integrations, beta flags & geographical restrictions, admin webhook configuration hints, multimedia posts, comment replies, enhanced activity stickers, SEO structured data fixes, admin moderation tools, knowledgebase publisher fixes, portal search integration, and system stability.

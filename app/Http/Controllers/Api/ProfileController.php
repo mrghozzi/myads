@@ -32,14 +32,19 @@ class ProfileController extends Controller
             return response()->json(['error' => 'User not found'], 404);
         }
 
+        $activityService = app(\App\Services\StatusActivityService::class);
+
         // Basic fetch of user statuses
         $statuses = Status::visible()
             ->where('uid', $user->id)
             ->orderBy('date', 'desc')
             ->paginate(20);
 
+        $activityService->decorateMany($statuses);
+
         return StatusResource::collection($statuses);
     }
+
 
     public function follow($identifier)
     {

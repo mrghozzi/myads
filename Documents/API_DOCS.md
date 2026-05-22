@@ -133,7 +133,13 @@ Allows any website to pre-fill the MYADS post composer.
 These endpoints are designed for the first-party mobile application and require Sanctum Bearer Token authentication.
 
 ### Community Feed & Statuses
-- `GET /api/portal/feed`: Retrieves the community feed (paginated). Optional query parameter `filter` (`all` or `me`). Returns a collection of `StatusResource` which includes `display_content`, `display_title`, and `display_image` properties containing pre-rendered HTML/attributes for diverse post types (Files, Products, Services, Videos, Reels).
+- `GET /api/portal/feed`: Retrieves the community feed (paginated). Optional query parameter `filter` (`all` or `me`). Returns a collection of `StatusResource` which includes:
+  - `display_content`, `display_title`, `display_image`: Pre-rendered HTML/attributes for diverse post types.
+  - `media`: Primary media object for multimedia posts (Video, Audio, File, Music, Reels) containing `type`, `url`, `mime_type`, `name`, and `size`. Returns `null` for text-only posts.
+  - `gallery`: Array of image URLs for multi-image posts. Empty array for non-image posts.
+  - `attachments`: Array of all file attachments, each with `url`, `mime_type`, `name`, and `size`.
+  - `grouped_reactions`: Map of reaction types to counts.
+  - `has_liked`, `user_reaction`: Current user's reaction state.
 - `POST /api/statuses`: Create a new status.
   *Payload:* `{"text": "Hello world!"}`
 - `DELETE /api/statuses/{status_id}`: Delete a status (requires ownership or admin rights).
@@ -147,8 +153,9 @@ These endpoints are designed for the first-party mobile application and require 
 
 ### Profile & Follow (Phase 2)
 - `GET /api/profile/{identifier}`: Retrieve user profile details and stats.
-- `GET /api/profile/{identifier}/statuses`: Retrieve user's feed statuses.
+- `GET /api/profile/{identifier}/statuses`: Retrieve user's feed statuses. Response includes the same enriched `StatusResource` fields (`media`, `gallery`, `attachments`) as the community feed, with full `related_content` hydration.
 - `POST /api/profile/{identifier}/follow`: Toggle follow status for a user.
+
 
 ### Private Messages (Phase 2)
 - `GET /api/messages`: Retrieve the list of active conversations (latest message per partner).
