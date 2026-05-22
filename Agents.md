@@ -295,7 +295,7 @@ myads/
 
 ### Route Files
 - **`routes/web.php`** (~500 lines) — All web routes
-- **`routes/api.php`** — REST API (Sanctum, alpha)
+- **`routes/api.php`** — REST API (Sanctum, Phase 1 Mobile App features)
 - **`routes/installer.php`** — Installer wizard
 
 ### URL Conventions

@@ -1,6 +1,15 @@
 # v4.3.4
 > **Feature Release** — Paid Plugin Licensing & Verification Protocol, Store Product License Key Integration, Plugin Auto-Update APIs, Store Discount Codes, Seller Temporary Sales, and Developer Architecture Guides.
 
+### Mobile App API (Phases 1-4)
+* **Feature**: Introduced a foundational JSON REST API for Android/mobile applications using Laravel Sanctum for secure token-based authentication.
+* **Feature**: Added robust Data Resources (`StatusResource`, `UserResource`, `UserProfileResource`, `CommentResource`, `MessageResource`, `ConversationResource`, `NotificationResource`, `ForumCategoryResource`, `ForumTopicResource`, `ProductResource`) to format and sanitize data safely for external mobile clients, including automatic message decryption for secure end-to-end messaging payloads.
+* **Feature**: Created dedicated API controllers (`Api\PortalController`, `Api\StatusController`, `Api\CommentController`, `Api\ReactionController`, `Api\ProfileController`, `Api\MessageController`, `Api\NotificationController`, `Api\WalletController`, `Api\ForumApiController`, `Api\StoreApiController`) to decouple mobile logic from web views.
+* **Feature**: Implemented **Phase 1** protected endpoints in `routes/api.php` for community feed retrieval (`/api/portal/feed`), status creation/deletion, comments, and reaction toggles.
+* **Feature**: Implemented **Phase 2** protected endpoints focusing on user socialization: fetching profile stats, loading a user's statuses, unified follow/unfollow toggle, querying active conversations, retrieving message history, sending private messages, and marking conversations as read.
+* **Feature**: Implemented **Phase 3** protected endpoints covering user utility logic: fetching paginated notifications, retrieving unread notification counts, marking notifications as read (single or bulk), and querying the user's real-time Points (PTS) and ad credits wallet balance.
+* **Feature**: Implemented **Phase 4** protected endpoints covering Forums and Store: fetching forum categories, topics, and replies, as well as paginated store products and details, expanding the API scope to cover community discussions and digital marketplace assets.
+
 ### Store Discount Codes & Sales System
 * **Feature**: Implemented a comprehensive **Store Discount System** (`store_discount_codes` and `store_discount_redemptions` tables) allowing sellers to generate personalized promotional codes for their products.
 * **Feature**: Added **Temporary Sales** functionality (`store_sales` table) enabling sellers to put products on sale for a limited time, rendering old and new prices dynamically on product pages.

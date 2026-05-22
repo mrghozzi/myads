@@ -41,7 +41,48 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/forum', [ForumController::class, 'index']);
     Route::post('/forum', [ForumController::class, 'store']);
     
-    // Add other endpoints here
+    // Community Feed API
+    Route::get('/portal/feed', [App\Http\Controllers\Api\PortalController::class, 'index']);
+    
+    // Statuses API
+    Route::post('/statuses', [App\Http\Controllers\Api\StatusController::class, 'store']);
+    Route::delete('/statuses/{status}', [App\Http\Controllers\Api\StatusController::class, 'destroy']);
+    
+    // Comments API
+    Route::get('/statuses/{status}/comments', [App\Http\Controllers\Api\CommentController::class, 'index']);
+    Route::post('/statuses/{status}/comments', [App\Http\Controllers\Api\CommentController::class, 'store']);
+    
+    // Reactions API
+    Route::post('/reactions/toggle', [App\Http\Controllers\Api\ReactionController::class, 'toggle']);
+
+    // Profile API
+    Route::get('/profile/{identifier}', [App\Http\Controllers\Api\ProfileController::class, 'show']);
+    Route::get('/profile/{identifier}/statuses', [App\Http\Controllers\Api\ProfileController::class, 'statuses']);
+    Route::post('/profile/{identifier}/follow', [App\Http\Controllers\Api\ProfileController::class, 'follow']);
+
+    // Messages API
+    Route::get('/messages', [App\Http\Controllers\Api\MessageController::class, 'index']);
+    Route::get('/messages/{identifier}', [App\Http\Controllers\Api\MessageController::class, 'show']);
+    Route::post('/messages/{identifier}', [App\Http\Controllers\Api\MessageController::class, 'store']);
+    Route::post('/messages/{identifier}/read', [App\Http\Controllers\Api\MessageController::class, 'markAsRead']);
+
+    // Notifications API
+    Route::get('/notifications', [App\Http\Controllers\Api\NotificationController::class, 'index']);
+    Route::get('/notifications/unread-count', [App\Http\Controllers\Api\NotificationController::class, 'unreadCount']);
+    Route::post('/notifications/read-all', [App\Http\Controllers\Api\NotificationController::class, 'markAllAsRead']);
+    Route::post('/notifications/{id}/read', [App\Http\Controllers\Api\NotificationController::class, 'markAsRead']);
+
+    // Wallet API
+    Route::get('/wallet/balance', [App\Http\Controllers\Api\WalletController::class, 'balance']);
+
+    // Forums API (Mobile specific)
+    Route::get('/forums/categories', [App\Http\Controllers\Api\ForumApiController::class, 'categories']);
+    Route::get('/forums/categories/{categoryId}/topics', [App\Http\Controllers\Api\ForumApiController::class, 'topics']);
+    Route::get('/forums/topics/{topicId}', [App\Http\Controllers\Api\ForumApiController::class, 'show']);
+
+    // Store API (Mobile specific)
+    Route::get('/store/products', [App\Http\Controllers\Api\StoreApiController::class, 'index']);
+    Route::get('/store/products/{id}', [App\Http\Controllers\Api\StoreApiController::class, 'show']);
 });
 
 // Developer Platform API v1

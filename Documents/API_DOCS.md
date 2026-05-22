@@ -122,6 +122,51 @@ Allows any website to pre-fill the MYADS post composer.
 
 ---
 
+## 7. Mobile App API (Phase 1)
+
+These endpoints are designed for the first-party mobile application and require Sanctum Bearer Token authentication.
+
+### Community Feed & Statuses
+- `GET /api/portal/feed`: Retrieves the community feed (paginated). Optional query parameter `filter` (`all` or `me`).
+- `POST /api/statuses`: Create a new status.
+  *Payload:* `{"text": "Hello world!"}`
+- `DELETE /api/statuses/{status_id}`: Delete a status (requires ownership or admin rights).
+
+### Comments & Reactions
+- `GET /api/statuses/{status_id}/comments`: Retrieve comments for a specific status.
+- `POST /api/statuses/{status_id}/comments`: Post a new comment.
+  *Payload:* `{"text": "My comment"}`
+- `POST /api/reactions/toggle`: Toggle a reaction on a subject.
+  *Payload:* `{"subject_id": 123, "type": 2}`
+
+### Profile & Follow (Phase 2)
+- `GET /api/profile/{identifier}`: Retrieve user profile details and stats.
+- `GET /api/profile/{identifier}/statuses`: Retrieve user's feed statuses.
+- `POST /api/profile/{identifier}/follow`: Toggle follow status for a user.
+
+### Private Messages (Phase 2)
+- `GET /api/messages`: Retrieve the list of active conversations (latest message per partner).
+- `GET /api/messages/{identifier}`: Retrieve message history with a specific user.
+- `POST /api/messages/{identifier}`: Send a private message to a user.
+  *Payload:* `{"text": "Hello!"}`
+- `POST /api/messages/{identifier}/read`: Mark all unread messages from a user as read.
+
+### Notifications & Wallet (Phase 3)
+- `GET /api/notifications`: Retrieve user notifications (paginated).
+- `GET /api/notifications/unread-count`: Get the number of unread notifications.
+- `POST /api/notifications/{id}/read`: Mark a specific notification as read.
+- `POST /api/notifications/read-all`: Mark all notifications as read.
+- `GET /api/wallet/balance`: Retrieve the user's current points (PTS) and ad credits balance.
+
+### Forums & Store (Phase 4)
+- `GET /api/forums/categories`: Retrieve forum categories.
+- `GET /api/forums/categories/{categoryId}/topics`: Retrieve topics in a specific category.
+- `GET /api/forums/topics/{topicId}`: Retrieve a specific topic and its replies.
+- `GET /api/store/products`: Retrieve store products (paginated).
+- `GET /api/store/products/{id}`: Retrieve a specific product's details.
+
+---
+
 ## 7. Response Format
 
 All API responses follow a consistent JSON structure:
