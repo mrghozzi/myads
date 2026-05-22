@@ -34,8 +34,11 @@ class ReelsController extends Controller
 
         $activities = \App\Models\Status::visible()
             ->where('s_type', 14)
-            ->whereHas('savedReels', function ($q) use ($user) {
-                $q->where('user_id', $user->id);
+            ->whereExists(function ($query) use ($user) {
+                $query->select(\Illuminate\Support\Facades\DB::raw(1))
+                      ->from('saved_statuses')
+                      ->whereColumn('saved_statuses.status_id', 'status.id')
+                      ->where('saved_statuses.user_id', $user->id);
             })
             ->orderBy('date', 'desc')
             ->paginate(10);
