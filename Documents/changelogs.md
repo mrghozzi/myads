@@ -1,5 +1,12 @@
 # v4.3.4
-> **Feature Release** — Paid Plugin Licensing & Verification Protocol, Store Product License Key Integration, Plugin Auto-Update APIs, Store Discount Codes, Seller Temporary Sales, and Developer Architecture Guides.
+> **Feature Release** — Paid Plugin Licensing & Verification Protocol, Store Product License Key Integration, Plugin Auto-Update APIs, Store Discount Codes, Seller Temporary Sales, Developer Architecture Guides, and Full Reels System (Web & Mobile).
+
+### Reels System (Web & Mobile)
+* **Feature**: Introduced a full **Reels** experience across both the Web Platform and Mobile App, allowing users to scroll vertically through short-form video content.
+* **Web**: Implemented a vertical scroll-snap UI for the Web Reels feed (`/reels`) with auto-playing videos, floating interaction sidebars (Like, Comment, Save, Share), and a dedicated Saved Reels grid.
+* **Mobile**: Built the `ReelsScreen` and `SavedReelsScreen` in Flutter with native `PageView.builder` for seamless vertical swiping and integrated `video_player`.
+* **API**: Added dedicated API endpoints for saving reels (`/api/reels/save`) and retrieving saved reels (`/api/reels/saved`).
+* **Architecture**: Upgraded `StatusResource` to include `has_saved` state and `reaction_type` for personalized Reels interactions.
 
 ### Mobile App API (Phases 1-4)
 * **Feature**: Introduced a foundational JSON REST API for Android/mobile applications using Laravel Sanctum for secure token-based authentication.

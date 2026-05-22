@@ -178,6 +178,10 @@ These endpoints are designed for the first-party mobile application and require 
 - `GET /api/store/products`: Retrieve store products (paginated).
 - `GET /api/store/products/{id}`: Retrieve a specific product's details.
 
+### Reels
+- `GET /api/reels/saved`: Retrieve a list of saved reels for the authenticated user.
+- `POST /api/reels/save`: Toggle the saved state of a specific reel. Payload: `{"status_id": 123}`
+
 ---
 
 ## 7. Response Format
