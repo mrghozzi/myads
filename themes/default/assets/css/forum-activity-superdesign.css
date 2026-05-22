@@ -522,6 +522,8 @@ html[dir="rtl"] .forum-rdx-comment-form-shell .forum-rdx-comment-footer {
   box-shadow: 0 12px 24px rgba(0,0,0,0.15);
   position: relative;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
+  width: 100%;
+  max-width: 100%;
   /* Plyr Theming */
   --plyr-color-main: #615dfa;
   --plyr-video-control-background-hover: rgba(97, 93, 250, 0.7);
@@ -557,6 +559,11 @@ html[dir="rtl"] .forum-rdx-comment-form-shell .forum-rdx-comment-footer {
   width: 100%;
   max-height: 520px;
   display: block;
+}
+
+.post-video-wrapper .plyr {
+  width: 100%;
+  max-width: 100%;
 }
 
 /* Audio Player Stylized */
@@ -670,3 +677,5 @@ body[data-theme="css"] .tag-sticker .fa-download {
   color: var(--rdx-text-muted, #8f91ac);
 }
 
+
+.activity-post-card, .widget-box-status, .widget-box-status-content { min-width: 0 !important; }

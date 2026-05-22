@@ -15,6 +15,10 @@
 * **UI**: Added a custom, styled **License Key Display Card** to the sidebar of purchased items in the store detail view (`/store/{name}`), allowing users to easily view and copy their licensing keys.
 * **Documentation**: Updated `Documents/PLUGIN_GUIDE.md` to establish the reusable design conventions and standards for paid plugins.
 
+### Bug Fixes & UI Polish
+* **Theme / UI**: Fixed a major layout bug in Light Mode where community posts containing videos or Reels would stretch beyond the screen boundaries. This was resolved by restoring the missing CSS layout properties in `styles.min.css`.
+* **Theme / UI**: Added robust overflow protections (`min-width: 0 !important`) to community feed post containers (`.activity-post-card`, `.widget-box-status-content`) in `forum-activity-superdesign.css` across both Light and Dark themes to prevent media content from breaking flex bounds.
+
 ---
 
 # v4.3.3
