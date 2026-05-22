@@ -24,8 +24,8 @@ class StoreEditorPagesTest extends TestCase
 
         $response->assertOk()
             ->assertSee('textarea name="txt" id="editor1" rows="15"', false)
-            ->assertSee('sceditor.create(textarea', false)
-            ->assertSee('jquery.sceditor.min.js', false)
+            ->assertSee('new Stackedit()', false)
+            ->assertSee('stackedit.min.js', false)
             ->assertSee('data-store-source-picker', false)
             ->assertSee('value="themes"', false)
             ->assertDontSee('value="templates"', false);

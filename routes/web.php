@@ -353,12 +353,23 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/store/delete', [StoreController::class, 'destroy'])->name('store.delete');
     Route::get('/store/{name}/update', [StoreController::class, 'update'])->name('store.update');
     Route::post('/store/{name}/update', [StoreController::class, 'storeUpdate'])->name('store.update.store');
+    Route::post('/store/{name}/update-price', [StoreController::class, 'updatePrice'])->name('store.update.price');
     Route::post('/store/{name}/update-topic', [StoreController::class, 'updateTopic'])->name('store.update.topic');
     Route::post('/store/{name}/update-details', [StoreController::class, 'updateDetails'])->name('store.update.details');
     Route::post('/store/download/{id}', [StoreController::class, 'download'])->name('store.download');
     Route::post('/store/upload-zip', [StoreController::class, 'uploadZip'])->name('store.upload_zip');
     Route::post('/store/verify-name', [StoreController::class, 'verifyName'])->name('store.verify_name');
     Route::post('/store/categories', [StoreController::class, 'loadCategories'])->name('store.categories');
+
+    // Store Discount Codes
+    Route::get('/store/discounts', [StoreController::class, 'discountsIndex'])->name('store.discounts.index');
+    Route::get('/store/discounts/create', [StoreController::class, 'discountsCreate'])->name('store.discounts.create');
+    Route::post('/store/discounts/store', [StoreController::class, 'discountsStore'])->name('store.discounts.store');
+    Route::get('/store/discounts/{id}/edit', [StoreController::class, 'discountsEdit'])->name('store.discounts.edit');
+    Route::post('/store/discounts/{id}/update', [StoreController::class, 'discountsUpdate'])->name('store.discounts.update');
+    Route::get('/store/discounts/{id}/delete', [StoreController::class, 'discountsDestroy'])->name('store.discounts.destroy');
+    Route::post('/store/discounts/validate', [StoreController::class, 'validateDiscount'])->name('store.discounts.validate');
+    Route::post('/store/{id}/purchase', [StoreController::class, 'purchaseProduct'])->name('store.purchase');
 });
 
 Route::get('/store', [StoreController::class, 'index'])->name('store.index');
@@ -650,6 +661,14 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/products/{id}/edit', [AdminController::class, 'editProduct'])->name('admin.products.edit');
     Route::post('/products/{id}', [AdminController::class, 'updateProduct'])->name('admin.products.update');
     Route::post('/products/{id}/suspend', [AdminController::class, 'suspendProduct'])->name('admin.products.suspend');
+
+    // Admin Store Discount Codes
+    Route::get('/store/discounts', [AdminController::class, 'discountsIndex'])->name('admin.store.discounts.index');
+    Route::get('/store/discounts/create', [AdminController::class, 'discountsCreate'])->name('admin.store.discounts.create');
+    Route::post('/store/discounts/store', [AdminController::class, 'discountsStore'])->name('admin.store.discounts.store');
+    Route::get('/store/discounts/{id}/edit', [AdminController::class, 'discountsEdit'])->name('admin.store.discounts.edit');
+    Route::post('/store/discounts/{id}/update', [AdminController::class, 'discountsUpdate'])->name('admin.store.discounts.update');
+    Route::get('/store/discounts/{id}/delete', [AdminController::class, 'discountsDestroy'])->name('admin.store.discounts.destroy');
 
     // Plugins
     Route::get('/plugins', [AdminController::class, 'plugins'])->name('admin.plugins');

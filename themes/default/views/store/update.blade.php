@@ -102,9 +102,9 @@
                 <div class="widget-box store-editor-card">
                     <p class="widget-box-title">{{ __('messages.price_pts') }}</p>
                     <div class="widget-box-content">
-                        <div class="form-row">
+                        <div class="form-row split">
                             <div class="form-item">
-                                <div class="form-input small">
+                                <div class="form-input small active">
                                     <label for="pts_update">{{ __('messages.price_pts') }} <small style="font-weight:normal;opacity:.7;">({{ __('messages.optional') }})</small></label>
                                     <input
                                         type="number"
@@ -115,9 +115,59 @@
                                         min="0"
                                         max="999999"
                                         style="width:100%;"
+                                        form="priceForm"
                                     >
                                 </div>
                             </div>
+                            <div class="form-item">
+                                <div class="form-input small active">
+                                    <label for="sale_price">{{ __('messages.sale_price') }} <small style="font-weight:normal;opacity:.7;">({{ __('messages.optional') }})</small></label>
+                                    <input
+                                        type="number"
+                                        id="sale_price"
+                                        name="sale_price"
+                                        value="{{ old('sale_price', $product->sale ? $product->sale->sale_price : '') }}"
+                                        placeholder="{{ __('messages.sale_price_hint') }}"
+                                        min="0"
+                                        max="999999"
+                                        style="width:100%;"
+                                        form="priceForm"
+                                    >
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row split" style="margin-top: 15px;">
+                            <div class="form-item">
+                                <div class="form-input small active">
+                                    <label for="sale_start">{{ __('messages.sale_start') }}</label>
+                                    <input
+                                        type="datetime-local"
+                                        id="sale_start"
+                                        name="sale_start"
+                                        value="{{ old('sale_start', $product->sale && $product->sale->start_date ? $product->sale->start_date->format('Y-m-d\TH:i') : '') }}"
+                                        style="width:100%;"
+                                        form="priceForm"
+                                    >
+                                </div>
+                            </div>
+                            <div class="form-item">
+                                <div class="form-input small active">
+                                    <label for="sale_end">{{ __('messages.sale_end') }}</label>
+                                    <input
+                                        type="datetime-local"
+                                        id="sale_end"
+                                        name="sale_end"
+                                        value="{{ old('sale_end', $product->sale && $product->sale->end_date ? $product->sale->end_date->format('Y-m-d\TH:i') : '') }}"
+                                        style="width:100%;"
+                                        form="priceForm"
+                                    >
+                                </div>
+                            </div>
+                        </div>
+                        <div style="display:flex; justify-content:flex-end; margin-top: 15px;">
+                            <button type="submit" form="priceForm" class="button primary">
+                                <i class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp; {{ __('messages.save') }}
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -160,6 +210,10 @@
                 </div>
             </aside>
         </div>
+    </form>
+
+    <form id="priceForm" method="post" action="{{ route('store.update.price', $product->name) }}">
+        @csrf
     </form>
 
     <details class="widget-box store-editor-card store-editor-history">

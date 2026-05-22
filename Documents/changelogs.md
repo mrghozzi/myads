@@ -1,5 +1,11 @@
 # v4.3.4
-> **Feature Release** — Paid Plugin Licensing & Verification Protocol, Store Product License Key Integration, Plugin Auto-Update APIs, and Developer Architecture Guides.
+> **Feature Release** — Paid Plugin Licensing & Verification Protocol, Store Product License Key Integration, Plugin Auto-Update APIs, Store Discount Codes, Seller Temporary Sales, and Developer Architecture Guides.
+
+### Store Discount Codes & Sales System
+* **Feature**: Implemented a comprehensive **Store Discount System** (`store_discount_codes` and `store_discount_redemptions` tables) allowing sellers to generate personalized promotional codes for their products.
+* **Feature**: Added **Temporary Sales** functionality (`store_sales` table) enabling sellers to put products on sale for a limited time, rendering old and new prices dynamically on product pages.
+* **Feature**: Integrated an **Ajax Coupon Validation** flow into the store checkout process, applying real-time PTS deductions for valid codes.
+* **Admin**: Introduced a centralized **Admin Discount Management** dashboard (`/admin/store/discounts`) enabling site administrators to issue global coupons, category-specific discounts, or seller-wide promotional codes.
 
 ### Paid Plugin Licensing & Auto-Update Protocol
 * **Feature**: Implemented a robust **Product Licensing Database Scheme** (`product_licenses` table) to bind product purchases to client domain hostnames.

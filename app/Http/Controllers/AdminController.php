@@ -2984,6 +2984,9 @@ class AdminController extends Controller
             'existing_files.*.vnbr' => ['required_with:existing_files', 'string', 'min:2', 'max:12', 'regex:/^[-a-zA-Z0-9.]+$/'],
             'existing_files.*.link' => ['required_with:existing_files', 'string'],
             'existing_files.*.desc' => ['nullable', 'string', 'max:2400'],
+            'sale_price' => ['nullable', 'integer', 'min:0', 'lt:pts'],
+            'sale_start' => ['nullable', 'date'],
+            'sale_end'   => ['nullable', 'date', 'after_or_equal:sale_start'],
         ]);
 
         $oldOwnerId = (int) $product->o_parent;
@@ -3079,6 +3082,20 @@ class AdminController extends Controller
             if ($seller) {
                 $this->notifications->send($seller, __('messages.product_updated_notification', ['product' => $product->name]));
             }
+        }
+
+        // Update sale information
+        if ($request->filled('sale_price')) {
+            \App\Models\StoreSale::updateOrCreate(
+                ['product_id' => $product->id],
+                [
+                    'sale_price' => $request->sale_price,
+                    'start_date' => $request->sale_start,
+                    'end_date' => $request->sale_end,
+                ]
+            );
+        } else {
+            \App\Models\StoreSale::where('product_id', $product->id)->delete();
         }
 
         return redirect()->back()->with('success', __('messages.product_updated') ?? 'Product updated successfully.');
@@ -3879,4 +3896,125 @@ class AdminController extends Controller
     }
 
     public function debugFfmpeg() { return response()->json(['status' => 200, 'message' => 'FFMPEG Debug started! Check logs later.']); }
+
+    /**
+     * Admin Discount Codes List
+     */
+    public function discountsIndex()
+    {
+        $discounts = \App\Models\StoreDiscountCode::orderBy('id', 'desc')->paginate(15);
+        return view('admin::admin.store.discounts.index', compact('discounts'));
+    }
+
+    /**
+     * Admin Create Discount Code Form
+     */
+    public function discountsCreate()
+    {
+        $products = Product::withoutGlobalScope('store')->where('o_type', 'store')->get();
+        
+        $sellerIds = Product::withoutGlobalScope('store')->where('o_type', 'store')->pluck('o_parent')->unique();
+        $sellers = User::whereIn('id', $sellerIds)->get();
+
+        $categories = ['plugins', 'themes', 'script'];
+
+        return view('admin::admin.store.discounts.create', compact('products', 'sellers', 'categories'));
+    }
+
+    /**
+     * Admin Store Discount Code
+     */
+    public function discountsStore(Request $request)
+    {
+        $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'code' => ['required', 'string', 'max:100', 'unique:store_discount_codes,code'],
+            'discount_type' => ['required', 'string', 'in:percent,fixed'],
+            'discount_value' => ['required', 'integer', 'min:1'],
+            'applies_to' => ['required', 'string', 'in:all,product,category,seller'],
+            'target_value' => ['required_unless:applies_to,all', 'nullable'],
+            'start_date' => ['nullable', 'date'],
+            'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],
+            'max_uses' => ['nullable', 'integer', 'min:1'],
+        ]);
+
+        \App\Models\StoreDiscountCode::create([
+            'user_id' => null, // admin/global
+            'name' => $request->name,
+            'code' => strtoupper($request->code),
+            'discount_type' => $request->discount_type,
+            'discount_value' => $request->discount_value,
+            'applies_to' => $request->applies_to,
+            'target_value' => $request->applies_to === 'all' ? null : $request->target_value,
+            'start_date' => $request->start_date,
+            'end_date' => $request->end_date,
+            'max_uses' => $request->max_uses,
+            'is_active' => $request->has('is_active'),
+        ]);
+
+        return redirect()->route('admin.store.discounts.index')->with('success', __('messages.added_successfully') ?? 'Discount code added successfully.');
+    }
+
+    /**
+     * Admin Edit Discount Code Form
+     */
+    public function discountsEdit($id)
+    {
+        $discount = \App\Models\StoreDiscountCode::findOrFail($id);
+        $products = Product::withoutGlobalScope('store')->where('o_type', 'store')->get();
+        
+        $sellerIds = Product::withoutGlobalScope('store')->where('o_type', 'store')->pluck('o_parent')->unique();
+        $sellers = User::whereIn('id', $sellerIds)->get();
+
+        $categories = ['plugins', 'themes', 'script'];
+
+        return view('admin::admin.store.discounts.edit', compact('discount', 'products', 'sellers', 'categories'));
+    }
+
+    /**
+     * Admin Update Discount Code
+     */
+    public function discountsUpdate(Request $request, $id)
+    {
+        $discount = \App\Models\StoreDiscountCode::findOrFail($id);
+
+        $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'code' => ['required', 'string', 'max:100', 'unique:store_discount_codes,code,' . $discount->id],
+            'discount_type' => ['required', 'string', 'in:percent,fixed'],
+            'discount_value' => ['required', 'integer', 'min:1'],
+            'applies_to' => ['required', 'string', 'in:all,product,category,seller'],
+            'target_value' => ['required_unless:applies_to,all', 'nullable'],
+            'start_date' => ['nullable', 'date'],
+            'end_date' => ['nullable', 'date', 'after_or_equal:start_date'],
+            'max_uses' => ['nullable', 'integer', 'min:1'],
+        ]);
+
+        $discount->update([
+            'name' => $request->name,
+            'code' => strtoupper($request->code),
+            'discount_type' => $request->discount_type,
+            'discount_value' => $request->discount_value,
+            'applies_to' => $request->applies_to,
+            'target_value' => $request->applies_to === 'all' ? null : $request->target_value,
+            'start_date' => $request->start_date,
+            'end_date' => $request->end_date,
+            'max_uses' => $request->max_uses,
+            'is_active' => $request->has('is_active'),
+        ]);
+
+        return redirect()->route('admin.store.discounts.index')->with('success', __('messages.updated_successfully') ?? 'Discount code updated successfully.');
+    }
+
+    /**
+     * Admin Delete Discount Code
+     */
+    public function discountsDestroy($id)
+    {
+        $discount = \App\Models\StoreDiscountCode::findOrFail($id);
+        $discount->delete();
+
+        return redirect()->route('admin.store.discounts.index')->with('success', __('messages.deleted_successfully') ?? 'Discount code deleted successfully.');
+    }
 }
+

@@ -105,6 +105,45 @@
                                 </div>
                             </div>
                         </div>
+                        
+                        <div class="form-row split">
+                            <div class="form-item">
+                                <div class="form-input small active">
+                                    <label for="sale-price">{{ __('messages.sale_price') }} <small style="font-weight:normal;opacity:.7;">({{ __('messages.optional') }})</small></label>
+                                    <input
+                                        type="number"
+                                        id="sale-price"
+                                        name="sale_price"
+                                        value="{{ old('sale_price') }}"
+                                        placeholder="{{ __('messages.sale_price_hint') }}"
+                                        min="0"
+                                        max="999999"
+                                    >
+                                </div>
+                            </div>
+                            <div class="form-item">
+                                <div class="form-input small active">
+                                    <label for="sale-start">{{ __('messages.sale_start') }}</label>
+                                    <input
+                                        type="datetime-local"
+                                        id="sale-start"
+                                        name="sale_start"
+                                        value="{{ old('sale_start') }}"
+                                    >
+                                </div>
+                            </div>
+                            <div class="form-item">
+                                <div class="form-input small active">
+                                    <label for="sale-end">{{ __('messages.sale_end') }}</label>
+                                    <input
+                                        type="datetime-local"
+                                        id="sale-end"
+                                        name="sale_end"
+                                        value="{{ old('sale_end') }}"
+                                    >
+                                </div>
+                            </div>
+                        </div>
 
                         <div class="form-row">
                             <div class="form-item">

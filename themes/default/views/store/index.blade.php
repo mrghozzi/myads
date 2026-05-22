@@ -85,7 +85,8 @@
             <a class="button white small" role="button" href="{{ $allUrl }}">&nbsp;<i class="fa fa-th" aria-hidden="true"></i>&nbsp;{{ __('messages.all') ?? 'All' }}&nbsp;</a>&nbsp;
         @endif
         @auth
-            <a class="button secondary" role="button" href="{{ route('store.create') }}">&nbsp;&nbsp;<i class="fa fa-plus" aria-hidden="true"></i>&nbsp;{{ __('messages.add_product') }}&nbsp;&nbsp;</a>
+            <a class="button primary small" role="button" href="{{ route('store.discounts.index') }}" style="margin-right: 8px; background-color: #615dfa; border-color: #615dfa;">&nbsp;&nbsp;<i class="fa fa-tags" aria-hidden="true"></i>&nbsp;{{ __('messages.discount_codes') ?? 'Discount Codes' }}&nbsp;&nbsp;</a>
+            <a class="button secondary small" role="button" href="{{ route('store.create') }}">&nbsp;&nbsp;<i class="fa fa-plus" aria-hidden="true"></i>&nbsp;{{ __('messages.add_product') }}&nbsp;&nbsp;</a>
         @endauth
     </div>
 </div>

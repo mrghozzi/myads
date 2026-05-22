@@ -71,7 +71,12 @@
                 </div>
                 <div class="store-hero__content">
                     <div class="store-badge-row">
-                        @if($product->o_order > 0)
+                        @if($product->has_active_sale)
+                            <span class="store-pill store-pill-sale" style="background: #e74c3c; color: white;">
+                                <span class="old-price" style="text-decoration: line-through; opacity: 0.7; margin-right: 5px;">{{ $product->o_order }}</span>
+                                <strong>{{ $product->sale_price }}</strong> {{ __('messages.points') }}
+                            </span>
+                        @elseif($product->o_order > 0)
                             <span class="store-pill"><strong>{{ $product->o_order }}</strong> {{ __('messages.points') }}</span>
                         @else
                             <span class="store-pill">{{ __('messages.free') }}</span>
@@ -104,20 +109,22 @@
                         </div>
                     </div>
                     <div class="store-inline-actions">
-                        @if($downloadHash)
-                            @if(auth()->check() && auth()->user()->pts < $product->o_order)
-                                <a href="javascript:void(0);" class="button secondary not-enough-points" style="color: #fff;">
-                                    <i class="fa fa-download"></i>&nbsp;{{ __('messages.download') }}
-                                </a>
-                            @elseif(auth()->check())
-                                <a href="{{ route('store.download.hash', $downloadHash) }}" class="button secondary" style="color: #fff;">
-                                    <i class="fa fa-download"></i>&nbsp;{{ __('messages.download') }}
-                                </a>
+                        @if(auth()->check())
+                            @if($license || $product->o_order == 0 || auth()->id() == $product->o_parent)
+                                @if($downloadHash)
+                                    <a href="{{ route('store.download.hash', $downloadHash) }}" class="button secondary" style="color: #fff;">
+                                        <i class="fa fa-download"></i>&nbsp;{{ __('messages.download') }}
+                                    </a>
+                                @endif
                             @else
-                                <a href="{{ route('login') }}" class="button secondary" style="color: #fff;">
-                                    <i class="fa fa-download"></i>&nbsp;{{ __('messages.download') }}
-                                </a>
+                                <button type="button" class="button secondary" style="color: #fff;" data-bs-toggle="modal" data-bs-target="#purchaseModal">
+                                    <i class="fa fa-shopping-cart"></i>&nbsp;{{ __('messages.purchase') }}
+                                </button>
                             @endif
+                        @else
+                            <a href="{{ route('login') }}" class="button secondary" style="color: #fff;">
+                                <i class="fa fa-shopping-cart"></i>&nbsp;{{ __('messages.purchase') }}
+                            </a>
                         @endif
                         <a class="button tertiary" href="{{ route('kb.index', $product->name) }}">
                             <i class="fa fa-database" aria-hidden="true"></i>&nbsp;{{ __('messages.knowledgebase') }}
@@ -756,4 +763,169 @@
         margin-bottom: 16px;
     }
 </style>
+
+@if(auth()->check() && !$license && $product->o_order > 0)
+<!-- Purchase Modal -->
+<div class="modal fade" id="purchaseModal" tabindex="-1" aria-labelledby="purchaseModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="background: #1d2333; color: #fff; border: 1px solid #2f3749; border-radius: 12px; overflow: hidden; font-family: 'Inter', sans-serif;">
+            <div class="modal-header" style="border-bottom: 1px solid #2f3749; padding: 20px;">
+                <h5 class="modal-title" id="purchaseModalLabel" style="font-weight: 700; color: #fff; margin: 0;">{{ __('messages.confirm_purchase') ?? 'Confirm Purchase' }}</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close" style="filter: invert(1) grayscale(1) brightness(2); background: none; border: none; font-size: 1.5rem; color: #fff; line-height: 1;">&times;</button>
+            </div>
+            <div class="modal-body" style="padding: 24px;">
+                <div class="product-purchase-preview" style="display: flex; gap: 15px; margin-bottom: 20px; align-items: center; background: #21283b; padding: 12px; border-radius: 8px;">
+                    <img src="{{ $productImage }}" alt="{{ $product->name }}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 6px;">
+                    <div>
+                        <h4 style="font-size: 16px; margin: 0; font-weight: 600; color: #fff;">{{ $product->name }}</h4>
+                        <p style="margin: 5px 0 0 0; color: #9aa4bf; font-size: 14px;">{{ $categoryLabel }}</p>
+                    </div>
+                </div>
+
+                <div class="price-breakdown-box" style="background: #21283b; border-radius: 8px; padding: 16px; margin-bottom: 20px;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span style="color: #9aa4bf;">{{ __('messages.price') ?? 'Price' }}</span>
+                        <strong style="color: #fff;" id="base-price-display">{{ $product->current_price }} PTS</strong>
+                    </div>
+                    <div id="discount-row" style="display: none; justify-content: space-between; margin-bottom: 10px; color: #2ecc71;">
+                        <span>{{ __('messages.discount') ?? 'Discount' }}</span>
+                        <strong id="discount-amount-display">-0 PTS</strong>
+                    </div>
+                    <hr style="border-top: 1px solid #2f3749; margin: 12px 0; background: none;">
+                    <div style="display: flex; justify-content: space-between; font-size: 16px; font-weight: 700;">
+                        <span style="color: #fff;">{{ __('messages.total') ?? 'Total' }}</span>
+                        <strong style="color: #4f46e5;" id="final-price-display">{{ $product->current_price }} PTS</strong>
+                    </div>
+                </div>
+
+                <!-- Promo Code Form -->
+                <div class="promo-code-section" style="margin-bottom: 20px;">
+                    <label style="display: block; font-size: 13px; font-weight: 600; color: #9aa4bf; margin-bottom: 8px;">{{ __('messages.discount_code') ?? 'Promo Code' }}</label>
+                    <div style="display: flex; gap: 8px;">
+                        <input type="text" id="coupon-code-input" class="form-control" placeholder="{{ __('messages.enter_promo_code') ?? 'Enter code...' }}" style="background: #181f29; border: 1px solid #2f3749; color: #fff; border-radius: 6px; padding: 10px 14px; flex-grow: 1;">
+                        <button type="button" id="apply-coupon-btn" class="button primary" style="padding: 10px 20px; border-radius: 6px; white-space: nowrap;">{{ __('messages.apply') ?? 'Apply' }}</button>
+                    </div>
+                    <div id="coupon-feedback" style="margin-top: 8px; font-size: 13px; font-weight: 600; display: none;"></div>
+                </div>
+
+                <div id="purchase-error" class="alert alert-danger" style="display: none; font-size: 14px; padding: 12px; margin-bottom: 0;"></div>
+            </div>
+            <div class="modal-footer" style="border-top: 1px solid #2f3749; padding: 16px 20px; display: flex; justify-content: flex-end; gap: 10px;">
+                <button type="button" class="button secondary" data-bs-dismiss="modal" style="padding: 10px 20px; border-radius: 6px; background: #2f3749; color: #fff; border: none; cursor: pointer;">{{ __('messages.cancel') ?? 'Cancel' }}</button>
+                <button type="button" id="confirm-purchase-btn" class="button primary" style="padding: 10px 24px; border-radius: 6px; background: #4f46e5; border: none; cursor: pointer;">{{ __('messages.confirm_purchase') ?? 'Confirm Purchase' }}</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const applyCouponBtn = document.getElementById('apply-coupon-btn');
+    const couponCodeInput = document.getElementById('coupon-code-input');
+    const couponFeedback = document.getElementById('coupon-feedback');
+    const discountRow = document.getElementById('discount-row');
+    const discountAmountDisplay = document.getElementById('discount-amount-display');
+    const finalPriceDisplay = document.getElementById('final-price-display');
+    const confirmPurchaseBtn = document.getElementById('confirm-purchase-btn');
+    const purchaseError = document.getElementById('purchase-error');
+
+    let currentCoupon = null;
+
+    if (applyCouponBtn) {
+        applyCouponBtn.addEventListener('click', function() {
+            const code = couponCodeInput.value.trim();
+            if (!code) {
+                couponFeedback.textContent = "{{ __('messages.enter_coupon_code') ?? 'Please enter a coupon code.' }}";
+                couponFeedback.style.color = '#e74c3c';
+                couponFeedback.style.display = 'block';
+                return;
+            }
+
+            applyCouponBtn.disabled = true;
+            couponFeedback.textContent = "{{ __('messages.validating') ?? 'Validating...' }}";
+            couponFeedback.style.color = '#9aa4bf';
+            couponFeedback.style.display = 'block';
+
+            fetch("{{ route('store.discounts.validate') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({
+                    code: code,
+                    product_id: "{{ $product->id }}"
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                applyCouponBtn.disabled = false;
+                if (data.success) {
+                    currentCoupon = code;
+                    couponFeedback.textContent = "{{ __('messages.coupon_applied') ?? 'Coupon applied successfully!' }} (" + data.discount_text + ")";
+                    couponFeedback.style.color = '#2ecc71';
+                    
+                    discountAmountDisplay.textContent = "-" + data.discount_amount + " PTS";
+                    discountRow.style.display = 'flex';
+                    finalPriceDisplay.textContent = data.final_price + " PTS";
+                } else {
+                    currentCoupon = null;
+                    couponFeedback.textContent = data.message;
+                    couponFeedback.style.color = '#e74c3c';
+                    
+                    discountRow.style.display = 'none';
+                    finalPriceDisplay.textContent = "{{ $product->current_price }} PTS";
+                }
+            })
+            .catch(err => {
+                applyCouponBtn.disabled = false;
+                currentCoupon = null;
+                couponFeedback.textContent = "{{ __('messages.network_error') ?? 'An error occurred. Please try again.' }}";
+                couponFeedback.style.color = '#e74c3c';
+                
+                discountRow.style.display = 'none';
+                finalPriceDisplay.textContent = "{{ $product->current_price }} PTS";
+            });
+        });
+    }
+
+    if (confirmPurchaseBtn) {
+        confirmPurchaseBtn.addEventListener('click', function() {
+            confirmPurchaseBtn.disabled = true;
+            confirmPurchaseBtn.textContent = "{{ __('messages.processing') ?? 'Processing...' }}";
+            purchaseError.style.display = 'none';
+
+            fetch("{{ route('store.purchase', $product->id) }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({
+                    code: currentCoupon
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = data.download_url;
+                } else {
+                    confirmPurchaseBtn.disabled = false;
+                    confirmPurchaseBtn.textContent = "{{ __('messages.confirm_purchase') ?? 'Confirm Purchase' }}";
+                    purchaseError.textContent = data.message;
+                    purchaseError.style.display = 'block';
+                }
+            })
+            .catch(err => {
+                confirmPurchaseBtn.disabled = false;
+                confirmPurchaseBtn.textContent = "{{ __('messages.confirm_purchase') ?? 'Confirm Purchase' }}";
+                purchaseError.textContent = "{{ __('messages.network_error') ?? 'An error occurred. Please try again.' }}";
+                purchaseError.style.display = 'block';
+            });
+        });
+    }
+});
+</script>
+@endif
+
 @endsection

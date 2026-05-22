@@ -153,6 +153,7 @@
                                 <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.news') }}">{{ __('messages.news_site') }}</a></li>
                                 <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.reports') }}">{{ __('messages.reports') }}</a></li>
                                 <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.products') }}">{{ __('messages.products') ?? 'Products' }}</a></li>
+                                <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.store.discounts.index') }}">{{ __('messages.discount_codes') ?? 'Discount Codes' }}</a></li>
                                 <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.orders.index') }}">{{ __('messages.order_requests') }}</a></li>
                                 <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.comments.index') }}">{{ __('messages.manage_comments') }}</a></li>
                                 <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.reactions.index') }}">{{ __('messages.manage_reactions') }}</a></li>

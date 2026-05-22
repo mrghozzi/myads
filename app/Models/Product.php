@@ -54,6 +54,33 @@ class Product extends Model
         return $this->hasOne(ProductType::class, 'o_parent', 'id');
     }
 
+    // Relationship to active/inactive sales
+    public function sale()
+    {
+        return $this->hasOne(StoreSale::class, 'product_id');
+    }
+
+    public function getHasActiveSaleAttribute()
+    {
+        return $this->sale && $this->sale->is_active;
+    }
+
+    public function isOnSale()
+    {
+        return (bool) $this->has_active_sale;
+    }
+
+    public function getSalePriceAttribute()
+    {
+        return $this->has_active_sale ? $this->sale->sale_price : null;
+    }
+
+    public function getCurrentPriceAttribute()
+    {
+        return $this->has_active_sale ? $this->sale->sale_price : $this->o_order;
+    }
+
+
     /**
      * Relationship to status options (for suspension check).
      */

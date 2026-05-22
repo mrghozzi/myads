@@ -250,6 +250,9 @@ class StoreController extends Controller
             'txt' => ['required', 'string', 'min:10'],
             'linkzip' => ['required', 'string'],
             'img' => ['required', 'string'],
+            'sale_price' => ['nullable', 'integer', 'min:0', 'lt:pts'],
+            'sale_start' => ['nullable', 'date'],
+            'sale_end' => ['nullable', 'date', 'after_or_equal:sale_start'],
         ]);
 
         $user = Auth::user();
@@ -307,6 +310,15 @@ class StoreController extends Controller
                 's_type' => 7867,
                 'tp_id' => $product->id,
             ]);
+
+            if ($request->filled('sale_price')) {
+                \App\Models\StoreSale::create([
+                    'product_id' => $product->id,
+                    'sale_price' => $request->sale_price,
+                    'start_date' => $request->sale_start,
+                    'end_date' => $request->sale_end,
+                ]);
+            }
 
             app(\App\Services\GamificationService::class)->recordEvent($user->id, 'product_created');
 
@@ -399,7 +411,7 @@ class StoreController extends Controller
             return true;
         }
 
-        $price = $product->o_order;
+        $price = $product->current_price;
         if ($price > 0 && $user->pts < $price) {
             return false;
         }
@@ -515,6 +527,9 @@ class StoreController extends Controller
             'linkzip' => ['required', 'string'],
             'pts'     => ['nullable', 'integer', 'min:0', 'max:999999'],
             'img'     => ['nullable', 'string'],
+            'sale_price' => ['nullable', 'integer', 'min:0', 'lt:pts'],
+            'sale_start' => ['nullable', 'date'],
+            'sale_end'   => ['nullable', 'date', 'after_or_equal:sale_start'],
         ]);
 
         $fileOption = ProductFile::create([
@@ -547,6 +562,20 @@ class StoreController extends Controller
             $product->update(['o_order' => (int) $request->pts]);
         }
 
+        // Update sale information
+        if ($request->filled('sale_price')) {
+            \App\Models\StoreSale::updateOrCreate(
+                ['product_id' => $product->id],
+                [
+                    'sale_price' => $request->sale_price,
+                    'start_date' => $request->sale_start,
+                    'end_date' => $request->sale_end,
+                ]
+            );
+        } else {
+            \App\Models\StoreSale::where('product_id', $product->id)->delete();
+        }
+
         // [v4.2.0] Trigger community status update
         \App\Models\Status::create([
             'uid'    => Auth::id(),
@@ -557,6 +586,40 @@ class StoreController extends Controller
         ]);
 
         return redirect()->route('store.show', $product->name)->with('success', __('updated_successfully'));
+    }
+
+    public function updatePrice(Request $request, $name)
+    {
+        $product = Product::withoutGlobalScope('store')->where('o_type', 'store')->where('name', $name)->firstOrFail();
+        if (!Auth::check() || (Auth::id() != $product->o_parent && !Auth::user()->isAdmin())) {
+            return redirect()->route('store.show', $product->name);
+        }
+
+        $request->validate([
+            'pts'        => ['nullable', 'integer', 'min:0', 'max:999999'],
+            'sale_price' => ['nullable', 'integer', 'min:0', 'lt:pts'],
+            'sale_start' => ['nullable', 'date'],
+            'sale_end'   => ['nullable', 'date', 'after_or_equal:sale_start'],
+        ]);
+
+        if ($request->filled('pts')) {
+            $product->update(['o_order' => (int) $request->pts]);
+        }
+
+        if ($request->filled('sale_price')) {
+            \App\Models\StoreSale::updateOrCreate(
+                ['product_id' => $product->id],
+                [
+                    'sale_price' => $request->sale_price,
+                    'start_date' => $request->sale_start,
+                    'end_date'   => $request->sale_end,
+                ]
+            );
+        } else {
+            \App\Models\StoreSale::where('product_id', $product->id)->delete();
+        }
+
+        return redirect()->back()->with('success', __('updated_successfully'));
     }
 
     public function uploadZip(Request $request)
@@ -1175,5 +1238,294 @@ class StoreController extends Controller
                     'label' => $scriptCategory->name,
                 ];
             });
+    }
+
+
+    /**
+     * AJAX Purchase Product Flow
+     */
+    public function purchaseProduct(Request $request, $id)
+    {
+        $product = Product::withoutGlobalScope('store')->where('o_type', 'store')->findOrFail($id);
+        $user = Auth::user();
+
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => __('messages.login_required') ?? 'Please log in to purchase.'
+            ], 401);
+        }
+
+        $alreadyPurchased = DB::table('product_licenses')
+            ->where('user_id', $user->id)
+            ->where('product_id', $product->id)
+            ->exists();
+
+        $latestFile = ProductFile::where('o_parent', $product->id)->orderBy('id', 'desc')->first();
+        if (!$latestFile) {
+            return response()->json([
+                'success' => false,
+                'message' => __('messages.file_not_found') ?? 'No file version is available for this product.'
+            ], 404);
+        }
+
+        $downloadHash = hash('crc32', $latestFile->o_mode . $latestFile->id);
+        $downloadUrl = route('store.download.hash', $downloadHash);
+
+        if ($alreadyPurchased || $user->id == $product->o_parent) {
+            return response()->json([
+                'success' => true,
+                'download_url' => $downloadUrl
+            ]);
+        }
+
+        $basePrice = $product->current_price;
+        $discountCode = null;
+        $discountAmount = 0;
+        $finalPrice = $basePrice;
+
+        if ($request->filled('code')) {
+            $discountCode = \App\Models\StoreDiscountCode::where('code', strtoupper($request->code))->first();
+            if (!$discountCode) {
+                return response()->json([
+                    'success' => false,
+                    'message' => __('messages.coupon_not_found') ?? 'Invalid coupon code.'
+                ], 422);
+            }
+
+            $validation = $discountCode->isValidFor($product, $user);
+            if (!$validation['valid']) {
+                return response()->json([
+                    'success' => false,
+                    'message' => __('messages.' . $validation['error']) ?? 'Coupon is not valid.'
+                ], 422);
+            }
+
+            $calc = $discountCode->calculateDiscount($basePrice);
+            $discountAmount = $calc['discount_amount'];
+            $finalPrice = $calc['final_price'];
+        }
+
+        if ($user->pts < $finalPrice) {
+            return response()->json([
+                'success' => false,
+                'message' => __('messages.not_enough_points') ?? 'Insufficient points balance.'
+            ], 422);
+        }
+
+        DB::transaction(function () use ($user, $product, $finalPrice, $discountCode, $discountAmount) {
+            if ($finalPrice > 0) {
+                $user->decrement('pts', $finalPrice);
+                $seller = User::find($product->o_parent);
+                if ($seller) {
+                    $seller->increment('pts', $finalPrice);
+                }
+
+                Option::create([
+                    'name' => 'Store',
+                    'o_valuer' => "-$finalPrice",
+                    'o_type' => 'hest_pts',
+                    'o_parent' => $user->id,
+                    'o_order' => $product->o_parent,
+                    'o_mode' => time(),
+                ]);
+
+                if ($seller) {
+                    Option::create([
+                        'name' => 'Store',
+                        'o_valuer' => "$finalPrice",
+                        'o_type' => 'hest_pts',
+                        'o_parent' => $seller->id,
+                        'o_order' => $user->id,
+                        'o_mode' => time(),
+                    ]);
+                }
+            }
+
+            if ($discountCode) {
+                $discountCode->increment('uses');
+                \App\Models\StoreDiscountRedemption::create([
+                    'user_id' => $user->id,
+                    'discount_code_id' => $discountCode->id,
+                    'product_id' => $product->id,
+                    'points_saved' => $discountAmount,
+                ]);
+            }
+
+            $licenseKey = 'ADSTN-' . implode('-', str_split(strtoupper(Str::random(16)), 4));
+            DB::table('product_licenses')->insert([
+                'user_id' => $user->id,
+                'product_id' => $product->id,
+                'license_key' => $licenseKey,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        });
+
+        return response()->json([
+            'success' => true,
+            'message' => __('messages.purchase_success') ?? 'Purchase successful!',
+            'download_url' => $downloadUrl
+        ]);
+    }
+
+    public function discountsIndex(Request $request)
+    {
+        $discounts = \App\Models\StoreDiscountCode::where('user_id', Auth::id())
+            ->orderBy('id', 'desc')
+            ->paginate(15);
+
+        return view('theme::store.discounts.index', compact('discounts'));
+    }
+
+    public function discountsCreate()
+    {
+        $products = Product::withoutGlobalScope('store')
+            ->where('o_type', 'store')
+            ->where('o_parent', Auth::id())
+            ->get();
+        $discount = new \App\Models\StoreDiscountCode();
+
+        return view('theme::store.discounts.form', compact('products', 'discount'));
+    }
+
+    public function discountsStore(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'code' => 'required|string|max:50|unique:store_discount_codes,code',
+            'discount_type' => 'required|in:percent,fixed',
+            'discount_value' => 'required|numeric|min:0',
+            'scope' => 'required|in:all_my_products,one_of_my_products',
+            'product_id' => 'required_if:scope,one_of_my_products|nullable|integer',
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date|after_or_equal:start_date',
+            'max_uses' => 'nullable|integer|min:1',
+        ]);
+
+        $applies_to = $request->scope === 'one_of_my_products' ? 'product' : 'all';
+        $target_value = $request->scope === 'one_of_my_products' ? $request->product_id : null;
+
+        if ($target_value) {
+            $product = Product::withoutGlobalScope('store')->where('o_type', 'store')->findOrFail($target_value);
+            if ($product->o_parent != Auth::id()) {
+                abort(403);
+            }
+        }
+
+        \App\Models\StoreDiscountCode::create([
+            'name' => $request->name,
+            'code' => strtoupper($request->code),
+            'discount_type' => $request->discount_type,
+            'discount_value' => $request->discount_value,
+            'applies_to' => $applies_to,
+            'target_value' => $target_value,
+            'user_id' => Auth::id(),
+            'start_date' => $request->start_date,
+            'end_date' => $request->end_date,
+            'max_uses' => $request->max_uses,
+            'uses' => 0,
+            'is_active' => true,
+        ]);
+
+        return redirect()->route('store.discounts.index')->with('success', __('messages.discount_created_successfully') ?? 'Coupon created successfully.');
+    }
+
+    public function discountsEdit($id)
+    {
+        $discount = \App\Models\StoreDiscountCode::where('user_id', Auth::id())->findOrFail($id);
+        $products = Product::withoutGlobalScope('store')
+            ->where('o_type', 'store')
+            ->where('o_parent', Auth::id())
+            ->get();
+
+        return view('theme::store.discounts.form', compact('discount', 'products'));
+    }
+
+    public function discountsUpdate(Request $request, $id)
+    {
+        $discount = \App\Models\StoreDiscountCode::where('user_id', Auth::id())->findOrFail($id);
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'code' => 'required|string|max:50|unique:store_discount_codes,code,' . $discount->id,
+            'discount_type' => 'required|in:percent,fixed',
+            'discount_value' => 'required|numeric|min:0',
+            'scope' => 'required|in:all_my_products,one_of_my_products',
+            'product_id' => 'required_if:scope,one_of_my_products|nullable|integer',
+            'start_date' => 'nullable|date',
+            'end_date' => 'nullable|date|after_or_equal:start_date',
+            'max_uses' => 'nullable|integer|min:1',
+        ]);
+
+        $applies_to = $request->scope === 'one_of_my_products' ? 'product' : 'all';
+        $target_value = $request->scope === 'one_of_my_products' ? $request->product_id : null;
+
+        if ($target_value) {
+            $product = Product::withoutGlobalScope('store')->where('o_type', 'store')->findOrFail($target_value);
+            if ($product->o_parent != Auth::id()) {
+                abort(403);
+            }
+        }
+
+        $discount->update([
+            'name' => $request->name,
+            'code' => strtoupper($request->code),
+            'discount_type' => $request->discount_type,
+            'discount_value' => $request->discount_value,
+            'applies_to' => $applies_to,
+            'target_value' => $target_value,
+            'start_date' => $request->start_date,
+            'end_date' => $request->end_date,
+            'max_uses' => $request->max_uses,
+            'is_active' => $request->has('is_active') ? (bool) $request->is_active : $discount->is_active,
+        ]);
+
+        return redirect()->route('store.discounts.index')->with('success', __('messages.discount_updated_successfully') ?? 'Coupon updated successfully.');
+    }
+
+    public function discountsDestroy($id)
+    {
+        $discount = \App\Models\StoreDiscountCode::where('user_id', Auth::id())->findOrFail($id);
+        $discount->delete();
+
+        return redirect()->route('store.discounts.index')->with('success', __('messages.discount_deleted_successfully') ?? 'Coupon deleted successfully.');
+    }
+
+    public function validateDiscount(Request $request)
+    {
+        $request->validate([
+            'code' => 'required|string',
+            'product_id' => 'required|integer',
+        ]);
+
+        $discountCode = \App\Models\StoreDiscountCode::where('code', strtoupper($request->code))->first();
+        if (!$discountCode) {
+            return response()->json([
+                'success' => false,
+                'message' => __('messages.coupon_not_found') ?? 'Invalid coupon code.'
+            ]);
+        }
+
+        $product = Product::withoutGlobalScope('store')->where('o_type', 'store')->findOrFail($request->product_id);
+        $user = Auth::user();
+
+        $validation = $discountCode->isValidFor($product, $user);
+        if (!$validation['valid']) {
+            return response()->json([
+                'success' => false,
+                'message' => __('messages.' . $validation['error']) ?? $validation['error']
+            ]);
+        }
+
+        $calc = $discountCode->calculateDiscount($product->current_price);
+        $discountText = $discountCode->discount_type === 'percent' ? $discountCode->discount_value . '%' : $discountCode->discount_value . ' PTS';
+
+        return response()->json([
+            'success' => true,
+            'discount_amount' => $calc['discount_amount'],
+            'final_price' => $calc['final_price'],
+            'discount_text' => $discountText
+        ]);
     }
 }
