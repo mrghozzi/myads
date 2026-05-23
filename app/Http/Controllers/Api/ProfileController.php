@@ -15,7 +15,11 @@ class ProfileController extends Controller
 {
     public function show($identifier)
     {
-        $user = User::resolvePublicIdentifier($identifier);
+        if ($identifier === 'me') {
+            $user = Auth::guard('sanctum')->user();
+        } else {
+            $user = User::resolvePublicIdentifier($identifier) ?: User::where('username', $identifier)->first();
+        }
 
         if (!$user) {
             return response()->json(['error' => 'User not found'], 404);
@@ -26,7 +30,11 @@ class ProfileController extends Controller
 
     public function statuses($identifier, Request $request)
     {
-        $user = User::resolvePublicIdentifier($identifier);
+        if ($identifier === 'me') {
+            $user = Auth::guard('sanctum')->user();
+        } else {
+            $user = User::resolvePublicIdentifier($identifier) ?: User::where('username', $identifier)->first();
+        }
 
         if (!$user) {
             return response()->json(['error' => 'User not found'], 404);
@@ -48,7 +56,11 @@ class ProfileController extends Controller
 
     public function follow($identifier)
     {
-        $targetUser = User::resolvePublicIdentifier($identifier);
+        if ($identifier === 'me') {
+            return response()->json(['error' => 'You cannot follow yourself'], 400);
+        }
+
+        $targetUser = User::resolvePublicIdentifier($identifier) ?: User::where('username', $identifier)->first();
 
         if (!$targetUser) {
             return response()->json(['error' => 'User not found'], 404);

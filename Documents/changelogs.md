@@ -8,6 +8,16 @@
 * **API**: Added dedicated API endpoints for saving reels (`/api/reels/save`) and retrieving saved reels (`/api/reels/saved`).
 * **Architecture**: Upgraded `StatusResource` to include `has_saved` state and `reaction_type` for personalized Reels interactions.
 
+### Member Profile & Click-to-Profile Navigation (Mobile & API)
+* **Feature**: Designed and implemented a premium **Member Profile Screen** (`ProfileScreen`) in Flutter, matching the exact aesthetics and components of the Web platform (`themes/default`). It features cover photos, a profile avatar, name, verification status, live online indicators, premium subscription badge card, a glassmorphic social links scroll bar, profile stats, and a TabBar (Timeline, Photos, and About).
+* **Feature**: Implemented **Click-to-Profile** navigation throughout the mobile app. Users can tap on a member's avatar or username in community feed posts (`PostCard`), post comments (`PostDetailsScreen`), and reels creator rows (`ReelsScreen`) to navigate directly to their profile.
+* **Feature**: Introduced a reusable **HexagonAvatar** widget in Flutter that clips and borders profile pictures as vertical hexagons matching the web theme's styling. This was integrated across all app views (Feed, Comments, Reels, and Profile).
+* **Feature**: Created a dynamic **UrlHelper** class in Flutter to handle image/asset URL normalization. It rewrites local hostnames (e.g. `http://localhost/myads`) using the active `BASE_URL` of the running API server, making avatar and media images load seamlessly on real device emulators and physical phones.
+* **API**: Upgraded the API `/api/profile/{identifier}` endpoint to handle `'me'` to retrieve the logged-in user profile, and fall back to searching by username if public ID resolution fails.
+* **API**: Enhanced `UserProfileResource` to return cover image URLs, `is_following` status, `posts_count`, `subscription_badge` details (label/color), `social_links`, and unlocked `badges` showcases.
+* **API**: Fixed a duplicate folder bug in `UserResource` by calling `$this->avatarUrl()` directly, correcting the path resolution for mobile client avatars.
+* **Privacy**: Hidden the user's PTS points balance in the profile's "About" tab to protect member points privacy.
+
 ### Mobile App API (Phases 1-4)
 * **Feature**: Introduced a foundational JSON REST API for Android/mobile applications using Laravel Sanctum for secure token-based authentication.
 * **Feature**: Added robust Data Resources (`StatusResource`, `UserResource`, `UserProfileResource`, `CommentResource`, `MessageResource`, `ConversationResource`, `NotificationResource`, `ForumCategoryResource`, `ForumTopicResource`, `ProductResource`) to format and sanitize data safely for external mobile clients, including automatic message decryption for secure end-to-end messaging payloads.

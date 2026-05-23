@@ -18,7 +18,7 @@ class UserResource extends JsonResource
             'id' => $this->id,
             'username' => $this->username,
             'name' => $this->name,
-            'avatar' => $this->avatar ? asset('upload/' . $this->avatar) : asset('assets/images/default-avatar.png'),
+            'avatar' => $this->avatarUrl(),
             'pts' => $this->pts,
             'verified' => $this->hasVerifiedBadge(),
             'created_at' => $this->created_at ? $this->created_at->toIso8601String() : null,

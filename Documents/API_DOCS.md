@@ -154,6 +154,16 @@ These endpoints are designed for the first-party mobile application and require 
 
 ### Profile & Follow (Phase 2)
 - `GET /api/profile/{identifier}`: Retrieve user profile details and stats.
+  - **Note:** `{identifier}` can be `'me'` to fetch the currently authenticated user, or a `username`, or a public user ID.
+  - **Response Fields:** Returns `UserProfileResource` which includes:
+    - `id`, `username`, `name`, `bio`, `online` (boolean), `verified` (boolean), `pts` (private, hidden or zeroed for privacy if viewed by others), `created_at` (formatted date).
+    - `cover`: Resolved cover image URL.
+    - `followers_count`, `following_count`, `posts_count`.
+    - `is_following`: Whether the current viewer is following this user (boolean).
+    - `subscription_badge`: Premium level badge containing `label` and `color` (or `null` if none).
+    - `social_links`: Key-value map of configured social media platform URLs.
+    - `badges`: List of unlocked badges, each containing `name` and `icon` URL.
+    - `profile_badge_color`: Color hex string representing user level/tier styling.
 - `GET /api/profile/{identifier}/statuses`: Retrieve user's feed statuses. Response includes the same enriched `StatusResource` fields (`media`, `gallery`, `attachments`) as the community feed, with full `related_content` hydration.
 - `POST /api/profile/{identifier}/follow`: Toggle follow status for a user.
 
