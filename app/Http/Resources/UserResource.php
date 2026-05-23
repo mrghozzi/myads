@@ -21,6 +21,7 @@ class UserResource extends JsonResource
             'avatar' => $this->avatarUrl(),
             'pts' => $this->pts,
             'verified' => $this->hasVerifiedBadge(),
+            'profile_badge_color' => $this->profileBadgeColor(),
             'created_at' => $this->created_at ? $this->created_at->toIso8601String() : null,
         ];
     }
