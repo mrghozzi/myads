@@ -201,49 +201,11 @@ class PluginManager
             $plugins = $this->getAllPlugins();
 
             foreach ($plugins as $plugin) {
-                $adstnProduct = $plugin['ADStn_url'] ?? null;
-                if ($adstnProduct) {
-                    try {
-                        $adstnUrl = filter_var($adstnProduct, FILTER_VALIDATE_URL)
-                            ? $adstnProduct
-                            : 'https://www.adstn.ovh/api/marketplace/extensions/plugins';
-
-                        $remoteSlug = filter_var($adstnProduct, FILTER_VALIDATE_URL)
-                            ? $plugin['slug']
-                            : $adstnProduct;
-
-                        $licenseKeyOption = Option::where('o_type', 'plugin_license')
-                            ->where('name', $plugin['slug'] . '_key')
-                            ->first();
-                        $licenseKey = $licenseKeyOption ? $licenseKeyOption->o_valuer : '';
-
-                        $response = Http::timeout(10)->post($adstnUrl, [
-                            'slug'        => $remoteSlug,
-                            'version'     => $plugin['version'],
-                            'license_key' => $licenseKey,
-                            'domain'      => request()->getHost(),
-                        ]);
-
-                        if ($response->successful()) {
-                            $remoteData = $response->json();
-                            $remoteVersion = $remoteData['version'] ?? null;
-                            if ($remoteVersion && version_compare($remoteVersion, $plugin['version'], '>')) {
-                                $updates[$plugin['slug']] = [
-                                    'new_version' => $remoteVersion,
-                                    'download_url' => $remoteData['download_url'] ?? '',
-                                    'changelog' => $remoteData['changelog'] ?? '',
-                                ];
-                            }
-                        }
-                    } catch (\Exception $e) {
-                        Log::error("Failed to check ADStn updates for plugin {$plugin['slug']}: " . $e->getMessage());
-                    }
-                    continue;
-                }
-
                 $updateUrl = $plugin['latest_url'] ?? $plugin['update_url'] ?? null;
+                $checked = false;
                 
                 if ($updateUrl && filter_var($updateUrl, FILTER_VALIDATE_URL)) {
+                    $checked = true;
                     try {
                         // Handle GitHub Latest Release URL
                         if (preg_match('/github\.com\/([^\/]+)\/([^\/]+)\/releases\/latest/i', $updateUrl, $matches)) {
@@ -284,6 +246,47 @@ class PluginManager
                         }
                     } catch (\Exception $e) {
                         Log::error("Failed to check updates for plugin {$plugin['slug']}: " . $e->getMessage());
+                    }
+                }
+
+                if (!$checked) {
+                    $adstnProduct = $plugin['ADStn_url'] ?? null;
+                    if ($adstnProduct) {
+                        try {
+                            $adstnUrl = filter_var($adstnProduct, FILTER_VALIDATE_URL)
+                                ? $adstnProduct
+                                : 'https://www.adstn.ovh/api/marketplace/extensions/plugins';
+
+                            $remoteSlug = filter_var($adstnProduct, FILTER_VALIDATE_URL)
+                                ? $plugin['slug']
+                                : $adstnProduct;
+
+                            $licenseKeyOption = Option::where('o_type', 'plugin_license')
+                                ->where('name', $plugin['slug'] . '_key')
+                                ->first();
+                            $licenseKey = $licenseKeyOption ? $licenseKeyOption->o_valuer : '';
+
+                            $response = Http::timeout(10)->post($adstnUrl, [
+                                'slug'        => $remoteSlug,
+                                'version'     => $plugin['version'],
+                                'license_key' => $licenseKey,
+                                'domain'      => request()->getHost(),
+                            ]);
+
+                            if ($response->successful()) {
+                                $remoteData = $response->json();
+                                $remoteVersion = $remoteData['version'] ?? null;
+                                if ($remoteVersion && version_compare($remoteVersion, $plugin['version'], '>')) {
+                                    $updates[$plugin['slug']] = [
+                                        'new_version' => $remoteVersion,
+                                        'download_url' => $remoteData['download_url'] ?? '',
+                                        'changelog' => $remoteData['changelog'] ?? '',
+                                    ];
+                                }
+                            }
+                        } catch (\Exception $e) {
+                            Log::error("Failed to check ADStn updates for plugin {$plugin['slug']}: " . $e->getMessage());
+                        }
                     }
                 }
             }
