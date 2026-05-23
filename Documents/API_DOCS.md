@@ -149,7 +149,8 @@ These endpoints are designed for the first-party mobile application and require 
 - `POST /api/statuses/{status_id}/comments`: Post a new comment.
   *Payload:* `{"text": "My comment"}`
 - `POST /api/reactions/toggle`: Toggle a reaction on a subject.
-  *Payload:* `{"subject_id": 123, "type": 2, "reaction": "Like"}` *(Supported reactions: Like, Love, Haha, Wow, Sad, Angry)*
+  *Payload:* `{"subject_id": 123, "type": 2, "reaction_name": "Love"}` *(Supported reactions: Like, Love, Haha, Wow, Sad, Angry)*
+  **Note:** Clients must extract `subject_id` and `type` dynamically from the `interaction_subject_id` and `reaction_type` properties provided in the `StatusResource` to ensure reactions are logged against the correct parent topic or media format (e.g., `type 14` for Reels, `type 2` for statuses, `type 3` for groups) and to ensure notifications and gamification points are awarded to the correct owner.
 
 ### Profile & Follow (Phase 2)
 - `GET /api/profile/{identifier}`: Retrieve user profile details and stats.

@@ -39,6 +39,8 @@
 * **Theme / UI**: Added robust overflow protections (`min-width: 0 !important`) to community feed post containers (`.activity-post-card`, `.widget-box-status-content`) in `forum-activity-superdesign.css` across both Light and Dark themes to prevent media content from breaking flex bounds.
 * **API / Security**: Fixed a critical `500 Internal Server Error` during Mobile App API login caused by the missing `HasApiTokens` trait in the `User` model, restoring secure token generation capabilities.
 * **API / Database**: Provided explicit schema definitions and migration guidelines for `personal_access_tokens` to support free hosting environments where terminal execution for Sanctum installation is restricted.
+* **API / Reactions**: Completely rewrote the Mobile API `ReactionController` to perfectly match the Web platform's logic, properly tracking `time_t`, adding options formatting, triggering real-time notifications to post owners (`NotificationService`), and awarding/deducting correct gamification points (`PointLedgerService`).
+* **API / Models**: Fixed the `Status` model's `getReactionType()` accessor to properly recognize and classify Reels posts as reaction type `14`, fixing the sync issue where Reels reactions disappeared upon refresh.
 
 ### Mobile App Multimedia Support
 * **Feature**: Overhauled `StatusResource` API output to include three new structured fields — `media` (primary media object with `type`, `url`, `mime_type`, `name`, `size`), `gallery` (array of image URLs for multi-image posts), and `attachments` (array of all file attachments with full metadata) — enabling the Flutter app to render all multimedia post types.
