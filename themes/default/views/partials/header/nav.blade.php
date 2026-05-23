@@ -51,20 +51,6 @@
                     </svg>
                 </a>
             </li>
-            <li class="menu-item {{ Request::is('quests*') ? 'active' : '' }}">
-                <a class="menu-item-link text-tooltip-tfr" href="{{ url('/quests') }}" data-title="{{ __('messages.quests') }}">
-                    <svg class="menu-item-link-icon icon-quests">
-                        <use xlink:href="#svg-quests"></use>
-                    </svg>
-                </a>
-            </li>
-            <li class="menu-item {{ Request::is('badges*') ? 'active' : '' }}">
-                <a class="menu-item-link text-tooltip-tfr" href="{{ route('badges.all') }}" data-title="{{ __('messages.badges') }}">
-                    <svg class="menu-item-link-icon icon-badges">
-                        <use xlink:href="#svg-badges"></use>
-                    </svg>
-                </a>
-            </li>
         @endauth
         <li class="menu-item {{ Request::is('forum*', 'f*', 't*', 'post*', 'editor*') ? 'active' : '' }}">
             <a class="menu-item-link text-tooltip-tfr" href="{{ url('/forum') }}" data-title="{{ __('messages.forum') }}">
