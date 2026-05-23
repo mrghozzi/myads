@@ -134,8 +134,8 @@ class ReactionController extends Controller
             $site = \App\Models\Directory::find($postId);
             return $site ? $site->uid : null;
         } elseif ($type == 14) {
-            $status = \App\Models\Status::find($postId);
-            return $status ? $status->uid : null;
+            $topic = \App\Models\ForumTopic::find($postId);
+            return $topic ? $topic->uid : null;
         }
         return null;
     }

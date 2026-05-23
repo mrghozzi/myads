@@ -56,6 +56,7 @@ class ReactionController extends Controller
         elseif ($type == 'kb_comment') $dbType = KnowledgebaseCommunityService::COMMENT_REACTION_TYPE;
         elseif ($type == 'order') $dbType = 6;
         elseif ($type == 'order_comment') $dbType = 66;
+        elseif ($type == 'reels' || $type == 14) $dbType = 14;
 
         if ($dbType === 0) {
             return response()->json(['error' => 'Invalid type'], 400);
@@ -231,6 +232,8 @@ class ReactionController extends Controller
                 }
             } elseif ($type == 6) {
                 $postUrl = "/orders/" . $postId;
+            } elseif ($type == 14) {
+                $postUrl = "/reels";
             } elseif ($type == KnowledgebaseCommunityService::REACTION_TYPE) {
                 $status = Status::find($postId);
                 $article = $status?->related_content;
@@ -296,6 +299,10 @@ class ReactionController extends Controller
             // Order Request
             $order = \App\Models\OrderRequest::find($postId);
             return $order ? $order->uid : null;
+        } elseif ($type == 14) {
+            // Reels (uses ForumTopic ID)
+            $topic = ForumTopic::find($postId);
+            return $topic ? $topic->uid : null;
         } elseif ($type == KnowledgebaseCommunityService::REACTION_TYPE) {
             $status = Status::find($postId);
             return $status ? $status->uid : null;
@@ -322,6 +329,10 @@ class ReactionController extends Controller
                 return app(GroupAccessService::class)->canPostToGroup($topic->group()->first(), $user);
             }
 
+            return true;
+        }
+
+        if ($type === 'reels' || $type == 14) {
             return true;
         }
 

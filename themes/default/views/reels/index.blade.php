@@ -441,7 +441,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 'X-CSRF-TOKEN': '{{ csrf_token() }}'
             },
             body: JSON.stringify({
-                subject_id: sid,
+                id: sid,
                 type: type,
                 reaction: 'like'
             })
