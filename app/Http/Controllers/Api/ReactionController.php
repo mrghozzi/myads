@@ -59,6 +59,7 @@ class ReactionController extends Controller
             $like->uid = $user->id;
             $like->sid = $sid;
             $like->type = $type;
+            $like->time_t = time();
             $like->save();
 
             if ($reactionName !== 'like') {
