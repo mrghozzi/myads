@@ -417,7 +417,11 @@ class Status extends Model
             return 22;
         }
 
-        if (in_array($this->s_type, [2, 4, 100, 10, 11, 12, 13, 14])) {
+        if ($this->s_type == 14 || $this->post_kind === 'reels') {
+            return 14;
+        }
+
+        if (in_array($this->s_type, [2, 4, 100, 10, 11, 12, 13])) {
             return 2;
         }
 
