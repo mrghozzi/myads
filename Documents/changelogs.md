@@ -8,6 +8,14 @@
 * **API**: Upgraded `StatusResource` to format `repost_record` with the nested `original_status` resource, enabling mobile clients to fetch fully formatted nested original posts.
 * **Mobile App**: Updated the mobile model parser and `PostCard` widget to render a beautifully nested, styled inline container for the original post, including creator avatar, name, verification badge, creation time, text content, and all original media players/attachments.
 
+### Mobile Community Publishing & Editing
+* **Feature**: Extracted web post creation/editing logic into a shared `StatusPostService` to guarantee strict backend feature parity across Web and Mobile.
+* **Feature**: Added full post creation capabilities from the Flutter mobile app (text, gallery, link, quote repost, video, audio, file, music, Reels).
+* **Feature**: Added full Edit and Delete capabilities for posts on Mobile and Web via new unified API endpoints and web routes.
+* **Feature**: Added Android External Share capabilities (via `receive_sharing_intent`), allowing users to share text, links, and media from other apps directly into the MYADS Flutter composer as drafts.
+* **Feature**: Added `/api/composer/options` to serve available post kinds, directory categories, and user groups for the mobile composer.
+* **Feature**: Upgraded `StatusResource` to return `can_edit`, `can_delete`, `is_owner`, and structured `gallery_items` for the mobile UI.
+
 ### Reels System (Web & Mobile)
 * **Feature**: Introduced a full **Reels** experience across both the Web Platform and Mobile App, allowing users to scroll vertically through short-form video content.
 * **Web**: Implemented a vertical scroll-snap UI for the Web Reels feed (`/reels`) with auto-playing videos, floating interaction sidebars (Like, Comment, Save, Share), and a dedicated Saved Reels grid.

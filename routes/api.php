@@ -45,8 +45,14 @@ Route::middleware(['api.key', 'auth:sanctum'])->group(function () {
     // Community Feed API
     Route::get('/portal/feed', [App\Http\Controllers\Api\PortalController::class, 'index']);
     
+    // Composer Options
+    Route::get('/composer/options', [App\Http\Controllers\Api\StatusController::class, 'composerOptions']);
+    Route::post('/statuses/link-preview', [App\Http\Controllers\Api\StatusController::class, 'linkPreview']);
+    
     // Statuses API
+    Route::get('/statuses/{status}', [App\Http\Controllers\Api\StatusController::class, 'show']);
     Route::post('/statuses', [App\Http\Controllers\Api\StatusController::class, 'store']);
+    Route::post('/statuses/{status}/update', [App\Http\Controllers\Api\StatusController::class, 'update']);
     Route::delete('/statuses/{status}', [App\Http\Controllers\Api\StatusController::class, 'destroy']);
     
     // Comments API

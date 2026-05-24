@@ -51,6 +51,9 @@ Route::post('/comment/store', [CommentController::class, 'store'])->name('commen
 Route::post('/comment/delete', [CommentController::class, 'destroy'])->name('comment.delete')->middleware('auth');
 
 Route::post('/status/create', [App\Http\Controllers\StatusController::class, 'create'])->name('status.create')->middleware('auth');
+Route::get('/statuses/{status}/edit', [App\Http\Controllers\StatusController::class, 'edit'])->name('status.edit')->middleware('auth');
+Route::post('/statuses/{status}/update', [App\Http\Controllers\StatusController::class, 'update'])->name('status.update')->middleware('auth');
+Route::delete('/statuses/{status}', [App\Http\Controllers\StatusController::class, 'destroy'])->name('status.destroy')->middleware('auth');
 Route::post('/status/upload-image', [App\Http\Controllers\StatusController::class, 'uploadImage'])->name('status.upload_image')->middleware('auth');
 Route::post('/status/link-preview', [App\Http\Controllers\StatusController::class, 'linkPreview'])->name('status.link_preview')->middleware('auth');
 Route::post('/status/gallery/add-images/{topicId}', [App\Http\Controllers\StatusController::class, 'addGalleryImages'])->name('status.gallery.add_images')->middleware('auth');

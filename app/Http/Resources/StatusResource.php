@@ -44,6 +44,19 @@ class StatusResource extends JsonResource
                 ->exists();
         }
 
+        $isOwner = $user ? ((int) $this->uid === (int) $user->id) : false;
+        $canEdit = $isOwner || ($user && method_exists($user, 'isAdmin') && $user->isAdmin());
+        $canDelete = $canEdit;
+
+        $groupMeta = null;
+        if ($this->group_id && $this->relationLoaded('groupRecord') && $this->groupRecord) {
+            $groupMeta = [
+                'id' => $this->groupRecord->id,
+                'name' => $this->groupRecord->name,
+                'slug' => $this->groupRecord->slug,
+            ];
+        }
+
         return [
             'id' => $this->id,
             'user' => new UserResource($this->whenLoaded('user')),
@@ -56,6 +69,10 @@ class StatusResource extends JsonResource
             'comments_count' => $this->comments_count,
             'reposts_count' => $this->reposts_count,
             'group_id' => $this->group_id,
+            'group' => $groupMeta,
+            'can_edit' => $canEdit,
+            'can_delete' => $canDelete,
+            'is_owner' => $isOwner,
             'has_liked' => $hasLiked,
             'user_reaction' => $userReaction,
             'grouped_reactions' => collect($groupedReactions)->map(fn($users) => count($users))->toArray(),
@@ -68,7 +85,7 @@ class StatusResource extends JsonResource
             'display_content' => $this->getDisplayContent(),
             'display_image' => $this->getDisplayImage(),
             'media' => $this->getMedia(),
-            'gallery' => $this->getGallery(),
+            'gallery_items' => $this->getGallery(),
             'attachments' => $this->getAttachments(),
             'activity_card' => $this->getActivityCard(),
             'related_content' => $this->related_content,
@@ -173,6 +190,7 @@ class StatusResource extends JsonResource
         if (in_array($sType, [10, 11, 12, 13, 14]) && isset($content->attachments) && $content->attachments->count() > 0) {
             $attachment = $content->attachments->first();
             return [
+                'id' => $attachment->id,
                 'type' => $mediaType,
                 'url' => asset($attachment->file_path),
                 'mime_type' => $attachment->mime_type,
@@ -212,14 +230,24 @@ class StatusResource extends JsonResource
         if (isset($content->attachments) && $content->attachments) {
             foreach ($content->attachments as $attachment) {
                 if (str_starts_with((string) ($attachment->mime_type ?? ''), 'image/')) {
-                    $gallery[] = asset($attachment->file_path);
+                    $gallery[] = [
+                        'id' => $attachment->id,
+                        'url' => asset($attachment->file_path),
+                        'mime_type' => $attachment->mime_type,
+                        'size' => (int) $attachment->file_size,
+                    ];
                 }
             }
         }
 
         // Fallback to imageOption if no image attachments
         if (empty($gallery) && isset($content->image_url) && $content->image_url) {
-            $gallery[] = asset($content->image_url);
+            $gallery[] = [
+                'id' => null,
+                'url' => asset($content->image_url),
+                'mime_type' => 'image/jpeg',
+                'size' => 0,
+            ];
         }
 
         return $gallery;
@@ -236,6 +264,7 @@ class StatusResource extends JsonResource
         }
 
         return $content->attachments->map(fn($a) => [
+            'id' => $a->id,
             'url' => asset($a->file_path),
             'mime_type' => $a->mime_type,
             'name' => $a->original_name,

@@ -21,6 +21,7 @@ use App\Services\SecurityPolicyService;
 use App\Services\SecurityThrottleService;
 use App\Services\UserPrivacyService;
 use App\Services\V420SchemaService;
+use App\Services\StatusPostService;
 use App\Support\ContentFormatter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -72,334 +73,63 @@ class StatusController extends Controller
         return response()->json($linkPreviewService->fetch($request->input('link_url')));
     }
 
-    public function create(
-        Request $request,
-        LinkPreviewService $linkPreviewService,
-        MentionService $mentions,
-        NotificationService $notifications,
-        UserPrivacyService $privacy,
-        GamificationService $gamification,
-        SecurityPolicyService $securityPolicy,
-        SecurityThrottleService $securityThrottle
-    ) {
-        $user = Auth::user();
-        $schema = app(V420SchemaService::class);
-        $legacyType = (int) $request->input('s_type', 100);
-        $postKind = (string) $request->input('post_kind', '');
-        $group = null;
-
-        $request->merge([
-            'directory_category_id' => $this->normalizeDirectoryCategoryId($request->input('directory_category_id')),
-            'publish_mode' => $this->normalizePublishMode($request->input('publish_mode')),
-        ]);
-
-        if ($postKind === '' && $request->filled('repost_status_id')) {
-            $postKind = 'repost';
-        }
-
-        if ($postKind === '' && $legacyType === 1) {
-            return $this->createLegacyDirectoryPost($request, $user, $securityPolicy, $securityThrottle);
-        }
-
-        if ($postKind === '') {
-            $postKind = match ($legacyType) {
-                4 => 'gallery',
-                10 => 'video',
-                11 => 'audio',
-                12 => 'file',
-                13 => 'music',
-                14 => 'reels',
-                default => 'text',
-            };
-        }
-
-        $rules = [
-            'text' => 'nullable|string|max:10000',
-            'txt' => 'nullable|string|max:10000',
-            'images' => 'nullable|array|max:10',
-            'images.*' => 'image|max:10000',
-            'videos' => 'nullable|array|max:1',
-            'videos.*' => 'file|mimes:mp4,webm,ogg,mov|max:100000',
-            'audios' => 'nullable|array|max:1',
-            'audios.*' => 'file|mimes:mp3,wav,ogg,m4a|max:20000',
-            'files' => 'nullable|array|max:5',
-            'files.*' => 'file|max:50000',
-            'link_url' => 'nullable|string|max:2048',
-            'publish_mode' => 'nullable|in:post,directory_only',
-            'post_kind' => 'nullable|string|in:text,gallery,link,repost,video,audio,file,music,reels',
-            'save_to_directory' => 'nullable|boolean',
-            'directory_name' => 'nullable|string|max:255',
-            'directory_category_id' => 'nullable|integer|exists:cat_dir,id',
-            'directory_tags' => 'nullable|string|max:255',
-            'repost_status_id' => 'nullable|integer|exists:status,id',
-        ];
-
-        if ($schema->supports('groups')) {
-            $rules['group_id'] = 'nullable|integer|exists:groups,id';
-        }
-
-        $request->validate($rules);
-
-        $text = trim((string) $request->input('text', $request->input('txt', '')));
-        $time = time();
-        $postKind = (string) $request->input('post_kind', 'text');
-        $statusType = match ($postKind) {
-            'gallery' => 4,
-            'video' => Status::TYPE_VIDEO,
-            'audio' => Status::TYPE_AUDIO,
-            'file' => Status::TYPE_FILE,
-            'music' => Status::TYPE_MUSIC,
-            'reels' => Status::TYPE_REELS,
-            default => 100,
-        };
-        $publishMode = (string) $request->input('publish_mode', 'post');
-        $linkUrl = $this->resolveLinkUrl($request, $text);
-        $legacyDirectorySave = $request->boolean('save_to_directory');
-
-        if ($schema->supports('groups') && $request->filled('group_id')) {
-            $group = Group::findOrFail((int) $request->input('group_id'));
-            app(GroupAccessService::class)->ensureCanPostToGroup($group, $user);
-        }
-
-        if ($cooldownMessage = $securityThrottle->actionMessage($user, 'post')) {
-            return back()->with('error', $cooldownMessage)->withInput();
-        }
-
-        if ($violation = $securityPolicy->textViolation($text, 'posts')) {
-            return back()->with('error', $violation)->withInput();
-        }
-
-        if ($violation = $securityPolicy->urlViolation($linkUrl, 'posts')) {
-            return back()->with('error', $violation)->withInput();
-        }
-
-        $hasMentions = ContentFormatter::extractMentionUsernames($text) !== [];
-
-        if (($postKind === 'link' || $legacyDirectorySave || $publishMode === 'directory_only') && !$schema->supports('link_previews')) {
-            return back()
-                ->with('error', $schema->blockedActionMessage('link_previews', __('messages.link_previews')))
-                ->withInput();
-        }
-
-        if ($linkUrl && !$schema->supports('link_previews')) {
-            $linkUrl = null;
-        }
-
-        if ($publishMode === 'directory_only') {
-            if ($group) {
-                return back()
-                    ->with('error', __('messages.groups_directory_publish_disabled'))
-                    ->withInput();
-            }
-
-            if (!$linkUrl) {
-                return back()
-                    ->with('error', __('messages.directory_only_requires_link'))
-                    ->withInput();
-            }
-
-            if ($this->requestHasGallerySelection($request) || $postKind === 'repost') {
-                return back()
-                    ->with('error', __('messages.directory_only_incompatible_post_type'))
-                    ->withInput();
-            }
-
-            DB::beginTransaction();
-            try {
-                $preview = $linkPreviewService->fetch($linkUrl);
-                [$directory] = $this->createDirectoryEntry($request, $user, $preview, $text, $time);
-
-                DB::commit();
-                $securityThrottle->hitAction($user, 'post');
-                return redirect()->route('directory.show', $directory->id);
-            } catch (\Throwable $e) {
-                DB::rollBack();
-                return back()->with('error', $e->getMessage())->withInput();
-            }
-        }
-
-        if ($group && ($legacyDirectorySave || $publishMode === 'directory_only')) {
-            return back()
-                ->with('error', __('messages.groups_directory_publish_disabled'))
-                ->withInput();
-        }
-
-        if ($postKind === 'repost' && !$schema->supports('reposts')) {
-            return back()
-                ->with('error', $schema->blockedActionMessage('reposts', __('messages.reposts')))
-                ->withInput();
-        }
-
-        if ($group && $postKind === 'repost') {
-            return back()
-                ->with('error', __('messages.groups_reposts_disabled'))
-                ->withInput();
-        }
-
-        if ($hasMentions && !$schema->supports('mentions')) {
-            return back()
-                ->with('error', $schema->blockedActionMessage('mentions', __('messages.mentions')))
-                ->withInput();
-        }
-
-        DB::beginTransaction();
+    public function create(Request $request, StatusPostService $statusPostService)
+    {
         try {
-            $topic = $this->createForumTopic($user->id, $text, $postKind, $time, $group?->id);
-            $status = Status::create([
-                'uid' => $user->id,
-                'group_id' => $group?->id,
-                'date' => $time,
-                's_type' => $statusType,
-                'tp_id' => $topic->id,
-                'statu' => 1,
-            ]);
-
-            if ($postKind === 'gallery') {
-                $this->storeGalleryAssets($topic, $request, $user->id);
-            }
-
-            if (in_array($postKind, ['video', 'audio', 'file', 'music', 'reels'])) {
-                $this->storeMediaAssets($topic, $request, $user->id, $postKind);
-            }
-
-            if ($linkUrl) {
-                $preview = $linkPreviewService->fetch($linkUrl);
-                $linkPreview = StatusLinkPreview::create([
-                    'status_id' => $status->id,
-                    'url' => $preview['url'],
-                    'normalized_url' => $preview['normalized_url'],
-                    'title' => $preview['title'],
-                    'description' => $preview['description'],
-                    'image_url' => $preview['image_url'],
-                    'site_name' => $preview['site_name'],
-                    'domain' => $preview['domain'],
-                ]);
-
-                if ($legacyDirectorySave) {
-                    [$directory, $directoryStatus] = $this->createDirectoryEntry($request, $user, $preview, $text, $time);
-
-                    $linkPreview->update([
-                        'directory_id' => $directory->id,
-                        'directory_status_id' => $directoryStatus->id,
-                    ]);
+            $status = $statusPostService->create($request, Auth::user());
+            
+            if ($status->s_type == 1 && $status->tp_id) {
+                if ($request->input('publish_mode') === 'directory_only') {
+                     return redirect()->route('directory.show', $status->tp_id);
+                }
+                if ($request->input('s_type') == 1) {
+                     return redirect()->route('directory.show.short', $status->tp_id);
                 }
             }
-
-            if ($postKind === 'repost') {
-                $originalStatus = Status::findOrFail((int) $request->input('repost_status_id'));
-                $originalOwner = $originalStatus->user()->first();
-
-                if ($originalOwner && !$privacy->canRepost($originalOwner, $user) && (int) $originalOwner->id !== (int) $user->id && !$user->isAdmin()) {
-                    throw new \RuntimeException(__('messages.reposts_disabled_for_user'));
-                }
-
-                StatusRepost::create([
-                    'status_id' => $status->id,
-                    'original_status_id' => $originalStatus->id,
-                    'user_id' => $user->id,
-                ]);
-
-                if ($originalOwner) {
-                        $notifications->send(
-                            $originalOwner->id,
-                            __('messages.repost_notification', ['user' => $user->username]),
-                            '/t' . $topic->id,
-                            'share',
-                            $user->id,
-                            'repost'
-                        );
-                }
-            }
-
-            $mentions->createStatusMentions($user, $status, $text, '/t' . $topic->id);
-
-            $gamification->recordEvent($user->id, 'post_created');
-            if ($postKind === 'repost') {
-                $gamification->recordEvent($user->id, 'repost_created');
-            } else {
-                $gamification->refreshBadges($user->id);
-            }
-
-            DB::commit();
-            $securityThrottle->hitAction($user, 'post');
-            if ($group) {
-                app(GroupMembershipService::class)->touchActivity($group, $time);
-
+            if ($status->group_id) {
+                $group = Group::find($status->group_id);
                 return redirect()
                     ->route('groups.show', ['group' => $group->slug, 'tab' => 'feed'])
                     ->with('success', __('messages.groups_post_created'));
             }
-
-            return redirect()->route('forum.topic', $topic->id);
+            return redirect()->route('forum.topic', $status->tp_id);
         } catch (\Throwable $e) {
-            DB::rollBack();
             return back()->with('error', $e->getMessage())->withInput();
         }
     }
 
-    private function createLegacyDirectoryPost(
-        Request $request,
-        $user,
-        SecurityPolicyService $securityPolicy,
-        SecurityThrottleService $securityThrottle
-    )
+    public function edit(Status $status)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'url' => 'required|url',
-            'categ' => 'required|integer',
-        ]);
-
-        if ($cooldownMessage = $securityThrottle->actionMessage($user, 'post')) {
-            return back()->with('error', $cooldownMessage)->withInput();
+        $user = Auth::user();
+        if ((int)$status->uid !== (int)$user->id && !$user->isAdmin()) {
+            abort(403, __('messages.unauthorized'));
         }
+        return view('theme::status.edit', compact('status'));
+    }
 
-        if ($violation = $securityPolicy->textViolation((string) $request->input('txt', ''), 'posts')) {
-            return back()->with('error', $violation)->withInput();
-        }
-
-        if ($violation = $securityPolicy->urlViolation((string) $request->input('url'), 'posts')) {
-            return back()->with('error', $violation)->withInput();
-        }
-
-        DB::beginTransaction();
+    public function update(Request $request, Status $status, StatusPostService $statusPostService)
+    {
         try {
-            $time = time();
-            $dir = Directory::create([
-                'uid' => $user->id,
-                'name' => $request->name,
-                'url' => $request->url,
-                'txt' => $request->input('txt', ''),
-                'metakeywords' => $request->input('tag', ''),
-                'cat' => $request->categ,
-                'vu' => 0,
-                'statu' => 1,
-                'date' => $time,
-            ]);
-
-            Status::create([
-                'uid' => $user->id,
-                'date' => $time,
-                's_type' => 1,
-                'tp_id' => $dir->id,
-                'statu' => 1,
-            ]);
-
-            Short::create([
-                'uid' => $user->id,
-                'sho' => hash('crc32', $request->url . $dir->id),
-                'url' => $request->url,
-                'clik' => 0,
-                'sh_type' => 1,
-                'tp_id' => $dir->id,
-            ]);
-
-            DB::commit();
-            $securityThrottle->hitAction($user, 'post');
-            return redirect()->route('directory.show.short', $dir->id);
+            $statusPostService->update($request, $status, Auth::user());
+            if ($status->group_id) {
+                $group = Group::find($status->group_id);
+                return redirect()
+                    ->route('groups.show', ['group' => $group->slug, 'tab' => 'feed'])
+                    ->with('success', __('messages.post_updated_successfully'));
+            }
+            return redirect()->route('forum.topic', $status->tp_id)->with('success', __('messages.post_updated_successfully'));
         } catch (\Throwable $e) {
-            DB::rollBack();
             return back()->with('error', $e->getMessage())->withInput();
+        }
+    }
+
+    public function destroy(Status $status, StatusPostService $statusPostService)
+    {
+        try {
+            $statusPostService->delete($status, Auth::user());
+            return redirect()->route('portal')->with('success', __('messages.post_deleted_successfully'));
+        } catch (\Throwable $e) {
+            return back()->with('error', $e->getMessage());
         }
     }
 
