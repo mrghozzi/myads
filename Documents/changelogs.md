@@ -1,6 +1,13 @@
 # v4.3.4
 > **Feature Release** — Paid Plugin Licensing & Verification Protocol, Store Product License Key Integration, Plugin Auto-Update APIs, Store Discount Codes, Seller Temporary Sales, Developer Architecture Guides, and Full Reels System (Web & Mobile).
 
+### Repost & Share System (Web & Mobile)
+* **Bug Fix**: Fixed a bug where reposted/shared posts appeared on both the Web Platform and the Mobile App as plain text posts showing only the quote text.
+* **Web**: Enhanced the repost embed layout (`repost_embed.blade.php`) to dynamically support all original media types (Videos, Reels, Audio, Music, File Attachments) inside the shared post container.
+* **Web**: Integrated recursive hydration in `ForumController@topic` via `StatusActivityService::decorate` to ensure nested repost contents are fully eager-loaded and visible on the single post page.
+* **API**: Upgraded `StatusResource` to format `repost_record` with the nested `original_status` resource, enabling mobile clients to fetch fully formatted nested original posts.
+* **Mobile App**: Updated the mobile model parser and `PostCard` widget to render a beautifully nested, styled inline container for the original post, including creator avatar, name, verification badge, creation time, text content, and all original media players/attachments.
+
 ### Reels System (Web & Mobile)
 * **Feature**: Introduced a full **Reels** experience across both the Web Platform and Mobile App, allowing users to scroll vertically through short-form video content.
 * **Web**: Implemented a vertical scroll-snap UI for the Web Reels feed (`/reels`) with auto-playing videos, floating interaction sidebars (Like, Comment, Save, Share), and a dedicated Saved Reels grid.

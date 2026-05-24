@@ -95,6 +95,48 @@
             @if((int) $original->s_type === 4)
                 @include('theme::partials.activity.gallery', ['activity' => $original])
             @endif
+
+            @if(in_array((int) $original->s_type, [10, 14]))
+                @php $video = $original->related_content->attachments->first(); @endphp
+                @if($video)
+                    <div class="post-video-wrapper" style="margin-top: 14px; border-radius: 12px; overflow: hidden; background: #000;">
+                        <video controls preload="metadata" style="width: 100%; max-height: 400px; display: block;">
+                            <source src="{{ asset($video->file_path) }}" type="{{ $video->mime_type }}">
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+                @endif
+            @elseif(in_array((int) $original->s_type, [11, 13]))
+                @php $audio = $original->related_content->attachments->first(); @endphp
+                @if($audio)
+                    <div class="post-audio-wrapper" style="margin-top: 14px; border-radius: 12px; padding: 12px; background: var(--section-background-color); border: 1px solid var(--border-color);">
+                        <audio controls style="width: 100%;">
+                            <source src="{{ asset($audio->file_path) }}" type="{{ $audio->mime_type }}">
+                            Your browser does not support the audio element.
+                        </audio>
+                    </div>
+                @endif
+            @elseif((int) $original->s_type === 12)
+                @php $attachments = $original->related_content->attachments; @endphp
+                @if($attachments && $attachments->count() > 0)
+                    <div class="post-files-list" style="margin-top: 14px; display: grid; gap: 10px;">
+                        @foreach($attachments as $file)
+                            <div class="post-file-item" style="display: flex; align-items: center; justify-content: space-between; padding: 10px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--section-background-color);">
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <i class="fa-solid fa-file-lines" style="font-size: 20px; color: #615dfa;"></i>
+                                    <div>
+                                        <p class="bold" style="font-size: 13px; margin: 0;">{{ $file->original_name }}</p>
+                                        <p style="font-size: 11px; color: #7f85a3; margin: 0;">{{ $file->human_size }}</p>
+                                    </div>
+                                </div>
+                                <a href="{{ route('forum.attachment.download', $file->id) }}" class="button small primary" style="padding: 0 10px; height: 28px; line-height: 28px;">
+                                    <i class="fa fa-download"></i>
+                                </a>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
+            @endif
         </div>
     </div>
 @endif

@@ -149,6 +149,8 @@ class ForumController extends Controller
             ->whereIn('s_type', [2, 4, 100, 7867, 10, 11, 12, 13, 14])
             ->firstOrFail();
 
+        app(\App\Services\StatusActivityService::class)->decorate($status);
+
         if ($status->s_type == 7867) {
             $product = \App\Models\Product::withoutGlobalScope('store')->find($id);
             if ($product) {

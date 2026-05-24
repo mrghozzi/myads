@@ -139,6 +139,12 @@ These endpoints are designed for the first-party mobile application and require 
   - `media`: Primary media object for multimedia posts (Video, Audio, File, Music, Reels) containing `type`, `url`, `mime_type`, `name`, and `size`. Returns `null` for text-only posts.
   - `gallery`: Array of image URLs for multi-image posts. Empty array for non-image posts.
   - `attachments`: Array of all file attachments, each with `url`, `mime_type`, `name`, and `size`.
+  - `repost_record`: Details of the original status if the post is a share/repost. Returns `null` for regular posts. Includes:
+    - `id`: Unique repost record ID.
+    - `status_id`: ID of the share status.
+    - `original_status_id`: ID of the original post.
+    - `user_id`: ID of the user who reposted.
+    - `original_status`: A nested `StatusResource` representing the original post (containing its own `user`, `display_content`, `media`, `gallery`, `attachments`, etc.).
   - `grouped_reactions`: Map of reaction types to counts.
   - `has_liked`, `user_reaction`: Current user's reaction state.
 - `POST /api/statuses`: Create a new status.

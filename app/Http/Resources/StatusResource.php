@@ -72,7 +72,17 @@ class StatusResource extends JsonResource
             'attachments' => $this->getAttachments(),
             'activity_card' => $this->getActivityCard(),
             'related_content' => $this->related_content,
-            'repost_record' => $this->whenLoaded('repostRecord'),
+            'repost_record' => $this->relationLoaded('repostRecord') && $this->repostRecord
+                ? [
+                    'id' => $this->repostRecord->id,
+                    'status_id' => $this->repostRecord->status_id,
+                    'original_status_id' => $this->repostRecord->original_status_id,
+                    'user_id' => $this->repostRecord->user_id,
+                    'original_status' => $this->repostRecord->originalStatus 
+                        ? new StatusResource($this->repostRecord->originalStatus) 
+                        : null,
+                  ]
+                : null,
             'link_preview' => $this->whenLoaded('linkPreviewRecord'),
         ];
     }

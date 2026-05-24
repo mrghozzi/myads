@@ -598,6 +598,12 @@ admin/mail_settings.blade.php → Database-driven mail configuration form
 - **Process:** Checks for authentication (redirects if guests), then pre-fills the `add_post.blade.php` composer using the `text` parameter as a fallback when no session (`old`) input exists.
 - **Documentation:** A public `/developer` page provides HTML/JS implementation guides, localized across all 9 languages.
 
+### Repost (Share) System (v4.3.4)
+- **Concept:** Enables users to share (quote-repost) other member statuses (including text, media, files, store items, directories) into the community feed with an optional attached quote text.
+- **Web Rendering:** Uses `repost_embed.blade.php` to render the original post inside a nested widget box. Supports images, videos, reels, audio, music, and file attachments dynamically.
+- **Hydration:** Relies on recursive decoration in `StatusActivityService::decorate` to ensure the nested original status and its associated models (user, attachments, link previews, related content) are fully loaded, avoiding blank embeds on single post detail views.
+- **REST API & Mobile Client:** Upgrades `StatusResource` to format `repost_record` with the nested `original_status` resource formatted using `StatusResource`. The mobile app parses this structure into `RepostRecordModel` and renders it via `_buildRepostEmbed` in `PostCard`, matching the web layout and functionality.
+
 ---
 
 ## 14. Environment Configuration
