@@ -101,6 +101,7 @@ class StatusResource extends JsonResource
                   ]
                 : null,
             'link_preview' => $this->whenLoaded('linkPreviewRecord'),
+            'is_promoted_ad' => $this->is_promoted_ad ?? false,
         ];
     }
 

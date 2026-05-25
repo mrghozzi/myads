@@ -15,6 +15,14 @@
 * **Feature**: Added Android External Share capabilities (via `receive_sharing_intent`), allowing users to share text, links, and media from other apps directly into the MYADS Flutter composer as drafts.
 * **Feature**: Added `/api/composer/options` to serve available post kinds, directory categories, and user groups for the mobile composer.
 * **Feature**: Upgraded `StatusResource` to return `can_edit`, `can_delete`, `is_owner`, and structured `gallery_items` for the mobile UI.
+* **Feature**: Redesigned the mobile post composer using `.superdesign` standards to closely match the web platform's premium appearance.
+* **Fix**: Resolved multipart payload mapping issues (`videos[]`, `audios[]`, `files[]`) in the mobile composer, ensuring reliable multimedia uploads to the backend.
+* **Fix**: Added global `SafeArea` padding across all primary mobile screens (`home_screen.dart`, `explore_screen.dart`, `profile_screen.dart`) preventing bottom UI content from being obscured by system navigation bars.
+
+### Promoted Posts (Web & Mobile)
+* **Feature**: Expanded Promoted Posts campaigns (`StatusPromotion`) to be fully supported and rendered within the Mobile App community feed.
+* **API**: Upgraded `StatusResource` to output the boolean flag `is_promoted_ad`, dynamically injected by `StatusPromotionService`.
+* **Mobile**: Updated `StatusModel` and `PostCard` widget to parse `isPromotedAd` and display a prominent "Promoted" (مُموّل) badge alongside the post timestamp.
 
 ### Reels System (Web & Mobile)
 * **Feature**: Introduced a full **Reels** experience across both the Web Platform and Mobile App, allowing users to scroll vertically through short-form video content.

@@ -147,6 +147,7 @@ These endpoints are designed for the first-party mobile application and require 
     - `original_status`: A nested `StatusResource` representing the original post (containing its own `user`, `display_content`, `media`, `gallery`, `attachments`, etc.).
   - `grouped_reactions`: Map of reaction types to counts.
   - `has_liked`, `user_reaction`: Current user's reaction state.
+  - `is_promoted_ad`: Boolean flag indicating if the post is a promoted ad campaign injected into the feed.
 - `POST /api/statuses`: Create a new status.
   *Payload:* `{"text": "Hello world!"}`
 - `DELETE /api/statuses/{status_id}`: Delete a status (requires ownership or admin rights).
