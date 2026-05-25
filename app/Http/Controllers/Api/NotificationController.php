@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Notification;
-use App\Http\Resources\NotificationResource;
 
 class NotificationController extends Controller
 {
@@ -17,7 +16,29 @@ class NotificationController extends Controller
             ->orderBy('time', 'desc')
             ->paginate(20);
 
-        return NotificationResource::collection($notifications);
+        // Map notifications to include icon and target_url if not already present in the model or resource
+        $formatted = $notifications->getCollection()->map(function ($notif) {
+            return [
+                'id' => $notif->id,
+                'type' => $notif->type,
+                'text' => $notif->text,
+                'time' => $notif->time,
+                'state' => $notif->state,
+                'is_unread' => in_array((int)$notif->state, [0, 3]),
+                'icon' => $notif->icon ?? 'bell', // Fallback icon
+                'target_url' => $notif->url ?? '', // Ensure URL is provided for navigation
+                'source_user_id' => $notif->from_id,
+            ];
+        });
+
+        $notifications->setCollection($formatted);
+
+        return response()->json([
+            'success' => true,
+            'data' => $notifications->items(),
+            'current_page' => $notifications->currentPage(),
+            'last_page' => $notifications->lastPage(),
+        ]);
     }
 
     public function markAsRead($id)
@@ -34,26 +55,26 @@ class NotificationController extends Controller
         $notification->state = 1;
         $notification->save();
 
-        return response()->json(['message' => 'Notification marked as read']);
+        return response()->json(['success' => true, 'message' => 'Notification marked as read']);
     }
 
     public function markAllAsRead()
     {
         $userId = Auth::id();
         Notification::where('uid', $userId)
-            ->where('state', 0)
+            ->whereIn('state', [0, 3])
             ->update(['state' => 1]);
 
-        return response()->json(['message' => 'All notifications marked as read']);
+        return response()->json(['success' => true, 'message' => 'All notifications marked as read']);
     }
 
     public function unreadCount()
     {
         $userId = Auth::id();
         $count = Notification::where('uid', $userId)
-            ->where('state', 0)
+            ->whereIn('state', [0, 3])
             ->count();
 
-        return response()->json(['unread_count' => $count]);
+        return response()->json(['success' => true, 'unread_count' => $count]);
     }
 }

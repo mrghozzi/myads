@@ -23,6 +23,11 @@ All mobile API requests require a two-layer authentication:
 **Header (Login):** `x-api-key: {YOUR_GLOBAL_API_KEY}`  
 **Header (Subsequent Requests):** `Authorization: Bearer {token}` along with `x-api-key: {YOUR_GLOBAL_API_KEY}`
 
+### API Localization (Accept-Language)
+The MYADS Mobile API supports dynamic localization for validation errors and API responses (such as notification text). To receive localized responses, the client must send the `Accept-Language` header.
+**Supported Languages:** `en`, `ar` (more can be configured).
+**Example Header:** `Accept-Language: ar`
+
 ### B. OAuth2 Authorization (Third-Party)
 Best for third-party websites and integrations. Users authorize your app via the MYADS OAuth screen without sharing their password.
 
@@ -128,11 +133,22 @@ Allows any website to pre-fill the MYADS post composer.
 
 ---
 
-## 7. Mobile App API (Phase 1)
-
-These endpoints are designed for the first-party mobile application and require Sanctum Bearer Token authentication.
-
-### Community Feed & Statuses
+## 7. Mobile App API
+  
+  These endpoints are designed for the first-party mobile application and require Sanctum Bearer Token authentication.
+  
+  ### Settings & Hub (Phase 5)
+  - `GET /api/settings/account`: Returns the current user's profile and account data (`UserProfileResource`).
+  - `POST /api/settings/account`: Updates the user's name, bio, location, website, etc.
+  - `GET /api/settings/privacy`: Returns the user's privacy settings.
+  - `POST /api/settings/privacy`: Updates privacy settings.
+  - `GET /api/settings/social`: Returns user social links.
+  - `POST /api/settings/social`: Updates social links.
+  - `GET /api/settings/mail`: Returns email notification preferences.
+  - `POST /api/settings/mail`: Updates email preferences.
+  - `GET /api/settings/points-ledger`: Returns the user's point transaction history.
+  
+  ### Community Feed & Statuses
 - `GET /api/portal/feed`: Retrieves the community feed (paginated). Optional query parameter `filter` (`all` or `me`). Returns a collection of `StatusResource` which includes:
   - `user`: User details (`UserResource`) containing `id`, `username`, `name`, `avatar` URL, `verified` status, and `profile_badge_color` (the hex color corresponding to their active paid plan or Super Admin status).
   - `display_content`, `display_title`, `display_image`: Pre-rendered HTML/attributes for diverse post types.

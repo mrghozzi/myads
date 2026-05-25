@@ -84,7 +84,10 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\TrackSeoMetrics::class,
             \App\Http\Middleware\TwoFactorMiddleware::class,
         ]);
-        
+        $middleware->api(append: [
+            \App\Http\Middleware\SetApiLocale::class,
+        ]);
+
         $middleware->alias([
             'admin' => \App\Http\Middleware\AdminMiddleware::class,
             'admin.password.confirm' => \App\Http\Middleware\RequireAdminPasswordConfirmation::class,

@@ -36,7 +36,7 @@ MYADS is a community platform where website owners:
 14. **Media Manager** — administrative hub for monitoring, renaming, previewing, and securely deleting uploaded media files.
 15. **Multimedia Posts** — community feed support for Video, Audio, Files, Music, and Reels with dedicated players and tag-sticker indicators.
 16. **Custom Member Ads** — members create embeddable ad spaces, negotiate direct deals, track impressions/clicks, and settle daily PTS payouts or record external agreements.
-17. **Mobile App API & Client** — foundational Flutter app for Android (`myads_app`) with full community feed parity (Reactions with points/notification syncing, Comments, Multimedia posts with Video/Audio/Image gallery/File rendering, Promoted Posts, Share intent), Forums, Store, a native **Reels System**, and a premium **Member Profile & Social Navigation** experience with vertical hexagonal avatars matching the web theme (featuring dynamic borders representing user subscription tiers and roles), all powered by Laravel Sanctum and a secure Mobile API.
+17. **Mobile App API & Client** — foundational Flutter app for Android (`myads_app`) with full community feed parity (Reactions with points/notification syncing, Comments, Multimedia posts with Video/Audio/Image gallery/File rendering, Promoted Posts, Share intent), Forums, Store, a native **Reels System**, a premium **Member Profile & Social Navigation** experience with vertical hexagonal avatars matching the web theme, and a **Settings & Communication Hub** (Messages, Notifications, localized in English/Arabic), all powered by Laravel Sanctum and a secure Mobile API.
 
 ---
 
@@ -171,6 +171,7 @@ myads/
 | `BillingController` | Member paid plans catalog, billing dashboard, purchases, receipts, returns, webhooks |
 | `NewsController` | Public news pages |
 | `ReportController` | Content reporting |
+| `Api\SettingsController` | Mobile API endpoints for member settings, privacy, social links, sessions, and points ledger |
 | `TagController` | Tag/hashtag pages |
 | `PageController` | Static pages (privacy, terms, refund, custom) |
 | `AdminController` | **Main admin controller** — users, ads, forum, directory, store, widgets, menus, plugins, themes, settings, news, reports, emojis, knowledgebase, maintenance mode settings |

@@ -3,110 +3,281 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Message;
+use App\Models\User;
+use App\Services\MessageConversationService;
+use App\Services\NotificationService;
+use App\Services\SecurityPolicyService;
+use App\Services\SecurityThrottleService;
+use App\Services\UserPrivacyService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use App\Models\User;
-use App\Models\Message;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use App\Http\Resources\MessageResource;
 use App\Http\Resources\ConversationResource;
 
 class MessageController extends Controller
 {
-    public function index()
+    private const MAX_ATTACHMENT_SIZE_KB = 5120;
+    private const ATTACHMENT_MIME_TYPES = 'jpg,jpeg,png,gif,webp,pdf,zip,rar,7z,doc,docx,xls,xlsx,ppt,pptx,txt,csv';
+
+    private ?bool $messageAttachmentColumnsReady = null;
+
+    public function __construct(private readonly MessageConversationService $conversations)
     {
-        $userId = Auth::id();
+    }
 
-        // Get the latest message for each conversation
-        // This is a simplified query; MYADS typically has specific logic in MessageController@index
-        // Using subquery to find the latest message per partner
-        $latestMessages = Message::select('messages.*')
-            ->whereRaw('id_msg IN (
-                SELECT MAX(id_msg)
-                FROM messages
-                WHERE us_env = ? OR us_rec = ?
-                GROUP BY CASE
-                    WHEN us_env = ? THEN us_rec
-                    ELSE us_env
-                END
-            )', [$userId, $userId, $userId])
-            ->with(['sender', 'receiver'])
-            ->orderBy('time', 'desc')
-            ->paginate(20);
+    public function index(Request $request)
+    {
+        $user = $request->user();
 
-        return ConversationResource::collection($latestMessages);
+        if ($request->boolean('mark_all_read')) {
+            $this->conversations->markAllAsRead($user);
+            return response()->json(['success' => true]);
+        }
+
+        [$paged] = $this->conversations->paginatedConversations($user);
+
+        return response()->json([
+            'success' => true,
+            'conversations' => $paged->items(), // Might need resource mapping depending on existing ConversationResource
+            'unread_count' => $this->conversations->unreadConversationCount($user),
+            'has_more' => $paged->hasMorePages(),
+        ]);
     }
 
     public function show($identifier)
     {
-        $partner = User::resolvePublicIdentifier($identifier);
-        if (!$partner) {
-            return response()->json(['error' => 'User not found'], 404);
-        }
-
-        $userId = Auth::id();
-
-        $messages = Message::with(['sender', 'receiver'])
-            ->where(function ($q) use ($userId, $partner) {
-                $q->where('us_env', $userId)->where('us_rec', $partner->id);
-            })
-            ->orWhere(function ($q) use ($userId, $partner) {
-                $q->where('us_env', $partner->id)->where('us_rec', $userId);
-            })
-            ->orderBy('time', 'desc')
-            ->paginate(30);
-
-        // Mark unread messages as read
-        Message::where('us_env', $partner->id)
-            ->where('us_rec', $userId)
-            ->where('state', 0)
-            ->update(['state' => 1]);
-
-        return MessageResource::collection($messages);
-    }
-
-    public function store(Request $request, $identifier)
-    {
-        $request->validate([
-            'text' => 'required|string',
-        ]);
-
-        $partner = User::resolvePublicIdentifier($identifier);
-        if (!$partner) {
-            return response()->json(['error' => 'User not found'], 404);
-        }
-
         $user = Auth::user();
+        $partner = $this->conversations->resolvePartner($identifier, $user);
+        
+        if (!$partner) {
+            return response()->json(['error' => 'User not found'], 404);
+        }
 
-        $message = new Message();
-        $message->name = $user->username; // Legacy support
-        $message->us_env = $user->id;
-        $message->us_rec = $partner->id;
-        $message->text = $request->input('text'); // This uses the setTextAttribute mutator to encrypt if enabled
-        $message->time = time();
-        $message->state = 0;
-        $message->save();
+        abort_unless(app(UserPrivacyService::class)->canDirectMessage($partner, $user), 403);
+
+        $messages = $this->conversations->recentMessages($user, $partner);
+        $this->conversations->markConversationAsRead($user, $partner);
 
         return response()->json([
-            'message' => 'Message sent',
-            'data' => new MessageResource($message)
+            'success' => true,
+            'partner' => [
+                'id' => $partner->id,
+                'username' => $partner->username,
+                'name' => $partner->name,
+                'avatar' => $partner->img,
+                'is_verified' => $partner->verified,
+            ],
+            'messages' => $messages,
+        ]);
+    }
+
+    public function store(
+        Request $request,
+        $identifier,
+        UserPrivacyService $privacy,
+        SecurityPolicyService $securityPolicy,
+        SecurityThrottleService $securityThrottle,
+        NotificationService $notifications
+    ) {
+        $user = $request->user();
+        $partner = $this->conversations->resolvePartner($identifier, $user);
+        
+        if (!$partner) {
+            return response()->json(['error' => 'User not found'], 404);
+        }
+
+        if (!$privacy->canDirectMessage($partner, $user)) {
+            return response()->json(['error' => __('messages.direct_messages_disabled')], 403);
+        }
+
+        $validator = $this->buildMessageValidator($request);
+        if ($validator->fails()) {
+            return response()->json(['error' => $validator->errors()->first()], 422);
+        }
+
+        $text = trim((string) $request->input('message', ''));
+        if ($violation = $securityPolicy->textViolation($text, 'messages')) {
+            return response()->json(['error' => $violation], 422);
+        }
+
+        if ($cooldownMessage = $securityThrottle->actionMessage($user, 'private_message')) {
+            return response()->json(['error' => $cooldownMessage], 429);
+        }
+
+        try {
+            [$attachmentPath, $attachmentName, $attachmentSize] = $this->storeMessageAttachment($request);
+        } catch (\Throwable) {
+            return response()->json(['error' => __('messages.upload_failed')], 500);
+        }
+
+        $message = $this->createMessage($user, $partner, $text, $attachmentPath, $attachmentName, $attachmentSize);
+        $securityThrottle->hitAction($user, 'private_message');
+        $this->sendMessageNotification($notifications, $partner, $user, $message);
+
+        return response()->json([
+            'success' => true,
+            'data' => $message
         ], 201);
     }
 
     public function markAsRead($identifier)
     {
-        $partner = User::resolvePublicIdentifier($identifier);
+        $user = Auth::user();
+        $partner = $this->conversations->resolvePartner($identifier, $user);
+        
         if (!$partner) {
             return response()->json(['error' => 'User not found'], 404);
         }
 
-        $userId = Auth::id();
+        $this->conversations->markConversationAsRead($user, $partner);
 
-        Message::where('us_env', $partner->id)
-            ->where('us_rec', $userId)
-            ->where('state', 0)
-            ->update(['state' => 1]);
+        return response()->json(['success' => true, 'message' => 'Messages marked as read']);
+    }
 
-        return response()->json(['message' => 'Messages marked as read']);
+    public function updates(Request $request)
+    {
+        $user = $request->user();
+        $conversationKey = trim((string) $request->query('conversation', ''));
+        $afterId = (int) $request->query('after_id', 0);
+        
+        $partner = $conversationKey !== ''
+            ? $this->conversations->resolvePartner($conversationKey, $user)
+            : null;
+
+        $activeMessages = collect();
+        $latestId = $afterId;
+
+        if ($partner) {
+            $activeMessages = $this->conversations->newerMessages($user, $partner, $afterId);
+            if ($activeMessages->isNotEmpty()) {
+                $this->conversations->markConversationAsRead($user, $partner);
+                $latestId = (int) $activeMessages->last()->id_msg;
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'unread_count' => $this->conversations->unreadConversationCount($user),
+            'latest_id' => $latestId,
+            'active_messages' => $activeMessages,
+        ]);
+    }
+
+    private function createMessage(
+        User $sender,
+        User $recipient,
+        string $text,
+        ?string $attachmentPath = null,
+        ?string $attachmentName = null,
+        ?int $attachmentSize = null
+    ): Message {
+        $message = new Message();
+        $message->name = $sender->username ?? $sender->name ?? '';
+        $message->us_env = $sender->id;
+        $message->us_rec = $recipient->id;
+        $message->text = $text;
+        if ($this->supportsMessageAttachments()) {
+            $message->attachment_path = $attachmentPath;
+            $message->attachment_name = $attachmentName;
+            $message->attachment_size = $attachmentSize;
+        }
+        $message->time = time();
+        $message->state = 3; // 3 means unread based on web logic
+        $message->save();
+
+        return $message;
+    }
+
+    private function sendMessageNotification(
+        NotificationService $notifications,
+        User $recipient,
+        User $sender,
+        Message $message
+    ): void {
+        $notifications->send(
+            $recipient,
+            __('messages.message_notification', ['user' => $sender->username]),
+            "/messages/" . $sender->username,
+            'envelope',
+            $sender->id,
+            'new_message',
+            false
+        );
+    }
+
+    private function buildMessageValidator(Request $request)
+    {
+        $rules = [
+            'message' => 'nullable|string|max:2000',
+        ];
+
+        if ($this->supportsMessageAttachments()) {
+            $rules['attachment'] = 'nullable|file|max:' . self::MAX_ATTACHMENT_SIZE_KB . '|mimes:' . self::ATTACHMENT_MIME_TYPES;
+        }
+
+        $validator = Validator::make($request->all(), $rules);
+
+        $validator->after(function ($validator) use ($request) {
+            $text = trim((string) $request->input('message', ''));
+            if ($text === '' && !$request->hasFile('attachment')) {
+                $validator->errors()->add(
+                    'message',
+                    __('validation.required', ['attribute' => __('messages.message')])
+                );
+            }
+
+            if ($request->hasFile('attachment') && !$this->supportsMessageAttachments()) {
+                $validator->errors()->add(
+                    'attachment',
+                    'Attachment upload is not enabled yet. Please run the latest database migration.'
+                );
+            }
+        });
+
+        return $validator;
+    }
+
+    private function storeMessageAttachment(Request $request): array
+    {
+        if (!$request->hasFile('attachment')) {
+            return [null, null, null];
+        }
+
+        $file = $request->file('attachment');
+        $originalName = $file->getClientOriginalName();
+        $fileSize = (int) $file->getSize();
+        $extension = strtolower($file->getClientOriginalExtension() ?: $file->extension() ?: '');
+        $filename = 'msg_' . time() . '_' . Str::random(10) . ($extension ? '.' . $extension : '');
+        $relativeDirectory = 'message_attachments';
+        $destinationPath = storage_path('app/' . $relativeDirectory);
+
+        if (!is_dir($destinationPath) && !mkdir($destinationPath, 0755, true) && !is_dir($destinationPath)) {
+            throw new \RuntimeException('Unable to create message attachment directory.');
+        }
+
+        $file->move($destinationPath, $filename);
+
+        return [
+            $relativeDirectory . '/' . $filename,
+            $originalName,
+            $fileSize,
+        ];
+    }
+
+    private function supportsMessageAttachments(): bool
+    {
+        if ($this->messageAttachmentColumnsReady !== null) {
+            return $this->messageAttachmentColumnsReady;
+        }
+
+        $this->messageAttachmentColumnsReady = Schema::hasColumn('messages', 'attachment_path')
+            && Schema::hasColumn('messages', 'attachment_name')
+            && Schema::hasColumn('messages', 'attachment_size');
+
+        return $this->messageAttachmentColumnsReady;
     }
 }

@@ -43,7 +43,7 @@
 * **API**: Fixed a duplicate folder bug in `UserResource` by calling `$this->avatarUrl()` directly, correcting the path resolution for mobile client avatars.
 * **Privacy**: Hidden the user's PTS points balance in the profile's "About" tab to protect member points privacy.
 
-### Mobile App API (Phases 1-4)
+### Mobile App API (Phases 1-5)
 * **Feature**: Introduced a foundational JSON REST API for Android/mobile applications using Laravel Sanctum for secure token-based authentication.
 * **Feature**: Added robust Data Resources (`StatusResource`, `UserResource`, `UserProfileResource`, `CommentResource`, `MessageResource`, `ConversationResource`, `NotificationResource`, `ForumCategoryResource`, `ForumTopicResource`, `ProductResource`) to format and sanitize data safely for external mobile clients, including automatic message decryption for secure end-to-end messaging payloads.
 * **Feature**: Created dedicated API controllers (`Api\PortalController`, `Api\StatusController`, `Api\CommentController`, `Api\ReactionController`, `Api\ProfileController`, `Api\MessageController`, `Api\NotificationController`, `Api\WalletController`, `Api\ForumApiController`, `Api\StoreApiController`) to decouple mobile logic from web views.
@@ -55,6 +55,9 @@
 * **Bugfix**: Fixed reaction notification delivery failures for Reels and Community Feed posts across both Web and Mobile API controllers by correctly resolving the interaction subject to its base entity owner.
 * **Feature**: Implemented full `PostDetailsScreen` routing and state in the Flutter app to fetch comments, post new comments, and render interactive native share sheets using `share_plus`.
 * **Security**: Introduced a two-layer API authentication mechanism requiring a globally managed `API_KEY` (generated securely from the Admin panel by Super Admins) in addition to the user's `Sanctum Bearer Token`. This mitigates unauthorized third-party scraping and prevents 500 errors by forcing strict `application/json` accept headers at the middleware level (`RequireMobileApiKey`).
+* **Feature**: Implemented **API Localization Support** via `SetApiLocale` middleware, which parses the `Accept-Language` header sent by the mobile app to automatically localize validation messages and API payload responses.
+* **Feature**: Introduced **Settings API endpoints** (`/api/settings/*`) serving unified JSON representations of the user's Account, Privacy, Social, Mail Notifications, Badges, Sessions, Authorized Apps, and Points Ledger for native rendering in the mobile settings hub.
+* **Feature**: Modified standard endpoints like `/api/messages` and `/api/notifications` to handle native polling effectively, ensuring parity with the web's alert and conversation history systems.
 
 ### Store Discount Codes & Sales System
 * **Feature**: Implemented a comprehensive **Store Discount System** (`store_discount_codes` and `store_discount_redemptions` tables) allowing sellers to generate personalized promotional codes for their products.

@@ -38,6 +38,26 @@ Route::middleware(['api.key', 'auth:sanctum'])->group(function () {
         return new App\Http\Resources\UserResource($request->user());
     });
 
+    // Settings API
+    Route::get('/settings/overview', [App\Http\Controllers\Api\SettingsController::class, 'overview']);
+    Route::get('/settings/profile', [App\Http\Controllers\Api\SettingsController::class, 'getProfile']);
+    Route::post('/settings/profile', [App\Http\Controllers\Api\SettingsController::class, 'updateProfile']);
+    Route::get('/settings/privacy', [App\Http\Controllers\Api\SettingsController::class, 'getPrivacy']);
+    Route::patch('/settings/privacy', [App\Http\Controllers\Api\SettingsController::class, 'updatePrivacy']);
+    Route::post('/settings/2fa/enable', [App\Http\Controllers\Api\SettingsController::class, 'enableTwoFactor']);
+    Route::post('/settings/2fa/disable', [App\Http\Controllers\Api\SettingsController::class, 'disableTwoFactor']);
+    Route::get('/settings/social', [App\Http\Controllers\Api\SettingsController::class, 'getSocial']);
+    Route::patch('/settings/social', [App\Http\Controllers\Api\SettingsController::class, 'updateSocial']);
+    Route::get('/settings/notification-preferences', [App\Http\Controllers\Api\SettingsController::class, 'getNotificationPreferences']);
+    Route::patch('/settings/notification-preferences', [App\Http\Controllers\Api\SettingsController::class, 'updateNotificationPreferences']);
+    Route::get('/settings/sessions', [App\Http\Controllers\Api\SettingsController::class, 'getSessions']);
+    Route::post('/settings/sessions/{id}/revoke', [App\Http\Controllers\Api\SettingsController::class, 'revokeSession']);
+    Route::get('/settings/badges', [App\Http\Controllers\Api\SettingsController::class, 'getBadges']);
+    Route::patch('/settings/badges', [App\Http\Controllers\Api\SettingsController::class, 'updateBadges']);
+    Route::get('/settings/history', [App\Http\Controllers\Api\SettingsController::class, 'getHistory']);
+    Route::get('/settings/apps', [App\Http\Controllers\Api\SettingsController::class, 'getApps']);
+    Route::post('/settings/apps/{id}/revoke', [App\Http\Controllers\Api\SettingsController::class, 'revokeApp']);
+
     // Forum API
     Route::get('/forum', [ForumController::class, 'index']);
     Route::post('/forum', [ForumController::class, 'store']);
