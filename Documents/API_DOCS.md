@@ -146,6 +146,12 @@ Allows any website to pre-fill the MYADS post composer.
   - `POST /api/settings/social`: Updates social links.
   - `GET /api/settings/mail`: Returns email notification preferences.
   - `POST /api/settings/mail`: Updates email preferences.
+  - `GET /api/settings/sessions`: Returns active authenticated sessions for the user.
+  - `DELETE /api/settings/sessions/{id}`: Revokes a specific session.
+  - `GET /api/settings/apps`: Returns third-party apps authorized via OAuth (Socialite).
+  - `DELETE /api/settings/apps/{id}`: Revokes a specific third-party app authorization.
+  - `GET /api/settings/badges`: Returns gamification badges earned by the user.
+  - `GET /api/settings/history`: Returns login history logs.
   - `GET /api/settings/points-ledger`: Returns the user's point transaction history.
   
   ### Community Feed & Statuses

@@ -20,14 +20,14 @@ class NotificationController extends Controller
         $formatted = $notifications->getCollection()->map(function ($notif) {
             return [
                 'id' => $notif->id,
-                'type' => $notif->type,
-                'text' => $notif->text,
+                'type' => 'general',
+                'text' => $notif->name,
                 'time' => $notif->time,
                 'state' => $notif->state,
                 'is_unread' => in_array((int)$notif->state, [0, 3]),
-                'icon' => $notif->icon ?? 'bell', // Fallback icon
-                'target_url' => $notif->url ?? '', // Ensure URL is provided for navigation
-                'source_user_id' => $notif->from_id,
+                'icon' => $notif->logo ?? 'bell', // Fallback icon
+                'target_url' => $notif->nurl ?? '', // Ensure URL is provided for navigation
+                'source_user_id' => null,
             ];
         });
 
