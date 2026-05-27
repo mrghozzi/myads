@@ -318,7 +318,7 @@ class AdminController extends Controller
             'admin_theme' => 'nullable|string',
         ]);
 
-        $settings->update($request->except(['admin_theme', 'lang']));
+        $settings->update($request->only(['titer', 'url', 'description', 'slog', 'theme', 'keyw', 'r_pts', 'r_vu', 'r_nvu', 'r_nlink']));
 
         Option::updateOrCreate(
             ['o_type' => 'admin_settings', 'name' => 'theme'],
@@ -549,7 +549,7 @@ class AdminController extends Controller
         }
 
         if ($request->has('search')) {
-            $search = $request->search;
+            $search = str_replace(['%', '_'], ['\%', '\_'], $request->search);
             $query->where(function($q) use ($search) {
                 $q->where('username', 'like', "%{$search}%")
                   ->orWhere('email', 'like', "%{$search}%");

@@ -19,11 +19,11 @@ class RequireMobileApiKey
         // Force Accept: application/json to avoid 500 errors on exceptions like ModelNotFoundException
         $request->headers->set('Accept', 'application/json');
 
-        // Allow bypassing if explicitly allowed or in debug mode (optional, but let's keep it strictly secured as requested)
-        $providedKey = $request->header('X-API-KEY') ?? $request->query('api_key');
+        // Security: Only accept API key via header (never query parameter to avoid log/referrer leaks)
+        $providedKey = $request->header('X-API-KEY');
         
         if (empty($providedKey)) {
-            return response()->json(['error' => 'API Key is missing.'], 401);
+            return response()->json(['error' => 'API Key is missing. Provide it via X-API-KEY header.'], 401);
         }
 
         $validKeyOption = Option::where('o_type', 'mobile_api')->where('name', 'api_key')->first();

@@ -750,7 +750,7 @@ class ProfileController extends Controller
 
         $request->validate([
             'email' => 'required|email|unique:users,email,' . $user->id,
-            'password' => 'nullable|min:6|confirmed',
+            'password' => 'nullable|min:8|confirmed',
             'avatar' => 'nullable|image|max:2048',
             'cover' => 'nullable|image|max:4096',
             'about_me' => 'nullable|string|max:4000',

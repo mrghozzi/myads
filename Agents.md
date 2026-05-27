@@ -74,7 +74,7 @@ myads/
 │   ├── helpers.php         # Global helpers: theme_asset(), ads_site(), locale_direction(), is_locale_rtl()
 │   ├── Http/
 │   │   ├── Controllers/    # 50+ controllers (see §5)
-│   │   └── Middleware/     # AdminMiddleware, SetLocale, UpdateUserOnline, CheckSystemVersion, InstallerGuard, TrackSeoMetrics, RequireMobileApiKey
+│   │   └── Middleware/     # AdminMiddleware, SetLocale, UpdateUserOnline, CheckSystemVersion, InstallerGuard, TrackSeoMetrics, RequireMobileApiKey, SecurityHeaders
 │   ├── Models/             # 50+ Eloquent models (see §6)
 │   ├── Providers/          # AppServiceProvider, ThemeServiceProvider, PluginServiceProvider, InstallerServiceProvider, MailConfigServiceProvider
 │   ├── Services/           # Business logic services (see §7)
@@ -363,7 +363,8 @@ myads/
 ### Middleware Groups
 - **`auth`** — Standard Laravel auth
 - **`admin`** — `AdminMiddleware` (checks `AdminAccessService`)
-- **Global middleware** — `SetLocale`, `CheckForMaintenanceMode`, `UpdateUserOnline`, `CheckSystemVersion`, `InstallerGuard`, `TrackSeoMetrics`
+- **Global middleware** — `SecurityHeaders`, `SetLocale`, `CheckForMaintenanceMode`, `UpdateUserOnline`, `CheckSystemVersion`, `InstallerGuard`, `TrackSeoMetrics`
+- **API rate limiting** — Public auth endpoints use `throttle` middleware: `/api/login` (5/min), `/api/register` (3/min), `/api/license/verify` (10/min)
 
 ### Orders Workflow Routes
 - Member offer CRUD uses `/orders/{order}/offers` and `/orders/offers/{offer}`.
@@ -460,7 +461,10 @@ admin/mail_settings.blade.php → Database-driven mail configuration form
 - **Admin ACL:** `site_admins` table with module-scoped permissions, managed via `/admin/admins`. Current module list includes `ads`, `community`, `security`, `billing`, `developers`, and other admin areas in `AdminAccessService::MODULES`.
 - **CAPTCHA:** On registration
 - **CSRF:** Laravel middleware on all forms (installer routes excluded). Billing webhooks are isolated exceptions via `billing/webhook/*`.
-- **API Auth:** Sanctum bearer tokens
+- **API Auth:** Sanctum bearer tokens + `X-API-KEY` header (query parameter acceptance removed for security)
+- **API Rate Limiting:** Public auth endpoints throttled per-IP
+- **Security Headers:** `SecurityHeaders` middleware adds `X-Content-Type-Options`, `X-Frame-Options`, `X-XSS-Protection`, `Referrer-Policy`, and `Permissions-Policy` to all responses
+- **Upload Security:** File extension whitelist + MIME blocklist in `StatusController`, `.htaccess` in `upload/` blocks PHP execution
 
 ---
 

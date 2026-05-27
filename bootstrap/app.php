@@ -75,6 +75,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->web(append: [
+            \App\Http\Middleware\SecurityHeaders::class,
             \App\Http\Middleware\BlockBannedIp::class,
             \App\Http\Middleware\SetLocale::class,
             \App\Http\Middleware\CheckForMaintenanceMode::class,
@@ -85,6 +86,7 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\TwoFactorMiddleware::class,
         ]);
         $middleware->api(append: [
+            \App\Http\Middleware\SecurityHeaders::class,
             \App\Http\Middleware\SetApiLocale::class,
         ]);
 

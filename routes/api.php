@@ -19,10 +19,10 @@ use App\Http\Controllers\MarketplaceExtensionFeedController;
 |
 */
 
-// Public Routes
-Route::post('/login', [\App\Http\Controllers\Api\AuthController::class, 'login']);
-Route::post('/register', [\App\Http\Controllers\Api\AuthController::class, 'register']);
-Route::post('/license/verify', [App\Http\Controllers\LicenseApiController::class, 'verify'])->name('api.license.verify');
+// Public Routes (rate-limited for security)
+Route::post('/login', [\App\Http\Controllers\Api\AuthController::class, 'login'])->middleware('throttle:5,1');
+Route::post('/register', [\App\Http\Controllers\Api\AuthController::class, 'register'])->middleware('throttle:3,1');
+Route::post('/license/verify', [App\Http\Controllers\LicenseApiController::class, 'verify'])->name('api.license.verify')->middleware('throttle:10,1');
 
 // Legacy Ad Serving Endpoints (API version)
 Route::get('/banner', [AdsServingController::class, 'bannerScript']);

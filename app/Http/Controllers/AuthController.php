@@ -101,35 +101,39 @@ class AuthController extends Controller
 
         // Referral Logic
         if ($request->hasCookie('ref')) {
-            $referrerId = $request->cookie('ref');
-            $referrer = User::find($referrerId);
-            
-            if ($referrer) {
-                // 1. Insert into referral table
-                Referral::create([
-                    'uid' => $referrerId,
-                    'ruid' => $user->id,
-                    'date' => date('Y-m-d'),
-                ]);
-                
-                // 2. Insert into options (History/Notification)
-                Option::create([
-                    'name' => 'referal',
-                    'o_valuer' => '10',
-                    'o_type' => 'hest_pts',
-                    'o_parent' => $referrerId,
-                    'o_order' => $user->id,
-                    'o_mode' => time(),
-                ]);
-                
-                // 3. Update referrer stats
-                $referrer->increment('pts', 10);
-                $referrer->increment('vu', 10);
-                $referrer->increment('nvu', 10);
-                $referrer->increment('nlink', 10);
-                
-                // 4. Clear cookie
+            $referrerId = (int) $request->cookie('ref');
+            if ($referrerId <= 0) {
                 Cookie::queue(Cookie::forget('ref'));
+            } else {
+                $referrer = User::find($referrerId);
+                
+                if ($referrer) {
+                    // 1. Insert into referral table
+                    Referral::create([
+                        'uid' => $referrerId,
+                        'ruid' => $user->id,
+                        'date' => date('Y-m-d'),
+                    ]);
+                    
+                    // 2. Insert into options (History/Notification)
+                    Option::create([
+                        'name' => 'referal',
+                        'o_valuer' => '10',
+                        'o_type' => 'hest_pts',
+                        'o_parent' => $referrerId,
+                        'o_order' => $user->id,
+                        'o_mode' => time(),
+                    ]);
+                    
+                    // 3. Update referrer stats
+                    $referrer->increment('pts', 10);
+                    $referrer->increment('vu', 10);
+                    $referrer->increment('nvu', 10);
+                    $referrer->increment('nlink', 10);
+                    
+                    // 4. Clear cookie
+                    Cookie::queue(Cookie::forget('ref'));
+                }
             }
         }
 

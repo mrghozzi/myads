@@ -91,6 +91,19 @@
 * **Feature**: Added color-coded media type badges (Video 🔵, Audio 🟢, Reels 🟣, Music 🟠, File 🔘) to post cards for quick content-type identification.
 * **Dependency**: Added `url_launcher` package to Flutter app for opening media files in external applications.
 
+### Security Hardening
+* **Critical Fix**: Added a **file extension whitelist** (`ALLOWED_MEDIA_EXTENSIONS`) and **MIME type blocklist** (`BLOCKED_MIME_PREFIXES`) to `StatusController::storeMediaFile()`, preventing upload of executable files (`.php`, `.phtml`, `.exe`, etc.) and dangerous MIME types.
+* **Critical Fix**: Created a protective `.htaccess` in the `upload/` directory that blocks PHP execution (`php_flag engine off`), denies direct access to all PHP-family files, and disables directory listing — hardening file storage even if extension validation is bypassed.
+* **High Fix**: Added **rate limiting** to all public API authentication endpoints: `/api/login` (5/min), `/api/register` (3/min), and `/api/license/verify` (10/min) to prevent brute-force attacks.
+* **High Fix**: Removed API key acceptance via **query parameter** (`?api_key=...`) in `RequireMobileApiKey` middleware — API keys are now only accepted via the `X-API-KEY` HTTP header, preventing leakage through server logs, browser history, and referrer headers.
+* **Medium Fix**: Fixed insecure **directory permission** from `0777` to `0755` in `StatusController::uploadImage()`.
+* **Medium Fix**: Aligned **password minimum length** to 8 characters in `ProfileController` settings update, matching the registration requirement.
+* **Medium Fix**: Added **LIKE wildcard escaping** (`%`, `_`) in `AdminController` user search to prevent SQL LIKE injection.
+* **Medium Fix**: Replaced `$request->except()` with explicit **`$request->only()`** in `AdminController::updateSettings()` to prevent mass assignment of unintended fields.
+* **Low Fix**: Introduced a new **`SecurityHeaders` middleware** that adds `X-Content-Type-Options: nosniff`, `X-Frame-Options: SAMEORIGIN`, `X-XSS-Protection: 1; mode=block`, `Referrer-Policy`, and `Permissions-Policy` headers to all web and API responses.
+* **Low Fix**: Registered `SecurityHeaders` globally in `bootstrap/app.php` for both web and API middleware stacks.
+* **Low Fix**: Added **referral cookie sanitization** in `AuthController` — referral IDs are now cast to integer and validated before database lookup, preventing injection via cookie manipulation.
+
 ---
 
 
