@@ -102,6 +102,7 @@ class MessageController extends Controller
     {
         $user = Auth::user();
         $partner = $this->conversations->resolvePartner($id, $user);
+        abort_unless($partner, 404);
         abort_unless($privacy->canDirectMessage($partner, $user), 403);
 
         return view('theme::messages.index', $this->buildPageData($user, $partner));
@@ -111,6 +112,7 @@ class MessageController extends Controller
     {
         $user = $request->user();
         $partner = $this->conversations->resolvePartner($id, $user);
+        abort_unless($partner, 404);
         $beforeId = (int) $request->query('before_id', 0);
         $limit = max(1, min(50, (int) $request->query('limit', MessageConversationService::PAGE_SIZE)));
 
@@ -141,6 +143,7 @@ class MessageController extends Controller
     {
         $user = $request->user();
         $partner = $this->conversations->resolvePartner($id, $user);
+        abort_unless($partner, 404);
 
         if ($request->has('after_id')) {
             $afterId = (int) $request->query('after_id', 0);
@@ -253,6 +256,7 @@ class MessageController extends Controller
 
         $user = $request->user();
         $partner = $this->conversations->resolvePartner($id, $user);
+        abort_unless($partner, 404);
         if (!$privacy->canDirectMessage($partner, $user)) {
             return $this->messageErrorResponse($request, __('messages.direct_messages_disabled'), 403);
         }

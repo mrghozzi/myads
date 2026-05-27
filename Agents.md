@@ -297,6 +297,7 @@ myads/
 | `CustomAdServingService` | Selects active custom ad deals, renders safe banner/text/native markup, and records impressions/clicks |
 | `CustomAdSettlementService` | Accepts/rejects/cancels custom ad deals, reserves/refunds PTS, and releases daily publisher payouts |
 | `CustomAdAnalyticsService` | Aggregates custom ad summaries, daily/hourly series, referrers, countries, devices, and CTR |
+| `MessageConversationService` | Manages message conversation resolution, partner lookup (encrypted key + username fallback), pagination, unread counts, and read-state updates |
 | `MailConfigServiceProvider` | Boots early to override `config('mail.*')` from the `mail_settings` database table at runtime, with graceful fallback |
 
 ---
@@ -952,6 +953,7 @@ php artisan storage:link
 - **Feature (2026-05-21):** Implemented product licensing scheme (`product_licenses` table) and verification endpoint (`/api/license/verify`).
 - **Integration (2026-05-21):** Integrated license keys with `StoreController` download flows. Added license card to store sidebar in `show.blade.php`.
 - **Documentation (2026-05-21):** Documented paid plugin conventions in `PLUGIN_GUIDE.md` and updated `changelogs.md`.
+- **Bugfix (2026-05-27):** Fixed mobile app private messages **red screen crash**. Updated `Api\MessageController::index` to return `last_message`/`unread_count`/`route_key` matching Flutter expectations. Added `GET /api/messages/updates` and `POST /api/messages/{identifier}/read` routes. Enhanced `MessageConversationService::resolvePartner` with username fallback. Added null safety guards to web `MessageController`.
 
 ---
 
@@ -977,4 +979,4 @@ If in doubt, update it. An outdated `Agents.md` causes future agents to make wro
 
 ---
 
-*Last updated: 2026-05-21 — MYADS v4.3.4 (Paid plugin licensing, domain verification, and store integration)*
+*Last updated: 2026-05-27 — MYADS v4.3.4 (Paid plugin licensing, domain verification, store integration, mobile messaging fix)*

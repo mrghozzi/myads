@@ -217,7 +217,7 @@ class MessageConversationService
         ];
     }
 
-    public function resolvePartner(string|int $id, User $user): User
+    public function resolvePartner(string|int $id, User $user): ?User
     {
         $partnerId = Message::decodeConversationRouteKey($id, $user);
         $partner = $partnerId ? User::find($partnerId) : null;
@@ -225,8 +225,14 @@ class MessageConversationService
             return $partner;
         }
 
+        // Fallback: try resolving by username (mobile app may pass username directly)
+        $byUsername = User::where('username', $id)->first();
+        if ($byUsername) {
+            return $byUsername;
+        }
+
         if ((bool) SecuritySettings::get('private_message_encryption_enabled', 0)) {
-            abort(404);
+            return null;
         }
 
         $message = Message::whereKey($id)
@@ -234,11 +240,15 @@ class MessageConversationService
                 $query->where('us_rec', $user->id)
                     ->orWhere('us_env', $user->id);
             })
-            ->firstOrFail();
+            ->first();
+
+        if (!$message) {
+            return null;
+        }
 
         $partnerId = $this->partnerIdForMessage($message, $user);
 
-        return User::findOrFail($partnerId);
+        return User::find($partnerId);
     }
 
     public function conversationRouteKey(User|int $viewer, User|int $partner): string

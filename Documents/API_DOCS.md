@@ -210,10 +210,21 @@ Allows any website to pre-fill the MYADS post composer.
 
 ### Private Messages (Phase 2)
 - `GET /api/messages`: Retrieve the list of active conversations (latest message per partner).
+  - **Response Fields:** Each conversation contains:
+    - `user`: Partner details (`id`, `username`, `name`, `img`, `online`, `verified`).
+    - `last_message`: Object with `text` (string) and `time` (unix timestamp).
+    - `unread_count`: Integer count of unread messages from this partner.
+    - `route_key`: Encrypted conversation identifier for navigating to the chat (preferred over username).
+  - **Response also includes:** `unread_count` (total across all conversations), `has_more` (pagination flag).
+- `GET /api/messages/updates`: Poll for new messages and unread count updates.
+  - *Query:* `?conversation={route_key_or_username}&after_id={last_message_id}`
+  - *Response:* `unread_count`, `latest_id`, `active_messages` (new messages since `after_id`).
 - `GET /api/messages/{identifier}`: Retrieve message history with a specific user.
+  - **Note:** `{identifier}` can be an encrypted `route_key` (preferred) or a `username` (fallback).
 - `POST /api/messages/{identifier}`: Send a private message to a user.
   *Payload:* `{"text": "Hello!"}`
 - `POST /api/messages/{identifier}/read`: Mark all unread messages from a user as read.
+
 
 ### Notifications & Wallet (Phase 3)
 - `GET /api/notifications`: Retrieve user notifications (paginated).

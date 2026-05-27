@@ -1,6 +1,18 @@
 # v4.3.4
 > **Feature Release** — Paid Plugin Licensing & Verification Protocol, Store Product License Key Integration, Plugin Auto-Update APIs, Store Discount Codes, Seller Temporary Sales, Developer Architecture Guides, and Full Reels System (Web & Mobile).
 
+### Mobile App Private Messages (Bug Fix)
+* **Critical Fix**: Resolved a **red screen crash** on the Mobile App Private Messages page caused by API response format mismatches and null safety violations.
+* **API**: Updated `Api\MessageController::index` to return `last_message` (object) and `unread_count` (integer) fields matching the Flutter model expectations, replacing the previous `message` and `unread` (boolean) keys.
+* **API**: Added `route_key` to conversation list responses, enabling the mobile app to navigate using encrypted conversation identifiers instead of plain usernames, preventing 404 errors on the backend.
+* **API**: Added missing `GET /api/messages/updates` endpoint for real-time message polling from the mobile app.
+* **API**: Added `POST /api/messages/{identifier}/read` endpoint for marking conversations as read.
+* **Backend**: Enhanced `MessageConversationService::resolvePartner` to support username-based fallback lookup when the identifier is not a valid encrypted route key, enabling direct profile-to-message navigation from the mobile app.
+* **Backend**: Added null safety guards (`abort_unless($partner, 404)`) to all `MessageController` (web) methods that call `resolvePartner`, preventing 500 errors when the nullable return type is propagated.
+* **Mobile**: Fixed null safety crash in `MessagesListScreen` and `ChatScreen` where `partner['img']` could be `null` but `HexagonAvatar.avatarUrl` required a non-nullable `String`.
+* **Mobile**: Updated `ChatScreen` sender detection logic to handle both nested `sender` objects and flat `us_env` fields from the API response.
+
+
 ### Repost & Share System (Web & Mobile)
 * **Bug Fix**: Fixed a bug where reposted/shared posts appeared on both the Web Platform and the Mobile App as plain text posts showing only the quote text.
 * **Web**: Enhanced the repost embed layout (`repost_embed.blade.php`) to dynamically support all original media types (Videos, Reels, Audio, Music, File Attachments) inside the shared post container.

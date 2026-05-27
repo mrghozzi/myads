@@ -95,6 +95,7 @@ Route::middleware(['api.key', 'auth:sanctum'])->group(function () {
 
     // Messages API
     Route::get('/messages', [App\Http\Controllers\Api\MessageController::class, 'index']);
+    Route::get('/messages/updates', [App\Http\Controllers\Api\MessageController::class, 'updates']);
     Route::get('/messages/{identifier}', [App\Http\Controllers\Api\MessageController::class, 'show']);
     Route::post('/messages/{identifier}', [App\Http\Controllers\Api\MessageController::class, 'store']);
     Route::post('/messages/{identifier}/read', [App\Http\Controllers\Api\MessageController::class, 'markAsRead']);

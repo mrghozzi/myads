@@ -40,11 +40,40 @@ class MessageController extends Controller
 
         [$paged] = $this->conversations->paginatedConversations($user);
 
+        // Map conversations into the format the mobile app expects
+        $mapped = collect($paged->items())->map(function ($conv) use ($user) {
+            $partner = $conv['user'];
+            $message = $conv['message'];
+
+            // Count unread messages from this partner
+            $unreadCount = \App\Models\Message::where('us_env', $partner->id)
+                ->where('us_rec', $user->id)
+                ->where('state', '!=', 0)
+                ->count();
+
+            return [
+                'user' => [
+                    'id'       => $partner->id,
+                    'username' => $partner->username,
+                    'name'     => $partner->name ?? $partner->username,
+                    'img'      => $partner->img ?? '',
+                    'online'   => (bool) ($partner->online ?? false),
+                    'verified' => (bool) ($partner->verified ?? false),
+                ],
+                'last_message' => [
+                    'text' => $message->text ?? '',
+                    'time' => $message->time ?? 0,
+                ],
+                'unread_count' => $unreadCount,
+                'route_key'    => $conv['route_key'] ?? '',
+            ];
+        })->values();
+
         return response()->json([
-            'success' => true,
-            'conversations' => $paged->items(), // Might need resource mapping depending on existing ConversationResource
-            'unread_count' => $this->conversations->unreadConversationCount($user),
-            'has_more' => $paged->hasMorePages(),
+            'success'       => true,
+            'conversations' => $mapped,
+            'unread_count'  => $this->conversations->unreadConversationCount($user),
+            'has_more'      => $paged->hasMorePages(),
         ]);
     }
 
@@ -65,11 +94,12 @@ class MessageController extends Controller
         return response()->json([
             'success' => true,
             'partner' => [
-                'id' => $partner->id,
-                'username' => $partner->username,
-                'name' => $partner->name,
-                'avatar' => $partner->img,
-                'is_verified' => $partner->verified,
+                'id'          => $partner->id,
+                'username'    => $partner->username,
+                'name'        => $partner->name,
+                'avatar'      => $partner->img ?? '',
+                'online'      => (bool) ($partner->online ?? false),
+                'is_verified' => (bool) ($partner->verified ?? false),
             ],
             'messages' => $messages,
         ]);
