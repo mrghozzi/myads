@@ -11,6 +11,12 @@
 * **Feature**: Authenticated users now see their exact hexagonal avatar (with verified badge and dynamic color ring) directly in the navigation bar of standalone pages instead of "Login/Register" buttons, implemented cleanly via SVG/CSS without requiring heavy JS dependencies.
 * **Fix**: Corrected footer URL paths for legal pages (`/privacy`, `/terms`, `/refund`) and resolved missing translation keys.
 
+### Store Publisher Features
+* **Feature**: Added **Downloads History** page (`/store/{name}/downloads`) allowing product publishers to track which members downloaded their digital products and when.
+* **Feature**: Added **Updates Management** page (`/store/{name}/updates-management`) empowering publishers to review and delete legacy product versions and updates.
+* **UI/UX**: Both new publisher pages were built using the premium "superdesign" (Duralux) aesthetic, utilizing responsive grid layouts, hexagon member avatars (`user-preview` cards), gradient icons, and styled timeline widgets instead of standard tables.
+* **i18n**: Added new translation keys (`manage_updates`, `member`, `downloaded`) across English and Arabic language files.
+
 ### Mobile App Private Messages (Bug Fix)
 * **Critical Fix**: Resolved a **red screen crash** on the Mobile App Private Messages page caused by API response format mismatches and null safety violations.
 * **API**: Updated `Api\MessageController::index` to return `last_message` (object) and `unread_count` (integer) fields matching the Flutter model expectations, replacing the previous `message` and `unread` (boolean) keys.

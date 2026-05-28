@@ -3222,4 +3222,7 @@ return [
     'forum_desc' => 'Join specialized topics, share knowledge, and get support from experts and fellow website owners.',
     'directory_desc' => 'Submit your website to our categorized directory to boost your SEO and get discovered by thousands of users.',
     'store_desc' => 'Buy and sell digital products, scripts, and services securely. Find what you need to elevate your website.',
+    'manage_updates' => 'Manage Updates',
+    'member' => 'Member',
+    'downloaded' => 'Downloaded at',
 ];

@@ -1528,4 +1528,77 @@ class StoreController extends Controller
             'discount_text' => $discountText
         ]);
     }
+
+    public function downloads($name)
+    {
+        $product = Product::withoutGlobalScope('store')->where('o_type', 'store')->where('name', $name)->firstOrFail();
+        
+        if (!Auth::check() || (Auth::id() != $product->o_parent && !Auth::user()->isAdmin())) {
+            return redirect()->route('store.show', $product->name);
+        }
+
+        $licenses = DB::table('product_licenses')
+            ->where('product_id', $product->id)
+            ->join('users', 'product_licenses.user_id', '=', 'users.id')
+            ->select('product_licenses.*', 'users.username', 'users.img as avatar')
+            ->orderBy('product_licenses.created_at', 'desc')
+            ->paginate(20);
+
+        $this->seo([
+            'resource_title' => __('downloads') . ' - ' . $product->name,
+            'breadcrumbs' => [
+                ['name' => __('messages.home'), 'url' => url('/')],
+                ['name' => __('messages.store'), 'url' => route('store.index')],
+                ['name' => $product->name, 'url' => route('store.show', $product->name)],
+                ['name' => __('downloads'), 'url' => route('store.downloads', $product->name)],
+            ],
+        ]);
+
+        return view('theme::store.downloads', compact('product', 'licenses'));
+    }
+
+    public function updates($name)
+    {
+        $product = Product::withoutGlobalScope('store')->where('o_type', 'store')->where('name', $name)->firstOrFail();
+        
+        if (!Auth::check() || (Auth::id() != $product->o_parent && !Auth::user()->isAdmin())) {
+            return redirect()->route('store.show', $product->name);
+        }
+
+        $files = ProductFile::where('o_parent', $product->id)->orderBy('id', 'desc')->paginate(20);
+
+        $this->seo([
+            'resource_title' => __('updates') . ' - ' . $product->name,
+            'breadcrumbs' => [
+                ['name' => __('messages.home'), 'url' => url('/')],
+                ['name' => __('messages.store'), 'url' => route('store.index')],
+                ['name' => $product->name, 'url' => route('store.show', $product->name)],
+                ['name' => __('updates'), 'url' => route('store.updates', $product->name)],
+            ],
+        ]);
+
+        return view('theme::store.updates', compact('product', 'files'));
+    }
+
+    public function destroyUpdate(Request $request, $name, $fileId)
+    {
+        $product = Product::withoutGlobalScope('store')->where('o_type', 'store')->where('name', $name)->firstOrFail();
+        
+        if (!Auth::check() || (Auth::id() != $product->o_parent && !Auth::user()->isAdmin())) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+
+        $file = ProductFile::where('o_parent', $product->id)->findOrFail($fileId);
+        
+        DB::transaction(function () use ($file) {
+            Short::where('tp_id', $file->id)->where('sh_type', 7867)->delete();
+            $file->delete();
+        });
+
+        if ($request->expectsJson() || $request->wantsJson() || $request->ajax()) {
+            return response()->json(['success' => true]);
+        }
+
+        return redirect()->route('store.updates', $product->name)->with('success', __('messages.deleted_successfully') ?? 'Deleted successfully.');
+    }
 }

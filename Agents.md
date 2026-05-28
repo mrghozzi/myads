@@ -324,6 +324,8 @@ myads/
 | `/store/discounts` | `/store/discounts` | Member dashboard for generating and managing store discount codes |
 | `/store/discounts/validate` | `/store/discounts/validate` | Public AJAX endpoint for validating coupons during checkout |
 | `/admin/store/discounts` | `/admin/store/discounts` | Admin dashboard for global/category store coupons |
+| `/store/{name}/downloads` | `/store/my-script/downloads` | Store product publishers dashboard for tracking downloads |
+| `/store/{name}/updates-management` | `/store/my-script/updates-management` | Store product publishers dashboard for managing updates |
 | `/ads/posts` | `/ads/posts` | Member promoted-post campaigns dashboard |
 | `/ads/posts/{status}/promote` | `/ads/posts/55/promote` | Member promoted-post setup and purchase page |
 | `/ads/custom` | `/ads/custom` | Member custom ads dashboard for placements and deals |

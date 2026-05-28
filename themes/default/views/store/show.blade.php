@@ -197,6 +197,12 @@
                                     <a class="simple-dropdown-link" href="{{ route('store.update', $product->name) }}">
                                         <i class="fa fa-edit" aria-hidden="true"></i>&nbsp;{{ __('messages.edit_product') }}
                                     </a>
+                                    <a class="simple-dropdown-link" href="{{ route('store.downloads', $product->name) }}">
+                                        <i class="fa fa-users" aria-hidden="true"></i>&nbsp;{{ __('messages.downloads') ?? 'Downloads' }}
+                                    </a>
+                                    <a class="simple-dropdown-link" href="{{ route('store.updates', $product->name) }}">
+                                        <i class="fa fa-history" aria-hidden="true"></i>&nbsp;{{ __('messages.manage_updates') ?? 'Manage Updates' }}
+                                    </a>
                                     @if($topic)
                                     <button type="button" class="simple-dropdown-link store-dropdown-button" id="trigger-topic-edit-from-menu">
                                         <i class="fa fa-pencil-square" aria-hidden="true"></i>&nbsp;{{ __('messages.edit_topic') }}

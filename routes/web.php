@@ -363,6 +363,9 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/store/{name}/update-price', [StoreController::class, 'updatePrice'])->name('store.update.price');
     Route::post('/store/{name}/update-topic', [StoreController::class, 'updateTopic'])->name('store.update.topic');
     Route::post('/store/{name}/update-details', [StoreController::class, 'updateDetails'])->name('store.update.details');
+    Route::get('/store/{name}/downloads', [StoreController::class, 'downloads'])->name('store.downloads');
+    Route::get('/store/{name}/updates-management', [StoreController::class, 'updates'])->name('store.updates');
+    Route::delete('/store/{name}/updates-management/{file}', [StoreController::class, 'destroyUpdate'])->name('store.updates.destroy');
     Route::post('/store/download/{id}', [StoreController::class, 'download'])->name('store.download');
     Route::post('/store/upload-zip', [StoreController::class, 'uploadZip'])->name('store.upload_zip');
     Route::post('/store/verify-name', [StoreController::class, 'verifyName'])->name('store.verify_name');
