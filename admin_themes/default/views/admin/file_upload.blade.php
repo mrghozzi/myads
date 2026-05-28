@@ -70,14 +70,6 @@
                         </div>
                     </div>
 
-                    <div class="admin-utility-card">
-                        <div class="form-check form-switch px-0 d-flex align-items-center gap-3">
-                            <input class="form-check-input ms-0 mt-0" type="checkbox" role="switch" id="css_sharing" name="css_sharing" value="1" {{ ($options['css_sharing']->o_valuer ?? '0') == '1' ? 'checked' : '' }} style="width: 40px; height: 20px;">
-                            <div>
-                                <label class="form-check-label mb-0 fw-semibold" for="css_sharing">{{ __('messages.css_upload_sharing') }}</label>
-                                <div class="small text-muted">{{ __('messages.css_upload_sharing_help') }}</div>
-                            </div>
-                        </div>
                     </div>
                 </div>
 

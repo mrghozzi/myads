@@ -61,17 +61,22 @@ class StatusPostService
             };
         }
 
+        $settings = $this->getUploadSettings();
+        $maxSizeKb = $settings['max_upload_size'] * 1024;
+        $mimes = $settings['allowed_extensions'];
+        $mimetypes = $settings['allowed_mime_types'];
+
         $rules = [
             'text' => 'nullable|string|max:10000',
             'txt' => 'nullable|string|max:10000',
             'images' => 'nullable|array|max:10',
-            'images.*' => 'image|max:10000',
+            'images.*' => "image|mimes:{$mimes}|mimetypes:{$mimetypes}|max:{$maxSizeKb}",
             'videos' => 'nullable|array|max:1',
-            'videos.*' => 'file|mimes:mp4,webm,ogg,mov|max:100000',
+            'videos.*' => "file|mimes:{$mimes}|mimetypes:{$mimetypes}|max:{$maxSizeKb}",
             'audios' => 'nullable|array|max:1',
-            'audios.*' => 'file|mimes:mp3,wav,ogg,m4a|max:20000',
+            'audios.*' => "file|mimes:{$mimes}|mimetypes:{$mimetypes}|max:{$maxSizeKb}",
             'files' => 'nullable|array|max:5',
-            'files.*' => 'file|max:50000',
+            'files.*' => "file|mimes:{$mimes}|mimetypes:{$mimetypes}|max:{$maxSizeKb}",
             'link_url' => 'nullable|string|max:2048',
             'publish_mode' => 'nullable|in:post,directory_only',
             'post_kind' => 'nullable|string|in:text,gallery,link,repost,video,audio,file,music,reels',
@@ -87,6 +92,19 @@ class StatusPostService
         }
 
         $request->validate($rules);
+
+        if (!$settings['video_sharing'] && $postKind === 'video') {
+            throw new \RuntimeException(__('messages.video_upload_disabled') ?? 'Video upload is disabled.');
+        }
+        if (!$settings['reels_upload'] && $postKind === 'reels') {
+            throw new \RuntimeException(__('messages.reels_upload_disabled') ?? 'Reels upload is disabled.');
+        }
+        if (!$settings['audio_sharing'] && in_array($postKind, ['audio', 'music'])) {
+            throw new \RuntimeException(__('messages.audio_upload_disabled') ?? 'Audio upload is disabled.');
+        }
+        if (!$settings['file_sharing'] && $postKind === 'file') {
+            throw new \RuntimeException(__('messages.file_upload_disabled') ?? 'File upload is disabled.');
+        }
 
         $text = trim((string) $request->input('text', $request->input('txt', '')));
         $time = time();
@@ -269,17 +287,22 @@ class StatusPostService
             throw new \RuntimeException(__('messages.unauthorized'));
         }
 
+        $settings = $this->getUploadSettings();
+        $maxSizeKb = $settings['max_upload_size'] * 1024;
+        $mimes = $settings['allowed_extensions'];
+        $mimetypes = $settings['allowed_mime_types'];
+
         $rules = [
             'text' => 'nullable|string|max:10000',
             'txt' => 'nullable|string|max:10000',
             'images' => 'nullable|array|max:10',
-            'images.*' => 'image|max:10000',
+            'images.*' => "image|mimes:{$mimes}|mimetypes:{$mimetypes}|max:{$maxSizeKb}",
             'videos' => 'nullable|array|max:1',
-            'videos.*' => 'file|mimes:mp4,webm,ogg,mov|max:100000',
+            'videos.*' => "file|mimes:{$mimes}|mimetypes:{$mimetypes}|max:{$maxSizeKb}",
             'audios' => 'nullable|array|max:1',
-            'audios.*' => 'file|mimes:mp3,wav,ogg,m4a|max:20000',
+            'audios.*' => "file|mimes:{$mimes}|mimetypes:{$mimetypes}|max:{$maxSizeKb}",
             'files' => 'nullable|array|max:5',
-            'files.*' => 'file|max:50000',
+            'files.*' => "file|mimes:{$mimes}|mimetypes:{$mimetypes}|max:{$maxSizeKb}",
             'delete_attachment_ids' => 'nullable|array',
             'delete_attachment_ids.*' => 'integer|exists:forum_attachments,id',
             'attachment_order' => 'nullable|array',
@@ -287,6 +310,21 @@ class StatusPostService
         ];
 
         $request->validate($rules);
+        
+        $postKind = $this->determinePostKind($status);
+        if (!$settings['video_sharing'] && $postKind === 'video' && $request->hasFile('videos')) {
+            throw new \RuntimeException(__('messages.video_upload_disabled') ?? 'Video upload is disabled.');
+        }
+        if (!$settings['reels_upload'] && $postKind === 'reels' && $request->hasFile('videos')) {
+            throw new \RuntimeException(__('messages.reels_upload_disabled') ?? 'Reels upload is disabled.');
+        }
+        if (!$settings['audio_sharing'] && in_array($postKind, ['audio', 'music']) && $request->hasFile('audios')) {
+            throw new \RuntimeException(__('messages.audio_upload_disabled') ?? 'Audio upload is disabled.');
+        }
+        if (!$settings['file_sharing'] && $postKind === 'file' && $request->hasFile('files')) {
+            throw new \RuntimeException(__('messages.file_upload_disabled') ?? 'File upload is disabled.');
+        }
+
         $text = trim((string) $request->input('text', $request->input('txt', '')));
 
         if ($violation = $this->securityPolicy->textViolation($text, 'posts')) {
@@ -737,5 +775,20 @@ class StatusPostService
             14 => 'reels',
             default => 'text',
         };
+    }
+
+    private function getUploadSettings(): array
+    {
+        $options = Option::where('o_type', 'file_upload_settings')->get()->keyBy('name');
+        
+        return [
+            'file_sharing' => ($options['file_sharing']->o_valuer ?? '1') == '1',
+            'video_sharing' => ($options['video_sharing']->o_valuer ?? '1') == '1',
+            'reels_upload' => ($options['reels_upload']->o_valuer ?? '1') == '1',
+            'audio_sharing' => ($options['audio_sharing']->o_valuer ?? '1') == '1',
+            'max_upload_size' => (int) ($options['max_upload_size']->o_valuer ?? '10'),
+            'allowed_extensions' => $options['allowed_extensions']->o_valuer ?? 'jpg,png,jpeg,gif,mp4,mp3,pdf,zip',
+            'allowed_mime_types' => $options['allowed_mime_types']->o_valuer ?? 'image/jpeg,image/png,image/gif,video/mp4,audio/mpeg,application/pdf,application/zip',
+        ];
     }
 }

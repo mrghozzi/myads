@@ -3784,6 +3784,15 @@ class AdminController extends Controller
     public function updateFileUploadSettings(Request $request)
     {
         $settings = $request->except('_token');
+        
+        // Handle unchecked checkboxes that are not sent by the browser
+        $checkboxes = ['file_sharing', 'video_sharing', 'reels_upload', 'audio_sharing'];
+        foreach ($checkboxes as $checkbox) {
+            if (!isset($settings[$checkbox])) {
+                $settings[$checkbox] = '0';
+            }
+        }
+
         foreach ($settings as $key => $value) {
             Option::updateOrCreate(
                 ['o_type' => 'file_upload_settings', 'name' => $key],

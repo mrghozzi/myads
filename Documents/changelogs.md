@@ -11,6 +11,13 @@
 * **Feature**: Authenticated users now see their exact hexagonal avatar (with verified badge and dynamic color ring) directly in the navigation bar of standalone pages instead of "Login/Register" buttons, implemented cleanly via SVG/CSS without requiring heavy JS dependencies.
 * **Fix**: Corrected footer URL paths for legal pages (`/privacy`, `/terms`, `/refund`) and resolved missing translation keys.
 
+### Media Upload & Content Sharing Settings
+* **Feature**: Enforced `file_upload_settings` across the platform to dynamically control media sharing (Video, Audio, Files, Reels, Music).
+* **Backend**: Updated `StatusPostService` to enforce size limits (`max_upload_size`) and allowed extensions/MIME types during post creation and updates.
+* **Backend**: Fixed a bug in `AdminController@updateFileUploadSettings` where unchecked HTML toggles were not being saved, ensuring disabled settings accurately update the database.
+* **Frontend**: Updated the post composer UI (`add_post.blade.php`) to dynamically hide the upload buttons for disabled media types.
+* **Cleanup**: Removed the legacy "CSS Upload" setting from the admin panel (`file_upload.blade.php`).
+
 ### Store Publisher Features
 * **Feature**: Added **Downloads History** page (`/store/{name}/downloads`) allowing product publishers to track which members downloaded their digital products and when.
 * **Feature**: Added **Updates Management** page (`/store/{name}/updates-management`) empowering publishers to review and delete legacy product versions and updates.

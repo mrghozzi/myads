@@ -467,7 +467,7 @@ admin/mail_settings.blade.php → Database-driven mail configuration form
 - **API Auth:** Sanctum bearer tokens + `X-API-KEY` header (query parameter acceptance removed for security)
 - **API Rate Limiting:** Public auth endpoints throttled per-IP
 - **Security Headers:** `SecurityHeaders` middleware adds `X-Content-Type-Options`, `X-Frame-Options`, `X-XSS-Protection`, `Referrer-Policy`, and `Permissions-Policy` to all responses
-- **Upload Security:** File extension whitelist + MIME blocklist in `StatusController`, `.htaccess` in `upload/` blocks PHP execution
+- **Upload Security:** File extension whitelist + MIME blocklist in `StatusController`, dynamic file size and type enforcement in `StatusPostService` driven by database `file_upload_settings`, and `.htaccess` in `upload/` blocks PHP execution
 
 ---
 

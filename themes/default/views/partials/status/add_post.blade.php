@@ -13,6 +13,13 @@
     $categories = $disableDirectoryOnly
         ? collect()
         : \App\Models\DirectoryCategory::where('statu', 1)->orderBy('name', 'ASC')->get();
+        
+    $uploadOptions = \App\Models\Option::where('o_type', 'file_upload_settings')->get()->keyBy('name');
+    $allowVideo = ($uploadOptions['video_sharing']->o_valuer ?? '1') == '1';
+    $allowAudio = ($uploadOptions['audio_sharing']->o_valuer ?? '1') == '1';
+    $allowFiles = ($uploadOptions['file_sharing']->o_valuer ?? '1') == '1';
+    $allowReels = ($uploadOptions['reels_upload']->o_valuer ?? '1') == '1';
+
     $oldText = (string) old('text', old('txt', request('text', '')));
     $oldLinkUrl = (string) old('link_url', '');
     $oldPublishMode = $disableDirectoryOnly ? 'post' : (string) old('publish_mode', 'post');
@@ -22,11 +29,11 @@
         $allowGallery ? 'gallery' : null,
         $allowLink ? 'link' : null,
         $allowRepost ? 'repost' : null,
-        'video',
-        'audio',
-        'file',
-        'music',
-        'reels',
+        $allowVideo ? 'video' : null,
+        $allowAudio ? 'audio' : null,
+        $allowFiles ? 'file' : null,
+        $allowAudio ? 'music' : null,
+        $allowReels ? 'reels' : null,
     ]), true)) {
         $oldPostKind = 'text';
     }
@@ -227,26 +234,32 @@
                 </div>
             @endif
 
+            @if($allowVideo)
             <div id="composer-video-block" class="widget-box composer-refresh__panel" style="display:none;">
                 <div class="widget-box-content composer-refresh__panel-content">
                     <input type="file" id="composer-videos" name="videos[]" accept="video/*" multiple style="display:none">
                     <div id="composer-video-preview" class="composer-refresh__preview"></div>
                 </div>
             </div>
+            @endif
 
+            @if($allowAudio)
             <div id="composer-audio-block" class="widget-box composer-refresh__panel" style="display:none;">
                 <div class="widget-box-content composer-refresh__panel-content">
                     <input type="file" id="composer-audios" name="audios[]" accept="audio/*" multiple style="display:none">
                     <div id="composer-audio-preview" class="composer-refresh__preview"></div>
                 </div>
             </div>
+            @endif
 
+            @if($allowFiles)
             <div id="composer-file-block" class="widget-box composer-refresh__panel" style="display:none;">
                 <div class="widget-box-content composer-refresh__panel-content">
                     <input type="file" id="composer-files" name="files[]" multiple style="display:none">
                     <div id="composer-file-list" class="composer-refresh__preview"></div>
                 </div>
             </div>
+            @endif
 
             <input type="file" id="imgupload" name="fimg" accept=".jpg, .jpeg, .png, .gif, .webp" style="display:none"/>
         </div>
@@ -267,11 +280,14 @@
                     </button>
                 @endif
 
+                @if($allowVideo)
                 <button type="button" class="quick-post-footer-action composer-refresh__tool" data-title="{{ __('messages.upload_video') }}" id="composer-mode-video" aria-pressed="false">
                     <i class="fa fa-video-camera" aria-hidden="true" style="color: #615dfa;"></i>
                     <span class="composer-refresh__tool-label">{{ __('messages.upload_video') }}</span>
                 </button>
+                @endif
 
+                @if($allowAudio)
                 <button type="button" class="quick-post-footer-action composer-refresh__tool" data-title="{{ __('messages.record_audio') }}" id="composer-mode-audio" aria-pressed="false">
                     <i class="fa fa-microphone" aria-hidden="true" style="color: #ff5e3a;"></i>
                     <span class="composer-refresh__tool-label">{{ __('messages.record_audio') }}</span>
@@ -281,16 +297,21 @@
                     <i class="fa fa-music" aria-hidden="true" style="color: #00d7d2;"></i>
                     <span class="composer-refresh__tool-label">{{ __('messages.upload_music') }}</span>
                 </button>
+                @endif
 
+                @if($allowFiles)
                 <button type="button" class="quick-post-footer-action composer-refresh__tool composer-refresh__tool--extra" data-title="{{ __('messages.upload_files') }}" id="composer-mode-file" aria-pressed="false">
                     <i class="fa fa-file-text" aria-hidden="true" style="color: #4b4b4b;"></i>
                     <span class="composer-refresh__tool-label">{{ __('messages.upload_files') }}</span>
                 </button>
+                @endif
 
+                @if($allowReels)
                 <button type="button" class="quick-post-footer-action composer-refresh__tool composer-refresh__tool--extra" data-title="{{ __('messages.upload_reels') }}" id="composer-mode-reels" aria-pressed="false">
                     <i class="fa fa-film" aria-hidden="true" style="color: #ffb100;"></i>
                     <span class="composer-refresh__tool-label">{{ __('messages.upload_reels') }}</span>
                 </button>
+                @endif
 
                 @if($allowLink)
                     <button type="button" class="quick-post-footer-action composer-refresh__tool composer-refresh__tool--extra" data-title="{{ __('messages.insertlink') }}" id="composer-mode-link" aria-pressed="false">
