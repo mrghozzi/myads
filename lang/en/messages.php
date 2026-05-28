@@ -3216,4 +3216,10 @@ return [
     'coupon_applied' => 'Coupon applied successfully!',
     'network_error' => 'An error occurred. Please try again.',
     'processing' => 'Processing...',
+    'daily_visits' => 'Total Visits',
+    'active_ads' => 'Active Ads',
+    'quests_desc' => 'Earn points, unlock exclusive badges, and complete daily quests while engaging with the platform.',
+    'forum_desc' => 'Join specialized topics, share knowledge, and get support from experts and fellow website owners.',
+    'directory_desc' => 'Submit your website to our categorized directory to boost your SEO and get discovered by thousands of users.',
+    'store_desc' => 'Buy and sell digital products, scripts, and services securely. Find what you need to elevate your website.',
 ];

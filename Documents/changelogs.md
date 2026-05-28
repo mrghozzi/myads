@@ -1,6 +1,16 @@
 # v4.3.4
 > **Feature Release** — Paid Plugin Licensing & Verification Protocol, Store Product License Key Integration, Plugin Auto-Update APIs, Store Discount Codes, Seller Temporary Sales, Developer Architecture Guides, and Full Reels System (Web & Mobile).
 
+### Standalone Pages Redesign
+* **Feature**: Completely redesigned the Welcome (`/`), Login (`/login`), Register (`/register`), and Password Reset (`/password/reset`) pages to use a modern, standalone layout.
+* **Feature**: Applied the layout to the legal pages: Privacy Policy (`/privacy`), Terms & Conditions (`/terms`), and Refund Policy (`/refund`).
+* **UI/UX**: The new design features a sleek glassmorphism aesthetic, animated scroll-reveal elements, a dark/light mode toggle, and custom animated background blobs.
+* **UI/UX**: Removed standard sidebars and top navigation menus from these pages for a cleaner, focused, and immersive user experience.
+* **Feature**: Added dynamic site statistics (Members, Posts, Active Ads, Daily Visits) to the Welcome page.
+* **UI/UX**: Standardized the footer across all standalone pages, adding appropriate icons and links to Privacy Policy, Terms & Conditions, and Refund Policy.
+* **Feature**: Authenticated users now see their exact hexagonal avatar (with verified badge and dynamic color ring) directly in the navigation bar of standalone pages instead of "Login/Register" buttons, implemented cleanly via SVG/CSS without requiring heavy JS dependencies.
+* **Fix**: Corrected footer URL paths for legal pages (`/privacy`, `/terms`, `/refund`) and resolved missing translation keys.
+
 ### Mobile App Private Messages (Bug Fix)
 * **Critical Fix**: Resolved a **red screen crash** on the Mobile App Private Messages page caused by API response format mismatches and null safety violations.
 * **API**: Updated `Api\MessageController::index` to return `last_message` (object) and `unread_count` (integer) fields matching the Flutter model expectations, replacing the previous `message` and `unread` (boolean) keys.
