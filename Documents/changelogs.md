@@ -26,6 +26,12 @@
 * **Mobile**: Fixed null safety crash in `MessagesListScreen` and `ChatScreen` where `partner['img']` could be `null` but `HexagonAvatar.avatarUrl` required a non-nullable `String`.
 * **Mobile**: Updated `ChatScreen` sender detection logic to handle both nested `sender` objects and flat `us_env` fields from the API response.
 
+### Dependencies
+* **chore(deps-dev)**: Bumped `symfony/yaml` from 7.4.1 to 7.4.13.
+* **chore(deps)**: Bumped `symfony/routing` from 7.4.4 to 7.4.13.
+* **chore(deps)**: Bumped `symfony/http-kernel` from 7.4.5 to 7.4.13.
+* **chore(deps)**: Bumped `symfony/mailer` from 7.4.4 to 7.4.12.
+* **chore(deps)**: Bumped `symfony/mime` from 7.4.5 to 7.4.13.
 
 ### Repost & Share System (Web & Mobile)
 * **Bug Fix**: Fixed a bug where reposted/shared posts appeared on both the Web Platform and the Mobile App as plain text posts showing only the quote text.
