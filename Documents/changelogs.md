@@ -16,6 +16,10 @@
 * **API**: Updated `Api\MessageController::index` to return `last_message` (object) and `unread_count` (integer) fields matching the Flutter model expectations, replacing the previous `message` and `unread` (boolean) keys.
 * **API**: Added `route_key` to conversation list responses, enabling the mobile app to navigate using encrypted conversation identifiers instead of plain usernames, preventing 404 errors on the backend.
 * **API**: Added missing `GET /api/messages/updates` endpoint for real-time message polling from the mobile app.
+
+### SEO & Sitemap (Bug Fix)
+* **Bug Fix**: Fixed a critical issue where `/sitemap.xml` and `/robots.txt` were returning **404 Not Found** errors instead of displaying their dynamically generated content.
+* **Core**: Updated the root `.htaccess` file to explicitly exclude `sitemap.xml` and `robots.txt` from being rewritten as static assets, ensuring the requests are properly routed through Laravel's front controller.
 * **API**: Added `POST /api/messages/{identifier}/read` endpoint for marking conversations as read.
 * **Backend**: Enhanced `MessageConversationService::resolvePartner` to support username-based fallback lookup when the identifier is not a valid encrypted route key, enabling direct profile-to-message navigation from the mobile app.
 * **Backend**: Added null safety guards (`abort_unless($partner, 404)`) to all `MessageController` (web) methods that call `resolvePartner`, preventing 500 errors when the nullable return type is propagated.

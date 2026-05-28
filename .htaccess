@@ -35,6 +35,10 @@
     # Keep Laravel embed/*.js endpoints dynamic so they reach the router under
     # both /embed/*.js and subdirectory installs such as /myads/embed/*.js.
     RewriteCond %{REQUEST_URI} !(^|/)embed/(banner|link|smart|custom)\.js$ [NC]
+    # Keep sitemap XMLs dynamic so they reach the router
+    RewriteCond %{REQUEST_URI} !(^|/)sitemap(|/.*)\.xml$ [NC]
+    # Keep robots.txt dynamic so it reaches the router
+    RewriteCond %{REQUEST_URI} !(^|/)robots\.txt$ [NC]
     RewriteCond %{REQUEST_URI} !public/
     RewriteCond %{REQUEST_URI} !themes/
     RewriteCond %{REQUEST_URI} !upload/
