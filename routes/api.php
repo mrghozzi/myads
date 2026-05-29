@@ -57,6 +57,7 @@ Route::middleware(['api.key', 'auth:sanctum'])->group(function () {
     Route::get('/settings/history', [App\Http\Controllers\Api\SettingsController::class, 'getHistory']);
     Route::get('/settings/apps', [App\Http\Controllers\Api\SettingsController::class, 'getApps']);
     Route::post('/settings/apps/{id}/revoke', [App\Http\Controllers\Api\SettingsController::class, 'revokeApp']);
+    Route::get('/settings/blocks', [App\Http\Controllers\Api\SettingsController::class, 'getBlocks']);
 
     // Forum API
     Route::get('/forum', [ForumController::class, 'index']);
@@ -92,6 +93,8 @@ Route::middleware(['api.key', 'auth:sanctum'])->group(function () {
     Route::get('/profile/{identifier}', [App\Http\Controllers\Api\ProfileController::class, 'show']);
     Route::get('/profile/{identifier}/statuses', [App\Http\Controllers\Api\ProfileController::class, 'statuses']);
     Route::post('/profile/{identifier}/follow', [App\Http\Controllers\Api\ProfileController::class, 'follow']);
+    Route::post('/profile/{identifier}/block', [App\Http\Controllers\Api\ProfileController::class, 'block']);
+    Route::delete('/profile/{identifier}/unblock', [App\Http\Controllers\Api\ProfileController::class, 'unblock']);
 
     // Messages API
     Route::get('/messages', [App\Http\Controllers\Api\MessageController::class, 'index']);

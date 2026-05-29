@@ -418,6 +418,10 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/settings/notification', [ProfileController::class, 'updateNotificationSettings'])->name('profile.notifications.update');
     Route::post('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
     Route::post('/profile/{id}/follow', [ProfileController::class, 'toggleFollow'])->name('profile.follow');
+    Route::get('/profile/{id}/block', [\App\Http\Controllers\UserBlockController::class, 'create'])->name('profile.block.create');
+    Route::post('/profile/{id}/block', [\App\Http\Controllers\UserBlockController::class, 'store'])->name('profile.block.store');
+    Route::delete('/profile/{id}/unblock', [\App\Http\Controllers\UserBlockController::class, 'destroy'])->name('profile.block.destroy');
+    Route::get('/settings/blocks', [\App\Http\Controllers\UserBlockController::class, 'index'])->name('profile.blocks');
 });
 
 // Legacy Redirects

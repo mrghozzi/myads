@@ -265,6 +265,12 @@
                         <span class="hide-text-mobile">{{ __('messages.send_message') }}</span>&nbsp;<i class="fa fa-envelope" aria-hidden="true"></i>
                     </a>
                 @endif
+                <a href="{{ route('profile.block.create', $user->id) }}" class="profile-header-info-action button tertiary" style="padding: 10px 14px; min-width: auto; width: 44px; justify-content: center;" title="{{ __('messages.block') ?? 'Block' }}">
+                    <i class="fa fa-ban" aria-hidden="true"></i>
+                </a>
+                <a href="{{ route('report.index', ['user' => $user->id]) }}" class="profile-header-info-action button tertiary" style="padding: 10px 14px; min-width: auto; width: 44px; justify-content: center;" title="{{ __('messages.report') ?? 'Report' }}">
+                    <i class="fa fa-flag" aria-hidden="true"></i>
+                </a>
             @endif
         </div>
     </div>
@@ -533,6 +539,9 @@
         <x-widget-column side="profile_right" />
     </div>
 </div>
+
+
+
 @endsection
 
 @push('scripts')

@@ -10,6 +10,16 @@
 * **UI/UX**: Standardized the footer across all standalone pages, adding appropriate icons and links to Privacy Policy, Terms & Conditions, and Refund Policy.
 * **Feature**: Authenticated users now see their exact hexagonal avatar (with verified badge and dynamic color ring) directly in the navigation bar of standalone pages instead of "Login/Register" buttons, implemented cleanly via SVG/CSS without requiring heavy JS dependencies.
 * **Fix**: Corrected footer URL paths for legal pages (`/privacy`, `/terms`, `/refund`) and resolved missing translation keys.
+### User Block System (Web & Mobile)
+* **Feature**: Added a comprehensive User Block system allowing members to block others for a specific duration or indefinitely.
+* **Feature**: Added granular block types: `messages_only` (blocks private messages) and `full_platform` (blocks messages, following, profile viewing, and community feed interactions).
+* **UI/UX**: Replaced the Block Modal with a sleek standalone `block_create` page using the "superdesign" aesthetic (hexagon avatars, glassmorphism, responsive grid).
+* **UI/UX**: Reduced the width of "Block" and "Report" buttons on the member profile page to show clean icons only.
+* **Feature**: Added a dedicated **Blocked Users** dashboard (`/settings/blocks`) for members to manage their active blocks, view expiration dates, and unblock users.
+* **Backend**: Created `UserBlockService` to handle block validation, enforcement, and integration with `UserPrivacyService` and `MessageConversationService`.
+* **Backend**: Added automated notifications for when a user is blocked (indefinitely or temporarily) and when a temporary block expires, powered by a new `blocks:process-expired` console command scheduled to run hourly.
+* **API**: Added Mobile App support with new endpoints (`GET /api/settings/blocks`, `POST /api/profile/{id}/block`, `DELETE /api/profile/{id}/unblock`).
+
 
 ### Media Upload & Content Sharing Settings
 * **Feature**: Enforced `file_upload_settings` across the platform to dynamically control media sharing (Video, Audio, Files, Reels, Music).

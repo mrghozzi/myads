@@ -12,6 +12,7 @@
         <a href="{{ route('profile.notifications') }}" class="button {{ request()->routeIs('profile.notifications') ? 'primary' : 'secondary' }} full" style="border-radius: 0; box-shadow: none;">{{ __('messages.notification_settings') }}</a>
         <a href="{{ route('profile.sessions') }}" class="button {{ request()->routeIs('profile.sessions') ? 'primary' : 'secondary' }} full" style="border-radius: 0; box-shadow: none;">{{ __('messages.active_sessions') }}</a>
         <a href="{{ route('profile.apps') }}" class="button {{ request()->routeIs('profile.apps') ? 'primary' : 'secondary' }} full" style="border-radius: 0; box-shadow: none;">{{ __('messages.authorized_apps') }}</a>
+        <a href="{{ route('profile.blocks') }}" class="button {{ request()->routeIs('profile.blocks') ? 'primary' : 'secondary' }} full" style="border-radius: 0; box-shadow: none;">{{ __('messages.blocked_users') ?? 'Blocked Users' }}</a>
         @if($showBillingLink)
             <a href="{{ route('billing.dashboard') }}" class="button {{ request()->routeIs('billing.*') ? 'primary' : 'secondary' }} full" style="border-radius: 0; box-shadow: none;">{{ __('messages.billing_feature_title') }}</a>
         @endif

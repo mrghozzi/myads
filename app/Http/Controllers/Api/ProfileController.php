@@ -90,4 +90,46 @@ class ProfileController extends Controller
             return response()->json(['message' => 'Followed successfully', 'following' => true]);
         }
     }
+
+    public function block(Request $request, $identifier)
+    {
+        $request->validate([
+            'block_type' => 'required|in:messages_only,full_platform',
+            'duration' => 'nullable|integer|min:1',
+        ]);
+
+        $targetUser = User::resolvePublicIdentifier($identifier) ?: User::where('username', $identifier)->first();
+
+        if (!$targetUser) {
+            return response()->json(['error' => 'User not found'], 404);
+        }
+
+        $currentUser = Auth::user();
+
+        if ($currentUser->id === $targetUser->id) {
+            return response()->json(['error' => 'You cannot block yourself'], 400);
+        }
+
+        app(\App\Services\UserBlockService::class)->blockUser(
+            $currentUser->id,
+            $targetUser->id,
+            $request->block_type,
+            $request->duration
+        );
+
+        return response()->json(['message' => 'User blocked successfully', 'blocked' => true]);
+    }
+
+    public function unblock($identifier)
+    {
+        $targetUser = User::resolvePublicIdentifier($identifier) ?: User::where('username', $identifier)->first();
+
+        if (!$targetUser) {
+            return response()->json(['error' => 'User not found'], 404);
+        }
+
+        app(\App\Services\UserBlockService::class)->unblockUser(Auth::id(), $targetUser->id);
+
+        return response()->json(['message' => 'User unblocked successfully', 'blocked' => false]);
+    }
 }

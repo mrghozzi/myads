@@ -164,6 +164,7 @@ myads/
 | `CustomAdsServingController` | Public custom ad embed, serving, impression/click tracking, and click redirects |
 | `VisitController` | Visit exchange system |
 | `ProfileController` | Profile view/edit, follow, privacy, sessions/revocation, badges, history |
+| `UserBlockController` | User block management, block creation view, and blocked users dashboard |
 | `MessageController` | Private messaging |
 | `NotificationController` | Notification center, mark-all-read |
 | `OrderRequestController` | Marketplace request discovery, CRUD, workflow actions, and completion ratings |
@@ -249,6 +250,7 @@ myads/
 | `BillingCurrency` | `billing_currencies` | Billing currencies, base-currency flag, and manual exchange rates |
 | `SiteAdmin` | `site_admins` | Admin ACL (module-scoped permissions) |
 | `UserPrivacySetting` | `user_privacy_settings` | Per-member privacy controls |
+| `UserBlock` | `user_blocks` | User-to-user blocking rules (messages_only, full_platform) and optional expiration dates |
 | `MailSetting` | `mail_settings` | Singleton mail configuration (mailer, host, port, credentials, encryption, sender info) with encrypted password |
 | `SeoSetting` / `SeoRule` / `SeoDailyMetric` | `seo_settings` / `seo_rules` / `seo_daily_metrics` | SEO engine |
 
@@ -263,6 +265,7 @@ myads/
 | `PointLedgerService` | Awards/deducts PTS, records transactions |
 | `GamificationService` | Badge/quest progress tracking |
 | `UserPrivacyService` | Enforces per-member privacy rules across profile, DMs, mentions, reposts |
+| `UserBlockService` | Manages block creation, expiration, querying, and enforces block boundaries between users |
 | `MentionService` | Extracts and stores @mentions, sends notifications |
 | `ContentFormatter` | Shared formatter for hashtags, links, Markdown, mentions |
 | `LinkPreviewService` | Fetches URL metadata for link posts |

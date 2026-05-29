@@ -22,6 +22,14 @@ trait HasPrivacy
         $viewer = $viewer ?? Auth::user();
         $authorIdColumn = $column ?? $this->getAuthorIdColumn();
 
+        // Filter out full-platform blocked users for non-admins
+        if ($viewer && !$viewer->isAdmin()) {
+            $blockedUserIds = app(\App\Services\UserBlockService::class)->getBlockedUserIds($viewer, 'full_platform');
+            if (!empty($blockedUserIds)) {
+                $query->whereNotIn($authorIdColumn, $blockedUserIds);
+            }
+        }
+
         // 1. If viewer is Admin, they see everything.
         if ($viewer && $viewer->isAdmin()) {
             return $query;

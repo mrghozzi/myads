@@ -14,3 +14,4 @@ Schedule::call(function () {
 
 Schedule::command('myads:archive-impressions')->daily();
 Schedule::command('myads:custom-ads-settle')->dailyAt('00:20');
+Schedule::command('blocks:process-expired')->hourly();

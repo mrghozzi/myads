@@ -313,4 +313,15 @@ class SettingsController extends Controller
         // Revoke app placeholder
         return response()->json(['message' => 'App revoked (not fully implemented yet)']);
     }
+
+    public function getBlocks()
+    {
+        $user = Auth::user();
+        $blocks = \App\Models\UserBlock::with('blockedUser:id,name,username,img')
+            ->where('user_id', $user->id)
+            ->active()
+            ->get();
+
+        return response()->json(['blocks' => $blocks]);
+    }
 }

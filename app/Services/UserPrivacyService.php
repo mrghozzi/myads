@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Like;
 use App\Models\User;
 use App\Models\UserPrivacySetting;
+use App\Services\UserBlockService;
 
 class UserPrivacyService
 {
@@ -61,42 +62,64 @@ class UserPrivacyService
 
     public function canViewProfile(User $owner, ?User $viewer): bool
     {
+        if ($viewer && app(UserBlockService::class)->hasFullBlock($owner, $viewer)) {
+            return false;
+        }
         $settings = $this->settingsFor($owner);
         return $this->canViewVisibility($owner, $viewer, $settings->profile_visibility);
     }
 
     public function canViewAbout(User $owner, ?User $viewer): bool
     {
+        if ($viewer && app(UserBlockService::class)->hasFullBlock($owner, $viewer)) {
+            return false;
+        }
         $settings = $this->settingsFor($owner);
         return $this->canViewVisibility($owner, $viewer, $settings->about_visibility);
     }
 
     public function canViewPhotos(User $owner, ?User $viewer): bool
     {
+        if ($viewer && app(UserBlockService::class)->hasFullBlock($owner, $viewer)) {
+            return false;
+        }
         $settings = $this->settingsFor($owner);
         return $this->canViewVisibility($owner, $viewer, $settings->photos_visibility);
     }
 
     public function canViewFollowers(User $owner, ?User $viewer): bool
     {
+        if ($viewer && app(UserBlockService::class)->hasFullBlock($owner, $viewer)) {
+            return false;
+        }
         $settings = $this->settingsFor($owner);
         return $this->canViewVisibility($owner, $viewer, $settings->followers_visibility);
     }
 
     public function canViewFollowing(User $owner, ?User $viewer): bool
     {
+        if ($viewer && app(UserBlockService::class)->hasFullBlock($owner, $viewer)) {
+            return false;
+        }
         $settings = $this->settingsFor($owner);
         return $this->canViewVisibility($owner, $viewer, $settings->following_visibility);
     }
 
     public function canViewPointsHistory(User $owner, ?User $viewer): bool
     {
+        if ($viewer && app(UserBlockService::class)->hasFullBlock($owner, $viewer)) {
+            return false;
+        }
         $settings = $this->settingsFor($owner);
         return $this->canViewVisibility($owner, $viewer, $settings->points_history_visibility);
     }
 
     public function canDirectMessage(User $owner, ?User $viewer): bool
     {
+        if ($viewer && app(UserBlockService::class)->hasMessagesBlock($owner, $viewer)) {
+            return false;
+        }
+
         if ($viewer && ((int) $viewer->id === (int) $owner->id || $viewer->hasAdminAccess())) {
             return true;
         }
@@ -106,6 +129,10 @@ class UserPrivacyService
 
     public function canMention(User $owner, ?User $viewer): bool
     {
+        if ($viewer && app(UserBlockService::class)->hasFullBlock($owner, $viewer)) {
+            return false;
+        }
+
         if ($viewer && ((int) $viewer->id === (int) $owner->id || $viewer->hasAdminAccess())) {
             return true;
         }
@@ -115,6 +142,10 @@ class UserPrivacyService
 
     public function canRepost(User $owner, ?User $viewer): bool
     {
+        if ($viewer && app(UserBlockService::class)->hasFullBlock($owner, $viewer)) {
+            return false;
+        }
+
         if ($viewer && ((int) $viewer->id === (int) $owner->id || $viewer->hasAdminAccess())) {
             return true;
         }
