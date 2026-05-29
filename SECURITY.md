@@ -2,20 +2,16 @@
 
 ## Supported Versions
 
-Use this section to tell people about which versions of your project are
-currently being supported with security updates.
+MYADS currently supports security updates for the following versions:
 
 | Version | Supported          |
 | ------- | ------------------ |
-| 5.1.x   | :white_check_mark: |
-| 5.0.x   | :x:                |
-| 4.0.x   | :white_check_mark: |
-| < 4.0   | :x:                |
+| 4.3.x   | :white_check_mark: |
+| 4.2.x   | :white_check_mark: |
+| < 4.2   | :x:                |
 
 ## Reporting a Vulnerability
 
-Use this section to tell people how to report a vulnerability.
+If you discover a security vulnerability within MYADS, please report it privately to the author (`mrghozzi`) through GitHub's Security Advisory feature or via direct communication.
 
-Tell them where to go, how often they can expect to get an update on a
-reported vulnerability, what to expect if the vulnerability is accepted or
-declined, etc.
+Please **do not** disclose security vulnerabilities publicly or create a public issue until a fix has been officially released. We appreciate your cooperation in keeping the platform secure.
