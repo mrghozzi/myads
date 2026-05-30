@@ -48,6 +48,27 @@ class ComposerRenderingTest extends TestCase
             ->assertDontSee('id="social-composer"', false);
     }
 
+    public function test_shared_composer_renders_on_portal_with_bootstrap_sample_theme(): void
+    {
+        Setting::create([
+            'titer' => 'MyAds',
+            'url' => 'http://localhost',
+            'styles' => 'bootstrap-sample',
+            'lang' => 'en',
+            'timezone' => 'UTC',
+        ]);
+
+        $owner = User::factory()->create([
+            'username' => 'composerowner',
+            'email' => 'composerowner@example.com',
+        ]);
+
+        $portalResponse = $this->actingAs($owner)->get(route('portal.index'));
+
+        $portalResponse->assertOk()
+            ->assertSee('id="social-composer"', false);
+    }
+
     private function createSetting(): Setting
     {
         return Setting::create([
