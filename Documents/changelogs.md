@@ -51,6 +51,7 @@
 
 ### Dependencies
 * **chore(deps-dev)**: Bumped `symfony/yaml` from 7.4.1 to 7.4.13.
+* **chore(deps-dev)**: Bumped `axios` from 1.15.2 to 1.16.0.
 * **chore(deps)**: Bumped `symfony/routing` from 7.4.4 to 7.4.13.
 * **chore(deps)**: Bumped `symfony/http-kernel` from 7.4.5 to 7.4.13.
 * **chore(deps)**: Bumped `symfony/mailer` from 7.4.4 to 7.4.12.
