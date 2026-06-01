@@ -139,21 +139,39 @@
                     @if($canAdmin('community'))
                         <li class="nxl-item nxl-hasmenu">
                             <a href="javascript:void(0);" class="nxl-link">
+                                <span class="nxl-micon"><i class="feather-shopping-bag"></i></span>
+                                <span class="nxl-mtext">{{ __('messages.store') ?? 'Store' }}</span><span class="nxl-arrow"><i class="feather-chevron-right"></i></span>
+                            </a>
+                            <ul class="nxl-submenu">
+                                <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.products') }}">{{ __('messages.products') ?? 'Products' }}</a></li>
+                                <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.store.discounts.index') }}">{{ __('messages.discount_codes') ?? 'Discount Codes' }}</a></li>
+                                <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.knowledgebase') }}">{{ __('messages.knowledgebase') }}</a></li>
+                            </ul>
+                        </li>
+
+                        <li class="nxl-item nxl-hasmenu">
+                            <a href="javascript:void(0);" class="nxl-link">
+                                <span class="nxl-micon"><i class="feather-message-square"></i></span>
+                                <span class="nxl-mtext">{{ __('messages.forum') ?? 'Forum' }}</span><span class="nxl-arrow"><i class="feather-chevron-right"></i></span>
+                            </a>
+                            <ul class="nxl-submenu">
+                                <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.forum_categories') }}">{{ __('messages.forum_cats') }}</a></li>
+                                <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.forum.settings') }}">{{ __('messages.forum_settings') }}</a></li>
+                                <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.forum.moderators') }}">{{ __('messages.forum_moderators') }}</a></li>
+                            </ul>
+                        </li>
+
+                        <li class="nxl-item nxl-hasmenu">
+                            <a href="javascript:void(0);" class="nxl-link">
                                 <span class="nxl-micon"><i class="feather-users"></i></span>
                                 <span class="nxl-mtext">{{ __('messages.Comusetting') }}</span><span class="nxl-arrow"><i class="feather-chevron-right"></i></span>
                             </a>
                             <ul class="nxl-submenu">
-                                <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.knowledgebase') }}">{{ __('messages.knowledgebase') }}</a></li>
-                                <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.forum_categories') }}">{{ __('messages.forum_cats') }}</a></li>
                                 <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.community.feed.settings') }}">{{ __('messages.community_feed_settings_title') }}</a></li>
-                                <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.forum.settings') }}">{{ __('messages.forum_settings') }}</a></li>
-                                <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.forum.moderators') }}">{{ __('messages.forum_moderators') }}</a></li>
                                 <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.directory_categories') }}">{{ __('messages.dir_cats') }}</a></li>
                                 <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.emojis') }}">{{ __('messages.emojis') }}</a></li>
                                 <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.news') }}">{{ __('messages.news_site') }}</a></li>
                                 <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.reports') }}">{{ __('messages.reports') }}</a></li>
-                                <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.products') }}">{{ __('messages.products') ?? 'Products' }}</a></li>
-                                <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.store.discounts.index') }}">{{ __('messages.discount_codes') ?? 'Discount Codes' }}</a></li>
                                 <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.orders.index') }}">{{ __('messages.order_requests') }}</a></li>
                                 <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.comments.index') }}">{{ __('messages.manage_comments') }}</a></li>
                                 <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.reactions.index') }}">{{ __('messages.manage_reactions') }}</a></li>
