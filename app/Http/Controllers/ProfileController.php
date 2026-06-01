@@ -83,7 +83,7 @@ class ProfileController extends Controller
                 case 'files':
                     $query->where('s_type', 12);
                     break;
-                case 'reels':
+                case 'clips':
                     $query->where('s_type', 14);
                     break;
                 case 'store':

@@ -7,7 +7,7 @@
     @endphp
     @if($mediaUrl)
         <div class="saved-reel-card">
-            <a href="{{ route('reels.index') }}#{{ $activity->id }}" class="saved-reel-link">
+            <a href="{{ route('clips.index') }}#{{ $activity->id }}" class="saved-reel-link">
                 <video class="saved-reel-video" src="{{ $mediaUrl }}#t=0.1" preload="metadata"></video>
                 <div class="saved-reel-overlay">
                     <svg class="icon-play" viewBox="0 0 24 24" fill="#fff" width="32" height="32"><path d="M8 5v14l11-7z"/></svg>

@@ -8,12 +8,12 @@
                 {{ __('messages.community') }}
             </a>
         </li>
-        <li class="menu-item {{ Request::is('reels*') ? 'active' : '' }}">
-            <a class="menu-item-link text-tooltip-tfr" href="{{ url('/reels') }}">
+        <li class="menu-item {{ Request::is('clips*') ? 'active' : '' }}">
+            <a class="menu-item-link text-tooltip-tfr" href="{{ url('/clips') }}">
                 <svg class="menu-item-link-icon icon-videos">
                     <use xlink:href="#svg-videos"></use>
                 </svg>
-                {{ __('messages.reels') ?? 'Reels' }}
+                {{ __('messages.clips') ?? 'Clips' }}
             </a>
         </li>
         @auth

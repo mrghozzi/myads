@@ -18,7 +18,7 @@
     $allowVideo = ($uploadOptions['video_sharing']->o_valuer ?? '1') == '1';
     $allowAudio = ($uploadOptions['audio_sharing']->o_valuer ?? '1') == '1';
     $allowFiles = ($uploadOptions['file_sharing']->o_valuer ?? '1') == '1';
-    $allowReels = ($uploadOptions['reels_upload']->o_valuer ?? '1') == '1';
+    $allowClips = ($uploadOptions['clips_upload']->o_valuer ?? '1') == '1';
 
     $oldText = (string) old('text', old('txt', request('text', '')));
     $oldLinkUrl = (string) old('link_url', '');
@@ -33,7 +33,7 @@
         $allowAudio ? 'audio' : null,
         $allowFiles ? 'file' : null,
         $allowAudio ? 'music' : null,
-        $allowReels ? 'reels' : null,
+        $allowClips ? 'clips' : null,
     ]), true)) {
         $oldPostKind = 'text';
     }
@@ -306,10 +306,10 @@
                 </button>
                 @endif
 
-                @if($allowReels)
-                <button type="button" class="quick-post-footer-action composer-refresh__tool composer-refresh__tool--extra" data-title="{{ __('messages.upload_reels') }}" id="composer-mode-reels" aria-pressed="false">
+                @if($allowClips)
+                <button type="button" class="quick-post-footer-action composer-refresh__tool composer-refresh__tool--extra" data-title="{{ __('messages.upload_clips') }}" id="composer-mode-clips" aria-pressed="false">
                     <i class="fa fa-film" aria-hidden="true" style="color: #ffb100;"></i>
-                    <span class="composer-refresh__tool-label">{{ __('messages.upload_reels') }}</span>
+                    <span class="composer-refresh__tool-label">{{ __('messages.upload_clips') }}</span>
                 </button>
                 @endif
 
@@ -1035,7 +1035,7 @@
         const modeAudioButton = document.getElementById('composer-mode-audio');
         const modeMusicButton = document.getElementById('composer-mode-music');
         const modeFileButton = document.getElementById('composer-mode-file');
-        const modeReelsButton = document.getElementById('composer-mode-reels');
+        const modeClipsButton = document.getElementById('composer-mode-clips');
         const moreToggle = document.getElementById('composer-more-toggle');
         const toolbar = document.getElementById('composer-toolbar');
 
@@ -1124,11 +1124,11 @@
 
             toggleTool(modeTextButton, textActive);
             toggleTool(modeGalleryButton, hasGallery);
-            toggleTool(modeVideoButton, hasVideo || (postKind.value === 'reels'));
+            toggleTool(modeVideoButton, hasVideo || (postKind.value === 'clips'));
             toggleTool(modeAudioButton, hasAudio && (postKind.value === 'audio'));
             toggleTool(modeMusicButton, hasAudio && (postKind.value === 'music'));
             toggleTool(modeFileButton, hasFiles);
-            toggleTool(modeReelsButton, hasVideo && (postKind.value === 'reels'));
+            toggleTool(modeClipsButton, hasVideo && (postKind.value === 'clips'));
             toggleTool(modeLinkButton, linkActive);
 
             composerRoot.classList.toggle('has-gallery', hasGallery);
@@ -1160,7 +1160,7 @@
             }
 
             if (videoInput && (videoInput.files || []).length > 0) {
-                if (postKind.value !== 'reels') {
+                if (postKind.value !== 'clips') {
                     postKind.value = 'video';
                 }
                 return;
@@ -1425,7 +1425,7 @@
         function clearMediaSelections(exclude) {
             if (exclude !== 'gallery') clearGallerySelection();
             
-            if (videoInput && exclude !== 'video' && exclude !== 'reels') {
+            if (videoInput && exclude !== 'video' && exclude !== 'clips') {
                 videoInput.value = '';
                 videoPreview.innerHTML = '';
                 videoBlock.style.display = 'none';
@@ -1504,10 +1504,10 @@
             });
         }
 
-        if (modeReelsButton && videoInput) {
-            modeReelsButton.addEventListener('click', function () {
-                clearMediaSelections('reels');
-                postKind.value = 'reels';
+        if (modeClipsButton && videoInput) {
+            modeClipsButton.addEventListener('click', function () {
+                clearMediaSelections('clips');
+                postKind.value = 'clips';
                 videoInput.click();
             });
         }
@@ -1516,8 +1516,8 @@
             videoInput.addEventListener('change', function () {
                 if (this.files && this.files[0]) {
                     const currentKind = postKind.value;
-                    clearMediaSelections(currentKind === 'reels' ? 'reels' : 'video');
-                    if (currentKind === 'reels') postKind.value = 'reels'; else postKind.value = 'video';
+                    clearMediaSelections(currentKind === 'clips' ? 'clips' : 'video');
+                    if (currentKind === 'clips') postKind.value = 'clips'; else postKind.value = 'video';
                     
                     videoBlock.style.display = 'block';
                     videoPreview.innerHTML = `<div class="composer-refresh__preview-item"><i class="fa fa-film"></i> ${this.files[0].name}</div>`;

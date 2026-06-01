@@ -2,7 +2,7 @@
 
 @section('content')
 <style>
-    .saved-reels-container {
+    .saved-clips-container {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
         gap: 15px;
@@ -113,8 +113,8 @@
 
 <div class="grid">
     <div class="section-banner">
-        <p class="section-banner-title">{{ __('messages.saved_reels') ?? 'Saved Reels' }}</p>
-        <p class="section-banner-text text-center">{{ __('messages.saved_reels_desc') ?? 'Reels you have saved.' }}</p>
+        <p class="section-banner-title">{{ __('messages.saved_clips') ?? 'Saved Clips' }}</p>
+        <p class="section-banner-text text-center">{{ __('messages.saved_clips_desc') ?? 'Clips you have saved.' }}</p>
     </div>
 
     @if($activities->isEmpty())
@@ -122,16 +122,16 @@
             <svg class="widget-box-icon" style="width: 64px; height: 64px; fill: #615dfa; margin-bottom: 20px;" viewBox="0 0 24 24">
                 <path d="M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2z"/>
             </svg>
-            <h2>{{ __('messages.no_saved_reels') ?? 'No Saved Reels' }}</h2>
-            <p>{{ __('messages.no_saved_reels_desc') ?? 'You haven\'t saved any reels yet. Explore the community and save your favorites!' }}</p>
-            <a href="{{ route('reels.index') }}" class="button primary" style="margin-top: 15px; display: inline-block;">{{ __('messages.explore_reels') ?? 'Explore Reels' }}</a>
+            <h2>{{ __('messages.no_saved_clips') ?? 'No Saved Clips' }}</h2>
+            <p>{{ __('messages.no_saved_clips_desc') ?? 'You haven\'t saved any clips yet. Explore the community and save your favorites!' }}</p>
+            <a href="{{ route('clips.index') }}" class="button primary" style="margin-top: 15px; display: inline-block;">{{ __('messages.explore_clips') ?? 'Explore Clips' }}</a>
         </div>
     @else
-        <div class="saved-reels-container" id="saved-reels-container">
-            @include('theme::reels.partials.reels_grid', ['activities' => $activities])
+        <div class="saved-clips-container" id="saved-clips-container">
+            @include('theme::clips.partials.clips_grid', ['activities' => $activities])
         </div>
         
-        <div id="reels-loading" style="display: none; text-align: center; padding: 20px; color: var(--text-color);">
+        <div id="clips-loading" style="display: none; text-align: center; padding: 20px; color: var(--text-color);">
             <i class="fa-solid fa-spinner fa-spin"></i> Loading...
         </div>
     @endif
@@ -142,15 +142,15 @@
 @if($activities->isNotEmpty())
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const container = document.getElementById('saved-reels-container');
-    const loadingEl = document.getElementById('reels-loading');
+    const container = document.getElementById('saved-clips-container');
+    const loadingEl = document.getElementById('clips-loading');
     let nextPageUrl = '{{ $activities->nextPageUrl() }}';
     let isLoading = false;
 
     const sentinelObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting && nextPageUrl && !isLoading) {
-                loadMoreReels();
+                loadMoreClips();
             }
         });
     }, {
@@ -168,7 +168,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     observeSentinel();
 
-    function loadMoreReels() {
+    function loadMoreClips() {
         if (!nextPageUrl) return;
         
         isLoading = true;

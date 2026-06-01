@@ -9,19 +9,19 @@ use App\Http\Resources\StatusResource;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
-class ReelsController extends Controller
+class ClipsController extends Controller
 {
     public function index(Request $request)
     {
         $query = Status::with(['user', 'repostRecord', 'linkPreviewRecord'])
-            ->where('s_type', Status::TYPE_REELS)
+            ->where('s_type', Status::TYPE_CLIPS)
             ->where('statu', 1)
             ->privacyVisible();
 
         // Basic ordering for now, descending by date
-        $reels = $query->orderBy('date', 'desc')->paginate(10);
+        $clips = $query->orderBy('date', 'desc')->paginate(10);
 
-        return StatusResource::collection($reels);
+        return StatusResource::collection($clips);
     }
 
     public function saved(Request $request)
@@ -37,9 +37,9 @@ class ReelsController extends Controller
             ->where('statu', 1)
             ->privacyVisible();
 
-        $reels = $query->orderBy('date', 'desc')->paginate(10);
+        $clips = $query->orderBy('date', 'desc')->paginate(10);
 
-        return StatusResource::collection($reels);
+        return StatusResource::collection($clips);
     }
 
     public function save(Status $status)

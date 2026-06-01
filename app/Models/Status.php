@@ -166,7 +166,7 @@ class Status extends Model
     const TYPE_AUDIO = 11;
     const TYPE_FILE = 12;
     const TYPE_MUSIC = 13;
-    const TYPE_REELS = 14;
+    const TYPE_CLIPS = 14;
 
     public function supportsPromotion(): bool
     {
@@ -404,8 +404,8 @@ class Status extends Model
             return 'music';
         }
 
-        if ((int) $this->s_type === self::TYPE_REELS) {
-            return 'reels';
+        if ((int) $this->s_type === self::TYPE_CLIPS) {
+            return 'clips';
         }
 
         return 'text';
@@ -417,7 +417,7 @@ class Status extends Model
             return 22;
         }
 
-        if ($this->s_type == 14 || $this->post_kind === 'reels') {
+        if ($this->s_type == 14 || $this->post_kind === 'clips') {
             return 14;
         }
 

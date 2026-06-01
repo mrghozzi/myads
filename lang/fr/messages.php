@@ -2409,7 +2409,7 @@ return [
 
     'enable' => 'Enable',
     'disable' => 'Disable',
-    'Reels' => 'Reels',
+    'Clips' => 'Clips',
     'search_results_for_tag' => 'Résultats de recherche pour',
     'tag_insights' => 'Statistiques du tag',
     'total_posts' => 'Total des messages',

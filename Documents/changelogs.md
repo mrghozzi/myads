@@ -1,5 +1,5 @@
 # v4.3.4
-> **Feature Release** — Paid Plugin Licensing & Verification Protocol, Store Product License Key Integration, Plugin Auto-Update APIs, Store Discount Codes, Seller Temporary Sales, Developer Architecture Guides, and Full Reels System (Web & Mobile).
+> **Feature Release** — Paid Plugin Licensing & Verification Protocol, Store Product License Key Integration, Plugin Auto-Update APIs, Store Discount Codes, Seller Temporary Sales, Developer Architecture Guides, and Full Clips System (Web & Mobile).
 
 ### Standalone Pages Redesign
 * **Feature**: Completely redesigned the Welcome (`/`), Login (`/login`), Register (`/register`), and Password Reset (`/password/reset`) pages to use a modern, standalone layout.
@@ -22,7 +22,7 @@
 
 
 ### Media Upload & Content Sharing Settings
-* **Feature**: Enforced `file_upload_settings` across the platform to dynamically control media sharing (Video, Audio, Files, Reels, Music).
+* **Feature**: Enforced `file_upload_settings` across the platform to dynamically control media sharing (Video, Audio, Files, Clips, Music).
 * **Backend**: Updated `StatusPostService` to enforce size limits (`max_upload_size`) and allowed extensions/MIME types during post creation and updates.
 * **Backend**: Fixed a bug in `AdminController@updateFileUploadSettings` where unchecked HTML toggles were not being saved, ensuring disabled settings accurately update the database.
 * **Frontend**: Updated the post composer UI (`add_post.blade.php`) to dynamically hide the upload buttons for disabled media types.
@@ -59,14 +59,14 @@
 
 ### Repost & Share System (Web & Mobile)
 * **Bug Fix**: Fixed a bug where reposted/shared posts appeared on both the Web Platform and the Mobile App as plain text posts showing only the quote text.
-* **Web**: Enhanced the repost embed layout (`repost_embed.blade.php`) to dynamically support all original media types (Videos, Reels, Audio, Music, File Attachments) inside the shared post container.
+* **Web**: Enhanced the repost embed layout (`repost_embed.blade.php`) to dynamically support all original media types (Videos, Clips, Audio, Music, File Attachments) inside the shared post container.
 * **Web**: Integrated recursive hydration in `ForumController@topic` via `StatusActivityService::decorate` to ensure nested repost contents are fully eager-loaded and visible on the single post page.
 * **API**: Upgraded `StatusResource` to format `repost_record` with the nested `original_status` resource, enabling mobile clients to fetch fully formatted nested original posts.
 * **Mobile App**: Updated the mobile model parser and `PostCard` widget to render a beautifully nested, styled inline container for the original post, including creator avatar, name, verification badge, creation time, text content, and all original media players/attachments.
 
 ### Mobile Community Publishing & Editing
 * **Feature**: Extracted web post creation/editing logic into a shared `StatusPostService` to guarantee strict backend feature parity across Web and Mobile.
-* **Feature**: Added full post creation capabilities from the Flutter mobile app (text, gallery, link, quote repost, video, audio, file, music, Reels).
+* **Feature**: Added full post creation capabilities from the Flutter mobile app (text, gallery, link, quote repost, video, audio, file, music, Clips).
 * **Feature**: Added full Edit and Delete capabilities for posts on Mobile and Web via new unified API endpoints and web routes.
 * **Feature**: Added Android External Share capabilities (via `receive_sharing_intent`), allowing users to share text, links, and media from other apps directly into the MYADS Flutter composer as drafts.
 * **Feature**: Added `/api/composer/options` to serve available post kinds, directory categories, and user groups for the mobile composer.
@@ -80,22 +80,22 @@
 * **API**: Upgraded `StatusResource` to output the boolean flag `is_promoted_ad`, dynamically injected by `StatusPromotionService`.
 * **Mobile**: Updated `StatusModel` and `PostCard` widget to parse `isPromotedAd` and display a prominent "Promoted" (مُموّل) badge alongside the post timestamp.
 
-### Reels System (Web & Mobile)
-* **Feature**: Introduced a full **Reels** experience across both the Web Platform and Mobile App, allowing users to scroll vertically through short-form video content.
-* **Web**: Implemented a vertical scroll-snap UI for the Web Reels feed (`/reels`) with auto-playing videos, floating interaction sidebars (Like, Comment, Save, Share), and a dedicated Saved Reels grid.
-* **Mobile**: Built the `ReelsScreen` and `SavedReelsScreen` in Flutter with native `PageView.builder` for seamless vertical swiping and integrated `video_player`.
-* **API**: Added dedicated API endpoints for saving reels (`/api/reels/save`) and retrieving saved reels (`/api/reels/saved`).
-* **Architecture**: Upgraded `StatusResource` to include `has_saved` state and `reaction_type` for personalized Reels interactions.
+### Clips System (Web & Mobile)
+* **Feature**: Introduced a full **Clips** experience across both the Web Platform and Mobile App, allowing users to scroll vertically through short-form video content.
+* **Web**: Implemented a vertical scroll-snap UI for the Web Clips feed (`/clips`) with auto-playing videos, floating interaction sidebars (Like, Comment, Save, Share), and a dedicated Saved Clips grid.
+* **Mobile**: Built the `ClipsScreen` and `SavedClipsScreen` in Flutter with native `PageView.builder` for seamless vertical swiping and integrated `video_player`.
+* **API**: Added dedicated API endpoints for saving clips (`/api/clips/save`) and retrieving saved clips (`/api/clips/saved`).
+* **Architecture**: Upgraded `StatusResource` to include `has_saved` state and `reaction_type` for personalized Clips interactions.
 
 ### Member Profile & Click-to-Profile Navigation (Mobile & API)
 * **Feature**: Designed and implemented a premium **Member Profile Screen** (`ProfileScreen`) in Flutter, matching the exact aesthetics and components of the Web platform (`themes/default`). It features cover photos, a profile avatar, name, verification status, live online indicators, premium subscription badge card, a glassmorphic social links scroll bar, profile stats, and a TabBar (Timeline, Photos, and About).
-* **Feature**: Implemented **Click-to-Profile** navigation throughout the mobile app. Users can tap on a member's avatar or username in community feed posts (`PostCard`), post comments (`PostDetailsScreen`), and reels creator rows (`ReelsScreen`) to navigate directly to their profile.
-* **Feature**: Introduced a reusable **HexagonAvatar** widget in Flutter that clips and borders profile pictures as vertical hexagons matching the web theme's styling. This was integrated across all app views (Feed, Comments, Reels, and Profile).
-* **Feature**: Added **Dynamic Colored Borders** to hexagonal avatars. The border color dynamically updates in community posts, comments, and reels based on the user's active paid subscription plan or roles (e.g. Premium Gold for Super Admin), mimicking the web theme's styling.
+* **Feature**: Implemented **Click-to-Profile** navigation throughout the mobile app. Users can tap on a member's avatar or username in community feed posts (`PostCard`), post comments (`PostDetailsScreen`), and clips creator rows (`ClipsScreen`) to navigate directly to their profile.
+* **Feature**: Introduced a reusable **HexagonAvatar** widget in Flutter that clips and borders profile pictures as vertical hexagons matching the web theme's styling. This was integrated across all app views (Feed, Comments, Clips, and Profile).
+* **Feature**: Added **Dynamic Colored Borders** to hexagonal avatars. The border color dynamically updates in community posts, comments, and clips based on the user's active paid subscription plan or roles (e.g. Premium Gold for Super Admin), mimicking the web theme's styling.
 * **Feature**: Created a dynamic **UrlHelper** class in Flutter to handle image/asset URL normalization. It rewrites local hostnames (e.g. `http://localhost/myads`) using the active `BASE_URL` of the running API server, making avatar and media images load seamlessly on real device emulators and physical phones.
 * **API**: Upgraded the API `/api/profile/{identifier}` endpoint to handle `'me'` to retrieve the logged-in user profile, and fall back to searching by username if public ID resolution fails.
 * **API**: Enhanced `UserProfileResource` to return cover image URLs, `is_following` status, `posts_count`, `subscription_badge` details (label/color), `social_links`, and unlocked `badges` showcases.
-* **API**: Enhanced `UserResource` (used inside posts, comments, reels, etc.) to return the member's `profile_badge_color` dynamically based on their active subscription or super-admin role.
+* **API**: Enhanced `UserResource` (used inside posts, comments, clips, etc.) to return the member's `profile_badge_color` dynamically based on their active subscription or super-admin role.
 * **API**: Fixed a duplicate folder bug in `UserResource` by calling `$this->avatarUrl()` directly, correcting the path resolution for mobile client avatars.
 * **Privacy**: Hidden the user's PTS points balance in the profile's "About" tab to protect member points privacy.
 
@@ -108,7 +108,7 @@
 * **Feature**: Implemented **Phase 4** protected endpoints covering Forums and Store: fetching forum categories, topics, and replies, as well as paginated store products and details, expanding the API scope to cover community discussions and digital marketplace assets.
 * **Feature**: Achieved **Community Feed Parity** in the Mobile App by mapping diverse content types (Videos, Files, Products, Site Directories, Service Requests) directly into dynamic HTML formatting using `display_content`, `display_title`, and `display_image` via `StatusResource`.
 * **Feature**: Upgraded Mobile App reactions logic in `ReactionController` to accept explicit reaction names (`Like`, `Love`, `Haha`, `Wow`, `Sad`, `Angry`), mirroring the web platform's multiple reaction system instead of generic binary toggles.
-* **Bugfix**: Fixed reaction notification delivery failures for Reels and Community Feed posts across both Web and Mobile API controllers by correctly resolving the interaction subject to its base entity owner.
+* **Bugfix**: Fixed reaction notification delivery failures for Clips and Community Feed posts across both Web and Mobile API controllers by correctly resolving the interaction subject to its base entity owner.
 * **Feature**: Implemented full `PostDetailsScreen` routing and state in the Flutter app to fetch comments, post new comments, and render interactive native share sheets using `share_plus`.
 * **Security**: Introduced a two-layer API authentication mechanism requiring a globally managed `API_KEY` (generated securely from the Admin panel by Super Admins) in addition to the user's `Sanctum Bearer Token`. This mitigates unauthorized third-party scraping and prevents 500 errors by forcing strict `application/json` accept headers at the middleware level (`RequireMobileApiKey`).
 * **Feature**: Implemented **API Localization Support** via `SetApiLocale` middleware, which parses the `Accept-Language` header sent by the mobile app to automatically localize validation messages and API payload responses.
@@ -130,12 +130,12 @@
 * **Documentation**: Updated `Documents/PLUGIN_GUIDE.md` to establish the reusable design conventions and standards for paid plugins.
 
 ### Bug Fixes & UI Polish
-* **Theme / UI**: Fixed a major layout bug in Light Mode where community posts containing videos or Reels would stretch beyond the screen boundaries. This was resolved by restoring the missing CSS layout properties in `styles.min.css`.
+* **Theme / UI**: Fixed a major layout bug in Light Mode where community posts containing videos or Clips would stretch beyond the screen boundaries. This was resolved by restoring the missing CSS layout properties in `styles.min.css`.
 * **Theme / UI**: Added robust overflow protections (`min-width: 0 !important`) to community feed post containers (`.activity-post-card`, `.widget-box-status-content`) in `forum-activity-superdesign.css` across both Light and Dark themes to prevent media content from breaking flex bounds.
 * **API / Security**: Fixed a critical `500 Internal Server Error` during Mobile App API login caused by the missing `HasApiTokens` trait in the `User` model, restoring secure token generation capabilities.
 * **API / Database**: Provided explicit schema definitions and migration guidelines for `personal_access_tokens` to support free hosting environments where terminal execution for Sanctum installation is restricted.
 * **API / Reactions**: Completely rewrote the Mobile API `ReactionController` to perfectly match the Web platform's logic, properly tracking `time_t`, adding options formatting, triggering real-time notifications to post owners (`NotificationService`), and awarding/deducting correct gamification points (`PointLedgerService`).
-* **API / Models**: Fixed the `Status` model's `getReactionType()` accessor to properly recognize and classify Reels posts as reaction type `14`, fixing the sync issue where Reels reactions disappeared upon refresh.
+* **API / Models**: Fixed the `Status` model's `getReactionType()` accessor to properly recognize and classify Clips posts as reaction type `14`, fixing the sync issue where Clips reactions disappeared upon refresh.
 
 ### Mobile App Multimedia Support
 * **Feature**: Overhauled `StatusResource` API output to include three new structured fields — `media` (primary media object with `type`, `url`, `mime_type`, `name`, `size`), `gallery` (array of image URLs for multi-image posts), and `attachments` (array of all file attachments with full metadata) — enabling the Flutter app to render all multimedia post types.
@@ -143,8 +143,8 @@
 * **Fix**: Added `StatusActivityService::decorateMany()` call to `Api\ProfileController::statuses()` to properly hydrate `related_content` and attachment data for profile feed posts, matching the portal feed behavior.
 * **Feature**: Created `AttachmentModel` in Flutter (`core/models/attachment_model.dart`) with type detection helpers (`isImage`, `isVideo`, `isAudio`) and human-readable file size formatting.
 * **Feature**: Extended `StatusModel` in Flutter with `MediaInfo` class and new fields (`media`, `gallery`, `attachments`) to parse the enriched API response.
-* **Feature**: Implemented full multimedia rendering in `PostCard` widget including: video/reels player cards with play overlay and aspect ratio detection (16:9 for video, 9:16 for reels), audio/music player cards with waveform visualization and accent-colored UI, smart image gallery grid (2-up, 1+row layouts with "+N" overflow indicator), and file attachment cards with download icons and human-readable sizes.
-* **Feature**: Added color-coded media type badges (Video 🔵, Audio 🟢, Reels 🟣, Music 🟠, File 🔘) to post cards for quick content-type identification.
+* **Feature**: Implemented full multimedia rendering in `PostCard` widget including: video/clips player cards with play overlay and aspect ratio detection (16:9 for video, 9:16 for clips), audio/music player cards with waveform visualization and accent-colored UI, smart image gallery grid (2-up, 1+row layouts with "+N" overflow indicator), and file attachment cards with download icons and human-readable sizes.
+* **Feature**: Added color-coded media type badges (Video 🔵, Audio 🟢, Clips 🟣, Music 🟠, File 🔘) to post cards for quick content-type identification.
 * **Dependency**: Added `url_launcher` package to Flutter app for opening media files in external applications.
 
 ### Security Hardening
@@ -183,12 +183,12 @@
 * **i18n & Tests**: Fully localized Apple Pay, Tabby, and Flouci payment options, configuration inputs, validation messages, and simulation notice strings in English and Arabic. Added unit and feature test coverage for checkout redirects, validation rules, return redirects, and checkout simulations.
 
 ### Multimedia Community Posts
-* **Feature**: Introduced **Multimedia Post Types** to the community feed, allowing members to publish **Video**, **Audio**, **Files**, **Music**, and **Reels** directly.
+* **Feature**: Introduced **Multimedia Post Types** to the community feed, allowing members to publish **Video**, **Audio**, **Files**, **Music**, and **Clips** directly.
 * **Architecture**: Implemented a dedicated media storage and validation engine in `StatusController`, supporting secure uploads to `upload/` with mime-type protection.
 * **UI**: Added premium **Activity Feed Partials** for media content, featuring HTML5 players for video/audio and a structured list view for downloadable file attachments.
 * **UI**: Enhanced all community activity cards with a dynamic **Tag-Sticker UI** system, providing clear content-type indicators with curated icons and theme-aware styling.
 * **Customization**:
-    * **Video/Reels**: Specialized icons (`icon-videos` and `icon-streams`) for clear content differentiation.
+    * **Video/Clips**: Specialized icons (`icon-videos` and `icon-streams`) for clear content differentiation.
     * **Audio/Music**: New `icon-play` sticker for media-rich posts.
     * **Files**: Integrated a FontAwesome-based `fa-download` sticker for file attachments.
 * **Theme Support**: Implemented **Theme-Aware Coloring** for media stickers; the file download icon automatically switches between Black (Light Mode) and White (Dark Mode) for optimal contrast.

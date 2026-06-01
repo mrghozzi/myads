@@ -36,8 +36,8 @@
                 </svg>
             </a>
         </li>
-        <li class="menu-item {{ Request::is('reels*') ? 'active' : '' }}">
-            <a class="menu-item-link text-tooltip-tfr" href="{{ url('/reels') }}" data-title="{{ __('messages.reels') ?? 'Reels' }}">
+        <li class="menu-item {{ Request::is('clips*') ? 'active' : '' }}">
+            <a class="menu-item-link text-tooltip-tfr" href="{{ url('/clips') }}" data-title="{{ __('messages.clips') ?? 'Clips' }}">
                 <svg class="menu-item-link-icon icon-videos">
                     <use xlink:href="#svg-videos"></use>
                 </svg>

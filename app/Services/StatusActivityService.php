@@ -76,7 +76,7 @@ class StatusActivityService
                     11 => 'Audio',
                     12 => 'File',
                     13 => 'Music',
-                    14 => 'Reels',
+                    14 => 'Clips',
                     default => 'Forum',
                 };
                 break;

@@ -23,7 +23,7 @@
     } elseif ($activity->s_type == 13) {
         $type = 'audio'; // Music uses same player as audio
     } elseif ($activity->s_type == 14) {
-        $type = 'video'; // Reels uses same player as video
+        $type = 'video'; // Clips uses same player as video
     }
     
     // Check if related content exists before including

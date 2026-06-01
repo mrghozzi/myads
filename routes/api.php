@@ -83,11 +83,11 @@ Route::middleware(['api.key', 'auth:sanctum'])->group(function () {
     // Reactions API
     Route::post('/reactions/toggle', [App\Http\Controllers\Api\ReactionController::class, 'toggle']);
 
-    // Reels API
-    Route::get('/reels', [App\Http\Controllers\Api\ReelsController::class, 'index']);
-    Route::get('/reels/saved', [App\Http\Controllers\Api\ReelsController::class, 'saved']);
-    Route::post('/reels/{status}/save', [App\Http\Controllers\Api\ReelsController::class, 'save']);
-    Route::delete('/reels/{status}/save', [App\Http\Controllers\Api\ReelsController::class, 'unsave']);
+    // Clips API
+    Route::get('/clips', [App\Http\Controllers\Api\ClipsController::class, 'index']);
+    Route::get('/clips/saved', [App\Http\Controllers\Api\ClipsController::class, 'saved']);
+    Route::post('/clips/{status}/save', [App\Http\Controllers\Api\ClipsController::class, 'save']);
+    Route::delete('/clips/{status}/save', [App\Http\Controllers\Api\ClipsController::class, 'unsave']);
 
     // Profile API
     Route::get('/profile/{identifier}', [App\Http\Controllers\Api\ProfileController::class, 'show']);

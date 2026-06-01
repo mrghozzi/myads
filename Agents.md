@@ -34,9 +34,9 @@ MYADS is a community platform where website owners:
 12. **Session Monitoring** — view and manage active member sessions across devices with remote revocation.
 13. **Admin Notifications** — centralized header alerts for billing, reports, and system/extension updates with permission-based visibility.
 14. **Media Manager** — administrative hub for monitoring, renaming, previewing, and securely deleting uploaded media files.
-15. **Multimedia Posts** — community feed support for Video, Audio, Files, Music, and Reels with dedicated players and tag-sticker indicators.
+15. **Multimedia Posts** — community feed support for Video, Audio, Files, Music, and Clips with dedicated players and tag-sticker indicators.
 16. **Custom Member Ads** — members create embeddable ad spaces, negotiate direct deals, track impressions/clicks, and settle daily PTS payouts or record external agreements.
-17. **Mobile App API & Client** — foundational Flutter app for Android (`myads_app`) with full community feed parity (Reactions with points/notification syncing, Comments, Multimedia posts with Video/Audio/Image gallery/File rendering, Promoted Posts, Share intent), Forums, Store, a native **Reels System**, a premium **Member Profile & Social Navigation** experience with vertical hexagonal avatars matching the web theme, and a **Settings & Communication Hub** (Messages, Notifications, localized in English/Arabic), all powered by Laravel Sanctum and a secure Mobile API.
+17. **Mobile App API & Client** — foundational Flutter app for Android (`myads_app`) with full community feed parity (Reactions with points/notification syncing, Comments, Multimedia posts with Video/Audio/Image gallery/File rendering, Promoted Posts, Share intent), Forums, Store, a native **Clips System**, a premium **Member Profile & Social Navigation** experience with vertical hexagonal avatars matching the web theme, and a **Settings & Communication Hub** (Messages, Notifications, localized in English/Arabic), all powered by Laravel Sanctum and a secure Mobile API.
 
 ---
 
@@ -147,7 +147,7 @@ myads/
 | `ForgotPasswordController` / `ResetPasswordController` | Password reset flow |
 | `HomeController` | Dashboard (`/home`), point conversion |
 | `PortalController` | Community feed (`/portal`), smart feed algorithm |
-| `StatusController` | Create posts (text, link, gallery, repost, multimedia: video, audio, file, music, reels), image upload, link preview |
+| `StatusController` | Create posts (text, link, gallery, repost, multimedia: video, audio, file, music, clips), image upload, link preview |
 | `CommentController` | Load, store, delete comments |
 | `ReactionController` | Toggle reactions |
 | `MentionController` | `@mention` user lookup |
@@ -612,7 +612,7 @@ admin/mail_settings.blade.php → Database-driven mail configuration form
 
 ### Repost (Share) System (v4.3.4)
 - **Concept:** Enables users to share (quote-repost) other member statuses (including text, media, files, store items, directories) into the community feed with an optional attached quote text.
-- **Web Rendering:** Uses `repost_embed.blade.php` to render the original post inside a nested widget box. Supports images, videos, reels, audio, music, and file attachments dynamically.
+- **Web Rendering:** Uses `repost_embed.blade.php` to render the original post inside a nested widget box. Supports images, videos, clips, audio, music, and file attachments dynamically.
 - **Hydration:** Relies on recursive decoration in `StatusActivityService::decorate` to ensure the nested original status and its associated models (user, attachments, link previews, related content) are fully loaded, avoiding blank embeds on single post detail views.
 - **REST API & Mobile Client:** Upgrades `StatusResource` to format `repost_record` with the nested `original_status` resource formatted using `StatusResource`. The mobile app parses this structure into `RepostRecordModel` and renders it via `_buildRepostEmbed` in `PostCard`, matching the web layout and functionality.
 
@@ -881,7 +881,7 @@ php artisan storage:link
 
 - **Status:** In Progress.
 - **Focus:** Multimedia integration, Custom Member Ads, SEO structured data, and platform stability.
-- **Feature (2026-05-13):** Introduced **Multimedia Community Posts**, enabling direct publishing of Video, Audio, Music, Files, and Reels.
+- **Feature (2026-05-13):** Introduced **Multimedia Community Posts**, enabling direct publishing of Video, Audio, Music, Files, and Clips.
 - **UI/UX (2026-05-13):** Implemented the **Tag-Sticker Icon System** for activity cards, with dynamic icon mapping (`play`, `videos`, `streams`, `fa-download`) and theme-aware contrast adjustments.
 - **SEO (2026-05-12):** Deployed JSON-LD fixes for Google Search Console compliance, including ProfilePage schema and author URL integration.
 - **Stability (2026-05-12):** Resolved critical 503 maintenance mode loops and hardened system version middleware.

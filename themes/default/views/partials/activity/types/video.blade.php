@@ -87,7 +87,7 @@
                 </a>
                 <p class="user-status-title medium">
                     <a class="bold" href="{{ $activityUserProfileUrl }}">{{ $activityUserName }}</a>
-                    &nbsp;{{ $activity->s_type == 14 ? __('messages.added_reels') : __('messages.added_video') }}
+                    &nbsp;{{ $activity->s_type == 14 ? __('messages.added_clips') : __('messages.added_video') }}
                 </p>
                 <p class="user-status-text small">
                     <i class="fa fa-clock-o"></i>&nbsp;{{ __('messages.ago') }}&nbsp;{{ $activity->date_formatted }}

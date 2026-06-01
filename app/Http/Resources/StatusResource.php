@@ -165,7 +165,7 @@ class StatusResource extends JsonResource
     }
 
     /**
-     * Get the primary media for multimedia posts (video, audio, reels, music).
+     * Get the primary media for multimedia posts (video, audio, clips, music).
      */
     protected function getMedia(): ?array
     {
@@ -180,7 +180,7 @@ class StatusResource extends JsonResource
             11 => 'audio',
             12 => 'file',
             13 => 'music',
-            14 => 'reels',
+            14 => 'clips',
             4  => 'image',
             default => null,
         };

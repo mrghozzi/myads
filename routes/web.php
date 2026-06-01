@@ -133,9 +133,9 @@ Route::get('/plans', [BillingController::class, 'plans'])->name('billing.plans')
 Route::get('/portal', [PortalController::class, 'index'])->name('portal.index');
 Route::get('/share', [PortalController::class, 'share'])->name('portal.share')->middleware('auth');
 
-// Reels Routes
-Route::get('/reels', [App\Http\Controllers\ReelsController::class, 'index'])->name('reels.index');
-Route::get('/reels/saved', [App\Http\Controllers\ReelsController::class, 'saved'])->name('reels.saved')->middleware('auth');
+// Clips Routes
+Route::get('/clips', [App\Http\Controllers\ClipsController::class, 'index'])->name('clips.index');
+Route::get('/clips/saved', [App\Http\Controllers\ClipsController::class, 'saved'])->name('clips.saved')->middleware('auth');
 
 // Developer Platform
 Route::prefix('developer')->group(function () {

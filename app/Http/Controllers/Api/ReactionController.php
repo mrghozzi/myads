@@ -106,7 +106,7 @@ class ReactionController extends Controller
                 if ($type == 2) {
                     $postUrl = "/t" . $sid;
                 } elseif ($type == 14) {
-                    $postUrl = "/reels";
+                    $postUrl = "/clips";
                 } elseif ($type == 22) {
                     $postUrl = "/dr" . $sid;
                 }

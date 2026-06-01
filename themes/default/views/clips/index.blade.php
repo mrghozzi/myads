@@ -2,8 +2,8 @@
 
 @section('content')
 <style>
-    /* Full Reels TikTok-style Container */
-    .reels-wrapper {
+    /* Full Clips TikTok-style Container */
+    .clips-wrapper {
         height: calc(100vh - 80px); /* Adjust based on your header height */
         background-color: #000 !important;
         border-radius: 12px;
@@ -14,7 +14,7 @@
         box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     }
     
-    .reels-container {
+    .clips-container {
         height: 100%;
         overflow-y: scroll;
         scroll-snap-type: y mandatory;
@@ -24,7 +24,7 @@
         background-color: #000 !important;
     }
     
-    .reels-container::-webkit-scrollbar {
+    .clips-container::-webkit-scrollbar {
         display: none;
     }
 
@@ -174,15 +174,15 @@
         100% { transform: scale(1); }
     }
 
-    /* Floating Saved Reels Button */
-    .reels-header-actions {
+    /* Floating Saved Clips Button */
+    .clips-header-actions {
         position: absolute;
         top: 15px;
         right: 15px;
         z-index: 20;
     }
     
-    .btn-saved-reels {
+    .btn-saved-clips {
         background: rgba(0,0,0,0.5);
         backdrop-filter: blur(5px);
         color: #fff;
@@ -197,11 +197,11 @@
         text-decoration: none;
         transition: background 0.2s;
     }
-    .btn-saved-reels:hover {
+    .btn-saved-clips:hover {
         background: rgba(0,0,0,0.8);
         color: #fff;
     }
-    .btn-saved-reels svg {
+    .btn-saved-clips svg {
         width: 16px;
         height: 16px;
         fill: currentColor;
@@ -243,20 +243,20 @@
 </style>
 
 <div class="grid" style="padding-top: 20px;">
-    <div class="reels-wrapper">
-        <div class="reels-header-actions">
-            <a href="{{ route('reels.saved') }}" class="btn-saved-reels">
+    <div class="clips-wrapper">
+        <div class="clips-header-actions">
+            <a href="{{ route('clips.saved') }}" class="btn-saved-clips">
                 <svg viewBox="0 0 24 24"><path d="M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2z"/></svg>
                 {{ __('messages.saved') ?? 'Saved' }}
             </a>
         </div>
         
-        <div class="reels-container" id="reels-container">
-            @include('theme::reels.partials.reels_list', ['activities' => $activities])
+        <div class="clips-container" id="clips-container">
+            @include('theme::clips.partials.clips_list', ['activities' => $activities])
         </div>
         
         <!-- Loading Indicator for Infinite Scroll -->
-        <div id="reels-loading" style="display: none; position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); text-align: center; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.8);">
+        <div id="clips-loading" style="display: none; position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); text-align: center; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.8);">
             <i class="fa-solid fa-spinner fa-spin"></i> Loading...
         </div>
     </div>
@@ -266,8 +266,8 @@
 @section('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const container = document.getElementById('reels-container');
-    const loadingEl = document.getElementById('reels-loading');
+    const container = document.getElementById('clips-container');
+    const loadingEl = document.getElementById('clips-loading');
     let nextPageUrl = '{{ $activities->nextPageUrl() }}';
     let isLoading = false;
 
@@ -336,7 +336,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     muteBtn.addEventListener('click', (e) => {
                         e.stopPropagation(); // Prevent play/pause toggle
                         
-                        // Toggle global mute state for all reels
+                        // Toggle global mute state for all clips
                         const isMuted = !video.muted;
                         
                         document.querySelectorAll('.reel-video').forEach(v => {
@@ -366,7 +366,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const sentinelObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting && nextPageUrl && !isLoading) {
-                loadMoreReels();
+                loadMoreClips();
             }
         });
     }, {
@@ -385,7 +385,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     observeSentinel();
 
-    function loadMoreReels() {
+    function loadMoreClips() {
         if (!nextPageUrl) return;
         
         isLoading = true;
@@ -467,7 +467,7 @@ document.addEventListener('DOMContentLoaded', function() {
             countSpan.textContent = currentCount + 1;
         }
 
-        fetch('{{ url('/api/reels/save') }}', {
+        fetch('{{ url('/api/clips/save') }}', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -488,7 +488,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const url = btn.dataset.url;
         if (navigator.share) {
             navigator.share({
-                title: 'MYADS Reels',
+                title: 'MYADS Clips',
                 url: url
             }).catch(console.error);
         } else {

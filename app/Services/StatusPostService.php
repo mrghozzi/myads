@@ -56,7 +56,7 @@ class StatusPostService
                 11 => 'audio',
                 12 => 'file',
                 13 => 'music',
-                14 => 'reels',
+                14 => 'clips',
                 default => 'text',
             };
         }
@@ -79,7 +79,7 @@ class StatusPostService
             'files.*' => "file|mimes:{$mimes}|mimetypes:{$mimetypes}|max:{$maxSizeKb}",
             'link_url' => 'nullable|string|max:2048',
             'publish_mode' => 'nullable|in:post,directory_only',
-            'post_kind' => 'nullable|string|in:text,gallery,link,repost,video,audio,file,music,reels',
+            'post_kind' => 'nullable|string|in:text,gallery,link,repost,video,audio,file,music,clips',
             'save_to_directory' => 'nullable|boolean',
             'directory_name' => 'nullable|string|max:255',
             'directory_category_id' => 'nullable|integer|exists:cat_dir,id',
@@ -96,8 +96,8 @@ class StatusPostService
         if (!$settings['video_sharing'] && $postKind === 'video') {
             throw new \RuntimeException(__('messages.video_upload_disabled') ?? 'Video upload is disabled.');
         }
-        if (!$settings['reels_upload'] && $postKind === 'reels') {
-            throw new \RuntimeException(__('messages.reels_upload_disabled') ?? 'Reels upload is disabled.');
+        if (!$settings['clips_upload'] && $postKind === 'clips') {
+            throw new \RuntimeException(__('messages.clips_upload_disabled') ?? 'Clips upload is disabled.');
         }
         if (!$settings['audio_sharing'] && in_array($postKind, ['audio', 'music'])) {
             throw new \RuntimeException(__('messages.audio_upload_disabled') ?? 'Audio upload is disabled.');
@@ -115,7 +115,7 @@ class StatusPostService
             'audio' => Status::TYPE_AUDIO,
             'file' => Status::TYPE_FILE,
             'music' => Status::TYPE_MUSIC,
-            'reels' => Status::TYPE_REELS,
+            'clips' => Status::TYPE_CLIPS,
             default => 100,
         };
         $publishMode = (string) $request->input('publish_mode', 'post');
@@ -206,7 +206,7 @@ class StatusPostService
                 $this->storeGalleryAssets($topic, $request, $user->id);
             }
 
-            if (in_array($postKind, ['video', 'audio', 'file', 'music', 'reels'])) {
+            if (in_array($postKind, ['video', 'audio', 'file', 'music', 'clips'])) {
                 $this->storeMediaAssets($topic, $request, $user->id, $postKind);
             }
 
@@ -315,8 +315,8 @@ class StatusPostService
         if (!$settings['video_sharing'] && $postKind === 'video' && $request->hasFile('videos')) {
             throw new \RuntimeException(__('messages.video_upload_disabled') ?? 'Video upload is disabled.');
         }
-        if (!$settings['reels_upload'] && $postKind === 'reels' && $request->hasFile('videos')) {
-            throw new \RuntimeException(__('messages.reels_upload_disabled') ?? 'Reels upload is disabled.');
+        if (!$settings['clips_upload'] && $postKind === 'clips' && $request->hasFile('videos')) {
+            throw new \RuntimeException(__('messages.clips_upload_disabled') ?? 'Clips upload is disabled.');
         }
         if (!$settings['audio_sharing'] && in_array($postKind, ['audio', 'music']) && $request->hasFile('audios')) {
             throw new \RuntimeException(__('messages.audio_upload_disabled') ?? 'Audio upload is disabled.');
@@ -363,7 +363,7 @@ class StatusPostService
             $postKind = $this->determinePostKind($status);
             if ($postKind === 'gallery' && $request->hasFile('images')) {
                 $this->storeGalleryAssets($topic, $request, $user->id);
-            } elseif (in_array($postKind, ['video', 'audio', 'file', 'music', 'reels'])) {
+            } elseif (in_array($postKind, ['video', 'audio', 'file', 'music', 'clips'])) {
                 // Ensure media asset arrays are present
                 if ($request->hasFile('videos') || $request->hasFile('audios') || $request->hasFile('files')) {
                     $this->storeMediaAssets($topic, $request, $user->id, $postKind);
@@ -574,7 +574,7 @@ class StatusPostService
     private function storeMediaAssets(ForumTopic $topic, Request $request, int $userId, string $kind): void
     {
         $inputName = match ($kind) {
-            'video', 'reels' => 'videos',
+            'video', 'clips' => 'videos',
             'audio', 'music' => 'audios',
             'file' => 'files',
             default => 'files',
@@ -772,7 +772,7 @@ class StatusPostService
             11 => 'audio',
             12 => 'file',
             13 => 'music',
-            14 => 'reels',
+            14 => 'clips',
             default => 'text',
         };
     }
@@ -784,7 +784,7 @@ class StatusPostService
         return [
             'file_sharing' => ($options['file_sharing']->o_valuer ?? '1') == '1',
             'video_sharing' => ($options['video_sharing']->o_valuer ?? '1') == '1',
-            'reels_upload' => ($options['reels_upload']->o_valuer ?? '1') == '1',
+            'clips_upload' => ($options['clips_upload']->o_valuer ?? '1') == '1',
             'audio_sharing' => ($options['audio_sharing']->o_valuer ?? '1') == '1',
             'max_upload_size' => (int) ($options['max_upload_size']->o_valuer ?? '10'),
             'allowed_extensions' => $options['allowed_extensions']->o_valuer ?? 'jpg,png,jpeg,gif,mp4,mp3,pdf,zip',

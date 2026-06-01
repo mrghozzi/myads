@@ -52,10 +52,10 @@
 
                     <div class="admin-utility-card mb-3">
                         <div class="form-check form-switch px-0 d-flex align-items-center gap-3">
-                            <input class="form-check-input ms-0 mt-0" type="checkbox" role="switch" id="reels_upload" name="reels_upload" value="1" {{ ($options['reels_upload']->o_valuer ?? '1') == '1' ? 'checked' : '' }} style="width: 40px; height: 20px;">
+                            <input class="form-check-input ms-0 mt-0" type="checkbox" role="switch" id="clips_upload" name="clips_upload" value="1" {{ ($options['clips_upload']->o_valuer ?? '1') == '1' ? 'checked' : '' }} style="width: 40px; height: 20px;">
                             <div>
-                                <label class="form-check-label mb-0 fw-semibold" for="reels_upload">{{ __('messages.reels_upload') }}</label>
-                                <div class="small text-muted">{{ __('messages.reels_upload_help') }}</div>
+                                <label class="form-check-label mb-0 fw-semibold" for="clips_upload">{{ __('messages.clips_upload') }}</label>
+                                <div class="small text-muted">{{ __('messages.clips_upload_help') }}</div>
                             </div>
                         </div>
                     </div>

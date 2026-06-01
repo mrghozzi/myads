@@ -2357,7 +2357,7 @@ class AdminController extends Controller
                         11 => __('messages.audio'),
                         12 => __('messages.file'),
                         13 => __('messages.music'),
-                        14 => __('messages.reels'),
+                        14 => __('messages.clips'),
                         default => __('messages.forum'),
                     };
                     $targetIcon = match((int) $report->s_type) {
@@ -3786,7 +3786,7 @@ class AdminController extends Controller
         $settings = $request->except('_token');
         
         // Handle unchecked checkboxes that are not sent by the browser
-        $checkboxes = ['file_sharing', 'video_sharing', 'reels_upload', 'audio_sharing'];
+        $checkboxes = ['file_sharing', 'video_sharing', 'clips_upload', 'audio_sharing'];
         foreach ($checkboxes as $checkbox) {
             if (!isset($settings[$checkbox])) {
                 $settings[$checkbox] = '0';

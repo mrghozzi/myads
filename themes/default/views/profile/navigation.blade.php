@@ -34,9 +34,9 @@
             <svg class="section-menu-item-icon icon-files" width="20" height="20"><use xlink:href="#svg-file-custom"></use></svg>
             <p class="section-menu-item-text">{{ __('messages.Files') }}</p>
         </a>
-        <a class="section-menu-item {{ request('tab') == 'reels' ? 'active' : '' }}" href="{{ route('profile.show', $user->username) }}?tab=reels">
-            <svg class="section-menu-item-icon icon-reels" width="20" height="20"><use xlink:href="#svg-streams"></use></svg>
-            <p class="section-menu-item-text">{{ __('messages.Reels') }}</p>
+        <a class="section-menu-item {{ request('tab') == 'clips' ? 'active' : '' }}" href="{{ route('profile.show', $user->username) }}?tab=clips">
+            <svg class="section-menu-item-icon icon-clips" width="20" height="20"><use xlink:href="#svg-streams"></use></svg>
+            <p class="section-menu-item-text">{{ __('messages.Clips') }}</p>
         </a>
         @if(($canViewFollowers ?? true) || request()->routeIs('profile.followers'))
             <a class="section-menu-item {{ request()->routeIs('profile.followers') ? 'active' : '' }}" href="{{ route('profile.followers', $user->username) }}">

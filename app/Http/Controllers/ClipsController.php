@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-class ReelsController extends Controller
+class ClipsController extends Controller
 {
     public function index()
     {
@@ -17,12 +17,12 @@ class ReelsController extends Controller
 
         if (request()->ajax()) {
             return response()->json([
-                'html' => view('theme::reels.partials.reels_list', compact('activities'))->render(),
+                'html' => view('theme::clips.partials.clips_list', compact('activities'))->render(),
                 'next_page_url' => $activities->nextPageUrl()
             ]);
         }
 
-        return view('theme::reels.index', compact('activities'));
+        return view('theme::clips.index', compact('activities'));
     }
 
     public function saved()
@@ -47,11 +47,11 @@ class ReelsController extends Controller
 
         if (request()->ajax()) {
             return response()->json([
-                'html' => view('theme::reels.partials.reels_grid', compact('activities'))->render(),
+                'html' => view('theme::clips.partials.clips_grid', compact('activities'))->render(),
                 'next_page_url' => $activities->nextPageUrl()
             ]);
         }
 
-        return view('theme::reels.saved', compact('activities'));
+        return view('theme::clips.saved', compact('activities'));
     }
 }

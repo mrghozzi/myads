@@ -201,7 +201,7 @@ class StatusController extends Controller
     private function storeMediaAssets(ForumTopic $topic, Request $request, int $userId, string $kind): void
     {
         $inputName = match ($kind) {
-            'video', 'reels' => 'videos',
+            'video', 'clips' => 'videos',
             'audio', 'music' => 'audios',
             'file' => 'files',
             default => 'files',

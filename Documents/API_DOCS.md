@@ -168,7 +168,7 @@ Allows any website to pre-fill the MYADS post composer.
 - `GET /api/portal/feed`: Retrieves the community feed (paginated). Optional query parameter `filter` (`all` or `me`). Returns a collection of `StatusResource` which includes:
   - `user`: User details (`UserResource`) containing `id`, `username`, `name`, `avatar` URL, `verified` status, and `profile_badge_color` (the hex color corresponding to their active paid plan or Super Admin status).
   - `display_content`, `display_title`, `display_image`: Pre-rendered HTML/attributes for diverse post types.
-  - `media`: Primary media object for multimedia posts (Video, Audio, File, Music, Reels) containing `type`, `url`, `mime_type`, `name`, and `size`. Returns `null` for text-only posts.
+  - `media`: Primary media object for multimedia posts (Video, Audio, File, Music, Clips) containing `type`, `url`, `mime_type`, `name`, and `size`. Returns `null` for text-only posts.
   - `gallery`: Array of image URLs for multi-image posts. Empty array for non-image posts.
   - `attachments`: Array of all file attachments, each with `url`, `mime_type`, `name`, and `size`.
   - `repost_record`: Details of the original status if the post is a share/repost. Returns `null` for regular posts. Includes:
@@ -190,7 +190,7 @@ Allows any website to pre-fill the MYADS post composer.
   *Payload:* `{"text": "My comment"}`
 - `POST /api/reactions/toggle`: Toggle a reaction on a subject.
   *Payload:* `{"subject_id": 123, "type": 2, "reaction_name": "Love"}` *(Supported reactions: Like, Love, Haha, Wow, Sad, Angry)*
-  **Note:** Clients must extract `subject_id` and `type` dynamically from the `interaction_subject_id` and `reaction_type` properties provided in the `StatusResource` to ensure reactions are logged against the correct parent topic or media format (e.g., `type 14` for Reels, `type 2` for statuses, `type 3` for groups) and to ensure notifications and gamification points are awarded to the correct owner.
+  **Note:** Clients must extract `subject_id` and `type` dynamically from the `interaction_subject_id` and `reaction_type` properties provided in the `StatusResource` to ensure reactions are logged against the correct parent topic or media format (e.g., `type 14` for Clips, `type 2` for statuses, `type 3` for groups) and to ensure notifications and gamification points are awarded to the correct owner.
 
 ### Profile & Follow (Phase 2)
 - `GET /api/profile/{identifier}`: Retrieve user profile details and stats.
@@ -243,9 +243,9 @@ Allows any website to pre-fill the MYADS post composer.
 - `GET /api/store/products`: Retrieve store products (paginated).
 - `GET /api/store/products/{id}`: Retrieve a specific product's details.
 
-### Reels
-- `GET /api/reels/saved`: Retrieve a list of saved reels for the authenticated user.
-- `POST /api/reels/save`: Toggle the saved state of a specific reel. Payload: `{"status_id": 123}`
+### Clips
+- `GET /api/clips/saved`: Retrieve a list of saved clips for the authenticated user.
+- `POST /api/clips/save`: Toggle the saved state of a specific reel. Payload: `{"status_id": 123}`
 
 ---
 

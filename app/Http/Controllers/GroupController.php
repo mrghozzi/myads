@@ -492,7 +492,7 @@ class GroupController extends Controller
 
     private function reservedFeedTopicNames(): array
     {
-        return ['text', 'link', 'gallery', 'video', 'audio', 'file', 'music', 'reels'];
+        return ['text', 'link', 'gallery', 'video', 'audio', 'file', 'music', 'clips'];
     }
 
     private function emptyPaginator(string $pageName, int $perPage): LengthAwarePaginator

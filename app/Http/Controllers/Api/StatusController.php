@@ -42,7 +42,7 @@ class StatusController extends Controller
         return response()->json([
             'groups' => $groups,
             'directory_categories' => $directoryCategories,
-            'supported_kinds' => ['text', 'gallery', 'link', 'repost', 'video', 'audio', 'file', 'music', 'reels'],
+            'supported_kinds' => ['text', 'gallery', 'link', 'repost', 'video', 'audio', 'file', 'music', 'clips'],
         ]);
     }
 
