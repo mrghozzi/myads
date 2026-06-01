@@ -329,6 +329,26 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Posts Breakdown Row -->
+                    <div class="row g-3 mt-3">
+                        <div class="col-12">
+                            <h6 class="fw-bold text-dark mb-3 mt-2" style="font-size: 0.85rem;">{{ __('messages.total_posts') }} ({{ number_format($stats['posts']) }})</h6>
+                            <div class="d-flex flex-wrap gap-2">
+                                <span class="badge bg-light text-dark border px-2 py-1"><i class="feather-align-left text-muted me-1"></i> {{ __('messages.post_text') ?? 'Text' }}: {{ number_format($stats['posts_breakdown']['text']) }}</span>
+                                <span class="badge bg-light text-dark border px-2 py-1"><i class="feather-link text-primary me-1"></i> {{ __('messages.post_link') ?? 'Link' }}: {{ number_format($stats['posts_breakdown']['link']) }}</span>
+                                <span class="badge bg-light text-dark border px-2 py-1"><i class="feather-image text-success me-1"></i> {{ __('messages.post_gallery') ?? 'Gallery' }}: {{ number_format($stats['posts_breakdown']['gallery']) }}</span>
+                                <span class="badge bg-light text-dark border px-2 py-1"><i class="feather-video text-danger me-1"></i> {{ __('messages.post_video') ?? 'Video' }}: {{ number_format($stats['posts_breakdown']['video']) }}</span>
+                                <span class="badge bg-light text-dark border px-2 py-1"><i class="feather-film text-warning me-1"></i> {{ __('messages.post_clip') ?? 'Clip' }}: {{ number_format($stats['posts_breakdown']['clip']) }}</span>
+                                <span class="badge bg-light text-dark border px-2 py-1"><i class="feather-mic text-info me-1"></i> {{ __('messages.post_audio') ?? 'Audio' }}: {{ number_format($stats['posts_breakdown']['audio']) }}</span>
+                                <span class="badge bg-light text-dark border px-2 py-1"><i class="feather-mic text-secondary me-1"></i> {{ __('messages.post_voice') ?? 'Voice' }}: {{ number_format($stats['posts_breakdown']['voice']) }}</span>
+                                <span class="badge bg-light text-dark border px-2 py-1"><i class="feather-file text-dark me-1"></i> {{ __('messages.post_file') ?? 'File' }}: {{ number_format($stats['posts_breakdown']['file']) }}</span>
+                                <span class="badge bg-light text-dark border px-2 py-1"><i class="feather-music text-primary me-1"></i> {{ __('messages.post_music') ?? 'Music' }}: {{ number_format($stats['posts_breakdown']['music']) }}</span>
+                                <span class="badge bg-light text-dark border px-2 py-1"><i class="feather-repeat text-info me-1"></i> {{ __('messages.post_repost') ?? 'Repost' }}: {{ number_format($stats['posts_breakdown']['repost']) }}</span>
+                                <span class="badge bg-light text-dark border px-2 py-1"><i class="feather-book-open text-success me-1"></i> {{ __('messages.knowledgebase') ?? 'Knowledgebase' }}: {{ number_format($stats['posts_breakdown']['knowledgebase']) }}</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -635,6 +655,72 @@ document.addEventListener('DOMContentLoaded', function() {
                         borderWidth: 3,
                         pointRadius: 3,
                         pointHoverRadius: 6
+                    },
+                    {
+                        label: '{{ __('messages.post_video') ?? 'Video Posts' }}',
+                        data: {!! json_encode($communityChartData['posts']['video']) !!},
+                        borderColor: '#ef4444',
+                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 3,
+                        pointRadius: 3,
+                        pointHoverRadius: 6
+                    },
+                    {
+                        label: '{{ __('messages.post_clips') ?? 'Clips' }}',
+                        data: {!! json_encode($communityChartData['posts']['clips']) !!},
+                        borderColor: '#ec4899',
+                        backgroundColor: 'rgba(236, 72, 153, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 3,
+                        pointRadius: 3,
+                        pointHoverRadius: 6
+                    },
+                    {
+                        label: '{{ __('messages.post_audio') ?? 'Audio Posts' }}',
+                        data: {!! json_encode($communityChartData['posts']['audio']) !!},
+                        borderColor: '#14b8a6',
+                        backgroundColor: 'rgba(20, 184, 166, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 3,
+                        pointRadius: 3,
+                        pointHoverRadius: 6
+                    },
+                    {
+                        label: '{{ __('messages.post_file') ?? 'File Posts' }}',
+                        data: {!! json_encode($communityChartData['posts']['file']) !!},
+                        borderColor: '#8b5cf6',
+                        backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 3,
+                        pointRadius: 3,
+                        pointHoverRadius: 6
+                    },
+                    {
+                        label: '{{ __('messages.post_music') ?? 'Music Posts' }}',
+                        data: {!! json_encode($communityChartData['posts']['music']) !!},
+                        borderColor: '#f97316',
+                        backgroundColor: 'rgba(249, 115, 22, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 3,
+                        pointRadius: 3,
+                        pointHoverRadius: 6
+                    },
+                    {
+                        label: '{{ __('messages.knowledgebase') ?? 'Knowledgebase' }}',
+                        data: {!! json_encode($communityChartData['posts']['knowledgebase']) !!},
+                        borderColor: '#0ea5e9',
+                        backgroundColor: 'rgba(14, 165, 233, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        borderWidth: 3,
+                        pointRadius: 3,
+                        pointHoverRadius: 6
                     }
                 ]
             },
@@ -692,6 +778,16 @@ document.addEventListener('DOMContentLoaded', function() {
                         borderWidth: 2,
                         pointRadius: 2
                     },
+                    {
+                        label: '{{ __('messages.knowledgebase_comments') ?? 'Knowledgebase Comments' }}',
+                        data: {!! json_encode($communityChartData['comments']['knowledgebase']) !!},
+                        borderColor: '#0ea5e9',
+                        backgroundColor: 'rgba(14, 165, 233, 0.05)',
+                        fill: false,
+                        tension: 0.4,
+                        borderWidth: 2,
+                        pointRadius: 2
+                    },
                     // Reactions
                     {
                         label: '{{ __('messages.forum_reactions') ?? 'Forum Reactions' }}',
@@ -707,6 +803,26 @@ document.addEventListener('DOMContentLoaded', function() {
                         label: '{{ __('messages.store_reactions') ?? 'Store Reactions' }}',
                         data: {!! json_encode($communityChartData['reactions']['store']) !!},
                         borderColor: '#06b6d4',
+                        borderDash: [5, 5],
+                        fill: false,
+                        tension: 0.4,
+                        borderWidth: 2,
+                        pointRadius: 2
+                    },
+                    {
+                        label: '{{ __('messages.clips_reactions') ?? 'Clips Reactions' }}',
+                        data: {!! json_encode($communityChartData['reactions']['clips']) !!},
+                        borderColor: '#ec4899',
+                        borderDash: [5, 5],
+                        fill: false,
+                        tension: 0.4,
+                        borderWidth: 2,
+                        pointRadius: 2
+                    },
+                    {
+                        label: '{{ __('messages.knowledgebase_reactions') ?? 'Knowledgebase Reactions' }}',
+                        data: {!! json_encode($communityChartData['reactions']['knowledgebase']) !!},
+                        borderColor: '#0284c7',
                         borderDash: [5, 5],
                         fill: false,
                         tension: 0.4,

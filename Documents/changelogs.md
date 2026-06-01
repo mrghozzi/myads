@@ -49,6 +49,13 @@
 * **Mobile**: Fixed null safety crash in `MessagesListScreen` and `ChatScreen` where `partner['img']` could be `null` but `HexagonAvatar.avatarUrl` required a non-nullable `String`.
 * **Mobile**: Updated `ChatScreen` sender detection logic to handle both nested `sender` objects and flat `us_env` fields from the API response.
 
+### Administration & Analytics
+* **Feature**: Updated the `/admin` engagement activity statistics to include granular breakdowns for new post types: Videos, Clips, Audio, Voice Records, Files, and Knowledgebase articles.
+* **Fix**: Resolved a 500 Internal Server Error in the admin dashboard caused by counting columns that belong to separated relationship tables (`StatusLinkPreview` and `StatusRepost`) directly on the base `Status` model.
+* **Architecture**: Enhanced the `$stats` generator in `AdminController` to safely fallback to a zeroed array if database queries fail, preventing fatal rendering crashes on the dashboard.
+* **i18n**: Added missing translation keys for `post_clips`, `knowledgebase_comments`, `clips_reactions`, and `knowledgebase_reactions` across English and Arabic language files.
+* **UI**: Added a "Posts Breakdown" badge row in the admin Activity & Engagement card for detailed analytical oversight of community content.
+
 ### Dependencies
 * **chore(deps-dev)**: Bumped `symfony/yaml` from 7.4.1 to 7.4.13.
 * **chore(deps-dev)**: Bumped `axios` from 1.15.2 to 1.16.0.

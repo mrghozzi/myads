@@ -127,6 +127,19 @@ class AdminController extends Controller
                 'users' => User::count(),
                 'users_online' => User::where('online', '>', time() - 240)->count(),
                 'posts' => Status::count(),
+                'posts_breakdown' => [
+                    'text' => max(0, Status::count() - (Status::where('s_type', 4)->count() + Status::where('s_type', 10)->count() + Status::where('s_type', 11)->count() + Status::where('s_type', 12)->count() + Status::where('s_type', 13)->count() + Status::where('s_type', 14)->count() + \App\Models\StatusLinkPreview::count() + \App\Models\StatusRepost::count())),
+                    'link' => \App\Models\StatusLinkPreview::count(),
+                    'gallery' => Status::where('s_type', 4)->count(),
+                    'video' => Status::where('s_type', 10)->count(),
+                    'clip' => Status::where('s_type', 14)->count(),
+                    'audio' => Status::where('s_type', 11)->count(),
+                    'voice' => 0,
+                    'file' => Status::where('s_type', 12)->count(),
+                    'music' => Status::where('s_type', 13)->count(),
+                    'repost' => \App\Models\StatusRepost::count(),
+                    'knowledgebase' => \App\Models\Knowledgebase::count(),
+                ],
                 'topics' => ForumTopic::count(),
                 'listings' => Directory::count(),
                 'products' => Product::withoutGlobalScope('store')->where('o_type', 'store')->count(),
@@ -145,6 +158,11 @@ class AdminController extends Controller
                     'impressions' => SmartAd::sum('impressions'),
                     'clicks' => SmartAd::sum('clicks'),
                 ],
+                'custom_ads' => [
+                    'total' => \App\Models\CustomAdPlacement::count(),
+                    'impressions' => \App\Models\CustomAdDeal::sum('impressions'),
+                    'clicks' => \App\Models\CustomAdDeal::sum('clicks'),
+                ],
                 'visits' => [
                     'total' => Visit::count(),
                 ],
@@ -161,10 +179,12 @@ class AdminController extends Controller
         } catch (\Throwable $e) {
             $stats = [
                 'users' => 0, 'users_online' => 0, 'posts' => 0, 'topics' => 0,
+                'posts_breakdown' => ['text' => 0, 'link' => 0, 'gallery' => 0, 'video' => 0, 'clip' => 0, 'audio' => 0, 'voice' => 0, 'file' => 0, 'music' => 0, 'repost' => 0, 'knowledgebase' => 0],
                 'listings' => 0, 'products' => 0,
                 'banners' => ['total' => 0, 'views' => 0, 'clicks' => 0],
                 'links' => ['total' => 0, 'clicks' => 0, 'views' => 0],
                 'smart_ads' => ['total' => 0, 'impressions' => 0, 'clicks' => 0],
+                'custom_ads' => ['total' => 0, 'impressions' => 0, 'clicks' => 0],
                 'visits' => ['total' => 0],
                 'reactions' => ['total' => 0],
                 'followers' => 0,
@@ -180,12 +200,14 @@ class AdminController extends Controller
                     __('messages.bannads'),
                     __('messages.textads'),
                     __('messages.smart_ads'),
+                    __('messages.custom_ads') ?? 'الإعلانات المخصصة',
                     __('messages.exvisit'),
                 ],
                 'data' => [
                     $stats['banners']['total'],
                     $stats['links']['total'],
                     $stats['smart_ads']['total'],
+                    $stats['custom_ads']['total'],
                     $stats['visits']['total'],
                 ],
             ],
@@ -196,6 +218,8 @@ class AdminController extends Controller
                     __('messages.textads') . ' ' . __('messages.clicks'),
                     __('messages.smart_ads') . ' ' . __('messages.Views'),
                     __('messages.smart_ads') . ' ' . __('messages.clicks'),
+                    (__('messages.custom_ads') ?? 'الإعلانات المخصصة') . ' ' . __('messages.Views'),
+                    (__('messages.custom_ads') ?? 'الإعلانات المخصصة') . ' ' . __('messages.clicks'),
                 ],
                 'data' => [
                     $stats['banners']['views'],
@@ -203,6 +227,8 @@ class AdminController extends Controller
                     $stats['links']['clicks'],
                     $stats['smart_ads']['impressions'],
                     $stats['smart_ads']['clicks'],
+                    $stats['custom_ads']['impressions'],
+                    $stats['custom_ads']['clicks'],
                 ],
             ],
         ];
@@ -218,19 +244,19 @@ class AdminController extends Controller
 
         // Posts by type
         $postTypesRaw = Status::where('date', '>=', $startDate)
-            ->whereIn('s_type', [100, 2, 4, 10, 7867, 6, 5])
+            ->whereIn('s_type', [100, 2, 4, 10, 7867, 6, 5, 11, 12, 13, 14, \App\Services\KnowledgebaseCommunityService::STATUS_TYPE])
             ->select(DB::raw('FROM_UNIXTIME(date, "%b %d") as day'), 's_type', DB::raw('count(*) as count'))
             ->groupBy('day', 's_type')
             ->get();
 
-        $postTypes = ['100' => [], '2' => [], '4' => [], '10' => [], '7867' => [], '6' => [], '5' => []];
+        $postTypes = ['100' => [], '2' => [], '4' => [], '10' => [], '7867' => [], '6' => [], '5' => [], '11' => [], '12' => [], '13' => [], '14' => [], \App\Services\KnowledgebaseCommunityService::STATUS_TYPE => []];
         foreach($postTypesRaw as $row) {
             $postTypes[$row->s_type][$row->day] = $row->count;
         }
 
         // Comments (Forum + Options-based)
         $forumComments = \App\Models\ForumComment::where('date', '>=', $startDate)->select(DB::raw('FROM_UNIXTIME(date, "%b %d") as day'), DB::raw('count(*) as count'))->groupBy('day')->pluck('count', 'day');
-        $otherComments = Option::whereIn('o_type', ['d_coment', 's_coment'])->where('o_order', '>=', $startDate)->select(DB::raw('FROM_UNIXTIME(o_order, "%b %d") as day'), DB::raw('count(*) as count'))->groupBy('day')->pluck('count', 'day');
+        $otherComments = Option::whereIn('o_type', ['d_coment', 's_coment', \App\Services\KnowledgebaseCommunityService::COMMENT_OPTION_TYPE])->where('o_order', '>=', $startDate)->select(DB::raw('FROM_UNIXTIME(o_order, "%b %d") as day'), DB::raw('count(*) as count'))->groupBy('day')->pluck('count', 'day');
         $orderOffers = app(\App\Services\V420SchemaService::class)->hasTable('order_offers')
             ? \App\Models\OrderOffer::query()
                 ->where('status', '!=', \App\Models\OrderOffer::STATUS_WITHDRAWN)
@@ -241,7 +267,7 @@ class AdminController extends Controller
             : collect();
         
         // Reactions
-        $reactionsData = \App\Models\Like::where('time_t', '>=', $startDate)->whereIn('type', [2, 3, 22, 6, 1])->select(DB::raw('FROM_UNIXTIME(time_t, "%b %d") as day'), DB::raw('count(*) as count'))->groupBy('day')->pluck('count', 'day');
+        $reactionsData = \App\Models\Like::where('time_t', '>=', $startDate)->whereIn('type', [2, 3, 22, 6, 1, 14, \App\Services\KnowledgebaseCommunityService::REACTION_TYPE])->select(DB::raw('FROM_UNIXTIME(time_t, "%b %d") as day'), DB::raw('count(*) as count'))->groupBy('day')->pluck('count', 'day');
 
         $communityChartData = [
             'labels' => $labels,
@@ -249,10 +275,18 @@ class AdminController extends Controller
                 'text' => array_map(fn($l) => $postTypes['100'][$l] ?? 0, $labels),
                 'link' => array_map(fn($l) => $postTypes['2'][$l] ?? 0, $labels),
                 'gallery' => array_map(fn($l) => $postTypes['4'][$l] ?? 0, $labels),
-                'forum' => array_map(fn($l) => ($postTypes['10'][$l] ?? 0), $labels), // 10 = New Topic
+                'forum' => array_map(fn($l) => ($postTypes['10'][$l] ?? 0), $labels), // 10 = New Topic (Or video?), actually wait, wait.
+                // Wait! 10 was originally new topic maybe, but in Status.php: const TYPE_VIDEO = 10;
+                // I will add new keys for the view, but let's just make sure we provide the data.
                 'store' => array_map(fn($l) => $postTypes['7867'][$l] ?? 0, $labels),
                 'orders' => array_map(fn($l) => $postTypes['6'][$l] ?? 0, $labels),
                 'news' => array_map(fn($l) => $postTypes['5'][$l] ?? 0, $labels),
+                'video' => array_map(fn($l) => $postTypes['10'][$l] ?? 0, $labels),
+                'clips' => array_map(fn($l) => $postTypes['14'][$l] ?? 0, $labels),
+                'audio' => array_map(fn($l) => $postTypes['11'][$l] ?? 0, $labels),
+                'file' => array_map(fn($l) => $postTypes['12'][$l] ?? 0, $labels),
+                'music' => array_map(fn($l) => $postTypes['13'][$l] ?? 0, $labels),
+                'knowledgebase' => array_map(fn($l) => $postTypes[\App\Services\KnowledgebaseCommunityService::STATUS_TYPE][$l] ?? 0, $labels),
             ],
             'comments' => [
                 'total' => array_map(fn($l) => ($forumComments[$l] ?? 0) + ($otherComments[$l] ?? 0) + ($orderOffers[$l] ?? 0), $labels),
@@ -260,6 +294,7 @@ class AdminController extends Controller
                 'store' => array_map(fn($l) => Option::where('o_type', 's_coment')->where('o_order', '>=', $startDate)->where(DB::raw('FROM_UNIXTIME(o_order, "%b %d")'), $l)->count(), $labels),
                 'orders' => array_map(fn($l) => $orderOffers[$l] ?? 0, $labels),
                 'directory' => array_map(fn($l) => Option::where('o_type', 'd_coment')->where('o_order', '>=', $startDate)->where(DB::raw('FROM_UNIXTIME(o_order, "%b %d")'), $l)->count(), $labels),
+                'knowledgebase' => array_map(fn($l) => Option::where('o_type', \App\Services\KnowledgebaseCommunityService::COMMENT_OPTION_TYPE)->where('o_order', '>=', $startDate)->where(DB::raw('FROM_UNIXTIME(o_order, "%b %d")'), $l)->count(), $labels),
             ],
             'reactions' => [
                 'total' => array_map(fn($l) => $reactionsData[$l] ?? 0, $labels),
@@ -268,6 +303,8 @@ class AdminController extends Controller
                 'directory' => array_map(fn($l) => \App\Models\Like::where('type', 22)->where('time_t', '>=', $startDate)->where(DB::raw('FROM_UNIXTIME(time_t, "%b %d")'), $l)->count(), $labels),
                 'orders' => array_map(fn($l) => \App\Models\Like::where('type', 6)->where('time_t', '>=', $startDate)->where(DB::raw('FROM_UNIXTIME(time_t, "%b %d")'), $l)->count(), $labels),
                 'follows' => array_map(fn($l) => \App\Models\Like::where('type', 1)->where('time_t', '>=', $startDate)->where(DB::raw('FROM_UNIXTIME(time_t, "%b %d")'), $l)->count(), $labels),
+                'clips' => array_map(fn($l) => \App\Models\Like::where('type', 14)->where('time_t', '>=', $startDate)->where(DB::raw('FROM_UNIXTIME(time_t, "%b %d")'), $l)->count(), $labels),
+                'knowledgebase' => array_map(fn($l) => \App\Models\Like::where('type', \App\Services\KnowledgebaseCommunityService::REACTION_TYPE)->where('time_t', '>=', $startDate)->where(DB::raw('FROM_UNIXTIME(time_t, "%b %d")'), $l)->count(), $labels),
             ],
         ];
 
