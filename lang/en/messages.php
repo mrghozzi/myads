@@ -3331,4 +3331,10 @@ return [
     'yt_campaigns' => 'YouTube Campaigns',
     'yt_settings' => 'YouTube Settings',
     'created_at' => 'Created At',
+    'custom_ads' => 'Custom Ads',
+    'custom_ads_title' => 'Monetize with Custom Ads',
+    'custom_ads_desc' => 'Create embeddable ad spaces on your website, negotiate direct deals with advertisers, and settle payments easily.',
+    'custom_ads_dashboard' => 'Dashboard',
+    'custom_ads_create' => 'Create Placement',
+    'custom_ads_marketplace' => 'Marketplace',
 ];

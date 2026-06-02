@@ -1,6 +1,12 @@
 # v4.3.4
 > **Feature Release** — Paid Plugin Licensing & Verification Protocol, Store Product License Key Integration, Plugin Auto-Update APIs, Store Discount Codes, Seller Temporary Sales, Developer Architecture Guides, and Full Clips System (Web & Mobile).
 
+### Custom Ads Dashboard Integration
+* **Feature**: Added a new modern "Custom Ads" block to the main dashboard (`/home`) to promote the monetization feature.
+* **UI/UX**: Designed with a sleek purple/indigo glassmorphism gradient, matching the premium aesthetic of the YouTube Exchange and Smart Ads blocks.
+* **Feature**: Included quick access buttons for the Custom Ads Dashboard (`/ads/custom`), Create Placement (`/ads/custom/placements/create`), and Marketplace (`/ads/custom/marketplace`).
+* **i18n**: Fully localized the Custom Ads dashboard block across all 9 supported languages.
+
 ### YouTube Views Exchange (Web & Admin)
 * **Feature**: Introduced the **YouTube Views Exchange** system (`/youtube/exchange` and `/youtube/advertiser`), allowing members to promote YouTube videos and earn points by watching others' videos.
 * **Feature**: Advertisers can create campaigns, specifying Video ID, required view duration (in seconds), budget (PTS), and cost per second.

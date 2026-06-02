@@ -205,6 +205,27 @@
         </div>
       </div>
 
+      <!-- Custom Ads Block -->
+      <div id="custom-ads" style="margin-top: 24px; position: relative; overflow: hidden; border-radius: 24px; padding: 28px; background: linear-gradient(135deg, rgba(30,27,75,0.98) 0%, rgba(79,70,229,0.96) 52%, rgba(139,92,246,0.92) 100%); box-shadow: 0 24px 50px rgba(124, 58, 237, 0.2); color: #fff;">
+        <div style="position: absolute; inset: auto -70px -70px auto; width: 220px; height: 220px; border-radius: 50%; background: rgba(255,255,255,0.08);"></div>
+        <div style="position: absolute; inset: -80px auto auto -60px; width: 180px; height: 180px; border-radius: 50%; background: rgba(255,255,255,0.08);"></div>
+        <div style="position: relative; z-index: 1;">
+          <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap;">
+            <div style="max-width: 700px;">
+              <span style="display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 999px; background: rgba(255,255,255,0.12); font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;"><i class="fa-solid fa-bullseye"></i> {{ __('messages.custom_ads') }}</span>
+              <h2 style="margin: 16px 0 10px; font-size: 32px; line-height: 1.15; color: #fff;">{{ __('messages.custom_ads_title') }}</h2>
+              <p style="margin: 0; max-width: 620px; color: rgba(255,255,255,0.86); font-size: 15px; line-height: 1.8;">{{ __('messages.custom_ads_desc') }}</p>
+            </div>
+          </div>
+
+          <div class="home-smart-actions" style="margin-top: 24px; display: flex; gap: 12px; flex-wrap: wrap;">
+            <a href="{{ url('/ads/custom') }}" class="button primary home-smart-action" style="background: #fff; color: #4f46e5;">&nbsp;{{ __('messages.custom_ads_dashboard') }}&nbsp;</a>
+            <a href="{{ url('/ads/custom/placements/create') }}" class="button secondary home-smart-action" style="background: rgba(255,255,255,0.15); color: #fff; border: 1px solid rgba(255,255,255,0.2);">&nbsp;{{ __('messages.custom_ads_create') }}&nbsp;</a>
+            <a href="{{ url('/ads/custom/marketplace') }}" class="button tertiary home-smart-action" style="background: rgba(0,0,0,0.2); color: #fff; border: 1px solid rgba(255,255,255,0.1);">&nbsp;<i class="fa-solid fa-shop"></i> {{ __('messages.custom_ads_marketplace') }}&nbsp;</a>
+          </div>
+        </div>
+      </div>
+
       <!-- Visits Decoration -->
       <div class="stats-decoration v2 big secondary" id="Exchange" style="background: url({{ asset('themes/default/assets/img/graph/stat/07.png') }}) repeat-x bottom;">
         <p class="stats-decoration-title">{{ __('messages.exvisit') }}</p>
