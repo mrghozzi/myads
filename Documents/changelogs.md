@@ -29,6 +29,7 @@
 * **Cleanup**: Removed the legacy "CSS Upload" setting from the admin panel (`file_upload.blade.php`).
 
 ### Store Publisher Features
+* **Feature**: Updated the Store index page (`/store`) to dynamically order products by their last update date (newest first), ensuring actively maintained products appear at the top.
 * **Feature**: Added **Downloads History** page (`/store/{name}/downloads`) allowing product publishers to track which members downloaded their digital products and when.
 * **Feature**: Added **Updates Management** page (`/store/{name}/updates-management`) empowering publishers to review and delete legacy product versions and updates.
 * **UI/UX**: Both new publisher pages were built using the premium "superdesign" (Duralux) aesthetic, utilizing responsive grid layouts, hexagon member avatars (`user-preview` cards), gradient icons, and styled timeline widgets instead of standard tables.

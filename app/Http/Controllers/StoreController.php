@@ -39,7 +39,15 @@ class StoreController extends Controller
             }
         }
 
-        $query = Product::visible()->orderBy('id', 'desc');
+        $query = Product::visible()
+            ->orderByDesc(
+                \App\Models\Status::select('date')
+                    ->whereColumn('tp_id', 'options.id')
+                    ->where('s_type', 7867)
+                    ->orderByDesc('date')
+                    ->limit(1)
+            )
+            ->orderBy('id', 'desc');
 
         $categoryNames = StoreCategoryCatalog::namesForFilter($category);
         if ($category !== null && $categoryNames === []) {
