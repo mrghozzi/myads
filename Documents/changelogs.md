@@ -1,6 +1,10 @@
 # v4.3.4
 > **Feature Release** — Paid Plugin Licensing & Verification Protocol, Store Product License Key Integration, Plugin Auto-Update APIs, Store Discount Codes, Seller Temporary Sales, Developer Architecture Guides, and Full Clips System (Web & Mobile).
 
+### Embedded Media (YouTube)
+* **Feature**: Added automatic conversion of YouTube links into responsive embedded `<iframe>` video players within text posts in the community feed and single post view.
+* **Architecture**: Enhanced `ContentFormatter` with `embedYouTubeLinks` to intercept YouTube URLs (including standard, `youtu.be`, and `shorts` links) and replace them with Bootstrap 5 16:9 ratio containers.
+
 ### Standalone Pages Redesign
 * **Feature**: Completely redesigned the Welcome (`/`), Login (`/login`), Register (`/register`), and Password Reset (`/password/reset`) pages to use a modern, standalone layout.
 * **Feature**: Applied the layout to the legal pages: Privacy Policy (`/privacy`), Terms & Conditions (`/terms`), and Refund Policy (`/refund`).

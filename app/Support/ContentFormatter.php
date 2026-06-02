@@ -16,10 +16,24 @@ class ContentFormatter
         $value = str_replace(["\r\n", "\r"], "\n", $value);
         $value = self::linkifyMentions(self::linkifyHashtags($value));
 
-        return trim((string) Str::markdown($value, [
+        $html = trim((string) Str::markdown($value, [
             'html_input' => 'strip',
             'allow_unsafe_links' => false,
         ]));
+
+        return self::embedYouTubeLinks($html);
+    }
+
+    public static function embedYouTubeLinks(string $html): string
+    {
+        return (string) preg_replace_callback(
+            '/<a[^>]*href="([^"]*(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?)\/|\S*?[?&]v=)|youtu\.be\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})[^"]*)"[^>]*>(.*?)<\/a>/i',
+            static function (array $matches): string {
+                $videoId = $matches[2];
+                return '<div class="ratio ratio-16x9 my-3"><iframe src="https://www.youtube.com/embed/' . $videoId . '" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>';
+            },
+            $html
+        );
     }
 
     public static function extractMentionUsernames(?string $text): array
