@@ -18,7 +18,7 @@ MYADS combines ad exchange, community, marketplace, directory, forum, and admin 
 
 Core areas include:
 
-- Banner ads, text ads, visit exchange, Smart Ads with **Geo-Targeting** and **A/B Testing**, and **Custom Member Ads**
+- Banner ads, text ads, visit exchange, YouTube Views Exchange, Smart Ads with **Geo-Targeting** and **A/B Testing**, and **Custom Member Ads**
 - Ad analytics with **Hourly Click Heatmaps**
 - Member-to-member custom ad placements with embed codes, deal requests, PTS settlement, and external agreement tracking
 - Community feed with **Multimedia Posts** (Video, Audio, Music, Files, Reels), reactions, comments, reposts, mentions, and messaging

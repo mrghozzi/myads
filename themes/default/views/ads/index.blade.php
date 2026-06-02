@@ -31,6 +31,12 @@
     <a href="{{ route('ads.posts.index') }}" class="ads-nav-item" style="display: flex; align-items: center; gap: 8px; padding: 12px 22px; background: linear-gradient(135deg, #1d4ed8 0%, #38bdf8 100%); color: #fff; border-radius: 12px; font-weight: 700; font-size: 0.9rem; text-decoration: none; box-shadow: 0 4px 15px rgba(29,78,216,0.25); transition: all 0.3s ease;">
         <i class="fa fa-rocket"></i> {{ __('messages.status_promotions_title') }}
     </a>
+    <a href="{{ route('youtube.advertiser.index') }}" class="ads-nav-item" style="display: flex; align-items: center; gap: 8px; padding: 12px 22px; background: linear-gradient(135deg, #e11d48 0%, #be123c 100%); color: #fff; border-radius: 12px; font-weight: 700; font-size: 0.9rem; text-decoration: none; box-shadow: 0 4px 15px rgba(225,29,72,0.25); transition: all 0.3s ease;">
+        <i class="fa-brands fa-youtube"></i> {{ __('messages.yt_advertiser') }} <span style="background: rgba(255,255,255,0.2); padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; margin-left: 4px;">BETA</span>
+    </a>
+    <a href="{{ route('youtube.exchange.index') }}" class="ads-nav-item" style="display: flex; align-items: center; gap: 8px; padding: 12px 22px; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: #fff; border-radius: 12px; font-weight: 700; font-size: 0.9rem; text-decoration: none; box-shadow: 0 4px 15px rgba(239,68,68,0.25); transition: all 0.3s ease;">
+        <i class="fa-brands fa-youtube"></i> {{ __('messages.yt_exchange') }} <span style="background: rgba(255,255,255,0.2); padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; margin-left: 4px;">BETA</span>
+    </a>
 </div>
 
 {{-- Stats Overview Cards --}}

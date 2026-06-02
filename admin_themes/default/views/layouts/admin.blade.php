@@ -124,6 +124,8 @@
                             <ul class="nxl-submenu">
                                 <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.ads') }}">{{ __('messages.ads') }}</a></li>
                                 <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.ads.settings') }}">{{ __('messages.ads_settings_title') }}</a></li>
+                                <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.youtube.index') }}">{{ __('messages.yt_campaigns') }} <span class="badge bg-soft-danger text-danger ms-2" style="font-size:9px; padding:3px 5px">BETA</span></a></li>
+                                <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.youtube.settings') }}">{{ __('messages.yt_settings') }}</a></li>
                                 <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.custom_ads.index') }}">{{ __('messages.custom_ads') }}</a></li>
                                 <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.custom_ads.settings') }}">{{ __('messages.custom_ads_settings') }}</a></li>
                                 <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.ads.posts.index') }}">{{ __('messages.status_promotions_title') }}</a></li>

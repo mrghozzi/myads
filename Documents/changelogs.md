@@ -1,6 +1,14 @@
 # v4.3.4
 > **Feature Release** — Paid Plugin Licensing & Verification Protocol, Store Product License Key Integration, Plugin Auto-Update APIs, Store Discount Codes, Seller Temporary Sales, Developer Architecture Guides, and Full Clips System (Web & Mobile).
 
+### YouTube Views Exchange (Web & Admin)
+* **Feature**: Introduced the **YouTube Views Exchange** system (`/youtube/exchange` and `/youtube/advertiser`), allowing members to promote YouTube videos and earn points by watching others' videos.
+* **Feature**: Advertisers can create campaigns, specifying Video ID, required view duration (in seconds), budget (PTS), and cost per second.
+* **UI/UX**: Designed both the Advertiser and Exchange dashboards using the premium `superdesign` layout (Duralux), consistent with the core platform aesthetic.
+* **Admin**: Created an **Admin YouTube Campaigns** dashboard (`/admin/youtube`) to monitor, manage, and delete active YouTube campaigns.
+* **Admin**: Added an **Admin YouTube Settings** page (`/admin/youtube/settings`) allowing site administrators to define global parameters: minimum view duration and minimum cost per second.
+* **i18n**: Fully localized the entire YouTube Views Exchange system (user-facing and admin interfaces) in both English and Arabic.
+
 ### Embedded Media (YouTube)
 * **Feature**: Added automatic conversion of YouTube links into responsive embedded `<iframe>` video players within text posts in the community feed and single post view.
 * **Architecture**: Enhanced `ContentFormatter` with `embedYouTubeLinks` to intercept YouTube URLs (including standard, `youtu.be`, and `shorts` links) and replace them with Bootstrap 5 16:9 ratio containers.

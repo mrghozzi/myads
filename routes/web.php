@@ -299,6 +299,18 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/ads/posts/{status}/quote', [StatusPromotionController::class, 'quote'])->name('ads.posts.quote');
     Route::post('/ads/posts/{status}/promote', [StatusPromotionController::class, 'store'])->name('ads.posts.store');
 
+    // YouTube Exchange
+    Route::prefix('youtube')->name('youtube.')->group(function () {
+        Route::get('/advertiser', [App\Http\Controllers\YoutubeAdvertiserController::class, 'index'])->name('advertiser.index');
+        Route::post('/advertiser', [App\Http\Controllers\YoutubeAdvertiserController::class, 'store'])->name('advertiser.store');
+        Route::post('/advertiser/{video}/pause', [App\Http\Controllers\YoutubeAdvertiserController::class, 'pause'])->name('advertiser.pause');
+        Route::post('/advertiser/{video}/resume', [App\Http\Controllers\YoutubeAdvertiserController::class, 'resume'])->name('advertiser.resume');
+
+        Route::get('/exchange', [App\Http\Controllers\YoutubeExchangeController::class, 'index'])->name('exchange.index');
+        Route::get('/exchange/watch/{video}', [App\Http\Controllers\YoutubeExchangeController::class, 'watch'])->name('exchange.watch');
+        Route::post('/exchange/verify', [App\Http\Controllers\YoutubeExchangeController::class, 'verify'])->name('exchange.verify');
+    });
+
     // Promote
     Route::get('/ads/promote', [AdsController::class, 'promote'])->name('ads.promote');
     Route::get('/promote', [AdsController::class, 'promote']); // Alias
@@ -545,6 +557,13 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/ads/posts/settings', [AdminStatusPromotionController::class, 'settings'])->name('admin.ads.posts.settings');
     Route::post('/ads/posts/settings', [AdminStatusPromotionController::class, 'updateSettings'])->name('admin.ads.posts.settings.update');
     Route::post('/ads/posts/{promotion}/status', [AdminStatusPromotionController::class, 'updateStatus'])->name('admin.ads.posts.status');
+    
+    // YouTube
+    Route::get('/youtube', [App\Http\Controllers\AdminYoutubeController::class, 'index'])->name('admin.youtube.index');
+    Route::get('/youtube/settings', [App\Http\Controllers\AdminYoutubeController::class, 'settings'])->name('admin.youtube.settings');
+    Route::post('/youtube/settings', [App\Http\Controllers\AdminYoutubeController::class, 'updateSettings'])->name('admin.youtube.settings.update');
+    Route::post('/youtube/{video}/update', [App\Http\Controllers\AdminYoutubeController::class, 'update'])->name('admin.youtube.update');
+    Route::delete('/youtube/{video}', [App\Http\Controllers\AdminYoutubeController::class, 'destroy'])->name('admin.youtube.destroy');
     Route::get('/banners', [AdminController::class, 'banners'])->name('admin.banners');
     Route::get('/banners/{id}/edit', [AdminController::class, 'editBanner'])->name('admin.banners.edit');
     Route::post('/banners/{id}', [AdminController::class, 'updateBanner'])->name('admin.banners.update');

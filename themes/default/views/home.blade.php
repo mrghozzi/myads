@@ -178,6 +178,33 @@
         </div>
       </div>
 
+      <!-- YouTube Exchange Block -->
+      <div id="youtube-ads" style="margin-top: 24px; position: relative; overflow: hidden; border-radius: 24px; padding: 28px; background: linear-gradient(135deg, rgba(60,0,0,0.98) 0%, rgba(185,28,28,0.96) 52%, rgba(239,68,68,0.92) 100%); box-shadow: 0 24px 50px rgba(239, 68, 68, 0.2); color: #fff;">
+        <div style="position: absolute; inset: auto -70px -70px auto; width: 220px; height: 220px; border-radius: 50%; background: rgba(255,255,255,0.08);"></div>
+        <div style="position: absolute; inset: -80px auto auto -60px; width: 180px; height: 180px; border-radius: 50%; background: rgba(255,255,255,0.08);"></div>
+        <div style="position: relative; z-index: 1;">
+          <div style="display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; flex-wrap: wrap;">
+            <div style="max-width: 700px;">
+              <span style="display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 999px; background: rgba(255,255,255,0.12); font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;"><i class="fa-brands fa-youtube"></i> {{ __('messages.yt_exchange') }} <span style="background: #fff; color: #dc2626; padding: 2px 6px; border-radius: 4px; font-size: 9px; margin-left: 4px;">BETA</span></span>
+              <h2 style="margin: 16px 0 10px; font-size: 32px; line-height: 1.15; color: #fff;">{{ __('messages.yt_views_exchange') }}</h2>
+              <p style="margin: 0; max-width: 620px; color: rgba(255,255,255,0.86); font-size: 15px; line-height: 1.8;">{{ __('messages.yt_exchange_desc') }}</p>
+            </div>
+            <div style="display: grid; gap: 12px; min-width: 260px;">
+              <div style="padding: 16px 18px; border-radius: 18px; background: rgba(255,255,255,0.12); backdrop-filter: blur(8px);">
+                <p style="margin: 0 0 6px; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: rgba(255,255,255,0.72);">Available Points</p>
+                <p style="margin: 0; font-size: 28px; font-weight: 800; color: #fff;">{{ number_format((float) $user->pts, 2) }}</p>
+                <p style="margin: 6px 0 0; font-size: 13px; color: rgba(255,255,255,0.82);">Ready to use</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="home-smart-actions" style="margin-top: 24px; display: flex; gap: 12px; flex-wrap: wrap;">
+            <a href="{{ route('youtube.exchange.index') }}" class="button secondary home-smart-action" style="background: rgba(255,255,255,0.15); color: #fff; border: 1px solid rgba(255,255,255,0.2);">&nbsp;{{ __('messages.yt_watch_earn_btn') }}&nbsp;</a>
+            <a href="{{ route('youtube.advertiser.index') }}" class="button primary home-smart-action" style="background: #fff; color: #dc2626;">&nbsp;{{ __('messages.yt_add_campaign') }}&nbsp;</a>
+          </div>
+        </div>
+      </div>
+
       <!-- Visits Decoration -->
       <div class="stats-decoration v2 big secondary" id="Exchange" style="background: url({{ asset('themes/default/assets/img/graph/stat/07.png') }}) repeat-x bottom;">
         <p class="stats-decoration-title">{{ __('messages.exvisit') }}</p>

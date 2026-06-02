@@ -20,7 +20,7 @@
 ## 2. What This Project Does
 
 MYADS is a community platform where website owners:
-1. **Exchange advertising** — banner ads, text/link ads, visit exchange (surf-to-earn), Smart Ads (contextual/native), and Custom Ads (member-to-member placements/deals).
+1. **Exchange advertising** — banner ads, text/link ads, visit exchange (surf-to-earn), YouTube Views Exchange (watch-to-earn), Smart Ads (contextual/native), and Custom Ads (member-to-member placements/deals).
 2. **Socialize** — profiles, follow system, community feed (posts, galleries, link previews, quote reposts, @mentions), private messaging, reactions, comments.
 3. **Forum** — categories with visibility controls, topics, moderation (pin/lock), attachments, moderator roles.
 4. **Marketplace (Store)** — upload/download scripts, plugins, templates (PTS-based pricing). Wiki-style Knowledgebase per product with Markdown support.
@@ -163,6 +163,8 @@ myads/
 | `CustomAdsController` | Member custom ad placements, marketplace requests, private invites, deal lifecycle, code, and analytics views |
 | `CustomAdsServingController` | Public custom ad embed, serving, impression/click tracking, and click redirects |
 | `VisitController` | Visit exchange system |
+| `YoutubeAdvertiserController` | YouTube campaigns and views exchange |
+| `YoutubeExchangeController` | YouTube watch and earn points |
 | `ProfileController` | Profile view/edit, follow, privacy, sessions/revocation, badges, history |
 | `UserBlockController` | User block management, block creation view, and blocked users dashboard |
 | `MessageController` | Private messaging |
@@ -184,6 +186,7 @@ myads/
 | `AdminMailSettingsController` | Database-driven mail configuration admin page (`/admin/settings/mail`) |
 | `AdminStatusPromotionController` | Admin monitoring and settings for promoted community posts |
 | `AdminCustomAdsController` | Admin custom ads dashboard, settings, creative review, and placement/deal moderation |
+| `AdminYoutubeController` | Admin YouTube campaigns and settings management |
 | `AdminUpdatesController` | System update management |
 | `AdminMediaController` | **Media Manager** — monitor, rename, and delete uploaded files |
 | `SitemapController` | Dynamic sitemap generation |
@@ -221,6 +224,8 @@ myads/
 | `CustomAdEvent` | `custom_ad_events` | Independent custom ad impression/click log with visitor key, referrer, country, device, and timestamp |
 | `CustomAdPayout` | `custom_ad_payouts` | Daily PTS payout and refund ledger for custom ad deals |
 | `Visit` | `visit` | Visit exchange entries |
+| `YtVideo` | `yt_videos` | YouTube campaigns |
+| `YtViewsLog` | `yt_views_log` | Log of watched YouTube videos by members |
 | `Directory` | `directory` | Website directory listings |
 | `DirectoryCategory` | `directory_cat` | Directory categories |
 | `Product` | `product` | Store products |
@@ -337,10 +342,14 @@ myads/
 | `/embed/custom.js` | `/embed/custom.js` | Public custom ad loader script |
 | `/ads/custom/serve` | `/ads/custom/serve?placement=cap_x` | Public custom ad serving endpoint |
 | `/ads/custom/click/{token}` | `/ads/custom/click/abc` | Custom ad click tracking and redirect endpoint |
+| `/youtube/exchange` | `/youtube/exchange` | Member YouTube views exchange dashboard |
+| `/youtube/advertiser` | `/youtube/advertiser` | Member YouTube campaigns dashboard |
 | `/admin/ads/posts` | `/admin/ads/posts` | Admin monitoring for all promoted-post campaigns |
 | `/admin/ads/posts/settings` | `/admin/ads/posts/settings` | Admin pricing and delivery settings for promoted posts |
 | `/admin/ads/custom` | `/admin/ads/custom` | Admin custom ads placements/deals dashboard |
 | `/admin/ads/custom/settings` | `/admin/ads/custom/settings` | Admin custom ads service, marketplace, review, and PTS limit settings |
+| `/admin/youtube` | `/admin/youtube` | Admin YouTube campaigns management dashboard |
+| `/admin/youtube/settings` | `/admin/youtube/settings` | Admin YouTube settings for view limits and costs |
 | `/admin/maintenance` | `/admin/maintenance` | Admin maintenance dashboard, toggle, message, and logo settings |
 | `/admin/maintenance/settings` | `/admin/maintenance/settings` | Persists maintenance mode configuration from the admin panel |
 | `/plans` | `/plans` | Public/member paid plans catalog (hidden when billing is disabled) |
