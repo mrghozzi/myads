@@ -154,7 +154,7 @@ class StatusResource extends JsonResource
         }
 
         // First image attachment
-        if (isset($content->attachments) && $content->attachments && $content->attachments->count() > 0) {
+        if (method_exists($content, 'attachments') && $content->attachments && $content->attachments->count() > 0) {
             $firstImage = $content->attachments->first(fn($a) => str_starts_with((string) ($a->mime_type ?? ''), 'image/'));
             if ($firstImage) {
                 return asset($firstImage->file_path);
@@ -188,7 +188,7 @@ class StatusResource extends JsonResource
         if (!$mediaType) return null;
 
         // For multimedia posts, the first attachment is the media file
-        if (in_array($sType, [10, 11, 12, 13, 14]) && isset($content->attachments) && $content->attachments->count() > 0) {
+        if (in_array($sType, [10, 11, 12, 13, 14]) && method_exists($content, 'attachments') && $content->attachments && $content->attachments->count() > 0) {
             $attachment = $content->attachments->first();
             return [
                 'id' => $attachment->id,
@@ -228,7 +228,7 @@ class StatusResource extends JsonResource
         $gallery = [];
 
         // Collect image attachments
-        if (isset($content->attachments) && $content->attachments) {
+        if (method_exists($content, 'attachments') && $content->attachments) {
             foreach ($content->attachments as $attachment) {
                 if (str_starts_with((string) ($attachment->mime_type ?? ''), 'image/')) {
                     $gallery[] = [
@@ -260,7 +260,7 @@ class StatusResource extends JsonResource
     protected function getAttachments(): array
     {
         $content = $this->related_content;
-        if (!$content || !isset($content->attachments) || !$content->attachments) {
+        if (!$content || !method_exists($content, 'attachments') || !$content->attachments) {
             return [];
         }
 
