@@ -143,6 +143,12 @@ Project documentation is available in `Documents/`:
 - [Paid Subscriptions Guide](Documents/PAID_SUBSCRIPTIONS_GUIDE.md)
 - [Changelog](Documents/changelogs.md)
 
+### Mobile App
+
+The official open-source MYADS mobile app is available at: [https://github.com/mrghozzi/myads_app](https://github.com/mrghozzi/myads_app)
+
+To learn how to connect the app with your MYADS website, please read the [Mobile App Guide](Documents/MOBILE_APP_GUIDE.md).
+
 ---
 
 ## Installation

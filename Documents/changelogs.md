@@ -1,5 +1,6 @@
 # v4.3.4
 > **Feature Release** — Paid Plugin Licensing & Verification Protocol, Store Product License Key Integration, Plugin Auto-Update APIs, Store Discount Codes, Seller Temporary Sales, Developer Architecture Guides, and Full Clips System (Web & Mobile).
+> **Mobile App Release** — The official open-source MYADS mobile app is now available at [https://github.com/mrghozzi/myads_app](https://github.com/mrghozzi/myads_app). See the [Mobile App Guide](MOBILE_APP_GUIDE.md) for setup instructions.
 
 ### Custom Ads Dashboard Integration
 * **Feature**: Added a new modern "Custom Ads" block to the main dashboard (`/home`) to promote the monetization feature.
