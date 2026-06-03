@@ -1,3 +1,11 @@
+# v4.3.5
+> **Maintenance & UI Polish Release**
+
+### YouTube Views Exchange
+* **UI/UX**: Redesigned the `/youtube/exchange/watch/{id}` page using the premium `superdesign` layout to fully integrate with the default theme (top menu, sidebar, footer) and improved the player and timer interface.
+
+---
+
 # v4.3.4
 > **Feature Release** — Paid Plugin Licensing & Verification Protocol, Store Product License Key Integration, Plugin Auto-Update APIs, Store Discount Codes, Seller Temporary Sales, Developer Architecture Guides, and Full Clips System (Web & Mobile).
 > **Mobile App Release** — The official open-source MYADS mobile app is now available at [https://github.com/mrghozzi/myads_app](https://github.com/mrghozzi/myads_app). See the [Mobile App Guide](MOBILE_APP_GUIDE.md) for setup instructions.
