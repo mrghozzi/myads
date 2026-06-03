@@ -2524,4 +2524,5 @@ return [
     'custom_ads_dashboard' => 'Dashboard',
     'custom_ads_create' => 'Create Placement',
     'custom_ads_marketplace' => 'Marketplace',
+    'paused' => 'Paused. Resume to continue.',
 ];

@@ -3339,4 +3339,5 @@ return [
     'custom_ads_dashboard' => 'لوحة التحكم',
     'custom_ads_create' => 'إنشاء مساحة إعلانية',
     'custom_ads_marketplace' => 'متجر الإعلانات',
+    'paused' => 'تم الإيقاف المؤقت. استأنف للمتابعة.',
 ];

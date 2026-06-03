@@ -94,7 +94,7 @@
         } else {
             stopTimer();
             if (event.data == YT.PlayerState.PAUSED) {
-                document.getElementById('status-message').innerText = "{{ __('Paused. Resume to continue.') }}";
+                document.getElementById('status-message').innerText = "{{ __('messages.paused') }}";
                 document.getElementById('status-message').style.color = '#ffb800';
             }
         }
