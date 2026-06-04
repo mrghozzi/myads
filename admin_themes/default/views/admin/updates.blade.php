@@ -724,8 +724,19 @@
     }
 
     async function cancelUpdateSession() {
-        if (!currentUpdateSession || !currentUpdateRoutes || !currentUpdateSession.can_cancel) {
+        if (!currentUpdateSession || !currentUpdateRoutes) {
             return;
+        }
+
+        if (!currentUpdateSession.can_cancel) {
+            showFlash('warning', '<i class="feather-alert-triangle me-2"></i>' + escapeHtml('{{ __("messages.update_session_cancel_forbidden") }}'));
+            return;
+        }
+
+        const cancelBtn = document.getElementById('update-cancel-btn');
+        if (cancelBtn) {
+            cancelBtn.disabled = true;
+            cancelBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status"></span>' + escapeHtml('{{ __("messages.update_cancel") }}');
         }
 
         try {
@@ -748,6 +759,11 @@
             showFlash('info', '<i class="feather-x-circle me-2"></i>' + escapeHtml(data.message || updateConfig.labels.cancelled));
         } catch (error) {
             showFlash('danger', '<i class="feather-alert-circle me-2"></i>' + escapeHtml(error.message || updateConfig.labels.connectionError));
+        } finally {
+            if (cancelBtn) {
+                cancelBtn.disabled = false;
+                cancelBtn.innerHTML = '<i class="feather-x-circle me-1"></i>' + escapeHtml('{{ __("messages.update_cancel") }}');
+            }
         }
     }
 
@@ -815,7 +831,12 @@
         }
 
         if (retryBtn) retryBtn.style.display = session.can_retry ? 'inline-flex' : 'none';
-        if (cancelBtn) cancelBtn.style.display = session.can_cancel ? 'inline-flex' : 'none';
+        if (cancelBtn) {
+            const isTerminal = ['completed', 'cancelled'].includes(session.status);
+            cancelBtn.style.display = isTerminal ? 'none' : 'inline-flex';
+            cancelBtn.disabled = !session.can_cancel;
+            cancelBtn.title = session.can_cancel ? '' : '{{ __("messages.update_session_cancel_forbidden") }}';
+        }
     }
 
     function setUpdateControlsLocked(locked) {

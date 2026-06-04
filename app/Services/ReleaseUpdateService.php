@@ -704,13 +704,13 @@ class ReleaseUpdateService
             $definition = self::STAGES[$key] ?? ['label' => $key, 'icon' => 'circle'];
 
             return array_merge($stage, [
-                'label' => __($definition['label']),
+                'label' => __('messages.' . $definition['label']),
                 'icon' => $definition['icon'],
             ]);
         }, $session['stages'] ?? []);
 
         $session['stages'] = $stages;
-        $session['stage_label'] = __(self::STAGES[$currentStage]['label'] ?? $currentStage);
+        $session['stage_label'] = __('messages.' . (self::STAGES[$currentStage]['label'] ?? $currentStage));
         $session['percent'] = $this->overallPercent($session);
         $session['is_stale'] = $isStale;
         $session['can_retry'] = ($session['status'] ?? '') === 'failed' || $isStale;
