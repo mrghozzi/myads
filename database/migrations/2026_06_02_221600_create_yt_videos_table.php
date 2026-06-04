@@ -11,10 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        \Illuminate\Support\Facades\Schema::disableForeignKeyConstraints();
-        \Illuminate\Support\Facades\Schema::dropIfExists('yt_views_log');
-        \Illuminate\Support\Facades\Schema::dropIfExists('yt_videos');
-        \Illuminate\Support\Facades\Schema::enableForeignKeyConstraints();
+        if (Schema::hasTable('yt_videos')) {
+            return;
+        }
 
         Schema::create('yt_videos', function (Blueprint $table) {
             $table->id();

@@ -19,6 +19,9 @@
 ### Routes
 * **New**: Added `POST /visits/verify` route for the new token-based visit verification system.
 
+### Updater & Migrations
+* **Fix**: **YouTube Migrations Blocking Update** — The `create_yt_videos_table` and `create_yt_views_log_table` migrations used `Schema::dropIfExists()` inside `up()` to drop-then-recreate tables, which the `UpdateSafetyService` preflight correctly flagged as destructive, blocking upgrades from v4.3.3 → v4.3.4+. Replaced with safe `Schema::hasTable()` guards that skip creation when the table already exists — safe for both fresh installs and upgrades.
+
 # v4.3.4
 > **Feature Release** — Paid Plugin Licensing & Verification Protocol, Store Product License Key Integration, Plugin Auto-Update APIs, Store Discount Codes, Seller Temporary Sales, Developer Architecture Guides, and Full Clips System (Web & Mobile).
 > **Mobile App Release** — The official open-source MYADS mobile app is now available at [https://github.com/mrghozzi/myads_app](https://github.com/mrghozzi/myads_app). See the [Mobile App Guide](MOBILE_APP_GUIDE.md) for setup instructions.

@@ -999,4 +999,4 @@ If in doubt, update it. An outdated `Agents.md` causes future agents to make wro
 
 ---
 
-*Last updated: 2026-05-27 — MYADS v4.3.4 (Paid plugin licensing, domain verification, store integration, mobile messaging fix)*
+*Last updated: 2026-06-04 — MYADS v4.3.5 (Security hardening, YouTube Views Exchange UI, migration safety fix)*
