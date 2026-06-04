@@ -11,6 +11,7 @@ use App\Models\Visit;
 use App\Models\SmartAd;
 use App\Models\Option;
 use App\Models\Setting;
+use App\Models\User;
 use App\Support\SmartAdsSettings;
 
 class HomeController extends Controller
