@@ -1,4 +1,4 @@
-# Agents.md — MYADS v4.3.4
+# Agents.md — MYADS v4.3.5
 
 > **Purpose:** This file gives AI coding agents a fast, comprehensive understanding of the MYADS project — its architecture, conventions, key files, and rules — so they can work effectively from a fresh chat context.
 
@@ -6,7 +6,7 @@
 
 ## 1. Project Identity
 
-- **Name:** MYADS v4.3.4
+- **Name:** MYADS v4.3.5
 - **Type:** Social network + ad exchange platform for website owners
 - **Framework:** Laravel 12 (PHP 8.2+)
 - **Database:** MySQL 5.7+ / MariaDB 10.3+
@@ -144,7 +144,7 @@ myads/
 |-----------|---------|
 | `AuthController` | Login, register, logout |
 | `SocialAuthController` | Google/Facebook OAuth |
-| `ForgotPasswordController` / `ResetPasswordController` | Password reset flow |
+| `ForgotPasswordController` | Password reset flow |
 | `HomeController` | Dashboard (`/home`), point conversion |
 | `PortalController` | Community feed (`/portal`), smart feed algorithm |
 | `StatusController` | Create posts (text, link, gallery, repost, multimedia: video, audio, file, music, clips), image upload, link preview |
@@ -162,7 +162,7 @@ myads/
 | `AdsServingController` | Public ad serving endpoints (`bn.php`, `link.php`, `smart.php`, embed scripts) |
 | `CustomAdsController` | Member custom ad placements, marketplace requests, private invites, deal lifecycle, code, and analytics views |
 | `CustomAdsServingController` | Public custom ad embed, serving, impression/click tracking, and click redirects |
-| `VisitController` | Visit exchange system |
+| `VisitController` | Visit exchange system (token-based verification, anti-fraud) |
 | `YoutubeAdvertiserController` | YouTube campaigns and views exchange |
 | `YoutubeExchangeController` | YouTube watch and earn points |
 | `ProfileController` | Profile view/edit, follow, privacy, sessions/revocation, badges, history |
@@ -371,6 +371,7 @@ myads/
 | `/api/marketplace/extensions/plugins` | `/api/marketplace/extensions/plugins` | Marketplace plugin feed & auto-update check endpoint |
 | `/api/marketplace/extensions/themes` | `/api/marketplace/extensions/themes` | Marketplace themes discovery feed endpoint |
 | `/api/marketplace/extensions/download` | `/api/marketplace/extensions/download` | Secure plugin and extension zip package download endpoint |
+| `/visits/verify` | `POST /visits/verify` | Token-based visit verification endpoint (anti-fraud) |
 | `/share` | `/share?text={content}` | External share endpoint (requires auth) |
 | `/developer` | `/developer` | Public developer documentation for Share API |
 | `/refund` | `/refund` | Refund policy legal page |
@@ -379,7 +380,7 @@ myads/
 - **`auth`** — Standard Laravel auth
 - **`admin`** — `AdminMiddleware` (checks `AdminAccessService`)
 - **Global middleware** — `SecurityHeaders`, `SetLocale`, `CheckForMaintenanceMode`, `UpdateUserOnline`, `CheckSystemVersion`, `InstallerGuard`, `TrackSeoMetrics`
-- **API rate limiting** — Public auth endpoints use `throttle` middleware: `/api/login` (5/min), `/api/register` (3/min), `/api/license/verify` (10/min)
+- **API rate limiting** — Public auth endpoints use `throttle` middleware: `/api/login` (5/min), `/api/register` (3/min), `/api/license/verify` (10/min), Developer API v1 (30/min)
 
 ### Orders Workflow Routes
 - Member offer CRUD uses `/orders/{order}/offers` and `/orders/offers/{offer}`.
@@ -477,9 +478,14 @@ admin/mail_settings.blade.php → Database-driven mail configuration form
 - **CAPTCHA:** On registration
 - **CSRF:** Laravel middleware on all forms (installer routes excluded). Billing webhooks are isolated exceptions via `billing/webhook/*`.
 - **API Auth:** Sanctum bearer tokens + `X-API-KEY` header (query parameter acceptance removed for security)
-- **API Rate Limiting:** Public auth endpoints throttled per-IP
-- **Security Headers:** `SecurityHeaders` middleware adds `X-Content-Type-Options`, `X-Frame-Options`, `X-XSS-Protection`, `Referrer-Policy`, and `Permissions-Policy` to all responses
+- **API Rate Limiting:** Public auth endpoints throttled per-IP; Developer API v1 routes throttled at 30/min
+- **Security Headers:** `SecurityHeaders` middleware adds `X-Content-Type-Options`, `X-Frame-Options`, `X-XSS-Protection`, `Referrer-Policy`, `Permissions-Policy`, `Strict-Transport-Security` (HTTPS only), and `Cross-Origin-Opener-Policy` to all responses
 - **Upload Security:** File extension whitelist + MIME blocklist in `StatusController`, dynamic file size and type enforcement in `StatusPostService` driven by database `file_upload_settings`, and `.htaccess` in `upload/` blocks PHP execution
+- **Ad Fraud Prevention:** IP-based rate limiting on banner/link impression serving (10s cooldown) and click tracking (5s cooldown) to prevent automated point farming; URL scheme validation on ad redirects to block open redirect attacks
+- **Point Economy Safety:** Point conversion uses `DB::transaction()` with `lockForUpdate()` to prevent double-spend race conditions; conversion type validated against whitelist
+- **Reaction Validation:** Reaction names validated against a strict whitelist (`like, love, haha, wow, sad, angry, care`) before being used in HTML output
+- **Installer Guard:** `/install/update` route requires Super Admin authentication after initial installation to prevent unauthorized migration execution
+- **Visit Exchange Anti-Fraud:** Token-based verification model replaces instant-reward surfing; encrypted tokens enforce minimum view time, one-time use, and per-user rate limiting
 
 ---
 

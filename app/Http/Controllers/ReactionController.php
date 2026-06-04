@@ -43,6 +43,13 @@ class ReactionController extends Controller
             return response()->json(['error' => 'Missing parameters'], 400);
         }
 
+        // SECURITY: Whitelist allowed reaction names to prevent XSS via injected reaction values.
+        // The reaction name is used in HTML output (img src/alt attributes), so it must be strictly validated.
+        $allowedReactions = ['like', 'love', 'haha', 'wow', 'sad', 'angry', 'care'];
+        if (!in_array($reaction, $allowedReactions, true)) {
+            return response()->json(['error' => 'Invalid reaction type'], 400);
+        }
+
         // Determine DB Type ID (2 for forum, 22 for directory, 3 for store)
         // Comment types: 4 (forum), 44 (directory), 444 (store)
         $dbType = 0;

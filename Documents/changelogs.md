@@ -1,10 +1,23 @@
 # v4.3.5
-> **Maintenance & UI Polish Release**
+> **Security Hardening Release** — 10 security vulnerability patches across Points Economy, Ad Exchange, Reaction System, Installer, Error Disclosure, Developer API, and HTTP Headers.
 
 ### YouTube Views Exchange
 * **UI/UX**: Redesigned the `/youtube/exchange/watch/{id}` page using the premium `superdesign` layout to fully integrate with the default theme (top menu, sidebar, footer) and improved the player and timer interface.
 
----
+### Security Hardening
+* **Critical Fix**: **Visit Exchange Points Fraud** — Rewrote the surf system from immediate point-on-load to a **token-based verification model** (matching the YouTube Exchange pattern). Points are now only awarded after the user calls a new `POST /visits/verify` endpoint with an encrypted token that encodes session ID, user, and timestamp. The verify endpoint enforces: minimum viewing duration, one-time token replay prevention via cache, and per-user rate limiting (1 surf per 8 seconds).
+* **Critical Fix**: **Ad Impression Fraud** — Added **IP-based rate limiting** (10s cooldown per IP+publisher) to `bannerScript()` and `linkScript()` public serving endpoints. When rate-limited, ads are still served (no broken embeds) but no PTS/credits are awarded, preventing automated bot farming.
+* **Critical Fix**: **Ad Click Open Redirect** — The `redirect()` method now validates that stored ad URLs use `http://` or `https://` schemes only via a new `safeRedirect()` helper, preventing phishing and `javascript:` protocol injection attacks. Additionally, publisher IDs are verified against the database and IP-based click rate limiting (5s cooldown) blocks reward farming.
+* **Critical Fix**: **Point Conversion Race Condition** — Wrapped `convertPoints()` in `DB::transaction()` with `lockForUpdate()` to prevent double-spend attacks via concurrent requests. Added strict `$type` whitelist validation (link, banners, exchv, smartads) — previously an unknown type would deduct PTS without granting any credits. Applied integer casting to prevent negative-number manipulation.
+* **Critical Fix**: **Reaction XSS** — The `$reaction` parameter in `ReactionController` was injected directly into HTML `<img>` tag attributes (src and alt) without sanitization. Added a strict whitelist of allowed reaction names (`like, love, haha, wow, sad, angry, care`) — any unrecognized value is now rejected with HTTP 400.
+* **Critical Fix**: **Installer Update Route Bypass** — The `/install/update` route was accessible to anonymous users without any authentication after installation. Now requires **Super Admin authentication** when the installation marker file exists, preventing unauthorized database migrations and seeders.
+* **Medium Fix**: **Comment Error Disclosure** — Replaced raw `$e->getMessage()` in `CommentController` catch block with a generic error response. Internal exception details (table names, SQL errors) are now only written to server logs, never exposed to the client.
+* **Medium Fix**: **Developer API Rate Limiting** — Added `throttle:30,1` middleware (30 requests per minute) to all Developer Platform API v1 routes (`/api/developer/v1/*`) to prevent spam follows, message flooding, and data scraping.
+* **Low Fix**: **HSTS Header** — Added `Strict-Transport-Security: max-age=31536000; includeSubDomains` to `SecurityHeaders` middleware when the connection is HTTPS, preventing SSL stripping attacks.
+* **Low Fix**: **Cross-Origin Opener Policy** — Added `Cross-Origin-Opener-Policy: same-origin` header to mitigate Spectre-class side-channel attacks via cross-origin window references.
+
+### Routes
+* **New**: Added `POST /visits/verify` route for the new token-based visit verification system.
 
 # v4.3.4
 > **Feature Release** — Paid Plugin Licensing & Verification Protocol, Store Product License Key Integration, Plugin Auto-Update APIs, Store Discount Codes, Seller Temporary Sales, Developer Architecture Guides, and Full Clips System (Web & Mobile).

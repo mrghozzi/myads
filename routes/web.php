@@ -338,6 +338,7 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/visits/{id}', [VisitController::class, 'update'])->name('visits.update');
     Route::delete('/visits/{id}', [VisitController::class, 'destroy'])->name('visits.destroy');
     Route::get('/visits/surf', [VisitController::class, 'surf'])->name('visits.surf');
+    Route::post('/visits/verify', [VisitController::class, 'verify'])->name('visits.verify');
 });
 
 // Order Request Routes

@@ -123,7 +123,8 @@ Route::middleware(['api.key', 'auth:sanctum'])->group(function () {
 });
 
 // Developer Platform API v1
-Route::prefix('developer/v1')->group(function () {
+// SECURITY: Rate limited to prevent spam (follows, messages, data scraping)
+Route::prefix('developer/v1')->middleware('throttle:30,1')->group(function () {
     Route::get('/me', [App\Http\Controllers\DeveloperApiController::class, 'me'])->name('api.developer.me');
     Route::get('/me/profile', [App\Http\Controllers\DeveloperApiController::class, 'myProfile'])->name('api.developer.me.profile');
     

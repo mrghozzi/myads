@@ -12,6 +12,7 @@ use App\Services\SecurityPolicyService;
 use App\Support\BannerSizeCatalog;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
@@ -441,13 +442,26 @@ class AdsController extends Controller
             return response('// User not found', 200)->header('Content-Type', 'application/javascript');
         }
 
-        // Logic to pick a banner
-        // 1. Update Publisher Points
+        // SECURITY: IP-based rate limiting to prevent impression fraud (1 per 10s per IP+publisher)
+        $rateLimitKey = 'ad_banner_' . md5($request->ip() . '_' . $user_id);
+        if (Cache::has($rateLimitKey)) {
+            // Still serve ad but don't award points (prevents point farming)
+            $banner = Banner::where('statu', 1)->where('px', $px)->inRandomOrder()->first();
+            if ($banner) {
+                $html = "<a href='" . route('ads.redirect', ['ads' => $banner->id, 'vu' => $user_id]) . "' target='_blank'><img src='" . e($banner->img) . "' width='" . $this->getWidth($px) . "' height='" . $this->getHeight($px) . "' border='0'></a>";
+                return response('document.write("' . addslashes($html) . '");', 200)->header('Content-Type', 'application/javascript');
+            }
+            $defaultImg = theme_asset('img/banner/banner_ads.png');
+            $html = "<a href='" . url('/') . "?ref=" . (int) $user_id . "' target='_blank'><img src='" . $defaultImg . "' width='" . $this->getWidth($px) . "' height='" . $this->getHeight($px) . "' border='0'></a>";
+            return response('document.write("' . addslashes($html) . '");', 200)->header('Content-Type', 'application/javascript');
+        }
+        Cache::put($rateLimitKey, true, 10);
+
+        // Update Publisher Points
         $user->increment('pts', 1);
         $user->increment('nvu', 0.5);
 
-        // 2. Select a Banner
-        // Logic: Banner from user who has nvu >= 1 and NOT same user
+        // Select a Banner
         $banner = Banner::where('statu', 1)
             ->where('px', $px)
             ->whereHas('user', function ($query) use ($user_id) {
@@ -468,12 +482,12 @@ class AdsController extends Controller
             $this->logState($user_id, $banner->id, 'banner', $request);
 
             // Return JS to display banner
-            $html = "<a href='" . route('ads.redirect', ['ads' => $banner->id, 'vu' => $user_id]) . "' target='_blank'><img src='" . $banner->img . "' width='" . $this->getWidth($px) . "' height='" . $this->getHeight($px) . "' border='0'></a>";
+            $html = "<a href='" . route('ads.redirect', ['ads' => $banner->id, 'vu' => $user_id]) . "' target='_blank'><img src='" . e($banner->img) . "' width='" . $this->getWidth($px) . "' height='" . $this->getHeight($px) . "' border='0'></a>";
             return response('document.write("' . addslashes($html) . '");', 200)->header('Content-Type', 'application/javascript');
         } else {
             // Default Banner
             $defaultImg = theme_asset('img/banner/banner_ads.png');
-            $html = "<a href='" . url('/') . "?ref=" . $user_id . "' target='_blank'><img src='" . $defaultImg . "' width='" . $this->getWidth($px) . "' height='" . $this->getHeight($px) . "' border='0'></a>";
+            $html = "<a href='" . url('/') . "?ref=" . (int) $user_id . "' target='_blank'><img src='" . $defaultImg . "' width='" . $this->getWidth($px) . "' height='" . $this->getHeight($px) . "' border='0'></a>";
             return response('document.write("' . addslashes($html) . '");', 200)->header('Content-Type', 'application/javascript');
         }
     }
@@ -492,12 +506,24 @@ class AdsController extends Controller
             return response('// User not found', 200)->header('Content-Type', 'application/javascript');
         }
 
-        // 1. Update Publisher Points (0.5 pts for links usually less)
+        // SECURITY: IP-based rate limiting to prevent impression fraud (1 per 10s per IP+publisher)
+        $rateLimitKey = 'ad_link_' . md5($request->ip() . '_' . $user_id);
+        if (Cache::has($rateLimitKey)) {
+            // Still serve ad but don't award points
+            $link = Link::where('statu', 1)->inRandomOrder()->first();
+            if ($link) {
+                $html = "<div class='myads-link'><a href='" . route('ads.redirect', ['ads' => $link->id, 'vu' => $user_id, 'type' => 'link']) . "' target='_blank' style='font-weight:bold;'>" . addslashes(e($link->name)) . "</a><br><span style='font-size:small;'>" . addslashes(e(Str::limit($link->txt, 100))) . "</span></div>";
+                return response('document.write("' . addslashes($html) . '");', 200)->header('Content-Type', 'application/javascript');
+            }
+            return response('// No ads available', 200)->header('Content-Type', 'application/javascript');
+        }
+        Cache::put($rateLimitKey, true, 10);
+
+        // Update Publisher Points
         $user->increment('pts', 0.5);
         $user->increment('nlink', 0.5);
 
-        // 2. Select a Link
-        // Logic: Link from user who has nlink >= 1 and NOT same user
+        // Select a Link
         $link = Link::where('statu', 1)
             ->whereHas('user', function ($query) use ($user_id) {
                 $query->where('nlink', '>=', 1)->where('id', '!=', $user_id);
@@ -511,18 +537,17 @@ class AdsController extends Controller
             if ($advertiser) {
                 $advertiser->decrement('nlink', 1);
             }
-            $link->increment('clik'); // Increment view/click count (links often count views as well or just display)
+            $link->increment('clik');
 
             // Log State
             $this->logState($user_id, $link->id, 'link', $request);
 
             // Return JS to display link
-            // Assuming link.php displays: <a href="...">Title</a><br>Description
-            $html = "<div class='myads-link'><a href='" . route('ads.redirect', ['ads' => $link->id, 'vu' => $user_id, 'type' => 'link']) . "' target='_blank' style='font-weight:bold;'>" . addslashes($link->name) . "</a><br><span style='font-size:small;'>" . addslashes(Str::limit($link->txt, 100)) . "</span></div>";
+            $html = "<div class='myads-link'><a href='" . route('ads.redirect', ['ads' => $link->id, 'vu' => $user_id, 'type' => 'link']) . "' target='_blank' style='font-weight:bold;'>" . addslashes(e($link->name)) . "</a><br><span style='font-size:small;'>" . addslashes(e(Str::limit($link->txt, 100))) . "</span></div>";
             return response('document.write("' . addslashes($html) . '");', 200)->header('Content-Type', 'application/javascript');
         } else {
             // Default Link
-            $html = "<div class='myads-link'><a href='" . url('/') . "?ref=" . $user_id . "' target='_blank' style='font-weight:bold;'>" . __('advertise_here') . "</a></div>";
+            $html = "<div class='myads-link'><a href='" . url('/') . "?ref=" . (int) $user_id . "' target='_blank' style='font-weight:bold;'>" . __('advertise_here') . "</a></div>";
             return response('document.write("' . addslashes($html) . '");', 200)->header('Content-Type', 'application/javascript');
         }
     }
@@ -548,41 +573,80 @@ class AdsController extends Controller
             $bannerId = $request->input('ads');
             $publisherId = $request->input('vu');
 
+            // SECURITY: Validate publisher ID exists
+            if (!is_numeric($publisherId) || !User::where('id', (int) $publisherId)->exists()) {
+                return redirect('/');
+            }
+
+            // SECURITY: IP-based rate limiting to prevent click fraud (1 per 5s per IP)
+            $clickKey = 'ad_click_' . md5($request->ip() . '_banner_' . $bannerId);
+            $skipReward = Cache::has($clickKey);
+            Cache::put($clickKey, true, 5);
+
             $banner = Banner::find($bannerId);
             if ($banner) {
                 $banner->increment('clik');
-                
-                // Reward Publisher
-                User::where('id', $publisherId)->increment('pts', 2);
+
+                // Reward Publisher only if not rate limited
+                if (!$skipReward) {
+                    User::where('id', (int) $publisherId)->increment('pts', 2);
+                }
 
                 // Log Click
-                $this->logState($publisherId, $bannerId, 'vu', $request); // 'vu' in old code means click on banner? show.php lines 38-48 log 'vu'
+                $this->logState($publisherId, $bannerId, 'vu', $request);
 
-                return redirect($banner->url);
+                // SECURITY: Validate URL scheme to prevent Open Redirect
+                return $this->safeRedirect($banner->url);
             }
         }
         
         // Link Click
         if ($request->has('link') && $request->has('clik')) {
             $linkId = $request->input('link');
-            $publisherId = $request->input('clik'); // 'clik' param is user id in old code
+            $publisherId = $request->input('clik');
+
+            // SECURITY: Validate publisher ID exists
+            if (!is_numeric($publisherId) || !User::where('id', (int) $publisherId)->exists()) {
+                return redirect('/');
+            }
+
+            // SECURITY: IP-based rate limiting to prevent click fraud
+            $clickKey = 'ad_click_' . md5($request->ip() . '_link_' . $linkId);
+            $skipReward = Cache::has($clickKey);
+            Cache::put($clickKey, true, 5);
 
             $link = Link::find($linkId);
             if ($link) {
                 $link->increment('clik');
 
-                // Reward Publisher
-                User::where('id', $publisherId)->increment('pts', 2);
-                User::where('id', $publisherId)->increment('nlink', 0.5);
+                // Reward Publisher only if not rate limited
+                if (!$skipReward) {
+                    User::where('id', (int) $publisherId)->increment('pts', 2);
+                    User::where('id', (int) $publisherId)->increment('nlink', 0.5);
+                }
 
                 // Log Click
                 $this->logState($publisherId, $linkId, 'clik', $request);
 
-                return redirect($link->url);
+                // SECURITY: Validate URL scheme to prevent Open Redirect
+                return $this->safeRedirect($link->url);
             }
         }
 
         return redirect('/');
+    }
+
+    /**
+     * SECURITY: Only redirect to http:// or https:// URLs to prevent open redirect attacks.
+     */
+    private function safeRedirect(string $url)
+    {
+        $parsed = parse_url($url);
+        if (!$parsed || !isset($parsed['scheme']) || !in_array(strtolower($parsed['scheme']), ['http', 'https'], true)) {
+            return redirect('/');
+        }
+
+        return redirect($url);
     }
 
     private function logState($sid, $pid, $type, $request)

@@ -310,7 +310,9 @@ class CommentController extends Controller
                 'exception' => $e,
                 'request' => $request->all()
             ]);
-            return response()->json(['error' => $e->getMessage()], 500);
+            // SECURITY: Never expose internal error details to the client.
+            // The full error is already logged above for debugging.
+            return response()->json(['error' => __('messages.error_occurred')], 500);
         }
     }
 

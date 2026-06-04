@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use App\Models\Visit;
 use App\Models\User;
@@ -103,17 +105,22 @@ class VisitController extends Controller
     }
 
     // Surfing: The Auto-Surf Page
+    // SECURITY: Points are NO LONGER granted on page load. Instead, a secure token
+    // is generated and passed to the view. Points are only granted after the user
+    // calls verify() with the token, which checks that the required viewing
+    // duration has actually elapsed.
     public function surf(Request $request)
     {
         $user = Auth::user();
 
-        // 1. Credit Viewer Immediately (Legacy Logic: "Pay on Load")
-        // UPDATE users SET pts=pts+5, vu=vu+.5 WHERE id=:id
-        $user->increment('pts', 5);
-        $user->increment('vu', 0.5);
+        // Rate limit: prevent rapid-fire surf requests (1 per 8 seconds per user)
+        $rateLimitKey = 'visit_surf_' . $user->id;
+        if (Cache::has($rateLimitKey)) {
+            return view('theme::visits.no_sites');
+        }
+        Cache::put($rateLimitKey, true, 8);
 
-        // 2. Select Next Site
-        // Logic: Site from user who has vu >= 1 and NOT same user
+        // Select Next Site
         $site = Visit::where('statu', 1)
             ->where('uid', '!=', $user->id)
             ->whereHas('user', function ($query) {
@@ -123,16 +130,10 @@ class VisitController extends Controller
             ->first();
 
         if (!$site) {
-             // Legacy behavior: Reload after 10s even if no sites
-             // We can use the same surf view but with a placeholder or just the no_sites view with auto-reload
             return view('theme::visits.no_sites');
         }
 
-        // 3. Credit Site Stats & Debit Site Owner (Legacy Logic)
-        $site->increment('vu');
-
-        // Deduct points from owner based on duration
-        // Legacy mapping: 1->1, 2->2, 3->5, 4->10
+        // Determine duration for this site
         $cost = 1;
         $duration = 10;
         switch ($site->tims) {
@@ -142,13 +143,86 @@ class VisitController extends Controller
             case 4: $cost = 10; $duration = 60; break;
         }
 
-        // UPDATE users SET vu=vu-:ivu WHERE id=:id
-        DB::table('users')->where('id', $site->uid)->decrement('vu', $cost);
+        // Generate a secure token to validate the view later
+        $timestamp = now()->timestamp;
+        $token = Crypt::encryptString(json_encode([
+            'site_id' => $site->id,
+            'user_id' => $user->id,
+            'cost' => $cost,
+            'duration' => $duration,
+            'timestamp' => $timestamp,
+        ]));
 
-        app(\App\Services\GamificationService::class)->recordEvent($user->id, 'visit_exchange_completed');
+        // Show View with token (points granted only after verify)
+        return view('theme::visits.surf', compact('site', 'duration', 'token'));
+    }
 
-        // 4. Show View
-        return view('theme::visits.surf', compact('site', 'duration'));
+    /**
+     * Verify a surf session and award points.
+     * Called via AJAX after the required viewing duration has elapsed.
+     */
+    public function verify(Request $request)
+    {
+        $request->validate([
+            'token' => 'required|string',
+        ]);
 
+        try {
+            $payload = json_decode(Crypt::decryptString($request->token), true);
+
+            if (!$payload || !isset($payload['site_id'], $payload['user_id'], $payload['timestamp'], $payload['cost'], $payload['duration'])) {
+                return response()->json(['success' => false, 'message' => __('Invalid token.')], 400);
+            }
+
+            // Verify user matches
+            if ($payload['user_id'] !== Auth::id()) {
+                return response()->json(['success' => false, 'message' => __('Token user mismatch.')], 403);
+            }
+
+            // Verify time elapsed (allow 3 seconds grace)
+            $timeElapsed = now()->timestamp - $payload['timestamp'];
+            if ($timeElapsed < ($payload['duration'] - 3)) {
+                return response()->json(['success' => false, 'message' => __('View duration not met.')], 400);
+            }
+
+            // Prevent token replay: each token can only be used once
+            $tokenHash = hash('sha256', $request->token);
+            $replayKey = 'visit_token_' . $tokenHash;
+            if (Cache::has($replayKey)) {
+                return response()->json(['success' => false, 'message' => __('Token already used.')], 400);
+            }
+            // Mark token as used for 2x the duration window
+            Cache::put($replayKey, true, max(120, $payload['duration'] * 2));
+
+            $site = Visit::find($payload['site_id']);
+            if (!$site || $site->statu != 1) {
+                return response()->json(['success' => false, 'message' => __('Site unavailable.')], 404);
+            }
+
+            $user = Auth::user();
+
+            DB::beginTransaction();
+
+            // Credit viewer
+            $user->increment('pts', 5);
+            $user->increment('vu', 0.5);
+
+            // Credit site stats & debit site owner
+            $site->increment('vu');
+            DB::table('users')->where('id', $site->uid)->decrement('vu', $payload['cost']);
+
+            DB::commit();
+
+            app(\App\Services\GamificationService::class)->recordEvent($user->id, 'visit_exchange_completed');
+
+            return response()->json(['success' => true, 'message' => __('View verified. Points awarded!')]);
+
+        } catch (\Illuminate\Contracts\Encryption\DecryptException $e) {
+            return response()->json(['success' => false, 'message' => __('Invalid or tampered token.')], 400);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Visit Verify Error: ' . $e->getMessage());
+            return response()->json(['success' => false, 'message' => __('An error occurred.')], 500);
+        }
     }
 }

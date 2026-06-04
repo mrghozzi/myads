@@ -30,6 +30,7 @@ Public API endpoints are rate-limited per IP to prevent brute-force attacks:
 | `POST /api/login` | 5 requests / minute |
 | `POST /api/register` | 3 requests / minute |
 | `POST /api/license/verify` | 10 requests / minute |
+| `GET/POST /api/developer/v1/*` | 30 requests / minute |
 
 When rate-limited, the server responds with HTTP `429 Too Many Requests`.
 
@@ -99,7 +100,8 @@ Content-Type: application/json
 
 ## 4. Developer API v1
 
-All Developer API requests require an `Authorization: Bearer {access_token}` header.
+All Developer API requests require an `Authorization: Bearer {access_token}` header.  
+**Rate Limit:** 30 requests per minute per IP.
 
 ### User Endpoints (Scope: `user.*`)
 - `GET /api/developer/v1/me`: Returns basic identity (ID, Username, Email).  

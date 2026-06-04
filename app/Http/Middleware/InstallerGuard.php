@@ -18,12 +18,24 @@ class InstallerGuard
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // Always allow update route (for upgrades from older versions)
-        if ($request->is('install/update') || $request->is('install/update/*')) {
-            return $next($request);
-        }
-
         $installedFile = storage_path('installed');
+
+        // Always allow update route ONLY if not fully installed yet.
+        // Once installed, require admin authentication.
+        if ($request->is('install/update') || $request->is('install/update/*')) {
+            // If not installed at all, allow access (first-time setup)
+            if (!file_exists($installedFile)) {
+                return $next($request);
+            }
+
+            // SECURITY: After installation, require admin authentication for update routes
+            // to prevent unauthorized users from running migrations/seeders.
+            if (\Illuminate\Support\Facades\Auth::check() && \Illuminate\Support\Facades\Auth::user()->isSuperAdmin()) {
+                return $next($request);
+            }
+
+            return redirect('/')->with('error', __('access_denied'));
+        }
 
         // If installed marker doesn't exist → allow all installer routes
         if (!file_exists($installedFile)) {
