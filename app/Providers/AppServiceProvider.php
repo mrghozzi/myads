@@ -116,7 +116,7 @@ class AppServiceProvider extends ServiceProvider
 
         View::composer('admin::layouts.admin', \App\Http\View\Composers\AdminNotificationComposer::class);
 
-        View::composer('theme::layouts.master', function ($view) {
+        View::composer(['theme::layouts.master', 'theme::layouts.oauth'], function ($view) {
             $view->with('seo', app(SeoManager::class)->resolve(request()));
         });
     }

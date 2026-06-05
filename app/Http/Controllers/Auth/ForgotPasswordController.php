@@ -21,6 +21,17 @@ class ForgotPasswordController extends Controller
 
     public function showLinkRequestForm()
     {
+        $this->seo([
+            'scope_key' => 'password_reset_page',
+            'resource_title' => __('messages.forgot_password'),
+            'description' => __('messages.seo_password_reset_description', ['default' => '']),
+            'indexable' => false,
+            'breadcrumbs' => [
+                ['name' => __('messages.home'), 'url' => url('/')],
+                ['name' => __('messages.forgot_password'), 'url' => route('password.request')],
+            ],
+        ]);
+
         return view('theme::auth.passwords.email');
     }
 

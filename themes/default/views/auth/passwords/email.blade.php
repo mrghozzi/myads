@@ -3,13 +3,17 @@
     $pageDirection = locale_direction();
     $mode = \Illuminate\Support\Facades\Cookie::get('modedark', 'css');
     $css_path = $mode == 'css_d' ? 'css_d' : 'css';
+    $seo = app(\App\Services\SeoManager::class)->resolve(request());
+    $resolvedTitle = trim((string) ($seo->title ?? ''));
+    $resolvedTitle = $resolvedTitle !== '' ? $resolvedTitle : (__('messages.reset_password') . ' - ' . ($site_settings->titer ?? 'MyAds'));
 @endphp
 <!DOCTYPE html>
 <html lang="{{ $pageLocale }}" dir="{{ $pageDirection }}" data-theme="{{ $css_path }}">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ __('messages.reset_password') }} - {{ $site_settings->titer ?? 'MyAds' }}</title>
+    <title>{{ $resolvedTitle }}</title>
+    @include('theme::partials._seo_head')
     
     <!-- Fonts & Icons -->
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -229,21 +233,7 @@
         .back-link a { color: var(--primary); font-weight: 600; }
         .back-link a:hover { text-decoration: underline; }
 
-        /* --- Footer --- */
-        .footer {
-            padding: 40px 24px; text-align: center; border-top: 1px solid rgba(255, 255, 255, 0.05);
-            background: var(--bg-surface); position: relative; z-index: 10; margin-top: auto;
-        }
-        [data-theme="css"] .footer { border-top: 1px solid rgba(0, 0, 0, 0.05); }
-        .footer p { color: var(--text-muted); font-size: 0.95rem; }
-        .footer-links {
-            display: flex; justify-content: center; gap: 30px; margin-bottom: 25px; flex-wrap: wrap;
-        }
-        .footer-links a {
-            color: var(--text-muted); font-size: 0.95rem; font-weight: 500; display: flex; align-items: center; gap: 8px; transition: color 0.3s;
-        }
-        .footer-links a i { font-size: 1.1rem; }
-        .footer-links a:hover { color: var(--primary); }
+
 
         /* Lang Dropdown */
         .lang-switcher { position: relative; }
@@ -320,18 +310,8 @@
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="footer-links">
-            <a href="{{ url('/sitemap.xml') }}"><i class="fa-solid fa-sitemap"></i> Sitemap</a>
-            <a href="{{ url('/developer') }}"><i class="fa-solid fa-code"></i> Developers</a>
-            <a href="{{ url('/privacy') }}"><i class="fa-solid fa-shield-halved"></i> Privacy Policy</a>
-            <a href="{{ url('/terms') }}"><i class="fa-solid fa-file-contract"></i> Terms & Conditions</a>
-            <a href="{{ url('/refund') }}"><i class="fa-solid fa-arrow-rotate-left"></i> Refund Policy</a>
-        </div>
-        <p>&copy; {{ date('Y') }} {{ $site_settings->titer ?? 'MyAds' }}. {{ __('messages.all_rights_reserved') ?? 'All rights reserved.' }}</p>
-        <p style="margin-top: 10px; font-size: 0.85rem; opacity: 0.7;">Powered by <strong>MyAds SEO Engine</strong> | v{{ \App\Support\SystemVersion::CURRENT ?? '4.3.5' }}</p>
-    </footer>
+    @include('theme::partials._standalone_footer')
+
 
     <!-- Scripts -->
     <script>

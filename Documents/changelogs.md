@@ -1,3 +1,17 @@
+# v4.3.6
+> **Release** — _In Development_
+
+### SEO — Standalone Pages Integration
+* **Fix**: 7 standalone pages (`/`, `/login`, `/register`, `/password/reset`, `/privacy`, `/terms`, `/refund`) now fully integrate with the centralized SEO engine and `/admin/seo` settings (meta tags, OG, canonical, GA4, Schema.org).
+* Added 4 new admin-configurable SEO scopes: `login_page`, `register_page`, `password_reset_page`, `refund_page`.
+* Created reusable `partials/_seo_head.blade.php` partial for standalone views.
+
+### UI — Unified Standalone Footer
+* Created shared `partials/_standalone_footer.blade.php` with scoped CSS, replacing ~200 lines of duplicated footer code across 7 views.
+* Footer link labels are now translatable instead of hardcoded English.
+
+---
+
 # v4.3.5
 > **Security Hardening Release** — 10 security vulnerability patches across Points Economy, Ad Exchange, Reaction System, Installer, Error Disclosure, Developer API, and HTTP Headers.
 

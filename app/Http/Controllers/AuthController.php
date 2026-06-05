@@ -18,11 +18,33 @@ class AuthController extends Controller
 {
     public function showLoginForm()
     {
+        $this->seo([
+            'scope_key' => 'login_page',
+            'resource_title' => __('messages.sign_in'),
+            'description' => __('messages.seo_login_description', ['default' => '']),
+            'indexable' => false,
+            'breadcrumbs' => [
+                ['name' => __('messages.home'), 'url' => url('/')],
+                ['name' => __('messages.sign_in'), 'url' => route('login')],
+            ],
+        ]);
+
         return view('theme::auth.login');
     }
 
     public function showRegistrationForm()
     {
+        $this->seo([
+            'scope_key' => 'register_page',
+            'resource_title' => __('messages.sign_up'),
+            'description' => __('messages.seo_register_description', ['default' => '']),
+            'indexable' => false,
+            'breadcrumbs' => [
+                ['name' => __('messages.home'), 'url' => url('/')],
+                ['name' => __('messages.sign_up'), 'url' => route('register')],
+            ],
+        ]);
+
         return view('theme::auth.register');
     }
 

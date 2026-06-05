@@ -34,6 +34,10 @@ class SeoManager
         'profile_show' => 'Public Profile',
         'privacy_page' => 'Privacy Page',
         'terms_page' => 'Terms Page',
+        'refund_page' => 'Refund Page',
+        'login_page' => 'Login Page',
+        'register_page' => 'Register Page',
+        'password_reset_page' => 'Password Reset Page',
     ];
 
     /**
@@ -160,6 +164,10 @@ class SeoManager
             'page.show' => 'page_show',
             'privacy' => 'privacy_page',
             'terms' => 'terms_page',
+            'refund' => 'refund_page',
+            'login' => 'login_page',
+            'register' => 'register_page',
+            'password.request' => 'password_reset_page',
             'profile.show' => 'profile_show',
             default => $routeName !== '' ? $routeName : ($request->path() !== '/' ? $request->path() : 'home'),
         };
