@@ -3338,4 +3338,16 @@ return [
     'custom_ads_create' => 'Create Placement',
     'custom_ads_marketplace' => 'Marketplace',
     'paused' => 'Paused. Resume to continue.',
+
+    // Visit Exchange System
+    'viewing' => 'Viewing...',
+    'visit_paused' => 'Paused — return to window',
+    'visit_verifying' => 'Verifying...',
+    'visit_verified' => 'Points awarded!',
+    'visit_error' => 'Verification error',
+    'visit_network_error' => 'Network error. Retrying...',
+    'daily_limit' => 'Daily Limit',
+    'daily_visit_limit_reached' => 'You have reached your daily visit limit',
+    'daily_visit_limit_message' => 'Come back tomorrow to earn more points!',
+    'pts_visit_exchange' => 'Points earned from visit exchange',
 ];

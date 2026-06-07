@@ -2526,4 +2526,16 @@ return [
     'custom_ads_create' => 'Create Placement',
     'custom_ads_marketplace' => 'Marketplace',
     'paused' => 'Paused. Resume to continue.',
+
+    // Visit Exchange System
+    'viewing' => 'Görüntüleniyor...',
+    'visit_paused' => 'Duraklatıldı — pencereye geri dönün',
+    'visit_verifying' => 'Doğrulanıyor...',
+    'visit_verified' => 'Puanlar verildi!',
+    'visit_error' => 'Doğrulama hatası',
+    'visit_network_error' => 'Ağ hatası. Yeniden deneniyor...',
+    'daily_limit' => 'Günlük Limit',
+    'daily_visit_limit_reached' => 'Günlük ziyaret limitinize ulaştınız',
+    'daily_visit_limit_message' => 'Daha fazla puan kazanmak için yarın tekrar gelin!',
+    'pts_visit_exchange' => 'Ziyaret değişiminden kazanılan puanlar',
 ];

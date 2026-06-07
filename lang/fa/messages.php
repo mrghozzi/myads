@@ -2525,4 +2525,16 @@ return [
     'custom_ads_create' => 'Create Placement',
     'custom_ads_marketplace' => 'Marketplace',
     'paused' => 'Paused. Resume to continue.',
+
+    // Visit Exchange System
+    'viewing' => 'در حال مشاهده...',
+    'visit_paused' => 'متوقف — به پنجره بازگردید',
+    'visit_verifying' => 'در حال بررسی...',
+    'visit_verified' => 'امتیاز اعطا شد!',
+    'visit_error' => 'خطای تأیید',
+    'visit_network_error' => 'خطای شبکه. تلاش مجدد...',
+    'daily_limit' => 'محدودیت روزانه',
+    'daily_visit_limit_reached' => 'شما به حداکثر بازدید روزانه رسیده‌اید',
+    'daily_visit_limit_message' => 'فردا برگردید تا امتیاز بیشتری کسب کنید!',
+    'pts_visit_exchange' => 'امتیاز کسب شده از تبادل بازدید',
 ];

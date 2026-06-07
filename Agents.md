@@ -162,7 +162,7 @@ myads/
 | `AdsServingController` | Public ad serving endpoints (`bn.php`, `link.php`, `smart.php`, embed scripts) |
 | `CustomAdsController` | Member custom ad placements, marketplace requests, private invites, deal lifecycle, code, and analytics views |
 | `CustomAdsServingController` | Public custom ad embed, serving, impression/click tracking, and click redirects |
-| `VisitController` | Visit exchange system (token-based verification, anti-fraud) |
+| `VisitController` | Visit exchange system (AJAX token-based verification, 7-layer anti-fraud: daily cap, JS math challenge, token expiry, replay prevention, focus detection, IP monitoring, PointLedgerService integration) |
 | `YoutubeAdvertiserController` | YouTube campaigns and views exchange |
 | `YoutubeExchangeController` | YouTube watch and earn points |
 | `ProfileController` | Profile view/edit, follow, privacy, sessions/revocation, badges, history |
@@ -485,7 +485,7 @@ admin/mail_settings.blade.php → Database-driven mail configuration form
 - **Point Economy Safety:** Point conversion uses `DB::transaction()` with `lockForUpdate()` to prevent double-spend race conditions; conversion type validated against whitelist
 - **Reaction Validation:** Reaction names validated against a strict whitelist (`like, love, haha, wow, sad, angry, care`) before being used in HTML output
 - **Installer Guard:** `/install/update` route requires Super Admin authentication after initial installation to prevent unauthorized migration execution
-- **Visit Exchange Anti-Fraud:** Token-based verification model replaces instant-reward surfing; encrypted tokens enforce minimum view time, one-time use, and per-user rate limiting
+- **Visit Exchange Anti-Fraud:** AJAX token-based verification model replaces instant-reward surfing; 7 protection layers: daily visit cap (50/day), JS math challenge, encrypted token expiry (300s), one-time token replay prevention via Cache, site repeat cooldown (1h), owner balance verification before PTS deduction, IP consistency monitoring between token creation and verification; browser focus detection pauses timer when tab is inactive; all points awarded via `PointLedgerService` with full transaction audit trail
 
 ---
 

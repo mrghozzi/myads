@@ -10,6 +10,24 @@
 * Created shared `partials/_standalone_footer.blade.php` with scoped CSS, replacing ~200 lines of duplicated footer code across 7 views.
 * Footer link labels are now translatable instead of hardcoded English.
 
+### Visit Exchange — Bug Fix & Anti-Cheat Hardening
+* **Critical Fix**: Visit exchange (`/visits/surf`) was **never awarding points** — the `surf.blade.php` view used `window.location.reload()` after the countdown instead of calling the server-side `verify()` endpoint. Rewrote the view to send an AJAX `POST` to `/visits/verify` upon countdown completion.
+* **Fix**: Points are now awarded through `PointLedgerService::award()` instead of raw `$user->increment('pts')`, ensuring all visit-earned points appear in the points transaction ledger.
+* **Feature**: Added **7-layer anti-cheat protection** to the visit exchange system:
+    1. **Daily visit cap** — 50 visits per user per day, enforced via Cache.
+    2. **Site repeat cooldown** — same site cannot be revisited within 1 hour.
+    3. **JavaScript math challenge** — browser must solve `challenge * 7 + 3` and return the answer, blocking headless automation.
+    4. **Token expiry** — encrypted tokens expire after 300 seconds.
+    5. **Replay prevention** — each token can only be used once (Cache-based tracking).
+    6. **Owner balance check** — site owner's PTS balance is verified before deduction.
+    7. **IP consistency monitoring** — IP is logged at token creation and compared at verification.
+* **Feature**: Added **browser focus detection** — the countdown timer pauses when the user leaves the tab/window, preventing background tab farming.
+* **UX**: Added a visual **progress bar** and **status indicator** (Viewing → Verifying → Success/Error) to the surf page.
+* **UX**: Added a dedicated "Daily Limit Reached" page when the user has exhausted their daily visit quota.
+
+### Internationalization (i18n)
+* Added 10 new translation keys for the Visit Exchange system (`viewing`, `visit_paused`, `visit_verifying`, `visit_verified`, `visit_error`, `visit_network_error`, `daily_limit`, `daily_visit_limit_reached`, `daily_visit_limit_message`, `pts_visit_exchange`) across all **9 supported languages** (ar, de, en, es, fa, fr, it, pt, tr).
+
 ---
 
 # v4.3.5

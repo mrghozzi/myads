@@ -3340,4 +3340,16 @@ return [
     'custom_ads_create' => 'إنشاء مساحة إعلانية',
     'custom_ads_marketplace' => 'متجر الإعلانات',
     'paused' => 'تم الإيقاف المؤقت. استأنف للمتابعة.',
+
+    // نظام تبادل الزيارات
+    'viewing' => 'جاري المشاهدة...',
+    'visit_paused' => 'متوقف — عد إلى النافذة',
+    'visit_verifying' => 'جاري التحقق...',
+    'visit_verified' => 'تم منح النقاط!',
+    'visit_error' => 'خطأ في التحقق',
+    'visit_network_error' => 'خطأ في الاتصال. جاري المحاولة...',
+    'daily_limit' => 'الحد اليومي',
+    'daily_visit_limit_reached' => 'لقد وصلت إلى الحد الأقصى اليومي للزيارات',
+    'daily_visit_limit_message' => 'عد غداً لكسب المزيد من النقاط!',
+    'pts_visit_exchange' => 'نقاط مكتسبة من تبادل الزيارات',
 ];

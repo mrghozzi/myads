@@ -2526,4 +2526,16 @@ return [
     'custom_ads_create' => 'Create Placement',
     'custom_ads_marketplace' => 'Marketplace',
     'paused' => 'Paused. Resume to continue.',
+
+    // Visit Exchange System
+    'viewing' => 'Visualizzazione...',
+    'visit_paused' => 'In pausa — torna alla finestra',
+    'visit_verifying' => 'Verifica in corso...',
+    'visit_verified' => 'Punti assegnati!',
+    'visit_error' => 'Errore di verifica',
+    'visit_network_error' => 'Errore di rete. Nuovo tentativo...',
+    'daily_limit' => 'Limite giornaliero',
+    'daily_visit_limit_reached' => 'Hai raggiunto il limite giornaliero di visite',
+    'daily_visit_limit_message' => 'Torna domani per guadagnare più punti!',
+    'pts_visit_exchange' => 'Punti guadagnati dallo scambio di visite',
 ];
