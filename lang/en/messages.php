@@ -3366,4 +3366,6 @@ return [
     'kb_delete_category_note' => 'Articles in this category will become uncategorized. They will not be deleted.',
     'kb_confirm_delete_category' => 'Are you sure you want to delete this category?',
     'optional' => 'Optional',
+    'saved_clips' => 'Saved Clips',
+    'saved_clips_desc' => 'Manage and watch your saved clips.',
 ];

@@ -2538,4 +2538,6 @@ return [
     'daily_visit_limit_reached' => 'Günlük ziyaret limitinize ulaştınız',
     'daily_visit_limit_message' => 'Daha fazla puan kazanmak için yarın tekrar gelin!',
     'pts_visit_exchange' => 'Ziyaret değişiminden kazanılan puanlar',
+    'saved_clips' => 'Kaydedilen Klipler',
+    'saved_clips_desc' => 'Kaydedilmiş kliplerinizi yönetin ve izleyin.',
 ];

@@ -54,4 +54,38 @@ class ClipsController extends Controller
 
         return view('theme::clips.saved', compact('activities'));
     }
+
+    public function toggleSave(Request $request)
+    {
+        $user = \Illuminate\Support\Facades\Auth::user();
+        if (!$user) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
+        $statusId = $request->input('status_id');
+        $status = \App\Models\Status::findOrFail($statusId);
+
+        $exists = \Illuminate\Support\Facades\DB::table('saved_statuses')
+            ->where('user_id', $user->id)
+            ->where('status_id', $status->id)
+            ->exists();
+
+        if ($exists) {
+            \Illuminate\Support\Facades\DB::table('saved_statuses')
+                ->where('user_id', $user->id)
+                ->where('status_id', $status->id)
+                ->delete();
+            $action = 'removed';
+        } else {
+            \Illuminate\Support\Facades\DB::table('saved_statuses')->insert([
+                'user_id' => $user->id,
+                'status_id' => $status->id,
+                'created_at' => now(),
+                'updated_at' => now()
+            ]);
+            $action = 'added';
+        }
+
+        return response()->json(['success' => true, 'action' => $action]);
+    }
 }

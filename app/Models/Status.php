@@ -273,7 +273,7 @@ class Status extends Model
                     ->count();
             }
 
-            if (in_array($this->s_type, [2, 4, 100])) {
+            if (in_array($this->s_type, [2, 4, 100, 10, 11, 12, 13, 14])) {
                 return ForumComment::where('tid', $this->tp_id)->count();
             }
 

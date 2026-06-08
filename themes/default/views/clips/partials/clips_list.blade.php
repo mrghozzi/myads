@@ -6,7 +6,7 @@
         }
     @endphp
     @if($mediaUrl)
-        <div class="reel-item" data-id="{{ $activity->id }}">
+        <div class="reel-item" data-id="{{ $activity->id }}" data-tp-id="{{ $activity->tp_id }}">
             <video class="reel-video" loop muted playsinline src="{{ $mediaUrl }}" preload="auto"></video>
             
             <div class="reel-overlay">
@@ -57,7 +57,7 @@
                     </button>
 
                     <!-- Comment -->
-                    <button class="reel-action-btn open-comments" data-id="{{ $activity->id }}">
+                    <button class="reel-action-btn open-comments" data-id="{{ $activity->id }}" data-tp-id="{{ $activity->tp_id }}">
                         <svg class="icon" viewBox="0 0 24 24"><path d="M21.99 4c0-1.1-.89-2-1.99-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4-.01-18zM18 14H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/></svg>
                         <span>{{ $activity->comments_count }}</span>
                     </button>

@@ -4,12 +4,14 @@
 <style>
     /* Full Clips TikTok-style Container */
     .clips-wrapper {
-        height: calc(100vh - 80px); /* Adjust based on your header height */
+        height: 100%;
         background-color: #000 !important;
         border-radius: 12px;
         overflow: hidden;
         position: relative;
+        width: 100%;
         max-width: 450px;
+        flex-shrink: 0;
         margin: 0 auto;
         box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     }
@@ -222,6 +224,97 @@
         justify-content: center;
         cursor: pointer;
         backdrop-filter: blur(4px);
+        pointer-events: auto; /* Enable clicks on mute button overlay child */
+    }
+
+    .reel-mute-toggle svg {
+        pointer-events: none; /* Let clicks pass through to the parent div handler */
+    }
+
+    /* Comments Sidebar Layout */
+    .clips-layout-container {
+        display: flex;
+        justify-content: center;
+        align-items: stretch;
+        gap: 20px;
+        max-width: 900px;
+        margin: 0 auto;
+        height: calc(100vh - 120px);
+        position: relative;
+        width: 100%;
+    }
+
+    .clips-comments-sidebar {
+        width: 420px;
+        background: var(--bg-color, #fff);
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        display: none;
+        flex-direction: column;
+        height: 100%;
+        overflow: hidden;
+        border: 1px solid rgba(0,0,0,0.08);
+        z-index: 30;
+    }
+
+    .clips-comments-sidebar.active {
+        display: flex;
+    }
+
+    .sidebar-header {
+        padding: 15px 20px;
+        border-bottom: 1px solid rgba(0,0,0,0.08);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .sidebar-header h3 {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 700;
+        color: var(--text-color, #3e3f5e);
+    }
+
+    .close-sidebar-btn {
+        background: transparent;
+        border: none;
+        font-size: 28px;
+        cursor: pointer;
+        line-height: 1;
+        color: var(--text-color-light, #9aa0ac);
+        padding: 0;
+        transition: color 0.2s;
+    }
+
+    .close-sidebar-btn:hover {
+        color: var(--text-color, #3e3f5e);
+    }
+
+    .sidebar-content {
+        flex: 1;
+        overflow-y: auto;
+        padding: 10px 15px 20px 15px;
+    }
+
+    @media (max-width: 991px) {
+        .clips-layout-container {
+            flex-direction: column;
+            align-items: center;
+            height: calc(100vh - 80px);
+        }
+
+        .clips-comments-sidebar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            height: 60%;
+            border-radius: 16px 16px 0 0;
+            box-shadow: 0 -10px 30px rgba(0,0,0,0.3);
+            z-index: 100;
+        }
     }
 
     .reel-progress {
@@ -243,27 +336,45 @@
 </style>
 
 <div class="grid" style="padding-top: 20px;">
-    <div class="clips-wrapper">
-        <div class="clips-header-actions">
-            <a href="{{ route('clips.saved') }}" class="btn-saved-clips">
-                <svg viewBox="0 0 24 24"><path d="M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2z"/></svg>
-                {{ __('messages.saved') ?? 'Saved' }}
-            </a>
+    <div class="clips-layout-container">
+        <div class="clips-wrapper">
+            <div class="clips-header-actions">
+                <a href="{{ route('clips.saved') }}" class="btn-saved-clips">
+                    <svg viewBox="0 0 24 24"><path d="M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2z"/></svg>
+                    {{ __('messages.saved') ?? 'Saved' }}
+                </a>
+            </div>
+            
+            <div class="clips-container" id="clips-container">
+                @include('theme::clips.partials.clips_list', ['activities' => $activities])
+            </div>
+            
+            <!-- Loading Indicator for Infinite Scroll -->
+            <div id="clips-loading" style="display: none; position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); text-align: center; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.8);">
+                <i class="fa-solid fa-spinner fa-spin"></i> Loading...
+            </div>
         </div>
-        
-        <div class="clips-container" id="clips-container">
-            @include('theme::clips.partials.clips_list', ['activities' => $activities])
-        </div>
-        
-        <!-- Loading Indicator for Infinite Scroll -->
-        <div id="clips-loading" style="display: none; position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); text-align: center; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.8);">
-            <i class="fa-solid fa-spinner fa-spin"></i> Loading...
+
+        <!-- Comments Sidebar -->
+        <div class="clips-comments-sidebar" id="clips-comments-sidebar">
+            <div class="sidebar-header">
+                <h3>{{ __('messages.comments') ?? 'Comments' }}</h3>
+                <button class="close-sidebar-btn" id="close-comments-sidebar">&times;</button>
+            </div>
+            <div class="sidebar-content">
+                <div id="clips-comments-placeholder" class="post-comment-list-placeholder">
+                    <div class="no-comments-selected" style="text-align: center; padding: 40px 20px; color: var(--text-color-light, #9aa0ac);">
+                        <i class="fa-regular fa-comments" style="font-size: 48px; margin-bottom: 15px; display: block; opacity: 0.5;"></i>
+                        {{ __('messages.click_to_view_comments') ?? 'Click the comment icon on a clip to view comments.' }}
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 @endsection
 
-@section('scripts')
+@push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const container = document.getElementById('clips-container');
@@ -293,6 +404,17 @@ document.addEventListener('DOMContentLoaded', function() {
                     item.classList.add('is-paused');
                     console.log('Autoplay prevented:', e);
                 });
+
+                // Track active reel details!
+                const activeTpId = item.dataset.tpId;
+                container.dataset.activeTpId = activeTpId;
+                container.dataset.activeStatusId = item.dataset.id;
+                
+                // If comments sidebar is active, dynamically load comments for the newly active clip!
+                const sidebar = document.getElementById('clips-comments-sidebar');
+                if (sidebar && sidebar.classList.contains('active')) {
+                    loadClipsComments(activeTpId);
+                }
             } else {
                 video.pause();
                 item.classList.add('is-paused');
@@ -467,7 +589,7 @@ document.addEventListener('DOMContentLoaded', function() {
             countSpan.textContent = currentCount + 1;
         }
 
-        fetch('{{ url('/api/clips/save') }}', {
+        fetch('{{ route('clips.save.toggle') }}', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -497,15 +619,70 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
     });
+
+    // Load comments helper
+    function loadClipsComments(tpId) {
+        const placeholder = document.getElementById('clips-comments-placeholder');
+        if (!placeholder) return;
+        
+        placeholder.className = 'post-comment-list-placeholder post-comment-list-' + tpId;
+        placeholder.innerHTML = '<div style="text-align: center; padding: 40px 20px; color: var(--text-color-light);"><i class="fa-solid fa-spinner fa-spin" style="font-size: 24px; margin-bottom: 10px; display: block;"></i> Loading comments...</div>';
+        
+        if (typeof window.loadComments === 'function') {
+            window.loadComments(tpId, 'forum');
+        }
+    }
+
+    // Toggle comments sidebar
+    const sidebar = document.getElementById('clips-comments-sidebar');
+    const closeBtn = document.getElementById('close-comments-sidebar');
     
-    // Comments Action (redirect to post page)
+    if (closeBtn && sidebar) {
+        closeBtn.addEventListener('click', () => {
+            sidebar.classList.remove('active');
+        });
+    }
+
+    // Comments click delegation
     container.addEventListener('click', function(e) {
         const btn = e.target.closest('.open-comments');
         if (!btn) return;
         
-        const sid = btn.dataset.id;
-        window.location.href = '{{ url('/status') }}/' + sid;
+        e.preventDefault();
+        if (!sidebar) return;
+
+        const tpId = btn.dataset.tpId;
+        const isActive = sidebar.classList.contains('active');
+        
+        if (isActive && container.dataset.activeTpId == tpId) {
+            sidebar.classList.remove('active');
+        } else {
+            sidebar.classList.add('active');
+            container.dataset.activeTpId = tpId;
+            loadClipsComments(tpId);
+        }
     });
+
+    // Observe comment list changes to update the count badge
+    // Uses MutationObserver since postComment/deleteComment don't return promises
+    const commentCountObserver = new MutationObserver(() => {
+        const activeTpId = container.dataset.activeTpId;
+        if (!activeTpId) return;
+        const item = document.querySelector(`.reel-item[data-tp-id="${activeTpId}"]`);
+        if (!item) return;
+        const placeholder = document.getElementById('clips-comments-placeholder');
+        if (!placeholder) return;
+        const commentElements = placeholder.querySelectorAll('[class*="coment"]');
+        const countSpan = item.querySelector('.open-comments span');
+        if (countSpan) {
+            countSpan.textContent = commentElements.length;
+        }
+    });
+
+    const commentsPlaceholder = document.getElementById('clips-comments-placeholder');
+    if (commentsPlaceholder) {
+        commentCountObserver.observe(commentsPlaceholder, { childList: true, subtree: true });
+    }
 });
 </script>
-@endsection
+@endpush

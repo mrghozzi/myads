@@ -2558,4 +2558,6 @@ return [
     'daily_visit_limit_reached' => 'Has alcanzado tu límite diario de visitas',
     'daily_visit_limit_message' => '¡Vuelve mañana para ganar más puntos!',
     'pts_visit_exchange' => 'Puntos ganados por intercambio de visitas',
+    'saved_clips' => 'Clips guardados',
+    'saved_clips_desc' => 'Administra y mira tus clips guardados.',
 ];
