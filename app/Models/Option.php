@@ -21,5 +21,15 @@ class Option extends Model
         'o_parent',
         'o_order',
         'o_mode',
+        'updated_at',
+        'kb_category_id',
     ];
+
+    /**
+     * Get the KB category this article belongs to.
+     */
+    public function kbCategory()
+    {
+        return $this->belongsTo(KbCategory::class, 'kb_category_id');
+    }
 }

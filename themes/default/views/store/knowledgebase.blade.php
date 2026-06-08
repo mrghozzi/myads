@@ -7,6 +7,8 @@
     $ownerAvatar = $owner ? $owner->avatarUrl() : asset('upload/_avatar.png');
     $pendingCounts = $pendingCounts ?? collect();
     $articleAuthors = $articleAuthors ?? collect();
+    $kbCategories = $kbCategories ?? collect();
+    $selectedCategory = $selectedCategory ?? null;
     $currentArticle = $article ?? null;
     $currentTopicPendingCount = $currentArticle
         ? \App\Models\Option::where('o_type', 'knowledgebase')->where('o_mode', $product->name)->where('name', $currentArticle->name)->where('o_order', 1)->count()
@@ -130,9 +132,27 @@
             </div>
         </div>
 
-        @if($articles->isEmpty())
+        @if($articles->isEmpty() && !$selectedCategory)
             <div class="kb-empty-state">{{ __('messages.no_post') }}</div>
         @else
+            @if($kbCategories->isNotEmpty())
+                <div class="widget-box kb-helper-card" style="padding: 16px 20px;">
+                    <div class="kb-category-filter">
+                        <span class="kb-category-filter__label"><i class="fa fa-filter" aria-hidden="true"></i>&nbsp;{{ __('messages.kb_filter_by_category') }}:</span>
+                        <div class="kb-category-filter__pills">
+                            <a class="kb-category-pill {{ !$selectedCategory ? 'active' : '' }}" href="{{ route('kb.index', $product->name) }}">{{ __('messages.kb_all_categories') }}</a>
+                            @foreach($kbCategories as $cat)
+                                <a class="kb-category-pill {{ $selectedCategory == $cat->id ? 'active' : '' }}" href="{{ route('kb.index', $product->name) }}?category={{ $cat->id }}">{{ $cat->name }}</a>
+                            @endforeach
+                            <a class="kb-category-pill {{ $selectedCategory === 'uncategorized' ? 'active' : '' }}" href="{{ route('kb.index', $product->name) }}?category=uncategorized">{{ __('messages.kb_no_category') }}</a>
+                        </div>
+                    </div>
+                </div>
+            @endif
+
+            @if($articles->isEmpty())
+                <div class="kb-empty-state">{{ __('messages.no_post') }}</div>
+            @else
             <div class="kb-topic-grid">
                 @foreach($articles as $item)
                     @php
@@ -165,6 +185,12 @@
                         <div class="kb-topic-card__meta">
                             <span class="kb-pill">{{ __('messages.author') }}: {{ $cardAuthor ? $cardAuthor->username : __('messages.guest') }}</span>
                             <span class="kb-pill">{{ __('messages.pending') }}: <strong>{{ $pending }}</strong></span>
+                            @if($item->kbCategory)
+                                <span class="kb-pill kb-pill--category"><i class="fa fa-folder-o" aria-hidden="true"></i>&nbsp;{{ $item->kbCategory->name }}</span>
+                            @endif
+                            @if($item->updated_at)
+                                <span class="kb-pill"><i class="fa fa-clock-o" aria-hidden="true"></i>&nbsp;{{ __('messages.kb_last_modified') }}: {{ \Carbon\Carbon::parse($item->updated_at)->diffForHumans() }}</span>
+                            @endif
                         </div>
                         <div id="report{{ $reportKey }}" class="store-inline-report"></div>
                         <div class="kb-topic-card__footer">
@@ -173,6 +199,12 @@
                     </article>
                 @endforeach
             </div>
+            @if($articles->hasPages())
+                <div class="kb-pagination">
+                    {{ $articles->links('pagination::bootstrap-5') }}
+                </div>
+            @endif
+            @endif
         @endif
     @endif
 
@@ -201,6 +233,21 @@
                                 <div class="form-item">
                                     <div class="form-input">
                                         <input type="text" value="{{ $articleName }}" readonly>
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
+                        @if(isset($kbCategories) && $kbCategories->isNotEmpty())
+                            <div class="form-row">
+                                <div class="form-item">
+                                    <label style="font-size: 13px; font-weight: 600; margin-bottom: 6px; display: block; color: var(--store-shell-muted);">{{ __('messages.kb_category') }} <small style="font-weight: 400;">({{ __('messages.optional') }})</small></label>
+                                    <div class="form-select" style="position:relative;">
+                                        <select name="kb_category_id" class="form-control" style="width: 100%; padding: 8px 12px; border-radius: 8px; border: 1px solid var(--store-shell-border, rgba(143,145,172,0.2)); background: var(--store-shell-input-bg, #fff); color: var(--store-shell-body); font-size: 14px;">
+                                            <option value="">{{ __('messages.kb_no_category') }}</option>
+                                            @foreach($kbCategories as $cat)
+                                                <option value="{{ $cat->id }}" {{ old('kb_category_id', ($article->kb_category_id ?? null)) == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
+                                            @endforeach
+                                        </select>
                                     </div>
                                 </div>
                             </div>
@@ -623,6 +670,44 @@
     .markdown-content-preview blockquote { border-left: 4px solid #ddd; padding-left: 1rem; color: #666; font-style: italic; margin-bottom: 1rem; }
     .markdown-content-preview table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
     .markdown-content-preview th, .markdown-content-preview td { border: 1px solid #ddd; padding: 0.75rem; text-align: left; }
+
+    /* KB Category Filter */
+    .kb-category-filter { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .kb-category-filter__label { font-size: 13px; font-weight: 600; color: var(--store-shell-muted); white-space: nowrap; }
+    .kb-category-filter__pills { display: flex; flex-wrap: wrap; gap: 8px; }
+    .kb-category-pill {
+        display: inline-flex; align-items: center; padding: 5px 14px; border-radius: 20px;
+        font-size: 12px; font-weight: 600; text-decoration: none;
+        background: var(--store-shell-badge-bg, rgba(143, 145, 172, 0.1));
+        color: var(--store-shell-muted, #8f91ac);
+        border: 1px solid transparent;
+        transition: all 0.2s ease;
+    }
+    .kb-category-pill:hover { background: var(--store-shell-badge-bg-hover, rgba(143, 145, 172, 0.18)); color: var(--store-shell-body); text-decoration: none; }
+    .kb-category-pill.active {
+        background: var(--store-shell-accent, #615dfa);
+        color: #fff;
+        border-color: var(--store-shell-accent, #615dfa);
+    }
+    .kb-pill--category {
+        background: rgba(97, 93, 250, 0.12);
+        color: var(--store-shell-accent, #615dfa);
+        font-weight: 600;
+    }
+
+    /* KB Pagination */
+    .kb-pagination { display: flex; justify-content: center; margin-top: 24px; }
+    .kb-pagination .pagination { gap: 4px; }
+    .kb-pagination .page-link {
+        border-radius: 8px; font-size: 13px; font-weight: 600; padding: 6px 14px;
+        border: 1px solid var(--store-shell-border, rgba(143,145,172,0.2));
+        color: var(--store-shell-muted, #8f91ac);
+        background: var(--store-shell-card-bg, #fff);
+        transition: all 0.2s ease;
+    }
+    .kb-pagination .page-link:hover { background: var(--store-shell-accent, #615dfa); color: #fff; border-color: var(--store-shell-accent, #615dfa); }
+    .kb-pagination .page-item.active .page-link { background: var(--store-shell-accent, #615dfa); color: #fff; border-color: var(--store-shell-accent, #615dfa); }
+    .kb-pagination .page-item.disabled .page-link { opacity: 0.5; pointer-events: none; }
 </style>
 @endpush
 @endsection

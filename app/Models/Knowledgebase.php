@@ -20,6 +20,7 @@ class Knowledgebase extends Model
         'o_mode',    // Category
         'o_order',   // Order
         'o_parent',  // Publisher ID
+        'kb_category_id',
     ];
 
     protected static function booted()
@@ -37,5 +38,10 @@ class Knowledgebase extends Model
                 $model->o_parent = auth()->id() ?? 1;
             }
         });
+    }
+
+    public function kbCategory()
+    {
+        return $this->belongsTo(KbCategory::class, 'kb_category_id');
     }
 }

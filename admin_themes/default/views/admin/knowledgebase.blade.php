@@ -24,10 +24,13 @@
                 <a href="javascript:void(0);" class="badge bg-gray-100 shadow-sm text-muted mx-1">{{ $cat->name }}</a>
             @endforeach
         </div>
-        <div class="mt-4">
+        <div class="mt-4 d-flex gap-2 justify-content-center">
              <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addArticleModal">
                 <i class="feather-plus me-2"></i> {{ __('messages.add_article') }}
             </button>
+            <a href="{{ route('admin.kb_categories') }}" class="btn btn-outline-primary">
+                <i class="feather-folder me-2"></i> {{ __('messages.kb_categories') }}
+            </a>
         </div>
     </div>
 </div>
@@ -44,6 +47,9 @@
                                 <h5 class="fw-bold"><a href="javascript:void(0);" data-bs-toggle="modal" data-bs-target="#viewArticleModal{{ $article->id }}">{{ $article->name }}</a></h5>
                                 <p class="text-muted">{{ Str::limit($article->o_valuer, 150) }}</p>
                                 <span class="badge bg-soft-primary">{{ $article->o_mode }}</span>
+                                @if($article->kbCategory)
+                                    <span class="badge bg-soft-success">{{ $article->kbCategory->name }}</span>
+                                @endif
                             </div>
                             <div class="d-flex align-items-start gap-2">
                                 <button class="btn btn-sm btn-icon btn-light-primary" data-bs-toggle="modal" data-bs-target="#editArticleModal{{ $article->id }}"><i class="feather-edit-3"></i></button>
@@ -191,6 +197,17 @@
                         <label class="form-label">{{ __('messages.category_fallback') }}</label>
                         <input type="text" name="o_mode" class="form-control" placeholder="e.g. Getting Started" required>
                     </div>
+                    @if(isset($kbCategories) && $kbCategories->isNotEmpty())
+                        <div class="mb-3">
+                            <label class="form-label">{{ __('messages.kb_category') }} <small class="text-muted">({{ __('messages.optional') }})</small></label>
+                            <select name="kb_category_id" class="form-select">
+                                <option value="">{{ __('messages.kb_no_category') }}</option>
+                                @foreach($kbCategories as $kbCat)
+                                    <option value="{{ $kbCat->id }}">{{ $kbCat->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    @endif
                     <div class="mb-3">
                         <label class="form-label">{{ __('messages.content') }}</label>
                         <div class="stackedit-tools mb-2">
@@ -234,6 +251,9 @@
             </div>
             <div class="modal-body">
                 <span class="badge bg-soft-primary mb-3">{{ $article->o_mode }}</span>
+                @if($article->kbCategory)
+                    <span class="badge bg-soft-success mb-3">{{ $article->kbCategory->name }}</span>
+                @endif
                 <div class="article-content markdown-content" id="admin-kb-view-{{ $article->id }}">{!! $article->o_valuer !!}</div>
             </div>
             <div class="modal-footer">
@@ -263,6 +283,17 @@
                         <label class="form-label">{{ __('messages.category_fallback') }}</label>
                         <input type="text" name="o_mode" value="{{ $article->o_mode }}" class="form-control" required>
                     </div>
+                    @if(isset($kbCategories) && $kbCategories->isNotEmpty())
+                        <div class="mb-3">
+                            <label class="form-label">{{ __('messages.kb_category') }} <small class="text-muted">({{ __('messages.optional') }})</small></label>
+                            <select name="kb_category_id" class="form-select">
+                                <option value="">{{ __('messages.kb_no_category') }}</option>
+                                @foreach($kbCategories as $kbCat)
+                                    <option value="{{ $kbCat->id }}" {{ $article->kb_category_id == $kbCat->id ? 'selected' : '' }}>{{ $kbCat->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    @endif
                     <div class="mb-3">
                         <label class="form-label">{{ __('messages.content') }}</label>
                         <div class="stackedit-tools mb-2">

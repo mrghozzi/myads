@@ -27,6 +27,23 @@
 
 ### Internationalization (i18n)
 * Added 10 new translation keys for the Visit Exchange system (`viewing`, `visit_paused`, `visit_verifying`, `visit_verified`, `visit_error`, `visit_network_error`, `daily_limit`, `daily_visit_limit_reached`, `daily_visit_limit_message`, `pts_visit_exchange`) across all **9 supported languages** (ar, de, en, es, fa, fr, it, pt, tr).
+* Added 15 new translation keys for the Knowledgebase Categories system (`kb_categories`, `kb_category`, `kb_all_categories`, `kb_no_category`, `kb_category_created`, `kb_category_updated`, `kb_category_deleted`, `kb_manage_categories`, `kb_manage_categories_desc`, `kb_filter_by_category`, `kb_no_categories`, `kb_no_categories_desc`, `kb_delete_category_note`, `kb_confirm_delete_category`, `optional`) in English and Arabic.
+
+### Knowledgebase — Categories & Pagination
+* **Feature**: Introduced a **Knowledgebase Categories** system (`kb_categories` table) with `name`, `slug` (auto-generated, unique), `description`, and `sort_order` fields.
+* **Feature**: Added a dedicated **Admin KB Categories** management page (`/admin/kb/categories`) with full CRUD via modals (create, edit, delete), article count per category, and empty state UI.
+* **Feature**: Added a sidebar link to KB Categories under the Store section in the admin navigation menu.
+* **Feature**: Updated the **Admin Knowledgebase** page (`/admin/knowledgebase`) with an optional KB Category select dropdown in both the Add Article and Edit Article modals, and category badges displayed on article cards and view modals.
+* **Feature**: Added an optional **category selector** dropdown in the public KB article create and edit forms (`/kb/{name}?st={article}` and `/kb/{name}/{article}/edit`).
+* **Feature**: Added a **category filter bar** (pill-style links) on the public KB index page (`/kb/{name}`), allowing visitors to filter articles by category, including an "Uncategorized" filter option.
+* **Feature**: Added a **category badge** (colored pill) on each KB topic card showing the assigned category name.
+* **Feature**: Implemented **pagination** (15 articles per page) on the public KB index page with `withQueryString()` to preserve category filter state across pages. Styled pagination controls match the KB theme accent color.
+* **Feature**: KB article listing is now **ordered by last modification date** (`updated_at DESC`) to surface recently updated content first.
+* **Backend**: Created `KbCategory` Eloquent model with auto-slug generation via `Str::slug()`, `articles()` hasMany relationship, and `articles_count` eager loading for admin.
+* **Backend**: Updated `Option` and `Knowledgebase` models with `kb_category_id` foreign key and `kbCategory()` belongsTo relationship.
+* **Backend**: Updated `StoreController` (`knowledgebaseIndex`, `knowledgebaseStore`, `knowledgebaseEdit`) with category filtering, eager loading (`with('kbCategory')`), and `kb_category_id` validation/persistence.
+* **Backend**: Updated `AdminController` (`knowledgebase`, `storeKnowledgebase`, `updateKnowledgebase`) with `kbCategories` data and `kb_category_id` support.
+* **Migration**: `2026_06_08_100000_create_kb_categories_table` — creates `kb_categories` table and adds nullable `kb_category_id` FK column to `options` table with `SET NULL` on delete.
 
 ---
 

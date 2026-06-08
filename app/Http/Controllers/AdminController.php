@@ -39,6 +39,7 @@ use App\Models\Report;
 use App\Models\Emoji;
 use App\Models\Menu;
 use App\Models\Knowledgebase;
+use App\Models\KbCategory;
 use App\Models\Page;
 use App\Models\ProductFile;
 use App\Models\Short;
@@ -2138,9 +2139,6 @@ class AdminController extends Controller
     // Knowledgebase Management
     public function knowledgebase(Request $request)
     {
-        // If searching or filtering, we might want to return a list view, 
-        // but for now let's pass data for the Help Center layout
-        
         // Get all unique categories (o_mode)
         $categories = Knowledgebase::select('o_mode')
             ->distinct()
@@ -2157,7 +2155,8 @@ class AdminController extends Controller
 
         $latestArticles = Knowledgebase::orderBy('id', 'desc')->take(5)->get();
         $totalArticles = Knowledgebase::count();
-        
+        $kbCategories = KbCategory::orderBy('sort_order')->orderBy('name')->get();
+
         // If we are searching, we might pass the search results
         $searchResults = null;
         if ($request->has('search')) {
@@ -2170,7 +2169,7 @@ class AdminController extends Controller
                   ->paginate(20);
         }
 
-        return view('admin::admin.knowledgebase', compact('categories', 'latestArticles', 'totalArticles', 'searchResults'));
+        return view('admin::admin.knowledgebase', compact('categories', 'latestArticles', 'totalArticles', 'searchResults', 'kbCategories'));
     }
 
     public function storeKnowledgebase(Request $request)
@@ -2178,10 +2177,16 @@ class AdminController extends Controller
         $request->validate([
             'name' => 'required|string',
             'o_valuer' => 'required|string',
-            'o_mode' => 'nullable|string', // Category
+            'o_mode' => 'nullable|string',
+            'kb_category_id' => 'nullable|integer|exists:kb_categories,id',
         ]);
 
-        Knowledgebase::create($request->all());
+        Knowledgebase::create([
+            'name' => $request->input('name'),
+            'o_valuer' => $request->input('o_valuer'),
+            'o_mode' => $request->input('o_mode'),
+            'kb_category_id' => $request->input('kb_category_id'),
+        ]);
 
         return redirect()->back()->with('success', __('article_created'));
     }
@@ -2194,9 +2199,15 @@ class AdminController extends Controller
             'name' => 'required|string',
             'o_valuer' => 'required|string',
             'o_mode' => 'nullable|string',
+            'kb_category_id' => 'nullable|integer|exists:kb_categories,id',
         ]);
 
-        $article->update($request->all());
+        $article->update([
+            'name' => $request->input('name'),
+            'o_valuer' => $request->input('o_valuer'),
+            'o_mode' => $request->input('o_mode'),
+            'kb_category_id' => $request->input('kb_category_id'),
+        ]);
 
         return redirect()->back()->with('success', __('article_updated'));
     }
@@ -2207,6 +2218,66 @@ class AdminController extends Controller
         $article->delete();
         
         return redirect()->back()->with('success', __('article_deleted'));
+    }
+
+    // KB Categories Management
+    public function kbCategories()
+    {
+        $categories = KbCategory::withCount('articles')
+            ->orderBy('sort_order')
+            ->orderBy('name')
+            ->get();
+
+        return view('admin::admin.kb_categories', compact('categories'));
+    }
+
+    public function storeKbCategory(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:150',
+            'description' => 'nullable|string|max:500',
+            'sort_order' => 'nullable|integer|min:0',
+        ]);
+
+        KbCategory::create([
+            'name' => $request->input('name'),
+            'description' => $request->input('description'),
+            'sort_order' => (int) ($request->input('sort_order', 0)),
+        ]);
+
+        return redirect()->back()->with('success', __('messages.kb_category_created'));
+    }
+
+    public function updateKbCategory(Request $request, $id)
+    {
+        $category = KbCategory::findOrFail($id);
+
+        $request->validate([
+            'name' => 'required|string|max:150',
+            'description' => 'nullable|string|max:500',
+            'sort_order' => 'nullable|integer|min:0',
+        ]);
+
+        $category->update([
+            'name' => $request->input('name'),
+            'slug' => Str::slug($request->input('name')),
+            'description' => $request->input('description'),
+            'sort_order' => (int) ($request->input('sort_order', 0)),
+        ]);
+
+        return redirect()->back()->with('success', __('messages.kb_category_updated'));
+    }
+
+    public function deleteKbCategory($id)
+    {
+        $category = KbCategory::findOrFail($id);
+
+        // Unlink articles from this category (set to null)
+        Option::where('kb_category_id', $id)->update(['kb_category_id' => null]);
+
+        $category->delete();
+
+        return redirect()->back()->with('success', __('messages.kb_category_deleted'));
     }
 
     // Site Ads Management

@@ -652,6 +652,12 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::post('/knowledgebase/{id}', [AdminController::class, 'updateKnowledgebase'])->name('admin.knowledgebase.update');
     Route::delete('/knowledgebase/{id}', [AdminController::class, 'deleteKnowledgebase'])->name('admin.knowledgebase.delete');
 
+    // KB Categories
+    Route::get('/kb/categories', [AdminController::class, 'kbCategories'])->name('admin.kb_categories');
+    Route::post('/kb/categories', [AdminController::class, 'storeKbCategory'])->name('admin.kb_categories.store');
+    Route::post('/kb/categories/{id}', [AdminController::class, 'updateKbCategory'])->name('admin.kb_categories.update');
+    Route::delete('/kb/categories/{id}', [AdminController::class, 'deleteKbCategory'])->name('admin.kb_categories.delete');
+
     // Emojis
     Route::get('/emojis', [AdminController::class, 'emojis'])->name('admin.emojis');
     Route::post('/emojis', [AdminController::class, 'storeEmoji'])->name('admin.emojis.store');

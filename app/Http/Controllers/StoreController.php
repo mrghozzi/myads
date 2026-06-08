@@ -18,6 +18,7 @@ use App\Models\ForumTopic;
 use App\Models\Emoji;
 use App\Services\KnowledgebaseCommunityService;
 use App\Support\StoreCategoryCatalog;
+use App\Models\KbCategory;
 
 class StoreController extends Controller
 {
@@ -705,11 +706,29 @@ class StoreController extends Controller
     public function knowledgebaseIndex(Request $request, $name)
     {
         $product = Product::withoutGlobalScope('store')->where('o_type', 'store')->where('name', $name)->firstOrFail();
-        $articles = Option::where('o_type', 'knowledgebase')
+
+        // KB Categories
+        $kbCategories = KbCategory::orderBy('sort_order')->orderBy('name')->get();
+        $selectedCategory = $request->query('category');
+
+        $articlesQuery = Option::where('o_type', 'knowledgebase')
             ->where('o_mode', $product->name)
-            ->where('o_order', 0)
-            ->orderBy('id')
-            ->get();
+            ->where('o_order', 0);
+
+        // Apply category filter
+        if ($selectedCategory === 'uncategorized') {
+            $articlesQuery->whereNull('kb_category_id');
+        } elseif ($selectedCategory && is_numeric($selectedCategory)) {
+            $articlesQuery->where('kb_category_id', (int) $selectedCategory);
+        }
+
+        $articles = $articlesQuery
+            ->with('kbCategory')
+            ->orderByDesc('updated_at')
+            ->orderByDesc('id')
+            ->paginate(15)
+            ->withQueryString();
+
         $pendingCounts = Option::where('o_type', 'knowledgebase')
             ->where('o_mode', $product->name)
             ->where('o_order', 1)
@@ -759,6 +778,8 @@ class StoreController extends Controller
                 'articleAuthors' => $articleAuthors,
                 'articleName' => $articleName,
                 'editorText' => old('txt'),
+                'kbCategories' => $kbCategories,
+                'selectedCategory' => $selectedCategory,
             ] + $shellData);
         }
 
@@ -768,6 +789,8 @@ class StoreController extends Controller
             'articles' => $articles,
             'pendingCounts' => $pendingCounts,
             'articleAuthors' => $articleAuthors,
+            'kbCategories' => $kbCategories,
+            'selectedCategory' => $selectedCategory,
         ] + $shellData);
     }
 
@@ -829,6 +852,7 @@ class StoreController extends Controller
         }
 
         $shellData = $this->buildKnowledgebaseShellData($product, $kbArticle);
+        $kbCategories = KbCategory::orderBy('sort_order')->orderBy('name')->get();
 
         return view('theme::store.knowledgebase', [
             'product' => $product,
@@ -836,6 +860,7 @@ class StoreController extends Controller
             'article' => $kbArticle,
             'articleName' => $kbArticle->name,
             'editorText' => old('txt', $kbArticle->o_valuer),
+            'kbCategories' => $kbCategories,
         ] + $shellData);
     }
 
@@ -899,6 +924,7 @@ class StoreController extends Controller
             'txt' => 'required|string|min:10',
             'capt' => 'required|string',
             'share_to_community' => 'nullable|boolean',
+            'kb_category_id' => 'nullable|integer|exists:kb_categories,id',
         ]);
 
         $captcha = session('kb_captcha');
@@ -943,7 +969,13 @@ class StoreController extends Controller
                 'o_parent' => $userId,
                 'o_order' => $status,
                 'o_mode' => $product->name,
+                'kb_category_id' => $request->input('kb_category_id'),
             ]);
+
+            // Track last modification date for knowledgebase ordering
+            if ($status === 0) {
+                $article->update(['updated_at' => now()]);
+            }
 
             app(\App\Services\GamificationService::class)->recordEvent($userId, 'kb_article_created');
 
@@ -1032,7 +1064,7 @@ class StoreController extends Controller
                 ->where('name', $request->input('article'))
                 ->where('o_order', 0)
                 ->update(['o_order' => 2]);
-            $entry->update(['o_order' => 0]);
+            $entry->update(['o_order' => 0, 'updated_at' => now()]);
             Option::where('o_type', 'knowledgebase')
                 ->where('o_mode', $product->name)
                 ->where('name', $request->input('article'))
