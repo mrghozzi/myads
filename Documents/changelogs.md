@@ -34,6 +34,7 @@
 * **UI/UX**: Re-styled the profile picture on Clips to use the uniform hexagonal avatar design with active status and verified badges.
 * **UI/UX**: Long captions on clips are now properly truncated with a "Show more/Show less" toggle.
 * **Feature**: Added dynamic URL hash updating (`/clips#{id}`) while scrolling through the Clips feed.
+* **SEO**: Implemented `VideoObject` Schema.org structured data (JSON-LD) for individual clips to help search engines understand and index them as short-form video content, including interactions and direct anchor links (`/clips#{id}`).
 
 ### Knowledgebase — Categories & Pagination
 * **Feature**: Introduced a **Knowledgebase Categories** system (`kb_categories` table) with `name`, `slug` (auto-generated, unique), `description`, and `sort_order` fields.

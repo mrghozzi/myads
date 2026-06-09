@@ -14,6 +14,38 @@
         $isCaptionLong = mb_strlen($clipCaptionPlain) > 80;
     @endphp
     @if($mediaUrl)
+        <!-- SEO Structured Data for Short Video Clip -->
+        <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "VideoObject",
+            "name": "{{ $clipCaptionPlain ? \Illuminate\Support\Str::limit(trim(preg_replace('/\s+/', ' ', $clipCaptionPlain)), 100) : 'Clip by ' . ($clipUser->username ?? 'User') }}",
+            "description": "{{ $clipCaptionPlain ? trim(preg_replace('/\s+/', ' ', $clipCaptionPlain)) : 'Short video clip on MYADS' }}",
+            "thumbnailUrl": [
+                "{{ $clipUserAvatar }}"
+            ],
+            "uploadDate": "{{ $activity->created_at->toIso8601String() }}",
+            "contentUrl": "{{ $mediaUrl }}",
+            "url": "{{ url('/clips#' . $activity->id) }}",
+            "author": {
+                "@type": "Person",
+                "name": "{{ $clipUser->username ?? 'Unknown' }}",
+                "url": "{{ $clipUser ? route('profile.show', $clipUser->username) : url('/') }}"
+            },
+            "interactionStatistic": [
+                {
+                    "@type": "InteractionCounter",
+                    "interactionType": "https://schema.org/LikeAction",
+                    "userInteractionCount": {{ $activity->reactions_count ?? 0 }}
+                },
+                {
+                    "@type": "InteractionCounter",
+                    "interactionType": "https://schema.org/CommentAction",
+                    "userInteractionCount": {{ $activity->comments_count ?? 0 }}
+                }
+            ]
+        }
+        </script>
         <div class="reel-item" data-id="{{ $activity->id }}" data-tp-id="{{ $activity->tp_id }}" data-s-type="{{ $activity->s_type }}" data-related-id="{{ $activity->related_content->id }}">
             <video class="reel-video" loop muted playsinline src="{{ $mediaUrl }}" preload="auto"></video>
             
