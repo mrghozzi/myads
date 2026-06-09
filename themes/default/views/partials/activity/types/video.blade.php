@@ -110,22 +110,42 @@
             </div>
 
             @if($video)
-                <div class="post-video-wrapper">
-                    <div class="video-watermark">
-                        <img src="{{ theme_asset('img/logo_w.webp') }}" alt="Watermark">
+                @if((int) $activity->s_type === 14)
+                    {{-- Clips: Show preview with link to clips viewer --}}
+                    <a href="{{ url('/clips#' . $activity->id) }}" class="post-video-wrapper" style="display: block; position: relative; text-decoration: none; cursor: pointer;">
+                        <div class="video-watermark">
+                            <img src="{{ theme_asset('img/logo_w.webp') }}" alt="Watermark">
+                        </div>
+                        <video preload="metadata" muted style="width: 100%; max-height: 500px; object-fit: cover; border-radius: 12px; pointer-events: none;">
+                            <source src="{{ asset($video->file_path) }}#t=0.5" type="{{ $video->mime_type }}">
+                        </video>
+                        <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(0,0,0,0.35); border-radius: 12px; transition: background 0.2s;">
+                            <svg viewBox="0 0 24 24" width="56" height="56" fill="rgba(255,255,255,0.9)"><path d="M8 5v14l11-7z"/></svg>
+                            <span style="color: #fff; font-weight: 700; font-size: 14px; margin-top: 10px; background: rgba(0,0,0,0.5); padding: 6px 16px; border-radius: 20px; backdrop-filter: blur(4px);">
+                                <i class="fa-solid fa-clapperboard" style="margin-{{ locale_direction() == 'rtl' ? 'left' : 'right' }}: 6px;"></i>
+                                {{ __('messages.watch_in_clips') ?? 'Watch in Clips' }}
+                            </span>
+                        </div>
+                    </a>
+                @else
+                    {{-- Regular Video: Standard Plyr player --}}
+                    <div class="post-video-wrapper">
+                        <div class="video-watermark">
+                            <img src="{{ theme_asset('img/logo_w.webp') }}" alt="Watermark">
+                        </div>
+                        <video class="js-plyr" controls preload="metadata">
+                            <source src="{{ asset($video->file_path) }}" type="{{ $video->mime_type }}">
+                            Your browser does not support the video tag.
+                        </video>
                     </div>
-                    <video class="js-plyr" controls preload="metadata">
-                        <source src="{{ asset($video->file_path) }}" type="{{ $video->mime_type }}">
-                        Your browser does not support the video tag.
-                    </video>
-                </div>
-                <script>
-                    if (typeof Plyr !== 'undefined') {
-                        new Plyr('.post{{ $activity->id }} .js-plyr', {
-                            controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'captions', 'settings', 'pip', 'airplay', 'fullscreen'],
-                        });
-                    }
-                </script>
+                    <script>
+                        if (typeof Plyr !== 'undefined') {
+                            new Plyr('.post{{ $activity->id }} .js-plyr', {
+                                controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'captions', 'settings', 'pip', 'airplay', 'fullscreen'],
+                            });
+                        }
+                    </script>
+                @endif
             @endif
 
             @if($activity->linkPreviewRecord)

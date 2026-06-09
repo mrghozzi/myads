@@ -25,15 +25,15 @@
 * **UX**: Added a visual **progress bar** and **status indicator** (Viewing → Verifying → Success/Error) to the surf page.
 * **UX**: Added a dedicated "Daily Limit Reached" page when the user has exhausted their daily visit quota.
 
-### Internationalization (i18n)
-* Added 10 new translation keys for the Visit Exchange system (`viewing`, `visit_paused`, `visit_verifying`, `visit_verified`, `visit_error`, `visit_network_error`, `daily_limit`, `daily_visit_limit_reached`, `daily_visit_limit_message`, `pts_visit_exchange`) across all **9 supported languages** (ar, de, en, es, fa, fr, it, pt, tr).
-* Added 15 new translation keys for the Knowledgebase Categories system (`kb_categories`, `kb_category`, `kb_all_categories`, `kb_no_category`, `kb_category_created`, `kb_category_updated`, `kb_category_deleted`, `kb_manage_categories`, `kb_manage_categories_desc`, `kb_filter_by_category`, `kb_no_categories`, `kb_no_categories_desc`, `kb_delete_category_note`, `kb_confirm_delete_category`, `optional`) in English and Arabic.
-* Added 2 new translation keys for the Saved Clips feature (`saved_clips`, `saved_clips_desc`) across all **9 supported languages** (ar, de, en, es, fa, fr, it, pt, tr).
-
 ### Clips — Bug Fixes
 * **Fix**: Fixed video playback not working on the `/clips` page — videos now autoplay correctly when visible using IntersectionObserver.
 * **Fix**: Fixed the mute/unmute toggle button on clips not responding to clicks.
 * **Fix**: Fixed the comments button on clips redirecting to a 404 page — now opens an inline comments sidebar panel alongside the video, with full comment loading, posting, and deletion matching the community feed comment UI.
+* **Fix**: Fixed navigation issues in the `/clips/saved` and community feed pages, where clicking a clip now correctly opens the immersive Clips viewer at `/clips#{id}` instead of the standard Plyr video player.
+* **Fix**: Fixed the report button on the Clips page which was failing to load the report modal. Added a centralized modal container to correctly inject and render the standard report form.
+* **UI/UX**: Re-styled the profile picture on Clips to use the uniform hexagonal avatar design with active status and verified badges.
+* **UI/UX**: Long captions on clips are now properly truncated with a "Show more/Show less" toggle.
+* **Feature**: Added dynamic URL hash updating (`/clips#{id}`) while scrolling through the Clips feed.
 
 ### Knowledgebase — Categories & Pagination
 * **Feature**: Introduced a **Knowledgebase Categories** system (`kb_categories` table) with `name`, `slug` (auto-generated, unique), `description`, and `sort_order` fields.

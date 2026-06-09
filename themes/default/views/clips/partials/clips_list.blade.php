@@ -4,9 +4,17 @@
         if (isset($activity->related_content->attachments) && $activity->related_content->attachments->count() > 0) {
             $mediaUrl = asset($activity->related_content->attachments->first()->file_path);
         }
+        $clipUser = $activity->user;
+        $clipUserAvatar = $clipUser ? $clipUser->avatarUrl() : asset('upload/avatar.png');
+        $clipUserBadgeColor = $clipUser ? $clipUser->profileBadgeColor() : '';
+        $clipUserHasVerifiedBadge = $clipUser?->hasVerifiedBadge() ?? false;
+        $clipCaption = $activity->related_content->txt ?? '';
+        $clipCaptionFormatted = \App\Support\ContentFormatter::format($clipCaption);
+        $clipCaptionPlain = strip_tags($clipCaptionFormatted);
+        $isCaptionLong = mb_strlen($clipCaptionPlain) > 80;
     @endphp
     @if($mediaUrl)
-        <div class="reel-item" data-id="{{ $activity->id }}" data-tp-id="{{ $activity->tp_id }}">
+        <div class="reel-item" data-id="{{ $activity->id }}" data-tp-id="{{ $activity->tp_id }}" data-s-type="{{ $activity->s_type }}" data-related-id="{{ $activity->related_content->id }}">
             <video class="reel-video" loop muted playsinline src="{{ $mediaUrl }}" preload="auto"></video>
             
             <div class="reel-overlay">
@@ -28,17 +36,41 @@
                 <!-- Bottom Info -->
                 <div class="reel-info">
                     <a href="{{ route('profile.show', $activity->user->username) }}" class="reel-user">
-                        <img src="{{ asset('upload/'.$activity->user->avatar) }}" alt="avatar" class="reel-avatar" onerror="this.src='{{ asset('upload/avatar.png') }}'">
+                        <!-- Hexagonal Avatar -->
+                        <div class="user-avatar small no-outline reel-hex-avatar {{ $clipUser?->isOnline() ? 'online' : 'offline' }}">
+                            <div class="user-avatar-content">
+                                <div class="hexagon-image-30-32" data-src="{{ $clipUserAvatar }}" style="width: 30px; height: 32px; position: relative;"></div>
+                            </div>
+                            <div class="user-avatar-progress-border">
+                                <div class="hexagon-border-40-44" data-line-color="{{ $clipUserBadgeColor }}" style="width: 40px; height: 44px; position: relative;"></div>
+                            </div>
+                            @if($clipUserHasVerifiedBadge)
+                                <div class="user-avatar-badge">
+                                    <div class="user-avatar-badge-border">
+                                        <div class="hexagon-22-24" style="width: 22px; height: 24px; position: relative;"></div>
+                                    </div>
+                                    <div class="user-avatar-badge-content">
+                                        <div class="hexagon-dark-16-18" style="width: 16px; height: 18px; position: relative;"></div>
+                                    </div>
+                                    <p class="user-avatar-badge-text"><i class="fa fa-fw fa-check"></i></p>
+                                </div>
+                            @endif
+                        </div>
                         <span class="reel-username">
                             {{ $activity->user->username }}
-                            @if($activity->user->hasVerifiedBadge())
+                            @if($clipUserHasVerifiedBadge)
                                 <svg class="verified-icon" viewBox="0 0 24 24" width="16" height="16" fill="#23d2e2" style="vertical-align: middle; margin-left: 2px;"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm-1.9 14.7L6 12.6l1.5-1.5 2.6 2.6 6.4-6.4 1.5 1.5-7.9 7.9z"/></svg>
                             @endif
                         </span>
                     </a>
-                    <div class="reel-caption" dir="auto">
-                        {!! \App\Support\ContentFormatter::format($activity->txt) !!}
-                    </div>
+                    @if(!empty($clipCaption))
+                        <div class="reel-caption {{ $isCaptionLong ? 'reel-caption-truncated' : '' }}" dir="auto">
+                            {!! $clipCaptionFormatted !!}
+                        </div>
+                        @if($isCaptionLong)
+                            <button class="reel-caption-more" onclick="this.previousElementSibling.classList.toggle('reel-caption-truncated'); this.textContent = this.previousElementSibling.classList.contains('reel-caption-truncated') ? '{{ __("messages.show_more") }}' : '{{ __("messages.show_less") }}';">{{ __('messages.show_more') }}</button>
+                        @endif
+                    @endif
                 </div>
 
                 <!-- Right Actions Sidebar -->
@@ -76,7 +108,7 @@
                     </button>
 
                     <!-- Share -->
-                    <button class="reel-action-btn share-reel" data-url="{{ url('/status/'.$activity->id) }}">
+                    <button class="reel-action-btn share-reel" data-url="{{ url('/clips#'.$activity->id) }}">
                         <svg class="icon" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>
                         <span>{{ __('messages.share') ?? 'Share' }}</span>
                     </button>

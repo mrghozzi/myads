@@ -87,7 +87,7 @@
         display: inline-flex;
         align-items: center;
         gap: 10px;
-        margin-bottom: 10px;
+        margin-bottom: 8px;
         color: #fff;
         text-decoration: none;
     }
@@ -96,12 +96,15 @@
         color: #fff;
     }
 
-    .reel-avatar {
+    /* Hexagonal Avatar in Clips - Override theme defaults for dark background */
+    .reel-hex-avatar {
         width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        border: 2px solid #fff;
-        object-fit: cover;
+        height: 44px;
+        flex-shrink: 0;
+    }
+
+    .reel-hex-avatar .user-avatar-progress-border .hexagon-border-40-44 canvas {
+        opacity: 0.9;
     }
 
     .reel-username {
@@ -109,13 +112,34 @@
         font-size: 16px;
     }
 
+    /* Reel Caption with truncation and "more" button */
     .reel-caption {
         font-size: 14px;
         line-height: 1.4;
+        word-break: break-word;
+    }
+
+    .reel-caption.reel-caption-truncated {
         display: -webkit-box;
-        -webkit-line-clamp: 3;
+        -webkit-line-clamp: 2;
         -webkit-box-orient: vertical;
         overflow: hidden;
+    }
+
+    .reel-caption-more {
+        background: none;
+        border: none;
+        color: rgba(255,255,255,0.7);
+        font-size: 13px;
+        font-weight: 600;
+        padding: 4px 0 0 0;
+        cursor: pointer;
+        text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+        pointer-events: auto;
+    }
+
+    .reel-caption-more:hover {
+        color: #fff;
     }
 
     .reel-actions {
@@ -176,15 +200,19 @@
         100% { transform: scale(1); }
     }
 
-    /* Floating Saved Clips Button */
+    /* Floating Header Actions (Saved + Report) */
     .clips-header-actions {
         position: absolute;
         top: 15px;
         right: 15px;
         z-index: 20;
+        display: flex;
+        gap: 8px;
+        align-items: center;
     }
     
-    .btn-saved-clips {
+    .btn-saved-clips,
+    .btn-report-clip {
         background: rgba(0,0,0,0.5);
         backdrop-filter: blur(5px);
         color: #fff;
@@ -198,12 +226,15 @@
         gap: 8px;
         text-decoration: none;
         transition: background 0.2s;
+        cursor: pointer;
     }
-    .btn-saved-clips:hover {
+    .btn-saved-clips:hover,
+    .btn-report-clip:hover {
         background: rgba(0,0,0,0.8);
         color: #fff;
     }
-    .btn-saved-clips svg {
+    .btn-saved-clips svg,
+    .btn-report-clip svg {
         width: 16px;
         height: 16px;
         fill: currentColor;
@@ -239,7 +270,7 @@
         gap: 20px;
         max-width: 900px;
         margin: 0 auto;
-        height: calc(100vh - 120px);
+        height: calc(100vh - 80px);
         position: relative;
         width: 100%;
     }
@@ -301,7 +332,7 @@
         .clips-layout-container {
             flex-direction: column;
             align-items: center;
-            height: calc(100vh - 80px);
+            height: calc(100vh - 70px);
         }
 
         .clips-comments-sidebar {
@@ -335,10 +366,16 @@
     }
 </style>
 
-<div class="grid" style="padding-top: 20px;">
+<div class="grid" style="padding-top: 0;">
     <div class="clips-layout-container">
         <div class="clips-wrapper">
             <div class="clips-header-actions">
+                @auth
+                <button class="btn-report-clip" id="btn-report-clip" title="{{ __('messages.report') ?? 'Report' }}">
+                    <svg viewBox="0 0 24 24"><path d="M14.4 6L14 4H5v17h2v-7h5.6l.4 2h7V6z"/></svg>
+                    {{ __('messages.report') ?? 'Report' }}
+                </button>
+                @endauth
                 <a href="{{ route('clips.saved') }}" class="btn-saved-clips">
                     <svg viewBox="0 0 24 24"><path d="M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2z"/></svg>
                     {{ __('messages.saved') ?? 'Saved' }}
@@ -370,6 +407,9 @@
                 </div>
             </div>
         </div>
+        
+        <!-- Centralized container for the report modal -->
+        <div id="reportclips-modal-container" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1050; width: 90%; max-width: 400px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);"></div>
     </div>
 </div>
 @endsection
@@ -381,6 +421,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const loadingEl = document.getElementById('clips-loading');
     let nextPageUrl = '{{ $activities->nextPageUrl() }}';
     let isLoading = false;
+
+    // Initialize hexagonal avatars for clips
+    if (typeof initHexagons === 'function') {
+        initHexagons(container);
+    }
+    if (typeof recolorBadgeHexagons === 'function') {
+        recolorBadgeHexagons(container);
+    }
 
     // Intersection Observer for playing/pausing videos
     const videoObserverOptions = {
@@ -410,6 +458,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 container.dataset.activeTpId = activeTpId;
                 container.dataset.activeStatusId = item.dataset.id;
                 
+                // Update URL hash to reflect the active clip
+                const clipId = item.dataset.id;
+                if (clipId && window.location.hash !== '#' + clipId) {
+                    history.replaceState(null, '', '/clips#' + clipId);
+                }
+
                 // If comments sidebar is active, dynamically load comments for the newly active clip!
                 const sidebar = document.getElementById('clips-comments-sidebar');
                 if (sidebar && sidebar.classList.contains('active')) {
@@ -484,6 +538,29 @@ document.addEventListener('DOMContentLoaded', function() {
 
     observeVideos();
 
+    // Scroll to specific clip if URL has a hash (e.g. /clips#55)
+    function scrollToHashClip() {
+        const hash = window.location.hash;
+        if (hash && hash.length > 1) {
+            const clipId = hash.substring(1);
+            const targetItem = document.querySelector('.reel-item[data-id="' + clipId + '"]');
+            if (targetItem) {
+                // Temporarily disable smooth scroll for instant jump
+                container.style.scrollBehavior = 'auto';
+                targetItem.scrollIntoView({ block: 'start' });
+                // Restore smooth scroll after a brief delay
+                setTimeout(() => {
+                    container.style.scrollBehavior = 'smooth';
+                }, 100);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // Try to scroll to hash clip on initial load
+    scrollToHashClip();
+
     // Infinite Scroll Observer
     const sentinelObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
@@ -525,6 +602,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 nextPageUrl = data.next_page_url;
                 observeVideos();
                 observeSentinel();
+
+                // Initialize hexagonal avatars for newly loaded clips
+                if (typeof initHexagons === 'function') {
+                    initHexagons(container);
+                }
+                if (typeof recolorBadgeHexagons === 'function') {
+                    recolorBadgeHexagons(container);
+                }
+
+                // After loading more clips, check if we need to scroll to hash target
+                scrollToHashClip();
             } else {
                 nextPageUrl = null;
             }
@@ -619,6 +707,21 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
     });
+
+    // Report Button (top header)
+    const reportBtn = document.getElementById('btn-report-clip');
+    if (reportBtn) {
+        reportBtn.addEventListener('click', function() {
+            const activeItem = document.querySelector('.reel-item[data-id="' + container.dataset.activeStatusId + '"]');
+            if (activeItem) {
+                const tpId = activeItem.dataset.tpId;
+                const sType = activeItem.dataset.sType;
+                if (typeof reportPost === 'function') {
+                    reportPost(tpId, sType, 'clips-modal-container');
+                }
+            }
+        });
+    }
 
     // Load comments helper
     function loadClipsComments(tpId) {

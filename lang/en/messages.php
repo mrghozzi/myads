@@ -3368,4 +3368,7 @@ return [
     'optional' => 'Optional',
     'saved_clips' => 'Saved Clips',
     'saved_clips_desc' => 'Manage and watch your saved clips.',
+    'show_more' => 'Show more',
+    'show_less' => 'Show less',
+    'watch_in_clips' => 'Watch in Clips',
 ];
