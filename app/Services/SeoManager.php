@@ -471,8 +471,10 @@ class SeoManager
                 'mainEntity' => array_filter([
                     '@type' => 'Person',
                     'name' => (string) ($context['author_name'] ?? $title),
+                    'description' => $description,
                     'url' => $canonicalUrl,
                     'image' => $image,
+                    'sameAs' => $context['social_links'] ?? null,
                 ]),
                 'url' => $canonicalUrl,
             ]);

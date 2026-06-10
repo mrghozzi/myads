@@ -1,6 +1,10 @@
 # v4.3.6
 > **Release** — _In Development_
 
+### SEO — Member Profiles
+* **Feature**: Enhanced SEO for public member profile pages (`/u/{username}`) with rich `ProfilePage` and `Person` Schema.org structured data, automatically exposing the user's description and linked social accounts (`sameAs`).
+* **Privacy**: Profile SEO now fully respects the member's privacy settings (`/settings/privacy`). Profiles set to "Followers Only" or "Private" automatically emit `noindex, nofollow` robots meta tags to prevent search engine indexing.
+
 ### SEO — Standalone Pages Integration
 * **Fix**: 7 standalone pages (`/`, `/login`, `/register`, `/password/reset`, `/privacy`, `/terms`, `/refund`) now fully integrate with the centralized SEO engine and `/admin/seo` settings (meta tags, OG, canonical, GA4, Schema.org).
 * Added 4 new admin-configurable SEO scopes: `login_page`, `register_page`, `password_reset_page`, `refund_page`.

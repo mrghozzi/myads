@@ -140,6 +140,9 @@ class ProfileController extends Controller
                 : __('messages.profile_private_notice'))
             : null;
 
+        $socialOption = Option::where('o_type', 'user_social_links')->where('o_parent', $user->id)->first();
+        $socialLinks = $socialOption ? json_decode($socialOption->o_valuer, true) : [];
+
         $this->seo([
             'scope_key' => 'profile_show',
             'content_type' => 'user',
@@ -151,14 +154,13 @@ class ProfileController extends Controller
             'image' => $user->img,
             'username' => $user->username,
             'author_name' => $user->username,
+            'social_links' => !empty($socialLinks) ? array_values($socialLinks) : null,
+            'indexable' => $privacySettings->profile_visibility === UserPrivacyService::VISIBILITY_PUBLIC,
             'breadcrumbs' => [
                 ['name' => __('messages.home'), 'url' => url('/')],
                 ['name' => $user->username, 'url' => route('profile.show', $user->username)],
             ],
         ]);
-
-        $socialOption = Option::where('o_type', 'user_social_links')->where('o_parent', $user->id)->first();
-        $socialLinks = $socialOption ? json_decode($socialOption->o_valuer, true) : [];
         $subscriptionProfileBadge = app(SubscriptionEntitlementService::class)->activeProfileBadgeForUserId($user->id);
 
         if ($request->ajax() || $request->wantsJson()) {
