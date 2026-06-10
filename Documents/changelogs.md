@@ -56,6 +56,9 @@
 * **Backend**: Updated `AdminController` (`knowledgebase`, `storeKnowledgebase`, `updateKnowledgebase`) with `kbCategories` data and `kb_category_id` support.
 * **Migration**: `2026_06_08_100000_create_kb_categories_table` — creates `kb_categories` table and adds nullable `kb_category_id` FK column to `options` table with `SET NULL` on delete.
 
+### Security & Dependencies
+* **Security Fix**: Resolved a Critical Dependabot alert (GHSA-w7jw-789q-3m8p) regarding `shell-quote` by adding an `overrides` section in `package.json` to force `shell-quote` to `^1.8.4`. This patches an issue where `quote()` did not escape newlines in object `.op` values, mitigating potential shell command injection vulnerabilities inherited via the `concurrently` dev dependency.
+
 ---
 
 # v4.3.5
