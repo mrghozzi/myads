@@ -319,6 +319,7 @@
                             <ul class="nxl-submenu">
                                 @if($canAdmin('users'))
                                     <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.users') }}">{{ __('messages.users') }}</a></li>
+                                    <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.pts_activities') }}">{{ __('messages.pts_activities') }}</a></li>
                                 @endif
                                 @if($canAdmin('community'))
                                     <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.groups.index') }}">{{ __('messages.admin_groups_title') }}</a></li>

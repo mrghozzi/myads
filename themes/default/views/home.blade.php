@@ -282,6 +282,102 @@
                     </div>
                 </form>
             </div>
+
+            <hr />
+            <p class="switch-option-title"><b>{{ __('messages.transfer_pts') }}</b></p>
+            <br />
+            <div class="switch-option">
+                <form action="{{ route('dashboard.pts.transfer') }}" method="POST">
+                    @csrf
+                    <div class="form-row split">
+                        <div class="form-item">
+                            <div class="form-input active">
+                                <label for="transfer_username">{{ __('messages.username') }}</label>
+                                <input type="text" id="transfer_username" name="username" required>
+                            </div>
+                        </div>
+                        <div class="form-item">
+                            <div class="form-input active">
+                                <label for="transfer_amount">{{ __('messages.Points') }}</label>
+                                <input type="number" id="transfer_amount" name="amount" min="1" step="0.01" required>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-row split">
+                        <button type="submit" class="button tertiary padded">{{ __('messages.send') }}</button>
+                    </div>
+                </form>
+            </div>
+            
+            <hr />
+            <p class="switch-option-title"><b>{{ __('messages.generate_voucher') }}</b></p>
+            <br />
+            <div class="switch-option">
+                <form action="{{ route('dashboard.pts.voucher.generate') }}" method="POST">
+                    @csrf
+                    <div class="form-row split">
+                        <div class="form-item">
+                            <div class="form-input active">
+                                <label for="voucher_amount">{{ __('messages.Points') }}</label>
+                                <input type="number" id="voucher_amount" name="amount" min="1" step="0.01" required>
+                            </div>
+                        </div>
+                        <div class="form-item" style="display:flex; align-items:end;">
+                            <button type="submit" class="button secondary padded">{{ __('messages.generate') }}</button>
+                        </div>
+                    </div>
+                </form>
+                @if(isset($vouchers) && $vouchers->count() > 0)
+                <div class="table-container" style="margin-top: 15px;">
+                    <table class="table" style="width: 100%; text-align: right; background: rgba(0,0,0,0.2); border-radius: 8px;">
+                        <thead>
+                            <tr>
+                                <th style="padding: 10px;">{{ __('messages.code') }}</th>
+                                <th style="padding: 10px;">{{ __('messages.amount') }}</th>
+                                <th style="padding: 10px;">{{ __('messages.status') }}</th>
+                                <th style="padding: 10px;">{{ __('messages.date') }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($vouchers as $voucher)
+                            <tr>
+                                <td style="padding: 10px;"><code>{{ $voucher->code }}</code></td>
+                                <td style="padding: 10px;">{{ $voucher->amount }} PTS</td>
+                                <td style="padding: 10px;">
+                                    @if($voucher->is_used)
+                                        <span style="color: #ef4444; font-weight: bold;">{{ __('messages.used') }} <br><small>بواسطة {{ $voucher->claimer->username ?? '?' }}</small></span>
+                                    @else
+                                        <span style="color: #10b981; font-weight: bold;">{{ __('messages.unused') }}</span>
+                                    @endif
+                                </td>
+                                <td style="padding: 10px;">{{ $voucher->created_at->format('Y-m-d') }}</td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+                @endif
+            </div>
+
+            <hr />
+            <p class="switch-option-title"><b>{{ __('messages.claim_voucher') }}</b></p>
+            <br />
+            <div class="switch-option">
+                <form action="{{ route('dashboard.pts.voucher.claim') }}" method="POST">
+                    @csrf
+                    <div class="form-row split">
+                        <div class="form-item">
+                            <div class="form-input active">
+                                <label for="claim_code">{{ __('messages.code') }}</label>
+                                <input type="text" id="claim_code" name="code" required>
+                            </div>
+                        </div>
+                        <div class="form-item" style="display:flex; align-items:end;">
+                            <button type="submit" class="button primary padded">{{ __('messages.claim') }}</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
         </div>
       </div>
       {!! ads_site(2) !!}

@@ -1,6 +1,16 @@
 # v4.3.6
 > **Release** — _In Development_
 
+### Points (PTS) Economy
+* **Feature**: Added **PTS Transfer** system, allowing members to transfer points to other members directly from the `/home` dashboard.
+* **Feature**: Added **PTS Vouchers** system, allowing members to generate single-use voucher codes loaded with PTS. Other members can claim these codes to add the PTS to their balance.
+* **Backend**: Created `PtsVoucher` Eloquent model and `pts_vouchers` migration to track voucher generation, codes, amounts, and usage status.
+* **Backend**: Implemented robust concurrency protection (`lockForUpdate()`) and validation (cannot transfer to self, minimum amounts) in `HomeController` for both transfers and vouchers.
+* **Feature**: Integrated with `PointLedgerService` to ensure all transfers and voucher claims are properly logged in the points transaction ledger.
+* **Feature**: Integrated with `NotificationService` to automatically alert recipients when they receive a PTS transfer or when their generated voucher is claimed.
+* **Admin**: Added a dedicated **PTS Activities** dashboard (`/admin/pts-activities`) using the Duralux "Superdesign" template to monitor all global point transfers and voucher generation/usage.
+* **Localization**: Fully localized the new systems with over 20 new terminology keys in both Arabic (`lang/ar/messages.php`) and English (`lang/en/messages.php`), and resolved a syntax issue causing 500 errors when passing fallback strings to `__()`.
+
 ### SEO — Member Profiles
 * **Feature**: Enhanced SEO for public member profile pages (`/u/{username}`) with rich `ProfilePage` and `Person` Schema.org structured data, automatically exposing the user's description and linked social accounts (`sameAs`).
 * **Privacy**: Profile SEO now fully respects the member's privacy settings (`/settings/privacy`). Profiles set to "Followers Only" or "Private" automatically emit `noindex, nofollow` robots meta tags to prevent search engine indexing.

@@ -126,6 +126,9 @@ Route::get('/', function () {
 
 Route::get('/home', [HomeController::class, 'index'])->name('dashboard')->middleware('auth');
 Route::post('/home', [HomeController::class, 'convertPoints'])->name('dashboard.convert')->middleware('auth');
+Route::post('/home/pts/transfer', [HomeController::class, 'transferPts'])->name('dashboard.pts.transfer')->middleware('auth');
+Route::post('/home/pts/voucher/generate', [HomeController::class, 'generateVoucher'])->name('dashboard.pts.voucher.generate')->middleware('auth');
+Route::post('/home/pts/voucher/claim', [HomeController::class, 'claimVoucher'])->name('dashboard.pts.voucher.claim')->middleware('auth');
 Route::get('/quests', [App\Http\Controllers\QuestController::class, 'index'])->name('quests.index')->middleware('auth');
 Route::get('/plans', [BillingController::class, 'plans'])->name('billing.plans');
 
@@ -536,6 +539,7 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::post('/seo/ads-files', [AdminSeoController::class, 'updateAdsFiles'])->name('admin.seo.ads_files.update');
     
     Route::get('/users', [AdminController::class, 'users'])->name('admin.users');
+    Route::get('/pts-activities', [\App\Http\Controllers\AdminPtsActivityController::class, 'index'])->name('admin.pts_activities');
     Route::get('/users/{id}/edit', [AdminController::class, 'editUser'])->name('admin.users.edit');
     Route::put('/users/{id}', [AdminController::class, 'updateUser'])->name('admin.users.update');
     Route::put('/users/{id}/password', [AdminController::class, 'updateUserPassword'])->name('admin.users.password');

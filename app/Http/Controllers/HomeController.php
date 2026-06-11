@@ -13,7 +13,10 @@ use App\Models\Option;
 use App\Models\Setting;
 use App\Models\User;
 use App\Support\SmartAdsSettings;
-
+use App\Models\PtsVoucher;
+use App\Services\PointLedgerService;
+use App\Services\NotificationService;
+use Illuminate\Support\Str;
 class HomeController extends Controller
 {
     public function index()
@@ -45,7 +48,9 @@ class HomeController extends Controller
         
         $site_settings = Setting::first();
 
-        return view('theme::home', compact('user', 'bannerStats', 'linkStats', 'visitStats', 'smartAdStats', 'site_settings'));
+        $vouchers = PtsVoucher::where('user_id', $user->id)->orderBy('created_at', 'desc')->get();
+
+        return view('theme::home', compact('user', 'bannerStats', 'linkStats', 'visitStats', 'smartAdStats', 'site_settings', 'vouchers'));
     }
 
     public function convertPoints(Request $request)
@@ -147,6 +152,191 @@ class HomeController extends Controller
             });
         } catch (\Exception $e) {
             \Log::error('Point Conversion Error: ' . $e->getMessage());
+            return redirect()->route('dashboard')->with('errMSG', __('messages.error_occurred'));
+        }
+    }
+
+    public function transferPts(Request $request, PointLedgerService $ledger, NotificationService $notifications)
+    {
+        $request->validate([
+            'username' => 'required|string|exists:users,username',
+            'amount' => 'required|numeric|min:1'
+        ]);
+
+        $sender = Auth::user();
+        $amount = (float) $request->input('amount');
+        $recipientUsername = $request->input('username');
+
+        if (strtolower($sender->username) === strtolower($recipientUsername)) {
+            return redirect()->back()->with('errMSG', __('messages.cannot_transfer_to_self'));
+        }
+
+        try {
+            return DB::transaction(function () use ($sender, $recipientUsername, $amount, $ledger, $notifications) {
+                // Lock sender
+                $lockedSender = User::where('id', $sender->id)->lockForUpdate()->first();
+                if ($lockedSender->pts < $amount) {
+                    return redirect()->back()->with('errMSG', __('tnopmtrnon') . " : " . $lockedSender->pts);
+                }
+
+                // Lock recipient
+                $lockedRecipient = User::where('username', $recipientUsername)->lockForUpdate()->first();
+
+                // Deduct from sender
+                $ledger->award(
+                    $lockedSender,
+                    -$amount,
+                    'transfer_sent',
+                    'transfer_sent_desc',
+                    'user',
+                    $lockedRecipient->id,
+                    ['recipient_username' => $lockedRecipient->username],
+                    true
+                );
+
+                // Add to recipient
+                $ledger->award(
+                    $lockedRecipient,
+                    $amount,
+                    'transfer_received',
+                    'transfer_received_desc',
+                    'user',
+                    $lockedSender->id,
+                    ['sender_username' => $lockedSender->username],
+                    true
+                );
+
+                // Send Notification
+                $msg = __('messages.received_pts_transfer', ['amount' => $amount, 'sender' => $lockedSender->username]);
+                $notifications->send(
+                    $lockedRecipient,
+                    $msg,
+                    url('/history'),
+                    'item'
+                );
+
+                $successMsg = __('messages.transfer_successful', ['amount' => $amount, 'recipient' => $lockedRecipient->username]);
+
+                return redirect()->route('dashboard')->with('MSG', $successMsg);
+            });
+        } catch (\Exception $e) {
+            \Log::error('PTS Transfer Error: ' . $e->getMessage());
+            return redirect()->route('dashboard')->with('errMSG', __('messages.error_occurred'));
+        }
+    }
+
+    public function generateVoucher(Request $request, PointLedgerService $ledger)
+    {
+        $request->validate([
+            'amount' => 'required|numeric|min:1'
+        ]);
+
+        $user = Auth::user();
+        $amount = (float) $request->input('amount');
+
+        try {
+            return DB::transaction(function () use ($user, $amount, $ledger) {
+                $lockedUser = User::where('id', $user->id)->lockForUpdate()->first();
+                if ($lockedUser->pts < $amount) {
+                    return redirect()->back()->with('errMSG', __('tnopmtrnon') . " : " . $lockedUser->pts);
+                }
+
+                $code = strtoupper(Str::random(12));
+
+                // Deduct from user
+                $transaction = $ledger->award(
+                    $lockedUser,
+                    -$amount,
+                    'voucher_generated',
+                    'voucher_generated_desc',
+                    'voucher',
+                    null,
+                    ['code' => $code],
+                    true
+                );
+
+                // Create Voucher
+                $voucher = PtsVoucher::create([
+                    'user_id' => $lockedUser->id,
+                    'code' => $code,
+                    'amount' => $amount,
+                    'is_used' => false,
+                ]);
+
+                // Update ledger reference
+                $transaction->update([
+                    'reference_type' => PtsVoucher::class,
+                    'reference_id' => $voucher->id
+                ]);
+
+                $successMsg = __('messages.voucher_generated_success');
+
+                return redirect()->route('dashboard')->with('MSG', $successMsg);
+            });
+        } catch (\Exception $e) {
+            \Log::error('Voucher Generation Error: ' . $e->getMessage());
+            return redirect()->route('dashboard')->with('errMSG', __('messages.error_occurred'));
+        }
+    }
+
+    public function claimVoucher(Request $request, PointLedgerService $ledger, NotificationService $notifications)
+    {
+        $request->validate([
+            'code' => 'required|string'
+        ]);
+
+        $user = Auth::user();
+        $code = trim($request->input('code'));
+
+        try {
+            return DB::transaction(function () use ($user, $code, $ledger, $notifications) {
+                // Find voucher with lock
+                $voucher = PtsVoucher::where('code', $code)->lockForUpdate()->first();
+
+                if (!$voucher) {
+                    return redirect()->back()->with('errMSG', __('messages.invalid_voucher_code'));
+                }
+
+                if ($voucher->is_used) {
+                    return redirect()->back()->with('errMSG', __('messages.voucher_already_used'));
+                }
+
+                $lockedUser = User::where('id', $user->id)->lockForUpdate()->first();
+
+                // Award to user
+                $ledger->award(
+                    $lockedUser,
+                    $voucher->amount,
+                    'voucher_claimed',
+                    'voucher_claimed_desc',
+                    PtsVoucher::class,
+                    $voucher->id,
+                    ['generator_username' => $voucher->generator->username],
+                    true
+                );
+
+                // Mark voucher as used
+                $voucher->update([
+                    'is_used' => true,
+                    'used_by' => $lockedUser->id,
+                    'used_at' => now(),
+                ]);
+
+                // Notify Generator
+                $msg = __('messages.voucher_claimed_by', ['amount' => $voucher->amount, 'claimer' => $lockedUser->username]);
+                $notifications->send(
+                    $voucher->generator,
+                    $msg,
+                    url('/history'),
+                    'item'
+                );
+
+                $successMsg = __('messages.voucher_claimed_success', ['amount' => $voucher->amount]);
+
+                return redirect()->route('dashboard')->with('MSG', $successMsg);
+            });
+        } catch (\Exception $e) {
+            \Log::error('Voucher Claim Error: ' . $e->getMessage());
             return redirect()->route('dashboard')->with('errMSG', __('messages.error_occurred'));
         }
     }
