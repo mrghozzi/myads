@@ -124,7 +124,8 @@ class MarketplaceExtensionFeedTest extends TestCase
         $items = collect($response->json('items'))->keyBy('slug');
 
         $this->assertNotEmpty($items['free-plugin']['download_url']);
-        $this->assertStringContainsString('free-plugin.zip', $items['free-plugin']['download_url']);
+        $this->assertStringContainsString('/download/', $items['free-plugin']['download_url']);
+        $this->assertStringNotContainsString('free-plugin.zip', $items['free-plugin']['download_url']);
         
         $this->assertEmpty($items['paid-plugin']['download_url']);
     }
@@ -226,13 +227,20 @@ class MarketplaceExtensionFeedTest extends TestCase
         $zip->addFromString($entryName, $payload);
         $zip->close();
 
-        ProductFile::create([
+        $file = ProductFile::create([
             'name' => 'v1.0.0',
             'o_valuer' => 'Marketplace package',
             'o_type' => 'store_file',
             'o_parent' => $product->id,
             'o_order' => 0,
             'o_mode' => 'upload/testing-marketplace-feed/' . $archiveName,
+        ]);
+
+        \App\Models\Short::create([
+            'tp_id' => $file->id,
+            'sh_type' => 7867,
+            'sho' => \Illuminate\Support\Str::random(10),
+            'url' => $file->o_mode,
         ]);
     }
 }

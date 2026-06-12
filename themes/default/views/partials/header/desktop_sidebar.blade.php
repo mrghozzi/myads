@@ -323,11 +323,11 @@
                 <div class="dropdown-navigation header-settings-dropdown">
                     <!-- User Summary -->
                     <div class="dropdown-navigation-user-summary" style="padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); margin-bottom: 10px; display: flex; align-items: center; gap: 12px;">
-                        <div class="user-avatar small no-outline">
+                        <a href="{{ route('profile.short', auth()->user()->publicRouteIdentifier()) }}" class="user-avatar small no-outline">
                             <div class="user-avatar-content">
                                 <div class="hexagon-image-30-32" data-src="{{ auth()->user()->avatarUrl() }}"></div>
                             </div>
-                        </div>
+                        </a>
                         <div class="user-info">
                             <p class="user-name" style="font-size: 0.875rem; font-weight: 700; color: #fff; margin-bottom: 2px;">{{ auth()->user()->username }}</p>
                             <p class="user-pts" style="font-size: 0.75rem; font-weight: 600; color: #4ff461; display: flex; align-items: center; gap: 4px;">

@@ -84,6 +84,10 @@ class CommunityFeedFeatureTest extends TestCase
         $oldStatus = $this->createForumStatus($oldAuthor, 'Needs rescue to return', time() - (120 * 3600), 150);
         $freshStatus = $this->createForumStatus($freshAuthor, 'Fresh anchor post', time() - 1800, 10);
 
+        for ($i = 0; $i < 60; $i++) {
+            $this->createForumStatus($freshAuthor, "Filler $i", time() - 3600, 0);
+        }
+
         $initialIds = $this->rankedStatusIds(null);
 
         $this->assertNotContains($oldStatus->id, $initialIds);
@@ -104,8 +108,8 @@ class CommunityFeedFeatureTest extends TestCase
     {
         $author = User::factory()->create(['username' => 'archiveauthor']);
 
-        $olderStatus = $this->createForumStatus($author, 'Archived post one', time() - (14 * 24 * 3600), 20);
-        $newerArchivedStatus = $this->createForumStatus($author, 'Archived post two', time() - (10 * 24 * 3600), 10);
+        $olderStatus = $this->createForumStatus($author, 'Archived post one', time() - (14 * 24 * 3600), 0);
+        $newerArchivedStatus = $this->createForumStatus($author, 'Archived post two', time() - (10 * 24 * 3600), 0);
 
         $ids = $this->rankedStatusIds(null);
 
@@ -203,6 +207,7 @@ class CommunityFeedFeatureTest extends TestCase
 
     public function test_non_community_admin_cannot_access_feed_settings(): void
     {
+        User::factory()->create(); // Ensure $admin is not ID 1
         $admin = User::factory()->create(['username' => 'limitedcommunityadmin']);
 
         SiteAdmin::create([

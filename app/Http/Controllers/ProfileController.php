@@ -275,6 +275,11 @@ class ProfileController extends Controller
     public function showById(string $id)
     {
         $user = User::resolvePublicIdentifier($id);
+        
+        if (!$user && ctype_digit($id)) {
+            $user = User::find((int) $id);
+        }
+        
         abort_if(!$user, 404);
         $option = Option::where('o_type', 'user')->where('o_order', $user->id)->first();
 

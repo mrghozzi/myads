@@ -1,3 +1,12 @@
+# v4.3.7
+> **Release** — _Development_
+
+### Bug Fixes
+* **System**: Fixed desktop header navigation avatar link to correctly use the public short route instead of legacy numeric or username routes, ensuring full compliance with the new public member identifiers security policy.
+* **API**: Fixed Mobile Settings API Notification fetching failing due to referencing a non-existent database column. 
+* **Marketplace API**: Updated Extensions Feed API to utilize the new URL Shortener system for free product download links instead of exposing raw zip filenames.
+* **Profile Controller**: Fixed issue where the legacy `showById` routing failed to redirect numeric member identifiers to their public member identifiers correctly because the numeric lookup was blocked entirely.
+
 # v4.3.6
 > **Release** — _Stable_
 
