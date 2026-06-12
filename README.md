@@ -1,4 +1,4 @@
-# MYADS v4.3.5
+# MYADS v4.3.6
 
 Advanced Laravel-based social networking and ad exchange platform for website owners.
 
@@ -26,7 +26,7 @@ Core areas include:
 - Store and product knowledgebase
 - Web directory
 - News publishing
-- Gamification with PTS, badges, quests, and ledgers
+- Gamification with PTS, PTS transfers and vouchers, badges, quests, and ledgers
 - SEO suite with sitemap, robots.txt, and analytics support
 - Security suite with IP bans, session monitoring, and protected public identifiers
 - Optional paid subscriptions and billing
@@ -43,14 +43,16 @@ Core areas include:
 - Social profiles with follows, badges, privacy controls, and social links
 - Community feed with **Multimedia Posts** (Video, Audio, Music, Files, Reels), comments, reactions, reposts, and mentions
 - Forum participation with categories, topics, and attachments
-- Marketplace and knowledgebase access
+- Marketplace and knowledgebase (with categories) access
+- Direct PTS transfers and vouchers system for members
 - Session monitoring and device revocation
 - Optional paid plans with a billing dashboard and hosted checkout flow
 
 ### Administrator Features
 
 - Duralux admin panel with module-based ACL
-- Full content and member management
+- Full content, knowledgebase categories, and member management
+- Dedicated PTS Activities monitoring dashboard
 - Plugin and theme management
 - SEO dashboard and indexing tools
 - Maintenance mode and updater workflows
