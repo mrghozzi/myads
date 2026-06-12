@@ -17,29 +17,29 @@
         <!-- SEO Structured Data for Short Video Clip -->
         <script type="application/ld+json">
         {
-            "@context": "https://schema.org",
-            "@type": "VideoObject",
+            "@@context": "https://schema.org",
+            "@@type": "VideoObject",
             "name": "{{ $clipCaptionPlain ? \Illuminate\Support\Str::limit(trim(preg_replace('/\s+/', ' ', $clipCaptionPlain)), 100) : 'Clip by ' . ($clipUser->username ?? 'User') }}",
             "description": "{{ $clipCaptionPlain ? trim(preg_replace('/\s+/', ' ', $clipCaptionPlain)) : 'Short video clip on MYADS' }}",
             "thumbnailUrl": [
                 "{{ $clipUserAvatar }}"
             ],
-            "uploadDate": "{{ $activity->created_at->toIso8601String() }}",
+            "uploadDate": "{{ $activity->created_at?->toIso8601String() ?? now()->toIso8601String() }}",
             "contentUrl": "{{ $mediaUrl }}",
             "url": "{{ url('/clips#' . $activity->id) }}",
             "author": {
-                "@type": "Person",
+                "@@type": "Person",
                 "name": "{{ $clipUser->username ?? 'Unknown' }}",
                 "url": "{{ $clipUser ? route('profile.show', $clipUser->username) : url('/') }}"
             },
             "interactionStatistic": [
                 {
-                    "@type": "InteractionCounter",
+                    "@@type": "InteractionCounter",
                     "interactionType": "https://schema.org/LikeAction",
                     "userInteractionCount": {{ $activity->reactions_count ?? 0 }}
                 },
                 {
-                    "@type": "InteractionCounter",
+                    "@@type": "InteractionCounter",
                     "interactionType": "https://schema.org/CommentAction",
                     "userInteractionCount": {{ $activity->comments_count ?? 0 }}
                 }
