@@ -1,5 +1,5 @@
 # v4.3.6
-> **Release** — _In Development_
+> **Release** — _Stable_
 
 ### Points (PTS) Economy
 * **Feature**: Added **PTS Transfer** system, allowing members to transfer points to other members directly from the `/home` dashboard.
