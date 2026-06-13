@@ -1,5 +1,5 @@
 # v4.3.7
-> **Release** — _Development_
+> **Development Release** — Bug fixes for avatar links, mobile API notifications, marketplace feeds, profile routing, and dependency updates.
 
 ### Bug Fixes
 * **System**: Fixed desktop header navigation avatar link to correctly use the public short route instead of legacy numeric or username routes, ensuring full compliance with the new public member identifiers security policy.
@@ -7,8 +7,11 @@
 * **Marketplace API**: Updated Extensions Feed API to utilize the new URL Shortener system for free product download links instead of exposing raw zip filenames.
 * **Profile Controller**: Fixed issue where the legacy `showById` routing failed to redirect numeric member identifiers to their public member identifiers correctly because the numeric lookup was blocked entirely.
 
+### Dependencies
+* **chore(deps)**: bump esbuild from 0.27.3 to removed in the npm_and_yarn group across 1 directory.
+
 # v4.3.6
-> **Release** — _Stable_
+> **Stable Release** — Introduced PTS Transfers & Vouchers, Knowledgebase Categories, Visit Exchange Anti-Cheat Hardening, Member Profile SEO enhancements, and bug fixes for Clips and Security.
 
 ### Points (PTS) Economy
 * **Feature**: Added **PTS Transfer** system, allowing members to transfer points to other members directly from the `/home` dashboard.
