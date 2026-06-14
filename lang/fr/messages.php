@@ -2548,4 +2548,8 @@ return [
     'pts_visit_exchange' => 'Points gagnés par échange de visites',
     'saved_clips' => 'Clips sauvegardés',
     'saved_clips_desc' => 'Les clips que vous avez sauvegardés pour les regarder plus tard.',
+    'permission_edit' => 'Autorisation de modifier',
+    'permission_delete' => 'Autorisation de supprimer',
+    'permission_lock' => 'Autorisation de verrouiller',
+    'permission_pin' => 'Autorisation d\'épingler',
 ];

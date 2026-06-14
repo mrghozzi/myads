@@ -2540,4 +2540,8 @@ return [
     'pts_visit_exchange' => 'Ziyaret değişiminden kazanılan puanlar',
     'saved_clips' => 'Kaydedilen Klipler',
     'saved_clips_desc' => 'Kaydedilmiş kliplerinizi yönetin ve izleyin.',
+    'permission_edit' => 'Düzenleme İzni',
+    'permission_delete' => 'Silme İzni',
+    'permission_lock' => 'Kilitleme İzni',
+    'permission_pin' => 'Sabitleme İzni',
 ];

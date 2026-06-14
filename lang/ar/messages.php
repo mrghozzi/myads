@@ -3404,4 +3404,8 @@ return [
     'voucher_generated_success' => 'تم توليد بطاقة النقاط بنجاح',
     'voucher_claimed_by' => 'قام العضو :claimer باستخدام بطاقة النقاط الخاصة بك (:amount PTS)',
     'voucher_claimed_success' => 'تم إضافة :amount PTS إلى رصيدك بنجاح',
+    'permission_edit' => 'صلاحية التعديل',
+    'permission_delete' => 'صلاحية الحذف',
+    'permission_lock' => 'صلاحية الإغلاق',
+    'permission_pin' => 'صلاحية التثبيت',
 ];

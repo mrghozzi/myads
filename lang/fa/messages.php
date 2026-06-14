@@ -2539,4 +2539,8 @@ return [
     'pts_visit_exchange' => 'امتیاز کسب شده از تبادل بازدید',
     'saved_clips' => 'کلیپ‌های ذخیره شده',
     'saved_clips_desc' => 'کلیپ‌هایی که برای تماشای بعدی ذخیره کرده‌اید.',
+    'permission_edit' => 'مجوز ویرایش',
+    'permission_delete' => 'مجوز حذف',
+    'permission_lock' => 'مجوز قفل',
+    'permission_pin' => 'مجوز سنجاق',
 ];

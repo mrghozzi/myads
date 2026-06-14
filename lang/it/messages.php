@@ -2540,4 +2540,8 @@ return [
     'pts_visit_exchange' => 'Punti guadagnati dallo scambio di visite',
     'saved_clips' => 'Clip salvati',
     'saved_clips_desc' => 'I clip che hai salvato per guardarli più tardi.',
+    'permission_edit' => 'Permesso di modifica',
+    'permission_delete' => 'Permesso di eliminazione',
+    'permission_lock' => 'Permesso di blocco',
+    'permission_pin' => 'Permesso di fissare',
 ];

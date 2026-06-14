@@ -3402,4 +3402,8 @@ return [
     'voucher_generated_success' => 'Voucher generated successfully',
     'voucher_claimed_by' => ':claimer claimed your voucher for :amount PTS',
     'voucher_claimed_success' => 'Successfully claimed :amount PTS',
+    'permission_edit' => 'Edit Permission',
+    'permission_delete' => 'Delete Permission',
+    'permission_lock' => 'Lock Permission',
+    'permission_pin' => 'Pin Permission',
 ];
