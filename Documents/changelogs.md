@@ -1,5 +1,5 @@
 # v4.3.7
-> **Development Release** — Bug fixes for avatar links, mobile API notifications, marketplace feeds, profile routing, and dependency updates.
+> **Stable Release** — Bug fixes for avatar links, mobile API notifications, marketplace feeds, profile routing, and dependency updates.
 
 ### Bug Fixes
 * **System**: Fixed desktop header navigation avatar link to correctly use the public short route instead of legacy numeric or username routes, ensuring full compliance with the new public member identifiers security policy.

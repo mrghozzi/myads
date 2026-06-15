@@ -55,5 +55,5 @@
         <a href="{{ url('/refund') }}"><i class="fa-solid fa-arrow-rotate-left"></i> {{ __('messages.refund_policy') ?? 'Refund Policy' }}</a>
     </div>
     <p>&copy; {{ date('Y') }} {{ $site_settings->titer ?? 'MyAds' }}. {{ __('messages.all_rights_reserved') ?? 'All rights reserved.' }}</p>
-    <p style="margin-top: 10px; font-size: 0.85rem; opacity: 0.7;">Powered by <strong>MyAds</strong> | v{{ \App\Support\SystemVersion::CURRENT ?? '4.3.6' }}</p>
+    <p style="margin-top: 10px; font-size: 0.85rem; opacity: 0.7;">Powered by <strong>MyAds</strong> | v{{ \App\Support\SystemVersion::CURRENT ?? '4.3.7' }}</p>
 </footer>
