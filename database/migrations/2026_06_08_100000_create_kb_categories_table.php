@@ -21,8 +21,7 @@ return new class extends Migration
 
         if (!Schema::hasColumn('options', 'kb_category_id')) {
             Schema::table('options', function (Blueprint $table) {
-                $table->unsignedBigInteger('kb_category_id')->nullable()->after('updated_at');
-                $table->foreign('kb_category_id')->references('id')->on('kb_categories')->nullOnDelete();
+                $table->unsignedBigInteger('kb_category_id')->nullable();
             });
         }
     }
@@ -31,7 +30,6 @@ return new class extends Migration
     {
         if (Schema::hasColumn('options', 'kb_category_id')) {
             Schema::table('options', function (Blueprint $table) {
-                $table->dropForeign(['kb_category_id']);
                 $table->dropColumn('kb_category_id');
             });
         }

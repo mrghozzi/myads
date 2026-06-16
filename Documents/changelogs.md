@@ -1,3 +1,11 @@
+# v4.3.8
+> **In Development**
+
+### Bug Fixes
+* **Installer/Updater**: Fixed `errno: 150 (Foreign key constraint is incorrectly formed)` migration error during the `kb_categories` table creation. This occurred on older server environments where the legacy `options` table used the `MyISAM` storage engine. Resolved by removing the strict database-level foreign key constraint while safely maintaining the cascading deletion logic (`SET NULL`) internally at the application level in `AdminController`.
+
+---
+
 # v4.3.7
 > **Stable Release** — Bug fixes for avatar links, mobile API notifications, marketplace feeds, profile routing, and dependency updates.
 
