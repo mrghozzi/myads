@@ -2564,4 +2564,6 @@ return [
     'permission_delete' => 'Permiso para eliminar',
     'permission_lock' => 'Permiso para bloquear',
     'permission_pin' => 'Permiso para fijar',
+    'translate' => 'Traducir',
+    'original' => 'Mostrar Original',
 ];

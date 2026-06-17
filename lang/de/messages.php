@@ -2544,4 +2544,6 @@ return [
     'permission_delete' => 'Löschberechtigung',
     'permission_lock' => 'Sperrberechtigung',
     'permission_pin' => 'Anheftberechtigung',
+    'translate' => 'Übersetzen',
+    'original' => 'Original anzeigen',
 ];

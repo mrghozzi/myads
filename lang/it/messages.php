@@ -2544,4 +2544,6 @@ return [
     'permission_delete' => 'Permesso di eliminazione',
     'permission_lock' => 'Permesso di blocco',
     'permission_pin' => 'Permesso di fissare',
+    'translate' => 'Traduci',
+    'original' => 'Mostra Originale',
 ];

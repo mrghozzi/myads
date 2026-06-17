@@ -2552,4 +2552,6 @@ return [
     'permission_delete' => 'Autorisation de supprimer',
     'permission_lock' => 'Autorisation de verrouiller',
     'permission_pin' => 'Autorisation d\'épingler',
+    'translate' => 'Traduire',
+    'original' => 'Afficher l\'original',
 ];

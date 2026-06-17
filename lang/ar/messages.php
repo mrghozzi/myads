@@ -3408,4 +3408,6 @@ return [
     'permission_delete' => 'صلاحية الحذف',
     'permission_lock' => 'صلاحية الإغلاق',
     'permission_pin' => 'صلاحية التثبيت',
+    'translate' => 'ترجمة النص',
+    'original' => 'إظهار النص الأصلي',
 ];

@@ -2544,4 +2544,6 @@ return [
     'permission_delete' => 'Silme İzni',
     'permission_lock' => 'Kilitleme İzni',
     'permission_pin' => 'Sabitleme İzni',
+    'translate' => 'Çevir',
+    'original' => 'Orijinali Göster',
 ];

@@ -3406,4 +3406,6 @@ return [
     'permission_delete' => 'Delete Permission',
     'permission_lock' => 'Lock Permission',
     'permission_pin' => 'Pin Permission',
+    'translate' => 'Translate',
+    'original' => 'Show Original',
 ];

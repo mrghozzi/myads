@@ -2543,4 +2543,6 @@ return [
     'permission_delete' => 'مجوز حذف',
     'permission_lock' => 'مجوز قفل',
     'permission_pin' => 'مجوز سنجاق',
+    'translate' => 'ترجمه متن',
+    'original' => 'نمایش متن اصلی',
 ];
