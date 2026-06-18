@@ -34,6 +34,10 @@ class AuthController extends Controller
 
     public function showRegistrationForm()
     {
+        if (\App\Support\SecuritySettings::get('disable_new_registrations')) {
+            abort(403, __('messages.security_registrations_disabled_message'));
+        }
+
         $this->seo([
             'scope_key' => 'register_page',
             'resource_title' => __('messages.sign_up'),
@@ -55,6 +59,10 @@ class AuthController extends Controller
         SecuritySessionService $securitySessions
     )
     {
+        if (\App\Support\SecuritySettings::get('disable_new_registrations')) {
+            abort(403, __('messages.security_registrations_disabled_message'));
+        }
+
         $request->validate([
             'username' => ['required', 'string', 'max:255', 'unique:users'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
@@ -173,10 +181,24 @@ class AuthController extends Controller
         SecuritySessionService $securitySessions
     )
     {
-        $request->validate([
+        $rules = [
             'username' => ['required', 'string'],
             'password' => ['required'],
-        ]);
+        ];
+
+        if (\App\Support\SecuritySettings::get('captcha_enabled_for_login')) {
+            $rules['capt'] = ['required', function ($attribute, $value, $fail) {
+                if ($value != session('captcha_result')) {
+                    $fail(__('captcha_error') ?? 'Invalid CAPTCHA');
+                }
+            }];
+        }
+
+        $request->validate($rules);
+
+        if (\App\Support\SecuritySettings::get('captcha_enabled_for_login')) {
+            session()->forget('captcha_result');
+        }
 
         $input = $request->input('username');
 

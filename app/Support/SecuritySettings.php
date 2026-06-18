@@ -54,6 +54,9 @@ class SecuritySettings
         'max_active_sessions_per_user' => 5,
         'private_message_encryption_enabled' => 0,
         'public_member_ids_enabled' => 0,
+        'disable_new_registrations' => 0,
+        'force_https' => 0,
+        'captcha_enabled_for_login' => 0,
     ];
 
     public static function all(): array
@@ -122,6 +125,9 @@ class SecuritySettings
             'max_active_sessions_per_user' => self::nonNegativeInt($values['max_active_sessions_per_user'] ?? $defaults['max_active_sessions_per_user']),
             'private_message_encryption_enabled' => !empty($values['private_message_encryption_enabled']) ? 1 : 0,
             'public_member_ids_enabled' => !empty($values['public_member_ids_enabled']) ? 1 : 0,
+            'disable_new_registrations' => !empty($values['disable_new_registrations']) ? 1 : 0,
+            'force_https' => !empty($values['force_https']) ? 1 : 0,
+            'captcha_enabled_for_login' => !empty($values['captcha_enabled_for_login']) ? 1 : 0,
         ]);
     }
 
@@ -170,6 +176,9 @@ class SecuritySettings
             'max_active_sessions_per_user' => self::nonNegativeInt($settings['max_active_sessions_per_user'] ?? self::DEFAULTS['max_active_sessions_per_user']),
             'private_message_encryption_enabled' => self::boolish($settings['private_message_encryption_enabled'] ?? self::DEFAULTS['private_message_encryption_enabled']),
             'public_member_ids_enabled' => self::boolish($settings['public_member_ids_enabled'] ?? self::DEFAULTS['public_member_ids_enabled']),
+            'disable_new_registrations' => self::boolish($settings['disable_new_registrations'] ?? self::DEFAULTS['disable_new_registrations']),
+            'force_https' => self::boolish($settings['force_https'] ?? self::DEFAULTS['force_https']),
+            'captcha_enabled_for_login' => self::boolish($settings['captcha_enabled_for_login'] ?? self::DEFAULTS['captcha_enabled_for_login']),
         ];
     }
 

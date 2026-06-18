@@ -1,6 +1,11 @@
 # v4.3.8
 > **In Development**
 
+### Security Settings
+* **Feature**: Added **Disable new account registrations** toggle in `/admin/security` to completely prevent new users from registering, returning a localized 403 error page.
+* **Feature**: Added **Force HTTPS secure browsing** toggle in `/admin/security` which natively forces the `https://` scheme for all generated URLs and assets via `AppServiceProvider`.
+* **Feature**: Added **Enable CAPTCHA for login** toggle in `/admin/security`. When enabled, it requires users to successfully solve a CAPTCHA challenge during login to prevent brute-force attacks.
+
 ### Bug Fixes
 * **Installer/Updater**: Fixed `errno: 150 (Foreign key constraint is incorrectly formed)` migration error during the `kb_categories` table creation. This occurred on older server environments where the legacy `options` table used the `MyISAM` storage engine. Resolved by removing the strict database-level foreign key constraint while safely maintaining the cascading deletion logic (`SET NULL`) internally at the application level in `AdminController`.
 

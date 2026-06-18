@@ -362,6 +362,16 @@
                     <input type="password" class="form-control" id="login-password" name="password" required>
                 </div>
 
+                @if(\App\Support\SecuritySettings::get('captcha_enabled_for_login'))
+                    <div class="form-group">
+                        <label for="capt">{{ __('messages.verification_code') ?? 'Verification Code' }}</label>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <img src="{{ route('captcha.generate') }}" id="captcha-img" style="cursor: pointer; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);" title="Click to refresh" onclick="document.getElementById('captcha-img').src='{{ route('captcha.generate') }}?'+Math.random()">
+                            <input type="text" class="form-control" id="capt" name="capt" required style="width: 120px;">
+                        </div>
+                    </div>
+                @endif
+
                 <div class="form-options">
                     <div class="checkbox-wrap">
                         <input type="checkbox" id="login-remember" name="remember" checked>

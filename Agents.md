@@ -184,6 +184,7 @@ myads/
 | `AdminSeoController` | SEO suite admin |
 | `AdminPageController` | Custom pages admin CRUD |
 | `AdminMailSettingsController` | Database-driven mail configuration admin page (`/admin/settings/mail`) |
+| `AdminSecurityController` | Admin security settings (`/admin/security`), including IP bans, force HTTPS, login CAPTCHA, and registration controls |
 | `AdminStatusPromotionController` | Admin monitoring and settings for promoted community posts |
 | `AdminCustomAdsController` | Admin custom ads dashboard, settings, creative review, and placement/deal moderation |
 | `AdminYoutubeController` | Admin YouTube campaigns and settings management |
@@ -368,6 +369,7 @@ myads/
 | `/admin/billing/gateways` | `/admin/billing/gateways` | Admin gateway configuration for Stripe, PayPal, Bank Transfer, Lemon Squeezy, Paddle, Tabby, Flouci, and Apple Pay |
 | `/admin/orders` | `/admin/orders` | Admin marketplace moderation dashboard under the `community` ACL scope |
 | `/admin/settings/mail` | `/admin/settings/mail` | Database-driven mail configuration (SMTP, sendmail, log, array) |
+| `/admin/security` | `/admin/security` | Admin security settings dashboard (HTTPS, CAPTCHA, IP blocks) |
 | `/admin/media` | `/admin/media` | Admin Media Manager dashboard and file operations |
 | `/api/license/verify` | `/api/license/verify` | Verification endpoint for paid plugins |
 | `/api/marketplace/extensions/plugins` | `/api/marketplace/extensions/plugins` | Marketplace plugin feed & auto-update check endpoint |

@@ -14,6 +14,9 @@
         'admin_password_confirmation_enabled' => __('messages.security_admin_password_confirmation'),
         'private_message_encryption_enabled' => __('messages.security_pm_encryption'),
         'public_member_ids_enabled' => __('messages.security_public_member_ids'),
+        'disable_new_registrations' => __('messages.security_disable_new_registrations'),
+        'force_https' => __('messages.security_force_https'),
+        'captcha_enabled_for_login' => __('messages.security_captcha_enabled_for_login'),
     ];
 @endphp
 
@@ -201,6 +204,18 @@
                         <label class="form-check-label" for="admin_password_confirmation_enabled">{{ $toggleFields['admin_password_confirmation_enabled'] }}</label>
                     </div>
                 </div>
+                <div class="col-lg-4">
+                    <div class="form-check form-switch mt-4 pt-2">
+                        <input class="form-check-input" type="checkbox" id="disable_new_registrations" name="disable_new_registrations" value="1" @checked(old('disable_new_registrations', $settings['disable_new_registrations'] ?? 0))>
+                        <label class="form-check-label" for="disable_new_registrations">{{ $toggleFields['disable_new_registrations'] }}</label>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="form-check form-switch mt-4 pt-2">
+                        <input class="form-check-input" type="checkbox" id="captcha_enabled_for_login" name="captcha_enabled_for_login" value="1" @checked(old('captcha_enabled_for_login', $settings['captcha_enabled_for_login'] ?? 0))>
+                        <label class="form-check-label" for="captcha_enabled_for_login">{{ $toggleFields['captcha_enabled_for_login'] }}</label>
+                    </div>
+                </div>
                 <div class="col-lg-6">
                     <label class="form-label">{{ __('messages.security_blocked_usernames') }}</label>
                     <textarea name="blocked_usernames" rows="6" class="form-control" placeholder="{{ __('messages.security_list_placeholder') }}">{{ old('blocked_usernames', $settings['blocked_usernames'] ?? '') }}</textarea>
@@ -235,6 +250,12 @@
                     <div class="form-check form-switch mt-4 pt-2">
                         <input class="form-check-input" type="checkbox" id="public_member_ids_enabled" name="public_member_ids_enabled" value="1" @checked(old('public_member_ids_enabled', $settings['public_member_ids_enabled'] ?? 0))>
                         <label class="form-check-label" for="public_member_ids_enabled">{{ $toggleFields['public_member_ids_enabled'] }}</label>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="form-check form-switch mt-4 pt-2">
+                        <input class="form-check-input" type="checkbox" id="force_https" name="force_https" value="1" @checked(old('force_https', $settings['force_https'] ?? 0))>
+                        <label class="form-check-label" for="force_https">{{ $toggleFields['force_https'] }}</label>
                     </div>
                 </div>
             </div>
