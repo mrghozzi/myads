@@ -9,6 +9,11 @@
 ### Bug Fixes
 * **Installer/Updater**: Fixed `errno: 150 (Foreign key constraint is incorrectly formed)` migration error during the `kb_categories` table creation. This occurred on older server environments where the legacy `options` table used the `MyISAM` storage engine. Resolved by removing the strict database-level foreign key constraint while safely maintaining the cascading deletion logic (`SET NULL`) internally at the application level in `AdminController`.
 
+### Security & Dependencies
+* **Security Fix**: Resolved a High-severity Dependabot alert regarding CRLF injection in `form-data` via unescaped multipart field names and filenames by adding an override to `package.json` to force `form-data` to `^4.0.6` (transitive dependency of `axios`).
+* **chore(deps)**: bump phpseclib/phpseclib from 3.0.52 to 3.0.55 in the composer group across 1 directory.
+* **chore(deps)**: bump laravel/framework from 12.51.0 to 12.61.1 in the composer group across 1 directory.
+
 ---
 
 # v4.3.7
