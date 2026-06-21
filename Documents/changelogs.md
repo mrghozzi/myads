@@ -1,5 +1,5 @@
 # v4.3.8
-> **In Development**
+> **Stable Release** — Dynamic security controls (Force HTTPS, CAPTCHA, Disable Registrations), KB migration fixes for legacy database engines, and package security overrides.
 
 ### Security Settings
 * **Feature**: Added **Disable new account registrations** toggle in `/admin/security` to completely prevent new users from registering, returning a localized 403 error page.
