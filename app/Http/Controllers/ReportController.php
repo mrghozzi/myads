@@ -54,6 +54,11 @@ class ReportController extends Controller
 
     public function store(Request $request)
     {
+        // SECURITY: Require authentication to prevent spam reports
+        if (!Auth::check()) {
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+
         $request->validate([
             'txt' => 'required|string|max:1000',
             's_type' => 'required|integer',
@@ -61,12 +66,11 @@ class ReportController extends Controller
         ]);
 
         Report::create([
-            'uid' => Auth::id() ?? 0,
+            'uid' => Auth::id(),
             'txt' => $request->txt,
             's_type' => $request->s_type,
             'tp_id' => $request->tp_id,
             'statu' => 1,
-            // 'date' => time(), // Column not found in model
         ]);
 
         if ($request->ajax()) {

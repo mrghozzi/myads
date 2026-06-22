@@ -94,7 +94,8 @@ class StatusController extends Controller
             }
             return redirect()->route('forum.topic', $status->tp_id);
         } catch (\Throwable $e) {
-            return back()->with('error', $e->getMessage())->withInput();
+            report($e);
+            return back()->with('error', __('messages.error_occurred'))->withInput();
         }
     }
 
@@ -119,7 +120,8 @@ class StatusController extends Controller
             }
             return redirect()->route('forum.topic', $status->tp_id)->with('success', __('messages.post_updated_successfully'));
         } catch (\Throwable $e) {
-            return back()->with('error', $e->getMessage())->withInput();
+            report($e);
+            return back()->with('error', __('messages.error_occurred'))->withInput();
         }
     }
 
@@ -129,7 +131,8 @@ class StatusController extends Controller
             $statusPostService->delete($status, Auth::user());
             return redirect()->route('portal')->with('success', __('messages.post_deleted_successfully'));
         } catch (\Throwable $e) {
-            return back()->with('error', $e->getMessage());
+            report($e);
+            return back()->with('error', __('messages.error_occurred'));
         }
     }
 
@@ -239,7 +242,7 @@ class StatusController extends Controller
      */
     private const ALLOWED_MEDIA_EXTENSIONS = [
         // Images
-        'jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg',
+        'jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp',
         // Video
         'mp4', 'webm', 'ogg', 'mov', 'avi', 'mkv',
         // Audio
@@ -386,7 +389,8 @@ class StatusController extends Controller
             return response()->json(['success' => true]);
         } catch (\Throwable $e) {
             DB::rollBack();
-            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['success' => false, 'message' => __('messages.error_occurred')], 500);
         }
     }
 

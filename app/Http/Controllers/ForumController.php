@@ -274,7 +274,13 @@ class ForumController extends Controller
             $imagePath = null;
             if ((int) $request->type === 4 && $request->hasFile('img')) {
                 $file = $request->file('img');
-                $filename = time() . '_' . Str::random(12) . '_' . $file->getClientOriginalName();
+                $extension = strtolower($file->getClientOriginalExtension() ?: 'bin');
+                // SECURITY: Whitelist allowed image extensions and sanitize filename
+                $allowedImageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'];
+                if (!in_array($extension, $allowedImageExtensions, true)) {
+                    throw new \RuntimeException(__('messages.invalid_file_type'));
+                }
+                $filename = time() . '_' . Str::random(12) . '.' . $extension;
                 $file->move(base_path('upload'), $filename);
                 $imagePath = 'upload/' . $filename;
             }
@@ -451,7 +457,8 @@ class ForumController extends Controller
             }
         } catch (\Throwable $e) {
             DB::rollBack();
-            return response()->json(['error' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['error' => __('messages.error_occurred')], 500);
         }
 
         if ($request->wantsJson() || $request->ajax()) {

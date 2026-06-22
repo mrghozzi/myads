@@ -69,7 +69,7 @@ class AuthController extends Controller
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'agree_terms' => ['required', 'accepted'],
             'capt' => ['required', function ($attribute, $value, $fail) {
-                if ($value != session('captcha_result')) {
+                if ((string) $value !== (string) session('captcha_result')) {
                     $fail(__('captcha_error'));
                 }
             }],
@@ -188,7 +188,7 @@ class AuthController extends Controller
 
         if (\App\Support\SecuritySettings::get('captcha_enabled_for_login')) {
             $rules['capt'] = ['required', function ($attribute, $value, $fail) {
-                if ($value != session('captcha_result')) {
+                if ((string) $value !== (string) session('captcha_result')) {
                     $fail(__('captcha_error') ?? 'Invalid CAPTCHA');
                 }
             }];

@@ -43,7 +43,8 @@ class SocialAuthController extends Controller
             }
             return Socialite::driver($provider)->redirect();
         } catch (\Exception $e) {
-            return redirect()->route('login')->with('error', 'Could not redirect to provider: ' . $e->getMessage());
+            \Log::error('Social redirect error (' . $provider . '): ' . $e->getMessage());
+            return redirect()->route('login')->with('error', __('messages.error_occurred'));
         }
     }
 
@@ -147,7 +148,8 @@ class SocialAuthController extends Controller
                 $socialUser = Socialite::driver($provider)->user();
             }
         } catch (\Exception $e) {
-            return redirect()->route('login')->with('error', 'Login failed: ' . $e->getMessage());
+            \Log::error('Social login error (' . $provider . '): ' . $e->getMessage());
+            return redirect()->route('login')->with('error', __('messages.error_occurred'));
         }
 
         $email = $socialUser->getEmail();

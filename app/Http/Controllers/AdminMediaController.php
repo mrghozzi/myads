@@ -99,12 +99,23 @@ class AdminMediaController extends Controller
     {
         $request->validate([
             'path' => 'required|string',
-            'new_name' => 'required|string',
+            'new_name' => ['required', 'string', 'regex:/^[a-zA-Z0-9_\-\.]+$/'],
         ]);
+
+        // SECURITY: Block path traversal in new filename
+        $newName = $request->new_name;
+        if (str_contains($newName, '..') || str_contains($newName, '/') || str_contains($newName, '\\')) {
+            return redirect()->back()->with('error', 'Invalid filename.');
+        }
 
         $oldPath = base_path($request->path);
         $directory = dirname($oldPath);
-        $newPath = $directory . DIRECTORY_SEPARATOR . $request->new_name;
+        $newPath = $directory . DIRECTORY_SEPARATOR . $newName;
+
+        // SECURITY: Validate that both old and new paths are within allowed upload directories
+        if (!$this->isWithinAllowedDirectory($oldPath) || !$this->isWithinAllowedDirectory($newPath)) {
+            return redirect()->back()->with('error', 'Access denied: path is outside allowed directories.');
+        }
 
         if (!File::exists($oldPath)) {
             return redirect()->back()->with('error', __('messages.no_results'));
@@ -130,6 +141,11 @@ class AdminMediaController extends Controller
 
         $filePath = base_path($request->path);
 
+        // SECURITY: Validate that the path is within allowed upload directories
+        if (!$this->isWithinAllowedDirectory($filePath)) {
+            return redirect()->back()->with('error', 'Access denied: path is outside allowed directories.');
+        }
+
         if (File::exists($filePath)) {
             try {
                 File::delete($filePath);
@@ -140,6 +156,39 @@ class AdminMediaController extends Controller
         }
 
         return redirect()->back()->with('error', __('messages.no_results'));
+    }
+
+    /**
+     * SECURITY: Verify that a given path is within allowed upload directories.
+     * Prevents path traversal attacks that could access .env, config, or other sensitive files.
+     */
+    private function isWithinAllowedDirectory(string $path): bool
+    {
+        // Resolve to real path (handles ../ sequences)
+        $realPath = realpath($path);
+        if ($realPath === false) {
+            // File doesn't exist yet (e.g. rename target), resolve the parent directory
+            $parentDir = realpath(dirname($path));
+            if ($parentDir === false) {
+                return false;
+            }
+            $realPath = $parentDir . DIRECTORY_SEPARATOR . basename($path);
+        }
+
+        $normalizedPath = strtolower(str_replace('\\', '/', $realPath));
+
+        $allowedDirectories = [
+            strtolower(str_replace('\\', '/', realpath(base_path('upload')) ?: base_path('upload'))),
+            strtolower(str_replace('\\', '/', realpath(public_path('upload')) ?: public_path('upload'))),
+        ];
+
+        foreach ($allowedDirectories as $allowedDir) {
+            if (str_starts_with($normalizedPath, $allowedDir)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private function getFileIcon($extension)

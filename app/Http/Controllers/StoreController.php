@@ -650,7 +650,7 @@ class StoreController extends Controller
         $filename = time() . '_' . Str::random(8) . '.' . $extension;
         $destinationPath = base_path('upload');
         if (!file_exists($destinationPath)) {
-            mkdir($destinationPath, 0777, true);
+            mkdir($destinationPath, 0755, true);
         }
         $file->move($destinationPath, $filename);
         $relativePath = 'upload/' . $filename;

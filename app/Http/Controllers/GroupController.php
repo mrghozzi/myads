@@ -320,7 +320,7 @@ class GroupController extends Controller
         try {
             $this->memberships->leave($group, Auth::user());
         } catch (\Throwable $e) {
-            return back()->with('error', $e->getMessage());
+            return back()->with('error', __('messages.error_occurred'));
         }
 
         return back()->with('success', __('messages.groups_left_success'));
@@ -358,7 +358,7 @@ class GroupController extends Controller
         try {
             $this->memberships->updateRole($membership, (string) $validated['role'], Auth::user());
         } catch (\Throwable $e) {
-            return back()->with('error', $e->getMessage());
+            return back()->with('error', __('messages.error_occurred'));
         }
 
         return back()->with('success', __('messages.groups_role_updated'));
@@ -383,7 +383,7 @@ class GroupController extends Controller
         try {
             $this->memberships->transferOwnership($group, $membership->user, Auth::user());
         } catch (\Throwable $e) {
-            return back()->with('error', $e->getMessage());
+            return back()->with('error', __('messages.error_occurred'));
         }
 
         return redirect()
@@ -472,7 +472,8 @@ class GroupController extends Controller
         } catch (\Throwable $e) {
             DB::rollBack();
 
-            return back()->withErrors(['discussion' => $e->getMessage()])->withInput();
+            report($e);
+            return back()->withErrors(['discussion' => __('messages.error_occurred')])->withInput();
         }
     }
 

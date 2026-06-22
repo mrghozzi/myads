@@ -197,7 +197,8 @@ class OrderRequestController extends Controller
         } catch (\Throwable $e) {
             DB::rollBack();
 
-            return back()->with('errMSG', $e->getMessage())->withInput();
+            report($e);
+            return back()->with('errMSG', __('messages.error_occurred'))->withInput();
         }
     }
 
@@ -391,7 +392,8 @@ class OrderRequestController extends Controller
         } catch (\Throwable $e) {
             DB::rollBack();
 
-            return back()->with('errMSG', $e->getMessage());
+            report($e);
+            return back()->with('errMSG', __('messages.error_occurred'));
         }
     }
 

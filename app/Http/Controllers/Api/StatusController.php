@@ -73,7 +73,8 @@ class StatusController extends Controller
                 'status' => new StatusResource($status)
             ], 201);
         } catch (\Throwable $e) {
-            return response()->json(['message' => $e->getMessage()], 422);
+            report($e);
+            return response()->json(['message' => __('messages.error_occurred')], 422);
         }
     }
 
@@ -86,7 +87,8 @@ class StatusController extends Controller
                 'status' => new StatusResource($updatedStatus)
             ]);
         } catch (\Throwable $e) {
-            return response()->json(['message' => $e->getMessage()], 422);
+            report($e);
+            return response()->json(['message' => __('messages.error_occurred')], 422);
         }
     }
 
@@ -96,7 +98,8 @@ class StatusController extends Controller
             $this->statusPostService->delete($status, Auth::user());
             return response()->json(['message' => 'Status deleted successfully']);
         } catch (\Throwable $e) {
-            return response()->json(['message' => $e->getMessage()], 403);
+            report($e);
+            return response()->json(['message' => __('messages.error_occurred')], 403);
         }
     }
 }

@@ -393,7 +393,8 @@ class CommentController extends Controller
             return response()->json(['status' => 'success']);
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['error' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['error' => __('messages.error_occurred')], 500);
         }
     }
 

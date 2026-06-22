@@ -137,7 +137,8 @@ class ReactionController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['error' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['error' => __('messages.error_occurred')], 500);
         }
     }
 

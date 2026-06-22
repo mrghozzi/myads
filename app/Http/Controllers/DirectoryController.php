@@ -231,7 +231,7 @@ class DirectoryController extends Controller
             return redirect()->route('directory.show', $listing->id)->with('success', __('WebsiteCreated'));
         } catch (\Throwable $e) {
             return redirect()->back()
-                ->withErrors(['error' => __('messages.error_occurred') . ': ' . $e->getMessage()])
+                ->withErrors(['error' => __('messages.error_occurred')])
                 ->withInput();
         }
     }
@@ -534,7 +534,8 @@ class DirectoryController extends Controller
                 'tags' => $preview['keywords'] ?? ''
             ]);
         } catch (\Throwable $e) {
-            return response()->json(['error' => 'Error: ' . $e->getMessage()], 500);
+            report($e);
+            return response()->json(['error' => __('messages.error_occurred')], 500);
         }
     }
 

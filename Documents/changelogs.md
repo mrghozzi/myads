@@ -1,5 +1,5 @@
 # v4.4.0
-> **Stable Release** — Dynamic system updater, two-pronged installation and upgrade system, secure offline database update bypass, and system optimizations.
+> **Stable Release** — Dynamic system updater, two-pronged installation and upgrade system, secure offline database update bypass, comprehensive security audit, and system optimizations.
 
 ### Installer & Upgrade System
 * **Feature**: Re-engineered the installation and upgrade wizard in `installer` to support incremental updates from `v4.x` to `v4.4.0` dynamically, alongside the legacy `v3.x` to `v4.0` full database conversion.
@@ -8,6 +8,15 @@
 
 ### System & Core
 * **Feature**: Prepared `requests/update.php` as a standard update execution entry point for database migrations, option updates, and cache clearing.
+
+### Security Audit & Hardening
+* **Critical Fix**: Patched **path traversal vulnerability** in Admin Media Manager (`AdminMediaController`). The `rename()` and `destroy()` actions accepted arbitrary file paths without validation, allowing attackers with admin access to rename or delete sensitive system files (`.env`, `config/database.php`, etc.). Added `isWithinAllowedDirectory()` validation to restrict all file operations to the `upload/` directories only, plus regex-based filename sanitization blocking `../` and special characters.
+* **High Fix**: Removed **SVG files** from the allowed media upload whitelist in `StatusController`. SVG files can contain embedded `<script>` tags and JavaScript event handlers, making them a persistent XSS attack vector when served inline by the browser.
+* **High Fix**: Added **image extension whitelist** to forum topic image uploads in `ForumController`. Previously, `$file->getClientOriginalName()` was used directly in the stored filename, which could include dangerous extensions (e.g., `.php`, `.phtml`). Now enforces `['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp']` and generates safe randomized filenames.
+* **Medium Fix**: Eliminated **internal error information disclosure** across 23+ catch blocks in 10 controllers (`StatusController`, `ForumController`, `CommentController`, `ReactionController`, `SocialAuthController`, `DirectoryController`, `OrderRequestController`, `GroupController`, `Api\StatusController`, `PortalController`). Previously, raw `$e->getMessage()` was returned to clients, leaking internal SQL errors, table names, file paths, and stack traces. All instances now return generic localized error messages while logging full details server-side via `report($e)`.
+* **Medium Fix**: Changed insecure directory creation permissions from `0777` (world-writable) to `0755` in `StoreController::uploadZip()`.
+* **Medium Fix**: Added **authentication requirement** to `ReportController::store()`. Previously allowed unauthenticated users to submit reports as `uid=0`, creating a spam and abuse vector. Now returns `401 Unauthorized` for guests.
+* **Low Fix**: Strengthened **CAPTCHA validation** in `AuthController` registration and login flows by replacing loose PHP comparison (`!=`) with strict type-safe comparison (`(string) !== (string)`), preventing potential type-juggling bypass attacks.
 
 ---
 
