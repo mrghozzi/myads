@@ -240,354 +240,368 @@ class InstallerController extends Controller
     // Update Logic
     public function update()
     {
-        return view('installer::update');
+        $usingBypass = file_exists(storage_path('allow_update')) && !(\Illuminate\Support\Facades\Auth::check() && \Illuminate\Support\Facades\Auth::user()->isSuperAdmin());
+        return view('installer::update', compact('usingBypass'));
     }
 
     public function processUpdate(Request $request)
     {
+        $request->validate([
+            'upgrade_type' => 'required|in:incremental,legacy',
+        ]);
+
+        $upgradeType = $request->input('upgrade_type');
         $log = [];
         $maintenance = app(\App\Services\MaintenanceModeManager::class);
         $maintenance->enable(null, 'manual_update');
 
         try {
-            // ============================================================
-            // STEP 1: Add timestamps to all legacy tables
-            // ============================================================
-            $tables = [
-                'users', 'options', 'status', 'forum', 'f_coment',
-                'like', 'news', 'state', 'short', 'referral',
-                'banner', 'link', 'visits', 'directory', 'report',
-                'messages', 'notif', 'emojis', 'menu', 'ads',
-                'cat_dir', 'f_cat', 'setting',
-            ];
+            if ($upgradeType === 'legacy') {
+                // ============================================================
+                // STEP 1: Add timestamps to all legacy tables
+                // ============================================================
+                $tables = [
+                    'users', 'options', 'status', 'forum', 'f_coment',
+                    'like', 'news', 'state', 'short', 'referral',
+                    'banner', 'link', 'visits', 'directory', 'report',
+                    'messages', 'notif', 'emojis', 'menu', 'ads',
+                    'cat_dir', 'f_cat', 'setting',
+                ];
 
-            foreach ($tables as $tableName) {
-                if (Schema::hasTable($tableName)) {
-                    Schema::table($tableName, function (Blueprint $tbl) use ($tableName) {
-                        if (!Schema::hasColumn($tableName, 'created_at')) {
-                            $tbl->timestamp('created_at')->nullable();
+                foreach ($tables as $tableName) {
+                    if (Schema::hasTable($tableName)) {
+                        Schema::table($tableName, function (Blueprint $tbl) use ($tableName) {
+                            if (!Schema::hasColumn($tableName, 'created_at')) {
+                                $tbl->timestamp('created_at')->nullable();
+                            }
+                            if (!Schema::hasColumn($tableName, 'updated_at')) {
+                                $tbl->timestamp('updated_at')->nullable();
+                            }
+                        });
+                        $log[] = "✅ Timestamps added: {$tableName}";
+                    }
+                }
+
+                // ============================================================
+                // STEP 2: Add missing columns to users table
+                // ============================================================
+                if (Schema::hasTable('users')) {
+                    Schema::table('users', function (Blueprint $tbl) {
+                        if (!Schema::hasColumn('users', 'email_verified_at')) {
+                            $tbl->timestamp('email_verified_at')->nullable();
                         }
-                        if (!Schema::hasColumn($tableName, 'updated_at')) {
-                            $tbl->timestamp('updated_at')->nullable();
+                        if (!Schema::hasColumn('users', 'remember_token')) {
+                            $tbl->rememberToken();
+                        }
+                        if (!Schema::hasColumn('users', 'sig')) {
+                            $tbl->text('sig')->nullable();
+                        }
+                        if (!Schema::hasColumn('users', 'pts')) {
+                            $tbl->integer('pts')->default(0);
+                        }
+                        if (!Schema::hasColumn('users', 'vu')) {
+                            $tbl->integer('vu')->default(0);
+                        }
+                        if (!Schema::hasColumn('users', 'nvu')) {
+                            $tbl->float('nvu')->default(0);
+                        }
+                        if (!Schema::hasColumn('users', 'nlink')) {
+                            $tbl->float('nlink')->default(0);
                         }
                     });
-                    $log[] = "✅ Timestamps added: {$tableName}";
+                    $log[] = '✅ Users table updated with Laravel columns';
+                }
+
+                // ============================================================
+                // STEP 3: Add missing columns to setting table
+                // ============================================================
+                if (Schema::hasTable('setting')) {
+                    Schema::table('setting', function (Blueprint $tbl) {
+                        if (!Schema::hasColumn('setting', 'cookie_enabled')) {
+                            $tbl->boolean('cookie_enabled')->default(false);
+                        }
+                        if (!Schema::hasColumn('setting', 'cookie_title')) {
+                            $tbl->string('cookie_title')->nullable();
+                        }
+                        if (!Schema::hasColumn('setting', 'cookie_message')) {
+                            $tbl->text('cookie_message')->nullable();
+                        }
+                        if (!Schema::hasColumn('setting', 'cookie_accept_text')) {
+                            $tbl->string('cookie_accept_text')->nullable();
+                        }
+                        if (!Schema::hasColumn('setting', 'cookie_decline_text')) {
+                            $tbl->string('cookie_decline_text')->nullable();
+                        }
+                        if (!Schema::hasColumn('setting', 'cookie_position')) {
+                            $tbl->string('cookie_position')->default('bottom');
+                        }
+                        if (!Schema::hasColumn('setting', 'cookie_bg_color')) {
+                            $tbl->string('cookie_bg_color')->default('#1a1a2e');
+                        }
+                        if (!Schema::hasColumn('setting', 'cookie_text_color')) {
+                            $tbl->string('cookie_text_color')->default('#ffffff');
+                        }
+                        if (!Schema::hasColumn('setting', 'cookie_btn_bg_color')) {
+                            $tbl->string('cookie_btn_bg_color')->default('#4f46e5');
+                        }
+                        if (!Schema::hasColumn('setting', 'cookie_btn_text_color')) {
+                            $tbl->string('cookie_btn_text_color')->default('#ffffff');
+                        }
+                        if (!Schema::hasColumn('setting', 'timezone')) {
+                            $tbl->string('timezone')->default('UTC');
+                        }
+                    });
+                    $log[] = '✅ Setting table updated with cookie/timezone columns';
+                }
+
+                // ============================================================
+                // STEP 4: Create missing Laravel tables
+                // ============================================================
+                if (!Schema::hasTable('password_reset_tokens')) {
+                    Schema::create('password_reset_tokens', function (Blueprint $tbl) {
+                        $tbl->string('email', 191)->primary();
+                        $tbl->string('token');
+                        $tbl->timestamp('created_at')->nullable();
+                    });
+                    $log[] = '✅ Created: password_reset_tokens';
+                }
+
+                if (!Schema::hasTable('sessions')) {
+                    Schema::create('sessions', function (Blueprint $tbl) {
+                        $tbl->string('id', 191)->primary();
+                        $tbl->foreignId('user_id')->nullable()->index();
+                        $tbl->string('ip_address', 45)->nullable();
+                        $tbl->text('user_agent')->nullable();
+                        $tbl->longText('payload');
+                        $tbl->integer('last_activity')->index();
+                    });
+                    $log[] = '✅ Created: sessions';
+                }
+
+                if (!Schema::hasTable('cache')) {
+                    Schema::create('cache', function (Blueprint $tbl) {
+                        $tbl->string('key', 191)->primary();
+                        $tbl->mediumText('value');
+                        $tbl->integer('expiration');
+                    });
+                    $log[] = '✅ Created: cache';
+                }
+
+                if (!Schema::hasTable('cache_locks')) {
+                    Schema::create('cache_locks', function (Blueprint $tbl) {
+                        $tbl->string('key', 191)->primary();
+                        $tbl->string('owner');
+                        $tbl->integer('expiration');
+                    });
+                    $log[] = '✅ Created: cache_locks';
+                }
+
+                if (!Schema::hasTable('jobs')) {
+                    Schema::create('jobs', function (Blueprint $tbl) {
+                        $tbl->id();
+                        $tbl->string('queue')->index();
+                        $tbl->longText('payload');
+                        $tbl->unsignedTinyInteger('attempts');
+                        $tbl->unsignedInteger('reserved_at')->nullable();
+                        $tbl->unsignedInteger('available_at');
+                        $tbl->unsignedInteger('created_at');
+                    });
+                    $log[] = '✅ Created: jobs';
+                }
+
+                if (!Schema::hasTable('failed_jobs')) {
+                    Schema::create('failed_jobs', function (Blueprint $tbl) {
+                        $tbl->id();
+                        $tbl->string('uuid')->unique();
+                        $tbl->text('connection');
+                        $tbl->text('queue');
+                        $tbl->longText('payload');
+                        $tbl->longText('exception');
+                        $tbl->timestamp('failed_at')->useCurrent();
+                    });
+                    $log[] = '✅ Created: failed_jobs';
+                }
+
+                // ============================================================
+                // STEP 5: Create options table if missing
+                // ============================================================
+                if (!Schema::hasTable('options')) {
+                    Schema::create('options', function (Blueprint $tbl) {
+                        $tbl->id();
+                        $tbl->string('name')->nullable();
+                        $tbl->longText('o_valuer')->nullable();
+                        $tbl->string('o_type')->nullable();
+                        $tbl->integer('o_parent')->default(0);
+                        $tbl->integer('o_order')->default(0);
+                        $tbl->string('o_mode')->nullable();
+                    });
+                    $log[] = '✅ Created: options';
+                }
+
+                // ============================================================
+                // STEP 5.1: Create pages table if missing (v4.1 feature)
+                // ============================================================
+                if (!Schema::hasTable('pages')) {
+                    Schema::create('pages', function (Blueprint $tbl) {
+                        $tbl->id();
+                        $tbl->string('title');
+                        $tbl->string('slug')->unique();
+                        $tbl->longText('content')->nullable();
+                        $tbl->enum('status', ['published', 'draft'])->default('published');
+                        $tbl->boolean('widget_left')->default(true);
+                        $tbl->boolean('widget_right')->default(true);
+                        $tbl->text('meta_description')->nullable();
+                        $tbl->text('meta_keywords')->nullable();
+                        $tbl->integer('order')->default(0);
+                        $tbl->timestamps();
+                    });
+                    $log[] = '✅ Created: pages';
+                }
+
+                // ============================================================
+                // STEP 5.2: Add forum moderation columns & tables (v4.1)
+                // ============================================================
+                if (Schema::hasTable('forum')) {
+                    Schema::table('forum', function (Blueprint $tbl) {
+                        if (!Schema::hasColumn('forum', 'is_pinned')) {
+                            $tbl->boolean('is_pinned')->default(false);
+                        }
+                        if (!Schema::hasColumn('forum', 'pinned_at')) {
+                            $tbl->unsignedBigInteger('pinned_at')->nullable();
+                        }
+                        if (!Schema::hasColumn('forum', 'pinned_by')) {
+                            $tbl->unsignedBigInteger('pinned_by')->nullable();
+                        }
+                        if (!Schema::hasColumn('forum', 'is_locked')) {
+                            $tbl->boolean('is_locked')->default(false);
+                        }
+                        if (!Schema::hasColumn('forum', 'locked_at')) {
+                            $tbl->unsignedBigInteger('locked_at')->nullable();
+                        }
+                        if (!Schema::hasColumn('forum', 'locked_by')) {
+                            $tbl->unsignedBigInteger('locked_by')->nullable();
+                        }
+                    });
+                    $log[] = '✅ Forum table updated with moderation columns';
+                }
+
+                if (!Schema::hasTable('forum_moderators')) {
+                    Schema::create('forum_moderators', function (Blueprint $tbl) {
+                        $tbl->id();
+                        $tbl->unsignedBigInteger('user_id')->unique();
+                        $tbl->boolean('is_global')->default(false);
+                        $tbl->text('permissions')->nullable();
+                        $tbl->boolean('is_active')->default(true);
+                        $tbl->unsignedBigInteger('created_by')->nullable();
+                        $tbl->timestamps();
+
+                        $tbl->index('is_global');
+                        $tbl->index('is_active');
+                        $tbl->index('created_by');
+                    });
+                    $log[] = '✅ Created: forum_moderators';
+                }
+
+                if (!Schema::hasTable('forum_moderator_categories')) {
+                    Schema::create('forum_moderator_categories', function (Blueprint $tbl) {
+                        $tbl->id();
+                        $tbl->unsignedBigInteger('moderator_id');
+                        $tbl->unsignedBigInteger('category_id');
+
+                        $tbl->unique(['moderator_id', 'category_id'], 'forum_moderator_category_unique');
+                        $tbl->index('moderator_id');
+                        $tbl->index('category_id');
+                    });
+                    $log[] = '✅ Created: forum_moderator_categories';
+                }
+
+                if (!Schema::hasTable('forum_attachments')) {
+                    Schema::create('forum_attachments', function (Blueprint $tbl) {
+                        $tbl->id();
+                        $tbl->unsignedBigInteger('topic_id');
+                        $tbl->unsignedBigInteger('user_id');
+                        $tbl->string('file_path');
+                        $tbl->string('original_name');
+                        $tbl->string('mime_type')->nullable();
+                        $tbl->unsignedBigInteger('file_size')->default(0);
+                        $tbl->unsignedInteger('sort_order')->default(0);
+                        $tbl->timestamps();
+
+                        $tbl->index('topic_id');
+                        $tbl->index('user_id');
+                    });
+                    $log[] = '✅ Created: forum_attachments';
+                }
+
+                // ============================================================
+                // STEP 8: Create storage link
+                // ============================================================
+                $this->createStorageLink();
+                $log[] = '✅ Storage link created';
+
+                // ============================================================
+                // STEP 9: Copy old upload directory if exists
+                // ============================================================
+                try {
+                    $possibleUploadPaths = [
+                        base_path('../old/upload'),
+                        base_path('../upload'),
+                        base_path('upload'),
+                    ];
+                    $newUploadPath = public_path('upload');
+                    foreach ($possibleUploadPaths as $oldUploadPath) {
+                        if (@is_dir($oldUploadPath) && realpath($oldUploadPath) !== realpath($newUploadPath)) {
+                            if (!is_dir($newUploadPath)) {
+                                @mkdir($newUploadPath, 0775, true);
+                            }
+                            File::copyDirectory($oldUploadPath, $newUploadPath);
+                            $log[] = '✅ Old upload files copied';
+                            break;
+                        }
+                    }
+                } catch (\Throwable $e) {
+                    $log[] = '⚠️ Upload copy skipped (hosting restriction)';
+                }
+
+                // ============================================================
+                // STEP 10: Generate APP_KEY if missing
+                // ============================================================
+                if (empty(env('APP_KEY'))) {
+                    $key = 'base64:' . base64_encode(random_bytes(32));
+                    $this->writeEnv(['APP_KEY' => $key]);
+                    $log[] = '✅ APP_KEY generated';
                 }
             }
 
             // ============================================================
-            // STEP 2: Add missing columns to users table
+            // SHARED UPGRADE STEPS (Both Legacy and Incremental)
             // ============================================================
-            if (Schema::hasTable('users')) {
-                Schema::table('users', function (Blueprint $tbl) {
-                    if (!Schema::hasColumn('users', 'email_verified_at')) {
-                        $tbl->timestamp('email_verified_at')->nullable();
-                    }
-                    if (!Schema::hasColumn('users', 'remember_token')) {
-                        $tbl->rememberToken();
-                    }
-                    if (!Schema::hasColumn('users', 'sig')) {
-                        $tbl->text('sig')->nullable();
-                    }
-                    if (!Schema::hasColumn('users', 'pts')) {
-                        $tbl->integer('pts')->default(0);
-                    }
-                    if (!Schema::hasColumn('users', 'vu')) {
-                        $tbl->integer('vu')->default(0);
-                    }
-                    if (!Schema::hasColumn('users', 'nvu')) {
-                        $tbl->float('nvu')->default(0);
-                    }
-                    if (!Schema::hasColumn('users', 'nlink')) {
-                        $tbl->float('nlink')->default(0);
-                    }
-                });
-                $log[] = '✅ Users table updated with Laravel columns';
-            }
 
-            // ============================================================
-            // STEP 3: Add missing columns to setting table
-            // ============================================================
-            if (Schema::hasTable('setting')) {
-                Schema::table('setting', function (Blueprint $tbl) {
-                    if (!Schema::hasColumn('setting', 'cookie_enabled')) {
-                        $tbl->boolean('cookie_enabled')->default(false);
-                    }
-                    if (!Schema::hasColumn('setting', 'cookie_title')) {
-                        $tbl->string('cookie_title')->nullable();
-                    }
-                    if (!Schema::hasColumn('setting', 'cookie_message')) {
-                        $tbl->text('cookie_message')->nullable();
-                    }
-                    if (!Schema::hasColumn('setting', 'cookie_accept_text')) {
-                        $tbl->string('cookie_accept_text')->nullable();
-                    }
-                    if (!Schema::hasColumn('setting', 'cookie_decline_text')) {
-                        $tbl->string('cookie_decline_text')->nullable();
-                    }
-                    if (!Schema::hasColumn('setting', 'cookie_position')) {
-                        $tbl->string('cookie_position')->default('bottom');
-                    }
-                    if (!Schema::hasColumn('setting', 'cookie_bg_color')) {
-                        $tbl->string('cookie_bg_color')->default('#1a1a2e');
-                    }
-                    if (!Schema::hasColumn('setting', 'cookie_text_color')) {
-                        $tbl->string('cookie_text_color')->default('#ffffff');
-                    }
-                    if (!Schema::hasColumn('setting', 'cookie_btn_bg_color')) {
-                        $tbl->string('cookie_btn_bg_color')->default('#4f46e5');
-                    }
-                    if (!Schema::hasColumn('setting', 'cookie_btn_text_color')) {
-                        $tbl->string('cookie_btn_text_color')->default('#ffffff');
-                    }
-                    if (!Schema::hasColumn('setting', 'timezone')) {
-                        $tbl->string('timezone')->default('UTC');
-                    }
-                });
-                $log[] = '✅ Setting table updated with cookie/timezone columns';
-            }
-
-            // ============================================================
-            // STEP 4: Create missing Laravel tables
-            // ============================================================
-            if (!Schema::hasTable('password_reset_tokens')) {
-                Schema::create('password_reset_tokens', function (Blueprint $tbl) {
-                    $tbl->string('email', 191)->primary();
-                    $tbl->string('token');
-                    $tbl->timestamp('created_at')->nullable();
-                });
-                $log[] = '✅ Created: password_reset_tokens';
-            }
-
-            if (!Schema::hasTable('sessions')) {
-                Schema::create('sessions', function (Blueprint $tbl) {
-                    $tbl->string('id', 191)->primary();
-                    $tbl->foreignId('user_id')->nullable()->index();
-                    $tbl->string('ip_address', 45)->nullable();
-                    $tbl->text('user_agent')->nullable();
-                    $tbl->longText('payload');
-                    $tbl->integer('last_activity')->index();
-                });
-                $log[] = '✅ Created: sessions';
-            }
-
-            if (!Schema::hasTable('cache')) {
-                Schema::create('cache', function (Blueprint $tbl) {
-                    $tbl->string('key', 191)->primary();
-                    $tbl->mediumText('value');
-                    $tbl->integer('expiration');
-                });
-                $log[] = '✅ Created: cache';
-            }
-
-            if (!Schema::hasTable('cache_locks')) {
-                Schema::create('cache_locks', function (Blueprint $tbl) {
-                    $tbl->string('key', 191)->primary();
-                    $tbl->string('owner');
-                    $tbl->integer('expiration');
-                });
-                $log[] = '✅ Created: cache_locks';
-            }
-
-            if (!Schema::hasTable('jobs')) {
-                Schema::create('jobs', function (Blueprint $tbl) {
-                    $tbl->id();
-                    $tbl->string('queue')->index();
-                    $tbl->longText('payload');
-                    $tbl->unsignedTinyInteger('attempts');
-                    $tbl->unsignedInteger('reserved_at')->nullable();
-                    $tbl->unsignedInteger('available_at');
-                    $tbl->unsignedInteger('created_at');
-                });
-                $log[] = '✅ Created: jobs';
-            }
-
-            if (!Schema::hasTable('failed_jobs')) {
-                Schema::create('failed_jobs', function (Blueprint $tbl) {
-                    $tbl->id();
-                    $tbl->string('uuid')->unique();
-                    $tbl->text('connection');
-                    $tbl->text('queue');
-                    $tbl->longText('payload');
-                    $tbl->longText('exception');
-                    $tbl->timestamp('failed_at')->useCurrent();
-                });
-                $log[] = '✅ Created: failed_jobs';
-            }
-
-            // ============================================================
-            // STEP 5: Create options table if missing
-            // ============================================================
-            if (!Schema::hasTable('options')) {
-                Schema::create('options', function (Blueprint $tbl) {
-                    $tbl->id();
-                    $tbl->string('name')->nullable();
-                    $tbl->longText('o_valuer')->nullable();
-                    $tbl->string('o_type')->nullable();
-                    $tbl->integer('o_parent')->default(0);
-                    $tbl->integer('o_order')->default(0);
-                    $tbl->string('o_mode')->nullable();
-                });
-                $log[] = '✅ Created: options';
-            }
-
-            // ============================================================
-            // STEP 5.1: Create pages table if missing (v4.1 feature)
-            // ============================================================
-            if (!Schema::hasTable('pages')) {
-                Schema::create('pages', function (Blueprint $tbl) {
-                    $tbl->id();
-                    $tbl->string('title');
-                    $tbl->string('slug')->unique();
-                    $tbl->longText('content')->nullable();
-                    $tbl->enum('status', ['published', 'draft'])->default('published');
-                    $tbl->boolean('widget_left')->default(true);
-                    $tbl->boolean('widget_right')->default(true);
-                    $tbl->text('meta_description')->nullable();
-                    $tbl->text('meta_keywords')->nullable();
-                    $tbl->integer('order')->default(0);
-                    $tbl->timestamps();
-                });
-                $log[] = '✅ Created: pages';
-            }
-
-            // ============================================================
-            // STEP 5.2: Add forum moderation columns & tables (v4.1)
-            // ============================================================
-            if (Schema::hasTable('forum')) {
-                Schema::table('forum', function (Blueprint $tbl) {
-                    if (!Schema::hasColumn('forum', 'is_pinned')) {
-                        $tbl->boolean('is_pinned')->default(false);
-                    }
-                    if (!Schema::hasColumn('forum', 'pinned_at')) {
-                        $tbl->unsignedBigInteger('pinned_at')->nullable();
-                    }
-                    if (!Schema::hasColumn('forum', 'pinned_by')) {
-                        $tbl->unsignedBigInteger('pinned_by')->nullable();
-                    }
-                    if (!Schema::hasColumn('forum', 'is_locked')) {
-                        $tbl->boolean('is_locked')->default(false);
-                    }
-                    if (!Schema::hasColumn('forum', 'locked_at')) {
-                        $tbl->unsignedBigInteger('locked_at')->nullable();
-                    }
-                    if (!Schema::hasColumn('forum', 'locked_by')) {
-                        $tbl->unsignedBigInteger('locked_by')->nullable();
-                    }
-                });
-                $log[] = '✅ Forum table updated with moderation columns';
-            }
-
-            if (!Schema::hasTable('forum_moderators')) {
-                Schema::create('forum_moderators', function (Blueprint $tbl) {
-                    $tbl->id();
-                    $tbl->unsignedBigInteger('user_id')->unique();
-                    $tbl->boolean('is_global')->default(false);
-                    $tbl->text('permissions')->nullable();
-                    $tbl->boolean('is_active')->default(true);
-                    $tbl->unsignedBigInteger('created_by')->nullable();
-                    $tbl->timestamps();
-
-                    $tbl->index('is_global');
-                    $tbl->index('is_active');
-                    $tbl->index('created_by');
-                });
-                $log[] = '✅ Created: forum_moderators';
-            }
-
-            if (!Schema::hasTable('forum_moderator_categories')) {
-                Schema::create('forum_moderator_categories', function (Blueprint $tbl) {
-                    $tbl->id();
-                    $tbl->unsignedBigInteger('moderator_id');
-                    $tbl->unsignedBigInteger('category_id');
-
-                    $tbl->unique(['moderator_id', 'category_id'], 'forum_moderator_category_unique');
-                    $tbl->index('moderator_id');
-                    $tbl->index('category_id');
-                });
-                $log[] = '✅ Created: forum_moderator_categories';
-            }
-
-            if (!Schema::hasTable('forum_attachments')) {
-                Schema::create('forum_attachments', function (Blueprint $tbl) {
-                    $tbl->id();
-                    $tbl->unsignedBigInteger('topic_id');
-                    $tbl->unsignedBigInteger('user_id');
-                    $tbl->string('file_path');
-                    $tbl->string('original_name');
-                    $tbl->string('mime_type')->nullable();
-                    $tbl->unsignedBigInteger('file_size')->default(0);
-                    $tbl->unsignedInteger('sort_order')->default(0);
-                    $tbl->timestamps();
-
-                    $tbl->index('topic_id');
-                    $tbl->index('user_id');
-                });
-                $log[] = '✅ Created: forum_attachments';
-            }
-
-            // ============================================================
-            // STEP 6: Run any pending Laravel migrations
-            // ============================================================
+            // Run database migrations
             try {
                 Artisan::call('migrate', ['--force' => true]);
-                $log[] = '✅ Laravel migrations completed';
+                $log[] = '✅ Database migrations applied successfully';
             } catch (\Exception $e) {
                 $log[] = '⚠️ Migrations: ' . $e->getMessage();
             }
 
-            // ============================================================
-            // STEP 7: Seed default data if missing
-            // ============================================================
+            // Execute custom update script if exists
+            $updateScript = base_path('requests' . DIRECTORY_SEPARATOR . 'update.php');
+            if (File::exists($updateScript)) {
+                $log[] = '⏳ Running custom update script...';
+                include_once $updateScript;
+                $log[] = '✅ Custom update script executed';
+            }
+
+            // Seed default data if needed
             try {
                 Artisan::call('db:seed', ['--force' => true]);
                 $log[] = '✅ Default data seeded';
             } catch (\Exception $e) {
-                $log[] = '⚠️ Seeder: ' . $e->getMessage();
+                $log[] = '⚠️ Seeder skipped or failed: ' . $e->getMessage();
             }
 
-            // ============================================================
-            // STEP 8: Create storage link
-            // ============================================================
-            $this->createStorageLink();
-            $log[] = '✅ Storage link created';
-
-            // ============================================================
-            // STEP 9: Copy old upload directory if exists
-            // ============================================================
-            try {
-                $possibleUploadPaths = [
-                    base_path('../old/upload'),
-                    base_path('../upload'),
-                    base_path('upload'),        // same directory
-                ];
-                $newUploadPath = public_path('upload');
-                foreach ($possibleUploadPaths as $oldUploadPath) {
-                    if (@is_dir($oldUploadPath) && realpath($oldUploadPath) !== realpath($newUploadPath)) {
-                        if (!is_dir($newUploadPath)) {
-                            @mkdir($newUploadPath, 0775, true);
-                        }
-                        File::copyDirectory($oldUploadPath, $newUploadPath);
-                        $log[] = '✅ Old upload files copied';
-                        break;
-                    }
-                }
-            } catch (\Throwable $e) {
-                $log[] = '⚠️ Upload copy skipped (hosting restriction)';
-            }
-
-            // ============================================================
-            // STEP 10: Generate APP_KEY if missing
-            // ============================================================
-            if (empty(env('APP_KEY'))) {
-                $key = 'base64:' . base64_encode(random_bytes(32));
-                $this->writeEnv(['APP_KEY' => $key]);
-                $log[] = '✅ APP_KEY generated';
-            }
-
-            // ============================================================
-            // STEP 11: Update version in DB
-            // ============================================================
+            // Update version in DB
             $versionOption = \App\Models\Option::where('o_type', 'version')->first();
             if ($versionOption) {
                 $versionOption->update([
@@ -606,13 +620,12 @@ class InstallerController extends Controller
             }
             $log[] = '✅ Version updated to ' . SystemVersion::CURRENT;
 
-            // ============================================================
-            // STEP 12: Clear caches
-            // ============================================================
+            // Clear all caches
             try {
                 Artisan::call('config:clear');
                 Artisan::call('route:clear');
                 Artisan::call('view:clear');
+                $log[] = '✅ System cache cleared';
             } catch (\Exception $e) {
                 // Non-critical
             }
@@ -620,7 +633,17 @@ class InstallerController extends Controller
             app(GamificationService::class)->repairQuestData();
 
             // Mark as installed
-            File::put(storage_path('installed'), date('Y-m-d H:i:s') . ' (upgraded from v3.x to v' . SystemVersion::CURRENT . ')');
+            $installMessage = $upgradeType === 'incremental'
+                ? ' (incremental upgrade to v' . SystemVersion::CURRENT . ')'
+                : ' (upgraded from v3.x to v' . SystemVersion::CURRENT . ')';
+            File::put(storage_path('installed'), date('Y-m-d H:i:s') . $installMessage);
+
+            // Clean up the bypass file if it exists
+            $bypassFile = storage_path('allow_update');
+            if (File::exists($bypassFile)) {
+                File::delete($bypassFile);
+                $log[] = '✅ Security bypass file removed';
+            }
 
             $maintenance->disable(null, 'manual_update_success');
 

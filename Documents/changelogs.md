@@ -1,3 +1,16 @@
+# v4.4.0
+> **Stable Release** — Dynamic system updater, two-pronged installation and upgrade system, secure offline database update bypass, and system optimizations.
+
+### Installer & Upgrade System
+* **Feature**: Re-engineered the installation and upgrade wizard in `installer` to support incremental updates from `v4.x` to `v4.4.0` dynamically, alongside the legacy `v3.x` to `v4.0` full database conversion.
+* **Feature**: Added secure offline/maintenance update authentication using a temporary validation file (`storage/allow_update`) to allow running updates without requiring a logged-in admin session (e.g. if a database mismatch breaks login).
+* **Feature**: Made the version display in the installer layout dynamic using `SystemVersion::CURRENT` to avoid hardcoded version strings.
+
+### System & Core
+* **Feature**: Prepared `requests/update.php` as a standard update execution entry point for database migrations, option updates, and cache clearing.
+
+---
+
 # v4.3.8
 > **Stable Release** — Dynamic security controls (Force HTTPS, CAPTCHA, Disable Registrations), KB migration fixes for legacy database engines, and package security overrides.
 

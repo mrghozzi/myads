@@ -34,6 +34,11 @@ class InstallerGuard
                 return $next($request);
             }
 
+            // Fallback security bypass: allow access if a temporary security file exists on the server
+            if (file_exists(storage_path('allow_update'))) {
+                return $next($request);
+            }
+
             return redirect('/')->with('error', __('access_denied'));
         }
 

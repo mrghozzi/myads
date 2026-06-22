@@ -371,7 +371,7 @@
         </div>
 
         <div class="installer-footer">
-            MyAds v4.0.0 &mdash; &copy; {{ date('Y') }}
+            MyAds v{{ \App\Support\SystemVersion::CURRENT }} &mdash; &copy; {{ date('Y') }}
         </div>
     </div>
 

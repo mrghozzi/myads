@@ -20,7 +20,7 @@
         </a>
         <a href="{{ route('installer.update') }}" class="btn-warning-installer justify-content-center" style="text-decoration:none; padding: .85rem;">
             <i class="fas fa-arrow-up"></i>
-            Upgrade from v3.x to v4.0
+            Upgrade / Update System
         </a>
     </div>
 
@@ -28,7 +28,7 @@
         <p style="font-size: .8rem; color: var(--installer-text-muted); margin: 0;">
             <i class="fas fa-info-circle" style="color: var(--installer-primary);"></i>
             Select <strong>Fresh Installation</strong> if this is a new setup.
-            Select <strong>Upgrade</strong> if you already have v3.x installed and want to migrate your data.
+            Select <strong>Upgrade / Update System</strong> to upgrade a legacy v3.x database or apply updates to an existing v4.x installation.
         </p>
     </div>
 @endsection
