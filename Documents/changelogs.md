@@ -10,6 +10,8 @@
 * **Feature**: Prepared `requests/update.php` as a standard update execution entry point for database migrations, option updates, and cache clearing.
 
 ### UI & Design
+* **Improvement**: Redesigned the entire **Billing Administration Suite** (`/admin/billing/*`) including Overview, Orders, Order Details, Plans, Currencies, Transactions, and Settings with the premium "Superdesign" aesthetic, featuring modern cards, glassmorphic headers, and enhanced responsive layouts.
+* **Improvement**: Redesigned the **Billing Gateways** admin interface (`/admin/billing/gateways`) using the premium "Superdesign" template to ensure a consistent, modern administrative experience.
 * **Improvement**: Redesigned the **Knowledgebase Categories** admin interface (`/admin/kb/categories`) with the premium "Superdesign" aesthetic, featuring glassmorphic headers, dynamic gradient hero blocks, and enhanced modal designs for a consistent administrative experience.
 
 ### Security Audit & Hardening
