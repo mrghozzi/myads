@@ -9,6 +9,9 @@
 ### System & Core
 * **Feature**: Prepared `requests/update.php` as a standard update execution entry point for database migrations, option updates, and cache clearing.
 
+### UI & Design
+* **Improvement**: Redesigned the **Knowledgebase Categories** admin interface (`/admin/kb/categories`) with the premium "Superdesign" aesthetic, featuring glassmorphic headers, dynamic gradient hero blocks, and enhanced modal designs for a consistent administrative experience.
+
 ### Security Audit & Hardening
 * **Critical Fix**: Patched **path traversal vulnerability** in Admin Media Manager (`AdminMediaController`). The `rename()` and `destroy()` actions accepted arbitrary file paths without validation, allowing attackers with admin access to rename or delete sensitive system files (`.env`, `config/database.php`, etc.). Added `isWithinAllowedDirectory()` validation to restrict all file operations to the `upload/` directories only, plus regex-based filename sanitization blocking `../` and special characters.
 * **High Fix**: Removed **SVG files** from the allowed media upload whitelist in `StatusController`. SVG files can contain embedded `<script>` tags and JavaScript event handlers, making them a persistent XSS attack vector when served inline by the browser.
