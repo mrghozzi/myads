@@ -165,7 +165,7 @@ myads/
 | `VisitController` | Visit exchange system (AJAX token-based verification, 7-layer anti-fraud: daily cap, JS math challenge, token expiry, replay prevention, focus detection, IP monitoring, PointLedgerService integration) |
 | `YoutubeAdvertiserController` | YouTube campaigns and views exchange |
 | `YoutubeExchangeController` | YouTube watch and earn points |
-| `ProfileController` | Profile view/edit, follow, privacy, sessions/revocation, badges, history |
+| `ProfileController` | Profile view/edit, follow, privacy, sessions/revocation, badges, history, personal activity timeline |
 | `UserBlockController` | User block management, block creation view, and blocked users dashboard |
 | `MessageController` | Private messaging |
 | `NotificationController` | Notification center, mark-all-read |
@@ -331,6 +331,7 @@ myads/
 | `/kb/{name}:{article}` | `/kb/MyScript:setup` | Wiki article (redirects to create if missing) |
 | `/kb/{name}?st={article}` | `/kb/MyScript?st=setup` | Wiki-style create/find article |
 | `/e{id}`, `/p{id}` | `/e1` | Legacy profile redirects |
+| `/my-activity` | `/my-activity` | Member personal activity timeline |
 | `/store/discounts` | `/store/discounts` | Member dashboard for generating and managing store discount codes |
 | `/store/discounts/validate` | `/store/discounts/validate` | Public AJAX endpoint for validating coupons during checkout |
 | `/admin/store/discounts` | `/admin/store/discounts` | Admin dashboard for global/category store coupons |

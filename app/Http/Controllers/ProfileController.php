@@ -916,4 +916,82 @@ class ProfileController extends Controller
 
         return back()->with('success', __('messages.app_access_revoked'));
     }
+
+    public function personalActivity(Request $request)
+    {
+        $user = Auth::user();
+
+        // Posts
+        $posts = Status::with(['linkPreviewRecord', 'repostRecord'])
+            ->where('uid', $user->id)
+            ->where('s_type', '!=', 5)
+            ->orderByDesc('date')
+            ->take(100)
+            ->get()
+            ->map(function ($status) {
+                return (object) [
+                    'activity_type' => 'post',
+                    'timestamp' => (int) $status->date,
+                    'item' => $status,
+                ];
+            });
+
+        // Comments
+        $comments = \App\Models\ForumComment::with('topic')
+            ->where('uid', $user->id)
+            ->orderByDesc('date')
+            ->take(100)
+            ->get()
+            ->map(function ($comment) {
+                return (object) [
+                    'activity_type' => 'comment',
+                    'timestamp' => (int) $comment->date,
+                    'item' => $comment,
+                ];
+            });
+
+        // Reactions (Likes)
+        $likes = Like::where('uid', $user->id)->orderByDesc('time_t')->take(100)->get();
+        
+        $userIds = $likes->where('type', 1)->pluck('sid')->unique()->toArray();
+        $topicIds = $likes->whereIn('type', [2, 14, 6])->pluck('sid')->unique()->toArray();
+        $dirIds = $likes->where('type', 22)->pluck('sid')->unique()->toArray();
+        $prodIds = $likes->where('type', 3)->pluck('sid')->unique()->toArray();
+        
+        $users = empty($userIds) ? collect() : User::whereIn('id', $userIds)->get()->keyBy('id');
+        $topics = empty($topicIds) ? collect() : \App\Models\ForumTopic::whereIn('id', $topicIds)->get()->keyBy('id');
+        $dirs = empty($dirIds) ? collect() : \App\Models\Directory::whereIn('id', $dirIds)->get()->keyBy('id');
+        $prods = empty($prodIds) ? collect() : \App\Models\Product::whereIn('id', $prodIds)->get()->keyBy('id');
+
+        $reactions = $likes->map(function ($like) use ($users, $topics, $dirs, $prods) {
+            $target = null;
+            if ($like->type == 1) {
+                $target = $users->get($like->sid);
+            } elseif (in_array($like->type, [2, 14, 6])) {
+                $target = $topics->get($like->sid);
+            } elseif ($like->type == 22) {
+                $target = $dirs->get($like->sid);
+            } elseif ($like->type == 3) {
+                $target = $prods->get($like->sid);
+            }
+            
+            return (object) [
+                'activity_type' => 'reaction',
+                'timestamp' => (int) $like->time_t,
+                'item' => $like,
+                'target' => $target,
+            ];
+        });
+
+        $merged = collect()
+            ->concat($posts)
+            ->concat($comments)
+            ->concat($reactions)
+            ->sortByDesc('timestamp')
+            ->values();
+
+        $activities = $this->paginateCollection($merged, 20, $request->integer('page', 1));
+
+        return view('theme::profile.personal_activity', compact('user', 'activities'));
+    }
 }

@@ -21,6 +21,7 @@
         @endif
         <a href="{{ route('profile.badges') }}" class="button {{ request()->routeIs('profile.badges') ? 'primary' : 'secondary' }} full" style="border-radius: 0; box-shadow: none;">{{ __('messages.badges') }}</a>
         <a href="{{ route('profile.history') }}" class="button {{ request()->routeIs('profile.history') ? 'primary' : 'secondary' }} full" style="border-radius: 0; box-shadow: none;">{{ __('messages.pts_history') }}</a>
+        <a href="{{ route('profile.personal_activity') }}" class="button {{ request()->routeIs('profile.personal_activity') ? 'primary' : 'secondary' }} full" style="border-radius: 0; box-shadow: none;">{{ __('messages.personal_activity') }}</a>
         <a href="{{ route('profile.show', $user->username) }}" class="button secondary full" style="border-radius: 0; box-shadow: none;">{{ __('messages.view_profile') }}</a>
     </div>
 </div>
