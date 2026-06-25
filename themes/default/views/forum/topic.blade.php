@@ -183,13 +183,13 @@
                     @endif
 
                     <div class="forum-post-info">
-                        <p class="forum-post-paragraph">
+                        <div class="forum-post-paragraph" style="color: #3e3f5e; font-size: 14px; line-height: 1.6em; margin-bottom: 12px;">
                             {!! \App\Support\ContentFormatter::format($topic->txt) !!}
                             
                             @if($topic->imageOption)
                                 <br><img src="{{ asset($topic->imageOption->o_valuer) }}" style="margin-top: 24px; width: 75%; height: auto; border-radius: 12px;">
                             @endif
-                        </p>
+                        </div>
 
                         @if($topic->attachments->isNotEmpty())
                             <div class="widget-box" style="margin-top: 12px; margin-bottom: 0;">
