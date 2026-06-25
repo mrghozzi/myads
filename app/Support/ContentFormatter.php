@@ -24,6 +24,24 @@ class ContentFormatter
         return self::embedYouTubeLinks($html);
     }
 
+    public static function formatForum(?string $text): string
+    {
+        $value = trim((string) $text);
+        if ($value === '') {
+            return '';
+        }
+
+        $value = str_replace(["\r\n", "\r"], "\n", $value);
+        $value = self::linkifyMentions(self::linkifyHashtags($value));
+
+        $html = trim((string) Str::markdown($value, [
+            'html_input' => 'allow',
+            'allow_unsafe_links' => false,
+        ]));
+
+        return self::embedYouTubeLinks($html);
+    }
+
     public static function embedYouTubeLinks(string $html): string
     {
         return (string) preg_replace_callback(

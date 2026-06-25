@@ -215,7 +215,7 @@
                 <div class="widget-box-status-text post_text{{ $topic->id }}">
                     <br/>
                     <div class="textpost" id="post_form{{ $topic->id }}">
-                        {!! \App\Support\ContentFormatter::format($topic->txt) !!}
+                        {!! \App\Support\ContentFormatter::formatForum($topic->txt) !!}
 
                         @if(in_array((int) $status->s_type, [10, 14]))
                             @php $video = $topic->attachments->first(); @endphp

@@ -217,7 +217,7 @@
                 <div class="widget-box-status-text post_text{{ $topic->id }}">
                     <br/>
                     <div class="textpost" id="post_form{{ $topic->id }}">
-                        {!! \App\Support\ContentFormatter::format($topic->txt) !!}
+                        {!! \App\Support\ContentFormatter::formatForum($topic->txt) !!}
                         <div id="report{{ $topic->id }}"></div>
                     </div>
                 </div>
