@@ -217,12 +217,7 @@
                 <div class="widget-box-status-text post_text{{ $topic->id }}">
                     <br/>
                     <div class="textpost" id="post_form{{ $topic->id }}">
-                        @php
-                            $content = $topic->txt;
-                            $content = preg_replace('/#(\w+)/', '<a href="'.url('/tag/$1').'">#$1</a>', $content);
-                            $content = strip_tags($content, '<p><a><b><br><li><ul><font><span><pre><u><s><img><iframe>');
-                        @endphp
-                        {!! nl2br($content) !!}
+                        {!! \App\Support\ContentFormatter::format($topic->txt) !!}
                         <div id="report{{ $topic->id }}"></div>
                     </div>
                 </div>

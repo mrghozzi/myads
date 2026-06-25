@@ -215,13 +215,7 @@
                 <div class="widget-box-status-text post_text{{ $topic->id }}">
                     <br/>
                     <div class="textpost" id="post_form{{ $topic->id }}">
-                        @php
-                            $content = $topic->txt;
-                            $content = preg_replace('/#(\w+)/', '<a href="'.url('/tag/$1').'">#$1</a>', $content);
-                            // Basic sanitization if needed, but old code just did strip_tags with exceptions
-                            $content = strip_tags($content, '<p><a><b><br><li><ul><font><span><pre><u><s><img><iframe>');
-                        @endphp
-                        {!! nl2br($content) !!}
+                        {!! \App\Support\ContentFormatter::format($topic->txt) !!}
 
                         @if(in_array((int) $status->s_type, [10, 14]))
                             @php $video = $topic->attachments->first(); @endphp

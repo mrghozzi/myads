@@ -7,6 +7,7 @@
 * **Feature**: Made the version display in the installer layout dynamic using `SystemVersion::CURRENT` to avoid hardcoded version strings.
 
 ### System & Core
+* **Feature**: Added full Markdown rendering support to Forum topics (`/forum/topic/{id}`) using the centralized `ContentFormatter` for secure parsing of Markdown, mentions, hashtags, and YouTube embeds.
 * **Feature**: Added a "Personal Activity" page (`/my-activity`) for members to view a combined, chronological timeline of their recent posts, comments, and reactions, with multilingual support.
 * **Feature**: Prepared `requests/update.php` as a standard update execution entry point for database migrations, option updates, and cache clearing.
 

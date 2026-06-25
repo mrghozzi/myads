@@ -182,14 +182,7 @@
 
                     <div class="forum-post-info">
                         <p class="forum-post-paragraph">
-                            @php
-                                $content = $topic->txt;
-                                // Basic parsing for hashtags
-                                $content = preg_replace('/#(\w+)/', '<a href="'.url('/tag/$1').'">#$1</a>', $content);
-                                // Allow safe HTML tags (strip unsafe ones)
-                                $content = strip_tags($content, '<p><a><b><br><li><ul><font><span><pre><u><s><img><iframe>');
-                            @endphp
-                            {!! nl2br($content) !!}
+                            {!! \App\Support\ContentFormatter::format($topic->txt) !!}
                             
                             @if($topic->imageOption)
                                 <br><img src="{{ asset($topic->imageOption->o_valuer) }}" style="margin-top: 24px; width: 75%; height: auto; border-radius: 12px;">
