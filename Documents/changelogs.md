@@ -8,6 +8,9 @@
 
 ### System & Core
 * **Feature**: Added full Markdown rendering support to Forum topics (`/forum/topic/{id}`) using the centralized `ContentFormatter` for secure parsing of Markdown, mentions, hashtags, and YouTube embeds.
+* **Feature**: Added dynamic **Forum Statistics** (`superdesign` block) to the forum index page (`/forum`), displaying total topics, contributions, total members, and the latest registered member.
+* **Feature**: Added a "Contributions" (Replies) column to the forum index category listing.
+* **Feature**: Fixed and activated the **Topic View Counter** (`vu`). Views now increment accurately upon topic visit and are correctly displayed on community feed posts and inside the topic view header.
 * **Feature**: Added a "Personal Activity" page (`/my-activity`) for members to view a combined, chronological timeline of their recent posts, comments, and reactions, with multilingual support.
 * **Feature**: Prepared `requests/update.php` as a standard update execution entry point for database migrations, option updates, and cache clearing.
 

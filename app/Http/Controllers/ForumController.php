@@ -126,6 +126,9 @@ class ForumController extends Controller
     public function topic($id)
     {
         $topic = ForumTopic::visible()->with(['user', 'category', 'group', 'comments.user', 'attachments'])->findOrFail($id);
+        
+        // Increment view count
+        $topic->increment('vu');
 
         $group = $topic->group;
         if ($group) {

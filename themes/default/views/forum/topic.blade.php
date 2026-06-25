@@ -37,7 +37,9 @@
                 <a href="{{ route('forum.topic', $topic->id) }}">{{ $topic->name }}</a>
             </p>
             <div class="section-filters-bar-text small-space">
-                {{ \Carbon\Carbon::createFromTimestamp($status->date)->diffForHumans() }}
+                <i class="fa fa-clock-o" style="color: #adafca;"></i> {{ \Carbon\Carbon::createFromTimestamp($status->date)->diffForHumans() }}
+                &nbsp;&nbsp;&bull;&nbsp;&nbsp;
+                <i class="fa fa-eye" style="color: #adafca;"></i> {{ $topic->vu }}
             </div>
         </div>
     </div>

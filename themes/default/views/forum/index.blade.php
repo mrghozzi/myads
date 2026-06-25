@@ -47,6 +47,9 @@
         <div class="table-header-column centered padded-medium">
             <p class="table-header-title">{{ __('messages.topics') }}</p>
         </div>
+        <div class="table-header-column centered padded-medium">
+            <p class="table-header-title">{{ __('messages.replies') ?? 'المساهمات' }}</p>
+        </div>
         <div class="table-header-column padded-big-left">
             <p class="table-header-title">{{ __('messages.latest_post') }}</p>
         </div>
@@ -58,6 +61,7 @@
         @foreach($categories as $category)
         @php
             $topicCount = \App\Models\ForumTopic::where('cat', $category->id)->where('statu', 1)->count();
+            $commentsCount = \App\Models\ForumComment::whereHas('topic', function($q) use ($category) { $q->where('cat', $category->id); })->count();
             $latestTopic = \App\Models\ForumTopic::where('cat', $category->id)->where('statu', 1)->orderBy('id', 'desc')->first();
             
             // Get latest status date for the latest topic
@@ -87,6 +91,9 @@
             <div class="table-column centered padded-medium">
                 <p class="table-title">{{ $topicCount }}</p>
             </div>
+            <div class="table-column centered padded-medium">
+                <p class="table-title">{{ $commentsCount }}</p>
+            </div>
             <div class="table-column padded-big-left">
                 @if($latestTopic)
                 <a class="table-link" href="{{ route('forum.topic', $latestTopic->id) }}">{{ $latestTopic->name }}</a>
@@ -103,5 +110,47 @@
     </div>
     <!-- /TABLE BODY -->
 </div>
+
+<!-- FORUM STATS SUPERDESIGN -->
+@php
+    $totalTopics = \App\Models\ForumTopic::count();
+    $totalComments = \App\Models\ForumComment::count();
+    $totalMembers = \App\Models\User::count();
+    $latestMember = \App\Models\User::orderBy('id', 'desc')->first();
+@endphp
+<div class="section-header" style="margin-top: 32px;">
+    <div class="section-header-info">
+        <h2 class="section-title"><i class="fa fa-line-chart"></i> إحصائيات المنتدى</h2>
+    </div>
+</div>
+<div class="grid grid-4-4-4-4" style="margin-top: 16px;">
+    <div class="widget-box superdesign-wrap" style="text-align: center; padding: 24px; border-radius: 12px; background: linear-gradient(135deg, #615dfa, #23d2e2); color: white;">
+        <i class="fa fa-folder-open fa-3x" style="margin-bottom: 12px; color: rgba(255,255,255,0.8);"></i>
+        <p style="font-size: 28px; font-weight: bold; margin: 0;">{{ $totalTopics }}</p>
+        <p style="margin: 0; font-size: 14px; font-weight: 500;">عدد المواضيع</p>
+    </div>
+    <div class="widget-box superdesign-wrap" style="text-align: center; padding: 24px; border-radius: 12px; background: linear-gradient(135deg, #fd4350, #ff8c42); color: white;">
+        <i class="fa fa-comments fa-3x" style="margin-bottom: 12px; color: rgba(255,255,255,0.8);"></i>
+        <p style="font-size: 28px; font-weight: bold; margin: 0;">{{ $totalComments }}</p>
+        <p style="margin: 0; font-size: 14px; font-weight: 500;">عدد المساهمات</p>
+    </div>
+    <div class="widget-box superdesign-wrap" style="text-align: center; padding: 24px; border-radius: 12px; background: linear-gradient(135deg, #1bc8db, #00d2ff); color: white;">
+        <i class="fa fa-users fa-3x" style="margin-bottom: 12px; color: rgba(255,255,255,0.8);"></i>
+        <p style="font-size: 28px; font-weight: bold; margin: 0;">{{ $totalMembers }}</p>
+        <p style="margin: 0; font-size: 14px; font-weight: 500;">الأعضاء المسجلين</p>
+    </div>
+    <div class="widget-box superdesign-wrap" style="text-align: center; padding: 24px; border-radius: 12px; background: linear-gradient(135deg, #44cc56, #28a745); color: white;">
+        <i class="fa fa-user-plus fa-3x" style="margin-bottom: 12px; color: rgba(255,255,255,0.8);"></i>
+        <p style="font-size: 28px; font-weight: bold; margin: 0;">
+            @if($latestMember)
+                <a href="{{ route('profile.show', $latestMember->username) }}" style="color: white; text-decoration: underline;">{{ $latestMember->username }}</a>
+            @else
+                -
+            @endif
+        </p>
+        <p style="margin: 0; font-size: 14px; font-weight: 500;">أحدث عضو مسجل</p>
+    </div>
+</div>
+<!-- /FORUM STATS SUPERDESIGN -->
 </div>
 @endsection
