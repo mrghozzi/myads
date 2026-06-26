@@ -37,6 +37,7 @@ MYADS is a community platform where website owners:
 15. **Multimedia Posts** — community feed support for Video, Audio, Files, Music, and Clips with dedicated players and tag-sticker indicators.
 16. **Custom Member Ads** — members create embeddable ad spaces, negotiate direct deals, track impressions/clicks, and settle daily PTS payouts or record external agreements.
 17. **Mobile App API & Client** — foundational Flutter app for Android (`myads_app`) with full community feed parity (Reactions with points/notification syncing, Comments, Multimedia posts with Video/Audio/Image gallery/File rendering, Promoted Posts, Share intent), Forums, Store, a native **Clips System**, a premium **Member Profile & Social Navigation** experience with vertical hexagonal avatars matching the web theme, and a **Settings & Communication Hub** (Messages, Notifications, localized in English/Arabic), all powered by Laravel Sanctum and a secure Mobile API.
+18. **Modern UI/UX** — Progressive Web App (PWA) support with offline fallback, a Live Global Search engine, Skeleton load placeholders, Toast notifications, intelligent OS-based Dark Mode detection, and refined micro-animations.
 
 ---
 
@@ -158,6 +159,7 @@ myads/
 | `MarketplaceExtensionFeedController` | Marketplace extension discovery feed and secure auto-update checker/download handlers |
 | `AdsController` | Banner/link ad management, embed codes, promote, referrals |
 | `StatusPromotionController` | Member promoted-post campaigns: create quote, purchase, dashboard |
+| `SearchLiveController` | Live global search AJAX endpoint (`/search/live`) across Users, Products, Forum Topics, and Posts |
 | `SmartAdsController` | Smart ads CRUD, embed code |
 | `AdsServingController` | Public ad serving endpoints (`bn.php`, `link.php`, `smart.php`, embed scripts) |
 | `CustomAdsController` | Member custom ad placements, marketplace requests, private invites, deal lifecycle, code, and analytics views |

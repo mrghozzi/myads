@@ -19,6 +19,7 @@
 ### UI & Design
 * **Feature**: Added **Toast Notifications System** replacing legacy `alert()` prompts with sliding, theme-aware notifications (`showToast`).
 * **Feature**: Implemented **Skeleton Loaders (Shimmer Effect)** in the community feed to provide a premium placeholder loading state during infinite scroll.
+* **Feature**: Added **Micro-animations & Smarter Dark Mode**. Buttons and cards now have smooth hover transitions (scale and shadow depth). Dark Mode now automatically detects and applies the user's OS preference (`prefers-color-scheme`) on their first visit if no preference was previously saved.
 * **Feature**: Added **PWA (Progressive Web App)** support, allowing users to install MYADS as a native app on mobile and desktop, complete with offline fallback support.
 * **Feature**: Added **Live Global Search (Ajax)** to the top navigation bar, enabling instant debounced search across Users, Products, Forum Topics, and Posts with a rich dropdown preview.
 * **Improvement**: Redesigned the entire **Billing Administration Suite** (`/admin/billing/*`) including Overview, Orders, Order Details, Plans, Currencies, Transactions, and Settings with the premium "Superdesign" aesthetic, featuring modern cards, glassmorphic headers, and enhanced responsive layouts.

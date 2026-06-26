@@ -62,7 +62,7 @@
         $css_path = $mode == 'css_d' ? 'css_d' : 'css';
     @endphp
     <script>
-        (function(){function r(n){const m=document.cookie.match(new RegExp('(?:^|; )'+n+'=([^;]*)'));return m?decodeURIComponent(m[1]):null}function s(){try{const v=localStorage.getItem('themeMode');if(v==='css'||v==='css_d')return v}catch(e){}const c=r('modedark');return c==='css'||c==='css_d'?c:null}const o=s()||'{{ $css_path }}';document.documentElement.dataset.theme=o;window.__themeMode=o;})();
+        (function(){function r(n){const m=document.cookie.match(new RegExp('(?:^|; )'+n+'=([^;]*)'));return m?decodeURIComponent(m[1]):null}function s(){try{const v=localStorage.getItem('themeMode');if(v==='css'||v==='css_d')return v}catch(e){}const c=r('modedark');return c==='css'||c==='css_d'?c:null}let o=s();if(!o){o=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'css_d':'css';}document.documentElement.dataset.theme=o;window.__themeMode=o;})();
     </script>
     <style id="critical-css">
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;border:none;outline:none}
@@ -602,6 +602,25 @@
         .menu .menu-item.active .menu-item-link .menu-fallback-icon,
         .menu .menu-item.active .menu-item-link:hover .menu-fallback-icon {
             fill: #fff;
+        }
+
+        /* Micro Animations */
+        .button, .action-item, .user-avatar, .interactive-input {
+            transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1) !important;
+        }
+        .button:hover, .action-item:hover, .user-avatar:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+        }
+        .button:active, .action-item:active, .user-avatar:active {
+            transform: translateY(0);
+        }
+        .widget-box, .post-preview, .user-preview {
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
+        }
+        .widget-box:hover, .post-preview:hover, .user-preview:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.06);
         }
 
         /* Skeleton Loaders */
