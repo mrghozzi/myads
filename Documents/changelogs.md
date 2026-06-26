@@ -17,6 +17,10 @@
 * **Feature**: Prepared `requests/update.php` as a standard update execution entry point for database migrations, option updates, and cache clearing.
 
 ### UI & Design
+* **Feature**: Added **Toast Notifications System** replacing legacy `alert()` prompts with sliding, theme-aware notifications (`showToast`).
+* **Feature**: Implemented **Skeleton Loaders (Shimmer Effect)** in the community feed to provide a premium placeholder loading state during infinite scroll.
+* **Feature**: Added **PWA (Progressive Web App)** support, allowing users to install MYADS as a native app on mobile and desktop, complete with offline fallback support.
+* **Feature**: Added **Live Global Search (Ajax)** to the top navigation bar, enabling instant debounced search across Users, Products, Forum Topics, and Posts with a rich dropdown preview.
 * **Improvement**: Redesigned the entire **Billing Administration Suite** (`/admin/billing/*`) including Overview, Orders, Order Details, Plans, Currencies, Transactions, and Settings with the premium "Superdesign" aesthetic, featuring modern cards, glassmorphic headers, and enhanced responsive layouts.
 * **Improvement**: Redesigned the **Billing Gateways** admin interface (`/admin/billing/gateways`) using the premium "Superdesign" template to ensure a consistent, modern administrative experience.
 * **Improvement**: Redesigned the **Knowledgebase Categories** admin interface (`/admin/kb/categories`) with the premium "Superdesign" aesthetic, featuring glassmorphic headers, dynamic gradient hero blocks, and enhanced modal designs for a consistent administrative experience.

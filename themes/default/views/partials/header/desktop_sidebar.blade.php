@@ -35,18 +35,28 @@
         </nav>
     </div>
 
-    <form class="header-actions search-bar" action="{{ url('/portal') }}" method="GET">
+    <form class="header-actions search-bar" action="{{ url('/portal') }}" method="GET" style="position: relative;">
         <div class="interactive-input dark">
-            <input type="text" id="search-main" name="search" placeholder="{{ __('messages.search_placeholder') }}">
+            <input type="text" id="search-main" name="search" placeholder="{{ __('messages.search_placeholder') }}" autocomplete="off">
             <div class="interactive-input-icon-wrap">
                 <svg class="interactive-input-icon icon-magnifying-glass" width="20" height="20">
                     <use xlink:href="#svg-magnifying-glass"></use>
                 </svg>
             </div>
-            <div class="interactive-input-action">
+            <div class="interactive-input-action" id="search-clear-btn" style="cursor:pointer; display:none;">
                 <svg class="interactive-input-action-icon icon-cross-thin" width="20" height="20">
                     <use xlink:href="#svg-cross-thin"></use>
                 </svg>
+            </div>
+        </div>
+        
+        <!-- Live Search Dropdown -->
+        <div id="live-search-dropdown" class="header-dropdown" style="display: none; position: absolute; top: 100%; left: 0; width: 100%; margin-top: 8px; z-index: 9999; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); background: var(--notification-ui-card-bg); border: 1px solid var(--notification-ui-card-border); overflow: hidden;">
+            <div class="dropdown-box" style="box-shadow: none;">
+                <div class="dropdown-box-list" id="live-search-results" style="max-height: 400px; overflow-y: auto;">
+                    <!-- Results injected here -->
+                </div>
+                <a class="dropdown-box-button secondary" href="#" id="live-search-see-all">{{ __('messages.search') }}</a>
             </div>
         </div>
     </form>

@@ -51,7 +51,7 @@
     <link rel="icon" type="image/png" sizes="32x32" href="{{ theme_asset('img/favicon-32x32.png') }}">
     <link rel="icon" type="image/png" sizes="96x96" href="{{ theme_asset('img/favicon-96x96.png') }}">
     <link rel="icon" type="image/png" sizes="16x16" href="{{ theme_asset('img/favicon-16x16.png') }}">
-    <link rel="manifest" href="{{ theme_asset('img/manifest.json') }}">
+    <link rel="manifest" href="{{ asset('manifest.json') }}">
     <meta name="msapplication-TileColor" content="#615dfa">
     <meta name="msapplication-TileImage" content="{{ theme_asset('img/ms-icon-144x144.png') }}">
     <meta name="theme-color" content="#615dfa">
@@ -603,6 +603,78 @@
         .menu .menu-item.active .menu-item-link:hover .menu-fallback-icon {
             fill: #fff;
         }
+
+        /* Skeleton Loaders */
+        .skeleton {
+            background: linear-gradient(90deg, var(--notification-ui-card-border) 25%, var(--notification-ui-summary-surface) 50%, var(--notification-ui-card-border) 75%);
+            background-size: 200% 100%;
+            animation: skeletonLoading 1.5s infinite linear;
+            border-radius: 4px;
+        }
+        @keyframes skeletonLoading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        .skeleton-text { width: 100%; height: 16px; margin-bottom: 8px; }
+        .skeleton-avatar { width: 40px; height: 40px; border-radius: 50%; }
+
+        /* Toast Notifications */
+        .myads-toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 999999;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            pointer-events: none;
+        }
+        [dir="rtl"] .myads-toast-container {
+            right: auto;
+            left: 24px;
+        }
+        .myads-toast {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 16px 20px;
+            background: var(--notification-ui-card-bg);
+            color: var(--notification-ui-summary-heading);
+            border: 1px solid var(--notification-ui-card-border);
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transform: translateX(120%);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            pointer-events: auto;
+            min-width: 250px;
+            max-width: 350px;
+        }
+        [dir="rtl"] .myads-toast {
+            transform: translateX(-120%);
+        }
+        .myads-toast.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        .myads-toast-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            color: #fff;
+        }
+        .myads-toast.success .myads-toast-icon { background: #10d876; }
+        .myads-toast.error .myads-toast-icon { background: #e94b5f; }
+        .myads-toast.info .myads-toast-icon { background: #615dfa; }
+        .myads-toast-content {
+            font-size: 0.875rem;
+            font-weight: 600;
+            line-height: 1.4;
+        }
     </style>
 </head>
 <body data-theme="{{ $css_path }}" data-dir="{{ $pageDirection }}" class="{{ $pageDirection }}">
@@ -622,7 +694,8 @@
         @include('theme::partials.ads', ['id' => 6])
     @endunless
 
-
+    <!-- Global Toast Container -->
+    <div class="myads-toast-container" id="myads-toast-container"></div>
 
     <!-- Global Footer -->
     @if(Request::is('store*', 'forum*', 'f*', 't*', 'home', 'news*', 'ads*', 'groups*', 'badges*', 'quests*', 'settings*', 'kb*', 'edk*', 'pgk*', 'hkd*', 'u/*', 'profile/edit', 'history'))
@@ -1293,9 +1366,9 @@
                     window.location.reload();
                 } else {
                     response.json().then(data => {
-                        alert('Error: ' + (data.message || 'Error saving post'));
+                        showToast('error', data.message || 'Error saving post');
                     }).catch(() => {
-                        alert('Error saving post');
+                        showToast('error', 'Error saving post');
                     });
                 }
             });
@@ -1361,7 +1434,7 @@
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert(error.message || @json(__('messages.error_prefix')));
+                showToast('error', error.message || @json(__('messages.error_prefix')));
             });
         }
 
@@ -1385,7 +1458,7 @@
                         let el = document.querySelector('.coment' + trashid);
                         if (el) el.remove();
                     } else {
-                        alert('Error: ' + data.error);
+                        showToast('error', data.error);
                     }
                 })
                 .catch(error => console.error('Error:', error));
@@ -1483,7 +1556,7 @@
                         }
                         window.location.reload();
                     } else if (data.error) {
-                        alert(data.error);
+                        showToast('error', data.error);
                     }
                 })
                 .catch(error => console.error('Error:', error));
@@ -1505,9 +1578,9 @@
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    alert('{{ __('messages.report_sent') }}');
+                    showToast('success', '{{ __('messages.report_sent') }}');
                 } else if (data.error) {
-                    alert(data.error);
+                    showToast('error', data.error);
                 }
             })
             .catch(error => console.error('Error:', error));
@@ -1617,6 +1690,161 @@
     </div>
 
     @include('theme::partials._cookie_consent')
+
+    <!-- PWA Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').catch(error => {
+                    console.log('SW Registration failed: ', error);
+                });
+            });
+        }
+    </script>
+    
+    <!-- Toast Notification JS -->
+    <script>
+        function showToast(type, message) {
+            const container = document.getElementById('myads-toast-container');
+            if (!container) return;
+            
+            const toast = document.createElement('div');
+            toast.className = `myads-toast ${type}`;
+            
+            let iconHtml = '';
+            if (type === 'success') {
+                iconHtml = '<i class="fas fa-check"></i>';
+            } else if (type === 'error') {
+                iconHtml = '<i class="fas fa-exclamation"></i>';
+            } else {
+                iconHtml = '<i class="fas fa-info"></i>';
+            }
+            
+            toast.innerHTML = `
+                <div class="myads-toast-icon">${iconHtml}</div>
+                <div class="myads-toast-content">${message}</div>
+            `;
+            
+            container.appendChild(toast);
+            
+            // Trigger animation
+            setTimeout(() => toast.classList.add('show'), 10);
+            
+            // Remove after 3.5 seconds
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+    </script>
+
+    <!-- Live Search JS -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('search-main');
+            const clearBtn = document.getElementById('search-clear-btn');
+            const dropdown = document.getElementById('live-search-dropdown');
+            const resultsContainer = document.getElementById('live-search-results');
+            const seeAllBtn = document.getElementById('live-search-see-all');
+            
+            if (!searchInput || !dropdown) return;
+            
+            let debounceTimer;
+            
+            searchInput.addEventListener('input', function() {
+                clearTimeout(debounceTimer);
+                const query = this.value.trim();
+                
+                if (query.length > 0) {
+                    clearBtn.style.display = 'flex';
+                } else {
+                    clearBtn.style.display = 'none';
+                    dropdown.style.display = 'none';
+                    return;
+                }
+                
+                if (query.length < 2) {
+                    dropdown.style.display = 'none';
+                    return;
+                }
+                
+                seeAllBtn.href = "{{ url('/portal') }}?search=" + encodeURIComponent(query);
+                
+                debounceTimer = setTimeout(() => {
+                    resultsContainer.innerHTML = '<div style="padding: 20px; text-align: center;"><div class="skeleton-avatar" style="margin: 0 auto 10px;"></div><div class="skeleton-text" style="width: 60%; margin: 0 auto;"></div></div>';
+                    dropdown.style.display = 'block';
+                    
+                    fetch("{{ route('search.live') }}?q=" + encodeURIComponent(query))
+                        .then(response => response.json())
+                        .then(data => {
+                            resultsContainer.innerHTML = '';
+                            if (data.results && data.results.length > 0) {
+                                data.results.forEach(item => {
+                                    const iconHtml = item.type === 'user' ? '<i class="fas fa-user"></i>' : 
+                                                     (item.type === 'product' ? '<i class="fas fa-box"></i>' : 
+                                                     (item.type === 'forum' ? '<i class="fas fa-comments"></i>' : '<i class="fas fa-newspaper"></i>'));
+                                    
+                                    const imgHtml = item.img ? 
+                                        `<div class="user-status-avatar"><div class="user-avatar small no-outline"><div class="user-avatar-content"><div class="hexagon-image-30-32" data-src="${item.img}"></div></div></div></div>` :
+                                        `<div class="user-status-avatar" style="width:40px; height:40px; border-radius:50%; background:var(--notification-ui-card-border); display:flex; align-items:center; justify-content:center; color:var(--notification-ui-summary-heading);">${iconHtml}</div>`;
+                                        
+                                    const subtitleHtml = item.subtitle ? `<p class="user-status-text" style="font-size: 0.75rem;">${item.subtitle}</p>` : '';
+                                    
+                                    resultsContainer.innerHTML += `
+                                        <a class="dropdown-box-list-item" href="${item.url}" style="display:flex; align-items:center; gap:12px;">
+                                            ${imgHtml}
+                                            <div style="flex:1; overflow:hidden;">
+                                                <p class="user-status-title" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${item.title}</p>
+                                                ${subtitleHtml}
+                                            </div>
+                                        </a>
+                                    `;
+                                });
+                                // Initialize any dynamically added hexagons
+                                if (typeof app !== 'undefined' && app.plugins && app.plugins.createHexagon) {
+                                    resultsContainer.querySelectorAll('.hexagon-image-30-32').forEach(el => {
+                                        app.plugins.createHexagon({
+                                            container: el,
+                                            width: 30,
+                                            height: 32,
+                                            roundedCorners: true,
+                                            roundedCornerRadius: 1,
+                                            clip: true
+                                        });
+                                    });
+                                }
+                            } else {
+                                resultsContainer.innerHTML = `<p style="padding: 18px 28px; text-align: center; color: var(--notification-ui-muted); font-size: 0.85rem;">{{ __('messages.no_results_found') ?? 'No results found.' }}</p>`;
+                            }
+                        })
+                        .catch(err => {
+                            console.error('Live search error', err);
+                            resultsContainer.innerHTML = `<p style="padding: 18px 28px; text-align: center; color: var(--notification-ui-muted); font-size: 0.85rem;">Error loading results</p>`;
+                        });
+                }, 300);
+            });
+            
+            clearBtn.addEventListener('click', function() {
+                searchInput.value = '';
+                clearBtn.style.display = 'none';
+                dropdown.style.display = 'none';
+                searchInput.focus();
+            });
+            
+            // Close dropdown on outside click
+            document.addEventListener('click', function(e) {
+                if (!searchInput.contains(e.target) && !dropdown.contains(e.target)) {
+                    dropdown.style.display = 'none';
+                }
+            });
+            
+            searchInput.addEventListener('focus', function() {
+                if (this.value.trim().length >= 2) {
+                    dropdown.style.display = 'block';
+                }
+            });
+        });
+    </script>
 
     @stack('scripts')
     <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
