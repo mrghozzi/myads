@@ -4148,5 +4148,86 @@ class AdminController extends Controller
 
         return redirect()->route('admin.store.discounts.index')->with('success', __('messages.deleted_successfully') ?? 'Discount code deleted successfully.');
     }
+    /**
+     * Performance Settings (Community Feed Tuning)
+     */
+    public function performanceSettings()
+    {
+
+
+        $settings = \App\Support\CommunityFeedSettings::all();
+        return view('admin::admin.performance_settings', compact('settings'));
+    }
+
+    public function updatePerformanceSettings(Request $request)
+    {
+
+
+        $validated = $request->validate([
+            'cache_ttl_seconds' => 'required|integer|min:0',
+            'fresh_candidate_limit' => 'required|integer|min:10',
+            'rescue_candidate_limit' => 'required|integer|min:10',
+            'fresh_candidate_hours' => 'required|integer|min:1',
+            'trend_window_hours' => 'required|integer|min:1',
+            'rapid_window_hours' => 'required|integer|min:1',
+            'rescue_max_age_hours' => 'required|integer|min:1',
+            'rescue_min_recent_reactions' => 'required|integer|min:0',
+            'rescue_min_recent_comments' => 'required|integer|min:0',
+            'rescue_min_recent_reposts' => 'required|integer|min:0',
+        ]);
+
+        \App\Support\CommunityFeedSettings::save($validated);
+        \App\Support\CommunityFeedSettings::clearCache();
+
+        return redirect()->route('admin.settings.performance')
+            ->with('success', __('messages.updated_successfully') ?? 'Performance settings updated successfully.');
+    }
+
+    /**
+     * System Monitor Dashboard
+     */
+    public function systemMonitor()
+    {
+
+
+        $load = function_exists('sys_getloadavg') ? sys_getloadavg() : false;
+        if ($load === false) {
+            $load = [0, 0, 0];
+        }
+        // Memory
+        $memoryUsage = memory_get_usage(true);
+        $memoryPeak = memory_get_peak_usage(true);
+        $memoryLimit = ini_get('memory_limit');
+
+        // Disk
+        $diskTotal = function_exists('disk_total_space') ? @disk_total_space('/') : 0;
+        $diskFree = function_exists('disk_free_space') ? @disk_free_space('/') : 0;
+        
+        // Cache Directory Size
+        $cacheDir = storage_path('framework/cache/data');
+        $cacheSize = 0;
+        if (\Illuminate\Support\Facades\File::exists($cacheDir)) {
+            foreach (\Illuminate\Support\Facades\File::allFiles($cacheDir) as $file) {
+                $cacheSize += $file->getSize();
+            }
+        }
+
+        return view('admin::admin.system_monitor', compact(
+            'load', 'memoryUsage', 'memoryPeak', 'memoryLimit', 'diskTotal', 'diskFree', 'cacheSize'
+        ));
+    }
+
+    public function clearSystemCache()
+    {
+
+
+        \Illuminate\Support\Facades\Artisan::call('cache:clear');
+        \Illuminate\Support\Facades\Artisan::call('view:clear');
+        \Illuminate\Support\Facades\Artisan::call('config:clear');
+        \App\Support\CommunityFeedSettings::clearCache();
+
+        return redirect()->route('admin.system_monitor')
+            ->with('success', __('messages.deleted_successfully') ?? 'System cache cleared successfully.');
+    }
 }
 

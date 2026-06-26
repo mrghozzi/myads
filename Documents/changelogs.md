@@ -7,6 +7,8 @@
 * **Feature**: Made the version display in the installer layout dynamic using `SystemVersion::CURRENT` to avoid hardcoded version strings.
 
 ### System & Core
+* **Feature**: Added **System Monitor** dashboard (`/admin/system-monitor`) for real-time overview of server resource consumption (CPU, RAM) and application health (storage, cache sizes).
+* **Feature**: Added **Performance Settings** (`/admin/settings/performance`) to fine-tune community feed algorithms, candidate query limits, and cache TTL to significantly reduce server CPU usage and database queries.
 * **Feature**: Added full Markdown rendering support to Forum topics (`/forum/topic/{id}`) using the centralized `ContentFormatter` for secure parsing of Markdown, mentions, hashtags, and YouTube embeds.
 * **Feature**: Added dynamic **Forum Statistics** (`superdesign` block) to the forum index page (`/forum`), displaying total topics, contributions, total members, and the latest registered member.
 * **Feature**: Added a "Contributions" (Replies) column to the forum index category listing.

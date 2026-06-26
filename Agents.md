@@ -177,7 +177,7 @@ myads/
 | `Api\SettingsController` | Mobile API endpoints for member settings, privacy, social links, sessions, and points ledger |
 | `TagController` | Tag/hashtag pages |
 | `PageController` | Static pages (privacy, terms, refund, custom) |
-| `AdminController` | **Main admin controller** — users, ads, forum, directory, store, widgets, menus, plugins, themes, settings, news, reports, emojis, knowledgebase, KB categories CRUD, maintenance mode settings |
+| `AdminController` | **Main admin controller** — users, ads, forum, directory, store, widgets, menus, plugins, themes, settings (including performance settings and system monitor), news, reports, emojis, knowledgebase, KB categories CRUD, maintenance mode settings |
 | `AdminAdminsController` | Admin ACL management |
 | `AdminBillingController` | Admin billing hub: settings, plans, orders, transactions, currencies, gateways |
 | `AdminOrderController` | Admin marketplace dashboard and moderation actions for service requests |

@@ -99,6 +99,12 @@
                                 <span class="nxl-mtext">{{ __('messages.board') }}</span>
                             </a>
                         </li>
+                        <li class="nxl-item">
+                            <a href="{{ route('admin.system_monitor') }}" class="nxl-link">
+                                <span class="nxl-micon"><i class="feather-activity"></i></span>
+                                <span class="nxl-mtext">{{ __('messages.system_monitor') ?? 'System Monitor' }}</span>
+                            </a>
+                        </li>
                     @endif
 
                     @if($canAdmin('pages'))
@@ -259,6 +265,7 @@
                                 @if($canAdmin('settings'))
                                     <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.settings') }}">{{ __('messages.settings') }}</a></li>
                                     <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.settings.system') }}">{{ __('messages.system_settings') }}</a></li>
+                                    <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.settings.performance') }}">{{ __('messages.performance_settings') ?? 'Performance Settings' }}</a></li>
                                     <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.settings.mail') }}">{{ __('messages.mail_settings_title') }}</a></li>
                                     <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.cookie_notice') }}">{{ __('messages.cookie_notice_settings') }}</a></li>
                                 @endif
