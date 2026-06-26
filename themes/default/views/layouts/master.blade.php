@@ -623,6 +623,79 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.06);
         }
 
+        /* User Popover */
+        #global-user-popover {
+            position: absolute;
+            z-index: 100000;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(10px);
+            transition: opacity 0.2s ease, transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            pointer-events: none;
+        }
+        #global-user-popover.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+        .user-popover-content {
+            background: var(--notification-ui-card-bg);
+            border: 1px solid var(--notification-ui-card-border);
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            width: 320px;
+            padding: 24px;
+            position: relative;
+        }
+        .user-popover-header {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 12px;
+        }
+        .user-popover-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--notification-ui-summary-heading);
+            display: block;
+        }
+        .user-popover-role {
+            font-size: 0.8rem;
+            color: var(--notification-ui-muted);
+            margin-bottom: 12px;
+        }
+        .user-popover-bio {
+            font-size: 0.85rem;
+            color: var(--notification-ui-summary-text);
+            line-height: 1.5;
+            margin-bottom: 16px;
+        }
+        .user-popover-stats {
+            display: flex;
+            gap: 20px;
+            border-top: 1px solid var(--notification-ui-card-border);
+            border-bottom: 1px solid var(--notification-ui-card-border);
+            padding: 12px 0;
+            margin-bottom: 12px;
+        }
+        .user-popover-stat {
+            display: flex;
+            flex-direction: column;
+        }
+        .user-popover-stat .stat-value {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--notification-ui-summary-heading);
+        }
+        .user-popover-stat .stat-label {
+            font-size: 0.75rem;
+            color: var(--notification-ui-muted);
+        }
+        .user-popover-last-seen {
+            font-size: 0.8rem;
+            color: var(--notification-ui-muted);
+        }
+
         /* Skeleton Loaders */
         .skeleton {
             background: linear-gradient(90deg, var(--notification-ui-card-border) 25%, var(--notification-ui-summary-surface) 50%, var(--notification-ui-card-border) 75%);
@@ -1860,6 +1933,107 @@
             searchInput.addEventListener('focus', function() {
                 if (this.value.trim().length >= 2) {
                     dropdown.style.display = 'block';
+                }
+            });
+        });
+    </script>
+
+    <!-- User Popover JS -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const popover = document.createElement('div');
+            popover.id = 'global-user-popover';
+            document.body.appendChild(popover);
+            
+            let hoverTimer;
+            let hideTimer;
+            let currentTarget = null;
+            let cache = {};
+            
+            function showPopover(trigger) {
+                const username = trigger.getAttribute('data-username');
+                if (!username) return;
+                
+                if (cache[username]) {
+                    renderPopover(trigger, cache[username]);
+                } else {
+                    popover.innerHTML = '<div class="user-popover-content"><div style="padding: 20px; text-align: center;"><div class="skeleton-avatar" style="margin: 0 auto 10px;"></div><div class="skeleton-text" style="width: 60%; margin: 0 auto;"></div></div></div>';
+                    positionPopover(trigger);
+                    popover.classList.add('show');
+                    
+                    fetch("{{ url('/ajax/user-popover') }}/" + encodeURIComponent(username))
+                        .then(response => {
+                            if (!response.ok) throw new Error('Not found');
+                            return response.text();
+                        })
+                        .then(html => {
+                            cache[username] = html;
+                            if (currentTarget === trigger) {
+                                renderPopover(trigger, html);
+                            }
+                        })
+                        .catch(err => {
+                            console.error('Popover fetch error', err);
+                            popover.classList.remove('show');
+                        });
+                }
+            }
+            
+            function renderPopover(trigger, html) {
+                popover.innerHTML = html;
+                positionPopover(trigger);
+                popover.classList.add('show');
+                
+                if (typeof initHexagons === 'function') {
+                    initHexagons(popover);
+                }
+            }
+            
+            function positionPopover(trigger) {
+                const rect = trigger.getBoundingClientRect();
+                let top = rect.bottom + window.scrollY + 10;
+                let left = rect.left + window.scrollX;
+                
+                if (left + 320 > window.innerWidth) {
+                    left = window.innerWidth - 340;
+                }
+                
+                popover.style.top = top + 'px';
+                popover.style.left = left + 'px';
+            }
+            
+            document.addEventListener('mouseover', function(e) {
+                const trigger = e.target.closest('.user-popover-trigger');
+                if (trigger) {
+                    clearTimeout(hideTimer);
+                    if (currentTarget !== trigger) {
+                        clearTimeout(hoverTimer);
+                        hoverTimer = setTimeout(() => {
+                            currentTarget = trigger;
+                            showPopover(trigger);
+                        }, 400);
+                    }
+                } else if (popover.contains(e.target)) {
+                    clearTimeout(hideTimer);
+                } else {
+                    clearTimeout(hoverTimer);
+                    if (popover.classList.contains('show')) {
+                        hideTimer = setTimeout(() => {
+                            popover.classList.remove('show');
+                            currentTarget = null;
+                        }, 300);
+                    }
+                }
+            });
+            
+            document.addEventListener('mouseout', function(e) {
+                const trigger = e.target.closest('.user-popover-trigger');
+                if (trigger) {
+                    clearTimeout(hoverTimer);
+                    hideTimer = setTimeout(() => {
+                        popover.classList.remove('show');
+                        currentTarget = null;
+                    }, 300);
                 }
             });
         });

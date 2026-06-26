@@ -48,7 +48,7 @@
             <!-- USER STATUS -->
             <div class="user-status">
                 <!-- USER STATUS AVATAR -->
-                <a class="user-status-avatar" href="{{ $activityUserProfileUrl }}">
+                <a class="user-status-avatar user-popover-trigger" data-username="{{ $activityUserName }}" href="{{ $activityUserProfileUrl }}">
                     <!-- USER AVATAR -->
                     <div class="user-avatar small no-outline {{ $activityUserPresence }}">
                         <!-- USER AVATAR CONTENT -->
@@ -87,7 +87,7 @@
 
                 <!-- USER STATUS TITLE -->
                 <p class="user-status-title medium">
-                    <a class="bold" href="{{ $activityUserProfileUrl }}">{{ $activityUserName }}</a>
+                    <a class="bold user-popover-trigger" data-username="{{ $activityUserName }}" href="{{ $activityUserProfileUrl }}">{{ $activityUserName }}</a>
                     
                     @if($activity->s_type == 1 && $activity->related_content)
                         <span class="user-status-title-text">{{ __('messages.added_website') }}</span>

@@ -505,6 +505,8 @@ Route::get('/following/{id}', function($id) {
 // Better to keep showById for ID-based lookups or redirect.
 Route::get('/u/id/{id}', [ProfileController::class, 'showById'])->name('profile.short');
 
+Route::get('/ajax/user-popover/{username}', [ProfileController::class, 'popover'])->name('profile.popover');
+
 // Report Routes
 Route::get('/report', [App\Http\Controllers\ReportController::class, 'index'])->name('report.index');
 Route::post('/report', [App\Http\Controllers\ReportController::class, 'store'])->name('report.store')->middleware('auth');

@@ -37,7 +37,7 @@ MYADS is a community platform where website owners:
 15. **Multimedia Posts** — community feed support for Video, Audio, Files, Music, and Clips with dedicated players and tag-sticker indicators.
 16. **Custom Member Ads** — members create embeddable ad spaces, negotiate direct deals, track impressions/clicks, and settle daily PTS payouts or record external agreements.
 17. **Mobile App API & Client** — foundational Flutter app for Android (`myads_app`) with full community feed parity (Reactions with points/notification syncing, Comments, Multimedia posts with Video/Audio/Image gallery/File rendering, Promoted Posts, Share intent), Forums, Store, a native **Clips System**, a premium **Member Profile & Social Navigation** experience with vertical hexagonal avatars matching the web theme, and a **Settings & Communication Hub** (Messages, Notifications, localized in English/Arabic), all powered by Laravel Sanctum and a secure Mobile API.
-18. **Modern UI/UX** — Progressive Web App (PWA) support with offline fallback, a Live Global Search engine, Skeleton load placeholders, Toast notifications, intelligent OS-based Dark Mode detection, and refined micro-animations.
+18. **Modern UI/UX** — Progressive Web App (PWA) support with offline fallback, a Live Global Search engine, Skeleton load placeholders, Toast notifications, Hover Popovers for user profiles, intelligent OS-based Dark Mode detection, and refined micro-animations.
 
 ---
 

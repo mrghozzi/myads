@@ -994,4 +994,28 @@ class ProfileController extends Controller
 
         return view('theme::profile.personal_activity', compact('user', 'activities'));
     }
+
+    public function popover(Request $request, string $username)
+    {
+        $viewer = Auth::user();
+        $user = User::where('username', $username)->first();
+
+        if (!$user) {
+            return response()->json(['error' => 'User not found'], 404);
+        }
+
+        $privacy = app(UserPrivacyService::class);
+        $followersCount = Like::where('sid', $user->id)->where('type', 1)->whereHas('user')->count();
+        $followingCount = Like::where('uid', $user->id)->where('type', 1)->whereHas('targetUser')->count();
+        $postsCount = Status::where('uid', $user->id)->where('s_type', '!=', 5)->count();
+        $showOnlineStatus = $privacy->shouldShowOnlineStatus($user, $viewer);
+
+        return view('theme::partials.ajax.user_popover', compact(
+            'user', 
+            'followersCount', 
+            'followingCount', 
+            'postsCount', 
+            'showOnlineStatus'
+        ));
+    }
 }

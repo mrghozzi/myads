@@ -58,7 +58,7 @@
 
     <div class="post-comment coment{{ $comment->id }}" id="comment_{{ $comment->id }}">
         @if($user)
-            <a class="user-avatar small no-outline {{ $user->isOnline() ? 'online' : 'offline' }}" href="{{ route('profile.show', $user->username) }}">
+            <a class="user-avatar small no-outline user-popover-trigger {{ $user->isOnline() ? 'online' : 'offline' }}" data-username="{{ $user->username }}" href="{{ route('profile.show', $user->username) }}">
                 <div class="user-avatar-content">
                     <div class="hexagon-image-30-32" data-src="{{ $user->avatarUrl() }}" style="width: 30px; height: 32px; position: relative;">
                         <canvas style="position: absolute; top: 0px; left: 0px;" width="30" height="32"></canvas>
@@ -102,7 +102,7 @@
 
         <div class="post-comment-text">
             @if($user)
-                <a class="post-comment-text-author" href="{{ route('profile.show', $user->username) }}">{{ $user->username }}</a>
+                <a class="post-comment-text-author user-popover-trigger" data-username="{{ $user->username }}" href="{{ route('profile.show', $user->username) }}">{{ $user->username }}</a>
                 @if($type === 'forum' && $showForumRoleBadges)
                     <span style="display: block; font-size: 11px; color: #7f85a3;">
                         {{ $user->forumRoleLabel($forumCategoryId ?: null) }}
