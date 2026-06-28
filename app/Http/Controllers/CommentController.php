@@ -52,24 +52,28 @@ class CommentController extends Controller
                     && (!Auth::check() || !$this->canUserCommentLockedTopic(Auth::user(), $topic));
             }
 
-            $comments = ForumComment::where('tid', $id)
+            $comments = ForumComment::with('user')
+                ->where('tid', $id)
                 ->orderBy('id', 'desc')
                 ->limit($limit)
                 ->get();
         } elseif ($type == 'directory') {
-            $comments = Option::where('o_parent', $id)
+            $comments = Option::with('user')
+                ->where('o_parent', $id)
                 ->where('o_type', 'd_coment')
                 ->orderBy('id', 'desc')
                 ->limit($limit)
                 ->get();
         } elseif ($type == 'store') {
-            $comments = Option::where('o_parent', $id)
+            $comments = Option::with('user')
+                ->where('o_parent', $id)
                 ->where('o_type', 's_coment')
                 ->orderBy('id', 'desc')
                 ->limit($limit)
                 ->get();
         } elseif ($type == 'knowledgebase') {
-            $comments = Option::where('o_parent', $id)
+            $comments = Option::with('user')
+                ->where('o_parent', $id)
                 ->where('o_type', KnowledgebaseCommunityService::COMMENT_OPTION_TYPE)
                 ->orderBy('id', 'desc')
                 ->limit($limit)
@@ -79,7 +83,8 @@ class CommentController extends Controller
             if ($order && $order->statu == 0) {
                 $hide_form = true;
             }
-            $comments = Option::where('o_parent', $id)
+            $comments = Option::with('user')
+                ->where('o_parent', $id)
                 ->where('o_type', 'order_comment')
                 ->orderBy('id', 'desc')
                 ->limit($limit)

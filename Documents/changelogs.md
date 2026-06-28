@@ -14,6 +14,9 @@
 * **Feature**: Added a "Contributions" (Replies) column to the forum index category listing.
 * **Feature**: Fixed and activated the **Topic View Counter** (`vu`). Views now increment accurately upon topic visit and are correctly displayed on community feed posts and inside the topic view header.
 * **Feature**: Added a "Personal Activity" page (`/my-activity`) for members to view a combined, chronological timeline of their recent posts, comments, and reactions, with multilingual support.
+* **Optimization**: Eliminated severe N+1 database queries on the community feed (`StatusActivityService`) by implementing bulk eager-loading for related statuses, directories, forum topics, and products, drastically reducing feed generation time.
+* **Optimization**: Eliminated N+1 database queries when rendering comments (`CommentController`) across all sections (Forums, Directory, Store, Knowledgebase) by adding dynamic `user` relationships to the options table and eager-loading author profiles.
+* **Optimization**: Resolved a severe memory exhaustion bottleneck in the private messaging system (`MessageConversationService`) by replacing a full message history query with an optimized `GROUP BY` and `MAX(id_msg)` approach to fetch only the latest message per conversation partner.
 * **Feature**: Prepared `requests/update.php` as a standard update execution entry point for database migrations, option updates, and cache clearing.
 
 ### Ad System & Visit Exchange

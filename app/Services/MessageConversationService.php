@@ -16,8 +16,15 @@ class MessageConversationService
 
     public function conversationSummaries(User $user): array
     {
-        $messages = Message::where('us_rec', $user->id)
+        $partnerIdExpression = \Illuminate\Support\Facades\DB::raw('CASE WHEN us_env = ' . $user->id . ' THEN us_rec ELSE us_env END');
+        
+        $latestMessageIds = Message::where('us_rec', $user->id)
             ->orWhere('us_env', $user->id)
+            ->selectRaw('MAX(id_msg) as latest_id')
+            ->groupBy($partnerIdExpression)
+            ->pluck('latest_id');
+
+        $messages = Message::whereIn('id_msg', $latestMessageIds)
             ->orderBy('time', 'desc')
             ->orderBy('id_msg', 'desc')
             ->get();

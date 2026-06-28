@@ -149,7 +149,7 @@ myads/
 | `HomeController` | Dashboard (`/home`), point conversion |
 | `PortalController` | Community feed (`/portal`), smart feed algorithm |
 | `StatusController` | Create posts (text, link, gallery, repost, multimedia: video, audio, file, music, clips), image upload, link preview |
-| `CommentController` | Load, store, delete comments |
+| `CommentController` | Load, store, delete comments (optimized N+1 eager-loading) |
 | `ReactionController` | Toggle reactions |
 | `MentionController` | `@mention` user lookup |
 | `ForumController` | Forum index, categories, topics, CRUD, moderation |
@@ -279,7 +279,7 @@ myads/
 | `ContentFormatter` | Shared formatter for hashtags, links, Markdown, mentions |
 | `LinkPreviewService` | Fetches URL metadata for link posts |
 | `NotificationService` | Creates and manages notifications |
-| `StatusActivityService` | Status/activity card rendering logic |
+| `StatusActivityService` | Status/activity card rendering logic (bulk eager-loading optimized) |
 | `StatusPostService` | Centralized business logic for creating, editing, and deleting community statuses across Web and Mobile |
 | `StatusPromotionPricingService` | Smart PTS pricing, delivery caps, duration estimates, and active-subscription discount support for promoted posts |
 | `StatusPromotionService` | Campaign creation, feed injection, pacing, progress tracking, and admin actions for promoted posts |
@@ -309,7 +309,7 @@ myads/
 | `CustomAdServingService` | Selects active custom ad deals, renders safe banner/text/native markup, and records impressions/clicks |
 | `CustomAdSettlementService` | Accepts/rejects/cancels custom ad deals, reserves/refunds PTS, and releases daily publisher payouts |
 | `CustomAdAnalyticsService` | Aggregates custom ad summaries, daily/hourly series, referrers, countries, devices, and CTR |
-| `MessageConversationService` | Manages message conversation resolution, partner lookup (encrypted key + username fallback), pagination, unread counts, and read-state updates |
+| `MessageConversationService` | Manages message conversation resolution, partner lookup, pagination, unread counts, and read-state updates (optimized MAX(id_msg) memory fetching) |
 | `MailConfigServiceProvider` | Boots early to override `config('mail.*')` from the `mail_settings` database table at runtime, with graceful fallback |
 
 ---

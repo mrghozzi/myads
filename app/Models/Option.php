@@ -32,4 +32,12 @@ class Option extends Model
     {
         return $this->belongsTo(KbCategory::class, 'kb_category_id');
     }
+
+    /**
+     * Get the user who authored this option (used when option acts as a comment).
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'o_order');
+    }
 }

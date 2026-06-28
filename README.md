@@ -21,7 +21,7 @@ Core areas include:
 - Banner ads, text ads, visit exchange, YouTube Views Exchange, Smart Ads with **Geo-Targeting** and **A/B Testing**, and **Custom Member Ads**
 - Ad analytics with **Hourly Click Heatmaps**
 - Member-to-member custom ad placements with embed codes, deal requests, PTS settlement, and external agreement tracking
-- Community feed with **Multimedia Posts** (Video, Audio, Music, Files, Reels), reactions, comments, reposts, mentions, and messaging
+- High-performance community feed (N+1 query optimized) with **Multimedia Posts** (Video, Audio, Music, Files, Reels), reactions, comments, reposts, mentions, and fast low-memory messaging
 - Forum with moderation tools and attachments
 - Store and product knowledgebase
 - Web directory
