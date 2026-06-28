@@ -272,7 +272,7 @@ myads/
 | `FeedService` | Hybrid ranking algorithm for `/portal?filter=all` (recency, follows, affinity, social proof, reactions, diversity penalties) |
 | `AdminAccessService` | Centralized admin ACL — checks if user can access admin routes by module |
 | `PointLedgerService` | Awards/deducts PTS, records transactions |
-| `GamificationService` | Badge/quest progress tracking |
+| `GamificationService` | Centralized badge/quest progress tracking (handles daily/weekly premium quests and 20+ dynamic engagement badges) |
 | `UserPrivacyService` | Enforces per-member privacy rules across profile, DMs, mentions, reposts |
 | `UserBlockService` | Manages block creation, expiration, querying, and enforces block boundaries between users |
 | `MentionService` | Extracts and stores @mentions, sends notifications |

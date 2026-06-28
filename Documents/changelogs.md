@@ -43,6 +43,9 @@
 * **Medium Fix**: Added **authentication requirement** to `ReportController::store()`. Previously allowed unauthenticated users to submit reports as `uid=0`, creating a spam and abuse vector. Now returns `401 Unauthorized` for guests.
 * **Low Fix**: Strengthened **CAPTCHA validation** in `AuthController` registration and login flows by replacing loose PHP comparison (`!=`) with strict type-safe comparison (`(string) !== (string)`), preventing potential type-juggling bypass attacks.
 
+### Gamification & Engagement
+* **Feature**: Added 5 new engagement badges (Top Client, Helpful Seller, Trendsetter, Prolific Writer, Top Commenter).
+* **Feature**: Added 5 new premium quests (Daily Login, Daily Reactions, Weekly Posts, Weekly Comments, Weekly Reactions Received) to reward regular platform activity.
 ---
 
 # v4.3.8
