@@ -16,6 +16,13 @@
 * **Feature**: Added a "Personal Activity" page (`/my-activity`) for members to view a combined, chronological timeline of their recent posts, comments, and reactions, with multilingual support.
 * **Feature**: Prepared `requests/update.php` as a standard update execution entry point for database migrations, option updates, and cache clearing.
 
+### Ad System & Visit Exchange
+* **Feature**: Added **Ad Concurrency Prevention** to the banner serving system. A 5-second concurrency lock ensures that multiple ad widgets on the exact same page view will never fetch duplicate ads.
+* **Feature**: Added **Seen Ads Fallback** logic for banner ads. If all available banner ads are excluded by the visitor's repeat window, the system will fall back to displaying previously seen ads instead of rendering a blank default image.
+* **Feature**: Added **Link Ads Repeat Window** configuration. Text link ads can now be limited by a time window (minutes) before showing the same ad to the same visitor again.
+* **Feature**: Added dynamic Admin panel configuration for the **Visit Exchange (Surf)** system. Administrators can now adjust the Daily Visit Limit, Points (PTS) Reward, and Visit Credits (VU) Reward directly from `/admin/ads/settings` instead of relying on hardcoded variables.
+* **Improvement**: Reorganized the `/admin/ads/settings` page to group settings logically across Banner Ads, Text Ads, Smart Ads, Visit Exchange, and Privacy. Fully integrated all new settings with the multilingual translation system.
+
 ### UI & Design
 * **Feature**: Added **Toast Notifications System** replacing legacy `alert()` prompts with sliding, theme-aware notifications (`showToast`).
 * **Feature**: Implemented **Skeleton Loaders (Shimmer Effect)** in the community feed to provide a premium placeholder loading state during infinite scroll.

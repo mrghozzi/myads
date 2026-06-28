@@ -54,6 +54,8 @@ use App\Support\BannerServingSettings;
 use App\Support\BannerSizeCatalog;
 use App\Support\ForumSettings;
 use App\Support\SmartAdsSettings;
+use App\Support\LinkServingSettings;
+use App\Support\VisitExchangeSettings;
 use App\Support\SmartAdTargeting;
 use App\Support\StoreCategoryCatalog;
 use Illuminate\Validation\ValidationException;
@@ -370,16 +372,30 @@ class AdminController extends Controller
     {
         $adsBrandName = AdsSettings::brandName();
         $bannerRepeatWindowMinutes = BannerServingSettings::repeatWindowMinutes();
+        $bannerFallbackToSeen = BannerServingSettings::fallbackToSeenAds();
+        $bannerPreventConcurrent = BannerServingSettings::preventConcurrentDuplicates();
         $smartAdsPointsDivisor = SmartAdsSettings::pointsDivisor();
         $ipVisibility = AdsSettings::ipVisibility();
         $plans = $this->plans->activePlans();
+        
+        $linkRepeatWindowMinutes = LinkServingSettings::repeatWindowMinutes();
+        
+        $visitDailyLimit = VisitExchangeSettings::dailyLimit();
+        $visitPointsReward = VisitExchangeSettings::pointsReward();
+        $visitVuReward = VisitExchangeSettings::vuReward();
 
         return view('admin::admin.ads_settings', compact(
             'adsBrandName',
             'bannerRepeatWindowMinutes',
+            'bannerFallbackToSeen',
+            'bannerPreventConcurrent',
             'smartAdsPointsDivisor',
             'ipVisibility',
-            'plans'
+            'plans',
+            'linkRepeatWindowMinutes',
+            'visitDailyLimit',
+            'visitPointsReward',
+            'visitVuReward'
         ));
     }
 
@@ -388,6 +404,12 @@ class AdminController extends Controller
         $validated = $request->validate([
             'ads_brand_name' => 'required|string|max:255',
             'banner_repeat_window_minutes' => 'nullable|integer|min:0|max:525600',
+            'banner_fallback_to_seen' => 'nullable|boolean',
+            'banner_prevent_concurrent_duplicates' => 'nullable|boolean',
+            'link_repeat_window_minutes' => 'nullable|integer|min:0|max:525600',
+            'visit_daily_limit' => 'required|integer|min:1|max:1000',
+            'visit_points_reward' => 'required|numeric|min:0|max:1000',
+            'visit_vu_reward' => 'required|numeric|min:0|max:100',
             'smart_ads_points_divisor' => 'nullable|numeric|min:0.1|max:1000',
             'ip_visibility' => 'nullable|string',
         ]);
@@ -419,6 +441,66 @@ class AdminController extends Controller
             ],
             [
                 'o_valuer' => (string) ($validated['smart_ads_points_divisor'] ?? SmartAdsSettings::DEFAULT_POINTS_DIVISOR),
+            ]
+        );
+
+        Option::updateOrCreate(
+            [
+                'o_type' => BannerServingSettings::OPTION_TYPE,
+                'name' => BannerServingSettings::FALLBACK_TO_SEEN_NAME,
+            ],
+            [
+                'o_valuer' => $request->has('banner_fallback_to_seen') ? 'true' : 'false',
+            ]
+        );
+
+        Option::updateOrCreate(
+            [
+                'o_type' => BannerServingSettings::OPTION_TYPE,
+                'name' => BannerServingSettings::PREVENT_CONCURRENT_NAME,
+            ],
+            [
+                'o_valuer' => $request->has('banner_prevent_concurrent_duplicates') ? 'true' : 'false',
+            ]
+        );
+
+        Option::updateOrCreate(
+            [
+                'o_type' => LinkServingSettings::OPTION_TYPE,
+                'name' => LinkServingSettings::REPEAT_WINDOW_NAME,
+            ],
+            [
+                'o_valuer' => (string) ($validated['link_repeat_window_minutes'] ?? LinkServingSettings::DEFAULT_REPEAT_WINDOW_MINUTES),
+            ]
+        );
+
+        Option::updateOrCreate(
+            [
+                'o_type' => VisitExchangeSettings::OPTION_TYPE,
+                'name' => VisitExchangeSettings::DAILY_LIMIT_NAME,
+            ],
+            [
+                'o_valuer' => (string) $validated['visit_daily_limit'],
+            ]
+        );
+
+        Option::updateOrCreate(
+            [
+                'o_type' => VisitExchangeSettings::OPTION_TYPE,
+                'name' => VisitExchangeSettings::POINTS_REWARD_NAME,
+            ],
+            [
+                'o_valuer' => (string) $validated['visit_points_reward'],
+            ]
+        );
+
+        Option::updateOrCreate(
+            [
+                'o_type' => VisitExchangeSettings::OPTION_TYPE,
+                'name' => VisitExchangeSettings::VU_REWARD_NAME,
+            ],
+            [
+                'o_valuer' => (string) $validated['visit_vu_reward'],
             ]
         );
 

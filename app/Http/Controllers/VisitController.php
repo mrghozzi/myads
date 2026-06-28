@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Visit;
 use App\Models\User;
 use App\Models\Option;
+use App\Support\VisitExchangeSettings;
 use App\Services\PointLedgerService;
 use App\Services\SecurityPolicyService;
 
@@ -18,7 +19,6 @@ class VisitController extends Controller
     /**
      * Anti-cheat configuration constants.
      */
-    private const DAILY_VISIT_LIMIT     = 50;   // Max rewarded visits per day per user
     private const SAME_SITE_COOLDOWN    = 3600;  // Seconds before same site can be viewed again (1 hour)
     private const RATE_LIMIT_SECONDS    = 8;     // Minimum seconds between surf requests
     private const TOKEN_EXPIRY_SECONDS  = 300;   // Tokens older than 5 minutes are rejected
@@ -135,7 +135,8 @@ class VisitController extends Controller
         // Anti-cheat: Check daily limit
         $dailyKey = 'visit_daily_' . $user->id . '_' . now()->format('Y-m-d');
         $dailyCount = (int) Cache::get($dailyKey, 0);
-        if ($dailyCount >= self::DAILY_VISIT_LIMIT) {
+        $dailyLimit = VisitExchangeSettings::dailyLimit();
+        if ($dailyCount >= $dailyLimit) {
             return view('theme::visits.no_sites', ['daily_limit_reached' => true]);
         }
 
@@ -265,7 +266,8 @@ class VisitController extends Controller
             $user = Auth::user();
             $dailyKey = 'visit_daily_' . $user->id . '_' . now()->format('Y-m-d');
             $dailyCount = (int) Cache::get($dailyKey, 0);
-            if ($dailyCount >= self::DAILY_VISIT_LIMIT) {
+            $dailyLimit = VisitExchangeSettings::dailyLimit();
+            if ($dailyCount >= $dailyLimit) {
                 return response()->json(['success' => false, 'message' => __('Daily visit limit reached.')], 429);
             }
 
@@ -293,8 +295,8 @@ class VisitController extends Controller
             DB::beginTransaction();
 
             // Credit viewer: award PTS via PointLedgerService for proper ledger tracking
-            $pointsReward = 5;
-            $vuReward = 0.5;
+            $pointsReward = VisitExchangeSettings::pointsReward();
+            $vuReward = VisitExchangeSettings::vuReward();
 
             app(PointLedgerService::class)->award(
                 $user,
@@ -340,7 +342,7 @@ class VisitController extends Controller
             // Gamification event
             app(\App\Services\GamificationService::class)->recordEvent($user->id, 'visit_exchange_completed');
 
-            $remaining = self::DAILY_VISIT_LIMIT - ($dailyCount + 1);
+            $remaining = $dailyLimit - ($dailyCount + 1);
             return response()->json([
                 'success' => true,
                 'message' => __('View verified. Points awarded!'),

@@ -14,9 +14,11 @@ use App\Support\AdsSettings;
 use App\Support\BannerServingSettings;
 use App\Support\BannerSizeCatalog;
 use App\Support\SmartAdTargeting;
+use App\Support\LinkServingSettings;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Cache;
 
 class AdsServingController extends Controller
 {
@@ -66,9 +68,37 @@ class AdsServingController extends Controller
             });
         }
 
+        // Prevent concurrent duplicates on the same page view
+        $preventConcurrent = BannerServingSettings::preventConcurrentDuplicates();
+        $cacheKey = 'recent_banners_' . md5($visitorKey);
+        $recentBanners = [];
+        if ($preventConcurrent) {
+            $recentBanners = Cache::get($cacheKey, []);
+            if (!empty($recentBanners)) {
+                $bannerQuery->whereNotIn('id', $recentBanners);
+            }
+        }
+
         $candidates = $bannerQuery->get()->filter(function (Banner $candidate) use ($countryCode, $deviceType) {
             return $this->matchesAdCandidate($candidate, $countryCode, $deviceType);
         });
+
+        // Fallback if no fresh ads are available
+        if ($candidates->count() === 0 && BannerServingSettings::fallbackToSeenAds()) {
+            $fallbackQuery = Banner::where('statu', 1)
+                ->whereIn('px', BannerSizeCatalog::queryCandidates($pxValue))
+                ->whereHas('user', function ($query) use ($user_id) {
+                    $query->where('nvu', '>=', 1)->where('id', '!=', $user_id);
+                });
+            
+            if ($preventConcurrent && !empty($recentBanners)) {
+                $fallbackQuery->whereNotIn('id', $recentBanners);
+            }
+            
+            $candidates = $fallbackQuery->get()->filter(function (Banner $candidate) use ($countryCode, $deviceType) {
+                return $this->matchesAdCandidate($candidate, $countryCode, $deviceType);
+            });
+        }
 
         $banner = $candidates->count() > 0 ? $candidates->random() : null;
 
@@ -88,6 +118,11 @@ class AdsServingController extends Controller
             // Log State
             $this->logState($user_id, $banner->id, 'banner', $request);
             $this->recordBannerImpression($banner->id, (int) $user_id, $visitorKey, $abVersion);
+
+            if ($preventConcurrent) {
+                $recentBanners[] = $banner->id;
+                Cache::put($cacheKey, $recentBanners, 5); // Cache for 5 seconds
+            }
 
             // Return JS to display banner (Matches old bn.php output style)
             $html = $this->renderBannerMarkup($banner, (int) $user_id, $pxValue, $placementMode, $abVersion);
@@ -126,14 +161,42 @@ class AdsServingController extends Controller
 
         // 2. Select First Link ($ab)
         // Logic: Link from user who has nlink >= 1 and NOT same user
-        $candidates1 = Link::where('statu', 1)
+        $linkRepeatWindowSeconds = LinkServingSettings::repeatWindowMinutes() * 60;
+        $visitorIp = $request->ip();
+
+        $linkQuery = Link::where('statu', 1)
             ->whereHas('user', function ($query) use ($user_id) {
                 $query->where('nlink', '>=', 1)->where('id', '!=', $user_id);
-            })
-            ->get()
-            ->filter(function (Link $candidate) use ($countryCode, $deviceType) {
-                return $this->matchesAdCandidate($candidate, $countryCode, $deviceType);
             });
+
+        if ($linkRepeatWindowSeconds > 0) {
+            $cutoff = time() - $linkRepeatWindowSeconds;
+            $linkQuery->whereNotExists(function ($query) use ($user_id, $visitorIp, $cutoff) {
+                $query->select(DB::raw(1))
+                    ->from('state')
+                    ->whereColumn('state.pid', 'link.id')
+                    ->where('state.t_name', 'link')
+                    ->where('state.sid', (int) $user_id)
+                    ->where('state.v_ip', $visitorIp)
+                    ->where('state.r_date', '>=', $cutoff);
+            });
+        }
+
+        $candidates1 = $linkQuery->get()->filter(function (Link $candidate) use ($countryCode, $deviceType) {
+            return $this->matchesAdCandidate($candidate, $countryCode, $deviceType);
+        });
+
+        // Fallback if no links found due to repeat window
+        if ($candidates1->count() === 0 && $linkRepeatWindowSeconds > 0) {
+            $candidates1 = Link::where('statu', 1)
+                ->whereHas('user', function ($query) use ($user_id) {
+                    $query->where('nlink', '>=', 1)->where('id', '!=', $user_id);
+                })
+                ->get()
+                ->filter(function (Link $candidate) use ($countryCode, $deviceType) {
+                    return $this->matchesAdCandidate($candidate, $countryCode, $deviceType);
+                });
+        }
 
         $link1 = $candidates1->count() > 0 ? $candidates1->random() : null;
 
@@ -144,17 +207,45 @@ class AdsServingController extends Controller
         // 3. Select Second Link ($ab2)
         // Logic: Link from user who has nlink >= 1, NOT same user as publisher, AND NOT same user as first link owner
         // AND NOT the same link as first link.
-        $candidates2 = Link::where('statu', 1)
+        $linkQuery2 = Link::where('statu', 1)
             ->where('id', '!=', ($link1 ? $link1->id : 0))
             ->whereHas('user', function ($query) use ($user_id, $link1) {
                 $query->where('nlink', '>=', 1)
                       ->where('id', '!=', $user_id)
                       ->where('id', '!=', ($link1 ? $link1->uid : 0));
-            })
-            ->get()
-            ->filter(function (Link $candidate) use ($countryCode, $deviceType) {
-                return $this->matchesAdCandidate($candidate, $countryCode, $deviceType);
             });
+            
+        if ($linkRepeatWindowSeconds > 0) {
+            $cutoff = time() - $linkRepeatWindowSeconds;
+            $linkQuery2->whereNotExists(function ($query) use ($user_id, $visitorIp, $cutoff) {
+                $query->select(DB::raw(1))
+                    ->from('state')
+                    ->whereColumn('state.pid', 'link.id')
+                    ->where('state.t_name', 'link')
+                    ->where('state.sid', (int) $user_id)
+                    ->where('state.v_ip', $visitorIp)
+                    ->where('state.r_date', '>=', $cutoff);
+            });
+        }
+
+        $candidates2 = $linkQuery2->get()->filter(function (Link $candidate) use ($countryCode, $deviceType) {
+            return $this->matchesAdCandidate($candidate, $countryCode, $deviceType);
+        });
+        
+        // Fallback for second link
+        if ($candidates2->count() === 0 && $linkRepeatWindowSeconds > 0) {
+            $candidates2 = Link::where('statu', 1)
+                ->where('id', '!=', ($link1 ? $link1->id : 0))
+                ->whereHas('user', function ($query) use ($user_id, $link1) {
+                    $query->where('nlink', '>=', 1)
+                          ->where('id', '!=', $user_id)
+                          ->where('id', '!=', ($link1 ? $link1->uid : 0));
+                })
+                ->get()
+                ->filter(function (Link $candidate) use ($countryCode, $deviceType) {
+                    return $this->matchesAdCandidate($candidate, $countryCode, $deviceType);
+                });
+        }
 
         $link2 = $candidates2->count() > 0 ? $candidates2->random() : null;
 
