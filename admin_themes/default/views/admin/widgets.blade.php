@@ -37,10 +37,12 @@
                     <div class="admin-muted">{{ __('messages.drag_rows_to_reorder') }}</div>
                 </div>
                 <div class="admin-type-select">
-                    <select id="widget_cat" class="form-select">
+                    <select id="widget_cat" class="form-select admin-form-control">
                         <option value="">{{ __('messages.select') ?? 'Select' }}</option>
                         <option value="widget_html">{{ __('messages.html_code') ?? 'Html code' }}</option>
                         <option value="widget_members">{{ __('messages.suggest_members') ?? 'Suggest Members' }}</option>
+                        <option value="widget_online_members">{{ __('messages.online_members') ?? 'Online Members' }}</option>
+                        <option value="widget_recent_comments">{{ __('messages.recent_comments') ?? 'Recent Comments' }}</option>
                         <option value="widget_stats_box">{{ __('messages.stats_box') ?? 'Stats Box' }}</option>
                         <option value="widget_forum_latest">{{ __('messages.latest_topic') ?? 'Latest Topics' }}</option>
                         <option value="widget_news_latest">{{ __('messages.latest_news') ?? 'Latest News' }}</option>

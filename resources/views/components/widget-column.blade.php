@@ -6,6 +6,12 @@
         @case('widget_members')
             @include('theme::partials.widgets.widget_members', ['widget' => $widget])
             @break
+        @case('widget_online_members')
+            @include('theme::partials.widgets.widget_online_members', ['widget' => $widget])
+            @break
+        @case('widget_recent_comments')
+            @include('theme::partials.widgets.widget_recent_comments', ['widget' => $widget])
+            @break
         @case('widget_stats_box')
             @include('theme::partials.widgets.widget_stats_box', ['widget' => $widget])
             @break

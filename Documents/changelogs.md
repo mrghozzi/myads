@@ -36,6 +36,7 @@
 * **Improvement**: Redesigned the entire **Billing Administration Suite** (`/admin/billing/*`) including Overview, Orders, Order Details, Plans, Currencies, Transactions, and Settings with the premium "Superdesign" aesthetic, featuring modern cards, glassmorphic headers, and enhanced responsive layouts.
 * **Improvement**: Redesigned the **Billing Gateways** admin interface (`/admin/billing/gateways`) using the premium "Superdesign" template to ensure a consistent, modern administrative experience.
 * **Improvement**: Redesigned the **Knowledgebase Categories** admin interface (`/admin/kb/categories`) with the premium "Superdesign" aesthetic, featuring glassmorphic headers, dynamic gradient hero blocks, and enhanced modal designs for a consistent administrative experience.
+* **Improvement**: Upgraded the **Admin Widgets Manager** (`/admin/widgets`) with a unified "Superdesign" layout, and added two new widgets: **Online Members** and **Recent Comments**.
 
 ### Security Audit & Hardening
 * **Critical Fix**: Patched **path traversal vulnerability** in Admin Media Manager (`AdminMediaController`). The `rename()` and `destroy()` actions accepted arbitrary file paths without validation, allowing attackers with admin access to rename or delete sensitive system files (`.env`, `config/database.php`, etc.). Added `isWithinAllowedDirectory()` validation to restrict all file operations to the `upload/` directories only, plus regex-based filename sanitization blocking `../` and special characters.

@@ -3518,4 +3518,10 @@ return [
     'save' => 'حفظ التغييرات',
     'updated_successfully' => 'تم التحديث بنجاح',
     'deleted_successfully' => 'تم الحذف بنجاح',
+    
+    // Widget Translations
+    'online_members' => 'الأعضاء المتصلون',
+    'recent_comments' => 'أحدث التعليقات',
+    'no_users_online_right_now' => 'لا يوجد أعضاء متصلون حالياً.',
+    'no_comments_found' => 'لم يتم العثور على تعليقات.',
 ];

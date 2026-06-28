@@ -984,6 +984,14 @@ php artisan storage:link
 
 ---
 
+## 19N. Admin Widgets Update (2026-06-28)
+
+- **Feature:** Introduced new widgets `widget_online_members` and `widget_recent_comments` to the widget ecosystem.
+- **Admin UI (Superdesign):** Refined `/admin/widgets` with unified action buttons, polished empty states, and standard `admin-form-control` classes matching the Duralux framework.
+- **Translations:** Added mandatory multilingual keys (`online_members`, `recent_comments`, `no_users_online_right_now`, `no_comments_found`) to `lang/en/messages.php` and `lang/ar/messages.php` adhering to the system's strict translation priority.
+
+---
+
 ## 20. Maintaining This File
 
 > **⚠️ RULE: This `Agents.md` file MUST be kept up to date.**
@@ -994,6 +1002,7 @@ Whenever you make changes that affect any of the following, **update this file a
 - Adding or changing **routes or URL patterns**
 - Adding new **database tables or migrations**
 - Adding new **plugins, themes, or languages**
+- Introducing new **translation keys** (Must update at least `lang/en/messages.php` and `lang/ar/messages.php` to maintain the multi-language priority system)
 - Changing **authentication, authorization, or admin ACL logic**
 - Introducing new **architectural patterns or conventions**
 - Adding or modifying **environment variables**
@@ -1008,4 +1017,4 @@ If in doubt, update it. An outdated `Agents.md` causes future agents to make wro
 
 ---
 
-*Last updated: 2026-06-28 — MYADS v4.4.0 (Ad Concurrency Prevention, Banner Fallbacks, dynamic Visit Exchange settings)*
+*Last updated: 2026-06-29 — MYADS v4.4.0 (Ad Concurrency Prevention, Banner Fallbacks, dynamic Visit Exchange settings, Admin Widgets Update)*

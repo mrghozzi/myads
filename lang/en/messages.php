@@ -3516,4 +3516,10 @@ return [
     'save' => 'Save Changes',
     'updated_successfully' => 'Updated successfully',
     'deleted_successfully' => 'Deleted successfully',
+    
+    // Widget Translations
+    'online_members' => 'Online Members',
+    'recent_comments' => 'Recent Comments',
+    'no_users_online_right_now' => 'No users online right now.',
+    'no_comments_found' => 'No comments found.',
 ];
