@@ -1014,7 +1014,8 @@ Whenever you make changes that affect any of the following, **update this file a
 If in doubt, update it. An outdated `Agents.md` causes future agents to make wrong assumptions and waste time. Keeping it accurate is as important as keeping the code itself correct.
 
 - **Support (2026-06-28):** Added `BannerServingSettings`, `LinkServingSettings`, and `VisitExchangeSettings` to `app/Support/` to handle dynamic concurrency and fallback configs.
+- **Feature (2026-06-29):** Expanded Store Categories adding Graphics, Audio, Video, eBooks, Software, and Courses with dynamic subcategories via `StoreCategoryCatalog`.
 
 ---
 
-*Last updated: 2026-06-29 — MYADS v4.4.0 (Ad Concurrency Prevention, Banner Fallbacks, dynamic Visit Exchange settings, Admin Widgets Update)*
+*Last updated: 2026-06-29 — MYADS v4.4.0 (Expanded Store Categories, Ad Concurrency Prevention, Banner Fallbacks, dynamic Visit Exchange settings, Admin Widgets Update)*

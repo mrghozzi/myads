@@ -3164,9 +3164,22 @@ class AdminController extends Controller
             })
             ->pluck('name', 'id');
 
+        $genericCategories = [
+            StoreCategoryCatalog::GRAPHICS,
+            StoreCategoryCatalog::AUDIO,
+            StoreCategoryCatalog::VIDEO,
+            StoreCategoryCatalog::EBOOKS,
+            StoreCategoryCatalog::SOFTWARE,
+            StoreCategoryCatalog::COURSES,
+        ];
+        $genericCategoryOptions = collect();
+        if (in_array($selectedStoreCategory, $genericCategories)) {
+            $genericCategoryOptions = Option::where('o_type', $selectedStoreCategory . 'cat')->orderBy('o_order')->get();
+        }
+
         return view('admin::admin.product_edit', compact(
             'product', 'typeOption', 'files', 'latestFile', 'topic', 'storeCategories', 'isSuspended',
-            'selectedStoreCategory', 'selectedStoreSubcategory', 'scriptCategoryOptions', 'scriptProductOptions'
+            'selectedStoreCategory', 'selectedStoreSubcategory', 'scriptCategoryOptions', 'scriptProductOptions', 'genericCategoryOptions'
         ));
     }
 

@@ -1223,6 +1223,7 @@ class StoreController extends Controller
             'selectedStoreSubcategory' => $selectedStoreSubcategory,
             'scriptProductOptions' => $this->scriptProductOptions($selectedStoreCategory),
             'scriptCategoryOptions' => $this->scriptCategoryOptions($selectedStoreCategory),
+            'genericCategoryOptions' => $this->genericCategoryOptions($selectedStoreCategory),
         ];
     }
 
@@ -1280,6 +1281,31 @@ class StoreController extends Controller
             });
     }
 
+    private function genericCategoryOptions(?string $selectedCategory)
+    {
+        $genericCategories = [
+            StoreCategoryCatalog::GRAPHICS,
+            StoreCategoryCatalog::AUDIO,
+            StoreCategoryCatalog::VIDEO,
+            StoreCategoryCatalog::EBOOKS,
+            StoreCategoryCatalog::SOFTWARE,
+            StoreCategoryCatalog::COURSES,
+        ];
+
+        if (!in_array($selectedCategory, $genericCategories)) {
+            return collect();
+        }
+
+        return Option::where('o_type', $selectedCategory . 'cat')
+            ->orderBy('o_order')
+            ->get(['name'])
+            ->map(function (Option $cat) {
+                return [
+                    'value' => $cat->name,
+                    'label' => $cat->name,
+                ];
+            });
+    }
 
     /**
      * AJAX Purchase Product Flow

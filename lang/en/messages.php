@@ -3522,4 +3522,33 @@ return [
     'recent_comments' => 'Recent Comments',
     'no_users_online_right_now' => 'No users online right now.',
     'no_comments_found' => 'No comments found.',
+    
+    // Store Categories
+    'graphics' => 'Graphics',
+    'audio' => 'Audio',
+    'video' => 'Video',
+    'ebooks' => 'eBooks',
+    'software' => 'Software',
+    'courses' => 'Courses',
+    
+    // Store Subcategories
+    'logos' => 'Logos',
+    'vectors' => 'Vectors',
+    'templates' => 'Templates',
+    'ui_kits' => 'UI Kits',
+    'music' => 'Music',
+    'sound_effects' => 'Sound Effects',
+    'loops' => 'Loops',
+    'stock_footage' => 'Stock Footage',
+    'motion_graphics' => 'Motion Graphics',
+    'fiction' => 'Fiction',
+    'non_fiction' => 'Non-Fiction',
+    'tutorials' => 'Tutorials',
+    'guides' => 'Guides',
+    'apps' => 'Apps',
+    'games' => 'Games',
+    'tools' => 'Tools',
+    'programming' => 'Programming',
+    'design' => 'Design',
+    'marketing' => 'Marketing',
 ];

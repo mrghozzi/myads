@@ -242,7 +242,7 @@ Allows any website to pre-fill the MYADS post composer.
 - `GET /api/forums/categories`: Retrieve forum categories.
 - `GET /api/forums/categories/{categoryId}/topics`: Retrieve topics in a specific category.
 - `GET /api/forums/topics/{topicId}`: Retrieve a specific topic and its replies.
-- `GET /api/store/products`: Retrieve store products (paginated).
+- `GET /api/store/products`: Retrieve store products (paginated). Products can be of categories: Scripts, Themes, Plugins, Graphics, Audio, Video, eBooks, Software, and Courses.
 - `GET /api/store/products/{id}`: Retrieve a specific product's details.
 
 ### Clips

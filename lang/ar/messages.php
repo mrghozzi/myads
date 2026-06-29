@@ -3524,4 +3524,33 @@ return [
     'recent_comments' => 'أحدث التعليقات',
     'no_users_online_right_now' => 'لا يوجد أعضاء متصلون حالياً.',
     'no_comments_found' => 'لم يتم العثور على تعليقات.',
+    
+    // Store Categories
+    'graphics' => 'جرافيكس',
+    'audio' => 'صوتيات',
+    'video' => 'فيديو',
+    'ebooks' => 'كتب إلكترونية',
+    'software' => 'برمجيات',
+    'courses' => 'دورات',
+    
+    // Store Subcategories
+    'logos' => 'شعارات',
+    'vectors' => 'فيكتور',
+    'templates' => 'قوالب',
+    'ui_kits' => 'واجهات مستخدم',
+    'music' => 'موسيقى',
+    'sound_effects' => 'مؤثرات صوتية',
+    'loops' => 'تكرارات',
+    'stock_footage' => 'مقاطع فيديو خام',
+    'motion_graphics' => 'موشن جرافيك',
+    'fiction' => 'خيالي',
+    'non_fiction' => 'غير خيالي',
+    'tutorials' => 'دروس',
+    'guides' => 'أدلة',
+    'apps' => 'تطبيقات',
+    'games' => 'ألعاب',
+    'tools' => 'أدوات',
+    'programming' => 'برمجة',
+    'design' => 'تصميم',
+    'marketing' => 'تسويق',
 ];

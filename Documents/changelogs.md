@@ -26,6 +26,13 @@
 * **Feature**: Added dynamic Admin panel configuration for the **Visit Exchange (Surf)** system. Administrators can now adjust the Daily Visit Limit, Points (PTS) Reward, and Visit Credits (VU) Reward directly from `/admin/ads/settings` instead of relying on hardcoded variables.
 * **Improvement**: Reorganized the `/admin/ads/settings` page to group settings logically across Banner Ads, Text Ads, Smart Ads, Visit Exchange, and Privacy. Fully integrated all new settings with the multilingual translation system.
 
+### Store & Digital Marketplace
+* **Feature**: Expanded Store Categories significantly to diversify digital product offerings. Added 6 new primary categories: **Graphics, Audio, Video, eBooks, Software, and Courses**.
+* **Feature**: Introduced dynamic Subcategory Selection. When creating or editing products, selecting a non-script category now dynamically loads its specific subcategories (e.g., Logos for Graphics, Sound Effects for Audio) via AJAX.
+* **Feature**: Updated `/admin/products` and `/store/create` interfaces to support the new unified category-subcategory selector logic.
+* **API**: Updated the Developer API (`/api/store/products`) to officially document and support retrieval of products across all the newly added categories.
+* **i18n**: Fully localized the 25 new category and subcategory string keys across English and Arabic dictionaries.
+
 ### UI & Design
 * **Feature**: Added **Toast Notifications System** replacing legacy `alert()` prompts with sliding, theme-aware notifications (`showToast`).
 * **Feature**: Implemented **Skeleton Loaders (Shimmer Effect)** in the community feed to provide a premium placeholder loading state during infinite scroll.

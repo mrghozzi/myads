@@ -8,6 +8,12 @@ final class StoreCategoryCatalog
     public const THEMES = 'themes';
     public const TEMPLATES = 'templates';
     public const PLUGINS = 'plugins';
+    public const GRAPHICS = 'graphics';
+    public const AUDIO = 'audio';
+    public const VIDEO = 'video';
+    public const EBOOKS = 'ebooks';
+    public const SOFTWARE = 'software';
+    public const COURSES = 'courses';
 
     /**
      * @return array<int, string>
@@ -18,6 +24,12 @@ final class StoreCategoryCatalog
             self::SCRIPT,
             self::THEMES,
             self::PLUGINS,
+            self::GRAPHICS,
+            self::AUDIO,
+            self::VIDEO,
+            self::EBOOKS,
+            self::SOFTWARE,
+            self::COURSES,
         ];
     }
 
@@ -65,6 +77,12 @@ final class StoreCategoryCatalog
             self::SCRIPT => [self::SCRIPT],
             self::PLUGINS => [self::PLUGINS],
             self::THEMES => [self::THEMES, self::TEMPLATES],
+            self::GRAPHICS => [self::GRAPHICS],
+            self::AUDIO => [self::AUDIO],
+            self::VIDEO => [self::VIDEO],
+            self::EBOOKS => [self::EBOOKS],
+            self::SOFTWARE => [self::SOFTWARE],
+            self::COURSES => [self::COURSES],
             default => [],
         };
     }

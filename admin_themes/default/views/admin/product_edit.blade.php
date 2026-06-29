@@ -145,6 +145,16 @@ function toggleFileVersion(id) {
                                             </option>
                                         @endforeach
                                     </select>
+                                @elseif(in_array($selectedStoreCategory, [\App\Support\StoreCategoryCatalog::GRAPHICS, \App\Support\StoreCategoryCatalog::AUDIO, \App\Support\StoreCategoryCatalog::VIDEO, \App\Support\StoreCategoryCatalog::EBOOKS, \App\Support\StoreCategoryCatalog::SOFTWARE, \App\Support\StoreCategoryCatalog::COURSES]))
+                                    <label class="form-label fs-12 text-muted">{{ __('messages.subcategories') ?? 'Sub Category' }}</label>
+                                    <select name="sc_cat" id="sc_cat" class="form-select">
+                                        <option value="">-- {{ __('messages.select') ?? 'Select' }} --</option>
+                                        @foreach($genericCategoryOptions as $genericCategory)
+                                            <option value="{{ $genericCategory->name }}" {{ (string)$selectedStoreSubcategory === (string)$genericCategory->name ? 'selected' : '' }}>
+                                                {{ __('messages.' . $genericCategory->name) ?? $genericCategory->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
                                 @endif
                             </div>
                         </div>

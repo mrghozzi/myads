@@ -3,6 +3,7 @@
     $selectedStoreSubcategory = $selectedStoreSubcategory ?? null;
     $scriptProductOptions = $scriptProductOptions ?? collect();
     $scriptCategoryOptions = $scriptCategoryOptions ?? collect();
+    $genericCategoryOptions = $genericCategoryOptions ?? collect();
 @endphp
 
 <div class="form-select">
@@ -40,6 +41,19 @@
             @foreach($scriptCategoryOptions as $scriptCategory)
                 <option value="{{ $scriptCategory['value'] }}" @selected((string) $selectedStoreSubcategory === (string) $scriptCategory['value'])>
                     {{ \Illuminate\Support\Facades\Lang::has('messages.' . $scriptCategory['label']) ? __('messages.' . $scriptCategory['label']) : $scriptCategory['label'] }}
+                </option>
+            @endforeach
+        </select>
+        <svg class="form-select-icon icon-small-arrow"><use xlink:href="#svg-small-arrow"></use></svg>
+    </div>
+@elseif(in_array($selectedStoreCategory, [\App\Support\StoreCategoryCatalog::GRAPHICS, \App\Support\StoreCategoryCatalog::AUDIO, \App\Support\StoreCategoryCatalog::VIDEO, \App\Support\StoreCategoryCatalog::EBOOKS, \App\Support\StoreCategoryCatalog::SOFTWARE, \App\Support\StoreCategoryCatalog::COURSES]))
+    <div class="form-select" style="margin-top: 16px;">
+        <label for="sc_cat"><i class="fa fa-sitemap" aria-hidden="true"></i>&nbsp;{{ __('messages.subcategories') }}</label>
+        <select id="sc_cat" name="sc_cat" required>
+            <option value="">-- {{ __('messages.select') }} --</option>
+            @foreach($genericCategoryOptions as $genericCategory)
+                <option value="{{ $genericCategory['value'] }}" @selected((string) $selectedStoreSubcategory === (string) $genericCategory['value'])>
+                    {{ \Illuminate\Support\Facades\Lang::has('messages.' . $genericCategory['label']) ? __('messages.' . $genericCategory['label']) : $genericCategory['label'] }}
                 </option>
             @endforeach
         </select>
