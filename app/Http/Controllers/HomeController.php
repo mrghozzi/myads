@@ -48,7 +48,12 @@ class HomeController extends Controller
         
         $site_settings = Setting::first();
 
-        $vouchers = PtsVoucher::where('user_id', $user->id)->orderBy('created_at', 'desc')->get();
+        try {
+            $vouchers = PtsVoucher::where('user_id', $user->id)->orderBy('created_at', 'desc')->get();
+        } catch (\Exception $e) {
+            $vouchers = collect();
+            \Log::error('Failed to load vouchers on home page: ' . $e->getMessage());
+        }
 
         return view('theme::home', compact('user', 'bannerStats', 'linkStats', 'visitStats', 'smartAdStats', 'site_settings', 'vouchers'));
     }
