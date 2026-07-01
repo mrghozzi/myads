@@ -38,10 +38,13 @@ Every theme SHOULD have a `theme.json` file in its root directory for proper ide
     "slug": "default",
     "version": "1.0.0",
     "author": "MyAds Core",
+    "author_url": "https://example.com/author",
     "description": "The default starter theme for MyAds.",
     "thumbnail": "screenshot.png",
     "latest": "https://github.com/mrghozzi/myads-theme-default/releases/latest",
-    "min_myads": "4.2.5"
+    "min_myads": "4.2.5",
+    "ADStn_url": "myads-theme-default",
+    "siteweb": "https://example.com/theme-website"
 }
 ```
 
@@ -50,10 +53,35 @@ Every theme SHOULD have a `theme.json` file in its root directory for proper ide
 - `slug`: Unique identifier (should match the folder name).
 - `version`: Current version string.
 - `author`: Author name.
+- `author_url`: (Optional) URL to the author's profile.
 - `description`: A brief summary of the theme.
 - `thumbnail`: (Optional) Filename of the preview image. Fallback: `screenshot.png`.
 - `latest`: (Optional) GitHub release URL for automatic update checks and changelog display.
 - `min_myads`: (Optional) Minimum compatible MyAds version (e.g., "4.2.0").
+- `ADStn_url`: (Optional) Marketplace slug or full API URL for checking premium updates.
+- `siteweb`: (Optional) URL to the theme's official website.
+
+## Theme Documentation (Markdown)
+
+Just like plugins, themes support markdown files to provide rich documentation directly in the admin panel Details modal:
+
+- `README.md`: The primary description and documentation.
+- `changelogs.md`: A log of version updates and fixes.
+- `screenshots.md`: Markdown image embeds showing the theme interface. Example: `![Home Page](./img/screenshot1.png)`
+
+> **Note:** Any relative image links used inside these markdown files will be automatically resolved and served securely via the `admin.themes.asset` route.
+
+## Paid Theme Licensing Protocol
+
+To support premium themes, the MyAds platform implements a unified licensing and updates mechanism connected to the ADStn marketplace. This is identical to the plugin licensing protocol.
+
+1.  **Metadata Tagging:** Premium themes must declare the `ADStn_url` in their `theme.json` to instruct the update manager to query the marketplace API.
+2.  **License Key Storage:** When a user enters their license key in the admin settings, it is stored in the `options` table with the following parameters:
+    -   `o_type`: `theme_license`
+    -   `name`: `{theme_slug}_key` (e.g., `dark_ocean_key`)
+    -   `o_valuer`: The license key string.
+3.  **Auto-Updates Check:** The `ThemeManager` routinely calls the API endpoint `https://www.adstn.ovh/api/marketplace/extensions/themes`. It securely sends the theme `slug`, current `version`, active `license_key`, and the installation `domain`.
+4.  **Authorized Download:** If the license is active and a new version exists, the API returns a temporary, secure `download_url` for a one-click update from the Admin Panel.
 
 ## How Templates Work
 

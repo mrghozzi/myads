@@ -770,6 +770,8 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::post('/themes/install-marketplace', [AdminController::class, 'installThemeFromMarketplace'])->name('admin.themes.install_marketplace');
 
     Route::get('themes/thumbnail/{slug}', [AdminController::class, 'themeThumbnail'])->name('admin.themes.thumbnail');
+    Route::get('themes/asset/{slug}', [AdminController::class, 'themeAsset'])->name('admin.themes.asset');
+    Route::get('themes/details/{slug}', [AdminController::class, 'themeDetails'])->name('admin.themes.details');
     Route::match(['get', 'post'], '/sitemap/generate', [SitemapController::class, 'generate'])->name('admin.sitemap.generate');
 
     // Billing

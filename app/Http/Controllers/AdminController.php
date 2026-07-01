@@ -3596,6 +3596,91 @@ class AdminController extends Controller
         return response()->json($data);
     }
 
+    public function themeAsset($slug, Request $request, ThemeManager $themeManager)
+    {
+        $themes = $themeManager->getAllThemes();
+        $theme = collect($themes)->where('slug', $slug)->first();
+
+        if ($theme) {
+            $assetPath = $request->query('path');
+            if (!$assetPath) abort(404);
+
+            $fullPath = $theme['path'] . '/' . ltrim($assetPath, './');
+            
+            if (File::exists($fullPath)) {
+                $mimeType = File::mimeType($fullPath);
+                return response()->file($fullPath, [
+                    'Content-Type' => $mimeType,
+                    'Cache-Control' => 'public, max-age=31536000'
+                ]);
+            }
+        }
+
+        abort(404);
+    }
+
+    public function themeDetails($slug, ThemeManager $themeManager)
+    {
+        $themes = $themeManager->getAllThemes();
+        $theme = collect($themes)->where('slug', $slug)->first();
+
+        if (!$theme) {
+            return response()->json(['error' => 'Theme not found'], 404);
+        }
+
+        $path = $theme['path'];
+        $data = [
+            'name' => $theme['name'] ?? '',
+            'slug' => $theme['slug'] ?? '',
+            'version' => $theme['version'] ?? '1.0.0',
+            'author' => $theme['author'] ?? '',
+            'author_url' => $theme['author_url'] ?? null,
+            'min_myads' => $theme['min_myads'] ?? null,
+            'ADStn_url' => $theme['ADStn_url'] ?? null,
+            'siteweb' => $theme['siteweb'] ?? null,
+            'thumbnail' => !empty($theme['thumbnail']) ? route('admin.themes.thumbnail', $theme['slug']) : null,
+            'description' => $theme['description'] ?? '',
+            'readme' => null,
+            'changelogs' => null,
+            'screenshots' => null,
+        ];
+
+        if (File::exists($path . '/README.md')) {
+            $readme = File::get($path . '/README.md');
+            
+            // Rewrite relative image paths
+            $readme = preg_replace_callback('/!\[([^\]]*)\]\((?!https?:\/\/|ftp:\/\/|mailto:)([^\)]+)\)/i', function($matches) use ($slug) {
+                $alt = $matches[1];
+                $assetPath = $matches[2];
+                $url = route('admin.themes.asset', ['slug' => $slug, 'path' => $assetPath]);
+                return "![$alt]($url)";
+            }, $readme);
+
+            $data['readme'] = $readme;
+        }
+
+        if (File::exists($path . '/changelogs.md')) {
+            $data['changelogs'] = File::get($path . '/changelogs.md');
+        }
+
+        if (File::exists($path . '/screenshots.md')) {
+            $screenshots = File::get($path . '/screenshots.md');
+            
+            // Rewrite relative image paths to use the theme asset route
+            // Matches ![alt](./path/to/img.png) or ![alt](path/to/img.png)
+            $screenshots = preg_replace_callback('/!\[([^\]]*)\]\((?!https?:\/\/|ftp:\/\/|mailto:)([^\)]+)\)/i', function($matches) use ($slug) {
+                $alt = $matches[1];
+                $assetPath = $matches[2];
+                $url = route('admin.themes.asset', ['slug' => $slug, 'path' => $assetPath]);
+                return "![$alt]($url)";
+            }, $screenshots);
+
+            $data['screenshots'] = $screenshots;
+        }
+
+        return response()->json($data);
+    }
+
     // Themes Management
     public function themes(ThemeManager $themeManager, RemoteExtensionMarketplaceService $marketplace)
     {

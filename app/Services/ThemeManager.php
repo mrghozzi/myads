@@ -45,6 +45,9 @@ class ThemeManager
                     $themeData['path'] = $directory;
                     $themeData['latest_url'] = $themeData['latest'] ?? null;
                     $themeData['min_myads'] = $themeData['min_myads'] ?? null;
+                    $themeData['ADStn_url'] = $themeData['ADStn_url'] ?? null;
+                    $themeData['siteweb'] = $themeData['siteweb'] ?? null;
+                    $themeData['author_url'] = $themeData['author_url'] ?? null;
                     
                     // Determine thumbnail filename
                     if (!isset($themeData['thumbnail'])) {
@@ -160,6 +163,45 @@ class ThemeManager
                         Log::error("Failed to check updates for theme {$theme['slug']}: " . $e->getMessage());
                     }
                 }
+
+                $adstnProduct = $theme['ADStn_url'] ?? null;
+                if ($adstnProduct) {
+                    try {
+                        $adstnUrl = filter_var($adstnProduct, FILTER_VALIDATE_URL)
+                            ? $adstnProduct
+                            : 'https://www.adstn.ovh/api/marketplace/extensions/themes';
+
+                        $remoteSlug = filter_var($adstnProduct, FILTER_VALIDATE_URL)
+                            ? $theme['slug']
+                            : $adstnProduct;
+
+                        $licenseKeyOption = \App\Models\Option::where('o_type', 'theme_license')
+                            ->where('name', $theme['slug'] . '_key')
+                            ->first();
+                        $licenseKey = $licenseKeyOption ? $licenseKeyOption->o_valuer : '';
+
+                        $response = Http::timeout(10)->post($adstnUrl, [
+                            'slug'        => $remoteSlug,
+                            'version'     => $theme['version'],
+                            'license_key' => $licenseKey,
+                            'domain'      => request()->getHost(),
+                        ]);
+
+                        if ($response->successful()) {
+                            $remoteData = $response->json();
+                            $remoteVersion = $remoteData['version'] ?? null;
+                            if ($remoteVersion && version_compare($remoteVersion, $theme['version'], '>')) {
+                                $updates[$theme['slug']] = [
+                                    'new_version' => $remoteVersion,
+                                    'download_url' => $remoteData['download_url'] ?? '',
+                                    'changelog' => $remoteData['changelog'] ?? '',
+                                ];
+                            }
+                        }
+                    } catch (\Exception $e) {
+                        Log::error("Failed to check ADStn updates for theme {$theme['slug']}: " . $e->getMessage());
+                    }
+                }
             }
             return $updates;
         });
@@ -191,10 +233,35 @@ class ThemeManager
             return __('messages.extension_no_update_available');
         }
 
+        $downloadUrl = $updates[$slug]['download_url'];
+
+        // Secure download URL parameters if ADStn theme
+        $themeDir = $this->themePath . '/' . $directory;
+        $jsonFile = $themeDir . '/theme.json';
+        if (File::exists($jsonFile)) {
+            $themeData = json_decode(File::get($jsonFile), true);
+            if ($themeData && !empty($themeData['ADStn_url'])) {
+                $licenseKeyOption = \App\Models\Option::where('o_type', 'theme_license')
+                    ->where('name', $slug . '_key')
+                    ->first();
+                $licenseKey = $licenseKeyOption ? $licenseKeyOption->o_valuer : '';
+                $domain = request()->getHost();
+
+                if (!str_contains($downloadUrl, 'license_key=')) {
+                    $separator = str_contains($downloadUrl, '?') ? '&' : '?';
+                    $downloadUrl .= $separator . http_build_query([
+                        'license_key' => $licenseKey,
+                        'domain'      => $domain,
+                        'slug'        => $slug
+                    ]);
+                }
+            }
+        }
+
         return $this->packageUpgrader->upgradeFromDownload(
             type: 'theme',
             slug: $slug,
-            downloadUrl: $updates[$slug]['download_url'],
+            downloadUrl: $downloadUrl,
             extensionsPath: $this->themePath,
             metadataFile: 'theme.json',
             cacheKey: 'theme_updates',

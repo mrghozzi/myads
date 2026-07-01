@@ -18,6 +18,7 @@
 * **Optimization**: Eliminated N+1 database queries when rendering comments (`CommentController`) across all sections (Forums, Directory, Store, Knowledgebase) by adding dynamic `user` relationships to the options table and eager-loading author profiles.
 * **Optimization**: Resolved a severe memory exhaustion bottleneck in the private messaging system (`MessageConversationService`) by replacing a full message history query with an optimized `GROUP BY` and `MAX(id_msg)` approach to fetch only the latest message per conversation partner.
 * **Feature**: Prepared `requests/update.php` as a standard update execution entry point for database migrations, option updates, and cache clearing.
+* **Feature**: Aligned the Premium Themes upgrade system (`ThemeManager`) with the Plugin system to securely authenticate and pass the `license_key` during ADStn marketplace updates.
 
 ### Ad System & Visit Exchange
 * **Feature**: Added **Ad Concurrency Prevention** to the banner serving system. A 5-second concurrency lock ensures that multiple ad widgets on the exact same page view will never fetch duplicate ads.
