@@ -50,17 +50,23 @@ Route::post('/comment/load', [CommentController::class, 'load'])->name('comment.
 Route::post('/comment/store', [CommentController::class, 'store'])->name('comment.store')->middleware('auth');
 Route::post('/comment/delete', [CommentController::class, 'destroy'])->name('comment.delete')->middleware('auth');
 
-Route::post('/status/create', [App\Http\Controllers\StatusController::class, 'create'])->name('status.create')->middleware('auth');
+// SECURITY: Rate-limit file uploads and posting to prevent DoS and disk-filling attacks
+Route::middleware(['auth', 'throttle:20,1'])->group(function () {
+    Route::post('/status/create', [App\Http\Controllers\StatusController::class, 'create'])->name('status.create');
+    Route::post('/status/upload-image', [App\Http\Controllers\StatusController::class, 'uploadImage'])->name('status.upload_image');
+    Route::post('/status/link-preview', [App\Http\Controllers\StatusController::class, 'linkPreview'])->name('status.link_preview');
+    Route::post('/status/gallery/add-images/{topicId}', [App\Http\Controllers\StatusController::class, 'addGalleryImages'])->name('status.gallery.add_images');
+});
+
 Route::get('/statuses/{status}/edit', [App\Http\Controllers\StatusController::class, 'edit'])->name('status.edit')->middleware('auth');
 Route::post('/statuses/{status}/update', [App\Http\Controllers\StatusController::class, 'update'])->name('status.update')->middleware('auth');
 Route::delete('/statuses/{status}', [App\Http\Controllers\StatusController::class, 'destroy'])->name('status.destroy')->middleware('auth');
-Route::post('/status/upload-image', [App\Http\Controllers\StatusController::class, 'uploadImage'])->name('status.upload_image')->middleware('auth');
-Route::post('/status/link-preview', [App\Http\Controllers\StatusController::class, 'linkPreview'])->name('status.link_preview')->middleware('auth');
-Route::post('/status/gallery/add-images/{topicId}', [App\Http\Controllers\StatusController::class, 'addGalleryImages'])->name('status.gallery.add_images')->middleware('auth');
 Route::post('/status/gallery/delete-image/{attachmentId}', [App\Http\Controllers\StatusController::class, 'deleteGalleryImage'])->name('status.gallery.delete_image')->middleware('auth');
 Route::post('/status/gallery/clear/{topicId}', [App\Http\Controllers\StatusController::class, 'clearGallery'])->name('status.gallery.clear')->middleware('auth');
 Route::post('/status/gallery/reorder/{topicId}', [App\Http\Controllers\StatusController::class, 'reorderGalleryImages'])->name('status.gallery.reorder')->middleware('auth');
-Route::get('/search/live', [App\Http\Controllers\SearchLiveController::class, 'search'])->name('search.live');
+
+// SECURITY: Rate-limit live search to prevent DoS
+Route::get('/search/live', [App\Http\Controllers\SearchLiveController::class, 'search'])->name('search.live')->middleware('throttle:40,1');
 Route::get('/mentions/users', [MentionController::class, 'users'])->name('mentions.users')->middleware('auth');
 Route::get('/robots.txt', [SeoPublicController::class, 'robots'])->name('robots.txt');
 
@@ -70,15 +76,15 @@ Route::middleware('guest')->group(function () {
     Route::get('/login/{provider}', [App\Http\Controllers\SocialAuthController::class, 'redirect'])->name('social.redirect');
     Route::get('/login/{provider}/callback', [App\Http\Controllers\SocialAuthController::class, 'callback'])->name('social.callback');
     Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
-    Route::post('/login', [AuthController::class, 'login'])->name('login.post');
+    Route::post('/login', [AuthController::class, 'login'])->name('login.post')->middleware('throttle:5,1');
     Route::get('/register', [AuthController::class, 'showRegistrationForm'])->name('register');
-    Route::post('/register', [AuthController::class, 'register'])->name('register.post');
+    Route::post('/register', [AuthController::class, 'register'])->name('register.post')->middleware('throttle:3,1');
 
     // Password Reset Routes
     Route::get('password/reset', [App\Http\Controllers\Auth\ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
-    Route::post('password/email', [App\Http\Controllers\Auth\ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+    Route::post('password/email', [App\Http\Controllers\Auth\ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email')->middleware('throttle:3,1');
     Route::get('password/reset/{token}', [App\Http\Controllers\Auth\ResetPasswordController::class, 'showResetForm'])->name('password.reset');
-    Route::post('password/reset', [App\Http\Controllers\Auth\ResetPasswordController::class, 'reset'])->name('password.update');
+    Route::post('password/reset', [App\Http\Controllers\Auth\ResetPasswordController::class, 'reset'])->name('password.update')->middleware('throttle:5,1');
 });
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 

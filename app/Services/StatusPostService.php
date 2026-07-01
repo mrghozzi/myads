@@ -609,9 +609,50 @@ class StatusPostService
         }
     }
 
+    /**
+     * Allowed file extensions for media uploads (security whitelist).
+     */
+    private const ALLOWED_MEDIA_EXTENSIONS = [
+        // Images
+        'jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp',
+        // Video
+        'mp4', 'webm', 'ogg', 'mov', 'avi', 'mkv',
+        // Audio
+        'mp3', 'wav', 'ogg', 'flac', 'aac', 'm4a',
+        // Documents
+        'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'txt', 'csv', 'rtf',
+        // Archives
+        'zip', 'rar', '7z', 'tar', 'gz',
+    ];
+
+    /**
+     * Dangerous MIME type prefixes that must never be stored.
+     */
+    private const BLOCKED_MIME_PREFIXES = [
+        'application/x-httpd-php',
+        'application/x-php',
+        'text/x-php',
+        'application/x-executable',
+        'application/x-sharedlib',
+    ];
+
     private function storeMediaFile($file, int $topicId, int $userId, string $kind): string
     {
         $extension = strtolower($file->getClientOriginalExtension() ?: $file->extension() ?: 'bin');
+
+        // SECURITY: Block dangerous file extensions
+        if (!in_array($extension, self::ALLOWED_MEDIA_EXTENSIONS, true)) {
+            throw new \RuntimeException(__('messages.file_type_not_allowed') ?? 'File type not allowed: ' . $extension);
+        }
+
+        // SECURITY: Block dangerous MIME types
+        $mimeType = strtolower((string) ($file->getClientMimeType() ?: ''));
+        foreach (self::BLOCKED_MIME_PREFIXES as $blockedPrefix) {
+            if (str_starts_with($mimeType, $blockedPrefix)) {
+                throw new \RuntimeException(__('messages.file_type_not_allowed') ?? 'File type not allowed.');
+            }
+        }
+
         $filename = $kind . '_' . $topicId . '_' . time() . '_' . Str::random(12) . '.' . $extension;
         $destinationPath = base_path('upload');
 

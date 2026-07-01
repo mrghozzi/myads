@@ -25,9 +25,22 @@ class SecurityHeaders
 
         $response->headers->set('X-Content-Type-Options', 'nosniff');
         $response->headers->set('X-Frame-Options', 'SAMEORIGIN');
-        $response->headers->set('X-XSS-Protection', '1; mode=block');
         $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
         $response->headers->set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+
+        // SECURITY: Content-Security-Policy — balanced for ad platforms while blocking injection attacks
+        $response->headers->set('Content-Security-Policy',
+            "default-src 'self'; " .
+            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://pagead2.googlesyndication.com; " .
+            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " .
+            "img-src 'self' data: blob: https: http:; " .
+            "font-src 'self' https://fonts.gstatic.com data:; " .
+            "connect-src 'self' https://www.google-analytics.com; " .
+            "frame-src 'self' https://www.youtube.com https://www.google.com; " .
+            "object-src 'none'; " .
+            "base-uri 'self'; " .
+            "form-action 'self';"
+        );
 
         // SECURITY: Prevent SSL stripping attacks via HSTS (only when serving over HTTPS)
         if ($request->isSecure()) {

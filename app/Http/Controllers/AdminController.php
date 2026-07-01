@@ -2162,13 +2162,16 @@ class AdminController extends Controller
         $request->validate([
             'name' => 'required|string',
             'text' => 'required|string',
+            'img' => 'nullable|image|mimes:jpg,jpeg,png,gif,webp|max:5120',
         ]);
 
         $text = $request->input('text');
         $img = null;
         if ($request->hasFile('img')) {
             $file = $request->file('img');
-            $filename = time() . '.' . $file->getClientOriginalExtension();
+            // SECURITY: Use guessExtension() (based on real MIME type) instead of getClientOriginalExtension()
+            $extension = $file->guessExtension() ?: 'jpg';
+            $filename = time() . '_' . \Illuminate\Support\Str::random(8) . '.' . $extension;
             $file->move(base_path('upload'), $filename);
             $img = 'upload/' . $filename;
         }

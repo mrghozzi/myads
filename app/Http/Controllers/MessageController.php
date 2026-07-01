@@ -468,6 +468,22 @@ class MessageController extends Controller
         $originalName = $file->getClientOriginalName();
         $fileSize = (int) $file->getSize();
         $extension = strtolower($file->getClientOriginalExtension() ?: $file->extension() ?: '');
+
+        // SECURITY: Block dangerous executable extensions as defense-in-depth
+        $blockedExtensions = ['php', 'phtml', 'php3', 'php4', 'php5', 'phps', 'phar', 'exe', 'bat', 'cmd', 'sh', 'cgi', 'pl', 'py', 'jsp', 'asp', 'aspx'];
+        if (in_array($extension, $blockedExtensions, true)) {
+            throw new \RuntimeException(__('messages.file_type_not_allowed') ?? 'File type not allowed.');
+        }
+
+        // SECURITY: Block dangerous MIME types
+        $mimeType = strtolower((string) ($file->getClientMimeType() ?: ''));
+        $blockedMimePrefixes = ['application/x-httpd-php', 'application/x-php', 'text/x-php', 'application/x-executable'];
+        foreach ($blockedMimePrefixes as $prefix) {
+            if (str_starts_with($mimeType, $prefix)) {
+                throw new \RuntimeException(__('messages.file_type_not_allowed') ?? 'File type not allowed.');
+            }
+        }
+
         $filename = 'msg_' . time() . '_' . Str::random(10) . ($extension ? '.' . $extension : '');
         $relativeDirectory = 'message_attachments';
         $destinationPath = storage_path('app/' . $relativeDirectory);

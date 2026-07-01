@@ -209,7 +209,8 @@ class BillingController extends Controller
             mkdir($uploadDirectory, 0755, true);
         }
 
-        $extension = $request->file('receipt')->getClientOriginalExtension();
+        // SECURITY: Use guessExtension() (based on real MIME type) instead of getClientOriginalExtension()
+        $extension = $request->file('receipt')->guessExtension() ?: 'jpg';
         $filename = 'billing_receipt_' . auth()->id() . '_' . time() . '.' . $extension;
         $request->file('receipt')->move($uploadDirectory, $filename);
 
