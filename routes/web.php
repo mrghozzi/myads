@@ -702,6 +702,7 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::delete('/widgets/{id}', [AdminController::class, 'deleteWidget'])->name('admin.widgets.delete');
 
     // Updates
+    Route::get('/about', [App\Http\Controllers\AdminUpdatesController::class, 'about'])->name('admin.about');
     Route::get('/updates', [App\Http\Controllers\AdminUpdatesController::class, 'index'])->name('admin.updates');
     Route::post('/updates', [App\Http\Controllers\AdminUpdatesController::class, 'update'])->name('admin.updates.process');
     Route::post('/updates/check', [App\Http\Controllers\AdminUpdatesController::class, 'checkUpdate'])->name('admin.updates.check');

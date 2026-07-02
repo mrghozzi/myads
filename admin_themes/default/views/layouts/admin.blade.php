@@ -273,6 +273,7 @@
                                     <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.languages') }}">{{ __('messages.languages') }}</a></li>
                                 @endif
                                 @if($canAdmin('updates'))
+                                    <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.about') }}">{{ __('about.tab_about') }}</a></li>
                                     <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.updates') }}">{{ __('messages.updates') }}</a></li>
                                 @endif
                                 @if($canAdmin('maintenance'))

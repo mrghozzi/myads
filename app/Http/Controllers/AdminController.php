@@ -92,6 +92,11 @@ class AdminController extends Controller
         // Version Check
         $currentVersion = \App\Http\Controllers\AdminUpdatesController::CURRENT_VERSION;
         
+        // Redirect to "What's New" page after an update
+        $lastSeenAboutVersion = Option::where('name', 'last_seen_about_version')->value('o_valuer') ?? '0.0.0';
+        if (version_compare($currentVersion, $lastSeenAboutVersion, '>')) {
+            return redirect()->route('admin.about');
+        }
         // Sync version in DB (optional but good for consistency)
         try {
             $versionParts = explode('.', $currentVersion);

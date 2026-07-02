@@ -190,7 +190,7 @@ myads/
 | `AdminStatusPromotionController` | Admin monitoring and settings for promoted community posts |
 | `AdminCustomAdsController` | Admin custom ads dashboard, settings, creative review, and placement/deal moderation |
 | `AdminYoutubeController` | Admin YouTube campaigns and settings management |
-| `AdminUpdatesController` | System update management |
+| `AdminUpdatesController` | System update management and "About MYADS" post-update page (`/admin/about`) |
 | `AdminMediaController` | **Media Manager** — monitor, rename, and delete uploaded files |
 | `SitemapController` | Dynamic sitemap generation |
 | `SeoPublicController` | Public robots.txt |
@@ -205,7 +205,7 @@ myads/
 |-------|-------|---------|
 | `User` | `users` | Members. `id=1` is super-admin. Has `pts` (points), ad credits, verified status, and uses `HasApiTokens` for API authentication |
 | `Setting` | `setting` | Single-row site settings (name, description, theme slug, etc.) |
-| `Option` | `options` | Key-value config store (plugins active state, misc settings) |
+| `Option` | `options` | Key-value config store (plugins active state, misc settings, `last_seen_about_version` tracking) |
 | `Status` | `status` | Community feed posts |
 | `StatusPromotion` | `status_promotions` | Paid promoted-post campaigns shown inside the community feed |
 | `StatusLinkPreview` | `status_link_previews` | Link previews for posts |

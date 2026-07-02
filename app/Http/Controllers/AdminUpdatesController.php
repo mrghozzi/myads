@@ -41,6 +41,43 @@ class AdminUpdatesController extends Controller
     private const GITHUB_RELEASES_URL = 'https://api.github.com/repos/mrghozzi/myads/releases';
 
     /**
+     * Display the What's New / About MYADS page.
+     */
+    public function about()
+    {
+        // Mark the current version as seen
+        Option::updateOrCreate(
+            ['name' => 'last_seen_about_version'],
+            ['o_valuer' => self::CURRENT_VERSION, 'o_type' => 'system', 'o_mode' => 'active']
+        );
+
+        $currentVersion = self::CURRENT_VERSION;
+        
+        // System Statistics
+        $totalUsers = \App\Models\User::count();
+        $totalPosts = \App\Models\Status::count();
+        $totalProducts = \App\Models\Product::count();
+        
+        // Environment Information
+        $phpVersion = phpversion();
+        $laravelVersion = app()->version();
+        $mysqlVersion = 'Unknown';
+        try {
+            $mysqlVersion = \Illuminate\Support\Facades\DB::connection()->getPdo()->getAttribute(\PDO::ATTR_SERVER_VERSION);
+        } catch (\Exception $e) {}
+
+        return view('admin::about.index', compact(
+            'currentVersion', 
+            'totalUsers', 
+            'totalPosts', 
+            'totalProducts', 
+            'phpVersion', 
+            'laravelVersion', 
+            'mysqlVersion'
+        ));
+    }
+
+    /**
      * Display the updates page.
      */
     public function index(Request $request)
