@@ -117,27 +117,26 @@
             font-style: normal;
             font-weight: 900;
             font-display: swap;
-            src: url('https://use.fontawesome.com/releases/v6.4.2/webfonts/fa-solid-900.woff2') format('woff2');
+            src: url('{{ theme_asset('webfonts/fa-solid-900.woff2') }}') format('woff2');
         }
         @font-face {
             font-family: 'FontAwesome';
             font-style: normal;
             font-weight: normal;
             font-display: swap;
-            src: url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/fonts/fontawesome-webfont.woff2?v=4.7.0') format('woff2');
+            src: url('{{ theme_asset('fonts/fontawesome-webfont.woff2?v=4.7.0') }}') format('woff2');
         }
     </style>
 
-    <link href="https://use.fontawesome.com/releases/v6.4.2/css/all.css" rel="stylesheet" media="print" onload="this.media='all'">
-    <noscript><link href="https://use.fontawesome.com/releases/v6.4.2/css/all.css" rel="stylesheet"></noscript>
+    <link href="{{ theme_asset('css/fontawesome6.min.css') }}" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link href="{{ theme_asset('css/fontawesome6.min.css') }}" rel="stylesheet"></noscript>
 
     <!-- Resource Hints & Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preconnect" href="https://use.fontawesome.com">
     <link rel="preconnect" href="https://cdn.datatables.net">
     <link rel="dns-prefetch" href="https://ads.hsoubcdn.com">
-    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/fonts/fontawesome-webfont.woff2?v=4.7.0" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="{{ theme_asset('fonts/fontawesome-webfont.woff2?v=4.7.0') }}" as="font" type="font/woff2" crossorigin>
 
     <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;700&family=Inter:wght@300;400;500;600;700;800;900&family=Muli:ital,wght@0,300;0,400;1,300;1,400&family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,600;1,700;1,800&family=Sanchez:ital,wght@0,400;1,400&family=Rajdhani:wght@400;500;600;700&family=Titillium+Web:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700&display=swap" rel="stylesheet">
 

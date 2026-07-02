@@ -64,7 +64,7 @@
     <link rel="stylesheet" type="text/css" href="{{ admin_asset('admin-duralux/css/admin-redesign.css') }}">
     
     <!-- FontAwesome for compatibility -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ admin_asset('admin-duralux/vendors/css/fontawesome.min.css') }}">
 
     <!-- Tailwind CSS for compatibility (Legacy Views) -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -562,7 +562,7 @@
     <script src="{{ admin_asset('admin-duralux/js/common-init.min.js') }}"></script>
     <script src="{{ admin_asset('admin-duralux/js/theme-customizer-init.min.js') }}"></script>
     <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+    <script src="{{ admin_asset('admin-duralux/vendors/js/chart.umd.min.js') }}"></script>
     @stack('scripts')
     <script>
         (function() {

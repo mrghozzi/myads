@@ -447,7 +447,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // ── Doughnut Chart: Ad Distribution ──
     var distCtx = document.getElementById('adDistributionChart');
     if (distCtx) {
-        new Chart(distCtx, {
+        try {
+            new Chart(distCtx, {
+
             type: 'doughnut',
             data: {
                 labels: {!! json_encode($chartData['distribution']['labels']) !!},
@@ -457,11 +459,15 @@ document.addEventListener('DOMContentLoaded', function() {
                         'rgba(99, 102, 241, 0.85)',
                         'rgba(245, 158, 11, 0.85)',
                         'rgba(16, 185, 129, 0.85)',
+                        'rgba(139, 92, 246, 0.85)',
+                        'rgba(236, 72, 153, 0.85)',
                     ],
                     borderColor: [
                         'rgba(99, 102, 241, 1)',
                         'rgba(245, 158, 11, 1)',
                         'rgba(16, 185, 129, 1)',
+                        'rgba(139, 92, 246, 1)',
+                        'rgba(236, 72, 153, 1)',
                     ],
                     borderWidth: 2,
                     hoverOffset: 8,
@@ -496,12 +502,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         });
+        } catch (e) {
+            distCtx.parentElement.innerHTML = '<div class="alert alert-danger" style="font-size:12px;">' + e.message + '</div>';
+            console.error(e);
+        }
     }
 
     // ── Bar Chart: Views & Clicks ──
     var engCtx = document.getElementById('engagementChart');
     if (engCtx) {
-        new Chart(engCtx, {
+        try {
+            new Chart(engCtx, {
             type: 'bar',
             data: {
                 labels: {!! json_encode($chartData['engagement']['labels']) !!},
@@ -512,11 +523,19 @@ document.addEventListener('DOMContentLoaded', function() {
                         'rgba(99, 102, 241, 0.75)',
                         'rgba(139, 92, 246, 0.75)',
                         'rgba(245, 158, 11, 0.75)',
+                        'rgba(16, 185, 129, 0.75)',
+                        'rgba(236, 72, 153, 0.75)',
+                        'rgba(14, 165, 233, 0.75)',
+                        'rgba(244, 63, 94, 0.75)',
                     ],
                     borderColor: [
                         'rgba(99, 102, 241, 1)',
                         'rgba(139, 92, 246, 1)',
                         'rgba(245, 158, 11, 1)',
+                        'rgba(16, 185, 129, 1)',
+                        'rgba(236, 72, 153, 1)',
+                        'rgba(14, 165, 233, 1)',
+                        'rgba(244, 63, 94, 1)',
                     ],
                     borderWidth: 2,
                     borderRadius: 10,
@@ -569,18 +588,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         });
+        } catch (e) {
+            engCtx.parentElement.innerHTML = '<div class="alert alert-danger" style="font-size:12px;">' + e.message + '</div>';
+            console.error(e);
+        }
     }
 
     // ── Community: Posts ──
     var postsCommunityCtx = document.getElementById('postsCommunityChart');
     if (postsCommunityCtx) {
-        new Chart(postsCommunityCtx, {
+        try {
+            new Chart(postsCommunityCtx, {
             type: 'line',
             data: {
                 labels: {!! json_encode($communityChartData['labels']) !!},
                 datasets: [
                     {
-                        label: '{{ __('messages.post_text') ?? 'Text Posts' }}',
+                        label: @json(__('messages.post_text') ?? 'Text Posts'),
                         data: {!! json_encode($communityChartData['posts']['text']) !!},
                         borderColor: '#6366f1',
                         backgroundColor: 'rgba(99, 102, 241, 0.1)',
@@ -591,7 +615,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         pointHoverRadius: 6
                     },
                     {
-                        label: '{{ __('messages.post_link') ?? 'Link Posts' }}',
+                        label: @json(__('messages.post_link') ?? 'Link Posts'),
                         data: {!! json_encode($communityChartData['posts']['link']) !!},
                         borderColor: '#f59e0b',
                         backgroundColor: 'rgba(245, 158, 11, 0.1)',
@@ -602,7 +626,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         pointHoverRadius: 6
                     },
                     {
-                        label: '{{ __('messages.post_gallery') ?? 'Gallery Posts' }}',
+                        label: @json(__('messages.post_gallery') ?? 'Gallery Posts'),
                         data: {!! json_encode($communityChartData['posts']['gallery']) !!},
                         borderColor: '#10b981',
                         backgroundColor: 'rgba(16, 185, 129, 0.1)',
@@ -613,7 +637,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         pointHoverRadius: 6
                     },
                     {
-                        label: '{{ __('messages.forum_posts') ?? 'Forum Topics' }}',
+                        label: @json(__('messages.forum_posts') ?? 'Forum Topics'),
                         data: {!! json_encode($communityChartData['posts']['forum']) !!},
                         borderColor: '#8b5cf6',
                         backgroundColor: 'rgba(139, 92, 246, 0.1)',
@@ -624,7 +648,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         pointHoverRadius: 6
                     },
                     {
-                        label: '{{ __('messages.store_posts') ?? 'Store Products' }}',
+                        label: @json(__('messages.store_posts') ?? 'Store Products'),
                         data: {!! json_encode($communityChartData['posts']['store']) !!},
                         borderColor: '#3b82f6',
                         backgroundColor: 'rgba(59, 130, 246, 0.1)',
@@ -635,7 +659,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         pointHoverRadius: 6
                     },
                     {
-                        label: '{{ __('messages.order_posts') ?? 'Order Requests' }}',
+                        label: @json(__('messages.order_posts') ?? 'Order Requests'),
                         data: {!! json_encode($communityChartData['posts']['orders']) !!},
                         borderColor: '#f43f5e',
                         backgroundColor: 'rgba(244, 63, 94, 0.1)',
@@ -646,7 +670,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         pointHoverRadius: 6
                     },
                     {
-                        label: '{{ __('messages.news_posts') ?? 'News Articles' }}',
+                        label: @json(__('messages.news_posts') ?? 'News Articles'),
                         data: {!! json_encode($communityChartData['posts']['news']) !!},
                         borderColor: '#94a3b8',
                         backgroundColor: 'rgba(148, 163, 184, 0.1)',
@@ -657,7 +681,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         pointHoverRadius: 6
                     },
                     {
-                        label: '{{ __('messages.post_video') ?? 'Video Posts' }}',
+                        label: @json(__('messages.post_video') ?? 'Video Posts'),
                         data: {!! json_encode($communityChartData['posts']['video']) !!},
                         borderColor: '#ef4444',
                         backgroundColor: 'rgba(239, 68, 68, 0.1)',
@@ -668,7 +692,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         pointHoverRadius: 6
                     },
                     {
-                        label: '{{ __('messages.post_clips') ?? 'Clips' }}',
+                        label: @json(__('messages.post_clips') ?? 'Clips'),
                         data: {!! json_encode($communityChartData['posts']['clips']) !!},
                         borderColor: '#ec4899',
                         backgroundColor: 'rgba(236, 72, 153, 0.1)',
@@ -679,7 +703,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         pointHoverRadius: 6
                     },
                     {
-                        label: '{{ __('messages.post_audio') ?? 'Audio Posts' }}',
+                        label: @json(__('messages.post_audio') ?? 'Audio Posts'),
                         data: {!! json_encode($communityChartData['posts']['audio']) !!},
                         borderColor: '#14b8a6',
                         backgroundColor: 'rgba(20, 184, 166, 0.1)',
@@ -690,7 +714,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         pointHoverRadius: 6
                     },
                     {
-                        label: '{{ __('messages.post_file') ?? 'File Posts' }}',
+                        label: @json(__('messages.post_file') ?? 'File Posts'),
                         data: {!! json_encode($communityChartData['posts']['file']) !!},
                         borderColor: '#8b5cf6',
                         backgroundColor: 'rgba(139, 92, 246, 0.1)',
@@ -701,7 +725,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         pointHoverRadius: 6
                     },
                     {
-                        label: '{{ __('messages.post_music') ?? 'Music Posts' }}',
+                        label: @json(__('messages.post_music') ?? 'Music Posts'),
                         data: {!! json_encode($communityChartData['posts']['music']) !!},
                         borderColor: '#f97316',
                         backgroundColor: 'rgba(249, 115, 22, 0.1)',
@@ -712,7 +736,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         pointHoverRadius: 6
                     },
                     {
-                        label: '{{ __('messages.knowledgebase') ?? 'Knowledgebase' }}',
+                        label: @json(__('messages.knowledgebase') ?? 'Knowledgebase'),
                         data: {!! json_encode($communityChartData['posts']['knowledgebase']) !!},
                         borderColor: '#0ea5e9',
                         backgroundColor: 'rgba(14, 165, 233, 0.1)',
@@ -737,19 +761,24 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         });
+        } catch (e) {
+            postsCommunityCtx.parentElement.innerHTML = '<div class="alert alert-danger" style="font-size:12px;">' + e.message + '</div>';
+            console.error(e);
+        }
     }
 
-    // ── Community: Comments & Reactions ──
+    // ── Community: Engagement ──
     var engCommunityCtx = document.getElementById('engagementCommunityChart');
     if (engCommunityCtx) {
-        new Chart(engCommunityCtx, {
+        try {
+            new Chart(engCommunityCtx, {
             type: 'line',
             data: {
                 labels: {!! json_encode($communityChartData['labels']) !!},
                 datasets: [
                     // Comments
                     {
-                        label: '{{ __('messages.forum_comments') ?? 'Forum Comments' }}',
+                        label: @json(__('messages.forum_comments') ?? 'Forum Comments'),
                         data: {!! json_encode($communityChartData['comments']['forum']) !!},
                         borderColor: '#10b981',
                         backgroundColor: 'rgba(16, 185, 129, 0.05)',
@@ -759,7 +788,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         pointRadius: 2
                     },
                     {
-                        label: '{{ __('messages.store_comments') ?? 'Store Comments' }}',
+                        label: @json(__('messages.store_comments') ?? 'Store Comments'),
                         data: {!! json_encode($communityChartData['comments']['store']) !!},
                         borderColor: '#3b82f6',
                         backgroundColor: 'rgba(59, 130, 246, 0.05)',
@@ -769,7 +798,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         pointRadius: 2
                     },
                     {
-                        label: '{{ __('messages.order_comments') ?? 'Order Comments' }}',
+                        label: @json(__('messages.order_comments') ?? 'Order Comments'),
                         data: {!! json_encode($communityChartData['comments']['orders']) !!},
                         borderColor: '#f43f5e',
                         backgroundColor: 'rgba(244, 63, 94, 0.05)',
@@ -779,7 +808,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         pointRadius: 2
                     },
                     {
-                        label: '{{ __('messages.knowledgebase_comments') ?? 'Knowledgebase Comments' }}',
+                        label: @json(__('messages.knowledgebase_comments') ?? 'Knowledgebase Comments'),
                         data: {!! json_encode($communityChartData['comments']['knowledgebase']) !!},
                         borderColor: '#0ea5e9',
                         backgroundColor: 'rgba(14, 165, 233, 0.05)',
@@ -790,7 +819,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     },
                     // Reactions
                     {
-                        label: '{{ __('messages.forum_reactions') ?? 'Forum Reactions' }}',
+                        label: @json(__('messages.forum_reactions') ?? 'Forum Reactions'),
                         data: {!! json_encode($communityChartData['reactions']['forum']) !!},
                         borderColor: '#8b5cf6',
                         borderDash: [5, 5],
@@ -800,7 +829,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         pointRadius: 2
                     },
                     {
-                        label: '{{ __('messages.store_reactions') ?? 'Store Reactions' }}',
+                        label: @json(__('messages.store_reactions') ?? 'Store Reactions'),
                         data: {!! json_encode($communityChartData['reactions']['store']) !!},
                         borderColor: '#06b6d4',
                         borderDash: [5, 5],
@@ -810,7 +839,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         pointRadius: 2
                     },
                     {
-                        label: '{{ __('messages.clips_reactions') ?? 'Clips Reactions' }}',
+                        label: @json(__('messages.clips_reactions') ?? 'Clips Reactions'),
                         data: {!! json_encode($communityChartData['reactions']['clips']) !!},
                         borderColor: '#ec4899',
                         borderDash: [5, 5],
@@ -820,7 +849,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         pointRadius: 2
                     },
                     {
-                        label: '{{ __('messages.knowledgebase_reactions') ?? 'Knowledgebase Reactions' }}',
+                        label: @json(__('messages.knowledgebase_reactions') ?? 'Knowledgebase Reactions'),
                         data: {!! json_encode($communityChartData['reactions']['knowledgebase']) !!},
                         borderColor: '#0284c7',
                         borderDash: [5, 5],
@@ -830,7 +859,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         pointRadius: 2
                     },
                     {
-                        label: '{{ __('messages.follows_count') ?? 'New Follows' }}',
+                        label: @json(__('messages.follows_count') ?? 'New Follows'),
                         data: {!! json_encode($communityChartData['reactions']['follows']) !!},
                         borderColor: '#f59e0b',
                         backgroundColor: 'rgba(245, 158, 11, 0.1)',
@@ -854,7 +883,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
         });
+        } catch (e) {
+            engCommunityCtx.parentElement.innerHTML = '<div class="alert alert-danger" style="font-size:12px;">' + e.message + '</div>';
+            console.error(e);
+        }
     }
 });
 </script>
 @endpush
+
