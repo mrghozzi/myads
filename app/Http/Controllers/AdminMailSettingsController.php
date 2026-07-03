@@ -100,7 +100,7 @@ class AdminMailSettingsController extends Controller
 
             return redirect()
                 ->route('admin.settings.mail')
-                ->with('error', __('messages.mail_test_failed') . ' — ' . $e->getMessage());
+                ->with('error', __('messages.mail_test_failed'));
         }
     }
 }

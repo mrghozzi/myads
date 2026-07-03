@@ -224,6 +224,7 @@ class AuthController extends Controller
             
             // Fallback: Check MD5 (Legacy)
             if ($user->pass === md5($request->input('password'))) {
+                \Log::info('MD5 legacy password used — auto-rehashing to bcrypt', ['user_id' => $user->id, 'username' => $user->name]);
                 Auth::login($user, $request->boolean('remember'));
                 
                 // Rehash password to Bcrypt

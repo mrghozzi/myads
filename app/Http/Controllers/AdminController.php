@@ -2435,7 +2435,8 @@ class AdminController extends Controller
                 ]);
             }
         } catch (\Exception $e) {
-            return redirect()->back()->withErrors([__('messages.error') . ': ' . $e->getMessage()]);
+            report($e);
+            return redirect()->back()->withErrors([__('messages.error_occurred')]);
         }
 
         return redirect()->back()->with('success', __('messages.ad_updated') ?? 'Ads Updated');
@@ -3394,7 +3395,8 @@ class AdminController extends Controller
             return redirect()->back()->with('error', __('messages.plugin_activation_failed'));
         } catch (\Throwable $e) {
             $this->maintenanceMode->disable(Auth::user(), 'plugin_activation_error');
-            return redirect()->back()->with('error', __('messages.error_prefix') . $e->getMessage());
+            report($e);
+            return redirect()->back()->with('error', __('messages.plugin_activation_failed'));
         }
     }
 
@@ -3412,7 +3414,8 @@ class AdminController extends Controller
             return redirect()->back()->with('error', __('messages.plugin_deactivation_failed'));
         } catch (\Throwable $e) {
             $this->maintenanceMode->disable(Auth::user(), 'plugin_deactivation_error');
-            return redirect()->back()->with('error', __('messages.error_prefix') . $e->getMessage());
+            report($e);
+            return redirect()->back()->with('error', __('messages.plugin_deactivation_failed'));
         }
     }
 
@@ -3448,7 +3451,8 @@ class AdminController extends Controller
             return redirect()->back()->with('error', $result);
         } catch (\Throwable $e) {
             $this->maintenanceMode->disable(Auth::user(), 'plugin_upload_error');
-            return redirect()->back()->with('error', __('messages.error_prefix') . $e->getMessage());
+            report($e);
+            return redirect()->back()->with('error', __('messages.error_occurred'));
         }
     }
 
@@ -3469,7 +3473,8 @@ class AdminController extends Controller
             return redirect()->back()->with('error', $result);
         } catch (\Throwable $e) {
             $this->maintenanceMode->disable(Auth::user(), 'plugin_upgrade_error');
-            return redirect()->back()->with('error', __('messages.error_prefix') . $e->getMessage());
+            report($e);
+            return redirect()->back()->with('error', __('messages.error_occurred'));
         }
     }
 
@@ -3493,7 +3498,8 @@ class AdminController extends Controller
             return redirect()->route('admin.plugins')->with('error', is_string($result) ? $result : 'Failed to install plugin.');
         } catch (\Throwable $e) {
             $this->maintenanceMode->disable(Auth::user(), 'plugin_marketplace_install_error');
-            return redirect()->route('admin.plugins')->with('error', __('messages.error_prefix') . $e->getMessage());
+            report($e);
+            return redirect()->route('admin.plugins')->with('error', __('messages.error_occurred'));
         }
     }
 
@@ -3733,7 +3739,8 @@ class AdminController extends Controller
             return redirect()->back()->with('error', __('messages.theme_activation_failed'));
         } catch (\Throwable $e) {
             $this->maintenanceMode->disable(Auth::user(), 'theme_activation_error');
-            return redirect()->back()->with('error', __('messages.error_prefix') . $e->getMessage());
+            report($e);
+            return redirect()->back()->with('error', __('messages.theme_activation_failed'));
         }
     }
 
@@ -3754,7 +3761,8 @@ class AdminController extends Controller
             return redirect()->back()->with('error', $result);
         } catch (\Throwable $e) {
             $this->maintenanceMode->disable(Auth::user(), 'theme_upgrade_error');
-            return redirect()->back()->with('error', __('messages.error_prefix') . $e->getMessage());
+            report($e);
+            return redirect()->back()->with('error', __('messages.error_occurred'));
         }
     }
 
@@ -3778,7 +3786,8 @@ class AdminController extends Controller
             return redirect()->route('admin.themes')->with('error', is_string($result) ? $result : 'Failed to install theme.');
         } catch (\Throwable $e) {
             $this->maintenanceMode->disable(Auth::user(), 'theme_marketplace_install_error');
-            return redirect()->route('admin.themes')->with('error', __('messages.error_prefix') . $e->getMessage());
+            report($e);
+            return redirect()->route('admin.themes')->with('error', __('messages.error_occurred'));
         }
     }
 
@@ -3837,7 +3846,8 @@ class AdminController extends Controller
             return redirect()->back()->with('success', __('Caches cleared successfully.'));
         } catch (\Throwable $e) {
             $this->maintenanceMode->disable(Auth::user(), 'clear_cache_error');
-            return redirect()->back()->with('error', __('Failed to clear caches: ') . $e->getMessage());
+            report($e);
+            return redirect()->back()->with('error', __('messages.error_occurred'));
         }
     }
 
@@ -3854,7 +3864,8 @@ class AdminController extends Controller
             return redirect()->back()->with('success', __('Migrations ran successfully: ') . $output);
         } catch (\Throwable $e) {
             $this->maintenanceMode->disable(Auth::user(), 'run_migrations_error');
-            return redirect()->back()->with('error', __('Failed to run migrations: ') . $e->getMessage());
+            report($e);
+            return redirect()->back()->with('error', __('messages.error_occurred'));
         }
     }
 
@@ -3890,7 +3901,8 @@ class AdminController extends Controller
             return redirect()->back()->with('success', __('Database maintenance completed for :count tables.', ['count' => count($results)]));
         } catch (\Throwable $e) {
             $this->maintenanceMode->disable(Auth::user(), 'db_repair_error');
-            return redirect()->back()->with('error', __('Failed to perform database maintenance: ') . $e->getMessage());
+            report($e);
+            return redirect()->back()->with('error', __('messages.error_occurred'));
         }
     }
     public function repairOrphanedRecords()
@@ -3913,7 +3925,8 @@ class AdminController extends Controller
             return redirect()->back()->with('success', __('messages.orphaned_records_repaired', ['count' => $totalCleaned]));
         } catch (\Throwable $e) {
             $this->maintenanceMode->disable(Auth::user(), 'repair_orphaned_records_error');
-            return redirect()->back()->with('error', __('messages.orphaned_records_repair_failed') . ': ' . $e->getMessage());
+            report($e);
+            return redirect()->back()->with('error', __('messages.orphaned_records_repair_failed'));
         }
     }
 
@@ -4016,7 +4029,8 @@ class AdminController extends Controller
             return redirect()->back()->with('success', __('messages.orphaned_content_repaired', ['count' => $totalCleaned]));
         } catch (\Throwable $e) {
             $this->maintenanceMode->disable(Auth::user(), 'repair_orphaned_content_error');
-            return redirect()->back()->with('error', __('messages.orphaned_content_repair_failed') . ': ' . $e->getMessage());
+            report($e);
+            return redirect()->back()->with('error', __('messages.orphaned_content_repair_failed'));
         }
     }
 
@@ -4057,7 +4071,8 @@ class AdminController extends Controller
             return redirect()->back()->with('success', __('messages.orphaned_stats_repaired', ['count' => $totalCleaned]));
         } catch (\Throwable $e) {
             $this->maintenanceMode->disable(Auth::user(), 'repair_orphaned_stats_error');
-            return redirect()->back()->with('error', __('messages.orphaned_stats_repair_failed') . ': ' . $e->getMessage());
+            report($e);
+            return redirect()->back()->with('error', __('messages.orphaned_stats_repair_failed'));
         }
     }
 

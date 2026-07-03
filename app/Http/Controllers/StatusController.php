@@ -416,7 +416,8 @@ class StatusController extends Controller
             return response()->json(['success' => true]);
         } catch (\Throwable $e) {
             DB::rollBack();
-            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['success' => false, 'message' => __('messages.error_occurred')], 500);
         }
     }
 
@@ -443,7 +444,8 @@ class StatusController extends Controller
             return response()->json(['success' => true]);
         } catch (\Throwable $e) {
             DB::rollBack();
-            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['success' => false, 'message' => __('messages.error_occurred')], 500);
         }
     }
 
@@ -475,7 +477,8 @@ class StatusController extends Controller
             return response()->json(['success' => true]);
         } catch (\Throwable $e) {
             DB::rollBack();
-            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
+            report($e);
+            return response()->json(['success' => false, 'message' => __('messages.error_occurred')], 500);
         }
     }
 

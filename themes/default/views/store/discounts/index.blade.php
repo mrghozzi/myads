@@ -103,9 +103,13 @@
                                 <a href="{{ route('store.discounts.edit', $discount->id) }}" class="btn btn-sm btn-outline-info" style="color: #0dcaf0; border-color: #0dcaf0; border-radius: 6px; padding: 5px 10px; margin-right: 5px;">
                                     <i class="fa fa-edit"></i>
                                 </a>
-                                <a href="{{ route('store.discounts.destroy', $discount->id) }}" onclick="return confirm('{{ __('messages.confirm_delete') ?? 'Are you sure you want to delete this?' }}')" class="btn btn-sm btn-outline-danger" style="color: #dc3545; border-color: #dc3545; border-radius: 6px; padding: 5px 10px;">
-                                    <i class="fa fa-trash"></i>
-                                </a>
+                                <form action="{{ route('store.discounts.destroy', $discount->id) }}" method="POST" style="display:inline" onsubmit="return confirm('{{ __('messages.confirm_delete') ?? 'Are you sure you want to delete this?' }}')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" style="color: #dc3545; border-color: #dc3545; border-radius: 6px; padding: 5px 10px;">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                </form>
                             </td>
                         </tr>
                     @empty

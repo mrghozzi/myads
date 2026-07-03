@@ -60,6 +60,9 @@
 * **Medium Fix**: Added **authentication requirement** to `ReportController::store()`. Previously allowed unauthenticated users to submit reports as `uid=0`, creating a spam and abuse vector. Now returns `401 Unauthorized` for guests.
 * **Low Fix**: Strengthened **CAPTCHA validation** in `AuthController` registration and login flows by replacing loose PHP comparison (`!=`) with strict type-safe comparison (`(string) !== (string)`), preventing potential type-juggling bypass attacks.
 
+### Bug Fixes
+* **Fix**: Resolved a critical 500 Internal Server Error affecting all Knowledgebase pages caused by an orphaned InnoDB tablespace (`Error 1813/1932`) for the `kb_categories` table. Recovered by manually discarding the tablespace and forcing a migration refresh.
+* **Fix**: Fixed Knowledgebase article text not displaying (only the title was visible). This was caused by the new strict Content-Security-Policy (CSP) blocking `cdn.jsdelivr.net` and `unpkg.com`, which prevented the client-side execution of `marked.js`, `DOMPurify`, and `StackEdit` required for Markdown rendering. Allowed these CDNs in `SecurityHeaders`.
 ### Gamification & Engagement
 * **Feature**: Added 5 new engagement badges (Top Client, Helpful Seller, Trendsetter, Prolific Writer, Top Commenter).
 * **Feature**: Added 5 new premium quests (Daily Login, Daily Reactions, Weekly Posts, Weekly Comments, Weekly Reactions Received) to reward regular platform activity.

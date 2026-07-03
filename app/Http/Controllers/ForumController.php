@@ -339,7 +339,7 @@ class ForumController extends Controller
         } catch (\Throwable $e) {
             DB::rollBack();
             report($e);
-            return back()->withErrors(['forum' => $e->getMessage()])->withInput();
+            return back()->withErrors(['forum' => __('messages.error_occurred')])->withInput();
         }
     }
 
@@ -416,7 +416,7 @@ class ForumController extends Controller
         } catch (\Throwable $e) {
             DB::rollBack();
             report($e);
-            return back()->withErrors(['forum' => $e->getMessage()])->withInput();
+            return back()->withErrors(['forum' => __('messages.error_occurred')])->withInput();
         }
     }
 

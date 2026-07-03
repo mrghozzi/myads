@@ -24,14 +24,25 @@ class SecurityHeaders
         $response = $next($request);
 
         $response->headers->set('X-Content-Type-Options', 'nosniff');
-        $response->headers->set('X-Frame-Options', 'SAMEORIGIN');
-        $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
+
+        // SECURITY: Allow ad routes to be framed by external sites, and prevent referrer leakage
+        $isAdRoute = $request->is('bn.php', 'link.php', 'smart.php', 'embed/*', 'ads/*', 'show.php');
+        
+        if (!$isAdRoute) {
+            $response->headers->set('X-Frame-Options', 'SAMEORIGIN');
+            $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
+        } else {
+            // Protect referrer data during ad clicks/embeds
+            $response->headers->set('Referrer-Policy', 'origin');
+        }
+
         $response->headers->set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
 
         // SECURITY: Content-Security-Policy — balanced for ad platforms while blocking injection attacks
         $response->headers->set('Content-Security-Policy',
             "default-src 'self'; " .
-            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://pagead2.googlesyndication.com; " .
+            // Note: 'unsafe-eval' was removed for security. If WYSIWYG editors (like SCEditor) break, add it back locally.
+            "script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://pagead2.googlesyndication.com https://cdn.jsdelivr.net https://unpkg.com; " .
             "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " .
             "img-src 'self' data: blob: https: http:; " .
             "font-src 'self' https://fonts.gstatic.com data:; " .

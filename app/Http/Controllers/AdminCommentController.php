@@ -43,7 +43,8 @@ class AdminCommentController extends Controller
             return redirect()->back()->with('success', __('messages.comment_deleted'));
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->back()->with('error', $e->getMessage());
+            report($e);
+            return redirect()->back()->with('error', __('messages.error_occurred'));
         }
     }
 }

@@ -1017,7 +1017,8 @@ If in doubt, update it. An outdated `Agents.md` causes future agents to make wro
 - **Feature (2026-06-29):** Expanded Store Categories adding Graphics, Audio, Video, eBooks, Software, and Courses with dynamic subcategories via `StoreCategoryCatalog`.
 - **Feature (2026-07-01):** Aligned Premium Themes upgrade logic in `ThemeManager` with Plugins to securely pass `license_key` for marketplace validation.
 - **Security (2026-07-02):** Executed comprehensive security audit fixes including AdminController upload validation, StatusPostService MIME checks, CSP headers, and HTTP rate limiting.
+- **Bug Fix (2026-07-03):** Fixed KB categories table corruption (Error 1813), and CSP blocking Markdown rendering in Knowledgebase.
 
 ---
 
-*Last updated: 2026-07-02 — MYADS v4.4.0 (Premium Themes Marketplace Alignment, Expanded Store Categories, Ad Concurrency Prevention, Banner Fallbacks, dynamic Visit Exchange settings, Admin Widgets Update, Comprehensive Security Audit Fixes)*
+*Last updated: 2026-07-03 — MYADS v4.4.0 (Premium Themes Marketplace Alignment, Expanded Store Categories, Ad Concurrency Prevention, Banner Fallbacks, dynamic Visit Exchange settings, Admin Widgets Update, Comprehensive Security Audit Fixes, Critical Bug Fixes)*

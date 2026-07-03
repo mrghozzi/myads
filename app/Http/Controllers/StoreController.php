@@ -928,7 +928,7 @@ class StoreController extends Controller
         ]);
 
         $captcha = session('kb_captcha');
-        if (!$captcha || $request->input('capt') != $captcha) {
+        if (!$captcha || (string) $request->input('capt') !== (string) $captcha) {
             return redirect()->back()->withInput()->with('kb_error', __('invalid'));
         }
         session()->forget('kb_captcha');

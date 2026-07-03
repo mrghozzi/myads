@@ -203,7 +203,8 @@ class AdminGroupController extends Controller
         try {
             $this->memberships->updateRole($membership, (string) $validated['role'], \Illuminate\Support\Facades\Auth::user());
         } catch (\Throwable $e) {
-            return back()->with('error', $e->getMessage());
+            report($e);
+            return back()->with('error', __('messages.error_occurred'));
         }
 
         return back()->with('success', __('messages.groups_member_role_updated'));
