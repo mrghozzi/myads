@@ -28,7 +28,7 @@ MYADS is a community platform where website owners:
 6. **Services Marketplace** — publish service requests, receive structured provider offers, award a provider, track delivery workflow, and exchange completion ratings.
 7. **News** — admin-published articles posted to community feed.
 8. **Gamification** — points (PTS), badges, quests, point transactions ledger.
-9. **SEO Suite** — centralized SEO engine, admin SEO dashboard, dynamic robots.txt, sitemap index, GA4 integration.
+9. **SEO Suite** — centralized SEO engine, admin SEO dashboard, dynamic robots.txt, sitemap index, GA4 integration, and a **Free SEO Checker** for webmasters to analyze speed, errors, and backlinks.
 10. **Social Links** — managed user social media presence across 12 platforms with branded icons and smart URL validation.
 11. **External Share API** — a dedicated `/share` endpoint for third-party websites to pre-fill post composer text, documented at `/developer`.
 12. **Session Monitoring** — view and manage active member sessions across devices with remote revocation.
@@ -194,6 +194,8 @@ myads/
 | `AdminMediaController` | **Media Manager** — monitor, rename, and delete uploaded files |
 | `SitemapController` | Dynamic sitemap generation |
 | `SeoPublicController` | Public robots.txt |
+| `SeoCheckerController` | Free SEO Checker frontend (analysis, landing page) |
+| `AdminSeoCheckerController` | Admin settings for SEO Checker permissions |
 | `CaptchaController` | CAPTCHA image generation |
 | `InstallerController` | Visual web installer |
 
@@ -1018,7 +1020,8 @@ If in doubt, update it. An outdated `Agents.md` causes future agents to make wro
 - **Feature (2026-07-01):** Aligned Premium Themes upgrade logic in `ThemeManager` with Plugins to securely pass `license_key` for marketplace validation.
 - **Security (2026-07-02):** Executed comprehensive security audit fixes including AdminController upload validation, StatusPostService MIME checks, CSP headers, and HTTP rate limiting.
 - **Bug Fix (2026-07-03):** Fixed KB categories table corruption (Error 1813), and CSP blocking Markdown rendering in Knowledgebase.
+- **Feature (2026-07-06):** Added **Free SEO Checker** (`/directory/seo-checker`) tool with role-based access gating and a premium "Superdesign" UI, seamlessly integrated into the directory and home dashboards.
 
 ---
 
-*Last updated: 2026-07-03 — MYADS v4.4.0 (Premium Themes Marketplace Alignment, Expanded Store Categories, Ad Concurrency Prevention, Banner Fallbacks, dynamic Visit Exchange settings, Admin Widgets Update, Comprehensive Security Audit Fixes, Critical Bug Fixes)*
+*Last updated: 2026-07-06 — MYADS v4.4.0 (Free SEO Checker, Premium Themes Marketplace Alignment, Expanded Store Categories, Ad Concurrency Prevention, Banner Fallbacks, dynamic Visit Exchange settings, Admin Widgets Update, Comprehensive Security Audit Fixes, Critical Bug Fixes)*

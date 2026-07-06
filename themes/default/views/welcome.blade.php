@@ -709,6 +709,15 @@
                 <h3>{{ __('messages.forum') ?? 'Discussion Forums' }}</h3>
                 <p>{{ __('messages.forum_desc') ?? 'Join specialized topics, share knowledge, and get support from experts and fellow website owners.' }}</p>
             </div>
+
+            <!-- Feature 7 -->
+            <div class="feature-card scroll-reveal delay-3" onclick="window.location.href='{{ route('seo_checker.index') }}'" style="cursor: pointer;">
+                <div class="feature-icon" style="background: rgba(14, 165, 233, 0.1); color: #0ea5e9;">
+                    <i class="fa-solid fa-magnifying-glass-chart"></i>
+                </div>
+                <h3>{{ __('messages.seo_checker') ?? 'Free SEO Checker' }}</h3>
+                <p>{{ __('messages.seo_checker_desc') ?? 'Analyze your website\'s SEO performance, check backlinks, and get actionable insights to improve your rankings for free.' }}</p>
+            </div>
         </div>
     </section>
 

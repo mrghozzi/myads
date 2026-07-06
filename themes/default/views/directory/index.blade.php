@@ -27,6 +27,10 @@
                         <a href="{{ route('directory.create') }}" class="button secondary">
                             <i class="fa fa-plus" aria-hidden="true"></i>&nbsp;{{ __('messages.addWebsite') }}
                         </a>
+                        
+                        <a href="{{ route('seo_checker.index') }}" class="button tertiary" style="background-color: #10b981; color: white; border-color: #10b981;">
+                            <i class="fa-solid fa-chart-line" aria-hidden="true"></i>&nbsp;{{ __('messages.seo_checker') }}
+                        </a>
                     </div>
                 </div>
             </div>

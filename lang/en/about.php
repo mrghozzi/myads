@@ -16,6 +16,8 @@ return [
     'feature_3_desc' => 'New layers of security including enhanced rate-limiting and improved permission architecture.',
     'feature_4_title' => 'Global Search Live',
     'feature_4_desc' => 'Find anything instantly with the new Live Global Search engine powered by AJAX.',
+    'feature_5_title' => 'Free SEO Checker',
+    'feature_5_desc' => 'Analyze websites for speed, HTML errors, and backlinks with a premium new tool integrated into the dashboard.',
 
     // About Section
     'about_description' => 'MYADS is a powerful, all-in-one community platform and ad exchange network. It empowers website owners to connect, exchange traffic, trade services, and monetize their platforms effectively.',
@@ -33,6 +35,8 @@ return [
     'feat_forum_desc' => 'Full-featured discussion boards with categories, topic moderation, file attachments, and Markdown support.',
     'feat_gamification_title' => 'Gamification & Quests',
     'feat_gamification_desc' => 'Points (PTS) economy, unlockable dynamic badges, and daily/weekly engagement quests.',
+    'feat_seo_title' => 'SEO Suite & Tools',
+    'feat_seo_desc' => 'Centralized SEO engine, dynamic sitemaps, robots.txt, and a Free SEO Checker for webmasters.',
     
     'system_environment' => 'System Environment',
     'env_php' => 'PHP Version',

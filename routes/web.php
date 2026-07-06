@@ -231,6 +231,10 @@ Route::post('/forum/report', [AdminController::class, 'storeReport'])->name('for
 
 // Directory Routes
 Route::get('/directory', [DirectoryController::class, 'index'])->name('directory.index');
+// SEO Checker
+Route::get('/directory/seo-checker', [\App\Http\Controllers\SeoCheckerController::class, 'index'])->name('seo_checker.index');
+Route::post('/directory/seo-checker', [\App\Http\Controllers\SeoCheckerController::class, 'analyze'])->name('seo_checker.analyze');
+
 Route::get('/directory/{id}', [DirectoryController::class, 'show'])->name('directory.show');
 Route::get('/dr{id}', [DirectoryController::class, 'showShort'])->name('directory.show.short');
 Route::get('/site-{hash}', [DirectoryController::class, 'redirectShort'])->name('directory.redirect.short');
@@ -243,6 +247,7 @@ Route::get('/cat/{id}', [DirectoryController::class, 'category'])->name('directo
 Route::get('/add-site.html', [DirectoryController::class, 'create'])->name('directory.create');
 Route::post('/directory/fetch-metadata', [DirectoryController::class, 'fetchMetadata'])->name('directory.fetch_metadata')->middleware('auth');
 Route::get('/directory/image/{id}', [DirectoryController::class, 'fetchImage'])->name('directory.image.fetch');
+
 
 // News Routes
 Route::get('/news', [NewsController::class, 'index'])->name('news.index');
@@ -649,6 +654,10 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::post('/directory/categories', [AdminController::class, 'storeDirectoryCategory'])->name('admin.directory_categories.store');
     Route::post('/directory/categories/{id}', [AdminController::class, 'updateDirectoryCategory'])->name('admin.directory_categories.update');
     Route::delete('/directory/categories/{id}', [AdminController::class, 'deleteDirectoryCategory'])->name('admin.directory_categories.delete');
+
+    // SEO Checker Settings
+    Route::get('/directory/seo-checker/settings', [\App\Http\Controllers\AdminSeoCheckerController::class, 'settings'])->name('admin.seo_checker.settings');
+    Route::post('/directory/seo-checker/settings', [\App\Http\Controllers\AdminSeoCheckerController::class, 'updateSettings']);
     
     // Site Ads
     Route::get('/site-ads', [AdminController::class, 'siteAds'])->name('admin.site_ads');

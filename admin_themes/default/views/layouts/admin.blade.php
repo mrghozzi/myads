@@ -178,6 +178,7 @@
                             <ul class="nxl-submenu">
                                 <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.community.feed.settings') }}">{{ __('messages.community_feed_settings_title') }}</a></li>
                                 <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.directory_categories') }}">{{ __('messages.dir_cats') }}</a></li>
+                                <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.seo_checker.settings') }}">{{ __('messages.seo_checker_settings') }}</a></li>
                                 <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.emojis') }}">{{ __('messages.emojis') }}</a></li>
                                 <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.news') }}">{{ __('messages.news_site') }}</a></li>
                                 <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.reports') }}">{{ __('messages.reports') }}</a></li>

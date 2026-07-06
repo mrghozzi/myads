@@ -319,8 +319,8 @@
                     
                     <!-- What's New Tab -->
                     <div class="tab-pane fade show active" id="whats-new" role="tabpanel" aria-labelledby="whats-new-tab">
-                        <div class="row g-4">
-                            <div class="col-md-6 col-lg-3">
+                        <div class="row g-4 justify-content-center">
+                            <div class="col-md-6 col-lg-4">
                                 <div class="feature-card p-4">
                                     <div class="feature-icon-wrapper">
                                         <i class="feather-layout"></i>
@@ -329,7 +329,7 @@
                                     <p class="text-muted mb-0 fs-13">{{ __('about.feature_1_desc') }}</p>
                                 </div>
                             </div>
-                            <div class="col-md-6 col-lg-3">
+                            <div class="col-md-6 col-lg-4">
                                 <div class="feature-card p-4">
                                     <div class="feature-icon-wrapper">
                                         <i class="feather-zap"></i>
@@ -338,7 +338,7 @@
                                     <p class="text-muted mb-0 fs-13">{{ __('about.feature_2_desc') }}</p>
                                 </div>
                             </div>
-                            <div class="col-md-6 col-lg-3">
+                            <div class="col-md-6 col-lg-4">
                                 <div class="feature-card p-4">
                                     <div class="feature-icon-wrapper">
                                         <i class="feather-shield"></i>
@@ -347,13 +347,22 @@
                                     <p class="text-muted mb-0 fs-13">{{ __('about.feature_3_desc') }}</p>
                                 </div>
                             </div>
-                            <div class="col-md-6 col-lg-3">
+                            <div class="col-md-6 col-lg-4">
                                 <div class="feature-card p-4">
                                     <div class="feature-icon-wrapper">
                                         <i class="feather-search"></i>
                                     </div>
                                     <h5 class="fw-bold mb-3">{{ __('about.feature_4_title') }}</h5>
                                     <p class="text-muted mb-0 fs-13">{{ __('about.feature_4_desc') }}</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                                <div class="feature-card p-4">
+                                    <div class="feature-icon-wrapper" style="background: rgba(16,185,129,0.1); color: #10b981;">
+                                        <i class="feather-activity"></i>
+                                    </div>
+                                    <h5 class="fw-bold mb-3">{{ __('about.feature_5_title') }}</h5>
+                                    <p class="text-muted mb-0 fs-13">{{ __('about.feature_5_desc') }}</p>
                                 </div>
                             </div>
                         </div>
@@ -366,8 +375,12 @@
                                 <div class="timeline-item">
                                     <div class="timeline-icon"><i class="feather-box fs-12"></i></div>
                                     <h6 class="fw-bold mb-1">v4.4.0 <span class="badge bg-soft-primary text-primary ms-2">Current</span></h6>
-                                    <p class="text-muted fs-13 mb-3">Major release with Superdesign aesthetics, Performance Settings, System Monitor, and enhanced security.</p>
+                                    <p class="text-muted fs-13 mb-3">Major release with Superdesign aesthetics, Performance Settings, System Monitor, and Free SEO Checker.</p>
                                     <div class="d-flex flex-column gap-2">
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-feature mt-1">Feature</span>
+                                            <span class="text-muted fs-13">Added Free SEO Checker with role-based access gating and a premium "Superdesign" UI.</span>
+                                        </div>
                                         <div class="d-flex align-items-start">
                                             <span class="changelog-badge badge-feature mt-1">Feature</span>
                                             <span class="text-muted fs-13">Added System Monitor dashboard for real-time overview of server resource consumption.</span>
@@ -538,6 +551,17 @@
                                             <div>
                                                 <h6 class="fw-bold mb-2">{{ __('about.feat_gamification_title') }}</h6>
                                                 <p class="text-muted mb-0 fs-13">{{ __('about.feat_gamification_desc') }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="feature-card p-4 d-flex align-items-start">
+                                            <div class="feature-icon-wrapper flex-shrink-0 me-3 mb-0" style="width: 50px; height: 50px; font-size: 22px; background: rgba(16,185,129,0.1); color: #10b981;">
+                                                <i class="feather-activity"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="fw-bold mb-2">{{ __('about.feat_seo_title') }}</h6>
+                                                <p class="text-muted mb-0 fs-13">{{ __('about.feat_seo_desc') }}</p>
                                             </div>
                                         </div>
                                     </div>

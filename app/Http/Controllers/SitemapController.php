@@ -267,6 +267,13 @@ class SitemapController extends Controller
                 'changefreq' => 'yearly',
                 'priority' => '0.3',
             ],
+            [
+                'scope_key' => 'seo_checker',
+                'loc' => route('seo_checker.index'),
+                'lastmod' => $defaultLastmod,
+                'changefreq' => 'weekly',
+                'priority' => '0.8',
+            ],
         ]);
 
         if (Schema::hasTable('groups') && GroupSettings::isEnabled()) {
