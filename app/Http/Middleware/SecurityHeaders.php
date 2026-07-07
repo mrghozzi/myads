@@ -47,7 +47,7 @@ class SecurityHeaders
             "img-src 'self' data: blob: https: http:; " .
             "font-src 'self' https://fonts.gstatic.com data:; " .
             "connect-src 'self' https://www.google-analytics.com; " .
-            "frame-src 'self' https://www.youtube.com https://www.google.com; " .
+            "frame-src 'self' https://www.youtube.com https://www.google.com https://stackedit.io; " .
             "object-src 'none'; " .
             "base-uri 'self'; " .
             "form-action 'self';"

@@ -1,6 +1,10 @@
 # v4.4.1
 > **In Development** — Preparations for the next release.
 
+### Bug Fixes
+* **Knowledgebase:** Resolved a critical 500 error on Knowledgebase pages caused by an orphaned `kb_categories` tablespace.
+* **Security:** Allowed `stackedit.io` iframe in the Content-Security-Policy (CSP) to fix the StackEdit Markdown editor not loading.
+
 ---
 
 # v4.4.0
