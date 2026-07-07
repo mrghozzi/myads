@@ -374,27 +374,35 @@
                             <div class="timeline">
                                 <div class="timeline-item">
                                     <div class="timeline-icon"><i class="feather-box fs-12"></i></div>
-                                    <h6 class="fw-bold mb-1">v4.4.0 <span class="badge bg-soft-primary text-primary ms-2">Current</span></h6>
-                                    <p class="text-muted fs-13 mb-3">Major release with Superdesign aesthetics, Performance Settings, System Monitor, and Free SEO Checker.</p>
+                                    <h6 class="fw-bold mb-1">v4.4.1 <span class="badge bg-soft-primary text-primary ms-2">Current</span></h6>
+                                    <p class="text-muted fs-13 mb-3">In Development.</p>
+                                    <div class="d-flex flex-column gap-2">
+                                    </div>
+                                </div>
+                                
+                                <div class="timeline-item">
+                                    <div class="timeline-icon" style="border-color: #6b7280; color: #6b7280;"><i class="feather-check fs-12"></i></div>
+                                    <h6 class="fw-bold mb-1 text-muted">v4.4.0</h6>
+                                    <p class="text-muted fs-13 mb-2">Major release with Superdesign aesthetics, Performance Settings, System Monitor, and Free SEO Checker.</p>
                                     <div class="d-flex flex-column gap-2">
                                         <div class="d-flex align-items-start">
-                                            <span class="changelog-badge badge-feature mt-1">Feature</span>
+                                            <span class="changelog-badge badge-feature mt-1" style="background: rgba(107, 114, 128, 0.1); color: #6b7280;">Feature</span>
                                             <span class="text-muted fs-13">Added Free SEO Checker with role-based access gating and a premium "Superdesign" UI.</span>
                                         </div>
                                         <div class="d-flex align-items-start">
-                                            <span class="changelog-badge badge-feature mt-1">Feature</span>
+                                            <span class="changelog-badge badge-feature mt-1" style="background: rgba(107, 114, 128, 0.1); color: #6b7280;">Feature</span>
                                             <span class="text-muted fs-13">Added System Monitor dashboard for real-time overview of server resource consumption.</span>
                                         </div>
                                         <div class="d-flex align-items-start">
-                                            <span class="changelog-badge badge-feature mt-1">Feature</span>
+                                            <span class="changelog-badge badge-feature mt-1" style="background: rgba(107, 114, 128, 0.1); color: #6b7280;">Feature</span>
                                             <span class="text-muted fs-13">Implemented Skeleton Loaders (Shimmer Effect) in the community feed for a premium loading state.</span>
                                         </div>
                                         <div class="d-flex align-items-start">
-                                            <span class="changelog-badge badge-optimization mt-1">Optimization</span>
+                                            <span class="changelog-badge badge-optimization mt-1" style="background: rgba(107, 114, 128, 0.1); color: #6b7280;">Optimization</span>
                                             <span class="text-muted fs-13">Eliminated severe N+1 database queries on the community feed by implementing bulk eager-loading.</span>
                                         </div>
                                         <div class="d-flex align-items-start">
-                                            <span class="changelog-badge badge-fix mt-1">Security</span>
+                                            <span class="changelog-badge badge-fix mt-1" style="background: rgba(107, 114, 128, 0.1); color: #6b7280;">Security</span>
                                             <span class="text-muted fs-13">Patched path traversal vulnerability in Admin Media Manager to prevent arbitrary file renaming.</span>
                                         </div>
                                     </div>

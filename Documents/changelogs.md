@@ -1,3 +1,8 @@
+# v4.4.1
+> **In Development** — Preparations for the next release.
+
+---
+
 # v4.4.0
 > **Stable Release** — Dynamic system updater, two-pronged installation and upgrade system, secure offline database update bypass, comprehensive security audit, and system optimizations.
 
