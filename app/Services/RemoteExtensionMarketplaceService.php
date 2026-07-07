@@ -50,7 +50,13 @@ class RemoteExtensionMarketplaceService
                 return $this->fetchFromFallback($type, $browseUrl, $fallback);
             }
 
-            return $this->parseResponse($response->json(), $type, $browseUrl, $fallback);
+            $payload = $response->json();
+            if (! is_array($payload) || ! isset($payload['items']) || ! is_array($payload['items'])) {
+                Log::warning("Marketplace primary feed invalid payload. Attempting fallback.");
+                return $this->fetchFromFallback($type, $browseUrl, $fallback);
+            }
+
+            return $this->parseResponse($payload, $type, $browseUrl, $fallback);
         } catch (\Throwable $e) {
             Log::warning("Marketplace feed exception: " . $e->getMessage() . ". Attempting fallback.");
             return $this->fetchFromFallback($type, $browseUrl, $fallback);
@@ -63,13 +69,14 @@ class RemoteExtensionMarketplaceService
     private function fetchFromFallback(string $type, string $browseUrl, array $fallback): array
     {
         try {
+            $url = $this->fallbackFeedUrl($type);
             $response = Http::withHeaders([
                 'Accept' => 'application/json',
                 'User-Agent' => 'MyAds-Extension-Marketplace-Fallback',
-            ])->timeout(8)->get($this->fallbackFeedUrl($type));
+            ])->timeout(8)->get($url);
 
             if (! $response->successful()) {
-                Log::error("Marketplace fallback feed failed: " . $response->status() . " for " . $this->fallbackFeedUrl($type));
+                Log::error("Marketplace fallback feed failed: " . $response->status() . " for " . $url);
                 return $fallback;
             }
 
@@ -135,7 +142,7 @@ class RemoteExtensionMarketplaceService
 
     private function fallbackFeedUrl(string $type): string
     {
-        return rtrim(self::FALLBACK_BASE_URL, '/') . '/marketplace_' . $type . '.json';
+        return rtrim(self::FALLBACK_BASE_URL, '/') . '/marketplace_' . $type . '.json?t=' . time();
     }
 
     private function browseUrl(string $type): string
