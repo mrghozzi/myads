@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Log;
 class RemoteExtensionMarketplaceService
 {
     private const BASE_URL = 'https://www.adstn.ovh';
+    private const FALLBACK_BASE_URL = 'https://raw.githubusercontent.com/mrghozzi/myads_check_updates/main';
     private const CACHE_TTL_SECONDS = 300;
 
     /**
@@ -42,65 +43,99 @@ class RemoteExtensionMarketplaceService
             $response = Http::withHeaders([
                 'Accept' => 'application/json',
                 'User-Agent' => 'MyAds-Extension-Marketplace',
-            ])->timeout(10)->get($this->feedUrl($type));
+            ])->timeout(8)->get($this->feedUrl($type));
 
             if (! $response->successful()) {
-                Log::error("Marketplace feed failed: " . $response->status() . " for " . $this->feedUrl($type));
-                return $fallback;
+                Log::warning("Marketplace feed failed: " . $response->status() . " for " . $this->feedUrl($type) . ". Attempting fallback.");
+                return $this->fetchFromFallback($type, $browseUrl, $fallback);
             }
 
-            $payload = $response->json();
-            if (! is_array($payload) || ! isset($payload['items']) || ! is_array($payload['items'])) {
-                Log::error("Marketplace feed invalid payload: " . json_encode($payload));
-                return $fallback;
-            }
-
-            $items = [];
-            foreach ($payload['items'] as $item) {
-                if (! is_array($item)) {
-                    continue;
-                }
-
-                $productUrl = trim((string) ($item['product_url'] ?? ''));
-                if (! $this->isHttpUrl($productUrl)) {
-                    continue;
-                }
-
-                $imageUrl = trim((string) ($item['image_url'] ?? ''));
-                $category = $this->normalizeCategory((string) ($item['category'] ?? ''));
-
-                $downloadUrl = trim((string) ($item['download_url'] ?? ''));
-
-                $items[] = [
-                    'name' => trim((string) ($item['name'] ?? '')),
-                    'slug' => trim((string) ($item['slug'] ?? '')),
-                    'version' => trim((string) ($item['version'] ?? '')),
-                    'author' => trim((string) ($item['author'] ?? '')),
-                    'description' => trim((string) ($item['description'] ?? '')),
-                    'min_myads' => trim((string) ($item['min_myads'] ?? '')),
-                    'product_url' => $productUrl,
-                    'image_url' => $this->isHttpUrl($imageUrl) ? $imageUrl : '',
-                    'download_url' => $this->isHttpUrl($downloadUrl) ? $downloadUrl : '',
-                    'category' => $category,
-                ];
-
-            }
-
-            return [
-                'type' => $type,
-                'items' => $items,
-                'error' => null,
-                'browse_url' => $browseUrl,
-            ];
+            return $this->parseResponse($response->json(), $type, $browseUrl, $fallback);
         } catch (\Throwable $e) {
-            Log::error("Marketplace feed exception: " . $e->getMessage());
+            Log::warning("Marketplace feed exception: " . $e->getMessage() . ". Attempting fallback.");
+            return $this->fetchFromFallback($type, $browseUrl, $fallback);
+        }
+    }
+
+    /**
+     * @return array{type: string, items: array<int, array<string, string>>, error: ?string, browse_url: string}
+     */
+    private function fetchFromFallback(string $type, string $browseUrl, array $fallback): array
+    {
+        try {
+            $response = Http::withHeaders([
+                'Accept' => 'application/json',
+                'User-Agent' => 'MyAds-Extension-Marketplace-Fallback',
+            ])->timeout(8)->get($this->fallbackFeedUrl($type));
+
+            if (! $response->successful()) {
+                Log::error("Marketplace fallback feed failed: " . $response->status() . " for " . $this->fallbackFeedUrl($type));
+                return $fallback;
+            }
+
+            return $this->parseResponse($response->json(), $type, $browseUrl, $fallback);
+        } catch (\Throwable $e) {
+            Log::error("Marketplace fallback feed exception: " . $e->getMessage());
             return $fallback;
         }
+    }
+
+    /**
+     * @return array{type: string, items: array<int, array<string, string>>, error: ?string, browse_url: string}
+     */
+    private function parseResponse($payload, string $type, string $browseUrl, array $fallback): array
+    {
+        if (! is_array($payload) || ! isset($payload['items']) || ! is_array($payload['items'])) {
+            Log::error("Marketplace feed invalid payload: " . json_encode($payload));
+            return $fallback;
+        }
+
+        $items = [];
+        foreach ($payload['items'] as $item) {
+            if (! is_array($item)) {
+                continue;
+            }
+
+            $productUrl = trim((string) ($item['product_url'] ?? ''));
+            if (! $this->isHttpUrl($productUrl)) {
+                continue;
+            }
+
+            $imageUrl = trim((string) ($item['image_url'] ?? ''));
+            $category = $this->normalizeCategory((string) ($item['category'] ?? ''));
+
+            $downloadUrl = trim((string) ($item['download_url'] ?? ''));
+
+            $items[] = [
+                'name' => trim((string) ($item['name'] ?? '')),
+                'slug' => trim((string) ($item['slug'] ?? '')),
+                'version' => trim((string) ($item['version'] ?? '')),
+                'author' => trim((string) ($item['author'] ?? '')),
+                'description' => trim((string) ($item['description'] ?? '')),
+                'min_myads' => trim((string) ($item['min_myads'] ?? '')),
+                'product_url' => $productUrl,
+                'image_url' => $this->isHttpUrl($imageUrl) ? $imageUrl : '',
+                'download_url' => $this->isHttpUrl($downloadUrl) ? $downloadUrl : '',
+                'category' => $category,
+            ];
+        }
+
+        return [
+            'type' => $type,
+            'items' => $items,
+            'error' => null,
+            'browse_url' => $browseUrl,
+        ];
     }
 
     private function feedUrl(string $type): string
     {
         return rtrim(self::BASE_URL, '/') . '/api/marketplace/extensions/' . $type;
+    }
+
+    private function fallbackFeedUrl(string $type): string
+    {
+        return rtrim(self::FALLBACK_BASE_URL, '/') . '/marketplace_' . $type . '.json';
     }
 
     private function browseUrl(string $type): string
