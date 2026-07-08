@@ -2,6 +2,7 @@
 > **In Development** — Preparations for the next release.
 
 ### Bug Fixes
+* **Performance:** Resolved a severe CPU consumption issue affecting ad serving endpoints (`bn.php`, `link.php`) by adding missing database indexes to the `state` table for the Ad Repeat Window feature introduced in v4.4.0.
 * **Knowledgebase:** Resolved a critical 500 error on Knowledgebase pages caused by an orphaned `kb_categories` tablespace.
 * **Security:** Allowed `stackedit.io` iframe in the Content-Security-Policy (CSP) to fix the StackEdit Markdown editor not loading.
 
