@@ -6,6 +6,9 @@ use Illuminate\Support\Str;
 
 class ContentFormatter
 {
+    protected static ?array $blockedDomainsCache = null;
+    protected static ?array $blockedPatternsCache = null;
+
     public static function format(?string $text): string
     {
         $value = trim((string) $text);
@@ -14,7 +17,7 @@ class ContentFormatter
         }
 
         $value = str_replace(["\r\n", "\r"], "\n", $value);
-        $value = self::linkifyMentions(self::linkifyHashtags($value));
+        $value = self::linkifyBbcodeUrl(self::linkifyMentions(self::linkifyHashtags($value)));
 
         $html = trim((string) Str::markdown($value, [
             'html_input' => 'strip',
@@ -32,7 +35,7 @@ class ContentFormatter
         }
 
         $value = str_replace(["\r\n", "\r"], "\n", $value);
-        $value = self::linkifyMentions(self::linkifyHashtags($value));
+        $value = self::linkifyBbcodeUrl(self::linkifyMentions(self::linkifyHashtags($value)));
 
         $html = trim((string) Str::markdown($value, [
             'html_input' => 'allow',
@@ -86,6 +89,40 @@ class ContentFormatter
                 $prefix = $matches[1];
                 $username = $matches[2];
                 return $prefix . '[@' . $username . '](/u/' . rawurlencode($username) . ')';
+            },
+            $text
+        );
+    }
+
+    public static function linkifyBbcodeUrl(string $text): string
+    {
+        return (string) preg_replace_callback(
+            '/\[url(?:=([^\]]+))?\](.*?)\[\/url\]/is',
+            static function (array $matches): string {
+                $url = trim(!empty($matches[1]) ? $matches[1] : $matches[2]);
+                $anchorText = $matches[2];
+                
+                if (!preg_match('/^https?:\/\//i', $url)) {
+                    return $anchorText;
+                }
+                
+                if (self::$blockedDomainsCache === null) {
+                    self::$blockedDomainsCache = \App\Support\SecuritySettings::blockedDomains();
+                    self::$blockedPatternsCache = \App\Support\SecuritySettings::blockedUrlPatterns();
+                }
+
+                $inspector = app(\App\Services\Contracts\UrlSafetyInspectorInterface::class);
+                $violation = $inspector->firstViolation(
+                    $url,
+                    self::$blockedDomainsCache,
+                    self::$blockedPatternsCache
+                );
+                
+                if ($violation !== null) {
+                    return $anchorText;
+                }
+                
+                return '[' . $anchorText . '](' . $url . ')';
             },
             $text
         );

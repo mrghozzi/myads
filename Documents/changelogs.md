@@ -1,6 +1,9 @@
 # v4.4.1
 > **In Development** — Preparations for the next release.
 
+### Features
+* **Security & Formatting:** Added support for BBCode URL formatting (`[url=https://...]Text[/url]`) in community posts and forum topics. All generated links are dynamically verified against the `/admin/security` blocked domains and URL patterns list. If a domain is blocked, the system strips the link and securely renders only the anchor text to prevent linking to malicious external sites.
+
 ### Bug Fixes
 * **Performance:** Resolved a severe CPU consumption issue affecting ad serving endpoints (`bn.php`, `link.php`) by adding missing database indexes to the `state` table for the Ad Repeat Window feature introduced in v4.4.0.
 * **Knowledgebase:** Resolved a critical 500 error on Knowledgebase pages caused by an orphaned `kb_categories` tablespace.
