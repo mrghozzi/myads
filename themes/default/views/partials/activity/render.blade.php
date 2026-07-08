@@ -82,6 +82,37 @@
                     form.submit();
                 };
             }
+
+            if (typeof window.togglePinPost !== 'function') {
+                window.togglePinPost = function (statusId, isCurrentlyPinned, userHasPinnedPost) {
+                    if (!isCurrentlyPinned && userHasPinnedPost) {
+                        const confirmMsg = '{{ __('messages.confirm_replace_pinned_post') ?? 'You already have a pinned post. Pinning this one will unpin the other. Continue?' }}';
+                        if (!window.confirm(confirmMsg)) {
+                            return;
+                        }
+                    }
+
+                    fetch('/statuses/' + statusId + '/pin', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        },
+                        body: JSON.stringify({})
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            window.location.reload();
+                        } else {
+                            alert(data.message || 'Error occurred');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
+                };
+            }
         </script>
     @endpush
 @endonce

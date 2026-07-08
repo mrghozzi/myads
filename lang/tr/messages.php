@@ -2546,4 +2546,7 @@ return [
     'permission_pin' => 'Sabitleme İzni',
     'translate' => 'Çevir',
     'original' => 'Orijinali Göster',
+    'pin_post' => 'Pin to profile',
+    'unpin_post' => 'Unpin post',
 ];
+

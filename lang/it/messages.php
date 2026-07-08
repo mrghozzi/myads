@@ -2546,4 +2546,7 @@ return [
     'permission_pin' => 'Permesso di fissare',
     'translate' => 'Traduci',
     'original' => 'Mostra Originale',
+    'pin_post' => 'Pin to profile',
+    'unpin_post' => 'Unpin post',
 ];
+

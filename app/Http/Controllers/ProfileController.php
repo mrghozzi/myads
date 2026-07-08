@@ -62,6 +62,7 @@ class ProfileController extends Controller
                 ->where('date', '<=', time())
                 ->where('s_type', '!=', 5)
                 ->when($selectedTab !== 'links' && !empty($hiddenDirectoryStatusIds), fn ($builder) => $builder->whereNotIn('id', $hiddenDirectoryStatusIds))
+                ->orderBy('is_pinned', 'desc')
                 ->orderBy('date', 'desc');
 
             switch ($selectedTab) {
@@ -162,10 +163,12 @@ class ProfileController extends Controller
             ],
         ]);
         $subscriptionProfileBadge = app(SubscriptionEntitlementService::class)->activeProfileBadgeForUserId($user->id);
+        $hasPinnedPost = Status::where('uid', $user->id)->where('is_pinned', true)->exists();
+        $isOwnProfile = (Auth::check() && Auth::id() === $user->id);
 
         if ($request->ajax() || $request->wantsJson()) {
             return response()->json([
-                'html' => view('theme::partials.ajax.activities', compact('activities'))->render(),
+                'html' => view('theme::partials.ajax.activities', compact('activities', 'hasPinnedPost', 'isOwnProfile'))->render(),
                 'next_page_url' => $activities->nextPageUrl(),
             ]);
         }
@@ -190,7 +193,9 @@ class ProfileController extends Controller
             'canViewFollowing',
             'canSendMessage',
             'showOnlineStatus',
-            'profileContentNotice'
+            'profileContentNotice',
+            'hasPinnedPost',
+            'isOwnProfile'
         ));
     }
 

@@ -495,7 +495,10 @@
                         </div>
                     @else
                         @forelse($activities as $activity)
-                            @include('theme::partials.activity.render', ['activity' => $activity])
+                            @include('theme::partials.activity.render', [
+                                'activity' => $activity, 
+                                'isOwnProfile' => (auth()->check() && auth()->user()->username === $user->username)
+                            ])
                         @empty
                             <div class="widget-box" style="margin-bottom: 0;">
                                 <div class="widget-box-content">

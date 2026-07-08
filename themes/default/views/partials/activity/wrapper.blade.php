@@ -32,6 +32,11 @@
                             <i class="fa fa-trash" aria-hidden="true"></i>&nbsp;{{ __('messages.delete') }}
                         </p>
                     @endif
+                    @if(isset($isOwnProfile) && $isOwnProfile && auth()->id() == $activity->uid)
+                        <p class="simple-dropdown-link" onclick="togglePinPost({{ $activity->id }}, {{ $activity->is_pinned ? 'true' : 'false' }}, {{ isset($hasPinnedPost) && $hasPinnedPost ? 'true' : 'false' }})" style="cursor: pointer;">
+                            <i class="fa fa-thumb-tack" aria-hidden="true"></i>&nbsp;{{ $activity->is_pinned ? __('messages.unpin_post') ?? 'Unpin' : __('messages.pin_post') ?? 'Pin to profile' }}
+                        </p>
+                    @endif
                     <p class="simple-dropdown-link"><i class="fa fa-flag" aria-hidden="true"></i>&nbsp;{{ __('messages.report') }}</p>
                 @endauth
             </div>
@@ -88,6 +93,10 @@
                 <!-- USER STATUS TITLE -->
                 <p class="user-status-title medium">
                     <a class="bold user-popover-trigger" data-username="{{ $activityUserName }}" href="{{ $activityUserProfileUrl }}">{{ $activityUserName }}</a>
+                    
+                    @if($activity->is_pinned)
+                        <span class="badge ms-2" style="background-color: var(--primary-color); color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 0.75rem;"><i class="fa fa-thumb-tack"></i> {{ __('messages.pinned_post') ?? 'Pinned Post' }}</span>
+                    @endif
                     
                     @if($activity->s_type == 1 && $activity->related_content)
                         <span class="user-status-title-text">{{ __('messages.added_website') }}</span>

@@ -42,6 +42,13 @@
                     @if(auth()->id() == $activity->uid || auth()->user()->isAdmin())
                         <p class="simple-dropdown-link post_edit{{ $activity->id }}" onclick="postEdit({{ $activity->tp_id }}, 4)"><i class="fa fa-edit" aria-hidden="true"></i>&nbsp;{{ __('messages.edit') }}</p>
                         <p class="simple-dropdown-link post_delete{{ $activity->id }}" onclick="deletePost({{ $activity->tp_id }}, 4, '.post{{ $activity->id }}')"><i class="fa fa-trash" aria-hidden="true"></i>&nbsp;{{ __('messages.delete') }}</p>
+                                        @endif
+                    @if(isset($isOwnProfile) && $isOwnProfile && auth()->id() == $activity->uid)
+                        <!-- SIMPLE DROPDOWN LINK -->
+                        <p class="simple-dropdown-link" onclick="togglePinPost({{ $activity->id }}, {{ $activity->is_pinned ? 'true' : 'false' }}, {{ isset($hasPinnedPost) && $hasPinnedPost ? 'true' : 'false' }})" style="cursor: pointer;">
+                            <i class="fa fa-thumb-tack" aria-hidden="true"></i>&nbsp;{{ $activity->is_pinned ? __('messages.unpin_post') ?? 'Unpin' : __('messages.pin_post') ?? 'Pin to profile' }}
+                        </p>
+                        <!-- /SIMPLE DROPDOWN LINK -->
                     @endif
                     @include('theme::partials.activity.promotion_link', ['activity' => $activity])
                     <p class="simple-dropdown-link post_report{{ $activity->id }}" onclick="reportPost({{ $activity->tp_id }}, 4, {{ $activity->related_content->id }})"><i class="fa fa-flag" aria-hidden="true"></i>&nbsp;{{ __('messages.report') }}</p>

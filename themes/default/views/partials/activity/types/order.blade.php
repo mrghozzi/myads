@@ -46,6 +46,13 @@
                         <p class="simple-dropdown-link post_delete{{ $status->id }}" onclick="deletePost({{ $order->id }}, 6, '.post{{ $status->id }}')">
                             <i class="fa fa-trash" aria-hidden="true"></i>&nbsp;{{ __('messages.delete') }}
                         </p>
+                                        @endif
+                    @if(isset($isOwnProfile) && $isOwnProfile && auth()->id() == $activity->uid)
+                        <!-- SIMPLE DROPDOWN LINK -->
+                        <p class="simple-dropdown-link" onclick="togglePinPost({{ $activity->id }}, {{ $activity->is_pinned ? 'true' : 'false' }}, {{ isset($hasPinnedPost) && $hasPinnedPost ? 'true' : 'false' }})" style="cursor: pointer;">
+                            <i class="fa fa-thumb-tack" aria-hidden="true"></i>&nbsp;{{ $activity->is_pinned ? __('messages.unpin_post') ?? 'Unpin' : __('messages.pin_post') ?? 'Pin to profile' }}
+                        </p>
+                        <!-- /SIMPLE DROPDOWN LINK -->
                     @endif
 
                     @auth

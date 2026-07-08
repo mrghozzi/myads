@@ -550,4 +550,27 @@ class StatusController extends Controller
 
         return [$directory, $directoryStatus];
     }
+
+    public function togglePin(\Illuminate\Http\Request $request, Status $status)
+    {
+        $user = \Illuminate\Support\Facades\Auth::user();
+
+        if ($status->uid !== $user->id) {
+            return response()->json(['success' => false, 'message' => __('messages.unauthorized')], 403);
+        }
+
+        if ($status->is_pinned) {
+            $status->is_pinned = false;
+            $status->save();
+            return response()->json(['success' => true, 'pinned' => false, 'message' => __('messages.post_unpinned') ?? 'Post unpinned']);
+        }
+
+        // Unpin any previously pinned status for this user
+        Status::where('uid', $user->id)->where('is_pinned', true)->update(['is_pinned' => false]);
+
+        $status->is_pinned = true;
+        $status->save();
+
+        return response()->json(['success' => true, 'pinned' => true, 'message' => __('messages.post_pinned') ?? 'Post pinned']);
+    }
 }

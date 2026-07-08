@@ -43,7 +43,14 @@
                     @auth
                         @if($canDeleteStatus)
                             <p class="simple-dropdown-link post_delete{{ $status->id }}" onclick="deletePost({{ $status->id }}, 205, '.post{{ $status->id }}')"><i class="fa fa-trash" aria-hidden="true"></i>&nbsp;{{ __('messages.delete') }}</p>
-                        @endif
+                                            @endif
+                    @if(isset($isOwnProfile) && $isOwnProfile && auth()->id() == $activity->uid)
+                        <!-- SIMPLE DROPDOWN LINK -->
+                        <p class="simple-dropdown-link" onclick="togglePinPost({{ $activity->id }}, {{ $activity->is_pinned ? 'true' : 'false' }}, {{ isset($hasPinnedPost) && $hasPinnedPost ? 'true' : 'false' }})" style="cursor: pointer;">
+                            <i class="fa fa-thumb-tack" aria-hidden="true"></i>&nbsp;{{ $activity->is_pinned ? __('messages.unpin_post') ?? 'Unpin' : __('messages.pin_post') ?? 'Pin to profile' }}
+                        </p>
+                        <!-- /SIMPLE DROPDOWN LINK -->
+                    @endif
                         @if($canReportTopic)
                             <p class="simple-dropdown-link" onclick="reportPost({{ $article->id }}, 205, '{{ $reportKey }}')"><i class="fa fa-flag" aria-hidden="true"></i>&nbsp;{{ __('messages.report_topic') }}</p>
                         @endif

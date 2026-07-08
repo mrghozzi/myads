@@ -2545,4 +2545,7 @@ return [
     'permission_pin' => 'مجوز سنجاق',
     'translate' => 'ترجمه متن',
     'original' => 'نمایش متن اصلی',
+    'pin_post' => 'Pin to profile',
+    'unpin_post' => 'Unpin post',
 ];
+

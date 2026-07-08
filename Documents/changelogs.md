@@ -2,9 +2,11 @@
 > **In Development** — Preparations for the next release.
 
 ### Features
+* **Community:** Added **Pin Post to Profile** feature. Members can now pin a single post to the top of their personal profile page via an AJAX-powered dropdown menu. Pinning a new post automatically unpins any previously pinned post. Fully localized and supported across all 11 multimedia post types.
 * **Security & Formatting:** Added support for BBCode URL formatting (`[url=https://...]Text[/url]`) in community posts and forum topics. All generated links are dynamically verified against the `/admin/security` blocked domains and URL patterns list. If a domain is blocked, the system strips the link and securely renders only the anchor text to prevent linking to malicious external sites.
 
 ### Bug Fixes
+* **Community:** Fixed a 500 Internal Server Error on the community feed and member profiles caused by malformed Blade template directives (`@endif`) in the activity dropdown menus.
 * **Performance:** Resolved a severe CPU consumption issue affecting ad serving endpoints (`bn.php`, `link.php`) by adding missing database indexes to the `state` table for the Ad Repeat Window feature introduced in v4.4.0.
 * **Knowledgebase:** Resolved a critical 500 error on Knowledgebase pages caused by an orphaned `kb_categories` tablespace.
 * **Security:** Allowed `stackedit.io` iframe in the Content-Security-Policy (CSP) to fix the StackEdit Markdown editor not loading.

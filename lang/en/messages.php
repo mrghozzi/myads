@@ -3595,4 +3595,8 @@ return [
     'seo_new_check' => 'New Check',
     'seo_analysis_complete' => 'Analysis complete for :url',
     'seo_checker_desc' => 'Analyze your website\'s SEO performance, check backlinks, and get actionable insights to improve your rankings for free.',
+    'error_occurred' => 'An error occurred. Please try again.',
+    'pin_post' => 'Pin to profile',
+    'unpin_post' => 'Unpin post',
 ];
+

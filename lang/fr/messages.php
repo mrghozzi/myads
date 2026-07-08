@@ -2554,4 +2554,7 @@ return [
     'permission_pin' => 'Autorisation d\'épingler',
     'translate' => 'Traduire',
     'original' => 'Afficher l\'original',
+    'pin_post' => 'Pin to profile',
+    'unpin_post' => 'Unpin post',
 ];
+
