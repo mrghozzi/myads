@@ -3238,6 +3238,7 @@ return [
     'coupon_uses' => 'Coupon Uses',
     'coupon_dates' => 'Coupon Dates',
     'no_discounts_found' => 'No discounts found.',
+    'no_discounts_found_desc' => 'You have not created any discount codes yet.',
     'back_to_list' => 'Back to List',
     'create_new_discount' => 'Create New Discount',
     'all_discount_codes' => 'All Discount Codes',

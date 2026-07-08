@@ -3242,6 +3242,7 @@ return [
     'coupon_uses' => 'استخدامات الكوبون',
     'coupon_dates' => 'تواريخ الكوبون',
     'no_discounts_found' => 'لم يتم العثور على أي تخفيضات.',
+    'no_discounts_found_desc' => 'لم تقم بإنشاء أي أكواد تخفيض بعد.',
     'back_to_list' => 'العودة للقائمة',
     'create_new_discount' => 'إنشاء كود خصم جديد',
     'all_discount_codes' => 'جميع أكواد الخصم',
