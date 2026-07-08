@@ -1204,6 +1204,7 @@ return [
     'privacy_security_desc' => 'We implement industry-standard security measures to protect your personal information. However, no method of transmission over the Internet or electronic storage is completely secure. While we strive to protect your data, we cannot guarantee its absolute security.',
     'privacy_settings' => 'Privacy Settings',
     'privacy_settings_saved' => 'Your privacy settings have been saved.',
+    'end_to_end_encrypted' => 'End-to-End Encrypted',
     'private_messages_encryption_notice' => 'Messages below are now encrypted.',
     'product_deleted' => 'Product deleted successfully',
     'product_details' => 'product_details',
@@ -3599,5 +3600,8 @@ return [
     'error_occurred' => 'An error occurred. Please try again.',
     'pin_post' => 'Pin to profile',
     'unpin_post' => 'Unpin post',
+    'points_services' => 'Points Services',
+    'yt_exchange_title' => 'YouTube Views Exchange',
+    'watch_videos' => 'Watch Videos',
 ];
 
