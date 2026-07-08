@@ -1,5 +1,5 @@
 # v4.4.1
-> **In Development** — Preparations for the next release.
+> **Stable Release** — Pin Post to Profile, BBCode URL formatting security, and critical bug fixes for Knowledgebase, ad serving performance, and Content-Security-Policy.
 
 ### Features
 * **Community:** Added **Pin Post to Profile** feature. Members can now pin a single post to the top of their personal profile page via an AJAX-powered dropdown menu. Pinning a new post automatically unpins any previously pinned post. Fully localized and supported across all 11 multimedia post types.
