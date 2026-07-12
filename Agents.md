@@ -1,4 +1,4 @@
-# Agents.md — MYADS v4.4.1
+# Agents.md — MYADS v4.4.2
 
 > **Purpose:** This file gives AI coding agents a fast, comprehensive understanding of the MYADS project — its architecture, conventions, key files, and rules — so they can work effectively from a fresh chat context.
 

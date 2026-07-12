@@ -1,3 +1,8 @@
+# v4.4.2
+> **Under Development** — Release cycle initialized.
+
+---
+
 # v4.4.1
 > **Stable Release** — Pin Post to Profile, BBCode URL formatting security, and critical bug fixes for Knowledgebase, ad serving performance, and Content-Security-Policy.
 
