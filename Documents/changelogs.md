@@ -1,6 +1,13 @@
 # v4.4.2
 > **Under Development** — Release cycle initialized.
 
+### Features
+* **Admin / Database:** Added a new **Database Cleanup** tool (`/admin/database-cleanup`) to manually prune large analytics and tracking tables (`state`, `banner_impressions`, `seo_daily_metrics`) to free up disk space and improve query performance.
+* **Admin / UI:** Reorganized the admin sidebar navigation by introducing a unified **System** menu, which now groups System Monitor, Database Cleanup, Performance Settings, Updates, About, and Maintenance pages.
+
+### Bug Fixes
+* **Admin:** Fixed a 500 Internal Server Error on the Database Cleanup page caused by an invalid Blade template inclusion, and ensured all UI elements strictly adhere to the multilingual system (`__('messages.xxx')`).
+
 ---
 
 # v4.4.1

@@ -99,12 +99,7 @@
                                 <span class="nxl-mtext">{{ __('messages.board') }}</span>
                             </a>
                         </li>
-                        <li class="nxl-item">
-                            <a href="{{ route('admin.system_monitor') }}" class="nxl-link">
-                                <span class="nxl-micon"><i class="feather-activity"></i></span>
-                                <span class="nxl-mtext">{{ __('messages.system_monitor') ?? 'System Monitor' }}</span>
-                            </a>
-                        </li>
+
                     @endif
 
                     @if($canAdmin('pages'))
@@ -266,12 +261,33 @@
                                 @if($canAdmin('settings'))
                                     <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.settings') }}">{{ __('messages.settings') }}</a></li>
                                     <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.settings.system') }}">{{ __('messages.system_settings') }}</a></li>
-                                    <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.settings.performance') }}">{{ __('messages.performance_settings') ?? 'Performance Settings' }}</a></li>
+
                                     <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.settings.mail') }}">{{ __('messages.mail_settings_title') }}</a></li>
                                     <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.cookie_notice') }}">{{ __('messages.cookie_notice_settings') }}</a></li>
                                 @endif
                                 @if($canAdmin('languages'))
                                     <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.languages') }}">{{ __('messages.languages') }}</a></li>
+                                @endif
+
+                                <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.media') }}">{{ __('messages.media_manager') }}</a></li>
+
+                            </ul>
+                        </li>
+                    @endif
+
+                    @if($canAnyAdminSection(['dashboard', 'settings', 'updates', 'maintenance']))
+                        <li class="nxl-item nxl-hasmenu">
+                            <a href="javascript:void(0);" class="nxl-link">
+                                <span class="nxl-micon"><i class="feather-cpu"></i></span>
+                                <span class="nxl-mtext">{{ __('messages.system_menu_title') ?? 'System' }}</span><span class="nxl-arrow"><i class="feather-chevron-right"></i></span>
+                            </a>
+                            <ul class="nxl-submenu">
+                                @if($canAdmin('dashboard'))
+                                    <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.system_monitor') }}">{{ __('messages.system_monitor') ?? 'System Monitor' }}</a></li>
+                                    <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.database_cleanup') }}">{{ __('messages.database_cleanup') ?? 'Database Cleanup' }}</a></li>
+                                @endif
+                                @if($canAdmin('settings'))
+                                    <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.settings.performance') }}">{{ __('messages.performance_settings') ?? 'Performance Settings' }}</a></li>
                                 @endif
                                 @if($canAdmin('updates'))
                                     <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.about') }}">{{ __('about.tab_about') }}</a></li>
@@ -280,8 +296,6 @@
                                 @if($canAdmin('maintenance'))
                                     <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.maintenance') }}">{{ __('messages.maintenance') }}</a></li>
                                 @endif
-                                <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.media') }}">{{ __('messages.media_manager') }}</a></li>
-
                             </ul>
                         </li>
                     @endif

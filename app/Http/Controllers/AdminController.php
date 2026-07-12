@@ -4432,5 +4432,51 @@ class AdminController extends Controller
         return redirect()->route('admin.system_monitor')
             ->with('success', __('messages.deleted_successfully') ?? 'System cache cleared successfully.');
     }
-}
 
+    public function databaseCleanup()
+    {
+        $stateCount = \App\Models\State::count();
+        $bannerImpressionsCount = \App\Models\BannerImpression::count();
+        $seoMetricsCount = \App\Models\SeoDailyMetric::count();
+
+        return view('admin::admin.database_cleanup', compact(
+            'stateCount', 'bannerImpressionsCount', 'seoMetricsCount'
+        ));
+    }
+
+    public function databaseCleanupAction(\Illuminate\Http\Request $request)
+    {
+        $request->validate([
+            'state_days' => 'nullable|integer|min:1',
+            'banner_impressions_days' => 'nullable|integer|min:1',
+            'seo_metrics_days' => 'nullable|integer|min:1',
+        ]);
+
+        $deletedState = 0;
+        if ($request->filled('state_days')) {
+            $days = $request->input('state_days');
+            $deletedState = \App\Models\State::where('r_date', '<', time() - ($days * 86400))->delete();
+        }
+
+        $deletedBanner = 0;
+        if ($request->filled('banner_impressions_days')) {
+            $days = $request->input('banner_impressions_days');
+            $deletedBanner = \App\Models\BannerImpression::where('served_at', '<', time() - ($days * 86400))->delete();
+        }
+
+        $deletedSeo = 0;
+        if ($request->filled('seo_metrics_days')) {
+            $days = $request->input('seo_metrics_days');
+            $deletedSeo = \App\Models\SeoDailyMetric::where('metric_date', '<', now()->subDays($days)->toDateString())->delete();
+        }
+
+        $message = __('messages.database_cleanup_success', [
+            'state' => $deletedState,
+            'banner' => $deletedBanner,
+            'seo' => $deletedSeo
+        ]);
+
+        return redirect()->route('admin.database_cleanup')
+            ->with('success', $message);
+    }
+}

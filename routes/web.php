@@ -538,6 +538,8 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::post('/settings/performance', [AdminController::class, 'updatePerformanceSettings'])->name('admin.settings.performance.update');
     Route::get('/system-monitor', [AdminController::class, 'systemMonitor'])->name('admin.system_monitor');
     Route::post('/system-monitor/clear-cache', [AdminController::class, 'clearSystemCache'])->name('admin.system_monitor.clear_cache');
+    Route::get('/database-cleanup', [AdminController::class, 'databaseCleanup'])->name('admin.database_cleanup');
+    Route::post('/database-cleanup', [AdminController::class, 'databaseCleanupAction'])->name('admin.database_cleanup.action');
     Route::post('/settings/api-key/generate', [AdminController::class, 'generateApiKey'])->name('admin.settings.api_key.generate');
     Route::get('/settings/mail', [AdminMailSettingsController::class, 'index'])->name('admin.settings.mail');
     Route::post('/settings/mail', [AdminMailSettingsController::class, 'update'])->name('admin.settings.mail.update');
