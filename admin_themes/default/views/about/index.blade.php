@@ -374,31 +374,51 @@
                             <div class="timeline">
                                 <div class="timeline-item">
                                     <div class="timeline-icon"><i class="feather-box fs-12"></i></div>
-                                    <h6 class="fw-bold mb-1">v4.4.1 <span class="badge bg-soft-primary text-primary ms-2">Current</span></h6>
-                                    <p class="text-muted fs-13 mb-3">Stable release with Pin Post to Profile, BBCode URL formatting, and critical security and performance fixes.</p>
+                                    <h6 class="fw-bold mb-1">v4.4.2 <span class="badge bg-soft-primary text-primary ms-2">Current</span></h6>
+                                    <p class="text-muted fs-13 mb-3">Stable release introducing the Database Cleanup Tool and Admin UI Enhancements.</p>
                                     <div class="d-flex flex-column gap-2">
                                         <div class="d-flex align-items-start">
                                             <span class="changelog-badge badge-feature mt-1" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">Feature</span>
-                                            <span class="text-muted fs-13">Added <strong>Pin Post to Profile</strong> feature, allowing members to pin a single post to the top of their personal profile page.</span>
+                                            <span class="text-muted fs-13">Added a new <strong>Database Cleanup</strong> tool to manually prune large analytics and tracking tables.</span>
                                         </div>
                                         <div class="d-flex align-items-start">
                                             <span class="changelog-badge badge-feature mt-1" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">Feature</span>
+                                            <span class="text-muted fs-13">Reorganized the admin sidebar navigation by introducing a unified <strong>System</strong> menu.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-fix mt-1" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;">Fix</span>
+                                            <span class="text-muted fs-13">Fixed a 500 Internal Server Error on the Database Cleanup page and enforced multilingual support.</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="timeline-item">
+                                    <div class="timeline-icon" style="border-color: #6b7280; color: #6b7280;"><i class="feather-check fs-12"></i></div>
+                                    <h6 class="fw-bold mb-1 text-muted">v4.4.1</h6>
+                                    <p class="text-muted fs-13 mb-2">Stable release with Pin Post to Profile, BBCode URL formatting, and critical security and performance fixes.</p>
+                                    <div class="d-flex flex-column gap-2">
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-feature mt-1" style="background: rgba(107, 114, 128, 0.1); color: #6b7280;">Feature</span>
+                                            <span class="text-muted fs-13">Added <strong>Pin Post to Profile</strong> feature, allowing members to pin a single post to the top of their personal profile page.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-feature mt-1" style="background: rgba(107, 114, 128, 0.1); color: #6b7280;">Feature</span>
                                             <span class="text-muted fs-13">Added BBCode URL formatting support with dynamic domain blockage filtering.</span>
                                         </div>
                                         <div class="d-flex align-items-start">
-                                            <span class="changelog-badge badge-fix mt-1" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;">Fix</span>
+                                            <span class="changelog-badge badge-fix mt-1" style="background: rgba(107, 114, 128, 0.1); color: #6b7280;">Fix</span>
                                             <span class="text-muted fs-13">Fixed a 500 Internal Server Error in community feed/member profiles caused by malformed Blade directives.</span>
                                         </div>
                                         <div class="d-flex align-items-start">
-                                            <span class="changelog-badge badge-optimization mt-1" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">Performance</span>
+                                            <span class="changelog-badge badge-optimization mt-1" style="background: rgba(107, 114, 128, 0.1); color: #6b7280;">Optimization</span>
                                             <span class="text-muted fs-13">Resolved CPU consumption on ad serving endpoints by adding missing database indexes to the state table.</span>
                                         </div>
                                         <div class="d-flex align-items-start">
-                                            <span class="changelog-badge badge-fix mt-1" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;">Fix</span>
+                                            <span class="changelog-badge badge-fix mt-1" style="background: rgba(107, 114, 128, 0.1); color: #6b7280;">Fix</span>
                                             <span class="text-muted fs-13">Resolved a critical 500 error on Knowledgebase pages due to an orphaned tablespace.</span>
                                         </div>
                                         <div class="d-flex align-items-start">
-                                            <span class="changelog-badge badge-fix mt-1" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;">Security</span>
+                                            <span class="changelog-badge badge-fix mt-1" style="background: rgba(107, 114, 128, 0.1); color: #6b7280;">Security</span>
                                             <span class="text-muted fs-13">Allowed stackedit.io iframe in the Content-Security-Policy (CSP) to enable StackEdit Markdown editor.</span>
                                         </div>
                                     </div>

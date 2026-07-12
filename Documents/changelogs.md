@@ -1,5 +1,5 @@
 # v4.4.2
-> **Under Development** — Release cycle initialized.
+> **Stable Release** — Database Cleanup Tool, Admin UI Enhancements, and Bug Fixes.
 
 ### Features
 * **Admin / Database:** Added a new **Database Cleanup** tool (`/admin/database-cleanup`) to manually prune large analytics and tracking tables (`state`, `banner_impressions`, `seo_daily_metrics`) to free up disk space and improve query performance.
