@@ -17,7 +17,7 @@ class ContentFormatter
         }
 
         $value = str_replace(["\r\n", "\r"], "\n", $value);
-        $value = self::linkifyBbcodeUrl(self::linkifyMentions(self::linkifyHashtags($value)));
+        $value = self::linkifyBbcodeEmail(self::linkifyBbcodeUrl(self::linkifyMentions(self::linkifyHashtags($value))));
 
         $html = trim((string) Str::markdown($value, [
             'html_input' => 'strip',
@@ -35,7 +35,7 @@ class ContentFormatter
         }
 
         $value = str_replace(["\r\n", "\r"], "\n", $value);
-        $value = self::linkifyBbcodeUrl(self::linkifyMentions(self::linkifyHashtags($value)));
+        $value = self::linkifyBbcodeEmail(self::linkifyBbcodeUrl(self::linkifyMentions(self::linkifyHashtags($value))));
 
         $html = trim((string) Str::markdown($value, [
             'html_input' => 'allow',
@@ -123,6 +123,24 @@ class ContentFormatter
                 }
                 
                 return '[' . $anchorText . '](' . $url . ')';
+            },
+            $text
+        );
+    }
+
+    public static function linkifyBbcodeEmail(string $text): string
+    {
+        return (string) preg_replace_callback(
+            '/\[email(?:=([^\]]+))?\](.*?)\[\/email\]/is',
+            static function (array $matches): string {
+                $email = trim(!empty($matches[1]) ? $matches[1] : $matches[2]);
+                $anchorText = $matches[2];
+                
+                if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                    return $anchorText;
+                }
+                
+                return '[' . $anchorText . '](mailto:' . $email . ')';
             },
             $text
         );

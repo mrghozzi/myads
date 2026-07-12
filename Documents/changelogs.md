@@ -1,3 +1,14 @@
+# v4.4.3
+> **Development** — 
+
+### Features
+* **Community & Forum:** Added support for BBCode email formatting (`[email=...]Text[/email]`) in community posts and forum topics. The system automatically validates the email address and safely renders a `mailto:` link.
+
+### Bug Fixes
+* 
+
+---
+
 # v4.4.2
 > **Stable Release** — Database Cleanup Tool, Admin UI Enhancements, and Bug Fixes.
 
