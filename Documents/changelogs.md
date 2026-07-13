@@ -1,5 +1,5 @@
 # v4.4.3
-> **Development** — 
+> **Stable Release** — Ad Serving Performance Fix, BBCode Emails.
 
 ### Features
 * **Community & Forum:** Added support for BBCode email formatting (`[email=...]Text[/email]`) in community posts and forum topics. The system automatically validates the email address and safely renders a `mailto:` link.
