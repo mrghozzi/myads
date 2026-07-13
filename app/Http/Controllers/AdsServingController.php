@@ -22,6 +22,31 @@ use Illuminate\Support\Facades\Cache;
 
 class AdsServingController extends Controller
 {
+    private function applyTargetingConstraints($query, string $countryCode, string $deviceType, string $tableName)
+    {
+        if ($countryCode !== '') {
+            $query->where(function ($q) use ($countryCode, $tableName) {
+                $q->whereNull("$tableName.countries")
+                  ->orWhere("$tableName.countries", '')
+                  ->orWhere("$tableName.countries", '[]')
+                  ->orWhere("$tableName.countries", 'LIKE', '%"' . $countryCode . '"%')
+                  ->orWhere("$tableName.countries", 'LIKE', '%' . $countryCode . '%');
+            });
+        }
+
+        if ($deviceType !== '') {
+            $query->where(function ($q) use ($deviceType, $tableName) {
+                $q->whereNull("$tableName.devices")
+                  ->orWhere("$tableName.devices", '')
+                  ->orWhere("$tableName.devices", '[]')
+                  ->orWhere("$tableName.devices", 'LIKE', '%"' . $deviceType . '"%')
+                  ->orWhere("$tableName.devices", 'LIKE', '%' . $deviceType . '%');
+            });
+        }
+        
+        return $query;
+    }
+
     // Public: Serve Banner Script (bn.php)
     public function bannerScript(Request $request, SmartAdGeoResolver $geoResolver)
     {
@@ -79,12 +104,23 @@ class AdsServingController extends Controller
             }
         }
 
-        $candidates = $bannerQuery->get()->filter(function (Banner $candidate) use ($countryCode, $deviceType) {
-            return $this->matchesAdCandidate($candidate, $countryCode, $deviceType);
-        });
+        $this->applyTargetingConstraints($bannerQuery, $countryCode, $deviceType, 'banner');
+        $ids = $bannerQuery->pluck('banner.id')->toArray();
+        
+        $banner = null;
+        if (!empty($ids)) {
+            shuffle($ids);
+            foreach(array_slice($ids, 0, 15) as $id) {
+                $candidate = Banner::find($id);
+                if ($candidate && $this->matchesAdCandidate($candidate, $countryCode, $deviceType)) {
+                    $banner = $candidate;
+                    break;
+                }
+            }
+        }
 
         // Fallback if no fresh ads are available
-        if ($candidates->count() === 0 && BannerServingSettings::fallbackToSeenAds()) {
+        if (!$banner && BannerServingSettings::fallbackToSeenAds()) {
             $fallbackQuery = Banner::where('statu', 1)
                 ->whereIn('px', BannerSizeCatalog::queryCandidates($pxValue))
                 ->whereHas('user', function ($query) use ($user_id) {
@@ -95,12 +131,20 @@ class AdsServingController extends Controller
                 $fallbackQuery->whereNotIn('id', $recentBanners);
             }
             
-            $candidates = $fallbackQuery->get()->filter(function (Banner $candidate) use ($countryCode, $deviceType) {
-                return $this->matchesAdCandidate($candidate, $countryCode, $deviceType);
-            });
+            $this->applyTargetingConstraints($fallbackQuery, $countryCode, $deviceType, 'banner');
+            $fallbackIds = $fallbackQuery->pluck('banner.id')->toArray();
+            
+            if (!empty($fallbackIds)) {
+                shuffle($fallbackIds);
+                foreach(array_slice($fallbackIds, 0, 15) as $id) {
+                    $candidate = Banner::find($id);
+                    if ($candidate && $this->matchesAdCandidate($candidate, $countryCode, $deviceType)) {
+                        $banner = $candidate;
+                        break;
+                    }
+                }
+            }
         }
-
-        $banner = $candidates->count() > 0 ? $candidates->random() : null;
 
 
         if ($banner) {
@@ -182,23 +226,42 @@ class AdsServingController extends Controller
             });
         }
 
-        $candidates1 = $linkQuery->get()->filter(function (Link $candidate) use ($countryCode, $deviceType) {
-            return $this->matchesAdCandidate($candidate, $countryCode, $deviceType);
-        });
-
-        // Fallback if no links found due to repeat window
-        if ($candidates1->count() === 0 && $linkRepeatWindowSeconds > 0) {
-            $candidates1 = Link::where('statu', 1)
-                ->whereHas('user', function ($query) use ($user_id) {
-                    $query->where('nlink', '>=', 1)->where('id', '!=', $user_id);
-                })
-                ->get()
-                ->filter(function (Link $candidate) use ($countryCode, $deviceType) {
-                    return $this->matchesAdCandidate($candidate, $countryCode, $deviceType);
-                });
+        $this->applyTargetingConstraints($linkQuery, $countryCode, $deviceType, 'link');
+        $ids1 = $linkQuery->pluck('link.id')->toArray();
+        
+        $link1 = null;
+        if (!empty($ids1)) {
+            shuffle($ids1);
+            foreach(array_slice($ids1, 0, 15) as $id) {
+                $candidate = Link::find($id);
+                if ($candidate && $this->matchesAdCandidate($candidate, $countryCode, $deviceType)) {
+                    $link1 = $candidate;
+                    break;
+                }
+            }
         }
 
-        $link1 = $candidates1->count() > 0 ? $candidates1->random() : null;
+        // Fallback if no links found due to repeat window
+        if (!$link1 && $linkRepeatWindowSeconds > 0) {
+            $fallbackQuery1 = Link::where('statu', 1)
+                ->whereHas('user', function ($query) use ($user_id) {
+                    $query->where('nlink', '>=', 1)->where('id', '!=', $user_id);
+                });
+            
+            $this->applyTargetingConstraints($fallbackQuery1, $countryCode, $deviceType, 'link');
+            $fallbackIds1 = $fallbackQuery1->pluck('link.id')->toArray();
+            
+            if (!empty($fallbackIds1)) {
+                shuffle($fallbackIds1);
+                foreach(array_slice($fallbackIds1, 0, 15) as $id) {
+                    $candidate = Link::find($id);
+                    if ($candidate && $this->matchesAdCandidate($candidate, $countryCode, $deviceType)) {
+                        $link1 = $candidate;
+                        break;
+                    }
+                }
+            }
+        }
 
         if (!$link1) {
              return $this->javascriptResponse('// No ads available');
@@ -228,26 +291,45 @@ class AdsServingController extends Controller
             });
         }
 
-        $candidates2 = $linkQuery2->get()->filter(function (Link $candidate) use ($countryCode, $deviceType) {
-            return $this->matchesAdCandidate($candidate, $countryCode, $deviceType);
-        });
+        $this->applyTargetingConstraints($linkQuery2, $countryCode, $deviceType, 'link');
+        $ids2 = $linkQuery2->pluck('link.id')->toArray();
+        
+        $link2 = null;
+        if (!empty($ids2)) {
+            shuffle($ids2);
+            foreach(array_slice($ids2, 0, 15) as $id) {
+                $candidate = Link::find($id);
+                if ($candidate && $this->matchesAdCandidate($candidate, $countryCode, $deviceType)) {
+                    $link2 = $candidate;
+                    break;
+                }
+            }
+        }
         
         // Fallback for second link
-        if ($candidates2->count() === 0 && $linkRepeatWindowSeconds > 0) {
-            $candidates2 = Link::where('statu', 1)
+        if (!$link2 && $linkRepeatWindowSeconds > 0) {
+            $fallbackQuery2 = Link::where('statu', 1)
                 ->where('id', '!=', ($link1 ? $link1->id : 0))
                 ->whereHas('user', function ($query) use ($user_id, $link1) {
                     $query->where('nlink', '>=', 1)
                           ->where('id', '!=', $user_id)
                           ->where('id', '!=', ($link1 ? $link1->uid : 0));
-                })
-                ->get()
-                ->filter(function (Link $candidate) use ($countryCode, $deviceType) {
-                    return $this->matchesAdCandidate($candidate, $countryCode, $deviceType);
                 });
+            
+            $this->applyTargetingConstraints($fallbackQuery2, $countryCode, $deviceType, 'link');
+            $fallbackIds2 = $fallbackQuery2->pluck('link.id')->toArray();
+            
+            if (!empty($fallbackIds2)) {
+                shuffle($fallbackIds2);
+                foreach(array_slice($fallbackIds2, 0, 15) as $id) {
+                    $candidate = Link::find($id);
+                    if ($candidate && $this->matchesAdCandidate($candidate, $countryCode, $deviceType)) {
+                        $link2 = $candidate;
+                        break;
+                    }
+                }
+            }
         }
-
-        $link2 = $candidates2->count() > 0 ? $candidates2->random() : null;
 
         // If no second link found, what does old code do?
         // "if ($num_rows = $results2->fetchColumn() == 0) { } else { ... }"
@@ -263,12 +345,21 @@ class AdsServingController extends Controller
                 ->where('id', '!=', ($link1 ? $link1->id : 0))
                 ->whereHas('user', function ($query) use ($user_id) {
                     $query->where('nlink', '>=', 1)->where('id', '!=', $user_id);
-                })
-                ->get()
-                ->filter(function (Link $candidate) use ($countryCode, $deviceType) {
-                    return $this->matchesAdCandidate($candidate, $countryCode, $deviceType);
                 });
-             $link2 = $candidates3->count() > 0 ? $candidates3->random() : null;
+                
+             $this->applyTargetingConstraints($candidates3, $countryCode, $deviceType, 'link');
+             $ids3 = $candidates3->pluck('link.id')->toArray();
+             
+             if (!empty($ids3)) {
+                 shuffle($ids3);
+                 foreach(array_slice($ids3, 0, 15) as $id) {
+                     $candidate = Link::find($id);
+                     if ($candidate && $this->matchesAdCandidate($candidate, $countryCode, $deviceType)) {
+                         $link2 = $candidate;
+                         break;
+                     }
+                 }
+             }
              
              // If still nothing, use link1 again
              if (!$link2) {
@@ -489,10 +580,13 @@ class AdsServingController extends Controller
     ): ?SmartAd {
         $requiresAdvertiserCredit = !$selfOnly;
 
-        return SmartAd::with('user')
+        $query = SmartAd::with('user')
             ->where('statu', 1)
-            ->where('uid', $selfOnly ? '=' : '!=', $publisherId)
-            ->get()
+            ->where('uid', $selfOnly ? '=' : '!=', $publisherId);
+            
+        $this->applyTargetingConstraints($query, $countryCode, $deviceType, 'smart_ads');
+
+        return $query->get()
             ->filter(function (SmartAd $candidate) use ($countryCode, $deviceType, $requiresAdvertiserCredit) {
                 return $this->matchesSmartAdCandidate($candidate, $countryCode, $deviceType, $requiresAdvertiserCredit);
             })

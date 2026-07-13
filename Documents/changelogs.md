@@ -5,7 +5,7 @@
 * **Community & Forum:** Added support for BBCode email formatting (`[email=...]Text[/email]`) in community posts and forum topics. The system automatically validates the email address and safely renders a `mailto:` link.
 
 ### Bug Fixes
-* 
+* **Performance:** Resolved severe CPU and RAM consumption bottlenecks (up to 98% load) in ad serving endpoints (`bn.php`, `link.php`, `smart.php`). Pushed complex JSON targeting logic (countries and devices) directly into the database queries and used targeted ID plucking, completely eliminating the need to hydrate tens of thousands of Eloquent models into PHP memory on every ad request.
 
 ---
 
