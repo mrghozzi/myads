@@ -1,3 +1,14 @@
+# v4.4.4
+> **Stable Release** — [Short Summary of v4.4.4 changes]
+
+### Features
+* None yet.
+
+### Bug Fixes
+* None yet.
+
+---
+
 # v4.4.3
 > **Stable Release** — Ad Serving Performance Fix, BBCode Emails.
 
