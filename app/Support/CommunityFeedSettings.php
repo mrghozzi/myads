@@ -144,6 +144,9 @@ class CommunityFeedSettings
             'fresh_candidate_limit' => self::positiveInt($values['fresh_candidate_limit'] ?? $defaults['fresh_candidate_limit']),
             'rescue_candidate_limit' => self::positiveInt($values['rescue_candidate_limit'] ?? $defaults['rescue_candidate_limit']),
             'cache_ttl_seconds' => self::nonNegativeInt($values['cache_ttl_seconds'] ?? $defaults['cache_ttl_seconds']),
+            'feed_mode' => in_array($values['feed_mode'] ?? null, ['smart', 'simple'], true) ? $values['feed_mode'] : $defaults['feed_mode'],
+            'track_online_status' => (int) ($values['track_online_status'] ?? $defaults['track_online_status']),
+            'track_seo_metrics' => (int) ($values['track_seo_metrics'] ?? $defaults['track_seo_metrics']),
         ];
 
         $settings['trend_window_hours'] = max($settings['trend_window_hours'], $settings['rapid_window_hours']);
@@ -192,6 +195,9 @@ class CommunityFeedSettings
             'fresh_candidate_limit' => self::positiveInt($settings['fresh_candidate_limit'] ?? self::DEFAULTS['fresh_candidate_limit']),
             'rescue_candidate_limit' => self::positiveInt($settings['rescue_candidate_limit'] ?? self::DEFAULTS['rescue_candidate_limit']),
             'cache_ttl_seconds' => self::nonNegativeInt($settings['cache_ttl_seconds'] ?? self::DEFAULTS['cache_ttl_seconds']),
+            'feed_mode' => in_array($settings['feed_mode'] ?? null, ['smart', 'simple'], true) ? $settings['feed_mode'] : self::DEFAULTS['feed_mode'],
+            'track_online_status' => (int) ($settings['track_online_status'] ?? self::DEFAULTS['track_online_status']),
+            'track_seo_metrics' => (int) ($settings['track_seo_metrics'] ?? self::DEFAULTS['track_seo_metrics']),
         ];
     }
 
