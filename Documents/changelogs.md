@@ -18,8 +18,6 @@
 * **Feature:** Added `myads:prune-storage` Artisan command to remove expired file cache entries and stale session files. Scheduled to run daily at 03:30 alongside the database cleanup at 03:00.
 * **Feature:** Added **probabilistic storage cleanup** — expired cache files and stale session files are cleaned with 1-in-200 chance per ad request, preventing disk usage growth on shared hosting without cron.
 
-### Bug Fixes
-* None yet.
 
 ---
 
