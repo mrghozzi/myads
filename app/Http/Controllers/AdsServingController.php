@@ -9,12 +9,14 @@ use App\Models\SmartAdImpression;
 use App\Models\User;
 use App\Models\Banner;
 use App\Models\Link;
+use App\Services\DatabaseMaintenanceService;
 use App\Services\SmartAdGeoResolver;
 use App\Support\AdsSettings;
 use App\Support\BannerServingSettings;
 use App\Support\BannerSizeCatalog;
 use App\Support\SmartAdTargeting;
 use App\Support\LinkServingSettings;
+use App\Console\Commands\PruneStorageFiles;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -170,6 +172,8 @@ class AdsServingController extends Controller
 
             // Return JS to display banner (Matches old bn.php output style)
             $html = $this->renderBannerMarkup($banner, (int) $user_id, $pxValue, $placementMode, $abVersion);
+
+            $this->triggerBackgroundMaintenance();
 
             return $this->javascriptResponse($this->renderHtmlInsertionScript($html, $slotId));
         }
@@ -414,7 +418,9 @@ class AdsServingController extends Controller
         
         // Strip newlines to avoid JS errors in document.write
         $html = str_replace(["\r", "\n"], ' ', $html);
-        
+
+        $this->triggerBackgroundMaintenance();
+
         return $this->javascriptResponse($this->renderHtmlInsertionScript($html, $slotId));
     }
 
@@ -468,6 +474,8 @@ class AdsServingController extends Controller
         }
 
         $html = $this->renderSmartMarkup($smartAd, $publisherId, $placement, $slot['banner_size']);
+
+        $this->triggerBackgroundMaintenance();
 
         return $this->javascriptResponse($this->renderHtmlInsertionScript($html, $slotId));
     }
@@ -580,31 +588,61 @@ class AdsServingController extends Controller
     ): ?SmartAd {
         $requiresAdvertiserCredit = !$selfOnly;
 
-        $query = SmartAd::with('user')
-            ->where('statu', 1)
+        $query = SmartAd::where('statu', 1)
             ->where('uid', $selfOnly ? '=' : '!=', $publisherId);
-            
+
+        if ($requiresAdvertiserCredit) {
+            $query->whereHas('user', function ($q) {
+                $q->where('nsmart', '>=', 1);
+            });
+        }
+
         $this->applyTargetingConstraints($query, $countryCode, $deviceType, 'smart_ads');
 
-        return $query->get()
+        // Pluck IDs instead of hydrating all models into memory (v4.4.4 perf fix)
+        $ids = $query->pluck('smart_ads.id')->toArray();
+
+        if ($ids === []) {
+            return null;
+        }
+
+        // Load a limited batch of candidates for context scoring
+        $batchSize = min(30, count($ids));
+        shuffle($ids);
+        $candidateIds = array_slice($ids, 0, $batchSize);
+
+        $candidates = SmartAd::with('user')
+            ->whereIn('id', $candidateIds)
+            ->get()
             ->filter(function (SmartAd $candidate) use ($countryCode, $deviceType, $requiresAdvertiserCredit) {
                 return $this->matchesSmartAdCandidate($candidate, $countryCode, $deviceType, $requiresAdvertiserCredit);
-            })
-            ->map(function (SmartAd $candidate) use ($contextTokens) {
-                return [
-                    'ad' => $candidate,
-                    'score' => $this->scoreSmartAd($candidate, $contextTokens),
-                    'tie' => random_int(0, 100000),
-                ];
-            })
-            ->sort(function (array $left, array $right) {
-                if ($left['score'] === $right['score']) {
-                    return $right['tie'] <=> $left['tie'];
-                }
+            });
 
-                return $right['score'] <=> $left['score'];
-            })
-            ->first()['ad'] ?? null;
+        if ($candidates->isEmpty()) {
+            return null;
+        }
+
+        // If context tokens are provided, score and sort
+        if ($contextTokens !== []) {
+            return $candidates
+                ->map(function (SmartAd $candidate) use ($contextTokens) {
+                    return [
+                        'ad' => $candidate,
+                        'score' => $this->scoreSmartAd($candidate, $contextTokens),
+                        'tie' => random_int(0, 100000),
+                    ];
+                })
+                ->sort(function (array $left, array $right) {
+                    if ($left['score'] === $right['score']) {
+                        return $right['tie'] <=> $left['tie'];
+                    }
+                    return $right['score'] <=> $left['score'];
+                })
+                ->first()['ad'] ?? null;
+        }
+
+        // No context — return random candidate
+        return $candidates->random();
     }
 
     private function matchesAdCandidate(
@@ -658,7 +696,16 @@ class AdsServingController extends Controller
 
     private function logState($sid, $pid, $type, $request)
     {
-        // Using DB facade as State model might not exist or table 'state' is used directly
+        // Rate-limit state logging: skip if same IP+type+pid was logged within 10 seconds
+        $ip = $request->ip();
+        $rateLimitKey = 'state_log:' . md5($ip . '|' . $type . '|' . $pid);
+
+        if (Cache::has($rateLimitKey)) {
+            return;
+        }
+
+        Cache::put($rateLimitKey, 1, 10); // 10-second cooldown
+
         DB::table('state')->insert([
             'sid' => $sid,
             'pid' => $pid,
@@ -666,8 +713,21 @@ class AdsServingController extends Controller
             'r_link' => $request->server('HTTP_REFERER') ?? 'N',
             'r_date' => time(),
             'visitor_Agent' => $request->server('HTTP_USER_AGENT'),
-            'v_ip' => $request->ip(),
+            'v_ip' => $ip,
         ]);
+    }
+
+    /**
+     * Probabilistic background maintenance — 1% chance per ad request.
+     * Cleans up old database records and expired storage files.
+     */
+    private function triggerBackgroundMaintenance(): void
+    {
+        if (DatabaseMaintenanceService::isAutoCleanupEnabled()) {
+            DatabaseMaintenanceService::maybePrune();
+        }
+
+        PruneStorageFiles::maybePrune();
     }
 
     private function resolveVisitorKey(Request $request): string

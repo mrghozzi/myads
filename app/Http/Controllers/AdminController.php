@@ -4439,8 +4439,19 @@ class AdminController extends Controller
         $bannerImpressionsCount = \App\Models\BannerImpression::count();
         $seoMetricsCount = \App\Models\SeoDailyMetric::count();
 
+        // v4.4.4: Enhanced table size reporting
+        $tableSizes = \App\Services\DatabaseMaintenanceService::tableSizes();
+        $retentionDays = \App\Services\DatabaseMaintenanceService::retentionDays();
+        $autoCleanupEnabled = \App\Services\DatabaseMaintenanceService::isAutoCleanupEnabled();
+
+        // Storage info
+        $cacheSize = $this->getDirectorySizeMB(storage_path('framework/cache/data'));
+        $sessionSize = $this->getDirectorySizeMB(storage_path('framework/sessions'));
+
         return view('admin::admin.database_cleanup', compact(
-            'stateCount', 'bannerImpressionsCount', 'seoMetricsCount'
+            'stateCount', 'bannerImpressionsCount', 'seoMetricsCount',
+            'tableSizes', 'retentionDays', 'autoCleanupEnabled',
+            'cacheSize', 'sessionSize'
         ));
     }
 
@@ -4451,6 +4462,43 @@ class AdminController extends Controller
             'banner_impressions_days' => 'nullable|integer|min:1',
             'seo_metrics_days' => 'nullable|integer|min:1',
         ]);
+
+        // v4.4.4: Handle auto-cleanup settings
+        if ($request->has('save_settings')) {
+            $settingsMap = [
+                'db_auto_cleanup_enabled' => $request->boolean('auto_cleanup_enabled') ? '1' : '0',
+                'db_retention_state' => max(1, (int) $request->input('retention_state', 14)),
+                'db_retention_banner_impressions' => max(1, (int) $request->input('retention_banner_impressions', 30)),
+                'db_retention_smart_ad_impressions' => max(1, (int) $request->input('retention_smart_ad_impressions', 30)),
+                'db_retention_seo_daily_metrics' => max(1, (int) $request->input('retention_seo_daily_metrics', 90)),
+                'db_retention_custom_ad_events' => max(1, (int) $request->input('retention_custom_ad_events', 60)),
+            ];
+
+            foreach ($settingsMap as $key => $value) {
+                \Illuminate\Support\Facades\DB::table('options')->updateOrInsert(
+                    ['o_name' => $key],
+                    ['o_value' => (string) $value]
+                );
+            }
+
+            return redirect()->route('admin.database_cleanup')
+                ->with('success', __('messages.settings_updated') ?? 'Auto-cleanup settings saved.');
+        }
+
+        // v4.4.4: Handle storage cleanup
+        if ($request->has('prune_cache')) {
+            \Illuminate\Support\Facades\Artisan::call('myads:prune-storage', ['--cache' => true]);
+
+            return redirect()->route('admin.database_cleanup')
+                ->with('success', __('messages.cache_cleared') ?? 'Expired cache files pruned.');
+        }
+
+        if ($request->has('prune_sessions')) {
+            \Illuminate\Support\Facades\Artisan::call('myads:prune-storage', ['--sessions' => true]);
+
+            return redirect()->route('admin.database_cleanup')
+                ->with('success', __('messages.cache_cleared') ?? 'Stale session files pruned.');
+        }
 
         $deletedState = 0;
         if ($request->filled('state_days')) {
@@ -4478,5 +4526,33 @@ class AdminController extends Controller
 
         return redirect()->route('admin.database_cleanup')
             ->with('success', $message);
+    }
+
+    /**
+     * Get directory size in MB (for storage reporting).
+     */
+    private function getDirectorySizeMB(string $path): float
+    {
+        if (!is_dir($path)) {
+            return 0.0;
+        }
+
+        $totalBytes = 0;
+
+        try {
+            $iterator = new \RecursiveIteratorIterator(
+                new \RecursiveDirectoryIterator($path, \FilesystemIterator::SKIP_DOTS)
+            );
+
+            foreach ($iterator as $file) {
+                if ($file->isFile()) {
+                    $totalBytes += $file->getSize();
+                }
+            }
+        } catch (\Throwable) {
+            return 0.0;
+        }
+
+        return round($totalBytes / 1024 / 1024, 2);
     }
 }

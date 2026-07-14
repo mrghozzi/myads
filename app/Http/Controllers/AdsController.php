@@ -651,6 +651,16 @@ class AdsController extends Controller
 
     private function logState($sid, $pid, $type, $request)
     {
+        // Rate-limit state logging: skip if same IP+type+pid was logged within 10 seconds
+        $ip = $request->ip();
+        $rateLimitKey = 'state_log:' . md5($ip . '|' . $type . '|' . $pid);
+
+        if (Cache::has($rateLimitKey)) {
+            return;
+        }
+
+        Cache::put($rateLimitKey, 1, 10); // 10-second cooldown
+
         DB::table('state')->insert([
             'sid' => $sid,
             'pid' => $pid,
@@ -658,7 +668,7 @@ class AdsController extends Controller
             'r_link' => $request->server('HTTP_REFERER') ?? 'N',
             'r_date' => time(),
             'visitor_Agent' => $request->server('HTTP_USER_AGENT'),
-            'v_ip' => $request->ip(),
+            'v_ip' => $ip,
         ]);
     }
 

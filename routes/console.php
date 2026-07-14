@@ -15,3 +15,7 @@ Schedule::call(function () {
 Schedule::command('myads:archive-impressions')->daily();
 Schedule::command('myads:custom-ads-settle')->dailyAt('00:20');
 Schedule::command('blocks:process-expired')->hourly();
+
+// v4.4.4: Automated database and storage maintenance
+Schedule::command('myads:db-cleanup --force')->dailyAt('03:00');
+Schedule::command('myads:prune-storage')->dailyAt('03:30');

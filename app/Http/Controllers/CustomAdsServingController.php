@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\CustomAdCreative;
 use App\Models\CustomAdPlacement;
 use App\Services\CustomAds\CustomAdServingService;
+use App\Services\DatabaseMaintenanceService;
 use App\Services\SmartAdGeoResolver;
 use App\Support\CustomAdsSettings;
 use App\Support\SmartAdTargeting;
+use App\Console\Commands\PruneStorageFiles;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
 
@@ -55,6 +57,8 @@ class CustomAdsServingController extends Controller
         }
 
         $serving->recordImpression($placement, $deal, $deal->creative, $request, $countryCode, $deviceType);
+
+        $this->triggerBackgroundMaintenance();
 
         return $this->javascriptResponse($serving->renderInsertionScript(
             $serving->renderMarkup($placement, $deal->creative),
@@ -133,5 +137,17 @@ class CustomAdsServingController extends Controller
         } catch (\Throwable) {
             return false;
         }
+    }
+
+    /**
+     * Probabilistic background maintenance — 1% chance per ad request.
+     */
+    private function triggerBackgroundMaintenance(): void
+    {
+        if (DatabaseMaintenanceService::isAutoCleanupEnabled()) {
+            DatabaseMaintenanceService::maybePrune();
+        }
+
+        PruneStorageFiles::maybePrune();
     }
 }

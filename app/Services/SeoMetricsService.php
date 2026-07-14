@@ -23,7 +23,13 @@ class SeoMetricsService
 {
     public function canTrack(): bool
     {
-        return Schema::hasTable('seo_daily_metrics');
+        static $result;
+
+        if ($result !== null) {
+            return $result;
+        }
+
+        return $result = Schema::hasTable('seo_daily_metrics');
     }
 
     public function record(Request $request, Response $response, array $context, ?string $scopeKey = null): void
@@ -55,6 +61,13 @@ class SeoMetricsService
         if ($this->isPrivateScope($scopeKey)) {
             return;
         }
+
+        // Rate-limit: only record once per IP+scope per 60 seconds to reduce DB writes
+        $rateLimitKey = 'seo_rec:' . md5((string) $request->ip() . '|' . $scopeKey);
+        if (Cache::has($rateLimitKey)) {
+            return;
+        }
+        Cache::put($rateLimitKey, 1, 60);
 
         $metricDate = now()->toDateString();
         $contentTypeKey = $context['content_type'] ?? null;
