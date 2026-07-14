@@ -3629,5 +3629,16 @@ return [
     'points_services' => 'Points Services',
     'yt_exchange_title' => 'YouTube Views Exchange',
     'watch_videos' => 'Watch Videos',
+    
+    // Performance Settings Toggles
+    'resource_heavy_features' => 'Resource-Heavy Features (Shared Hosting)',
+    'community_feed_mode' => 'Community Feed Mode (/portal)',
+    'feed_mode_smart' => 'Smart Ranked Feed (Algorithm based on views, reactions, etc)',
+    'feed_mode_simple' => 'Simple Chronological Feed (Lightweight, newest first)',
+    'community_feed_mode_desc' => 'Choose "Simple Chronological" if your server cannot handle the smart ranking engine.',
+    'track_online_status' => 'Track User Online Status',
+    'track_online_status_desc' => 'If disabled, users will not appear "online" and it will save a massive amount of database UPDATE queries per click.',
+    'track_seo_metrics' => 'Track SEO Daily Metrics',
+    'track_seo_metrics_desc' => 'If disabled, the SEO engine will not log daily visits to pages, reducing database INSERTs.',
 ];
 

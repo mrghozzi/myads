@@ -42,7 +42,37 @@
 
             <form action="{{ route('admin.settings.performance.update') }}" method="POST" class="row g-4">
                 @csrf
-                <div class="col-12"><h3 class="h5 mb-0 text-primary"><i class="feather-zap me-2"></i>{{ __('messages.cache_and_generation') ?? 'Cache & Generation' }}</h3></div>
+                
+                <div class="col-12"><h3 class="h5 mb-0 text-primary"><i class="feather-server me-2"></i>{{ __('messages.resource_heavy_features') ?? 'Resource-Heavy Features (Shared Hosting)' }}</h3></div>
+                
+                <div class="col-lg-12">
+                    <label class="form-label fw-bold">{{ __('messages.community_feed_mode') ?? 'Community Feed Mode (/portal)' }}</label>
+                    <select name="feed_mode" class="form-select">
+                        <option value="smart" {{ ($settings['feed_mode'] ?? 'smart') === 'smart' ? 'selected' : '' }}>{{ __('messages.feed_mode_smart') ?? 'Smart Ranked Feed (Algorithm based on views, reactions, etc)' }}</option>
+                        <option value="simple" {{ ($settings['feed_mode'] ?? 'smart') === 'simple' ? 'selected' : '' }}>{{ __('messages.feed_mode_simple') ?? 'Simple Chronological Feed (Lightweight, newest first)' }}</option>
+                    </select>
+                    <div class="small text-muted mt-1">{{ __('messages.community_feed_mode_desc') ?? 'Choose "Simple Chronological" if your server cannot handle the smart ranking engine.' }}</div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="form-check form-switch mt-2">
+                        <input class="form-check-input" type="checkbox" role="switch" name="track_online_status" id="track_online_status" value="1" {{ ($settings['track_online_status'] ?? 1) ? 'checked' : '' }}>
+                        <label class="form-check-label fw-bold" for="track_online_status">{{ __('messages.track_online_status') ?? 'Track User Online Status' }}</label>
+                    </div>
+                    <div class="small text-muted mt-1">{{ __('messages.track_online_status_desc') ?? 'If disabled, users will not appear "online" and it will save a massive amount of database UPDATE queries per click.' }}</div>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="form-check form-switch mt-2">
+                        <input class="form-check-input" type="checkbox" role="switch" name="track_seo_metrics" id="track_seo_metrics" value="1" {{ ($settings['track_seo_metrics'] ?? 1) ? 'checked' : '' }}>
+                        <label class="form-check-label fw-bold" for="track_seo_metrics">{{ __('messages.track_seo_metrics') ?? 'Track SEO Daily Metrics' }}</label>
+                    </div>
+                    <div class="small text-muted mt-1">{{ __('messages.track_seo_metrics_desc') ?? 'If disabled, the SEO engine will not log daily visits to pages, reducing database INSERTs.' }}</div>
+                </div>
+
+                <div class="col-12"><hr class="my-2"></div>
+
+                <div class="col-12"><h3 class="h5 mb-0 text-primary"><i class="feather-zap me-2"></i>{{ __('messages.cache_and_generation') ?? 'Smart Feed Cache & Generation' }}</h3></div>
                 <div class="col-lg-6">
                     <label class="form-label fw-bold">{{ __('messages.feed_cache_ttl') ?? 'Feed Cache TTL (Seconds)' }}</label>
                     <input type="number" name="cache_ttl_seconds" class="form-control" value="{{ $settings['cache_ttl_seconds'] ?? 300 }}">

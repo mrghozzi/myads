@@ -26,6 +26,11 @@ class TrackSeoMetrics
         }
 
         try {
+            $settings = \App\Support\CommunityFeedSettings::all();
+            if (empty($settings['track_seo_metrics'])) {
+                return $response;
+            }
+
             $this->seoManager->resolve($request);
 
             $this->metrics->record(

@@ -26,21 +26,37 @@ class FeedService
     public static function getRankedFeed(?int $userId, int $page = 1, int $perPage = 20): LengthAwarePaginator
     {
         $settings = CommunityFeedSettings::all();
-        $ttl = (int) ($settings['cache_ttl_seconds'] ?? 300);
-        $cacheKey = 'community_feed:' . self::CACHE_VERSION . ':' . ($userId ?: 'guest') . ':' . CommunityFeedSettings::signature();
-
-        if ($ttl > 0) {
-            $cacheKey .= ':' . floor(time() / max(1, $ttl));
-            $ranked = Cache::remember($cacheKey, $ttl, function () use ($userId, $settings) {
-                return self::buildRankedCollection($userId, $settings);
-            });
+        
+        // Simple Chronological Feed Mode (Bypass Smart Algorithm)
+        if (($settings['feed_mode'] ?? 'smart') === 'simple') {
+            $schema = app(V420SchemaService::class);
+            $hiddenDirectoryStatusIds = self::hiddenDirectoryStatusIds($schema);
+            
+            $paginator = self::baseVisibleStatusQuery($hiddenDirectoryStatusIds, time())
+                ->orderBy('date', 'desc')
+                ->paginate($perPage, ['*'], 'page', $page);
+                
+            $total = $paginator->total();
+            $organicItems = $paginator->getCollection();
+            $items = $organicItems;
         } else {
-            $ranked = self::buildRankedCollection($userId, $settings);
-        }
+            // Smart Feed Mode
+            $ttl = (int) ($settings['cache_ttl_seconds'] ?? 300);
+            $cacheKey = 'community_feed:' . self::CACHE_VERSION . ':' . ($userId ?: 'guest') . ':' . CommunityFeedSettings::signature();
 
-        $total = $ranked->count();
-        $organicItems = $ranked->forPage($page, $perPage)->values();
-        $items = $organicItems;
+            if ($ttl > 0) {
+                $cacheKey .= ':' . floor(time() / max(1, $ttl));
+                $ranked = Cache::remember($cacheKey, $ttl, function () use ($userId, $settings) {
+                    return self::buildRankedCollection($userId, $settings);
+                });
+            } else {
+                $ranked = self::buildRankedCollection($userId, $settings);
+            }
+
+            $total = $ranked->count();
+            $organicItems = $ranked->forPage($page, $perPage)->values();
+            $items = $organicItems;
+        }
 
         $request = request();
         if (

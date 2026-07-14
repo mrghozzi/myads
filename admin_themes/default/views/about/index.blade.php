@@ -374,15 +374,39 @@
                             <div class="timeline">
                                 <div class="timeline-item">
                                     <div class="timeline-icon"><i class="feather-box fs-12"></i></div>
-                                    <h6 class="fw-bold mb-1">v4.4.3 <span class="badge bg-soft-primary text-primary ms-2">Current</span></h6>
-                                    <p class="text-muted fs-13 mb-3">Stable release with Ad Serving Performance Fix and BBCode Emails.</p>
+                                    <h6 class="fw-bold mb-1">v4.4.4 <span class="badge bg-soft-primary text-primary ms-2">Current</span></h6>
+                                    <p class="text-muted fs-13 mb-3">Stable release with Automated Database Maintenance, Smart Ads Memory Fix, and Performance Toggles.</p>
                                     <div class="d-flex flex-column gap-2">
                                         <div class="d-flex align-items-start">
-                                            <span class="changelog-badge badge-feature mt-1" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">Feature</span>
-                                            <span class="text-muted fs-13">Added support for BBCode email formatting (<code>[email=...]</code>) in community posts and forum topics.</span>
+                                            <span class="changelog-badge badge-optimization mt-1" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">Optimization</span>
+                                            <span class="text-muted fs-13">Introduced <strong>Automated Database Maintenance</strong> with probabilistic garbage collection that prunes old records on shared hosting without cron.</span>
                                         </div>
                                         <div class="d-flex align-items-start">
                                             <span class="changelog-badge badge-optimization mt-1" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">Optimization</span>
+                                            <span class="text-muted fs-13">Resolved a severe memory leak in Smart Ads by replacing eager-loading with ID plucking and batch limits.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-optimization mt-1" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">Optimization</span>
+                                            <span class="text-muted fs-13">Introduced a <strong>Simple Chronological Feed Mode</strong> for the community portal, reducing CPU usage by over 90% for shared hosting.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-feature mt-1" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">Feature</span>
+                                            <span class="text-muted fs-13">Added <strong>Resource-Heavy Features</strong> toggles to disable User Online Status and SEO Daily Metrics tracking.</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="timeline-item">
+                                    <div class="timeline-icon" style="border-color: #6b7280; color: #6b7280;"><i class="feather-check fs-12"></i></div>
+                                    <h6 class="fw-bold mb-1 text-muted">v4.4.3</h6>
+                                    <p class="text-muted fs-13 mb-2">Stable release with Ad Serving Performance Fix and BBCode Emails.</p>
+                                    <div class="d-flex flex-column gap-2">
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-feature mt-1" style="background: rgba(107, 114, 128, 0.1); color: #6b7280;">Feature</span>
+                                            <span class="text-muted fs-13">Added support for BBCode email formatting (<code>[email=...]</code>) in community posts and forum topics.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-optimization mt-1" style="background: rgba(107, 114, 128, 0.1); color: #6b7280;">Optimization</span>
                                             <span class="text-muted fs-13">Resolved severe CPU and RAM consumption bottlenecks in ad serving endpoints using direct database JSON targeting.</span>
                                         </div>
                                     </div>

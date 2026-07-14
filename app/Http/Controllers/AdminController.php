@@ -4377,7 +4377,15 @@ class AdminController extends Controller
             'rescue_min_recent_reactions' => 'required|integer|min:0',
             'rescue_min_recent_comments' => 'required|integer|min:0',
             'rescue_min_recent_reposts' => 'required|integer|min:0',
+            'feed_mode' => 'nullable|string|in:smart,simple',
+            'track_online_status' => 'nullable|boolean',
+            'track_seo_metrics' => 'nullable|boolean',
         ]);
+
+        // Fallbacks for booleans if unchecked
+        $validated['track_online_status'] = $request->has('track_online_status') ? 1 : 0;
+        $validated['track_seo_metrics'] = $request->has('track_seo_metrics') ? 1 : 0;
+        $validated['feed_mode'] = $validated['feed_mode'] ?? 'smart';
 
         \App\Support\CommunityFeedSettings::save($validated);
         \App\Support\CommunityFeedSettings::clearCache();

@@ -40,6 +40,9 @@ class CommunityFeedSettings
         'fresh_candidate_limit' => 350,
         'rescue_candidate_limit' => 200,
         'cache_ttl_seconds' => 300,
+        'feed_mode' => 'smart', // 'smart' or 'simple'
+        'track_online_status' => 1,
+        'track_seo_metrics' => 1,
     ];
 
     private static ?array $cached = null;

@@ -17,6 +17,11 @@ class UpdateUserOnline
         }
 
         try {
+            $settings = \App\Support\CommunityFeedSettings::all();
+            if (empty($settings['track_online_status'])) {
+                return $next($request);
+            }
+
             if (Auth::check()) {
                 $userId = Auth::id();
                 $currentTime = time();

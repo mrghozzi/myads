@@ -8,8 +8,11 @@
 * **Performance:** Added **rate limiting to `SeoMetricsService::record()`**. SEO metric recordings are now limited to once per IP+scope per 60 seconds, preventing 2+ database queries on every single page view.
 * **Performance:** Added **cross-request caching to `V420SchemaService::hasTable()`** with a 5-minute TTL. Previously, `Schema::hasTable()` (which executes `SHOW TABLES LIKE '...'`) was called 35+ times per request across service providers, middleware, and controllers. Now cached via file cache across request boundaries.
 * **Performance:** Added **static caching to `SeoMetricsService::canTrack()`** to avoid redundant `Schema::hasTable()` calls within the same request.
+* **Performance:** Introduced a **Simple Chronological Feed Mode** for the community `/portal` as an alternative to the Smart Ranked algorithm. Can reduce CPU and memory usage by over 90% on shared hosting environments.
+* **Performance:** Added admin toggles to **disable User Online Status tracking** and **disable SEO Daily Metrics tracking**, drastically reducing database `UPDATE` and `INSERT` queries on high-traffic sites.
 
 ### Admin / System
+* **Feature:** Added a new **Resource-Heavy Features** section in Performance Settings to manage the new feed mode and tracking toggles specifically designed for shared and free hosting plans.
 * **Feature:** Enhanced the **Database Cleanup** admin page (`/admin/database-cleanup`) with real-time table sizes in MB, row counts for all 5 tracked tables, configurable retention periods per table, auto-cleanup toggle, and buttons for pruning expired cache and stale session files.
 * **Feature:** Added `myads:db-cleanup` Artisan command for manual or scheduled database maintenance with before/after size reporting.
 * **Feature:** Added `myads:prune-storage` Artisan command to remove expired file cache entries and stale session files. Scheduled to run daily at 03:30 alongside the database cleanup at 03:00.
