@@ -1,4 +1,4 @@
-# MYADS v4.4.1
+# MYADS v4.4.4
 
 Advanced Laravel-based social networking and ad exchange platform for website owners.
 
@@ -55,7 +55,7 @@ Core areas include:
 - Dedicated PTS Activities monitoring dashboard
 - Plugin and theme management
 - SEO dashboard and indexing tools
-- Maintenance mode and updater workflows
+- Maintenance mode, database cleanup, and updater workflows
 - Security dashboard for IP bans and member sessions
 - Custom Ads administration for placements, deals, creative review, settlement limits, and marketplace settings
 - Billing workspace for:
@@ -212,7 +212,7 @@ To learn how to connect the app with your MYADS website, please read the [Mobile
 
 Current platform direction includes:
 
-- Continued platform polish for v4.3.x
+- Continued platform polish for v4.4.x
 - Expansion of billing and monetization tooling
 - More Custom Ads targeting, reporting, and moderation capabilities
 - More API coverage
