@@ -38,22 +38,33 @@ class V420SchemaService
             return $this->tableCache[$table];
         }
 
-        // Cross-request cache layer (5 minutes) to avoid SHOW TABLES on every request
-        $cacheKey = 'schema_has_table:' . $table;
-        $cached = \Illuminate\Support\Facades\Cache::get($cacheKey);
-        if ($cached !== null) {
-            return $this->tableCache[$table] = ($cached === 'yes');
+        // Cross-request cache layer (5 minutes) to avoid SHOW TABLES on every request.
+        // Skipped during testing because tests may drop/recreate tables dynamically.
+        $useFileCache = !app()->runningUnitTests();
+
+        if ($useFileCache) {
+            $cacheKey = 'schema_has_table:' . $table;
+            $cached = \Illuminate\Support\Facades\Cache::get($cacheKey);
+            if ($cached !== null) {
+                return $this->tableCache[$table] = ($cached === 'yes');
+            }
         }
 
         try {
             $exists = Schema::hasTable($table);
             $this->tableCache[$table] = $exists;
-            \Illuminate\Support\Facades\Cache::put($cacheKey, $exists ? 'yes' : 'no', 300); // 5 min
+
+            if ($useFileCache) {
+                \Illuminate\Support\Facades\Cache::put($cacheKey ?? '', $exists ? 'yes' : 'no', 300);
+            }
 
             return $exists;
         } catch (\Throwable) {
             $this->tableCache[$table] = false;
-            \Illuminate\Support\Facades\Cache::put($cacheKey, 'no', 60); // 1 min on failure
+
+            if ($useFileCache) {
+                \Illuminate\Support\Facades\Cache::put($cacheKey ?? '', 'no', 60);
+            }
 
             return false;
         }
