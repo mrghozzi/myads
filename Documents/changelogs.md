@@ -1,3 +1,14 @@
+# v4.4.5
+> **Stable Release** — 
+
+### Features
+* **Feature:** ...
+
+### Bug Fixes
+* **Fix:** ...
+
+---
+
 # v4.4.4
 > **Stable Release** — Critical Performance & Resource Optimization, Automated Database Maintenance, Smart Ads Memory Fix.
 
