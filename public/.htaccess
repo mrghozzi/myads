@@ -5,7 +5,11 @@
 
     RewriteEngine On
 
-    # Handle Authorization Header
+    # Handle Authorization Header (for various shared hosts / LiteSpeed / FastCGI)
+    SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1
+    <IfModule mod_env.c>
+        CGIPassAuth On
+    </IfModule>
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
 
