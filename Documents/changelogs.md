@@ -5,7 +5,7 @@
 * **Feature:** ...
 
 ### Bug Fixes
-* **Fix:** ...
+* **Fix (Mobile API):** Added `X-Authorization` header support in `index.php` as a fallback mechanism to prevent `401 Unauthenticated` errors on shared hosts (LiteSpeed/FastCGI/cPanel) that aggressively strip the standard `Authorization: Bearer` header.
 
 ---
 

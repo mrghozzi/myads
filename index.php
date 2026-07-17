@@ -34,6 +34,11 @@ foreach ([
 // Register the Composer autoloader...
 require __DIR__.'/vendor/autoload.php';
 
+// Fix for Shared Hosts dropping the Authorization Header
+if (isset($_SERVER['HTTP_X_AUTHORIZATION'])) {
+    $_SERVER['HTTP_AUTHORIZATION'] = $_SERVER['HTTP_X_AUTHORIZATION'];
+}
+
 // Bootstrap Laravel and handle the request...
 (require_once __DIR__.'/bootstrap/app.php')
     ->handleRequest(Request::capture());

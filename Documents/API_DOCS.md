@@ -21,7 +21,7 @@ All mobile API requests require a two-layer authentication:
 **Login Endpoint:** `POST /api/login`  
 **Payload:** `{"login": "username_or_email", "password": "..."}`  
 **Header (Login):** `X-API-KEY: {YOUR_GLOBAL_API_KEY}`  
-**Header (Subsequent Requests):** `Authorization: Bearer {token}` along with `X-API-KEY: {YOUR_GLOBAL_API_KEY}`
+**Header (Subsequent Requests):** `Authorization: Bearer {token}` along with `X-API-KEY: {YOUR_GLOBAL_API_KEY}`. *(Note: You may also send `X-Authorization: Bearer {token}` as a fallback for shared hosts that strip the standard Authorization header).*
 
 ### Rate Limiting
 Public API endpoints are rate-limited per IP to prevent brute-force attacks:
