@@ -1,6 +1,6 @@
 # API Documentation
 
-> **Note:** The MYADS v4.3 REST API is currently in **Beta**. It now supports both Internal Authentication (Sanctum) and Third-Party Authorization (OAuth2).
+> **Note:** The MYADS v4.4.5 REST API is currently in **Beta**. It now supports both Internal Authentication (Sanctum) and Third-Party Authorization (OAuth2).
 
 The REST API allows external applications and third-party developers to interface with the MYADS core, authenticate users, retrieve content, and perform actions on behalf of users.
 
