@@ -68,4 +68,54 @@ class ForumApiController extends Controller
 
         return new ForumTopicResource($topic);
     }
+
+    public function storeTopic(Request $request, $categoryId)
+    {
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'content' => 'required|string|min:10',
+        ]);
+
+        $category = ForumCategory::findOrFail($categoryId);
+        
+        if ($category->visibility !== 'public' && $category->visibility !== null && $category->visibility !== '') {
+            if (!Auth::user() || !Auth::user()->isAdmin()) {
+                return response()->json(['error' => 'Unauthorized'], 403);
+            }
+        }
+
+        $topic = ForumTopic::create([
+            'id_cat' => $categoryId,
+            'uid' => Auth::id(),
+            'name' => $request->title,
+            'txt' => $request->content,
+            'date' => time(),
+            'statu' => 1,
+            'ep' => 0
+        ]);
+
+        app(\App\Services\GamificationService::class)->recordEvent(Auth::id(), 'forum_topic_created');
+
+        return response()->json(['success' => true, 'message' => __('messages.topic_created_successfully'), 'data' => new ForumTopicResource($topic)]);
+    }
+
+    public function storeReply(Request $request, $topicId)
+    {
+        $request->validate([
+            'content' => 'required|string|min:2',
+        ]);
+
+        $topic = ForumTopic::findOrFail($topicId);
+
+        $reply = \App\Models\ForumComment::create([
+            'tid' => $topicId,
+            'uid' => Auth::id(),
+            'txt' => $request->content,
+            'date' => time(),
+        ]);
+
+        app(\App\Services\GamificationService::class)->recordEvent(Auth::id(), 'forum_reply_created');
+
+        return response()->json(['success' => true, 'message' => __('messages.reply_added_successfully')]);
+    }
 }

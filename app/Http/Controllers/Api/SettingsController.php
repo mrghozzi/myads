@@ -324,4 +324,20 @@ class SettingsController extends Controller
 
         return response()->json(['blocks' => $blocks]);
     }
+
+    public function updateDeviceToken(Request $request)
+    {
+        $request->validate([
+            'token' => ['required', 'string', 'max:500'],
+        ]);
+
+        $user = Auth::user();
+        
+        \App\Models\Option::updateOrCreate(
+            ['o_type' => 'fcm_token', 'o_parent' => $user->id],
+            ['o_valuer' => $request->input('token'), 'name' => 'FCM Device Token', 'o_order' => 0]
+        );
+
+        return response()->json(['success' => true, 'message' => 'Device token updated']);
+    }
 }

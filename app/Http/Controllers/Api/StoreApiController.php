@@ -32,4 +32,22 @@ class StoreApiController extends Controller
 
         return new ProductResource($product);
     }
+
+    public function knowledgebase($id)
+    {
+        $product = Product::findOrFail($id);
+
+        $articles = \App\Models\Option::where('o_type', 'knowledgebase')
+            ->where('o_mode', $product->name)
+            ->where('o_order', 0)
+            ->with('kbCategory')
+            ->orderByDesc('updated_at')
+            ->orderByDesc('id')
+            ->paginate(15);
+
+        return response()->json([
+            'success' => true,
+            'data' => $articles
+        ]);
+    }
 }

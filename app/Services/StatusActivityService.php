@@ -155,6 +155,12 @@ class StatusActivityService
 
     public function decorateMany(iterable $activities): void
     {
+        if (is_object($activities) && method_exists($activities, 'getCollection')) {
+            $activities = $activities->getCollection();
+        } elseif (is_object($activities) && method_exists($activities, 'items')) {
+            $activities = collect($activities->items());
+        }
+
         $activities = collect($activities);
         if ($activities->isEmpty()) {
             return;

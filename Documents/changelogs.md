@@ -1,11 +1,12 @@
 # v4.4.5
-> **Stable Release** — 
+> **Stable Release** — Mobile API Community Feed Enhancements & Authorization Fixes.
 
 ### Features
-* **Feature:** ...
+* **Mobile API**: Enhanced the `PortalController` and `StatusActivityService` to properly handle and serialize `LengthAwarePaginator` objects, allowing eager-loaded relationships to be delivered in paginated API endpoints.
 
 ### Bug Fixes
 * **Fix (Mobile API):** Added `X-Authorization` header support in `index.php` as a fallback mechanism to prevent `401 Unauthenticated` errors on shared hosts (LiteSpeed/FastCGI/cPanel) that aggressively strip the standard `Authorization: Bearer` header.
+* **Fix (Mobile API):** Fixed a serialization issue where the community feed API (`/api/portal/feed`) failed to eagerly load the `user` relationship, resulting in posts appearing without their author data (unknown users) in the mobile app.
 
 ---
 

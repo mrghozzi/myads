@@ -167,7 +167,7 @@ Allows any website to pre-fill the MYADS post composer.
   - `GET /api/settings/points-ledger`: Returns the user's point transaction history.
   
   ### Community Feed & Statuses
-- `GET /api/portal/feed`: Retrieves the community feed (paginated). Optional query parameter `filter` (`all` or `me`). Returns a collection of `StatusResource` which includes:
+- `GET /api/portal/feed`: Retrieves the community feed (paginated). Optional query parameter `filter` (`all` or `me`). Returns a paginated collection of `StatusResource` (with properly eager-loaded relationships including `user`) which includes:
   - `user`: User details (`UserResource`) containing `id`, `username`, `name`, `avatar` URL, `verified` status, and `profile_badge_color` (the hex color corresponding to their active paid plan or Super Admin status).
   - `display_content`, `display_title`, `display_image`: Pre-rendered HTML/attributes for diverse post types.
   - `media`: Primary media object for multimedia posts (Video, Audio, File, Music, Clips) containing `type`, `url`, `mime_type`, `name`, and `size`. Returns `null` for text-only posts.

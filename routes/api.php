@@ -115,11 +115,35 @@ Route::middleware(['api.key', 'auth:sanctum'])->group(function () {
     // Forums API (Mobile specific)
     Route::get('/forums/categories', [App\Http\Controllers\Api\ForumApiController::class, 'categories']);
     Route::get('/forums/categories/{categoryId}/topics', [App\Http\Controllers\Api\ForumApiController::class, 'topics']);
+    Route::post('/forums/categories/{categoryId}/topics', [App\Http\Controllers\Api\ForumApiController::class, 'storeTopic']);
     Route::get('/forums/topics/{topicId}', [App\Http\Controllers\Api\ForumApiController::class, 'show']);
+    Route::post('/forums/topics/{topicId}/replies', [App\Http\Controllers\Api\ForumApiController::class, 'storeReply']);
 
     // Store API (Mobile specific)
     Route::get('/store/products', [App\Http\Controllers\Api\StoreApiController::class, 'index']);
     Route::get('/store/products/{id}', [App\Http\Controllers\Api\StoreApiController::class, 'show']);
+    Route::get('/store/products/{id}/knowledgebase', [App\Http\Controllers\Api\StoreApiController::class, 'knowledgebase']);
+
+    // Orders API
+    Route::get('/orders', [App\Http\Controllers\Api\OrderApiController::class, 'index']);
+    Route::get('/orders/{id}', [App\Http\Controllers\Api\OrderApiController::class, 'show']);
+    Route::post('/orders/{id}/offers', [App\Http\Controllers\Api\OrderApiController::class, 'submitOffer']);
+
+    // Gamification API
+    Route::get('/quests', [App\Http\Controllers\Api\GamificationApiController::class, 'quests']);
+    Route::post('/quests/{id}/claim', [App\Http\Controllers\Api\GamificationApiController::class, 'claimQuest']);
+    Route::post('/pts/transfer', [App\Http\Controllers\Api\GamificationApiController::class, 'transferPts']);
+    Route::post('/pts/vouchers/create', [App\Http\Controllers\Api\GamificationApiController::class, 'createVoucher']);
+    Route::post('/pts/vouchers/claim', [App\Http\Controllers\Api\GamificationApiController::class, 'claimVoucher']);
+
+    // Live Search API
+    Route::get('/search/live', [App\Http\Controllers\Api\SearchApiController::class, 'search']);
+
+    // Settings Additions (FCM)
+    Route::post('/settings/device-token', [App\Http\Controllers\Api\SettingsController::class, 'updateDeviceToken']);
+
+    // Ads Stats API
+    Route::get('/ads/stats', [App\Http\Controllers\Api\AdsStatsApiController::class, 'stats']);
 });
 
 // Developer Platform API v1

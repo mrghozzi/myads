@@ -281,7 +281,7 @@ myads/
 | `ContentFormatter` | Shared formatter for hashtags, links, Markdown, mentions |
 | `LinkPreviewService` | Fetches URL metadata for link posts |
 | `NotificationService` | Creates and manages notifications |
-| `StatusActivityService` | Status/activity card rendering logic (bulk eager-loading optimized) |
+| `StatusActivityService` | Status/activity card rendering logic (bulk eager-loading optimized, supports `LengthAwarePaginator` for Mobile API hydration) |
 | `StatusPostService` | Centralized business logic for creating, editing, and deleting community statuses across Web and Mobile |
 | `StatusPromotionPricingService` | Smart PTS pricing, delivery caps, duration estimates, and active-subscription discount support for promoted posts |
 | `StatusPromotionService` | Campaign creation, feed injection, pacing, progress tracking, and admin actions for promoted posts |
