@@ -11,14 +11,14 @@ class StoreApiController extends Controller
 {
     public function index(Request $request)
     {
-        $query = Product::where('app', 1)->with(['seller']);
+        $query = Product::visible()->with(['user']);
 
         if ($request->has('category')) {
-            $query->where('cat', $request->category);
+            $categoryIds = \App\Models\Option::where('o_type', 'store_type')->where('name', $request->category)->pluck('o_parent');
+            $query->whereIn('id', $categoryIds);
         }
 
-        $products = $query->orderBy('ep', 'desc')
-            ->orderBy('id', 'desc')
+        $products = $query->orderBy('id', 'desc')
             ->paginate(20);
 
         return ProductResource::collection($products);
@@ -26,7 +26,7 @@ class StoreApiController extends Controller
 
     public function show($id, Request $request)
     {
-        $product = Product::where('app', 1)->with(['seller'])->findOrFail($id);
+        $product = Product::visible()->with(['user'])->findOrFail($id);
         
         $product->increment('vu');
 

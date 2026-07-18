@@ -18,15 +18,15 @@ class ProductResource extends JsonResource
         return [
             'id' => $this->id,
             'title' => $this->name,
-            'description' => $this->des,
-            'price' => $this->prix, // Points (PTS)
-            'sales' => $this->vente,
-            'thumbnail' => $this->img ? asset('upload/' . $this->img) : null,
-            'seller' => new UserResource($this->whenLoaded('seller')),
-            'is_featured' => $this->ep == 1,
-            'category_id' => $this->cat,
-            'created_at' => $this->date,
-            'date_formatted' => $this->date ? Carbon::createFromTimestamp($this->date)->diffForHumans() : '',
+            'description' => $this->product_description,
+            'price' => $this->product_price, // Points (PTS)
+            'sales' => 0, // Not available easily
+            'thumbnail' => $this->product_image,
+            'seller' => new UserResource($this->whenLoaded('user')),
+            'is_featured' => false,
+            'category_id' => $this->product_category,
+            'created_at' => null,
+            'date_formatted' => '',
         ];
     }
 }

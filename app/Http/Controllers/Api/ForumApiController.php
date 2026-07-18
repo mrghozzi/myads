@@ -16,7 +16,7 @@ class ForumApiController extends Controller
     {
         $user = Auth::guard('sanctum')->user();
         
-        $query = ForumCategory::orderBy('sort_order', 'asc');
+        $query = ForumCategory::orderBy('ordercat', 'desc');
         
         if (!$user || !$user->isAdmin()) {
             $query->where(function($q) {
