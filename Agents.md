@@ -213,9 +213,9 @@ myads/
 | `StatusLinkPreview` | `status_link_previews` | Link previews for posts |
 | `StatusMention` | `status_mentions` | @mention records |
 | `StatusRepost` | `status_reposts` | Quote repost records |
-| `ForumTopic` | `f_topic` | Forum topics |
+| `ForumTopic` | `forum` | Forum topics. Note: category column is `cat`, user relationship is `user`, pinned column is `is_pinned`. |
 | `ForumComment` | `f_comment` | Forum/activity comments |
-| `ForumCategory` | `f_cat` | Forum categories (with `visibility` field) |
+| `ForumCategory` | `f_cat` | Forum categories. Note: `visibility` is an integer: `0` (Public), `1` (Members), `2` (Moderators). |
 | `ForumModerator` | `forum_moderators` | Moderator assignments |
 | `ForumAttachment` | `forum_attachments` | File attachments |
 | `Banner` | `banner` | Banner ads |
@@ -233,7 +233,7 @@ myads/
 | `YtViewsLog` | `yt_views_log` | Log of watched YouTube videos by members |
 | `Directory` | `directory` | Website directory listings |
 | `DirectoryCategory` | `directory_cat` | Directory categories |
-| `Product` | `product` | Store products |
+| `Product` | `options` | Store products. Note: Maps to `options` table with `o_type=store`. Uses `current_price` (price), `product_description` (description), `product_image` (thumbnail), `product_category` (category). |
 | `ProductFile` | `product_files` | Store file versions |
 | `ProductLicense` | `product_licenses` | Binds purchased products to license keys and active client domains |
 | `StoreSale` | `store_sales` | Temporary product sales with discounted price and start/end dates |

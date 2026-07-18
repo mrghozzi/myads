@@ -7,6 +7,8 @@
 ### Bug Fixes
 * **Fix (Mobile API):** Added `X-Authorization` header support in `index.php` as a fallback mechanism to prevent `401 Unauthenticated` errors on shared hosts (LiteSpeed/FastCGI/cPanel) that aggressively strip the standard `Authorization: Bearer` header.
 * **Fix (Mobile API):** Fixed a serialization issue where the community feed API (`/api/portal/feed`) failed to eagerly load the `user` relationship, resulting in posts appearing without their author data (unknown users) in the mobile app.
+* **Fix (Mobile API):** Resolved an SQL exception in `StoreApiController` and `ProductResource` caused by mapping to legacy properties. The API now correctly fetches and serializes Store Products.
+* **Fix (Mobile API):** Fixed Forum API (`ForumApiController`) `topics` endpoint crashing due to incorrect model column mapping. Also corrected category `visibility` logic to correctly handle database integer values (`0`, `1`, `2`) instead of string text, preventing `403 Unauthorized` errors on public categories.
 
 ---
 

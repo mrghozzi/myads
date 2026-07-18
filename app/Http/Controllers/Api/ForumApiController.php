@@ -19,10 +19,19 @@ class ForumApiController extends Controller
         $query = ForumCategory::orderBy('ordercat', 'desc');
         
         if (!$user || !$user->isAdmin()) {
-            $query->where(function($q) {
-                $q->where('visibility', 'public')
+            $query->where(function($q) use ($user) {
+                $q->where('visibility', '0')
+                  ->orWhere('visibility', 0)
                   ->orWhereNull('visibility')
                   ->orWhere('visibility', '');
+                if ($user) {
+                    $q->orWhere('visibility', '1')
+                      ->orWhere('visibility', 1);
+                    if (method_exists($user, 'canModerateForum') && $user->canModerateForum()) {
+                        $q->orWhere('visibility', '2')
+                          ->orWhere('visibility', 2);
+                    }
+                }
             });
         }
         
@@ -36,15 +45,16 @@ class ForumApiController extends Controller
         $category = ForumCategory::findOrFail($categoryId);
         $user = Auth::guard('sanctum')->user();
         
-        if ($category->visibility !== 'public' && $category->visibility !== null && $category->visibility !== '') {
-            if (!$user || !$user->isAdmin()) {
-                return response()->json(['error' => 'Unauthorized'], 403);
-            }
+        if ($category->visibility == 1 && !$user) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+        if ($category->visibility == 2 && (!$user || !(method_exists($user, 'canModerateForum') && $user->canModerateForum()))) {
+            return response()->json(['error' => 'Unauthorized'], 403);
         }
 
-        $topics = ForumTopic::where('id_cat', $categoryId)
-            ->with(['author'])
-            ->orderBy('ep', 'desc')
+        $topics = ForumTopic::where('cat', $categoryId)
+            ->with(['user'])
+            ->orderBy('is_pinned', 'desc')
             ->orderBy('date', 'desc')
             ->paginate(20);
 
@@ -53,12 +63,15 @@ class ForumApiController extends Controller
 
     public function show($topicId, Request $request)
     {
-        $topic = ForumTopic::with(['author'])->findOrFail($topicId);
+        $topic = ForumTopic::with(['user'])->findOrFail($topicId);
         
-        $category = ForumCategory::find($topic->id_cat);
-        if ($category && $category->visibility !== 'public' && $category->visibility !== null && $category->visibility !== '') {
+        $category = ForumCategory::find($topic->cat);
+        if ($category) {
             $user = Auth::guard('sanctum')->user();
-            if (!$user || !$user->isAdmin()) {
+            if ($category->visibility == 1 && !$user) {
+                return response()->json(['error' => 'Unauthorized'], 403);
+            }
+            if ($category->visibility == 2 && (!$user || !(method_exists($user, 'canModerateForum') && $user->canModerateForum()))) {
                 return response()->json(['error' => 'Unauthorized'], 403);
             }
         }
@@ -78,10 +91,12 @@ class ForumApiController extends Controller
 
         $category = ForumCategory::findOrFail($categoryId);
         
-        if ($category->visibility !== 'public' && $category->visibility !== null && $category->visibility !== '') {
-            if (!Auth::user() || !Auth::user()->isAdmin()) {
-                return response()->json(['error' => 'Unauthorized'], 403);
-            }
+        $user = Auth::guard('sanctum')->user();
+        if ($category->visibility == 1 && !$user) {
+            return response()->json(['error' => 'Unauthorized'], 403);
+        }
+        if ($category->visibility == 2 && (!$user || !(method_exists($user, 'canModerateForum') && $user->canModerateForum()))) {
+            return response()->json(['error' => 'Unauthorized'], 403);
         }
 
         $topic = ForumTopic::create([
@@ -91,7 +106,7 @@ class ForumApiController extends Controller
             'txt' => $request->content,
             'date' => time(),
             'statu' => 1,
-            'ep' => 0
+            'is_pinned' => false
         ]);
 
         app(\App\Services\GamificationService::class)->recordEvent(Auth::id(), 'forum_topic_created');
