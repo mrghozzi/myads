@@ -771,6 +771,7 @@ php artisan storage:link
 32. **PHP Commands:** Agents must not execute PHP commands directly (e.g., `php artisan migrate`, `php artisan tinker`). These commands often fail or time out in the background and can be destructive if misconfigured.
 33. **Task Completion:** After finishing code changes, the agent must provide a summary of recommendations, manual actions required (like running migrations), or general notes, rather than executing terminal commands for deployment or maintenance.
 34. **Changelog Documentation Rule:** When updating `Documents/changelogs.md`, **NEVER** mention modifications made to any plugin (inside `plugins/`) or any theme except for the primary `themes/default/` theme. Public changelogs should remain focused on core platform changes only.
+35. **Admin Views Extends Rule:** When creating admin Blade views for plugins or core admin pages, ALWAYS use `@extends('admin::layouts.admin')`. Do NOT use `admin::layouts.master` or `layouts.master`.
 
 ---
 
