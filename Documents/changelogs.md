@@ -1,6 +1,12 @@
 # v4.4.5
 > **Stable Release** — Mobile API Community Feed Enhancements & Authorization Fixes.
 
+### UI / UX Improvements
+* **Admin Dashboard:** Added a dynamic "Marketplace Recommendations" slider displaying premium scripts, themes, and plugins directly on the admin home page.
+* **Member Dashboard (`/home`):** Redesigned the main member dashboard using a responsive CSS Grid layout and the `.superdesign` aesthetic. Extracted hardcoded theme colors into dynamic CSS variables for flawless Dark Mode support.
+* **Marketplace (`/store`):** Completely redesigned the product catalog layout utilizing a modern 16:9 `.modern-product-grid`. Upgraded the header banner and corrected empty-state translation keys.
+* **Community Feed (`/portal`):** Overhauled the global search results layout. Replaced legacy list views with `.modern-user-card` and `.modern-product-grid` components. Upgraded the portal banner and implemented scoped CSS variables for seamless light/dark theme switching without duplicate rules.
+
 ### Features
 * **Mobile API**: Enhanced the `PortalController` and `StatusActivityService` to properly handle and serialize `LengthAwarePaginator` objects, allowing eager-loaded relationships to be delivered in paginated API endpoints.
 
