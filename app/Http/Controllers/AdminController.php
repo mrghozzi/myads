@@ -4458,8 +4458,11 @@ class AdminController extends Controller
             fn () => $this->getDirectorySizeBytes(storage_path('framework/cache/data'), 3000)
         );
 
+        $feedSettings = \App\Support\CommunityFeedSettings::all();
+        $pressureSources = $this->serverPressureSources($load, $cacheSize, $feedSettings);
+
         return view('admin::admin.system_monitor', compact(
-            'load', 'memoryUsage', 'memoryPeak', 'memoryLimit', 'diskTotal', 'diskFree', 'cacheSize'
+            'load', 'memoryUsage', 'memoryPeak', 'memoryLimit', 'diskTotal', 'diskFree', 'cacheSize', 'pressureSources'
         ));
     }
 
@@ -4474,6 +4477,121 @@ class AdminController extends Controller
 
         return redirect()->route('admin.system_monitor')
             ->with('success', __('messages.deleted_successfully') ?? 'System cache cleared successfully.');
+    }
+
+    /**
+     * Build a lightweight list of likely pressure sources without profiling
+     * live requests or scanning large folders.
+     */
+    private function serverPressureSources(array $load, int $cacheSize, array $feedSettings): array
+    {
+        $sources = [];
+
+        $add = static function (string $severity, string $title, string $description, string $action, ?string $route = null) use (&$sources): void {
+            $sources[] = compact('severity', 'title', 'description', 'action', 'route');
+        };
+
+        if (($load[0] ?? 0) > 2 || ($load[1] ?? 0) > 2) {
+            $add(
+                'danger',
+                __('messages.pressure_cpu_high_title'),
+                __('messages.pressure_cpu_high_desc'),
+                __('messages.pressure_cpu_high_action'),
+                'admin.settings.performance'
+            );
+        }
+
+        if (config('cache.default') === 'file') {
+            $add(
+                'warning',
+                __('messages.pressure_file_cache_title'),
+                __('messages.pressure_file_cache_desc'),
+                __('messages.pressure_file_cache_action'),
+                'admin.shared_hosting_guide'
+            );
+        }
+
+        if (config('session.driver') === 'file') {
+            $add(
+                'warning',
+                __('messages.pressure_file_sessions_title'),
+                __('messages.pressure_file_sessions_desc'),
+                __('messages.pressure_file_sessions_action'),
+                'admin.shared_hosting_guide'
+            );
+        }
+
+        if ($cacheSize > 50 * 1024 * 1024) {
+            $add(
+                'warning',
+                __('messages.pressure_large_cache_title'),
+                __('messages.pressure_large_cache_desc'),
+                __('messages.pressure_large_cache_action'),
+                'admin.database_cleanup'
+            );
+        }
+
+        if (($feedSettings['feed_mode'] ?? 'smart') === 'smart') {
+            $add(
+                'info',
+                __('messages.pressure_smart_feed_title'),
+                __('messages.pressure_smart_feed_desc'),
+                __('messages.pressure_smart_feed_action'),
+                'admin.settings.performance'
+            );
+        }
+
+        if ((int) ($feedSettings['cache_ttl_seconds'] ?? 300) < 300) {
+            $add(
+                'info',
+                __('messages.pressure_short_feed_cache_title'),
+                __('messages.pressure_short_feed_cache_desc'),
+                __('messages.pressure_short_feed_cache_action'),
+                'admin.settings.performance'
+            );
+        }
+
+        if (!empty($feedSettings['track_online_status'])) {
+            $add(
+                'info',
+                __('messages.pressure_online_tracking_title'),
+                __('messages.pressure_online_tracking_desc'),
+                __('messages.pressure_online_tracking_action'),
+                'admin.settings.performance'
+            );
+        }
+
+        if (!empty($feedSettings['track_seo_metrics'])) {
+            $add(
+                'info',
+                __('messages.pressure_seo_tracking_title'),
+                __('messages.pressure_seo_tracking_desc'),
+                __('messages.pressure_seo_tracking_action'),
+                'admin.settings.performance'
+            );
+        }
+
+        if (config('app.debug')) {
+            $add(
+                'danger',
+                __('messages.pressure_debug_title'),
+                __('messages.pressure_debug_desc'),
+                __('messages.pressure_debug_action'),
+                'admin.shared_hosting_guide'
+            );
+        }
+
+        if ($sources === []) {
+            $add(
+                'success',
+                __('messages.pressure_no_issues_title'),
+                __('messages.pressure_no_issues_desc'),
+                __('messages.pressure_no_issues_action'),
+                null
+            );
+        }
+
+        return $sources;
     }
 
     public function databaseCleanup()

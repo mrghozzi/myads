@@ -10,6 +10,8 @@
 ### Features
 * **Mobile API**: Enhanced the `PortalController` and `StatusActivityService` to properly handle and serialize `LengthAwarePaginator` objects, allowing eager-loaded relationships to be delivered in paginated API endpoints.
 * **Admin / Performance:** Added a new **Shared Hosting Guide** page (`/admin/shared-hosting-guide`) with practical recommendations for reducing CPU load, file usage, cache pressure, and database growth on small shared or free hosting plans.
+* **Admin / System Monitor:** Added a lightweight **Server Pressure Sources** section to `/admin/system-monitor`, showing likely CPU, cache, session, feed, and tracking features that may increase load, with direct links to the relevant optimization pages.
+* **i18n:** Localized all new `/admin/system-monitor` pressure-diagnostics labels, descriptions, severity badges, and action text through the language files, with Arabic and English strings plus fallback entries for the remaining supported locales.
 
 ### Bug Fixes
 * **Fix (Mobile API):** Added `X-Authorization` header support in `index.php` as a fallback mechanism to prevent `401 Unauthenticated` errors on shared hosts (LiteSpeed/FastCGI/cPanel) that aggressively strip the standard `Authorization: Bearer` header.
