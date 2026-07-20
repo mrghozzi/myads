@@ -3640,5 +3640,6 @@ return [
     'track_online_status_desc' => 'If disabled, users will not appear "online" and it will save a massive amount of database UPDATE queries per click.',
     'track_seo_metrics' => 'Track SEO Daily Metrics',
     'track_seo_metrics_desc' => 'If disabled, the SEO engine will not log daily visits to pages, reducing database INSERTs.',
+    'recommended' => 'Recommended',
 ];
 
