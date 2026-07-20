@@ -86,10 +86,8 @@ class AdminController extends Controller
         private readonly NotificationService $notifications
     ) {
     }
-
-    public function index(PluginManager $pluginManager, ThemeManager $themeManager, RemoteExtensionMarketplaceService $marketplace)
+    public function marketplaceRecommendations(PluginManager $pluginManager, ThemeManager $themeManager, RemoteExtensionMarketplaceService $marketplace)
     {
-        // Fetch uninstalled marketplace items for the dashboard slide
         $plugins = $pluginManager->getAllPlugins();
         $installedPluginSlugs = collect($plugins)->pluck('slug')->toArray();
         $marketplacePlugins = collect($marketplace->catalog('plugins')['items'] ?? [])
@@ -102,8 +100,15 @@ class AdminController extends Controller
             ->filter(fn($t) => !in_array($t['slug'], $installedThemeSlugs))
             ->values();
 
-        // Combine and limit to 10 items for the slider
         $uninstalledMarketplaceItems = $marketplacePlugins->merge($marketplaceThemes)->shuffle()->take(10);
+
+        return view('admin::admin.partials.marketplace_recommendations', compact('uninstalledMarketplaceItems'));
+    }
+
+
+    public function index(PluginManager $pluginManager, ThemeManager $themeManager, RemoteExtensionMarketplaceService $marketplace)
+    {
+
         // Version Check
         $currentVersion = \App\Http\Controllers\AdminUpdatesController::CURRENT_VERSION;
         
@@ -357,7 +362,7 @@ class AdminController extends Controller
             }
         }
 
-        return view('admin::admin.index', compact('stats', 'currentVersion', 'latestVersion', 'chartData', 'communityChartData', 'reactionsSummary', 'uninstalledMarketplaceItems'));
+        return view('admin::admin.index', compact('stats', 'currentVersion', 'latestVersion', 'chartData', 'communityChartData', 'reactionsSummary'));
     }
 
     public function settings()

@@ -530,6 +530,7 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
 
     Route::middleware(['admin.password.confirm'])->group(function () {
     Route::get('/', [AdminController::class, 'index'])->name('admin.index');
+    Route::get('/marketplace-recommendations', [AdminController::class, 'marketplaceRecommendations'])->name('admin.marketplace_recommendations');
     Route::get('/settings', [AdminController::class, 'settings'])->name('admin.settings');
     Route::post('/settings', [AdminController::class, 'updateSettings'])->name('admin.settings.update');
     Route::get('/settings/system', [AdminController::class, 'systemSettings'])->name('admin.settings.system');
