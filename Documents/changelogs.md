@@ -20,6 +20,9 @@
 * **Fix (Mobile API):** Fixed Forum API (`ForumApiController`) `topics` endpoint crashing due to incorrect model column mapping. Also corrected category `visibility` logic to correctly handle database integer values (`0`, `1`, `2`) instead of string text, preventing `403 Unauthorized` errors on public categories.
 * **Fix (Mobile API):** Fixed a 500 Internal Server Error in `StoreApiController` product detail endpoint caused by an attempt to increment a non-existent `vu` (view count) column on the `options` table.
 
+### Dependencies
+* **chore(deps-dev)**: bump axios from 1.16.0 to 1.18.0 in the npm_and_yarn group across 1 directory.
+
 ---
 
 # v4.4.4

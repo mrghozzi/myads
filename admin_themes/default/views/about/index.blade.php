@@ -393,6 +393,10 @@
                                             <span class="changelog-badge badge-fix mt-1" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;">Fix</span>
                                             <span class="text-muted fs-13">Fixed Mobile API relationship loading, Store product view counts, and Forum category visibility mapping.</span>
                                         </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge mt-1" style="background: rgba(107, 114, 128, 0.1); color: #6b7280;">Update</span>
+                                            <span class="text-muted fs-13">Bumped <strong>axios</strong> from 1.16.0 to 1.18.0.</span>
+                                        </div>
                                     </div>
                                 </div>
 
