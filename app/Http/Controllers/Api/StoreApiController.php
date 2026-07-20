@@ -27,8 +27,6 @@ class StoreApiController extends Controller
     public function show($id, Request $request)
     {
         $product = Product::visible()->with(['user'])->findOrFail($id);
-        
-        $product->increment('vu');
 
         return new ProductResource($product);
     }

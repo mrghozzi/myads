@@ -244,9 +244,9 @@ Allows any website to pre-fill the MYADS post composer.
 - `POST /api/forums/categories/{categoryId}/topics`: Create a new topic. Payload: `{"title": "...", "content": "..."}`
 - `GET /api/forums/topics/{topicId}`: Retrieve a specific topic and its replies.
 - `POST /api/forums/topics/{topicId}/replies`: Add a reply to a topic. Payload: `{"content": "..."}`
-- `GET /api/store/products`: Retrieve store products (paginated). Products can be of categories: Scripts, Themes, Plugins, Graphics, Audio, Video, eBooks, Software, and Courses.
-- `GET /api/store/products/{id}`: Retrieve a specific product's details.
-- `GET /api/store/products/{id}/knowledgebase`: Retrieve the knowledgebase articles for a product.
+- `GET /api/store/products`: Retrieve store products (paginated). Products can be of categories: Scripts, Themes, Plugins, Graphics, Audio, Video, eBooks, Software, and Courses. Returns list with `thumbnail` and `title` keys.
+- `GET /api/store/products/{id}`: Retrieve a specific product's details. Does not increment view counts (`vu`) as it is not supported.
+- `GET /api/store/products/{id}/knowledgebase`: Retrieve the knowledgebase articles for a product (paginated).
 
 ### Clips
 - `GET /api/clips/saved`: Retrieve a list of saved clips for the authenticated user.

@@ -233,7 +233,7 @@ myads/
 | `YtViewsLog` | `yt_views_log` | Log of watched YouTube videos by members |
 | `Directory` | `directory` | Website directory listings |
 | `DirectoryCategory` | `directory_cat` | Directory categories |
-| `Product` | `options` | Store products. Note: Maps to `options` table with `o_type=store`. Uses `current_price` (price), `product_description` (description), `product_image` (thumbnail), `product_category` (category). |
+| `Product` | `options` | Store products. Note: Maps to `options` table with `o_type=store`. Uses `current_price` (price), `product_description` (description), `product_image` (thumbnail), `product_category` (category). Does not have a `vu` (view count) column. |
 | `ProductFile` | `product_files` | Store file versions |
 | `ProductLicense` | `product_licenses` | Binds purchased products to license keys and active client domains |
 | `StoreSale` | `store_sales` | Temporary product sales with discounted price and start/end dates |
