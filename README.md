@@ -1,4 +1,4 @@
-# MYADS v4.4.4
+# MYADS v4.4.5
 
 Advanced Laravel-based social networking and ad exchange platform for website owners.
 

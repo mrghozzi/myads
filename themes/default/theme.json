@@ -1,9 +1,9 @@
 {
     "name": "Default Theme",
     "slug": "default",
-    "version": "2.0.0",
+    "version": "4.4.5",
     "author": "MyAds Core",
     "description": "The default starter theme for MyAds.",
     "thumbnail": "screenshot.png",
-    "min_myads": "4.4.1"
+    "min_myads": "4.4.5"
 }
