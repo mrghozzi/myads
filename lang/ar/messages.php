@@ -3675,5 +3675,8 @@ return [
     'unused' => 'غير مستخدم',
     'claim_voucher' => 'استخدام قسيمة',
     'claim' => 'استخدام',
+    
+    // Store Redesign
+    'store_banner_desc' => 'اكتشف القوالب، السكربتات، والإضافات المميزة.',
 ];
 

@@ -3673,5 +3673,8 @@ return [
     'unused' => 'Unused',
     'claim_voucher' => 'Claim Voucher',
     'claim' => 'Claim',
+    
+    // Store Redesign
+    'store_banner_desc' => 'Discover themes, scripts, and plugins.',
 ];
 
