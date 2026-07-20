@@ -9,6 +9,7 @@
 
 ### Features
 * **Mobile API**: Enhanced the `PortalController` and `StatusActivityService` to properly handle and serialize `LengthAwarePaginator` objects, allowing eager-loaded relationships to be delivered in paginated API endpoints.
+* **Admin / Performance:** Added a new **Shared Hosting Guide** page (`/admin/shared-hosting-guide`) with practical recommendations for reducing CPU load, file usage, cache pressure, and database growth on small shared or free hosting plans.
 
 ### Bug Fixes
 * **Fix (Mobile API):** Added `X-Authorization` header support in `index.php` as a fallback mechanism to prevent `401 Unauthenticated` errors on shared hosts (LiteSpeed/FastCGI/cPanel) that aggressively strip the standard `Authorization: Bearer` header.

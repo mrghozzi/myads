@@ -200,7 +200,12 @@ class PruneStorageFiles extends Command
     }
 
     /**
-     * Quick inline cache file pruning (limited to 500 files per run).
+     * Quick inline cache file pruning for web requests.
+     *
+     * Keep both scanned and deleted counts bounded. On shared hosting a cache
+     * directory can contain hundreds of thousands of files, so scanning until
+     * 500 expired entries are found can become the CPU spike we are trying to
+     * avoid.
      */
     private static function quickPruneCacheFiles(): void
     {
@@ -209,7 +214,9 @@ class PruneStorageFiles extends Command
             return;
         }
 
-        $limit = 500;
+        $scanLimit = (int) env('MYADS_INLINE_CACHE_PRUNE_SCAN_LIMIT', 750);
+        $deleteLimit = (int) env('MYADS_INLINE_CACHE_PRUNE_DELETE_LIMIT', 150);
+        $scanned = 0;
         $deleted = 0;
 
         $iterator = new \RecursiveIteratorIterator(
@@ -217,13 +224,15 @@ class PruneStorageFiles extends Command
         );
 
         foreach ($iterator as $file) {
-            if ($deleted >= $limit) {
+            if ($scanned >= $scanLimit || $deleted >= $deleteLimit) {
                 break;
             }
 
             if (!$file->isFile()) {
                 continue;
             }
+
+            $scanned++;
 
             try {
                 $handle = fopen($file->getRealPath(), 'r');
@@ -252,7 +261,7 @@ class PruneStorageFiles extends Command
     }
 
     /**
-     * Quick inline session file pruning (limited to 200 files per run).
+     * Quick inline session file pruning for web requests.
      */
     private static function quickPruneSessionFiles(): void
     {
@@ -263,13 +272,17 @@ class PruneStorageFiles extends Command
 
         $lifetimeMinutes = (int) config('session.lifetime', 120);
         $staleThreshold = time() - ($lifetimeMinutes * 60 * 2);
-        $limit = 200;
+        $scanLimit = (int) env('MYADS_INLINE_SESSION_PRUNE_SCAN_LIMIT', 300);
+        $deleteLimit = (int) env('MYADS_INLINE_SESSION_PRUNE_DELETE_LIMIT', 100);
+        $scanned = 0;
         $deleted = 0;
 
         foreach (\Illuminate\Support\Facades\File::files($sessionPath) as $file) {
-            if ($deleted >= $limit) {
+            if ($scanned >= $scanLimit || $deleted >= $deleteLimit) {
                 break;
             }
+
+            $scanned++;
 
             if ($file->getMTime() < $staleThreshold) {
                 @unlink($file->getRealPath());

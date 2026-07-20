@@ -4382,6 +4382,22 @@ class AdminController extends Controller
         return view('admin::admin.performance_settings', compact('settings'));
     }
 
+    /**
+     * Shared hosting optimization guide.
+     */
+    public function sharedHostingGuide()
+    {
+        $environment = [
+            'cache_store' => config('cache.default'),
+            'session_driver' => config('session.driver'),
+            'queue_connection' => config('queue.default'),
+            'debug' => (bool) config('app.debug'),
+            'php_memory_limit' => ini_get('memory_limit'),
+        ];
+
+        return view('admin::admin.shared_hosting_guide', compact('environment'));
+    }
+
     public function updatePerformanceSettings(Request $request)
     {
 
@@ -4434,14 +4450,13 @@ class AdminController extends Controller
         $diskTotal = function_exists('disk_total_space') ? @disk_total_space('/') : 0;
         $diskFree = function_exists('disk_free_space') ? @disk_free_space('/') : 0;
         
-        // Cache Directory Size
-        $cacheDir = storage_path('framework/cache/data');
-        $cacheSize = 0;
-        if (\Illuminate\Support\Facades\File::exists($cacheDir)) {
-            foreach (\Illuminate\Support\Facades\File::allFiles($cacheDir) as $file) {
-                $cacheSize += $file->getSize();
-            }
-        }
+        // Cache Directory Size. Keep this cached because large file-cache
+        // directories are common on shared hosting and expensive to scan.
+        $cacheSize = \Illuminate\Support\Facades\Cache::remember(
+            'system_monitor_cache_size_bytes',
+            now()->addMinutes(10),
+            fn () => $this->getDirectorySizeBytes(storage_path('framework/cache/data'), 3000)
+        );
 
         return view('admin::admin.system_monitor', compact(
             'load', 'memoryUsage', 'memoryPeak', 'memoryLimit', 'diskTotal', 'diskFree', 'cacheSize'
@@ -4473,8 +4488,16 @@ class AdminController extends Controller
         $autoCleanupEnabled = \App\Services\DatabaseMaintenanceService::isAutoCleanupEnabled();
 
         // Storage info
-        $cacheSize = $this->getDirectorySizeMB(storage_path('framework/cache/data'));
-        $sessionSize = $this->getDirectorySizeMB(storage_path('framework/sessions'));
+        $cacheSize = \Illuminate\Support\Facades\Cache::remember(
+            'database_cleanup_cache_size_mb',
+            now()->addMinutes(10),
+            fn () => $this->getDirectorySizeMB(storage_path('framework/cache/data'), 3000)
+        );
+        $sessionSize = \Illuminate\Support\Facades\Cache::remember(
+            'database_cleanup_session_size_mb',
+            now()->addMinutes(10),
+            fn () => $this->getDirectorySizeMB(storage_path('framework/sessions'), 3000)
+        );
 
         return view('admin::admin.database_cleanup', compact(
             'stateCount', 'bannerImpressionsCount', 'seoMetricsCount',
@@ -4559,13 +4582,22 @@ class AdminController extends Controller
     /**
      * Get directory size in MB (for storage reporting).
      */
-    private function getDirectorySizeMB(string $path): float
+    private function getDirectorySizeMB(string $path, int $maxFiles = 3000): float
+    {
+        return round($this->getDirectorySizeBytes($path, $maxFiles) / 1024 / 1024, 2);
+    }
+
+    /**
+     * Get directory size with a scan limit so admin dashboards stay cheap.
+     */
+    private function getDirectorySizeBytes(string $path, int $maxFiles = 3000): int
     {
         if (!is_dir($path)) {
-            return 0.0;
+            return 0;
         }
 
         $totalBytes = 0;
+        $scanned = 0;
 
         try {
             $iterator = new \RecursiveIteratorIterator(
@@ -4573,14 +4605,19 @@ class AdminController extends Controller
             );
 
             foreach ($iterator as $file) {
+                if ($scanned >= $maxFiles) {
+                    break;
+                }
+
                 if ($file->isFile()) {
+                    $scanned++;
                     $totalBytes += $file->getSize();
                 }
             }
         } catch (\Throwable) {
-            return 0.0;
+            return 0;
         }
 
-        return round($totalBytes / 1024 / 1024, 2);
+        return $totalBytes;
     }
 }
