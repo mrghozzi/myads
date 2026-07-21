@@ -215,7 +215,83 @@
             </div>
         </div>
 
-        <!-- Card 3: Developer Integration & Quick Test -->
+        <!-- Card 3: Open Source GitHub Repository -->
+        <div class="col-12">
+            <div class="card bg-soft-primary border border-primary border-dashed shadow-sm">
+                <div class="card-body d-flex align-items-center justify-content-between flex-wrap gap-3">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="avatar-text avatar-lg bg-primary text-white rounded-3 fs-2">
+                            <i class="fa-brands fa-github"></i>
+                        </div>
+                        <div>
+                            <h4 class="fs-16 fw-bold mb-1 d-flex align-items-center gap-2">
+                                {{ __('messages.mobile_github_repo_title') }}
+                                <span class="badge bg-soft-success text-success fs-11">MIT License</span>
+                            </h4>
+                            <p class="text-muted fs-13 mb-0">{{ __('messages.mobile_github_repo_desc') }}</p>
+                        </div>
+                    </div>
+                    <a href="https://github.com/mrghozzi/myads_app" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-md">
+                        <i class="fa-brands fa-github me-1"></i> {{ __('messages.mobile_github_repo_btn') }}
+                        <i class="feather-external-link ms-1 fs-12"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 4: Step-by-Step Setup Guide -->
+        <div class="col-12">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-transparent border-bottom py-3 d-flex align-items-center justify-content-between">
+                    <h5 class="card-title mb-0 d-flex align-items-center">
+                        <i class="feather-book-open me-2 text-primary"></i>
+                        {{ __('messages.mobile_setup_guide_title') }}
+                    </h5>
+                    <span class="badge bg-soft-primary text-primary">Flutter 3.27+</span>
+                </div>
+                <div class="card-body">
+                    <div class="row g-4">
+                        <div class="col-lg-6">
+                            <div class="p-3 bg-light border rounded-3 h-100">
+                                <h6 class="fw-bold mb-2 fs-13 text-primary"><i class="feather-git-branch me-1"></i> {{ __('messages.mobile_step1_title') }}</h6>
+                                <pre class="bg-dark text-white p-2.5 rounded font-monospace mb-0 fs-12 user-select-all">git clone https://github.com/mrghozzi/myads_app.git
+cd myads_app</pre>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6">
+                            <div class="p-3 bg-light border rounded-3 h-100">
+                                <h6 class="fw-bold mb-2 fs-13 text-primary"><i class="feather-file-text me-1"></i> {{ __('messages.mobile_step2_title') }}</h6>
+                                <p class="text-muted fs-12 mb-2">{{ __('messages.mobile_step2_desc') }}</p>
+                                <pre class="bg-dark text-white p-2.5 rounded font-monospace mb-0 fs-12 user-select-all">BASE_URL={{ url('/api') }}
+MOBILE_API_KEY=<span id="guideEnvKeyDisplay">{{ !empty($mobileSettings['api_key']) ? '••••••••••••••••••••••••••••••••' : 'YOUR_GENERATED_API_KEY' }}</span></pre>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6">
+                            <div class="p-3 bg-light border rounded-3 h-100">
+                                <h6 class="fw-bold mb-2 fs-13 text-primary"><i class="feather-play me-1"></i> {{ __('messages.mobile_step3_title') }}</h6>
+                                <pre class="bg-dark text-white p-2.5 rounded font-monospace mb-0 fs-12 user-select-all">flutter pub get
+flutter run</pre>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-6">
+                            <div class="p-3 bg-light border rounded-3 h-100">
+                                <h6 class="fw-bold mb-2 fs-13 text-primary"><i class="feather-package me-1"></i> {{ __('messages.mobile_step4_title') }}</h6>
+                                <pre class="bg-dark text-white p-2.5 rounded font-monospace mb-0 fs-12 user-select-all"># Android APK
+flutter build apk --release
+
+# Google Play App Bundle
+flutter build appbundle</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Card 5: Developer Integration & Quick Test -->
         <div class="col-12">
             <div class="card border-0 shadow-sm">
                 <div class="card-header bg-transparent border-bottom py-3 d-flex align-items-center justify-content-between">
@@ -285,6 +361,7 @@
         const input = document.getElementById('mobileApiKeyInput');
         const icon = document.getElementById('toggleApiKeyIcon');
         const envKey = document.getElementById('flutterEnvKeyDisplay');
+        const guideKey = document.getElementById('guideEnvKeyDisplay');
         const curlKey = document.getElementById('curlKeyDisplay');
 
         if (input.type === 'password') {
@@ -292,12 +369,14 @@
             icon.classList.remove('feather-eye');
             icon.classList.add('feather-eye-off');
             if (envKey) envKey.innerText = rawApiKey || "YOUR_GENERATED_API_KEY";
+            if (guideKey) guideKey.innerText = rawApiKey || "YOUR_GENERATED_API_KEY";
             if (curlKey) curlKey.innerText = rawApiKey || "YOUR_API_KEY";
         } else {
             input.type = 'password';
             icon.classList.remove('feather-eye-off');
             icon.classList.add('feather-eye');
             if (envKey) envKey.innerText = maskedKey;
+            if (guideKey) guideKey.innerText = maskedKey;
             if (curlKey) curlKey.innerText = maskedCurlKey;
         }
     }
