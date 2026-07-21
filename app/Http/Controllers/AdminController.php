@@ -2976,6 +2976,10 @@ class AdminController extends Controller
                     if ($code === 'it') $name = 'Italian';
                     if ($code === 'tr') $name = 'Turkish';
                     if ($code === 'fa') $name = 'Persian';
+                    if ($code === 'sr') $name = 'Serbian';
+                    if ($code === 'ja') $name = 'Japanese';
+                    if ($code === 'zh_CN' || $code === 'zh-CN') $name = 'Chinese (Simplified)';
+                    if ($code === 'zh_TW' || $code === 'zh-TW') $name = 'Chinese (Traditional)';
                     
                     Option::create([
                         'name' => $name,

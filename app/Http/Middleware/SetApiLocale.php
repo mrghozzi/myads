@@ -18,14 +18,18 @@ class SetApiLocale
         $locale = $request->header('Accept-Language') ?? $request->header('X-Locale');
 
         if ($locale) {
-            // Extract the base language code (e.g., "en-US,en;q=0.9" -> "en")
-            $locale = substr($locale, 0, 2);
+            // Support both 2-letter (en, sr, ja) and 5-letter (zh_CN, zh_TW) locale format
+            $rawLocale = str_replace('-', '_', explode(',', $locale)[0]);
             
-            // Check if the locale is supported, assuming 'ar' and 'en' for now, or fallback to config
-            $supportedLocales = ['en', 'ar', 'de', 'es', 'fa', 'fr', 'it', 'pt', 'tr'];
+            $supportedLocales = ['en', 'ar', 'de', 'es', 'fa', 'fr', 'it', 'ja', 'pt', 'sr', 'tr', 'zh_CN', 'zh_TW'];
             
-            if (in_array($locale, $supportedLocales)) {
-                app()->setLocale($locale);
+            if (in_array($rawLocale, $supportedLocales)) {
+                app()->setLocale($rawLocale);
+            } else {
+                $baseLocale = substr($rawLocale, 0, 2);
+                if (in_array($baseLocale, $supportedLocales)) {
+                    app()->setLocale($baseLocale);
+                }
             }
         }
 
