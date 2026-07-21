@@ -24,7 +24,7 @@ class SearchApiController extends Controller
         try {
             // Search Users
             $users = User::where('username', 'LIKE', "%{$query}%")
-                ->select('id', 'username', 'name', 'img')
+                ->select('id', 'username', 'img')
                 ->limit(3)
                 ->get();
             
@@ -35,7 +35,7 @@ class SearchApiController extends Controller
                     'identifier' => $user->username,
                     'title' => $user->username,
                     'img' => $user->avatarUrl(),
-                    'subtitle' => $user->name,
+                    'subtitle' => '@' . $user->username,
                 ];
             }
 

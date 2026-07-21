@@ -1,3 +1,9 @@
+# v4.4.6
+> **Patch Release** — Mobile API Search Fix.
+
+### Bug Fixes
+* **Fix (Mobile API):** Resolved a `500 Internal Server Error` in the Live Search API (`SearchApiController`) caused by attempting to select a non-existent `name` column on the `User` model, restoring global search functionality within the mobile app.
+
 # v4.4.5
 > **Stable Release** — Mobile API Community Feed Enhancements & Authorization Fixes.
 
