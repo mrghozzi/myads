@@ -535,6 +535,8 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::post('/settings', [AdminController::class, 'updateSettings'])->name('admin.settings.update');
     Route::get('/settings/system', [AdminController::class, 'systemSettings'])->name('admin.settings.system');
     Route::post('/settings/system', [AdminController::class, 'updateSystemSettings'])->name('admin.settings.system.update');
+    Route::get('/settings/mobile', [AdminController::class, 'mobileSettings'])->name('admin.settings.mobile');
+    Route::post('/settings/mobile', [AdminController::class, 'updateMobileSettings'])->name('admin.settings.mobile.update');
     Route::get('/settings/performance', [AdminController::class, 'performanceSettings'])->name('admin.settings.performance');
     Route::post('/settings/performance', [AdminController::class, 'updatePerformanceSettings'])->name('admin.settings.performance.update');
     Route::get('/shared-hosting-guide', [AdminController::class, 'sharedHostingGuide'])->name('admin.shared_hosting_guide');

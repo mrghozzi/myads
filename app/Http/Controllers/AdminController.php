@@ -544,10 +544,21 @@ class AdminController extends Controller
 
     public function systemSettings()
     {
-        $mobileApiKeyOption = Option::where('o_type', 'mobile_api')->where('name', 'api_key')->first();
-        $mobileApiKey = $mobileApiKeyOption ? $mobileApiKeyOption->o_valuer : null;
+        return view('admin::admin.system_settings');
+    }
 
-        return view('admin::admin.system_settings', compact('mobileApiKey'));
+    public function mobileSettings()
+    {
+        $options = Option::where('o_type', 'mobile_api')->get()->keyBy('name');
+
+        $mobileSettings = [
+            'api_key' => $options->has('api_key') ? $options['api_key']->o_valuer : null,
+            'enabled' => $options->has('enabled') ? $options['enabled']->o_valuer : '1',
+            'maintenance_mode' => $options->has('maintenance_mode') ? $options['maintenance_mode']->o_valuer : '0',
+            'min_version' => $options->has('min_version') ? $options['min_version']->o_valuer : '1.0.0',
+        ];
+
+        return view('admin::admin.mobile_settings', compact('mobileSettings'));
     }
 
     public function generateApiKey(Request $request)
@@ -559,7 +570,33 @@ class AdminController extends Controller
             ['o_valuer' => $newKey]
         );
 
-        return redirect()->route('admin.settings.system')->with('success', __('Mobile API Key generated successfully.'));
+        return redirect()->route('admin.settings.mobile')->with('success', __('messages.mobile_api_key_generated') ?? __('Mobile API Key generated successfully.'));
+    }
+
+    public function updateMobileSettings(Request $request)
+    {
+        $validated = $request->validate([
+            'enabled' => 'required|in:0,1',
+            'maintenance_mode' => 'required|in:0,1',
+            'min_version' => 'nullable|string|max:20',
+        ]);
+
+        Option::updateOrCreate(
+            ['o_type' => 'mobile_api', 'name' => 'enabled'],
+            ['o_valuer' => (string)$validated['enabled']]
+        );
+
+        Option::updateOrCreate(
+            ['o_type' => 'mobile_api', 'name' => 'maintenance_mode'],
+            ['o_valuer' => (string)$validated['maintenance_mode']]
+        );
+
+        Option::updateOrCreate(
+            ['o_type' => 'mobile_api', 'name' => 'min_version'],
+            ['o_valuer' => (string)($validated['min_version'] ?? '1.0.0')]
+        );
+
+        return redirect()->route('admin.settings.mobile')->with('success', __('messages.mobile_settings_updated') ?? __('Mobile app settings updated successfully.'));
     }
 
     public function updateSystemSettings(Request $request)

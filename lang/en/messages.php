@@ -1,6 +1,12 @@
 <?php
 
 return [
+    'mobile_settings_title' => 'Mobile App Settings',
+    'mobile_settings_subtitle' => 'Manage your mobile application API key, client authentication security, and app feature toggles.',
+    'mobile_settings_hint' => 'Manage your mobile application security API key, maintenance mode, and developer API configuration in a dedicated panel.',
+    'open_mobile_settings' => 'Open Mobile App Settings',
+    'mobile_api_key_generated' => 'Mobile API Key generated successfully.',
+    'mobile_settings_updated' => 'Mobile app settings updated successfully.',
     'Activated' => 'Activated',
     'Admin' => 'Admin',
     'Admins' => 'Admins',

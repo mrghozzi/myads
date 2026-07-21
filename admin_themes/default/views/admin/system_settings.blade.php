@@ -89,23 +89,22 @@
                     </div>
                 </div>
                 <div class="col-12"><hr class="my-0"></div>
-                <div class="col-12 d-flex justify-content-between align-items-center">
-                    <h3 class="h5 mb-0 text-primary"><i class="feather-smartphone me-2"></i>{{ __('Mobile App API Key') }}</h3>
-                </div>
                 <div class="col-12">
-                    <div class="alert alert-secondary py-3 px-3 mb-0">
-                        <div class="d-flex align-items-center mb-2">
-                            <strong class="me-2">{{ __('Current API Key') }}:</strong>
-                            @if($mobileApiKey)
-                                <code class="fs-6 px-2 py-1 bg-dark text-white rounded user-select-all">{{ $mobileApiKey }}</code>
-                            @else
-                                <span class="badge bg-danger">{{ __('Not Generated') }}</span>
-                            @endif
+                    <div class="card bg-soft-primary border-primary border-dashed mb-0">
+                        <div class="card-body d-flex align-items-center justify-content-between flex-wrap gap-3">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="avatar-text avatar-lg bg-primary text-white rounded-3 fs-3">
+                                    <i class="feather-smartphone"></i>
+                                </div>
+                                <div>
+                                    <h4 class="fs-15 fw-bold mb-1">{{ __('messages.mobile_settings_title') ?? 'Mobile App Settings & API Key' }}</h4>
+                                    <p class="text-muted fs-12 mb-0">{{ __('messages.mobile_settings_hint') ?? 'Manage your mobile application security API key, maintenance mode, and developer API configuration in a dedicated panel.' }}</p>
+                                </div>
+                            </div>
+                            <a href="{{ route('admin.settings.mobile') }}" class="btn btn-primary btn-md">
+                                <i class="feather-external-link me-1"></i>{{ __('messages.open_mobile_settings') ?? 'Open Mobile App Settings' }}
+                            </a>
                         </div>
-                        <p class="text-muted small mb-3">{{ __('Copy this key and paste it into the .env file of your Android/Mobile application source code (e.g. MOBILE_API_KEY=...). This protects your API from unauthorized access.') }}</p>
-                        <button type="button" class="btn btn-sm btn-{{ $mobileApiKey ? 'warning' : 'primary' }}" onclick="document.getElementById('generate-api-key-form').submit();">
-                            <i class="feather-refresh-cw me-1"></i>{{ $mobileApiKey ? __('Regenerate API Key') : __('Generate API Key') }}
-                        </button>
                     </div>
                 </div>
                 <div class="col-12"><hr class="my-0"></div>
@@ -127,10 +126,5 @@
             </form>
         </div>
     </section>
-
-    <!-- Hidden form for API Key Generation -->
-    <form id="generate-api-key-form" action="{{ route('admin.settings.api_key.generate') }}" method="POST" style="display: none;">
-        @csrf
-    </form>
 </div>
 @endsection

@@ -1,6 +1,12 @@
 <?php
 
 return [
+    'mobile_settings_title' => 'إعدادات تطبيق الجوال',
+    'mobile_settings_subtitle' => 'إدارة مفتاح API، وأمن الاتصال، والتحكم في مفاتيح تشغيل تطبيق الهاتف الجوال.',
+    'mobile_settings_hint' => 'إدارة مفتاح API الخاص بتطبيق الجوال، ووضع الصيانة، وإعدادات المطورين في صفحة مخصصة ومستقلة.',
+    'open_mobile_settings' => 'فتح إعدادات تطبيق الجوال',
+    'mobile_api_key_generated' => 'تم توليد مفتاح API الخاص بتطبيق الجوال بنجاح.',
+    'mobile_settings_updated' => 'تم تحديث إعدادات تطبيق الجوال بنجاح.',
     'Activated' => 'مفعل',
     'Admin' => 'مدير',
     'Admins' => 'المديرون',
