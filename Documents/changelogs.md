@@ -1,11 +1,11 @@
 # v4.4.6
-> **Patch Release** — Mobile API Search Fix, Log Bloat & Server Storage Optimization, New Language Packs (Serbian, Japanese, Simplified & Traditional Chinese), Daily Log Rotation, Automated Log Cleanup.
+> **Patch Release** — Mobile API Search Fix, Log Bloat & Server Storage Optimization, New Language Packs (Russian, Serbian, Japanese, Simplified & Traditional Chinese), Daily Log Rotation, Automated Log Cleanup.
 
 ### Internationalization (i18n)
-* **Feature (Language Support):** Added full language support for **Serbian** (`sr`), **Japanese** (`ja`), **Simplified Chinese** (`zh_CN`), and **Traditional Chinese** (`zh_TW`) across all 3,625+ system translation keys (`lang/{locale}/messages.php`, `about.php`, `auth.php`, `pagination.php`, `passwords.php`, `validation.php`).
-* **Feature (UI & Native Display):** Integrated native language display names (`Српски`, `日本語`, `简体中文`, `繁體中文`) into language selector dropdown menus in the header, desktop/mobile sidebars, and admin panel.
+* **Feature (Language Support):** Added full language support for **Russian** (`ru`), **Serbian** (`sr`), **Japanese** (`ja`), **Simplified Chinese** (`zh_CN`), and **Traditional Chinese** (`zh_TW`) across all 3,625+ system translation keys (`lang/{locale}/messages.php`, `about.php`, `auth.php`, `pagination.php`, `passwords.php`, `validation.php`).
+* **Feature (UI & Native Display):** Integrated native language display names (`Русский`, `Српски`, `日本語`, `简体中文`, `繁體中文`) into language selector dropdown menus in the header, desktop/mobile sidebars, and admin panel.
 * **Feature (API & Middleware):** Enhanced `SetApiLocale` middleware to handle 2-letter and 5-letter locale codes with automatic HTTP header string normalization (`zh-CN` -> `zh_CN`, `zh-TW` -> `zh_TW`). Updated `AdminController` language auto-sync.
-* **Quality (Automated Testing):** Expanded `V420TranslationsFeatureTest`, `V430GroupsTranslationsFeatureTest`, and `SmartAdsFeatureTest` to enforce translation key existence and non-English locale verification across all 13 supported languages.
+* **Quality (Automated Testing):** Expanded `V420TranslationsFeatureTest`, `V430GroupsTranslationsFeatureTest`, and `SmartAdsFeatureTest` to enforce translation key existence and non-English locale verification across all 14 supported languages.
 
 ### Performance & Optimization
 * **Critical Fix (Storage & System):** Resolved server disk space exhaustion and high disk I/O load caused by unbounded growth of `storage/logs/laravel.log`.

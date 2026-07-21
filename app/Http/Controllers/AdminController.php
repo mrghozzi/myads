@@ -2978,6 +2978,7 @@ class AdminController extends Controller
                     if ($code === 'fa') $name = 'Persian';
                     if ($code === 'sr') $name = 'Serbian';
                     if ($code === 'ja') $name = 'Japanese';
+                    if ($code === 'ru') $name = 'Russian';
                     if ($code === 'zh_CN' || $code === 'zh-CN') $name = 'Chinese (Simplified)';
                     if ($code === 'zh_TW' || $code === 'zh-TW') $name = 'Chinese (Traditional)';
                     

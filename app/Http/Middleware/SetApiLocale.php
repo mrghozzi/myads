@@ -21,7 +21,7 @@ class SetApiLocale
             // Support both 2-letter (en, sr, ja) and 5-letter (zh_CN, zh_TW) locale format
             $rawLocale = str_replace('-', '_', explode(',', $locale)[0]);
             
-            $supportedLocales = ['en', 'ar', 'de', 'es', 'fa', 'fr', 'it', 'ja', 'pt', 'sr', 'tr', 'zh_CN', 'zh_TW'];
+            $supportedLocales = ['en', 'ar', 'de', 'es', 'fa', 'fr', 'it', 'ja', 'pt', 'ru', 'sr', 'tr', 'zh_CN', 'zh_TW'];
             
             if (in_array($rawLocale, $supportedLocales)) {
                 app()->setLocale($rawLocale);
