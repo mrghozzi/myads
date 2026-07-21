@@ -396,14 +396,14 @@
                 </div>
             </div>
 
-            <!-- Developer Info -->
+            <!-- Developer Info & Community Hub -->
             <div class="card border-0 shadow-sm mb-3" style="border-radius: 14px;">
                 <div class="card-body px-4 py-4 text-center">
                     <div class="mb-3 d-flex align-items-center justify-content-center mx-auto" style="width: 48px; height: 48px; border-radius: 12px; background: linear-gradient(135deg, rgba(59,130,246,0.1), rgba(99,102,241,0.1));">
                         <i class="feather-code" style="color: #3b82f6; font-size: 20px;"></i>
                     </div>
                     <h6 class="fw-semibold text-muted mb-1" style="font-size: 0.8rem;">{{ __('messages.developed_by') ?? 'Developed by' }}</h6>
-                    <a href="https://github.com/mrghozzi" target="_blank" class="fw-bold" style="color: #3b82f6;">MrGhozzi</a>
+                    <a href="https://github.com/mrghozzi" target="_blank" rel="noopener noreferrer" class="fw-bold" style="color: #3b82f6;">MrGhozzi</a>
                     
                     <div class="d-flex align-items-center justify-content-center gap-2 mt-3">
                         <span class="text-muted" style="font-size: 0.8rem;">{{ __('messages.version') }}</span>
@@ -415,9 +415,28 @@
                         @endif
                     </div>
                     
-                    <a href="{{ route('admin.updates') }}" class="btn btn-sm w-100 mt-3 py-2" style="background: rgba(59,130,246,0.08); color: #3b82f6; border: 1px solid rgba(59,130,246,0.15); border-radius: 10px;">
+                    <a href="{{ route('admin.updates') }}" class="btn btn-sm w-100 mt-3 py-2 mb-3" style="background: rgba(59,130,246,0.08); color: #3b82f6; border: 1px solid rgba(59,130,246,0.15); border-radius: 10px;">
                         <i class="feather-refresh-cw me-1"></i> {{ __('messages.check_for_updates') ?? 'Check for Updates' }}
                     </a>
+
+                    <!-- Community, Support & Docs Links -->
+                    <div class="pt-3 border-top border-dashed d-flex flex-wrap justify-content-center gap-2">
+                        <a href="https://github.com/mrghozzi/myads" target="_blank" rel="noopener noreferrer" class="btn btn-sm px-2 py-1 text-dark fw-bold" style="background: rgba(245,158,11,0.12); color: #d97706; border: 1px solid rgba(245,158,11,0.2); border-radius: 8px; font-size: 0.75rem;">
+                            <i class="feather-star me-1" style="color: #f59e0b;"></i> ⭐ {{ __('about.star_on_github') }}
+                        </a>
+                        <a href="https://github.com/mrghozzi/myads/discussions" target="_blank" rel="noopener noreferrer" class="btn btn-sm px-2 py-1" style="background: rgba(59,130,246,0.08); color: #3b82f6; border: 1px solid rgba(59,130,246,0.15); border-radius: 8px; font-size: 0.75rem;">
+                            <i class="feather-life-buoy me-1"></i> {{ __('about.get_support') }}
+                        </a>
+                        <a href="https://github.com/mrghozzi/myads/wiki" target="_blank" rel="noopener noreferrer" class="btn btn-sm px-2 py-1" style="background: rgba(14,165,233,0.08); color: #0284c7; border: 1px solid rgba(14,165,233,0.15); border-radius: 8px; font-size: 0.75rem;">
+                            <i class="feather-book-open me-1"></i> Wiki
+                        </a>
+                        <a href="https://www.adstn.ovh/kb/myads" target="_blank" rel="noopener noreferrer" class="btn btn-sm px-2 py-1" style="background: rgba(16,185,129,0.08); color: #059669; border: 1px solid rgba(16,185,129,0.15); border-radius: 8px; font-size: 0.75rem;">
+                            <i class="feather-globe me-1"></i> KB
+                        </a>
+                        <a href="https://github.com/mrghozzi/myads/issues" target="_blank" rel="noopener noreferrer" class="btn btn-sm px-2 py-1" style="background: rgba(239,68,68,0.08); color: #dc2626; border: 1px solid rgba(239,68,68,0.15); border-radius: 8px; font-size: 0.75rem;">
+                            <i class="feather-alert-circle me-1"></i> {{ __('about.report_issue') }}
+                        </a>
+                    </div>
                 </div>
             </div>
 
