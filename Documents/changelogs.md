@@ -12,6 +12,10 @@
 ### Bug Fixes
 * **Fix (Mobile API):** Resolved a `500 Internal Server Error` in the Live Search API (`SearchApiController`) caused by attempting to select a non-existent `name` column on the `User` model, restoring global search functionality within the mobile app.
 
+### Dependencies
+* **chore(deps)**: bump guzzlehttp/guzzle from 7.12.1 to 7.15.1 in the composer group across 1 directory.
+* **chore(deps-dev)**: bump shell-quote from 1.8.4 to 1.9.0 in the npm_and_yarn group across 1 directory.
+
 # v4.4.5
 > **Stable Release** — Mobile API Community Feed Enhancements & Authorization Fixes.
 

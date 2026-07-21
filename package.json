@@ -23,7 +23,7 @@
         "jsvectormap": "^1.7.0"
     },
     "overrides": {
-        "shell-quote": "^1.8.4",
+        "shell-quote": "^1.9.0",
         "form-data": "^4.0.6"
     }
 }
