@@ -13,6 +13,7 @@ use App\Services\DatabaseMaintenanceService;
 use App\Services\SmartAdGeoResolver;
 use App\Support\AdsSettings;
 use App\Support\BannerServingSettings;
+use App\Console\Commands\LogCleanup;
 use App\Support\BannerSizeCatalog;
 use App\Support\SmartAdTargeting;
 use App\Support\LinkServingSettings;
@@ -728,6 +729,7 @@ class AdsServingController extends Controller
         }
 
         PruneStorageFiles::maybePrune();
+        LogCleanup::maybePrune();
     }
 
     private function resolveVisitorKey(Request $request): string

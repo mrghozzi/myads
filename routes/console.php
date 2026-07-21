@@ -19,3 +19,4 @@ Schedule::command('blocks:process-expired')->hourly();
 // v4.4.4: Automated database and storage maintenance
 Schedule::command('myads:db-cleanup --force')->dailyAt('03:00');
 Schedule::command('myads:prune-storage')->dailyAt('03:30');
+Schedule::command('myads:log-cleanup')->dailyAt('04:00');

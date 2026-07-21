@@ -98,6 +98,20 @@
                                         <span class="input-group-text">{{ __('messages.days') ?? 'days' }}</span>
                                     </div>
                                 </div>
+                                <div class="col-md-4 col-lg mb-3">
+                                    <label class="form-label small text-muted">{{ __('messages.log_files') ?? 'Log Files Retention' }}</label>
+                                    <div class="input-group input-group-sm">
+                                        <input type="number" name="retention_logs" class="form-control" min="1" value="{{ $retentionDays['logs'] ?? 7 }}">
+                                        <span class="input-group-text">{{ __('messages.days') ?? 'days' }}</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-4 col-lg mb-3">
+                                    <label class="form-label small text-muted">{{ __('messages.max_log_size') ?? 'Max Log File Size' }}</label>
+                                    <div class="input-group input-group-sm">
+                                        <input type="number" name="max_log_size_mb" class="form-control" min="1" value="{{ $retentionDays['max_log_size_mb'] ?? 10 }}">
+                                        <span class="input-group-text">MB</span>
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="d-flex justify-content-end mt-2">
@@ -170,7 +184,7 @@
 
         {{-- v4.4.4: Storage Cleanup --}}
         <div class="row">
-            <div class="col-md-6 mb-3">
+            <div class="col-md-4 mb-3">
                 <div class="card stretch stretch-full">
                     <div class="card-body">
                         <div class="d-flex align-items-center justify-content-between mb-2">
@@ -190,7 +204,7 @@
                 </div>
             </div>
 
-            <div class="col-md-6 mb-3">
+            <div class="col-md-4 mb-3">
                 <div class="card stretch stretch-full">
                     <div class="card-body">
                         <div class="d-flex align-items-center justify-content-between mb-2">
@@ -204,6 +218,30 @@
                             @csrf
                             <button type="submit" name="prune_sessions" value="1" class="btn btn-outline-info btn-sm">
                                 <i class="feather-trash me-1"></i> {{ __('messages.prune_stale') ?? 'Prune Stale' }}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            {{-- v4.4.7: Log Files Cleanup --}}
+            <div class="col-md-4 mb-3">
+                <div class="card stretch stretch-full">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <div>
+                                <h6 class="mb-1"><i class="feather-file-text me-2"></i>{{ __('messages.log_files') ?? 'Log Files' }}</h6>
+                                <p class="text-muted small mb-0">{{ __('messages.log_files_hint') ?? 'Remove old log files and truncate oversized logs' }}</p>
+                            </div>
+                            <div class="text-end">
+                                <span class="badge bg-soft-danger text-danger fs-6">{{ $logSize }} MB</span>
+                                <br><small class="text-muted">{{ $logFileCount }} {{ __('messages.files') ?? 'files' }}</small>
+                            </div>
+                        </div>
+                        <form action="{{ route('admin.database_cleanup.action') }}" method="POST" class="d-inline">
+                            @csrf
+                            <button type="submit" name="prune_logs" value="1" class="btn btn-outline-danger btn-sm">
+                                <i class="feather-trash me-1"></i> {{ __('messages.prune_logs') ?? 'Clean Logs' }}
                             </button>
                         </form>
                     </div>

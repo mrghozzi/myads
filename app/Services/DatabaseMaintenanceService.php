@@ -27,6 +27,8 @@ class DatabaseMaintenanceService
         'smart_ad_impressions'   => 30,
         'seo_daily_metrics'      => 90,
         'custom_ad_events'       => 60,
+        'logs'                   => 7,
+        'max_log_size_mb'        => 10,
     ];
 
     /**
@@ -115,6 +117,8 @@ class DatabaseMaintenanceService
             'smart_ad_impressions' => (int) ($options['db_retention_smart_ad_impressions'] ?? $defaults['smart_ad_impressions']),
             'seo_daily_metrics'    => (int) ($options['db_retention_seo_daily_metrics'] ?? $defaults['seo_daily_metrics']),
             'custom_ad_events'     => (int) ($options['db_retention_custom_ad_events'] ?? $defaults['custom_ad_events']),
+            'logs'                 => (int) ($options['db_retention_logs'] ?? 7),
+            'max_log_size_mb'      => (int) ($options['db_max_log_size_mb'] ?? 10),
         ];
     }
 

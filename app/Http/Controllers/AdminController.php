@@ -4617,10 +4617,14 @@ class AdminController extends Controller
             fn () => $this->getDirectorySizeMB(storage_path('framework/sessions'), 3000)
         );
 
+        // v4.4.7: Log files size reporting
+        $logSize = $this->getDirectorySizeMB(storage_path('logs'), 100);
+        $logFileCount = is_dir(storage_path('logs')) ? count(\Illuminate\Support\Facades\File::files(storage_path('logs'))) : 0;
+
         return view('admin::admin.database_cleanup', compact(
             'stateCount', 'bannerImpressionsCount', 'seoMetricsCount',
             'tableSizes', 'retentionDays', 'autoCleanupEnabled',
-            'cacheSize', 'sessionSize'
+            'cacheSize', 'sessionSize', 'logSize', 'logFileCount'
         ));
     }
 
@@ -4641,6 +4645,8 @@ class AdminController extends Controller
                 'db_retention_smart_ad_impressions' => max(1, (int) $request->input('retention_smart_ad_impressions', 30)),
                 'db_retention_seo_daily_metrics' => max(1, (int) $request->input('retention_seo_daily_metrics', 90)),
                 'db_retention_custom_ad_events' => max(1, (int) $request->input('retention_custom_ad_events', 60)),
+                'db_retention_logs' => max(1, (int) $request->input('retention_logs', 7)),
+                'db_max_log_size_mb' => max(1, (int) $request->input('max_log_size_mb', 10)),
             ];
 
             foreach ($settingsMap as $key => $value) {
@@ -4667,6 +4673,14 @@ class AdminController extends Controller
 
             return redirect()->route('admin.database_cleanup')
                 ->with('success', __('messages.cache_cleared') ?? 'Stale session files pruned.');
+        }
+
+        // v4.4.7: Handle log cleanup
+        if ($request->has('prune_logs')) {
+            \Illuminate\Support\Facades\Artisan::call('myads:log-cleanup');
+
+            return redirect()->route('admin.database_cleanup')
+                ->with('success', __('messages.logs_cleaned') ?? 'Old log files cleaned up.');
         }
 
         $deletedState = 0;

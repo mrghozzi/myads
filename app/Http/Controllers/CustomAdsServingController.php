@@ -10,6 +10,7 @@ use App\Services\SmartAdGeoResolver;
 use App\Support\CustomAdsSettings;
 use App\Support\SmartAdTargeting;
 use App\Console\Commands\PruneStorageFiles;
+use App\Console\Commands\LogCleanup;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
 
@@ -149,5 +150,6 @@ class CustomAdsServingController extends Controller
         }
 
         PruneStorageFiles::maybePrune();
+        LogCleanup::maybePrune();
     }
 }

@@ -18,14 +18,18 @@ class PruneStorageFiles extends Command
 {
     protected $signature = 'myads:prune-storage
                             {--sessions : Only prune session files}
-                            {--cache : Only prune cache files}';
+                            {--cache : Only prune cache files}
+                            {--logs : Only prune log files}';
 
     protected $description = 'Remove expired cache files and stale session files to free disk space.';
 
     public function handle(): int
     {
-        $pruneCache = !$this->option('sessions');
-        $pruneSessions = !$this->option('cache');
+        $specificMode = $this->option('sessions') || $this->option('cache') || $this->option('logs');
+
+        $pruneCache = !$specificMode || $this->option('cache');
+        $pruneSessions = !$specificMode || $this->option('sessions');
+        $pruneLogs = !$specificMode || $this->option('logs');
 
         if ($pruneCache) {
             $this->pruneExpiredCacheFiles();
@@ -33,6 +37,10 @@ class PruneStorageFiles extends Command
 
         if ($pruneSessions) {
             $this->pruneStaleSessionFiles();
+        }
+
+        if ($pruneLogs) {
+            $this->call('myads:log-cleanup');
         }
 
         return Command::SUCCESS;
@@ -194,6 +202,7 @@ class PruneStorageFiles extends Command
             // Quick inline cleanup without full command infrastructure
             static::quickPruneCacheFiles();
             static::quickPruneSessionFiles();
+            \App\Console\Commands\LogCleanup::maybePrune();
         } catch (\Throwable) {
             // Silently fail
         }

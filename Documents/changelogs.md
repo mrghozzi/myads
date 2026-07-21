@@ -1,5 +1,13 @@
 # v4.4.6
-> **Patch Release** — Mobile API Search Fix.
+> **Patch Release** — Mobile API Search Fix, Log Bloat & Server Storage Optimization, Daily Log Rotation, Automated Log Cleanup.
+
+### Performance & Optimization
+* **Critical Fix (Storage & System):** Resolved server disk space exhaustion and high disk I/O load caused by unbounded growth of `storage/logs/laravel.log`.
+* **Feature (Log System):** Converted the default logging stack from single monolithic file (`LOG_STACK=single`) to daily rotated log files (`LOG_STACK=daily`) with an automatic 7-day retention window (`LOG_DAILY_DAYS=7`).
+* **Feature (Artisan & Maintenance):** Created new `myads:log-cleanup` command that removes expired rotated log files (`laravel-YYYY-MM-DD.log`), truncates oversized monolithic logs (`laravel.log` > 10MB while preserving the latest 2MB entries), and clears temporary log files (`error_temp.log`, `temp_tail.log`). Scheduled automatically via `routes/console.php` at 04:00 daily.
+* **Feature (Shared Hosting Auto-Cleanup):** Integrated 3-tier fallback probabilistic log pruning into `PruneStorageFiles::maybePrune()` and ad serving endpoints (`AdsServingController`, `CustomAdsServingController`), guaranteeing log cleanup on shared hosting environments without cron job support.
+* **Feature (Admin Dashboard & Storage Control):** Added configurable **Log Files Retention** (`db_retention_logs`) and **Max Monolithic Log Size** (`db_max_log_size_mb`) settings to the Auto-Cleanup section on `/admin/database-cleanup`. Integrated these settings directly into `DatabaseMaintenanceService` and `LogCleanup` to guarantee seamless automated log management for existing sites without requiring manual `.env` edits.
+* **Admin Dashboard:** Added a new **Log Files** resource monitor card to the Admin Database Cleanup page (`/admin/database-cleanup`) displaying total log directory size, file count, and a manual "Clean Logs" trigger button.
 
 ### Bug Fixes
 * **Fix (Mobile API):** Resolved a `500 Internal Server Error` in the Live Search API (`SearchApiController`) caused by attempting to select a non-existent `name` column on the `User` model, restoring global search functionality within the mobile app.

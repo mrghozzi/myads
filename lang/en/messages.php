@@ -3756,4 +3756,11 @@ return [
     'shg_safe_6' => 'Leave only necessary plugins and themes enabled.',
     'shg_safe_7' => 'Monitor System Monitor after changing performance settings.',
     'shg_safe_8' => 'Upgrade hosting if CPU remains above limits after optimization.',
+
+    // v4.4.7: Log Cleanup
+    'log_files' => 'Log Files',
+    'log_files_hint' => 'Remove old log files and truncate oversized logs',
+    'prune_logs' => 'Clean Logs',
+    'logs_cleaned' => 'Old log files cleaned up successfully.',
+    'files' => 'files',
 ];
