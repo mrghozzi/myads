@@ -50,4 +50,22 @@ return [
     'made_with_love' => 'صُنع بحب ❤️ بواسطة mrghozzi',
     'github_repo' => 'مستودع GitHub',
     'return_dashboard' => 'العودة إلى لوحة التحكم',
+    
+    // GitHub Community, Documentation & Support
+    'star_on_github' => 'تقييم بنجمة ⭐',
+    'get_support' => 'طلب الدعم والمساندة',
+    'report_issue' => 'الإبلاغ عن أخطاء أو مشاكل',
+    'docs_wiki' => 'ويكي الشروحات (Wiki)',
+    'online_kb' => 'قاعدة المعرفة (KB)',
+    'docs_title' => 'مكتبة الدروس والشروحات',
+    'docs_desc' => 'تصفح الشروحات الرسمية وقاعدة المعرفة لمعرفة كافة تفاصيل إعداد واستخدام النظام.',
+    'github_community_title' => 'مجتمع MYADS والدعم والشروحات',
+    'github_community_subtitle' => 'انضم للمجتمع، ساهم في تقييم المشروع بنجمة، احصل على الدعم المباشر، وتصفح الشروحات الرسمية',
+    'star_project_title' => 'تقييم المشروع بنجمة',
+    'star_project_desc' => 'إذا نال مشروع MYADS إعجابك، يسعدنا دعمك بإضافة نجمة ⭐ للمستودع على GitHub.',
+    'support_title' => 'طلب الدعم والمساندة',
+    'support_desc' => 'هل تحتاج إلى مساعدة أو لديك استفسار؟ شارك في النقاشات عبر GitHub Discussions.',
+    'report_issue_title' => 'الإبلاغ عن أخطاء أو مشاكل',
+    'report_issue_desc' => 'هل واجهت مشكلة أو خطأ برمجياً؟ يمكنك تقديم بلاغ مباشر ليتم معالجته فوراً.',
 ];
+

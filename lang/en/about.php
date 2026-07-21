@@ -50,4 +50,21 @@ return [
     'made_with_love' => 'Made with ❤️ by mrghozzi',
     'github_repo' => 'GitHub Repository',
     'return_dashboard' => 'Return to Dashboard',
+
+    // GitHub Community, Documentation & Support
+    'star_on_github' => 'Star on GitHub ⭐',
+    'get_support' => 'Get Support',
+    'report_issue' => 'Report Bugs & Issues',
+    'docs_wiki' => 'GitHub Wiki',
+    'online_kb' => 'Online KB',
+    'docs_title' => 'Lessons & Documentation',
+    'docs_desc' => 'Explore official tutorials and knowledgebase articles to set up and master MYADS.',
+    'github_community_title' => 'MYADS Community, Support & Docs',
+    'github_community_subtitle' => 'Join the community, star the project, get support via Discussions, and browse official documentation',
+    'star_project_title' => 'Star Project on GitHub',
+    'star_project_desc' => 'If you find MYADS helpful, please show your support by giving us a star ⭐ on GitHub.',
+    'support_title' => 'Request Support',
+    'support_desc' => 'Need help or have questions? Connect with us on GitHub Discussions.',
+    'report_issue_title' => 'Report Bugs & Issues',
+    'report_issue_desc' => 'Found a bug or encountered an issue? Submit a bug report on GitHub to help us fix it.',
 ];

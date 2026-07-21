@@ -271,6 +271,28 @@
         margin-right: 0;
         margin-left: 1rem;
     }
+    
+    .github-community-card {
+        background: linear-gradient(135deg, rgba(79, 70, 229, 0.05) 0%, rgba(245, 158, 11, 0.05) 100%);
+        border: 1px solid rgba(79, 70, 229, 0.15) !important;
+        border-radius: 1rem;
+    }
+    .app-skin-dark .github-community-card {
+        background: linear-gradient(135deg, rgba(79, 70, 229, 0.1) 0%, rgba(245, 158, 11, 0.1) 100%);
+        border-color: rgba(255, 255, 255, 0.1) !important;
+    }
+    .sub-github-card {
+        background: rgba(255, 255, 255, 0.85);
+        border-radius: 1rem;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .app-skin-dark .sub-github-card {
+        background: rgba(30, 31, 34, 0.65);
+    }
+    .sub-github-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08) !important;
+    }
 </style>
 
 <div class="nxl-content">
@@ -287,9 +309,24 @@
                         <p class="lead text-muted mx-auto" style="max-width: 600px;">
                             {{ __('about.subtitle', ['version' => $currentVersion]) }}
                         </p>
-                        <div class="mt-4">
+                        <div class="mt-4 d-flex flex-wrap gap-2 justify-content-center align-items-center">
                             <a href="{{ route('admin.index') }}" class="btn btn-primary rounded-pill px-4 py-2 shadow-sm">
                                 <i class="feather-airplay me-2"></i> {{ __('about.return_dashboard') }}
+                            </a>
+                            <a href="https://github.com/mrghozzi/myads" target="_blank" rel="noopener noreferrer" class="btn btn-warning text-dark fw-bold rounded-pill px-3 py-2 shadow-sm">
+                                <i class="feather-star me-2"></i> {{ __('about.star_on_github') }}
+                            </a>
+                            <a href="https://github.com/mrghozzi/myads/discussions" target="_blank" rel="noopener noreferrer" class="btn btn-outline-primary rounded-pill px-3 py-2 shadow-sm">
+                                <i class="feather-life-buoy me-2"></i> {{ __('about.get_support') }}
+                            </a>
+                            <a href="https://github.com/mrghozzi/myads/wiki" target="_blank" rel="noopener noreferrer" class="btn btn-outline-info rounded-pill px-3 py-2 shadow-sm">
+                                <i class="feather-book-open me-2"></i> {{ __('about.docs_wiki') }}
+                            </a>
+                            <a href="https://www.adstn.ovh/kb/myads" target="_blank" rel="noopener noreferrer" class="btn btn-outline-success rounded-pill px-3 py-2 shadow-sm">
+                                <i class="feather-globe me-2"></i> {{ __('about.online_kb') }}
+                            </a>
+                            <a href="https://github.com/mrghozzi/myads/issues" target="_blank" rel="noopener noreferrer" class="btn btn-outline-danger rounded-pill px-3 py-2 shadow-sm">
+                                <i class="feather-alert-circle me-2"></i> {{ __('about.report_issue') }}
                             </a>
                         </div>
                     </div>
@@ -673,8 +710,72 @@
                                     </div>
                                 </div>
                                 
-                                <div class="text-center pt-4 border-top border-dashed border-secondary">
-                                    <a href="https://github.com/mrghozzi/myads" target="_blank" class="btn btn-dark rounded-pill px-4 py-2 shadow-sm mb-3">
+                                <div class="github-community-card p-4 mb-4 mt-5">
+                                    <div class="d-flex align-items-center mb-4">
+                                        <div class="feature-icon-wrapper flex-shrink-0 me-3 mb-0" style="width: 50px; height: 50px; font-size: 24px; background: rgba(79, 70, 229, 0.15); color: #4f46e5;">
+                                            <i class="feather-github"></i>
+                                        </div>
+                                        <div class="text-start">
+                                            <h5 class="fw-bold mb-1">{{ __('about.github_community_title') }}</h5>
+                                            <p class="text-muted mb-0 fs-13">{{ __('about.github_community_subtitle') }}</p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row g-3">
+                                        <!-- Star Project -->
+                                        <div class="col-lg-3 col-md-6">
+                                            <div class="card h-100 border-0 p-4 shadow-none text-center sub-github-card">
+                                                <div class="text-warning mb-2 fs-28"><i class="feather-star"></i></div>
+                                                <h6 class="fw-bold mb-2">{{ __('about.star_project_title') }}</h6>
+                                                <p class="text-muted fs-13 mb-3">{{ __('about.star_project_desc') }}</p>
+                                                <a href="https://github.com/mrghozzi/myads" target="_blank" rel="noopener noreferrer" class="btn btn-warning text-dark fw-bold rounded-pill px-3 py-2 shadow-sm mt-auto">
+                                                    <i class="feather-star me-1"></i> {{ __('about.star_on_github') }}
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <!-- Support Discussions -->
+                                        <div class="col-lg-3 col-md-6">
+                                            <div class="card h-100 border-0 p-4 shadow-none text-center sub-github-card">
+                                                <div class="text-primary mb-2 fs-28"><i class="feather-life-buoy"></i></div>
+                                                <h6 class="fw-bold mb-2">{{ __('about.support_title') }}</h6>
+                                                <p class="text-muted fs-13 mb-3">{{ __('about.support_desc') }}</p>
+                                                <a href="https://github.com/mrghozzi/myads/discussions" target="_blank" rel="noopener noreferrer" class="btn btn-primary rounded-pill px-3 py-2 shadow-sm mt-auto">
+                                                    <i class="feather-message-square me-1"></i> {{ __('about.get_support') }}
+                                                </a>
+                                            </div>
+                                        </div>
+                                        <!-- Lessons & Docs -->
+                                        <div class="col-lg-3 col-md-6">
+                                            <div class="card h-100 border-0 p-4 shadow-none text-center sub-github-card">
+                                                <div class="text-info mb-2 fs-28"><i class="feather-book-open"></i></div>
+                                                <h6 class="fw-bold mb-2">{{ __('about.docs_title') }}</h6>
+                                                <p class="text-muted fs-13 mb-3">{{ __('about.docs_desc') }}</p>
+                                                <div class="d-flex flex-column gap-2 mt-auto">
+                                                    <a href="https://github.com/mrghozzi/myads/wiki" target="_blank" rel="noopener noreferrer" class="btn btn-info text-white rounded-pill px-2 py-1 fs-12 shadow-sm">
+                                                        <i class="feather-book me-1"></i> {{ __('about.docs_wiki') }}
+                                                    </a>
+                                                    <a href="https://www.adstn.ovh/kb/myads" target="_blank" rel="noopener noreferrer" class="btn btn-outline-info rounded-pill px-2 py-1 fs-12 shadow-sm">
+                                                        <i class="feather-globe me-1"></i> {{ __('about.online_kb') }}
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- Report Bug -->
+                                        <div class="col-lg-3 col-md-6">
+                                            <div class="card h-100 border-0 p-4 shadow-none text-center sub-github-card">
+                                                <div class="text-danger mb-2 fs-28"><i class="feather-alert-triangle"></i></div>
+                                                <h6 class="fw-bold mb-2">{{ __('about.report_issue_title') }}</h6>
+                                                <p class="text-muted fs-13 mb-3">{{ __('about.report_issue_desc') }}</p>
+                                                <a href="https://github.com/mrghozzi/myads/issues" target="_blank" rel="noopener noreferrer" class="btn btn-outline-danger rounded-pill px-3 py-2 shadow-sm mt-auto">
+                                                    <i class="feather-bug me-1"></i> {{ __('about.report_issue') }}
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="text-center pt-3 border-top border-dashed border-secondary">
+                                    <a href="https://github.com/mrghozzi/myads" target="_blank" rel="noopener noreferrer" class="btn btn-dark rounded-pill px-4 py-2 shadow-sm mb-3">
                                         <i class="feather-github me-2"></i> {{ __('about.github_repo') }}
                                     </a>
                                     <p class="text-muted mb-0 fs-13">{{ __('about.made_with_love') }}</p>
