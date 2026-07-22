@@ -1956,6 +1956,7 @@ return [
     'system_settings' => 'System Settings',
     'system_settings_desc' => 'Configure app name, environment mode, debug mode, system timezone, sessions, and social OAuth credentials.',
     'system_settings_updated' => 'System settings updated successfully and applied to environment file.',
+    'settings_updated' => 'Settings updated successfully.',
     'r_pts' => 'Registration PTS Points',
     'r_vu' => 'Registration Banner Ad Credits',
     'r_nvu' => 'Registration Link Ad Credits',
