@@ -1,8 +1,12 @@
-# MYADS v4.4.5
+# MYADS v4.4.6
 
 Advanced Laravel-based social networking and ad exchange platform for website owners.
 
 ![MYADS](https://raw.githubusercontent.com/mrghozzi/myads_check_updates/main/myads.png)
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Sponsor Ko-Fi](https://img.shields.io/badge/Sponsor-Ko--fi-ff5e5b.svg)](https://ko-fi.com/mrghozzi)
+[![Sponsor Patreon](https://img.shields.io/badge/Sponsor-Patreon-f96854.svg)](https://www.patreon.com/MrGhozzi)
 
 - Project: [MYADS](https://github.com/mrghozzi/myads)
 - Author: [mrghozzi](https://github.com/mrghozzi)
@@ -217,6 +221,15 @@ Current platform direction includes:
 - More Custom Ads targeting, reporting, and moderation capabilities
 - More API coverage
 - More real-time and marketplace capabilities
+
+## Community & Contributing
+
+We welcome community contributions, bug reports, and suggestions! Please review the following resources:
+
+- 📖 [Contributing Guidelines](CONTRIBUTING.md)
+- 🤝 [Code of Conduct](CODE_OF_CONDUCT.md)
+- 🔒 [Security Policy](SECURITY.md)
+- 💖 [Sponsorship & Support](.github/FUNDING.yml)
 
 ---
 

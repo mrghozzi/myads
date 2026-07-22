@@ -65,6 +65,12 @@ MYADS is a community platform where website owners:
 
 ```
 myads/
+├── .github/                # GitHub templates, workflows, and sponsorship configuration
+│   ├── ISSUE_TEMPLATE/     # Structured bug report, feature request, and issue config forms
+│   ├── workflows/          # GitHub Actions CI/CD workflows (tests.yml)
+│   ├── FUNDING.yml         # Sponsorship configuration (Patreon, Ko-fi, Ba9chich)
+│   ├── PULL_REQUEST_TEMPLATE.md # PR description & checklist template
+│   └── dependabot.yml      # Dependency update configuration
 ├── admin_themes/           # Admin-only themes (Duralux lives here)
 │   └── default/
 │       ├── assets/         # Admin CSS, JS, images
@@ -131,6 +137,8 @@ myads/
 ├── upload/                 # Legacy upload directory
 ├── .env.example            # Environment template
 ├── .htaccess               # Subdirectory routing to public/
+├── CODE_OF_CONDUCT.md      # Contributor Covenant Code of Conduct
+├── CONTRIBUTING.md         # Contribution guidelines and developer setup
 ├── composer.json
 ├── package.json
 ├── vite.config.js
@@ -1022,7 +1030,8 @@ If in doubt, update it. An outdated `Agents.md` causes future agents to make wro
 - **Security (2026-07-02):** Executed comprehensive security audit fixes including AdminController upload validation, StatusPostService MIME checks, CSP headers, and HTTP rate limiting.
 - **Bug Fix (2026-07-03):** Fixed KB categories table corruption (Error 1813), and CSP blocking Markdown rendering in Knowledgebase.
 - **Feature (2026-07-06):** Added **Free SEO Checker** (`/directory/seo-checker`) tool with role-based access gating and a premium "Superdesign" UI, seamlessly integrated into the directory and home dashboards.
+- **GitHub Standards & CI (2026-07-22):** Cleaned up `FUNDING.yml`, added structured Issue templates (`bug_report.yml`, `feature_request.yml`, `config.yml`), PR template (`PULL_REQUEST_TEMPLATE.md`), automated GitHub Actions testing pipeline (`.github/workflows/tests.yml`), `CONTRIBUTING.md`, and `CODE_OF_CONDUCT.md`.
 
 ---
 
-*Last updated: 2026-07-06 — MYADS v4.4.0 (Free SEO Checker, Premium Themes Marketplace Alignment, Expanded Store Categories, Ad Concurrency Prevention, Banner Fallbacks, dynamic Visit Exchange settings, Admin Widgets Update, Comprehensive Security Audit Fixes, Critical Bug Fixes)*
+*Last updated: 2026-07-22 — MYADS v4.4.6 (GitHub Community Standards, Issue & PR Templates, Automated CI Workflows, Clean Sponsorship Configuration)*
