@@ -370,27 +370,107 @@ class AdminController extends Controller
         $settings = Setting::firstOrFail();
         $adminTheme = Option::where('o_type', 'admin_settings')->where('name', 'theme')->value('o_valuer') ?? 'default';
 
-        return view('admin::admin.settings', compact('settings', 'adminTheme'));
+        $systemSettings = [
+            'APP_NAME' => env('APP_NAME', $settings->titer ?? 'MYADS'),
+            'APP_ENV' => env('APP_ENV', 'production'),
+            'APP_DEBUG' => env('APP_DEBUG', false) ? 'true' : 'false',
+            'APP_URL' => env('APP_URL', $settings->url ?? config('app.url', 'http://localhost')),
+            'APP_TIMEZONE' => env('APP_TIMEZONE', $settings->timezone ?? config('app.timezone', 'UTC')),
+            'APP_LOCALE' => env('APP_LOCALE', config('app.locale', 'en')),
+            'SESSION_DRIVER' => env('SESSION_DRIVER', 'file'),
+            'SESSION_LIFETIME' => env('SESSION_LIFETIME', 120),
+            'FACEBOOK_CLIENT_ID' => env('FACEBOOK_CLIENT_ID'),
+            'FACEBOOK_CLIENT_SECRET' => env('FACEBOOK_CLIENT_SECRET'),
+            'GOOGLE_CLIENT_ID' => env('GOOGLE_CLIENT_ID'),
+            'GOOGLE_CLIENT_SECRET' => env('GOOGLE_CLIENT_SECRET'),
+            'ADSTN_CLIENT_ID' => env('ADSTN_CLIENT_ID'),
+            'ADSTN_CLIENT_SECRET' => env('ADSTN_CLIENT_SECRET'),
+        ];
+
+        return view('admin::admin.settings', compact('settings', 'adminTheme', 'systemSettings'));
     }
 
     public function updateSettings(Request $request)
     {
         $settings = Setting::firstOrFail();
         
-        $request->validate([
-            'titer' => 'required|string',
+        $validated = $request->validate([
+            'titer' => 'required|string|max:255',
             'url' => 'required|url',
-            'admin_theme' => 'nullable|string',
+            'slog' => 'nullable|string|max:255',
+            'description' => 'nullable|string',
+            'keyw' => 'nullable|string',
+            'theme' => 'nullable|string|max:100',
+            'admin_theme' => 'nullable|string|max:100',
+            'a_mail' => 'nullable|email|max:255',
+            'r_pts' => 'nullable|numeric|min:0',
+            'r_vu' => 'nullable|integer|min:0',
+            'r_nvu' => 'nullable|integer|min:0',
+            'r_nlink' => 'nullable|integer|min:0',
+            'APP_ENV' => 'required|string|in:production,local,development,testing',
+            'APP_DEBUG' => 'required|string|in:true,false',
+            'APP_TIMEZONE' => 'required|string|max:100',
+            'APP_LOCALE' => 'required|string|in:ar,en,fr,es,de,it,pt,tr,fa',
+            'SESSION_DRIVER' => 'required|string|in:file,cookie,database',
+            'SESSION_LIFETIME' => 'required|integer|min:1|max:10080',
+            'FACEBOOK_CLIENT_ID' => 'nullable|string',
+            'FACEBOOK_CLIENT_SECRET' => 'nullable|string',
+            'GOOGLE_CLIENT_ID' => 'nullable|string',
+            'GOOGLE_CLIENT_SECRET' => 'nullable|string',
+            'ADSTN_CLIENT_ID' => 'nullable|string',
+            'ADSTN_CLIENT_SECRET' => 'nullable|string',
         ]);
 
-        $settings->update($request->only(['titer', 'url', 'description', 'slog', 'theme', 'keyw', 'r_pts', 'r_vu', 'r_nvu', 'r_nlink']));
+        // 1. Update DB site settings table
+        $settings->update([
+            'titer' => $validated['titer'],
+            'url' => $validated['url'],
+            'slog' => $validated['slog'] ?? $settings->slog,
+            'description' => $validated['description'] ?? $settings->description,
+            'keyw' => $validated['keyw'] ?? $settings->keyw,
+            'theme' => $validated['theme'] ?? $settings->theme,
+            'timezone' => $validated['APP_TIMEZONE'],
+            'a_mail' => $validated['a_mail'] ?? $settings->a_mail,
+            'r_pts' => $validated['r_pts'] ?? $settings->r_pts,
+            'r_vu' => $validated['r_vu'] ?? $settings->r_vu,
+            'r_nvu' => $validated['r_nvu'] ?? $settings->r_nvu,
+            'r_nlink' => $validated['r_nlink'] ?? $settings->r_nlink,
+        ]);
 
+        // 2. Update Admin theme in options
         Option::updateOrCreate(
             ['o_type' => 'admin_settings', 'name' => 'theme'],
-            ['o_valuer' => $request->input('admin_theme', 'default')]
+            ['o_valuer' => $validated['admin_theme'] ?? 'default']
         );
 
-        return redirect()->route('admin.settings')->with('success', __('settings_updated'));
+        // 3. Write environment configuration to .env
+        $envData = [
+            'APP_NAME' => $validated['titer'],
+            'APP_URL' => $validated['url'],
+            'APP_ENV' => $validated['APP_ENV'],
+            'APP_DEBUG' => $validated['APP_DEBUG'],
+            'APP_TIMEZONE' => $validated['APP_TIMEZONE'],
+            'APP_LOCALE' => $validated['APP_LOCALE'],
+            'SESSION_DRIVER' => $validated['SESSION_DRIVER'],
+            'SESSION_LIFETIME' => $validated['SESSION_LIFETIME'],
+            'FACEBOOK_CLIENT_ID' => $validated['FACEBOOK_CLIENT_ID'] ?? '',
+            'FACEBOOK_CLIENT_SECRET' => $validated['FACEBOOK_CLIENT_SECRET'] ?? '',
+            'GOOGLE_CLIENT_ID' => $validated['GOOGLE_CLIENT_ID'] ?? '',
+            'GOOGLE_CLIENT_SECRET' => $validated['GOOGLE_CLIENT_SECRET'] ?? '',
+            'ADSTN_CLIENT_ID' => $validated['ADSTN_CLIENT_ID'] ?? '',
+            'ADSTN_CLIENT_SECRET' => $validated['ADSTN_CLIENT_SECRET'] ?? '',
+        ];
+
+        $this->writeEnv($envData);
+
+        // 4. Clear config cache to apply changes
+        try {
+            \Illuminate\Support\Facades\Artisan::call('config:clear');
+        } catch (\Exception $e) {
+            // May fail on some shared hosts
+        }
+
+        return redirect()->route('admin.settings')->with('success', __('messages.settings_updated') ?? __('Settings updated successfully.'));
     }
 
     public function adsSettings()
@@ -544,24 +624,12 @@ class AdminController extends Controller
 
     public function systemSettings()
     {
-        $systemSettings = [
-            'APP_NAME' => env('APP_NAME', 'MYADS'),
-            'APP_ENV' => env('APP_ENV', 'production'),
-            'APP_DEBUG' => env('APP_DEBUG', false) ? 'true' : 'false',
-            'APP_URL' => env('APP_URL', config('app.url', 'http://localhost')),
-            'APP_TIMEZONE' => env('APP_TIMEZONE', config('app.timezone', 'UTC')),
-            'APP_LOCALE' => env('APP_LOCALE', config('app.locale', 'en')),
-            'SESSION_DRIVER' => env('SESSION_DRIVER', 'file'),
-            'SESSION_LIFETIME' => env('SESSION_LIFETIME', 120),
-            'FACEBOOK_CLIENT_ID' => env('FACEBOOK_CLIENT_ID'),
-            'FACEBOOK_CLIENT_SECRET' => env('FACEBOOK_CLIENT_SECRET'),
-            'GOOGLE_CLIENT_ID' => env('GOOGLE_CLIENT_ID'),
-            'GOOGLE_CLIENT_SECRET' => env('GOOGLE_CLIENT_SECRET'),
-            'ADSTN_CLIENT_ID' => env('ADSTN_CLIENT_ID'),
-            'ADSTN_CLIENT_SECRET' => env('ADSTN_CLIENT_SECRET'),
-        ];
+        return redirect()->route('admin.settings');
+    }
 
-        return view('admin::admin.system_settings', compact('systemSettings'));
+    public function updateSystemSettings(Request $request)
+    {
+        return $this->updateSettings($request);
     }
 
     public function mobileSettings()
@@ -616,36 +684,7 @@ class AdminController extends Controller
         return redirect()->route('admin.settings.mobile')->with('success', __('messages.mobile_settings_updated') ?? __('Mobile app settings updated successfully.'));
     }
 
-    public function updateSystemSettings(Request $request)
-    {
-        $validated = $request->validate([
-            'APP_NAME' => 'required|string|max:100',
-            'APP_ENV' => 'required|string|in:production,local,development,testing',
-            'APP_DEBUG' => 'required|string|in:true,false',
-            'APP_URL' => 'required|url',
-            'APP_TIMEZONE' => 'required|string|max:100',
-            'APP_LOCALE' => 'required|string|in:ar,en,fr,es,de,it,pt,tr,fa',
-            'SESSION_DRIVER' => 'required|string|in:file,cookie,database',
-            'SESSION_LIFETIME' => 'required|integer|min:1|max:10080',
-            'FACEBOOK_CLIENT_ID' => 'nullable|string',
-            'FACEBOOK_CLIENT_SECRET' => 'nullable|string',
-            'GOOGLE_CLIENT_ID' => 'nullable|string',
-            'GOOGLE_CLIENT_SECRET' => 'nullable|string',
-            'ADSTN_CLIENT_ID' => 'nullable|string',
-            'ADSTN_CLIENT_SECRET' => 'nullable|string',
-        ]);
 
-        $this->writeEnv($validated);
-
-        // Clear config cache to apply changes
-        try {
-            \Illuminate\Support\Facades\Artisan::call('config:clear');
-        } catch (\Exception $e) {
-            // May fail on some shared hosts
-        }
-
-        return redirect()->route('admin.settings.system')->with('success', __('messages.system_settings_updated') ?? __('System settings updated successfully and .env file updated.'));
-    }
 
     public function cookieNoticeSettings()
     {

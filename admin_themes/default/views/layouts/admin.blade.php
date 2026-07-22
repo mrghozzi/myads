@@ -260,7 +260,6 @@
                             <ul class="nxl-submenu">
                                 @if($canAdmin('settings'))
                                     <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.settings') }}">{{ __('messages.settings') }}</a></li>
-                                    <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.settings.system') }}">{{ __('messages.system_settings') }}</a></li>
                                     <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.settings.mobile') }}">{{ __('messages.mobile_settings_title') ?? 'Mobile App Settings' }}</a></li>
 
                                     <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.settings.mail') }}">{{ __('messages.mail_settings_title') }}</a></li>
