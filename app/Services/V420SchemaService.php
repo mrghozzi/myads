@@ -34,7 +34,7 @@ class V420SchemaService
 
     public function hasTable(string $table): bool
     {
-        if (array_key_exists($table, $this->tableCache)) {
+        if (array_key_exists($table, $this->tableCache) && !app()->runningUnitTests()) {
             return $this->tableCache[$table];
         }
 
@@ -72,7 +72,7 @@ class V420SchemaService
 
     public function supports(string $feature): bool
     {
-        if (array_key_exists($feature, $this->featureCache)) {
+        if (array_key_exists($feature, $this->featureCache) && !app()->runningUnitTests()) {
             return $this->featureCache[$feature];
         }
 
@@ -90,7 +90,7 @@ class V420SchemaService
     {
         $key = $table . '.' . $column;
 
-        if (array_key_exists($key, $this->columnCache)) {
+        if (array_key_exists($key, $this->columnCache) && !app()->runningUnitTests()) {
             return $this->columnCache[$key];
         }
 
