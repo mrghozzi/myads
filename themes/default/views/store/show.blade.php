@@ -25,11 +25,7 @@
 
 @include('theme::store.partials.page-shell-styles')
 
-<div class="section-banner" style="background: url({{ theme_asset('img/banner/Newsfeed.png') }}) no-repeat 50%;">
-    <img class="section-banner-icon" src="{{ theme_asset('img/banner/marketplace-icon.png') }}">
-    <p class="section-banner-title">{{ __('messages.store') }}</p>
-    <p class="section-banner-text"></p>
-</div>
+
 
 <div class="section-header">
     <div class="section-header-info">

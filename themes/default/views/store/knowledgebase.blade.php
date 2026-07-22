@@ -10,6 +10,9 @@
     $kbCategories = $kbCategories ?? collect();
     $selectedCategory = $selectedCategory ?? null;
     $currentArticle = $article ?? null;
+    $articleAuthor = $articleAuthor ?? null;
+    $canManageCurrentArticle = $canManageCurrentArticle ?? false;
+    $mode = $mode ?? 'list';
     $currentTopicPendingCount = $currentArticle
         ? \App\Models\Option::where('o_type', 'knowledgebase')->where('o_mode', $product->name)->where('name', $currentArticle->name)->where('o_order', 1)->count()
         : 0;
@@ -27,11 +30,7 @@
 
 @include('theme::store.partials.page-shell-styles')
 
-<div class="section-banner" style="background: url({{ theme_asset('img/banner/Newsfeed.png') }}) no-repeat 50%;">
-    <img class="section-banner-icon" src="{{ theme_asset('img/banner/marketplace-icon.png') }}">
-    <p class="section-banner-title">{{ __('messages.knowledgebase') }}</p>
-    <p class="section-banner-text"></p>
-</div>
+
 
 <div class="section-header">
     <div class="section-header-info">

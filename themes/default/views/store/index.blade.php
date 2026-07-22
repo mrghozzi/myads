@@ -150,76 +150,135 @@
     /* Categories Grid */
     .modern-category-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        grid-template-columns: repeat(4, 1fr);
         gap: 16px;
     }
     
+    @media (max-width: 1200px) {
+        .modern-category-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .modern-category-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .modern-category-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+    
     .modern-category-card {
-        border-radius: 16px;
-        padding: 24px;
-        color: #fff;
+        border-radius: 18px;
+        padding: 22px 24px;
+        color: #ffffff;
         text-decoration: none;
         display: flex;
         flex-direction: column;
+        justify-content: space-between;
         position: relative;
         overflow: hidden;
-        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease;
-        min-height: 120px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        min-height: 125px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.06);
     }
     
     .modern-category-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 12px 24px rgba(0,0,0,0.15);
-        color: #fff;
+        transform: translateY(-4px) scale(1.01);
+        box-shadow: 0 14px 28px rgba(0, 0, 0, 0.18);
+        color: #ffffff;
     }
     
     .modern-category-card.active {
-        box-shadow: 0 0 0 4px var(--surface-bg), 0 0 0 6px var(--myads-primary);
+        box-shadow: 0 0 0 3px var(--surface-bg), 0 0 0 6px var(--myads-primary);
+    }
+
+    .modern-category-header-wrap {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        width: 100%;
     }
     
+    .modern-category-title-wrap {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
     .modern-category-title {
-        font-size: 20px;
+        font-size: 19px;
         font-weight: 800;
-        margin: 0 0 4px;
-        position: relative;
-        z-index: 1;
+        margin: 0;
+        line-height: 1.25;
+        color: #ffffff;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
     }
     
     .modern-category-text {
-        font-size: 14px;
-        opacity: 0.9;
+        font-size: 13px;
+        font-weight: 600;
+        opacity: 0.92;
         margin: 0;
-        position: relative;
-        z-index: 1;
+        color: rgba(255, 255, 255, 0.95);
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
     }
     
     .modern-category-badge {
-        position: absolute;
-        top: 20px;
-        right: 20px;
-        background: rgba(255,255,255,0.2);
-        backdrop-filter: blur(4px);
+        background: rgba(0, 0, 0, 0.25);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.25);
         padding: 4px 12px;
         border-radius: 999px;
-        font-size: 14px;
+        font-size: 13px;
         font-weight: 700;
-        z-index: 1;
+        color: #ffffff;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
     }
     
-    .cat-script { background: linear-gradient(135deg, #615dfa 0%, #8d7aff 100%); }
-    .cat-themes { background: linear-gradient(135deg, #417ae1 0%, #5aafff 100%); }
-    .cat-plugins { background: linear-gradient(135deg, #2ebfef 0%, #4ce4ff 100%); }
+    .cat-script { background: linear-gradient(135deg, #615dfa 0%, #4338ca 100%); }
+    .cat-themes { background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); }
+    .cat-plugins { background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%); }
+    .cat-graphics { background: linear-gradient(135deg, #db2777 0%, #be185d 100%); }
+    .cat-audio { background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%); }
+    .cat-video { background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%); }
+    .cat-ebooks { background: linear-gradient(135deg, #059669 0%, #047857 100%); }
+    .cat-software { background: linear-gradient(135deg, #d97706 0%, #b45309 100%); }
+    .cat-courses { background: linear-gradient(135deg, #0891b2 0%, #0e7490 100%); }
     
     .cat-bg-img {
         position: absolute;
-        bottom: -10px;
-        right: -10px;
-        width: 100px;
-        height: 100px;
-        opacity: 0.3;
-        z-index: 0;
-        transform: rotate(-10deg);
+        bottom: -8px;
+        right: -8px;
+        width: 105px;
+        height: 105px;
+        opacity: 0.65;
+        z-index: 1;
+        transform: rotate(-6deg);
         background-size: contain;
+        background-repeat: no-repeat;
+        background-position: center right;
+        filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.2));
+        transition: transform 0.3s ease, opacity 0.3s ease;
+    }
+
+    [dir="rtl"] .cat-bg-img {
+        right: auto;
+        left: -8px;
+        transform: rotate(6deg);
+        background-position: center left;
+    }
+
+    .modern-category-card:hover .cat-bg-img {
+        transform: rotate(0deg) scale(1.08);
+        opacity: 0.85;
     }
 
     /* Product Grid */
@@ -476,31 +535,39 @@
     <div class="modern-category-grid">
         @php
             $isScriptSpecific = isset($scriptName) && $scriptName !== 'all';
+            $allCategories = \App\Support\StoreCategoryCatalog::selectable();
+            $categoryImageMap = [
+                'script' => 'script.png',
+                'themes' => 'templates.png',
+                'plugins' => 'plugins.png',
+                'graphics' => 'graphics.png',
+                'audio' => 'audio.png',
+                'video' => 'video.png',
+                'ebooks' => 'ebooks.png',
+                'software' => 'software.png',
+                'courses' => 'courses.png',
+            ];
         @endphp
         
-        <a class="modern-category-card cat-script {{ ($category ?? '') === 'script' ? 'active' : '' }}" 
-           href="{{ $isScriptSpecific ? route('store.script_category', [$scriptName, 'script']) : route('store.index', ['category' => 'script']) }}">
-            <span class="modern-category-badge">{{ $categoryCounts['script'] ?? 0 }}</span>
-            <h3 class="modern-category-title">{{ __('messages.script') }}</h3>
-            <p class="modern-category-text">{{ __('messages.products') ?? 'Products' }}</p>
-            <div class="cat-bg-img" style="background-image: url({{ theme_asset('img/banner/script.png') }});"></div>
-        </a>
-        
-        <a class="modern-category-card cat-themes {{ ($category ?? '') === 'themes' ? 'active' : '' }}" 
-           href="{{ $isScriptSpecific ? route('store.script_category', [$scriptName, 'themes']) : route('store.index', ['category' => 'themes']) }}">
-            <span class="modern-category-badge">{{ $categoryCounts['themes'] ?? 0 }}</span>
-            <h3 class="modern-category-title">{{ __('messages.themes') }}</h3>
-            <p class="modern-category-text">{{ __('messages.products') ?? 'Products' }}</p>
-            <div class="cat-bg-img" style="background-image: url({{ theme_asset('img/banner/templates.png') }});"></div>
-        </a>
-        
-        <a class="modern-category-card cat-plugins {{ ($category ?? '') === 'plugins' ? 'active' : '' }}" 
-           href="{{ $isScriptSpecific ? route('store.script_category', [$scriptName, 'plugins']) : route('store.index', ['category' => 'plugins']) }}">
-            <span class="modern-category-badge">{{ $categoryCounts['plugins'] ?? 0 }}</span>
-            <h3 class="modern-category-title">{{ __('messages.plugins') }}</h3>
-            <p class="modern-category-text">{{ __('messages.products') ?? 'Products' }}</p>
-            <div class="cat-bg-img" style="background-image: url({{ theme_asset('img/banner/plugins.png') }});"></div>
-        </a>
+        @foreach($allCategories as $catKey)
+            @php
+                $catImage = $categoryImageMap[$catKey] ?? ($catKey . '.png');
+                $catUrl = $isScriptSpecific 
+                    ? route('store.script_category', [$scriptName, $catKey]) 
+                    : route('store.index', ['category' => $catKey]);
+                $isActive = ($category ?? '') === $catKey;
+            @endphp
+            <a class="modern-category-card cat-{{ $catKey }} {{ $isActive ? 'active' : '' }}" href="{{ $catUrl }}">
+                <div class="modern-category-header-wrap">
+                    <div class="modern-category-title-wrap">
+                        <h3 class="modern-category-title">{{ __('messages.' . $catKey) != 'messages.' . $catKey ? __('messages.' . $catKey) : ucfirst($catKey) }}</h3>
+                        <p class="modern-category-text">{{ __('messages.products') ?? 'Products' }}</p>
+                    </div>
+                    <span class="modern-category-badge">{{ $categoryCounts[$catKey] ?? 0 }}</span>
+                </div>
+                <div class="cat-bg-img" style="background-image: url({{ theme_asset('img/banner/' . $catImage) }});"></div>
+            </a>
+        @endforeach
     </div>
 
     <!-- PRODUCTS HEADER -->

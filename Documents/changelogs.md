@@ -1,5 +1,11 @@
 # v4.4.6
-> **Patch Release** — Unified Admin Settings Control Panel, Dedicated Mobile App Settings Panel, API Key Security Masking, Mobile API Search Fix, Log Bloat & Server Storage Optimization, New Language Packs (Russian, Serbian, Japanese, Simplified & Traditional Chinese), Daily Log Rotation, Automated Log Cleanup.
+> **Patch Release** — Unified Admin Settings Control Panel, Dedicated Mobile App Settings Panel, API Key Security Masking, Mobile API Search Fix, Log Bloat & Server Storage Optimization, New Language Packs (Russian, Serbian, Japanese, Simplified & Traditional Chinese), Marketplace & Store Enhancements, Daily Log Rotation, Automated Log Cleanup.
+
+### Marketplace & Store Enhancements
+* **Feature (All Market Categories Visibility):** Expanded the `/store` market categories section to dynamically display all 9 defined product categories (Scripts, Themes, Plugins, Graphics, Audio, Video, E-Books, Software, Courses) with live product counts and localized category names.
+* **Feature (Superdesign UI & Responsiveness):** Redesigned the store category grid (`modern-category-grid`) following `@.superdesign` guidelines with a 4-column responsive layout, polished gradient cards (`cat-graphics`, `cat-audio`, `cat-video`, `cat-ebooks`, `cat-software`, `cat-courses`), refined micro-animations, glassmorphism count badges, and RTL-optimized background asset positioning.
+* **Feature (Modern 3D Banner Icons):** Generated and integrated 6 high-resolution 3D minimalist category banner illustrations (`graphics.png`, `audio.png`, `video.png`, `ebooks.png`, `software.png`, `courses.png`) alongside redesigned 3D main store & category banners (`script.png`, `templates.png`, `plugins.png`, `marketplace-icon.png`).
+* **UI / UX (Banner Removal):** Removed redundant header banner blocks (`<div class="section-banner">`) across all store product detail pages (`store/show.blade.php`) and Knowledgebase articles (`store/knowledgebase.blade.php`) for a cleaner, modern full-width layout.
 
 ### Admin Panel & Mobile App
 * **Feature (Unified Master Settings Page):** Merged `/admin/settings/system` and `/admin/settings` into a single consolidated control panel at `/admin/settings`, completely eliminating UI duplication, redundant inputs, and desynchronized database/environment configuration variables.
@@ -28,7 +34,8 @@
 * **Feature (Admin Dashboard & Storage Control):** Added configurable **Log Files Retention** (`db_retention_logs`) and **Max Monolithic Log Size** (`db_max_log_size_mb`) settings to the Auto-Cleanup section on `/admin/database-cleanup`. Integrated these settings directly into `DatabaseMaintenanceService` and `LogCleanup` to guarantee seamless automated log management for existing sites without requiring manual `.env` edits.
 * **Admin Dashboard:** Added a new **Log Files** resource monitor card to the Admin Database Cleanup page (`/admin/database-cleanup`) displaying total log directory size, file count, and a manual "Clean Logs" trigger button.
 
-### Bug Fixes
+### Bug Fixes & Database Repairs
+* **Fix (Knowledgebase Engine 500 Error):** Fixed a 500 Internal Server Error occurring on `/kb/{name}` routes caused by an orphaned MySQL InnoDB tablespace file (`kb_categories.ibd`) without a matching data dictionary entry. Recreated the table structure and verified 200 OK rendering.
 * **Fix (Mobile API):** Resolved a `500 Internal Server Error` in the Live Search API (`SearchApiController`) caused by attempting to select a non-existent `name` column on the `User` model, restoring global search functionality within the mobile app.
 
 ### Dependencies

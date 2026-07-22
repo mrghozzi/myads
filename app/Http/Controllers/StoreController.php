@@ -82,11 +82,10 @@ class StoreController extends Controller
             return $q->count();
         };
 
-        $categoryCounts = [
-            'script' => $countQuery(['script']),
-            'themes' => $countQuery(StoreCategoryCatalog::namesForFilter('themes')),
-            'plugins' => $countQuery(['plugins']),
-        ];
+        $categoryCounts = [];
+        foreach (StoreCategoryCatalog::selectable() as $catKey) {
+            $categoryCounts[$catKey] = $countQuery(StoreCategoryCatalog::namesForFilter($catKey));
+        }
 
         $this->seo([
             'scope_key' => 'store_index',
