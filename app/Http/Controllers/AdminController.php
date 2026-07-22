@@ -544,7 +544,24 @@ class AdminController extends Controller
 
     public function systemSettings()
     {
-        return view('admin::admin.system_settings');
+        $systemSettings = [
+            'APP_NAME' => env('APP_NAME', 'MYADS'),
+            'APP_ENV' => env('APP_ENV', 'production'),
+            'APP_DEBUG' => env('APP_DEBUG', false) ? 'true' : 'false',
+            'APP_URL' => env('APP_URL', config('app.url', 'http://localhost')),
+            'APP_TIMEZONE' => env('APP_TIMEZONE', config('app.timezone', 'UTC')),
+            'APP_LOCALE' => env('APP_LOCALE', config('app.locale', 'en')),
+            'SESSION_DRIVER' => env('SESSION_DRIVER', 'file'),
+            'SESSION_LIFETIME' => env('SESSION_LIFETIME', 120),
+            'FACEBOOK_CLIENT_ID' => env('FACEBOOK_CLIENT_ID'),
+            'FACEBOOK_CLIENT_SECRET' => env('FACEBOOK_CLIENT_SECRET'),
+            'GOOGLE_CLIENT_ID' => env('GOOGLE_CLIENT_ID'),
+            'GOOGLE_CLIENT_SECRET' => env('GOOGLE_CLIENT_SECRET'),
+            'ADSTN_CLIENT_ID' => env('ADSTN_CLIENT_ID'),
+            'ADSTN_CLIENT_SECRET' => env('ADSTN_CLIENT_SECRET'),
+        ];
+
+        return view('admin::admin.system_settings', compact('systemSettings'));
     }
 
     public function mobileSettings()
@@ -601,13 +618,24 @@ class AdminController extends Controller
 
     public function updateSystemSettings(Request $request)
     {
-        $data = $request->only([
-            'FACEBOOK_CLIENT_ID', 'FACEBOOK_CLIENT_SECRET',
-            'GOOGLE_CLIENT_ID', 'GOOGLE_CLIENT_SECRET',
-            'ADSTN_CLIENT_ID', 'ADSTN_CLIENT_SECRET',
+        $validated = $request->validate([
+            'APP_NAME' => 'required|string|max:100',
+            'APP_ENV' => 'required|string|in:production,local,development,testing',
+            'APP_DEBUG' => 'required|string|in:true,false',
+            'APP_URL' => 'required|url',
+            'APP_TIMEZONE' => 'required|string|max:100',
+            'APP_LOCALE' => 'required|string|in:ar,en,fr,es,de,it,pt,tr,fa',
+            'SESSION_DRIVER' => 'required|string|in:file,cookie,database',
+            'SESSION_LIFETIME' => 'required|integer|min:1|max:10080',
+            'FACEBOOK_CLIENT_ID' => 'nullable|string',
+            'FACEBOOK_CLIENT_SECRET' => 'nullable|string',
+            'GOOGLE_CLIENT_ID' => 'nullable|string',
+            'GOOGLE_CLIENT_SECRET' => 'nullable|string',
+            'ADSTN_CLIENT_ID' => 'nullable|string',
+            'ADSTN_CLIENT_SECRET' => 'nullable|string',
         ]);
 
-        $this->writeEnv($data);
+        $this->writeEnv($validated);
 
         // Clear config cache to apply changes
         try {
@@ -616,7 +644,7 @@ class AdminController extends Controller
             // May fail on some shared hosts
         }
 
-        return redirect()->route('admin.settings.system')->with('success', __('System settings updated successfully and .env file updated.'));
+        return redirect()->route('admin.settings.system')->with('success', __('messages.system_settings_updated') ?? __('System settings updated successfully and .env file updated.'));
     }
 
     public function cookieNoticeSettings()
