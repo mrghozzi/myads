@@ -1,0 +1,61 @@
+name: 🐛 Bug Report
+description: Create a report to help us improve MYADS
+title: "[BUG]: "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for taking the time to report an issue! Please fill out the form below as completely as possible.
+
+  - type: input
+    id: version
+    attributes:
+      label: MYADS Version / App Version
+      description: What version of MYADS or MYADS Mobile App are you running?
+      placeholder: e.g. v4.4.6 / Flutter App v1.0.0
+    validations:
+      required: true
+
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Environment
+      description: Where is the bug occurring?
+      options:
+        - Web App (Laravel Backend / Theme)
+        - Mobile App (Flutter)
+        - Admin Panel (Duralux)
+        - API / Sanctum Endpoints
+        - Installation / Migration
+    validations:
+      required: true
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Also tell us what you expected to happen.
+      placeholder: Describe the bug clearly...
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce
+      description: How can we reproduce this issue?
+      placeholder: |
+        1. Go to '...'
+        2. Click on '...'
+        3. Scroll down to '...'
+        4. See error
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant Log Output or Screenshots
+      description: Please copy and paste any relevant log output, stack trace, or attach screenshots.
+      render: shell
