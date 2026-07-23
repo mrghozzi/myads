@@ -57,17 +57,34 @@
             const mode = readStoredMode() || '{{ $css_path }}';
             document.documentElement.dataset.theme = mode;
             window.__themeMode = mode;
+
+            document.documentElement.classList.add('fouc-loading');
+            function reveal(){
+                document.documentElement.classList.remove('fouc-loading');
+                document.documentElement.classList.add('fouc-loaded');
+            }
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', reveal);
+                window.addEventListener('load', reveal);
+            } else {
+                reveal();
+            }
+            setTimeout(reveal, 1500);
         })();
     </script>
+    <style id="oauth-fouc-css">
+        html.fouc-loading body{opacity:0 !important;visibility:hidden !important}
+        body{transition:opacity 0.2s ease-in-out}
+    </style>
 
-    <link id="theme-bootstrap" data-theme-link="true" href="{{ theme_asset($css_path . '/bootstrap.min.css') }}" rel="stylesheet" media="print" onload="this.media='all'">
-    <link id="theme-styles" data-theme-link="true" href="{{ theme_asset($css_path . '/styles.min.css') }}" rel="stylesheet" media="print" onload="this.media='all'">
-    <link id="theme-prestyle" data-theme-link="true" href="{{ theme_asset($css_path . '/prestyle.css') }}" rel="stylesheet" media="print" onload="this.media='all'">
+    <link id="theme-bootstrap" data-theme-link="true" href="{{ theme_asset($css_path . '/bootstrap.min.css') }}" rel="stylesheet">
+    <link id="theme-styles" data-theme-link="true" href="{{ theme_asset($css_path . '/styles.min.css') }}" rel="stylesheet">
+    <link id="theme-prestyle" data-theme-link="true" href="{{ theme_asset($css_path . '/prestyle.css') }}" rel="stylesheet">
     @if(is_locale_rtl())
-        <link id="theme-rtl" data-theme-link="true" href="{{ theme_asset($css_path . '/rtl.css') }}" rel="stylesheet" media="print" onload="this.media='all'">
+        <link id="theme-rtl" data-theme-link="true" href="{{ theme_asset($css_path . '/rtl.css') }}" rel="stylesheet">
     @endif
 
-    <link href="{{ theme_asset('css/fontawesome6.min.css') }}" rel="stylesheet" media="print" onload="this.media='all'">
+    <link href="{{ theme_asset('css/fontawesome6.min.css') }}" rel="stylesheet">
     <noscript><link href="{{ theme_asset('css/fontawesome6.min.css') }}" rel="stylesheet"></noscript>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

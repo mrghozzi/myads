@@ -62,9 +62,29 @@
         $css_path = $mode == 'css_d' ? 'css_d' : 'css';
     @endphp
     <script>
-        (function(){function r(n){const m=document.cookie.match(new RegExp('(?:^|; )'+n+'=([^;]*)'));return m?decodeURIComponent(m[1]):null}function s(){try{const v=localStorage.getItem('themeMode');if(v==='css'||v==='css_d')return v}catch(e){}const c=r('modedark');return c==='css'||c==='css_d'?c:null}let o=s();if(!o){o=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'css_d':'css';}document.documentElement.dataset.theme=o;window.__themeMode=o;})();
+        (function(){
+            document.documentElement.classList.add('fouc-loading');
+            function r(n){const m=document.cookie.match(new RegExp('(?:^|; )'+n+'=([^;]*)'));return m?decodeURIComponent(m[1]):null}
+            function s(){try{const v=localStorage.getItem('themeMode');if(v==='css'||v==='css_d')return v}catch(e){}const c=r('modedark');return c==='css'||c==='css_d'?c:null}
+            let o=s();if(!o){o=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'css_d':'css';}
+            document.documentElement.dataset.theme=o;window.__themeMode=o;
+
+            function reveal(){
+                document.documentElement.classList.remove('fouc-loading');
+                document.documentElement.classList.add('fouc-loaded');
+            }
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', reveal);
+                window.addEventListener('load', reveal);
+            } else {
+                reveal();
+            }
+            setTimeout(reveal, 1500);
+        })();
     </script>
     <style id="critical-css">
+        html.fouc-loading body{opacity:0 !important;visibility:hidden !important}
+        body{transition:opacity 0.2s ease-in-out}
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;border:none;outline:none}
         *::before,*::after{display:block}
         body{background-color:#f8faff;font-family:"Inter",sans-serif;overflow-x:hidden}
@@ -74,22 +94,21 @@
         @media screen and (max-width: 680px){.header{height:60px}.content-grid{padding-top:80px}}
     </style>
 
-    <link id="theme-bootstrap" data-theme-link="true" href="{{ theme_asset($css_path . '/bootstrap.min.css') }}" rel="stylesheet" media="print" onload="this.media='all'">
-    <link id="theme-styles" data-theme-link="true" href="{{ theme_asset($css_path . '/styles.min.css') }}" rel="stylesheet" media="print" onload="this.media='all'">
-    <link id="theme-prestyle" data-theme-link="true" href="{{ theme_asset($css_path . '/prestyle.css') }}" rel="stylesheet" media="print" onload="this.media='all'">
+    <link id="theme-bootstrap" data-theme-link="true" href="{{ theme_asset($css_path . '/bootstrap.min.css') }}" rel="stylesheet">
+    <link id="theme-styles" data-theme-link="true" href="{{ theme_asset($css_path . '/styles.min.css') }}" rel="stylesheet">
+    <link id="theme-prestyle" data-theme-link="true" href="{{ theme_asset($css_path . '/prestyle.css') }}" rel="stylesheet">
+    <link id="theme-forum-activity-super" data-theme-link="true" rel="stylesheet" href="{{ theme_asset($css_path . '/forum-activity-superdesign.css') }}">
+    @if(is_locale_rtl())
+        <link id="theme-rtl" data-theme-link="true" href="{{ theme_asset($css_path . '/rtl.css') }}" rel="stylesheet" type="text/css" />
+    @endif
     
-    <!-- Deferred CSS -->
+    <!-- Deferred Vendor CSS -->
     <link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap4.min.css" rel="stylesheet" media="print" onload="this.media='all'">
     <link id="theme-simplebar" data-theme-link="true" rel="stylesheet" href="{{ theme_asset($css_path . '/simplebar.css') }}" media="print" onload="this.media='all'">
     <link id="theme-tiny-slider" data-theme-link="true" rel="stylesheet" href="{{ theme_asset($css_path . '/tiny-slider.css') }}" media="print" onload="this.media='all'">
     <link id="theme-dataTables" data-theme-link="true" rel="stylesheet" href="{{ theme_asset($css_path . '/dataTables.css') }}" media="print" onload="this.media='all'">
     <!-- Plyr Player -->
     <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
-    <link id="theme-forum-activity-super" data-theme-link="true" rel="stylesheet" href="{{ theme_asset($css_path . '/forum-activity-superdesign.css') }}" media="print" onload="this.media='all'">
-    
-    @if(is_locale_rtl())
-        <link id="theme-rtl" data-theme-link="true" href="{{ theme_asset($css_path . '/rtl.css') }}" rel="stylesheet" type="text/css" media="print" onload="this.media='all'" />
-    @endif
 
     <style>
         html[dir="ltr"] body .content-grid {
@@ -128,7 +147,7 @@
         }
     </style>
 
-    <link href="{{ theme_asset('css/fontawesome6.min.css') }}" rel="stylesheet" media="print" onload="this.media='all'">
+    <link href="{{ theme_asset('css/fontawesome6.min.css') }}" rel="stylesheet">
     <noscript><link href="{{ theme_asset('css/fontawesome6.min.css') }}" rel="stylesheet"></noscript>
 
     <!-- Resource Hints & Fonts -->

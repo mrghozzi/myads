@@ -35,6 +35,7 @@
 * **Admin Dashboard:** Added a new **Log Files** resource monitor card to the Admin Database Cleanup page (`/admin/database-cleanup`) displaying total log directory size, file count, and a manual "Clean Logs" trigger button.
 
 ### Bug Fixes & Database Repairs
+* **Fix (Anti-FOUC & Page Load Layout Shift):** Resolved Flash of Unstyled Content (FOUC) on slow network connections where raw unstyled HTML elements, uncollapsible sidebars, and stacked lists appeared before theme styles loaded. Restored render-blocking for critical layout stylesheets (`bootstrap.min.css`, `styles.min.css`, `prestyle.css`, `rtl.css`, `fontawesome6.min.css`, `forum-activity-superdesign.css`) in `master.blade.php` and `oauth.blade.php`, and implemented an inline Anti-FOUC JavaScript/CSS transition guard to guarantee smooth page rendering.
 * **Fix (Knowledgebase Engine 500 Error):** Fixed a 500 Internal Server Error occurring on `/kb/{name}` routes caused by an orphaned MySQL InnoDB tablespace file (`kb_categories.ibd`) without a matching data dictionary entry. Recreated the table structure and verified 200 OK rendering.
 * **Fix (Mobile API):** Resolved a `500 Internal Server Error` in the Live Search API (`SearchApiController`) caused by attempting to select a non-existent `name` column on the `User` model, restoring global search functionality within the mobile app.
 
