@@ -707,7 +707,11 @@ class StoreController extends Controller
         $product = Product::withoutGlobalScope('store')->where('o_type', 'store')->where('name', $name)->firstOrFail();
 
         // KB Categories
-        $kbCategories = KbCategory::orderBy('sort_order')->orderBy('name')->get();
+        try {
+            $kbCategories = KbCategory::orderBy('sort_order')->orderBy('name')->get();
+        } catch (\Throwable $e) {
+            $kbCategories = collect();
+        }
         $selectedCategory = $request->query('category');
 
         $articlesQuery = Option::where('o_type', 'knowledgebase')
@@ -851,7 +855,11 @@ class StoreController extends Controller
         }
 
         $shellData = $this->buildKnowledgebaseShellData($product, $kbArticle);
-        $kbCategories = KbCategory::orderBy('sort_order')->orderBy('name')->get();
+        try {
+            $kbCategories = KbCategory::orderBy('sort_order')->orderBy('name')->get();
+        } catch (\Throwable $e) {
+            $kbCategories = collect();
+        }
 
         return view('theme::store.knowledgebase', [
             'product' => $product,
