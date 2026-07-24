@@ -49,16 +49,16 @@ class MailConfigServiceProvider extends ServiceProvider
             };
 
             config([
-                'mail.default' => $settings->mail_mailer,
+                'mail.default' => $settings->mail_mailer ?: config('mail.default', 'smtp'),
 
-                'mail.mailers.smtp.host'     => $settings->mail_host,
-                'mail.mailers.smtp.port'     => (int) $settings->mail_port,
-                'mail.mailers.smtp.username' => $settings->mail_username,
-                'mail.mailers.smtp.password' => $settings->mail_password, // decrypted via accessor
+                'mail.mailers.smtp.host'     => $settings->mail_host ?: config('mail.mailers.smtp.host'),
+                'mail.mailers.smtp.port'     => $settings->mail_port ? (int) $settings->mail_port : (int) config('mail.mailers.smtp.port', 587),
+                'mail.mailers.smtp.username' => $settings->mail_username ?: config('mail.mailers.smtp.username'),
+                'mail.mailers.smtp.password' => $settings->mail_password ?: config('mail.mailers.smtp.password'),
                 'mail.mailers.smtp.scheme'   => $scheme,
 
-                'mail.from.address' => $settings->mail_from_address,
-                'mail.from.name'    => $settings->mail_from_name,
+                'mail.from.address' => $settings->mail_from_address ?: config('mail.from.address'),
+                'mail.from.name'    => $settings->mail_from_name ?: config('mail.from.name'),
             ]);
 
             // Purge any previously resolved mailer so the fresh config takes effect
