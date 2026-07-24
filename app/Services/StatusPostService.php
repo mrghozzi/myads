@@ -291,11 +291,12 @@ class StatusPostService
         $maxSizeKb = $settings['max_upload_size'] * 1024;
         $mimes = $settings['allowed_extensions'];
         $mimetypes = $settings['allowed_mime_types'];
+        $maxFiles = $settings['max_files_per_post'] ?? 10;
 
         $rules = [
             'text' => 'nullable|string|max:10000',
             'txt' => 'nullable|string|max:10000',
-            'images' => 'nullable|array|max:10',
+            'images' => "nullable|array|max:{$maxFiles}",
             'images.*' => "image|mimes:{$mimes}|mimetypes:{$mimetypes}|max:{$maxSizeKb}",
             'videos' => 'nullable|array|max:1',
             'videos.*' => "file|mimes:{$mimes}|mimetypes:{$mimetypes}|max:{$maxSizeKb}",
@@ -828,6 +829,11 @@ class StatusPostService
             'clips_upload' => ($options['clips_upload']->o_valuer ?? '1') == '1',
             'audio_sharing' => ($options['audio_sharing']->o_valuer ?? '1') == '1',
             'max_upload_size' => (int) ($options['max_upload_size']->o_valuer ?? '10'),
+            'max_avatar_size' => (int) ($options['max_avatar_size']->o_valuer ?? '2'),
+            'max_files_per_post' => (int) ($options['max_files_per_post']->o_valuer ?? '10'),
+            'auto_convert_webp' => ($options['auto_convert_webp']->o_valuer ?? '0') == '1',
+            'sanitize_filenames' => ($options['sanitize_filenames']->o_valuer ?? '1') == '1',
+            'block_dangerous_extensions' => ($options['block_dangerous_extensions']->o_valuer ?? '1') == '1',
             'allowed_extensions' => $options['allowed_extensions']->o_valuer ?? 'jpg,png,jpeg,gif,mp4,mp3,pdf,zip',
             'allowed_mime_types' => $options['allowed_mime_types']->o_valuer ?? 'image/jpeg,image/png,image/gif,video/mp4,audio/mpeg,application/pdf,application/zip',
         ];

@@ -4218,7 +4218,19 @@ class AdminController extends Controller
     public function fileUploadSettings()
     {
         $options = Option::where('o_type', 'file_upload_settings')->get()->keyBy('name');
-        return view('admin::admin.file_upload', compact('options'));
+        
+        $serverInfo = [
+            'upload_max_filesize' => ini_get('upload_max_filesize') ?: 'N/A',
+            'post_max_size' => ini_get('post_max_size') ?: 'N/A',
+            'memory_limit' => ini_get('memory_limit') ?: 'N/A',
+            'max_execution_time' => (ini_get('max_execution_time') ?: '30') . 's',
+            'gd_installed' => extension_loaded('gd'),
+            'imagick_installed' => extension_loaded('imagick'),
+            'zip_installed' => extension_loaded('zip'),
+            'disk_free_space' => function_exists('disk_free_space') ? @round(disk_free_space(base_path()) / (1024 * 1024 * 1024), 2) . ' GB' : 'N/A',
+        ];
+
+        return view('admin::admin.file_upload', compact('options', 'serverInfo'));
     }
 
     public function updateFileUploadSettings(Request $request)
@@ -4226,7 +4238,15 @@ class AdminController extends Controller
         $settings = $request->except('_token');
         
         // Handle unchecked checkboxes that are not sent by the browser
-        $checkboxes = ['file_sharing', 'video_sharing', 'clips_upload', 'audio_sharing'];
+        $checkboxes = [
+            'file_sharing', 
+            'video_sharing', 
+            'clips_upload', 
+            'audio_sharing', 
+            'auto_convert_webp', 
+            'sanitize_filenames', 
+            'block_dangerous_extensions'
+        ];
         foreach ($checkboxes as $checkbox) {
             if (!isset($settings[$checkbox])) {
                 $settings[$checkbox] = '0';
