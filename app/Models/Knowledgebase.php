@@ -21,6 +21,7 @@ class Knowledgebase extends Model
         'o_order',   // Order
         'o_parent',  // Publisher ID
         'kb_category_id',
+        'updated_at',
     ];
 
     protected static function booted()
