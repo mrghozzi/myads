@@ -182,8 +182,33 @@ Allows any website to pre-fill the MYADS post composer.
   - `grouped_reactions`: Map of reaction types to counts.
   - `has_liked`, `user_reaction`: Current user's reaction state.
   - `is_promoted_ad`: Boolean flag indicating if the post is a promoted ad campaign injected into the feed.
-- `POST /api/statuses`: Create a new status.
-  *Payload:* `{"text": "Hello world!"}`
+- `GET /api/v1/composer/options`: Retrieves post composer options including user's joined groups (`groups`), web directory categories (`directory_categories`), and supported post kinds (`supported_kinds`).
+- `POST /api/v1/statuses/link-preview`: Generates live metadata preview for a target URL.
+  *Payload:* `{"link_url": "https://example.com"}`  
+  *Response:* `{"url": "...", "normalized_url": "...", "title": "...", "description": "...", "image_url": "...", "site_name": "...", "domain": "..."}`
+- `POST /api/statuses`: Create a new status post.
+  *Payload (Multipart Form-Data):*
+  - `text`: Post text content (supports @mentions).
+  - `post_kind`: Post kind (`text`, `gallery`, `video`, `audio`, `music`, `file`, `clips`, `link`, `repost`).
+  - `publish_mode`: `post` (default) or `directory_only` (publishes link as a Web Directory entry).
+  - `images[]`: Array of image files (for `gallery` posts up to 10 images).
+  - `videos[]`: Array of video files (for `video` or `clips` posts).
+  - `audios[]`: Array of audio files (for `audio` or `music` posts).
+  - `files[]`: Array of document files (for `file` posts up to 5 documents).
+  - `link_url`: URL string for link posts.
+  - `directory_name`, `directory_category_id`, `directory_tags`: Directory fields required when `publish_mode` is `directory_only`.
+  - `group_id`: Optional target group ID when posting inside a community group.
+  - `repost_status_id`: Target status ID when `post_kind` is `repost`.
+  *Error Response (HTTP 422):*
+  ```json
+  {
+      "message": "First validation error message",
+      "errors": {
+          "videos.0": ["The videos.0 file size must not exceed 10MB."]
+      }
+  }
+  ```
+- `POST /api/statuses/{status_id}/update`: Update an existing status (requires post ownership or admin rights).
 - `DELETE /api/statuses/{status_id}`: Delete a status (requires ownership or admin rights).
 
 ### Comments & Reactions

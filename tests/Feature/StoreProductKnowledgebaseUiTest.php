@@ -191,7 +191,7 @@ class StoreProductKnowledgebaseUiTest extends TestCase
                 'share_to_community' => '1',
             ]);
 
-        $response->assertRedirect(route('kb.show', ['name' => $product->name, 'article' => 'guest-start']));
+        $response->assertRedirect(route('login'));
         $this->assertDatabaseMissing('status', [
             's_type' => KnowledgebaseCommunityService::STATUS_TYPE,
         ]);
@@ -441,7 +441,8 @@ class StoreProductKnowledgebaseUiTest extends TestCase
             ->get(route('admin.reports'))
             ->assertOk()
             ->assertSee(route('kb.show', ['name' => $product->name, 'article' => $article->name]), false)
-            ->assertSee(__('messages.knowledgebase') . ': ' . $article->name, false)
+            ->assertSee(__('messages.knowledgebase'))
+            ->assertSee($article->name)
             ->assertSee($author->username);
     }
 

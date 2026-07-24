@@ -2,6 +2,7 @@
 
 @section('content')
 @php
+    $articles = $articles ?? collect();
     $productImage = $product->product_image ?? theme_asset('img/error_plug.png');
     $owner = $product->user;
     $ownerAvatar = $owner ? $owner->avatarUrl() : asset('upload/_avatar.png');
@@ -23,8 +24,8 @@
     $knowledgebaseSocialPlatforms = ['facebook', 'twitter', 'linkedin', 'telegram'];
     $shellTitle = $currentArticle ? $currentArticle->name : $product->name;
     $shellSummary = $currentArticle
-        ? \Illuminate\Support\Str::limit(strip_tags($currentArticle->o_valuer), 240)
-        : \Illuminate\Support\Str::limit($product->o_valuer, 240);
+        ? \Illuminate\Support\Str::limit(strip_tags((string) $currentArticle->o_valuer), 240)
+        : \Illuminate\Support\Str::limit((string) $product->o_valuer, 240);
     $newTopicUrl = route('kb.index', $product->name) . '#kb-new-topic';
 @endphp
 
@@ -180,15 +181,36 @@
                                 </div>
                             </div>
                         </div>
-                        <p class="kb-topic-card__summary">{{ \Illuminate\Support\Str::limit(strip_tags($item->o_valuer), 180) }}</p>
+                        <p class="kb-topic-card__summary">{{ \Illuminate\Support\Str::limit(strip_tags((string) $item->o_valuer), 180) }}</p>
                         <div class="kb-topic-card__meta">
                             <span class="kb-pill">{{ __('messages.author') }}: {{ $cardAuthor ? $cardAuthor->username : __('messages.guest') }}</span>
                             <span class="kb-pill">{{ __('messages.pending') }}: <strong>{{ $pending }}</strong></span>
-                            @if($item->kbCategory)
-                                <span class="kb-pill kb-pill--category"><i class="fa fa-folder-o" aria-hidden="true"></i>&nbsp;{{ $item->kbCategory->name }}</span>
+                            @php
+                                $itemCategoryName = null;
+                                try {
+                                    if ($item->relationLoaded('kbCategory') && $item->kbCategory) {
+                                        $itemCategoryName = $item->kbCategory->name;
+                                    } elseif (isset($hasCategoryTable) && $hasCategoryTable && !empty($item->kb_category_id)) {
+                                        $itemCategoryName = $item->kbCategory ? $item->kbCategory->name : null;
+                                    }
+                                } catch (\Throwable $e) {
+                                    $itemCategoryName = null;
+                                }
+                            @endphp
+                            @if($itemCategoryName)
+                                <span class="kb-pill kb-pill--category"><i class="fa fa-folder-o" aria-hidden="true"></i>&nbsp;{{ $itemCategoryName }}</span>
                             @endif
-                            @if($item->updated_at)
-                                <span class="kb-pill"><i class="fa fa-clock-o" aria-hidden="true"></i>&nbsp;{{ __('messages.kb_last_modified') }}: {{ \Carbon\Carbon::parse($item->updated_at)->diffForHumans() }}</span>
+                            @if(!empty($item->updated_at) && $item->updated_at !== '0000-00-00 00:00:00')
+                                @php
+                                    try {
+                                        $itemUpdatedAt = \Carbon\Carbon::parse($item->updated_at)->diffForHumans();
+                                    } catch (\Throwable $e) {
+                                        $itemUpdatedAt = null;
+                                    }
+                                @endphp
+                                @if($itemUpdatedAt)
+                                    <span class="kb-pill"><i class="fa fa-clock-o" aria-hidden="true"></i>&nbsp;{{ __('messages.kb_last_modified') }}: {{ $itemUpdatedAt }}</span>
+                                @endif
                             @endif
                         </div>
                         <div id="report{{ $reportKey }}" class="store-inline-report"></div>
@@ -198,7 +220,7 @@
                     </article>
                 @endforeach
             </div>
-            @if($articles->hasPages())
+            @if(method_exists($articles, 'hasPages') && $articles->hasPages())
                 <div class="kb-pagination">
                     {{ $articles->links('pagination::bootstrap-5') }}
                 </div>

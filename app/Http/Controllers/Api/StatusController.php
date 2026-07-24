@@ -72,9 +72,15 @@ class StatusController extends Controller
                 'message' => 'Status created successfully',
                 'status' => new StatusResource($status)
             ], 201);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $firstError = collect($e->errors())->flatten()->first() ?? __('messages.error_occurred');
+            return response()->json([
+                'message' => $firstError,
+                'errors' => $e->errors()
+            ], 422);
         } catch (\Throwable $e) {
             report($e);
-            return response()->json(['message' => __('messages.error_occurred')], 422);
+            return response()->json(['message' => $e->getMessage() ?: __('messages.error_occurred')], 422);
         }
     }
 
@@ -86,9 +92,15 @@ class StatusController extends Controller
                 'message' => 'Status updated successfully',
                 'status' => new StatusResource($updatedStatus)
             ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $firstError = collect($e->errors())->flatten()->first() ?? __('messages.error_occurred');
+            return response()->json([
+                'message' => $firstError,
+                'errors' => $e->errors()
+            ], 422);
         } catch (\Throwable $e) {
             report($e);
-            return response()->json(['message' => __('messages.error_occurred')], 422);
+            return response()->json(['message' => $e->getMessage() ?: __('messages.error_occurred')], 422);
         }
     }
 

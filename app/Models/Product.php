@@ -118,11 +118,11 @@ class Product extends Model
                     $inner->orWhere($authorIdColumn, $viewer->id);
                 }
 
-                // Public profile visibility
-                $inner->orWhereIn($authorIdColumn, function ($sub) {
+                // Public profile visibility (or fallback to public if no row exists)
+                $inner->orWhereNotIn($authorIdColumn, function ($sub) {
                     $sub->select('user_id')
                         ->from('user_privacy_settings')
-                        ->where('profile_visibility', 'public');
+                        ->where('profile_visibility', '!=', 'public');
                 });
 
                 // Followers visibility

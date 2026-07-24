@@ -704,33 +704,58 @@ class StoreController extends Controller
 
     public function knowledgebaseIndex(Request $request, $name)
     {
-        $product = Product::withoutGlobalScope('store')->where('o_type', 'store')->where('name', $name)->firstOrFail();
+        $product = $this->findKnowledgebaseProduct($name);
 
-        // KB Categories
+        $schema = app(\App\Services\V420SchemaService::class);
+        $hasCategoryCol = $schema->hasColumn('options', 'kb_category_id');
+        $hasUpdatedAtCol = $schema->hasColumn('options', 'updated_at');
+
+        // Safely check if kb_categories table exists and is queryable in MySQL engine
+        $kbCategories = collect();
+        $hasCategoryTable = false;
         try {
             $kbCategories = KbCategory::orderBy('sort_order')->orderBy('name')->get();
+            $hasCategoryTable = true;
         } catch (\Throwable $e) {
             $kbCategories = collect();
+            $hasCategoryTable = false;
         }
+
         $selectedCategory = $request->query('category');
 
         $articlesQuery = Option::where('o_type', 'knowledgebase')
             ->where('o_mode', $product->name)
             ->where('o_order', 0);
 
-        // Apply category filter
-        if ($selectedCategory === 'uncategorized') {
-            $articlesQuery->whereNull('kb_category_id');
-        } elseif ($selectedCategory && is_numeric($selectedCategory)) {
-            $articlesQuery->where('kb_category_id', (int) $selectedCategory);
+        // Apply category filter safely
+        if ($hasCategoryCol) {
+            if ($selectedCategory === 'uncategorized') {
+                $articlesQuery->whereNull('kb_category_id');
+            } elseif ($selectedCategory && is_numeric($selectedCategory)) {
+                $articlesQuery->where('kb_category_id', (int) $selectedCategory);
+            }
+
+            if ($hasCategoryTable) {
+                $articlesQuery->with('kbCategory');
+            }
         }
 
-        $articles = $articlesQuery
-            ->with('kbCategory')
-            ->orderByDesc('updated_at')
-            ->orderByDesc('id')
-            ->paginate(15)
-            ->withQueryString();
+        if ($hasUpdatedAtCol) {
+            $articlesQuery->orderByDesc('updated_at');
+        }
+        $articlesQuery->orderByDesc('id');
+
+        try {
+            $articles = $articlesQuery->paginate(15)->withQueryString();
+        } catch (\Throwable $e) {
+            // Safe fallback if eager loading or custom column ordering fails
+            $articles = Option::where('o_type', 'knowledgebase')
+                ->where('o_mode', $product->name)
+                ->where('o_order', 0)
+                ->orderByDesc('id')
+                ->paginate(15)
+                ->withQueryString();
+        }
 
         $pendingCounts = Option::where('o_type', 'knowledgebase')
             ->where('o_mode', $product->name)
@@ -738,13 +763,16 @@ class StoreController extends Controller
             ->selectRaw('name, COUNT(*) as total')
             ->groupBy('name')
             ->pluck('total', 'name');
+
         $articleAuthorIds = $articles->pluck('o_parent')
             ->filter(fn ($id) => (int) $id > 0)
             ->unique()
             ->values();
+
         $articleAuthors = $articleAuthorIds->isEmpty()
             ? collect()
             : User::whereIn('id', $articleAuthorIds)->get()->keyBy('id');
+
         $shellData = $this->buildKnowledgebaseShellData($product);
         $articleName = $request->query('st');
 
@@ -799,7 +827,7 @@ class StoreController extends Controller
 
     public function knowledgebaseShow($name, $article)
     {
-        $product = Product::withoutGlobalScope('store')->where('o_type', 'store')->where('name', $name)->firstOrFail();
+        $product = $this->findKnowledgebaseProduct($name);
         $kbArticle = Option::where('o_type', 'knowledgebase')
             ->where('o_mode', $product->name)
             ->where('name', $article)
@@ -843,7 +871,7 @@ class StoreController extends Controller
 
     public function knowledgebaseEdit($name, $article)
     {
-        $product = Product::withoutGlobalScope('store')->where('o_type', 'store')->where('name', $name)->firstOrFail();
+        $product = $this->findKnowledgebaseProduct($name);
         $kbArticle = Option::where('o_type', 'knowledgebase')
             ->where('o_mode', $product->name)
             ->where('name', $article)
@@ -873,7 +901,7 @@ class StoreController extends Controller
 
     public function knowledgebasePending($name, $article)
     {
-        $product = Product::withoutGlobalScope('store')->where('o_type', 'store')->where('name', $name)->firstOrFail();
+        $product = $this->findKnowledgebaseProduct($name);
         $kbArticle = Option::where('o_type', 'knowledgebase')
             ->where('o_mode', $product->name)
             ->where('name', $article)
@@ -899,7 +927,7 @@ class StoreController extends Controller
 
     public function knowledgebaseHistory($name, $article)
     {
-        $product = Product::withoutGlobalScope('store')->where('o_type', 'store')->where('name', $name)->firstOrFail();
+        $product = $this->findKnowledgebaseProduct($name);
         $kbArticle = Option::where('o_type', 'knowledgebase')
             ->where('o_mode', $product->name)
             ->where('name', $article)
@@ -921,6 +949,32 @@ class StoreController extends Controller
             'entries' => $entries,
             'isAuthorized' => $isAuthorized,
         ] + $shellData);
+    }
+
+    private function findKnowledgebaseProduct(string $name): Product
+    {
+        $decodedName = rawurldecode($name);
+        $spaceName = str_replace('-', ' ', $name);
+
+        $product = Product::withoutGlobalScope('store')
+            ->where('o_type', 'store')
+            ->where(function ($q) use ($name, $decodedName, $spaceName) {
+                $q->where('name', $name)
+                  ->orWhere('name', $decodedName)
+                  ->orWhere('name', $spaceName);
+            })
+            ->first();
+
+        if (!$product) {
+            abort(404);
+        }
+
+        $canManageProduct = Auth::check() && (Auth::id() == $product->o_parent || (Auth::user() && Auth::user()->isAdmin()));
+        if ($product->is_suspended && !$canManageProduct) {
+            abort(403, __('messages.product_suspended_notice'));
+        }
+
+        return $product;
     }
 
     public function knowledgebaseStore(Request $request)
