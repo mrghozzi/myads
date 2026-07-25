@@ -1,4 +1,4 @@
-# Agents.md — MYADS v4.4.6
+# Agents.md — MYADS v4.5.0
 
 > **Purpose:** This file gives AI coding agents a fast, comprehensive understanding of the MYADS project — its architecture, conventions, key files, and rules — so they can work effectively from a fresh chat context.
 
@@ -6,7 +6,7 @@
 
 ## 1. Project Identity
 
-- **Name:** MYADS v4.4.6
+- **Name:** MYADS v4.5.0
 - **Type:** Social network + ad exchange platform for website owners
 - **Framework:** Laravel 12 (PHP 8.2+)
 - **Database:** MySQL 5.7+ / MariaDB 10.3+
@@ -1031,7 +1031,8 @@ If in doubt, update it. An outdated `Agents.md` causes future agents to make wro
 - **Bug Fix (2026-07-03):** Fixed KB categories table corruption (Error 1813), and CSP blocking Markdown rendering in Knowledgebase.
 - **Feature (2026-07-06):** Added **Free SEO Checker** (`/directory/seo-checker`) tool with role-based access gating and a premium "Superdesign" UI, seamlessly integrated into the directory and home dashboards.
 - **GitHub Standards & CI (2026-07-22):** Cleaned up `FUNDING.yml`, added structured Issue templates (`bug_report.yml`, `feature_request.yml`, `config.yml`), PR template (`PULL_REQUEST_TEMPLATE.md`), automated GitHub Actions testing pipeline (`.github/workflows/tests.yml`), `CONTRIBUTING.md`, and `CODE_OF_CONDUCT.md`.
+- **v4.5.0 Groundwork (2026-07-25):** Initialized release cycle for MYADS v4.5.0, bumped canonical `SystemVersion::CURRENT` to v4.5.0, updated system documentation, and configured dynamic admin panel version badges.
 
 ---
 
-*Last updated: 2026-07-22 — MYADS v4.4.6 (GitHub Community Standards, Issue & PR Templates, Automated CI Workflows, Clean Sponsorship Configuration)*
+*Last updated: 2026-07-25 — MYADS v4.5.0 (Groundwork Initialization for v4.5.0 Major Release)*

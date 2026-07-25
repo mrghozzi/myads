@@ -21,7 +21,7 @@
             </div>
             <div class="d-flex align-items-center gap-2">
                 <span class="badge bg-soft-primary text-primary px-3 py-2 fs-12 fw-semibold border border-primary-subtle rounded-pill">
-                    <i class="feather-box me-1"></i>v4.4.6
+                    <i class="feather-box me-1"></i>v{{ \App\Support\SystemVersion::CURRENT }}
                 </span>
                 <span class="badge bg-soft-{{ ($systemSettings['APP_ENV'] ?? 'production') === 'production' ? 'success' : 'warning' }} text-{{ ($systemSettings['APP_ENV'] ?? 'production') === 'production' ? 'success' : 'warning' }} px-3 py-2 fs-12 fw-semibold rounded-pill">
                     <i class="feather-server me-1"></i>{{ strtoupper($systemSettings['APP_ENV'] ?? 'production') }}

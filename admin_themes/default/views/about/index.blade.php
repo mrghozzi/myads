@@ -411,7 +411,19 @@
                             <div class="timeline">
                                 <div class="timeline-item">
                                     <div class="timeline-icon"><i class="feather-box fs-12"></i></div>
-                                    <h6 class="fw-bold mb-1">v4.4.6 <span class="badge bg-soft-primary text-primary ms-2">Current</span></h6>
+                                    <h6 class="fw-bold mb-1">v4.5.0 <span class="badge bg-soft-primary text-primary ms-2">Current</span></h6>
+                                    <p class="text-muted fs-13 mb-3">Groundwork Initialization, Platform Infrastructure Upgrades, Enhanced Dynamic Versioning & Mobile API Architecture.</p>
+                                    <div class="d-flex flex-column gap-2">
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-feature mt-1" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">Feature</span>
+                                            <span class="text-muted fs-13">Initialized <strong>MYADS v4.5.0</strong> release cycle, updated canonical version constant (<code>SystemVersion::CURRENT</code>), updated system documentation, and configured dynamic admin panel versioning.</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="timeline-item">
+                                    <div class="timeline-icon"><i class="feather-box fs-12"></i></div>
+                                    <h6 class="fw-bold mb-1">v4.4.6</h6>
                                     <p class="text-muted fs-13 mb-3">Unified Admin Settings Control Panel, Dedicated Mobile App Settings Panel, API Key Security Masking, Log Bloat & Server Storage Optimization, New Language Packs, Marketplace & Store Enhancements.</p>
                                     <div class="d-flex flex-column gap-2">
                                         <div class="d-flex align-items-start">
