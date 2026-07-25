@@ -76,6 +76,7 @@
             }
         }
     </script>
+    @stack('styles')
 </head>
 <body data-dir="{{ $pageDirection }}" class="{{ $pageDirection }} admin-premium-shell">
     <nav class="nxl-navigation">

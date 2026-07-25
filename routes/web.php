@@ -858,8 +858,11 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
 
     // Media Manager
     Route::get('/media', [App\Http\Controllers\AdminMediaController::class, 'index'])->name('admin.media');
+    Route::post('/media/upload', [App\Http\Controllers\AdminMediaController::class, 'upload'])->name('admin.media.upload');
     Route::post('/media/rename', [App\Http\Controllers\AdminMediaController::class, 'rename'])->name('admin.media.rename');
     Route::post('/media/delete', [App\Http\Controllers\AdminMediaController::class, 'destroy'])->name('admin.media.delete');
+    Route::post('/media/bulk-delete', [App\Http\Controllers\AdminMediaController::class, 'bulkDestroy'])->name('admin.media.bulk_delete');
+    Route::post('/media/clear-cache', [App\Http\Controllers\AdminMediaController::class, 'clearCache'])->name('admin.media.clear_cache');
 
     // Security
     Route::get('/security', [AdminSecurityController::class, 'index'])->name('admin.security.index');

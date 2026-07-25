@@ -33,7 +33,7 @@ MYADS is a community platform where website owners:
 11. **External Share API** — a dedicated `/share` endpoint for third-party websites to pre-fill post composer text, documented at `/developer`.
 12. **Session Monitoring** — view and manage active member sessions across devices with remote revocation.
 13. **Admin Notifications** — centralized header alerts for billing, reports, and system/extension updates with permission-based visibility.
-14. **Media Manager** — administrative hub for monitoring, renaming, previewing, and securely deleting uploaded media files.
+14. **Media Manager** — administrative hub for monitoring, drag-and-drop uploading, multi-media previewing (images, HTML5 video/audio, code), renaming, filtering, sorting, bulk deleting, and caching media files (`/admin/media`).
 15. **Multimedia Posts** — community feed support for Video, Audio, Files, Music, and Clips with dedicated players and tag-sticker indicators.
 16. **Custom Member Ads** — members create embeddable ad spaces, negotiate direct deals, track impressions/clicks, and settle daily PTS payouts or record external agreements.
 17. **Mobile App API & Client** — foundational Flutter app for Android (`myads_app`) with full community feed parity (Reactions with points/notification syncing, Comments, Multimedia posts with Video/Audio/Image gallery/File rendering, Promoted Posts, Share intent), Forums, Store, a native **Clips System**, a premium **Member Profile & Social Navigation** experience with vertical hexagonal avatars matching the web theme, and a **Settings & Communication Hub** (Messages, Notifications, localized in English/Arabic), all powered by Laravel Sanctum and a secure Mobile API.
@@ -199,7 +199,7 @@ myads/
 | `AdminCustomAdsController` | Admin custom ads dashboard, settings, creative review, and placement/deal moderation |
 | `AdminYoutubeController` | Admin YouTube campaigns and settings management |
 | `AdminUpdatesController` | System update management and "About MYADS" post-update page (`/admin/about`) |
-| `AdminMediaController` | **Media Manager** — monitor, rename, and delete uploaded files |
+| `AdminMediaController` | **Media Manager** — administrative hub for monitoring, drag-and-drop uploading, multi-media previewing (images, HTML5 video/audio, code), renaming, filtering, sorting, bulk deleting, and caching media files (`/admin/media`) |
 | `SitemapController` | Dynamic sitemap generation |
 | `SeoPublicController` | Public robots.txt |
 | `SeoCheckerController` | Free SEO Checker frontend (analysis, landing page) |
