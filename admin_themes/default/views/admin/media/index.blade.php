@@ -28,6 +28,9 @@
         </div>
     </section>
 
+    <!-- Superdesign Storage Sub-Nav -->
+    @include('admin::admin.partials.storage_nav')
+
     <!-- Session Alerts -->
     @if(session('success'))
         <div class="alert alert-success alert-dismissible fade show shadow-sm border-0 mb-4" role="alert">
