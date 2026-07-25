@@ -411,7 +411,43 @@
                             <div class="timeline">
                                 <div class="timeline-item">
                                     <div class="timeline-icon"><i class="feather-box fs-12"></i></div>
-                                    <h6 class="fw-bold mb-1">v4.4.5 <span class="badge bg-soft-primary text-primary ms-2">Current</span></h6>
+                                    <h6 class="fw-bold mb-1">v4.4.6 <span class="badge bg-soft-primary text-primary ms-2">Current</span></h6>
+                                    <p class="text-muted fs-13 mb-3">Unified Admin Settings Control Panel, Dedicated Mobile App Settings Panel, API Key Security Masking, Log Bloat & Server Storage Optimization, New Language Packs, Marketplace & Store Enhancements.</p>
+                                    <div class="d-flex flex-column gap-2">
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-feature mt-1" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">Feature</span>
+                                            <span class="text-muted fs-13">Merged <code>/admin/settings/system</code> into <strong>Unified Admin Settings Control Panel</strong> (<code>/admin/settings</code>) and overhauled S3, DigitalOcean, Google Cloud, and FTP storage settings with <strong>Superdesign</strong> UI and diagnostic tools.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-feature mt-1" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">Feature</span>
+                                            <span class="text-muted fs-13">Created <strong>Dedicated Mobile App Settings</strong> (<code>/admin/settings/mobile</code>) with official Flutter repository setup guide, secret API key masking/regeneration, and standardized media upload array key parity (<code>images[]</code>, <code>videos[]</code>, <code>audios[]</code>, <code>files[]</code>).</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-optimization mt-1" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">Optimization</span>
+                                            <span class="text-muted fs-13">Converted logging stack to <strong>Daily Log Rotation</strong> (<code>LOG_STACK=daily</code>), implemented automated <code>myads:log-cleanup</code> Artisan command, probabilistic log pruning for shared hosting, and a <strong>Log Files Monitor</strong> on <code>/admin/database-cleanup</code>.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-feature mt-1" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">Feature</span>
+                                            <span class="text-muted fs-13">Added <strong>5 New Language Packs</strong> for Russian (<code>ru</code>), Serbian (<code>sr</code>), Japanese (<code>ja</code>), Simplified Chinese (<code>zh_CN</code>), and Traditional Chinese (<code>zh_TW</code>) across 3,625+ system keys (14 total languages).</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-feature mt-1" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">Feature</span>
+                                            <span class="text-muted fs-13">Expanded <strong>Store Market Grid</strong> to display all 9 product categories with product counts, minimalist 3D category illustrations, and full-width header layouts.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-fix mt-1" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;">Fix</span>
+                                            <span class="text-muted fs-13">Resolved PTS Activities 500 error, Bootstrap modal backdrop stacking, slow network FOUC, Knowledgebase engine fallbacks, and Admin Mail SMTP environment fallbacks.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge mt-1" style="background: rgba(107, 114, 128, 0.1); color: #6b7280;">Update</span>
+                                            <span class="text-muted fs-13">Bumped <strong>guzzlehttp/guzzle</strong> to 7.15.1 and <strong>shell-quote</strong> to 1.9.0.</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="timeline-item">
+                                    <div class="timeline-icon" style="border-color: #6b7280; color: #6b7280;"><i class="feather-check fs-12"></i></div>
+                                    <h6 class="fw-bold mb-1 text-muted">v4.4.5</h6>
                                     <p class="text-muted fs-13 mb-3">Stable Release with Mobile API Community Feed Enhancements, UI Overhaul, and Authorization Fixes.</p>
                                     <div class="d-flex flex-column gap-2">
                                         <div class="d-flex align-items-start">
@@ -705,6 +741,17 @@
                                             <div>
                                                 <h6 class="fw-bold mb-2">{{ __('about.feat_seo_title') }}</h6>
                                                 <p class="text-muted mb-0 fs-13">{{ __('about.feat_seo_desc') }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="feature-card p-4 d-flex align-items-start">
+                                            <div class="feature-icon-wrapper flex-shrink-0 me-3 mb-0" style="width: 50px; height: 50px; font-size: 22px; background: rgba(99,102,241,0.1); color: #6366f1;">
+                                                <i class="feather-globe"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="fw-bold mb-2">{{ __('about.feat_i18n_title') }}</h6>
+                                                <p class="text-muted mb-0 fs-13">{{ __('about.feat_i18n_desc') }}</p>
                                             </div>
                                         </div>
                                     </div>
