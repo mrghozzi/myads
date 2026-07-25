@@ -772,10 +772,12 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/settings/ftp', [AdminController::class, 'ftpSettings'])->name('admin.settings.ftp');
     Route::post('/settings/ftp', [AdminController::class, 'updateFtpSettings'])->name('admin.settings.ftp.update');
     Route::post('/settings/ftp/test', [AdminController::class, 'testFtpConnection'])->name('admin.settings.ftp.test');
+    Route::post('/settings/ftp/upload', [AdminController::class, 'uploadFilesToFtp'])->name('admin.settings.ftp.upload');
     
     Route::get('/settings/google-cloud', [AdminController::class, 'googleCloudSettings'])->name('admin.settings.google_cloud');
     Route::post('/settings/google-cloud', [AdminController::class, 'updateGoogleCloudSettings'])->name('admin.settings.google_cloud.update');
     Route::post('/settings/google-cloud/test', [AdminController::class, 'testGoogleCloudConnection'])->name('admin.settings.google_cloud.test');
+    Route::post('/settings/google-cloud/upload', [AdminController::class, 'uploadFilesToGoogleCloud'])->name('admin.settings.google_cloud.upload');
     
     Route::get('/settings/digitalocean', [AdminController::class, 'digitaloceanSettings'])->name('admin.settings.digitalocean');
     Route::post('/settings/digitalocean', [AdminController::class, 'updateDigitaloceanSettings'])->name('admin.settings.digitalocean.update');

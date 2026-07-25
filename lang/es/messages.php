@@ -2607,6 +2607,8 @@ return [
     'pressure_no_issues_desc' => 'The current settings look healthy for the known pressure sources.',
     'pressure_no_issues_action' => 'Continue monitoring after updates or during high-traffic periods.',
     'file_upload_settings' => 'Configuración de subida de archivos',
+    'upload_files_to_ftp' => 'Sincronizar archivos multimedia con el servidor FTP',
+    'upload_files_to_google_cloud' => 'Sincronizar archivos multimedia con Google Cloud',
 ];
 
 

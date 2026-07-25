@@ -3957,4 +3957,6 @@ return [
     'amazon_s3_secret_key' => 'AWS Secret Access Key',
     'amazon_s3_custom_endpoint' => 'Custom CDN Endpoint',
     'file_upload_settings' => 'File Upload Settings',
+    'upload_files_to_ftp' => 'Sync Media to FTP Server',
+    'upload_files_to_google_cloud' => 'Sync Media to Google Cloud',
 ];

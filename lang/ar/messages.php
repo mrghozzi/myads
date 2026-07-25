@@ -3960,4 +3960,6 @@ return [
     'amazon_s3_secret_key' => 'المفتاح السري AWS Secret Key',
     'amazon_s3_custom_endpoint' => 'نقطة النهاية المخصصة CDN',
     'file_upload_settings' => 'إعدادات رفع الملفات',
+    'upload_files_to_ftp' => 'مزامنة الوسائط إلى خادم FTP',
+    'upload_files_to_google_cloud' => 'مزامنة الوسائط إلى Google Cloud',
 ];

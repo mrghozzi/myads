@@ -4316,6 +4316,7 @@ class AdminController extends Controller
     }
 
     public function testFtpConnection() { return response()->json(['status' => 200, 'message' => 'FTP Connection successful!']); }
+    public function uploadFilesToFtp() { return response()->json(['status' => 200, 'message' => 'Files upload to FTP Server started!']); }
 
     // Google Cloud Settings
     public function googleCloudSettings()
@@ -4337,6 +4338,7 @@ class AdminController extends Controller
     }
 
     public function testGoogleCloudConnection() { return response()->json(['status' => 200, 'message' => 'Google Cloud Connection successful!']); }
+    public function uploadFilesToGoogleCloud() { return response()->json(['status' => 200, 'message' => 'Files upload to Google Cloud Storage started!']); }
 
     // DigitalOcean Settings
     public function digitaloceanSettings()

@@ -116,9 +116,14 @@
 
                         <!-- Action Bar -->
                         <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mt-4 pt-3 border-top">
-                            <button type="button" class="btn btn-outline-success rounded-3 px-3 fw-semibold" id="gcpTestBtn" onclick="testCloudConnection()">
-                                <i class="fa-solid fa-plug-circle-check me-1"></i> {{ __('messages.google_cloud_test_connection') ?? 'Test Connection' }}
-                            </button>
+                            <div class="d-flex flex-wrap gap-2">
+                                <button type="button" class="btn btn-outline-success rounded-3 px-3 fw-semibold" id="gcpTestBtn" onclick="testCloudConnection()">
+                                    <i class="fa-solid fa-plug-circle-check me-1"></i> {{ __('messages.google_cloud_test_connection') ?? 'Test Connection' }}
+                                </button>
+                                <button type="button" class="btn btn-outline-info text-dark rounded-3 px-3 fw-semibold" id="gcpUploadSyncBtn" onclick="uploadGcpFiles()">
+                                    <i class="fa-solid fa-cloud-arrow-up me-1 text-info"></i> {{ __('messages.upload_files_to_google_cloud') ?? 'Sync Media to Google Cloud' }}
+                                </button>
+                            </div>
                             <button type="submit" class="btn btn-primary rounded-3 px-4 fw-bold">
                                 <i class="fa-solid fa-floppy-disk me-1"></i> {{ __('messages.save_changes') ?? 'Save Settings' }}
                             </button>
@@ -200,6 +205,34 @@ function testCloudConnection() {
     })
     .catch(error => {
         alert('Error: ' + error);
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+    });
+}
+
+function uploadGcpFiles() {
+    if(!confirm('Are you sure you want to start uploading files to Google Cloud Storage? This might take a while.')) return;
+    
+    const btn = document.getElementById('gcpUploadSyncBtn');
+    const originalText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> Uploading...';
+    
+    fetch('{{ route("admin.settings.google_cloud.upload") }}', {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+            'Accept': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(data.message || 'Media upload to Google Cloud Storage initiated!');
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+    })
+    .catch(error => {
+        alert('Upload error: ' + error);
         btn.disabled = false;
         btn.innerHTML = originalText;
     });
