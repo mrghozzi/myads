@@ -215,9 +215,18 @@ Allows any website to pre-fill the MYADS post composer.
 - `GET /api/statuses/{status_id}/comments`: Retrieve comments for a specific status.
 - `POST /api/statuses/{status_id}/comments`: Post a new comment.
   *Payload:* `{"text": "My comment"}`
-- `POST /api/reactions/toggle`: Toggle a reaction on a subject.
-  *Payload:* `{"subject_id": 123, "type": 2, "reaction_name": "Love"}` *(Supported reactions: Like, Love, Haha, Wow, Sad, Angry)*
-  **Note:** Clients must extract `subject_id` and `type` dynamically from the `interaction_subject_id` and `reaction_type` properties provided in the `StatusResource` to ensure reactions are logged against the correct parent topic or media format (e.g., `type 14` for Clips, `type 2` for statuses, `type 3` for groups) and to ensure notifications and gamification points are awarded to the correct owner.
+- `POST /api/reactions/toggle`: Toggle a reaction on a subject (post, topic, store product, directory listing, comment, order request, clips, KB article).
+  *Payload:* `{"subject_id": 123, "type": 2, "reaction_name": "love"}` *(Supported reactions: like, love, haha, wow, sad, angry, care)*
+  *Response (HTTP 200):*
+  ```json
+  {
+      "message": "Reaction added",
+      "action": "added",
+      "reacted": true,
+      "reaction": "love"
+  }
+  ```
+  **Note:** Clients must extract `subject_id` and `type` dynamically from the `interaction_subject_id` and `reaction_type` properties provided in the `StatusResource` to ensure reactions are logged against the correct parent topic or media format (e.g., `type 14` for Clips, `type 2` for statuses, `type 22` for Directory, `type 3` for Store, `type 4` for Forum comments, `type 44` for Directory comments, `type 444` for Store comments) and to ensure notifications and gamification points are awarded to the correct owner.
 
 ### Profile & Follow (Phase 2)
 - `GET /api/profile/{identifier}`: Retrieve user profile details and stats.

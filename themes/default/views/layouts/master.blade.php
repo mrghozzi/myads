@@ -1205,6 +1205,11 @@
         }
 
         function toggleReaction(id, type, reaction) {
+            let prefix = type.includes('comment') ? 'reaction-btn-comment-' : 'reaction-btn-';
+            let btn = document.getElementById(prefix + id);
+            if (btn && btn.dataset.busy === "true") return;
+            if (btn) btn.dataset.busy = "true";
+
             let token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
             
             fetch('{{ route("reaction.toggle") }}', {
@@ -1222,11 +1227,6 @@
             .then(response => response.json())
             .then(data => {
                 if (data.html) {
-                    let prefix = 'reaction-btn-';
-                    if (type.includes('comment')) {
-                        prefix = 'reaction-btn-comment-';
-                    }
-                    let btn = document.getElementById(prefix + id);
                     if (btn) {
                         btn.innerHTML = data.html;
                     }
@@ -1237,6 +1237,9 @@
             })
             .catch(error => {
                 console.error('Error:', error);
+            })
+            .finally(() => {
+                if (btn) btn.dataset.busy = "false";
             });
         }
 

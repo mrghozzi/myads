@@ -102,7 +102,7 @@ class GamificationService
                 ]);
             }
 
-            $this->refreshBadges($userId);
+            $this->refreshBadges($userId, $eventKey);
         } catch (\Throwable $e) {
             \Log::error('Gamification recordEvent Error: ' . $e->getMessage(), [
                 'userId' => $userId,
@@ -111,7 +111,7 @@ class GamificationService
         }
     }
 
-    public function refreshBadges(int $userId): void
+    public function refreshBadges(int $userId, ?string $eventKey = null): void
     {
         try {
             if (!$this->schema->supports('badges')) {
@@ -123,7 +123,33 @@ class GamificationService
                 return;
             }
 
-            $badges = Badge::where('is_active', true)->orderBy('sort_order')->get();
+            $query = Badge::where('is_active', true)->orderBy('sort_order');
+
+            if ($eventKey !== null) {
+                $criteriaTypes = match ($eventKey) {
+                    'reaction_received' => ['reactions_received'],
+                    'post_created' => ['post_count', 'image_post_count', 'link_preview_count', 'night_posts'],
+                    'comment_created' => ['comment_count', 'forum_replies_count'],
+                    'repost_created' => ['repost_count'],
+                    'follower_added' => ['followers_count'],
+                    'following_added' => ['following_count'],
+                    'product_created' => ['product_count'],
+                    'directory_submitted' => ['directory_count'],
+                    'visit_exchange_completed' => ['visit_exchanges'],
+                    'order_request_created' => ['order_requests_count'],
+                    'order_bid_created' => ['order_bids_count'],
+                    'forum_topic_created' => ['forum_topics_count', 'unique_categories_topics'],
+                    'forum_reply_created' => ['forum_replies_count', 'comment_count'],
+                    default => [],
+                };
+
+                $query->whereIn('criteria_type', $criteriaTypes);
+            }
+
+            $badges = $query->get();
+            if ($badges->isEmpty()) {
+                return;
+            }
             foreach ($badges as $badge) {
                 $progress = $this->progressForBadge($user, $badge);
 

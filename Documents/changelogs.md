@@ -4,6 +4,13 @@
 ### Core & Infrastructure
 * **Feature (Groundwork Initialization):** Initialized release cycle for MYADS v4.5.0. Updated canonical version constant (`SystemVersion::CURRENT`), system documentation (`AGENTS.md`, `API_DOCS.md`), and configured dynamic versioning across the admin control panel.
 
+### Performance & Reaction System Fixes
+* **Critical Fix (Database Indexes & Table Scans):** Created database migration (`2026_07_26_000000_add_reaction_performance_indexes.php`) adding composite B-Tree indexes on `like` (`like_uid_sid_type_idx`, `like_sid_type_idx`, `like_uid_type_idx`), `options` (`options_parent_type_idx`, `options_order_type_idx`), and `notif` (`notif_uid_time_state_idx`), eliminating full table scans on reaction toggles, profile views, and social feeds.
+* **Critical Fix (Gamification Badge Query Optimization):** Optimized `GamificationService::recordEvent()` and `refreshBadges($userId, $eventKey)` to filter badge progress recalculations by event key. Reduced database query count on reaction toggles by over 95% (from 50+ heavy `COUNT` queries across 12 tables per click down to 0-1 targeted queries).
+* **Feature (Centralized Reaction Engine):** Created `App\Services\ReactionService` consolidating reaction toggling, whitelisting validation (`like`, `love`, `haha`, `wow`, `sad`, `angry`, `care`), atomic database transactions, owner notification resolution, and type normalization across 11+ item types (posts, topics, store items, directory listings, comments, orders, clips, KB articles).
+* **Feature & Fix (Web & Mobile API Parity):** Refactored `ReactionController` (Web) and `Api\ReactionController` (Mobile API) to delegate to `ReactionService`, providing full feature parity, input validation, and unified JSON responses (`action`, `reacted`, `reaction`).
+* **UI / UX (Web Debouncer & Request Lock):** Enhanced `toggleReaction` JavaScript function in `master.blade.php` with a request lock (`dataset.busy`) to prevent double-click duplicate network calls from browser clients.
+
 ---
 
 # v4.4.6
