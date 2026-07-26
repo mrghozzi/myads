@@ -18,6 +18,18 @@
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
 
+    # Increase PHP File Upload Limits for Video Uploads
+    <IfModule mod_php.c>
+        php_value upload_max_filesize 256M
+        php_value post_max_size 256M
+        php_value memory_limit 512M
+    </IfModule>
+    <IfModule mod_php7.c>
+        php_value upload_max_filesize 256M
+        php_value post_max_size 256M
+        php_value memory_limit 512M
+    </IfModule>
+
     # Block access to sensitive files
     RewriteRule ^\.env$ - [F,L]
     RewriteRule ^\.env\..*$ - [F,L]

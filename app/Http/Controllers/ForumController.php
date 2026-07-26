@@ -188,7 +188,57 @@ class ForumController extends Controller
                 ],
         ];
 
-        if (in_array($status->s_type, [100, 10, 11, 12, 13, 14])) {
+        // Dedicated YouTube-style Video Watch Page for Video posts (s_type == 10 or post_kind === 'video', excluding clips s_type == 14)
+        if ((int) $status->s_type === 10 || ($status->post_kind === 'video' && (int) $status->s_type !== 14)) {
+            $suggestedVideos = Status::visible()
+                ->where('id', '!=', $status->id)
+                ->whereNotIn('s_type', [4, 14]) // Strictly exclude Images (4) and Clips (14)
+                ->where(function ($q) {
+                    $q->where('s_type', 10)
+                      ->orWhereHas('forumTopic', function ($ft) {
+                          $ft->whereHas('attachments', function ($att) {
+                              $att->where('mime_type', 'like', 'video/%')
+                                  ->orWhere('original_name', 'like', '%.mp4')
+                                  ->orWhere('original_name', 'like', '%.webm')
+                                  ->orWhere('original_name', 'like', '%.mov')
+                                  ->orWhere('original_name', 'like', '%.mkv');
+                          });
+                      })
+                      ->orWhereHas('linkPreviewRecord', function ($lp) {
+                          $lp->where('url', 'like', '%youtube.com%')
+                             ->orWhere('url', 'like', '%youtu.be%')
+                             ->orWhere('url', 'like', '%vimeo.com%');
+                      });
+                })
+                ->orderBy('id', 'desc')
+                ->limit(10)
+                ->get();
+
+            if ($suggestedVideos->isEmpty()) {
+                $suggestedVideos = Status::visible()
+                    ->where('id', '!=', $status->id)
+                    ->where('s_type', 10) // Strictly fallback to video statuses only
+                    ->orderBy('id', 'desc')
+                    ->limit(8)
+                    ->get();
+            }
+
+            app(\App\Services\StatusActivityService::class)->decorateMany($suggestedVideos);
+
+            $viewer = auth()->user();
+            $isFollowing = ($viewer && $topic->user)
+                ? \App\Models\Like::where('uid', $viewer->id)->where('sid', $topic->user->id)->where('type', 1)->exists()
+                : false;
+
+            $isSaved = $viewer
+                ? \Illuminate\Support\Facades\DB::table('saved_statuses')->where('user_id', $viewer->id)->where('status_id', $status->id)->exists()
+                : false;
+
+            $this->seo($seoContext);
+            return view('theme::forum.video', compact('topic', 'status', 'forumSettings', 'group', 'suggestedVideos', 'isFollowing', 'isSaved'));
+        }
+
+        if (in_array($status->s_type, [100, 11, 12, 13, 14])) {
             $this->seo($seoContext);
             return view('theme::forum.post', compact('topic', 'status', 'forumSettings', 'group'));
         }
@@ -393,11 +443,30 @@ class ForumController extends Controller
 
         DB::beginTransaction();
         try {
+            $topicName = $request->input('video_title') ?: $request->name;
             $topic->update([
-                'name' => $request->name,
+                'name' => $topicName,
                 'txt' => $request->txt,
                 'cat' => $request->cat,
             ]);
+
+            $thumbFile = $request->file('video_thumbnail') ?: $request->file('img');
+            if ($thumbFile) {
+                $extension = strtolower($thumbFile->getClientOriginalExtension() ?: 'png');
+                $filename = time() . '_' . Str::random(12) . '.' . $extension;
+                $thumbFile->move(base_path('upload'), $filename);
+                $imagePath = 'upload/' . $filename;
+
+                Option::updateOrCreate(
+                    ['o_parent' => $topic->id, 'o_type' => 'image_post'],
+                    [
+                        'name' => (string) time(),
+                        'o_valuer' => $imagePath,
+                        'o_order' => auth()->id(),
+                        'o_mode' => 'file',
+                    ]
+                );
+            }
 
             $deleteAttachmentIds = collect($request->input('delete_attachments', []))
                 ->filter(fn ($id) => is_numeric($id))

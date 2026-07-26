@@ -236,9 +236,46 @@
 
             @if($allowVideo)
             <div id="composer-video-block" class="widget-box composer-refresh__panel" style="display:none;">
-                <div class="widget-box-content composer-refresh__panel-content">
-                    <input type="file" id="composer-videos" name="videos[]" accept="video/*" multiple style="display:none">
-                    <div id="composer-video-preview" class="composer-refresh__preview"></div>
+                <div class="widget-box-content composer-refresh__panel-content p-3">
+                    <div class="composer-refresh__field mb-3">
+                        <label class="composer-refresh__label fw-bold mb-1" for="composer-video-title">
+                            <i class="fa fa-heading text-primary me-1"></i> {{ __('messages.video_title') }}
+                        </label>
+                        <input
+                            type="text"
+                            id="composer-video-title"
+                            name="video_title"
+                            class="composer-refresh__control form-control"
+                            value="{{ old('video_title', '') }}"
+                            placeholder="{{ __('messages.video_title_placeholder') }}"
+                        >
+                    </div>
+
+                    <div class="composer-refresh__field mb-3">
+                        <label class="composer-refresh__label fw-bold mb-1" for="composer-video-thumbnail">
+                            <i class="fa fa-image text-primary me-1"></i> {{ __('messages.video_thumbnail') }}
+                        </label>
+                        <input
+                            type="file"
+                            id="composer-video-thumbnail"
+                            name="video_thumbnail"
+                            accept=".jpg,.jpeg,.png,.gif,.webp"
+                            class="form-control text-muted"
+                            onchange="if(this.files && this.files[0]){ var r = new FileReader(); r.onload = function(e){ var img = document.getElementById('composer-video-thumb-preview'); img.src = e.target.result; document.getElementById('composer-video-thumb-wrap').style.display='block'; }; r.readAsDataURL(this.files[0]); }"
+                        >
+                        <div id="composer-video-thumb-wrap" class="mt-2" style="display:none;">
+                            <p class="small text-muted mb-1">معاينة غلاف الفيديو:</p>
+                            <img id="composer-video-thumb-preview" src="" style="max-height: 120px; border-radius: 8px; border: 1px solid var(--border-color, #e0e6ed); object-fit: cover;">
+                        </div>
+                    </div>
+
+                    <div class="composer-refresh__field">
+                        <label class="composer-refresh__label fw-bold mb-1">
+                            <i class="fa fa-film text-primary me-1"></i> {{ __('messages.select_video_file') }}
+                        </label>
+                        <input type="file" id="composer-videos" name="videos[]" accept="video/*" multiple style="display:none">
+                        <div id="composer-video-preview" class="composer-refresh__preview"></div>
+                    </div>
                 </div>
             </div>
             @endif

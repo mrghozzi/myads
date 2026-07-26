@@ -1,8 +1,18 @@
 # v4.5.0
-> **Major Release (In Progress)** — Groundwork Initialization, Platform Infrastructure Upgrades, Enhanced Dynamic Versioning & Mobile API Architecture.
+> **Major Release (In Progress)** — Groundwork Initialization, Platform Infrastructure Upgrades, YouTube-Style Video Watch Page, Community Publisher & Edit Enhancements, Server Upload Limit Optimization, Enhanced Dynamic Versioning & Mobile API Architecture.
 
 ### Core & Infrastructure
 * **Feature (Groundwork Initialization):** Initialized release cycle for MYADS v4.5.0. Updated canonical version constant (`SystemVersion::CURRENT`), system documentation (`AGENTS.md`, `API_DOCS.md`), and configured dynamic versioning across the admin control panel.
+
+### YouTube-Style Video Watch Page & Publisher Enhancements
+* **Feature (YouTube-Style Video Watch Page):** Built a dedicated YouTube-style watch page (`/t{id}`) for regular video posts (`s_type == 10` or `post_kind === 'video'`, excluding clips `s_type == 14`) featuring a custom HTML5 Video Player with custom scrubber, volume slider, playback speed (0.5x-2x), fullscreen, keyboard shortcuts (Space/K/F/M), and YouTube embed fallback.
+* **Feature (Publisher Card & Hexagon Avatars):** Integrated exact Vikinger Hexagon avatar styling (`user-avatar small no-outline` with `hexagon-image-30-32` / `hexagon-border-40-44` and `clip-path` fallback) matching the main site header, user role labels, and interactive Follow/Unfollow toggle button.
+* **Feature (Action Buttons & Standalone Popover Flyouts):** Designed compact uniform action buttons (Reactions, Save, Share, Options/Report) using standalone custom JavaScript popovers (`.custom-v-flyout`) without Bootstrap modal dependencies, featuring link copy toast notifications, direct social network sharing (Facebook, X, LinkedIn, Telegram), and `overflow: visible` container fixes.
+* **Feature (Suggested Videos & Strict Filtering):** Integrated a 4-column suggested videos sidebar strictly filtered to video posts only (`whereNotIn('s_type', [4, 14])`), excluding images (`s_type = 4`) and clips (`s_type = 14`).
+* **Feature (Community Publisher Video Title & Thumbnail):** Enhanced the community feed composer (`add_post.blade.php`) and topic edit form (`edit.blade.php`) with input fields for **Video Title** (`video_title`) and **Video Thumbnail (Cover Image)** (`video_thumbnail`) with live image preview (`#composer-video-thumb-preview`) and cover persistence (`o_type = 'image_post'`).
+* **Feature (Server Upload Capacity & 413 Error Resolution):** Resolved HTTP 413 Content Too Large errors when uploading large videos (30MB+). Updated PHP configuration (`upload_max_filesize = 256M`, `post_max_size = 256M` in `php.ini`), updated Apache `.htaccess` / `public/.htaccess`, synced database options (`file_upload_settings.max_upload_size = 256`), and added a graceful `PostTooLargeException` renderer in `bootstrap/app.php`.
+* **Internationalization (i18n):** Added system translation keys (`messages.video_title`, `messages.video_title_placeholder`, `messages.video_thumbnail`, `messages.select_video_file`, `messages.file_too_large`) across Arabic and English language packs.
+* **Quality & Automated Testing:** Created comprehensive PHPUnit feature test suite (`VideoWatchPageTest.php`) verifying video status rendering, player component presence, publisher card elements, suggested videos filtering, and automated video post creation/editing with title and thumbnail uploads.
 
 ### Performance & Reaction System Fixes
 * **Critical Fix (Database Indexes & Table Scans):** Created database migration (`2026_07_26_000000_add_reaction_performance_indexes.php`) adding composite B-Tree indexes on `like` (`like_uid_sid_type_idx`, `like_sid_type_idx`, `like_uid_type_idx`), `options` (`options_parent_type_idx`, `options_order_type_idx`), and `notif` (`notif_uid_time_state_idx`), eliminating full table scans on reaction toggles, profile views, and social feeds.

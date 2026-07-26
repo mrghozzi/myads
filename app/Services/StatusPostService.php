@@ -192,7 +192,8 @@ class StatusPostService
 
         DB::beginTransaction();
         try {
-            $topic = $this->createForumTopic($user->id, $text, $postKind, $time, $group?->id);
+            $videoTitle = trim((string) ($request->input('video_title') ?: $request->input('title') ?: $request->input('name', '')));
+            $topic = $this->createForumTopic($user->id, $text, $postKind, $time, $group?->id, $videoTitle);
             $status = Status::create([
                 'uid' => $user->id,
                 'group_id' => $group?->id,
@@ -201,6 +202,20 @@ class StatusPostService
                 'tp_id' => $topic->id,
                 'statu' => 1,
             ]);
+
+            $thumbFile = $request->file('video_thumbnail') ?: ($request->file('thumbnail') ?: $request->file('fimg'));
+            if ($thumbFile) {
+                $thumbPath = $this->storeGalleryFile($thumbFile, $topic->id, $user->id);
+                Option::updateOrCreate(
+                    ['o_parent' => $topic->id, 'o_type' => 'image_post'],
+                    [
+                        'name' => (string) time(),
+                        'o_valuer' => $thumbPath,
+                        'o_order' => $user->id,
+                        'o_mode' => 'file',
+                    ]
+                );
+            }
 
             if ($postKind === 'gallery') {
                 $this->storeGalleryAssets($topic, $request, $user->id);
@@ -341,7 +356,26 @@ class StatusPostService
         try {
             $topic = ForumTopic::where('id', $status->tp_id)->first();
             if ($topic) {
-                $topic->update(['txt' => $text]);
+                $topicUpdate = ['txt' => $text];
+                $videoTitle = trim((string) ($request->input('video_title') ?: $request->input('title') ?: $request->input('name', '')));
+                if ($videoTitle !== '') {
+                    $topicUpdate['name'] = $videoTitle;
+                }
+                $topic->update($topicUpdate);
+
+                $thumbFile = $request->file('video_thumbnail') ?: ($request->file('thumbnail') ?: $request->file('fimg'));
+                if ($thumbFile) {
+                    $thumbPath = $this->storeGalleryFile($thumbFile, $topic->id, $user->id);
+                    Option::updateOrCreate(
+                        ['o_parent' => $topic->id, 'o_type' => 'image_post'],
+                        [
+                            'name' => (string) time(),
+                            'o_valuer' => $thumbPath,
+                            'o_order' => $user->id,
+                            'o_mode' => 'file',
+                        ]
+                    );
+                }
             }
             // Directory only updates
             $directoryListing = Directory::where('id', $status->tp_id)->first();
@@ -505,11 +539,12 @@ class StatusPostService
         }
     }
 
-    private function createForumTopic(int $userId, string $text, string $postKind, int $time, ?int $groupId = null): ForumTopic
+    private function createForumTopic(int $userId, string $text, string $postKind, int $time, ?int $groupId = null, ?string $videoTitle = null): ForumTopic
     {
+        $topicTitle = ($videoTitle && trim($videoTitle) !== '') ? trim($videoTitle) : $postKind;
         return ForumTopic::create([
             'uid' => $userId,
-            'name' => $postKind,
+            'name' => $topicTitle,
             'txt' => $text,
             'cat' => 0,
             'group_id' => $groupId,

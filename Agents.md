@@ -34,7 +34,7 @@ MYADS is a community platform where website owners:
 12. **Session Monitoring** — view and manage active member sessions across devices with remote revocation.
 13. **Admin Notifications** — centralized header alerts for billing, reports, and system/extension updates with permission-based visibility.
 14. **Media Manager** — administrative hub for monitoring, drag-and-drop uploading, multi-media previewing (images, HTML5 video/audio, code), renaming, filtering, sorting, bulk deleting, and caching media files (`/admin/media`).
-15. **Multimedia Posts** — community feed support for Video, Audio, Files, Music, and Clips with dedicated players and tag-sticker indicators.
+15. **Multimedia Posts** — community feed support for Video, Audio, Files, Music, and Clips with dedicated players, YouTube-style Watch Page (`/t{id}`) for regular video posts (`s_type == 10`), custom HTML5 video controls, video title & cover thumbnail fields, suggested video recommendations, and tag-sticker indicators.
 16. **Custom Member Ads** — members create embeddable ad spaces, negotiate direct deals, track impressions/clicks, and settle daily PTS payouts or record external agreements.
 17. **Mobile App API & Client** — foundational Flutter app for Android (`myads_app`) with full community feed parity (Reactions with points/notification syncing, Comments, Multimedia posts with Video/Audio/Image gallery/File rendering, Promoted Posts, Share intent), Forums, Store, a native **Clips System**, a premium **Member Profile & Social Navigation** experience with vertical hexagonal avatars matching the web theme, and a **Settings & Communication Hub** (Messages, Notifications, localized in English/Arabic), all powered by Laravel Sanctum and a secure Mobile API.
 18. **Modern UI/UX** — Progressive Web App (PWA) support with offline fallback, a Live Global Search engine, Skeleton load placeholders, Toast notifications, Hover Popovers for user profiles, intelligent OS-based Dark Mode detection, and refined micro-animations.
@@ -290,7 +290,7 @@ myads/
 | `LinkPreviewService` | Fetches URL metadata for link posts |
 | `NotificationService` | Creates and manages notifications |
 | `StatusActivityService` | Status/activity card rendering logic (bulk eager-loading optimized, supports `LengthAwarePaginator` for Mobile API hydration) |
-| `StatusPostService` | Centralized business logic for creating, editing, and deleting community statuses across Web and Mobile (supports 9 post kinds, array multipart keys `images[]`/`videos[]`/`audios[]`/`files[]`, live link previews, and directory publishing) |
+| `StatusPostService` | Centralized business logic for creating, editing, and deleting community statuses across Web and Mobile (supports 9 post kinds, array multipart keys `images[]`/`videos[]`/`audios[]`/`files[]`, video titles & cover thumbnails, live link previews, and directory publishing) |
 | `ReactionService` | Centralized atomic reaction processing, input whitelisting, owner notification resolution, and Web/Mobile API parity across 11+ item types |
 | `StatusPromotionPricingService` | Smart PTS pricing, delivery caps, duration estimates, and active-subscription discount support for promoted posts |
 | `StatusPromotionService` | Campaign creation, feed injection, pacing, progress tracking, and admin actions for promoted posts |

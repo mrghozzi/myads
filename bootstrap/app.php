@@ -119,6 +119,13 @@ return Application::configure(basePath: dirname(__DIR__))
             }
         });
 
+        $exceptions->render(function (\Illuminate\Http\Exceptions\PostTooLargeException $e, $request) {
+            if ($request->expectsJson()) {
+                return response()->json(['message' => __('messages.file_too_large')], 413);
+            }
+            return back()->with('error', __('messages.file_too_large'))->withInput();
+        });
+
         $exceptions->render(function (\Throwable $e) {
             if (! \App\Support\DatabaseExceptionClassifier::shouldRenderServiceUnavailable($e)) {
                 return null;

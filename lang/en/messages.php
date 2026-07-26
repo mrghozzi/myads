@@ -3959,4 +3959,9 @@ return [
     'file_upload_settings' => 'File Upload Settings',
     'upload_files_to_ftp' => 'Sync Media to FTP Server',
     'upload_files_to_google_cloud' => 'Sync Media to Google Cloud',
+    'video_title' => 'Video Title',
+    'video_title_placeholder' => 'Enter a catchy video title...',
+    'video_thumbnail' => 'Video Thumbnail',
+    'select_video_file' => 'Select Video File',
+    'file_too_large' => 'File size is too large and exceeds the maximum allowed upload limit.',
 ];

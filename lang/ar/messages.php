@@ -3962,4 +3962,9 @@ return [
     'file_upload_settings' => 'إعدادات رفع الملفات',
     'upload_files_to_ftp' => 'مزامنة الوسائط إلى خادم FTP',
     'upload_files_to_google_cloud' => 'مزامنة الوسائط إلى Google Cloud',
+    'video_title' => 'عنوان الفيديو',
+    'video_title_placeholder' => 'أدخل عنواناً جذاباً للفيديو...',
+    'video_thumbnail' => 'الصورة المصغرة للفيديو (Thumbnail)',
+    'select_video_file' => 'ملف الفيديو',
+    'file_too_large' => 'حجم الملف كبيرا جداً، يتجاوز الحد المسموح به للرفع.',
 ];
