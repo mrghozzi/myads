@@ -57,12 +57,26 @@ class StatusResource extends JsonResource
             ];
         }
 
+        $videoTitle = null;
+        $videoThumbnail = null;
+        $topic = $this->forumTopic ?? ($this->related_content instanceof \App\Models\ForumTopic ? $this->related_content : null);
+        if ($topic) {
+            if ($topic->name && !in_array(strtolower(trim($topic->name)), ['video', 'text', 'gallery', 'clips', 'audio', 'file', 'music'])) {
+                $videoTitle = $topic->name;
+            }
+            if ($topic->image_url) {
+                $videoThumbnail = asset($topic->image_url);
+            }
+        }
+
         return [
             'id' => $this->id,
             'user' => new UserResource($this->whenLoaded('user')),
             'type' => $this->s_type,
             'post_kind' => $this->post_kind,
             'text' => $this->txt,
+            'video_title' => $videoTitle ?: $this->getDisplayTitle(),
+            'video_thumbnail' => $videoThumbnail ?: $this->getDisplayImage(),
             'date' => $this->date,
             'date_formatted' => $this->date_formatted,
             'reactions_count' => $this->reactions_count,

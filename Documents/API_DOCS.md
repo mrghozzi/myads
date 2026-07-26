@@ -170,6 +170,7 @@ Allows any website to pre-fill the MYADS post composer.
 - `GET /api/portal/feed`: Retrieves the community feed (paginated). Optional query parameter `filter` (`all` or `me`). Returns a paginated collection of `StatusResource` (with properly eager-loaded relationships including `user`) which includes:
   - `user`: User details (`UserResource`) containing `id`, `username`, `name`, `avatar` URL, `verified` status, and `profile_badge_color` (the hex color corresponding to their active paid plan or Super Admin status).
   - `display_content`, `display_title`, `display_image`: Pre-rendered HTML/attributes for diverse post types.
+  - `video_title`, `video_thumbnail`: Resolved custom video title and video cover thumbnail image URL for video posts.
   - `media`: Primary media object for multimedia posts (Video, Audio, File, Music, Clips) containing `type`, `url`, `mime_type`, `name`, and `size`. Returns `null` for text-only posts.
   - `gallery`: Array of image URLs for multi-image posts. Empty array for non-image posts.
   - `attachments`: Array of all file attachments, each with `url`, `mime_type`, `name`, and `size`.
@@ -182,6 +183,7 @@ Allows any website to pre-fill the MYADS post composer.
   - `grouped_reactions`: Map of reaction types to counts.
   - `has_liked`, `user_reaction`: Current user's reaction state.
   - `is_promoted_ad`: Boolean flag indicating if the post is a promoted ad campaign injected into the feed.
+- `GET /api/statuses/{status_id}`: Retrieves details for a specific status. For video posts (`s_type == 10` or `post_kind == 'video'`), the response includes `StatusResource` attributes alongside `suggested_videos` (collection of recommended video posts), `is_following` (whether viewer follows publisher), and `is_saved` (whether status is saved by viewer).
 - `GET /api/v1/composer/options`: Retrieves post composer options including user's joined groups (`groups`), web directory categories (`directory_categories`), and supported post kinds (`supported_kinds`).
 - `POST /api/v1/statuses/link-preview`: Generates live metadata preview for a target URL.
   *Payload:* `{"link_url": "https://example.com"}`  
@@ -190,6 +192,8 @@ Allows any website to pre-fill the MYADS post composer.
   *Payload (Multipart Form-Data):*
   - `text`: Post text content (supports @mentions).
   - `post_kind`: Post kind (`text`, `gallery`, `video`, `audio`, `music`, `file`, `clips`, `link`, `repost`).
+  - `video_title`: Optional custom video title string (for `video` posts).
+  - `video_thumbnail`: Optional video cover thumbnail image file upload (for `video` posts).
   - `publish_mode`: `post` (default) or `directory_only` (publishes link as a Web Directory entry).
   - `images[]`: Array of image files (for `gallery` posts up to 10 images).
   - `videos[]`: Array of video files (for `video` or `clips` posts).
@@ -208,7 +212,7 @@ Allows any website to pre-fill the MYADS post composer.
       }
   }
   ```
-- `POST /api/statuses/{status_id}/update`: Update an existing status (requires post ownership or admin rights).
+- `POST /api/statuses/{status_id}/update`: Update an existing status (supports `video_title` and `video_thumbnail` parameters). Requires post ownership or admin rights.
 - `DELETE /api/statuses/{status_id}`: Delete a status (requires ownership or admin rights).
 
 ### Comments & Reactions

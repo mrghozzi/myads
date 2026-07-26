@@ -61,7 +61,42 @@ class StatusController extends Controller
 
     public function show(Status $status)
     {
-        return new StatusResource($status->load(['user', 'linkPreviewRecord', 'repostRecord.originalStatus.user']));
+        $status->load(['user', 'linkPreviewRecord', 'repostRecord.originalStatus.user', 'forumTopic.attachments']);
+        $resource = (new StatusResource($status))->toArray(request());
+
+        if ((int) $status->s_type === 10 || $status->post_kind === 'video') {
+            $viewer = auth('sanctum')->user();
+            $topic = $status->forumTopic;
+
+            $suggestedVideos = Status::visible()
+                ->where('id', '!=', $status->id)
+                ->whereNotIn('s_type', [4, 14])
+                ->where(function ($q) {
+                    $q->where('s_type', 10)
+                      ->orWhereHas('forumTopic', function ($ft) {
+                          $ft->whereHas('attachments', function ($att) {
+                              $att->where('mime_type', 'like', 'video/%')
+                                  ->orWhere('original_name', 'like', '%.mp4')
+                                  ->orWhere('original_name', 'like', '%.webm')
+                                  ->orWhere('original_name', 'like', '%.mov')
+                                  ->orWhere('original_name', 'like', '%.mkv');
+                          });
+                      });
+                })
+                ->orderBy('id', 'desc')
+                ->limit(10)
+                ->get();
+
+            $resource['suggested_videos'] = StatusResource::collection($suggestedVideos)->toArray(request());
+            $resource['is_following'] = ($viewer && $topic && $topic->user)
+                ? \App\Models\Like::where('uid', $viewer->id)->where('sid', $topic->user->id)->where('type', 1)->exists()
+                : false;
+            $resource['is_saved'] = $viewer
+                ? \Illuminate\Support\Facades\DB::table('saved_statuses')->where('user_id', $viewer->id)->where('status_id', $status->id)->exists()
+                : false;
+        }
+
+        return response()->json($resource);
     }
 
     public function store(Request $request)
