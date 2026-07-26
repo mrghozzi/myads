@@ -2494,6 +2494,92 @@ class AdminController extends Controller
         return redirect()->back()->with('success', __('messages.kb_category_deleted'));
     }
 
+    // Script Subcategories (scriptcat)
+    public function scriptCategories()
+    {
+        $categories = Option::where('o_type', 'scriptcat')
+            ->orderBy('o_order')
+            ->orderBy('id')
+            ->get();
+
+        return view('admin::admin.script_categories', compact('categories'));
+    }
+
+    public function storeScriptCategory(Request $request)
+    {
+        $request->validate([
+            'name' => ['required', 'string', 'max:80', 'regex:/^[A-Za-z0-9_]+$/'],
+            'sort_order' => ['nullable', 'integer', 'min:0', 'max:9999'],
+        ]);
+
+        $exists = Option::where('o_type', 'scriptcat')->where('name', $request->name)->exists();
+        if ($exists) {
+            return redirect()->back()->withErrors(['name' => __('messages.script_category_exists') ?? 'A script subcategory with this name already exists.']);
+        }
+
+        Option::create([
+            'name' => $request->name,
+            'o_valuer' => '0',
+            'o_type' => 'scriptcat',
+            'o_parent' => 0,
+            'o_order' => (int) ($request->input('sort_order', 0)),
+            'o_mode' => $request->name,
+        ]);
+
+        return redirect()->back()->with('success', __('messages.script_category_created') ?? 'Script subcategory created successfully.');
+    }
+
+    public function updateScriptCategory(Request $request, $id)
+    {
+        $category = Option::where('o_type', 'scriptcat')->where('id', $id)->firstOrFail();
+
+        $request->validate([
+            'name' => ['required', 'string', 'max:80', 'regex:/^[A-Za-z0-9_]+$/'],
+            'sort_order' => ['nullable', 'integer', 'min:0', 'max:9999'],
+        ]);
+
+        $exists = Option::where('o_type', 'scriptcat')
+            ->where('name', $request->name)
+            ->where('id', '!=', $id)
+            ->exists();
+        if ($exists) {
+            return redirect()->back()->withErrors(['name' => __('messages.script_category_exists') ?? 'A script subcategory with this name already exists.']);
+        }
+
+        $oldName = $category->name;
+
+        $category->update([
+            'name' => $request->name,
+            'o_mode' => $request->name,
+            'o_order' => (int) ($request->input('sort_order', 0)),
+        ]);
+
+        Option::where('o_type', 'store_type')
+            ->where('name', \App\Support\StoreCategoryCatalog::SCRIPT)
+            ->where('o_mode', $oldName)
+            ->update(['o_mode' => $request->name]);
+
+        return redirect()->back()->with('success', __('messages.script_category_updated') ?? 'Script subcategory updated successfully.');
+    }
+
+    public function deleteScriptCategory(Request $request, $id)
+    {
+        $category = Option::where('o_type', 'scriptcat')->where('id', $id)->firstOrFail();
+
+        $usageCount = Option::where('o_type', 'store_type')
+            ->where('name', \App\Support\StoreCategoryCatalog::SCRIPT)
+            ->where('o_mode', $category->name)
+            ->count();
+
+        if ($usageCount > 0) {
+            return redirect()->back()->withErrors(['delete' => __('messages.script_category_in_use') ?? 'This subcategory is in use by existing products and cannot be deleted.']);
+        }
+
+        $category->delete();
+
+        return redirect()->back()->with('success', __('messages.script_category_deleted') ?? 'Script subcategory deleted successfully.');
+    }
+
     // Site Ads Management
     public function siteAds()
     {

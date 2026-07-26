@@ -1036,7 +1036,8 @@ If in doubt, update it. An outdated `Agents.md` causes future agents to make wro
 - **GitHub Standards & CI (2026-07-22):** Cleaned up `FUNDING.yml`, added structured Issue templates (`bug_report.yml`, `feature_request.yml`, `config.yml`), PR template (`PULL_REQUEST_TEMPLATE.md`), automated GitHub Actions testing pipeline (`.github/workflows/tests.yml`), `CONTRIBUTING.md`, and `CODE_OF_CONDUCT.md`.
 - **v4.5.0 Groundwork (2026-07-25):** Initialized release cycle for MYADS v4.5.0, bumped canonical `SystemVersion::CURRENT` to v4.5.0, updated system documentation, and configured dynamic admin panel version badges.
 - **Reaction System Optimization (2026-07-26):** Created composite performance indexes (`like`, `options`, `notif`), optimized `GamificationService` badge queries (reduced query count by >95%), added centralized `ReactionService`, enabled Optimistic UI updates on mobile (`v1.5.0+10`), and added web request debouncing.
+- **Store Script Subcategories (2026-07-26):** Seeded default `scriptcat` options (CMS, Blog, Forum, Ecommerce, Social_Network, Marketplace, LMS, CRM, Helpdesk, Booking, Directory, Portfolio, Wiki, API, Landing_Page, Newsletter, Survey, Project_Management, File_Management, Others) via migration `2026_07_26_235900_seed_script_subcategories.php`, fixed the empty subcategory selector on `/store/create` for the `script` main category, and added a dedicated admin management page at `/admin/store/script-categories` with full CRUD, sidebar link, and EN/AR translations.
 
 ---
 
-*Last updated: 2026-07-26 — MYADS v4.5.0 (Reaction System Optimization, Index Performance Upgrades, Optimistic Mobile UI)*
+*Last updated: 2026-07-26 — MYADS v4.5.0 (Reaction System Optimization, Index Performance Upgrades, Optimistic Mobile UI, Script Subcategories Seed & Admin CRUD)*

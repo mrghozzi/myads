@@ -695,6 +695,12 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::post('/kb/categories/{id}', [AdminController::class, 'updateKbCategory'])->name('admin.kb_categories.update');
     Route::delete('/kb/categories/{id}', [AdminController::class, 'deleteKbCategory'])->name('admin.kb_categories.delete');
 
+    // Script Subcategories (scriptcat)
+    Route::get('/store/script-categories', [AdminController::class, 'scriptCategories'])->name('admin.script_categories');
+    Route::post('/store/script-categories', [AdminController::class, 'storeScriptCategory'])->name('admin.script_categories.store');
+    Route::post('/store/script-categories/{id}', [AdminController::class, 'updateScriptCategory'])->name('admin.script_categories.update');
+    Route::delete('/store/script-categories/{id}', [AdminController::class, 'deleteScriptCategory'])->name('admin.script_categories.delete');
+
     // Emojis
     Route::get('/emojis', [AdminController::class, 'emojis'])->name('admin.emojis');
     Route::post('/emojis', [AdminController::class, 'storeEmoji'])->name('admin.emojis.store');
