@@ -1,11 +1,6 @@
 @extends('theme::layouts.master')
 
 @section('content')
-<div class="section-banner" style="background: url({{ theme_asset('img/banner/Newsfeed.png') }}) no-repeat 50%;" >
-    <img class="section-banner-icon" src="{{ theme_asset('img/banner/marketplace-icon.png') }}">
-    <p class="section-banner-title">{{ __('downloads') }} - {{ $product->name }}</p>
-</div>
-
 <div class="section-header">
     <div class="section-header-info">
         <h2 class="section-title">

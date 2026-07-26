@@ -7,12 +7,6 @@
 
 @include('theme::store.partials.editor-assets')
 
-<div class="section-banner" style="background: url({{ theme_asset('img/banner/Newsfeed.png') }}) no-repeat 50%;">
-    <img class="section-banner-icon" src="{{ theme_asset('img/banner/marketplace-icon.png') }}">
-    <p class="section-banner-title"><span><i class="fa fa-cart-plus" aria-hidden="true"></i></span>&nbsp;{{ __('messages.add_product') }}</p>
-    <p class="section-banner-text">{{ __('messages.landing_community_store_desc') }}</p>
-</div>
-
 <div class="store-editor-page">
     <form id="addstore" method="post" class="form-horizontal" action="{{ route('store.store') }}">
         @csrf
@@ -56,7 +50,7 @@
                                         required
                                     >
                                     <div id="msg_name">
-                                        <input type="text" style="visibility:hidden" value="{{ old('vname') }}" name="vname" required>
+                                        <input type="hidden" value="{{ old('vname') }}" name="vname">
                                     </div>
                                 </div>
                             </div>
@@ -354,6 +348,26 @@
                         $("#msg_name").html(html);
                     }
                 });
+            });
+
+            $('#addstore').on('submit', function (event) {
+                var form = this;
+
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+
+                    if (typeof form.reportValidity === 'function') {
+                        form.reportValidity();
+                    }
+
+                    var firstInvalid = form.querySelector(':invalid');
+                    if (firstInvalid) {
+                        firstInvalid.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        if (typeof firstInvalid.focus === 'function' && firstInvalid.type !== 'hidden') {
+                            firstInvalid.focus({ preventScroll: true });
+                        }
+                    }
+                }
             });
 
             $('#store-version, #store-price').on('input', syncCreateSummary);

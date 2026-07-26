@@ -678,17 +678,17 @@ class StoreController extends Controller
 
         $length = strlen($name);
         if (!preg_match('/^[-a-zA-Z0-9_]+$/', $name)) {
-            return response("<div class=\"alert alert-danger\" role=\"alert\"><strong><i class=\"fa fa-exclamation-triangle\" aria-hidden=\"true\"></i></strong>&nbsp;".__('olanwas')."</div><input type=\"text\" style=\"visibility:hidden\" value=\"\" name=\"vname\" required>");
+            return response("<div class=\"alert alert-danger\" role=\"alert\"><strong><i class=\"fa fa-exclamation-triangle\" aria-hidden=\"true\"></i></strong>&nbsp;".__('olanwas')."</div><input type=\"hidden\" value=\"\" name=\"vname\">");
         }
         if ($length < 3 || $length > 35) {
-            return response("<div class=\"alert alert-danger\" role=\"alert\"><strong><i class=\"fa fa-exclamation-triangle\" aria-hidden=\"true\"></i></strong>&nbsp;".__('ttmbnlt')."</div><input type=\"text\" style=\"visibility:hidden\" value=\"\" name=\"vname\" required>");
+            return response("<div class=\"alert alert-danger\" role=\"alert\"><strong><i class=\"fa fa-exclamation-triangle\" aria-hidden=\"true\"></i></strong>&nbsp;".__('ttmbnlt')."</div><input type=\"hidden\" value=\"\" name=\"vname\">");
         }
         $exists = Option::where('o_type', 'store')->where('name', $name)->exists();
         if ($exists) {
-            return response("<div class=\"alert alert-danger\" role=\"alert\"><strong><i class=\"fa fa-exclamation-triangle\" aria-hidden=\"true\"></i></strong>&nbsp;".__('exists')."</div><input type=\"text\" style=\"visibility:hidden\" value=\"\" name=\"vname\" required>");
+            return response("<div class=\"alert alert-danger\" role=\"alert\"><strong><i class=\"fa fa-exclamation-triangle\" aria-hidden=\"true\"></i></strong>&nbsp;".__('exists')."</div><input type=\"hidden\" value=\"\" name=\"vname\">");
         }
 
-        return response('<input type="text" style="visibility:hidden" value="1" name="vname" required>');
+        return response('<input type="hidden" value="1" name="vname">');
     }
 
     public function loadCategories(Request $request)

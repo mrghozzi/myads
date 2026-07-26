@@ -27,6 +27,10 @@
 * **Feature & Fix (Web & Mobile API Parity):** Refactored `ReactionController` (Web) and `Api\ReactionController` (Mobile API) to delegate to `ReactionService`, providing full feature parity, input validation, and unified JSON responses (`action`, `reacted`, `reaction`).
 * **UI / UX (Web Debouncer & Request Lock):** Enhanced `toggleReaction` JavaScript function in `master.blade.php` with a request lock (`dataset.busy`) to prevent double-click duplicate network calls from browser clients.
 
+### Marketplace & Store Enhancements
+* **Fix (Store Product Creation Submit):** Resolved a silent submit failure on `/store/create` caused by a hidden required `vname` validation field blocking the browser form submission before Laravel validation could run. The store editor now relies on backend validation as the source of truth while using `reportValidity()` to surface missing required fields clearly to publishers.
+* **UI / UX (Store Management Banner Cleanup):** Removed redundant `section-banner` header blocks, including banner imagery and marketplace icons, from store publisher management pages (`/store/create`, `/store/discounts`, `/store/discounts/create`, `/store/{name}/update`, `/store/{name}/downloads`, and `/store/{name}/updates-management`) for a cleaner editor and dashboard layout.
+
 ---
 
 # v4.4.6

@@ -1,12 +1,6 @@
 @extends('theme::layouts.master')
 
 @section('content')
-<div class="section-banner" style="background: url({{ theme_asset('img/banner/Newsfeed.png') }}) no-repeat 50%;">
-    <img class="section-banner-icon" src="{{ theme_asset('img/banner/marketplace-icon.png') }}">
-    <p class="section-banner-title"><span><i class="fa fa-tags" aria-hidden="true"></i></span>&nbsp;{{ __('messages.discount_codes') ?? 'Discount Codes' }}</p>
-    <p class="section-banner-text">{{ __('messages.manage_store_discounts_desc') ?? 'Create and manage promo codes for your products.' }}</p>
-</div>
-
 <div class="store-editor-page container" style="margin-top: 30px;">
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
         <h3 style="color: #fff; font-weight: 700; margin: 0;">{{ __('messages.my_discounts') ?? 'My Discount Codes' }}</h3>

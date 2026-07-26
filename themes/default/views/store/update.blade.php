@@ -8,12 +8,6 @@
 
 @include('theme::store.partials.editor-assets')
 
-<div class="section-banner" style="background: url({{ theme_asset('img/banner/Newsfeed.png') }}) no-repeat 50%;">
-    <img class="section-banner-icon" src="{{ theme_asset('img/banner/marketplace-icon.png') }}">
-    <p class="section-banner-title">{{ __('messages.update') }} | {{ $product->name }}</p>
-    <p class="section-banner-text">{{ __('messages.Version_nbr') }} {{ $latestVersionName }}</p>
-</div>
-
 <div class="store-editor-page">
     <form id="addstore" method="post" class="form-horizontal" action="{{ route('store.update.store', $product->name) }}">
         @csrf

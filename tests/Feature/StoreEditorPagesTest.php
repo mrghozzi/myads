@@ -31,6 +31,7 @@ class StoreEditorPagesTest extends TestCase
             ->assertDontSee('value="templates"', false);
 
         $this->assertSame(1, substr_count($html, 'name="linkzip"'));
+        $this->assertStringNotContainsString('name="vname" required', $html);
     }
 
     public function test_store_update_page_uses_collapsible_history_and_single_linkzip_field(): void
@@ -103,7 +104,6 @@ class StoreEditorPagesTest extends TestCase
             'txt' => '<p>Rich topic content from SCEditor.</p>',
             'linkzip' => 'https://example.test/files/direct-product.zip',
             'img' => 'upload/product-cover.png',
-            'vname' => '1',
         ]);
 
         $response->assertRedirect(route('store.show', 'new-direct-link-product'));
