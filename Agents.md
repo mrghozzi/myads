@@ -758,6 +758,8 @@ php artisan storage:link
 19. **Migration filenames:** Use date prefix format `YYYY_MM_DD_HHMMSS_description.php`.
 20. **Never modify existing migrations** — create new ones for schema changes.
 21. **Repair migrations:** For upgrade-safe schema changes, use `Schema::hasTable()` / `Schema::hasColumn()` checks.
+22. **Idempotent migrations:** Every `Schema::create()` in a new migration **must** be wrapped in a `Schema::hasTable()` guard so the migration can safely re-run after a partial failure (e.g. when an earlier `Schema::create()` succeeded but a later FK creation failed, leaving the migration record unwritten). See `2026_04_22_151420_create_developer_platform_tables.php` as the canonical example.
+23. **Foreign key column types:** Columns participating in a foreign key to `users.id` **must** be declared as `unsignedBigInteger` (not `unsignedInteger` / `integer`), because `users.id` is `bigint unsigned`. MySQL/MariaDB reject FKs when the column type/sign does not exactly match the referenced PK. The same rule applies to any other `bigint` primary key. See `2026_05_29_000000_create_user_blocks_table.php` for the fix that resolved the `errno: 150` installer error.
 
 ### Plugin/Theme Development
 

@@ -14,8 +14,8 @@ return new class extends Migration
         if (!Schema::hasTable('user_blocks')) {
             Schema::create('user_blocks', function (Blueprint $table) {
                 $table->id();
-                $table->unsignedInteger('user_id');
-                $table->unsignedInteger('blocked_user_id');
+                $table->unsignedBigInteger('user_id');
+                $table->unsignedBigInteger('blocked_user_id');
                 $table->enum('block_type', ['messages_only', 'full_platform'])->default('full_platform');
                 $table->timestamp('expires_at')->nullable();
                 $table->timestamps();
