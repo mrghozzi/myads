@@ -93,6 +93,8 @@ class StatusController extends Controller
                     ->with('success', __('messages.groups_post_created'));
             }
             return redirect()->route('forum.topic', $status->tp_id);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            throw $e;
         } catch (\Throwable $e) {
             report($e);
             return back()->with('error', __('messages.error_occurred'))->withInput();
@@ -119,6 +121,8 @@ class StatusController extends Controller
                     ->with('success', __('messages.post_updated_successfully'));
             }
             return redirect()->route('forum.topic', $status->tp_id)->with('success', __('messages.post_updated_successfully'));
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            throw $e;
         } catch (\Throwable $e) {
             report($e);
             return back()->with('error', __('messages.error_occurred'))->withInput();
