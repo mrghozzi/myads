@@ -279,6 +279,18 @@ class StatusPostService
             $this->gamification->recordEvent($user->id, 'post_created');
             if ($postKind === 'repost') {
                 $this->gamification->recordEvent($user->id, 'repost_created');
+            } elseif ($postKind === 'video' || (int) $status->s_type === Status::TYPE_VIDEO) {
+                $this->gamification->recordEvent($user->id, 'video_post_created');
+                $this->gamification->recordEvent($user->id, 'multimedia_post_created');
+            } elseif (in_array($postKind, ['audio', 'music'], true) || in_array((int) $status->s_type, [Status::TYPE_AUDIO, Status::TYPE_MUSIC], true)) {
+                $this->gamification->recordEvent($user->id, 'audio_post_created');
+                $this->gamification->recordEvent($user->id, 'multimedia_post_created');
+            } elseif ($postKind === 'file' || (int) $status->s_type === Status::TYPE_FILE) {
+                $this->gamification->recordEvent($user->id, 'file_post_created');
+                $this->gamification->recordEvent($user->id, 'multimedia_post_created');
+            } elseif ($postKind === 'clips' || (int) $status->s_type === Status::TYPE_CLIPS) {
+                $this->gamification->recordEvent($user->id, 'clips_post_created');
+                $this->gamification->recordEvent($user->id, 'multimedia_post_created');
             } else {
                 $this->gamification->refreshBadges($user->id);
             }

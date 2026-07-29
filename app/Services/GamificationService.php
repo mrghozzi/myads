@@ -128,7 +128,12 @@ class GamificationService
             if ($eventKey !== null) {
                 $criteriaTypes = match ($eventKey) {
                     'reaction_received' => ['reactions_received'],
-                    'post_created' => ['post_count', 'image_post_count', 'link_preview_count', 'night_posts'],
+                    'post_created' => ['post_count', 'image_post_count', 'video_post_count', 'audio_post_count', 'file_post_count', 'clips_post_count', 'multimedia_post_count', 'link_preview_count', 'night_posts'],
+                    'video_post_created' => ['video_post_count', 'multimedia_post_count', 'post_count'],
+                    'audio_post_created' => ['audio_post_count', 'multimedia_post_count', 'post_count'],
+                    'file_post_created' => ['file_post_count', 'multimedia_post_count', 'post_count'],
+                    'clips_post_created' => ['clips_post_count', 'multimedia_post_count', 'post_count'],
+                    'multimedia_post_created' => ['multimedia_post_count', 'post_count'],
                     'comment_created' => ['comment_count', 'forum_replies_count'],
                     'repost_created' => ['repost_count'],
                     'follower_added' => ['followers_count'],
@@ -200,8 +205,13 @@ class GamificationService
     {
         return match ($badge->criteria_type) {
             'complete_profile' => ($user->email && $user->img && trim((string) $user->sig) !== '') ? 1 : 0,
-            'post_count' => Status::where('uid', $user->id)->whereIn('s_type', [2, 4, 100])->count(),
+            'post_count' => Status::where('uid', $user->id)->whereIn('s_type', [0, 2, 4, 10, 11, 12, 13, 14, 100])->count(),
             'image_post_count' => Status::where('uid', $user->id)->where('s_type', 4)->count(),
+            'video_post_count' => Status::where('uid', $user->id)->where('s_type', 10)->count(),
+            'audio_post_count' => Status::where('uid', $user->id)->whereIn('s_type', [11, 13])->count(),
+            'file_post_count' => Status::where('uid', $user->id)->where('s_type', 12)->count(),
+            'clips_post_count' => Status::where('uid', $user->id)->where('s_type', 14)->count(),
+            'multimedia_post_count' => Status::where('uid', $user->id)->whereIn('s_type', [10, 11, 12, 13, 14])->count(),
             'link_preview_count' => $this->schema->supports('link_previews')
                 ? Status::where('uid', $user->id)->whereHas('linkPreviewRecord')->count()
                 : 0,
