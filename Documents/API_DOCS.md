@@ -183,6 +183,7 @@ Allows any website to pre-fill the MYADS post composer.
   - `grouped_reactions`: Map of reaction types to counts.
   - `has_liked`, `user_reaction`: Current user's reaction state.
   - `is_promoted_ad`: Boolean flag indicating if the post is a promoted ad campaign injected into the feed.
+  - `s_type`: Status type integer code (`0` community post, `1` directory listing, `2` regular forum topic, `4` forum image post, `5` news, `6` order request, `10` video, `11` audio, `12` file, `13` music, `14` clips, `100` forum text post, `205` KB article, `7867` store product).
 - `GET /api/statuses/{status_id}`: Retrieves details for a specific status. For video posts (`s_type == 10` or `post_kind == 'video'`), the response includes `StatusResource` attributes alongside `suggested_videos` (collection of recommended video posts), `is_following` (whether viewer follows publisher), and `is_saved` (whether status is saved by viewer).
 - `GET /api/v1/composer/options`: Retrieves post composer options including user's joined groups (`groups`), web directory categories (`directory_categories`), and supported post kinds (`supported_kinds`).
 - `POST /api/v1/statuses/link-preview`: Generates live metadata preview for a target URL.

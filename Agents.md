@@ -216,7 +216,7 @@ myads/
 | `User` | `users` | Members. `id=1` is super-admin. Has `pts` (points), ad credits, verified status, and uses `HasApiTokens` for API authentication |
 | `Setting` | `setting` | Single-row site settings (name, description, theme slug, etc.) |
 | `Option` | `options` | Key-value config store (plugins active state, misc settings, `last_seen_about_version` tracking) |
-| `Status` | `status` | Community feed posts |
+| `Status` | `status` | Community feed posts. `s_type`: `0` (community post), `1` (directory listing), `2` (regular forum topic), `4` (forum image/gallery post), `5` (news article), `6` (order request), `10` (video), `11` (audio), `12` (file), `13` (music), `14` (clips), `100` (forum text post), `205` (knowledgebase), `7867` (store product). |
 | `StatusPromotion` | `status_promotions` | Paid promoted-post campaigns shown inside the community feed |
 | `StatusLinkPreview` | `status_link_previews` | Link previews for posts |
 | `StatusMention` | `status_mentions` | @mention records |

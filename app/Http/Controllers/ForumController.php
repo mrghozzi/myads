@@ -68,7 +68,7 @@ class ForumController extends Controller
         $sidebarCategories = $this->buildCategorySidebar((int) $category->id);
 
         $statuses = Status::visible()
-            ->whereIn('s_type', [2, 4, 10, 11, 12, 13, 14])
+            ->whereIn('s_type', [2, 4, 100, 10, 11, 12, 13, 14])
             ->where('date', '<=', $time)
             ->whereIn('tp_id', function ($query) use ($id) {
                 $query->select('id')

@@ -200,7 +200,7 @@ class GamificationService
     {
         return match ($badge->criteria_type) {
             'complete_profile' => ($user->email && $user->img && trim((string) $user->sig) !== '') ? 1 : 0,
-            'post_count' => Status::where('uid', $user->id)->whereIn('s_type', [100, 4])->count(),
+            'post_count' => Status::where('uid', $user->id)->whereIn('s_type', [2, 4, 100])->count(),
             'image_post_count' => Status::where('uid', $user->id)->where('s_type', 4)->count(),
             'link_preview_count' => $this->schema->supports('link_previews')
                 ? Status::where('uid', $user->id)->whereHas('linkPreviewRecord')->count()

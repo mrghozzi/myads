@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\DB;
 
 class ReactionService
 {
-    public const ALLOWED_REACTIONS = ['like', 'love', 'haha', 'wow', 'sad', 'angry', 'care'];
+    public const ALLOWED_REACTIONS = ['like', 'love', 'dislike', 'happy', 'funny', 'wow', 'angry', 'sad'];
 
     public function __construct(
         private readonly NotificationService $notifications,
