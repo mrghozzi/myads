@@ -40,7 +40,25 @@
     @include('admin::admin.seo.partials.nav')
     @include('admin::admin.seo.partials.alerts')
 
+    <div class="alert alert-info d-flex align-items-center justify-content-between flex-wrap gap-2 py-2 px-3 mb-4 rounded-3 border-0 shadow-sm" style="background: rgba(97, 93, 250, 0.08); color: var(--admin-premium-text);">
+        <div>
+            <i class="feather-info text-primary me-2 fs-5"></i>
+            <span>{{ __('messages.seo_performance_settings_hint') ?? 'Looking to tune server CPU usage or change daily SEO visit log retention?' }}</span>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <a href="{{ route('admin.settings.performance') }}" class="btn btn-sm btn-outline-primary">
+                <i class="feather-cpu me-1"></i> {{ __('messages.performance_settings') ?? 'Performance Settings' }}
+            </a>
+            <a href="{{ route('admin.database_cleanup') }}" class="btn btn-sm btn-outline-danger">
+                <i class="feather-database me-1"></i> {{ __('messages.database_cleanup') ?? 'Database Cleanup' }}
+            </a>
+        </div>
+    </div>
+
     <div class="card seo-card">
+        <div class="card-header border-bottom-0 pb-0">
+            <h5 class="card-title text-primary"><i class="feather-sliders me-2"></i>{{ __('messages.seo_settings') }}</h5>
+        </div>
         <div class="card-body">
             <form action="{{ route('admin.seo.settings.update') }}" method="POST" class="row g-4">
                 @csrf
@@ -86,6 +104,7 @@
                 <div class="col-12"><hr class="my-0"></div>
 
                 <div class="col-12">
+                    <h6 class="text-primary mb-3"><i class="feather-bar-chart-2 me-2"></i>Google Analytics 4 (GA4) Integration</h6>
                     <div class="form-check form-switch">
                         <input class="form-check-input" type="checkbox" id="ga4_enabled" name="ga4_enabled" value="1" @checked(old('ga4_enabled', $settings->ga4_enabled))>
                         <label class="form-check-label fw-semibold" for="ga4_enabled">{{ __('messages.seo_ga4_enable') }}</label>
@@ -100,7 +119,7 @@
                     <div class="seo-form-note">{!! __('messages.seo_ga4_measurement_help', ['example' => '<code>G-AB12CDEF34</code>']) !!}</div>
                 </div>
 
-                <div class="col-12">
+                <div class="col-12 d-flex justify-content-end mt-4">
                     <button type="submit" class="btn btn-primary">
                         <i class="feather-save me-2"></i>{{ __('messages.seo_save_settings') }}
                     </button>

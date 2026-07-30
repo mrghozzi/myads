@@ -28,7 +28,7 @@ MYADS is a community platform where website owners:
 6. **Services Marketplace** — publish service requests, receive structured provider offers, award a provider, track delivery workflow, and exchange completion ratings.
 7. **News** — admin-published articles posted to community feed.
 8. **Gamification** — points (PTS), badges, quests, point transactions ledger.
-9. **SEO Suite** — centralized SEO engine, admin SEO dashboard, dynamic robots.txt, sitemap index, GA4 integration, and a **Free SEO Checker** for webmasters to analyze speed, errors, and backlinks.
+9. **SEO Suite** — centralized SEO engine, redesigned `@.superdesign` admin SEO suite (`/admin/seo/*`) with real-time performance & DB cleanup integration, dynamic robots.txt, sitemap index, GA4 integration, custom rules engine, and a **Free SEO Checker** for webmasters to analyze speed, errors, and backlinks.
 10. **Social Links** — managed user social media presence across 12 platforms with branded icons and smart URL validation.
 11. **External Share API** — a dedicated `/share` endpoint for third-party websites to pre-fill post composer text, documented at `/developer`.
 12. **Session Monitoring** — view and manage active member sessions across devices with remote revocation.
@@ -191,7 +191,7 @@ myads/
 | `AdminAdminsController` | Admin ACL management |
 | `AdminBillingController` | Admin billing hub: settings, plans, orders, transactions, currencies, gateways |
 | `AdminOrderController` | Admin marketplace dashboard and moderation actions for service requests |
-| `AdminSeoController` | SEO suite admin |
+| `AdminSeoController` | SEO suite admin (Dashboard, Settings, Head Meta, Custom Rules, Indexing & Robots, Ads.txt, and Performance/DB Cleanup integration) |
 | `AdminPageController` | Custom pages admin CRUD |
 | `AdminMailSettingsController` | Database-driven mail configuration admin page (`/admin/settings/mail`) |
 | `AdminSecurityController` | Admin security settings (`/admin/security`), including IP bans, force HTTPS, login CAPTCHA, and registration controls |

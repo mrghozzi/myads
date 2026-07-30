@@ -37,8 +37,10 @@
     @include('admin::admin.seo.partials.alerts')
 
     <div class="card seo-card mb-4">
+        <div class="card-header border-bottom-0 pb-0">
+            <h5 class="card-title text-primary"><i class="feather-plus-circle me-2"></i>{{ __('messages.seo_create_rule') }}</h5>
+        </div>
         <div class="card-body">
-            <h5 class="mb-3">{{ __('messages.seo_create_rule') }}</h5>
             <form action="{{ route('admin.seo.rules.store') }}" method="POST" class="row g-3">
                 @csrf
                 @include('admin::admin.seo.rules_form', [
@@ -48,7 +50,7 @@
                     'twitterCards' => $twitterCards,
                     'prefix' => 'new',
                 ])
-                <div class="col-12">
+                <div class="col-12 d-flex justify-content-end mt-4">
                     <button type="submit" class="btn btn-primary">
                         <i class="feather-plus me-2"></i>{{ __('messages.seo_create_rule_button') }}
                     </button>
@@ -58,27 +60,34 @@
     </div>
 
     <div class="card seo-card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0"><i class="feather-shield me-2 text-primary"></i>{{ __('messages.seo_existing_rules') }}</h5>
+            <span class="badge bg-soft-primary text-primary fs-6">{{ __('messages.seo_total_count', ['count' => $rules->count()]) }}</span>
+        </div>
         <div class="card-body">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 class="mb-0">{{ __('messages.seo_existing_rules') }}</h5>
-                <span class="badge bg-light text-dark">{{ __('messages.seo_total_count', ['count' => $rules->count()]) }}</span>
-            </div>
-
             @forelse($rules as $rule)
-                <details class="mb-3 rounded-4 p-3" style="border: 1px solid rgba(148, 163, 184, 0.18);">
-                    <summary class="d-flex flex-wrap align-items-center gap-2" style="cursor: pointer; list-style: none;">
-                        <span class="fw-semibold">{{ $supportedScopes[$rule->scope_key] ?? $rule->scope_key }}</span>
-                        <span class="badge bg-light text-dark">{{ $rule->scope_key }}</span>
-                        @if($rule->content_type && $rule->content_id)
-                            <span class="badge bg-soft-primary text-primary">{{ $rule->content_type }} #{{ $rule->content_id }}</span>
-                        @endif
-                        <span class="seo-pill {{ $rule->is_active ? 'ok' : 'warn' }}">{{ $rule->is_active ? __('messages.seo_rule_active') : __('messages.seo_rule_inactive') }}</span>
-                        <span class="seo-pill {{ $rule->indexable === false ? 'bad' : ($rule->indexable === true ? 'ok' : 'warn') }}">
-                            {{ $rule->indexable === false ? __('messages.seo_noindex') : ($rule->indexable === true ? __('messages.seo_index') : __('messages.seo_inherit')) }}
-                        </span>
+                <details class="mb-3 rounded-3 p-3 shadow-xs" style="background: var(--admin-premium-surface); border: 1px solid var(--admin-premium-border);">
+                    <summary class="d-flex flex-wrap align-items-center justify-content-between gap-2" style="cursor: pointer; list-style: none;">
+                        <div class="d-flex flex-wrap align-items-center gap-2">
+                            <i class="feather-chevron-right text-muted me-1"></i>
+                            <span class="fw-bold text-dark dark:text-light">{{ $supportedScopes[$rule->scope_key] ?? $rule->scope_key }}</span>
+                            <span class="badge bg-soft-secondary text-dark">{{ $rule->scope_key }}</span>
+                            @if($rule->content_type && $rule->content_id)
+                                <span class="badge bg-soft-primary text-primary"><i class="feather-box me-1"></i>{{ $rule->content_type }} #{{ $rule->content_id }}</span>
+                            @endif
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="seo-pill {{ $rule->is_active ? 'ok' : 'warn' }}">
+                                <i class="feather-{{ $rule->is_active ? 'check-circle' : 'pause-circle' }}"></i>
+                                {{ $rule->is_active ? __('messages.seo_rule_active') : __('messages.seo_rule_inactive') }}
+                            </span>
+                            <span class="seo-pill {{ $rule->indexable === false ? 'bad' : ($rule->indexable === true ? 'ok' : 'warn') }}">
+                                {{ $rule->indexable === false ? __('messages.seo_noindex') : ($rule->indexable === true ? __('messages.seo_index') : __('messages.seo_inherit')) }}
+                            </span>
+                        </div>
                     </summary>
 
-                    <form action="{{ route('admin.seo.rules.update', $rule) }}" method="POST" class="row g-3 mt-3">
+                    <form action="{{ route('admin.seo.rules.update', $rule) }}" method="POST" class="row g-3 mt-3 pt-3 border-top">
                         @csrf
                         @method('PUT')
                         @include('admin::admin.seo.rules_form', [
@@ -88,23 +97,23 @@
                             'twitterCards' => $twitterCards,
                             'prefix' => 'rule_' . $rule->id,
                         ])
-                        <div class="col-12">
+                        <div class="col-12 d-flex justify-content-between align-items-center mt-4">
                             <button type="submit" class="btn btn-primary">
                                 <i class="feather-save me-2"></i>{{ __('messages.seo_update_rule') }}
                             </button>
+                            <button type="button" class="btn btn-outline-danger" onclick="if(confirm(@js(__('messages.seo_delete_rule_confirm')))) { document.getElementById('delete-rule-form-{{ $rule->id }}').submit(); }">
+                                <i class="feather-trash-2 me-2"></i>{{ __('messages.delete') }}
+                            </button>
                         </div>
                     </form>
-
-                    <form action="{{ route('admin.seo.rules.delete', $rule) }}" method="POST" class="mt-2" onsubmit="return confirm(@js(__('messages.seo_delete_rule_confirm')));">
+                    <form id="delete-rule-form-{{ $rule->id }}" action="{{ route('admin.seo.rules.delete', $rule) }}" method="POST" class="d-none">
                         @csrf
                         @method('DELETE')
-                        <button type="submit" class="btn btn-outline-danger">
-                            <i class="feather-trash-2 me-2"></i>{{ __('messages.delete') }}
-                        </button>
                     </form>
                 </details>
             @empty
-                <div class="rounded-4 p-4 text-muted text-center" style="background: rgba(248, 250, 252, 0.85);">
+                <div class="rounded-3 p-4 text-muted text-center border" style="background: rgba(248, 250, 252, 0.5);">
+                    <i class="feather-shield-off fs-1 d-block mb-2 text-muted"></i>
                     {{ __('messages.seo_no_rules') }}
                 </div>
             @endforelse

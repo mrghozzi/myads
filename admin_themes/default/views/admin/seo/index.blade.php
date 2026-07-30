@@ -42,11 +42,62 @@
     @include('admin::admin.seo.partials.nav')
     @include('admin::admin.seo.partials.alerts')
 
+    @php
+        $trackSeoMetrics = (bool) \App\Support\CommunityFeedSettings::get('track_seo_metrics', 1);
+        $retentionDays = \App\Services\DatabaseMaintenanceService::retentionDays();
+        $seoRetentionDays = $retentionDays['seo_daily_metrics'] ?? 90;
+    @endphp
+
+    {{-- SEO Performance & Database Integration Card --}}
+    <div class="seo-integration-card mb-4">
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+            <div class="d-flex align-items-center gap-3">
+                <div class="seo-stat__icon">
+                    <i class="feather-cpu fs-4"></i>
+                </div>
+                <div>
+                    <h6 class="mb-1 fw-bold text-dark dark:text-light">
+                        <i class="feather-link me-1 text-primary"></i> {{ __('messages.seo_performance_integration') ?? 'SEO System & Maintenance Integration' }}
+                    </h6>
+                    <p class="text-muted small mb-0">
+                        {{ __('messages.seo_performance_integration_desc') ?? 'Monitors SEO daily visit tracking & automatic database metrics pruning for optimal server performance.' }}
+                    </p>
+                </div>
+            </div>
+            <div class="d-flex flex-wrap align-items-center gap-2">
+                <div class="p-2 px-3 rounded-3 border d-flex align-items-center gap-2" style="background: var(--admin-premium-surface);">
+                    <span class="small text-muted fw-semibold">{{ __('messages.track_seo_metrics') ?? 'Metrics Tracking' }}:</span>
+                    @if($trackSeoMetrics)
+                        <span class="badge bg-soft-success text-success"><i class="feather-check-circle me-1"></i> {{ __('messages.enabled') ?? 'Active' }}</span>
+                    @else
+                        <span class="badge bg-soft-warning text-warning"><i class="feather-pause-circle me-1"></i> {{ __('messages.disabled') ?? 'Paused (CPU Saver)' }}</span>
+                    @endif
+                    <a href="{{ route('admin.settings.performance') }}" class="btn btn-xs btn-outline-primary ms-1" title="{{ __('messages.performance_settings') ?? 'Configure Performance' }}">
+                        <i class="feather-external-link"></i>
+                    </a>
+                </div>
+
+                <div class="p-2 px-3 rounded-3 border d-flex align-items-center gap-2" style="background: var(--admin-premium-surface);">
+                    <span class="small text-muted fw-semibold">{{ __('messages.retention_period') ?? 'DB Retention' }}:</span>
+                    <span class="badge bg-soft-info text-info"><i class="feather-clock me-1"></i> {{ $seoRetentionDays }} {{ __('messages.days') ?? 'Days' }}</span>
+                    <a href="{{ route('admin.database_cleanup') }}" class="btn btn-xs btn-outline-danger ms-1" title="{{ __('messages.database_cleanup') ?? 'Database Cleanup' }}">
+                        <i class="feather-external-link"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="row g-3 mb-4">
         <div class="col-xl-3 col-md-6">
             <div class="seo-stat">
-                <div class="label">{{ __('messages.seo_score') }}</div>
-                <div class="value">{{ $dashboard['score'] }}/100</div>
+                <div>
+                    <div class="seo-stat__header">
+                        <span class="label">{{ __('messages.seo_score') }}</span>
+                        <div class="seo-stat__icon"><i class="feather-award"></i></div>
+                    </div>
+                    <div class="value">{{ $dashboard['score'] }}/100</div>
+                </div>
                 <div class="mt-2">
                     <span class="seo-pill {{ $dashboard['score'] >= 85 ? 'ok' : ($dashboard['score'] >= 65 ? 'warn' : 'bad') }}">
                         <i class="feather-bar-chart-2"></i>
@@ -57,22 +108,37 @@
         </div>
         <div class="col-xl-3 col-md-6">
             <div class="seo-stat">
-                <div class="label">{{ __('messages.seo_indexable_urls') }}</div>
-                <div class="value">{{ number_format($dashboard['summary_cards']['indexable_urls']) }}</div>
+                <div>
+                    <div class="seo-stat__header">
+                        <span class="label">{{ __('messages.seo_indexable_urls') }}</span>
+                        <div class="seo-stat__icon" style="background: rgba(35, 210, 226, 0.08); color: #0891b2;"><i class="feather-globe"></i></div>
+                    </div>
+                    <div class="value">{{ number_format($dashboard['summary_cards']['indexable_urls']) }}</div>
+                </div>
                 <div class="seo-form-note mt-2">{{ __('messages.seo_indexable_urls_dashboard_note') }}</div>
             </div>
         </div>
         <div class="col-xl-3 col-md-6">
             <div class="seo-stat">
-                <div class="label">{{ __('messages.seo_users_posts') }}</div>
-                <div class="value">{{ number_format($dashboard['summary_cards']['users']) }} / {{ number_format($dashboard['summary_cards']['posts']) }}</div>
+                <div>
+                    <div class="seo-stat__header">
+                        <span class="label">{{ __('messages.seo_users_posts') }}</span>
+                        <div class="seo-stat__icon" style="background: rgba(79, 244, 97, 0.12); color: #16a34a;"><i class="feather-users"></i></div>
+                    </div>
+                    <div class="value">{{ number_format($dashboard['summary_cards']['users']) }} / {{ number_format($dashboard['summary_cards']['posts']) }}</div>
+                </div>
                 <div class="seo-form-note mt-2">{{ __('messages.seo_users_posts_note') }}</div>
             </div>
         </div>
         <div class="col-xl-3 col-md-6">
             <div class="seo-stat">
-                <div class="label">{{ __('messages.seo_content_inventory') }}</div>
-                <div class="value">{{ number_format($dashboard['summary_cards']['news'] + $dashboard['summary_cards']['pages'] + $dashboard['summary_cards']['topics'] + $dashboard['summary_cards']['listings'] + $dashboard['summary_cards']['products']) }}</div>
+                <div>
+                    <div class="seo-stat__header">
+                        <span class="label">{{ __('messages.seo_content_inventory') }}</span>
+                        <div class="seo-stat__icon" style="background: rgba(251, 191, 36, 0.12); color: #d97706;"><i class="feather-layers"></i></div>
+                    </div>
+                    <div class="value">{{ number_format($dashboard['summary_cards']['news'] + $dashboard['summary_cards']['pages'] + $dashboard['summary_cards']['topics'] + $dashboard['summary_cards']['listings'] + $dashboard['summary_cards']['products']) }}</div>
+                </div>
                 <div class="seo-form-note mt-2">{{ __('messages.seo_content_inventory_note') }}</div>
             </div>
         </div>

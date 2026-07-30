@@ -46,19 +46,29 @@
     <div class="row g-3 mb-4">
         <div class="col-xl-4">
             <div class="seo-stat">
-                <div class="label">{{ __('messages.seo_robots_status') }}</div>
-                <div class="mt-2">
-                    <span class="seo-pill {{ app(\App\Services\RobotsTxtService::class)->blocksAll($settings) ? 'bad' : 'ok' }}">
-                        {{ app(\App\Services\RobotsTxtService::class)->blocksAll($settings) ? __('messages.seo_blocking_sitewide') : __('messages.seo_health_healthy') }}
-                    </span>
+                <div>
+                    <div class="seo-stat__header">
+                        <span class="label">{{ __('messages.seo_robots_status') }}</span>
+                        <div class="seo-stat__icon"><i class="feather-shield"></i></div>
+                    </div>
+                    <div class="mt-2">
+                        <span class="seo-pill {{ app(\App\Services\RobotsTxtService::class)->blocksAll($settings) ? 'bad' : 'ok' }}">
+                            {{ app(\App\Services\RobotsTxtService::class)->blocksAll($settings) ? __('messages.seo_blocking_sitewide') : __('messages.seo_health_healthy') }}
+                        </span>
+                    </div>
                 </div>
                 <div class="seo-form-note mt-3">{{ __('messages.seo_robots_status_note') }}</div>
             </div>
         </div>
         <div class="col-xl-4">
             <div class="seo-stat">
-                <div class="label">{{ __('messages.seo_sitemap_url') }}</div>
-                <div class="value" style="font-size: 1.05rem;">/sitemap.xml</div>
+                <div>
+                    <div class="seo-stat__header">
+                        <span class="label">{{ __('messages.seo_sitemap_url') }}</span>
+                        <div class="seo-stat__icon" style="background: rgba(35, 210, 226, 0.08); color: #0891b2;"><i class="feather-map"></i></div>
+                    </div>
+                    <div class="value" style="font-size: 1.05rem;">/sitemap.xml</div>
+                </div>
                 <div class="mt-3 hstack gap-2">
                     <a href="{{ route('sitemap.xml') }}" target="_blank" class="btn btn-outline-primary btn-sm">
                         <i class="feather-eye me-1"></i>{{ __('messages.seo_preview_sitemap') }}
@@ -74,14 +84,22 @@
         </div>
         <div class="col-xl-4">
             <div class="seo-stat">
-                <div class="label">{{ __('messages.seo_indexable_urls') }}</div>
-                <div class="value">{{ number_format($dashboard['summary_cards']['indexable_urls']) }}</div>
+                <div>
+                    <div class="seo-stat__header">
+                        <span class="label">{{ __('messages.seo_indexable_urls') }}</span>
+                        <div class="seo-stat__icon" style="background: rgba(79, 244, 97, 0.12); color: #16a34a;"><i class="feather-globe"></i></div>
+                    </div>
+                    <div class="value">{{ number_format($dashboard['summary_cards']['indexable_urls']) }}</div>
+                </div>
                 <div class="seo-form-note mt-3">{{ __('messages.seo_indexable_urls_indexing_note') }}</div>
             </div>
         </div>
     </div>
 
     <div class="card seo-card mb-4">
+        <div class="card-header border-bottom-0 pb-0">
+            <h5 class="card-title text-primary"><i class="feather-search me-2"></i>{{ __('messages.seo_indexing_heading') }}</h5>
+        </div>
         <div class="card-body">
             <form action="{{ route('admin.seo.indexing.update') }}" method="POST" class="row g-4">
                 @csrf
@@ -92,19 +110,19 @@
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <label class="form-label fw-semibold">{{ __('messages.seo_allow_paths') }}</label>
-                    <textarea name="robots_allow_paths" rows="8" class="form-control">{{ old('robots_allow_paths', $settings->robots_allow_paths) }}</textarea>
+                    <label class="form-label fw-semibold"><i class="feather-check text-success me-1"></i> {{ __('messages.seo_allow_paths') }}</label>
+                    <textarea name="robots_allow_paths" rows="8" class="form-control seo-code" style="min-height: 180px;">{{ old('robots_allow_paths', $settings->robots_allow_paths) }}</textarea>
                 </div>
                 <div class="col-md-4">
-                    <label class="form-label fw-semibold">{{ __('messages.seo_disallow_paths') }}</label>
-                    <textarea name="robots_disallow_paths" rows="8" class="form-control">{{ old('robots_disallow_paths', $settings->robots_disallow_paths) }}</textarea>
+                    <label class="form-label fw-semibold"><i class="feather-x text-danger me-1"></i> {{ __('messages.seo_disallow_paths') }}</label>
+                    <textarea name="robots_disallow_paths" rows="8" class="form-control seo-code" style="min-height: 180px;">{{ old('robots_disallow_paths', $settings->robots_disallow_paths) }}</textarea>
                 </div>
                 <div class="col-md-4">
-                    <label class="form-label fw-semibold">{{ __('messages.seo_extra_robots_lines') }}</label>
-                    <textarea name="robots_extra" rows="8" class="form-control">{{ old('robots_extra', $settings->robots_extra) }}</textarea>
+                    <label class="form-label fw-semibold"><i class="feather-plus-circle text-primary me-1"></i> {{ __('messages.seo_extra_robots_lines') }}</label>
+                    <textarea name="robots_extra" rows="8" class="form-control seo-code" style="min-height: 180px;">{{ old('robots_extra', $settings->robots_extra) }}</textarea>
                     <div class="seo-form-note mt-2">{!! __('messages.seo_extra_robots_help', ['example' => '<code>Crawl-delay: 5</code>']) !!}</div>
                 </div>
-                <div class="col-12">
+                <div class="col-12 d-flex justify-content-end mt-4">
                     <button type="submit" class="btn btn-primary">
                         <i class="feather-save me-2"></i>{{ __('messages.seo_save_indexing') }}
                     </button>
@@ -116,22 +134,22 @@
     <div class="row g-3">
         <div class="col-xl-6">
             <div class="card seo-card h-100">
+                <div class="card-header border-bottom-0 pb-0 d-flex align-items-center justify-content-between">
+                    <h5 class="card-title text-primary mb-0"><i class="feather-file-text me-2"></i>{{ __('messages.seo_robots_preview') }}</h5>
+                    <a href="{{ route('robots.txt') }}" target="_blank" class="btn btn-outline-secondary btn-sm"><i class="feather-external-link me-1"></i>{{ __('messages.seo_open') }}</a>
+                </div>
                 <div class="card-body">
-                    <div class="d-flex align-items-center justify-content-between mb-3">
-                        <h5 class="mb-0">{{ __('messages.seo_robots_preview') }}</h5>
-                        <a href="{{ route('robots.txt') }}" target="_blank" class="btn btn-outline-secondary btn-sm">{{ __('messages.seo_open') }}</a>
-                    </div>
                     <pre class="seo-code mb-0">{{ $robotsPreview }}</pre>
                 </div>
             </div>
         </div>
         <div class="col-xl-6">
             <div class="card seo-card h-100">
+                <div class="card-header border-bottom-0 pb-0 d-flex align-items-center justify-content-between">
+                    <h5 class="card-title text-primary mb-0"><i class="feather-map me-2"></i>{{ __('messages.seo_sitemap_preview') }}</h5>
+                    <a href="{{ route('sitemap.xml') }}" target="_blank" class="btn btn-outline-secondary btn-sm"><i class="feather-external-link me-1"></i>{{ __('messages.seo_open') }}</a>
+                </div>
                 <div class="card-body">
-                    <div class="d-flex align-items-center justify-content-between mb-3">
-                        <h5 class="mb-0">{{ __('messages.seo_sitemap_preview') }}</h5>
-                        <a href="{{ route('sitemap.xml') }}" target="_blank" class="btn btn-outline-secondary btn-sm">{{ __('messages.seo_open') }}</a>
-                    </div>
                     <pre class="seo-code mb-0">{{ $sitemapPreview }}</pre>
                 </div>
             </div>
