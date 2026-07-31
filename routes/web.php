@@ -144,6 +144,10 @@ Route::get('/plans', [BillingController::class, 'plans'])->name('billing.plans')
 Route::get('/portal', [PortalController::class, 'index'])->name('portal.index');
 Route::get('/share', [PortalController::class, 'share'])->name('portal.share')->middleware('auth');
 
+// Video Hub Routes
+Route::get('/video', [App\Http\Controllers\VideoHubController::class, 'index'])->name('video.index');
+Route::get('/video/{filter}', [App\Http\Controllers\VideoHubController::class, 'index'])->name('video.filter');
+
 // Clips Routes
 Route::get('/clips', [App\Http\Controllers\ClipsController::class, 'index'])->name('clips.index');
 Route::get('/clips/saved', [App\Http\Controllers\ClipsController::class, 'saved'])->name('clips.saved')->middleware('auth');

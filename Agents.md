@@ -40,6 +40,7 @@ MYADS is a community platform where website owners:
 18. **Modern UI/UX** — Progressive Web App (PWA) support with offline fallback, a Live Global Search engine, Skeleton load placeholders, Toast notifications, Hover Popovers for user profiles, intelligent OS-based Dark Mode detection, and refined micro-animations.
 19. **Smart Widget Management & Admin Control** — permission-gated empty widget prompt (`<x-widget-column>`) displaying location-aware instructions and CTA redirection to a redesigned `@.superdesign` admin widget management hub (`/admin/widgets`) featuring location filter chips, target place pre-selection (`place` param), and drag-and-drop row reordering.
 20. **Admin Dashboard Superdesign & Performance Engine** — complete `@.superdesign` overhaul of `/admin` with glassmorphic hero header, dynamic rotating Admin Advice/Tips engine ("نصيحة اليوم للمدير"), real-time System Health Bar, optimized single-pass SQL query aggregation (95%+ query reduction), interactive 30-day analytics charts, developer & community hub links, and project support block.
+21. **YouTube-Style Video Hub (`/video`)** — dedicated YouTube-style Video Hub page designed according to `@.superdesign` guidelines, featuring a glassmorphic hero header with `/share` publisher redirection, scrollable tag filter pills (`All`, `Shorts Clips`, `Videos`, `Trending`, `Latest`), a dedicated **YouTube Shorts Shelf** (9:16 vertical cards with play overlays, clip titles, view counts, and publisher Hexagon Avatars), a Spotlight Hero Video, a 16:9 main video grid with multi-source video thumbnail resolution (direct upload, topic covers, image attachments, YouTube URL embed images, link previews), navigation sidebar integration, and complete PHPUnit test suite (`VideoHubTest.php`).
 
 
 ---
@@ -178,6 +179,7 @@ myads/
 | `VisitController` | Visit exchange system (AJAX token-based verification, 7-layer anti-fraud: daily cap, JS math challenge, token expiry, replay prevention, focus detection, IP monitoring, PointLedgerService integration) |
 | `YoutubeAdvertiserController` | YouTube campaigns and views exchange |
 | `YoutubeExchangeController` | YouTube watch and earn points |
+| `VideoHubController` | YouTube-style Video Hub page (`/video` and `/video/{filter}`), category/tag filter pills, multi-source video thumbnail resolution engine, search filtering, and Shorts shelf |
 | `ProfileController` | Profile view/edit, follow, privacy, sessions/revocation, badges, history, personal activity timeline |
 | `UserBlockController` | User block management, block creation view, and blocked users dashboard |
 | `MessageController` | Private messaging |

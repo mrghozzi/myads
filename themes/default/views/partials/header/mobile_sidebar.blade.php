@@ -33,6 +33,7 @@
     <p class="navigation-widget-section-title">{{ __('messages.sections') }}</p>
     <ul class="menu">
         <li class="menu-item {{ Request::is('portal*', 'tag*') ? 'active' : '' }}"><a class="menu-item-link text-tooltip-tfr" href="{{ url('/portal') }}"><svg class="menu-item-link-icon icon-newsfeed"><use xlink:href="#svg-newsfeed"></use></svg>{{ __('messages.community') }}</a></li>
+        <li class="menu-item {{ Request::is('video*') ? 'active' : '' }}"><a class="menu-item-link text-tooltip-tfr" href="{{ route('video.index') }}"><svg class="menu-item-link-icon icon-videos"><use xlink:href="#svg-videos"></use></svg>{{ __('messages.video_hub') }}</a></li>
         <li class="menu-item {{ Request::is('clips*') ? 'active' : '' }}"><a class="menu-item-link text-tooltip-tfr" href="{{ url('/clips') }}"><svg class="menu-item-link-icon icon-videos"><use xlink:href="#svg-videos"></use></svg>{{ __('messages.clips') ?? 'Clips' }}</a></li>
         @auth
         <li class="menu-item {{ Request::is('home*') ? 'active' : '' }}"><a class="menu-item-link text-tooltip-tfr" href="{{ url('/home') }}"><svg class="menu-item-link-icon icon-overview"><use xlink:href="#svg-overview"></use></svg>{{ __('messages.board') }}</a></li>

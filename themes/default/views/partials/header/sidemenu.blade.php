@@ -8,6 +8,14 @@
                 {{ __('messages.community') }}
             </a>
         </li>
+        <li class="menu-item {{ Request::is('video*') ? 'active' : '' }}">
+            <a class="menu-item-link text-tooltip-tfr" href="{{ route('video.index') }}">
+                <svg class="menu-item-link-icon icon-videos">
+                    <use xlink:href="#svg-videos"></use>
+                </svg>
+                {{ __('messages.video_hub') }}
+            </a>
+        </li>
         <li class="menu-item {{ Request::is('clips*') ? 'active' : '' }}">
             <a class="menu-item-link text-tooltip-tfr" href="{{ url('/clips') }}">
                 <svg class="menu-item-link-icon icon-videos">
