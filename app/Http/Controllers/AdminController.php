@@ -282,20 +282,38 @@ class AdminController extends Controller
             $postTypes[$row->s_type][$row->day] = $row->count;
         }
 
-        // Comments (Forum + Options-based)
-        $forumComments = \App\Models\ForumComment::where('date', '>=', $startDate)->select(DB::raw('FROM_UNIXTIME(date, "%b %d") as day'), DB::raw('count(*) as count'))->groupBy('day')->pluck('count', 'day');
-        $otherComments = Option::whereIn('o_type', ['d_coment', 's_coment', \App\Services\KnowledgebaseCommunityService::COMMENT_OPTION_TYPE])->where('o_order', '>=', $startDate)->select(DB::raw('FROM_UNIXTIME(o_order, "%b %d") as day'), DB::raw('count(*) as count'))->groupBy('day')->pluck('count', 'day');
-        $orderOffers = app(\App\Services\V420SchemaService::class)->hasTable('order_offers')
-            ? \App\Models\OrderOffer::query()
-                ->where('status', '!=', \App\Models\OrderOffer::STATUS_WITHDRAWN)
-                ->where('created_at', '>=', date('Y-m-d H:i:s', $startDate))
-                ->select(DB::raw('DATE_FORMAT(created_at, "%b %d") as day'), DB::raw('count(*) as count'))
-                ->groupBy('day')
-                ->pluck('count', 'day')
-            : collect();
-        
-        // Reactions
-        $reactionsData = \App\Models\Like::where('time_t', '>=', $startDate)->whereIn('type', [2, 3, 22, 6, 1, 14, \App\Services\KnowledgebaseCommunityService::REACTION_TYPE])->select(DB::raw('FROM_UNIXTIME(time_t, "%b %d") as day'), DB::raw('count(*) as count'))->groupBy('day')->pluck('count', 'day');
+        // Aggregated Option Comments grouped by o_type and day in ONE query
+        $optionCommentsGrouped = Option::whereIn('o_type', ['d_coment', 's_coment', \App\Services\KnowledgebaseCommunityService::COMMENT_OPTION_TYPE])
+            ->where('o_order', '>=', $startDate)
+            ->select('o_type', DB::raw('FROM_UNIXTIME(o_order, "%b %d") as day'), DB::raw('count(*) as count'))
+            ->groupBy('o_type', 'day')
+            ->get();
+
+        $storeCommentsGrouped = [];
+        $directoryCommentsGrouped = [];
+        $kbCommentsGrouped = [];
+
+        foreach ($optionCommentsGrouped as $row) {
+            if ($row->o_type === 's_coment') {
+                $storeCommentsGrouped[$row->day] = $row->count;
+            } elseif ($row->o_type === 'd_coment') {
+                $directoryCommentsGrouped[$row->day] = $row->count;
+            } elseif ($row->o_type === \App\Services\KnowledgebaseCommunityService::COMMENT_OPTION_TYPE) {
+                $kbCommentsGrouped[$row->day] = $row->count;
+            }
+        }
+
+        // Aggregated Likes by type and day in ONE query
+        $likesGroupedRaw = \App\Models\Like::where('time_t', '>=', $startDate)
+            ->whereIn('type', [1, 2, 3, 6, 14, 22, \App\Services\KnowledgebaseCommunityService::REACTION_TYPE])
+            ->select('type', DB::raw('FROM_UNIXTIME(time_t, "%b %d") as day'), DB::raw('count(*) as count'))
+            ->groupBy('type', 'day')
+            ->get();
+
+        $likesGrouped = [];
+        foreach ($likesGroupedRaw as $row) {
+            $likesGrouped[$row->type][$row->day] = $row->count;
+        }
 
         $communityChartData = [
             'labels' => $labels,
@@ -303,9 +321,7 @@ class AdminController extends Controller
                 'text' => array_map(fn($l) => $postTypes['100'][$l] ?? 0, $labels),
                 'link' => array_map(fn($l) => $postTypes['2'][$l] ?? 0, $labels),
                 'gallery' => array_map(fn($l) => $postTypes['4'][$l] ?? 0, $labels),
-                'forum' => array_map(fn($l) => ($postTypes['10'][$l] ?? 0), $labels), // 10 = New Topic (Or video?), actually wait, wait.
-                // Wait! 10 was originally new topic maybe, but in Status.php: const TYPE_VIDEO = 10;
-                // I will add new keys for the view, but let's just make sure we provide the data.
+                'forum' => array_map(fn($l) => ($postTypes['10'][$l] ?? 0), $labels),
                 'store' => array_map(fn($l) => $postTypes['7867'][$l] ?? 0, $labels),
                 'orders' => array_map(fn($l) => $postTypes['6'][$l] ?? 0, $labels),
                 'news' => array_map(fn($l) => $postTypes['5'][$l] ?? 0, $labels),
@@ -319,25 +335,24 @@ class AdminController extends Controller
             'comments' => [
                 'total' => array_map(fn($l) => ($forumComments[$l] ?? 0) + ($otherComments[$l] ?? 0) + ($orderOffers[$l] ?? 0), $labels),
                 'forum' => array_map(fn($l) => $forumComments[$l] ?? 0, $labels),
-                'store' => array_map(fn($l) => Option::where('o_type', 's_coment')->where('o_order', '>=', $startDate)->where(DB::raw('FROM_UNIXTIME(o_order, "%b %d")'), $l)->count(), $labels),
+                'store' => array_map(fn($l) => $storeCommentsGrouped[$l] ?? 0, $labels),
                 'orders' => array_map(fn($l) => $orderOffers[$l] ?? 0, $labels),
-                'directory' => array_map(fn($l) => Option::where('o_type', 'd_coment')->where('o_order', '>=', $startDate)->where(DB::raw('FROM_UNIXTIME(o_order, "%b %d")'), $l)->count(), $labels),
-                'knowledgebase' => array_map(fn($l) => Option::where('o_type', \App\Services\KnowledgebaseCommunityService::COMMENT_OPTION_TYPE)->where('o_order', '>=', $startDate)->where(DB::raw('FROM_UNIXTIME(o_order, "%b %d")'), $l)->count(), $labels),
+                'directory' => array_map(fn($l) => $directoryCommentsGrouped[$l] ?? 0, $labels),
+                'knowledgebase' => array_map(fn($l) => $kbCommentsGrouped[$l] ?? 0, $labels),
             ],
             'reactions' => [
                 'total' => array_map(fn($l) => $reactionsData[$l] ?? 0, $labels),
-                'forum' => array_map(fn($l) => \App\Models\Like::where('type', 2)->where('time_t', '>=', $startDate)->where(DB::raw('FROM_UNIXTIME(time_t, "%b %d")'), $l)->count(), $labels),
-                'store' => array_map(fn($l) => \App\Models\Like::where('type', 3)->where('time_t', '>=', $startDate)->where(DB::raw('FROM_UNIXTIME(time_t, "%b %d")'), $l)->count(), $labels),
-                'directory' => array_map(fn($l) => \App\Models\Like::where('type', 22)->where('time_t', '>=', $startDate)->where(DB::raw('FROM_UNIXTIME(time_t, "%b %d")'), $l)->count(), $labels),
-                'orders' => array_map(fn($l) => \App\Models\Like::where('type', 6)->where('time_t', '>=', $startDate)->where(DB::raw('FROM_UNIXTIME(time_t, "%b %d")'), $l)->count(), $labels),
-                'follows' => array_map(fn($l) => \App\Models\Like::where('type', 1)->where('time_t', '>=', $startDate)->where(DB::raw('FROM_UNIXTIME(time_t, "%b %d")'), $l)->count(), $labels),
-                'clips' => array_map(fn($l) => \App\Models\Like::where('type', 14)->where('time_t', '>=', $startDate)->where(DB::raw('FROM_UNIXTIME(time_t, "%b %d")'), $l)->count(), $labels),
-                'knowledgebase' => array_map(fn($l) => \App\Models\Like::where('type', \App\Services\KnowledgebaseCommunityService::REACTION_TYPE)->where('time_t', '>=', $startDate)->where(DB::raw('FROM_UNIXTIME(time_t, "%b %d")'), $l)->count(), $labels),
+                'forum' => array_map(fn($l) => $likesGrouped[2][$l] ?? 0, $labels),
+                'store' => array_map(fn($l) => $likesGrouped[3][$l] ?? 0, $labels),
+                'directory' => array_map(fn($l) => $likesGrouped[22][$l] ?? 0, $labels),
+                'orders' => array_map(fn($l) => $likesGrouped[6][$l] ?? 0, $labels),
+                'follows' => array_map(fn($l) => $likesGrouped[1][$l] ?? 0, $labels),
+                'clips' => array_map(fn($l) => $likesGrouped[14][$l] ?? 0, $labels),
+                'knowledgebase' => array_map(fn($l) => $likesGrouped[\App\Services\KnowledgebaseCommunityService::REACTION_TYPE][$l] ?? 0, $labels),
             ],
         ];
 
         // Fetch detailed reaction summary (like, love, etc.)
-        // We look in options for 'data_reaction' but fallback to 'like' for any Like entry that doesn't have an option record
         $detailedReactions = Option::where('o_type', 'data_reaction')
             ->select('o_valuer as type', DB::raw('count(*) as count'))
             ->groupBy('o_valuer')
@@ -362,7 +377,93 @@ class AdminController extends Controller
             }
         }
 
-        return view('admin::admin.index', compact('stats', 'currentVersion', 'latestVersion', 'chartData', 'communityChartData', 'reactionsSummary'));
+        // --- Dynamic Admin Tips Engine ---
+        $adminTips = [
+            [
+                'id' => 1,
+                'category' => __('messages.seo_suite') ?? 'SEO & الأرشفة',
+                'icon' => 'feather-search',
+                'badge_bg' => 'linear-gradient(135deg, #615dfa, #23d2e2)',
+                'title' => __('messages.tip_seo_title') ?? 'تحسين محركات البحث والأرشفة الذكية',
+                'tip' => __('messages.tip_seo_desc') ?? 'قم بفحص أخطاء الأرشفة وإنشاء ملف Sitemap مخصص من محرك SEO لتسريع فهرسة مواضيعك ومقالات المنصة.',
+                'action_text' => __('messages.seo_suite') ?? 'جناح SEO',
+                'action_url' => route('admin.seo.index'),
+            ],
+            [
+                'id' => 2,
+                'category' => __('messages.pts_activities') ?? 'النقاط والتحفيز',
+                'icon' => 'feather-award',
+                'badge_bg' => 'linear-gradient(135deg, #f59e0b, #d97706)',
+                'title' => __('messages.tip_pts_title') ?? 'تنشيط اقتصاد نقاط PTS',
+                'tip' => __('messages.tip_pts_desc') ?? 'إنشاء مهام يومية جديدة (Quests) ومكافآت التفاعل يزيد الاستخدام اليومي للمنصة ويرفع معدل تبادل الإعلانات والزيارات.',
+                'action_text' => __('messages.pts_activities') ?? 'إدارة PTS',
+                'action_url' => route('admin.pts_activities'),
+            ],
+            [
+                'id' => 3,
+                'category' => __('messages.system_monitor') ?? 'الأداء والسرعة',
+                'icon' => 'feather-cpu',
+                'badge_bg' => 'linear-gradient(135deg, #10b981, #059669)',
+                'title' => __('messages.tip_cleanup_title') ?? 'تنظيف الذاكرة وقاعدة البيانات',
+                'tip' => __('messages.tip_cleanup_desc') ?? 'استخدم أداة تنظيف قاعدة البيانات لتفريغ السجلات القديمة والمعاينات المعطلة، مما يقلل استخدام الذاكرة ويسرع استجابة السيرفر.',
+                'action_text' => __('messages.database_cleanup') ?? 'تنظيف DB',
+                'action_url' => route('admin.database_cleanup'),
+            ],
+            [
+                'id' => 4,
+                'category' => __('messages.store') ?? 'المتجر والخدمات',
+                'icon' => 'feather-shopping-bag',
+                'badge_bg' => 'linear-gradient(135deg, #3b82f6, #1d4ed8)',
+                'title' => __('messages.tip_store_title') ?? 'تنشيط متجر السكريبتات والخدمات',
+                'tip' => __('messages.tip_store_desc') ?? 'إضافة خصومات وقسائم ترويجية للمتجر تزيد من شراء المنتجات وتفاعل البائعين والمشترين داخل مجتمع MYADS.',
+                'action_text' => __('messages.discounts') ?? 'خصومات المتجر',
+                'action_url' => route('admin.store.discounts.index'),
+            ],
+            [
+                'id' => 5,
+                'category' => __('messages.custom_ads') ?? 'الإعلانات المخصصة',
+                'icon' => 'feather-grid',
+                'badge_bg' => 'linear-gradient(135deg, #8b5cf6, #6d28d9)',
+                'title' => __('messages.tip_custom_ads_title') ?? 'إعلانات الأعضاء المباشرة',
+                'tip' => __('messages.tip_custom_ads_desc') ?? 'مراقبة ومراجعة المساحات الإعلانية التي ينشئها الأعضاء تضمن جودة الإعلانات المعروضة وتمنع المعاملات المخالفة.',
+                'action_text' => __('messages.custom_ads') ?? 'الإعلانات المخصصة',
+                'action_url' => route('admin.custom_ads.index'),
+            ],
+            [
+                'id' => 6,
+                'category' => __('messages.security') ?? 'الأمان والحظر',
+                'icon' => 'feather-shield',
+                'badge_bg' => 'linear-gradient(135deg, #ef4444, #b91c1c)',
+                'title' => __('messages.tip_security_title') ?? 'حماية الحسابات والجلسات النشطة',
+                'tip' => __('messages.tip_security_desc') ?? 'راجع قائمة IP المطرودة وجلسات الأعضاء النشطة بشكل دوري للحفاظ على أمان الشبكة ومنع الحسابات الوهمية.',
+                'action_text' => __('messages.security') ?? 'مركز الأمان',
+                'action_url' => route('admin.security.index'),
+            ],
+            [
+                'id' => 7,
+                'category' => __('messages.media_manager') ?? 'الوسائط والمرفقات',
+                'icon' => 'feather-folder',
+                'badge_bg' => 'linear-gradient(135deg, #64748b, #334155)',
+                'title' => __('messages.tip_media_title') ?? 'إدارة وسائط الفيديوهات والصور',
+                'tip' => __('messages.tip_media_desc') ?? 'تصفح مدير الوسائط الجديد لمعاينة الفيديوهات والمقاطع وإلغاء المرفقات غير المستخدمة لتوفير مساحة السيرفر.',
+                'action_text' => __('messages.media_manager') ?? 'مدير الوسائط',
+                'action_url' => route('admin.media'),
+            ],
+            [
+                'id' => 8,
+                'category' => __('messages.system_updates') ?? 'التحديثات والصيانة',
+                'icon' => 'feather-zap',
+                'badge_bg' => 'linear-gradient(135deg, #f59e0b, #b45309)',
+                'title' => __('messages.tip_update_title') ?? 'تحديث المنصة والنظام دورياً',
+                'tip' => __('messages.tip_update_desc') ?? 'احرص دائماً على التحقق من وجود إصدارات جديدة من MYADS للاستفادة من أحدث الميزات الأمنية وتحسينات الأداء.',
+                'action_text' => __('messages.check_for_updates') ?? 'فحص التحديثات',
+                'action_url' => route('admin.updates'),
+            ]
+        ];
+
+        $currentTip = $adminTips[array_rand($adminTips)];
+
+        return view('admin::admin.index', compact('stats', 'currentVersion', 'latestVersion', 'chartData', 'communityChartData', 'reactionsSummary', 'adminTips', 'currentTip'));
     }
 
     public function settings()

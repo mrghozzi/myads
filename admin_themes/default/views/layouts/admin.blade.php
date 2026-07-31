@@ -545,20 +545,6 @@
 
     <main class="nxl-container">
         <div class="nxl-content">
-            @if($adminShellHeaderMode !== 'hidden')
-                <div class="page-header admin-shell-header">
-                    <div class="page-header-left d-flex align-items-center">
-                        <div class="page-header-title">
-                            <h5 class="m-b-10">{{ __('messages.admin_panel') ?? 'Admin Panel' }}</h5>
-                        </div>
-                        <ul class="breadcrumb">
-                            <li class="breadcrumb-item"><a href="{{ route('admin.index') }}">{{ __('messages.home') ?? 'Home' }}</a></li>
-                            <li class="breadcrumb-item">{{ __('messages.dashboard') ?? 'Dashboard' }}</li>
-                        </ul>
-                    </div>
-                </div>
-            @endif
-            
             <div class="main-content">
                 @yield('content')
             </div>
