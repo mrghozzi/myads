@@ -1,4 +1,4 @@
-# MYADS v4.4.6
+# MYADS v4.5.0
 
 Advanced Laravel-based social networking and ad exchange platform for website owners.
 
@@ -23,16 +23,20 @@ MYADS combines ad exchange, community, marketplace, directory, forum, and admin 
 Core areas include:
 
 - Banner ads, text ads, visit exchange, YouTube Views Exchange, Smart Ads with **Geo-Targeting** and **A/B Testing**, and **Custom Member Ads**
+- Dedicated **YouTube-Style Video Watch Page** (`/t{id}`) and **Video Hub** (`/video`) with Shorts shelf, HTML5 custom player, publisher Hexagon avatars, and cover image composer
 - Ad analytics with **Hourly Click Heatmaps**
 - Member-to-member custom ad placements with embed codes, deal requests, PTS settlement, and external agreement tracking
-- High-performance community feed (N+1 query optimized) with **Multimedia Posts** (Video, Audio, Music, Files, Reels), reactions, comments, reposts, mentions, and fast low-memory messaging
+- High-performance community feed (N+1 query optimized) with **Multimedia Posts** (Video, Audio, Music, Files, Reels/Clips), reactions, comments, reposts, mentions, and fast low-memory messaging
 - Forum with moderation tools and attachments
-- Store and product knowledgebase
-- Web directory
+- Store and dense power-user **Knowledgebase** dashboard with categories
+- Web directory and **Services Marketplace**
 - News publishing
-- Gamification with PTS, PTS transfers and vouchers, badges, quests, and ledgers
-- SEO suite with sitemap, robots.txt, and analytics support
+- Gamification engine with PTS, PTS transfers and vouchers, 25+ badges (including Video Star, Clips Master, Audio Maestro), daily/weekly quests, and ledgers
+- SEO suite with sitemap, robots.txt, performance integration, and Free SEO Checker for webmasters
+- Permission-gated **Smart Widget Management** (`<x-widget-column>`) with drag-and-drop location reordering (`/admin/widgets`)
+- High-performance Admin Dashboard powered by a **Single-Pass SQL Aggregation Engine** (95%+ query reduction)
 - Security suite with IP bans, session monitoring, and protected public identifiers
+- Full Flutter mobile app integration (`myads_app`) with native video watch screen, Hexagon avatars, and localized i18n in 14 languages
 - Optional paid subscriptions and billing
 
 ---
@@ -42,24 +46,30 @@ Core areas include:
 ### Member Features
 
 - Ad exchange tools for banners, text ads, visit exchange, Smart Ads with **Geo-Targeting**, and Custom Ads
+- Dedicated **YouTube-Style Video Watch Page** (`/t{id}`) and **YouTube-Style Video Hub** (`/video`) with Shorts shelf, 16:9 video grid, Hexagon publisher avatars, standalone popover flyouts, and suggested video recommendations
+- Video Title (`video_title`) and Cover Thumbnail (`video_thumbnail`) post composer inputs with 256MB upload optimization
 - **A/B Testing** optimization and **Performance Heatmaps** for advertisers
 - Custom ad spaces that members can publish in the marketplace, invite advertisers into, or monetize with daily PTS deals
-- Social profiles with follows, badges, privacy controls, and social links
-- Community feed with **Multimedia Posts** (Video, Audio, Music, Files, Reels), comments, reactions, reposts, and mentions
-- Forum participation with categories, topics, and attachments
-- Marketplace and knowledgebase (with categories) access
-- Direct PTS transfers and vouchers system for members
+- Social profiles with follows, dynamic badges, privacy controls, and 12-platform social links
+- Community feed with **Multimedia Posts** (Video, Audio, Music, Files, Reels/Clips), comments, reactions, reposts, and mentions
+- Forum participation with categories, topics, attachments, and Markdown support
+- Marketplace and Knowledgebase access (with article categories)
+- Direct PTS transfers, PTS vouchers system, 25+ unlockable dynamic badges, and daily/weekly multimedia quests
 - Session monitoring and device revocation
 - Optional paid plans with a billing dashboard and hosted checkout flow
 
 ### Administrator Features
 
-- Duralux admin panel with module-based ACL
-- Full content, knowledgebase categories, and member management
+- Duralux admin panel with module-based ACL and `@.superdesign` aesthetics
+- High-performance Admin Dashboard (`/admin`) with **Single-Pass SQL Aggregations** (95%+ load time reduction) and dynamic **Admin Advice/Tips Engine**
+- **Smart Widget Management** hub (`/admin/widgets`) with target location pre-selection, category filter chips, drag-and-drop reordering, and permission-gated `<x-widget-column>` prompts
+- **Admin SEO Suite** (`/admin/seo/*`) with real-time retention & database cleanup integration
+- Dense power-user **Knowledgebase Hub** (`/admin/knowledgebase`) with live KPI stat cards, single-row filter bar, and category management
+- Media Manager hub (`/admin/media`) with drag-and-drop uploads, code/video/audio previewers, and bulk cleanup
 - Dedicated PTS Activities monitoring dashboard
+- Unified Master Settings control panel (`/admin/settings`) and dedicated Mobile App settings (`/admin/settings/mobile`)
 - Plugin and theme management
-- SEO dashboard and indexing tools
-- Maintenance mode, database cleanup, and updater workflows
+- Maintenance mode, database cleanup, daily log rotation (`LOG_STACK=daily`), and updater workflows
 - Security dashboard for IP bans and member sessions
 - Custom Ads administration for placements, deals, creative review, settlement limits, and marketplace settings
 - Billing workspace for:
@@ -216,7 +226,7 @@ To learn how to connect the app with your MYADS website, please read the [Mobile
 
 Current platform direction includes:
 
-- Continued platform polish for v4.4.x
+- Continued platform polish and feature expansion for v4.5.x
 - Expansion of billing and monetization tooling
 - More Custom Ads targeting, reporting, and moderation capabilities
 - More API coverage

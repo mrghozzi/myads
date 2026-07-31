@@ -11,6 +11,7 @@ use App\Models\News;
 use App\Models\Page;
 use App\Models\Product;
 use App\Models\SeoRule;
+use App\Models\Status;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
@@ -97,6 +98,13 @@ class SitemapController extends Controller
                     'daily',
                     '0.6'
                 ),
+                'videos' => $this->streamModelEntries(
+                    $this->publishedVideosQuery()->offset($offset)->limit($this->chunkSize)->get(),
+                    fn (Status $video) => route('forum.topic', $video->id),
+                    fn (Status $video) => $video->date,
+                    'daily',
+                    '0.8'
+                ),
                 'directory_categories' => $this->streamModelEntries(
                     $this->publishedDirectoryCategoriesQuery()->offset($offset)->limit($this->chunkSize)->get(),
                     fn (DirectoryCategory $category) => route('directory.category', $category->id),
@@ -177,6 +185,7 @@ class SitemapController extends Controller
                 'news' => $this->safeCount($this->publishedNewsQuery()),
                 'forum_categories' => $this->safeCount($this->publishedForumCategoriesQuery()),
                 'topics' => $this->safeCount($this->publishedTopicsQuery()),
+                'videos' => $this->safeCount($this->publishedVideosQuery()),
                 'directory_categories' => $this->safeCount($this->publishedDirectoryCategoriesQuery()),
                 'directories' => $this->safeCount($this->publishedDirectoriesQuery()),
                 'products' => $this->safeCount($this->publishedProductsQuery()),
@@ -274,6 +283,41 @@ class SitemapController extends Controller
                 'changefreq' => 'weekly',
                 'priority' => '0.8',
             ],
+            [
+                'scope_key' => 'video_index',
+                'loc' => route('video.index'),
+                'lastmod' => $this->latestTimestamp(Status::query()->where('statu', 1)->whereIn('s_type', [10, 14]), 'date') ?? $defaultLastmod,
+                'changefreq' => 'daily',
+                'priority' => '0.9',
+            ],
+            [
+                'scope_key' => 'video_filter_shorts',
+                'loc' => route('video.filter', 'shorts'),
+                'lastmod' => $defaultLastmod,
+                'changefreq' => 'daily',
+                'priority' => '0.8',
+            ],
+            [
+                'scope_key' => 'video_filter_videos',
+                'loc' => route('video.filter', 'videos'),
+                'lastmod' => $defaultLastmod,
+                'changefreq' => 'daily',
+                'priority' => '0.8',
+            ],
+            [
+                'scope_key' => 'video_filter_trending',
+                'loc' => route('video.filter', 'trending'),
+                'lastmod' => $defaultLastmod,
+                'changefreq' => 'daily',
+                'priority' => '0.8',
+            ],
+            [
+                'scope_key' => 'video_filter_latest',
+                'loc' => route('video.filter', 'latest'),
+                'lastmod' => $defaultLastmod,
+                'changefreq' => 'daily',
+                'priority' => '0.8',
+            ],
         ]);
 
         if (Schema::hasTable('groups') && GroupSettings::isEnabled()) {
@@ -367,6 +411,17 @@ class SitemapController extends Controller
         });
 
         return $this->applyScopeFilters($query, 'forum_topic', 'forum_topic');
+    }
+
+    private function publishedVideosQuery(): Builder
+    {
+        $query = Status::query()
+            ->where('statu', 1)
+            ->whereNull('group_id')
+            ->whereIn('s_type', [10, 14])
+            ->visible();
+
+        return $this->applyScopeFilters($query, 'video_show', 'status');
     }
 
     private function publishedGroupsQuery(): Builder

@@ -7,6 +7,7 @@ use App\Models\Page;
 use App\Models\SeoRule;
 use App\Models\SeoSetting;
 use App\Models\Setting;
+use App\Models\Status;
 use App\Models\User;
 use App\Services\MaintenanceModeManager;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -137,6 +138,53 @@ class SeoSystemTest extends TestCase
         $this->assertStringContainsString('/news/' . $visible->id, $sectionXml);
         $this->assertStringNotContainsString('/news/' . $hidden->id, $sectionXml);
         $this->assertStringContainsString('<lastmod>', $sectionXml);
+    }
+
+    public function test_video_pages_and_video_posts_are_included_in_sitemap(): void
+    {
+        $this->seedThemeSetting();
+
+        $user = User::factory()->create();
+
+        $videoStatus = Status::create([
+            'uid' => $user->id,
+            'txt' => 'Sample Video Topic',
+            'statu' => 1,
+            's_type' => 10, // Video
+            'date' => 1710000200,
+        ]);
+
+        $clipStatus = Status::create([
+            'uid' => $user->id,
+            'txt' => 'Sample Clip Topic',
+            'statu' => 1,
+            's_type' => 14, // Clip
+            'date' => 1710000300,
+        ]);
+
+        // Static sitemap section check
+        $staticResponse = $this->get('/sitemap/static/1.xml');
+        $staticResponse->assertOk();
+        $staticXml = $staticResponse->streamedContent();
+
+        $this->assertStringContainsString('/video', $staticXml);
+        $this->assertStringContainsString('/video/shorts', $staticXml);
+        $this->assertStringContainsString('/video/videos', $staticXml);
+        $this->assertStringContainsString('/video/trending', $staticXml);
+        $this->assertStringContainsString('/video/latest', $staticXml);
+
+        // Videos sitemap index check
+        $this->get('/sitemap.xml')
+            ->assertOk()
+            ->assertSee('/sitemap/videos/1.xml', false);
+
+        // Videos sitemap section check
+        $videoSectionResponse = $this->get('/sitemap/videos/1.xml');
+        $videoSectionResponse->assertOk();
+        $videoXml = $videoSectionResponse->streamedContent();
+
+        $this->assertStringContainsString('/t' . $videoStatus->id, $videoXml);
+        $this->assertStringContainsString('/t' . $clipStatus->id, $videoXml);
     }
 
     public function test_admin_seo_pages_render_and_persist_settings(): void
