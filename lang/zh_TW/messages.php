@@ -1001,6 +1001,7 @@ return array (
   'no_plugins_found' => '沒有找到插件',
   'no_post' => '沒有文章',
   'no_products_found' => '沒有找到產品',
+  'try_adjusting_filters' => '嘗試選擇不同的分類或搜尋詞。',
   'no_results_found' => '沒有找到結果',
   'no_sites' => '沒有站點',
   'no_sites_available' => '沒有可供衝浪的網站。',

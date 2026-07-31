@@ -838,6 +838,7 @@ return [
     'no_plugins_found' => 'Aucun module trouvé',
     'no_post' => 'Aucun article',
     'no_products_found' => 'Aucun produit trouvé',
+    'try_adjusting_filters' => 'Essayez de sélectionner une autre catégorie ou un autre terme de recherche.',
     'no_results' => 'Aucun résultat trouvé',
     'no_results_found' => 'Aucun résultat trouvé',
     'no_sites' => 'Aucun site',

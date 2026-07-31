@@ -844,6 +844,7 @@ return [
     'no_plugins_found' => 'پلاگینی یافت نشد',
     'no_post' => 'مقاله‌ای یافت نشد',
     'no_products_found' => 'محصولی یافت نشد',
+    'try_adjusting_filters' => 'لطفاً دسته‌بندی یا عبارت جستجوی دیگری را امتحان کنید.',
     'no_results' => 'نتیجه‌ای یافت نشد',
     'no_results_found' => 'نتیجه‌ای یافت نشد',
     'no_sites' => 'بدون سایت',

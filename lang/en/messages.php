@@ -1071,6 +1071,7 @@ return [
     'no_plugins_found' => 'No plugins found',
     'no_post' => 'No articles',
     'no_products_found' => 'No products found',
+    'try_adjusting_filters' => 'Try selecting a different category or search term.',
     'no_results_found' => 'No Results Found',
     'no_sites' => 'No sites',
     'no_sites_available' => 'No sites available for surfing.',

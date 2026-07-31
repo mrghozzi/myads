@@ -1097,6 +1097,7 @@ return [
     'no_plugins_found' => 'لم يتم العثور على إضافات',
     'no_post' => 'لا توجد مقالات',
     'no_products_found' => 'عفوا, لا يوجد عناصر محفوظة حاليا',
+    'try_adjusting_filters' => 'جرب اختيار تصنيف آخر أو تغيير كلمة البحث.',
     'no_results_found' => 'لا توجد نتائج',
     'no_sites' => 'لا توجد مواقع',
     'no_sites_available' => 'لا توجد مواقع متاحة للتصفح حالياً.',

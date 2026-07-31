@@ -411,12 +411,36 @@
                             <div class="timeline">
                                 <div class="timeline-item">
                                     <div class="timeline-icon"><i class="feather-box fs-12"></i></div>
-                                    <h6 class="fw-bold mb-1">v4.5.0 <span class="badge bg-soft-primary text-primary ms-2">Current</span></h6>
-                                    <p class="text-muted fs-13 mb-3">Groundwork Initialization, Platform Infrastructure Upgrades, Enhanced Dynamic Versioning & Mobile API Architecture.</p>
+                                    <h6 class="fw-bold mb-1">v4.5.0 <span class="badge bg-soft-success text-success ms-2">Stable (Current)</span></h6>
+                                    <p class="text-muted fs-13 mb-3">YouTube-Style Watch Page & Video Hub, Gamification Badges & Quests, Admin SEO Suite & Knowledgebase Power Overhaul, 95%+ DB Aggregation Engine, Smart Widgets & Flutter App Parity.</p>
                                     <div class="d-flex flex-column gap-2">
                                         <div class="d-flex align-items-start">
                                             <span class="changelog-badge badge-feature mt-1" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">Feature</span>
-                                            <span class="text-muted fs-13">Initialized <strong>MYADS v4.5.0</strong> release cycle, updated canonical version constant (<code>SystemVersion::CURRENT</code>), updated system documentation, and configured dynamic admin panel versioning.</span>
+                                            <span class="text-muted fs-13">Built dedicated <strong>YouTube-Style Video Watch Page</strong> (<code>/t{id}</code>) with HTML5 custom video player, Hexagon publisher avatars, standalone popover flyouts, 4-column suggested video filtering, Video Title & Cover Thumbnail composer, 256MB PHP/Apache upload capacity, and dedicated <strong>YouTube Shorts & Video Hub</strong> (<code>/video</code>).</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-feature mt-1" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">Feature</span>
+                                            <span class="text-muted fs-13">Expanded Gamification Engine with <strong>5 New Multimedia Badges</strong> (<em>Video Star, Clips Master, Audio Maestro, Resource Vault, Multimedia Pioneer</em>) and <strong>5 New Daily & Weekly Quests</strong> across all 14 supported locales with full test coverage.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-feature mt-1" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">Feature</span>
+                                            <span class="text-muted fs-13">Complete <strong>Superdesign UI Overhaul</strong> of all 7 Admin SEO Suite views (<code>/admin/seo/*</code>) with real-time performance & DB cleanup retention panel, and reimagined <strong>Admin Knowledgebase Hub</strong> (<code>/admin/knowledgebase</code>) with single-row filter bar and live KPI statistics.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-optimization mt-1" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">Optimization</span>
+                                            <span class="text-muted fs-13">Optimized Admin Dashboard (<code>/admin</code>) load times by replacing 300+ loop database queries with <strong>Single-Pass SQL Aggregations</strong> (95%+ reduction), added composite DB B-Tree indexes on reaction/option tables, and unified atomic <code>ReactionService</code>.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-feature mt-1" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">Feature</span>
+                                            <span class="text-muted fs-13">Introduced permission-gated <strong>Smart Widget Management Prompt</strong> (<code>&lt;x-widget-column&gt;</code>) and redesigned <strong>Admin Widgets Hub</strong> (<code>/admin/widgets</code>) with place pre-selection, location filter chips, and drag-and-drop row reordering.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-feature mt-1" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">Feature</span>
+                                            <span class="text-muted fs-13">Released <strong>Flutter Mobile App v1.6.0+11</strong> featuring native YouTube-style video watch screen (<code>post_details_screen.dart</code>), video title & thumbnail composer support, and vertical Hexagon avatars.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-fix mt-1" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;">Fix</span>
+                                            <span class="text-muted fs-13">Resolved installer migration foreign key mismatches on <code>user_blocks</code> and <code>developer_apps</code> tables, store editor client validation blocking, video hub trending 500 error, and reaction debouncer duplicate network calls.</span>
                                         </div>
                                     </div>
                                 </div>

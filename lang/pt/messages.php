@@ -844,6 +844,7 @@ return [
     'no_plugins_found' => 'Nenhum plugin encontrado',
     'no_post' => 'Sem artigos',
     'no_products_found' => 'Nenhum produto encontrado',
+    'try_adjusting_filters' => 'Tente selecionar uma categoria ou termo de busca diferente.',
     'no_results' => 'Nenhum resultado encontrado',
     'no_results_found' => 'Nenhum resultado encontrado',
     'no_sites' => 'Sem sites',

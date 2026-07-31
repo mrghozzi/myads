@@ -838,6 +838,7 @@ return [
     'no_plugins_found' => 'No se encontraron plugins',
     'no_post' => 'Sin artículos',
     'no_products_found' => 'No se encontraron productos',
+    'try_adjusting_filters' => 'Intente seleccionar otra categoría o término de búsqueda.',
     'no_results' => 'No se encontraron resultados',
     'no_results_found' => 'No se encontraron resultados',
     'no_sites' => 'Sin sitios',

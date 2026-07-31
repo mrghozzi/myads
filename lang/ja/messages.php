@@ -1001,6 +1001,7 @@ return array (
   'no_plugins_found' => 'プラグインが見つかりません',
   'no_post' => '記事がありません',
   'no_products_found' => '製品が見つかりませんでした',
+  'try_adjusting_filters' => '別のカテゴリまたは検索語を選択してみてください。',
   'no_results_found' => '結果が見つかりませんでした',
   'no_sites' => 'サイトがありません',
   'no_sites_available' => 'サーフィンに利用できるサイトはありません。',

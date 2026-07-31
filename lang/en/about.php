@@ -8,16 +8,16 @@ return [
     'tab_about' => 'About MYADS',
     
     // What's New Section
-    'feature_1_title' => 'Unified Control Panel',
-    'feature_1_desc' => 'Merged Admin settings into a streamlined control panel with modern Superdesign tabbed navigation and diagnostic tools for S3, DigitalOcean, Google Cloud, and FTP.',
-    'feature_2_title' => 'Dedicated Mobile App Hub',
-    'feature_2_desc' => 'Manage Mobile App settings, secure API key masking and regeneration, feature toggles, and direct links to the official open-source Flutter repository.',
-    'feature_3_title' => 'Log & Storage Optimization',
-    'feature_3_desc' => 'Switched to daily log rotation (LOG_STACK=daily) with automatic 7-day retention, automated daily cleanup commands, and real-time log monitoring.',
-    'feature_4_title' => 'Multi-Language Expansion',
-    'feature_4_desc' => 'Added complete support for Russian, Serbian, Japanese, Simplified Chinese, and Traditional Chinese across 3,625+ system translation keys (14 total languages).',
-    'feature_5_title' => 'Marketplace 3D Banners',
-    'feature_5_desc' => 'Expanded the digital store to display all 9 product categories with product counts, custom minimalist 3D illustrations, and full-width header layouts.',
+    'feature_1_title' => 'YouTube-Style Watch Page & Hub',
+    'feature_1_desc' => 'Dedicated YouTube-style watch page (/t{id}) and Video Hub (/video) with Shorts shelf, custom HTML5 player, publisher Hexagon avatars, cover image composer, and 256MB upload optimization.',
+    'feature_2_title' => 'Multimedia Badges & Quests',
+    'feature_2_desc' => '5 new multimedia Badges and 5 new Quests for Video, Clip, Audio, and File engagement, fully integrated into the gamification engine across 14 languages.',
+    'feature_3_title' => 'SEO Suite & Knowledgebase Overhaul',
+    'feature_3_desc' => 'Complete @.superdesign redesign of all 7 SEO management views with retention & DB cleanup integration, and a dense power dashboard for Knowledgebase administration.',
+    'feature_4_title' => '95%+ DB Query Optimization Engine',
+    'feature_4_desc' => 'Single-pass SQL query aggregations for the Admin dashboard reducing load from 300+ DB queries to under 10, plus new composite DB indexes and a unified ReactionService.',
+    'feature_5_title' => 'Smart Widgets & Flutter App Parity',
+    'feature_5_desc' => 'Permission-gated empty widget prompt (<x-widget-column>), redesigned /admin/widgets hub with drag-and-drop reordering, and Flutter mobile app watch screen parity.',
 
     // About Section
     'about_description' => 'MYADS is a powerful, all-in-one community platform and ad exchange network. It empowers website owners to connect, exchange traffic, trade services, and monetize their platforms effectively.',
