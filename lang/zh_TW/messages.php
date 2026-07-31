@@ -3638,4 +3638,6 @@ return array (
   'prune_logs' => '清理日誌',
   'logs_cleaned' => '舊日誌檔案已成功清理。',
   'files' => '文件',
+  'clear_filter' => '清除篩選',
 );
+

@@ -3638,4 +3638,6 @@ return array (
   'prune_logs' => 'クリーンログ',
   'logs_cleaned' => '古いログ ファイルは正常にクリーンアップされました。',
   'files' => 'ファイル',
+  'clear_filter' => 'フィルターをクリア',
 );
+

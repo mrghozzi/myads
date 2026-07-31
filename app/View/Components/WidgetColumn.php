@@ -3,17 +3,23 @@
 namespace App\View\Components;
 
 use App\Models\Option;
+use App\Models\Page;
+use App\Services\AdminAccessService;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\View\Component;
 
 class WidgetColumn extends Component
 {
     public $side;
     public $widgets;
+    public $resolvedSide;
+    public $placeName;
+    public $canManageWidgets = false;
 
     /**
      * Create a new component instance.
      *
-     * @param int $side The side of the widget column (1 for left, 2 for right).
+     * @param int|string $side The side of the widget column (1 for left, 2 for right).
      * @return void
      */
     public function __construct($side)
@@ -34,18 +40,68 @@ class WidgetColumn extends Component
             'groups_right' => 10,
         ];
 
-        // Resolve the mapped ID or use the side value directly if it's already an integer
-        $resolvedSide = current(array_filter([$sideMapping[$this->side] ?? null, is_numeric($this->side) ? (int)$this->side : null]));
+        // Resolve the mapped ID or use the side value directly if it's numeric
+        $mappedId = $sideMapping[$this->side] ?? null;
+        $numericId = is_numeric($this->side) ? (int)$this->side : null;
+        $this->resolvedSide = $mappedId ?? $numericId;
 
-        if ($resolvedSide !== null) {
+        if ($this->resolvedSide !== null) {
             // Fetch widgets for this side
             $this->widgets = Option::where('o_type', 'box_widget')
-                ->where('o_parent', $resolvedSide)
+                ->where('o_parent', $this->resolvedSide)
                 ->orderBy('o_order', 'desc')
                 ->get();
         } else {
             $this->widgets = collect(); // Default to empty for unknown sides
         }
+
+        // Check if the current user is an admin who can access /admin/widgets
+        $user = auth()->user();
+        if ($user) {
+            $this->canManageWidgets = app(AdminAccessService::class)->canAccess($user, 'admin.widgets');
+        }
+
+        $this->placeName = $this->resolvePlaceName($this->resolvedSide);
+    }
+
+    /**
+     * Resolve human readable name for place ID.
+     */
+    private function resolvePlaceName(?int $placeId): string
+    {
+        if (!$placeId) {
+            return '';
+        }
+
+        $places = [
+            1 => __('messages.portal_left') ?: 'الجانب الأيسر للرئيسية',
+            2 => __('messages.portal_right') ?: 'الجانب الأيمن للرئيسية',
+            3 => __('messages.forum_left') ?: 'الجانب الأيسر للمنتدى',
+            4 => __('messages.forum_right') ?: 'الجانب الأيمن للمنتدى',
+            5 => __('messages.directory_left') ?: 'الجانب الأيسر للمجلة/الدليل',
+            6 => __('messages.directory_right') ?: 'الجانب الأيمن للمجلة/الدليل',
+            7 => __('messages.profile_left') ?: 'الجانب الأيسر للملف الشخصي',
+            8 => __('messages.profile_right') ?: 'الجانب الأيمن للملف الشخصي',
+            9 => __('messages.groups_left') ?: 'الجانب الأيسر للمجموعات',
+            10 => __('messages.groups_right') ?: 'الجانب الأيمن للمجموعات',
+        ];
+
+        if (isset($places[$placeId])) {
+            return (string) $places[$placeId];
+        }
+
+        // Dynamic custom pages places
+        if ($placeId >= 100 && Schema::hasTable('pages')) {
+            $pageId = (int) floor(($placeId - 100 + 1) / 2);
+            $page = Page::find($pageId);
+            if ($page) {
+                $isLeft = ($placeId % 2 !== 0);
+                $sideText = $isLeft ? (__('messages.page_left') ?: 'صفحة يسار') : (__('messages.page_right') ?: 'صفحة يمين');
+                return $sideText . ': ' . $page->title;
+            }
+        }
+
+        return __('messages.place') . ' #' . $placeId;
     }
 
     /**
@@ -58,3 +114,4 @@ class WidgetColumn extends Component
         return view('components.widget-column');
     }
 }
+

@@ -4025,4 +4025,14 @@ return [
     'video_thumbnail' => 'Video Thumbnail',
     'select_video_file' => 'Select Video File',
     'file_too_large' => 'File size is too large and exceeds the maximum allowed upload limit.',
+    'admin_widget_area' => 'Widget Setup (Admin Only)',
+    'no_widgets_in_place_title' => 'No widgets in this location yet',
+    'no_widgets_in_place_desc' => 'No widgets have been added to this area yet. As an administrator, you can easily add and configure widgets for this slot from the admin panel.',
+    'add_widgets_here' => 'Add Widgets Here',
+    'target_location' => 'Target Location',
+    'target_location_prompt' => 'Welcome! You were redirected to customize widgets for:',
+    'clear_filter' => 'Clear Filter',
 ];
+
+
+

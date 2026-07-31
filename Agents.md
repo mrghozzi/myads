@@ -38,6 +38,8 @@ MYADS is a community platform where website owners:
 16. **Custom Member Ads** — members create embeddable ad spaces, negotiate direct deals, track impressions/clicks, and settle daily PTS payouts or record external agreements.
 17. **Mobile App API & Client** — foundational Flutter app for Android (`myads_app`) with full community feed parity (Reactions with points/notification syncing, Comments, Multimedia posts with Video/Audio/Image gallery/File rendering, Promoted Posts, Share intent), Forums, Store, a native **Clips System**, a dedicated **YouTube-Style Video Watch Screen** (`post_details_screen.dart`), Video Title & Cover Thumbnail composer support, a premium **Member Profile & Social Navigation** experience with vertical hexagonal avatars matching the web theme, and a **Settings & Communication Hub** (Messages, Notifications, localized in English/Arabic), all powered by Laravel Sanctum and a secure Mobile API.
 18. **Modern UI/UX** — Progressive Web App (PWA) support with offline fallback, a Live Global Search engine, Skeleton load placeholders, Toast notifications, Hover Popovers for user profiles, intelligent OS-based Dark Mode detection, and refined micro-animations.
+19. **Smart Widget Management & Admin Control** — permission-gated empty widget prompt (`<x-widget-column>`) displaying location-aware instructions and CTA redirection to a redesigned `@.superdesign` admin widget management hub (`/admin/widgets`) featuring location filter chips, target place pre-selection (`place` param), and drag-and-drop row reordering.
+
 
 ---
 
@@ -187,7 +189,7 @@ myads/
 | `Api\SettingsController` | Mobile API endpoints for member settings, privacy, social links, sessions, and points ledger |
 | `TagController` | Tag/hashtag pages |
 | `PageController` | Static pages (privacy, terms, refund, custom) |
-| `AdminController` | **Main admin controller** — users, ads, forum, directory, store, widgets, menus, plugins, themes, settings (including performance settings and system monitor), news, reports, emojis, knowledgebase, KB categories CRUD, maintenance mode settings |
+| `AdminController` | **Main admin controller** — users, ads, forum, directory, store, widgets (redesigned `@.superdesign` hub with `place` pre-selection & location filter chips), menus, plugins, themes, settings (including performance settings and system monitor), news, reports, emojis, knowledgebase, KB categories CRUD, maintenance mode settings |
 | `AdminAdminsController` | Admin ACL management |
 | `AdminBillingController` | Admin billing hub: settings, plans, orders, transactions, currencies, gateways |
 | `AdminOrderController` | Admin marketplace dashboard and moderation actions for service requests |

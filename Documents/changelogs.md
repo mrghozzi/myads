@@ -53,6 +53,13 @@
 * **Fix (Store Product Creation Submit):** Resolved a silent submit failure on `/store/create` caused by a hidden required `vname` validation field blocking the browser form submission before Laravel validation could run. The store editor now relies on backend validation as the source of truth while using `reportValidity()` to surface missing required fields clearly to publishers.
 * **UI / UX (Store Management Banner Cleanup):** Removed redundant `section-banner` header blocks, including banner imagery and marketplace icons, from store publisher management pages (`/store/create`, `/store/discounts`, `/store/discounts/create`, `/store/{name}/update`, `/store/{name}/downloads`, and `/store/{name}/updates-management`) for a cleaner editor and dashboard layout.
 
+### Widget Management & Admin Control Redesign
+* **Feature (Admin Permission-Gated Widget Prompt):** Added a smart, `@.superdesign` empty state card on the website's widget areas (`<x-widget-column>`) when no widgets have been configured for a location. The prompt is strictly permission-gated via `AdminAccessService::canAccess(auth()->user(), 'admin.widgets')` (visible only to logged-in admins with `/admin/widgets` access). It features location-aware titles (`portal_left`, `forum_right`, custom pages, etc.) and a direct CTA button linking to `/admin/widgets?place={side}`.
+* **Feature (Admin Widgets Hub Redesign):** Re-architected `/admin/widgets` and `/admin/widgets_form` according to `@.superdesign` guidelines with a glassmorphic hero strip, dynamic stat cards, place target alert banner, real-time location filter chips/tabs, widget type visual selector, drag-and-drop row reordering, and pre-selected location binding.
+* **Internationalization (i18n):** Added system translation keys (`messages.admin_widget_area`, `messages.no_widgets_in_place_title`, `messages.no_widgets_in_place_desc`, `messages.add_widgets_here`, `messages.target_location`, `messages.target_location_prompt`, `messages.clear_filter`) across all 14 supported locales (`ar`, `en`, `de`, `es`, `fa`, `fr`, `it`, `ja`, `pt`, `ru`, `sr`, `tr`, `zh_CN`, `zh_TW`).
+* **Quality & Automated Testing:** Added comprehensive PHPUnit feature test suites (`WidgetAdminPromptTest.php` and `AdminWidgetsRedesignTest.php`) verifying guest/regular user prompt invisibility, admin prompt rendering, route authorization, `place` query parameter pre-selection, and AJAX form rendering.
+
+
 ---
 
 # v4.4.6

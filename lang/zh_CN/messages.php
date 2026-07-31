@@ -3638,4 +3638,6 @@ return array (
   'prune_logs' => 'Clean Logs',
   'logs_cleaned' => 'Old log files cleaned up successfully.',
   'files' => 'files',
+  'clear_filter' => '清除筛选',
 );
+

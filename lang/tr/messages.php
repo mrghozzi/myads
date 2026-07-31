@@ -2607,6 +2607,9 @@ return [
     'pressure_debug_action' => 'Set APP_DEBUG=false in the .env file.',
     'pressure_no_issues_title' => 'No clear pressure indicators',
     'pressure_no_issues_desc' => 'The current settings look healthy for the known pressure sources.',
-    'pressure_no_issues_action' => 'Continue monitoring after updates or during high-traffic periods.',];
+    'pressure_no_issues_action' => 'Continue monitoring after updates or during high-traffic periods.',
+    'clear_filter' => 'Filtreyi Temizle',
+];
+
 
 

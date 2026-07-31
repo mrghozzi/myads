@@ -3034,19 +3034,53 @@ class AdminController extends Controller
         return self::FORUM_PERMISSION_KEYS;
     }
 
-    public function widgets()
+    public function widgets(Request $request)
     {
+        $selectedPlace = $request->get('place');
+        $sideMapping = [
+            'portal_left' => 1,
+            'portal_right' => 2,
+            'forum_left' => 3,
+            'forum_right' => 4,
+            'directory_left' => 5,
+            'directory_right' => 6,
+            'profile_left' => 7,
+            'profile_right' => 8,
+            'groups_left' => 9,
+            'groups_right' => 10,
+        ];
+        if (isset($sideMapping[$selectedPlace])) {
+            $selectedPlace = (string) $sideMapping[$selectedPlace];
+        }
+
         $widgets = Option::where('o_type', 'box_widget')
             ->orderBy('o_parent', 'asc')
             ->orderBy('o_order', 'asc')
             ->get();
         $places = $this->getWidgetPlaces();
-        return view('admin::admin.widgets', compact('widgets', 'places'));
+        return view('admin::admin.widgets', compact('widgets', 'places', 'selectedPlace'));
     }
 
     public function widgetForm(Request $request)
     {
         $type = $request->get('type');
+        $selectedPlace = $request->get('place');
+        $sideMapping = [
+            'portal_left' => 1,
+            'portal_right' => 2,
+            'forum_left' => 3,
+            'forum_right' => 4,
+            'directory_left' => 5,
+            'directory_right' => 6,
+            'profile_left' => 7,
+            'profile_right' => 8,
+            'groups_left' => 9,
+            'groups_right' => 10,
+        ];
+        if (isset($sideMapping[$selectedPlace])) {
+            $selectedPlace = (string) $sideMapping[$selectedPlace];
+        }
+
         $allowedTypes = ['widget_html', 'widget_members', 'widget_online_members', 'widget_recent_comments', 'widget_stats_box', 'widget_forum_latest', 'widget_news_latest', 'widget_points_leaderboard', 'widget_store_latest', 'widget_directory_latest', 'widget_orders_latest', 'widget_badges_showcase', 'widget_quests_daily', 'widget_landing_footer'];
         if (!in_array($type, $allowedTypes, true)) {
             abort(404);
@@ -3059,6 +3093,7 @@ class AdminController extends Controller
             'type' => $type,
             'places' => $places,
             'allowedPlaceIds' => $allowedPlaceIds,
+            'selectedPlace' => $selectedPlace,
         ]);
     }
 
