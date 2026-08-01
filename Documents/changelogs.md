@@ -5,6 +5,9 @@
 * **Feature (Groundwork Initialization):** Initialized release cycle for MYADS v5.5.1. Updated canonical version constant (`SystemVersion::CURRENT`), system documentation, and dynamic versioning.
 * **Fix (SCEditor Rich Text Editor Integration):** Resolved SCEditor initialization failures across admin pages (`/admin/pages/create`, `/admin/pages/{id}/edit`) and community forum (`/forum/create`, `/forum/{id}/edit`). Corrected invalid CDN script path (`formats/xhtml.min.js`), added defensive locale script loading (`onerror="this.remove()"`), added `DOMContentLoaded` execution wrappers, ensured form value synchronization (`inst.updateOriginal()`) on submission, and integrated dark mode CSS styling for Duralux theme (`.app-skin-dark`).
 
+### Bug Fixes
+* **Fix (Database Cleanup Settings 500 Error):** Resolved an HTTP 500 error when saving auto-cleanup settings on `/admin/database-cleanup`, caused by `AdminController::databaseCleanupAction()` writing to non-existent `o_name`/`o_value` columns on the `options` table (whose real schema uses `name`/`o_valuer`). Corrected the `updateOrInsert` call to use the proper column names scoped with `o_type = 'system_setting'`, and fixed `DatabaseMaintenanceService::retentionDays()` and `isAutoCleanupEnabled()` to read from the same corrected columns so saved retention/auto-cleanup settings are now actually persisted and honored instead of silently falling back to defaults.
+
 # v4.5.0
 > **Major Release (Stable)** — Groundwork Initialization, Platform Infrastructure Upgrades, YouTube-Style Video Watch Page, Community Publisher & Edit Enhancements, Server Upload Limit Optimization, Enhanced Dynamic Versioning & Mobile API Architecture.
 

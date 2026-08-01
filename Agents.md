@@ -1042,7 +1042,9 @@ If in doubt, update it. An outdated `Agents.md` causes future agents to make wro
 - **v4.5.0 Groundwork (2026-07-25):** Initialized release cycle for MYADS v4.5.0, bumped canonical `SystemVersion::CURRENT` to v4.5.0, updated system documentation, and configured dynamic admin panel version badges.
 - **Reaction System Optimization (2026-07-26):** Created composite performance indexes (`like`, `options`, `notif`), optimized `GamificationService` badge queries (reduced query count by >95%), added centralized `ReactionService`, enabled Optimistic UI updates on mobile (`v1.5.0+10`), and added web request debouncing.
 - **Store Script Subcategories (2026-07-26):** Seeded default `scriptcat` options (CMS, Blog, Forum, Ecommerce, Social_Network, Marketplace, LMS, CRM, Helpdesk, Booking, Directory, Portfolio, Wiki, API, Landing_Page, Newsletter, Survey, Project_Management, File_Management, Others) via migration `2026_07_26_235900_seed_script_subcategories.php`, fixed the empty subcategory selector on `/store/create` for the `script` main category, and added a dedicated admin management page at `/admin/store/script-categories` with full CRUD, sidebar link, and EN/AR translations.
+- **v5.5.1 Groundwork (2026-08-01):** Initialized release cycle for MYADS v5.5.1, bumped canonical `SystemVersion::CURRENT` to v5.5.1, and fixed SCEditor initialization failures across admin/forum content editors.
+- **Bug Fix (2026-08-01):** Fixed a 500 error when saving settings on `/admin/database-cleanup`, caused by `AdminController::databaseCleanupAction()` and `DatabaseMaintenanceService` writing/reading non-existent `o_name`/`o_value` columns on the `options` table. Corrected both to use the table's real `name`/`o_valuer` columns scoped with `o_type = 'system_setting'`, so auto-cleanup retention settings now persist and are actually honored.
 
 ---
 
-*Last updated: 2026-07-26 — MYADS v4.5.0 (Reaction System Optimization, Index Performance Upgrades, Optimistic Mobile UI, Script Subcategories Seed & Admin CRUD)*
+*Last updated: 2026-08-01 — MYADS v5.5.1 (Groundwork Initialization, SCEditor Fix, Database Cleanup Settings Fix)*

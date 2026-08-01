@@ -104,8 +104,17 @@ class DatabaseMaintenanceService
 
         try {
             $options = DB::table('options')
-                ->where('o_name', 'LIKE', 'db_retention_%')
-                ->pluck('o_value', 'o_name')
+                ->where('o_type', 'system_setting')
+                ->whereIn('name', [
+                    'db_retention_state',
+                    'db_retention_banner_impressions',
+                    'db_retention_smart_ad_impressions',
+                    'db_retention_seo_daily_metrics',
+                    'db_retention_custom_ad_events',
+                    'db_retention_logs',
+                    'db_max_log_size_mb',
+                ])
+                ->pluck('o_valuer', 'name')
                 ->toArray();
         } catch (\Throwable) {
             return $defaults;
@@ -129,8 +138,9 @@ class DatabaseMaintenanceService
     {
         try {
             $option = DB::table('options')
-                ->where('o_name', 'db_auto_cleanup_enabled')
-                ->value('o_value');
+                ->where('o_type', 'system_setting')
+                ->where('name', 'db_auto_cleanup_enabled')
+                ->value('o_valuer');
 
             return $option === null || $option === '1' || $option === 'true';
         } catch (\Throwable) {

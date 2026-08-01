@@ -5004,8 +5004,8 @@ class AdminController extends Controller
 
             foreach ($settingsMap as $key => $value) {
                 \Illuminate\Support\Facades\DB::table('options')->updateOrInsert(
-                    ['o_name' => $key],
-                    ['o_value' => (string) $value]
+                    ['name' => $key, 'o_type' => 'system_setting'],
+                    ['o_valuer' => (string) $value]
                 );
             }
 
