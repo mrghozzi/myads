@@ -136,44 +136,66 @@
                         <form action="{{ route('admin.database_cleanup.action') }}" method="POST">
                             @csrf
                             
-                            <div class="row mb-4">
-                                <div class="col-md-4">
-                                    <div class="p-3 border rounded">
-                                        <h6 class="mb-2">{{ __('messages.state_table') }}</h6>
-                                        <p class="text-muted small">{{ __('messages.current_records') }}: <strong>{{ number_format($stateCount) }}</strong></p>
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <div class="p-3 border rounded h-100">
+                                        <h6 class="mb-2">{{ __('messages.state_table') ?? 'Ad Event Logs' }}</h6>
+                                        <p class="text-muted small">{{ __('messages.current_records') ?? 'Current Records' }}: <strong>{{ number_format($stateCount) }}</strong></p>
                                         <div class="form-group mb-0">
-                                            <label class="form-label">{{ __('messages.delete_older_than_days') }}</label>
-                                            <input type="number" name="state_days" class="form-control" min="1" placeholder="30">
+                                            <label class="form-label small text-muted">{{ __('messages.delete_older_than_days') ?? 'Delete older than (days)' }}</label>
+                                            <input type="number" name="state_days" class="form-control form-control-sm" min="1" placeholder="30">
                                         </div>
                                     </div>
                                 </div>
 
-                                <div class="col-md-4">
-                                    <div class="p-3 border rounded">
-                                        <h6 class="mb-2">{{ __('messages.banner_impressions') }}</h6>
-                                        <p class="text-muted small">{{ __('messages.current_records') }}: <strong>{{ number_format($bannerImpressionsCount) }}</strong></p>
+                                <div class="col-md-4 mb-3">
+                                    <div class="p-3 border rounded h-100">
+                                        <h6 class="mb-2">{{ __('messages.banner_impressions') ?? 'Banner Impressions' }}</h6>
+                                        <p class="text-muted small">{{ __('messages.current_records') ?? 'Current Records' }}: <strong>{{ number_format($bannerImpressionsCount) }}</strong></p>
                                         <div class="form-group mb-0">
-                                            <label class="form-label">{{ __('messages.delete_older_than_days') }}</label>
-                                            <input type="number" name="banner_impressions_days" class="form-control" min="1" placeholder="30">
+                                            <label class="form-label small text-muted">{{ __('messages.delete_older_than_days') ?? 'Delete older than (days)' }}</label>
+                                            <input type="number" name="banner_impressions_days" class="form-control form-control-sm" min="1" placeholder="30">
                                         </div>
                                     </div>
                                 </div>
 
-                                <div class="col-md-4">
-                                    <div class="p-3 border rounded">
-                                        <h6 class="mb-2">{{ __('messages.seo_daily_metrics') }}</h6>
-                                        <p class="text-muted small">{{ __('messages.current_records') }}: <strong>{{ number_format($seoMetricsCount) }}</strong></p>
+                                <div class="col-md-4 mb-3">
+                                    <div class="p-3 border rounded h-100">
+                                        <h6 class="mb-2">{{ __('messages.smart_ad_impressions') ?? 'Smart Ad Impressions' }}</h6>
+                                        <p class="text-muted small">{{ __('messages.current_records') ?? 'Current Records' }}: <strong>{{ number_format($smartAdImpressionsCount ?? 0) }}</strong></p>
                                         <div class="form-group mb-0">
-                                            <label class="form-label">{{ __('messages.delete_older_than_days') }}</label>
-                                            <input type="number" name="seo_metrics_days" class="form-control" min="1" placeholder="30">
+                                            <label class="form-label small text-muted">{{ __('messages.delete_older_than_days') ?? 'Delete older than (days)' }}</label>
+                                            <input type="number" name="smart_ad_impressions_days" class="form-control form-control-sm" min="1" placeholder="30">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4 mb-3">
+                                    <div class="p-3 border rounded h-100">
+                                        <h6 class="mb-2">{{ __('messages.custom_ad_events') ?? 'Custom Ad Events' }}</h6>
+                                        <p class="text-muted small">{{ __('messages.current_records') ?? 'Current Records' }}: <strong>{{ number_format($customAdEventsCount ?? 0) }}</strong></p>
+                                        <div class="form-group mb-0">
+                                            <label class="form-label small text-muted">{{ __('messages.delete_older_than_days') ?? 'Delete older than (days)' }}</label>
+                                            <input type="number" name="custom_ad_events_days" class="form-control form-control-sm" min="1" placeholder="30">
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4 mb-3">
+                                    <div class="p-3 border rounded h-100">
+                                        <h6 class="mb-2">{{ __('messages.seo_daily_metrics') ?? 'SEO Metrics' }}</h6>
+                                        <p class="text-muted small">{{ __('messages.current_records') ?? 'Current Records' }}: <strong>{{ number_format($seoMetricsCount) }}</strong></p>
+                                        <div class="form-group mb-0">
+                                            <label class="form-label small text-muted">{{ __('messages.delete_older_than_days') ?? 'Delete older than (days)' }}</label>
+                                            <input type="number" name="seo_metrics_days" class="form-control form-control-sm" min="1" placeholder="30">
                                         </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="d-flex justify-content-end">
-                                <button type="submit" class="btn btn-danger" onclick="return confirm('{{ __('messages.confirm_cleanup') }}')">
-                                    <i class="feather-trash-2 me-2"></i> {{ __('messages.execute_cleanup') }}
+                            <div class="d-flex justify-content-end mt-3">
+                                <button type="submit" class="btn btn-danger" onclick="return confirm('{{ __('messages.confirm_cleanup') ?? 'Are you sure you want to execute manual cleanup?' }}')">
+                                    <i class="feather-trash-2 me-2"></i> {{ __('messages.execute_cleanup') ?? 'Execute Manual Cleanup' }}
                                 </button>
                             </div>
                         </form>

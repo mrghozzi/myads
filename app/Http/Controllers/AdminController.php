@@ -4951,6 +4951,8 @@ class AdminController extends Controller
     {
         $stateCount = \App\Models\State::count();
         $bannerImpressionsCount = \App\Models\BannerImpression::count();
+        $smartAdImpressionsCount = \App\Models\SmartAdImpression::count();
+        $customAdEventsCount = \App\Models\CustomAdEvent::count();
         $seoMetricsCount = \App\Models\SeoDailyMetric::count();
 
         // v4.4.4: Enhanced table size reporting
@@ -4975,7 +4977,7 @@ class AdminController extends Controller
         $logFileCount = is_dir(storage_path('logs')) ? count(\Illuminate\Support\Facades\File::files(storage_path('logs'))) : 0;
 
         return view('admin::admin.database_cleanup', compact(
-            'stateCount', 'bannerImpressionsCount', 'seoMetricsCount',
+            'stateCount', 'bannerImpressionsCount', 'smartAdImpressionsCount', 'customAdEventsCount', 'seoMetricsCount',
             'tableSizes', 'retentionDays', 'autoCleanupEnabled',
             'cacheSize', 'sessionSize', 'logSize', 'logFileCount'
         ));
@@ -4986,6 +4988,8 @@ class AdminController extends Controller
         $request->validate([
             'state_days' => 'nullable|integer|min:1',
             'banner_impressions_days' => 'nullable|integer|min:1',
+            'smart_ad_impressions_days' => 'nullable|integer|min:1',
+            'custom_ad_events_days' => 'nullable|integer|min:1',
             'seo_metrics_days' => 'nullable|integer|min:1',
         ]);
 
@@ -5063,17 +5067,31 @@ class AdminController extends Controller
             $deletedBanner = \App\Models\BannerImpression::where('served_at', '<', time() - ($days * 86400))->delete();
         }
 
+        $deletedSmart = 0;
+        if ($request->filled('smart_ad_impressions_days')) {
+            $days = $request->input('smart_ad_impressions_days');
+            $deletedSmart = \App\Models\SmartAdImpression::where('created_at', '<', now()->subDays($days))->delete();
+        }
+
+        $deletedCustomEvents = 0;
+        if ($request->filled('custom_ad_events_days')) {
+            $days = $request->input('custom_ad_events_days');
+            $deletedCustomEvents = \App\Models\CustomAdEvent::where('created_at', '<', now()->subDays($days))->delete();
+        }
+
         $deletedSeo = 0;
         if ($request->filled('seo_metrics_days')) {
             $days = $request->input('seo_metrics_days');
             $deletedSeo = \App\Models\SeoDailyMetric::where('metric_date', '<', now()->subDays($days)->toDateString())->delete();
         }
 
+        $totalDeleted = $deletedState + $deletedBanner + $deletedSmart + $deletedCustomEvents + $deletedSeo;
+
         $message = __('messages.database_cleanup_success', [
             'state' => $deletedState,
             'banner' => $deletedBanner,
             'seo' => $deletedSeo
-        ]);
+        ]) ?? "Manual cleanup complete: deleted {$totalDeleted} records.";
 
         return redirect()->route('admin.database_cleanup')
             ->with('success', $message);
