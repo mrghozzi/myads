@@ -176,18 +176,105 @@
 </div>
 
 @push('head')
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sceditor@3/minified/themes/default.min.css" />
-<script src="https://cdn.jsdelivr.net/npm/sceditor@3/minified/sceditor.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sceditor@3/minified/formats/xhtml.min.js"></script>
+<link rel="stylesheet" href="{{ asset('assets/vendor/sceditor/themes/default.min.css') }}" />
+<style>
+.sceditor-container {
+    width: 100% !important;
+    min-height: 380px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    background: #ffffff;
+    border-radius: 12px;
+    overflow: hidden;
+}
+.sceditor-container iframe,
+.sceditor-container textarea {
+    flex: 1 1 auto !important;
+    min-height: 320px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+}
+.sceditor-toolbar {
+    background: #f8fafc !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+    padding: 6px 8px !important;
+    user-select: none;
+    line-height: 1 !important;
+}
+.sceditor-group {
+    background: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 6px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    margin: 2px 4px !important;
+    padding: 2px 4px !important;
+}
+.sceditor-button {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 28px !important;
+    height: 28px !important;
+    padding: 4px !important;
+    margin: 1px !important;
+    border-radius: 6px !important;
+    box-sizing: border-box !important;
+    cursor: pointer !important;
+    float: none !important;
+}
+.sceditor-button:hover {
+    background: #e2e8f0 !important;
+}
+.sceditor-button div {
+    display: block !important;
+    width: 16px !important;
+    height: 16px !important;
+    margin: 0 auto !important;
+    color: transparent !important;
+    font-size: 0 !important;
+    line-height: 0 !important;
+}
+body[data-theme="css_d"] .sceditor-container {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+}
+body[data-theme="css_d"] .sceditor-toolbar {
+    background: #0f172a !important;
+    border-bottom-color: #334155 !important;
+}
+body[data-theme="css_d"] .sceditor-group {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+}
+body[data-theme="css_d"] .sceditor-button:hover {
+    background: #334155 !important;
+}
+body[data-theme="css_d"] .sceditor-button div {
+    filter: invert(0.9) hue-rotate(180deg);
+}
+</style>
+<script src="{{ asset('assets/vendor/sceditor/sceditor.min.js') }}"></script>
+<script src="{{ asset('assets/vendor/sceditor/formats/xhtml.min.js') }}"></script>
+@if(app()->getLocale() !== 'en' && file_exists(public_path('assets/vendor/sceditor/languages/' . app()->getLocale() . '.js')))
+<script src="{{ asset('assets/vendor/sceditor/languages/' . app()->getLocale() . '.js') }}"></script>
+@endif
 @endpush
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         var textarea = document.getElementById('editor1');
-        if (textarea) {
-            sceditor.create(textarea, {
+        if (textarea && typeof sceditor !== 'undefined') {
+            if (sceditor.instance(textarea)) {
+                sceditor.instance(textarea).destroy();
+            }
+            var currentLocale = '{{ app()->getLocale() }}';
+            var opts = {
                 format: 'xhtml',
-                style: 'https://cdn.jsdelivr.net/npm/sceditor@3/minified/themes/content/default.min.css',
+                style: '{{ asset("assets/vendor/sceditor/themes/content/default.min.css") }}',
+                width: '100%',
+                height: '350px',
+                resizeEnabled: true,
                 emoticons: {
                     dropdown: {
                         @foreach(\App\Models\Emoji::limit(10)->get() as $emoji)
@@ -195,7 +282,23 @@
                         @endforeach
                     }
                 }
-            });
+            };
+
+            if (currentLocale !== 'en' && sceditor.locale && sceditor.locale[currentLocale]) {
+                opts.locale = currentLocale;
+            }
+
+            sceditor.create(textarea, opts);
+
+            var form = textarea.closest('form');
+            if (form) {
+                form.addEventListener('submit', function() {
+                    var inst = sceditor.instance(textarea);
+                    if (inst) {
+                        inst.updateOriginal();
+                    }
+                });
+            }
         }
     });
 

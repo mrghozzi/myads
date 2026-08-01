@@ -1,3 +1,10 @@
+# v5.5.1
+> **Under Active Development** — Initialized release cycle for MYADS v5.5.1.
+
+### Core & Infrastructure
+* **Feature (Groundwork Initialization):** Initialized release cycle for MYADS v5.5.1. Updated canonical version constant (`SystemVersion::CURRENT`), system documentation, and dynamic versioning.
+* **Fix (SCEditor Rich Text Editor Integration):** Resolved SCEditor initialization failures across admin pages (`/admin/pages/create`, `/admin/pages/{id}/edit`) and community forum (`/forum/create`, `/forum/{id}/edit`). Corrected invalid CDN script path (`formats/xhtml.min.js`), added defensive locale script loading (`onerror="this.remove()"`), added `DOMContentLoaded` execution wrappers, ensured form value synchronization (`inst.updateOriginal()`) on submission, and integrated dark mode CSS styling for Duralux theme (`.app-skin-dark`).
+
 # v4.5.0
 > **Major Release (Stable)** — Groundwork Initialization, Platform Infrastructure Upgrades, YouTube-Style Video Watch Page, Community Publisher & Edit Enhancements, Server Upload Limit Optimization, Enhanced Dynamic Versioning & Mobile API Architecture.
 
