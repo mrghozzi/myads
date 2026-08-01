@@ -3637,7 +3637,10 @@ return array (
   'log_files' => 'Log Files',
   'log_files_hint' => 'Remove old log files and truncate oversized logs',
   'prune_logs' => 'Clean Logs',
+  'max_log_size' => '最大日志文件大小',
   'logs_cleaned' => 'Old log files cleaned up successfully.',
+  'logs_cleaned_freed' => '日志清理完成 — 已释放 :size。',
+  'logs_cleaned_none' => '无需清理 — 所有日志文件均在配置的保留限制内(:days 天，最大 :max_size MB)。',
   'files' => 'files',
   'clear_filter' => '清除筛选',
 );

@@ -2610,6 +2610,7 @@ return [
     'file_upload_settings' => 'Paramètres de téléversement de fichiers',
     'upload_files_to_ftp' => 'Synchroniser les médias vers le serveur FTP',
     'upload_files_to_google_cloud' => 'Synchroniser les médias vers Google Cloud',
+    'max_log_size' => 'Taille maximale du fichier journal',
     'clear_filter' => 'Effacer le filtre',
 ];
 

@@ -2622,6 +2622,7 @@ return [
     'file_upload_settings' => 'Configuración de subida de archivos',
     'upload_files_to_ftp' => 'Sincronizar archivos multimedia con el servidor FTP',
     'upload_files_to_google_cloud' => 'Sincronizar archivos multimedia con Google Cloud',
+    'max_log_size' => 'Tamaño máximo de archivo de registro',
     'clear_filter' => 'Limpiar filtro',
 ];
 

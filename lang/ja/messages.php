@@ -3637,7 +3637,10 @@ return array (
   'log_files' => 'ログファイル',
   'log_files_hint' => '古いログ ファイルを削除し、サイズが大きすぎるログを切り詰めます。',
   'prune_logs' => 'クリーンログ',
+  'max_log_size' => '最大ログファイルサイズ',
   'logs_cleaned' => '古いログ ファイルは正常にクリーンアップされました。',
+  'logs_cleaned_freed' => 'ログのクリーンアップが完了しました — :size を解放しました。',
+  'logs_cleaned_none' => 'クリーンアップは不要です — すべてのログファイルは設定された保持期間内です(:days 日、最大 :max_size MB)。',
   'files' => 'ファイル',
   'clear_filter' => 'フィルターをクリア',
 );

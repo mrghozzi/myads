@@ -3637,7 +3637,10 @@ return array (
   'log_files' => '紀錄檔案',
   'log_files_hint' => '刪除舊日誌檔案並截斷過大的日誌',
   'prune_logs' => '清理日誌',
+  'max_log_size' => '最大日誌檔案大小',
   'logs_cleaned' => '舊日誌檔案已成功清理。',
+  'logs_cleaned_freed' => '日誌清理完成 — 已釋放 :size。',
+  'logs_cleaned_none' => '無需清理 — 所有日誌檔案均在設定的保留限制內(:days 天，上限 :max_size MB)。',
   'files' => '文件',
   'clear_filter' => '清除篩選',
 );

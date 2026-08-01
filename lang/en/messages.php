@@ -3964,7 +3964,10 @@ return [
     'log_files' => 'Log Files',
     'log_files_hint' => 'Remove old log files and truncate oversized logs',
     'prune_logs' => 'Clean Logs',
+    'max_log_size' => 'Max Log File Size',
     'logs_cleaned' => 'Old log files cleaned up successfully.',
+    'logs_cleaned_freed' => 'Log cleanup complete — freed :size.',
+    'logs_cleaned_none' => 'No cleanup needed — all log files are within the configured retention limits (:days days, :max_size MB max).',
     'files' => 'files',
 
     // Media Manager Overhaul

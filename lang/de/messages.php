@@ -2599,6 +2599,7 @@ return [
     'pressure_no_issues_title' => 'No clear pressure indicators',
     'pressure_no_issues_desc' => 'The current settings look healthy for the known pressure sources.',
     'pressure_no_issues_action' => 'Continue monitoring after updates or during high-traffic periods.',
+    'max_log_size' => 'Maximale Log-Dateigröße',
     'clear_filter' => 'Filter zurücksetzen',
 ];
 

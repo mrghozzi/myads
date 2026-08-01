@@ -5030,10 +5030,25 @@ class AdminController extends Controller
 
         // v4.4.7: Handle log cleanup
         if ($request->has('prune_logs')) {
+            $sizeBeforeBytes = $this->getDirectorySizeBytes(storage_path('logs'), 3000);
             \Illuminate\Support\Facades\Artisan::call('myads:log-cleanup');
+            $sizeAfterBytes = $this->getDirectorySizeBytes(storage_path('logs'), 3000);
+
+            $freedMB = round(max(0, $sizeBeforeBytes - $sizeAfterBytes) / 1024 / 1024, 2);
+
+            if ($freedMB > 0) {
+                $message = __('messages.logs_cleaned_freed', ['size' => $freedMB . ' MB'])
+                    ?? "Log cleanup complete — freed {$freedMB} MB.";
+            } else {
+                $retentions = \App\Services\DatabaseMaintenanceService::retentionDays();
+                $message = __('messages.logs_cleaned_none', [
+                    'days' => $retentions['logs'] ?? 7,
+                    'max_size' => $retentions['max_log_size_mb'] ?? 10,
+                ]) ?? 'No cleanup needed — all log files are within the configured retention limits.';
+            }
 
             return redirect()->route('admin.database_cleanup')
-                ->with('success', __('messages.logs_cleaned') ?? 'Old log files cleaned up.');
+                ->with('success', $message);
         }
 
         $deletedState = 0;
