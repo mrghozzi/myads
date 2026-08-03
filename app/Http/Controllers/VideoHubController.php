@@ -254,6 +254,18 @@ class VideoHubController extends Controller
     }
 
     /**
+     * Extract 11-char YouTube Video ID from text or URL if present.
+     */
+    public static function extractYoutubeId(?string $text): ?string
+    {
+        if (empty($text)) return null;
+        if (preg_match('/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/', $text, $matches)) {
+            return $matches[1];
+        }
+        return null;
+    }
+
+    /**
      * Resolve clean title for video.
      */
     public static function resolveVideoTitle($status): string

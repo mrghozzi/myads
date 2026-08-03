@@ -600,73 +600,67 @@ function initVideoHoverPreviews() {
         const stage = card.querySelector('.yt-thumb-wrapper') || card.querySelector('.ratio') || card;
         const imgEl = stage.querySelector('img');
         const overlayEl = stage.querySelector('.yt-thumb-overlay');
-        let existingVideo = stage.querySelector('video');
-        
-        let rawUrl = card.dataset.videoUrl || stage.dataset.videoUrl || (existingVideo ? existingVideo.getAttribute('src') : null);
+        let videoEl = stage.querySelector('video');
+        const ytId = stage.dataset.ytId || card.dataset.ytId;
+        const rawUrl = stage.dataset.videoUrl || card.dataset.videoUrl || (videoEl ? videoEl.getAttribute('src') : null);
 
-        if (!rawUrl && !existingVideo) return;
-
-        const cleanUrl = rawUrl ? rawUrl.split('#')[0] : '';
-        const ytMatch = cleanUrl.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
-        const youtubeId = ytMatch ? ytMatch[1] : null;
+        if (!rawUrl && !videoEl && !ytId) return;
 
         let hoverTimer = null;
-        let previewEl = null;
+        let iframeEl = null;
 
         card.addEventListener('mouseenter', function() {
             hoverTimer = setTimeout(() => {
-                if (youtubeId) {
+                if (ytId) {
                     if (!stage.querySelector('.yt-hover-iframe')) {
-                        previewEl = document.createElement('iframe');
-                        previewEl.src = `https://www.youtube.com/embed/${youtubeId}?autoplay=1&mute=1&controls=0&modestbranding=1&loop=1&playlist=${youtubeId}&enablejsapi=1`;
-                        previewEl.className = 'yt-hover-iframe position-absolute top-0 start-0 w-100 h-100 border-0';
-                        previewEl.style.zIndex = '5';
-                        previewEl.style.opacity = '0';
-                        previewEl.style.transition = 'opacity 0.25s ease';
-                        previewEl.style.pointerEvents = 'none';
-                        previewEl.onload = function() {
+                        iframeEl = document.createElement('iframe');
+                        iframeEl.src = `https://www.youtube.com/embed/${ytId}?autoplay=1&mute=1&controls=0&modestbranding=1&loop=1&playlist=${ytId}&enablejsapi=1`;
+                        iframeEl.className = 'yt-hover-iframe position-absolute top-0 start-0 w-100 h-100 border-0 pointer-events-none';
+                        iframeEl.style.zIndex = '4';
+                        iframeEl.style.opacity = '0';
+                        iframeEl.style.transition = 'opacity 0.25s ease';
+                        iframeEl.onload = function() {
                             if (imgEl) imgEl.style.opacity = '0';
                             if (overlayEl) overlayEl.style.opacity = '0';
-                            previewEl.style.opacity = '1';
+                            iframeEl.style.opacity = '1';
                         };
-                        stage.appendChild(previewEl);
+                        stage.appendChild(iframeEl);
                     } else {
-                        previewEl = stage.querySelector('.yt-hover-iframe');
+                        iframeEl = stage.querySelector('.yt-hover-iframe');
                         if (imgEl) imgEl.style.opacity = '0';
                         if (overlayEl) overlayEl.style.opacity = '0';
-                        previewEl.style.opacity = '1';
+                        iframeEl.style.opacity = '1';
                     }
                 } else {
-                    if (existingVideo) {
-                        previewEl = existingVideo;
-                    } else if (cleanUrl && !stage.querySelector('.yt-hover-preview-video')) {
-                        previewEl = document.createElement('video');
-                        previewEl.src = cleanUrl + '#t=0.1';
-                        previewEl.muted = true;
-                        previewEl.loop = true;
-                        previewEl.playsInline = true;
-                        previewEl.setAttribute('muted', '');
-                        previewEl.setAttribute('playsinline', '');
-                        previewEl.className = 'yt-hover-preview-video position-absolute top-0 start-0 w-100 h-100 object-fit-cover';
-                        previewEl.style.zIndex = '5';
-                        previewEl.style.opacity = '0';
-                        previewEl.style.transition = 'opacity 0.25s ease';
-                        previewEl.style.pointerEvents = 'none';
-                        stage.appendChild(previewEl);
-                    } else {
-                        previewEl = stage.querySelector('.yt-hover-preview-video');
+                    if (!videoEl && rawUrl) {
+                        const cleanUrl = rawUrl.split('#')[0];
+                        videoEl = document.createElement('video');
+                        videoEl.src = cleanUrl + '#t=0.1';
+                        videoEl.muted = true;
+                        videoEl.loop = true;
+                        videoEl.playsInline = true;
+                        videoEl.setAttribute('muted', '');
+                        videoEl.setAttribute('playsinline', '');
+                        videoEl.className = 'yt-preview-video position-absolute top-0 start-0 w-100 h-100 object-fit-cover pointer-events-none';
+                        videoEl.style.zIndex = '4';
+                        videoEl.style.opacity = '0';
+                        videoEl.style.transition = 'opacity 0.25s ease';
+                        stage.appendChild(videoEl);
                     }
 
-                    if (previewEl && previewEl.tagName === 'VIDEO') {
-                        previewEl.muted = true;
-                        try { previewEl.currentTime = 0.1; } catch(e) {}
-                        const playPromise = previewEl.play();
+                    if (videoEl) {
+                        videoEl.muted = true;
+                        try { videoEl.currentTime = 0.1; } catch(e) {}
+                        const playPromise = videoEl.play();
                         if (playPromise !== undefined) {
                             playPromise.then(() => {
                                 if (imgEl) imgEl.style.opacity = '0';
                                 if (overlayEl) overlayEl.style.opacity = '0';
-                                previewEl.style.opacity = '1';
-                            }).catch(() => {});
+                                videoEl.style.opacity = '1';
+                            }).catch(() => {
+                                if (imgEl) imgEl.style.opacity = '1';
+                                if (overlayEl) overlayEl.style.opacity = '';
+                            });
                         }
                     }
                 }
@@ -682,18 +676,13 @@ function initVideoHoverPreviews() {
             if (imgEl) imgEl.style.opacity = '1';
             if (overlayEl) overlayEl.style.opacity = '';
 
-            if (youtubeId) {
+            if (ytId) {
                 const iframe = stage.querySelector('.yt-hover-iframe');
                 if (iframe) iframe.remove();
-            } else {
-                const vid = previewEl || stage.querySelector('video');
-                if (vid && vid.tagName === 'VIDEO') {
-                    vid.pause();
-                    try { vid.currentTime = 0.5; } catch(e) {}
-                    if (imgEl) {
-                        vid.style.opacity = '0';
-                    }
-                }
+            } else if (videoEl) {
+                videoEl.pause();
+                try { videoEl.currentTime = 0.5; } catch(e) {}
+                videoEl.style.opacity = '0';
             }
         });
     });

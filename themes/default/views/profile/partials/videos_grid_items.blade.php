@@ -11,20 +11,24 @@
         $reactionsCount = (int) ($status->reactions_count ?? 0);
         $timeAgo = $status->date_formatted ?: ($status->created_at ? $status->created_at->diffForHumans() : '');
         $hasCustomThumb = $thumbUrl && !str_contains($thumbUrl, 'video-placeholder');
+        $ytId = \App\Http\Controllers\VideoHubController::extractYoutubeId($videoUrl);
     @endphp
 
     <div class="col">
         <div class="profile-yt-video-card rounded-4 overflow-hidden shadow-sm bg-surface h-100 border border-translucent position-relative" data-id="{{ $status->id }}">
             <a href="{{ $watchUrl }}" class="yt-thumb-stage d-block text-decoration-none">
-                <div class="yt-thumb-wrapper ratio ratio-16x9 position-relative overflow-hidden bg-dark rounded-top-4" @if($videoUrl) data-video-url="{{ $videoUrl }}" @endif>
+                <div class="yt-thumb-wrapper ratio ratio-16x9 position-relative overflow-hidden bg-dark rounded-top-4" @if($videoUrl) data-video-url="{{ $videoUrl }}" @endif @if($ytId) data-yt-id="{{ $ytId }}" @endif>
                     @if($hasCustomThumb)
-                        <img src="{{ $thumbUrl }}" alt="{{ $videoTitle }}" class="yt-thumb-img img-fluid w-100 h-100 object-fit-cover lazyload" onError="this.onerror=null;this.src='{{ theme_asset('img/video-placeholder.svg') }}';">
-                    @elseif($videoUrl)
-                        <video src="{{ $videoUrl }}#t=0.5" preload="metadata" muted playsinline class="yt-thumb-img img-fluid w-100 h-100 object-fit-cover pointer-events-none"></video>
+                        <img src="{{ $thumbUrl }}" alt="{{ $videoTitle }}" class="yt-thumb-img img-fluid w-100 h-100 object-fit-cover lazyload" style="transition: opacity 0.25s ease;" onError="this.onerror=null;this.src='{{ theme_asset('img/video-placeholder.svg') }}';">
                     @else
-                        <img src="{{ theme_asset('img/video-placeholder.svg') }}" alt="{{ $videoTitle }}" class="yt-thumb-img img-fluid w-100 h-100 object-fit-cover">
+                        <img src="{{ theme_asset('img/video-placeholder.svg') }}" alt="{{ $videoTitle }}" class="yt-thumb-img img-fluid w-100 h-100 object-fit-cover" style="transition: opacity 0.25s ease;">
                     @endif
-                    <div class="yt-thumb-overlay position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center">
+
+                    @if($videoUrl && !$ytId)
+                        <video src="{{ $videoUrl }}#t=0.5" preload="metadata" muted playsinline loop class="yt-preview-video position-absolute top-0 start-0 w-100 h-100 object-fit-cover pointer-events-none" style="opacity: 0; z-index: 2; transition: opacity 0.25s ease;"></video>
+                    @endif
+
+                    <div class="yt-thumb-overlay position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style="z-index: 3; transition: opacity 0.25s ease;">
                         <span class="yt-play-btn-circle d-flex align-items-center justify-content-center rounded-circle">
                             <i class="fa-solid fa-play text-white fs-6 ms-1"></i>
                         </span>

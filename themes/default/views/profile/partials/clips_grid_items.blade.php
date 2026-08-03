@@ -8,17 +8,20 @@
         $clipTitle = \Illuminate\Support\Str::limit($clip->resolved_title ?: \App\Http\Controllers\VideoHubController::resolveVideoTitle($clip), 40);
         $clipViews = $clipTopic ? (int) ($clipTopic->vu ?? 0) : (int) ($clip->views_count ?? 0);
         $hasClipCustomThumb = $clipThumb && !str_contains($clipThumb, 'video-placeholder');
+        $clipYtId = \App\Http\Controllers\VideoHubController::extractYoutubeId($clipVideoUrl);
     @endphp
 
     <div class="col">
-        <div class="yt-shorts-card profile-yt-shorts-card rounded-4 position-relative overflow-hidden shadow-xs h-100 bg-dark" style="aspect-ratio: 9/16;" @if($clipVideoUrl) data-video-url="{{ $clipVideoUrl }}" @endif>
+        <div class="yt-shorts-card profile-yt-shorts-card rounded-4 position-relative overflow-hidden shadow-xs h-100 bg-dark" style="aspect-ratio: 9/16;" @if($clipVideoUrl) data-video-url="{{ $clipVideoUrl }}" @endif @if($clipYtId) data-yt-id="{{ $clipYtId }}" @endif>
             <a href="{{ $clipUrl }}" class="d-block w-100 h-100 text-decoration-none">
                 @if($hasClipCustomThumb)
-                    <img src="{{ $clipThumb }}" alt="{{ $clipTitle }}" class="w-100 h-100 object-fit-cover opacity-90 lazyload" onError="this.onerror=null;this.src='{{ theme_asset('img/video-placeholder.svg') }}';">
-                @elseif($clipVideoUrl)
-                    <video src="{{ $clipVideoUrl }}#t=0.5" preload="metadata" muted playsinline class="w-100 h-100 object-fit-cover opacity-90 pointer-events-none"></video>
+                    <img src="{{ $clipThumb }}" alt="{{ $clipTitle }}" class="w-100 h-100 object-fit-cover opacity-90 lazyload" style="transition: opacity 0.25s ease;" onError="this.onerror=null;this.src='{{ theme_asset('img/video-placeholder.svg') }}';">
                 @else
-                    <img src="{{ theme_asset('img/video-placeholder.svg') }}" alt="{{ $clipTitle }}" class="w-100 h-100 object-fit-cover opacity-90">
+                    <img src="{{ theme_asset('img/video-placeholder.svg') }}" alt="{{ $clipTitle }}" class="w-100 h-100 object-fit-cover opacity-90" style="transition: opacity 0.25s ease;">
+                @endif
+
+                @if($clipVideoUrl && !$clipYtId)
+                    <video src="{{ $clipVideoUrl }}#t=0.5" preload="metadata" muted playsinline loop class="yt-preview-video position-absolute top-0 start-0 w-100 h-100 object-fit-cover pointer-events-none" style="opacity: 0; z-index: 2; transition: opacity 0.25s ease;"></video>
                 @endif
                 
                 <!-- Dark Gradient Scrim -->
