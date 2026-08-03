@@ -3,6 +3,7 @@
 
 ### Core & Infrastructure
 * **Feature (Groundwork Initialization):** Initialized release cycle for MYADS v5.5.1. Updated canonical version constant (`SystemVersion::CURRENT`), system documentation, and dynamic versioning.
+* **Security (PostCSS Security Vulnerability Patch — GHSA-r28c-9q8g-f849):** Resolved high-severity path traversal vulnerability in transitive dependency `postcss` (`<=8.5.17`) introduced via `vite`. Added `"postcss": "^8.5.18"` to package overrides in `package.json` and updated `package-lock.json`, eliminating security alerts.
 * **Fix (SCEditor Rich Text Editor Integration):** Resolved SCEditor initialization failures across admin pages (`/admin/pages/create`, `/admin/pages/{id}/edit`) and community forum (`/forum/create`, `/forum/{id}/edit`). Corrected invalid CDN script path (`formats/xhtml.min.js`), added defensive locale script loading (`onerror="this.remove()"`), added `DOMContentLoaded` execution wrappers, ensured form value synchronization (`inst.updateOriginal()`) on submission, and integrated dark mode CSS styling for Duralux theme (`.app-skin-dark`).
 
 ### Bug Fixes
