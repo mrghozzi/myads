@@ -176,7 +176,21 @@
 </div>
 
 @push('head')
-<link rel="stylesheet" href="{{ asset('assets/vendor/sceditor/themes/default.min.css') }}" />
+@php
+    $sceditorCss = file_exists(public_path('assets/vendor/sceditor/themes/default.min.css'))
+        ? asset('assets/vendor/sceditor/themes/default.min.css')
+        : asset('public/assets/vendor/sceditor/themes/default.min.css');
+    $sceditorJs = file_exists(public_path('assets/vendor/sceditor/sceditor.min.js'))
+        ? asset('assets/vendor/sceditor/sceditor.min.js')
+        : asset('public/assets/vendor/sceditor/sceditor.min.js');
+    $sceditorXhtml = file_exists(public_path('assets/vendor/sceditor/formats/xhtml.min.js'))
+        ? asset('assets/vendor/sceditor/formats/xhtml.min.js')
+        : asset('public/assets/vendor/sceditor/formats/xhtml.min.js');
+    $sceditorImg = file_exists(public_path('assets/vendor/sceditor/themes/famfamfam.png'))
+        ? asset('assets/vendor/sceditor/themes/famfamfam.png')
+        : asset('public/assets/vendor/sceditor/themes/famfamfam.png');
+@endphp
+<link rel="stylesheet" href="{{ $sceditorCss }}" />
 <style>
 .sceditor-container {
     width: 100% !important;
@@ -200,6 +214,10 @@
     padding: 6px 8px !important;
     user-select: none;
     line-height: 1 !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 4px !important;
+    align-items: center !important;
 }
 .sceditor-group {
     background: #ffffff !important;
@@ -207,8 +225,13 @@
     border-radius: 6px !important;
     display: inline-flex !important;
     align-items: center !important;
-    margin: 2px 4px !important;
-    padding: 2px 4px !important;
+    margin: 2px 2px !important;
+    padding: 2px 3px !important;
+}
+.sceditor-container *,
+.sceditor-container *::before,
+.sceditor-container *::after {
+    box-sizing: content-box !important;
 }
 .sceditor-button {
     display: inline-flex !important;
@@ -216,15 +239,17 @@
     justify-content: center !important;
     width: 28px !important;
     height: 28px !important;
-    padding: 4px !important;
+    padding: 2px !important;
     margin: 1px !important;
     border-radius: 6px !important;
     box-sizing: border-box !important;
     cursor: pointer !important;
     float: none !important;
+    background: transparent !important;
+    border: none !important;
 }
 .sceditor-button:hover {
-    background: #e2e8f0 !important;
+    background-color: #e2e8f0 !important;
 }
 .sceditor-button div {
     display: block !important;
@@ -234,6 +259,9 @@
     color: transparent !important;
     font-size: 0 !important;
     line-height: 0 !important;
+    overflow: hidden !important;
+    background-image: url('{{ $sceditorImg }}') !important;
+    background-repeat: no-repeat !important;
 }
 body[data-theme="css_d"] .sceditor-container {
     background: #1e293b !important;
@@ -248,16 +276,18 @@ body[data-theme="css_d"] .sceditor-group {
     border-color: #334155 !important;
 }
 body[data-theme="css_d"] .sceditor-button:hover {
-    background: #334155 !important;
+    background-color: #334155 !important;
 }
 body[data-theme="css_d"] .sceditor-button div {
     filter: invert(0.9) hue-rotate(180deg);
 }
 </style>
-<script src="{{ asset('assets/vendor/sceditor/sceditor.min.js') }}"></script>
-<script src="{{ asset('assets/vendor/sceditor/formats/xhtml.min.js') }}"></script>
+<script src="{{ $sceditorJs }}"></script>
+<script src="{{ $sceditorXhtml }}"></script>
 @if(app()->getLocale() !== 'en' && file_exists(public_path('assets/vendor/sceditor/languages/' . app()->getLocale() . '.js')))
 <script src="{{ asset('assets/vendor/sceditor/languages/' . app()->getLocale() . '.js') }}"></script>
+@elseif(app()->getLocale() !== 'en' && file_exists(public_path('public/assets/vendor/sceditor/languages/' . app()->getLocale() . '.js')))
+<script src="{{ asset('public/assets/vendor/sceditor/languages/' . app()->getLocale() . '.js') }}"></script>
 @endif
 @endpush
 
