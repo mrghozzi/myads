@@ -296,7 +296,7 @@
                 <div class="sd-tip-card" id="admin-tip-container">
                     <div class="sd-tip-header">
                         <span class="sd-tip-category-badge" id="tip-category-badge" style="background: {{ $currentTip['badge_bg'] }};">
-                            <i class="{{ $currentTip['icon'] }}"></i> <span id="tip-category-text">{{ $currentTip['category'] }}</span>
+                            <i class="{{ $currentTip['icon'] }}" id="tip-category-icon"></i> <span id="tip-category-text">{{ $currentTip['category'] }}</span>
                         </span>
                         <button type="button" class="sd-tip-rotator-btn" id="btn-rotate-tip" title="{{ __('messages.another_tip') ?? 'Another Tip' }}">
                             <i class="feather-refresh-cw"></i> <span>{{ __('messages.another_tip') ?? 'Another Tip' }}</span>
@@ -755,6 +755,8 @@ document.addEventListener('DOMContentLoaded', function() {
             tipContainer.style.opacity = '0.4';
             setTimeout(function() {
                 document.getElementById('tip-category-badge').style.background = tip.badge_bg;
+                var catIcon = document.getElementById('tip-category-icon');
+                if (catIcon) catIcon.className = tip.icon;
                 document.getElementById('tip-category-text').innerText = tip.category;
                 document.getElementById('tip-title').innerText = '💡 ' + tip.title;
                 document.getElementById('tip-desc').innerText = tip.tip;
