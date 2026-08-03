@@ -205,8 +205,12 @@ class VideoHubController extends Controller
         $topic = $status->forumTopic ?? ($status->related_content instanceof \App\Models\ForumTopic ? $status->related_content : null);
 
         if ($topic) {
-            if ($topic->relationLoaded('attachments') && $topic->attachments && $topic->attachments->isNotEmpty()) {
-                $videoAtt = $topic->attachments->first(function ($att) {
+            $attachments = $topic->relationLoaded('attachments')
+                ? $topic->attachments
+                : (method_exists($topic, 'attachments') ? $topic->attachments()->get() : collect());
+
+            if ($attachments && $attachments->isNotEmpty()) {
+                $videoAtt = $attachments->first(function ($att) {
                     $mime = strtolower((string) ($att->mime_type ?? ''));
                     $ext = strtolower(pathinfo((string) ($att->file_path ?? ''), PATHINFO_EXTENSION));
                     return str_starts_with($mime, 'video/') || in_array($ext, ['mp4', 'webm', 'mov', 'mkv', 'avi', 'ogg'], true);
@@ -216,21 +220,29 @@ class VideoHubController extends Controller
                 }
             }
 
-            if (!$topic->relationLoaded('attachments') && method_exists($topic, 'attachments')) {
-                $videoAtt = $topic->attachments()->get()->first(function ($att) {
-                    $mime = strtolower((string) ($att->mime_type ?? ''));
-                    $ext = strtolower(pathinfo((string) ($att->file_path ?? ''), PATHINFO_EXTENSION));
-                    return str_starts_with($mime, 'video/') || in_array($ext, ['mp4', 'webm', 'mov', 'mkv', 'avi', 'ogg'], true);
-                });
-                if ($videoAtt && !empty($videoAtt->file_path)) {
-                    return asset($videoAtt->file_path);
-                }
+            $topicText = (string) ($topic->txt ?? '');
+            if ($topicText !== '' && preg_match('/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/', $topicText, $matches)) {
+                return 'https://www.youtube.com/watch?v=' . $matches[1];
             }
         }
 
         if (!empty($status->video_url)) {
             $url = (string) $status->video_url;
             return (str_starts_with($url, 'http://') || str_starts_with($url, 'https://')) ? $url : asset($url);
+        }
+
+        $linkRecord = $status->linkPreviewRecord;
+        if ($linkRecord) {
+            $linkUrl = (string) ($linkRecord->url ?? '');
+            if ($linkUrl !== '') {
+                if (preg_match('/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/', $linkUrl, $matches)) {
+                    return 'https://www.youtube.com/watch?v=' . $matches[1];
+                }
+                $ext = strtolower(pathinfo(parse_url($linkUrl, PHP_URL_PATH) ?? '', PATHINFO_EXTENSION));
+                if (in_array($ext, ['mp4', 'webm', 'mov', 'mkv', 'avi', 'ogg'], true)) {
+                    return $linkUrl;
+                }
+            }
         }
 
         return null;

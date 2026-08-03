@@ -363,50 +363,74 @@ html[dir="rtl"] .dir-rtl-icon {
 
 <script>
 function initVideoHoverPreviews() {
-    const selector = '.yt-shorts-card, .yt-spotlight-card .ratio';
+    const selector = '.yt-thumb-wrapper, .yt-shorts-card, .profile-yt-video-card .yt-thumb-wrapper, .profile-yt-shorts-card, .yt-spotlight-card .ratio';
     const cards = document.querySelectorAll(selector);
     
     cards.forEach(card => {
         if (card.dataset.hoverPreviewBound === 'true') return;
         card.dataset.hoverPreviewBound = 'true';
 
-        let videoEl = card.querySelector('video');
-        const videoUrl = card.dataset.videoUrl || (videoEl ? (videoEl.getAttribute('src') || '').split('#')[0] : null);
+        let existingVideo = card.querySelector('video');
+        let rawUrl = card.dataset.videoUrl || (existingVideo ? existingVideo.getAttribute('src') : null);
 
-        if (!videoUrl && !videoEl) return;
+        if (!rawUrl && !existingVideo) return;
+
+        const cleanUrl = rawUrl ? rawUrl.split('#')[0] : '';
+        const ytMatch = cleanUrl.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
+        const youtubeId = ytMatch ? ytMatch[1] : null;
 
         let hoverTimer = null;
+        let previewEl = null;
 
         card.addEventListener('mouseenter', function() {
             hoverTimer = setTimeout(() => {
-                if (!videoEl && videoUrl) {
-                    const cleanUrl = videoUrl.split('#')[0];
-                    videoEl = document.createElement('video');
-                    videoEl.src = cleanUrl + '#t=0.1';
-                    videoEl.muted = true;
-                    videoEl.loop = true;
-                    videoEl.playsInline = true;
-                    videoEl.setAttribute('muted', '');
-                    videoEl.setAttribute('playsinline', '');
-                    videoEl.className = 'yt-hover-preview-video position-absolute top-0 start-0 w-100 h-100 object-fit-cover';
-                    videoEl.style.zIndex = '2';
-                    videoEl.style.opacity = '0';
-                    videoEl.style.transition = 'opacity 0.3s ease';
-                    videoEl.style.pointerEvents = 'none';
-                    card.appendChild(videoEl);
-                }
+                if (youtubeId) {
+                    if (!card.querySelector('.yt-hover-iframe')) {
+                        previewEl = document.createElement('iframe');
+                        previewEl.src = `https://www.youtube.com/embed/${youtubeId}?autoplay=1&mute=1&controls=0&modestbranding=1&loop=1&playlist=${youtubeId}&enablejsapi=1`;
+                        previewEl.className = 'yt-hover-iframe position-absolute top-0 start-0 w-100 h-100 border-0';
+                        previewEl.style.zIndex = '3';
+                        previewEl.style.opacity = '0';
+                        previewEl.style.transition = 'opacity 0.3s ease';
+                        previewEl.style.pointerEvents = 'none';
+                        previewEl.onload = function() {
+                            previewEl.style.opacity = '1';
+                        };
+                        card.appendChild(previewEl);
+                    } else {
+                        previewEl = card.querySelector('.yt-hover-iframe');
+                        previewEl.style.opacity = '1';
+                    }
+                } else {
+                    if (existingVideo) {
+                        previewEl = existingVideo;
+                    } else if (cleanUrl && !card.querySelector('.yt-hover-preview-video')) {
+                        previewEl = document.createElement('video');
+                        previewEl.src = cleanUrl + '#t=0.1';
+                        previewEl.muted = true;
+                        previewEl.loop = true;
+                        previewEl.playsInline = true;
+                        previewEl.setAttribute('muted', '');
+                        previewEl.setAttribute('playsinline', '');
+                        previewEl.className = 'yt-hover-preview-video position-absolute top-0 start-0 w-100 h-100 object-fit-cover';
+                        previewEl.style.zIndex = '3';
+                        previewEl.style.opacity = '0';
+                        previewEl.style.transition = 'opacity 0.3s ease';
+                        previewEl.style.pointerEvents = 'none';
+                        card.appendChild(previewEl);
+                    } else {
+                        previewEl = card.querySelector('.yt-hover-preview-video');
+                    }
 
-                if (videoEl) {
-                    videoEl.muted = true;
-                    try {
-                        videoEl.currentTime = 0.1;
-                    } catch(e) {}
-                    
-                    const playPromise = videoEl.play();
-                    if (playPromise !== undefined) {
-                        playPromise.then(() => {
-                            videoEl.style.opacity = '1';
-                        }).catch(() => {});
+                    if (previewEl && previewEl.tagName === 'VIDEO') {
+                        previewEl.muted = true;
+                        try { previewEl.currentTime = 0.1; } catch(e) {}
+                        const playPromise = previewEl.play();
+                        if (playPromise !== undefined) {
+                            playPromise.then(() => {
+                                previewEl.style.opacity = '1';
+                            }).catch(() => {});
+                        }
                     }
                 }
             }, 180);
@@ -417,12 +441,18 @@ function initVideoHoverPreviews() {
                 clearTimeout(hoverTimer);
                 hoverTimer = null;
             }
-            if (videoEl) {
-                videoEl.pause();
-                try {
-                    videoEl.currentTime = 0.5;
-                } catch(e) {}
-                videoEl.style.opacity = '0';
+            if (youtubeId) {
+                const iframe = card.querySelector('.yt-hover-iframe');
+                if (iframe) iframe.remove();
+            } else {
+                const vid = previewEl || card.querySelector('video');
+                if (vid && vid.tagName === 'VIDEO') {
+                    vid.pause();
+                    try { vid.currentTime = 0.5; } catch(e) {}
+                    if (card.querySelector('img')) {
+                        vid.style.opacity = '0';
+                    }
+                }
             }
         });
     });
