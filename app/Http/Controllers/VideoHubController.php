@@ -39,27 +39,26 @@ class VideoHubController extends Controller
         // Filter type handling
         if ($filter === 'clips') {
             $videosQuery->where('s_type', 14);
-        } elseif ($filter === 'videos') {
-            $videosQuery->where('s_type', 10);
         } else {
-            // 'all', 'trending', 'latest' -> Include Video posts (10) and Clips (14) or topics with video attachments/embeds
-            $videosQuery->where(function ($q) {
-                $q->whereIn('s_type', [10, 14])
-                  ->orWhereHas('forumTopic', function ($ft) {
-                      $ft->whereHas('attachments', function ($att) {
-                          $att->where('mime_type', 'like', 'video/%')
-                              ->orWhere('original_name', 'like', '%.mp4')
-                              ->orWhere('original_name', 'like', '%.webm')
-                              ->orWhere('original_name', 'like', '%.mov')
-                              ->orWhere('original_name', 'like', '%.mkv');
+            // 'all', 'videos', 'trending', 'latest' -> Exclude Clips (s_type = 14) from main video grid
+            $videosQuery->where('s_type', '!=', 14)
+                ->where(function ($q) {
+                    $q->where('s_type', 10)
+                      ->orWhereHas('forumTopic', function ($ft) {
+                          $ft->whereHas('attachments', function ($att) {
+                              $att->where('mime_type', 'like', 'video/%')
+                                  ->orWhere('original_name', 'like', '%.mp4')
+                                  ->orWhere('original_name', 'like', '%.webm')
+                                  ->orWhere('original_name', 'like', '%.mov')
+                                  ->orWhere('original_name', 'like', '%.mkv');
+                          });
+                      })
+                      ->orWhereHas('linkPreviewRecord', function ($lp) {
+                          $lp->where('url', 'like', '%youtube.com%')
+                             ->orWhere('url', 'like', '%youtu.be%')
+                             ->orWhere('url', 'like', '%vimeo.com%');
                       });
-                  })
-                  ->orWhereHas('linkPreviewRecord', function ($lp) {
-                      $lp->where('url', 'like', '%youtube.com%')
-                         ->orWhere('url', 'like', '%youtu.be%')
-                         ->orWhere('url', 'like', '%vimeo.com%');
-                  });
-            });
+                });
         }
 
         // Search filtering
