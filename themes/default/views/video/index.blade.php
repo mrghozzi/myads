@@ -103,16 +103,24 @@
                         $clipUser = $clip->user;
                         $clipUrl = route('clips.index') . '#' . $clip->id;
                         
-                        // Resolved Thumbnail & Title
+                        // Resolved Thumbnail & Title & Video URL
                         $clipThumb = $clip->resolved_thumbnail ?: \App\Http\Controllers\VideoHubController::resolveVideoThumbnailUrl($clip);
+                        $clipVideoUrl = $clip->resolved_video_url ?: \App\Http\Controllers\VideoHubController::resolveVideoUrl($clip);
                         $clipTitle = \Illuminate\Support\Str::limit($clip->resolved_title ?: \App\Http\Controllers\VideoHubController::resolveVideoTitle($clip), 40);
                         $clipViews = $clipTopic ? (int) ($clipTopic->vu ?? 0) : (int) ($clip->views_count ?? 0);
+                        $hasClipCustomThumb = $clipThumb && !str_contains($clipThumb, 'video-placeholder');
                     @endphp
 
                     <div class="col">
                         <div class="yt-shorts-card rounded-4 position-relative overflow-hidden shadow-xs h-100 bg-dark" style="aspect-ratio: 9/16;">
                             <a href="{{ $clipUrl }}" class="d-block w-100 h-100 text-decoration-none">
-                                <img src="{{ $clipThumb }}" alt="{{ $clipTitle }}" class="w-100 h-100 object-fit-cover opacity-90 lazyload" onError="this.onerror=null;this.src='{{ theme_asset('img/avatar.jpg') }}';">
+                                @if($hasClipCustomThumb)
+                                    <img src="{{ $clipThumb }}" alt="{{ $clipTitle }}" class="w-100 h-100 object-fit-cover opacity-90 lazyload" onError="this.onerror=null;this.src='{{ theme_asset('img/video-placeholder.svg') }}';">
+                                @elseif($clipVideoUrl)
+                                    <video src="{{ $clipVideoUrl }}#t=0.5" preload="metadata" muted playsinline class="w-100 h-100 object-fit-cover opacity-90 pointer-events-none"></video>
+                                @else
+                                    <img src="{{ theme_asset('img/video-placeholder.svg') }}" alt="{{ $clipTitle }}" class="w-100 h-100 object-fit-cover opacity-90">
+                                @endif
                                 
                                 <!-- Dark Gradient Scrim -->
                                 <div class="position-absolute top-0 start-0 w-100 h-100 d-flex flex-column justify-content-between p-3" style="background: linear-gradient(180deg, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.1) 40%, rgba(0,0,0,0.85) 100%);">
@@ -160,17 +168,25 @@
             $spUser = $spotlightVideo->user;
             $spWatchUrl = $spTopic ? route('forum.topic', $spTopic->id) : url('/portal');
             
-            // Resolved Thumbnail & Title
+            // Resolved Thumbnail & Title & Video URL
             $spThumb = $spotlightVideo->resolved_thumbnail ?: \App\Http\Controllers\VideoHubController::resolveVideoThumbnailUrl($spotlightVideo);
+            $spVideoUrl = $spotlightVideo->resolved_video_url ?: \App\Http\Controllers\VideoHubController::resolveVideoUrl($spotlightVideo);
             $spTitle = $spotlightVideo->resolved_title ?: \App\Http\Controllers\VideoHubController::resolveVideoTitle($spotlightVideo);
             $spViews = $spTopic ? (int) ($spTopic->vu ?? 0) : (int) ($spotlightVideo->views_count ?? 0);
+            $hasSpCustomThumb = $spThumb && !str_contains($spThumb, 'video-placeholder');
         @endphp
 
         <div class="yt-spotlight-card rounded-4 p-4 mb-5 shadow-sm">
             <div class="row align-items-center g-4">
                 <div class="col-lg-7">
                     <a href="{{ $spWatchUrl }}" class="d-block ratio ratio-16x9 rounded-4 overflow-hidden shadow-lg position-relative group">
-                        <img src="{{ $spThumb }}" alt="{{ $spTitle }}" class="w-100 h-100 object-fit-cover lazyload" onError="this.onerror=null;this.src='{{ theme_asset('img/avatar.jpg') }}';">
+                        @if($hasSpCustomThumb)
+                            <img src="{{ $spThumb }}" alt="{{ $spTitle }}" class="w-100 h-100 object-fit-cover lazyload" onError="this.onerror=null;this.src='{{ theme_asset('img/video-placeholder.svg') }}';">
+                        @elseif($spVideoUrl)
+                            <video src="{{ $spVideoUrl }}#t=0.5" preload="metadata" muted playsinline class="w-100 h-100 object-fit-cover pointer-events-none"></video>
+                        @else
+                            <img src="{{ theme_asset('img/video-placeholder.svg') }}" alt="{{ $spTitle }}" class="w-100 h-100 object-fit-cover">
+                        @endif
                         <div class="position-absolute top-0 start-0 w-100 h-100 bg-dark bg-opacity-40 d-flex align-items-center justify-content-center">
                             <span class="btn btn-light rounded-circle p-4 shadow-lg text-primary scale-on-hover">
                                 <i class="fa-solid fa-play fs-2 ms-1"></i>

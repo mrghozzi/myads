@@ -116,12 +116,13 @@ class VideoHubController extends Controller
     }
 
     /**
-     * Attach resolved thumbnail URL and display title to status models.
+     * Attach resolved thumbnail URL, video URL, and display title to status models.
      */
     protected function attachThumbnailAndTitle(iterable $statuses): void
     {
         foreach ($statuses as $status) {
             $status->resolved_thumbnail = static::resolveVideoThumbnailUrl($status);
+            $status->resolved_video_url = static::resolveVideoUrl($status);
             $status->resolved_title = static::resolveVideoTitle($status);
         }
     }
@@ -194,7 +195,46 @@ class VideoHubController extends Controller
         }
 
         // 7. Fallback video placeholder asset
-        return theme_asset('img/video-placeholder.jpg');
+        return theme_asset('img/video-placeholder.svg');
+    }
+
+    /**
+     * Resolve direct video file URL (e.g. MP4/WebM attachment or direct video link) if available.
+     */
+    public static function resolveVideoUrl($status): ?string
+    {
+        $topic = $status->forumTopic ?? ($status->related_content instanceof \App\Models\ForumTopic ? $status->related_content : null);
+
+        if ($topic) {
+            if ($topic->relationLoaded('attachments') && $topic->attachments && $topic->attachments->isNotEmpty()) {
+                $videoAtt = $topic->attachments->first(function ($att) {
+                    $mime = strtolower((string) ($att->mime_type ?? ''));
+                    $ext = strtolower(pathinfo((string) ($att->file_path ?? ''), PATHINFO_EXTENSION));
+                    return str_starts_with($mime, 'video/') || in_array($ext, ['mp4', 'webm', 'mov', 'mkv', 'avi', 'ogg'], true);
+                });
+                if ($videoAtt && !empty($videoAtt->file_path)) {
+                    return asset($videoAtt->file_path);
+                }
+            }
+
+            if (!$topic->relationLoaded('attachments') && method_exists($topic, 'attachments')) {
+                $videoAtt = $topic->attachments()->get()->first(function ($att) {
+                    $mime = strtolower((string) ($att->mime_type ?? ''));
+                    $ext = strtolower(pathinfo((string) ($att->file_path ?? ''), PATHINFO_EXTENSION));
+                    return str_starts_with($mime, 'video/') || in_array($ext, ['mp4', 'webm', 'mov', 'mkv', 'avi', 'ogg'], true);
+                });
+                if ($videoAtt && !empty($videoAtt->file_path)) {
+                    return asset($videoAtt->file_path);
+                }
+            }
+        }
+
+        if (!empty($status->video_url)) {
+            $url = (string) $status->video_url;
+            return (str_starts_with($url, 'http://') || str_starts_with($url, 'https://')) ? $url : asset($url);
+        }
+
+        return null;
     }
 
     /**
