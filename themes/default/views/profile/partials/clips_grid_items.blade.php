@@ -11,7 +11,7 @@
     @endphp
 
     <div class="col">
-        <div class="yt-shorts-card profile-yt-shorts-card rounded-4 position-relative overflow-hidden shadow-xs h-100 bg-dark" style="aspect-ratio: 9/16;">
+        <div class="yt-shorts-card profile-yt-shorts-card rounded-4 position-relative overflow-hidden shadow-xs h-100 bg-dark" style="aspect-ratio: 9/16;" @if($clipVideoUrl) data-video-url="{{ $clipVideoUrl }}" @endif>
             <a href="{{ $clipUrl }}" class="d-block w-100 h-100 text-decoration-none">
                 @if($hasClipCustomThumb)
                     <img src="{{ $clipThumb }}" alt="{{ $clipTitle }}" class="w-100 h-100 object-fit-cover opacity-90 lazyload" onError="this.onerror=null;this.src='{{ theme_asset('img/video-placeholder.svg') }}';">

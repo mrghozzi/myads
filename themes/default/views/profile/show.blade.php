@@ -589,10 +589,77 @@
 
 @push('scripts')
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        if (typeof initHexagons === 'function') {
-            initHexagons();
-        }
+function initVideoHoverPreviews() {
+    const selector = '.yt-thumb-wrapper, .yt-shorts-card, .profile-yt-video-card .yt-thumb-wrapper, .profile-yt-shorts-card, .yt-spotlight-card .ratio';
+    const cards = document.querySelectorAll(selector);
+    
+    cards.forEach(card => {
+        if (card.dataset.hoverPreviewBound === 'true') return;
+        card.dataset.hoverPreviewBound = 'true';
+
+        let videoEl = card.querySelector('video');
+        const videoUrl = card.dataset.videoUrl || (videoEl ? (videoEl.getAttribute('src') || '').split('#')[0] : null);
+
+        if (!videoUrl && !videoEl) return;
+
+        let hoverTimer = null;
+
+        card.addEventListener('mouseenter', function() {
+            hoverTimer = setTimeout(() => {
+                if (!videoEl && videoUrl) {
+                    const cleanUrl = videoUrl.split('#')[0];
+                    videoEl = document.createElement('video');
+                    videoEl.src = cleanUrl + '#t=0.1';
+                    videoEl.muted = true;
+                    videoEl.loop = true;
+                    videoEl.playsInline = true;
+                    videoEl.setAttribute('muted', '');
+                    videoEl.setAttribute('playsinline', '');
+                    videoEl.className = 'yt-hover-preview-video position-absolute top-0 start-0 w-100 h-100 object-fit-cover';
+                    videoEl.style.zIndex = '2';
+                    videoEl.style.opacity = '0';
+                    videoEl.style.transition = 'opacity 0.3s ease';
+                    videoEl.style.pointerEvents = 'none';
+                    card.appendChild(videoEl);
+                }
+
+                if (videoEl) {
+                    videoEl.muted = true;
+                    try {
+                        videoEl.currentTime = 0.1;
+                    } catch(e) {}
+                    
+                    const playPromise = videoEl.play();
+                    if (playPromise !== undefined) {
+                        playPromise.then(() => {
+                            videoEl.style.opacity = '1';
+                        }).catch(() => {});
+                    }
+                }
+            }, 180);
+        });
+
+        card.addEventListener('mouseleave', function() {
+            if (hoverTimer) {
+                clearTimeout(hoverTimer);
+                hoverTimer = null;
+            }
+            if (videoEl) {
+                videoEl.pause();
+                try {
+                    videoEl.currentTime = 0.5;
+                } catch(e) {}
+                videoEl.style.opacity = '0';
+            }
+        });
     });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof initHexagons === 'function') {
+        initHexagons();
+    }
+    initVideoHoverPreviews();
+});
 </script>
 @endpush

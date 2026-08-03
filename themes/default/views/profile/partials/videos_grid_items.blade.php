@@ -16,7 +16,7 @@
     <div class="col">
         <div class="profile-yt-video-card rounded-4 overflow-hidden shadow-sm bg-surface h-100 border border-translucent position-relative" data-id="{{ $status->id }}">
             <a href="{{ $watchUrl }}" class="yt-thumb-stage d-block text-decoration-none">
-                <div class="yt-thumb-wrapper ratio ratio-16x9 position-relative overflow-hidden bg-dark rounded-top-4">
+                <div class="yt-thumb-wrapper ratio ratio-16x9 position-relative overflow-hidden bg-dark rounded-top-4" @if($videoUrl) data-video-url="{{ $videoUrl }}" @endif>
                     @if($hasCustomThumb)
                         <img src="{{ $thumbUrl }}" alt="{{ $videoTitle }}" class="yt-thumb-img img-fluid w-100 h-100 object-fit-cover lazyload" onError="this.onerror=null;this.src='{{ theme_asset('img/video-placeholder.svg') }}';">
                     @elseif($videoUrl)

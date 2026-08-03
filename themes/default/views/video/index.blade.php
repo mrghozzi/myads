@@ -112,7 +112,7 @@
                     @endphp
 
                     <div class="col">
-                        <div class="yt-shorts-card rounded-4 position-relative overflow-hidden shadow-xs h-100 bg-dark" style="aspect-ratio: 9/16;">
+                        <div class="yt-shorts-card rounded-4 position-relative overflow-hidden shadow-xs h-100 bg-dark" style="aspect-ratio: 9/16;" @if($clipVideoUrl) data-video-url="{{ $clipVideoUrl }}" @endif>
                             <a href="{{ $clipUrl }}" class="d-block w-100 h-100 text-decoration-none">
                                 @if($hasClipCustomThumb)
                                     <img src="{{ $clipThumb }}" alt="{{ $clipTitle }}" class="w-100 h-100 object-fit-cover opacity-90 lazyload" onError="this.onerror=null;this.src='{{ theme_asset('img/video-placeholder.svg') }}';">
@@ -179,7 +179,7 @@
         <div class="yt-spotlight-card rounded-4 p-4 mb-5 shadow-sm">
             <div class="row align-items-center g-4">
                 <div class="col-lg-7">
-                    <a href="{{ $spWatchUrl }}" class="d-block ratio ratio-16x9 rounded-4 overflow-hidden shadow-lg position-relative group">
+                    <a href="{{ $spWatchUrl }}" class="d-block ratio ratio-16x9 rounded-4 overflow-hidden shadow-lg position-relative group" @if($spVideoUrl) data-video-url="{{ $spVideoUrl }}" @endif>
                         @if($hasSpCustomThumb)
                             <img src="{{ $spThumb }}" alt="{{ $spTitle }}" class="w-100 h-100 object-fit-cover lazyload" onError="this.onerror=null;this.src='{{ theme_asset('img/video-placeholder.svg') }}';">
                         @elseif($spVideoUrl)
@@ -360,4 +360,76 @@ html[dir="rtl"] .dir-rtl-icon {
     transform: scaleX(-1);
 }
 </style>
+
+<script>
+function initVideoHoverPreviews() {
+    const selector = '.yt-shorts-card, .yt-spotlight-card .ratio';
+    const cards = document.querySelectorAll(selector);
+    
+    cards.forEach(card => {
+        if (card.dataset.hoverPreviewBound === 'true') return;
+        card.dataset.hoverPreviewBound = 'true';
+
+        let videoEl = card.querySelector('video');
+        const videoUrl = card.dataset.videoUrl || (videoEl ? (videoEl.getAttribute('src') || '').split('#')[0] : null);
+
+        if (!videoUrl && !videoEl) return;
+
+        let hoverTimer = null;
+
+        card.addEventListener('mouseenter', function() {
+            hoverTimer = setTimeout(() => {
+                if (!videoEl && videoUrl) {
+                    const cleanUrl = videoUrl.split('#')[0];
+                    videoEl = document.createElement('video');
+                    videoEl.src = cleanUrl + '#t=0.1';
+                    videoEl.muted = true;
+                    videoEl.loop = true;
+                    videoEl.playsInline = true;
+                    videoEl.setAttribute('muted', '');
+                    videoEl.setAttribute('playsinline', '');
+                    videoEl.className = 'yt-hover-preview-video position-absolute top-0 start-0 w-100 h-100 object-fit-cover';
+                    videoEl.style.zIndex = '2';
+                    videoEl.style.opacity = '0';
+                    videoEl.style.transition = 'opacity 0.3s ease';
+                    videoEl.style.pointerEvents = 'none';
+                    card.appendChild(videoEl);
+                }
+
+                if (videoEl) {
+                    videoEl.muted = true;
+                    try {
+                        videoEl.currentTime = 0.1;
+                    } catch(e) {}
+                    
+                    const playPromise = videoEl.play();
+                    if (playPromise !== undefined) {
+                        playPromise.then(() => {
+                            videoEl.style.opacity = '1';
+                        }).catch(() => {});
+                    }
+                }
+            }, 180);
+        });
+
+        card.addEventListener('mouseleave', function() {
+            if (hoverTimer) {
+                clearTimeout(hoverTimer);
+                hoverTimer = null;
+            }
+            if (videoEl) {
+                videoEl.pause();
+                try {
+                    videoEl.currentTime = 0.5;
+                } catch(e) {}
+                videoEl.style.opacity = '0';
+            }
+        });
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    initVideoHoverPreviews();
+});
+</script>
 @endsection
