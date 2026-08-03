@@ -1,4 +1,4 @@
-# Agents.md — MYADS v5.5.1
+# Agents.md — MYADS v4.5.1
 
 > **Purpose:** This file gives AI coding agents a fast, comprehensive understanding of the MYADS project — its architecture, conventions, key files, and rules — so they can work effectively from a fresh chat context.
 
@@ -6,7 +6,7 @@
 
 ## 1. Project Identity
 
-- **Name:** MYADS v5.5.1
+- **Name:** MYADS v4.5.1
 - **Type:** Social network + ad exchange platform for website owners
 - **Framework:** Laravel 12 (PHP 8.2+)
 - **Database:** MySQL 5.7+ / MariaDB 10.3+
@@ -1043,10 +1043,10 @@ If in doubt, update it. An outdated `Agents.md` causes future agents to make wro
 - **v4.5.0 Groundwork (2026-07-25):** Initialized release cycle for MYADS v4.5.0, bumped canonical `SystemVersion::CURRENT` to v4.5.0, updated system documentation, and configured dynamic admin panel version badges.
 - **Reaction System Optimization (2026-07-26):** Created composite performance indexes (`like`, `options`, `notif`), optimized `GamificationService` badge queries (reduced query count by >95%), added centralized `ReactionService`, enabled Optimistic UI updates on mobile (`v1.5.0+10`), and added web request debouncing.
 - **Store Script Subcategories (2026-07-26):** Seeded default `scriptcat` options (CMS, Blog, Forum, Ecommerce, Social_Network, Marketplace, LMS, CRM, Helpdesk, Booking, Directory, Portfolio, Wiki, API, Landing_Page, Newsletter, Survey, Project_Management, File_Management, Others) via migration `2026_07_26_235900_seed_script_subcategories.php`, fixed the empty subcategory selector on `/store/create` for the `script` main category, and added a dedicated admin management page at `/admin/store/script-categories` with full CRUD, sidebar link, and EN/AR translations.
-- **v5.5.1 Groundwork (2026-08-01):** Initialized release cycle for MYADS v5.5.1, bumped canonical `SystemVersion::CURRENT` to v5.5.1, and fixed SCEditor initialization failures across admin/forum content editors.
+- **v4.5.1 Groundwork (2026-08-01):** Initialized release cycle for MYADS v4.5.1, bumped canonical `SystemVersion::CURRENT` to v4.5.1, and fixed SCEditor initialization failures across admin/forum content editors.
 - **Bug Fix (2026-08-01):** Fixed a 500 error when saving settings on `/admin/database-cleanup`, caused by `AdminController::databaseCleanupAction()` and `DatabaseMaintenanceService` writing/reading non-existent `o_name`/`o_value` columns on the `options` table. Corrected both to use the table's real `name`/`o_valuer` columns scoped with `o_type = 'system_setting'`, so auto-cleanup retention settings now persist and are actually honored.
 - **Bug Fix (2026-08-01):** Fixed misleading "Clean Logs" feedback on `/admin/database-cleanup` — the action always showed a generic success message even when no log files needed cleanup (within retention/size limits), making it look like nothing happened. `AdminController::databaseCleanupAction()` now measures `storage/logs` size before/after running `myads:log-cleanup` and reports the actual space freed, or explains the active retention limits when there is nothing to clean. Added translation keys `logs_cleaned_freed` and `logs_cleaned_none` to `ar`, `en`, `ja`, `ru`, `sr`, `zh_CN`, `zh_TW`.
 
 ---
 
-*Last updated: 2026-08-01 — MYADS v5.5.1 (Groundwork Initialization, SCEditor Fix, Database Cleanup Fixes)*
+*Last updated: 2026-08-01 — MYADS v4.5.1 (Groundwork Initialization, SCEditor Fix, Database Cleanup Fixes)*
