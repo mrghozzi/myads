@@ -4104,6 +4104,9 @@ return [
     'create_clip' => 'Create Clip',
     'view_all_clips' => 'View All',
     'video_views_count' => ':count views',
+    'play_pause' => 'Play / Pause',
+    'mute' => 'Mute',
+    'fullscreen' => 'Fullscreen',
 ];
 
 

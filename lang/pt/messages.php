@@ -2601,6 +2601,9 @@ return [
     'pressure_no_issues_action' => 'Continue monitoring after updates or during high-traffic periods.',
     'max_log_size' => 'Tamanho máximo do arquivo de log',
     'clear_filter' => 'Limpar filtro',
+    'play_pause' => 'Reproduzir / Pausar',
+    'mute' => 'Silenciar',
+    'fullscreen' => 'Tela cheia',
 ];
 
 

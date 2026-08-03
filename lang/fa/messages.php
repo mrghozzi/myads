@@ -2600,6 +2600,9 @@ return [
     'pressure_no_issues_action' => 'Continue monitoring after updates or during high-traffic periods.',
     'max_log_size' => 'حداکثر اندازه فایل لاگ',
     'clear_filter' => 'پاک کردن فیلتر',
+    'play_pause' => 'پخش / توقف',
+    'mute' => 'بی‌صدا',
+    'fullscreen' => 'تمام‌صفحه',
 ];
 
 

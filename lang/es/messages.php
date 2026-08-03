@@ -2624,6 +2624,9 @@ return [
     'upload_files_to_google_cloud' => 'Sincronizar archivos multimedia con Google Cloud',
     'max_log_size' => 'Tamaño máximo de archivo de registro',
     'clear_filter' => 'Limpiar filtro',
+    'play_pause' => 'Reproducir / Pausar',
+    'mute' => 'Silenciar',
+    'fullscreen' => 'Pantalla completa',
 ];
 
 

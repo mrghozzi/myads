@@ -4107,6 +4107,9 @@ return [
     'create_clip' => 'إنشاء مقطع',
     'view_all_clips' => 'عرض الكل',
     'video_views_count' => ':count مشاهدة',
+    'play_pause' => 'تشغيل / إيقاف مؤقت',
+    'mute' => 'كتم الصوت',
+    'fullscreen' => 'ملء الشاشة',
 ];
 
 

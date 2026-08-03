@@ -2611,6 +2611,9 @@ return [
     'pressure_no_issues_action' => 'Continue monitoring after updates or during high-traffic periods.',
     'max_log_size' => 'Maksimum Log Dosyası Boyutu',
     'clear_filter' => 'Filtreyi Temizle',
+    'play_pause' => 'Oynat / Duraklat',
+    'mute' => 'Sesi Kapat',
+    'fullscreen' => 'Tam Ekran',
 ];
 
 

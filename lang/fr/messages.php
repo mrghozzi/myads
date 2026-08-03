@@ -2612,6 +2612,9 @@ return [
     'upload_files_to_google_cloud' => 'Synchroniser les médias vers Google Cloud',
     'max_log_size' => 'Taille maximale du fichier journal',
     'clear_filter' => 'Effacer le filtre',
+    'play_pause' => 'Lecture / Pause',
+    'mute' => 'Muet',
+    'fullscreen' => 'Plein écran',
 ];
 
 
