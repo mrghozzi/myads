@@ -590,15 +590,19 @@
 @push('scripts')
 <script>
 function initVideoHoverPreviews() {
-    const selector = '.yt-thumb-wrapper, .yt-shorts-card, .profile-yt-video-card .yt-thumb-wrapper, .profile-yt-shorts-card, .yt-spotlight-card .ratio';
+    const selector = '.yt-video-card, .yt-thumb-wrapper, .yt-shorts-card, .profile-yt-video-card, .profile-yt-shorts-card, .yt-spotlight-card .ratio';
     const cards = document.querySelectorAll(selector);
     
     cards.forEach(card => {
         if (card.dataset.hoverPreviewBound === 'true') return;
         card.dataset.hoverPreviewBound = 'true';
 
-        let existingVideo = card.querySelector('video');
-        let rawUrl = card.dataset.videoUrl || (existingVideo ? existingVideo.getAttribute('src') : null);
+        const stage = card.querySelector('.yt-thumb-wrapper') || card.querySelector('.ratio') || card;
+        const imgEl = stage.querySelector('img');
+        const overlayEl = stage.querySelector('.yt-thumb-overlay');
+        let existingVideo = stage.querySelector('video');
+        
+        let rawUrl = card.dataset.videoUrl || stage.dataset.videoUrl || (existingVideo ? existingVideo.getAttribute('src') : null);
 
         if (!rawUrl && !existingVideo) return;
 
@@ -612,26 +616,30 @@ function initVideoHoverPreviews() {
         card.addEventListener('mouseenter', function() {
             hoverTimer = setTimeout(() => {
                 if (youtubeId) {
-                    if (!card.querySelector('.yt-hover-iframe')) {
+                    if (!stage.querySelector('.yt-hover-iframe')) {
                         previewEl = document.createElement('iframe');
                         previewEl.src = `https://www.youtube.com/embed/${youtubeId}?autoplay=1&mute=1&controls=0&modestbranding=1&loop=1&playlist=${youtubeId}&enablejsapi=1`;
                         previewEl.className = 'yt-hover-iframe position-absolute top-0 start-0 w-100 h-100 border-0';
-                        previewEl.style.zIndex = '3';
+                        previewEl.style.zIndex = '5';
                         previewEl.style.opacity = '0';
-                        previewEl.style.transition = 'opacity 0.3s ease';
+                        previewEl.style.transition = 'opacity 0.25s ease';
                         previewEl.style.pointerEvents = 'none';
                         previewEl.onload = function() {
+                            if (imgEl) imgEl.style.opacity = '0';
+                            if (overlayEl) overlayEl.style.opacity = '0';
                             previewEl.style.opacity = '1';
                         };
-                        card.appendChild(previewEl);
+                        stage.appendChild(previewEl);
                     } else {
-                        previewEl = card.querySelector('.yt-hover-iframe');
+                        previewEl = stage.querySelector('.yt-hover-iframe');
+                        if (imgEl) imgEl.style.opacity = '0';
+                        if (overlayEl) overlayEl.style.opacity = '0';
                         previewEl.style.opacity = '1';
                     }
                 } else {
                     if (existingVideo) {
                         previewEl = existingVideo;
-                    } else if (cleanUrl && !card.querySelector('.yt-hover-preview-video')) {
+                    } else if (cleanUrl && !stage.querySelector('.yt-hover-preview-video')) {
                         previewEl = document.createElement('video');
                         previewEl.src = cleanUrl + '#t=0.1';
                         previewEl.muted = true;
@@ -640,13 +648,13 @@ function initVideoHoverPreviews() {
                         previewEl.setAttribute('muted', '');
                         previewEl.setAttribute('playsinline', '');
                         previewEl.className = 'yt-hover-preview-video position-absolute top-0 start-0 w-100 h-100 object-fit-cover';
-                        previewEl.style.zIndex = '3';
+                        previewEl.style.zIndex = '5';
                         previewEl.style.opacity = '0';
-                        previewEl.style.transition = 'opacity 0.3s ease';
+                        previewEl.style.transition = 'opacity 0.25s ease';
                         previewEl.style.pointerEvents = 'none';
-                        card.appendChild(previewEl);
+                        stage.appendChild(previewEl);
                     } else {
-                        previewEl = card.querySelector('.yt-hover-preview-video');
+                        previewEl = stage.querySelector('.yt-hover-preview-video');
                     }
 
                     if (previewEl && previewEl.tagName === 'VIDEO') {
@@ -655,6 +663,8 @@ function initVideoHoverPreviews() {
                         const playPromise = previewEl.play();
                         if (playPromise !== undefined) {
                             playPromise.then(() => {
+                                if (imgEl) imgEl.style.opacity = '0';
+                                if (overlayEl) overlayEl.style.opacity = '0';
                                 previewEl.style.opacity = '1';
                             }).catch(() => {});
                         }
@@ -668,15 +678,19 @@ function initVideoHoverPreviews() {
                 clearTimeout(hoverTimer);
                 hoverTimer = null;
             }
+
+            if (imgEl) imgEl.style.opacity = '1';
+            if (overlayEl) overlayEl.style.opacity = '';
+
             if (youtubeId) {
-                const iframe = card.querySelector('.yt-hover-iframe');
+                const iframe = stage.querySelector('.yt-hover-iframe');
                 if (iframe) iframe.remove();
             } else {
-                const vid = previewEl || card.querySelector('video');
+                const vid = previewEl || stage.querySelector('video');
                 if (vid && vid.tagName === 'VIDEO') {
                     vid.pause();
                     try { vid.currentTime = 0.5; } catch(e) {}
-                    if (card.querySelector('img')) {
+                    if (imgEl) {
                         vid.style.opacity = '0';
                     }
                 }

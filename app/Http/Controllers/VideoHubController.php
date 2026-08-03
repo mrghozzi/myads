@@ -221,8 +221,13 @@ class VideoHubController extends Controller
             }
 
             $topicText = (string) ($topic->txt ?? '');
-            if ($topicText !== '' && preg_match('/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/', $topicText, $matches)) {
-                return 'https://www.youtube.com/watch?v=' . $matches[1];
+            if ($topicText !== '') {
+                if (preg_match('/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/', $topicText, $matches)) {
+                    return 'https://www.youtube.com/watch?v=' . $matches[1];
+                }
+                if (preg_match('/(https?:\/\/[^\s<"]+\.(?:mp4|webm|mov|mkv|avi|ogg))/i', $topicText, $matches)) {
+                    return $matches[1];
+                }
             }
         }
 
