@@ -507,7 +507,7 @@ class AdminController extends Controller
                 'title' => __('messages.tip_billing_title'),
                 'tip' => __('messages.tip_billing_desc'),
                 'action_text' => __('messages.billing'),
-                'action_url' => route('admin.billing.plans.index'),
+                'action_url' => route('admin.billing.plans'),
             ],
             [
                 'id' => 14,
