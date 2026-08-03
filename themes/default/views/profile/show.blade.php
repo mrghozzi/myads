@@ -332,6 +332,42 @@
         text-align: center;
         padding: 40px 24px;
     }
+
+    /* Superdesign Video & Clips Cards for Profile Tabs */
+    .profile-yt-video-card {
+        transition: transform 0.25s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.25s cubic-bezier(0.165, 0.84, 0.44, 1);
+    }
+    .profile-yt-video-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 28px rgba(97, 93, 250, 0.15) !important;
+    }
+    .profile-yt-video-card .yt-thumb-overlay {
+        background: rgba(0, 0, 0, 0.3);
+        opacity: 0;
+        transition: opacity 0.25s ease;
+    }
+    .profile-yt-video-card:hover .yt-thumb-overlay {
+        opacity: 1;
+    }
+    .profile-yt-video-card .yt-play-btn-circle {
+        width: 44px;
+        height: 44px;
+        background: rgba(97, 93, 250, 0.9);
+        box-shadow: 0 4px 14px rgba(97, 93, 250, 0.4);
+        transform: scale(0.85);
+        transition: transform 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .profile-yt-video-card:hover .yt-play-btn-circle {
+        transform: scale(1);
+    }
+
+    .profile-yt-shorts-card {
+        transition: transform 0.25s cubic-bezier(0.165, 0.84, 0.44, 1), box-shadow 0.25s cubic-bezier(0.165, 0.84, 0.44, 1);
+    }
+    .profile-yt-shorts-card:hover {
+        transform: scale(1.03);
+        box-shadow: 0 14px 30px rgba(239, 68, 68, 0.25) !important;
+    }
 </style>
 
 <div class="grid grid-3-6-3 mobile-prefer-content">
@@ -432,7 +468,7 @@
     </div>
 
     <div class="grid-column">
-        @if(Auth::check() && Auth::id() == $user->id && !in_array($selectedTab, ['photos', 'about'], true))
+        @if(Auth::check() && Auth::id() == $user->id && !in_array($selectedTab, ['photos', 'about', 'videos', 'clips'], true))
             @include('theme::partials.status.add_post')
         @endif
 
@@ -484,6 +520,10 @@
                     @endif
                 </div>
             </div>
+        @elseif($selectedTab === 'videos')
+            @include('theme::profile.partials.videos_tab', ['activities' => $activities, 'user' => $user, 'isOwnProfile' => $isOwnProfile])
+        @elseif($selectedTab === 'clips')
+            @include('theme::profile.partials.clips_tab', ['activities' => $activities, 'user' => $user, 'isOwnProfile' => $isOwnProfile])
         @else
             <div id="infinite-scroll-container" style="display: grid; grid-gap: 16px;">
                 <div id="timeline-content" style="display: contents;">

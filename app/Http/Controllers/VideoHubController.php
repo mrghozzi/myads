@@ -117,7 +117,7 @@ class VideoHubController extends Controller
     /**
      * Attach resolved thumbnail URL, video URL, and display title to status models.
      */
-    protected function attachThumbnailAndTitle(iterable $statuses): void
+    public static function attachThumbnailAndTitle(iterable $statuses): void
     {
         foreach ($statuses as $status) {
             $status->resolved_thumbnail = static::resolveVideoThumbnailUrl($status);

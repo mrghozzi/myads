@@ -96,8 +96,12 @@ class ProfileController extends Controller
                     break;
             }
 
-            $activities = $query->paginate(10);
+            $activities = $query->paginate(12);
             $activityService->decorateMany($activities);
+
+            if (in_array($selectedTab, ['videos', 'clips'], true)) {
+                \App\Http\Controllers\VideoHubController::attachThumbnailAndTitle($activities);
+            }
         }
 
         $canViewAbout = $privacy->canViewAbout($user, $viewer);
@@ -167,8 +171,14 @@ class ProfileController extends Controller
         $isOwnProfile = (Auth::check() && Auth::id() === $user->id);
 
         if ($request->ajax() || $request->wantsJson()) {
+            $ajaxView = match($selectedTab) {
+                'videos' => 'theme::profile.partials.videos_grid_items',
+                'clips' => 'theme::profile.partials.clips_grid_items',
+                default => 'theme::partials.ajax.activities',
+            };
+
             return response()->json([
-                'html' => view('theme::partials.ajax.activities', compact('activities', 'hasPinnedPost', 'isOwnProfile'))->render(),
+                'html' => view($ajaxView, compact('activities', 'hasPinnedPost', 'isOwnProfile', 'user'))->render(),
                 'next_page_url' => $activities->nextPageUrl(),
             ]);
         }
