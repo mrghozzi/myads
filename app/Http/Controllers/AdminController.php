@@ -4894,9 +4894,108 @@ class AdminController extends Controller
         $feedSettings = \App\Support\CommunityFeedSettings::all();
         $pressureSources = $this->serverPressureSources($load, $cacheSize, $feedSettings);
 
+        // v4.5.1: Vitals ring percentages (Split Diagnostic panel) — all derived
+        // from values already computed above, no extra system calls.
+        $cpuPercent = $load[0] > 0 ? (int) min(100, round(($load[0] / 2) * 100)) : 0;
+        $memoryLimitBytes = $this->parsePhpSizeToBytes((string) $memoryLimit);
+        $ramPercent = $memoryLimitBytes > 0 ? (int) min(100, round(($memoryUsage / $memoryLimitBytes) * 100)) : null;
+        $diskUsedPercent = $diskTotal > 0 ? (int) min(100, round((($diskTotal - $diskFree) / $diskTotal) * 100)) : null;
+
+        // OPcache status — reads in-memory PHP OPcache stats, no I/O at all.
+        $opcacheEnabled = function_exists('opcache_get_status') && (bool) ini_get('opcache.enable');
+        $opcacheHitRate = null;
+        if ($opcacheEnabled) {
+            $opcacheStatus = @opcache_get_status(false);
+            if (!empty($opcacheStatus['opcache_statistics']['opcache_hit_rate'])) {
+                $opcacheHitRate = round($opcacheStatus['opcache_statistics']['opcache_hit_rate'], 1);
+            }
+        }
+
+        // Critical PHP extensions — extension_loaded() is an in-memory check.
+        $criticalExtensions = collect([
+            'BCMath' => 'bcmath',
+            'Ctype' => 'ctype',
+            'Fileinfo' => 'fileinfo',
+            'JSON' => 'json',
+            'Mbstring' => 'mbstring',
+            'OpenSSL' => 'openssl',
+            'PDO' => 'pdo',
+            'GD' => 'gd',
+            'cURL' => 'curl',
+            'Zip' => 'zip',
+            'Intl' => 'intl',
+        ])->map(fn (string $extension, string $label) => [
+            'label' => $label,
+            'loaded' => extension_loaded($extension),
+        ])->values()->all();
+
+        // Failed queue jobs — a single cached COUNT() query, refreshed every 5 min.
+        $failedJobsCount = \Illuminate\Support\Facades\Cache::remember(
+            'system_monitor_failed_jobs_count',
+            now()->addMinutes(5),
+            function () {
+                try {
+                    return \Illuminate\Support\Facades\Schema::hasTable('failed_jobs')
+                        ? \Illuminate\Support\Facades\DB::table('failed_jobs')->count()
+                        : null;
+                } catch (\Throwable $e) {
+                    return null;
+                }
+            }
+        );
+
+        // Scheduler last run — populated by a cron-only event listener
+        // (routes/console.php), never touched by web requests.
+        $schedulerLastRun = \Illuminate\Support\Facades\Cache::get('system_scheduler_last_run');
+        $schedulerStale = !$schedulerLastRun || $schedulerLastRun->lt(now()->subHours(26));
+
+        // Storage disks — reuses the same capped/cached directory-size scan
+        // already used for the framework cache size above.
+        $storageDisks = collect(config('filesystems.disks', []))->map(function (array $diskConfig, string $name) {
+            $driver = $diskConfig['driver'] ?? 'unknown';
+            $usedBytes = null;
+            if ($driver === 'local' && !empty($diskConfig['root'])) {
+                $usedBytes = \Illuminate\Support\Facades\Cache::remember(
+                    'system_monitor_disk_size_' . $name,
+                    now()->addMinutes(10),
+                    fn () => $this->getDirectorySizeBytes($diskConfig['root'], 3000)
+                );
+            }
+
+            return [
+                'name' => $name,
+                'driver' => $driver,
+                'usedBytes' => $usedBytes,
+            ];
+        })->values()->all();
+
         return view('admin::admin.system_monitor', compact(
-            'load', 'memoryUsage', 'memoryPeak', 'memoryLimit', 'diskTotal', 'diskFree', 'cacheSize', 'pressureSources'
+            'load', 'memoryUsage', 'memoryPeak', 'memoryLimit', 'diskTotal', 'diskFree', 'cacheSize', 'pressureSources',
+            'cpuPercent', 'ramPercent', 'diskUsedPercent', 'opcacheEnabled', 'opcacheHitRate', 'criticalExtensions',
+            'failedJobsCount', 'schedulerLastRun', 'schedulerStale', 'storageDisks'
         ));
+    }
+
+    /**
+     * Parse a php.ini shorthand byte value (e.g. "256M", "1G", "-1") into bytes.
+     * Returns -1 for unlimited.
+     */
+    private function parsePhpSizeToBytes(string $size): int
+    {
+        $size = trim($size);
+        if ($size === '' || $size === '-1') {
+            return -1;
+        }
+
+        $unit = strtolower(substr($size, -1));
+        $value = (float) $size;
+
+        return match ($unit) {
+            'g' => (int) ($value * 1073741824),
+            'm' => (int) ($value * 1048576),
+            'k' => (int) ($value * 1024),
+            default => (int) $value,
+        };
     }
 
     public function clearSystemCache()
