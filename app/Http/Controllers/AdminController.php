@@ -4970,6 +4970,9 @@ class AdminController extends Controller
         })->values()->all();
 
         // Active Plugins Resource Footprint Diagnostics (Zero Overhead, Cached 10min)
+        // Only scans boot.php, routes.php, and src/ PHP files — skips .git, vendor,
+        // node_modules, views, lang, and assets directories entirely. Caps each file
+        // read to 8 KB and limits directory-size stat to 500 files per plugin.
         $pluginManager = new \App\Services\PluginManager();
         $activePluginDiagnostics = \Illuminate\Support\Facades\Cache::remember(
             'system_monitor_active_plugin_diagnostics',
@@ -4984,7 +4987,9 @@ class AdminController extends Controller
                     }
 
                     $dir = $plugin['path'] ?? base_path('plugins/' . $plugin['directory']);
-                    $sizeBytes = $this->getDirectorySizeBytes($dir, 3000);
+
+                    // Lightweight directory size — cap at 500 files per plugin
+                    $sizeBytes = $this->getDirectorySizeBytes($dir, 500);
 
                     $hooksCount = 0;
                     $hasRoutes = \Illuminate\Support\Facades\File::exists($dir . '/routes.php');
@@ -4992,38 +4997,64 @@ class AdminController extends Controller
                         count(\Illuminate\Support\Facades\File::files($dir . '/database/migrations')) > 0;
                     $hasExternalApis = false;
 
-                    if (\Illuminate\Support\Facades\File::exists($dir)) {
-                        $allPhpFiles = \Illuminate\Support\Facades\File::allFiles($dir);
-                        foreach ($allPhpFiles as $file) {
-                            if ($file->getExtension() !== 'php') {
-                                continue;
-                            }
-                            $content = $file->getContents();
-
-                            $hooksCount += substr_count($content, 'Hooks::add_action');
-                            $hooksCount += substr_count($content, 'Hooks::add_filter');
-                            $hooksCount += substr_count($content, 'add_action(');
-                            $hooksCount += substr_count($content, 'add_filter(');
-
-                            if (!$hasRoutes && (str_contains($content, 'Route::get(') || str_contains($content, 'Route::post(') || str_contains($content, 'Route::group('))) {
-                                $hasRoutes = true;
-                            }
-
-                            if (!$hasExternalApis && (
-                                str_contains($content, 'Http::') ||
-                                str_contains($content, 'curl_exec') ||
-                                str_contains($content, 'GuzzleHttp') ||
-                                str_contains($content, "file_get_contents('http") ||
-                                str_contains($content, 'file_get_contents("http')
-                            )) {
-                                $hasExternalApis = true;
+                    // Collect only the PHP files that execute at boot/request time:
+                    // boot.php, routes.php, and src/*.php — skip .git, views, lang, assets, vendor
+                    $phpFilesToScan = [];
+                    $bootFile = $dir . '/boot.php';
+                    $routesFile = $dir . '/routes.php';
+                    if (\Illuminate\Support\Facades\File::exists($bootFile)) {
+                        $phpFilesToScan[] = new \SplFileInfo($bootFile);
+                    }
+                    if (\Illuminate\Support\Facades\File::exists($routesFile)) {
+                        $phpFilesToScan[] = new \SplFileInfo($routesFile);
+                    }
+                    $srcDir = $dir . '/src';
+                    if (\Illuminate\Support\Facades\File::isDirectory($srcDir)) {
+                        foreach (\Illuminate\Support\Facades\File::allFiles($srcDir) as $srcFile) {
+                            if ($srcFile->getExtension() === 'php') {
+                                $phpFilesToScan[] = $srcFile;
                             }
                         }
                     }
 
-                    if ($hasExternalApis || $hooksCount > 5) {
+                    foreach ($phpFilesToScan as $file) {
+                        // Read only the first 8 KB — enough to detect patterns
+                        $handle = @fopen($file->getPathname(), 'r');
+                        if (!$handle) {
+                            continue;
+                        }
+                        $content = (string) fread($handle, 8192);
+                        fclose($handle);
+
+                        $hooksCount += substr_count($content, 'Hooks::add_action');
+                        $hooksCount += substr_count($content, 'Hooks::add_filter');
+                        $hooksCount += substr_count($content, 'add_action(');
+                        $hooksCount += substr_count($content, 'add_filter(');
+
+                        if (!$hasRoutes && (str_contains($content, 'Route::get(') || str_contains($content, 'Route::post(') || str_contains($content, 'Route::group('))) {
+                            $hasRoutes = true;
+                        }
+
+                        if (!$hasExternalApis && (
+                            str_contains($content, 'Http::') ||
+                            str_contains($content, 'curl_exec') ||
+                            str_contains($content, 'GuzzleHttp') ||
+                            str_contains($content, "file_get_contents('http") ||
+                            str_contains($content, 'file_get_contents("http')
+                        )) {
+                            $hasExternalApis = true;
+                        }
+                    }
+
+                    // Smarter impact rating: external APIs alone are "medium" because
+                    // AI/Groq plugins call APIs on-demand (user action), not on every
+                    // page load. "high" is reserved for heavy hook registration (>5)
+                    // combined with external APIs, or >8 hooks alone.
+                    if ($hasExternalApis && $hooksCount > 5) {
                         $impactLevel = 'high';
-                    } elseif ($hasRoutes || $hasMigrations || $hooksCount > 2) {
+                    } elseif ($hooksCount > 8) {
+                        $impactLevel = 'high';
+                    } elseif ($hasExternalApis || $hasRoutes || $hasMigrations || $hooksCount > 2) {
                         $impactLevel = 'medium';
                     } else {
                         $impactLevel = 'low';
