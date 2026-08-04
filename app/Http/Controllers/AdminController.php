@@ -4969,10 +4969,90 @@ class AdminController extends Controller
             ];
         })->values()->all();
 
+        // Active Plugins Resource Footprint Diagnostics (Zero Overhead, Cached 10min)
+        $pluginManager = new \App\Services\PluginManager();
+        $activePluginDiagnostics = \Illuminate\Support\Facades\Cache::remember(
+            'system_monitor_active_plugin_diagnostics',
+            now()->addMinutes(10),
+            function () use ($pluginManager) {
+                $allPlugins = $pluginManager->getAllPlugins();
+                $diagnostics = [];
+
+                foreach ($allPlugins as $plugin) {
+                    if (empty($plugin['is_active'])) {
+                        continue;
+                    }
+
+                    $dir = $plugin['path'] ?? base_path('plugins/' . $plugin['directory']);
+                    $sizeBytes = $this->getDirectorySizeBytes($dir, 3000);
+
+                    $hooksCount = 0;
+                    $hasRoutes = \Illuminate\Support\Facades\File::exists($dir . '/routes.php');
+                    $hasMigrations = \Illuminate\Support\Facades\File::exists($dir . '/database/migrations') &&
+                        count(\Illuminate\Support\Facades\File::files($dir . '/database/migrations')) > 0;
+                    $hasExternalApis = false;
+
+                    if (\Illuminate\Support\Facades\File::exists($dir)) {
+                        $allPhpFiles = \Illuminate\Support\Facades\File::allFiles($dir);
+                        foreach ($allPhpFiles as $file) {
+                            if ($file->getExtension() !== 'php') {
+                                continue;
+                            }
+                            $content = $file->getContents();
+
+                            $hooksCount += substr_count($content, 'Hooks::add_action');
+                            $hooksCount += substr_count($content, 'Hooks::add_filter');
+                            $hooksCount += substr_count($content, 'add_action(');
+                            $hooksCount += substr_count($content, 'add_filter(');
+
+                            if (!$hasRoutes && (str_contains($content, 'Route::get(') || str_contains($content, 'Route::post(') || str_contains($content, 'Route::group('))) {
+                                $hasRoutes = true;
+                            }
+
+                            if (!$hasExternalApis && (
+                                str_contains($content, 'Http::') ||
+                                str_contains($content, 'curl_exec') ||
+                                str_contains($content, 'GuzzleHttp') ||
+                                str_contains($content, "file_get_contents('http") ||
+                                str_contains($content, 'file_get_contents("http')
+                            )) {
+                                $hasExternalApis = true;
+                            }
+                        }
+                    }
+
+                    if ($hasExternalApis || $hooksCount > 5) {
+                        $impactLevel = 'high';
+                    } elseif ($hasRoutes || $hasMigrations || $hooksCount > 2) {
+                        $impactLevel = 'medium';
+                    } else {
+                        $impactLevel = 'low';
+                    }
+
+                    $diagnostics[] = [
+                        'name' => $plugin['name'] ?? $plugin['slug'],
+                        'slug' => $plugin['slug'],
+                        'version' => $plugin['version'] ?? '1.0',
+                        'author' => $plugin['author'] ?? __('messages.unknown'),
+                        'author_url' => $plugin['author_url'] ?? null,
+                        'description' => $plugin['description'] ?? '',
+                        'size_bytes' => $sizeBytes,
+                        'hooks_count' => $hooksCount,
+                        'has_routes' => $hasRoutes,
+                        'has_migrations' => $hasMigrations,
+                        'has_external_apis' => $hasExternalApis,
+                        'impact_level' => $impactLevel,
+                    ];
+                }
+
+                return $diagnostics;
+            }
+        );
+
         return view('admin::admin.system_monitor', compact(
             'load', 'memoryUsage', 'memoryPeak', 'memoryLimit', 'diskTotal', 'diskFree', 'cacheSize', 'pressureSources',
             'cpuPercent', 'ramPercent', 'diskUsedPercent', 'opcacheEnabled', 'opcacheHitRate', 'criticalExtensions',
-            'failedJobsCount', 'schedulerLastRun', 'schedulerStale', 'storageDisks'
+            'failedJobsCount', 'schedulerLastRun', 'schedulerStale', 'storageDisks', 'activePluginDiagnostics'
         ));
     }
 
@@ -5006,6 +5086,7 @@ class AdminController extends Controller
         \Illuminate\Support\Facades\Artisan::call('view:clear');
         \Illuminate\Support\Facades\Artisan::call('config:clear');
         \App\Support\CommunityFeedSettings::clearCache();
+        \Illuminate\Support\Facades\Cache::forget('system_monitor_active_plugin_diagnostics');
 
         return redirect()->route('admin.system_monitor')
             ->with('success', __('messages.deleted_successfully') ?? 'System cache cleared successfully.');

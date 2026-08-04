@@ -267,6 +267,119 @@
                         </div>
                     </div>
 
+                    <!-- Active Plugins Diagnostics (Zero Overhead Footprint) -->
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header d-flex align-items-center justify-content-between">
+                            <div>
+                                <h5 class="card-title mb-1">
+                                    <i class="feather-cpu text-primary me-2"></i>{{ __('messages.active_plugins_diagnostics_title') }}
+                                </h5>
+                                <p class="text-muted mb-0 small">{{ __('messages.active_plugins_diagnostics_desc') }}</p>
+                            </div>
+                            <a href="{{ route('admin.plugins') }}" class="btn btn-sm btn-light border flex-shrink-0">
+                                <i class="feather-box me-1"></i>{{ __('messages.plugins') ?? 'Plugins' }}
+                            </a>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table align-middle mb-0">
+                                <thead>
+                                    <tr class="text-muted small text-uppercase">
+                                        <th>{{ __('messages.plugin_name') }}</th>
+                                        <th>{{ __('messages.plugin_author_version') }}</th>
+                                        <th>{{ __('messages.registered_hooks_count') }}</th>
+                                        <th>{{ __('messages.active_components') }}</th>
+                                        <th>{{ __('messages.storage_footprint') }}</th>
+                                        <th class="text-end">{{ __('messages.estimated_impact') }}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse($activePluginDiagnostics as $pluginDiag)
+                                        @php
+                                            $impactBadgeClass = match ($pluginDiag['impact_level']) {
+                                                'high' => 'bg-danger text-white',
+                                                'medium' => 'bg-warning text-dark',
+                                                default => 'bg-success text-white',
+                                            };
+                                            $impactLabel = match ($pluginDiag['impact_level']) {
+                                                'high' => __('messages.impact_high'),
+                                                'medium' => __('messages.impact_medium'),
+                                                default => __('messages.impact_low'),
+                                            };
+                                        @endphp
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <div class="bg-soft-primary text-primary rounded-circle p-2 d-inline-flex align-items-center justify-content-center" style="width: 36px; height: 36px;">
+                                                        <i class="feather-box fs-6"></i>
+                                                    </div>
+                                                    <div>
+                                                        <div class="fw-bold text-dark">{{ $pluginDiag['name'] }}</div>
+                                                        <span class="badge bg-light text-muted border" style="font-size: 0.7rem;">{{ $pluginDiag['slug'] }}</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-soft-info text-info border me-1">v{{ $pluginDiag['version'] }}</span>
+                                                <small class="text-muted d-block">{{ $pluginDiag['author'] }}</small>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-light text-dark border">
+                                                    <i class="feather-anchor text-secondary me-1"></i>
+                                                    {{ __('messages.hooks_label_count', ['count' => $pluginDiag['hooks_count']]) }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <div class="d-flex flex-wrap gap-1">
+                                                    @if($pluginDiag['has_routes'])
+                                                        <span class="badge bg-soft-primary text-primary border" title="{{ __('messages.plugin_routes') }}">
+                                                            <i class="feather-navigation me-1"></i>{{ __('messages.plugin_routes') }}
+                                                        </span>
+                                                    @endif
+                                                    @if($pluginDiag['has_migrations'])
+                                                        <span class="badge bg-soft-secondary text-secondary border" title="{{ __('messages.plugin_migrations') }}">
+                                                            <i class="feather-database me-1"></i>{{ __('messages.plugin_migrations') }}
+                                                        </span>
+                                                    @endif
+                                                    @if($pluginDiag['has_external_apis'])
+                                                        <span class="badge bg-soft-danger text-danger border" title="{{ __('messages.plugin_external_apis') }}">
+                                                            <i class="feather-globe me-1"></i>{{ __('messages.plugin_external_apis') }}
+                                                        </span>
+                                                    @endif
+                                                    @if(!$pluginDiag['has_routes'] && !$pluginDiag['has_migrations'] && !$pluginDiag['has_external_apis'])
+                                                        <span class="text-muted small">{{ __('messages.plugin_no_extra_components') }}</span>
+                                                    @endif
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="fw-semibold text-muted small">
+                                                    {{ number_format($pluginDiag['size_bytes'] / 1048576, 2) }} MB
+                                                </span>
+                                            </td>
+                                            <td class="text-end">
+                                                <span class="badge {{ $impactBadgeClass }} px-2 py-1" style="border-radius: 12px;">
+                                                    @if($pluginDiag['impact_level'] === 'high')
+                                                        🟠
+                                                    @elseif($pluginDiag['impact_level'] === 'medium')
+                                                        🟡
+                                                    @else
+                                                        🟢
+                                                    @endif
+                                                    {{ $impactLabel }}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="6" class="text-center py-4 text-muted">
+                                                <i class="feather-info me-1"></i>{{ __('messages.no_active_plugins') }}
+                                            </td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
                     <!-- Storage Disks & Drivers -->
                     <div class="card border-0 shadow-sm">
                         <div class="card-header">
