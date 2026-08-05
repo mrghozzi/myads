@@ -56,6 +56,7 @@ Route::middleware(['auth', 'throttle:20,1'])->group(function () {
     Route::post('/status/upload-image', [App\Http\Controllers\StatusController::class, 'uploadImage'])->name('status.upload_image');
     Route::post('/status/link-preview', [App\Http\Controllers\StatusController::class, 'linkPreview'])->name('status.link_preview');
     Route::post('/status/gallery/add-images/{topicId}', [App\Http\Controllers\StatusController::class, 'addGalleryImages'])->name('status.gallery.add_images');
+    Route::post('/editor/upload-image', [App\Http\Controllers\StatusController::class, 'editorUploadImage'])->name('editor.upload_image');
 });
 
 Route::get('/statuses/{status}/edit', [App\Http\Controllers\StatusController::class, 'edit'])->name('status.edit')->middleware('auth');

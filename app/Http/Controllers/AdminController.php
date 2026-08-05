@@ -550,6 +550,8 @@ class AdminController extends Controller
     {
         $settings = Setting::firstOrFail();
         $adminTheme = Option::where('o_type', 'admin_settings')->where('name', 'theme')->value('o_valuer') ?? 'default';
+        $availableEditors = \App\Services\RichTextEditorService::getAvailableEditors();
+        $activeEditor = \App\Services\RichTextEditorService::getActiveEditor();
 
         $systemSettings = [
             'APP_NAME' => env('APP_NAME', $settings->titer ?? 'MYADS'),
@@ -568,7 +570,7 @@ class AdminController extends Controller
             'ADSTN_CLIENT_SECRET' => env('ADSTN_CLIENT_SECRET'),
         ];
 
-        return view('admin::admin.settings', compact('settings', 'adminTheme', 'systemSettings'));
+        return view('admin::admin.settings', compact('settings', 'adminTheme', 'systemSettings', 'availableEditors', 'activeEditor'));
     }
 
     public function updateSettings(Request $request)
@@ -583,6 +585,7 @@ class AdminController extends Controller
             'keyw' => 'nullable|string',
             'theme' => 'nullable|string|max:100',
             'admin_theme' => 'nullable|string|max:100',
+            'rich_text_editor' => 'nullable|string|max:100',
             'a_mail' => 'nullable|email|max:255',
             'r_pts' => 'nullable|numeric|min:0',
             'r_vu' => 'nullable|integer|min:0',
@@ -623,6 +626,11 @@ class AdminController extends Controller
             ['o_type' => 'admin_settings', 'name' => 'theme'],
             ['o_valuer' => $validated['admin_theme'] ?? 'default']
         );
+
+        // 2b. Update Active Rich Text Editor in options
+        if (isset($validated['rich_text_editor'])) {
+            \App\Services\RichTextEditorService::setActiveEditor($validated['rich_text_editor']);
+        }
 
         // 3. Write environment configuration to .env
         $envData = [

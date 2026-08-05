@@ -54,6 +54,31 @@ class StatusController extends Controller
             . '<input type="text" name="img" style="visibility:hidden" value="' . e($relativePath) . '">';
     }
 
+    /**
+     * Upload an image from the rich text editor (Quill.js).
+     * Returns JSON { url: '...' } for the editor to insert.
+     */
+    public function editorUploadImage(Request $request)
+    {
+        $request->validate([
+            'image' => 'required|image|mimes:jpeg,png,gif,webp,svg|max:5120',
+        ]);
+
+        $file = $request->file('image');
+        $extension = $file->getClientOriginalExtension();
+        $filename = 'editor_' . time() . '_' . Str::random(10) . '.' . $extension;
+
+        $destinationPath = base_path('upload');
+        if (!file_exists($destinationPath)) {
+            mkdir($destinationPath, 0755, true);
+        }
+
+        $file->move($destinationPath, $filename);
+        $url = asset('upload/' . $filename);
+
+        return response()->json(['url' => $url]);
+    }
+
     public function linkPreview(
         Request $request,
         LinkPreviewService $linkPreviewService,

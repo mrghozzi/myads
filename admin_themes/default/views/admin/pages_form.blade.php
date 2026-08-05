@@ -414,7 +414,10 @@
                             <label class="form-label" for="page-content">{{ __('messages.content') }}</label>
                             <div class="pe-content-wrap">
                                 <div class="pe-content-note">
-                                    <i class="feather-type me-1"></i>SCEditor
+                                    @php
+                                        $activeEditorBadge = \App\Services\RichTextEditorService::getActiveEditor();
+                                    @endphp
+                                    <i class="feather-type me-1"></i>{{ $activeEditorBadge === 'quill' ? 'Quill.js' : ($activeEditorBadge === 'sceditor' ? 'SCEditor' : ucfirst($activeEditorBadge)) }}
                                 </div>
                                 <textarea name="content" id="page-content" rows="16" class="form-control">{{ old('content', $page->content ?? '') }}</textarea>
                             </div>
@@ -542,21 +545,56 @@
 </div>
 
 @php
-    $sceditorCss = file_exists(public_path('assets/vendor/sceditor/themes/default.min.css'))
+    $activeEditor = \App\Services\RichTextEditorService::getActiveEditor();
+
+    $sceditorCss = file_exists(public_path('assets/vendor/sceditor/themes/default.min.css')) && str_contains(asset(''), '/public')
         ? asset('assets/vendor/sceditor/themes/default.min.css')
         : asset('public/assets/vendor/sceditor/themes/default.min.css');
-    $sceditorJs = file_exists(public_path('assets/vendor/sceditor/sceditor.min.js'))
+
+    $sceditorJs = file_exists(public_path('assets/vendor/sceditor/sceditor.min.js')) && str_contains(asset(''), '/public')
         ? asset('assets/vendor/sceditor/sceditor.min.js')
         : asset('public/assets/vendor/sceditor/sceditor.min.js');
-    $sceditorXhtml = file_exists(public_path('assets/vendor/sceditor/formats/xhtml.min.js'))
+
+    $sceditorXhtml = file_exists(public_path('assets/vendor/sceditor/formats/xhtml.min.js')) && str_contains(asset(''), '/public')
         ? asset('assets/vendor/sceditor/formats/xhtml.min.js')
         : asset('public/assets/vendor/sceditor/formats/xhtml.min.js');
-    $sceditorImg = file_exists(public_path('assets/vendor/sceditor/themes/famfamfam.png'))
+
+    $sceditorImg = file_exists(public_path('assets/vendor/sceditor/themes/famfamfam.png')) && str_contains(asset(''), '/public')
         ? asset('assets/vendor/sceditor/themes/famfamfam.png')
         : asset('public/assets/vendor/sceditor/themes/famfamfam.png');
+
+    $sceditorContentCss = file_exists(public_path('assets/vendor/sceditor/themes/content/default.min.css')) && str_contains(asset(''), '/public')
+        ? asset('assets/vendor/sceditor/themes/content/default.min.css')
+        : asset('public/assets/vendor/sceditor/themes/content/default.min.css');
+
+    $quillCss = file_exists(public_path('assets/vendor/quill/quill.snow.css')) && str_contains(asset(''), '/public')
+        ? asset('assets/vendor/quill/quill.snow.css')
+        : asset('public/assets/vendor/quill/quill.snow.css');
+
+    $quillJs = file_exists(public_path('assets/vendor/quill/quill.min.js')) && str_contains(asset(''), '/public')
+        ? asset('assets/vendor/quill/quill.min.js')
+        : asset('public/assets/vendor/quill/quill.min.js');
 @endphp
 
+@if($activeEditor === 'quill')
+<link rel="stylesheet" href="{{ $quillCss }}">
+<script src="{{ $quillJs }}"></script>
+@elseif($activeEditor === 'sceditor')
 <link rel="stylesheet" href="{{ $sceditorCss }}">
+<script src="{{ $sceditorJs }}"></script>
+<script src="{{ $sceditorXhtml }}"></script>
+@if(app()->getLocale() !== 'en' && file_exists(public_path('assets/vendor/sceditor/languages/' . app()->getLocale() . '.js')))
+<script src="{{ asset('assets/vendor/sceditor/languages/' . app()->getLocale() . '.js') }}"></script>
+@elseif(app()->getLocale() !== 'en' && file_exists(public_path('public/assets/vendor/sceditor/languages/' . app()->getLocale() . '.js')))
+<script src="{{ asset('public/assets/vendor/sceditor/languages/' . app()->getLocale() . '.js') }}"></script>
+@endif
+@else
+@php
+    \App\Helpers\Hooks::do_action('render_custom_editor_assets', $activeEditor);
+@endphp
+@endif
+
+
 <style>
 .pe-content-wrap {
     border: 1px solid var(--pe-border, #cbd5e1);
@@ -564,6 +602,7 @@
     overflow: hidden;
     background: var(--pe-card-bg, #ffffff);
 }
+/* --- SCEditor Styles --- */
 .sceditor-container {
     border: 0 !important;
     border-radius: 0 !important;
@@ -624,7 +663,7 @@
     background-color: #e2e8f0 !important;
 }
 .sceditor-button div {
-    display: block !important;
+    display: inline-block !important;
     width: 16px !important;
     height: 16px !important;
     margin: 0 auto !important;
@@ -655,15 +694,61 @@
 .app-skin-dark .sceditor-button div {
     filter: invert(0.9) hue-rotate(180deg);
 }
-</style>
 
-<script src="{{ $sceditorJs }}"></script>
-<script src="{{ $sceditorXhtml }}"></script>
-@if(app()->getLocale() !== 'en' && file_exists(public_path('assets/vendor/sceditor/languages/' . app()->getLocale() . '.js')))
-<script src="{{ asset('assets/vendor/sceditor/languages/' . app()->getLocale() . '.js') }}"></script>
-@elseif(app()->getLocale() !== 'en' && file_exists(public_path('public/assets/vendor/sceditor/languages/' . app()->getLocale() . '.js')))
-<script src="{{ asset('public/assets/vendor/sceditor/languages/' . app()->getLocale() . '.js') }}"></script>
-@endif
+/* --- Quill Styles --- */
+.ql-toolbar.ql-snow button {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+    width: 28px !important;
+    height: 28px !important;
+    padding: 4px !important;
+    margin: 1px !important;
+    border-radius: 6px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+.ql-toolbar.ql-snow button:hover {
+    background-color: #e2e8f0 !important;
+}
+.ql-toolbar.ql-snow button.ql-active {
+    background-color: #e0e7ff !important;
+}
+.ql-toolbar.ql-snow button svg {
+    display: block !important;
+    width: 18px !important;
+    height: 18px !important;
+    margin: 0 auto !important;
+}
+.ql-container.ql-snow {
+    min-height: 350px !important;
+    background: #ffffff;
+    border-radius: 0 0 12px 12px !important;
+    border: 1px solid #cbd5e1 !important;
+}
+.ql-editor {
+    min-height: 300px !important;
+    font-family: inherit !important;
+    font-size: 15px !important;
+}
+body[data-theme="css_d"] .ql-container.ql-snow,
+.app-skin-dark .ql-container.ql-snow {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+    color: #f8fafc !important;
+}
+body[data-theme="css_d"] .ql-toolbar.ql-snow,
+.app-skin-dark .ql-toolbar.ql-snow {
+    background: #0f172a !important;
+    border-color: #334155 !important;
+}
+body[data-theme="css_d"] .ql-toolbar.ql-snow button:hover,
+.app-skin-dark .ql-toolbar.ql-snow button:hover {
+    background-color: #334155 !important;
+}
+</style>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -696,9 +781,74 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // --- SCEditor ---
+    // --- Rich Text Editor Engine ---
+    var activeEditor = '{{ $activeEditor }}';
     var textarea = document.getElementById('page-content');
-    if (textarea && typeof sceditor !== 'undefined') {
+    if (!textarea) return;
+
+    if (activeEditor === 'quill' && typeof Quill !== 'undefined') {
+        textarea.style.display = 'none';
+        var quillDiv = document.createElement('div');
+        quillDiv.id = 'quill-page-editor';
+        quillDiv.style.minHeight = '340px';
+        quillDiv.innerHTML = textarea.value;
+        textarea.parentNode.insertBefore(quillDiv, textarea);
+
+        var quill = new Quill('#quill-page-editor', {
+            theme: 'snow',
+            modules: {
+                toolbar: {
+                    container: [
+                        [{ 'header': [1, 2, 3, 4, false] }],
+                        ['bold', 'italic', 'underline', 'strike', 'blockquote', 'code-block'],
+                        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                        [{ 'align': [] }, { 'direction': 'rtl' }],
+                        ['link', 'image'],
+                        ['clean']
+                    ],
+                    handlers: {
+                        image: function() {
+                            var input = document.createElement('input');
+                            input.setAttribute('type', 'file');
+                            input.setAttribute('accept', 'image/jpeg,image/png,image/gif,image/webp,image/svg+xml');
+                            input.click();
+                            input.onchange = function() {
+                                var file = input.files[0];
+                                if (!file) return;
+                                var formData = new FormData();
+                                formData.append('image', file);
+                                formData.append('_token', '{{ csrf_token() }}');
+                                fetch('{{ route("editor.upload_image") }}', {
+                                    method: 'POST',
+                                    body: formData,
+                                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                                })
+                                .then(function(res) { return res.json(); })
+                                .then(function(data) {
+                                    if (data.url) {
+                                        var range = quill.getSelection(true);
+                                        quill.insertEmbed(range.index, 'image', data.url);
+                                        quill.setSelection(range.index + 1);
+                                    }
+                                })
+                                .catch(function(err) { console.error('Image upload failed:', err); });
+                            };
+                        }
+                    }
+                }
+            }
+        });
+
+        var syncQuill = function() {
+            textarea.value = quill.root.innerHTML;
+        };
+
+        quill.on('text-change', syncQuill);
+        var form = textarea.closest('form');
+        if (form) {
+            form.addEventListener('submit', syncQuill);
+        }
+    } else if (activeEditor === 'sceditor' && typeof sceditor !== 'undefined') {
         if (sceditor.instance(textarea)) {
             sceditor.instance(textarea).destroy();
         }
@@ -706,7 +856,7 @@ document.addEventListener('DOMContentLoaded', function() {
         var currentLocale = '{{ app()->getLocale() }}';
         var opts = {
             format: 'xhtml',
-            style: '{{ asset("assets/vendor/sceditor/themes/content/default.min.css") }}',
+            style: '{{ $sceditorContentCss }}',
             toolbar: 'bold,italic,underline,strike|font,size,color,removeformat|left,center,right,justify|bulletlist,orderedlist|link,unlink,image|source',
             width: '100%',
             height: '380px',
@@ -720,7 +870,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
         sceditor.create(textarea, opts);
 
-        // Ensure editor instance syncs back to textarea on form submit
         var form = textarea.closest('form');
         if (form) {
             form.addEventListener('submit', function() {
@@ -730,6 +879,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
         }
+    } else {
+        @php
+            \App\Helpers\Hooks::do_action('render_custom_editor_js', 'page-content', $activeEditor);
+        @endphp
     }
 });
 </script>

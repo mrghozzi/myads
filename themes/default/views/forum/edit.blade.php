@@ -177,21 +177,57 @@
 
 @push('head')
 @php
-    $sceditorCss = file_exists(public_path('assets/vendor/sceditor/themes/default.min.css'))
+    $activeEditor = \App\Services\RichTextEditorService::getActiveEditor();
+
+    $sceditorCss = file_exists(public_path('assets/vendor/sceditor/themes/default.min.css')) && str_contains(asset(''), '/public')
         ? asset('assets/vendor/sceditor/themes/default.min.css')
         : asset('public/assets/vendor/sceditor/themes/default.min.css');
-    $sceditorJs = file_exists(public_path('assets/vendor/sceditor/sceditor.min.js'))
+
+    $sceditorJs = file_exists(public_path('assets/vendor/sceditor/sceditor.min.js')) && str_contains(asset(''), '/public')
         ? asset('assets/vendor/sceditor/sceditor.min.js')
         : asset('public/assets/vendor/sceditor/sceditor.min.js');
-    $sceditorXhtml = file_exists(public_path('assets/vendor/sceditor/formats/xhtml.min.js'))
+
+    $sceditorXhtml = file_exists(public_path('assets/vendor/sceditor/formats/xhtml.min.js')) && str_contains(asset(''), '/public')
         ? asset('assets/vendor/sceditor/formats/xhtml.min.js')
         : asset('public/assets/vendor/sceditor/formats/xhtml.min.js');
-    $sceditorImg = file_exists(public_path('assets/vendor/sceditor/themes/famfamfam.png'))
+
+    $sceditorImg = file_exists(public_path('assets/vendor/sceditor/themes/famfamfam.png')) && str_contains(asset(''), '/public')
         ? asset('assets/vendor/sceditor/themes/famfamfam.png')
         : asset('public/assets/vendor/sceditor/themes/famfamfam.png');
+
+    $sceditorContentCss = file_exists(public_path('assets/vendor/sceditor/themes/content/default.min.css')) && str_contains(asset(''), '/public')
+        ? asset('assets/vendor/sceditor/themes/content/default.min.css')
+        : asset('public/assets/vendor/sceditor/themes/content/default.min.css');
+
+    $quillCss = file_exists(public_path('assets/vendor/quill/quill.snow.css')) && str_contains(asset(''), '/public')
+        ? asset('assets/vendor/quill/quill.snow.css')
+        : asset('public/assets/vendor/quill/quill.snow.css');
+
+    $quillJs = file_exists(public_path('assets/vendor/quill/quill.min.js')) && str_contains(asset(''), '/public')
+        ? asset('assets/vendor/quill/quill.min.js')
+        : asset('public/assets/vendor/quill/quill.min.js');
 @endphp
+
+@if($activeEditor === 'quill')
+<link rel="stylesheet" href="{{ $quillCss }}" />
+<script src="{{ $quillJs }}"></script>
+@elseif($activeEditor === 'sceditor')
 <link rel="stylesheet" href="{{ $sceditorCss }}" />
+<script src="{{ $sceditorJs }}"></script>
+<script src="{{ $sceditorXhtml }}"></script>
+@if(app()->getLocale() !== 'en' && file_exists(public_path('assets/vendor/sceditor/languages/' . app()->getLocale() . '.js')))
+<script src="{{ asset('assets/vendor/sceditor/languages/' . app()->getLocale() . '.js') }}"></script>
+@elseif(app()->getLocale() !== 'en' && file_exists(public_path('public/assets/vendor/sceditor/languages/' . app()->getLocale() . '.js')))
+<script src="{{ asset('public/assets/vendor/sceditor/languages/' . app()->getLocale() . '.js') }}"></script>
+@endif
+@else
+@php
+    \App\Helpers\Hooks::do_action('render_custom_editor_assets', $activeEditor);
+@endphp
+@endif
+
 <style>
+/* --- SCEditor Styles --- */
 .sceditor-container {
     width: 100% !important;
     min-height: 380px !important;
@@ -252,7 +288,7 @@
     background-color: #e2e8f0 !important;
 }
 .sceditor-button div {
-    display: block !important;
+    display: inline-block !important;
     width: 16px !important;
     height: 16px !important;
     margin: 0 auto !important;
@@ -281,27 +317,136 @@ body[data-theme="css_d"] .sceditor-button:hover {
 body[data-theme="css_d"] .sceditor-button div {
     filter: invert(0.9) hue-rotate(180deg);
 }
+
+/* --- Quill Styles --- */
+.ql-toolbar.ql-snow button {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+    width: 28px !important;
+    height: 28px !important;
+    padding: 4px !important;
+    margin: 1px !important;
+    border-radius: 6px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+.ql-toolbar.ql-snow button:hover {
+    background-color: #e2e8f0 !important;
+}
+.ql-toolbar.ql-snow button.ql-active {
+    background-color: #e0e7ff !important;
+}
+.ql-toolbar.ql-snow button svg {
+    display: block !important;
+    width: 18px !important;
+    height: 18px !important;
+    margin: 0 auto !important;
+}
+.ql-container.ql-snow {
+    min-height: 350px !important;
+    background: #ffffff;
+    border-radius: 0 0 12px 12px !important;
+    border: 1px solid #cbd5e1 !important;
+}
+.ql-editor {
+    min-height: 300px !important;
+    font-family: inherit !important;
+    font-size: 15px !important;
+}
+body[data-theme="css_d"] .ql-container.ql-snow {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+    color: #f8fafc !important;
+}
+body[data-theme="css_d"] .ql-toolbar.ql-snow {
+    background: #0f172a !important;
+    border-color: #334155 !important;
+}
+body[data-theme="css_d"] .ql-toolbar.ql-snow button:hover {
+    background-color: #334155 !important;
+}
 </style>
-<script src="{{ $sceditorJs }}"></script>
-<script src="{{ $sceditorXhtml }}"></script>
-@if(app()->getLocale() !== 'en' && file_exists(public_path('assets/vendor/sceditor/languages/' . app()->getLocale() . '.js')))
-<script src="{{ asset('assets/vendor/sceditor/languages/' . app()->getLocale() . '.js') }}"></script>
-@elseif(app()->getLocale() !== 'en' && file_exists(public_path('public/assets/vendor/sceditor/languages/' . app()->getLocale() . '.js')))
-<script src="{{ asset('public/assets/vendor/sceditor/languages/' . app()->getLocale() . '.js') }}"></script>
-@endif
 @endpush
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        var activeEditor = '{{ $activeEditor }}';
         var textarea = document.getElementById('editor1');
-        if (textarea && typeof sceditor !== 'undefined') {
+        if (!textarea) return;
+
+        if (activeEditor === 'quill' && typeof Quill !== 'undefined') {
+            textarea.style.display = 'none';
+            var quillDiv = document.createElement('div');
+            quillDiv.id = 'quill-forum-edit-editor';
+            quillDiv.style.minHeight = '340px';
+            quillDiv.innerHTML = textarea.value;
+            textarea.parentNode.insertBefore(quillDiv, textarea);
+
+            var quill = new Quill('#quill-forum-edit-editor', {
+                theme: 'snow',
+                modules: {
+                    toolbar: {
+                        container: [
+                            [{ 'header': [1, 2, 3, 4, false] }],
+                            ['bold', 'italic', 'underline', 'strike', 'blockquote', 'code-block'],
+                            [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                            [{ 'align': [] }, { 'direction': 'rtl' }],
+                            ['link', 'image'],
+                            ['clean']
+                        ],
+                        handlers: {
+                            image: function() {
+                                var input = document.createElement('input');
+                                input.setAttribute('type', 'file');
+                                input.setAttribute('accept', 'image/jpeg,image/png,image/gif,image/webp,image/svg+xml');
+                                input.click();
+                                input.onchange = function() {
+                                    var file = input.files[0];
+                                    if (!file) return;
+                                    var formData = new FormData();
+                                    formData.append('image', file);
+                                    formData.append('_token', '{{ csrf_token() }}');
+                                    fetch('{{ route("editor.upload_image") }}', {
+                                        method: 'POST',
+                                        body: formData,
+                                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                                    })
+                                    .then(function(res) { return res.json(); })
+                                    .then(function(data) {
+                                        if (data.url) {
+                                            var range = quill.getSelection(true);
+                                            quill.insertEmbed(range.index, 'image', data.url);
+                                            quill.setSelection(range.index + 1);
+                                        }
+                                    })
+                                    .catch(function(err) { console.error('Image upload failed:', err); });
+                                };
+                            }
+                        }
+                    }
+                }
+            });
+
+            var syncQuill = function() {
+                textarea.value = quill.root.innerHTML;
+            };
+
+            quill.on('text-change', syncQuill);
+            var form = textarea.closest('form');
+            if (form) {
+                form.addEventListener('submit', syncQuill);
+            }
+        } else if (activeEditor === 'sceditor' && typeof sceditor !== 'undefined') {
             if (sceditor.instance(textarea)) {
                 sceditor.instance(textarea).destroy();
             }
             var currentLocale = '{{ app()->getLocale() }}';
             var opts = {
                 format: 'xhtml',
-                style: '{{ asset("assets/vendor/sceditor/themes/content/default.min.css") }}',
+                style: '{{ $sceditorContentCss }}',
                 width: '100%',
                 height: '350px',
                 resizeEnabled: true,
@@ -329,6 +474,10 @@ body[data-theme="css_d"] .sceditor-button div {
                     }
                 });
             }
+        } else {
+            @php
+                \App\Helpers\Hooks::do_action('render_custom_editor_js', 'editor1', $activeEditor);
+            @endphp
         }
     });
 

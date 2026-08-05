@@ -173,6 +173,25 @@
                                 <label class="form-label fw-semibold">{{ __('messages.admin_theme_title') ?? 'Admin Panel Theme' }}</label>
                                 <input type="text" name="admin_theme" class="form-control" value="{{ old('admin_theme', $adminTheme ?? 'default') }}" placeholder="default">
                             </div>
+
+                            <div class="col-12">
+                                <label class="form-label fw-semibold">
+                                    <i class="feather-edit-3 me-1 text-primary"></i>{{ __('messages.rich_text_editor_title') ?? 'Rich Text Editor (محرر النصوص)' }}
+                                </label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light"><i class="feather-edit-2"></i></span>
+                                    <select name="rich_text_editor" class="form-select">
+                                        @foreach($availableEditors as $key => $label)
+                                            <option value="{{ $key }}" {{ old('rich_text_editor', $activeEditor ?? 'quill') === $key ? 'selected' : '' }}>
+                                                {{ $label }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="form-text text-muted">
+                                    {{ __('messages.rich_text_editor_help') ?? 'Choose the default rich text editor used for site pages, forum topics, and articles. 3rd-party plugins can register custom editors here.' }}
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </section>
