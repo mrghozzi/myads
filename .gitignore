@@ -33,6 +33,7 @@ Thumbs.db
 /Documents
 !/Documents/
 !/Documents/UPGRADE.md
+/Documents/proposals_*.md
 
 /plugins/*
 !/plugins/.gitignore
