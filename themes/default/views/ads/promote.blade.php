@@ -1,244 +1,773 @@
 @extends('theme::layouts.master')
 
 @section('content')
-<div class="promotion-shell">
-    <div class="section-banner" style="background: linear-gradient(135deg, #615dfa 0%, #40d4f3 100%); min-height: 200px; border-radius: 16px; margin-bottom: 30px; position: relative; overflow: hidden; display: flex; align-items: center; padding: 0 50px;">
-        <div class="section-banner-content" style="z-index: 2; position: relative; max-width: 600px;">
-            <p class="section-banner-title" style="font-size: 2.5rem; font-weight: 800; color: #fff; margin-bottom: 10px; line-height: 1.2;">{{ __('messages.promote_your_site') }}</p>
-            <p class="section-banner-text" style="color: rgba(255, 255, 255, 0.95); font-size: 1.1rem; line-height: 1.5;">{{ __('messages.get_traffic') }}</p>
-        </div>
-        <div class="section-banner-decoration" style="position: absolute; right: -50px; bottom: -50px; width: 300px; height: 300px; background: rgba(255,255,255,0.1); border-radius: 50%; pointer-events: none;"></div>
-        <img class="section-banner-icon" src="{{ theme_asset('img/banner/newsfeed-icon.png') }}" alt="promote-icon" style="position: absolute; right: 60px; top: 50%; transform: translateY(-50%); height: 140px; opacity: 0.2; pointer-events: none;">
-    </div>
-
-    @if(session('success'))
-    <div class="alert alert-success shadow-sm mb-4" style="border-radius: 12px; border: none; padding: 15px 25px;">
-        <i class="fa fa-check-circle me-2"></i> {{ session('success') }}
-    </div>
-    @endif
-
-    @if($errors->any())
-    <div class="alert alert-danger shadow-sm mb-4" style="border-radius: 12px; border: none;">
-        <ul style="list-style: none; padding: 0; margin: 0;">
-            @foreach($errors->all() as $error)
-                <li><i class="fa fa-exclamation-triangle me-2"></i> {{ $error }}</li>
-            @endforeach
-        </ul>
-    </div>
-    @endif
-
+<div class="promotion-shell superdesign-post-container">
     @php
         $activeTab = request('p', 'all');
         $bannerSizes = \App\Support\BannerSizeCatalog::ordered();
     @endphp
 
-    <div class="grid grid-3-9">
-        {{-- Sidebar Navigation --}}
-        <div class="grid-column">
-            <div class="widget-box shadow-sm" style="border-radius: 12px; border: none; padding: 10px;">
-                <div class="sidebar-menu">
-                    <a href="{{ route('ads.promote', ['p' => 'banners']) }}" class="sidebar-menu-item {{ $activeTab === 'banners' ? 'active' : '' }}">
-                        <i class="fa fa-image me-3"></i> {{ __('messages.bannads') }}
+    <!-- @.superdesign Glassmorphic Hero Banner -->
+    <div class="superdesign-post-hero">
+        <div class="superdesign-hero-header">
+            <div class="superdesign-hero-title-wrap">
+                <div class="superdesign-hero-icon-badge">
+                    <i class="fa fa-bullhorn"></i>
+                </div>
+                <div>
+                    <h1 class="superdesign-hero-title">
+                        {{ __('messages.promote_your_site') }}
+                    </h1>
+                    <p class="superdesign-hero-subtitle">
+                        {{ __('messages.get_traffic') }}
+                    </p>
+                </div>
+            </div>
+            <div class="superdesign-hero-badges">
+                <span class="superdesign-pill-badge">
+                    <i class="fa fa-ad"></i>
+                    {{ __('messages.ad_exchange') ?? 'تبادل الإعلانات' }}
+                </span>
+                <span class="superdesign-pill-badge">
+                    <i class="fa fa-coins"></i>
+                    {{ __('messages.pts_short') ?? 'PTS' }}
+                </span>
+            </div>
+        </div>
+    </div>
+
+    @if(session('success'))
+        <div class="alert alert-success shadow-sm mb-4" style="border-radius: 14px; border: none; padding: 15px 25px;">
+            <i class="fa fa-check-circle me-2"></i> {{ session('success') }}
+        </div>
+    @endif
+
+    @if($errors->any())
+        <div class="alert alert-danger shadow-sm mb-4" style="border-radius: 14px; border: none;">
+            <ul style="list-style: none; padding: 0; margin: 0;">
+                @foreach($errors->all() as $error)
+                    <li><i class="fa fa-exclamation-triangle me-2"></i> {{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
+    <!-- Main Grid Architecture -->
+    <div class="superdesign-post-grid">
+        <!-- Sidebar Navigation & Tips -->
+        <div class="superdesign-sidebar-col">
+            <div class="superdesign-sidebar-card">
+                <h3 class="superdesign-sidebar-title">
+                    <i class="fa fa-layer-group"></i>
+                    {{ __('messages.ad_types') ?? 'أنواع الإعلانات' }}
+                </h3>
+                <div class="superdesign-nav-list">
+                    <a href="{{ route('ads.promote', ['p' => 'banners']) }}" class="superdesign-nav-item {{ $activeTab === 'banners' ? 'active' : '' }}">
+                        <i class="fa fa-image"></i>
+                        <span>{{ __('messages.bannads') }}</span>
                     </a>
-                    <a href="{{ route('ads.promote', ['p' => 'link']) }}" class="sidebar-menu-item {{ $activeTab === 'link' ? 'active' : '' }}">
-                        <i class="fa fa-link me-3"></i> {{ __('messages.textads') }}
+                    <a href="{{ route('ads.promote', ['p' => 'link']) }}" class="superdesign-nav-item {{ $activeTab === 'link' ? 'active' : '' }}">
+                        <i class="fa fa-font"></i>
+                        <span>{{ __('messages.textads') }}</span>
                     </a>
-                    <a href="{{ route('ads.promote', ['p' => 'exchange']) }}" class="sidebar-menu-item {{ $activeTab === 'exchange' ? 'active' : '' }}">
-                        <i class="fa fa-exchange-alt me-3"></i> {{ __('messages.exvisit') }}
+                    <a href="{{ route('ads.promote', ['p' => 'exchange']) }}" class="superdesign-nav-item {{ $activeTab === 'exchange' ? 'active' : '' }}">
+                        <i class="fa fa-exchange-alt"></i>
+                        <span>{{ __('messages.exvisit') }}</span>
                     </a>
-                    <hr style="margin: 10px 0; border-top: 1px solid #eee;">
-                    <a href="{{ route('ads.promote') }}" class="sidebar-menu-item {{ $activeTab === 'all' ? 'active' : '' }}">
-                        <i class="fa fa-th-large me-3"></i> {{ __('messages.all_methods') }}
+                    <div style="height: 1px; background: #f1f5f9; margin: 10px 0;"></div>
+                    <a href="{{ route('ads.promote') }}" class="superdesign-nav-item {{ $activeTab === 'all' ? 'active' : '' }}">
+                        <i class="fa fa-th-large"></i>
+                        <span>{{ __('messages.all_methods') }}</span>
                     </a>
                 </div>
             </div>
 
-            <div class="widget-box shadow-sm mt-4" style="border-radius: 12px; border: none; padding: 20px;">
-                <h6 style="font-weight: 700; margin-bottom: 10px; color: #333;">{{ __('messages.quick_tip') }}</h6>
-                <p style="font-size: 0.85rem; color: #777; line-height: 1.5;">
+            <!-- Quick Tip Card -->
+            <div class="superdesign-pts-tip">
+                <div class="superdesign-pts-tip-title">
+                    <i class="fa fa-lightbulb"></i>
+                    <span>{{ __('messages.quick_tip') }}</span>
+                </div>
+                <span>
                     {{ __('messages.promote_tip_desc') }}
-                </p>
+                </span>
             </div>
         </div>
 
-        {{-- Main Content --}}
-        <div class="grid-column">
-            {{-- BANNERS SECTION --}}
+        <!-- Main Content Area -->
+        <div class="superdesign-main-content">
+            
+            <!-- BANNERS SECTION -->
             @if($activeTab === 'banners' || $activeTab === 'all')
-            <div class="widget-box shadow-lg mb-4" style="border-radius: 16px; border: none; padding: 30px;">
-                <div class="widget-box-header d-flex justify-content-between align-items-center mb-4">
-                    <h5 class="widget-box-title" style="font-size: 1.25rem; font-weight: 700; color: #615dfa;">
-                        <i class="fa fa-image me-2"></i> {{ __('messages.bannads') }}
-                    </h5>
-                    <span class="badge" style="background: rgba(97, 93, 250, 0.1); color: #615dfa; padding: 5px 12px; border-radius: 20px; font-weight: 600;">-1 {{ __('messages.point') }}</span>
-                </div>
-                <form method="post" action="{{ route('ads.banners.store') }}" class="form-modern">
-                    @csrf
-                    <div class="form-row split mb-3">
-                        <div class="form-item">
-                            <div class="form-input small active shadow-sm">
-                                <label>{{ __('messages.name_ads') }}</label>
-                                <input type="text" name="name" value="{{ old('name') }}" required placeholder="{{ __('messages.name_ads_placeholder') }}">
-                            </div>
+                <div class="superdesign-composer-card" style="margin-bottom: 28px;">
+                    <div class="superdesign-section-header">
+                        <div class="superdesign-section-title">
+                            <i class="fa fa-image text-primary"></i>
+                            <h2>{{ __('messages.bannads') }}</h2>
                         </div>
-                        <div class="form-item">
-                            <div class="form-input small active shadow-sm">
-                                <label>{{ __('messages.url_link') }}</label>
-                                <input type="url" name="url" value="{{ old('url') }}" required placeholder="{{ __('messages.url_link_placeholder') }}">
-                            </div>
-                        </div>
+                        <span class="superdesign-cost-badge">
+                            -1 {{ __('messages.point') }}
+                        </span>
                     </div>
-                    <div class="form-row split mb-4">
-                        <div class="form-item">
-                            <div class="form-select shadow-sm" style="border: 1px solid #eee; border-radius: 8px;">
-                                <label>{{ __('messages.banner_size') }}</label>
-                                <select name="px" required>
+
+                    <form method="post" action="{{ route('ads.banners.store') }}">
+                        @csrf
+                        <div class="superdesign-fields-row">
+                            <div class="superdesign-field-group">
+                                <label class="superdesign-field-label">
+                                    <i class="fa fa-heading"></i>
+                                    {{ __('messages.name_ads') }}
+                                </label>
+                                <div class="superdesign-input-wrapper">
+                                    <input 
+                                        type="text" 
+                                        name="name" 
+                                        class="superdesign-input" 
+                                        value="{{ old('name') }}" 
+                                        required 
+                                        placeholder="{{ __('messages.name_ads_placeholder') }}"
+                                    >
+                                </div>
+                            </div>
+
+                            <div class="superdesign-field-group">
+                                <label class="superdesign-field-label">
+                                    <i class="fa fa-link"></i>
+                                    {{ __('messages.url_link') }}
+                                </label>
+                                <div class="superdesign-input-wrapper">
+                                    <input 
+                                        type="url" 
+                                        name="url" 
+                                        class="superdesign-input" 
+                                        value="{{ old('url') }}" 
+                                        required 
+                                        placeholder="{{ __('messages.url_link_placeholder') }}"
+                                    >
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="superdesign-fields-row">
+                            <div class="superdesign-field-group">
+                                <label class="superdesign-field-label">
+                                    <i class="fa fa-ruler-combined"></i>
+                                    {{ __('messages.banner_size') }}
+                                </label>
+                                <select name="px" class="superdesign-select" required>
                                     @foreach($bannerSizes as $size)
                                         <option value="{{ $size['value'] }}" {{ old('px') == $size['value'] ? 'selected' : '' }}>{{ $size['label'] }}</option>
                                     @endforeach
                                 </select>
-                                <svg class="form-select-icon icon-small-arrow"><use xlink:href="#svg-small-arrow"></use></svg>
+                            </div>
+
+                            <div class="superdesign-field-group">
+                                <label class="superdesign-field-label">
+                                    <i class="fa fa-image"></i>
+                                    {{ __('messages.image_link') }}
+                                </label>
+                                <div class="superdesign-input-wrapper">
+                                    <input 
+                                        type="text" 
+                                        name="img" 
+                                        class="superdesign-input" 
+                                        value="{{ old('img') }}" 
+                                        required 
+                                        placeholder="{{ __('messages.image_link_placeholder') }}"
+                                    >
+                                </div>
                             </div>
                         </div>
-                        <div class="form-item">
-                            <div class="form-input small active shadow-sm">
-                                <label>{{ __('messages.image_link') }}</label>
-                                <input type="text" name="img" value="{{ old('img') }}" required placeholder="{{ __('messages.image_link_placeholder') }}">
-                            </div>
+
+                        <div class="superdesign-actions-bar" style="margin-top: 14px; border-top: none; padding-top: 0;">
+                            <div></div>
+                            <button type="submit" class="superdesign-btn-primary">
+                                <i class="fa fa-plus"></i>
+                                {{ __('messages.add') }}
+                            </button>
                         </div>
-                    </div>
-                    <div class="d-flex justify-content-end">
-                        <button type="submit" class="button primary big shadow-sm" style="padding: 0 40px; border-radius: 8px;">
-                            <i class="fa fa-plus me-2"></i> {{ __('messages.add') }}
-                        </button>
-                    </div>
-                </form>
-            </div>
+                    </form>
+                </div>
             @endif
 
-            {{-- TEXT ADS SECTION --}}
+            <!-- TEXT ADS SECTION -->
             @if($activeTab === 'link' || $activeTab === 'all')
-            <div class="widget-box shadow-lg mb-4" style="border-radius: 16px; border: none; padding: 30px;">
-                <div class="widget-box-header d-flex justify-content-between align-items-center mb-4">
-                    <h5 class="widget-box-title" style="font-size: 1.25rem; font-weight: 700; color: #40d4f3;">
-                        <i class="fa fa-link me-2"></i> {{ __('messages.textads') }}
-                    </h5>
-                    <span class="badge" style="background: rgba(64, 212, 243, 0.1); color: #40d4f3; padding: 5px 12px; border-radius: 20px; font-weight: 600;">-1 {{ __('messages.point') }}</span>
+                <div class="superdesign-composer-card" style="margin-bottom: 28px;">
+                    <div class="superdesign-section-header">
+                        <div class="superdesign-section-title">
+                            <i class="fa fa-font text-info"></i>
+                            <h2>{{ __('messages.textads') }}</h2>
+                        </div>
+                        <span class="superdesign-cost-badge" style="background: rgba(35, 210, 226, 0.12); color: #23d2e2;">
+                            -1 {{ __('messages.point') }}
+                        </span>
+                    </div>
+
+                    <form method="post" action="{{ route('ads.links.store') }}">
+                        @csrf
+                        <div class="superdesign-fields-row">
+                            <div class="superdesign-field-group">
+                                <label class="superdesign-field-label">
+                                    <i class="fa fa-heading"></i>
+                                    {{ __('messages.name_ads') }}
+                                </label>
+                                <div class="superdesign-input-wrapper">
+                                    <input 
+                                        type="text" 
+                                        name="name" 
+                                        class="superdesign-input" 
+                                        value="{{ old('name') }}" 
+                                        required 
+                                        placeholder="{{ __('messages.text_ads_placeholder') }}"
+                                    >
+                                </div>
+                            </div>
+
+                            <div class="superdesign-field-group">
+                                <label class="superdesign-field-label">
+                                    <i class="fa fa-link"></i>
+                                    {{ __('messages.url_link') }}
+                                </label>
+                                <div class="superdesign-input-wrapper">
+                                    <input 
+                                        type="url" 
+                                        name="url" 
+                                        class="superdesign-input" 
+                                        value="{{ old('url') }}" 
+                                        required 
+                                        placeholder="{{ __('messages.url_link_placeholder') }}"
+                                    >
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="superdesign-field-group">
+                            <label class="superdesign-field-label">
+                                <i class="fa fa-align-left"></i>
+                                {{ __('messages.text_p') }}
+                            </label>
+                            <div class="superdesign-input-wrapper">
+                                <textarea 
+                                    name="txt" 
+                                    class="superdesign-textarea" 
+                                    rows="4" 
+                                    required 
+                                    placeholder="{{ __('messages.was_desc') }}"
+                                >{{ old('txt') }}</textarea>
+                            </div>
+                        </div>
+
+                        <div class="superdesign-actions-bar" style="margin-top: 14px; border-top: none; padding-top: 0;">
+                            <div></div>
+                            <button type="submit" class="superdesign-btn-primary" style="background: linear-gradient(135deg, #23d2e2 0%, #00d2ff 100%);">
+                                <i class="fa fa-plus"></i>
+                                {{ __('messages.add') }}
+                            </button>
+                        </div>
+                    </form>
                 </div>
-                <form method="post" action="{{ route('ads.links.store') }}" class="form-modern">
-                    @csrf
-                    <div class="form-row split mb-3">
-                        <div class="form-item">
-                            <div class="form-input small active shadow-sm">
-                                <label>{{ __('messages.name_ads') }}</label>
-                                <input type="text" name="name" value="{{ old('name') }}" required placeholder="{{ __('messages.text_ads_placeholder') }}">
-                            </div>
-                        </div>
-                        <div class="form-item">
-                            <div class="form-input small active shadow-sm">
-                                <label>{{ __('messages.url_link') }}</label>
-                                <input type="url" name="url" value="{{ old('url') }}" required placeholder="{{ __('messages.url_link_placeholder') }}">
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-row mb-4">
-                        <div class="form-item">
-                            <div class="form-input small full shadow-sm" style="border: 1px solid #eee; border-radius: 8px;">
-                                <textarea name="txt" placeholder="{{ __('messages.was_desc') }}" required style="min-height: 100px;">{{ old('txt') }}</textarea>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="d-flex justify-content-end">
-                        <button type="submit" class="button secondary big shadow-sm" style="padding: 0 40px; border-radius: 8px; background: #40d4f3 !important;">
-                            <i class="fa fa-plus me-2" style="color: #fff;"></i> <span style="color: #fff;">{{ __('messages.add') }}</span>
-                        </button>
-                    </div>
-                </form>
-            </div>
             @endif
 
-            {{-- EXCHANGE SECTION --}}
+            <!-- VISIT EXCHANGE SECTION -->
             @if($activeTab === 'exchange' || $activeTab === 'all')
-            <div class="widget-box shadow-lg mb-4" style="border-radius: 16px; border: none; padding: 30px;">
-                <div class="widget-box-header d-flex justify-content-between align-items-center mb-4">
-                    <h5 class="widget-box-title" style="font-size: 1.25rem; font-weight: 700; color: #fd4350;">
-                        <i class="fa fa-exchange-alt me-2"></i> {{ __('messages.exvisit') }}
-                    </h5>
-                    <span class="badge" style="background: rgba(253, 67, 80, 0.1); color: #fd4350; padding: 5px 12px; border-radius: 20px; font-weight: 600;">{{ __('messages.dynamic_cost') }}</span>
-                </div>
-                <form method="post" action="{{ route('visits.store') }}" class="form-modern">
-                    @csrf
-                    <div class="form-row split mb-3">
-                        <div class="form-item">
-                            <div class="form-input small active shadow-sm">
-                                <label>{{ __('messages.name_ads') }}</label>
-                                <input type="text" name="name" value="{{ old('name') }}" required placeholder="{{ __('messages.exchange_name_placeholder') }}">
-                            </div>
+                <div class="superdesign-composer-card">
+                    <div class="superdesign-section-header">
+                        <div class="superdesign-section-title">
+                            <i class="fa fa-exchange-alt text-danger"></i>
+                            <h2>{{ __('messages.exvisit') }}</h2>
                         </div>
-                        <div class="form-item">
-                            <div class="form-input small active shadow-sm">
-                                <label>{{ __('messages.url_link') }}</label>
-                                <input type="url" name="url" value="{{ old('url') }}" required placeholder="{{ __('messages.url_link_placeholder') }}">
-                            </div>
-                        </div>
+                        <span class="superdesign-cost-badge" style="background: rgba(239, 68, 68, 0.12); color: #ef4444;">
+                            {{ __('messages.dynamic_cost') }}
+                        </span>
                     </div>
-                    <div class="form-row split mb-4">
-                        <div class="form-item">
-                            <div class="form-select shadow-sm" style="border: 1px solid #eee; border-radius: 8px;">
-                                <label>{{ __('messages.visits_time') }}</label>
-                                <select name="tims" required>
+
+                    <form method="post" action="{{ route('visits.store') }}">
+                        @csrf
+                        <div class="superdesign-fields-row">
+                            <div class="superdesign-field-group">
+                                <label class="superdesign-field-label">
+                                    <i class="fa fa-heading"></i>
+                                    {{ __('messages.name_ads') }}
+                                </label>
+                                <div class="superdesign-input-wrapper">
+                                    <input 
+                                        type="text" 
+                                        name="name" 
+                                        class="superdesign-input" 
+                                        value="{{ old('name') }}" 
+                                        required 
+                                        placeholder="{{ __('messages.exchange_name_placeholder') }}"
+                                    >
+                                </div>
+                            </div>
+
+                            <div class="superdesign-field-group">
+                                <label class="superdesign-field-label">
+                                    <i class="fa fa-link"></i>
+                                    {{ __('messages.url_link') }}
+                                </label>
+                                <div class="superdesign-input-wrapper">
+                                    <input 
+                                        type="url" 
+                                        name="url" 
+                                        class="superdesign-input" 
+                                        value="{{ old('url') }}" 
+                                        required 
+                                        placeholder="{{ __('messages.url_link_placeholder') }}"
+                                    >
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="superdesign-fields-row">
+                            <div class="superdesign-field-group">
+                                <label class="superdesign-field-label">
+                                    <i class="fa fa-clock"></i>
+                                    {{ __('messages.visits_time') }}
+                                </label>
+                                <select name="tims" class="superdesign-select" required>
                                     <option value="1" {{ old('tims') == '1' ? 'selected' : '' }}>10s / -1 {{ __('messages.pts_short') }}</option>
                                     <option value="2" {{ old('tims') == '2' ? 'selected' : '' }}>20s / -2 {{ __('messages.pts_short') }}</option>
                                     <option value="3" {{ old('tims') == '3' ? 'selected' : '' }}>30s / -5 {{ __('messages.pts_short') }}</option>
                                     <option value="4" {{ old('tims') == '4' ? 'selected' : '' }}>60s / -10 {{ __('messages.pts_short') }}</option>
                                 </select>
-                                <svg class="form-select-icon icon-small-arrow"><use xlink:href="#svg-small-arrow"></use></svg>
+                            </div>
+
+                            <div class="superdesign-field-group" style="display: flex; align-items: flex-end;">
+                                <button type="submit" class="superdesign-btn-primary" style="width: 100%; background: linear-gradient(135deg, #ef4444 0%, #f97316 100%);">
+                                    <i class="fa fa-plus"></i>
+                                    {{ __('messages.add') }}
+                                </button>
                             </div>
                         </div>
-                        <div class="form-item d-flex align-items-center justify-content-end">
-                            <button type="submit" class="button primary big shadow-sm" style="padding: 0 40px; border-radius: 8px; background: #fd4350 !important;">
-                                <i class="fa fa-plus me-2"></i> {{ __('messages.add') }}
-                            </button>
-                        </div>
-                    </div>
-                </form>
-            </div>
+                    </form>
+                </div>
             @endif
         </div>
     </div>
 </div>
 
 <style>
-    .sidebar-menu { display: flex; flex-direction: column; }
-    .sidebar-menu-item {
-        padding: 12px 15px;
-        border-radius: 8px;
-        color: #3e3f5e;
-        font-weight: 600;
-        font-size: 0.875rem;
-        transition: all 0.2s ease;
-        display: flex;
-        align-items: center;
-        text-decoration: none !important;
+/* --- @.superdesign Core Tokens for /ads/promote --- */
+.superdesign-post-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 24px 15px 60px;
+}
+
+/* Glassmorphic Hero Banner */
+.superdesign-post-hero {
+    position: relative;
+    background: linear-gradient(135deg, rgba(97, 93, 250, 0.14) 0%, rgba(35, 210, 226, 0.09) 50%, rgba(27, 200, 219, 0.03) 100%);
+    border: 1px solid rgba(97, 93, 250, 0.2);
+    border-radius: 24px;
+    padding: 32px;
+    margin-bottom: 28px;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 14px 35px rgba(15, 23, 42, 0.04);
+    overflow: hidden;
+}
+.superdesign-post-hero::before {
+    content: '';
+    position: absolute;
+    top: -60px;
+    right: -60px;
+    width: 220px;
+    height: 220px;
+    background: radial-gradient(circle, rgba(97, 93, 250, 0.25) 0%, rgba(97, 93, 250, 0) 70%);
+    border-radius: 50%;
+    pointer-events: none;
+}
+.superdesign-hero-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+.superdesign-hero-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+.superdesign-hero-icon-badge {
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #615dfa 0%, #23d2e2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    font-size: 24px;
+    box-shadow: 0 8px 20px rgba(97, 93, 250, 0.35);
+    flex-shrink: 0;
+}
+.superdesign-hero-title {
+    font-size: 24px;
+    font-weight: 800;
+    margin: 0 0 4px 0;
+    color: #1e293b;
+    letter-spacing: -0.02em;
+}
+.superdesign-hero-subtitle {
+    font-size: 14px;
+    color: #64748b;
+    margin: 0;
+}
+.superdesign-hero-badges {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.superdesign-pill-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 50rem;
+    font-size: 12.5px;
+    font-weight: 600;
+    background: rgba(255, 255, 255, 0.85);
+    border: 1px solid rgba(97, 93, 250, 0.25);
+    color: #615dfa;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+}
+
+/* Grid Architecture */
+.superdesign-post-grid {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 28px;
+}
+@media (max-width: 991px) {
+    .superdesign-post-grid {
+        grid-template-columns: 1fr;
     }
-    .sidebar-menu-item:hover { background: #f8f8fb; color: #615dfa; }
-    .sidebar-menu-item.active { background: #615dfa; color: #fff !important; }
-    
-    .form-input.small.active { border: 1px solid #eee; border-radius: 8px; }
-    .form-input.small.active label { background: #fff; padding: 0 5px; left: 10px; top: -10px; color: #615dfa; font-weight: 600; }
-    
-    .shadow-lg { box-shadow: 0 10px 30px rgba(0,0,0,0.08) !important; }
-    .shadow-sm { box-shadow: 0 2px 8px rgba(0,0,0,0.04) !important; }
-    
-    .d-flex { display: flex !important; }
-    .justify-content-between { justify-content: space-between !important; }
-    .justify-content-end { justify-content: flex-end !important; }
-    .align-items-center { align-items: center !important; }
-    .me-2 { margin-right: 0.5rem; }
-    .me-3 { margin-right: 0.75rem; }
-    .mb-4 { margin-bottom: 1.5rem; }
-    .mb-3 { margin-bottom: 1rem; }
-    .mt-4 { margin-top: 1.5rem; }
-    .w-100 { width: 100%; }
+}
+
+/* Main Composer Card */
+.superdesign-composer-card {
+    background: #ffffff;
+    border-radius: 20px;
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+    padding: 28px;
+}
+
+.superdesign-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 22px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid #f1f5f9;
+}
+.superdesign-section-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.superdesign-section-title h2 {
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0;
+    color: #1e293b;
+}
+.superdesign-cost-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 4px 12px;
+    border-radius: 50rem;
+    font-size: 12.5px;
+    font-weight: 700;
+    background: rgba(97, 93, 250, 0.12);
+    color: #615dfa;
+}
+
+.superdesign-fields-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+@media (max-width: 768px) {
+    .superdesign-fields-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+.superdesign-field-group {
+    margin-bottom: 20px;
+}
+.superdesign-field-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #334155;
+    margin-bottom: 8px;
+}
+.superdesign-field-label i {
+    color: #615dfa;
+}
+.superdesign-input-wrapper {
+    position: relative;
+}
+.superdesign-input {
+    width: 100%;
+    height: 48px;
+    padding: 10px 16px;
+    font-size: 15px;
+    font-weight: 500;
+    color: #0f172a;
+    background: #f8fafc;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 12px;
+    transition: all 0.25s ease;
+    outline: none;
+}
+.superdesign-input:focus {
+    background: #ffffff;
+    border-color: #615dfa;
+    box-shadow: 0 0 0 4px rgba(97, 93, 250, 0.15);
+}
+.superdesign-textarea {
+    width: 100%;
+    min-height: 100px;
+    padding: 12px 16px;
+    font-size: 14.5px;
+    font-weight: 500;
+    color: #0f172a;
+    background: #f8fafc;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 12px;
+    transition: all 0.25s ease;
+    outline: none;
+    resize: vertical;
+}
+.superdesign-textarea:focus {
+    background: #ffffff;
+    border-color: #615dfa;
+    box-shadow: 0 0 0 4px rgba(97, 93, 250, 0.15);
+}
+.superdesign-select {
+    width: 100%;
+    height: 48px;
+    padding: 10px 16px;
+    font-size: 14.5px;
+    font-weight: 600;
+    color: #334155;
+    background: #f8fafc url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%20615dfa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") no-repeat calc(100% - 16px) center;
+    background-size: 16px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 12px;
+    appearance: none;
+    -webkit-appearance: none;
+    outline: none;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+html[dir="rtl"] .superdesign-select {
+    background-position: 16px center;
+}
+.superdesign-select:focus {
+    background-color: #ffffff;
+    border-color: #615dfa;
+    box-shadow: 0 0 0 4px rgba(97, 93, 250, 0.15);
+}
+
+/* Sidebar Navigation Items */
+.superdesign-nav-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+.superdesign-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #475569;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+.superdesign-nav-item:hover {
+    background: #f1f5f9;
+    color: #615dfa;
+}
+.superdesign-nav-item.active {
+    background: linear-gradient(135deg, #615dfa 0%, #23d2e2 100%);
+    color: #ffffff !important;
+    box-shadow: 0 6px 16px rgba(97, 93, 250, 0.3);
+}
+
+/* Buttons */
+.superdesign-actions-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.superdesign-btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 12px 28px;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 700;
+    color: #ffffff;
+    background: linear-gradient(135deg, #615dfa 0%, #23d2e2 100%);
+    border: none;
+    box-shadow: 0 8px 20px rgba(97, 93, 250, 0.3);
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+.superdesign-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px rgba(97, 93, 250, 0.4);
+    color: #ffffff;
+}
+
+/* Sidebar Widgets */
+.superdesign-sidebar-card {
+    background: #ffffff;
+    border-radius: 20px;
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+    padding: 22px;
+    margin-bottom: 20px;
+}
+.superdesign-sidebar-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 16px;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0 0 16px 0;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #f1f5f9;
+}
+.superdesign-sidebar-title i {
+    color: #615dfa;
+}
+.superdesign-pts-tip {
+    background: linear-gradient(135deg, rgba(97, 93, 250, 0.08) 0%, rgba(35, 210, 226, 0.08) 100%);
+    border: 1px solid rgba(97, 93, 250, 0.2);
+    border-radius: 16px;
+    padding: 16px;
+    font-size: 13px;
+    color: #475569;
+    line-height: 1.5;
+}
+.superdesign-pts-tip-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    color: #615dfa;
+    margin-bottom: 6px;
+}
+
+/* --- Dark Mode Parity --- */
+body[data-theme="css_d"] .superdesign-post-hero,
+html.app-skin-dark .superdesign-post-hero,
+.dark-mode .superdesign-post-hero {
+    background: linear-gradient(135deg, rgba(97, 93, 250, 0.15) 0%, rgba(35, 210, 226, 0.1) 100%), #1a1d2e;
+    border-color: rgba(255, 255, 255, 0.08);
+}
+body[data-theme="css_d"] .superdesign-hero-title,
+html.app-skin-dark .superdesign-hero-title,
+.dark-mode .superdesign-hero-title {
+    color: #f8fafc;
+}
+body[data-theme="css_d"] .superdesign-hero-subtitle,
+html.app-skin-dark .superdesign-hero-subtitle,
+.dark-mode .superdesign-hero-subtitle {
+    color: #94a3b8;
+}
+body[data-theme="css_d"] .superdesign-pill-badge,
+html.app-skin-dark .superdesign-pill-badge,
+.dark-mode .superdesign-pill-badge {
+    background: rgba(30, 41, 59, 0.9);
+    border-color: rgba(97, 93, 250, 0.35);
+    color: #818cf8;
+}
+
+body[data-theme="css_d"] .superdesign-composer-card,
+body[data-theme="css_d"] .superdesign-sidebar-card,
+html.app-skin-dark .superdesign-composer-card,
+html.app-skin-dark .superdesign-sidebar-card,
+.dark-mode .superdesign-composer-card,
+.dark-mode .superdesign-sidebar-card {
+    background: #1a1d2e;
+    border-color: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+body[data-theme="css_d"] .superdesign-section-title h2,
+body[data-theme="css_d"] .superdesign-field-label,
+body[data-theme="css_d"] .superdesign-sidebar-title,
+html.app-skin-dark .superdesign-section-title h2,
+html.app-skin-dark .superdesign-field-label,
+html.app-skin-dark .superdesign-sidebar-title,
+.dark-mode .superdesign-section-title h2,
+.dark-mode .superdesign-field-label,
+.dark-mode .superdesign-sidebar-title {
+    color: #f1f5f9;
+}
+body[data-theme="css_d"] .superdesign-input,
+body[data-theme="css_d"] .superdesign-textarea,
+body[data-theme="css_d"] .superdesign-select,
+html.app-skin-dark .superdesign-input,
+html.app-skin-dark .superdesign-textarea,
+html.app-skin-dark .superdesign-select,
+.dark-mode .superdesign-input,
+.dark-mode .superdesign-textarea,
+.dark-mode .superdesign-select {
+    background-color: #0f172a;
+    border-color: #334155;
+    color: #f8fafc;
+}
+body[data-theme="css_d"] .superdesign-input:focus,
+body[data-theme="css_d"] .superdesign-textarea:focus,
+body[data-theme="css_d"] .superdesign-select:focus,
+html.app-skin-dark .superdesign-input:focus,
+html.app-skin-dark .superdesign-textarea:focus,
+html.app-skin-dark .superdesign-select:focus,
+.dark-mode .superdesign-input:focus,
+.dark-mode .superdesign-textarea:focus,
+.dark-mode .superdesign-select:focus {
+    background-color: #1e293b;
+    border-color: #615dfa;
+}
+body[data-theme="css_d"] .superdesign-nav-item,
+html.app-skin-dark .superdesign-nav-item,
+.dark-mode .superdesign-nav-item {
+    color: #cbd5e1;
+}
+body[data-theme="css_d"] .superdesign-nav-item:hover,
+html.app-skin-dark .superdesign-nav-item:hover,
+.dark-mode .superdesign-nav-item:hover {
+    background: #334155;
+    color: #615dfa;
+}
+body[data-theme="css_d"] .superdesign-pts-tip,
+html.app-skin-dark .superdesign-pts-tip,
+.dark-mode .superdesign-pts-tip {
+    background: rgba(97, 93, 250, 0.12);
+    border-color: rgba(97, 93, 250, 0.3);
+    color: #cbd5e1;
+}
+body[data-theme="css_d"] .superdesign-section-header,
+html.app-skin-dark .superdesign-section-header,
+.dark-mode .superdesign-section-header {
+    border-bottom-color: #334155;
+}
 </style>
 @endsection

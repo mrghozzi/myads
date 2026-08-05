@@ -2,7 +2,7 @@
 @include('theme::forum._assets')
 
 @section('content')
-<div class="forum-rdx forum-rdx-form">
+<div class="forum-rdx forum-rdx-form superdesign-post-container">
 @php
     $activeEditor = \App\Services\RichTextEditorService::getActiveEditor();
 
@@ -54,7 +54,357 @@
 @endif
 
 <style>
-/* --- SCEditor Styles --- */
+/* --- @.superdesign Core Tokens & Layout for /post --- */
+.superdesign-post-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 24px 15px 60px;
+}
+
+/* Glassmorphic Hero Banner */
+.superdesign-post-hero {
+    position: relative;
+    background: linear-gradient(135deg, rgba(97, 93, 250, 0.12) 0%, rgba(35, 210, 226, 0.08) 50%, rgba(27, 200, 219, 0.03) 100%);
+    border: 1px solid rgba(97, 93, 250, 0.2);
+    border-radius: 24px;
+    padding: 32px;
+    margin-bottom: 28px;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 14px 35px rgba(15, 23, 42, 0.04);
+    overflow: hidden;
+}
+.superdesign-post-hero::before {
+    content: '';
+    position: absolute;
+    top: -60px;
+    right: -60px;
+    width: 220px;
+    height: 220px;
+    background: radial-gradient(circle, rgba(97, 93, 250, 0.25) 0%, rgba(97, 93, 250, 0) 70%);
+    border-radius: 50%;
+    pointer-events: none;
+}
+.superdesign-hero-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+.superdesign-hero-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+.superdesign-hero-icon-badge {
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #615dfa 0%, #23d2e2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    font-size: 24px;
+    box-shadow: 0 8px 20px rgba(97, 93, 250, 0.35);
+    flex-shrink: 0;
+}
+.superdesign-hero-title {
+    font-size: 24px;
+    font-weight: 800;
+    margin: 0 0 4px 0;
+    color: #1e293b;
+    letter-spacing: -0.02em;
+}
+.superdesign-hero-subtitle {
+    font-size: 14px;
+    color: #64748b;
+    margin: 0;
+}
+.superdesign-hero-badges {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.superdesign-pill-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 50rem;
+    font-size: 12.5px;
+    font-weight: 600;
+    background: rgba(255, 255, 255, 0.85);
+    border: 1px solid rgba(97, 93, 250, 0.25);
+    color: #615dfa;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+}
+
+/* Grid Architecture */
+.superdesign-post-grid {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 28px;
+}
+@media (max-width: 991px) {
+    .superdesign-post-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Main Composer Card */
+.superdesign-composer-card {
+    background: #ffffff;
+    border-radius: 20px;
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+    padding: 28px;
+}
+.superdesign-field-group {
+    margin-bottom: 22px;
+}
+.superdesign-field-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #334155;
+    margin-bottom: 8px;
+}
+.superdesign-field-label i {
+    color: #615dfa;
+}
+.superdesign-input-wrapper {
+    position: relative;
+}
+.superdesign-input {
+    width: 100%;
+    height: 48px;
+    padding: 10px 16px;
+    font-size: 15px;
+    font-weight: 500;
+    color: #0f172a;
+    background: #f8fafc;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 12px;
+    transition: all 0.25s ease;
+    outline: none;
+}
+.superdesign-input:focus {
+    background: #ffffff;
+    border-color: #615dfa;
+    box-shadow: 0 0 0 4px rgba(97, 93, 250, 0.15);
+}
+.superdesign-select {
+    width: 100%;
+    height: 48px;
+    padding: 10px 16px;
+    font-size: 14.5px;
+    font-weight: 600;
+    color: #334155;
+    background: #f8fafc url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%20615dfa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") no-repeat calc(100% - 16px) center;
+    background-size: 16px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 12px;
+    appearance: none;
+    -webkit-appearance: none;
+    outline: none;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+html[dir="rtl"] .superdesign-select {
+    background-position: 16px center;
+}
+.superdesign-select:focus {
+    background-color: #ffffff;
+    border-color: #615dfa;
+    box-shadow: 0 0 0 4px rgba(97, 93, 250, 0.15);
+}
+
+/* Editor Wrapper Upgrade */
+.superdesign-editor-box {
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1.5px solid #e2e8f0;
+    transition: border-color 0.25s ease;
+}
+.superdesign-editor-box:focus-within {
+    border-color: #615dfa;
+    box-shadow: 0 0 0 4px rgba(97, 93, 250, 0.12);
+}
+
+/* Attachments Dropzone Box */
+.superdesign-dropzone-box {
+    background: #f8fafc;
+    border: 2px dashed #cbd5e1;
+    border-radius: 16px;
+    padding: 20px;
+    text-align: center;
+    transition: all 0.25s ease;
+    cursor: pointer;
+    margin-top: 10px;
+}
+.superdesign-dropzone-box:hover {
+    border-color: #615dfa;
+    background: rgba(97, 93, 250, 0.02);
+}
+.superdesign-dropzone-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: rgba(97, 93, 250, 0.1);
+    color: #615dfa;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    margin-bottom: 8px;
+}
+.superdesign-dropzone-text {
+    font-size: 14px;
+    font-weight: 600;
+    color: #475569;
+    margin-bottom: 4px;
+}
+.superdesign-dropzone-hint {
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+/* Existing attachments list */
+.superdesign-attachments-list {
+    margin-top: 14px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 14px;
+}
+.superdesign-attachment-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: #f8fafc;
+    margin-bottom: 6px;
+}
+.superdesign-attachment-item:last-child {
+    margin-bottom: 0;
+}
+
+/* Form Actions */
+.superdesign-actions-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 28px;
+    padding-top: 20px;
+    border-top: 1px solid #f1f5f9;
+}
+.superdesign-btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 28px;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 700;
+    color: #ffffff;
+    background: linear-gradient(135deg, #615dfa 0%, #23d2e2 100%);
+    border: none;
+    box-shadow: 0 8px 20px rgba(97, 93, 250, 0.3);
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+.superdesign-btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px rgba(97, 93, 250, 0.4);
+    color: #ffffff;
+}
+.superdesign-btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #64748b;
+    background: #f1f5f9;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+.superdesign-btn-secondary:hover {
+    background: #e2e8f0;
+    color: #334155;
+}
+
+/* Sidebar Widgets */
+.superdesign-sidebar-card {
+    background: #ffffff;
+    border-radius: 20px;
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+    padding: 22px;
+    margin-bottom: 20px;
+}
+.superdesign-sidebar-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 16px;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0 0 16px 0;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #f1f5f9;
+}
+.superdesign-sidebar-title i {
+    color: #615dfa;
+}
+.superdesign-guidelines-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.superdesign-guidelines-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 13.5px;
+    color: #475569;
+    line-height: 1.5;
+    margin-bottom: 12px;
+}
+.superdesign-guidelines-list li:last-child {
+    margin-bottom: 0;
+}
+.superdesign-guidelines-list i {
+    color: #10b981;
+    margin-top: 3px;
+    flex-shrink: 0;
+}
+.superdesign-pts-tip {
+    background: linear-gradient(135deg, rgba(97, 93, 250, 0.08) 0%, rgba(35, 210, 226, 0.08) 100%);
+    border: 1px solid rgba(97, 93, 250, 0.2);
+    border-radius: 16px;
+    padding: 16px;
+    font-size: 13px;
+    color: #475569;
+    line-height: 1.5;
+}
+.superdesign-pts-tip-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    color: #615dfa;
+    margin-bottom: 6px;
+}
+
+/* --- SCEditor Override Styles --- */
 .sceditor-container {
     width: 100% !important;
     min-height: 380px !important;
@@ -126,26 +476,8 @@
     background-image: url('{{ $sceditorImg }}') !important;
     background-repeat: no-repeat !important;
 }
-body[data-theme="css_d"] .sceditor-container {
-    background: #1e293b !important;
-    border-color: #334155 !important;
-}
-body[data-theme="css_d"] .sceditor-toolbar {
-    background: #0f172a !important;
-    border-bottom-color: #334155 !important;
-}
-body[data-theme="css_d"] .sceditor-group {
-    background: #1e293b !important;
-    border-color: #334155 !important;
-}
-body[data-theme="css_d"] .sceditor-button:hover {
-    background-color: #334155 !important;
-}
-body[data-theme="css_d"] .sceditor-button div {
-    filter: invert(0.9) hue-rotate(180deg);
-}
 
-/* --- Quill Styles --- */
+/* --- Quill Override Styles --- */
 .ql-toolbar.ql-snow button {
     background: transparent !important;
     border: none !important;
@@ -183,124 +515,362 @@ body[data-theme="css_d"] .sceditor-button div {
     font-family: inherit !important;
     font-size: 15px !important;
 }
-body[data-theme="css_d"] .ql-container.ql-snow {
+
+/* --- Dark Mode Parity --- */
+body[data-theme="css_d"] .superdesign-post-hero,
+html.app-skin-dark .superdesign-post-hero,
+.dark-mode .superdesign-post-hero {
+    background: linear-gradient(135deg, rgba(97, 93, 250, 0.15) 0%, rgba(35, 210, 226, 0.1) 100%), #1a1d2e;
+    border-color: rgba(255, 255, 255, 0.08);
+}
+body[data-theme="css_d"] .superdesign-hero-title,
+html.app-skin-dark .superdesign-hero-title,
+.dark-mode .superdesign-hero-title {
+    color: #f8fafc;
+}
+body[data-theme="css_d"] .superdesign-hero-subtitle,
+html.app-skin-dark .superdesign-hero-subtitle,
+.dark-mode .superdesign-hero-subtitle {
+    color: #94a3b8;
+}
+body[data-theme="css_d"] .superdesign-pill-badge,
+html.app-skin-dark .superdesign-pill-badge,
+.dark-mode .superdesign-pill-badge {
+    background: rgba(30, 41, 59, 0.9);
+    border-color: rgba(97, 93, 250, 0.35);
+    color: #818cf8;
+}
+
+body[data-theme="css_d"] .superdesign-composer-card,
+body[data-theme="css_d"] .superdesign-sidebar-card,
+html.app-skin-dark .superdesign-composer-card,
+html.app-skin-dark .superdesign-sidebar-card,
+.dark-mode .superdesign-composer-card,
+.dark-mode .superdesign-sidebar-card {
+    background: #1a1d2e;
+    border-color: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+body[data-theme="css_d"] .superdesign-field-label,
+body[data-theme="css_d"] .superdesign-sidebar-title,
+html.app-skin-dark .superdesign-field-label,
+html.app-skin-dark .superdesign-sidebar-title,
+.dark-mode .superdesign-field-label,
+.dark-mode .superdesign-sidebar-title {
+    color: #f1f5f9;
+}
+body[data-theme="css_d"] .superdesign-input,
+body[data-theme="css_d"] .superdesign-select,
+html.app-skin-dark .superdesign-input,
+html.app-skin-dark .superdesign-select,
+.dark-mode .superdesign-input,
+.dark-mode .superdesign-select {
+    background-color: #0f172a;
+    border-color: #334155;
+    color: #f8fafc;
+}
+body[data-theme="css_d"] .superdesign-input:focus,
+body[data-theme="css_d"] .superdesign-select:focus,
+html.app-skin-dark .superdesign-input:focus,
+html.app-skin-dark .superdesign-select:focus,
+.dark-mode .superdesign-input:focus,
+.dark-mode .superdesign-select:focus {
+    background-color: #1e293b;
+    border-color: #615dfa;
+}
+body[data-theme="css_d"] .superdesign-dropzone-box,
+html.app-skin-dark .superdesign-dropzone-box,
+.dark-mode .superdesign-dropzone-box {
+    background: #0f172a;
+    border-color: #334155;
+}
+body[data-theme="css_d"] .superdesign-dropzone-text,
+html.app-skin-dark .superdesign-dropzone-text,
+.dark-mode .superdesign-dropzone-text {
+    color: #cbd5e1;
+}
+body[data-theme="css_d"] .superdesign-guidelines-list li,
+html.app-skin-dark .superdesign-guidelines-list li,
+.dark-mode .superdesign-guidelines-list li {
+    color: #cbd5e1;
+}
+body[data-theme="css_d"] .superdesign-pts-tip,
+html.app-skin-dark .superdesign-pts-tip,
+.dark-mode .superdesign-pts-tip {
+    background: rgba(97, 93, 250, 0.12);
+    border-color: rgba(97, 93, 250, 0.3);
+    color: #cbd5e1;
+}
+body[data-theme="css_d"] .superdesign-actions-bar,
+html.app-skin-dark .superdesign-actions-bar,
+.dark-mode .superdesign-actions-bar {
+    border-top-color: #334155;
+}
+body[data-theme="css_d"] .superdesign-btn-secondary,
+html.app-skin-dark .superdesign-btn-secondary,
+.dark-mode .superdesign-btn-secondary {
+    background: #334155;
+    color: #cbd5e1;
+}
+body[data-theme="css_d"] .superdesign-btn-secondary:hover,
+html.app-skin-dark .superdesign-btn-secondary:hover,
+.dark-mode .superdesign-btn-secondary:hover {
+    background: #475569;
+    color: #ffffff;
+}
+
+body[data-theme="css_d"] .sceditor-container,
+html.app-skin-dark .sceditor-container,
+.dark-mode .sceditor-container {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+}
+body[data-theme="css_d"] .sceditor-toolbar,
+html.app-skin-dark .sceditor-toolbar,
+.dark-mode .sceditor-toolbar {
+    background: #0f172a !important;
+    border-bottom-color: #334155 !important;
+}
+body[data-theme="css_d"] .sceditor-group,
+html.app-skin-dark .sceditor-group,
+.dark-mode .sceditor-group {
+    background: #1e293b !important;
+    border-color: #334155 !important;
+}
+body[data-theme="css_d"] .sceditor-button:hover,
+html.app-skin-dark .sceditor-button:hover,
+.dark-mode .sceditor-button:hover {
+    background-color: #334155 !important;
+}
+body[data-theme="css_d"] .sceditor-button div,
+html.app-skin-dark .sceditor-button div,
+.dark-mode .sceditor-button div {
+    filter: invert(0.9) hue-rotate(180deg);
+}
+
+body[data-theme="css_d"] .ql-container.ql-snow,
+html.app-skin-dark .ql-container.ql-snow,
+.dark-mode .ql-container.ql-snow {
     background: #1e293b !important;
     border-color: #334155 !important;
     color: #f8fafc !important;
 }
-body[data-theme="css_d"] .ql-toolbar.ql-snow {
+body[data-theme="css_d"] .ql-toolbar.ql-snow,
+html.app-skin-dark .ql-toolbar.ql-snow,
+.dark-mode .ql-toolbar.ql-snow {
     background: #0f172a !important;
     border-color: #334155 !important;
 }
-body[data-theme="css_d"] .ql-toolbar.ql-snow button:hover {
+body[data-theme="css_d"] .ql-toolbar.ql-snow button:hover,
+html.app-skin-dark .ql-toolbar.ql-snow button:hover,
+.dark-mode .ql-toolbar.ql-snow button:hover {
     background-color: #334155 !important;
 }
 </style>
 
 <div id="page-wrapper" class="forum-rdx-form-shell">
-                    @if($errors->any())
-                        <div class="alert alert-danger" style="margin-bottom: 12px;">
-                            <ul style="margin: 0; padding-left: 18px;">
-                                @foreach($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
 
-                    <form method="POST" action="{{ isset($topic) ? route('forum.update', $topic->id) : route('forum.store') }}" enctype="multipart/form-data">
-                        @csrf
-                        @if(isset($topic))
-                            <input type="hidden" name="id" value="{{ $topic->id }}">
-                        @endif
-
-                        @if(isset($editType) && $editType == 7867)
-                            <input type="hidden" name="name" value="{{ old('name', $topic->name ?? '') }}" />
-                        @else
-                            <div class="form-row split">
-                                <div class="form-item">
-                                    <div class="form-input social-input small active">
-                                        <div class="social-link no-hover name">
-                                            <i class="fa fa-edit" aria-hidden="true"></i>
-                                        </div>
-                                        <label for="name">{{ __('messages.sbj') }}</label>
-                                        <input type="text" id="name" name="name" value="{{ old('name', $topic->name ?? '') }}">
-                                    </div>
-                                </div>
-                            </div>
-                        @endif
-
-                        <div class="form-row">
-                            <div class="form-item">
-                                <div class="form-input">
-                                    <textarea id="editor1" name="txt" rows="16">{{ old('txt', $topic->txt ?? '') }}</textarea>
-                                </div>
-                            </div>
-                        </div>
-
-                        @if(!isset($editType) || $editType != 7867)
-                            <div class="form-row split">
-                                <div class="form-item">
-                                    <div class="form-select">
-                                        <label for="profile-status"><i class="fa fa-folder" aria-hidden="true"></i>&nbsp;{{ __('messages.category_fallback') ?? 'Category' }}</label>
-                                        <select id="profile-status" name="categ">
-                                            @foreach($categories as $category)
-                                                <option value="{{ $category->id }}" {{ (old('categ', $topic->cat ?? '') == $category->id) ? 'selected' : '' }}>
-                                                    {{ $category->name }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                        <svg class="form-select-icon icon-small-arrow">
-                                            <use xlink:href="#svg-small-arrow"></use>
-                                        </svg>
-                                    </div>
-                                </div>
-                            </div>
-                        @endif
-
-                        @if((int) ($forumSettings['attachments_enabled'] ?? 1) === 1)
-                            <div class="form-row forum-rdx-attachment-box">
-                                <div class="form-item">
-                                    <label for="attachments">{{ __('messages.attachments') }}</label>
-                                    <input
-                                        type="file"
-                                        id="attachments"
-                                        name="attachments[]"
-                                        multiple
-                                        style="width: 100%;"
-                                        accept=".{{ str_replace(',', ',.', $forumSettings['allowed_attachment_extensions'] ?? '') }}"
-                                    >
-                                    <small style="display:block;color:#7f85a3;margin-top:4px;">
-                                        {{ __('messages.max_attachments_per_topic') }}: {{ $forumSettings['max_attachments_per_topic'] ?? 5 }} |
-                                        {{ __('messages.max_attachment_size') }}: {{ $forumSettings['max_attachment_size_kb'] ?? 10240 }} KB
-                                    </small>
-                                </div>
-                            </div>
-
-                            @if(isset($topic) && $topic->attachments && $topic->attachments->isNotEmpty())
-                                <div class="form-row forum-rdx-attachment-box" style="margin-top: 12px;">
-                                    <div class="form-item">
-                                        <p class="bold" style="margin-bottom: 8px;">{{ __('messages.current_attachments') }}</p>
-                                        @foreach($topic->attachments as $attachment)
-                                            <label style="display:block;margin-bottom:6px;">
-                                                <input type="checkbox" name="delete_attachments[]" value="{{ $attachment->id }}">
-                                                {{ __('messages.delete') }}: {{ $attachment->original_name }} ({{ $attachment->human_size }})
-                                            </label>
-                                        @endforeach
-                                    </div>
-                                </div>
-                            @endif
-                        @endif
-
-                        <hr />
-
-                        <div class="form-item split">
-                            <input type="hidden" name="type" value="100" />
-                            <input type="hidden" name="set" value="Publish" />
-                            <button type="submit" name="submit" value="Publish" class="button primary">{{ __('messages.spread') }}</button>
-                        </div>
-                    </form>
+    <!-- @.superdesign Glassmorphic Hero Banner -->
+    <div class="superdesign-post-hero">
+        <div class="superdesign-hero-header">
+            <div class="superdesign-hero-title-wrap">
+                <div class="superdesign-hero-icon-badge">
+                    <i class="fa fa-pen-nib"></i>
                 </div>
+                <div>
+                    <h1 class="superdesign-hero-title">
+                        {{ isset($topic) ? __('messages.edit_topic') : (__('messages.create_new_topic') ?? 'نشر موضوع جديد') }}
+                    </h1>
+                    <p class="superdesign-hero-subtitle">
+                        {{ __('messages.forum_post_subtitle') ?? 'شارك أفكارك وتجاربك مع مجتمع MYADS وساهم في إثراء النقاش الفعّال' }}
+                    </p>
+                </div>
+            </div>
+            <div class="superdesign-hero-badges">
+                <span class="superdesign-pill-badge">
+                    <i class="fa fa-code"></i>
+                    {{ strtoupper($activeEditor) }}
+                </span>
+                <span class="superdesign-pill-badge">
+                    <i class="fa fa-shield-alt"></i>
+                    {{ __('messages.community_rules') ?? 'قواعد المجتمع' }}
+                </span>
+            </div>
+        </div>
+    </div>
+
+    @if($errors->any())
+        <div class="alert alert-danger" style="margin-bottom: 24px; border-radius: 14px;">
+            <ul style="margin: 0; padding-left: 18px;">
+                @foreach($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
+    <!-- Main Grid Architecture -->
+    <div class="superdesign-post-grid">
+        <!-- Column 1: Main Form -->
+        <div class="superdesign-composer-card">
+            <form method="POST" action="{{ isset($topic) ? route('forum.update', $topic->id) : route('forum.store') }}" enctype="multipart/form-data">
+                @csrf
+                @if(isset($topic))
+                    <input type="hidden" name="id" value="{{ $topic->id }}">
+                @endif
+
+                @if(isset($editType) && $editType == 7867)
+                    <input type="hidden" name="name" value="{{ old('name', $topic->name ?? '') }}" />
+                @else
+                    <div class="superdesign-field-group">
+                        <label for="name" class="superdesign-field-label">
+                            <i class="fa fa-heading"></i>
+                            {{ __('messages.sbj') }}
+                        </label>
+                        <div class="superdesign-input-wrapper">
+                            <input 
+                                type="text" 
+                                id="name" 
+                                name="name" 
+                                class="superdesign-input" 
+                                placeholder="{{ __('messages.subject_placeholder') ?? 'اكتب عنواناً واضحاً وموجزاً لموضوعك...' }}" 
+                                value="{{ old('name', $topic->name ?? '') }}" 
+                                required
+                            >
+                        </div>
+                    </div>
+                @endif
+
+                @if(!isset($editType) || $editType != 7867)
+                    <div class="superdesign-field-group">
+                        <label for="profile-status" class="superdesign-field-label">
+                            <i class="fa fa-folder-open"></i>
+                            {{ __('messages.category_fallback') ?? 'القسم' }}
+                        </label>
+                        <select id="profile-status" name="categ" class="superdesign-select" required>
+                            @foreach($categories as $category)
+                                <option value="{{ $category->id }}" {{ (old('categ', $topic->cat ?? '') == $category->id) ? 'selected' : '' }}>
+                                    {{ $category->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                @endif
+
+                <div class="superdesign-field-group">
+                    <label for="editor1" class="superdesign-field-label">
+                        <i class="fa fa-align-left"></i>
+                        {{ __('messages.content') ?? 'المحتوى والتفاصيل' }}
+                    </label>
+                    <div class="superdesign-editor-box">
+                        <textarea id="editor1" name="txt" rows="16">{{ old('txt', $topic->txt ?? '') }}</textarea>
+                    </div>
+                </div>
+
+                @if((int) ($forumSettings['attachments_enabled'] ?? 1) === 1)
+                    <div class="superdesign-field-group">
+                        <label class="superdesign-field-label">
+                            <i class="fa fa-paperclip"></i>
+                            {{ __('messages.attachments') }}
+                        </label>
+                        <div class="superdesign-dropzone-box" onclick="document.getElementById('attachments').click();">
+                            <div class="superdesign-dropzone-icon">
+                                <i class="fa fa-cloud-upload-alt"></i>
+                            </div>
+                            <div class="superdesign-dropzone-text">
+                                {{ __('messages.click_to_upload_files') ?? 'اضغط هنا لرفع المرفقات والمستندات' }}
+                            </div>
+                            <div class="superdesign-dropzone-hint">
+                                {{ __('messages.max_attachments_per_topic') }}: {{ $forumSettings['max_attachments_per_topic'] ?? 5 }} |
+                                {{ __('messages.max_attachment_size') }}: {{ $forumSettings['max_attachment_size_kb'] ?? 10240 }} KB
+                            </div>
+                            <input
+                                type="file"
+                                id="attachments"
+                                name="attachments[]"
+                                multiple
+                                style="display: none;"
+                                accept=".{{ str_replace(',', ',.', $forumSettings['allowed_attachment_extensions'] ?? '') }}"
+                                onchange="if(this.files.length) { this.previousElementSibling.innerText = this.files.length + ' ملف/ملفات مختارة'; }"
+                            >
+                        </div>
+
+                        @if(isset($topic) && $topic->attachments && $topic->attachments->isNotEmpty())
+                            <div class="superdesign-attachments-list">
+                                <div class="superdesign-field-label" style="font-size: 13px; margin-bottom: 8px;">
+                                    <i class="fa fa-file-alt"></i>
+                                    {{ __('messages.current_attachments') }}
+                                </div>
+                                @foreach($topic->attachments as $attachment)
+                                    <div class="superdesign-attachment-item">
+                                        <span style="font-size: 13px; font-weight: 500; color: #475569;">
+                                            <i class="fa fa-paperclip me-1 text-primary"></i>
+                                            {{ $attachment->original_name }} ({{ $attachment->human_size }})
+                                        </span>
+                                        <label style="font-size: 12px; font-weight: 600; color: #ef4444; margin: 0; cursor: pointer;">
+                                            <input type="checkbox" name="delete_attachments[]" value="{{ $attachment->id }}">
+                                            {{ __('messages.delete') }}
+                                        </label>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endif
+                    </div>
+                @endif
+
+                <div class="superdesign-actions-bar">
+                    <a href="{{ route('forum.index') }}" class="superdesign-btn-secondary">
+                        <i class="fa fa-times"></i>
+                        {{ __('messages.cancel') ?? 'إلغاء' }}
+                    </a>
+
+                    <input type="hidden" name="type" value="100" />
+                    <input type="hidden" name="set" value="Publish" />
+                    <button type="submit" name="submit" value="Publish" class="superdesign-btn-primary">
+                        <i class="fa fa-paper-plane"></i>
+                        {{ __('messages.spread') }}
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Column 2: Sidebar Guidance -->
+        <div class="superdesign-sidebar-col">
+            <!-- Guidelines Card -->
+            <div class="superdesign-sidebar-card">
+                <h3 class="superdesign-sidebar-title">
+                    <i class="fa fa-lightbulb"></i>
+                    {{ __('messages.posting_tips') ?? 'إرشادات النشر المثالي' }}
+                </h3>
+                <ul class="superdesign-guidelines-list">
+                    <li>
+                        <i class="fa fa-check-circle"></i>
+                        <span>اختر عنواناً واضحاً ومختصراً يلخص الفكرة الأساسية للموضوع.</span>
+                    </li>
+                    <li>
+                        <i class="fa fa-check-circle"></i>
+                        <span>اختر القسم المناسب لموضوعك لضمان وصوله للجمهور المهتم.</span>
+                    </li>
+                    <li>
+                        <i class="fa fa-check-circle"></i>
+                        <span>استخدم تنسيقات النصوص والصور لتوضيح الفكرة وتسهيل القراءة.</span>
+                    </li>
+                    <li>
+                        <i class="fa fa-check-circle"></i>
+                        <span>تأكد من خلو الموضوع من الروابط الترويجية العشوائية أو المحتوى السبام.</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- PTS Reward Tip Card -->
+            <div class="superdesign-pts-tip">
+                <div class="superdesign-pts-tip-title">
+                    <i class="fa fa-coins"></i>
+                    <span>مكافآت التفاعل (PTS)</span>
+                </div>
+                <span>
+                    كتابة المواضيع القيمة والتفاعل مع ردود الأعضاء يمنحك نقاط تفاعل جديدة تساعدك على ترويج إعلاناتك ومستنداتك داخل الشبكة!
+                </span>
             </div>
         </div>
     </div>
