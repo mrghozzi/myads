@@ -547,6 +547,7 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/shared-hosting-guide', [AdminController::class, 'sharedHostingGuide'])->name('admin.shared_hosting_guide');
     Route::get('/system-monitor', [AdminController::class, 'systemMonitor'])->name('admin.system_monitor');
     Route::post('/system-monitor/clear-cache', [AdminController::class, 'clearSystemCache'])->name('admin.system_monitor.clear_cache');
+    Route::post('/system-monitor/optimize-table', [AdminController::class, 'optimizeTable'])->name('admin.system_monitor.optimize_table');
     Route::get('/database-cleanup', [AdminController::class, 'databaseCleanup'])->name('admin.database_cleanup');
     Route::post('/database-cleanup', [AdminController::class, 'databaseCleanupAction'])->name('admin.database_cleanup.action');
     Route::post('/settings/api-key/generate', [AdminController::class, 'generateApiKey'])->name('admin.settings.api_key.generate');

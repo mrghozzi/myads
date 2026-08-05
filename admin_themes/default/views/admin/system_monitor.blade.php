@@ -267,6 +267,130 @@
                         </div>
                     </div>
 
+                    <!-- Database Index & Table Size Health Check (v4.5.1 Proposal #1) -->
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header d-flex flex-wrap align-items-center justify-content-between gap-3">
+                            <div>
+                                <h5 class="card-title mb-1">
+                                    <i class="feather-database text-primary me-2"></i>{{ __('messages.db_health_check_title') }}
+                                </h5>
+                                <p class="text-muted mb-0 small">{{ __('messages.db_health_check_desc') }}</p>
+                            </div>
+                            <a href="{{ route('admin.database_cleanup') }}" class="btn btn-sm btn-light border flex-shrink-0">
+                                <i class="feather-tool me-1"></i>{{ __('messages.cleanup') ?? 'Database Cleanup' }}
+                            </a>
+                        </div>
+                        <div class="card-body border-bottom bg-light bg-opacity-25 py-3">
+                            <div class="row row-cols-2 row-cols-md-4 g-3 text-center">
+                                <div class="col">
+                                    <div class="p-2 rounded bg-white border">
+                                        <div class="text-muted small mb-1">{{ __('messages.db_total_size') }}</div>
+                                        <div class="fw-bold fs-6 text-primary">{{ number_format(($dbHealthCheck['total_db_bytes'] ?? 0) / 1048576, 2) }} MB</div>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="p-2 rounded bg-white border">
+                                        <div class="text-muted small mb-1">{{ __('messages.db_index_size') }}</div>
+                                        <div class="fw-bold fs-6 text-info">{{ number_format(($dbHealthCheck['total_index_bytes'] ?? 0) / 1048576, 2) }} MB</div>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="p-2 rounded bg-white border">
+                                        <div class="text-muted small mb-1">{{ __('messages.db_overhead_size') }}</div>
+                                        <div class="fw-bold fs-6 {{ ($dbHealthCheck['total_overhead_bytes'] ?? 0) > 0 ? 'text-warning' : 'text-success' }}">
+                                            {{ number_format(($dbHealthCheck['total_overhead_bytes'] ?? 0) / 1048576, 2) }} MB
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="p-2 rounded bg-white border">
+                                        <div class="text-muted small mb-1">{{ __('messages.tables_need_optimization') }}</div>
+                                        <div class="fw-bold fs-6 {{ ($dbHealthCheck['tables_needing_optimization'] ?? 0) > 0 ? 'text-danger' : 'text-success' }}">
+                                            {{ $dbHealthCheck['tables_needing_optimization'] ?? 0 }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="table-responsive" style="max-height: 380px; overflow-y: auto;">
+                            <table class="table align-middle mb-0">
+                                <thead class="sticky-top bg-white border-bottom">
+                                    <tr class="text-muted small text-uppercase">
+                                        <th>{{ __('messages.table_name') }}</th>
+                                        <th>{{ __('messages.table_rows') }}</th>
+                                        <th>{{ __('messages.table_data_size') }}</th>
+                                        <th>{{ __('messages.table_index_size') }}</th>
+                                        <th>{{ __('messages.table_overhead') }}</th>
+                                        <th>{{ __('messages.table_status') }}</th>
+                                        <th class="text-end">{{ __('messages.actions') ?? 'Actions' }}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse(($dbHealthCheck['tables'] ?? []) as $table)
+                                        @php
+                                            $needsOpt = $table['needs_optimization'] ?? false;
+                                        @endphp
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <i class="feather-grid text-secondary"></i>
+                                                    <span class="fw-bold text-dark font-monospace small">{{ $table['name'] }}</span>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-light text-dark border">{{ number_format($table['rows']) }}</span>
+                                            </td>
+                                            <td>
+                                                <span class="fw-semibold text-muted small">{{ number_format($table['data_bytes'] / 1048576, 2) }} MB</span>
+                                            </td>
+                                            <td>
+                                                <span class="fw-semibold text-muted small">{{ number_format($table['index_bytes'] / 1048576, 2) }} MB</span>
+                                            </td>
+                                            <td>
+                                                @if($table['overhead_bytes'] > 0)
+                                                    <span class="badge {{ $needsOpt ? 'bg-soft-warning text-warning border-warning' : 'bg-light text-muted border' }}">
+                                                        {{ number_format($table['overhead_bytes'] / 1048576, 2) }} MB ({{ $table['overhead_ratio'] }}%)
+                                                    </span>
+                                                @else
+                                                    <span class="text-muted small">0 MB</span>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                @if($needsOpt)
+                                                    <span class="badge bg-warning text-dark px-2 py-1" style="border-radius: 12px;">
+                                                        🟡 {{ __('messages.status_needs_optimization') }}
+                                                    </span>
+                                                @else
+                                                    <span class="badge bg-success text-white px-2 py-1" style="border-radius: 12px;">
+                                                        🟢 {{ __('messages.status_good') }}
+                                                    </span>
+                                                @endif
+                                            </td>
+                                            <td class="text-end">
+                                                <form action="{{ route('admin.system_monitor.optimize_table') }}" method="POST" class="d-inline">
+                                                    @csrf
+                                                    <input type="hidden" name="table_name" value="{{ $table['name'] }}">
+                                                    <button type="submit" 
+                                                            class="btn btn-sm {{ $needsOpt ? 'btn-warning' : 'btn-outline-secondary' }}" 
+                                                            style="font-size: 0.75rem;"
+                                                            onclick="return confirm('{{ __('messages.optimize_table_confirm') }}')">
+                                                        <i class="feather-zap me-1"></i>{{ __('messages.optimize_table') }}
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="7" class="text-center py-4 text-muted">
+                                                <i class="feather-info me-1"></i>{{ __('messages.no_data_found') ?? 'No database tables found.' }}
+                                            </td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
                     <!-- Active Plugins Diagnostics (Zero Overhead Footprint) -->
                     <div class="card border-0 shadow-sm">
                         <div class="card-header d-flex align-items-center justify-content-between">
