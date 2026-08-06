@@ -2632,6 +2632,8 @@ return [
     'play_pause' => 'Wiedergabe / Pause',
     'mute' => 'Stummschalten',
     'fullscreen' => 'Vollbild',
+    'original_audio' => 'Originalton',
+    'return_to_main_player' => 'Zurück zum Hauptplayer',
 ];
 
 

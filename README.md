@@ -1,4 +1,4 @@
-# MYADS v4.5.0
+# MYADS v4.5.1
 
 Advanced Laravel-based social networking and ad exchange platform for website owners.
 
@@ -22,11 +22,13 @@ MYADS combines ad exchange, community, marketplace, directory, forum, and admin 
 
 Core areas include:
 
-- Banner ads, text ads, visit exchange, YouTube Views Exchange, Smart Ads with **Geo-Targeting** and **A/B Testing**, and **Custom Member Ads**
-- Dedicated **YouTube-Style Video Watch Page** (`/t{id}`) and **Video Hub** (`/video`) with Shorts shelf, HTML5 custom player, publisher Hexagon avatars, and cover image composer
-- Ad analytics with **Hourly Click Heatmaps**
+- Banner ads, text ads, visit exchange, YouTube Views Exchange, Smart Ads with **Geo-Targeting** and **A/B Testing**, and **Custom Member Ads** with **Anti-Click-Farm Rate Limiting**
+- Dedicated **YouTube-Style Video Watch Page** (`/t{id}`) with **Mini Floating Picture-in-Picture (PIP) Player** and **Video Hub** (`/video`) with Shorts shelf, HTML5 custom player, publisher Hexagon avatars, and cover image composer
+- **Shorts Clips Engine** (`/clips`) with vertical touch swipe gesture navigation and spinning audio disc sound tagging (`messages.original_audio`)
+- Ad analytics with **Hourly Click Heatmaps** and **Ad Quality Index** metrics
 - Member-to-member custom ad placements with embed codes, deal requests, PTS settlement, and external agreement tracking
 - High-performance community feed (N+1 query optimized) with **Multimedia Posts** (Video, Audio, Music, Files, Reels/Clips), reactions, comments, reposts, mentions, and fast low-memory messaging
+- Dual **Rich Text Editor Engine** (Quill.js v1.3.7 & SCEditor classic) with AJAX image uploads and plugin extensibility hooks
 - Forum with moderation tools and attachments
 - Store and dense power-user **Knowledgebase** dashboard with categories
 - Web directory and **Services Marketplace**
@@ -34,8 +36,8 @@ Core areas include:
 - Gamification engine with PTS, PTS transfers and vouchers, 25+ badges (including Video Star, Clips Master, Audio Maestro), daily/weekly quests, and ledgers
 - SEO suite with sitemap, robots.txt, performance integration, and Free SEO Checker for webmasters
 - Permission-gated **Smart Widget Management** (`<x-widget-column>`) with drag-and-drop location reordering (`/admin/widgets`)
-- High-performance Admin Dashboard powered by a **Single-Pass SQL Aggregation Engine** (95%+ query reduction)
-- Security suite with IP bans, session monitoring, and protected public identifiers
+- High-performance Admin Dashboard with **Selective Cache Warmup** (`CacheWarmupService`), **Database Health Check** (`/admin/system-monitor`), and **Single-Pass SQL Aggregation Engine**
+- Security suite with IP bans, session monitoring, anti-click-farm fingerprinting, and protected public identifiers
 - Full Flutter mobile app integration (`myads_app`) with native video watch screen, Hexagon avatars, and localized i18n in 14 languages
 - Optional paid subscriptions and billing
 
@@ -46,10 +48,12 @@ Core areas include:
 ### Member Features
 
 - Ad exchange tools for banners, text ads, visit exchange, Smart Ads with **Geo-Targeting**, and Custom Ads
-- Dedicated **YouTube-Style Video Watch Page** (`/t{id}`) and **YouTube-Style Video Hub** (`/video`) with Shorts shelf, 16:9 video grid, Hexagon publisher avatars, standalone popover flyouts, and suggested video recommendations
+- Dedicated **YouTube-Style Video Watch Page** (`/t{id}`) with **Mini Floating Picture-in-Picture (PIP) Player** and **YouTube-Style Video Hub** (`/video`) with Shorts shelf, 16:9 video grid, Hexagon publisher avatars, standalone popover flyouts, and suggested video recommendations
+- **Shorts Clips Engine** (`/clips`) with vertical touch swipe gestures (`touchstart`/`touchend`), mouse wheel scrolling, and original sound tagging with animated spinning audio disc
 - Video Title (`video_title`) and Cover Thumbnail (`video_thumbnail`) post composer inputs with 256MB upload optimization
-- **A/B Testing** optimization and **Performance Heatmaps** for advertisers
+- **A/B Testing** optimization, **Performance Heatmaps**, and **Anti-Click-Farm Rate Limiting** with **Ad Quality Index** for advertisers
 - Custom ad spaces that members can publish in the marketplace, invite advertisers into, or monetize with daily PTS deals
+- Dual **Rich Text Editor** support (Quill.js and SCEditor) with server-side image upload and dark mode parity
 - Social profiles with follows, dynamic badges, privacy controls, and 12-platform social links
 - Community feed with **Multimedia Posts** (Video, Audio, Music, Files, Reels/Clips), comments, reactions, reposts, and mentions
 - Forum participation with categories, topics, attachments, and Markdown support

@@ -2643,6 +2643,8 @@ return [
     'play_pause' => 'Lecture / Pause',
     'mute' => 'Muet',
     'fullscreen' => 'Plein écran',
+    'original_audio' => 'Audio d\'origine',
+    'return_to_main_player' => 'Retour au lecteur principal',
 ];
 
 

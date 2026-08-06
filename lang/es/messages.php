@@ -2655,6 +2655,8 @@ return [
     'play_pause' => 'Reproducir / Pausar',
     'mute' => 'Silenciar',
     'fullscreen' => 'Pantalla completa',
+    'original_audio' => 'Audio original',
+    'return_to_main_player' => 'Volver al reproductor principal',
 ];
 
 

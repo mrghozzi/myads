@@ -2642,6 +2642,8 @@ return [
     'play_pause' => 'Oynat / Duraklat',
     'mute' => 'Sesi Kapat',
     'fullscreen' => 'Tam Ekran',
+    'original_audio' => 'Orijinal Ses',
+    'return_to_main_player' => 'Ana Oynatıcıya Dön',
 ];
 
 

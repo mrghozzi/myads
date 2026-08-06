@@ -4198,6 +4198,8 @@ return [
     'ad_types' => 'أنواع الإعلانات',
     'ad_exchange' => 'تبادل الإعلانات',
     'available_credits' => 'رصيد الحملات المتاح',
+    'original_audio' => 'الصوت الأصلي',
+    'return_to_main_player' => 'العودة للمشغل الرئيسي',
 ];
 
 

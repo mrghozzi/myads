@@ -2632,6 +2632,8 @@ return [
     'play_pause' => 'Riproduci / Pausa',
     'mute' => 'Disattiva audio',
     'fullscreen' => 'Schermo intero',
+    'original_audio' => 'Audio originale',
+    'return_to_main_player' => 'Torna al lettore principale',
 ];
 
 

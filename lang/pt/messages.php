@@ -2632,6 +2632,8 @@ return [
     'play_pause' => 'Reproduzir / Pausar',
     'mute' => 'Silenciar',
     'fullscreen' => 'Tela cheia',
+    'original_audio' => 'Áudio original',
+    'return_to_main_player' => 'Voltar ao reprodutor principal',
 ];
 
 

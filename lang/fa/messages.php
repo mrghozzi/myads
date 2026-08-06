@@ -2631,6 +2631,8 @@ return [
     'play_pause' => 'پخش / توقف',
     'mute' => 'بی‌صدا',
     'fullscreen' => 'تمام‌صفحه',
+    'original_audio' => 'صدا اصلی',
+    'return_to_main_player' => 'بازگشت به پخش‌کننده اصلی',
 ];
 
 

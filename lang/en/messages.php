@@ -4195,6 +4195,8 @@ return [
     'ad_types' => 'Ad Types',
     'ad_exchange' => 'Ad Exchange',
     'available_credits' => 'Available Credits',
+    'original_audio' => 'Original Audio',
+    'return_to_main_player' => 'Return to Main Player',
 ];
 
 
