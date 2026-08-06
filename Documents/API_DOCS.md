@@ -1,6 +1,6 @@
 # API Documentation
 
-> **Note:** The MYADS v4.5.1 REST API is currently in **Beta**. It now supports both Internal Authentication (Sanctum) and Third-Party Authorization (OAuth2).
+> **Note:** The MYADS v4.5.1 REST API is currently in **Beta**. It supports Internal Authentication (Sanctum), Mobile API tokens, and Third-Party Authorization (OAuth2).
 
 The REST API allows external applications and third-party developers to interface with the MYADS core, authenticate users, retrieve content, and perform actions on behalf of users.
 
@@ -287,9 +287,14 @@ Allows any website to pre-fill the MYADS post composer.
 - `GET /api/store/products/{id}`: Retrieve a specific product's details. Does not increment view counts (`vu`) as it is not supported.
 - `GET /api/store/products/{id}/knowledgebase`: Retrieve the knowledgebase articles for a product (paginated).
 
-### Clips
+### Clips & Shorts
 - `GET /api/clips/saved`: Retrieve a list of saved clips for the authenticated user.
 - `POST /api/clips/save`: Toggle the saved state of a specific reel. Payload: `{"status_id": 123}`
+
+### Custom Member Ads & Anti-Click-Farm Serving
+- `GET /ads/custom/embed`: Returns placement loader JavaScript script.
+- `GET /ads/custom/serve?placement={key}&slot={slot_id}&vt={visitor_token}`: Serves HTML creative markup for custom ad placement. Automatically records impression with 24-hour fingerprint rate limit check (`sha256(IP + UserAgent + AcceptLanguage)`).
+- `GET /ads/custom/click/{token}`: Tracks click event and redirects visitor to target URL. Enforces minimum 1.5-second session dwell check. Repeated or rapid clicks are marked `is_flagged = true` without deducting advertiser PTS or incrementing publisher earnings.
 
 ---
 
