@@ -1,4 +1,4 @@
-# Agents.md — MYADS v4.5.1
+# Agents.md — MYADS v4.5.2
 
 > **Purpose:** This file gives AI coding agents a fast, comprehensive understanding of the MYADS project — its architecture, conventions, key files, and rules — so they can work effectively from a fresh chat context.
 
@@ -6,7 +6,7 @@
 
 ## 1. Project Identity
 
-- **Name:** MYADS v4.5.1
+- **Name:** MYADS v4.5.2
 - **Type:** Social network + ad exchange platform for website owners
 - **Framework:** Laravel 12 (PHP 8.2+)
 - **Database:** MySQL 5.7+ / MariaDB 10.3+
@@ -50,6 +50,7 @@ MYADS is a community platform where website owners:
 28. **Mini Floating Picture-in-Picture (PIP) Video Player** — watch page (`/t{id}`) floating video player powered by JavaScript `IntersectionObserver` attached to `#videoStageCard` (`video.blade.php`). Automatically transitions playing video to a floating corner card (`.v-mini-floating-player`) when scrolling down, featuring expand-back and dismiss overlay controls without interrupting video/audio playback position.
 29. **Shorts Clips Mobile Touch Swipe & Sound Tagging** — vertical Shorts/Clips (`s_type = 14`) in `/clips` featuring native touch swipe (`touchstart`, `touchmove`, `touchend`) and mouse wheel navigation for vertical reel switching, combined with original sound tag pills (`messages.original_audio`) and CSS keyframe spinning audio disc animation (`.spinning-audio-disc`).
 30. **Anti-Click-Farm Protection & Ad Quality Index for Custom Ads** — multi-layered verification in `CustomAdServingService` featuring 24-hour rate limiting per anonymous visitor fingerprint (`sha256(IP + UserAgent + AcceptLanguage)`), minimum 1.5-second session dwell window check before click registration, flagging suspicious or rapid clicks (`is_flagged = true` via migration `2026_08_06_000000_add_is_flagged_to_custom_ad_events_table.php`) without deducting advertiser PTS or incrementing publisher earnings, and Ad Quality Index calculation (`getAdQualityIndex()`). Supported by dedicated test suite (`CustomAdsRateLimitingTest.php`).
+31. **Extensible Rich Text Editor Plugin Integration (`myads-tinymce-editor`)** — self-contained rich text editor plugin (`plugins/myads-tinymce-editor`) leveraging `RichTextEditorService` hook engine (`registered_rich_text_editors`, `render_custom_editor_assets`, `render_custom_editor_js`), allowing site administrators to dynamically select and switch to **TinyMCE 7 (Plugin Editor)** directly from `/admin/settings` when active, supported by automatic graceful fallback to default editor (`quill`) when deactivated and dedicated PHPUnit test suite (`TinyMCEEditorPluginTest.php`).
 
 
 ---

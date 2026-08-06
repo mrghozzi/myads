@@ -46,6 +46,7 @@ class PluginServiceProvider extends ServiceProvider
             $activePlugins[] = 'arabic-fixer';
             $activePlugins[] = 'groq-adstn-publisher';
             $activePlugins[] = 'monetization';
+            $activePlugins[] = 'tinymce-editor';
         }
                              
         if (empty($activePlugins)) {
@@ -69,12 +70,14 @@ class PluginServiceProvider extends ServiceProvider
                 $activeDirs[] = 'arabic-fixer';
                 $activeDirs[] = 'groq-adstn-publisher';
                 $activeDirs[] = 'monetization';
+                $activeDirs[] = 'myads-tinymce-editor';
             }
         } catch (\Exception $e) {
             if (app()->environment('testing')) {
                 $activeDirs[] = 'arabic-fixer';
                 $activeDirs[] = 'groq-adstn-publisher';
                 $activeDirs[] = 'monetization';
+                $activeDirs[] = 'myads-tinymce-editor';
             } else {
                 return;
             }

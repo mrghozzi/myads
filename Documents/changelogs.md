@@ -1,3 +1,11 @@
+# v4.5.2
+> **Maintenance & Extension Extensibility Release** — Modular Rich Text Editor Plugin (`myads-tinymce-editor`) Integration, Extensible Plugin Provider Directory Resolution, and Comprehensive Automated Testing.
+
+### Core & Infrastructure
+* **Feature (Extensible Rich Text Editor Plugin Integration — TinyMCE 7):** Designed and created a self-contained, modular Rich Text Editor plugin (`myads-tinymce-editor`) under `plugins/myads-tinymce-editor`. Integrated seamlessly with MYADS v4.5.1's `RichTextEditorService` hook engine (`registered_rich_text_editors`, `render_custom_editor_assets`, `render_custom_editor_js`), allowing site administrators to dynamically select and switch to **TinyMCE 7 (Plugin Editor)** directly from `/admin/settings` when active.
+* **Feature (Plugin Provider Directory Resolution & Testing Fallback):** Updated `PluginServiceProvider` (`app/Providers/PluginServiceProvider.php`) to include `myads-tinymce-editor` in testing active plugin resolutions, ensuring directory-based slug mapping and seamless test execution.
+* **Feature (Graceful Editor Fallback & Safety):** Enforced automatic graceful fallback to the default editor (`quill`) in `RichTextEditorService::getActiveEditor()` whenever `myads-tinymce-editor` is deactivated in `/admin/plugins`, preventing invalid DB option states or missing script errors. Added automated test suite (`TinyMCEEditorPluginTest.php`).
+
 # v4.5.1
 > **Major Release (Stable)** — Rich Text Editor Engine (Quill.js & Extensibility Hooks), Database Index & Health Diagnostic Panel, Selective Cache Warmup Engine, Mini Floating PIP Video Player, Shorts Touch Swipe & Audio Tagging, Anti-Click-Farm Security & Ad Quality Index, and Comprehensive Frontend `@.superdesign` Overhauls.
 
