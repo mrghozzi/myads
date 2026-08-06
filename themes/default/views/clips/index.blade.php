@@ -142,6 +142,38 @@
         color: #fff;
     }
 
+    /* Sound Tag & Spinning Disc Styles */
+    .spinning-audio-disc {
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        background: radial-gradient(circle, #333 40%, #111 70%, #000 100%);
+        border: 2px solid rgba(255, 255, 255, 0.4);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 10px;
+        animation: spinDisc 4s linear infinite;
+    }
+    @keyframes spinDisc {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+    .reel-item.is-paused .spinning-audio-disc {
+        animation-play-state: paused;
+    }
+    .reel-sound-tag {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.9);
+        background: rgba(0, 0, 0, 0.45);
+        padding: 5px 12px;
+        border-radius: 20px;
+        backdrop-filter: blur(4px);
+        max-width: 240px;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+
     .reel-actions {
         position: absolute;
         right: 15px;

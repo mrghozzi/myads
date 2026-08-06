@@ -180,7 +180,42 @@ JS;
         string $countryCode,
         string $deviceType
     ): CustomAdEvent {
-        return DB::transaction(function () use ($placement, $deal, $creative, $type, $request, $countryCode, $deviceType) {
+        $visitorKey = $this->visitorKey($request);
+        $ipHash = hash('sha256', (string) $request->ip());
+
+        // Multi-layered rate limiting check (24-hour window per fingerprint & event type)
+        $recentCount = CustomAdEvent::query()
+            ->where('creative_id', $creative->id)
+            ->where('event_type', $type)
+            ->where(function ($q) use ($visitorKey, $ipHash) {
+                $q->where('visitor_key', $visitorKey)
+                  ->orWhere('ip_hash', $ipHash);
+            })
+            ->where('occurred_at', '>=', now()->subHours(24))
+            ->where('is_flagged', false)
+            ->count();
+
+        $isFlagged = $recentCount > 0;
+
+        // Session dwell window check (minimum 1.5 seconds)
+        if ($type === CustomAdEvent::TYPE_CLICK && !$isFlagged) {
+            $lastImpression = CustomAdEvent::query()
+                ->where('creative_id', $creative->id)
+                ->where('event_type', CustomAdEvent::TYPE_IMPRESSION)
+                ->where(function ($q) use ($visitorKey, $ipHash) {
+                    $q->where('visitor_key', $visitorKey)
+                      ->orWhere('ip_hash', $ipHash);
+                })
+                ->where('occurred_at', '>=', now()->subSeconds(60))
+                ->latest('occurred_at')
+                ->first();
+
+            if ($lastImpression && $lastImpression->occurred_at->diffInMilliseconds(now()) < 1500) {
+                $isFlagged = true;
+            }
+        }
+
+        return DB::transaction(function () use ($placement, $deal, $creative, $type, $request, $countryCode, $deviceType, $visitorKey, $ipHash, $isFlagged) {
             $event = CustomAdEvent::create([
                 'placement_id' => $placement->id,
                 'deal_id' => $deal->id,
@@ -188,22 +223,52 @@ JS;
                 'publisher_id' => $deal->publisher_id,
                 'advertiser_id' => $deal->advertiser_id,
                 'event_type' => $type,
-                'visitor_key' => $this->visitorKey($request),
+                'visitor_key' => $visitorKey,
                 'country_code' => $countryCode,
                 'device_type' => $deviceType,
                 'referrer' => $request->headers->get('referer'),
-                'ip_hash' => hash('sha256', (string) $request->ip()),
+                'ip_hash' => $ipHash,
                 'user_agent' => $request->userAgent(),
+                'is_flagged' => $isFlagged,
                 'occurred_at' => now(),
             ]);
 
-            $column = $type === CustomAdEvent::TYPE_CLICK ? 'clicks' : 'impressions';
-            CustomAdPlacement::whereKey($placement->id)->increment($column);
-            CustomAdDeal::whereKey($deal->id)->increment($column);
-            CustomAdCreative::whereKey($creative->id)->increment($column);
+            // Increment metrics ONLY if the event is clean
+            if (!$isFlagged) {
+                $column = $type === CustomAdEvent::TYPE_CLICK ? 'clicks' : 'impressions';
+                CustomAdPlacement::whereKey($placement->id)->increment($column);
+                CustomAdDeal::whereKey($deal->id)->increment($column);
+                CustomAdCreative::whereKey($creative->id)->increment($column);
+            }
 
             return $event;
         });
+    }
+
+    /**
+     * Calculate Ad Quality Index (percentage of valid, unflagged clicks).
+     */
+    public function getAdQualityIndex($target): float
+    {
+        $column = $target instanceof CustomAdDeal ? 'deal_id' : 'creative_id';
+        $targetId = $target->id ?? 0;
+
+        $totalClicks = CustomAdEvent::query()
+            ->where($column, $targetId)
+            ->where('event_type', CustomAdEvent::TYPE_CLICK)
+            ->count();
+
+        if ($totalClicks === 0) {
+            return 100.0;
+        }
+
+        $validClicks = CustomAdEvent::query()
+            ->where($column, $targetId)
+            ->where('event_type', CustomAdEvent::TYPE_CLICK)
+            ->where('is_flagged', false)
+            ->count();
+
+        return round(($validClicks / $totalClicks) * 100, 1);
     }
 
     private function renderBannerMarkup(CustomAdPlacement $placement, CustomAdCreative $creative): string

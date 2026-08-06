@@ -4280,6 +4280,7 @@ class AdminController extends Controller
             \Illuminate\Support\Facades\Artisan::call('cache:clear');
             \Illuminate\Support\Facades\Artisan::call('view:clear');
             \Illuminate\Support\Facades\Artisan::call('route:clear');
+            app(\App\Services\CacheWarmupService::class)->warmupCoreData();
             
             $this->maintenanceMode->disable(Auth::user(), 'clear_cache_success');
             return redirect()->back()->with('success', __('Caches cleared successfully.'));
@@ -5234,6 +5235,7 @@ class AdminController extends Controller
         \App\Support\CommunityFeedSettings::clearCache();
         \Illuminate\Support\Facades\Cache::forget('system_monitor_active_plugin_diagnostics');
         \Illuminate\Support\Facades\Cache::forget('system_monitor_db_tables_health');
+        app(\App\Services\CacheWarmupService::class)->warmupCoreData();
 
         return redirect()->route('admin.system_monitor')
             ->with('success', __('messages.deleted_successfully') ?? 'System cache cleared successfully.');

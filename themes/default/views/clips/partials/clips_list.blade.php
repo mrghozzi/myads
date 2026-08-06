@@ -103,6 +103,16 @@
                             <button class="reel-caption-more" onclick="this.previousElementSibling.classList.toggle('reel-caption-truncated'); this.textContent = this.previousElementSibling.classList.contains('reel-caption-truncated') ? '{{ __("messages.show_more") }}' : '{{ __("messages.show_less") }}';">{{ __('messages.show_more') }}</button>
                         @endif
                     @endif
+
+                    <!-- Sound Tag & Spinning Disc -->
+                    <div class="reel-sound-tag d-flex align-items-center gap-2 mt-2">
+                        <div class="spinning-audio-disc">
+                            <i class="fa fa-music"></i>
+                        </div>
+                        <span class="reel-sound-title text-truncate">
+                            <i class="fa fa-volume-up me-1"></i> {{ $activity->related_content->sound_title ?? ($clipUser ? $clipUser->username . ' • ' . __('messages.original_audio') : __('messages.original_audio')) }}
+                        </span>
+                    </div>
                 </div>
 
                 <!-- Right Actions Sidebar -->

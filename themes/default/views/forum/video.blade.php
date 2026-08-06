@@ -2,6 +2,62 @@
 @include('theme::forum._assets')
 
 @section('content')
+<style>
+/* MINI FLOATING PICTURE-IN-PICTURE (PIP) STYLES */
+.myads-video-player-container.v-mini-floating-player {
+    position: fixed !important;
+    bottom: 24px !important;
+    inset-inline-end: 24px !important;
+    width: 360px !important;
+    height: 202px !important;
+    z-index: 99990 !important;
+    border-radius: 14px !important;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45) !important;
+    animation: pipSlideIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    overflow: hidden !important;
+    border: 2px solid rgba(97, 93, 250, 0.4) !important;
+}
+
+@keyframes pipSlideIn {
+    from { transform: translateY(40px) scale(0.9); opacity: 0; }
+    to { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+.v-pip-controls-overlay {
+    display: none;
+    position: absolute;
+    top: 8px;
+    inset-inline-end: 8px;
+    z-index: 99995;
+    gap: 6px;
+}
+
+.myads-video-player-container.v-mini-floating-player .v-pip-controls-overlay {
+    display: flex !important;
+}
+
+.v-pip-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.65);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    cursor: pointer;
+    backdrop-filter: blur(4px);
+    transition: all 0.2s ease;
+}
+
+.v-pip-btn:hover {
+    background: #615dfa;
+    color: #fff;
+    transform: scale(1.1);
+}
+</style>
 <div class="forum-rdx video-watch-page">
     <!-- ADS -->
     @include('theme::partials.ads', ['id' => 5])
@@ -1036,6 +1092,60 @@ function showToast(msg) {
     notifBox.appendChild(toastEl);
     setTimeout(() => toastEl.remove(), 3500);
 }
+
+/* MINI FLOATING PICTURE-IN-PICTURE (PIP) OBSERVER */
+(function() {
+    document.addEventListener('DOMContentLoaded', function() {
+        const stageCard = document.getElementById('videoStageCard');
+        const container = document.querySelector('.myads-video-player-container');
+        const video = container ? container.querySelector('video') : null;
+        
+        if (!stageCard || !container || !video) return;
+
+        let pipOverlay = container.querySelector('.v-pip-controls-overlay');
+        if (!pipOverlay) {
+            pipOverlay = document.createElement('div');
+            pipOverlay.className = 'v-pip-controls-overlay';
+            pipOverlay.innerHTML = `
+                <button type="button" class="v-pip-btn v-pip-return-btn" title="{{ __('messages.return_to_main_player') ?? 'العودة للمشغل الرئيسي' }}">
+                    <i class="fa fa-expand"></i>
+                </button>
+                <button type="button" class="v-pip-btn v-pip-close-btn" title="{{ __('messages.close') ?? 'إغلاق' }}">
+                    <i class="fa fa-times"></i>
+                </button>
+            `;
+            container.appendChild(pipOverlay);
+
+            pipOverlay.querySelector('.v-pip-return-btn').addEventListener('click', function(e) {
+                e.stopPropagation();
+                container.classList.remove('v-mini-floating-player');
+                stageCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            });
+
+            pipOverlay.querySelector('.v-pip-close-btn').addEventListener('click', function(e) {
+                e.stopPropagation();
+                container.classList.remove('v-mini-floating-player');
+                container.dataset.pipDismissed = 'true';
+            });
+        }
+
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                const isVideoPlaying = video && !video.paused && !video.ended && video.readyState >= 2;
+                const isDismissed = container.dataset.pipDismissed === 'true';
+
+                if (!entry.isIntersecting && isVideoPlaying && !isDismissed) {
+                    container.classList.add('v-mini-floating-player');
+                } else if (entry.isIntersecting) {
+                    container.classList.remove('v-mini-floating-player');
+                    container.dataset.pipDismissed = 'false';
+                }
+            });
+        }, { threshold: 0.2 });
+
+        observer.observe(stageCard);
+    });
+})();
 </script>
 
 @include('theme::forum.scripts')

@@ -27,10 +27,12 @@ class CustomAdEvent extends Model
         'referrer',
         'ip_hash',
         'user_agent',
+        'is_flagged',
         'occurred_at',
     ];
 
     protected $casts = [
+        'is_flagged' => 'boolean',
         'occurred_at' => 'datetime',
     ];
 
