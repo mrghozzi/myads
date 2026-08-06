@@ -411,7 +411,47 @@
                             <div class="timeline">
                                 <div class="timeline-item">
                                     <div class="timeline-icon"><i class="feather-box fs-12"></i></div>
-                                    <h6 class="fw-bold mb-1">v4.5.0 <span class="badge bg-soft-success text-success ms-2">Stable (Current)</span></h6>
+                                    <h6 class="fw-bold mb-1">v4.5.1 <span class="badge bg-soft-success text-success ms-2">Stable (Current)</span></h6>
+                                    <p class="text-muted fs-13 mb-3">Rich Text Editor Engine (Quill.js & Extensibility Hooks), Database Index & Health Diagnostic Panel, Selective Cache Warmup Engine, Mini Floating PIP Video Player, Shorts Touch Swipe & Audio Tagging, Anti-Click-Farm Security & Ad Quality Index, and Comprehensive Frontend @.superdesign Overhauls.</p>
+                                    <div class="d-flex flex-column gap-2">
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-feature mt-1" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">Feature</span>
+                                            <span class="text-muted fs-13">Integrated <strong>Quill.js Rich Text Editor</strong> with server-side AJAX image uploads into <code>upload/</code>, Quill editor switcher option in <code>/admin/settings</code>, and dynamic plugin hooks (<code>RichTextEditorService</code>).</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-feature mt-1" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">Feature</span>
+                                            <span class="text-muted fs-13">Added <strong>Database Index & Table Size Health Check</strong> to <code>/admin/system-monitor</code> featuring 10-min cached table KPIs, space overhead warnings, and one-click <code>OPTIMIZE TABLE</code> execution.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-optimization mt-1" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">Optimization</span>
+                                            <span class="text-muted fs-13">Developed <strong>Selective Cache Warmup Engine</strong> (<code>CacheWarmupService</code>) to automatically pre-fill core site settings, system options, and primary menus immediately after admin cache flushes.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-feature mt-1" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">Feature</span>
+                                            <span class="text-muted fs-13">Integrated <strong>Mini Floating Picture-in-Picture (PIP) Video Player</strong> on watch pages (<code>/t{id}</code>) powered by <code>IntersectionObserver</code> for non-disruptive scrolling.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-feature mt-1" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">Feature</span>
+                                            <span class="text-muted fs-13">Enhanced <strong>Shorts & Clips</strong> with native mobile touch swipe gestures, mouse wheel reel switching, original audio tag pills, and spinning audio disc keyframe animation.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-security mt-1" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;">Security</span>
+                                            <span class="text-muted fs-13">Upgraded <strong>Custom Ads Anti-Click-Farm Engine</strong> with 24h visitor fingerprint rate limiting, 1.5s dwell time verification, suspicious click flagging (<code>is_flagged</code>), and <strong>Ad Quality Index</strong> calculation.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-feature mt-1" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">Feature</span>
+                                            <span class="text-muted fs-13">Completed <strong>Frontend @.superdesign Overhauls</strong> across Topic Creation/Edit (<code>/post</code>, <code>/editor/{id}</code>), Directory Submission/Edit (<code>/add-site.html</code>), Service Requests (<code>/orders/create</code>), Ad Promotion (<code>/ads/promote</code>), and Smart Ads (<code>/ads/smart/create</code>).</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-fix mt-1" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;">Fix</span>
+                                            <span class="text-muted fs-13">Resolved Database Cleanup 500 error on <code>options</code> table column names, log cleanup status feedback, video thumbnail fallbacks, and PostCSS transitive security vulnerability (GHSA-r28c-9q8g-f849).</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="timeline-item">
+                                    <div class="timeline-icon"><i class="feather-box fs-12"></i></div>
+                                    <h6 class="fw-bold mb-1">v4.5.0 <span class="badge bg-soft-secondary text-secondary ms-2">Stable</span></h6>
                                     <p class="text-muted fs-13 mb-3">YouTube-Style Watch Page & Video Hub, Gamification Badges & Quests, Admin SEO Suite & Knowledgebase Power Overhaul, 95%+ DB Aggregation Engine, Smart Widgets & Flutter App Parity.</p>
                                     <div class="d-flex flex-column gap-2">
                                         <div class="d-flex align-items-start">
