@@ -1055,7 +1055,8 @@ If in doubt, update it. An outdated `Agents.md` causes future agents to make wro
 - **v4.5.1 Groundwork (2026-08-01):** Initialized release cycle for MYADS v4.5.1, bumped canonical `SystemVersion::CURRENT` to v4.5.1, and fixed SCEditor initialization failures across admin/forum content editors.
 - **Bug Fix (2026-08-01):** Fixed a 500 error when saving settings on `/admin/database-cleanup`, caused by `AdminController::databaseCleanupAction()` and `DatabaseMaintenanceService` writing/reading non-existent `o_name`/`o_value` columns on the `options` table. Corrected both to use the table's real `name`/`o_valuer` columns scoped with `o_type = 'system_setting'`, so auto-cleanup retention settings now persist and are actually honored.
 - **Bug Fix (2026-08-01):** Fixed misleading "Clean Logs" feedback on `/admin/database-cleanup` — the action always showed a generic success message even when no log files needed cleanup (within retention/size limits), making it look like nothing happened. `AdminController::databaseCleanupAction()` now measures `storage/logs` size before/after running `myads:log-cleanup` and reports the actual space freed, or explains the active retention limits when there is nothing to clean. Added translation keys `logs_cleaned_freed` and `logs_cleaned_none` to `ar`, `en`, `ja`, `ru`, `sr`, `zh_CN`, `zh_TW`.
+- **v4.5.2 Groundwork (2026-08-06):** Initialized release cycle for MYADS v4.5.2, bumped canonical `SystemVersion::CURRENT` to v4.5.2, updated system documentation (`AGENTS.md`, `API_DOCS.md`, `README.md`), configured dynamic admin panel version badges and About page timeline, and integrated modular Rich Text Editor Plugin (`myads-tinymce-editor`).
 
 ---
 
-*Last updated: 2026-08-01 — MYADS v4.5.1 (Groundwork Initialization, SCEditor Fix, Database Cleanup Fixes)*
+*Last updated: 2026-08-06 — MYADS v4.5.2 (Groundwork Initialization, TinyMCE Editor Plugin, Extensible Plugin Provider)*

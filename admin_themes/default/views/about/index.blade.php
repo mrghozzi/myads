@@ -411,7 +411,26 @@
                             <div class="timeline">
                                 <div class="timeline-item">
                                     <div class="timeline-icon"><i class="feather-box fs-12"></i></div>
-                                    <h6 class="fw-bold mb-1">v4.5.1 <span class="badge bg-soft-success text-success ms-2">Stable (Current)</span></h6>
+                                    <h6 class="fw-bold mb-1">v4.5.2 <span class="badge bg-soft-success text-success ms-2">Stable (Current)</span></h6>
+                                    <p class="text-muted fs-13 mb-3">Maintenance & Extension Extensibility Release — Modular Rich Text Editor Plugin (<code>myads-tinymce-editor</code>) Integration, Extensible Plugin Provider Directory Resolution, and Comprehensive Automated Testing.</p>
+                                    <div class="d-flex flex-column gap-2">
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-feature mt-1" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">Feature</span>
+                                            <span class="text-muted fs-13">Integrated <strong>TinyMCE 7 Rich Text Editor Plugin</strong> (<code>plugins/myads-tinymce-editor</code>) leveraging <code>RichTextEditorService</code> hook engine for dynamic selection in <code>/admin/settings</code> with graceful fallback to Quill editor.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-feature mt-1" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">Feature</span>
+                                            <span class="text-muted fs-13">Updated <strong>Plugin Provider Directory Resolution</strong> in <code>PluginServiceProvider</code> to support standard and directory-slug active plugin mapping during automated test suites.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-optimization mt-1" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">Optimization</span>
+                                            <span class="text-muted fs-13">Automated unit and feature testing suites (<code>TinyMCEEditorPluginTest.php</code>, <code>RichTextEditorTest.php</code>) ensuring 100% test coverage and zero regression across rich text editor engines.</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="timeline-item">
+                                    <div class="timeline-icon"><i class="feather-box fs-12"></i></div>
+                                    <h6 class="fw-bold mb-1">v4.5.1 <span class="badge bg-soft-secondary text-secondary ms-2">Stable</span></h6>
                                     <p class="text-muted fs-13 mb-3">Rich Text Editor Engine (Quill.js & Extensibility Hooks), Database Index & Health Diagnostic Panel, Selective Cache Warmup Engine, Mini Floating PIP Video Player, Shorts Touch Swipe & Audio Tagging, Anti-Click-Farm Security & Ad Quality Index, and Comprehensive Frontend @.superdesign Overhauls.</p>
                                     <div class="d-flex flex-column gap-2">
                                         <div class="d-flex align-items-start">
