@@ -35,7 +35,7 @@
 * **Internationalization (i18n):** Synchronized Arabic and English translation files (`lang/ar/messages.php`, `lang/en/messages.php`) with 21 newly added UI terms (`edit_topic`, `create_new_topic`, `forum_post_subtitle`, `community_rules`, `subject_placeholder`, `click_to_upload_files`, `posting_tips`, `edit_topic_subtitle`, `editing_tips`, `auto_fetch_metadata`, `website_title_placeholder`, `website_desc_placeholder`, `login_required_add_site`, `submission_rules`, `edit_website_subtitle`, `order_title_placeholder`, `order_desc_placeholder`, `services_marketplace`, `ad_types`, `ad_exchange`, `available_credits`).
 
 # v4.5.0
-> **Major Release (Stable)** — Groundwork Initialization, Platform Infrastructure Upgrades, YouTube-Style Video Watch Page, Community Publisher & Edit Enhancements, Server Upload Limit Optimization, Enhanced Dynamic Versioning & Mobile API Architecture.
+> **Major Release** — Groundwork Initialization, Platform Infrastructure Upgrades, YouTube-Style Video Watch Page, Community Publisher & Edit Enhancements, Server Upload Limit Optimization, Enhanced Dynamic Versioning & Mobile API Architecture.
 
 ### Core & Infrastructure
 * **Feature (Groundwork Initialization):** Initialized release cycle for MYADS v4.5.0. Updated canonical version constant (`SystemVersion::CURRENT`), system documentation (`AGENTS.md`, `API_DOCS.md`), and configured dynamic versioning across the admin control panel.
