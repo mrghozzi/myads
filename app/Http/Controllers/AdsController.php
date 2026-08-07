@@ -327,20 +327,24 @@ class AdsController extends Controller
     public function referralList()
     {
         $user = Auth::user();
+        $totalReferrals = \App\Models\Referral::where('uid', $user->id)->count();
+        $totalEarnedPts = $totalReferrals * 10;
         $referrals = \App\Models\Referral::where('uid', $user->id)
             ->with('referredUser')
             ->orderBy('id', 'desc')
             ->paginate(20);
             
-        return view('theme::ads.referrals_list', compact('user', 'referrals'));
+        return view('theme::ads.referrals_list', compact('user', 'referrals', 'totalReferrals', 'totalEarnedPts'));
     }
 
     // Referral Codes/Banners (r_code.php)
     public function referrals()
     {
         $user = Auth::user();
+        $totalReferrals = \App\Models\Referral::where('uid', $user->id)->count();
+        $totalEarnedPts = $totalReferrals * 10;
         $extensions_code = \App\Models\Option::where('o_type', 'extensions_code')->value('o_valuer');
-        return view('theme::ads.referrals', compact('user', 'extensions_code'));
+        return view('theme::ads.referrals', compact('user', 'extensions_code', 'totalReferrals', 'totalEarnedPts'));
     }
 
     public function state(Request $request)

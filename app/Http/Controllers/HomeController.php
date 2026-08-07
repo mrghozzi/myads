@@ -46,6 +46,12 @@ class HomeController extends Controller
             'total' => SmartAd::where('uid', $user->id)->count(),
         ];
         
+        $totalReferrals = \App\Models\Referral::where('uid', $user->id)->count();
+        $referralStats = [
+            'total' => $totalReferrals,
+            'pts' => $totalReferrals * 10,
+        ];
+        
         $site_settings = Setting::first();
 
         try {
@@ -55,7 +61,7 @@ class HomeController extends Controller
             \Log::error('Failed to load vouchers on home page: ' . $e->getMessage());
         }
 
-        return view('theme::home', compact('user', 'bannerStats', 'linkStats', 'visitStats', 'smartAdStats', 'site_settings', 'vouchers'));
+        return view('theme::home', compact('user', 'bannerStats', 'linkStats', 'visitStats', 'smartAdStats', 'referralStats', 'site_settings', 'vouchers'));
     }
 
     public function convertPoints(Request $request)
