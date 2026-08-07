@@ -56,12 +56,21 @@ class NotificationService
             ]);
         }
 
-        // 2. Handle Email Notification
-        try {
-            $this->sendEmailNotification($user, $message, $url, $logo, $type);
-        } catch (\Throwable $e) {
-            Log::error('Failed to send email notification: ' . $e->getMessage());
-        }
+        // 2. Handle Email Notification (deferred to after HTTP response is sent)
+        // This prevents slow SMTP connections from blocking AJAX responses.
+        $emailUser = $user;
+        $emailMessage = $message;
+        $emailUrl = $url;
+        $emailLogo = $logo;
+        $emailType = $type;
+
+        app()->terminating(function () use ($emailUser, $emailMessage, $emailUrl, $emailLogo, $emailType) {
+            try {
+                $this->sendEmailNotification($emailUser, $emailMessage, $emailUrl, $emailLogo, $emailType);
+            } catch (\Throwable $e) {
+                Log::error('Failed to send email notification: ' . $e->getMessage());
+            }
+        });
 
         return $notification;
     }

@@ -1210,7 +1210,20 @@
             if (btn && btn.dataset.busy === "true") return;
             if (btn) btn.dataset.busy = "true";
 
+            // Optimistic UI: show the reaction image immediately
+            let originalHtml = btn ? btn.innerHTML : '';
+            let isComment = type.includes('comment');
+            let imgSize = isComment ? 16 : 30;
+            let reactionImgUrl = '{{ theme_asset("img/reaction") }}/' + reaction + '.png';
+            if (btn) {
+                btn.innerHTML = '<img class="reaction-option-image" src="' + reactionImgUrl + '" width="' + imgSize + '" alt="reaction-' + reaction + '" style="opacity:0.6">';
+            }
+
             let token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+            // Abort controller for timeout
+            let controller = new AbortController();
+            let timeoutId = setTimeout(() => controller.abort(), 15000);
             
             fetch('{{ route("reaction.toggle") }}', {
                 method: 'POST',
@@ -1222,9 +1235,16 @@
                     id: id,
                     type: type,
                     reaction: reaction
-                })
+                }),
+                signal: controller.signal
             })
-            .then(response => response.json())
+            .then(response => {
+                clearTimeout(timeoutId);
+                if (!response.ok) {
+                    throw new Error('HTTP ' + response.status);
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.html) {
                     if (btn) {
@@ -1232,11 +1252,26 @@
                     }
                 } else if (data.error) {
                     console.error(data.error);
-                    alert('{{ __('messages.error_prefix') }}' + data.error);
+                    // Revert optimistic update on server-side error
+                    if (btn) btn.innerHTML = originalHtml;
+                    alert(data.error);
                 }
             })
             .catch(error => {
-                console.error('Error:', error);
+                clearTimeout(timeoutId);
+                if (error.name === 'AbortError') {
+                    // Timeout: reaction likely saved, just confirm the optimistic UI
+                    console.warn('Reaction request timed out, but likely saved.');
+                    if (btn) {
+                        // Remove the opacity dimming to confirm
+                        let img = btn.querySelector('.reaction-option-image');
+                        if (img) img.style.opacity = '1';
+                    }
+                } else {
+                    console.error('Reaction error:', error);
+                    // Revert optimistic update on network error
+                    if (btn) btn.innerHTML = originalHtml;
+                }
             })
             .finally(() => {
                 if (btn) btn.dataset.busy = "false";

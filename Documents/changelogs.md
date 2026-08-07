@@ -7,6 +7,12 @@
 * **Feature (Plugin Provider Directory Resolution & Testing Fallback):** Updated `PluginServiceProvider` (`app/Providers/PluginServiceProvider.php`) to include `myads-tinymce-editor` in testing active plugin resolutions, ensuring directory-based slug mapping and seamless test execution.
 * **Feature (Graceful Editor Fallback & Safety):** Enforced automatic graceful fallback to the default editor (`quill`) in `RichTextEditorService::getActiveEditor()` whenever `myads-tinymce-editor` is deactivated in `/admin/plugins`, preventing invalid DB option states or missing script errors. Added automated test suite (`TinyMCEEditorPluginTest.php`).
 
+### Bug Fixes
+* **Fix (Reaction Toggle Timeout & False Error on Community Feed):** Resolved a critical UX issue where clicking a reaction on community posts would hang for a long time then display a generic error alert ("An error occurred, please try again"), even though the reaction was successfully saved in the database. **Root cause:** `NotificationService::send()` was calling `Mail::to()->send()` synchronously, blocking the HTTP response while waiting for the SMTP connection to complete (or timeout). **Backend fix:** Deferred email notification dispatch to `app()->terminating()` callback in `NotificationService.php`, so the JSON response returns instantly while the email sends after the response is delivered. **Frontend fix:** Enhanced `toggleReaction()` in `master.blade.php` with optimistic UI (reaction icon appears immediately with subtle opacity), `AbortController` with 15-second timeout, and intelligent error handling — on timeout the optimistic UI is confirmed (since the reaction was likely saved), on true server errors the UI reverts to its original state.
+
+### Quality & Automated Testing
+* **Fix (ReactionSystemTest — Invalid Reaction Name):** Fixed pre-existing test failure in `ReactionSystemTest::web_user_can_add_update_and_remove_reaction` where the test used `'haha'` as a reaction name, which is not in the `ALLOWED_REACTIONS` list. Changed to `'funny'` which is the correct reaction identifier. All 3 reaction tests now pass (13 assertions).
+
 # v4.5.1
 > **Major Release (Stable)** — Rich Text Editor Engine (Quill.js & Extensibility Hooks), Database Index & Health Diagnostic Panel, Selective Cache Warmup Engine, Mini Floating PIP Video Player, Shorts Touch Swipe & Audio Tagging, Anti-Click-Farm Security & Ad Quality Index, and Comprehensive Frontend `@.superdesign` Overhauls.
 
