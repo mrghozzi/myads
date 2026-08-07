@@ -2111,7 +2111,11 @@
                 ]);
             }
         }
+    ?>
+    @include('theme::partials.continuous_audio_player')
+    <?php
         \App\Helpers\Hooks::do_action('theme_master_before_body_close');
     ?>
 </body>
+
 </html>

@@ -52,6 +52,8 @@ Route::middleware(['api.key', 'auth:sanctum'])->group(function () {
     Route::patch('/settings/notification-preferences', [App\Http\Controllers\Api\SettingsController::class, 'updateNotificationPreferences']);
     Route::get('/settings/sessions', [App\Http\Controllers\Api\SettingsController::class, 'getSessions']);
     Route::post('/settings/sessions/{id}/revoke', [App\Http\Controllers\Api\SettingsController::class, 'revokeSession']);
+    Route::post('/settings/tokens/{id}/revoke', [App\Http\Controllers\Api\SettingsController::class, 'revokeToken']);
+
     Route::get('/settings/badges', [App\Http\Controllers\Api\SettingsController::class, 'getBadges']);
     Route::patch('/settings/badges', [App\Http\Controllers\Api\SettingsController::class, 'updateBadges']);
     Route::get('/settings/history', [App\Http\Controllers\Api\SettingsController::class, 'getHistory']);

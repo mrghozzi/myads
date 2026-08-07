@@ -248,8 +248,11 @@ Allows any website to pre-fill the MYADS post composer.
 - `GET /api/profile/{identifier}/statuses`: Retrieve user's feed statuses. Response includes the same enriched `StatusResource` fields (`media`, `gallery`, `attachments`) as the community feed, with full `related_content` hydration.
 - `POST /api/profile/{identifier}/follow`: Toggle follow status for a user.
 - `POST /api/profile/{identifier}/block`: Block a user. Payload: `{"block_type": "messages_only|full_platform", "duration": 30}` (duration is optional).
-- `DELETE /api/profile/{identifier}/unblock`: Unblock a user.
 - `GET /api/settings/blocks`: Retrieve the authenticated user's list of blocked users.
+- `GET /api/settings/sessions`: Retrieve active web sessions (`sessions`) and active Sanctum API device tokens (`sanctum_tokens`).
+- `POST /api/settings/sessions/{id}/revoke`: Revoke a specific web session by session ID.
+- `POST /api/settings/tokens/{id}/revoke`: Revoke a specific Sanctum API token device session by token ID.
+
 
 
 ### Private Messages (Phase 2)

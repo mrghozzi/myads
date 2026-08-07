@@ -49,6 +49,9 @@
                             <p class="extension-hub__hero-desc">{{ __('messages.plugins_desc') }}</p>
                         </div>
                         <div class="col-xl-5 text-xl-end">
+                            <a href="{{ route('admin.plugins.inspector') }}" class="btn btn-outline-light btn-lg fw-bold shadow-sm px-4 py-3 me-2" style="border-radius: 16px;">
+                                <i class="feather-layers me-2"></i> {{ __('messages.plugins_inspector') }}
+                            </a>
                             <button type="button" class="btn btn-light btn-lg fw-bold shadow-sm px-4 py-3" data-bs-toggle="modal" data-bs-target="#uploadPluginModal" style="border-radius: 16px; color: var(--extension-hub-accent);">
                                 <i class="feather-upload-cloud me-2"></i> {{ __('messages.upload_plugin') }}
                             </button>

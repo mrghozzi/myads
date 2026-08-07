@@ -3817,8 +3817,27 @@ class AdminController extends Controller
         $installedSlugs = collect($plugins)->pluck('slug')->toArray();
 
         return view('admin::admin.plugins', compact('plugins', 'updates', 'marketplaceCatalog', 'installedSlugs'));
-
     }
+
+    public function pluginsInspector(PluginManager $pluginManager)
+    {
+        $actions = \App\Helpers\Hooks::getActions();
+        $filters = \App\Helpers\Hooks::getFilters();
+        $editors = \App\Services\RichTextEditorService::getAvailableEditors();
+        $activeEditor = \App\Services\RichTextEditorService::getActiveEditor();
+        $plugins = $pluginManager->getAllPlugins();
+        $activePlugins = collect($plugins)->where('is_active', true)->values();
+
+        return view('admin::admin.plugins_inspector', compact(
+            'actions',
+            'filters',
+            'editors',
+            'activeEditor',
+            'plugins',
+            'activePlugins'
+        ));
+    }
+
 
     public function activatePlugin(Request $request, PluginManager $pluginManager)
     {

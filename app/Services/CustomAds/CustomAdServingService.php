@@ -271,6 +271,35 @@ JS;
         return round(($validClicks / $totalClicks) * 100, 1);
     }
 
+    /**
+     * Get overall Ad Quality Index statistics for admin / publisher dashboards.
+     */
+    public function getOverallAdQualityStats(): array
+    {
+        $totalClicks = CustomAdEvent::query()
+            ->where('event_type', CustomAdEvent::TYPE_CLICK)
+            ->count();
+
+        $flaggedClicks = CustomAdEvent::query()
+            ->where('event_type', CustomAdEvent::TYPE_CLICK)
+            ->where('is_flagged', true)
+            ->count();
+
+        $legitimateClicks = max(0, $totalClicks - $flaggedClicks);
+
+        $qualityScore = $totalClicks > 0
+            ? round(($legitimateClicks / $totalClicks) * 100, 1)
+            : 100.0;
+
+        return [
+            'quality_score' => $qualityScore,
+            'total_clicks' => $totalClicks,
+            'legitimate_clicks' => $legitimateClicks,
+            'flagged_clicks' => $flaggedClicks,
+        ];
+    }
+
+
     private function renderBannerMarkup(CustomAdPlacement $placement, CustomAdCreative $creative): string
     {
         $size = $this->resolveSize((string) $placement->size);

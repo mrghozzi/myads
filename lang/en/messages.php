@@ -4197,7 +4197,28 @@ return [
     'available_credits' => 'Available Credits',
     'original_audio' => 'Original Audio',
     'return_to_main_player' => 'Return to Main Player',
+    'plugins_inspector' => 'Plugins & Hooks Inspector',
+    'plugins_inspector_desc' => 'Monitor active action/filter hooks and extensible plugin engines in real time',
+    'registered_actions' => 'Action Hooks',
+    'registered_filters' => 'Filter Hooks',
+    'active_editor_plugins' => 'Available Rich Text Editors',
+    'hook_name' => 'Hook Name',
+    'priority' => 'Priority',
+    'callback' => 'Callback',
+    'accepted_args' => 'Accepted Args',
+    'active_plugins_count' => 'Active Plugins',
+    'continuous_audio_player' => 'Continuous Audio Player',
+    'media_playback_preferences' => 'Media Playback Preferences',
+    'autoplay_videos' => 'Autoplay Videos on Scroll',
+    'default_playback_speed' => 'Default Playback Speed',
+    'ad_quality_index' => 'Ad Quality Index',
+    'legitimate_clicks' => 'Legitimate Clicks',
+    'flagged_clicks' => 'Flagged / Suspicious Clicks',
+    'device_sessions' => 'Device Sessions (Sanctum Tokens)',
+    'revoke_device' => 'Revoke Device',
+    'device_revoked_successfully' => 'Device session revoked successfully',
 ];
+
 
 
 

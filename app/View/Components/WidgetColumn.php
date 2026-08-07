@@ -55,6 +55,11 @@ class WidgetColumn extends Component
             $this->widgets = collect(); // Default to empty for unknown sides
         }
 
+        if (class_exists(\App\Helpers\Hooks::class)) {
+            $this->widgets = \App\Helpers\Hooks::apply_filters('registered_plugin_widgets', $this->widgets, $this->resolvedSide, $this->side);
+        }
+
+
         // Check if the current user is an admin who can access /admin/widgets
         $user = auth()->user();
         if ($user) {

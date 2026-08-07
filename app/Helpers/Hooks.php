@@ -80,6 +80,26 @@ class Hooks
     }
 
     /**
+     * Get all registered action hooks.
+     *
+     * @return array
+     */
+    public static function getActions(): array
+    {
+        return static::$actions;
+    }
+
+    /**
+     * Get all registered filter hooks.
+     *
+     * @return array
+     */
+    public static function getFilters(): array
+    {
+        return static::$filters;
+    }
+
+    /**
      * Reset all registered actions and filters.
      */
     public static function reset(): void
@@ -88,3 +108,4 @@ class Hooks
         static::$filters = [];
     }
 }
+

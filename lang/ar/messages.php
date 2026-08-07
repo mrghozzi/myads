@@ -4200,7 +4200,28 @@ return [
     'available_credits' => 'رصيد الحملات المتاح',
     'original_audio' => 'الصوت الأصلي',
     'return_to_main_player' => 'العودة للمشغل الرئيسي',
+    'plugins_inspector' => 'فاحص ومراقب الإضافات والخطاطيف',
+    'plugins_inspector_desc' => 'مراقبة خطاطيف الأفعال والفلترة والبرمجيات الممتدة النشطة في الوقت الفعلي',
+    'registered_actions' => 'خطاطيف الأفعال (Actions)',
+    'registered_filters' => 'خطاطيف الفلترة (Filters)',
+    'active_editor_plugins' => 'محررات النصوص المتاحة',
+    'hook_name' => 'اسم الخطاف (Hook Name)',
+    'priority' => 'الأولوية',
+    'callback' => 'دالة الاستدعاء (Callback)',
+    'accepted_args' => 'الوسائط',
+    'active_plugins_count' => 'الإضافات النشطة',
+    'continuous_audio_player' => 'مشغل الصوتيات المستمر',
+    'media_playback_preferences' => 'تفضيلات تشغيل الوسائط',
+    'autoplay_videos' => 'تشغيل الفيديو تلقائياً عند التمرير',
+    'default_playback_speed' => 'سرعة التشغيل الإفتراضية',
+    'ad_quality_index' => 'مؤشر جودة الإعلانات',
+    'legitimate_clicks' => 'النقرات المعتمدة',
+    'flagged_clicks' => 'النقرات المستبعدة / المشبوهة',
+    'device_sessions' => 'جلسات الأجهزة (Sanctum Tokens)',
+    'revoke_device' => 'سحب صلاحية الجهاز',
+    'device_revoked_successfully' => 'تم سحب صلاحية الجهاز بنجاح',
 ];
+
 
 
 

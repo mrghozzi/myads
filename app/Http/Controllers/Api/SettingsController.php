@@ -225,16 +225,23 @@ class SettingsController extends Controller
         $user = Auth::user();
         $schema = app(V420SchemaService::class);
 
-        if (!$schema->supports('security_sessions')) {
-            return response()->json(['sessions' => []]);
+        $sessions = [];
+        if ($schema->supports('security_sessions')) {
+            $sessions = SecurityMemberSession::query()
+                ->where('user_id', $user->id)
+                ->orderByDesc('last_seen_at')
+                ->get();
         }
 
-        $sessions = SecurityMemberSession::query()
-            ->where('user_id', $user->id)
-            ->orderByDesc('last_seen_at')
+        $tokens = $user->tokens()
+            ->select(['id', 'name', 'abilities', 'last_used_at', 'created_at'])
+            ->orderByDesc('last_used_at')
             ->get();
 
-        return response()->json(['sessions' => $sessions]);
+        return response()->json([
+            'sessions' => $sessions,
+            'sanctum_tokens' => $tokens,
+        ]);
     }
 
     public function revokeSession(Request $request, int $id)
@@ -247,6 +254,14 @@ class SettingsController extends Controller
         app(SecuritySessionService::class)->revoke($session, $user);
         return response()->json(['message' => 'Session revoked']);
     }
+
+    public function revokeToken(Request $request, int $id)
+    {
+        $user = Auth::user();
+        $user->tokens()->where('id', $id)->delete();
+        return response()->json(['message' => __('messages.device_revoked_successfully')]);
+    }
+
 
     public function getBadges()
     {

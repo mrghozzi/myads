@@ -763,6 +763,8 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
 
     // Plugins
     Route::get('/plugins', [AdminController::class, 'plugins'])->name('admin.plugins');
+    Route::get('/plugins/inspector', [AdminController::class, 'pluginsInspector'])->name('admin.plugins.inspector');
+
     Route::post('/plugins/activate', [AdminController::class, 'activatePlugin'])->name('admin.plugins.activate');
     Route::post('/plugins/deactivate', [AdminController::class, 'deactivatePlugin'])->name('admin.plugins.deactivate');
     Route::post('/plugins/delete', [AdminController::class, 'deletePlugin'])->name('admin.plugins.delete');
