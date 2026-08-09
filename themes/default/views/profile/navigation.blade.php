@@ -1,8 +1,47 @@
-<nav class="section-navigation" dir="ltr">
+<nav class="section-navigation" dir="{{ is_locale_rtl() ? 'rtl' : 'ltr' }}">
     <style>
+        .section-navigation {
+            position: relative;
+        }
+        .section-menu {
+            display: flex !important;
+            flex-wrap: nowrap !important;
+            overflow-x: auto !important;
+            scroll-behavior: smooth !important;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none !important;
+            -ms-overflow-style: none !important;
+        }
+        .section-menu::-webkit-scrollbar {
+            display: none !important;
+            width: 0 !important;
+            height: 0 !important;
+        }
+        .section-menu .section-menu-item {
+            flex: 0 0 auto !important;
+            float: none !important;
+            width: auto !important;
+            min-width: 105px !important;
+            padding: 0 16px !important;
+            display: inline-flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            justify-content: center !important;
+            white-space: nowrap !important;
+        }
         .section-menu-item-icon {
             width: 20px !important;
             height: 20px !important;
+        }
+        .section-navigation .slider-controls {
+            pointer-events: auto;
+        }
+        .section-navigation .slider-controls .slider-control {
+            cursor: pointer;
+            z-index: 5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
     </style>
     <div id="section-navigation-slider" class="section-menu">
@@ -73,3 +112,43 @@
         <div class="slider-control right"><svg class="slider-control-icon icon-small-arrow"><use xlink:href="#svg-small-arrow"></use></svg></div>
     </div>
 </nav>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const navMenu = document.getElementById('section-navigation-slider');
+    const controls = document.getElementById('section-navigation-slider-controls');
+    if (!navMenu) return;
+
+    // Scroll active item into view
+    const activeItem = navMenu.querySelector('.section-menu-item.active');
+    if (activeItem) {
+        setTimeout(function () {
+            activeItem.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+        }, 150);
+    }
+
+    if (controls) {
+        const leftBtn = controls.querySelector('.slider-control.left');
+        const rightBtn = controls.querySelector('.slider-control.right');
+        const scrollAmount = 240;
+
+        if (leftBtn) {
+            leftBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                const isRtl = document.documentElement.getAttribute('dir') === 'rtl' || document.body.getAttribute('dir') === 'rtl' || navMenu.getAttribute('dir') === 'rtl';
+                const direction = isRtl ? scrollAmount : -scrollAmount;
+                navMenu.scrollBy({ left: direction, behavior: 'smooth' });
+            });
+        }
+
+        if (rightBtn) {
+            rightBtn.addEventListener('click', function (e) {
+                e.preventDefault();
+                const isRtl = document.documentElement.getAttribute('dir') === 'rtl' || document.body.getAttribute('dir') === 'rtl' || navMenu.getAttribute('dir') === 'rtl';
+                const direction = isRtl ? -scrollAmount : scrollAmount;
+                navMenu.scrollBy({ left: direction, behavior: 'smooth' });
+            });
+        }
+    }
+});
+</script>
