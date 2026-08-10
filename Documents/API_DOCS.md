@@ -184,6 +184,30 @@ Allows any website to pre-fill the MYADS post composer.
   - `has_liked`, `user_reaction`: Current user's reaction state.
   - `is_promoted_ad`: Boolean flag indicating if the post is a promoted ad campaign injected into the feed.
   - `s_type`: Status type integer code (`0` community post, `1` directory listing, `2` regular forum topic, `4` forum image post, `5` news, `6` order request, `10` video, `11` audio, `12` file, `13` music, `14` clips, `100` forum text post, `205` KB article, `7867` store product).
+- `GET /api/video/feed`: Retrieves Video Hub content for mobile clients (paginated). Enforces strict `s_type` scoping (`whereIn('s_type', [10, 2, 4, 100])` for main videos, `14` for clips), completely excluding web directory listings (`s_type = 1`), store products (`s_type = 7867`), news, orders, and KB posts.
+  - *Query Parameters:*
+    - `filter`: Category filter (`all` default, `videos`, `clips`, `trending`, `latest`).
+    - `q`: Optional search query string.
+    - `page`: Page number (default `1`).
+    - `per_page`: Items per page (default `12`).
+  - *Response:*
+    ```json
+    {
+        "filter": "all",
+        "search_query": "",
+        "spotlight_video": StatusResource | null,
+        "clips": [ StatusResource, ... ],
+        "videos": {
+            "data": [ StatusResource, ... ]
+        },
+        "meta": {
+            "current_page": 1,
+            "last_page": 5,
+            "per_page": 12,
+            "total": 54
+        }
+    }
+    ```
 - `GET /api/statuses/{status_id}`: Retrieves details for a specific status. For video posts (`s_type == 10` or `post_kind == 'video'`), the response includes `StatusResource` attributes alongside `suggested_videos` (collection of recommended video posts), `is_following` (whether viewer follows publisher), and `is_saved` (whether status is saved by viewer).
 - `GET /api/v1/composer/options`: Retrieves post composer options including user's joined groups (`groups`), web directory categories (`directory_categories`), and supported post kinds (`supported_kinds`).
 - `POST /api/v1/statuses/link-preview`: Generates live metadata preview for a target URL.

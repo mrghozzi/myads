@@ -192,22 +192,28 @@ class ForumController extends Controller
         if ((int) $status->s_type === 10 || ($status->post_kind === 'video' && (int) $status->s_type !== 14)) {
             $suggestedVideos = Status::visible()
                 ->where('id', '!=', $status->id)
-                ->whereNotIn('s_type', [4, 14]) // Strictly exclude Images (4) and Clips (14)
+                ->whereIn('s_type', [10, 2, 100])
                 ->where(function ($q) {
                     $q->where('s_type', 10)
-                      ->orWhereHas('forumTopic', function ($ft) {
-                          $ft->whereHas('attachments', function ($att) {
-                              $att->where('mime_type', 'like', 'video/%')
-                                  ->orWhere('original_name', 'like', '%.mp4')
-                                  ->orWhere('original_name', 'like', '%.webm')
-                                  ->orWhere('original_name', 'like', '%.mov')
-                                  ->orWhere('original_name', 'like', '%.mkv');
-                          });
+                      ->orWhere(function ($sub) {
+                          $sub->whereIn('s_type', [2, 100])
+                              ->whereHas('forumTopic', function ($ft) {
+                                  $ft->whereHas('attachments', function ($att) {
+                                      $att->where('mime_type', 'like', 'video/%')
+                                          ->orWhere('original_name', 'like', '%.mp4')
+                                          ->orWhere('original_name', 'like', '%.webm')
+                                          ->orWhere('original_name', 'like', '%.mov')
+                                          ->orWhere('original_name', 'like', '%.mkv');
+                                  });
+                              });
                       })
-                      ->orWhereHas('linkPreviewRecord', function ($lp) {
-                          $lp->where('url', 'like', '%youtube.com%')
-                             ->orWhere('url', 'like', '%youtu.be%')
-                             ->orWhere('url', 'like', '%vimeo.com%');
+                      ->orWhere(function ($sub) {
+                          $sub->whereIn('s_type', [2, 100, 10])
+                              ->whereHas('linkPreviewRecord', function ($lp) {
+                                  $lp->where('url', 'like', '%youtube.com%')
+                                     ->orWhere('url', 'like', '%youtu.be%')
+                                     ->orWhere('url', 'like', '%vimeo.com%');
+                              });
                       });
                 })
                 ->orderBy('id', 'desc')

@@ -85,6 +85,9 @@ Route::middleware(['api.key', 'auth:sanctum'])->group(function () {
     // Reactions API
     Route::post('/reactions/toggle', [App\Http\Controllers\Api\ReactionController::class, 'toggle']);
 
+    // Video Hub API
+    Route::get('/video/feed', [App\Http\Controllers\Api\VideoApiController::class, 'index']);
+
     // Clips API
     Route::get('/clips', [App\Http\Controllers\Api\ClipsController::class, 'index']);
     Route::get('/clips/saved', [App\Http\Controllers\Api\ClipsController::class, 'saved']);

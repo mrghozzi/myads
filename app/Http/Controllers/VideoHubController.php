@@ -23,8 +23,11 @@ class VideoHubController extends Controller
         if ($searchQuery !== '') {
             $clipsQuery->where(function ($q) use ($searchQuery) {
                 $q->where('txt', 'like', '%' . $searchQuery . '%')
-                  ->orWhereHas('forumTopic', function ($ft) use ($searchQuery) {
-                      $ft->where('name', 'like', '%' . $searchQuery . '%');
+                  ->orWhere(function ($sub) use ($searchQuery) {
+                      $sub->whereIn('s_type', [2, 4, 100, 10, 11, 12, 13, 14])
+                          ->whereHas('forumTopic', function ($ft) use ($searchQuery) {
+                              $ft->where('name', 'like', '%' . $searchQuery . '%');
+                          });
                   });
             });
         }
@@ -41,22 +44,30 @@ class VideoHubController extends Controller
             $videosQuery->where('s_type', 14);
         } else {
             // 'all', 'videos', 'trending', 'latest' -> Exclude Clips (s_type = 14) from main video grid
+            // Strictly scope to forum & video status types (excludes directory s_type=1, store s_type=7867, news s_type=5, orders s_type=6, kb s_type=205)
             $videosQuery->where('s_type', '!=', 14)
+                ->whereIn('s_type', [10, 2, 4, 100])
                 ->where(function ($q) {
                     $q->where('s_type', 10)
-                      ->orWhereHas('forumTopic', function ($ft) {
-                          $ft->whereHas('attachments', function ($att) {
-                              $att->where('mime_type', 'like', 'video/%')
-                                  ->orWhere('original_name', 'like', '%.mp4')
-                                  ->orWhere('original_name', 'like', '%.webm')
-                                  ->orWhere('original_name', 'like', '%.mov')
-                                  ->orWhere('original_name', 'like', '%.mkv');
-                          });
+                      ->orWhere(function ($sub) {
+                          $sub->whereIn('s_type', [2, 4, 100])
+                              ->whereHas('forumTopic', function ($ft) {
+                                  $ft->whereHas('attachments', function ($att) {
+                                      $att->where('mime_type', 'like', 'video/%')
+                                          ->orWhere('original_name', 'like', '%.mp4')
+                                          ->orWhere('original_name', 'like', '%.webm')
+                                          ->orWhere('original_name', 'like', '%.mov')
+                                          ->orWhere('original_name', 'like', '%.mkv');
+                                  });
+                              });
                       })
-                      ->orWhereHas('linkPreviewRecord', function ($lp) {
-                          $lp->where('url', 'like', '%youtube.com%')
-                             ->orWhere('url', 'like', '%youtu.be%')
-                             ->orWhere('url', 'like', '%vimeo.com%');
+                      ->orWhere(function ($sub) {
+                          $sub->whereIn('s_type', [2, 4, 100, 10])
+                              ->whereHas('linkPreviewRecord', function ($lp) {
+                                  $lp->where('url', 'like', '%youtube.com%')
+                                     ->orWhere('url', 'like', '%youtu.be%')
+                                     ->orWhere('url', 'like', '%vimeo.com%');
+                              });
                       });
                 });
         }
@@ -65,8 +76,11 @@ class VideoHubController extends Controller
         if ($searchQuery !== '') {
             $videosQuery->where(function ($q) use ($searchQuery) {
                 $q->where('txt', 'like', '%' . $searchQuery . '%')
-                  ->orWhereHas('forumTopic', function ($ft) use ($searchQuery) {
-                      $ft->where('name', 'like', '%' . $searchQuery . '%');
+                  ->orWhere(function ($sub) use ($searchQuery) {
+                      $sub->whereIn('s_type', [2, 4, 100, 10, 14])
+                          ->whereHas('forumTopic', function ($ft) use ($searchQuery) {
+                              $ft->where('name', 'like', '%' . $searchQuery . '%');
+                          });
                   });
             });
         }
