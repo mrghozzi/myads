@@ -245,7 +245,7 @@ Allows any website to pre-fill the MYADS post composer.
     - `social_links`: Key-value map of configured social media platform URLs.
     - `badges`: List of unlocked badges, each containing `name` and `icon` URL.
     - `profile_badge_color`: Color hex string representing user level/tier styling.
-- `GET /api/profile/{identifier}/statuses`: Retrieve user's feed statuses. Response includes the same enriched `StatusResource` fields (`media`, `gallery`, `attachments`) as the community feed, with full `related_content` hydration.
+- `GET /api/profile/{identifier}/statuses`: Retrieve user's feed statuses. Response includes enriched `StatusResource` fields (`display_title`, `display_content`, `media`, `gallery`, `attachments`, `activity_card`). Knowledgebase status posts (`s_type = 205`) return the complete formatted article body (`o_valuer`) in `display_content` with strict `s_type` isolation in `related_content`.
 - `POST /api/profile/{identifier}/follow`: Toggle follow status for a user.
 - `POST /api/profile/{identifier}/block`: Block a user. Payload: `{"block_type": "messages_only|full_platform", "duration": 30}` (duration is optional).
 - `GET /api/settings/blocks`: Retrieve the authenticated user's list of blocked users.

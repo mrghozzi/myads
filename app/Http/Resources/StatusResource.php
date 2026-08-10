@@ -59,7 +59,10 @@ class StatusResource extends JsonResource
 
         $videoTitle = null;
         $videoThumbnail = null;
-        $topic = $this->forumTopic ?? ($this->related_content instanceof \App\Models\ForumTopic ? $this->related_content : null);
+        $sType = (int) $this->s_type;
+        $topic = in_array($sType, [100, 4, 2, 10, 11, 12, 13, 14], true)
+            ? ($this->relationLoaded('forumTopic') ? $this->forumTopic : ($this->related_content instanceof \App\Models\ForumTopic ? $this->related_content : null))
+            : null;
         if ($topic) {
             if ($topic->name && !in_array(strtolower(trim($topic->name)), ['video', 'text', 'gallery', 'clips', 'audio', 'file', 'music'])) {
                 $videoTitle = $topic->name;
@@ -130,9 +133,9 @@ class StatusResource extends JsonResource
 
         $sType = (int) $this->s_type;
 
-        // Text/media posts don't have meaningful separate titles.
-        // The ForumTopic.name for these is the post text itself, not a title.
-        if (in_array($sType, [2, 4, 10, 11, 12, 13, 14, 100])) {
+        // Text/media posts and rich activity card posts don't use a separate displayTitle header,
+        // as their titles are rendered directly within their specialized activity card widgets.
+        if (in_array($sType, [1, 2, 4, 6, 10, 11, 12, 13, 14, 100, 205, 7867])) {
             return null;
         }
 
@@ -144,6 +147,11 @@ class StatusResource extends JsonResource
         $content = $this->related_content;
         if (!$content) return $this->txt;
         
+        // Option model for Knowledgebase articles uses o_valuer for body content
+        if (isset($content->o_type) && $content->o_type === 'knowledgebase') {
+            return $content->o_valuer ?? $this->txt;
+        }
+
         return $content->content ?? $content->description ?? $content->txt ?? $this->txt;
     }
 

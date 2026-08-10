@@ -190,37 +190,12 @@ class Status extends Model
 
     public function getRelatedContentAttribute()
     {
-        if ($this->relationLoaded('forumTopic') && $this->forumTopic) {
-            return $this->forumTopic;
-        }
+        $sType = (int) $this->s_type;
 
-        if ($this->relationLoaded('directoryListing') && $this->directoryListing) {
-            return $this->directoryListing;
-        }
-
-        if ($this->relationLoaded('productItem') && $this->productItem) {
-            return $this->productItem;
-        }
-
-        if ($this->relationLoaded('knowledgebaseItem') && $this->knowledgebaseItem) {
-            return $this->knowledgebaseItem;
-        }
-
-        if ($this->relationLoaded('newsItem') && $this->newsItem) {
-            return $this->newsItem;
-        }
-
-        if (in_array($this->s_type, [100, 4, 2, 10, 11, 12, 13, 14])) {
-            return ForumTopic::find($this->tp_id);
-        } elseif ($this->s_type == 1) {
-            return Directory::find($this->tp_id);
-        } elseif ($this->s_type == 7867) {
-            return Product::find($this->tp_id) ?? ForumTopic::find($this->tp_id);
-        } elseif ($this->s_type == 5) {
-            return News::find($this->tp_id);
-        } elseif ($this->s_type == 6) {
-            return OrderRequest::find($this->tp_id);
-        } elseif ((int) $this->s_type === KnowledgebaseCommunityService::STATUS_TYPE) {
+        if ($sType === KnowledgebaseCommunityService::STATUS_TYPE) {
+            if ($this->relationLoaded('knowledgebaseItem') && $this->knowledgebaseItem) {
+                return $this->knowledgebaseItem;
+            }
             $article = Option::query()
                 ->where('id', $this->tp_id)
                 ->where('o_type', 'knowledgebase')
@@ -236,6 +211,42 @@ class Status extends Model
             }
             return $article;
         }
+
+        if ($sType === 1) {
+            if ($this->relationLoaded('directoryListing') && $this->directoryListing) {
+                return $this->directoryListing;
+            }
+            return Directory::find($this->tp_id);
+        }
+
+        if ($sType === 7867) {
+            if ($this->relationLoaded('productItem') && $this->productItem) {
+                return $this->productItem;
+            }
+            return Product::find($this->tp_id) ?? ForumTopic::find($this->tp_id);
+        }
+
+        if ($sType === 5) {
+            if ($this->relationLoaded('newsItem') && $this->newsItem) {
+                return $this->newsItem;
+            }
+            return News::find($this->tp_id);
+        }
+
+        if ($sType === 6) {
+            if ($this->relationLoaded('orderRequest') && $this->orderRequest) {
+                return $this->orderRequest;
+            }
+            return OrderRequest::find($this->tp_id);
+        }
+
+        if (in_array($sType, [100, 4, 2, 10, 11, 12, 13, 14], true)) {
+            if ($this->relationLoaded('forumTopic') && $this->forumTopic) {
+                return $this->forumTopic;
+            }
+            return ForumTopic::find($this->tp_id);
+        }
+
         return null;
     }
 

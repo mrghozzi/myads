@@ -56,7 +56,7 @@ MYADS is a community platform where website owners:
 34. **Continuous Audio Player Bar (`continuous_audio_player`)** — persistent glassmorphic floating bottom audio player component (`themes/default/views/partials/continuous_audio_player.blade.php`) featuring HTML5 audio controls, spinning audio disc animation, track title/avatar rendering, progress scrubber, and `sessionStorage` state persistence across page navigations.
 35. **Sanctum Multi-Device Session Control & Token Revocation** — multi-device API session management returning active Sanctum API tokens with device names and last used timestamps alongside web sessions (`GET /api/settings/sessions`), paired with a 1-click token revocation API endpoint (`POST /api/settings/tokens/{id}/revoke`).
 36. **Referral System Overhaul & ADStn Share Integration (`@.superdesign` & i18n)** — comprehensive redesign of `/ads/referrals`, `/referral`, and `/home` referral hub. Features glassmorphic hero headers, stat counters, 1-click clipboard copy tools, multi-size banner embed codes, multi-language support, direct sharing to 7 networks including **ADStn (`https://www.adstn.ovh/share`)** using `fa-brands fa-buysellads`, and dedicated feature test suite (`ReferralSystemTest.php`).
-
+37. **Knowledgebase Relation Isolation & Rich Content API Resource** — strict `s_type === 205` relation resolution in `Status::getRelatedContentAttribute()` eliminating eager-loading ID collisions with `forum` topics, paired with complete Knowledgebase article content hydration (`o_valuer`) in `StatusResource::getDisplayContent()` and URL normalization for mobile clients.
 
 ---
 
