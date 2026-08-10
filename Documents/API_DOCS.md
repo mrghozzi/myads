@@ -286,8 +286,8 @@ Allows any website to pre-fill the MYADS post composer.
 - `POST /api/forums/categories/{categoryId}/topics`: Create a new topic. Payload: `{"title": "...", "content": "..."}`
 - `GET /api/forums/topics/{topicId}`: Retrieve a specific topic and its replies.
 - `POST /api/forums/topics/{topicId}/replies`: Add a reply to a topic. Payload: `{"content": "..."}`
-- `GET /api/store/products`: Retrieve store products (paginated). Products can be of categories: Scripts, Themes, Plugins, Graphics, Audio, Video, eBooks, Software, and Courses. Returns list with `thumbnail` and `title` keys.
-- `GET /api/store/products/{id}`: Retrieve a specific product's details. Does not increment view counts (`vu`) as it is not supported.
+- `GET /api/store/products`: Retrieve store products (paginated). Products are ordered chronologically by status promotion date (`s_type = 7867`), `updated_at`, then `id DESC`. Returns `ProductResource` containing `price`, `original_price`, `sale_price`, `current_price`, `is_on_sale`, `thumbnail`, `seller`, `updated_at`, and `date_formatted`.
+- `GET /api/store/products/{id}`: Retrieve a specific product's details with complete sale pricing and seller metadata.
 - `GET /api/store/products/{id}/knowledgebase`: Retrieve the knowledgebase articles for a product (paginated).
 
 ### Clips & Shorts
