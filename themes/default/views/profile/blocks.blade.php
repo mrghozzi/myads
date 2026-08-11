@@ -61,7 +61,7 @@
                                             @endif
                                         </td>
                                         <td>
-                                            <form action="{{ route('profile.block.destroy', $block->blocked_user_id) }}" method="POST">
+                                            <form action="{{ route('profile.block.destroy', $block->blockedUser->username ?? $block->blocked_user_id) }}" method="POST">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="button small secondary" onclick="return confirm('{{ __('messages.confirm_unblock') ?? 'Are you sure you want to unblock this user?' }}')">

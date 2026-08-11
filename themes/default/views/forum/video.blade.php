@@ -243,7 +243,7 @@
                         <!-- FOLLOW / UNFOLLOW BUTTON -->
                         @auth
                             @if(auth()->id() !== $topic->user->id)
-                                <form action="{{ route('profile.follow', $topic->user->id) }}" method="POST" class="ms-2 d-inline">
+                                <form action="{{ route('profile.follow', $topic->user->username) }}" method="POST" class="ms-2 d-inline">
                                     @csrf
                                     <button type="submit" class="button {{ $isFollowing ? 'primary' : 'secondary' }} small" style="height: 32px; padding: 0 14px; font-size: 12px; font-weight: 700; border-radius: 16px; width: auto !important; flex: none !important;">
                                         <i class="fa {{ $isFollowing ? 'fa-check' : 'fa-user-plus' }} me-1"></i>

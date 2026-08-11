@@ -86,7 +86,7 @@
                     <!-- ACTION REQUEST LIST -->
                     <div class="action-request-list">
                         <!-- ACTION REQUEST -->
-                        <form action="{{ route('profile.follow', $user->id) }}" method="POST" style="display:inline;">
+                        <form action="{{ route('profile.follow', $user->username) }}" method="POST" style="display:inline;">
                             @csrf
                             <button type="submit" class="action-request accept" style="border:none; background:none; cursor:pointer;">
                                 <!-- ACTION REQUEST ICON -->

@@ -39,7 +39,9 @@ class ReportController extends Controller
             $typeId = 6;
         } elseif ($request->has('user')) {
             $id = $request->input('user');
-            $item = \App\Models\User::find($id);
+            $item = \App\Models\User::where('username', $id)->first()
+                ?? \App\Models\User::resolvePublicIdentifier($id)
+                ?? \App\Models\User::find($id);
             $type = 'user';
             $typeId = 99;
         }

@@ -27,7 +27,9 @@ class MentionController extends Controller
                 ->filter(fn (User $user) => $privacy->canMention($user, $viewer))
                 ->take(8)
                 ->map(fn (User $user) => [
-                    'id' => $user->id,
+                    'id' => $user->usesPublicMemberIds()
+                        ? $user->publicRouteIdentifier()
+                        : $user->id,
                     'username' => $user->username,
                     'avatar' => $user->img ? asset($user->img) : theme_asset('img/avatar/default.png'),
                     'url' => route('profile.show', $user->username),

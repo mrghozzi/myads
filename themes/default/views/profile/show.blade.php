@@ -245,14 +245,14 @@
                 </a>
             @else
                 @if($isFollowing)
-                    <form action="{{ route('profile.follow', $user->id) }}" method="POST" style="display: inline;">
+                    <form action="{{ route('profile.follow', $user->username) }}" method="POST" style="display: inline;">
                         @csrf
                         <button type="submit" class="profile-header-info-action button tertiary">
                             <span class="hide-text-mobile">{{ __('messages.unfollow') }}</span>&nbsp;<i class="fa fa-user-times" aria-hidden="true"></i>
                         </button>
                     </form>
                 @else
-                    <form action="{{ route('profile.follow', $user->id) }}" method="POST" style="display: inline;">
+                    <form action="{{ route('profile.follow', $user->username) }}" method="POST" style="display: inline;">
                         @csrf
                         <button type="submit" class="profile-header-info-action button secondary" style="color: #fff;">
                             <span class="hide-text-mobile">{{ __('messages.follow') }}</span>&nbsp;<i class="fa fa-user-plus" aria-hidden="true"></i>
@@ -265,10 +265,10 @@
                         <span class="hide-text-mobile">{{ __('messages.send_message') }}</span>&nbsp;<i class="fa fa-envelope" aria-hidden="true"></i>
                     </a>
                 @endif
-                <a href="{{ route('profile.block.create', $user->id) }}" class="profile-header-info-action button tertiary" style="padding: 10px 14px; min-width: auto; width: 44px; justify-content: center;" title="{{ __('messages.block') ?? 'Block' }}">
+                <a href="{{ route('profile.block.create', $user->username) }}" class="profile-header-info-action button tertiary" style="padding: 10px 14px; min-width: auto; width: 44px; justify-content: center;" title="{{ __('messages.block') ?? 'Block' }}">
                     <i class="fa fa-ban" aria-hidden="true"></i>
                 </a>
-                <a href="{{ route('report.index', ['user' => $user->id]) }}" class="profile-header-info-action button tertiary" style="padding: 10px 14px; min-width: auto; width: 44px; justify-content: center;" title="{{ __('messages.report') ?? 'Report' }}">
+                <a href="{{ route('report.index', ['user' => $user->username]) }}" class="profile-header-info-action button tertiary" style="padding: 10px 14px; min-width: auto; width: 44px; justify-content: center;" title="{{ __('messages.report') ?? 'Report' }}">
                     <i class="fa fa-flag" aria-hidden="true"></i>
                 </a>
             @endif

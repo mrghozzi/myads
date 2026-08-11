@@ -168,7 +168,7 @@ Allows any website to pre-fill the MYADS post composer.
   
   ### Community Feed & Statuses
 - `GET /api/portal/feed`: Retrieves the community feed (paginated). Optional query parameter `filter` (`all` or `me`). Returns a paginated collection of `StatusResource` (with properly eager-loaded relationships including `user`) which includes:
-  - `user`: User details (`UserResource`) containing `id`, `username`, `name`, `avatar` URL, `verified` status, and `profile_badge_color` (the hex color corresponding to their active paid plan or Super Admin status).
+  - `user`: User details (`UserResource`) containing `id` (returns `public_uid` when `public_member_ids_enabled` setting is active; returns raw integer `id` otherwise), `username`, `name`, `avatar` URL, `verified` status, and `profile_badge_color` (the hex color corresponding to their active paid plan or Super Admin status).
   - `display_content`, `display_title`, `display_image`: Pre-rendered HTML/attributes for diverse post types.
   - `video_title`, `video_thumbnail`: Resolved custom video title and video cover thumbnail image URL for video posts.
   - `media`: Primary media object for multimedia posts (Video, Audio, File, Music, Clips) containing `type`, `url`, `mime_type`, `name`, and `size`. Returns `null` for text-only posts.
@@ -261,7 +261,7 @@ Allows any website to pre-fill the MYADS post composer.
 - `GET /api/profile/{identifier}`: Retrieve user profile details and stats.
   - **Note:** `{identifier}` can be `'me'` to fetch the currently authenticated user, or a `username`, or a public user ID.
   - **Response Fields:** Returns `UserProfileResource` which includes:
-    - `id`, `username`, `name`, `bio`, `online` (boolean), `verified` (boolean), `pts` (private, hidden or zeroed for privacy if viewed by others), `created_at` (formatted date).
+    - `id` (returns randomized `public_uid` when `public_member_ids_enabled` setting is active; returns raw integer `id` otherwise), `username`, `name`, `bio`, `online` (boolean), `verified` (boolean), `pts` (private, hidden or zeroed for privacy if viewed by others), `created_at` (formatted date).
     - `cover`: Resolved cover image URL.
     - `followers_count`, `following_count`, `posts_count`.
     - `is_following`: Whether the current viewer is following this user (boolean).

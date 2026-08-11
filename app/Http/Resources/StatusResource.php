@@ -111,7 +111,12 @@ class StatusResource extends JsonResource
                     'id' => $this->repostRecord->id,
                     'status_id' => $this->repostRecord->status_id,
                     'original_status_id' => $this->repostRecord->original_status_id,
-                    'user_id' => $this->repostRecord->user_id,
+                    'user_id' => (function () {
+                        $repostUser = $this->repostRecord->user ?? null;
+                        return $repostUser instanceof \App\Models\User && $repostUser->usesPublicMemberIds()
+                            ? $repostUser->publicRouteIdentifier()
+                            : $this->repostRecord->user_id;
+                    })(),
                     'original_status' => $this->repostRecord->originalStatus 
                         ? new StatusResource($this->repostRecord->originalStatus) 
                         : null,

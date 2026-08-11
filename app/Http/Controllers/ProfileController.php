@@ -291,7 +291,10 @@ class ProfileController extends Controller
     {
         $user = User::resolvePublicIdentifier($id);
         
-        if (!$user && ctype_digit($id)) {
+        // Only fallback to numeric ID lookup when public UIDs are NOT enabled.
+        // When public_member_ids_enabled is active, we must NOT resolve by raw
+        // numeric ID to prevent member ID enumeration attacks (e.g. /u/id/1, /u/id/2…).
+        if (!$user && ctype_digit($id) && !((bool) \App\Support\SecuritySettings::get('public_member_ids_enabled', 0))) {
             $user = User::find((int) $id);
         }
         
@@ -317,9 +320,9 @@ class ProfileController extends Controller
         return redirect()->route('profile.show', $user->username);
     }
 
-    public function toggleFollow(Request $request, int $id, \App\Services\NotificationService $notifications)
+    public function toggleFollow(Request $request, string $username, \App\Services\NotificationService $notifications)
     {
-        $targetUser = User::findOrFail($id);
+        $targetUser = User::where('username', $username)->firstOrFail();
         $currentUser = Auth::user();
 
         if ((int) $currentUser->id === (int) $targetUser->id) {

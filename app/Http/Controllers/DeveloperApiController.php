@@ -65,7 +65,9 @@ class DeveloperApiController extends Controller
         $user = $auth['token']->user;
 
         return $this->successResponse([
-            'id' => $user->id,
+            'id' => $user->usesPublicMemberIds()
+                ? $user->publicRouteIdentifier()
+                : $user->id,
             'username' => $user->username,
             'email' => $user->email,
         ]);
@@ -79,7 +81,9 @@ class DeveloperApiController extends Controller
         $user = $auth['token']->user;
 
         return $this->successResponse([
-            'id' => $user->id,
+            'id' => $user->usesPublicMemberIds()
+                ? $user->publicRouteIdentifier()
+                : $user->id,
             'username' => $user->username,
             'avatar' => asset($user->img),
             'points' => $user->pts,
@@ -94,7 +98,9 @@ class DeveloperApiController extends Controller
         $owner = $auth['token']->app->user;
 
         return $this->successResponse([
-            'id' => $owner->id,
+            'id' => $owner->usesPublicMemberIds()
+                ? $owner->publicRouteIdentifier()
+                : $owner->id,
             'username' => $owner->username,
             'avatar' => asset($owner->img),
         ]);

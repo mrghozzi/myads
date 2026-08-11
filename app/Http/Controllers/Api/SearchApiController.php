@@ -31,7 +31,9 @@ class SearchApiController extends Controller
             foreach ($users as $user) {
                 $results[] = [
                     'type' => 'user',
-                    'id' => $user->id,
+                    'id' => $user->usesPublicMemberIds()
+                        ? $user->publicRouteIdentifier()
+                        : $user->id,
                     'identifier' => $user->username,
                     'title' => $user->username,
                     'img' => $user->avatarUrl(),

@@ -26,7 +26,9 @@ class SettingsController extends Controller
         $user = Auth::user();
         return response()->json([
             'user' => [
-                'id' => $user->id,
+                'id' => $user->usesPublicMemberIds()
+                    ? $user->publicRouteIdentifier()
+                    : $user->id,
                 'name' => $user->name,
                 'username' => $user->username,
                 'email' => $user->email,

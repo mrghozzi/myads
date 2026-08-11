@@ -50,7 +50,7 @@
 
         @if(Auth::check() && Auth::id() !== $targetUser->id)
             <div class="profile-relationship-card__actions">
-                <form class="profile-relationship-card__action-form" action="{{ route('profile.follow', $targetUser->id) }}" method="POST">
+                <form class="profile-relationship-card__action-form" action="{{ route('profile.follow', $targetUser->username) }}" method="POST">
                     @csrf
                     <button type="submit" class="profile-relationship-card__action button {{ $isViewerFollowingTarget ? 'tertiary' : 'secondary' }}" @if(!$isViewerFollowingTarget) style="color: #fff;" @endif>
                         <i class="fa {{ $isViewerFollowingTarget ? 'fa-user-times' : 'fa-user-plus' }}" aria-hidden="true"></i>

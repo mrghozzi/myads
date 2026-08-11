@@ -25,9 +25,17 @@ class UserBlockController extends Controller
         return view('theme::profile.blocks', compact('user', 'blocks'));
     }
 
-    public function create($id)
+    private function resolveUser(string|int $identifier): ?User
     {
-        $user = \App\Models\User::findOrFail($id);
+        return User::where('username', $identifier)->first()
+            ?? User::resolvePublicIdentifier($identifier)
+            ?? User::find($identifier);
+    }
+
+    public function create($identifier)
+    {
+        $user = $this->resolveUser($identifier);
+        abort_if(!$user, 404);
         
         if (Auth::id() === $user->id) {
             return back()->with('error', __('messages.cannot_block_self') ?? 'You cannot block yourself.');
@@ -36,16 +44,19 @@ class UserBlockController extends Controller
         return view('theme::profile.block_create', compact('user'));
     }
 
-    public function store(Request $request)
+    public function store(Request $request, $identifier)
     {
         $request->validate([
-            'user_id' => 'required|exists:users,id',
             'block_type' => 'required|in:messages_only,full_platform',
             'duration' => 'nullable|integer|min:1', // in days
         ]);
 
         $user = Auth::user();
-        $target = User::findOrFail($request->user_id);
+        $target = $this->resolveUser($identifier);
+        if (!$target && $request->filled('user_id')) {
+            $target = $this->resolveUser($request->input('user_id'));
+        }
+        abort_if(!$target, 404);
 
         if ($user->id === $target->id) {
             return back()->withErrors(['block' => 'You cannot block yourself.']);
@@ -76,10 +87,11 @@ class UserBlockController extends Controller
         return back()->with('success', __('messages.user_blocked_successfully'));
     }
 
-    public function destroy(Request $request, $id)
+    public function destroy(Request $request, $identifier)
     {
         $user = Auth::user();
-        $target = User::findOrFail($id);
+        $target = $this->resolveUser($identifier);
+        abort_if(!$target, 404);
 
         $this->blockService->unblockUser($user, $target);
 

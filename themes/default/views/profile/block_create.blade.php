@@ -41,9 +41,9 @@
 
         <!-- BLOCK FORM -->
         <div class="widget-box" style="border-radius: 24px; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05); border: 1px solid rgba(255,255,255,0.5); padding: 40px;">
-            <form action="{{ route('profile.block.store', $user->id) }}" method="POST">
+            <form action="{{ route('profile.block.store', $user->username) }}" method="POST">
                 @csrf
-                <input type="hidden" name="user_id" value="{{ $user->id }}">
+                <input type="hidden" name="user_id" value="{{ $user->username }}">
                 
                 <div class="form-item" style="margin-bottom: 25px;">
                     <div class="form-input small full">

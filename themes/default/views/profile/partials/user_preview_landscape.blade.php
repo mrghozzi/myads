@@ -105,7 +105,7 @@
         <div class="user-preview-actions">
             <!-- FOLLOW/UNFOLLOW BUTTON -->
             @if(Auth::check())
-                <form action="{{ route('profile.follow', $targetUser->id) }}" method="POST" style="display:inline;">
+                <form action="{{ route('profile.follow', $targetUser->username) }}" method="POST" style="display:inline;">
                     @csrf
                     <button type="submit" class="profile-header-info-action button {{ $isLoggedInUserFollowing ? 'tertiary' : 'secondary' }}" style="{{ !$isLoggedInUserFollowing ? 'color: #fff;' : '' }}">
                         <svg class="button-icon icon-add-friend"><use xlink:href="#svg-{{ $isLoggedInUserFollowing ? 'remove' : 'add' }}-friend"></use></svg>

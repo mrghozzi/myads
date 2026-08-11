@@ -79,14 +79,14 @@
                 </a>
             @else
                 @if($isFollowing)
-                    <form action="{{ route('profile.follow', $user->id) }}" method="POST" style="display: inline;">
+                    <form action="{{ route('profile.follow', $user->username) }}" method="POST" style="display: inline;">
                         @csrf
                         <button type="submit" class="profile-header-info-action button tertiary">
                             <span class="hide-text-mobile">{{ __('messages.unfollow') }}</span>&nbsp;<i class="fa fa-user-times" aria-hidden="true"></i>
                         </button>
                     </form>
                 @else
-                    <form action="{{ route('profile.follow', $user->id) }}" method="POST" style="display: inline;">
+                    <form action="{{ route('profile.follow', $user->username) }}" method="POST" style="display: inline;">
                         @csrf
                         <button type="submit" class="profile-header-info-action button secondary" style="color: #fff;">
                             <span class="hide-text-mobile">{{ __('messages.follow') }}</span>&nbsp;<i class="fa fa-user-plus" aria-hidden="true"></i>

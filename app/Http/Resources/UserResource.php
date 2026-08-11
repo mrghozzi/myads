@@ -15,7 +15,9 @@ class UserResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->id,
+            'id' => $this->resource instanceof \App\Models\User && $this->resource->usesPublicMemberIds()
+                ? $this->resource->publicRouteIdentifier()
+                : $this->id,
             'username' => $this->username,
             'name' => $this->name,
             'avatar' => $this->avatarUrl(),

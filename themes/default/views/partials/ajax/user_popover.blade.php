@@ -27,7 +27,7 @@
                     @php
                         $isFollowing = \App\Models\Like::where('uid', auth()->id())->where('sid', $user->id)->where('type', 1)->exists();
                     @endphp
-                    <a href="#" class="button {{ $isFollowing ? 'secondary' : 'primary' }} small" style="padding: 0 16px; height: 32px; line-height: 32px;" onclick="toggleFollow({{ $user->id }}, this); return false;">
+                    <a href="#" class="button {{ $isFollowing ? 'secondary' : 'primary' }} small" style="padding: 0 16px; height: 32px; line-height: 32px;" onclick="toggleFollow('{{ $user->username }}', this); return false;">
                         {{ $isFollowing ? __('messages.unfollow') : __('messages.Follow') }}
                     </a>
                 @endif

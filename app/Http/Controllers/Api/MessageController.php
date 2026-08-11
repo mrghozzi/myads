@@ -53,7 +53,9 @@ class MessageController extends Controller
 
             return [
                 'user' => [
-                    'id'       => $partner->id,
+                    'id'       => $partner instanceof \App\Models\User && $partner->usesPublicMemberIds()
+                        ? $partner->publicRouteIdentifier()
+                        : $partner->id,
                     'username' => $partner->username,
                     'name'     => $partner->name ?? $partner->username,
                     'img'      => $partner->img ?? '',
@@ -94,7 +96,9 @@ class MessageController extends Controller
         return response()->json([
             'success' => true,
             'partner' => [
-                'id'          => $partner->id,
+                'id'          => $partner instanceof \App\Models\User && $partner->usesPublicMemberIds()
+                    ? $partner->publicRouteIdentifier()
+                    : $partner->id,
                 'username'    => $partner->username,
                 'name'        => $partner->name,
                 'avatar'      => $partner->img ?? '',

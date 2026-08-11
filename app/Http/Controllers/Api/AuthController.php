@@ -34,7 +34,9 @@ class AuthController extends Controller
                 'status' => 'success',
                 'token' => $token,
                 'user' => [
-                    'id' => $user->id,
+                    'id' => $user->usesPublicMemberIds()
+                        ? $user->publicRouteIdentifier()
+                        : $user->id,
                     'username' => $user->username,
                     'name' => $user->name ?? $user->username,
                     'avatar_url' => asset($user->img ?? 'upload/avatar.png'),
@@ -53,7 +55,9 @@ class AuthController extends Controller
                 'status' => 'success',
                 'token' => $token,
                 'user' => [
-                    'id' => $user->id,
+                    'id' => $user->usesPublicMemberIds()
+                        ? $user->publicRouteIdentifier()
+                        : $user->id,
                     'username' => $user->username,
                     'name' => $user->name ?? $user->username,
                     'avatar_url' => asset($user->img ?? 'upload/avatar.png'),

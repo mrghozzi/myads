@@ -71,7 +71,9 @@ class UserProfileResource extends JsonResource
         }
 
         return [
-            'id' => $this->id,
+            'id' => $this->resource instanceof \App\Models\User && $this->resource->usesPublicMemberIds()
+                ? $this->resource->publicRouteIdentifier()
+                : $this->id,
             'username' => $this->username,
             'name' => $this->name,
             'avatar' => $this->avatarUrl(),
