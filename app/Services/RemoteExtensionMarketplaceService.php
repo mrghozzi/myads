@@ -40,10 +40,12 @@ class RemoteExtensionMarketplaceService
         ];
 
         try {
-            $response = Http::withHeaders([
-                'Accept' => 'application/json',
-                'User-Agent' => 'MyAds-Extension-Marketplace',
-            ])->timeout(8)->get($this->feedUrl($type));
+            $response = Http::withoutVerifying()
+                ->connectTimeout(3)
+                ->withHeaders([
+                    'Accept' => 'application/json',
+                    'User-Agent' => 'MyAds-Extension-Marketplace',
+                ])->timeout(5)->get($this->feedUrl($type));
 
             if (! $response->successful()) {
                 Log::warning("Marketplace feed failed: " . $response->status() . " for " . $this->feedUrl($type) . ". Attempting fallback.");
@@ -70,10 +72,12 @@ class RemoteExtensionMarketplaceService
     {
         try {
             $url = $this->fallbackFeedUrl($type);
-            $response = Http::withHeaders([
-                'Accept' => 'application/json',
-                'User-Agent' => 'MyAds-Extension-Marketplace-Fallback',
-            ])->timeout(8)->get($url);
+            $response = Http::withoutVerifying()
+                ->connectTimeout(3)
+                ->withHeaders([
+                    'Accept' => 'application/json',
+                    'User-Agent' => 'MyAds-Extension-Marketplace-Fallback',
+                ])->timeout(5)->get($url);
 
             if (! $response->successful()) {
                 Log::error("Marketplace fallback feed failed: " . $response->status() . " for " . $url);

@@ -194,13 +194,23 @@ class PluginManager
      * Check for updates for all plugins.
      * Returns an array of available updates.
      */
+    /**
+     * Check for updates for all plugins.
+     * Returns an array of available updates.
+     */
     public function checkForUpdates()
     {
         return Cache::remember('plugin_updates', 3600, function () {
             $updates = [];
             $plugins = $this->getAllPlugins();
+            $startTime = microtime(true);
+            $maxTimeSeconds = 3.0;
 
             foreach ($plugins as $plugin) {
+                if ((microtime(true) - $startTime) >= $maxTimeSeconds) {
+                    break;
+                }
+
                 $updateUrl = $plugin['latest_url'] ?? $plugin['update_url'] ?? null;
                 $checked = false;
                 
@@ -213,15 +223,17 @@ class PluginManager
                             $repo = $matches[2];
                             $apiUrl = "https://api.github.com/repos/{$owner}/{$repo}/releases/latest";
                             
-                            $response = Http::withHeaders(['User-Agent' => 'MyAds-Plugin-Manager'])
-                                           ->timeout(5)
+                            $response = Http::withoutVerifying()
+                                           ->withHeaders(['User-Agent' => 'MyAds-Plugin-Manager'])
+                                           ->connectTimeout(2)
+                                           ->timeout(2)
                                            ->get($apiUrl);
                             
                             if ($response->successful()) {
                                 $remoteData = $response->json();
-                                $remoteVersion = ltrim($remoteData['tag_name'], 'v');
+                                $remoteVersion = ltrim($remoteData['tag_name'] ?? '', 'v');
                                 
-                                if (version_compare($remoteVersion, $plugin['version'], '>')) {
+                                if (!empty($remoteVersion) && version_compare($remoteVersion, $plugin['version'], '>')) {
                                     $updates[$plugin['slug']] = [
                                         'new_version' => $remoteVersion,
                                         'download_url' => $remoteData['zipball_url'] ?? '',
@@ -232,7 +244,10 @@ class PluginManager
                             }
                         } else {
                             // Standard JSON update check
-                            $response = Http::timeout(5)->get($updateUrl);
+                            $response = Http::withoutVerifying()
+                                           ->connectTimeout(2)
+                                           ->timeout(2)
+                                           ->get($updateUrl);
                             if ($response->successful()) {
                                 $remoteData = $response->json();
                                 if (isset($remoteData['version']) && version_compare($remoteData['version'], $plugin['version'], '>')) {
@@ -244,7 +259,7 @@ class PluginManager
                                 }
                             }
                         }
-                    } catch (\Exception $e) {
+                    } catch (\Throwable $e) {
                         Log::error("Failed to check updates for plugin {$plugin['slug']}: " . $e->getMessage());
                     }
                 }
@@ -266,12 +281,15 @@ class PluginManager
                                 ->first();
                             $licenseKey = $licenseKeyOption ? $licenseKeyOption->o_valuer : '';
 
-                            $response = Http::timeout(10)->post($adstnUrl, [
-                                'slug'        => $remoteSlug,
-                                'version'     => $plugin['version'],
-                                'license_key' => $licenseKey,
-                                'domain'      => request()->getHost(),
-                            ]);
+                            $response = Http::withoutVerifying()
+                                           ->connectTimeout(2)
+                                           ->timeout(3)
+                                           ->post($adstnUrl, [
+                                               'slug'        => $remoteSlug,
+                                               'version'     => $plugin['version'],
+                                               'license_key' => $licenseKey,
+                                               'domain'      => request()->getHost(),
+                                           ]);
 
                             if ($response->successful()) {
                                 $remoteData = $response->json();
@@ -284,7 +302,7 @@ class PluginManager
                                     ];
                                 }
                             }
-                        } catch (\Exception $e) {
+                        } catch (\Throwable $e) {
                             Log::error("Failed to check ADStn updates for plugin {$plugin['slug']}: " . $e->getMessage());
                         }
                     }

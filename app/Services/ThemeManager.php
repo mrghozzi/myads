@@ -116,8 +116,14 @@ class ThemeManager
         return Cache::remember('theme_updates', 3600, function () {
             $updates = [];
             $themes = $this->getAllThemes();
+            $startTime = microtime(true);
+            $maxTimeSeconds = 3.0;
 
             foreach ($themes as $theme) {
+                if ((microtime(true) - $startTime) >= $maxTimeSeconds) {
+                    break;
+                }
+
                 $updateUrl = $theme['latest_url'] ?? $theme['update_url'] ?? null;
                 
                 if ($updateUrl && filter_var($updateUrl, FILTER_VALIDATE_URL)) {
@@ -128,15 +134,17 @@ class ThemeManager
                             $repo = $matches[2];
                             $apiUrl = "https://api.github.com/repos/{$owner}/{$repo}/releases/latest";
                             
-                            $response = Http::withHeaders(['User-Agent' => 'MyAds-Theme-Manager'])
-                                           ->timeout(5)
+                            $response = Http::withoutVerifying()
+                                           ->withHeaders(['User-Agent' => 'MyAds-Theme-Manager'])
+                                           ->connectTimeout(2)
+                                           ->timeout(2)
                                            ->get($apiUrl);
                             
                             if ($response->successful()) {
                                 $remoteData = $response->json();
-                                $remoteVersion = ltrim($remoteData['tag_name'], 'v');
+                                $remoteVersion = ltrim($remoteData['tag_name'] ?? '', 'v');
                                 
-                                if (version_compare($remoteVersion, $theme['version'], '>')) {
+                                if (!empty($remoteVersion) && version_compare($remoteVersion, $theme['version'], '>')) {
                                     $updates[$theme['slug']] = [
                                         'new_version' => $remoteVersion,
                                         'download_url' => $remoteData['zipball_url'] ?? '',
@@ -147,7 +155,10 @@ class ThemeManager
                             }
                         } else {
                             // Standard JSON update check
-                            $response = Http::timeout(5)->get($updateUrl);
+                            $response = Http::withoutVerifying()
+                                           ->connectTimeout(2)
+                                           ->timeout(2)
+                                           ->get($updateUrl);
                             if ($response->successful()) {
                                 $remoteData = $response->json();
                                 if (isset($remoteData['version']) && version_compare($remoteData['version'], $theme['version'], '>')) {
@@ -159,7 +170,7 @@ class ThemeManager
                                 }
                             }
                         }
-                    } catch (\Exception $e) {
+                    } catch (\Throwable $e) {
                         Log::error("Failed to check updates for theme {$theme['slug']}: " . $e->getMessage());
                     }
                 }
@@ -180,12 +191,15 @@ class ThemeManager
                             ->first();
                         $licenseKey = $licenseKeyOption ? $licenseKeyOption->o_valuer : '';
 
-                        $response = Http::timeout(10)->post($adstnUrl, [
-                            'slug'        => $remoteSlug,
-                            'version'     => $theme['version'],
-                            'license_key' => $licenseKey,
-                            'domain'      => request()->getHost(),
-                        ]);
+                        $response = Http::withoutVerifying()
+                                       ->connectTimeout(2)
+                                       ->timeout(3)
+                                       ->post($adstnUrl, [
+                                           'slug'        => $remoteSlug,
+                                           'version'     => $theme['version'],
+                                           'license_key' => $licenseKey,
+                                           'domain'      => request()->getHost(),
+                                       ]);
 
                         if ($response->successful()) {
                             $remoteData = $response->json();
@@ -198,7 +212,7 @@ class ThemeManager
                                 ];
                             }
                         }
-                    } catch (\Exception $e) {
+                    } catch (\Throwable $e) {
                         Log::error("Failed to check ADStn updates for theme {$theme['slug']}: " . $e->getMessage());
                     }
                 }

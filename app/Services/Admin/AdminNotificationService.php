@@ -117,33 +117,41 @@ class AdminNotificationService
 
         // 4. Plugin Updates
         if ($this->adminAccess->canAccess($user, null, 'plugins')) {
-            $pluginUpdates = $this->pluginManager->checkForUpdates();
-            $pluginUpdateCount = is_array($pluginUpdates) ? count($pluginUpdates) : 0;
-            if ($pluginUpdateCount > 0) {
-                $notifications[] = [
-                    'id' => 'plugin_updates',
-                    'count' => $pluginUpdateCount,
-                    'label' => __('messages.new_plugin_updates', ['count' => $pluginUpdateCount]),
-                    'icon' => 'feather-package',
-                    'url' => route('admin.plugins'),
-                    'module' => 'plugins'
-                ];
+            try {
+                $pluginUpdates = $this->pluginManager->checkForUpdates();
+                $pluginUpdateCount = is_array($pluginUpdates) ? count($pluginUpdates) : 0;
+                if ($pluginUpdateCount > 0) {
+                    $notifications[] = [
+                        'id' => 'plugin_updates',
+                        'count' => $pluginUpdateCount,
+                        'label' => __('messages.new_plugin_updates', ['count' => $pluginUpdateCount]),
+                        'icon' => 'feather-package',
+                        'url' => route('admin.plugins'),
+                        'module' => 'plugins'
+                    ];
+                }
+            } catch (\Throwable $e) {
+                // Silently ignore notification check failures
             }
         }
 
         // 5. Theme Updates
         if ($this->adminAccess->canAccess($user, null, 'themes')) {
-            $themeUpdates = $this->themeManager->checkForUpdates();
-            $themeUpdateCount = is_array($themeUpdates) ? count($themeUpdates) : 0;
-            if ($themeUpdateCount > 0) {
-                $notifications[] = [
-                    'id' => 'theme_updates',
-                    'count' => $themeUpdateCount,
-                    'label' => __('messages.new_theme_updates', ['count' => $themeUpdateCount]),
-                    'icon' => 'feather-layout',
-                    'url' => route('admin.themes'),
-                    'module' => 'themes'
-                ];
+            try {
+                $themeUpdates = $this->themeManager->checkForUpdates();
+                $themeUpdateCount = is_array($themeUpdates) ? count($themeUpdates) : 0;
+                if ($themeUpdateCount > 0) {
+                    $notifications[] = [
+                        'id' => 'theme_updates',
+                        'count' => $themeUpdateCount,
+                        'label' => __('messages.new_theme_updates', ['count' => $themeUpdateCount]),
+                        'icon' => 'feather-layout',
+                        'url' => route('admin.themes'),
+                        'module' => 'themes'
+                    ];
+                }
+            } catch (\Throwable $e) {
+                // Silently ignore notification check failures
             }
         }
 
