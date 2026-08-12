@@ -48,6 +48,7 @@ class PluginServiceProvider extends ServiceProvider
             $activePlugins[] = 'monetization';
             $activePlugins[] = 'tinymce-editor';
             $activePlugins[] = 'myads-bot';
+            $activePlugins[] = 'pollinations-ai-member';
         }
                              
         if (empty($activePlugins)) {
@@ -73,6 +74,7 @@ class PluginServiceProvider extends ServiceProvider
                 $activeDirs[] = 'monetization';
                 $activeDirs[] = 'myads-tinymce-editor';
                 $activeDirs[] = 'myads-bot';
+                $activeDirs[] = 'pollinations-ai-member';
             }
         } catch (\Exception $e) {
             if (app()->environment('testing')) {
@@ -81,6 +83,7 @@ class PluginServiceProvider extends ServiceProvider
                 $activeDirs[] = 'monetization';
                 $activeDirs[] = 'myads-tinymce-editor';
                 $activeDirs[] = 'myads-bot';
+                $activeDirs[] = 'pollinations-ai-member';
             } else {
                 return;
             }
