@@ -47,6 +47,7 @@ class PluginServiceProvider extends ServiceProvider
             $activePlugins[] = 'groq-adstn-publisher';
             $activePlugins[] = 'monetization';
             $activePlugins[] = 'tinymce-editor';
+            $activePlugins[] = 'myads-bot';
         }
                              
         if (empty($activePlugins)) {
@@ -71,6 +72,7 @@ class PluginServiceProvider extends ServiceProvider
                 $activeDirs[] = 'groq-adstn-publisher';
                 $activeDirs[] = 'monetization';
                 $activeDirs[] = 'myads-tinymce-editor';
+                $activeDirs[] = 'myads-bot';
             }
         } catch (\Exception $e) {
             if (app()->environment('testing')) {
@@ -78,6 +80,7 @@ class PluginServiceProvider extends ServiceProvider
                 $activeDirs[] = 'groq-adstn-publisher';
                 $activeDirs[] = 'monetization';
                 $activeDirs[] = 'myads-tinymce-editor';
+                $activeDirs[] = 'myads-bot';
             } else {
                 return;
             }
