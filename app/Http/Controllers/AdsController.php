@@ -456,7 +456,7 @@ class AdsController extends Controller
                 return response('document.write("' . addslashes($html) . '");', 200)->header('Content-Type', 'application/javascript');
             }
             $defaultImg = theme_asset('img/banner/banner_ads.png');
-            $html = "<a href='" . url('/') . "?ref=" . (int) $user_id . "' target='_blank'><img src='" . $defaultImg . "' width='" . $this->getWidth($px) . "' height='" . $this->getHeight($px) . "' border='0'></a>";
+            $html = "<a href='" . url('/') . "?ref=" . $user->publicRouteIdentifier() . "' target='_blank'><img src='" . $defaultImg . "' width='" . $this->getWidth($px) . "' height='" . $this->getHeight($px) . "' border='0'></a>";
             return response('document.write("' . addslashes($html) . '");', 200)->header('Content-Type', 'application/javascript');
         }
         Cache::put($rateLimitKey, true, 10);
@@ -491,7 +491,7 @@ class AdsController extends Controller
         } else {
             // Default Banner
             $defaultImg = theme_asset('img/banner/banner_ads.png');
-            $html = "<a href='" . url('/') . "?ref=" . (int) $user_id . "' target='_blank'><img src='" . $defaultImg . "' width='" . $this->getWidth($px) . "' height='" . $this->getHeight($px) . "' border='0'></a>";
+            $html = "<a href='" . url('/') . "?ref=" . $user->publicRouteIdentifier() . "' target='_blank'><img src='" . $defaultImg . "' width='" . $this->getWidth($px) . "' height='" . $this->getHeight($px) . "' border='0'></a>";
             return response('document.write("' . addslashes($html) . '");', 200)->header('Content-Type', 'application/javascript');
         }
     }
@@ -551,7 +551,7 @@ class AdsController extends Controller
             return response('document.write("' . addslashes($html) . '");', 200)->header('Content-Type', 'application/javascript');
         } else {
             // Default Link
-            $html = "<div class='myads-link'><a href='" . url('/') . "?ref=" . (int) $user_id . "' target='_blank' style='font-weight:bold;'>" . __('advertise_here') . "</a></div>";
+            $html = "<div class='myads-link'><a href='" . url('/') . "?ref=" . $user->publicRouteIdentifier() . "' target='_blank' style='font-weight:bold;'>" . __('advertise_here') . "</a></div>";
             return response('document.write("' . addslashes($html) . '");', 200)->header('Content-Type', 'application/javascript');
         }
     }

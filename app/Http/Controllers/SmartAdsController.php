@@ -280,7 +280,7 @@ class SmartAdsController extends Controller
             'publisherId' => $publisherId,
             'bannerSize' => $placement === 'banner' ? '728x90' : null,
             'clickUrl' => route('ads.redirect', ['ads' => $smartAd->id, 'vu' => $publisherId, 'type' => 'smart']),
-            'refUrl' => url('/') . '?ref=' . $publisherId,
+            'refUrl' => url('/') . '?ref=' . (User::find($publisherId)?->publicRouteIdentifier() ?? $publisherId),
             'reportUrl' => url('/report') . '?smart_ad=' . $smartAd->id,
         ])->render();
     }

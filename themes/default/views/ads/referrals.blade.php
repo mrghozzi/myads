@@ -2,7 +2,7 @@
 
 @section('content')
 @php
-    $refUrl = url('/') . '?ref=' . $user->id;
+    $refUrl = url('/') . '?ref=' . $user->publicRouteIdentifier();
     $siteTitle = $site_settings->titer ?? config('app.name');
     $banner728 = theme_asset('img/banner/728x90.gif');
     $banner300 = theme_asset('img/banner/300x250.gif');

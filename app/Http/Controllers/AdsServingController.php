@@ -25,6 +25,25 @@ use Illuminate\Support\Facades\Cache;
 
 class AdsServingController extends Controller
 {
+    /**
+     * Resolve the privacy-safe referral identifier for a publisher.
+     * Returns public_uid when privacy is enabled, numeric ID otherwise.
+     */
+    private function resolveRefIdentifier(int $publisherId): string
+    {
+        static $cache = [];
+
+        if (isset($cache[$publisherId])) {
+            return $cache[$publisherId];
+        }
+
+        $user = User::find($publisherId);
+
+        return $cache[$publisherId] = $user
+            ? $user->publicRouteIdentifier()
+            : (string) $publisherId;
+    }
+
     private function applyTargetingConstraints($query, string $countryCode, string $deviceType, string $tableName)
     {
         if ($countryCode !== '') {
@@ -172,14 +191,14 @@ class AdsServingController extends Controller
             }
 
             // Return JS to display banner (Matches old bn.php output style)
-            $html = $this->renderBannerMarkup($banner, (int) $user_id, $pxValue, $placementMode, $abVersion);
+            $html = $this->renderBannerMarkup($banner, (int) $user_id, $pxValue, $placementMode, $abVersion, $this->resolveRefIdentifier((int) $user_id));
 
             $this->triggerBackgroundMaintenance();
 
             return $this->javascriptResponse($this->renderHtmlInsertionScript($html, $slotId));
         }
 
-        $fallbackHtml = $this->renderBannerFallbackMarkup((int) $user_id, $pxValue);
+        $fallbackHtml = $this->renderBannerFallbackMarkup((int) $user_id, $pxValue, $this->resolveRefIdentifier((int) $user_id));
 
         return $this->javascriptResponse($this->renderHtmlInsertionScript($fallbackHtml, $slotId));
     }
@@ -457,7 +476,7 @@ class AdsServingController extends Controller
         }
 
         if (!$smartAd) {
-            $fallbackHtml = $this->renderSmartFallbackMarkup($publisherId, $slot);
+            $fallbackHtml = $this->renderSmartFallbackMarkup($publisherId, $slot, $this->resolveRefIdentifier($publisherId));
 
             return $this->javascriptResponse($this->renderHtmlInsertionScript($fallbackHtml, $slotId));
         }
@@ -474,7 +493,7 @@ class AdsServingController extends Controller
             $this->recordSmartImpression($smartAd->id, $publisherId, $visitorKey, $countryCode, $deviceType, $placement);
         }
 
-        $html = $this->renderSmartMarkup($smartAd, $publisherId, $placement, $slot['banner_size']);
+        $html = $this->renderSmartMarkup($smartAd, $publisherId, $placement, $slot['banner_size'], $this->resolveRefIdentifier($publisherId));
 
         $this->triggerBackgroundMaintenance();
 
@@ -814,23 +833,26 @@ class AdsServingController extends Controller
         return $enabled;
     }
 
-    private function renderBannerMarkup(Banner $banner, int $publisherId, string $pxValue, string $placementMode = 'fixed', string $version = 'a'): string
+    private function renderBannerMarkup(Banner $banner, int $publisherId, string $pxValue, string $placementMode = 'fixed', string $version = 'a', ?string $refIdentifier = null): string
     {
+        $refIdentifier ??= $this->resolveRefIdentifier($publisherId);
+
         if ($placementMode === 'responsive2') {
-            return $this->renderResponsive2BannerMarkup($banner, $publisherId, $pxValue, $version);
+            return $this->renderResponsive2BannerMarkup($banner, $publisherId, $pxValue, $version, $refIdentifier);
         }
 
-        return $this->renderClassicBannerMarkup($banner, $publisherId, $pxValue, $version);
+        return $this->renderClassicBannerMarkup($banner, $publisherId, $pxValue, $version, $refIdentifier);
     }
 
-    private function renderClassicBannerMarkup(Banner $banner, int $publisherId, string $pxValue, string $version = 'a'): string
+    private function renderClassicBannerMarkup(Banner $banner, int $publisherId, string $pxValue, string $version = 'a', ?string $refIdentifier = null): string
     {
+        $refIdentifier ??= $this->resolveRefIdentifier($publisherId);
         $width = $this->getWidth($pxValue);
         $height = $this->getHeight($pxValue);
         $bannerId = (int) $banner->id;
         $imgUrl = ($version === 'b' && $banner->img_b) ? $banner->img_b : $banner->img;
         $clickUrl = route('ads.redirect', ['ads' => $bannerId, 'vu' => $publisherId, 'v' => $version]);
-        $refUrl = url('/') . '?ref=' . $publisherId;
+        $refUrl = url('/') . '?ref=' . $refIdentifier;
         $reportUrl = url('/report') . '?banner=' . $bannerId;
         $bannerName = htmlspecialchars((string) $banner->name, ENT_QUOTES, 'UTF-8');
         $appName = htmlspecialchars(AdsSettings::servingBrandName(), ENT_QUOTES, 'UTF-8');
@@ -838,14 +860,15 @@ class AdsServingController extends Controller
         return "<style>.banner_{$bannerId}{background-image:url('{$imgUrl}');height:{$height}px;width:{$width}px;max-width:100%;margin:0 auto;display:block;background-size:cover;background-position:center;position:relative;overflow:hidden;}.banner_{$bannerId} .banner_click_{$bannerId}{position:absolute;inset:0;display:block;text-decoration:none;z-index:1;}.banner_icon_{$bannerId}{position:absolute;top:0;left:0;display:flex;gap:4px;padding:5px;z-index:2;background-color:rgba(0,0,0,0.5);}.banner_icon_{$bannerId} a{display:inline-flex;align-items:center;justify-content:center;height:auto;width:auto;text-decoration:none;}@media screen and (max-width: {$width}px){.banner_{$bannerId}{width:100%;}}</style><div class='banner_{$bannerId}'><a class='banner_click_{$bannerId}' href='{$clickUrl}' target='_blank' rel='noopener noreferrer' aria-label='{$bannerName}'></a><div class='banner_icon_{$bannerId}'><a href='{$refUrl}' target='_blank' rel='noopener noreferrer'><img src='" . theme_asset('img/logo_w.png') . "' width='16' height='16' alt='{$appName}'></a><a href='{$reportUrl}' target='_blank' rel='noopener noreferrer' aria-label='Report'><img src='" . theme_asset('img/Alert-icon.png') . "' alt=''></a></div></div>";
     }
 
-    private function renderResponsive2BannerMarkup(Banner $banner, int $publisherId, string $pxValue, string $version = 'a'): string
+    private function renderResponsive2BannerMarkup(Banner $banner, int $publisherId, string $pxValue, string $version = 'a', ?string $refIdentifier = null): string
     {
+        $refIdentifier ??= $this->resolveRefIdentifier($publisherId);
         $width = $this->getWidth($pxValue);
         $height = $this->getHeight($pxValue);
         $bannerId = (int) $banner->id;
         $imgUrl = ($version === 'b' && $banner->img_b) ? $banner->img_b : $banner->img;
         $clickUrl = route('ads.redirect', ['ads' => $bannerId, 'vu' => $publisherId, 'v' => $version]);
-        $refUrl = url('/') . '?ref=' . $publisherId;
+        $refUrl = url('/') . '?ref=' . $refIdentifier;
         $reportUrl = url('/report') . '?banner=' . $bannerId;
         $bannerName = htmlspecialchars((string) $banner->name, ENT_QUOTES, 'UTF-8');
         $appName = htmlspecialchars(AdsSettings::servingBrandName(), ENT_QUOTES, 'UTF-8');
@@ -891,8 +914,9 @@ class AdsServingController extends Controller
         return "<style>.{$class},.{$class} *{box-sizing:border-box;}.{$class}{position:relative;width:{$width}px;height:{$height}px;max-width:100%;margin:0 auto;display:block;overflow:hidden;border-radius:{$radius}px;background:#f1f3f4 url('{$imgUrl}') center/cover no-repeat;box-shadow:0 1px 3px rgba(18,24,40,.16);font-family:Arial,'Segoe UI',sans-serif;isolation:isolate;}.{$class}__click{position:absolute;inset:0;display:block;z-index:1;text-decoration:none;}.{$class}__chrome{position:absolute;top:0;right:0;z-index:3;display:flex;align-items:stretch;max-width:{$chipMaxWidth};border-radius:0 0 0 {$radius}px;overflow:hidden;box-shadow:0 1px 2px rgba(18,24,40,.18);}.{$class}__label,.{$class}__info{display:inline-flex;align-items:center;justify-content:center;height:{$labelHeight}px;background:rgba(255,255,255,.96);text-decoration:none;line-height:1;}.{$class}__label{max-width:calc(100% - {$infoWidth}px);padding:{$labelPadding};color:#202124;font-size:{$labelFontSize};font-weight:400;letter-spacing:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-inline-end:1px solid #dadce0;}.{$class}__label:hover,.{$class}__info:hover{background:#f8f9fa;text-decoration:none;}.{$class}__info{width:{$infoWidth}px;min-width:{$infoWidth}px;color:#5f6368;}.{$class}__info-mark{display:inline-flex;align-items:center;justify-content:center;width:" . ($profile === 'rail' ? 11 : 13) . "px;height:" . ($profile === 'rail' ? 11 : 13) . "px;border-radius:50%;border:1px solid #5f8def;color:#5f8def;font-size:" . ($profile === 'rail' ? '8px' : '9px') . ";font-weight:700;font-style:normal;font-family:Arial,'Segoe UI',sans-serif;}@media screen and (max-width: {$width}px){.{$class}{width:100%;}}</style><div class='{$class}' data-placement='responsive2' data-size='{$pxValue}' data-profile='{$profile}'><a class='{$class}__click' href='{$clickUrl}' target='_blank' rel='noopener noreferrer' aria-label='{$bannerName}'></a><div class='{$class}__chrome'><a class='{$class}__label' href='{$refUrl}' target='_blank' rel='noopener noreferrer'>{$chipText}</a><a class='{$class}__info' href='{$reportUrl}' target='_blank' rel='noopener noreferrer' aria-label='{$reportLabel}'><span class='{$class}__info-mark'>i</span></a></div></div>";
     }
 
-    private function renderSmartMarkup(SmartAd $smartAd, int $publisherId, string $placement, ?string $bannerSize = null): string
+    private function renderSmartMarkup(SmartAd $smartAd, int $publisherId, string $placement, ?string $bannerSize = null, ?string $refIdentifier = null): string
     {
+        $refIdentifier ??= $this->resolveRefIdentifier($publisherId);
         $viewName = $placement === 'banner'
             ? 'theme::ads.serving.smart_banner'
             : 'theme::ads.serving.smart_native';
@@ -903,15 +927,16 @@ class AdsServingController extends Controller
             'bannerSize' => $bannerSize,
             'adsBrandName' => AdsSettings::servingBrandName(),
             'clickUrl' => route('ads.redirect', ['ads' => $smartAd->id, 'vu' => $publisherId, 'type' => 'smart']),
-            'refUrl' => url('/') . '?ref=' . $publisherId,
+            'refUrl' => url('/') . '?ref=' . $refIdentifier,
             'reportUrl' => url('/report') . '?smart_ad=' . $smartAd->id,
         ])->render();
 
         return str_replace(["\r", "\n"], ' ', $html);
     }
 
-    private function renderBannerFallbackMarkup(int $publisherId, string $size): string
+    private function renderBannerFallbackMarkup(int $publisherId, string $size, ?string $refIdentifier = null): string
     {
+        $refIdentifier ??= $this->resolveRefIdentifier($publisherId);
         $fallbackMap = [
             '160x600' => 'img/banner/160x600.gif',
             '300x250' => 'img/banner/300x250.gif',
@@ -921,13 +946,15 @@ class AdsServingController extends Controller
         $src = theme_asset($fallbackMap[$size] ?? 'img/banner/300x250.gif');
         $width = $this->getWidth($size);
         $height = $this->getHeight($size);
-        $refUrl = url('/') . '?ref=' . $publisherId;
+        $refUrl = url('/') . '?ref=' . $refIdentifier;
 
         return "<div style=\"display:block;width:{$width}px;max-width:100%;margin:0 auto;text-align:center;\"><a href='{$refUrl}' target='_blank' rel='noopener noreferrer'><img src='{$src}' width='{$width}' height='{$height}' border='0' style='display:block;max-width:100%;margin:0 auto;'></a></div>";
     }
 
-    private function renderSmartFallbackMarkup(int $publisherId, array $slot): string
+    private function renderSmartFallbackMarkup(int $publisherId, array $slot, ?string $refIdentifier = null): string
     {
+        $refIdentifier ??= $this->resolveRefIdentifier($publisherId);
+
         if ($slot['banner_size'] !== null) {
             $size = $slot['banner_size'];
             $fallbackMap = [
@@ -938,11 +965,11 @@ class AdsServingController extends Controller
             ];
             $src = theme_asset($fallbackMap[$size] ?? 'img/banner/300x250.gif');
 
-            return "<div style=\"width:" . $this->getWidth($size) . "px;max-width:100%;margin:0 auto;text-align:center;\"><a href='" . url('/') . "?ref={$publisherId}' target='_blank' rel='noopener noreferrer'><img src='{$src}' width='" . $this->getWidth($size) . "' height='" . $this->getHeight($size) . "' border='0' style='display:block;max-width:100%;margin:0 auto;'></a></div>";
+            return "<div style=\"width:" . $this->getWidth($size) . "px;max-width:100%;margin:0 auto;text-align:center;\"><a href='" . url('/') . "?ref={$refIdentifier}' target='_blank' rel='noopener noreferrer'><img src='{$src}' width='" . $this->getWidth($size) . "' height='" . $this->getHeight($size) . "' border='0' style='display:block;max-width:100%;margin:0 auto;'></a></div>";
         }
 
         $appName = htmlspecialchars(AdsSettings::servingBrandName(), ENT_QUOTES, 'UTF-8');
-        $refUrl = url('/') . '?ref=' . $publisherId;
+        $refUrl = url('/') . '?ref=' . $refIdentifier;
         $adsByLabel = htmlspecialchars(__('messages.ads_by_site', ['site' => AdsSettings::servingBrandName()]), ENT_QUOTES, 'UTF-8');
         $learnMoreLabel = htmlspecialchars(__('messages.smart_learn_more'), ENT_QUOTES, 'UTF-8');
         $headline = htmlspecialchars(__('messages.smart_fallback_headline', ['site' => AdsSettings::servingBrandName()]), ENT_QUOTES, 'UTF-8');

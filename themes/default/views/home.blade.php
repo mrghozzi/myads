@@ -713,7 +713,7 @@
             </div>
 
             <!-- 1-Click Referral Copy Link -->
-            @php $homeRefUrl = url('/') . '?ref=' . $user->id; @endphp
+            @php $homeRefUrl = url('/') . '?ref=' . $user->publicRouteIdentifier(); @endphp
             <div style="display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap;">
                 <input type="text" id="homeRefInput" value="{{ $homeRefUrl }}" readonly style="flex: 1; min-width: 220px; padding: 10px 14px; border-radius: 12px; border: 1px solid var(--border-color, #ddd); font-size: 13px; font-weight: 600; background: var(--input-bg, rgba(0,0,0,0.02)); color: var(--text-color, #1e293b);">
                 <button type="button" id="homeCopyBtn" style="background: linear-gradient(135deg, #3454d1, #615dfa); color: #fff; border: none; padding: 10px 18px; border-radius: 12px; font-weight: 700; font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(52, 84, 209, 0.25);">

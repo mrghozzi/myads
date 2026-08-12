@@ -67,21 +67,21 @@
             <p class="widget-box-title">{{ __('messages.your_referral_link') }}</p>
             <br />
             <blockquote class="widget-box">
-                <center><kbd>{{ route('register', ['ref' => $user->id]) }}</kbd></center>
+                <center><kbd>{{ route('register', ['ref' => $user->publicRouteIdentifier()]) }}</kbd></center>
             </blockquote>
             <br />
             <p class="widget-box-title"><i class="fa fa-share"></i>&nbsp;{{ __('messages.share_your_referral_link') }}</p>
             <div class="widget-box-content">
                 <div class="social-links multiline align-left">
-                    <a class="social-link small facebook" href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(route('register', ['ref' => $user->id])) }}" target="_blank">
+                    <a class="social-link small facebook" href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(route('register', ['ref' => $user->publicRouteIdentifier()])) }}" target="_blank">
                         <i class="fa-brands fa-facebook-f" style="color: #ffffff;"></i>
                     </a>
 
-                    <a class="social-link small" href="https://twitter.com/intent/tweet?text={{ urlencode($adsBrandName) }}&url={{ urlencode(route('register', ['ref' => $user->id])) }}" style="background-color: #011a24;" target="_blank">
+                    <a class="social-link small" href="https://twitter.com/intent/tweet?text={{ urlencode($adsBrandName) }}&url={{ urlencode(route('register', ['ref' => $user->publicRouteIdentifier()])) }}" style="background-color: #011a24;" target="_blank">
                         <i class="fa-brands fa-x-twitter" style="color: #ffffff;"></i>
                     </a>
 
-                    <a class="social-link small youtube" href="https://telegram.me/share/url?url={{ urlencode(route('register', ['ref' => $user->id])) }}&text={{ urlencode($adsBrandName) }}" style="background-color: #0088cc;" target="_blank">
+                    <a class="social-link small youtube" href="https://telegram.me/share/url?url={{ urlencode(route('register', ['ref' => $user->publicRouteIdentifier()])) }}&text={{ urlencode($adsBrandName) }}" style="background-color: #0088cc;" target="_blank">
                         <i class="fa-brands fa-telegram" style="color: #ffffff;"></i>
                     </a>
                 </div>

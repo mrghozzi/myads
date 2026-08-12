@@ -131,16 +131,18 @@ class AuthController extends Controller
 
         // Referral Logic
         if ($request->hasCookie('ref')) {
-            $referrerId = (int) $request->cookie('ref');
-            if ($referrerId <= 0) {
+            $referrerIdentifier = trim((string) $request->cookie('ref'));
+            if ($referrerIdentifier === '' || $referrerIdentifier === '0') {
                 Cookie::queue(Cookie::forget('ref'));
             } else {
-                $referrer = User::find($referrerId);
+                // Resolve referrer via public_uid, username, or numeric ID (backward compat)
+                $referrer = User::resolvePublicIdentifier($referrerIdentifier)
+                    ?? (ctype_digit($referrerIdentifier) ? User::find((int) $referrerIdentifier) : null);
                 
                 if ($referrer) {
                     // 1. Insert into referral table
                     Referral::create([
-                        'uid' => $referrerId,
+                        'uid' => $referrer->id,
                         'ruid' => $user->id,
                         'date' => date('Y-m-d'),
                     ]);
@@ -150,7 +152,7 @@ class AuthController extends Controller
                         'name' => 'referal',
                         'o_valuer' => '10',
                         'o_type' => 'hest_pts',
-                        'o_parent' => $referrerId,
+                        'o_parent' => $referrer->id,
                         'o_order' => $user->id,
                         'o_mode' => time(),
                     ]);

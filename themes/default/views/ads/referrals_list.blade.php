@@ -2,7 +2,7 @@
 
 @section('content')
 @php
-    $refUrl = url('/') . '?ref=' . $user->id;
+    $refUrl = url('/') . '?ref=' . $user->publicRouteIdentifier();
 @endphp
 
 <div class="promotion-shell superdesign-post-container">
