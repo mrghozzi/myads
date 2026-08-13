@@ -290,7 +290,7 @@
                                 @endif
                                 @if($canAdmin('settings'))
                                     <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.settings.performance') }}">{{ __('messages.performance_settings') ?? 'Performance Settings' }}</a></li>
-                                    <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.shared_hosting_guide') }}">دليل الاستضافات الضعيفة</a></li>
+                                    <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.shared_hosting_guide') }}">{{ __('messages.shg_title') }}</a></li>
                                 @endif
                                 @if($canAdmin('updates'))
                                     <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.about') }}">{{ __('about.tab_about') }}</a></li>

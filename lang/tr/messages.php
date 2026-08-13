@@ -3849,7 +3849,7 @@ return [
     'welcome_dashboard_desc' => 'Manage your campaigns, track statistics, and convert your points directly from your dashboard.',
     'available' => 'Available',
     'store_banner_desc' => 'Discover themes, scripts, and plugins.',
-    'shg_title' => 'Shared Hosting Guide',
+    'shg_title' => 'Paylaşımlı Barındırma Rehberi',
     'shg_performance' => 'Performance',
     'shg_hero_title' => 'Guide to Reduce Load on Small Hostings',
     'shg_hero_copy' => 'Practical tips to reduce CPU usage, file count, and database pressure while keeping core MYADS functions in shared or free hostings.',
