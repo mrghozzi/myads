@@ -46,6 +46,7 @@ use App\Models\Short;
 
 use App\Services\GamificationService;
 use App\Services\MaintenanceModeManager;
+use App\Services\OrphanCleanupService;
 use App\Services\PluginManager;
 use App\Services\RemoteExtensionMarketplaceService;
 use App\Services\ThemeManager;
@@ -83,7 +84,8 @@ class AdminController extends Controller
         private readonly SubscriptionPlanService $plans,
         private readonly SubscriptionLifecycleService $subscriptions,
         private readonly SubscriptionEntitlementService $entitlements,
-        private readonly NotificationService $notifications
+        private readonly NotificationService $notifications,
+        private readonly OrphanCleanupService $orphanCleanup
     ) {
     }
     public function marketplaceRecommendations(PluginManager $pluginManager, ThemeManager $themeManager, RemoteExtensionMarketplaceService $marketplace)
@@ -4270,7 +4272,32 @@ class AdminController extends Controller
             $maintenanceSettings['last_changed_by'] ?? 0,
         ]))->get()->keyBy('id');
 
-        return view('admin::admin.maintenance', compact('maintenanceSettings', 'maintenanceUsers'));
+        $orphanDiagnostics = $this->orphanCleanup->diagnoseOrphans();
+        $bypassUrl = $this->maintenanceMode->bypassUrl();
+
+        // Calculate diagnostics for session and log files
+        $logPath = storage_path('logs');
+        $logFilesCount = File::exists($logPath) ? count(File::glob($logPath . '/*.log')) : 0;
+        $logSizeMb = 0.0;
+        if (File::exists($logPath)) {
+            foreach (File::glob($logPath . '/*.log') as $file) {
+                $logSizeMb += (File::size($file) / 1048576);
+            }
+        }
+        $logSizeMb = round($logSizeMb, 2);
+
+        $sessionPath = storage_path('framework/sessions');
+        $sessionFilesCount = File::exists($sessionPath) ? count(File::files($sessionPath)) : 0;
+
+        return view('admin::admin.maintenance', compact(
+            'maintenanceSettings',
+            'maintenanceUsers',
+            'orphanDiagnostics',
+            'bypassUrl',
+            'logFilesCount',
+            'logSizeMb',
+            'sessionFilesCount'
+        ));
     }
 
     public function updateMaintenanceSettings(Request $request)
@@ -4280,11 +4307,17 @@ class AdminController extends Controller
             'maintenance_message' => ['nullable', 'string', 'max:5000'],
             'maintenance_logo' => ['nullable', 'file', 'mimes:jpg,jpeg,png,webp,gif,svg', 'max:2048'],
             'remove_maintenance_logo' => ['nullable', 'boolean'],
+            'allowed_ips' => ['nullable', 'string', 'max:1000'],
+            'emergency_token' => ['nullable', 'string', 'max:255'],
+            'estimated_duration' => ['nullable', 'string', 'max:255'],
         ]);
 
         $this->maintenanceMode->saveAdminSettings([
             'enabled' => $request->boolean('maintenance_enabled'),
             'message' => $validated['maintenance_message'] ?? '',
+            'allowed_ips' => $validated['allowed_ips'] ?? '',
+            'emergency_token' => $validated['emergency_token'] ?? '',
+            'estimated_duration' => $validated['estimated_duration'] ?? '',
             'remove_logo' => $request->boolean('remove_maintenance_logo'),
         ], $request->file('maintenance_logo'), $request->user());
 
@@ -4302,7 +4335,7 @@ class AdminController extends Controller
             app(\App\Services\CacheWarmupService::class)->warmupCoreData();
             
             $this->maintenanceMode->disable(Auth::user(), 'clear_cache_success');
-            return redirect()->back()->with('success', __('Caches cleared successfully.'));
+            return redirect()->back()->with('success', __('messages.cache_cleared_success'));
         } catch (\Throwable $e) {
             $this->maintenanceMode->disable(Auth::user(), 'clear_cache_error');
             report($e);
@@ -4320,7 +4353,7 @@ class AdminController extends Controller
             $this->gamification->repairQuestData();
             
             $this->maintenanceMode->disable(Auth::user(), 'run_migrations_success');
-            return redirect()->back()->with('success', __('Migrations ran successfully: ') . $output);
+            return redirect()->back()->with('success', __('messages.migrations_ran_success') . ($output ? ' - ' . trim($output) : ''));
         } catch (\Throwable $e) {
             $this->maintenanceMode->disable(Auth::user(), 'run_migrations_error');
             report($e);
@@ -4336,20 +4369,20 @@ class AdminController extends Controller
             $results = [];
             
             foreach ($tables as $table) {
-                // $table is an array or object depending on Laravel version, usually has 'name'
                 $tableName = is_array($table) ? ($table['name'] ?? null) : ($table->name ?? null);
                 
                 if (!$tableName) {
-                    // Fallback for older Laravel or raw SQL results
                     $tableArray = (array) $table;
                     $tableName = reset($tableArray);
                 }
 
                 if ($tableName) {
-                    // Repair
-                    DB::statement("REPAIR TABLE `{$tableName}`");
-                    // Optimize
-                    DB::statement("OPTIMIZE TABLE `{$tableName}`");
+                    try {
+                        DB::statement("REPAIR TABLE `{$tableName}`");
+                        DB::statement("OPTIMIZE TABLE `{$tableName}`");
+                    } catch (\Throwable) {
+                        // Some engines (e.g. InnoDB on some MySQL/SQLite configurations) may not support REPAIR
+                    }
                     $results[] = $tableName;
                 }
             }
@@ -4357,31 +4390,22 @@ class AdminController extends Controller
             $this->gamification->repairQuestData();
             
             $this->maintenanceMode->disable(Auth::user(), 'db_repair_success');
-            return redirect()->back()->with('success', __('Database maintenance completed for :count tables.', ['count' => count($results)]));
+            return redirect()->back()->with('success', __('messages.db_repaired_success', ['count' => count($results)]));
         } catch (\Throwable $e) {
             $this->maintenanceMode->disable(Auth::user(), 'db_repair_error');
             report($e);
             return redirect()->back()->with('error', __('messages.error_occurred'));
         }
     }
+
     public function repairOrphanedRecords()
     {
         $this->maintenanceMode->enable(Auth::user(), 'repair_orphaned_records');
         try {
-            $userIds = User::pluck('id')->toArray();
-
-            // Clean up follow records referencing deleted users
-            $deletedFollowerRecords = Like::where('type', 1)->whereNotIn('uid', $userIds)->delete();
-            $deletedFollowedRecords = Like::where('type', 1)->whereNotIn('sid', $userIds)->delete();
-
-            // Clean up other orphaned like/reaction records
-            $deletedOtherUid = Like::whereNotIn('uid', $userIds)->delete();
-            $deletedOtherSid = Like::whereNotIn('sid', $userIds)->delete();
-
-            $totalCleaned = $deletedFollowerRecords + $deletedFollowedRecords + $deletedOtherUid + $deletedOtherSid;
+            $result = $this->orphanCleanup->repairOrphanedRecords();
 
             $this->maintenanceMode->disable(Auth::user(), 'repair_orphaned_records_success');
-            return redirect()->back()->with('success', __('messages.orphaned_records_repaired', ['count' => $totalCleaned]));
+            return redirect()->back()->with('success', __('messages.orphaned_records_repaired', ['count' => $result['total']]));
         } catch (\Throwable $e) {
             $this->maintenanceMode->disable(Auth::user(), 'repair_orphaned_records_error');
             report($e);
@@ -4393,99 +4417,10 @@ class AdminController extends Controller
     {
         $this->maintenanceMode->enable(Auth::user(), 'repair_orphaned_content');
         try {
-            $totalCleaned = 0;
-
-            // 1. Orphaned forum comments (topic deleted)
-            $forumTopicIds = DB::table('forum')->pluck('id')->toArray();
-            if (!empty($forumTopicIds)) {
-                $totalCleaned += ForumComment::whereNotIn('tid', $forumTopicIds)->delete();
-            } else {
-                $totalCleaned += ForumComment::count();
-                ForumComment::query()->delete();
-            }
-
-            // 2. Orphaned directory comments (directory listing deleted)
-            $directoryIds = DB::table('directory')->pluck('id')->toArray();
-            $totalCleaned += Option::where('o_type', 'd_coment')
-                ->when(!empty($directoryIds), fn($q) => $q->whereNotIn('o_parent', $directoryIds))
-                ->when(empty($directoryIds), fn($q) => $q)
-                ->delete();
-
-            // 3. Orphaned store comments (product deleted)
-            $productIds = DB::table('options')->where('o_type', 'store')->pluck('id')->toArray();
-            $totalCleaned += Option::where('o_type', 's_coment')
-                ->when(!empty($productIds), fn($q) => $q->whereNotIn('o_parent', $productIds))
-                ->when(empty($productIds), fn($q) => $q)
-                ->delete();
-
-            // 4. Orphaned order comments (order request deleted)
-            $orderIds = DB::table('order_requests')->pluck('id')->toArray();
-            $totalCleaned += Option::where('o_type', 'order_comment')
-                ->when(!empty($orderIds), fn($q) => $q->whereNotIn('o_parent', $orderIds))
-                ->when(empty($orderIds), fn($q) => $q)
-                ->delete();
-
-            // 5. Orphaned reactions on forum topics (type 2)
-            $totalCleaned += Like::where('type', 2)
-                ->when(!empty($forumTopicIds), fn($q) => $q->whereNotIn('sid', $forumTopicIds))
-                ->when(empty($forumTopicIds), fn($q) => $q)
-                ->delete();
-
-            // 6. Orphaned reactions on directory (type 22)
-            $totalCleaned += Like::where('type', 22)
-                ->when(!empty($directoryIds), fn($q) => $q->whereNotIn('sid', $directoryIds))
-                ->when(empty($directoryIds), fn($q) => $q)
-                ->delete();
-
-            // 7. Orphaned reactions on store products (type 3)
-            $totalCleaned += Like::where('type', 3)
-                ->when(!empty($productIds), fn($q) => $q->whereNotIn('sid', $productIds))
-                ->when(empty($productIds), fn($q) => $q)
-                ->delete();
-
-            // 8. Orphaned reactions on order requests (type 6)
-            $totalCleaned += Like::where('type', 6)
-                ->when(!empty($orderIds), fn($q) => $q->whereNotIn('sid', $orderIds))
-                ->when(empty($orderIds), fn($q) => $q)
-                ->delete();
-
-            // 9. Orphaned reactions on forum comments (type 4)
-            $commentIds = DB::table('f_coment')->pluck('id')->toArray();
-            $totalCleaned += Like::where('type', 4)
-                ->when(!empty($commentIds), fn($q) => $q->whereNotIn('sid', $commentIds))
-                ->when(empty($commentIds), fn($q) => $q)
-                ->delete();
-
-            // 10. Orphaned reactions on directory comments (type 44)
-            $dirCommentIds = Option::where('o_type', 'd_coment')->pluck('id')->toArray();
-            $totalCleaned += Like::where('type', 44)
-                ->when(!empty($dirCommentIds), fn($q) => $q->whereNotIn('sid', $dirCommentIds))
-                ->when(empty($dirCommentIds), fn($q) => $q)
-                ->delete();
-
-            // 11. Orphaned reactions on store comments (type 444)
-            $storeCommentIds = Option::where('o_type', 's_coment')->pluck('id')->toArray();
-            $totalCleaned += Like::where('type', 444)
-                ->when(!empty($storeCommentIds), fn($q) => $q->whereNotIn('sid', $storeCommentIds))
-                ->when(empty($storeCommentIds), fn($q) => $q)
-                ->delete();
-
-            // 12. Orphaned reactions on order comments (type 66)
-            $orderCommentIds = Option::where('o_type', 'order_comment')->pluck('id')->toArray();
-            $totalCleaned += Like::where('type', 66)
-                ->when(!empty($orderCommentIds), fn($q) => $q->whereNotIn('sid', $orderCommentIds))
-                ->when(empty($orderCommentIds), fn($q) => $q)
-                ->delete();
-
-            // 13. Orphaned reaction data (data_reaction where like record deleted)
-            $likeIds = Like::pluck('id')->toArray();
-            $totalCleaned += Option::where('o_type', 'data_reaction')
-                ->when(!empty($likeIds), fn($q) => $q->whereNotIn('o_parent', $likeIds))
-                ->when(empty($likeIds), fn($q) => $q)
-                ->delete();
+            $result = $this->orphanCleanup->repairOrphanedContent();
 
             $this->maintenanceMode->disable(Auth::user(), 'repair_orphaned_content_success');
-            return redirect()->back()->with('success', __('messages.orphaned_content_repaired', ['count' => $totalCleaned]));
+            return redirect()->back()->with('success', __('messages.orphaned_content_repaired', ['count' => $result['total']]));
         } catch (\Throwable $e) {
             $this->maintenanceMode->disable(Auth::user(), 'repair_orphaned_content_error');
             report($e);
@@ -4497,41 +4432,75 @@ class AdminController extends Controller
     {
         $this->maintenanceMode->enable(Auth::user(), 'repair_orphaned_stats');
         try {
-            $totalCleaned = 0;
-
-            // 1. Orphaned banner stats (banner or vu)
-            $bannerIds = DB::table('banner')->pluck('id')->toArray();
-            if (!empty($bannerIds)) {
-                $totalCleaned += State::whereIn('t_name', ['banner', 'vu'])->whereNotIn('pid', $bannerIds)->delete();
-            } else {
-                $totalCleaned += State::whereIn('t_name', ['banner', 'vu'])->count();
-                State::whereIn('t_name', ['banner', 'vu'])->delete();
-            }
-
-            // 2. Orphaned link stats (link or clik)
-            $linkIds = DB::table('link')->pluck('id')->toArray();
-            if (!empty($linkIds)) {
-                $totalCleaned += State::whereIn('t_name', ['link', 'clik'])->whereNotIn('pid', $linkIds)->delete();
-            } else {
-                $totalCleaned += State::whereIn('t_name', ['link', 'clik'])->count();
-                State::whereIn('t_name', ['link', 'clik'])->delete();
-            }
-
-            // 3. Orphaned smart ad stats (smart or smart_click)
-            $smartAdIds = DB::table('smart_ads')->pluck('id')->toArray();
-            if (!empty($smartAdIds)) {
-                $totalCleaned += State::whereIn('t_name', ['smart', 'smart_click'])->whereNotIn('pid', $smartAdIds)->delete();
-            } else {
-                $totalCleaned += State::whereIn('t_name', ['smart', 'smart_click'])->count();
-                State::whereIn('t_name', ['smart', 'smart_click'])->delete();
-            }
+            $result = $this->orphanCleanup->repairOrphanedStats();
 
             $this->maintenanceMode->disable(Auth::user(), 'repair_orphaned_stats_success');
-            return redirect()->back()->with('success', __('messages.orphaned_stats_repaired', ['count' => $totalCleaned]));
+            return redirect()->back()->with('success', __('messages.orphaned_stats_repaired', ['count' => $result['total']]));
         } catch (\Throwable $e) {
             $this->maintenanceMode->disable(Auth::user(), 'repair_orphaned_stats_error');
             report($e);
             return redirect()->back()->with('error', __('messages.orphaned_stats_repair_failed'));
+        }
+    }
+
+    public function pruneSessionsAndTemp()
+    {
+        $this->maintenanceMode->enable(Auth::user(), 'prune_sessions_temp');
+        try {
+            $deletedSessions = 0;
+            $sessionPath = storage_path('framework/sessions');
+            if (File::exists($sessionPath)) {
+                $files = File::files($sessionPath);
+                $expiredThreshold = time() - (config('session.lifetime', 120) * 60);
+                foreach ($files as $file) {
+                    if ($file->getFilename() !== '.gitignore' && $file->getMTime() < $expiredThreshold) {
+                        File::delete($file->getPathname());
+                        $deletedSessions++;
+                    }
+                }
+            }
+
+            $tempPath = storage_path('app/temp');
+            $deletedTemp = 0;
+            if (File::exists($tempPath)) {
+                $tempThreshold = time() - 86400;
+                foreach (File::allFiles($tempPath) as $tempFile) {
+                    if ($tempFile->getMTime() < $tempThreshold) {
+                        File::delete($tempFile->getPathname());
+                        $deletedTemp++;
+                    }
+                }
+            }
+
+            $this->maintenanceMode->disable(Auth::user(), 'prune_sessions_temp_success');
+            return redirect()->back()->with('success', __('messages.sessions_pruned_successfully', ['count' => ($deletedSessions + $deletedTemp)]));
+        } catch (\Throwable $e) {
+            $this->maintenanceMode->disable(Auth::user(), 'prune_sessions_temp_error');
+            report($e);
+            return redirect()->back()->with('error', __('messages.error_occurred'));
+        }
+    }
+
+    public function pruneLogs()
+    {
+        $this->maintenanceMode->enable(Auth::user(), 'prune_logs');
+        try {
+            $logPath = storage_path('logs');
+            $cleared = 0;
+            if (File::exists($logPath)) {
+                $logFiles = File::glob($logPath . '/*.log');
+                foreach ($logFiles as $logFile) {
+                    File::put($logFile, '');
+                    $cleared++;
+                }
+            }
+
+            $this->maintenanceMode->disable(Auth::user(), 'prune_logs_success');
+            return redirect()->back()->with('success', __('messages.logs_cleaned_successfully', ['count' => $cleared]));
+        } catch (\Throwable $e) {
+            $this->maintenanceMode->disable(Auth::user(), 'prune_logs_error');
+            report($e);
+            return redirect()->back()->with('error', __('messages.error_occurred'));
         }
     }
 

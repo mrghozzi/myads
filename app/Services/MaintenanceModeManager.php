@@ -40,6 +40,9 @@ class MaintenanceModeManager
         $payload = [
             'message' => trim((string) ($values['message'] ?? $current['message'])),
             'logo_path' => $current['logo_path'],
+            'allowed_ips' => trim((string) ($values['allowed_ips'] ?? $current['allowed_ips'] ?? '')),
+            'emergency_token' => trim((string) ($values['emergency_token'] ?? $current['emergency_token'] ?? '')),
+            'estimated_duration' => trim((string) ($values['estimated_duration'] ?? $current['estimated_duration'] ?? '')),
             'last_changed_at' => $now,
             'last_changed_by' => (int) ($actor?->getKey() ?? 0),
             'last_source' => 'admin_panel',
@@ -160,6 +163,45 @@ class MaintenanceModeManager
         return $this->signedEmergencyToken($token);
     }
 
+    /**
+     * Get list of parsed IP addresses allowed to bypass maintenance mode.
+     *
+     * @return array<string>
+     */
+    public function allowedIps(): array
+    {
+        $raw = (string) MaintenanceSettings::get('allowed_ips', '');
+        if (trim($raw) === '') {
+            return [];
+        }
+
+        $ips = preg_split('/[\r\n,]+/', $raw, -1, PREG_SPLIT_NO_EMPTY);
+        return array_values(array_filter(array_map('trim', (array) $ips)));
+    }
+
+    /**
+     * Get the emergency bypass URL if a token is configured.
+     */
+    public function bypassUrl(): ?string
+    {
+        $token = $this->emergencyToken();
+        if ($token === '') {
+            return null;
+        }
+
+        return url('/?' . self::BYPASS_QUERY_KEY . '=' . urlencode($token));
+    }
+
+    public function emergencyToken(): string
+    {
+        $configured = (string) MaintenanceSettings::get('emergency_token', '');
+        if (trim($configured) !== '') {
+            return trim($configured);
+        }
+
+        return trim((string) env('MAINTENANCE_EMERGENCY_TOKEN', ''));
+    }
+
     private function storeLogo(UploadedFile $logo, ?string $existingPath = null): string
     {
         $directory = base_path('upload/maintenance');
@@ -187,11 +229,6 @@ class MaintenanceModeManager
         if (File::exists($absolutePath)) {
             File::delete($absolutePath);
         }
-    }
-
-    private function emergencyToken(): string
-    {
-        return trim((string) env('MAINTENANCE_EMERGENCY_TOKEN', ''));
     }
 
     private function signedEmergencyToken(string $token): string

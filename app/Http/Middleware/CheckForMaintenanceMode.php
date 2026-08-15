@@ -66,6 +66,11 @@ class CheckForMaintenanceMode
             return true;
         }
 
+        $allowedIps = $this->maintenanceMode->allowedIps();
+        if (! empty($allowedIps) && in_array($request->ip(), $allowedIps, true)) {
+            return true;
+        }
+
         return $request->routeIs(
             'login',
             'login.post',
