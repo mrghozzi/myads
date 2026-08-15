@@ -7,17 +7,17 @@ return [
     'tab_changelog' => 'Changelog',
     'tab_about' => 'About MYADS',
     
-    // What's New Section
-    'feature_1_title' => 'YouTube-Style Watch Page & Hub',
-    'feature_1_desc' => 'Dedicated YouTube-style watch page (/t{id}) and Video Hub (/video) with Shorts shelf, custom HTML5 player, publisher Hexagon avatars, cover image composer, and 256MB upload optimization.',
-    'feature_2_title' => 'Multimedia Badges & Quests',
-    'feature_2_desc' => '5 new multimedia Badges and 5 new Quests for Video, Clip, Audio, and File engagement, fully integrated into the gamification engine across 14 languages.',
-    'feature_3_title' => 'SEO Suite & Knowledgebase Overhaul',
-    'feature_3_desc' => 'Complete @.superdesign redesign of all 7 SEO management views with retention & DB cleanup integration, and a dense power dashboard for Knowledgebase administration.',
-    'feature_4_title' => '95%+ DB Query Optimization Engine',
-    'feature_4_desc' => 'Single-pass SQL query aggregations for the Admin dashboard reducing load from 300+ DB queries to under 10, plus new composite DB indexes and a unified ReactionService.',
-    'feature_5_title' => 'Smart Widgets & Flutter App Parity',
-    'feature_5_desc' => 'Permission-gated empty widget prompt (<x-widget-column>), redesigned /admin/widgets hub with drag-and-drop reordering, and Flutter mobile app watch screen parity.',
+    // What's New Section (v4.5.2)
+    'feature_1_title' => 'Modular Rich Text Editor (TinyMCE 7)',
+    'feature_1_desc' => 'Integrated extensible rich text editor plugin architecture with self-contained TinyMCE 7 plugin (plugins/myads-tinymce-editor), dynamic hook engine, and automatic safe fallback to Quill.',
+    'feature_2_title' => 'Admin Plugins & Hooks Inspector',
+    'feature_2_desc' => 'Interactive diagnostic panel at /admin/plugins/inspector with real-time hook monitoring, active editor status, live search, and dynamic Blade widget column filter injection.',
+    'feature_3_title' => 'Continuous Floating Audio Player Bar',
+    'feature_3_desc' => 'Glassmorphic bottom audio player with spinning disc animation, track avatar, playback scrubber, and seamless persistent audio playback across page navigations via sessionStorage.',
+    'feature_4_title' => 'Developer Platform & API v1 Modernization',
+    'feature_4_desc' => 'Full REST API v1 alignment with 27 granular OAuth 2.0 permission scopes across 7 categories, categorized permission matrix, multi-language guides, and safe endpoint directory.',
+    'feature_5_title' => 'Maintenance Center & FFmpeg Diagnostic Terminal',
+    'feature_5_desc' => 'Overhauled /admin/maintenance with developer IP whitelist and emergency bypass token, alongside live interactive FFmpeg diagnostic terminal at /admin/settings/ffmpeg and public ID privacy security.',
 
     // About Section
     'about_description' => 'MYADS is a powerful, all-in-one community platform and ad exchange network. It empowers website owners to connect, exchange traffic, trade services, and monetize their platforms effectively.',

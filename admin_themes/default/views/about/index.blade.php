@@ -360,7 +360,7 @@
                             <div class="col-md-6 col-lg-4">
                                 <div class="feature-card p-4">
                                     <div class="feature-icon-wrapper">
-                                        <i class="feather-layout"></i>
+                                        <i class="feather-edit-3"></i>
                                     </div>
                                     <h5 class="fw-bold mb-3">{{ __('about.feature_1_title') }}</h5>
                                     <p class="text-muted mb-0 fs-13">{{ __('about.feature_1_desc') }}</p>
@@ -369,7 +369,7 @@
                             <div class="col-md-6 col-lg-4">
                                 <div class="feature-card p-4">
                                     <div class="feature-icon-wrapper">
-                                        <i class="feather-zap"></i>
+                                        <i class="feather-layers"></i>
                                     </div>
                                     <h5 class="fw-bold mb-3">{{ __('about.feature_2_title') }}</h5>
                                     <p class="text-muted mb-0 fs-13">{{ __('about.feature_2_desc') }}</p>
@@ -378,7 +378,7 @@
                             <div class="col-md-6 col-lg-4">
                                 <div class="feature-card p-4">
                                     <div class="feature-icon-wrapper">
-                                        <i class="feather-shield"></i>
+                                        <i class="feather-music"></i>
                                     </div>
                                     <h5 class="fw-bold mb-3">{{ __('about.feature_3_title') }}</h5>
                                     <p class="text-muted mb-0 fs-13">{{ __('about.feature_3_desc') }}</p>
@@ -387,7 +387,7 @@
                             <div class="col-md-6 col-lg-4">
                                 <div class="feature-card p-4">
                                     <div class="feature-icon-wrapper">
-                                        <i class="feather-search"></i>
+                                        <i class="feather-code"></i>
                                     </div>
                                     <h5 class="fw-bold mb-3">{{ __('about.feature_4_title') }}</h5>
                                     <p class="text-muted mb-0 fs-13">{{ __('about.feature_4_desc') }}</p>
@@ -396,7 +396,7 @@
                             <div class="col-md-6 col-lg-4">
                                 <div class="feature-card p-4">
                                     <div class="feature-icon-wrapper" style="background: rgba(16,185,129,0.1); color: #10b981;">
-                                        <i class="feather-activity"></i>
+                                        <i class="feather-shield"></i>
                                     </div>
                                     <h5 class="fw-bold mb-3">{{ __('about.feature_5_title') }}</h5>
                                     <p class="text-muted mb-0 fs-13">{{ __('about.feature_5_desc') }}</p>
@@ -412,19 +412,55 @@
                                 <div class="timeline-item">
                                     <div class="timeline-icon"><i class="feather-box fs-12"></i></div>
                                     <h6 class="fw-bold mb-1">v4.5.2 <span class="badge bg-soft-success text-success ms-2">Stable (Current)</span></h6>
-                                    <p class="text-muted fs-13 mb-3">Maintenance & Extension Extensibility Release — Modular Rich Text Editor Plugin (<code>myads-tinymce-editor</code>) Integration, Extensible Plugin Provider Directory Resolution, and Comprehensive Automated Testing.</p>
+                                    <p class="text-muted fs-13 mb-3">Maintenance & Extension Extensibility Release — Modular Rich Text Editor Plugin (<code>myads-tinymce-editor</code>) Integration, Admin Hooks Inspector, Continuous Floating Audio Player, Referral System Overhaul, Developer Platform Modernization, Admin Maintenance & FFmpeg Diagnostic Terminals, and Comprehensive Automated Testing.</p>
                                     <div class="d-flex flex-column gap-2">
                                         <div class="d-flex align-items-start">
                                             <span class="changelog-badge badge-feature mt-1" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">Feature</span>
-                                            <span class="text-muted fs-13">Integrated <strong>TinyMCE 7 Rich Text Editor Plugin</strong> (<code>plugins/myads-tinymce-editor</code>) leveraging <code>RichTextEditorService</code> hook engine for dynamic selection in <code>/admin/settings</code> with graceful fallback to Quill editor.</span>
+                                            <span class="text-muted fs-13">Integrated <strong>TinyMCE 7 Rich Text Editor Plugin</strong> (<code>plugins/myads-tinymce-editor</code>) leveraging <code>RichTextEditorService</code> hook engine for dynamic selection in <code>/admin/settings</code> with automatic graceful fallback to Quill editor.</span>
                                         </div>
                                         <div class="d-flex align-items-start">
                                             <span class="changelog-badge badge-feature mt-1" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">Feature</span>
-                                            <span class="text-muted fs-13">Updated <strong>Plugin Provider Directory Resolution</strong> in <code>PluginServiceProvider</code> to support standard and directory-slug active plugin mapping during automated test suites.</span>
+                                            <span class="text-muted fs-13">Developed <strong>Admin Plugins & Hooks Inspector</strong> at <code>/admin/plugins/inspector</code> for real-time action & filter hook diagnostics, and added dynamic widget injection via <code>registered_plugin_widgets</code> hook.</span>
                                         </div>
                                         <div class="d-flex align-items-start">
-                                            <span class="changelog-badge badge-optimization mt-1" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">Optimization</span>
-                                            <span class="text-muted fs-13">Automated unit and feature testing suites (<code>TinyMCEEditorPluginTest.php</code>, <code>RichTextEditorTest.php</code>) ensuring 100% test coverage and zero regression across rich text editor engines.</span>
+                                            <span class="changelog-badge badge-feature mt-1" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">Feature</span>
+                                            <span class="text-muted fs-13">Integrated <strong>Continuous Floating Audio Player Bar</strong> with spinning disc animation, scrubber controls, and persistent playback state across page navigations via <code>sessionStorage</code>.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-feature mt-1" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">Feature</span>
+                                            <span class="text-muted fs-13">Complete <strong>Referral System Overhaul</strong> (<code>/ads/referrals</code>, <code>/referral</code>, <code>/home</code>) with <code>@.superdesign</code> glassmorphism, 1-click clipboard copy, multi-size banner selectors, and 7-network social sharing including ADStn Network.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-feature mt-1" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">Feature</span>
+                                            <span class="text-muted fs-13">Enforced <strong>Video Feed Content Isolation</strong> (<code>s_type</code> scoping), Suggested Videos isolation, and Flutter Mobile App Video Hub parity (<code>v1.7.5+17</code>).</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-feature mt-1" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">Feature</span>
+                                            <span class="text-muted fs-13">Modernized <strong>Developer Platform & Guides</strong> with 27 granular OAuth 2.0 scopes across 7 categories, REST API v1 endpoint directory, parameter schemas, and multi-language SDK code samples.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-feature mt-1" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">Feature</span>
+                                            <span class="text-muted fs-13">Overhauled <strong>Admin Maintenance Center</strong> (<code>/admin/maintenance</code>) with Developer IP Whitelist (<code>allowed_ips</code>), Secret Emergency Bypass Token (<code>emergency_token</code>), and 1-click session/log/DB repair tools.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-feature mt-1" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">Feature</span>
+                                            <span class="text-muted fs-13">Redesigned <strong>Admin FFmpeg Video Processing Console</strong> (<code>/admin/settings/ffmpeg</code>) with live interactive diagnostic test terminal, codec detection, multi-hosting guides, and binary presets.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-security mt-1" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;">Security</span>
+                                            <span class="text-muted fs-13">Patched <strong>Public Member IDs Leakage</strong> across user routes, ad serving identifiers, referral cookies, and popovers when <code>public_member_ids_enabled</code> is active.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-fix mt-1" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;">Fix</span>
+                                            <span class="text-muted fs-13">Resolved critical non-orphan content reaction deletion in <code>OrphanCleanupService</code>, reaction toggle SMTP timeouts with asynchronous termination dispatch, and profile navigation tab horizontal auto-centering in RTL mode.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-fix mt-1" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;">Fix</span>
+                                            <span class="text-muted fs-13">Resolved Admin Panel 500 error on slow external networks by implementing a 3.0s time budget cap and non-blocking error resilience in plugin and theme update checks.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-optimization mt-1" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">Quality</span>
+                                            <span class="text-muted fs-13">Comprehensive automated test suites added covering Orphan Cleanup safety, Proposals features, Update checks timeouts, TinyMCE plugin, Referral system, and Video hub isolation (100% pass rate).</span>
                                         </div>
                                     </div>
                                 </div>
