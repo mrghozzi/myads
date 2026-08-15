@@ -26,7 +26,10 @@ class DeveloperPlatformController extends Controller
             }
         }
 
-        return view('theme::developer.index', compact('eligible', 'reason', 'apps'));
+        $scopes = DeveloperScopeCatalog::getAllScopes();
+        $categories = DeveloperScopeCatalog::getCategories();
+
+        return view('theme::developer.index', compact('eligible', 'reason', 'apps', 'scopes', 'categories'));
     }
 
     public function apps(DeveloperEligibilityService $eligibilityService)
@@ -167,6 +170,9 @@ class DeveloperPlatformController extends Controller
 
     public function guides()
     {
-        return view('theme::developer.guides');
+        $scopes = DeveloperScopeCatalog::getAllScopes();
+        $categories = DeveloperScopeCatalog::getCategories();
+
+        return view('theme::developer.guides', compact('scopes', 'categories'));
     }
 }
