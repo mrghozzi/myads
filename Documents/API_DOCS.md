@@ -47,14 +47,41 @@ Best for third-party websites and integrations. Users authorize your app via the
 
 ---
 
-## 4. Developer Platform
+## 4. Developer Platform & OAuth2 Scopes
 
-To build third-party integrations, you must first register your application in the **Developer Platform**.
+To build third-party integrations, you must first register your application in the **Developer Platform** at `/developer`.
 
-1. Go to `/developer`.
-2. Click **Create New App**.
-3. Provide your App Name, Website, and **Redirect URIs**.
-4. Obtain your `Client ID` and `Client Secret`.
+### Available OAuth2 Scopes Catalog
+
+| Category | Scope ID | Description | Sensitive |
+|---|---|---|---|
+| **Identity & Profile** | `user.identity.read` | Read member account identifier and basic public identity fields. | No |
+| | `user.profile.read` | Read public profile details and core member metadata. | No |
+| | `user.email.read` | Access the primary verified email address of the member. | **Yes** |
+| | `user.social_links.read` | Read public social links attached to a member profile. | No |
+| | `user.follows.read` | Read follower and following relationships for visible members. | No |
+| | `user.follows.write` | Follow or unfollow other members on behalf of the user. | **Yes** |
+| **Content & Interactions** | `user.content.read` | Read public posts and status updates authored by the user. | No |
+| | `user.content.write` | Create, update, and publish posts on behalf of the user. | **Yes** |
+| | `user.reactions.write` | Add or toggle likes and reactions to content on behalf of the user. | No |
+| | `user.comments.write` | Publish comments and replies on posts on behalf of the user. | **Yes** |
+| **Messages & Notifications** | `user.messages.read` | Read private direct message conversations belonging to the user. | **Yes** |
+| | `user.messages.write` | Send private direct messages on behalf of the user. | **Yes** |
+| | `user.notifications.read` | Read account notifications, alerts, and unread counters. | No |
+| **Wallet & Rewards** | `user.wallet.read` | Read user points balance, rewards, and wallet details. | **Yes** |
+| | `user.badges.read` | Read member badges, unlocked achievements, and quest status. | No |
+| **Community & Media** | `user.clips.read` | Browse short video clips feed and saved clips in user account. | No |
+| | `user.clips.write` | Save and unsave short video clips on behalf of the user. | No |
+| | `user.forums.read` | Read forum categories, topics, discussions, and replies. | No |
+| | `user.forums.write` | Create new topics and post replies in forums on behalf of the user. | **Yes** |
+| **Store & Advertising** | `user.store.read` | Browse marketplace products, offerings, and store knowledgebase. | No |
+| | `user.orders.read` | Read user purchase orders history and submitted offers. | **Yes** |
+| | `user.ads.read` | Read ad impression counts, clicks, and campaign performance statistics. | No |
+| **App Owner Integrations** | `owner.profile.read` | Read authorized owner profile through developer API. | No |
+| | `owner.content.read` | Read authorized owner content feed and published updates. | No |
+| | `owner.follow.write` | Follow or unfollow members on behalf of authorized owner. | **Yes** |
+| | `owner.messages.read` | Read private message conversations belonging to authorized owner. | **Yes** |
+| | `owner.messages.write` | Send private messages on behalf of authorized owner. | **Yes** |
 
 ---
 
@@ -103,14 +130,52 @@ Content-Type: application/json
 All Developer API requests require an `Authorization: Bearer {access_token}` header.  
 **Rate Limit:** 30 requests per minute per IP.
 
-### User Endpoints (Scope: `user.*`)
+### User Identity & Profile Endpoints
 - `GET /api/developer/v1/me`: Returns basic identity (ID, Username, Email).  
   *Scope: `user.identity.read`*
 - `GET /api/developer/v1/me/profile`: Returns profile details (Avatar, Points).  
   *Scope: `user.profile.read`*
+- `GET /api/developer/v1/me/email`: Returns verified email address and verification status.  
+  *Scope: `user.email.read`*
+- `GET /api/developer/v1/me/social-links`: Returns user's configured social media links.  
+  *Scope: `user.social_links.read`*
+- `GET /api/developer/v1/me/follows`: Returns following and followers count.  
+  *Scope: `user.follows.read`*
+- `POST /api/developer/v1/me/follows`: Follow or unfollow a target user (`target_user_id`, `action`).  
+  *Scope: `user.follows.write`*
 
-### App Owner Endpoints (Scope: `owner.*`)
-These endpoints allow interaction with the developer who owns the app.
+### Content, Engagement & Messages Endpoints
+- `GET /api/developer/v1/me/content`: Returns latest posts authored by the user.  
+  *Scope: `user.content.read`*
+- `POST /api/developer/v1/me/content`: Publishes a new status update on user's behalf (`content`, `privacy`).  
+  *Scope: `user.content.write`*
+- `POST /api/developer/v1/me/reactions`: Toggles reaction/like on a post (`status_id`).  
+  *Scope: `user.reactions.write`*
+- `GET /api/developer/v1/me/messages`: Returns user's recent direct message conversations.  
+  *Scope: `user.messages.read`*
+- `POST /api/developer/v1/me/messages`: Sends a direct message on behalf of the user (`receiver_id`, `content`).  
+  *Scope: `user.messages.write`*
+- `GET /api/developer/v1/me/notifications`: Returns user's notification list and unread counter.  
+  *Scope: `user.notifications.read`*
+
+### Economy, Gamification & Media Endpoints
+- `GET /api/developer/v1/me/wallet`: Returns user points (PTS) balance.  
+  *Scope: `user.wallet.read`*
+- `GET /api/developer/v1/me/badges`: Returns unlocked badges and achievements.  
+  *Scope: `user.badges.read`*
+- `GET /api/developer/v1/me/clips`: Returns public video clips feed.  
+  *Scope: `user.clips.read`*
+- `GET /api/developer/v1/forums`: Returns list of forum categories with topic counts.  
+  *Scope: `user.forums.read`*
+- `GET /api/developer/v1/store/products`: Returns marketplace store catalog.  
+  *Scope: `user.store.read`*
+- `GET /api/developer/v1/me/orders`: Returns user's service orders and requests.  
+  *Scope: `user.orders.read`*
+- `GET /api/developer/v1/me/ads/stats`: Returns banner and ad performance metrics.  
+  *Scope: `user.ads.read`*
+
+### App Owner Endpoints
+These endpoints allow interaction with the developer who owns the application.
 - `GET /api/developer/v1/owner/profile`: Get app owner's public profile.  
   *Scope: `owner.profile.read`*
 - `GET /api/developer/v1/owner/content`: Get app owner's latest public posts.  

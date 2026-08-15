@@ -60,6 +60,7 @@ MYADS is a community platform where website owners:
 38. **Store Products Chronological Ordering & Sale Discount Pricing** — chronological product ordering in `StoreApiController.php` matching web store sorting logic (status promotion date `s_type = 7867`, `updated_at`, `id DESC`), paired with complete pricing attributes (`original_price`, `sale_price`, `current_price`, `is_on_sale`, formatted timestamps) in `ProductResource.php` and Flutter discount badges & strikethrough pricing.
 39. **Video Feed Isolation, Video Hub API & Flutter Mobile Video Hub (`v1.7.5+17`)** — strict `s_type` scoping (`whereIn('s_type', [10, 2, 4, 100])` for main videos and `s_type = 14` for clips) across `VideoHubController`, `ForumController`, `Api\StatusController`, and the new `Api\VideoApiController` (`GET /api/video/feed`), completely excluding directory listings (`s_type = 1`) and store products (`s_type = 7867`) from video feeds. Paired with full Flutter mobile app (`myads_app`) Video Hub parity (`VideoHubScreen`, `video_hub_provider.dart`), featuring category filter pills, Spotlight Hero Video banner, YouTube Shorts shelf, 16:9 video grid, and 1-tap navigation shortcuts via `MyAdsScaffold` header bar icon and `ExploreScreen` discover grid card. Supported by dedicated test suites (`VideoHubIsolationTest.php` and `VideoApiTest.php`).
 40. **Member ID Privacy & Anti-Enumeration System** — Security suite protection (`public_member_ids_enabled`) replacing internal database member IDs (`users.id`) with randomized public identifiers (`public_uid`) or usernames across profile shortcut links (`/u/id/{public_uid}`), follow & block routes (`/profile/{username}/follow`, `/profile/{identifier}/block`), report endpoints (`/report?user={username}`), user popovers, mentions, live search, developer API, Sanctum mobile API resources (`UserResource`, `UserProfileResource`, `StatusResource`), and the entire referral & ad serving ecosystem (`?ref=`) across `AuthController` (with `User::resolvePublicIdentifier()` backward compatibility), `AdsServingController` (`resolveRefIdentifier()`), `AdsController`, `SmartAdsController`, `HomeController`, and theme Blade views (`home`, `referrals`, `referrals_list`, `banners/code`, `links/code`), while returning HTTP 404 on raw numeric ID enumeration attempts when active.
+41. **Developer Platform, OAuth 2.0 & Expanded Permissions Catalog** — A comprehensive developer ecosystem at `/developer` enabling third-party application registration, client secret management, review workflows, OAuth 2.0 authorization (`/oauth/authorize`, `/oauth/token`), and Developer API v1 (`/api/developer/v1/*`). Features an expanded catalog of 27 scopes across 7 categories (`Identity & Profile`, `Content & Interactions`, `Messages & Notifications`, `Wallet & Rewards`, `Community & Media`, `Store & Advertising`, and `App Owner Integrations`) with sensitive scope auditing, categorized grid selection in `/developer/apps/create` and `/developer/apps/{id}`, and full i18n support across both default and bootstrap-sample themes.
 
 
 ---
@@ -297,6 +298,11 @@ myads/
 | `UserBlock` | `user_blocks` | User-to-user blocking rules (messages_only, full_platform) and optional expiration dates |
 | `MailSetting` | `mail_settings` | Singleton mail configuration (mailer, host, port, credentials, encryption, sender info) with encrypted password |
 | `SeoSetting` / `SeoRule` / `SeoDailyMetric` | `seo_settings` / `seo_rules` / `seo_daily_metrics` | SEO engine |
+| `DeveloperApp` | `developer_apps` | Third-party developer OAuth 2.0 applications with client credentials, redirect URIs, requested scopes, and moderation status |
+| `DeveloperAccessToken` | `developer_access_tokens` | Bearer access tokens issued to third-party developer apps with scoped permissions and expiration |
+| `DeveloperRefreshToken` | `developer_refresh_tokens` | Refresh tokens for renewing developer access tokens |
+| `DeveloperAuthorization` | `developer_authorizations` | User-authorized app permissions record for third-party OAuth access |
+| `DeveloperAuthorizationCode` | `developer_authorization_codes` | Short-lived OAuth authorization codes exchanged for tokens |
 
 ---
 
@@ -306,6 +312,9 @@ myads/
 |---------|---------|
 | `FeedService` | Hybrid ranking algorithm for `/portal?filter=all` (recency, follows, affinity, social proof, reactions, diversity penalties) |
 | `AdminAccessService` | Centralized admin ACL — checks if user can access admin routes by module |
+| `DeveloperScopeCatalog` | Centralized OAuth 2.0 permission catalog defining 27 scopes across 7 categories with sensitivity flags and i18n support |
+| `DeveloperOAuthService` | Handles OAuth 2.0 authorization code generation, token exchange, verification, and revocation |
+| `DeveloperEligibilityService` | Evaluates user eligibility requirements (account age, points, verification) to register developer applications |
 | `PointLedgerService` | Awards/deducts PTS, records transactions |
 | `GamificationService` | Centralized badge/quest progress tracking (handles daily/weekly premium quests and 20+ dynamic engagement badges) |
 | `UserPrivacyService` | Enforces per-member privacy rules across profile, DMs, mentions, reposts |
@@ -416,7 +425,12 @@ myads/
 | `/api/marketplace/extensions/download` | `/api/marketplace/extensions/download` | Secure plugin and extension zip package download endpoint |
 | `/visits/verify` | `POST /visits/verify` | Token-based visit verification endpoint (anti-fraud) |
 | `/share` | `/share?text={content}` | External share endpoint (requires auth) |
-| `/developer` | `/developer` | Public developer documentation for Share API |
+| `/developer` | `/developer` | Developer Platform hub, apps dashboard, and API documentation |
+| `/developer/apps/create` | `/developer/apps/create` | Third-party developer application creation wizard with categorized scopes |
+| `/developer/apps/{app}` | `/developer/apps/5` | Developer application management, client secret rotation, and widget codes |
+| `/oauth/authorize` | `/oauth/authorize` | OAuth 2.0 user consent & authorization screen |
+| `/oauth/token` | `POST /oauth/token` | OAuth 2.0 authorization code and refresh token exchange endpoint |
+| `/api/developer/v1/*` | `GET/POST /api/developer/v1/*` | Developer API v1 endpoints with Bearer token authentication |
 | `/refund` | `/refund` | Refund policy legal page |
 
 ### Middleware Groups

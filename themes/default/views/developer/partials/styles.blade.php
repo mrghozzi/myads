@@ -452,6 +452,32 @@
         line-height: 1.6;
     }
 
+    .dev-scope-category {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .dev-scope-category-head {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding-bottom: 8px;
+        border-bottom: 1px solid var(--dev-border);
+    }
+
+    .dev-scope-category-head i {
+        color: var(--dev-accent);
+        font-size: 1rem;
+    }
+
+    .dev-scope-category-head h4 {
+        color: var(--dev-title);
+        font-size: 0.95rem;
+        font-weight: 800;
+        margin: 0;
+    }
+
     .dev-scope-grid {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));

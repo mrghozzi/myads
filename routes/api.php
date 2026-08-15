@@ -154,14 +154,38 @@ Route::middleware(['api.key', 'auth:sanctum'])->group(function () {
 // Developer Platform API v1
 // SECURITY: Rate limited to prevent spam (follows, messages, data scraping)
 Route::prefix('developer/v1')->middleware('throttle:30,1')->group(function () {
+    // User Identity & Profile
     Route::get('/me', [App\Http\Controllers\DeveloperApiController::class, 'me'])->name('api.developer.me');
     Route::get('/me/profile', [App\Http\Controllers\DeveloperApiController::class, 'myProfile'])->name('api.developer.me.profile');
-    
+    Route::get('/me/email', [App\Http\Controllers\DeveloperApiController::class, 'myEmail'])->name('api.developer.me.email');
+    Route::get('/me/social-links', [App\Http\Controllers\DeveloperApiController::class, 'mySocialLinks'])->name('api.developer.me.social_links');
+    Route::get('/me/follows', [App\Http\Controllers\DeveloperApiController::class, 'myFollows'])->name('api.developer.me.follows');
+    Route::post('/me/follows', [App\Http\Controllers\DeveloperApiController::class, 'followUser'])->name('api.developer.me.follow_user');
+
+    // Content & Interaction
+    Route::get('/me/content', [App\Http\Controllers\DeveloperApiController::class, 'myContent'])->name('api.developer.me.content');
+    Route::post('/me/content', [App\Http\Controllers\DeveloperApiController::class, 'postContent'])->name('api.developer.me.post_content');
+    Route::post('/me/reactions', [App\Http\Controllers\DeveloperApiController::class, 'reactContent'])->name('api.developer.me.reactions');
+
+    // Messages & Notifications
+    Route::get('/me/messages', [App\Http\Controllers\DeveloperApiController::class, 'myMessages'])->name('api.developer.me.messages');
+    Route::post('/me/messages', [App\Http\Controllers\DeveloperApiController::class, 'sendMessage'])->name('api.developer.me.send_message');
+    Route::get('/me/notifications', [App\Http\Controllers\DeveloperApiController::class, 'myNotifications'])->name('api.developer.me.notifications');
+
+    // Economy, Gamification & Media
+    Route::get('/me/wallet', [App\Http\Controllers\DeveloperApiController::class, 'myWallet'])->name('api.developer.me.wallet');
+    Route::get('/me/badges', [App\Http\Controllers\DeveloperApiController::class, 'myBadges'])->name('api.developer.me.badges');
+    Route::get('/me/clips', [App\Http\Controllers\DeveloperApiController::class, 'myClips'])->name('api.developer.me.clips');
+    Route::get('/forums', [App\Http\Controllers\DeveloperApiController::class, 'forumsList'])->name('api.developer.forums');
+
+    // Store & Ads
+    Route::get('/store/products', [App\Http\Controllers\DeveloperApiController::class, 'storeProducts'])->name('api.developer.store.products');
+    Route::get('/me/orders', [App\Http\Controllers\DeveloperApiController::class, 'myOrders'])->name('api.developer.me.orders');
+    Route::get('/me/ads/stats', [App\Http\Controllers\DeveloperApiController::class, 'adsStats'])->name('api.developer.me.ads_stats');
+
+    // Owner Scopes
     Route::get('/owner/profile', [App\Http\Controllers\DeveloperApiController::class, 'ownerProfile'])->name('api.developer.owner.profile');
     Route::get('/owner/content', [App\Http\Controllers\DeveloperApiController::class, 'ownerContent'])->name('api.developer.owner.content');
-    
     Route::post('/owner/follow', [App\Http\Controllers\DeveloperApiController::class, 'ownerFollow'])->name('api.developer.owner.follow');
-    
-    // Route::get('/owner/messages', [App\Http\Controllers\DeveloperApiController::class, 'ownerMessagesRead'])->name('api.developer.owner.messages.read'); // Not implemented yet
     Route::post('/owner/messages', [App\Http\Controllers\DeveloperApiController::class, 'ownerMessages'])->name('api.developer.owner.messages');
 });
