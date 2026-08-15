@@ -4665,12 +4665,87 @@ class AdminController extends Controller
     public function ffmpegSettings()
     {
         $options = Option::where('o_type', 'ffmpeg_settings')->get()->keyBy('name');
-        return view('admin::admin.ffmpeg', compact('options'));
+
+        // Inspect PHP execution environment safely
+        $disabledFunctions = array_map('trim', explode(',', (string) ini_get('disable_functions')));
+        $execAllowed = function_exists('exec') && !in_array('exec', $disabledFunctions, true);
+        $shellExecAllowed = function_exists('shell_exec') && !in_array('shell_exec', $disabledFunctions, true);
+        $procOpenAllowed = function_exists('proc_open') && !in_array('proc_open', $disabledFunctions, true);
+        
+        $osFamily = PHP_OS_FAMILY; // Windows, Linux, Darwin, BSD, Solaris, Unknown
+        $defaultPath = $osFamily === 'Windows' ? 'C:\ffmpeg\bin\ffmpeg.exe' : '/usr/bin/ffmpeg';
+        $configuredPath = $options['ffmpeg_binary_path']->o_valuer ?? $defaultPath;
+        
+        // Check if configured path exists on filesystem
+        $pathExists = false;
+        $isExecutable = false;
+        if (!empty($configuredPath)) {
+            $cleanPath = trim($configuredPath, '"\'');
+            if (@file_exists($cleanPath)) {
+                $pathExists = true;
+                $isExecutable = @is_executable($cleanPath);
+            }
+        }
+
+        // Auto-detect common system ffmpeg paths if not found
+        $detectedPath = null;
+        $commonPaths = [
+            '/usr/bin/ffmpeg',
+            '/usr/local/bin/ffmpeg',
+            '/opt/homebrew/bin/ffmpeg',
+            '/usr/bin/local/ffmpeg',
+            'C:\\ffmpeg\\bin\\ffmpeg.exe',
+            'C:\\Program Files\\ffmpeg\\bin\\ffmpeg.exe',
+            'C:\\xampp\\ffmpeg\\bin\\ffmpeg.exe'
+        ];
+        foreach ($commonPaths as $p) {
+            if (@file_exists($p)) {
+                $detectedPath = $p;
+                break;
+            }
+        }
+        if (!$detectedPath && ($execAllowed || $shellExecAllowed)) {
+            $cmd = $osFamily === 'Windows' ? 'where ffmpeg 2>nul' : 'which ffmpeg 2>/dev/null';
+            $cmdOutput = @shell_exec($cmd);
+            if ($cmdOutput && trim($cmdOutput) !== '') {
+                $firstLine = trim(explode("\n", trim($cmdOutput))[0]);
+                if (@file_exists($firstLine)) {
+                    $detectedPath = $firstLine;
+                }
+            }
+        }
+
+        $serverInfo = [
+            'os' => PHP_OS . ' (' . $osFamily . ')',
+            'os_family' => $osFamily,
+            'exec_allowed' => $execAllowed,
+            'shell_exec_allowed' => $shellExecAllowed,
+            'proc_open_allowed' => $procOpenAllowed,
+            'configured_path' => $configuredPath,
+            'path_exists' => $pathExists,
+            'is_executable' => $isExecutable,
+            'detected_path' => $detectedPath,
+            'upload_max_filesize' => ini_get('upload_max_filesize') ?: '2M',
+            'post_max_size' => ini_get('post_max_size') ?: '8M',
+            'max_execution_time' => (ini_get('max_execution_time') ?: '30') . 's',
+            'memory_limit' => ini_get('memory_limit') ?: '128M',
+        ];
+
+        return view('admin::admin.ffmpeg', compact('options', 'serverInfo'));
     }
 
     public function updateFfmpegSettings(Request $request)
     {
         $settings = $request->except('_token');
+        
+        // Handle switches default when unchecked
+        if (!$request->has('ffmpeg_system')) {
+            $settings['ffmpeg_system'] = '0';
+        }
+        if (!$request->has('ffmpeg_auto_thumbnail')) {
+            $settings['ffmpeg_auto_thumbnail'] = '0';
+        }
+
         foreach ($settings as $key => $value) {
             Option::updateOrCreate(
                 ['o_type' => 'ffmpeg_settings', 'name' => $key],
@@ -4680,7 +4755,95 @@ class AdminController extends Controller
         return redirect()->back()->with('success', __('messages.settings_saved') ?? 'Settings Saved');
     }
 
-    public function debugFfmpeg() { return response()->json(['status' => 200, 'message' => 'FFMPEG Debug started! Check logs later.']); }
+    public function debugFfmpeg(Request $request)
+    {
+        $options = Option::where('o_type', 'ffmpeg_settings')->get()->keyBy('name');
+        $binaryPath = $request->input('binary_path') ?: ($options['ffmpeg_binary_path']->o_valuer ?? '/usr/bin/ffmpeg');
+        $cleanPath = trim((string) $binaryPath, '"\'');
+
+        $disabledFunctions = array_map('trim', explode(',', (string) ini_get('disable_functions')));
+        $execAllowed = function_exists('exec') && !in_array('exec', $disabledFunctions, true);
+        $shellExecAllowed = function_exists('shell_exec') && !in_array('shell_exec', $disabledFunctions, true);
+
+        if (!$execAllowed && !$shellExecAllowed) {
+            return response()->json([
+                'status' => 403,
+                'success' => false,
+                'error_type' => 'php_disabled_functions',
+                'title' => __('messages.ffmpeg_exec_disabled_title') ?? 'PHP Execution Functions Disabled',
+                'message' => __('messages.ffmpeg_exec_disabled_msg') ?? 'The functions exec() and shell_exec() are disabled in your php.ini configuration (disable_functions). Please enable them or contact your hosting provider.',
+                'log' => "[ERROR] PHP disable_functions: " . (ini_get('disable_functions') ?: 'none') . "\nCannot execute external binaries without exec() or shell_exec()."
+            ]);
+        }
+
+        if (empty($cleanPath)) {
+            return response()->json([
+                'status' => 400,
+                'success' => false,
+                'error_type' => 'empty_path',
+                'title' => __('messages.ffmpeg_path_empty_title') ?? 'FFmpeg Path is Empty',
+                'message' => __('messages.ffmpeg_path_empty_msg') ?? 'Please provide a valid path to the FFmpeg binary executable.',
+                'log' => "[ERROR] FFmpeg binary path was empty."
+            ]);
+        }
+
+        // Test running FFmpeg
+        $cmd = escapeshellcmd($cleanPath) . ' -version 2>&1';
+        $outputLines = [];
+        $returnVar = -1;
+
+        if ($execAllowed) {
+            @exec($cmd, $outputLines, $returnVar);
+            $fullOutput = implode("\n", $outputLines);
+        } else {
+            $fullOutput = (string) @shell_exec($cmd);
+            $returnVar = ($fullOutput !== '' && str_contains(strtolower($fullOutput), 'ffmpeg version')) ? 0 : 1;
+        }
+
+        if ($returnVar === 0 && (str_contains(strtolower($fullOutput), 'ffmpeg version') || str_contains($fullOutput, 'configuration:'))) {
+            // Extract version string
+            preg_match('/ffmpeg version ([^\s,]+)/i', $fullOutput, $matches);
+            $version = $matches[1] ?? 'Detected';
+
+            // Check for key codecs
+            $codecs = [];
+            if (str_contains($fullOutput, '--enable-libx264') || str_contains($fullOutput, 'libx264')) $codecs[] = 'H.264 (libx264)';
+            if (str_contains($fullOutput, '--enable-libvpx') || str_contains($fullOutput, 'libvpx')) $codecs[] = 'VP8/VP9 (WebM)';
+            if (str_contains($fullOutput, '--enable-libmp3lame') || str_contains($fullOutput, 'libmp3lame')) $codecs[] = 'MP3 (libmp3lame)';
+            if (str_contains($fullOutput, '--enable-libfdk-aac') || str_contains($fullOutput, 'aac')) $codecs[] = 'AAC Audio';
+
+            return response()->json([
+                'status' => 200,
+                'success' => true,
+                'version' => $version,
+                'binary_path' => $cleanPath,
+                'codecs' => $codecs,
+                'title' => __('messages.ffmpeg_test_success_title') ?? 'FFmpeg is Installed & Functional!',
+                'message' => __('messages.ffmpeg_test_success_msg', ['version' => $version]) ?? "FFmpeg (v{$version}) was detected and tested successfully on your server.",
+                'log' => $fullOutput
+            ]);
+        }
+
+        // Failure diagnostics
+        $suggestions = [];
+        if (!@file_exists($cleanPath)) {
+            $suggestions[] = __('messages.ffmpeg_err_file_not_found', ['path' => $cleanPath]) ?? "The file does not exist at '{$cleanPath}'. Check the path or install FFmpeg.";
+        } elseif (!@is_executable($cleanPath)) {
+            $suggestions[] = __('messages.ffmpeg_err_not_executable', ['path' => $cleanPath]) ?? "The file exists at '{$cleanPath}' but lacks execute permissions. Run: chmod +x {$cleanPath}";
+        } else {
+            $suggestions[] = __('messages.ffmpeg_err_execution_failed', ['code' => $returnVar]) ?? "Execution returned error code ({$returnVar}). Verify that the binary is compiled for this operating system architecture.";
+        }
+
+        return response()->json([
+            'status' => 400,
+            'success' => false,
+            'error_type' => 'test_failed',
+            'title' => __('messages.ffmpeg_test_failed_title') ?? 'FFmpeg Diagnostic Failed',
+            'message' => implode(' ', $suggestions),
+            'suggestions' => $suggestions,
+            'log' => "[COMMAND] {$cmd}\n[EXIT CODE] {$returnVar}\n[OUTPUT]\n" . ($fullOutput ?: '(No output returned. Check server permissions and logs.)')
+        ]);
+    }
 
     /**
      * Admin Discount Codes List

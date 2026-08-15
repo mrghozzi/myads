@@ -40,6 +40,12 @@
                 <i class="fa-solid fa-network-wired text-success me-2"></i>
                 <span>FTP Server</span>
             </a>
+
+            <!-- FFmpeg Video Engine -->
+            <a href="{{ route('admin.settings.ffmpeg') }}" class="storage-nav-pill {{ $currentRoute === 'admin.settings.ffmpeg' ? 'active' : '' }}">
+                <i class="fa-solid fa-film text-danger me-2"></i>
+                <span>FFmpeg Engine</span>
+            </a>
         </div>
 
         <div class="d-none d-md-flex align-items-center gap-2 pe-2">
@@ -74,4 +80,26 @@
     }
     .text-purple { color: #8b5cf6 !important; }
     .text-cyan { color: #0284c7 !important; }
+    .text-amber { color: #d97706 !important; }
+
+    html.app-skin-dark .storage-superdesign-nav > div {
+        background: var(--admin-premium-surface, #23263b) !important;
+        border-color: var(--admin-premium-border, rgba(148, 163, 184, 0.14)) !important;
+    }
+    html.app-skin-dark .storage-superdesign-nav .storage-nav-pill {
+        color: #94a3b8;
+    }
+    html.app-skin-dark .storage-superdesign-nav .storage-nav-pill:hover {
+        color: #f1f5f9;
+        background: rgba(255, 255, 255, 0.05);
+    }
+    html.app-skin-dark .storage-superdesign-nav .storage-nav-pill.active {
+        color: #818cf8 !important;
+        background: rgba(129, 140, 248, 0.15) !important;
+    }
+    html.app-skin-dark .storage-superdesign-nav .badge.bg-light {
+        background: rgba(255, 255, 255, 0.06) !important;
+        color: #cbd5e1 !important;
+        border-color: rgba(255, 255, 255, 0.1) !important;
+    }
 </style>
