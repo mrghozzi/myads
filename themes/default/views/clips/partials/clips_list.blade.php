@@ -1,8 +1,13 @@
 @foreach($activities as $activity)
     @php
         $mediaUrl = null;
+        $posterUrl = null;
         if (isset($activity->related_content->attachments) && $activity->related_content->attachments->count() > 0) {
             $mediaUrl = asset($activity->related_content->attachments->first()->file_path);
+        }
+        $thumbOpt = \App\Models\Option::where('o_parent', $activity->tp_id ?: ($activity->related_content->id ?? $activity->id))->where('o_type', 'image_post')->first();
+        if ($thumbOpt && !empty($thumbOpt->o_valuer)) {
+            $posterUrl = asset($thumbOpt->o_valuer);
         }
         $clipUser = $activity->user;
         $clipUserAvatar = $clipUser ? $clipUser->avatarUrl() : asset('upload/avatar.png');
@@ -22,7 +27,7 @@
             "name": "{{ $clipCaptionPlain ? \Illuminate\Support\Str::limit(trim(preg_replace('/\s+/', ' ', $clipCaptionPlain)), 100) : 'Clip by ' . ($clipUser->username ?? 'User') }}",
             "description": "{{ $clipCaptionPlain ? trim(preg_replace('/\s+/', ' ', $clipCaptionPlain)) : 'Short video clip on MYADS' }}",
             "thumbnailUrl": [
-                "{{ $clipUserAvatar }}"
+                "{{ $posterUrl ?: $clipUserAvatar }}"
             ],
             "uploadDate": "{{ $activity->created_at?->toIso8601String() ?? now()->toIso8601String() }}",
             "contentUrl": "{{ $mediaUrl }}",
@@ -47,7 +52,7 @@
         }
         </script>
         <div class="reel-item" data-id="{{ $activity->id }}" data-tp-id="{{ $activity->tp_id }}" data-s-type="{{ $activity->s_type }}" data-related-id="{{ $activity->related_content->id }}">
-            <video class="reel-video" loop muted playsinline src="{{ $mediaUrl }}" preload="auto"></video>
+            <video class="reel-video" loop muted playsinline src="{{ $mediaUrl }}" @if($posterUrl) poster="{{ $posterUrl }}" @endif preload="auto"></video>
             
             <div class="reel-overlay">
                 <!-- Play/Pause Indicator -->
