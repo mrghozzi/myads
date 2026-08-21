@@ -50,6 +50,7 @@ class PluginServiceProvider extends ServiceProvider
             $activePlugins[] = 'myads-bot';
             $activePlugins[] = 'pollinations-ai-member';
             $activePlugins[] = 'myads-instant-indexer';
+            $activePlugins[] = 'support-chat';
         }
                              
         if (empty($activePlugins)) {
@@ -77,6 +78,7 @@ class PluginServiceProvider extends ServiceProvider
                 $activeDirs[] = 'myads-bot';
                 $activeDirs[] = 'pollinations-ai-member';
                 $activeDirs[] = 'myads-instant-indexer';
+                $activeDirs[] = 'support-chat';
             }
         } catch (\Exception $e) {
             if (app()->environment('testing')) {
@@ -87,6 +89,7 @@ class PluginServiceProvider extends ServiceProvider
                 $activeDirs[] = 'myads-bot';
                 $activeDirs[] = 'pollinations-ai-member';
                 $activeDirs[] = 'myads-instant-indexer';
+                $activeDirs[] = 'support-chat';
             } else {
                 return;
             }
