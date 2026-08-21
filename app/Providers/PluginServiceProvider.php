@@ -50,6 +50,7 @@ class PluginServiceProvider extends ServiceProvider
             $activePlugins[] = 'myads-bot';
             $activePlugins[] = 'pollinations-ai-member';
             $activePlugins[] = 'myads-instant-indexer';
+            $activePlugins[] = 'myads-social-auto-poster';
             $activePlugins[] = 'support-chat';
         }
                              
@@ -78,6 +79,7 @@ class PluginServiceProvider extends ServiceProvider
                 $activeDirs[] = 'myads-bot';
                 $activeDirs[] = 'pollinations-ai-member';
                 $activeDirs[] = 'myads-instant-indexer';
+                $activeDirs[] = 'myads-social-auto-poster';
                 $activeDirs[] = 'support-chat';
             }
         } catch (\Exception $e) {
@@ -89,6 +91,7 @@ class PluginServiceProvider extends ServiceProvider
                 $activeDirs[] = 'myads-bot';
                 $activeDirs[] = 'pollinations-ai-member';
                 $activeDirs[] = 'myads-instant-indexer';
+                $activeDirs[] = 'myads-social-auto-poster';
                 $activeDirs[] = 'support-chat';
             } else {
                 return;

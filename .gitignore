@@ -18,6 +18,10 @@
 /public/hot
 /public/storage
 /public/upload
+/public/*.txt
+!/public/ads.txt
+!/public/app-ads.txt
+!/public/robots.txt
 /storage/*.key
 /storage/installed
 /storage/pail
