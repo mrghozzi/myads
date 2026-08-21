@@ -21,83 +21,52 @@ class PluginServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        // Define plugins path
         $pluginsPath = base_path('plugins');
 
-        if (!File::exists($pluginsPath)) {
+        if (!File::isDirectory($pluginsPath)) {
             return;
         }
 
-        $activePlugins = [];
-
-        try {
-            if (Schema::hasTable('options')) {
-                // Get active plugins from DB
-                $activePlugins = \App\Models\Option::where('o_type', 'plugins')
-                                     ->where('o_valuer', '1')
-                                     ->pluck('name')
-                                     ->toArray();
-            }
-        } catch (\Exception $e) {
-            // Ignore DB errors
-        }
-
-        if (app()->environment('testing')) {
-            $activePlugins[] = 'arabic-fixer';
-            $activePlugins[] = 'groq-adstn-publisher';
-            $activePlugins[] = 'monetization';
-            $activePlugins[] = 'tinymce-editor';
-            $activePlugins[] = 'myads-bot';
-            $activePlugins[] = 'pollinations-ai-member';
-            $activePlugins[] = 'myads-instant-indexer';
-            $activePlugins[] = 'myads-social-auto-poster';
-            $activePlugins[] = 'support-chat';
-        }
-                             
-        if (empty($activePlugins)) {
-            return;
-        }
-        
         $activeDirs = [];
 
-        try {
-            if (Schema::hasTable('options')) {
-                // Resolve plugin directories
-                $pluginManager = new \App\Services\PluginManager();
-                $plugins = $pluginManager->getAllPlugins();
-                
-                foreach ($plugins as $plugin) {
-                    if (in_array($plugin['slug'], $activePlugins, true)) {
-                        $activeDirs[] = $plugin['directory'];
+        // 1. In testing environment: dynamically auto-discover all installed plugins
+        if (app()->environment('testing')) {
+            $directories = File::directories($pluginsPath);
+            foreach ($directories as $dir) {
+                $activeDirs[] = basename($dir);
+            }
+        } else {
+            // 2. In normal environment: fetch active plugin slugs from database
+            $activeSlugs = [];
+            try {
+                if (Schema::hasTable('options')) {
+                    $activeSlugs = \App\Models\Option::where('o_type', 'plugins')
+                                         ->where('o_valuer', '1')
+                                         ->pluck('name')
+                                         ->toArray();
+                }
+            } catch (\Throwable $e) {
+                // Ignore DB connection errors during early bootstrap
+            }
+
+            if (empty($activeSlugs)) {
+                return;
+            }
+
+            // Dynamically match plugin slugs to their directories via plugin.json
+            $directories = File::directories($pluginsPath);
+            foreach ($directories as $dir) {
+                $jsonFile = $dir . '/plugin.json';
+                if (File::exists($jsonFile)) {
+                    $pluginData = json_decode(File::get($jsonFile), true);
+                    if (!empty($pluginData['slug']) && in_array($pluginData['slug'], $activeSlugs, true)) {
+                        $activeDirs[] = basename($dir);
                     }
                 }
-            } else if (app()->environment('testing')) {
-                $activeDirs[] = 'arabic-fixer';
-                $activeDirs[] = 'groq-adstn-publisher';
-                $activeDirs[] = 'monetization';
-                $activeDirs[] = 'myads-tinymce-editor';
-                $activeDirs[] = 'myads-bot';
-                $activeDirs[] = 'pollinations-ai-member';
-                $activeDirs[] = 'myads-instant-indexer';
-                $activeDirs[] = 'myads-social-auto-poster';
-                $activeDirs[] = 'support-chat';
-            }
-        } catch (\Exception $e) {
-            if (app()->environment('testing')) {
-                $activeDirs[] = 'arabic-fixer';
-                $activeDirs[] = 'groq-adstn-publisher';
-                $activeDirs[] = 'monetization';
-                $activeDirs[] = 'myads-tinymce-editor';
-                $activeDirs[] = 'myads-bot';
-                $activeDirs[] = 'pollinations-ai-member';
-                $activeDirs[] = 'myads-instant-indexer';
-                $activeDirs[] = 'myads-social-auto-poster';
-                $activeDirs[] = 'support-chat';
-            } else {
-                return;
             }
         }
 
+        // 3. Boot active plugins
         foreach ($activeDirs as $dirName) {
             $pluginDir = $pluginsPath . '/' . $dirName;
             $bootFile = $pluginDir . '/boot.php';

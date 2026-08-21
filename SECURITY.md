@@ -10,7 +10,7 @@ We provide active security updates and maintenance for the following versions of
 
 | Version | Supported          | Security Maintenance Status |
 | ------- | ------------------ | --------------------------- |
-| 4.5.x   | :white_check_mark: | Active Development, Patches & Latest Features (Current: `v4.5.2`) |
+| 4.5.x   | :white_check_mark: | Active Development, Patches & Latest Features (Current: `v4.5.3`) |
 | 4.4.x   | :white_check_mark: | Active Security Patches Only |
 | 4.3.x   | :white_check_mark: | Critical Security Patches Only |
 | 4.2.x   | :white_check_mark: | Critical Security Patches Only |

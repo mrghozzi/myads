@@ -1,4 +1,4 @@
-# Agents.md — MYADS v4.5.2
+# Agents.md — MYADS v4.5.3
 
 > **Purpose:** This file gives AI coding agents a fast, comprehensive understanding of the MYADS project — its architecture, conventions, key files, and rules — so they can work effectively from a fresh chat context.
 
@@ -6,7 +6,7 @@
 
 ## 1. Project Identity
 
-- **Name:** MYADS v4.5.2
+- **Name:** MYADS v4.5.3
 - **Type:** Social network + ad exchange platform for website owners
 - **Framework:** Laravel 12 (PHP 8.2+)
 - **Database:** MySQL 5.7+ / MariaDB 10.3+
@@ -1080,7 +1080,8 @@ If in doubt, update it. An outdated `Agents.md` causes future agents to make wro
 - **Bug Fix (2026-08-01):** Fixed a 500 error when saving settings on `/admin/database-cleanup`, caused by `AdminController::databaseCleanupAction()` and `DatabaseMaintenanceService` writing/reading non-existent `o_name`/`o_value` columns on the `options` table. Corrected both to use the table's real `name`/`o_valuer` columns scoped with `o_type = 'system_setting'`, so auto-cleanup retention settings now persist and are actually honored.
 - **Bug Fix (2026-08-01):** Fixed misleading "Clean Logs" feedback on `/admin/database-cleanup` — the action always showed a generic success message even when no log files needed cleanup (within retention/size limits), making it look like nothing happened. `AdminController::databaseCleanupAction()` now measures `storage/logs` size before/after running `myads:log-cleanup` and reports the actual space freed, or explains the active retention limits when there is nothing to clean. Added translation keys `logs_cleaned_freed` and `logs_cleaned_none` to `ar`, `en`, `ja`, `ru`, `sr`, `zh_CN`, `zh_TW`.
 - **v4.5.2 Groundwork (2026-08-06):** Initialized release cycle for MYADS v4.5.2, bumped canonical `SystemVersion::CURRENT` to v4.5.2, updated system documentation (`AGENTS.md`, `API_DOCS.md`, `README.md`), configured dynamic admin panel version badges and About page timeline, and integrated modular Rich Text Editor Plugin (`myads-tinymce-editor`).
+- **v4.5.3 Groundwork & Dynamic Plugin Architecture (2026-08-22):** Initialized release cycle for MYADS v4.5.3, bumped canonical `SystemVersion::CURRENT` to v4.5.3, updated system documentation, and completely refactored `PluginServiceProvider` to eliminate all hardcoded plugin names with zero-configuration dynamic auto-discovery in testing and dynamic `plugin.json` slug-to-directory resolution in production.
 
 ---
 
-*Last updated: 2026-08-06 — MYADS v4.5.2 (Groundwork Initialization, TinyMCE Editor Plugin, Extensible Plugin Provider)*
+*Last updated: 2026-08-22 — MYADS v4.5.3 (Groundwork Initialization, Zero-Hardcoding Dynamic Plugin Architecture)*
