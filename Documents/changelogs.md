@@ -1,16 +1,17 @@
 # v4.5.3
-> **Architecture & Dynamic Extensibility Release** — Groundwork Initialization, Zero-Hardcoding Modular Plugin Architecture (`PluginServiceProvider` Auto-Discovery & Dynamic Resolution), and Scalability Enhancements.
+> **Architecture & Dynamic Extensibility Release** — Groundwork Initialization, Zero-Hardcoding Modular Plugin Architecture (`PluginServiceProvider` Auto-Discovery & Dynamic Resolution), Security Patching (`league/commonmark` CVE-2026-71488), and Scalability Enhancements.
 
 ### Core & Infrastructure
 * **Feature (Groundwork Initialization):** Initialized release cycle for MYADS v4.5.3. Updated canonical version constant (`SystemVersion::CURRENT`), system documentation (`AGENTS.md`, `API_DOCS.md`, `README.md`, `SECURITY.md`), and configured dynamic versioning across the platform.
 * **Feature (Zero-Hardcoding Dynamic Plugin Architecture):** Completely refactored `PluginServiceProvider` (`app/Providers/PluginServiceProvider.php`) to eliminate all hardcoded plugin arrays. Implemented zero-configuration dynamic filesystem auto-discovery in testing environments (`File::directories($pluginsPath)`) and dynamic `plugin.json` slug-to-directory matching for active database options in production/development, enabling seamless support for hundreds of independent third-party plugins from any developer.
+* **Security (league/commonmark Quadratic-Time DoS Patch — CVE-2026-71488):** Patched a high-severity denial of service (DoS) algorithmic complexity vulnerability in `league/commonmark` (`< 2.9.0`) by upgrading the dependency to `2.9.0`. This eliminates quadratic time parsing hangs and resource exhaustion when parsing crafted Markdown with multibyte characters across content formatters (`ContentFormatter::format`), group rules, and markdown parsers.
+* **Chore (Dependencies & Vendor Synchronizations):** Synchronized Composer dependencies, upgrading `nette/utils` from `v4.1.4` to `v4.1.5`, `laravel/framework` to `v12.61.1`, and regenerating optimized autoload class mappings.
 
 # v4.5.2
 > **Maintenance & Extension Extensibility Release** — Groundwork Initialization, Modular Rich Text Editor Plugin (`myads-tinymce-editor`) Integration, Extensible Plugin Provider Directory Resolution, and Comprehensive Automated Testing.
 
 ### Core & Infrastructure
 * **Feature (Groundwork Initialization):** Initialized release cycle for MYADS v4.5.2. Updated canonical version constant (`SystemVersion::CURRENT`), system documentation (`AGENTS.md`, `API_DOCS.md`, `README.md`), and configured dynamic versioning across the admin control panel and About page.
-* **Chore (Dependency Update — league/commonmark):** Updated `league/commonmark` from `2.8.2` to `2.9.0` in the Composer dependencies group.
 * **Feature (Extensible Rich Text Editor Plugin Integration — TinyMCE 7):** Designed and created a self-contained, modular Rich Text Editor plugin (`myads-tinymce-editor`) under `plugins/myads-tinymce-editor`. Integrated seamlessly with MYADS v4.5.2's `RichTextEditorService` hook engine (`registered_rich_text_editors`, `render_custom_editor_assets`, `render_custom_editor_js`), allowing site administrators to dynamically select and switch to **TinyMCE 7 (Plugin Editor)** directly from `/admin/settings` when active.
 * **Feature (Plugin Provider Directory Resolution & Testing Fallback):** Updated `PluginServiceProvider` (`app/Providers/PluginServiceProvider.php`) to include `myads-tinymce-editor` in testing active plugin resolutions, ensuring directory-based slug mapping and seamless test execution.
 * **Feature (Graceful Editor Fallback & Safety):** Enforced automatic graceful fallback to the default editor (`quill`) in `RichTextEditorService::getActiveEditor()` whenever `myads-tinymce-editor` is deactivated in `/admin/plugins`, preventing invalid DB option states or missing script errors. Added automated test suite (`TinyMCEEditorPluginTest.php`).
