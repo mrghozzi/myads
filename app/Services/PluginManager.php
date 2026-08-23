@@ -223,7 +223,7 @@ class PluginManager
                             $repo = $matches[2];
                             $apiUrl = "https://api.github.com/repos/{$owner}/{$repo}/releases/latest";
                             
-                            $response = Http::withoutVerifying()
+                            $response = http_secure()
                                            ->withHeaders(['User-Agent' => 'MyAds-Plugin-Manager'])
                                            ->connectTimeout(2)
                                            ->timeout(2)
@@ -244,7 +244,7 @@ class PluginManager
                             }
                         } else {
                             // Standard JSON update check
-                            $response = Http::withoutVerifying()
+                            $response = http_secure()
                                            ->connectTimeout(2)
                                            ->timeout(2)
                                            ->get($updateUrl);
@@ -281,7 +281,7 @@ class PluginManager
                                 ->first();
                             $licenseKey = $licenseKeyOption ? $licenseKeyOption->o_valuer : '';
 
-                            $response = Http::withoutVerifying()
+                            $response = http_secure()
                                            ->connectTimeout(2)
                                            ->timeout(3)
                                            ->post($adstnUrl, [

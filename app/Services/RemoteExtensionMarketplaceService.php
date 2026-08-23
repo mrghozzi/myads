@@ -40,7 +40,7 @@ class RemoteExtensionMarketplaceService
         ];
 
         try {
-            $response = Http::withoutVerifying()
+            $response = http_secure()
                 ->connectTimeout(3)
                 ->withHeaders([
                     'Accept' => 'application/json',
@@ -72,7 +72,7 @@ class RemoteExtensionMarketplaceService
     {
         try {
             $url = $this->fallbackFeedUrl($type);
-            $response = Http::withoutVerifying()
+            $response = http_secure()
                 ->connectTimeout(3)
                 ->withHeaders([
                     'Accept' => 'application/json',

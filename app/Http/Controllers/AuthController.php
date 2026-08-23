@@ -64,7 +64,9 @@ class AuthController extends Controller
         }
 
         $request->validate([
-            'username' => ['required', 'string', 'max:255', 'unique:users'],
+            // SECURITY: Restrict username to safe characters to prevent XSS via username display.
+            // Allows: letters (Latin + Arabic), digits, underscores, hyphens, dots.
+            'username' => ['required', 'string', 'max:255', 'unique:users', 'regex:/^[\p{L}\p{N}_\-\.]+$/u'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'agree_terms' => ['required', 'accepted'],
@@ -225,7 +227,8 @@ class AuthController extends Controller
             }
             
             // Fallback: Check MD5 (Legacy)
-            if ($user->pass === md5($request->input('password'))) {
+            // SECURITY: Use hash_equals() instead of === to prevent timing attacks
+            if (hash_equals($user->pass, md5($request->input('password')))) {
                 \Log::info('MD5 legacy password used — auto-rehashing to bcrypt', ['user_id' => $user->id, 'username' => $user->name]);
                 Auth::login($user, $request->boolean('remember'));
                 

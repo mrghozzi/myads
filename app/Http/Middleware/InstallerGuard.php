@@ -35,8 +35,16 @@ class InstallerGuard
             }
 
             // Fallback security bypass: allow access if a temporary security file exists on the server
-            if (file_exists(storage_path('allow_update'))) {
-                return $next($request);
+            // AND the request includes the matching token stored inside that file.
+            // SECURITY: Just checking file existence was insecure — any file-creation
+            // vulnerability (e.g. arbitrary upload) could bypass authentication.
+            $bypassFile = storage_path('allow_update');
+            if (file_exists($bypassFile)) {
+                $storedToken = trim((string) file_get_contents($bypassFile));
+                $providedToken = (string) $request->query('bypass_token', '');
+                if ($storedToken !== '' && hash_equals($storedToken, $providedToken)) {
+                    return $next($request);
+                }
             }
 
             return redirect('/')->with('error', __('access_denied'));
@@ -65,9 +73,18 @@ class InstallerGuard
             return $next($request);
         }
 
-        // Allow access to finish route (needed after update completes)
+        // Allow access to finish route only for authenticated admins or bypass token holders
+        // SECURITY: Previously this was unrestricted, allowing anyone to trigger
+        // cache clearing and installed-marker creation.
         if ($request->is('install/finish')) {
-            return $next($request);
+            if (\Illuminate\Support\Facades\Auth::check() && \Illuminate\Support\Facades\Auth::user()->isSuperAdmin()) {
+                return $next($request);
+            }
+            // Also allow if the request came from a valid update flow (just completed)
+            if (session()->has('success') || session()->has('log')) {
+                return $next($request);
+            }
+            return redirect('/')->with('error', 'Application is already installed.');
         }
 
         // Installation is fully complete — block all installer routes

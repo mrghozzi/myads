@@ -295,7 +295,7 @@ class ReleaseUpdateService
         $lastPersistedAt = microtime(true);
         $lastPersistedBytes = 0;
 
-        $response = Http::withoutVerifying()->withHeaders([
+        $response = http_secure()->withHeaders([
             'User-Agent' => 'MyAds-Updater/1.0',
         ])->timeout(300)->withOptions([
             'sink' => $zipPath,
@@ -498,10 +498,25 @@ class ReleaseUpdateService
             }
         }
 
+        // SECURITY: Verify script integrity via SHA-256 hash signature before executing.
         $updateScript = base_path('requests' . DIRECTORY_SEPARATOR . 'update.php');
+        $signatureFile = base_path('requests' . DIRECTORY_SEPARATOR . 'update.php.sha256');
         if (File::exists($updateScript)) {
-            $this->updateStageProgress($session, 'finalize', 60, __('messages.update_stage_finalize_running_script'), null, null, true);
-            include_once $updateScript;
+            if (File::exists($signatureFile)) {
+                $expectedHash = trim((string) File::get($signatureFile));
+                $actualHash = hash_file('sha256', $updateScript);
+                if (hash_equals($expectedHash, $actualHash)) {
+                    $this->updateStageProgress($session, 'finalize', 60, __('messages.update_stage_finalize_running_script'), null, null, true);
+                    include_once $updateScript;
+                } else {
+                    \Log::critical('Update script signature mismatch — execution blocked', [
+                        'expected' => $expectedHash,
+                        'actual' => $actualHash,
+                    ]);
+                }
+            } else {
+                \Log::warning('Custom update script found but no signature file — skipped for security');
+            }
         }
 
         $this->updateStageProgress($session, 'finalize', 72, __('messages.update_stage_finalize_running_migrations'), null, null, true);

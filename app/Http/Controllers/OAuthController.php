@@ -63,6 +63,14 @@ class OAuthController extends Controller
         }
 
         if ($request->action === 'reject') {
+            // SECURITY: Validate redirect_uri against registered URIs to prevent Open Redirect.
+            // Without this check, an attacker could craft a malicious OAuth URL with
+            // redirect_uri=https://evil.com to redirect victims to phishing sites.
+            $app = DeveloperApp::where('client_id', $request->client_id)->first();
+            if (!$app || !$app->isActive() || !in_array($request->redirect_uri, $app->redirect_uris)) {
+                return response('Invalid client or redirect URI', 400);
+            }
+
             $redirect = $request->redirect_uri . '?error=access_denied&state=' . urlencode($request->state);
             return redirect($redirect);
         }
@@ -90,11 +98,11 @@ class OAuthController extends Controller
             'client_secret' => 'required|string',
         ]);
 
-        $app = DeveloperApp::where('client_id', $request->client_id)
-            ->where('client_secret', $request->client_secret)
-            ->first();
+        // SECURITY: Do not query by client_secret directly (leaks timing info).
+        // Fetch by client_id only, then compare secret with constant-time hash_equals().
+        $app = DeveloperApp::where('client_id', $request->client_id)->first();
 
-        if (!$app || !$app->isActive()) {
+        if (!$app || !$app->isActive() || !hash_equals((string) $app->client_secret, (string) $request->client_secret)) {
             return response()->json(['error' => 'invalid_client'], 401);
         }
 

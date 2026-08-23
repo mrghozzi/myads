@@ -61,7 +61,9 @@ class StatusController extends Controller
     public function editorUploadImage(Request $request)
     {
         $request->validate([
-            'image' => 'required|image|mimes:jpeg,png,gif,webp,svg|max:5120',
+            // SECURITY: SVG removed — SVG files can contain embedded <script> tags
+            // that execute in the browser, enabling Stored XSS attacks.
+            'image' => 'required|image|mimes:jpeg,png,gif,webp|max:5120',
         ]);
 
         $file = $request->file('image');

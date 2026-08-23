@@ -251,7 +251,7 @@ class AdminUpdatesController extends Controller
     {
         return Cache::remember('github_latest_release', 3600, function () {
             try {
-                $response = Http::withoutVerifying()->withHeaders([
+                $response = http_secure()->withHeaders([
                     'User-Agent' => 'MyAds-Updater/1.0',
                     'Accept'     => 'application/vnd.github.v3+json',
                 ])->timeout(10)->get(self::GITHUB_API_URL);

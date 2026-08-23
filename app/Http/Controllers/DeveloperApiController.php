@@ -114,8 +114,9 @@ class DeveloperApiController extends Controller
         $owner = $auth['token']->app->user;
 
         // Only public content
-        $posts = Status::where('user_id', $owner->id)
-            ->where('privacy', 'public')
+        $posts = Status::visible()
+            ->where('uid', $owner->id)
+            ->where('statu', 1)
             ->orderBy('id', 'desc')
             ->limit(20)
             ->get();
@@ -123,8 +124,8 @@ class DeveloperApiController extends Controller
         $data = $posts->map(function ($post) {
             return [
                 'id' => $post->id,
-                'content' => $post->content,
-                'created_at' => $post->created_at,
+                'content' => $post->txt,
+                'created_at' => $post->date ? date('Y-m-d H:i:s', $post->date) : null,
             ];
         });
 
@@ -155,8 +156,6 @@ class DeveloperApiController extends Controller
                 'type' => 1,
                 'time_t' => time()
             ]);
-            // Increment follower counts etc if needed
-            // This is a simplified version, should ideally use the existing follow logic if decoupled
         }
 
         return $this->successResponse(null, 'Followed successfully');
@@ -167,7 +166,7 @@ class DeveloperApiController extends Controller
         $auth = $this->validateToken($request, 'owner.messages.write');
         if (isset($auth['error'])) return $this->errorResponse($auth['error'], $auth['code']);
 
-        $request->validate(['content' => 'required|string']);
+        $request->validate(['content' => 'required|string|max:2000']);
 
         $user = $auth['token']->user;
         $owner = $auth['token']->app->user;
@@ -182,13 +181,14 @@ class DeveloperApiController extends Controller
         }
 
         $message = Message::create([
-            'sender_id' => $user->id,
-            'receiver_id' => $owner->id,
-            'content' => $request->content,
-            'seen' => 0,
+            'us_env' => $user->id,
+            'us_rec' => $owner->id,
+            'msg' => $request->content,
+            'time' => time(),
+            'state' => 0,
         ]);
 
-        return $this->successResponse(['id' => $message->id], 'Message sent successfully');
+        return $this->successResponse(['id' => $message->id_msg ?? $message->id], 'Message sent successfully');
     }
 
     public function myEmail(Request $request)
@@ -286,7 +286,8 @@ class DeveloperApiController extends Controller
 
         $user = $auth['token']->user;
 
-        $posts = Status::where('user_id', $user->id)
+        $posts = Status::where('uid', $user->id)
+            ->where('statu', 1)
             ->orderBy('id', 'desc')
             ->limit(25)
             ->get();
@@ -294,11 +295,10 @@ class DeveloperApiController extends Controller
         $data = $posts->map(function ($post) {
             return [
                 'id' => $post->id,
-                'content' => $post->content,
-                'privacy' => $post->privacy,
-                'likes_count' => $post->likes_count ?? 0,
+                'content' => $post->txt,
+                'likes_count' => $post->reactions_count ?? 0,
                 'comments_count' => $post->comments_count ?? 0,
-                'created_at' => $post->created_at,
+                'created_at' => $post->date ? date('Y-m-d H:i:s', $post->date) : null,
             ];
         });
 
@@ -312,15 +312,16 @@ class DeveloperApiController extends Controller
 
         $request->validate([
             'content' => 'required|string|max:5000',
-            'privacy' => 'nullable|in:public,followers,private',
         ]);
 
         $user = $auth['token']->user;
 
         $status = Status::create([
-            'user_id' => $user->id,
-            'content' => $request->content,
-            'privacy' => $request->privacy ?? 'public',
+            'uid' => $user->id,
+            'txt' => $request->content,
+            's_type' => 0,
+            'statu' => 1,
+            'date' => time(),
         ]);
 
         return $this->successResponse(['id' => $status->id], 'Post created successfully');
@@ -364,19 +365,19 @@ class DeveloperApiController extends Controller
         $user = $auth['token']->user;
 
         $messages = Message::where(function ($q) use ($user) {
-                $q->where('sender_id', $user->id)->orWhere('receiver_id', $user->id);
+                $q->where('us_env', $user->id)->orWhere('us_rec', $user->id);
             })
-            ->orderBy('id', 'desc')
+            ->orderBy('id_msg', 'desc')
             ->limit(30)
             ->get();
 
         $data = $messages->map(function ($msg) use ($user) {
             return [
-                'id' => $msg->id,
-                'is_sender' => $msg->sender_id === $user->id,
-                'content' => $msg->content,
-                'seen' => (bool) $msg->seen,
-                'created_at' => $msg->created_at,
+                'id' => $msg->id_msg,
+                'is_sender' => (int) $msg->us_env === (int) $user->id,
+                'content' => $msg->text ?? $msg->msg,
+                'seen' => (int) $msg->state === 1,
+                'created_at' => $msg->time ? date('Y-m-d H:i:s', $msg->time) : null,
             ];
         });
 
@@ -409,13 +410,14 @@ class DeveloperApiController extends Controller
         }
 
         $message = Message::create([
-            'sender_id' => $user->id,
-            'receiver_id' => $receiver->id,
-            'content' => $request->content,
-            'seen' => 0,
+            'us_env' => $user->id,
+            'us_rec' => $receiver->id,
+            'msg' => $request->content,
+            'time' => time(),
+            'state' => 0,
         ]);
 
-        return $this->successResponse(['id' => $message->id], 'Message sent successfully');
+        return $this->successResponse(['id' => $message->id_msg ?? $message->id], 'Message sent successfully');
     }
 
     public function myNotifications(Request $request)
@@ -425,12 +427,12 @@ class DeveloperApiController extends Controller
 
         $user = $auth['token']->user;
 
-        $notifications = \App\Models\Notification::where('user_id', $user->id)
+        $notifications = \App\Models\Notification::where('uid', $user->id)
             ->orderBy('id', 'desc')
             ->limit(20)
             ->get();
 
-        $unreadCount = \App\Models\Notification::where('user_id', $user->id)->where('seen', 0)->count();
+        $unreadCount = \App\Models\Notification::where('uid', $user->id)->where('state', 0)->count();
 
         return $this->successResponse([
             'unread_count' => $unreadCount,
@@ -466,7 +468,7 @@ class DeveloperApiController extends Controller
         $auth = $this->validateToken($request, 'user.clips.read');
         if (isset($auth['error'])) return $this->errorResponse($auth['error'], $auth['code']);
 
-        $clips = \App\Models\Short::orderBy('id', 'desc')->limit(20)->get();
+        $clips = Status::visible()->where('s_type', 14)->orderBy('id', 'desc')->limit(20)->get();
 
         return $this->successResponse($clips);
     }
@@ -497,7 +499,7 @@ class DeveloperApiController extends Controller
         if (isset($auth['error'])) return $this->errorResponse($auth['error'], $auth['code']);
 
         $user = $auth['token']->user;
-        $orders = \App\Models\OrderRequest::where('user_id', $user->id)->orderBy('id', 'desc')->limit(20)->get();
+        $orders = \App\Models\OrderRequest::where('uid', $user->id)->orderBy('id', 'desc')->limit(20)->get();
 
         return $this->successResponse($orders);
     }
@@ -508,7 +510,7 @@ class DeveloperApiController extends Controller
         if (isset($auth['error'])) return $this->errorResponse($auth['error'], $auth['code']);
 
         $user = $auth['token']->user;
-        $bannerImpressions = \App\Models\BannerImpression::where('user_id', $user->id)->count();
+        $bannerImpressions = \App\Models\BannerImpression::where('publisher_id', $user->id)->count();
 
         return $this->successResponse([
             'banner_impressions' => $bannerImpressions,

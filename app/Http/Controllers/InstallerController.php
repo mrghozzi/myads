@@ -115,7 +115,12 @@ class InstallerController extends Controller
             return redirect()->route('installer.migrate');
 
         } catch (\Exception $e) {
-            return back()->with('error', 'Database connection failed: ' . $e->getMessage());
+            // SECURITY: Log the full error for debugging but don't expose internal details to the user.
+            \Log::error('Installer DB connection failed: ' . $e->getMessage());
+            $userMessage = app()->environment('local')
+                ? 'Database connection failed: ' . $e->getMessage()
+                : 'Database connection failed. Please verify your credentials and try again.';
+            return back()->with('error', $userMessage);
         }
     }
 
@@ -586,11 +591,29 @@ class InstallerController extends Controller
             }
 
             // Execute custom update script if exists
+            // SECURITY: Verify script integrity via SHA-256 hash signature before executing.
+            // Without this, an attacker who can place a file at requests/update.php
+            // (e.g. via file upload vulnerability) gets arbitrary code execution.
             $updateScript = base_path('requests' . DIRECTORY_SEPARATOR . 'update.php');
+            $signatureFile = base_path('requests' . DIRECTORY_SEPARATOR . 'update.php.sha256');
             if (File::exists($updateScript)) {
-                $log[] = '⏳ Running custom update script...';
-                include_once $updateScript;
-                $log[] = '✅ Custom update script executed';
+                if (File::exists($signatureFile)) {
+                    $expectedHash = trim((string) File::get($signatureFile));
+                    $actualHash = hash_file('sha256', $updateScript);
+                    if (hash_equals($expectedHash, $actualHash)) {
+                        $log[] = '⏳ Running custom update script (signature verified)...';
+                        include_once $updateScript;
+                        $log[] = '✅ Custom update script executed';
+                    } else {
+                        $log[] = '🔴 SECURITY: Custom update script signature mismatch — SKIPPED';
+                        \Log::critical('Update script signature mismatch', [
+                            'expected' => $expectedHash,
+                            'actual' => $actualHash,
+                        ]);
+                    }
+                } else {
+                    $log[] = '⚠️ Custom update script found but no signature file — SKIPPED for security';
+                }
             }
 
             // Seed default data if needed

@@ -77,3 +77,29 @@ if (!function_exists('is_locale_rtl')) {
         return locale_direction($locale) === 'rtl';
     }
 }
+
+if (!function_exists('http_secure')) {
+    /**
+     * Return an Http PendingRequest that only skips SSL verification
+     * in local/testing environments. In production, SSL is always verified
+     * to prevent Man-in-the-Middle attacks.
+     *
+     * Usage: http_secure()->get($url) instead of Http::withoutVerifying()->get($url)
+     *
+     * @return \Illuminate\Http\Client\PendingRequest
+     */
+    function http_secure(): \Illuminate\Http\Client\PendingRequest
+    {
+        $http = \Illuminate\Support\Facades\Http::withHeaders([
+            'User-Agent' => 'MyAds/' . (\App\Support\SystemVersion::CURRENT ?? '4.5.3'),
+        ]);
+
+        // SECURITY: Only disable SSL verification in local/testing environments.
+        // Production MUST verify SSL to prevent MITM attacks during update checks.
+        if (app()->environment('local', 'testing')) {
+            $http = $http->withoutVerifying();
+        }
+
+        return $http;
+    }
+}

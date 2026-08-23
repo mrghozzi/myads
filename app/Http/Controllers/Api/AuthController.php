@@ -45,11 +45,14 @@ class AuthController extends Controller
         }
         
         // Fallback: Check MD5 (Legacy)
-        if ($user->pass === md5($request->input('password'))) {
+        // SECURITY: Use hash_equals() instead of === to prevent timing attacks
+        if (hash_equals($user->pass, md5($request->input('password')))) {
             // Rehash password to Bcrypt
             $user->pass = Hash::make($request->input('password'));
             $user->save();
             
+            \Log::info('MD5 legacy password used via API — auto-rehashed to bcrypt', ['user_id' => $user->id]);
+
             $token = $user->createToken('MobileApp')->plainTextToken;
             return response()->json([
                 'status' => 'success',
@@ -64,6 +67,12 @@ class AuthController extends Controller
                 ]
             ]);
         }
+
+        // SECURITY: Log failed API login attempt for monitoring
+        \Log::warning('Failed API login attempt', [
+            'input' => $input,
+            'ip' => $request->ip(),
+        ]);
 
         return response()->json([
             'status' => 'error',
