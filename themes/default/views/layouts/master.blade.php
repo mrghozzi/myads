@@ -2113,6 +2113,18 @@
         }
     ?>
     @include('theme::partials.continuous_audio_player')
+    @auth
+    <script>
+        window.MyAdsLiveConfig = {
+            enabled: true,
+            userId: {{ (int) auth()->id() }},
+            streamUrl: '{{ route('live.stream') }}',
+            fallbackPollUrl: '{{ url('/api/notifications/unread-count') }}',
+            pollInterval: 30000
+        };
+    </script>
+    <script src="{{ theme_asset('js/live-events.js') }}" defer></script>
+    @endauth
     <?php
         \App\Helpers\Hooks::do_action('theme_master_before_body_close');
     ?>

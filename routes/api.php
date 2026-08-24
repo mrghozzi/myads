@@ -114,6 +114,9 @@ Route::middleware(['api.key', 'auth:sanctum'])->group(function () {
     Route::post('/notifications/read-all', [App\Http\Controllers\Api\NotificationController::class, 'markAllAsRead']);
     Route::post('/notifications/{id}/read', [App\Http\Controllers\Api\NotificationController::class, 'markAsRead']);
 
+    // Live Event Stream (SSE)
+    Route::get('/live/stream', [App\Http\Controllers\LiveStreamController::class, 'stream'])->name('api.live.stream');
+
     // Wallet API
     Route::get('/wallet/balance', [App\Http\Controllers\Api\WalletController::class, 'balance']);
 

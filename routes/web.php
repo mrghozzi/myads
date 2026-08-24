@@ -210,6 +210,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/notification', [NotificationController::class, 'index'])->name('notifications.index');
     Route::post('/notification/mark-all-read', [NotificationController::class, 'markAllAsRead'])->name('notifications.mark_all_read');
     Route::get('/notif/{id}', [NotificationController::class, 'show'])->name('notifications.show');
+    Route::get('/live/stream', [\App\Http\Controllers\LiveStreamController::class, 'stream'])->name('live.stream');
     Route::get('/settings/billing', [BillingController::class, 'dashboard'])->name('billing.dashboard');
     Route::post('/plans/{plan}/purchase', [BillingController::class, 'purchase'])->name('billing.purchase');
     Route::get('/billing/orders/{order}', [BillingController::class, 'showOrder'])->name('billing.orders.show');

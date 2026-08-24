@@ -67,6 +67,7 @@ Thumbs.db
 !/tests/Feature/CommunityFeedFeatureTest.php
 !/tests/Feature/StoreProductKnowledgebaseUiTest.php
 !/tests/Feature/MessagesRealtimeFeatureTest.php
+!/tests/Feature/LiveEventStreamTest.php
 ~/.pi/
 /wiki/
 /brain/

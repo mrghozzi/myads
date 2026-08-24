@@ -955,6 +955,13 @@
         refreshConversation();
       }
     });
+
+    // Real-Time Event Listener (RT-04 SSE Live Stream)
+    window.addEventListener('myads:live-message', function (e) {
+      if (e.detail && e.detail.has_new) {
+        refreshConversation();
+      }
+    });
   });
 
   window.addEventListener('beforeunload', function () {
