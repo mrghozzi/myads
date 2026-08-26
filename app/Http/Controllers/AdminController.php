@@ -272,11 +272,15 @@ class AdminController extends Controller
         }
 
         $startDate = now()->subDays($days)->startOfDay()->timestamp;
+        $isSqlite = DB::connection()->getDriverName() === 'sqlite';
+        $dayDateExpr = $isSqlite ? 'strftime(\'%b %d\', datetime(date, \'unixepoch\')) as day' : 'FROM_UNIXTIME(date, "%b %d") as day';
+        $dayOrderExpr = $isSqlite ? 'strftime(\'%b %d\', datetime(o_order, \'unixepoch\')) as day' : 'FROM_UNIXTIME(o_order, "%b %d") as day';
+        $dayTimeExpr = $isSqlite ? 'strftime(\'%b %d\', datetime(time_t, \'unixepoch\')) as day' : 'FROM_UNIXTIME(time_t, "%b %d") as day';
 
         // Posts by type
         $postTypesRaw = Status::where('date', '>=', $startDate)
             ->whereIn('s_type', [100, 2, 4, 10, 7867, 6, 5, 11, 12, 13, 14, \App\Services\KnowledgebaseCommunityService::STATUS_TYPE])
-            ->select(DB::raw('FROM_UNIXTIME(date, "%b %d") as day'), 's_type', DB::raw('count(*) as count'))
+            ->select(DB::raw($dayDateExpr), 's_type', DB::raw('count(*) as count'))
             ->groupBy('day', 's_type')
             ->get();
 
@@ -288,7 +292,7 @@ class AdminController extends Controller
         // Aggregated Option Comments grouped by o_type and day in ONE query
         $optionCommentsGrouped = Option::whereIn('o_type', ['d_coment', 's_coment', \App\Services\KnowledgebaseCommunityService::COMMENT_OPTION_TYPE])
             ->where('o_order', '>=', $startDate)
-            ->select('o_type', DB::raw('FROM_UNIXTIME(o_order, "%b %d") as day'), DB::raw('count(*) as count'))
+            ->select('o_type', DB::raw($dayOrderExpr), DB::raw('count(*) as count'))
             ->groupBy('o_type', 'day')
             ->get();
 
@@ -309,7 +313,7 @@ class AdminController extends Controller
         // Aggregated Likes by type and day in ONE query
         $likesGroupedRaw = \App\Models\Like::where('time_t', '>=', $startDate)
             ->whereIn('type', [1, 2, 3, 6, 14, 22, \App\Services\KnowledgebaseCommunityService::REACTION_TYPE])
-            ->select('type', DB::raw('FROM_UNIXTIME(time_t, "%b %d") as day'), DB::raw('count(*) as count'))
+            ->select('type', DB::raw($dayTimeExpr), DB::raw('count(*) as count'))
             ->groupBy('type', 'day')
             ->get();
 
@@ -541,6 +545,16 @@ class AdminController extends Controller
                 'tip' => __('messages.tip_youtube_desc'),
                 'action_text' => __('messages.yt_campaigns'),
                 'action_url' => route('admin.youtube.index'),
+            ],
+            [
+                'id' => 17,
+                'category' => __('messages.theme_customizer') ?? 'مخصص القوالب',
+                'icon' => 'feather-layout',
+                'badge_bg' => 'linear-gradient(135deg, #6366f1, #9333ea)',
+                'title' => __('messages.tip_theme_customizer_title'),
+                'tip' => __('messages.tip_theme_customizer_desc'),
+                'action_text' => __('messages.theme_customizer') ?? 'مخصص القوالب',
+                'action_url' => route('admin.themes.customizer'),
             ],
         ];
 

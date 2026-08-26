@@ -4119,6 +4119,8 @@ return [
     'tip_mobile_desc' => 'Monitoring mobile API security keys and release versions expands active user retention across mobile platforms.',
     'tip_youtube_title' => 'Monitor YouTube Watch-to-Earn Exchange',
     'tip_youtube_desc' => 'Reviewing YouTube watch campaigns and PTS reward settings incentivizes creators to boost their channel audience.',
+    'tip_theme_customizer_title' => 'Live Theme Customizer & Design Tokens',
+    'tip_theme_customizer_desc' => 'Use the Live Theme Customizer to tune brand colors, typography, border radiuses, and glassmorphism with real-time split-screen device previews without code editing.',
     'another_tip' => 'Another Tip',
     'tips_rotate_on_refresh' => 'Tips rotate on page refresh',
     'server_database' => 'Server & Database:',

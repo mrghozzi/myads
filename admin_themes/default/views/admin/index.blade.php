@@ -1077,6 +1077,36 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Error fetching marketplace recommendations:', error);
         });
     }
+
+    // Dynamic Tips Rotator
+    var adminTips = @json($adminTips);
+    var currentTipId = {{ $currentTip['id'] ?? 1 }};
+    var currentTipIdx = Math.max(0, adminTips.findIndex(function(t) { return t.id === currentTipId; }));
+    var btnRotateTip = document.getElementById('btn-rotate-tip');
+    if (btnRotateTip && adminTips && adminTips.length > 0) {
+        btnRotateTip.addEventListener('click', function() {
+            currentTipIdx = (currentTipIdx + 1) % adminTips.length;
+            var tip = adminTips[currentTipIdx];
+            if (!tip) return;
+
+            var badge = document.getElementById('tip-category-badge');
+            var icon = document.getElementById('tip-category-icon');
+            var catText = document.getElementById('tip-category-text');
+            var title = document.getElementById('tip-title');
+            var desc = document.getElementById('tip-desc');
+            var actionLink = document.getElementById('tip-action-link');
+
+            if (badge) badge.style.background = tip.badge_bg;
+            if (icon) icon.className = tip.icon;
+            if (catText) catText.textContent = tip.category;
+            if (title) title.textContent = '💡 ' + tip.title;
+            if (desc) desc.textContent = tip.tip;
+            if (actionLink) {
+                actionLink.href = tip.action_url;
+                actionLink.innerHTML = tip.action_text + ' <i class="feather-arrow-left ms-1"></i>';
+            }
+        });
+    }
 });
 </script>
 @endpush
