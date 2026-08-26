@@ -1,14 +1,23 @@
 @php
     $developerApp = (isset($app) && $app instanceof \App\Models\DeveloperApp) ? $app : null;
-    $selectedScopes = old('requested_scopes', $developerApp ? ($developerApp->requested_scopes ?? []) : []);
-    if (!is_array($selectedScopes)) {
+    $rawScopes = old('requested_scopes', $developerApp ? ($developerApp->requested_scopes ?? []) : []);
+    if (is_string($rawScopes)) {
+        $selectedScopes = json_decode($rawScopes, true) ?? [];
+    } elseif (is_array($rawScopes)) {
+        $selectedScopes = $rawScopes;
+    } else {
         $selectedScopes = [];
     }
 
-    $redirectUrisValue = old(
-        'redirect_uris',
-        $developerApp ? implode(', ', $developerApp->redirect_uris ?? []) : ''
-    );
+    $rawRedirectUris = old('redirect_uris', $developerApp ? ($developerApp->redirect_uris ?? '') : '');
+    if (is_array($rawRedirectUris)) {
+        $redirectUrisValue = implode(', ', $rawRedirectUris);
+    } elseif (is_string($rawRedirectUris)) {
+        $decoded = json_decode($rawRedirectUris, true);
+        $redirectUrisValue = is_array($decoded) ? implode(', ', $decoded) : $rawRedirectUris;
+    } else {
+        $redirectUrisValue = '';
+    }
 @endphp
 
 <div class="dev-form-section">

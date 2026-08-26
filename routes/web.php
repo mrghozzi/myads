@@ -162,7 +162,7 @@ Route::prefix('developer')->group(function () {
     Route::get('/apps/create', [App\Http\Controllers\DeveloperPlatformController::class, 'create'])->name('developer.apps.create');
     Route::post('/apps', [App\Http\Controllers\DeveloperPlatformController::class, 'store'])->name('developer.apps.store');
     Route::get('/apps/{app}', [App\Http\Controllers\DeveloperPlatformController::class, 'show'])->name('developer.apps.show');
-    Route::put('/apps/{app}', [App\Http\Controllers\DeveloperPlatformController::class, 'update'])->name('developer.apps.update');
+    Route::match(['PUT', 'POST', 'PATCH'], '/apps/{app}', [App\Http\Controllers\DeveloperPlatformController::class, 'update'])->name('developer.apps.update');
     Route::post('/apps/{app}/rotate-secret', [App\Http\Controllers\DeveloperPlatformController::class, 'rotateSecret'])->name('developer.apps.rotate_secret');
     Route::post('/apps/{app}/submit', [App\Http\Controllers\DeveloperPlatformController::class, 'submit'])->name('developer.apps.submit');
 });

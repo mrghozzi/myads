@@ -118,21 +118,24 @@ class DeveloperPlatformController extends Controller
             'domain' => 'required|url|max:191',
             'description' => 'required|string|max:1000',
             'redirect_uris' => 'required|string',
-            'requested_scopes' => 'array',
+            'requested_scopes' => 'nullable|array',
         ]);
 
-        $redirectUris = array_map('trim', explode(',', $request->redirect_uris));
+        $redirectUris = array_values(array_filter(array_map('trim', explode(',', $request->redirect_uris))));
+        $scopes = is_array($request->requested_scopes)
+            ? array_values(array_filter($request->requested_scopes))
+            : [];
 
         $sensitiveFieldsChanged = 
             $app->domain !== $request->domain ||
             $app->redirect_uris !== $redirectUris ||
-            $app->requested_scopes !== ($request->requested_scopes ?? []);
+            $app->requested_scopes !== $scopes;
 
         $app->name = $request->name;
         $app->domain = $request->domain;
         $app->description = $request->description;
         $app->redirect_uris = $redirectUris;
-        $app->requested_scopes = $request->requested_scopes ?? [];
+        $app->requested_scopes = $scopes;
 
         if ($sensitiveFieldsChanged && in_array($app->status, ['active', 'rejected'])) {
             $app->status = 'pending_review';
