@@ -72,7 +72,7 @@ class AdsServingController extends Controller
     // Public: Serve Banner Script (bn.php)
     public function bannerScript(Request $request, SmartAdGeoResolver $geoResolver)
     {
-        $user_id = $request->query('ID');
+        $user_id = $request->query('ID') ?? $request->query('id');
         $slotId = $this->normalizeSlotId($request->query('slot'));
         ['placement' => $placementMode, 'size' => $pxValue] = $this->resolveBannerPlacement($request);
 
@@ -97,11 +97,19 @@ class AdsServingController extends Controller
         $countryCode = $geoResolver->resolveCountryCode($request);
         $deviceType = $this->resolveSmartDeviceType($request);
 
-        $bannerQuery = Banner::where('statu', 1)
-            ->whereIn('px', BannerSizeCatalog::queryCandidates($pxValue))
-            ->whereHas('user', function ($query) use ($user_id) {
-                $query->where('nvu', '>=', 1)->where('id', '!=', $user_id);
-            });
+        $microCacheKey = 'active_banner_pool_' . md5($pxValue . '_' . $countryCode . '_' . $deviceType);
+        $poolIds = Cache::remember($microCacheKey, 20, function () use ($pxValue, $countryCode, $deviceType) {
+            $q = Banner::where('statu', 1)
+                ->whereIn('px', BannerSizeCatalog::queryCandidates($pxValue))
+                ->whereHas('user', function ($query) {
+                    $query->where('nvu', '>=', 1);
+                });
+            $this->applyTargetingConstraints($q, $countryCode, $deviceType, 'banner');
+            return $q->pluck('banner.id')->toArray();
+        });
+
+        $bannerQuery = Banner::whereIn('id', $poolIds)
+            ->where('uid', '!=', $user_id);
 
         if ($repeatWindowSeconds > 0 && $this->bannerImpressionsEnabled()) {
             $cutoff = time() - $repeatWindowSeconds;
@@ -126,7 +134,6 @@ class AdsServingController extends Controller
             }
         }
 
-        $this->applyTargetingConstraints($bannerQuery, $countryCode, $deviceType, 'banner');
         $ids = $bannerQuery->pluck('banner.id')->toArray();
         
         $banner = null;
@@ -206,7 +213,7 @@ class AdsServingController extends Controller
     // Public: Serve Link Script (link.php)
     public function linkScript(Request $request, SmartAdGeoResolver $geoResolver)
     {
-        $user_id = $request->query('ID');
+        $user_id = $request->query('ID') ?? $request->query('id');
         $slotId = $this->normalizeSlotId($request->query('slot'));
         $px = $request->query('px');
         $linkPlacement = $this->normalizeLinkPlacement($px);
@@ -232,10 +239,18 @@ class AdsServingController extends Controller
         $linkRepeatWindowSeconds = LinkServingSettings::repeatWindowMinutes() * 60;
         $visitorIp = $request->ip();
 
-        $linkQuery = Link::where('statu', 1)
-            ->whereHas('user', function ($query) use ($user_id) {
-                $query->where('nlink', '>=', 1)->where('id', '!=', $user_id);
-            });
+        $microCacheKey = 'active_link_pool_' . md5($countryCode . '_' . $deviceType);
+        $poolIds = Cache::remember($microCacheKey, 20, function () use ($countryCode, $deviceType) {
+            $q = Link::where('statu', 1)
+                ->whereHas('user', function ($query) {
+                    $query->where('nlink', '>=', 1);
+                });
+            $this->applyTargetingConstraints($q, $countryCode, $deviceType, 'link');
+            return $q->pluck('link.id')->toArray();
+        });
+
+        $linkQuery = Link::whereIn('id', $poolIds)
+            ->where('uid', '!=', $user_id);
 
         if ($linkRepeatWindowSeconds > 0) {
             $cutoff = time() - $linkRepeatWindowSeconds;
@@ -250,7 +265,6 @@ class AdsServingController extends Controller
             });
         }
 
-        $this->applyTargetingConstraints($linkQuery, $countryCode, $deviceType, 'link');
         $ids1 = $linkQuery->pluck('link.id')->toArray();
         
         $link1 = null;
@@ -267,12 +281,9 @@ class AdsServingController extends Controller
 
         // Fallback if no links found due to repeat window
         if (!$link1 && $linkRepeatWindowSeconds > 0) {
-            $fallbackQuery1 = Link::where('statu', 1)
-                ->whereHas('user', function ($query) use ($user_id) {
-                    $query->where('nlink', '>=', 1)->where('id', '!=', $user_id);
-                });
+            $fallbackQuery1 = Link::whereIn('id', $poolIds)
+                ->where('uid', '!=', $user_id);
             
-            $this->applyTargetingConstraints($fallbackQuery1, $countryCode, $deviceType, 'link');
             $fallbackIds1 = $fallbackQuery1->pluck('link.id')->toArray();
             
             if (!empty($fallbackIds1)) {
@@ -294,13 +305,10 @@ class AdsServingController extends Controller
         // 3. Select Second Link ($ab2)
         // Logic: Link from user who has nlink >= 1, NOT same user as publisher, AND NOT same user as first link owner
         // AND NOT the same link as first link.
-        $linkQuery2 = Link::where('statu', 1)
+        $linkQuery2 = Link::whereIn('id', $poolIds)
             ->where('id', '!=', ($link1 ? $link1->id : 0))
-            ->whereHas('user', function ($query) use ($user_id, $link1) {
-                $query->where('nlink', '>=', 1)
-                      ->where('id', '!=', $user_id)
-                      ->where('id', '!=', ($link1 ? $link1->uid : 0));
-            });
+            ->where('uid', '!=', $user_id)
+            ->where('uid', '!=', ($link1 ? $link1->uid : 0));
             
         if ($linkRepeatWindowSeconds > 0) {
             $cutoff = time() - $linkRepeatWindowSeconds;
@@ -315,7 +323,6 @@ class AdsServingController extends Controller
             });
         }
 
-        $this->applyTargetingConstraints($linkQuery2, $countryCode, $deviceType, 'link');
         $ids2 = $linkQuery2->pluck('link.id')->toArray();
         
         $link2 = null;
@@ -447,7 +454,7 @@ class AdsServingController extends Controller
     // Public: Serve Smart Ads Script (smart.php)
     public function smartScript(Request $request, SmartAdGeoResolver $geoResolver)
     {
-        $user_id = $request->query('ID');
+        $user_id = $request->query('ID') ?? $request->query('id');
         $slotId = $this->normalizeSlotId($request->query('slot'));
 
         if (!$user_id || !is_numeric($user_id)) {
@@ -619,8 +626,10 @@ class AdsServingController extends Controller
 
         $this->applyTargetingConstraints($query, $countryCode, $deviceType, 'smart_ads');
 
-        // Pluck IDs instead of hydrating all models into memory (v4.4.4 perf fix)
-        $ids = $query->pluck('smart_ads.id')->toArray();
+        $microCacheKey = 'active_smart_ads_pool_' . md5(($selfOnly ? 'self_' . $publisherId : 'all') . '_' . $countryCode . '_' . $deviceType);
+        $ids = Cache::remember($microCacheKey, 20, function () use ($query) {
+            return $query->pluck('smart_ads.id')->toArray();
+        });
 
         if ($ids === []) {
             return null;

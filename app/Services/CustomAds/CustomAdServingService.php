@@ -19,22 +19,34 @@ class CustomAdServingService
         }
 
         $now = now();
+        $cacheKey = 'custom_ad_active_deal_ids_' . $placement->id;
+
+        $dealIds = \Illuminate\Support\Facades\Cache::remember($cacheKey, 20, function () use ($placement, $now) {
+            return CustomAdDeal::query()
+                ->where('placement_id', $placement->id)
+                ->where('status', CustomAdDeal::STATUS_ACTIVE)
+                ->where(function ($query) use ($now) {
+                    $query->whereNull('starts_at')->orWhere('starts_at', '<=', $now);
+                })
+                ->where(function ($query) use ($now) {
+                    $query->whereNull('ends_at')->orWhere('ends_at', '>=', $now);
+                })
+                ->whereHas('creative', function ($query) {
+                    $query->where('status', CustomAdCreative::STATUS_APPROVED);
+                })
+                ->pluck('id')
+                ->toArray();
+        });
+
+        if (empty($dealIds)) {
+            return null;
+        }
+
+        $selectedId = count($dealIds) === 1 ? $dealIds[0] : $dealIds[array_rand($dealIds)];
 
         return CustomAdDeal::query()
             ->with('creative')
-            ->where('placement_id', $placement->id)
-            ->where('status', CustomAdDeal::STATUS_ACTIVE)
-            ->where(function ($query) use ($now) {
-                $query->whereNull('starts_at')->orWhere('starts_at', '<=', $now);
-            })
-            ->where(function ($query) use ($now) {
-                $query->whereNull('ends_at')->orWhere('ends_at', '>=', $now);
-            })
-            ->whereHas('creative', function ($query) {
-                $query->where('status', CustomAdCreative::STATUS_APPROVED);
-            })
-            ->inRandomOrder()
-            ->first();
+            ->find($selectedId);
     }
 
     public function recordImpression(

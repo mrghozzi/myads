@@ -143,6 +143,8 @@ class GamificationService
                     'visit_exchange_completed' => ['visit_exchanges'],
                     'order_request_created' => ['order_requests_count'],
                     'order_bid_created' => ['order_bids_count'],
+                    'order_offer_awarded' => ['best_offers_won'],
+                    'five_star_rating_received' => ['five_star_ratings'],
                     'forum_topic_created' => ['forum_topics_count', 'unique_categories_topics'],
                     'forum_reply_created' => ['forum_replies_count', 'comment_count'],
                     default => [],

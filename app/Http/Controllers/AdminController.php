@@ -703,9 +703,9 @@ class AdminController extends Controller
             'banner_fallback_to_seen' => 'nullable|boolean',
             'banner_prevent_concurrent_duplicates' => 'nullable|boolean',
             'link_repeat_window_minutes' => 'nullable|integer|min:0|max:525600',
-            'visit_daily_limit' => 'required|integer|min:1|max:1000',
-            'visit_points_reward' => 'required|numeric|min:0|max:1000',
-            'visit_vu_reward' => 'required|numeric|min:0|max:100',
+            'visit_daily_limit' => 'nullable|integer|min:1|max:1000',
+            'visit_points_reward' => 'nullable|numeric|min:0|max:1000',
+            'visit_vu_reward' => 'nullable|numeric|min:0|max:100',
             'smart_ads_points_divisor' => 'nullable|numeric|min:0.1|max:1000',
             'ip_visibility' => 'nullable|string',
         ]);
@@ -746,7 +746,7 @@ class AdminController extends Controller
                 'name' => BannerServingSettings::FALLBACK_TO_SEEN_NAME,
             ],
             [
-                'o_valuer' => $request->has('banner_fallback_to_seen') ? 'true' : 'false',
+                'o_valuer' => !empty($validated['banner_fallback_to_seen']) ? '1' : '0',
             ]
         );
 
@@ -756,7 +756,7 @@ class AdminController extends Controller
                 'name' => BannerServingSettings::PREVENT_CONCURRENT_NAME,
             ],
             [
-                'o_valuer' => $request->has('banner_prevent_concurrent_duplicates') ? 'true' : 'false',
+                'o_valuer' => !empty($validated['banner_prevent_concurrent_duplicates']) ? '1' : '0',
             ]
         );
 
@@ -770,35 +770,41 @@ class AdminController extends Controller
             ]
         );
 
-        Option::updateOrCreate(
-            [
-                'o_type' => VisitExchangeSettings::OPTION_TYPE,
-                'name' => VisitExchangeSettings::DAILY_LIMIT_NAME,
-            ],
-            [
-                'o_valuer' => (string) $validated['visit_daily_limit'],
-            ]
-        );
+        if (isset($validated['visit_daily_limit'])) {
+            Option::updateOrCreate(
+                [
+                    'o_type' => VisitExchangeSettings::OPTION_TYPE,
+                    'name' => VisitExchangeSettings::DAILY_LIMIT_NAME,
+                ],
+                [
+                    'o_valuer' => (string) $validated['visit_daily_limit'],
+                ]
+            );
+        }
 
-        Option::updateOrCreate(
-            [
-                'o_type' => VisitExchangeSettings::OPTION_TYPE,
-                'name' => VisitExchangeSettings::POINTS_REWARD_NAME,
-            ],
-            [
-                'o_valuer' => (string) $validated['visit_points_reward'],
-            ]
-        );
+        if (isset($validated['visit_points_reward'])) {
+            Option::updateOrCreate(
+                [
+                    'o_type' => VisitExchangeSettings::OPTION_TYPE,
+                    'name' => VisitExchangeSettings::POINTS_REWARD_NAME,
+                ],
+                [
+                    'o_valuer' => (string) $validated['visit_points_reward'],
+                ]
+            );
+        }
 
-        Option::updateOrCreate(
-            [
-                'o_type' => VisitExchangeSettings::OPTION_TYPE,
-                'name' => VisitExchangeSettings::VU_REWARD_NAME,
-            ],
-            [
-                'o_valuer' => (string) $validated['visit_vu_reward'],
-            ]
-        );
+        if (isset($validated['visit_vu_reward'])) {
+            Option::updateOrCreate(
+                [
+                    'o_type' => VisitExchangeSettings::OPTION_TYPE,
+                    'name' => VisitExchangeSettings::VU_REWARD_NAME,
+                ],
+                [
+                    'o_valuer' => (string) $validated['visit_vu_reward'],
+                ]
+            );
+        }
 
         Option::updateOrCreate(
             [

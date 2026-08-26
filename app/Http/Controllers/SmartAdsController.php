@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Option;
 use App\Models\Setting;
 use App\Models\SmartAd;
+use App\Models\User;
 use App\Services\SecurityPolicyService;
 use App\Services\SmartAdAnalyzer;
 use App\Support\SmartAdEmbedCode;
