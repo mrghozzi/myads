@@ -28,6 +28,12 @@ if (!function_exists('theme_asset')) {
             // Fallback to default
         }
 
+        if (request()->has('preview_theme') && is_dir(base_path('themes/' . request()->query('preview_theme')))) {
+            $theme = (string) request()->query('preview_theme');
+        } elseif (request()->has('theme_preview') && request()->has('theme') && is_dir(base_path('themes/' . request()->query('theme')))) {
+            $theme = (string) request()->query('theme');
+        }
+
         return asset("themes/{$theme}/assets/{$path}");
     }
 }

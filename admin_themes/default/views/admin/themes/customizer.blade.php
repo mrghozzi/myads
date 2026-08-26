@@ -36,9 +36,9 @@
             <div class="d-flex align-items-center gap-3">
                 <!-- Theme Switcher -->
                 <div class="dropdown">
-                    <button class="btn btn-sm btn-outline-dark dropdown-toggle rounded-pill px-3" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="feather-layout me-1"></i>
-                        <span class="fw-semibold">{{ $themeSlug }}</span>
+                    <button class="btn btn-sm btn-outline-dark dropdown-toggle rounded-pill px-3 shadow-none d-inline-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fa-solid fa-layer-group text-primary"></i>
+                        <span class="fw-semibold">{{ collect($themes)->firstWhere('slug', $themeSlug)['name'] ?? strtoupper($themeSlug) }}</span>
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0 rounded-3">
                         @foreach($themes as $t)
@@ -56,14 +56,14 @@
 
                 <!-- Device Preview Switcher -->
                 <div class="btn-group btn-group-sm bg-light p-1 rounded-pill border" role="group">
-                    <button type="button" class="btn btn-sm rounded-pill active px-3" id="device-desktop" title="Desktop View" onclick="setPreviewDevice('desktop')">
-                        <i class="feather-monitor"></i>
+                    <button type="button" class="btn btn-sm rounded-pill btn-primary text-white active px-3" id="device-desktop" title="Desktop View (100%)" onclick="setPreviewDevice('desktop')">
+                        <i class="fa-solid fa-desktop"></i>
                     </button>
-                    <button type="button" class="btn btn-sm rounded-pill px-3" id="device-tablet" title="Tablet View" onclick="setPreviewDevice('tablet')">
-                        <i class="feather-tablet"></i>
+                    <button type="button" class="btn btn-sm rounded-pill btn-light text-dark px-3" id="device-tablet" title="Tablet View (768px)" onclick="setPreviewDevice('tablet')">
+                        <i class="fa-solid fa-tablet-screen-button"></i>
                     </button>
-                    <button type="button" class="btn btn-sm rounded-pill px-3" id="device-mobile" title="Mobile View" onclick="setPreviewDevice('mobile')">
-                        <i class="feather-smartphone"></i>
+                    <button type="button" class="btn btn-sm rounded-pill btn-light text-dark px-3" id="device-mobile" title="Mobile View (375px)" onclick="setPreviewDevice('mobile')">
+                        <i class="fa-solid fa-mobile-screen-button"></i>
                     </button>
                 </div>
 
@@ -248,7 +248,7 @@
                         </div>
                         <div class="preview-url-pill bg-white px-4 py-1 rounded-pill fs-12 text-muted border text-truncate" style="max-width: 400px;">
                             <i class="feather-lock me-1 text-success fs-10"></i>
-                            <span id="preview-url-text">{{ url('/?theme_preview=1') }}</span>
+                            <span id="preview-url-text">{{ url('/?theme_preview=1&preview_theme=' . $themeSlug) }}</span>
                         </div>
                         <div class="d-flex align-items-center gap-2">
                             <button type="button" class="btn btn-sm btn-icon text-muted" onclick="reloadPreview()" title="Reload Preview">
@@ -257,8 +257,8 @@
                         </div>
                     </div>
 
-                    <div class="preview-frame-wrapper flex-grow-1 d-flex justify-content-center align-items-stretch overflow-hidden p-2 bg-light rounded-bottom-3 position-relative">
-                        <iframe id="theme-preview-frame" src="{{ url('/?theme_preview=1') }}" class="preview-iframe shadow-sm border-0 rounded-3 w-100 h-100" style="transition: width 0.3s ease;"></iframe>
+                    <div class="preview-frame-wrapper flex-grow-1 d-flex justify-content-center align-items-stretch overflow-hidden p-2 rounded-bottom-3 position-relative" style="background: #e2e8f0 !important;">
+                        <iframe id="theme-preview-frame" src="{{ url('/?theme_preview=1&preview_theme=' . $themeSlug) }}" class="preview-iframe shadow-sm border-0 rounded-3 h-100" style="width: 100%; max-width: 100%; height: 100%; transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1); background: #ffffff;"></iframe>
                     </div>
                 </div>
             </div>
@@ -300,16 +300,31 @@
     }
 
     function setPreviewDevice(device) {
-        document.querySelectorAll('#device-desktop, #device-tablet, #device-mobile').forEach(btn => btn.classList.remove('active'));
-        document.getElementById('device-' + device).classList.add('active');
+        ['desktop', 'tablet', 'mobile'].forEach(d => {
+            const btn = document.getElementById('device-' + d);
+            if (btn) {
+                if (d === device) {
+                    btn.classList.add('active', 'btn-primary', 'text-white');
+                    btn.classList.remove('btn-light', 'text-dark');
+                } else {
+                    btn.classList.remove('active', 'btn-primary', 'text-white');
+                    btn.classList.add('btn-light', 'text-dark');
+                }
+            }
+        });
 
         const frame = document.getElementById('theme-preview-frame');
+        if (!frame) return;
+
         if (device === 'mobile') {
-            frame.style.width = '375px';
+            frame.style.setProperty('width', '375px', 'important');
+            frame.style.setProperty('max-width', '375px', 'important');
         } else if (device === 'tablet') {
-            frame.style.width = '768px';
+            frame.style.setProperty('width', '768px', 'important');
+            frame.style.setProperty('max-width', '768px', 'important');
         } else {
-            frame.style.width = '100%';
+            frame.style.setProperty('width', '100%', 'important');
+            frame.style.setProperty('max-width', '100%', 'important');
         }
     }
 

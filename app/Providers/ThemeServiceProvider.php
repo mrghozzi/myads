@@ -5,6 +5,8 @@ namespace App\Providers {
     use Illuminate\Support\ServiceProvider;
     use Illuminate\Support\Facades\View;
     use Illuminate\Support\Facades\Config;
+    use Illuminate\Support\Facades\Schema;
+    use App\Models\Setting;
 
     class ThemeServiceProvider extends ServiceProvider
     {
@@ -21,18 +23,32 @@ namespace App\Providers {
          */
         public function boot(): void
         {
-            // For now, we hardcode the active theme. Later this will come from DB.
-            $activeTheme = 'default'; 
-            
+            $activeTheme = 'default';
+
+            try {
+                if (Schema::hasTable('setting')) {
+                    $setting = Setting::first();
+                    if ($setting && !empty($setting->styles)) {
+                        $activeTheme = $setting->styles;
+                    }
+                }
+            } catch (\Throwable $e) {
+                // Fallback to default
+            }
+
+            // Support live previewing other themes when requested
+            if (request()->has('preview_theme') && is_dir(base_path('themes/' . request()->query('preview_theme') . '/views'))) {
+                $activeTheme = (string) request()->query('preview_theme');
+            } elseif (request()->has('theme_preview') && request()->has('theme') && is_dir(base_path('themes/' . request()->query('theme') . '/views'))) {
+                $activeTheme = (string) request()->query('theme');
+            }
+
             $themePath = base_path("themes/{$activeTheme}");
             $viewsPath = "{$themePath}/views";
 
             // Register the theme's view directory
             if (is_dir($viewsPath)) {
                 $this->loadViewsFrom($viewsPath, 'theme');
-                
-                // Also allow accessing views without namespace if we want to override default laravel views
-                // View::addLocation($viewsPath);
             }
 
             // Share theme data globally
@@ -47,10 +63,26 @@ namespace {
     if (!function_exists('theme_asset')) {
         function theme_asset($path)
         {
-            // Assuming 'themes' is in the root and accessible via web
-            // and index.php is also in root.
-            $activeTheme = 'default'; // Should match the one in boot()
-            return url("themes/{$activeTheme}/assets/{$path}");
+            $activeTheme = 'default';
+
+            try {
+                if (\Illuminate\Support\Facades\Schema::hasTable('setting')) {
+                    $setting = \App\Models\Setting::first();
+                    if ($setting && !empty($setting->styles)) {
+                        $activeTheme = $setting->styles;
+                    }
+                }
+            } catch (\Throwable $e) {
+                // Fallback to default
+            }
+
+            if (request()->has('preview_theme') && is_dir(base_path('themes/' . request()->query('preview_theme')))) {
+                $activeTheme = (string) request()->query('preview_theme');
+            } elseif (request()->has('theme_preview') && request()->has('theme') && is_dir(base_path('themes/' . request()->query('theme')))) {
+                $activeTheme = (string) request()->query('theme');
+            }
+
+            return asset("themes/{$activeTheme}/assets/{$path}");
         }
     }
 
@@ -74,3 +106,4 @@ namespace {
         }
     }
 }
+
