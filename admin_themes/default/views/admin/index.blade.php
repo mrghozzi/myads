@@ -1079,7 +1079,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Dynamic Tips Rotator
-    var adminTips = @json($adminTips);
+    var adminTips = {!! json_encode($adminTips, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!};
     var currentTipId = {{ $currentTip['id'] ?? 1 }};
     var currentTipIdx = Math.max(0, adminTips.findIndex(function(t) { return t.id === currentTipId; }));
     var btnRotateTip = document.getElementById('btn-rotate-tip');
