@@ -29,8 +29,14 @@ MYADS includes multi-layered security controls across the core platform, API, an
 - **Maintenance Mode Safety & IP Whitelisting**: Dual-layer maintenance mode access control featuring an Allowed IP Whitelist (`allowed_ips`) and a secret emergency bypass token (`emergency_token`) for safe administrative access during 503 maintenance mode.
 - **Safe Orphan Records Cleanup (`OrphanCleanupService`)**: Transaction-isolated, subquery-based cascading cleanup engine preventing data corruption or inadvertent content/reaction deletion during database maintenance.
 - **Strict Table Sanitization & Query Isolation**: Strict table name whitelisting and PDO query isolation on administrative database tools (`/admin/system-monitor`, `/admin/database-cleanup`, and `/admin/maintenance/db-repair`).
-- **CSRF, Rate Limiting & Request Locking**: Token-based anti-fraud protection across visit exchange, status reactions, comments, member messaging, and external Web Share API endpoints (capped at 30 req/min).
-- **Dependency & Transitive Vulnerability Management**: Continuous dependency audits and package overrides (e.g. PostCSS `postcss >= 8.5.18` security patch, `guzzlehttp/guzzle 7.15.2`, `league/commonmark 2.9.0`).
+- **Stored SVG XSS Elimination**: SVG MIME type is restricted from rich text editor uploads, eliminating Stored Cross-Site Scripting attack vectors via embedded scripts in SVG payloads.
+- **OAuth Rejection Open Redirect Prevention**: Strict registration whitelist validation on application `redirect_uri` prior to issuing authorization rejection redirects.
+- **Default Session Encryption & Secure Cookies**: Mandatory session payload encryption (`SESSION_ENCRYPT=true`) and HTTPS-only secure cookies (`SESSION_SECURE_COOKIE=true`) protecting session data at rest and over the wire.
+- **Constant-Time Cryptographic Comparison**: Constant-time `hash_equals()` string comparison across legacy MD5 password verification and OAuth client secrets to neutralize timing attack vectors.
+- **Cryptographic Update Script Verification**: Mandatory SHA-256 integrity signature verification (`update.php.sha256`) before executing custom disk update scripts during system updates.
+- **Strict Production SSL Enforcement (`http_secure()`)**: Centralized HTTP client enforcing strict SSL certificate verification in production environments for extension update checks and remote marketplace operations.
+- **Username Character Whitelist Validation**: Strict regex whitelisting (`regex:/^[\p{L}\p{N}_\-\.]+$/u`) on member usernames preventing HTML/script payload injection.
+- **Dependency & Transitive Vulnerability Management**: Continuous dependency audits and package overrides (e.g. PostCSS `postcss >= 8.5.18` security patch, `guzzlehttp/guzzle 7.15.2`, `league/commonmark 2.9.0` quadratic-time DoS patch).
 
 ---
 

@@ -1,11 +1,11 @@
 <?php
 
 return [
-    'title' => 'Welcome to MYADS',
-    'subtitle' => 'You have successfully updated to version :version. Discover the new features and improvements.',
-    'tab_whats_new' => 'What\'s New',
-    'tab_changelog' => 'Changelog',
-    'tab_about' => 'About MYADS',
+    'title' => 'Willkommen bei MYADS',
+    'subtitle' => 'Sie haben erfolgreich auf Version :version aktualisiert. Entdecken Sie die neuen Funktionen und Verbesserungen.',
+    'tab_whats_new' => 'Neuigkeiten',
+    'tab_changelog' => 'Änderungsprotokoll',
+    'tab_about' => 'Über MYADS',
     
     // What's New Section (v4.5.3)
     'feature_1_title' => 'Live Theme Customizer & Dynamic CSS Engine',
@@ -22,7 +22,7 @@ return [
     // About Section
     'about_description' => 'MYADS is a powerful, all-in-one community platform and ad exchange network. It empowers website owners to connect, exchange traffic, trade services, and monetize their platforms effectively.',
     
-    'core_features' => 'Core Platform Features',
+    'core_features' => 'Kernfunktionen',
     'feat_social_title' => 'Social Network & Feed',
     'feat_social_desc' => 'Engaging community feed with text, galleries, multimedia posts, mentions, reactions, and private messaging.',
     'feat_exchange_title' => 'Traffic & Ad Exchange',
@@ -40,33 +40,31 @@ return [
     'feat_i18n_title' => 'Multi-Language System (i18n)',
     'feat_i18n_desc' => 'Complete internationalization supporting 14 global languages with native display names, automatic LTR/RTL layout directionality, and header locale auto-detection.',
     
-    'system_environment' => 'System Environment',
+    'system_environment' => 'Systemumgebung',
     'env_php' => 'PHP Version',
     'env_laravel' => 'Laravel Framework',
     'env_mysql' => 'MySQL / MariaDB',
-    'platform_stats' => 'Platform Statistics',
-    'stat_users' => 'Total Members',
-    'stat_posts' => 'Community Posts',
-    'stat_products' => 'Digital Products',
+    'platform_stats' => 'Plattformstatistiken',
+    'stat_users' => 'Mitglieder gesamt',
+    'stat_posts' => 'Beiträge',
+    'stat_products' => 'Digitale Produkte',
     
     'made_with_love' => 'Made with ❤️ by mrghozzi',
     'github_repo' => 'GitHub Repository',
-    'return_dashboard' => 'Return to Dashboard',
-
-    // GitHub Community, Documentation & Support
-    'star_on_github' => 'Star on GitHub ⭐',
-    'get_support' => 'Get Support',
-    'report_issue' => 'Report Bugs & Issues',
+    'return_dashboard' => 'Zurück zum Dashboard',
+    'star_on_github' => 'Auf GitHub bewerten ⭐',
+    'get_support' => 'Support erhalten',
+    'report_issue' => 'Fehler melden',
     'docs_wiki' => 'GitHub Wiki',
     'online_kb' => 'Online KB',
-    'docs_title' => 'Lessons & Documentation',
-    'docs_desc' => 'Explore official tutorials and knowledgebase articles to set up and master MYADS.',
+    'docs_title' => 'Dokumentation & Anleitungen',
+    'docs_desc' => 'Entdecken Sie offizielle Tutorials und Wissensdatenbank-Artikel für MYADS.',
     'github_community_title' => 'MYADS Community, Support & Docs',
-    'github_community_subtitle' => 'Join the community, star the project, get support via Discussions, and browse official documentation',
-    'star_project_title' => 'Star Project on GitHub',
-    'star_project_desc' => 'If you find MYADS helpful, please show your support by giving us a star ⭐ on GitHub.',
-    'support_title' => 'Request Support',
-    'support_desc' => 'Need help or have questions? Connect with us on GitHub Discussions.',
-    'report_issue_title' => 'Report Bugs & Issues',
-    'report_issue_desc' => 'Found a bug or encountered an issue? Submit a bug report on GitHub to help us fix it.',
+    'github_community_subtitle' => 'Treten Sie der Community bei und entdecken Sie die offizielle Dokumentation',
+    'star_project_title' => 'Projekt mit einem Stern unterstützen',
+    'star_project_desc' => 'Wenn Ihnen MYADS gefällt, geben Sie uns bitte einen Stern ⭐ auf GitHub.',
+    'support_title' => 'Support anfordern',
+    'support_desc' => 'Haben Sie Fragen? Verbinden Sie sich über GitHub Discussions.',
+    'report_issue_title' => 'Problem melden',
+    'report_issue_desc' => 'Einen Fehler gefunden? Erstellen Sie einen Fehlerbericht auf GitHub.',
 ];

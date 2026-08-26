@@ -359,8 +359,8 @@
                         <div class="row g-4 justify-content-center">
                             <div class="col-md-6 col-lg-4">
                                 <div class="feature-card p-4">
-                                    <div class="feature-icon-wrapper">
-                                        <i class="feather-edit-3"></i>
+                                    <div class="feature-icon-wrapper" style="background: linear-gradient(135deg, rgba(79, 70, 229, 0.1) 0%, rgba(124, 58, 237, 0.1) 100%); color: #6366f1;">
+                                        <i class="feather-sliders"></i>
                                     </div>
                                     <h5 class="fw-bold mb-3">{{ __('about.feature_1_title') }}</h5>
                                     <p class="text-muted mb-0 fs-13">{{ __('about.feature_1_desc') }}</p>
@@ -368,8 +368,8 @@
                             </div>
                             <div class="col-md-6 col-lg-4">
                                 <div class="feature-card p-4">
-                                    <div class="feature-icon-wrapper">
-                                        <i class="feather-layers"></i>
+                                    <div class="feature-icon-wrapper" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">
+                                        <i class="feather-radio"></i>
                                     </div>
                                     <h5 class="fw-bold mb-3">{{ __('about.feature_2_title') }}</h5>
                                     <p class="text-muted mb-0 fs-13">{{ __('about.feature_2_desc') }}</p>
@@ -377,8 +377,8 @@
                             </div>
                             <div class="col-md-6 col-lg-4">
                                 <div class="feature-card p-4">
-                                    <div class="feature-icon-wrapper">
-                                        <i class="feather-music"></i>
+                                    <div class="feature-icon-wrapper" style="background: rgba(16,185,129,0.1); color: #10b981;">
+                                        <i class="feather-shield"></i>
                                     </div>
                                     <h5 class="fw-bold mb-3">{{ __('about.feature_3_title') }}</h5>
                                     <p class="text-muted mb-0 fs-13">{{ __('about.feature_3_desc') }}</p>
@@ -386,8 +386,8 @@
                             </div>
                             <div class="col-md-6 col-lg-4">
                                 <div class="feature-card p-4">
-                                    <div class="feature-icon-wrapper">
-                                        <i class="feather-code"></i>
+                                    <div class="feature-icon-wrapper" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;">
+                                        <i class="feather-cpu"></i>
                                     </div>
                                     <h5 class="fw-bold mb-3">{{ __('about.feature_4_title') }}</h5>
                                     <p class="text-muted mb-0 fs-13">{{ __('about.feature_4_desc') }}</p>
@@ -395,8 +395,8 @@
                             </div>
                             <div class="col-md-6 col-lg-4">
                                 <div class="feature-card p-4">
-                                    <div class="feature-icon-wrapper" style="background: rgba(16,185,129,0.1); color: #10b981;">
-                                        <i class="feather-shield"></i>
+                                    <div class="feature-icon-wrapper" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6;">
+                                        <i class="feather-lock"></i>
                                     </div>
                                     <h5 class="fw-bold mb-3">{{ __('about.feature_5_title') }}</h5>
                                     <p class="text-muted mb-0 fs-13">{{ __('about.feature_5_desc') }}</p>
@@ -411,7 +411,54 @@
                             <div class="timeline">
                                 <div class="timeline-item">
                                     <div class="timeline-icon"><i class="feather-box fs-12"></i></div>
-                                    <h6 class="fw-bold mb-1">v4.5.2 <span class="badge bg-soft-success text-success ms-2">Stable (Current)</span></h6>
+                                    <h6 class="fw-bold mb-1">v4.5.3 <span class="badge bg-soft-success text-success ms-2">Stable (Current)</span></h6>
+                                    <p class="text-muted fs-13 mb-3">Architecture & Dynamic Extensibility Release — Live Theme Customizer & Dynamic CSS Variables Engine, Real-Time Events SSE Stream, Anti-Fraud Shield & Ad Quality Engine v2, Smart Micro-Caching & High-Traffic Indexes, Zero-Hardcoding Modular Plugin Architecture, and Comprehensive Security Audit & Vulnerability Hardening.</p>
+                                    <div class="d-flex flex-column gap-2">
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-feature mt-1" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">Feature</span>
+                                            <span class="text-muted fs-13">Added interactive visual <strong>Live Theme Customizer</strong> at <code>/admin/themes/customizer</code> powered by <code>ThemeCustomizerService</code> with responsive split-screen preview (Desktop, Tablet, Mobile), brand colors, Google & Arabic fonts (Inter, Cairo, Tajawal, Roboto, Outfit, System), border radius, and instant CSS compilation.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-feature mt-1" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">Feature</span>
+                                            <span class="text-muted fs-13">Implemented high-performance <strong>Real-Time Events Engine (SSE Live Stream)</strong> at <code>/live/stream</code> and <code>/api/live/stream</code> for instant notification & message badge updates, live feed toasts, and non-blocking session handling.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-security mt-1" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;">Security</span>
+                                            <span class="text-muted fs-13">Upgraded <strong>Anti-Fraud Shield & Ad Quality Engine v2</strong> with IAB Viewability Standard (>= 50% visibility >= 1s), real-time human behavior fingerprinting (mouse trajectory, touch duration, WebGL/bot checks), async view beacons, and advertiser PTS protection with flag reason tags.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-optimization mt-1" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">Optimization</span>
+                                            <span class="text-muted fs-13">Implemented <strong>Smart Micro-Caching & High-Traffic Compound Indexes</strong> reducing ad serving database load by >80% with 20s TTL candidate pools in-memory caching and compound indexes on <code>status</code>, <code>smart_ads</code>, <code>banner</code>, <code>link</code>, and <code>custom_ad_events</code>.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-feature mt-1" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">Feature</span>
+                                            <span class="text-muted fs-13">Completely refactored <strong>Zero-Hardcoding Dynamic Plugin Architecture</strong> in <code>PluginServiceProvider</code> with zero-config filesystem auto-discovery in testing and dynamic slug-to-directory resolution for production plugins.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-security mt-1" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;">Security</span>
+                                            <span class="text-muted fs-13">Executed <strong>Comprehensive Security Audit & Vulnerability Hardening</strong>: eliminated Stored SVG XSS in editor uploads, patched OAuth authorization open redirects, enforced default session encryption and HTTPS cookies, constant-time <code>hash_equals()</code> comparison, SHA-256 update script verification, and strict production SSL enforcement (<code>http_secure()</code>).</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-security mt-1" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;">Security</span>
+                                            <span class="text-muted fs-13">Patched <strong>league/commonmark Quadratic-Time DoS (CVE-2026-71488)</strong> by upgrading to <code>v2.9.0</code>, eliminating algorithmic complexity resource exhaustion on crafted multibyte Markdown.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-fix mt-1" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;">Fix</span>
+                                            <span class="text-muted fs-13">Synchronized <strong>Developer Platform & REST API v1</strong> schema queries (<code>Status</code>, <code>Message</code>, <code>Notification</code>, <code>BannerImpression</code>, <code>OrderRequest</code>) and resolved application scopes persistence in <code>/developer/apps/{app}</code>.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge mt-1" style="background: rgba(107, 114, 128, 0.1); color: #6b7280;">Update</span>
+                                            <span class="text-muted fs-13">Synchronized dependencies, upgrading <strong>nette/utils</strong> to <code>v4.1.5</code>, <strong>laravel/framework</strong> to <code>v12.61.1</code>, and regenerating optimized autoload mappings.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-optimization mt-1" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">Quality</span>
+                                            <span class="text-muted fs-13">Added comprehensive automated PHPUnit test suites covering Live Stream Events, Ad Quality Shield, High-Traffic Micro-Caching, and Theme Customizer (100% pass rate).</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="timeline-item">
+                                    <div class="timeline-icon"><i class="feather-box fs-12"></i></div>
+                                    <h6 class="fw-bold mb-1">v4.5.2 <span class="badge bg-soft-secondary text-secondary ms-2">Stable</span></h6>
                                     <p class="text-muted fs-13 mb-3">Maintenance & Extension Extensibility Release — Modular Rich Text Editor Plugin (<code>myads-tinymce-editor</code>) Integration, Admin Hooks Inspector, Continuous Floating Audio Player, Referral System Overhaul, Developer Platform Modernization, Admin Maintenance & FFmpeg Diagnostic Terminals, and Comprehensive Automated Testing.</p>
                                     <div class="d-flex flex-column gap-2">
                                         <div class="d-flex align-items-start">
