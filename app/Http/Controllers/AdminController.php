@@ -49,6 +49,7 @@ use App\Services\MaintenanceModeManager;
 use App\Services\OrphanCleanupService;
 use App\Services\PluginManager;
 use App\Services\RemoteExtensionMarketplaceService;
+use App\Services\ThemeCustomizerService;
 use App\Services\ThemeManager;
 use App\Support\AdsSettings;
 use App\Support\BannerServingSettings;
@@ -4170,6 +4171,73 @@ class AdminController extends Controller
         $installedSlugs = collect($themes)->pluck('slug')->toArray();
 
         return view('admin::admin.themes.index', compact('themes', 'updates', 'marketplaceCatalog', 'installedSlugs'));
+    }
+
+    public function themeCustomizer(Request $request, ThemeManager $themeManager, ThemeCustomizerService $customizer)
+    {
+        $themes = $themeManager->getAllThemes();
+        $activeSlug = $themeManager->getActiveThemeSlug() ?? 'default';
+        $themeSlug = (string) $request->query('theme', $activeSlug);
+
+        // Verify theme exists or fallback to active
+        $themeExists = collect($themes)->firstWhere('slug', $themeSlug);
+        if (!$themeExists) {
+            $themeSlug = $activeSlug;
+        }
+
+        $variables = $customizer->getVariables($themeSlug);
+        $defaults = $customizer->getDefaults($themeSlug);
+        $presets = ThemeCustomizerService::PALETTE_PRESETS;
+        $fonts = ThemeCustomizerService::SUPPORTED_FONTS;
+        $hasCustomizations = $customizer->hasCustomizations($themeSlug);
+
+        return view('admin::admin.themes.customizer', compact(
+            'themes',
+            'themeSlug',
+            'variables',
+            'defaults',
+            'presets',
+            'fonts',
+            'hasCustomizations',
+            'activeSlug'
+        ));
+    }
+
+    public function updateThemeCustomizer(Request $request, ThemeCustomizerService $customizer)
+    {
+        $themeSlug = (string) $request->input('theme_slug', 'default');
+        $variables = $request->except(['_token', 'theme_slug']);
+
+        $saved = $customizer->saveVariables($themeSlug, $variables);
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => __('messages.theme_customizer_saved'),
+                'variables' => $saved,
+            ]);
+        }
+
+        return redirect()->route('admin.themes.customizer', ['theme' => $themeSlug])
+            ->with('success', __('messages.theme_customizer_saved'));
+    }
+
+    public function resetThemeCustomizer(Request $request, ThemeCustomizerService $customizer)
+    {
+        $themeSlug = (string) $request->input('theme_slug', 'default');
+
+        $customizer->reset($themeSlug);
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => __('messages.theme_customizer_reset'),
+                'defaults' => $customizer->getDefaults($themeSlug),
+            ]);
+        }
+
+        return redirect()->route('admin.themes.customizer', ['theme' => $themeSlug])
+            ->with('success', __('messages.theme_customizer_reset'));
     }
 
 

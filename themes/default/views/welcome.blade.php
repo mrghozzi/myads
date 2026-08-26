@@ -22,6 +22,60 @@
     <!-- Core CSS -->
     <link href="{{ theme_asset($css_path . '/bootstrap.min.css') }}" rel="stylesheet">
 
+    <!-- Theme Customizer Dynamic Variables (THEME-07) -->
+    @php
+        $activeThemeSlug = $site_settings->styles ?? 'default';
+        $themeCustomizer = app(\App\Services\ThemeCustomizerService::class);
+        $customCssUrl = $themeCustomizer->getPublicCssUrl($activeThemeSlug);
+    @endphp
+    @if($customCssUrl)
+        <link id="theme-custom-variables" rel="stylesheet" href="{{ $customCssUrl }}">
+    @elseif($themeCustomizer->hasCustomizations($activeThemeSlug))
+        <style id="theme-custom-variables">
+            {!! $themeCustomizer->getCompiledCss($activeThemeSlug) !!}
+        </style>
+    @endif
+    <script>
+        window.addEventListener('message', function(event) {
+            if (!event.data || event.data.type !== 'MYADS_THEME_CUSTOMIZER_UPDATE') return;
+            const v = event.data.variables;
+            if (!v) return;
+            let styleTag = document.getElementById('theme-customizer-live-style');
+            if (!styleTag) {
+                styleTag = document.createElement('style');
+                styleTag.id = 'theme-customizer-live-style';
+                document.head.appendChild(styleTag);
+            }
+            const fontFamily = event.data.fontFamily || (v.font_family ? `'${v.font_family}', sans-serif` : 'inherit');
+            styleTag.innerHTML = `
+                :root {
+                    --primary: ${v.primary_color};
+                    --secondary: ${v.secondary_color};
+                    --theme-primary: ${v.primary_color};
+                    --theme-secondary: ${v.secondary_color};
+                    --theme-bg: ${v.bg_color};
+                    --theme-card-bg: ${v.card_bg};
+                    --theme-text: ${v.text_color};
+                    --theme-text-muted: ${v.text_muted};
+                    --theme-header-bg: ${v.header_bg};
+                    --theme-radius: ${v.border_radius}px;
+                    --theme-font-family: ${fontFamily};
+                    --theme-glass-blur: ${v.glass_blur}px;
+                    --theme-glass-opacity: ${v.glass_opacity};
+                }
+                body {
+                    font-family: ${fontFamily} !important;
+                    background-color: ${v.bg_color} !important;
+                    color: ${v.text_color} !important;
+                }
+                .btn-primary, .button.primary {
+                    background-color: ${v.primary_color} !important;
+                    border-color: ${v.primary_color} !important;
+                }
+            `;
+        });
+    </script>
+
     <style>
         :root {
             --primary: #615dfa;

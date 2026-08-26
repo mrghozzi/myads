@@ -49,14 +49,20 @@
                             <p class="extension-hub__hero-desc">{{ __('messages.themes_desc') }}</p>
                         </div>
                         <div class="col-xl-5 text-xl-end">
-                            <div class="extension-hub__hero-panel ms-xl-auto">
-                                <span class="extension-hub__hero-panel-icon">
-                                    <i class="feather-star"></i>
-                                </span>
-                                <span>
-                                    <span class="extension-hub__hero-panel-label">{{ __('messages.current_theme') }}</span>
-                                    <span class="extension-hub__hero-panel-value">{{ $activeTheme['name'] ?? __('messages.unknown') }}</span>
-                                </span>
+                            <div class="d-flex flex-column flex-sm-row align-items-xl-end justify-content-xl-end gap-2">
+                                <div class="extension-hub__hero-panel">
+                                    <span class="extension-hub__hero-panel-icon">
+                                        <i class="feather-star"></i>
+                                    </span>
+                                    <span>
+                                        <span class="extension-hub__hero-panel-label">{{ __('messages.current_theme') }}</span>
+                                        <span class="extension-hub__hero-panel-value">{{ $activeTheme['name'] ?? __('messages.unknown') }}</span>
+                                    </span>
+                                </div>
+                                <a href="{{ route('admin.themes.customizer', ['theme' => $activeTheme['slug'] ?? 'default']) }}" class="btn btn-light rounded-pill px-3 py-2 shadow-sm d-inline-flex align-items-center gap-2 fw-semibold text-primary">
+                                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                                    <span>{{ __('messages.theme_customizer') ?? 'تخصيص القالب' }}</span>
+                                </a>
                             </div>
                         </div>
                     </div>

@@ -808,6 +808,9 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
 
     // Themes
     Route::get('/themes', [AdminController::class, 'themes'])->name('admin.themes');
+    Route::get('/themes/customizer', [AdminController::class, 'themeCustomizer'])->name('admin.themes.customizer');
+    Route::post('/themes/customizer', [AdminController::class, 'updateThemeCustomizer'])->name('admin.themes.customizer.update');
+    Route::post('/themes/customizer/reset', [AdminController::class, 'resetThemeCustomizer'])->name('admin.themes.customizer.reset');
     Route::post('/themes/activate', [AdminController::class, 'activateTheme'])->name('admin.themes.activate');
     Route::post('/themes/upgrade', [AdminController::class, 'upgradeTheme'])->name('admin.themes.upgrade');
     Route::post('/themes/install-marketplace', [AdminController::class, 'installThemeFromMarketplace'])->name('admin.themes.install_marketplace');
