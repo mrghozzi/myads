@@ -348,6 +348,7 @@ Route::get('/embed/link.js', [AdsServingController::class, 'linkEmbedScript'])->
 Route::get('/embed/smart.js', [AdsServingController::class, 'smartEmbedScript'])->name('ads.embed.smart');
 Route::get('/embed/custom.js', [CustomAdsServingController::class, 'embed'])->name('ads.custom.embed');
 Route::get('/ads/custom/serve', [CustomAdsServingController::class, 'serve'])->name('ads.custom.serve');
+Route::match(['get', 'post'], '/ads/custom/view/{token?}', [CustomAdsServingController::class, 'view'])->name('ads.custom.view');
 Route::get('/ads/custom/click/{token}', [CustomAdsServingController::class, 'click'])->name('ads.custom.click');
 Route::get('/show.php', [AdsServingController::class, 'redirect'])->name('ads.redirect');
 Route::get('/ads/redirect', [AdsServingController::class, 'redirect']); // Alias

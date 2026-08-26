@@ -12,6 +12,15 @@ class CustomAdEvent extends Model
     public const TYPE_IMPRESSION = 'impression';
     public const TYPE_CLICK = 'click';
 
+    public const REASON_RAPID_CLICK = 'RAPID_CLICK';
+    public const REASON_HIDDEN_TAB = 'HIDDEN_TAB';
+    public const REASON_BOT_FINGERPRINT = 'BOT_FINGERPRINT';
+    public const REASON_UNVIEWABLE = 'UNVIEWABLE';
+    public const REASON_DWELL_TOO_SHORT = 'DWELL_TOO_SHORT';
+    public const REASON_RATE_LIMIT = 'RATE_LIMIT';
+    public const REASON_HEADLESS = 'HEADLESS_BROWSER';
+    public const REASON_REPLAY_ATTACK = 'REPLAY_ATTACK';
+
     public $timestamps = false;
 
     protected $fillable = [
@@ -28,6 +37,7 @@ class CustomAdEvent extends Model
         'ip_hash',
         'user_agent',
         'is_flagged',
+        'flag_reason',
         'occurred_at',
     ];
 

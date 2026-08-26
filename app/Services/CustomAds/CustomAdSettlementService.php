@@ -253,6 +253,7 @@ class CustomAdSettlementService
         $impressions = CustomAdEvent::query()
             ->where('deal_id', $deal->id)
             ->where('event_type', CustomAdEvent::TYPE_IMPRESSION)
+            ->where('is_flagged', false)
             ->whereBetween('occurred_at', [$start, $end])
             ->count();
 

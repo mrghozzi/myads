@@ -57,14 +57,48 @@ class CustomAdsServingController extends Controller
             ));
         }
 
+        // Record initial impression request
         $serving->recordImpression($placement, $deal, $deal->creative, $request, $countryCode, $deviceType);
 
         $this->triggerBackgroundMaintenance();
 
         return $this->javascriptResponse($serving->renderInsertionScript(
             $serving->renderMarkup($placement, $deal->creative),
-            $slotId
+            $slotId,
+            $deal->creative->token
         ));
+    }
+
+    /**
+     * IAB Viewability Beacon Endpoint (POST/GET /ads/custom/view/{token?})
+     */
+    public function view(Request $request, ?string $token = null, SmartAdGeoResolver $geoResolver, CustomAdServingService $serving)
+    {
+        $token = $token ?: (string) $request->query('token', $request->input('token', ''));
+
+        if (!$this->hasCustomAdsTables() || $token === '') {
+            return response()->noContent();
+        }
+
+        $creative = CustomAdCreative::query()
+            ->with('deal.placement')
+            ->where('token', $token)
+            ->first();
+
+        if ($creative && $creative->deal && $creative->deal->placement && $creative->deal->status === \App\Models\CustomAdDeal::STATUS_ACTIVE) {
+            $bhPayload = (string) ($request->query('_bh') ?? $request->input('_bh') ?? '');
+            $serving->recordViewableImpression(
+                $creative->deal->placement,
+                $creative->deal,
+                $creative,
+                $request,
+                $geoResolver->resolveCountryCode($request),
+                $this->resolveDeviceType($request),
+                $bhPayload
+            );
+        }
+
+        return response()->noContent();
     }
 
     public function click(string $token, Request $request, SmartAdGeoResolver $geoResolver, CustomAdServingService $serving)
@@ -84,11 +118,13 @@ class CustomAdsServingController extends Controller
 
         $deal = $creative->deal;
         if ($deal && $deal->status === \App\Models\CustomAdDeal::STATUS_ACTIVE) {
+            $bhPayload = (string) ($request->query('_bh') ?? $request->input('_bh') ?? '');
             $serving->recordClick(
                 $creative,
                 $request,
                 $geoResolver->resolveCountryCode($request),
-                $this->resolveDeviceType($request)
+                $this->resolveDeviceType($request),
+                $bhPayload
             );
         }
 
