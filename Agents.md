@@ -1,4 +1,4 @@
-# Agents.md — MYADS v4.5.3
+# Agents.md — MYADS v4.5.4
 
 > **Purpose:** This file gives AI coding agents a fast, comprehensive understanding of the MYADS project — its architecture, conventions, key files, and rules — so they can work effectively from a fresh chat context.
 
@@ -6,7 +6,7 @@
 
 ## 1. Project Identity
 
-- **Name:** MYADS v4.5.3
+- **Name:** MYADS v4.5.4
 - **Type:** Social network + ad exchange platform for website owners
 - **Framework:** Laravel 12 (PHP 8.2+)
 - **Database:** MySQL 5.7+ / MariaDB 10.3+
@@ -1092,7 +1092,8 @@ If in doubt, update it. An outdated `Agents.md` causes future agents to make wro
   - **Proposal DB-08 (Smart Micro-Caching & High-Traffic Query Optimization):** High-throughput database query optimization reducing load by >80% with compound B-Tree indexes across `status`, `smart_ads`, `banner`, `link`, and `custom_ad_events`, and smart 20s TTL in-memory micro-caching for candidate ad pools.
   - **Proposal THEME-07 (Live Theme Customizer & Dynamic CSS Variables Engine):** Interactive visual customizer (`/admin/themes/customizer`) with responsive split-screen preview (Desktop, Tablet, Mobile), brand colors, Google & Arabic fonts (Inter, Cairo, Tajawal, Roboto, Outfit, System), border radius, glassmorphism, and compiled CSS variables file generation.
 - **v4.5.3 Official Public Release (2026-08-26):** Updated `/admin/about` page with v4.5.3 What's New highlights and complete changelog timeline, updated all 14 locale translation packs (`lang/*/about.php`), verified PHPUnit automated test suites, and prepared all assets for public release.
+- **v4.5.4 Groundwork & Release Cycle Setup (2026-08-27):** Initialized release cycle for MYADS v4.5.4, bumped canonical `SystemVersion::CURRENT` to v4.5.4, aligned system documentation (`AGENTS.md`, `API_DOCS.md`, `README.md`, `SECURITY.md`), and configured dynamic versioning across the platform.
 
 ---
 
-*Last updated: 2026-08-26 — MYADS v4.5.3 (Official Public Release — Architecture & Dynamic Extensibility Release)*
+*Last updated: 2026-08-27 — MYADS v4.5.4 (Development & Groundwork Cycle)*
