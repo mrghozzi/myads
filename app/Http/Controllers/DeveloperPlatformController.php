@@ -171,6 +171,21 @@ class DeveloperPlatformController extends Controller
         return back()->with('success', __('messages.dev_app_secret_rotated'));
     }
 
+    public function destroy(DeveloperApp $app)
+    {
+        if (!auth()->check()) {
+            return redirect()->route('login');
+        }
+
+        if ($app->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        $app->delete();
+
+        return redirect()->route('developer.apps.index')->with('success', __('messages.dev_app_deleted'));
+    }
+
     public function guides()
     {
         $scopes = DeveloperScopeCatalog::getAllScopes();

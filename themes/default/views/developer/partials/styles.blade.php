@@ -677,6 +677,20 @@
         align-items: center;
     }
 
+    .dev-btn-danger {
+        background: rgba(217, 75, 99, 0.12) !important;
+        border: 1px solid rgba(217, 75, 99, 0.28) !important;
+        color: var(--dev-danger) !important;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .dev-btn-danger:hover {
+        background: var(--dev-danger) !important;
+        color: #ffffff !important;
+        border-color: var(--dev-danger) !important;
+    }
+
     .dev-divider {
         height: 1px;
         background: var(--dev-border);

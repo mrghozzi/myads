@@ -72,4 +72,11 @@ class AdminDeveloperController extends Controller
 
         return back()->with('success', __('messages.app_status_updated'));
     }
+
+    public function destroy(DeveloperApp $app)
+    {
+        $app->delete();
+
+        return redirect()->route('admin.developers')->with('success', __('messages.dev_app_deleted'));
+    }
 }

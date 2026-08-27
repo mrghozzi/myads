@@ -147,6 +147,25 @@
                     </form>
                 </div>
             </section>
+
+            <section class="admin-panel mt-4">
+                <div class="admin-panel__header border-bottom">
+                    <div>
+                        <span class="admin-panel__eyebrow text-danger">@lang('messages.danger_zone')</span>
+                        <h2 class="admin-panel__title">@lang('messages.delete_app')</h2>
+                    </div>
+                </div>
+                <div class="admin-panel__body">
+                    <p class="text-muted small mb-3">@lang('messages.delete_app_warning')</p>
+                    <form action="{{ route('admin.developers.destroy', $app->id) }}" method="POST" onsubmit="return confirm('@lang('messages.confirm_delete_app')')">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-outline-danger w-100">
+                            <i class="feather-trash-2 me-1"></i> @lang('messages.delete_app')
+                        </button>
+                    </form>
+                </div>
+            </section>
         </div>
     </div>
 </div>

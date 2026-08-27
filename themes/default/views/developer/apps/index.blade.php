@@ -112,6 +112,13 @@
 
                                 <div class="dev-inline-actions" style="margin-top: 20px;">
                                     <a href="{{ route('developer.apps.show', $developerApp->id) }}" class="button secondary">{{ __('messages.manage') }}</a>
+                                    <form action="{{ route('developer.apps.destroy', $developerApp->id) }}" method="POST" onsubmit="return confirm('@lang('messages.confirm_delete_app')')" style="margin: 0;">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="button dev-btn-danger">
+                                            <i class="fa fa-trash"></i> {{ __('messages.delete_app') }}
+                                        </button>
+                                    </form>
                                 </div>
                             </div>
                         </article>

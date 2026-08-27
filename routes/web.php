@@ -165,6 +165,7 @@ Route::prefix('developer')->group(function () {
     Route::match(['PUT', 'POST', 'PATCH'], '/apps/{app}', [App\Http\Controllers\DeveloperPlatformController::class, 'update'])->name('developer.apps.update');
     Route::post('/apps/{app}/rotate-secret', [App\Http\Controllers\DeveloperPlatformController::class, 'rotateSecret'])->name('developer.apps.rotate_secret');
     Route::post('/apps/{app}/submit', [App\Http\Controllers\DeveloperPlatformController::class, 'submit'])->name('developer.apps.submit');
+    Route::delete('/apps/{app}', [App\Http\Controllers\DeveloperPlatformController::class, 'destroy'])->name('developer.apps.destroy');
 });
 
 // OAuth
@@ -865,6 +866,7 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
         Route::post('/settings', [App\Http\Controllers\AdminDeveloperController::class, 'updateSettings'])->name('admin.developers.settings.update');
         Route::get('/{app}', [App\Http\Controllers\AdminDeveloperController::class, 'show'])->name('admin.developers.show');
         Route::post('/{app}/status', [App\Http\Controllers\AdminDeveloperController::class, 'updateStatus'])->name('admin.developers.status');
+        Route::delete('/{app}', [App\Http\Controllers\AdminDeveloperController::class, 'destroy'])->name('admin.developers.destroy');
     });
 
     // Maintenance

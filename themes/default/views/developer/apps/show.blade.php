@@ -196,6 +196,20 @@
                     </div>
                 </div>
             </div>
+
+            <div class="widget-box dev-panel">
+                <p class="widget-box-title" style="color: var(--dev-danger);">{{ __('messages.danger_zone') }}</p>
+                <div class="widget-box-content" style="padding: 28px;">
+                    <p class="dev-card-copy">{{ __('messages.delete_app_warning') }}</p>
+                    <form action="{{ route('developer.apps.destroy', $app->id) }}" method="POST" onsubmit="return confirm('@lang('messages.confirm_delete_app')')" style="margin-top: 18px;">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="button dev-btn-danger" style="width: 100%;">
+                            <i class="fa fa-trash"></i> {{ __('messages.delete_app') }}
+                        </button>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 </div>

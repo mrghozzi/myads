@@ -103,9 +103,18 @@
                                 </td>
                                 <td class="text-muted">{{ $app->created_at->format('Y-m-d') }}</td>
                                 <td class="text-end">
-                                    <a href="{{ route('admin.developers.show', $app->id) }}" class="btn btn-sm btn-light">
-                                        <i class="feather-eye me-1"></i> @lang('messages.details')
-                                    </a>
+                                    <div class="d-inline-flex gap-1">
+                                        <a href="{{ route('admin.developers.show', $app->id) }}" class="btn btn-sm btn-light" title="@lang('messages.details')">
+                                            <i class="feather-eye me-1"></i> @lang('messages.details')
+                                        </a>
+                                        <form action="{{ route('admin.developers.destroy', $app->id) }}" method="POST" onsubmit="return confirm('@lang('messages.confirm_delete_app')')" class="d-inline">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="btn btn-sm btn-soft-danger" title="@lang('messages.delete')">
+                                                <i class="feather-trash-2"></i>
+                                            </button>
+                                        </form>
+                                    </div>
                                 </td>
                             </tr>
                         @empty
