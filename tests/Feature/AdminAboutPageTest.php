@@ -42,9 +42,10 @@ class AdminAboutPageTest extends TestCase
             ->assertSee(__('about.feature_3_title'))
             ->assertSee(__('about.feature_4_title'))
             ->assertSee(__('about.feature_5_title'))
-            ->assertSee('Live Theme Customizer & Dynamic CSS Engine')
-            ->assertSee('Real-Time Events Engine & Live SSE Stream')
-            ->assertSee('Anti-Fraud Shield & Ad Quality Engine v2');
+            ->assertSee(__('about.feature_6_title'))
+            ->assertSee('Developer App Deletion & Lifecycle Management')
+            ->assertSee('High-Traffic Indexes Resilience & MyISAM Key Limit Patch')
+            ->assertSee('Danger Zone & Interactive Confirmation Modals');
 
         $this->assertDatabaseHas('options', [
             'name' => 'last_seen_about_version',
@@ -62,9 +63,9 @@ class AdminAboutPageTest extends TestCase
         $response = $this->actingAs($admin)->get(route('admin.about', ['lang' => 'ar']));
 
         $response->assertOk()
-            ->assertSee('تخصيص القوالب المباشر ومحرك متغيرات CSS الديناميكية')
-            ->assertSee('محرك البث الحي للأحداث المباشرة (SSE Live Stream)')
-            ->assertSee('درع الحماية ضد الاحتيال ومحرك جودة الإعلانات v2');
+            ->assertSee('حذف تطبيقات المطورين وإدارة دورة الحياة')
+            ->assertSee('مرونة فهارس قواعد البيانات فائقة الأداء وتوافق MyISAM')
+            ->assertSee('منطقة الخطر ونوافذ التأكيد التفاعلية');
     }
 
     public function test_non_admin_user_cannot_access_about_page(): void

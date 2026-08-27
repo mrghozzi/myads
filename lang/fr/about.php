@@ -7,17 +7,19 @@ return [
     'tab_changelog' => 'Journal des modifications',
     'tab_about' => 'À propos de MYADS',
     
-    // What's New Section (v4.5.3)
-    'feature_1_title' => 'Personnalisateur de Thème en Direct & Moteur CSS',
-    'feature_1_desc' => 'Personnalisateur visuel interactif sur /admin/themes/customizer avec aperçu en temps réel (Bureau, Tablette, Mobile), palettes de couleurs, typographie Google & Arabe, et injection CSS compilée.',
-    'feature_2_title' => 'Moteur d\'Événements en Temps Réel & Flux SSE',
-    'feature_2_desc' => 'Flux Server-Sent Events (SSE) haute performance (/live/stream) pour la mise à jour instantanée des badges de notifications et messages, alertes en direct et notifications d\'administration.',
-    'feature_3_title' => 'Bouclier Anti-Fraude & Indice de Qualité des Publicités v2',
-    'feature_3_desc' => 'Protection publicitaire avancée selon le standard IAB Viewability (>= 50% visibilité >= 1s), empreinte comportementale humaine en temps réel, balises de vue asynchrones et protection des points annonceurs.',
-    'feature_4_title' => 'Micro-Mise en Cache Intelligente & Index Haute Fréquence',
-    'feature_4_desc' => 'Optimisation des requêtes publicitaires réduisant la charge de la base de données de plus de 80% lors des pics de trafic, avec micro-mise en cache mémoire (TTL 20s) et index B-Tree composés.',
-    'feature_5_title' => 'Architecture de Plugins Dynamiques & Renforcement Sécuritaire',
-    'feature_5_desc' => 'Découverte automatique des plugins dans PluginServiceProvider, correctif DoS league/commonmark (CVE-2026-71488), suppression XSS SVG, chiffrement des sessions, et validation SSL stricte en production.',
+    // What's New Section (v4.5.4)
+    'feature_1_title' => 'Suppression d\'Applications Développeur & Gestion du Cycle de Vie',
+    'feature_1_desc' => 'Permet aux développeurs (/developer/apps) et aux administrateurs (/admin/developers) de supprimer définitivement des applications avec révocation automatique en cascade des jetons et autorisations.',
+    'feature_2_title' => 'Résilience des Index Haute Fréquence & Correctif MyISAM',
+    'feature_2_desc' => 'Élimination des erreurs de longueur de clé 1000 octets sur MySQL/MariaDB en convertissant les tables en InnoDB DYNAMIC pour des migrations sans interruption de service.',
+    'feature_3_title' => 'Zone de Danger & Modales de Confirmation Interactives',
+    'feature_3_desc' => 'Espaces de gestion d\'applications dotés d\'une zone de danger dédiée, vérification stricte de propriété et modales interactives pour prévenir toute suppression accidentelle.',
+    'feature_4_title' => 'Personnalisateur de Thème en Direct & Moteur CSS',
+    'feature_4_desc' => 'Personnalisateur visuel interactif sur /admin/themes/customizer avec aperçu en temps réel (Bureau, Tablette, Mobile), palettes de couleurs, typographie Google & Arabe, et injection CSS compilée.',
+    'feature_5_title' => 'Moteur d\'Événements en Temps Réel & Flux SSE',
+    'feature_5_desc' => 'Flux Server-Sent Events (SSE) haute performance (/live/stream) pour la mise à jour instantanée des badges de notifications et messages, alertes en direct et notifications d\'administration.',
+    'feature_6_title' => 'Bouclier Anti-Fraude & Indice de Qualité des Publicités v2',
+    'feature_6_desc' => 'Protection publicitaire avancée selon le standard IAB Viewability (>= 50% visibilité >= 1s), empreinte comportementale humaine en temps réel, balises de vue asynchrones et protection des points annonceurs.',
 
     // About Section
     'about_description' => 'MYADS est une plateforme communautaire et un réseau d\'échange publicitaire tout-en-un. Elle permet aux propriétaires de sites de se connecter, d\'échanger du trafic, de négocier des services et de monétiser leurs plateformes.',

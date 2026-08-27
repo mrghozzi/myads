@@ -7,17 +7,19 @@ return [
     'tab_changelog' => 'Registro de cambios',
     'tab_about' => 'Acerca de MYADS',
     
-    // What's New Section (v4.5.3)
-    'feature_1_title' => 'Personalizador de Temas en Vivo & Motor CSS',
-    'feature_1_desc' => 'Personalizador visual interactivo en /admin/themes/customizer con vista previa en tiempo real (Escritorio, Tableta, Móvil), paletas de colores, tipografía Google y Árabe, e inyección CSS compilada.',
-    'feature_2_title' => 'Motor de Eventos en Tiempo Real & Flujo SSE',
-    'feature_2_desc' => 'Flujo Server-Sent Events (SSE) de alto rendimiento en /live/stream para recuentos instantáneos de notificaciones y mensajes, alertas en vivo y notificaciones de administración.',
-    'feature_3_title' => 'Escudo Antifraude & Motor de Calidad de Anuncios v2',
-    'feature_3_desc' => 'Protección publicitaria según el estándar IAB Viewability (>= 50% visibilidad >= 1s), huella de comportamiento humano en tiempo real, balizas asíncronas y protección de puntos de anunciantes.',
-    'feature_4_title' => 'Micro-Caché Inteligente & Índices de Alto Rendimiento',
-    'feature_4_desc' => 'Optimización de consultas publicitarias que reduce la carga de la base de datos en más del 80% durante picos de tráfico, con micro-caché en memoria (TTL 20s) e índices B-Tree compuestos.',
-    'feature_5_title' => 'Arquitectura de Plugins Dinámica & Refuerzo de Seguridad',
-    'feature_5_desc' => 'Descubrimiento automático de plugins en PluginServiceProvider, parche DoS league/commonmark (CVE-2026-71488), eliminación XSS SVG, cifrado de sesiones y validación SSL estricta.',
+    // What's New Section (v4.5.4)
+    'feature_1_title' => 'Eliminación de Apps de Desarrollador y Ciclo de Vida',
+    'feature_1_desc' => 'Permite a los desarrolladores (/developer/apps) y administradores (/admin/developers) eliminar aplicaciones de forma permanente con revocación automática en cascada de tokens y autorizaciones.',
+    'feature_2_title' => 'Resiliencia de Índices de Alto Tráfico y Parche MyISAM',
+    'feature_2_desc' => 'Eliminación de errores de longitud de clave de 1000 bytes en MySQL/MariaDB al convertir tablas a InnoDB DYNAMIC para migraciones seguras y sin tiempo de inactividad.',
+    'feature_3_title' => 'Zona de Peligro y Modales de Confirmación Interactivos',
+    'feature_3_desc' => 'Espacios de gestión con paneles de Danger Zone, verificación estricta de propiedad y modales interactivos para prevenir eliminaciones accidentales de aplicaciones.',
+    'feature_4_title' => 'Personalizador de Temas en Vivo & Motor CSS',
+    'feature_4_desc' => 'Personalizador visual interactivo en /admin/themes/customizer con vista previa responsiva en tiempo real, colores de marca, tipografía Google y árabe, y compilación CSS.',
+    'feature_5_title' => 'Motor de Eventos en Tiempo Real & Stream SSE',
+    'feature_5_desc' => 'Transmisión Server-Sent Events (SSE) de alto rendimiento en /live/stream con contadores de notificaciones en tiempo real, alertas de feed y liberación de sesiones.',
+    'feature_6_title' => 'Escudo Antifraude & Motor de Calidad de Anuncios v2',
+    'feature_6_desc' => 'Protección publicitaria con estándar IAB Viewability (>= 50% visibilidad >= 1s), huella digital de comportamiento en tiempo real, balizas asíncronas y protección de puntos PTS.',
 
     // About Section
     'about_description' => 'MYADS es una potente plataforma comunitaria y red de intercambio publicitario todo en uno.',

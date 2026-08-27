@@ -1092,8 +1092,11 @@ If in doubt, update it. An outdated `Agents.md` causes future agents to make wro
   - **Proposal DB-08 (Smart Micro-Caching & High-Traffic Query Optimization):** High-throughput database query optimization reducing load by >80% with compound B-Tree indexes across `status`, `smart_ads`, `banner`, `link`, and `custom_ad_events`, and smart 20s TTL in-memory micro-caching for candidate ad pools.
   - **Proposal THEME-07 (Live Theme Customizer & Dynamic CSS Variables Engine):** Interactive visual customizer (`/admin/themes/customizer`) with responsive split-screen preview (Desktop, Tablet, Mobile), brand colors, Google & Arabic fonts (Inter, Cairo, Tajawal, Roboto, Outfit, System), border radius, glassmorphism, and compiled CSS variables file generation.
 - **v4.5.3 Official Public Release (2026-08-26):** Updated `/admin/about` page with v4.5.3 What's New highlights and complete changelog timeline, updated all 14 locale translation packs (`lang/*/about.php`), verified PHPUnit automated test suites, and prepared all assets for public release.
-- **v4.5.4 Groundwork & Release Cycle Setup (2026-08-27):** Initialized release cycle for MYADS v4.5.4, bumped canonical `SystemVersion::CURRENT` to v4.5.4, aligned system documentation (`AGENTS.md`, `API_DOCS.md`, `README.md`, `SECURITY.md`), and configured dynamic versioning across the platform.
+- **v4.5.4 Official Release — Developer Platform Lifecycle, Database Reliability & Maintenance (2026-08-27):**
+  - **Developer Platform Application Deletion & Cascade Lifecycle:** Implemented secure self-service application deletion for developers (`/developer/apps`, `/developer/apps/{id}`) and administrative moderation deletion (`/admin/developers`, `/admin/developers/{id}`) with ownership validation, Danger Zone workspaces, confirmation dialogs, and automated database cascading revocation (`ON DELETE CASCADE`) across access tokens, refresh tokens, authorizations, and authorization codes.
+  - **High-Traffic Compound Indexes Resilience & MyISAM Key Limit Patch:** Fixed MySQL/MariaDB 1000-byte key length limit error (`SQLSTATE[42000]: 1071`) in migration `2026_08_26_010000_add_high_traffic_compound_indexes.php` with proactive `InnoDB ROW_FORMAT=DYNAMIC` table conversion, column value sanitization, and isolated try/catch handlers for resilient, zero-downtime execution.
+  - **What's New / About Page & Multilingual Parity:** Updated `/admin/about` page with v4.5.4 What's New highlights, stable changelog timeline entry, synchronized all 14 locale translation packs (`lang/*/about.php`), and verified PHPUnit test suites (100% pass rate).
 
 ---
 
-*Last updated: 2026-08-27 — MYADS v4.5.4 (Development & Groundwork Cycle)*
+*Last updated: 2026-08-27 — MYADS v4.5.4 (Official Release)*

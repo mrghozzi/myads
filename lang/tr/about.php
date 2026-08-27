@@ -7,17 +7,19 @@ return [
     'tab_changelog' => 'Değişiklik Günlüğü',
     'tab_about' => 'MYADS Hakkında',
     
-    // What's New Section (v4.5.3)
-    'feature_1_title' => 'Canlı Tema Özelleştirici & Dinamik CSS Motoru',
-    'feature_1_desc' => '/admin/themes/customizer adresinde gerçek zamanlı bölünmüş ekran önizlemesi (Masaüstü, Tablet, Mobil), renk paletleri, Google ve Arapça tipografi ve derlenmiş CSS enjeksiyonu.',
-    'feature_2_title' => 'Gerçek Zamanlı Olay Motoru & Canlı SSE Akışı',
-    'feature_2_desc' => 'Bildirim ve mesaj rozetlerinin anlık güncellenmesi, canlı akış uyarıları ve yönetim bildirimleri için /live/stream adresinde yüksek performanslı Server-Sent Events (SSE) akışı.',
-    'feature_3_title' => 'Dolandırıcılık Karşıtı Kalkan & Reklam Kalite Motoru v2',
-    'feature_3_desc' => 'IAB Viewability Standardı (>= %50 görünürlük >= 1s), gerçek zamanlı insan davranış parmak izi, eşzamansız görüntüleme sinyalleri ve reklamveren puan koruması.',
-    'feature_4_title' => 'Akıllı Mikro Önbellekleme & Yüksek Trafik İndeksleri',
-    'feature_4_desc' => 'Trafik artışlarında veritabanı yükünü %80\'in üzerinde azaltan reklam sunum optimizasyonu, 20s TTL bellek içi mikro önbellekleme ve bileşik B-Tree indeksleri.',
-    'feature_5_title' => 'Dinamik Eklenti Mimarisi & Güvenlik Güçlendirmesi',
-    'feature_5_desc' => 'PluginServiceProvider\'da dinamik eklenti keşfi, league/commonmark DoS yaması (CVE-2026-71488), SVG XSS temizliği, oturum şifreleme ve sıkı üretim SSL doğrulaması.',
+    // What's New Section (v4.5.4)
+    'feature_1_title' => 'Geliştirici Uygulama Silme & Yaşam Döngüsü Yönetimi',
+    'feature_1_desc' => 'Geliştiricilerin (/developer/apps) ve yöneticilerin (/admin/developers) uygulamaları kalıcı olarak silmesini ve tüm belirteçlerin otomatik iptal edilmesini sağlar.',
+    'feature_2_title' => 'Yüksek Trafik İndeks Dayanıklılığı & MyISAM Düzeltmesi',
+    'feature_2_desc' => 'Kesintisiz geçişler için tabloları InnoDB DYNAMIC\'e dönüştürerek MySQL/MariaDB 1000 bayt anahtar uzunluğu hatalarını ortadan kaldırır.',
+    'feature_3_title' => 'Tehlike Bölgesi & Etkileşimli Onay Pencereleri',
+    'feature_3_desc' => 'Uygulama yönetiminde özel Danger Zone panelleri, sıkı sahiplik doğrulaması ve yanlışlıkla silinmeyi önleyen etkileşimli onaylar.',
+    'feature_4_title' => 'Canlı Tema Özelleştirici & Dinamik CSS Motoru',
+    'feature_4_desc' => '/admin/themes/customizer adresinde gerçek zamanlı bölünmüş ekran önizlemesi (Masaüstü, Tablet, Mobil), renk paletleri, Google ve Arapça tipografi ve derlenmiş CSS enjeksiyonu.',
+    'feature_5_title' => 'Gerçek Zamanlı Olay Motoru & Canlı SSE Akışı',
+    'feature_5_desc' => 'Bildirim ve mesaj rozetlerinin anlık güncellenmesi, canlı akış uyarıları ve yönetim bildirimleri için /live/stream adresinde yüksek performanslı Server-Sent Events (SSE) akışı.',
+    'feature_6_title' => 'Dolandırıcılık Karşıtı Kalkan & Reklam Kalite Motoru v2',
+    'feature_6_desc' => 'IAB Viewability Standardı (>= %50 görünürlük >= 1s), gerçek zamanlı insan davranış parmak izi, eşzamansız görüntüleme sinyalleri ve reklamveren puan koruması.',
 
     // About Section
     'about_description' => 'MYADS, güçlü bir topluluk platformu ve hepsi bir arada reklam değişim ağıdır.',

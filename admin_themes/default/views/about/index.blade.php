@@ -360,7 +360,7 @@
                             <div class="col-md-6 col-lg-4">
                                 <div class="feature-card p-4">
                                     <div class="feature-icon-wrapper" style="background: linear-gradient(135deg, rgba(79, 70, 229, 0.1) 0%, rgba(124, 58, 237, 0.1) 100%); color: #6366f1;">
-                                        <i class="feather-sliders"></i>
+                                        <i class="feather-trash-2"></i>
                                     </div>
                                     <h5 class="fw-bold mb-3">{{ __('about.feature_1_title') }}</h5>
                                     <p class="text-muted mb-0 fs-13">{{ __('about.feature_1_desc') }}</p>
@@ -369,7 +369,7 @@
                             <div class="col-md-6 col-lg-4">
                                 <div class="feature-card p-4">
                                     <div class="feature-icon-wrapper" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">
-                                        <i class="feather-radio"></i>
+                                        <i class="feather-database"></i>
                                     </div>
                                     <h5 class="fw-bold mb-3">{{ __('about.feature_2_title') }}</h5>
                                     <p class="text-muted mb-0 fs-13">{{ __('about.feature_2_desc') }}</p>
@@ -378,7 +378,7 @@
                             <div class="col-md-6 col-lg-4">
                                 <div class="feature-card p-4">
                                     <div class="feature-icon-wrapper" style="background: rgba(16,185,129,0.1); color: #10b981;">
-                                        <i class="feather-shield"></i>
+                                        <i class="feather-alert-triangle"></i>
                                     </div>
                                     <h5 class="fw-bold mb-3">{{ __('about.feature_3_title') }}</h5>
                                     <p class="text-muted mb-0 fs-13">{{ __('about.feature_3_desc') }}</p>
@@ -387,7 +387,7 @@
                             <div class="col-md-6 col-lg-4">
                                 <div class="feature-card p-4">
                                     <div class="feature-icon-wrapper" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;">
-                                        <i class="feather-cpu"></i>
+                                        <i class="feather-sliders"></i>
                                     </div>
                                     <h5 class="fw-bold mb-3">{{ __('about.feature_4_title') }}</h5>
                                     <p class="text-muted mb-0 fs-13">{{ __('about.feature_4_desc') }}</p>
@@ -396,10 +396,19 @@
                             <div class="col-md-6 col-lg-4">
                                 <div class="feature-card p-4">
                                     <div class="feature-icon-wrapper" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6;">
-                                        <i class="feather-lock"></i>
+                                        <i class="feather-radio"></i>
                                     </div>
                                     <h5 class="fw-bold mb-3">{{ __('about.feature_5_title') }}</h5>
                                     <p class="text-muted mb-0 fs-13">{{ __('about.feature_5_desc') }}</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6 col-lg-4">
+                                <div class="feature-card p-4">
+                                    <div class="feature-icon-wrapper" style="background: rgba(6, 182, 212, 0.1); color: #06b6d4;">
+                                        <i class="feather-shield"></i>
+                                    </div>
+                                    <h5 class="fw-bold mb-3">{{ __('about.feature_6_title') }}</h5>
+                                    <p class="text-muted mb-0 fs-13">{{ __('about.feature_6_desc') }}</p>
                                 </div>
                             </div>
                         </div>
@@ -411,12 +420,20 @@
                             <div class="timeline">
                                 <div class="timeline-item">
                                     <div class="timeline-icon"><i class="feather-box fs-12"></i></div>
-                                    <h6 class="fw-bold mb-1">v4.5.4 <span class="badge bg-soft-success text-success ms-2">Development Track</span></h6>
-                                    <p class="text-muted fs-13 mb-3">Development & Groundwork Cycle — Groundwork Initialization, System Documentation Alignment, Canonical Version Synchronization, and Release Track Setup.</p>
+                                    <h6 class="fw-bold mb-1">v4.5.4 <span class="badge bg-soft-success text-success ms-2">Stable</span></h6>
+                                    <p class="text-muted fs-13 mb-3">Developer Platform Lifecycle, Database Reliability & Maintenance Release — Developer Application Deletion & Lifecycle Management (Developer Self-Service & Administrative Moderation with Foreign-Key Cascade Revocation), High-Traffic Compound Indexes Migration Key Length Resilience Patch, Legacy MySQL / MyISAM Schema Hardening, and Zero-Downtime Migration Execution.</p>
                                     <div class="d-flex flex-column gap-2">
                                         <div class="d-flex align-items-start">
                                             <span class="changelog-badge badge-feature mt-1" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">Feature</span>
-                                            <span class="text-muted fs-13">Initialized release cycle for MYADS v4.5.4, updated canonical version constant (<code>SystemVersion::CURRENT</code>), synchronized system documentation, and configured dynamic versioning across the platform.</span>
+                                            <span class="text-muted fs-13">Implemented <strong>Developer Application Deletion & Cascade Lifecycle</strong> enabling developers (<code>/developer/apps</code>) and site administrators (<code>/admin/developers</code>) to permanently delete applications with ownership verification, Danger Zone workspaces, and automated cascade revocation of tokens and authorizations.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-fix mt-1" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;">Fix</span>
+                                            <span class="text-muted fs-13">Resolved MySQL/MariaDB 1000-byte key length limit error (<code>SQLSTATE[42000]: 1071</code>) in high-traffic compound indexes migration by proactively converting tables to <code>InnoDB ROW_FORMAT=DYNAMIC</code> and sanitizing column types.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-optimization mt-1" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">UI & Themes</span>
+                                            <span class="text-muted fs-13">Full multi-theme integration with confirmation modals across Default theme and Admin console across all 14 supported locales.</span>
                                         </div>
                                     </div>
                                 </div>
@@ -469,7 +486,7 @@
                                 </div>
                                 <div class="timeline-item">
                                     <div class="timeline-icon"><i class="feather-box fs-12"></i></div>
-                                    <h6 class="fw-bold mb-1">v4.5.2 <span class="badge bg-soft-secondary text-secondary ms-2">Stable</span></h6>
+                                    <h6 class="fw-bold mb-1">v4.5.2 <span class="badge bg-soft-secondary text-muted ms-2">v4.5.2</span></h6>
                                     <p class="text-muted fs-13 mb-3">Maintenance & Extension Extensibility Release — Modular Rich Text Editor Plugin (<code>myads-tinymce-editor</code>) Integration, Admin Hooks Inspector, Continuous Floating Audio Player, Referral System Overhaul, Developer Platform Modernization, Admin Maintenance & FFmpeg Diagnostic Terminals, and Comprehensive Automated Testing.</p>
                                     <div class="d-flex flex-column gap-2">
                                         <div class="d-flex align-items-start">
@@ -524,7 +541,7 @@
                                 </div>
                                 <div class="timeline-item">
                                     <div class="timeline-icon"><i class="feather-box fs-12"></i></div>
-                                    <h6 class="fw-bold mb-1">v4.5.1 <span class="badge bg-soft-secondary text-secondary ms-2">Stable</span></h6>
+                                    <h6 class="fw-bold mb-1">v4.5.1 <span class="badge bg-soft-secondary text-muted ms-2">v4.5.1</span></h6>
                                     <p class="text-muted fs-13 mb-3">Rich Text Editor Engine (Quill.js & Extensibility Hooks), Database Index & Health Diagnostic Panel, Selective Cache Warmup Engine, Mini Floating PIP Video Player, Shorts Touch Swipe & Audio Tagging, Anti-Click-Farm Security & Ad Quality Index, and Comprehensive Frontend @.superdesign Overhauls.</p>
                                     <div class="d-flex flex-column gap-2">
                                         <div class="d-flex align-items-start">
@@ -564,7 +581,7 @@
 
                                 <div class="timeline-item">
                                     <div class="timeline-icon"><i class="feather-box fs-12"></i></div>
-                                    <h6 class="fw-bold mb-1">v4.5.0 <span class="badge bg-soft-secondary text-secondary ms-2">Stable</span></h6>
+                                    <h6 class="fw-bold mb-1">v4.5.0 <span class="badge bg-soft-secondary text-muted ms-2">v4.5.0</span></h6>
                                     <p class="text-muted fs-13 mb-3">YouTube-Style Watch Page & Video Hub, Gamification Badges & Quests, Admin SEO Suite & Knowledgebase Power Overhaul, 95%+ DB Aggregation Engine, Smart Widgets & Flutter App Parity.</p>
                                     <div class="d-flex flex-column gap-2">
                                         <div class="d-flex align-items-start">
@@ -594,190 +611,6 @@
                                         <div class="d-flex align-items-start">
                                             <span class="changelog-badge badge-fix mt-1" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;">Fix</span>
                                             <span class="text-muted fs-13">Resolved installer migration foreign key mismatches on <code>user_blocks</code> and <code>developer_apps</code> tables, store editor client validation blocking, video hub trending 500 error, and reaction debouncer duplicate network calls.</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="timeline-item">
-                                    <div class="timeline-icon"><i class="feather-box fs-12"></i></div>
-                                    <h6 class="fw-bold mb-1">v4.4.6</h6>
-                                    <p class="text-muted fs-13 mb-3">Unified Admin Settings Control Panel, Dedicated Mobile App Settings Panel, API Key Security Masking, Log Bloat & Server Storage Optimization, New Language Packs, Marketplace & Store Enhancements.</p>
-                                    <div class="d-flex flex-column gap-2">
-                                        <div class="d-flex align-items-start">
-                                            <span class="changelog-badge badge-feature mt-1" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">Feature</span>
-                                            <span class="text-muted fs-13">Merged <code>/admin/settings/system</code> into <strong>Unified Admin Settings Control Panel</strong> (<code>/admin/settings</code>) and overhauled S3, DigitalOcean, Google Cloud, and FTP storage settings with <strong>Superdesign</strong> UI and diagnostic tools.</span>
-                                        </div>
-                                        <div class="d-flex align-items-start">
-                                            <span class="changelog-badge badge-feature mt-1" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">Feature</span>
-                                            <span class="text-muted fs-13">Created <strong>Dedicated Mobile App Settings</strong> (<code>/admin/settings/mobile</code>) with official Flutter repository setup guide, secret API key masking/regeneration, and standardized media upload array key parity (<code>images[]</code>, <code>videos[]</code>, <code>audios[]</code>, <code>files[]</code>).</span>
-                                        </div>
-                                        <div class="d-flex align-items-start">
-                                            <span class="changelog-badge badge-optimization mt-1" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">Optimization</span>
-                                            <span class="text-muted fs-13">Converted logging stack to <strong>Daily Log Rotation</strong> (<code>LOG_STACK=daily</code>), implemented automated <code>myads:log-cleanup</code> Artisan command, probabilistic log pruning for shared hosting, and a <strong>Log Files Monitor</strong> on <code>/admin/database-cleanup</code>.</span>
-                                        </div>
-                                        <div class="d-flex align-items-start">
-                                            <span class="changelog-badge badge-feature mt-1" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">Feature</span>
-                                            <span class="text-muted fs-13">Added <strong>5 New Language Packs</strong> for Russian (<code>ru</code>), Serbian (<code>sr</code>), Japanese (<code>ja</code>), Simplified Chinese (<code>zh_CN</code>), and Traditional Chinese (<code>zh_TW</code>) across 3,625+ system keys (14 total languages).</span>
-                                        </div>
-                                        <div class="d-flex align-items-start">
-                                            <span class="changelog-badge badge-feature mt-1" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">Feature</span>
-                                            <span class="text-muted fs-13">Expanded <strong>Store Market Grid</strong> to display all 9 product categories with product counts, minimalist 3D category illustrations, and full-width header layouts.</span>
-                                        </div>
-                                        <div class="d-flex align-items-start">
-                                            <span class="changelog-badge badge-fix mt-1" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;">Fix</span>
-                                            <span class="text-muted fs-13">Resolved PTS Activities 500 error, Bootstrap modal backdrop stacking, slow network FOUC, Knowledgebase engine fallbacks, and Admin Mail SMTP environment fallbacks.</span>
-                                        </div>
-                                        <div class="d-flex align-items-start">
-                                            <span class="changelog-badge mt-1" style="background: rgba(107, 114, 128, 0.1); color: #6b7280;">Update</span>
-                                            <span class="text-muted fs-13">Bumped <strong>guzzlehttp/guzzle</strong> to 7.15.1 and <strong>shell-quote</strong> to 1.9.0.</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="timeline-item">
-                                    <div class="timeline-icon" style="border-color: #6b7280; color: #6b7280;"><i class="feather-check fs-12"></i></div>
-                                    <h6 class="fw-bold mb-1 text-muted">v4.4.5</h6>
-                                    <p class="text-muted fs-13 mb-3">Stable Release with Mobile API Community Feed Enhancements, UI Overhaul, and Authorization Fixes.</p>
-                                    <div class="d-flex flex-column gap-2">
-                                        <div class="d-flex align-items-start">
-                                            <span class="changelog-badge badge-feature mt-1" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">Feature</span>
-                                            <span class="text-muted fs-13">Redesigned Member Dashboard, Marketplace catalog, and Community Feed search results with <strong>Superdesign</strong> aesthetic and responsive layouts.</span>
-                                        </div>
-                                        <div class="d-flex align-items-start">
-                                            <span class="changelog-badge badge-feature mt-1" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">Feature</span>
-                                            <span class="text-muted fs-13">Enhanced <strong>Mobile API</strong> to handle paginated API endpoints and fixed aggressive header stripping on shared hosts.</span>
-                                        </div>
-                                        <div class="d-flex align-items-start">
-                                            <span class="changelog-badge badge-optimization mt-1" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">Optimization</span>
-                                            <span class="text-muted fs-13">Added <strong>Shared Hosting Guide</strong> and <strong>Server Pressure Sources</strong> sections in the Admin panel to help diagnose and reduce server load.</span>
-                                        </div>
-                                        <div class="d-flex align-items-start">
-                                            <span class="changelog-badge badge-fix mt-1" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;">Fix</span>
-                                            <span class="text-muted fs-13">Fixed Mobile API relationship loading, Store product view counts, and Forum category visibility mapping.</span>
-                                        </div>
-                                        <div class="d-flex align-items-start">
-                                            <span class="changelog-badge mt-1" style="background: rgba(107, 114, 128, 0.1); color: #6b7280;">Update</span>
-                                            <span class="text-muted fs-13">Bumped <strong>axios</strong> from 1.16.0 to 1.18.0.</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="timeline-item">
-                                    <div class="timeline-icon" style="border-color: #6b7280; color: #6b7280;"><i class="feather-check fs-12"></i></div>
-                                    <h6 class="fw-bold mb-1 text-muted">v4.4.4</h6>
-                                    <p class="text-muted fs-13 mb-2">Stable release with Automated Database Maintenance, Smart Ads Memory Fix, and Performance Toggles.</p>
-                                    <div class="d-flex flex-column gap-2">
-                                        <div class="d-flex align-items-start">
-                                            <span class="changelog-badge badge-optimization mt-1" style="background: rgba(107, 114, 128, 0.1); color: #6b7280;">Optimization</span>
-                                            <span class="text-muted fs-13">Introduced <strong>Automated Database Maintenance</strong> with probabilistic garbage collection that prunes old records on shared hosting without cron.</span>
-                                        </div>
-                                        <div class="d-flex align-items-start">
-                                            <span class="changelog-badge badge-optimization mt-1" style="background: rgba(107, 114, 128, 0.1); color: #6b7280;">Optimization</span>
-                                            <span class="text-muted fs-13">Resolved a severe memory leak in Smart Ads by replacing eager-loading with ID plucking and batch limits.</span>
-                                        </div>
-                                        <div class="d-flex align-items-start">
-                                            <span class="changelog-badge badge-optimization mt-1" style="background: rgba(107, 114, 128, 0.1); color: #6b7280;">Optimization</span>
-                                            <span class="text-muted fs-13">Introduced a <strong>Simple Chronological Feed Mode</strong> for the community portal, reducing CPU usage by over 90% for shared hosting.</span>
-                                        </div>
-                                        <div class="d-flex align-items-start">
-                                            <span class="changelog-badge badge-feature mt-1" style="background: rgba(107, 114, 128, 0.1); color: #6b7280;">Feature</span>
-                                            <span class="text-muted fs-13">Added <strong>Resource-Heavy Features</strong> toggles to disable User Online Status and SEO Daily Metrics tracking.</span>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="timeline-item">
-                                    <div class="timeline-icon" style="border-color: #6b7280; color: #6b7280;"><i class="feather-check fs-12"></i></div>
-                                    <h6 class="fw-bold mb-1 text-muted">v4.4.3</h6>
-                                    <p class="text-muted fs-13 mb-2">Stable release with Ad Serving Performance Fix and BBCode Emails.</p>
-                                    <div class="d-flex flex-column gap-2">
-                                        <div class="d-flex align-items-start">
-                                            <span class="changelog-badge badge-feature mt-1" style="background: rgba(107, 114, 128, 0.1); color: #6b7280;">Feature</span>
-                                            <span class="text-muted fs-13">Added support for BBCode email formatting (<code>[email=...]</code>) in community posts and forum topics.</span>
-                                        </div>
-                                        <div class="d-flex align-items-start">
-                                            <span class="changelog-badge badge-optimization mt-1" style="background: rgba(107, 114, 128, 0.1); color: #6b7280;">Optimization</span>
-                                            <span class="text-muted fs-13">Resolved severe CPU and RAM consumption bottlenecks in ad serving endpoints using direct database JSON targeting.</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="timeline-item">
-                                    <div class="timeline-icon" style="border-color: #6b7280; color: #6b7280;"><i class="feather-check fs-12"></i></div>
-                                    <h6 class="fw-bold mb-1 text-muted">v4.4.2</h6>
-                                    <p class="text-muted fs-13 mb-2">Stable release introducing the Database Cleanup Tool and Admin UI Enhancements.</p>
-                                    <div class="d-flex flex-column gap-2">
-                                        <div class="d-flex align-items-start">
-                                            <span class="changelog-badge badge-feature mt-1" style="background: rgba(107, 114, 128, 0.1); color: #6b7280;">Feature</span>
-                                            <span class="text-muted fs-13">Added a new <strong>Database Cleanup</strong> tool to manually prune large analytics and tracking tables.</span>
-                                        </div>
-                                        <div class="d-flex align-items-start">
-                                            <span class="changelog-badge badge-feature mt-1" style="background: rgba(107, 114, 128, 0.1); color: #6b7280;">Feature</span>
-                                            <span class="text-muted fs-13">Reorganized the admin sidebar navigation by introducing a unified <strong>System</strong> menu.</span>
-                                        </div>
-                                        <div class="d-flex align-items-start">
-                                            <span class="changelog-badge badge-fix mt-1" style="background: rgba(107, 114, 128, 0.1); color: #6b7280;">Fix</span>
-                                            <span class="text-muted fs-13">Fixed a 500 Internal Server Error on the Database Cleanup page and enforced multilingual support.</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="timeline-item">
-                                    <div class="timeline-icon" style="border-color: #6b7280; color: #6b7280;"><i class="feather-check fs-12"></i></div>
-                                    <h6 class="fw-bold mb-1 text-muted">v4.4.1</h6>
-                                    <p class="text-muted fs-13 mb-2">Stable release with Pin Post to Profile, BBCode URL formatting, and critical security and performance fixes.</p>
-                                    <div class="d-flex flex-column gap-2">
-                                        <div class="d-flex align-items-start">
-                                            <span class="changelog-badge badge-feature mt-1" style="background: rgba(107, 114, 128, 0.1); color: #6b7280;">Feature</span>
-                                            <span class="text-muted fs-13">Added <strong>Pin Post to Profile</strong> feature, allowing members to pin a single post to the top of their personal profile page.</span>
-                                        </div>
-                                        <div class="d-flex align-items-start">
-                                            <span class="changelog-badge badge-feature mt-1" style="background: rgba(107, 114, 128, 0.1); color: #6b7280;">Feature</span>
-                                            <span class="text-muted fs-13">Added BBCode URL formatting support with dynamic domain blockage filtering.</span>
-                                        </div>
-                                        <div class="d-flex align-items-start">
-                                            <span class="changelog-badge badge-fix mt-1" style="background: rgba(107, 114, 128, 0.1); color: #6b7280;">Fix</span>
-                                            <span class="text-muted fs-13">Fixed a 500 Internal Server Error in community feed/member profiles caused by malformed Blade directives.</span>
-                                        </div>
-                                        <div class="d-flex align-items-start">
-                                            <span class="changelog-badge badge-optimization mt-1" style="background: rgba(107, 114, 128, 0.1); color: #6b7280;">Optimization</span>
-                                            <span class="text-muted fs-13">Resolved CPU consumption on ad serving endpoints by adding missing database indexes to the state table.</span>
-                                        </div>
-                                        <div class="d-flex align-items-start">
-                                            <span class="changelog-badge badge-fix mt-1" style="background: rgba(107, 114, 128, 0.1); color: #6b7280;">Fix</span>
-                                            <span class="text-muted fs-13">Resolved a critical 500 error on Knowledgebase pages due to an orphaned tablespace.</span>
-                                        </div>
-                                        <div class="d-flex align-items-start">
-                                            <span class="changelog-badge badge-fix mt-1" style="background: rgba(107, 114, 128, 0.1); color: #6b7280;">Security</span>
-                                            <span class="text-muted fs-13">Allowed stackedit.io iframe in the Content-Security-Policy (CSP) to enable StackEdit Markdown editor.</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="timeline-item">
-                                    <div class="timeline-icon" style="border-color: #6b7280; color: #6b7280;"><i class="feather-check fs-12"></i></div>
-                                    <h6 class="fw-bold mb-1 text-muted">v4.4.0</h6>
-                                    <p class="text-muted fs-13 mb-2">Major release with Superdesign aesthetics, Performance Settings, System Monitor, and Free SEO Checker.</p>
-                                    <div class="d-flex flex-column gap-2">
-                                        <div class="d-flex align-items-start">
-                                            <span class="changelog-badge badge-feature mt-1" style="background: rgba(107, 114, 128, 0.1); color: #6b7280;">Feature</span>
-                                            <span class="text-muted fs-13">Added Free SEO Checker with role-based access gating and a premium "Superdesign" UI.</span>
-                                        </div>
-                                        <div class="d-flex align-items-start">
-                                            <span class="changelog-badge badge-feature mt-1" style="background: rgba(107, 114, 128, 0.1); color: #6b7280;">Feature</span>
-                                            <span class="text-muted fs-13">Added System Monitor dashboard for real-time overview of server resource consumption.</span>
-                                        </div>
-                                        <div class="d-flex align-items-start">
-                                            <span class="changelog-badge badge-feature mt-1" style="background: rgba(107, 114, 128, 0.1); color: #6b7280;">Feature</span>
-                                            <span class="text-muted fs-13">Implemented Skeleton Loaders (Shimmer Effect) in the community feed for a premium loading state.</span>
-                                        </div>
-                                        <div class="d-flex align-items-start">
-                                            <span class="changelog-badge badge-optimization mt-1" style="background: rgba(107, 114, 128, 0.1); color: #6b7280;">Optimization</span>
-                                            <span class="text-muted fs-13">Eliminated severe N+1 database queries on the community feed by implementing bulk eager-loading.</span>
-                                        </div>
-                                        <div class="d-flex align-items-start">
-                                            <span class="changelog-badge badge-fix mt-1" style="background: rgba(107, 114, 128, 0.1); color: #6b7280;">Security</span>
-                                            <span class="text-muted fs-13">Patched path traversal vulnerability in Admin Media Manager to prevent arbitrary file renaming.</span>
                                         </div>
                                     </div>
                                 </div>

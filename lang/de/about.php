@@ -7,17 +7,19 @@ return [
     'tab_changelog' => 'Änderungsprotokoll',
     'tab_about' => 'Über MYADS',
     
-    // What's New Section (v4.5.3)
-    'feature_1_title' => 'Live Theme Customizer & Dynamic CSS Engine',
-    'feature_1_desc' => 'Interactive visual customizer at /admin/themes/customizer with real-time split-screen preview (Desktop, Tablet, Mobile), brand colors, Google & Arabic typography (Inter, Cairo, Tajawal, Roboto, Outfit, System), border radius, glassmorphism, and compiled CSS injection.',
-    'feature_2_title' => 'Real-Time Events Engine & Live SSE Stream',
-    'feature_2_desc' => 'High-performance Server-Sent Events (SSE) stream at /live/stream and /api/live/stream providing instant notification and message badge counts, live toast alerts, community feed updates, admin alerts, and non-blocking session release.',
-    'feature_3_title' => 'Anti-Fraud Shield & Ad Quality Engine v2',
-    'feature_3_desc' => 'Enterprise-grade ad protection with IAB Viewability Standard (>= 50% visibility >= 1 continuous sec), real-time human behavior fingerprinting (mouse trajectory, touch duration, WebGL/bot checks), async view beacons, and advertiser PTS protection with flag reason tags.',
-    'feature_4_title' => 'Smart Micro-Caching & High-Traffic Indexes',
-    'feature_4_desc' => 'Optimized ad serving queries reducing database load by >80% during traffic bursts, with smart in-memory micro-caching (20s TTL) for active campaign pools and compound B-Tree indexes across status, smart_ads, banner, link, and custom_ad_events.',
-    'feature_5_title' => 'Zero-Hardcoding Dynamic Plugins & Security Hardening',
-    'feature_5_desc' => 'Fully dynamic plugin auto-discovery and resolution in PluginServiceProvider, paired with league/commonmark DoS patch (CVE-2026-71488), Stored SVG XSS elimination, OAuth redirect hardening, session encryption, constant-time hash_equals(), and strict production SSL enforcement.',
+    // What's New Section (v4.5.4)
+    'feature_1_title' => 'Entwickler-App-Löschung & Lebenszyklus-Management',
+    'feature_1_desc' => 'Ermöglicht Entwicklern (/developer/apps) und Administratoren (/admin/developers) das dauerhafte Löschen von Anwendungen mit automatischer Kaskaden-Widerrufung von Tokens und Berechtigungen.',
+    'feature_2_title' => 'Widerstandsfähigkeit von Hochleistungs-Indizes & MyISAM-Patch',
+    'feature_2_desc' => 'Beseitigung von MySQL/MariaDB 1000-Byte-Schlüssellängenfehlern durch proaktive Konvertierung von Tabellen in InnoDB DYNAMIC für unterbrechungsfreie Migrationen.',
+    'feature_3_title' => 'Gefahrenzone & Interaktive Bestätigungsdialoge',
+    'feature_3_desc' => 'Ausstattung von App-Verwaltungsbereichen mit Danger-Zone-Panels, strenger Eigentumsprüfung und interaktiven Bestätigungsdialogen zur Verhinderung versehentlicher Löschungen.',
+    'feature_4_title' => 'Live Theme Customizer & Dynamic CSS Engine',
+    'feature_4_desc' => 'Interaktiver visueller Customizer unter /admin/themes/customizer mit responsiver Echtzeit-Vorschau, Markenfarben, Google- und arabischen Schriftarten, Rahmenradius und kompilierter CSS-Injektion.',
+    'feature_5_title' => 'Echtzeit-Ereignis-Engine & Live SSE Stream',
+    'feature_5_desc' => 'Hochleistungs-Server-Sent Events (SSE) Stream unter /live/stream für sofortige Benachrichtigungs- und Nachrichtenzähler, Live-Toast-Warnungen und nicht-blockierende Sitzungsfreigabe.',
+    'feature_6_title' => 'Anti-Fraud Shield & Ad Quality Engine v2',
+    'feature_6_desc' => 'Werbeschutz nach IAB Viewability Standard (>= 50% Sichtbarkeit >= 1s), Echtzeit-Verhaltens-Fingerprinting, asynchrone View-Beacons und PTS-Punkte-Schutz für Werbetreibende.',
 
     // About Section
     'about_description' => 'MYADS is a powerful, all-in-one community platform and ad exchange network. It empowers website owners to connect, exchange traffic, trade services, and monetize their platforms effectively.',
