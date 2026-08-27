@@ -1,8 +1,9 @@
 # v4.5.4
-> **Development & Groundwork Cycle** — Groundwork Initialization, System Documentation Alignment, Canonical Version Synchronization, and Release Track Setup.
+> **Database Reliability & Maintenance Release** — High-Traffic Compound Indexes Migration Key Length Resilience Patch, Legacy MySQL / MyISAM Schema Hardening, and Zero-Downtime Migration Execution.
 
-### Core & Infrastructure
-* **Feature (Groundwork Initialization):** Initialized release cycle for MYADS v4.5.4. Updated canonical version constant (`SystemVersion::CURRENT`), system documentation (`AGENTS.md`, `API_DOCS.md`, `README.md`, `SECURITY.md`), and configured dynamic versioning across the platform.
+### Bug Fixes & Database Reliability
+* **Bug Fix & Reliability (High-Traffic Compound Indexes Migration Resilience & MyISAM / utf8mb4 1000-byte Key Limit Patch):** Resolved a MySQL/MariaDB schema error (`SQLSTATE[42000]: 1071 Specified key was too long; max key length is 1000 bytes`) during execution of migration `2026_08_26_010000_add_high_traffic_compound_indexes.php`. Implemented proactive conversion of target high-traffic tables (`status`, `smart_ads`, `banner`, `link`, `custom_ad_events`) to `ENGINE = InnoDB ROW_FORMAT = DYNAMIC`, sanitized legacy non-numeric values before modifying column types (`s_type`, `statu`, `date`), and encapsulated compound index creation in isolated `try/catch` handlers with warning telemetry to guarantee resilient execution across legacy databases and shared hosting environments.
+
 
 
 # v4.5.3

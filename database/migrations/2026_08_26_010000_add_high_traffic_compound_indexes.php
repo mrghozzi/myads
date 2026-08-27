@@ -15,7 +15,16 @@ return new class extends Migration
         if (Schema::hasTable('status')) {
             if ($isMysql) {
                 try {
+                    // Normalize table engine & format for long index keys
                     DB::statement('ALTER TABLE `status` ENGINE = InnoDB ROW_FORMAT = DYNAMIC');
+                    
+                    // Sanitize any corrupt non-numeric data in legacy columns before type conversion
+                    try {
+                        DB::statement("UPDATE `status` SET `s_type` = 100 WHERE `s_type` IS NULL OR `s_type` = ''");
+                        DB::statement("UPDATE `status` SET `statu` = 1 WHERE `statu` IS NULL OR `statu` = ''");
+                        DB::statement("UPDATE `status` SET `date` = 0 WHERE `date` IS NULL OR `date` = ''");
+                    } catch (\Throwable $e) {}
+
                     DB::statement('ALTER TABLE `status` MODIFY `s_type` INT NOT NULL DEFAULT 100, MODIFY `statu` TINYINT NOT NULL DEFAULT 1, MODIFY `date` BIGINT NOT NULL DEFAULT 0');
                 } catch (\Throwable $e) {
                     // Fallback if alter fails on specific hosting constraints
