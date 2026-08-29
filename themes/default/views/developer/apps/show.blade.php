@@ -35,6 +35,12 @@
             </div>
         @endif
 
+        @if(session('error'))
+            <div class="dev-note dev-note--danger" style="margin-bottom: 20px;">
+                <strong>{{ session('error') }}</strong>
+            </div>
+        @endif
+
         <div class="widget-box dev-panel" style="margin-bottom: 20px;">
             <div class="widget-box-content" style="padding: 28px;">
                 <div class="dev-summary-head">

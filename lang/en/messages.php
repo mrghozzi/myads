@@ -2982,6 +2982,8 @@ return [
     'dev_app_deleted' => 'Application deleted successfully.',
     'dev_app_submitted' => 'App submitted for review.',
     'dev_app_secret_rotated' => 'Client secret rotated successfully.',
+    'dev_app_creation_failed' => 'Failed to create the application. Please try again later or contact support if the problem persists.',
+    'dev_app_update_failed' => 'Failed to update the application. Please try again later or contact support if the problem persists.',
     'delete_app' => 'Delete Application',
     'confirm_delete_app' => 'Are you sure you want to delete this application? This action cannot be undone and will revoke all associated authorizations and tokens.',
     'delete_app_warning' => 'Deleting this application will permanently revoke all granted authorizations, active tokens, and API credentials.',

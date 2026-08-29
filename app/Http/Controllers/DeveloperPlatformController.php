@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Services\DeveloperEligibilityService;
 use App\Models\DeveloperApp;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Services\DeveloperScopeCatalog;
@@ -81,17 +82,26 @@ class DeveloperPlatformController extends Controller
         $clientId = bin2hex(random_bytes(16));
         $clientSecret = bin2hex(random_bytes(32));
 
-        $app = DeveloperApp::create([
-            'user_id' => auth()->id(),
-            'name' => $request->name,
-            'domain' => $request->domain,
-            'description' => $request->description,
-            'client_id' => $clientId,
-            'client_secret' => $clientSecret,
-            'redirect_uris' => $redirectUris,
-            'requested_scopes' => $request->requested_scopes ?? [],
-            'status' => 'draft', // By default draft
-        ]);
+        try {
+            $app = DeveloperApp::create([
+                'user_id' => auth()->id(),
+                'name' => $request->name,
+                'domain' => $request->domain,
+                'description' => $request->description,
+                'client_id' => $clientId,
+                'client_secret' => $clientSecret,
+                'redirect_uris' => $redirectUris,
+                'requested_scopes' => $request->requested_scopes ?? [],
+                'status' => 'draft', // By default draft
+            ]);
+        } catch (QueryException $e) {
+            \Log::error('Developer app creation failed', [
+                'user_id' => auth()->id(),
+                'error' => $e->getMessage(),
+            ]);
+
+            return back()->withInput()->with('error', __('messages.dev_app_creation_failed'));
+        }
 
         return redirect()->route('developer.apps.show', $app->id)->with('success', __('messages.dev_app_created'));
     }
@@ -141,7 +151,16 @@ class DeveloperPlatformController extends Controller
             $app->status = 'pending_review';
         }
 
-        $app->save();
+        try {
+            $app->save();
+        } catch (QueryException $e) {
+            \Log::error('Developer app update failed', [
+                'app_id' => $app->id,
+                'error' => $e->getMessage(),
+            ]);
+
+            return back()->withInput()->with('error', __('messages.dev_app_update_failed'));
+        }
 
         return back()->with('success', __('messages.dev_app_updated'));
     }

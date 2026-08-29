@@ -24,6 +24,18 @@
     </div>
 
     <div class="grid-column">
+        @if(session('success'))
+            <div class="alert alert-success" role="alert" style="margin-bottom: 20px;">
+                {{ session('success') }}
+            </div>
+        @endif
+
+        @if(session('error'))
+            <div class="dev-note dev-note--danger" style="margin-bottom: 20px;">
+                <strong>{{ session('error') }}</strong>
+            </div>
+        @endif
+
         @if($errors->any())
             <div class="dev-note dev-note--danger">
                 <strong>{{ __('messages.save') }}</strong>
