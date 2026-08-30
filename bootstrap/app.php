@@ -74,6 +74,8 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->trustProxies(at: '*');
+
         $middleware->web(append: [
             \App\Http\Middleware\SecurityHeaders::class,
             \App\Http\Middleware\BlockBannedIp::class,
@@ -111,8 +113,15 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) use ($isTestingContext): void {
-        // Force the application to use our themed error views
-        $exceptions->render(function (\Symfony\Component\HttpKernel\Exception\HttpExceptionInterface $e) {
+        // Force the application to use our themed error views for web, and JSON for AJAX/API
+        $exceptions->render(function (\Symfony\Component\HttpKernel\Exception\HttpExceptionInterface $e, $request) {
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $e->getMessage() ?: ('HTTP ' . $e->getStatusCode() . ' - ' . basename($e->getFile()) . ':' . $e->getLine()),
+                ], $e->getStatusCode());
+            }
+
             $code = $e->getStatusCode();
             if (view()->exists("theme::errors.{$code}")) {
                 return response()->view("theme::errors.{$code}", [], $code);

@@ -132,10 +132,13 @@
             </div>
         </div>
 
+        <div id="dev-form-alert" class="dev-note dev-note--danger" style="display: none; margin-bottom: 20px;"></div>
+        <div id="dev-form-success" class="alert alert-success" style="display: none; margin-bottom: 20px;"></div>
+
         <div class="widget-box dev-panel">
             <p class="widget-box-title">{{ __('messages.app_settings') }}</p>
             <div class="widget-box-content" style="padding: 32px;">
-                <form action="{{ route('developer.apps.update', $app->id) }}" method="POST" class="dev-form-layout">
+                <form action="{{ route('developer.apps.update', $app->id, false) }}" method="POST" class="dev-form-layout" id="dev-update-app-form">
                     @csrf
                     @method('PUT')
 
@@ -147,7 +150,7 @@
 
                     <div class="dev-form-actions">
                         <a href="{{ route('developer.apps.index') }}" class="button secondary">{{ __('messages.my_apps') }}</a>
-                        <button type="submit" class="button primary">{{ __('messages.save_changes') }}</button>
+                        <button type="submit" class="button primary" id="dev-update-btn">{{ __('messages.save_changes') }}</button>
                     </div>
                 </form>
             </div>

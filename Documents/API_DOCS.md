@@ -218,6 +218,34 @@ Developers can register external applications at `/developer` to build third-par
 | | `owner.messages.read` | Read private message conversations belonging to authorized owner. | **Yes** |
 | | `owner.messages.write` | Send private messages on behalf of authorized owner. | **Yes** |
 
+### Application Management & Form Architecture (v4.5.5)
+- **Application Registration:** `POST /developer/apps`
+  - **Headers:** `Content-Type: application/json`, `X-CSRF-TOKEN: {token}`, `Accept: application/json`
+  - **Payload:**
+    ```json
+    {
+      "name": "My WordPress Sync App",
+      "domain": "https://example.com",
+      "description": "Auto-publish articles and sync updates.",
+      "redirect_uris": "https://example.com/oauth/callback",
+      "requested_scopes": ["user.identity.read", "user.content.write"]
+    }
+    ```
+  - **Response:**
+    ```json
+    {
+      "success": true,
+      "message": "App created successfully",
+      "redirect": "/developer/apps/42"
+    }
+    ```
+- **Application Update:** `PUT /developer/apps/{id}`
+  - **Headers:** `Content-Type: application/json`, `X-CSRF-TOKEN: {token}`, `Accept: application/json`
+  - **Payload:** Includes `_method: "PUT"`, updated scopes array, redirect URIs, and metadata.
+- **Client Secret Rotation:** `POST /developer/apps/{id}/rotate-secret`
+- **Application Submission:** `POST /developer/apps/{id}/submit`
+- **Application Self-Service Deletion:** `DELETE /developer/apps/{id}` (Cascades across tokens and authorizations)
+
 ---
 
 ## 5. Developer API v1 Endpoints

@@ -62,47 +62,99 @@ class DeveloperPlatformController extends Controller
 
     public function store(Request $request, DeveloperEligibilityService $eligibilityService)
     {
-        if (!auth()->check()) return redirect()->route('login');
+        \Log::error('[DevApp:store] Step 1: Method entered', [
+            'user_id' => auth()->id(),
+            'ip' => $request->ip(),
+            'has_csrf' => $request->has('_token'),
+            'inputs' => $request->except(['_token', 'client_secret']),
+        ]);
+
+        if (!auth()->check()) {
+            \Log::error('[DevApp:store] Aborting: user not authenticated');
+            return redirect()->route('login');
+        }
 
         $check = $eligibilityService->checkEligibility(auth()->user());
         if (!$check['eligible']) {
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => __('messages.dev_not_eligible'),
+                ], 403);
+            }
             return redirect()->route('developer.index')->with('error', __('messages.dev_not_eligible'));
         }
 
-        $validated = $request->validate([
-            'name' => 'required|string|max:191',
-            'domain' => 'required|url|max:191',
-            'description' => 'required|string|max:1000',
-            'redirect_uris' => 'required|string', // Comma separated
-            'requested_scopes' => 'array',
-        ]);
+        try {
+            $validated = $request->validate([
+                'name' => 'required|string|max:191',
+                'domain' => 'required|string|max:191',
+                'description' => 'required|string|max:1000',
+                'redirect_uris' => 'required|string',
+                'requested_scopes' => 'nullable|array',
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'errors' => $e->errors(),
+                    'message' => implode(' | ', array_map(function($err) {
+                        return is_array($err) ? implode(', ', $err) : $err;
+                    }, $e->errors())),
+                ], 422);
+            }
 
-        $redirectUris = array_map('trim', explode(',', $request->redirect_uris));
+            return back()->withInput()->withErrors($e->errors())->with('error', implode(' | ', array_map(function($err) {
+                return is_array($err) ? implode(', ', $err) : $err;
+            }, $e->errors())));
+        }
+
+        $redirectUris = array_values(array_filter(array_map('trim', explode(',', $request->redirect_uris))));
         
         $clientId = bin2hex(random_bytes(16));
         $clientSecret = bin2hex(random_bytes(32));
 
+        $domain = trim($request->domain);
+        if (!preg_match('~^https?://~i', $domain)) {
+            $domain = 'https://' . $domain;
+        }
+
         try {
             $app = DeveloperApp::create([
                 'user_id' => auth()->id(),
-                'name' => $request->name,
-                'domain' => $request->domain,
-                'description' => $request->description,
+                'name' => trim($request->name),
+                'domain' => $domain,
+                'description' => trim($request->description),
                 'client_id' => $clientId,
                 'client_secret' => $clientSecret,
                 'redirect_uris' => $redirectUris,
-                'requested_scopes' => $request->requested_scopes ?? [],
-                'status' => 'draft', // By default draft
+                'requested_scopes' => is_array($request->requested_scopes) ? array_values(array_filter($request->requested_scopes)) : [],
+                'status' => 'draft',
             ]);
         } catch (\Throwable $e) {
-            \Log::error('Developer app creation failed', [
+            \Log::error('Developer app creation failed: ' . $e->getMessage(), [
                 'user_id' => auth()->id(),
-                'exception' => get_class($e),
-                'error' => $e->getMessage(),
                 'file' => $e->getFile() . ':' . $e->getLine(),
             ]);
 
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => __('messages.dev_app_creation_failed') . ' (' . $e->getMessage() . ')',
+                ], 500);
+            }
+
             return back()->withInput()->with('error', __('messages.dev_app_creation_failed'));
+        }
+
+        \Log::error('[DevApp:store] Step 6: App created successfully', ['app_id' => $app->id]);
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => __('messages.dev_app_created'),
+                'redirect' => route('developer.apps.show', $app->id),
+            ]);
         }
 
         return redirect()->route('developer.apps.show', $app->id)->with('success', __('messages.dev_app_created'));
@@ -110,7 +162,7 @@ class DeveloperPlatformController extends Controller
 
     public function show(DeveloperApp $app)
     {
-        if ($app->user_id !== auth()->id()) {
+        if ((int) $app->user_id !== (int) auth()->id()) {
             abort(403);
         }
 
@@ -121,31 +173,61 @@ class DeveloperPlatformController extends Controller
 
     public function update(Request $request, DeveloperApp $app)
     {
-        if ($app->user_id !== auth()->id()) {
+        \Log::error('[DevApp:update] Step 1: Update method entered', [
+            'app_id' => $app->id,
+            'user_id' => auth()->id(),
+        ]);
+
+        if ((int) $app->user_id !== (int) auth()->id()) {
             abort(403);
         }
 
-        $request->validate([
-            'name' => 'required|string|max:191',
-            'domain' => 'required|url|max:191',
-            'description' => 'required|string|max:1000',
-            'redirect_uris' => 'required|string',
-            'requested_scopes' => 'nullable|array',
-        ]);
+        try {
+            $request->validate([
+                'name' => 'required|string|max:191',
+                'domain' => 'required|string|max:191',
+                'description' => 'required|string|max:1000',
+                'redirect_uris' => 'required|string',
+                'requested_scopes' => 'nullable|array',
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            \Log::error('[DevApp:update] Step 2: Validation FAILED', [
+                'errors' => $e->errors(),
+            ]);
+
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'errors' => $e->errors(),
+                    'message' => implode(' | ', array_map(function($err) {
+                        return is_array($err) ? implode(', ', $err) : $err;
+                    }, $e->errors())),
+                ], 422);
+            }
+
+            return back()->withInput()->withErrors($e->errors())->with('error', implode(' | ', array_map(function($err) {
+                return is_array($err) ? implode(', ', $err) : $err;
+            }, $e->errors())));
+        }
 
         $redirectUris = array_values(array_filter(array_map('trim', explode(',', $request->redirect_uris))));
         $scopes = is_array($request->requested_scopes)
             ? array_values(array_filter($request->requested_scopes))
             : [];
 
+        $domain = trim($request->domain);
+        if (!preg_match('~^https?://~i', $domain)) {
+            $domain = 'https://' . $domain;
+        }
+
         $sensitiveFieldsChanged = 
-            $app->domain !== $request->domain ||
+            $app->domain !== $domain ||
             $app->redirect_uris !== $redirectUris ||
             $app->requested_scopes !== $scopes;
 
-        $app->name = $request->name;
-        $app->domain = $request->domain;
-        $app->description = $request->description;
+        $app->name = trim($request->name);
+        $app->domain = $domain;
+        $app->description = trim($request->description);
         $app->redirect_uris = $redirectUris;
         $app->requested_scopes = $scopes;
 
@@ -156,14 +238,30 @@ class DeveloperPlatformController extends Controller
         try {
             $app->save();
         } catch (\Throwable $e) {
-            \Log::error('Developer app update failed', [
+            \Log::error('[DevApp:update] Step 3: Save FAILED', [
                 'app_id' => $app->id,
                 'exception' => get_class($e),
                 'error' => $e->getMessage(),
                 'file' => $e->getFile() . ':' . $e->getLine(),
             ]);
 
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => __('messages.dev_app_update_failed') . ' (' . $e->getMessage() . ')',
+                ], 500);
+            }
+
             return back()->withInput()->with('error', __('messages.dev_app_update_failed'));
+        }
+
+        \Log::error('[DevApp:update] Step 4: App updated successfully', ['app_id' => $app->id]);
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => __('messages.dev_app_updated'),
+            ]);
         }
 
         return back()->with('success', __('messages.dev_app_updated'));
@@ -171,7 +269,7 @@ class DeveloperPlatformController extends Controller
 
     public function submit(DeveloperApp $app)
     {
-        if ($app->user_id !== auth()->id()) {
+        if ((int) $app->user_id !== (int) auth()->id()) {
             abort(403);
         }
 
@@ -184,7 +282,7 @@ class DeveloperPlatformController extends Controller
 
     public function rotateSecret(DeveloperApp $app)
     {
-        if ($app->user_id !== auth()->id()) {
+        if ((int) $app->user_id !== (int) auth()->id()) {
             abort(403);
         }
 
@@ -200,7 +298,7 @@ class DeveloperPlatformController extends Controller
             return redirect()->route('login');
         }
 
-        if ($app->user_id !== auth()->id()) {
+        if ((int) $app->user_id !== (int) auth()->id()) {
             abort(403);
         }
 
