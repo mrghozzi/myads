@@ -7,6 +7,7 @@ use App\Models\Notification;
 use App\Models\Report;
 use App\Models\Status;
 use App\Models\User;
+use App\Services\MessageConversationService;
 
 class LiveEventStreamService
 {
@@ -90,7 +91,7 @@ class LiveEventStreamService
         $latestMessage = Message::with('sender')
             ->where('us_rec', $user->id)
             ->where('time', '>=', $lastCheckTimestamp)
-            ->where('state', 0)
+            ->where('state', '!=', 0)
             ->orderByDesc('time')
             ->first();
 
@@ -156,8 +157,6 @@ class LiveEventStreamService
      */
     public function getUnreadMessagesCount(User $user): int
     {
-        return Message::where('us_rec', $user->id)
-            ->where('state', 0)
-            ->count();
+        return app(MessageConversationService::class)->unreadConversationCount($user);
     }
 }

@@ -183,9 +183,9 @@ class DeveloperApiController extends Controller
         $message = Message::create([
             'us_env' => $user->id,
             'us_rec' => $owner->id,
-            'msg' => $request->content,
+            'msg' => $request->input('content'),
             'time' => time(),
-            'state' => 0,
+            'state' => 3,
         ]);
 
         return $this->successResponse(['id' => $message->id_msg ?? $message->id], 'Message sent successfully');
@@ -318,7 +318,7 @@ class DeveloperApiController extends Controller
 
         $status = Status::create([
             'uid' => $user->id,
-            'txt' => $request->content,
+            'txt' => $request->input('content'),
             's_type' => 0,
             'statu' => 1,
             'date' => time(),
@@ -412,9 +412,9 @@ class DeveloperApiController extends Controller
         $message = Message::create([
             'us_env' => $user->id,
             'us_rec' => $receiver->id,
-            'msg' => $request->content,
+            'msg' => $request->input('content'),
             'time' => time(),
-            'state' => 0,
+            'state' => 3,
         ]);
 
         return $this->successResponse(['id' => $message->id_msg ?? $message->id], 'Message sent successfully');
@@ -432,7 +432,7 @@ class DeveloperApiController extends Controller
             ->limit(20)
             ->get();
 
-        $unreadCount = \App\Models\Notification::where('uid', $user->id)->where('state', 0)->count();
+        $unreadCount = \App\Models\Notification::where('uid', $user->id)->whereIn('state', [0, 3])->count();
 
         return $this->successResponse([
             'unread_count' => $unreadCount,

@@ -90,7 +90,7 @@ class LiveEventStreamTest extends TestCase
             'us_rec' => $recipient->id,
             'msg' => 'Hello Real-Time!',
             'time' => time(),
-            'state' => 0,
+            'state' => 3,
         ]);
 
         // Poll events
@@ -109,6 +109,37 @@ class LiveEventStreamTest extends TestCase
         $this->assertEquals(1, $msgEvent['data']['unread_count']);
         $this->assertTrue($msgEvent['data']['has_new']);
         $this->assertEquals('Hello Real-Time!', $msgEvent['data']['latest']['text_preview']);
+    }
+
+    public function test_read_messages_are_not_counted_as_unread_in_handshake_or_poll(): void
+    {
+        $sender = User::factory()->create();
+        $recipient = User::factory()->create();
+
+        $service = app(LiveEventStreamService::class);
+
+        // Create 150 read messages (state = 0)
+        for ($i = 1; $i <= 150; $i++) {
+            Message::create([
+                'name' => $sender->username,
+                'us_env' => $sender->id,
+                'us_rec' => $recipient->id,
+                'msg' => "Read message {$i}",
+                'time' => time() - 3600,
+                'state' => 0,
+            ]);
+        }
+
+        // Handshake should report 0 unread messages (not 150 / 99+)
+        $handshake = $service->getInitialHandshake($recipient);
+        $this->assertEquals(0, $handshake['unread_messages']);
+
+        // Poll events should report 0 unread messages
+        $events = $service->pollUserEvents($recipient, time() - 10);
+        $msgEvent = collect($events)->firstWhere('type', 'messages');
+        $this->assertNotNull($msgEvent);
+        $this->assertEquals(0, $msgEvent['data']['unread_count']);
+        $this->assertFalse($msgEvent['data']['has_new']);
     }
 
     public function test_admin_user_receives_admin_monitoring_alerts(): void

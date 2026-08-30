@@ -103,7 +103,7 @@ class ForumApiController extends Controller
             'id_cat' => $categoryId,
             'uid' => Auth::id(),
             'name' => $request->title,
-            'txt' => $request->content,
+            'txt' => $request->input('content'),
             'date' => time(),
             'statu' => 1,
             'is_pinned' => false
@@ -125,7 +125,7 @@ class ForumApiController extends Controller
         $reply = \App\Models\ForumComment::create([
             'tid' => $topicId,
             'uid' => Auth::id(),
-            'txt' => $request->content,
+            'txt' => $request->input('content'),
             'date' => time(),
         ]);
 

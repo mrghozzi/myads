@@ -1,5 +1,5 @@
-# MYADS v4.5.4 REST & Real-Time API Documentation
-> **Specification Version:** `v4.5.4` (Development)  
+# MYADS v4.5.5 REST & Real-Time API Documentation
+> **Specification Version:** `v4.5.5` (Stable / Maintenance Release)  
 > **Target Framework:** Laravel 12 (PHP 8.2+)  
 > **Authentication Engines:** Laravel Sanctum (Mobile & Web API), OAuth 2.0 (Developer Platform), and Server-Sent Events (SSE Live Stream).  
 > **Last Updated:** August 2026  
@@ -8,11 +8,11 @@
 
 ## 1. Overview & Architecture
 
-The MYADS v4.5.4 API ecosystem delivers high-performance, secure, and extensible interfaces connecting web clients, companion mobile applications (Flutter), and third-party developer integrations.
+The MYADS v4.5.5 API ecosystem delivers high-performance, secure, and extensible interfaces connecting web clients, companion mobile applications (Flutter), and third-party developer integrations.
 
 ### Primary API Subsystems
 1. **Internal Mobile & Web API (`/api/*`):** Powered by Laravel Sanctum for mobile app companion clients and web AJAX workflows.
-2. **Real-Time Events Engine (`/live/stream` & `/api/live/stream` — RT-04):** Zero-overhead Server-Sent Events (SSE) streaming engine delivering instant unread counters, live toasts, and feed updates.
+2. **Real-Time Events Engine (`/live/stream` & `/api/live/stream` — RT-04):** Zero-overhead Server-Sent Events (SSE) streaming engine delivering instant unread counters (synchronized with `MessageConversationService`), live toasts, and feed updates.
 3. **Developer Platform & OAuth 2.0 (`/oauth/*` & `/api/developer/v1/*`):** 27 granular permissions for external applications registered at `/developer`.
 4. **Ad Serving & Exchange Engine (`/ads/*`):** High-throughput ad delivery, anti-click-farm validation, and conversion tracking.
 
@@ -116,7 +116,7 @@ data: {
 ```
 
 #### 3. `messages` (Direct Messages & Unread Counters)
-Dispatched when an incoming private message arrives:
+Dispatched when an incoming private message arrives or unread state changes:
 ```text
 event: messages
 data: {
@@ -132,6 +132,7 @@ data: {
     }
 }
 ```
+*Note: `unread_count` reflects active unread conversation threads (`state != 0`) matching `MessageConversationService::unreadConversationCount()`, ensuring full parity across Blade views, polling, and SSE live streams.*
 
 #### 4. `feed` (Community Feed Updates Counter)
 Dispatched when other users publish new public posts:

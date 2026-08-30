@@ -209,7 +209,7 @@ class MessagesRealtimeFeatureTest extends TestCase
 
         $this->assertSame(
             MessageConversationService::PAGE_SIZE,
-            substr_count($response->getContent(), 'data-message-id=')
+            substr_count($response->getContent(), 'data-thread-item')
         );
     }
 
