@@ -69,7 +69,7 @@ class DeveloperPlatformController extends Controller
             return redirect()->route('developer.index')->with('error', __('messages.dev_not_eligible'));
         }
 
-        $request->validate([
+        $validated = $request->validate([
             'name' => 'required|string|max:191',
             'domain' => 'required|url|max:191',
             'description' => 'required|string|max:1000',
@@ -94,10 +94,12 @@ class DeveloperPlatformController extends Controller
                 'requested_scopes' => $request->requested_scopes ?? [],
                 'status' => 'draft', // By default draft
             ]);
-        } catch (QueryException $e) {
+        } catch (\Throwable $e) {
             \Log::error('Developer app creation failed', [
                 'user_id' => auth()->id(),
+                'exception' => get_class($e),
                 'error' => $e->getMessage(),
+                'file' => $e->getFile() . ':' . $e->getLine(),
             ]);
 
             return back()->withInput()->with('error', __('messages.dev_app_creation_failed'));
@@ -153,10 +155,12 @@ class DeveloperPlatformController extends Controller
 
         try {
             $app->save();
-        } catch (QueryException $e) {
+        } catch (\Throwable $e) {
             \Log::error('Developer app update failed', [
                 'app_id' => $app->id,
+                'exception' => get_class($e),
                 'error' => $e->getMessage(),
+                'file' => $e->getFile() . ':' . $e->getLine(),
             ]);
 
             return back()->withInput()->with('error', __('messages.dev_app_update_failed'));

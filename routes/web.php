@@ -166,6 +166,104 @@ Route::prefix('developer')->group(function () {
     Route::post('/apps/{app}/rotate-secret', [App\Http\Controllers\DeveloperPlatformController::class, 'rotateSecret'])->name('developer.apps.rotate_secret');
     Route::post('/apps/{app}/submit', [App\Http\Controllers\DeveloperPlatformController::class, 'submit'])->name('developer.apps.submit');
     Route::delete('/apps/{app}', [App\Http\Controllers\DeveloperPlatformController::class, 'destroy'])->name('developer.apps.destroy');
+
+    // Temporary diagnostic route (admin only) - remove after debugging
+    Route::get('/diagnose', function () {
+        if (!auth()->check() || auth()->id() != 1) {
+            abort(403, 'Admin only');
+        }
+
+        $results = [];
+
+        // 1. Database connection
+        try {
+            \DB::connection()->getPdo();
+            $results['database'] = '✅ Connected: ' . \DB::connection()->getDatabaseName();
+        } catch (\Throwable $e) {
+            $results['database'] = '❌ FAILED: ' . $e->getMessage();
+            return response()->json($results, 500);
+        }
+
+        // 2. Table check
+        $results['table_exists'] = \Schema::hasTable('developer_apps') ? '✅ Yes' : '❌ No';
+        if (\Schema::hasTable('developer_apps')) {
+            $columns = \Schema::getColumnListing('developer_apps');
+            $results['table_columns'] = $columns;
+            $results['table_rows'] = \DB::table('developer_apps')->count();
+        }
+
+        // 3. Platform settings
+        $settings = \App\Models\Option::where('o_type', 'developer_platform')->get();
+        if ($settings->isEmpty()) {
+            $legacy = \App\Models\Option::where('name', 'LIKE', 'dev_platform_%')->get();
+            $results['platform_settings'] = $legacy->isEmpty()
+                ? '⚠️ No settings found (platform likely DISABLED)'
+                : $legacy->pluck('o_valuer', 'name')->toArray();
+        } else {
+            $results['platform_settings'] = $settings->pluck('o_valuer', 'name')->toArray();
+        }
+
+        // 4. Eligibility check
+        try {
+            $svc = app(\App\Services\DeveloperEligibilityService::class);
+            $check = $svc->checkEligibility(auth()->user());
+            $results['eligibility'] = $check;
+        } catch (\Throwable $e) {
+            $results['eligibility'] = '❌ ' . get_class($e) . ': ' . $e->getMessage();
+        }
+
+        // 5. Test INSERT
+        $testClientId = 'diag_' . bin2hex(random_bytes(8));
+        try {
+            $app = \App\Models\DeveloperApp::create([
+                'user_id' => auth()->id(),
+                'name' => 'Diagnostic Test',
+                'domain' => 'https://test.example.com',
+                'description' => 'Temporary diagnostic test',
+                'client_id' => $testClientId,
+                'client_secret' => bin2hex(random_bytes(32)),
+                'redirect_uris' => ['https://test.example.com/cb'],
+                'requested_scopes' => ['read_profile'],
+                'status' => 'draft',
+            ]);
+
+            if ($app && $app->id) {
+                $raw = \DB::table('developer_apps')->where('id', $app->id)->first();
+                $results['test_insert'] = '✅ Success (ID: ' . $app->id . ')';
+                $results['test_insert_raw'] = [
+                    'redirect_uris' => $raw->redirect_uris ?? 'NULL',
+                    'requested_scopes' => $raw->requested_scopes ?? 'NULL',
+                ];
+                $app->delete();
+                $results['test_cleanup'] = '✅ Deleted';
+            } else {
+                $results['test_insert'] = '❌ No ID returned';
+            }
+        } catch (\Throwable $e) {
+            $results['test_insert'] = '❌ ' . get_class($e) . ': ' . $e->getMessage();
+            $results['test_insert_file'] = $e->getFile() . ':' . $e->getLine();
+        }
+
+        // 6. Session / view info
+        $results['session_driver'] = config('session.driver');
+        $results['app_debug'] = config('app.debug');
+        $results['app_env'] = config('app.env');
+        $results['cached_views'] = count(glob(storage_path('framework/views/*.php')));
+
+        // 7. Recent errors in log
+        $logFile = storage_path('logs/laravel.log');
+        if (file_exists($logFile)) {
+            $logContent = file_get_contents($logFile);
+            $results['log_size_kb'] = round(strlen($logContent) / 1024, 1);
+            // Find last developer-related errors
+            preg_match_all('/\[[\d\-: ]+\].*Developer app.*/i', $logContent, $matches);
+            $results['developer_errors_in_log'] = array_slice($matches[0] ?? [], -5);
+        } else {
+            $results['log_file'] = '⚠️ No log file';
+        }
+
+        return response()->json($results, 200, [], JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+    })->name('developer.diagnose');
 });
 
 // OAuth
