@@ -1,504 +1,139 @@
-# Developer Guide: Paid Subscriptions and Billing in MYADS
-
-## 1. Purpose
-
-This system adds an optional paid subscriptions layer to MYADS.
-
-Administrators can:
-
-- Enable or disable the billing system from the admin panel.
-- Create and manage paid plans.
-- Manage billing currencies and manual exchange rates.
-- Configure supported payment gateways.
-- Review bank transfer orders manually.
-
-Members can:
-
-- Browse plans on `/plans`.
-- Review their current or queued subscription on `/settings/billing`.
-- Purchase through externally hosted payment pages.
-- Upload only a receipt when using `Bank Transfer`.
-
-## 2. Core Design Rules
-
-- The billing system is optional and can be disabled globally.
-- The current release supports:
-  - `Stripe`
-  - `PayPal`
-  - `Bank Transfer`
-  - `Lemon Squeezy`
-  - `Paddle`
-  - `Tabby` (Beta flag, UAE & KSA local currencies only, phone number validation required)
-  - `Flouci` (Beta flag, Tunisia TND only, three-decimal currency conversion in millimes)
-  - `Apple Pay` (Premium mobile simulation with high-fidelity glassmorphic FaceID double-click overlay flow)
-- There is no `auto-renew` in the current release.
-- MYADS must not store card data or sensitive payment identity data.
-- `Stripe`, `PayPal`, `Lemon Squeezy`, `Paddle`, `Tabby`, `Flouci`, and `Apple Pay` must use hosted checkout or checkout redirect/simulation flows only.
-- `Bank Transfer` uses plain-text instructions plus a receipt image upload.
-- Any code that depends on the new billing tables must follow the project compatibility pattern:
-  - `try/catch`
-  - `V420SchemaService`
-
-## 3. Main File Locations
-
-### Controllers
-
-- `app/Http/Controllers/BillingController.php`
-- `app/Http/Controllers/AdminBillingController.php`
-
-### Models
-
-- `app/Models/SubscriptionPlan.php`
-- `app/Models/MemberSubscription.php`
-- `app/Models/BillingOrder.php`
-- `app/Models/BillingTransaction.php`
-- `app/Models/BillingCurrency.php`
-
-### Services
-
-- `app/Services/Billing/BillingGatewayRegistry.php`
-- `app/Services/Billing/BillingCurrencyService.php`
-- `app/Services/Billing/SubscriptionPlanService.php`
-- `app/Services/Billing/SubscriptionLifecycleService.php`
-- `app/Services/Billing/SubscriptionEntitlementService.php`
-
-### Gateway Layer
-
-- `app/Services/Billing/Gateways/BillingGatewayInterface.php`
-- `app/Services/Billing/Gateways/AbstractBillingGateway.php`
-- `app/Services/Billing/Gateways/StripeGateway.php`
-- `app/Services/Billing/Gateways/PayPalGateway.php`
-- `app/Services/Billing/Gateways/BankTransferGateway.php`
-- `app/Services/Billing/Gateways/LemonSqueezyGateway.php`
-- `app/Services/Billing/Gateways/PaddleGateway.php`
-- `app/Services/Billing/Gateways/TabbyGateway.php`
-- `app/Services/Billing/Gateways/FlouciGateway.php`
-- `app/Services/Billing/Gateways/ApplePayGateway.php`
-
-### Support / Settings
-
-- `app/Support/SubscriptionSettings.php`
-- `app/Support/SubscriptionGatewaySettings.php`
-
-### Views
-
-#### Member views
-
-- `themes/default/views/billing/plans.blade.php`
-- `themes/default/views/billing/dashboard.blade.php`
-- `themes/default/views/billing/order.blade.php`
-- `themes/default/views/billing/apple_pay_simulate.blade.php`
-- `themes/default/views/billing/partials/*`
-
-#### Admin views
-
-- `admin_themes/default/views/admin/billing/*`
-
-### Migration
-
-- `database/migrations/2026_04_14_130000_create_billing_subscription_tables.php`
-
-### Tests
-
-- `tests/Feature/BillingFeatureTest.php`
-
-## 4. New Database Tables
-
-### `subscription_plans`
-
-Stores the plan definition itself:
-
-- `name`
-- `description`
-- `duration_days`
-- `is_lifetime`
-- `base_price`
-- `is_featured`
-- `is_active`
-- `sort_order`
-- `accent_color`
-- `recommended_text`
-- `marketing_bullets`
-- `entitlements`
-
-### `billing_currencies`
-
-Stores billing currencies available in the system:
-
-- `code`
-- `name`
-- `symbol`
-- `exchange_rate`
-- `decimal_places`
-- `is_active`
-- `is_base`
-- `sort_order`
-
-### `billing_orders`
-
-Represents a paid plan purchase order:
-
-- `order_number`
-- `user_id`
-- `subscription_plan_id`
-- `member_subscription_id`
-- `gateway`
-- `status`
-- `base_currency_code`
-- `currency_code`
-- `base_amount`
-- `display_amount`
-- `exchange_rate_snapshot`
-- `gateway_checkout_reference`
-- `gateway_reference`
-- `receipt_path`
-- `receipt_note`
-- `admin_note`
-- `paid_at`
-- `approved_at`
-- `rejected_at`
-- `expires_at`
-- `plan_snapshot`
-- `meta`
-
-### `member_subscriptions`
-
-Represents the resulting subscription after payment:
-
-- `user_id`
-- `subscription_plan_id`
-- `billing_order_id`
-- `queued_from_subscription_id`
-- `status`
-- `plan_name`
-- `plan_snapshot`
-- `entitlements_snapshot`
-- `starts_at`
-- `ends_at`
-- `activated_at`
-- `benefits_applied_at`
-- `completed_at`
-- `meta`
-
-### `billing_transactions`
-
-Stores the minimal payment event log:
-
-- `billing_order_id`
-- `user_id`
-- `gateway`
-- `transaction_type`
-- `status`
-- `external_transaction_id`
-- `amount`
-- `currency_code`
-- `exchange_rate_snapshot`
-- `processed_at`
-- `meta`
-
-## 5. Settings Stored in `options`
-
-### `subscription_settings`
-
-Managed through `App\Support\SubscriptionSettings`.
-
-Current keys:
-
-- `enabled`
-- `base_currency_code`
-
-### `subscription_gateway_settings`
-
-Managed through `App\Support\SubscriptionGatewaySettings`.
-
-Each gateway has its own stored payload, for example:
-
-- `enabled`
-- `mode`
-- `supported_currencies`
-- provider keys and secrets
-- `instructions` and `note` for bank transfer
-- For `Apple Pay`: `enabled` (boolean), `mode` (`sandbox` / `live`), `merchant_id` (string), `supported_currencies` (array of supported currency codes: `USD`, `EUR`, `AED`, `SAR`)
-
-Important notes:
-
-- Secrets are encrypted with Laravel `Crypt`.
-- Sensitive values are masked in the admin UI.
-- Leaving a secret field blank during save means: keep the currently stored value.
-
-## 6. Main Routes
-
-### Member
-
-- `GET /plans` -> `billing.plans`
-- `GET /settings/billing` -> `billing.dashboard`
-- `POST /plans/{plan}/purchase` -> `billing.purchase`
-- `GET /billing/orders/{order}` -> `billing.orders.show`
-- `GET /billing/apple-pay/simulate/{order}` -> `billing.apple_pay.simulate`
-- `POST /billing/orders/{order}/receipt` -> `billing.orders.receipt.update`
-- `GET /billing/return/{gateway}/{order}` -> `billing.return`
-- `POST /billing/webhook/{gateway}` -> `billing.webhook`
-
-### Admin
-
-All admin billing routes live under `/admin/billing/*`:
-
-- `admin.billing.overview`
-- `admin.billing.settings`
-- `admin.billing.settings.update`
-- `admin.billing.plans`
-- `admin.billing.plans.store`
-- `admin.billing.plans.update`
-- `admin.billing.orders`
-- `admin.billing.orders.show`
-- `admin.billing.orders.review`
-- `admin.billing.transactions`
-- `admin.billing.currencies`
-- `admin.billing.currencies.store`
-- `admin.billing.currencies.update`
-- `admin.billing.currencies.delete`
-- `admin.billing.currencies.base`
-- `admin.billing.gateways`
-- `admin.billing.gateways.update`
-
-## 7. Order and Subscription Statuses
-
-### `billing_orders` statuses
-
-- `pending_checkout`
-- `pending_receipt`
-- `pending_review`
-- `paid`
-- `rejected`
-- `cancelled`
-- `failed`
-
-### `member_subscriptions` statuses
-
-- `active`
-- `queued`
-- `expired`
-- `cancelled`
-- `rejected`
-
-## 8. Main Payment Flows
-
-### 8.1 Stripe or PayPal purchase
-
-1. The member selects a plan, gateway, and currency on `/plans`.
-2. `BillingController@purchase` verifies:
-   - the system is enabled
-   - at least one gateway is enabled
-   - the plan is valid
-   - the currency is valid
-   - the selected gateway supports that currency
-3. `SubscriptionLifecycleService::createOrder()` creates a `billing_orders` row.
-4. The gateway creates a hosted checkout session/order.
-5. When the user returns from the provider or the webhook arrives:
-   - the order is marked `paid` on success
-   - the member subscription is created, extended, or queued
-
-### 8.2 Bank Transfer purchase
-
-1. The order is created with `pending_receipt`.
-2. The member uploads a receipt from the order details page.
-3. The order moves to `pending_review`.
-4. The admin either:
-   - approves it -> order becomes `paid` and the subscription is activated
-   - rejects it -> order becomes `rejected` with `admin_note` and `rejected_at`
-
-### 8.3 Apple Pay Simulated purchase
-
-1. The member selects a plan, gateway (Apple Pay), and currency on `/plans`.
-2. `BillingController@purchase` validates:
-   - System is enabled
-   - Apple Pay gateway is enabled
-   - Selected currency is supported by Apple Pay (`USD`, `EUR`, `AED`, `SAR`)
-3. `SubscriptionLifecycleService::createOrder()` creates a `billing_orders` row.
-4. The member is redirected to `/billing/apple-pay/simulate/{order}`.
-5. The screen presents a premium FaceID overlay:
-   - Clicking "Pay with Apple Pay" initiates the payment modal sheet.
-   - The user must **double-click** the side button inside the simulated overlay to run the Mock FaceID scanning and transaction processing.
-6. Upon successful simulation, the script redirects the user back to the gateway return handler with successful mock payload parameters `status=success` and `transaction_id=ap_sim_[timestamp]`, activating the subscription.
-
-## 9. Subscription Lifecycle Logic
-
-The main logic lives in:
-
-- `SubscriptionLifecycleService`
-- `SubscriptionEntitlementService`
-
-Current behavior:
-
-- If there is no active subscription, a new `active` subscription is created.
-- If the member buys the same plan again, `ends_at` is extended.
-- If the member buys a different plan while another plan is active, a new `queued` subscription is created.
-- When the active subscription ends, the queued one is activated.
-
-## 10. Entitlements
-
-The current supported entitlement keys are:
-
-- `profile_badge_label`
-- `profile_badge_color`
-- `bonus_pts`
-- `bonus_nvu`
-- `bonus_nlink`
-- `bonus_nsmart`
-- `status_promotion_discount_pct`
-
-### Where they are applied
-
-- `bonus_pts` through `PointLedgerService`
-- ad credits through user columns:
-  - `nvu`
-  - `nlink`
-  - `nsmart`
-- profile badge through:
-  - `SubscriptionEntitlementService::activeProfileBadgeForUserId()`
-- promotion discount through:
-  - `StatusPromotionPricingService`
-
-## 11. How to Add a New Payment Gateway
-
-Use this order:
-
-1. Create a new class in:
-   - `app/Services/Billing/Gateways/`
-2. Implement:
-   - `BillingGatewayInterface`
-3. Register it in:
-   - `BillingGatewayRegistry::all()`
-4. Add its defaults to:
-   - `SubscriptionGatewaySettings::DEFAULTS`
-5. Add its secret fields to:
-   - `SubscriptionGatewaySettings::SECRET_FIELDS`
-6. Update validation in:
-   - `AdminBillingController::validateGateway()`
-7. Add its admin form fields to:
-   - `admin_themes/default/views/admin/billing/gateways.blade.php`
-8. Add translation keys in all supported languages.
-9. Add feature tests for its main paths.
-
-### Required contract
-
-```php
-public function key(): string;
-public function label(): string;
-public function supportsCurrency(string $currencyCode): bool;
-public function createCheckout(BillingOrder $order): array;
-public function handleReturn(Request $request, BillingOrder $order): array;
-public function handleWebhook(Request $request): ?array;
-public function normalizeTransaction(array $payload, ?BillingOrder $order = null): array;
-public function maskConfig(array $config): array;
+# Developer Guide: Paid Subscriptions & Billing in MYADS
+
+## 1. Purpose & Overview
+
+The Paid Subscriptions & Billing System provides an optional, modular monetization layer for the MYADS platform.
+
+### Administrator Capabilities:
+- Enable or disable the billing system globally from `/admin/billing/settings`.
+- Create and manage tiered subscription plans (`/admin/billing/plans`).
+- Manage multiple billing currencies, exchange rates, and decimal precision (`/admin/billing/currencies`).
+- Configure credentials and environments for 8 supported payment gateways (`/admin/billing/gateways`).
+- Review and approve/reject manual bank transfer orders with transaction notes (`/admin/billing/orders`).
+- Monitor real-time transaction ledger logs (`/admin/billing/transactions`).
+
+### Member Capabilities:
+- Browse available subscription plans with dynamic currency conversion on `/plans`.
+- View active, queued, or expired subscription history on `/settings/billing`.
+- Complete purchases via secure external hosted checkout flows or bank transfer receipt upload.
+- Enjoy automatic entitlements (exclusive profile badge, bonus points, free advertising credits, and promotional discounts).
+
+---
+
+## 2. Supported Payment Gateways
+
+| Gateway | Integration Mode | Supported Currencies / Features |
+| :--- | :--- | :--- |
+| **Stripe** | Hosted Checkout Session | Global currencies (USD, EUR, GBP, etc.) with webhook sync. |
+| **PayPal** | Hosted Order Flow | Global PayPal supported currencies with IPN/Webhook. |
+| **Bank Transfer** | Manual Receipt Flow | Plain-text bank transfer instructions + receipt image upload. |
+| **Lemon Squeezy** | Hosted Checkout | Global SaaS merchant of record checkout with signature verification. |
+| **Paddle** | Hosted Checkout | Global checkout with overlay / redirect support. |
+| **Tabby** (Beta) | Buy Now Pay Later | UAE (AED) & Saudi Arabia (SAR) local currencies with phone validation. |
+| **Flouci** (Beta) | Mobile Wallet & Gateway | Tunisia (TND) with 3-decimal precision (millimes conversion). |
+| **Apple Pay** | High-Fidelity Simulation | FaceID double-click modal sheet simulation for mobile testing (`USD`, `EUR`, `AED`, `SAR`). |
+
+---
+
+## 3. Core Architecture & File Structure
+
+### 3.1 Controllers
+- `app/Http/Controllers/BillingController.php` — Frontend member checkout, order display, and webhook handlers.
+- `app/Http/Controllers/AdminBillingController.php` — Administrator plan, currency, order review, and gateway settings.
+
+### 3.2 Models
+- `app/Models/SubscriptionPlan.php` — Plan definitions, pricing, duration, and entitlements.
+- `app/Models/MemberSubscription.php` — User subscription records with lifecycle states (`active`, `queued`, `expired`, `cancelled`, `rejected`).
+- `app/Models/BillingOrder.php` — Purchase orders, status snapshots, gateway checkout references, and receipt metadata.
+- `app/Models/BillingTransaction.php` — Granular transaction events log.
+- `app/Models/BillingCurrency.php` — Currency records, exchange rates, and symbols.
+
+### 3.3 Services
+- `app/Services/Billing/BillingGatewayRegistry.php` — Central registry for payment providers.
+- `app/Services/Billing/BillingCurrencyService.php` — Currency formatting, rate conversions, and active currency resolution.
+- `app/Services/Billing/SubscriptionPlanService.php` — Plan CRUD, entitlement defaults, and normalization.
+- `app/Services/Billing/SubscriptionLifecycleService.php` — Subscription activation, queuing, extension, and completion logic.
+- `app/Services/Billing/SubscriptionEntitlementService.php` — Active badge resolution, bonus point injection, and ad credit provisioning.
+
+### 3.4 Gateway Implementations (`app/Services/Billing/Gateways/`)
+- `BillingGatewayInterface.php` & `AbstractBillingGateway.php`
+- `StripeGateway.php`
+- `PayPalGateway.php`
+- `BankTransferGateway.php`
+- `LemonSqueezyGateway.php`
+- `PaddleGateway.php`
+- `TabbyGateway.php`
+- `FlouciGateway.php`
+- `ApplePayGateway.php`
+
+---
+
+## 4. Database Schema Overview
+
+```mermaid
+erDiagram
+    SUBSCRIPTION_PLANS ||--o{ BILLING_ORDERS : "orders"
+    SUBSCRIPTION_PLANS ||--o{ MEMBER_SUBSCRIPTIONS : "subscriptions"
+    BILLING_ORDERS ||--o| MEMBER_SUBSCRIPTIONS : "activates"
+    BILLING_ORDERS ||--o{ BILLING_TRANSACTIONS : "logs"
+    USERS ||--o{ BILLING_ORDERS : "purchases"
+    USERS ||--o{ MEMBER_SUBSCRIPTIONS : "holds"
 ```
 
-## 12. How to Add a New Plan Entitlement
+### Key Tables:
+1. `subscription_plans`: `name`, `duration_days`, `is_lifetime`, `base_price`, `is_featured`, `is_active`, `accent_color`, `recommended_text`, `marketing_bullets`, `entitlements`.
+2. `billing_currencies`: `code`, `name`, `symbol`, `exchange_rate`, `decimal_places`, `is_active`, `is_base`.
+3. `billing_orders`: `order_number`, `user_id`, `subscription_plan_id`, `gateway`, `status`, `base_currency_code`, `currency_code`, `base_amount`, `display_amount`, `gateway_reference`, `receipt_path`.
+4. `member_subscriptions`: `user_id`, `subscription_plan_id`, `status`, `starts_at`, `ends_at`, `activated_at`, `entitlements_snapshot`.
+5. `billing_transactions`: `billing_order_id`, `user_id`, `gateway`, `transaction_type`, `status`, `external_transaction_id`, `amount`, `currency_code`.
 
-If you want to add a new entitlement:
+---
 
-1. Add it to:
-   - `SubscriptionPlanService::ENTITLEMENT_KEYS`
-   - `SubscriptionPlanService::entitlementDefaults()`
-   - `SubscriptionEntitlementService::entitlementsForSubscription()`
-2. Add its field to the admin plan form:
-   - `admin_themes/default/views/admin/billing/plans.blade.php`
-3. Update validation in:
-   - `AdminBillingController::validatePlan()`
-4. If it changes behavior, implement it in:
-   - `SubscriptionEntitlementService`
-   - or the service that consumes that entitlement
-5. Add translations in all supported languages.
-6. Add or update tests for the new behavior.
+## 5. Subscription Lifecycle & Entitlements
 
-## 13. UI Development Notes
+### 5.1 Lifecycle Rules
+- **No Active Plan:** Purchasing a plan immediately creates an `active` subscription starting at `now()`.
+- **Same Plan Renewal:** Purchasing the currently active plan automatically extends the existing `ends_at` expiration date.
+- **Different Plan Upgrade:** Purchasing a different tier creates a `queued` subscription that automatically activates once the current plan reaches expiration.
 
-### Member UI
+### 5.2 Entitlements Engine
+When a subscription becomes `active`, the following entitlements are processed:
 
-Directory:
+| Entitlement Key | Effect on Member Account |
+| :--- | :--- |
+| `profile_badge_label` | Renders a verified glowing badge next to the username on feed and profile. |
+| `profile_badge_color` | Custom hex color for the profile badge. |
+| `bonus_pts` | Instant PTS credit credited to user's point ledger. |
+| `bonus_nvu` | Direct addition of Visit Exchange view credits (`users.nvu`). |
+| `bonus_nlink` | Direct addition of Text/Link ad click credits (`users.nlink`). |
+| `bonus_nsmart` | Direct addition of Smart Ad impression credits (`users.nsmart`). |
+| `status_promotion_discount_pct` | Automatic percentage discount applied during community post promotions. |
 
-- `themes/default/views/billing/`
+---
 
-Important rules:
+## 6. Security & Payment Data Privacy
 
-- `/plans` must be hidden completely when billing is disabled.
-- `/settings/billing` must remain accessible to the member even when billing is disabled, so they can review history.
-- Bank transfer instructions must stay escaped plain text, not raw HTML.
+- **Zero Card Storage:** MYADS never accepts, processes, or stores credit card numbers or sensitive CVV codes. All payments use externally hosted checkout sessions or secure redirect flows.
+- **Encrypted Secrets:** Gateway API keys, client secrets, and webhook tokens are encrypted at rest via `Illuminate\Support\Facades\Crypt`.
+- **Masked Credentials:** Sensitive credentials in `/admin/billing/gateways` are masked in the UI.
+- **Receipt Upload Security:** Bank transfer receipt images are strictly validated:
+  - Allowed MIME types: `image/jpeg`, `image/png`, `image/webp`.
+  - Maximum upload size: `4096 KB` (4 MB).
+  - Stored in isolated path: `public/upload/billing/receipts/`.
+- **CSRF Protection:** Webhook routes (`POST /billing/webhook/{gateway}`) are exempted from CSRF verification and protected by cryptographic webhook signature headers.
 
-### Admin UI
+---
 
-Directory:
+## 7. How to Implement a Custom Gateway
 
-- `admin_themes/default/views/admin/billing/`
+To add a new payment provider:
 
-Important rules:
-
-- Follow the existing Duralux language and component patterns.
-- Reuse the shared billing partials:
-  - `partials/nav.blade.php`
-  - `partials/alerts.blade.php`
-  - `partials/status_badge.blade.php`
-
-## 14. Security and Privacy Rules
-
-These rules must remain true:
-
-- Never store card details.
-- Never ask the member for unnecessary personal payment data.
-- Store only:
-  - external references
-  - payment status
-  - amount
-  - currency
-  - exchange-rate snapshot
-  - sanitized `meta`
-- Store receipt uploads only in:
-  - `public/upload/billing/receipts/`
-- Validate uploads with:
-  - `image`
-  - `mimes: jpg,jpeg,png,webp`
-  - `max:4096`
-- Only billing webhooks are exempt from CSRF:
-  - `billing/webhook/*`
-
-## 15. Upgrade Compatibility Rules
-
-Any new billing-dependent code must respect:
-
-- `V420SchemaService::supports('subscriptions_billing')`
-- `try/catch` around queries that depend on the new tables
-- showing an `upgradeNotice` instead of crashing with `500`
-
-This matters because MYADS supports installations that may be partially upgraded.
-
-## 16. Tests
-
-Current references:
-
-- `tests/Feature/BillingFeatureTest.php`
-- `tests/Feature/FlouciGatewayTest.php`
-
-It currently covers:
-
-- `/plans` visible vs hidden
-- `/settings/billing` still accessible when the system is disabled
-- `Bank Transfer` purchase + receipt upload + admin approval
-- bank transfer rejection with `admin_note` and `rejected_at`
-- same-plan extension
-- different-plan queueing
-- `billing` ACL enforcement
-- fallback behavior when billing tables are missing
-
-Any new billing development should update or extend these tests instead of leaving behavior uncovered.
-
-## 17. Pre-Merge Checklist
-
-- Did you add translations to all nine locales?
-- Did you verify both LTR and RTL rendering?
-- Did you keep business logic in services and controllers thin?
-- Did you respect `V420SchemaService`?
-- Did you avoid storing sensitive payment data?
-- Did you preserve hosted checkout for external gateways?
-- Did you update `Agents.md` if architecture, routes, or tables changed?
-- Did you update this guide if the extension path or development workflow changed?
-
+1. Create `app/Services/Billing/Gateways/CustomGateway.php` extending `AbstractBillingGateway` and implementing `BillingGatewayInterface`.
+2. Implement required contract methods:
+   - `key()`, `label()`, `supportsCurrency()`
+   - `createCheckout()`, `handleReturn()`, `handleWebhook()`
+   - `normalizeTransaction()`, `maskConfig()`
+3. Register the gateway in `BillingGatewayRegistry::all()`.
+4. Define configuration keys in `SubscriptionGatewaySettings::DEFAULTS` and secret fields in `SubscriptionGatewaySettings::SECRET_FIELDS`.
+5. Add admin form fields to `admin_themes/default/views/admin/billing/gateways.blade.php`.
+6. Synchronize translation keys across all supported language packs (`lang/*/messages.php`).

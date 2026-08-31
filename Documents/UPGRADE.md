@@ -1,47 +1,110 @@
-# MYADS Upgrade Guide
+# MYADS Upgrade & Migration Guide
 
-This is the supported upgrade path for an existing MYADS installation.
+This document outlines the standard, zero-downtime procedure for upgrading an existing MYADS deployment to **v4.5.5**.
 
-## Before anything
+---
 
-1. Create a full SQL backup of your database.
-2. Create a backup of your project files, especially custom themes, uploads, and local modifications.
-3. Do **not** continue until both backups are complete and restorable.
+## 1. Pre-Upgrade Preparation & Backups
 
-## Safe upgrade steps
+> [!IMPORTANT]
+> **Always back up before upgrading.** Never perform an upgrade without a verified database and file backup.
+
+1. **Database Backup:** Create a full SQL dump:
+   ```bash
+   mysqldump -u myads_user -p myads_db > backup_$(date +%Y%m%d_%H%M%S).sql
+   ```
+2. **Files Backup:** Create an archive of your custom files and user uploads:
+   ```bash
+   tar -czf uploads_backup.tar.gz upload/ storage/ app/ .env
+   ```
+
+---
+
+## 2. Safe CLI Upgrade Procedure
+
+Follow these commands in sequence from your project root:
 
 ```bash
-git pull
+# 1. Pull the latest release code
+git pull origin main
+
+# 2. Update PHP dependencies with optimized class mapping
 composer install --no-dev --optimize-autoloader
+
+# 3. Run the automated preflight safety check
 php artisan myads:update:preflight
+
+# 4. Enable maintenance mode (Admins with allowed IP can still access)
 php artisan down
+
+# 5. Execute safe, additive database schema migrations
 php artisan migrate --force
+
+# 6. Flush stale cache and re-warm system configurations
 php artisan optimize:clear
+
+# 7. Bring the application back online
 php artisan up
 ```
 
-## What the preflight command checks
+---
 
-- Active database connection
-- Writable paths needed by the updater
-- Pending migrations
-- Destructive operations inside `up()` for pending migrations
+## 3. The `myads:update:preflight` Safety Engine
 
-If the preflight check fails, stop and fix the reported issue before migrating.
+MYADS includes an automated preflight check command (`php artisan myads:update:preflight`) that verifies:
+- **Database Connectivity:** Validates active PDO connection and database version.
+- **Storage & Cache Permissions:** Ensures `/storage`, `/bootstrap/cache`, and `/upload` are writable.
+- **Pending Migrations Analysis:** Checks for pending schema changes and scans for potentially destructive operations.
+- **InnoDB Dynamic Row Format:** Ensures high-traffic tables are compatible with compound index migrations.
 
-## Never do this on a live database
+If the preflight check reports any warning or failure, address the flagged issue before running `php artisan migrate`.
 
-- `php artisan migrate:fresh`
-- `php artisan db:wipe`
-- `php artisan test`
+---
 
-Those commands are for isolated development and testing environments only.
+## 4. High-Traffic Compound Indexes & MySQL Engine Hardening
 
-## Admin panel updates
+Starting with v4.5.3+, MYADS introduces compound indexes on high-traffic tables (`status`, `smart_ads`, `banner`, `link`, `custom_ad_events`) for sub-millisecond query performance.
 
-The `/admin/updates` screen now requires explicit confirmation that you created:
+If your database previously used legacy `MyISAM` or `COMPACT` row formats, the migration automatically applies:
+```sql
+ALTER TABLE status ENGINE = InnoDB ROW_FORMAT = DYNAMIC;
+ALTER TABLE smart_ads ENGINE = InnoDB ROW_FORMAT = DYNAMIC;
+ALTER TABLE banner ENGINE = InnoDB ROW_FORMAT = DYNAMIC;
+ALTER TABLE link ENGINE = InnoDB ROW_FORMAT = DYNAMIC;
+ALTER TABLE custom_ad_events ENGINE = InnoDB ROW_FORMAT = DYNAMIC;
+```
+This guarantees full `utf8mb4` multibyte unicode support without encountering MySQL 1000-byte index key length errors.
 
-- a database backup
-- a file backup
+---
 
-It will also block the update if the safety preflight fails.
+## 5. Post-Upgrade Maintenance & Optimization
+
+After bringing the application online:
+
+1. **Orphaned Records Audit:**
+   - Log in to the Admin Panel as Super Admin (`id=1`).
+   - Navigate to `/admin/maintenance`.
+   - Run the **Safe Orphan Records Audit** powered by `OrphanCleanupService` to clean dangling notification or reaction options safely.
+2. **Live Theme Customizer Check:**
+   - Visit `/admin/themes/customizer` to verify your custom variables and regenerate `custom_variables.css` if necessary.
+3. **Real-Time Live Stream Test:**
+   - Open the website in a browser to confirm the Server-Sent Events (SSE) stream connects cleanly without proxy buffering errors.
+
+---
+
+## 6. Admin Panel Web Updates (`/admin/updates`)
+
+When upgrading via the Admin Control Panel:
+- The system requires explicit checkboxes confirming that you have taken a database and file backup.
+- Custom update scripts (`update.php`) are validated against their cryptographic **SHA-256 signature** (`update.php.sha256`) before execution.
+- If the preflight validation fails, the visual updater will prevent execution to safeguard the existing database.
+
+---
+
+## 7. Prohibited Production Commands
+
+> [!CAUTION]
+> **NEVER** run the following commands on a production database:
+> - `php artisan migrate:fresh` (Drops all database tables and deletes all data)
+> - `php artisan db:wipe` (Wipes the entire database schema)
+> - `php artisan test` (May truncate tables during isolated test suite runs)
