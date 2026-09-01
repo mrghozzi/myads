@@ -360,7 +360,7 @@
                             <div class="col-md-6 col-lg-4">
                                 <div class="feature-card p-4">
                                     <div class="feature-icon-wrapper" style="background: linear-gradient(135deg, rgba(79, 70, 229, 0.1) 0%, rgba(124, 58, 237, 0.1) 100%); color: #6366f1;">
-                                        <i class="feather-trash-2"></i>
+                                        <i class="feather-code"></i>
                                     </div>
                                     <h5 class="fw-bold mb-3">{{ __('about.feature_1_title') }}</h5>
                                     <p class="text-muted mb-0 fs-13">{{ __('about.feature_1_desc') }}</p>
@@ -369,7 +369,7 @@
                             <div class="col-md-6 col-lg-4">
                                 <div class="feature-card p-4">
                                     <div class="feature-icon-wrapper" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">
-                                        <i class="feather-database"></i>
+                                        <i class="feather-cloud"></i>
                                     </div>
                                     <h5 class="fw-bold mb-3">{{ __('about.feature_2_title') }}</h5>
                                     <p class="text-muted mb-0 fs-13">{{ __('about.feature_2_desc') }}</p>
@@ -378,7 +378,7 @@
                             <div class="col-md-6 col-lg-4">
                                 <div class="feature-card p-4">
                                     <div class="feature-icon-wrapper" style="background: rgba(16,185,129,0.1); color: #10b981;">
-                                        <i class="feather-alert-triangle"></i>
+                                        <i class="feather-layers"></i>
                                     </div>
                                     <h5 class="fw-bold mb-3">{{ __('about.feature_3_title') }}</h5>
                                     <p class="text-muted mb-0 fs-13">{{ __('about.feature_3_desc') }}</p>
@@ -396,7 +396,7 @@
                             <div class="col-md-6 col-lg-4">
                                 <div class="feature-card p-4">
                                     <div class="feature-icon-wrapper" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6;">
-                                        <i class="feather-radio"></i>
+                                        <i class="feather-message-square"></i>
                                     </div>
                                     <h5 class="fw-bold mb-3">{{ __('about.feature_5_title') }}</h5>
                                     <p class="text-muted mb-0 fs-13">{{ __('about.feature_5_desc') }}</p>
@@ -420,7 +420,26 @@
                             <div class="timeline">
                                 <div class="timeline-item">
                                     <div class="timeline-icon"><i class="feather-box fs-12"></i></div>
-                                    <h6 class="fw-bold mb-1">v4.5.4 <span class="badge bg-soft-success text-success ms-2">Stable</span></h6>
+                                    <h6 class="fw-bold mb-1">v4.5.5 <span class="badge bg-soft-success text-success ms-2">Stable</span></h6>
+                                    <p class="text-muted fs-13 mb-3">Developer Platform Resilience, Reverse Proxy Compatibility, Real-Time Messaging, Theme Customizer & Security Hardening Release — Reverse Proxy & Cloudflare Protocol Trust (<code>trustProxies(at: '*')</code>), Route Model Binding & Verb Disambiguation (<code>->whereNumber('app')</code>), Clean JSON Payload Architecture for Developer Forms (<code>application/json</code>), Real-Time SSE Unread Message Badge State Correction, Live Theme Customizer Site-Wide Persistence & Cascading Order Precedence, Superdesign Code & Mermaid Diagram Engine across Themes, and Security Patch & Dependency Hardening (<code>league/commonmark</code> v2.10.0).</p>
+                                    <div class="d-flex flex-column gap-2">
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-feature mt-1" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">Feature</span>
+                                            <span class="text-muted fs-13">Superdesign macOS-style Code Windows & Mermaid Interactive Diagram Engine with Diagram/Code toggle across Knowledgebase (<code>/kb/*</code>), Store Products (<code>/store/*</code>), and Forum Topics (<code>/forum/*</code>) across active themes.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-fix mt-1" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;">Fix</span>
+                                            <span class="text-muted fs-13">Resolved Cloudflare/Reverse Proxy HTTPS redirection body-stripping and route collisions via <code>trustProxies(at: '*')</code>, numeric route constraints <code>->whereNumber('app')</code>, and standardized JSON payloads.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-optimization mt-1" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">Themes & SSE</span>
+                                            <span class="text-muted fs-13">Live Theme Customizer persistence across all site pages & layouts with dynamic CSS cascading precedence, and real-time SSE unread message badge count synchronization.</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="timeline-item">
+                                    <div class="timeline-icon"><i class="feather-box fs-12"></i></div>
+                                    <h6 class="fw-bold mb-1">v4.5.4 <span class="badge bg-soft-secondary text-muted ms-2">v4.5.4</span></h6>
                                     <p class="text-muted fs-13 mb-3">Developer Platform Lifecycle, Database Reliability & Maintenance Release — Developer Application Deletion & Lifecycle Management (Developer Self-Service & Administrative Moderation with Foreign-Key Cascade Revocation), High-Traffic Compound Indexes Migration Key Length Resilience Patch, Legacy MySQL / MyISAM Schema Hardening, and Zero-Downtime Migration Execution.</p>
                                     <div class="d-flex flex-column gap-2">
                                         <div class="d-flex align-items-start">

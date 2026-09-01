@@ -43,9 +43,9 @@ class AdminAboutPageTest extends TestCase
             ->assertSee(__('about.feature_4_title'))
             ->assertSee(__('about.feature_5_title'))
             ->assertSee(__('about.feature_6_title'))
-            ->assertSee('Developer App Deletion & Lifecycle Management')
-            ->assertSee('High-Traffic Indexes Resilience & MyISAM Key Limit Patch')
-            ->assertSee('Danger Zone & Interactive Confirmation Modals');
+            ->assertSee('Superdesign Code Windows & Mermaid Diagram Engine')
+            ->assertSee('Reverse Proxy & Cloudflare Protocol Trust')
+            ->assertSee('Developer Platform Route & JSON Architecture');
 
         $this->assertDatabaseHas('options', [
             'name' => 'last_seen_about_version',
@@ -63,9 +63,9 @@ class AdminAboutPageTest extends TestCase
         $response = $this->actingAs($admin)->get(route('admin.about', ['lang' => 'ar']));
 
         $response->assertOk()
-            ->assertSee('حذف تطبيقات المطورين وإدارة دورة الحياة')
-            ->assertSee('مرونة فهارس قواعد البيانات فائقة الأداء وتوافق MyISAM')
-            ->assertSee('منطقة الخطر ونوافذ التأكيد التفاعلية');
+            ->assertSee('نوافذ الأكواد Superdesign ومحرك الرسوم التفاعلية Mermaid')
+            ->assertSee('توافق البروكسي العكسي ووثوقية بروتوكول Cloudflare')
+            ->assertSee('بنية مسارات المطورين والبيانات المعيارية JSON');
     }
 
     public function test_non_admin_user_cannot_access_about_page(): void

@@ -7,19 +7,19 @@ return [
     'tab_changelog' => 'Changelog',
     'tab_about' => 'About MYADS',
     
-    // What's New Section (v4.5.4)
-    'feature_1_title' => 'Developer App Deletion & Lifecycle Management',
-    'feature_1_desc' => 'Allows developers (/developer/apps) and administrators (/admin/developers) to permanently delete applications with automated database cascading revocation of tokens and authorizations.',
-    'feature_2_title' => 'High-Traffic Indexes Resilience & MyISAM Key Limit Patch',
-    'feature_2_desc' => 'Eliminated legacy MySQL/MariaDB 1000-byte key limit schema errors by proactively converting high-traffic tables to InnoDB DYNAMIC for resilient, zero-downtime migrations.',
-    'feature_3_title' => 'Danger Zone & Interactive Confirmation Modals',
-    'feature_3_desc' => 'Equipped app management workspaces with dedicated Danger Zone panels, strict ownership validation, and interactive client confirmations to prevent accidental application deletion.',
-    'feature_4_title' => 'Live Theme Customizer & Dynamic CSS Engine',
-    'feature_4_desc' => 'Interactive visual customizer at /admin/themes/customizer with real-time responsive split-screen preview, brand colors, Google & Arabic fonts, border radius, and compiled CSS injection.',
-    'feature_5_title' => 'Real-Time Events Engine & Live SSE Stream',
-    'feature_5_desc' => 'High-performance Server-Sent Events (SSE) stream at /live/stream providing instant notification and message badge counts, live toast alerts, community feed updates, and non-blocking session release.',
-    'feature_6_title' => 'Anti-Fraud Shield & Ad Quality Engine v2',
-    'feature_6_desc' => 'Enterprise-grade ad protection with IAB Viewability Standard (>= 50% visibility >= 1s), real-time human behavior fingerprinting, async view beacons, and advertiser PTS protection.',
+    // What's New Section (v4.5.5)
+    'feature_1_title' => 'Superdesign Code Windows & Mermaid Diagram Engine',
+    'feature_1_desc' => 'Interactive Mermaid architecture diagrams and dark macOS-style code windows with one-click copying, line numbers, and dark/light mode across Knowledgebase, Store & Forums.',
+    'feature_2_title' => 'Reverse Proxy & Cloudflare Protocol Trust',
+    'feature_2_desc' => 'Full trust of reverse proxy and Cloudflare headers (trustProxies), preventing HTTPS redirection request-body stripping and HTTP 405/403 errors on form submissions.',
+    'feature_3_title' => 'Developer Platform Route & JSON Architecture',
+    'feature_3_desc' => 'Disambiguated numeric route constraints (->whereNumber), standardized JSON payloads (application/json) across developer forms, and robust \Throwable exception safety.',
+    'feature_4_title' => 'Live Theme Customizer Site-Wide Persistence',
+    'feature_4_desc' => 'Enhanced CSS cascading precedence, dynamic header partial injection, multi-page iframe switcher preview, and compiled CSS variables across all frontend and auth layouts.',
+    'feature_5_title' => 'Real-Time SSE Message Badge Synchronization',
+    'feature_5_desc' => 'Corrected Server-Sent Events unread message counter logic, eliminating false +99 badges on high-volume accounts and synchronizing real-time and API state calculations.',
+    'feature_6_title' => 'Security Hardening & Dependency Upgrades',
+    'feature_6_desc' => 'Patched league/commonmark XSS filter bypass (v2.10.0 - Dependabot #70), upgraded nette/schema (v1.3.6), and strengthened error exception handling.',
 
     // About Section
     'about_description' => 'MYADS is a powerful, all-in-one community platform and ad exchange network. It empowers website owners to connect, exchange traffic, trade services, and monetize their platforms effectively.',

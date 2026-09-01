@@ -7,19 +7,19 @@ return [
     'tab_changelog' => 'Değişiklik Günlüğü',
     'tab_about' => 'MYADS Hakkında',
     
-    // What's New Section (v4.5.4)
-    'feature_1_title' => 'Geliştirici Uygulama Silme & Yaşam Döngüsü Yönetimi',
-    'feature_1_desc' => 'Geliştiricilerin (/developer/apps) ve yöneticilerin (/admin/developers) uygulamaları kalıcı olarak silmesini ve tüm belirteçlerin otomatik iptal edilmesini sağlar.',
-    'feature_2_title' => 'Yüksek Trafik İndeks Dayanıklılığı & MyISAM Düzeltmesi',
-    'feature_2_desc' => 'Kesintisiz geçişler için tabloları InnoDB DYNAMIC\'e dönüştürerek MySQL/MariaDB 1000 bayt anahtar uzunluğu hatalarını ortadan kaldırır.',
-    'feature_3_title' => 'Tehlike Bölgesi & Etkileşimli Onay Pencereleri',
-    'feature_3_desc' => 'Uygulama yönetiminde özel Danger Zone panelleri, sıkı sahiplik doğrulaması ve yanlışlıkla silinmeyi önleyen etkileşimli onaylar.',
-    'feature_4_title' => 'Canlı Tema Özelleştirici & Dinamik CSS Motoru',
-    'feature_4_desc' => '/admin/themes/customizer adresinde gerçek zamanlı bölünmüş ekran önizlemesi (Masaüstü, Tablet, Mobil), renk paletleri, Google ve Arapça tipografi ve derlenmiş CSS enjeksiyonu.',
-    'feature_5_title' => 'Gerçek Zamanlı Olay Motoru & Canlı SSE Akışı',
-    'feature_5_desc' => 'Bildirim ve mesaj rozetlerinin anlık güncellenmesi, canlı akış uyarıları ve yönetim bildirimleri için /live/stream adresinde yüksek performanslı Server-Sent Events (SSE) akışı.',
-    'feature_6_title' => 'Dolandırıcılık Karşıtı Kalkan & Reklam Kalite Motoru v2',
-    'feature_6_desc' => 'IAB Viewability Standardı (>= %50 görünürlük >= 1s), gerçek zamanlı insan davranış parmak izi, eşzamansız görüntüleme sinyalleri ve reklamveren puan koruması.',
+    // What's New Section (v4.5.5)
+    'feature_1_title' => 'Superdesign Kod Pencereleri & Mermaid Diyagram Motoru',
+    'feature_1_desc' => 'Bilgi Bankası, Mağaza ve Forum genelinde tek tıkla kopyalama, satır numaraları ve açık/koyu mod desteği sunan etkileşimli Mermaid mimari diyagramları ve macOS tarzı kod pencereleri.',
+    'feature_2_title' => 'Ters Proxy & Cloudflare Protokol Güveni',
+    'feature_2_desc' => 'Ters proxy ve Cloudflare başlıklarına tam güven (trustProxies), HTTPS yönlendirmelerinde veri kaybını ve form gönderimlerindeki 405/403 hatalarını önler.',
+    'feature_3_title' => 'Geliştirici Rotaları & JSON Payload Mimarisi',
+    'feature_3_desc' => 'Geliştirici formlarında sayısal rota kısıtlamaları (->whereNumber), standart JSON veri yükleri (application/json) ve kapsamlı \Throwable istisna güvenliği.',
+    'feature_4_title' => 'Site Genelinde Canlı Tema Özelleştirici Kalıcılığı',
+    'feature_4_desc' => 'Gelişmiş CSS basamaklama önceliği, dinamik başlık parçacığı enjeksiyonu, iframe içinde çok sayfalı canlı önizleme ve derlenmiş CSS değişkenleri.',
+    'feature_5_title' => 'Gerçek Zamanlı SSE Mesaj Rozeti Senkronizasyonu',
+    'feature_5_desc' => 'SSE akışındaki okunmamış mesaj sayacı mantığı düzeltildi, yüksek hacimli hesaplardaki hatalı +99 rozetleri giderildi ve gerçek zamanlı API durumları eşitlendi.',
+    'feature_6_title' => 'Güvenlik Güçlendirmesi & Bağımlılık Güncellemeleri',
+    'feature_6_desc' => 'league/commonmark XSS güvenlik açığı düzeltildi (v2.10.0 - Dependabot #70), nette/schema v1.3.6 sürümüne yükseltildi ve istisna işleme sağlamlaştırıldı.',
 
     // About Section
     'about_description' => 'MYADS, güçlü bir topluluk platformu ve hepsi bir arada reklam değişim ağıdır.',

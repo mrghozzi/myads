@@ -7,19 +7,19 @@ return [
     'tab_changelog' => 'Registro de Alterações',
     'tab_about' => 'Sobre o MYADS',
     
-    // What's New Section (v4.5.4)
-    'feature_1_title' => 'Exclusão de Apps de Desenvolvedor e Ciclo de Vida',
-    'feature_1_desc' => 'Permite que desenvolvedores (/developer/apps) e administradores (/admin/developers) excluam aplicativos permanentemente com revogação em cascata no banco de dados.',
-    'feature_2_title' => 'Resiliência de Índices de Alto Tráfego & Correção MyISAM',
-    'feature_2_desc' => 'Eliminação de erros de limite de 1000 bytes no MySQL/MariaDB ao converter tabelas para InnoDB DYNAMIC para migrações seguras e sem tempo de inatividade.',
-    'feature_3_title' => 'Zona de Perigo & Modais de Confirmação Interativos',
-    'feature_3_desc' => 'Painéis de Danger Zone dedicados, validação rigorosa de propriedade e diálogos interativos de confirmação para prevenir exclusões acidentais.',
-    'feature_4_title' => 'Personalizador de Temas ao Vivo & Motor CSS',
-    'feature_4_desc' => 'Personalizador visual em /admin/themes/customizer com visualização em tempo real (Desktop, Tablet, Mobile), paletas de cores, tipografia Google e Árabe, e injeção CSS compilada.',
-    'feature_5_title' => 'Motor de Eventos em Tempo Real & Fluxo SSE',
-    'feature_5_desc' => 'Fluxo Server-Sent Events (SSE) em /live/stream para atualizações instantâneas de notificações, mensagens, alertas de feed e avisos de administração.',
-    'feature_6_title' => 'Escudo Antifraude & Qualidade de Anúncios v2',
-    'feature_6_desc' => 'Proteção com padrão IAB Viewability (>= 50% visibilidade >= 1s), impressão digital de comportamento humano em tempo real, beacons assíncronos e proteção de pontos.',
+    // What's New Section (v4.5.5)
+    'feature_1_title' => 'Janelas de Código Superdesign & Motor de Diagramas Mermaid',
+    'feature_1_desc' => 'Diagramas de arquitetura interativos Mermaid e janelas de código estilo macOS com cópia em um clique, numeração de linhas e suporte aos modos claro/escuro na Base de Conhecimento, Loja e Fóruns.',
+    'feature_2_title' => 'Confiança de Protocolo Reverse Proxy & Cloudflare',
+    'feature_2_desc' => 'Confiança total nos cabeçalhos de reverse proxy e Cloudflare (trustProxies), evitando a perda do corpo das requisições em redirecionamentos HTTPS e erros 405/403.',
+    'feature_3_title' => 'Roteamento de Desenvolvedores & Arquitetura JSON',
+    'feature_3_desc' => 'Restrições numéricas rigorosas de rotas (->whereNumber), padronização de payloads JSON (application/json) em formulários de desenvolvedores e tratamento seguro de exceções.',
+    'feature_4_title' => 'Persistência Global do Personalizador de Temas',
+    'feature_4_desc' => 'Precedência aprimorada de cascata CSS, injeção dinâmica de cabeçalho, seletor de páginas na pré-visualização e variáveis CSS compiladas em todos os layouts.',
+    'feature_5_title' => 'Sincronização de Notificações de Mensagens SSE',
+    'feature_5_desc' => 'Correção da lógica do contador de mensagens não lidas no fluxo SSE, eliminando badges falsos de +99 em contas ativas e sincronizando os estados com a API.',
+    'feature_6_title' => 'Reforço de Segurança & Atualização de Pacotes',
+    'feature_6_desc' => 'Correção da vulnerabilidade XSS no league/commonmark (v2.10.0 - Dependabot #70), atualização do nette/schema (v1.3.6) e maior robustez no tratamento de erros.',
 
     // About Section
     'about_description' => 'MYADS é uma poderosa plataforma comunitária e rede de troca de anúncios completa.',

@@ -7,19 +7,19 @@ return [
     'tab_changelog' => 'Änderungsprotokoll',
     'tab_about' => 'Über MYADS',
     
-    // What's New Section (v4.5.4)
-    'feature_1_title' => 'Entwickler-App-Löschung & Lebenszyklus-Management',
-    'feature_1_desc' => 'Ermöglicht Entwicklern (/developer/apps) und Administratoren (/admin/developers) das dauerhafte Löschen von Anwendungen mit automatischer Kaskaden-Widerrufung von Tokens und Berechtigungen.',
-    'feature_2_title' => 'Widerstandsfähigkeit von Hochleistungs-Indizes & MyISAM-Patch',
-    'feature_2_desc' => 'Beseitigung von MySQL/MariaDB 1000-Byte-Schlüssellängenfehlern durch proaktive Konvertierung von Tabellen in InnoDB DYNAMIC für unterbrechungsfreie Migrationen.',
-    'feature_3_title' => 'Gefahrenzone & Interaktive Bestätigungsdialoge',
-    'feature_3_desc' => 'Ausstattung von App-Verwaltungsbereichen mit Danger-Zone-Panels, strenger Eigentumsprüfung und interaktiven Bestätigungsdialogen zur Verhinderung versehentlicher Löschungen.',
-    'feature_4_title' => 'Live Theme Customizer & Dynamic CSS Engine',
-    'feature_4_desc' => 'Interaktiver visueller Customizer unter /admin/themes/customizer mit responsiver Echtzeit-Vorschau, Markenfarben, Google- und arabischen Schriftarten, Rahmenradius und kompilierter CSS-Injektion.',
-    'feature_5_title' => 'Echtzeit-Ereignis-Engine & Live SSE Stream',
-    'feature_5_desc' => 'Hochleistungs-Server-Sent Events (SSE) Stream unter /live/stream für sofortige Benachrichtigungs- und Nachrichtenzähler, Live-Toast-Warnungen und nicht-blockierende Sitzungsfreigabe.',
-    'feature_6_title' => 'Anti-Fraud Shield & Ad Quality Engine v2',
-    'feature_6_desc' => 'Werbeschutz nach IAB Viewability Standard (>= 50% Sichtbarkeit >= 1s), Echtzeit-Verhaltens-Fingerprinting, asynchrone View-Beacons und PTS-Punkte-Schutz für Werbetreibende.',
+    // What's New Section (v4.5.5)
+    'feature_1_title' => 'Superdesign Code-Fenster & Interaktive Mermaid-Diagramme',
+    'feature_1_desc' => 'Interaktive Mermaid-Architekturdiagramme und macOS-Code-Fenster mit Ein-Klick-Kopieren, Zeilennummern und Hell/Dunkel-Modus-Unterstützung in Wissensdatenbank, Store und Foren.',
+    'feature_2_title' => 'Reverse-Proxy & Cloudflare Protokoll-Vertrauen',
+    'feature_2_desc' => 'Vollständiges Vertrauen in Reverse-Proxy- und Cloudflare-Header (trustProxies), verhindert Datenverlust bei HTTPS-Weiterleitungen und 405/403-Fehler beim Absenden von Formularen.',
+    'feature_3_title' => 'Entwickler-Routing & JSON-Payload-Architektur',
+    'feature_3_desc' => 'Eindeutige numerische Routenbeschränkungen (->whereNumber), standardisierte JSON-Payloads (application/json) in Entwicklerformularen und vollständige \Throwable-Ausnahmesicherheit.',
+    'feature_4_title' => 'Seitenweite Persistenz des Theme-Customizers',
+    'feature_4_desc' => 'Optimierte CSS-Kaskadenreihenfolge, dynamische Header-Injektion, Multi-Seiten-Vorschau-Umschalter im Iframe und kompilierte CSS-Variablen für alle Layouts.',
+    'feature_5_title' => 'Echtzeit-SSE-Nachrichten-Badge-Synchronisierung',
+    'feature_5_desc' => 'Korrektur der Zähllogik für ungelesene Nachrichten im SSE-Stream, Beseitigung falscher +99-Badges bei aktiven Konten und Synchronisation von Echtzeit- und API-Status.',
+    'feature_6_title' => 'Sicherheitshärtung & Abhängigkeits-Upgrades',
+    'feature_6_desc' => 'Behebung der XSS-Schwachstelle in league/commonmark (v2.10.0 - Dependabot #70), Upgrade von nette/schema (v1.3.6) und verbesserte Ausnahmebehandlung.',
 
     // About Section
     'about_description' => 'MYADS is a powerful, all-in-one community platform and ad exchange network. It empowers website owners to connect, exchange traffic, trade services, and monetize their platforms effectively.',
