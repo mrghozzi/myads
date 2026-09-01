@@ -36,12 +36,36 @@ namespace App\Providers {
                 // Fallback to default
             }
 
-            // Support live previewing other themes when requested
-            if (request()->has('preview_theme') && is_dir(base_path('themes/' . request()->query('preview_theme') . '/views'))) {
-                $activeTheme = (string) request()->query('preview_theme');
-            } elseif (request()->has('theme_preview') && request()->has('theme') && is_dir(base_path('themes/' . request()->query('theme') . '/views'))) {
-                $activeTheme = (string) request()->query('theme');
+            // Support live previewing other themes when requested via query, request, or $_GET
+            $previewTheme = null;
+            if (isset($_GET['preview_theme']) && is_string($_GET['preview_theme'])) {
+                $previewTheme = trim($_GET['preview_theme']);
+            } elseif (isset($_GET['theme_preview']) && isset($_GET['theme']) && is_string($_GET['theme'])) {
+                $previewTheme = trim($_GET['theme']);
+            } elseif (isset($_REQUEST['preview_theme']) && is_string($_REQUEST['preview_theme'])) {
+                $previewTheme = trim($_REQUEST['preview_theme']);
             }
+
+            if (!$previewTheme) {
+                try {
+                    if ($this->app->bound('request')) {
+                        $req = $this->app->make('request');
+                        if ($req && $req->has('preview_theme')) {
+                            $previewTheme = (string) $req->query('preview_theme', $req->input('preview_theme'));
+                        } elseif ($req && $req->has('theme_preview') && $req->has('theme')) {
+                            $previewTheme = (string) $req->query('theme', $req->input('theme'));
+                        }
+                    }
+                } catch (\Throwable $e) {
+                    // Ignore container resolution edge cases
+                }
+            }
+
+            if ($previewTheme && is_dir(base_path("themes/{$previewTheme}/views"))) {
+                $activeTheme = $previewTheme;
+            }
+
+            $GLOBALS['MYADS_ACTIVE_THEME'] = $activeTheme;
 
             $themePath = base_path("themes/{$activeTheme}");
             $viewsPath = "{$themePath}/views";
@@ -63,24 +87,24 @@ namespace {
     if (!function_exists('theme_asset')) {
         function theme_asset($path)
         {
-            $activeTheme = 'default';
+            $activeTheme = $GLOBALS['MYADS_ACTIVE_THEME'] ?? null;
 
-            try {
-                if (\Illuminate\Support\Facades\Schema::hasTable('setting')) {
-                    $setting = \App\Models\Setting::first();
-                    if ($setting && !empty($setting->styles)) {
-                        $activeTheme = $setting->styles;
+            if (!$activeTheme) {
+                try {
+                    if (isset($_GET['preview_theme']) && is_dir(base_path('themes/' . $_GET['preview_theme']))) {
+                        $activeTheme = (string) $_GET['preview_theme'];
+                    } elseif (\Illuminate\Support\Facades\Schema::hasTable('setting')) {
+                        $setting = \App\Models\Setting::first();
+                        if ($setting && !empty($setting->styles)) {
+                            $activeTheme = $setting->styles;
+                        }
                     }
+                } catch (\Throwable $e) {
+                    // Fallback to default
                 }
-            } catch (\Throwable $e) {
-                // Fallback to default
             }
 
-            if (request()->has('preview_theme') && is_dir(base_path('themes/' . request()->query('preview_theme')))) {
-                $activeTheme = (string) request()->query('preview_theme');
-            } elseif (request()->has('theme_preview') && request()->has('theme') && is_dir(base_path('themes/' . request()->query('theme')))) {
-                $activeTheme = (string) request()->query('theme');
-            }
+            $activeTheme = $activeTheme ?: 'default';
 
             return asset("themes/{$activeTheme}/assets/{$path}");
         }

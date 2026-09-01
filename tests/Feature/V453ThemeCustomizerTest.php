@@ -243,10 +243,11 @@ class V453ThemeCustomizerTest extends TestCase
         $response = $this->get('/?theme_preview=1&preview_theme=bootstrap-sample');
         $response->assertOk();
 
-        // Check customizer view embeds the correct preview theme query
+        // Check customizer view embeds the correct preview theme query and page switcher
         $customizerResponse = $this->actingAs($this->admin)->get(route('admin.themes.customizer', ['theme' => 'bootstrap-sample']));
         $customizerResponse->assertOk();
         $customizerResponse->assertSee('preview_theme=bootstrap-sample', false);
+        $customizerResponse->assertSee('switchPreviewPage', false);
     }
 
     public function test_admin_dashboard_includes_theme_customizer_tip(): void

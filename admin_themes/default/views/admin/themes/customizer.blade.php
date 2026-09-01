@@ -240,13 +240,28 @@
             <!-- Right Preview Panel -->
             <div class="col-lg-8 col-xl-9">
                 <div class="preview-container bg-surface rounded-4 shadow-sm border p-2 d-flex flex-column" style="height: calc(100vh - 170px);">
-                    <div class="preview-browser-bar d-flex align-items-center justify-content-between px-3 py-2 bg-light rounded-top-3 border-bottom">
+                    <div class="preview-browser-bar d-flex flex-wrap align-items-center justify-content-between gap-2 px-3 py-2 bg-light rounded-top-3 border-bottom">
                         <div class="d-flex align-items-center gap-2">
                             <span style="width: 10px; height: 10px; border-radius: 50%; background: #ff5f56; display: inline-block;"></span>
                             <span style="width: 10px; height: 10px; border-radius: 50%; background: #ffbd2e; display: inline-block;"></span>
                             <span style="width: 10px; height: 10px; border-radius: 50%; background: #27c93f; display: inline-block;"></span>
+                            
+                            <!-- Page Switcher -->
+                            <div class="dropdown ms-2">
+                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle rounded-pill px-2.5 py-0.5 fs-12 d-inline-flex align-items-center gap-1 shadow-none bg-white" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="feather-layout text-primary fs-11"></i>
+                                    <span id="preview-page-label">{{ __('messages.home') ?? 'الرئيسية' }} (/)</span>
+                                </button>
+                                <ul class="dropdown-menu shadow-sm border-0 rounded-3 fs-12">
+                                    <li><a class="dropdown-item cursor-pointer py-1.5 active" onclick="switchPreviewPage('/', '{{ __('messages.home') ?? 'الرئيسية' }} (/)', this)"><i class="feather-home me-2 text-muted"></i>{{ __('messages.home') ?? 'الرئيسية' }} (/)</a></li>
+                                    <li><a class="dropdown-item cursor-pointer py-1.5" onclick="switchPreviewPage('/portal', '{{ __('messages.community') ?? 'المجتمع' }} (/portal)', this)"><i class="feather-globe me-2 text-muted"></i>{{ __('messages.community') ?? 'المجتمع' }} (/portal)</a></li>
+                                    <li><a class="dropdown-item cursor-pointer py-1.5" onclick="switchPreviewPage('/home', '{{ __('messages.dashboard') ?? 'لوحة التحكم' }} (/home)', this)"><i class="feather-grid me-2 text-muted"></i>{{ __('messages.dashboard') ?? 'لوحة التحكم' }} (/home)</a></li>
+                                    <li><a class="dropdown-item cursor-pointer py-1.5" onclick="switchPreviewPage('/login', '{{ __('messages.login') ?? 'تسجيل الدخول' }} (/login)', this)"><i class="feather-log-in me-2 text-muted"></i>{{ __('messages.login') ?? 'تسجيل الدخول' }} (/login)</a></li>
+                                    <li><a class="dropdown-item cursor-pointer py-1.5" onclick="switchPreviewPage('/register', '{{ __('messages.register') ?? 'إنشاء حساب' }} (/register)', this)"><i class="feather-user-plus me-2 text-muted"></i>{{ __('messages.register') ?? 'إنشاء حساب' }} (/register)</a></li>
+                                </ul>
+                            </div>
                         </div>
-                        <div class="preview-url-pill bg-white px-4 py-1 rounded-pill fs-12 text-muted border text-truncate" style="max-width: 400px;">
+                        <div class="preview-url-pill bg-white px-3 py-1 rounded-pill fs-12 text-muted border text-truncate flex-grow-1 mx-2" style="max-width: 380px;">
                             <i class="feather-lock me-1 text-success fs-10"></i>
                             <span id="preview-url-text">{{ url('/?theme_preview=1&preview_theme=' . $themeSlug) }}</span>
                         </div>
@@ -328,9 +343,36 @@
         }
     }
 
+    let currentPreviewPage = '/';
+
+    function switchPreviewPage(path, label, element) {
+        currentPreviewPage = path;
+        if (label) {
+            const labelEl = document.getElementById('preview-page-label');
+            if (labelEl) labelEl.innerText = label;
+        }
+        if (element) {
+            const items = element.closest('.dropdown-menu')?.querySelectorAll('.dropdown-item');
+            if (items) items.forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+        }
+
+        const theme = document.getElementById('theme_slug').value;
+        const rootUrl = '{{ rtrim(url('/'), '/') }}';
+        const cleanPath = '/' + path.replace(/^\/+/, '');
+        const targetUrl = (cleanPath === '/' ? rootUrl + '/' : rootUrl + cleanPath);
+        const fullUrl = targetUrl + (targetUrl.includes('?') ? '&' : '?') + 'theme_preview=1&preview_theme=' + encodeURIComponent(theme);
+        
+        document.getElementById('preview-url-text').innerText = fullUrl;
+        const frame = document.getElementById('theme-preview-frame');
+        if (frame) {
+            frame.src = fullUrl;
+        }
+    }
+
     function reloadPreview() {
         const frame = document.getElementById('theme-preview-frame');
-        frame.src = frame.src;
+        if (frame) frame.src = frame.src;
     }
 
     function getCurrentVariables() {
