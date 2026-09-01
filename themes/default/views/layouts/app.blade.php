@@ -12,6 +12,7 @@
     @if(is_locale_rtl())
         <link rel="stylesheet" href="{{ theme_asset('css/rtl.css') }}">
     @endif
+    @include('theme::partials._customizer_head')
 </head>
 <body data-dir="{{ $pageDirection }}" class="{{ $pageDirection }}">
     <header>

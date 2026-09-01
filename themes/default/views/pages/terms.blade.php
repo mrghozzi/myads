@@ -202,6 +202,8 @@
         [data-theme="css"] .legal-section h2 { border-bottom: 2px solid rgba(0,0,0,0.05); }
         .legal-section p { font-size: 0.95rem; line-height: 1.7; color: var(--text-muted); }
     </style>
+    <!-- Theme Customizer Dynamic Styles (THEME-07) -->
+    @include('theme::partials._customizer_head')
 </head>
 <body>
 

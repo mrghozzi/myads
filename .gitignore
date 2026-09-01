@@ -43,9 +43,11 @@ Thumbs.db
 /plugins/*
 !/plugins/.gitignore
 /themes/*
-/public/themes/*
-!/public/themes/default/
 !/themes/default/
+/public/themes/*
+/public/themes/**
+custom_variables.css
+
 /tests
 !/tests/
 /tests/*

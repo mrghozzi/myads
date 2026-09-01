@@ -219,6 +219,25 @@ class V453ThemeCustomizerTest extends TestCase
         $this->assertTrue($hasCustomLink || $hasCustomPrimary);
     }
 
+    public function test_welcome_and_auth_pages_render_custom_theme_variables(): void
+    {
+        $this->customizer->saveVariables('default', [
+            'primary_color' => '#dc2626',
+            'secondary_color' => '#f43f5e',
+            'font_family' => 'Cairo',
+        ]);
+
+        $welcomeResponse = $this->get('/');
+        $welcomeResponse->assertOk();
+        $welcomeContent = $welcomeResponse->getContent();
+        $this->assertTrue(str_contains($welcomeContent, 'id="theme-custom-variables"') || str_contains($welcomeContent, 'custom_variables.css'));
+
+        $loginResponse = $this->get('/login');
+        $loginResponse->assertOk();
+        $loginContent = $loginResponse->getContent();
+        $this->assertTrue(str_contains($loginContent, 'id="theme-custom-variables"') || str_contains($loginContent, 'custom_variables.css'));
+    }
+
     public function test_preview_theme_query_loads_target_theme(): void
     {
         $response = $this->get('/?theme_preview=1&preview_theme=bootstrap-sample');

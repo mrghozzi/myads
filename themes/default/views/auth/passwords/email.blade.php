@@ -244,6 +244,8 @@
         .lang-dropdown a { padding: 10px 20px; color: var(--text-main); transition: background 0.2s; font-size: 0.9rem; }
         .lang-dropdown a:hover { background: rgba(97, 93, 250, 0.1); color: var(--primary); }
     </style>
+    <!-- Theme Customizer Dynamic Styles (THEME-07) -->
+    @include('theme::partials._customizer_head')
 </head>
 <body>
     <!-- Animated Blobs -->
