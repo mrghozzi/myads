@@ -4068,4 +4068,6 @@ return [
     'share_on_social' => 'Share on Social Media',
     'referral_hub_title' => 'Referral & Rewards Program',
     'referral_hub_desc' => 'Share your unique referral URL with your audience and friends to automatically collect bonus points for each sign-up.',
+    'theme_website' => 'Sitio web del tema',
+    'selected' => 'Seleccionado',
 ];

@@ -4061,4 +4061,6 @@ return [
     'referral_hub_desc' => 'Share your unique referral URL with your audience and friends to automatically collect bonus points for each sign-up.',
     'edit_user' => 'تعديل المستخدم',
     'edit_website' => 'تعديل الموقع',
+    'theme_website' => 'テーマのウェブサイト',
+    'selected' => '選択済み',
 ];

@@ -4254,4 +4254,6 @@ return [
     'glass_opacity' => 'Glassmorphism Opacity',
     'reset_defaults' => 'Reset Defaults',
     'save_changes' => 'Save Changes',
+    'theme_website' => 'Theme Website',
+    'selected' => 'Selected',
 ];

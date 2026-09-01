@@ -4255,4 +4255,6 @@ return [
     'glass_opacity' => 'شفافية الزجاج',
     'reset_defaults' => 'استعادة الافتراضي',
     'save_changes' => 'حفظ التعديلات',
+    'theme_website' => 'موقع القالب',
+    'selected' => 'محدد',
 ];
