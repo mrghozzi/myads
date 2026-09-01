@@ -344,9 +344,7 @@
                         @endif
 
                         {{-- Read-only view --}}
-                        <div id="store-details-display" class="markdown-content">
-                            {!! $product->o_valuer !!}
-                        </div>
+                        <div id="store-details-display" class="markdown-content">{!! $product->o_valuer !!}</div>
 
                         {{-- Editor (hidden by default) --}}
                         @if($canManageProduct)
@@ -387,9 +385,7 @@
                         @endif
 
                         {{-- Read-only view --}}
-                        <div id="store-topic-display" class="store-rich-text markdown-content">
-                            {!! $topic->txt !!}
-                        </div>
+                        <div id="store-topic-display" class="store-rich-text markdown-content">{!! $topic->txt !!}</div>
 
                         {{-- Editor (hidden by default) --}}
                         @if($canManageProduct)
@@ -506,8 +502,10 @@
             document.querySelectorAll('.markdown-content').forEach(el => {
                 if (!el.getAttribute('data-rendered')) {
                     try {
-                        const rawContent = el.innerHTML;
-                        el.innerHTML = DOMPurify.sanitize(marked.parse(el.innerText || rawContent));
+                        let text = (el.textContent || el.innerText || el.innerHTML || '');
+                        // Strip leading whitespace / indentation that triggers 4-space markdown code blocks
+                        text = text.replace(/^\s+/, '').trimEnd();
+                        el.innerHTML = DOMPurify.sanitize(marked.parse(text));
                         el.setAttribute('data-rendered', 'true');
                         el.style.display = 'block';
                         if (window.enhanceSuperdesignKbContent) {
