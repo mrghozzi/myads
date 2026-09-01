@@ -4065,4 +4065,10 @@ return [
     'referral_hub_desc' => 'Share your unique referral URL with your audience and friends to automatically collect bonus points for each sign-up.',
     'theme_website' => 'وب‌سایت پوسته',
     'selected' => 'انتخاب شده',
+    'diagram' => 'نمودار',
+    'copy' => 'کپی',
+    'insert_code_template' => 'کد و نمودار سریع:',
+    'code' => 'کد',
+    'copied' => 'کپی شد!',
+    'mermaid_render_error' => 'امکان رسم نمودار Mermaid وجود ندارد، لطفاً ساختار کد را بررسی کنید.',
 ];

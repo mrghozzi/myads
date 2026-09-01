@@ -4070,4 +4070,10 @@ return [
     'referral_hub_desc' => 'Share your unique referral URL with your audience and friends to automatically collect bonus points for each sign-up.',
     'theme_website' => 'Tema Web Sitesi',
     'selected' => 'Seçildi',
+    'diagram' => 'Diyagram',
+    'copy' => 'Kopyala',
+    'insert_code_template' => 'Hızlı Kod & Diyagram:',
+    'code' => 'Kod',
+    'copied' => 'Kopyalandı!',
+    'mermaid_render_error' => 'Mermaid diyagramı oluşturulamadı, lütfen sözdizimini kontrol edin.',
 ];

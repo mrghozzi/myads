@@ -4063,4 +4063,10 @@ return [
     'edit_website' => 'تعديل الموقع',
     'theme_website' => 'テーマのウェブサイト',
     'selected' => '選択済み',
+    'diagram' => 'ダイアグラム',
+    'copy' => 'コピー',
+    'insert_code_template' => 'クイックコード＆ダイアグラム:',
+    'code' => 'コード',
+    'copied' => 'コピーしました！',
+    'mermaid_render_error' => 'Mermaid ダイアグラムを描画できませんでした。構文を確認してください。',
 ];

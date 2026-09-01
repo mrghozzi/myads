@@ -4063,4 +4063,10 @@ return [
     'edit_website' => 'تعديل الموقع',
     'theme_website' => 'Веб-сайт темы',
     'selected' => 'Выбрано',
+    'diagram' => 'Диаграмма',
+    'copy' => 'Копировать',
+    'insert_code_template' => 'Быстрый Код и Диаграмма:',
+    'code' => 'Код',
+    'copied' => 'Скопировано!',
+    'mermaid_render_error' => 'Не удалось отрендерить диаграмму Mermaid, проверьте синтаксис.',
 ];

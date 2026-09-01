@@ -4063,4 +4063,10 @@ return [
     'edit_website' => 'تعديل الموقع',
     'theme_website' => 'Веб-сајт теме',
     'selected' => 'Изабрано',
+    'diagram' => 'Dijagram',
+    'copy' => 'Kopiraj',
+    'insert_code_template' => 'Brzi Kod & Dijagram:',
+    'code' => 'Kod',
+    'copied' => 'Kopirano!',
+    'mermaid_render_error' => 'Nije moguće prikazati Mermaid dijagram, proverite sintaksu.',
 ];

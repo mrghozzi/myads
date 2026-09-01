@@ -4256,4 +4256,10 @@ return [
     'save_changes' => 'Save Changes',
     'theme_website' => 'Theme Website',
     'selected' => 'Selected',
+    'diagram' => 'Diagram',
+    'copy' => 'Copy',
+    'insert_code_template' => 'Quick Code & Diagram:',
+    'code' => 'Code',
+    'copied' => 'Copied!',
+    'mermaid_render_error' => 'Could not render Mermaid diagram syntax.',
 ];

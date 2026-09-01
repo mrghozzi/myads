@@ -4068,4 +4068,10 @@ return [
     'edit_website' => 'تعديل الموقع',
     'theme_website' => '主題官網',
     'selected' => '已選擇',
+    'diagram' => '圖表',
+    'copy' => '複製',
+    'insert_code_template' => '快捷程式碼與圖表:',
+    'code' => '程式碼',
+    'copied' => '已複製！',
+    'mermaid_render_error' => '無法渲染 Mermaid 圖表，請檢查語法結構。',
 ];

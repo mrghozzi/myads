@@ -4257,4 +4257,10 @@ return [
     'save_changes' => 'حفظ التعديلات',
     'theme_website' => 'موقع القالب',
     'selected' => 'محدد',
+    'diagram' => 'رسم تخطيطي',
+    'copy' => 'نسخ',
+    'insert_code_template' => 'إدراج قالب برمجي أو رسم:',
+    'code' => 'الكود',
+    'copied' => 'تم النسخ!',
+    'mermaid_render_error' => 'تعذر رسم المخطط، يرجى التحقق من بنية كود Mermaid.',
 ];

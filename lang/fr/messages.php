@@ -4074,4 +4074,10 @@ return [
     'referral_hub_desc' => 'Share your unique referral URL with your audience and friends to automatically collect bonus points for each sign-up.',
     'theme_website' => 'Site web du thème',
     'selected' => 'Sélectionné',
+    'diagram' => 'Diagramme',
+    'copy' => 'Copier',
+    'insert_code_template' => 'Code & Diagramme Rapides :',
+    'code' => 'Code',
+    'copied' => 'Copié !',
+    'mermaid_render_error' => 'Impossible de générer le diagramme Mermaid, veuillez vérifier la syntaxe.',
 ];
