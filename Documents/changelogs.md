@@ -22,6 +22,16 @@
 ### Database Reliability & User Feedback
 * **Bug Fix & Database Resilience (Developer App Store & Update Full Exception Handling):** Broadened exception handling across developer platform actions from `catch (QueryException $e)` to `catch (\Throwable $e)` to capture all failure types (SQL errors, model validation exceptions, runtime errors), with user-friendly feedback redirection and error telemetry.
 * **UI/UX & Feedback (Flash Message Notifications):** Added session and AJAX status alert banners (`#dev-form-alert` and `#dev-form-success`) across developer application creation and management views, ensuring instant visual feedback on both successful operations and operational errors.
+### Superdesign Code & Mermaid Diagram Engine (Knowledgebase, Store & Forum)
+* **Feature & UI/UX (Superdesign macOS-Style Code Windows & Mermaid Interactive Diagrams):**
+  * **Interactive Mermaid Diagrams (` ```mermaid `):** Integrated dynamic SVG rendering for Mermaid architecture diagrams and flowcharts across Knowledgebase articles, Store product topics, and Forum discussions with a seamless Diagram/Code toggle button, one-click code copy, error recovery, and auto-adapting Light/Dark mode themes.
+  * **Dark macOS Code Windows (` ```text `, ` ```json `, ` ```blade `, ` ```html `, ` ```css `, ` ```php `, ` ```code `):** Styled code blocks with 3 macOS colored action dots, language badge chips, line numbers gutter, and animated one-click clipboard copying with RTL/LTR isolation.
+  * **Unified Superdesign Formatter Partial (`kb-superdesign-formatter.blade.php`):** Created a shared modular Blade component (`themes/default/views/store/partials/kb-superdesign-formatter.blade.php`) bundling Highlight.js and Mermaid.js with custom syntax highlighters.
+  * **Multi-Module Platform Integration:**
+    * **Knowledgebase (`/kb/*`):** Enabled on reader articles, AJAX topic live previews, and modal preview cards.
+    * **Store Products (`/store/*`):** Enabled on product details and topic description tabs.
+    * **Forum Topics & Posts (`/forum/*`):** Enabled across all forum discussion threads, category topics, media posts, and member replies.
+  * **Quick-Insert Snippets Toolbar:** Added a one-click template insertion toolbar above article and product markdown editors to quickly insert pre-formatted code templates for all supported languages and diagrams.
 * **Internationalization (i18n):** Added and synchronized missing translation keys for developer platform operation errors (`messages.dev_app_creation_failed`, `messages.dev_app_update_failed`) across supported language packs.
 
 

@@ -30,6 +30,7 @@
 @endphp
 
 @include('theme::store.partials.page-shell-styles')
+@include('theme::store.partials.kb-superdesign-formatter')
 
 
 
@@ -566,6 +567,9 @@
                             el.innerHTML = DOMPurify.sanitize(marked.parse(el.innerText || rawContent));
                             el.setAttribute('data-rendered', 'true');
                             el.style.display = 'block';
+                            if (window.enhanceSuperdesignKbContent) {
+                                window.enhanceSuperdesignKbContent(el);
+                            }
                         } catch (e) {
                             console.error('Error rendering markdown:', e);
                         }
@@ -574,44 +578,50 @@
             };
             renderMarkdown();
 
-            // StackEdit Integration
+            // Quick-Insert Snippets Toolbar & StackEdit Integration
             const textarea = document.getElementById('kb-editor');
-            if (textarea && typeof Stackedit !== 'undefined') {
-                const stackedit = new Stackedit();
-                const editorWrapper = document.createElement('div');
-                editorWrapper.className = 'stackedit-tools mb-3';
-                editorWrapper.innerHTML = `
-                    <button type="button" class="button secondary small" id="open-stackedit">
-                        <i class="fa fa-pencil-square" aria-hidden="true"></i>&nbsp;{{ __('messages.edit_with_stackedit') ?? 'Edit with StackEdit' }}
-                    </button>
-                `;
-                textarea.parentNode.insertBefore(editorWrapper, textarea);
+            if (textarea) {
+                if (window.initKbSnippetsToolbar) {
+                    window.initKbSnippetsToolbar('kb-editor');
+                }
 
-                document.getElementById('open-stackedit').addEventListener('click', () => {
-                    stackedit.openFile({
-                        name: '{{ $articleName ?? $shellTitle }}',
-                        content: { text: textarea.value }
+                if (typeof Stackedit !== 'undefined') {
+                    const stackedit = new Stackedit();
+                    const editorWrapper = document.createElement('div');
+                    editorWrapper.className = 'stackedit-tools mb-3';
+                    editorWrapper.innerHTML = `
+                        <button type="button" class="button secondary small" id="open-stackedit">
+                            <i class="fa fa-pencil-square" aria-hidden="true"></i>&nbsp;{{ __('messages.edit_with_stackedit') ?? 'Edit with StackEdit' }}
+                        </button>
+                    `;
+                    textarea.parentNode.insertBefore(editorWrapper, textarea);
+
+                    document.getElementById('open-stackedit').addEventListener('click', () => {
+                        stackedit.openFile({
+                            name: '{{ $articleName ?? $shellTitle }}',
+                            content: { text: textarea.value }
+                        });
+
+                        const adjustIframe = () => {
+                            const iframe = document.querySelector('iframe[src*="stackedit.io"]');
+                            if (iframe) {
+                                const header = document.querySelector('.header');
+                                if (header) {
+                                    const headerHeight = header.offsetHeight;
+                                    iframe.style.top = headerHeight + 'px';
+                                    iframe.style.height = `calc(100% - ${headerHeight}px)`;
+                                }
+                            } else {
+                                setTimeout(adjustIframe, 50);
+                            }
+                        };
+                        adjustIframe();
                     });
 
-                    const adjustIframe = () => {
-                        const iframe = document.querySelector('iframe[src*="stackedit.io"]');
-                        if (iframe) {
-                            const header = document.querySelector('.header');
-                            if (header) {
-                                const headerHeight = header.offsetHeight;
-                                iframe.style.top = headerHeight + 'px';
-                                iframe.style.height = `calc(100% - ${headerHeight}px)`;
-                            }
-                        } else {
-                            setTimeout(adjustIframe, 50);
-                        }
-                    };
-                    adjustIframe();
-                });
-
-                stackedit.on('fileChange', (file) => {
-                    textarea.value = file.content.text;
-                });
+                    stackedit.on('fileChange', (file) => {
+                        textarea.value = file.content.text;
+                    });
+                }
             }
 
             // AJAX Preview Logic - Use Event Delegation
@@ -642,6 +652,9 @@
                         if (ajaxPreviewCard && ajaxPreviewContent) {
                             ajaxPreviewTitle.innerText = title;
                             ajaxPreviewContent.innerHTML = renderedHtml;
+                            if (window.enhanceSuperdesignKbContent) {
+                                window.enhanceSuperdesignKbContent(ajaxPreviewContent);
+                            }
                             ajaxPreviewCard.style.display = 'block';
                             if (window.innerWidth < 1100) {
                                 ajaxPreviewCard.scrollIntoView({ behavior: 'smooth' });
@@ -649,6 +662,9 @@
                         } else if (previewModal && modalPreviewContent) {
                             modalPreviewTitle.innerText = title;
                             modalPreviewContent.innerHTML = renderedHtml;
+                            if (window.enhanceSuperdesignKbContent) {
+                                window.enhanceSuperdesignKbContent(modalPreviewContent);
+                            }
                             previewModal.show();
                         }
                     }

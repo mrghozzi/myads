@@ -24,6 +24,7 @@
 @endphp
 
 @include('theme::store.partials.page-shell-styles')
+@include('theme::store.partials.kb-superdesign-formatter')
 
 
 
@@ -509,6 +510,9 @@
                         el.innerHTML = DOMPurify.sanitize(marked.parse(el.innerText || rawContent));
                         el.setAttribute('data-rendered', 'true');
                         el.style.display = 'block';
+                        if (window.enhanceSuperdesignKbContent) {
+                            window.enhanceSuperdesignKbContent(el);
+                        }
                     } catch (e) {
                         console.error('Error rendering markdown:', e);
                     }
@@ -516,6 +520,11 @@
             });
         }
         renderAllMarkdown();
+
+        if (window.initKbSnippetsToolbar) {
+            window.initKbSnippetsToolbar('store-topic-textarea');
+            window.initKbSnippetsToolbar('store-details-textarea');
+        }
 
         // ── Topic inline editing ──
         const editBtn   = document.getElementById('store-edit-topic-btn');

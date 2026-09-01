@@ -421,6 +421,8 @@
 </div>
 @endforeach
 
+@include('theme::store.partials.kb-superdesign-formatter')
+
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/dompurify/dist/purify.min.js"></script>
@@ -433,10 +435,20 @@
                     el.innerHTML = DOMPurify.sanitize(marked.parse(el.innerText || el.innerHTML));
                     el.setAttribute('data-rendered', 'true');
                     el.style.display = 'block';
+                    if (window.enhanceSuperdesignKbContent) {
+                        window.enhanceSuperdesignKbContent(el);
+                    }
                 }
             });
         }
         renderMarkdown();
+
+        // Initialize snippets toolbar on admin textareas
+        document.querySelectorAll('textarea[name="valuer"]').forEach(txt => {
+            if (txt.id && window.initKbSnippetsToolbar) {
+                window.initKbSnippetsToolbar(txt.id);
+            }
+        });
 
         document.querySelectorAll('.modal').forEach(modal => {
             modal.addEventListener('shown.bs.modal', function () {
