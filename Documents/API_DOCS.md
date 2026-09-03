@@ -1,8 +1,8 @@
-# MYADS v4.5.5 REST & Real-Time API Documentation
-> **Specification Version:** `v4.5.5` (Stable / Maintenance Release)  
+# MYADS v4.5.6 REST & Real-Time API Documentation
+> **Specification Version:** `v4.5.6` (Stable Release)  
 > **Target Framework:** Laravel 12 (PHP 8.2+)  
 > **Authentication Engines:** Laravel Sanctum (Mobile & Web API), OAuth 2.0 (Developer Platform), and Server-Sent Events (SSE Live Stream).  
-> **Last Updated:** August 2026  
+> **Last Updated:** September 2026  
 
 ---
 
@@ -218,7 +218,7 @@ Developers can register external applications at `/developer` to build third-par
 | | `owner.messages.read` | Read private message conversations belonging to authorized owner. | **Yes** |
 | | `owner.messages.write` | Send private messages on behalf of authorized owner. | **Yes** |
 
-### Application Management & Form Architecture (v4.5.5)
+### Application Management & Form Architecture (v4.5.6)
 - **Application Registration:** `POST /developer/apps`
   - **Headers:** `Content-Type: application/json`, `X-CSRF-TOKEN: {token}`, `Accept: application/json`
   - **Payload:**
@@ -245,6 +245,67 @@ Developers can register external applications at `/developer` to build third-par
 - **Client Secret Rotation:** `POST /developer/apps/{id}/rotate-secret`
 - **Application Submission:** `POST /developer/apps/{id}/submit`
 - **Application Self-Service Deletion:** `DELETE /developer/apps/{id}` (Cascades across tokens and authorizations)
+
+### OAuth 2.0 Authorization Flow & RFC 6749 Compliance
+
+#### 1. Authorization Request
+```http
+GET /oauth/authorize?client_id={client_id}&redirect_uri={redirect_uri}&response_type=code&scope={scope}&state={state}
+```
+- **`client_id`** *(required)*: The 32-character hexadecimal Client ID of the registered application.
+- **`redirect_uri`** *(required)*: Must match one of the registered URIs. Supports URIs with pre-existing query parameters (e.g. `https://example.com/wp-admin/admin.php?page=plugin&action=callback`).
+- **`response_type`** *(required)*: Must be `code`.
+- **`scope`** *(optional)*: Space-delimited or comma-delimited list of requested permissions (e.g. `user.identity.read user.content.write`).
+- **`state`** *(recommended)*: CSRF protection token returned back to the client.
+
+> **RFC 6749 Section 4.1.2 URL Concatenation:** If the `redirect_uri` contains existing query parameters, the authorization response automatically appends parameters using `&` (e.g. `https://example.com/callback?page=plugin&code={code}&state={state}`).
+
+> **WAF / ModSecurity Rule 930120 Bypass:** Sensitive scope aliases (`profile.read`, `user_profile.read`, `user_profile_read`, `user-profile-read`) are automatically normalized to `user.profile.read` to prevent web application firewalls from treating `.profile` as a Linux dotfile access attempt.
+
+> **Draft Application Development Mode:** Application owners can test their own applications while in `draft` mode without requiring administrative approval.
+
+#### 2. Token Exchange (RFC 6749 Section 4.1.3 & Section 2.3.1)
+```http
+POST /oauth/token
+Content-Type: application/x-www-form-urlencoded (or application/json)
+Authorization: Basic {base64(client_id:client_secret)}
+```
+Or with credentials in the request body:
+```json
+{
+  "grant_type": "authorization_code",
+  "client_id": "{client_id}",
+  "client_secret": "{client_secret}",
+  "redirect_uri": "{redirect_uri}",
+  "code": "{authorization_code}"
+}
+```
+
+**Successful Response (HTTP 200 OK):**
+```json
+{
+  "access_token": "DbMYZk4zAq5iZ4KNRBCceUyhnwZw5SbYp4fRIMRAXz40JzMjalN6XjsuuCAU",
+  "token_type": "Bearer",
+  "expires_in": 2592000,
+  "refresh_token": "KONxbh1KItXybhrMTiikoy0YBAUzkrb3rk3iywZT4fvEx7zRTcpRgtHuaxfD",
+  "scope": "user.identity.read user.content.write"
+}
+```
+
+#### 3. Refreshing Tokens (RFC 6749 Section 6)
+```json
+{
+  "grant_type": "refresh_token",
+  "client_id": "{client_id}",
+  "client_secret": "{client_secret}",
+  "refresh_token": "{refresh_token}"
+}
+```
+
+#### 4. Token Validity Lifecycles
+- **Authorization Code:** 10 minutes (single-use).
+- **Access Token:** 30 days (`2592000` seconds).
+- **Refresh Token:** 90 days.
 
 ---
 

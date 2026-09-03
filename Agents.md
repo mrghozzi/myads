@@ -1,4 +1,4 @@
-# Agents.md — MYADS v4.5.5
+# Agents.md — MYADS v4.5.6
 
 > **Purpose:** This file gives AI coding agents a fast, comprehensive understanding of the MYADS project — its architecture, conventions, key files, and rules — so they can work effectively from a fresh chat context.
 
@@ -6,7 +6,7 @@
 
 ## 1. Project Identity
 
-- **Name:** MYADS v4.5.5
+- **Name:** MYADS v4.5.6
 - **Type:** Social network + ad exchange platform for website owners
 - **Framework:** Laravel 12 (PHP 8.2+)
 - **Database:** MySQL 5.7+ / MariaDB 10.3+
@@ -1102,7 +1102,16 @@ If in doubt, update it. An outdated `Agents.md` causes future agents to make wro
   - **Clean JSON Payload Architecture for Developer Forms:** Modernized application creation (`create.blade.php`) and management (`show.blade.php`, `scripts.blade.php`) forms to submit structured JSON payloads (`Content-Type: application/json`) with dynamic CSRF token extraction, matching the robust AJAX pattern across `master.blade.php`.
   - **Real-Time SSE Badge State & Message Synchronization:** Corrected unread message badge count logic in `LiveEventStreamService` to count `state != 0` (unread) rather than `state = 0` (read), eliminating false `+99` badge counts, and synchronized message state across `DeveloperApiController` (`state = 3`).
   - **Developer Platform Controllers & Theme Parity:** Updated `DeveloperPlatformController` actions to return structured JSON responses for AJAX clients, added strict `(int)` casting for ownership checks, and synchronized all developer views between `themes/default` and `themes/bootstrap-sample`.
+- **v4.5.6 Official Release — OAuth 2.0 RFC 6749 Section 4.1.2 Compliance, Universal Schema Resilience & Exception Security (2026-09-03):**
+  - **RFC 6749 Section 4.1.2 Redirect Query Concatenation (`OAuthController::buildRedirectUri`):** Dynamically appends parameters using `&` (e.g. `&code=` or `&error=`) when third-party `redirect_uri` contains existing query strings (such as WordPress plugin callback `admin.php?page=adstn-auto-poster&action=adstn_oauth_callback`), resolving URL corruption caused by double question marks (`callback?code=...`).
+  - **Universal Database Schema Resilience & Self-Healing (`DeveloperOAuthService`, Models & Migration `2026_09_03_170000`):** Created migration `2026_09_03_170000_ensure_developer_platform_columns.php` and runtime self-healing validation. Disabled Eloquent automatic timestamps (`public $timestamps = false`) on `DeveloperAuthorizationCode`, `DeveloperAccessToken`, `DeveloperRefreshToken`, and `DeveloperAuthorization` so Eloquent never forces non-existent `updated_at` or `created_at` columns. Implemented universal dynamic column inspection (`getTableColumns()`) and strict intersection filtering (`array_intersect_key()`) in `DeveloperOAuthService`, alongside automatic regex-based bad-column stripping on QueryException.
+  - **Dynamic Fallback Expiration Calculation:** Added graceful timestamp fallbacks in `DeveloperAuthorizationCode::isExpired()` (`created_at + 10 minutes`), `DeveloperAccessToken::isExpired()` (`created_at + 30 days`), and `DeveloperRefreshToken::isExpired()` (`created_at + 90 days`) ensuring compatibility with legacy database schemas.
+  - **Zero Database Information Leakage on OAuth Errors:** Wrapped all authorization endpoints in sanitized exception handlers rendering themed 500 error views (`theme::errors.500`) without exposing database hosts, user credentials, or SQL queries, writing full diagnostic traces exclusively to `storage/logs/laravel.log`.
+  - **HTTP Basic Authentication Support (`RFC 6749 Section 2.3.1`):** Added support for client credentials delivered via HTTP Basic Authentication header (`Authorization: Basic ...`) on the `/oauth/token` endpoint, seamlessly extracting `client_id` and `client_secret` if not present in the POST request body.
+  - **WAF / ModSecurity Sensitive Scope Normalization (`DeveloperScopeCatalog`):** Normalized scope aliases (`profile.read`, `user_profile.read`, `user_profile_read`, `user-profile-read`) to `user.profile.read` to prevent OWASP CRS Rule 930120 False Positives (`~/.profile`).
+  - **Draft Application Development Testing Mode (`DeveloperApp::isUsableBy`):** Permitted application developers to authorize and test their own applications while in `draft` status without administrative approval.
+  - **Themes Parity & View Safety:** Safeguarded `@includeIf('theme::partials._customizer_head')` and `optional($auth->created_at)->format(...)` across both `themes/default` and `themes/bootstrap-sample` (bumped `bootstrap-sample` to v2.1.2).
 
 ---
 
-*Last updated: 2026-08-30 — MYADS v4.5.5 (Official Release)*
+*Last updated: 2026-09-03 — MYADS v4.5.6 (Official Release)*
