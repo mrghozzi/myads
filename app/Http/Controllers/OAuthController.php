@@ -60,13 +60,15 @@ class OAuthController extends Controller
                 'trace' => $e->getTraceAsString(),
             ]);
 
-            return response('OAuth Authorization Server Error: ' . (config('app.debug') ? $e->getMessage() : 'An internal error occurred.'), 500);
+            return response('OAuth Authorization Server Error: ' . $e->getMessage() . ' (' . basename($e->getFile()) . ':' . $e->getLine() . ')', 500);
         }
     }
 
     public function authorizeResponse(Request $request)
     {
         try {
+            $this->ensureDeveloperPlatformTables();
+
             $request->validate([
                 'client_id' => 'required|string',
                 'redirect_uri' => 'required|url',
@@ -115,7 +117,7 @@ class OAuthController extends Controller
                 'trace' => $e->getTraceAsString(),
             ]);
 
-            return response('OAuth Authorization Server Error: ' . (config('app.debug') ? $e->getMessage() : 'An internal error occurred.'), 500);
+            return response('OAuth Authorization Server Error: ' . $e->getMessage() . ' (' . basename($e->getFile()) . ':' . $e->getLine() . ')', 500);
         }
     }
 
@@ -212,5 +214,65 @@ class OAuthController extends Controller
     {
         $separator = str_contains($baseUri, '?') ? '&' : '?';
         return $baseUri . $separator . http_build_query($params);
+    }
+
+    /**
+     * Ensure all required OAuth 2.0 developer tables exist in the database.
+     */
+    protected function ensureDeveloperPlatformTables(): void
+    {
+        try {
+            if (!\Illuminate\Support\Facades\Schema::hasTable('developer_authorization_codes')) {
+                \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+            }
+
+            if (!\Illuminate\Support\Facades\Schema::hasTable('developer_authorization_codes')) {
+                \Illuminate\Support\Facades\Schema::create('developer_authorization_codes', function (\Illuminate\Database\Schema\Blueprint $table) {
+                    $table->id();
+                    $table->unsignedBigInteger('developer_app_id');
+                    $table->unsignedBigInteger('user_id');
+                    $table->string('code')->unique();
+                    $table->string('redirect_uri');
+                    $table->json('scopes')->nullable();
+                    $table->timestamp('expires_at')->nullable();
+                    $table->boolean('used')->default(false);
+                    $table->timestamps();
+                });
+            }
+
+            if (!\Illuminate\Support\Facades\Schema::hasTable('developer_authorizations')) {
+                \Illuminate\Support\Facades\Schema::create('developer_authorizations', function (\Illuminate\Database\Schema\Blueprint $table) {
+                    $table->id();
+                    $table->unsignedBigInteger('user_id');
+                    $table->unsignedBigInteger('developer_app_id');
+                    $table->json('scopes')->nullable();
+                    $table->timestamps();
+                });
+            }
+
+            if (!\Illuminate\Support\Facades\Schema::hasTable('developer_access_tokens')) {
+                \Illuminate\Support\Facades\Schema::create('developer_access_tokens', function (\Illuminate\Database\Schema\Blueprint $table) {
+                    $table->id();
+                    $table->unsignedBigInteger('developer_app_id');
+                    $table->unsignedBigInteger('user_id');
+                    $table->string('access_token')->unique();
+                    $table->json('scopes')->nullable();
+                    $table->timestamp('expires_at')->nullable();
+                    $table->timestamps();
+                });
+            }
+
+            if (!\Illuminate\Support\Facades\Schema::hasTable('developer_refresh_tokens')) {
+                \Illuminate\Support\Facades\Schema::create('developer_refresh_tokens', function (\Illuminate\Database\Schema\Blueprint $table) {
+                    $table->id();
+                    $table->unsignedBigInteger('developer_access_token_id');
+                    $table->string('refresh_token')->unique();
+                    $table->timestamp('expires_at')->nullable();
+                    $table->timestamps();
+                });
+            }
+        } catch (\Throwable $e) {
+            \Log::error('[OAuthController::ensureDeveloperPlatformTables] ' . $e->getMessage());
+        }
     }
 }
