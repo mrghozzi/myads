@@ -261,8 +261,13 @@ class AuthController extends Controller
             $next = $request->input('next');
             if (filter_var($next, FILTER_VALIDATE_URL)) {
                 $parsedHost = parse_url($next, PHP_URL_HOST);
+                $currentHost = $request->getHost();
                 $appHost = parse_url(config('app.url'), PHP_URL_HOST);
-                if ($parsedHost === $appHost || ($appHost && str_ends_with((string) $parsedHost, '.' . $appHost))) {
+                
+                $isCurrentHost = $parsedHost === $currentHost || ($currentHost && str_ends_with((string) $parsedHost, '.' . $currentHost));
+                $isAppHost = $parsedHost === $appHost || ($appHost && str_ends_with((string) $parsedHost, '.' . $appHost));
+
+                if ($isCurrentHost || $isAppHost) {
                     return redirect()->to($next);
                 }
             } elseif (str_starts_with($next, '/')) {

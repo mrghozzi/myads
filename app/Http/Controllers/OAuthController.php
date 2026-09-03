@@ -18,81 +18,105 @@ class OAuthController extends Controller
 
     public function authorizeRequest(Request $request)
     {
-        $request->validate([
-            'client_id' => 'required|string',
-            'redirect_uri' => 'required|url',
-            'response_type' => 'required|in:code',
-            'state' => 'required|string',
-            'scope' => 'required|string',
-        ]);
+        try {
+            $request->validate([
+                'client_id' => 'required|string',
+                'redirect_uri' => 'required|url',
+                'response_type' => 'required|in:code',
+                'state' => 'required|string',
+                'scope' => 'required|string',
+            ]);
 
-        if (!auth()->check()) {
-            session()->put('url.intended', $request->fullUrl());
-            return redirect()->guest(route('login', ['next' => $request->fullUrl()]));
+            if (!auth()->check()) {
+                session()->put('url.intended', $request->fullUrl());
+                return redirect()->guest(route('login', ['next' => $request->fullUrl()]));
+            }
+
+            $app = DeveloperApp::where('client_id', $request->client_id)->first();
+
+            if (!$app || !$app->isUsableBy(auth()->user())) {
+                return response('Invalid or inactive client_id', 400);
+            }
+
+            if (!$this->isRedirectUriValid($app, $request->redirect_uri)) {
+                return response('Invalid redirect_uri', 400);
+            }
+
+            $requestedScopes = array_map(
+                [DeveloperScopeCatalog::class, 'normalizeScopeId'],
+                preg_split('/[\s,]+/', trim($request->scope))
+            );
+            $appScopes = (array) ($app->requested_scopes ?? []);
+            $validScopes = array_values(array_intersect($requestedScopes, $appScopes));
+
+            $scopeDetails = DeveloperScopeCatalog::getScopes($validScopes);
+
+            return view('theme::oauth.authorize', compact('app', 'scopeDetails', 'request'));
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            throw $e;
+        } catch (\Throwable $e) {
+            \Log::error('[OAuthController::authorizeRequest] Exception: ' . $e->getMessage(), [
+                'file' => $e->getFile() . ':' . $e->getLine(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response('OAuth Authorization Server Error: ' . (config('app.debug') ? $e->getMessage() : 'An internal error occurred.'), 500);
         }
-
-        $app = DeveloperApp::where('client_id', $request->client_id)->first();
-
-        if (!$app || !$app->isActive()) {
-            return response('Invalid or inactive client_id', 400);
-        }
-
-        if (!$this->isRedirectUriValid($app, $request->redirect_uri)) {
-            return response('Invalid redirect_uri', 400);
-        }
-
-        $requestedScopes = array_map(
-            [DeveloperScopeCatalog::class, 'normalizeScopeId'],
-            preg_split('/[\s,]+/', trim($request->scope))
-        );
-        $validScopes = array_values(array_intersect($requestedScopes, $app->requested_scopes ?? []));
-
-        $scopeDetails = DeveloperScopeCatalog::getScopes($validScopes);
-
-        return view('theme::oauth.authorize', compact('app', 'scopeDetails', 'request'));
     }
 
     public function authorizeResponse(Request $request)
     {
-        $request->validate([
-            'client_id' => 'required|string',
-            'redirect_uri' => 'required|url',
-            'state' => 'required|string',
-            'scope' => 'required|string',
-            'action' => 'required|in:accept,reject',
-        ]);
+        try {
+            $request->validate([
+                'client_id' => 'required|string',
+                'redirect_uri' => 'required|url',
+                'state' => 'required|string',
+                'scope' => 'required|string',
+                'action' => 'required|in:accept,reject',
+            ]);
 
-        if (!auth()->check()) {
-            abort(403);
-        }
+            if (!auth()->check()) {
+                abort(403);
+            }
 
-        $app = DeveloperApp::where('client_id', $request->client_id)->first();
+            $app = DeveloperApp::where('client_id', $request->client_id)->first();
 
-        if (!$app || !$app->isActive() || !$this->isRedirectUriValid($app, $request->redirect_uri)) {
-            return response('Invalid client or redirect URI', 400);
-        }
+            if (!$app || !$app->isUsableBy(auth()->user()) || !$this->isRedirectUriValid($app, $request->redirect_uri)) {
+                return response('Invalid client or redirect URI', 400);
+            }
 
-        if ($request->action === 'reject') {
+            if ($request->action === 'reject') {
+                $redirect = $this->buildRedirectUri($request->redirect_uri, [
+                    'error' => 'access_denied',
+                    'state' => $request->state,
+                ]);
+                return redirect($redirect);
+            }
+
+            $requestedScopes = array_map(
+                [DeveloperScopeCatalog::class, 'normalizeScopeId'],
+                preg_split('/[\s,]+/', trim($request->scope))
+            );
+            $appScopes = (array) ($app->requested_scopes ?? []);
+            $validScopes = array_values(array_intersect($requestedScopes, $appScopes));
+
+            $authData = $this->oauthService->generateAuthorizationCode($app, auth()->user(), $request->redirect_uri, $validScopes);
+
             $redirect = $this->buildRedirectUri($request->redirect_uri, [
-                'error' => 'access_denied',
+                'code' => $authData['plain_code'],
                 'state' => $request->state,
             ]);
             return redirect($redirect);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            throw $e;
+        } catch (\Throwable $e) {
+            \Log::error('[OAuthController::authorizeResponse] Exception: ' . $e->getMessage(), [
+                'file' => $e->getFile() . ':' . $e->getLine(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+
+            return response('OAuth Authorization Server Error: ' . (config('app.debug') ? $e->getMessage() : 'An internal error occurred.'), 500);
         }
-
-        $requestedScopes = array_map(
-            [DeveloperScopeCatalog::class, 'normalizeScopeId'],
-            preg_split('/[\s,]+/', trim($request->scope))
-        );
-        $validScopes = array_values(array_intersect($requestedScopes, $app->requested_scopes ?? []));
-
-        $authData = $this->oauthService->generateAuthorizationCode($app, auth()->user(), $request->redirect_uri, $validScopes);
-
-        $redirect = $this->buildRedirectUri($request->redirect_uri, [
-            'code' => $authData['plain_code'],
-            'state' => $request->state,
-        ]);
-        return redirect($redirect);
     }
 
     public function token(Request $request)
@@ -115,7 +139,7 @@ class OAuthController extends Controller
         // Fetch by client_id only, then compare secret with constant-time hash_equals().
         $app = DeveloperApp::where('client_id', $request->client_id)->first();
 
-        if (!$app || !$app->isActive() || !hash_equals((string) $app->client_secret, (string) $request->client_secret)) {
+        if (!$app || $app->status === 'suspended' || !hash_equals((string) $app->client_secret, (string) $request->client_secret)) {
             return response()->json(['error' => 'invalid_client'], 401);
         }
 
