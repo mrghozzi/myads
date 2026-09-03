@@ -339,7 +339,7 @@
         }
     </style>
 
-    @include('theme::partials._customizer_head')
+    @includeIf('theme::partials._customizer_head')
     @stack('head')
 </head>
 <body data-theme="{{ $css_path }}" class="oauth-layout-body {{ $pageDirection }}">

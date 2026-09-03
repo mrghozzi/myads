@@ -37,6 +37,14 @@ class DeveloperAuthorizationCode extends Model
 
     public function isExpired()
     {
-        return $this->expires_at->isPast();
+        if ($this->expires_at) {
+            return $this->expires_at->isPast();
+        }
+
+        if ($this->created_at) {
+            return $this->created_at->addMinutes(10)->isPast();
+        }
+
+        return false;
     }
 }

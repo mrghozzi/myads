@@ -28,7 +28,15 @@ class DeveloperRefreshToken extends Model
 
     public function isExpired()
     {
-        return $this->expires_at->isPast();
+        if ($this->expires_at) {
+            return $this->expires_at->isPast();
+        }
+
+        if ($this->created_at) {
+            return $this->created_at->addDays(90)->isPast();
+        }
+
+        return false;
     }
 
     public function isValid()

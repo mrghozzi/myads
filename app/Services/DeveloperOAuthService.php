@@ -47,7 +47,17 @@ class DeveloperOAuthService
                         \Illuminate\Support\Facades\DB::statement($sql);
                     } catch (\Throwable $ignored) {}
                 }
-                $record = DeveloperAuthorizationCode::create($payload);
+                try {
+                    $record = DeveloperAuthorizationCode::create($payload);
+                } catch (\Illuminate\Database\QueryException $secondException) {
+                    if (str_contains($secondException->getMessage(), 'expires_at')) {
+                        unset($payload['expires_at']);
+                    }
+                    if (str_contains($secondException->getMessage(), 'used')) {
+                        unset($payload['used']);
+                    }
+                    $record = DeveloperAuthorizationCode::create($payload);
+                }
             } else {
                 throw $e;
             }
@@ -153,13 +163,22 @@ class DeveloperOAuthService
                         \Illuminate\Support\Facades\DB::statement($sql);
                     } catch (\Throwable $ignored) {}
                 }
-                $accessToken = DeveloperAccessToken::create([
-                    'developer_app_id' => $app->id,
-                    'user_id' => $userId,
-                    'access_token' => hash('sha256', $accessTokenPlain),
-                    'scopes' => $scopes,
-                    'expires_at' => now()->addDays(30),
-                ]);
+                try {
+                    $accessToken = DeveloperAccessToken::create([
+                        'developer_app_id' => $app->id,
+                        'user_id' => $userId,
+                        'access_token' => hash('sha256', $accessTokenPlain),
+                        'scopes' => $scopes,
+                        'expires_at' => now()->addDays(30),
+                    ]);
+                } catch (\Illuminate\Database\QueryException $secondException) {
+                    $accessToken = DeveloperAccessToken::create([
+                        'developer_app_id' => $app->id,
+                        'user_id' => $userId,
+                        'access_token' => hash('sha256', $accessTokenPlain),
+                        'scopes' => $scopes,
+                    ]);
+                }
             } else {
                 throw $e;
             }
@@ -181,11 +200,18 @@ class DeveloperOAuthService
                         \Illuminate\Support\Facades\DB::statement($sql);
                     } catch (\Throwable $ignored) {}
                 }
-                DeveloperRefreshToken::create([
-                    'developer_access_token_id' => $accessToken->id,
-                    'refresh_token' => hash('sha256', $refreshTokenPlain),
-                    'expires_at' => now()->addDays(90),
-                ]);
+                try {
+                    DeveloperRefreshToken::create([
+                        'developer_access_token_id' => $accessToken->id,
+                        'refresh_token' => hash('sha256', $refreshTokenPlain),
+                        'expires_at' => now()->addDays(90),
+                    ]);
+                } catch (\Illuminate\Database\QueryException $secondException) {
+                    DeveloperRefreshToken::create([
+                        'developer_access_token_id' => $accessToken->id,
+                        'refresh_token' => hash('sha256', $refreshTokenPlain),
+                    ]);
+                }
             } else {
                 throw $e;
             }
