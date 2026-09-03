@@ -60,7 +60,13 @@ class OAuthController extends Controller
                 'trace' => $e->getTraceAsString(),
             ]);
 
-            return response('OAuth Authorization Server Error: ' . $e->getMessage() . ' (' . basename($e->getFile()) . ':' . $e->getLine() . ')', 500);
+            if (view()->exists('theme::errors.500')) {
+                return response()->view('theme::errors.500', [
+                    'message' => __('messages.error_500_text'),
+                ], 500);
+            }
+
+            return response(__('messages.error_500_text') ?: 'An error occurred during authorization. Please try again.', 500);
         }
     }
 
@@ -117,7 +123,13 @@ class OAuthController extends Controller
                 'trace' => $e->getTraceAsString(),
             ]);
 
-            return response('OAuth Authorization Server Error: ' . $e->getMessage() . ' (' . basename($e->getFile()) . ':' . $e->getLine() . ')', 500);
+            if (view()->exists('theme::errors.500')) {
+                return response()->view('theme::errors.500', [
+                    'message' => __('messages.error_500_text'),
+                ], 500);
+            }
+
+            return response(__('messages.error_500_text') ?: 'An error occurred during authorization. Please try again.', 500);
         }
     }
 
@@ -217,29 +229,56 @@ class OAuthController extends Controller
     }
 
     /**
-     * Ensure all required OAuth 2.0 developer tables exist in the database.
+     * Ensure all required OAuth 2.0 developer tables and columns exist in the database.
      */
     protected function ensureDeveloperPlatformTables(): void
     {
         try {
-            if (!\Illuminate\Support\Facades\Schema::hasTable('developer_authorization_codes')) {
+            if (!\Illuminate\Support\Facades\Schema::hasTable('developer_authorization_codes') ||
+                !\Illuminate\Support\Facades\Schema::hasColumn('developer_authorization_codes', 'expires_at')) {
                 \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
             }
 
+            // Ensure developer_authorization_codes table and all columns exist
             if (!\Illuminate\Support\Facades\Schema::hasTable('developer_authorization_codes')) {
                 \Illuminate\Support\Facades\Schema::create('developer_authorization_codes', function (\Illuminate\Database\Schema\Blueprint $table) {
                     $table->id();
                     $table->unsignedBigInteger('developer_app_id');
                     $table->unsignedBigInteger('user_id');
                     $table->string('code')->unique();
-                    $table->string('redirect_uri');
+                    $table->text('redirect_uri');
                     $table->json('scopes')->nullable();
                     $table->timestamp('expires_at')->nullable();
                     $table->boolean('used')->default(false);
                     $table->timestamps();
                 });
+            } else {
+                \Illuminate\Support\Facades\Schema::table('developer_authorization_codes', function (\Illuminate\Database\Schema\Blueprint $table) {
+                    if (!\Illuminate\Support\Facades\Schema::hasColumn('developer_authorization_codes', 'developer_app_id')) {
+                        $table->unsignedBigInteger('developer_app_id')->after('id');
+                    }
+                    if (!\Illuminate\Support\Facades\Schema::hasColumn('developer_authorization_codes', 'user_id')) {
+                        $table->unsignedBigInteger('user_id')->after('developer_app_id');
+                    }
+                    if (!\Illuminate\Support\Facades\Schema::hasColumn('developer_authorization_codes', 'code')) {
+                        $table->string('code')->after('user_id');
+                    }
+                    if (!\Illuminate\Support\Facades\Schema::hasColumn('developer_authorization_codes', 'redirect_uri')) {
+                        $table->text('redirect_uri')->after('code');
+                    }
+                    if (!\Illuminate\Support\Facades\Schema::hasColumn('developer_authorization_codes', 'scopes')) {
+                        $table->json('scopes')->nullable()->after('redirect_uri');
+                    }
+                    if (!\Illuminate\Support\Facades\Schema::hasColumn('developer_authorization_codes', 'expires_at')) {
+                        $table->timestamp('expires_at')->nullable()->after('scopes');
+                    }
+                    if (!\Illuminate\Support\Facades\Schema::hasColumn('developer_authorization_codes', 'used')) {
+                        $table->boolean('used')->default(false)->after('expires_at');
+                    }
+                });
             }
 
+            // Ensure developer_authorizations table and all columns exist
             if (!\Illuminate\Support\Facades\Schema::hasTable('developer_authorizations')) {
                 \Illuminate\Support\Facades\Schema::create('developer_authorizations', function (\Illuminate\Database\Schema\Blueprint $table) {
                     $table->id();
@@ -247,9 +286,23 @@ class OAuthController extends Controller
                     $table->unsignedBigInteger('developer_app_id');
                     $table->json('scopes')->nullable();
                     $table->timestamps();
+                    $table->unique(['user_id', 'developer_app_id']);
+                });
+            } else {
+                \Illuminate\Support\Facades\Schema::table('developer_authorizations', function (\Illuminate\Database\Schema\Blueprint $table) {
+                    if (!\Illuminate\Support\Facades\Schema::hasColumn('developer_authorizations', 'user_id')) {
+                        $table->unsignedBigInteger('user_id')->after('id');
+                    }
+                    if (!\Illuminate\Support\Facades\Schema::hasColumn('developer_authorizations', 'developer_app_id')) {
+                        $table->unsignedBigInteger('developer_app_id')->after('user_id');
+                    }
+                    if (!\Illuminate\Support\Facades\Schema::hasColumn('developer_authorizations', 'scopes')) {
+                        $table->json('scopes')->nullable()->after('developer_app_id');
+                    }
                 });
             }
 
+            // Ensure developer_access_tokens table and all columns exist
             if (!\Illuminate\Support\Facades\Schema::hasTable('developer_access_tokens')) {
                 \Illuminate\Support\Facades\Schema::create('developer_access_tokens', function (\Illuminate\Database\Schema\Blueprint $table) {
                     $table->id();
@@ -258,17 +311,71 @@ class OAuthController extends Controller
                     $table->string('access_token')->unique();
                     $table->json('scopes')->nullable();
                     $table->timestamp('expires_at')->nullable();
+                    $table->boolean('revoked')->default(false);
                     $table->timestamps();
+                });
+            } else {
+                \Illuminate\Support\Facades\Schema::table('developer_access_tokens', function (\Illuminate\Database\Schema\Blueprint $table) {
+                    if (!\Illuminate\Support\Facades\Schema::hasColumn('developer_access_tokens', 'developer_app_id')) {
+                        $table->unsignedBigInteger('developer_app_id')->after('id');
+                    }
+                    if (!\Illuminate\Support\Facades\Schema::hasColumn('developer_access_tokens', 'user_id')) {
+                        $table->unsignedBigInteger('user_id')->after('developer_app_id');
+                    }
+                    if (!\Illuminate\Support\Facades\Schema::hasColumn('developer_access_tokens', 'access_token')) {
+                        $table->string('access_token')->after('user_id');
+                    }
+                    if (!\Illuminate\Support\Facades\Schema::hasColumn('developer_access_tokens', 'scopes')) {
+                        $table->json('scopes')->nullable()->after('access_token');
+                    }
+                    if (!\Illuminate\Support\Facades\Schema::hasColumn('developer_access_tokens', 'expires_at')) {
+                        $table->timestamp('expires_at')->nullable()->after('scopes');
+                    }
+                    if (!\Illuminate\Support\Facades\Schema::hasColumn('developer_access_tokens', 'revoked')) {
+                        $table->boolean('revoked')->default(false)->after('expires_at');
+                    }
                 });
             }
 
+            // Ensure developer_refresh_tokens table and all columns exist
             if (!\Illuminate\Support\Facades\Schema::hasTable('developer_refresh_tokens')) {
                 \Illuminate\Support\Facades\Schema::create('developer_refresh_tokens', function (\Illuminate\Database\Schema\Blueprint $table) {
                     $table->id();
                     $table->unsignedBigInteger('developer_access_token_id');
                     $table->string('refresh_token')->unique();
                     $table->timestamp('expires_at')->nullable();
+                    $table->boolean('revoked')->default(false);
                     $table->timestamps();
+                });
+            } else {
+                \Illuminate\Support\Facades\Schema::table('developer_refresh_tokens', function (\Illuminate\Database\Schema\Blueprint $table) {
+                    if (!\Illuminate\Support\Facades\Schema::hasColumn('developer_refresh_tokens', 'developer_access_token_id')) {
+                        $table->unsignedBigInteger('developer_access_token_id')->after('id');
+                    }
+                    if (!\Illuminate\Support\Facades\Schema::hasColumn('developer_refresh_tokens', 'refresh_token')) {
+                        $table->string('refresh_token')->after('developer_access_token_id');
+                    }
+                    if (!\Illuminate\Support\Facades\Schema::hasColumn('developer_refresh_tokens', 'expires_at')) {
+                        $table->timestamp('expires_at')->nullable()->after('refresh_token');
+                    }
+                    if (!\Illuminate\Support\Facades\Schema::hasColumn('developer_refresh_tokens', 'revoked')) {
+                        $table->boolean('revoked')->default(false)->after('expires_at');
+                    }
+                });
+            }
+
+            // Ensure developer_apps table has all required columns
+            if (\Illuminate\Support\Facades\Schema::hasTable('developer_apps')) {
+                \Illuminate\Support\Facades\Schema::table('developer_apps', function (\Illuminate\Database\Schema\Blueprint $table) {
+                    if (!\Illuminate\Support\Facades\Schema::hasColumn('developer_apps', 'redirect_uris')) {
+                        $table->json('redirect_uris')->nullable();
+                    }
+                    if (!\Illuminate\Support\Facades\Schema::hasColumn('developer_apps', 'requested_scopes')) {
+                        $table->json('requested_scopes')->nullable();
+                    }
+                    if (!\Illuminate\Support\Facades\Schema::hasColumn('developer_apps', 'widget_capabilities')) {
+                        $table->json('widget_capabilities')->nullable();
+                    }
                 });
             }
         } catch (\Throwable $e) {
