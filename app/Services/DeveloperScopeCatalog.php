@@ -215,10 +215,26 @@ class DeveloperScopeCatalog
         ];
     }
 
+    /**
+     * Normalize scope aliases to standard scope IDs (e.g. avoiding WAF rules on '.profile').
+     */
+    public static function normalizeScopeId(string $id): string
+    {
+        $id = trim($id);
+        return match ($id) {
+            'profile.read', 'user_profile.read', 'user_profile_read', 'user-profile-read', 'user-profile.read' => 'user.profile.read',
+            'identity.read', 'user_identity.read', 'user_identity_read', 'user-identity-read' => 'user.identity.read',
+            'content.write', 'user_content.write', 'user_content_write', 'user-content-write' => 'user.content.write',
+            'content.read', 'user_content.read', 'user_content_read', 'user-content-read' => 'user.content.read',
+            default => $id,
+        };
+    }
+
     public static function getScope(string $id): ?array
     {
         $scopes = self::getAllScopes();
-        return $scopes[$id] ?? null;
+        $normalized = self::normalizeScopeId($id);
+        return $scopes[$normalized] ?? $scopes[$id] ?? null;
     }
 
     public static function getScopes(array $ids): array

@@ -27,7 +27,8 @@ class OAuthController extends Controller
         ]);
 
         if (!auth()->check()) {
-            return redirect()->route('login', ['next' => $request->fullUrl()]);
+            session()->put('url.intended', $request->fullUrl());
+            return redirect()->guest(route('login', ['next' => $request->fullUrl()]));
         }
 
         $app = DeveloperApp::where('client_id', $request->client_id)->first();
@@ -36,12 +37,15 @@ class OAuthController extends Controller
             return response('Invalid or inactive client_id', 400);
         }
 
-        if (!in_array($request->redirect_uri, $app->redirect_uris)) {
+        if (!$this->isRedirectUriValid($app, $request->redirect_uri)) {
             return response('Invalid redirect_uri', 400);
         }
 
-        $requestedScopes = explode(' ', $request->scope);
-        $validScopes = array_intersect($requestedScopes, $app->requested_scopes);
+        $requestedScopes = array_map(
+            [DeveloperScopeCatalog::class, 'normalizeScopeId'],
+            preg_split('/[\s,]+/', trim($request->scope))
+        );
+        $validScopes = array_values(array_intersect($requestedScopes, $app->requested_scopes ?? []));
 
         $scopeDetails = DeveloperScopeCatalog::getScopes($validScopes);
 
@@ -62,36 +66,45 @@ class OAuthController extends Controller
             abort(403);
         }
 
-        if ($request->action === 'reject') {
-            // SECURITY: Validate redirect_uri against registered URIs to prevent Open Redirect.
-            // Without this check, an attacker could craft a malicious OAuth URL with
-            // redirect_uri=https://evil.com to redirect victims to phishing sites.
-            $app = DeveloperApp::where('client_id', $request->client_id)->first();
-            if (!$app || !$app->isActive() || !in_array($request->redirect_uri, $app->redirect_uris)) {
-                return response('Invalid client or redirect URI', 400);
-            }
-
-            $redirect = $request->redirect_uri . '?error=access_denied&state=' . urlencode($request->state);
-            return redirect($redirect);
-        }
-
         $app = DeveloperApp::where('client_id', $request->client_id)->first();
 
-        if (!$app || !$app->isActive() || !in_array($request->redirect_uri, $app->redirect_uris)) {
+        if (!$app || !$app->isActive() || !$this->isRedirectUriValid($app, $request->redirect_uri)) {
             return response('Invalid client or redirect URI', 400);
         }
 
-        $requestedScopes = explode(' ', $request->scope);
-        $validScopes = array_intersect($requestedScopes, $app->requested_scopes);
+        if ($request->action === 'reject') {
+            $redirect = $this->buildRedirectUri($request->redirect_uri, [
+                'error' => 'access_denied',
+                'state' => $request->state,
+            ]);
+            return redirect($redirect);
+        }
+
+        $requestedScopes = array_map(
+            [DeveloperScopeCatalog::class, 'normalizeScopeId'],
+            preg_split('/[\s,]+/', trim($request->scope))
+        );
+        $validScopes = array_values(array_intersect($requestedScopes, $app->requested_scopes ?? []));
 
         $authData = $this->oauthService->generateAuthorizationCode($app, auth()->user(), $request->redirect_uri, $validScopes);
 
-        $redirect = $request->redirect_uri . '?code=' . urlencode($authData['plain_code']) . '&state=' . urlencode($request->state);
+        $redirect = $this->buildRedirectUri($request->redirect_uri, [
+            'code' => $authData['plain_code'],
+            'state' => $request->state,
+        ]);
         return redirect($redirect);
     }
 
     public function token(Request $request)
     {
+        // Support HTTP Basic Authentication for client credentials (RFC 6749 Section 2.3.1)
+        if (!$request->has('client_id') && $request->getUser()) {
+            $request->merge([
+                'client_id' => $request->getUser(),
+                'client_secret' => $request->getPassword(),
+            ]);
+        }
+
         $request->validate([
             'grant_type' => 'required|in:authorization_code,refresh_token',
             'client_id' => 'required|string',
@@ -136,5 +149,44 @@ class OAuthController extends Controller
         }
 
         return response()->json(['error' => 'unsupported_grant_type'], 400);
+    }
+
+    /**
+     * Check whether the redirect URI is registered and allowed for the app.
+     * Supports exact match, URL-decoded match, and trailing-slash normalization.
+     */
+    protected function isRedirectUriValid(DeveloperApp $app, string $redirectUri): bool
+    {
+        $allowedUris = (array) ($app->redirect_uris ?? []);
+        $target = trim($redirectUri);
+        $targetDecoded = urldecode($target);
+
+        foreach ($allowedUris as $allowed) {
+            $allowedTrimmed = trim((string) $allowed);
+            if ($target === $allowedTrimmed) {
+                return true;
+            }
+            if ($targetDecoded === urldecode($allowedTrimmed)) {
+                return true;
+            }
+            // Normalize trailing slashes if neither URI contains a query component
+            if (!str_contains($target, '?') && !str_contains($allowedTrimmed, '?')) {
+                if (rtrim($target, '/') === rtrim($allowedTrimmed, '/')) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Build the redirect URI by properly appending query parameters,
+     * retaining any existing query string in the base URI (RFC 6749 Section 4.1.2).
+     */
+    protected function buildRedirectUri(string $baseUri, array $params): string
+    {
+        $separator = str_contains($baseUri, '?') ? '&' : '?';
+        return $baseUri . $separator . http_build_query($params);
     }
 }

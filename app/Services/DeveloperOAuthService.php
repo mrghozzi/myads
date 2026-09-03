@@ -45,11 +45,16 @@ class DeveloperOAuthService
 
         $authCode = DeveloperAuthorizationCode::where('developer_app_id', $app->id)
             ->where('code', $hashedCode)
-            ->where('redirect_uri', $redirectUri)
             ->where('used', false)
             ->first();
 
         if (!$authCode || $authCode->isExpired()) {
+            return null;
+        }
+
+        $targetUri = trim($redirectUri);
+        $storedUri = trim((string) $authCode->redirect_uri);
+        if ($targetUri !== $storedUri && urldecode($targetUri) !== urldecode($storedUri)) {
             return null;
         }
 

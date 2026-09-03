@@ -354,6 +354,9 @@
 
             <form method="post" action="{{ route('login.post') }}">
                 @csrf
+                @if(request('next'))
+                    <input type="hidden" name="next" value="{{ request('next') }}">
+                @endif
                 <div class="form-group">
                     <label for="login-username">{{ __('messages.usermail') }}</label>
                     <input type="text" class="form-control" id="login-username" name="username" value="{{ old('username') }}" required>

@@ -109,7 +109,7 @@ class DeveloperPlatformController extends Controller
             }, $e->errors())));
         }
 
-        $redirectUris = array_values(array_filter(array_map('trim', explode(',', $request->redirect_uris))));
+        $redirectUris = array_values(array_filter(array_map('trim', preg_split('/[\r\n,]+/', (string) $request->redirect_uris))));
         
         $clientId = bin2hex(random_bytes(16));
         $clientSecret = bin2hex(random_bytes(32));
@@ -210,7 +210,7 @@ class DeveloperPlatformController extends Controller
             }, $e->errors())));
         }
 
-        $redirectUris = array_values(array_filter(array_map('trim', explode(',', $request->redirect_uris))));
+        $redirectUris = array_values(array_filter(array_map('trim', preg_split('/[\r\n,]+/', (string) $request->redirect_uris))));
         $scopes = is_array($request->requested_scopes)
             ? array_values(array_filter($request->requested_scopes))
             : [];

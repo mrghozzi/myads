@@ -223,7 +223,7 @@ class AuthController extends Controller
                 $request->session()->regenerate();
                 $securityThrottle->clearLoginAttempts($input, $request->ip());
                 $securitySessions->trackLogin($request, $user, 'login');
-                return redirect()->intended('/');
+                return $this->resolveLoginRedirect($request);
             }
             
             // Fallback: Check MD5 (Legacy)
@@ -241,7 +241,7 @@ class AuthController extends Controller
                 $request->session()->regenerate();
                 $securityThrottle->clearLoginAttempts($input, $request->ip());
                 $securitySessions->trackLogin($request, $user, 'login');
-                return redirect()->intended('/');
+                return $this->resolveLoginRedirect($request);
             }
         }
 
@@ -250,6 +250,27 @@ class AuthController extends Controller
         return back()->withErrors([
             'username' => __('messages.login_error') ?? 'The provided credentials do not match our records.',
         ])->onlyInput('username');
+    }
+
+    /**
+     * Resolve the target redirect after successful login, honoring next URL safely.
+     */
+    protected function resolveLoginRedirect(Request $request): \Illuminate\Http\RedirectResponse
+    {
+        if ($request->filled('next')) {
+            $next = $request->input('next');
+            if (filter_var($next, FILTER_VALIDATE_URL)) {
+                $parsedHost = parse_url($next, PHP_URL_HOST);
+                $appHost = parse_url(config('app.url'), PHP_URL_HOST);
+                if ($parsedHost === $appHost || ($appHost && str_ends_with((string) $parsedHost, '.' . $appHost))) {
+                    return redirect()->to($next);
+                }
+            } elseif (str_starts_with($next, '/')) {
+                return redirect()->to($next);
+            }
+        }
+
+        return redirect()->intended('/');
     }
 
     public function logout(Request $request, SecuritySessionService $securitySessions)
