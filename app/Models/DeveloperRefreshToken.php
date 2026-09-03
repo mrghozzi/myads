@@ -9,6 +9,8 @@ class DeveloperRefreshToken extends Model
 {
     use HasFactory;
 
+    public $timestamps = false;
+
     protected $fillable = [
         'developer_access_token_id',
         'refresh_token',

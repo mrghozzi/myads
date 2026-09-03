@@ -40,7 +40,7 @@
                                         @if($auth->app->domain)
                                             <p class="app-domain">{{ $auth->app->domain }}</p>
                                         @endif
-                                        <p class="app-date">@lang('messages.authorized_on') {{ $auth->created_at->format('M d, Y') }}</p>
+                                        <p class="app-date">@lang('messages.authorized_on') {{ optional($auth->created_at)->format('M d, Y') ?? '—' }}</p>
                                     </div>
                                 </div>
                                 <div class="app-actions">

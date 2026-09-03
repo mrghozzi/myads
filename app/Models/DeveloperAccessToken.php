@@ -9,6 +9,8 @@ class DeveloperAccessToken extends Model
 {
     use HasFactory;
 
+    public $timestamps = false;
+
     protected $fillable = [
         'developer_app_id',
         'user_id',
