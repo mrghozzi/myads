@@ -165,6 +165,7 @@
     .badge-feature { background: rgba(16, 185, 129, 0.1); color: #10b981; }
     .badge-fix { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
     .badge-optimization { background: rgba(245, 158, 11, 0.1); color: #f59e0b; }
+    .badge-security { background: rgba(59, 130, 246, 0.1); color: #3b82f6; }
     
     /* Timeline & Stats Styles */
     .timeline {
@@ -421,19 +422,31 @@
                                 <div class="timeline-item">
                                     <div class="timeline-icon"><i class="feather-box fs-12"></i></div>
                                     <h6 class="fw-bold mb-1">v4.5.5 <span class="badge bg-soft-success text-success ms-2">Stable</span></h6>
-                                    <p class="text-muted fs-13 mb-3">Developer Platform Resilience, Reverse Proxy Compatibility, Real-Time Messaging, Theme Customizer & Security Hardening Release — Reverse Proxy & Cloudflare Protocol Trust (<code>trustProxies(at: '*')</code>), Route Model Binding & Verb Disambiguation (<code>->whereNumber('app')</code>), Clean JSON Payload Architecture for Developer Forms (<code>application/json</code>), Real-Time SSE Unread Message Badge State Correction, Live Theme Customizer Site-Wide Persistence & Cascading Order Precedence, Superdesign Code & Mermaid Diagram Engine across Themes, and Security Patch & Dependency Hardening (<code>league/commonmark</code> v2.10.0).</p>
+                                    <p class="text-muted fs-13 mb-3">Developer Platform Resilience, Reverse Proxy Compatibility, OAuth 2.0 RFC 6749 Section 4.1.2 & 2.3.1 Compliance, Real-Time Messaging, Theme Customizer, Universal Schema Resilience & Security Hardening Release — Reverse Proxy & Cloudflare Protocol Trust (<code>trustProxies(at: '*')</code>), Route Model Binding & Verb Disambiguation (<code>->whereNumber('app')</code>), Clean JSON Payload Architecture for Developer Forms (<code>application/json</code>), OAuth 2.0 Callback Query String Preservation, Scope Aliasing & WAF / ModSecurity Bypass, Flexible URI Validation, HTTP Basic Auth Token Support, Post-Login Redirection Flow, Universal Database Schema-Agnostic Self-Healing (Migration <code>2026_09_03_170000</code>), Real-Time SSE Unread Message Badge State Correction, Live Theme Customizer Site-Wide Persistence & Cascading Order Precedence, Superdesign Code & Mermaid Diagram Engine across Themes, and Security Patch & Dependency Hardening (<code>league/commonmark</code> v2.10.0).</p>
                                     <div class="d-flex flex-column gap-2">
                                         <div class="d-flex align-items-start">
-                                            <span class="changelog-badge badge-feature mt-1" style="background: rgba(16, 185, 129, 0.1); color: #10b981;">Feature</span>
+                                            <span class="changelog-badge badge-feature mt-1">Feature</span>
                                             <span class="text-muted fs-13">Superdesign macOS-style Code Windows & Mermaid Interactive Diagram Engine with Diagram/Code toggle across Knowledgebase (<code>/kb/*</code>), Store Products (<code>/store/*</code>), and Forum Topics (<code>/forum/*</code>) across active themes.</span>
                                         </div>
                                         <div class="d-flex align-items-start">
-                                            <span class="changelog-badge badge-fix mt-1" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;">Fix</span>
+                                            <span class="changelog-badge badge-feature mt-1">Feature</span>
+                                            <span class="text-muted fs-13">OAuth 2.0 RFC 6749 Section 4.1.2 & 2.3.1 Compliance with automated callback query parameter preservation (<code>&amp;code=</code>), HTTP Basic Authentication header support on <code>/oauth/token</code>, multi-delimiter scope parsing, and seamless post-login redirection.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-fix mt-1">Fix</span>
                                             <span class="text-muted fs-13">Resolved Cloudflare/Reverse Proxy HTTPS redirection body-stripping and route collisions via <code>trustProxies(at: '*')</code>, numeric route constraints <code>->whereNumber('app')</code>, and standardized JSON payloads.</span>
                                         </div>
                                         <div class="d-flex align-items-start">
-                                            <span class="changelog-badge badge-optimization mt-1" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">Themes & SSE</span>
+                                            <span class="changelog-badge badge-security mt-1">Security</span>
+                                            <span class="text-muted fs-13">Universal Database Schema Self-Healing & Zero Info Leakage via runtime dynamic column inspection (<code>getTableColumns()</code>), migration <code>2026_09_03_170000</code>, legacy table expiration fallbacks, WAF / ModSecurity Rule 930120 normalization, and sanitized error views.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-optimization mt-1">Themes & SSE</span>
                                             <span class="text-muted fs-13">Live Theme Customizer persistence across all site pages & layouts with dynamic CSS cascading precedence, and real-time SSE unread message badge count synchronization.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-security mt-1">Security</span>
+                                            <span class="text-muted fs-13">Patched Cross-Site Scripting (XSS) filter bypass in <code>league/commonmark</code> (<code>v2.10.0</code> — Dependabot #70), upgraded <code>nette/schema</code> to <code>v1.3.6</code>, and strengthened error exception handling.</span>
                                         </div>
                                     </div>
                                 </div>

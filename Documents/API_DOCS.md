@@ -1,5 +1,5 @@
-# MYADS v4.5.6 REST & Real-Time API Documentation
-> **Specification Version:** `v4.5.6` (Stable Release)  
+# MYADS v4.5.5 REST & Real-Time API Documentation
+> **Specification Version:** `v4.5.5` (Stable Release)  
 > **Target Framework:** Laravel 12 (PHP 8.2+)  
 > **Authentication Engines:** Laravel Sanctum (Mobile & Web API), OAuth 2.0 (Developer Platform), and Server-Sent Events (SSE Live Stream).  
 > **Last Updated:** September 2026  
@@ -218,7 +218,7 @@ Developers can register external applications at `/developer` to build third-par
 | | `owner.messages.read` | Read private message conversations belonging to authorized owner. | **Yes** |
 | | `owner.messages.write` | Send private messages on behalf of authorized owner. | **Yes** |
 
-### Application Management & Form Architecture (v4.5.6)
+### Application Management & Form Architecture (v4.5.5)
 - **Application Registration:** `POST /developer/apps`
   - **Headers:** `Content-Type: application/json`, `X-CSRF-TOKEN: {token}`, `Accept: application/json`
   - **Payload:**

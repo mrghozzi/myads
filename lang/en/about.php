@@ -13,13 +13,13 @@ return [
     'feature_2_title' => 'Reverse Proxy & Cloudflare Protocol Trust',
     'feature_2_desc' => 'Full trust of reverse proxy and Cloudflare headers (trustProxies), preventing HTTPS redirection request-body stripping and HTTP 405/403 errors on form submissions.',
     'feature_3_title' => 'Developer Platform Route & JSON Architecture',
-    'feature_3_desc' => 'Disambiguated numeric route constraints (->whereNumber), standardized JSON payloads (application/json) across developer forms, and robust \Throwable exception safety.',
+    'feature_3_desc' => 'OAuth 2.0 RFC 6749 Section 4.1.2 compliance with callback query preservation, HTTP Basic Auth, disambiguated numeric route constraints (->whereNumber), standardized JSON payloads (application/json), and robust \Throwable exception safety.',
     'feature_4_title' => 'Live Theme Customizer Site-Wide Persistence',
     'feature_4_desc' => 'Enhanced CSS cascading precedence, dynamic header partial injection, multi-page iframe switcher preview, and compiled CSS variables across all frontend and auth layouts.',
     'feature_5_title' => 'Real-Time SSE Message Badge Synchronization',
     'feature_5_desc' => 'Corrected Server-Sent Events unread message counter logic, eliminating false +99 badges on high-volume accounts and synchronizing real-time and API state calculations.',
     'feature_6_title' => 'Security Hardening & Dependency Upgrades',
-    'feature_6_desc' => 'Patched league/commonmark XSS filter bypass (v2.10.0 - Dependabot #70), upgraded nette/schema (v1.3.6), and strengthened error exception handling.',
+    'feature_6_desc' => 'Patched league/commonmark XSS filter bypass (v2.10.0 - Dependabot #70), upgraded nette/schema (v1.3.6), database schema-agnostic self-healing, WAF / ModSecurity Rule 930120 normalization, and zero database information leakage.',
 
     // About Section
     'about_description' => 'MYADS is a powerful, all-in-one community platform and ad exchange network. It empowers website owners to connect, exchange traffic, trade services, and monetize their platforms effectively.',

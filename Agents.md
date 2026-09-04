@@ -1,4 +1,4 @@
-# Agents.md — MYADS v4.5.6
+# Agents.md — MYADS v4.5.5
 
 > **Purpose:** This file gives AI coding agents a fast, comprehensive understanding of the MYADS project — its architecture, conventions, key files, and rules — so they can work effectively from a fresh chat context.
 
@@ -6,7 +6,7 @@
 
 ## 1. Project Identity
 
-- **Name:** MYADS v4.5.6
+- **Name:** MYADS v4.5.5
 - **Type:** Social network + ad exchange platform for website owners
 - **Framework:** Laravel 12 (PHP 8.2+)
 - **Database:** MySQL 5.7+ / MariaDB 10.3+
@@ -1096,13 +1096,7 @@ If in doubt, update it. An outdated `Agents.md` causes future agents to make wro
   - **Developer Platform Application Deletion & Cascade Lifecycle:** Implemented secure self-service application deletion for developers (`/developer/apps`, `/developer/apps/{id}`) and administrative moderation deletion (`/admin/developers`, `/admin/developers/{id}`) with ownership validation, Danger Zone workspaces, confirmation dialogs, and automated database cascading revocation (`ON DELETE CASCADE`) across access tokens, refresh tokens, authorizations, and authorization codes.
   - **High-Traffic Compound Indexes Resilience & MyISAM Key Limit Patch:** Fixed MySQL/MariaDB 1000-byte key length limit error (`SQLSTATE[42000]: 1071`) in migration `2026_08_26_010000_add_high_traffic_compound_indexes.php` with proactive `InnoDB ROW_FORMAT=DYNAMIC` table conversion, column value sanitization, and isolated try/catch handlers for resilient, zero-downtime execution.
   - **What's New / About Page & Multilingual Parity:** Updated `/admin/about` page with v4.5.4 What's New highlights, stable changelog timeline entry, synchronized all 14 locale translation packs (`lang/*/about.php`), and verified PHPUnit test suites (100% pass rate).
-- **v4.5.5 Official Release — Developer Platform Resilience, Reverse Proxy Compatibility & Real-Time Sync (2026-08-30):**
-  - **Cloudflare & Reverse Proxy HTTPS Protocol Trust:** Configured `$middleware->trustProxies(at: '*')` in `bootstrap/app.php` to properly trust `X-Forwarded-Proto: https` from Cloudflare reverse proxies, preventing 301 HTTP-to-HTTPS redirect degradation that converts `POST` requests to `GET` and strips request payloads.
-  - **Developer Platform Route Disambiguation:** Enforced numeric route constraints `->whereNumber('app')` across all application endpoints (`/developer/apps/{app}`) in `routes/web.php` and restricted update methods specifically to `PUT`, eliminating route matching collisions with `POST /developer/apps`.
-  - **Clean JSON Payload Architecture for Developer Forms:** Modernized application creation (`create.blade.php`) and management (`show.blade.php`, `scripts.blade.php`) forms to submit structured JSON payloads (`Content-Type: application/json`) with dynamic CSRF token extraction, matching the robust AJAX pattern across `master.blade.php`.
-  - **Real-Time SSE Badge State & Message Synchronization:** Corrected unread message badge count logic in `LiveEventStreamService` to count `state != 0` (unread) rather than `state = 0` (read), eliminating false `+99` badge counts, and synchronized message state across `DeveloperApiController` (`state = 3`).
-  - **Developer Platform Controllers & Theme Parity:** Updated `DeveloperPlatformController` actions to return structured JSON responses for AJAX clients, added strict `(int)` casting for ownership checks, and synchronized all developer views with modern form patterns.
-- **v4.5.6 Official Release — OAuth 2.0 RFC 6749 Section 4.1.2 Compliance, Universal Schema Resilience & Exception Security (2026-09-03):**
+- **v4.5.5 Official Public Release — OAuth 2.0 RFC 6749 Section 4.1.2 Compliance, Developer Platform Resilience, Reverse Proxy Compatibility, Universal Schema Resilience & Real-Time Sync (2026-09-04):**
   - **RFC 6749 Section 4.1.2 Redirect Query Concatenation (`OAuthController::buildRedirectUri`):** Dynamically appends parameters using `&` (e.g. `&code=` or `&error=`) when third-party `redirect_uri` contains existing query strings (such as WordPress plugin callback `admin.php?page=adstn-auto-poster&action=adstn_oauth_callback`), resolving URL corruption caused by double question marks (`callback?code=...`).
   - **Universal Database Schema Resilience & Self-Healing (`DeveloperOAuthService`, Models & Migration `2026_09_03_170000`):** Created migration `2026_09_03_170000_ensure_developer_platform_columns.php` and runtime self-healing validation. Disabled Eloquent automatic timestamps (`public $timestamps = false`) on `DeveloperAuthorizationCode`, `DeveloperAccessToken`, `DeveloperRefreshToken`, and `DeveloperAuthorization` so Eloquent never forces non-existent `updated_at` or `created_at` columns. Implemented universal dynamic column inspection (`getTableColumns()`) and strict intersection filtering (`array_intersect_key()`) in `DeveloperOAuthService`, alongside automatic regex-based bad-column stripping on QueryException.
   - **Dynamic Fallback Expiration Calculation:** Added graceful timestamp fallbacks in `DeveloperAuthorizationCode::isExpired()` (`created_at + 10 minutes`), `DeveloperAccessToken::isExpired()` (`created_at + 30 days`), and `DeveloperRefreshToken::isExpired()` (`created_at + 90 days`) ensuring compatibility with legacy database schemas.
@@ -1111,7 +1105,14 @@ If in doubt, update it. An outdated `Agents.md` causes future agents to make wro
   - **WAF / ModSecurity Sensitive Scope Normalization (`DeveloperScopeCatalog`):** Normalized scope aliases (`profile.read`, `user_profile.read`, `user_profile_read`, `user-profile-read`) to `user.profile.read` to prevent OWASP CRS Rule 930120 False Positives (`~/.profile`).
   - **Draft Application Development Testing Mode (`DeveloperApp::isUsableBy`):** Permitted application developers to authorize and test their own applications while in `draft` status without administrative approval.
   - **View Exception Safety & Resilient Date Formatting:** Safeguarded `@includeIf('theme::partials._customizer_head')` across layouts and views to eliminate `ViewNotFoundException` during view cache reloads, and secured `optional($auth->created_at)->format(...)` in the authorized applications view to maintain compatibility with legacy or timestamp-less database records.
+  - **Cloudflare & Reverse Proxy HTTPS Protocol Trust:** Configured `$middleware->trustProxies(at: '*')` in `bootstrap/app.php` to properly trust `X-Forwarded-Proto: https` from Cloudflare reverse proxies, preventing 301 HTTP-to-HTTPS redirect degradation that converts `POST` requests to `GET` and strips request payloads.
+  - **Developer Platform Route Disambiguation:** Enforced numeric route constraints `->whereNumber('app')` across all application endpoints (`/developer/apps/{app}`) in `routes/web.php` and restricted update methods specifically to `PUT`, eliminating route matching collisions with `POST /developer/apps`.
+  - **Clean JSON Payload Architecture for Developer Forms:** Modernized application creation (`create.blade.php`) and management (`show.blade.php`, `scripts.blade.php`) forms to submit structured JSON payloads (`Content-Type: application/json`) with dynamic CSRF token extraction, matching the robust AJAX pattern across `master.blade.php`.
+  - **Real-Time SSE Badge State & Message Synchronization:** Corrected unread message badge count logic in `LiveEventStreamService` to count `state != 0` (unread) rather than `state = 0` (read), eliminating false `+99` badge counts, and synchronized message state across `DeveloperApiController` (`state = 3`).
+  - **Live Theme Customizer Site-Wide Persistence:** Enhanced CSS cascading precedence, dynamic header partial injection, multi-page iframe switcher preview, and compiled CSS variables across all frontend and auth layouts.
+  - **Superdesign Code & Mermaid Diagram Engine:** Integrated interactive Mermaid diagrams and macOS-style dark code windows across Knowledgebase (`/kb/*`), Store (`/store/*`), and Forums (`/forum/*`).
+  - **Security Hardening (league/commonmark v2.10.0):** Patched XSS filter bypass in `league/commonmark` (Dependabot #70), upgraded `nette/schema` to `v1.3.6`.
 
 ---
 
-*Last updated: 2026-09-03 — MYADS v4.5.6 (Official Release)*
+*Last updated: 2026-09-04 — MYADS v4.5.5 (Official Public Release)*

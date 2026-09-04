@@ -216,8 +216,8 @@ PHP);
 
         Http::fake([
             'https://api.github.com/repos/mrghozzi/myads/releases/latest' => Http::response([
-                'tag_name' => 'v4.5.0',
-                'name' => 'v4.5.0',
+                'tag_name' => 'v9.9.9',
+                'name' => 'v9.9.9',
                 'body' => 'Test release',
                 'assets' => [
                     [
@@ -409,8 +409,8 @@ PHP);
 
         Http::fake([
             'https://api.github.com/repos/mrghozzi/myads/releases/latest' => Http::response([
-                'tag_name' => 'v4.5.0',
-                'name' => 'v4.5.0',
+                'tag_name' => 'v9.9.9',
+                'name' => 'v9.9.9',
                 'body' => 'UI release',
                 'assets' => [
                     [
@@ -464,8 +464,8 @@ PHP);
     private function releasePayload(string $zipPath): array
     {
         return [
-            'tag_name' => 'v4.5.0',
-            'name' => 'v4.5.0',
+            'tag_name' => 'v9.9.9',
+            'name' => 'v9.9.9',
             'body' => 'Staged release',
             'assets' => [
                 [
