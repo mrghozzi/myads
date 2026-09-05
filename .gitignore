@@ -83,6 +83,8 @@ custom_variables.css
 !/tests/Feature/VideoHubIsolationTest.php
 !/tests/Feature/VideoApiTest.php
 !/tests/Feature/SecuritySuiteFeatureTest.php
+!/tests/Feature/OAuthFlowTest.php
+!/tests/Feature/DeveloperApiTest.php
 ~/.pi/
 /wiki/
 /brain/

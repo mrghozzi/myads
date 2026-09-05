@@ -21,10 +21,51 @@ class DeveloperAccessToken extends Model
     ];
 
     protected $casts = [
-        'scopes' => 'array',
         'expires_at' => 'datetime',
         'revoked' => 'boolean',
     ];
+
+    public function getScopesAttribute($value): array
+    {
+        if (is_array($value)) {
+            $raw = $value;
+        } elseif (is_string($value)) {
+            $decoded = json_decode($value, true);
+            $raw = is_array($decoded) ? $decoded : preg_split('/[\s,]+/', trim($value));
+        } else {
+            $raw = [];
+        }
+
+        $result = [];
+        foreach ($raw as $item) {
+            if (is_string($item)) {
+                foreach (preg_split('/[\s,]+/', trim($item)) as $sub) {
+                    if ($sub !== '') {
+                        $result[] = $sub;
+                    }
+                }
+            }
+        }
+
+        return array_values(array_unique($result));
+    }
+
+    public function setScopesAttribute($value): void
+    {
+        if (is_array($value)) {
+            $this->attributes['scopes'] = json_encode(array_values($value));
+        } elseif (is_string($value)) {
+            $trimmed = trim($value);
+            if (str_starts_with($trimmed, '[') || str_starts_with($trimmed, '{')) {
+                $this->attributes['scopes'] = $trimmed;
+            } else {
+                $parts = array_values(array_filter(preg_split('/[\s,]+/', $trimmed)));
+                $this->attributes['scopes'] = json_encode($parts);
+            }
+        } else {
+            $this->attributes['scopes'] = json_encode([]);
+        }
+    }
 
     public function app()
     {

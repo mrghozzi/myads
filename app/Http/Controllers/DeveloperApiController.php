@@ -3,9 +3,12 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
 use App\Services\DeveloperOAuthService;
 use App\Models\User;
 use App\Models\Status;
+use App\Models\ForumTopic;
 use App\Models\Message;
 use App\Services\UserPrivacyService;
 
@@ -54,8 +57,31 @@ class DeveloperApiController extends Controller
             return ['error' => 'Invalid or expired token', 'code' => 401];
         }
 
-        if (!in_array($requiredScope, $token->scopes)) {
+        $rawScopes = $token->scopes;
+        if (is_string($rawScopes)) {
+            $decoded = json_decode($rawScopes, true);
+            $rawScopes = is_array($decoded) ? $decoded : preg_split('/[\s,]+/', trim($rawScopes));
+        }
+
+        $scopes = [];
+        if (is_array($rawScopes)) {
+            foreach ($rawScopes as $item) {
+                if (is_string($item)) {
+                    foreach (preg_split('/[\s,]+/', trim($item)) as $sub) {
+                        if ($sub !== '') {
+                            $scopes[] = $sub;
+                        }
+                    }
+                }
+            }
+        }
+
+        if (!in_array($requiredScope, $scopes)) {
             return ['error' => 'Insufficient scope', 'code' => 403];
+        }
+
+        if (!$token->user) {
+            return ['error' => 'Authenticated user not found', 'code' => 404];
         }
 
         return ['token' => $token];
@@ -84,15 +110,25 @@ class DeveloperApiController extends Controller
         $auth = $this->validateToken($request, 'user.identity.read');
         if (isset($auth['error'])) return $this->errorResponse($auth['error'], $auth['code']);
 
-        $user = $auth['token']->user;
+        try {
+            $user = $auth['token']->user;
 
-        return $this->successResponse([
-            'id' => $user->usesPublicMemberIds()
-                ? $user->publicRouteIdentifier()
-                : $user->id,
-            'username' => $user->username,
-            'email' => $user->email,
-        ]);
+            return $this->successResponse([
+                'id' => $user->usesPublicMemberIds()
+                    ? $user->publicRouteIdentifier()
+                    : $user->id,
+                'user_id' => $user->id,
+                'username' => $user->username,
+                'name' => $user->username,
+                'email' => $user->email,
+                'avatar' => $user->img ? asset($user->img) : null,
+                'points' => $user->pts ?? 0,
+                'verified' => !empty($user->ucheck),
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('Developer API me error: ' . $e->getMessage());
+            return $this->errorResponse('Failed to retrieve identity: ' . $e->getMessage(), 500);
+        }
     }
 
     public function myProfile(Request $request)
@@ -100,16 +136,25 @@ class DeveloperApiController extends Controller
         $auth = $this->validateToken($request, 'user.profile.read');
         if (isset($auth['error'])) return $this->errorResponse($auth['error'], $auth['code']);
 
-        $user = $auth['token']->user;
+        try {
+            $user = $auth['token']->user;
 
-        return $this->successResponse([
-            'id' => $user->usesPublicMemberIds()
-                ? $user->publicRouteIdentifier()
-                : $user->id,
-            'username' => $user->username,
-            'avatar' => asset($user->img),
-            'points' => $user->pts,
-        ]);
+            return $this->successResponse([
+                'id' => $user->usesPublicMemberIds()
+                    ? $user->publicRouteIdentifier()
+                    : $user->id,
+                'user_id' => $user->id,
+                'username' => $user->username,
+                'name' => $user->username,
+                'email' => $user->email,
+                'avatar' => $user->img ? asset($user->img) : null,
+                'points' => $user->pts ?? 0,
+                'verified' => !empty($user->ucheck),
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('Developer API myProfile error: ' . $e->getMessage());
+            return $this->errorResponse('Failed to retrieve profile: ' . $e->getMessage(), 500);
+        }
     }
 
     public function ownerProfile(Request $request)
@@ -117,15 +162,23 @@ class DeveloperApiController extends Controller
         $auth = $this->validateToken($request, 'owner.profile.read');
         if (isset($auth['error'])) return $this->errorResponse($auth['error'], $auth['code']);
 
-        $owner = $auth['token']->app->user;
+        try {
+            $owner = $auth['token']->app?->user;
+            if (!$owner) {
+                return $this->errorResponse('Application owner not found', 404);
+            }
 
-        return $this->successResponse([
-            'id' => $owner->usesPublicMemberIds()
-                ? $owner->publicRouteIdentifier()
-                : $owner->id,
-            'username' => $owner->username,
-            'avatar' => asset($owner->img),
-        ]);
+            return $this->successResponse([
+                'id' => $owner->usesPublicMemberIds()
+                    ? $owner->publicRouteIdentifier()
+                    : $owner->id,
+                'username' => $owner->username,
+                'avatar' => $owner->img ? asset($owner->img) : null,
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('Developer API ownerProfile error: ' . $e->getMessage());
+            return $this->errorResponse('Failed to retrieve owner profile: ' . $e->getMessage(), 500);
+        }
     }
 
     public function ownerContent(Request $request)
@@ -133,25 +186,33 @@ class DeveloperApiController extends Controller
         $auth = $this->validateToken($request, 'owner.content.read');
         if (isset($auth['error'])) return $this->errorResponse($auth['error'], $auth['code']);
 
-        $owner = $auth['token']->app->user;
+        try {
+            $owner = $auth['token']->app?->user;
+            if (!$owner) {
+                return $this->errorResponse('Application owner not found', 404);
+            }
 
-        // Only public content
-        $posts = Status::visible()
-            ->where('uid', $owner->id)
-            ->where('statu', 1)
-            ->orderBy('id', 'desc')
-            ->limit(20)
-            ->get();
+            // Only public content
+            $posts = Status::visible()
+                ->where('uid', $owner->id)
+                ->where('statu', 1)
+                ->orderBy('id', 'desc')
+                ->limit(20)
+                ->get();
 
-        $data = $posts->map(function ($post) {
-            return [
-                'id' => $post->id,
-                'content' => $post->txt,
-                'created_at' => $post->date ? date('Y-m-d H:i:s', $post->date) : null,
-            ];
-        });
+            $data = $posts->map(function ($post) {
+                return [
+                    'id' => $post->id,
+                    'content' => $post->txt,
+                    'created_at' => $post->date ? date('Y-m-d H:i:s', $post->date) : null,
+                ];
+            });
 
-        return $this->successResponse($data);
+            return $this->successResponse($data);
+        } catch (\Throwable $e) {
+            Log::error('Developer API ownerContent error: ' . $e->getMessage());
+            return $this->errorResponse('Failed to retrieve content: ' . $e->getMessage(), 500);
+        }
     }
 
     public function ownerFollow(Request $request)
@@ -159,28 +220,37 @@ class DeveloperApiController extends Controller
         $auth = $this->validateToken($request, 'owner.follow.write');
         if (isset($auth['error'])) return $this->errorResponse($auth['error'], $auth['code']);
 
-        $user = $auth['token']->user;
-        $owner = $auth['token']->app->user;
+        try {
+            $user = $auth['token']->user;
+            $owner = $auth['token']->app?->user;
 
-        if ($user->id === $owner->id) {
-            return $this->errorResponse('Cannot follow yourself', 400);
+            if (!$owner) {
+                return $this->errorResponse('Application owner not found', 404);
+            }
+
+            if ($user->id === $owner->id) {
+                return $this->errorResponse('Cannot follow yourself', 400);
+            }
+
+            $existing = \App\Models\Like::where('uid', $user->id)
+                ->where('sid', $owner->id)
+                ->where('type', 1)
+                ->first();
+                
+            if (!$existing) {
+                \App\Models\Like::create([
+                    'uid' => $user->id,
+                    'sid' => $owner->id,
+                    'type' => 1,
+                    'time_t' => time()
+                ]);
+            }
+
+            return $this->successResponse(null, 'Followed successfully');
+        } catch (\Throwable $e) {
+            Log::error('Developer API ownerFollow error: ' . $e->getMessage());
+            return $this->errorResponse('Failed to follow user: ' . $e->getMessage(), 500);
         }
-
-        $existing = \App\Models\Like::where('uid', $user->id)
-            ->where('sid', $owner->id)
-            ->where('type', 1)
-            ->first();
-            
-        if (!$existing) {
-            \App\Models\Like::create([
-                'uid' => $user->id,
-                'sid' => $owner->id,
-                'type' => 1,
-                'time_t' => time()
-            ]);
-        }
-
-        return $this->successResponse(null, 'Followed successfully');
     }
 
     public function ownerMessages(Request $request)
@@ -190,27 +260,36 @@ class DeveloperApiController extends Controller
 
         $request->validate(['content' => 'required|string|max:2000']);
 
-        $user = $auth['token']->user;
-        $owner = $auth['token']->app->user;
+        try {
+            $user = $auth['token']->user;
+            $owner = $auth['token']->app?->user;
 
-        if ($user->id === $owner->id) {
-            return $this->errorResponse('Cannot message yourself', 400);
+            if (!$owner) {
+                return $this->errorResponse('Application owner not found', 404);
+            }
+
+            if ($user->id === $owner->id) {
+                return $this->errorResponse('Cannot message yourself', 400);
+            }
+
+            $privacyService = app(UserPrivacyService::class);
+            if (!$privacyService->canDirectMessage($user, $owner)) {
+                return $this->errorResponse('Messaging restricted by privacy settings', 403);
+            }
+
+            $message = Message::create([
+                'us_env' => $user->id,
+                'us_rec' => $owner->id,
+                'msg' => $request->input('content'),
+                'time' => time(),
+                'state' => 3,
+            ]);
+
+            return $this->successResponse(['id' => $message->id_msg ?? $message->id], 'Message sent successfully');
+        } catch (\Throwable $e) {
+            Log::error('Developer API ownerMessages error: ' . $e->getMessage());
+            return $this->errorResponse('Failed to send message: ' . $e->getMessage(), 500);
         }
-
-        $privacyService = app(UserPrivacyService::class);
-        if (!$privacyService->canDirectMessage($user, $owner)) {
-            return $this->errorResponse('Messaging restricted by privacy settings', 403);
-        }
-
-        $message = Message::create([
-            'us_env' => $user->id,
-            'us_rec' => $owner->id,
-            'msg' => $request->input('content'),
-            'time' => time(),
-            'state' => 3,
-        ]);
-
-        return $this->successResponse(['id' => $message->id_msg ?? $message->id], 'Message sent successfully');
     }
 
     public function myEmail(Request $request)
@@ -333,20 +412,54 @@ class DeveloperApiController extends Controller
         if (isset($auth['error'])) return $this->errorResponse($auth['error'], $auth['code']);
 
         $request->validate([
-            'content' => 'required|string|max:5000',
+            'content' => 'required|string|max:10000',
         ]);
 
-        $user = $auth['token']->user;
+        try {
+            $user = $auth['token']->user;
+            $content = $request->input('content');
+            $now = time();
 
-        $status = Status::create([
-            'uid' => $user->id,
-            'txt' => $request->input('content'),
-            's_type' => 0,
-            'statu' => 1,
-            'date' => time(),
-        ]);
+            // Extract topic title or fallback to first line / snippet
+            $firstLine = trim((string) strtok($content, "\r\n"));
+            $title = Str::limit($firstLine, 120, '...');
+            if (empty($title)) {
+                $title = 'text';
+            }
 
-        return $this->successResponse(['id' => $status->id], 'Post created successfully');
+            $topic = ForumTopic::create([
+                'uid' => $user->id,
+                'name' => $title,
+                'txt' => $content,
+                'cat' => 0,
+                'group_id' => null,
+                'statu' => 1,
+                'date' => $now,
+                'reply' => 0,
+                'vu' => 0,
+            ]);
+
+            $status = Status::create([
+                'uid' => $user->id,
+                'group_id' => null,
+                'tp_id' => $topic->id,
+                's_type' => 100,
+                'txt' => $content,
+                'statu' => 1,
+                'date' => $now,
+            ]);
+
+            return $this->successResponse([
+                'id' => $status->id,
+                'topic_id' => $topic->id,
+                'url' => url('/status/' . $status->id),
+            ], 'Post created successfully');
+        } catch (\Throwable $e) {
+            Log::error('Developer API postContent error: ' . $e->getMessage(), [
+                'exception' => $e,
+            ]);
+            return $this->errorResponse('Failed to create post: ' . $e->getMessage(), 500);
+        }
     }
 
     public function reactContent(Request $request)

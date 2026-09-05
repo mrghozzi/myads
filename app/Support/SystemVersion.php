@@ -4,7 +4,7 @@ namespace App\Support;
 
 final class SystemVersion
 {
-    public const CURRENT = '4.5.5';
+    public const CURRENT = '4.5.6';
 
     private function __construct()
     {
