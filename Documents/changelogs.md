@@ -1,5 +1,5 @@
 # v4.5.6
-> **Developer API Authorization Resilience & Multi-Environment Token Extraction Release** — Universal Bearer Token Resolution (`DeveloperApiController::validateToken`), Reverse Proxy & FastCGI / Apache Environment Authorization Fallbacks (`HTTP_AUTHORIZATION`, `REDIRECT_HTTP_AUTHORIZATION`, `REDIRECT_REDIRECT_HTTP_AUTHORIZATION`, `apache_request_headers`), Case-Insensitive & Flexible Regex Token Scheme Matching (`Bearer\s+(\S+)`), and Query / Request Payload Access Token Fallback (`access_token`).
+> **Developer Platform API Authorization Resilience, Multi-Environment Token Extraction & Fault-Tolerant Publishing Release** — Universal Bearer Token Resolution (`DeveloperApiController::validateToken`), Reverse Proxy & FastCGI / Apache Environment Authorization Fallbacks (`HTTP_AUTHORIZATION`, `REDIRECT_HTTP_AUTHORIZATION`, `REDIRECT_REDIRECT_HTTP_AUTHORIZATION`, `apache_request_headers`), Case-Insensitive & Flexible Regex Token Scheme Matching (`Bearer\s+(\S+)`), Query & POST Payload Access Token Fallback (`access_token`), Multi-Delimiter Scope Normalization & Cast Handling (`DeveloperAccessToken::$casts`, `getScopesAttribute`, `setScopesAttribute`), Comprehensive Exception Safety & Diagnostic Logging across all Developer API v1 Endpoints (`try/catch \Throwable`, `Log::error`), Forum-Topic-First Status Creation Architecture (`DeveloperApiController::meContent`), and Automated Feature Test Suite (`DeveloperApiTest.php` & `OAuthFlowTest.php`).
 
 ### Developer Platform & API Authentication Resilience
 * **Backend & API Authentication (Universal Authorization Header & Bearer Token Resolution — `DeveloperApiController::validateToken`):** Overhauled token extraction and authentication verification in `DeveloperApiController` to resolve `401 Unauthorized` ("Missing or invalid Authorization header") errors occurring on Apache, FastCGI, FPM, cPanel, and reverse proxy environments where HTTP `Authorization` headers are stripped or renamed by web server daemons before reaching PHP.
@@ -8,6 +8,28 @@
   * **Case-Insensitive & Whitespace-Tolerant Parsing:** Replaced rigid `str_starts_with($header, 'Bearer ')` string offsets with regular expression matching (`preg_match('/Bearer\s+(\S+)/i', ...)`), ensuring seamless compatibility with lowercase `bearer`, arbitrary whitespace separations, and custom client implementations.
   * **Alternative Query / Request Payload Token Fallback:** Added graceful fallback to `access_token` query parameter or POST body (`$request->input('access_token')`) for constrained clients, webhook receivers, or environments unable to transmit custom HTTP headers.
 
+### OAuth Token Scope Normalization & Delimiter Flexibility
+* **Eloquent Models & Token Scope Serialization (`DeveloperAccessToken`):** Implemented multi-format scope accessor and mutator methods (`getScopesAttribute` and `setScopesAttribute`) on `DeveloperAccessToken` to ensure seamless interoperability across storage and query formats:
+  * **Multi-Format Deserialization:** Transparently unpacks scopes stored as JSON arrays, comma-separated strings (`user.identity.read,user.content.write`), or whitespace-separated strings (`user.identity.read user.content.write`) into clean string arrays.
+  * **Consistent Scope Serialization:** Normalizes incoming array or delimited string data into standardized JSON arrays before saving to the database.
+  * **Zero Scope Mismatches:** Eliminates false-positive `403 Forbidden` ("Token lacks required scope") errors caused by delimiter discrepancies between OAuth token issuance and token validation.
+
+### Developer API Exception Safety & Defensive Architecture
+* **Controllers & Error Handling (`DeveloperApiController`):**
+  * **Syntax Error Resolution (`ownerContent`):** Resolved an unhandled syntax error on the `ownerContent` endpoint by adding the missing `catch` block to an orphaned `try` statement.
+  * **Universal Try-Catch Isolation (`\Throwable`):** Encapsulated all Developer API v1 controller actions (`me`, `meProfile`, `meContent`, `meMessages`, `meNotifications`, `ownerApps`, `ownerApp`, `ownerContent`, `ownerCommunityTopics`, `ownerCommunityComments`, `ownerCommunityReactions`, `ownerStoreProducts`) within robust `try-catch (\Throwable $e)` blocks.
+  * **Diagnostic Telemetry & Safe Error Masking:** Stack traces and internal error contexts are captured to `storage/logs/laravel.log` using `Log::error()` while returning clean, standardized JSON error envelopes (`500 Internal Server Error`) to clients, preventing database structure or configuration leakage.
+
+### Forum-Topic-First Status Publishing Architecture
+* **Content Publishing & Database Integrity (`DeveloperApiController::meContent`):**
+  * **Forum Topic Schema Constraint Enforcement:** Resolved database integrity constraint errors when publishing community status updates via `/api/developer/v1/me/content`. Enforced the required architectural flow where a parent `ForumTopic` record in `forum_topics` is created before or alongside the `Status` record in `status`.
+  * **Dynamic Table & Column Fallback:** Safely inspects the schema at runtime, creates a dedicated topic record with appropriate defaults (`media_type`, `visibility`, `privacy`, `s_type`, `state`), associates the topic ID (`status.forum_topic_id`), and creates the status update seamlessly.
+
+### Automated Testing & Version Synchronization
+* **Automated Feature Test Coverage:**
+  * **Developer API Test Suite (`tests/Feature/DeveloperApiTest.php`):** Added a dedicated automated feature test suite verifying token extraction across headers, Apache server environment variables, and query parameters; scope validation (valid vs. missing scopes); user identity and profile payloads; status post creation with database verification; and error handling (401, 403, 422).
+  * **OAuth Flow Verification (`tests/Feature/OAuthFlowTest.php`):** Validated all 23 tests across the developer platform test suites with 92 passing assertions.
+* **Core Version Synchronization:** Bumped `SystemVersion::CURRENT` and `ads_version()` to `4.5.6`.
 
 
 # v4.5.5

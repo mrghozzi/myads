@@ -1,5 +1,5 @@
-# MYADS v4.5.5 REST & Real-Time API Documentation
-> **Specification Version:** `v4.5.5` (Stable Release)  
+# MYADS v4.5.6 REST & Real-Time API Documentation
+> **Specification Version:** `v4.5.6` (Stable Release)  
 > **Target Framework:** Laravel 12 (PHP 8.2+)  
 > **Authentication Engines:** Laravel Sanctum (Mobile & Web API), OAuth 2.0 (Developer Platform), and Server-Sent Events (SSE Live Stream).  
 > **Last Updated:** September 2026  
@@ -8,7 +8,7 @@
 
 ## 1. Overview & Architecture
 
-The MYADS v4.5.5 API ecosystem delivers high-performance, secure, and extensible interfaces connecting web clients, companion mobile applications (Flutter), and third-party developer integrations.
+The MYADS v4.5.6 API ecosystem delivers high-performance, secure, and extensible interfaces connecting web clients, companion mobile applications (Flutter), and third-party developer integrations.
 
 ### Primary API Subsystems
 1. **Internal Mobile & Web API (`/api/*`):** Powered by Laravel Sanctum for mobile app companion clients and web AJAX workflows.
@@ -311,39 +311,100 @@ Or with credentials in the request body:
 
 ## 5. Developer API v1 Endpoints
 
-All Developer API requests require the header: `Authorization: Bearer {access_token}`.  
-**Rate Limit:** 30 requests per minute per IP.
+### A. Authorization Protocol & Multi-Environment Token Extraction (v4.5.6)
+All Developer API requests require an active OAuth 2.0 access token issued via `/oauth/token`. In **v4.5.6**, token extraction is hardened across diverse web server daemons, reverse proxies, and constrained hosting environments (`DeveloperApiController::validateToken`):
 
-### User Identity & Profile
-- `GET /api/developer/v1/me`: Returns member ID, username, and identity metadata (`user.identity.read`).
-- `GET /api/developer/v1/me/profile`: Returns full profile details, avatar URL, and points (`user.profile.read`).
-- `GET /api/developer/v1/me/email`: Returns verified email address (`user.email.read`).
-- `GET /api/developer/v1/me/social-links`: Returns configured social media links (`user.social_links.read`).
-- `GET /api/developer/v1/me/follows`: Returns following and followers counts (`user.follows.read`).
-- `POST /api/developer/v1/me/follows`: Follow or unfollow target member (`target_user_id`, `action`) (`user.follows.write`).
+1. **Standard HTTP Header (Recommended):**
+   ```http
+   Authorization: Bearer {access_token}
+   ```
+   *Case-insensitive matching (`Bearer` or `bearer`) with whitespace tolerance.*
 
-### Content, Community & Messages
-- `GET /api/developer/v1/me/content`: Returns recent posts authored by the user (`user.content.read`).
-- `POST /api/developer/v1/me/content`: Publishes a new status post (`content`, `privacy`) (`user.content.write`).
-- `POST /api/developer/v1/me/reactions`: Toggles reaction/like on a post (`status_id`) (`user.reactions.write`).
-- `GET /api/developer/v1/me/messages`: Returns user's private message conversations (`user.messages.read`).
-- `POST /api/developer/v1/me/messages`: Sends a private message (`receiver_id`, `content`) (`user.messages.write`).
-- `GET /api/developer/v1/me/notifications`: Returns notifications list and unread count (`user.notifications.read`).
-- `GET /api/developer/v1/forums`: Returns list of forum categories with topic counts (`user.forums.read`).
-- `GET /api/developer/v1/me/clips`: Returns public video clips feed (`user.clips.read`).
+2. **Web Server & Reverse Proxy Environment Variables:**
+   If the hosting server daemon (Apache, Nginx, LiteSpeed, cPanel, FastCGI, FPM) strips or renames the standard `Authorization` header, the authentication pipeline automatically cascades through:
+   - `HTTP_AUTHORIZATION`
+   - `REDIRECT_HTTP_AUTHORIZATION`
+   - `REDIRECT_REDIRECT_HTTP_AUTHORIZATION`
+   - `apache_request_headers()['Authorization']`
 
-### Economy, Store & Advertising
-- `GET /api/developer/v1/me/wallet`: Returns user points (PTS) wallet balance (`user.wallet.read`).
-- `GET /api/developer/v1/me/badges`: Returns earned badges and achievements (`user.badges.read`).
-- `GET /api/developer/v1/store/products`: Returns marketplace product listings (`user.store.read`).
-- `GET /api/developer/v1/me/orders`: Returns service orders history (`user.orders.read`).
-- `GET /api/developer/v1/me/ads/stats`: Returns banner and custom ad performance metrics (`user.ads.read`).
+3. **Query Parameter or Request Body Fallback:**
+   For constrained clients, webhooks, or direct browser integrations unable to set custom HTTP headers:
+   - **Query String:** `GET /api/developer/v1/me?access_token={access_token}`
+   - **Request Payload:** `POST /api/developer/v1/me/content` with JSON `{"access_token": "{access_token}", ...}`
 
-### Application Owner Endpoints
-- `GET /api/developer/v1/owner/profile`: Get app owner's public profile (`owner.profile.read`).
-- `GET /api/developer/v1/owner/content`: Get app owner's published updates (`owner.content.read`).
-- `POST /api/developer/v1/owner/follow`: Follow the app owner (`owner.follow.write`).
-- `POST /api/developer/v1/owner/messages`: Send a private message to the app owner (`owner.messages.write`).
+### B. Multi-Delimiter Scope Flexibility
+Scopes are validated using resilient accessor and mutator normalization (`DeveloperAccessToken`). Scopes formatted as JSON arrays, comma-delimited strings (`user.identity.read,user.profile.read`), or space-delimited strings (`user.identity.read user.profile.read`) are parsed identically, eliminating false-positive `403 Forbidden` errors.
+
+### C. Rate Limiting & Error Handling
+- **Rate Limit:** 30 requests per minute per client IP (`throttle:30,1`). Exceeding this limit returns HTTP `429 Too Many Requests`.
+- **Fault-Tolerant Exception Isolation:** All endpoints are wrapped in `try/catch (\Throwable $e)` handlers. Errors are recorded to `storage/logs/laravel.log` with complete debug traces, while returning structured JSON error envelopes (`401`, `403`, `422`, `500`) without exposing internal database structures or credentials.
+
+### D. User Identity & Profile Endpoints
+- `GET /api/developer/v1/me`: Returns basic member identity (numeric ID or public ID, username, creation date).  
+  *Required Scope:* `user.identity.read`
+- `GET /api/developer/v1/me/profile`: Returns full profile details, display name, bio, points balance, and avatar URL.  
+  *Required Scope:* `user.profile.read`
+- `GET /api/developer/v1/me/email`: Returns verified member email address.  
+  *Required Scope:* `user.email.read`
+- `GET /api/developer/v1/me/social-links`: Returns list of configured external social profile links.  
+  *Required Scope:* `user.social_links.read`
+- `GET /api/developer/v1/me/follows`: Returns counts and collections of followers and following members.  
+  *Required Scope:* `user.follows.read`
+- `POST /api/developer/v1/me/follows`: Follow or unfollow a target member.  
+  *Required Scope:* `user.follows.write`  
+  *Payload:* `{"target_user_id": 123, "action": "follow"}` (or `"unfollow"`)
+
+### E. Content, Community & Interaction Endpoints
+- `GET /api/developer/v1/me/content`: Returns recent community posts and updates authored by the authenticated member.  
+  *Required Scope:* `user.content.read`
+- `POST /api/developer/v1/me/content`: Publishes a new status update to the community feed.  
+  *Required Scope:* `user.content.write`  
+  *Payload:*
+  ```json
+  {
+      "text": "Hello world from the Developer Platform API!",
+      "title": "Optional Post Title",
+      "privacy": 0
+  }
+  ```
+  *(Note: In v4.5.6, the backend automatically provisions and links a corresponding `ForumTopic` record to guarantee strict database schema and foreign-key integrity).*
+- `POST /api/developer/v1/me/reactions`: Adds or toggles a reaction on a community post.  
+  *Required Scope:* `user.reactions.write`  
+  *Payload:* `{"status_id": 456, "reaction_name": "like"}`
+- `GET /api/developer/v1/me/messages`: Returns active direct message conversations.  
+  *Required Scope:* `user.messages.read`
+- `POST /api/developer/v1/me/messages`: Sends a private direct message to another member.  
+  *Required Scope:* `user.messages.write`  
+  *Payload:* `{"receiver_id": 789, "content": "Hello!"}`
+- `GET /api/developer/v1/me/notifications`: Returns user notification feed and unread count.  
+  *Required Scope:* `user.notifications.read`
+- `GET /api/developer/v1/forums`: Returns forum categories with topic and post counters.  
+  *Required Scope:* `user.forums.read`
+- `GET /api/developer/v1/me/clips`: Returns public vertical video clips feed.  
+  *Required Scope:* `user.clips.read`
+
+### F. Economy, Store & Advertising Endpoints
+- `GET /api/developer/v1/me/wallet`: Returns Points (PTS) wallet balance, credits, and earnings.  
+  *Required Scope:* `user.wallet.read`
+- `GET /api/developer/v1/me/badges`: Returns unlocked gamification badges and progress.  
+  *Required Scope:* `user.badges.read`
+- `GET /api/developer/v1/store/products`: Returns marketplace products with pricing and category metadata.  
+  *Required Scope:* `user.store.read`
+- `GET /api/developer/v1/me/orders`: Returns service orders and marketplace request history.  
+  *Required Scope:* `user.orders.read`
+- `GET /api/developer/v1/me/ads/stats`: Returns banner, link, and custom ad impression and click performance metrics.  
+  *Required Scope:* `user.ads.read`
+
+### G. Application Owner Endpoints
+Allows integrations on behalf of the application owner:
+- `GET /api/developer/v1/owner/profile`: Returns application owner's public profile metadata.  
+  *Required Scope:* `owner.profile.read`
+- `GET /api/developer/v1/owner/content`: Returns published posts and updates authored by the application owner.  
+  *Required Scope:* `owner.content.read`
+- `POST /api/developer/v1/owner/follow`: Follows the application owner on behalf of the member.  
+  *Required Scope:* `owner.follow.write`
+- `POST /api/developer/v1/owner/messages`: Sends a direct message directly to the application owner.  
+  *Required Scope:* `owner.messages.write`
 
 ---
 

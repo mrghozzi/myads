@@ -1,4 +1,4 @@
-# Agents.md — MYADS v4.5.5
+# Agents.md — MYADS v4.5.6
 
 > **Purpose:** This file gives AI coding agents a fast, comprehensive understanding of the MYADS project — its architecture, conventions, key files, and rules — so they can work effectively from a fresh chat context.
 
@@ -6,7 +6,7 @@
 
 ## 1. Project Identity
 
-- **Name:** MYADS v4.5.5
+- **Name:** MYADS v4.5.6
 - **Type:** Social network + ad exchange platform for website owners
 - **Framework:** Laravel 12 (PHP 8.2+)
 - **Database:** MySQL 5.7+ / MariaDB 10.3+
@@ -66,6 +66,9 @@ MYADS is a community platform where website owners:
 44. **Real-Time Events Engine (SSE Live Stream — RT-04)** — High-performance Server-Sent Events (SSE) streaming engine (`/live/stream` & `/api/live/stream`) powered by `LiveStreamController` and `LiveEventStreamService`. Delivers instant unread notification and message badge updates, live toast alerts, community feed update notices, admin monitoring stats, proactive session-lock release preventing worker thread blocking, and client-side manager (`live-events.js`) with automatic fallback interval polling and PHPUnit test suite (`LiveEventStreamTest.php`).
 45. **Smart Micro-Caching & High-Traffic Query Optimization (`DB-08`)** — Database performance enhancements reducing query load by >80% during peak traffic bursts. Includes compound indexes (`2026_08_26_010000_add_high_traffic_compound_indexes.php`) on `status` (`['s_type', 'statu', 'date']`), `smart_ads` (`['statu', 'uid']`), `banner` (`['statu', 'px']`), `link` (`['statu', 'id']`), and `custom_ad_events` (`['deal_id', 'event_type', 'is_flagged', 'occurred_at']`), paired with 20-second in-memory micro-caching of active candidate pools across `AdsServingController` (banners, links, smart ads) and `CustomAdServingService` (custom ad deal selection). Supported by dedicated test suite (`V453HighTrafficMicroCachingTest.php`).
 46. **Live Theme Customizer & Dynamic CSS Variables Engine (`THEME-07`)** — Visual theme customizer console in admin panel (`/admin/themes/customizer`) managed by `ThemeCustomizerService`. Features interactive controls for brand colors (primary, accent, header), surface palettes, text colors, Google/Arabic typography (Inter, Cairo, Tajawal, Roboto, Outfit, System), border radius, and glassmorphism blur/opacity with real-time responsive split-screen preview (Desktop, Tablet, Mobile) via `postMessage` CSS variable injection. Automatically compiles and persists cached CSS variables to `public/themes/{theme}/custom_variables.css` and options database table, integrated into master and welcome layouts. Supported by dedicated test suite (`V453ThemeCustomizerTest.php`).
+47. **Developer Platform Lifecycle, Cascading App Revocation & MyISAM Resilience (v4.5.4)** — Developer self-service and administrative deletion of applications (`/developer/apps` & `/admin/developers`) with database foreign-key cascading (`ON DELETE CASCADE`) to automatically and safely revoke authorizations, access tokens, refresh tokens, and authorization codes. Resolved MySQL/MariaDB 1000-byte key limit on legacy MyISAM tables with dynamic conversion to InnoDB and resilient compound index migrations.
+48. **Developer Platform Resilience, Cloudflare Proxy Trust & Superdesign Code/Mermaid Engine (v4.5.5)** — Universal Cloudflare / reverse proxy protocol trust (`trustProxies(at: '*')`), numeric route model binding disambiguation (`->whereNumber('app')`), JSON payload standard for developer forms (`application/json`), OAuth 2.0 RFC 6749 Section 4.1.2 compliance (query-preserving `redirect_uri` generation), WAF/ModSecurity sensitive dotfile rule bypass via scope aliasing (`DeveloperScopeCatalog`), HTTP Basic Auth client credentials support (`RFC 6749 Section 2.3.1`), real-time SSE unread message badge count correction (`state != 0`), Superdesign macOS-style code windows and interactive Mermaid diagrams across Knowledgebase, Store, and Forum, and Live Theme Customizer cascading CSS order precedence.
+49. **Developer API Authorization Resilience, Multi-Environment Token Extraction & Fault-Tolerant Publishing (v4.5.6)** — Robust universal token resolution in `DeveloperApiController::validateToken` supporting native Bearer extraction, Apache/FastCGI/cPanel rewrite headers (`HTTP_AUTHORIZATION`, `REDIRECT_HTTP_AUTHORIZATION`, `REDIRECT_REDIRECT_HTTP_AUTHORIZATION`, `apache_request_headers()`), case-insensitive regex parsing (`Bearer\s+(\S+)`), and URL query/POST payload fallback (`access_token`). Multi-delimiter scope accessor/mutator in `DeveloperAccessToken` handling JSON, comma, and space separators. End-to-end exception safety across all Developer API endpoints with debug logging, schema-compliant forum-topic-first post creation on `/api/developer/v1/me/content`, and automated test coverage (`DeveloperApiTest.php` & `OAuthFlowTest.php`).
 
 ---
 
@@ -1112,7 +1115,14 @@ If in doubt, update it. An outdated `Agents.md` causes future agents to make wro
   - **Live Theme Customizer Site-Wide Persistence:** Enhanced CSS cascading precedence, dynamic header partial injection, multi-page iframe switcher preview, and compiled CSS variables across all frontend and auth layouts.
   - **Superdesign Code & Mermaid Diagram Engine:** Integrated interactive Mermaid diagrams and macOS-style dark code windows across Knowledgebase (`/kb/*`), Store (`/store/*`), and Forums (`/forum/*`).
   - **Security Hardening (league/commonmark v2.10.0):** Patched XSS filter bypass in `league/commonmark` (Dependabot #70), upgraded `nette/schema` to `v1.3.6`.
+- **v4.5.6 Official Release — Developer Platform API Authorization Resilience, Multi-Environment Token Extraction & Fault-Tolerant Publishing (2026-09-05):**
+  - **Universal Token Extraction Pipeline (`DeveloperApiController::validateToken`):** Multi-tier Bearer token extraction resolving 401 Unauthorized errors across reverse proxy, FastCGI, FPM, cPanel, and Apache environments. Cascades across `$request->bearerToken()`, `Authorization` / `authorization` headers, `HTTP_AUTHORIZATION`, `REDIRECT_HTTP_AUTHORIZATION`, `REDIRECT_REDIRECT_HTTP_AUTHORIZATION`, `apache_request_headers()`, case-insensitive regex matching (`Bearer\s+(\S+)`), and URL query/POST payload fallback (`access_token`).
+  - **Multi-Format Token Scope Deserialization (`DeveloperAccessToken`):** Added Eloquent `getScopesAttribute` and `setScopesAttribute` accessors handling JSON arrays, comma-delimited strings, and space-delimited strings transparently to eliminate scope comparison discrepancies.
+  - **Developer API Controller Exception Safety & Syntax Patch:** Fixed syntax error on `ownerContent` (missing `catch` block on `try`), wrapped all Developer API v1 actions in `try-catch (\Throwable $e)` with debug telemetry to `storage/logs/laravel.log`, and ensured standardized JSON error envelopes.
+  - **Forum-Topic-First Status Publishing Architecture:** Handled schema constraint in `/api/developer/v1/me/content` by automatically creating a corresponding `ForumTopic` record before creating a `Status` record, ensuring clean and consistent database integrity.
+  - **Automated Test Suite:** Built automated test suite `tests/Feature/DeveloperApiTest.php` and validated all 23 developer platform feature tests across `OAuthFlowTest.php` and `DeveloperApiTest.php`.
+  - **Version Bump:** Bumped canonical `SystemVersion::CURRENT` and `ads_version()` to `4.5.6`.
 
 ---
 
-*Last updated: 2026-09-04 — MYADS v4.5.5 (Official Public Release)*
+*Last updated: 2026-09-05 — MYADS v4.5.6 (Official Public Release)*

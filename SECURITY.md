@@ -10,7 +10,7 @@ We provide active security updates and maintenance for the following versions of
 
 | Version | Supported          | Security Maintenance Status |
 | ------- | ------------------ | --------------------------- |
-| 4.5.x   | :white_check_mark: | Active Development, Patches & Latest Features (Current: `v4.5.5`) |
+| 4.5.x   | :white_check_mark: | Active Development, Patches & Latest Features (Current: `v4.5.6`) |
 | 4.4.x   | :white_check_mark: | Active Security Patches Only |
 | 4.3.x   | :white_check_mark: | Critical Security Patches Only |
 | 4.2.x   | :white_check_mark: | Critical Security Patches Only |
@@ -22,6 +22,7 @@ We provide active security updates and maintenance for the following versions of
 
 MYADS includes multi-layered security controls across the core platform, API, and ad exchange ecosystem:
 
+- **Developer API Resilient Authorization & Multi-Environment Token Protection (v4.5.6)**: Hardened token resolution pipeline cascading across standard Bearer headers, Apache/FastCGI/cPanel rewrite variables (`HTTP_AUTHORIZATION`, `REDIRECT_HTTP_AUTHORIZATION`, `REDIRECT_REDIRECT_HTTP_AUTHORIZATION`, `apache_request_headers()`), case-insensitive regex parsing (`Bearer\s+(\S+)`), and query string fallback. Features multi-format scope normalization in `DeveloperAccessToken` preventing scope-matching bypasses, complete exception isolation (`try/catch \Throwable`) preventing database disclosure, and schema-compliant forum-topic-first post creation.
 - **Public Member IDs & Enumeration Protection**: When `public_member_ids_enabled` is active in `/admin/security`, numeric database ID lookups are strictly blocked with HTTP 404 on profile routes (`/u/{id}`) to prevent user enumeration. All internal database `id`s in referral links (`?ref=`), ad impression trackers, API resources, mention lookups, follow/block routes, and popover handlers are replaced with secure public identifiers (`public_uid`).
 - **Anti-Click-Farm & Click Fraud Protection (Custom Ads)**: Multi-layered verification using privacy-first anonymous SHA-256 visitor fingerprinting (`sha256(IP + UserAgent + AcceptLanguage)`), 24-hour rate limiting windows per visitor, and a 1.5-second minimum session dwell window check. Suspicious or rapid clicks are flagged (`is_flagged = true`) and isolated from PTS billing without deducting advertiser points or rewarding publishers.
 - **Granular OAuth 2.0 Scopes & Token Authorization**: Developer platform enforces 27 granular permission scopes across 7 categories (Identity, Content, Messages, Wallet, Media, Store, Owner Integrations) with strict scope-checking middleware on all Developer API v1 endpoints.
