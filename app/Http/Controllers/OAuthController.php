@@ -42,12 +42,22 @@ class OAuthController extends Controller
                 return response('Invalid redirect_uri', 400);
             }
 
-            $requestedScopes = array_map(
+            $rawRequested = preg_split('/[\s,]+/', trim($request->scope));
+            $requestedScopes = array_values(array_unique(array_filter(array_map(
                 [DeveloperScopeCatalog::class, 'normalizeScopeId'],
-                preg_split('/[\s,]+/', trim($request->scope))
-            );
-            $appScopes = (array) ($app->requested_scopes ?? []);
-            $validScopes = array_values(array_intersect($requestedScopes, $appScopes));
+                $rawRequested
+            ))));
+
+            $allCatalogScopes = array_keys(DeveloperScopeCatalog::getAllScopes());
+            $validRequestedScopes = array_values(array_intersect($requestedScopes, $allCatalogScopes));
+
+            $rawAppScopes = (array) ($app->requested_scopes ?? []);
+            $appScopes = array_values(array_unique(array_filter(array_map(
+                [DeveloperScopeCatalog::class, 'normalizeScopeId'],
+                $rawAppScopes
+            ))));
+
+            $validScopes = !empty($validRequestedScopes) ? $validRequestedScopes : $appScopes;
 
             $scopeDetails = DeveloperScopeCatalog::getScopes($validScopes);
 
@@ -101,12 +111,31 @@ class OAuthController extends Controller
                 return redirect($redirect);
             }
 
-            $requestedScopes = array_map(
+            $rawRequested = preg_split('/[\s,]+/', trim($request->scope));
+            $requestedScopes = array_values(array_unique(array_filter(array_map(
                 [DeveloperScopeCatalog::class, 'normalizeScopeId'],
-                preg_split('/[\s,]+/', trim($request->scope))
-            );
-            $appScopes = (array) ($app->requested_scopes ?? []);
-            $validScopes = array_values(array_intersect($requestedScopes, $appScopes));
+                $rawRequested
+            ))));
+
+            $allCatalogScopes = array_keys(DeveloperScopeCatalog::getAllScopes());
+            $validRequestedScopes = array_values(array_intersect($requestedScopes, $allCatalogScopes));
+
+            $rawAppScopes = (array) ($app->requested_scopes ?? []);
+            $appScopes = array_values(array_unique(array_filter(array_map(
+                [DeveloperScopeCatalog::class, 'normalizeScopeId'],
+                $rawAppScopes
+            ))));
+
+            $validScopes = !empty($validRequestedScopes) ? $validRequestedScopes : $appScopes;
+
+            // Sync approved scopes back to the app record if missing
+            try {
+                $mergedAppScopes = array_values(array_unique(array_merge($appScopes, $validScopes)));
+                if ($mergedAppScopes !== $appScopes) {
+                    $app->requested_scopes = $mergedAppScopes;
+                    $app->save();
+                }
+            } catch (\Throwable $ignored) {}
 
             $authData = $this->oauthService->generateAuthorizationCode($app, auth()->user(), $request->redirect_uri, $validScopes);
 

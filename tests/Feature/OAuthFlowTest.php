@@ -369,4 +369,38 @@ class OAuthFlowTest extends TestCase
 
         $response->assertStatus(400);
     }
+
+    public function test_oauth_grants_valid_catalog_scopes_and_syncs_to_app_even_if_initially_missing()
+    {
+        // App initially only has identity scope
+        $this->developerApp->requested_scopes = ['user.identity.read'];
+        $this->developerApp->save();
+
+        // Client requests both identity and content.write (e.g. from WordPress plugin)
+        $response = $this->actingAs($this->endUser)->post('/oauth/authorize', [
+            'client_id' => $this->developerApp->client_id,
+            'redirect_uri' => 'https://example.com/callback',
+            'response_type' => 'code',
+            'scope' => 'user.identity.read user.content.write',
+            'state' => 'xyz456',
+            'action' => 'accept',
+        ]);
+
+        $response->assertRedirectContains('https://example.com/callback?code=');
+
+        $authCode = DeveloperAuthorizationCode::query()
+            ->where('developer_app_id', $this->developerApp->id)
+            ->where('user_id', $this->endUser->id)
+            ->latest('id')
+            ->first();
+
+        $this->assertNotNull($authCode);
+        $scopes = is_array($authCode->scopes) ? $authCode->scopes : json_decode($authCode->scopes, true);
+        $this->assertContains('user.identity.read', $scopes);
+        $this->assertContains('user.content.write', $scopes);
+
+        // Verify scopes were synced to the app record
+        $this->developerApp->refresh();
+        $this->assertContains('user.content.write', $this->developerApp->requested_scopes);
+    }
 }

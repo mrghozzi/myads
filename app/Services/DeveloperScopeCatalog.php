@@ -222,10 +222,17 @@ class DeveloperScopeCatalog
     {
         $id = trim($id);
         return match ($id) {
-            'profile.read', 'user_profile.read', 'user_profile_read', 'user-profile-read', 'user-profile.read' => 'user.profile.read',
-            'identity.read', 'user_identity.read', 'user_identity_read', 'user-identity-read' => 'user.identity.read',
-            'content.write', 'user_content.write', 'user_content_write', 'user-content-write' => 'user.content.write',
-            'content.read', 'user_content.read', 'user_content_read', 'user-content-read' => 'user.content.read',
+            'profile.read', 'user_profile.read', 'user_profile_read', 'user-profile-read', 'user-profile.read', 'profile' => 'user.profile.read',
+            'identity.read', 'user_identity.read', 'user_identity_read', 'user-identity-read', 'identity' => 'user.identity.read',
+            'content.write', 'user_content.write', 'user_content_write', 'user-content-write', 'content.create', 'posts.write', 'user.posts.write', 'publish_posts', 'posts.create', 'user.content.create', 'content' => 'user.content.write',
+            'content.read', 'user_content.read', 'user_content_read', 'user-content-read', 'posts.read', 'user.posts.read' => 'user.content.read',
+            'reactions.write', 'user_reactions.write', 'user_reactions_write', 'user-reactions-write' => 'user.reactions.write',
+            'messages.read', 'user_messages.read', 'user_messages_read' => 'user.messages.read',
+            'messages.write', 'user_messages.write', 'user_messages_write' => 'user.messages.write',
+            'social_links.read', 'user_social_links.read', 'user-social-links-read' => 'user.social_links.read',
+            'follows.read', 'user_follows.read' => 'user.follows.read',
+            'follows.write', 'user_follows.write' => 'user.follows.write',
+            'wallet.read', 'user_wallet.read' => 'user.wallet.read',
             default => $id,
         };
     }

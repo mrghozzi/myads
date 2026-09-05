@@ -11,6 +11,7 @@ use App\Models\Status;
 use App\Models\ForumTopic;
 use App\Models\Message;
 use App\Services\UserPrivacyService;
+use App\Services\DeveloperScopeCatalog;
 
 class DeveloperApiController extends Controller
 {
@@ -69,14 +70,20 @@ class DeveloperApiController extends Controller
                 if (is_string($item)) {
                     foreach (preg_split('/[\s,]+/', trim($item)) as $sub) {
                         if ($sub !== '') {
-                            $scopes[] = $sub;
+                            $scopes[] = DeveloperScopeCatalog::normalizeScopeId($sub);
                         }
                     }
                 }
             }
         }
 
-        if (!in_array($requiredScope, $scopes)) {
+        $requiredScope = DeveloperScopeCatalog::normalizeScopeId($requiredScope);
+
+        $hasScope = in_array($requiredScope, $scopes, true)
+            || in_array('*', $scopes, true)
+            || in_array('all', $scopes, true);
+
+        if (!$hasScope) {
             return ['error' => 'Insufficient scope', 'code' => 403];
         }
 

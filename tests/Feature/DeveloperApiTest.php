@@ -149,6 +149,25 @@ class DeveloperApiTest extends TestCase
         ]);
     }
 
+    public function test_post_content_accepts_alias_scope_content_write()
+    {
+        // Token has alias 'content.write' instead of canonical 'user.content.write'
+        $this->tokenRecord->scopes = ['content.write'];
+        $this->tokenRecord->save();
+
+        $response = $this->withHeaders([
+            'Authorization' => 'Bearer ' . $this->plainToken,
+        ])->postJson('/api/developer/v1/me/content', [
+            'content' => 'Alias post content',
+        ]);
+
+        $response->assertStatus(200);
+        $response->assertJson([
+            'success' => true,
+            'message' => 'Post created successfully',
+        ]);
+    }
+
     public function test_insufficient_scope_returns_403()
     {
         // Token only has identity scope
