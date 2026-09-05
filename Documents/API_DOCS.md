@@ -260,7 +260,13 @@ GET /oauth/authorize?client_id={client_id}&redirect_uri={redirect_uri}&response_
 
 > **RFC 6749 Section 4.1.2 URL Concatenation:** If the `redirect_uri` contains existing query parameters, the authorization response automatically appends parameters using `&` (e.g. `https://example.com/callback?page=plugin&code={code}&state={state}`).
 
-> **WAF / ModSecurity Rule 930120 Bypass:** Sensitive scope aliases (`profile.read`, `user_profile.read`, `user_profile_read`, `user-profile-read`) are automatically normalized to `user.profile.read` to prevent web application firewalls from treating `.profile` as a Linux dotfile access attempt.
+> **WAF / ModSecurity Rule 930120 Bypass & Extended Scope Aliases:** In addition to normalizing sensitive dotfile patterns (`profile.read`, `user_profile.read`, `user_profile_read`, `user-profile-read` &rarr; `user.profile.read`) to prevent web application firewalls from treating `.profile` as a Linux dotfile access attempt, the platform normalizes common WordPress and developer aliases:
+>   - **Content Publishing:** `content.write`, `posts.write`, `publish_posts`, `posts.create`, `content.create`, `user.content.create`, `content` &rarr; `user.content.write`
+>   - **Content Reading:** `content.read`, `posts.read` &rarr; `user.content.read`
+>   - **Profile & Identity:** `profile`, `user.profile` &rarr; `user.profile.read`; `identity`, `user.identity` &rarr; `user.identity.read`
+>   - **Interactions & Messaging:** `reactions.write`, `like.write` &rarr; `user.reactions.write`; `messages.write`, `dm.send` &rarr; `user.messages.write`; `messages.read`, `dm.read` &rarr; `user.messages.read`; `follows.write`, `follow.write` &rarr; `user.follows.write`
+
+> **Dynamic Catalog Scope Granting & Auto-Syncing (v4.5.6):** Third-party integrations (such as the ADStn Auto Poster WordPress plugin) can request any legitimate permissions cataloged in `DeveloperScopeCatalog` at authorization time. The authorization server evaluates requested scopes against the global system scope catalog and the user's explicit consent rather than strictly dropping scopes unselected during initial app registration. Newly approved valid scopes are automatically merged and synchronized into the application's `requested_scopes` record in `developer_apps`.
 
 > **Draft Application Development Mode:** Application owners can test their own applications while in `draft` mode without requiring administrative approval.
 
@@ -332,8 +338,10 @@ All Developer API requests require an active OAuth 2.0 access token issued via `
    - **Query String:** `GET /api/developer/v1/me?access_token={access_token}`
    - **Request Payload:** `POST /api/developer/v1/me/content` with JSON `{"access_token": "{access_token}", ...}`
 
-### B. Multi-Delimiter Scope Flexibility
-Scopes are validated using resilient accessor and mutator normalization (`DeveloperAccessToken`). Scopes formatted as JSON arrays, comma-delimited strings (`user.identity.read,user.profile.read`), or space-delimited strings (`user.identity.read user.profile.read`) are parsed identically, eliminating false-positive `403 Forbidden` errors.
+### B. Multi-Delimiter Scope Flexibility & Runtime Alias Resolution (v4.5.6)
+Scopes are validated using resilient accessor and mutator normalization (`DeveloperAccessToken`) and canonical alias resolution (`DeveloperApiController::validateToken` & `DeveloperScopeCatalog::normalizeScopeId`):
+1. **Multi-Format Storage & Deserialization:** Scopes stored in database records formatted as JSON arrays (`["user.identity.read", "user.content.write"]`), comma-delimited strings (`user.identity.read,user.content.write`), or space-delimited strings (`user.identity.read user.content.write`) are transparently unpacked into uniform string arrays.
+2. **Runtime Alias Resolution:** When an API endpoint validates required permissions (such as `user.content.write` for publishing posts), `validateToken` normalizes both canonical scope IDs and accepted aliases. Tokens possessing aliases such as `content.write`, `posts.write`, or `publish_posts` seamlessly satisfy the required scope check without returning false-positive `403 Forbidden` ("Insufficient scope") errors.
 
 ### C. Rate Limiting & Error Handling
 - **Rate Limit:** 30 requests per minute per client IP (`throttle:30,1`). Exceeding this limit returns HTTP `429 Too Many Requests`.

@@ -8,7 +8,14 @@
   * **Case-Insensitive & Whitespace-Tolerant Parsing:** Replaced rigid `str_starts_with($header, 'Bearer ')` string offsets with regular expression matching (`preg_match('/Bearer\s+(\S+)/i', ...)`), ensuring seamless compatibility with lowercase `bearer`, arbitrary whitespace separations, and custom client implementations.
   * **Alternative Query / Request Payload Token Fallback:** Added graceful fallback to `access_token` query parameter or POST body (`$request->input('access_token')`) for constrained clients, webhook receivers, or environments unable to transmit custom HTTP headers.
 
-### OAuth Token Scope Normalization & Delimiter Flexibility
+### OAuth Token Scope Normalization, Dynamic Granting & Delimiter Flexibility
+* **OAuth Authorization Engine & Dynamic Scope Granting (`OAuthController::authorizeRequest` & `authorizeResponse`):**
+  * **Elimination of Pre-Registration Scope Stripping:** Resolved an issue where third-party applications (such as the ADStn Auto Poster WordPress plugin) requesting legitimate permissions (e.g. `user.content.write`) had those scopes silently dropped if the app creator had not pre-checked the corresponding boxes during application registration at `/developer/apps`, resulting in subsequent `403 Forbidden ("Insufficient scope")` API errors when publishing posts.
+  * **Dynamic Catalog Scope Resolution:** Updated authorization logic to grant all valid scopes requested by the client that exist in `DeveloperScopeCatalog::getAllScopes()` and are consented to by the resource owner during authorization.
+  * **Automated App Scope Synchronization:** Approved scopes are automatically merged and synchronized back to the application's `requested_scopes` column in `developer_apps`, keeping the app's registered permissions up to date.
+* **Expanded Scope Alias Normalization (`DeveloperScopeCatalog::normalizeScopeId`):**
+  * Added extensive alias mappings for content publishing (`content.write`, `posts.write`, `publish_posts`, `posts.create`, `content.create`, `user.content.create`, `user_content.write`, `user_content_write`, `user-content-write`, `content` &rarr; `user.content.write`), profile reading (`profile` &rarr; `user.profile.read`), identity reading (`identity` &rarr; `user.identity.read`), reactions, private messaging, social links, follows, and wallet balances.
+  * Applied `normalizeScopeId` during token validation in `DeveloperApiController::validateToken` so that tokens stored with alias formats seamlessly authorize matching API endpoints without false rejections.
 * **Eloquent Models & Token Scope Serialization (`DeveloperAccessToken`):** Implemented multi-format scope accessor and mutator methods (`getScopesAttribute` and `setScopesAttribute`) on `DeveloperAccessToken` to ensure seamless interoperability across storage and query formats:
   * **Multi-Format Deserialization:** Transparently unpacks scopes stored as JSON arrays, comma-separated strings (`user.identity.read,user.content.write`), or whitespace-separated strings (`user.identity.read user.content.write`) into clean string arrays.
   * **Consistent Scope Serialization:** Normalizes incoming array or delimited string data into standardized JSON arrays before saving to the database.
@@ -27,8 +34,8 @@
 
 ### Automated Testing & Version Synchronization
 * **Automated Feature Test Coverage:**
-  * **Developer API Test Suite (`tests/Feature/DeveloperApiTest.php`):** Added a dedicated automated feature test suite verifying token extraction across headers, Apache server environment variables, and query parameters; scope validation (valid vs. missing scopes); user identity and profile payloads; status post creation with database verification; and error handling (401, 403, 422).
-  * **OAuth Flow Verification (`tests/Feature/OAuthFlowTest.php`):** Validated all 23 tests across the developer platform test suites with 92 passing assertions.
+  * **Developer API Test Suite (`tests/Feature/DeveloperApiTest.php`):** Automated feature test suite verifying token extraction across headers, Apache server environment variables, and query parameters; scope validation (valid vs. missing scopes); scope alias normalization (e.g. `content.write` for `user.content.write`); user identity and profile payloads; status post creation with database verification; and error handling (401, 403, 422).
+  * **OAuth Flow Verification (`tests/Feature/OAuthFlowTest.php`):** Validated all 25 tests across the developer platform test suites with 100 passing assertions, including dynamic scope granting and auto-syncing to developer app records.
 * **Core Version Synchronization:** Bumped `SystemVersion::CURRENT` and `ads_version()` to `4.5.6`.
 
 
