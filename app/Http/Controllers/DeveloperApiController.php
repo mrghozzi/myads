@@ -20,12 +20,34 @@ class DeveloperApiController extends Controller
 
     protected function validateToken(Request $request, string $requiredScope)
     {
-        $header = $request->header('Authorization');
-        if (!$header || !str_starts_with($header, 'Bearer ')) {
+        $tokenStr = $request->bearerToken();
+
+        if (!$tokenStr) {
+            $header = $request->header('Authorization')
+                ?? $request->header('authorization')
+                ?? $request->server('HTTP_AUTHORIZATION')
+                ?? $request->server('REDIRECT_HTTP_AUTHORIZATION')
+                ?? $request->server('REDIRECT_REDIRECT_HTTP_AUTHORIZATION')
+                ?? (function_exists('apache_request_headers') ? (apache_request_headers()['Authorization'] ?? apache_request_headers()['authorization'] ?? null) : null);
+
+            if ($header && preg_match('/Bearer\s+(\S+)/i', $header, $matches)) {
+                $tokenStr = $matches[1];
+            }
+        }
+
+        // Fallback to request input/query access_token
+        if (!$tokenStr && $request->has('access_token')) {
+            $tokenStr = $request->input('access_token');
+        }
+
+        if ($tokenStr) {
+            $tokenStr = trim($tokenStr);
+        }
+
+        if (!$tokenStr) {
             return ['error' => 'Missing or invalid Authorization header', 'code' => 401];
         }
 
-        $tokenStr = substr($header, 7);
         $token = $this->oauthService->verifyAccessToken($tokenStr);
 
         if (!$token) {
