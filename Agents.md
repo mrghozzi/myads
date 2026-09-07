@@ -69,6 +69,7 @@ MYADS is a community platform where website owners:
 47. **Developer Platform Lifecycle, Cascading App Revocation & MyISAM Resilience (v4.5.4)** — Developer self-service and administrative deletion of applications (`/developer/apps` & `/admin/developers`) with database foreign-key cascading (`ON DELETE CASCADE`) to automatically and safely revoke authorizations, access tokens, refresh tokens, and authorization codes. Resolved MySQL/MariaDB 1000-byte key limit on legacy MyISAM tables with dynamic conversion to InnoDB and resilient compound index migrations.
 48. **Developer Platform Resilience, Cloudflare Proxy Trust & Superdesign Code/Mermaid Engine (v4.5.5)** — Universal Cloudflare / reverse proxy protocol trust (`trustProxies(at: '*')`), numeric route model binding disambiguation (`->whereNumber('app')`), JSON payload standard for developer forms (`application/json`), OAuth 2.0 RFC 6749 Section 4.1.2 compliance (query-preserving `redirect_uri` generation), WAF/ModSecurity sensitive dotfile rule bypass via scope aliasing (`DeveloperScopeCatalog`), HTTP Basic Auth client credentials support (`RFC 6749 Section 2.3.1`), real-time SSE unread message badge count correction (`state != 0`), Superdesign macOS-style code windows and interactive Mermaid diagrams across Knowledgebase, Store, and Forum, and Live Theme Customizer cascading CSS order precedence.
 49. **Developer API Authorization Resilience, Dynamic Scope Granting & Fault-Tolerant Publishing (v4.5.6)** — Robust universal token resolution in `DeveloperApiController::validateToken` supporting native Bearer extraction, Apache/FastCGI/cPanel rewrite headers (`HTTP_AUTHORIZATION`, `REDIRECT_HTTP_AUTHORIZATION`, `REDIRECT_REDIRECT_HTTP_AUTHORIZATION`, `apache_request_headers()`), case-insensitive regex parsing (`Bearer\s+(\S+)`), and URL query/POST payload fallback (`access_token`). Dynamic catalog scope granting in `OAuthController` eliminating 403 Insufficient scope errors by honoring requested permissions (e.g. `user.content.write` from WordPress auto-posters) and auto-syncing approved scopes to `developer_apps`. Multi-delimiter scope accessor/mutator in `DeveloperAccessToken` handling JSON, comma, and space separators, paired with expanded alias normalization in `DeveloperScopeCatalog` (`content.write`, `posts.write`, `publish_posts`, `posts.create`). End-to-end exception safety across all Developer API endpoints with debug logging, schema-compliant forum-topic-first post creation on `/api/developer/v1/me/content`, and automated test coverage (`DeveloperApiTest.php` & `OAuthFlowTest.php`).
+50. **Plugin Automatic Database Migrations, Zero-Reload AJAX Management & Live Client-Side Filtering (v4.5.6)** — Automated execution of database migrations (`runMigrations`) upon plugin activation (`PluginManager::activate`) and plugin upgrades (`PluginManager::upgrade`) via `Artisan::call('migrate', ['--path' => 'plugins/{dir}/database/migrations', '--force' => true])`, eliminating manual navigation to `/admin/maintenance`. Enhanced `/admin/plugins` with zero-reload AJAX activation/deactivation (`AdminController::activatePlugin`, `deactivatePlugin`) returning structured JSON, instant button/card state swapping, dynamic status badge transitions (`active`/`inactive`), and auto-dismissing glassmorphic toast notifications. Built instant client-side category filtering (All, Active, Inactive, Available Updates) with dynamic badge counters and real-time keyword search, supported by comprehensive automated PHPUnit test coverage (`PluginMigrationActivationTest.php`).
 
 ---
 
@@ -158,7 +159,7 @@ myads/
 │   └── console.php
 ├── storage/
 ├── tests/
-│   ├── Feature/            # 47 feature tests
+│   ├── Feature/            # 97 feature tests (including PluginMigrationActivationTest.php)
 │   ├── Unit/
 │   └── Concerns/           # SeedsSiteSettings trait
 ├── themes/
@@ -220,7 +221,7 @@ myads/
 | `Api\SettingsController` | Mobile API endpoints for member settings, privacy, social links, sessions, and points ledger |
 | `TagController` | Tag/hashtag pages |
 | `PageController` | Static pages (privacy, terms, refund, custom) |
-| `AdminController` | **Main admin controller** — users, ads, forum, directory, store, widgets (redesigned `@.superdesign` hub with `place` pre-selection & location filter chips), menus, plugins, themes, settings (including performance settings and system monitor), news, reports, emojis, knowledgebase, KB categories CRUD, maintenance mode settings |
+| `AdminController` | **Main admin controller** — users, ads, forum, directory, store, widgets (redesigned `@.superdesign` hub with `place` pre-selection & location filter chips), menus, plugins (zero-reload AJAX activate/deactivate endpoints and asset serving), themes, settings (including performance settings and system monitor), news, reports, emojis, knowledgebase, KB categories CRUD, maintenance mode settings |
 | `AdminAdminsController` | Admin ACL management |
 | `AdminBillingController` | Admin billing hub: settings, plans, orders, transactions, currencies, gateways |
 | `AdminOrderController` | Admin marketplace dashboard and moderation actions for service requests |
@@ -343,7 +344,7 @@ myads/
 | `SubscriptionPlanService` | Plan CRUD, search/pagination, snapshots, and entitlement normalization |
 | `SubscriptionLifecycleService` | Order creation, receipt upload, payment completion, manual bank-transfer review, and active/queued subscription transitions |
 | `SubscriptionEntitlementService` | Applies subscription entitlements (PTS, ad credits, profile badge, promotion discount) |
-| `PluginManager` | Discovers, activates, manages plugins |
+| `PluginManager` | Discovers, activates, and manages plugins (including automated database migration execution on activation/upgrades via Artisan) |
 | `ThemeManager` | Theme discovery and management |
 | `SeoManager` | Centralized SEO context (titles, OG, structured data) |
 | `SeoAuditService` / `SeoMetricsService` | SEO analytics and auditing |
@@ -524,6 +525,9 @@ admin/mail_settings.blade.php → Database-driven mail configuration form
 - **Metadata:** `plugin.json` (name, slug, version, author, thumbnail, latest, min_myads)
 - **Boot file:** `boot.php` — loaded by `PluginServiceProvider` when activated
 - **Activation state:** Stored in `options` table (`o_type = 'plugins'`)
+- **Automatic Migrations:** Activating a plugin (`PluginManager::activate`) or upgrading an active plugin (`PluginManager::upgrade`) automatically runs pending database migrations located in `/plugins/{PluginName}/database/migrations/` via `Artisan::call('migrate', ['--path' => '...', '--force' => true])`. No manual visit to `/admin/maintenance` is needed.
+- **Zero-Reload AJAX Management:** The `/admin/plugins` dashboard supports instant AJAX toggling for activation and deactivation (`AdminController::activatePlugin` and `deactivatePlugin`) without reloading the page, returning structured JSON, updating UI status badges, swapping action buttons, updating delete protection, and providing floating toast alerts.
+- **Client-Side Live Filtering & Search:** Instant filtering chips (All, Active, Inactive, Available Updates) with dynamic counts that update in real-time on toggle, coupled with real-time keyword search across plugin titles, slugs, and descriptions, and contextual empty state messaging.
 - **Hooks:** WordPress-like `add_action()` / `add_filter()` via `App\Helpers\Hooks`
 - **Admin:** Upload ZIP, activate/deactivate, GitHub update checks, changelog modal
 - **Safety:** Active plugins cannot be deleted; compatibility locking via `min_myads`
@@ -694,6 +698,11 @@ admin/mail_settings.blade.php → Database-driven mail configuration form
 - **Web Rendering:** Uses `repost_embed.blade.php` to render the original post inside a nested widget box. Supports images, videos, clips, audio, music, and file attachments dynamically.
 - **Hydration:** Relies on recursive decoration in `StatusActivityService::decorate` to ensure the nested original status and its associated models (user, attachments, link previews, related content) are fully loaded, avoiding blank embeds on single post detail views.
 - **REST API & Mobile Client:** Upgrades `StatusResource` to format `repost_record` with the nested `original_status` resource formatted using `StatusResource`. The mobile app parses this structure into `RepostRecordModel` and renders it via `_buildRepostEmbed` in `PostCard`, matching the web layout and functionality.
+
+### Plugin System & Automated Migrations (v4.5.6)
+- **Automatic Migration Execution:** When a plugin containing a `database/migrations` directory is activated or upgraded, `PluginManager::runMigrations($slug)` executes `Artisan::call('migrate', ['--path' => "plugins/{$dirName}/database/migrations", '--force' => true])`. This ensures that required database tables are immediately created without requiring site administrators to manually navigate to `/admin/maintenance`.
+- **Zero-Reload AJAX Management:** `/admin/plugins` implements asynchronous form submission for plugin activation and deactivation. `AdminController::activatePlugin` and `deactivatePlugin` detect AJAX requests (`$request->expectsJson() || $request->ajax()`) and return structured JSON responses, updating plugin cards, status badges, action buttons, delete modal attributes, and dynamic counters (`stat-active-plugins`, `count-active`, `count-inactive`) in real time, accompanied by auto-dismissing toast notifications.
+- **Client-Side Live Filtering & Search:** `/admin/plugins` features instant, zero-reload filter chips (`All`, `Active`, `Inactive`, `Available Updates`) with live badge counts and instantaneous keyword search across plugin names, slugs, and descriptions.
 
 ---
 
@@ -1124,7 +1133,12 @@ If in doubt, update it. An outdated `Agents.md` causes future agents to make wro
   - **Forum-Topic-First Status Publishing Architecture:** Handled schema constraint in `/api/developer/v1/me/content` by automatically creating a corresponding `ForumTopic` record before creating a `Status` record, ensuring clean and consistent database integrity.
   - **Automated Test Suite:** Built automated test suite `tests/Feature/DeveloperApiTest.php` and validated all 25 developer platform feature tests across `OAuthFlowTest.php` and `DeveloperApiTest.php` (100 assertions, 100% pass rate).
   - **Version Bump:** Bumped canonical `SystemVersion::CURRENT` and `ads_version()` to `4.5.6`.
+- **v4.5.6 Feature Release — Plugin Automated Migrations, Zero-Reload AJAX Management & Live Client-Side Filtering (2026-09-08):**
+  - **Automated Migration Execution on Plugin Activation & Upgrades:** Resolved the architectural requirement for administrators to manually navigate to `/admin/maintenance` after activating a plugin containing database migrations. Integrated automatic execution of pending plugin migrations via `Artisan::call('migrate', ['--path' => "plugins/{$dirName}/database/migrations", '--force' => true])` during `PluginManager::activate()` and `PluginManager::upgrade()`.
+  - **Zero-Reload AJAX Plugin Activation & Deactivation:** Enhanced `AdminController::activatePlugin` and `deactivatePlugin` to detect AJAX requests (`$request->expectsJson() || $request->ajax()`) and return structured JSON envelopes. Upgraded `plugins.blade.php` with seamless client-side form interception, button loading spinners, instant badge swapping (`active` vs `inactive`), toggle form attribute updates, delete modal permission updates, and glassmorphic floating toast alerts.
+  - **Instant Client-Side Category Filtering & Quick Search:** Implemented zero-reload interactive filter chips for All Plugins, Active Plugins, Inactive Plugins, and Available Updates with live synchronized counters, real-time keyword search, and contextual empty state cards.
+  - **Comprehensive Automated Test Coverage:** Developed `tests/Feature/Plugins/PluginMigrationActivationTest.php` validating automated migration execution, idempotency, plugins without migrations, view rendering with filter markup, and JSON responses for AJAX activate/deactivate (5 tests, 31 assertions, 100% pass rate).
 
 ---
 
-*Last updated: 2026-09-05 — MYADS v4.5.6 (Official Public Release)*
+*Last updated: 2026-09-08 — MYADS v4.5.6 (Official Public Release)*
