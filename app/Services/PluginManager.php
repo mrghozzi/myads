@@ -72,10 +72,18 @@ class PluginManager
     public function activate($slug)
     {
         // Verify plugin exists
-        $pluginDir = $this->pluginPath . '/' . $this->findDirectoryBySlug($slug);
+        $dirName = $this->findDirectoryBySlug($slug);
+        if (!$dirName) {
+            return false;
+        }
+
+        $pluginDir = $this->pluginPath . '/' . $dirName;
         if (!File::exists($pluginDir . '/plugin.json')) {
             return false;
         }
+
+        // Run migrations if plugin has database/migrations directory
+        $this->runMigrations($slug);
 
         Option::updateOrCreate(
             ['name' => $slug, 'o_type' => 'plugins'],
@@ -83,6 +91,43 @@ class PluginManager
         );
 
         return true;
+    }
+
+    /**
+     * Run migrations for a plugin if it has any.
+     *
+     * @param string $slug
+     * @return bool
+     */
+    public function runMigrations($slug): bool
+    {
+        $dirName = $this->findDirectoryBySlug($slug);
+        if (!$dirName) {
+            return false;
+        }
+
+        $migrationsDir = $this->pluginPath . '/' . $dirName . '/database/migrations';
+        if (!File::isDirectory($migrationsDir)) {
+            return true;
+        }
+
+        $relativePath = 'plugins/' . $dirName . '/database/migrations';
+
+        try {
+            $exitCode = \Illuminate\Support\Facades\Artisan::call('migrate', [
+                '--path' => $relativePath,
+                '--force' => true,
+            ]);
+
+            return $exitCode === 0;
+        } catch (\Throwable $e) {
+            Log::error("Failed to run migrations for plugin [{$slug}]: " . $e->getMessage(), [
+                'slug' => $slug,
+                'directory' => $dirName,
+                'exception' => $e,
+            ]);
+            throw $e;
+        }
     }
 
     /**
@@ -355,7 +400,7 @@ class PluginManager
             }
         }
 
-        return $this->packageUpgrader->upgradeFromDownload(
+        $result = $this->packageUpgrader->upgradeFromDownload(
             type: 'plugin',
             slug: $slug,
             downloadUrl: $downloadUrl,
@@ -365,6 +410,19 @@ class PluginManager
             currentVersion: \App\Http\Controllers\AdminUpdatesController::CURRENT_VERSION,
             existingDirectory: $directory
         );
+
+        if ($result === true) {
+            $option = Option::where('name', $slug)->where('o_type', 'plugins')->first();
+            if ($option && $option->o_valuer == 1) {
+                try {
+                    $this->runMigrations($slug);
+                } catch (\Throwable $e) {
+                    Log::error("Failed to run migrations during upgrade for plugin [{$slug}]: " . $e->getMessage());
+                }
+            }
+        }
+
+        return $result;
     }
 
     /**

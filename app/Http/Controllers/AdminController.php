@@ -3877,7 +3877,11 @@ class AdminController extends Controller
         } catch (\Throwable $e) {
             $this->maintenanceMode->disable(Auth::user(), 'plugin_activation_error');
             report($e);
-            return redirect()->back()->with('error', __('messages.plugin_activation_failed'));
+            $errorMessage = __('messages.plugin_activation_failed');
+            if (config('app.debug')) {
+                $errorMessage .= ' (' . $e->getMessage() . ')';
+            }
+            return redirect()->back()->with('error', $errorMessage);
         }
     }
 

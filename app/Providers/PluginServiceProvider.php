@@ -90,7 +90,7 @@ class PluginServiceProvider extends ServiceProvider
             }
 
             // 4. Load Migrations
-            if (File::exists($migrationsDir)) {
+            if (File::isDirectory($migrationsDir)) {
                 $this->loadMigrationsFrom($migrationsDir);
             }
         }
