@@ -3870,9 +3870,25 @@ class AdminController extends Controller
         try {
             if ($pluginManager->activate($request->slug)) {
                 $this->maintenanceMode->disable(Auth::user(), 'plugin_activation_success');
+                if ($request->expectsJson() || $request->ajax()) {
+                    $activeCount = \App\Models\Option::where('o_type', 'plugins')->where('o_valuer', '1')->count();
+                    return response()->json([
+                        'success' => true,
+                        'message' => __('messages.plugin_activated_successfully'),
+                        'slug' => $request->slug,
+                        'is_active' => true,
+                        'active_count' => $activeCount,
+                    ]);
+                }
                 return redirect()->back()->with('success', __('messages.plugin_activated_successfully'));
             }
             $this->maintenanceMode->disable(Auth::user(), 'plugin_activation_failed');
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => __('messages.plugin_activation_failed'),
+                ], 422);
+            }
             return redirect()->back()->with('error', __('messages.plugin_activation_failed'));
         } catch (\Throwable $e) {
             $this->maintenanceMode->disable(Auth::user(), 'plugin_activation_error');
@@ -3880,6 +3896,12 @@ class AdminController extends Controller
             $errorMessage = __('messages.plugin_activation_failed');
             if (config('app.debug')) {
                 $errorMessage .= ' (' . $e->getMessage() . ')';
+            }
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $errorMessage,
+                ], 500);
             }
             return redirect()->back()->with('error', $errorMessage);
         }
@@ -3893,14 +3915,40 @@ class AdminController extends Controller
         try {
             if ($pluginManager->deactivate($request->slug)) {
                 $this->maintenanceMode->disable(Auth::user(), 'plugin_deactivation_success');
+                if ($request->expectsJson() || $request->ajax()) {
+                    $activeCount = \App\Models\Option::where('o_type', 'plugins')->where('o_valuer', '1')->count();
+                    return response()->json([
+                        'success' => true,
+                        'message' => __('messages.plugin_deactivated_successfully'),
+                        'slug' => $request->slug,
+                        'is_active' => false,
+                        'active_count' => $activeCount,
+                    ]);
+                }
                 return redirect()->back()->with('success', __('messages.plugin_deactivated_successfully'));
             }
             $this->maintenanceMode->disable(Auth::user(), 'plugin_deactivation_failed');
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => __('messages.plugin_deactivation_failed'),
+                ], 422);
+            }
             return redirect()->back()->with('error', __('messages.plugin_deactivation_failed'));
         } catch (\Throwable $e) {
             $this->maintenanceMode->disable(Auth::user(), 'plugin_deactivation_error');
             report($e);
-            return redirect()->back()->with('error', __('messages.plugin_deactivation_failed'));
+            $errorMessage = __('messages.plugin_deactivation_failed');
+            if (config('app.debug')) {
+                $errorMessage .= ' (' . $e->getMessage() . ')';
+            }
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $errorMessage,
+                ], 500);
+            }
+            return redirect()->back()->with('error', $errorMessage);
         }
     }
 

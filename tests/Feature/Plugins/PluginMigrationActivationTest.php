@@ -147,7 +147,61 @@ PHP;
             if (File::isDirectory($pluginDir)) {
                 File::deleteDirectory($pluginDir);
             }
-            Option::where('name', $slugNoMig)->where('o_type', 'plugins')->delete();
         }
+    }
+
+    public function test_admin_plugins_index_page_renders_with_filters_and_ajax_markup(): void
+    {
+        $admin = User::factory()->create(['id' => 1]);
+
+        $response = $this->actingAs($admin)
+            ->withSession(['admin_password_confirmed_at' => time()])
+            ->get('/admin/plugins');
+
+        $response->assertStatus(200);
+        $response->assertSee('data-filter="all"', false);
+        $response->assertSee('data-filter="active"', false);
+        $response->assertSee('data-filter="inactive"', false);
+        $response->assertSee('data-filter="updates"', false);
+        $response->assertSee('id="plugin-search-input"', false);
+        $response->assertSee('plugin-ajax-toggle-form', false);
+    }
+
+    public function test_ajax_activate_and_deactivate_returns_json_without_redirect(): void
+    {
+        $admin = User::factory()->create(['id' => 1]);
+
+        // AJAX Activate
+        $response = $this->actingAs($admin)
+            ->withSession(['admin_password_confirmed_at' => time()])
+            ->postJson('/admin/plugins/activate', [
+                'slug' => $this->testPluginSlug,
+            ]);
+
+        $response->assertOk();
+        $response->assertJson([
+            'success' => true,
+            'is_active' => true,
+            'slug' => $this->testPluginSlug,
+        ]);
+        $response->assertJsonStructure(['success', 'message', 'slug', 'is_active', 'active_count']);
+        $this->assertTrue(Schema::hasTable('temp_plugin_test_table'));
+
+        // AJAX Deactivate
+        $deactResponse = $this->actingAs($admin)
+            ->withSession(['admin_password_confirmed_at' => time()])
+            ->postJson('/admin/plugins/deactivate', [
+                'slug' => $this->testPluginSlug,
+            ]);
+
+        $deactResponse->assertOk();
+        $deactResponse->assertJson([
+            'success' => true,
+            'is_active' => false,
+            'slug' => $this->testPluginSlug,
+        ]);
+
+        $option = Option::where('name', $this->testPluginSlug)->where('o_type', 'plugins')->first();
+        $this->assertEquals('0', (string) $option->o_valuer);
     }
 }
