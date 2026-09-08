@@ -3156,44 +3156,127 @@ class AdminController extends Controller
     }
 
     // Menu Management
-    public function menus()
+    public function menus(Request $request)
     {
-        $menus = Menu::orderBy('id_m', 'desc')->paginate(20);
+        $query = Menu::orderBy('id_m', 'desc');
+
+        if ($request->filled('q')) {
+            $q = trim((string) $request->query('q'));
+            $query->where(function ($b) use ($q) {
+                $b->where('name', 'like', "%{$q}%")
+                  ->orWhere('dir', 'like', "%{$q}%");
+            });
+        }
+
+        $menus = $query->paginate(20);
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'menus' => $menus,
+                'total' => Menu::count(),
+            ]);
+        }
+
         return view('admin::admin.menus', compact('menus'));
     }
 
     public function storeMenu(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string',
-            'dir' => 'required|string',
+        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'dir' => 'required|string|max:255',
         ]);
 
-        Menu::create($request->all());
+        if ($validator->fails()) {
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $validator->errors()->first(),
+                    'errors' => $validator->errors(),
+                ], 422);
+            }
 
-        return redirect()->back()->with('success', __('menu_created'));
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
+        $menu = Menu::create([
+            'name' => trim((string) $request->input('name')),
+            'dir' => trim((string) $request->input('dir')),
+            'type' => $request->filled('type') ? trim((string) $request->input('type')) : null,
+        ]);
+
+        Cache::forget(\App\Services\CacheWarmupService::CACHE_KEY_PRIMARY_MENUS);
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => __('messages.menu_created') ?: __('messages.menu_added'),
+                'menu' => $menu,
+                'total' => Menu::count(),
+            ]);
+        }
+
+        return redirect()->back()->with('success', __('messages.menu_created') ?: __('messages.menu_added'));
     }
 
     public function updateMenu(Request $request, $id)
     {
         $menu = Menu::findOrFail($id);
-        
-        $request->validate([
-            'name' => 'required|string',
-            'dir' => 'required|string',
+
+        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'dir' => 'required|string|max:255',
         ]);
 
-        $menu->update($request->all());
+        if ($validator->fails()) {
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $validator->errors()->first(),
+                    'errors' => $validator->errors(),
+                ], 422);
+            }
 
-        return redirect()->back()->with('success', __('menu_updated'));
+            return redirect()->back()->withErrors($validator)->withInput();
+        }
+
+        $menu->update([
+            'name' => trim((string) $request->input('name')),
+            'dir' => trim((string) $request->input('dir')),
+            'type' => $request->has('type') ? trim((string) $request->input('type')) : $menu->type,
+        ]);
+
+        Cache::forget(\App\Services\CacheWarmupService::CACHE_KEY_PRIMARY_MENUS);
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => __('messages.menu_updated'),
+                'menu' => $menu,
+            ]);
+        }
+
+        return redirect()->back()->with('success', __('messages.menu_updated'));
     }
 
-    public function deleteMenu($id)
+    public function deleteMenu(Request $request, $id)
     {
         $menu = Menu::findOrFail($id);
         $menu->delete();
-        
-        return redirect()->back()->with('success', __('menu_deleted'));
+
+        Cache::forget(\App\Services\CacheWarmupService::CACHE_KEY_PRIMARY_MENUS);
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => __('messages.menu_deleted'),
+                'id' => (int) $id,
+                'total' => Menu::count(),
+            ]);
+        }
+
+        return redirect()->back()->with('success', __('messages.menu_deleted'));
     }
 
     // Widgets Management

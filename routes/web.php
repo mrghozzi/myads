@@ -746,7 +746,7 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     // Menus
     Route::get('/menus', [AdminController::class, 'menus'])->name('admin.menus');
     Route::post('/menus', [AdminController::class, 'storeMenu'])->name('admin.menus.store');
-    Route::post('/menus/{id}', [AdminController::class, 'updateMenu'])->name('admin.menus.update');
+    Route::match(['post', 'put'], '/menus/{id}', [AdminController::class, 'updateMenu'])->name('admin.menus.update');
     Route::delete('/menus/{id}', [AdminController::class, 'deleteMenu'])->name('admin.menus.delete');
 
     // Products

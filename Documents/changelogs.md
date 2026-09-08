@@ -26,6 +26,18 @@
   * **Integrated Search & Empty States:** Added live keyword search filtering across theme titles, slugs, authors, and descriptions, coupled with contextual empty state messages when no themes match the selected criteria.
   * **Automated Feature Test Coverage:** Built dedicated test suite `tests/Feature/Themes/ThemeAjaxActivationTest.php` validating filter toolbar rendering, standard HTTP fallback, JSON AJAX activation, and error handling (4 passed, 24 assertions).
 
+### Admin Navigation Menus Superdesign & Zero-Reload AJAX Overhaul
+* **Admin Navigation Menus (@.superdesign & Full AJAX Workflow — `/admin/menus`):**
+  * **Complete @.superdesign Visual Overhaul:** Redesigned the `/admin/menus` management interface according to `.superdesign` guidelines. Features a modern glassmorphic hero header with breadcrumbs and live counters (`#heroTotalCount`), 2-column responsive workspace grid (`.admin-workspace-grid`), card elevation with soft shadows and rounded tokens, quick-insert route shortcut chips (`/`, `/forum`, `/store`, `/news`, `/directory`), and full dark mode (`html.app-skin-dark`) & RTL support.
+  * **Zero-Reload AJAX Lifecycle:** Transformed all menu operations (Add, Inline Quick Save, Modal Edit, and Delete) into asynchronous, non-blocking requests via `fetch()`:
+    * **Add Menu:** Dynamically prepends newly created menu rows to the table with highlight animations, clears input fields, and increments global and card counter badges in real-time.
+    * **Inline & Modal Edit:** Enables instant in-place table cell editing with saving indicators or centralized editing via `#menuEditModal`, updating table rows without reloading.
+    * **Delete Confirmation Modal:** Replaced traditional form deletion with `#menuDeleteModal`, smoothly animating row removal (`fade-out`), decrementing counters, and displaying empty states when 0 items remain.
+    * **Live Client-Side Filtering:** Instant search filtering across menu titles, URLs, and IDs as the user types.
+    * **Integrated Toast Notifications:** Auto-dismissing glassmorphic toast notification engine delivering real-time operation status.
+  * **Controller Enhancement (`AdminController`):** Enhanced `menus`, `storeMenu`, `updateMenu`, and `deleteMenu` to handle AJAX/JSON requests, deliver structured JSON error envelopes on validation failures (`422 Unprocessable Entity`), invalidate cached primary menus (`CacheWarmupService::CACHE_KEY_PRIMARY_MENUS`), and retain standard HTTP redirect fallback.
+  * **Automated Feature Test Coverage:** Comprehensive test suite in `tests/Feature/AdminMenusAjaxTest.php` validating admin page rendering, AJAX creation, validation errors, PUT/POST updates, deletion, and cache invalidation (7 passed, 41 assertions).
+
 ### Developer Platform & API Authentication Resilience
 * **Backend & API Authentication (Universal Authorization Header & Bearer Token Resolution — `DeveloperApiController::validateToken`):** Overhauled token extraction and authentication verification in `DeveloperApiController` to resolve `401 Unauthorized` ("Missing or invalid Authorization header") errors occurring on Apache, FastCGI, FPM, cPanel, and reverse proxy environments where HTTP `Authorization` headers are stripped or renamed by web server daemons before reaching PHP.
   * **Native Laravel Bearer Extraction:** Utilized `$request->bearerToken()` as the primary, standards-compliant Bearer token extraction pipeline.
