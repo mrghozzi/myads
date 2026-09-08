@@ -2158,6 +2158,8 @@ return [
     'total_themes' => '主题总数',
     'active_plugins' => '活跃插件',
     'available_updates' => '可用更新',
+    'no_matching_extensions' => '未找到匹配的扩展程序',
+    'try_adjusting_search_filter' => '请尝试调整搜索词或所选筛选器',
     'upload_plugin_info' => '上传包含有效插件结构和清单的 ZIP 包。',
     'view_changelog' => '查看变更日志',
     'reports_desc' => '无需离开队列即可查看成员报告、检查标记的目标并清除审核项目。',

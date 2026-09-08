@@ -1862,6 +1862,8 @@ return [
     'total_themes' => 'Themes au total',
     'active_plugins' => 'Plugins actifs',
     'available_updates' => 'Mises a jour disponibles',
+    'no_matching_extensions' => 'Aucune extension correspondante trouvée',
+    'try_adjusting_search_filter' => 'Essayez d\'ajuster votre recherche ou le filtre sélectionné',
     'reports_desc' => 'Examinez les signalements des membres, inspectez la cible signalee et traitez la moderation sans quitter la file.',
     'reviewed' => 'Traite',
     'translation_default_reference' => 'Texte anglais par dÃ©faut',

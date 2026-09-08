@@ -2368,6 +2368,8 @@ return [
     'total_themes' => 'Total themes',
     'active_plugins' => 'Active plugins',
     'available_updates' => 'Available updates',
+    'no_matching_extensions' => 'No matching extensions found',
+    'try_adjusting_search_filter' => 'Try adjusting your search query or selected filter',
     'upload_plugin_info' => 'Upload a ZIP package that includes a valid plugin structure and manifest.',
     'view_changelog' => 'View changelog',
     'reports_desc' => 'Review member reports, inspect the flagged target, and clear moderation items without leaving the queue.',

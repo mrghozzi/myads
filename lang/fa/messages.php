@@ -1869,6 +1869,8 @@ return [
     'total_themes' => 'مجموع قالب ها',
     'active_plugins' => 'افزونه های فعال',
     'available_updates' => 'به روزرسانی های موجود',
+    'no_matching_extensions' => 'هیچ افزونه یا قالبی یافت نشد',
+    'try_adjusting_search_filter' => 'عبارت جستجو یا فیلتر انتخابی خود را تغییر دهید',
     'reports_desc' => 'گزارش‌های اعضا را بررسی کنید، مورد گزارش‌‌شده را ببینید و بدون خروج از صف، موارد مدیریتی را رسیدگی کنید.',
     'reviewed' => 'بررسی شد',
     'translation_default_reference' => 'متن پیش‌فرض انگلیسی',

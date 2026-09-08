@@ -1879,6 +1879,8 @@ return [
     'total_themes' => 'Toplam tema',
     'active_plugins' => 'Etkin eklentiler',
     'available_updates' => 'Mevcut guncellemeler',
+    'no_matching_extensions' => 'Eşleşen eklenti veya tema bulunamadı',
+    'try_adjusting_search_filter' => 'Arama sorgunuzu veya seçilen filtreyi değiştirmeyi deneyin',
     'reports_desc' => 'Uye bildirimlerini inceleyin, bildirilen hedefi kontrol edin ve kuyruktan cikmadan moderasyon islemlerini tamamlayin.',
     'reviewed' => 'Incelendi',
     'translation_default_reference' => 'VarsayÄ±lan Ä°ngilizce Metin',

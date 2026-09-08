@@ -1869,6 +1869,8 @@ return [
     'total_themes' => 'Total de temas',
     'active_plugins' => 'Plugins ativos',
     'available_updates' => 'Atualizacoes disponiveis',
+    'no_matching_extensions' => 'Nenhuma extensão correspondente encontrada',
+    'try_adjusting_search_filter' => 'Tente ajustar sua pesquisa ou o filtro selecionado',
     'reports_desc' => 'Revise os relatos dos membros, inspecione o alvo sinalizado e conclua a moderacao sem sair da fila.',
     'reviewed' => 'Revisado',
     'translation_default_reference' => 'Texto padrÃ£o em inglÃªs',

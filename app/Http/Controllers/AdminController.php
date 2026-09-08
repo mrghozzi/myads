@@ -4356,14 +4356,44 @@ class AdminController extends Controller
         try {
             if ($themeManager->activate($request->slug)) {
                 $this->maintenanceMode->disable(Auth::user(), 'theme_activation_success');
+                if ($request->expectsJson() || $request->ajax()) {
+                    $themes = $themeManager->getAllThemes();
+                    $activeTheme = collect($themes)->firstWhere('slug', $request->slug);
+                    $themeName = $activeTheme['name'] ?? $request->slug;
+                    return response()->json([
+                        'success' => true,
+                        'message' => __('messages.theme_activated_successfully'),
+                        'slug' => $request->slug,
+                        'theme_name' => $themeName,
+                        'is_active' => true,
+                        'active_slug' => $request->slug,
+                        'customizer_url' => route('admin.themes.customizer', ['theme' => $request->slug]),
+                    ]);
+                }
                 return redirect()->back()->with('success', __('messages.theme_activated_successfully'));
             }
 
             $this->maintenanceMode->disable(Auth::user(), 'theme_activation_failed');
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => __('messages.theme_activation_failed'),
+                ], 422);
+            }
             return redirect()->back()->with('error', __('messages.theme_activation_failed'));
         } catch (\Throwable $e) {
             $this->maintenanceMode->disable(Auth::user(), 'theme_activation_error');
             report($e);
+            $errorMessage = __('messages.theme_activation_failed');
+            if (config('app.debug')) {
+                $errorMessage .= ' (' . $e->getMessage() . ')';
+            }
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => $errorMessage,
+                ], 500);
+            }
             return redirect()->back()->with('error', __('messages.theme_activation_failed'));
         }
     }

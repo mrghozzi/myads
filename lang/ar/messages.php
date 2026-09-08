@@ -2370,6 +2370,8 @@ return [
     'total_themes' => 'إجمالي القوالب',
     'active_plugins' => 'الإضافات النشطة',
     'available_updates' => 'التحديثات المتاحة',
+    'no_matching_extensions' => 'لا توجد إضافات أو قوالب مطابقة',
+    'try_adjusting_search_filter' => 'جرب تغيير عبارة البحث أو الفلتر المختار',
     'update_available' => 'تحديث متاح',
     'upload_plugin_info' => 'ارفع ملف ZIP يحتوي على بنية إضافة صحيحة وملف تعريف صالح.',
     'reports_desc' => 'راجع بلاغات الأعضاء، وافحص العنصر المبلّغ عنه، وأنهِ عناصر الإشراف من نفس القائمة.',

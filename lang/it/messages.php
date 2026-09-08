@@ -1869,6 +1869,8 @@ return [
     'total_themes' => 'Temi totali',
     'active_plugins' => 'Plugin attivi',
     'available_updates' => 'Aggiornamenti disponibili',
+    'no_matching_extensions' => 'Nessuna estensione corrispondente trovata',
+    'try_adjusting_search_filter' => 'Prova a modificare la ricerca o il filtro selezionato',
     'reports_desc' => 'Controlla le segnalazioni dei membri, ispeziona l\'elemento segnalato e gestisci la moderazione senza uscire dalla coda.',
     'reviewed' => 'Revisionato',
     'translation_default_reference' => 'Testo inglese predefinito',

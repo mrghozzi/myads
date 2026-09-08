@@ -1884,6 +1884,8 @@ return [
     'total_themes' => 'Temas totales',
     'active_plugins' => 'Plugins activos',
     'available_updates' => 'Actualizaciones disponibles',
+    'no_matching_extensions' => 'No se encontraron extensiones coincidentes',
+    'try_adjusting_search_filter' => 'Intente ajustar su búsqueda o el filtro seleccionado',
     'reports_desc' => 'Revisa los reportes de los miembros, inspecciona el objetivo marcado y resuelve elementos de moderacion sin salir de la cola.',
     'reviewed' => 'Revisado',
     'translation_default_reference' => 'Texto predeterminado en inglÃ©s',

@@ -2158,6 +2158,8 @@ return [
     'total_themes' => '主題總數',
     'active_plugins' => '活躍插件',
     'available_updates' => '可用更新',
+    'no_matching_extensions' => '未找到符合的擴充程式',
+    'try_adjusting_search_filter' => '請嘗試調整搜尋字詞或所選篩選器',
     'upload_plugin_info' => '上傳包含有效插件結構和清單的 ZIP 套件。',
     'view_changelog' => '查看變更日誌',
     'reports_desc' => '無需離開佇列即可查看成員報告、檢查標記的目標並清除審核項目。',

@@ -2158,6 +2158,8 @@ return [
     'total_themes' => '合計テーマ',
     'active_plugins' => 'アクティブなプラグイン',
     'available_updates' => '利用可能なアップデート',
+    'no_matching_extensions' => '一致する拡張機能が見つかりません',
+    'try_adjusting_search_filter' => '検索キーワードまたは選択したフィルターを調整してみてください',
     'upload_plugin_info' => '有効なプラグイン構造とマニフェストを含む ZIP パッケージをアップロードします。',
     'view_changelog' => '変更ログを表示する',
     'reports_desc' => 'キューから離れることなく、メンバーのレポートを確認し、フラグが設定されたターゲットを検査し、モデレーション項目をクリアします。',
