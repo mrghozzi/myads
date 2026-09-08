@@ -4073,4 +4073,6 @@ return [
     'code' => 'Código',
     'copied' => 'Copiado!',
     'mermaid_render_error' => 'Não foi possível renderizar o diagrama Mermaid, verifique a sintaxe.',
+    'shortcut' => 'Atalho',
+    'shortcuts' => 'Atalhos',
 ];

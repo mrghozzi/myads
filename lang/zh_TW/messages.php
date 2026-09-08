@@ -4076,4 +4076,6 @@ return [
     'code' => '程式碼',
     'copied' => '已複製！',
     'mermaid_render_error' => '無法渲染 Mermaid 圖表，請檢查語法結構。',
+    'shortcut' => '快捷方式',
+    'shortcuts' => '快捷方式',
 ];

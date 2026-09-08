@@ -4073,4 +4073,6 @@ return [
     'code' => 'Codice',
     'copied' => 'Copiato!',
     'mermaid_render_error' => 'Impossibile eseguire il rendering del diagramma Mermaid, verificare la sintassi.',
+    'shortcut' => 'Scorciatoia',
+    'shortcuts' => 'Scorciatoie',
 ];

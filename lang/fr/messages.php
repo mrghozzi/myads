@@ -4082,4 +4082,6 @@ return [
     'code' => 'Code',
     'copied' => 'Copié !',
     'mermaid_render_error' => 'Impossible de générer le diagramme Mermaid, veuillez vérifier la syntaxe.',
+    'shortcut' => 'Raccourci',
+    'shortcuts' => 'Raccourcis',
 ];

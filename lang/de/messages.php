@@ -4078,4 +4078,6 @@ return [
     'code' => 'Code',
     'copied' => 'Kopiert!',
     'mermaid_render_error' => 'Mermaid-Diagramm konnte nicht gerendert werden, bitte Syntax prüfen.',
+    'shortcut' => 'Verknüpfung',
+    'shortcuts' => 'Verknüpfungen',
 ];

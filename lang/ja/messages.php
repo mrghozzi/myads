@@ -4071,4 +4071,6 @@ return [
     'code' => 'コード',
     'copied' => 'コピーしました！',
     'mermaid_render_error' => 'Mermaid ダイアグラムを描画できませんでした。構文を確認してください。',
+    'shortcut' => 'ショートカット',
+    'shortcuts' => 'ショートカット',
 ];

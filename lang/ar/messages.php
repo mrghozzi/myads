@@ -4265,4 +4265,6 @@ return [
     'code' => 'الكود',
     'copied' => 'تم النسخ!',
     'mermaid_render_error' => 'تعذر رسم المخطط، يرجى التحقق من بنية كود Mermaid.',
+    'shortcut' => 'اختصار',
+    'shortcuts' => 'اختصارات',
 ];

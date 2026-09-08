@@ -4264,4 +4264,6 @@ return [
     'code' => 'Code',
     'copied' => 'Copied!',
     'mermaid_render_error' => 'Could not render Mermaid diagram syntax.',
+    'shortcut' => 'Shortcut',
+    'shortcuts' => 'Shortcuts',
 ];

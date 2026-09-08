@@ -4078,4 +4078,6 @@ return [
     'code' => 'Kod',
     'copied' => 'Kopyalandı!',
     'mermaid_render_error' => 'Mermaid diyagramı oluşturulamadı, lütfen sözdizimini kontrol edin.',
+    'shortcut' => 'Kısayol',
+    'shortcuts' => 'Kısayollar',
 ];

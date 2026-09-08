@@ -4073,4 +4073,6 @@ return [
     'code' => 'کد',
     'copied' => 'کپی شد!',
     'mermaid_render_error' => 'امکان رسم نمودار Mermaid وجود ندارد، لطفاً ساختار کد را بررسی کنید.',
+    'shortcut' => 'میانبر',
+    'shortcuts' => 'میانبرها',
 ];

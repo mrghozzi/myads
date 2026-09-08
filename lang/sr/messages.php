@@ -4071,4 +4071,6 @@ return [
     'code' => 'Kod',
     'copied' => 'Kopirano!',
     'mermaid_render_error' => 'Nije moguće prikazati Mermaid dijagram, proverite sintaksu.',
+    'shortcut' => 'Пречица',
+    'shortcuts' => 'Пречице',
 ];
