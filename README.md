@@ -28,6 +28,7 @@ Built with passion on **Laravel 12**, **PHP 8.2+**, and **Bootstrap 5 / Flutter*
 <a href="#-official-flutter-mobile-app"><strong>Mobile App</strong></a> •
 <a href="#-developer-platform--rest-api"><strong>Developer API</strong></a> •
 <a href="Documents/README.md"><strong>Documentation</strong></a> •
+<a href="README_AR.md"><strong>🇸🇦 النسخة العربية</strong></a> •
 <a href="#-community--support"><strong>Support</strong></a>
 
 <br/><br/>
