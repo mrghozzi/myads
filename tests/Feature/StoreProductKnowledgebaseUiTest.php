@@ -140,7 +140,8 @@ class StoreProductKnowledgebaseUiTest extends TestCase
 
         // 2. Meta description and robots
         $this->assertStringContainsString('<meta name="description"', $html);
-        $this->assertStringContainsString('content="index,follow"', $html);
+        $this->assertStringContainsString('name="robots"', $html);
+        $this->assertStringContainsString('index,follow', $html);
 
         // 3. Schema.org Product & Breadcrumbs JSON-LD in head
         $this->assertStringContainsString('"@type":"Product"', $html);
@@ -157,6 +158,57 @@ class StoreProductKnowledgebaseUiTest extends TestCase
         $this->assertStringContainsString('<h3>Features Overview</h3>', $html);
         $this->assertStringContainsString('.markdown-content { display: block; word-break: break-word; }', $html);
         $this->assertStringNotContainsString('.markdown-content { display: none; }', $html);
+    }
+
+    public function test_store_show_renders_topic_tab_and_seo_microdata_on_bootstrap_sample_theme(): void
+    {
+        Setting::create([
+            'titer' => 'MyAds',
+            'url' => 'https://example.test',
+            'styles' => 'bootstrap-sample',
+            'lang' => 'en',
+            'timezone' => 'UTC',
+        ]);
+        \Illuminate\Support\Facades\View::getFinder()->replaceNamespace('theme', [base_path('themes/bootstrap-sample/views')]);
+        $GLOBALS['MYADS_ACTIVE_THEME'] = 'bootstrap-sample';
+        $this->createAdmin();
+        $owner = User::factory()->create(['username' => 'bsowner']);
+        $product = $this->createStoreProduct($owner, 'bs-sample-product');
+
+        \App\Models\ForumTopic::create([
+            'name' => $product->name,
+            'txt' => "### Bootstrap Sample Overview\nThis product is tested with the bootstrap-sample theme.",
+            'cat' => 1,
+            'uid' => $owner->id,
+            'statu' => 1,
+        ]);
+
+        $response = $this->actingAs($owner)->get(route('store.show', $product->name));
+        $html = $response->getContent();
+
+        $response->assertOk();
+
+        // 1. Topic tab active by default, Details tab eliminated
+        $this->assertStringContainsString('data-bs-target="#topic-tab"', $html);
+        $this->assertStringContainsString('id="topic-tab"', $html);
+        $this->assertStringNotContainsString('data-bs-target="#desc-tab"', $html);
+        $this->assertStringNotContainsString('id="desc-tab"', $html);
+
+        // 2. Server-side markdown rendering
+        $this->assertStringContainsString('id="store-topic-display"', $html);
+        $this->assertStringContainsString('<h3>Bootstrap Sample Overview</h3>', $html);
+        $this->assertStringContainsString('data-rendered="true"', $html);
+        $this->assertStringContainsString('.markdown-content { display: block; word-break: break-word; }', $html);
+
+        // 3. Semantic Heading & Single h1
+        $this->assertStringContainsString('<h1 class="fw-black mb-3 text-dark h2 section-title" itemprop="name">bs-sample-product</h1>', $html);
+        $this->assertSame(1, substr_count($html, '<h1 '));
+
+        // 4. Schema.org Product & Microdata
+        $this->assertStringContainsString('itemscope itemtype="https://schema.org/Product"', $html);
+        $this->assertStringContainsString('itemscope itemtype="https://schema.org/Offer"', $html);
+        $this->assertStringContainsString('"@type":"Product"', $html);
+        $this->assertStringContainsString('"@type":"BreadcrumbList"', $html);
     }
 
     public function test_knowledgebase_show_displays_topic_and_publisher_reports_when_author_exists(): void
