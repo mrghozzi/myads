@@ -100,7 +100,11 @@ class SeoManager
         $og = array_filter([
             'title' => (string) ($context['og_title'] ?? $rule?->og_title ?? $title),
             'description' => (string) ($context['og_description'] ?? $rule?->og_description ?? $description),
-            'type' => $schemaType === 'Article' ? 'article' : 'website',
+            'type' => match ($schemaType) {
+                'Article' => 'article',
+                'Product' => 'product',
+                default => 'website',
+            },
             'url' => $canonicalUrl,
             'image' => $image,
             'site_name' => $tokens['site'],
@@ -478,6 +482,48 @@ class SeoManager
                 ]),
                 'url' => $canonicalUrl,
             ]);
+        } elseif ($schemaType === 'Product') {
+            $price = isset($context['price']) ? (float) $context['price'] : 0.0;
+            $currency = (string) ($context['price_currency'] ?? 'PTS');
+            $availability = (string) ($context['availability'] ?? 'https://schema.org/InStock');
+
+            $offers = array_filter([
+                '@type' => 'Offer',
+                'price' => $price,
+                'priceCurrency' => $currency,
+                'availability' => $availability,
+                'url' => $canonicalUrl,
+                'priceValidUntil' => Carbon::now()->addYear()->toDateString(),
+            ]);
+
+            $brandName = (string) ($context['brand_name'] ?? $tokens['site'] ?? 'MyAds');
+            $productBlock = array_filter([
+                '@context' => 'https://schema.org',
+                '@type' => 'Product',
+                'name' => $title,
+                'description' => $description,
+                'image' => $image ? [$image] : null,
+                'category' => (string) ($context['category_name'] ?? null) ?: null,
+                'brand' => array_filter([
+                    '@type' => 'Brand',
+                    'name' => $brandName,
+                ]),
+                'offers' => $offers,
+                'url' => $canonicalUrl,
+            ]);
+
+            $reviewCount = isset($context['review_count']) ? (int) $context['review_count'] : (isset($context['download_count']) && $context['download_count'] > 0 ? (int) $context['download_count'] : null);
+            if ($reviewCount !== null && $reviewCount > 0) {
+                $ratingValue = isset($context['rating_value']) ? (float) $context['rating_value'] : 5.0;
+                $productBlock['aggregateRating'] = [
+                    '@type' => 'AggregateRating',
+                    'ratingValue' => $ratingValue,
+                    'bestRating' => 5,
+                    'ratingCount' => $reviewCount,
+                ];
+            }
+
+            $blocks[] = $productBlock;
         } else {
             $blocks[] = array_filter([
                 '@context' => 'https://schema.org',
@@ -543,6 +589,7 @@ class SeoManager
             'news_show' => 'Article',
             'forum_topic' => 'DiscussionForumPosting',
             'profile_show' => 'ProfilePage',
+            'store_show' => 'Product',
             default => 'WebPage',
         };
     }

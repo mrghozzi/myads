@@ -9,7 +9,7 @@
                     </picture>
                 </a>
             </div>
-            <h1 class="header-brand-text">{{ $site_settings->titer ?? 'MyAds' }}</h1>
+            <span class="header-brand-text">{{ $site_settings->titer ?? 'MyAds' }}</span>
         </div>
     </div>
 

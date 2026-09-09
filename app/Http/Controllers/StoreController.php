@@ -218,19 +218,51 @@ class StoreController extends Controller
             }
         }
 
+        $categoryName = $type ? $type->name : '';
+        $categoryLabel = $categoryName ? (__('messages.' . $categoryName) ?? $categoryName) : '';
+        $owner = $product->user;
+
+        $rawDescription = trim(strip_tags((string) ($product->o_valuer ?: ($topic?->txt ?? ''))));
+        $rawDescription = preg_replace('/\s+/u', ' ', $rawDescription) ?? '';
+        $cleanDescription = Str::limit($rawDescription, 160, '...');
+        if (empty($cleanDescription)) {
+            $cleanDescription = __('messages.seo_store_description') ?? ($product->name . ' - ' . __('messages.store'));
+        }
+
+        $price = (float) ($product->has_active_sale ? $product->sale_price : $product->o_order);
+
+        $keywords = array_filter([
+            $product->name,
+            $categoryLabel,
+            $categoryName,
+            __('messages.store'),
+            __('messages.download'),
+            'store',
+            'download',
+            'product',
+        ]);
+
         $this->seo([
             'scope_key' => 'store_show',
             'content_type' => 'product',
             'content_id' => $product->id,
             'resource_title' => $product->name,
-            'description' => Str::limit(strip_tags((string) $product->o_valuer), 170, ''),
+            'description' => $cleanDescription,
             'image' => $product->product_image,
-            'lastmod' => $status?->date,
-            'breadcrumbs' => [
+            'lastmod' => $status?->date ?? $product->updated_at?->timestamp,
+            'category_name' => $categoryLabel ?: $categoryName,
+            'author_name' => $owner?->username,
+            'author_url' => $owner ? route('profile.show', $owner->username) : null,
+            'price' => $price,
+            'price_currency' => 'PTS',
+            'download_count' => $downloadCount,
+            'keywords' => implode(', ', array_unique($keywords)),
+            'breadcrumbs' => array_values(array_filter([
                 ['name' => __('messages.home'), 'url' => url('/')],
                 ['name' => __('messages.store'), 'url' => route('store.index')],
+                $categoryLabel ? ['name' => $categoryLabel, 'url' => route('store.script_category', ['script' => 'all', 'category' => $categoryName])] : null,
                 ['name' => $product->name, 'url' => route('store.show', $product->name)],
-            ],
+            ])),
         ]);
 
         return view('theme::store.show', compact('product', 'status', 'type', 'topic', 'latestFile', 'downloadHash', 'downloadCount', 'files', 'canManageProduct', 'isSuspended', 'license'));

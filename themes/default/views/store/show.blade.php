@@ -20,30 +20,30 @@
     $latestVersionLabel = $latestFile ? $latestFile->name : 'v1.0';
     $fileCount = $files->count();
     $reportKey = 'product' . $product->id;
-    $pageSummary = \Illuminate\Support\Str::limit($product->o_valuer, 240);
+    $pageSummary = \Illuminate\Support\Str::limit(strip_tags((string) ($product->o_valuer ?: ($topic?->txt ?? ''))), 240);
 @endphp
 
 @include('theme::store.partials.page-shell-styles')
 @include('theme::store.partials.kb-superdesign-formatter')
 
-
-
-<div class="section-header">
+<header class="section-header">
     <div class="section-header-info">
-        <p class="section-pretitle">{{ $categoryLabel }}</p>
-        <h2 class="section-title">{{ $product->name }}</h2>
+        @if($categoryLabel)
+            <p class="section-pretitle">{{ $categoryLabel }}</p>
+        @endif
+        <h1 class="section-title">{{ $product->name }}</h1>
     </div>
-    <div class="section-header-actions">
+    <nav aria-label="breadcrumb" class="section-header-actions">
         <a class="section-header-subsection" href="{{ route('store.index') }}">{{ __('messages.store') }}</a>
         @if($categoryLabel)
-            <a class="section-header-subsection" href="#">{{ $categoryLabel }}</a>
+            <a class="section-header-subsection" href="{{ route('store.script_category', ['script' => 'all', 'category' => $type?->name ?? 'all']) }}">{{ $categoryLabel }}</a>
         @endif
         @if($subCategoryLabel)
-            <a class="section-header-subsection" href="#">{{ $subCategoryLabel }}</a>
+            <span class="section-header-subsection">{{ $subCategoryLabel }}</span>
         @endif
-        <p class="section-header-subsection">{{ $product->name }}</p>
-    </div>
-</div>
+        <span class="section-header-subsection" aria-current="page">{{ $product->name }}</span>
+    </nav>
+</header>
 
 @if(session('success'))
     <div class="alert alert-success" role="alert">
@@ -59,33 +59,42 @@
     </div>
 @endif
 
-<div class="store-detail-page post{{ $status ? $status->id : $product->id }}">
+<article class="store-detail-page post{{ $status ? $status->id : $product->id }}" itemscope itemtype="https://schema.org/Product">
     <div class="widget-box store-shell-card no-padding">
         <div class="store-hero">
             <div class="store-hero__main">
                 <div class="store-hero__media">
-                    <img src="{{ $productImage }}" alt="{{ $product->name }}" onerror="this.onerror=null;this.src='{{ theme_asset('img/error_plug.png') }}';">
+                    <img itemprop="image" src="{{ $productImage }}" alt="{{ $product->name }}" title="{{ $product->name }}" loading="eager" decoding="async" width="280" height="180" onerror="this.onerror=null;this.src='{{ theme_asset('img/error_plug.png') }}';">
                 </div>
                 <div class="store-hero__content">
                     <div class="store-badge-row">
-                        @if($product->has_active_sale)
-                            <span class="store-pill store-pill-sale" style="background: #e74c3c; color: white;">
-                                <span class="old-price" style="text-decoration: line-through; opacity: 0.7; margin-right: 5px;">{{ $product->o_order }}</span>
-                                <strong>{{ $product->sale_price }}</strong> {{ __('messages.points') }}
-                            </span>
-                        @elseif($product->o_order > 0)
-                            <span class="store-pill"><strong>{{ $product->o_order }}</strong> {{ __('messages.points') }}</span>
-                        @else
-                            <span class="store-pill">{{ __('messages.free') }}</span>
-                        @endif
+                        @php
+                            $numericPrice = (float) ($product->has_active_sale ? $product->sale_price : $product->o_order);
+                        @endphp
+                        <div itemprop="offers" itemscope itemtype="https://schema.org/Offer" style="display: inline-flex;">
+                            <meta itemprop="price" content="{{ $numericPrice }}">
+                            <meta itemprop="priceCurrency" content="PTS">
+                            <meta itemprop="availability" content="https://schema.org/InStock">
+                            <meta itemprop="url" content="{{ route('store.show', $product->name) }}">
+                            @if($product->has_active_sale)
+                                <span class="store-pill store-pill-sale" style="background: #e74c3c; color: white;">
+                                    <span class="old-price" style="text-decoration: line-through; opacity: 0.7; margin-right: 5px;">{{ $product->o_order }}</span>
+                                    <strong>{{ $product->sale_price }}</strong> {{ __('messages.points') }}
+                                </span>
+                            @elseif($product->o_order > 0)
+                                <span class="store-pill"><strong>{{ $product->o_order }}</strong> {{ __('messages.points') }}</span>
+                            @else
+                                <span class="store-pill">{{ __('messages.free') }}</span>
+                            @endif
+                        </div>
                         @if($categoryLabel)
-                            <span class="store-pill">{{ $categoryLabel }}</span>
+                            <span class="store-pill" itemprop="category">{{ $categoryLabel }}</span>
                         @endif
                         @if($subCategoryLabel)
                             <span class="store-pill">{{ $subCategoryLabel }}</span>
                         @endif
                     </div>
-                    <h3 class="store-title">{{ $product->name }}</h3>
+                    <h2 class="store-title" itemprop="name">{{ $product->name }}</h2>
                     <p class="store-subtitle">{{ $pageSummary }}</p>
                     <div class="store-stat-grid">
                         <div class="store-stat-card">
@@ -163,7 +172,7 @@
                 </div>
             </div>
 
-            <div class="store-aside">
+            <aside class="store-aside">
                 <div class="store-aside-card">
                     <div class="store-aside-card__header">
                         <div>
@@ -296,7 +305,7 @@
                     </p>
                 </div>
                 @endif
-            </div>
+            </aside>
         </div>
     </div>
 
@@ -338,7 +347,7 @@
                         @endif
 
                         {{-- Read-only view --}}
-                        <div id="store-topic-display" class="store-rich-text markdown-content">{!! $topic?->txt ?? $product->o_valuer !!}</div>
+                        <div id="store-topic-display" class="store-rich-text markdown-content" data-rendered="true" itemprop="description">{!! \Illuminate\Support\Str::markdown($topic?->txt ?? $product->o_valuer ?? '') !!}</div>
 
                         {{-- Editor (hidden by default) --}}
                         @if($canManageProduct)
@@ -419,7 +428,7 @@
             </div>
         </div>
     </div>
-</div>
+</article>
 
 <script>
     document.querySelectorAll('.tab-box-option').forEach(function(tab) {
@@ -460,12 +469,12 @@
                         el.innerHTML = DOMPurify.sanitize(marked.parse(text));
                         el.setAttribute('data-rendered', 'true');
                         el.style.display = 'block';
-                        if (window.enhanceSuperdesignKbContent) {
-                            window.enhanceSuperdesignKbContent(el);
-                        }
                     } catch (e) {
                         console.error('Error rendering markdown:', e);
                     }
+                }
+                if (window.enhanceSuperdesignKbContent) {
+                    window.enhanceSuperdesignKbContent(el);
                 }
             });
         }
@@ -606,7 +615,7 @@
     });
 </script>
 <style>
-    .markdown-content { display: none; }
+    .markdown-content { display: block; word-break: break-word; }
     .store-topic-toolbar {
         display: flex;
         align-items: center;

@@ -114,6 +114,51 @@ class StoreProductKnowledgebaseUiTest extends TestCase
         ]);
     }
 
+    public function test_store_show_renders_optimal_seo_metadata_schema_jsonld_and_semantic_headings(): void
+    {
+        $this->seedThemeSetting();
+        $this->createAdmin();
+        $owner = User::factory()->create(['username' => 'testauthor']);
+        $product = $this->createStoreProduct($owner, 'seo-master-product');
+
+        \App\Models\ForumTopic::create([
+            'name' => $product->name,
+            'txt' => "### Features Overview\nThis product is optimized for search engines with markdown support.",
+            'cat' => 1,
+            'uid' => $owner->id,
+            'statu' => 1,
+        ]);
+
+        $response = $this->get(route('store.show', $product->name));
+        $html = $response->getContent();
+
+        $response->assertOk();
+
+        // 1. Semantic Heading structure: single h1
+        $this->assertStringContainsString('<h1 class="section-title">seo-master-product</h1>', $html);
+        $this->assertSame(1, substr_count($html, '<h1 '));
+
+        // 2. Meta description and robots
+        $this->assertStringContainsString('<meta name="description"', $html);
+        $this->assertStringContainsString('content="index,follow"', $html);
+
+        // 3. Schema.org Product & Breadcrumbs JSON-LD in head
+        $this->assertStringContainsString('"@type":"Product"', $html);
+        $this->assertStringContainsString('"@type":"Offer"', $html);
+        $this->assertStringContainsString('"price":15', $html);
+        $this->assertStringContainsString('"@type":"BreadcrumbList"', $html);
+
+        // 4. Microdata Schema tags
+        $this->assertStringContainsString('itemscope itemtype="https://schema.org/Product"', $html);
+        $this->assertStringContainsString('itemscope itemtype="https://schema.org/Offer"', $html);
+
+        // 5. Server-rendered markdown content visible without display:none
+        $this->assertStringContainsString('id="store-topic-display"', $html);
+        $this->assertStringContainsString('<h3>Features Overview</h3>', $html);
+        $this->assertStringContainsString('.markdown-content { display: block; word-break: break-word; }', $html);
+        $this->assertStringNotContainsString('.markdown-content { display: none; }', $html);
+    }
+
     public function test_knowledgebase_show_displays_topic_and_publisher_reports_when_author_exists(): void
     {
         $this->seedThemeSetting();

@@ -122,9 +122,9 @@ class SitemapController extends Controller
                 'products' => $this->streamModelEntries(
                     $this->publishedProductsQuery()->offset($offset)->limit($this->chunkSize)->get(),
                     fn (Product $product) => route('store.show', $product->name),
-                    fn () => null,
+                    fn (Product $product) => $product->updated_at,
                     'weekly',
-                    '0.7'
+                    '0.8'
                 ),
                 'knowledgebase_indexes' => $this->streamModelEntries(
                     $this->knowledgebaseIndexesQuery()->offset($offset)->limit($this->chunkSize)->get(),
