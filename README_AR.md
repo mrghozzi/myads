@@ -14,6 +14,7 @@
 [![إطار العمل](https://img.shields.io/badge/Laravel-12.x-ff2d20.svg?style=for-the-badge&logo=laravel)](https://laravel.com)
 [![بيئة التشغيل](https://img.shields.io/badge/PHP-8.2%2B-777bb4.svg?style=for-the-badge&logo=php)](https://php.net)
 [![تطبيق الموبايل](https://img.shields.io/badge/تطبيق_الموبايل-Flutter_3.27%2B-02569b.svg?style=for-the-badge&logo=flutter)](https://github.com/mrghozzi/myads_app)
+[![فحص الاختبارات](https://img.shields.io/github/actions/workflow/status/mrghozzi/myads/tests.yml?branch=main&style=for-the-badge&logo=githubactions&label=الاختبارات&color=22c55e)](https://github.com/mrghozzi/myads/actions)
 [![الترخيص](https://img.shields.io/badge/الترخيص-MIT-10b981.svg?style=for-the-badge)](LICENSE)
 
 [![دعم عبر Ko-Fi](https://img.shields.io/badge/دعم-Ko--fi-ff5e5b.svg?style=for-the-badge&logo=ko-fi)](https://ko-fi.com/mrghozzi)

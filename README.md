@@ -14,6 +14,7 @@ Built with passion on **Laravel 12**, **PHP 8.2+**, and **Bootstrap 5 / Flutter*
 [![Laravel Version](https://img.shields.io/badge/Laravel-12.x-ff2d20.svg?style=for-the-badge&logo=laravel)](https://laravel.com)
 [![PHP Version](https://img.shields.io/badge/PHP-8.2%2B-777bb4.svg?style=for-the-badge&logo=php)](https://php.net)
 [![Flutter Mobile App](https://img.shields.io/badge/Flutter-3.27%2B-02569b.svg?style=for-the-badge&logo=flutter)](https://github.com/mrghozzi/myads_app)
+[![CI Tests](https://img.shields.io/github/actions/workflow/status/mrghozzi/myads/tests.yml?branch=main&style=for-the-badge&logo=githubactions&label=Tests&color=22c55e)](https://github.com/mrghozzi/myads/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-10b981.svg?style=for-the-badge)](LICENSE)
 
 [![Sponsor Ko-Fi](https://img.shields.io/badge/Sponsor-Ko--fi-ff5e5b.svg?style=for-the-badge&logo=ko-fi)](https://ko-fi.com/mrghozzi)

@@ -13,7 +13,7 @@ body:
     attributes:
       label: MYADS Version / App Version
       description: What version of MYADS or MYADS Mobile App are you running?
-      placeholder: e.g. v4.4.6 / Flutter App v1.0.0
+      placeholder: e.g. v4.5.6 / Flutter App v1.7.8
     validations:
       required: true
 

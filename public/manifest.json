@@ -1,11 +1,12 @@
 {
-  "name": "MYADS",
+  "name": "MYADS — Social Network & Ad Exchange",
   "short_name": "MYADS",
-  "description": "Social network and ad exchange platform",
+  "description": "Advanced social networking, video hub, digital marketplace, and ad exchange platform.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#f8faff",
+  "background_color": "#0f172a",
   "theme_color": "#615dfa",
+  "categories": ["social", "business", "entertainment"],
   "icons": [
     {
       "src": "/themes/default/img/android-icon-192x192.png",

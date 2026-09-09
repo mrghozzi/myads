@@ -1,10 +1,36 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "laravel/laravel",
+    "name": "mrghozzi/myads",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
-    "keywords": ["laravel", "framework"],
+    "description": "Advanced Laravel 12 social network, video hub, digital marketplace, and ad exchange platform for webmasters.",
+    "keywords": [
+        "laravel",
+        "laravel-12",
+        "social-network",
+        "ad-exchange",
+        "traffic-exchange",
+        "video-hub",
+        "shorts-clips",
+        "digital-marketplace",
+        "freelance-services",
+        "pts-rewards",
+        "flutter-app",
+        "banner-ads",
+        "webmasters"
+    ],
+    "homepage": "https://github.com/mrghozzi/myads",
     "license": "MIT",
+    "authors": [
+        {
+            "name": "mrghozzi",
+            "homepage": "https://github.com/mrghozzi"
+        }
+    ],
+    "support": {
+        "issues": "https://github.com/mrghozzi/myads/issues",
+        "source": "https://github.com/mrghozzi/myads",
+        "docs": "https://github.com/mrghozzi/myads/tree/main/Documents"
+    },
     "require": {
         "php": "^8.2",
         "laravel/framework": "^12.0",
