@@ -200,11 +200,9 @@
                                     <a class="simple-dropdown-link" href="{{ route('store.updates', $product->name) }}">
                                         <i class="fa fa-history" aria-hidden="true"></i>&nbsp;{{ __('messages.manage_updates') ?? 'Manage Updates' }}
                                     </a>
-                                    @if($topic)
                                     <button type="button" class="simple-dropdown-link store-dropdown-button" id="trigger-topic-edit-from-menu">
                                         <i class="fa fa-pencil-square" aria-hidden="true"></i>&nbsp;{{ __('messages.edit_topic') }}
                                     </button>
-                                    @endif
                                     <p class="simple-dropdown-link store-dropdown-button" onclick="deletePost({{ $product->id }}, 7867, '.store-detail-page')">
                                         <i class="fa fa-trash" aria-hidden="true"></i>&nbsp;{{ __('messages.delete') }}
                                     </p>
@@ -305,14 +303,9 @@
     <div class="widget-box store-content-card store-tabs">
         <div class="tab-box">
             <div class="tab-box-options">
-                <div class="tab-box-option active" data-tab="desc-tab">
-                    <p class="tab-box-option-title">{{ __('messages.details') }}</p>
-                </div>
-                @if($topic)
-                <div class="tab-box-option" data-tab="topic-tab">
+                <div class="tab-box-option active" data-tab="topic-tab">
                     <p class="tab-box-option-title">{{ __('messages.topic') }}</p>
                 </div>
-                @endif
                 <div class="tab-box-option" data-tab="comments-tab">
                     <p class="tab-box-option-title">{{ __('messages.comments') }} <span class="highlighted">{{ $commentCount }}</span></p>
                 </div>
@@ -321,48 +314,8 @@
                 </div>
             </div>
             <div class="tab-box-items">
-                <div class="tab-box-item" id="desc-tab" style="display: block; transition: none 0s ease 0s;">
-                    <div class="tab-box-item-content store-rich-text">
-                        @if($canManageProduct)
-                        <div class="store-details-toolbar">
-                            <button type="button" class="button secondary small" id="store-edit-details-btn">
-                                <i class="fa fa-pencil-square" aria-hidden="true"></i>&nbsp; {{ __('messages.edit_product') }}
-                            </button>
-                            <button type="button" class="button primary small" id="store-save-details-btn" style="display:none;">
-                                <i class="fa fa-floppy-o" aria-hidden="true"></i>&nbsp; {{ __('messages.save') }}
-                            </button>
-                            <button type="button" class="button white small" id="store-cancel-details-btn" style="display:none;">
-                                <i class="fa fa-times" aria-hidden="true"></i>&nbsp; {{ __('messages.cancel') }}
-                            </button>
-                            <span id="store-details-saving" style="display:none;color:#8f91ac;font-size:.85rem;margin-inline-start:10px;">
-                                <i class="fa fa-spinner fa-spin"></i>&nbsp; {{ __('messages.saving') }}
-                            </span>
-                            <span id="store-details-saved" style="display:none;color:#4ff461;font-size:.85rem;margin-inline-start:10px;">
-                                <i class="fa fa-check-circle"></i>&nbsp; {{ __('messages.saved') }}
-                            </span>
-                        </div>
-                        @endif
-
-                        {{-- Read-only view --}}
-                        <div id="store-details-display" class="markdown-content">{!! $product->o_valuer !!}</div>
-
-                        {{-- Editor (hidden by default) --}}
-                        @if($canManageProduct)
-                        <div id="store-details-editor" style="display:none;">
-                            <div class="stackedit-tools mb-2">
-                                <button type="button" class="button secondary small open-stackedit-details">
-                                    <i class="fa fa-pencil-square" aria-hidden="true"></i>&nbsp; {{ __('messages.edit_with_stackedit') }}
-                                </button>
-                            </div>
-                            <textarea id="store-details-textarea" rows="15" class="form-control" style="width:100%;padding:10px;">{{ $product->o_valuer }}</textarea>
-                        </div>
-                        @endif
-                    </div>
-                </div>
-
-                {{-- Topic Tab --}}
-                @if($topic)
-                <div class="tab-box-item" id="topic-tab" style="display: none; transition: none 0s ease 0s;">
+                {{-- Topic Tab (First and Default) --}}
+                <div class="tab-box-item" id="topic-tab" style="display: block; transition: none 0s ease 0s;">
                     <div class="tab-box-item-content">
                         @if($canManageProduct)
                         <div class="store-topic-toolbar">
@@ -385,7 +338,7 @@
                         @endif
 
                         {{-- Read-only view --}}
-                        <div id="store-topic-display" class="store-rich-text markdown-content">{!! $topic->txt !!}</div>
+                        <div id="store-topic-display" class="store-rich-text markdown-content">{!! $topic?->txt ?? $product->o_valuer !!}</div>
 
                         {{-- Editor (hidden by default) --}}
                         @if($canManageProduct)
@@ -395,12 +348,11 @@
                                     <i class="fa fa-pencil-square" aria-hidden="true"></i>&nbsp; {{ __('messages.edit_with_stackedit') ?? 'Edit with StackEdit' }}
                                 </button>
                             </div>
-                            <textarea id="store-topic-textarea" rows="15" class="form-control" style="width:100%;padding:10px;">{{ $topic->txt }}</textarea>
+                            <textarea id="store-topic-textarea" rows="15" class="form-control" style="width:100%;padding:10px;">{{ $topic?->txt ?? $product->o_valuer }}</textarea>
                         </div>
                         @endif
                     </div>
                 </div>
-                @endif
 
                 <div class="tab-box-item" id="comments-tab" style="display: none; transition: none 0s ease 0s;">
                     <div class="tab-box-item-content">
@@ -521,7 +473,6 @@
 
         if (window.initKbSnippetsToolbar) {
             window.initKbSnippetsToolbar('store-topic-textarea');
-            window.initKbSnippetsToolbar('store-details-textarea');
         }
 
         // ── Topic inline editing ──
@@ -652,121 +603,6 @@
             }
         }
 
-        // ── Details inline editing ──
-        const editDetailsBtn   = document.getElementById('store-edit-details-btn');
-        const saveDetailsBtn   = document.getElementById('store-save-details-btn');
-        const cancelDetailsBtn = document.getElementById('store-cancel-details-btn');
-        const savingDetailsEl  = document.getElementById('store-details-saving');
-        const savedDetailsEl   = document.getElementById('store-details-saved');
-        const displayDetails   = document.getElementById('store-details-display');
-        const editorDetails    = document.getElementById('store-details-editor');
-        const textareaDetails  = document.getElementById('store-details-textarea');
-
-        if (editDetailsBtn && textareaDetails) {
-            let originalDetailsValue = textareaDetails.value;
-
-            // Enter edit mode
-            editDetailsBtn.addEventListener('click', function() {
-                originalDetailsValue = textareaDetails.value;
-                displayDetails.style.display = 'none';
-                editorDetails.style.display = 'block';
-                editDetailsBtn.style.display = 'none';
-                saveDetailsBtn.style.display = '';
-                cancelDetailsBtn.style.display = '';
-                savedDetailsEl.style.display = 'none';
-            });
-
-            // Cancel edit
-            cancelDetailsBtn.addEventListener('click', function() {
-                textareaDetails.value = originalDetailsValue;
-                editorDetails.style.display = 'none';
-                displayDetails.style.display = '';
-                displayDetails.removeAttribute('data-rendered');
-                displayDetails.innerHTML = originalDetailsValue;
-                renderAllMarkdown();
-                editDetailsBtn.style.display = '';
-                saveDetailsBtn.style.display = 'none';
-                cancelDetailsBtn.style.display = 'none';
-            });
-
-            // Save via AJAX
-            saveDetailsBtn.addEventListener('click', function() {
-                saveDetailsBtn.disabled = true;
-                savingDetailsEl.style.display = '';
-                savedDetailsEl.style.display = 'none';
-
-                const csrfToken = document.querySelector('meta[name="csrf-token"]');
-                fetch("{{ route('store.update.details', $product->name) }}", {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': csrfToken ? csrfToken.content : '',
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify({ txt: textareaDetails.value })
-                })
-                .then(r => r.json())
-                .then(data => {
-                    savingDetailsEl.style.display = 'none';
-                    saveDetailsBtn.disabled = false;
-                    if (data.success) {
-                        originalDetailsValue = textareaDetails.value;
-                        // Update display
-                        displayDetails.removeAttribute('data-rendered');
-                        displayDetails.innerHTML = textareaDetails.value;
-                        renderAllMarkdown();
-                        // Switch back to view mode
-                        editorDetails.style.display = 'none';
-                        displayDetails.style.display = '';
-                        editDetailsBtn.style.display = '';
-                        saveDetailsBtn.style.display = 'none';
-                        cancelDetailsBtn.style.display = 'none';
-                        savedDetailsEl.style.display = '';
-                        setTimeout(() => { savedDetailsEl.style.display = 'none'; }, 3000);
-                    } else {
-                        alert(data.message || 'Error');
-                    }
-                })
-                .catch(() => {
-                    savingDetailsEl.style.display = 'none';
-                    saveDetailsBtn.disabled = false;
-                    alert('Network error');
-                });
-            });
-
-            // StackEdit integration for details editor
-            const stackeditDetailsBtn = document.querySelector('.open-stackedit-details');
-            if (stackeditDetailsBtn) {
-                stackeditDetailsBtn.addEventListener('click', function() {
-                    const stackedit = new Stackedit();
-                    stackedit.openFile({
-                        name: '{{ $product->name }}',
-                        content: { text: textareaDetails.value }
-                    });
-                    const adjustIframe = () => {
-                        const iframe = document.querySelector('iframe[src*="stackedit.io"]');
-                        if (iframe) {
-                            const header = document.querySelector('.header, .nxl-header');
-                            if (header) {
-                                const hh = header.offsetHeight;
-                                iframe.style.top = hh + 'px';
-                                iframe.style.height = `calc(100% - ${hh}px)`;
-                            } else {
-                                iframe.style.top = '80px';
-                                iframe.style.height = 'calc(100% - 80px)';
-                            }
-                        } else {
-                            setTimeout(adjustIframe, 50);
-                        }
-                    };
-                    adjustIframe();
-                    stackedit.on('fileChange', (file) => {
-                        textareaDetails.value = file.content.text;
-                    });
-                });
-            }
-        }
     });
 </script>
 <style>
@@ -780,8 +616,8 @@
         border-bottom: 1px solid rgba(140, 146, 182, 0.16);
         margin-bottom: 16px;
     }
-    #store-topic-editor, #store-details-editor { margin-top: 4px; }
-    #store-topic-editor textarea, #store-details-editor textarea {
+    #store-topic-editor { margin-top: 4px; }
+    #store-topic-editor textarea {
         font-family: Consolas, Monaco, 'Courier New', monospace;
         font-size: 0.92rem;
         line-height: 1.7;
@@ -789,20 +625,10 @@
         border: 1px solid rgba(140, 146, 182, 0.24);
         background: rgba(97, 93, 250, 0.03);
     }
-    body[data-theme="css_d"] #store-topic-editor textarea,
-    body[data-theme="css_d"] #store-details-editor textarea {
+    body[data-theme="css_d"] #store-topic-editor textarea {
         background: rgba(97, 93, 250, 0.08);
         border-color: rgba(140, 146, 182, 0.18);
         color: #e8e8e8;
-    }
-    .store-details-toolbar {
-        display: flex;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 8px;
-        padding: 0 0 16px;
-        border-bottom: 1px solid rgba(140, 146, 182, 0.16);
-        margin-bottom: 16px;
     }
 </style>
 

@@ -491,13 +491,35 @@ class StoreController extends Controller
         ]);
 
         $type = Option::where('o_type', 'store_type')->where('o_parent', $product->id)->first();
+        $topic = null;
 
         if ($type && $type->o_order) {
             $topic = ForumTopic::find($type->o_order);
-            if ($topic) {
-                $topic->update(['txt' => $request->input('txt')]);
+        }
+
+        if (!$topic) {
+            $topic = ForumTopic::where('name', $product->name)->first();
+        }
+
+        if ($topic) {
+            $topic->update(['txt' => $request->input('txt')]);
+            if ($type && !$type->o_order) {
+                $type->update(['o_order' => $topic->id]);
+            }
+        } else {
+            $topic = ForumTopic::create([
+                'uid' => $product->o_parent,
+                'name' => $product->name,
+                'txt' => $request->input('txt'),
+                'cat' => 0,
+                'statu' => 1,
+            ]);
+            if ($type) {
+                $type->update(['o_order' => $topic->id]);
             }
         }
+
+        $product->update(['o_valuer' => $request->input('txt')]);
 
         return response()->json(['success' => true, 'message' => __('messages.updated_successfully') ?? 'Updated successfully']);
     }

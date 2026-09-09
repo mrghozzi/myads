@@ -76,6 +76,44 @@ class StoreProductKnowledgebaseUiTest extends TestCase
             ->assertJson(['success' => true]);
     }
 
+    public function test_store_show_renders_topic_tab_as_default_and_hides_details_tab(): void
+    {
+        $this->seedThemeSetting();
+        $this->createAdmin();
+        $owner = User::factory()->create();
+        $product = $this->createStoreProduct($owner, 'tab-test-product');
+
+        $response = $this->actingAs($owner)->get(route('store.show', $product->name));
+        $html = $response->getContent();
+
+        $response->assertOk();
+
+        // Topic tab is rendered as default active tab
+        $this->assertStringContainsString('class="tab-box-option active" data-tab="topic-tab"', $html);
+        $this->assertStringContainsString(__('messages.topic'), $html);
+        $this->assertStringContainsString('id="topic-tab" style="display: block;', $html);
+
+        // Details tab is removed
+        $this->assertStringNotContainsString('data-tab="desc-tab"', $html);
+        $this->assertStringNotContainsString('id="desc-tab"', $html);
+
+        // Can update topic inline
+        $updateResponse = $this->actingAs($owner)->postJson(route('store.update.topic', $product->name), [
+            'txt' => 'Updated markdown description and topic text for store product.',
+        ]);
+
+        $updateResponse->assertOk()->assertJson(['success' => true]);
+
+        $this->assertDatabaseHas('forum', [
+            'name' => $product->name,
+            'txt' => 'Updated markdown description and topic text for store product.',
+        ]);
+        $this->assertDatabaseHas('options', [
+            'id' => $product->id,
+            'o_valuer' => 'Updated markdown description and topic text for store product.',
+        ]);
+    }
+
     public function test_knowledgebase_show_displays_topic_and_publisher_reports_when_author_exists(): void
     {
         $this->seedThemeSetting();
