@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MYADS - The Ultimate Open-Source Social Network, Traffic & Ad Exchange Platform</title>
+  
+  <!-- Primary Meta Tags -->
+  <meta name="title" content="MYADS - The Ultimate Open-Source Social Network, Traffic & Ad Exchange Platform">
+  <meta name="description" content="MYADS is an enterprise-grade, open-source social network, peer-to-peer advertising exchange, YouTube-style video hub, and digital marketplace built on Laravel 12 and Flutter 3.27+.">
+  <meta name="keywords" content="myads, traffic exchange, ad network, social network script, laravel 12, flutter app, youtube views exchange, digital marketplace, open source script, peer to peer ads, anti fraud shield">
+  <meta name="author" content="Zoubair Ghozzi (@mrghozzi)">
+  <meta name="robots" content="index, follow">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://mrghozzi.github.io/myads/">
+  <meta property="og:title" content="MYADS - The Ultimate Open-Source Social Network, Traffic & Ad Exchange Platform">
+  <meta property="og:description" content="All-in-one ecosystem for social engagement, ad exchange, video streaming, digital commerce, and native Flutter mobile app. Built with Laravel 12.">
+  <meta property="og:image" content="https://raw.githubusercontent.com/mrghozzi/myads_check_updates/main/myads.png">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://mrghozzi.github.io/myads/">
+  <meta name="twitter:title" content="MYADS - Open-Source Traffic Exchange & Social Platform">
+  <meta name="twitter:description" content="Next-gen open-source ad network and social platform on Laravel 12 & Flutter 3.27+.">
+  <meta name="twitter:image" content="https://raw.githubusercontent.com/mrghozzi/myads_check_updates/main/myads.png">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+
+  <!-- JSON-LD Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "MYADS",
+    "operatingSystem": "Cross-platform (Web, Linux, Windows, Android, iOS)",
+    "applicationCategory": "SocialNetworkingApplication, BusinessApplication",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    },
+    "description": "The ultimate open-source platform for social networking, peer-to-peer traffic exchange, digital marketplace, and native Flutter mobile app.",
+    "author": {
+      "@type": "Person",
+      "name": "Zoubair Ghozzi",
+      "url": "https://github.com/mrghozzi"
+    }
+  }
+  </script>
+</head>
+<body>
+
+  <!-- Toast Notification -->
+  <div id="toast-notification" class="toast">
+    <span style="font-size: 1.2rem;">📋</span>
+    <span class="toast-text" data-i18n="copied_toast">تم نسخ أمر التثبيت إلى الحافظة!</span>
+  </div>
+
+  <!-- Global Navigation Bar -->
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="#" class="nav-brand">
+        <img src="assets/images/icon.png" alt="MYADS Logo" onerror="this.src='favicon.ico'">
+        <span data-i18n="nav_brand">MYADS</span>
+        <span class="badge-tag" style="font-size: 0.72rem; padding: 0.2rem 0.55rem;">v4.5.6</span>
+      </a>
+
+      <!-- Desktop & Mobile Drawer Links -->
+      <nav id="nav-links" class="nav-links">
+        <a href="#features" class="nav-link" data-i18n="nav_features">المميزات</a>
+        <a href="#mobile" class="nav-link" data-i18n="nav_mobile">تطبيق الجوال</a>
+        <a href="#architecture" class="nav-link" data-i18n="nav_arch">البنية التقنية</a>
+        <a href="#quickstart" class="nav-link" data-i18n="nav_quickstart">التشغيل السريع</a>
+        <a href="#documentation" class="nav-link" data-i18n="nav_docs">التوثيق</a>
+        <a href="#community" class="nav-link" data-i18n="nav_community">المجتمع</a>
+      </nav>
+
+      <!-- Actions (Lang, Theme, GitHub) -->
+      <div class="nav-actions">
+        <button id="lang-switch-btn" class="lang-switch-btn" title="Toggle Language">
+          English 🌐
+        </button>
+
+        <button id="theme-toggle-btn" class="btn-icon" title="Toggle Dark/Light Mode">
+          ☀️
+        </button>
+
+        <a href="https://github.com/mrghozzi/myads" target="_blank" class="btn btn-github" style="padding: 0.5rem 1rem; font-size: 0.88rem;">
+          <svg height="18" width="18" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+          </svg>
+          <span data-i18n="nav_star">نجمة</span>
+        </a>
+
+        <!-- Hamburger Toggle -->
+        <button id="mobile-toggle-btn" class="nav-toggle" aria-label="Open Menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="section hero">
+    <div class="hero-glow-sphere"></div>
+    <div class="container hero-content">
+      
+      <!-- Badges -->
+      <div class="hero-badges-wrapper">
+        <span class="badge-tag pulse" data-i18n="badge_release">الإصدار v4.5.6 جاهز</span>
+        <span class="badge-tag" data-i18n="badge_tech">Laravel 12 + Flutter 3.27+</span>
+        <span class="badge-tag" data-i18n="badge_mit">مفتوح المصدر 100% ومجاني (MIT)</span>
+      </div>
+
+      <!-- Main Headline -->
+      <h1 class="hero-title" data-i18n="hero_title">
+        المنصة المتكاملة مفتوحة المصدر <span class="gradient-text">لتبادل الزيارات، شبكات التواصل الاجتماعي والربح الرقمي</span>
+      </h1>
+
+      <!-- Subtitle -->
+      <p class="hero-desc" data-i18n="hero_desc">
+        امنح مجتمعك الرقمي منصة فائقة القوة تجمع بين شبكة إعلانات متطورة، تبادل الزيارات والمشاهدات بنظام يوتيوب وتيك توك، مجتمع تفاعلي، متجر رقمي، وتطبيق جوال فلاتر أصلي.
+      </p>
+
+      <!-- Call to Actions -->
+      <div class="hero-cta">
+        <a href="#quickstart" class="btn btn-primary" data-i18n="btn_get_started">دليل البدء السريع 🚀</a>
+        <a href="https://github.com/mrghozzi/myads" target="_blank" class="btn btn-secondary">
+          <svg height="18" width="18" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+          </svg>
+          <span data-i18n="btn_github">مستودع GitHub</span>
+        </a>
+        <a href="#mobile" class="btn btn-secondary" data-i18n="btn_mobile_app">استكشف تطبيق الجوال 📱</a>
+      </div>
+
+      <!-- Interactive Terminal Card -->
+      <div class="hero-terminal">
+        <div class="terminal-header">
+          <div class="terminal-dots">
+            <span class="terminal-dot dot-red"></span>
+            <span class="terminal-dot dot-yellow"></span>
+            <span class="terminal-dot dot-green"></span>
+          </div>
+          <span class="terminal-title" data-i18n="terminal_title">التثبيت السريع عبر Composer</span>
+          <button class="btn-copy-code" data-code="git clone https://github.com/mrghozzi/myads.git && cd myads && composer install">
+            <span style="font-size: 0.85rem;">📋</span>
+            <span data-i18n="btn_copy">نسخ</span>
+          </button>
+        </div>
+        <div class="terminal-body">
+          <div class="terminal-line">
+            <span class="terminal-prompt">$</span>
+            <span>git clone https://github.com/mrghozzi/myads.git</span>
+          </div>
+          <div class="terminal-line">
+            <span class="terminal-prompt">$</span>
+            <span>cd myads && composer install</span>
+          </div>
+          <div class="terminal-line">
+            <span class="terminal-prompt">$</span>
+            <span>cp .env.example .env && php artisan key:generate</span>
+          </div>
+          <div class="terminal-comment"># Ready in seconds. Open in browser to complete setup!</div>
+        </div>
+      </div>
+
+      <!-- Stats / Impact Metrics -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-number gradient-text" data-i18n="stat_engines_num">+6</div>
+          <div class="stat-label" data-i18n="stat_engines_label">محركات وأنظمة مدمجة</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number gradient-gold" data-i18n="stat_open_num">100%</div>
+          <div class="stat-label" data-i18n="stat_open_label">مفتوح المصدر بالكامل (MIT)</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" style="color: var(--emerald);" data-i18n="stat_speed_num">+95%</div>
+          <div class="stat-label" data-i18n="stat_speed_label">تسريع استعلامات قواعد البيانات</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" style="color: var(--indigo);" data-i18n="stat_langs_num">+14</div>
+          <div class="stat-label" data-i18n="stat_langs_label">لغة مجهزة مسبقاً</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Features Showcase Section -->
+  <section id="features" class="section">
+    <div class="container">
+      <div class="section-header">
+        <span class="badge-tag" data-i18n="features_badge">إمكانيات فائقة ومتقدمة</span>
+        <h2 class="section-title" data-i18n="features_title">نظام بيئي موحد بإمكانيات لا محدودة</h2>
+        <p class="section-subtitle" data-i18n="features_subtitle">تخلّص من عشرات السكربتات والإضافات المتفرقة واستمتع بنظام متكامل ومحسّن لتحمل الزيارات العالية وتحقيق أقصى ربحية ممكنة.</p>
+      </div>
+
+      <!-- Filter Tabs -->
+      <div class="features-filter-nav">
+        <button class="filter-btn active" data-filter="all" data-i18n="filter_all">جميع المميزات</button>
+        <button class="filter-btn" data-filter="ads" data-i18n="filter_ads">شبكة الإعلانات</button>
+        <button class="filter-btn" data-filter="video" data-i18n="filter_video">الفيديو والكليبس</button>
+        <button class="filter-btn" data-filter="social" data-i18n="filter_social">المجتمع التفاعلي</button>
+        <button class="filter-btn" data-filter="mobile" data-i18n="filter_mobile">تطبيق الجوال</button>
+        <button class="filter-btn" data-filter="store" data-i18n="filter_store">المتجر والخدمات</button>
+        <button class="filter-btn" data-filter="security" data-i18n="filter_security">الحماية والأمان</button>
+      </div>
+
+      <!-- Feature Cards Grid -->
+      <div class="features-grid">
+        
+        <!-- Card 1: Ad Exchange -->
+        <div class="feature-card" data-category="ads">
+          <div class="feature-icon-wrapper">📢</div>
+          <h3 class="feature-title" data-i18n="f1_title">شبكة الإعلانات وتبادل الزيارات</h3>
+          <p class="feature-desc" data-i18n="f1_desc">منظومة إعلانية متكاملة تدعم البانرات التفاعلية، الروابط النصية، تبادل الزيارات التلقائي (Auto-Surf)، ومشاهدات يوتيوب مع تسوية يومية لنقاط PTS.</p>
+          <div class="feature-tags">
+            <span class="feature-tag-item" data-i18n="f1_tag1">تصفح تلقائي</span>
+            <span class="feature-tag-item" data-i18n="f1_tag2">إعلانات ذكية</span>
+            <span class="feature-tag-item" data-i18n="f1_tag3">نقاط PTS</span>
+          </div>
+        </div>
+
+        <!-- Card 2: Video Hub & Shorts -->
+        <div class="feature-card" data-category="video">
+          <div class="feature-icon-wrapper" style="color: var(--rose); background: rgba(244, 63, 94, 0.12); border-color: rgba(244, 63, 94, 0.3);">📺</div>
+          <h3 class="feature-title" data-i18n="f2_title">مركز الفيديو ومقاطع الكليبس القصيرة</h3>
+          <p class="feature-desc" data-i18n="f2_desc">تجربة فيديو عصرية مع فيديو مميز في الواجهة بنسبة 16:9، مشغل مصغر عائم (Picture-in-Picture)، ومقاطع قصيرة 9:16 بإيماءات التمرير كالتيك توك.</p>
+          <div class="feature-tags">
+            <span class="feature-tag-item" data-i18n="f2_tag1">مشغل عائم PIP</span>
+            <span class="feature-tag-item" data-i18n="f2_tag2">فيديوهات قصيرة</span>
+            <span class="feature-tag-item" data-i18n="f2_tag3">بث عالي السرعة</span>
+          </div>
+        </div>
+
+        <!-- Card 3: Social Community -->
+        <div class="feature-card" data-category="social">
+          <div class="feature-icon-wrapper" style="color: var(--indigo); background: rgba(99, 102, 241, 0.12); border-color: rgba(99, 102, 241, 0.3);">💬</div>
+          <h3 class="feature-title" data-i18n="f3_title">الخلاصة والمجتمع التفاعلي الحديث</h3>
+          <p class="feature-desc" data-i18n="f3_desc">خط زمني تفاعلي محسن بدون استعلامات فائضة، يدعم المنشورات المتعددة (موجات صوتية، فيديوهات، معرض صور شبكي، ملفات)، التفاعلات والإشعارات اللحظية.</p>
+          <div class="feature-tags">
+            <span class="feature-tag-item" data-i18n="f3_tag1">موجات صوتية</span>
+            <span class="feature-tag-item" data-i18n="f3_tag2">تفاعلات المنشورات</span>
+            <span class="feature-tag-item" data-i18n="f3_tag3">بث SSE المباشر</span>
+          </div>
+        </div>
+
+        <!-- Card 4: Mobile App -->
+        <div class="feature-card" data-category="mobile">
+          <div class="feature-icon-wrapper" style="color: #38bdf8; background: rgba(56, 189, 248, 0.12); border-color: rgba(56, 189, 248, 0.3);">📱</div>
+          <h3 class="feature-title" data-i18n="f4_title">تطبيق الجوال الأصلي بتقنية Flutter</h3>
+          <p class="feature-desc" data-i18n="f4_desc">تطبيق متكامل لنظامي أندرويد وآيفون (myads_app) بتطابق كامل مع الويب، مشغل كليبس، إطارات الناشرين السداسية، وتشفير الأجهزة AES-256.</p>
+          <div class="feature-tags">
+            <span class="feature-tag-item" data-i18n="f4_tag1">فلاتر 3.27+</span>
+            <span class="feature-tag-item" data-i18n="f4_tag2">أندرويد وآبل</span>
+            <span class="feature-tag-item" data-i18n="f4_tag3">Riverpod + Dio</span>
+          </div>
+        </div>
+
+        <!-- Card 5: Digital Store -->
+        <div class="feature-card" data-category="store">
+          <div class="feature-icon-wrapper" style="color: var(--amber); background: rgba(245, 158, 11, 0.12); border-color: rgba(245, 158, 11, 0.3);">🛍️</div>
+          <h3 class="feature-title" data-i18n="f5_title">متجر المنتجات الرقمية والوساطة للخدمات</h3>
+          <p class="feature-desc" data-i18n="f5_desc">سوق رقمي متعدد البائعين لبيع السكربتات والإضافات والتصاميم بنقاط PTS، مع توثيق ويكي مستقل لكل منتج، ومنصة وساطة وضمان لمزايدات الخدمات المصغرة.</p>
+          <div class="feature-tags">
+            <span class="feature-tag-item" data-i18n="f5_tag1">تحميلات رقمية</span>
+            <span class="feature-tag-item" data-i18n="f5_tag2">وساطة الخدمات</span>
+            <span class="feature-tag-item" data-i18n="f5_tag3">ويكي المنتجات</span>
+          </div>
+        </div>
+
+        <!-- Card 6: Superdesign Admin -->
+        <div class="feature-card" data-category="store">
+          <div class="feature-icon-wrapper" style="color: var(--purple); background: rgba(168, 85, 247, 0.12); border-color: rgba(168, 85, 247, 0.3);">⚡</div>
+          <h3 class="feature-title" data-i18n="f6_title">لوحة تحكم إدارية Superdesign Duralux</h3>
+          <p class="feature-desc" data-i18n="f6_desc">لوحة تحكم فائقة السرعة بتصميم داكن مريح للعين، تقارير مجمعة فورية، إدارة الإضافات والقوالب بتقنية AJAX بدون إعادة تحميل، ومخصص المظهر المباشر.</p>
+          <div class="feature-tags">
+            <span class="feature-tag-item" data-i18n="f6_tag1">AJAX بدون إعادة تحميل</span>
+            <span class="feature-tag-item" data-i18n="f6_tag2">مخصص المظهر</span>
+            <span class="feature-tag-item" data-i18n="f6_tag3">مراقب النظام</span>
+          </div>
+        </div>
+
+        <!-- Card 7: Security Shield -->
+        <div class="feature-card" data-category="security">
+          <div class="feature-icon-wrapper" style="color: var(--emerald); background: rgba(16, 185, 129, 0.12); border-color: rgba(16, 185, 129, 0.3);">🛡️</div>
+          <h3 class="feature-title" data-i18n="f7_title">درع مكافحة الاحتيال v2 وحماية الخصوصية</h3>
+          <p class="feature-desc" data-i18n="f7_desc">نظام أمني متعدد الطبقات مع فحص بصمة المتصفح، كشف البروكسي وVPN، معرفات عامة مشفرة لمنع استكشاف الحسابات، ومصادقة Sanctum الثنائية.</p>
+          <div class="feature-tags">
+            <span class="feature-tag-item" data-i18n="f7_tag1">مكافحة الاحتيال v2</span>
+            <span class="feature-tag-item" data-i18n="f7_tag2">حظر الاستكشاف</span>
+            <span class="feature-tag-item" data-i18n="f7_tag3">مصادقة Sanctum</span>
+          </div>
+        </div>
+
+        <!-- Card 8: RESTful API -->
+        <div class="feature-card" data-category="mobile">
+          <div class="feature-icon-wrapper" style="color: #38bdf8; background: rgba(6, 182, 212, 0.12); border-color: rgba(6, 182, 212, 0.3);">🔌</div>
+          <h3 class="feature-title" data-i18n="f8_title">نظام الإضافات المرن وواجهة REST API</h3>
+          <p class="feature-desc" data-i18n="f8_desc">محرك إضافات ديناميكي يثبّت الجداول تلقائياً، مع نظام خطافات (Hooks)، وواجهات برمجية REST API كاملة لربط أي تطبيقات خارجية بسهولة.</p>
+          <div class="feature-tags">
+            <span class="feature-tag-item" data-i18n="f8_tag1">إضافات ديناميكية</span>
+            <span class="feature-tag-item" data-i18n="f8_tag2">OAuth / REST API</span>
+            <span class="feature-tag-item" data-i18n="f8_tag3">Webhooks</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Mobile App Spotlight Section -->
+  <section id="mobile" class="section mobile-spotlight">
+    <div class="container">
+      <div class="mobile-grid">
+        
+        <!-- Left: Text & Highlights -->
+        <div class="mobile-text-content">
+          <span class="badge-tag" data-i18n="mobile_badge">قوة عبر جميع الأنظمة</span>
+          <h2 class="section-title" data-i18n="mobile_title">
+            انطلق بمجتمعك في كل مكان مع <span class="gradient-text">تطبيق MYADS للجوال</span>
+          </h2>
+          <p class="section-subtitle" data-i18n="mobile_desc">
+            تطبيق جوال جاهز للإنتاج مبني على Flutter 3.27+ بأحدث معايير Clean Architecture وإدارة الحالة عبر Riverpod وأداء native فائق.
+          </p>
+
+          <ul class="mobile-features-list">
+            <li class="mobile-feature-item">
+              <div class="mobile-feature-icon">✓</div>
+              <div class="mobile-feature-text">
+                <h4 data-i18n="m_feat1_title">تطابق 100% مع الخلاصة ومقاطع الكليبس</h4>
+                <p data-i18n="m_feat1_desc">عش تجربة الويب الكاملة على هاتفك، بما يشمل المنشورات القابلة للتوسيع، مشغل الصوت المدمج، ومقاطع الفيديو الرأسية بسلاسة تامة.</p>
+              </div>
+            </li>
+            <li class="mobile-feature-item">
+              <div class="mobile-feature-icon">✓</div>
+              <div class="mobile-feature-text">
+                <h4 data-i18n="m_feat2_title">أمان مدعوم بعتاد الهاتف التشفيري</h4>
+                <p data-i18n="m_feat2_desc">رموز الدخول Sanctum ومفاتيح الـ API مشفرة عتادياً داخل Android Keystore و iOS Keychain بتشفير AES-256 المتين.</p>
+              </div>
+            </li>
+            <li class="mobile-feature-item">
+              <div class="mobile-feature-icon">✓</div>
+              <div class="mobile-feature-text">
+                <h4 data-i18n="m_feat3_title">ويكي شامل يضم 24 دليلاً تقنياً</h4>
+                <p data-i18n="m_feat3_desc">كل طبقة معمارية، وكل معترض شبكي، وخطوات التجميع وتوقيع التطبيق موثقة بالتفصيل في الويكي الرسمي للتطبيق.</p>
+              </div>
+            </li>
+          </ul>
+
+          <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+            <a href="https://github.com/mrghozzi/myads_app/wiki" target="_blank" class="btn btn-primary" data-i18n="btn_view_app_wiki">قراءة ويكي تطبيق الجوال 📖</a>
+            <a href="https://github.com/mrghozzi/myads_app" target="_blank" class="btn btn-secondary" data-i18n="btn_app_github">مستودع تطبيق الجوال 📱</a>
+          </div>
+        </div>
+
+        <!-- Right: Frame & Mockup -->
+        <div class="mobile-mockup-frame">
+          <img src="assets/images/myads.png" alt="MYADS Ecosystem Preview" onerror="this.src='assets/images/logo_w.png'">
+          <div style="display: flex; justify-content: center; gap: 0.5rem; flex-wrap: wrap;">
+            <span class="badge-tag">Flutter 3.27+</span>
+            <span class="badge-tag">Riverpod</span>
+            <span class="badge-tag">Dio Client</span>
+            <span class="badge-tag">FCM Push</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Architecture & System Overview -->
+  <section id="architecture" class="section">
+    <div class="container">
+      <div class="section-header">
+        <span class="badge-tag" data-i18n="arch_badge">مصمم للتحمل والأداء العالي</span>
+        <h2 class="section-title" data-i18n="arch_title">مبني على أسس برمجية عصرية ومتينة</h2>
+        <p class="section-subtitle" data-i18n="arch_subtitle">خالٍ من الحشو البرمجي. بُني من الصفر باستخدام أحدث معايير ومكتبات هندسة البرمجيات الاحترافية.</p>
+      </div>
+
+      <div class="arch-grid">
+        
+        <!-- Arch 1: Backend -->
+        <div class="arch-card">
+          <div class="arch-card-header">
+            <span class="arch-badge" data-i18n="arch_card1_b">Laravel 12</span>
+            <h3 data-i18n="arch_card1_title">النواة الخلفية (Backend)</h3>
+          </div>
+          <ul class="arch-list">
+            <li data-i18n="arch_card1_i1">بنية برمجية قوية مع PHP 8.2+</li>
+            <li data-i18n="arch_card1_i2">مصادقة آمنة عبر Laravel Sanctum</li>
+            <li data-i18n="arch_card1_i3">بث أحداث مباشر Server-Sent Events (SSE)</li>
+            <li data-i18n="arch_card1_i4">استعلامات SQL مجمعة عالية السرعة</li>
+          </ul>
+        </div>
+
+        <!-- Arch 2: Frontend -->
+        <div class="arch-card">
+          <div class="arch-card-header">
+            <span class="arch-badge" style="background: rgba(6, 182, 212, 0.15); color: var(--cyan);" data-i18n="arch_card2_b">Modern Blade</span>
+            <h3 data-i18n="arch_card2_title">الواجهة الأمامية (Frontend)</h3>
+          </div>
+          <ul class="arch-list">
+            <li data-i18n="arch_card2_i1">شبكة متجاوبة مع Bootstrap 5</li>
+            <li data-i18n="arch_card2_i2">وحدات تفاعلية Vanilla ES6+ سريعة</li>
+            <li data-i18n="arch_card2_i3">تحديثات AJAX بدون إعادة تحميل</li>
+            <li data-i18n="arch_card2_i4">واجهة زجاجية Glassmorphism داكنة ومضيئة</li>
+          </ul>
+        </div>
+
+        <!-- Arch 3: Mobile -->
+        <div class="arch-card">
+          <div class="arch-card-header">
+            <span class="arch-badge" style="background: rgba(16, 185, 129, 0.15); color: var(--emerald);" data-i18n="arch_card3_b">Flutter 3.27+</span>
+            <h3 data-i18n="arch_card3_title">تطبيق الجوال (Mobile)</h3>
+          </div>
+          <ul class="arch-list">
+            <li data-i18n="arch_card3_i1">بنية برمجية نظيفة مع Dart 3.10+</li>
+            <li data-i18n="arch_card3_i2">إدارة حالة متطورة عبر Riverpod</li>
+            <li data-i18n="arch_card3_i3">عميل شبكي ذكي Dio مع معترضات</li>
+            <li data-i18n="arch_card3_i4">تشفير عتادي في Keystore / Keychain</li>
+          </ul>
+        </div>
+
+        <!-- Arch 4: Data -->
+        <div class="arch-card">
+          <div class="arch-card-header">
+            <span class="arch-badge" style="background: rgba(245, 158, 11, 0.15); color: var(--amber);" data-i18n="arch_card4_b">أداء فائق</span>
+            <h3 data-i18n="arch_card4_title">البيانات والتوسع (Data)</h3>
+          </div>
+          <ul class="arch-list">
+            <li data-i18n="arch_card4_i1">قواعد بيانات MySQL / MariaDB (محرك InnoDB)</li>
+            <li data-i18n="arch_card4_i2">نظام تسخين الذاكرة المؤقتة التلقائي</li>
+            <li data-i18n="arch_card4_i3">درع فحص البصمة ضد الاحتيال</li>
+            <li data-i18n="arch_card4_i4">بوابات دفع متعددة ونظام اشتراكات</li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Quick Start & Installation Section -->
+  <section id="quickstart" class="section">
+    <div class="container">
+      <div class="section-header">
+        <span class="badge-tag" data-i18n="qs_badge">تشغيل سريع وبسيط</span>
+        <h2 class="section-title" data-i18n="qs_title">انطلق بموقعك خلال أقل من 5 دقائق</h2>
+        <p class="section-subtitle" data-i18n="qs_subtitle">اختر بين معالج التثبيت المرئي السهل عبر المتصفح، أو التثبيت البرمجي عبر سطر الأوامر.</p>
+      </div>
+
+      <!-- Tabs Navigation -->
+      <div class="quickstart-tabs">
+        <button class="qs-tab-btn active" data-target="panel-gui" data-i18n="tab_gui">المعالج المرئي (Web GUI)</button>
+        <button class="qs-tab-btn" data-target="panel-cli" data-i18n="tab_cli">سطر الأوامر (Composer & CLI)</button>
+        <button class="qs-tab-btn" data-target="panel-reqs" data-i18n="tab_reqs">متطلبات السيرفر</button>
+      </div>
+
+      <!-- Panel 1: GUI -->
+      <div id="panel-gui" class="qs-content-panel active">
+        <div class="steps-list">
+          <div class="step-item">
+            <div class="step-num">1</div>
+            <div class="step-info">
+              <h4 data-i18n="gui_step1_title">1. تنزيل واستخراج الملفات</h4>
+              <p data-i18n="gui_step1_desc">قم بتنزيل أحدث حزمة إصدار v4.5.6 من GitHub واستخرج محتوياتها داخل المجلد الرئيسي لسيرفر الويب الخاص بك.</p>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-num">2</div>
+            <div class="step-info">
+              <h4 data-i18n="gui_step2_title">2. فتح معالج التثبيت في المتصفح</h4>
+              <p data-i18n="gui_step2_desc">افتح الرابط في متصفحك (مثلاً: https://yourdomain.com/install) لبدء المعالج التفاعلي خطوة بخطوة.</p>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-num">3</div>
+            <div class="step-info">
+              <h4 data-i18n="gui_step3_title">3. ربط قاعدة البيانات والانطلاق</h4>
+              <p data-i18n="gui_step3_desc">أدخل بيانات الاتصال بقاعدة البيانات، وأنشئ حساب المدير، ثم اضغط على زر التثبيت. سيتولى السكربت إعداد كل شيء تلقائياً!</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel 2: CLI -->
+      <div id="panel-cli" class="qs-content-panel">
+        <div class="steps-list">
+          <div class="step-item">
+            <div class="step-num">1</div>
+            <div class="step-info" style="width: 100%;">
+              <h4 data-i18n="cli_step1_title">1. استنساخ المستودع وتثبيت الحزم</h4>
+              <div class="code-box">
+                <span>git clone https://github.com/mrghozzi/myads.git && cd myads && composer install</span>
+                <button class="btn-copy-code" data-code="git clone https://github.com/mrghozzi/myads.git && cd myads && composer install">📋</button>
+              </div>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-num">2</div>
+            <div class="step-info" style="width: 100%;">
+              <h4 data-i18n="cli_step2_title">2. ضبط ملف الإعدادات وتوليد المفتاح</h4>
+              <div class="code-box">
+                <span>cp .env.example .env && php artisan key:generate</span>
+                <button class="btn-copy-code" data-code="cp .env.example .env && php artisan key:generate">📋</button>
+              </div>
+            </div>
+          </div>
+          <div class="step-item">
+            <div class="step-num">3</div>
+            <div class="step-info" style="width: 100%;">
+              <h4 data-i18n="cli_step3_title">3. تشغيل التهجيرات وبدء السيرفر</h4>
+              <div class="code-box">
+                <span>php artisan migrate --seed && php artisan serve</span>
+                <button class="btn-copy-code" data-code="php artisan migrate --seed && php artisan serve">📋</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel 3: Requirements -->
+      <div id="panel-reqs" class="qs-content-panel">
+        <div class="req-grid">
+          <div class="req-item"><span class="check">✓</span> <span data-i18n="req1">إصدار PHP 8.2 أو أحدث</span></div>
+          <div class="req-item"><span class="check">✓</span> <span data-i18n="req2">قواعد بيانات MySQL 5.7+ أو MariaDB 10.3+</span></div>
+          <div class="req-item"><span class="check">✓</span> <span data-i18n="req3">إضافات BCMath و Ctype</span></div>
+          <div class="req-item"><span class="check">✓</span> <span data-i18n="req4">إضافات cURL و DOM</span></div>
+          <div class="req-item"><span class="check">✓</span> <span data-i18n="req5">إضافات Fileinfo و JSON</span></div>
+          <div class="req-item"><span class="check">✓</span> <span data-i18n="req6">إضافات Mbstring و OpenSSL</span></div>
+          <div class="req-item"><span class="check">✓</span> <span data-i18n="req7">مشغلات PDO و PDO_MySQL</span></div>
+          <div class="req-item"><span class="check">✓</span> <span data-i18n="req8">إضافات XML و Tokenizer</span></div>
+          <div class="req-item"><span class="check">✓</span> <span data-i18n="req9">سيرفر Apache (mod_rewrite) أو Nginx</span></div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Documentation Portal Section -->
+  <section id="documentation" class="section">
+    <div class="container">
+      <div class="section-header">
+        <span class="badge-tag" data-i18n="docs_badge">مركز المعرفة والشروحات</span>
+        <h2 class="section-title" data-i18n="docs_title">توثيق شامل ومفصل لكل جزء في المنصة</h2>
+        <p class="section-subtitle" data-i18n="docs_subtitle">استكشف أدلة الإعداد، ومواصفات واجهة الـ API، وشروحات التطوير المصممة لأصحاب المواقع والمطورين على حد سواء.</p>
+      </div>
+
+      <div class="docs-grid">
+        
+        <!-- Doc 1: Web Docs -->
+        <div class="doc-card">
+          <div class="doc-card-icon">🌐</div>
+          <h3 data-i18n="doc1_title">توثيق منصة الويب الشامل</h3>
+          <p data-i18n="doc1_desc">كل ما تحتاجه بدءاً من التثبيت وضبط بريد SMTP، وصولاً لإعداد الإعلانات الذكية واقتصاد نقاط PTS.</p>
+          <a href="https://github.com/mrghozzi/myads/tree/main/Documents" target="_blank" class="doc-card-link" data-i18n="doc1_link">استكشف شروحات الويب ➔</a>
+        </div>
+
+        <!-- Doc 2: App Wiki -->
+        <div class="doc-card">
+          <div class="doc-card-icon">📱</div>
+          <h3 data-i18n="doc2_title">ويكي تطبيق الجوال (24 دليلاً)</h3>
+          <p data-i18n="doc2_desc">تحليل معماري شامل لتطبيق Flutter: شبكة Dio، إشعارات FCM، وبناء وتوقيع النسخ النهائية.</p>
+          <a href="https://github.com/mrghozzi/myads_app/wiki" target="_blank" class="doc-card-link" data-i18n="doc2_link">استكشف ويكي التطبيق ➔</a>
+        </div>
+
+        <!-- Doc 3: API Reference -->
+        <div class="doc-card">
+          <div class="doc-card-icon">🔌</div>
+          <h3 data-i18n="doc3_title">دليل واجهات برمجة التطبيقات (API)</h3>
+          <p data-i18n="doc3_desc">توثيق نقاط النهاية البرمجية بالتفصيل مع مصادقة Sanctum Bearer لربط أي تطبيقات ومواقع خارجية.</p>
+          <a href="https://github.com/mrghozzi/myads/blob/main/Documents/API_DOCS.md" target="_blank" class="doc-card-link" data-i18n="doc3_link">عرض مواصفات الـ API ➔</a>
+        </div>
+
+        <!-- Doc 4: Plugins & Themes -->
+        <div class="doc-card">
+          <div class="doc-card-icon">🎨</div>
+          <h3 data-i18n="doc4_title">دليل مطوري الإضافات والقوالب</h3>
+          <p data-i18n="doc4_desc">برمج إضافاتك ومربعاتك الجانبية وقوالبك المخصصة بكل سهولة باستخدام محرك Superdesign بدون إعادة تحميل.</p>
+          <a href="https://github.com/mrghozzi/myads/blob/main/Documents/THEME_GUIDE.md" target="_blank" class="doc-card-link" data-i18n="doc4_link">قراءة دليل المطورين ➔</a>
+        </div>
+
+        <!-- Doc 5: Anti-Fraud Shield -->
+        <div class="doc-card">
+          <div class="doc-card-icon">🛡️</div>
+          <h3 data-i18n="doc5_title">درع الحماية ومكافحة الاحتيال</h3>
+          <p data-i18n="doc5_desc">كيف يمنع MYADS نقرات الروبوتات، وتزييف الزيارات، واستكشاف أسماء المستخدمين، والتلاعب بالرموز.</p>
+          <a href="https://github.com/mrghozzi/myads/blob/main/SECURITY.md" target="_blank" class="doc-card-link" data-i18n="doc5_link">عرض مواصفات الأمان ➔</a>
+        </div>
+
+        <!-- Doc 6: Changelogs -->
+        <div class="doc-card">
+          <div class="doc-card-icon">📋</div>
+          <h3 data-i18n="doc6_title">سجل التغييرات والتحديثات</h3>
+          <p data-i18n="doc6_desc">سجل تاريخي يوثق كل ميزة، وإصلاح، وتسريع للأداء منذ الإصدار الأول v1.0.0 وحتى v4.5.6.</p>
+          <a href="https://github.com/mrghozzi/myads/blob/main/Documents/changelogs.md" target="_blank" class="doc-card-link" data-i18n="doc6_link">قراءة سجل التغييرات ➔</a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Community & Sponsorship Banner -->
+  <section id="community" class="section">
+    <div class="container">
+      <div class="community-banner">
+        <h2 data-i18n="comm_title">انضم إلى مجتمع MYADS المتنامي</h2>
+        <p data-i18n="comm_desc">سكربت MYADS هو مشروع حر ومستقل مدفوع بحب المجتمع. ضع نجمة على المستودع، أو شارك في التطوير، أو ادعم استمرار المشروع!</p>
+        
+        <div class="community-actions">
+          <a href="https://github.com/mrghozzi/myads" target="_blank" class="btn btn-github">
+            <svg height="20" width="20" viewBox="0 0 16 16" fill="currentColor">
+              <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+            </svg>
+            <span data-i18n="btn_contribute">المساهمة على GitHub 🐙</span>
+          </a>
+          <a href="https://ko-fi.com/mrghozzi" target="_blank" class="btn btn-sponsor" data-i18n="btn_sponsor_kofi">ادعم عبر Ko-Fi ☕</a>
+          <a href="https://www.patreon.com/MrGhozzi" target="_blank" class="btn btn-secondary" style="border-color: #f96854; color: #f96854;" data-i18n="btn_sponsor_patreon">ادعم عبر Patreon ❤️</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <span class="badge-tag" data-i18n="faq_badge">الأسئلة الشائعة</span>
+        <h2 class="section-title" data-i18n="faq_title">كل ما تود معرفته عن MYADS</h2>
+        <p class="section-subtitle" data-i18n="faq_subtitle">إليك إجابات وافية ومباشرة عن أبرز التساؤلات حول السكربت وكيفية الاستفادة منه.</p>
+      </div>
+
+      <div class="faq-list">
+        
+        <div class="faq-item active">
+          <button class="faq-question">
+            <span data-i18n="faq1_q">هل سكربت MYADS مجاني ومفتوح المصدر بالكامل؟</span>
+            <span class="faq-chevron">▾</span>
+          </button>
+          <div class="faq-answer">
+            <p data-i18n="faq1_a">نعم تماماً! السكربت مرخص بموجب رخصة MIT المفتوحة والمرنة. يمكنك استخدامه، وتعديله، واستضافته لمشاريعك الشخصية أو التجارية مجاناً وبدون أي رسوم ترخيص.</p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question">
+            <span data-i18n="faq2_q">هل كود تطبيق الجوال مشمول ومتاح مجاناً؟</span>
+            <span class="faq-chevron">▾</span>
+          </button>
+          <div class="faq-answer">
+            <p data-i18n="faq2_a">نعم بكل تأكيد. الكود المصدري الرسمي لتطبيق الجوال Flutter متاح في مستودع mrghozzi/myads_app مع كامل الشروحات وخطوات البناء والإنتاج.</p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question">
+            <span data-i18n="faq3_q">هل يمكنني تحقيق دخل مالي حقيقي من المنصة؟</span>
+            <span class="faq-chevron">▾</span>
+          </button>
+          <div class="faq-answer">
+            <p data-i18n="faq3_a">نعم. يدعم MYADS بوابات دفع إلكترونية متعددة، والاشتراكات الشهرية المدفوعة للعضويات المميزة (VIP)، وشراء النقاط، وإيداعات المعلنين، وعمولات مبيعات المتجر الرقمي.</p>
+          </div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question">
+            <span data-i18n="faq4_q">كيف يحمي درع مكافحة الاحتيال تبادل الزيارات؟</span>
+            <span class="faq-chevron">▾</span>
+          </button>
+          <div class="faq-answer">
+            <p data-i18n="faq4_a">يعتمد السكربت على تقنيات فحص بصمة المتصفح الرقمية، وتأكيد تركيز النافذة النشطة، وكشف شبكات البروكسي وVPN، وتحديد معدل الطلبات لضمان أن الزيارات حقيقية وبشرية فقط.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Global Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        
+        <div class="footer-brand">
+          <h3>
+            <img src="assets/images/icon.png" alt="MYADS" style="height: 28px; border-radius: 4px;" onerror="this.src='favicon.ico'">
+            MYADS v4.5.6
+          </h3>
+          <p data-i18n="footer_desc">المنصة مفتوحة المصدر لتبادل الزيارات، شبكات التواصل الاجتماعي، والربح الرقمي المبنية على Laravel 12 و Flutter.</p>
+        </div>
+
+        <div class="footer-col">
+          <h4 data-i18n="footer_col1">المنظومة</h4>
+          <ul class="footer-links">
+            <li><a href="#features" data-i18n="nav_features">المميزات</a></li>
+            <li><a href="#mobile" data-i18n="nav_mobile">تطبيق الجوال</a></li>
+            <li><a href="#architecture" data-i18n="nav_arch">البنية التقنية</a></li>
+            <li><a href="#quickstart" data-i18n="nav_quickstart">التشغيل السريع</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4 data-i18n="footer_col2">المطورون</h4>
+          <ul class="footer-links">
+            <li><a href="https://github.com/mrghozzi/myads/blob/main/Documents/API_DOCS.md" target="_blank" data-i18n="doc3_title">واجهة الـ API</a></li>
+            <li><a href="https://github.com/mrghozzi/myads_app/wiki" target="_blank" data-i18n="doc2_title">ويكي التطبيق</a></li>
+            <li><a href="https://github.com/mrghozzi/myads/blob/main/Documents/THEME_GUIDE.md" target="_blank" data-i18n="doc4_title">دليل القوالب</a></li>
+            <li><a href="https://github.com/mrghozzi/myads/blob/main/Documents/changelogs.md" target="_blank" data-i18n="doc6_title">سجل التغييرات</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4 data-i18n="footer_col3">المجتمع</h4>
+          <ul class="footer-links">
+            <li><a href="https://github.com/mrghozzi/myads" target="_blank">GitHub Repository</a></li>
+            <li><a href="https://github.com/mrghozzi/myads_app" target="_blank">Mobile App Repo</a></li>
+            <li><a href="https://ko-fi.com/mrghozzi" target="_blank">Ko-Fi Support</a></li>
+            <li><a href="https://www.patreon.com/MrGhozzi" target="_blank">Patreon Sponsor</a></li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="footer-bottom">
+        <div data-i18n="footer_credits">تم التطوير بكل فخر وشغف بواسطة <a href='https://github.com/mrghozzi' target='_blank'><strong>زبیر الغزي (@mrghozzi)</strong></a>.</div>
+        <div data-i18n="footer_mit">مرخص بموجب ترخيص <a href='https://github.com/mrghozzi/myads/blob/main/LICENSE' target='_blank'>MIT License</a>.</div>
+        <a href="#" class="back-to-top" data-i18n="back_to_top">العودة للأعلى ↑</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="app.js"></script>
+</body>
+</html>
