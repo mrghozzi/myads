@@ -1,6 +1,6 @@
 @extends('admin::layouts.admin')
 
-@section('title', __('messages.updates_myads'))
+@section('title', __('messages.updates_myads') ?? 'System Updates')
 
 @section('content')
 @php
@@ -17,43 +17,64 @@
         ['key' => 'finalize', 'label' => __('messages.update_stage_finalize'), 'icon' => 'upload-cloud', 'status' => 'pending', 'percent' => 0, 'detail' => ''],
         ['key' => 'cleanup', 'label' => __('messages.update_stage_cleanup'), 'icon' => 'check-circle', 'status' => 'pending', 'percent' => 0, 'detail' => ''],
     ];
+
+    $mysqlVersion = 'MySQL';
+    try {
+        $mysqlVersion = \Illuminate\Support\Facades\DB::connection()->getPdo()->getAttribute(\PDO::ATTR_SERVER_VERSION);
+    } catch (\Throwable) {}
 @endphp
 
 <div class="admin-page">
+    <!-- Admin Hero Header (Superdesign Style) -->
     <section class="admin-hero">
         <div class="admin-hero__content">
             <ul class="admin-breadcrumb">
                 <li><a href="{{ route('admin.index') }}">{{ __('messages.admin_panel') ?? 'Admin' }}</a></li>
                 <li>{{ __('messages.updates') }}</li>
             </ul>
-            <div class="admin-hero__eyebrow">{{ __('messages.updates_myads') ?? 'System Updates' }}</div>
+            <div class="admin-hero__eyebrow">
+                <i class="feather-refresh-cw me-1"></i>{{ __('messages.updates_myads') ?? 'System Updates' }}
+            </div>
             <h1 class="admin-hero__title" id="status-title">
                 @if($updateAvailable)
-                    {{ __('messages.new_version_available') ?? 'Update Available!' }}
+                    {{ __('messages.new_version_available') ?? 'New Update Available!' }}
+                    <span class="badge bg-primary fs-13 align-middle ms-2">v{{ $latestVersion }}</span>
                 @else
                     {{ __('messages.system_up_to_date') ?? 'System is Up to Date' }}
+                    <span class="badge bg-soft-success text-success fs-13 align-middle ms-2"><i class="feather-check me-1"></i>v{{ $currentVersion }}</span>
                 @endif
             </h1>
             <p class="admin-hero__copy" id="status-subtitle">
                 @if($updateAvailable)
-                    {{ __('messages.update_available_desc') ?? 'A new version is available for download.' }}
+                    {{ __('messages.update_available_desc') ?? 'A newer release is available on GitHub with performance upgrades, security patches, and fixes.' }}
                 @else
-                    {{ __('messages.up_to_date_desc') ?? 'You are running the latest version of MyAds.' }}
+                    {{ __('messages.up_to_date_desc') ?? 'Your platform is operating on the official latest version. No pending updates.' }}
                 @endif
             </p>
 
+            <!-- Quick Metrics Strip -->
             <div class="admin-stat-strip" id="version-display">
                 <div class="admin-stat-card">
-                    <span class="admin-stat-label">{{ __('messages.installed') ?? 'Installed' }}</span>
-                    <span class="admin-stat-value">v{{ $currentVersion }}</span>
+                    <span class="admin-stat-label">{{ __('messages.installed') ?? 'Installed Version' }}</span>
+                    <span class="admin-stat-value text-primary">v{{ $currentVersion }}</span>
                 </div>
                 <div class="admin-stat-card">
-                    <span class="admin-stat-label">{{ __('messages.latest') ?? 'Latest' }}</span>
-                    <span class="admin-stat-value">{{ $latestVersion ? 'v' . $latestVersion : '--' }}</span>
+                    <span class="admin-stat-label">{{ __('messages.latest') ?? 'Latest Release' }}</span>
+                    <span class="admin-stat-value {{ $updateAvailable ? 'text-warning' : 'text-success' }}">
+                        {{ $latestVersion ? 'v' . $latestVersion : '--' }}
+                    </span>
                 </div>
                 <div class="admin-stat-card">
                     <span class="admin-stat-label">{{ __('messages.update_preflight_title') }}</span>
-                    <span class="admin-stat-value">{{ $passedChecks }}/{{ $preflightChecks->count() }}</span>
+                    <span class="admin-stat-value {{ $preflightReport->isSafe() ? 'text-success' : 'text-danger' }}">
+                        {{ $passedChecks }}/{{ $preflightChecks->count() }}
+                    </span>
+                </div>
+                <div class="admin-stat-card">
+                    <span class="admin-stat-label">{{ __('messages.maintenance_mode') ?? 'Maintenance' }}</span>
+                    <span class="admin-stat-value fs-15 {{ $maintenanceEnabled ? 'text-warning' : 'text-muted' }}">
+                        {{ $maintenanceEnabled ? __('messages.maintenance_status_enabled') : __('messages.maintenance_status_disabled') }}
+                    </span>
                 </div>
             </div>
         </div>
@@ -61,60 +82,65 @@
         <div class="admin-hero__actions">
             <div class="admin-toolbar-card">
                 <div class="d-flex align-items-center gap-3 w-100">
-                    <div class="admin-modal-icon {{ $updateAvailable ? 'is-primary' : 'is-primary' }} mb-0" id="status-icon">
-                        <i class="feather-{{ $updateAvailable ? 'arrow-up-circle' : 'check-circle' }}"></i>
+                    <div class="admin-modal-icon {{ $updateAvailable ? 'is-warning' : 'is-primary' }} mb-0" id="status-icon">
+                        <i class="feather-{{ $updateAvailable ? 'arrow-up-circle' : 'shield' }}"></i>
                     </div>
                     <div>
                         <span class="admin-panel__eyebrow">{{ __('messages.current_version') ?? 'Version' }}</span>
-                        <div class="admin-panel__title mb-1">v{{ $currentVersion }}</div>
-                        <div class="admin-muted">
+                        <div class="admin-panel__title mb-0">v{{ $currentVersion }}</div>
+                        <div class="admin-muted fs-12">
                             @if($latestVersion)
-                                v{{ $latestVersion }}
+                                {{ __('messages.target_version') ?? 'Target' }}: v{{ $latestVersion }}
                             @else
                                 {{ __('messages.check_for_updates') }}
                             @endif
                         </div>
                     </div>
                 </div>
-                <button type="button" class="btn btn-outline-primary w-100 mt-3" id="btn-check-update" onclick="checkForUpdates()">
-                    <i class="feather-refresh-cw me-1"></i>{{ __('messages.check_for_updates') }}
+                <button type="button" class="btn btn-outline-primary w-100 mt-3 fw-bold" id="btn-check-update" onclick="checkForUpdates()">
+                    <i class="feather-refresh-cw me-2"></i>{{ __('messages.check_for_updates') }}
                 </button>
             </div>
 
             <div class="admin-chip-list">
-                <span class="admin-chip">
+                <span class="admin-chip {{ $preflightReport->isSafe() ? 'text-success' : 'text-danger' }}">
                     <i class="feather-shield"></i>
                     {{ $preflightReport->isSafe() ? __('messages.update_preflight_passed') : __('messages.update_preflight_failed') }}
                 </span>
-                <span class="admin-chip">
-                    <i class="feather-tool"></i>
-                    {{ $maintenanceEnabled ? __('messages.maintenance_status_enabled') : __('messages.maintenance_status_disabled') }}
-                </span>
+                @if($latestRelease && !empty($latestRelease['published_at']))
+                    <span class="admin-chip">
+                        <i class="feather-calendar"></i>
+                        {{ \Carbon\Carbon::parse($latestRelease['published_at'])->format('Y-m-d') }}
+                    </span>
+                @endif
             </div>
         </div>
     </section>
 
+    <!-- Session Notifications -->
     @if(session('success'))
-        <div class="alert alert-success d-flex align-items-center mb-0" role="alert">
-            <i class="feather-check-circle fs-4 me-2"></i>
+        <div class="alert alert-success d-flex align-items-center shadow-sm border-0 mb-0" role="alert">
+            <i class="feather-check-circle fs-4 me-3"></i>
             <div>{{ session('success') }}</div>
         </div>
     @endif
     @if(session('error'))
-        <div class="alert alert-danger d-flex align-items-center mb-0" role="alert">
-            <i class="feather-alert-circle fs-4 me-2"></i>
+        <div class="alert alert-danger d-flex align-items-center shadow-sm border-0 mb-0" role="alert">
+            <i class="feather-alert-octagon fs-4 me-3"></i>
             <div>{{ session('error') }}</div>
         </div>
     @endif
     @if(session('info'))
-        <div class="alert alert-info d-flex align-items-center mb-0" role="alert">
-            <i class="feather-info fs-4 me-2"></i>
+        <div class="alert alert-info d-flex align-items-center shadow-sm border-0 mb-0" role="alert">
+            <i class="feather-info fs-4 me-3"></i>
             <div>{{ session('info') }}</div>
         </div>
     @endif
     @if($errors->any())
-        <div class="alert alert-danger mb-0" role="alert">
-            <div class="fw-bold mb-2">{{ __('messages.warning') ?? 'Warning' }}</div>
+        <div class="alert alert-danger shadow-sm border-0 mb-0" role="alert">
+            <div class="fw-bold mb-2 d-flex align-items-center">
+                <i class="feather-alert-triangle me-2"></i>{{ __('messages.warning') ?? 'Warning' }}
+            </div>
             <ul class="mb-0 ps-3">
                 @foreach($errors->all() as $error)
                     <li>{{ $error }}</li>
@@ -123,286 +149,376 @@
         </div>
     @endif
 
-    <div class="admin-workspace-grid">
-        <div class="admin-section-stack">
-            <section class="admin-panel">
-                <div class="admin-panel__header">
-                    <div>
-                        <span class="admin-panel__eyebrow">{{ __('messages.update_preflight_title') }}</span>
-                        <h2 class="admin-panel__title">{{ __('messages.update_preflight_title') }}</h2>
-                    </div>
-                    <span class="badge {{ $preflightReport->isSafe() ? 'bg-soft-success text-success' : 'bg-soft-danger text-danger' }}">
-                        {{ $preflightReport->isSafe() ? __('messages.update_preflight_passed') : __('messages.update_preflight_failed') }}
-                    </span>
-                </div>
-                <div class="admin-panel__body">
-                    <p class="admin-panel__copy">{{ __('messages.update_preflight_description') }}</p>
+    <!-- Main Workspace Grid (8 cols Main / 4 cols Sidebar) -->
+    <div class="row g-4">
+        <!-- Main Column -->
+        <div class="col-xl-8 col-lg-7">
+            <div class="d-flex flex-column gap-4">
 
-                    <div class="admin-check-list">
-                        @foreach($preflightReport->checks as $check)
-                            <div class="admin-check-item">
-                                <span class="admin-check-item__icon {{ $check['status'] === 'passed' ? 'is-passed' : 'is-failed' }}">
-                                    <i class="feather-{{ $check['status'] === 'passed' ? 'check' : 'alert-circle' }}"></i>
-                                </span>
-                                <div>
-                                    <span class="admin-check-item__title">{{ $check['title'] }}</span>
-                                    <span class="admin-check-item__detail">{{ $check['detail'] }}</span>
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-
-                    @if(!$preflightReport->isSafe())
-                        <div class="admin-status-banner is-danger mt-4">
-                            <i class="feather-alert-octagon"></i>
-                            <div>
-                                <strong>{{ __('messages.update_preflight_failed') }}</strong>
-                                <div class="mt-1">{{ __('messages.update_blocked_preflight', ['details' => implode(' ', $preflightReport->failureMessages())]) }}</div>
-                            </div>
-                        </div>
-                    @endif
-                </div>
-            </section>
-
-            <section class="admin-panel admin-update-progress-panel" id="update-progress-panel" @if(!$activeUpdateSession) style="display: none;" @endif>
-                <div class="admin-panel__header">
-                    <div>
-                        <span class="admin-panel__eyebrow">{{ __('messages.update_progress_title') }}</span>
-                        <h2 class="admin-panel__title" id="update-progress-stage">
-                            {{ $activeUpdateSession['stage_label'] ?? __('messages.update_progress_idle') }}
-                        </h2>
-                    </div>
-                    <span class="badge bg-soft-primary text-primary" id="update-progress-status">
-                        {{ $activeUpdateSession['status'] ?? __('messages.pending') }}
-                    </span>
-                </div>
-                <div class="admin-panel__body">
-                    <div class="admin-update-progress">
-                        <div class="admin-update-progress__meta">
-                            <span id="update-progress-detail">{{ $activeUpdateSession['detail'] ?? __('messages.update_progress_description') }}</span>
-                            <strong id="update-progress-percent">{{ (int) ($activeUpdateSession['percent'] ?? 0) }}%</strong>
-                        </div>
-                        <div class="progress admin-update-progress__bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ (int) ($activeUpdateSession['percent'] ?? 0) }}">
-                            <div class="progress-bar" id="update-progress-bar" style="width: {{ (int) ($activeUpdateSession['percent'] ?? 0) }}%;"></div>
-                        </div>
-                        <div class="admin-muted mt-2" id="update-progress-bytes">
-                            @if(!empty($activeUpdateSession['bytes_total']))
-                                {{ __('messages.update_stage_download_detail', [
-                                    'downloaded' => $activeUpdateSession['bytes_done'] ?? 0,
-                                    'total' => $activeUpdateSession['bytes_total'],
-                                ]) }}
-                            @endif
-                        </div>
-                    </div>
-
-                    <div class="admin-update-steps mt-4" id="update-progress-steps">
-                        @foreach($updateProgressStages as $stage)
-                            <div class="admin-update-step is-{{ $stage['status'] ?? 'pending' }}" data-update-stage="{{ $stage['key'] }}">
-                                <span class="admin-update-step__icon">
-                                    <i class="feather-{{ $stage['icon'] ?? 'circle' }}"></i>
-                                </span>
-                                <div>
-                                    <span class="admin-update-step__title">{{ $stage['label'] }}</span>
-                                    <span class="admin-update-step__detail">{{ $stage['detail'] ?? '' }}</span>
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-
-                    <div class="admin-status-banner is-danger mt-4" id="update-progress-error" style="display: none;">
-                        <i class="feather-alert-circle"></i>
-                        <div>
-                            <strong>{{ __('messages.update_session_failed') }}</strong>
-                            <div class="mt-1" id="update-progress-error-text"></div>
-                        </div>
-                    </div>
-
-                    <div class="d-flex flex-wrap gap-2 mt-4">
-                        <button type="button" class="btn btn-outline-primary btn-sm" id="update-retry-btn" style="display: none;">
-                            <i class="feather-rotate-cw me-1"></i>{{ __('messages.update_retry_stage') }}
-                        </button>
-                        <button type="button" class="btn btn-outline-danger btn-sm" id="update-cancel-btn" style="display: none;">
-                            <i class="feather-x-circle me-1"></i>{{ __('messages.update_cancel') }}
-                        </button>
-                    </div>
-                </div>
-            </section>
-
-            @if($updateAvailable && $latestRelease)
-                <section class="admin-panel" id="update-card">
+                <!-- 1. Active Staged Progress Card (Live Stepper) -->
+                <section class="admin-panel admin-update-progress-panel" id="update-progress-panel" @if(!$activeUpdateSession) style="display: none;" @endif>
                     <div class="admin-panel__header">
                         <div>
-                            <span class="admin-panel__eyebrow">{{ __('messages.available_updates') ?? __('messages.updates') }}</span>
-                            <h2 class="admin-panel__title">{{ $latestRelease['name'] ?: $latestRelease['tag'] }}</h2>
+                            <span class="admin-panel__eyebrow">{{ __('messages.update_progress_title') }}</span>
+                            <h2 class="admin-panel__title" id="update-progress-stage">
+                                {{ $activeUpdateSession['stage_label'] ?? __('messages.update_progress_idle') }}
+                            </h2>
                         </div>
-                        @if($latestRelease['published_at'])
-                            <span class="admin-chip"><i class="feather-calendar"></i>{{ \Carbon\Carbon::parse($latestRelease['published_at'])->format('M d, Y') }}</span>
-                        @endif
+                        <span class="badge bg-soft-primary text-primary fs-12 px-3 py-2" id="update-progress-status">
+                            {{ $activeUpdateSession['status'] ?? __('messages.pending') }}
+                        </span>
                     </div>
+
                     <div class="admin-panel__body">
-                        <div class="admin-metric-inline mb-4">
-                            <span class="admin-metric-pill"><i class="feather-tag"></i>{{ $latestRelease['tag'] }}</span>
-                            @if($latestRelease['download_size'])
-                                <span class="admin-metric-pill"><i class="feather-hard-drive"></i>{{ number_format($latestRelease['download_size'] / 1024 / 1024, 2) }} MB</span>
-                            @endif
-                            @if($latestRelease['html_url'])
-                                <a href="{{ $latestRelease['html_url'] }}" target="_blank" class="admin-metric-pill text-decoration-none">
-                                    <i class="feather-external-link"></i>{{ __('messages.view_on_github') ?? 'View on GitHub' }}
-                                </a>
-                            @endif
+                        <!-- Progress Metric & Bar -->
+                        <div class="admin-update-progress">
+                            <div class="admin-update-progress__meta">
+                                <span id="update-progress-detail" class="fw-semibold">{{ $activeUpdateSession['detail'] ?? __('messages.update_progress_description') }}</span>
+                                <strong id="update-progress-percent" class="fs-5 text-primary">{{ (int) ($activeUpdateSession['percent'] ?? 0) }}%</strong>
+                            </div>
+                            <div class="progress admin-update-progress__bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ (int) ($activeUpdateSession['percent'] ?? 0) }}">
+                                <div class="progress-bar progress-bar-striped progress-bar-animated" id="update-progress-bar" style="width: {{ (int) ($activeUpdateSession['percent'] ?? 0) }}%;"></div>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mt-2 small text-muted">
+                                <span id="update-progress-bytes">
+                                    @if(!empty($activeUpdateSession['bytes_total']))
+                                        {{ __('messages.update_stage_download_detail', [
+                                            'downloaded' => $activeUpdateSession['bytes_done'] ?? 0,
+                                            'total' => $activeUpdateSession['bytes_total'],
+                                        ]) }}
+                                    @endif
+                                </span>
+                                <span><i class="feather-activity me-1"></i>{{ __('messages.live_execution') ?? 'Live Stage Pipeline' }}</span>
+                            </div>
                         </div>
 
-                        @if($latestRelease['body'])
-                            <div class="mb-4">
-                                <div class="admin-panel__eyebrow">{{ __('messages.release_notes') }}</div>
-                                <div class="admin-release-notes markdown-content" style="display: none;">{{ $latestRelease['body'] }}</div>
-                            </div>
-                        @endif
+                        <!-- 7 Execution Stage Steps -->
+                        <div class="admin-update-steps mt-4" id="update-progress-steps">
+                            @foreach($updateProgressStages as $stage)
+                                <div class="admin-update-step is-{{ $stage['status'] ?? 'pending' }}" data-update-stage="{{ $stage['key'] }}">
+                                    <span class="admin-update-step__icon">
+                                        <i class="feather-{{ $stage['icon'] ?? 'circle' }}"></i>
+                                    </span>
+                                    <div class="flex-grow-1 min-w-0">
+                                        <span class="admin-update-step__title">{{ $stage['label'] }}</span>
+                                        <span class="admin-update-step__detail">{{ $stage['detail'] ?? '' }}</span>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
 
-                        <div class="admin-status-banner is-warning mb-3">
-                            <i class="feather-alert-triangle"></i>
+                        <!-- Error Banner (Shown on Failure) -->
+                        <div class="admin-status-banner is-danger mt-4" id="update-progress-error" style="display: none;">
+                            <i class="feather-alert-octagon fs-4"></i>
                             <div>
-                                <strong>{{ __('messages.important') ?? 'Important' }}</strong>
-                                <div>{{ __('messages.backup_warning') ?? 'Please create a full backup of your database and files before proceeding with the update. This action cannot be undone.' }}</div>
+                                <strong>{{ __('messages.update_session_failed') }}</strong>
+                                <div class="mt-1" id="update-progress-error-text"></div>
                             </div>
                         </div>
 
-                        <div class="admin-surface-soft mb-4">
-                            <div class="admin-panel__eyebrow">{{ __('messages.maintenance_update_title') }}</div>
-                            <div class="admin-muted">{{ __('messages.maintenance_update_auto_activate') }}</div>
-                        </div>
-
-                        <div class="d-flex flex-wrap gap-3">
-                            <button type="button" class="btn btn-primary px-4 js-update-trigger" data-bs-toggle="modal" data-bs-target="#confirmUpdateModal" @disabled(!$preflightReport->isSafe())>
-                                <i class="feather-download me-2"></i>{{ __('messages.update_now') }}
+                        <!-- Recovery Controls -->
+                        <div class="d-flex flex-wrap gap-2 mt-4 pt-2 border-top">
+                            <button type="button" class="btn btn-outline-primary btn-sm fw-bold" id="update-retry-btn" style="display: none;">
+                                <i class="feather-rotate-cw me-1"></i>{{ __('messages.update_retry_stage') }}
                             </button>
-                            @if($latestRelease['html_url'])
-                                <a href="{{ $latestRelease['html_url'] }}" target="_blank" class="btn btn-outline-secondary px-4">
-                                    <i class="feather-github me-2"></i>{{ __('messages.release_page') ?? 'Release Page' }}
-                                </a>
-                            @endif
+                            <button type="button" class="btn btn-outline-danger btn-sm fw-bold" id="update-cancel-btn" style="display: none;">
+                                <i class="feather-x-circle me-1"></i>{{ __('messages.update_cancel') }}
+                            </button>
                         </div>
                     </div>
                 </section>
-            @else
-                <section class="admin-panel" id="no-update-card">
-                    <div class="admin-panel__body">
-                        <div class="admin-empty-state py-4">
-                            <div class="admin-modal-icon is-primary">
-                                <i class="feather-shield"></i>
+
+                <!-- 2. Available Release Card -->
+                @if($updateAvailable && $latestRelease)
+                    <section class="admin-panel" id="update-card">
+                        <div class="admin-panel__header">
+                            <div>
+                                <span class="admin-panel__eyebrow">{{ __('messages.available_updates') ?? 'Available Release' }}</span>
+                                <h2 class="admin-panel__title d-flex align-items-center gap-2">
+                                    {{ $latestRelease['name'] ?: $latestRelease['tag'] }}
+                                    <span class="badge bg-primary fs-12">v{{ $latestVersion }}</span>
+                                </h2>
                             </div>
-                            <h4>{{ __('messages.all_good') ?? 'Everything looks good!' }}</h4>
-                            <p class="admin-muted mb-0">{{ __('messages.no_updates_desc') }}</p>
-                            <a href="https://github.com/mrghozzi/myads/releases" target="_blank" class="btn btn-outline-primary btn-sm mt-2">
-                                <i class="feather-github me-1"></i>{{ __('messages.view_all_releases') ?? 'View All Releases' }}
+                            @if($latestRelease['published_at'])
+                                <span class="admin-chip">
+                                    <i class="feather-calendar"></i>{{ \Carbon\Carbon::parse($latestRelease['published_at'])->format('M d, Y') }}
+                                </span>
+                            @endif
+                        </div>
+
+                        <div class="admin-panel__body">
+                            <!-- Release Meta Pills -->
+                            <div class="admin-metric-inline mb-4">
+                                <span class="admin-metric-pill"><i class="feather-tag"></i>{{ $latestRelease['tag'] }}</span>
+                                @if($latestRelease['download_size'])
+                                    <span class="admin-metric-pill"><i class="feather-hard-drive"></i>{{ number_format($latestRelease['download_size'] / 1024 / 1024, 2) }} MB</span>
+                                @endif
+                                @if($latestRelease['html_url'])
+                                    <a href="{{ $latestRelease['html_url'] }}" target="_blank" class="admin-metric-pill text-decoration-none">
+                                        <i class="feather-external-link"></i>{{ __('messages.view_on_github') ?? 'View on GitHub' }}
+                                    </a>
+                                @endif
+                            </div>
+
+                            <!-- Release Notes (Markdown rendered) -->
+                            @if($latestRelease['body'])
+                                <div class="mb-4">
+                                    <div class="admin-panel__eyebrow mb-2">
+                                        <i class="feather-file-text me-1"></i>{{ __('messages.release_notes') }}
+                                    </div>
+                                    <div class="admin-release-notes-wrapper p-3 rounded border">
+                                        <div class="admin-release-notes markdown-content" style="display: none;">{{ $latestRelease['body'] }}</div>
+                                    </div>
+                                </div>
+                            @endif
+
+                            <!-- Safety & Backup Note -->
+                            <div class="admin-status-banner is-warning mb-3">
+                                <i class="feather-alert-triangle fs-4"></i>
+                                <div>
+                                    <strong>{{ __('messages.important') ?? 'Important' }}</strong>
+                                    <div>{{ __('messages.backup_warning') ?? 'Please ensure you have verified your database and files backup before running this release upgrade.' }}</div>
+                                </div>
+                            </div>
+
+                            <div class="admin-surface-soft mb-4 p-3 rounded">
+                                <div class="fw-bold text-dark d-flex align-items-center">
+                                    <i class="feather-tool text-primary me-2"></i>{{ __('messages.maintenance_update_title') }}
+                                </div>
+                                <div class="admin-muted small mt-1">{{ __('messages.maintenance_update_auto_activate') }}</div>
+                            </div>
+
+                            <!-- Action Trigger -->
+                            <div class="d-flex flex-wrap align-items-center gap-3">
+                                <button type="button" class="btn btn-primary px-4 py-2 fw-bold js-update-trigger shadow-sm" data-bs-toggle="modal" data-bs-target="#confirmUpdateModal" @disabled(!$preflightReport->isSafe())>
+                                    <i class="feather-download me-2"></i>{{ __('messages.update_now') }}
+                                </button>
+                                @if($latestRelease['html_url'])
+                                    <a href="{{ $latestRelease['html_url'] }}" target="_blank" class="btn btn-outline-secondary px-4 py-2">
+                                        <i class="feather-github me-2"></i>{{ __('messages.release_page') ?? 'Release Page' }}
+                                    </a>
+                                @endif
+                            </div>
+                        </div>
+                    </section>
+                @else
+                    <!-- 3. System Up To Date Card -->
+                    <section class="admin-panel" id="no-update-card">
+                        <div class="admin-panel__body text-center py-5">
+                            <div class="admin-modal-icon is-primary mx-auto mb-3" style="width: 64px; height: 64px; font-size: 28px;">
+                                <i class="feather-check-circle text-success"></i>
+                            </div>
+                            <h3 class="fw-bold mb-2">{{ __('messages.all_good') ?? 'Everything looks good!' }}</h3>
+                            <p class="admin-muted mx-auto mb-4" style="max-width: 520px;">
+                                {{ __('messages.no_updates_desc') ?? 'Your MyAds platform is running on the latest official build. Security checks and database integrity are verified.' }}
+                            </p>
+                            <div class="d-inline-flex gap-2">
+                                <a href="https://github.com/mrghozzi/myads/releases" target="_blank" class="btn btn-outline-primary btn-sm px-3">
+                                    <i class="feather-github me-1"></i>{{ __('messages.view_all_releases') ?? 'View All Releases' }}
+                                </a>
+                                <a href="{{ route('admin.about') }}" class="btn btn-light btn-sm px-3 border">
+                                    <i class="feather-info me-1"></i>{{ __('messages.system_info') }}
+                                </a>
+                            </div>
+                        </div>
+                    </section>
+                @endif
+
+                <!-- 4. Quick Link: What's New & System Stats -->
+                <section class="admin-panel">
+                    <div class="admin-panel__body">
+                        <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="bg-soft-primary text-primary rounded p-3">
+                                    <i class="feather-award fs-3"></i>
+                                </div>
+                                <div>
+                                    <h6 class="fw-bold mb-1">{{ __('messages.about_myads') ?? 'About MYADS & Platform Statistics' }}</h6>
+                                    <p class="admin-muted small mb-0">{{ __('messages.view_system_overview_stats') ?? 'Explore server metrics, platform volume, and system architecture.' }}</p>
+                                </div>
+                            </div>
+                            <a href="{{ route('admin.about') }}" class="btn btn-outline-primary btn-sm">
+                                <i class="feather-external-link me-1"></i>{{ __('messages.view_details') ?? 'View Details' }}
                             </a>
                         </div>
                     </div>
                 </section>
-            @endif
+
+            </div>
         </div>
 
-        <aside class="admin-section-stack">
-            <section class="admin-note-card {{ $maintenanceEnabled ? '' : '' }}">
-                <span class="admin-note-label">{{ __('messages.maintenance_update_title') }}</span>
-                <span class="admin-note-copy">{{ $maintenanceEnabled ? __('messages.maintenance_update_active_notice') : __('messages.maintenance_update_inactive_notice') }}</span>
-                <div class="admin-chip-list mt-3">
-                    <span class="admin-chip"><i class="feather-tool"></i>{{ $maintenanceEnabled ? __('messages.maintenance_status_enabled') : __('messages.maintenance_status_disabled') }}</span>
-                </div>
-            </section>
+        <!-- Sidebar Column (Preflight & Environment) -->
+        <div class="col-xl-4 col-lg-5">
+            <div class="d-flex flex-column gap-4">
 
-            <section class="admin-panel">
-                <div class="admin-panel__header">
-                    <div>
-                        <span class="admin-panel__eyebrow">{{ __('messages.system_info') }}</span>
-                        <h2 class="admin-panel__title">{{ __('messages.system_info') }}</h2>
+                <!-- Preflight Safety Checklist Card -->
+                <section class="admin-panel">
+                    <div class="admin-panel__header">
+                        <div>
+                            <span class="admin-panel__eyebrow">{{ __('messages.update_preflight_title') }}</span>
+                            <h2 class="admin-panel__title">{{ __('messages.update_preflight_title') }}</h2>
+                        </div>
+                        <span class="badge {{ $preflightReport->isSafe() ? 'bg-soft-success text-success' : 'bg-soft-danger text-danger' }} px-2 py-1">
+                            {{ $preflightReport->isSafe() ? __('messages.update_preflight_passed') : __('messages.update_preflight_failed') }}
+                        </span>
                     </div>
-                </div>
-                <div class="admin-panel__body">
-                    <table class="table admin-kv-table mb-0">
-                        <tbody>
-                            <tr>
-                                <td class="fw-medium text-muted">{{ __('messages.script_name') ?? 'Script' }}</td>
-                                <td class="text-end fw-bold">MyAds</td>
-                            </tr>
-                            <tr>
-                                <td class="fw-medium text-muted">{{ __('messages.current_version') ?? 'Version' }}</td>
-                                <td class="text-end fw-bold">v{{ $currentVersion }}</td>
-                            </tr>
-                            <tr>
-                                <td class="fw-medium text-muted">PHP</td>
-                                <td class="text-end fw-bold">{{ phpversion() }}</td>
-                            </tr>
-                            <tr>
-                                <td class="fw-medium text-muted">Laravel</td>
-                                <td class="text-end fw-bold">{{ app()->version() }}</td>
-                            </tr>
-                            <tr>
-                                <td class="fw-medium text-muted">{{ __('messages.github_repo') ?? 'Repository' }}</td>
-                                <td class="text-end">
-                                    <a href="https://github.com/mrghozzi/myads" target="_blank" class="text-primary fs-12">
-                                        <i class="feather-github me-1"></i>mrghozzi/myads
-                                    </a>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-        </aside>
+
+                    <div class="admin-panel__body">
+                        <p class="admin-panel__copy small mb-3">{{ __('messages.update_preflight_description') }}</p>
+
+                        <div class="admin-check-list">
+                            @foreach($preflightReport->checks as $check)
+                                <div class="admin-check-item">
+                                    <span class="admin-check-item__icon {{ $check['status'] === 'passed' ? 'is-passed' : 'is-failed' }}">
+                                        <i class="feather-{{ $check['status'] === 'passed' ? 'check' : 'alert-circle' }}"></i>
+                                    </span>
+                                    <div class="flex-grow-1 min-w-0">
+                                        <span class="admin-check-item__title">{{ $check['title'] }}</span>
+                                        <span class="admin-check-item__detail">{{ $check['detail'] }}</span>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+
+                        @if(!$preflightReport->isSafe())
+                            <div class="admin-status-banner is-danger mt-3">
+                                <i class="feather-alert-octagon"></i>
+                                <div>
+                                    <strong>{{ __('messages.update_preflight_failed') }}</strong>
+                                    <div class="mt-1 small">{{ __('messages.update_blocked_preflight', ['details' => implode(' ', $preflightReport->failureMessages())]) }}</div>
+                                </div>
+                            </div>
+                        @else
+                            <div class="mt-3 p-2 rounded bg-soft-success text-success small d-flex align-items-center">
+                                <i class="feather-shield me-2 fs-5"></i>
+                                <span>{{ __('messages.update_preflight_passed') }} — {{ __('messages.safe_to_update') ?? 'Ready for safe upgrade' }}</span>
+                            </div>
+                        @endif
+                    </div>
+                </section>
+
+                <!-- Maintenance Policy Card -->
+                <section class="admin-note-card">
+                    <span class="admin-note-label">{{ __('messages.maintenance_update_title') }}</span>
+                    <span class="admin-note-copy">{{ $maintenanceEnabled ? __('messages.maintenance_update_active_notice') : __('messages.maintenance_update_inactive_notice') }}</span>
+                    <div class="admin-chip-list mt-3">
+                        <span class="admin-chip">
+                            <i class="feather-tool"></i>
+                            {{ $maintenanceEnabled ? __('messages.maintenance_status_enabled') : __('messages.maintenance_status_disabled') }}
+                        </span>
+                    </div>
+                </section>
+
+                <!-- Environment & System Specs Card -->
+                <section class="admin-panel">
+                    <div class="admin-panel__header">
+                        <div>
+                            <span class="admin-panel__eyebrow">{{ __('messages.system_info') }}</span>
+                            <h2 class="admin-panel__title">{{ __('messages.system_info') }}</h2>
+                        </div>
+                    </div>
+                    <div class="admin-panel__body p-0">
+                        <table class="table admin-kv-table mb-0">
+                            <tbody>
+                                <tr>
+                                    <td class="fw-medium text-muted ps-3">{{ __('messages.script_name') ?? 'Script' }}</td>
+                                    <td class="text-end fw-bold pe-3">MyAds Core</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-medium text-muted ps-3">{{ __('messages.current_version') ?? 'Version' }}</td>
+                                    <td class="text-end fw-bold pe-3">v{{ $currentVersion }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-medium text-muted ps-3">PHP</td>
+                                    <td class="text-end fw-bold pe-3">{{ phpversion() }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-medium text-muted ps-3">Laravel</td>
+                                    <td class="text-end fw-bold pe-3">{{ app()->version() }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-medium text-muted ps-3">Database</td>
+                                    <td class="text-end fw-bold pe-3">{{ $mysqlVersion }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-medium text-muted ps-3">{{ __('messages.github_repo') ?? 'Repository' }}</td>
+                                    <td class="text-end pe-3">
+                                        <a href="https://github.com/mrghozzi/myads" target="_blank" class="text-primary fw-semibold fs-12">
+                                            <i class="feather-github me-1"></i>mrghozzi/myads
+                                        </a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+            </div>
+        </div>
     </div>
 </div>
 @endsection
 
 @section('modals')
 @if($updateAvailable && $latestRelease)
+    <!-- Upgrade Confirmation Modal -->
     <div class="modal fade" id="confirmUpdateModal" tabindex="-1" aria-labelledby="confirmUpdateModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title fw-bold" id="confirmUpdateModalLabel">
-                        <i class="feather-alert-triangle text-warning me-2"></i>{{ __('messages.confirm_update') }}
+            <div class="modal-content border-0 shadow-lg" style="border-radius: var(--admin-premium-radius);">
+                <div class="modal-header border-bottom pb-3">
+                    <h5 class="modal-title fw-bold d-flex align-items-center" id="confirmUpdateModalLabel">
+                        <i class="feather-alert-triangle text-warning me-2 fs-4"></i>{{ __('messages.confirm_update') }}
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body">
-                    <p class="text-muted mb-3">
+
+                <div class="modal-body py-4">
+                    <!-- Version Transition Badge -->
+                    <div class="p-3 mb-3 rounded d-flex align-items-center justify-content-center gap-3 bg-light">
+                        <span class="badge bg-secondary fs-13 py-2 px-3">v{{ $currentVersion }}</span>
+                        <i class="feather-arrow-right fs-4 text-primary"></i>
+                        <span class="badge bg-primary fs-13 py-2 px-3">v{{ $latestVersion }}</span>
+                    </div>
+
+                    <p class="text-muted small mb-3">
                         {{ __('messages.confirm_update_desc') }}
                         <strong>v{{ $currentVersion }}</strong>
                         {{ __('messages.to') ?? 'to' }}
                         <strong>v{{ $latestVersion }}</strong>.
                     </p>
 
-                    <div class="admin-status-banner is-danger mb-3">
-                        <i class="feather-alert-circle"></i>
+                    <div class="admin-status-banner is-danger mb-3 p-3 rounded">
+                        <i class="feather-alert-circle fs-4"></i>
                         <div>
                             <strong>{{ __('messages.before_updating') ?? 'Before updating' }}</strong>
-                            <ul class="mb-0 mt-2 ps-3">
+                            <ul class="mb-0 mt-2 ps-3 small">
                                 <li>{{ __('messages.backup_database') ?? 'Backup your database' }}</li>
                                 <li>{{ __('messages.backup_files') ?? 'Backup your files (especially modified theme files)' }}</li>
-                                <li>{{ __('messages.ensure_no_users') }}</li>
+                                <li>{{ __('messages.ensure_no_users') ?? 'Maintenance mode will automatically engage during update.' }}</li>
                             </ul>
                         </div>
                     </div>
 
+                    <!-- Explicit Checkboxes -->
                     <div class="form-check mb-2">
                         <input class="form-check-input" type="checkbox" value="1" id="backup_ack_database" name="backup_ack_database" form="update-form" {{ old('backup_ack_database') ? 'checked' : '' }}>
-                        <label class="form-check-label" for="backup_ack_database">
+                        <label class="form-check-label fw-semibold" for="backup_ack_database">
                             {{ __('messages.backup_ack_database') ?? 'I have created a backup of the database.' }}
                         </label>
                     </div>
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" value="1" id="backup_ack_files" name="backup_ack_files" form="update-form" {{ old('backup_ack_files') ? 'checked' : '' }}>
-                        <label class="form-check-label" for="backup_ack_files">
+                        <label class="form-check-label fw-semibold" for="backup_ack_files">
                             {{ __('messages.backup_ack_files') ?? 'I have created a backup of the files.' }}
                         </label>
                     </div>
                 </div>
-                <div class="modal-footer">
+
+                <div class="modal-footer border-top pt-3">
                     <button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ __('messages.cancel') ?? 'Cancel' }}</button>
                     <form action="{{ route('admin.updates.process') }}" method="POST" id="update-form">
                         @csrf
-                        <button type="submit" class="btn btn-primary fw-bold" id="btn-update" @disabled(!$preflightReport->isSafe())>
+                        <button type="submit" class="btn btn-primary fw-bold px-4" id="btn-update" @disabled(!$preflightReport->isSafe())>
                             <i class="feather-download me-1"></i>{{ __('messages.yes_update') }}
                         </button>
                     </form>
@@ -442,7 +558,7 @@
     let updateRecoveryTimer = null;
 
     document.addEventListener('DOMContentLoaded', function () {
-        // Markdown Rendering
+        // Markdown Rendering with DOMPurify sanitization
         function renderMarkdown() {
             document.querySelectorAll('.markdown-content').forEach(el => {
                 if (!el.getAttribute('data-rendered')) {
@@ -493,7 +609,7 @@
         const originalHtml = btn.innerHTML;
 
         btn.disabled = true;
-        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status"></span> {{ __("messages.checking") ?? "Checking..." }}';
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status"></span> ' + updateConfig.labels.checking;
 
         fetch('{{ route("admin.updates.check") }}', {
             method: 'POST',
@@ -523,7 +639,7 @@
         .catch(() => {
             btn.disabled = false;
             btn.innerHTML = originalHtml;
-            showFlash('danger', '<i class="feather-alert-circle me-2"></i>{{ __("messages.connection_error") ?? "Connection error. Please try again." }}');
+            showFlash('danger', '<i class="feather-alert-circle me-2"></i>' + updateConfig.labels.connectionError);
         });
     }
 
@@ -886,7 +1002,7 @@
         }
 
         const alertDiv = document.createElement('div');
-        alertDiv.className = 'alert alert-' + type + ' d-flex align-items-center dynamic-alert';
+        alertDiv.className = 'alert alert-' + type + ' d-flex align-items-center shadow-sm border-0 dynamic-alert';
         alertDiv.setAttribute('role', 'alert');
         alertDiv.innerHTML = '<div>' + message + '</div>';
 
@@ -905,34 +1021,158 @@
     }
 </script>
 <style>
-    .markdown-content h1, .markdown-content h2, .markdown-content h3 { margin-top: 1.25rem; margin-bottom: 0.75rem; font-weight: 700; color: var(--vz-heading-color); }
-    .markdown-content h1 { font-size: 1.5rem; }
-    .markdown-content h2 { font-size: 1.25rem; }
-    .markdown-content h3 { font-size: 1.1rem; }
-    .markdown-content p { margin-bottom: 1rem; line-height: 1.6; }
-    .markdown-content ul, .markdown-content ol { margin-bottom: 1rem; padding-left: 1.5rem; }
-    .markdown-content li { margin-bottom: 0.5rem; }
-    .markdown-content code { background: rgba(var(--vz-primary-rgb), 0.1); color: var(--vz-primary); padding: 0.2rem 0.4rem; border-radius: 4px; font-size: 85%; }
-    .markdown-content pre { background: var(--vz-light); padding: 1rem; border-radius: 6px; overflow-x: auto; margin-bottom: 1rem; border: 1px solid var(--vz-border-color); }
-    .markdown-content pre code { background: transparent; color: inherit; padding: 0; }
-    .markdown-content blockquote { border-left: 4px solid var(--vz-primary); padding-left: 1rem; margin-left: 0; font-style: italic; color: var(--vz-muted); }
-    .markdown-content img { max-width: 100%; height: auto; border-radius: 6px; }
-    .markdown-content hr { margin: 1.5rem 0; border-top: 1px solid var(--vz-border-color); opacity: 1; }
-    .admin-update-progress { background: rgba(var(--vz-primary-rgb), 0.06); border: 1px solid rgba(var(--vz-primary-rgb), 0.14); border-radius: 8px; padding: 1rem; }
-    .admin-update-progress__meta { display: flex; align-items: center; justify-content: space-between; gap: 1rem; font-size: 0.95rem; color: var(--vz-heading-color); }
-    .admin-update-progress__bar { height: 10px; margin-top: 0.75rem; background: rgba(120, 130, 160, 0.18); border-radius: 999px; overflow: hidden; }
-    .admin-update-progress__bar .progress-bar { background: linear-gradient(90deg, #0ea5e9, #2563eb); }
-    .admin-update-steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 0.75rem; }
-    .admin-update-step { display: flex; align-items: flex-start; gap: 0.75rem; min-height: 72px; padding: 0.85rem; border: 1px solid var(--vz-border-color); border-radius: 8px; background: var(--vz-card-bg); transition: border-color 0.2s ease, background 0.2s ease; }
-    .admin-update-step__icon { width: 34px; height: 34px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; flex: 0 0 34px; background: var(--vz-light); color: var(--vz-muted); }
-    .admin-update-step__title { display: block; font-weight: 700; color: var(--vz-heading-color); line-height: 1.25; }
-    .admin-update-step__detail { display: block; margin-top: 0.25rem; color: var(--vz-muted); font-size: 0.78rem; line-height: 1.35; overflow-wrap: anywhere; }
-    .admin-update-step.is-current { border-color: rgba(var(--vz-primary-rgb), 0.45); background: rgba(var(--vz-primary-rgb), 0.05); }
+    /* Superdesign Refined Styles for /admin/updates */
+    .admin-update-progress {
+        background: var(--admin-premium-surface-alt, #f6f7fb);
+        border: 1px solid var(--admin-premium-border, rgba(15, 23, 42, 0.08));
+        border-radius: 16px;
+        padding: 1.25rem;
+    }
+    .admin-update-progress__meta {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        font-size: 0.95rem;
+        color: var(--admin-premium-text, #1f2937);
+    }
+    .admin-update-progress__bar {
+        height: 12px;
+        margin-top: 0.75rem;
+        background: rgba(120, 130, 160, 0.14);
+        border-radius: 999px;
+        overflow: hidden;
+    }
+    .admin-update-progress__bar .progress-bar {
+        background: linear-gradient(90deg, #3454d1, #615dfa);
+        transition: width 0.4s ease;
+    }
+    .admin-update-steps {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 0.85rem;
+    }
+    .admin-update-step {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.85rem;
+        min-height: 76px;
+        padding: 0.95rem;
+        border: 1px solid var(--admin-premium-border, rgba(15, 23, 42, 0.08));
+        border-radius: 12px;
+        background: var(--admin-premium-surface, #ffffff);
+        transition: border-color 0.25s ease, background 0.25s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .admin-update-step:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--admin-premium-shadow-soft, 0 14px 30px rgba(15,23,42,.05));
+    }
+    .admin-update-step__icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex: 0 0 38px;
+        background: var(--admin-premium-surface-alt, #f6f7fb);
+        color: var(--admin-premium-muted, #6b7280);
+        font-size: 1.15rem;
+        transition: all 0.25s ease;
+    }
+    .admin-update-step__title {
+        display: block;
+        font-weight: 700;
+        font-size: 0.88rem;
+        color: var(--admin-premium-text, #1f2937);
+        line-height: 1.3;
+    }
+    .admin-update-step__detail {
+        display: block;
+        margin-top: 0.25rem;
+        color: var(--admin-premium-muted, #6b7280);
+        font-size: 0.76rem;
+        line-height: 1.35;
+        overflow-wrap: anywhere;
+    }
+    .admin-update-step.is-current {
+        border-color: rgba(97, 93, 250, 0.45);
+        background: rgba(97, 93, 250, 0.04);
+        box-shadow: 0 0 0 1px rgba(97, 93, 250, 0.2);
+    }
     .admin-update-step.is-running .admin-update-step__icon,
-    .admin-update-step.is-current .admin-update-step__icon { background: rgba(var(--vz-primary-rgb), 0.14); color: var(--vz-primary); }
-    .admin-update-step.is-completed .admin-update-step__icon { background: rgba(25, 135, 84, 0.14); color: #198754; }
-    .admin-update-step.is-failed { border-color: rgba(220, 53, 69, 0.35); background: rgba(220, 53, 69, 0.05); }
-    .admin-update-step.is-failed .admin-update-step__icon { background: rgba(220, 53, 69, 0.14); color: #dc3545; }
+    .admin-update-step.is-current .admin-update-step__icon {
+        background: rgba(97, 93, 250, 0.15);
+        color: var(--admin-premium-accent, #615dfa);
+        animation: pulseIcon 1.8s infinite;
+    }
+    .admin-update-step.is-completed .admin-update-step__icon {
+        background: rgba(23, 198, 102, 0.15);
+        color: #17c666;
+    }
+    .admin-update-step.is-completed {
+        border-color: rgba(23, 198, 102, 0.25);
+    }
+    .admin-update-step.is-failed {
+        border-color: rgba(234, 77, 77, 0.35);
+        background: rgba(234, 77, 77, 0.04);
+    }
+    .admin-update-step.is-failed .admin-update-step__icon {
+        background: rgba(234, 77, 77, 0.15);
+        color: #ea4d4d;
+    }
+
+    @keyframes pulseIcon {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.08); }
+        100% { transform: scale(1); }
+    }
+
+    .admin-release-notes-wrapper {
+        background: var(--admin-premium-surface-alt, #f6f7fb);
+        max-height: 380px;
+        overflow-y: auto;
+    }
+    .markdown-content h1, .markdown-content h2, .markdown-content h3 {
+        margin-top: 1rem;
+        margin-bottom: 0.5rem;
+        font-weight: 700;
+        color: var(--admin-premium-text, #1f2937);
+    }
+    .markdown-content h1 { font-size: 1.35rem; }
+    .markdown-content h2 { font-size: 1.15rem; }
+    .markdown-content h3 { font-size: 1.05rem; }
+    .markdown-content p { margin-bottom: 0.85rem; line-height: 1.6; font-size: 0.9rem; }
+    .markdown-content ul, .markdown-content ol { margin-bottom: 0.85rem; padding-inline-start: 1.5rem; }
+    .markdown-content li { margin-bottom: 0.4rem; font-size: 0.88rem; }
+    .markdown-content code {
+        background: rgba(97, 93, 250, 0.1);
+        color: var(--admin-premium-accent, #615dfa);
+        padding: 0.15rem 0.35rem;
+        border-radius: 4px;
+        font-size: 85%;
+    }
+    .markdown-content pre {
+        background: var(--admin-premium-surface, #ffffff);
+        padding: 0.85rem;
+        border-radius: 8px;
+        overflow-x: auto;
+        margin-bottom: 1rem;
+        border: 1px solid var(--admin-premium-border, rgba(15, 23, 42, 0.08));
+    }
+    .markdown-content pre code { background: transparent; color: inherit; padding: 0; }
+    .markdown-content blockquote {
+        border-inline-start: 4px solid var(--admin-premium-accent, #615dfa);
+        padding-inline-start: 1rem;
+        font-style: italic;
+        color: var(--admin-premium-muted, #6b7280);
+    }
+    .markdown-content hr {
+        margin: 1.25rem 0;
+        border-top: 1px solid var(--admin-premium-border, rgba(15, 23, 42, 0.08));
+        opacity: 1;
+    }
+
     @media (max-width: 575.98px) {
         .admin-update-progress__meta { align-items: flex-start; flex-direction: column; gap: 0.35rem; }
         .admin-update-steps { grid-template-columns: 1fr; }

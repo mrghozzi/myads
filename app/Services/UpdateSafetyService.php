@@ -89,6 +89,43 @@ class UpdateSafetyService
             );
         }
 
+        $freeSpace = @disk_free_space(base_path());
+        if ($freeSpace !== false) {
+            $freeMb = round($freeSpace / 1048576, 1);
+            if ($freeSpace >= 52428800) { // 50 MB
+                $checks[] = $this->makeCheck(
+                    'disk_space',
+                    'passed',
+                    __('messages.free_disk_space') ?? 'Free Disk Space',
+                    $freeMb >= 1024 ? round($freeMb / 1024, 2) . ' GB free' : "{$freeMb} MB free"
+                );
+            } else {
+                $checks[] = $this->makeCheck(
+                    'disk_space',
+                    'failed',
+                    __('messages.free_disk_space') ?? 'Free Disk Space',
+                    "Insufficient disk space: {$freeMb} MB available, at least 50 MB required."
+                );
+            }
+        }
+
+        $phpVersion = PHP_VERSION;
+        if (version_compare($phpVersion, '8.1.0', '>=')) {
+            $checks[] = $this->makeCheck(
+                'php_version',
+                'passed',
+                'PHP Version',
+                "PHP {$phpVersion} (>= 8.1)"
+            );
+        } else {
+            $checks[] = $this->makeCheck(
+                'php_version',
+                'failed',
+                'PHP Version',
+                "PHP {$phpVersion} is too old. PHP 8.1 or higher is required."
+            );
+        }
+
         try {
             $repository = $this->migrator->getRepository();
 

@@ -4266,4 +4266,8 @@ return [
     'mermaid_render_error' => 'Could not render Mermaid diagram syntax.',
     'shortcut' => 'Shortcut',
     'shortcuts' => 'Shortcuts',
+    'target_version' => 'Target Version',
+    'about_myads' => 'About MYADS & Platform Statistics',
+    'view_system_overview_stats' => 'Explore server metrics, platform volume, and system architecture.',
+    'safe_to_update' => 'Ready for safe upgrade',
 ];

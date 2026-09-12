@@ -349,6 +349,10 @@ class ReleaseUpdateService
         }
 
         $size = File::size($zipPath);
+
+        // Verify package checksum if provided in release assets
+        $this->verifyPackageChecksum($session, $zipPath);
+
         $this->updateStageProgress(
             $session,
             'download',
@@ -463,6 +467,9 @@ class ReleaseUpdateService
         $copied = 0;
         $lastPersistedAt = microtime(true);
 
+        // Create pre-update snapshot of files being replaced for safe rollback
+        $this->createPreUpdateSnapshot($session, $files, $inner);
+
         foreach ($files as $file) {
             $sourcePath = (string) $file->getRealPath();
             $relativePath = $this->relativePath($inner, $sourcePath);
@@ -524,6 +531,11 @@ class ReleaseUpdateService
 
         $this->updateStageProgress($session, 'finalize', 88, __('messages.update_stage_finalize_clearing_cache'), null, null, true);
         Artisan::call('optimize:clear');
+
+        // Reset OPcache if available so updated PHP bytecode loads immediately
+        if (function_exists('opcache_reset')) {
+            @opcache_reset();
+        }
 
         $this->updateStageProgress($session, 'finalize', 100, __('messages.update_stage_finalize_done'), null, null, true);
     }
@@ -905,6 +917,19 @@ class ReleaseUpdateService
         if ($currentVersion !== '') {
             Cache::forget('system_version_checked_' . str_replace('.', '-', $currentVersion));
         }
+
+        try {
+            Artisan::call('view:clear');
+            Artisan::call('route:clear');
+            Artisan::call('config:clear');
+        } catch (\Throwable) {
+            // Silently continue if CLI artisan has permission limits
+        }
+
+        // Reset OPcache if enabled
+        if (function_exists('opcache_reset')) {
+            @opcache_reset();
+        }
     }
 
     private function deleteTempRoot(array $session): void
@@ -1043,5 +1068,71 @@ class ReleaseUpdateService
         }
 
         return null;
+    }
+
+    private function createPreUpdateSnapshot(array &$session, array $incomingFiles, string $inner): void
+    {
+        try {
+            $snapshotRoot = storage_path('app' . DIRECTORY_SEPARATOR . 'myads_updates' . DIRECTORY_SEPARATOR . 'snapshots' . DIRECTORY_SEPARATOR . ($session['current_version'] ?? 'prev') . '_' . date('Ymd_His'));
+            $snapshotCount = 0;
+
+            foreach ($incomingFiles as $file) {
+                $relativePath = $this->relativePath($inner, (string) $file->getRealPath());
+                $targetPath = base_path(str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $relativePath));
+
+                if (File::exists($targetPath) && ! File::isDirectory($targetPath)) {
+                    $snapshotTarget = $snapshotRoot . DIRECTORY_SEPARATOR . str_replace(['/', '\\'], DIRECTORY_SEPARATOR, $relativePath);
+                    File::ensureDirectoryExists(dirname($snapshotTarget), 0755, true);
+                    @File::copy($targetPath, $snapshotTarget);
+                    $snapshotCount++;
+                }
+            }
+
+            if ($snapshotCount > 0) {
+                $session['snapshot_path'] = $snapshotRoot;
+                $session['snapshot_count'] = $snapshotCount;
+            }
+        } catch (\Throwable $e) {
+            \Log::warning('Pre-update file snapshot skipped: ' . $e->getMessage());
+        }
+    }
+
+    private function verifyPackageChecksum(array &$session, string $zipPath): void
+    {
+        $releaseData = $session['release_data'] ?? [];
+        $expectedHash = null;
+
+        $assets = $releaseData['assets'] ?? [];
+        $checksumAsset = null;
+        foreach ($assets as $asset) {
+            $name = (string) ($asset['name'] ?? '');
+            if (str_ends_with($name, '.sha256') || str_ends_with($name, '.sha256sum') || $name === 'checksums.txt') {
+                $checksumAsset = $asset;
+                break;
+            }
+        }
+
+        if ($checksumAsset && ! empty($checksumAsset['browser_download_url'])) {
+            try {
+                $hashResponse = http_secure()->timeout(15)->get($checksumAsset['browser_download_url']);
+                if ($hashResponse->successful()) {
+                    $content = trim($hashResponse->body());
+                    if (preg_match('/\b([a-f0-9]{64})\b/i', $content, $m)) {
+                        $expectedHash = strtolower($m[1]);
+                    }
+                }
+            } catch (\Throwable) {
+                // Ignore network error fetching optional checksum
+            }
+        }
+
+        if ($expectedHash !== null) {
+            $actualHash = strtolower((string) hash_file('sha256', $zipPath));
+            if (! hash_equals($expectedHash, $actualHash)) {
+                File::delete($zipPath);
+                throw new RuntimeException(__('messages.update_checksum_mismatch') ?? 'Package SHA-256 integrity check failed. The downloaded file may be corrupted.');
+            }
+            $session['package_sha256'] = $actualHash;
+        }
     }
 }

@@ -4267,4 +4267,8 @@ return [
     'mermaid_render_error' => 'تعذر رسم المخطط، يرجى التحقق من بنية كود Mermaid.',
     'shortcut' => 'اختصار',
     'shortcuts' => 'اختصارات',
+    'target_version' => 'الإصدار المستهدف',
+    'about_myads' => 'حول MYADS وإحصائيات المنصة',
+    'view_system_overview_stats' => 'استكشف مؤشرات السيرفر وحجم المنصة والبنية التحتية للنظام.',
+    'safe_to_update' => 'جاهز للترقية الآمنة',
 ];
