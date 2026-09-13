@@ -7,19 +7,19 @@ return [
     'tab_changelog' => 'Değişiklik Günlüğü',
     'tab_about' => 'MYADS Hakkında',
     
-    // What's New Section (v4.5.5)
-    'feature_1_title' => 'Superdesign Kod Pencereleri & Mermaid Diyagram Motoru',
-    'feature_1_desc' => 'Bilgi Bankası, Mağaza ve Forum genelinde tek tıkla kopyalama, satır numaraları ve açık/koyu mod desteği sunan etkileşimli Mermaid mimari diyagramları ve macOS tarzı kod pencereleri.',
-    'feature_2_title' => 'Ters Proxy & Cloudflare Protokol Güveni',
-    'feature_2_desc' => 'Ters proxy ve Cloudflare başlıklarına tam güven (trustProxies), HTTPS yönlendirmelerinde veri kaybını ve form gönderimlerindeki 405/403 hatalarını önler.',
-    'feature_3_title' => 'Geliştirici Rotaları & JSON Payload Mimarisi',
-    'feature_3_desc' => 'Geliştirici formlarında sayısal rota kısıtlamaları (->whereNumber), standart JSON veri yükleri (application/json) ve kapsamlı \Throwable istisna güvenliği.',
-    'feature_4_title' => 'Site Genelinde Canlı Tema Özelleştirici Kalıcılığı',
-    'feature_4_desc' => 'Gelişmiş CSS basamaklama önceliği, dinamik başlık parçacığı enjeksiyonu, iframe içinde çok sayfalı canlı önizleme ve derlenmiş CSS değişkenleri.',
-    'feature_5_title' => 'Gerçek Zamanlı SSE Mesaj Rozeti Senkronizasyonu',
-    'feature_5_desc' => 'SSE akışındaki okunmamış mesaj sayacı mantığı düzeltildi, yüksek hacimli hesaplardaki hatalı +99 rozetleri giderildi ve gerçek zamanlı API durumları eşitlendi.',
-    'feature_6_title' => 'Güvenlik Güçlendirmesi & Bağımlılık Güncellemeleri',
-    'feature_6_desc' => 'league/commonmark XSS güvenlik açığı düzeltildi (v2.10.0 - Dependabot #70), nette/schema v1.3.6 sürümüne yükseltildi ve istisna işleme sağlamlaştırıldı.',
+        // What's New Section (v4.5.6)
+    'feature_1_title' => 'Platform Çapında Performans İyileştirmesi ve TTFB Hızlandırması',
+    'feature_1_desc' => 'Sunucu yanıt süresinin (TTFB) 100ms altına düşürülmesi. Bellek içi statik önbellekleme ve toplu ön yükleme veritabanı sorgularını %88 oranında azaltır.',
+    'feature_2_title' => 'Asenkron Kuyruk Motoru ve Öncelikli Kanallar',
+    'feature_2_desc' => '4 özel kanallı (high, default, media, maintenance) yüksek verimli asenkron görev mimarisi, anında bildirimler ve tek tıkla iş kurtarma.',
+    'feature_3_title' => 'Geliştirici Platformu ve Evrensel Bearer Yetkilendirmesi',
+    'feature_3_desc' => 'Apache ve proxy ortamlarında 401 hatalarını çözen çok katmanlı token ayrıştırma, dinamik izin ataması ve şemaya uygun gönderi yayınlama.',
+    'feature_4_title' => 'Yeniden Yüklemesiz AJAX Eklenti Merkezi ve Otomatik Taşıma',
+    'feature_4_desc' => 'Eklenti etkinleştirildiğinde otomatik veritabanı taşıma çalıştırma, sıfır gecikmeli AJAX geçişleri, canlı kategori filtreleri ve anlık arama.',
+    'feature_5_title' => 'Güncelleme Motoru Güçlendirmesi ve Ön Yedekleme',
+    'feature_5_desc' => 'Otomatik güvenlik kontrolleri (disk alanı >= 50MB, PHP), dosya üzerine yazılmadan önce anlık yedekleme ve OPcache sıfırlama.',
+    'feature_6_title' => 'Konu Öncelikli Mağaza Mimarisi ve Gelişmiş SEO',
+    'feature_6_desc' => 'Konu sekmesini varsayılan yapan modern ürün sayfası, sunucu taraflı Markdown oluşturma, Schema.org Product/Offer JSON-LD ve Apache GZIP sıkıştırması.',
 
     // About Section
     'about_description' => 'MYADS, güçlü bir topluluk platformu ve hepsi bir arada reklam değişim ağıdır.',

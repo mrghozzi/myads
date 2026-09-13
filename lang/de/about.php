@@ -7,19 +7,19 @@ return [
     'tab_changelog' => 'Änderungsprotokoll',
     'tab_about' => 'Über MYADS',
     
-    // What's New Section (v4.5.5)
-    'feature_1_title' => 'Superdesign Code-Fenster & Interaktive Mermaid-Diagramme',
-    'feature_1_desc' => 'Interaktive Mermaid-Architekturdiagramme und macOS-Code-Fenster mit Ein-Klick-Kopieren, Zeilennummern und Hell/Dunkel-Modus-Unterstützung in Wissensdatenbank, Store und Foren.',
-    'feature_2_title' => 'Reverse-Proxy & Cloudflare Protokoll-Vertrauen',
-    'feature_2_desc' => 'Vollständiges Vertrauen in Reverse-Proxy- und Cloudflare-Header (trustProxies), verhindert Datenverlust bei HTTPS-Weiterleitungen und 405/403-Fehler beim Absenden von Formularen.',
-    'feature_3_title' => 'Entwickler-Routing & JSON-Payload-Architektur',
-    'feature_3_desc' => 'Eindeutige numerische Routenbeschränkungen (->whereNumber), standardisierte JSON-Payloads (application/json) in Entwicklerformularen und vollständige \Throwable-Ausnahmesicherheit.',
-    'feature_4_title' => 'Seitenweite Persistenz des Theme-Customizers',
-    'feature_4_desc' => 'Optimierte CSS-Kaskadenreihenfolge, dynamische Header-Injektion, Multi-Seiten-Vorschau-Umschalter im Iframe und kompilierte CSS-Variablen für alle Layouts.',
-    'feature_5_title' => 'Echtzeit-SSE-Nachrichten-Badge-Synchronisierung',
-    'feature_5_desc' => 'Korrektur der Zähllogik für ungelesene Nachrichten im SSE-Stream, Beseitigung falscher +99-Badges bei aktiven Konten und Synchronisation von Echtzeit- und API-Status.',
-    'feature_6_title' => 'Sicherheitshärtung & Abhängigkeits-Upgrades',
-    'feature_6_desc' => 'Behebung der XSS-Schwachstelle in league/commonmark (v2.10.0 - Dependabot #70), Upgrade von nette/schema (v1.3.6) und verbesserte Ausnahmebehandlung.',
+        // What's New Section (v4.5.6)
+    'feature_1_title' => 'Plattformweite Leistungsoptimierung & TTFB-Beschleunigung',
+    'feature_1_desc' => 'Drastische Reduzierung der Serverantwortzeit (TTFB) auf unter 100ms. Statische Speicherung und Batch-Vorabladen eliminieren über 88% der Datenbankabfragen.',
+    'feature_2_title' => 'Asynchrone Queue-Engine & Prioritätskanäle',
+    'feature_2_desc' => 'Leistungsstarke asynchrone Auftragsarchitektur mit 4 dedizierten Kanälen (high, default, media, maintenance), blockierungsfreie Benachrichtigungen und 1-Klick-Wiederherstellung.',
+    'feature_3_title' => 'Entwicklerplattform & Universelle Bearer-Autorisierung',
+    'feature_3_desc' => 'Mehrstufige Token-Extraktion zur Behebung von 401-Fehlern auf Apache und Proxys, dynamische Rechtevergabe und schemakonforme Statusveröffentlichung.',
+    'feature_4_title' => 'Erweiterungs-Hub mit Zero-Reload AJAX & Auto-Migrationen',
+    'feature_4_desc' => 'Automatische Datenbankmigrationen bei Plugin-Aktivierung, nahtlose AJAX-Umschaltung, Echtzeit-Kategoriefilter und Live-Suche für Plugins und Themes.',
+    'feature_5_title' => 'Absicherung des Update-Systems & Vorab-Snapshots',
+    'feature_5_desc' => 'Stufenweises Update-System mit Sicherheitsprüfungen (Speicherplatz >= 50MB, PHP), automatische Datei-Snapshots vor Überschreiben und OPcache-Reset.',
+    'feature_6_title' => 'Themen-zentrierte Shop-Architektur & Erweitertes SEO',
+    'feature_6_desc' => 'Optimierte Produktansicht mit Standard-Themen-Tab, serverseitiges Markdown-Rendering, native Schema.org Product/Offer JSON-LD und Apache GZIP-Kompression.',
 
     // About Section
     'about_description' => 'MYADS is a powerful, all-in-one community platform and ad exchange network. It empowers website owners to connect, exchange traffic, trade services, and monetize their platforms effectively.',

@@ -421,7 +421,38 @@
                             <div class="timeline">
                                 <div class="timeline-item">
                                     <div class="timeline-icon"><i class="feather-box fs-12"></i></div>
-                                    <h6 class="fw-bold mb-1">v4.5.5 <span class="badge bg-soft-success text-success ms-2">Stable</span></h6>
+                                    <h6 class="fw-bold mb-1">v4.5.6 <span class="badge bg-soft-success text-success ms-2">Latest / Stable</span></h6>
+                                    <p class="text-muted fs-13 mb-3">Performance Overhaul, Asynchronous Queue Engine & Priority Channels, Universal Developer Platform Bearer Authorization, Extension Hub AJAX & Auto Migrations, Admin Updates Hardening & Pre-Update Snapshots, Store Topic-First & Advanced SEO Release.</p>
+                                    <div class="d-flex flex-column gap-2">
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-optimization mt-1">Performance</span>
+                                            <span class="text-muted fs-13">Platform-wide performance overhaul with in-memory memoization (<code>theme_asset</code>, <code>admin_asset</code>, <code>ads_site</code>) eliminating 320+ redundant queries per request, and bulk batch activity preloading in <code>StatusActivityService</code> slashing database queries on <code>/portal</code> by 88% and accelerating response times from 9.2s down to sub-300ms.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-feature mt-1">Feature</span>
+                                            <span class="text-muted fs-13">Asynchronous Queue Engine with 4 dedicated channels (<code>high</code>, <code>default</code>, <code>media</code>, <code>maintenance</code>), <code>SendTransactionalEmailJob</code> with exponential backoff, non-blocking community notifications, async 2FA dispatch, and System Monitor diagnostics hub with 1-click retry/flush failed jobs recovery.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-feature mt-1">Developer API</span>
+                                            <span class="text-muted fs-13">Multi-tier Bearer token extraction resolving 401 Unauthorized errors across reverse proxies, FastCGI, and cPanel environments, dynamic scope auto-granting, multi-delimiter deserialization, and schema-compliant forum-topic-first status publishing.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-feature mt-1">Extension Hub</span>
+                                            <span class="text-muted fs-13">Automated database migration execution on plugin activation/upgrades, zero-reload AJAX extension toggles with instant category filter chips, dynamic badge counters, and real-time search across plugins and themes.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-security mt-1">Admin Updates</span>
+                                            <span class="text-muted fs-13">Hardened update engine with automated preflight checks (disk space >= 50MB, PHP runtime), pre-update snapshot file backups, OPcache bytecode reset, and Superdesign 7-stage interactive progress stepper.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-feature mt-1">Store & SEO</span>
+                                            <span class="text-muted fs-13">Store product detail view reconfigured with Topic tab as default active, server-rendered markdown without layout shift, native Schema.org Product/Offer JSON-LD, single <code>&lt;h1&gt;</code> hierarchy, and GZIP compression & browser caching rules in <code>.htaccess</code>.</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="timeline-item">
+                                    <div class="timeline-icon"><i class="feather-box fs-12"></i></div>
+                                    <h6 class="fw-bold mb-1">v4.5.5 <span class="badge bg-soft-secondary text-secondary ms-2">Previous</span></h6>
                                     <p class="text-muted fs-13 mb-3">Developer Platform Resilience, Reverse Proxy Compatibility, OAuth 2.0 RFC 6749 Section 4.1.2 & 2.3.1 Compliance, Real-Time Messaging, Theme Customizer, Universal Schema Resilience & Security Hardening Release — Reverse Proxy & Cloudflare Protocol Trust (<code>trustProxies(at: '*')</code>), Route Model Binding & Verb Disambiguation (<code>->whereNumber('app')</code>), Clean JSON Payload Architecture for Developer Forms (<code>application/json</code>), OAuth 2.0 Callback Query String Preservation, Scope Aliasing & WAF / ModSecurity Bypass, Flexible URI Validation, HTTP Basic Auth Token Support, Post-Login Redirection Flow, Universal Database Schema-Agnostic Self-Healing (Migration <code>2026_09_03_170000</code>), Real-Time SSE Unread Message Badge State Correction, Live Theme Customizer Site-Wide Persistence & Cascading Order Precedence, Superdesign Code & Mermaid Diagram Engine across Themes, and Security Patch & Dependency Hardening (<code>league/commonmark</code> v2.10.0).</p>
                                     <div class="d-flex flex-column gap-2">
                                         <div class="d-flex align-items-start">

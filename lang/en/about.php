@@ -7,19 +7,19 @@ return [
     'tab_changelog' => 'Changelog',
     'tab_about' => 'About MYADS',
     
-    // What's New Section (v4.5.5)
-    'feature_1_title' => 'Superdesign Code Windows & Mermaid Diagram Engine',
-    'feature_1_desc' => 'Interactive Mermaid architecture diagrams and dark macOS-style code windows with one-click copying, line numbers, and dark/light mode across Knowledgebase, Store & Forums.',
-    'feature_2_title' => 'Reverse Proxy & Cloudflare Protocol Trust',
-    'feature_2_desc' => 'Full trust of reverse proxy and Cloudflare headers (trustProxies), preventing HTTPS redirection request-body stripping and HTTP 405/403 errors on form submissions.',
-    'feature_3_title' => 'Developer Platform Route & JSON Architecture',
-    'feature_3_desc' => 'OAuth 2.0 RFC 6749 Section 4.1.2 compliance with callback query preservation, HTTP Basic Auth, disambiguated numeric route constraints (->whereNumber), standardized JSON payloads (application/json), and robust \Throwable exception safety.',
-    'feature_4_title' => 'Live Theme Customizer Site-Wide Persistence',
-    'feature_4_desc' => 'Enhanced CSS cascading precedence, dynamic header partial injection, multi-page iframe switcher preview, and compiled CSS variables across all frontend and auth layouts.',
-    'feature_5_title' => 'Real-Time SSE Message Badge Synchronization',
-    'feature_5_desc' => 'Corrected Server-Sent Events unread message counter logic, eliminating false +99 badges on high-volume accounts and synchronizing real-time and API state calculations.',
-    'feature_6_title' => 'Security Hardening & Dependency Upgrades',
-    'feature_6_desc' => 'Patched league/commonmark XSS filter bypass (v2.10.0 - Dependabot #70), upgraded nette/schema (v1.3.6), database schema-agnostic self-healing, WAF / ModSecurity Rule 930120 normalization, and zero database information leakage.',
+    // What's New Section (v4.5.6)
+    'feature_1_title' => 'Platform-Wide Performance Overhaul & TTFB Speedup',
+    'feature_1_desc' => 'Drastic reduction in server response time (TTFB) down to sub-100ms. In-memory static memoization and bulk activity preloading eliminate over 88% of queries on feed and portal pages.',
+    'feature_2_title' => 'Asynchronous Queue Engine & Priority Channels',
+    'feature_2_desc' => 'High-throughput async job architecture with 4 dedicated channels (high, default, media, maintenance), non-blocking community notifications, async 2FA dispatch, and 1-click admin job recovery.',
+    'feature_3_title' => 'Developer Platform & Universal Bearer Authorization',
+    'feature_3_desc' => 'Multi-tier token extraction resolving 401 errors across Apache, FastCGI, and reverse proxies, dynamic scope auto-granting, multi-format deserialization, and schema-compliant status creation.',
+    'feature_4_title' => 'Extension Hub Zero-Reload AJAX & Auto Migrations',
+    'feature_4_desc' => 'Automated database migration execution on plugin activation, zero-reload AJAX toggles with instant category filtering chips, dynamic badge counters, and live search across plugins and themes.',
+    'feature_5_title' => 'Admin Updates Hardening & Pre-Update Snapshots',
+    'feature_5_desc' => 'Hardened update engine with automated preflight checks (disk space >= 50MB, PHP runtime), pre-update snapshot file backups, OPcache bytecode reset, and Superdesign 7-stage interactive progress stepper.',
+    'feature_6_title' => 'Store Topic-First Architecture & Advanced SEO',
+    'feature_6_desc' => 'Streamlined product detail view making the Topic tab primary and default, server-side markdown rendering, native Schema.org Product/Offer JSON-LD, single <h1> hierarchy, and Apache GZIP compression.',
 
     // About Section
     'about_description' => 'MYADS is a powerful, all-in-one community platform and ad exchange network. It empowers website owners to connect, exchange traffic, trade services, and monetize their platforms effectively.',

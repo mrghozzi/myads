@@ -7,19 +7,19 @@ return [
     'tab_changelog' => 'Registro de cambios',
     'tab_about' => 'Acerca de MYADS',
     
-    // What's New Section (v4.5.5)
-    'feature_1_title' => 'Ventanas de Código Superdesign y Motor de Diagramas Mermaid',
-    'feature_1_desc' => 'Diagramas de arquitectura interactivos Mermaid y ventanas de código estilo macOS con copia en un clic, números de línea y compatibilidad con modo claro/oscuro en base de conocimientos, tienda y foros.',
-    'feature_2_title' => 'Confianza de Protocolo Proxy Inverso y Cloudflare',
-    'feature_2_desc' => 'Confianza total en los encabezados de proxy inverso y Cloudflare (trustProxies), evitando la pérdida del cuerpo de peticiones en redirecciones HTTPS y errores 405/403.',
-    'feature_3_title' => 'Enrutamiento de Desarrolladores y Arquitectura JSON',
-    'feature_3_desc' => 'Restricciones de rutas numéricas estrictas (->whereNumber), estandarización de payloads JSON (application/json) en formularios de desarrolladores y captura segura de excepciones.',
-    'feature_4_title' => 'Persistencia Global del Personalizador de Temas',
-    'feature_4_desc' => 'Precedencia de cascada CSS mejorada, inyección de encabezado dinámico, selector multipágina en vista previa y variables CSS compiladas en todos los diseños.',
-    'feature_5_title' => 'Sincronización de Notificaciones de Mensajes SSE',
-    'feature_5_desc' => 'Corrección de la lógica de conteo de mensajes no leídos en eventos SSE, eliminando badges falsos de +99 en cuentas con amplio historial y sincronizando el estado con la API.',
-    'feature_6_title' => 'Refuerzo de Seguridad y Actualización de Paquetes',
-    'feature_6_desc' => 'Corrección de vulnerabilidad XSS en league/commonmark (v2.10.0 - Dependabot #70), actualización de nette/schema (v1.3.6) y endurecimiento en la gestión de errores.',
+        // What's New Section (v4.5.6)
+    'feature_1_title' => 'Optimización Global de Rendimiento y Aceleración TTFB',
+    'feature_1_desc' => 'Reducción drástica del tiempo de respuesta del servidor (TTFB) a menos de 100ms. La memorización estática y la precarga por lotes eliminan más del 88% de las consultas SQL.',
+    'feature_2_title' => 'Motor de Colas Asíncronas y Canales Prioritarios',
+    'feature_2_desc' => 'Arquitectura asíncrona de alto rendimiento con 4 canales dedicados (high, default, media, maintenance), notificaciones sin bloqueo y recuperación de fallos en 1 clic.',
+    'feature_3_title' => 'Plataforma para Desarrolladores y Autorización Bearer Universal',
+    'feature_3_desc' => 'Extracción multinivel de tokens que resuelve errores 401 en Apache y proxies, concesión dinámica de permisos y publicación de estados compatible con el esquema.',
+    'feature_4_title' => 'Centro de Extensiones AJAX sin Recarga y Migraciones Auto',
+    'feature_4_desc' => 'Ejecución automática de migraciones al activar plugins, alternancia AJAX instantánea, filtros por categorías en tiempo real y búsqueda para plugins y temas.',
+    'feature_5_title' => 'Blindaje de Actualizaciones y Copias de Seguridad Previas',
+    'feature_5_desc' => 'Verificaciones previas de seguridad (espacio en disco >= 50MB, PHP), copias de seguridad instantáneas antes de sobrescribir y restablecimiento de OPcache.',
+    'feature_6_title' => 'Arquitectura de Producto Centrada en Temas y SEO Avanzado',
+    'feature_6_desc' => 'Vista de producto con pestaña de Tema por defecto, renderizado Markdown en el servidor, Schema.org Product/Offer JSON-LD y compresión GZIP de Apache.',
 
     // About Section
     'about_description' => 'MYADS es una potente plataforma comunitaria y red de intercambio publicitario todo en uno.',

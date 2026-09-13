@@ -43,9 +43,9 @@ class AdminAboutPageTest extends TestCase
             ->assertSee(__('about.feature_4_title'))
             ->assertSee(__('about.feature_5_title'))
             ->assertSee(__('about.feature_6_title'))
-            ->assertSee('Superdesign Code Windows & Mermaid Diagram Engine')
-            ->assertSee('Reverse Proxy & Cloudflare Protocol Trust')
-            ->assertSee('Developer Platform Route & JSON Architecture');
+            ->assertSee('Platform-Wide Performance Overhaul & TTFB Speedup')
+            ->assertSee('Asynchronous Queue Engine & Priority Channels')
+            ->assertSee('Developer Platform & Universal Bearer Authorization');
 
         $this->assertDatabaseHas('options', [
             'name' => 'last_seen_about_version',
@@ -63,9 +63,9 @@ class AdminAboutPageTest extends TestCase
         $response = $this->actingAs($admin)->get(route('admin.about', ['lang' => 'ar']));
 
         $response->assertOk()
-            ->assertSee('نوافذ الأكواد Superdesign ومحرك الرسوم التفاعلية Mermaid')
-            ->assertSee('توافق البروكسي العكسي ووثوقية بروتوكول Cloudflare')
-            ->assertSee('بنية مسارات المطورين والبيانات المعيارية JSON');
+            ->assertSee('تسريع شامل للأداء وخفض فائق لزمن استجابة الخادم (TTFB)')
+            ->assertSee('محرك الطوابير غير المتزامن وقنوات الأولوية المخصصة')
+            ->assertSee('منصة المطورين والاعتماد الشامل لترويسات Bearer');
     }
 
     public function test_non_admin_user_cannot_access_about_page(): void

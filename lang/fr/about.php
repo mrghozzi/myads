@@ -7,19 +7,19 @@ return [
     'tab_changelog' => 'Journal des modifications',
     'tab_about' => 'À propos de MYADS',
     
-    // What's New Section (v4.5.5)
-    'feature_1_title' => 'Fenêtres de Code Superdesign & Moteur de Diagrammes Mermaid',
-    'feature_1_desc' => 'Diagrammes d\'architecture interactifs Mermaid et fenêtres de code style macOS avec copie en un clic, numérotation des lignes et support des modes clair/sombre sur la base de connaissances, boutique et forums.',
-    'feature_2_title' => 'Confiance Protocolaire Proxy Inverse & Cloudflare',
-    'feature_2_desc' => 'Prise en charge intégrale des en-têtes de proxy inverse et Cloudflare (trustProxies), empêchant la perte du corps des requêtes lors des redirections HTTPS et les erreurs 405/403.',
-    'feature_3_title' => 'Routage Développeur & Architecture de Payloads JSON',
-    'feature_3_desc' => 'Contraintes de routes numériques strictes (->whereNumber), standardisation des données JSON (application/json) pour les formulaires développeurs et sécurité totale contre les exceptions.',
-    'feature_4_title' => 'Persistance Globale du Personnalisateur de Thème',
-    'feature_4_desc' => 'Priorité de cascade CSS renforcée, injection d\'en-tête dynamique, sélecteur multipage dans l\'aperçu en direct et variables CSS compilées sur tous les thèmes.',
-    'feature_5_title' => 'Synchronisation des Badges de Messages SSE',
-    'feature_5_desc' => 'Correction de la logique de comptage des messages non lus dans le flux SSE, élimination des faux badges +99 sur les comptes actifs et synchronisation avec l\'API.',
-    'feature_6_title' => 'Renforcement de la Sécurité & Mises à Jour',
-    'feature_6_desc' => 'Correction de la vulnérabilité XSS dans league/commonmark (v2.10.0 - Dependabot #70), mise à niveau de nette/schema (v1.3.6) et gestion renforcée des exceptions.',
+        // What's New Section (v4.5.6)
+    'feature_1_title' => 'Optimisation Globale des Performances & Accélération TTFB',
+    'feature_1_desc' => 'Réduction drastique du temps de réponse serveur (TTFB) sous les 100ms. La mémoisation statique en mémoire et le préchargement groupé éliminent plus de 88% des requêtes SQL.',
+    'feature_2_title' => 'Moteur de Files d\'Attente Asynchrone & Canaux Prioritaires',
+    'feature_2_desc' => 'Architecture de tâches asynchrones à haut débit sur 4 canaux dédiés (high, default, media, maintenance), notifications instantanées et récupération des échecs en 1 clic.',
+    'feature_3_title' => 'Plateforme Développeurs & Autorisation Bearer Universelle',
+    'feature_3_desc' => 'Extraction multi-niveaux des jetons résolvant les erreurs 401 sur Apache et proxys, attribution dynamique des permissions et publication de statuts conforme au schéma.',
+    'feature_4_title' => 'Hub d\'Extensions AJAX Sans Rechargement & Migrations Auto',
+    'feature_4_desc' => 'Exécution automatique des migrations lors de l\'activation des plugins, bascule AJAX instantanée, filtres dynamiques et recherche en direct pour plugins et thèmes.',
+    'feature_5_title' => 'Renforcement du Moteur de Mises à Jour & Sauvegardes Instantanées',
+    'feature_5_desc' => 'Vérifications préalables de sécurité (espace disque >= 50Mo, PHP), instantanés de sauvegarde automatique avant écrasement et réinitialisation OPcache.',
+    'feature_6_title' => 'Architecture Produit Centrée sur les Sujets & SEO Avancé',
+    'feature_6_desc' => 'Affichage épuré des produits avec onglet Sujet par défaut, rendu Markdown côté serveur, données structurées Schema.org Produit/Offre et compression GZIP Apache.',
 
     // About Section
     'about_description' => 'MYADS est une plateforme communautaire et un réseau d\'échange publicitaire tout-en-un. Elle permet aux propriétaires de sites de se connecter, d\'échanger du trafic, de négocier des services et de monétiser leurs plateformes.',
