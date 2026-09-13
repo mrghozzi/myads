@@ -18,7 +18,7 @@ class VideoHubController extends Controller
         }
 
         // 1. Fetch Clips (YouTube Shorts shelf) - Top 8 latest/popular clips
-        $clipsQuery = Status::visible()->where('s_type', 14);
+        $clipsQuery = Status::visible()->with(['user', 'forumTopic'])->where('s_type', 14);
 
         if ($searchQuery !== '') {
             $clipsQuery->where(function ($q) use ($searchQuery) {
@@ -37,7 +37,7 @@ class VideoHubController extends Controller
         $this->attachThumbnailAndTitle($clips);
 
         // 2. Fetch Main Videos
-        $videosQuery = Status::visible();
+        $videosQuery = Status::visible()->with(['user', 'forumTopic']);
 
         // Filter type handling
         if ($filter === 'clips') {
