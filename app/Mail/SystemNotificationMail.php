@@ -9,7 +9,7 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class SystemNotificationMail extends Mailable
+class SystemNotificationMail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
@@ -25,6 +25,7 @@ class SystemNotificationMail extends Mailable
         $this->user = $user;
         $this->messageText = $messageText;
         $this->actionUrl = $actionUrl;
+        $this->onQueue('default');
     }
 
     /**

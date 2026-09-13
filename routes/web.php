@@ -551,6 +551,8 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/system-monitor', [AdminController::class, 'systemMonitor'])->name('admin.system_monitor');
     Route::post('/system-monitor/clear-cache', [AdminController::class, 'clearSystemCache'])->name('admin.system_monitor.clear_cache');
     Route::post('/system-monitor/optimize-table', [AdminController::class, 'optimizeTable'])->name('admin.system_monitor.optimize_table');
+    Route::post('/system-monitor/queue/retry-all', [AdminController::class, 'retryFailedJobs'])->name('admin.system_monitor.queue_retry');
+    Route::post('/system-monitor/queue/flush', [AdminController::class, 'flushFailedJobs'])->name('admin.system_monitor.queue_flush');
     Route::get('/database-cleanup', [AdminController::class, 'databaseCleanup'])->name('admin.database_cleanup');
     Route::post('/database-cleanup', [AdminController::class, 'databaseCleanupAction'])->name('admin.database_cleanup.action');
     Route::post('/settings/api-key/generate', [AdminController::class, 'generateApiKey'])->name('admin.settings.api_key.generate');

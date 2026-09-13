@@ -56,21 +56,12 @@ class NotificationService
             ]);
         }
 
-        // 2. Handle Email Notification (deferred to after HTTP response is sent)
-        // This prevents slow SMTP connections from blocking AJAX responses.
-        $emailUser = $user;
-        $emailMessage = $message;
-        $emailUrl = $url;
-        $emailLogo = $logo;
-        $emailType = $type;
-
-        app()->terminating(function () use ($emailUser, $emailMessage, $emailUrl, $emailLogo, $emailType) {
-            try {
-                $this->sendEmailNotification($emailUser, $emailMessage, $emailUrl, $emailLogo, $emailType);
-            } catch (\Throwable $e) {
-                Log::error('Failed to send email notification: ' . $e->getMessage());
-            }
-        });
+        // 2. Queue Email Notification asynchronously
+        try {
+            $this->sendEmailNotification($user, $message, $url, $logo, $type);
+        } catch (\Throwable $e) {
+            Log::error('Failed to queue email notification: ' . $e->getMessage());
+        }
 
         return $notification;
     }
@@ -97,7 +88,16 @@ class NotificationService
         $isEnabled = !$settings || (bool) $settings->{$fieldName};
 
         if ($isEnabled && !empty($user->email)) {
-            Mail::to($user->email)->send(new SystemNotificationMail($user, $message, $url));
+            try {
+                Mail::to($user->email)->queue(new SystemNotificationMail($user, $message, $url));
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::warning("NotificationService email queue notice: " . $e->getMessage());
+                try {
+                    \App\Jobs\SendTransactionalEmailJob::forMailable($user->email, new SystemNotificationMail($user, $message, $url), 'default');
+                } catch (\Throwable $err) {
+                    \Illuminate\Support\Facades\Log::error("NotificationService failed to queue email: " . $err->getMessage());
+                }
+            }
         }
     }
 

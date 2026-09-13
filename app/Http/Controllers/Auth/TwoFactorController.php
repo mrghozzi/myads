@@ -80,14 +80,24 @@ class TwoFactorController extends Controller
         $code = strtoupper(Str::random(6));
         session(['auth.2fa_code' => $code]);
 
-        // Send email (Assuming Mail is configured)
+        // Send email asynchronously on high priority queue
         try {
-            Mail::raw("Your MYADS verification code is: {$code}", function ($message) use ($user) {
-                $message->to($user->email)
-                    ->subject('MYADS - Verification Code');
-            });
-        } catch (\Exception $e) {
-            \Log::error('Failed to send 2FA email: ' . $e->getMessage());
+            \App\Jobs\SendTransactionalEmailJob::forRaw(
+                $user->email,
+                'MYADS - Verification Code',
+                "Your MYADS verification code is: {$code}",
+                'high'
+            );
+        } catch (\Throwable $e) {
+            \Log::warning('Failed to dispatch 2FA email job, falling back to direct send: ' . $e->getMessage());
+            try {
+                Mail::raw("Your MYADS verification code is: {$code}", function ($message) use ($user) {
+                    $message->to($user->email)
+                        ->subject('MYADS - Verification Code');
+                });
+            } catch (\Throwable $err) {
+                \Log::error('Failed to send 2FA email: ' . $err->getMessage());
+            }
         }
     }
 }

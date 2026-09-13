@@ -96,6 +96,12 @@
                                     </span>
                                 </div>
                                 <div class="d-flex justify-content-between align-items-center vitals-status-row">
+                                    <span class="text-muted small text-uppercase fw-bold">{{ __('messages.queue_status', ['default' => 'Queue Status']) }}</span>
+                                    <span class="badge bg-light text-dark border">
+                                        {{ strtoupper($queueConnection ?? 'SYNC') }} &bull; {{ $pendingJobsCount ?? 0 }} {{ __('messages.pending', ['default' => 'pending']) }}
+                                    </span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center vitals-status-row">
                                     <span class="text-muted small text-uppercase fw-bold">{{ __('messages.failed_jobs') }}</span>
                                     <span class="badge {{ $failedJobsCount === null ? 'bg-secondary' : ($failedJobsCount > 0 ? 'bg-danger' : 'bg-success') }}">
                                         @if($failedJobsCount === null)
@@ -388,6 +394,91 @@
                                     @endforelse
                                 </tbody>
                             </table>
+                        </div>
+                    </div>
+
+                    <!-- Queue Engine & Background Tasks Diagnostics (v4.5.6) -->
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header d-flex flex-wrap align-items-center justify-content-between gap-3">
+                            <div>
+                                <h5 class="card-title mb-1">
+                                    <i class="feather-layers text-primary me-2"></i>{{ __('messages.queue_engine_title', ['default' => 'Queue Engine & Background Workers']) }}
+                                </h5>
+                                <p class="text-muted mb-0 small">{{ __('messages.queue_engine_desc', ['default' => 'Asynchronous task processing status across dedicated priority channels.']) }}</p>
+                            </div>
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge bg-soft-primary text-primary px-3 py-2 fw-bold text-uppercase">
+                                    {{ __('messages.queue_driver', ['default' => 'Driver']) }}: {{ $queueConnection }}
+                                </span>
+                                @if(($failedJobsCount ?? 0) > 0)
+                                    <form action="{{ route('admin.system_monitor.queue_retry') }}" method="POST" class="d-inline">
+                                        @csrf
+                                        <button type="submit" class="btn btn-sm btn-warning" onclick="return confirm('{{ __('messages.queue_retry_all_confirm', ['default' => 'Retry all failed queue jobs now?']) }}')">
+                                            <i class="feather-rotate-cw me-1"></i>{{ __('messages.queue_retry_all', ['default' => 'Retry All Failed']) }}
+                                        </button>
+                                    </form>
+                                    <form action="{{ route('admin.system_monitor.queue_flush') }}" method="POST" class="d-inline">
+                                        @csrf
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('{{ __('messages.queue_flush_confirm', ['default' => 'Permanently delete all failed jobs?']) }}')">
+                                            <i class="feather-trash-2 me-1"></i>{{ __('messages.queue_flush', ['default' => 'Flush']) }}
+                                        </button>
+                                    </form>
+                                @endif
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3 mb-4">
+                                <div class="col-sm-6 col-md-3">
+                                    <div class="p-3 rounded bg-light border text-center">
+                                        <div class="text-muted small text-uppercase fw-bold mb-1">{{ __('messages.queue_channel_high', ['default' => 'High Priority']) }}</div>
+                                        <div class="fs-4 fw-bold {{ ($queueChannels['high'] ?? 0) > 0 ? 'text-danger' : 'text-success' }}">
+                                            {{ number_format($queueChannels['high'] ?? 0) }}
+                                        </div>
+                                        <small class="text-muted">{{ __('messages.queue_high_desc', ['default' => 'Security & 2FA']) }}</small>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-md-3">
+                                    <div class="p-3 rounded bg-light border text-center">
+                                        <div class="text-muted small text-uppercase fw-bold mb-1">{{ __('messages.queue_channel_default', ['default' => 'Default Queue']) }}</div>
+                                        <div class="fs-4 fw-bold {{ ($queueChannels['default'] ?? 0) > 100 ? 'text-warning' : 'text-primary' }}">
+                                            {{ number_format($queueChannels['default'] ?? 0) }}
+                                        </div>
+                                        <small class="text-muted">{{ __('messages.queue_default_desc', ['default' => 'Notifications & Mail']) }}</small>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-md-3">
+                                    <div class="p-3 rounded bg-light border text-center">
+                                        <div class="text-muted small text-uppercase fw-bold mb-1">{{ __('messages.queue_channel_media', ['default' => 'Media Channel']) }}</div>
+                                        <div class="fs-4 fw-bold text-info">
+                                            {{ number_format($queueChannels['media'] ?? 0) }}
+                                        </div>
+                                        <small class="text-muted">{{ __('messages.queue_media_desc', ['default' => 'WebP & Thumbnails']) }}</small>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-md-3">
+                                    <div class="p-3 rounded bg-light border text-center">
+                                        <div class="text-muted small text-uppercase fw-bold mb-1">{{ __('messages.queue_channel_maintenance', ['default' => 'Maintenance']) }}</div>
+                                        <div class="fs-4 fw-bold text-secondary">
+                                            {{ number_format($queueChannels['maintenance'] ?? 0) }}
+                                        </div>
+                                        <small class="text-muted">{{ __('messages.queue_maintenance_desc', ['default' => 'Cleanup & Sitemaps']) }}</small>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex flex-wrap align-items-center justify-content-between p-3 rounded bg-soft-info border border-info border-opacity-25">
+                                <div class="d-flex align-items-center gap-3">
+                                    <i class="feather-info text-info fs-4"></i>
+                                    <div>
+                                        <span class="fw-bold d-block text-dark">{{ __('messages.queue_worker_command_hint', ['default' => 'Worker Daemon Command']) }}</span>
+                                        <code class="text-dark small">php artisan queue:work --queue=high,default,media,maintenance --sleep=3 --tries=3</code>
+                                    </div>
+                                </div>
+                                <div class="text-end mt-2 mt-sm-0">
+                                    <span class="text-muted small">{{ __('messages.total_pending_jobs', ['default' => 'Total Pending']) }}:</span>
+                                    <span class="badge bg-primary fs-6 ms-1">{{ number_format($pendingJobsCount ?? 0) }}</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
 

@@ -29,6 +29,24 @@ return [
     |
     */
 
+    /*
+    |--------------------------------------------------------------------------
+    | Dedicated Application Queue Channels
+    |--------------------------------------------------------------------------
+    |
+    | MYADS v4.5.6 defines dedicated queue channels to isolate high-priority
+    | operations (e.g. security codes, 2FA) from heavy background processing
+    | (e.g. media resizing, database maintenance, sitemaps).
+    |
+    */
+
+    'channels' => [
+        'high'        => env('QUEUE_CHANNEL_HIGH', 'high'),
+        'default'     => env('QUEUE_CHANNEL_DEFAULT', 'default'),
+        'media'       => env('QUEUE_CHANNEL_MEDIA', 'media'),
+        'maintenance' => env('QUEUE_CHANNEL_MAINTENANCE', 'maintenance'),
+    ],
+
     'connections' => [
 
         'sync' => [
@@ -40,6 +58,15 @@ return [
             'connection' => env('DB_QUEUE_CONNECTION'),
             'table' => env('DB_QUEUE_TABLE', 'jobs'),
             'queue' => env('DB_QUEUE', 'default'),
+            'retry_after' => (int) env('DB_QUEUE_RETRY_AFTER', 90),
+            'after_commit' => false,
+        ],
+
+        'database-high' => [
+            'driver' => 'database',
+            'connection' => env('DB_QUEUE_CONNECTION'),
+            'table' => env('DB_QUEUE_TABLE', 'jobs'),
+            'queue' => 'high',
             'retry_after' => (int) env('DB_QUEUE_RETRY_AFTER', 90),
             'after_commit' => false,
         ],

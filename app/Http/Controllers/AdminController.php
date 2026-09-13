@@ -5366,20 +5366,56 @@ class AdminController extends Controller
             'loaded' => extension_loaded($extension),
         ])->values()->all();
 
-        // Failed queue jobs — a single cached COUNT() query, refreshed every 5 min.
-        $failedJobsCount = \Illuminate\Support\Facades\Cache::remember(
-            'system_monitor_failed_jobs_count',
-            now()->addMinutes(5),
+        // Queue diagnostics (v4.5.6) — connection, pending jobs by channel, and failed jobs.
+        $queueMetrics = \Illuminate\Support\Facades\Cache::remember(
+            'system_monitor_queue_metrics',
+            now()->addMinutes(2),
             function () {
                 try {
-                    return \Illuminate\Support\Facades\Schema::hasTable('failed_jobs')
-                        ? \Illuminate\Support\Facades\DB::table('failed_jobs')->count()
-                        : null;
+                    $hasJobs = \Illuminate\Support\Facades\Schema::hasTable('jobs');
+                    $hasFailed = \Illuminate\Support\Facades\Schema::hasTable('failed_jobs');
+
+                    $pendingTotal = $hasJobs ? \Illuminate\Support\Facades\DB::table('jobs')->count() : 0;
+                    $failedTotal = $hasFailed ? \Illuminate\Support\Facades\DB::table('failed_jobs')->count() : 0;
+
+                    $channels = [
+                        'high' => 0,
+                        'default' => 0,
+                        'media' => 0,
+                        'maintenance' => 0,
+                    ];
+
+                    if ($hasJobs && $pendingTotal > 0) {
+                        $channelCounts = \Illuminate\Support\Facades\DB::table('jobs')
+                            ->select('queue', \Illuminate\Support\Facades\DB::raw('count(*) as count'))
+                            ->groupBy('queue')
+                            ->pluck('count', 'queue')
+                            ->toArray();
+
+                        foreach ($channelCounts as $q => $cnt) {
+                            $channels[$q] = (int) $cnt;
+                        }
+                    }
+
+                    return [
+                        'pending_total' => $pendingTotal,
+                        'failed_total' => $failedTotal,
+                        'channels' => $channels,
+                    ];
                 } catch (\Throwable $e) {
-                    return null;
+                    return [
+                        'pending_total' => 0,
+                        'failed_total' => 0,
+                        'channels' => ['high' => 0, 'default' => 0, 'media' => 0, 'maintenance' => 0],
+                    ];
                 }
             }
         );
+
+        $failedJobsCount = $queueMetrics['failed_total'];
+        $pendingJobsCount = $queueMetrics['pending_total'];
+        $queueChannels = $queueMetrics['channels'];
+        $queueConnection = config('queue.default', 'sync');
 
         // Scheduler last run — populated by a cron-only event listener
         // (routes/console.php), never touched by web requests.
@@ -5627,7 +5663,8 @@ class AdminController extends Controller
         return view('admin::admin.system_monitor', compact(
             'load', 'memoryUsage', 'memoryPeak', 'memoryLimit', 'diskTotal', 'diskFree', 'cacheSize', 'pressureSources',
             'cpuPercent', 'ramPercent', 'diskUsedPercent', 'opcacheEnabled', 'opcacheHitRate', 'criticalExtensions',
-            'failedJobsCount', 'schedulerLastRun', 'schedulerStale', 'storageDisks', 'activePluginDiagnostics', 'dbHealthCheck'
+            'failedJobsCount', 'pendingJobsCount', 'queueChannels', 'queueConnection',
+            'schedulerLastRun', 'schedulerStale', 'storageDisks', 'activePluginDiagnostics', 'dbHealthCheck'
         ));
     }
 
@@ -5736,6 +5773,46 @@ class AdminController extends Controller
         } catch (\Throwable $e) {
             return redirect()->route('admin.system_monitor')
                 ->with('error', __('messages.error_occurred') ?? 'An error occurred' . ': ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Retry all failed queue jobs.
+     */
+    public function retryFailedJobs(\Illuminate\Http\Request $request)
+    {
+        try {
+            \Illuminate\Support\Facades\Artisan::call('queue:retry', ['id' => ['all']]);
+            \Illuminate\Support\Facades\Cache::forget('system_monitor_queue_metrics');
+            \Illuminate\Support\Facades\Cache::forget('system_monitor_failed_jobs_count');
+
+            return redirect()->route('admin.system_monitor')
+                ->with('success', __('messages.queue_retry_all_success', ['default' => 'All failed jobs have been queued for retry.']));
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Retry failed jobs error: ' . $e->getMessage());
+
+            return redirect()->route('admin.system_monitor')
+                ->with('error', __('messages.queue_retry_failed', ['default' => 'Failed to retry jobs: ' . $e->getMessage()]));
+        }
+    }
+
+    /**
+     * Flush/clear all failed queue jobs.
+     */
+    public function flushFailedJobs(\Illuminate\Http\Request $request)
+    {
+        try {
+            \Illuminate\Support\Facades\Artisan::call('queue:flush');
+            \Illuminate\Support\Facades\Cache::forget('system_monitor_queue_metrics');
+            \Illuminate\Support\Facades\Cache::forget('system_monitor_failed_jobs_count');
+
+            return redirect()->route('admin.system_monitor')
+                ->with('success', __('messages.queue_flush_success', ['default' => 'All failed jobs have been flushed from the database.']));
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Flush failed jobs error: ' . $e->getMessage());
+
+            return redirect()->route('admin.system_monitor')
+                ->with('error', __('messages.queue_flush_failed', ['default' => 'Failed to flush jobs: ' . $e->getMessage()]));
         }
     }
 
