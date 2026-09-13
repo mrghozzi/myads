@@ -7,56 +7,94 @@ use Illuminate\Support\Facades\Schema;
 if (!function_exists('theme_asset')) {
     /**
      * Generate an asset path for the current theme.
+     * Optimized with static in-memory caching to eliminate redundant queries.
      *
      * @param  string  $path
      * @return string
      */
     function theme_asset($path)
     {
-        $theme = 'default';
+        static $resolvedTheme = null;
 
-        try {
-            // Attempt to get the theme from settings, cached if possible
-            // For now, simple query, but in production should be cached
-            if (Schema::hasTable('setting')) {
-                $setting = Setting::first();
-                if ($setting && !empty($setting->styles)) {
-                    $theme = $setting->styles;
+        if ($resolvedTheme === null) {
+            $theme = $GLOBALS['MYADS_ACTIVE_THEME'] ?? null;
+
+            if (!$theme) {
+                try {
+                    if (app()->bound('request')) {
+                        $req = request();
+                        if ($req->has('preview_theme') && is_dir(base_path('themes/' . $req->query('preview_theme')))) {
+                            $theme = (string) $req->query('preview_theme');
+                        } elseif ($req->has('theme_preview') && $req->has('theme') && is_dir(base_path('themes/' . $req->query('theme')))) {
+                            $theme = (string) $req->query('theme');
+                        }
+                    }
+                } catch (\Throwable $e) {
+                    // Ignore container resolution edge cases
                 }
             }
-        } catch (\Throwable $e) {
-            // Fallback to default
+
+            if (!$theme) {
+                try {
+                    $schema = app()->bound(App\Services\V420SchemaService::class)
+                        ? app(App\Services\V420SchemaService::class)
+                        : null;
+
+                    $hasSettingTable = $schema ? $schema->hasTable('setting') : Schema::hasTable('setting');
+
+                    if ($hasSettingTable) {
+                        $setting = Setting::first();
+                        if ($setting && !empty($setting->styles)) {
+                            $theme = $setting->styles;
+                        }
+                    }
+                } catch (\Throwable $e) {
+                    // Fallback to default
+                }
+            }
+
+            $resolvedTheme = $theme ?: 'default';
+            $GLOBALS['MYADS_ACTIVE_THEME'] = $resolvedTheme;
         }
 
-        if (request()->has('preview_theme') && is_dir(base_path('themes/' . request()->query('preview_theme')))) {
-            $theme = (string) request()->query('preview_theme');
-        } elseif (request()->has('theme_preview') && request()->has('theme') && is_dir(base_path('themes/' . request()->query('theme')))) {
-            $theme = (string) request()->query('theme');
-        }
-
-        return asset("themes/{$theme}/assets/{$path}");
+        return asset("themes/{$resolvedTheme}/assets/{$path}");
     }
 }
 
 if (!function_exists('ads_site')) {
     /**
      * Get ad code by ID.
+     * Optimized with in-memory caching to avoid database queries on every ad call.
      *
      * @param  int  $id
      * @return string
      */
     function ads_site($id)
     {
+        static $adsCache = [];
+
+        if (array_key_exists($id, $adsCache)) {
+            return $adsCache[$id];
+        }
+
         try {
-            if (Schema::hasTable('ads')) {
+            $schema = app()->bound(App\Services\V420SchemaService::class)
+                ? app(App\Services\V420SchemaService::class)
+                : null;
+
+            $hasAdsTable = $schema ? $schema->hasTable('ads') : Schema::hasTable('ads');
+
+            if ($hasAdsTable) {
                 $ad = Ad::find($id);
-                if ($ad) {
-                    return $ad->code_ads;
-                }
+                $adsCache[$id] = $ad ? ($ad->code_ads ?? '') : '';
+                return $adsCache[$id];
             }
         } catch (\Throwable $e) {
+            $adsCache[$id] = '';
             return '';
         }
+
+        $adsCache[$id] = '';
         return '';
     }
 }

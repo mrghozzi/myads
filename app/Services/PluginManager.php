@@ -90,6 +90,8 @@ class PluginManager
             ['o_valuer' => 1]
         );
 
+        \Illuminate\Support\Facades\Cache::forget('myads_active_plugin_dirs');
+
         return true;
     }
 
@@ -141,6 +143,7 @@ class PluginManager
         $option = Option::where('name', $slug)->where('o_type', 'plugins')->first();
         if ($option) {
             $option->update(['o_valuer' => 0]);
+            \Illuminate\Support\Facades\Cache::forget('myads_active_plugin_dirs');
             return true;
         }
         return false;

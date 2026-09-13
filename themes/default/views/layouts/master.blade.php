@@ -63,28 +63,13 @@
     @endphp
     <script>
         (function(){
-            document.documentElement.classList.add('fouc-loading');
             function r(n){const m=document.cookie.match(new RegExp('(?:^|; )'+n+'=([^;]*)'));return m?decodeURIComponent(m[1]):null}
             function s(){try{const v=localStorage.getItem('themeMode');if(v==='css'||v==='css_d')return v}catch(e){}const c=r('modedark');return c==='css'||c==='css_d'?c:null}
             let o=s();if(!o){o=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'css_d':'css';}
             document.documentElement.dataset.theme=o;window.__themeMode=o;
-
-            function reveal(){
-                document.documentElement.classList.remove('fouc-loading');
-                document.documentElement.classList.add('fouc-loaded');
-            }
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', reveal);
-                window.addEventListener('load', reveal);
-            } else {
-                reveal();
-            }
-            setTimeout(reveal, 1500);
         })();
     </script>
     <style id="critical-css">
-        html.fouc-loading body{opacity:0 !important;visibility:hidden !important}
-        body{transition:opacity 0.2s ease-in-out}
         *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;border:none;outline:none}
         *::before,*::after{display:block}
         body{background-color:#f8faff;font-family:"Inter",sans-serif;overflow-x:hidden}
@@ -158,7 +143,7 @@
     <link rel="dns-prefetch" href="https://ads.hsoubcdn.com">
     <link rel="preload" href="{{ theme_asset('fonts/fontawesome-webfont.woff2?v=4.7.0') }}" as="font" type="font/woff2" crossorigin>
 
-    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;700&family=Inter:wght@300;400;500;600;700;800;900&family=Muli:ital,wght@0,300;0,400;1,300;1,400&family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,300;1,400;1,600;1,700;1,800&family=Sanchez:ital,wght@0,400;1,400&family=Rajdhani:wght@400;500;600;700&family=Titillium+Web:ital,wght@0,200;0,300;0,400;0,600;0,700;0,900;1,200;1,300;1,400;1,600;1,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
         /* Fix for header dropdown interaction */
@@ -2099,7 +2084,7 @@
     </script>
 
     @stack('scripts')
-    <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
+    <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js" defer></script>
     <script type="text/javascript" src="{{ theme_asset('js/jquery-3.6.0.min.js') }}" defer></script>
     <?php
         if (class_exists(\MyAds\Plugins\SupportChat\Services\SupportChatService::class)) {

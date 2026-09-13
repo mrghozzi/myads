@@ -114,19 +114,30 @@ namespace {
     if (!function_exists('admin_asset')) {
         function admin_asset($path)
         {
-            $adminTheme = 'default';
-            try {
-                if (\Illuminate\Support\Facades\Schema::hasTable('options')) {
-                    $adminThemeOpt = \App\Models\Option::where('o_type', 'admin_settings')->where('name', 'theme')->first();
-                    if ($adminThemeOpt && !empty($adminThemeOpt->o_valuer)) {
-                        $adminTheme = $adminThemeOpt->o_valuer;
+            static $cachedAdminTheme = null;
+
+            if ($cachedAdminTheme === null) {
+                $adminTheme = 'default';
+                try {
+                    $schema = app()->bound(App\Services\V420SchemaService::class)
+                        ? app(App\Services\V420SchemaService::class)
+                        : null;
+
+                    $hasOptionsTable = $schema ? $schema->hasTable('options') : \Illuminate\Support\Facades\Schema::hasTable('options');
+
+                    if ($hasOptionsTable) {
+                        $adminThemeOpt = \App\Models\Option::where('o_type', 'admin_settings')->where('name', 'theme')->first();
+                        if ($adminThemeOpt && !empty($adminThemeOpt->o_valuer)) {
+                            $adminTheme = $adminThemeOpt->o_valuer;
+                        }
                     }
+                } catch (\Throwable $e) {
+                    // Fallback to default
                 }
-            } catch (\Throwable $e) {
-                // Fallback to default
+                $cachedAdminTheme = $adminTheme;
             }
 
-            return url("admin_themes/{$adminTheme}/assets/{$path}");
+            return url("admin_themes/{$cachedAdminTheme}/assets/{$path}");
         }
     }
 }

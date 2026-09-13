@@ -261,6 +261,10 @@ class Status extends Model
 
     public function getReactionsCountAttribute()
     {
+        if (array_key_exists('reactions_count', $this->attributes)) {
+            return (int) $this->attributes['reactions_count'];
+        }
+
         try {
             $type = $this->getReactionType();
             if (!$type) {
@@ -277,6 +281,10 @@ class Status extends Model
 
     public function getCommentsCountAttribute()
     {
+        if (array_key_exists('comments_count', $this->attributes)) {
+            return (int) $this->attributes['comments_count'];
+        }
+
         try {
             if ($this->s_type == 1) {
                 return Option::where('o_parent', $this->tp_id)
@@ -314,6 +322,10 @@ class Status extends Model
 
     public function getGroupedReactionsAttribute()
     {
+        if (array_key_exists('grouped_reactions', $this->attributes)) {
+            return $this->attributes['grouped_reactions'];
+        }
+
         try {
             $type = $this->getReactionType();
             if (!$type) {
@@ -352,6 +364,10 @@ class Status extends Model
 
     public function getRepostsCountAttribute(): int
     {
+        if (array_key_exists('reposts_count', $this->attributes)) {
+            return (int) $this->attributes['reposts_count'];
+        }
+
         if (!app(V420SchemaService::class)->supports('reposts')) {
             return 0;
         }

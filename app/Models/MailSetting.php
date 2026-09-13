@@ -21,6 +21,16 @@ class MailSetting extends Model
         'mail_from_name',
     ];
 
+    protected static function booted(): void
+    {
+        static::saved(function () {
+            \Illuminate\Support\Facades\Cache::forget('myads_mail_settings_config');
+        });
+        static::deleted(function () {
+            \Illuminate\Support\Facades\Cache::forget('myads_mail_settings_config');
+        });
+    }
+
     /* ------------------------------------------------------------------ */
     /*  Password encryption / decryption                                  */
     /* ------------------------------------------------------------------ */

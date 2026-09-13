@@ -28,11 +28,19 @@ class MailConfigServiceProvider extends ServiceProvider
     public function boot(): void
     {
         try {
-            if (!Schema::hasTable('mail_settings')) {
+            $schema = app()->bound(\App\Services\V420SchemaService::class)
+                ? app(\App\Services\V420SchemaService::class)
+                : null;
+
+            $hasTable = $schema ? $schema->hasTable('mail_settings') : Schema::hasTable('mail_settings');
+
+            if (!$hasTable) {
                 return;
             }
 
-            $settings = MailSetting::query()->first();
+            $settings = \Illuminate\Support\Facades\Cache::remember('myads_mail_settings_config', 3600, function () {
+                return MailSetting::query()->first();
+            });
 
             if (!$settings || !$settings->exists) {
                 return;

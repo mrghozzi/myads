@@ -29,20 +29,23 @@ class BlockBannedIp
             return $next($request);
         }
 
-        try {
-            $ban = SecurityIpBan::query()
-                ->where('ip_address', $ip)
-                ->where('is_active', true)
-                ->where(function ($query) {
-                    $query->whereNull('expires_at')
-                        ->orWhere('expires_at', '>', now());
-                })
-                ->first();
-        } catch (\Throwable) {
-            $ban = null;
-        }
+        $cacheKey = 'security_ip_banned_' . md5($ip);
+        $isBanned = \Illuminate\Support\Facades\Cache::remember($cacheKey, 300, function () use ($ip) {
+            try {
+                return SecurityIpBan::query()
+                    ->where('ip_address', $ip)
+                    ->where('is_active', true)
+                    ->where(function ($query) {
+                        $query->whereNull('expires_at')
+                            ->orWhere('expires_at', '>', now());
+                    })
+                    ->exists();
+            } catch (\Throwable) {
+                return false;
+            }
+        });
 
-        if (!$ban) {
+        if (!$isBanned) {
             return $next($request);
         }
 

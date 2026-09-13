@@ -3,13 +3,16 @@
 namespace App\Services;
 
 use App\Models\Directory;
+use App\Models\ForumComment;
+use App\Models\ForumTopic;
+use App\Models\Like;
 use App\Models\News;
 use App\Models\Option;
 use App\Models\OrderRequest;
 use App\Models\Product;
 use App\Models\Status;
 use App\Models\StatusLinkPreview;
-use App\Models\ForumTopic;
+use App\Models\StatusRepost;
 use App\Models\User;
 use App\Services\KnowledgebaseCommunityService;
 
@@ -36,7 +39,7 @@ class StatusActivityService
 
     public function decorate(Status $activity): Status
     {
-        $relations = ['user', 'group'];
+        $relations = ['user.siteAdminEntry', 'group'];
 
         if ($this->schema->supports('link_previews')) {
             $relations[] = 'linkPreviewRecord';
@@ -45,7 +48,7 @@ class StatusActivityService
         }
 
         if ($this->schema->supports('reposts')) {
-            $relations[] = 'repostRecord.originalStatus.user';
+            $relations[] = 'repostRecord.originalStatus.user.siteAdminEntry';
         } else {
             $activity->setRelation('repostRecord', null);
         }
@@ -107,7 +110,7 @@ class StatusActivityService
                 $activity->type_label = 'Order';
                 break;
             case KnowledgebaseCommunityService::STATUS_TYPE:
-                $article = $this->hydrateKnowledgebaseArticle($activity->tp_id);
+                $article = $this->hydrateKnowledgebaseArticle((int) $activity->tp_id);
                 $activity->setRelation('knowledgebaseItem', $article);
                 $activity->related_content = $article;
                 $activity->type_label = 'Knowledgebase';
@@ -115,7 +118,7 @@ class StatusActivityService
         }
 
         if ($this->schema->supports('reposts') && $activity->repostRecord) {
-            $repostRelations = ['originalStatus.user'];
+            $repostRelations = ['originalStatus.user.siteAdminEntry', 'originalStatus.group'];
             if ($this->schema->supports('link_previews')) {
                 $repostRelations[] = 'originalStatus.linkPreviewRecord';
             }
@@ -171,12 +174,12 @@ class StatusActivityService
             return;
         }
 
-        $relations = ['user', 'group'];
+        $relations = ['user.siteAdminEntry', 'group'];
         if ($this->schema->supports('link_previews')) {
             $relations[] = 'linkPreviewRecord';
         }
         if ($this->schema->supports('reposts')) {
-            $relations[] = 'repostRecord.originalStatus.user';
+            $relations[] = 'repostRecord.originalStatus.user.siteAdminEntry';
             if ($this->schema->supports('link_previews')) {
                 $relations[] = 'repostRecord.originalStatus.linkPreviewRecord';
             }
@@ -233,6 +236,110 @@ class StatusActivityService
                 $article->setRelation('productItem', $products->get($article->o_mode));
                 $article->setRelation('authorUser', $authors->get((int) $article->o_parent));
                 $kbs->put($article->id, $article);
+            }
+        }
+
+        // --- BULK PRELOAD COMMENTS COUNTS ---
+        $forumCommentCounts = !empty($forumIds)
+            ? ForumComment::whereIn('tid', array_unique($forumIds))
+                ->selectRaw('tid, COUNT(*) as cnt')
+                ->groupBy('tid')
+                ->pluck('cnt', 'tid')
+                ->all()
+            : [];
+
+        $dirCommentCounts = !empty($directoryIds)
+            ? Option::whereIn('o_parent', array_unique($directoryIds))
+                ->where('o_type', 'd_coment')
+                ->selectRaw('o_parent, COUNT(*) as cnt')
+                ->groupBy('o_parent')
+                ->pluck('cnt', 'o_parent')
+                ->all()
+            : [];
+
+        $storeCommentCounts = !empty($storeIds)
+            ? Option::whereIn('o_parent', array_unique($storeIds))
+                ->where('o_type', 's_coment')
+                ->selectRaw('o_parent, COUNT(*) as cnt')
+                ->groupBy('o_parent')
+                ->pluck('cnt', 'o_parent')
+                ->all()
+            : [];
+
+        $kbCommentCounts = !empty($kbIds)
+            ? Option::whereIn('o_parent', array_unique($kbIds))
+                ->where('o_type', KnowledgebaseCommunityService::COMMENT_OPTION_TYPE)
+                ->selectRaw('o_parent, COUNT(*) as cnt')
+                ->groupBy('o_parent')
+                ->pluck('cnt', 'o_parent')
+                ->all()
+            : [];
+
+        // --- BULK PRELOAD REPOSTS COUNTS ---
+        $allStatusIds = $allStatusesToDecorate->pluck('id')->all();
+        $repostCounts = [];
+        if ($this->schema->supports('reposts') && !empty($allStatusIds)) {
+            $repostCounts = StatusRepost::whereIn('original_status_id', $allStatusIds)
+                ->selectRaw('original_status_id, COUNT(*) as cnt')
+                ->groupBy('original_status_id')
+                ->pluck('cnt', 'original_status_id')
+                ->all();
+        }
+
+        // --- BULK PRELOAD REACTIONS COUNTS, GROUPED REACTIONS & USER REACTIONS ---
+        $subjectsByType = [];
+        foreach ($allStatusesToDecorate as $st) {
+            $rType = $st->getReactionType();
+            if ($rType) {
+                $subjectsByType[$rType][] = $st->interactionSubjectId();
+            }
+        }
+
+        $reactionCounts = [];
+        $groupedReactions = [];
+        $currentUserId = auth()->id();
+        $userReactions = [];
+
+        foreach ($subjectsByType as $rType => $sids) {
+            $uniqueSids = array_unique($sids);
+
+            $counts = Like::where('type', $rType)
+                ->whereIn('sid', $uniqueSids)
+                ->selectRaw('sid, COUNT(*) as cnt')
+                ->groupBy('sid')
+                ->pluck('cnt', 'sid')
+                ->all();
+            foreach ($counts as $sid => $c) {
+                $reactionCounts[$rType . '_' . $sid] = (int) $c;
+            }
+
+            $likes = Like::with('user.siteAdminEntry')
+                ->where('type', $rType)
+                ->whereIn('sid', $uniqueSids)
+                ->get();
+
+            if ($likes->isNotEmpty()) {
+                $options = Option::whereIn('o_parent', $likes->pluck('id'))
+                    ->where('o_type', 'data_reaction')
+                    ->get()
+                    ->keyBy('o_parent');
+
+                foreach ($likes as $like) {
+                    if (!$like->user) {
+                        continue;
+                    }
+                    $opt = $options->get($like->id);
+                    $reactName = $opt ? $opt->o_valuer : 'like';
+                    $groupedReactions[$rType . '_' . $like->sid][$reactName][] = $like->user;
+
+                    if ($currentUserId && (int) $like->uid === (int) $currentUserId) {
+                        $userReactions[$rType . '_' . $like->sid] = [
+                            'like' => $like,
+                            'option' => $opt,
+                            'reaction' => $reactName,
+                        ];
+                    }
+                }
             }
         }
 
@@ -299,6 +406,37 @@ class StatusActivityService
                     $activity->type_label = 'Knowledgebase';
                     break;
             }
+
+            // Assign precalculated counts and reactions into attributes
+            $sid = $activity->interactionSubjectId();
+            $rType = $activity->getReactionType();
+            $reactionKey = $rType ? ($rType . '_' . $sid) : null;
+
+            $activity->setAttribute(
+                'reactions_count',
+                $reactionKey && isset($reactionCounts[$reactionKey]) ? $reactionCounts[$reactionKey] : 0
+            );
+
+            $activity->setAttribute(
+                'grouped_reactions',
+                $reactionKey && isset($groupedReactions[$reactionKey]) ? $groupedReactions[$reactionKey] : []
+            );
+
+            $activity->user_reaction_data = $reactionKey && isset($userReactions[$reactionKey])
+                ? $userReactions[$reactionKey]
+                : null;
+
+            $commentsCount = match ($type) {
+                1 => (int) ($dirCommentCounts[$activity->tp_id] ?? 0),
+                2, 4, 10, 11, 12, 13, 14, 100 => (int) ($forumCommentCounts[$activity->tp_id] ?? 0),
+                7867 => (int) ($storeCommentCounts[$activity->tp_id] ?? 0),
+                6 => (int) ($activity->related_content->offers_count ?? 0),
+                KnowledgebaseCommunityService::STATUS_TYPE => (int) ($kbCommentCounts[$activity->id] ?? 0),
+                default => 0,
+            };
+            $activity->setAttribute('comments_count', $commentsCount);
+
+            $activity->setAttribute('reposts_count', (int) ($repostCounts[$activity->id] ?? 0));
         }
     }
 }

@@ -36,34 +36,42 @@ class PluginServiceProvider extends ServiceProvider
                 $activeDirs[] = basename($dir);
             }
         } else {
-            // 2. In normal environment: fetch active plugin slugs from database
-            $activeSlugs = [];
-            try {
-                if (Schema::hasTable('options')) {
+            // 2. In normal environment: fetch active plugin slugs from database with caching
+            $activeDirs = \Illuminate\Support\Facades\Cache::remember('myads_active_plugin_dirs', 3600, function () use ($pluginsPath) {
+                $schema = app()->bound(\App\Services\V420SchemaService::class) ? app(\App\Services\V420SchemaService::class) : null;
+                $hasOptions = $schema ? $schema->hasTable('options') : Schema::hasTable('options');
+                if (!$hasOptions) {
+                    return [];
+                }
+
+                $activeSlugs = [];
+                try {
                     $activeSlugs = \App\Models\Option::where('o_type', 'plugins')
                                          ->where('o_valuer', '1')
                                          ->pluck('name')
                                          ->toArray();
+                } catch (\Throwable $e) {
+                    return [];
                 }
-            } catch (\Throwable $e) {
-                // Ignore DB connection errors during early bootstrap
-            }
 
-            if (empty($activeSlugs)) {
-                return;
-            }
+                if (empty($activeSlugs)) {
+                    return [];
+                }
 
-            // Dynamically match plugin slugs to their directories via plugin.json
-            $directories = File::directories($pluginsPath);
-            foreach ($directories as $dir) {
-                $jsonFile = $dir . '/plugin.json';
-                if (File::exists($jsonFile)) {
-                    $pluginData = json_decode(File::get($jsonFile), true);
-                    if (!empty($pluginData['slug']) && in_array($pluginData['slug'], $activeSlugs, true)) {
-                        $activeDirs[] = basename($dir);
+                // Dynamically match plugin slugs to their directories via plugin.json
+                $dirs = [];
+                $directories = File::directories($pluginsPath);
+                foreach ($directories as $dir) {
+                    $jsonFile = $dir . '/plugin.json';
+                    if (File::exists($jsonFile)) {
+                        $pluginData = json_decode(File::get($jsonFile), true);
+                        if (!empty($pluginData['slug']) && in_array($pluginData['slug'], $activeSlugs, true)) {
+                            $dirs[] = basename($dir);
+                        }
                     }
                 }
-            }
+                return $dirs;
+            });
         }
 
         // 3. Boot active plugins

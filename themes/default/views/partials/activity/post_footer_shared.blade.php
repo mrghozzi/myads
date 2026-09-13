@@ -34,11 +34,17 @@
             <div class="post-option" data-activity-menu-trigger data-activity-menu-type="reaction">
                 <div id="reaction-btn-{{ $activity->related_content->id }}">
                 @php
-                    $myReaction = \App\Models\Like::where('uid', auth()->id())
-                        ->where('sid', $activity->related_content->id)
-                        ->where('type', 2)
-                        ->first();
-                    $myReactionOption = $myReaction ? \App\Models\Option::where('o_parent', $myReaction->id)->where('o_type', 'data_reaction')->first() : null;
+                    $userReactData = $activity->user_reaction_data ?? null;
+                    if ($userReactData !== null) {
+                        $myReaction = $userReactData['like'] ?? null;
+                        $myReactionOption = $userReactData['option'] ?? null;
+                    } else {
+                        $myReaction = \App\Models\Like::where('uid', auth()->id())
+                            ->where('sid', $activity->related_content->id)
+                            ->where('type', $activity->getReactionType() ?? 2)
+                            ->first();
+                        $myReactionOption = $myReaction ? \App\Models\Option::where('o_parent', $myReaction->id)->where('o_type', 'data_reaction')->first() : null;
+                    }
                 @endphp
                 @if($myReactionOption)
                     <img class="reaction-option-image" src="{{ theme_asset('img/reaction/'.$myReactionOption->o_valuer.'.png') }}" width="30" alt="reaction-{{ $myReactionOption->o_valuer }}">

@@ -56,31 +56,39 @@ class AppServiceProvider extends ServiceProvider
         $theme = 'default';
         $menus = [];
         $setting = null;
+        $schema = app(V420SchemaService::class);
         
         try {
-            if (Schema::hasTable('setting')) {
+            if ($schema->hasTable('setting')) {
                 $setting = Setting::first();
                 if ($setting && !empty($setting->styles)) {
                     $theme = $setting->styles;
                 }
             }
 
-            if (Schema::hasTable('menu')) {
+            if ($schema->hasTable('menu')) {
                 $menus = Menu::all();
             }
         } catch (\Throwable $e) {
             // Fallback to default
         }
 
-        if (request()->has('preview_theme') && is_dir(base_path('themes/' . request()->query('preview_theme') . '/views'))) {
-            $theme = (string) request()->query('preview_theme');
-        } elseif (request()->has('theme_preview') && request()->has('theme') && is_dir(base_path('themes/' . request()->query('theme') . '/views'))) {
-            $theme = (string) request()->query('theme');
+        try {
+            if (app()->bound('request')) {
+                $req = request();
+                if ($req->has('preview_theme') && is_dir(base_path('themes/' . $req->query('preview_theme') . '/views'))) {
+                    $theme = (string) $req->query('preview_theme');
+                } elseif ($req->has('theme_preview') && $req->has('theme') && is_dir(base_path('themes/' . $req->query('theme') . '/views'))) {
+                    $theme = (string) $req->query('theme');
+                }
+            }
+        } catch (\Throwable $e) {
+            // Fallback
         }
 
         $adminTheme = 'default';
         try {
-            if (Schema::hasTable('options')) {
+            if ($schema->hasTable('options')) {
                 $adminThemeOpt = \App\Models\Option::where('o_type', 'admin_settings')->where('name', 'theme')->first();
                 if ($adminThemeOpt && !empty($adminThemeOpt->o_valuer)) {
                     $adminTheme = $adminThemeOpt->o_valuer;
@@ -98,27 +106,30 @@ class AppServiceProvider extends ServiceProvider
             View::share('seo_settings', new SeoSetting(SeoSetting::defaults()));
         }
 
-        // Fetch all available languages
+        // Fetch all available languages with in-memory / cross-request cache
         $langDir = base_path('lang');
-        $availableLanguages = [];
-        if (\Illuminate\Support\Facades\File::exists($langDir)) {
-            $dirs = \Illuminate\Support\Facades\File::directories($langDir);
-            foreach ($dirs as $dir) {
-                $code = basename($dir);
-                $filePath = $dir . '/messages.php';
-                if (\Illuminate\Support\Facades\File::exists($filePath)) {
-                    try {
-                        $content = include $filePath;
-                        $availableLanguages[] = (object)[
-                            'code' => $code,
-                            'name' => $content['language'] ?? strtoupper($code)
-                        ];
-                    } catch (\Exception $e) {
-                        // Skip corrupted language files
+        $availableLanguages = \Illuminate\Support\Facades\Cache::remember('myads_available_languages', 3600, function () use ($langDir) {
+            $languages = [];
+            if (\Illuminate\Support\Facades\File::exists($langDir)) {
+                $dirs = \Illuminate\Support\Facades\File::directories($langDir);
+                foreach ($dirs as $dir) {
+                    $code = basename($dir);
+                    $filePath = $dir . '/messages.php';
+                    if (\Illuminate\Support\Facades\File::exists($filePath)) {
+                        try {
+                            $content = include $filePath;
+                            $languages[] = (object)[
+                                'code' => $code,
+                                'name' => $content['language'] ?? strtoupper($code)
+                            ];
+                        } catch (\Exception $e) {
+                            // Skip corrupted language files
+                        }
                     }
                 }
             }
-        }
+            return $languages;
+        });
         View::share('available_languages', $availableLanguages);
 
         View::addNamespace('theme', base_path("themes/$theme/views"));
