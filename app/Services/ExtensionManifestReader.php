@@ -121,6 +121,7 @@ class ExtensionManifestReader
                 'author' => trim((string) ($metadata['author'] ?? '')),
                 'description' => trim((string) ($metadata['description'] ?? '')),
                 'min_myads' => trim((string) ($metadata['min_myads'] ?? '')),
+                'max_myads' => trim((string) ($metadata['max_myads'] ?? '')),
             ];
 
             if ($normalized['name'] === '' || $normalized['slug'] === '' || $normalized['version'] === '') {

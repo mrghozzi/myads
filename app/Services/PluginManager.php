@@ -45,9 +45,15 @@ class PluginManager
                     $pluginData['thumbnail'] = $pluginData['thumbnail'] ?? null;
                     $pluginData['latest_url'] = $pluginData['latest'] ?? null;
                     $pluginData['min_myads'] = $pluginData['min_myads'] ?? null;
+                    $pluginData['max_myads'] = $pluginData['max_myads'] ?? null;
                     $pluginData['ADStn_url'] = $pluginData['ADStn_url'] ?? null;
                     $pluginData['settings_url'] = $pluginData['settings_url'] ?? $pluginData['settings'] ?? null;
                     $pluginData['boot_error'] = Cache::get("plugin_boot_error_{$pluginData['directory']}");
+                    
+                    $compat = self::checkCompatibility($pluginData['min_myads'], $pluginData['max_myads'], $pluginData['name'] ?? $pluginData['slug'] ?? '');
+                    $pluginData['is_compatible'] = $compat['is_compatible'];
+                    $pluginData['compatibility_status'] = $compat['status'];
+                    $pluginData['compatibility_message'] = $compat['message'];
                     
                     // Check status in DB
                     $option = Option::where('name', $pluginData['slug'])
@@ -93,6 +99,18 @@ class PluginManager
                 throw new \RuntimeException(__('messages.plugin_requires_newer_myads', [
                     'plugin' => $pluginData['name'] ?? $slug,
                     'min' => $pluginData['min_myads'],
+                    'current' => \App\Support\SystemVersion::CURRENT,
+                ]));
+            }
+        }
+
+        // Check max_myads compatibility
+        if (!empty($pluginData['max_myads'])) {
+            $normalizedMax = self::normalizeMaxVersion($pluginData['max_myads']);
+            if (version_compare(\App\Support\SystemVersion::CURRENT, $normalizedMax, '>')) {
+                throw new \RuntimeException(__('messages.plugin_exceeds_max_myads', [
+                    'plugin' => $pluginData['name'] ?? $slug,
+                    'max' => $pluginData['max_myads'],
                     'current' => \App\Support\SystemVersion::CURRENT,
                 ]));
             }
@@ -277,6 +295,18 @@ class PluginManager
                 return __('messages.plugin_requires_newer_myads', [
                     'plugin' => $manifestData['name'] ?? $slug,
                     'min' => $manifestData['min_myads'],
+                    'current' => \App\Support\SystemVersion::CURRENT,
+                ]);
+            }
+        }
+
+        // Check max_myads
+        if (!empty($manifestData['max_myads'])) {
+            $normalizedMax = self::normalizeMaxVersion($manifestData['max_myads']);
+            if (version_compare(\App\Support\SystemVersion::CURRENT, $normalizedMax, '>')) {
+                return __('messages.plugin_exceeds_max_myads', [
+                    'plugin' => $manifestData['name'] ?? $slug,
+                    'max' => $manifestData['max_myads'],
                     'current' => \App\Support\SystemVersion::CURRENT,
                 ]);
             }
@@ -593,5 +623,69 @@ class PluginManager
             File::directories($this->pluginPath),
             fn (string $directory): bool => ! str_starts_with(basename($directory), '.')
         ));
+    }
+
+    /**
+     * Check version compatibility against min_myads and max_myads.
+     *
+     * @param string|null $minVersion
+     * @param string|null $maxVersion
+     * @param string|null $name
+     * @param string|null $currentVersion
+     * @return array{is_compatible: bool, status: string, message: string}
+     */
+    public static function checkCompatibility(?string $minVersion, ?string $maxVersion, ?string $name = null, ?string $currentVersion = null): array
+    {
+        $current = $currentVersion ?? \App\Support\SystemVersion::CURRENT;
+        $isCompatible = true;
+        $status = 'compatible';
+        $message = __('messages.compatible_with_version', ['version' => $current]);
+
+        if (!empty($minVersion)) {
+            $normalizedMin = trim($minVersion);
+            if (version_compare($current, $normalizedMin, '<')) {
+                $isCompatible = false;
+                $status = 'incompatible_min';
+                $message = __('messages.plugin_requires_newer_myads', [
+                    'plugin' => $name ?? '',
+                    'min' => $minVersion,
+                    'current' => $current,
+                ]);
+            }
+        }
+
+        if ($isCompatible && !empty($maxVersion)) {
+            $normalizedMax = self::normalizeMaxVersion($maxVersion);
+            if (version_compare($current, $normalizedMax, '>')) {
+                $isCompatible = false;
+                $status = 'incompatible_max';
+                $message = __('messages.plugin_exceeds_max_myads', [
+                    'plugin' => $name ?? '',
+                    'max' => $maxVersion,
+                    'current' => $current,
+                ]);
+            }
+        }
+
+        return [
+            'is_compatible' => $isCompatible,
+            'status' => $status,
+            'message' => $message,
+        ];
+    }
+
+    /**
+     * Normalize max version for comparison (supports e.g. 4.6, 4.6.x, 4.6.* -> 4.6.999).
+     */
+    public static function normalizeMaxVersion(string $version): string
+    {
+        $version = trim($version);
+        if (preg_match('/^\d+\.\d+$/', $version)) {
+            return $version . '.999';
+        }
+        if (str_ends_with($version, '.x') || str_ends_with($version, '.*')) {
+            return substr($version, 0, -2) . '.999';
+        }
+        return $version;
     }
 }

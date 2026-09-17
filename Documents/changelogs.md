@@ -1,5 +1,5 @@
 # v4.6.0
-> **Modern Visual Design System, Mobile Navigation Hub, Advanced File & Plugin Security Hardening, Isolated Plugin Boot Engine & Lifecycle Hooks, Guest Page Micro-Caching with ETag 304 Optimization, and Google Sitelinks Search Schema Release** — Comprehensive Modernization of User Interface and Architecture for MYADS v4.6.0: CSS Design Tokens & Semantic Variables (`theme-tokens.css`), Glassmorphism 2.0 Surfaces & Shimmering Skeleton Loaders, Ergonomic Mobile Bottom Navigation Bar with Quick-Post FAB (`mobile_bottom_nav.blade.php`), Binary Magic Bytes & Header MIME Verification (`FileUploadSecurityService`), Native SVG Stored-XSS Sanitizer, Plugin ZIP Archive Directory Traversal & Dangerous Script Inspector, Enhanced HTTP Security Headers (`Permissions-Policy`, `COOP`, `HSTS preload`), Isolated Plugin Safe Boot Engine (`PluginServiceProvider`) Preventing 500 Crashes from Third-Party Errors, Automated Plugin Translation Namespacing, Plugin Lifecycle Hooks (`plugin_activated`, `plugin_deactivated`, `plugin_deleted`), Plugin Compatibility & Dependency Checks (`min_myads`, `requires_plugins`), Extension Hub UI Direct Settings Action (`settings_url`) & Boot Diagnostics, Guest Page Micro-Caching (`GuestPageCacheMiddleware`) with Instant Version Invalidation (`CacheWarmupService`), Conditional ETag HTTP 304 Not Modified Responses, Google Sitelinks Search Schema.org Integration (`SeoManager`), Cached XML Sitemap Indexing, and 100% Automated Feature Test Suite Verification (`V460SecurityHardeningTest.php`, `V460PluginSystemLifecycleTest.php`, `V460PerformanceAndSeoTest.php`).
+> **Modern Visual Design System, Mobile Navigation Hub, Advanced File & Plugin Security Hardening, Isolated Plugin Boot Engine & Lifecycle Hooks, Dual Version Bounding & Compatibility Badges, Guest Page Micro-Caching with ETag 304 Optimization, and Google Sitelinks Search Schema Release** — Comprehensive Modernization of User Interface and Architecture for MYADS v4.6.0: CSS Design Tokens & Semantic Variables (`theme-tokens.css`), Glassmorphism 2.0 Surfaces & Shimmering Skeleton Loaders, Ergonomic Mobile Bottom Navigation Bar with Quick-Post FAB (`mobile_bottom_nav.blade.php`), Binary Magic Bytes & Header MIME Verification (`FileUploadSecurityService`), Native SVG Stored-XSS Sanitizer, Plugin ZIP Archive Directory Traversal & Dangerous Script Inspector, Enhanced HTTP Security Headers (`Permissions-Policy`, `COOP`, `HSTS preload`), Isolated Plugin Safe Boot Engine (`PluginServiceProvider`) Preventing 500 Crashes from Third-Party Errors, Automated Plugin Translation Namespacing, Plugin Lifecycle Hooks (`plugin_activated`, `plugin_deactivated`, `plugin_deleted`), Extension Dual Version Compatibility Bounding (`min_myads` & `max_myads`) with Visual Notice Badges across `/admin/plugins` and `/admin/themes`, Extension Hub UI Direct Settings Action (`settings_url`) & Boot Diagnostics, Guest Page Micro-Caching (`GuestPageCacheMiddleware`) with Instant Version Invalidation (`CacheWarmupService`), Conditional ETag HTTP 304 Not Modified Responses, Google Sitelinks Search Schema.org Integration (`SeoManager`), Cached XML Sitemap Indexing, and 100% Automated Feature Test Suite Verification (`V460SecurityHardeningTest.php`, `V460PluginSystemLifecycleTest.php`, `V460PerformanceAndSeoTest.php`, `V460VersionCompatibilityTest.php`).
 
 ### Modern Visual Design System & Mobile Navigation Hub
 * **CSS Design Tokens & Semantic Architecture (`themes/default/assets/css/theme-tokens.css` & `css_d/theme-tokens.css`):**
@@ -29,8 +29,16 @@
 * **Plugin Lifecycle Hooks & Automated Routines (`app/Services/PluginManager.php`):**
   * Added execution of `activate.php`, `deactivate.php`, and `uninstall.php` lifecycle files upon activation, deactivation, and deletion.
   * Fired dedicated lifecycle action hooks: `plugin_activated`, `plugin_deactivated`, and `plugin_deleted` via the core `Hooks` system.
-* **Compatibility & Dependency Guarding:**
-  * Added preflight checks in `activate()` enforcing `min_myads` platform version checks and `requires_plugins` dependencies before enabling any plugin.
+* **Dual Version Bounding (`min_myads` & `max_myads`) & Extension Compatibility Guards:**
+  * Upgraded `PluginManager.php`, `ThemeManager.php`, `ExtensionManifestReader.php`, `ExtensionPackageUpgrader.php`, and `RemoteExtensionMarketplaceService.php` to parse and enforce both lower and upper platform version bounds (`min_myads` and `max_myads`).
+  * Implemented flexible version normalization (`normalizeMaxVersion`), gracefully standardizing wildcard patterns (`4.6`, `4.6.x`, `4.6.*`) to `4.6.999`.
+  * Activation routines in `PluginManager::activate()` and `ThemeManager::activate()` reject activation with clean, localized `RuntimeException` error notices if the platform version is lower than `min_myads` or exceeds `max_myads`.
+* **Dynamic Visual Compatibility Badges & Notices (`admin_themes/default/views/admin/`):**
+  * Updated `/admin/plugins` and `/admin/themes` cards to calculate real-time compatibility states (`is_compatible`, `compatibility_status`, `compatibility_message`).
+  * Cards render vibrant status badges: green compatibility pills (`متوافق مع هذا الإصدار`) or red incompatibility warnings (`غير متوافق مع هذا الإصدار - يتطلب إصداراً أحدث/أقدم`) along with explicit version badges (`min_myads` & `max_myads`).
+* **Comprehensive Programmatic Compatibility Audit Across All Plugins & Themes:**
+  * Audited all 22 plugins and 2 themes (`default` and `bootstrap-sample`) based on their real programmatic dependencies (core hooks, database migrations, asset tokens, and modern layouts) rather than arbitrary manifest strings.
+  * Synchronized manifests with exact minimum versions (`min_myads: 4.5.0` for hook consumers, `4.5.6` for auto-migration extensions, `4.6.0` for theme token consumers) and set tested upper bound `max_myads: 4.6.99`.
 * **Direct Settings Action & Diagnostic UI (`admin_themes/default/views/admin/plugins.blade.php`):**
   * Exposed `settings_url` in plugin manifest allowing active cards to render a direct **Settings (الإعدادات)** button linking to their management dashboard.
   * Integrated real-time AJAX toggling of the Settings button upon activation/deactivation and rendered boot error warning badges if a plugin failed safe boot.
@@ -54,6 +62,7 @@
   * `V460SecurityHardeningTest.php`: 4 passed, 21 assertions.
   * `V460PluginSystemLifecycleTest.php`: 3 passed, 10 assertions.
   * `V460PerformanceAndSeoTest.php`: 5 passed, 24 assertions.
+  * `V460VersionCompatibilityTest.php`: 5 passed, 23 assertions.
   * 100% test pass rate with zero regressions across core subsystems.
 
 # v4.5.6 

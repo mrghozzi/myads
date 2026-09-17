@@ -45,9 +45,15 @@ class ThemeManager
                     $themeData['path'] = $directory;
                     $themeData['latest_url'] = $themeData['latest'] ?? null;
                     $themeData['min_myads'] = $themeData['min_myads'] ?? null;
+                    $themeData['max_myads'] = $themeData['max_myads'] ?? null;
                     $themeData['ADStn_url'] = $themeData['ADStn_url'] ?? null;
                     $themeData['siteweb'] = $themeData['siteweb'] ?? null;
                     $themeData['author_url'] = $themeData['author_url'] ?? null;
+                    
+                    $compat = self::checkCompatibility($themeData['min_myads'], $themeData['max_myads'], $themeData['name'] ?? $themeData['slug'] ?? '');
+                    $themeData['is_compatible'] = $compat['is_compatible'];
+                    $themeData['compatibility_status'] = $compat['status'];
+                    $themeData['compatibility_message'] = $compat['message'];
                     
                     // Determine thumbnail filename
                     if (!isset($themeData['thumbnail'])) {
@@ -97,6 +103,15 @@ class ThemeManager
         
         if (!$themeDir) {
             return false;
+        }
+
+        $manifestPath = $this->themePath . '/' . $themeDir . '/theme.json';
+        if (File::exists($manifestPath)) {
+            $themeData = json_decode(File::get($manifestPath), true) ?: [];
+            $compat = self::checkCompatibility($themeData['min_myads'] ?? null, $themeData['max_myads'] ?? null, $themeData['name'] ?? $slug);
+            if (!$compat['is_compatible']) {
+                throw new \RuntimeException($compat['message']);
+            }
         }
 
         $setting = \App\Models\Setting::first();
@@ -331,5 +346,69 @@ class ThemeManager
             File::directories($this->themePath),
             fn (string $directory): bool => ! str_starts_with(basename($directory), '.')
         ));
+    }
+
+    /**
+     * Check version compatibility against min_myads and max_myads.
+     *
+     * @param string|null $minVersion
+     * @param string|null $maxVersion
+     * @param string|null $name
+     * @param string|null $currentVersion
+     * @return array{is_compatible: bool, status: string, message: string}
+     */
+    public static function checkCompatibility(?string $minVersion, ?string $maxVersion, ?string $name = null, ?string $currentVersion = null): array
+    {
+        $current = $currentVersion ?? \App\Support\SystemVersion::CURRENT;
+        $isCompatible = true;
+        $status = 'compatible';
+        $message = __('messages.compatible_with_version', ['version' => $current]);
+
+        if (!empty($minVersion)) {
+            $normalizedMin = trim($minVersion);
+            if (version_compare($current, $normalizedMin, '<')) {
+                $isCompatible = false;
+                $status = 'incompatible_min';
+                $message = __('messages.theme_requires_newer_myads', [
+                    'theme' => $name ?? '',
+                    'min' => $minVersion,
+                    'current' => $current,
+                ]);
+            }
+        }
+
+        if ($isCompatible && !empty($maxVersion)) {
+            $normalizedMax = self::normalizeMaxVersion($maxVersion);
+            if (version_compare($current, $normalizedMax, '>')) {
+                $isCompatible = false;
+                $status = 'incompatible_max';
+                $message = __('messages.theme_exceeds_max_myads', [
+                    'theme' => $name ?? '',
+                    'max' => $maxVersion,
+                    'current' => $current,
+                ]);
+            }
+        }
+
+        return [
+            'is_compatible' => $isCompatible,
+            'status' => $status,
+            'message' => $message,
+        ];
+    }
+
+    /**
+     * Normalize max version for comparison (supports e.g. 4.6, 4.6.x, 4.6.* -> 4.6.999).
+     */
+    public static function normalizeMaxVersion(string $version): string
+    {
+        $version = trim($version);
+        if (preg_match('/^\d+\.\d+$/', $version)) {
+            return $version . '.999';
+        }
+        if (str_ends_with($version, '.x') || str_ends_with($version, '.*')) {
+            return substr($version, 0, -2) . '.999';
+        }
+        return $version;
     }
 }

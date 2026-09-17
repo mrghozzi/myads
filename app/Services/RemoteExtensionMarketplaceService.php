@@ -124,6 +124,7 @@ class RemoteExtensionMarketplaceService
                 'author' => trim((string) ($item['author'] ?? '')),
                 'description' => trim((string) ($item['description'] ?? '')),
                 'min_myads' => trim((string) ($item['min_myads'] ?? '')),
+                'max_myads' => trim((string) ($item['max_myads'] ?? '')),
                 'product_url' => $productUrl,
                 'image_url' => $this->isHttpUrl($imageUrl) ? $imageUrl : '',
                 'download_url' => $this->isHttpUrl($downloadUrl) ? $downloadUrl : '',

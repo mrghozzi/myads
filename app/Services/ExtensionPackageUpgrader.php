@@ -78,6 +78,14 @@ class ExtensionPackageUpgrader
                 return __('messages.extension_requires_newer_myads', ['version' => $minMyads]);
             }
 
+            $maxMyads = trim((string) ($metadata['max_myads'] ?? ''));
+            if ($maxMyads !== '') {
+                $normalizedMax = \App\Services\PluginManager::normalizeMaxVersion($maxMyads);
+                if (version_compare($currentVersion, $normalizedMax, '>')) {
+                    return __('messages.extension_exceeds_max_myads', ['version' => $maxMyads]);
+                }
+            }
+
             if (! File::copyDirectory($packageRoot, $stagedPath)) {
                 throw new RuntimeException(__('messages.extension_package_invalid', ['file' => $metadataFile]));
             }

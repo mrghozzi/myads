@@ -210,6 +210,18 @@
                                                         </span>
                                                     @endif
 
+                                                    @if($plugin['is_compatible'] ?? true)
+                                                        <span class="extension-hub__update-badge bg-success-subtle text-success border border-success-subtle" title="{{ __('messages.compatible_with_version', ['version' => \App\Support\SystemVersion::CURRENT]) }}">
+                                                            <i class="feather-check-circle"></i>
+                                                            {{ __('messages.compatible_with_version', ['version' => \App\Support\SystemVersion::CURRENT]) }}
+                                                        </span>
+                                                    @else
+                                                        <span class="extension-hub__update-badge bg-danger text-white border-0 shadow-xs" title="{{ $plugin['compatibility_message'] ?? '' }}">
+                                                            <i class="feather-alert-triangle"></i>
+                                                            {{ $plugin['compatibility_message'] ?? __('messages.incompatible_version') }}
+                                                        </span>
+                                                    @endif
+
                                                     @if(!empty($plugin['boot_error']))
                                                         <span class="extension-hub__update-badge bg-danger text-white border-0 shadow-xs" title="{{ $plugin['boot_error'] }}">
                                                             <i class="feather-alert-octagon"></i>
@@ -237,6 +249,12 @@
                                                 <span class="extension-hub__token">
                                                     <i class="feather-shield"></i>
                                                     {{ __('messages.requires_myads') }}: {{ $plugin['min_myads'] }}
+                                                </span>
+                                            @endif
+                                            @if(!empty($plugin['max_myads']))
+                                                <span class="extension-hub__token">
+                                                    <i class="feather-shield"></i>
+                                                    {{ __('messages.max_myads') }}: {{ $plugin['max_myads'] }}
                                                 </span>
                                             @endif
                                         </div>

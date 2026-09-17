@@ -4185,6 +4185,9 @@ class AdminController extends Controller
             'author' => $plugin['author'] ?? '',
             'author_url' => $plugin['author_url'] ?? null,
             'min_myads' => $plugin['min_myads'] ?? null,
+            'max_myads' => $plugin['max_myads'] ?? null,
+            'is_compatible' => $plugin['is_compatible'] ?? true,
+            'compatibility_message' => $plugin['compatibility_message'] ?? '',
             'ADStn_url' => $plugin['ADStn_url'] ?? null,
             'siteweb' => $plugin['siteweb'] ?? null,
             'thumbnail' => !empty($plugin['thumbnail']) ? route('admin.plugins.thumbnail', $plugin['slug']) : null,
@@ -4285,6 +4288,9 @@ class AdminController extends Controller
             'author' => $theme['author'] ?? '',
             'author_url' => $theme['author_url'] ?? null,
             'min_myads' => $theme['min_myads'] ?? null,
+            'max_myads' => $theme['max_myads'] ?? null,
+            'is_compatible' => $theme['is_compatible'] ?? true,
+            'compatibility_message' => $theme['compatibility_message'] ?? '',
             'ADStn_url' => $theme['ADStn_url'] ?? null,
             'siteweb' => $theme['siteweb'] ?? null,
             'thumbnail' => !empty($theme['thumbnail']) ? route('admin.themes.thumbnail', $theme['slug']) : null,
@@ -4467,8 +4473,8 @@ class AdminController extends Controller
         } catch (\Throwable $e) {
             $this->maintenanceMode->disable(Auth::user(), 'theme_activation_error');
             report($e);
-            $errorMessage = __('messages.theme_activation_failed');
-            if (config('app.debug')) {
+            $errorMessage = $e instanceof \RuntimeException ? $e->getMessage() : __('messages.theme_activation_failed');
+            if (config('app.debug') && !($e instanceof \RuntimeException)) {
                 $errorMessage .= ' (' . $e->getMessage() . ')';
             }
             if ($request->expectsJson() || $request->ajax()) {

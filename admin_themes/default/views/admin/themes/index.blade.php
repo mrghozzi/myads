@@ -207,6 +207,18 @@
                                                         {{ __('messages.update_available') }}
                                                     </span>
                                                 @endif
+
+                                                @if($theme['is_compatible'] ?? true)
+                                                    <span class="extension-hub__update-badge bg-success-subtle text-success border border-success-subtle d-inline-flex align-items-center gap-1" title="{{ __('messages.compatible_with_version', ['version' => \App\Support\SystemVersion::CURRENT]) }}">
+                                                        <i class="feather-check-circle"></i>
+                                                        {{ __('messages.compatible_with_version', ['version' => \App\Support\SystemVersion::CURRENT]) }}
+                                                    </span>
+                                                @else
+                                                    <span class="extension-hub__update-badge bg-danger text-white border-0 shadow-xs d-inline-flex align-items-center gap-1" title="{{ $theme['compatibility_message'] ?? '' }}">
+                                                        <i class="feather-alert-triangle"></i>
+                                                        {{ $theme['compatibility_message'] ?? __('messages.incompatible_version') }}
+                                                    </span>
+                                                @endif
                                             </div>
                                         </div>
 
@@ -232,6 +244,12 @@
                                                 <span class="extension-hub__token">
                                                     <i class="feather-shield"></i>
                                                     {{ __('messages.requires_myads') }}: {{ $theme['min_myads'] }}
+                                                </span>
+                                            @endif
+                                            @if(!empty($theme['max_myads']))
+                                                <span class="extension-hub__token">
+                                                    <i class="feather-shield"></i>
+                                                    {{ __('messages.max_myads') }}: {{ $theme['max_myads'] }}
                                                 </span>
                                             @endif
                                         </div>
