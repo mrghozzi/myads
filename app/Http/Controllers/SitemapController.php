@@ -31,20 +31,23 @@ class SitemapController extends Controller
     public function index()
     {
         try {
-            $xml = '<?xml version="1.0" encoding="UTF-8"?>' . PHP_EOL;
-            $xml .= '<?xml-stylesheet type="text/xsl" href="' . e(asset('sitemap.xsl')) . '"?>' . PHP_EOL;
-            $xml .= '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . PHP_EOL;
+            $xml = \Illuminate\Support\Facades\Cache::remember('myads_sitemap_index_xml', 1800, function () {
+                $content = '<?xml version="1.0" encoding="UTF-8"?>' . PHP_EOL;
+                $content .= '<?xml-stylesheet type="text/xsl" href="' . e(asset('sitemap.xsl')) . '"?>' . PHP_EOL;
+                $content .= '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . PHP_EOL;
 
-            foreach ($this->sectionIndex() as $type => $pages) {
-                for ($i = 1; $i <= $pages; $i++) {
-                    $xml .= '  <sitemap>' . PHP_EOL;
-                    $xml .= '    <loc>' . e(url("sitemap/{$type}/{$i}.xml")) . '</loc>' . PHP_EOL;
-                    $xml .= '    <lastmod>' . date('c') . '</lastmod>' . PHP_EOL;
-                    $xml .= '  </sitemap>' . PHP_EOL;
+                foreach ($this->sectionIndex() as $type => $pages) {
+                    for ($i = 1; $i <= $pages; $i++) {
+                        $content .= '  <sitemap>' . PHP_EOL;
+                        $content .= '    <loc>' . e(url("sitemap/{$type}/{$i}.xml")) . '</loc>' . PHP_EOL;
+                        $content .= '    <lastmod>' . date('c') . '</lastmod>' . PHP_EOL;
+                        $content .= '  </sitemap>' . PHP_EOL;
+                    }
                 }
-            }
 
-            $xml .= '</sitemapindex>';
+                $content .= '</sitemapindex>';
+                return $content;
+            });
 
             return response($xml)->header('Content-Type', 'text/xml');
         } catch (\Throwable $e) {

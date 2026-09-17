@@ -209,6 +209,13 @@
                                                             {{ __('messages.update_available') }}: {{ $pluginUpdate['new_version'] }}
                                                         </span>
                                                     @endif
+
+                                                    @if(!empty($plugin['boot_error']))
+                                                        <span class="extension-hub__update-badge bg-danger text-white border-0 shadow-xs" title="{{ $plugin['boot_error'] }}">
+                                                            <i class="feather-alert-octagon"></i>
+                                                            {{ __('messages.plugin_boot_error_alert', ['plugin' => $plugin['name'], 'error' => \Illuminate\Support\Str::limit($plugin['boot_error'], 35)]) }}
+                                                        </span>
+                                                    @endif
                                                 </div>
 
                                                 <h3 class="extension-hub__card-title">{{ $plugin['name'] }}</h3>
@@ -286,6 +293,17 @@
                                                 <i class="feather-info"></i>
                                                 <span>{{ __('messages.details') ?? 'Details' }}</span>
                                             </button>
+
+                                            @if(!empty($plugin['settings_url']))
+                                                <a
+                                                    href="{{ str_starts_with($plugin['settings_url'], 'http') ? $plugin['settings_url'] : url($plugin['settings_url']) }}"
+                                                    class="btn-extension-glass btn-extension-glass--primary plugin-settings-btn {{ !$plugin['is_active'] ? 'd-none' : '' }}"
+                                                    title="{{ __('messages.plugin_settings') ?? 'Settings' }}"
+                                                >
+                                                    <i class="feather-settings"></i>
+                                                    <span>{{ __('messages.plugin_settings') ?? 'Settings' }}</span>
+                                                </a>
+                                            @endif
 
                                             @if($pluginUpdate && !empty($pluginUpdate['changelog']))
                                                 <button
@@ -854,6 +872,16 @@ document.addEventListener('DOMContentLoaded', function () {
                     var deleteBtn = card.querySelector('.btn-plugin-delete');
                     if (deleteBtn) {
                         deleteBtn.setAttribute('data-is-active', res.data.is_active ? '1' : '0');
+                    }
+
+                    // Update Settings Button Visibility
+                    var settingsBtn = card.querySelector('.plugin-settings-btn');
+                    if (settingsBtn) {
+                        if (res.data.is_active) {
+                            settingsBtn.classList.remove('d-none');
+                        } else {
+                            settingsBtn.classList.add('d-none');
+                        }
                     }
                 }
 

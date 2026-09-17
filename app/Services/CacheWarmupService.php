@@ -65,7 +65,11 @@ class CacheWarmupService
             $warmed['primary_menus'] = 0;
         }
 
-        // 4. Record Warmup Timestamp
+        // 4. Invalidate guest page micro-cache and sitemap cache
+        \App\Http\Middleware\GuestPageCacheMiddleware::flush();
+        Cache::forget('myads_sitemap_index_xml');
+
+        // 5. Record Warmup Timestamp
         Cache::put(self::CACHE_KEY_WARMUP_TIMESTAMP, now()->toIso8601String(), 86400);
         $warmed['timestamp'] = now()->toIso8601String();
 

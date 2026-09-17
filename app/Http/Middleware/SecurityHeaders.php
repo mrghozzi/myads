@@ -36,7 +36,7 @@ class SecurityHeaders
             $response->headers->set('Referrer-Policy', 'origin');
         }
 
-        $response->headers->set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+        $response->headers->set('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=(self)');
 
         // SECURITY: Content-Security-Policy — balanced for ad platforms while blocking injection attacks
         $response->headers->set('Content-Security-Policy',
@@ -55,11 +55,13 @@ class SecurityHeaders
 
         // SECURITY: Prevent SSL stripping attacks via HSTS (only when serving over HTTPS)
         if ($request->isSecure()) {
-            $response->headers->set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+            $response->headers->set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
         }
 
-        // SECURITY: Mitigate Spectre-class side-channel attacks via cross-origin window references
-        $response->headers->set('Cross-Origin-Opener-Policy', 'same-origin');
+        // SECURITY: Mitigate Spectre-class side-channel attacks while allowing OAuth popups
+        if (!$isAdRoute) {
+            $response->headers->set('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
+        }
 
         return $response;
     }

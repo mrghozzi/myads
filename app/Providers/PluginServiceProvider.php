@@ -74,32 +74,61 @@ class PluginServiceProvider extends ServiceProvider
             });
         }
 
-        // 3. Boot active plugins
+        // 3. Boot active plugins with Safe Mode Isolation
         foreach ($activeDirs as $dirName) {
             $pluginDir = $pluginsPath . '/' . $dirName;
             $bootFile = $pluginDir . '/boot.php';
             $routesFile = $pluginDir . '/routes.php';
             $viewsDir = $pluginDir . '/views';
+            $langDir = $pluginDir . '/lang';
             $migrationsDir = $pluginDir . '/database/migrations';
 
-            // 1. Load Boot File
-            if (File::exists($bootFile)) {
-                require $bootFile;
-            }
+            try {
+                // 1. Load Boot File
+                if (File::exists($bootFile)) {
+                    require $bootFile;
+                }
 
-            // 2. Load Routes
-            if (File::exists($routesFile)) {
-                $this->loadRoutesFrom($routesFile);
-            }
+                // 2. Load Routes
+                if (File::exists($routesFile)) {
+                    $this->loadRoutesFrom($routesFile);
+                }
 
-            // 3. Load Views
-            if (File::exists($viewsDir)) {
-                $this->loadViewsFrom($viewsDir, $dirName);
-            }
+                // 3. Load Views
+                if (File::exists($viewsDir)) {
+                    $this->loadViewsFrom($viewsDir, $dirName);
+                }
 
-            // 4. Load Migrations
-            if (File::isDirectory($migrationsDir)) {
-                $this->loadMigrationsFrom($migrationsDir);
+                // 4. Load Translations (Namespaced)
+                if (File::isDirectory($langDir)) {
+                    $this->loadTranslationsFrom($langDir, $dirName);
+                }
+
+                // 5. Load Migrations
+                if (File::isDirectory($migrationsDir)) {
+                    $this->loadMigrationsFrom($migrationsDir);
+                }
+            } catch (\Throwable $e) {
+                \Illuminate\Support\Facades\Log::critical("Plugin [{$dirName}] failed during boot lifecycle: " . $e->getMessage(), [
+                    'directory' => $dirName,
+                    'file' => $e->getFile(),
+                    'line' => $e->getLine(),
+                ]);
+
+                // Store crash diagnostic in cache for admin dashboard visibility
+                \Illuminate\Support\Facades\Cache::put("plugin_boot_error_{$dirName}", $e->getMessage(), 86400);
+
+                // In non-testing environments, gracefully isolate crashed plugin
+                if (!app()->environment('testing')) {
+                    try {
+                        \App\Models\Option::where('name', $dirName)
+                            ->where('o_type', 'plugins')
+                            ->update(['o_valuer' => 0]);
+                        \Illuminate\Support\Facades\Cache::forget('myads_active_plugin_dirs');
+                    } catch (\Throwable $dbEx) {
+                        // ignore secondary DB error during fail-safe recovery
+                    }
+                }
             }
         }
     }

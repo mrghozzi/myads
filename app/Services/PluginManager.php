@@ -46,6 +46,8 @@ class PluginManager
                     $pluginData['latest_url'] = $pluginData['latest'] ?? null;
                     $pluginData['min_myads'] = $pluginData['min_myads'] ?? null;
                     $pluginData['ADStn_url'] = $pluginData['ADStn_url'] ?? null;
+                    $pluginData['settings_url'] = $pluginData['settings_url'] ?? $pluginData['settings'] ?? null;
+                    $pluginData['boot_error'] = Cache::get("plugin_boot_error_{$pluginData['directory']}");
                     
                     // Check status in DB
                     $option = Option::where('name', $pluginData['slug'])
@@ -78,8 +80,35 @@ class PluginManager
         }
 
         $pluginDir = $this->pluginPath . '/' . $dirName;
-        if (!File::exists($pluginDir . '/plugin.json')) {
+        $manifestPath = $pluginDir . '/plugin.json';
+        if (!File::exists($manifestPath)) {
             return false;
+        }
+
+        $pluginData = json_decode(File::get($manifestPath), true) ?: [];
+
+        // Check min_myads compatibility
+        if (!empty($pluginData['min_myads'])) {
+            if (version_compare(\App\Support\SystemVersion::CURRENT, $pluginData['min_myads'], '<')) {
+                throw new \RuntimeException(__('messages.plugin_requires_newer_myads', [
+                    'plugin' => $pluginData['name'] ?? $slug,
+                    'min' => $pluginData['min_myads'],
+                    'current' => \App\Support\SystemVersion::CURRENT,
+                ]));
+            }
+        }
+
+        // Check required plugins
+        if (!empty($pluginData['requires_plugins']) && is_array($pluginData['requires_plugins'])) {
+            foreach ($pluginData['requires_plugins'] as $reqSlug) {
+                $reqActive = Option::where('name', $reqSlug)->where('o_type', 'plugins')->where('o_valuer', '1')->exists();
+                if (!$reqActive) {
+                    throw new \RuntimeException(__('messages.plugin_requires_missing_plugin', [
+                        'plugin' => $pluginData['name'] ?? $slug,
+                        'required' => $reqSlug,
+                    ]));
+                }
+            }
         }
 
         // Run migrations if plugin has database/migrations directory
@@ -91,6 +120,20 @@ class PluginManager
         );
 
         \Illuminate\Support\Facades\Cache::forget('myads_active_plugin_dirs');
+        \Illuminate\Support\Facades\Cache::forget("plugin_boot_error_{$dirName}");
+
+        // Execute activate.php if present
+        $activateFile = $pluginDir . '/activate.php';
+        if (File::exists($activateFile)) {
+            try {
+                require $activateFile;
+            } catch (\Throwable $e) {
+                Log::warning("Plugin [{$slug}] activate.php warning: " . $e->getMessage());
+            }
+        }
+
+        // Fire lifecycle action hook
+        \App\Helpers\Hooks::do_action('plugin_activated', $slug, $pluginData);
 
         return true;
     }
@@ -140,10 +183,26 @@ class PluginManager
      */
     public function deactivate($slug)
     {
+        $dirName = $this->findDirectoryBySlug($slug);
+        $pluginDir = $dirName ? $this->pluginPath . '/' . $dirName : null;
+
         $option = Option::where('name', $slug)->where('o_type', 'plugins')->first();
         if ($option) {
             $option->update(['o_valuer' => 0]);
             \Illuminate\Support\Facades\Cache::forget('myads_active_plugin_dirs');
+
+            // Execute deactivate.php if present
+            if ($pluginDir && File::exists($pluginDir . '/deactivate.php')) {
+                try {
+                    require $pluginDir . '/deactivate.php';
+                } catch (\Throwable $e) {
+                    Log::warning("Plugin [{$slug}] deactivate.php warning: " . $e->getMessage());
+                }
+            }
+
+            // Fire lifecycle action hook
+            \App\Helpers\Hooks::do_action('plugin_deactivated', $slug);
+
             return true;
         }
         return false;
@@ -171,6 +230,19 @@ class PluginManager
             return __('messages.plugin_delete_active_forbidden');
         }
 
+        // Execute uninstall.php if present (to clean up plugin tables/options)
+        $uninstallFile = $pluginDir . '/uninstall.php';
+        if (File::exists($uninstallFile)) {
+            try {
+                require $uninstallFile;
+            } catch (\Throwable $e) {
+                Log::warning("Plugin [{$slug}] uninstall.php warning: " . $e->getMessage());
+            }
+        }
+
+        // Fire lifecycle action hook
+        \App\Helpers\Hooks::do_action('plugin_deleted', $slug);
+
         // Remove from DB
         if ($option) {
             $option->delete();
@@ -188,54 +260,58 @@ class PluginManager
      */
     public function install($file)
     {
-        $zip = new ZipArchive;
-        if ($zip->open($file->getPathname()) === TRUE) {
-            // Extract to temp folder to check structure
-            $tempExtractPath = storage_path('app/temp_plugins/' . uniqid());
-            $zip->extractTo($tempExtractPath);
-            $zip->close();
+        $security = app(\App\Services\Security\FileUploadSecurityService::class);
+        $validation = $security->validatePluginArchive($file->getPathname());
 
-            // Find plugin.json
-            $pluginJsonPath = null;
-            $rootFolder = null;
-
-            // Check if plugin.json is in root or subfolder
-            if (File::exists($tempExtractPath . '/plugin.json')) {
-                $pluginJsonPath = $tempExtractPath . '/plugin.json';
-                $rootFolder = $tempExtractPath;
-            } else {
-                $directories = File::directories($tempExtractPath);
-                if (count($directories) === 1 && File::exists($directories[0] . '/plugin.json')) {
-                    $pluginJsonPath = $directories[0] . '/plugin.json';
-                    $rootFolder = $directories[0];
-                }
-            }
-
-            if (!$pluginJsonPath) {
-                File::deleteDirectory($tempExtractPath);
-                return __('messages.plugin_zip_structure_invalid');
-            }
-
-            $pluginData = json_decode(File::get($pluginJsonPath), true);
-            if (!$pluginData || !isset($pluginData['slug'])) {
-                File::deleteDirectory($tempExtractPath);
-                return __('messages.plugin_manifest_slug_required');
-            }
-
-            // Move to plugins directory
-            $targetPath = $this->pluginPath . '/' . $pluginData['slug']; // Use slug as directory name for consistency
-            
-            if (File::exists($targetPath)) {
-                File::deleteDirectory($tempExtractPath);
-                return __('messages.plugin_already_exists');
-            }
-
-            File::moveDirectory($rootFolder, $targetPath);
-            File::deleteDirectory($tempExtractPath); // Clean up temp root if it was a subfolder move
-
-            return true;
+        if (!$validation['valid']) {
+            $errorKey = $validation['error'] ?? 'messages.plugin_zip_open_failed';
+            return __($errorKey);
         }
-        return __('messages.plugin_zip_open_failed');
+
+        $manifestData = $validation['manifest'];
+        $slug = $manifestData['slug'];
+
+        // Check min_myads
+        if (!empty($manifestData['min_myads'])) {
+            if (version_compare(\App\Support\SystemVersion::CURRENT, $manifestData['min_myads'], '<')) {
+                return __('messages.plugin_requires_newer_myads', [
+                    'plugin' => $manifestData['name'] ?? $slug,
+                    'min' => $manifestData['min_myads'],
+                    'current' => \App\Support\SystemVersion::CURRENT,
+                ]);
+            }
+        }
+
+        $targetPath = $this->pluginPath . '/' . $slug;
+        if (File::exists($targetPath)) {
+            return __('messages.plugin_already_exists');
+        }
+
+        $tempExtractPath = storage_path('app/temp_plugins/' . uniqid());
+        try {
+            $zip = new ZipArchive;
+            if ($zip->open($file->getPathname()) === TRUE) {
+                $zip->extractTo($tempExtractPath);
+                $zip->close();
+
+                // Find root folder containing plugin.json
+                $rootFolder = $tempExtractPath;
+                if (!File::exists($tempExtractPath . '/plugin.json')) {
+                    $directories = File::directories($tempExtractPath);
+                    if (count($directories) === 1 && File::exists($directories[0] . '/plugin.json')) {
+                        $rootFolder = $directories[0];
+                    }
+                }
+
+                File::moveDirectory($rootFolder, $targetPath);
+                return true;
+            }
+            return __('messages.plugin_zip_open_failed');
+        } finally {
+            if (File::exists($tempExtractPath)) {
+                File::deleteDirectory($tempExtractPath);
+            }
+        }
     }
 
     /**

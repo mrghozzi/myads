@@ -81,6 +81,7 @@
 
     <link id="theme-bootstrap" data-theme-link="true" href="{{ theme_asset($css_path . '/bootstrap.min.css') }}" rel="stylesheet">
     <link id="theme-styles" data-theme-link="true" href="{{ theme_asset($css_path . '/styles.min.css') }}" rel="stylesheet">
+    <link id="theme-tokens" data-theme-link="true" href="{{ theme_asset($css_path . '/theme-tokens.css') }}" rel="stylesheet">
     <link id="theme-prestyle" data-theme-link="true" href="{{ theme_asset($css_path . '/prestyle.css') }}" rel="stylesheet">
     <link id="theme-forum-activity-super" data-theme-link="true" rel="stylesheet" href="{{ theme_asset($css_path . '/forum-activity-superdesign.css') }}">
     @if(is_locale_rtl())
@@ -2101,6 +2102,7 @@
         }
     ?>
     @include('theme::partials.continuous_audio_player')
+    @include('theme::partials.mobile_bottom_nav')
     @auth
     <script>
         window.MyAdsLiveConfig = {

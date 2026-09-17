@@ -71,6 +71,7 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\SecurityHeaders::class,
             \App\Http\Middleware\BlockBannedIp::class,
             \App\Http\Middleware\SetLocale::class,
+            \App\Http\Middleware\GuestPageCacheMiddleware::class,
             \App\Http\Middleware\CheckForMaintenanceMode::class,
             \App\Http\Middleware\UpdateUserOnline::class,
             \App\Http\Middleware\TrackMemberSecuritySession::class,
@@ -87,6 +88,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin' => \App\Http\Middleware\AdminMiddleware::class,
             'admin.password.confirm' => \App\Http\Middleware\RequireAdminPasswordConfirmation::class,
             'api.key' => \App\Http\Middleware\RequireMobileApiKey::class,
+            'guest.cache' => \App\Http\Middleware\GuestPageCacheMiddleware::class,
         ]);
 
         $middleware->redirectTo(

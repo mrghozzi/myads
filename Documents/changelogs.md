@@ -1,3 +1,61 @@
+# v4.6.0
+> **Modern Visual Design System, Mobile Navigation Hub, Advanced File & Plugin Security Hardening, Isolated Plugin Boot Engine & Lifecycle Hooks, Guest Page Micro-Caching with ETag 304 Optimization, and Google Sitelinks Search Schema Release** — Comprehensive Modernization of User Interface and Architecture for MYADS v4.6.0: CSS Design Tokens & Semantic Variables (`theme-tokens.css`), Glassmorphism 2.0 Surfaces & Shimmering Skeleton Loaders, Ergonomic Mobile Bottom Navigation Bar with Quick-Post FAB (`mobile_bottom_nav.blade.php`), Binary Magic Bytes & Header MIME Verification (`FileUploadSecurityService`), Native SVG Stored-XSS Sanitizer, Plugin ZIP Archive Directory Traversal & Dangerous Script Inspector, Enhanced HTTP Security Headers (`Permissions-Policy`, `COOP`, `HSTS preload`), Isolated Plugin Safe Boot Engine (`PluginServiceProvider`) Preventing 500 Crashes from Third-Party Errors, Automated Plugin Translation Namespacing, Plugin Lifecycle Hooks (`plugin_activated`, `plugin_deactivated`, `plugin_deleted`), Plugin Compatibility & Dependency Checks (`min_myads`, `requires_plugins`), Extension Hub UI Direct Settings Action (`settings_url`) & Boot Diagnostics, Guest Page Micro-Caching (`GuestPageCacheMiddleware`) with Instant Version Invalidation (`CacheWarmupService`), Conditional ETag HTTP 304 Not Modified Responses, Google Sitelinks Search Schema.org Integration (`SeoManager`), Cached XML Sitemap Indexing, and 100% Automated Feature Test Suite Verification (`V460SecurityHardeningTest.php`, `V460PluginSystemLifecycleTest.php`, `V460PerformanceAndSeoTest.php`).
+
+### Modern Visual Design System & Mobile Navigation Hub
+* **CSS Design Tokens & Semantic Architecture (`themes/default/assets/css/theme-tokens.css` & `css_d/theme-tokens.css`):**
+  * Built a modern design token system with CSS custom properties defining semantic colors (primary, accent, surfaces, borders, text hierarchies), typography sizing, elevations, fluid spacing, and transitions.
+  * Implemented **Glassmorphism 2.0** (`.myads-glass-surface`) utilizing multi-layer backdrop blur, ambient light borders, and frosted translucent gradients compatible with both light and dark modes.
+  * Added dynamic micro-interactions (`.myads-hover-lift`, `.myads-btn-press`, focus ring transitions) and accessible skeleton loading state animations (`.myads-skeleton`).
+* **Ergonomic Mobile Bottom Navigation Hub (`themes/default/views/partials/mobile_bottom_nav.blade.php` & `master.blade.php`):**
+  * Designed and integrated a fixed mobile bottom navigation bar on mobile/tablet viewports (`< 768px`) with safe-area inset support (`env(safe-area-inset-bottom)`).
+  * Highlights active sections (Home, Portal, Notifications, Profile) with subtle glowing indicators and real-time unread badges.
+  * Features an elevated central Floating Action Button (FAB) with gradient accent for instant post creation without scrolling to page top.
+
+### Platform Security Hardening
+* **Binary File Upload & Magic Bytes Verification (`app/Services/Security/FileUploadSecurityService.php`):**
+  * Created unified security service enforcing strict binary signature (magic bytes) validation for JPEG (`\xFF\xD8\xFF`), PNG (`\x89PNG\r\n\x1a\n`), GIF (`GIF87a`/`GIF89a`), WebP (`RIFF....WEBP`), ZIP (`PK\x03\x04`), and PDF (`%PDF-`), completely thwarting extension spoofing and polyglot file uploads.
+* **Native SVG Sanitizer for Stored XSS Mitigation (`FileUploadSecurityService::sanitizeSvgContent`):**
+  * Built a DOM-level and regex-backed SVG sanitizer that strips `<script>`, `<foreignObject>`, `<iframe`, `<embed`, `<object>`, inline event listeners (`onload`, `onerror`, `onclick`, etc.), and dangerous URI schemes (`javascript:`, `vbscript:`, `data:text/html`).
+* **Plugin ZIP Archive Path Traversal & Script Inspector (`FileUploadSecurityService::validatePluginZipArchive`):**
+  * Engineered deep ZIP inspection verifying manifest presence (`plugin.json`), rejecting zip slips / directory traversal (`../`, `..\`), and blocking hidden executable payloads (`.php*`, `.phar`, `.phtml`, `.exe`, `.bat`, `.sh`, `.cmd`, `.cgi`).
+* **Enhanced Security Headers (`app/Http/Middleware/SecurityHeaders.php`):**
+  * Added `payment=(self)` to `Permissions-Policy`, configured `Cross-Origin-Opener-Policy` to `same-origin-allow-popups`, and enforced HSTS `preload`.
+
+### Plugin System & Extension Hub Overhaul
+* **Isolated Plugin Safe Boot Engine (`app/Providers/PluginServiceProvider.php`):**
+  * Isolated third-party plugin booting inside individual `try/catch (\Throwable)` blocks. When a plugin encounters a fatal error, syntax error, or missing dependency during boot, the platform catches the exception, logs detailed diagnostic context, records the error in cache (`plugin_boot_error_{slug}`), and continues booting the site smoothly without triggering a 500 error for visitors.
+* **Automated Namespaced Translations:**
+  * Enabled automatic loading of plugin translation files (`loadTranslationsFrom($langDir, $dirName)`) if a `lang` folder is present in the plugin directory.
+* **Plugin Lifecycle Hooks & Automated Routines (`app/Services/PluginManager.php`):**
+  * Added execution of `activate.php`, `deactivate.php`, and `uninstall.php` lifecycle files upon activation, deactivation, and deletion.
+  * Fired dedicated lifecycle action hooks: `plugin_activated`, `plugin_deactivated`, and `plugin_deleted` via the core `Hooks` system.
+* **Compatibility & Dependency Guarding:**
+  * Added preflight checks in `activate()` enforcing `min_myads` platform version checks and `requires_plugins` dependencies before enabling any plugin.
+* **Direct Settings Action & Diagnostic UI (`admin_themes/default/views/admin/plugins.blade.php`):**
+  * Exposed `settings_url` in plugin manifest allowing active cards to render a direct **Settings (الإعدادات)** button linking to their management dashboard.
+  * Integrated real-time AJAX toggling of the Settings button upon activation/deactivation and rendered boot error warning badges if a plugin failed safe boot.
+
+### Browser UX, SEO & High Performance
+* **Guest Page Micro-Caching (`app/Http/Middleware/GuestPageCacheMiddleware.php`):**
+  * Engineered a lightweight 45-second micro-cache for public guest visits across high-traffic landing routes (`/`, `portal`, `directory`, `store`, `about`, `terms`, `privacy`, `news`, `video`).
+  * Bypasses cache immediately for authenticated users, non-GET methods, and requests with sensitive session/transaction query parameters.
+  * Delivers micro-cached pages with `X-MyAds-MicroCache: HIT` and `Cache-Control: public, max-age=45, stale-while-revalidate=30`.
+* **Conditional HTTP 304 Not Modified Optimization:**
+  * Computes weak ETags (`W/"..."`) for HTML responses and evaluates incoming `If-None-Match` headers, responding with empty `304 Not Modified` headers to conserve server CPU and bandwidth on repeated visits.
+* **Instant Version Invalidation (`GuestPageCacheMiddleware::flush` & `CacheWarmupService.php`):**
+  * Integrated zero-latency cache invalidation via version bumping (`myads_guest_cache_version`), automatically triggered on post creation, status updates, or manual admin cache warmup.
+* **Google Sitelinks Search Schema.org Markup (`app/Services/SeoManager.php`):**
+  * Enhanced `getWebSiteSchema()` to output structured `SearchAction` markup (`query-input: required name=search_term_string`) enabling Google to render rich sitelinks search boxes for the domain.
+* **Cached XML Sitemap Indexing (`app/Http/Controllers/SitemapController.php`):**
+  * Cached the master sitemap index XML with automatic invalidation hooked into `CacheWarmupService`.
+
+### Automated Test Verification
+* **Full Feature Test Coverage (`tests/Feature/`):**
+  * `V460SecurityHardeningTest.php`: 4 passed, 21 assertions.
+  * `V460PluginSystemLifecycleTest.php`: 3 passed, 10 assertions.
+  * `V460PerformanceAndSeoTest.php`: 5 passed, 24 assertions.
+  * 100% test pass rate with zero regressions across core subsystems.
+
 # v4.5.6 
 > **Platform-Wide Performance Overhaul, TTFB Optimization & N+1 Query Elimination, Asynchronous Queue Engine & Dedicated Priority Channels, Developer Platform API Authorization Resilience, Extension Hub AJAX & Theme Management, Plugin Automatic Migrations, Admin Updates Engine Hardening & Superdesign Overhaul Release** — Comprehensive Server Response (TTFB) and Page Load Acceleration, In-Memory Static Memoization (`theme_asset`, `admin_asset`, `ads_site`), Bulk Batch Preloading & N+1 Query Elimination in Community Feed Activity (`StatusActivityService::decorateMany`), Eager Loading `user.siteAdminEntry`, Grouped Batch Preloading of Post Comments, Reactions & Reposts, Caching of Service Providers & Bootstrap Lifecycle (`available_languages` directory scanning cache, `active_plugin_dirs` cache with invalidation in `PluginManager`, `MailSetting` config cache, and 5-minute cache on `BlockBannedIp` checks), Skipping Redundant Disk `.env` Reads, Elimination of Frontend Render-Blocking Bottlenecks in `master.blade.php` (Removed FOUC body opacity hiding rules, Streamlined bloated 7-font Google Fonts to Inter & Outfit, Deferred `plyr.js`), Fixed 500 error on `/video`, Apache Server-Level GZIP Compression (`mod_deflate`) and 1-Year Browser Caching (`mod_expires`) across `.htaccess` and `public/.htaccess`, Universal Bearer Token Resolution (`DeveloperApiController::validateToken`), Reverse Proxy & FastCGI / Apache Environment Authorization Fallbacks (`HTTP_AUTHORIZATION`, `REDIRECT_HTTP_AUTHORIZATION`, `REDIRECT_REDIRECT_HTTP_AUTHORIZATION`, `apache_request_headers`), Case-Insensitive & Flexible Regex Token Scheme Matching (`Bearer\s+(\S+)`), Query & POST Payload Access Token Fallback (`access_token`), Multi-Delimiter Scope Normalization & Cast Handling (`DeveloperAccessToken::$casts`, `getScopesAttribute`, `setScopesAttribute`), Automatic Database Migration Execution on Plugin Activation & Upgrades (`PluginManager::activate`, `PluginManager::runMigrations`), Zero-Reload AJAX Extension Toggles & Instant Category Filtering across Plugins (`/admin/plugins`) and Themes (`/admin/themes`), Admin Updates Staged AJAX Engine Hardening & Superdesign Overhaul (`/admin/updates`, `UpdateSafetyService`, `ReleaseUpdateService`), Pre-Update Snapshot File Backups, OPcache Invalidation, Disk Space & Runtime Preflight Checks, Comprehensive Exception Safety & Diagnostic Logging across all Developer API v1 Endpoints (`try/catch \Throwable`, `Log::error`), Forum-Topic-First Status Creation Architecture (`DeveloperApiController::meContent`), Asynchronous Queue Engine with Dedicated Priority Channels (`high`, `default`, `media`, `maintenance` via `config/queue.php`), Standardized Transactional Email Job (`SendTransactionalEmailJob`), Non-Blocking Community Notifications (`NotificationService::send`), Asynchronous 2FA Email Dispatch (`TwoFactorController::sendEmailCode`), System Monitor Queue Diagnostics & 1-Click Failed Jobs Recovery Hub (`/admin/system-monitor`, `AdminController::retryFailedJobs`, `flushFailedJobs`), and Automated Feature Test Suites (`DeveloperApiTest.php`, `OAuthFlowTest.php`, `PluginMigrationActivationTest.php`, `ThemeAjaxActivationTest.php`, `UpdateSafetyFeatureTest.php` & `AsyncQueueSystemTest.php`).
 

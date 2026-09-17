@@ -3976,8 +3976,8 @@ class AdminController extends Controller
         } catch (\Throwable $e) {
             $this->maintenanceMode->disable(Auth::user(), 'plugin_activation_error');
             report($e);
-            $errorMessage = __('messages.plugin_activation_failed');
-            if (config('app.debug')) {
+            $errorMessage = ($e instanceof \RuntimeException) ? $e->getMessage() : __('messages.plugin_activation_failed');
+            if (config('app.debug') && !($e instanceof \RuntimeException)) {
                 $errorMessage .= ' (' . $e->getMessage() . ')';
             }
             if ($request->expectsJson() || $request->ajax()) {
