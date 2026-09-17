@@ -48,6 +48,7 @@ class PluginManager
                     $pluginData['max_myads'] = $pluginData['max_myads'] ?? null;
                     $pluginData['ADStn_url'] = $pluginData['ADStn_url'] ?? null;
                     $pluginData['settings_url'] = $pluginData['settings_url'] ?? $pluginData['settings'] ?? null;
+                    $pluginData['admin_menu'] = $pluginData['admin_menu'] ?? null;
                     $pluginData['boot_error'] = Cache::get("plugin_boot_error_{$pluginData['directory']}");
                     
                     $compat = self::checkCompatibility($pluginData['min_myads'], $pluginData['max_myads'], $pluginData['name'] ?? $pluginData['slug'] ?? '');
@@ -138,6 +139,7 @@ class PluginManager
         );
 
         \Illuminate\Support\Facades\Cache::forget('myads_active_plugin_dirs');
+        \Illuminate\Support\Facades\Cache::forget('myads_active_plugin_admin_menus');
         \Illuminate\Support\Facades\Cache::forget("plugin_boot_error_{$dirName}");
 
         // Execute activate.php if present
@@ -208,6 +210,7 @@ class PluginManager
         if ($option) {
             $option->update(['o_valuer' => 0]);
             \Illuminate\Support\Facades\Cache::forget('myads_active_plugin_dirs');
+            \Illuminate\Support\Facades\Cache::forget('myads_active_plugin_admin_menus');
 
             // Execute deactivate.php if present
             if ($pluginDir && File::exists($pluginDir . '/deactivate.php')) {
@@ -267,6 +270,7 @@ class PluginManager
         }
 
         // Remove files
+        \Illuminate\Support\Facades\Cache::forget('myads_active_plugin_admin_menus');
         return File::deleteDirectory($pluginDir);
     }
 
@@ -696,5 +700,46 @@ class PluginManager
             return $base . '.999';
         }
         return $version;
+    }
+
+    /**
+     * Get all admin menus registered by active plugins.
+     *
+     * @return array
+     */
+    public static function getActiveAdminMenus(): array
+    {
+        return Cache::remember('myads_active_plugin_admin_menus', 3600, function () {
+            $menus = [];
+            $manager = app(self::class);
+            $activePlugins = collect($manager->getAllPlugins())->where('is_active', true);
+
+            foreach ($activePlugins as $plugin) {
+                if (!empty($plugin['admin_menu']) && is_array($plugin['admin_menu'])) {
+                    $menu = $plugin['admin_menu'];
+                    $title = $menu['title'] ?? $menu['name'] ?? $plugin['name'];
+                    $url = $menu['url'] ?? $plugin['settings_url'] ?? null;
+                    $icon = $menu['icon'] ?? 'feather-grid';
+
+                    if ($url) {
+                        $menus[] = [
+                            'slug' => $plugin['slug'],
+                            'title' => $title,
+                            'url' => str_starts_with($url, 'http') ? $url : url($url),
+                            'icon' => $icon,
+                        ];
+                    }
+                } elseif (!empty($plugin['settings_url'])) {
+                    $menus[] = [
+                        'slug' => $plugin['slug'],
+                        'title' => $plugin['name'],
+                        'url' => str_starts_with($plugin['settings_url'], 'http') ? $plugin['settings_url'] : url($plugin['settings_url']),
+                        'icon' => $plugin['icon'] ?? 'feather-settings',
+                    ];
+                }
+            }
+
+            return $menus;
+        });
     }
 }

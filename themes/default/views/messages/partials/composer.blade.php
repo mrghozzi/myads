@@ -1,4 +1,9 @@
 <footer class="messages-composer" data-message-composer>
+    <div class="messages-composer-drop-indicator" aria-hidden="true">
+        <i class="fa fa-cloud-arrow-up" aria-hidden="true"></i>
+        <span>{{ __('messages.drop_files_here') ?? 'أفلت الملف أو الصورة هنا للإرفاق' }}</span>
+    </div>
+
     <div class="messages-compose-file is-hidden" id="message_attachment_meta">
         <span class="messages-compose-file-name" id="message_attachment_name"></span>
         <button type="button" class="messages-compose-file-clear" id="message_attachment_clear" aria-label="{{ __('messages.cancel') }}">

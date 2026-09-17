@@ -96,13 +96,17 @@
                     </div>
                 @endif
 
-                <div class="composer-refresh__editor" id="composer-editor-shell">
+                <div class="composer-refresh__editor composer-dropzone" id="composer-editor-shell">
                     <textarea
                         id="composer-text"
                         name="text"
                         class="quicktext composer-refresh__textarea"
                         placeholder="{{ $composerPlaceholder }}"
                     >{{ $oldText }}</textarea>
+                    <div class="composer-dropzone-indicator">
+                        <i class="fa fa-cloud-upload-alt"></i>
+                        <span>{{ __('messages.drop_files_here') ?? 'أفلت الصور والوسائط هنا للإرفاق المباشر' }}</span>
+                    </div>
                 </div>
 
                 <p class="composer-refresh__hint">{{ __('messages.mentions_hint') }}</p>
@@ -1668,6 +1672,90 @@
                 syncPostKind();
                 syncToolStates();
             });
+        }
+
+        const editorShell = document.getElementById('composer-editor-shell');
+        if (editorShell && galleryInput) {
+            ['dragenter', 'dragover'].forEach(function (eventName) {
+                editorShell.addEventListener(eventName, function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    editorShell.classList.add('composer-dropzone--active');
+                });
+            });
+
+            ['dragleave', 'drop'].forEach(function (eventName) {
+                editorShell.addEventListener(eventName, function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    editorShell.classList.remove('composer-dropzone--active');
+                });
+            });
+
+            editorShell.addEventListener('drop', function (e) {
+                const dt = e.dataTransfer;
+                if (dt && dt.files && dt.files.length > 0) {
+                    clearMediaSelections('gallery');
+                    galleryInput.files = dt.files;
+                    galleryInput.dispatchEvent(new Event('change', { bubbles: true }));
+                    manualGalleryOpen = true;
+                    if (galleryBlock) {
+                        galleryBlock.style.display = 'block';
+                    }
+                    syncToolStates();
+                }
+            });
+
+            function handleComposerPaste(e) {
+                const clipboardData = e.clipboardData || window.clipboardData;
+                if (!clipboardData || !clipboardData.items) {
+                    return;
+                }
+
+                const items = clipboardData.items;
+                const pastedFiles = [];
+                for (let i = 0; i < items.length; i++) {
+                    const item = items[i];
+                    if (item.type && item.type.indexOf('image') !== -1) {
+                        const file = item.getAsFile();
+                        if (file) {
+                            const ext = (file.type.split('/')[1] || 'png').replace('jpeg', 'jpg');
+                            const filename = file.name && file.name !== 'image.png'
+                                ? file.name
+                                : 'pasted-image-' + Date.now() + '-' + (i + 1) + '.' + ext;
+                            try {
+                                pastedFiles.push(new File([file], filename, { type: file.type }));
+                            } catch (err) {
+                                pastedFiles.push(file);
+                            }
+                        }
+                    }
+                }
+
+                if (pastedFiles.length > 0) {
+                    e.preventDefault();
+                    clearMediaSelections('gallery');
+                    if (typeof DataTransfer !== 'undefined') {
+                        const transfer = new DataTransfer();
+                        const combined = (selectedGalleryFiles || []).concat(pastedFiles);
+                        combined.slice(0, 10).forEach(function (f) {
+                            transfer.items.add(f);
+                        });
+                        galleryInput.files = transfer.files;
+                    }
+                    galleryInput.dispatchEvent(new Event('change', { bubbles: true }));
+                    manualGalleryOpen = true;
+                    if (galleryBlock) {
+                        galleryBlock.style.display = 'block';
+                    }
+                    syncToolStates();
+                }
+            }
+
+            editorShell.addEventListener('paste', handleComposerPaste);
+            if (composerText && composerText !== editorShell) {
+                composerText.addEventListener('paste', handleComposerPaste);
+            }
         }
 
         form.addEventListener('submit', function () {

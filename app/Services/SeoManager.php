@@ -38,6 +38,8 @@ class SeoManager
         'login_page' => 'Login Page',
         'register_page' => 'Register Page',
         'password_reset_page' => 'Password Reset Page',
+        'status_show' => 'Status Post',
+        'video_show' => 'Video View',
     ];
 
     /**
@@ -473,6 +475,39 @@ class SeoManager
                 ]),
                 'image' => $image ? [$image] : null,
             ]);
+        } elseif ($schemaType === 'SocialMediaPosting') {
+            $blocks[] = array_filter([
+                '@context' => 'https://schema.org',
+                '@type' => 'SocialMediaPosting',
+                'headline' => $title,
+                'articleBody' => $description,
+                'datePublished' => $lastmod,
+                'dateModified' => $lastmod,
+                'mainEntityOfPage' => $canonicalUrl,
+                'url' => $canonicalUrl,
+                'author' => array_filter([
+                    '@type' => 'Person',
+                    'name' => (string) ($context['author_name'] ?? $tokens['site']),
+                    'url' => (string) ($context['author_url'] ?? null) ?: null,
+                ]),
+                'image' => $image ? [$image] : null,
+            ]);
+        } elseif ($schemaType === 'VideoObject') {
+            $blocks[] = array_filter([
+                '@context' => 'https://schema.org',
+                '@type' => 'VideoObject',
+                'name' => $title,
+                'description' => $description,
+                'thumbnailUrl' => $image ? [$image] : null,
+                'uploadDate' => $lastmod,
+                'contentUrl' => (string) ($context['video_url'] ?? $canonicalUrl),
+                'embedUrl' => (string) ($context['embed_url'] ?? null) ?: null,
+                'author' => array_filter([
+                    '@type' => 'Person',
+                    'name' => (string) ($context['author_name'] ?? $tokens['site']),
+                    'url' => (string) ($context['author_url'] ?? null) ?: null,
+                ]),
+            ]);
         } elseif ($schemaType === 'ProfilePage') {
             $blocks[] = array_filter([
                 '@context' => 'https://schema.org',
@@ -593,6 +628,8 @@ class SeoManager
             'home' => 'WebSite',
             'news_show' => 'Article',
             'forum_topic' => 'DiscussionForumPosting',
+            'status_show' => 'SocialMediaPosting',
+            'video_show', 'video.show' => 'VideoObject',
             'profile_show' => 'ProfilePage',
             'store_show' => 'Product',
             default => 'WebPage',

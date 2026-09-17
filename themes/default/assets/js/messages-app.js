@@ -895,6 +895,85 @@
       });
     }
 
+    const messageComposer = app.querySelector('[data-message-composer]');
+    function handleDroppedOrPastedFile(file) {
+      if (!file || !attachmentInput) {
+        return;
+      }
+      if (file.size > maxAttachmentBytes) {
+        setComposeError('Maximum attachment size is 5 MB.');
+        resetAttachment();
+        return;
+      }
+      clearComposeError();
+      if (typeof DataTransfer !== 'undefined') {
+        const transfer = new DataTransfer();
+        transfer.items.add(file);
+        attachmentInput.files = transfer.files;
+      }
+      showAttachment(file);
+    }
+
+    if (messageComposer) {
+      ['dragenter', 'dragover'].forEach(function (eventName) {
+        messageComposer.addEventListener(eventName, function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          messageComposer.classList.add('messages-composer--dropzone-active');
+        });
+      });
+
+      ['dragleave', 'drop'].forEach(function (eventName) {
+        messageComposer.addEventListener(eventName, function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          messageComposer.classList.remove('messages-composer--dropzone-active');
+        });
+      });
+
+      messageComposer.addEventListener('drop', function (e) {
+        const dt = e.dataTransfer;
+        if (dt && dt.files && dt.files.length > 0) {
+          handleDroppedOrPastedFile(dt.files[0]);
+        }
+      });
+    }
+
+    function handleMessagePaste(e) {
+      const clipboardData = e.clipboardData || window.clipboardData;
+      if (!clipboardData || !clipboardData.items) {
+        return;
+      }
+
+      const items = clipboardData.items;
+      for (let i = 0; i < items.length; i++) {
+        const item = items[i];
+        if (item.type && (item.type.indexOf('image') !== -1 || item.kind === 'file')) {
+          const file = item.getAsFile();
+          if (file) {
+            e.preventDefault();
+            const ext = (file.type.split('/')[1] || 'png').replace('jpeg', 'jpg');
+            const filename = file.name && file.name !== 'image.png'
+              ? file.name
+              : 'pasted-message-' + Date.now() + '.' + ext;
+            let namedFile = file;
+            try {
+              namedFile = new File([file], filename, { type: file.type });
+            } catch (err) {}
+            handleDroppedOrPastedFile(namedFile);
+            break;
+          }
+        }
+      }
+    }
+
+    if (messageInput) {
+      messageInput.addEventListener('paste', handleMessagePaste);
+    }
+    if (messageComposer && messageComposer !== messageInput) {
+      messageComposer.addEventListener('paste', handleMessagePaste);
+    }
+
     if (emojiButton && emojiPanel) {
       emojiButton.addEventListener('click', function (event) {
         event.preventDefault();

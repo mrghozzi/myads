@@ -143,7 +143,7 @@ Route::get('/plans', [BillingController::class, 'plans'])->name('billing.plans')
 
 // Portal Routes
 Route::get('/portal', [PortalController::class, 'index'])->name('portal.index');
-Route::get('/share', [PortalController::class, 'share'])->name('portal.share')->middleware('auth');
+Route::get('/share', [PortalController::class, 'share'])->name('portal.share')->middleware(['auth', 'throttle:15,1']);
 
 // Video Hub Routes
 Route::get('/video', [App\Http\Controllers\VideoHubController::class, 'index'])->name('video.index');
@@ -903,6 +903,7 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
 });
 
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap.xml');
+Route::get('/sitemap-{type}.xml', [SitemapController::class, 'smartSection'])->name('sitemap.smart_section');
 Route::get('/sitemap/{type}/{page}.xml', [SitemapController::class, 'section'])->name('sitemap.section');
 
 // Tags

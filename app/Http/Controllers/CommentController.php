@@ -15,6 +15,7 @@ use App\Services\GroupAccessService;
 use App\Services\MentionService;
 use App\Services\NotificationService;
 use App\Services\PointLedgerService;
+use App\Services\Security\FileUploadSecurityService;
 use App\Services\SecurityPolicyService;
 use App\Services\SecurityThrottleService;
 use App\Services\V420SchemaService;
@@ -22,6 +23,7 @@ use App\Support\ContentFormatter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class CommentController extends Controller
 {
@@ -91,12 +93,6 @@ class CommentController extends Controller
                 ->get();
         }
 
-        // We need to reverse the order for display (oldest first? No, usually newest at bottom, but let's check old code. 
-        // Old code: ORDER BY `id` DESC. But it displays them. Usually chat/comments are DESC but maybe UI reverses?
-        // Old code: while($sutcat=$catsum->fetch...) -> loops through results.
-        // If query is DESC, first result is newest.
-        // Let's keep it DESC for now.
-
         return view('theme::partials.activity.comments', compact('comments', 'id', 'type', 'limit', 'hide_form', 'locked_topic', 'forum_category_id'));
     }
 
@@ -118,18 +114,60 @@ class CommentController extends Controller
         $uid = $user->id;
         $id = $request->input('id');
         $type = $request->input('type');
-        $text = $request->input('comment');
+        $text = trim((string) $request->input('comment', ''));
+        $file = $request->file('attachment') ?? $request->file('image') ?? $request->file('file');
 
-        if (!$id || !$type || !$text) {
+        if (!$id || !$type || ($text === '' && !$file)) {
             return response()->json(['error' => 'Missing parameters'], 400);
         }
 
-        if ($violation = $securityPolicy->textViolation((string) $text, 'comments')) {
+        if ($text !== '' && ($violation = $securityPolicy->textViolation((string) $text, 'comments'))) {
             return response()->json(['error' => $violation], 422);
         }
 
         if ($cooldownMessage = $securityThrottle->actionMessage($user, 'comment')) {
             return response()->json(['error' => $cooldownMessage], 429);
+        }
+
+        if ($file) {
+            $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'];
+            $ext = strtolower($file->getClientOriginalExtension() ?: $file->extension() ?: 'png');
+            if (!in_array($ext, $allowedExtensions, true)) {
+                return response()->json(['error' => __('messages.file_type_not_allowed') ?? 'File type not allowed'], 422);
+            }
+
+            if ($file->getSize() > 5242880) {
+                return response()->json(['error' => 'File exceeds maximum size of 5 MB'], 422);
+            }
+
+            $securityService = app(FileUploadSecurityService::class);
+            if (!$securityService->validateBinaryMime($file, ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/bmp'])) {
+                return response()->json(['error' => 'Invalid or unsafe file format'], 422);
+            }
+
+            $destinationPath = base_path('upload/comments');
+            if (!is_dir($destinationPath)) {
+                @mkdir($destinationPath, 0755, true);
+            }
+
+            $filename = 'comment_' . $uid . '_' . time() . '_' . Str::random(10) . '.' . $ext;
+            $file->move($destinationPath, $filename);
+            $fullPath = $destinationPath . DIRECTORY_SEPARATOR . $filename;
+
+            if (in_array($ext, ['jpg', 'jpeg', 'png', 'bmp'], true) && function_exists('imagewebp')) {
+                $webpFilename = pathinfo($filename, PATHINFO_FILENAME) . '.webp';
+                $webpFullPath = $destinationPath . DIRECTORY_SEPARATOR . $webpFilename;
+                if ($this->convertImageToWebp($fullPath, $webpFullPath, $ext)) {
+                    if (file_exists($fullPath) && $fullPath !== $webpFullPath) {
+                        @unlink($fullPath);
+                    }
+                    $filename = $webpFilename;
+                }
+            }
+
+            $mediaUrl = asset('upload/comments/' . $filename);
+            $imageMarkdown = '![' . pathinfo($filename, PATHINFO_FILENAME) . '](' . $mediaUrl . ')';
+            $text = $text !== '' ? ($text . "\n\n" . $imageMarkdown) : $imageMarkdown;
         }
 
         $time = time();
@@ -412,5 +450,34 @@ class CommentController extends Controller
 
         return (int) $user->id === (int) $topic->uid
             || $user->canModerateForum('lock_topics', (int) $topic->cat);
+    }
+
+    protected function convertImageToWebp(string $sourcePath, string $targetPath, string $extension): bool
+    {
+        if (!function_exists('imagewebp')) {
+            return false;
+        }
+
+        $image = match (strtolower($extension)) {
+            'jpg', 'jpeg' => @imagecreatefromjpeg($sourcePath),
+            'png' => @imagecreatefrompng($sourcePath),
+            'bmp' => function_exists('imagecreatefrombmp') ? @imagecreatefrombmp($sourcePath) : false,
+            default => false,
+        };
+
+        if ($image === false || $image === null) {
+            return false;
+        }
+
+        if (in_array(strtolower($extension), ['png'], true)) {
+            imagepalettetotruecolor($image);
+            imagealphablending($image, true);
+            imagesavealpha($image, true);
+        }
+
+        $result = @imagewebp($image, $targetPath, 85);
+        imagedestroy($image);
+
+        return $result && file_exists($targetPath) && filesize($targetPath) > 0;
     }
 }

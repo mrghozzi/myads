@@ -709,7 +709,61 @@ class StatusPostService
         }
 
         $file->move($destinationPath, $filename);
+        $fullPath = $destinationPath . DIRECTORY_SEPARATOR . $filename;
+
+        $settings = $this->getFileUploadSettings();
+        if (!empty($settings['auto_convert_webp']) && in_array($extension, ['jpg', 'jpeg', 'png', 'bmp'], true) && function_exists('imagewebp')) {
+            $webpFilename = pathinfo($filename, PATHINFO_FILENAME) . '.webp';
+            $webpFullPath = $destinationPath . DIRECTORY_SEPARATOR . $webpFilename;
+
+            if ($this->convertToWebP($fullPath, $webpFullPath, $extension)) {
+                if (file_exists($fullPath) && $fullPath !== $webpFullPath) {
+                    @unlink($fullPath);
+                }
+                $filename = $webpFilename;
+            }
+        }
+
         return 'upload/' . $filename;
+    }
+
+    /**
+     * Convert an image file to WebP format using PHP GD.
+     *
+     * @param string $sourcePath
+     * @param string $targetPath
+     * @param string $extension
+     * @param int $quality
+     * @return bool
+     */
+    public function convertToWebP(string $sourcePath, string $targetPath, string $extension, int $quality = 85): bool
+    {
+        try {
+            $image = match (strtolower($extension)) {
+                'jpg', 'jpeg' => @imagecreatefromjpeg($sourcePath),
+                'png' => @imagecreatefrompng($sourcePath),
+                'bmp' => function_exists('imagecreatefrombmp') ? @imagecreatefrombmp($sourcePath) : null,
+                default => null,
+            };
+
+            if (!$image) {
+                return false;
+            }
+
+            if ($extension === 'png') {
+                imagepalettetotruecolor($image);
+                imagealphablending($image, true);
+                imagesavealpha($image, true);
+            }
+
+            $success = @imagewebp($image, $targetPath, $quality);
+            imagedestroy($image);
+
+            return $success && file_exists($targetPath) && filesize($targetPath) > 0;
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning("WebP conversion failed for {$sourcePath}: " . $e->getMessage());
+            return false;
+        }
     }
 
     private function storeGalleryFile($file, int $topicId, int $userId): string

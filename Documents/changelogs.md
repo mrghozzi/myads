@@ -10,6 +10,15 @@
   * Designed and integrated a fixed mobile bottom navigation bar on mobile/tablet viewports (`< 768px`) with safe-area inset support (`env(safe-area-inset-bottom)`).
   * Highlights active sections (Home, Portal, Notifications, Profile) with subtle glowing indicators and real-time unread badges.
   * Features an elevated central Floating Action Button (FAB) with gradient accent for instant post creation without scrolling to page top.
+* **Glassmorphic Spring Reaction Picker, Universal Drag-and-Drop & Clipboard Image Paste (`Ctrl+V`):**
+  * Upgraded reaction selector bubble (`.reaction-options.reaction-options-dropdown`) with Glassmorphism 2.0 multi-layer frosted glass, pill radius, and smooth spring hover physics (`cubic-bezier(0.175, 0.885, 0.32, 1.275)`).
+  * **Post Composer Media Hub (`add_post.blade.php`):** Integrated interactive drag-and-drop dropzone (`#composer-editor-shell.composer-dropzone`) with live visual drop indicator, alongside **Clipboard Image Paste (`Ctrl+V` / Paste)** allowing users to copy images or screenshots from anywhere and directly attach them to the gallery preview.
+  * **Private Messages Media Hub (`messages-app.js` & `composer.blade.php`):** Added interactive file & image Drag-and-Drop dropzone and Clipboard Image Paste (`Ctrl+V`) with visual drop indicator (`messages-composer-drop-indicator`), size validation, and immediate attachment staging.
+  * **Comments Media Attachments (`comments.blade.php`, `CommentController.php`, & `theme-tokens.css`):**
+    * Enabled image & small media attachments in comments with dedicated toolbar button (`fa-image`), interactive Drag-and-Drop dropzone, and Clipboard Image Paste (`Ctrl+V`).
+    * Added instant thumbnail & file preview with quick remove button (`.forum-rdx-comment-media-preview`).
+    * Integrated deep binary validation (`FileUploadSecurityService`), WebP auto-conversion, and seamless Markdown image embedding (`![image](url)`) fully backward-compatible across Forum, Directory, Store, Knowledgebase, and Order comments.
+  * Added modern media chips (`.composer-media-chip`) for fast media selection.
 
 ### Platform Security Hardening
 * **Binary File Upload & Magic Bytes Verification (`app/Services/Security/FileUploadSecurityService.php`):**
@@ -20,6 +29,8 @@
   * Engineered deep ZIP inspection verifying manifest presence (`plugin.json`), rejecting zip slips / directory traversal (`../`, `..\`), and blocking hidden executable payloads (`.php*`, `.phar`, `.phtml`, `.exe`, `.bat`, `.sh`, `.cmd`, `.cgi`).
 * **Enhanced Security Headers (`app/Http/Middleware/SecurityHeaders.php`):**
   * Added `payment=(self)` to `Permissions-Policy`, configured `Cross-Origin-Opener-Policy` to `same-origin-allow-popups`, and enforced HSTS `preload`.
+* **External Share Endpoint Rate Limiting (`routes/web.php`):**
+  * Enforced dedicated `throttle:15,1` rate limit middleware to `/share` (`portal.share`), completely preventing bot request flooding.
 
 ### Plugin System & Extension Hub Overhaul
 * **Isolated Plugin Safe Boot Engine (`app/Providers/PluginServiceProvider.php`):**
@@ -42,6 +53,9 @@
 * **Direct Settings Action & Diagnostic UI (`admin_themes/default/views/admin/plugins.blade.php`):**
   * Exposed `settings_url` in plugin manifest allowing active cards to render a direct **Settings (الإعدادات)** button linking to their management dashboard.
   * Integrated real-time AJAX toggling of the Settings button upon activation/deactivation and rendered boot error warning badges if a plugin failed safe boot.
+* **Dynamic Plugin Admin Sidebar Menus (`PluginManager::getActiveAdminMenus`):**
+  * Built programmatic discovery of plugin admin navigation (`admin_menu` and `settings_url`) across active plugins via core extension hooks.
+  * Automatically registers active plugin navigation links into the admin sidebar menu under the extensions section without modifying core layout code.
 
 ### Browser UX, SEO & High Performance
 * **Guest Page Micro-Caching (`app/Http/Middleware/GuestPageCacheMiddleware.php`):**
@@ -52,13 +66,18 @@
   * Computes weak ETags (`W/"..."`) for HTML responses and evaluates incoming `If-None-Match` headers, responding with empty `304 Not Modified` headers to conserve server CPU and bandwidth on repeated visits.
 * **Instant Version Invalidation (`GuestPageCacheMiddleware::flush` & `CacheWarmupService.php`):**
   * Integrated zero-latency cache invalidation via version bumping (`myads_guest_cache_version`), automatically triggered on post creation, status updates, or manual admin cache warmup.
-* **Google Sitelinks Search Schema.org Markup (`app/Services/SeoManager.php`):**
+* **Automatic WebP Image Conversion Engine (`StatusPostService::storeMediaFile` & `convertToWebP`):**
+  * Built automatic image conversion to high-efficiency WebP format for uploaded post attachments and gallery images when `auto_convert_webp` is enabled, reducing disk footprints and speeding up image delivery.
+* **Google Sitelinks Search Schema.org Markup & Expanded Schemas (`app/Services/SeoManager.php`):**
   * Enhanced `getWebSiteSchema()` to output structured `SearchAction` markup (`query-input: required name=search_term_string`) enabling Google to render rich sitelinks search boxes for the domain.
-* **Cached XML Sitemap Indexing (`app/Http/Controllers/SitemapController.php`):**
+  * Added native Schema.org JSON-LD generation for community social posts (`SocialMediaPosting`) and video viewing pages (`VideoObject`).
+* **Cached XML Sitemap Indexing & Partitioned Sitemaps (`app/Http/Controllers/SitemapController.php`):**
   * Cached the master sitemap index XML with automatic invalidation hooked into `CacheWarmupService`.
+  * Added clean direct partition routes (`/sitemap-topics.xml`, `/sitemap-products.xml`, `/sitemap-videos.xml`, `/sitemap-directory.xml`, `/sitemap-news.xml`) supporting instant search bot indexation.
 
 ### Automated Test Verification
 * **Full Feature Test Coverage (`tests/Feature/`):**
+  * `V460ProposalsCompletionTest.php`: 7 passed, 33 assertions.
   * `V460SecurityHardeningTest.php`: 4 passed, 21 assertions.
   * `V460PluginSystemLifecycleTest.php`: 3 passed, 10 assertions.
   * `V460PerformanceAndSeoTest.php`: 5 passed, 24 assertions.

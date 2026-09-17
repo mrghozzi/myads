@@ -1524,19 +1524,27 @@
             if (!input) return;
 
             let text = input.value;
-            if (!text.trim()) return;
+            let mediaFile = window.getCommentPendingMedia ? window.getCommentPendingMedia(id) : null;
+            if (!text.trim() && !mediaFile) return;
+
+            let submitBtn = document.querySelector('[data-comment-submit="' + id + '"]');
+            if (submitBtn) submitBtn.disabled = true;
+
+            let formData = new FormData();
+            formData.append('id', id);
+            formData.append('type', type);
+            formData.append('comment', text);
+            if (mediaFile) {
+                formData.append('attachment', mediaFile);
+            }
 
             fetch('{{ route("comment.store") }}', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
                     'X-CSRF-TOKEN': token
                 },
-                body: JSON.stringify({
-                    id: id,
-                    type: type,
-                    comment: text
-                })
+                body: formData
             })
             .then(async response => {
                 const fallbackError = @json(__('messages.error_prefix'));
@@ -1566,12 +1574,18 @@
                 }
 
                 input.value = '';
+                if (window.clearCommentPendingMedia) {
+                    window.clearCommentPendingMedia(id);
+                }
                 input.dispatchEvent(new Event('input', { bubbles: true }));
                 input.focus();
             })
             .catch(error => {
                 console.error('Error:', error);
                 showToast('error', error.message || @json(__('messages.error_prefix')));
+            })
+            .finally(() => {
+                if (submitBtn) submitBtn.disabled = false;
             });
         }
 

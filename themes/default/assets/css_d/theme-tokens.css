@@ -234,3 +234,231 @@ html[data-theme="css_d"] {
         box-shadow: 0 2px 6px rgba(239, 68, 68, 0.4);
     }
 }
+
+/* Glassmorphism 2.0 Reaction Picker Bubble & Spring Interactions */
+.reaction-options.reaction-options-dropdown {
+    background: var(--myads-glass-bg) !important;
+    backdrop-filter: blur(var(--myads-glass-blur)) saturate(180%) !important;
+    -webkit-backdrop-filter: blur(var(--myads-glass-blur)) saturate(180%) !important;
+    border: 1px solid var(--myads-glass-border) !important;
+    box-shadow: var(--myads-glass-shadow), 0 10px 30px rgba(0, 0, 0, 0.12) !important;
+    border-radius: var(--myads-radius-pill) !important;
+    padding: 6px 14px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    height: auto !important;
+}
+
+.reaction-options.reaction-options-dropdown .reaction-option {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    transition: transform 0.28s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.2s ease !important;
+    cursor: pointer !important;
+    padding: 2px !important;
+}
+
+.reaction-options.reaction-options-dropdown .reaction-option:hover {
+    transform: scale(1.35) translateY(-5px) !important;
+    filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.2)) !important;
+    z-index: 10 !important;
+}
+
+.reaction-options.reaction-options-dropdown .reaction-option:active {
+    transform: scale(0.92) !important;
+}
+
+.reaction-options.reaction-options-dropdown .reaction-option .reaction-option-image {
+    width: 32px !important;
+    height: 32px !important;
+    object-fit: contain !important;
+    transition: transform 0.2s ease !important;
+}
+
+/* Post Composer Dropzone & Interactive Chips */
+.composer-dropzone {
+    border: 2px dashed transparent;
+    transition: border-color var(--myads-transition-smooth), background-color var(--myads-transition-smooth), transform var(--myads-transition-smooth);
+    border-radius: var(--myads-radius-md);
+}
+
+.composer-dropzone.composer-dropzone--active {
+    border-color: var(--myads-primary) !important;
+    background-color: rgba(var(--myads-primary-rgb), 0.06) !important;
+    transform: scale(1.008);
+}
+
+.composer-dropzone-indicator {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px;
+    color: var(--myads-primary);
+    font-weight: 600;
+    font-size: 13px;
+    background: var(--myads-glass-bg);
+    border-radius: var(--myads-radius-sm);
+    margin-top: 8px;
+    backdrop-filter: blur(8px);
+}
+
+.composer-dropzone.composer-dropzone--active .composer-dropzone-indicator {
+    display: flex !important;
+}
+
+.composer-media-chip {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    padding: 6px 12px !important;
+    border-radius: var(--myads-radius-pill) !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    background: var(--myads-surface-border) !important;
+    color: var(--myads-text-main) !important;
+    transition: all var(--myads-transition-fast) !important;
+    border: 1px solid transparent !important;
+    cursor: pointer !important;
+    text-decoration: none !important;
+}
+
+.composer-media-chip:hover {
+    background: rgba(var(--myads-primary-rgb), 0.12) !important;
+    color: var(--myads-primary) !important;
+    border-color: rgba(var(--myads-primary-rgb), 0.25) !important;
+    transform: translateY(-1px) !important;
+}
+
+.composer-media-chip.active {
+    background: var(--myads-primary) !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 12px var(--myads-primary-glow) !important;
+}
+
+/* Universal Messages & Comments Dropzone & Media Hub Styles */
+.messages-composer {
+    position: relative !important;
+}
+
+.messages-composer-drop-indicator {
+    display: none;
+    position: absolute;
+    inset: 0;
+    background: rgba(35, 210, 226, 0.15);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 2px dashed var(--myads-primary, #23d2e2);
+    border-radius: var(--myads-radius-md, 12px);
+    z-index: 50;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--myads-primary, #23d2e2);
+    pointer-events: none;
+}
+
+.messages-composer.messages-composer--dropzone-active .messages-composer-drop-indicator {
+    display: flex !important;
+}
+
+.forum-rdx-comment-composer {
+    position: relative !important;
+    transition: border-color var(--myads-transition-fast), box-shadow var(--myads-transition-fast);
+}
+
+.forum-rdx-comment-composer.comment-dropzone--active {
+    border-color: var(--myads-primary, #23d2e2) !important;
+    box-shadow: 0 0 0 3px rgba(35, 210, 226, 0.25) !important;
+}
+
+.forum-rdx-comment-dropzone-indicator {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px 12px;
+    margin-bottom: 6px;
+    color: var(--myads-primary, #23d2e2);
+    font-weight: 600;
+    font-size: 12px;
+    background: rgba(35, 210, 226, 0.15);
+    border: 1px dashed var(--myads-primary, #23d2e2);
+    border-radius: var(--myads-radius-sm, 8px);
+}
+
+.forum-rdx-comment-composer.comment-dropzone--active .forum-rdx-comment-dropzone-indicator {
+    display: flex !important;
+}
+
+.forum-rdx-comment-media-preview {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 10px;
+    margin: 6px 0;
+    background: var(--myads-glass-bg, rgba(15, 23, 42, 0.85));
+    border: 1px solid var(--myads-surface-border, rgba(255, 255, 255, 0.1));
+    border-radius: var(--myads-radius-sm, 8px);
+    width: fit-content;
+    max-width: 100%;
+}
+
+.forum-rdx-comment-media-preview.is-hidden {
+    display: none !important;
+}
+
+.forum-rdx-comment-media-preview .comment-media-thumb {
+    width: 36px;
+    height: 36px;
+    object-fit: cover;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.forum-rdx-comment-media-preview .comment-media-name {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--myads-text-main, #f1f5f9);
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.forum-rdx-comment-media-preview .comment-media-remove {
+    background: transparent;
+    border: none;
+    color: var(--myads-danger, #ef4444);
+    cursor: pointer;
+    font-size: 14px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    transition: background-color var(--myads-transition-fast);
+}
+
+.forum-rdx-comment-media-preview .comment-media-remove:hover {
+    background: rgba(239, 68, 68, 0.2);
+}
+
+/* Comment Image Markdown Display Styling */
+.post-comment-text img {
+    max-width: 100% !important;
+    max-height: 380px !important;
+    height: auto !important;
+    border-radius: var(--myads-radius-sm, 8px) !important;
+    margin-top: 8px !important;
+    display: block !important;
+    object-fit: contain !important;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35) !important;
+    transition: transform var(--myads-transition-fast), box-shadow var(--myads-transition-fast);
+}
+
+.post-comment-text img:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5) !important;
+}
+
+

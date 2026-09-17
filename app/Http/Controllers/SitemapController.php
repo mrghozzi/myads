@@ -57,9 +57,29 @@ class SitemapController extends Controller
         }
     }
 
+    public function smartSection($type)
+    {
+        $aliases = [
+            'directory' => 'directories',
+            'topic' => 'topics',
+            'product' => 'products',
+            'video' => 'videos',
+        ];
+
+        $normalizedType = $aliases[$type] ?? $type;
+
+        return $this->section($normalizedType, 1);
+    }
+
     public function section($type, $page = 1)
     {
-        if (!array_key_exists($type, $this->sectionIndex())) {
+        $validTypes = [
+            'static', 'pages', 'news', 'forum_categories', 'topics', 'videos',
+            'directory_categories', 'directories', 'products', 'knowledgebase_indexes',
+            'knowledgebases', 'users', 'groups',
+        ];
+
+        if (!in_array($type, $validTypes, true) && !array_key_exists($type, $this->sectionIndex())) {
             abort(404);
         }
 
