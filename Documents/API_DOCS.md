@@ -1,5 +1,5 @@
-# MYADS v4.5.6 REST & Real-Time API Documentation
-> **Specification Version:** `v4.5.6` (Stable Release)  
+# MYADS v4.6.0 REST & Real-Time API Documentation
+> **Specification Version:** `v4.6.0` (Stable Release)  
 > **Target Framework:** Laravel 12 (PHP 8.2+)  
 > **Authentication Engines:** Laravel Sanctum (Mobile & Web API), OAuth 2.0 (Developer Platform), and Server-Sent Events (SSE Live Stream).  
 > **Last Updated:** September 2026  
@@ -8,13 +8,15 @@
 
 ## 1. Overview & Architecture
 
-The MYADS v4.5.6 API ecosystem delivers high-performance, secure, and extensible interfaces connecting web clients, companion mobile applications (Flutter), and third-party developer integrations.
+The MYADS v4.6.0 API ecosystem delivers high-performance, secure, and extensible interfaces connecting web clients, companion mobile applications (Flutter), and third-party developer integrations.
 
 ### Primary API Subsystems
 1. **Internal Mobile & Web API (`/api/*`):** Powered by Laravel Sanctum for mobile app companion clients and web AJAX workflows.
 2. **Real-Time Events Engine (`/live/stream` & `/api/live/stream` — RT-04):** Zero-overhead Server-Sent Events (SSE) streaming engine delivering instant unread counters (synchronized with `MessageConversationService`), live toasts, and feed updates.
 3. **Developer Platform & OAuth 2.0 (`/oauth/*` & `/api/developer/v1/*`):** 27 granular permissions for external applications registered at `/developer`.
 4. **Ad Serving & Exchange Engine (`/ads/*`):** High-throughput ad delivery, anti-click-farm validation, and conversion tracking.
+5. **Universal Media & Comments Ingestion Engine (`/comment/*`, `/api/statuses/*`):** Drag-and-drop & clipboard (`Ctrl+V`) media ingestion, binary MIME verification (`FileUploadSecurityService`), and automatic WebP image optimization.
+6. **Smart Partitioned Sitemaps & Discovery (`/sitemap.xml`, `/sitemap/*.xml`):** Partitioned XML sitemaps with ETag conditional HTTP 304 caching for enterprise SEO discovery.
 
 ---
 
@@ -49,6 +51,7 @@ Public and authenticated API endpoints are protected with sliding-window rate li
 | `POST /api/login` | 5 req / min / IP | Brute-force credential stuffing |
 | `POST /api/register` | 3 req / min / IP | Automated spam registration |
 | `POST /api/license/verify` | 10 req / min / IP | License enumeration |
+| `GET /share` | 15 req / min / IP | External link preview scraping & spam protection |
 | `GET/POST /api/developer/v1/*` | 30 req / min / IP | Developer API scraping & abuse |
 | `GET /api/live/stream` | 1 connection / user | Persistent streaming session |
 
@@ -520,6 +523,63 @@ https://myads.com/share?text=Check+out+this+awesome+platform!+https://example.co
 - `GET /api/clips/saved`: Retrieve user's saved clips list.
 - `POST /api/clips/{id}/save`: Save a clip.
 - `DELETE /api/clips/{id}/save`: Unsave a clip.
+
+### I. Unified Comments & Media Attachment API
+Unified AJAX/REST endpoints managing contextual discussions across all platform entities (Forum Topics, Directory Listings, Store Products, Knowledgebase Articles, and Service Orders):
+
+- `POST /comment/store`: Post a comment with optional inline image attachment.
+  - **Headers:** `X-CSRF-TOKEN: {token}` (Web) or `Authorization: Bearer {token}` (Mobile), `Accept: application/json`
+  - **Request Type:** `multipart/form-data`
+  - **Payload Parameters:**
+    | Parameter | Type | Required | Description |
+    |---|---|---|---|
+    | `id` | integer | **Yes** | Target entity ID (e.g. topic ID, product ID, order ID). |
+    | `type` | string | **Yes** | Entity domain (`forum`, `directory`, `store`, `knowledgebase`, `order`). |
+    | `comment` | string | Conditional | Comment text. Optional if an `attachment` is provided. |
+    | `attachment` | file | Optional | Image attachment (`.jpg`, `.jpeg`, `.png`, `.gif`, `.webp`, `.bmp`). Max size: **5 MB**. |
+  - **Security & Media Pipeline:**
+    - Real binary signature (Magic Bytes) inspection via `FileUploadSecurityService`.
+    - Auto-conversion to compressed `WebP` (85% quality, alpha channel preserved).
+    - Auto-embedding as Markdown image `![image](upload/comments/comment-...)` directly into the comment text for universal backward compatibility.
+  - **Response (HTTP 200):**
+    ```json
+    {
+        "status": "success",
+        "html": "<div class=\"... comment...\">...</div>",
+        "comment_id": 142,
+        "media_url": "https://domain.com/upload/comments/comment-142.webp"
+    }
+    ```
+  - **Validation Error (HTTP 422 / 400):**
+    ```json
+    {
+        "error": "The uploaded file exceeds the maximum allowed size (5 MB)."
+    }
+    ```
+
+- `POST /comment/delete`: Remove an existing comment.
+  - **Headers:** `X-CSRF-TOKEN: {token}`, `Content-Type: application/json`
+  - **Payload:** `{"trashid": 142, "type": "forum"}`
+  - **Permissions:** Comment author, Forum Moderator (`delete_comments` permission), or System Administrator.
+
+- `POST /reaction/toggle`: Toggle an emoji reaction on a post or comment.
+  - **Headers:** `X-CSRF-TOKEN: {token}`, `Content-Type: application/json`
+  - **Payload:** `{"id": 142, "type": "forum_comment", "reaction": "like"}`
+
+### J. Smart Partitioned XML Sitemaps
+MYADS v4.6.0 provides scalable, partitioned XML Sitemaps compliant with Google Sitemaps Protocol 0.9 and Schema.org standards:
+
+| Endpoint | Content | Cache Strategy |
+|---|---|---|
+| `GET /sitemap.xml` | Master Sitemap Index referencing all partition endpoints | Dynamic Cache (1 hr) + ETag |
+| `GET /sitemap/pages.xml` | Core static & CMS landing pages | Dynamic Cache (24 hrs) + ETag |
+| `GET /sitemap/topics.xml` | Public forum discussion topics | Dynamic Cache (1 hr) + ETag |
+| `GET /sitemap/products.xml` | Marketplace store listings & products | Dynamic Cache (2 hrs) + ETag |
+| `GET /sitemap/directory.xml` | Web directory links and categories | Dynamic Cache (6 hrs) + ETag |
+| `GET /sitemap/knowledgebase.xml` | Help center and documentation articles | Dynamic Cache (12 hrs) + ETag |
+
+- **HTTP 304 Conditional Support:** Endpoints calculate an `ETag` and check incoming `If-None-Match` request headers. If content has not changed, the server returns an immediate `HTTP 304 Not Modified` without transferring payload bytes.
+- **Content-Type:** `application/xml; charset=utf-8` with XML declaration and standard `<urlset>` / `<sitemapindex>` roots.
 
 ---
 

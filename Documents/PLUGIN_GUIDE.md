@@ -46,7 +46,16 @@ Every plugin **must** include a valid `plugin.json` file in its root folder. The
     "siteweb": "https://www.example.com",
     "ADStn_url": "auto-commenter-pro",
     "latest": "https://github.com/mrghozzi/auto-commenter/releases/latest",
-    "min_myads": "4.5.0"
+    "settings_url": "/admin/plugins/auto-commenter/settings",
+    "admin_menu": [
+        {
+            "title": "Auto Commenter",
+            "url": "/admin/plugins/auto-commenter",
+            "icon": "fa fa-comments"
+        }
+    ],
+    "min_myads": "4.6.0",
+    "max_myads": "4.6.x"
 }
 ```
 
@@ -64,7 +73,10 @@ Every plugin **must** include a valid `plugin.json` file in its root folder. The
 | `siteweb` | string | No | Official documentation or marketing website URL. |
 | `ADStn_url` | string | No | Marketplace slug on the central ADStn marketplace (`www.adstn.ovh`) for automated licensing and update checks. |
 | `latest` | string | No | GitHub latest release URL for update checks (fallback if `ADStn_url` is omitted). |
-| `min_myads` | string | No | Minimum compatible MYADS version (e.g. `4.5.0`). |
+| `settings_url` | string | No | Direct URL to plugin configuration in Admin Panel (e.g. `/admin/plugins/{slug}/settings`). |
+| `admin_menu` | array | No | Array of administration navigation items (`title`, `url`, `icon`, `permission`) dynamically registered in the sidebar. |
+| `min_myads` | string | No | Minimum compatible MYADS version (e.g. `4.6.0`). |
+| `max_myads` | string | No | Maximum compatible MYADS version bounding (e.g. `4.6.x`). |
 
 ---
 
@@ -101,6 +113,11 @@ Actions allow plugins to execute custom logic, fire background jobs, or render H
 add_action('after_user_register', function ($userId) {
     // Send external notification or initialize custom user rewards
     app(\App\Services\ExternalNotifier::class)->notify($userId);
+});
+
+// Adding custom administrative sidebar menu links dynamically
+add_action('admin_sidebar_menu', function () {
+    echo '<li class="sidebar-item"><a class="sidebar-link" href="' . url('/admin/my-plugin') . '"><i class="fa fa-cogs"></i> <span>Custom Tool</span></a></li>';
 });
 ```
 
@@ -177,6 +194,12 @@ Administrators can inspect all active action and filter hooks in real-time, view
 ### 7.3 System Resource Footprint (`/admin/system-monitor`)
 The diagnostic engine measures disk size, registered hooks, custom routes, and calculates an estimated performance impact rating (🟢 Low, 🟡 Medium, 🟠 High).
 
+### 7.4 Dynamic Administration Sidebar Menus (`getActiveAdminMenus`)
+In MYADS v4.6.0, `PluginManager::getActiveAdminMenus()` inspects active plugins and caches their declared `admin_menu` and `settings_url` entries. The administration layout renders these links automatically:
+- Menu declarations are validated against the current administrator's permission level.
+- Avoids manual edits to core admin layout files.
+- Active menus are cached under `active_admin_menus` and invalidated automatically on plugin activation, deactivation, or update.
+
 ---
 
 ## 8. Paid Plugin Licensing & Marketplace Protocol
@@ -243,3 +266,43 @@ In your plugin's main initialization file:
 ### Usage in Code & Blade
 - **Blade Views:** `{{ __('auto-commenter::messages.widget_title') }}`
 - **PHP Controllers:** `__('auto-commenter::messages.success_notice')`
+
+---
+
+## 10. Secure File & Media Handling in Plugins
+
+Plugins that process user-uploaded media or files must adhere to the platform's multi-layered security protocol:
+
+### 10.1 Binary MIME Inspection (`FileUploadSecurityService`)
+Never rely solely on client-provided file extensions or HTTP `Content-Type` headers. Use `FileUploadSecurityService`:
+
+```php
+use App\Services\FileUploadSecurityService;
+
+$security = app(FileUploadSecurityService::class);
+$result = $security->validateUpload($request->file('attachment'), [
+    'allowed_extensions' => ['jpg', 'jpeg', 'png', 'webp', 'gif'],
+    'max_size_kb' => 5120, // 5 MB
+]);
+
+if (!$result['valid']) {
+    return response()->json(['error' => $result['error']], 422);
+}
+```
+
+### 10.2 Automated WebP Conversion
+To minimize bandwidth and disk consumption, convert raster uploads to WebP with an 85% quality factor:
+
+```php
+// Check GD support for WebP
+if (function_exists('imagewebp')) {
+    $image = imagecreatefromstring(file_get_contents($uploadedFile->getRealPath()));
+    if ($image !== false) {
+        imagepalettetotruecolor($image);
+        imagealphablending($image, true);
+        imagesavealpha($image, true);
+        imagewebp($image, $destinationPath, 85);
+        imagedestroy($image);
+    }
+}
+```
