@@ -38,7 +38,7 @@
   * Cards render vibrant status badges: green compatibility pills (`متوافق مع هذا الإصدار`) or red incompatibility warnings (`غير متوافق مع هذا الإصدار - يتطلب إصداراً أحدث/أقدم`) along with explicit version badges (`min_myads` & `max_myads`).
 * **Comprehensive Programmatic Compatibility Audit Across All Plugins & Themes:**
   * Audited all 22 plugins and 2 themes (`default` and `bootstrap-sample`) based on their real programmatic dependencies (core hooks, database migrations, asset tokens, and modern layouts) rather than arbitrary manifest strings.
-  * Synchronized manifests with exact minimum versions (`min_myads: 4.5.0` for hook consumers, `4.5.6` for auto-migration extensions, `4.6.0` for theme token consumers) and set tested upper bound `max_myads: 4.6.99`.
+  * Synchronized manifests with exact minimum versions (`min_myads: 4.5.0` for hook consumers, `4.5.6` for auto-migration extensions, `4.6.0` for theme token consumers) and set semantic upper bound `max_myads: 4.6.x` (with automatic resolution for `4.6`, `4.6.x`, and `4.6.*`).
 * **Direct Settings Action & Diagnostic UI (`admin_themes/default/views/admin/plugins.blade.php`):**
   * Exposed `settings_url` in plugin manifest allowing active cards to render a direct **Settings (الإعدادات)** button linking to their management dashboard.
   * Integrated real-time AJAX toggling of the Settings button upon activation/deactivation and rendered boot error warning badges if a plugin failed safe boot.

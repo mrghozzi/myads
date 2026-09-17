@@ -403,11 +403,20 @@ class ThemeManager
     public static function normalizeMaxVersion(string $version): string
     {
         $version = trim($version);
+        $version = ltrim($version, '^~=v');
+
+        if (preg_match('/^\d+$/', $version)) {
+            return $version . '.999.999';
+        }
         if (preg_match('/^\d+\.\d+$/', $version)) {
             return $version . '.999';
         }
-        if (str_ends_with($version, '.x') || str_ends_with($version, '.*')) {
-            return substr($version, 0, -2) . '.999';
+        if (str_ends_with(strtolower($version), '.x') || str_ends_with($version, '.*')) {
+            $base = substr($version, 0, -2);
+            if (!str_contains($base, '.')) {
+                return $base . '.999.999';
+            }
+            return $base . '.999';
         }
         return $version;
     }

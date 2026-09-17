@@ -6,5 +6,5 @@
     "description": "The default starter theme for MyAds with Design Tokens, Glassmorphism 2.0 and Mobile Navigation.",
     "thumbnail": "screenshot.png",
     "min_myads": "4.6.0",
-    "max_myads": "4.6.99"
+    "max_myads": "4.6.x"
 }
