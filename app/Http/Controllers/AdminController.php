@@ -131,258 +131,45 @@ class AdminController extends Controller
         } catch (\Exception $e) {}
 
         $latestVersion = null;
-        try {
-            $latestVersion = Cache::remember('latest_version', 3600, function () {
-                try {
-                    $response = Http::withHeaders([
-                        'User-Agent' => 'MyAds-Updater/1.0',
-                        'Accept'     => 'application/vnd.github.v3+json',
-                    ])->timeout(5)->get('https://api.github.com/repos/mrghozzi/myads/releases/latest');
-                    
-                    if ($response->successful()) {
-                        $data = $response->json();
-                        return ltrim($data['tag_name'] ?? '', 'v');
-                    }
-                } catch (\Exception $e) {
-                    return null;
-                }
-                return null;
-            });
-        } catch (\Throwable $e) {
-            $latestVersion = null;
-        }
-
-        // Stats - wrapped in try-catch for fresh installs or restricted hosting
-        try {
-            $stats = [
-                'users' => User::count(),
-                'users_online' => User::where('online', '>', time() - 240)->count(),
-                'posts' => Status::count(),
-                'posts_breakdown' => [
-                    'text' => max(0, Status::count() - (Status::where('s_type', 4)->count() + Status::where('s_type', 10)->count() + Status::where('s_type', 11)->count() + Status::where('s_type', 12)->count() + Status::where('s_type', 13)->count() + Status::where('s_type', 14)->count() + \App\Models\StatusLinkPreview::count() + \App\Models\StatusRepost::count())),
-                    'link' => \App\Models\StatusLinkPreview::count(),
-                    'gallery' => Status::where('s_type', 4)->count(),
-                    'video' => Status::where('s_type', 10)->count(),
-                    'clip' => Status::where('s_type', 14)->count(),
-                    'audio' => Status::where('s_type', 11)->count(),
-                    'voice' => 0,
-                    'file' => Status::where('s_type', 12)->count(),
-                    'music' => Status::where('s_type', 13)->count(),
-                    'repost' => \App\Models\StatusRepost::count(),
-                    'knowledgebase' => \App\Models\Knowledgebase::count(),
-                ],
-                'topics' => ForumTopic::count(),
-                'listings' => Directory::count(),
-                'products' => Product::withoutGlobalScope('store')->where('o_type', 'store')->count(),
-                'banners' => [
-                    'total' => Banner::count(),
-                    'views' => Banner::sum('vu'),
-                    'clicks' => Banner::sum('clik'),
-                ],
-                'links' => [
-                    'total' => Link::count(),
-                    'clicks' => Link::sum('clik'),
-                    'views' => 0,
-                ],
-                'smart_ads' => [
-                    'total' => SmartAd::count(),
-                    'impressions' => SmartAd::sum('impressions'),
-                    'clicks' => SmartAd::sum('clicks'),
-                ],
-                'custom_ads' => [
-                    'total' => \App\Models\CustomAdPlacement::count(),
-                    'impressions' => \App\Models\CustomAdDeal::sum('impressions'),
-                    'clicks' => \App\Models\CustomAdDeal::sum('clicks'),
-                ],
-                'visits' => [
-                    'total' => Visit::count(),
-                ],
-                'reactions' => [
-                    'total' => \App\Models\Like::count(),
-                ],
-                'followers' => \App\Models\Like::where('type', 1)->count(),
-                'reports' => [
-                    'pending' => Report::where('statu', 1)->count(),
-                ],
-                'last_user' => User::orderBy('id', 'desc')->first(),
-                'last_post' => Status::with('user')->orderBy('id', 'desc')->first(),
-            ];
-        } catch (\Throwable $e) {
-            $stats = [
-                'users' => 0, 'users_online' => 0, 'posts' => 0, 'topics' => 0,
-                'posts_breakdown' => ['text' => 0, 'link' => 0, 'gallery' => 0, 'video' => 0, 'clip' => 0, 'audio' => 0, 'voice' => 0, 'file' => 0, 'music' => 0, 'repost' => 0, 'knowledgebase' => 0],
-                'listings' => 0, 'products' => 0,
-                'banners' => ['total' => 0, 'views' => 0, 'clicks' => 0],
-                'links' => ['total' => 0, 'clicks' => 0, 'views' => 0],
-                'smart_ads' => ['total' => 0, 'impressions' => 0, 'clicks' => 0],
-                'custom_ads' => ['total' => 0, 'impressions' => 0, 'clicks' => 0],
-                'visits' => ['total' => 0],
-                'reactions' => ['total' => 0],
-                'followers' => 0,
-                'reports' => ['pending' => 0],
-                'last_user' => null, 'last_post' => null,
-            ];
-        }
-
-        // Chart Data for Dashboard
-        $chartData = [
-            'distribution' => [
-                'labels' => [
-                    __('messages.bannads'),
-                    __('messages.textads'),
-                    __('messages.smart_ads'),
-                    __('messages.custom_ads') ?? 'الإعلانات المخصصة',
-                    __('messages.exvisit'),
-                ],
-                'data' => [
-                    $stats['banners']['total'],
-                    $stats['links']['total'],
-                    $stats['smart_ads']['total'],
-                    $stats['custom_ads']['total'],
-                    $stats['visits']['total'],
-                ],
+        $stats = [
+            'users' => 0,
+            'users_online' => 0,
+            'posts' => 0,
+            'posts_breakdown' => [
+                'text' => 0, 'link' => 0, 'gallery' => 0, 'video' => 0, 'clip' => 0,
+                'audio' => 0, 'voice' => 0, 'file' => 0, 'music' => 0, 'repost' => 0,
+                'knowledgebase' => 0,
             ],
-            'engagement' => [
-                'labels' => [
-                    __('messages.bannads') . ' ' . __('messages.Views'),
-                    __('messages.bannads') . ' ' . __('messages.clicks'),
-                    __('messages.textads') . ' ' . __('messages.clicks'),
-                    __('messages.smart_ads') . ' ' . __('messages.Views'),
-                    __('messages.smart_ads') . ' ' . __('messages.clicks'),
-                    (__('messages.custom_ads') ?? 'الإعلانات المخصصة') . ' ' . __('messages.Views'),
-                    (__('messages.custom_ads') ?? 'الإعلانات المخصصة') . ' ' . __('messages.clicks'),
-                ],
-                'data' => [
-                    $stats['banners']['views'],
-                    $stats['banners']['clicks'],
-                    $stats['links']['clicks'],
-                    $stats['smart_ads']['impressions'],
-                    $stats['smart_ads']['clicks'],
-                    $stats['custom_ads']['impressions'],
-                    $stats['custom_ads']['clicks'],
-                ],
-            ],
+            'topics' => 0,
+            'listings' => 0,
+            'products' => 0,
+            'banners' => ['total' => 0, 'views' => 0, 'clicks' => 0],
+            'links' => ['total' => 0, 'clicks' => 0, 'views' => 0],
+            'smart_ads' => ['total' => 0, 'impressions' => 0, 'clicks' => 0],
+            'custom_ads' => ['total' => 0, 'impressions' => 0, 'clicks' => 0],
+            'visits' => ['total' => 0],
+            'reactions' => ['total' => 0],
+            'followers' => 0,
+            'reports' => ['pending' => 0],
+            'last_user' => null,
+            'last_post' => null,
         ];
-        
-        // --- Community Statistics Charts ---
-        $days = 30;
-        $labels = [];
-        for ($i = $days - 1; $i >= 0; $i--) {
-            $labels[] = now()->subDays($i)->format('M d');
-        }
 
-        $startDate = now()->subDays($days)->startOfDay()->timestamp;
-        $isSqlite = DB::connection()->getDriverName() === 'sqlite';
-        $dayDateExpr = $isSqlite ? 'strftime(\'%b %d\', datetime(date, \'unixepoch\')) as day' : 'FROM_UNIXTIME(date, "%b %d") as day';
-        $dayOrderExpr = $isSqlite ? 'strftime(\'%b %d\', datetime(o_order, \'unixepoch\')) as day' : 'FROM_UNIXTIME(o_order, "%b %d") as day';
-        $dayTimeExpr = $isSqlite ? 'strftime(\'%b %d\', datetime(time_t, \'unixepoch\')) as day' : 'FROM_UNIXTIME(time_t, "%b %d") as day';
-
-        // Posts by type
-        $postTypesRaw = Status::where('date', '>=', $startDate)
-            ->whereIn('s_type', [100, 2, 4, 10, 7867, 6, 5, 11, 12, 13, 14, \App\Services\KnowledgebaseCommunityService::STATUS_TYPE])
-            ->select(DB::raw($dayDateExpr), 's_type', DB::raw('count(*) as count'))
-            ->groupBy('day', 's_type')
-            ->get();
-
-        $postTypes = ['100' => [], '2' => [], '4' => [], '10' => [], '7867' => [], '6' => [], '5' => [], '11' => [], '12' => [], '13' => [], '14' => [], \App\Services\KnowledgebaseCommunityService::STATUS_TYPE => []];
-        foreach($postTypesRaw as $row) {
-            $postTypes[$row->s_type][$row->day] = $row->count;
-        }
-
-        // Aggregated Option Comments grouped by o_type and day in ONE query
-        $optionCommentsGrouped = Option::whereIn('o_type', ['d_coment', 's_coment', \App\Services\KnowledgebaseCommunityService::COMMENT_OPTION_TYPE])
-            ->where('o_order', '>=', $startDate)
-            ->select('o_type', DB::raw($dayOrderExpr), DB::raw('count(*) as count'))
-            ->groupBy('o_type', 'day')
-            ->get();
-
-        $storeCommentsGrouped = [];
-        $directoryCommentsGrouped = [];
-        $kbCommentsGrouped = [];
-
-        foreach ($optionCommentsGrouped as $row) {
-            if ($row->o_type === 's_coment') {
-                $storeCommentsGrouped[$row->day] = $row->count;
-            } elseif ($row->o_type === 'd_coment') {
-                $directoryCommentsGrouped[$row->day] = $row->count;
-            } elseif ($row->o_type === \App\Services\KnowledgebaseCommunityService::COMMENT_OPTION_TYPE) {
-                $kbCommentsGrouped[$row->day] = $row->count;
-            }
-        }
-
-        // Aggregated Likes by type and day in ONE query
-        $likesGroupedRaw = \App\Models\Like::where('time_t', '>=', $startDate)
-            ->whereIn('type', [1, 2, 3, 6, 14, 22, \App\Services\KnowledgebaseCommunityService::REACTION_TYPE])
-            ->select('type', DB::raw($dayTimeExpr), DB::raw('count(*) as count'))
-            ->groupBy('type', 'day')
-            ->get();
-
-        $likesGrouped = [];
-        foreach ($likesGroupedRaw as $row) {
-            $likesGrouped[$row->type][$row->day] = $row->count;
-        }
+        $chartData = [
+            'distribution' => ['labels' => [], 'data' => []],
+            'engagement' => ['labels' => [], 'data' => []],
+        ];
 
         $communityChartData = [
-            'labels' => $labels,
-            'posts' => [
-                'text' => array_map(fn($l) => $postTypes['100'][$l] ?? 0, $labels),
-                'link' => array_map(fn($l) => $postTypes['2'][$l] ?? 0, $labels),
-                'gallery' => array_map(fn($l) => $postTypes['4'][$l] ?? 0, $labels),
-                'forum' => array_map(fn($l) => ($postTypes['10'][$l] ?? 0), $labels),
-                'store' => array_map(fn($l) => $postTypes['7867'][$l] ?? 0, $labels),
-                'orders' => array_map(fn($l) => $postTypes['6'][$l] ?? 0, $labels),
-                'news' => array_map(fn($l) => $postTypes['5'][$l] ?? 0, $labels),
-                'video' => array_map(fn($l) => $postTypes['10'][$l] ?? 0, $labels),
-                'clips' => array_map(fn($l) => $postTypes['14'][$l] ?? 0, $labels),
-                'audio' => array_map(fn($l) => $postTypes['11'][$l] ?? 0, $labels),
-                'file' => array_map(fn($l) => $postTypes['12'][$l] ?? 0, $labels),
-                'music' => array_map(fn($l) => $postTypes['13'][$l] ?? 0, $labels),
-                'knowledgebase' => array_map(fn($l) => $postTypes[\App\Services\KnowledgebaseCommunityService::STATUS_TYPE][$l] ?? 0, $labels),
-            ],
-            'comments' => [
-                'total' => array_map(fn($l) => ($forumComments[$l] ?? 0) + ($otherComments[$l] ?? 0) + ($orderOffers[$l] ?? 0), $labels),
-                'forum' => array_map(fn($l) => $forumComments[$l] ?? 0, $labels),
-                'store' => array_map(fn($l) => $storeCommentsGrouped[$l] ?? 0, $labels),
-                'orders' => array_map(fn($l) => $orderOffers[$l] ?? 0, $labels),
-                'directory' => array_map(fn($l) => $directoryCommentsGrouped[$l] ?? 0, $labels),
-                'knowledgebase' => array_map(fn($l) => $kbCommentsGrouped[$l] ?? 0, $labels),
-            ],
-            'reactions' => [
-                'total' => array_map(fn($l) => $reactionsData[$l] ?? 0, $labels),
-                'forum' => array_map(fn($l) => $likesGrouped[2][$l] ?? 0, $labels),
-                'store' => array_map(fn($l) => $likesGrouped[3][$l] ?? 0, $labels),
-                'directory' => array_map(fn($l) => $likesGrouped[22][$l] ?? 0, $labels),
-                'orders' => array_map(fn($l) => $likesGrouped[6][$l] ?? 0, $labels),
-                'follows' => array_map(fn($l) => $likesGrouped[1][$l] ?? 0, $labels),
-                'clips' => array_map(fn($l) => $likesGrouped[14][$l] ?? 0, $labels),
-                'knowledgebase' => array_map(fn($l) => $likesGrouped[\App\Services\KnowledgebaseCommunityService::REACTION_TYPE][$l] ?? 0, $labels),
-            ],
+            'labels' => [],
+            'posts' => ['text' => [], 'link' => [], 'gallery' => [], 'forum' => [], 'store' => [], 'orders' => [], 'news' => [], 'video' => [], 'clips' => [], 'audio' => [], 'file' => [], 'music' => [], 'knowledgebase' => []],
+            'comments' => ['forum' => [], 'store' => [], 'orders' => [], 'directory' => [], 'knowledgebase' => []],
+            'reactions' => ['forum' => [], 'store' => [], 'directory' => [], 'orders' => [], 'follows' => [], 'clips' => [], 'knowledgebase' => []],
         ];
 
-        // Fetch detailed reaction summary (like, love, etc.)
-        $detailedReactions = Option::where('o_type', 'data_reaction')
-            ->select('o_valuer as type', DB::raw('count(*) as count'))
-            ->groupBy('o_valuer')
-            ->pluck('count', 'type')
-            ->toArray();
-
-        // Count total actual reactions (excluding follows which are type=1)
-        $totalActualReactions = \App\Models\Like::where('type', '!=', 1)->count();
-        $totalRegisteredInOptions = array_sum($detailedReactions);
-        
-        // Difference goes to 'like' (fallback)
-        $likeFallback = max(0, $totalActualReactions - $totalRegisteredInOptions);
-        
-        $reactionsSummary = $detailedReactions;
-        $reactionsSummary['like'] = ($reactionsSummary['like'] ?? 0) + $likeFallback;
-
-        // Ensure common types exist even if 0 for the view to render them
-        $commonReactions = ['like', 'love', 'funny', 'wow', 'sad', 'angry', 'dislike', 'happy'];
-        foreach ($commonReactions as $cr) {
-            if (!isset($reactionsSummary[$cr])) {
-                $reactionsSummary[$cr] = 0;
-            }
-        }
+        $reactionsSummary = [
+            'like' => 0, 'love' => 0, 'funny' => 0, 'wow' => 0, 'sad' => 0, 'angry' => 0, 'dislike' => 0, 'happy' => 0,
+        ];
 
         // --- Dynamic Admin Tips Engine ---
         $adminTips = [
@@ -561,6 +348,387 @@ class AdminController extends Controller
         $currentTip = $adminTips[array_rand($adminTips)];
 
         return view('admin::admin.index', compact('stats', 'currentVersion', 'latestVersion', 'chartData', 'communityChartData', 'reactionsSummary', 'adminTips', 'currentTip'));
+    }
+
+    public function ajaxDashboardKpis()
+    {
+        $kpis = Cache::remember('admin_dashboard_kpis_data', 15, function () {
+            try {
+                return [
+                    'users' => User::count(),
+                    'users_online' => User::where('online', '>', time() - 240)->count(),
+                    'posts' => Status::count(),
+                    'banners' => [
+                        'total' => Banner::count(),
+                        'views' => (int) Banner::sum('vu'),
+                        'clicks' => (int) Banner::sum('clik'),
+                    ],
+                    'links' => [
+                        'total' => Link::count(),
+                        'clicks' => (int) Link::sum('clik'),
+                    ],
+                    'visits' => [
+                        'total' => Visit::count(),
+                    ],
+                ];
+            } catch (\Throwable $e) {
+                return [
+                    'users' => 0,
+                    'users_online' => 0,
+                    'posts' => 0,
+                    'banners' => ['total' => 0, 'views' => 0, 'clicks' => 0],
+                    'links' => ['total' => 0, 'clicks' => 0],
+                    'visits' => ['total' => 0],
+                ];
+            }
+        });
+
+        if (request()->wantsJson() || request()->query('format') === 'json') {
+            return response()->json($kpis);
+        }
+
+        return view('admin::admin.partials.dashboard_kpis', ['stats' => $kpis]);
+    }
+
+    public function ajaxDashboardReactions()
+    {
+        $reactionsData = Cache::remember('admin_dashboard_reactions_data', 30, function () {
+            try {
+                $detailedReactions = Option::where('o_type', 'data_reaction')
+                    ->select('o_valuer as type', DB::raw('count(*) as count'))
+                    ->groupBy('o_valuer')
+                    ->pluck('count', 'type')
+                    ->toArray();
+
+                $totalActualReactions = \App\Models\Like::where('type', '!=', 1)->count();
+                $totalRegisteredInOptions = array_sum($detailedReactions);
+                $likeFallback = max(0, $totalActualReactions - $totalRegisteredInOptions);
+
+                $reactionsSummary = $detailedReactions;
+                $reactionsSummary['like'] = ($reactionsSummary['like'] ?? 0) + $likeFallback;
+
+                $commonReactions = ['like', 'love', 'funny', 'wow', 'sad', 'angry', 'dislike', 'happy'];
+                foreach ($commonReactions as $cr) {
+                    if (!isset($reactionsSummary[$cr])) {
+                        $reactionsSummary[$cr] = 0;
+                    }
+                }
+
+                return [
+                    'total' => $totalActualReactions,
+                    'summary' => $reactionsSummary,
+                ];
+            } catch (\Throwable $e) {
+                return [
+                    'total' => 0,
+                    'summary' => [
+                        'like' => 0, 'love' => 0, 'funny' => 0, 'wow' => 0, 'sad' => 0, 'angry' => 0, 'dislike' => 0, 'happy' => 0,
+                    ],
+                ];
+            }
+        });
+
+        if (request()->wantsJson() || request()->query('format') === 'json') {
+            return response()->json($reactionsData);
+        }
+
+        return view('admin::admin.partials.dashboard_reactions', [
+            'totalReactions' => $reactionsData['total'],
+            'reactionsSummary' => $reactionsData['summary'],
+        ]);
+    }
+
+    public function ajaxDashboardActivity()
+    {
+        $activityData = Cache::remember('admin_dashboard_activity_data', 20, function () {
+            try {
+                $lastUser = User::orderBy('id', 'desc')->first();
+                $lastPost = Status::with('user')->orderBy('id', 'desc')->first();
+                $totalReactions = \App\Models\Like::count();
+                $totalFollowers = \App\Models\Like::where('type', 1)->count();
+                $topicsCount = ForumTopic::count();
+                $listingsCount = Directory::count();
+                $productsCount = Product::withoutGlobalScope('store')->where('o_type', 'store')->count();
+                $pendingReportsCount = Report::where('statu', 1)->count();
+
+                $totalPosts = Status::count();
+                $breakdown = [
+                    'gallery' => Status::where('s_type', 4)->count(),
+                    'video' => Status::where('s_type', 10)->count(),
+                    'clip' => Status::where('s_type', 14)->count(),
+                    'audio' => Status::where('s_type', 11)->count(),
+                    'file' => Status::where('s_type', 12)->count(),
+                    'music' => Status::where('s_type', 13)->count(),
+                    'link' => \App\Models\StatusLinkPreview::count(),
+                    'repost' => \App\Models\StatusRepost::count(),
+                    'knowledgebase' => \App\Models\Knowledgebase::count(),
+                ];
+                $specialCount = $breakdown['gallery'] + $breakdown['video'] + $breakdown['clip'] 
+                    + $breakdown['audio'] + $breakdown['file'] + $breakdown['music'] 
+                    + $breakdown['link'] + $breakdown['repost'];
+                $breakdown['text'] = max(0, $totalPosts - $specialCount);
+
+                return [
+                    'last_user' => $lastUser,
+                    'last_post' => $lastPost,
+                    'total_reactions' => $totalReactions,
+                    'followers' => $totalFollowers,
+                    'topics' => $topicsCount,
+                    'listings' => $listingsCount,
+                    'products' => $productsCount,
+                    'pending_reports' => $pendingReportsCount,
+                    'posts_total' => $totalPosts,
+                    'posts_breakdown' => $breakdown,
+                ];
+            } catch (\Throwable $e) {
+                return [
+                    'last_user' => null,
+                    'last_post' => null,
+                    'total_reactions' => 0,
+                    'followers' => 0,
+                    'topics' => 0,
+                    'listings' => 0,
+                    'products' => 0,
+                    'pending_reports' => 0,
+                    'posts_total' => 0,
+                    'posts_breakdown' => [
+                        'text' => 0, 'link' => 0, 'gallery' => 0, 'video' => 0, 'clip' => 0,
+                        'audio' => 0, 'file' => 0, 'music' => 0, 'repost' => 0, 'knowledgebase' => 0,
+                    ],
+                ];
+            }
+        });
+
+        if (request()->wantsJson() || request()->query('format') === 'json') {
+            return response()->json($activityData);
+        }
+
+        return view('admin::admin.partials.dashboard_activity', $activityData);
+    }
+
+    public function ajaxDashboardAdCharts()
+    {
+        $chartData = Cache::remember('admin_dashboard_ad_charts_data', 60, function () {
+            try {
+                $bannerTotal = Banner::count();
+                $bannerViews = (int) Banner::sum('vu');
+                $bannerClicks = (int) Banner::sum('clik');
+
+                $linkTotal = Link::count();
+                $linkClicks = (int) Link::sum('clik');
+
+                $smartAdTotal = SmartAd::count();
+                $smartAdViews = (int) SmartAd::sum('impressions');
+                $smartAdClicks = (int) SmartAd::sum('clicks');
+
+                $customAdTotal = \App\Models\CustomAdPlacement::count();
+                $customAdViews = (int) \App\Models\CustomAdDeal::sum('impressions');
+                $customAdClicks = (int) \App\Models\CustomAdDeal::sum('clicks');
+
+                $visitsTotal = Visit::count();
+
+                return [
+                    'distribution' => [
+                        'labels' => [
+                            __('messages.bannads'),
+                            __('messages.textads'),
+                            __('messages.smart_ads'),
+                            __('messages.custom_ads') ?? 'الإعلانات المخصصة',
+                            __('messages.exvisit'),
+                        ],
+                        'data' => [
+                            $bannerTotal,
+                            $linkTotal,
+                            $smartAdTotal,
+                            $customAdTotal,
+                            $visitsTotal,
+                        ],
+                    ],
+                    'engagement' => [
+                        'labels' => [
+                            __('messages.bannads') . ' ' . __('messages.Views'),
+                            __('messages.bannads') . ' ' . __('messages.clicks'),
+                            __('messages.textads') . ' ' . __('messages.clicks'),
+                            __('messages.smart_ads') . ' ' . __('messages.Views'),
+                            __('messages.smart_ads') . ' ' . __('messages.clicks'),
+                            (__('messages.custom_ads') ?? 'الإعلانات المخصصة') . ' ' . __('messages.Views'),
+                            (__('messages.custom_ads') ?? 'الإعلانات المخصصة') . ' ' . __('messages.clicks'),
+                        ],
+                        'data' => [
+                            $bannerViews,
+                            $bannerClicks,
+                            $linkClicks,
+                            $smartAdViews,
+                            $smartAdClicks,
+                            $customAdViews,
+                            $customAdClicks,
+                        ],
+                    ],
+                ];
+            } catch (\Throwable $e) {
+                return [
+                    'distribution' => ['labels' => [], 'data' => []],
+                    'engagement' => ['labels' => [], 'data' => []],
+                ];
+            }
+        });
+
+        return response()->json($chartData);
+    }
+
+    public function ajaxDashboardCommunityCharts()
+    {
+        $communityData = Cache::remember('admin_dashboard_community_charts_data', 180, function () {
+            try {
+                $days = 30;
+                $labels = [];
+                for ($i = $days - 1; $i >= 0; $i--) {
+                    $labels[] = now()->subDays($i)->format('M d');
+                }
+
+                $startDate = now()->subDays($days)->startOfDay()->timestamp;
+                $isSqlite = DB::connection()->getDriverName() === 'sqlite';
+                $dayDateExpr = $isSqlite ? 'strftime(\'%b %d\', datetime(date, \'unixepoch\')) as day' : 'FROM_UNIXTIME(date, "%b %d") as day';
+                $dayOrderExpr = $isSqlite ? 'strftime(\'%b %d\', datetime(o_order, \'unixepoch\')) as day' : 'FROM_UNIXTIME(o_order, "%b %d") as day';
+                $dayTimeExpr = $isSqlite ? 'strftime(\'%b %d\', datetime(time_t, \'unixepoch\')) as day' : 'FROM_UNIXTIME(time_t, "%b %d") as day';
+
+                // Posts by type
+                $postTypesRaw = Status::where('date', '>=', $startDate)
+                    ->whereIn('s_type', [100, 2, 4, 10, 7867, 6, 5, 11, 12, 13, 14, \App\Services\KnowledgebaseCommunityService::STATUS_TYPE])
+                    ->select(DB::raw($dayDateExpr), 's_type', DB::raw('count(*) as count'))
+                    ->groupBy('day', 's_type')
+                    ->get();
+
+                $postTypes = ['100' => [], '2' => [], '4' => [], '10' => [], '7867' => [], '6' => [], '5' => [], '11' => [], '12' => [], '13' => [], '14' => [], \App\Services\KnowledgebaseCommunityService::STATUS_TYPE => []];
+                foreach ($postTypesRaw as $row) {
+                    $postTypes[$row->s_type][$row->day] = $row->count;
+                }
+
+                // Aggregated Option Comments grouped by o_type and day in ONE query
+                $optionCommentsGrouped = Option::whereIn('o_type', ['d_coment', 's_coment', \App\Services\KnowledgebaseCommunityService::COMMENT_OPTION_TYPE])
+                    ->where('o_order', '>=', $startDate)
+                    ->select('o_type', DB::raw($dayOrderExpr), DB::raw('count(*) as count'))
+                    ->groupBy('o_type', 'day')
+                    ->get();
+
+                $storeCommentsGrouped = [];
+                $directoryCommentsGrouped = [];
+                $kbCommentsGrouped = [];
+
+                foreach ($optionCommentsGrouped as $row) {
+                    if ($row->o_type === 's_coment') {
+                        $storeCommentsGrouped[$row->day] = $row->count;
+                    } elseif ($row->o_type === 'd_coment') {
+                        $directoryCommentsGrouped[$row->day] = $row->count;
+                    } elseif ($row->o_type === \App\Services\KnowledgebaseCommunityService::COMMENT_OPTION_TYPE) {
+                        $kbCommentsGrouped[$row->day] = $row->count;
+                    }
+                }
+
+                // Forum comments by day
+                $forumComments = [];
+                try {
+                    $forumCommentsRaw = DB::table('forum_comments')
+                        ->where('date', '>=', $startDate)
+                        ->select(DB::raw($dayDateExpr), DB::raw('count(*) as count'))
+                        ->groupBy('day')
+                        ->pluck('count', 'day')
+                        ->toArray();
+                    $forumComments = $forumCommentsRaw;
+                } catch (\Throwable $e) {}
+
+                // Likes by type and day in ONE query
+                $likesGroupedRaw = \App\Models\Like::where('time_t', '>=', $startDate)
+                    ->whereIn('type', [1, 2, 3, 6, 14, 22, \App\Services\KnowledgebaseCommunityService::REACTION_TYPE])
+                    ->select('type', DB::raw($dayTimeExpr), DB::raw('count(*) as count'))
+                    ->groupBy('type', 'day')
+                    ->get();
+
+                $likesGrouped = [];
+                foreach ($likesGroupedRaw as $row) {
+                    $likesGrouped[$row->type][$row->day] = $row->count;
+                }
+
+                return [
+                    'labels' => $labels,
+                    'posts' => [
+                        'text' => array_map(fn($l) => $postTypes['100'][$l] ?? 0, $labels),
+                        'link' => array_map(fn($l) => $postTypes['2'][$l] ?? 0, $labels),
+                        'gallery' => array_map(fn($l) => $postTypes['4'][$l] ?? 0, $labels),
+                        'forum' => array_map(fn($l) => ($postTypes['10'][$l] ?? 0), $labels),
+                        'store' => array_map(fn($l) => $postTypes['7867'][$l] ?? 0, $labels),
+                        'orders' => array_map(fn($l) => $postTypes['6'][$l] ?? 0, $labels),
+                        'news' => array_map(fn($l) => $postTypes['5'][$l] ?? 0, $labels),
+                        'video' => array_map(fn($l) => $postTypes['10'][$l] ?? 0, $labels),
+                        'clips' => array_map(fn($l) => $postTypes['14'][$l] ?? 0, $labels),
+                        'audio' => array_map(fn($l) => $postTypes['11'][$l] ?? 0, $labels),
+                        'file' => array_map(fn($l) => $postTypes['12'][$l] ?? 0, $labels),
+                        'music' => array_map(fn($l) => $postTypes['13'][$l] ?? 0, $labels),
+                        'knowledgebase' => array_map(fn($l) => $postTypes[\App\Services\KnowledgebaseCommunityService::STATUS_TYPE][$l] ?? 0, $labels),
+                    ],
+                    'comments' => [
+                        'forum' => array_map(fn($l) => $forumComments[$l] ?? 0, $labels),
+                        'store' => array_map(fn($l) => $storeCommentsGrouped[$l] ?? 0, $labels),
+                        'directory' => array_map(fn($l) => $directoryCommentsGrouped[$l] ?? 0, $labels),
+                        'knowledgebase' => array_map(fn($l) => $kbCommentsGrouped[$l] ?? 0, $labels),
+                    ],
+                    'reactions' => [
+                        'forum' => array_map(fn($l) => $likesGrouped[2][$l] ?? 0, $labels),
+                        'store' => array_map(fn($l) => $likesGrouped[3][$l] ?? 0, $labels),
+                        'directory' => array_map(fn($l) => $likesGrouped[22][$l] ?? 0, $labels),
+                        'orders' => array_map(fn($l) => $likesGrouped[6][$l] ?? 0, $labels),
+                        'follows' => array_map(fn($l) => $likesGrouped[1][$l] ?? 0, $labels),
+                        'clips' => array_map(fn($l) => $likesGrouped[14][$l] ?? 0, $labels),
+                        'knowledgebase' => array_map(fn($l) => $likesGrouped[\App\Services\KnowledgebaseCommunityService::REACTION_TYPE][$l] ?? 0, $labels),
+                    ],
+                ];
+            } catch (\Throwable $e) {
+                return [
+                    'labels' => [],
+                    'posts' => ['text' => [], 'link' => [], 'gallery' => [], 'forum' => [], 'store' => [], 'orders' => [], 'news' => [], 'video' => [], 'clips' => [], 'audio' => [], 'file' => [], 'music' => [], 'knowledgebase' => []],
+                    'comments' => ['forum' => [], 'store' => [], 'directory' => [], 'knowledgebase' => []],
+                    'reactions' => ['forum' => [], 'store' => [], 'directory' => [], 'orders' => [], 'follows' => [], 'clips' => [], 'knowledgebase' => []],
+                ];
+            }
+        });
+
+        return response()->json($communityData);
+    }
+
+    public function ajaxDashboardVersionCheck()
+    {
+        $currentVersion = \App\Http\Controllers\AdminUpdatesController::CURRENT_VERSION;
+        $latestVersion = null;
+
+        try {
+            $latestVersion = Cache::remember('latest_version', 3600, function () {
+                try {
+                    $response = Http::withHeaders([
+                        'User-Agent' => 'MyAds-Updater/1.0',
+                        'Accept'     => 'application/vnd.github.v3+json',
+                    ])->timeout(3)->get('https://api.github.com/repos/mrghozzi/myads/releases/latest');
+
+                    if ($response->successful()) {
+                        $data = $response->json();
+                        return ltrim($data['tag_name'] ?? '', 'v');
+                    }
+                } catch (\Throwable $e) {
+                    return null;
+                }
+                return null;
+            });
+        } catch (\Throwable $e) {
+            $latestVersion = null;
+        }
+
+        $hasUpdate = $latestVersion && version_compare($latestVersion, $currentVersion, '>');
+
+        return response()->json([
+            'current_version' => $currentVersion,
+            'latest_version' => $latestVersion,
+            'has_update' => (bool) $hasUpdate,
+            'updates_url' => route('admin.updates'),
+        ]);
     }
 
     public function settings()

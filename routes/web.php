@@ -539,6 +539,12 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::middleware(['admin.password.confirm'])->group(function () {
     Route::get('/', [AdminController::class, 'index'])->name('admin.index');
     Route::get('/marketplace-recommendations', [AdminController::class, 'marketplaceRecommendations'])->name('admin.marketplace_recommendations');
+    Route::get('/ajax/dashboard/kpis', [AdminController::class, 'ajaxDashboardKpis'])->name('admin.ajax.kpis');
+    Route::get('/ajax/dashboard/reactions', [AdminController::class, 'ajaxDashboardReactions'])->name('admin.ajax.reactions');
+    Route::get('/ajax/dashboard/activity', [AdminController::class, 'ajaxDashboardActivity'])->name('admin.ajax.activity');
+    Route::get('/ajax/dashboard/ad-charts', [AdminController::class, 'ajaxDashboardAdCharts'])->name('admin.ajax.ad_charts');
+    Route::get('/ajax/dashboard/community-charts', [AdminController::class, 'ajaxDashboardCommunityCharts'])->name('admin.ajax.community_charts');
+    Route::get('/ajax/dashboard/version-check', [AdminController::class, 'ajaxDashboardVersionCheck'])->name('admin.ajax.version_check');
     Route::get('/settings', [AdminController::class, 'settings'])->name('admin.settings');
     Route::post('/settings', [AdminController::class, 'updateSettings'])->name('admin.settings.update');
     Route::get('/settings/system', [AdminController::class, 'systemSettings'])->name('admin.settings.system');

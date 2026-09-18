@@ -266,6 +266,34 @@
 .sd-reaction-pill:hover {
     transform: scale(1.08);
 }
+
+/* Skeleton Loading Shimmer */
+.sd-skeleton {
+    display: inline-block;
+    background: linear-gradient(90deg, rgba(97, 93, 250, 0.08) 25%, rgba(97, 93, 250, 0.18) 50%, rgba(97, 93, 250, 0.08) 75%);
+    background-size: 200% 100%;
+    animation: sd-shimmer 1.5s infinite;
+    border-radius: 6px;
+}
+
+.app-skin-dark .sd-skeleton {
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.05) 25%, rgba(255, 255, 255, 0.12) 50%, rgba(255, 255, 255, 0.05) 75%);
+    background-size: 200% 100%;
+}
+
+@keyframes sd-shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+.sd-fade-in {
+    animation: sdFadeIn 0.35s ease-in forwards;
+}
+
+@keyframes sdFadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
 </style>
 
 <div class="sd-dashboard">
@@ -279,11 +307,11 @@
                 </div>
                 <h1 class="sd-hero__title">{{ __('messages.dashboard') ?? 'Dashboard Hub' }}</h1>
                 <p class="sd-hero__subtitle">
-                    {{ __('messages.statistics') }} • {{ number_format($stats['users']) }} {{ __('messages.users') }} • {{ number_format($stats['posts']) }} {{ __('messages.Posts') }}
+                    {{ __('messages.statistics') }} • <span id="hero-stat-users"><span class="sd-skeleton" style="width: 48px; height: 16px; vertical-align: middle;"></span></span> {{ __('messages.users') }} • <span id="hero-stat-posts"><span class="sd-skeleton" style="width: 48px; height: 16px; vertical-align: middle;"></span></span> {{ __('messages.Posts') }}
                 </p>
                 <div class="d-flex align-items-center gap-3 mt-3">
                     <span class="badge px-3 py-2" style="background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.2); font-size: 0.8rem;">
-                        <i class="feather-wifi text-success me-1"></i> {{ number_format($stats['users_online']) }} {{ __('messages.online') }}
+                        <i class="feather-wifi text-success me-1"></i> <span id="hero-stat-online"><span class="sd-skeleton" style="width: 28px; height: 14px; vertical-align: middle;"></span></span> {{ __('messages.online') }}
                     </span>
                     <span class="badge px-3 py-2" style="background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.2); font-size: 0.8rem;">
                         <i class="feather-tag me-1" style="color: #23d2e2;"></i> v{{ $currentVersion }}
@@ -341,98 +369,33 @@
         </div>
     </div>
 
-    <!-- ═══════════════════ UPDATE ALERT ═══════════════════ -->
-    @if($latestVersion && version_compare($latestVersion, $currentVersion, '>'))
-    <div class="alert alert-warning d-flex align-items-center justify-content-between mb-4 border-0 shadow-sm" role="alert" style="border-radius: 14px; background: linear-gradient(135deg, #fff3cd 0%, #ffeeba 100%);">
-        <div class="d-flex align-items-center">
-            <div class="me-3" style="width: 48px; height: 48px; border-radius: 12px; background: linear-gradient(135deg, #f59e0b, #d97706); display: flex; align-items: center; justify-content: center;">
-                <i class="feather-zap text-white" style="font-size: 22px;"></i>
-            </div>
-            <div>
-                <h6 class="fw-bold mb-1 text-dark">{{ __('messages.new_version_available') ?? 'New Version Available!' }} — v{{ $latestVersion }}</h6>
-                <p class="mb-0 small" style="color: #92400e;">{{ __('messages.update_available_desc') ?? 'A new version is available for download.' }}</p>
-            </div>
-        </div>
-        <a href="{{ route('admin.updates') }}" class="btn btn-sm fw-bold px-3 shadow-sm" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; border: none; border-radius: 8px;">
-            <i class="feather-download-cloud me-1"></i> {{ __('messages.update_now') ?? 'Update Now' }}
-        </a>
-    </div>
-    @endif
+    <!-- ═══════════════════ UPDATE ALERT CONTAINER ═══════════════════ -->
+    <div id="admin-update-alert-container" data-url="{{ route('admin.ajax.version_check') }}"></div>
 
-    <!-- ═══════════════════ TOP KPI STATS ROW ═══════════════════ -->
-    <div class="row g-3 mb-4">
-        <!-- Banners Card -->
-        <div class="col-xl-3 col-sm-6">
-            <div class="sd-card p-3">
-                <div class="d-flex align-items-center gap-3">
-                    <div class="sd-icon-box" style="background: linear-gradient(135deg, #615dfa, #8b5cf6);">
-                        <i class="feather-image"></i>
+    <!-- ═══════════════════ TOP KPI STATS ROW (AJAX) ═══════════════════ -->
+    <div id="dashboard-kpis-container" data-url="{{ route('admin.ajax.kpis') }}">
+        <div class="row g-3 mb-4">
+            @for($i = 0; $i < 4; $i++)
+            <div class="col-xl-3 col-sm-6">
+                <div class="sd-card p-3">
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="sd-icon-box" style="background: rgba(97, 93, 250, 0.08);">
+                            <div class="spinner-border text-primary" role="status" style="width: 1.25rem; height: 1.25rem; border-width: 0.15rem;">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="sd-skeleton mb-2" style="width: 70px; height: 26px;"></div>
+                            <div class="sd-skeleton" style="width: 100px; height: 14px;"></div>
+                        </div>
                     </div>
-                    <div>
-                        <h3 class="sd-stat-num mb-0 text-dark">{{ number_format($stats['banners']['total']) }}</h3>
-                        <span class="text-muted fw-medium fs-13">{{ __('messages.bannads') }}</span>
+                    <div class="d-flex gap-3 mt-3 pt-2 border-top">
+                        <div class="sd-skeleton" style="width: 60px; height: 14px;"></div>
+                        <div class="sd-skeleton" style="width: 60px; height: 14px;"></div>
                     </div>
-                </div>
-                <div class="d-flex gap-3 mt-3 pt-2 border-top">
-                    <span class="fs-12 text-muted"><i class="feather-eye me-1" style="color: #615dfa;"></i> {{ number_format($stats['banners']['views']) }}</span>
-                    <span class="fs-12 text-muted"><i class="feather-mouse-pointer me-1" style="color: #8b5cf6;"></i> {{ number_format($stats['banners']['clicks']) }}</span>
                 </div>
             </div>
-        </div>
-
-        <!-- Text Ads Card -->
-        <div class="col-xl-3 col-sm-6">
-            <div class="sd-card p-3">
-                <div class="d-flex align-items-center gap-3">
-                    <div class="sd-icon-box" style="background: linear-gradient(135deg, #f59e0b, #f97316);">
-                        <i class="feather-type"></i>
-                    </div>
-                    <div>
-                        <h3 class="sd-stat-num mb-0 text-dark">{{ number_format($stats['links']['total']) }}</h3>
-                        <span class="text-muted fw-medium fs-13">{{ __('messages.textads') }}</span>
-                    </div>
-                </div>
-                <div class="d-flex gap-3 mt-3 pt-2 border-top">
-                    <span class="fs-12 text-muted"><i class="feather-mouse-pointer me-1" style="color: #f59e0b;"></i> {{ number_format($stats['links']['clicks']) }}</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Visits Card -->
-        <div class="col-xl-3 col-sm-6">
-            <div class="sd-card p-3">
-                <div class="d-flex align-items-center gap-3">
-                    <div class="sd-icon-box" style="background: linear-gradient(135deg, #10b981, #059669);">
-                        <i class="feather-repeat"></i>
-                    </div>
-                    <div>
-                        <h3 class="sd-stat-num mb-0 text-dark">{{ number_format($stats['visits']['total']) }}</h3>
-                        <span class="text-muted fw-medium fs-13">{{ __('messages.exvisit') }}</span>
-                    </div>
-                </div>
-                <div class="d-flex gap-3 mt-3 pt-2 border-top">
-                    <span class="fs-12 text-muted"><i class="feather-check-circle me-1" style="color: #10b981;"></i> {{ __('messages.safe_exchanges') ?? 'Safe Exchanges' }}</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Users Card -->
-        <div class="col-xl-3 col-sm-6">
-            <div class="sd-card p-3">
-                <div class="d-flex align-items-center gap-3">
-                    <div class="sd-icon-box" style="background: linear-gradient(135deg, #3b82f6, #2563eb);">
-                        <i class="feather-users"></i>
-                    </div>
-                    <div>
-                        <h3 class="sd-stat-num mb-0 text-dark">{{ number_format($stats['users']) }}</h3>
-                        <span class="text-muted fw-medium fs-13">{{ __('messages.users') }}</span>
-                    </div>
-                </div>
-                <div class="d-flex gap-3 mt-3 pt-2 border-top">
-                    <span class="fs-12 text-success"><i class="feather-circle me-1"></i> {{ $stats['users_online'] }} {{ __('messages.online') }}</span>
-                    <span class="fs-12 text-muted"><i class="feather-edit-3 me-1"></i> {{ number_format($stats['posts']) }} {{ __('messages.Posts') }}</span>
-                </div>
-            </div>
+            @endfor
         </div>
     </div>
 
@@ -445,8 +408,8 @@
         </div>
     </div>
 
-    <!-- ═══════════════════ ANALYTICS CHARTS ROW ═══════════════════ -->
-    <div class="row g-3 mb-4">
+    <!-- ═══════════════════ ANALYTICS CHARTS ROW (AJAX) ═══════════════════ -->
+    <div class="row g-3 mb-4" id="dashboard-ad-charts-container" data-url="{{ route('admin.ajax.ad_charts') }}">
         <!-- Ad Distribution Chart -->
         <div class="col-xl-4">
             <div class="sd-card h-100 p-4">
@@ -454,7 +417,10 @@
                     <h6 class="fw-bold text-dark mb-0"><i class="feather-pie-chart me-2" style="color: #615dfa;"></i> {{ __('messages.ad_statistics') ?? 'Ad Statistics' }}</h6>
                     <span class="badge bg-light text-muted border">{{ __('messages.overview') ?? 'Overview' }}</span>
                 </div>
-                <div class="d-flex align-items-center justify-content-center" style="min-height: 270px;">
+                <div class="d-flex align-items-center justify-content-center" style="min-height: 270px; position: relative;">
+                    <div id="ad-dist-loader" class="text-center position-absolute">
+                        <div class="spinner-border text-primary" role="status" style="width: 1.8rem; height: 1.8rem; border-width: 0.18rem;"></div>
+                    </div>
                     <div style="width: 100%; max-width: 260px;">
                         <canvas id="adDistributionChart"></canvas>
                     </div>
@@ -469,7 +435,10 @@
                     <h6 class="fw-bold text-dark mb-0"><i class="feather-bar-chart-2 me-2" style="color: #23d2e2;"></i> {{ __('messages.views_clicks_engagement') ?? 'Views & Clicks Engagement' }}</h6>
                     <span class="badge bg-light text-muted border">{{ __('messages.platform_total') ?? 'Platform Total' }}</span>
                 </div>
-                <div class="d-flex align-items-center" style="min-height: 270px;">
+                <div class="d-flex align-items-center" style="min-height: 270px; position: relative;">
+                    <div id="ad-eng-loader" class="text-center w-100 position-absolute">
+                        <div class="spinner-border text-info" role="status" style="width: 1.8rem; height: 1.8rem; border-width: 0.18rem;"></div>
+                    </div>
                     <div style="width: 100%;">
                         <canvas id="engagementChart"></canvas>
                     </div>
@@ -478,16 +447,19 @@
         </div>
     </div>
 
-    <!-- ═══════════════════ COMMUNITY TREND CHARTS ═══════════════════ -->
-    <div class="row g-3 mb-4">
+    <!-- ═══════════════════ COMMUNITY TREND CHARTS (AJAX) ═══════════════════ -->
+    <div class="row g-3 mb-4" id="dashboard-community-charts-container" data-url="{{ route('admin.ajax.community_charts') }}">
         <div class="col-xl-6">
             <div class="sd-card h-100 p-4">
                 <div class="d-flex align-items-center justify-content-between mb-3">
                     <h6 class="fw-bold text-dark mb-0"><i class="feather-edit-3 me-2" style="color: #615dfa;"></i> {{ __('messages.Posts') }} (30 {{ __('messages.days') ?? 'days' }})</h6>
                     <span class="badge bg-light text-muted border">{{ __('messages.posts_chart') ?? 'Posts Chart' }}</span>
                 </div>
-                <div style="height: 330px;">
-                    <canvas id="postsCommunityChart"></canvas>
+                <div style="height: 330px; position: relative;" class="d-flex align-items-center justify-content-center">
+                    <div id="posts-community-loader" class="text-center position-absolute">
+                        <div class="spinner-border text-primary" role="status" style="width: 1.8rem; height: 1.8rem; border-width: 0.18rem;"></div>
+                    </div>
+                    <canvas id="postsCommunityChart" style="width: 100%; height: 100%;"></canvas>
                 </div>
             </div>
         </div>
@@ -497,152 +469,74 @@
                     <h6 class="fw-bold text-dark mb-0"><i class="feather-message-circle me-2" style="color: #10b981;"></i> {{ __('messages.comments_reactions') ?? 'Comments & Reactions' }} (30 {{ __('messages.days') ?? 'days' }})</h6>
                     <span class="badge bg-light text-muted border">{{ __('messages.engagement_chart') ?? 'Engagement Chart' }}</span>
                 </div>
-                <div style="height: 330px;">
-                    <canvas id="engagementCommunityChart"></canvas>
+                <div style="height: 330px; position: relative;" class="d-flex align-items-center justify-content-center">
+                    <div id="eng-community-loader" class="text-center position-absolute">
+                        <div class="spinner-border text-success" role="status" style="width: 1.8rem; height: 1.8rem; border-width: 0.18rem;"></div>
+                    </div>
+                    <canvas id="engagementCommunityChart" style="width: 100%; height: 100%;"></canvas>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- ═══════════════════ REACTION COUNTERS STRIP ═══════════════════ -->
-    <div class="sd-reactions-strip mb-4">
-        <div class="d-flex align-items-center justify-content-between px-2 mb-3">
-            <h6 class="fw-bold text-dark mb-0"><i class="feather-thumbs-up me-2 text-danger"></i> {{ __('messages.live_member_reactions') ?? 'Live Member Reactions' }}</h6>
-            <span class="badge bg-soft-primary text-primary fw-bold">{{ number_format($stats['reactions']['total']) }} {{ __('messages.allreactions') ?? 'Reactions' }}</span>
-        </div>
-        <div class="d-flex align-items-center justify-content-around flex-wrap gap-3">
-            @php
-                $reactionIcons = [
-                    'like' => 'like.png',
-                    'love' => 'love.png',
-                    'dislike' => 'dislike.png',
-                    'funny' => 'funny.png',
-                    'wow' => 'wow.png',
-                    'sad' => 'sad.png',
-                    'angry' => 'angry.png',
-                    'happy' => 'happy.png'
-                ];
-                $orderedReactions = [];
-                foreach(['like', 'love', 'dislike', 'happy', 'funny', 'wow', 'sad', 'angry'] as $key) {
-                    if(isset($reactionsSummary[$key])) $orderedReactions[$key] = $reactionsSummary[$key];
-                }
-            @endphp
-            @foreach($orderedReactions as $type => $count)
+    <!-- ═══════════════════ REACTION COUNTERS STRIP (AJAX) ═══════════════════ -->
+    <div id="dashboard-reactions-container" data-url="{{ route('admin.ajax.reactions') }}">
+        <div class="sd-reactions-strip mb-4">
+            <div class="d-flex align-items-center justify-content-between px-2 mb-3">
+                <h6 class="fw-bold text-dark mb-0"><i class="feather-thumbs-up me-2 text-danger"></i> {{ __('messages.live_member_reactions') ?? 'Live Member Reactions' }}</h6>
+                <div class="sd-skeleton" style="width: 90px; height: 20px;"></div>
+            </div>
+            <div class="d-flex align-items-center justify-content-around flex-wrap gap-3 py-2">
+                @for($i = 0; $i < 8; $i++)
                 <div class="text-center px-3 py-2 sd-reaction-pill">
-                    <div class="mb-2">
-                        <img src="{{ theme_asset('img/reaction/' . $reactionIcons[$type]) }}" alt="{{ $type }}" style="width: 44px; height: 44px; object-fit: contain;">
-                    </div>
-                    <h5 class="fw-bold mb-0 text-dark">{{ number_format($count) }}</h5>
-                    <small class="text-uppercase text-muted fw-semibold" style="font-size: 0.65rem; letter-spacing: 0.5px;">{{ $type }}</small>
+                    <div class="mb-2 mx-auto sd-skeleton" style="width: 44px; height: 44px; border-radius: 50%;"></div>
+                    <div class="sd-skeleton mb-1" style="width: 40px; height: 18px;"></div>
+                    <div class="sd-skeleton" style="width: 35px; height: 10px;"></div>
                 </div>
-            @endforeach
+                @endfor
+            </div>
         </div>
     </div>
 
     <!-- ═══════════════════ ACTIVITY & QUICK ACTIONS ROW ═══════════════════ -->
     <div class="row g-3 mb-4">
-        <!-- Left Activity Section -->
-        <div class="col-xxl-8">
+        <!-- Left Activity Section (AJAX) -->
+        <div class="col-xxl-8" id="dashboard-activity-container" data-url="{{ route('admin.ajax.activity') }}">
             <div class="sd-card h-100 p-4">
-                <h6 class="fw-bold text-dark mb-4"><i class="feather-activity me-2" style="color: #10b981;"></i> {{ __('messages.activity_engagement') ?? 'Activity & Engagement' }}</h6>
-                
+                <div class="d-flex align-items-center justify-content-between mb-4">
+                    <h6 class="fw-bold text-dark mb-0"><i class="feather-activity me-2" style="color: #10b981;"></i> {{ __('messages.activity_engagement') ?? 'Activity & Engagement' }}</h6>
+                    <div class="spinner-border spinner-border-sm text-success" role="status" style="width: 1.2rem; height: 1.2rem; border-width: 0.15rem;"></div>
+                </div>
                 <div class="row g-3">
-                    <!-- Last Member -->
+                    @for($i = 0; $i < 4; $i++)
                     <div class="col-md-6 col-lg-3">
-                        <div class="text-center p-3 rounded-3" style="background: rgba(97, 93, 250, 0.05); border: 1px solid rgba(97, 93, 250, 0.1);">
-                            <div class="mb-2 mx-auto overflow-hidden" style="width: 54px; height: 54px; border-radius: 50%; border: 3px solid rgba(97,93,250,0.2);">
-                                <img src="{{ $stats['last_user'] && $stats['last_user']->img ? asset($stats['last_user']->img) : asset('themes/default/assets/admin-duralux/images/avatar/undefined.png') }}" alt="" class="img-fluid" style="width:100%; height:100%; object-fit:cover;">
-                            </div>
-                            <h6 class="mb-1 fw-semibold text-muted" style="font-size: 0.75rem;">{{ __('messages.lastrm') }}</h6>
-                            @if($stats['last_user'])
-                                <a href="{{ route('profile.show', $stats['last_user']->username) }}" class="fw-bold" style="color: #615dfa; font-size: 0.85rem;">{{ $stats['last_user']->username }}</a>
-                            @else
-                                <span class="text-muted">-</span>
-                            @endif
+                        <div class="text-center p-3 rounded-3" style="background: rgba(97, 93, 250, 0.03); border: 1px solid rgba(97, 93, 250, 0.08);">
+                            <div class="mb-2 mx-auto sd-skeleton" style="width: 54px; height: 54px; border-radius: 50%;"></div>
+                            <div class="sd-skeleton mb-1" style="width: 70px; height: 14px;"></div>
+                            <div class="sd-skeleton" style="width: 50px; height: 18px;"></div>
                         </div>
                     </div>
-
-                    <!-- Last Post -->
-                    <div class="col-md-6 col-lg-3">
-                        <div class="text-center p-3 rounded-3" style="background: rgba(245, 158, 11, 0.05); border: 1px solid rgba(245, 158, 11, 0.1);">
-                            <div class="mb-2 d-flex align-items-center justify-content-center mx-auto" style="width: 54px; height: 54px; border-radius: 50%; background: rgba(245,158,11,0.15);">
-                                <i class="feather-clock" style="color: #f59e0b; font-size: 20px;"></i>
-                            </div>
-                            <h6 class="mb-1 fw-semibold text-muted" style="font-size: 0.75rem;">{{ __('messages.lastps') }}</h6>
-                            <p class="fw-bold text-dark mb-0" style="font-size: 0.85rem;">
-                                {{ $stats['last_post'] ? $stats['last_post']->date_formatted : '-' }}
-                            </p>
-                        </div>
-                    </div>
-
-                    <!-- Reactions -->
-                    <div class="col-md-6 col-lg-3">
-                        <div class="text-center p-3 rounded-3" style="background: rgba(239, 68, 68, 0.05); border: 1px solid rgba(239, 68, 68, 0.1);">
-                            <div class="mb-2 d-flex align-items-center justify-content-center mx-auto" style="width: 54px; height: 54px; border-radius: 50%; background: rgba(239,68,68,0.15);">
-                                <i class="feather-thumbs-up" style="color: #ef4444; font-size: 20px;"></i>
-                            </div>
-                            <h6 class="mb-1 fw-semibold text-muted" style="font-size: 0.75rem;">{{ __('messages.allreactions') }}</h6>
-                            <h4 class="fw-bold text-dark mb-0" style="font-size: 1.25rem;">{{ number_format($stats['reactions']['total']) }}</h4>
-                        </div>
-                    </div>
-
-                    <!-- Followers -->
-                    <div class="col-md-6 col-lg-3">
-                        <div class="text-center p-3 rounded-3" style="background: rgba(59, 130, 246, 0.05); border: 1px solid rgba(59, 130, 246, 0.1);">
-                            <div class="mb-2 d-flex align-items-center justify-content-center mx-auto" style="width: 54px; height: 54px; border-radius: 50%; background: rgba(59,130,246,0.15);">
-                                <i class="feather-user-plus" style="color: #3b82f6; font-size: 20px;"></i>
-                            </div>
-                            <h6 class="mb-1 fw-semibold text-muted" style="font-size: 0.75rem;">{{ __('messages.allFollowers') }}</h6>
-                            <h4 class="fw-bold text-dark mb-0" style="font-size: 1.25rem;">{{ number_format($stats['followers']) }}</h4>
-                        </div>
-                    </div>
+                    @endfor
                 </div>
-
-                <!-- Secondary Sub-Counters -->
                 <div class="row g-3 mt-2">
+                    @for($i = 0; $i < 3; $i++)
                     <div class="col-md-4">
-                        <div class="d-flex align-items-center gap-3 p-3 rounded-3" style="background: rgba(97,93,250,0.04); border: 1px solid rgba(97,93,250,0.08);">
-                            <i class="feather-message-circle" style="color: #615dfa; font-size: 18px;"></i>
-                            <div>
-                                <div class="fw-bold text-dark">{{ number_format($stats['topics']) }}</div>
-                                <span class="text-muted" style="font-size: 0.75rem;">{{ __('messages.topics') }}</span>
+                        <div class="d-flex align-items-center gap-3 p-3 rounded-3" style="background: rgba(97,93,250,0.02); border: 1px solid rgba(97,93,250,0.06);">
+                            <div class="sd-skeleton" style="width: 24px; height: 24px; border-radius: 6px;"></div>
+                            <div class="flex-grow-1">
+                                <div class="sd-skeleton mb-1" style="width: 40px; height: 16px;"></div>
+                                <div class="sd-skeleton" style="width: 60px; height: 12px;"></div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-4">
-                        <div class="d-flex align-items-center gap-3 p-3 rounded-3" style="background: rgba(16,185,129,0.04); border: 1px solid rgba(16,185,129,0.08);">
-                            <i class="feather-globe" style="color: #10b981; font-size: 18px;"></i>
-                            <div>
-                                <div class="fw-bold text-dark">{{ number_format($stats['listings']) }}</div>
-                                <span class="text-muted" style="font-size: 0.75rem;">{{ __('messages.listings') }}</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="d-flex align-items-center gap-3 p-3 rounded-3" style="background: rgba(245,158,11,0.04); border: 1px solid rgba(245,158,11,0.08);">
-                            <i class="feather-shopping-bag" style="color: #f59e0b; font-size: 18px;"></i>
-                            <div>
-                                <div class="fw-bold text-dark">{{ number_format($stats['products']) }}</div>
-                                <span class="text-muted" style="font-size: 0.75rem;">{{ __('messages.products') }}</span>
-                            </div>
-                        </div>
-                    </div>
+                    @endfor
                 </div>
-
-                <!-- Posts Breakdown -->
                 <div class="mt-4 pt-3 border-top">
-                    <h6 class="fw-bold text-dark mb-3" style="font-size: 0.85rem;">{{ __('messages.posts_breakdown_by_type') ?? 'Posts Breakdown by Type' }} ({{ number_format($stats['posts']) }})</h6>
+                    <div class="sd-skeleton mb-2" style="width: 160px; height: 16px;"></div>
                     <div class="d-flex flex-wrap gap-2">
-                        <span class="badge bg-light text-dark border px-2.5 py-1.5"><i class="feather-align-left text-muted me-1"></i> {{ __('messages.post_text') ?? 'Text' }}: {{ number_format($stats['posts_breakdown']['text']) }}</span>
-                        <span class="badge bg-light text-dark border px-2.5 py-1.5"><i class="feather-link text-primary me-1"></i> {{ __('messages.post_link') ?? 'Link' }}: {{ number_format($stats['posts_breakdown']['link']) }}</span>
-                        <span class="badge bg-light text-dark border px-2.5 py-1.5"><i class="feather-image text-success me-1"></i> {{ __('messages.post_gallery') ?? 'Gallery' }}: {{ number_format($stats['posts_breakdown']['gallery']) }}</span>
-                        <span class="badge bg-light text-dark border px-2.5 py-1.5"><i class="feather-video text-danger me-1"></i> {{ __('messages.post_video') ?? 'Video' }}: {{ number_format($stats['posts_breakdown']['video']) }}</span>
-                        <span class="badge bg-light text-dark border px-2.5 py-1.5"><i class="feather-film text-warning me-1"></i> {{ __('messages.post_clip') ?? 'Clip' }}: {{ number_format($stats['posts_breakdown']['clip']) }}</span>
-                        <span class="badge bg-light text-dark border px-2.5 py-1.5"><i class="feather-mic text-info me-1"></i> {{ __('messages.post_audio') ?? 'Audio' }}: {{ number_format($stats['posts_breakdown']['audio']) }}</span>
-                        <span class="badge bg-light text-dark border px-2.5 py-1.5"><i class="feather-file text-dark me-1"></i> {{ __('messages.post_file') ?? 'File' }}: {{ number_format($stats['posts_breakdown']['file']) }}</span>
-                        <span class="badge bg-light text-dark border px-2.5 py-1.5"><i class="feather-music text-primary me-1"></i> {{ __('messages.post_music') ?? 'Music' }}: {{ number_format($stats['posts_breakdown']['music']) }}</span>
-                        <span class="badge bg-light text-dark border px-2.5 py-1.5"><i class="feather-repeat text-info me-1"></i> {{ __('messages.post_repost') ?? 'Repost' }}: {{ number_format($stats['posts_breakdown']['repost']) }}</span>
-                        <span class="badge bg-light text-dark border px-2.5 py-1.5"><i class="feather-book-open text-success me-1"></i> {{ __('messages.knowledgebase') ?? 'Knowledgebase' }}: {{ number_format($stats['posts_breakdown']['knowledgebase']) }}</span>
+                        @for($i = 0; $i < 8; $i++)
+                        <div class="sd-skeleton" style="width: 90px; height: 26px; border-radius: 6px;"></div>
+                        @endfor
                     </div>
                 </div>
             </div>
@@ -656,7 +550,7 @@
                 <div class="d-grid gap-2">
                     <a href="{{ route('admin.reports') }}" class="btn d-flex justify-content-between align-items-center px-3 py-2" style="background: linear-gradient(135deg, #615dfa, #8b5cf6); color: #fff; border: none; border-radius: 10px;">
                         <span><i class="feather-flag me-2"></i>{{ __('messages.report') }}</span>
-                        <span class="badge bg-white" style="color: #615dfa;">{{ $stats['reports']['pending'] }}</span>
+                        <span class="badge bg-white" style="color: #615dfa;" id="quick-action-reports-badge"><span class="sd-skeleton" style="width: 18px; height: 12px; vertical-align: middle;"></span></span>
                     </a>
                     
                     <div class="btn-group w-100" role="group">
@@ -741,11 +635,12 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // ── Dynamic Admin Tips Rotator ──
-    var adminTips = {!! json_encode($adminTips) !!};
-    var currentTipIndex = Math.floor(Math.random() * adminTips.length);
-    var btnRotate = document.getElementById('btn-rotate-tip');
-    
+    // ── Dynamic Admin Tips Engine ──
+    var adminTips = {!! json_encode($adminTips, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!};
+    var currentTipId = {{ $currentTip['id'] ?? 1 }};
+    var currentTipIdx = Math.max(0, adminTips.findIndex(function(t) { return t.id === currentTipId; }));
+    var btnRotateTip = document.getElementById('btn-rotate-tip');
+
     function renderTip(index) {
         var tip = adminTips[index];
         if (!tip) return;
@@ -754,14 +649,18 @@ document.addEventListener('DOMContentLoaded', function() {
         if (tipContainer) {
             tipContainer.style.opacity = '0.4';
             setTimeout(function() {
-                document.getElementById('tip-category-badge').style.background = tip.badge_bg;
-                var catIcon = document.getElementById('tip-category-icon');
-                if (catIcon) catIcon.className = tip.icon;
-                document.getElementById('tip-category-text').innerText = tip.category;
-                document.getElementById('tip-title').innerText = '💡 ' + tip.title;
-                document.getElementById('tip-desc').innerText = tip.tip;
-                
+                var badge = document.getElementById('tip-category-badge');
+                var icon = document.getElementById('tip-category-icon');
+                var catText = document.getElementById('tip-category-text');
+                var title = document.getElementById('tip-title');
+                var desc = document.getElementById('tip-desc');
                 var actionLink = document.getElementById('tip-action-link');
+
+                if (badge) badge.style.background = tip.badge_bg;
+                if (icon) icon.className = tip.icon;
+                if (catText) catText.textContent = tip.category;
+                if (title) title.textContent = '💡 ' + tip.title;
+                if (desc) desc.textContent = tip.tip;
                 if (actionLink) {
                     actionLink.href = tip.action_url;
                     actionLink.innerHTML = tip.action_text + ' <i class="feather-arrow-left ms-1"></i>';
@@ -771,10 +670,10 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    if (btnRotate) {
-        btnRotate.addEventListener('click', function() {
-            currentTipIndex = (currentTipIndex + 1) % adminTips.length;
-            renderTip(currentTipIndex);
+    if (btnRotateTip && adminTips && adminTips.length > 0) {
+        btnRotateTip.addEventListener('click', function() {
+            currentTipIdx = (currentTipIdx + 1) % adminTips.length;
+            renderTip(currentTipIdx);
         });
     }
 
@@ -783,330 +682,452 @@ document.addEventListener('DOMContentLoaded', function() {
     var textColor = isDark ? '#94a3b8' : '#64748b';
     var gridColor = isDark ? 'rgba(148,163,184,0.1)' : 'rgba(0,0,0,0.06)';
 
-    // ── Doughnut Chart: Ad Distribution ──
-    var distCtx = document.getElementById('adDistributionChart');
-    if (distCtx) {
-        try {
-            new Chart(distCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: {!! json_encode($chartData['distribution']['labels']) !!},
-                    datasets: [{
-                        data: {!! json_encode($chartData['distribution']['data']) !!},
-                        backgroundColor: [
-                            'rgba(97, 93, 250, 0.85)',
-                            'rgba(245, 158, 11, 0.85)',
-                            'rgba(16, 185, 129, 0.85)',
-                            'rgba(139, 92, 246, 0.85)',
-                            'rgba(236, 72, 153, 0.85)',
-                        ],
-                        borderColor: [
-                            '#615dfa',
-                            '#f59e0b',
-                            '#10b981',
-                            '#8b5cf6',
-                            '#ec4899',
-                        ],
-                        borderWidth: 2,
-                        hoverOffset: 8,
-                        spacing: 3,
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    cutout: '65%',
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                color: textColor,
-                                usePointStyle: true,
-                                pointStyle: 'circle',
-                                padding: 16,
-                                font: { size: 12, weight: '500' }
-                            }
-                        },
-                        tooltip: {
-                            backgroundColor: isDark ? '#1e293b' : '#fff',
-                            titleColor: isDark ? '#e2e8f0' : '#1e293b',
-                            bodyColor: isDark ? '#94a3b8' : '#64748b',
-                            borderColor: isDark ? '#334155' : '#e2e8f0',
-                            borderWidth: 1,
-                            cornerRadius: 10,
-                            padding: 12,
-                        }
-                    }
-                }
-            });
-        } catch (e) {
-            console.error(e);
-        }
-    }
+    // ── Helper to render Ad Charts ──
+    function renderAdCharts(chartData) {
+        var distLoader = document.getElementById('ad-dist-loader');
+        if (distLoader) distLoader.style.display = 'none';
 
-    // ── Bar Chart: Views & Clicks ──
-    var engCtx = document.getElementById('engagementChart');
-    if (engCtx) {
-        try {
-            new Chart(engCtx, {
-                type: 'bar',
-                data: {
-                    labels: {!! json_encode($chartData['engagement']['labels']) !!},
-                    datasets: [{
-                        label: '',
-                        data: {!! json_encode($chartData['engagement']['data']) !!},
-                        backgroundColor: [
-                            'rgba(97, 93, 250, 0.75)',
-                            'rgba(139, 92, 246, 0.75)',
-                            'rgba(245, 158, 11, 0.75)',
-                            'rgba(16, 185, 129, 0.75)',
-                            'rgba(236, 72, 153, 0.75)',
-                            'rgba(35, 210, 226, 0.75)',
-                            'rgba(244, 63, 94, 0.75)',
-                        ],
-                        borderColor: [
-                            '#615dfa',
-                            '#8b5cf6',
-                            '#f59e0b',
-                            '#10b981',
-                            '#ec4899',
-                            '#23d2e2',
-                            '#f43f5e',
-                        ],
-                        borderWidth: 2,
-                        borderRadius: 10,
-                        borderSkipped: false,
-                        barPercentage: 0.55,
-                        categoryPercentage: 0.7,
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            backgroundColor: isDark ? '#1e293b' : '#fff',
-                            titleColor: isDark ? '#e2e8f0' : '#1e293b',
-                            bodyColor: isDark ? '#94a3b8' : '#64748b',
-                            borderColor: isDark ? '#334155' : '#e2e8f0',
-                            borderWidth: 1,
-                            cornerRadius: 10,
-                            padding: 12,
-                        }
+        var distCtx = document.getElementById('adDistributionChart');
+        if (distCtx && chartData && chartData.distribution) {
+            try {
+                new Chart(distCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: chartData.distribution.labels,
+                        datasets: [{
+                            data: chartData.distribution.data,
+                            backgroundColor: [
+                                'rgba(97, 93, 250, 0.85)',
+                                'rgba(245, 158, 11, 0.85)',
+                                'rgba(16, 185, 129, 0.85)',
+                                'rgba(139, 92, 246, 0.85)',
+                                'rgba(236, 72, 153, 0.85)',
+                            ],
+                            borderColor: [
+                                '#615dfa',
+                                '#f59e0b',
+                                '#10b981',
+                                '#8b5cf6',
+                                '#ec4899',
+                            ],
+                            borderWidth: 2,
+                            hoverOffset: 8,
+                            spacing: 3,
+                        }]
                     },
-                    scales: {
-                        x: {
-                            grid: { display: false },
-                            ticks: { color: textColor, font: { size: 11, weight: '500' } },
-                            border: { display: false }
-                        },
-                        y: {
-                            grid: { color: gridColor, drawBorder: false },
-                            ticks: {
-                                color: textColor,
-                                font: { size: 11 },
-                                callback: function(value) {
-                                    if (value >= 1000000) return (value / 1000000).toFixed(1) + 'M';
-                                    if (value >= 1000) return (value / 1000).toFixed(0) + 'K';
-                                    return value;
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        cutout: '65%',
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    color: textColor,
+                                    usePointStyle: true,
+                                    pointStyle: 'circle',
+                                    padding: 16,
+                                    font: { size: 12, weight: '500' }
                                 }
                             },
-                            border: { display: false }
+                            tooltip: {
+                                backgroundColor: isDark ? '#1e293b' : '#fff',
+                                titleColor: isDark ? '#e2e8f0' : '#1e293b',
+                                bodyColor: isDark ? '#94a3b8' : '#64748b',
+                                borderColor: isDark ? '#334155' : '#e2e8f0',
+                                borderWidth: 1,
+                                cornerRadius: 10,
+                                padding: 12,
+                            }
                         }
                     }
-                }
-            });
-        } catch (e) {
-            console.error(e);
-        }
-    }
-
-    // ── Community: Posts ──
-    var postsCommunityCtx = document.getElementById('postsCommunityChart');
-    if (postsCommunityCtx) {
-        try {
-            new Chart(postsCommunityCtx, {
-                type: 'line',
-                data: {
-                    labels: {!! json_encode($communityChartData['labels']) !!},
-                    datasets: [
-                        {
-                            label: @json(__('messages.post_text') ?? 'Text Posts'),
-                            data: {!! json_encode($communityChartData['posts']['text']) !!},
-                            borderColor: '#615dfa',
-                            backgroundColor: 'rgba(97, 93, 250, 0.1)',
-                            fill: true,
-                            tension: 0.4,
-                            borderWidth: 3,
-                            pointRadius: 3
-                        },
-                        {
-                            label: @json(__('messages.post_link') ?? 'Link Posts'),
-                            data: {!! json_encode($communityChartData['posts']['link']) !!},
-                            borderColor: '#f59e0b',
-                            backgroundColor: 'rgba(245, 158, 11, 0.1)',
-                            fill: true,
-                            tension: 0.4,
-                            borderWidth: 3,
-                            pointRadius: 3
-                        },
-                        {
-                            label: @json(__('messages.post_gallery') ?? 'Gallery Posts'),
-                            data: {!! json_encode($communityChartData['posts']['gallery']) !!},
-                            borderColor: '#10b981',
-                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                            fill: true,
-                            tension: 0.4,
-                            borderWidth: 3,
-                            pointRadius: 3
-                        },
-                        {
-                            label: @json(__('messages.post_video') ?? 'Video Posts'),
-                            data: {!! json_encode($communityChartData['posts']['video']) !!},
-                            borderColor: '#ef4444',
-                            backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                            fill: true,
-                            tension: 0.4,
-                            borderWidth: 3,
-                            pointRadius: 3
-                        },
-                        {
-                            label: @json(__('messages.post_clips') ?? 'Clips'),
-                            data: {!! json_encode($communityChartData['posts']['clips']) !!},
-                            borderColor: '#ec4899',
-                            backgroundColor: 'rgba(236, 72, 153, 0.1)',
-                            fill: true,
-                            tension: 0.4,
-                            borderWidth: 3,
-                            pointRadius: 3
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { position: 'bottom', labels: { color: textColor, font: { size: 11 } } },
-                        tooltip: { mode: 'index', intersect: false }
-                    },
-                    scales: {
-                        x: { grid: { display: false }, ticks: { color: textColor, font: { size: 10 } } },
-                        y: { grid: { color: gridColor }, ticks: { color: textColor, font: { size: 10 } } }
-                    }
-                }
-            });
-        } catch (e) {
-            console.error(e);
-        }
-    }
-
-    // ── Community: Engagement ──
-    var engCommunityCtx = document.getElementById('engagementCommunityChart');
-    if (engCommunityCtx) {
-        try {
-            new Chart(engCommunityCtx, {
-                type: 'line',
-                data: {
-                    labels: {!! json_encode($communityChartData['labels']) !!},
-                    datasets: [
-                        {
-                            label: @json(__('messages.forum_comments') ?? 'Forum Comments'),
-                            data: {!! json_encode($communityChartData['comments']['forum']) !!},
-                            borderColor: '#10b981',
-                            fill: false,
-                            tension: 0.4,
-                            borderWidth: 2,
-                            pointRadius: 2
-                        },
-                        {
-                            label: @json(__('messages.store_comments') ?? 'Store Comments'),
-                            data: {!! json_encode($communityChartData['comments']['store']) !!},
-                            borderColor: '#3b82f6',
-                            fill: false,
-                            tension: 0.4,
-                            borderWidth: 2,
-                            pointRadius: 2
-                        },
-                        {
-                            label: @json(__('messages.follows_count') ?? 'New Follows'),
-                            data: {!! json_encode($communityChartData['reactions']['follows']) !!},
-                            borderColor: '#f59e0b',
-                            backgroundColor: 'rgba(245, 158, 11, 0.1)',
-                            fill: true,
-                            tension: 0.4,
-                            borderWidth: 2,
-                            pointRadius: 2
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { position: 'bottom', labels: { color: textColor, font: { size: 11 } } },
-                        tooltip: { mode: 'index', intersect: false }
-                    },
-                    scales: {
-                        x: { grid: { display: false }, ticks: { color: textColor, font: { size: 10 } } },
-                        y: { grid: { color: gridColor }, ticks: { color: textColor, font: { size: 10 } } }
-                    }
-                }
-            });
-        } catch (e) {
-            console.error(e);
-        }
-    }
-
-    // Fetch marketplace recommendations asynchronously
-    var marketContainer = document.getElementById('marketplace-recommendations-container');
-    if (marketContainer) {
-        var url = marketContainer.getAttribute('data-url');
-        fetch(url, {
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'Accept': 'text/html'
+                });
+            } catch (e) {
+                console.error('Error rendering distribution chart:', e);
             }
-        })
-        .then(response => response.text())
-        .then(html => {
-            marketContainer.innerHTML = html;
-        })
-        .catch(error => {
-            marketContainer.innerHTML = '';
-            console.error('Error fetching marketplace recommendations:', error);
-        });
-    }
+        }
 
-    // Dynamic Tips Rotator
-    var adminTips = {!! json_encode($adminTips, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) !!};
-    var currentTipId = {{ $currentTip['id'] ?? 1 }};
-    var currentTipIdx = Math.max(0, adminTips.findIndex(function(t) { return t.id === currentTipId; }));
-    var btnRotateTip = document.getElementById('btn-rotate-tip');
-    if (btnRotateTip && adminTips && adminTips.length > 0) {
-        btnRotateTip.addEventListener('click', function() {
-            currentTipIdx = (currentTipIdx + 1) % adminTips.length;
-            var tip = adminTips[currentTipIdx];
-            if (!tip) return;
+        var engLoader = document.getElementById('ad-eng-loader');
+        if (engLoader) engLoader.style.display = 'none';
 
-            var badge = document.getElementById('tip-category-badge');
-            var icon = document.getElementById('tip-category-icon');
-            var catText = document.getElementById('tip-category-text');
-            var title = document.getElementById('tip-title');
-            var desc = document.getElementById('tip-desc');
-            var actionLink = document.getElementById('tip-action-link');
-
-            if (badge) badge.style.background = tip.badge_bg;
-            if (icon) icon.className = tip.icon;
-            if (catText) catText.textContent = tip.category;
-            if (title) title.textContent = '💡 ' + tip.title;
-            if (desc) desc.textContent = tip.tip;
-            if (actionLink) {
-                actionLink.href = tip.action_url;
-                actionLink.innerHTML = tip.action_text + ' <i class="feather-arrow-left ms-1"></i>';
+        var engCtx = document.getElementById('engagementChart');
+        if (engCtx && chartData && chartData.engagement) {
+            try {
+                new Chart(engCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: chartData.engagement.labels,
+                        datasets: [{
+                            label: '',
+                            data: chartData.engagement.data,
+                            backgroundColor: [
+                                'rgba(97, 93, 250, 0.75)',
+                                'rgba(139, 92, 246, 0.75)',
+                                'rgba(245, 158, 11, 0.75)',
+                                'rgba(16, 185, 129, 0.75)',
+                                'rgba(236, 72, 153, 0.75)',
+                                'rgba(35, 210, 226, 0.75)',
+                                'rgba(244, 63, 94, 0.75)',
+                            ],
+                            borderColor: [
+                                '#615dfa',
+                                '#8b5cf6',
+                                '#f59e0b',
+                                '#10b981',
+                                '#ec4899',
+                                '#23d2e2',
+                                '#f43f5e',
+                            ],
+                            borderWidth: 2,
+                            borderRadius: 10,
+                            borderSkipped: false,
+                            barPercentage: 0.55,
+                            categoryPercentage: 0.7,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: isDark ? '#1e293b' : '#fff',
+                                titleColor: isDark ? '#e2e8f0' : '#1e293b',
+                                bodyColor: isDark ? '#94a3b8' : '#64748b',
+                                borderColor: isDark ? '#334155' : '#e2e8f0',
+                                borderWidth: 1,
+                                cornerRadius: 10,
+                                padding: 12,
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: { display: false },
+                                ticks: { color: textColor, font: { size: 11, weight: '500' } },
+                                border: { display: false }
+                            },
+                            y: {
+                                grid: { color: gridColor, drawBorder: false },
+                                ticks: {
+                                    color: textColor,
+                                    font: { size: 11 },
+                                    callback: function(value) {
+                                        if (value >= 1000000) return (value / 1000000).toFixed(1) + 'M';
+                                        if (value >= 1000) return (value / 1000).toFixed(0) + 'K';
+                                        return value;
+                                    }
+                                },
+                                border: { display: false }
+                            }
+                        }
+                    }
+                });
+            } catch (e) {
+                console.error('Error rendering engagement chart:', e);
             }
-        });
+        }
     }
+
+    // ── Helper to render Community Charts ──
+    function renderCommunityCharts(communityChartData) {
+        var postsLoader = document.getElementById('posts-community-loader');
+        if (postsLoader) postsLoader.style.display = 'none';
+
+        var postsCommunityCtx = document.getElementById('postsCommunityChart');
+        if (postsCommunityCtx && communityChartData && communityChartData.labels) {
+            try {
+                new Chart(postsCommunityCtx, {
+                    type: 'line',
+                    data: {
+                        labels: communityChartData.labels,
+                        datasets: [
+                            {
+                                label: @json(__('messages.post_text') ?? 'Text Posts'),
+                                data: communityChartData.posts.text,
+                                borderColor: '#615dfa',
+                                backgroundColor: 'rgba(97, 93, 250, 0.1)',
+                                fill: true,
+                                tension: 0.4,
+                                borderWidth: 3,
+                                pointRadius: 3
+                            },
+                            {
+                                label: @json(__('messages.post_link') ?? 'Link Posts'),
+                                data: communityChartData.posts.link,
+                                borderColor: '#f59e0b',
+                                backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                                fill: true,
+                                tension: 0.4,
+                                borderWidth: 3,
+                                pointRadius: 3
+                            },
+                            {
+                                label: @json(__('messages.post_gallery') ?? 'Gallery Posts'),
+                                data: communityChartData.posts.gallery,
+                                borderColor: '#10b981',
+                                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                                fill: true,
+                                tension: 0.4,
+                                borderWidth: 3,
+                                pointRadius: 3
+                            },
+                            {
+                                label: @json(__('messages.post_video') ?? 'Video Posts'),
+                                data: communityChartData.posts.video,
+                                borderColor: '#ef4444',
+                                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                                fill: true,
+                                tension: 0.4,
+                                borderWidth: 3,
+                                pointRadius: 3
+                            },
+                            {
+                                label: @json(__('messages.post_clips') ?? 'Clips'),
+                                data: communityChartData.posts.clips,
+                                borderColor: '#ec4899',
+                                backgroundColor: 'rgba(236, 72, 153, 0.1)',
+                                fill: true,
+                                tension: 0.4,
+                                borderWidth: 3,
+                                pointRadius: 3
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'bottom', labels: { color: textColor, font: { size: 11 } } },
+                            tooltip: { mode: 'index', intersect: false }
+                        },
+                        scales: {
+                            x: { grid: { display: false }, ticks: { color: textColor, font: { size: 10 } } },
+                            y: { grid: { color: gridColor }, ticks: { color: textColor, font: { size: 10 } } }
+                        }
+                    }
+                });
+            } catch (e) {
+                console.error('Error rendering community posts chart:', e);
+            }
+        }
+
+        var engLoader = document.getElementById('eng-community-loader');
+        if (engLoader) engLoader.style.display = 'none';
+
+        var engCommunityCtx = document.getElementById('engagementCommunityChart');
+        if (engCommunityCtx && communityChartData && communityChartData.labels) {
+            try {
+                new Chart(engCommunityCtx, {
+                    type: 'line',
+                    data: {
+                        labels: communityChartData.labels,
+                        datasets: [
+                            {
+                                label: @json(__('messages.forum_comments') ?? 'Forum Comments'),
+                                data: communityChartData.comments.forum,
+                                borderColor: '#10b981',
+                                fill: false,
+                                tension: 0.4,
+                                borderWidth: 2,
+                                pointRadius: 2
+                            },
+                            {
+                                label: @json(__('messages.store_comments') ?? 'Store Comments'),
+                                data: communityChartData.comments.store,
+                                borderColor: '#3b82f6',
+                                fill: false,
+                                tension: 0.4,
+                                borderWidth: 2,
+                                pointRadius: 2
+                            },
+                            {
+                                label: @json(__('messages.follows_count') ?? 'New Follows'),
+                                data: communityChartData.reactions.follows,
+                                borderColor: '#f59e0b',
+                                backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                                fill: true,
+                                tension: 0.4,
+                                borderWidth: 2,
+                                pointRadius: 2
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'bottom', labels: { color: textColor, font: { size: 11 } } },
+                            tooltip: { mode: 'index', intersect: false }
+                        },
+                        scales: {
+                            x: { grid: { display: false }, ticks: { color: textColor, font: { size: 10 } } },
+                            y: { grid: { color: gridColor }, ticks: { color: textColor, font: { size: 10 } } }
+                        }
+                    }
+                });
+            } catch (e) {
+                console.error('Error rendering community engagement chart:', e);
+            }
+        }
+    }
+
+    // ── SEQUENTIAL AJAX LOADER (توالياً) ──
+    async function loadDashboardSequentially() {
+        // Step 1: Top KPIs & Hero Counters
+        try {
+            var kpisContainer = document.getElementById('dashboard-kpis-container');
+            if (kpisContainer) {
+                var res = await fetch(kpisContainer.getAttribute('data-url'), {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                });
+                if (res.ok) {
+                    var html = await res.text();
+                    kpisContainer.innerHTML = html;
+                    var kpisRow = document.getElementById('kpis-row');
+                    if (kpisRow) {
+                        var u = document.getElementById('hero-stat-users');
+                        var p = document.getElementById('hero-stat-posts');
+                        var o = document.getElementById('hero-stat-online');
+                        if (u) u.textContent = kpisRow.getAttribute('data-users') || '0';
+                        if (p) p.textContent = kpisRow.getAttribute('data-posts') || '0';
+                        if (o) o.textContent = kpisRow.getAttribute('data-online') || '0';
+                    }
+                }
+            }
+        } catch (e) {
+            console.error('Error loading KPIs:', e);
+        }
+
+        // Step 2: Reactions Counters Strip
+        try {
+            var reactionsContainer = document.getElementById('dashboard-reactions-container');
+            if (reactionsContainer) {
+                var res = await fetch(reactionsContainer.getAttribute('data-url'), {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                });
+                if (res.ok) {
+                    var html = await res.text();
+                    reactionsContainer.innerHTML = html;
+                    reactionsContainer.classList.add('sd-fade-in');
+                }
+            }
+        } catch (e) {
+            console.error('Error loading Reactions:', e);
+        }
+
+        // Step 3: Activity & Breakdown
+        try {
+            var activityContainer = document.getElementById('dashboard-activity-container');
+            if (activityContainer) {
+                var res = await fetch(activityContainer.getAttribute('data-url'), {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                });
+                if (res.ok) {
+                    var html = await res.text();
+                    activityContainer.innerHTML = html;
+                    activityContainer.classList.add('sd-fade-in');
+
+                    var card = document.getElementById('dashboard-activity-card');
+                    if (card) {
+                        var reportsBadge = document.getElementById('quick-action-reports-badge');
+                        if (reportsBadge) reportsBadge.textContent = card.getAttribute('data-pending-reports') || '0';
+                    }
+                }
+            }
+        } catch (e) {
+            console.error('Error loading Activity:', e);
+        }
+
+        // Step 4: Ad Analytics Charts
+        try {
+            var adChartsContainer = document.getElementById('dashboard-ad-charts-container');
+            if (adChartsContainer) {
+                var res = await fetch(adChartsContainer.getAttribute('data-url'), {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                });
+                if (res.ok) {
+                    var adData = await res.json();
+                    renderAdCharts(adData);
+                }
+            }
+        } catch (e) {
+            console.error('Error loading Ad Charts:', e);
+        }
+
+        // Step 5: Community Trend Charts (30 days)
+        try {
+            var commChartsContainer = document.getElementById('dashboard-community-charts-container');
+            if (commChartsContainer) {
+                var res = await fetch(commChartsContainer.getAttribute('data-url'), {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                });
+                if (res.ok) {
+                    var commData = await res.json();
+                    renderCommunityCharts(commData);
+                }
+            }
+        } catch (e) {
+            console.error('Error loading Community Charts:', e);
+        }
+
+        // Step 6: Marketplace Recommendations
+        try {
+            var marketContainer = document.getElementById('marketplace-recommendations-container');
+            if (marketContainer) {
+                var res = await fetch(marketContainer.getAttribute('data-url'), {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'text/html'
+                    }
+                });
+                if (res.ok) {
+                    var html = await res.text();
+                    marketContainer.innerHTML = html;
+                } else {
+                    marketContainer.innerHTML = '';
+                }
+            }
+        } catch (e) {
+            var marketContainer = document.getElementById('marketplace-recommendations-container');
+            if (marketContainer) marketContainer.innerHTML = '';
+            console.error('Error loading Marketplace Recommendations:', e);
+        }
+
+        // Step 7: Background Version Check Alert
+        try {
+            var updateContainer = document.getElementById('admin-update-alert-container');
+            if (updateContainer) {
+                var res = await fetch(updateContainer.getAttribute('data-url'), {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                });
+                if (res.ok) {
+                    var verData = await res.json();
+                    if (verData && verData.has_update) {
+                        updateContainer.innerHTML = `
+                        <div class="alert alert-warning d-flex align-items-center justify-content-between mb-4 border-0 shadow-sm sd-fade-in" role="alert" style="border-radius: 14px; background: linear-gradient(135deg, #fff3cd 0%, #ffeeba 100%);">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3" style="width: 48px; height: 48px; border-radius: 12px; background: linear-gradient(135deg, #f59e0b, #d97706); display: flex; align-items: center; justify-content: center;">
+                                    <i class="feather-zap text-white" style="font-size: 22px;"></i>
+                                </div>
+                                <div>
+                                    <h6 class="fw-bold mb-1 text-dark">${ @json(__('messages.new_version_available') ?? 'New Version Available!') } — v${verData.latest_version}</h6>
+                                    <p class="mb-0 small" style="color: #92400e;">${ @json(__('messages.update_available_desc') ?? 'A new version is available for download.') }</p>
+                                </div>
+                            </div>
+                            <a href="${verData.updates_url}" class="btn btn-sm fw-bold px-3 shadow-sm" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; border: none; border-radius: 8px;">
+                                <i class="feather-download-cloud me-1"></i> ${ @json(__('messages.update_now') ?? 'Update Now') }
+                            </a>
+                        </div>`;
+                    }
+                }
+            }
+        } catch (e) {
+            console.error('Error checking Version Update:', e);
+        }
+    }
+
+    // Launch sequential loading
+    loadDashboardSequentially();
 });
 </script>
 @endpush
