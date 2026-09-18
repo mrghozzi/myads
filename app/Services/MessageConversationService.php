@@ -210,6 +210,9 @@ class MessageConversationService
         }
 
         $preview = trim(strip_tags((string) ($message->text ?? '')));
+        if (\Illuminate\Support\Str::startsWith($preview, 'enc:')) {
+            $preview = __('messages.encrypted_message_unavailable');
+        }
         if ($preview === '' && !empty($message->attachment_path)) {
             $preview = __('messages.file');
         }
@@ -228,17 +231,17 @@ class MessageConversationService
     {
         $partnerId = Message::decodeConversationRouteKey($id, $user);
         $partner = $partnerId ? User::find($partnerId) : null;
-        if ($partner) {
+        if ($partner && (int) $partner->id !== (int) $user->id) {
             return $partner;
         }
 
         // Fallback: try resolving by username (mobile app may pass username directly)
         $byUsername = User::where('username', $id)->first();
-        if ($byUsername) {
+        if ($byUsername && (int) $byUsername->id !== (int) $user->id) {
             return $byUsername;
         }
 
-        if ((bool) SecuritySettings::get('private_message_encryption_enabled', 0)) {
+        if ((bool) \App\Support\SecuritySettings::get('private_message_encryption_enabled', 0)) {
             return null;
         }
 

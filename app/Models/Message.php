@@ -47,9 +47,24 @@ class Message extends Model
 
     public function setTextAttribute($value)
     {
+        $this->setMessageContent($value);
+    }
+
+    public function setMsgAttribute($value)
+    {
+        $this->setMessageContent($value);
+    }
+
+    private function setMessageContent($value): void
+    {
         $text = (string) $value;
 
         if ($text === '') {
+            $this->attributes['msg'] = $text;
+            return;
+        }
+
+        if (Str::startsWith($text, 'enc:')) {
             $this->attributes['msg'] = $text;
             return;
         }
@@ -90,7 +105,12 @@ class Message extends Model
             return (string) $partnerId;
         }
 
+        $userA = min($viewerId, $partnerId);
+        $userB = max($viewerId, $partnerId);
+
         $payload = json_encode([
+            'user_a' => $userA,
+            'user_b' => $userB,
             'viewer_id' => $viewerId,
             'partner_id' => $partnerId,
         ]);
@@ -118,8 +138,7 @@ class Message extends Model
             if (!$encryptionEnabled) {
                 return (int) $normalized;
             }
-            // If encryption is enabled, we don't allow numeric IDs directly.
-            // We return null and let it fail unless it's a valid encrypted key.
+
             return null;
         }
 
@@ -138,15 +157,39 @@ class Message extends Model
 
             $partnerId = (int) ($payload['partner_id'] ?? 0);
             $payloadViewerId = (int) ($payload['viewer_id'] ?? 0);
-            if ($partnerId <= 0) {
+            $userA = (int) ($payload['user_a'] ?? 0);
+            $userB = (int) ($payload['user_b'] ?? 0);
+
+            if ($expectedViewerId !== null) {
+                // Symmetric pair check: if expected viewer is user_a, partner is user_b (and vice versa)
+                if ($userA > 0 && $userB > 0) {
+                    if ($expectedViewerId === $userA) {
+                        return $userB;
+                    }
+                    if ($expectedViewerId === $userB) {
+                        return $userA;
+                    }
+                }
+
+                // Legacy asymmetric check (viewer_id & partner_id) - support either participant
+                if ($expectedViewerId === $payloadViewerId && $partnerId > 0) {
+                    return $partnerId;
+                }
+                if ($expectedViewerId === $partnerId && $payloadViewerId > 0) {
+                    return $payloadViewerId;
+                }
+
                 return null;
             }
 
-            if ($expectedViewerId !== null && $payloadViewerId > 0 && $payloadViewerId !== $expectedViewerId) {
-                return null;
+            if ($partnerId > 0) {
+                return $partnerId;
+            }
+            if ($userB > 0) {
+                return $userB;
             }
 
-            return $partnerId;
+            return null;
         } catch (\Throwable) {
             return null;
         }
@@ -161,7 +204,8 @@ class Message extends Model
         try {
             return Crypt::decryptString(Str::after($value, 'enc:'));
         } catch (\Throwable) {
-            return $value;
+            // Never return raw ciphertext to users or AI assistants
+            return __('messages.encrypted_message_unavailable');
         }
     }
 

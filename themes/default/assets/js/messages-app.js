@@ -413,6 +413,9 @@
   }
 
   function jsonResponse(response) {
+    if (response.status === 401 || response.status === 419) {
+      return Promise.reject(new Error('انتهت جلسة تسجيل الدخول. يرجى تحديث الصفحة.'));
+    }
     return response.json().catch(function () {
       return { success: false, message: 'Request failed.' };
     }).then(function (payload) {

@@ -1346,6 +1346,7 @@ return [
     'privacy_settings_saved' => 'تم حفظ إعدادات الخصوصية بنجاح.',
     'end_to_end_encrypted' => 'مشفرة بين الطرفين',
     'private_messages_encryption_notice' => 'الرسائل التالية مشفرة ومحمية.',
+    'encrypted_message_unavailable' => 'الرسالة مشفرة وغير متاحة.',
     'product_deleted' => 'المنتج ممسوح بنجاح بالشبكة',
     'product_details' => 'تفاصيل المنتج',
     'product_not_found' => 'العنصر / المنتج مسجل وغير موجود',

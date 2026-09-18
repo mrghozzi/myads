@@ -5,6 +5,9 @@
         $conversationKey = $conversation['route_key'] ?? \App\Models\Message::encodeConversationRouteKey(auth()->id(), $partnerItem);
         $isActive = $partner && (int) $partner->id === (int) $partnerItem->id;
         $previewSource = trim(strip_tags((string) ($lastMessage->text ?? '')));
+        if (\Illuminate\Support\Str::startsWith($previewSource, 'enc:')) {
+            $previewSource = __('messages.encrypted_message_unavailable');
+        }
         if ($previewSource === '' && !empty($lastMessage->attachment_path)) {
             $previewSource = __('messages.file');
         }

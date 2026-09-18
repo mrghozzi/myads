@@ -189,6 +189,19 @@ class SecuritySessionService
         }
 
         try {
+            // First: automatically mark abandoned/expired sessions as ended rather than revoked
+            $lifetimeMinutes = (int) config('session.lifetime', 120);
+            $cutoff = now()->subMinutes($lifetimeMinutes);
+
+            SecurityMemberSession::query()
+                ->whereNull('ended_at')
+                ->whereNull('revoked_at')
+                ->where('user_id', (int) $user->getKey())
+                ->where('last_seen_at', '<', $cutoff)
+                ->update([
+                    'ended_at' => DB::raw('COALESCE(last_seen_at, CURRENT_TIMESTAMP)'),
+                ]);
+
             $sessions = SecurityMemberSession::query()
                 ->active()
                 ->where('user_id', (int) $user->getKey())

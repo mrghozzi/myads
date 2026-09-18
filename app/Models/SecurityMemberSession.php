@@ -43,6 +43,14 @@ class SecurityMemberSession extends Model
 
     public function scopeActive($query)
     {
-        return $query->whereNull('ended_at')->whereNull('revoked_at');
+        $lifetimeMinutes = (int) config('session.lifetime', 120);
+        $cutoff = now()->subMinutes($lifetimeMinutes);
+
+        return $query->whereNull('ended_at')
+            ->whereNull('revoked_at')
+            ->where(function ($q) use ($cutoff) {
+                $q->whereNull('last_seen_at')
+                    ->orWhere('last_seen_at', '>=', $cutoff);
+            });
     }
 }

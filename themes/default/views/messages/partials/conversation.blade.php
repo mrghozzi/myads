@@ -17,6 +17,9 @@
             $isEncryptedPayload = method_exists($message, 'isEncryptedPayload') ? $message->isEncryptedPayload() : false;
             $showEncryptionNotice = $isEncryptedPayload && $hasPreviousState && $previousEncryptedState === false;
             $text = trim((string) ($message->text ?? ''));
+            if (\Illuminate\Support\Str::startsWith($text, 'enc:')) {
+                $text = __('messages.encrypted_message_unavailable');
+            }
             $hasText = $text !== '';
             $attachmentPath = $message->attachment_path ?? null;
             $attachmentName = trim((string) ($message->attachment_name ?? ''));

@@ -1341,6 +1341,7 @@ return [
     'privacy_settings_saved' => 'Your privacy settings have been saved.',
     'end_to_end_encrypted' => 'End-to-End Encrypted',
     'private_messages_encryption_notice' => 'Messages below are now encrypted.',
+    'encrypted_message_unavailable' => 'Encrypted message unavailable.',
     'product_deleted' => 'Product deleted successfully',
     'product_details' => 'Product Details',
     'product_not_found' => 'Product not found',
