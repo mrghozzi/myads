@@ -1,6 +1,6 @@
 <?php
 
-return array (
+return [
   'title' => 'Welcome to MYADS',
   'subtitle' => 'You have successfully updated to version :version. Discover the new features and improvements.',
   'tab_whats_new' => 'What\'s New',
@@ -63,4 +63,13 @@ return array (
   'support_desc' => 'Need help or have questions? Connect with us on GitHub Discussions.',
   'report_issue_title' => 'Report Bugs & Issues',
   'report_issue_desc' => 'Found a bug or encountered an issue? Submit a bug report on GitHub to help us fix it.',
-);
+
+    // GitHub Sponsors Official Program
+    'sponsor_on_github' => 'Спонсировать на GitHub',
+    'sponsor_project_title' => 'Официальная программа GitHub Sponsors',
+    'sponsor_project_desc' => 'Профиль GitHub Sponsors официально одобрен! Теперь вы можете поддержать непрерывную разработку MYADS, безопасность и новые функции.',
+    'github_sponsors_approved_badge' => 'Официально одобрено GitHub',
+    'sponsor_tiers_available' => 'Гибкие ежемесячные и разовые уровни поддержки от $1',
+    'sponsor_now' => 'Поддержать на GitHub',
+    'other_sponsorship_options' => 'Другие платформы поддержки',
+];

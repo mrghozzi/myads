@@ -1,6 +1,6 @@
 <?php
 
-return array (
+return [
   'title' => 'Welcome to MYADS',
   'subtitle' => 'You have successfully updated to version :version. Discover the new features and improvements.',
   'tab_whats_new' => 'What\'s New',
@@ -63,4 +63,13 @@ return array (
   'support_desc' => 'Need help or have questions? Connect with us on GitHub Discussions.',
   'report_issue_title' => 'Report Bugs & Issues',
   'report_issue_desc' => 'Found a bug or encountered an issue? Submit a bug report on GitHub to help us fix it.',
-);
+
+    // GitHub Sponsors Official Program
+    'sponsor_on_github' => '在 GitHub 上赞助',
+    'sponsor_project_title' => '官方 GitHub Sponsors 赞助计划',
+    'sponsor_project_desc' => 'GitHub Sponsors 赞助档案已获官方正式批准！您现在可以直接赞助支持 MYADS 的持续开源开发、安全更新和全新功能。',
+    'github_sponsors_approved_badge' => 'GitHub 官方认证赞助档案',
+    'sponsor_tiers_available' => '灵活的一次性与每月赞助档位，仅需 1 美元起',
+    'sponsor_now' => '立即在 GitHub 上赞助',
+    'other_sponsorship_options' => '其他赞助平台',
+];

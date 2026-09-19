@@ -48,6 +48,8 @@ class AdminDashboardAjaxTest extends TestCase
         $response->assertSee('dashboard-activity-container', false);
         $response->assertSee('adDistributionChart', false);
         $response->assertSee('postsCommunityChart', false);
+        $response->assertSee('https://github.com/sponsors/mrghozzi', false);
+        $response->assertSee('sd-github-sponsor-btn', false);
     }
 
     public function test_ajax_dashboard_kpis_endpoint_returns_rendered_partial(): void

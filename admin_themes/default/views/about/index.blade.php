@@ -294,6 +294,73 @@
         transform: translateY(-4px);
         box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08) !important;
     }
+
+    /* GitHub Sponsors Spotlight */
+    .github-sponsor-banner {
+        background: linear-gradient(135deg, rgba(234, 74, 170, 0.08) 0%, rgba(124, 58, 237, 0.08) 100%);
+        border: 1px solid rgba(234, 74, 170, 0.25);
+        border-radius: 1.25rem;
+        position: relative;
+        overflow: hidden;
+        backdrop-filter: blur(10px);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .app-skin-dark .github-sponsor-banner {
+        background: linear-gradient(135deg, rgba(234, 74, 170, 0.12) 0%, rgba(124, 58, 237, 0.12) 100%);
+        border-color: rgba(234, 74, 170, 0.3);
+    }
+    .github-sponsor-banner:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 16px 32px rgba(234, 74, 170, 0.15);
+    }
+    .github-sponsor-icon-wrapper {
+        width: 64px;
+        height: 64px;
+        border-radius: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 30px;
+        background: linear-gradient(135deg, #ea4aaa 0%, #db61a2 100%);
+        color: white;
+        box-shadow: 0 8px 20px rgba(234, 74, 170, 0.35);
+        flex-shrink: 0;
+        transition: transform 0.3s ease;
+    }
+    .github-sponsor-banner:hover .github-sponsor-icon-wrapper {
+        transform: scale(1.08) rotate(6deg);
+    }
+    .btn-sponsor-primary {
+        background: linear-gradient(135deg, #ea4aaa 0%, #db61a2 100%);
+        border: none;
+        color: white !important;
+        font-weight: 700;
+        padding: 0.65rem 1.6rem;
+        border-radius: 50rem;
+        box-shadow: 0 4px 14px rgba(234, 74, 170, 0.35);
+        transition: all 0.25s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .btn-sponsor-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 22px rgba(234, 74, 170, 0.5);
+        filter: brightness(1.06);
+    }
+    .btn-sponsor-hero {
+        background: linear-gradient(135deg, #ea4aaa 0%, #db61a2 100%);
+        border: none;
+        color: white !important;
+        font-weight: 700;
+        box-shadow: 0 4px 12px rgba(234, 74, 170, 0.3);
+        transition: all 0.25s ease;
+    }
+    .btn-sponsor-hero:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(234, 74, 170, 0.45);
+        filter: brightness(1.06);
+    }
 </style>
 
 <div class="nxl-content">
@@ -316,6 +383,9 @@
                             </a>
                             <a href="https://github.com/mrghozzi/myads" target="_blank" rel="noopener noreferrer" class="btn btn-warning text-dark fw-bold rounded-pill px-3 py-2 shadow-sm">
                                 <i class="feather-star me-2"></i> {{ __('about.star_on_github') }}
+                            </a>
+                            <a href="https://github.com/sponsors/mrghozzi" target="_blank" rel="noopener noreferrer" class="btn btn-sponsor-hero rounded-pill px-3 py-2 shadow-sm">
+                                <i class="feather-heart me-2" style="fill: currentColor;"></i> {{ __('about.sponsor_on_github') }}
                             </a>
                             <a href="https://github.com/mrghozzi/myads/discussions" target="_blank" rel="noopener noreferrer" class="btn btn-outline-primary rounded-pill px-3 py-2 shadow-sm">
                                 <i class="feather-life-buoy me-2"></i> {{ __('about.get_support') }}
@@ -841,8 +911,46 @@
                                         </div>
                                     </div>
                                 </div>
-                                
-                                <div class="github-community-card p-4 mb-4 mt-5">
+                                                       <!-- GitHub Sponsors Official Spotlight Banner -->
+                                <div class="github-sponsor-banner p-4 p-md-5 mb-4 mt-5">
+                                    <div class="row align-items-center g-4">
+                                        <div class="col-lg-8 text-start">
+                                            <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
+                                                <span class="badge px-3 py-1.5" style="background: rgba(234, 74, 170, 0.15); color: #ea4aaa; border: 1px solid rgba(234, 74, 170, 0.35); border-radius: 20px; font-size: 0.75rem; font-weight: 700;">
+                                                    <i class="feather-check-circle me-1"></i> {{ __('about.github_sponsors_approved_badge') }}
+                                                </span>
+                                                <span class="text-muted fs-12">• {{ __('about.sponsor_tiers_available') }}</span>
+                                            </div>
+                                            <h4 class="fw-bold mb-2 d-flex align-items-center gap-2 flex-wrap">
+                                                <span>{{ __('about.sponsor_project_title') }}</span>
+                                                <i class="feather-heart text-danger" style="fill: #ea4aaa; color: #ea4aaa;"></i>
+                                            </h4>
+                                            <p class="text-muted mb-4 fs-14" style="line-height: 1.6;">
+                                                {{ __('about.sponsor_project_desc') }}
+                                            </p>
+                                            <div class="d-flex align-items-center gap-2 flex-wrap">
+                                                <a href="https://github.com/sponsors/mrghozzi" target="_blank" rel="noopener noreferrer" class="btn-sponsor-primary">
+                                                    <i class="feather-heart" style="fill: currentColor;"></i>
+                                                    <span>{{ __('about.sponsor_now') }}</span>
+                                                    <i class="feather-external-link opacity-75 ms-1" style="font-size: 13px;"></i>
+                                                </a>
+                                                <div class="d-flex align-items-center gap-1 ms-sm-2 mt-2 mt-sm-0 flex-wrap">
+                                                    <span class="text-muted fs-12 me-1">{{ __('about.other_sponsorship_options') }}:</span>
+                                                    <a href="https://www.patreon.com/MrGhozzi" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-secondary rounded-pill px-2.5 py-1 fs-12">Patreon</a>
+                                                    <a href="https://ko-fi.com/mrghozzi" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-warning rounded-pill px-2.5 py-1 fs-12">Ko-fi</a>
+                                                    <a href="https://www.ba9chich.com/en/mrghozzi" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-primary rounded-pill px-2.5 py-1 fs-12">Ba9chich</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4 text-center d-flex justify-content-center align-items-center">
+                                            <div class="github-sponsor-icon-wrapper" style="width: 100px; height: 100px; border-radius: 26px; font-size: 48px;">
+                                                <i class="feather-heart" style="fill: white;"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="github-community-card p-4 mb-4 mt-4">
                                     <div class="d-flex align-items-center mb-4">
                                         <div class="feature-icon-wrapper flex-shrink-0 me-3 mb-0" style="width: 50px; height: 50px; font-size: 24px; background: rgba(79, 70, 229, 0.15); color: #4f46e5;">
                                             <i class="feather-github"></i>
@@ -907,9 +1015,14 @@
                                 </div>
 
                                 <div class="text-center pt-3 border-top border-dashed border-secondary">
-                                    <a href="https://github.com/mrghozzi/myads" target="_blank" rel="noopener noreferrer" class="btn btn-dark rounded-pill px-4 py-2 shadow-sm mb-3">
-                                        <i class="feather-github me-2"></i> {{ __('about.github_repo') }}
-                                    </a>
+                                    <div class="d-flex justify-content-center align-items-center gap-2 flex-wrap mb-3">
+                                        <a href="https://github.com/mrghozzi/myads" target="_blank" rel="noopener noreferrer" class="btn btn-dark rounded-pill px-4 py-2 shadow-sm">
+                                            <i class="feather-github me-2"></i> {{ __('about.github_repo') }}
+                                        </a>
+                                        <a href="https://github.com/sponsors/mrghozzi" target="_blank" rel="noopener noreferrer" class="btn btn-outline-danger rounded-pill px-4 py-2 shadow-sm" style="border-color: #ea4aaa; color: #ea4aaa;">
+                                            <i class="feather-heart me-2" style="fill: #ea4aaa;"></i> {{ __('about.sponsor_on_github') }}
+                                        </a>
+                                    </div>
                                     <p class="text-muted mb-0 fs-13">{{ __('about.made_with_love') }}</p>
                                 </div>
                             </div>

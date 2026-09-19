@@ -69,4 +69,13 @@ return [
     'support_desc' => 'Sorularınız mı var? GitHub Discussions üzerinden iletişim kurun.',
     'report_issue_title' => 'Hata Bildir',
     'report_issue_desc' => 'Bir sorun mu buldunuz? GitHub\'da hata bildirimi açın.',
+
+    // GitHub Sponsors Official Program
+    'sponsor_on_github' => 'GitHub\'da Destekçi Ol',
+    'sponsor_project_title' => 'Resmi GitHub Sponsors Programı',
+    'sponsor_project_desc' => 'GitHub Sponsors profili resmi olarak onaylandı! Artık MYADS\'ın açık kaynak gelişimini, güvenlik güncellemelerini ve yeni özelliklerini doğrudan destekleyebilirsiniz.',
+    'github_sponsors_approved_badge' => 'GitHub Tarafından Resmi Olarak Onaylandı',
+    'sponsor_tiers_available' => '1$\'dan başlayan esnek aylık ve tek seferlik destek seçenekleri',
+    'sponsor_now' => 'Şimdi GitHub\'da Destekle',
+    'other_sponsorship_options' => 'Alternatif Destek Platformları',
 ];

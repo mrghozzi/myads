@@ -71,5 +71,14 @@ return [
     'support_desc' => 'هل تحتاج إلى مساعدة أو لديك استفسار؟ شارك في النقاشات عبر GitHub Discussions.',
     'report_issue_title' => 'الإبلاغ عن أخطاء أو مشاكل',
     'report_issue_desc' => 'هل واجهت مشكلة أو خطأ برمجياً؟ يمكنك تقديم بلاغ مباشر ليتم معالجته فوراً.',
+    
+    // GitHub Sponsors Official Program
+    'sponsor_on_github' => 'رعاية المشروع عبر GitHub Sponsors',
+    'sponsor_project_title' => 'برنامج الرعاية الرسمي عبر GitHub Sponsors',
+    'sponsor_project_desc' => 'تم اعتماد حساب الرعاية رسمياً من GitHub! يمكنك الآن رعاية واستدامة تطوير MYADS، ودعم إطلاق التحديثات، الميزات الجديدة، وحزم الأمان بموثوقية عالية وبدون أي عمولات إضافية.',
+    'github_sponsors_approved_badge' => 'برنامج رعاية معتمد رسمياً من GitHub',
+    'sponsor_tiers_available' => 'مستويات دعم مرنة تبدأ من 1$ شهرياً أو لمرة واحدة',
+    'sponsor_now' => 'ادعم المشروع الآن عبر GitHub',
+    'other_sponsorship_options' => 'خيارات دعم إضافية',
 ];
 

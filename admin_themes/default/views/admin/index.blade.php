@@ -294,6 +294,24 @@
     from { opacity: 0; transform: translateY(4px); }
     to { opacity: 1; transform: translateY(0); }
 }
+
+/* GitHub Sponsors Styling */
+.sd-github-sponsor-btn {
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.sd-github-sponsor-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(234, 74, 170, 0.45) !important;
+    filter: brightness(1.05);
+}
+.sd-sponsor-chip {
+    transition: all 0.2s ease;
+}
+.sd-sponsor-chip:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(234, 74, 170, 0.35);
+    color: #ffffff !important;
+}
 </style>
 
 <div class="sd-dashboard">
@@ -591,6 +609,9 @@
 
                 <!-- Community Links -->
                 <div class="pt-3 border-top border-dashed d-flex flex-wrap justify-content-center gap-2">
+                    <a href="https://github.com/sponsors/mrghozzi" target="_blank" rel="noopener noreferrer" class="btn btn-sm px-2.5 py-1 text-white fw-bold sd-sponsor-chip shadow-xs" style="background: linear-gradient(135deg, #ea4aaa, #db61a2); border: none; border-radius: 8px; font-size: 0.75rem;">
+                        <i class="feather-heart me-1" style="font-size: 11px;"></i> {{ __('messages.sponsor') ?? 'Sponsor' }}
+                    </a>
                     <a href="https://github.com/mrghozzi/myads" target="_blank" rel="noopener noreferrer" class="btn btn-sm px-2.5 py-1 text-dark fw-bold" style="background: rgba(245,158,11,0.12); color: #d97706; border: 1px solid rgba(245,158,11,0.2); border-radius: 8px; font-size: 0.75rem;">
                         <i class="feather-star me-1" style="color: #f59e0b;"></i> ⭐ GitHub
                     </a>
@@ -611,19 +632,34 @@
 
             <!-- Support Project Block -->
             <div class="sd-card p-4 text-center">
-                <div class="d-flex align-items-center justify-content-center gap-2 mb-3">
+                <div class="mb-2">
+                    <span class="badge px-3 py-1.5" style="background: rgba(234, 74, 170, 0.12); color: #ea4aaa; border: 1px solid rgba(234, 74, 170, 0.28); border-radius: 20px; font-size: 0.72rem; font-weight: 700;">
+                        <i class="feather-check-circle me-1"></i> {{ __('about.github_sponsors_approved_badge') ?? 'Officially Approved by GitHub' }}
+                    </span>
+                </div>
+                <div class="d-flex align-items-center justify-content-center gap-2 mb-1">
                     <h6 class="fw-bold text-dark mb-0">{{ __('messages.support_project') ?? 'Support Project' }}</h6>
                     <i class="feather-heart text-danger" style="font-size: 18px;"></i>
                 </div>
-                <div class="d-flex align-items-center justify-content-center gap-2 flex-wrap">
-                    <a href="https://www.patreon.com/MrGhozzi" target="_blank" rel="noopener noreferrer" class="btn btn-sm px-3 py-1.5 fw-bold text-uppercase" style="background: rgba(30,41,59,0.06); color: #1e293b; border: 1px solid rgba(30,41,59,0.12); border-radius: 10px; font-size: 0.78rem;">
-                        PATREON <i class="feather-heart ms-1" style="font-size: 13px;"></i>
+                <p class="text-muted fs-12 mb-3">{{ __('about.sponsor_tiers_available') ?? 'Flexible one-time and monthly tiers starting from $1' }}</p>
+
+                <!-- Primary GitHub Sponsors CTA -->
+                <a href="https://github.com/sponsors/mrghozzi" target="_blank" rel="noopener noreferrer" class="btn w-100 py-2.5 mb-3 fw-bold text-white d-flex align-items-center justify-content-center gap-2 shadow-sm sd-github-sponsor-btn" style="background: linear-gradient(135deg, #ea4aaa 0%, #db61a2 100%); border: none; border-radius: 12px; font-size: 0.85rem; letter-spacing: 0.2px;">
+                    <i class="feather-heart" style="font-size: 16px;"></i>
+                    <span>{{ __('about.sponsor_on_github') ?? 'Sponsor on GitHub' }}</span>
+                    <i class="feather-external-link opacity-75 ms-1" style="font-size: 12px;"></i>
+                </a>
+
+                <!-- Alternative Platforms -->
+                <div class="d-flex align-items-center justify-content-center gap-2 flex-wrap pt-2 border-top border-dashed">
+                    <a href="https://www.patreon.com/MrGhozzi" target="_blank" rel="noopener noreferrer" class="btn btn-sm px-2.5 py-1 fw-semibold text-uppercase" style="background: rgba(30,41,59,0.06); color: #334155; border: 1px solid rgba(30,41,59,0.12); border-radius: 8px; font-size: 0.74rem;">
+                        PATREON <i class="feather-heart ms-1" style="font-size: 11px;"></i>
                     </a>
-                    <a href="https://ko-fi.com/mrghozzi" target="_blank" rel="noopener noreferrer" class="btn btn-sm px-3 py-1.5 fw-bold text-uppercase" style="background: rgba(245,158,11,0.08); color: #d97706; border: 1px solid rgba(245,158,11,0.18); border-radius: 10px; font-size: 0.78rem;">
-                        KO-FI <i class="feather-coffee ms-1" style="font-size: 13px;"></i>
+                    <a href="https://ko-fi.com/mrghozzi" target="_blank" rel="noopener noreferrer" class="btn btn-sm px-2.5 py-1 fw-semibold text-uppercase" style="background: rgba(245,158,11,0.08); color: #d97706; border: 1px solid rgba(245,158,11,0.18); border-radius: 8px; font-size: 0.74rem;">
+                        KO-FI <i class="feather-coffee ms-1" style="font-size: 11px;"></i>
                     </a>
-                    <a href="https://www.ba9chich.com/en/mrghozzi" target="_blank" rel="noopener noreferrer" class="btn btn-sm px-3 py-1.5 fw-bold text-uppercase" style="background: rgba(59,130,246,0.08); color: #3b82f6; border: 1px solid rgba(59,130,246,0.18); border-radius: 10px; font-size: 0.78rem;">
-                        BA9CHICH <i class="feather-gift ms-1" style="font-size: 13px;"></i>
+                    <a href="https://www.ba9chich.com/en/mrghozzi" target="_blank" rel="noopener noreferrer" class="btn btn-sm px-2.5 py-1 fw-semibold text-uppercase" style="background: rgba(59,130,246,0.08); color: #2563eb; border: 1px solid rgba(59,130,246,0.18); border-radius: 8px; font-size: 0.74rem;">
+                        BA9CHICH <i class="feather-gift ms-1" style="font-size: 11px;"></i>
                     </a>
                 </div>
             </div>

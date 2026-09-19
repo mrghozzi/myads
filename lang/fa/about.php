@@ -69,4 +69,13 @@ return [
     'support_desc' => 'سؤالی دارید؟ در GitHub Discussions با ما گفتگو کنید.',
     'report_issue_title' => 'گزارش باگ',
     'report_issue_desc' => 'مشکلی پیدا کردید؟ یک گزارش در GitHub ارسال کنید.',
+
+    // GitHub Sponsors Official Program
+    'sponsor_on_github' => 'حمایت مالی در GitHub',
+    'sponsor_project_title' => 'برنامه رسمی GitHub Sponsors',
+    'sponsor_project_desc' => 'پروفایل حامیان گیت‌هاب رسماً تأیید شد! اکنون می‌توانید از توسعه متن‌باز، به‌روزرسانی‌های امنیتی و ویژگی‌های جدید MYADS پشتیبانی کنید.',
+    'github_sponsors_approved_badge' => 'تأیید شده رسمی توسط GitHub',
+    'sponsor_tiers_available' => 'سطوح حمایتی منعطف ماهانه و یک‌باره از ۱ دلار',
+    'sponsor_now' => 'اکنون در GitHub حمایت کنید',
+    'other_sponsorship_options' => 'سایر پلتفرم‌های حمایتی',
 ];

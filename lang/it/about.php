@@ -69,4 +69,13 @@ return [
     'support_desc' => 'Hai domande? Unisciti a GitHub Discussions.',
     'report_issue_title' => 'Segnala un Bug',
     'report_issue_desc' => 'Hai trovato un problema? Apri una segnalazione su GitHub.',
+
+    // GitHub Sponsors Official Program
+    'sponsor_on_github' => 'Sponsorizza su GitHub',
+    'sponsor_project_title' => 'Programma Ufficiale GitHub Sponsors',
+    'sponsor_project_desc' => 'Il profilo GitHub Sponsors è ufficialmente approvato! Ora puoi sostenere lo sviluppo continuo open source, gli aggiornamenti di sicurezza e le nuove funzionalità di MYADS.',
+    'github_sponsors_approved_badge' => 'Ufficialmente Approvato da GitHub',
+    'sponsor_tiers_available' => 'Piani flessibili mensili e una tantum a partire da 1$',
+    'sponsor_now' => 'Sponsorizza su GitHub Ora',
+    'other_sponsorship_options' => 'Piattaforme di Supporto Alternative',
 ];

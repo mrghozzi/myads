@@ -45,7 +45,10 @@ class AdminAboutPageTest extends TestCase
             ->assertSee(__('about.feature_6_title'))
             ->assertSee('Platform-Wide Performance Overhaul & TTFB Speedup')
             ->assertSee('Asynchronous Queue Engine & Priority Channels')
-            ->assertSee('Developer Platform & Universal Bearer Authorization');
+            ->assertSee('Developer Platform & Universal Bearer Authorization')
+            ->assertSee('https://github.com/sponsors/mrghozzi')
+            ->assertSee(__('about.sponsor_on_github'))
+            ->assertSee(__('about.sponsor_project_title'));
 
         $this->assertDatabaseHas('options', [
             'name' => 'last_seen_about_version',
@@ -65,7 +68,26 @@ class AdminAboutPageTest extends TestCase
         $response->assertOk()
             ->assertSee('تسريع شامل للأداء وخفض فائق لزمن استجابة الخادم (TTFB)')
             ->assertSee('محرك الطوابير غير المتزامن وقنوات الأولوية المخصصة')
-            ->assertSee('منصة المطورين والاعتماد الشامل لترويسات Bearer');
+            ->assertSee('منصة المطورين والاعتماد الشامل لترويسات Bearer')
+            ->assertSee('https://github.com/sponsors/mrghozzi')
+            ->assertSee('رعاية المشروع عبر GitHub Sponsors')
+            ->assertSee('برنامج الرعاية الرسمي عبر GitHub Sponsors');
+    }
+
+    public function test_admin_about_page_renders_in_all_supported_locales(): void
+    {
+        $this->seedSiteSettings();
+        $admin = $this->createSuperAdmin();
+
+        $locales = ['ar', 'de', 'en', 'es', 'fa', 'fr', 'it', 'ja', 'pt', 'ru', 'sr', 'tr', 'zh_CN', 'zh_TW'];
+
+        foreach ($locales as $loc) {
+            app()->setLocale($loc);
+            $response = $this->actingAs($admin)->get(route('admin.about', ['lang' => $loc]));
+
+            $response->assertOk()
+                ->assertSee('https://github.com/sponsors/mrghozzi');
+        }
     }
 
     public function test_non_admin_user_cannot_access_about_page(): void
