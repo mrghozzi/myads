@@ -26,6 +26,7 @@ use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class ProfileController extends Controller
@@ -379,25 +380,34 @@ class ProfileController extends Controller
         $ledgerHistory = collect();
 
         if ($featureAvailable) {
-            $legacyReferenceIds = PointTransaction::where('user_id', $user->id)
-                ->where('reference_type', 'legacy_option')
-                ->pluck('reference_id')
-                ->filter()
-                ->map(static fn ($id) => (int) $id)
-                ->all();
+            try {
+                $legacyReferenceIds = PointTransaction::where('user_id', $user->id)
+                    ->where('reference_type', 'legacy_option')
+                    ->pluck('reference_id')
+                    ->filter()
+                    ->map(static fn ($id) => (int) $id)
+                    ->all();
 
-            $ledgerHistory = PointTransaction::where('user_id', $user->id)
-                ->orderByDesc('created_at')
-                ->get()
-                ->map(function (PointTransaction $item) {
-                    return (object) [
-                        'id' => $item->id,
-                        'amount' => (float) $item->amount,
-                        'description_key' => $item->description_key,
-                        'created_at_ts' => optional($item->created_at)->timestamp ?? time(),
-                        'is_legacy' => false,
-                    ];
-                });
+                $orderColumn = $schema->hasColumn('point_transactions', 'created_at') ? 'created_at' : 'id';
+
+                $ledgerHistory = PointTransaction::where('user_id', $user->id)
+                    ->orderByDesc($orderColumn)
+                    ->get()
+                    ->toBase()
+                    ->map(function (PointTransaction $item) {
+                        return (object) [
+                            'id' => $item->id,
+                            'amount' => (float) $item->amount,
+                            'description_key' => $item->description_key,
+                            'created_at_ts' => optional($item->created_at)->timestamp ?? time(),
+                            'is_legacy' => false,
+                        ];
+                    });
+            } catch (\Throwable $e) {
+                Log::error('Failed to load ledger history: ' . $e->getMessage());
+                $ledgerHistory = collect();
+                $legacyReferenceIds = [];
+            }
         }
 
         $mirroredSubscriptionBonusEntries = $ledgerHistory
@@ -408,13 +418,15 @@ class ProfileController extends Controller
             ])
             ->values();
 
-        $history = $ledgerHistory
+        $history = collect($ledgerHistory)
+            ->toBase()
             ->merge(
                 Option::where('o_type', 'hest_pts')
                     ->where('o_parent', $user->id)
                     ->when(!empty($legacyReferenceIds), fn ($query) => $query->whereNotIn('id', $legacyReferenceIds))
                     ->orderByDesc('id')
                     ->get()
+                    ->toBase()
                     ->map(function (Option $item) {
                         return (object) [
                             'id' => $item->id,

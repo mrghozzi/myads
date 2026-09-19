@@ -458,9 +458,49 @@ https://myads.com/share?text=Check+out+this+awesome+platform!+https://example.co
 - `POST /api/settings/sessions/{id}/revoke`: Revoke a specific web session by ID.
 - `POST /api/settings/tokens/{id}/revoke`: Revoke a specific Sanctum API device token by ID.
 - `POST /api/settings/device-token`: Register FCM device token for mobile push notifications.
-- `GET /api/settings/badges`: Retrieve user earned badges and progress.
-- `GET /api/settings/history`: Retrieve account activity and login history.
+- `GET /api/settings/badges`: Retrieve user earned badges and showcase progress.
+- `PATCH /api/settings/badges`: Update badge showcase order and display (`{"badges": [1, 2, 3]}`).
+- `GET /api/settings/history`: Retrieve paginated member Points (PTS) transaction ledger history with dynamic timestamp sorting and error resilience.
+- `GET /api/settings/apps`: Retrieve authorized third-party OAuth applications.
+- `POST /api/settings/apps/{id}/revoke`: Revoke authorization for a third-party application.
 - `GET /api/settings/blocks`: Retrieve list of blocked users.
+
+#### Point Transactions Ledger History (`GET /api/settings/history`)
+- **Description:** Returns paginated Points (PTS) transaction ledger history for the authenticated member. Incorporates dynamic column sorting (sorting by `created_at` or falling back to `id` if timestamps are absent) and defensive error handling against schema inconsistencies.
+- **Headers:** `X-API-KEY: {YOUR_GLOBAL_KEY}`, `Authorization: Bearer {token}`, `Accept: application/json`
+- **Query Parameters:** `page` (integer, optional, default: `1`).
+- **Response (HTTP 200):**
+  ```json
+  {
+      "current_page": 1,
+      "data": [
+          {
+              "id": 14,
+              "user_id": 1,
+              "amount": "50.00",
+              "balance_after": "250.00",
+              "type": "reward",
+              "description_key": "quest_reward_daily_first_post",
+              "reference_type": null,
+              "reference_id": null,
+              "meta": null,
+              "created_at": "2026-09-20T00:10:00.000000Z",
+              "updated_at": "2026-09-20T00:10:00.000000Z"
+          }
+      ],
+      "first_page_url": "https://domain.com/api/settings/history?page=1",
+      "from": 1,
+      "last_page": 1,
+      "last_page_url": "https://domain.com/api/settings/history?page=1",
+      "next_page_url": null,
+      "path": "https://domain.com/api/settings/history",
+      "per_page": 20,
+      "prev_page_url": null,
+      "to": 1,
+      "total": 1
+  }
+  ```
+
 
 ### B. Community Feed & Multimedia Posts
 - `GET /api/portal/feed`: Retrieve the community feed (paginated).

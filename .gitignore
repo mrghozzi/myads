@@ -87,6 +87,7 @@ custom_variables.css
 !/tests/Feature/DeveloperApiTest.php
 !/tests/Feature/AsyncQueueSystemTest.php
 !/tests/Feature/AdminDashboardAjaxTest.php
+!/tests/Feature/PointHistoryTest.php
 ~/.pi/
 /wiki/
 /brain/

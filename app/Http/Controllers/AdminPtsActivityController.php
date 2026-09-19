@@ -22,9 +22,10 @@ class AdminPtsActivityController extends Controller
         // Get PTS Transfers
         try {
             if ($schema->hasTable('point_transactions')) {
+                $orderColumn = $schema->hasColumn('point_transactions', 'created_at') ? 'created_at' : 'id';
                 $transfers = PointTransaction::with('user')
                     ->where('type', 'transfer_sent')
-                    ->orderBy('created_at', 'desc')
+                    ->orderBy($orderColumn, 'desc')
                     ->paginate(15, ['*'], 'transfers_page');
             } else {
                 $transfers = new LengthAwarePaginator([], 0, 15, 1, ['pageName' => 'transfers_page']);

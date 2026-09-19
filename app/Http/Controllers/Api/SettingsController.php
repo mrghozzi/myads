@@ -312,10 +312,17 @@ class SettingsController extends Controller
     public function getHistory()
     {
         $user = Auth::user();
-        $history = PointTransaction::where('user_id', $user->id)
-            ->orderByDesc('created_at')
-            ->paginate(20);
-        return response()->json($history);
+        $schema = app(V420SchemaService::class);
+        $orderColumn = $schema->hasColumn('point_transactions', 'created_at') ? 'created_at' : 'id';
+        try {
+            $history = PointTransaction::where('user_id', $user->id)
+                ->orderByDesc($orderColumn)
+                ->paginate(20);
+            return response()->json($history);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Failed to load API point history: ' . $e->getMessage());
+            return response()->json(new \Illuminate\Pagination\LengthAwarePaginator([], 0, 20));
+        }
     }
 
     public function getApps()
