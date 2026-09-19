@@ -3318,6 +3318,7 @@ return [
     'yt_manage_campaigns' => 'Управљајте својим видео кампањама',
     'yt_watch_earn_btn' => 'Гледајте и зарадите',
     'yt_create_campaign' => 'Креирајте нову кампању',
+    'yt_campaign_creation' => 'Креирање ИоуТубе кампање',
     'yt_video_url' => 'УРЛ ИоуТубе видеа',
     'yt_duration_req' => 'Потребно трајање (секунде)',
     'yt_reward_per_view' => 'Награда по прегледу (поени)',

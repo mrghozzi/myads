@@ -3318,6 +3318,7 @@ return [
     'yt_manage_campaigns' => '動画キャンペーンを管理する',
     'yt_watch_earn_btn' => '見て獲得',
     'yt_create_campaign' => '新しいキャンペーンの作成',
+    'yt_campaign_creation' => 'YouTubeキャンペーンの作成',
     'yt_video_url' => 'YouTubeビデオのURL',
     'yt_duration_req' => '必要な期間 (秒)',
     'yt_reward_per_view' => '視聴ごとの報酬 (ポイント)',

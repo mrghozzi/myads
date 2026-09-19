@@ -3611,6 +3611,7 @@ return [
     'yt_manage_campaigns' => 'Manage your video campaigns',
     'yt_watch_earn_btn' => 'Watch & Earn',
     'yt_create_campaign' => 'Create New Campaign',
+    'yt_campaign_creation' => 'Création de campagne YouTube',
     'yt_video_url' => 'YouTube Video URL',
     'yt_duration_req' => 'Duration Required (seconds)',
     'yt_reward_per_view' => 'Reward per View (Points)',

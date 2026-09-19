@@ -3318,6 +3318,7 @@ return [
     'yt_manage_campaigns' => 'Управляйте своими видеокампаниями',
     'yt_watch_earn_btn' => 'Смотри и зарабатывай',
     'yt_create_campaign' => 'Создать новую кампанию',
+    'yt_campaign_creation' => 'Создание кампании YouTube',
     'yt_video_url' => 'URL-адрес видео YouTube',
     'yt_duration_req' => 'Требуемая продолжительность (секунды)',
     'yt_reward_per_view' => 'Вознаграждение за просмотр (баллы)',

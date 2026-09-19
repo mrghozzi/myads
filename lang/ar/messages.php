@@ -3693,6 +3693,7 @@ return [
     'yt_manage_campaigns' => 'إدارة حملات الفيديو الخاصة بك',
     'yt_watch_earn_btn' => 'شاهد واربح',
     'yt_create_campaign' => 'إنشاء حملة جديدة',
+    'yt_campaign_creation' => 'إنشاء حملة مشاهدات يوتيوب',
     'yt_video_url' => 'رابط فيديو يوتيوب',
     'yt_duration_req' => 'المدة المطلوبة (بالثواني)',
     'yt_reward_per_view' => 'المكافأة لكل مشاهدة (نقاط)',

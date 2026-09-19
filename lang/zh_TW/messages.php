@@ -3323,6 +3323,7 @@ return [
     'yt_manage_campaigns' => '管理您的影片廣告系列',
     'yt_watch_earn_btn' => '觀看並賺取',
     'yt_create_campaign' => '建立新活動',
+    'yt_campaign_creation' => '建立YouTube活動',
     'yt_video_url' => 'YouTube 影片網址',
     'yt_duration_req' => '所需持續時間（秒）',
     'yt_reward_per_view' => '每次觀看獎勵（積分）',
