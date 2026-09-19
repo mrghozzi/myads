@@ -412,6 +412,39 @@ img {
   box-shadow: 0 12px 28px -4px rgba(255, 94, 91, 0.6);
 }
 
+.btn-github-sponsors {
+  background: linear-gradient(135deg, #ea4aaa 0%, #db61a2 100%);
+  color: #ffffff !important;
+  box-shadow: 0 8px 22px -4px rgba(234, 74, 170, 0.45);
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-github-sponsors:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px -4px rgba(234, 74, 170, 0.65);
+  filter: brightness(1.06);
+  color: #ffffff !important;
+}
+
+.badge-sponsors-official {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: rgba(234, 74, 170, 0.14);
+  color: #ea4aaa;
+  border: 1px solid rgba(234, 74, 170, 0.35);
+  border-radius: 20px;
+  padding: 0.35rem 0.95rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  margin-bottom: 1.25rem;
+  backdrop-filter: blur(8px);
+}
+
 /* --- Hero Section --- */
 .hero {
   padding-top: 9rem;
@@ -1371,5 +1404,18 @@ img {
     transform: translateY(0);
     opacity: 1;
     pointer-events: auto;
+  }
+}
+
+@media (max-width: 640px) {
+  .nav-actions .btn-github-sponsors span,
+  .nav-actions .btn-github span {
+    display: none;
+  }
+  .nav-actions .btn-github-sponsors,
+  .nav-actions .btn-github {
+    padding: 0.5rem 0.65rem !important;
+    min-width: 38px;
+    justify-content: center;
   }
 }

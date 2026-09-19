@@ -16,6 +16,7 @@ const translations = {
     nav_docs: "Documentation",
     nav_community: "Community",
     nav_star: "Star",
+    nav_sponsor: "Sponsor 💖",
     lang_btn: "العربية 🇸🇦",
 
     // Hero Section
@@ -189,8 +190,10 @@ const translations = {
     doc6_link: "Read Changelogs ➔",
 
     // Community & Sponsors
-    comm_title: "Join the Growing MYADS Community",
-    comm_desc: "MYADS is an independent, community-driven open-source project. Star our repository, contribute code, or support our ongoing development!",
+    comm_sponsors_badge: "Officially Approved GitHub Sponsors Program",
+    comm_title: "Join the Community & Support Open Source",
+    comm_desc: "MYADS is an independent, community-driven open-source project. Back our continuous development, security hardening, and new features directly via GitHub Sponsors or other platforms!",
+    btn_sponsor_github: "Sponsor on GitHub 💖",
     btn_sponsor_kofi: "Sponsor on Ko-Fi ☕",
     btn_sponsor_patreon: "Sponsor on Patreon ❤️",
     btn_contribute: "Contribute on GitHub 🐙",
@@ -213,6 +216,7 @@ const translations = {
     footer_col1: "Ecosystem",
     footer_col2: "Developers",
     footer_col3: "Community",
+    footer_sponsors: "GitHub Sponsors 💖",
     footer_credits: "Developed with passion by <a href='https://github.com/mrghozzi' target='_blank'><strong>Zoubair Ghozzi (@mrghozzi)</strong></a>.",
     footer_mit: "Released under the <a href='https://github.com/mrghozzi/myads/blob/main/LICENSE' target='_blank'>MIT License</a>.",
     back_to_top: "Back to top ↑"
@@ -228,6 +232,7 @@ const translations = {
     nav_docs: "التوثيق",
     nav_community: "المجتمع",
     nav_star: "نجمة",
+    nav_sponsor: "رعاية 💖",
     lang_btn: "English 🌐",
 
     // Hero Section
@@ -401,8 +406,10 @@ const translations = {
     doc6_link: "قراءة سجل التغييرات ➔",
 
     // Community & Sponsors
-    comm_title: "انضم إلى مجتمع MYADS المتنامي",
-    comm_desc: "سكربت MYADS هو مشروع حر ومستقل مدفوع بحب المجتمع. ضع نجمة على المستودع، أو شارك في التطوير، أو ادعم استمرار المشروع!",
+    comm_sponsors_badge: "برنامج الرعاية الرسمي المعتمد من GitHub",
+    comm_title: "انضم إلى مجتمع MYADS وادعم استمراره",
+    comm_desc: "سكربت MYADS هو مشروع حر ومستقل مدفوع بحب المجتمع. يمكنك الآن رعاية التطوير المستمر، حزم الأمان، والميزات الجديدة مباشرة عبر GitHub Sponsors أو المنصات الأخرى!",
+    btn_sponsor_github: "رعاية عبر GitHub Sponsors 💖",
     btn_sponsor_kofi: "ادعم عبر Ko-Fi ☕",
     btn_sponsor_patreon: "ادعم عبر Patreon ❤️",
     btn_contribute: "المساهمة على GitHub 🐙",
@@ -425,6 +432,7 @@ const translations = {
     footer_col1: "المنظومة",
     footer_col2: "المطورون",
     footer_col3: "المجتمع",
+    footer_sponsors: "GitHub Sponsors 💖",
     footer_credits: "تم التطوير بكل فخر وشغف بواسطة <a href='https://github.com/mrghozzi' target='_blank'><strong>زبیر الغزي (@mrghozzi)</strong></a>.",
     footer_mit: "مرخص بموجب ترخيص <a href='https://github.com/mrghozzi/myads/blob/main/LICENSE' target='_blank'>MIT License</a>.",
     back_to_top: "العودة للأعلى ↑"
