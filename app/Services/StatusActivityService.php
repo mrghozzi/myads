@@ -129,6 +129,15 @@ class StatusActivityService
             }
         }
 
+        if (auth()->check()) {
+            $activity->is_saved = \Illuminate\Support\Facades\DB::table('saved_statuses')
+                ->where('user_id', auth()->id())
+                ->where('status_id', $activity->id)
+                ->exists();
+        } else {
+            $activity->is_saved = false;
+        }
+
         return $activity;
     }
 
@@ -286,6 +295,17 @@ class StatusActivityService
                 ->all();
         }
 
+        // --- BULK PRELOAD SAVED STATUSES FOR CURRENT VIEWER ---
+        $currentUserId = auth()->id();
+        $savedStatusIds = [];
+        if ($currentUserId && !empty($allStatusIds)) {
+            $savedStatusIds = \Illuminate\Support\Facades\DB::table('saved_statuses')
+                ->where('user_id', $currentUserId)
+                ->whereIn('status_id', $allStatusIds)
+                ->pluck('status_id')
+                ->all();
+        }
+
         // --- BULK PRELOAD REACTIONS COUNTS, GROUPED REACTIONS & USER REACTIONS ---
         $subjectsByType = [];
         foreach ($allStatusesToDecorate as $st) {
@@ -297,7 +317,6 @@ class StatusActivityService
 
         $reactionCounts = [];
         $groupedReactions = [];
-        $currentUserId = auth()->id();
         $userReactions = [];
 
         foreach ($subjectsByType as $rType => $sids) {
@@ -437,6 +456,7 @@ class StatusActivityService
             $activity->setAttribute('comments_count', $commentsCount);
 
             $activity->setAttribute('reposts_count', (int) ($repostCounts[$activity->id] ?? 0));
+            $activity->is_saved = in_array($activity->id, $savedStatusIds, true);
         }
     }
 }

@@ -459,4 +459,10 @@ class User extends Authenticatable
     {
         return $this->two_factor_recovery_codes ? json_decode($this->two_factor_recovery_codes, true) : [];
     }
+
+    public function savedStatuses(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(SavedStatus::class, 'user_id');
+    }
 }
+

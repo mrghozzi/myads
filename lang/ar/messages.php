@@ -4312,7 +4312,44 @@ return [
     'queue_channel_media' => 'قناة الوسائط',
     'queue_media_desc' => 'ضغط الصور والصور المصغرة',
     'queue_channel_maintenance' => 'الصيانة الدورية',
-    'queue_maintenance_desc' => 'التنظيف وخرائط الموقع',
     'queue_worker_command_hint' => 'أمر تشغيل عامل الطابور الخلفي',
     'total_pending_jobs' => 'إجمالي المهام المعلقة',
+
+    // Saved Posts & Bookmarks
+    'saved_posts' => 'العناصر المحفوظة',
+    'saved_posts_desc' => 'تصفح وإدارة المنشورات والمواضيع التي قمت بحفظها للرجوع إليها لاحقاً.',
+    'saved_posts_description' => 'قائمة المنشورات والمواضيع والمحتويات المحفوظة في حسابك على المنصة.',
+    'save_post' => 'حفظ المنشور',
+    'save' => 'حفظ',
+    'saved' => 'محفوظ',
+    'post_saved_success' => 'تم حفظ المنشور في عناصرك المحفوظة بنجاح.',
+    'post_unsaved_success' => 'تمت إزالة المنشور من عناصرك المحفوظة.',
+    'no_saved_posts_title' => 'لا توجد عناصر محفوظة حتى الآن',
+    'no_saved_posts_desc' => 'عندما ترى منشوراً أو موضوعاً مهماً في المجتمع، اضغط على زر الحفظ لتجده هنا في أي وقت.',
+    'explore_community' => 'استكشف المجتمع',
+
+    // Smart Autocomplete
+    'mention_placeholder' => 'اكتب @ للإشارة إلى عضو...',
+    'hashtag_placeholder' => 'اكتب # لإضافة وسم...',
+    'suggested_members' => 'أعضاء مقترحون',
+    'suggested_tags' => 'وسوم مقترحة',
+
+    // Site Health & Readiness Hub
+    'site_health' => 'صحة وفحص النظام',
+    'site_health_desc' => 'فحص هيكلي شامل لحالة الخادم، قواعد البيانات، طوابير الانتظار، الأمان، والمهام المجدولة.',
+    'site_health_score' => 'معدل صحة النظام',
+    'health_status_excellent' => 'ممتاز وجاهز تماماً للإنتاج',
+    'health_status_good' => 'جيد مع بعض الملاحظات البسيطة',
+    'health_status_warning' => 'يحتاج إلى مراجعة وانتباه إداري',
+    'health_check_database' => 'قاعدة البيانات ومحرك التخزين',
+    'health_check_queue' => 'محرك الطوابير والمهام الخلفية',
+    'health_check_cron' => 'مهام الجدولة التلقائية (Cron)',
+    'health_check_storage' => 'صلاحيات المجلدات والتخزين',
+    'health_check_security' => 'إعدادات الأمان والتشفير',
+    'health_check_php' => 'بيئة PHP والمكتبات الأساسية',
+    'health_passed' => 'اجتاز الفحص بنجاح',
+    'health_recommendation' => 'إجراء موصى به',
+    'health_refresh' => 'إعادة فحص النظام الآن',
+    'health_all_good' => 'جميع الخدمات الأساسية تعمل بكفاءة عالية وبدون مشاكل.',
 ];
+

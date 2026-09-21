@@ -4313,4 +4313,42 @@ return [
     'queue_maintenance_desc' => 'Cleanup & Sitemaps',
     'queue_worker_command_hint' => 'Worker Daemon Command',
     'total_pending_jobs' => 'Total Pending',
+
+    // Saved Posts & Bookmarks
+    'saved_posts' => 'Saved Posts',
+    'saved_posts_desc' => 'Browse and manage posts, videos, and topics you have saved for later.',
+    'saved_posts_description' => 'List of saved posts, topics, and community content in your account.',
+    'save_post' => 'Save Post',
+    'save' => 'Save',
+    'saved' => 'Saved',
+    'post_saved_success' => 'Post saved to your bookmarks successfully.',
+    'post_unsaved_success' => 'Post removed from your bookmarks.',
+    'no_saved_posts_title' => 'No saved items yet',
+    'no_saved_posts_desc' => 'When you find an interesting post or topic, click Save to find it here anytime.',
+    'explore_community' => 'Explore Community',
+
+    // Smart Autocomplete
+    'mention_placeholder' => 'Type @ to mention a member...',
+    'hashtag_placeholder' => 'Type # to add a hashtag...',
+    'suggested_members' => 'Suggested Members',
+    'suggested_tags' => 'Suggested Tags',
+
+    // Site Health & Readiness Hub
+    'site_health' => 'Site Health & Readiness',
+    'site_health_desc' => 'Comprehensive structural audit of server health, database, queues, security, and scheduled jobs.',
+    'site_health_score' => 'System Health Score',
+    'health_status_excellent' => 'Excellent & Production Ready',
+    'health_status_good' => 'Good with minor recommendations',
+    'health_status_warning' => 'Requires Administrative Attention',
+    'health_check_database' => 'Database & Storage Engine',
+    'health_check_queue' => 'Queue Engine & Background Tasks',
+    'health_check_cron' => 'Scheduled Tasks (Cron)',
+    'health_check_storage' => 'Storage & Directory Permissions',
+    'health_check_security' => 'Security & Encryption Posture',
+    'health_check_php' => 'PHP Environment & Core Extensions',
+    'health_passed' => 'Passed successfully',
+    'health_recommendation' => 'Recommended action',
+    'health_refresh' => 'Re-run Diagnostic Audit Now',
+    'health_all_good' => 'All core services are functioning optimally with no issues detected.',
 ];
+

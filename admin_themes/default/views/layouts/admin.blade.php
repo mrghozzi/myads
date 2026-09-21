@@ -285,9 +285,11 @@
                             </a>
                             <ul class="nxl-submenu">
                                 @if($canAdmin('dashboard'))
+                                    <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.site_health') }}">{{ __('messages.site_health') ?? 'Site Health' }}</a></li>
                                     <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.system_monitor') }}">{{ __('messages.system_monitor') ?? 'System Monitor' }}</a></li>
                                     <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.database_cleanup') }}">{{ __('messages.database_cleanup') ?? 'Database Cleanup' }}</a></li>
                                 @endif
+
                                 @if($canAdmin('settings'))
                                     <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.settings.performance') }}">{{ __('messages.performance_settings') ?? 'Performance Settings' }}</a></li>
                                     <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.shared_hosting_guide') }}">{{ __('messages.shg_title') }}</a></li>

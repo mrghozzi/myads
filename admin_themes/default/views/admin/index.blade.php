@@ -362,11 +362,16 @@
     </section>
 
     <!-- ═══════════════════ SYSTEM HEALTH STATUS BAR ═══════════════════ -->
-    <div class="sd-health-bar d-flex align-items-center justify-content-between flex-wrap gap-3">
+    <div class="sd-health-bar d-flex align-items-center justify-content-between flex-wrap gap-3" id="sd-live-health-bar">
         <div class="d-flex align-items-center gap-4 flex-wrap">
             <div class="sd-health-item">
-                <span class="sd-health-dot pulse" style="background: #10b981;"></span>
-                <span class="text-muted">{{ __('messages.server_database') ?? 'Server & DB:' }}</span> <span class="text-success fw-bold">{{ __('messages.status_excellent') ?? 'Excellent' }}</span>
+                <span class="sd-health-dot pulse" id="sd-health-dot" style="background: #10b981;"></span>
+                <span class="text-muted">{{ __('messages.site_health') ?? 'Site Health:' }}</span>
+                <a href="{{ route('admin.site_health') }}" class="text-decoration-none">
+                    <span id="sd-health-score-badge" class="badge bg-success ms-1" style="font-size: 0.78rem; font-weight: 700;">
+                        {{ __('messages.status_excellent') ?? '100% Excellent' }}
+                    </span>
+                </a>
             </div>
             <div class="sd-health-item">
                 <i class="feather-cpu text-primary"></i>
@@ -378,6 +383,9 @@
             </div>
         </div>
         <div class="d-flex align-items-center gap-2">
+            <a href="{{ route('admin.site_health') }}" class="btn btn-sm btn-light fw-bold border-0 px-3" style="border-radius: 20px; font-size: 0.78rem;">
+                <i class="feather-heart me-1 text-danger"></i> {{ __('messages.site_health') ?? 'Site Health' }}
+            </a>
             <a href="{{ route('admin.system_monitor') }}" class="btn btn-sm btn-light fw-bold border-0 px-3" style="border-radius: 20px; font-size: 0.78rem;">
                 <i class="feather-activity me-1 text-primary"></i> {{ __('messages.system_monitor') ?? 'Performance Monitor' }}
             </a>
@@ -1159,6 +1167,33 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         } catch (e) {
             console.error('Error checking Version Update:', e);
+        }
+
+        // Step 8: Site Health Diagnostic Live Check
+        try {
+            var healthBar = document.getElementById('sd-live-health-bar');
+            if (healthBar) {
+                var res = await fetch('{{ route("admin.ajax.site_health") }}', {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                });
+                if (res.ok) {
+                    var hData = await res.json();
+                    if (hData && hData.score !== undefined) {
+                        var dot = document.getElementById('sd-health-dot');
+                        var dotColor = hData.grade === 'excellent' ? '#10b981' : (hData.grade === 'good' ? '#f59e0b' : '#ef4444');
+                        if (dot) dot.style.background = dotColor;
+
+                        var scoreBadge = document.getElementById('sd-health-score-badge');
+                        if (scoreBadge) {
+                            var badgeBg = hData.grade === 'excellent' ? 'bg-success' : (hData.grade === 'good' ? 'bg-warning text-dark' : 'bg-danger text-white');
+                            scoreBadge.className = 'badge ' + badgeBg + ' ms-1';
+                            scoreBadge.textContent = hData.score + '% ' + hData.grade_label;
+                        }
+                    }
+                }
+            }
+        } catch (e) {
+            console.error('Error loading Site Health:', e);
         }
     }
 

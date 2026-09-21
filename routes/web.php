@@ -42,10 +42,13 @@ use App\Http\Controllers\AdminCommentController;
 use App\Http\Controllers\AdminReactionController;
 use App\Http\Controllers\StatusPromotionController;
 use App\Http\Controllers\AdminMailSettingsController;
+use App\Http\Controllers\SavedStatusController;
 use App\Http\Controllers\Auth\TwoFactorController;
 use App\Http\Middleware\AdminMiddleware;
 
 Route::post('/reaction/toggle', [ReactionController::class, 'toggle'])->name('reaction.toggle')->middleware('auth');
+Route::post('/status/save-toggle', [SavedStatusController::class, 'toggle'])->name('status.save_toggle')->middleware('auth');
+Route::get('/saved', [SavedStatusController::class, 'index'])->name('bookmarks.index')->middleware('auth');
 Route::post('/comment/load', [CommentController::class, 'load'])->name('comment.load');
 Route::post('/comment/store', [CommentController::class, 'store'])->name('comment.store')->middleware('auth');
 Route::post('/comment/delete', [CommentController::class, 'destroy'])->name('comment.delete')->middleware('auth');
@@ -70,6 +73,7 @@ Route::post('/status/gallery/reorder/{topicId}', [App\Http\Controllers\StatusCon
 // SECURITY: Rate-limit live search to prevent DoS
 Route::get('/search/live', [App\Http\Controllers\SearchLiveController::class, 'search'])->name('search.live')->middleware('throttle:40,1');
 Route::get('/mentions/users', [MentionController::class, 'users'])->name('mentions.users')->middleware('auth');
+Route::get('/tags/suggest', [TagController::class, 'suggest'])->name('tags.suggest');
 Route::get('/robots.txt', [SeoPublicController::class, 'robots'])->name('robots.txt');
 
 // Auth Routes
@@ -545,6 +549,7 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/ajax/dashboard/ad-charts', [AdminController::class, 'ajaxDashboardAdCharts'])->name('admin.ajax.ad_charts');
     Route::get('/ajax/dashboard/community-charts', [AdminController::class, 'ajaxDashboardCommunityCharts'])->name('admin.ajax.community_charts');
     Route::get('/ajax/dashboard/version-check', [AdminController::class, 'ajaxDashboardVersionCheck'])->name('admin.ajax.version_check');
+    Route::get('/ajax/dashboard/site-health', [AdminController::class, 'ajaxDashboardSiteHealth'])->name('admin.ajax.site_health');
     Route::get('/settings', [AdminController::class, 'settings'])->name('admin.settings');
     Route::post('/settings', [AdminController::class, 'updateSettings'])->name('admin.settings.update');
     Route::get('/settings/system', [AdminController::class, 'systemSettings'])->name('admin.settings.system');
@@ -554,6 +559,7 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/settings/performance', [AdminController::class, 'performanceSettings'])->name('admin.settings.performance');
     Route::post('/settings/performance', [AdminController::class, 'updatePerformanceSettings'])->name('admin.settings.performance.update');
     Route::get('/shared-hosting-guide', [AdminController::class, 'sharedHostingGuide'])->name('admin.shared_hosting_guide');
+    Route::get('/site-health', [AdminController::class, 'siteHealth'])->name('admin.site_health');
     Route::get('/system-monitor', [AdminController::class, 'systemMonitor'])->name('admin.system_monitor');
     Route::post('/system-monitor/clear-cache', [AdminController::class, 'clearSystemCache'])->name('admin.system_monitor.clear_cache');
     Route::post('/system-monitor/optimize-table', [AdminController::class, 'optimizeTable'])->name('admin.system_monitor.optimize_table');

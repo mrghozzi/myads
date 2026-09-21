@@ -1267,6 +1267,79 @@
             });
         }
 
+        function toggleBookmark(statusId, btn) {
+            if (!btn || btn.dataset.busy === "true") return;
+            btn.dataset.busy = "true";
+
+            let icon = btn.querySelector('.bookmark-icon') || btn.querySelector('i');
+            let label = btn.querySelector('.bookmark-label') || btn.querySelector('.post-option-text');
+            let isSaved = icon && icon.classList.contains('fa-solid');
+
+            // Optimistic UI toggle
+            if (icon) {
+                icon.classList.toggle('fa-solid', !isSaved);
+                icon.classList.toggle('fa-regular', isSaved);
+                icon.classList.toggle('text-primary', !isSaved);
+                icon.style.color = !isSaved ? '#615dfa' : '';
+            }
+            if (label) {
+                label.textContent = !isSaved ? '{{ __('messages.saved') }}' : '{{ __('messages.save') }}';
+            }
+
+            let tokenEl = document.querySelector('meta[name="csrf-token"]');
+            let token = tokenEl ? tokenEl.getAttribute('content') : '';
+
+            fetch('{{ route("status.save_toggle") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': token,
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ status_id: statusId })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    if (icon) {
+                        icon.classList.toggle('fa-solid', data.saved);
+                        icon.classList.toggle('fa-regular', !data.saved);
+                        icon.classList.toggle('text-primary', data.saved);
+                        icon.style.color = data.saved ? '#615dfa' : '';
+                    }
+                    if (label) {
+                        label.textContent = data.saved ? '{{ __('messages.saved') }}' : '{{ __('messages.save') }}';
+                    }
+                } else {
+                    // Revert
+                    if (icon) {
+                        icon.classList.toggle('fa-solid', isSaved);
+                        icon.classList.toggle('fa-regular', !isSaved);
+                        icon.classList.toggle('text-primary', isSaved);
+                        icon.style.color = isSaved ? '#615dfa' : '';
+                    }
+                    if (label) {
+                        label.textContent = isSaved ? '{{ __('messages.saved') }}' : '{{ __('messages.save') }}';
+                    }
+                }
+            })
+            .catch(err => {
+                console.error('Bookmark error:', err);
+                if (icon) {
+                    icon.classList.toggle('fa-solid', isSaved);
+                    icon.classList.toggle('fa-regular', !isSaved);
+                    icon.classList.toggle('text-primary', isSaved);
+                    icon.style.color = isSaved ? '#615dfa' : '';
+                }
+                if (label) {
+                    label.textContent = isSaved ? '{{ __('messages.saved') }}' : '{{ __('messages.save') }}';
+                }
+            })
+            .finally(() => {
+                btn.dataset.busy = "false";
+            });
+        }
+
         function loadComments(id, type, limit = 5) {
             let token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
             let selector = '.post-comment-list-' + id;
@@ -2129,9 +2202,16 @@
     </script>
     <script src="{{ theme_asset('js/live-events.js') }}" defer></script>
     @endauth
+    <script>
+        window.MYADS_I18N = window.MYADS_I18N || {};
+        window.MYADS_I18N.suggested_members = '{{ __('messages.suggested_members') }}';
+        window.MYADS_I18N.suggested_tags = '{{ __('messages.suggested_tags') }}';
+    </script>
+    <script src="{{ asset('js/smart-autocomplete.js') }}" defer></script>
     <?php
         \App\Helpers\Hooks::do_action('theme_master_before_body_close');
     ?>
 </body>
+
 
 </html>

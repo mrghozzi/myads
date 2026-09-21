@@ -20,6 +20,24 @@
     * Integrated deep binary validation (`FileUploadSecurityService`), WebP auto-conversion, and seamless Markdown image embedding (`![image](url)`) fully backward-compatible across Forum, Directory, Store, Knowledgebase, and Order comments.
   * Added modern media chips (`.composer-media-chip`) for fast media selection.
 
+### Core Platform Refinements: Bookmarks, Smart Autocomplete & Site Health Hub
+* **Saved Posts & Bookmarks Hub (`SavedStatus.php`, `SavedStatusController.php`, `saved.blade.php`):**
+  * Implemented native post saving/bookmarking without heavy dependencies or extra schema overhead (`saved_statuses` table).
+  * Provided optimistic toggle API (`POST /status/save-toggle`) with real-time UI feedback, state toggling, and count updates.
+  * Added dedicated saved items page (`GET /saved`) with infinite scrolling, modern empty states, and standard layout widgets.
+  * Optimized eager preloading (`is_saved`) inside `StatusActivityService::decorateMany()` in a single query across feeds, eliminating N+1 performance bottlenecks.
+  * Integrated bookmark actions into post options dropdown (`post_footer_shared.blade.php`), desktop user dropdown (`desktop_sidebar.blade.php`), and mobile drawer sidebar (`sidemenu.blade.php`).
+* **Zero-Dependency Smart Autocomplete for Mentions & Hashtags (`smart-autocomplete.js`, `TagController::suggest`):**
+  * Developed high-performance, dependency-free Vanilla JS autocomplete popup for `@mentions` and `#hashtags` across all textareas and comment fields.
+  * Implemented server-side suggestion endpoint (`GET /tags/suggest`) with 60-second in-memory caching for trending tags and member usernames.
+  * Full keyboard accessibility: Arrow navigation (`ArrowUp`/`ArrowDown`), selection (`Enter`/`Tab`), and dismissal (`Escape`).
+  * Dark mode aware design with smooth positioning relative to cursor coordinates and optimistic debounced querying (150ms).
+* **Site Health & Diagnostic Readiness Hub (`SiteHealthService.php`, `AdminController::siteHealth`, `site_health.blade.php`):**
+  * Created an in-depth diagnostic service inspecting 6 core system pillars: Database connection & table counts, Background Queues & failed jobs, Cron heartbeat status, Writable storage permissions, Security posture (`APP_DEBUG` in production, HTTPS), and PHP version/extensions (`curl`, `gd`, `mbstring`, `fileinfo`, `zip`, `openssl`).
+  * Calculated real-time health score (0-100%) with letter grading (A/B/C/D/F) and actionable remediation steps.
+  * Added dedicated admin management view (`/admin/site-health`) with circular SVG progress ring, status badges, and direct refresh action.
+  * Integrated live health status widget into Admin Dashboard (`/admin`) chained into sequential AJAX loading pipeline (`Step 8: loadSiteHealthBar`), replacing static placeholders with real system health metrics.
+
 ### Platform Security Hardening
 * **Binary File Upload & Magic Bytes Verification (`app/Services/Security/FileUploadSecurityService.php`):**
   * Created unified security service enforcing strict binary signature (magic bytes) validation for JPEG (`\xFF\xD8\xFF`), PNG (`\x89PNG\r\n\x1a\n`), GIF (`GIF87a`/`GIF89a`), WebP (`RIFF....WEBP`), ZIP (`PK\x03\x04`), and PDF (`%PDF-`), completely thwarting extension spoofing and polyglot file uploads.

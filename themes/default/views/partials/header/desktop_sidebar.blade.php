@@ -356,6 +356,9 @@
                     <a class="dropdown-navigation-link" href="{{ route('profile.history') }}">
                         <i class="fa-solid fa-calculator dropdown-navigation-link-icon" style="width: 20px;"></i> {{ __('messages.points_history') }}
                     </a>
+                    <a class="dropdown-navigation-link" href="{{ route('bookmarks.index') }}">
+                        <i class="fa-solid fa-bookmark dropdown-navigation-link-icon" style="width: 20px;"></i> {{ __('messages.saved_posts') }}
+                    </a>
                     
                     <p class="dropdown-navigation-category">{{ __('messages.market_categories') }}</p>
                     <a class="dropdown-navigation-link" href="{{ route('store.index') }}">

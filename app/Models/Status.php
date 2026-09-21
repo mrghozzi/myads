@@ -475,4 +475,26 @@ class Status extends Model
 
         return (int) $this->tp_id;
     }
+
+    public function savedStatuses(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(SavedStatus::class, 'status_id');
+    }
+
+    public function isSavedBy(?User $user): bool
+    {
+        if (!$user) {
+            return false;
+        }
+
+        if (isset($this->is_saved)) {
+            return (bool) $this->is_saved;
+        }
+
+        return \Illuminate\Support\Facades\DB::table('saved_statuses')
+            ->where('user_id', $user->id)
+            ->where('status_id', $this->id)
+            ->exists();
+    }
 }
+

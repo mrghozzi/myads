@@ -6296,4 +6296,34 @@ class AdminController extends Controller
 
         return $totalBytes;
     }
+
+    /**
+     * Site Health & Readiness Hub.
+     */
+    public function siteHealth(Request $request, \App\Services\SiteHealthService $healthService)
+    {
+        $fresh = $request->boolean('fresh');
+        $audit = $healthService->audit($fresh);
+
+        return view('admin::admin.site_health', compact('audit'));
+    }
+
+    /**
+     * AJAX endpoint for Site Health in dashboard / monitoring widgets.
+     */
+    public function ajaxDashboardSiteHealth(\App\Services\SiteHealthService $healthService)
+    {
+        $audit = $healthService->audit();
+
+        return response()->json([
+            'success' => true,
+            'score' => $audit['score'],
+            'grade' => $audit['grade'],
+            'grade_label' => $audit['grade_label'],
+            'checks' => $audit['checks'],
+            'recommendations' => $audit['recommendations'],
+            'audited_at' => $audit['audited_at'],
+        ]);
+    }
 }
+

@@ -71,7 +71,13 @@
             </svg>
             <p class="post-option-text">{{ __('messages.comment') }}</p>
         </div>
+
+        <div class="post-option bookmark-toggle-btn" onclick="toggleBookmark({{ $activity->id }}, this)" data-status-id="{{ $activity->id }}" style="cursor: pointer;">
+            <i class="post-option-icon fa-bookmark {{ ($activity->is_saved ?? false) ? 'fa-solid text-primary' : 'fa-regular' }} bookmark-icon" style="font-size: 16px; margin-right: 6px; {{ ($activity->is_saved ?? false) ? 'color: #615dfa;' : '' }}"></i>
+            <p class="post-option-text bookmark-label">{{ ($activity->is_saved ?? false) ? __('messages.saved') : __('messages.save') }}</p>
+        </div>
     @endauth
+
 
     <div class="post-option-wrap" style="position: relative;" data-activity-menu-wrap>
         <div class="post-option" data-activity-menu-trigger data-activity-menu-type="share">
