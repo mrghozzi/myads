@@ -10,6 +10,8 @@ use App\Models\Group;
 use App\Http\Resources\StatusResource;
 use App\Services\StatusPostService;
 use App\Services\LinkPreviewService;
+use App\Services\StatusActivityService;
+use Illuminate\Support\Facades\DB;
 
 class StatusController extends Controller
 {
@@ -151,5 +153,82 @@ class StatusController extends Controller
             report($e);
             return response()->json(['message' => __('messages.error_occurred')], 403);
         }
+    }
+
+    /**
+     * Toggle saved / bookmarked state for a status.
+     */
+    public function toggleSave(Request $request, ?Status $status = null)
+    {
+        $user = Auth::user();
+        if (!$user) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        $statusId = $status ? $status->id : (int) $request->input('status_id');
+        if (!$statusId) {
+            return response()->json(['message' => 'Status ID is required'], 422);
+        }
+
+        $targetStatus = $status ?: Status::findOrFail($statusId);
+
+        $existing = DB::table('saved_statuses')
+            ->where('user_id', $user->id)
+            ->where('status_id', $targetStatus->id)
+            ->first();
+
+        if ($existing) {
+            DB::table('saved_statuses')
+                ->where('user_id', $user->id)
+                ->where('status_id', $targetStatus->id)
+                ->delete();
+
+            $saved = false;
+            $message = __('messages.post_unsaved_success') ?? 'Post removed from saved items';
+        } else {
+            DB::table('saved_statuses')->insert([
+                'user_id' => $user->id,
+                'status_id' => $targetStatus->id,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            $saved = true;
+            $message = __('messages.post_saved_success') ?? 'Post saved successfully';
+        }
+
+        $totalSaved = DB::table('saved_statuses')
+            ->where('status_id', $targetStatus->id)
+            ->count();
+
+        return response()->json([
+            'success' => true,
+            'saved' => $saved,
+            'action' => $saved ? 'added' : 'removed',
+            'count' => $totalSaved,
+            'message' => $message,
+        ]);
+    }
+
+    /**
+     * Fetch saved / bookmarked statuses for the authenticated user.
+     */
+    public function savedStatuses(Request $request)
+    {
+        $user = Auth::user();
+        if (!$user) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        $statuses = Status::visible()
+            ->join('saved_statuses', 'status.id', '=', 'saved_statuses.status_id')
+            ->where('saved_statuses.user_id', $user->id)
+            ->orderBy('saved_statuses.id', 'desc')
+            ->select('status.*')
+            ->paginate(15);
+
+        app(StatusActivityService::class)->decorateMany($statuses);
+
+        return StatusResource::collection($statuses);
     }
 }

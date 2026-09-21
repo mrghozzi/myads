@@ -73,10 +73,17 @@ Route::middleware(['api.key', 'auth:sanctum'])->group(function () {
     Route::post('/statuses/link-preview', [App\Http\Controllers\Api\StatusController::class, 'linkPreview']);
     
     // Statuses API
+    Route::get('/statuses/saved', [App\Http\Controllers\Api\StatusController::class, 'savedStatuses']);
+    Route::post('/statuses/save-toggle', [App\Http\Controllers\Api\StatusController::class, 'toggleSave']);
+    Route::post('/statuses/{status}/save-toggle', [App\Http\Controllers\Api\StatusController::class, 'toggleSave']);
     Route::get('/statuses/{status}', [App\Http\Controllers\Api\StatusController::class, 'show']);
     Route::post('/statuses', [App\Http\Controllers\Api\StatusController::class, 'store']);
     Route::post('/statuses/{status}/update', [App\Http\Controllers\Api\StatusController::class, 'update']);
     Route::delete('/statuses/{status}', [App\Http\Controllers\Api\StatusController::class, 'destroy']);
+    
+    // Suggestions & Autocomplete API
+    Route::get('/tags/suggest', [App\Http\Controllers\TagController::class, 'suggest']);
+    Route::get('/mentions/users', [App\Http\Controllers\MentionController::class, 'users']);
     
     // Comments API
     Route::get('/statuses/{status}/comments', [App\Http\Controllers\Api\CommentController::class, 'index']);

@@ -37,6 +37,13 @@
   * Calculated real-time health score (0-100%) with letter grading (A/B/C/D/F) and actionable remediation steps.
   * Added dedicated admin management view (`/admin/site-health`) with circular SVG progress ring, status badges, and direct refresh action.
   * Integrated live health status widget into Admin Dashboard (`/admin`) chained into sequential AJAX loading pipeline (`Step 8: loadSiteHealthBar`), replacing static placeholders with real system health metrics.
+* **Flutter Mobile App Parity & Modernization (`myads_app` v1.7.9+21):**
+  * Fully synchronized the mobile Flutter application with the new web platform capabilities.
+  * Added instant bookmark/save button (`Icons.bookmark_rounded` / `Icons.bookmark_border_rounded`) on feed cards (`post_card.dart`) and post details screen (`post_details_screen.dart`) with optimistic state synchronization across Riverpod providers.
+  * Created dedicated `SavedPostsScreen` with pull-to-refresh, infinite scroll pagination, skeleton loaders, and modern empty states.
+  * Integrated interactive `SmartAutocompleteOverlay` into post composer (`composer_screen.dart`) for `@mentions` and `#hashtags` with debounced querying to `/mentions/users` and `/tags/suggest`.
+  * Registered `/saved-posts` navigation route and added direct shortcuts in `ExploreScreen` Discover grid and `SettingsHubScreen`.
+  * Added resilient dotenv checks in `ApiClient` and `ApiInterceptor`, and expanded automated test suite (100% passing Flutter tests).
 
 ### Platform Security Hardening
 * **Binary File Upload & Magic Bytes Verification (`app/Services/Security/FileUploadSecurityService.php`):**
