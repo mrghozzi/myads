@@ -1,6 +1,6 @@
 @extends('admin::layouts.admin')
 
-@section('title', __('messages.billing_settings_tab') ?? 'إعدادات الفوترة')
+@section('title', __('messages.billing_settings_tab'))
 
 @section('content')
 <div class="admin-page">
@@ -8,19 +8,19 @@
     <section class="admin-hero">
         <div class="admin-hero__content">
             <ul class="admin-breadcrumb">
-                <li><a href="{{ route('admin.index') }}">{{ __('messages.dashboard') ?? 'لوحة التحكم' }}</a></li>
-                <li><a href="{{ route('admin.billing.overview') }}">{{ __('messages.billing_feature_title') ?? 'الفوترة' }}</a></li>
-                <li>{{ __('messages.billing_settings_tab') ?? 'الإعدادات' }}</li>
+                <li><a href="{{ route('admin.index') }}">{{ __('messages.dashboard') }}</a></li>
+                <li><a href="{{ route('admin.billing.overview') }}">{{ __('messages.billing_feature_title') }}</a></li>
+                <li>{{ __('messages.billing_settings_tab') }}</li>
             </ul>
-            <div class="admin-hero__eyebrow">{{ __('messages.billing_admin_eyebrow') ?? 'مساحة عمل الإيرادات' }}</div>
-            <h1 class="admin-hero__title">{{ __('messages.billing_settings_tab') ?? 'إعدادات الفوترة والاشتراكات' }}</h1>
-            <p class="admin-hero__copy">{{ __('messages.billing_settings_help') ?? 'تمكين أو تعطيل الخطط المدفوعة واختيار العملة الأساسية للفوترة.' }}</p>
+            <div class="admin-hero__eyebrow">{{ __('messages.billing_admin_eyebrow') }}</div>
+            <h1 class="admin-hero__title">{{ __('messages.billing_settings_tab') }}</h1>
+            <p class="admin-hero__copy">{{ __('messages.billing_settings_help') }}</p>
         </div>
         <div class="admin-hero__actions">
             <div class="d-flex align-items-center gap-2 flex-wrap">
                 <span id="hero-status-badge" class="badge {{ !empty($settings['enabled']) ? 'bg-soft-success text-success border border-success border-opacity-25' : 'bg-soft-secondary text-secondary border border-secondary border-opacity-25' }} rounded-pill px-3 py-2 fw-bold fs-12">
                     <i class="feather-power me-1"></i>
-                    <span id="hero-status-text">{{ !empty($settings['enabled']) ? (__('messages.billing_system_enabled') ?? 'الفوترة مفعلة') : (__('messages.billing_system_disabled') ?? 'الفوترة معطلة') }}</span>
+                    <span id="hero-status-text">{{ !empty($settings['enabled']) ? __('messages.billing_system_enabled') : __('messages.billing_system_disabled') }}</span>
                 </span>
                 <span id="hero-currency-badge" class="badge bg-soft-primary text-primary border border-primary border-opacity-25 rounded-pill px-3 py-2 fw-bold fs-12">
                     <i class="feather-dollar-sign me-1"></i>
@@ -50,8 +50,8 @@
                     <div class="admin-panel mb-4">
                         <div class="admin-panel__header">
                             <div>
-                                <div class="admin-panel__eyebrow">{{ __('messages.options') ?? 'خيارات' }}</div>
-                                <h3 class="admin-panel__title">{{ __('messages.billing_settings_tab') ?? 'إعدادات النظام العامة' }}</h3>
+                                <div class="admin-panel__eyebrow">{{ __('messages.options') }}</div>
+                                <h3 class="admin-panel__title">{{ __('messages.billing_settings_tab') }}</h3>
                             </div>
                         </div>
 
@@ -65,10 +65,10 @@
                                         </div>
                                         <div>
                                             <label for="enabled" class="fw-bold text-dark fs-15 mb-1 cursor-pointer">
-                                                {{ __('messages.billing_enable_system_label') ?? 'تمكين الخطط المدفوعة والفوترة' }}
+                                                {{ __('messages.billing_enable_system_label') }}
                                             </label>
                                             <div class="text-muted fs-12">
-                                                {{ __('messages.billing_settings_runtime_note') ?? 'عند التفعيل، يمكن للأعضاء تصفح وشراء الخطط المدفوعة عبر بوابات الدفع النشطة.' }}
+                                                {{ __('messages.billing_settings_runtime_note') }}
                                             </div>
                                         </div>
                                     </div>
@@ -84,7 +84,7 @@
                                 <div class="col-md-7">
                                     <div class="form-group">
                                         <label for="base_currency_code" class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-2">
-                                            {{ __('messages.billing_base_currency_label') ?? 'العملة الأساسية' }}
+                                            {{ __('messages.billing_base_currency_label') }}
                                             <span class="text-danger">*</span>
                                         </label>
                                         <div class="input-group">
@@ -100,7 +100,7 @@
                                             </select>
                                         </div>
                                         <div class="text-muted fs-12 mt-2">
-                                            {{ __('messages.billing_currencies_help') ?? 'العملة المرجعية التي يتم على أساسها احتساب وتخزين مبالغ الخطط وأسعار الصرف.' }}
+                                            {{ __('messages.billing_currencies_help') }}
                                         </div>
                                     </div>
                                 </div>
@@ -110,11 +110,11 @@
                         <div class="admin-panel__footer d-flex align-items-center justify-content-between flex-wrap gap-3 bg-light">
                             <div class="d-flex align-items-center gap-2 text-muted fs-12">
                                 <i class="feather-info text-primary fs-5"></i>
-                                <span>{{ __('messages.billing_settings_runtime_note') ?? 'تعطيل النظام يمنع عمليات الشراء الجديدة ولكنه لا يحذف البيانات التاريخية.' }}</span>
+                                <span>{{ __('messages.billing_settings_runtime_note') }}</span>
                             </div>
                             <button type="submit" id="btn-save-settings" class="btn btn-primary btn-lg fw-bold px-4 shadow-sm d-inline-flex align-items-center gap-2" style="border-radius: 12px;">
                                 <i class="feather-save fs-5"></i>
-                                <span>{{ __('messages.save_changes') ?? 'حفظ الإعدادات' }}</span>
+                                <span>{{ __('messages.save_changes') }}</span>
                             </button>
                         </div>
                     </div>
@@ -137,7 +137,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         var originalHtml = btn.innerHTML;
         btn.disabled = true;
-        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> {{ __("messages.saving") ?? "جاري الحفظ..." }}';
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> {{ __("messages.saving") }}';
 
         var formData = new FormData(form);
 
@@ -159,7 +159,7 @@ document.addEventListener('DOMContentLoaded', function() {
             btn.innerHTML = originalHtml;
 
             if (result.status >= 200 && result.status < 300 && result.data.success) {
-                window.showBillingToast(result.data.message || '{{ __("messages.billing_settings_saved") ?? "تم حفظ الإعدادات بنجاح" }}', 'success');
+                window.showBillingToast(result.data.message || '{{ __("messages.billing_settings_saved") }}', 'success');
 
                 // Update hero badges live
                 var isEnabled = form.querySelector('#enabled').checked;
@@ -171,10 +171,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (heroStatusBadge && heroStatusText) {
                     if (isEnabled) {
                         heroStatusBadge.className = 'badge bg-soft-success text-success border border-success border-opacity-25 rounded-pill px-3 py-2 fw-bold fs-12';
-                        heroStatusText.innerText = '{{ __("messages.billing_system_enabled") ?? "الفوترة مفعلة" }}';
+                        heroStatusText.innerText = '{{ __("messages.billing_system_enabled") }}';
                     } else {
                         heroStatusBadge.className = 'badge bg-soft-secondary text-secondary border border-secondary border-opacity-25 rounded-pill px-3 py-2 fw-bold fs-12';
-                        heroStatusText.innerText = '{{ __("messages.billing_system_disabled") ?? "الفوترة معطلة" }}';
+                        heroStatusText.innerText = '{{ __("messages.billing_system_disabled") }}';
                     }
                 }
 
@@ -183,7 +183,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     heroCurrText.innerText = currCode;
                 }
             } else {
-                var errorMsg = result.data.message || '{{ __("messages.error_occurred") ?? "حدث خطأ أثناء حفظ الإعدادات" }}';
+                var errorMsg = result.data.message || '{{ __("messages.error_occurred") }}';
                 if (result.data.errors) {
                     var firstKey = Object.keys(result.data.errors)[0];
                     if (firstKey && result.data.errors[firstKey][0]) {
@@ -196,7 +196,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .catch(function(err) {
             btn.disabled = false;
             btn.innerHTML = originalHtml;
-            window.showBillingToast(err.message || '{{ __("messages.error_occurred") ?? "حدث خطأ غير متوقع" }}', 'danger');
+            window.showBillingToast(err.message || '{{ __("messages.error_occurred") }}', 'danger');
         });
     });
 });

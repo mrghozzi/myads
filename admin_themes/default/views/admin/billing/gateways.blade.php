@@ -1,6 +1,6 @@
 @extends('admin::layouts.admin')
 
-@section('title', __('messages.billing_gateways_title') ?? 'بوابات الدفع')
+@section('title', __('messages.billing_gateways_title'))
 
 @section('content')
 <div class="admin-page">
@@ -8,13 +8,13 @@
     <section class="admin-hero">
         <div class="admin-hero__content">
             <ul class="admin-breadcrumb">
-                <li><a href="{{ route('admin.index') }}">{{ __('messages.dashboard') ?? 'لوحة التحكم' }}</a></li>
-                <li><a href="{{ route('admin.billing.overview') }}">{{ __('messages.billing_feature_title') ?? 'الفوترة' }}</a></li>
-                <li>{{ __('messages.billing_gateways_tab') ?? 'البوابات' }}</li>
+                <li><a href="{{ route('admin.index') }}">{{ __('messages.dashboard') }}</a></li>
+                <li><a href="{{ route('admin.billing.overview') }}">{{ __('messages.billing_feature_title') }}</a></li>
+                <li>{{ __('messages.billing_gateways_tab') }}</li>
             </ul>
-            <div class="admin-hero__eyebrow">{{ __('messages.billing_admin_eyebrow') ?? 'مساحة عمل الإيرادات' }}</div>
-            <h1 class="admin-hero__title">{{ __('messages.billing_gateways_title') ?? 'بوابات الدفع الإلكتروني والتحويل' }}</h1>
-            <p class="admin-hero__copy">{{ __('messages.billing_gateways_help') ?? 'تكوين مزودي الدفع الإلكتروني وتوفير تعليمات التحويل البنكي اليدوي الآمن.' }}</p>
+            <div class="admin-hero__eyebrow">{{ __('messages.billing_admin_eyebrow') }}</div>
+            <h1 class="admin-hero__title">{{ __('messages.billing_gateways_title') }}</h1>
+            <p class="admin-hero__copy">{{ __('messages.billing_gateways_help') }}</p>
         </div>
         <div class="admin-hero__actions">
             @php
@@ -24,7 +24,7 @@
             <div class="d-flex align-items-center gap-2 flex-wrap">
                 <span class="badge bg-soft-success text-success border border-success border-opacity-25 rounded-pill px-3 py-2 fw-bold fs-12">
                     <i class="feather-check-circle me-1"></i>
-                    {{ $activeCount }} {{ __('messages.active') ?? 'بوابات نشطة' }} / {{ $totalCount }}
+                    {{ $activeCount }} {{ __('messages.active') }} / {{ $totalCount }}
                 </span>
             </div>
         </div>
@@ -73,14 +73,14 @@
                                         @endif
                                     </div>
                                     <div>
-                                        <div class="admin-panel__eyebrow mb-1">{{ __('messages.billing_gateways_tab') ?? 'بوابة دفع' }}</div>
+                                        <div class="admin-panel__eyebrow mb-1">{{ __('messages.billing_gateways_tab') }}</div>
                                         <h3 class="admin-panel__title d-flex align-items-center flex-wrap gap-2">
                                             <span>{{ $gateway['label'] }}</span>
                                             <span id="gateway-status-badge-{{ $gateway['key'] }}" class="badge {{ $isEnabled ? 'bg-soft-success text-success border border-success border-opacity-25' : 'bg-soft-secondary text-secondary border border-secondary border-opacity-25' }} rounded-pill px-2 py-1 fs-11">
-                                                {{ $isEnabled ? (__('messages.active') ?? 'نشطة') : (__('messages.inactive') ?? 'معطلة') }}
+                                                {{ $isEnabled ? __('messages.active') : __('messages.inactive') }}
                                             </span>
                                             @if(in_array($gateway['key'], ['tabby', 'flouci', 'apple_pay'], true))
-                                                <span class="badge bg-soft-warning text-warning border border-warning border-opacity-25 rounded-pill px-2 py-1 fs-11">{{ __('messages.billing_gateway_beta') ?? 'تجريبي' }}</span>
+                                                <span class="badge bg-soft-warning text-warning border border-warning border-opacity-25 rounded-pill px-2 py-1 fs-11">{{ __('messages.billing_gateway_beta') }}</span>
                                             @endif
                                         </h3>
                                     </div>
@@ -90,7 +90,7 @@
                                     <div class="form-check form-switch form-switch-lg mb-0 d-flex align-items-center">
                                         <input class="form-check-input shadow-sm gateway-enable-switch" type="checkbox" role="switch" name="enabled" id="enabled_{{ $gateway['key'] }}" value="1" @checked($isEnabled) style="width: 3.2em; height: 1.6em; cursor: pointer;">
                                         <label class="form-check-label ms-2 fw-bold text-dark cursor-pointer fs-13" for="enabled_{{ $gateway['key'] }}">
-                                            {{ __('messages.enable') ?? 'تفعيل' }}
+                                            {{ __('messages.enable') }}
                                         </label>
                                     </div>
                                 </div>
@@ -104,7 +104,7 @@
                                         <div class="d-flex align-items-center justify-content-between mb-2">
                                             <div class="d-flex align-items-center gap-2 text-dark fw-bold fs-13">
                                                 <i class="feather-info text-primary"></i>
-                                                <span>{{ __('messages.instructions') ?? 'دليل الإعداد ورابط الويب هوك (Webhook)' }}</span>
+                                                <span>{{ __('messages.instructions') }}</span>
                                             </div>
                                         </div>
                                         @if($setupGuide !== $setupGuideKey)
@@ -114,7 +114,7 @@
                                             <span class="font-monospace text-muted fs-12 text-break">{{ $webhookUrl }}</span>
                                             <button type="button" class="btn btn-sm btn-light fw-bold text-dark shadow-sm d-inline-flex align-items-center gap-1" style="border-radius: 6px; font-size: 11px;" onclick="window.copyBillingText('{{ $webhookUrl }}', this);">
                                                 <i class="feather-copy"></i>
-                                                <span>{{ __('messages.copy') ?? 'نسخ الرابط' }}</span>
+                                                <span>{{ __('messages.copy') }}</span>
                                             </button>
                                         </div>
                                     </div>
@@ -125,32 +125,32 @@
                                     {{-- Stripe --}}
                                     @if($gateway['key'] === 'stripe')
                                         <div class="col-md-4">
-                                            <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">{{ __('messages.mode') ?? 'بيئة التشغيل' }}</label>
+                                            <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">{{ __('messages.mode') }}</label>
                                             <select name="mode" class="form-select" style="border-radius: 10px;">
-                                                <option value="sandbox" @selected(($config['mode'] ?? 'sandbox') === 'sandbox')>{{ __('messages.sandbox_mode') ?? 'Sandbox (تجريبي)' }}</option>
-                                                <option value="live" @selected(($config['mode'] ?? 'sandbox') === 'live')>{{ __('messages.live_mode') ?? 'Live (إنتاجي مباشر)' }}</option>
+                                                <option value="sandbox" @selected(($config['mode'] ?? 'sandbox') === 'sandbox')>{{ __('messages.sandbox_mode') }}</option>
+                                                <option value="live" @selected(($config['mode'] ?? 'sandbox') === 'live')>{{ __('messages.live_mode') }}</option>
                                             </select>
                                         </div>
                                         <div class="col-md-8">
-                                            <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">{{ __('messages.billing_stripe_publishable_key_label') ?? 'المفتاح القابل للنشر (Publishable Key)' }}</label>
+                                            <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">{{ __('messages.billing_stripe_publishable_key_label') }}</label>
                                             <input type="text" name="publishable_key" class="form-control font-monospace" value="{{ old('publishable_key', $config['publishable_key'] ?? '') }}" style="border-radius: 10px;">
                                         </div>
                                         <div class="col-md-6">
-                                            <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">{{ __('messages.billing_stripe_secret_key_label') ?? 'المفتاح السري (Secret Key)' }}</label>
+                                            <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">{{ __('messages.billing_stripe_secret_key_label') }}</label>
                                             <input type="password" name="secret_key" class="form-control font-monospace" value="{{ old('secret_key', $config['secret_key'] ?? '') }}" style="border-radius: 10px;">
                                         </div>
                                         <div class="col-md-6">
-                                            <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">{{ __('messages.billing_stripe_webhook_secret_label') ?? 'مفتاح توقيع الويب هوك (Webhook Secret)' }}</label>
+                                            <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">{{ __('messages.billing_stripe_webhook_secret_label') }}</label>
                                             <input type="password" name="webhook_secret" class="form-control font-monospace" value="{{ old('webhook_secret', $config['webhook_secret'] ?? '') }}" style="border-radius: 10px;">
                                         </div>
 
                                     {{-- PayPal --}}
                                     @elseif($gateway['key'] === 'paypal')
                                         <div class="col-md-4">
-                                            <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">{{ __('messages.mode') ?? 'بيئة التشغيل' }}</label>
+                                            <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">{{ __('messages.mode') }}</label>
                                             <select name="mode" class="form-select" style="border-radius: 10px;">
-                                                <option value="sandbox" @selected(($config['mode'] ?? 'sandbox') === 'sandbox')>{{ __('messages.sandbox_mode') ?? 'Sandbox (تجريبي)' }}</option>
-                                                <option value="live" @selected(($config['mode'] ?? 'sandbox') === 'live')>{{ __('messages.live_mode') ?? 'Live (إنتاجي مباشر)' }}</option>
+                                                <option value="sandbox" @selected(($config['mode'] ?? 'sandbox') === 'sandbox')>{{ __('messages.sandbox_mode') }}</option>
+                                                <option value="live" @selected(($config['mode'] ?? 'sandbox') === 'live')>{{ __('messages.live_mode') }}</option>
                                             </select>
                                         </div>
                                         <div class="col-md-8">
@@ -169,12 +169,12 @@
                                     {{-- Bank Transfer --}}
                                     @elseif($gateway['key'] === 'bank_transfer')
                                         <div class="col-12">
-                                            <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">{{ __('messages.billing_bank_transfer_instructions_label') ?? 'تعليمات التحويل البنكي (تظهر للعميل)' }}</label>
-                                            <textarea name="instructions" class="form-control" rows="4" placeholder="{{ __('messages.billing_bank_transfer_instructions_placeholder') ?? 'اسم البنك، رقم الحساب، الآيبان IBAN، واسم المستفيد...' }}" style="border-radius: 10px;">{{ old('instructions', $config['instructions'] ?? '') }}</textarea>
+                                            <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">{{ __('messages.billing_bank_transfer_instructions_label') }}</label>
+                                            <textarea name="instructions" class="form-control" rows="4" placeholder="{{ __('messages.billing_bank_transfer_instructions_placeholder') }}" style="border-radius: 10px;">{{ old('instructions', $config['instructions'] ?? '') }}</textarea>
                                         </div>
                                         <div class="col-12">
-                                            <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">{{ __('messages.billing_bank_transfer_note_label') ?? 'ملاحظة توجيهية إضافية' }}</label>
-                                            <textarea name="note" class="form-control" rows="2" placeholder="{{ __('messages.billing_bank_transfer_note_placeholder') ?? 'مثال: يرجى كتابة رقم الطلب في سبب التحويل ورفع الإيصال بعد الإتمام.' }}" style="border-radius: 10px;">{{ old('note', $config['note'] ?? '') }}</textarea>
+                                            <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">{{ __('messages.billing_bank_transfer_note_label') }}</label>
+                                            <textarea name="note" class="form-control" rows="2" placeholder="{{ __('messages.billing_bank_transfer_note_placeholder') }}" style="border-radius: 10px;">{{ old('note', $config['note'] ?? '') }}</textarea>
                                         </div>
 
                                     {{-- Lemon Squeezy --}}
@@ -199,7 +199,7 @@
                                     {{-- Paddle --}}
                                     @elseif($gateway['key'] === 'paddle')
                                         <div class="col-md-4">
-                                            <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">{{ __('messages.mode') ?? 'بيئة التشغيل' }}</label>
+                                            <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">{{ __('messages.mode') }}</label>
                                             <select name="mode" class="form-select" style="border-radius: 10px;">
                                                 <option value="sandbox" @selected(($config['mode'] ?? 'sandbox') === 'sandbox')>{{ __('messages.sandbox_mode') ?? 'Sandbox' }}</option>
                                                 <option value="live" @selected(($config['mode'] ?? 'sandbox') === 'live')>{{ __('messages.live_mode') ?? 'Live' }}</option>
@@ -221,10 +221,10 @@
                                     {{-- Tabby --}}
                                     @elseif($gateway['key'] === 'tabby')
                                         <div class="col-md-4">
-                                            <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">{{ __('messages.region') ?? 'المنطقة' }}</label>
+                                            <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">{{ __('messages.region') }}</label>
                                             <select name="region" class="form-select" style="border-radius: 10px;">
-                                                <option value="UAE" @selected(($config['region'] ?? 'UAE') === 'UAE')>{{ __('messages.uae_region') ?? 'الإمارات (UAE)' }}</option>
-                                                <option value="KSA" @selected(($config['region'] ?? 'UAE') === 'KSA')>{{ __('messages.ksa_region') ?? 'السعودية (KSA)' }}</option>
+                                                <option value="UAE" @selected(($config['region'] ?? 'UAE') === 'UAE')>{{ __('messages.uae_region') }}</option>
+                                                <option value="KSA" @selected(($config['region'] ?? 'UAE') === 'KSA')>{{ __('messages.ksa_region') }}</option>
                                             </select>
                                         </div>
                                         <div class="col-md-8">
@@ -254,9 +254,9 @@
                                     {{-- Apple Pay --}}
                                     @elseif($gateway['key'] === 'apple_pay')
                                         <div class="col-md-4">
-                                            <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">{{ __('messages.mode') ?? 'بيئة التشغيل' }}</label>
+                                            <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">{{ __('messages.mode') }}</label>
                                             <select name="mode" class="form-select" style="border-radius: 10px;">
-                                                <option value="sandbox" @selected(($config['mode'] ?? 'sandbox') === 'sandbox')>{{ __('messages.sandbox_simulation_mode') ?? 'Sandbox (محاكاة)' }}</option>
+                                                <option value="sandbox" @selected(($config['mode'] ?? 'sandbox') === 'sandbox')>{{ __('messages.sandbox_simulation_mode') }}</option>
                                                 <option value="live" @selected(($config['mode'] ?? 'sandbox') === 'live')>{{ __('messages.live_mode') ?? 'Live' }}</option>
                                             </select>
                                         </div>
@@ -269,7 +269,7 @@
                                     {{-- Supported Currencies --}}
                                     <div class="col-12 mt-3">
                                         <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-2">
-                                            {{ __('messages.billing_supported_currencies_label') ?? 'العملات المدعومة في هذه البوابة' }}
+                                            {{ __('messages.billing_supported_currencies_label') }}
                                         </label>
                                         <div class="d-flex flex-wrap gap-2">
                                             @php
@@ -283,17 +283,17 @@
                                                 </label>
                                             @endforeach
                                         </div>
-                                        <div class="text-muted small fs-11 mt-1">{{ __('messages.billing_all_active_currencies_note') ?? 'إذا لم تحدد عملات معينة، فسيتم قبول جميع العملات النشطة افتراضياً.' }}</div>
+                                        <div class="text-muted small fs-11 mt-1">{{ __('messages.billing_all_active_currencies_note') }}</div>
                                     </div>
                                 </div>
                             </div>
 
                             {{-- Gateway Footer --}}
                             <div class="admin-panel__footer d-flex align-items-center justify-content-between p-3 bg-light">
-                                <span class="text-muted fs-12">{{ __('messages.billing_gateway_note') ?? 'يتم تفعيل البوابة فورياً للمستخدمين بعد الحفظ.' }}</span>
+                                <span class="text-muted fs-12">{{ __('messages.billing_gateway_note') }}</span>
                                 <button type="submit" id="btn-save-{{ $gateway['key'] }}" class="btn btn-primary fw-bold shadow-sm px-4 d-inline-flex align-items-center gap-2" style="border-radius: 12px;">
                                     <i class="feather-save"></i>
-                                    <span>{{ __('messages.save_changes') ?? 'حفظ إعدادات البوابة' }}</span>
+                                    <span>{{ __('messages.save_changes') }}</span>
                                 </button>
                             </div>
                         </div>
@@ -322,7 +322,7 @@ document.addEventListener('DOMContentLoaded', function() {
             var originalHtml = btn ? btn.innerHTML : '';
             if (btn) {
                 btn.disabled = true;
-                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> {{ __("messages.saving") ?? "جاري الحفظ..." }}';
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> {{ __("messages.saving") }}';
             }
 
             var formData = new FormData(form);
@@ -347,21 +347,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
 
                 if (result.status >= 200 && result.status < 300 && result.data.success) {
-                    window.showBillingToast(result.data.message || '{{ __("messages.billing_gateway_saved") ?? "تم حفظ إعدادات البوابة بنجاح" }}', 'success');
+                    window.showBillingToast(result.data.message || '{{ __("messages.billing_gateway_saved") }}', 'success');
 
                     // Update status badge on card
                     if (statusBadge && enableSwitch) {
                         var isChecked = enableSwitch.checked;
                         if (isChecked) {
                             statusBadge.className = 'badge bg-soft-success text-success border border-success border-opacity-25 rounded-pill px-2 py-1 fs-11';
-                            statusBadge.innerText = '{{ __("messages.active") ?? "نشطة" }}';
+                            statusBadge.innerText = '{{ __("messages.active") }}';
                         } else {
                             statusBadge.className = 'badge bg-soft-secondary text-secondary border border-secondary border-opacity-25 rounded-pill px-2 py-1 fs-11';
-                            statusBadge.innerText = '{{ __("messages.inactive") ?? "معطلة" }}';
+                            statusBadge.innerText = '{{ __("messages.inactive") }}';
                         }
                     }
                 } else {
-                    var errorMsg = result.data.message || '{{ __("messages.error_occurred") ?? "حدث خطأ أثناء حفظ البوابة" }}';
+                    var errorMsg = result.data.message || '{{ __("messages.error_occurred") }}';
                     if (result.data.errors) {
                         var firstKey = Object.keys(result.data.errors)[0];
                         if (firstKey && result.data.errors[firstKey][0]) {
@@ -376,7 +376,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     btn.disabled = false;
                     btn.innerHTML = originalHtml;
                 }
-                window.showBillingToast(err.message || '{{ __("messages.error_occurred") ?? "حدث خطأ غير متوقع" }}', 'danger');
+                window.showBillingToast(err.message || '{{ __("messages.error_occurred") }}', 'danger');
             });
         });
     });

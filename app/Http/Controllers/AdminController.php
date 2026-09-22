@@ -335,12 +335,12 @@ class AdminController extends Controller
             ],
             [
                 'id' => 17,
-                'category' => __('messages.theme_customizer') ?? 'مخصص القوالب',
+                'category' => __('messages.theme_customizer'),
                 'icon' => 'feather-layout',
                 'badge_bg' => 'linear-gradient(135deg, #6366f1, #9333ea)',
                 'title' => __('messages.tip_theme_customizer_title'),
                 'tip' => __('messages.tip_theme_customizer_desc'),
-                'action_text' => __('messages.theme_customizer') ?? 'مخصص القوالب',
+                'action_text' => __('messages.theme_customizer'),
                 'action_url' => route('admin.themes.customizer'),
             ],
         ];
@@ -533,7 +533,7 @@ class AdminController extends Controller
                             __('messages.bannads'),
                             __('messages.textads'),
                             __('messages.smart_ads'),
-                            __('messages.custom_ads') ?? 'الإعلانات المخصصة',
+                            __('messages.custom_ads'),
                             __('messages.exvisit'),
                         ],
                         'data' => [
@@ -551,8 +551,8 @@ class AdminController extends Controller
                             __('messages.textads') . ' ' . __('messages.clicks'),
                             __('messages.smart_ads') . ' ' . __('messages.Views'),
                             __('messages.smart_ads') . ' ' . __('messages.clicks'),
-                            (__('messages.custom_ads') ?? 'الإعلانات المخصصة') . ' ' . __('messages.Views'),
-                            (__('messages.custom_ads') ?? 'الإعلانات المخصصة') . ' ' . __('messages.clicks'),
+                            __('messages.custom_ads') . ' ' . __('messages.Views'),
+                            __('messages.custom_ads') . ' ' . __('messages.clicks'),
                         ],
                         'data' => [
                             $bannerViews,

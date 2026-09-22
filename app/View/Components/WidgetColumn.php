@@ -79,16 +79,16 @@ class WidgetColumn extends Component
         }
 
         $places = [
-            1 => __('messages.portal_left') ?: 'الجانب الأيسر للرئيسية',
-            2 => __('messages.portal_right') ?: 'الجانب الأيمن للرئيسية',
-            3 => __('messages.forum_left') ?: 'الجانب الأيسر للمنتدى',
-            4 => __('messages.forum_right') ?: 'الجانب الأيمن للمنتدى',
-            5 => __('messages.directory_left') ?: 'الجانب الأيسر للمجلة/الدليل',
-            6 => __('messages.directory_right') ?: 'الجانب الأيمن للمجلة/الدليل',
-            7 => __('messages.profile_left') ?: 'الجانب الأيسر للملف الشخصي',
-            8 => __('messages.profile_right') ?: 'الجانب الأيمن للملف الشخصي',
-            9 => __('messages.groups_left') ?: 'الجانب الأيسر للمجموعات',
-            10 => __('messages.groups_right') ?: 'الجانب الأيمن للمجموعات',
+            1 => __('messages.portal_left'),
+            2 => __('messages.portal_right'),
+            3 => __('messages.forum_left'),
+            4 => __('messages.forum_right'),
+            5 => __('messages.directory_left'),
+            6 => __('messages.directory_right'),
+            7 => __('messages.profile_left'),
+            8 => __('messages.profile_right'),
+            9 => __('messages.groups_left'),
+            10 => __('messages.groups_right'),
         ];
 
         if (isset($places[$placeId])) {
@@ -101,7 +101,7 @@ class WidgetColumn extends Component
             $page = Page::find($pageId);
             if ($page) {
                 $isLeft = ($placeId % 2 !== 0);
-                $sideText = $isLeft ? (__('messages.page_left') ?: 'صفحة يسار') : (__('messages.page_right') ?: 'صفحة يمين');
+                $sideText = $isLeft ? __('messages.page_left') : __('messages.page_right');
                 return $sideText . ': ' . $page->title;
             }
         }

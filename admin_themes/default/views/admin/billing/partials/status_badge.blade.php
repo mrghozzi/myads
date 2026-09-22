@@ -4,52 +4,52 @@
         'paid' => [
             'class' => 'bg-soft-success text-success border border-success border-opacity-25',
             'dot' => '#17c666',
-            'label' => __('messages.billing_status_paid') ?? 'مدفوع',
+            'label' => __('messages.billing_status_paid'),
         ],
         'pending_checkout' => [
             'class' => 'bg-soft-warning text-warning border border-warning border-opacity-25',
             'dot' => '#ffa21d',
-            'label' => __('messages.billing_status_pending_checkout') ?? 'بانتظار الدفع',
+            'label' => __('messages.billing_status_pending_checkout'),
         ],
         'pending_receipt' => [
             'class' => 'bg-soft-warning text-warning border border-warning border-opacity-25',
             'dot' => '#ffa21d',
-            'label' => __('messages.billing_status_pending_receipt') ?? 'بانتظار الإيصال',
+            'label' => __('messages.billing_status_pending_receipt'),
         ],
         'pending_review' => [
             'class' => 'bg-soft-warning text-warning border border-warning border-opacity-25',
             'dot' => '#ffa21d',
-            'label' => __('messages.billing_status_pending_review') ?? 'بانتظار المراجعة',
+            'label' => __('messages.billing_status_pending_review'),
         ],
         'rejected' => [
             'class' => 'bg-soft-danger text-danger border border-danger border-opacity-25',
             'dot' => '#ea4d4d',
-            'label' => __('messages.billing_status_rejected') ?? 'مرفوض',
+            'label' => __('messages.billing_status_rejected'),
         ],
         'failed' => [
             'class' => 'bg-soft-danger text-danger border border-danger border-opacity-25',
             'dot' => '#ea4d4d',
-            'label' => __('messages.billing_status_failed') ?? 'فشل',
+            'label' => __('messages.billing_status_failed'),
         ],
         'cancelled' => [
             'class' => 'bg-soft-secondary text-secondary border border-secondary border-opacity-25',
             'dot' => '#94a3b8',
-            'label' => __('messages.billing_status_cancelled') ?? 'ملغي',
+            'label' => __('messages.billing_status_cancelled'),
         ],
         'active' => [
             'class' => 'bg-soft-success text-success border border-success border-opacity-25',
             'dot' => '#17c666',
-            'label' => __('messages.billing_subscription_status_active') ?? 'نشط',
+            'label' => __('messages.billing_subscription_status_active'),
         ],
         'queued' => [
             'class' => 'bg-soft-primary text-primary border border-primary border-opacity-25',
             'dot' => '#3454d1',
-            'label' => __('messages.billing_subscription_status_queued') ?? 'في الانتظار',
+            'label' => __('messages.billing_subscription_status_queued'),
         ],
         'expired' => [
             'class' => 'bg-soft-secondary text-secondary border border-secondary border-opacity-25',
             'dot' => '#94a3b8',
-            'label' => __('messages.billing_subscription_status_expired') ?? 'منتهي',
+            'label' => __('messages.billing_subscription_status_expired'),
         ],
     ];
     $badge = $badgeMap[$status] ?? [

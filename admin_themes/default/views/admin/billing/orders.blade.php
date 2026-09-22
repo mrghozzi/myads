@@ -1,6 +1,6 @@
 @extends('admin::layouts.admin')
 
-@section('title', __('messages.billing_orders_title') ?? 'طلبات الفوترة')
+@section('title', __('messages.billing_orders_title'))
 
 @section('content')
 <div class="admin-page">
@@ -8,19 +8,19 @@
     <section class="admin-hero">
         <div class="admin-hero__content">
             <ul class="admin-breadcrumb">
-                <li><a href="{{ route('admin.index') }}">{{ __('messages.dashboard') ?? 'لوحة التحكم' }}</a></li>
-                <li><a href="{{ route('admin.billing.overview') }}">{{ __('messages.billing_feature_title') ?? 'الفوترة' }}</a></li>
-                <li>{{ __('messages.billing_orders_tab') ?? 'الطلبات' }}</li>
+                <li><a href="{{ route('admin.index') }}">{{ __('messages.dashboard') }}</a></li>
+                <li><a href="{{ route('admin.billing.overview') }}">{{ __('messages.billing_feature_title') }}</a></li>
+                <li>{{ __('messages.billing_orders_tab') }}</li>
             </ul>
-            <div class="admin-hero__eyebrow">{{ __('messages.billing_admin_eyebrow') ?? 'مساحة عمل الإيرادات' }}</div>
-            <h1 class="admin-hero__title">{{ __('messages.billing_orders_title') ?? 'طلبات الفوترة والاشتراكات' }}</h1>
-            <p class="admin-hero__copy">{{ __('messages.billing_orders_help') ?? 'تتبع كل عملية دفع وتحويل وكافة قرارات المراجعة اليدوية.' }}</p>
+            <div class="admin-hero__eyebrow">{{ __('messages.billing_admin_eyebrow') }}</div>
+            <h1 class="admin-hero__title">{{ __('messages.billing_orders_title') }}</h1>
+            <p class="admin-hero__copy">{{ __('messages.billing_orders_help') }}</p>
         </div>
         <div class="admin-hero__actions">
             <div class="d-flex align-items-center gap-2 flex-wrap">
                 <span class="badge bg-soft-primary text-primary border border-primary border-opacity-25 rounded-pill px-3 py-2 fw-bold fs-12">
                     <i class="feather-shopping-bag me-1"></i>
-                    {{ $orders->total() }} {{ __('messages.billing_orders_tab') ?? 'طلب' }}
+                    {{ $orders->total() }} {{ __('messages.billing_orders_tab') }}
                 </span>
             </div>
         </div>
@@ -46,12 +46,12 @@
                     <span class="input-group-text bg-white border-end-0 text-muted" style="border-radius: 12px 0 0 12px;">
                         <i class="feather-search"></i>
                     </span>
-                    <input type="text" name="search" id="orders-search-input" class="form-control border-start-0" value="{{ $search }}" placeholder="{{ __('messages.search_placeholder') ?? 'ابحث برقم الطلب أو المستخدم...' }}" style="border-radius: 0 12px 12px 0;">
+                    <input type="text" name="search" id="orders-search-input" class="form-control border-start-0" value="{{ $search }}" placeholder="{{ __('messages.search_placeholder') }}" style="border-radius: 0 12px 12px 0;">
                 </div>
 
                 <div style="min-width: 170px;">
                     <select name="status" id="orders-status-select" class="form-select" style="border-radius: 12px;">
-                        <option value="">{{ __('messages.billing_all_statuses') ?? 'جميع الحالات' }}</option>
+                        <option value="">{{ __('messages.billing_all_statuses') }}</option>
                         @foreach(['paid', 'pending_checkout', 'pending_receipt', 'pending_review', 'rejected', 'failed', 'cancelled'] as $statusOption)
                             <option value="{{ $statusOption }}" @selected($status === $statusOption)>
                                 {{ __('messages.billing_status_' . $statusOption) ?? $statusOption }}
@@ -62,7 +62,7 @@
 
                 <div style="min-width: 170px;">
                     <select name="gateway" id="orders-gateway-select" class="form-select" style="border-radius: 12px;">
-                        <option value="">{{ __('messages.billing_all_gateways') ?? 'جميع البوابات' }}</option>
+                        <option value="">{{ __('messages.billing_all_gateways') }}</option>
                         @foreach($gateways as $gatewayDefinition)
                             <option value="{{ $gatewayDefinition['key'] }}" @selected($gateway === $gatewayDefinition['key'])>
                                 {{ $gatewayDefinition['label'] }}
@@ -73,13 +73,13 @@
 
                 <button type="submit" id="btn-filter-orders" class="btn btn-primary fw-bold shadow-sm d-inline-flex align-items-center gap-2" style="border-radius: 12px; padding: 0.6rem 1.25rem;">
                     <i class="feather-filter"></i>
-                    <span>{{ __('messages.filter') ?? 'تصفية' }}</span>
+                    <span>{{ __('messages.filter') }}</span>
                 </button>
 
                 @if($search !== '' || $status !== '' || $gateway !== '')
                     <a href="{{ route('admin.billing.orders') }}" class="btn btn-light fw-bold text-muted d-inline-flex align-items-center gap-1 shadow-sm" style="border-radius: 12px; border: 1px solid var(--admin-premium-border);">
                         <i class="feather-x"></i>
-                        <span>{{ __('messages.reset') ?? 'إعادة تعيين' }}</span>
+                        <span>{{ __('messages.reset') }}</span>
                     </a>
                 @endif
             </form>
@@ -92,14 +92,14 @@
                     <table class="table admin-table align-middle mb-0">
                         <thead>
                             <tr>
-                                <th class="ps-4">{{ __('messages.billing_order_number_label') ?? 'رقم الطلب' }}</th>
-                                <th>{{ __('messages.user') ?? 'المستخدم' }}</th>
-                                <th>{{ __('messages.plan') ?? 'الخطة' }}</th>
-                                <th>{{ __('messages.gateway') ?? 'البوابة' }}</th>
-                                <th>{{ __('messages.amount') ?? 'المبلغ' }}</th>
-                                <th>{{ __('messages.status') ?? 'الحالة' }}</th>
-                                <th>{{ __('messages.date') ?? 'التاريخ' }}</th>
-                                <th class="pe-4 text-end">{{ __('messages.actions') ?? 'الإجراءات' }}</th>
+                                <th class="ps-4">{{ __('messages.billing_order_number_label') }}</th>
+                                <th>{{ __('messages.user') }}</th>
+                                <th>{{ __('messages.plan') }}</th>
+                                <th>{{ __('messages.gateway') }}</th>
+                                <th>{{ __('messages.amount') }}</th>
+                                <th>{{ __('messages.status') }}</th>
+                                <th>{{ __('messages.date') }}</th>
+                                <th class="pe-4 text-end">{{ __('messages.actions') }}</th>
                             </tr>
                         </thead>
                         <tbody id="orders-table-body">
@@ -110,7 +110,7 @@
                                             <a href="{{ route('admin.billing.orders.show', $order->id) }}" class="text-primary text-decoration-none">
                                                 {{ $order->order_number }}
                                             </a>
-                                            <button type="button" class="btn btn-sm btn-link text-muted p-0 shadow-none" onclick="window.copyBillingText('{{ $order->order_number }}', this);" title="{{ __('messages.copy_order_number') ?? 'نسخ رقم الطلب' }}">
+                                            <button type="button" class="btn btn-sm btn-link text-muted p-0 shadow-none" onclick="window.copyBillingText('{{ $order->order_number }}', this);" title="{{ __('messages.copy_order_number') }}">
                                                 <i class="feather-copy" style="font-size: 13px;"></i>
                                             </button>
                                         </div>
@@ -123,7 +123,7 @@
                                             <span>{{ $order->user->username ?? ('#' . $order->user_id) }}</span>
                                         </div>
                                     </td>
-                                    <td class="text-muted">{{ data_get($order->plan_snapshot, 'name', __('messages.billing_subscription_plan') ?? 'خطة اشتراك') }}</td>
+                                    <td class="text-muted">{{ data_get($order->plan_snapshot, 'name', __('messages.billing_subscription_plan')) }}</td>
                                     <td>
                                         <span class="d-inline-flex align-items-center gap-1 text-dark fs-13">
                                             <i class="feather-credit-card text-muted"></i>
@@ -143,7 +143,7 @@
                                     <td class="pe-4 text-end">
                                         <a href="{{ route('admin.billing.orders.show', $order->id) }}" class="btn btn-sm btn-light fw-bold text-dark shadow-sm d-inline-flex align-items-center gap-1" style="border-radius: 8px; border: 1px solid var(--admin-premium-border);">
                                             <i class="feather-eye"></i>
-                                            <span>{{ __('messages.details') ?? 'التفاصيل' }}</span>
+                                            <span>{{ __('messages.details') }}</span>
                                         </a>
                                     </td>
                                 </tr>
@@ -154,7 +154,7 @@
                                             <div class="bg-soft-secondary text-secondary rounded-circle d-flex align-items-center justify-content-center mb-3" style="width: 56px; height: 56px;">
                                                 <i class="feather-inbox fs-3"></i>
                                             </div>
-                                            <span class="fw-semibold">{{ __('messages.no_data') ?? 'لا توجد طلبات تطابق هذا البحث' }}</span>
+                                            <span class="fw-semibold">{{ __('messages.no_data') }}</span>
                                         </div>
                                     </td>
                                 </tr>
@@ -211,7 +211,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .catch(function(err) {
             wrapper.style.opacity = '1';
             wrapper.style.pointerEvents = 'auto';
-            window.showBillingToast('{{ __("messages.error_occurred") ?? "حدث خطأ أثناء تحميل البيانات" }}', 'danger');
+            window.showBillingToast('{{ __("messages.error_occurred") }}', 'danger');
         });
     }
 

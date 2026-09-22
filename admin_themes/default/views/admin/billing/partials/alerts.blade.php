@@ -35,7 +35,7 @@
                 <div class="bg-danger text-white rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 32px; height: 32px;">
                     <i class="feather-x-circle fs-5"></i>
                 </div>
-                <div class="fw-bold">{{ __('messages.error_occurred') ?? 'يرجى مراجعة الأخطاء التالية:' }}</div>
+                <div class="fw-bold">{{ __('messages.error_occurred') }}</div>
             </div>
             <ul class="mb-0 ps-4">
                 @foreach($errors->all() as $error)
@@ -131,7 +131,7 @@
                 }, 1800);
             }
             if (window.showBillingToast) {
-                window.showBillingToast('{{ __("messages.copied_to_clipboard") ?? "تم النسخ للحافظة بنجاح!" }}', 'success');
+                window.showBillingToast('{{ __("messages.copied_to_clipboard") }}', 'success');
             }
         };
     }
