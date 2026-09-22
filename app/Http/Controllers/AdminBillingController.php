@@ -12,6 +12,7 @@ use App\Services\Billing\SubscriptionPlanService;
 use App\Services\V420SchemaService;
 use App\Support\SubscriptionGatewaySettings;
 use App\Support\SubscriptionSettings;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -87,11 +88,14 @@ class AdminBillingController extends Controller
         ]);
     }
 
-    public function updateSettings(Request $request): RedirectResponse
+    public function updateSettings(Request $request): RedirectResponse|JsonResponse
     {
         if (!$this->schema->supports('subscriptions_billing')) {
-            return redirect()->route('admin.billing.settings')
-                ->with('error', $this->schema->blockedActionMessage('subscriptions_billing', __('messages.billing_feature_title')));
+            $msg = $this->schema->blockedActionMessage('subscriptions_billing', __('messages.billing_feature_title'));
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $msg], 403);
+            }
+            return redirect()->route('admin.billing.settings')->with('error', $msg);
         }
 
         $validated = $request->validate([
@@ -104,6 +108,14 @@ class AdminBillingController extends Controller
         $currency = $this->currencies->findByCode((string) $validated['base_currency_code']);
         if ($currency) {
             $this->currencies->setBaseCurrency($currency);
+        }
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => __('messages.billing_settings_saved'),
+                'settings' => SubscriptionSettings::all(),
+            ]);
         }
 
         return redirect()->route('admin.billing.settings')
@@ -133,25 +145,39 @@ class AdminBillingController extends Controller
         ]);
     }
 
-    public function storePlan(Request $request): RedirectResponse
+    public function storePlan(Request $request): RedirectResponse|JsonResponse
     {
         if (!$this->schema->supports('subscriptions_billing')) {
-            return redirect()->route('admin.billing.plans')
-                ->with('error', $this->schema->blockedActionMessage('subscriptions_billing', __('messages.billing_plans_title')));
+            $msg = $this->schema->blockedActionMessage('subscriptions_billing', __('messages.billing_plans_title'));
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $msg], 403);
+            }
+            return redirect()->route('admin.billing.plans')->with('error', $msg);
         }
 
         $validated = $this->validatePlan($request);
-        $this->plans->store($validated);
+        $plan = $this->plans->store($validated);
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => __('messages.billing_plan_saved'),
+                'plan' => $plan,
+            ]);
+        }
 
         return redirect()->route('admin.billing.plans')
             ->with('success', __('messages.billing_plan_saved'));
     }
 
-    public function updatePlan(Request $request, int $plan): RedirectResponse
+    public function updatePlan(Request $request, int $plan): RedirectResponse|JsonResponse
     {
         if (!$this->schema->supports('subscriptions_billing')) {
-            return redirect()->route('admin.billing.plans')
-                ->with('error', $this->schema->blockedActionMessage('subscriptions_billing', __('messages.billing_plans_title')));
+            $msg = $this->schema->blockedActionMessage('subscriptions_billing', __('messages.billing_plans_title'));
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $msg], 403);
+            }
+            return redirect()->route('admin.billing.plans')->with('error', $msg);
         }
 
         $planModel = $this->plans->find($plan);
@@ -159,6 +185,14 @@ class AdminBillingController extends Controller
 
         $validated = $this->validatePlan($request);
         $this->plans->update($planModel, $validated);
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => __('messages.billing_plan_saved'),
+                'plan' => $planModel->fresh(),
+            ]);
+        }
 
         return redirect()->route('admin.billing.plans')
             ->with('success', __('messages.billing_plan_saved'));
@@ -228,11 +262,14 @@ class AdminBillingController extends Controller
         ]);
     }
 
-    public function reviewOrder(Request $request, int $order): RedirectResponse
+    public function reviewOrder(Request $request, int $order): RedirectResponse|JsonResponse
     {
         if (!$this->schema->supports('subscriptions_billing')) {
-            return redirect()->route('admin.billing.orders')
-                ->with('error', $this->schema->blockedActionMessage('subscriptions_billing', __('messages.billing_orders_title')));
+            $msg = $this->schema->blockedActionMessage('subscriptions_billing', __('messages.billing_orders_title'));
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $msg], 403);
+            }
+            return redirect()->route('admin.billing.orders')->with('error', $msg);
         }
 
         $validated = $request->validate([
@@ -243,6 +280,9 @@ class AdminBillingController extends Controller
         $orderModel = BillingOrder::query()->findOrFail($order);
 
         if ($orderModel->gateway !== 'bank_transfer' || !$orderModel->isAwaitingManualReview()) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => __('messages.billing_order_review_unavailable')], 422);
+            }
             throw ValidationException::withMessages([
                 'action' => __('messages.billing_order_review_unavailable'),
             ]);
@@ -250,22 +290,37 @@ class AdminBillingController extends Controller
 
         $this->lifecycle->reviewBankTransfer($orderModel, (string) $validated['action'], $validated['admin_note'] ?? null);
 
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => __('messages.billing_order_review_saved'),
+                'order' => $orderModel->fresh(['user', 'subscription', 'transactions']),
+            ]);
+        }
+
         return redirect()->route('admin.billing.orders.show', $order)
             ->with('success', __('messages.billing_order_review_saved'));
     }
 
-    public function simulateLemonSqueezy(Request $request, int $order): RedirectResponse
+    public function simulateLemonSqueezy(Request $request, int $order): RedirectResponse|JsonResponse
     {
         if (!$this->schema->supports('subscriptions_billing')) {
-            return redirect()->route('admin.billing.orders')
-                ->with('error', $this->schema->blockedActionMessage('subscriptions_billing', __('messages.billing_orders_title')));
+            $msg = $this->schema->blockedActionMessage('subscriptions_billing', __('messages.billing_orders_title'));
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $msg], 403);
+            }
+            return redirect()->route('admin.billing.orders')->with('error', $msg);
         }
 
         $orderModel = BillingOrder::query()->findOrFail($order);
 
         if ($orderModel->gateway !== 'lemon_squeezy' || $orderModel->status !== BillingOrder::STATUS_PENDING_CHECKOUT) {
+            $errMsg = 'This order cannot be synced manually.';
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $errMsg], 422);
+            }
             return redirect()->route('admin.billing.orders.show', $orderModel->id)
-                ->with('error', 'This order cannot be synced manually.');
+                ->with('error', $errMsg);
         }
 
         $this->lifecycle->completePaidOrder($orderModel, [
@@ -280,8 +335,17 @@ class AdminBillingController extends Controller
             ]
         ]);
 
+        $successMsg = 'تم محاكاة نجاح الدفع وتغيير حالة الطلب إلى مدفوع للاختبار المحلي.';
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => $successMsg,
+                'order' => $orderModel->fresh(['user', 'subscription', 'transactions']),
+            ]);
+        }
+
         return redirect()->route('admin.billing.orders.show', $orderModel->id)
-            ->with('success', 'تم محاكاة نجاح الدفع وتغيير حالة الطلب إلى مدفوع للاختبار المحلي.');
+            ->with('success', $successMsg);
     }
 
     public function transactions(Request $request)
@@ -331,25 +395,39 @@ class AdminBillingController extends Controller
         ]);
     }
 
-    public function storeCurrency(Request $request): RedirectResponse
+    public function storeCurrency(Request $request): RedirectResponse|JsonResponse
     {
         if (!$this->schema->supports('subscriptions_billing')) {
-            return redirect()->route('admin.billing.currencies')
-                ->with('error', $this->schema->blockedActionMessage('subscriptions_billing', __('messages.billing_currencies_title')));
+            $msg = $this->schema->blockedActionMessage('subscriptions_billing', __('messages.billing_currencies_title'));
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $msg], 403);
+            }
+            return redirect()->route('admin.billing.currencies')->with('error', $msg);
         }
 
         $validated = $this->validateCurrency($request, null);
-        $this->currencies->store($validated);
+        $currency = $this->currencies->store($validated);
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => __('messages.billing_currency_saved'),
+                'currency' => $currency,
+            ]);
+        }
 
         return redirect()->route('admin.billing.currencies')
             ->with('success', __('messages.billing_currency_saved'));
     }
 
-    public function updateCurrency(Request $request, int $currency): RedirectResponse
+    public function updateCurrency(Request $request, int $currency): RedirectResponse|JsonResponse
     {
         if (!$this->schema->supports('subscriptions_billing')) {
-            return redirect()->route('admin.billing.currencies')
-                ->with('error', $this->schema->blockedActionMessage('subscriptions_billing', __('messages.billing_currencies_title')));
+            $msg = $this->schema->blockedActionMessage('subscriptions_billing', __('messages.billing_currencies_title'));
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $msg], 403);
+            }
+            return redirect()->route('admin.billing.currencies')->with('error', $msg);
         }
 
         $currencyModel = $this->currencies->find($currency);
@@ -358,15 +436,26 @@ class AdminBillingController extends Controller
         $validated = $this->validateCurrency($request, $currencyModel->id);
         $this->currencies->update($currencyModel, $validated);
 
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => __('messages.billing_currency_saved'),
+                'currency' => $currencyModel->fresh(),
+            ]);
+        }
+
         return redirect()->route('admin.billing.currencies')
             ->with('success', __('messages.billing_currency_saved'));
     }
 
-    public function deleteCurrency(int $currency): RedirectResponse
+    public function deleteCurrency(Request $request, int $currency): RedirectResponse|JsonResponse
     {
         if (!$this->schema->supports('subscriptions_billing')) {
-            return redirect()->route('admin.billing.currencies')
-                ->with('error', $this->schema->blockedActionMessage('subscriptions_billing', __('messages.billing_currencies_title')));
+            $msg = $this->schema->blockedActionMessage('subscriptions_billing', __('messages.billing_currencies_title'));
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $msg], 403);
+            }
+            return redirect()->route('admin.billing.currencies')->with('error', $msg);
         }
 
         $currencyModel = $this->currencies->find($currency);
@@ -375,24 +464,45 @@ class AdminBillingController extends Controller
         try {
             $this->currencies->delete($currencyModel);
         } catch (\Throwable $exception) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $exception->getMessage()], 422);
+            }
             return redirect()->route('admin.billing.currencies')
                 ->with('error', $exception->getMessage());
+        }
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => __('messages.billing_currency_deleted'),
+            ]);
         }
 
         return redirect()->route('admin.billing.currencies')
             ->with('success', __('messages.billing_currency_deleted'));
     }
 
-    public function setBaseCurrency(int $currency): RedirectResponse
+    public function setBaseCurrency(Request $request, int $currency): RedirectResponse|JsonResponse
     {
         if (!$this->schema->supports('subscriptions_billing')) {
-            return redirect()->route('admin.billing.currencies')
-                ->with('error', $this->schema->blockedActionMessage('subscriptions_billing', __('messages.billing_currencies_title')));
+            $msg = $this->schema->blockedActionMessage('subscriptions_billing', __('messages.billing_currencies_title'));
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $msg], 403);
+            }
+            return redirect()->route('admin.billing.currencies')->with('error', $msg);
         }
 
         $currencyModel = $this->currencies->find($currency);
         abort_if(!$currencyModel, 404);
         $this->currencies->setBaseCurrency($currencyModel);
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => __('messages.billing_currency_base_saved'),
+                'currency' => $currencyModel->fresh(),
+            ]);
+        }
 
         return redirect()->route('admin.billing.currencies')
             ->with('success', __('messages.billing_currency_base_saved'));
@@ -408,15 +518,27 @@ class AdminBillingController extends Controller
         ]);
     }
 
-    public function updateGateway(Request $request, string $gateway): RedirectResponse
+    public function updateGateway(Request $request, string $gateway): RedirectResponse|JsonResponse
     {
         if (!$this->schema->supports('subscriptions_billing')) {
-            return redirect()->route('admin.billing.gateways')
-                ->with('error', $this->schema->blockedActionMessage('subscriptions_billing', __('messages.billing_gateways_title')));
+            $msg = $this->schema->blockedActionMessage('subscriptions_billing', __('messages.billing_gateways_title'));
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $msg], 403);
+            }
+            return redirect()->route('admin.billing.gateways')->with('error', $msg);
         }
 
         $validated = $this->validateGateway($request, $gateway);
         SubscriptionGatewaySettings::save($gateway, $validated);
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => __('messages.billing_gateway_saved'),
+                'gateway' => $gateway,
+                'config' => SubscriptionGatewaySettings::for($gateway),
+            ]);
+        }
 
         return redirect()->route('admin.billing.gateways')
             ->with('success', __('messages.billing_gateway_saved'));

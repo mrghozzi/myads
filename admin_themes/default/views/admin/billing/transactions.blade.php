@@ -1,45 +1,33 @@
 @extends('admin::layouts.admin')
 
-@section('title', __('messages.billing_transactions_title'))
-@section('admin_shell_header_mode', 'hidden')
+@section('title', __('messages.billing_transactions_title') ?? 'سجل المعاملات')
 
 @section('content')
-<!-- Superdesign Header -->
-<div class="row g-0 align-items-center mb-4">
-    <div class="col-12 px-4">
-        <div class="card border-0 shadow-lg overflow-hidden position-relative" style="border-radius: 24px; background: linear-gradient(135deg, #6366f1 0%, #4338ca 100%);">
-            <div class="position-absolute top-0 end-0 p-5 opacity-10">
-                <i class="fa-solid fa-money-bill-transfer" style="font-size: 160px; transform: rotate(-15deg);"></i>
-            </div>
-            
-            <div class="card-body p-5 position-relative z-index-1">
-                <div class="row align-items-center">
-                    <div class="col-lg-8 text-white">
-                        <div class="d-flex align-items-center mb-3">
-                            <span class="badge bg-white text-primary rounded-pill px-3 py-1 fw-bold fs-12 text-uppercase tracking-wider shadow-sm">
-                                {{ __('messages.billing_admin_eyebrow') }}
-                            </span>
-                        </div>
-                        <h1 class="display-5 fw-black mb-3 animate__animated animate__fadeIn">
-                            {{ __('messages.billing_transactions_title') }}
-                        </h1>
-                        <p class="lead opacity-80 mb-0 animate__animated animate__fadeIn animate__delay-1s">
-                            {{ __('messages.billing_transactions_help') }}
-                        </p>
-                    </div>
-                </div>
-            </div>
+<div class="admin-page">
+    {{-- Superdesign Hero --}}
+    <section class="admin-hero">
+        <div class="admin-hero__content">
+            <ul class="admin-breadcrumb">
+                <li><a href="{{ route('admin.index') }}">{{ __('messages.dashboard') ?? 'لوحة التحكم' }}</a></li>
+                <li><a href="{{ route('admin.billing.overview') }}">{{ __('messages.billing_feature_title') ?? 'الفوترة' }}</a></li>
+                <li>{{ __('messages.billing_transactions_tab') ?? 'المعاملات' }}</li>
+            </ul>
+            <div class="admin-hero__eyebrow">{{ __('messages.billing_admin_eyebrow') ?? 'مساحة عمل الإيرادات' }}</div>
+            <h1 class="admin-hero__title">{{ __('messages.billing_transactions_title') ?? 'سجل المعاملات والأحداث' }}</h1>
+            <p class="admin-hero__copy">{{ __('messages.billing_transactions_help') ?? 'مراجعة أحداث البوابة وسجل الدفع والتحويل لجميع الطلبات.' }}</p>
         </div>
-    </div>
-</div>
-
-<div class="main-content container-lg px-4 pb-5">
-    <div class="card border-0 shadow-sm mb-4" style="border-radius: 20px; backdrop-filter: blur(10px); background: rgba(var(--nxl-white-rgb), 0.8);">
-        <div class="card-body p-2">
-            @include('admin::admin.billing.partials.nav', ['currentTab' => 'transactions'])
+        <div class="admin-hero__actions">
+            <span class="badge bg-soft-primary text-primary border border-primary border-opacity-25 rounded-pill px-3 py-2 fw-bold fs-12">
+                <i class="feather-file-text me-1"></i>
+                {{ $transactions->total() }} {{ __('messages.billing_transactions_tab') ?? 'معاملة' }}
+            </span>
         </div>
-    </div>
+    </section>
 
+    {{-- Billing Navigation Tabs --}}
+    @include('admin::admin.billing.partials.nav', ['currentTab' => 'transactions'])
+
+    {{-- Alerts & Toasts --}}
     @include('admin::admin.billing.partials.alerts')
 
     @if(!empty($upgradeNotice))
@@ -49,64 +37,103 @@
     @endif
 
     @if($featureAvailable)
-        <div class="card border-0 shadow-sm mb-4" style="border-radius: 20px; background: rgba(var(--nxl-white-rgb), 0.8);">
-            <div class="card-header bg-transparent border-0 p-4 pb-3 border-bottom border-soft-light d-flex flex-wrap align-items-center justify-content-between gap-3">
-                <div>
-                    <div class="text-uppercase tracking-wider fw-bold text-muted mb-1 fs-11">{{ __('messages.billing_transactions_tab') }}</div>
-                    <h4 class="fw-bold mb-0 text-dark">{{ __('messages.billing_transaction_log_title') }}</h4>
-                </div>
-                <form method="GET" action="{{ route('admin.billing.transactions') }}" class="d-flex flex-wrap align-items-center gap-2">
-                    <div class="input-group" style="width: auto;">
-                        <input type="text" name="search" class="form-control border-soft-light bg-light" value="{{ $search }}" placeholder="{{ __('messages.search_placeholder') }}" style="border-radius: 10px 0 0 10px;">
-                    </div>
-                    <button type="submit" class="btn btn-primary fw-bold shadow-sm px-3" style="border-radius: 10px;">
+        {{-- Filter Toolbar --}}
+        <div class="admin-toolbar-card mb-4">
+            <form id="transactions-filter-form" method="GET" action="{{ route('admin.billing.transactions') }}" class="d-flex flex-wrap align-items-center gap-2 w-100">
+                <div class="input-group" style="min-width: 250px; flex: 1 1 300px;">
+                    <span class="input-group-text bg-white border-end-0 text-muted" style="border-radius: 12px 0 0 12px;">
                         <i class="feather-search"></i>
-                    </button>
-                </form>
-            </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-borderless align-middle mb-0">
-                        <thead class="text-uppercase fs-11 fw-bold text-muted bg-soft-light">
+                    </span>
+                    <input type="text" name="search" id="transactions-search-input" class="form-control border-start-0" value="{{ $search }}" placeholder="{{ __('messages.search_placeholder') ?? 'ابحث بالمرجع الخارجي أو رقم الطلب...' }}" style="border-radius: 0 12px 12px 0;">
+                </div>
+
+                <button type="submit" class="btn btn-primary fw-bold shadow-sm d-inline-flex align-items-center gap-2" style="border-radius: 12px; padding: 0.6rem 1.25rem;">
+                    <i class="feather-filter"></i>
+                    <span>{{ __('messages.search') ?? 'بحث' }}</span>
+                </button>
+
+                @if($search !== '')
+                    <a href="{{ route('admin.billing.transactions') }}" class="btn btn-light fw-bold text-muted d-inline-flex align-items-center gap-1 shadow-sm" style="border-radius: 12px; border: 1px solid var(--admin-premium-border);">
+                        <i class="feather-x"></i>
+                        <span>{{ __('messages.reset') ?? 'إعادة تعيين' }}</span>
+                    </a>
+                @endif
+            </form>
+        </div>
+
+        {{-- Transactions Table Container --}}
+        <div id="transactions-table-wrapper" class="admin-panel transition-all">
+            <div class="admin-panel__body p-0">
+                <div class="admin-table-wrap">
+                    <table class="table admin-table align-middle mb-0">
+                        <thead>
                             <tr>
-                                <th class="ps-4 py-3">{{ __('messages.date') }}</th>
-                                <th class="py-3">{{ __('messages.billing_order_number_label') }}</th>
-                                <th class="py-3">{{ __('messages.user') }}</th>
-                                <th class="py-3">{{ __('messages.gateway') }}</th>
-                                <th class="py-3">{{ __('messages.billing_transaction_type_label') }}</th>
-                                <th class="py-3">{{ __('messages.amount') }}</th>
-                                <th class="py-3">{{ __('messages.status') }}</th>
-                                <th class="pe-4 py-3">{{ __('messages.billing_external_reference_label') }}</th>
+                                <th class="ps-4">{{ __('messages.date') ?? 'التاريخ' }}</th>
+                                <th>{{ __('messages.billing_order_number_label') ?? 'رقم الطلب' }}</th>
+                                <th>{{ __('messages.user') ?? 'المستخدم' }}</th>
+                                <th>{{ __('messages.gateway') ?? 'البوابة' }}</th>
+                                <th>{{ __('messages.billing_transaction_type_label') ?? 'نوع الحدث' }}</th>
+                                <th>{{ __('messages.amount') ?? 'المبلغ' }}</th>
+                                <th>{{ __('messages.status') ?? 'الحالة' }}</th>
+                                <th class="pe-4">{{ __('messages.billing_external_reference_label') ?? 'المرجع الخارجي' }}</th>
                             </tr>
                         </thead>
-                        <tbody class="fs-13">
+                        <tbody>
                             @forelse($transactions as $transaction)
-                                <tr class="hover-bg-light transition-all border-bottom border-soft-light">
-                                    <td class="ps-4 text-muted fw-semibold">{{ optional($transaction->processed_at)->format('Y-m-d H:i') }}</td>
+                                <tr class="transition-all">
+                                    <td class="ps-4 text-muted fs-12">{{ optional($transaction->processed_at)->format('Y-m-d H:i') }}</td>
                                     <td class="fw-bold">
                                         @if($transaction->order)
-                                            <a href="{{ route('admin.billing.orders.show', $transaction->order->id) }}" class="text-primary text-decoration-none hover-underline">
-                                                {{ $transaction->order->order_number }}
-                                            </a>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <a href="{{ route('admin.billing.orders.show', $transaction->order->id) }}" class="text-primary text-decoration-none">
+                                                    {{ $transaction->order->order_number }}
+                                                </a>
+                                                <button type="button" class="btn btn-sm btn-link text-muted p-0 shadow-none" onclick="window.copyBillingText('{{ $transaction->order->order_number }}', this);" title="نسخ">
+                                                    <i class="feather-copy" style="font-size: 11px;"></i>
+                                                </button>
+                                            </div>
                                         @else
                                             <span class="text-muted">-</span>
                                         @endif
                                     </td>
-                                    <td class="fw-semibold text-dark">{{ $transaction->user->username ?? ('#' . $transaction->user_id) }}</td>
-                                    <td class="text-muted">{{ $transaction->gatewayLabel() }}</td>
-                                    <td class="fw-semibold">{{ $transaction->transactionTypeLabel() }}</td>
-                                    <td class="fw-bold">{{ number_format((float) $transaction->amount, 2) }} <span class="text-muted fw-normal ms-1">{{ $transaction->currency_code }}</span></td>
-                                    <td>@include('admin::admin.billing.partials.status_badge', ['status' => $transaction->status])</td>
-                                    <td class="pe-4 text-muted font-monospace fs-12">{{ $transaction->external_transaction_id ?: '-' }}</td>
+                                    <td class="fw-semibold text-dark">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="bg-soft-primary text-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 28px; height: 28px; font-size: 11px;">
+                                                {{ strtoupper(substr($transaction->user->username ?? 'U', 0, 1)) }}
+                                            </div>
+                                            <span>{{ $transaction->user->username ?? ('#' . $transaction->user_id) }}</span>
+                                        </div>
+                                    </td>
+                                    <td class="text-muted fs-13">{{ $transaction->gatewayLabel() }}</td>
+                                    <td class="fw-semibold text-dark fs-13">{{ $transaction->transactionTypeLabel() }}</td>
+                                    <td class="fw-bold text-dark fs-14">
+                                        {{ number_format((float) $transaction->amount, 2) }}
+                                        <span class="text-muted fw-normal fs-11 ms-1">{{ $transaction->currency_code }}</span>
+                                    </td>
+                                    <td>
+                                        @include('admin::admin.billing.partials.status_badge', ['status' => $transaction->status])
+                                    </td>
+                                    <td class="pe-4 text-muted font-monospace fs-12">
+                                        @if($transaction->external_transaction_id)
+                                            <span class="d-inline-flex align-items-center gap-1">
+                                                <span>{{ $transaction->external_transaction_id }}</span>
+                                                <button type="button" class="btn btn-sm btn-link text-muted p-0 shadow-none" onclick="window.copyBillingText('{{ $transaction->external_transaction_id }}', this);" title="نسخ المرجع">
+                                                    <i class="feather-copy" style="font-size: 11px;"></i>
+                                                </button>
+                                            </span>
+                                        @else
+                                            -
+                                        @endif
+                                    </td>
                                 </tr>
                             @empty
                                 <tr>
                                     <td colspan="8" class="text-center text-muted py-5">
                                         <div class="d-flex flex-column align-items-center">
-                                            <div class="bg-soft-secondary rounded-circle d-flex align-items-center justify-content-center mb-3" style="width: 64px; height: 64px;">
-                                                <i class="feather-activity fs-3 text-secondary"></i>
+                                            <div class="bg-soft-secondary text-secondary rounded-circle d-flex align-items-center justify-content-center mb-3" style="width: 56px; height: 56px;">
+                                                <i class="feather-inbox fs-3"></i>
                                             </div>
-                                            <span class="fw-semibold">{{ __('messages.no_data') }}</span>
+                                            <span class="fw-semibold">{{ __('messages.no_data') ?? 'لا توجد معاملات مسجلة تطابق البحث' }}</span>
                                         </div>
                                     </td>
                                 </tr>
@@ -115,8 +142,9 @@
                     </table>
                 </div>
             </div>
+
             @if($transactions->hasPages())
-                <div class="card-footer bg-transparent border-top border-soft-light p-4">
+                <div class="admin-panel__footer d-flex justify-content-center p-3">
                     {{ $transactions->links('pagination::bootstrap-5') }}
                 </div>
             @endif
@@ -126,17 +154,63 @@
 @endsection
 
 @push('scripts')
-<style>
-    .tracking-wider { letter-spacing: 0.05em; }
-    .fw-black { font-weight: 900; }
-    .opacity-10 { opacity: 0.1; }
-    .opacity-80 { opacity: 0.8; }
-    .z-index-1 { z-index: 1; }
-    .fs-11 { font-size: 11px; }
-    .fs-12 { font-size: 12px; }
-    .fs-13 { font-size: 13px; }
-    
-    .transition-all { transition: all 0.3s ease; }
-    .hover-underline:hover { text-decoration: underline !important; }
-</style>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var form = document.getElementById('transactions-filter-form');
+    var wrapper = document.getElementById('transactions-table-wrapper');
+    if (!form || !wrapper) return;
+
+    function fetchTransactions(url) {
+        wrapper.style.opacity = '0.5';
+        wrapper.style.pointerEvents = 'none';
+
+        fetch(url, {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(function(res) { return res.text(); })
+        .then(function(html) {
+            var parser = new DOMParser();
+            var doc = parser.parseFromString(html, 'text/html');
+            var newWrapper = doc.getElementById('transactions-table-wrapper');
+            if (newWrapper) {
+                wrapper.innerHTML = newWrapper.innerHTML;
+            }
+            wrapper.style.opacity = '1';
+            wrapper.style.pointerEvents = 'auto';
+
+            bindPaginationLinks();
+            window.history.pushState(null, '', url);
+        })
+        .catch(function(err) {
+            wrapper.style.opacity = '1';
+            wrapper.style.pointerEvents = 'auto';
+            window.showBillingToast('{{ __("messages.error_occurred") ?? "حدث خطأ أثناء تحميل البيانات" }}', 'danger');
+        });
+    }
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        var params = new URLSearchParams(new FormData(form)).toString();
+        var url = form.action + (params ? '?' + params : '');
+        fetchTransactions(url);
+    });
+
+    function bindPaginationLinks() {
+        var links = wrapper.querySelectorAll('.pagination a');
+        links.forEach(function(link) {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                var href = this.getAttribute('href');
+                if (href) fetchTransactions(href);
+            });
+        });
+    }
+
+    bindPaginationLinks();
+
+    window.addEventListener('popstate', function() {
+        fetchTransactions(window.location.href);
+    });
+});
+</script>
 @endpush

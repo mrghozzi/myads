@@ -1,45 +1,35 @@
 @extends('admin::layouts.admin')
 
-@section('title', __('messages.billing_orders_title'))
-@section('admin_shell_header_mode', 'hidden')
+@section('title', __('messages.billing_orders_title') ?? 'طلبات الفوترة')
 
 @section('content')
-<!-- Superdesign Header -->
-<div class="row g-0 align-items-center mb-4">
-    <div class="col-12 px-4">
-        <div class="card border-0 shadow-lg overflow-hidden position-relative" style="border-radius: 24px; background: linear-gradient(135deg, #6366f1 0%, #4338ca 100%);">
-            <div class="position-absolute top-0 end-0 p-5 opacity-10">
-                <i class="fa-solid fa-file-invoice-dollar" style="font-size: 160px; transform: rotate(-15deg);"></i>
-            </div>
-            
-            <div class="card-body p-5 position-relative z-index-1">
-                <div class="row align-items-center">
-                    <div class="col-lg-8 text-white">
-                        <div class="d-flex align-items-center mb-3">
-                            <span class="badge bg-white text-primary rounded-pill px-3 py-1 fw-bold fs-12 text-uppercase tracking-wider shadow-sm">
-                                {{ __('messages.billing_admin_eyebrow') }}
-                            </span>
-                        </div>
-                        <h1 class="display-5 fw-black mb-3 animate__animated animate__fadeIn">
-                            {{ __('messages.billing_orders_title') }}
-                        </h1>
-                        <p class="lead opacity-80 mb-0 animate__animated animate__fadeIn animate__delay-1s">
-                            {{ __('messages.billing_orders_help') }}
-                        </p>
-                    </div>
-                </div>
+<div class="admin-page">
+    {{-- Superdesign Hero --}}
+    <section class="admin-hero">
+        <div class="admin-hero__content">
+            <ul class="admin-breadcrumb">
+                <li><a href="{{ route('admin.index') }}">{{ __('messages.dashboard') ?? 'لوحة التحكم' }}</a></li>
+                <li><a href="{{ route('admin.billing.overview') }}">{{ __('messages.billing_feature_title') ?? 'الفوترة' }}</a></li>
+                <li>{{ __('messages.billing_orders_tab') ?? 'الطلبات' }}</li>
+            </ul>
+            <div class="admin-hero__eyebrow">{{ __('messages.billing_admin_eyebrow') ?? 'مساحة عمل الإيرادات' }}</div>
+            <h1 class="admin-hero__title">{{ __('messages.billing_orders_title') ?? 'طلبات الفوترة والاشتراكات' }}</h1>
+            <p class="admin-hero__copy">{{ __('messages.billing_orders_help') ?? 'تتبع كل عملية دفع وتحويل وكافة قرارات المراجعة اليدوية.' }}</p>
+        </div>
+        <div class="admin-hero__actions">
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+                <span class="badge bg-soft-primary text-primary border border-primary border-opacity-25 rounded-pill px-3 py-2 fw-bold fs-12">
+                    <i class="feather-shopping-bag me-1"></i>
+                    {{ $orders->total() }} {{ __('messages.billing_orders_tab') ?? 'طلب' }}
+                </span>
             </div>
         </div>
-    </div>
-</div>
+    </section>
 
-<div class="main-content container-lg px-4 pb-5">
-    <div class="card border-0 shadow-sm mb-4" style="border-radius: 20px; backdrop-filter: blur(10px); background: rgba(var(--nxl-white-rgb), 0.8);">
-        <div class="card-body p-2">
-            @include('admin::admin.billing.partials.nav', ['currentTab' => 'orders'])
-        </div>
-    </div>
+    {{-- Billing Navigation Tabs --}}
+    @include('admin::admin.billing.partials.nav', ['currentTab' => 'orders'])
 
+    {{-- Alerts & Toasts --}}
     @include('admin::admin.billing.partials.alerts')
 
     @if(!empty($upgradeNotice))
@@ -49,69 +39,111 @@
     @endif
 
     @if($featureAvailable)
-        <div class="card border-0 shadow-sm mb-4" style="border-radius: 20px; background: rgba(var(--nxl-white-rgb), 0.8);">
-            <div class="card-header bg-transparent border-0 p-4 pb-3 border-bottom border-soft-light d-flex flex-wrap align-items-center justify-content-between gap-3">
-                <div>
-                    <div class="text-uppercase tracking-wider fw-bold text-muted mb-1 fs-11">{{ __('messages.billing_orders_tab') }}</div>
-                    <h4 class="fw-bold mb-0 text-dark">{{ __('messages.billing_orders_title') }}</h4>
+        {{-- Filter Toolbar --}}
+        <div class="admin-toolbar-card mb-4">
+            <form id="orders-filter-form" method="GET" action="{{ route('admin.billing.orders') }}" class="d-flex flex-wrap align-items-center gap-2 w-100">
+                <div class="input-group" style="min-width: 220px; flex: 1 1 240px;">
+                    <span class="input-group-text bg-white border-end-0 text-muted" style="border-radius: 12px 0 0 12px;">
+                        <i class="feather-search"></i>
+                    </span>
+                    <input type="text" name="search" id="orders-search-input" class="form-control border-start-0" value="{{ $search }}" placeholder="{{ __('messages.search_placeholder') ?? 'ابحث برقم الطلب أو المستخدم...' }}" style="border-radius: 0 12px 12px 0;">
                 </div>
-                <form method="GET" action="{{ route('admin.billing.orders') }}" class="d-flex flex-wrap align-items-center gap-2">
-                    <div class="input-group" style="width: auto;">
-                        <input type="text" name="search" class="form-control border-soft-light bg-light" value="{{ $search }}" placeholder="{{ __('messages.search_placeholder') }}" style="border-radius: 10px 0 0 10px;">
-                    </div>
-                    <select name="status" class="form-select border-soft-light bg-light" style="width: auto; border-radius: 10px;">
-                        <option value="">{{ __('messages.billing_all_statuses') }}</option>
+
+                <div style="min-width: 170px;">
+                    <select name="status" id="orders-status-select" class="form-select" style="border-radius: 12px;">
+                        <option value="">{{ __('messages.billing_all_statuses') ?? 'جميع الحالات' }}</option>
                         @foreach(['paid', 'pending_checkout', 'pending_receipt', 'pending_review', 'rejected', 'failed', 'cancelled'] as $statusOption)
                             <option value="{{ $statusOption }}" @selected($status === $statusOption)>
-                                {{ __('messages.billing_status_' . $statusOption) }}
+                                {{ __('messages.billing_status_' . $statusOption) ?? $statusOption }}
                             </option>
                         @endforeach
                     </select>
-                    <select name="gateway" class="form-select border-soft-light bg-light" style="width: auto; border-radius: 10px;">
-                        <option value="">{{ __('messages.billing_all_gateways') }}</option>
+                </div>
+
+                <div style="min-width: 170px;">
+                    <select name="gateway" id="orders-gateway-select" class="form-select" style="border-radius: 12px;">
+                        <option value="">{{ __('messages.billing_all_gateways') ?? 'جميع البوابات' }}</option>
                         @foreach($gateways as $gatewayDefinition)
                             <option value="{{ $gatewayDefinition['key'] }}" @selected($gateway === $gatewayDefinition['key'])>
                                 {{ $gatewayDefinition['label'] }}
                             </option>
                         @endforeach
                     </select>
-                    <button type="submit" class="btn btn-primary fw-bold shadow-sm px-3" style="border-radius: 10px;">
-                        <i class="feather-search"></i>
-                    </button>
-                </form>
-            </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-borderless align-middle mb-0">
-                        <thead class="text-uppercase fs-11 fw-bold text-muted bg-soft-light">
+                </div>
+
+                <button type="submit" id="btn-filter-orders" class="btn btn-primary fw-bold shadow-sm d-inline-flex align-items-center gap-2" style="border-radius: 12px; padding: 0.6rem 1.25rem;">
+                    <i class="feather-filter"></i>
+                    <span>{{ __('messages.filter') ?? 'تصفية' }}</span>
+                </button>
+
+                @if($search !== '' || $status !== '' || $gateway !== '')
+                    <a href="{{ route('admin.billing.orders') }}" class="btn btn-light fw-bold text-muted d-inline-flex align-items-center gap-1 shadow-sm" style="border-radius: 12px; border: 1px solid var(--admin-premium-border);">
+                        <i class="feather-x"></i>
+                        <span>{{ __('messages.reset') ?? 'إعادة تعيين' }}</span>
+                    </a>
+                @endif
+            </form>
+        </div>
+
+        {{-- Orders Table Container --}}
+        <div id="orders-table-wrapper" class="admin-panel transition-all">
+            <div class="admin-panel__body p-0">
+                <div class="admin-table-wrap">
+                    <table class="table admin-table align-middle mb-0">
+                        <thead>
                             <tr>
-                                <th class="ps-4 py-3">{{ __('messages.billing_order_number_label') }}</th>
-                                <th class="py-3">{{ __('messages.user') }}</th>
-                                <th class="py-3">{{ __('messages.plan') }}</th>
-                                <th class="py-3">{{ __('messages.gateway') }}</th>
-                                <th class="py-3">{{ __('messages.amount') }}</th>
-                                <th class="py-3">{{ __('messages.status') }}</th>
-                                <th class="py-3">{{ __('messages.date') }}</th>
-                                <th class="pe-4 py-3 text-end">{{ __('messages.actions') }}</th>
+                                <th class="ps-4">{{ __('messages.billing_order_number_label') ?? 'رقم الطلب' }}</th>
+                                <th>{{ __('messages.user') ?? 'المستخدم' }}</th>
+                                <th>{{ __('messages.plan') ?? 'الخطة' }}</th>
+                                <th>{{ __('messages.gateway') ?? 'البوابة' }}</th>
+                                <th>{{ __('messages.amount') ?? 'المبلغ' }}</th>
+                                <th>{{ __('messages.status') ?? 'الحالة' }}</th>
+                                <th>{{ __('messages.date') ?? 'التاريخ' }}</th>
+                                <th class="pe-4 text-end">{{ __('messages.actions') ?? 'الإجراءات' }}</th>
                             </tr>
                         </thead>
-                        <tbody class="fs-13">
+                        <tbody id="orders-table-body">
                             @forelse($orders as $order)
-                                <tr class="hover-bg-light transition-all border-bottom border-soft-light">
+                                <tr class="transition-all">
                                     <td class="ps-4 fw-bold">
-                                        <a href="{{ route('admin.billing.orders.show', $order->id) }}" class="text-primary text-decoration-none hover-underline">
-                                            {{ $order->order_number }}
-                                        </a>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <a href="{{ route('admin.billing.orders.show', $order->id) }}" class="text-primary text-decoration-none">
+                                                {{ $order->order_number }}
+                                            </a>
+                                            <button type="button" class="btn btn-sm btn-link text-muted p-0 shadow-none" onclick="window.copyBillingText('{{ $order->order_number }}', this);" title="نسخ رقم الطلب">
+                                                <i class="feather-copy" style="font-size: 13px;"></i>
+                                            </button>
+                                        </div>
                                     </td>
-                                    <td class="fw-semibold text-dark">{{ $order->user->username ?? ('#' . $order->user_id) }}</td>
-                                    <td class="text-muted">{{ data_get($order->plan_snapshot, 'name', __('messages.billing_subscription_plan')) }}</td>
-                                    <td class="text-muted">{{ data_get($order->meta, 'gateway_label', $order->gatewayLabel()) }}</td>
-                                    <td class="fw-bold">{{ number_format((float) $order->display_amount, 2) }} <span class="text-muted fw-normal ms-1">{{ $order->currency_code }}</span></td>
-                                    <td>@include('admin::admin.billing.partials.status_badge', ['status' => $order->status])</td>
-                                    <td class="text-muted">{{ optional($order->created_at)->format('Y-m-d H:i') }}</td>
+                                    <td class="fw-semibold text-dark">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <div class="bg-soft-primary text-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 30px; height: 30px; font-size: 11px;">
+                                                {{ strtoupper(substr($order->user->username ?? 'U', 0, 1)) }}
+                                            </div>
+                                            <span>{{ $order->user->username ?? ('#' . $order->user_id) }}</span>
+                                        </div>
+                                    </td>
+                                    <td class="text-muted">{{ data_get($order->plan_snapshot, 'name', __('messages.billing_subscription_plan') ?? 'خطة اشتراك') }}</td>
+                                    <td>
+                                        <span class="d-inline-flex align-items-center gap-1 text-dark fs-13">
+                                            <i class="feather-credit-card text-muted"></i>
+                                            <span>{{ data_get($order->meta, 'gateway_label', $order->gatewayLabel()) }}</span>
+                                        </span>
+                                    </td>
+                                    <td class="fw-bold text-dark fs-14">
+                                        {{ $order->display_amount }}
+                                        <span class="text-muted fw-normal fs-11 ms-1">{{ $order->currency_code }}</span>
+                                    </td>
+                                    <td>
+                                        @include('admin::admin.billing.partials.status_badge', ['status' => $order->status])
+                                    </td>
+                                    <td class="text-muted fs-12">
+                                        {{ optional($order->created_at)->format('Y-m-d H:i') }}
+                                    </td>
                                     <td class="pe-4 text-end">
-                                        <a href="{{ route('admin.billing.orders.show', $order->id) }}" class="btn btn-sm btn-light fw-bold shadow-sm" style="border-radius: 8px;">
-                                            <i class="feather-eye me-1"></i> {{ __('messages.view') }}
+                                        <a href="{{ route('admin.billing.orders.show', $order->id) }}" class="btn btn-sm btn-light fw-bold text-dark shadow-sm d-inline-flex align-items-center gap-1" style="border-radius: 8px; border: 1px solid var(--admin-premium-border);">
+                                            <i class="feather-eye"></i>
+                                            <span>{{ __('messages.details') ?? 'التفاصيل' }}</span>
                                         </a>
                                     </td>
                                 </tr>
@@ -119,10 +151,10 @@
                                 <tr>
                                     <td colspan="8" class="text-center text-muted py-5">
                                         <div class="d-flex flex-column align-items-center">
-                                            <div class="bg-soft-secondary rounded-circle d-flex align-items-center justify-content-center mb-3" style="width: 64px; height: 64px;">
-                                                <i class="feather-inbox fs-3 text-secondary"></i>
+                                            <div class="bg-soft-secondary text-secondary rounded-circle d-flex align-items-center justify-content-center mb-3" style="width: 56px; height: 56px;">
+                                                <i class="feather-inbox fs-3"></i>
                                             </div>
-                                            <span class="fw-semibold">{{ __('messages.no_data') }}</span>
+                                            <span class="fw-semibold">{{ __('messages.no_data') ?? 'لا توجد طلبات تطابق هذا البحث' }}</span>
                                         </div>
                                     </td>
                                 </tr>
@@ -131,8 +163,9 @@
                     </table>
                 </div>
             </div>
+
             @if($orders->hasPages())
-                <div class="card-footer bg-transparent border-top border-soft-light p-4">
+                <div class="admin-panel__footer d-flex justify-content-center p-3" id="orders-pagination-container">
                     {{ $orders->links('pagination::bootstrap-5') }}
                 </div>
             @endif
@@ -142,16 +175,84 @@
 @endsection
 
 @push('scripts')
-<style>
-    .tracking-wider { letter-spacing: 0.05em; }
-    .fw-black { font-weight: 900; }
-    .opacity-10 { opacity: 0.1; }
-    .opacity-80 { opacity: 0.8; }
-    .z-index-1 { z-index: 1; }
-    .fs-11 { font-size: 11px; }
-    .fs-13 { font-size: 13px; }
-    
-    .transition-all { transition: all 0.3s ease; }
-    .hover-underline:hover { text-decoration: underline !important; }
-</style>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var form = document.getElementById('orders-filter-form');
+    var wrapper = document.getElementById('orders-table-wrapper');
+    if (!form || !wrapper) return;
+
+    function fetchOrders(url) {
+        wrapper.style.opacity = '0.5';
+        wrapper.style.pointerEvents = 'none';
+
+        fetch(url, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(function(res) {
+            return res.text();
+        })
+        .then(function(html) {
+            var parser = new DOMParser();
+            var doc = parser.parseFromString(html, 'text/html');
+            var newWrapper = doc.getElementById('orders-table-wrapper');
+            if (newWrapper) {
+                wrapper.innerHTML = newWrapper.innerHTML;
+            }
+            wrapper.style.opacity = '1';
+            wrapper.style.pointerEvents = 'auto';
+
+            // Bind pagination clicks in new content
+            bindPaginationLinks();
+
+            window.history.pushState(null, '', url);
+        })
+        .catch(function(err) {
+            wrapper.style.opacity = '1';
+            wrapper.style.pointerEvents = 'auto';
+            window.showBillingToast('{{ __("messages.error_occurred") ?? "حدث خطأ أثناء تحميل البيانات" }}', 'danger');
+        });
+    }
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        var params = new URLSearchParams(new FormData(form)).toString();
+        var url = form.action + (params ? '?' + params : '');
+        fetchOrders(url);
+    });
+
+    var statusSelect = document.getElementById('orders-status-select');
+    var gatewaySelect = document.getElementById('orders-gateway-select');
+    if (statusSelect) {
+        statusSelect.addEventListener('change', function() {
+            form.dispatchEvent(new Event('submit'));
+        });
+    }
+    if (gatewaySelect) {
+        gatewaySelect.addEventListener('change', function() {
+            form.dispatchEvent(new Event('submit'));
+        });
+    }
+
+    function bindPaginationLinks() {
+        var links = wrapper.querySelectorAll('.pagination a');
+        links.forEach(function(link) {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                var href = this.getAttribute('href');
+                if (href) {
+                    fetchOrders(href);
+                }
+            });
+        });
+    }
+
+    bindPaginationLinks();
+
+    window.addEventListener('popstate', function() {
+        fetchOrders(window.location.href);
+    });
+});
+</script>
 @endpush
