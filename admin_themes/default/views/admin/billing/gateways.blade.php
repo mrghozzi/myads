@@ -127,8 +127,8 @@
                                         <div class="col-md-4">
                                             <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">{{ __('messages.mode') ?? 'بيئة التشغيل' }}</label>
                                             <select name="mode" class="form-select" style="border-radius: 10px;">
-                                                <option value="sandbox" @selected(($config['mode'] ?? 'sandbox') === 'sandbox')>Sandbox (تجريبي)</option>
-                                                <option value="live" @selected(($config['mode'] ?? 'sandbox') === 'live')>Live (إنتاجي مباشر)</option>
+                                                <option value="sandbox" @selected(($config['mode'] ?? 'sandbox') === 'sandbox')>{{ __('messages.sandbox_mode') ?? 'Sandbox (تجريبي)' }}</option>
+                                                <option value="live" @selected(($config['mode'] ?? 'sandbox') === 'live')>{{ __('messages.live_mode') ?? 'Live (إنتاجي مباشر)' }}</option>
                                             </select>
                                         </div>
                                         <div class="col-md-8">
@@ -149,8 +149,8 @@
                                         <div class="col-md-4">
                                             <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">{{ __('messages.mode') ?? 'بيئة التشغيل' }}</label>
                                             <select name="mode" class="form-select" style="border-radius: 10px;">
-                                                <option value="sandbox" @selected(($config['mode'] ?? 'sandbox') === 'sandbox')>Sandbox (تجريبي)</option>
-                                                <option value="live" @selected(($config['mode'] ?? 'sandbox') === 'live')>Live (إنتاجي مباشر)</option>
+                                                <option value="sandbox" @selected(($config['mode'] ?? 'sandbox') === 'sandbox')>{{ __('messages.sandbox_mode') ?? 'Sandbox (تجريبي)' }}</option>
+                                                <option value="live" @selected(($config['mode'] ?? 'sandbox') === 'live')>{{ __('messages.live_mode') ?? 'Live (إنتاجي مباشر)' }}</option>
                                             </select>
                                         </div>
                                         <div class="col-md-8">
@@ -170,29 +170,29 @@
                                     @elseif($gateway['key'] === 'bank_transfer')
                                         <div class="col-12">
                                             <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">{{ __('messages.billing_bank_transfer_instructions_label') ?? 'تعليمات التحويل البنكي (تظهر للعميل)' }}</label>
-                                            <textarea name="instructions" class="form-control" rows="4" placeholder="اسم البنك، رقم الحساب، الآيبان IBAN، واسم المستفيد..." style="border-radius: 10px;">{{ old('instructions', $config['instructions'] ?? '') }}</textarea>
+                                            <textarea name="instructions" class="form-control" rows="4" placeholder="{{ __('messages.billing_bank_transfer_instructions_placeholder') ?? 'اسم البنك، رقم الحساب، الآيبان IBAN، واسم المستفيد...' }}" style="border-radius: 10px;">{{ old('instructions', $config['instructions'] ?? '') }}</textarea>
                                         </div>
                                         <div class="col-12">
                                             <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">{{ __('messages.billing_bank_transfer_note_label') ?? 'ملاحظة توجيهية إضافية' }}</label>
-                                            <textarea name="note" class="form-control" rows="2" placeholder="مثال: يرجى كتابة رقم الطلب في سبب التحويل ورفع الإيصال بعد الإتمام." style="border-radius: 10px;">{{ old('note', $config['note'] ?? '') }}</textarea>
+                                            <textarea name="note" class="form-control" rows="2" placeholder="{{ __('messages.billing_bank_transfer_note_placeholder') ?? 'مثال: يرجى كتابة رقم الطلب في سبب التحويل ورفع الإيصال بعد الإتمام.' }}" style="border-radius: 10px;">{{ old('note', $config['note'] ?? '') }}</textarea>
                                         </div>
 
                                     {{-- Lemon Squeezy --}}
                                     @elseif($gateway['key'] === 'lemon_squeezy')
                                         <div class="col-md-6">
-                                            <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">Store ID</label>
+                                            <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">{{ __('messages.billing_store_id_label') ?? 'Store ID' }}</label>
                                             <input type="text" name="store_id" class="form-control font-monospace" value="{{ old('store_id', $config['store_id'] ?? '') }}" style="border-radius: 10px;">
                                         </div>
                                         <div class="col-md-6">
-                                            <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">Default Variant ID</label>
+                                            <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">{{ __('messages.billing_variant_id_label') ?? 'Default Variant ID' }}</label>
                                             <input type="text" name="variant_id" class="form-control font-monospace" value="{{ old('variant_id', $config['variant_id'] ?? '') }}" style="border-radius: 10px;">
                                         </div>
                                         <div class="col-md-6">
-                                            <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">API Key</label>
+                                            <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">{{ __('messages.billing_api_key_label') ?? 'API Key' }}</label>
                                             <input type="password" name="api_key" class="form-control font-monospace" value="{{ old('api_key', $config['api_key'] ?? '') }}" style="border-radius: 10px;">
                                         </div>
                                         <div class="col-md-6">
-                                            <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">Webhook Secret</label>
+                                            <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">{{ __('messages.billing_webhook_secret_label') ?? 'Webhook Secret' }}</label>
                                             <input type="password" name="webhook_secret" class="form-control font-monospace" value="{{ old('webhook_secret', $config['webhook_secret'] ?? '') }}" style="border-radius: 10px;">
                                         </div>
 
@@ -201,20 +201,20 @@
                                         <div class="col-md-4">
                                             <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">{{ __('messages.mode') ?? 'بيئة التشغيل' }}</label>
                                             <select name="mode" class="form-select" style="border-radius: 10px;">
-                                                <option value="sandbox" @selected(($config['mode'] ?? 'sandbox') === 'sandbox')>Sandbox</option>
-                                                <option value="live" @selected(($config['mode'] ?? 'sandbox') === 'live')>Live</option>
+                                                <option value="sandbox" @selected(($config['mode'] ?? 'sandbox') === 'sandbox')>{{ __('messages.sandbox_mode') ?? 'Sandbox' }}</option>
+                                                <option value="live" @selected(($config['mode'] ?? 'sandbox') === 'live')>{{ __('messages.live_mode') ?? 'Live' }}</option>
                                             </select>
                                         </div>
                                         <div class="col-md-8">
-                                            <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">API Key</label>
+                                            <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">{{ __('messages.billing_api_key_label') ?? 'API Key' }}</label>
                                             <input type="password" name="api_key" class="form-control font-monospace" value="{{ old('api_key', $config['api_key'] ?? '') }}" style="border-radius: 10px;">
                                         </div>
                                         <div class="col-md-6">
-                                            <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">Default Price ID</label>
+                                            <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">{{ __('messages.billing_price_id_label') ?? 'Default Price ID' }}</label>
                                             <input type="text" name="price_id" class="form-control font-monospace" value="{{ old('price_id', $config['price_id'] ?? '') }}" style="border-radius: 10px;">
                                         </div>
                                         <div class="col-md-6">
-                                            <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">Webhook Secret</label>
+                                            <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">{{ __('messages.billing_webhook_secret_label') ?? 'Webhook Secret' }}</label>
                                             <input type="password" name="webhook_secret" class="form-control font-monospace" value="{{ old('webhook_secret', $config['webhook_secret'] ?? '') }}" style="border-radius: 10px;">
                                         </div>
 
@@ -223,31 +223,31 @@
                                         <div class="col-md-4">
                                             <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">{{ __('messages.region') ?? 'المنطقة' }}</label>
                                             <select name="region" class="form-select" style="border-radius: 10px;">
-                                                <option value="UAE" @selected(($config['region'] ?? 'UAE') === 'UAE')>الإمارات (UAE)</option>
-                                                <option value="KSA" @selected(($config['region'] ?? 'UAE') === 'KSA')>السعودية (KSA)</option>
+                                                <option value="UAE" @selected(($config['region'] ?? 'UAE') === 'UAE')>{{ __('messages.uae_region') ?? 'الإمارات (UAE)' }}</option>
+                                                <option value="KSA" @selected(($config['region'] ?? 'UAE') === 'KSA')>{{ __('messages.ksa_region') ?? 'السعودية (KSA)' }}</option>
                                             </select>
                                         </div>
                                         <div class="col-md-8">
-                                            <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">Public Key</label>
+                                            <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">{{ __('messages.billing_public_key_label') ?? 'Public Key' }}</label>
                                             <input type="text" name="public_key" class="form-control font-monospace" value="{{ old('public_key', $config['public_key'] ?? '') }}" style="border-radius: 10px;">
                                         </div>
                                         <div class="col-md-6">
-                                            <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">Secret Key</label>
+                                            <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">{{ __('messages.billing_secret_key_label') ?? 'Secret Key' }}</label>
                                             <input type="password" name="secret_key" class="form-control font-monospace" value="{{ old('secret_key', $config['secret_key'] ?? '') }}" style="border-radius: 10px;">
                                         </div>
                                         <div class="col-md-6">
-                                            <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">Merchant Code</label>
+                                            <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">{{ __('messages.billing_merchant_code_label') ?? 'Merchant Code' }}</label>
                                             <input type="text" name="merchant_code" class="form-control font-monospace" value="{{ old('merchant_code', $config['merchant_code'] ?? '') }}" style="border-radius: 10px;">
                                         </div>
 
                                     {{-- Flouci --}}
                                     @elseif($gateway['key'] === 'flouci')
                                         <div class="col-md-6">
-                                            <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">Public Key (App Token)</label>
+                                            <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">{{ __('messages.billing_flouci_app_token_label') ?? 'Public Key (App Token)' }}</label>
                                             <input type="text" name="public_key" class="form-control font-monospace" value="{{ old('public_key', $config['public_key'] ?? '') }}" style="border-radius: 10px;">
                                         </div>
                                         <div class="col-md-6">
-                                            <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">Secret Key (App Secret)</label>
+                                            <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">{{ __('messages.billing_flouci_app_secret_label') ?? 'Secret Key (App Secret)' }}</label>
                                             <input type="password" name="secret_key" class="form-control font-monospace" value="{{ old('secret_key', $config['secret_key'] ?? '') }}" style="border-radius: 10px;">
                                         </div>
 
@@ -256,12 +256,12 @@
                                         <div class="col-md-4">
                                             <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">{{ __('messages.mode') ?? 'بيئة التشغيل' }}</label>
                                             <select name="mode" class="form-select" style="border-radius: 10px;">
-                                                <option value="sandbox" @selected(($config['mode'] ?? 'sandbox') === 'sandbox')>Sandbox (محاكاة)</option>
-                                                <option value="live" @selected(($config['mode'] ?? 'sandbox') === 'live')>Live</option>
+                                                <option value="sandbox" @selected(($config['mode'] ?? 'sandbox') === 'sandbox')>{{ __('messages.sandbox_simulation_mode') ?? 'Sandbox (محاكاة)' }}</option>
+                                                <option value="live" @selected(($config['mode'] ?? 'sandbox') === 'live')>{{ __('messages.live_mode') ?? 'Live' }}</option>
                                             </select>
                                         </div>
                                         <div class="col-md-8">
-                                            <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">Merchant ID</label>
+                                            <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">{{ __('messages.billing_merchant_id_label') ?? 'Merchant ID' }}</label>
                                             <input type="text" name="merchant_id" class="form-control font-monospace" value="{{ old('merchant_id', $config['merchant_id'] ?? '') }}" placeholder="merchant.com.example" style="border-radius: 10px;">
                                         </div>
                                     @endif

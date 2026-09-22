@@ -315,7 +315,7 @@ class AdminBillingController extends Controller
         $orderModel = BillingOrder::query()->findOrFail($order);
 
         if ($orderModel->gateway !== 'lemon_squeezy' || $orderModel->status !== BillingOrder::STATUS_PENDING_CHECKOUT) {
-            $errMsg = 'This order cannot be synced manually.';
+            $errMsg = __('messages.billing_order_sync_unavailable');
             if ($request->ajax() || $request->wantsJson()) {
                 return response()->json(['success' => false, 'message' => $errMsg], 422);
             }
@@ -335,7 +335,7 @@ class AdminBillingController extends Controller
             ]
         ]);
 
-        $successMsg = 'تم محاكاة نجاح الدفع وتغيير حالة الطلب إلى مدفوع للاختبار المحلي.';
+        $successMsg = __('messages.billing_simulate_payment_success');
         if ($request->ajax() || $request->wantsJson()) {
             return response()->json([
                 'success' => true,

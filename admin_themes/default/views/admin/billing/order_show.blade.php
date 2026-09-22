@@ -17,7 +17,7 @@
             <h1 class="admin-hero__title d-flex align-items-center gap-2 flex-wrap">
                 <span>{{ $order?->order_number ?? (__('messages.billing_order_details_title') ?? 'تفاصيل الطلب') }}</span>
                 @if($order)
-                    <button type="button" class="btn btn-sm btn-light border shadow-sm rounded-circle d-flex align-items-center justify-content-center" style="width: 34px; height: 34px;" onclick="window.copyBillingText('{{ $order->order_number }}', this);" title="نسخ رقم الطلب">
+                    <button type="button" class="btn btn-sm btn-light border shadow-sm rounded-circle d-flex align-items-center justify-content-center" style="width: 34px; height: 34px;" onclick="window.copyBillingText('{{ $order->order_number }}', this);" title="{{ __('messages.copy_order_number') ?? 'نسخ رقم الطلب' }}">
                         <i class="feather-copy text-muted"></i>
                     </button>
                 @endif
@@ -127,7 +127,7 @@
                                         </div>
                                         <div class="text-muted small fs-12">
                                             {{ number_format((float) $order->base_amount, 2) }} {{ $order->base_currency_code }}
-                                            (سعر الصرف: {{ number_format((float) $order->exchange_rate_snapshot, 4) }})
+                                            ({{ __('messages.billing_exchange_rate_label') ?? 'سعر الصرف' }}: {{ number_format((float) $order->exchange_rate_snapshot, 4) }})
                                         </div>
                                     </div>
                                 </div>
@@ -284,19 +284,19 @@
                     <div id="developer-tools-card" class="admin-panel mb-4" style="background: rgba(97, 93, 250, 0.06); border: 1px solid var(--admin-premium-border-strong);">
                         <div class="admin-panel__header">
                             <div>
-                                <div class="admin-panel__eyebrow text-primary">أدوات التطوير (محلياً)</div>
-                                <h3 class="admin-panel__title">محاكاة إتمام الدفع (Webhook)</h3>
+                                <div class="admin-panel__eyebrow text-primary">{{ __('messages.billing_dev_tools_eyebrow') ?? 'أدوات التطوير (محلياً)' }}</div>
+                                <h3 class="admin-panel__title">{{ __('messages.billing_simulate_webhook_title') ?? 'محاكاة إتمام الدفع (Webhook)' }}</h3>
                             </div>
                         </div>
                         <div class="admin-panel__body p-4">
                             <p class="text-muted fs-12 mb-3">
-                                عند الاختبار المحلي دون توفر Webhook خارجي متصل، يمكنك الضغط هنا لمحاكاة تأكيد الدفع بنجاح وترقية حالة الطلب والاشتراك فورياً.
+                                {{ __('messages.billing_simulate_webhook_desc') ?? 'عند الاختبار المحلي دون توفر Webhook خارجي متصل، يمكنك الضغط هنا لمحاكاة تأكيد الدفع بنجاح وترقية حالة الطلب والاشتراك فورياً.' }}
                             </p>
                             <form id="simulate-lemon-form" action="{{ route('admin.billing.orders.simulate_lemon_squeezy', $order->id ?? 0) }}" method="POST">
                                 @csrf
                                 <button type="submit" id="btn-simulate-lemon" class="btn btn-primary fw-bold w-100 shadow-sm d-inline-flex align-items-center justify-content-center gap-2" style="border-radius: 12px; padding: 0.75rem 1.25rem;">
                                     <i class="feather-check-circle fs-5"></i>
-                                    <span>تأكيد الدفع (محاكاة محلية عبر AJAX)</span>
+                                    <span>{{ __('messages.billing_simulate_webhook_btn') ?? 'تأكيد الدفع (محاكاة محلية عبر AJAX)' }}</span>
                                 </button>
                             </form>
                         </div>
@@ -318,7 +318,7 @@
 
                             @if(!empty($bankTransferConfig['instructions']))
                                 <div class="p-3 rounded-3 mb-3 text-muted fs-12 lh-base" style="background: var(--admin-premium-surface-alt); border: 1px solid var(--admin-premium-border);">
-                                    <strong class="d-block text-dark mb-1">تعليمات التحويل المعتمدة:</strong>
+                                    <strong class="d-block text-dark mb-1">{{ __('messages.billing_approved_transfer_instructions') ?? 'تعليمات التحويل المعتمدة' }}:</strong>
                                     {!! nl2br(e((string) $bankTransferConfig['instructions'])) !!}
                                 </div>
                             @endif
@@ -331,7 +331,7 @@
                                             <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">
                                                 {{ __('messages.billing_admin_note_label') ?? 'ملاحظة الإدارة' }}
                                             </label>
-                                            <textarea id="review-admin-note-input" name="admin_note" class="form-control" rows="3" placeholder="أدخل أي ملاحظات ترغب في توثيقها مع هذا القرار..." style="border-radius: 10px;">{{ old('admin_note', $order->admin_note) }}</textarea>
+                                            <textarea id="review-admin-note-input" name="admin_note" class="form-control" rows="3" placeholder="{{ __('messages.billing_admin_note_placeholder') ?? 'أدخل أي ملاحظات ترغب في توثيقها مع هذا القرار...' }}" style="border-radius: 10px;">{{ old('admin_note', $order->admin_note) }}</textarea>
                                         </div>
 
                                         <div class="d-flex gap-2 flex-wrap">
@@ -450,10 +450,12 @@ function submitBankReview(actionType) {
             // Update Review section to show processed alert
             var reviewSection = document.getElementById('review-action-section');
             if (reviewSection) {
+                var msgApproved = '{{ __("messages.billing_order_processed_approved") ?? "تمت معالجة الطلب والموافقة عليه بنجاح." }}';
+                var msgRejected = '{{ __("messages.billing_order_processed_rejected") ?? "تمت معالجة الطلب ورفضه بنجاح." }}';
                 reviewSection.innerHTML = `
                     <div class="alert alert-light border d-flex align-items-center gap-2 mb-0 fw-semibold text-center justify-content-center py-3" style="border-radius: 12px; background: var(--admin-premium-surface-alt);">
                         <i class="feather-check-circle text-success"></i>
-                        <span>تمت معالجة الطلب بنجاح (${actionType === 'approve' ? 'مقبول' : 'مرفوض'}).</span>
+                        <span>${actionType === 'approve' ? msgApproved : msgRejected}</span>
                     </div>
                 `;
             }
@@ -487,7 +489,7 @@ document.addEventListener('DOMContentLoaded', function() {
         simForm.addEventListener('submit', function(e) {
             e.preventDefault();
             simBtn.disabled = true;
-            simBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> جاري المحاكاة...';
+            simBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span> ' + '{{ __("messages.simulating") ?? "جاري المحاكاة..." }}';
 
             var formData = new FormData(simForm);
             fetch(simForm.action, {
@@ -521,13 +523,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 } else {
                     simBtn.disabled = false;
-                    simBtn.innerHTML = '<i class="feather-check-circle fs-5"></i> <span>تأكيد الدفع (محاكاة محلية عبر AJAX)</span>';
-                    window.showBillingToast(result.data.message || 'فشلت المحاكاة', 'danger');
+                    simBtn.innerHTML = '<i class="feather-check-circle fs-5"></i> <span>{{ __("messages.billing_simulate_webhook_btn") ?? "تأكيد الدفع (محاكاة محلية عبر AJAX)" }}</span>';
+                    window.showBillingToast(result.data.message || '{{ __("messages.simulation_failed") ?? "فشلت المحاكاة" }}', 'danger');
                 }
             })
             .catch(function(err) {
                 simBtn.disabled = false;
-                simBtn.innerHTML = '<i class="feather-check-circle fs-5"></i> <span>تأكيد الدفع (محاكاة محلية عبر AJAX)</span>';
+                simBtn.innerHTML = '<i class="feather-check-circle fs-5"></i> <span>{{ __("messages.billing_simulate_webhook_btn") ?? "تأكيد الدفع (محاكاة محلية عبر AJAX)" }}</span>';
                 window.showBillingToast(err.message, 'danger');
             });
         });

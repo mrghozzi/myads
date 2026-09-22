@@ -110,7 +110,7 @@
                                             <a href="{{ route('admin.billing.orders.show', $order->id) }}" class="text-primary text-decoration-none">
                                                 {{ $order->order_number }}
                                             </a>
-                                            <button type="button" class="btn btn-sm btn-link text-muted p-0 shadow-none" onclick="window.copyBillingText('{{ $order->order_number }}', this);" title="نسخ رقم الطلب">
+                                            <button type="button" class="btn btn-sm btn-link text-muted p-0 shadow-none" onclick="window.copyBillingText('{{ $order->order_number }}', this);" title="{{ __('messages.copy_order_number') ?? 'نسخ رقم الطلب' }}">
                                                 <i class="feather-copy" style="font-size: 13px;"></i>
                                             </button>
                                         </div>

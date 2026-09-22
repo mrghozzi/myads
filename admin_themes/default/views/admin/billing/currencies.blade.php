@@ -160,21 +160,21 @@
                                     <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">
                                         {{ __('messages.code') ?? 'رمز العملة (ISO)' }} <span class="text-danger">*</span>
                                     </label>
-                                    <input type="text" id="currency-code-input" name="code" class="form-control font-monospace" value="{{ old('code', $editingCurrency->code ?? '') }}" required placeholder="مثال: SAR, USD, EUR" style="border-radius: 10px; text-transform: uppercase;">
+                                    <input type="text" id="currency-code-input" name="code" class="form-control font-monospace" value="{{ old('code', $editingCurrency->code ?? '') }}" required placeholder="{{ __('messages.billing_currency_code_placeholder') ?? 'مثال: SAR, USD, EUR' }}" style="border-radius: 10px; text-transform: uppercase;">
                                 </div>
 
                                 <div class="col-md-6">
                                     <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">
                                         {{ __('messages.name') ?? 'اسم العملة' }}
                                     </label>
-                                    <input type="text" name="name" class="form-control" value="{{ old('name', $editingCurrency->name ?? '') }}" placeholder="مثال: ريال سعودي" style="border-radius: 10px;">
+                                    <input type="text" name="name" class="form-control" value="{{ old('name', $editingCurrency->name ?? '') }}" placeholder="{{ __('messages.billing_currency_name_placeholder') ?? 'مثال: ريال سعودي' }}" style="border-radius: 10px;">
                                 </div>
 
                                 <div class="col-md-6">
                                     <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">
                                         {{ __('messages.symbol') ?? 'العلامة / الرمز المختصر' }}
                                     </label>
-                                    <input type="text" name="symbol" class="form-control" value="{{ old('symbol', $editingCurrency->symbol ?? '') }}" placeholder="مثال: ر.س أو $" style="border-radius: 10px;">
+                                    <input type="text" name="symbol" class="form-control" value="{{ old('symbol', $editingCurrency->symbol ?? '') }}" placeholder="{{ __('messages.billing_currency_symbol_placeholder') ?? 'مثال: ر.س أو $' }}" style="border-radius: 10px;">
                                 </div>
 
                                 <div class="col-md-6">

@@ -88,7 +88,7 @@
                                                 <a href="{{ route('admin.billing.orders.show', $transaction->order->id) }}" class="text-primary text-decoration-none">
                                                     {{ $transaction->order->order_number }}
                                                 </a>
-                                                <button type="button" class="btn btn-sm btn-link text-muted p-0 shadow-none" onclick="window.copyBillingText('{{ $transaction->order->order_number }}', this);" title="نسخ">
+                                                <button type="button" class="btn btn-sm btn-link text-muted p-0 shadow-none" onclick="window.copyBillingText('{{ $transaction->order->order_number }}', this);" title="{{ __('messages.copy') ?? 'نسخ' }}">
                                                     <i class="feather-copy" style="font-size: 11px;"></i>
                                                 </button>
                                             </div>
@@ -117,7 +117,7 @@
                                         @if($transaction->external_transaction_id)
                                             <span class="d-inline-flex align-items-center gap-1">
                                                 <span>{{ $transaction->external_transaction_id }}</span>
-                                                <button type="button" class="btn btn-sm btn-link text-muted p-0 shadow-none" onclick="window.copyBillingText('{{ $transaction->external_transaction_id }}', this);" title="نسخ المرجع">
+                                                <button type="button" class="btn btn-sm btn-link text-muted p-0 shadow-none" onclick="window.copyBillingText('{{ $transaction->external_transaction_id }}', this);" title="{{ __('messages.copy_reference') ?? 'نسخ المرجع' }}">
                                                     <i class="feather-copy" style="font-size: 11px;"></i>
                                                 </button>
                                             </span>

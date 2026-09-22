@@ -174,14 +174,14 @@
                                     <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">
                                         {{ __('messages.name') ?? 'اسم الخطة' }} <span class="text-danger">*</span>
                                     </label>
-                                    <input type="text" id="plan-name-input" name="name" class="form-control" value="{{ old('name', $editingPlan->name ?? '') }}" required placeholder="مثال: الخطة الاحترافية (Pro)" style="border-radius: 10px;">
+                                    <input type="text" id="plan-name-input" name="name" class="form-control" value="{{ old('name', $editingPlan->name ?? '') }}" required placeholder="{{ __('messages.billing_plan_name_placeholder') ?? 'مثال: الخطة الاحترافية (Pro)' }}" style="border-radius: 10px;">
                                 </div>
 
                                 <div class="col-12">
                                     <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">
                                         {{ __('messages.description') ?? 'الوصف' }}
                                     </label>
-                                    <textarea name="description" class="form-control" rows="2" placeholder="وصف مختصر لمزايا الخطة..." style="border-radius: 10px;">{{ old('description', $editingPlan->description ?? '') }}</textarea>
+                                    <textarea name="description" class="form-control" rows="2" placeholder="{{ __('messages.billing_plan_desc_placeholder') ?? 'وصف مختصر لمزايا الخطة...' }}" style="border-radius: 10px;">{{ old('description', $editingPlan->description ?? '') }}</textarea>
                                 </div>
 
                                 <div class="col-md-6">
@@ -208,7 +208,7 @@
                                     <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">
                                         {{ __('messages.billing_recommended_label') ?? 'نص التوصية (شارة)' }}
                                     </label>
-                                    <input type="text" name="recommended_text" class="form-control" value="{{ old('recommended_text', $editingPlan->recommended_text ?? '') }}" placeholder="مثال: الأكثر طلباً" style="border-radius: 10px;">
+                                    <input type="text" name="recommended_text" class="form-control" value="{{ old('recommended_text', $editingPlan->recommended_text ?? '') }}" placeholder="{{ __('messages.billing_recommended_badge_placeholder') ?? 'مثال: الأكثر طلباً' }}" style="border-radius: 10px;">
                                 </div>
 
                                 <div class="col-md-6">
@@ -225,7 +225,7 @@
                                     <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">
                                         {{ __('messages.billing_marketing_bullets_label') ?? 'نقاط تسويقية (نقطة في كل سطر)' }}
                                     </label>
-                                    <textarea name="marketing_bullets_text" class="form-control" rows="3" placeholder="ميزة 1&#10;ميزة 2&#10;ميزة 3" style="border-radius: 10px;">{{ old('marketing_bullets_text', implode(PHP_EOL, (array) ($editingPlan->marketing_bullets ?? []))) }}</textarea>
+                                    <textarea name="marketing_bullets_text" class="form-control" rows="3" placeholder="{{ __('messages.billing_marketing_bullets_placeholder') ?? 'ميزة 1&#10;ميزة 2&#10;ميزة 3' }}" style="border-radius: 10px;">{{ old('marketing_bullets_text', implode(PHP_EOL, (array) ($editingPlan->marketing_bullets ?? []))) }}</textarea>
                                 </div>
 
                                 {{-- Switches --}}
@@ -308,12 +308,12 @@
 
                                 <div class="col-md-6">
                                     <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">{{ __('messages.billing_badge_label_field') ?? 'نص شارة الملف الشخصي' }}</label>
-                                    <input type="text" name="profile_badge_label" class="form-control" value="{{ old('profile_badge_label', $entitlementDefaults['profile_badge_label'] ?? '') }}" placeholder="مثال: VIP Member" style="border-radius: 10px;">
+                                    <input type="text" name="profile_badge_label" class="form-control" value="{{ old('profile_badge_label', $entitlementDefaults['profile_badge_label'] ?? '') }}" placeholder="{{ __('messages.billing_profile_badge_placeholder') ?? 'مثال: VIP Member' }}" style="border-radius: 10px;">
                                 </div>
 
                                 <div class="col-12">
                                     <label class="form-label fw-bold text-dark small text-uppercase tracking-wider mb-1">{{ __('messages.billing_plan_highlights_title') ?? 'مزايا إضافية (نقطة في كل سطر)' }}</label>
-                                    <textarea name="extra_included_benefits_text" class="form-control" rows="3" placeholder="ميزة إضافية 1&#10;ميزة إضافية 2" style="border-radius: 10px;">{{ $extraIncludedBenefitsText }}</textarea>
+                                    <textarea name="extra_included_benefits_text" class="form-control" rows="3" placeholder="{{ __('messages.billing_extra_included_benefits_placeholder') ?? 'ميزة واحدة في كل سطر' }}" style="border-radius: 10px;">{{ $extraIncludedBenefitsText }}</textarea>
                                 </div>
                             </div>
                         </div>
