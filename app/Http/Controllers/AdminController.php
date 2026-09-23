@@ -1154,12 +1154,25 @@ class AdminController extends Controller
     {
         $query = User::select('users.*');
 
+        // Accurate Global KPI statistics
+        $stats = [
+            'total' => User::count(),
+            'online' => User::where('online', '>', time() - 240)->count(),
+            'verified' => User::where('ucheck', 1)->count(),
+            'admins' => app(\App\Services\V420SchemaService::class)->supports('site_admins')
+                ? User::where(function($q) {
+                    $q->where('id', 1)->orWhereHas('siteAdminEntry', fn($sub) => $sub->where('is_active', 1));
+                })->count()
+                : User::where('id', 1)->count(),
+            'total_pts' => (float) User::sum('pts'),
+        ];
+
         // Handle Sorting
         $sort = $request->input('sort', 'id');
         $direction = $request->input('direction', 'desc');
         
-        $allowedSorts = ['id', 'username', 'online', 'pts', 'role'];
-        if (!in_array($sort, $allowedSorts)) {
+        $allowedSorts = ['id', 'username', 'online', 'pts', 'vu', 'nvu', 'nlink', 'nsmart', 'created_at', 'role'];
+        if (!in_array($sort, $allowedSorts, true)) {
             $sort = 'id';
         }
         $direction = strtolower($direction) === 'asc' ? 'asc' : 'desc';
@@ -1177,32 +1190,39 @@ class AdminController extends Controller
             $query->orderBy('users.' . $sort, $direction);
         }
 
-        if ($request->has('search')) {
-            $search = str_replace(['%', '_'], ['\%', '\_'], $request->search);
-            $query->where(function($q) use ($search) {
+        if ($request->filled('search')) {
+            $search = str_replace(['%', '_'], ['\%', '\_'], trim($request->search));
+            $hasPublicUid = app(\App\Services\V420SchemaService::class)->hasColumn('users', 'public_uid');
+            $query->where(function($q) use ($search, $hasPublicUid) {
                 $q->where('username', 'like', "%{$search}%")
                   ->orWhere('email', 'like', "%{$search}%");
+                if (is_numeric($search)) {
+                    $q->orWhere('id', (int) $search);
+                }
+                if ($hasPublicUid) {
+                    $q->orWhere('public_uid', 'like', "%{$search}%");
+                }
             });
         }
 
-        if ($request->has('role') && $request->role != '') {
+        if ($request->filled('role')) {
             // Filter by Role (Admin or Member)
-            if ($request->role == 'admin') {
+            if ($request->role === 'admin') {
                 $query->where(function($q) {
                     $q->where('id', 1);
                     if (app(\App\Services\V420SchemaService::class)->supports('site_admins')) {
-                        $q->orWhereHas('siteAdminEntry');
+                        $q->orWhereHas('siteAdminEntry', fn($sub) => $sub->where('is_active', 1));
                     }
                 });
-            } elseif ($request->role == 'member') {
+            } elseif ($request->role === 'member') {
                 $query->where('id', '!=', 1);
                 if (app(\App\Services\V420SchemaService::class)->supports('site_admins')) {
-                    $query->whereDoesntHave('siteAdminEntry');
+                    $query->whereDoesntHave('siteAdminEntry', fn($sub) => $sub->where('is_active', 1));
                 }
             }
         }
 
-        if ($request->has('online')) {
+        if ($request->has('online') && $request->online !== null && $request->online !== '') {
             // Filter by Online Status (Active in last 240 seconds)
             if ($request->online == '1') {
                 $query->where('online', '>', time() - 240);
@@ -1211,7 +1231,7 @@ class AdminController extends Controller
             }
         }
 
-        if ($request->has('verified')) {
+        if ($request->has('verified') && $request->verified !== null && $request->verified !== '') {
             // Filter by Email Verification Status
             if ($request->verified == '1') {
                 $query->where('ucheck', 1);
@@ -1220,8 +1240,288 @@ class AdminController extends Controller
             }
         }
 
-        $users = $query->paginate(20)->appends($request->except('page'));
-        return view('admin::admin.users', compact('users'));
+        $perPage = (int) $request->input('per_page', 20);
+        if (!in_array($perPage, [10, 20, 50, 100], true)) {
+            $perPage = 20;
+        }
+
+        $users = $query->paginate($perPage)->appends($request->except('page'));
+
+        // Handle AJAX requests for zero-reload table & pagination re-render
+        if ($request->ajax() || $request->wantsJson() || $request->boolean('ajax')) {
+            return response()->json([
+                'success' => true,
+                'html' => view('admin::admin.partials.users_table', compact('users'))->render(),
+                'pagination' => (string) $users->links('pagination::bootstrap-5'),
+                'summary' => [
+                    'first_item' => $users->firstItem() ?? 0,
+                    'last_item' => $users->lastItem() ?? 0,
+                    'total' => $users->total(),
+                    'stats' => $stats,
+                ],
+            ]);
+        }
+
+        return view('admin::admin.users', compact('users', 'stats'));
+    }
+
+    public function storeUser(Request $request)
+    {
+        $validated = $request->validate([
+            'username' => 'required|string|min:3|max:255|unique:users,username',
+            'email' => 'required|email|max:255|unique:users,email',
+            'password' => 'required|string|min:8',
+            'pts' => 'nullable|numeric|min:0',
+            'ucheck' => 'nullable|in:0,1',
+            'is_admin' => 'nullable|boolean',
+        ]);
+
+        $user = User::create([
+            'username' => $validated['username'],
+            'email' => $validated['email'],
+            'pass' => Hash::make($validated['password']),
+            'img' => 'upload/avatar.png',
+            'pts' => $request->input('pts', 10),
+            'vu' => 10,
+            'nvu' => 10,
+            'nlink' => 10,
+            'nsmart' => 0,
+            'ucheck' => $request->input('ucheck', 0),
+            'online' => time(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        // Create Option for Username/Slug (Legacy System Requirement)
+        Option::create([
+            'name' => $user->username,
+            'o_valuer' => Str::slug($user->username),
+            'o_type' => 'user',
+            'o_order' => $user->id,
+        ]);
+
+        // Optional: Grant Site Admin Permissions if toggled
+        if ($request->boolean('is_admin') && app(\App\Services\V420SchemaService::class)->supports('site_admins')) {
+            \App\Models\SiteAdmin::create([
+                'user_id' => $user->id,
+                'has_full_access' => true,
+                'is_active' => true,
+                'is_super' => false,
+                'permissions' => ['all'],
+                'notes' => 'Created directly via Admin Users Suite',
+                'created_by' => auth()->id(),
+            ]);
+        }
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => __('messages.user_created_successfully'),
+                'user' => [
+                    'id' => $user->id,
+                    'username' => $user->username,
+                    'email' => $user->email,
+                ],
+            ]);
+        }
+
+        return redirect()->route('admin.users')->with('success', __('messages.user_created_successfully'));
+    }
+
+    public function quickUpdateUser(Request $request, $id)
+    {
+        $user = User::findOrFail($id);
+        $action = $request->input('action');
+
+        if ($action === 'toggle_verification') {
+            $user->ucheck = $user->ucheck == 1 ? 0 : 1;
+            $user->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => __('messages.verified_status_toggled'),
+                'ucheck' => (int) $user->ucheck,
+                'label' => $user->ucheck == 1 ? __('messages.Verified') : __('messages.Unverified'),
+            ]);
+        }
+
+        if ($action === 'adjust_balances') {
+            $request->validate([
+                'mode' => 'required|in:increment,set',
+                'pts' => 'nullable|numeric',
+                'vu' => 'nullable|numeric',
+                'nvu' => 'nullable|numeric',
+                'nlink' => 'nullable|numeric',
+                'nsmart' => 'nullable|numeric',
+                'notify_user' => 'nullable|boolean',
+                'note' => 'nullable|string|max:500',
+            ]);
+
+            $mode = $request->input('mode');
+            $fields = ['pts', 'vu', 'nvu', 'nlink', 'nsmart'];
+            foreach ($fields as $field) {
+                if ($request->has($field) && $request->input($field) !== null && $request->input($field) !== '') {
+                    $val = (float) $request->input($field);
+                    if ($mode === 'set') {
+                        $user->{$field} = max(0, $val);
+                    } else { // increment
+                        $user->{$field} = max(0, (float) $user->{$field} + $val);
+                    }
+                }
+            }
+            $user->save();
+
+            if ($request->boolean('notify_user')) {
+                $note = $request->input('note');
+                $msg = $note ?: __('messages.points_added_successfully');
+                $this->notifications->send($user, $msg);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => __('messages.points_added_successfully'),
+                'balances' => [
+                    'pts' => number_format((float)$user->pts, 2),
+                    'vu' => number_format((float)$user->vu, 2),
+                    'nvu' => number_format((float)$user->nvu, 2),
+                    'nlink' => number_format((float)$user->nlink, 2),
+                    'nsmart' => number_format((float)$user->nsmart, 2),
+                ],
+            ]);
+        }
+
+        return response()->json(['success' => false, 'message' => 'Unsupported action'], 400);
+    }
+
+    public function quickDetailsUser(Request $request, $id)
+    {
+        $user = User::findOrFail($id);
+
+        $slugOption = Option::where('o_type', 'user')->where('o_order', $id)->first();
+        $slug = $slugOption ? $slugOption->o_valuer : '';
+
+        // Collect Content Activity Metrics
+        $topicsCount = \App\Models\ForumTopic::where('uid', $id)->count();
+        $commentsCount = \App\Models\ForumComment::where('uid', $id)->count();
+        $bannersCount = \App\Models\Banner::where('uid', $id)->count();
+        $linksCount = \App\Models\Link::where('uid', $id)->count();
+        $smartAdsCount = \App\Models\SmartAd::where('uid', $id)->count();
+        $productsCount = \App\Models\Product::where('o_parent', $id)->count();
+
+        $registeredAt = $user->created_at ? $user->created_at->format('Y-m-d H:i') : __('messages.unknown');
+        $lastOnline = $user->online ? \Carbon\Carbon::createFromTimestamp($user->online)->diffForHumans() : __('messages.unknown');
+
+        $is2FA = !empty($user->two_factor_secret) && !empty($user->two_factor_confirmed_at);
+
+        return response()->json([
+            'success' => true,
+            'user' => [
+                'id' => $user->id,
+                'username' => $user->username,
+                'email' => $user->email,
+                'slug' => $slug,
+                'public_uid' => $user->public_uid ?? null,
+                'avatar' => $user->avatarUrl(),
+                'is_admin' => $user->isAdmin(),
+                'is_super_admin' => $user->isSuperAdmin(),
+                'is_online' => $user->isOnline(),
+                'last_online' => $lastOnline,
+                'registered_at' => $registeredAt,
+                'ucheck' => (int) $user->ucheck,
+                'two_factor_enabled' => $is2FA,
+                'balances' => [
+                    'pts' => number_format((float) $user->pts, 2),
+                    'vu' => number_format((float) $user->vu, 2),
+                    'nvu' => number_format((float) $user->nvu, 2),
+                    'nlink' => number_format((float) $user->nlink, 2),
+                    'nsmart' => number_format((float) $user->nsmart, 2),
+                ],
+                'stats' => [
+                    'topics' => $topicsCount,
+                    'comments' => $commentsCount,
+                    'banners' => $bannersCount,
+                    'links' => $linksCount,
+                    'smart_ads' => $smartAdsCount,
+                    'products' => $productsCount,
+                ],
+                'profile_url' => route('profile.show', $user->username),
+                'edit_url' => route('admin.users.edit', $user->id),
+            ],
+        ]);
+    }
+
+    public function notifyUser(Request $request, $id)
+    {
+        $user = User::findOrFail($id);
+        $request->validate([
+            'message' => 'required|string|max:1000',
+        ]);
+
+        $this->notifications->send($user, $request->message);
+
+        return response()->json([
+            'success' => true,
+            'message' => __('messages.notification_sent'),
+        ]);
+    }
+
+    public function resetUserTwoFactor(Request $request, $id)
+    {
+        $user = User::findOrFail($id);
+
+        $user->forceFill([
+            'two_factor_secret' => null,
+            'two_factor_recovery_codes' => null,
+            'two_factor_confirmed_at' => null,
+            'two_factor_type' => null,
+        ])->save();
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => __('messages.two_factor_reset_success'),
+            ]);
+        }
+
+        return redirect()->back()->with('success', __('messages.two_factor_reset_success'));
+    }
+
+    public function bulkActionUsers(Request $request)
+    {
+        $ids = $request->input('ids');
+        $action = $request->input('action');
+
+        if (!$ids || !is_array($ids)) {
+            return response()->json(['success' => false, 'message' => __('messages.no_selection') ?? 'No users selected'], 422);
+        }
+
+        // Filter out super-admin ID 1 and self
+        $currentAuthId = (int)auth()->id();
+        $ids = array_map('intval', array_filter($ids, fn($id) => (int)$id !== 1 && (int)$id !== $currentAuthId));
+
+        if (empty($ids)) {
+            return response()->json(['success' => false, 'message' => __('messages.action_not_allowed') ?? 'Action not allowed'], 422);
+        }
+
+        if ($action === 'verify') {
+            User::whereIn('id', $ids)->update(['ucheck' => 1]);
+            return response()->json(['success' => true, 'message' => __('messages.bulk_action_completed')]);
+        }
+
+        if ($action === 'unverify') {
+            User::whereIn('id', $ids)->update(['ucheck' => 0]);
+            return response()->json(['success' => true, 'message' => __('messages.bulk_action_completed')]);
+        }
+
+        if ($action === 'add_points') {
+            $amount = (float) $request->input('amount', 0);
+            if ($amount > 0) {
+                User::whereIn('id', $ids)->increment('pts', $amount);
+            }
+            return response()->json(['success' => true, 'message' => __('messages.bulk_action_completed')]);
+        }
+
+        return response()->json(['success' => false, 'message' => 'Unsupported action'], 400);
     }
 
     public function editUser($id)
@@ -1238,7 +1538,33 @@ class AdminController extends Controller
         $subscriptionPlans = $billingEnabled ? $this->plans->activePlans() : collect();
         $activeSubscription = $billingEnabled ? $this->entitlements->activeSubscriptionFor($user) : null;
 
-        return view('admin::admin.user_edit', compact('user', 'slug', 'billingEnabled', 'subscriptionPlans', 'activeSubscription'));
+        // Navigation shortcuts: prev and next users
+        $prevUserId = User::where('id', '<', $id)->max('id');
+        $nextUserId = User::where('id', '>', $id)->min('id');
+
+        // Content activity metrics
+        $topicsCount = \App\Models\ForumTopic::where('uid', $id)->count();
+        $commentsCount = \App\Models\ForumComment::where('uid', $id)->count();
+        $bannersCount = \App\Models\Banner::where('uid', $id)->count();
+        $linksCount = \App\Models\Link::where('uid', $id)->count();
+        $smartAdsCount = \App\Models\SmartAd::where('uid', $id)->count();
+        $productsCount = \App\Models\Product::where('o_parent', $id)->count();
+
+        return view('admin::admin.user_edit', compact(
+            'user', 
+            'slug', 
+            'billingEnabled', 
+            'subscriptionPlans', 
+            'activeSubscription',
+            'prevUserId',
+            'nextUserId',
+            'topicsCount',
+            'commentsCount',
+            'bannersCount',
+            'linksCount',
+            'smartAdsCount',
+            'productsCount'
+        ));
     }
 
     public function updateUser(Request $request, $id)
@@ -1311,6 +1637,13 @@ class AdminController extends Controller
             $this->notifications->send($user, $msg);
         }
 
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => __('messages.user_updated_successfully'),
+            ]);
+        }
+
         return redirect()->back()->with('success', __('messages.user_updated_successfully'));
     }
 
@@ -1326,14 +1659,41 @@ class AdminController extends Controller
             'pass' => Hash::make($request->password)
         ]);
 
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => __('messages.password_updated_successfully'),
+            ]);
+        }
+
         return redirect()->back()->with('success', __('messages.password_updated_successfully'));
     }
 
     public function deleteUser($id)
     {
+        if ((int)$id === 1) {
+            $msg = __('messages.cannot_delete_super_admin');
+            if (request()->ajax() || request()->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $msg], 403);
+            }
+            return redirect()->back()->with('error', $msg);
+        }
+
+        if ((int)$id === (int)auth()->id()) {
+            $msg = __('messages.cannot_delete_self');
+            if (request()->ajax() || request()->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $msg], 403);
+            }
+            return redirect()->back()->with('error', $msg);
+        }
+
         $this->performUserDeletion($id);
         
-        return redirect()->route('admin.users')->with('success', __('messages.user_deleted_successfully'));
+        $msg = __('messages.user_deleted_successfully');
+        if (request()->ajax() || request()->wantsJson()) {
+            return response()->json(['success' => true, 'message' => $msg]);
+        }
+        return redirect()->route('admin.users')->with('success', $msg);
     }
 
     public function bulkDeleteUsers(Request $request)
@@ -1341,21 +1701,34 @@ class AdminController extends Controller
         $ids = $request->input('ids');
 
         if (!$ids || !is_array($ids)) {
-            return redirect()->back()->with('error', __('messages.no_selection') ?? 'No users selected');
+            $msg = __('messages.no_selection') ?? 'No users selected';
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $msg], 422);
+            }
+            return redirect()->back()->with('error', $msg);
         }
 
-        // Filter out super-admin (ID 1) for safety
-        $ids = array_filter($ids, fn($id) => (int)$id !== 1);
+        // Filter out super-admin (ID 1) and currently logged in admin for safety
+        $currentAuthId = (int)auth()->id();
+        $ids = array_filter($ids, fn($id) => (int)$id !== 1 && (int)$id !== $currentAuthId);
 
         if (empty($ids)) {
-            return redirect()->back()->with('error', __('messages.action_not_allowed') ?? 'Action not allowed');
+            $msg = __('messages.action_not_allowed') ?? 'Action not allowed';
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $msg], 422);
+            }
+            return redirect()->back()->with('error', $msg);
         }
 
         foreach ($ids as $id) {
             $this->performUserDeletion($id);
         }
 
-        return redirect()->route('admin.users')->with('success', __('messages.users_deleted_successfully') ?? 'Selected users deleted successfully');
+        $msg = __('messages.users_deleted_successfully') ?? 'Selected users deleted successfully';
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json(['success' => true, 'message' => $msg]);
+        }
+        return redirect()->route('admin.users')->with('success', $msg);
     }
 
     /**

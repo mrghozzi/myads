@@ -588,6 +588,12 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::post('/seo/ads-files', [AdminSeoController::class, 'updateAdsFiles'])->name('admin.seo.ads_files.update');
     
     Route::get('/users', [AdminController::class, 'users'])->name('admin.users');
+    Route::post('/users', [AdminController::class, 'storeUser'])->name('admin.users.store');
+    Route::post('/users/{id}/quick-update', [AdminController::class, 'quickUpdateUser'])->name('admin.users.quick_update');
+    Route::get('/users/{id}/details', [AdminController::class, 'quickDetailsUser'])->name('admin.users.details');
+    Route::post('/users/{id}/notify', [AdminController::class, 'notifyUser'])->name('admin.users.notify');
+    Route::post('/users/{id}/reset-2fa', [AdminController::class, 'resetUserTwoFactor'])->name('admin.users.reset_2fa');
+    Route::post('/users/bulk/action', [AdminController::class, 'bulkActionUsers'])->name('admin.users.bulk_action');
     Route::get('/pts-activities', [\App\Http\Controllers\AdminPtsActivityController::class, 'index'])->name('admin.pts_activities');
     Route::get('/users/{id}/edit', [AdminController::class, 'editUser'])->name('admin.users.edit');
     Route::put('/users/{id}', [AdminController::class, 'updateUser'])->name('admin.users.update');
