@@ -640,8 +640,39 @@
 (function() {
     'use strict';
 
-    // Global CSRF Token
+    // Global CSRF Token & Relative Base URL (works seamlessly across subfolders and domains)
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+    const currentBaseUrl = window.location.pathname.replace(/\/+$/, '');
+
+    // Multilingual Dictionary
+    const i18n = {
+        errorTogglingVerification: @json(__('messages.error_toggling_verification')),
+        bulkOperationNetworkError: @json(__('messages.bulk_operation_network_error')),
+        bulkOperationFailed: @json(__('messages.bulk_operation_failed')),
+        bulkDeletionFailed: @json(__('messages.bulk_deletion_failed')),
+        errorProcessingBulkDeletion: @json(__('messages.error_processing_bulk_deletion')),
+        errorUpdatingBalances: @json(__('messages.error_updating_balances')),
+        errorSendingNotification: @json(__('messages.error_sending_notification')),
+        failedToSendNotification: @json(__('messages.failed_to_send_notification')),
+        errorResettingPassword: @json(__('messages.error_resetting_password')),
+        passwordUpdateFailed: @json(__('messages.password_update_failed')),
+        failedToLoadProfileDetails: @json(__('messages.failed_to_load_profile_details')),
+        failedToLoadUsers: @json(__('messages.failed_to_load_users')),
+        dataRefreshed: @json(__('messages.data_refreshed')),
+        failedToCreateUser: @json(__('messages.failed_to_create_user')),
+        creationFailed: @json(__('messages.creation_failed')),
+        updateFailed: @json(__('messages.update_failed')),
+        errorDeletingUser: @json(__('messages.error_deleting_user')),
+        deletionFailed: @json(__('messages.deletion_failed')),
+        reset2faFailed: @json(__('messages.reset_2fa_failed')),
+        operationFailed: @json(__('messages.operation_failed')),
+        passwordCopied: @json(__('messages.password_copied')),
+        reset2faConfirm: @json(__('messages.reset_2fa_confirm')),
+        verified: @json(__('messages.Verified')),
+        unverified: @json(__('messages.Unverified')),
+        twoFactorEnabled: @json(__('messages.two_factor_enabled')),
+        twoFactorDisabled: @json(__('messages.two_factor_disabled')),
+    };
 
     // =========================================================================
     // 1. Toast Notification Engine (Glassmorphic / Light & Dark Parity)
@@ -849,7 +880,7 @@
         })
         .catch(err => {
             if (tableLoading) tableLoading.classList.add('d-none');
-            showAdminToast('Failed to load users. Please check connection.', 'danger');
+            showAdminToast(i18n.failedToLoadUsers, 'danger');
         });
     }
 
@@ -896,7 +927,7 @@
         refreshTableBtn.addEventListener('click', function() {
             const url = buildQueryUrl();
             fetchUsers(url, false);
-            showAdminToast('Data refreshed.', 'info');
+            showAdminToast(i18n.dataRefreshed, 'info');
         });
     }
 
@@ -1041,7 +1072,7 @@
             toggleBtn.disabled = true;
             toggleBtn.style.opacity = '0.5';
 
-            fetch(`/admin/users/${userId}/quick-update`, {
+            fetch(`${currentBaseUrl}/${userId}/quick-update`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -1067,13 +1098,13 @@
                     }
                     showAdminToast(data.message, 'success');
                 } else {
-                    showAdminToast(data.message || 'Operation failed', 'danger');
+                    showAdminToast(data.message || i18n.operationFailed, 'danger');
                 }
             })
             .catch(() => {
                 toggleBtn.disabled = false;
                 toggleBtn.style.opacity = '1';
-                showAdminToast('Error toggling verification', 'danger');
+                showAdminToast(i18n.errorTogglingVerification, 'danger');
             });
         }
     });
@@ -1141,7 +1172,7 @@
                         addUserErrors.classList.remove('d-none');
                     }
                 } else {
-                    showAdminToast(data.message || 'Creation failed', 'danger');
+                    showAdminToast(data.message || i18n.creationFailed, 'danger');
                 }
             })
             .catch(err => {
@@ -1149,7 +1180,7 @@
                     addUserSubmitBtn.disabled = false;
                     addUserSubmitBtn.querySelector('.spinner-border')?.classList.add('d-none');
                 }
-                showAdminToast('Failed to create member. Verify input fields.', 'danger');
+                showAdminToast(i18n.failedToCreateUser, 'danger');
             });
         });
     }
@@ -1211,7 +1242,7 @@
             const formData = new FormData(quickBalanceForm);
             const dataObj = Object.fromEntries(formData.entries());
 
-            fetch(`/admin/users/${uid}/quick-update`, {
+            fetch(`${currentBaseUrl}/${uid}/quick-update`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -1239,7 +1270,7 @@
                         if (ptsDisplay) ptsDisplay.innerHTML = `${data.balances.pts} <span class="fs-11 text-muted fw-normal">PTS</span>`;
                     }
                 } else {
-                    showAdminToast(data.message || 'Update failed', 'danger');
+                    showAdminToast(data.message || i18n.updateFailed, 'danger');
                 }
             })
             .catch(() => {
@@ -1247,7 +1278,7 @@
                     quickBalanceSubmitBtn.disabled = false;
                     quickBalanceSubmitBtn.querySelector('.spinner-border')?.classList.add('d-none');
                 }
-                showAdminToast('Error updating balances', 'danger');
+                showAdminToast(i18n.errorUpdatingBalances, 'danger');
             });
         });
     }
@@ -1285,7 +1316,7 @@
         copyQuickPasswordBtn.addEventListener('click', () => {
             if (navigator.clipboard) {
                 navigator.clipboard.writeText(quickPasswordInput.value);
-                showAdminToast('{{ __("messages.password_copied") }}', 'info');
+                showAdminToast(i18n.passwordCopied, 'info');
             }
         });
     }
@@ -1301,7 +1332,7 @@
                 quickPasswordSubmitBtn.querySelector('.spinner-border')?.classList.remove('d-none');
             }
 
-            fetch(`/admin/users/${uid}/password`, {
+            fetch(`${currentBaseUrl}/${uid}/password`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -1322,7 +1353,7 @@
                     bootstrap.Modal.getInstance(document.getElementById('quickPasswordModal'))?.hide();
                     showAdminToast(data.message, 'success');
                 } else {
-                    showAdminToast(data.message || 'Password update failed', 'danger');
+                    showAdminToast(data.message || i18n.passwordUpdateFailed, 'danger');
                 }
             })
             .catch(() => {
@@ -1330,7 +1361,7 @@
                     quickPasswordSubmitBtn.disabled = false;
                     quickPasswordSubmitBtn.querySelector('.spinner-border')?.classList.add('d-none');
                 }
-                showAdminToast('Error resetting password', 'danger');
+                showAdminToast(i18n.errorResettingPassword, 'danger');
             });
         });
     }
@@ -1377,7 +1408,7 @@
             quickViewContent.classList.add('d-none');
             new bootstrap.Modal(document.getElementById('quickViewModal')).show();
 
-            fetch(`/admin/users/${uid}/details`, {
+            fetch(`${currentBaseUrl}/${uid}/details`, {
                 headers: {
                     'Accept': 'application/json',
                     'X-Requested-With': 'XMLHttpRequest'
@@ -1404,8 +1435,8 @@
 
                     // Badges
                     qvVerifiedBadge.innerHTML = u.ucheck === 1 
-                        ? '<span class="badge bg-soft-success text-success"><i class="feather-check-circle me-1"></i>{{ __("messages.Verified") }}</span>'
-                        : '<span class="badge bg-soft-secondary text-muted">{{ __("messages.Unverified") }}</span>';
+                        ? `<span class="badge bg-soft-success text-success"><i class="feather-check-circle me-1"></i>${i18n.verified}</span>`
+                        : `<span class="badge bg-soft-secondary text-muted">${i18n.unverified}</span>`;
 
                     if (u.is_super_admin) {
                         qvRoleBadge.innerHTML = '<span class="badge bg-soft-danger text-danger"><i class="feather-shield me-1"></i>Super Admin</span>';
@@ -1419,10 +1450,10 @@
 
                     // 2FA
                     if (u.two_factor_enabled) {
-                        qv2faStatus.innerHTML = '<span class="badge bg-success">{{ __("messages.two_factor_enabled") }}</span>';
+                        qv2faStatus.innerHTML = `<span class="badge bg-success">${i18n.twoFactorEnabled}</span>`;
                         qvReset2faBtn.classList.remove('d-none');
                     } else {
-                        qv2faStatus.innerHTML = '<span class="badge bg-secondary">{{ __("messages.two_factor_disabled") }}</span>';
+                        qv2faStatus.innerHTML = `<span class="badge bg-secondary">${i18n.twoFactorDisabled}</span>`;
                         qvReset2faBtn.classList.add('d-none');
                     }
 
@@ -1448,7 +1479,7 @@
             })
             .catch(() => {
                 quickViewLoading.classList.add('d-none');
-                showAdminToast('Failed to load member profile details', 'danger');
+                showAdminToast(i18n.failedToLoadProfileDetails, 'danger');
             });
         }
     });
@@ -1456,9 +1487,9 @@
     if (qvReset2faBtn) {
         qvReset2faBtn.addEventListener('click', function() {
             if (!currentQvUserId) return;
-            if (!confirm('{{ __("messages.reset_2fa_confirm") }}')) return;
+            if (!confirm(i18n.reset2faConfirm)) return;
 
-            fetch(`/admin/users/${currentQvUserId}/reset-2fa`, {
+            fetch(`${currentBaseUrl}/${currentQvUserId}/reset-2fa`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -1471,11 +1502,14 @@
             .then(data => {
                 if (data.success) {
                     showAdminToast(data.message, 'success');
-                    qv2faStatus.innerHTML = '<span class="badge bg-secondary">{{ __("messages.two_factor_disabled") }}</span>';
+                    qv2faStatus.innerHTML = `<span class="badge bg-secondary">${i18n.twoFactorDisabled}</span>`;
                     qvReset2faBtn.classList.add('d-none');
                 } else {
-                    showAdminToast(data.message || '2FA Reset failed', 'danger');
+                    showAdminToast(data.message || i18n.reset2faFailed, 'danger');
                 }
+            })
+            .catch(() => {
+                showAdminToast(i18n.reset2faFailed, 'danger');
             });
         });
     }
@@ -1512,7 +1546,7 @@
                 quickNotifySubmitBtn.querySelector('.spinner-border')?.classList.remove('d-none');
             }
 
-            fetch(`/admin/users/${uid}/notify`, {
+            fetch(`${currentBaseUrl}/${uid}/notify`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -1533,7 +1567,7 @@
                     bootstrap.Modal.getInstance(document.getElementById('quickNotifyModal'))?.hide();
                     showAdminToast(data.message, 'success');
                 } else {
-                    showAdminToast(data.message || 'Failed to send notification', 'danger');
+                    showAdminToast(data.message || i18n.failedToSendNotification, 'danger');
                 }
             })
             .catch(() => {
@@ -1541,7 +1575,7 @@
                     quickNotifySubmitBtn.disabled = false;
                     quickNotifySubmitBtn.querySelector('.spinner-border')?.classList.add('d-none');
                 }
-                showAdminToast('Error sending notification', 'danger');
+                showAdminToast(i18n.errorSendingNotification, 'danger');
             });
         });
     }
@@ -1610,7 +1644,7 @@
                         }, 300);
                     }
                 } else {
-                    showAdminToast(data.message || 'Deletion failed', 'danger');
+                    showAdminToast(data.message || i18n.deletionFailed, 'danger');
                 }
             })
             .catch(() => {
@@ -1618,7 +1652,7 @@
                     deleteUserSubmitBtn.disabled = false;
                     deleteUserSubmitBtn.querySelector('.spinner-border')?.classList.add('d-none');
                 }
-                showAdminToast('Error deleting member', 'danger');
+                showAdminToast(i18n.errorDeletingUser, 'danger');
             });
         });
     }
@@ -1640,7 +1674,7 @@
         const ids = getSelectedUserIds();
         if (ids.length === 0) return;
 
-        fetch('/admin/users/bulk/action', {
+        fetch(`${currentBaseUrl}/bulk/action`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -1656,10 +1690,10 @@
                 showAdminToast(data.message, 'success');
                 fetchUsers(buildQueryUrl(), false);
             } else {
-                showAdminToast(data.message || 'Bulk operation failed', 'danger');
+                showAdminToast(data.message || i18n.bulkOperationFailed, 'danger');
             }
         })
-        .catch(() => showAdminToast('Bulk operation network error', 'danger'));
+        .catch(() => showAdminToast(i18n.bulkOperationNetworkError, 'danger'));
     }
 
     if (bulkVerifyBtn) {
@@ -1695,7 +1729,7 @@
             confirmBulkDeleteBtn.disabled = true;
             confirmBulkDeleteBtn.querySelector('.spinner-border')?.classList.remove('d-none');
 
-            fetch('{{ route("admin.users.bulk_delete") }}', {
+            fetch(`${currentBaseUrl}/bulk/delete`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
@@ -1715,13 +1749,13 @@
                     showAdminToast(data.message, 'success');
                     fetchUsers(buildQueryUrl(), false);
                 } else {
-                    showAdminToast(data.message || 'Bulk deletion failed', 'danger');
+                    showAdminToast(data.message || i18n.bulkDeletionFailed, 'danger');
                 }
             })
             .catch(() => {
                 confirmBulkDeleteBtn.disabled = false;
                 confirmBulkDeleteBtn.querySelector('.spinner-border')?.classList.add('d-none');
-                showAdminToast('Error processing bulk deletion', 'danger');
+                showAdminToast(i18n.errorProcessingBulkDeletion, 'danger');
             });
         });
     }

@@ -588,14 +588,31 @@
     </div>
 </div>
 @endsection
-
 @push('scripts')
 <script>
 (function() {
     'use strict';
 
+    // Global CSRF Token & Relative Base URL
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
     const userId = {{ $user->id }};
+    const currentBaseUrl = window.location.pathname.replace(/\/edit\/?$/, '');
+
+    // Multilingual Dictionary
+    const i18n = {
+        errorUpdatingBalances: @json(__('messages.error_updating_balances')),
+        errorUpdatingWalletBalances: @json(__('messages.error_updating_wallet_balances')),
+        errorSendingNotification: @json(__('messages.error_sending_notification')),
+        failedToSendNotification: @json(__('messages.failed_to_send_notification')),
+        errorResettingPassword: @json(__('messages.error_resetting_password')),
+        passwordUpdateFailed: @json(__('messages.password_update_failed')),
+        updateFailed: @json(__('messages.update_failed')),
+        reset2faFailed: @json(__('messages.reset_2fa_failed')),
+        networkErrorUpdatingProfile: @json(__('messages.network_error_updating_profile')),
+        operationFailed: @json(__('messages.operation_failed')),
+        passwordCopied: @json(__('messages.password_copied')),
+        reset2faConfirm: @json(__('messages.reset_2fa_confirm')),
+    };
 
     // Toast Engine
     function showAdminToast(message, type = 'success') {
@@ -697,7 +714,7 @@
                 if (data.success) {
                     showAdminToast(data.message, 'success');
                 } else {
-                    showAdminToast(data.message || 'Update failed', 'danger');
+                    showAdminToast(data.message || i18n.updateFailed, 'danger');
                 }
             })
             .catch(() => {
@@ -705,7 +722,7 @@
                     saveProfileBtn.disabled = false;
                     saveProfileBtn.querySelector('.spinner-border')?.classList.add('d-none');
                 }
-                showAdminToast('Network error updating profile', 'danger');
+                showAdminToast(i18n.networkErrorUpdatingProfile, 'danger');
             });
         });
     }
@@ -724,7 +741,7 @@
             const formData = new FormData(walletForm);
             const dataObj = Object.fromEntries(formData.entries());
 
-            fetch(`/admin/users/${userId}/quick-update`, {
+            fetch(`${currentBaseUrl}/quick-update`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -757,7 +774,7 @@
                         if (heroNsmart) heroNsmart.textContent = data.balances.nsmart;
                     }
                 } else {
-                    showAdminToast(data.message || 'Wallet update failed', 'danger');
+                    showAdminToast(data.message || i18n.updateFailed, 'danger');
                 }
             })
             .catch(() => {
@@ -765,7 +782,7 @@
                     saveWalletBtn.disabled = false;
                     saveWalletBtn.querySelector('.spinner-border')?.classList.add('d-none');
                 }
-                showAdminToast('Error updating wallet balances', 'danger');
+                showAdminToast(i18n.errorUpdatingWalletBalances, 'danger');
             });
         });
     }
@@ -800,7 +817,7 @@
         copyEditPasswordBtn.addEventListener('click', () => {
             if (navigator.clipboard) {
                 navigator.clipboard.writeText(editPasswordInput.value);
-                showAdminToast('{{ __("messages.password_copied") }}', 'info');
+                showAdminToast(i18n.passwordCopied, 'info');
             }
         });
     }
@@ -833,7 +850,7 @@
                 if (data.success) {
                     showAdminToast(data.message, 'success');
                 } else {
-                    showAdminToast(data.message || 'Password update failed', 'danger');
+                    showAdminToast(data.message || i18n.passwordUpdateFailed, 'danger');
                 }
             })
             .catch(() => {
@@ -841,7 +858,7 @@
                     savePasswordBtn.disabled = false;
                     savePasswordBtn.querySelector('.spinner-border')?.classList.add('d-none');
                 }
-                showAdminToast('Error updating password', 'danger');
+                showAdminToast(i18n.errorResettingPassword, 'danger');
             });
         });
     }
@@ -850,9 +867,9 @@
     const resetUser2faBtn = document.getElementById('resetUser2faBtn');
     if (resetUser2faBtn) {
         resetUser2faBtn.addEventListener('click', function() {
-            if (!confirm('{{ __("messages.reset_2fa_confirm") }}')) return;
+            if (!confirm(i18n.reset2faConfirm)) return;
 
-            fetch(`/admin/users/${userId}/reset-2fa`, {
+            fetch(`${currentBaseUrl}/reset-2fa`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -867,8 +884,11 @@
                     showAdminToast(data.message, 'success');
                     setTimeout(() => window.location.reload(), 1000);
                 } else {
-                    showAdminToast(data.message || 'Reset failed', 'danger');
+                    showAdminToast(data.message || i18n.reset2faFailed, 'danger');
                 }
+            })
+            .catch(() => {
+                showAdminToast(i18n.reset2faFailed, 'danger');
             });
         });
     }
@@ -886,7 +906,7 @@
                 directNotifySubmitBtn.querySelector('.spinner-border')?.classList.remove('d-none');
             }
 
-            fetch(`/admin/users/${userId}/notify`, {
+            fetch(`${currentBaseUrl}/notify`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -907,7 +927,7 @@
                     directNotifyMessage.value = '';
                     showAdminToast(data.message, 'success');
                 } else {
-                    showAdminToast(data.message || 'Notification failed', 'danger');
+                    showAdminToast(data.message || i18n.failedToSendNotification, 'danger');
                 }
             })
             .catch(() => {
@@ -915,7 +935,7 @@
                     directNotifySubmitBtn.disabled = false;
                     directNotifySubmitBtn.querySelector('.spinner-border')?.classList.add('d-none');
                 }
-                showAdminToast('Error sending notification', 'danger');
+                showAdminToast(i18n.errorSendingNotification, 'danger');
             });
         });
     }

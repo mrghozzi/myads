@@ -1492,15 +1492,13 @@ class AdminController extends Controller
         $action = $request->input('action');
 
         if (!$ids || !is_array($ids)) {
-            return response()->json(['success' => false, 'message' => __('messages.no_selection') ?? 'No users selected'], 422);
+            return response()->json(['success' => false, 'message' => __('messages.no_selection')], 422);
         }
 
-        // Filter out super-admin ID 1 and self
-        $currentAuthId = (int)auth()->id();
-        $ids = array_map('intval', array_filter($ids, fn($id) => (int)$id !== 1 && (int)$id !== $currentAuthId));
+        $ids = array_values(array_unique(array_filter(array_map('intval', $ids))));
 
         if (empty($ids)) {
-            return response()->json(['success' => false, 'message' => __('messages.action_not_allowed') ?? 'Action not allowed'], 422);
+            return response()->json(['success' => false, 'message' => __('messages.no_selection')], 422);
         }
 
         if ($action === 'verify') {
@@ -1509,7 +1507,11 @@ class AdminController extends Controller
         }
 
         if ($action === 'unverify') {
-            User::whereIn('id', $ids)->update(['ucheck' => 0]);
+            // Protect super-admin ID 1 from losing verification
+            $safeIds = array_values(array_filter($ids, fn($id) => (int)$id !== 1));
+            if (!empty($safeIds)) {
+                User::whereIn('id', $safeIds)->update(['ucheck' => 0]);
+            }
             return response()->json(['success' => true, 'message' => __('messages.bulk_action_completed')]);
         }
 
@@ -1521,7 +1523,7 @@ class AdminController extends Controller
             return response()->json(['success' => true, 'message' => __('messages.bulk_action_completed')]);
         }
 
-        return response()->json(['success' => false, 'message' => 'Unsupported action'], 400);
+        return response()->json(['success' => false, 'message' => __('messages.unsupported_action')], 400);
     }
 
     public function editUser($id)
