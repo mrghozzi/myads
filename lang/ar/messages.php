@@ -4468,5 +4468,10 @@ return [
     'adjustment_mode' => 'نوع التعديل',
     'amount' => 'القيمة',
     'reason_or_note' => 'ملاحظة / سبب التعديل',
+    'profile' => 'الملف الشخصي',
+    'Billing' => 'الفواتير والاشتراكات',
+    'showing' => 'عرض',
+    'of' => 'من',
+    'grant_admin_access' => 'منح صلاحيات إدارة الموقع',
 ];
 

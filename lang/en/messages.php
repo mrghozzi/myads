@@ -4467,5 +4467,10 @@ return [
     'adjustment_mode' => 'Adjustment Mode',
     'amount' => 'Amount',
     'reason_or_note' => 'Admin Reason / Note',
+    'profile' => 'Profile',
+    'Billing' => 'Billing',
+    'showing' => 'Showing',
+    'of' => 'of',
+    'grant_admin_access' => 'Grant Site Administrator Privileges',
 ];
 
