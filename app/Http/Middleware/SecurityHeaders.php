@@ -25,14 +25,24 @@ class SecurityHeaders
 
         $response->headers->set('X-Content-Type-Options', 'nosniff');
 
-        // SECURITY: Allow ad routes to be framed by external sites, and prevent referrer leakage
-        $isAdRoute = $request->is('bn.php', 'link.php', 'smart.php', 'embed/*', 'ads/*', 'show.php');
+        // SECURITY: Allow external ad serving/embed routes to be framed by external publisher sites, and prevent referrer leakage
+        $isAdServingRoute = $request->is(
+            'bn.php',
+            'link.php',
+            'smart.php',
+            'embed/*',
+            'show.php',
+            'ads/redirect',
+            'ads/custom/serve',
+            'ads/custom/view/*',
+            'ads/custom/click/*'
+        );
         
-        if (!$isAdRoute) {
+        if (!$isAdServingRoute) {
             $response->headers->set('X-Frame-Options', 'SAMEORIGIN');
             $response->headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
         } else {
-            // Protect referrer data during ad clicks/embeds
+            // Protect referrer data during external ad clicks/embeds
             $response->headers->set('Referrer-Policy', 'origin');
         }
 
@@ -59,7 +69,7 @@ class SecurityHeaders
         }
 
         // SECURITY: Mitigate Spectre-class side-channel attacks while allowing OAuth popups
-        if (!$isAdRoute) {
+        if (!$isAdServingRoute) {
             $response->headers->set('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
         }
 

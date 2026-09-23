@@ -112,6 +112,8 @@
 
                     <form method="post" action="{{ route('ads.banners.store') }}">
                         @csrf
+                        <input type="hidden" name="from_promote" value="1">
+                        <input type="hidden" name="p" value="banners">
                         <div class="superdesign-fields-row">
                             <div class="superdesign-field-group">
                                 <label class="superdesign-field-label">
@@ -182,8 +184,8 @@
                         <div class="superdesign-actions-bar" style="margin-top: 14px; border-top: none; padding-top: 0;">
                             <div></div>
                             <button type="submit" class="superdesign-btn-primary">
-                                <i class="fa fa-plus"></i>
-                                {{ __('messages.add') }}
+                                <i class="fa fa-save"></i>
+                                {{ __('messages.save') ?? __('messages.add') }}
                             </button>
                         </div>
                     </form>
@@ -205,6 +207,8 @@
 
                     <form method="post" action="{{ route('ads.links.store') }}">
                         @csrf
+                        <input type="hidden" name="from_promote" value="1">
+                        <input type="hidden" name="p" value="link">
                         <div class="superdesign-fields-row">
                             <div class="superdesign-field-group">
                                 <label class="superdesign-field-label">
@@ -260,8 +264,8 @@
                         <div class="superdesign-actions-bar" style="margin-top: 14px; border-top: none; padding-top: 0;">
                             <div></div>
                             <button type="submit" class="superdesign-btn-primary" style="background: linear-gradient(135deg, #23d2e2 0%, #00d2ff 100%);">
-                                <i class="fa fa-plus"></i>
-                                {{ __('messages.add') }}
+                                <i class="fa fa-save"></i>
+                                {{ __('messages.save') ?? __('messages.add') }}
                             </button>
                         </div>
                     </form>
@@ -283,6 +287,8 @@
 
                     <form method="post" action="{{ route('visits.store') }}">
                         @csrf
+                        <input type="hidden" name="from_promote" value="1">
+                        <input type="hidden" name="p" value="exchange">
                         <div class="superdesign-fields-row">
                             <div class="superdesign-field-group">
                                 <label class="superdesign-field-label">
@@ -335,8 +341,8 @@
 
                             <div class="superdesign-field-group" style="display: flex; align-items: flex-end;">
                                 <button type="submit" class="superdesign-btn-primary" style="width: 100%; background: linear-gradient(135deg, #ef4444 0%, #f97316 100%);">
-                                    <i class="fa fa-plus"></i>
-                                    {{ __('messages.add') }}
+                                    <i class="fa fa-save"></i>
+                                    {{ __('messages.save') ?? __('messages.add') }}
                                 </button>
                             </div>
                         </div>

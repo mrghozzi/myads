@@ -4094,4 +4094,7 @@ return [
     'target_url' => 'Hedef URL',
     'ab_test_hint' => 'İsteğe bağlı: Trafik bölme optimizasyonu için ikinci bir görsel sağlayın.',
     'txt' => 'Metin',
+    'banner_added_successfully' => 'Banner reklamı başarıyla eklendi.',
+    'link_added_successfully' => 'Metin reklamı başarıyla eklendi.',
+    'site_added_successfully' => 'Trafik değişim kampanyası başarıyla eklendi.',
 ];

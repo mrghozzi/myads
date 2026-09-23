@@ -71,6 +71,13 @@ class AdsController extends Controller
     // Store Banner
     public function storeBanner(Request $request, SecurityPolicyService $securityPolicy)
     {
+        if ($url = $request->input('url')) {
+            $trimmed = trim((string) $url);
+            if ($trimmed !== '' && !preg_match('~^https?://~i', $trimmed)) {
+                $request->merge(['url' => 'https://' . $trimmed]);
+            }
+        }
+
         $request->validate([
             'name' => 'required|string|max:255',
             'url' => 'required|url',
@@ -86,11 +93,11 @@ class AdsController extends Controller
         $bannerSize = $this->validatedBannerSize($request->input('px'));
 
         if ($violation = $securityPolicy->urlViolation((string) $request->input('url'), 'ads')) {
-            return back()->withErrors(['url' => $violation])->withInput();
+            return back(fallback: route('ads.promote', ['p' => 'banners']))->withErrors(['url' => $violation])->withInput();
         }
 
         if ($violation = $securityPolicy->urlViolation((string) $request->input('img'), 'ads', true)) {
-            return back()->withErrors(['img' => $violation])->withInput();
+            return back(fallback: route('ads.promote', ['p' => 'banners']))->withErrors(['img' => $violation])->withInput();
         }
 
         Banner::create([
@@ -111,7 +118,13 @@ class AdsController extends Controller
             'clik_b' => 0,
         ]);
 
-        return redirect()->route('ads.banners.index')->with('success', 'Banner added successfully.');
+        $successMsg = __('messages.banner_added_successfully') ?? 'Banner added successfully.';
+
+        if ($request->filled('from_promote') || str_contains((string) $request->headers->get('referer'), 'promote')) {
+            return redirect()->route('ads.promote', ['p' => 'banners'])->with('success', $successMsg);
+        }
+
+        return redirect()->route('ads.banners.index')->with('success', $successMsg);
     }
 
     // Edit Banner Form
@@ -200,6 +213,13 @@ class AdsController extends Controller
     // Store Link
     public function storeLink(Request $request, SecurityPolicyService $securityPolicy)
     {
+        if ($url = $request->input('url')) {
+            $trimmed = trim((string) $url);
+            if ($trimmed !== '' && !preg_match('~^https?://~i', $trimmed)) {
+                $request->merge(['url' => 'https://' . $trimmed]);
+            }
+        }
+
         $request->validate([
             'name' => 'required|string|max:255',
             'name_b' => 'nullable|string|max:255',
@@ -214,15 +234,15 @@ class AdsController extends Controller
         $user = Auth::user();
 
         if ($violation = $securityPolicy->urlViolation((string) $request->input('url'), 'ads')) {
-            return back()->withErrors(['url' => $violation])->withInput();
+            return back(fallback: route('ads.promote', ['p' => 'link']))->withErrors(['url' => $violation])->withInput();
         }
 
         if ($violation = $securityPolicy->textViolation((string) $request->input('txt'), 'ads')) {
-            return back()->withErrors(['txt' => $violation])->withInput();
+            return back(fallback: route('ads.promote', ['p' => 'link']))->withErrors(['txt' => $violation])->withInput();
         }
 
         if ($request->input('txt_b') && ($violation = $securityPolicy->textViolation((string) $request->input('txt_b'), 'ads'))) {
-            return back()->withErrors(['txt_b' => $violation])->withInput();
+            return back(fallback: route('ads.promote', ['p' => 'link']))->withErrors(['txt_b' => $violation])->withInput();
         }
 
         Link::create([
@@ -242,7 +262,13 @@ class AdsController extends Controller
             'clik_b' => 0,
         ]);
 
-        return redirect()->route('ads.links.index')->with('success', 'Link added successfully.');
+        $successMsg = __('messages.link_added_successfully') ?? 'Link added successfully.';
+
+        if ($request->filled('from_promote') || str_contains((string) $request->headers->get('referer'), 'promote')) {
+            return redirect()->route('ads.promote', ['p' => 'link'])->with('success', $successMsg);
+        }
+
+        return redirect()->route('ads.links.index')->with('success', $successMsg);
     }
 
     // Edit Link Form
@@ -321,6 +347,22 @@ class AdsController extends Controller
     public function promote()
     {
         return view('theme::ads.promote');
+    }
+
+    // Store from Promote page
+    public function storePromote(Request $request, SecurityPolicyService $securityPolicy)
+    {
+        $type = $request->input('p', $request->query('p', 'banners'));
+
+        if ($type === 'link') {
+            return $this->storeLink($request, $securityPolicy);
+        }
+
+        if ($type === 'exchange') {
+            return app(VisitController::class)->store($request, $securityPolicy);
+        }
+
+        return $this->storeBanner($request, $securityPolicy);
     }
 
     // Referrals Page (referral.php) - List of referred users

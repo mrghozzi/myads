@@ -4089,4 +4089,7 @@ return [
     'target_url' => 'آدرس هدف',
     'ab_test_hint' => 'اختیاری: ارائه تصویر دوم برای بهینه‌سازی تقسیم ترافیک.',
     'txt' => 'متن',
+    'banner_added_successfully' => 'تبلیغ بنری با موفقیت اضافه شد.',
+    'link_added_successfully' => 'تبلیغ متنی با موفقیت اضافه شد.',
+    'site_added_successfully' => 'کمپین تبادل ترافیک با موفقیت اضافه شد.',
 ];

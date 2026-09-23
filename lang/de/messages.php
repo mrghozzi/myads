@@ -4094,4 +4094,7 @@ return [
     'target_url' => 'Ziel-URL',
     'ab_test_hint' => 'Optional: Geben Sie ein zweites Bild für die A/B-Split-Optimierung an.',
     'txt' => 'Text',
+    'banner_added_successfully' => 'Banner-Werbung erfolgreich hinzugefügt.',
+    'link_added_successfully' => 'Textanzeige erfolgreich hinzugefügt.',
+    'site_added_successfully' => 'Traffic-Austausch-Kampagne erfolgreich hinzugefügt.',
 ];

@@ -4089,4 +4089,7 @@ return [
     'target_url' => 'URL di destinazione',
     'ab_test_hint' => 'Opzionale: Fornisci una seconda immagine per l\'ottimizzazione della suddivisione del traffico.',
     'txt' => 'Testo',
+    'banner_added_successfully' => 'Annuncio banner aggiunto con successo.',
+    'link_added_successfully' => 'Annuncio di testo aggiunto con successo.',
+    'site_added_successfully' => 'Campagna di scambio di traffico aggiunta con successo.',
 ];

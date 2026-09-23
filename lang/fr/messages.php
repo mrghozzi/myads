@@ -4098,4 +4098,7 @@ return [
     'target_url' => 'URL cible',
     'ab_test_hint' => 'Facultatif : Fournissez une deuxième image pour l\'optimisation de la répartition du trafic.',
     'txt' => 'Texte',
+    'banner_added_successfully' => 'Bannière publicitaire ajoutée avec succès.',
+    'link_added_successfully' => 'Annonce textuelle ajoutée avec succès.',
+    'site_added_successfully' => 'Campagne d\'échange de trafic ajoutée avec succès.',
 ];

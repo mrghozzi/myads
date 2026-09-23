@@ -4092,4 +4092,7 @@ return [
     'target_url' => '目标链接',
     'ab_test_hint' => '可选：提供第二张图片用于分流测试优化。',
     'txt' => '文本',
+    'banner_added_successfully' => '横幅广告添加成功。',
+    'link_added_successfully' => '文本广告添加成功。',
+    'site_added_successfully' => '流量交换活动添加成功。',
 ];

@@ -4087,4 +4087,7 @@ return [
     'target_url' => 'ターゲットURL',
     'ab_test_hint' => '任意: トラフィック分散最適化用の2枚目の画像を提供します。',
     'txt' => 'テキスト',
+    'banner_added_successfully' => 'バナー広告が正常に追加されました。',
+    'link_added_successfully' => 'テキスト広告が正常に追加されました。',
+    'site_added_successfully' => 'トラフィック交換キャンペーンが正常に追加されました。',
 ];

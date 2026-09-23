@@ -4094,4 +4094,7 @@ return [
     'target_url' => 'URL de destino',
     'ab_test_hint' => 'Opcional: Proporcione una segunda imagen para la optimización de división de tráfico.',
     'txt' => 'Texto',
+    'banner_added_successfully' => 'Anuncio de banner agregado con éxito.',
+    'link_added_successfully' => 'Anuncio de texto agregado con éxito.',
+    'site_added_successfully' => 'Campaña de intercambio de tráfico agregada con éxito.',
 ];

@@ -4551,5 +4551,7 @@ return [
     'target_url' => 'Target URL',
     'ab_test_hint' => 'Optional: Provide a second image for traffic split optimization.',
     'txt' => 'Text',
+    'banner_added_successfully' => 'Banner ad added successfully.',
+    'link_added_successfully' => 'Text ad added successfully.',
+    'site_added_successfully' => 'Traffic exchange campaign added successfully.',
 ];
-

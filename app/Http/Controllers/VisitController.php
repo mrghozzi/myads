@@ -49,6 +49,13 @@ class VisitController extends Controller
     // Management: Store Site
     public function store(Request $request, SecurityPolicyService $securityPolicy)
     {
+        if ($url = $request->input('url')) {
+            $trimmed = trim((string) $url);
+            if ($trimmed !== '' && !preg_match('~^https?://~i', $trimmed)) {
+                $request->merge(['url' => 'https://' . $trimmed]);
+            }
+        }
+
         $request->validate([
             'name' => 'required|string|max:255',
             'url' => 'required|url',
@@ -58,7 +65,7 @@ class VisitController extends Controller
         $user = Auth::user();
 
         if ($violation = $securityPolicy->urlViolation((string) $request->input('url'), 'ads')) {
-            return back()->withErrors(['url' => $violation])->withInput();
+            return back(fallback: route('ads.promote', ['p' => 'exchange']))->withErrors(['url' => $violation])->withInput();
         }
 
         Visit::create([
@@ -70,7 +77,13 @@ class VisitController extends Controller
             'vu' => 0,
         ]);
 
-        return redirect()->route('visits.index')->with('success', 'Site added successfully.');
+        $successMsg = __('messages.site_added_successfully') ?? 'Site added successfully.';
+
+        if ($request->filled('from_promote') || str_contains((string) $request->headers->get('referer'), 'promote')) {
+            return redirect()->route('ads.promote', ['p' => 'exchange'])->with('success', $successMsg);
+        }
+
+        return redirect()->route('visits.index')->with('success', $successMsg);
     }
 
     // Management: Edit Site
