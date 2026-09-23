@@ -4554,4 +4554,10 @@ return [
     'banner_added_successfully' => 'Banner ad added successfully.',
     'link_added_successfully' => 'Text ad added successfully.',
     'site_added_successfully' => 'Traffic exchange campaign added successfully.',
+
+    'banner_image_required' => 'Please upload a banner image or provide an image URL.',
+    'invalid_image_file' => 'The uploaded file is not a valid image.',
+    'upload_from_device' => 'Upload from device',
+    'enter_image_url' => 'Image URL',
+    'current_image' => 'Current image',
 ];

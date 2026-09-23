@@ -4095,4 +4095,10 @@ return [
     'banner_added_successfully' => '横幅广告添加成功。',
     'link_added_successfully' => '文本广告添加成功。',
     'site_added_successfully' => '流量交换活动添加成功。',
+
+    'banner_image_required' => '请上传横幅图片或提供图片网址。',
+    'invalid_image_file' => '上传的文件不是有效的图片。',
+    'upload_from_device' => '从设备上传',
+    'enter_image_url' => '图片网址',
+    'current_image' => '当前图片',
 ];

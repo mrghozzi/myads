@@ -53,7 +53,7 @@
                     </h5>
                 </div>
                 <div class="card-body p-4">
-                    <form id="editBannerForm" action="{{ route('admin.banners.update', $banner->id) }}" method="POST" class="row g-3">
+                    <form id="editBannerForm" action="{{ route('admin.banners.update', $banner->id) }}" method="POST" class="row g-3" enctype="multipart/form-data">
                         @csrf
                         
                         <div class="col-md-12">
@@ -88,21 +88,57 @@
                             </select>
                         </div>
 
+                        <!-- Image Version A -->
                         <div class="col-md-12">
-                            <label class="form-label fw-semibold text-dark">{{ __('messages.image_url') ?? 'Image URL' }} (Version A) <span class="text-danger">*</span></label>
-                            <div class="input-group">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <label class="form-label fw-semibold text-dark mb-0">{{ __('messages.image_url') ?? 'Image URL' }} (Version A) <span class="text-danger">*</span></label>
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <button type="button" class="btn btn-outline-primary active py-0 px-2" style="font-size: 11px;" id="adminImgModeUrlA" onclick="switchAdminImgMode('A', 'url')">
+                                        <i class="feather-link me-1"></i>{{ __('messages.enter_image_url') }}
+                                    </button>
+                                    <button type="button" class="btn btn-outline-primary py-0 px-2" style="font-size: 11px;" id="adminImgModeUploadA" onclick="switchAdminImgMode('A', 'upload')">
+                                        <i class="feather-upload me-1"></i>{{ __('messages.upload_from_device') }}
+                                    </button>
+                                </div>
+                            </div>
+                            <div id="adminImgUrlContainerA" class="input-group">
                                 <span class="input-group-text bg-light text-muted"><i class="feather-image"></i></span>
-                                <input type="text" class="form-control" name="img" id="imgInputA" value="{{ $banner->img }}" required>
+                                <input type="text" class="form-control" name="img" id="imgInputA" value="{{ $banner->img }}" placeholder="https://...">
+                            </div>
+                            <div id="adminImgUploadContainerA" style="display: none;">
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light text-muted"><i class="feather-upload"></i></span>
+                                    <input type="file" class="form-control" name="img_file" id="imgFileInputA" accept="image/*">
+                                </div>
+                                <small class="text-muted d-block mt-1">JPG, PNG, GIF, WEBP, SVG (Max 5MB)</small>
                             </div>
                         </div>
 
+                        <!-- Image Version B (A/B Test) -->
                         <div class="col-md-12">
-                            <label class="form-label fw-semibold text-dark">{{ __('messages.image_url') ?? 'Image URL' }} (Version B - A/B Test)</label>
-                            <div class="input-group">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <label class="form-label fw-semibold text-dark mb-0">{{ __('messages.image_url') ?? 'Image URL' }} (Version B - A/B Test)</label>
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <button type="button" class="btn btn-outline-info active py-0 px-2" style="font-size: 11px;" id="adminImgModeUrlB" onclick="switchAdminImgMode('B', 'url')">
+                                        <i class="feather-link me-1"></i>{{ __('messages.enter_image_url') }}
+                                    </button>
+                                    <button type="button" class="btn btn-outline-info py-0 px-2" style="font-size: 11px;" id="adminImgModeUploadB" onclick="switchAdminImgMode('B', 'upload')">
+                                        <i class="feather-upload me-1"></i>{{ __('messages.upload_from_device') }}
+                                    </button>
+                                </div>
+                            </div>
+                            <div id="adminImgUrlContainerB" class="input-group">
                                 <span class="input-group-text bg-light text-muted"><i class="feather-layers"></i></span>
                                 <input type="text" class="form-control" name="img_b" id="imgInputB" value="{{ $banner->img_b }}" placeholder="https://...">
                             </div>
-                            <small class="text-muted">{{ __('messages.ab_test_hint') ?? 'Optional: Provide a second image for traffic split optimization.' }}</small>
+                            <div id="adminImgUploadContainerB" style="display: none;">
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light text-muted"><i class="feather-upload"></i></span>
+                                    <input type="file" class="form-control" name="img_file_b" id="imgFileInputB" accept="image/*">
+                                </div>
+                                <small class="text-muted d-block mt-1">JPG, PNG, GIF, WEBP, SVG (Max 5MB)</small>
+                            </div>
+                            <small class="text-muted d-block mt-1">{{ __('messages.ab_test_hint') ?? 'Optional: Provide a second image for traffic split optimization.' }}</small>
                         </div>
 
                         <!-- Targeting Section -->
@@ -199,7 +235,52 @@ document.addEventListener('DOMContentLoaded', function() {
     const saveSpinner = document.getElementById('saveSpinner');
     const saveIcon = document.getElementById('saveIcon');
 
-    // Live preview updates
+    // Mode switcher for URL vs Upload
+    window.switchAdminImgMode = function(version, mode) {
+        const urlContainer = document.getElementById('adminImgUrlContainer' + version);
+        const uploadContainer = document.getElementById('adminImgUploadContainer' + version);
+        const btnUrl = document.getElementById('adminImgModeUrl' + version);
+        const btnUpload = document.getElementById('adminImgModeUpload' + version);
+
+        if (mode === 'url') {
+            urlContainer.style.display = 'flex';
+            uploadContainer.style.display = 'none';
+            btnUrl.classList.add('active');
+            btnUpload.classList.remove('active');
+            const val = document.getElementById('imgInput' + version).value;
+            if (val && val.trim()) {
+                const preview = document.getElementById('livePreview' + version);
+                if (preview) preview.src = val.trim();
+            }
+        } else {
+            urlContainer.style.display = 'none';
+            uploadContainer.style.display = 'block';
+            btnUpload.classList.add('active');
+            btnUrl.classList.remove('active');
+        }
+    };
+
+    // File input preview listeners
+    const imgFileInputA = document.getElementById('imgFileInputA');
+    if (imgFileInputA) {
+        imgFileInputA.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                livePreviewA.src = URL.createObjectURL(this.files[0]);
+            }
+        });
+    }
+
+    const imgFileInputB = document.getElementById('imgFileInputB');
+    if (imgFileInputB) {
+        imgFileInputB.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                livePreviewB.src = URL.createObjectURL(this.files[0]);
+                previewContainerB.classList.remove('d-none');
+            }
+        });
+    }
+
+    // Live preview updates from URL inputs
     imgInputA.addEventListener('input', function() {
         if (this.value.trim()) {
             livePreviewA.src = this.value.trim();

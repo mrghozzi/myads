@@ -83,7 +83,9 @@ MYADS is a community platform where website owners:
     - **Live Interactive Previews:** Redesigned banner edit (`banner_edit.blade.php`) and smart ad edit (`smart_ad_edit.blade.php`) screens with responsive split-grid layouts featuring real-time client-side creative preview updates, AI topic metadata, and targeting chips.
     - **Ads Hub & Global Inventory (`/admin/ads`):** Unified cross-module management hub featuring quick action tiles, type filter pills (`all`, `banner`, `link`, `smart`, `custom`), and dedicated categorized settings panel (`/admin/ads/settings`) with instant AJAX save.
     - **Portable Architecture & i18n Parity:** Fully dynamic base URL calculation (`window.location.pathname.replace(/\/+$/, '')`) preventing subdirectory deployment 404s (e.g. XAMPP `/myads`), comprehensive bilingual translation parity (38 synchronized keys in `lang/en/` and `lang/ar/`) with English default, dark/light theme parity, and 100% automated test coverage in `AdminAdsAjaxTest.php` (9 passed, 57 assertions).
-
+59. **Dual Image Upload & URL Resolution for Banner Advertising (v4.6.0)** — Comprehensive overhaul of banner ad creative inputs across all creation and editing touchpoints (`/ads/promote`, `/ads/banners/create`, `/ads/banners/{id}/edit`, and `/admin/banners/{id}/edit`).
+    - **Banner Image Upload Service (`BannerImageUploadService`):** Unified service handling server-side file uploads to `upload/banners/` with cryptographic naming, strict MIME/extension whitelisting (`jpg, jpeg, png, gif, webp, svg`), 5MB size limits, and full public URL persistence (`url('upload/banners/...')`) for flawless third-party embed rendering. Features intelligent 3-tier fallback (Upload > URL > Existing Creative) and internal URL safety detection.
+    - **Frontend & Admin UI Enhancements:** Modern tabbed pill controls switching between Image URL and Local Device Upload, drag-and-drop file dropzones, and instantaneous client-side preview via `URL.createObjectURL(file)`. Full support for both primary and A/B test variations with reactive admin preview panels and 100% multilingual translation parity across 14 locales.
 
 ---
 
@@ -377,6 +379,7 @@ myads/
 | `CustomAdSettlementService` | Accepts/rejects/cancels custom ad deals, reserves/refunds PTS, and releases daily publisher payouts |
 | `CustomAdAnalyticsService` | Aggregates custom ad summaries, daily/hourly series, referrers, countries, devices, and CTR |
 | `MessageConversationService` | Manages message conversation resolution, partner lookup, pagination, unread counts, and read-state updates (optimized MAX(id_msg) memory fetching) |
+| `BannerImageUploadService` | Handles banner creative image uploads (validation, unique naming, `upload/banners/` storage) with intelligent fallback to image URLs or existing creatives for user and admin banner forms |
 | `MailConfigServiceProvider` | Boots early to override `config('mail.*')` from the `mail_settings` database table at runtime, with graceful fallback |
 
 ---

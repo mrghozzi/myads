@@ -4097,4 +4097,10 @@ return [
     'banner_added_successfully' => 'Anuncio de banner agregado con éxito.',
     'link_added_successfully' => 'Anuncio de texto agregado con éxito.',
     'site_added_successfully' => 'Campaña de intercambio de tráfico agregada con éxito.',
+
+    'banner_image_required' => 'Por favor, suba una imagen de banner o proporcione una URL de imagen.',
+    'invalid_image_file' => 'El archivo subido no es una imagen válida.',
+    'upload_from_device' => 'Subir desde el dispositivo',
+    'enter_image_url' => 'URL de la imagen',
+    'current_image' => 'Imagen actual',
 ];

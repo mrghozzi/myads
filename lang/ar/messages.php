@@ -4555,4 +4555,10 @@ return [
     'banner_added_successfully' => 'تمت إضافة الإعلان الصوري بنجاح.',
     'link_added_successfully' => 'تمت إضافة الإعلان النصي بنجاح.',
     'site_added_successfully' => 'تمت إضافة حملة تبادل الزيارات بنجاح.',
+
+    'banner_image_required' => 'يرجى رفع صورة للبانر أو إدخال رابط الصورة.',
+    'invalid_image_file' => 'الملف المرفوع ليس صورة صالحة.',
+    'upload_from_device' => 'رفع من الجهاز',
+    'enter_image_url' => 'رابط الصورة',
+    'current_image' => 'الصورة الحالية',
 ];

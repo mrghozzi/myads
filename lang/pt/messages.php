@@ -4092,4 +4092,10 @@ return [
     'banner_added_successfully' => 'Anúncio em banner adicionado com sucesso.',
     'link_added_successfully' => 'Anúncio de texto adicionado com sucesso.',
     'site_added_successfully' => 'Campanha de troca de tráfego adicionada com sucesso.',
+
+    'banner_image_required' => 'Por favor, carregue uma imagem de banner ou forneça um URL de imagem.',
+    'invalid_image_file' => 'O arquivo enviado não é uma imagem válida.',
+    'upload_from_device' => 'Carregar do dispositivo',
+    'enter_image_url' => 'URL da imagem',
+    'current_image' => 'Imagem atual',
 ];

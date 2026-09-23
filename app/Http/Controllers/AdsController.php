@@ -8,6 +8,7 @@ use App\Models\SmartAd;
 use App\Models\State;
 use App\Models\User;
 use App\Services\AdStatsService;
+use App\Services\BannerImageUploadService;
 use App\Services\SecurityPolicyService;
 use App\Support\BannerSizeCatalog;
 use Illuminate\Http\Request;
@@ -69,13 +70,22 @@ class AdsController extends Controller
     }
 
     // Store Banner
-    public function storeBanner(Request $request, SecurityPolicyService $securityPolicy)
+    public function storeBanner(Request $request, SecurityPolicyService $securityPolicy, BannerImageUploadService $bannerImageService)
     {
         if ($url = $request->input('url')) {
             $trimmed = trim((string) $url);
             if ($trimmed !== '' && !preg_match('~^https?://~i', $trimmed)) {
                 $request->merge(['url' => 'https://' . $trimmed]);
             }
+        }
+
+        // Resolve images from file upload or URL
+        $resolvedImg = $bannerImageService->resolveImage($request, 'img_file', 'img', null, true);
+        $request->merge(['img' => $resolvedImg]);
+
+        $resolvedImgB = $bannerImageService->resolveImage($request, 'img_file_b', 'img_b', null, false);
+        if ($resolvedImgB !== null) {
+            $request->merge(['img_b' => $resolvedImgB]);
         }
 
         $request->validate([
@@ -96,8 +106,12 @@ class AdsController extends Controller
             return back(fallback: route('ads.promote', ['p' => 'banners']))->withErrors(['url' => $violation])->withInput();
         }
 
-        if ($violation = $securityPolicy->urlViolation((string) $request->input('img'), 'ads', true)) {
+        if (!$bannerImageService->isInternalUrl((string) $request->input('img')) && ($violation = $securityPolicy->urlViolation((string) $request->input('img'), 'ads', true))) {
             return back(fallback: route('ads.promote', ['p' => 'banners']))->withErrors(['img' => $violation])->withInput();
+        }
+
+        if ($request->input('img_b') && !$bannerImageService->isInternalUrl((string) $request->input('img_b')) && ($violation = $securityPolicy->urlViolation((string) $request->input('img_b'), 'ads', true))) {
+            return back(fallback: route('ads.promote', ['p' => 'banners']))->withErrors(['img_b' => $violation])->withInput();
         }
 
         Banner::create([
@@ -141,10 +155,24 @@ class AdsController extends Controller
     }
 
     // Update Banner
-    public function updateBanner(Request $request, $id, SecurityPolicyService $securityPolicy)
+    public function updateBanner(Request $request, $id, SecurityPolicyService $securityPolicy, BannerImageUploadService $bannerImageService)
     {
         $user = Auth::user();
         $banner = Banner::where('id', $id)->where('uid', $user->id)->firstOrFail();
+
+        if ($url = $request->input('url')) {
+            $trimmed = trim((string) $url);
+            if ($trimmed !== '' && !preg_match('~^https?://~i', $trimmed)) {
+                $request->merge(['url' => 'https://' . $trimmed]);
+            }
+        }
+
+        // Resolve images with fallback to existing banner images
+        $resolvedImg = $bannerImageService->resolveImage($request, 'img_file', 'img', $banner->img, true);
+        $request->merge(['img' => $resolvedImg]);
+
+        $resolvedImgB = $bannerImageService->resolveImage($request, 'img_file_b', 'img_b', $banner->img_b, false);
+        $request->merge(['img_b' => $resolvedImgB]);
 
         $request->validate([
             'name' => 'required|string|max:255',
@@ -162,11 +190,11 @@ class AdsController extends Controller
             return back()->withErrors(['url' => $violation])->withInput();
         }
 
-        if ($violation = $securityPolicy->urlViolation((string) $request->input('img'), 'ads', true)) {
+        if (!$bannerImageService->isInternalUrl((string) $request->input('img')) && ($violation = $securityPolicy->urlViolation((string) $request->input('img'), 'ads', true))) {
             return back()->withErrors(['img' => $violation])->withInput();
         }
 
-        if ($request->input('img_b') && ($violation = $securityPolicy->urlViolation((string) $request->input('img_b'), 'ads', true))) {
+        if ($request->input('img_b') && !$bannerImageService->isInternalUrl((string) $request->input('img_b')) && ($violation = $securityPolicy->urlViolation((string) $request->input('img_b'), 'ads', true))) {
             return back()->withErrors(['img_b' => $violation])->withInput();
         }
 
@@ -180,7 +208,7 @@ class AdsController extends Controller
             'devices' => \App\Support\SmartAdTargeting::encodeList(\App\Support\SmartAdTargeting::normalizeDeviceTypes($request->input('devices') ?? [])),
         ]);
 
-        return redirect()->route('ads.banners.index')->with('success', 'Banner updated successfully.');
+        return redirect()->route('ads.banners.index')->with('success', __('messages.banner_updated_successfully') ?? 'Banner updated successfully.');
     }
 
     // Delete Banner
@@ -350,7 +378,7 @@ class AdsController extends Controller
     }
 
     // Store from Promote page
-    public function storePromote(Request $request, SecurityPolicyService $securityPolicy)
+    public function storePromote(Request $request, SecurityPolicyService $securityPolicy, BannerImageUploadService $bannerImageService)
     {
         $type = $request->input('p', $request->query('p', 'banners'));
 
@@ -362,7 +390,7 @@ class AdsController extends Controller
             return app(VisitController::class)->store($request, $securityPolicy);
         }
 
-        return $this->storeBanner($request, $securityPolicy);
+        return $this->storeBanner($request, $securityPolicy, $bannerImageService);
     }
 
     // Referrals Page (referral.php) - List of referred users

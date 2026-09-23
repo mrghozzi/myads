@@ -44,6 +44,7 @@ use App\Models\Page;
 use App\Models\ProductFile;
 use App\Models\Short;
 
+use App\Services\BannerImageUploadService;
 use App\Services\GamificationService;
 use App\Services\MaintenanceModeManager;
 use App\Services\OrphanCleanupService;
@@ -1984,7 +1985,7 @@ class AdminController extends Controller
         ]);
     }
 
-    public function updateBanner(Request $request, $id)
+    public function updateBanner(Request $request, $id, BannerImageUploadService $bannerImageService)
     {
         $banner = Banner::findOrFail($id);
         $oldStatus = $banner->statu;
@@ -2019,6 +2020,13 @@ class AdminController extends Controller
             }
             return redirect()->route('admin.banners')->with('success', __('messages.status_toggled_successfully'));
         }
+
+        // Resolve images from upload or URL (keeping current banner images if unchanged)
+        $resolvedImg = $bannerImageService->resolveImage($request, 'img_file', 'img', $banner->img, true);
+        $request->merge(['img' => $resolvedImg]);
+
+        $resolvedImgB = $bannerImageService->resolveImage($request, 'img_file_b', 'img_b', $banner->img_b, false);
+        $request->merge(['img_b' => $resolvedImgB]);
         
         $request->validate([
             'name' => 'required|string',

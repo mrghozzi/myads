@@ -4090,4 +4090,10 @@ return [
     'banner_added_successfully' => 'Банер реклама је успешно додата.',
     'link_added_successfully' => 'Текстуална реклама је успешно додата.',
     'site_added_successfully' => 'Кампања размене саобраћаја је успешно додата.',
+
+    'banner_image_required' => 'Молимо отпремите слику банера или унесите УРЛ слике.',
+    'invalid_image_file' => 'Отпремљена датотека није важећа слика.',
+    'upload_from_device' => 'Отпреми са уређаја',
+    'enter_image_url' => 'УРЛ слике',
+    'current_image' => 'Тренутна слика',
 ];

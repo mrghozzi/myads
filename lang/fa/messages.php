@@ -4092,4 +4092,10 @@ return [
     'banner_added_successfully' => 'تبلیغ بنری با موفقیت اضافه شد.',
     'link_added_successfully' => 'تبلیغ متنی با موفقیت اضافه شد.',
     'site_added_successfully' => 'کمپین تبادل ترافیک با موفقیت اضافه شد.',
+
+    'banner_image_required' => 'لطفاً تصویر بنر را آپلود کنید یا آدرس تصویر را وارد نمایید.',
+    'invalid_image_file' => 'فایل آپلود شده یک تصویر معتبر نیست.',
+    'upload_from_device' => 'آپلود از دستگاه',
+    'enter_image_url' => 'آدرس تصویر',
+    'current_image' => 'تصویر فعلی',
 ];

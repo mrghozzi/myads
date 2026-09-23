@@ -4097,4 +4097,10 @@ return [
     'banner_added_successfully' => 'Banner-Werbung erfolgreich hinzugefügt.',
     'link_added_successfully' => 'Textanzeige erfolgreich hinzugefügt.',
     'site_added_successfully' => 'Traffic-Austausch-Kampagne erfolgreich hinzugefügt.',
+
+    'banner_image_required' => 'Bitte laden Sie ein Banner-Bild hoch oder geben Sie eine Bild-URL an.',
+    'invalid_image_file' => 'Die hochgeladene Datei ist kein gültiges Bild.',
+    'upload_from_device' => 'Vom Gerät hochladen',
+    'enter_image_url' => 'Bild-URL',
+    'current_image' => 'Aktuelles Bild',
 ];

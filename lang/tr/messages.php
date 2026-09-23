@@ -4097,4 +4097,10 @@ return [
     'banner_added_successfully' => 'Banner reklamı başarıyla eklendi.',
     'link_added_successfully' => 'Metin reklamı başarıyla eklendi.',
     'site_added_successfully' => 'Trafik değişim kampanyası başarıyla eklendi.',
+
+    'banner_image_required' => 'Lütfen bir banner resmi yükleyin veya bir resim URL\'si girin.',
+    'invalid_image_file' => 'Yüklenen dosya geçerli bir resim değil.',
+    'upload_from_device' => 'Cihazdan yükle',
+    'enter_image_url' => 'Resim URL\'si',
+    'current_image' => 'Geçerli resim',
 ];

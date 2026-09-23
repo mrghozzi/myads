@@ -4095,4 +4095,10 @@ return [
     'banner_added_successfully' => '橫幅廣告新增成功。',
     'link_added_successfully' => '文字廣告新增成功。',
     'site_added_successfully' => '流量交換活動新增成功。',
+
+    'banner_image_required' => '請上傳橫幅圖片或提供圖片網址。',
+    'invalid_image_file' => '上傳的檔案不是有效的圖片。',
+    'upload_from_device' => '從裝置上傳',
+    'enter_image_url' => '圖片網址',
+    'current_image' => '當前圖片',
 ];

@@ -110,7 +110,7 @@
                         </span>
                     </div>
 
-                    <form method="post" action="{{ route('ads.banners.store') }}">
+                    <form method="post" action="{{ route('ads.banners.store') }}" enctype="multipart/form-data">
                         @csrf
                         <input type="hidden" name="from_promote" value="1">
                         <input type="hidden" name="p" value="banners">
@@ -164,19 +164,54 @@
                             </div>
 
                             <div class="superdesign-field-group">
-                                <label class="superdesign-field-label">
-                                    <i class="fa fa-image"></i>
-                                    {{ __('messages.image_link') }}
-                                </label>
-                                <div class="superdesign-input-wrapper">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                                    <label class="superdesign-field-label" style="margin-bottom: 0;">
+                                        <i class="fa fa-image"></i>
+                                        {{ __('messages.image_link') }}
+                                    </label>
+                                    <div style="display: inline-flex; background: #e2e8f0; padding: 2px; border-radius: 6px; gap: 2px;">
+                                        <button type="button" id="promoteImgModeUrl" onclick="switchBannerImgMode('url')" style="border: none; background: #fff; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; cursor: pointer; color: #1e293b;">
+                                            <i class="fa fa-link"></i> {{ __('messages.enter_image_url') }}
+                                        </button>
+                                        <button type="button" id="promoteImgModeUpload" onclick="switchBannerImgMode('upload')" style="border: none; background: transparent; padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; cursor: pointer; color: #64748b;">
+                                            <i class="fa fa-cloud-upload-alt"></i> {{ __('messages.upload_from_device') }}
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div id="promoteImgUrlContainer" class="superdesign-input-wrapper">
                                     <input 
                                         type="text" 
                                         name="img" 
+                                        id="promoteImgInputUrl"
                                         class="superdesign-input" 
                                         value="{{ old('img') }}" 
-                                        required 
                                         placeholder="{{ __('messages.image_link_placeholder') }}"
+                                        oninput="updatePromoteBannerPreview(this.value)"
                                     >
+                                </div>
+
+                                <div id="promoteImgUploadContainer" style="display: none;">
+                                    <div style="border: 2px dashed #cbd5e1; border-radius: 8px; padding: 12px; text-align: center; background: #f8fafc; cursor: pointer;" onclick="document.getElementById('promoteImgFileInput').click();">
+                                        <input 
+                                            type="file" 
+                                            name="img_file" 
+                                            id="promoteImgFileInput" 
+                                            accept="image/*" 
+                                            style="display: none;" 
+                                            onchange="handlePromoteFileSelected(this)"
+                                        >
+                                        <i class="fa fa-cloud-upload-alt" style="font-size: 20px; color: #615dfa; margin-bottom: 4px; display: block;"></i>
+                                        <span id="promoteFileLabel" style="font-size: 12px; font-weight: 600; color: #334155;">
+                                            {{ __('messages.upload_from_device') }}
+                                        </span>
+                                        <small style="display: block; color: #94a3b8; font-size: 10px;">JPG, PNG, GIF, WEBP, SVG (Max 5MB)</small>
+                                    </div>
+                                </div>
+
+                                <div id="promoteImgPreviewBox" style="display: none; margin-top: 8px; text-align: center; padding: 8px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px;">
+                                    <span style="font-size: 10px; color: #64748b; font-weight: 600; display: block; margin-bottom: 4px;">{{ __('messages.preview') }}</span>
+                                    <img id="promoteImgPreview" src="" alt="Banner Preview" style="max-height: 90px; max-width: 100%; object-fit: contain; border-radius: 4px;">
                                 </div>
                             </div>
                         </div>
@@ -776,4 +811,69 @@ html.app-skin-dark .superdesign-section-header,
     border-bottom-color: #334155;
 }
 </style>
+
+<script>
+function switchBannerImgMode(mode) {
+    const urlContainer = document.getElementById('promoteImgUrlContainer');
+    const uploadContainer = document.getElementById('promoteImgUploadContainer');
+    const btnUrl = document.getElementById('promoteImgModeUrl');
+    const btnUpload = document.getElementById('promoteImgModeUpload');
+
+    if (!urlContainer || !uploadContainer) return;
+
+    if (mode === 'url') {
+        urlContainer.style.display = 'block';
+        uploadContainer.style.display = 'none';
+        btnUrl.style.background = '#fff';
+        btnUrl.style.color = '#1e293b';
+        btnUpload.style.background = 'transparent';
+        btnUpload.style.color = '#64748b';
+        const urlVal = document.getElementById('promoteImgInputUrl').value;
+        if (urlVal) updatePromoteBannerPreview(urlVal);
+    } else {
+        urlContainer.style.display = 'none';
+        uploadContainer.style.display = 'block';
+        btnUpload.style.background = '#fff';
+        btnUpload.style.color = '#1e293b';
+        btnUrl.style.background = 'transparent';
+        btnUrl.style.color = '#64748b';
+    }
+}
+
+function updatePromoteBannerPreview(url) {
+    const box = document.getElementById('promoteImgPreviewBox');
+    const img = document.getElementById('promoteImgPreview');
+    if (!box || !img) return;
+
+    const trimmed = (url || '').trim();
+    if (trimmed) {
+        img.src = trimmed;
+        box.style.display = 'block';
+    } else {
+        box.style.display = 'none';
+    }
+}
+
+function handlePromoteFileSelected(input) {
+    if (input.files && input.files[0]) {
+        const file = input.files[0];
+        const label = document.getElementById('promoteFileLabel');
+        if (label) label.textContent = file.name;
+
+        const box = document.getElementById('promoteImgPreviewBox');
+        const img = document.getElementById('promoteImgPreview');
+        if (box && img) {
+            img.src = URL.createObjectURL(file);
+            box.style.display = 'block';
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const urlInput = document.getElementById('promoteImgInputUrl');
+    if (urlInput && urlInput.value) {
+        updatePromoteBannerPreview(urlInput.value);
+    }
+});
+</script>
 @endsection

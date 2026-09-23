@@ -4090,4 +4090,10 @@ return [
     'banner_added_successfully' => 'バナー広告が正常に追加されました。',
     'link_added_successfully' => 'テキスト広告が正常に追加されました。',
     'site_added_successfully' => 'トラフィック交換キャンペーンが正常に追加されました。',
+
+    'banner_image_required' => 'バナー画像をアップロードするか、画像URLを入力してください。',
+    'invalid_image_file' => 'アップロードされたファイルは有効な画像ではありません。',
+    'upload_from_device' => 'デバイスからアップロード',
+    'enter_image_url' => '画像URL',
+    'current_image' => '現在の画像',
 ];

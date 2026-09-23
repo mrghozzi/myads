@@ -236,8 +236,29 @@
   * Added 38 synchronized bilingual keys to both `lang/en/messages.php` and `lang/ar/messages.php` with 0 missing translations.
   * Full dark mode support (`html.app-skin-dark body.admin-premium-shell`) and bidirectional RTL/LTR layout parity.
 
+### Dual Image Upload & URL Resolution for Banner Advertising (Frontend & Admin Panel)
+* **Unified Banner Image Upload Service (`app/Services/BannerImageUploadService.php`):**
+  * Engineered a dedicated, reusable banner image resolution and storage service supporting both direct file uploads (`img_file`, `img_file_b`) and external image URLs (`img`, `img_b`).
+  * Enforces strict server-side validation: MIME type check, extension whitelist (`jpg, jpeg, png, gif, webp, svg`), and maximum file size constraint (5MB).
+  * Automatically stores uploaded banners in the public `upload/banners/` directory with unique, cryptographically randomized filenames (`banner_{time}_{random}.{ext}`).
+  * Persists full public URLs (`url('upload/banners/' . $filename)`) in the database to ensure external publisher embed scripts (`bn.php`, `embed/banner.js`) render banner creatives seamlessly across third-party websites without relative path breakage.
+  * Implements intelligent three-tier resolution: prioritizes newly uploaded files, falls back to trimmed/normalized URL strings, and automatically preserves existing creative assets during edits if no new media is supplied.
+  * Features `isInternalUrl()` detection to bypass external SSRF and local URL security inspectors for local and uploaded assets.
+* **Frontend & Admin Panel Creative Management Overhaul:**
+  * **Ad Promotion Hub (`themes/default/views/ads/promote.blade.php`):** Added `enctype="multipart/form-data"` to banner form, modern dual-mode switcher pills (Image URL vs. Upload from Device), drag-and-drop file upload container with visual cue, and instantaneous live client-side preview via `URL.createObjectURL(file)`.
+  * **Direct Banner Creation (`themes/default/views/ads/banners/create.blade.php`):** Added `enctype="multipart/form-data"`, independent dual-mode toggles (URL / Upload from device) for both Version A and Version B (A/B testing) creatives, and instant client-side preview boxes.
+  * **User Banner Edit Studio (`themes/default/views/ads/banners/edit.blade.php`):** Displays existing banner image with dedicated label and provides seamless toggle to keep current image, enter new URL, or upload replacement file from local device for both A and B versions.
+  * **Admin Banner Edit Studio (`admin_themes/default/views/admin/banner_edit.blade.php`):** Added `enctype="multipart/form-data"`, dual URL/Upload controls for Version A and Version B, and reactive event listeners dynamically synchronizing the right-hand `#livePreviewA` and `#livePreviewB` cards upon file selection or URL input with full AJAX form persistence.
+* **Controller & Route Integration:**
+  * Integrated `BannerImageUploadService` across `AdsController::storeBanner`, `AdsController::updateBanner`, `AdsController::storePromote`, and `AdminController::updateBanner`.
+  * Seamlessly supports both standard multipart form submissions and asynchronous AJAX `FormData` requests.
+* **Multilingual Localization & Automated Test Suite:**
+  * Added 5 synchronized translation keys (`banner_image_required`, `invalid_image_file`, `upload_from_device`, `enter_image_url`, `current_image`) across all 14 supported locales (`lang/*/messages.php`).
+  * Comprehensive automated feature test suite (`tests/Feature/BannerImageUploadAndUrlTest.php`) verifying file upload storage, URL normalization, A/B testing variations, missing image validation, edit preservation, and admin AJAX multipart updates (7 passed, 31 assertions).
+
 ### Automated Test Verification
 * **Full Feature Test Coverage (`tests/Feature/`):**
+  * `BannerImageUploadAndUrlTest.php`: 7 passed, 31 assertions (100% pass rate).
   * `AdminAdsAjaxTest.php`: 9 passed, 57 assertions (100% pass rate).
   * `AdminUsersAjaxTest.php`: 6 passed, 20 assertions (100% pass rate).
   * `SecuritySuiteFeatureTest.php`: 7 passed, 23 assertions.

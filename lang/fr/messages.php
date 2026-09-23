@@ -4101,4 +4101,10 @@ return [
     'banner_added_successfully' => 'Bannière publicitaire ajoutée avec succès.',
     'link_added_successfully' => 'Annonce textuelle ajoutée avec succès.',
     'site_added_successfully' => 'Campagne d\'échange de trafic ajoutée avec succès.',
+
+    'banner_image_required' => 'Veuillez télécharger une image de bannière ou fournir une URL d\'image.',
+    'invalid_image_file' => 'Le fichier téléchargé n\'est pas une image valide.',
+    'upload_from_device' => 'Télécharger depuis l\'appareil',
+    'enter_image_url' => 'URL de l\'image',
+    'current_image' => 'Image actuelle',
 ];

@@ -4090,4 +4090,10 @@ return [
     'banner_added_successfully' => 'Баннер успешно добавлен.',
     'link_added_successfully' => 'Текстовое объявление успешно добавлено.',
     'site_added_successfully' => 'Кампания обмена трафиком успешно добавлена.',
+
+    'banner_image_required' => 'Пожалуйста, загрузите изображение баннера или укажите URL изображения.',
+    'invalid_image_file' => 'Загруженный файл не является допустимым изображением.',
+    'upload_from_device' => 'Загрузить с устройства',
+    'enter_image_url' => 'URL изображения',
+    'current_image' => 'Текущее изображение',
 ];
