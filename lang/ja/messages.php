@@ -4074,4 +4074,17 @@ return [
     'mermaid_render_error' => 'Mermaid ダイアグラムを描画できませんでした。構文を確認してください。',
     'shortcut' => 'ショートカット',
     'shortcuts' => 'ショートカット',
+
+    // Advertising & Traffic Suite Keys
+    'general' => '一般',
+    'rules' => 'ルール',
+    'minutes' => '分',
+    'targeting' => 'ターゲティング',
+    'sort_newest' => '新しい順',
+    'sort_views' => '閲覧数順',
+    'sort_clicks' => 'クリック数順',
+    'banner_details' => 'バナーの詳細とターゲティング',
+    'target_url' => 'ターゲットURL',
+    'ab_test_hint' => '任意: トラフィック分散最適化用の2枚目の画像を提供します。',
+    'txt' => 'テキスト',
 ];

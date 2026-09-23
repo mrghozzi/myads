@@ -4081,4 +4081,17 @@ return [
     'mermaid_render_error' => 'Mermaid diyagramı oluşturulamadı, lütfen sözdizimini kontrol edin.',
     'shortcut' => 'Kısayol',
     'shortcuts' => 'Kısayollar',
+
+    // Advertising & Traffic Suite Keys
+    'general' => 'Genel',
+    'rules' => 'Kurallar',
+    'minutes' => 'dakika',
+    'targeting' => 'Hedefleme',
+    'sort_newest' => 'Önce En Yeniler',
+    'sort_views' => 'En Çok Görüntülenen',
+    'sort_clicks' => 'En Çok Tıklanan',
+    'banner_details' => 'Banner Ayrıntıları ve Hedefleme',
+    'target_url' => 'Hedef URL',
+    'ab_test_hint' => 'İsteğe bağlı: Trafik bölme optimizasyonu için ikinci bir görsel sağlayın.',
+    'txt' => 'Metin',
 ];

@@ -4076,4 +4076,17 @@ return [
     'mermaid_render_error' => 'امکان رسم نمودار Mermaid وجود ندارد، لطفاً ساختار کد را بررسی کنید.',
     'shortcut' => 'میانبر',
     'shortcuts' => 'میانبرها',
+
+    // Advertising & Traffic Suite Keys
+    'general' => 'عمومی',
+    'rules' => 'قوانین',
+    'minutes' => 'دقیقه',
+    'targeting' => 'هدف‌گذاری',
+    'sort_newest' => 'جدیدترین‌ها',
+    'sort_views' => 'بیشترین بازدید',
+    'sort_clicks' => 'بیشترین کلیک',
+    'banner_details' => 'جزئیات بنر و هدف‌گذاری',
+    'target_url' => 'آدرس هدف',
+    'ab_test_hint' => 'اختیاری: ارائه تصویر دوم برای بهینه‌سازی تقسیم ترافیک.',
+    'txt' => 'متن',
 ];

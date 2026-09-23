@@ -4074,4 +4074,17 @@ return [
     'mermaid_render_error' => 'Не удалось отрендерить диаграмму Mermaid, проверьте синтаксис.',
     'shortcut' => 'Ярлык',
     'shortcuts' => 'Ярлыки',
+
+    // Advertising & Traffic Suite Keys
+    'general' => 'Общие',
+    'rules' => 'Правила',
+    'minutes' => 'минут',
+    'targeting' => 'Таргетинг',
+    'sort_newest' => 'Сначала новые',
+    'sort_views' => 'Больше просмотров',
+    'sort_clicks' => 'Больше кликов',
+    'banner_details' => 'Параметры баннера и таргетинг',
+    'target_url' => 'Целевой URL',
+    'ab_test_hint' => 'Необязательно: укажите второе изображение для A/B тестирования.',
+    'txt' => 'Текст',
 ];

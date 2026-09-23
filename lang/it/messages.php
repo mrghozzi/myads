@@ -4076,4 +4076,17 @@ return [
     'mermaid_render_error' => 'Impossibile eseguire il rendering del diagramma Mermaid, verificare la sintassi.',
     'shortcut' => 'Scorciatoia',
     'shortcuts' => 'Scorciatoie',
+
+    // Advertising & Traffic Suite Keys
+    'general' => 'Generale',
+    'rules' => 'Regole',
+    'minutes' => 'minuti',
+    'targeting' => 'Targeting',
+    'sort_newest' => 'Prima i più recenti',
+    'sort_views' => 'Più visualizzati',
+    'sort_clicks' => 'Più cliccati',
+    'banner_details' => 'Dettagli banner e targeting',
+    'target_url' => 'URL di destinazione',
+    'ab_test_hint' => 'Opzionale: Fornisci una seconda immagine per l\'ottimizzazione della suddivisione del traffico.',
+    'txt' => 'Testo',
 ];

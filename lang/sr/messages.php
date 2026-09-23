@@ -4074,4 +4074,17 @@ return [
     'mermaid_render_error' => 'Nije moguće prikazati Mermaid dijagram, proverite sintaksu.',
     'shortcut' => 'Пречица',
     'shortcuts' => 'Пречице',
+
+    // Advertising & Traffic Suite Keys
+    'general' => 'Опште',
+    'rules' => 'Правила',
+    'minutes' => 'минута',
+    'targeting' => 'Циљање',
+    'sort_newest' => 'Прво најновије',
+    'sort_views' => 'Највише прегледа',
+    'sort_clicks' => 'Највише кликова',
+    'banner_details' => 'Детаљи банера и циљање',
+    'target_url' => 'Циљни УРЛ',
+    'ab_test_hint' => 'Опционо: Обезбедите другу слику за оптимизацију поделе саобраћаја.',
+    'txt' => 'Текст',
 ];

@@ -4076,4 +4076,17 @@ return [
     'mermaid_render_error' => 'Não foi possível renderizar o diagrama Mermaid, verifique a sintaxe.',
     'shortcut' => 'Atalho',
     'shortcuts' => 'Atalhos',
+
+    // Advertising & Traffic Suite Keys
+    'general' => 'Geral',
+    'rules' => 'Regras',
+    'minutes' => 'minutos',
+    'targeting' => 'Segmentação',
+    'sort_newest' => 'Mais recentes primeiro',
+    'sort_views' => 'Mais visualizações',
+    'sort_clicks' => 'Mais cliques',
+    'banner_details' => 'Detalhes do banner e segmentação',
+    'target_url' => 'URL de destino',
+    'ab_test_hint' => 'Opcional: Forneça uma segunda imagem para otimização de divisão de tráfego.',
+    'txt' => 'Texto',
 ];

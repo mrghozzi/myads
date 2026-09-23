@@ -170,11 +170,11 @@
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold text-dark">{{ __('messages.txt') ?? 'Text / Description' }} (A) <span class="text-danger">*</span></label>
+                            <label class="form-label fw-semibold text-dark">{{ __('messages.text') }} (A) <span class="text-danger">*</span></label>
                             <textarea class="form-control" id="editLinkTxt" name="txt" rows="3" required></textarea>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-semibold text-dark">{{ __('messages.txt') ?? 'Text / Description' }} (B - Optional)</label>
+                            <label class="form-label fw-semibold text-dark">{{ __('messages.text') }} (B - Optional)</label>
                             <textarea class="form-control" id="editLinkTxtB" name="txt_b" rows="3" placeholder="A/B Split Test"></textarea>
                         </div>
                         <div class="col-md-6">

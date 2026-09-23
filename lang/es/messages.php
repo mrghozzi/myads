@@ -4081,4 +4081,17 @@ return [
     'mermaid_render_error' => 'No se pudo generar el diagrama Mermaid, revise la sintaxis.',
     'shortcut' => 'Acceso directo',
     'shortcuts' => 'Accesos directos',
+
+    // Advertising & Traffic Suite Keys
+    'general' => 'General',
+    'rules' => 'Reglas',
+    'minutes' => 'minutos',
+    'targeting' => 'Segmentación',
+    'sort_newest' => 'Más recientes primero',
+    'sort_views' => 'Más vistas',
+    'sort_clicks' => 'Más clics',
+    'banner_details' => 'Detalles del banner y segmentación',
+    'target_url' => 'URL de destino',
+    'ab_test_hint' => 'Opcional: Proporcione una segunda imagen para la optimización de división de tráfico.',
+    'txt' => 'Texto',
 ];

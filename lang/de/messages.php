@@ -4081,4 +4081,17 @@ return [
     'mermaid_render_error' => 'Mermaid-Diagramm konnte nicht gerendert werden, bitte Syntax prüfen.',
     'shortcut' => 'Verknüpfung',
     'shortcuts' => 'Verknüpfungen',
+
+    // Advertising & Traffic Suite Keys
+    'general' => 'Allgemein',
+    'rules' => 'Regeln',
+    'minutes' => 'Minuten',
+    'targeting' => 'Zielgruppenansprache',
+    'sort_newest' => 'Neueste zuerst',
+    'sort_views' => 'Meiste Aufrufe',
+    'sort_clicks' => 'Meiste Klicks',
+    'banner_details' => 'Banner-Details & Zielgruppenansprache',
+    'target_url' => 'Ziel-URL',
+    'ab_test_hint' => 'Optional: Geben Sie ein zweites Bild für die A/B-Split-Optimierung an.',
+    'txt' => 'Text',
 ];

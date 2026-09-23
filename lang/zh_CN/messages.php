@@ -4079,4 +4079,17 @@ return [
     'mermaid_render_error' => '无法渲染 Mermaid 图表，请检查语法结构。',
     'shortcut' => '快捷方式',
     'shortcuts' => '快捷方式',
+
+    // Advertising & Traffic Suite Keys
+    'general' => '常规',
+    'rules' => '规则',
+    'minutes' => '分钟',
+    'targeting' => '定向投放',
+    'sort_newest' => '最新优先',
+    'sort_views' => '浏览最多',
+    'sort_clicks' => '点击最多',
+    'banner_details' => '横幅详情与定向',
+    'target_url' => '目标链接',
+    'ab_test_hint' => '可选：提供第二张图片用于分流测试优化。',
+    'txt' => '文本',
 ];

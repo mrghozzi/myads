@@ -4540,5 +4540,16 @@ return [
     'selected_items' => 'selected items',
     'bulk_actions' => 'Bulk Actions',
     'open_link' => 'Open Link',
+    'general' => 'General',
+    'rules' => 'Rules',
+    'minutes' => 'minutes',
+    'targeting' => 'Targeting',
+    'sort_newest' => 'Newest First',
+    'sort_views' => 'Most Views',
+    'sort_clicks' => 'Most Clicks',
+    'banner_details' => 'Banner Details & Targeting',
+    'target_url' => 'Target URL',
+    'ab_test_hint' => 'Optional: Provide a second image for traffic split optimization.',
+    'txt' => 'Text',
 ];
 
