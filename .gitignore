@@ -89,6 +89,7 @@ custom_variables.css
 !/tests/Feature/AdminDashboardAjaxTest.php
 !/tests/Feature/PointHistoryTest.php
 !/tests/Feature/AdminUsersAjaxTest.php
+!/tests/Feature/AdminAdsAjaxTest.php
 ~/.pi/
 /wiki/
 /brain/

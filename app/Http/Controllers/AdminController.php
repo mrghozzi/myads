@@ -999,6 +999,13 @@ class AdminController extends Controller
             ]
         );
 
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => __('messages.ads_settings_saved'),
+            ]);
+        }
+
         return redirect()->route('admin.ads.settings')->with('success', __('messages.ads_settings_saved'));
     }
 
@@ -1788,14 +1795,51 @@ class AdminController extends Controller
             'size' => '',
         ]);
 
-        $query = Banner::with('user')->orderBy('id', 'desc');
+        if ($request->filled('search') && empty($filterState['keyword'])) {
+            $filterState['keyword'] = trim((string) $request->input('search'));
+        }
+        if ($request->filled('status') && empty($filterState['status'])) {
+            $filterState['status'] = $request->input('status');
+        }
+        if ($request->filled('size') && empty($filterState['size'])) {
+            $filterState['size'] = $request->input('size');
+        }
+
+        $sort = $request->input('sort', 'newest');
+        if ($sort === 'views') {
+            $query = Banner::with('user')->orderBy('vu', 'desc');
+        } elseif ($sort === 'clicks') {
+            $query = Banner::with('user')->orderBy('clik', 'desc');
+        } elseif ($sort === 'oldest') {
+            $query = Banner::with('user')->orderBy('id', 'asc');
+        } else {
+            $query = Banner::with('user')->orderBy('id', 'desc');
+        }
 
         $this->applyAdminInventoryFilters($query, $filterState, $this->bannerFilterCallbacks());
 
         $banners = $query->paginate(20)->withQueryString();
 
+        $stats = [
+            'total' => Banner::count(),
+            'active' => Banner::where('statu', 1)->count(),
+            'paused' => Banner::where('statu', '!=', 1)->count(),
+            'total_views' => (int) Banner::sum('vu'),
+            'total_clicks' => (int) Banner::sum('clik'),
+        ];
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'html' => view('admin::admin.partials.banners_table', compact('banners'))->render(),
+                'stats' => $stats,
+                'total' => $banners->total(),
+            ]);
+        }
+
         return view('admin::admin.banners', [
             'banners' => $banners,
+            'stats' => $stats,
             'filterState' => $filterState,
             'filterFields' => $this->bannerFilterFields(),
             'resultsCount' => $banners->total(),
@@ -1906,6 +1950,11 @@ class AdminController extends Controller
             ->sortByDesc(fn ($item) => optional($item->created_at)->getTimestamp() ?? 0)
             ->values();
 
+        $type = $request->query('type', 'all');
+        if ($type !== 'all') {
+            $items = $items->filter(fn ($item) => $item->type === $type)->values();
+        }
+
         $summary = [
             'banners' => Banner::count(),
             'links' => Link::count(),
@@ -1913,7 +1962,15 @@ class AdminController extends Controller
             'custom_ads' => CustomAdPlacement::count(),
         ];
 
-        return view('admin::admin.ads_overview', compact('items', 'summary', 'search'));
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'items' => $items,
+                'summary' => $summary,
+            ]);
+        }
+
+        return view('admin::admin.ads_overview', compact('items', 'summary', 'search', 'type'));
     }
 
     public function editBanner($id)
@@ -1931,6 +1988,37 @@ class AdminController extends Controller
     {
         $banner = Banner::findOrFail($id);
         $oldStatus = $banner->statu;
+
+        // Quick status toggle support
+        if ($request->has('toggle_status') || ($request->has('statu') && !$request->has('name'))) {
+            $newStatus = (int) $request->input('statu');
+            if (!in_array($newStatus, [1, 2])) {
+                $newStatus = ($banner->statu == 1) ? 2 : 1;
+            }
+            $banner->update(['statu' => $newStatus]);
+
+            if ($oldStatus != $newStatus) {
+                $nurl = 'ads/banners/' . $id . '/edit';
+                $name = ($newStatus == 1) ? __('your_ad_has_been_activated') : __('your_ad_as_been_blocked');
+                Notification::create([
+                    'uid' => $banner->uid,
+                    'name' => $name,
+                    'nurl' => $nurl,
+                    'logo' => 'overview',
+                    'time' => time(),
+                    'state' => 1
+                ]);
+            }
+
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => __('messages.status_toggled_successfully'),
+                    'status' => $banner->statu,
+                ]);
+            }
+            return redirect()->route('admin.banners')->with('success', __('messages.status_toggled_successfully'));
+        }
         
         $request->validate([
             'name' => 'required|string',
@@ -1971,29 +2059,64 @@ class AdminController extends Controller
             ]);
         }
 
-        return redirect()->route('admin.banners')->with('success', __('banner_updated'));
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => __('messages.banner_updated_successfully'),
+            ]);
+        }
+
+        return redirect()->route('admin.banners')->with('success', __('messages.banner_updated_successfully'));
     }
 
     public function deleteBanner($id)
     {
         $this->performBannerDeletion($id);
+
+        if (request()->ajax() || request()->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => __('messages.banner_deleted_successfully'),
+            ]);
+        }
         
-        return redirect()->route('admin.banners')->with('success', __('banner_deleted'));
+        return redirect()->route('admin.banners')->with('success', __('messages.banner_deleted_successfully'));
     }
 
     public function bulkDeleteBanners(Request $request)
     {
         $ids = $request->input('ids');
+        $action = $request->input('action', 'delete');
 
         if (!$ids || !is_array($ids)) {
-            return redirect()->back()->with('error', __('messages.no_selection') ?? 'No items selected');
+            $msg = __('messages.no_selection') ?? 'No items selected';
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $msg], 422);
+            }
+            return redirect()->back()->with('error', $msg);
         }
 
-        foreach ($ids as $id) {
-            $this->performBannerDeletion($id);
+        if ($action === 'activate') {
+            Banner::whereIn('id', $ids)->update(['statu' => 1]);
+            $msg = __('messages.bulk_activate_success');
+        } elseif ($action === 'pause') {
+            Banner::whereIn('id', $ids)->update(['statu' => 2]);
+            $msg = __('messages.bulk_pause_success');
+        } else {
+            foreach ($ids as $id) {
+                $this->performBannerDeletion($id);
+            }
+            $msg = __('messages.banner_deleted_successfully');
         }
 
-        return redirect()->route('admin.banners')->with('success', __('banner_deleted'));
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => $msg,
+            ]);
+        }
+
+        return redirect()->route('admin.banners')->with('success', $msg);
     }
 
     private function performBannerDeletion($id)
@@ -2073,14 +2196,45 @@ class AdminController extends Controller
             'clicks_max' => '',
         ]);
 
-        $query = Link::with('user')->orderBy('id', 'desc');
+        if ($request->filled('search') && empty($filterState['keyword'])) {
+            $filterState['keyword'] = trim((string) $request->input('search'));
+        }
+        if ($request->filled('status') && empty($filterState['status'])) {
+            $filterState['status'] = $request->input('status');
+        }
+
+        $sort = $request->input('sort', 'newest');
+        if ($sort === 'clicks') {
+            $query = Link::with('user')->orderBy('clik', 'desc');
+        } elseif ($sort === 'oldest') {
+            $query = Link::with('user')->orderBy('id', 'asc');
+        } else {
+            $query = Link::with('user')->orderBy('id', 'desc');
+        }
 
         $this->applyAdminInventoryFilters($query, $filterState, $this->linkFilterCallbacks());
 
         $links = $query->paginate(20)->withQueryString();
 
+        $stats = [
+            'total' => Link::count(),
+            'active' => Link::where('statu', 1)->count(),
+            'inactive' => Link::where('statu', '!=', 1)->count(),
+            'total_clicks' => (int) Link::sum('clik'),
+        ];
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'html' => view('admin::admin.partials.links_table', compact('links'))->render(),
+                'stats' => $stats,
+                'total' => $links->total(),
+            ]);
+        }
+
         return view('admin::admin.links', [
             'links' => $links,
+            'stats' => $stats,
             'filterState' => $filterState,
             'filterFields' => $this->linkFilterFields(),
             'resultsCount' => $links->total(),
@@ -2091,6 +2245,24 @@ class AdminController extends Controller
     public function updateLink(Request $request, $id)
     {
         $link = Link::findOrFail($id);
+
+        // Quick status toggle support
+        if ($request->has('toggle_status') || ($request->has('statu') && !$request->has('name'))) {
+            $newStatus = (int) $request->input('statu');
+            if (!in_array($newStatus, [0, 1, 2])) {
+                $newStatus = ($link->statu == 1) ? 0 : 1;
+            }
+            $link->update(['statu' => $newStatus]);
+
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => __('messages.status_toggled_successfully'),
+                    'status' => $link->statu,
+                ]);
+            }
+            return redirect()->back()->with('success', __('messages.status_toggled_successfully'));
+        }
         
         $request->validate([
             'name' => 'required|string',
@@ -2115,28 +2287,64 @@ class AdminController extends Controller
             'devices' => SmartAdTargeting::encodeList(SmartAdTargeting::normalizeDeviceTypes($request->input('devices') ?? [])),
         ]);
 
-        return redirect()->back()->with('success', __('link_updated'));
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => __('messages.link_updated_successfully'),
+            ]);
+        }
+
+        return redirect()->back()->with('success', __('messages.link_updated_successfully'));
     }
 
     public function deleteLink($id)
     {
         $this->performLinkDeletion($id);
-        return redirect()->back()->with('success', __('link_deleted'));
+
+        if (request()->ajax() || request()->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => __('messages.link_deleted_successfully'),
+            ]);
+        }
+
+        return redirect()->back()->with('success', __('messages.link_deleted_successfully'));
     }
 
     public function bulkDeleteLinks(Request $request)
     {
         $ids = $request->input('ids');
+        $action = $request->input('action', 'delete');
 
         if (!$ids || !is_array($ids)) {
-            return redirect()->back()->with('error', __('messages.no_selection') ?? 'No items selected');
+            $msg = __('messages.no_selection') ?? 'No items selected';
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $msg], 422);
+            }
+            return redirect()->back()->with('error', $msg);
         }
 
-        foreach ($ids as $id) {
-            $this->performLinkDeletion($id);
+        if ($action === 'activate') {
+            Link::whereIn('id', $ids)->update(['statu' => 1]);
+            $msg = __('messages.bulk_activate_success');
+        } elseif ($action === 'deactivate' || $action === 'pause') {
+            Link::whereIn('id', $ids)->update(['statu' => 0]);
+            $msg = __('messages.bulk_pause_success');
+        } else {
+            foreach ($ids as $id) {
+                $this->performLinkDeletion($id);
+            }
+            $msg = __('messages.link_deleted_successfully');
         }
 
-        return redirect()->back()->with('success', __('link_deleted'));
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => $msg,
+            ]);
+        }
+
+        return redirect()->back()->with('success', $msg);
     }
 
     private function performLinkDeletion($id)
@@ -2176,14 +2384,49 @@ class AdminController extends Controller
             'clicks_max' => '',
         ]);
 
-        $query = SmartAd::with('user')->orderBy('id', 'desc');
+        if ($request->filled('search') && empty($filterState['keyword'])) {
+            $filterState['keyword'] = trim((string) $request->input('search'));
+        }
+        if ($request->filled('status') && empty($filterState['status'])) {
+            $filterState['status'] = $request->input('status');
+        }
+
+        $sort = $request->input('sort', 'newest');
+        if ($sort === 'impressions') {
+            $query = SmartAd::with('user')->orderBy('impressions', 'desc');
+        } elseif ($sort === 'clicks') {
+            $query = SmartAd::with('user')->orderBy('clicks', 'desc');
+        } elseif ($sort === 'oldest') {
+            $query = SmartAd::with('user')->orderBy('id', 'asc');
+        } else {
+            $query = SmartAd::with('user')->orderBy('id', 'desc');
+        }
 
         $this->applyAdminInventoryFilters($query, $filterState, $this->smartAdFilterCallbacks());
 
         $smartAds = $query->paginate(20)->withQueryString();
 
+        $stats = [
+            'total' => SmartAd::count(),
+            'active' => SmartAd::where('statu', 1)->count(),
+            'paused' => SmartAd::where('statu', 0)->count(),
+            'blocked' => SmartAd::where('statu', 2)->count(),
+            'total_impressions' => (int) SmartAd::sum('impressions'),
+            'total_clicks' => (int) SmartAd::sum('clicks'),
+        ];
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'html' => view('admin::admin.partials.smart_ads_table', compact('smartAds'))->render(),
+                'stats' => $stats,
+                'total' => $smartAds->total(),
+            ]);
+        }
+
         return view('admin::admin.smart_ads', [
             'smartAds' => $smartAds,
+            'stats' => $stats,
             'filterState' => $filterState,
             'filterFields' => $this->smartAdFilterFields(),
             'resultsCount' => $smartAds->total(),
@@ -2205,6 +2448,24 @@ class AdminController extends Controller
     public function updateSmartAd(Request $request, $id)
     {
         $smartAd = SmartAd::findOrFail($id);
+
+        // Quick status toggle support
+        if ($request->has('toggle_status') || ($request->has('statu') && !$request->has('landing_url'))) {
+            $newStatus = (int) $request->input('statu');
+            if (!in_array($newStatus, [0, 1, 2])) {
+                $newStatus = ($smartAd->statu == 1) ? 0 : 1;
+            }
+            $smartAd->update(['statu' => $newStatus]);
+
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => __('messages.status_toggled_successfully'),
+                    'status' => $smartAd->statu,
+                ]);
+            }
+            return redirect()->route('admin.smart_ads')->with('success', __('messages.status_toggled_successfully'));
+        }
 
         $validated = $request->validate([
             'landing_url' => 'required|url|max:2048',
@@ -2229,28 +2490,67 @@ class AdminController extends Controller
             'statu' => (int) $validated['statu'],
         ]);
 
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => __('messages.smart_ad_admin_updated'),
+            ]);
+        }
+
         return redirect()->route('admin.smart_ads')->with('success', __('messages.smart_ad_admin_updated'));
     }
 
     public function deleteSmartAd($id)
     {
         $this->performSmartAdDeletion($id);
+
+        if (request()->ajax() || request()->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => __('messages.smart_ad_admin_deleted'),
+            ]);
+        }
+
         return redirect()->route('admin.smart_ads')->with('success', __('messages.smart_ad_admin_deleted'));
     }
 
     public function bulkDeleteSmartAds(Request $request)
     {
         $ids = $request->input('ids');
+        $action = $request->input('action', 'delete');
 
         if (!$ids || !is_array($ids)) {
-            return redirect()->back()->with('error', __('messages.no_selection') ?? 'No items selected');
+            $msg = __('messages.no_selection') ?? 'No items selected';
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $msg], 422);
+            }
+            return redirect()->back()->with('error', $msg);
         }
 
-        foreach ($ids as $id) {
-            $this->performSmartAdDeletion($id);
+        if ($action === 'activate') {
+            SmartAd::whereIn('id', $ids)->update(['statu' => 1]);
+            $msg = __('messages.bulk_activate_success');
+        } elseif ($action === 'pause') {
+            SmartAd::whereIn('id', $ids)->update(['statu' => 0]);
+            $msg = __('messages.bulk_pause_success');
+        } elseif ($action === 'block') {
+            SmartAd::whereIn('id', $ids)->update(['statu' => 2]);
+            $msg = __('messages.bulk_pause_success');
+        } else {
+            foreach ($ids as $id) {
+                $this->performSmartAdDeletion($id);
+            }
+            $msg = __('messages.smart_ad_admin_deleted');
         }
 
-        return redirect()->route('admin.smart_ads')->with('success', __('messages.smart_ad_admin_deleted'));
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => $msg,
+            ]);
+        }
+
+        return redirect()->route('admin.smart_ads')->with('success', $msg);
     }
 
     private function performSmartAdDeletion($id)
@@ -2290,14 +2590,49 @@ class AdminController extends Controller
             'views_max' => '',
         ]);
 
-        $query = Visit::with('user')->orderBy('id', 'desc');
+        if ($request->filled('search') && empty($filterState['keyword'])) {
+            $filterState['keyword'] = trim((string) $request->input('search'));
+        }
+        if ($request->filled('status') && empty($filterState['status'])) {
+            $filterState['status'] = $request->input('status');
+        }
+
+        $sort = $request->input('sort', 'newest');
+        if ($sort === 'views') {
+            $query = Visit::with('user')->orderBy('vu', 'desc');
+        } elseif ($sort === 'oldest') {
+            $query = Visit::with('user')->orderBy('id', 'asc');
+        } else {
+            $query = Visit::with('user')->orderBy('id', 'desc');
+        }
+
+        if ($request->filled('tims')) {
+            $query->where('tims', (int) $request->input('tims'));
+        }
 
         $this->applyAdminInventoryFilters($query, $filterState, $this->visitFilterCallbacks());
 
         $visits = $query->paginate(20)->withQueryString();
 
+        $stats = [
+            'total' => Visit::count(),
+            'active' => Visit::where('statu', 1)->count(),
+            'inactive' => Visit::where('statu', '!=', 1)->count(),
+            'total_delivered' => (int) Visit::sum('vu'),
+        ];
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'html' => view('admin::admin.partials.visits_table', compact('visits'))->render(),
+                'stats' => $stats,
+                'total' => $visits->total(),
+            ]);
+        }
+
         return view('admin::admin.visits', [
             'visits' => $visits,
+            'stats' => $stats,
             'filterState' => $filterState,
             'filterFields' => $this->visitFilterFields(),
             'resultsCount' => $visits->total(),
@@ -2307,6 +2642,24 @@ class AdminController extends Controller
     public function updateVisit(Request $request, $id)
     {
         $visit = Visit::findOrFail($id);
+
+        // Quick status toggle support
+        if ($request->has('toggle_status') || ($request->has('statu') && !$request->has('name'))) {
+            $newStatus = (int) $request->input('statu');
+            if (!in_array($newStatus, [1, 2])) {
+                $newStatus = ($visit->statu == 1) ? 2 : 1;
+            }
+            $visit->update(['statu' => $newStatus]);
+
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => __('messages.status_toggled_successfully'),
+                    'status' => $visit->statu,
+                ]);
+            }
+            return redirect()->back()->with('success', __('messages.status_toggled_successfully'));
+        }
         
         $validated = $request->validate([
             'name' => 'required|string',
@@ -2317,28 +2670,64 @@ class AdminController extends Controller
 
         $visit->update($validated);
 
-        return redirect()->back()->with('success', __('messages.visit_updated'));
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => __('messages.visit_updated_successfully'),
+            ]);
+        }
+
+        return redirect()->back()->with('success', __('messages.visit_updated_successfully'));
     }
 
     public function deleteVisit($id)
     {
         $this->performVisitDeletion($id);
-        return redirect()->back()->with('success', __('messages.visit_deleted'));
+
+        if (request()->ajax() || request()->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => __('messages.visit_deleted_successfully'),
+            ]);
+        }
+
+        return redirect()->back()->with('success', __('messages.visit_deleted_successfully'));
     }
 
     public function bulkDeleteVisits(Request $request)
     {
         $ids = $request->input('ids');
+        $action = $request->input('action', 'delete');
 
         if (!$ids || !is_array($ids)) {
-            return redirect()->back()->with('error', __('messages.no_selection') ?? 'No items selected');
+            $msg = __('messages.no_selection') ?? 'No items selected';
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['success' => false, 'message' => $msg], 422);
+            }
+            return redirect()->back()->with('error', $msg);
         }
 
-        foreach ($ids as $id) {
-            $this->performVisitDeletion($id);
+        if ($action === 'activate') {
+            Visit::whereIn('id', $ids)->update(['statu' => 1]);
+            $msg = __('messages.bulk_activate_success');
+        } elseif ($action === 'pause') {
+            Visit::whereIn('id', $ids)->update(['statu' => 2]);
+            $msg = __('messages.bulk_pause_success');
+        } else {
+            foreach ($ids as $id) {
+                $this->performVisitDeletion($id);
+            }
+            $msg = __('messages.visit_deleted_successfully');
         }
 
-        return redirect()->back()->with('success', __('messages.visit_deleted'));
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => $msg,
+            ]);
+        }
+
+        return redirect()->back()->with('success', $msg);
     }
 
     private function performVisitDeletion($id)

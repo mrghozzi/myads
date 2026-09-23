@@ -200,8 +200,46 @@
   * Audited and validated 100% key parity with 0 missing keys.
   * Full dark mode support (`html.app-skin-dark body.admin-premium-shell`) and bidirectional layout support (Arabic RTL & English LTR).
 
+### Administrative Advertising & Traffic Management Superdesign Suite & Zero-Reload AJAX Overhaul
+* **Comprehensive Redesign of Banners Control Center (`/admin/banners`, `banners.blade.php`, `banner_edit.blade.php`, `banners_table.blade.php`, `AdminController::banners`):**
+  * Modernized visual aesthetics using the `.superdesign` design language with soft shadows (`--admin-premium-shadow-soft`), rounded cards, and responsive cardify layout (`.admin-table-cardify`).
+  * **5-KPI Global Statistics Strip:** Displays Total Banners (`Banner::count()`), Active Banners (`statu = 1`), Paused Banners (`statu != 1`), Total Impressions/Views (`Banner::sum('vu')`), and Total Clicks (`Banner::sum('clik')`).
+  * **Zero-Reload AJAX Search, Filtering & Sorting Engine:** Live debounced search (350ms) matching banner name, target URL, and advertiser username. Instant filters for status (Active, Paused) and banner dimensions (728x90, 468x60, 300x250, 160x600, etc.), plus sort ordering (Newest, Oldest, Most Views, Most Clicks).
+  * **Single-Click Instant Inline Status Switch:** Interactive switch toggling banner state between Active (1) and Paused (2) via AJAX with optimistic label updates and bilingual toast alerts.
+  * **Lightbox Preview Modal & A/B Testing Inspector:** Integrated modal previewing Version A and Version B banners alongside traffic distribution statistics (`vu_a`, `vu_b`, `clik_a`, `clik_b`).
+  * **Floating Bulk Actions Toolbar:** Sliding bottom toolbar supporting multi-banner bulk activation, bulk pausing, and bulk deletion with modal confirmations.
+  * **Interactive Banner Edit Studio (`banner_edit.blade.php`):** Split-grid architecture featuring form controls with device pills and country targeting on the left, paired with a real-time reactive live banner preview card on the right that renders image changes instantaneously.
+* **Modernized Text Ads Control Center (`/admin/links`, `links.blade.php`, `links_table.blade.php`, `AdminController::links`):**
+  * **4-KPI Global Statistics Strip:** Tracks Total Links (`Link::count()`), Active Text Ads (`statu = 1`), Inactive Text Ads (`statu != 1`), and Total Clicks (`Link::sum('clik')`).
+  * **Zero-Reload AJAX Engine:** Instant debounced search matching ad title, description text (`txt`), target URL, and advertiser name, with instant status filtering and click sorting.
+  * **Single-Click Inline Status Switch:** Seamlessly toggles status between Active (1) and Inactive (0) with zero page reloads.
+  * **Dynamic Single Edit Link Modal:** Replaced duplicate per-row modal markup with a single lightweight dynamic modal populated via JavaScript data attributes, supporting instantaneous AJAX form submissions.
+  * **Floating Bulk Actions Bar:** Contextual multi-ad toolbar for bulk activation, deactivation, and deletion.
+* **Modernized Traffic Exchange Control Center (`/admin/visits`, `visits.blade.php`, `visits_table.blade.php`, `AdminController::visits`):**
+  * **4-KPI Global Statistics Strip:** Displays Total Campaigns (`Visit::count()`), Active Campaigns, Inactive Campaigns, and Total Visits Delivered (`Visit::sum('vu')`).
+  * **Advanced Duration & Status Filtering:** Instant AJAX filtering by visit duration (10s, 20s, 30s, 60s) and status (Active, Inactive) with live debounced search.
+  * **Single-Click Inline Status Switch:** Immediate toggling of campaign activation state.
+  * **Dynamic Edit Campaign Modal:** Single modal in DOM providing smooth AJAX campaign updates without page reload.
+  * **Floating Bulk Actions Bar:** Multi-campaign bulk operations (Activate, Pause, Delete).
+* **Modernized Smart Ads (AI Native) Control Center (`/admin/smart-ads`, `smart_ads.blade.php`, `smart_ad_edit.blade.php`, `smart_ads_table.blade.php`, `AdminController::smartAds`):**
+  * **5-KPI Global Statistics Strip:** Real-time metrics for Total Smart Ads (`SmartAd::count()`), Active Smart Ads, Paused Smart Ads, Total Impressions, and Total Clicks.
+  * **Targeting & CTR Analytics:** Displays audience targeting pills (Countries, Devices) and calculated Click-Through-Rate (CTR %) on every ad row.
+  * **Single-Click Inline Status Switch:** Toggles between Active (1) and Paused (0) with real-time badge transitions.
+  * **Floating Bulk Actions Bar:** Bulk Activate, Bulk Pause, and Bulk Delete actions.
+  * **Interactive Smart Ad Edit Studio (`smart_ad_edit.blade.php`):** Split-view editor featuring full override controls (landing URL, headline, description, image, manual keywords, targeting) and a live simulated end-user Smart Ad card preview component with AI topic tag chips and performance dossier.
+* **Unified Master Advertising Hub & Global Settings (`/admin/ads`, `ads_overview.blade.php`, `ads_settings.blade.php`, `AdminController::adsHub`, `AdminController::adsSettings`):**
+  * **Command Center Hub (`ads_overview.blade.php`):** High-level summary stat strip across all 4 inventory types, quick-action navigation cards, and live unified inventory search with instant type filter pills (All, Banners, Text Ads, Smart Ads, Custom Ads).
+  * **Segmented Global Ads Settings Studio (`ads_settings.blade.php`):** Tabbed/cardified settings interface organizing General & Brand Settings, IP Visibility Permissions, Banner Serving Rules, Text Ad Repeat Windows, Smart Ad Credit Pricing Divisor, and Traffic Exchange Rewards.
+  * **Zero-Reload AJAX Settings Persistence:** Instant settings saving via AJAX with button loading spinners and glassmorphic toast notifications.
+* **XAMPP Subdirectory Portability & Strict Localization Compliance:**
+  * All AJAX JavaScript engines derive their base endpoint via `window.location.pathname.replace(/\/+$/, '')`, preventing 404 routing errors on subfolder deployments (`http://localhost/myads/...`).
+  * Added 38 synchronized bilingual keys to both `lang/en/messages.php` and `lang/ar/messages.php` with 0 missing translations.
+  * Full dark mode support (`html.app-skin-dark body.admin-premium-shell`) and bidirectional RTL/LTR layout parity.
+
 ### Automated Test Verification
 * **Full Feature Test Coverage (`tests/Feature/`):**
+  * `AdminAdsAjaxTest.php`: 9 passed, 57 assertions (100% pass rate).
+  * `AdminUsersAjaxTest.php`: 6 passed, 20 assertions (100% pass rate).
   * `SecuritySuiteFeatureTest.php`: 7 passed, 23 assertions.
   * `MessagesRealtimeFeatureTest.php`: 9 passed, 53 assertions.
   * `V460ProposalsCompletionTest.php`: 7 passed, 33 assertions.
