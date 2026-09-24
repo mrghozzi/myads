@@ -61,7 +61,9 @@ class HomeController extends Controller
             \Log::error('Failed to load vouchers on home page: ' . $e->getMessage());
         }
 
-        return view('theme::home', compact('user', 'bannerStats', 'linkStats', 'visitStats', 'smartAdStats', 'referralStats', 'site_settings', 'vouchers'));
+        $smartDivisor = SmartAdsSettings::pointsDivisor();
+
+        return view('theme::home', compact('user', 'bannerStats', 'linkStats', 'visitStats', 'smartAdStats', 'referralStats', 'site_settings', 'vouchers', 'smartDivisor'));
     }
 
     public function convertPoints(Request $request)
@@ -69,26 +71,39 @@ class HomeController extends Controller
         $user = Auth::user();
         $points = (int) $request->input('pts');
         $type = $request->input('to');
+        $isAjax = $request->ajax() || $request->wantsJson();
 
         // SECURITY: Validate type against whitelist before doing anything
         $validTypes = ['link', 'banners', 'exchv', 'smartads'];
         if (!in_array($type, $validTypes, true)) {
-            return redirect()->back()->with('errMSG', __('messages.invalid_conversion_type'));
+            $err = __('messages.invalid_conversion_type');
+            if ($isAjax) {
+                return response()->json(['success' => false, 'message' => $err], 422);
+            }
+            return redirect()->back()->with('errMSG', $err);
         }
 
         // Validation
         if ($points <= 0) {
-            return redirect()->back()->with('errMSG', __('cnc0p'));
+            $err = __('messages.points_must_be_positive');
+            if ($isAjax) {
+                return response()->json(['success' => false, 'message' => $err], 422);
+            }
+            return redirect()->back()->with('errMSG', $err);
         }
 
         // SECURITY: Use DB transaction with pessimistic locking to prevent race conditions / double-spend
         try {
-            return DB::transaction(function () use ($user, $points, $type) {
+            return DB::transaction(function () use ($user, $points, $type, $isAjax) {
                 // Re-read user with lock to prevent concurrent manipulation
                 $lockedUser = User::where('id', $user->id)->lockForUpdate()->first();
 
                 if ($lockedUser->pts < $points) {
-                    return redirect()->back()->with('errMSG', __('tnopmtrnon') . " : " . $lockedUser->pts);
+                    $err = __('messages.insufficient_points', ['current' => number_format($lockedUser->pts, 2)]);
+                    if ($isAjax) {
+                        return response()->json(['success' => false, 'message' => $err], 422);
+                    }
+                    return redirect()->back()->with('errMSG', $err);
                 }
 
                 // Determine operation details
@@ -117,15 +132,19 @@ class HomeController extends Controller
                 ]);
 
                 // Update User Points and Stats atomically
+                $le_go = 0;
+                $msg = '';
+
                 if ($type == "link") {
                     $le_go = $points / 2;
                     $lockedUser->nlink += $le_go;
                     $lockedUser->pts -= $points;
                     $lockedUser->save();
                     
-                    $msg = str_replace("[le_go]", $le_go, __('phbdp'));
-                    $msg = str_replace("[le_name]", $points, $msg);
-                    return redirect()->route('dashboard')->with('MSG', $msg);
+                    $msg = __('messages.points_converted_link', [
+                        'points' => $points,
+                        'amount' => number_format($le_go, 0),
+                    ]);
 
                 } elseif ($type == "banners") {
                     $le_go = $points / 2;
@@ -133,9 +152,10 @@ class HomeController extends Controller
                     $lockedUser->pts -= $points;
                     $lockedUser->save();
 
-                    $msg = str_replace("[le_go]", $le_go, __('phbdb'));
-                    $msg = str_replace("[le_name]", $points, $msg);
-                    return redirect()->route('dashboard')->with('MSG', $msg);
+                    $msg = __('messages.points_converted_banners', [
+                        'points' => $points,
+                        'amount' => number_format($le_go, 0),
+                    ]);
 
                 } elseif ($type == "exchv") {
                     $le_go = $points / 4;
@@ -143,11 +163,14 @@ class HomeController extends Controller
                     $lockedUser->pts -= $points;
                     $lockedUser->save();
 
-                    $msg = str_replace("[le_go]", $le_go, __('phbdv'));
-                    $msg = str_replace("[le_name]", $points, $msg);
-                    return redirect()->route('dashboard')->with('MSG', $msg);
+                    $msg = __('messages.points_converted_visits', [
+                        'points' => $points,
+                        'amount' => number_format($le_go, 0),
+                    ]);
+
                 } elseif ($type == "smartads") {
-                    $le_go = $points / SmartAdsSettings::pointsDivisor();
+                    $divisor = SmartAdsSettings::pointsDivisor();
+                    $le_go = $points / $divisor;
                     $lockedUser->nsmart += $le_go;
                     $lockedUser->pts -= $points;
                     $lockedUser->save();
@@ -156,14 +179,34 @@ class HomeController extends Controller
                         'points' => $points,
                         'credits' => rtrim(rtrim(number_format($le_go, 2, '.', ''), '0'), '.'),
                     ]);
-                    return redirect()->route('dashboard')->with('MSG', $msg);
                 }
 
-                return redirect()->route('dashboard');
+                if ($isAjax) {
+                    return response()->json([
+                        'success' => true,
+                        'message' => $msg,
+                        'points_spent' => $points,
+                        'amount_gained' => $le_go,
+                        'target_type' => $type,
+                        'balances' => [
+                            'pts' => (float) $lockedUser->pts,
+                            'nlink' => (float) $lockedUser->nlink,
+                            'nvu' => (float) $lockedUser->nvu,
+                            'vu' => (float) $lockedUser->vu,
+                            'nsmart' => (float) $lockedUser->nsmart,
+                        ]
+                    ]);
+                }
+
+                return redirect()->route('dashboard')->with('MSG', $msg);
             });
         } catch (\Exception $e) {
             \Log::error('Point Conversion Error: ' . $e->getMessage());
-            return redirect()->route('dashboard')->with('errMSG', __('messages.error_occurred'));
+            $err = __('messages.error_occurred');
+            if ($isAjax) {
+                return response()->json(['success' => false, 'message' => $err], 500);
+            }
+            return redirect()->route('dashboard')->with('errMSG', $err);
         }
     }
 
@@ -177,17 +220,26 @@ class HomeController extends Controller
         $sender = Auth::user();
         $amount = (float) $request->input('amount');
         $recipientUsername = $request->input('username');
+        $isAjax = $request->ajax() || $request->wantsJson();
 
         if (strtolower($sender->username) === strtolower($recipientUsername)) {
-            return redirect()->back()->with('errMSG', __('messages.cannot_transfer_to_self'));
+            $err = __('messages.cannot_transfer_to_self');
+            if ($isAjax) {
+                return response()->json(['success' => false, 'message' => $err], 422);
+            }
+            return redirect()->back()->with('errMSG', $err);
         }
 
         try {
-            return DB::transaction(function () use ($sender, $recipientUsername, $amount, $ledger, $notifications) {
+            return DB::transaction(function () use ($sender, $recipientUsername, $amount, $ledger, $notifications, $isAjax) {
                 // Lock sender
                 $lockedSender = User::where('id', $sender->id)->lockForUpdate()->first();
                 if ($lockedSender->pts < $amount) {
-                    return redirect()->back()->with('errMSG', __('tnopmtrnon') . " : " . $lockedSender->pts);
+                    $err = __('messages.insufficient_points', ['current' => number_format($lockedSender->pts, 2)]);
+                    if ($isAjax) {
+                        return response()->json(['success' => false, 'message' => $err], 422);
+                    }
+                    return redirect()->back()->with('errMSG', $err);
                 }
 
                 // Lock recipient
@@ -228,11 +280,29 @@ class HomeController extends Controller
 
                 $successMsg = __('messages.transfer_successful', ['amount' => $amount, 'recipient' => $lockedRecipient->username]);
 
+                $lockedSender->refresh();
+
+                if ($isAjax) {
+                    return response()->json([
+                        'success' => true,
+                        'message' => $successMsg,
+                        'amount' => $amount,
+                        'recipient' => $lockedRecipient->username,
+                        'balances' => [
+                            'pts' => (float) $lockedSender->pts,
+                        ]
+                    ]);
+                }
+
                 return redirect()->route('dashboard')->with('MSG', $successMsg);
             });
         } catch (\Exception $e) {
             \Log::error('PTS Transfer Error: ' . $e->getMessage());
-            return redirect()->route('dashboard')->with('errMSG', __('messages.error_occurred'));
+            $err = __('messages.error_occurred');
+            if ($isAjax) {
+                return response()->json(['success' => false, 'message' => $err], 500);
+            }
+            return redirect()->route('dashboard')->with('errMSG', $err);
         }
     }
 
@@ -244,12 +314,18 @@ class HomeController extends Controller
 
         $user = Auth::user();
         $amount = (float) $request->input('amount');
+        $isAjax = $request->ajax() || $request->wantsJson();
 
         try {
-            return DB::transaction(function () use ($user, $amount, $ledger) {
+            return DB::transaction(function () use ($user, $amount, $ledger, $isAjax) {
                 $lockedUser = User::where('id', $user->id)->lockForUpdate()->first();
+
                 if ($lockedUser->pts < $amount) {
-                    return redirect()->back()->with('errMSG', __('tnopmtrnon') . " : " . $lockedUser->pts);
+                    $err = __('messages.insufficient_points', ['current' => number_format($lockedUser->pts, 2)]);
+                    if ($isAjax) {
+                        return response()->json(['success' => false, 'message' => $err], 422);
+                    }
+                    return redirect()->back()->with('errMSG', $err);
                 }
 
                 $code = strtoupper(Str::random(12));
@@ -282,11 +358,34 @@ class HomeController extends Controller
 
                 $successMsg = __('messages.voucher_generated_success');
 
+                $lockedUser->refresh();
+
+                if ($isAjax) {
+                    return response()->json([
+                        'success' => true,
+                        'message' => $successMsg,
+                        'balances' => [
+                            'pts' => (float) $lockedUser->pts,
+                        ],
+                        'voucher' => [
+                            'id' => $voucher->id,
+                            'code' => $voucher->code,
+                            'amount' => (float) $voucher->amount,
+                            'is_used' => false,
+                            'created_at' => 'Just now',
+                        ]
+                    ]);
+                }
+
                 return redirect()->route('dashboard')->with('MSG', $successMsg);
             });
         } catch (\Exception $e) {
             \Log::error('Voucher Generation Error: ' . $e->getMessage());
-            return redirect()->route('dashboard')->with('errMSG', __('messages.error_occurred'));
+            $err = __('messages.error_occurred');
+            if ($isAjax) {
+                return response()->json(['success' => false, 'message' => $err], 500);
+            }
+            return redirect()->route('dashboard')->with('errMSG', $err);
         }
     }
 
@@ -297,24 +396,34 @@ class HomeController extends Controller
         ]);
 
         $user = Auth::user();
-        $code = trim($request->input('code'));
+        $code = strtoupper(trim($request->input('code')));
+        $isAjax = $request->ajax() || $request->wantsJson();
 
         try {
-            return DB::transaction(function () use ($user, $code, $ledger, $notifications) {
+            return DB::transaction(function () use ($user, $code, $ledger, $notifications, $isAjax) {
                 // Find voucher with lock
                 $voucher = PtsVoucher::where('code', $code)->lockForUpdate()->first();
 
                 if (!$voucher) {
-                    return redirect()->back()->with('errMSG', __('messages.invalid_voucher_code'));
+                    $err = __('messages.invalid_voucher_code');
+                    if ($isAjax) {
+                        return response()->json(['success' => false, 'message' => $err], 422);
+                    }
+                    return redirect()->back()->with('errMSG', $err);
                 }
 
                 if ($voucher->is_used) {
-                    return redirect()->back()->with('errMSG', __('messages.voucher_already_used'));
+                    $err = __('messages.voucher_already_used');
+                    if ($isAjax) {
+                        return response()->json(['success' => false, 'message' => $err], 422);
+                    }
+                    return redirect()->back()->with('errMSG', $err);
                 }
 
                 $lockedUser = User::where('id', $user->id)->lockForUpdate()->first();
 
                 // Award to user
+                $generatorName = $voucher->generator ? $voucher->generator->username : 'System';
                 $ledger->award(
                     $lockedUser,
                     $voucher->amount,
@@ -322,7 +431,7 @@ class HomeController extends Controller
                     'voucher_claimed_desc',
                     PtsVoucher::class,
                     $voucher->id,
-                    ['generator_username' => $voucher->generator->username],
+                    ['generator_username' => $generatorName],
                     true
                 );
 
@@ -333,22 +442,43 @@ class HomeController extends Controller
                     'used_at' => now(),
                 ]);
 
-                // Notify Generator
-                $msg = __('messages.voucher_claimed_by', ['amount' => $voucher->amount, 'claimer' => $lockedUser->username]);
-                $notifications->send(
-                    $voucher->generator,
-                    $msg,
-                    url('/history'),
-                    'item'
-                );
+                // Notify Generator if not self
+                if ($voucher->generator && $voucher->generator->id !== $lockedUser->id) {
+                    $msg = __('messages.voucher_claimed_by', ['amount' => $voucher->amount, 'claimer' => $lockedUser->username]);
+                    $notifications->send(
+                        $voucher->generator,
+                        $msg,
+                        url('/history'),
+                        'item'
+                    );
+                }
 
                 $successMsg = __('messages.voucher_claimed_success', ['amount' => $voucher->amount]);
+
+                $lockedUser->refresh();
+
+                if ($isAjax) {
+                    return response()->json([
+                        'success' => true,
+                        'message' => $successMsg,
+                        'amount' => (float) $voucher->amount,
+                        'code' => $voucher->code,
+                        'balances' => [
+                            'pts' => (float) $lockedUser->pts,
+                        ]
+                    ]);
+                }
 
                 return redirect()->route('dashboard')->with('MSG', $successMsg);
             });
         } catch (\Exception $e) {
             \Log::error('Voucher Claim Error: ' . $e->getMessage());
-            return redirect()->route('dashboard')->with('errMSG', __('messages.error_occurred'));
+            $err = __('messages.error_occurred');
+            if ($isAjax) {
+                return response()->json(['success' => false, 'message' => $err], 500);
+            }
+            return redirect()->route('dashboard')->with('errMSG', $err);
         }
     }
 }
+
