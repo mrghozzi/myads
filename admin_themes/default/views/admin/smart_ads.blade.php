@@ -143,7 +143,9 @@
         </div>
     </div>
 </div>
+@endsection
 
+@section('modals')
 <!-- Single Delete Confirmation Modal -->
 <div class="modal fade" id="deleteSmartAdModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">

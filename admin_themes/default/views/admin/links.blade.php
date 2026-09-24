@@ -137,7 +137,9 @@
         </div>
     </div>
 </div>
+@endsection
 
+@section('modals')
 <!-- Dynamic Edit Link Modal -->
 <div class="modal fade" id="editLinkModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">

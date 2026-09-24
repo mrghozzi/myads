@@ -1897,3 +1897,14 @@ body.admin-premium-shell .translation-empty-state.is-inline {
 [dir="rtl"] body.admin-premium-shell .page-header .breadcrumb-item + .breadcrumb-item::before {
     content: "\\";
 }
+
+/* Modal Stacking Safeguards */
+body.admin-premium-shell .modal {
+    z-index: 1055 !important;
+}
+
+body.admin-premium-shell .modal-backdrop,
+.modal-backdrop {
+    z-index: 1050 !important;
+}
+
