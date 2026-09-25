@@ -7,7 +7,8 @@
        Compatible with Dark Mode, Light Mode, RTL & LTR
        ========================================================================== */
     :root,
-    html[data-theme="css"] {
+    html[data-theme="css"],
+    [data-bs-theme="light"] {
         --sd-primary: #615dfa;
         --sd-primary-hover: #4e4ac8;
         --sd-primary-rgb: 97, 93, 250;
@@ -44,6 +45,7 @@
 
     /* Dark Mode Theme Tokens */
     html[data-theme="css_d"],
+    [data-bs-theme="dark"],
     body.dark-mode,
     html.app-skin-dark {
         --sd-surface: #1e2538;
