@@ -11,11 +11,12 @@ class AdminCommunityFeedController extends Controller
     public function settings()
     {
         $settings = CommunityFeedSettings::all();
+        $presets = CommunityFeedSettings::presets();
 
-        return view('admin::admin.community_feed_settings', compact('settings'));
+        return view('admin::admin.community_feed_settings', compact('settings', 'presets'));
     }
 
-    public function updateSettings(Request $request): RedirectResponse
+    public function updateSettings(Request $request)
     {
         $validated = $request->validate([
             'freshness_base_score' => 'required|numeric|min:0|max:999999',
@@ -49,9 +50,24 @@ class AdminCommunityFeedController extends Controller
             'fresh_candidate_limit' => 'required|integer|min:1|max:2000',
             'rescue_candidate_limit' => 'required|integer|min:1|max:2000',
             'cache_ttl_seconds' => 'required|integer|min:0|max:86400',
+            'feed_mode' => 'nullable|string|in:smart,simple',
+            'track_online_status' => 'nullable|integer|in:0,1',
+            'track_seo_metrics' => 'nullable|integer|in:0,1',
+            'media_boost' => 'nullable|numeric|min:0|max:999999',
+            'verified_author_boost' => 'nullable|numeric|min:0|max:999999',
+            'feed_page_size' => 'nullable|integer|min:10|max:50',
+            'trending_highlight_boost' => 'nullable|numeric|min:0|max:999999',
         ]);
 
         CommunityFeedSettings::save($validated);
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => __('messages.community_feed_settings_saved'),
+                'settings' => CommunityFeedSettings::all(),
+            ]);
+        }
 
         return redirect()->route('admin.community.feed.settings')
             ->with('success', __('messages.community_feed_settings_saved'));

@@ -282,8 +282,41 @@
   * Developed a dedicated feature test suite verifying view rendering, AJAX points conversion, insufficient points validation, peer transfer, self-transfer prevention, voucher generation, voucher redemption, double-claim prevention, and bilingual rendering in English and Arabic (7 passed, 36 assertions, 100% pass rate).
   * Validated zero regressions against existing `PointHistoryTest` and `ReferralSystemTest`.
 
+### Community Portal & Feed Algorithm Superdesign Suite (/portal & /admin/community/feed/settings)
+* **Modern Portal UI & AJAX Live Activity Engine (`themes/default/views/portal/index.blade.php`, `PortalController.php`):**
+  * Completely redesigned `/portal` conforming to `.superdesign` design standards and modern theme tokens (`--portal-*`), supporting full bidirectional (LTR & RTL) layouts.
+  * **Adaptive Light & Dark Mode:** Built with scoped custom properties dynamically harmonizing with both light (`html[data-theme="css"]`) and dark surfaces (`html[data-theme="css_d"]`, `body.dark-mode`, `html.app-skin-dark`), delivering vibrant contrast, ambient glows, and glassmorphic card elevations.
+  * **Glassmorphic Hero & System Activity Strip:** Features an ambient gradient hero with live pulse activity indicator, quick directory shortcuts, and 5-minute cached portal metrics (`members_count`, `posts_today`, `feed_mode`) that incur zero ongoing server overhead.
+  * **Zero-Reload AJAX Feed Engine & Subfolder Resilience:**
+    * Re-architected feed navigation tabs (`All`, `Following / Me`, `Groups`, `Media`) with instant asynchronous data fetching, smooth skeleton placeholders, and full browser history integration (`history.pushState` & `popstate`).
+    * Implemented infinite scroll with IntersectionObserver alongside a reliable manual fallback trigger and modern "Caught Up" indicator (`portal_caught_up_title`).
+    * Integrated subfolder auto-resolution (`window.location.pathname.replace(/\/+$/, '')`) guaranteeing zero broken relative routes on XAMPP and subfolder installations.
+  * **High-Speed Debounced Live Portal Search (`themes/default/views/portal/partials/search_results.blade.php`):**
+    * Client-side debounced live search (350ms) querying status updates, members, groups, forum discussions, store products, and comments with an interactive loading spinner and 1-click query clearing.
+    * Server-side candidate bounding (capped at 30-50 items) preventing memory spikes and server CPU exhaustion.
+    * Driver-aware search execution using MySQL `MATCH(...) AGAINST(...) IN BOOLEAN MODE` in production while cleanly falling back to SQLite `LIKE` queries for test environments.
+    * Dedicated search results partial with category filter pills (`All`, `Posts`, `Members`, `Groups`, `Products`, `Comments`) offering instant client-side switching with zero extra roundtrips.
+* **Community Feed Algorithm Evolution & Dynamic Presets (`app/Support/CommunityFeedSettings.php`, `AdminCommunityFeedController.php`):**
+  * Expanded algorithmic scoring controls with new tunable levers: Media Richness Boost (`media_boost`), Verified Creator Boost (`verified_author_boost`), Page Size (`feed_page_size`), and Trending Highlight Boost (`trending_highlight_boost`).
+  * **Instant One-Click Presets Engine (`presets()`):**
+    * **Balanced Community Experience (Default):** Harmonious combination of freshness, media boost, and engagement for active communities.
+    * **High Engagement & Viral Discovery:** Aggressive weighting towards comments, reactions, and verified creators to surface trending conversations.
+    * **Breaking & Chronological Freshness:** Heavily prioritizes recent posts and fast decay for news and breaking discussions.
+    * **Eco / Ultra-Low Server Load:** Minimal candidates (30), disabled media boost, and lean page sizes to maximize throughput on constrained servers.
+  * Enhanced `AdminCommunityFeedController::updateSettings` to handle both AJAX JSON persistence and traditional redirects, complete with automatic cache clearing upon update.
+* **Superdesign Administrative Feed Settings Hub (`admin_themes/default/views/admin/community_feed_settings.blade.php`):**
+  * Modernized settings interface following `.superdesign` guidelines with soft elevation cards, Feather iconography, and clean typography.
+  * **Interactive Presets Strip:** Visual cards with 1-click preset application that dynamically populates and animates all input fields without page reloads.
+  * **Real-Time Algorithm Simulator Bar:** Dynamic CSS visualization bar calculating and rendering proportional weight distributions (Recency, Reactions, Comments, Media, Verified Creator) instantaneously as values are adjusted.
+  * **Organized 6-Panel Configuration Grid:** Core Feed Engine, Scoring Weights, Candidate Windows & Caps, Trending & Decay, Diversity Guardrails, and Performance & Diagnostics.
+  * Sticky bottom action bar with quick-save AJAX submission and clear cache controls.
+* **Core English Standardization & Multilingual Localization (`lang/en/messages.php`, `lang/ar/messages.php`):**
+  * Standardized all newly introduced and updated feed settings, presets, search categories, metrics, and diagnostics in English as primary source language.
+  * Added and synchronized 35+ bilingual translation keys across English and Arabic (`feed_preset_balanced`, `portal_live_search_placeholder`, `portal_caught_up_title`, `feed_media_boost_desc`, etc.), delivering 100% localization parity with zero hardcoded strings.
+
 ### Automated Test Verification
 * **Full Feature Test Coverage (`tests/Feature/`):**
+  * `PortalAjaxRedesignTest.php`: 5 passed, 31 assertions (100% pass rate).
   * `HomeDashboardModernizationTest.php`: 7 passed, 36 assertions (100% pass rate).
   * `BannerImageUploadAndUrlTest.php`: 7 passed, 31 assertions (100% pass rate).
   * `AdminAdsAjaxTest.php`: 9 passed, 57 assertions (100% pass rate).

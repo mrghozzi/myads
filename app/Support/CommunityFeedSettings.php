@@ -43,7 +43,63 @@ class CommunityFeedSettings
         'feed_mode' => 'smart', // 'smart' or 'simple'
         'track_online_status' => 1,
         'track_seo_metrics' => 1,
+        'media_boost' => 6.0,
+        'verified_author_boost' => 15.0,
+        'feed_page_size' => 20,
+        'trending_highlight_boost' => 10.0,
     ];
+
+    public static function presets(): array
+    {
+        return [
+            'balanced' => [
+                'name' => 'Balanced Experience',
+                'desc' => 'Optimal blend of freshness, social affinity, and trending engagement.',
+                'feed_mode' => 'smart',
+                'freshness_base_score' => 700.0,
+                'freshness_decay_exponent' => 1.35,
+                'following_boost' => 24.0,
+                'recent_comment_weight' => 6.0,
+                'recent_reaction_weight' => 4.0,
+                'cache_ttl_seconds' => 300,
+            ],
+            'high_engagement' => [
+                'name' => 'High Engagement & Viral',
+                'desc' => 'Prioritizes active conversations, discussions, and fast-moving reactions.',
+                'feed_mode' => 'smart',
+                'freshness_base_score' => 600.0,
+                'freshness_decay_exponent' => 1.1,
+                'following_boost' => 30.0,
+                'recent_comment_weight' => 12.0,
+                'recent_reaction_weight' => 8.0,
+                'social_proof_boost' => 20.0,
+                'cache_ttl_seconds' => 180,
+            ],
+            'fresh_breaking' => [
+                'name' => 'Breaking & Fresh',
+                'desc' => 'Strong recency bias to ensure brand-new updates appear at the very top.',
+                'feed_mode' => 'smart',
+                'freshness_base_score' => 1200.0,
+                'freshness_decay_exponent' => 2.0,
+                'freshness_suppression_after_hours' => 24,
+                'following_boost' => 18.0,
+                'recent_comment_weight' => 4.0,
+                'recent_reaction_weight' => 3.0,
+                'cache_ttl_seconds' => 120,
+            ],
+            'eco_shared' => [
+                'name' => 'Eco / Low Server Load',
+                'desc' => 'Lightweight chronological ordering and longer cache TTL for minimal server load.',
+                'feed_mode' => 'simple',
+                'freshness_base_score' => 500.0,
+                'freshness_decay_exponent' => 1.35,
+                'following_boost' => 0.0,
+                'recent_comment_weight' => 4.0,
+                'recent_reaction_weight' => 2.0,
+                'cache_ttl_seconds' => 600,
+            ],
+        ];
+    }
 
     private static ?array $cached = null;
 
@@ -147,6 +203,10 @@ class CommunityFeedSettings
             'feed_mode' => in_array($values['feed_mode'] ?? null, ['smart', 'simple'], true) ? $values['feed_mode'] : $defaults['feed_mode'],
             'track_online_status' => (int) ($values['track_online_status'] ?? $defaults['track_online_status']),
             'track_seo_metrics' => (int) ($values['track_seo_metrics'] ?? $defaults['track_seo_metrics']),
+            'media_boost' => self::nonNegativeFloat($values['media_boost'] ?? $defaults['media_boost']),
+            'verified_author_boost' => self::nonNegativeFloat($values['verified_author_boost'] ?? $defaults['verified_author_boost']),
+            'feed_page_size' => min(50, max(10, (int) ($values['feed_page_size'] ?? $defaults['feed_page_size']))),
+            'trending_highlight_boost' => self::nonNegativeFloat($values['trending_highlight_boost'] ?? $defaults['trending_highlight_boost']),
         ];
 
         $settings['trend_window_hours'] = max($settings['trend_window_hours'], $settings['rapid_window_hours']);
@@ -198,6 +258,10 @@ class CommunityFeedSettings
             'feed_mode' => in_array($settings['feed_mode'] ?? null, ['smart', 'simple'], true) ? $settings['feed_mode'] : self::DEFAULTS['feed_mode'],
             'track_online_status' => (int) ($settings['track_online_status'] ?? self::DEFAULTS['track_online_status']),
             'track_seo_metrics' => (int) ($settings['track_seo_metrics'] ?? self::DEFAULTS['track_seo_metrics']),
+            'media_boost' => self::nonNegativeFloat($settings['media_boost'] ?? self::DEFAULTS['media_boost']),
+            'verified_author_boost' => self::nonNegativeFloat($settings['verified_author_boost'] ?? self::DEFAULTS['verified_author_boost']),
+            'feed_page_size' => min(50, max(10, (int) ($settings['feed_page_size'] ?? self::DEFAULTS['feed_page_size']))),
+            'trending_highlight_boost' => self::nonNegativeFloat($settings['trending_highlight_boost'] ?? self::DEFAULTS['trending_highlight_boost']),
         ];
     }
 

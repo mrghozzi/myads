@@ -42,23 +42,58 @@ class PortalController extends Controller
         // ── Search ───────────────────────────────────────────────
         if (!empty($search)) {
             try {
-                // User search still uses LIKE as it's typically short and indexed by B-tree
-                $searchedUsers = User::where('username', 'LIKE', "%{$search}%")->get();
+                // User search with limit for performance
+                $searchedUsers = User::where('username', 'LIKE', "%{$search}%")->limit(30)->get();
 
-                $topicIds = ForumTopic::visible($user)
-                    ->whereRaw("MATCH(name, txt) AGAINST(? IN BOOLEAN MODE)", [$search])
+                $isSqlite = \Illuminate\Support\Facades\DB::connection()->getDriverName() === 'sqlite';
+
+                if ($isSqlite) {
+                    $topicIds = ForumTopic::visible($user)
+                        ->where(function ($q) use ($search) {
+                            $q->where('name', 'LIKE', "%{$search}%")->orWhere('txt', 'LIKE', "%{$search}%");
+                        })
+                        ->limit(50)
+                        ->pluck('id');
+
+                    $dirIds = Directory::where(function ($q) use ($search) {
+                        $q->where('name', 'LIKE', "%{$search}%")->orWhere('txt', 'LIKE', "%{$search}%");
+                    })
+                    ->limit(50)
                     ->pluck('id');
 
-                $dirIds = Directory::whereRaw("MATCH(name, txt) AGAINST(? IN BOOLEAN MODE)", [$search])
+                    $newsIds = News::where(function ($q) use ($search) {
+                        $q->where('name', 'LIKE', "%{$search}%")->orWhere('text', 'LIKE', "%{$search}%");
+                    })
+                    ->limit(50)
                     ->pluck('id');
 
-                $newsIds = News::whereRaw("MATCH(name, text) AGAINST(? IN BOOLEAN MODE)", [$search])
-                    ->pluck('id');
+                    $kbIds = Option::where('o_type', 'knowledgebase')
+                        ->where('o_order', 0)
+                        ->where(function ($q) use ($search) {
+                            $q->where('name', 'LIKE', "%{$search}%")->orWhere('o_valuer', 'LIKE', "%{$search}%");
+                        })
+                        ->limit(50)
+                        ->pluck('id');
+                } else {
+                    $topicIds = ForumTopic::visible($user)
+                        ->whereRaw("MATCH(name, txt) AGAINST(? IN BOOLEAN MODE)", [$search])
+                        ->limit(50)
+                        ->pluck('id');
 
-                $kbIds = Option::where('o_type', 'knowledgebase')
-                    ->where('o_order', 0)
-                    ->whereRaw("MATCH(name, o_valuer) AGAINST(? IN BOOLEAN MODE)", [$search])
-                    ->pluck('id');
+                    $dirIds = Directory::whereRaw("MATCH(name, txt) AGAINST(? IN BOOLEAN MODE)", [$search])
+                        ->limit(50)
+                        ->pluck('id');
+
+                    $newsIds = News::whereRaw("MATCH(name, text) AGAINST(? IN BOOLEAN MODE)", [$search])
+                        ->limit(50)
+                        ->pluck('id');
+
+                    $kbIds = Option::where('o_type', 'knowledgebase')
+                        ->where('o_order', 0)
+                        ->whereRaw("MATCH(name, o_valuer) AGAINST(? IN BOOLEAN MODE)", [$search])
+                        ->limit(50)
+                        ->pluck('id');
+                }
 
                 $searchedStatuses = Status::visible()
                 ->when(!empty($hiddenDirectoryStatusIds), fn ($query) => $query->whereNotIn('id', $hiddenDirectoryStatusIds))
@@ -75,31 +110,51 @@ class PortalController extends Controller
                       });
                 })
                 ->orderBy('date', 'desc')
+                ->limit(50)
                 ->get();
 
                 $activityService->decorateMany($searchedStatuses);
 
                 $searchedGroups = collect();
                 if (\App\Support\GroupSettings::isEnabled()) {
-                    $searchedGroups = \App\Models\Group::where('status', \App\Models\Group::STATUS_ACTIVE)
-                        ->whereRaw("MATCH(name, description) AGAINST(? IN BOOLEAN MODE)", [$search])
-                        ->get();
+                    $groupQuery = \App\Models\Group::where('status', \App\Models\Group::STATUS_ACTIVE);
+                    if ($isSqlite) {
+                        $groupQuery->where(function ($q) use ($search) {
+                            $q->where('name', 'LIKE', "%{$search}%")->orWhere('description', 'LIKE', "%{$search}%");
+                        });
+                    } else {
+                        $groupQuery->whereRaw("MATCH(name, description) AGAINST(? IN BOOLEAN MODE)", [$search]);
+                    }
+                    $searchedGroups = $groupQuery->limit(30)->get();
                 }
 
-                $searchedCommentsForum = \App\Models\ForumComment::visible()
-                    ->whereHas('topic', fn ($query) => $query->visible($user))
-                    ->whereRaw("MATCH(txt) AGAINST(? IN BOOLEAN MODE)", [$search])
-                    ->orderBy('date', 'desc')
-                    ->get();
+                $commentsForumQuery = \App\Models\ForumComment::visible()
+                    ->whereHas('topic', fn ($query) => $query->visible($user));
+                if ($isSqlite) {
+                    $commentsForumQuery->where('txt', 'LIKE', "%{$search}%");
+                } else {
+                    $commentsForumQuery->whereRaw("MATCH(txt) AGAINST(? IN BOOLEAN MODE)", [$search]);
+                }
+                $searchedCommentsForum = $commentsForumQuery->orderBy('date', 'desc')->limit(30)->get();
 
-                $searchedCommentsDir = \App\Models\Option::where('o_type', '=', 'd_coment')
-                    ->visible(null, 'o_order')
-                    ->whereRaw("MATCH(o_valuer) AGAINST(? IN BOOLEAN MODE)", [$search])
-                    ->get();
+                $commentsDirQuery = \App\Models\Option::where('o_type', '=', 'd_coment')
+                    ->visible(null, 'o_order');
+                if ($isSqlite) {
+                    $commentsDirQuery->where('o_valuer', 'LIKE', "%{$search}%");
+                } else {
+                    $commentsDirQuery->whereRaw("MATCH(o_valuer) AGAINST(? IN BOOLEAN MODE)", [$search]);
+                }
+                $searchedCommentsDir = $commentsDirQuery->limit(30)->get();
 
-                $searchedProducts = Product::visible()
-                    ->whereRaw("MATCH(name, o_valuer) AGAINST(? IN BOOLEAN MODE)", [$search])
-                    ->get();
+                $productsQuery = Product::visible();
+                if ($isSqlite) {
+                    $productsQuery->where(function ($q) use ($search) {
+                        $q->where('name', 'LIKE', "%{$search}%")->orWhere('o_valuer', 'LIKE', "%{$search}%");
+                    });
+                } else {
+                    $productsQuery->whereRaw("MATCH(name, o_valuer) AGAINST(? IN BOOLEAN MODE)", [$search]);
+                }
+                $searchedProducts = $productsQuery->limit(30)->get();
 
             } catch (\Throwable $e) {
                 \Log::error('Search failed: ' . $e->getMessage());
@@ -111,6 +166,24 @@ class PortalController extends Controller
                 $searchedProducts      = collect();
             }
 
+            if ($request->ajax() || $request->wantsJson()) {
+                $html = view('theme::portal.partials.search_results', compact(
+                    'filter', 'search',
+                    'searchedUsers', 'searchedStatuses', 'searchedGroups',
+                    'searchedCommentsForum', 'searchedCommentsDir', 'searchedProducts'
+                ))->render();
+
+                $totalCount = $searchedStatuses->count() + $searchedUsers->count() + $searchedGroups->count()
+                    + $searchedProducts->count() + $searchedCommentsForum->count() + $searchedCommentsDir->count();
+
+                return response()->json([
+                    'type' => 'search',
+                    'html' => $html,
+                    'total_count' => $totalCount,
+                    'search' => $search,
+                ]);
+            }
+
             return view('theme::portal.index', compact(
                 'filter', 'search',
                 'searchedUsers', 'searchedStatuses', 'searchedGroups',
@@ -119,6 +192,10 @@ class PortalController extends Controller
         }
 
         // ── Feed (no search) ─────────────────────────────────────
+        $pageSize = (int) \App\Support\CommunityFeedSettings::get('feed_page_size', 20);
+        $configuredFeedMode = \App\Support\CommunityFeedSettings::get('feed_mode', 'smart');
+        $requestedMode = $request->query('mode', $configuredFeedMode);
+
         try {
             if ($user && $filter === 'me') {
                 // Chronological feed of followed users
@@ -131,11 +208,21 @@ class PortalController extends Controller
                     ->when(!empty($hiddenDirectoryStatusIds), fn ($query) => $query->whereNotIn('id', $hiddenDirectoryStatusIds))
                     ->whereIn('uid', $followingIds)
                     ->orderBy('date', 'desc')
-                    ->paginate(20);
+                    ->paginate($pageSize);
 
                 $activityService->decorateMany($activities);
             } elseif ($user && $filter === 'groups') {
                 if (!\App\Support\GroupSettings::isEnabled()) {
+                    if ($request->ajax()) {
+                        return response()->json([
+                            'type' => 'feed',
+                            'html' => '',
+                            'next_page_url' => null,
+                            'has_more' => false,
+                            'total' => 0,
+                            'filter' => $filter,
+                        ]);
+                    }
                     return redirect()->route('portal.index');
                 }
 
@@ -145,7 +232,27 @@ class PortalController extends Controller
                     ->when(!empty($hiddenDirectoryStatusIds), fn ($query) => $query->whereNotIn('id', $hiddenDirectoryStatusIds))
                     ->tap(fn ($query) => app(\App\Services\GroupAccessService::class)->applyMyGroupsScope($query, $user))
                     ->orderBy('date', 'desc')
-                    ->paginate(20);
+                    ->paginate($pageSize);
+
+                $activityService->decorateMany($activities);
+            } elseif ($filter === 'media') {
+                // Feed filtered to rich media types
+                $mediaTypes = [4, 10, 11, 12, 13, 14, 7867];
+                $activities = Status::visible($user)
+                    ->where('date', '<=', time())
+                    ->whereIn('s_type', $mediaTypes)
+                    ->when(!empty($hiddenDirectoryStatusIds), fn ($query) => $query->whereNotIn('id', $hiddenDirectoryStatusIds))
+                    ->orderBy('date', 'desc')
+                    ->paginate($pageSize);
+
+                $activityService->decorateMany($activities);
+            } elseif ($requestedMode === 'simple' || $requestedMode === 'latest') {
+                // Chronological latest feed
+                $activities = Status::visible($user)
+                    ->where('date', '<=', time())
+                    ->when(!empty($hiddenDirectoryStatusIds), fn ($query) => $query->whereNotIn('id', $hiddenDirectoryStatusIds))
+                    ->orderBy('date', 'desc')
+                    ->paginate($pageSize);
 
                 $activityService->decorateMany($activities);
             } else {
@@ -153,7 +260,8 @@ class PortalController extends Controller
                 $page       = (int) $request->query('page', 1);
                 $activities = \App\Services\FeedService::getRankedFeed(
                     $user ? $user->id : null,
-                    $page
+                    $page,
+                    $pageSize
                 );
 
                 $activityService->decorateMany($activities);
@@ -165,18 +273,40 @@ class PortalController extends Controller
                 'user_id' => $user?->id,
                 'message' => $e->getMessage(),
             ]);
-            $activities = new \Illuminate\Pagination\LengthAwarePaginator([], 0, 20);
+            $activities = new \Illuminate\Pagination\LengthAwarePaginator([], 0, $pageSize);
         }
 
-        if ($request->ajax()) {
-            $html = view('theme::partials.ajax.activities', compact('activities'))->render();
+        if ($request->ajax() || $request->wantsJson()) {
+            $html = view('theme::partials.ajax.activities', compact('activities', 'filter'))->render();
             return response()->json([
+                'type'          => 'feed',
                 'html'          => $html,
-                'next_page_url' => $activities->nextPageUrl()
+                'next_page_url' => $activities->nextPageUrl(),
+                'has_more'      => $activities->hasMorePages(),
+                'total'         => $activities->total(),
+                'filter'        => $filter,
+                'feed_mode'     => $requestedMode,
             ]);
         }
 
-        return view('theme::portal.index', compact('activities', 'filter', 'search'));
+        // Lightweight portal stats cached for 5 minutes (low server load)
+        $portalStats = \Illuminate\Support\Facades\Cache::remember('portal_stats_summary', 300, function () {
+            try {
+                return [
+                    'members_count' => User::count(),
+                    'posts_today' => Status::where('date', '>=', strtotime('today'))->count(),
+                    'feed_mode' => \App\Support\CommunityFeedSettings::get('feed_mode', 'smart'),
+                ];
+            } catch (\Throwable) {
+                return [
+                    'members_count' => 0,
+                    'posts_today' => 0,
+                    'feed_mode' => 'smart',
+                ];
+            }
+        });
+
+        return view('theme::portal.index', compact('activities', 'filter', 'search', 'portalStats', 'requestedMode'));
     }
 
     public function share(Request $request)
