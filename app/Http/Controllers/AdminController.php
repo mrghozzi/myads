@@ -3771,7 +3771,7 @@ class AdminController extends Controller
             'code_ads' => $code ?? ''
         ]);
 
-        return redirect()->back()->with('success', __('messages.ad_updated') ?? 'Ad Updated');
+        return redirect()->route('admin.site_ads')->with('success', __('messages.ad_updated') ?? 'Ad Updated');
     }
 
     public function updateSiteAds(Request $request)
@@ -3798,10 +3798,10 @@ class AdminController extends Controller
             }
         } catch (\Exception $e) {
             report($e);
-            return redirect()->back()->withErrors([__('messages.error_occurred')]);
+            return redirect()->route('admin.site_ads')->withErrors([__('messages.error_occurred')]);
         }
 
-        return redirect()->back()->with('success', __('messages.ad_updated') ?? 'Ads Updated');
+        return redirect()->route('admin.site_ads')->with('success', __('messages.ad_updated') ?? 'Ads Updated');
     }
 
     // Reports Management

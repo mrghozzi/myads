@@ -47,7 +47,14 @@ class AppServiceProvider extends ServiceProvider
         // Fix for shared hosting with 1000-byte max key length (utf8mb4)
         Schema::defaultStringLength(191);
 
-        if (\App\Support\SecuritySettings::get('force_https')) {
+        if (
+            \App\Support\SecuritySettings::get('force_https')
+            || str_starts_with((string) config('app.url'), 'https://')
+            || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower((string) $_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https')
+            || (isset($_SERVER['HTTP_CF_VISITOR']) && str_contains((string) $_SERVER['HTTP_CF_VISITOR'], 'https'))
+            || (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' && !empty($_SERVER['HTTPS']))
+            || (isset($_SERVER['SERVER_PORT']) && (int) $_SERVER['SERVER_PORT'] === 443)
+        ) {
             \Illuminate\Support\Facades\URL::forceScheme('https');
         }
 

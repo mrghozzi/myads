@@ -213,6 +213,45 @@ class SiteAdPlacementTest extends TestCase
             ->assertDontSee('<div class="ads-container"', false);
     }
 
+    public function test_get_on_site_ad_id_redirects_safely_to_site_ads_instead_of_405(): void
+    {
+        $this->seedSiteAds();
+
+        $admin = User::factory()->create([
+            'id' => 1,
+            'username' => 'admin-user',
+            'email' => 'admin@example.com',
+        ]);
+
+        $this->actingAs($admin)
+            ->get('/admin/site-ads/1')
+            ->assertRedirect(route('admin.site_ads'));
+    }
+
+    public function test_post_site_ad_updates_and_redirects_to_site_ads(): void
+    {
+        $this->seedSiteAds();
+
+        $admin = User::factory()->create([
+            'id' => 1,
+            'username' => 'admin-user',
+            'email' => 'admin@example.com',
+        ]);
+
+        $this->actingAs($admin)
+            ->post('/admin/site-ads/1', [
+                'code_ads' => [
+                    '1' => '<script async src="https://example.com/ad.js"></script>',
+                ],
+            ])
+            ->assertRedirect(route('admin.site_ads'));
+
+        $this->assertDatabaseHas('ads', [
+            'id' => 1,
+            'code_ads' => '<script async src="https://example.com/ad.js"></script>',
+        ]);
+    }
+
     private function seedSiteAds(): void
     {
         Setting::create([

@@ -68,7 +68,7 @@
                                         <textarea rows="6" name="code_ads[{{ $ad->id }}]" class="form-control">{{ $ad->code_ads }}</textarea>
                                     </td>
                                     <td data-label="{{ __('messages.actions') }}" class="text-end">
-                                        <button type="submit" formaction="{{ route('admin.site_ads.update', $ad->id) }}" class="btn btn-sm btn-outline-primary">
+                                        <button type="submit" formaction="{{ route('admin.site_ads.update', $ad->id) }}" formmethod="POST" class="btn btn-sm btn-outline-primary">
                                             <i class="feather-save me-1"></i>{{ __('messages.save') }}
                                         </button>
                                     </td>

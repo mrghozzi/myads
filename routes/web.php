@@ -702,7 +702,8 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     // Site Ads
     Route::get('/site-ads', [AdminController::class, 'siteAds'])->name('admin.site_ads');
     Route::post('/site-ads', [AdminController::class, 'updateSiteAds'])->name('admin.site_ads.update_all');
-    Route::post('/site-ads/{id}', [AdminController::class, 'updateSiteAd'])->name('admin.site_ads.update');
+    Route::match(['POST', 'PUT', 'PATCH'], '/site-ads/{id}', [AdminController::class, 'updateSiteAd'])->name('admin.site_ads.update');
+    Route::get('/site-ads/{id}', fn () => redirect()->route('admin.site_ads'));
     
     // Languages
     Route::get('/languages', [AdminController::class, 'languages'])->name('admin.languages');

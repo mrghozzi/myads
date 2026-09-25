@@ -63,9 +63,7 @@ class SeoSetting extends Model
     public static function current(): self
     {
         try {
-            if (!Schema::hasTable('seo_settings')) {
-                return new static(static::defaults());
-            }
+            self::ensureTableExists();
 
             return static::query()->first() ?? new static(static::defaults());
         } catch (\Throwable $e) {
@@ -76,13 +74,46 @@ class SeoSetting extends Model
     public static function currentPersisted(): self
     {
         try {
-            if (!Schema::hasTable('seo_settings')) {
-                return new static(static::defaults());
-            }
+            self::ensureTableExists();
 
             return static::query()->first() ?? static::query()->create(static::defaults());
         } catch (\Throwable $e) {
             return new static(static::defaults());
+        }
+    }
+
+    public static function ensureTableExists(): void
+    {
+        try {
+            if (!Schema::hasTable('seo_settings')) {
+                Schema::create('seo_settings', function (\Illuminate\Database\Schema\Blueprint $table) {
+                    $table->id();
+                    $table->string('default_title')->nullable();
+                    $table->text('default_description')->nullable();
+                    $table->text('default_keywords')->nullable();
+                    $table->string('default_robots')->default('index,follow,max-image-preview:large');
+                    $table->string('canonical_mode')->default('strip_tracking');
+                    $table->string('default_og_image')->nullable();
+                    $table->string('default_twitter_card')->default('summary_large_image');
+                    $table->boolean('ga4_enabled')->default(false);
+                    $table->string('ga4_measurement_id')->nullable();
+                    $table->string('google_site_verification')->nullable();
+                    $table->string('bing_site_verification')->nullable();
+                    $table->string('yandex_site_verification')->nullable();
+                    $table->boolean('allow_indexing')->default(true);
+                    $table->text('robots_allow_paths')->nullable();
+                    $table->text('robots_disallow_paths')->nullable();
+                    $table->text('robots_extra')->nullable();
+                    $table->longText('head_snippets')->nullable();
+                    $table->timestamps();
+                });
+            } elseif (!Schema::hasColumn('seo_settings', 'head_snippets')) {
+                Schema::table('seo_settings', function (\Illuminate\Database\Schema\Blueprint $table) {
+                    $table->longText('head_snippets')->nullable()->after('robots_extra');
+                });
+            }
+        } catch (\Throwable $e) {
+            // Silence if schema cannot be altered in restricted environments
         }
     }
 }
