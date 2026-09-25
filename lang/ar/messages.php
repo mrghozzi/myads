@@ -1688,7 +1688,7 @@ return [
     'seo_head_management' => 'إدارة وسوم الرأس',
     'seo_head_meta' => 'وسوم الرأس',
     'seo_head_snippets' => 'مقتطفات الرأس الإضافية',
-    'seo_head_snippets_help' => 'الوسوم المسموح بها: <code>meta</code> و<code>link</code> و<code>script type=\\"application/ld+json\\"</code>. تتم إزالة أي scripts تنفيذية خام تلقائيا.',
+    'seo_head_snippets_help' => 'الوسوم المسموح بها: <code>meta</code> و<code>link</code> و<code>script</code> (مثل إعلانات Google AdSense وGoogle Analytics وJSON-LD) و<code>style</code> و<code>noscript</code>. يتم تنظيف المدخلات تلقائياً لأمان الصفحة.',
     'seo_health_attention' => 'يحتاج إلى انتباه',
     'seo_health_critical' => 'حرج',
     'seo_health_healthy' => 'سليم',

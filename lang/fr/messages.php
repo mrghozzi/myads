@@ -1268,7 +1268,7 @@ return [
     'seo_head_management' => 'Gestion des metas head',
     'seo_head_meta' => 'Meta Head',
     'seo_head_snippets' => 'Extraits head supplementaires',
-    'seo_head_snippets_help' => 'Balises autorisees: <code>meta</code>, <code>link</code> et <code>script type=\\"application/ld+json\\"</code>. Les scripts executables bruts sont supprimes automatiquement.',
+    'seo_head_snippets_help' => 'Balises autorisees: <code>meta</code>, <code>link</code>, <code>script</code> (comme Google AdSense, Analytics et JSON-LD), <code>style</code> et <code>noscript</code>. Le code est automatiquement assaini pour la securite.',
     'seo_health_attention' => 'A surveiller',
     'seo_health_critical' => 'Critique',
     'seo_health_healthy' => 'Sain',

@@ -2,12 +2,57 @@
 
 namespace App\Support;
 
+use DOMComment;
 use DOMDocument;
 use DOMElement;
 use DOMNode;
 
 class SeoHeadSanitizer
 {
+    private const ALLOWED_META_ATTRIBUTES = [
+        'name',
+        'content',
+        'property',
+        'http-equiv',
+        'charset',
+        'id',
+        'class',
+        'media',
+    ];
+
+    private const ALLOWED_LINK_ATTRIBUTES = [
+        'rel',
+        'href',
+        'as',
+        'type',
+        'sizes',
+        'media',
+        'crossorigin',
+        'integrity',
+        'referrerpolicy',
+        'title',
+        'imagesrcset',
+        'imagesizes',
+        'id',
+        'class',
+    ];
+
+    private const ALLOWED_SCRIPT_ATTRIBUTES = [
+        'src',
+        'async',
+        'defer',
+        'type',
+        'crossorigin',
+        'integrity',
+        'nomodule',
+        'referrerpolicy',
+        'nonce',
+        'id',
+        'class',
+        'charset',
+        'fetchpriority',
+    ];
+
     public function sanitize(?string $html): string
     {
         $html = trim((string) $html);
@@ -38,7 +83,10 @@ class SeoHeadSanitizer
             $cleanNode = $this->sanitizeNode($output, $node);
             if ($cleanNode instanceof DOMNode) {
                 $output->appendChild($cleanNode);
-                $fragments[] = trim($output->saveHTML($cleanNode));
+                $htmlFragment = trim($output->saveHTML($cleanNode));
+                // Normalize boolean attributes for cleaner HTML5 markup (e.g. async="" to async)
+                $htmlFragment = preg_replace('/\s(async|defer|nomodule)=""/i', ' $1', $htmlFragment);
+                $fragments[] = $htmlFragment;
             }
         }
 
@@ -47,6 +95,10 @@ class SeoHeadSanitizer
 
     private function sanitizeNode(DOMDocument $output, DOMNode $node): ?DOMNode
     {
+        if ($node instanceof DOMComment) {
+            return $output->createComment($node->nodeValue);
+        }
+
         if (!$node instanceof DOMElement) {
             return null;
         }
@@ -54,7 +106,9 @@ class SeoHeadSanitizer
         return match (strtolower($node->tagName)) {
             'meta' => $this->sanitizeMeta($output, $node),
             'link' => $this->sanitizeLink($output, $node),
-            'script' => $this->sanitizeJsonLd($output, $node),
+            'script' => $this->sanitizeScript($output, $node),
+            'style' => $this->sanitizeStyle($output, $node),
+            'noscript' => $this->sanitizeNoscript($output, $node),
             default => null,
         };
     }
@@ -63,7 +117,7 @@ class SeoHeadSanitizer
     {
         $element = $output->createElement('meta');
 
-        foreach (['name', 'content', 'property', 'http-equiv', 'charset'] as $attribute) {
+        foreach (self::ALLOWED_META_ATTRIBUTES as $attribute) {
             if ($node->hasAttribute($attribute)) {
                 $element->setAttribute($attribute, trim($node->getAttribute($attribute)));
             }
@@ -78,9 +132,14 @@ class SeoHeadSanitizer
             return null;
         }
 
+        $href = trim($node->getAttribute('href'));
+        if (preg_match('/^(?:javascript|vbscript):/i', $href)) {
+            return null;
+        }
+
         $element = $output->createElement('link');
 
-        foreach (['rel', 'href', 'as', 'type', 'sizes', 'media', 'crossorigin'] as $attribute) {
+        foreach (self::ALLOWED_LINK_ATTRIBUTES as $attribute) {
             if ($node->hasAttribute($attribute)) {
                 $element->setAttribute($attribute, trim($node->getAttribute($attribute)));
             }
@@ -89,23 +148,100 @@ class SeoHeadSanitizer
         return $element;
     }
 
-    private function sanitizeJsonLd(DOMDocument $output, DOMElement $node): ?DOMElement
+    private function sanitizeScript(DOMDocument $output, DOMElement $node): ?DOMElement
     {
-        $type = trim(strtolower($node->getAttribute('type')));
+        $type = strtolower(trim($node->getAttribute('type')));
         $content = trim($node->textContent);
+        $hasSrc = $node->hasAttribute('src');
+        $src = trim($node->getAttribute('src'));
 
-        if ($type !== 'application/ld+json' || $content === '') {
+        // Handle JSON-LD structured data
+        if ($type === 'application/ld+json') {
+            if ($content === '') {
+                return null;
+            }
+
+            json_decode($content, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                return null;
+            }
+
+            $element = $output->createElement('script');
+            $element->setAttribute('type', 'application/ld+json');
+            $element->appendChild($output->createTextNode($content));
+
+            return $element;
+        }
+
+        // Block javascript: or vbscript: pseudoprotocols in src
+        if ($hasSrc && preg_match('/^(?:javascript|vbscript):/i', $src)) {
             return null;
         }
 
-        json_decode($content, true);
-        if (json_last_error() !== JSON_ERROR_NONE) {
+        // If not JSON-LD and has neither src nor content, skip empty script
+        if (!$hasSrc && $content === '') {
+            return null;
+        }
+
+        // Validate type attribute if present (allow standard js types or empty)
+        $allowedTypes = [
+            '',
+            'text/javascript',
+            'application/javascript',
+            'module',
+        ];
+        if (!in_array($type, $allowedTypes, true)) {
             return null;
         }
 
         $element = $output->createElement('script');
-        $element->setAttribute('type', 'application/ld+json');
-        $element->appendChild($output->createTextNode($content));
+
+        // Copy allowed attributes and any data-* attributes (such as data-ad-client)
+        foreach ($node->attributes as $attr) {
+            $name = strtolower($attr->name);
+            if (in_array($name, self::ALLOWED_SCRIPT_ATTRIBUTES, true) || str_starts_with($name, 'data-')) {
+                if ($name === 'src') {
+                    $element->setAttribute('src', $src);
+                } elseif (in_array($name, ['async', 'defer', 'nomodule'], true)) {
+                    $element->setAttribute($name, '');
+                } else {
+                    $element->setAttribute($attr->name, trim($attr->value));
+                }
+            }
+        }
+
+        if ($content !== '') {
+            $element->appendChild($output->createTextNode($node->textContent));
+        }
+
+        return $element;
+    }
+
+    private function sanitizeStyle(DOMDocument $output, DOMElement $node): ?DOMElement
+    {
+        $content = trim($node->textContent);
+        if ($content === '') {
+            return null;
+        }
+
+        $element = $output->createElement('style');
+        foreach (['type', 'media', 'id', 'class', 'nonce'] as $attribute) {
+            if ($node->hasAttribute($attribute)) {
+                $element->setAttribute($attribute, trim($node->getAttribute($attribute)));
+            }
+        }
+        $element->appendChild($output->createTextNode($node->textContent));
+
+        return $element;
+    }
+
+    private function sanitizeNoscript(DOMDocument $output, DOMElement $node): ?DOMElement
+    {
+        $element = $output->createElement('noscript');
+        foreach ($node->childNodes as $child) {
+            $imported = $output->importNode($child, true);
+            $element->appendChild($imported);
+        }
 
         return $element;
     }

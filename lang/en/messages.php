@@ -1683,7 +1683,7 @@ return [
     'seo_head_management' => 'Head Meta Management',
     'seo_head_meta' => 'Head Meta',
     'seo_head_snippets' => 'Additional Head Snippets',
-    'seo_head_snippets_help' => 'Allowed tags: <code>meta</code>, <code>link</code>, and <code>script type=\\\\"application/ld+json\\\\"</code>. Raw executable scripts are stripped automatically.',
+    'seo_head_snippets_help' => 'Allowed tags: <code>meta</code>, <code>link</code>, <code>script</code> (such as Google AdSense, Analytics, and JSON-LD), <code>style</code>, and <code>noscript</code>. Code is automatically sanitized for safety.',
     'seo_health_attention' => 'Needs Attention',
     'seo_health_critical' => 'Critical',
     'seo_health_healthy' => 'Healthy',

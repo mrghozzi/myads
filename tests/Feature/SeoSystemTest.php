@@ -217,10 +217,27 @@ class SeoSystemTest extends TestCase
             'ga4_measurement_id' => 'G-AB12CDEF34',
         ]);
 
+        $adsenseSnippet = '<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9228974727858878" crossorigin="anonymous"></script>';
+
+        $this->actingAs($admin)
+            ->post('/admin/seo/head', [
+                'google_site_verification' => 'google-token-xyz',
+                'bing_site_verification' => 'bing-token-xyz',
+                'yandex_site_verification' => 'yandex-token-xyz',
+                'head_snippets' => $adsenseSnippet,
+            ])
+            ->assertRedirect('/admin/seo/head');
+
+        $this->assertDatabaseHas('seo_settings', [
+            'google_site_verification' => 'google-token-xyz',
+            'head_snippets' => $adsenseSnippet,
+        ]);
+
         $this->actingAs($admin)
             ->get('/admin/seo/head')
             ->assertOk()
-            ->assertSee(trans('messages.seo_head_meta', [], 'en'));
+            ->assertSee(trans('messages.seo_head_meta', [], 'en'))
+            ->assertSee($adsenseSnippet);
 
         $this->actingAs($admin)
             ->get('/admin/seo/rules')
