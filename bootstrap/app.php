@@ -67,6 +67,11 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->trustProxies(at: '*');
 
+        // SECURITY: Block access to .env, composer.json, artisan, and other sensitive
+        // files at the application level. This is the critical defence-in-depth layer
+        // for hosts where .htaccess is not supported (Nginx, LiteSpeed, etc.).
+        $middleware->prepend(\App\Http\Middleware\BlockSensitivePaths::class);
+
         $middleware->web(append: [
             \App\Http\Middleware\SecurityHeaders::class,
             \App\Http\Middleware\BlockBannedIp::class,
