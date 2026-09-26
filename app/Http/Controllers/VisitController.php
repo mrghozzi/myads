@@ -116,17 +116,21 @@ class VisitController extends Controller
             'tims' => $request->tims,
         ]);
 
-        return redirect()->route('visits.index')->with('success', 'Site updated successfully.');
+        return redirect()->route('visits.index')->with('success', __('messages.visit_updated_successfully'));
     }
 
     // Management: Delete Site
-    public function destroy($id)
+    public function destroy(Request $request, $id)
     {
         $user = Auth::user();
         $site = Visit::where('id', $id)->where('uid', $user->id)->firstOrFail();
         $site->delete();
 
-        return redirect()->route('visits.index')->with('success', 'Site deleted successfully.');
+        if ($request->expectsJson()) {
+            return response()->json(['success' => true, 'message' => __('messages.deleted_successfully')]);
+        }
+
+        return redirect()->route('visits.index')->with('success', __('messages.visit_deleted_successfully'));
     }
 
     // Surfing: The Auto-Surf Page

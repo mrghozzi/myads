@@ -106,6 +106,10 @@ class SmartAdsController extends Controller
         $smartAd = SmartAd::where('uid', $user->id)->findOrFail($id);
         $smartAd->delete();
 
+        if (request()->expectsJson()) {
+            return response()->json(['success' => true, 'message' => __('messages.smart_ad_deleted')]);
+        }
+
         return redirect()->route('ads.smart.index')->with('success', __('messages.smart_ad_deleted'));
     }
 

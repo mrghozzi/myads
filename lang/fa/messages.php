@@ -4098,4 +4098,10 @@ return [
     'upload_from_device' => 'آپلود از دستگاه',
     'enter_image_url' => 'آدرس تصویر',
     'current_image' => 'تصویر فعلی',
+    'ads_delete_failed' => 'حذف این مورد ممکن نشد. لطفاً دوباره تلاش کنید.',
+    'banner_deleted_successfully' => 'تبلیغ بنری حذف شد.',
+    'link_updated_successfully' => 'تبلیغ متنی به‌روزرسانی شد.',
+    'link_deleted_successfully' => 'تبلیغ متنی حذف شد.',
+    'visit_updated_successfully' => 'کارزار تبادل بازدید به‌روزرسانی شد.',
+    'visit_deleted_successfully' => 'کارزار تبادل بازدید حذف شد.',
 ];

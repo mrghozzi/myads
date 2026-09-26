@@ -7,6 +7,36 @@ use Carbon\Carbon;
 
 class AdStatsService
 {
+    /** Fetch heatmaps for a collection of ads in a single grouped query. */
+    public function getHourlyHeatmaps(array $adIds, string $type): array
+    {
+        $adIds = array_values(array_unique(array_map('intval', $adIds)));
+        if ($adIds === []) {
+            return [];
+        }
+
+        $isSqlite = DB::connection()->getDriverName() === 'sqlite';
+        $hourExpr = $isSqlite
+            ? 'cast(strftime(\'%H\', datetime(r_date, \'unixepoch\')) as integer) as hour'
+            : 'HOUR(FROM_UNIXTIME(r_date)) as hour';
+        $rows = DB::table('state')
+            ->select('pid', DB::raw($hourExpr), DB::raw('count(*) as count'))
+            ->whereIn('pid', $adIds)
+            ->where('t_name', $type)
+            ->groupBy('pid', 'hour')
+            ->get();
+
+        $heatmaps = [];
+        foreach ($adIds as $id) {
+            $heatmaps[$id] = array_fill(0, 24, 0);
+        }
+        foreach ($rows as $row) {
+            $heatmaps[(int) $row->pid][(int) $row->hour] = (int) $row->count;
+        }
+
+        return $heatmaps;
+    }
+
     /**
      * Get the hourly distribution of clicks for a specific ad.
      * 

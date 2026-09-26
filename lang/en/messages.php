@@ -4709,4 +4709,5 @@ return [
     'credits' => 'Credits',
     'interactions' => 'Interactions',
     'today' => 'Today',
+    'ads_delete_failed' => 'Unable to delete this item. Please try again.',
 ];

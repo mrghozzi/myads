@@ -1,66 +1,24 @@
 @extends('theme::layouts.master')
-
 @section('content')
-<div class="grid grid change-on-desktop">
-    <div class="achievement-box secondary" style="background: linear-gradient(135deg, rgba(15,23,42,.96) 0%, rgba(29,78,216,.94) 56%, rgba(14,165,233,.88) 100%);">
-        <div class="achievement-box-info-wrap">
-            <img class="achievement-box-image" src="{{ theme_asset('img/banner/banner_ads.png') }}" alt="smart-ads-code">
-            <div class="achievement-box-info">
-                <p class="achievement-box-title">{{ __('messages.smart_code_title') }}</p>
-                <p class="achievement-box-text"><b>{{ __('messages.smart_code_desc') }}</b></p>
-            </div>
-        </div>
-
-        <a class="button white-solid" href="{{ route('ads.smart.index') }}">{{ __('messages.smart_list_ads') }}</a>
-    </div>
-</div>
-
-<div class="grid grid">
-    <div class="grid-column">
-        @php
-            $recommendedCode = \App\Support\SmartAdEmbedCode::build(route('ads.embed.smart'), $user->id, $extensions_code ?? '');
-            $compatibleCode = \App\Support\SmartAdEmbedCode::buildInlineLoader(route('ads.smart.script'), $user->id, $extensions_code ?? '');
-        @endphp
-        <div class="widget-box">
-            <div class="widget-box-content">
-                <p class="widget-box-title">{{ __('messages.smart_code_recommended') }}</p>
-                <p style="margin: 10px 0 18px; color: #5d6488; line-height: 1.7;">{{ __('messages.smart_code_recommended_desc') }}</p>
-                <div class="well" style="color: black;">
-                    <textarea class="form-control" readonly onclick="this.select(); document.execCommand('copy');">{{ $recommendedCode }}</textarea>
-                </div>
-                <p style="margin: 14px 0 0; color: #5d6488; line-height: 1.7;">{{ __('messages.smart_code_live_behavior_note') }}</p>
-            </div>
-        </div>
-
-        <div class="widget-box" style="margin-top: 24px;">
-            <div class="widget-box-content">
-                <p class="widget-box-title">{{ __('messages.advanced_code') }}</p>
-                <div class="well" style="color: black;">
-                    <textarea class="form-control" readonly onclick="this.select(); document.execCommand('copy');">{{ $compatibleCode }}</textarea>
-                </div>
-            </div>
-        </div>
-
-        <div class="widget-box" style="margin-top: 24px;">
-            <div class="widget-box-content">
-                <p class="widget-box-title">{{ __('messages.preview') }}</p>
-                @if($previewMarkup)
-                    <div style="margin-top: 10px; color: #64748b; line-height: 1.7;">
-                        {{ $previewSmartAd->displayTitle() }}
-                    </div>
-                    <div style="margin-top: 16px; padding: 18px; border: 1px solid #e5e7eb; border-radius: 20px; background: linear-gradient(135deg, #f8fbff 0%, #ffffff 100%);">
-                        <div style="max-width: 760px; margin: 0 auto;">
-                            {!! $previewMarkup !!}
-                        </div>
-                    </div>
-                @else
-                    <div style="margin-top: 16px; padding: 24px; border: 1px dashed #cbd5e1; border-radius: 20px; background: linear-gradient(135deg, #f8fbff 0%, #ffffff 100%); text-align: center;">
-                        <p style="margin: 0 0 8px; font-size: 1rem; font-weight: 700; color: #1f2937;">{{ __('messages.smart_code_preview_empty_title') }}</p>
-                        <p style="margin: 0; color: #64748b; line-height: 1.8;">{{ __('messages.smart_code_preview_empty_desc') }}</p>
-                    </div>
-                @endif
-            </div>
-        </div>
-    </div>
-</div>
+@php
+    $recommendedCode = \App\Support\SmartAdEmbedCode::build(route('ads.embed.smart'), $user->id, $extensions_code ?? '');
+    $compatibleCode = \App\Support\SmartAdEmbedCode::buildInlineLoader(route('ads.smart.script'), $user->id, $extensions_code ?? '');
+@endphp
+@include('theme::ads.partials.workspace_styles')
+<main class="ads-workspace" data-ads-workspace data-copy-label="{{ __('messages.copy') }}" data-copied="{{ __('messages.copied') }}">
+    <header class="ads-workspace__hero"><div><span class="ads-workspace__eyebrow">{{ __('messages.smart_ads') }}</span><h1 class="ads-workspace__title">{{ __('messages.smart_code_title') }}</h1><p class="ads-workspace__copy">{{ __('messages.smart_code_desc') }}</p></div><div class="ads-workspace__actions"><a class="ads-workspace__button ads-workspace__button--soft" href="{{ route('ads.smart.index') }}"><i class="fa fa-arrow-left" aria-hidden="true"></i>{{ __('messages.smart_list_ads') }}</a><a class="ads-workspace__button" href="{{ route('ads.smart.create') }}"><i class="fa fa-plus" aria-hidden="true"></i>{{ __('messages.smart_create_ad') }}</a></div></header>
+    <section class="ads-workspace__code-layout">
+        <article class="ads-workspace__panel"><div class="ads-workspace__toolbar"><h2 class="ads-workspace__name">{{ __('messages.smart_code_recommended') }}</h2></div><div class="ads-workspace__list"><p class="ads-workspace__copy">{{ __('messages.smart_code_recommended_desc') }}</p><textarea class="ads-workspace__snippet" readonly aria-label="{{ __('messages.smart_code_recommended') }}">{{ $recommendedCode }}</textarea><p class="ads-workspace__copy">{{ __('messages.smart_code_live_behavior_note') }}</p></div></article>
+        <article class="ads-workspace__panel"><div class="ads-workspace__toolbar"><h2 class="ads-workspace__name">{{ __('messages.advanced_code') }}</h2></div><div class="ads-workspace__list"><p class="ads-workspace__copy">{{ __('messages.smart_code_live_behavior_note') }}</p><textarea class="ads-workspace__snippet" readonly aria-label="{{ __('messages.advanced_code') }}">{{ $compatibleCode }}</textarea></div></article>
+    </section>
+    <section class="ads-workspace__panel"><div class="ads-workspace__toolbar"><h2 class="ads-workspace__name">{{ __('messages.preview') }}</h2></div><div class="ads-workspace__list">
+        @if($previewMarkup)
+            <p class="ads-workspace__copy">{{ $previewSmartAd->displayTitle() }}</p><div class="ads-workspace__preview">{!! $previewMarkup !!}</div>
+        @else
+            <div class="ads-workspace__empty"><h3>{{ __('messages.smart_code_preview_empty_title') }}</h3><p>{{ __('messages.smart_code_preview_empty_desc') }}</p><a href="{{ route('ads.smart.create') }}" class="ads-workspace__button">{{ __('messages.smart_create_ad') }}</a></div>
+        @endif
+    </div></section>
+    <div class="ads-workspace__toast" data-ads-toast role="status" aria-live="polite"></div>
+</main>
+@include('theme::ads.partials.workspace_scripts')
 @endsection

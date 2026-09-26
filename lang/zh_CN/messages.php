@@ -4101,4 +4101,10 @@ return [
     'upload_from_device' => '从设备上传',
     'enter_image_url' => '图片网址',
     'current_image' => '当前图片',
+    'ads_delete_failed' => '无法删除此项目，请重试。',
+    'banner_deleted_successfully' => '横幅广告已删除。',
+    'link_updated_successfully' => '文字广告已更新。',
+    'link_deleted_successfully' => '文字广告已删除。',
+    'visit_updated_successfully' => '访问互换活动已更新。',
+    'visit_deleted_successfully' => '访问互换活动已删除。',
 ];

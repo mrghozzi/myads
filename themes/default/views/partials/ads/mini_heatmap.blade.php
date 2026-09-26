@@ -1,4 +1,4 @@
-<div class="mini-heatmap" title="Hourly Click Distribution (00:00 - 23:00)">
+<div class="mini-heatmap" title="{{ __('messages.performance') }} (00:00 - 23:00)">
     @php
         $max = max($heatmap) ?: 1;
     @endphp
@@ -14,7 +14,7 @@
                  style="flex: 1; height: {{ $height }}%; background: {{ $bg }}; border-radius: 1px; cursor: help;"
                  data-bs-toggle="tooltip" 
                  data-bs-placement="top"
-                 title="{{ sprintf('%02d:00', $hour) }}: {{ $count }} clicks">
+                 title="{{ sprintf('%02d:00', $hour) }}: {{ $count }} {{ __('messages.clicks') }}">
             </div>
         @endforeach
     </div>

@@ -4096,4 +4096,10 @@ return [
     'upload_from_device' => 'デバイスからアップロード',
     'enter_image_url' => '画像URL',
     'current_image' => '現在の画像',
+    'ads_delete_failed' => 'この項目を削除できませんでした。もう一度お試しください。',
+    'banner_deleted_successfully' => 'バナー広告を削除しました。',
+    'link_updated_successfully' => 'テキスト広告を更新しました。',
+    'link_deleted_successfully' => 'テキスト広告を削除しました。',
+    'visit_updated_successfully' => '訪問交換キャンペーンを更新しました。',
+    'visit_deleted_successfully' => '訪問交換キャンペーンを削除しました。',
 ];

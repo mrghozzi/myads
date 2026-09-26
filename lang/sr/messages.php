@@ -4096,4 +4096,10 @@ return [
     'upload_from_device' => 'Отпреми са уређаја',
     'enter_image_url' => 'УРЛ слике',
     'current_image' => 'Тренутна слика',
+    'ads_delete_failed' => 'Nije moguće obrisati ovu stavku. Pokušajte ponovo.',
+    'banner_deleted_successfully' => 'Baner je obrisan.',
+    'link_updated_successfully' => 'Tekstualni oglas je ažuriran.',
+    'link_deleted_successfully' => 'Tekstualni oglas je obrisan.',
+    'visit_updated_successfully' => 'Kampanja razmene poseta je ažurirana.',
+    'visit_deleted_successfully' => 'Kampanja razmene poseta je obrisana.',
 ];

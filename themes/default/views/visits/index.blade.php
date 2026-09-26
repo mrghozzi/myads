@@ -1,106 +1,23 @@
 @extends('theme::layouts.master')
-
 @section('content')
-<div class="grid grid change-on-desktop" >
-       <div class="achievement-box secondary" style="background: url({{ theme_asset('img/banner/03.jpg') }}) no-repeat 50%; background-size: cover " >
-          <!-- ACHIEVEMENT BOX INFO WRAP -->
-          <div class="achievement-box-info-wrap">
-            <!-- ACHIEVEMENT BOX IMAGE -->
-            <img class="achievement-box-image" src="{{ theme_asset('img/banner/exchange.png') }}" alt="badge-caffeinated-b">
-            <!-- /ACHIEVEMENT BOX IMAGE -->
-
-            <!-- ACHIEVEMENT BOX INFO -->
-            <div class="achievement-box-info">
-              <!-- ACHIEVEMENT BOX TITLE -->
-              <p class="achievement-box-title">{{ __('messages.list') }}&nbsp;{{ __('messages.exvisit') }}</p>
-              <!-- /ACHIEVEMENT BOX TITLE -->
-
-              <!-- ACHIEVEMENT BOX TEXT -->
-              <p class="achievement-box-text"><b>{{ __('messages.ctevbtexp') }}</b></p>
-              <!-- /ACHIEVEMENT BOX TEXT -->
-            </div>
-            <!-- /ACHIEVEMENT BOX INFO -->
-          </div>
-          <!-- /ACHIEVEMENT BOX INFO WRAP -->
-
-          <!-- BUTTON -->
-          <a class="button white-solid" onClick="window.open('{{ route('visits.surf') }}', 'SurfWindow', 'width=1024,height=768');" href="javascript:void(0);" >
-          <i class="fa fa-exchange nav_icon"></i>&nbsp;{{ __('messages.exvisit') }}
-          </a>
-          <!-- /BUTTON -->
-       </div>
-</div>
-
-<div class="section-filters-bar v6">
-      <!-- SECTION FILTERS BAR ACTIONS -->
-      <div class="section-filters-bar-actions" >
-      </div>
-      <p class="text-sticker">
-          <!-- TEXT STICKER ICON -->
-          <svg class="text-sticker-icon icon-info">
-            <use xlink:href="#svg-info"></use>
-          </svg>
-          <!-- TEXT STICKER ICON -->
-          {{ __('messages.you_have') }}&nbsp;{{ $user->vu }}&nbsp;{{ __('messages.ptvysa') }}&nbsp;|&nbsp;
-          {{ __('messages.yshbv') }}&nbsp;:&nbsp;{{ $visits }}
-      </p>
-      <div class="section-filters-bar-actions">
-        <!-- BUTTON -->
-        <a href="{{ route('ads.promote', ['p' => 'exchange']) }}" class="button secondary" style="color: #fff;" >
-        <i class="fa fa-plus nav_icon"></i>&nbsp;
-        {{ __('messages.add') }}
-        </a>
-        <!-- /BUTTON -->
-      </div>
-      <!-- /SECTION FILTERS BAR ACTIONS -->
-</div>
-
-<div class="grid grid" >
-  <div class="grid-column" >
-    <div class="widget-box" >
-        <table id="tablepagination" class="table table-borderless table-hover">
-            <thead>
-             <tr>
-              <th>{{ __('messages.id') ?? '#ID' }}</th>
-              <th>{{ __('messages.name') ?? 'Name' }}</th>
-              <th>{{ __('messages.vu') ?? 'Vu' }}</th>
-              <th>{{ __('messages.tims') ?? 'Tims' }}</th>
-              <th>{{ __('messages.statu') ?? 'Statu' }}</th>
-              <th></th>
-             </tr>
-            </thead>
-            <tbody>
-             @foreach($sites as $site)
-             @php
-                 $fgft = $site->statu == 1 ? "ON" : "OFF";
-                 $repvu = array("1","2","3","4");
-                 $repvu_to = array("10s","20s","30s","60s");
-                 $tims_vu = str_replace($repvu, $repvu_to, $site->tims);
-                 $bnname = mb_strlen($site->name, 'utf8') > 25 ? mb_substr($site->name, 0, 25) . "&nbsp;..." : $site->name;
-             @endphp
-             <tr>
-               <td>{{ $site->id }}</td>
-               <td>{!! $bnname !!}</td>
-               <td>{{ $site->vu }}</td>
-               <td>{{ $tims_vu }}</td>
-               <td>{{ $fgft }}</td>
-               <td>
-                   <div style="display: flex; align-items: center; gap: 8px;">
-                       <a href="{{ route('visits.edit', $site->id) }}" class='btn btn-success'><i class="fa fa-edit "></i></a>
-                       <form action="{{ route('visits.destroy', $site->id) }}" method="POST" onsubmit="return confirm('{{ __('messages.confirm_delete_visit') }}');" style="margin: 0;">
-                           @csrf
-                           @method('DELETE')
-                           <button type="submit" class="btn btn-danger" aria-label="{{ __('messages.delete_visit') }}" style="display: inline-flex; align-items: center; justify-content: center;">
-                               <i class="fa fa-ban "></i>
-                           </button>
-                       </form>
-                   </div>
-               </td>
-             </tr>
-             @endforeach
-            </tbody>
-        </table>
-    </div>
-  </div>
-</div>
+@include('theme::ads.partials.workspace_styles')
+<main class="ads-workspace" data-ads-workspace data-initial-empty="{{ $sites->isEmpty() ? 'true' : 'false' }}" data-deleted="{{ __('messages.deleted_successfully') }}" data-delete-error="{{ __('messages.ads_delete_failed') }}">
+    <header class="ads-workspace__hero"><div><span class="ads-workspace__eyebrow">{{ __('messages.exvisit') }}</span><h1 class="ads-workspace__title">{{ __('messages.list') }} {{ __('messages.exvisit') }}</h1><p class="ads-workspace__copy">{{ __('messages.ctevbtexp') }}</p></div><div class="ads-workspace__actions"><a class="ads-workspace__button ads-workspace__button--soft" href="{{ route('visits.surf') }}" target="SurfWindow" onclick="window.open(this.href,'SurfWindow','width=1024,height=768');return false"><i class="fa fa-exchange" aria-hidden="true"></i>{{ __('messages.exvisit') }}</a><a class="ads-workspace__button" href="{{ route('ads.promote', ['p' => 'exchange']) }}"><i class="fa fa-plus" aria-hidden="true"></i>{{ __('messages.add') }}</a></div></header>
+    @if(session('success'))<div class="alert alert-success" role="status">{{ session('success') }}</div>@endif
+    <section class="ads-workspace__stats" aria-label="{{ __('messages.statistics') }}"><div class="ads-workspace__stat"><span class="ads-workspace__stat-label">{{ __('messages.total') }}</span><span class="ads-workspace__stat-value" data-ads-count>{{ $sites->count() }}</span></div><div class="ads-workspace__stat"><span class="ads-workspace__stat-label">{{ __('messages.active') }}</span><span class="ads-workspace__stat-value">{{ $sites->where('statu', 1)->count() }}</span></div><div class="ads-workspace__stat"><span class="ads-workspace__stat-label">{{ __('messages.ptvysa') }}</span><span class="ads-workspace__stat-value">{{ number_format((float) $user->vu) }}</span></div><div class="ads-workspace__stat"><span class="ads-workspace__stat-label">{{ __('messages.yshbv') }}</span><span class="ads-workspace__stat-value">{{ number_format((int) $visits) }}</span></div></section>
+    <section class="ads-workspace__panel"><div class="ads-workspace__toolbar"><input class="ads-workspace__search" type="search" data-ads-search aria-label="{{ __('messages.btn_search') }}" placeholder="{{ __('messages.btn_search') }} {{ __('messages.exvisit') }}"><div class="ads-workspace__filters" role="group" aria-label="{{ __('messages.status') }}"><button class="ads-workspace__filter is-active" type="button" data-ads-filter="all" aria-pressed="true">{{ __('messages.all') }}</button><button class="ads-workspace__filter" type="button" data-ads-filter="active" aria-pressed="false">{{ __('messages.active') }}</button><button class="ads-workspace__filter" type="button" data-ads-filter="paused" aria-pressed="false">{{ __('messages.smart_status_paused') }}</button></div><span class="ads-workspace__status"><span data-ads-count>{{ $sites->count() }}</span> {{ __('messages.total') }}</span></div>
+      <div class="ads-workspace__list">
+      @foreach($sites as $site)
+        @php($isActive = (int) $site->statu === 1)
+        <article class="ads-workspace__item" data-ads-item data-status="{{ $isActive ? 'active' : 'paused' }}" data-search="{{ $site->name }} {{ $site->url }}">
+          <div class="ads-workspace__identity"><h2 class="ads-workspace__name">{{ $site->name }}</h2><p class="ads-workspace__sub">#{{ $site->id }} · <a href="{{ $site->url }}" target="_blank" rel="noopener noreferrer">{{ parse_url($site->url, PHP_URL_HOST) }}</a></p></div>
+          <div class="ads-workspace__metric">{{ number_format((int) $site->vu) }}<span class="ads-workspace__metric-label">{{ __('messages.views') }}</span></div><div class="ads-workspace__metric">{{ ['1' => '10s', '2' => '20s', '3' => '30s', '4' => '60s'][(string) $site->tims] ?? '10s' }}<span class="ads-workspace__metric-label">{{ __('messages.duration') }}</span></div>
+          <div class="ads-workspace__row-actions"><span class="ads-workspace__badge {{ $isActive ? 'ads-workspace__badge--active' : 'ads-workspace__badge--paused' }}">{{ $isActive ? __('messages.active') : __('messages.smart_status_paused') }}</span><a class="ads-workspace__button ads-workspace__button--soft" href="{{ route('visits.edit', $site->id) }}" aria-label="{{ __('messages.edit') }}"><i class="fa fa-edit" aria-hidden="true"></i></a><form action="{{ route('visits.destroy', $site->id) }}" method="POST" data-ajax-delete data-confirm="{{ __('messages.confirm_delete_visit') }}">@csrf @method('DELETE')<button class="ads-workspace__button ads-workspace__button--danger" type="submit" aria-label="{{ __('messages.delete') }}"><i class="fa fa-trash" aria-hidden="true"></i></button></form></div>
+        </article>
+      @endforeach
+      <div class="ads-workspace__empty" data-ads-empty hidden>{{ __('messages.no_results') }}</div>
+      @if($sites->isEmpty())<div class="ads-workspace__empty">{{ __('messages.no_results') }} · <a href="{{ route('ads.promote', ['p' => 'exchange']) }}">{{ __('messages.add') }}</a></div>@endif
+      </div></section><div class="ads-workspace__toast" data-ads-toast role="status" aria-live="polite"></div>
+</main>
+@include('theme::ads.partials.workspace_scripts')
 @endsection

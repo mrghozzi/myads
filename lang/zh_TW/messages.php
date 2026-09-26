@@ -4101,4 +4101,10 @@ return [
     'upload_from_device' => '從裝置上傳',
     'enter_image_url' => '圖片網址',
     'current_image' => '當前圖片',
+    'ads_delete_failed' => '無法刪除此項目，請再試一次。',
+    'banner_deleted_successfully' => '橫幅廣告已刪除。',
+    'link_updated_successfully' => '文字廣告已更新。',
+    'link_deleted_successfully' => '文字廣告已刪除。',
+    'visit_updated_successfully' => '訪問互換活動已更新。',
+    'visit_deleted_successfully' => '訪問互換活動已刪除。',
 ];

@@ -4098,4 +4098,10 @@ return [
     'upload_from_device' => 'Carregar do dispositivo',
     'enter_image_url' => 'URL da imagem',
     'current_image' => 'Imagem atual',
+    'ads_delete_failed' => 'Não foi possível excluir este item. Tente novamente.',
+    'banner_deleted_successfully' => 'Anúncio de banner excluído.',
+    'link_updated_successfully' => 'Anúncio de texto atualizado.',
+    'link_deleted_successfully' => 'Anúncio de texto excluído.',
+    'visit_updated_successfully' => 'Campanha de troca de visitas atualizada.',
+    'visit_deleted_successfully' => 'Campanha de troca de visitas excluída.',
 ];

@@ -1,118 +1,24 @@
 @extends('theme::layouts.master')
-
 @section('content')
-<div class="grid grid change-on-desktop">
-    <div class="achievement-box secondary" style="background: linear-gradient(135deg, rgba(15,23,42,.96) 0%, rgba(29,78,216,.94) 56%, rgba(14,165,233,.88) 100%);">
-        <div class="achievement-box-info-wrap">
-            <img class="achievement-box-image" src="{{ theme_asset('img/banner/banner_ads.png') }}" alt="smart-ads">
-            <div class="achievement-box-info">
-                <p class="achievement-box-title">{{ __('messages.smart_ads') }}</p>
-                <p class="achievement-box-text"><b>{{ __('messages.smart_index_byline') }}</b></p>
-            </div>
-        </div>
-
-        <a class="button white-solid" href="{{ route('ads.smart.code') }}">
-            <i class="fa fa-code" aria-hidden="true"></i>&nbsp;{{ __('messages.code') }}
-        </a>
-    </div>
-</div>
-
-@if(session('success'))
-    <div class="alert alert-success">{{ session('success') }}</div>
-@endif
-
-@if(session('warning'))
-    <div class="alert alert-warning">{{ session('warning') }}</div>
-@endif
-
-<div class="section-filters-bar v6">
-    <div class="section-filters-bar-actions">
-        <a class="button tertiary" href="{{ route('legacy.state', ['ty' => 'smart', 'st' => 'vu']) }}"><i class="fa fa-line-chart" aria-hidden="true"></i></a>
-    </div>
-    <p class="text-sticker">
-        <svg class="text-sticker-icon icon-info">
-            <use xlink:href="#svg-info"></use>
-        </svg>
-        {{ __('messages.smart_you_have_credits', ['credits' => number_format((float) $user->nsmart, 2)]) }}
-    </p>
-    <div class="section-filters-bar-actions">
-        <a href="{{ route('ads.smart.create') }}" class="button secondary" style="color: #fff;">
-            <i class="fa fa-plus nav_icon"></i>&nbsp;{{ __('messages.create') }}
-        </a>
-        <a href="{{ route('ads.smart.code') }}" class="button primary">
-            <i class="fa fa-code nav_icon"></i>&nbsp;{{ __('messages.code') }}
-        </a>
-    </div>
-</div>
-
-<div class="grid grid">
-    <div class="grid-column">
-        <div class="widget-box">
-            <div class="widget-box-content">
-                @if($smartAds->isEmpty())
-                    <div style="padding: 24px; border: 1px dashed #c7d2fe; border-radius: 18px; background: linear-gradient(135deg, #f8fbff 0%, #eef6ff 100%);">
-                        <h4 style="margin: 0 0 8px;">{{ __('messages.smart_empty_title') }}</h4>
-                        <p style="margin: 0 0 14px; color: #6b7280;">{{ __('messages.smart_empty_desc') }}</p>
-                        <a href="{{ route('ads.smart.create') }}" class="button secondary">{{ __('messages.smart_create_ad') }}</a>
-                    </div>
-                @else
-                    <div style="display: grid; gap: 18px;">
-                        @foreach($smartAds as $smartAd)
-                            <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 18px; padding: 22px; border: 1px solid #eef2ff; border-radius: 20px; background: #fff;">
-                                <div>
-                                    <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 10px;">
-                                        <span style="display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 999px; background: rgba(29,78,216,0.08); color: #1d4ed8; font-size: .72rem; font-weight: 700; text-transform: uppercase;">{{ __('messages.smart_ad') }}</span>
-                                        <span style="font-size: .8rem; color: #8f91ac;">#{{ $smartAd->id }}</span>
-                                        <span style="font-size: .8rem; color: {{ (int) $smartAd->statu === 1 ? '#0f766e' : '#b45309' }};">{{ (int) $smartAd->statu === 1 ? __('messages.active') : __('messages.smart_status_paused') }}</span>
-                                    </div>
-
-                                    <div style="display: grid; grid-template-columns: {{ $smartAd->displayImage() ? '112px minmax(0, 1fr)' : '1fr' }}; gap: 18px; align-items: start;">
-                                        @if($smartAd->displayImage())
-                                            <div style="width: 112px; height: 112px; border-radius: 16px; overflow: hidden; background: #f3f4f6;">
-                                                <img src="{{ $smartAd->displayImage() }}" alt="{{ $smartAd->displayTitle() }}" style="width: 100%; height: 100%; object-fit: cover;">
-                                            </div>
-                                        @endif
-                                        <div>
-                                            <h4 style="margin: 0 0 8px; color: #1f2937;">{{ $smartAd->displayTitle() }}</h4>
-                                            <p style="margin: 0 0 10px; color: #6b7280; line-height: 1.7;">{{ \Illuminate\Support\Str::limit($smartAd->displayDescription(), 200) }}</p>
-                                            <p style="margin: 0; color: #1d4ed8; font-size: .85rem; line-height: 1.6;">
-                                                <a href="{{ $smartAd->landing_url }}" target="_blank" rel="noopener noreferrer">{{ $smartAd->landing_url }}</a>
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div style="min-width: 220px; display: grid; gap: 14px;">
-                                    <div style="padding: 14px 16px; border-radius: 16px; background: linear-gradient(135deg, #f8fbff 0%, #eef6ff 100%);">
-                                        <p style="margin: 0 0 6px; font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: #1d4ed8; font-weight: 700;">{{ __('messages.smart_targets') }}</p>
-                                        <p style="margin: 0; color: #475569; line-height: 1.65;">{{ __('messages.smart_target_countries_label') }}: {{ \App\Support\SmartAdTargeting::formatTargets($smartAd->targetCountries()) }}</p>
-                                        <p style="margin: 6px 0 0; color: #475569; line-height: 1.65;">{{ __('messages.smart_target_devices_label') }}: {{ \App\Support\SmartAdTargeting::formatTargets($smartAd->targetDevices()) }}</p>
-                                    </div>
-                                    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px;">
-                                        <a href="{{ route('legacy.state', ['ty' => 'smart', 'id' => $smartAd->id]) }}" style="padding: 14px 12px; border-radius: 16px; background: #f8fafc; text-align: center; text-decoration: none; display: block;">
-                                            <div style="font-size: 1.25rem; font-weight: 800; color: #1d4ed8;">{{ $smartAd->impressions }}</div>
-                                            <div style="font-size: .75rem; color: #64748b;">{{ __('messages.smart_impressions_label') }}</div>
-                                        </a>
-                                        <a href="{{ route('legacy.state', ['ty' => 'smart_click', 'id' => $smartAd->id]) }}" style="padding: 14px 12px; border-radius: 16px; background: #f8fafc; text-align: center; text-decoration: none; display: block;">
-                                            <div style="font-size: 1.25rem; font-weight: 800; color: #0f766e;">{{ $smartAd->clicks }}</div>
-                                            <div style="font-size: .75rem; color: #64748b;">{{ __('messages.smart_clicks_label') }}</div>
-                                        </a>
-                                    </div>
-                                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                                        <a href="{{ route('ads.smart.edit', $smartAd->id) }}" class="button tertiary">{{ __('messages.edit') }}</a>
-                                        <form action="{{ route('ads.smart.destroy', $smartAd->id) }}" method="POST" onsubmit="return confirm('{{ __('messages.smart_delete_confirm') }}');">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="button primary">{{ __('messages.delete') }}</button>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-                @endif
-            </div>
-        </div>
-    </div>
-</div>
+@include('theme::ads.partials.workspace_styles')
+<main class="ads-workspace" data-ads-workspace data-initial-empty="{{ $smartAds->isEmpty() ? 'true' : 'false' }}" data-deleted="{{ __('messages.smart_ad_deleted') }}" data-delete-error="{{ __('messages.ads_delete_failed') }}" data-copied="{{ __('messages.copied') }}">
+    <header class="ads-workspace__hero"><div><span class="ads-workspace__eyebrow">{{ __('messages.advertising') }}</span><h1 class="ads-workspace__title">{{ __('messages.smart_ads') }}</h1><p class="ads-workspace__copy">{{ __('messages.smart_index_byline') }}</p></div><div class="ads-workspace__actions"><a class="ads-workspace__button ads-workspace__button--soft" href="{{ route('legacy.state', ['ty' => 'smart', 'st' => 'vu']) }}"><i class="fa fa-chart-line" aria-hidden="true"></i>{{ __('messages.statistics') }}</a><a class="ads-workspace__button ads-workspace__button--soft" href="{{ route('ads.smart.code') }}"><i class="fa fa-code" aria-hidden="true"></i>{{ __('messages.code') }}</a><a class="ads-workspace__button" href="{{ route('ads.smart.create') }}"><i class="fa fa-plus" aria-hidden="true"></i>{{ __('messages.smart_create_ad') }}</a></div></header>
+    @if(session('success'))<div class="alert alert-success" role="status">{{ session('success') }}</div>@endif
+    @if(session('warning'))<div class="alert alert-warning" role="status">{{ session('warning') }}</div>@endif
+    <section class="ads-workspace__stats" aria-label="{{ __('messages.statistics') }}"><div class="ads-workspace__stat"><span class="ads-workspace__stat-label">{{ __('messages.total') }}</span><span class="ads-workspace__stat-value" data-ads-count>{{ $smartAds->count() }}</span></div><div class="ads-workspace__stat"><span class="ads-workspace__stat-label">{{ __('messages.active') }}</span><span class="ads-workspace__stat-value">{{ $smartAds->where('statu', 1)->count() }}</span></div><div class="ads-workspace__stat"><span class="ads-workspace__stat-label">{{ __('messages.smart_impressions_label') }}</span><span class="ads-workspace__stat-value">{{ number_format((int) $smartAds->sum('impressions')) }}</span></div><div class="ads-workspace__stat"><span class="ads-workspace__stat-label">{{ __('messages.smart_clicks_label') }}</span><span class="ads-workspace__stat-value">{{ number_format((int) $smartAds->sum('clicks')) }}</span></div><div class="ads-workspace__stat"><span class="ads-workspace__stat-label">{{ __('messages.smart_ad_credits') }}</span><span class="ads-workspace__stat-value">{{ number_format((float) $user->nsmart, 2) }}</span></div></section>
+    <section class="ads-workspace__panel"><div class="ads-workspace__toolbar"><input class="ads-workspace__search" type="search" data-ads-search aria-label="{{ __('messages.btn_search') }}" placeholder="{{ __('messages.btn_search') }} {{ __('messages.smart_ads') }}"><div class="ads-workspace__filters" role="group" aria-label="{{ __('messages.status') }}"><button class="ads-workspace__filter is-active" type="button" data-ads-filter="all" aria-pressed="true">{{ __('messages.all') }}</button><button class="ads-workspace__filter" type="button" data-ads-filter="active" aria-pressed="false">{{ __('messages.active') }}</button><button class="ads-workspace__filter" type="button" data-ads-filter="paused" aria-pressed="false">{{ __('messages.smart_status_paused') }}</button></div><span class="ads-workspace__status"><span data-ads-count>{{ $smartAds->count() }}</span> {{ __('messages.total') }}</span></div>
+      <div class="ads-workspace__list">
+      @foreach($smartAds as $smartAd)
+        @php($isActive = (int) $smartAd->statu === 1)
+        <article class="ads-workspace__item" data-ads-item data-status="{{ $isActive ? 'active' : 'paused' }}" data-search="{{ $smartAd->displayTitle() }} {{ $smartAd->displayDescription() }} {{ $smartAd->landing_url }} {{ $smartAd->manual_keywords }} {{ $smartAd->extracted_keywords }}" style="grid-template-columns:minmax(0,1.3fr) repeat(2,minmax(90px,.55fr)) auto">
+          <div class="ads-workspace__identity"><h2 class="ads-workspace__name">{{ $smartAd->displayTitle() }}</h2><p class="ads-workspace__sub">#{{ $smartAd->id }} · <a href="{{ $smartAd->landing_url }}" target="_blank" rel="noopener noreferrer">{{ parse_url($smartAd->landing_url, PHP_URL_HOST) }}</a></p><p class="ads-workspace__sub">{{ \Illuminate\Support\Str::limit($smartAd->displayDescription(), 150) }}</p><p class="ads-workspace__sub">{{ __('messages.smart_target_countries_label') }}: {{ \App\Support\SmartAdTargeting::formatTargets($smartAd->targetCountries()) }} · {{ __('messages.smart_target_devices_label') }}: {{ \App\Support\SmartAdTargeting::formatTargets($smartAd->targetDevices()) }}</p></div>
+          <a class="ads-workspace__metric" href="{{ route('legacy.state', ['ty' => 'smart', 'id' => $smartAd->id]) }}">{{ number_format((int) $smartAd->impressions) }}<span class="ads-workspace__metric-label">{{ __('messages.smart_impressions_label') }}</span></a><a class="ads-workspace__metric" href="{{ route('legacy.state', ['ty' => 'smart_click', 'id' => $smartAd->id]) }}">{{ number_format((int) $smartAd->clicks) }}<span class="ads-workspace__metric-label">{{ __('messages.smart_clicks_label') }}</span></a>
+          <div class="ads-workspace__row-actions"><span class="ads-workspace__badge {{ $isActive ? 'ads-workspace__badge--active' : 'ads-workspace__badge--paused' }}">{{ $isActive ? __('messages.active') : __('messages.smart_status_paused') }}</span><a class="ads-workspace__button ads-workspace__button--soft" href="{{ route('ads.smart.edit', $smartAd->id) }}" aria-label="{{ __('messages.edit') }}"><i class="fa fa-edit" aria-hidden="true"></i></a><form action="{{ route('ads.smart.destroy', $smartAd->id) }}" method="POST" data-ajax-delete data-confirm="{{ __('messages.smart_delete_confirm') }}">@csrf @method('DELETE')<button class="ads-workspace__button ads-workspace__button--danger" type="submit" aria-label="{{ __('messages.delete') }}"><i class="fa fa-trash" aria-hidden="true"></i></button></form></div>
+        </article>
+      @endforeach
+      <div class="ads-workspace__empty" data-ads-empty hidden>{{ __('messages.no_results') }}</div>
+      @if($smartAds->isEmpty())<div class="ads-workspace__empty"><h2>{{ __('messages.smart_empty_title') }}</h2><p>{{ __('messages.smart_empty_desc') }}</p><a class="ads-workspace__button" href="{{ route('ads.smart.create') }}">{{ __('messages.smart_create_ad') }}</a></div>@endif
+      </div></section><div class="ads-workspace__toast" data-ads-toast role="status" aria-live="polite"></div>
+</main>
+@include('theme::ads.partials.workspace_scripts')
 @endsection

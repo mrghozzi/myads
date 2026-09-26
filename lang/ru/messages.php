@@ -4096,4 +4096,10 @@ return [
     'upload_from_device' => 'Загрузить с устройства',
     'enter_image_url' => 'URL изображения',
     'current_image' => 'Текущее изображение',
+    'ads_delete_failed' => 'Не удалось удалить этот элемент. Попробуйте ещё раз.',
+    'banner_deleted_successfully' => 'Баннер удалён.',
+    'link_updated_successfully' => 'Текстовое объявление обновлено.',
+    'link_deleted_successfully' => 'Текстовое объявление удалено.',
+    'visit_updated_successfully' => 'Кампания обмена посещениями обновлена.',
+    'visit_deleted_successfully' => 'Кампания обмена посещениями удалена.',
 ];

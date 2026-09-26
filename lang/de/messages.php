@@ -4103,4 +4103,10 @@ return [
     'upload_from_device' => 'Vom Gerät hochladen',
     'enter_image_url' => 'Bild-URL',
     'current_image' => 'Aktuelles Bild',
+    'ads_delete_failed' => 'Dieses Element konnte nicht gelöscht werden. Bitte versuchen Sie es erneut.',
+    'banner_deleted_successfully' => 'Banneranzeige gelöscht.',
+    'link_updated_successfully' => 'Textanzeige aktualisiert.',
+    'link_deleted_successfully' => 'Textanzeige gelöscht.',
+    'visit_updated_successfully' => 'Traffic-Austauschkampagne aktualisiert.',
+    'visit_deleted_successfully' => 'Traffic-Austauschkampagne gelöscht.',
 ];

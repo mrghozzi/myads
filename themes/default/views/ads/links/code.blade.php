@@ -1,6 +1,7 @@
 @extends('theme::layouts.master')
 
 @section('content')
+@include('theme::ads.partials.workspace_styles')
 @php
     $adsBrandName = \App\Support\AdsSettings::brandName();
     $scriptUrl = route('ads.link.script');
@@ -44,22 +45,8 @@
     ];
 @endphp
 
-<div class="grid grid change-on-desktop">
-    <div class="achievement-box secondary" style="background: url({{ theme_asset('img/banner/03.jpg') }}) no-repeat 50%; background-size: cover">
-        <div class="achievement-box-info-wrap">
-            <img class="achievement-box-image" src="{{ theme_asset('img/banner/link_ads.png') }}" alt="badge-caffeinated-b">
-
-            <div class="achievement-box-info">
-                <p class="achievement-box-title">{{ __('messages.codes') }}&nbsp;{{ __('messages.textads') }}</p>
-                <p class="achievement-box-text"><b>{{ __('messages.yhtierbpyaci') }}</b></p>
-            </div>
-        </div>
-
-        <a class="button white-solid" href="{{ route('legacy.l_list') }}">
-            {{ __('messages.list') }}&nbsp;{{ __('messages.textads') }}
-        </a>
-    </div>
-</div>
+<main class="ads-workspace ads-code-workspace" data-ads-workspace data-copy-label="{{ __('messages.copy') }}" data-copied="{{ __('messages.copied') }}">
+    <header class="ads-workspace__hero"><div><span class="ads-workspace__eyebrow">{{ __('messages.textads') }}</span><h1 class="ads-workspace__title">{{ __('messages.codes') }} {{ __('messages.textads') }}</h1><p class="ads-workspace__copy">{{ __('messages.yhtierbpyaci') }}</p></div><div class="ads-workspace__actions"><a class="ads-workspace__button ads-workspace__button--soft" href="{{ route('legacy.l_list') }}"><i class="fa fa-arrow-left" aria-hidden="true"></i>{{ __('messages.list') }} {{ __('messages.textads') }}</a></div></header>
 
 <div class="grid grid">
     <div class="grid-column">
@@ -185,4 +172,6 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.tab-box').forEach(initTabBox);
 });
 </script>
+<div class="ads-workspace__toast" data-ads-toast role="status" aria-live="polite"></div></main>
+@include('theme::ads.partials.workspace_scripts')
 @endsection

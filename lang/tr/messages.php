@@ -4103,4 +4103,10 @@ return [
     'upload_from_device' => 'Cihazdan yükle',
     'enter_image_url' => 'Resim URL\'si',
     'current_image' => 'Geçerli resim',
+    'ads_delete_failed' => 'Bu öğe silinemedi. Lütfen tekrar deneyin.',
+    'banner_deleted_successfully' => 'Banner reklam silindi.',
+    'link_updated_successfully' => 'Metin reklamı güncellendi.',
+    'link_deleted_successfully' => 'Metin reklamı silindi.',
+    'visit_updated_successfully' => 'Ziyaret değişim kampanyası güncellendi.',
+    'visit_deleted_successfully' => 'Ziyaret değişim kampanyası silindi.',
 ];

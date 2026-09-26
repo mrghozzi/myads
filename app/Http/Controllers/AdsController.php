@@ -36,13 +36,12 @@ class AdsController extends Controller
     {
         $user = Auth::user();
         $banners = Banner::where('uid', $user->id)->orderBy('id', 'desc')->get();
-        
-        foreach($banners as $banner) {
-            $banner->heatmap = $statsService->getHourlyHeatmap($banner->id, 'banner');
+        $heatmaps = $statsService->getHourlyHeatmaps($banners->modelKeys(), 'banner');
+        foreach ($banners as $banner) {
+            $banner->heatmap = $heatmaps[$banner->id] ?? array_fill(0, 24, 0);
         }
 
-        $site_settings = \App\Models\Setting::first();
-        return view('theme::ads.banners.index', compact('banners', 'user', 'site_settings'));
+        return view('theme::ads.banners.index', compact('banners', 'user'));
     }
 
     // List Links (l_list.php)
@@ -50,13 +49,12 @@ class AdsController extends Controller
     {
         $user = Auth::user();
         $links = Link::where('uid', $user->id)->orderBy('id', 'desc')->get();
-        
-        foreach($links as $link) {
-            $link->heatmap = $statsService->getHourlyHeatmap($link->id, 'link');
+        $heatmaps = $statsService->getHourlyHeatmaps($links->modelKeys(), 'link');
+        foreach ($links as $link) {
+            $link->heatmap = $heatmaps[$link->id] ?? array_fill(0, 24, 0);
         }
 
-        $site_settings = \App\Models\Setting::first();
-        return view('theme::ads.links.index', compact('links', 'user', 'site_settings'));
+        return view('theme::ads.links.index', compact('links', 'user'));
     }
 
     // Create Banner Form
@@ -217,7 +215,10 @@ class AdsController extends Controller
         $user = Auth::user();
         $banner = Banner::where('id', $id)->where('uid', $user->id)->firstOrFail();
         $banner->delete();
-        return redirect()->route('ads.banners.index')->with('success', 'Banner deleted successfully.');
+        if (request()->expectsJson()) {
+            return response()->json(['success' => true, 'message' => __('messages.deleted_successfully')]);
+        }
+        return redirect()->route('ads.banners.index')->with('success', __('messages.banner_deleted_successfully'));
     }
 
     // Get Banner Code (b_code.php)
@@ -351,7 +352,7 @@ class AdsController extends Controller
             'devices' => \App\Support\SmartAdTargeting::encodeList(\App\Support\SmartAdTargeting::normalizeDeviceTypes($request->input('devices') ?? [])),
         ]);
 
-        return redirect()->route('ads.links.index')->with('success', 'Link updated successfully.');
+        return redirect()->route('ads.links.index')->with('success', __('messages.link_updated_successfully'));
     }
 
     // Delete Link
@@ -360,7 +361,10 @@ class AdsController extends Controller
         $user = Auth::user();
         $link = Link::where('id', $id)->where('uid', $user->id)->firstOrFail();
         $link->delete();
-        return redirect()->route('ads.links.index')->with('success', 'Link deleted successfully.');
+        if (request()->expectsJson()) {
+            return response()->json(['success' => true, 'message' => __('messages.deleted_successfully')]);
+        }
+        return redirect()->route('ads.links.index')->with('success', __('messages.link_deleted_successfully'));
     }
 
     // Get Link Code (l_code.php)

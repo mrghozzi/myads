@@ -4107,4 +4107,10 @@ return [
     'upload_from_device' => 'Télécharger depuis l\'appareil',
     'enter_image_url' => 'URL de l\'image',
     'current_image' => 'Image actuelle',
+    'ads_delete_failed' => 'Impossible de supprimer cet élément. Veuillez réessayer.',
+    'banner_deleted_successfully' => 'Bannière supprimée.',
+    'link_updated_successfully' => 'Annonce textuelle mise à jour.',
+    'link_deleted_successfully' => 'Annonce textuelle supprimée.',
+    'visit_updated_successfully' => 'Campagne d’échange de visites mise à jour.',
+    'visit_deleted_successfully' => 'Campagne d’échange de visites supprimée.',
 ];

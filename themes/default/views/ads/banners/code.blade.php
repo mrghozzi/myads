@@ -1,6 +1,7 @@
 @extends('theme::layouts.master')
 
 @section('content')
+@include('theme::ads.partials.workspace_styles')
 @php
     $adsBrandName = \App\Support\AdsSettings::brandName();
     $quickBannerCodeTabs = \App\Support\BannerSizeCatalog::ordered();
@@ -20,35 +21,8 @@
     $bannerEmbedUrl = route('ads.embed.banner');
     $bannerServingUrl = route('ads.script');
 @endphp
-<div class="grid grid change-on-desktop" >
-       <div class="achievement-box secondary" style="background: url({{ theme_asset('img/banner/03.jpg') }}) no-repeat 50%; background-size: cover " >
-          <!-- ACHIEVEMENT BOX INFO WRAP -->
-          <div class="achievement-box-info-wrap">
-            <!-- ACHIEVEMENT BOX IMAGE -->
-            <img class="achievement-box-image" src="{{ theme_asset('img/banner/banner_ads.png') }}" alt="badge-caffeinated-b">
-            <!-- /ACHIEVEMENT BOX IMAGE -->
-
-            <!-- ACHIEVEMENT BOX INFO -->
-            <div class="achievement-box-info">
-              <!-- ACHIEVEMENT BOX TITLE -->
-              <p class="achievement-box-title">{{ __('messages.codes') }}&nbsp;{{ __('messages.bannads') }}</p>
-              <!-- /ACHIEVEMENT BOX TITLE -->
-
-              <!-- ACHIEVEMENT BOX TEXT -->
-              <p class="achievement-box-text"><b>{{ __('messages.yhtierbpyaci') }}</b></p>
-              <!-- /ACHIEVEMENT BOX TEXT -->
-            </div>
-            <!-- /ACHIEVEMENT BOX INFO -->
-          </div>
-          <!-- /ACHIEVEMENT BOX INFO WRAP -->
-
-          <!-- BUTTON -->
-          <a class="button white-solid" href="{{ route('legacy.b_list') }}">
-          {{ __('messages.list') }}&nbsp;{{ __('messages.bannads') }}
-          </a>
-          <!-- /BUTTON -->
-       </div>
-</div>
+<main class="ads-workspace ads-code-workspace" data-ads-workspace data-copy-label="{{ __('messages.copy') }}" data-copied="{{ __('messages.copied') }}">
+<header class="ads-workspace__hero"><div><span class="ads-workspace__eyebrow">{{ __('messages.bannads') }}</span><h1 class="ads-workspace__title">{{ __('messages.codes') }} {{ __('messages.bannads') }}</h1><p class="ads-workspace__copy">{{ __('messages.yhtierbpyaci') }}</p></div><div class="ads-workspace__actions"><a class="ads-workspace__button ads-workspace__button--soft" href="{{ route('legacy.b_list') }}"><i class="fa fa-arrow-left" aria-hidden="true"></i>{{ __('messages.list') }} {{ __('messages.bannads') }}</a></div></header>
 
 <div class="grid grid">
   <div class="grid-column">
@@ -322,4 +296,6 @@ document.addEventListener('DOMContentLoaded', function() {
     setMode('quick');
 });
 </script>
+<div class="ads-workspace__toast" data-ads-toast role="status" aria-live="polite"></div></main>
+@include('theme::ads.partials.workspace_scripts')
 @endsection
