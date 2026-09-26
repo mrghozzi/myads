@@ -136,14 +136,17 @@
         font-size: 26px;
         letter-spacing: -0.02em;
         margin-bottom: 8px;
-        color: #ffffff;
+        color: #ffffff !important;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     }
 
     .sessions-hero-subtitle {
-        opacity: 0.92;
+        color: rgba(255, 255, 255, 0.95) !important;
         font-size: 14.5px;
         line-height: 1.6;
         margin: 0;
+        font-weight: 500;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
     }
 
     .sessions-kpi-group {
@@ -156,22 +159,23 @@
         background: rgba(255, 255, 255, 0.16);
         backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.24);
+        border: 1px solid rgba(255, 255, 255, 0.28);
         padding: 12px 20px;
         border-radius: 18px;
         min-width: 110px;
         text-align: center;
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
     }
 
     .sessions-kpi-pill .kpi-label {
         display: block;
-        font-size: 11px;
+        font-size: 11.5px;
         text-transform: uppercase;
         letter-spacing: 0.06em;
-        opacity: 0.85;
+        color: rgba(255, 255, 255, 0.95) !important;
         font-weight: 700;
         margin-bottom: 4px;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
     }
 
     .sessions-kpi-pill .kpi-value {
@@ -179,6 +183,8 @@
         font-size: 22px;
         font-weight: 800;
         line-height: 1;
+        color: #ffffff;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
     }
 
     .sessions-kpi-pill .kpi-value.is-active {

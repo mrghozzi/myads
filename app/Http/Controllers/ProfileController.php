@@ -452,11 +452,33 @@ class ProfileController extends Controller
 
         $paginatedHistory = $this->paginateCollection($history, 20, request()->integer('page', 1));
 
+        $positiveTotal = (float) $history->sum(fn ($item) => max(0, (float) $item->amount));
+        $negativeTotal = (float) $history->sum(fn ($item) => min(0, (float) $item->amount));
+        $totalTransactions = $history->count();
+
+        if (request()->ajax() || request()->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'html' => view('theme::profile.partials.history_list', [
+                    'history' => $paginatedHistory,
+                    'featureAvailable' => $featureAvailable,
+                ])->render(),
+                'positive_total' => rtrim(rtrim(number_format($positiveTotal, 2), '0'), '.'),
+                'negative_total' => rtrim(rtrim(number_format(abs($negativeTotal), 2), '0'), '.'),
+                'total_count' => $totalTransactions,
+                'current_page' => $paginatedHistory->currentPage(),
+                'last_page' => $paginatedHistory->lastPage(),
+            ]);
+        }
+
         return view('theme::profile.history', [
             'user' => $user,
             'history' => $paginatedHistory,
             'featureAvailable' => $featureAvailable,
             'upgradeNotice' => $upgradeNotice,
+            'positiveTotal' => $positiveTotal,
+            'negativeTotal' => $negativeTotal,
+            'totalTransactions' => $totalTransactions,
         ]);
     }
 
