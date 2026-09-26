@@ -1,6 +1,6 @@
 # MYADS Upgrade & Migration Guide
 
-This document outlines the standard, zero-downtime procedure for upgrading an existing MYADS deployment to **v4.5.5**.
+This document outlines the standard, zero-downtime procedure for upgrading an existing MYADS deployment to **v4.6.0**.
 
 ---
 

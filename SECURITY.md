@@ -10,11 +10,11 @@ We provide active security updates and maintenance for the following versions of
 
 | Version | Supported          | Security Maintenance Status |
 | ------- | ------------------ | --------------------------- |
-| 4.5.x   | :white_check_mark: | Active Development, Patches & Latest Features (Current: `v4.5.6`) |
-| 4.4.x   | :white_check_mark: | Active Security Patches Only |
+| 4.6.x   | :white_check_mark: | Active Development, Patches & Latest Features (Current: `v4.6.0`) |
+| 4.5.x   | :white_check_mark: | Active Security Patches Only |
+| 4.4.x   | :white_check_mark: | Critical Security Patches Only |
 | 4.3.x   | :white_check_mark: | Critical Security Patches Only |
-| 4.2.x   | :white_check_mark: | Critical Security Patches Only |
-| < 4.2   | :x:                | End of Life (Unsupported) |
+| < 4.3   | :x:                | End of Life (Unsupported) |
 
 ---
 
@@ -22,6 +22,11 @@ We provide active security updates and maintenance for the following versions of
 
 MYADS includes multi-layered security controls across the core platform, API, and ad exchange ecosystem:
 
+- **Binary File Upload & Magic Bytes Verification (v4.6.0)**: Strict binary signature (magic bytes) verification (`FileUploadSecurityService`) for JPEG, PNG, GIF, WebP, ZIP, and PDF uploads, thwarting file extension spoofing and polyglot payloads.
+- **Native SVG Stored-XSS Sanitizer (v4.6.0)**: Built-in DOM and regex-backed SVG sanitizer stripping `<script>`, `<foreignObject>`, `<iframe>`, inline event listeners (`onload`, `onerror`), and dangerous URI schemes.
+- **Plugin ZIP Archive Traversal & Script Inspector (v4.6.0)**: Deep ZIP verification rejecting directory traversal (`../`, `..\`) and blocking hidden executable payloads (`.php*`, `.phar`, `.phtml`, `.exe`, `.sh`).
+- **Private Messages End-to-End Encryption & Key Integrity Hardening (v4.6.0)**: `APP_KEY` invariant protection preventing destructive key overwrites, symmetric route keys (`user_a` & `user_b`) for account switching, encrypted ciphertext fallback shielding, and active member session lifecycle scoping preventing accidental logout on reply.
+- **Pre-Boot Sensitive Paths Shield (v4.6.0)**: Ultra-early URI interceptor in `index.php` blocking probes to `/.env`, `/composer.json`, `/artisan`, and dotfiles with immediate 403 response before Laravel boot.
 - **Developer API Resilient Authorization & Multi-Environment Token Protection (v4.5.6)**: Hardened token resolution pipeline cascading across standard Bearer headers, Apache/FastCGI/cPanel rewrite variables (`HTTP_AUTHORIZATION`, `REDIRECT_HTTP_AUTHORIZATION`, `REDIRECT_REDIRECT_HTTP_AUTHORIZATION`, `apache_request_headers()`), case-insensitive regex parsing (`Bearer\s+(\S+)`), and query string fallback. Features multi-format scope normalization in `DeveloperAccessToken` preventing scope-matching bypasses, complete exception isolation (`try/catch \Throwable`) preventing database disclosure, and schema-compliant forum-topic-first post creation.
 - **Public Member IDs & Enumeration Protection**: When `public_member_ids_enabled` is active in `/admin/security`, numeric database ID lookups are strictly blocked with HTTP 404 on profile routes (`/u/{id}`) to prevent user enumeration. All internal database `id`s in referral links (`?ref=`), ad impression trackers, API resources, mention lookups, follow/block routes, and popover handlers are replaced with secure public identifiers (`public_uid`).
 - **Anti-Click-Farm & Click Fraud Protection (Custom Ads)**: Multi-layered verification using privacy-first anonymous SHA-256 visitor fingerprinting (`sha256(IP + UserAgent + AcceptLanguage)`), 24-hour rate limiting windows per visitor, and a 1.5-second minimum session dwell window check. Suspicious or rapid clicks are flagged (`is_flagged = true`) and isolated from PTS billing without deducting advertiser points or rewarding publishers.

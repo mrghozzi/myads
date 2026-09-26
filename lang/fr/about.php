@@ -7,19 +7,19 @@ return [
     'tab_changelog' => 'Journal des modifications',
     'tab_about' => 'À propos de MYADS',
     
-        // What's New Section (v4.5.6)
-    'feature_1_title' => 'Optimisation Globale des Performances & Accélération TTFB',
-    'feature_1_desc' => 'Réduction drastique du temps de réponse serveur (TTFB) sous les 100ms. La mémoisation statique en mémoire et le préchargement groupé éliminent plus de 88% des requêtes SQL.',
-    'feature_2_title' => 'Moteur de Files d\'Attente Asynchrone & Canaux Prioritaires',
-    'feature_2_desc' => 'Architecture de tâches asynchrones à haut débit sur 4 canaux dédiés (high, default, media, maintenance), notifications instantanées et récupération des échecs en 1 clic.',
-    'feature_3_title' => 'Plateforme Développeurs & Autorisation Bearer Universelle',
-    'feature_3_desc' => 'Extraction multi-niveaux des jetons résolvant les erreurs 401 sur Apache et proxys, attribution dynamique des permissions et publication de statuts conforme au schéma.',
-    'feature_4_title' => 'Hub d\'Extensions AJAX Sans Rechargement & Migrations Auto',
-    'feature_4_desc' => 'Exécution automatique des migrations lors de l\'activation des plugins, bascule AJAX instantanée, filtres dynamiques et recherche en direct pour plugins et thèmes.',
-    'feature_5_title' => 'Renforcement du Moteur de Mises à Jour & Sauvegardes Instantanées',
-    'feature_5_desc' => 'Vérifications préalables de sécurité (espace disque >= 50Mo, PHP), instantanés de sauvegarde automatique avant écrasement et réinitialisation OPcache.',
-    'feature_6_title' => 'Architecture Produit Centrée sur les Sujets & SEO Avancé',
-    'feature_6_desc' => 'Affichage épuré des produits avec onglet Sujet par défaut, rendu Markdown côté serveur, données structurées Schema.org Produit/Offre et compression GZIP Apache.',
+        // What's New Section (v4.6.0)
+    'feature_1_title' => 'Système de Design Visuel Moderne & Hub de Navigation Mobile',
+    'feature_1_desc' => 'Jetons CSS (theme-tokens.css), surfaces Glassmorphism 2.0, barre de navigation mobile ergonomique avec bouton FAB, sélecteur de réactions à ressort et collage d\'images (Ctrl+V).',
+    'feature_2_title' => 'Renforcement de la Sécurité des Téléchargements & de la Plateforme',
+    'feature_2_desc' => 'Vérification binaire stricte des magic bytes, assainisseur SVG natif contre XSS stocké, inspecteur d\'archives ZIP d\'extensions, en-têtes de sécurité HTTP renforcés et protection pré-démarrage.',
+    'feature_3_title' => 'Chiffrement de Bout en Bout des Messages Privés & Résilience des Sessions',
+    'feature_3_desc' => 'Protection de la clé APP_KEY contre les écrasements destructeurs, clés de routes symétriques pour le changement de compte, repli de texte chiffré et correction des déconnexions intempestives.',
+    'feature_4_title' => 'Démarrage Sécurisé Isolé des Plugins & Compatibilité Double Version',
+    'feature_4_desc' => 'Démarrage isolé des plugins évitant les erreurs 500, traductions automatiques avec espace de noms, crochets de cycle de vie (activation, désactivation, suppression) et badges de compatibilité.',
+    'feature_5_title' => 'Micro-Mise en Cache des Invités & Lancement AJAX Séquentiel du Tableau de Bord',
+    'feature_5_desc' => 'Micro-cache de 45 secondes pour les invités avec invalidation instantanée, support ETag 304, et rendu initial du tableau de bord admin en moins de 30ms via chargement AJAX séquentiel.',
+    'feature_6_title' => 'Suite Superdesign Administrative & Espace Utilisateur en AJAX Sans Rechargement',
+    'feature_6_desc' => 'Modernisation complète de la facturation, gestion des membres, centres de contrôle publicitaire et tableau de bord (/home) avec calculateur PTS en direct, générateur de coupons et standardisation en anglais.',
 
     // About Section
     'about_description' => 'MYADS est une plateforme communautaire et un réseau d\'échange publicitaire tout-en-un. Elle permet aux propriétaires de sites de se connecter, d\'échanger du trafic, de négocier des services et de monétiser leurs plateformes.',

@@ -1,6 +1,6 @@
 <div align="center" dir="rtl">
 
-# 🚀 MYADS v4.5.6
+# 🚀 MYADS v4.6.0
 
 ### المنصة المتكاملة مفتوحة المصدر للشبكات الاجتماعية، تبادل الإعلانات والزيارات، والمتجر الرقمي
 
@@ -10,7 +10,7 @@
 
 ---
 
-[![إصدار المشروع](https://img.shields.io/badge/الإصدار-v4.5.6-3b82f6.svg?style=for-the-badge&logo=github)](https://github.com/mrghozzi/myads/releases)
+[![إصدار المشروع](https://img.shields.io/badge/الإصدار-v4.6.0-3b82f6.svg?style=for-the-badge&logo=github)](https://github.com/mrghozzi/myads/releases)
 [![إطار العمل](https://img.shields.io/badge/Laravel-12.x-ff2d20.svg?style=for-the-badge&logo=laravel)](https://laravel.com)
 [![بيئة التشغيل](https://img.shields.io/badge/PHP-8.2%2B-777bb4.svg?style=for-the-badge&logo=php)](https://php.net)
 [![تطبيق الموبايل](https://img.shields.io/badge/تطبيق_الموبايل-Flutter_3.27%2B-02569b.svg?style=for-the-badge&logo=flutter)](https://github.com/mrghozzi/myads_app)

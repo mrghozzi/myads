@@ -7,19 +7,19 @@ return [
     'tab_changelog' => 'Registro de cambios',
     'tab_about' => 'Acerca de MYADS',
     
-        // What's New Section (v4.5.6)
-    'feature_1_title' => 'Optimización Global de Rendimiento y Aceleración TTFB',
-    'feature_1_desc' => 'Reducción drástica del tiempo de respuesta del servidor (TTFB) a menos de 100ms. La memorización estática y la precarga por lotes eliminan más del 88% de las consultas SQL.',
-    'feature_2_title' => 'Motor de Colas Asíncronas y Canales Prioritarios',
-    'feature_2_desc' => 'Arquitectura asíncrona de alto rendimiento con 4 canales dedicados (high, default, media, maintenance), notificaciones sin bloqueo y recuperación de fallos en 1 clic.',
-    'feature_3_title' => 'Plataforma para Desarrolladores y Autorización Bearer Universal',
-    'feature_3_desc' => 'Extracción multinivel de tokens que resuelve errores 401 en Apache y proxies, concesión dinámica de permisos y publicación de estados compatible con el esquema.',
-    'feature_4_title' => 'Centro de Extensiones AJAX sin Recarga y Migraciones Auto',
-    'feature_4_desc' => 'Ejecución automática de migraciones al activar plugins, alternancia AJAX instantánea, filtros por categorías en tiempo real y búsqueda para plugins y temas.',
-    'feature_5_title' => 'Blindaje de Actualizaciones y Copias de Seguridad Previas',
-    'feature_5_desc' => 'Verificaciones previas de seguridad (espacio en disco >= 50MB, PHP), copias de seguridad instantáneas antes de sobrescribir y restablecimiento de OPcache.',
-    'feature_6_title' => 'Arquitectura de Producto Centrada en Temas y SEO Avanzado',
-    'feature_6_desc' => 'Vista de producto con pestaña de Tema por defecto, renderizado Markdown en el servidor, Schema.org Product/Offer JSON-LD y compresión GZIP de Apache.',
+        // What's New Section (v4.6.0)
+    'feature_1_title' => 'Sistema de Diseño Visual Moderno y Barra de Navegación Móvil',
+    'feature_1_desc' => 'Tokens de diseño CSS (theme-tokens.css), superficies Glassmorphism 2.0, barra de navegación móvil fija con botón FAB, selector elástico de reacciones y pegado de imágenes (Ctrl+V).',
+    'feature_2_title' => 'Blindaje Avanzado de Seguridad de Subidas y de la Plataforma',
+    'feature_2_desc' => 'Verificación binaria estricta de magic bytes, sanitizador nativo de SVG contra XSS persistente, inspector de ZIPs contra directory traversal, cabeceras HTTP reforzadas y escudo de rutas sensibles.',
+    'feature_3_title' => 'Cifrado Extremo a Extremo de Mensajes Privados y Resiliencia de Sesiones',
+    'feature_3_desc' => 'Protección de clave APP_KEY contra sobreescrituras, claves de ruta simétricas para cambio de cuenta, respaldo de texto cifrado y corrección de cierres de sesión involuntarios.',
+    'feature_4_title' => 'Arranque Seguro Aislado de Plugins y Compatibilidad de Doble Versión',
+    'feature_4_desc' => 'Arranque aislado de extensiones que previene errores 500 fatales, nombres de espacio en traducciones, ganchos de ciclo de vida (activar, desactivar, borrar) y límites de versión con insignias visuales.',
+    'feature_5_title' => 'Micro-Caché de Invitados y Carga Secuencial AJAX del Panel de Control',
+    'feature_5_desc' => 'Micro-caché de 45 segundos para visitas con invalidación instantánea, soporte ETag 304 y renderizado del panel de administración en menos de 30ms mediante cargador AJAX secuencial.',
+    'feature_6_title' => 'Suite Superdesign Administrativa y Panel de Usuario con AJAX sin Recarga',
+    'feature_6_desc' => 'Modernización integral en Facturación, Usuarios, Anuncios y Panel (/home) con calculadora PTS en vivo, generador de cupones con copiado en 1 clic y estandarización del código en inglés.',
 
     // About Section
     'about_description' => 'MYADS es una potente plataforma comunitaria y red de intercambio publicitario todo en uno.',

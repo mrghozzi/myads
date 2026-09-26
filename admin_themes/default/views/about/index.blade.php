@@ -491,7 +491,38 @@
                             <div class="timeline">
                                 <div class="timeline-item">
                                     <div class="timeline-icon"><i class="feather-box fs-12"></i></div>
-                                    <h6 class="fw-bold mb-1">v4.5.6 <span class="badge bg-soft-success text-success ms-2">Latest / Stable</span></h6>
+                                    <h6 class="fw-bold mb-1">v4.6.0 <span class="badge bg-soft-success text-success ms-2">Latest / Stable</span></h6>
+                                    <p class="text-muted fs-13 mb-3">Modern Visual Design System, Mobile Navigation Hub, Advanced File & Plugin Security Hardening, Private Messages Encryption & Key Invariant Hardening, Symmetric Route Keys & Account Switching Resilience, Security Member Session Expiration & False Revocation Fix, Isolated Plugin Boot Engine & Lifecycle Hooks, Dual Version Bounding & Compatibility Badges, Guest Page Micro-Caching with ETag 304 Optimization, Instantaneous Admin Dashboard Launch & Sequential AJAX Data Loading Pipeline, Points Ledger & Member History Resilience, Google Sitelinks Search Schema, Administrative Billing Suite Modernization, Administrative Member & User Management Superdesign Suite & Zero-Reload AJAX Overhaul, User Dashboard (/home) Superdesign Suite & Zero-Reload AJAX Operations Overhaul, Dual Banner Image Upload & Core English Standardization Release.</p>
+                                    <div class="d-flex flex-column gap-2">
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-feature mt-1">Design & Mobile</span>
+                                            <span class="text-muted fs-13">Modern CSS design tokens (<code>theme-tokens.css</code>), Glassmorphism 2.0 multi-layer frosted surfaces, ergonomic fixed mobile bottom navigation bar with quick-post FAB, glassmorphic spring reaction picker, post composer media hub with drag-and-drop & clipboard image paste (<code>Ctrl+V</code>), and comments media attachments.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-security mt-1">Platform Security</span>
+                                            <span class="text-muted fs-13">Unified <code>FileUploadSecurityService</code> enforcing strict binary magic bytes verification, native SVG stored-XSS sanitizer, plugin ZIP archive directory traversal & script inspector, enhanced HTTP security headers (<code>Permissions-Policy</code>, <code>COOP</code>, <code>HSTS preload</code>), and pre-boot sensitive paths shield.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-security mt-1">Encrypted Messages</span>
+                                            <span class="text-muted fs-13">End-to-end private message encryption with <code>APP_KEY</code> invariant protection, symmetric conversation route keys (<code>user_a</code> & <code>user_b</code>) for seamless account switching, encrypted ciphertext fallback shielding, and active member session lifecycle scoping preventing accidental logout on reply.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-feature mt-1">Extension Hub</span>
+                                            <span class="text-muted fs-13">Isolated plugin safe boot engine (<code>PluginServiceProvider</code>) preventing 500 fatal errors from third-party bugs, automated plugin translation namespacing, lifecycle hooks (<code>plugin_activated</code>, <code>plugin_deactivated</code>, <code>plugin_deleted</code>), extension dual version compatibility bounds (<code>min_myads</code> & <code>max_myads</code>) with dynamic visual status badges, and direct settings actions.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-optimization mt-1">Speed & SEO</span>
+                                            <span class="text-muted fs-13">Guest page 45-second micro-caching with instant version cache invalidation, conditional HTTP 304 ETag optimization, instantaneous admin dashboard launch (&lt;30ms) with chained sequential AJAX data loaders, automatic WebP conversion, and Google Sitelinks Search Schema.org integration.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-feature mt-1">Admin & User Hub</span>
+                                            <span class="text-muted fs-13">Complete <code>.superdesign</code> suite with zero-reload AJAX operations across Billing Suite, User Management, Banners, Text Ads, Traffic Visits, Smart Ads, and User Dashboard (<code>/home</code>) with live PTS calculator, voucher generator & 1-click copy, and 100% core English standardization.</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="timeline-item">
+                                    <div class="timeline-icon"><i class="feather-box fs-12"></i></div>
+                                    <h6 class="fw-bold mb-1">v4.5.6 <span class="badge bg-soft-secondary text-secondary ms-2">Previous</span></h6>
                                     <p class="text-muted fs-13 mb-3">Performance Overhaul, Asynchronous Queue Engine & Priority Channels, Universal Developer Platform Bearer Authorization, Extension Hub AJAX & Auto Migrations, Admin Updates Hardening & Pre-Update Snapshots, Store Topic-First & Advanced SEO Release.</p>
                                     <div class="d-flex flex-column gap-2">
                                         <div class="d-flex align-items-start">

@@ -7,19 +7,19 @@ return [
     'tab_changelog' => 'Değişiklik Günlüğü',
     'tab_about' => 'MYADS Hakkında',
     
-        // What's New Section (v4.5.6)
-    'feature_1_title' => 'Platform Çapında Performans İyileştirmesi ve TTFB Hızlandırması',
-    'feature_1_desc' => 'Sunucu yanıt süresinin (TTFB) 100ms altına düşürülmesi. Bellek içi statik önbellekleme ve toplu ön yükleme veritabanı sorgularını %88 oranında azaltır.',
-    'feature_2_title' => 'Asenkron Kuyruk Motoru ve Öncelikli Kanallar',
-    'feature_2_desc' => '4 özel kanallı (high, default, media, maintenance) yüksek verimli asenkron görev mimarisi, anında bildirimler ve tek tıkla iş kurtarma.',
-    'feature_3_title' => 'Geliştirici Platformu ve Evrensel Bearer Yetkilendirmesi',
-    'feature_3_desc' => 'Apache ve proxy ortamlarında 401 hatalarını çözen çok katmanlı token ayrıştırma, dinamik izin ataması ve şemaya uygun gönderi yayınlama.',
-    'feature_4_title' => 'Yeniden Yüklemesiz AJAX Eklenti Merkezi ve Otomatik Taşıma',
-    'feature_4_desc' => 'Eklenti etkinleştirildiğinde otomatik veritabanı taşıma çalıştırma, sıfır gecikmeli AJAX geçişleri, canlı kategori filtreleri ve anlık arama.',
-    'feature_5_title' => 'Güncelleme Motoru Güçlendirmesi ve Ön Yedekleme',
-    'feature_5_desc' => 'Otomatik güvenlik kontrolleri (disk alanı >= 50MB, PHP), dosya üzerine yazılmadan önce anlık yedekleme ve OPcache sıfırlama.',
-    'feature_6_title' => 'Konu Öncelikli Mağaza Mimarisi ve Gelişmiş SEO',
-    'feature_6_desc' => 'Konu sekmesini varsayılan yapan modern ürün sayfası, sunucu taraflı Markdown oluşturma, Schema.org Product/Offer JSON-LD ve Apache GZIP sıkıştırması.',
+        // What's New Section (v4.6.0)
+    'feature_1_title' => 'Modern Görsel Tasarım Sistemi ve Mobil Alt Gezinme Çubuğu',
+    'feature_1_desc' => 'CSS tasarım belirteçleri (theme-tokens.css), Glassmorphism 2.0 yüzeyleri, FAB hızlı gönderi butonlu sabit mobil alt gezinme çubuğu, yay mekanizmalı tepki seçici ve pano görsel yapıştırma (Ctrl+V).',
+    'feature_2_title' => 'Gelişmiş Platform ve Yükleme Güvenliği Güçlendirmesi',
+    'feature_2_desc' => 'Katı ikili magic bytes doğrulaması, depolanmış XSS\'e karşı yerel SVG temizleyici, eklentiler için ZIP dizin atlama denetçisi, gelişmiş HTTP güvenlik başlıkları ve hassas dizin kalkanı.',
+    'feature_3_title' => 'Uçtan Uca Özel Mesaj Şifreleme ve Oturum Dayanıklılığı',
+    'feature_3_desc' => 'APP_KEY anahtarının silinmesine karşı koruma, hesap geçişlerinde 404\'ü önleyen simetrik rota anahtarları, şifrelenmiş metin yedeği ve yanıt verirken yanlış oturum kapatmayı önleme.',
+    'feature_4_title' => 'Yalıtılmış Eklenti Güvenli Başlatma ve Çift Sürüm Uyumluluğu',
+    'feature_4_desc' => 'Üçüncü taraf hatalarında 500 çökmesini önleyen yalıtılmış başlatma motoru, otomatik çeviri ad alanları, yaşam döngüsü kancaları ve görsel rozetlerle uyumluluk sınırları.',
+    'feature_5_title' => 'Misafir Sayfası Mikro Önbellekleme ve Sıralı AJAX Panel Başlatma',
+    'feature_5_desc' => 'Anında geçersiz kılınan 45 saniyelik misafir mikro önbelleği, ETag 304 optimizasyonu ve sıralı AJAX veri yükleme hattı ile 30ms altında anında admin paneli açılışı.',
+    'feature_6_title' => 'Yeniden Yüklemesiz AJAX ile Yönetim ve Kullanıcı Superdesign Paketi',
+    'feature_6_desc' => 'Faturalandırma, Üye Yönetimi, Reklam Merkezleri ve Kullanıcı Paneli (/home) genelinde canlı PTS hesaplayıcı, kupon üretici ve %100 İngilizce kaynak kod standardizasyonu.',
 
     // About Section
     'about_description' => 'MYADS, güçlü bir topluluk platformu ve hepsi bir arada reklam değişim ağıdır.',

@@ -7,19 +7,19 @@ return [
     'tab_changelog' => 'Changelog',
     'tab_about' => 'About MYADS',
     
-    // What's New Section (v4.5.6)
-    'feature_1_title' => 'Platform-Wide Performance Overhaul & TTFB Speedup',
-    'feature_1_desc' => 'Drastic reduction in server response time (TTFB) down to sub-100ms. In-memory static memoization and bulk activity preloading eliminate over 88% of queries on feed and portal pages.',
-    'feature_2_title' => 'Asynchronous Queue Engine & Priority Channels',
-    'feature_2_desc' => 'High-throughput async job architecture with 4 dedicated channels (high, default, media, maintenance), non-blocking community notifications, async 2FA dispatch, and 1-click admin job recovery.',
-    'feature_3_title' => 'Developer Platform & Universal Bearer Authorization',
-    'feature_3_desc' => 'Multi-tier token extraction resolving 401 errors across Apache, FastCGI, and reverse proxies, dynamic scope auto-granting, multi-format deserialization, and schema-compliant status creation.',
-    'feature_4_title' => 'Extension Hub Zero-Reload AJAX & Auto Migrations',
-    'feature_4_desc' => 'Automated database migration execution on plugin activation, zero-reload AJAX toggles with instant category filtering chips, dynamic badge counters, and live search across plugins and themes.',
-    'feature_5_title' => 'Admin Updates Hardening & Pre-Update Snapshots',
-    'feature_5_desc' => 'Hardened update engine with automated preflight checks (disk space >= 50MB, PHP runtime), pre-update snapshot file backups, OPcache bytecode reset, and Superdesign 7-stage interactive progress stepper.',
-    'feature_6_title' => 'Store Topic-First Architecture & Advanced SEO',
-    'feature_6_desc' => 'Streamlined product detail view making the Topic tab primary and default, server-side markdown rendering, native Schema.org Product/Offer JSON-LD, single <h1> hierarchy, and Apache GZIP compression.',
+    // What's New Section (v4.6.0)
+    'feature_1_title' => 'Modern Visual Design System & Mobile Navigation Hub',
+    'feature_1_desc' => 'CSS design tokens (theme-tokens.css), Glassmorphism 2.0 surfaces, ergonomic fixed mobile bottom nav with quick-post FAB, spring reaction picker, and clipboard image pasting (Ctrl+V).',
+    'feature_2_title' => 'Advanced Platform & Upload Security Hardening',
+    'feature_2_desc' => 'Strict binary magic bytes verification, native SVG stored-XSS sanitizer, plugin ZIP archive directory traversal & script inspector, enhanced HTTP headers, and pre-boot sensitive paths shield.',
+    'feature_3_title' => 'Private Messages End-to-End Encryption & Session Resilience',
+    'feature_3_desc' => 'APP_KEY invariant protection preventing destructive key overwrites, symmetric route keys for account switching, encrypted ciphertext fallback shielding, and session false revocation fix.',
+    'feature_4_title' => 'Isolated Plugin Safe Boot & Dual Version Compatibility',
+    'feature_4_desc' => 'Fault-isolated plugin booting preventing 500 fatal errors, automated translation namespacing, lifecycle hooks (activate, deactivate, delete), and dual version compatibility bounds with visual badges.',
+    'feature_5_title' => 'Guest Page Micro-Caching & Sequential AJAX Admin Launch',
+    'feature_5_desc' => '45-second guest page micro-caching with instant cache invalidation, ETag 304 optimization, and sub-30ms admin dashboard initial launch with chained sequential AJAX data loaders.',
+    'feature_6_title' => 'Administrative & User Superdesign Suite with Zero-Reload AJAX',
+    'feature_6_desc' => 'Comprehensive modernization across Billing Suite, User Management, Advertising Control Centers, and User Dashboard (/home) with live PTS calculator, voucher generator, and 100% English core.',
 
     // About Section
     'about_description' => 'MYADS is a powerful, all-in-one community platform and ad exchange network. It empowers website owners to connect, exchange traffic, trade services, and monetize their platforms effectively.',

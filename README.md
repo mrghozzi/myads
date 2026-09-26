@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🚀 MYADS v4.5.6
+# 🚀 MYADS v4.6.0
 
 ### The Ultimate Open-Source Social Network, Traffic & Ad Exchange Platform
 
@@ -10,7 +10,7 @@ Built with passion on **Laravel 12**, **PHP 8.2+**, and **Bootstrap 5 / Flutter*
 
 ---
 
-[![Release Version](https://img.shields.io/badge/Release-v4.5.6-3b82f6.svg?style=for-the-badge&logo=github)](https://github.com/mrghozzi/myads/releases)
+[![Release Version](https://img.shields.io/badge/Release-v4.6.0-3b82f6.svg?style=for-the-badge&logo=github)](https://github.com/mrghozzi/myads/releases)
 [![Laravel Version](https://img.shields.io/badge/Laravel-12.x-ff2d20.svg?style=for-the-badge&logo=laravel)](https://laravel.com)
 [![PHP Version](https://img.shields.io/badge/PHP-8.2%2B-777bb4.svg?style=for-the-badge&logo=php)](https://php.net)
 [![Flutter Mobile App](https://img.shields.io/badge/Flutter-3.27%2B-02569b.svg?style=for-the-badge&logo=flutter)](https://github.com/mrghozzi/myads_app)

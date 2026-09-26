@@ -43,9 +43,9 @@ class AdminAboutPageTest extends TestCase
             ->assertSee(__('about.feature_4_title'))
             ->assertSee(__('about.feature_5_title'))
             ->assertSee(__('about.feature_6_title'))
-            ->assertSee('Platform-Wide Performance Overhaul & TTFB Speedup')
-            ->assertSee('Asynchronous Queue Engine & Priority Channels')
-            ->assertSee('Developer Platform & Universal Bearer Authorization')
+            ->assertSee('Modern Visual Design System & Mobile Navigation Hub')
+            ->assertSee('Advanced Platform & Upload Security Hardening')
+            ->assertSee('Private Messages End-to-End Encryption & Session Resilience')
             ->assertSee('https://github.com/sponsors/mrghozzi')
             ->assertSee(__('about.sponsor_on_github'))
             ->assertSee(__('about.sponsor_project_title'));
@@ -66,9 +66,9 @@ class AdminAboutPageTest extends TestCase
         $response = $this->actingAs($admin)->get(route('admin.about', ['lang' => 'ar']));
 
         $response->assertOk()
-            ->assertSee('تسريع شامل للأداء وخفض فائق لزمن استجابة الخادم (TTFB)')
-            ->assertSee('محرك الطوابير غير المتزامن وقنوات الأولوية المخصصة')
-            ->assertSee('منصة المطورين والاعتماد الشامل لترويسات Bearer')
+            ->assertSee('نظام التصميم البصري الحديث وشريط التنقل السفلي للأجهزة المحمولة')
+            ->assertSee('تحصين شامل لأمان المنصة والتحقق الثنائي لملفات الرفع والإضافات')
+            ->assertSee('تشفير المحادثات والرسائل الخاصة الشامل وصمود جلسات الأعضاء')
             ->assertSee('https://github.com/sponsors/mrghozzi')
             ->assertSee('رعاية المشروع عبر GitHub Sponsors')
             ->assertSee('برنامج الرعاية الرسمي عبر GitHub Sponsors');

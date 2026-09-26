@@ -7,19 +7,19 @@ return [
     'tab_changelog' => 'Änderungsprotokoll',
     'tab_about' => 'Über MYADS',
     
-        // What's New Section (v4.5.6)
-    'feature_1_title' => 'Plattformweite Leistungsoptimierung & TTFB-Beschleunigung',
-    'feature_1_desc' => 'Drastische Reduzierung der Serverantwortzeit (TTFB) auf unter 100ms. Statische Speicherung und Batch-Vorabladen eliminieren über 88% der Datenbankabfragen.',
-    'feature_2_title' => 'Asynchrone Queue-Engine & Prioritätskanäle',
-    'feature_2_desc' => 'Leistungsstarke asynchrone Auftragsarchitektur mit 4 dedizierten Kanälen (high, default, media, maintenance), blockierungsfreie Benachrichtigungen und 1-Klick-Wiederherstellung.',
-    'feature_3_title' => 'Entwicklerplattform & Universelle Bearer-Autorisierung',
-    'feature_3_desc' => 'Mehrstufige Token-Extraktion zur Behebung von 401-Fehlern auf Apache und Proxys, dynamische Rechtevergabe und schemakonforme Statusveröffentlichung.',
-    'feature_4_title' => 'Erweiterungs-Hub mit Zero-Reload AJAX & Auto-Migrationen',
-    'feature_4_desc' => 'Automatische Datenbankmigrationen bei Plugin-Aktivierung, nahtlose AJAX-Umschaltung, Echtzeit-Kategoriefilter und Live-Suche für Plugins und Themes.',
-    'feature_5_title' => 'Absicherung des Update-Systems & Vorab-Snapshots',
-    'feature_5_desc' => 'Stufenweises Update-System mit Sicherheitsprüfungen (Speicherplatz >= 50MB, PHP), automatische Datei-Snapshots vor Überschreiben und OPcache-Reset.',
-    'feature_6_title' => 'Themen-zentrierte Shop-Architektur & Erweitertes SEO',
-    'feature_6_desc' => 'Optimierte Produktansicht mit Standard-Themen-Tab, serverseitiges Markdown-Rendering, native Schema.org Product/Offer JSON-LD und Apache GZIP-Kompression.',
+        // What's New Section (v4.6.0)
+    'feature_1_title' => 'Modernes visuelles Designsystem & Mobile Navigationsleiste',
+    'feature_1_desc' => 'CSS-Design-Tokens (theme-tokens.css), Glassmorphism 2.0-Oberflächen, ergonomische feste mobile Navigationsleiste mit FAB-Schnellpost-Button, Federreaktions-Wähler und Zwischenablagen-Bildeinfügen (Ctrl+V).',
+    'feature_2_title' => 'Umfassende Plattform- und Upload-Sicherheitshärtung',
+    'feature_2_desc' => 'Strikte binäre Magic-Bytes-Prüfung, nativer SVG-XSS-Bereiniger, ZIP-Archiv-Prüfung gegen Directory Traversal für Plugins, erweiterte HTTP-Sicherheits-Header und Schutz vor unbefugtem Pfadzugriff.',
+    'feature_3_title' => 'Ende-zu-Ende-Verschlüsselung für private Nachrichten & Sitzungsresilienz',
+    'feature_3_desc' => 'Schutz des APP_KEY vor unbeabsichtigtem Überschreiben, symmetrische Routenschlüssel für nahtlosen Kontowechsel, verschlüsselte Fallbacks und Beseitigung falscher Abmeldungen.',
+    'feature_4_title' => 'Isolierter Plugin-Sicherheitsstart & Doppelte Versionsgrenzen',
+    'feature_4_desc' => 'Fehlerisolierter Plugin-Start verhindert 500er-Abstürze bei Drittanbieterfehlern, automatische Übersetzungs-Namespaces, Lebenszyklus-Hooks und Kompatibilitätsgrenzen mit visuellen Badges.',
+    'feature_5_title' => 'Gäste-Micro-Caching & Sequenzieller AJAX-Admin-Dashboard-Start',
+    'feature_5_desc' => '45-Sekunden-Micro-Cache für Gäste mit sofortiger Entwertung, ETag-304-Unterstützung und Start des Admin-Dashboards in unter 30ms durch sequenzielle AJAX-Datenübertragung.',
+    'feature_6_title' => 'Administrative Superdesign-Suite & Benutzer-Dashboard ohne Neuladen',
+    'feature_6_desc' => 'Vollständige Modernisierung von Abrechnung, Benutzerverwaltung, Werbezentralen und Benutzer-Dashboard (/home) mit Live-PTS-Rechner, Gutschein-Generator und Standardisierung auf Englisch.',
 
     // About Section
     'about_description' => 'MYADS is a powerful, all-in-one community platform and ad exchange network. It empowers website owners to connect, exchange traffic, trade services, and monetize their platforms effectively.',
