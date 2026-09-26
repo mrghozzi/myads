@@ -674,20 +674,45 @@ class ProfileController extends Controller
         $featureAvailable = $schema->supports('security_sessions');
         $upgradeNotice = $schema->notice('security_sessions', __('messages.security_member_sessions_title'));
 
-        $sessions = $featureAvailable
-            ? SecurityMemberSession::query()
-                ->where('user_id', $user->id)
-                ->orderByDesc('last_seen_at')
-                ->get()
-                ->map(function ($session) use ($request) {
-                    $session->is_current = (string) $session->session_id === (string) $request->session()->getId();
-                    $session->device_type = $this->resolveDeviceType($session->user_agent);
-                    $session->browser = $this->resolveBrowser($session->user_agent);
-                    return $session;
-                })
-            : collect();
+        $totalCount = 0;
+        $activeCount = 0;
 
-        return view('theme::profile.sessions', compact('user', 'sessions', 'featureAvailable', 'upgradeNotice'));
+        if ($featureAvailable) {
+            $baseQuery = SecurityMemberSession::query()->where('user_id', $user->id);
+            $totalCount = (clone $baseQuery)->count();
+            $activeCount = (clone $baseQuery)->whereNull('revoked_at')->whereNull('ended_at')->count();
+
+            $rawSessions = $baseQuery
+                ->orderByDesc('last_seen_at')
+                ->paginate(10)
+                ->withQueryString();
+
+            $currentSessionId = (string) $request->session()->getId();
+
+            $rawSessions->getCollection()->transform(function ($session) use ($currentSessionId) {
+                $session->is_current = (string) $session->session_id === $currentSessionId;
+                $session->device_type = $this->resolveDeviceType($session->user_agent);
+                $session->browser = $this->resolveBrowser($session->user_agent);
+                return $session;
+            });
+
+            $sessions = $rawSessions;
+        } else {
+            $sessions = $this->paginateCollection(collect(), 10, 1);
+        }
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'html' => view('theme::profile.partials.sessions_list', compact('sessions', 'featureAvailable'))->render(),
+                'total' => $totalCount,
+                'active' => $activeCount,
+                'current_page' => $sessions->currentPage(),
+                'last_page' => $sessions->lastPage(),
+            ]);
+        }
+
+        return view('theme::profile.sessions', compact('user', 'sessions', 'featureAvailable', 'upgradeNotice', 'totalCount', 'activeCount'));
     }
 
     public function revokeSession(Request $request, int $id)
@@ -714,8 +739,31 @@ class ProfileController extends Controller
             $request->session()->invalidate();
             $request->session()->regenerateToken();
 
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'is_current' => true,
+                    'redirect' => route('login'),
+                    'message' => __('messages.session_revoked_current'),
+                ]);
+            }
+
             return redirect()->route('login')
                 ->with('success', __('messages.session_revoked_current'));
+        }
+
+        if ($request->ajax() || $request->wantsJson()) {
+            $baseQuery = SecurityMemberSession::query()->where('user_id', $user->id);
+            $totalCount = (clone $baseQuery)->count();
+            $activeCount = (clone $baseQuery)->whereNull('revoked_at')->whereNull('ended_at')->count();
+
+            return response()->json([
+                'success' => true,
+                'is_current' => false,
+                'message' => __('messages.session_revoked_success'),
+                'total' => $totalCount,
+                'active' => $activeCount,
+            ]);
         }
 
         return back()->with('success', __('messages.session_revoked_success'));
