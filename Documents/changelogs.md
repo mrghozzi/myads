@@ -69,6 +69,10 @@
   * **Frontend Session Timeout Handling (`themes/default/assets/js/messages-app.js`):** Added explicit handlers for HTTP 401 and 419 responses, notifying users gracefully to refresh the page when an actual session timeout occurs.
 * **External Share Endpoint Rate Limiting (`routes/web.php`):**
   * Enforced dedicated `throttle:15,1` rate limit middleware to `/share` (`portal.share`), completely preventing bot request flooding.
+* **Sensitive Paths & Environment Defense-in-Depth Shield (`index.php`, `app/Http/Middleware/BlockSensitivePaths.php`, `.htaccess`, `nginx-security.conf`):**
+  * **Pre-Boot Request Guard (`index.php`):** Implemented an ultra-early URI guard executing before Composer autoload and Laravel bootstrapping that intercepts and responds with `403 Access Denied` for direct access attempts to sensitive assets (`/env`, `/.env`, `/composer.json`, `/composer.lock`, `/artisan`, `/phpunit.xml`, `/.git*`, `/.editorconfig`).
+  * **Application Middleware Shield (`BlockSensitivePaths`):** Registered top-priority global middleware in `bootstrap/app.php` (`$middleware->prepend(BlockSensitivePaths::class)`) providing application-level inspection against URL-encoded bypasses, internal directories (`storage/`, `bootstrap/`, `config/`, `database/`, `app/`, `vendor/`), and hidden dotfiles with security warning audit logging.
+  * **Web Server Security Configurations:** Hardened `.htaccess` with mod_rewrite / FilesMatch directives and provided Nginx / Cloudflare WAF deployment configurations to block sensitive path probes before hitting PHP.
 
 ### Plugin System & Extension Hub Overhaul
 * **Isolated Plugin Safe Boot Engine (`app/Providers/PluginServiceProvider.php`):**
@@ -109,6 +113,7 @@
 * **Google Sitelinks Search Schema.org Markup & Expanded Schemas (`app/Services/SeoManager.php`):**
   * Enhanced `getWebSiteSchema()` to output structured `SearchAction` markup (`query-input: required name=search_term_string`) enabling Google to render rich sitelinks search boxes for the domain.
   * Added native Schema.org JSON-LD generation for community social posts (`SocialMediaPosting`) and video viewing pages (`VideoObject`).
+* **Fix (Admin SEO Head Snippets & Google AdSense Support):** Upgraded `SeoHeadSanitizer` (`/admin/seo/head`) to fully support Google AdSense script integration (`<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js..." crossorigin="anonymous"></script>`), external scripts with `data-*` attributes (`data-ad-client`), inline scripts, `<style>`, `<noscript>`, and HTML comments, preventing script stripping while preserving strict protection against malicious pseudoprotocols (`javascript:`). Updated locale guidance in Arabic, English, and French, with complete test coverage (`SeoHeadSanitizerTest`, `SeoSystemTest`).
 * **Cached XML Sitemap Indexing & Partitioned Sitemaps (`app/Http/Controllers/SitemapController.php`):**
   * Cached the master sitemap index XML with automatic invalidation hooked into `CacheWarmupService`.
   * Added clean direct partition routes (`/sitemap-topics.xml`, `/sitemap-products.xml`, `/sitemap-videos.xml`, `/sitemap-directory.xml`, `/sitemap-news.xml`) supporting instant search bot indexation.
@@ -330,6 +335,8 @@
   * `V460VersionCompatibilityTest.php`: 5 passed, 23 assertions.
   * `PointHistoryTest.php`: 3 passed, 8 assertions.
   * `ReferralSystemTest.php`: 3 passed, 10 assertions.
+  * `SeoHeadSanitizerTest.php`: 9 passed, 18 assertions (100% pass rate).
+  * `SeoSystemTest.php`: 100% test pass rate for SEO schemas and head snippets.
   * 100% test pass rate with zero regressions across core subsystems.
 
 # v4.5.6 
@@ -701,7 +708,6 @@
 * **Feature (Performance & Cleanup Integration):** Embedded a dedicated **SEO Performance & Storage Integration Panel** on the main SEO Dashboard displaying real-time `track_seo_metrics` toggle state and `retention_seo_daily_metrics` retention policy with direct action buttons linking to `/admin/settings/performance` and `/admin/database-cleanup`. Added navigation bar integration links and performance hint banners across SEO settings.
 * **Internationalization (i18n):** Added and updated system translation keys (`messages.seo_performance_integration`, `messages.seo_performance_integration_desc`, `messages.retention_period`, `messages.performance`, `messages.cleanup`, `messages.seo_performance_settings_hint`) across all 14 supported locales (`ar`, `en`, `de`, `es`, `fa`, `fr`, `it`, `ja`, `pt`, `ru`, `sr`, `tr`, `zh_CN`, `zh_TW`).
 * **Quality & Automated Testing:** Verified all Blade views compile cleanly (`php artisan view:clear`) and passed the complete PHPUnit test suite for SEO (`E:\xampp\php\php.exe vendor/bin/phpunit --filter=Seo`, 6 tests, 65 assertions).
-* **Fix (Admin SEO Head Snippets & Google AdSense Support):** Upgraded `SeoHeadSanitizer` (`/admin/seo/head`) to fully support Google AdSense script integration (`<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js..." crossorigin="anonymous"></script>`), external scripts with `data-*` attributes (`data-ad-client`), inline scripts, `<style>`, `<noscript>`, and HTML comments, preventing script stripping while preserving strict protection against malicious pseudoprotocols (`javascript:`). Updated locale guidance in Arabic, English, and French, with complete test coverage (`SeoHeadSanitizerTest`, `SeoSystemTest`).
 
 ### Performance & Reaction System Fixes
 * **Fix (Post Types & Forum Status Type Disambiguation):** Disambiguated `s_type` mappings in `types_definition.md` and fixed query filters across `ForumController` and `GamificationService`. Specifically:
