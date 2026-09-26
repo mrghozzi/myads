@@ -18,8 +18,8 @@
     $canLockTopic = auth()->check() && ($canManageGroupTopic || $viewer->canModerateForum('lock_topics', $topicCategoryId));
     $showForumRoleBadges = (int) \App\Support\ForumSettings::get('show_role_badges', 1) === 1;
 
-    $reactionsCount = \App\Models\Like::where('sid', $topic->id)->where('type', 2)->count();
-    $commentsCount = \App\Models\ForumComment::where('tid', $topic->id)->count();
+    $reactionsCount = (int) ($topic->likes_count ?? 0);
+    $commentsCount = (int) ($topic->comments_count ?? 0);
     $topicExcerpt = \Illuminate\Support\Str::limit(trim(preg_replace('/\s+/', ' ', strip_tags((string) $topic->txt))), 160);
 @endphp
 

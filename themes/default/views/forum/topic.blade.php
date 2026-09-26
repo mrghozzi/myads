@@ -13,13 +13,13 @@
 <!-- ADS -->
 @include('theme::partials.ads', ['id' => 5])
 
-<div class="section-header">
+<div class="section-header forum-topic-heading">
     <div class="section-header-info">
         <h2 class="section-title">{{ $topic->name }}</h2>
     </div>
 </div>
 
-<div class="section-filters-bar v7">
+<nav class="section-filters-bar v7 forum-topic-breadcrumb" aria-label="{{ __('messages.breadcrumbs') }}">
     <div class="section-filters-bar-actions">
         <div class="section-filters-bar-info">
             <p class="section-filters-bar-title">
@@ -43,7 +43,7 @@
             </div>
         </div>
     </div>
-</div>
+</nav>
 
 @php
     $group = $group ?? null;
@@ -70,7 +70,7 @@
     );
 @endphp
 
-<div class="section-header" style="margin-top: 12px;">
+<div class="section-header forum-topic-state" style="margin-top: 12px;">
     @if($group)
         @include('theme::partials.groups.badge', ['groupBadge' => $group])
     @endif
@@ -82,7 +82,7 @@
     @endif
 </div>
 
-<div class="grid grid post{{ $status->id }}">
+<div class="grid grid post{{ $status->id }} forum-topic-layout">
     <div class="forum-content">
         <div class="forum-post-header">
             <p class="forum-post-header-title">{{ __('messages.author') }}</p>
@@ -183,7 +183,7 @@
                     @endif
 
                     <div class="forum-post-info">
-                        <div class="forum-post-paragraph" style="color: #3e3f5e; font-size: 14px; line-height: 1.6em; margin-bottom: 12px;">
+                        <div class="forum-post-paragraph forum-topic-content">
                             {!! \App\Support\ContentFormatter::formatForum($topic->txt) !!}
                             
                             @if($topic->imageOption)
@@ -220,23 +220,14 @@
     <div class="post-option-wrap" style="position: relative;">
         <div class="post-option reaction-options-dropdown-trigger" onclick="toggleReactionDropdown(this)">
             <div id="reaction_image{{ $status->id }}">
-                @php
-                    $myReaction = \App\Models\Like::where('uid', Auth::id())->where('sid', $topic->id)->where('type', 2)->first();
-                    $reactionType = 'like';
-                    if($myReaction) {
-                        $reactionOption = \App\Models\Option::where('o_parent', $myReaction->id)->where('o_type', 'data_reaction')->first();
-                        if($reactionOption) $reactionType = $reactionOption->o_valuer;
-                    }
-                @endphp
-                
-                @if($myReaction)
-                    <img class="reaction-option-image" src="{{ theme_asset('img/reaction/'.$reactionType.'.png') }}" width="30" alt="reaction-{{ $reactionType }}">
+                @if($viewerReaction)
+                    <img class="reaction-option-image" src="{{ theme_asset('img/reaction/'.$viewerReactionType.'.png') }}" width="30" alt="reaction-{{ $viewerReactionType }}">
                 @else
                     <svg class="post-option-icon icon-thumbs-up"><use xlink:href="#svg-thumbs-up"></use></svg>
                 @endif
             </div>
-            <p class="post-option-text reaction_txt{{ $status->id }}" style="{{ $myReaction ? 'color: #1bc8db;' : '' }}">
-                &nbsp;{{ $myReaction ? ucfirst($reactionType) : __('messages.react') }}
+            <p class="post-option-text reaction_txt{{ $status->id }} {{ $viewerReaction ? 'is-reacted' : '' }}">
+                &nbsp;{{ $viewerReaction ? __('messages.' . $viewerReactionType) : __('messages.react') }}
             </p>
         </div>
         
@@ -276,7 +267,7 @@
 
 <div class="post-comment-list post-comment-list-{{ $topic->id }} comment_2_{{ $topic->id }} post{{ $status->id }}">
     @include('theme::partials.activity.comments', [
-        'comments' => $topic->comments()->orderBy('id', 'desc')->get(),
+        'comments' => $topicComments,
         'id' => $topic->id,
         'type' => 'forum',
         'limit' => 100,

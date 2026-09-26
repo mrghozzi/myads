@@ -38,6 +38,90 @@ class ForumController extends Controller
             ->orderBy('ordercat', 'desc')
             ->get();
 
+        $categoryIds = $categories->modelKeys();
+        $categoryMetrics = collect();
+        if ($categoryIds !== []) {
+            $categoryMetrics = \Illuminate\Support\Facades\Cache::remember(
+                'forum:index:category-metrics:v1:' . md5(implode(',', $categoryIds)),
+                now()->addMinute(),
+                function () use ($categoryIds) {
+                    $topicCounts = ForumTopic::query()
+                        ->selectRaw('cat, COUNT(*) AS topic_count')
+                        ->whereIn('cat', $categoryIds)
+                        ->where('statu', 1)
+                        ->groupBy('cat')
+                        ->get()
+                        ->keyBy('cat');
+
+                    $replyCounts = DB::table('f_coment')
+                        ->join('forum', 'forum.id', '=', 'f_coment.tid')
+                        ->whereIn('forum.cat', $categoryIds)
+                        ->selectRaw('forum.cat, COUNT(*) AS reply_count')
+                        ->groupBy('forum.cat')
+                        ->pluck('reply_count', 'cat');
+
+                    $latestTopics = DB::table('forum as topics')
+                        ->joinSub(
+                            DB::table('forum')
+                                ->selectRaw('cat, MAX(id) AS topic_id')
+                                ->whereIn('cat', $categoryIds)
+                                ->where('statu', 1)
+                                ->groupBy('cat'),
+                            'latest_topics',
+                            fn ($join) => $join->on('latest_topics.topic_id', '=', 'topics.id')
+                        )
+                        ->leftJoinSub(
+                            DB::table('status')
+                                ->selectRaw('tp_id, MAX(id) AS status_id')
+                                ->where('s_type', 2)
+                                ->groupBy('tp_id'),
+                            'latest_statuses',
+                            fn ($join) => $join->on('latest_statuses.tp_id', '=', 'topics.id')
+                        )
+                        ->leftJoin('status as latest_status', 'latest_status.id', '=', 'latest_statuses.status_id')
+                        ->get([
+                            'topics.cat',
+                            'topics.id as topic_id',
+                            'topics.name as topic_name',
+                            'latest_status.date as status_date',
+                        ])
+                        ->keyBy('cat');
+
+                    return collect($categoryIds)->mapWithKeys(function ($categoryId) use ($topicCounts, $replyCounts, $latestTopics) {
+                        $latestTopic = $latestTopics->get($categoryId);
+
+                        return [$categoryId => [
+                            'topics' => (int) ($topicCounts->get($categoryId)?->topic_count ?? 0),
+                            'replies' => (int) ($replyCounts[$categoryId] ?? 0),
+                            'latest_topic_id' => $latestTopic?->topic_id,
+                            'latest_topic_name' => $latestTopic?->topic_name,
+                            'latest_status_date' => $latestTopic?->status_date,
+                        ]];
+                    });
+                }
+            );
+        }
+
+        foreach ($categories as $category) {
+            $metrics = $categoryMetrics->get($category->id, []);
+            $category->setAttribute('topic_count', $metrics['topics'] ?? 0);
+            $category->setAttribute('reply_count', $metrics['replies'] ?? 0);
+            $category->setAttribute('latest_topic_id', $metrics['latest_topic_id'] ?? null);
+            $category->setAttribute('latest_topic_name', $metrics['latest_topic_name'] ?? null);
+            $category->setAttribute('latest_status_date', $metrics['latest_status_date'] ?? null);
+        }
+
+        $forumStats = \Illuminate\Support\Facades\Cache::remember(
+            'forum:index:summary:v1',
+            now()->addMinutes(2),
+            fn () => [
+                'topics' => ForumTopic::count(),
+                'replies' => ForumComment::count(),
+                'members' => \App\Models\User::count(),
+                'latest_member' => \App\Models\User::query()->latest('id')->first(),
+            ]
+        );
+
         $this->seo([
             'scope_key' => 'forum_index',
             'resource_title' => __('messages.seo_forum_title'),
@@ -48,7 +132,10 @@ class ForumController extends Controller
             ],
         ]);
 
-        return view('theme::forum.index', compact('categories'));
+        return view('theme::forum.index', [
+            'categories' => $categories,
+            'forumStats' => $forumStats,
+        ]);
     }
 
     public function category($id)
@@ -88,6 +175,7 @@ class ForumController extends Controller
 
         $topicIds = $statuses->pluck('tp_id');
         $topics = ForumTopic::with(['user', 'category'])
+            ->withCount(['comments', 'likes'])
             ->whereIn('id', $topicIds)
             ->get()
             ->keyBy('id');
@@ -125,7 +213,7 @@ class ForumController extends Controller
 
     public function topic($id)
     {
-        $topic = ForumTopic::visible()->with(['user', 'category', 'group', 'comments.user', 'attachments'])->findOrFail($id);
+        $topic = ForumTopic::visible()->with(['user', 'category', 'group', 'attachments'])->findOrFail($id);
         
         // Increment view count
         $topic->increment('vu');
@@ -256,7 +344,17 @@ class ForumController extends Controller
 
         $this->seo($seoContext);
 
-        return view('theme::forum.topic', compact('topic', 'status', 'forumSettings', 'group'));
+        $topicComments = $topic->comments()
+            ->with('user')
+            ->get();
+        $viewerReaction = auth()->check()
+            ? \App\Models\Like::query()->where('uid', auth()->id())->where('sid', $topic->id)->where('type', 2)->first()
+            : null;
+        $viewerReactionType = $viewerReaction
+            ? (string) (Option::query()->where('o_parent', $viewerReaction->id)->where('o_type', 'data_reaction')->value('o_valuer') ?: 'like')
+            : 'like';
+
+        return view('theme::forum.topic', compact('topic', 'status', 'forumSettings', 'group', 'topicComments', 'viewerReaction', 'viewerReactionType'));
     }
 
     public function create(Request $request)
@@ -318,11 +416,19 @@ class ForumController extends Controller
         }
 
         if ($cooldownMessage = $securityThrottle->actionMessage($uid, 'forum_topic')) {
+            if ($request->expectsJson()) {
+                return response()->json(['message' => $cooldownMessage], 429);
+            }
+
             return back()->withErrors(['forum' => $cooldownMessage])->withInput();
         }
 
         $contentToInspect = trim((string) $request->input('name') . "\n" . (string) $request->input('txt'));
         if ($violation = $securityPolicy->textViolation($contentToInspect, 'posts')) {
+            if ($request->expectsJson()) {
+                return response()->json(['message' => $violation], 422);
+            }
+
             return back()->withErrors(['forum' => $violation])->withInput();
         }
 
@@ -391,10 +497,24 @@ class ForumController extends Controller
 
             DB::commit();
             $securityThrottle->hitAction($uid, 'forum_topic');
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'url' => route('forum.topic', $topic->id),
+                    'message' => __('messages.forum_topic_created'),
+                ], 201);
+            }
+
             return redirect()->route('forum.topic', $topic->id);
         } catch (\Throwable $e) {
             DB::rollBack();
             report($e);
+
+            if ($request->expectsJson()) {
+                return response()->json(['message' => __('messages.error_occurred')], 500);
+            }
+
             return back()->withErrors(['forum' => __('messages.error_occurred')])->withInput();
         }
     }
@@ -444,6 +564,10 @@ class ForumController extends Controller
 
         $contentToInspect = trim((string) $request->input('name') . "\n" . (string) $request->input('txt'));
         if ($violation = $securityPolicy->textViolation($contentToInspect, 'posts')) {
+            if ($request->expectsJson()) {
+                return response()->json(['message' => $violation], 422);
+            }
+
             return back()->withErrors(['forum' => $violation])->withInput();
         }
 
@@ -487,10 +611,24 @@ class ForumController extends Controller
             $this->storeTopicAttachments($topic, $request, $settings);
 
             DB::commit();
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'url' => route('forum.topic', $topic->id),
+                    'message' => __('messages.forum_topic_updated'),
+                ]);
+            }
+
             return redirect()->route('forum.topic', $topic->id);
         } catch (\Throwable $e) {
             DB::rollBack();
             report($e);
+
+            if ($request->expectsJson()) {
+                return response()->json(['message' => __('messages.error_occurred')], 500);
+            }
+
             return back()->withErrors(['forum' => __('messages.error_occurred')])->withInput();
         }
     }

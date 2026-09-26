@@ -679,10 +679,10 @@ html.app-skin-dark .ql-toolbar.ql-snow button:hover,
                 </div>
                 <div>
                     <h1 class="superdesign-hero-title">
-                        {{ isset($topic) ? __('messages.edit_topic') : (__('messages.create_new_topic') ?? 'نشر موضوع جديد') }}
+                        {{ isset($topic) ? __('messages.edit_topic') : __('messages.create_new_topic') }}
                     </h1>
                     <p class="superdesign-hero-subtitle">
-                        {{ __('messages.forum_post_subtitle') ?? 'شارك أفكارك وتجاربك مع مجتمع MYADS وساهم في إثراء النقاش الفعّال' }}
+                        {{ __('messages.forum_post_subtitle') }}
                     </p>
                 </div>
             </div>
@@ -693,7 +693,7 @@ html.app-skin-dark .ql-toolbar.ql-snow button:hover,
                 </span>
                 <span class="superdesign-pill-badge">
                     <i class="fa fa-shield-alt"></i>
-                    {{ __('messages.community_rules') ?? 'قواعد المجتمع' }}
+                    {{ __('messages.community_rules') }}
                 </span>
             </div>
         </div>
@@ -713,8 +713,9 @@ html.app-skin-dark .ql-toolbar.ql-snow button:hover,
     <div class="superdesign-post-grid">
         <!-- Column 1: Main Form -->
         <div class="superdesign-composer-card">
-            <form method="POST" action="{{ isset($topic) ? route('forum.update', $topic->id) : route('forum.store') }}" enctype="multipart/form-data">
+            <form method="POST" action="{{ isset($topic) ? route('forum.update', $topic->id) : route('forum.store') }}" enctype="multipart/form-data" data-forum-ajax data-success-message="{{ isset($topic) ? __('messages.forum_topic_updated') : __('messages.forum_topic_created') }}" data-request-error="{{ __('messages.forum_request_failed') }}">
                 @csrf
+                <div class="forum-ajax-status" data-forum-form-status role="status" aria-live="polite" hidden></div>
                 @if(isset($topic))
                     <input type="hidden" name="id" value="{{ $topic->id }}">
                 @endif
@@ -733,7 +734,7 @@ html.app-skin-dark .ql-toolbar.ql-snow button:hover,
                                 id="name" 
                                 name="name" 
                                 class="superdesign-input" 
-                                placeholder="{{ __('messages.subject_placeholder') ?? 'اكتب عنواناً واضحاً وموجزاً لموضوعك...' }}" 
+                                placeholder="{{ __('messages.subject_placeholder') }}"
                                 value="{{ old('name', $topic->name ?? '') }}" 
                                 required
                             >
@@ -745,7 +746,7 @@ html.app-skin-dark .ql-toolbar.ql-snow button:hover,
                     <div class="superdesign-field-group">
                         <label for="profile-status" class="superdesign-field-label">
                             <i class="fa fa-folder-open"></i>
-                            {{ __('messages.category_fallback') ?? 'القسم' }}
+                            {{ __('messages.category_fallback') }}
                         </label>
                         <select id="profile-status" name="categ" class="superdesign-select" required>
                             @foreach($categories as $category)
@@ -757,13 +758,33 @@ html.app-skin-dark .ql-toolbar.ql-snow button:hover,
                     </div>
                 @endif
 
+                @if(!isset($topic))
+                    <div class="superdesign-field-group">
+                        <label for="type" class="superdesign-field-label">
+                            <i class="fa fa-list" aria-hidden="true"></i>
+                            {{ __('messages.type') }}
+                        </label>
+                        <select id="type" name="type" class="superdesign-select" onchange="toggleImageUpload(this.value)">
+                            <option value="100">{{ __('messages.spread') }}</option>
+                            <option value="4">{{ __('messages.img') }}</option>
+                        </select>
+                    </div>
+                    <div class="superdesign-field-group" id="image-upload-row" hidden>
+                        <label for="img" class="superdesign-field-label">
+                            <i class="fa fa-image" aria-hidden="true"></i>
+                            {{ __('messages.upload_image') }}
+                        </label>
+                        <input type="file" id="img" name="img" class="form-control" accept="image/*">
+                    </div>
+                @endif
+
                 <div class="superdesign-field-group">
                     <label for="editor1" class="superdesign-field-label">
                         <i class="fa fa-align-left"></i>
-                        {{ __('messages.content') ?? 'المحتوى والتفاصيل' }}
+                        {{ __('messages.content') }}
                     </label>
                     <div class="superdesign-editor-box">
-                        <textarea id="editor1" name="txt" rows="16">{{ old('txt', $topic->txt ?? '') }}</textarea>
+                        <textarea id="editor1" name="txt" rows="16" required>{{ old('txt', $topic->txt ?? '') }}</textarea>
                     </div>
                 </div>
 
@@ -773,12 +794,12 @@ html.app-skin-dark .ql-toolbar.ql-snow button:hover,
                             <i class="fa fa-paperclip"></i>
                             {{ __('messages.attachments') }}
                         </label>
-                        <div class="superdesign-dropzone-box" onclick="document.getElementById('attachments').click();">
+                        <label for="attachments" class="superdesign-dropzone-box">
                             <div class="superdesign-dropzone-icon">
                                 <i class="fa fa-cloud-upload-alt"></i>
                             </div>
-                            <div class="superdesign-dropzone-text">
-                                {{ __('messages.click_to_upload_files') ?? 'اضغط هنا لرفع المرفقات والمستندات' }}
+                            <div class="superdesign-dropzone-text" data-forum-attachment-name data-empty-label="{{ __('messages.click_to_upload_files') }}" data-selected-files="{{ __('messages.forum_selected_files', ['count' => ':count']) }}">
+                                {{ __('messages.click_to_upload_files') }}
                             </div>
                             <div class="superdesign-dropzone-hint">
                                 {{ __('messages.max_attachments_per_topic') }}: {{ $forumSettings['max_attachments_per_topic'] ?? 5 }} |
@@ -789,11 +810,11 @@ html.app-skin-dark .ql-toolbar.ql-snow button:hover,
                                 id="attachments"
                                 name="attachments[]"
                                 multiple
-                                style="display: none;"
+                                class="forum-file-input"
                                 accept=".{{ str_replace(',', ',.', $forumSettings['allowed_attachment_extensions'] ?? '') }}"
-                                onchange="if(this.files.length) { this.previousElementSibling.innerText = this.files.length + ' ملف/ملفات مختارة'; }"
+                                data-forum-attachments
                             >
-                        </div>
+                        </label>
 
                         @if(isset($topic) && $topic->attachments && $topic->attachments->isNotEmpty())
                             <div class="superdesign-attachments-list">
@@ -821,10 +842,9 @@ html.app-skin-dark .ql-toolbar.ql-snow button:hover,
                 <div class="superdesign-actions-bar">
                     <a href="{{ route('forum.index') }}" class="superdesign-btn-secondary">
                         <i class="fa fa-times"></i>
-                        {{ __('messages.cancel') ?? 'إلغاء' }}
+                        {{ __('messages.cancel') }}
                     </a>
 
-                    <input type="hidden" name="type" value="100" />
                     <input type="hidden" name="set" value="Publish" />
                     <button type="submit" name="submit" value="Publish" class="superdesign-btn-primary">
                         <i class="fa fa-paper-plane"></i>
@@ -840,24 +860,24 @@ html.app-skin-dark .ql-toolbar.ql-snow button:hover,
             <div class="superdesign-sidebar-card">
                 <h3 class="superdesign-sidebar-title">
                     <i class="fa fa-lightbulb"></i>
-                    {{ __('messages.posting_tips') ?? 'إرشادات النشر المثالي' }}
+                    {{ __('messages.posting_tips') }}
                 </h3>
                 <ul class="superdesign-guidelines-list">
                     <li>
                         <i class="fa fa-check-circle"></i>
-                        <span>اختر عنواناً واضحاً ومختصراً يلخص الفكرة الأساسية للموضوع.</span>
+                        <span>{{ __('messages.forum_posting_tip') }}</span>
                     </li>
                     <li>
                         <i class="fa fa-check-circle"></i>
-                        <span>اختر القسم المناسب لموضوعك لضمان وصوله للجمهور المهتم.</span>
+                        <span>{{ __('messages.forum_category_tip') }}</span>
                     </li>
                     <li>
                         <i class="fa fa-check-circle"></i>
-                        <span>استخدم تنسيقات النصوص والصور لتوضيح الفكرة وتسهيل القراءة.</span>
+                        <span>{{ __('messages.forum_formatting_tip') }}</span>
                     </li>
                     <li>
                         <i class="fa fa-check-circle"></i>
-                        <span>تأكد من خلو الموضوع من الروابط الترويجية العشوائية أو المحتوى السبام.</span>
+                        <span>{{ __('messages.forum_guidelines_tip') }}</span>
                     </li>
                 </ul>
             </div>
@@ -866,10 +886,10 @@ html.app-skin-dark .ql-toolbar.ql-snow button:hover,
             <div class="superdesign-pts-tip">
                 <div class="superdesign-pts-tip-title">
                     <i class="fa fa-coins"></i>
-                    <span>مكافآت التفاعل (PTS)</span>
+                    <span>{{ __('messages.forum_points_reward') }}</span>
                 </div>
                 <span>
-                    كتابة المواضيع القيمة والتفاعل مع ردود الأعضاء يمنحك نقاط تفاعل جديدة تساعدك على ترويج إعلاناتك ومستنداتك داخل الشبكة!
+                    {{ __('messages.forum_points_reward_desc') }}
                 </span>
             </div>
         </div>
@@ -889,9 +909,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (activeEditor === 'quill' && typeof Quill !== 'undefined') {
         textarea.style.display = 'none';
+        textarea.required = false;
         var quillDiv = document.createElement('div');
         quillDiv.id = 'quill-forum-create-editor';
         quillDiv.style.minHeight = '340px';
+        quillDiv.setAttribute('aria-label', @json(__('messages.content')));
         quillDiv.innerHTML = textarea.value || '';
         textarea.parentNode.insertBefore(quillDiv, textarea);
 

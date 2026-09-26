@@ -2,155 +2,105 @@
 @include('theme::forum._assets')
 
 @section('content')
-<div class="forum-rdx forum-rdx-index">
-<!-- SECTION BANNER -->
-<div class="section-banner" style="background: url({{ theme_asset('img/banner/Newsfeed.png') }}) no-repeat 50%;">
-    <!-- SECTION BANNER ICON -->
-    <img class="section-banner-icon" src="{{ theme_asset('img/banner/discussion-icon.png') }}">
-    <!-- /SECTION BANNER ICON -->
-
-    <!-- SECTION BANNER TITLE -->
-    <p class="section-banner-title">{{ __('messages.forum') }}</p>
-    <!-- /SECTION BANNER TITLE -->
-
-    <!-- SECTION BANNER TEXT -->
-    <p class="section-banner-text"></p>
-    <!-- /SECTION BANNER TEXT -->
-</div>
-<!-- /SECTION BANNER -->
-
-<!-- ADS -->
-@include('theme::partials.ads', ['id' => 4])
-
-<div class="section-filters-bar v6">
-    <!-- SECTION FILTERS BAR ACTIONS -->
-    <div class="section-filters-bar-actions">
-    </div>
-    @auth
-    <div class="section-filters-bar-actions">
-        <!-- BUTTON -->
-        <a href="{{ route('forum.create') }}" class="button secondary" style="color: #fff;">
-            <i class="fa fa-plus nav_icon"></i>&nbsp;{{ __('messages.add') }}
-        </a>
-        <!-- /BUTTON -->
-    </div>
-    @endauth
-    <!-- /SECTION FILTERS BAR ACTIONS -->
-</div>
-
-<div class="table table-forum table-forum-category">
-    <!-- TABLE HEADER -->
-    <div class="table-header">
-        <div class="table-header-column">
-            <p class="table-header-title">{{ __('messages.cat_s') }}</p>
+<main class="forum-rdx forum-rdx-index forum-index-page">
+    <section class="forum-index-hero" aria-labelledby="forum-index-title">
+        <div class="forum-index-hero-copy">
+            <span class="forum-index-eyebrow"><i class="fa fa-comments" aria-hidden="true"></i> {{ __('messages.community') }}</span>
+            <h1 id="forum-index-title">{{ __('messages.forum') }}</h1>
+            <p>{{ __('messages.forum_index_intro') }}</p>
         </div>
-        <div class="table-header-column centered padded-medium">
-            <p class="table-header-title">{{ __('messages.topics') }}</p>
+        @auth
+            <a href="{{ route('forum.create') }}" class="forum-index-primary-action">
+                <i class="fa fa-plus" aria-hidden="true"></i>
+                <span>{{ __('messages.w_new_tpc') }}</span>
+            </a>
+        @endauth
+        <div class="forum-index-summary" aria-label="{{ __('messages.forum_statistics') }}">
+            <div class="forum-index-summary-item">
+                <i class="fa fa-folder-open" aria-hidden="true"></i>
+                <span><strong>{{ $categories->count() }}</strong><small>{{ __('messages.cat_s') }}</small></span>
+            </div>
+            <div class="forum-index-summary-item">
+                <i class="fa fa-comments" aria-hidden="true"></i>
+                <span><strong>{{ number_format($forumStats['topics']) }}</strong><small>{{ __('messages.topics') }}</small></span>
+            </div>
+            <div class="forum-index-summary-item">
+                <i class="fa fa-users" aria-hidden="true"></i>
+                <span><strong>{{ number_format($forumStats['members']) }}</strong><small>{{ __('messages.members') }}</small></span>
+            </div>
         </div>
-        <div class="table-header-column centered padded-medium">
-            <p class="table-header-title">{{ __('messages.replies') ?? 'المساهمات' }}</p>
-        </div>
-        <div class="table-header-column padded-big-left">
-            <p class="table-header-title">{{ __('messages.latest_post') }}</p>
-        </div>
-    </div>
-    <!-- /TABLE HEADER -->
+    </section>
 
-    <!-- TABLE BODY -->
-    <div class="table-body">
-        @foreach($categories as $category)
-        @php
-            $topicCount = \App\Models\ForumTopic::where('cat', $category->id)->where('statu', 1)->count();
-            $commentsCount = \App\Models\ForumComment::whereHas('topic', function($q) use ($category) { $q->where('cat', $category->id); })->count();
-            $latestTopic = \App\Models\ForumTopic::where('cat', $category->id)->where('statu', 1)->orderBy('id', 'desc')->first();
-            
-            // Get latest status date for the latest topic
-            $latestDate = "";
-            if ($latestTopic) {
-                $status = \App\Models\Status::where('tp_id', $latestTopic->id)->where('s_type', 2)->first();
-                if ($status) {
-                    $latestDate = \Carbon\Carbon::createFromTimestamp($status->date)->diffForHumans();
-                }
-            }
-        @endphp
-        <!-- TABLE ROW -->
-        <div class="table-row big">
-            <div class="table-column">
-                <div class="forum-category">
-                    <a href="{{ route('forum.category', $category->id) }}">
-                        <i class="fa {{ $category->icons }}" aria-hidden="true"></i>
-                    </a>
-                    <div class="forum-category-info">
-                        <p class="forum-category-title">
-                            <a href="{{ route('forum.category', $category->id) }}">{{ $category->name }}</a>
-                        </p>
-                        <p class="forum-category-text">{!! nl2br(strip_tags($category->txt, '<br>')) !!}</p>
+    @include('theme::partials.ads', ['id' => 4])
+
+    <section class="forum-index-toolbar" aria-label="{{ __('messages.forum_categories') }}">
+        <div>
+            <span class="forum-index-eyebrow">{{ __('messages.explore') }}</span>
+            <h2>{{ __('messages.forum_categories') }}</h2>
+        </div>
+        <label class="forum-index-search">
+            <i class="fa fa-search" aria-hidden="true"></i>
+            <span class="sr-only">{{ __('messages.search_categories') }}</span>
+            <input type="search" data-forum-category-search placeholder="{{ __('messages.search_categories') }}" autocomplete="off">
+        </label>
+    </section>
+
+    @if($categories->isNotEmpty())
+        <div class="forum-index-category-grid" data-forum-category-list>
+            @foreach($categories as $category)
+                @php
+                    $latestActivity = $category->latest_status_date
+                        ? \Carbon\Carbon::createFromTimestamp((int) $category->latest_status_date)->diffForHumans()
+                        : null;
+                @endphp
+                <article class="forum-index-category-card" data-forum-category-item data-search-text="{{ \Illuminate\Support\Str::lower($category->name . ' ' . strip_tags((string) $category->txt)) }}">
+                    <div class="forum-index-category-heading">
+                        <a class="forum-index-category-icon" href="{{ route('forum.category', $category->id) }}" aria-label="{{ $category->name }}">
+                            <i class="fa {{ $category->icons ?: 'fa-comments' }}" aria-hidden="true"></i>
+                        </a>
+                        <div class="forum-index-category-title-wrap">
+                            <h3><a href="{{ route('forum.category', $category->id) }}">{{ $category->name }}</a></h3>
+                            <p>{{ trim(strip_tags((string) $category->txt)) ?: __('messages.forum_category_description_fallback') }}</p>
+                        </div>
+                        <a class="forum-index-open" href="{{ route('forum.category', $category->id) }}" aria-label="{{ __('messages.open_category', ['category' => $category->name]) }}">
+                            <i class="fa fa-arrow-up" aria-hidden="true"></i>
+                        </a>
                     </div>
-                </div>
-            </div>
-            <div class="table-column centered padded-medium">
-                <p class="table-title">{{ $topicCount }}</p>
-            </div>
-            <div class="table-column centered padded-medium">
-                <p class="table-title">{{ $commentsCount }}</p>
-            </div>
-            <div class="table-column padded-big-left">
-                @if($latestTopic)
-                <a class="table-link" href="{{ route('forum.topic', $latestTopic->id) }}">{{ $latestTopic->name }}</a>
-                <a class="table-link" href="{{ route('forum.topic', $latestTopic->id) }}">
-                    <i class="fa fa-clock-o" aria-hidden="true"></i> {{ __('messages.since') }} {{ $latestDate }}
-                </a>
-                @else
-                <p class="table-text">-</p>
-                @endif
-            </div>
-        </div>
-        <!-- /TABLE ROW -->
-        @endforeach
-    </div>
-    <!-- /TABLE BODY -->
-</div>
 
-<!-- FORUM STATS SUPERDESIGN -->
-@php
-    $totalTopics = \App\Models\ForumTopic::count();
-    $totalComments = \App\Models\ForumComment::count();
-    $totalMembers = \App\Models\User::count();
-    $latestMember = \App\Models\User::orderBy('id', 'desc')->first();
-@endphp
-<div class="section-header" style="margin-top: 32px;">
-    <div class="section-header-info">
-        <h2 class="section-title"><i class="fa fa-line-chart"></i> إحصائيات المنتدى</h2>
-    </div>
-</div>
-<div class="grid grid-4-4-4-4" style="margin-top: 16px;">
-    <div class="widget-box superdesign-wrap" style="text-align: center; padding: 24px; border-radius: 12px; background: linear-gradient(135deg, #615dfa, #23d2e2); color: white;">
-        <i class="fa fa-folder-open fa-3x" style="margin-bottom: 12px; color: rgba(255,255,255,0.8);"></i>
-        <p style="font-size: 28px; font-weight: bold; margin: 0;">{{ $totalTopics }}</p>
-        <p style="margin: 0; font-size: 14px; font-weight: 500;">عدد المواضيع</p>
-    </div>
-    <div class="widget-box superdesign-wrap" style="text-align: center; padding: 24px; border-radius: 12px; background: linear-gradient(135deg, #fd4350, #ff8c42); color: white;">
-        <i class="fa fa-comments fa-3x" style="margin-bottom: 12px; color: rgba(255,255,255,0.8);"></i>
-        <p style="font-size: 28px; font-weight: bold; margin: 0;">{{ $totalComments }}</p>
-        <p style="margin: 0; font-size: 14px; font-weight: 500;">عدد المساهمات</p>
-    </div>
-    <div class="widget-box superdesign-wrap" style="text-align: center; padding: 24px; border-radius: 12px; background: linear-gradient(135deg, #1bc8db, #00d2ff); color: white;">
-        <i class="fa fa-users fa-3x" style="margin-bottom: 12px; color: rgba(255,255,255,0.8);"></i>
-        <p style="font-size: 28px; font-weight: bold; margin: 0;">{{ $totalMembers }}</p>
-        <p style="margin: 0; font-size: 14px; font-weight: 500;">الأعضاء المسجلين</p>
-    </div>
-    <div class="widget-box superdesign-wrap" style="text-align: center; padding: 24px; border-radius: 12px; background: linear-gradient(135deg, #44cc56, #28a745); color: white;">
-        <i class="fa fa-user-plus fa-3x" style="margin-bottom: 12px; color: rgba(255,255,255,0.8);"></i>
-        <p style="font-size: 28px; font-weight: bold; margin: 0;">
-            @if($latestMember)
-                <a href="{{ route('profile.show', $latestMember->username) }}" style="color: white; text-decoration: underline;">{{ $latestMember->username }}</a>
-            @else
-                -
-            @endif
-        </p>
-        <p style="margin: 0; font-size: 14px; font-weight: 500;">أحدث عضو مسجل</p>
-    </div>
-</div>
-<!-- /FORUM STATS SUPERDESIGN -->
-</div>
+                    <div class="forum-index-category-metrics">
+                        <span><strong>{{ number_format($category->topic_count) }}</strong> {{ __('messages.topics') }}</span>
+                        <span><strong>{{ number_format($category->reply_count) }}</strong> {{ __('messages.replies') }}</span>
+                    </div>
+
+                    <div class="forum-index-latest">
+                        <i class="fa fa-clock-o" aria-hidden="true"></i>
+                        @if($category->latest_topic_id)
+                            <a href="{{ route('forum.topic', $category->latest_topic_id) }}">{{ $category->latest_topic_name }}</a>
+                            <time>{{ $latestActivity }}</time>
+                        @else
+                            <span>{{ __('messages.forum_no_activity') }}</span>
+                        @endif
+                    </div>
+                </article>
+            @endforeach
+        </div>
+        <p class="forum-index-empty-search" data-forum-category-empty hidden>{{ __('messages.forum_search_no_results') }}</p>
+    @else
+        <div class="forum-index-empty" role="status">
+            <i class="fa fa-comments-o" aria-hidden="true"></i>
+            <h2>{{ __('messages.forum_no_categories') }}</h2>
+            <p>{{ __('messages.forum_no_categories_desc') }}</p>
+        </div>
+    @endif
+
+    @if($forumStats['latest_member'])
+        <aside class="forum-index-new-member">
+            <span class="forum-index-new-member-icon"><i class="fa fa-user-plus" aria-hidden="true"></i></span>
+            <div>
+                <span>{{ __('messages.forum_newest_member') }}</span>
+                <a href="{{ route('profile.show', $forumStats['latest_member']->username) }}">{{ $forumStats['latest_member']->username }}</a>
+            </div>
+        </aside>
+    @endif
+</main>
 @endsection

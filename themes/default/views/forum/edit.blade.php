@@ -673,7 +673,7 @@ html.app-skin-dark .ql-toolbar.ql-snow button:hover,
                         {{ (isset($status) && $status->s_type == 4) ? __('messages.edit_gallery_post') : (isset($topic) ? __('messages.edit_topic') : __('messages.w_new_tpc')) }}
                     </h1>
                     <p class="superdesign-hero-subtitle">
-                        {{ __('messages.edit_topic_subtitle') ?? 'قم بتحديث وتعديل تفاصيل الموضوع والمرفقات بسهولة وبشكل احترافي' }}
+                        {{ __('messages.edit_topic_subtitle') }}
                     </p>
                 </div>
             </div>
@@ -709,8 +709,9 @@ html.app-skin-dark .ql-toolbar.ql-snow button:hover,
     <div class="superdesign-post-grid">
         <!-- Column 1: Main Editor Form -->
         <div class="superdesign-composer-card">
-            <form method="POST" action="{{ isset($topic) ? route('forum.update', $topic->id) : route('forum.store') }}" enctype="multipart/form-data">
+            <form method="POST" action="{{ isset($topic) ? route('forum.update', $topic->id) : route('forum.store') }}" enctype="multipart/form-data" data-forum-ajax data-success-message="{{ isset($topic) ? __('messages.forum_topic_updated') : __('messages.forum_topic_created') }}" data-request-error="{{ __('messages.forum_request_failed') }}">
                 @csrf
+                <div class="forum-ajax-status" data-forum-form-status role="status" aria-live="polite" hidden></div>
                 @if(isset($topic))
                     <input type="hidden" name="id" value="{{ $topic->id }}">
                 @endif
@@ -719,7 +720,7 @@ html.app-skin-dark .ql-toolbar.ql-snow button:hover,
                     <div class="superdesign-field-group">
                         <label for="name" class="superdesign-field-label">
                             <i class="fa fa-heading"></i>
-                            {{ __('messages.sbj') }} / {{ __('messages.video_title') ?? 'عنوان الفيديو' }}
+                            {{ __('messages.sbj') }} / {{ __('messages.video_title') }}
                         </label>
                         <div class="superdesign-input-wrapper">
                             <input 
@@ -740,13 +741,13 @@ html.app-skin-dark .ql-toolbar.ql-snow button:hover,
                     <div class="superdesign-field-group">
                         <label class="superdesign-field-label">
                             <i class="fa fa-image"></i>
-                            {{ __('messages.video_thumbnail') ?? 'الصورة المصغرة للفيديو (Thumbnail)' }}
+                            {{ __('messages.video_thumbnail') }}
                         </label>
                         <div class="superdesign-thumb-card">
                             <input type="file" id="video_thumbnail" name="video_thumbnail" class="form-control" accept="image/*">
                             @if($topic->image_url)
                                 <div style="margin-top: 12px; display: flex; align-items: center; gap: 12px;">
-                                    <span style="font-size: 13px; font-weight: 600; color: #64748b;">الغلاف الحالي للفيديو:</span>
+                                    <span class="forum-edit-current-cover-label">{{ __('messages.forum_current_video_cover') }}</span>
                                     <img src="{{ asset($topic->image_url) }}" style="max-height: 80px; border-radius: 10px; border: 1px solid #cbd5e1; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
                                 </div>
                             @endif
@@ -809,12 +810,12 @@ html.app-skin-dark .ql-toolbar.ql-snow button:hover,
                             <i class="fa fa-paperclip"></i>
                             {{ __('messages.attachments') }}
                         </label>
-                        <div class="superdesign-dropzone-box" onclick="document.getElementById('attachments').click();">
+                        <label for="attachments" class="superdesign-dropzone-box">
                             <div class="superdesign-dropzone-icon">
                                 <i class="fa fa-cloud-upload-alt"></i>
                             </div>
-                            <div class="superdesign-dropzone-text">
-                                {{ __('messages.click_to_upload_files') ?? 'اضغط هنا لرفع المرفقات والمستندات' }}
+                            <div class="superdesign-dropzone-text" data-forum-attachment-name data-empty-label="{{ __('messages.click_to_upload_files') }}" data-selected-files="{{ __('messages.forum_selected_files', ['count' => ':count']) }}">
+                                {{ __('messages.click_to_upload_files') }}
                             </div>
                             <div class="superdesign-dropzone-hint">
                                 {{ __('messages.max_attachments_per_topic') }}: {{ $forumSettings['max_attachments_per_topic'] ?? 5 }} |
@@ -825,11 +826,11 @@ html.app-skin-dark .ql-toolbar.ql-snow button:hover,
                                 id="attachments"
                                 name="attachments[]"
                                 multiple
-                                style="display: none;"
+                                class="forum-file-input"
                                 accept=".{{ str_replace(',', ',.', $forumSettings['allowed_attachment_extensions'] ?? '') }}"
-                                onchange="if(this.files.length) { this.previousElementSibling.innerText = this.files.length + ' ملف/ملفات مختارة'; }"
+                                data-forum-attachments
                             >
-                        </div>
+                        </label>
 
                         @if(isset($topic) && $topic->attachments && $topic->attachments->isNotEmpty())
                             <div class="superdesign-attachments-list">
@@ -857,7 +858,7 @@ html.app-skin-dark .ql-toolbar.ql-snow button:hover,
                 <div class="superdesign-actions-bar">
                     <a href="{{ isset($topic) ? route('forum.topic', $topic->id) : route('forum.index') }}" class="superdesign-btn-secondary">
                         <i class="fa fa-times"></i>
-                        {{ __('messages.cancel') ?? 'إلغاء' }}
+                        {{ __('messages.cancel') }}
                     </a>
 
                     <button type="submit" class="superdesign-btn-primary">
@@ -874,20 +875,20 @@ html.app-skin-dark .ql-toolbar.ql-snow button:hover,
             <div class="superdesign-sidebar-card">
                 <h3 class="superdesign-sidebar-title">
                     <i class="fa fa-lightbulb"></i>
-                    {{ __('messages.editing_tips') ?? 'إرشادات التعديل والتحديث' }}
+                    {{ __('messages.editing_tips') }}
                 </h3>
                 <ul class="superdesign-guidelines-list">
                     <li>
                         <i class="fa fa-check-circle"></i>
-                        <span>تأكد من تعديل العنوان بدقة ليعكس المحتوى الجديد للموضوع.</span>
+                        <span>{{ __('messages.forum_editing_tip') }}</span>
                     </li>
                     <li>
                         <i class="fa fa-check-circle"></i>
-                        <span>يمكنك مراجعة وتحديث المرفقات الحالية أو حذف القديم منها بسهولة.</span>
+                        <span>{{ __('messages.forum_attachments_tip') }}</span>
                     </li>
                     <li>
                         <i class="fa fa-check-circle"></i>
-                        <span>حافظ على تنسيق المحتوى بالصور والجداول لزيادة نسبة التفاعل.</span>
+                        <span>{{ __('messages.forum_formatting_tip') }}</span>
                     </li>
                 </ul>
             </div>
@@ -906,9 +907,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
     if (activeEditor === 'quill' && typeof Quill !== 'undefined') {
         textarea.style.display = 'none';
+        textarea.required = false;
         var quillDiv = document.createElement('div');
         quillDiv.id = 'quill-forum-edit-editor';
         quillDiv.style.minHeight = '340px';
+        quillDiv.setAttribute('aria-label', @json(__('messages.content')));
         quillDiv.innerHTML = textarea.value;
         textarea.parentNode.insertBefore(quillDiv, textarea);
 
@@ -1011,11 +1014,9 @@ document.addEventListener('DOMContentLoaded', function() {
 function toggleImageUpload(type) {
     var imageRow = document.getElementById('image-upload-row');
     if (imageRow) {
-        if (type == '4') {
-            imageRow.style.display = 'block';
-        } else {
-            imageRow.style.display = 'none';
-        }
+        var shouldShow = String(type) === '4';
+        imageRow.hidden = !shouldShow;
+        imageRow.style.display = shouldShow ? 'block' : 'none';
     }
 }
 </script>
