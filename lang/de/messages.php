@@ -4132,4 +4132,5 @@ return [
     "forum_attachments_tip" => "Prüfe Anhänge und entferne nicht mehr benötigte Dateien.",
     "forum_current_video_cover" => "Aktuelles Videocover",
     "explore" => "Entdecken",
+    "add_post" => "Beitrag erstellen",
 ];

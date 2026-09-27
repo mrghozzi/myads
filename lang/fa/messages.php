@@ -4127,4 +4127,5 @@ return [
     "forum_attachments_tip" => "پیوست‌ها را بررسی و فایل‌های غیرضروری را حذف کنید.",
     "forum_current_video_cover" => "جلد کنونی ویدیو",
     "explore" => "کاوش",
+    "add_post" => "ایجاد پست",
 ];

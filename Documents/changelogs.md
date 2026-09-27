@@ -1,5 +1,5 @@
 # v4.6.1
-> **Administrative User Management Schema Fault-Tolerance, On-the-Fly Schema Self-Healing & Extension Update Timeout Protection Release** — Critical hotfix addressing HTTP 500 error on `/admin/users` caused by missing `is_active` column in legacy or incomplete `site_admins` database tables. Added `FEATURE_COLUMNS` verification, automatic on-the-fly table schema repair, defensive try/catch query execution with super-admin fallback, dedicated schema repair migration `2026_09_27_020000_repair_site_admins_table_schema.php`, and recursive loopback self-call timeout protection in `PluginManager`.
+> **Administrative User Management Schema Fault-Tolerance, Mobile Navigation Overhaul & Legacy Floaty Bar Removal, Context-Aware Quick Post Routing, Multi-Language Add Post Localization & Extension Update Timeout Protection Release** — Critical hotfix addressing HTTP 500 error on `/admin/users` caused by missing `is_active` column in legacy or incomplete `site_admins` database tables. Added `FEATURE_COLUMNS` verification, automatic on-the-fly table schema repair, defensive try/catch query execution with super-admin fallback, dedicated schema repair migration `2026_09_27_020000_repair_site_admins_table_schema.php`, recursive loopback self-call timeout protection in `PluginManager`, complete removal and CSS suppression of legacy `.floaty-bar` in favor of `.myads-mobile-bottom-nav`, context-aware quick-post FAB navigation (`#quick-post-box` on `/portal` and own member profile `/u/{auth_username}` with smooth focus scrolling, and fallback to `/share` elsewhere), and comprehensive 14-language dictionary additions for `messages.add_post`.
 
 ### Administrative User Management Schema Resilience & Fault Tolerance
 * **Fix**: Resolved HTTP `500` error on `/admin/users` caused by missing `is_active` column in legacy or incomplete `site_admins` tables (`SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_active' in 'where clause'`).
@@ -7,6 +7,18 @@
 * **Fix**: Hardened `AdminController@users` with defensive column inspection and `try/catch` fallback blocks around admin KPI calculation and role filtering, ensuring `/admin/users` never crashes even if legacy database columns are missing.
 * **Add**: Added repair migration `2026_09_27_020000_repair_site_admins_table_schema.php` to permanently ensure all necessary columns (`user_id`, `is_super`, `has_full_access`, `permissions`, `is_active`, `created_by`, `timestamps`) and seed user #1 as super admin.
 * **Fix**: Prevented recursive loopback self-calls and cURL 28 timeouts during plugin update checks in `PluginManager.php` when the update endpoint matches the host domain.
+
+### Mobile Navigation Overhaul, Floaty Bar Suppression & Context-Aware Quick Post Routing
+* **Fix**: Resolved viewport occlusion on mobile devices where legacy `.floaty-bar` (`z-index: 10000; bottom: 0`) blocked the new Glassmorphism 2.0 bottom navigation bar `.myads-mobile-bottom-nav`.
+* **Refactor**: Completely removed `@include('theme::partials.header.floaty_bar')` from [master.blade.php](file:///e:/xampp/htdocs/myads/themes/default/views/layouts/master.blade.php) and deprecated [floaty_bar.blade.php](file:///e:/xampp/htdocs/myads/themes/default/views/partials/header/floaty_bar.blade.php) to prevent unneeded database queries and DOM rendering.
+* **Style**: Enforced permanent suppression rules (`display: none !important; pointer-events: none !important; visibility: hidden !important;`) across [theme-tokens.css](file:///e:/xampp/htdocs/myads/themes/default/assets/css/theme-tokens.css), `css_d/theme-tokens.css`, `styles.css`, and `styles.min.css`.
+* **Feature**: Upgraded central Quick Post Floating Action Button (FAB) in [mobile_bottom_nav.blade.php](file:///e:/xampp/htdocs/myads/themes/default/views/partials/mobile_bottom_nav.blade.php) with smart context-aware routing:
+  * Automatically targets `#quick-post-box` on `/portal` (and `/`) or on the authenticated member's own profile page (`/u/{auth_username}`), executing smooth animated scrolling and autofocusing `#composer-text`.
+  * Contextually redirects to `/share` when on any other member's profile page (`/u/{other_username}`) or across other sections (`/video`, `/forum`, `/messages`, etc.).
+* **Refactor**: Wrapped status composer in [profile/show.blade.php](file:///e:/xampp/htdocs/myads/themes/default/views/profile/show.blade.php) with `<div id="quick-post-box">` exclusively for the authenticated account owner (`Auth::id() == $user->id`).
+* **Localization**: Added missing `add_post` translation string across all 14 core localization dictionaries (`lang/*/messages.php`), standardizing on English source (`Create Post`) and localized Arabic (`إضافة منشور`) with zero hardcoded fallbacks.
+* **Realtime**: Added `data-notification-badge` and `data-message-unread-count` hooks with unread fallback bindings in [mobile_bottom_nav.blade.php](file:///e:/xampp/htdocs/myads/themes/default/views/partials/mobile_bottom_nav.blade.php) for live WebSocket/SSE badge count updates.
+
 
 
 # v4.6.0

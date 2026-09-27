@@ -4125,4 +4125,5 @@ return [
     "forum_attachments_tip" => "Pregledajte priloge i uklonite nepotrebne fajlove.",
     "forum_current_video_cover" => "Trenutna naslovna slika videa",
     "explore" => "Istraži",
+    "add_post" => "Креирај објаву",
 ];

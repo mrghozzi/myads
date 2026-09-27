@@ -2,6 +2,14 @@
     $unreadNotifCount = (int) ($unreadNotificationsCount ?? ($headerNotificationUnreadCount ?? 0));
     $unreadMsgCount = (int) ($unreadMessagesCount ?? ($headerMessageUnreadCount ?? 0));
     $formatNavCount = static fn (int $count): string => $count > 99 ? '99+' : (string) $count;
+
+    $isOwnProfile = auth()->check() && (
+        (isset($user) && $user instanceof \App\Models\User && $user->id === auth()->id()) ||
+        request()->is('u/' . auth()->user()->username) ||
+        request()->is('u/' . auth()->user()->username . '/*')
+    );
+    $hasQuickPostOnPage = auth()->check() && (request()->is('portal*') || request()->is('/') || $isOwnProfile);
+    $quickPostTarget = $hasQuickPostOnPage ? '#quick-post-box' : url('/share');
 @endphp
 
 <nav class="myads-mobile-bottom-nav" aria-label="Mobile Navigation">
@@ -19,11 +27,15 @@
 
     <!-- Quick Post (+ FAB) -->
     @auth
-        <a href="{{ url('/post') }}" class="myads-nav-fab myads-btn-press" title="{{ __('messages.add_post') ?? 'نشر' }}" aria-label="{{ __('messages.add_post') ?? 'نشر' }}">
+        <a href="{{ $quickPostTarget }}"
+           id="myads-nav-quick-post-btn"
+           class="myads-nav-fab myads-btn-press"
+           title="{{ __('messages.add_post') }}"
+           aria-label="{{ __('messages.add_post') }}">
             <i class="fa-solid fa-plus"></i>
         </a>
     @else
-        <a href="{{ route('login') }}" class="myads-nav-fab myads-btn-press" title="{{ __('messages.login') ?? 'دخول' }}" aria-label="{{ __('messages.login') ?? 'دخول' }}">
+        <a href="{{ route('login') }}" class="myads-nav-fab myads-btn-press" title="{{ __('messages.login') }}" aria-label="{{ __('messages.login') }}">
             <i class="fa-solid fa-arrow-right-to-bracket"></i>
         </a>
     @endauth
@@ -56,3 +68,38 @@
         </a>
     @endauth
 </nav>
+
+@auth
+<script>
+    (function () {
+        function setupQuickPostFab() {
+            var quickPostBtn = document.getElementById('myads-nav-quick-post-btn');
+            if (!quickPostBtn || quickPostBtn.__hasQuickPostListener) return;
+            quickPostBtn.__hasQuickPostListener = true;
+
+            quickPostBtn.addEventListener('click', function (e) {
+                var quickPostBox = document.getElementById('quick-post-box');
+                if (quickPostBox && (quickPostBox.offsetWidth > 0 || quickPostBox.offsetHeight > 0)) {
+                    e.preventDefault();
+                    quickPostBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    var input = quickPostBox.querySelector('#composer-text, textarea, input[type="text"]');
+                    if (input) {
+                        setTimeout(function () {
+                            input.focus();
+                        }, 250);
+                    }
+                } else if (quickPostBtn.getAttribute('href') === '#quick-post-box') {
+                    e.preventDefault();
+                    window.location.href = '{{ url('/share') }}';
+                }
+            });
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', setupQuickPostFab);
+        } else {
+            setupQuickPostFab();
+        }
+    })();
+</script>
+@endauth

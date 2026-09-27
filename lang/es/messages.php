@@ -4132,4 +4132,5 @@ return [
     "forum_attachments_tip" => "Revisa los archivos adjuntos y elimina los que ya no necesites.",
     "forum_current_video_cover" => "Portada actual del vídeo",
     "explore" => "Explorar",
+    "add_post" => "Crear publicación",
 ];

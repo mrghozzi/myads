@@ -4132,4 +4132,5 @@ return [
     "forum_attachments_tip" => "Ekleri gözden geçirin ve gereksiz dosyaları kaldırın.",
     "forum_current_video_cover" => "Geçerli video kapağı",
     "explore" => "Keşfet",
+    "add_post" => "Gönderi Oluştur",
 ];

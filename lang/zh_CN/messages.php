@@ -4130,4 +4130,5 @@ return [
     "forum_attachments_tip" => "检查附件并移除不再需要的文件。",
     "forum_current_video_cover" => "当前视频封面",
     "explore" => "探索",
+    "add_post" => "发布帖子",
 ];

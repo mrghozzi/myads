@@ -4136,4 +4136,5 @@ return [
     "forum_attachments_tip" => "Vérifiez les pièces jointes et supprimez les fichiers inutiles.",
     "forum_current_video_cover" => "Couverture vidéo actuelle",
     "explore" => "Explorer",
+    "add_post" => "Créer une publication",
 ];

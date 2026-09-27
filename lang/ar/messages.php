@@ -4743,4 +4743,5 @@ return [
     "pts_amount" => "قيمة النقاط",
     "pts_positive_badge" => "إيداع نقاط",
     "pts_negative_badge" => "خصم نقاط",
+    "add_post" => "إضافة منشور",
 ];

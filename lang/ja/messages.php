@@ -4125,4 +4125,5 @@ return [
     "forum_attachments_tip" => "添付ファイルを確認し、不要なファイルを削除してください。",
     "forum_current_video_cover" => "現在の動画カバー",
     "explore" => "探索",
+    "add_post" => "投稿を作成",
 ];

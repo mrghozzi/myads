@@ -4127,4 +4127,5 @@ return [
     "forum_attachments_tip" => "Controlla gli allegati e rimuovi i file che non servono più.",
     "forum_current_video_cover" => "Copertina video attuale",
     "explore" => "Esplora",
+    "add_post" => "Crea post",
 ];

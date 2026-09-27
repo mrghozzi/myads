@@ -4742,4 +4742,5 @@ return [
     "pts_amount" => "Points Value",
     "pts_positive_badge" => "Deposit",
     "pts_negative_badge" => "Deduction",
+    "add_post" => "Create Post",
 ];

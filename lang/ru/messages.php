@@ -4125,4 +4125,5 @@ return [
     "forum_attachments_tip" => "Проверьте вложения и удалите ненужные файлы.",
     "forum_current_video_cover" => "Текущая обложка видео",
     "explore" => "Обзор",
+    "add_post" => "Создать запись",
 ];
