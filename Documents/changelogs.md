@@ -10,14 +10,14 @@
 
 ### Mobile Navigation Overhaul, Floaty Bar Suppression & Context-Aware Quick Post Routing
 * **Fix**: Resolved viewport occlusion on mobile devices where legacy `.floaty-bar` (`z-index: 10000; bottom: 0`) blocked the new Glassmorphism 2.0 bottom navigation bar `.myads-mobile-bottom-nav`.
-* **Refactor**: Completely removed `@include('theme::partials.header.floaty_bar')` from [master.blade.php](file:///e:/xampp/htdocs/myads/themes/default/views/layouts/master.blade.php) and deprecated [floaty_bar.blade.php](file:///e:/xampp/htdocs/myads/themes/default/views/partials/header/floaty_bar.blade.php) to prevent unneeded database queries and DOM rendering.
-* **Style**: Enforced permanent suppression rules (`display: none !important; pointer-events: none !important; visibility: hidden !important;`) across [theme-tokens.css](file:///e:/xampp/htdocs/myads/themes/default/assets/css/theme-tokens.css), `css_d/theme-tokens.css`, `styles.css`, and `styles.min.css`.
-* **Feature**: Upgraded central Quick Post Floating Action Button (FAB) in [mobile_bottom_nav.blade.php](file:///e:/xampp/htdocs/myads/themes/default/views/partials/mobile_bottom_nav.blade.php) with smart context-aware routing:
+* **Refactor**: Completely removed `@include('theme::partials.header.floaty_bar')` from `master.blade.php` and deprecated `floaty_bar.blade.php` to prevent unneeded database queries and DOM rendering.
+* **Style**: Enforced permanent suppression rules (`display: none !important; pointer-events: none !important; visibility: hidden !important;`) across `theme-tokens.css`, `css_d/theme-tokens.css`, `styles.css`, and `styles.min.css`.
+* **Feature**: Upgraded central Quick Post Floating Action Button (FAB) in `mobile_bottom_nav.blade.php` with smart context-aware routing:
   * Automatically targets `#quick-post-box` on `/portal` (and `/`) or on the authenticated member's own profile page (`/u/{auth_username}`), executing smooth animated scrolling and autofocusing `#composer-text`.
   * Contextually redirects to `/share` when on any other member's profile page (`/u/{other_username}`) or across other sections (`/video`, `/forum`, `/messages`, etc.).
-* **Refactor**: Wrapped status composer in [profile/show.blade.php](file:///e:/xampp/htdocs/myads/themes/default/views/profile/show.blade.php) with `<div id="quick-post-box">` exclusively for the authenticated account owner (`Auth::id() == $user->id`).
+* **Refactor**: Wrapped status composer in `profile/show.blade.php` with `<div id="quick-post-box">` exclusively for the authenticated account owner (`Auth::id() == $user->id`).
 * **Localization**: Added missing `add_post` translation string across all 14 core localization dictionaries (`lang/*/messages.php`), standardizing on English source (`Create Post`) and localized Arabic (`إضافة منشور`) with zero hardcoded fallbacks.
-* **Realtime**: Added `data-notification-badge` and `data-message-unread-count` hooks with unread fallback bindings in [mobile_bottom_nav.blade.php](file:///e:/xampp/htdocs/myads/themes/default/views/partials/mobile_bottom_nav.blade.php) for live WebSocket/SSE badge count updates.
+* **Realtime**: Added `data-notification-badge` and `data-message-unread-count` hooks with unread fallback bindings in `mobile_bottom_nav.blade.php` for live WebSocket/SSE badge count updates.
 
 
 
