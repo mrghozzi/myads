@@ -76,6 +76,7 @@
         .header{display:flex;justify-content:space-between;align-items:center;width:100%;height:80px;background-color:#615dfa;position:fixed;top:0;left:0;z-index:10000}
         .header .header-actions{display:flex;align-items:center}
         .content-grid{width:100%;max-width:1184px;margin:0 auto;padding:112px 16px 100px;position:relative}
+        .floaty-bar{display:none!important}
         @media screen and (max-width: 680px){.header{height:60px}.content-grid{padding-top:80px}}
     </style>
 
@@ -262,16 +263,13 @@
             --notification-ui-card-time: #9aa4bf;
             --notification-ui-card-icon: #7f879f;
         }
-        .action-list .action-list-item.notification-trigger,
-        .floaty-bar .action-list .action-list-item.notification-trigger {
+        .action-list .action-list-item.notification-trigger {
             position: relative;
         }
-        .action-list .action-list-item.notification-trigger.unread::after,
-        .floaty-bar .action-list .action-list-item.notification-trigger.unread::after {
+        .action-list .action-list-item.notification-trigger.unread::after {
             display: none;
         }
-        .header .header-actions .header-action-count,
-        .floaty-bar .notification-action-count {
+        .header .header-actions .header-action-count {
             min-width: 20px;
             height: 20px;
             padding: 0 6px;
@@ -283,22 +281,18 @@
             line-height: 20px;
             text-align: center;
             box-shadow: var(--notification-ui-badge-shadow);
-        }
-        .header .header-actions .header-action-count {
             top: 12px;
             right: 0;
         }
-        .floaty-bar .notification-action-count {
-            position: absolute;
-            top: 7px;
-            right: 8px;
-            z-index: 2;
-        }
         .header .header-actions .header-action-count[hidden],
-        .floaty-bar .notification-action-count[hidden],
         .notification-feed-count[hidden],
         .notification-summary-button[hidden] {
             display: none !important;
+        }
+        .floaty-bar {
+            display: none !important;
+            visibility: hidden !important;
+            pointer-events: none !important;
         }
         .notification-center-banner .section-banner-text {
             margin-top: 12px;
@@ -783,7 +777,6 @@
     @include('theme::partials.header.sidemenu')
     @include('theme::partials.header.desktop_sidebar')
     @include('theme::partials.header.mobile_sidebar')
-    @include('theme::partials.header.floaty_bar')
 
     <div class="content-grid">
         @yield('content')

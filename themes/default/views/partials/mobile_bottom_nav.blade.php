@@ -1,6 +1,7 @@
 @php
-    $unreadNotifCount = (int) ($unreadNotificationsCount ?? 0);
-    $unreadMsgCount = (int) ($unreadMessagesCount ?? 0);
+    $unreadNotifCount = (int) ($unreadNotificationsCount ?? ($headerNotificationUnreadCount ?? 0));
+    $unreadMsgCount = (int) ($unreadMessagesCount ?? ($headerMessageUnreadCount ?? 0));
+    $formatNavCount = static fn (int $count): string => $count > 99 ? '99+' : (string) $count;
 @endphp
 
 <nav class="myads-mobile-bottom-nav" aria-label="Mobile Navigation">
@@ -29,12 +30,10 @@
 
     <!-- Messages / Forum -->
     @auth
-        <a href="{{ url('/messages') }}" class="myads-nav-item {{ request()->is('messages*') ? 'active' : '' }}">
+        <a href="{{ url('/messages') }}" class="myads-nav-item {{ request()->is('messages*') ? 'active' : '' }}" data-message-action-trigger>
             <i class="fa-solid fa-comment-dots"></i>
             <span>{{ __('messages.messages') ?? 'الرسائل' }}</span>
-            @if($unreadMsgCount > 0)
-                <span class="myads-nav-badge">{{ $unreadMsgCount > 99 ? '99+' : $unreadMsgCount }}</span>
-            @endif
+            <span class="myads-nav-badge" data-message-unread-count @if($unreadMsgCount === 0) hidden @endif>{{ $unreadMsgCount > 0 ? $formatNavCount($unreadMsgCount) : '' }}</span>
         </a>
     @else
         <a href="{{ url('/forum') }}" class="myads-nav-item {{ request()->is('forum*') ? 'active' : '' }}">
@@ -48,9 +47,7 @@
         <a href="{{ url('/u/' . auth()->user()->username) }}" class="myads-nav-item {{ request()->is('u/' . auth()->user()->username . '*') ? 'active' : '' }}">
             <i class="fa-solid fa-user"></i>
             <span>{{ __('messages.profile') ?? 'حسابي' }}</span>
-            @if($unreadNotifCount > 0)
-                <span class="myads-nav-badge">{{ $unreadNotifCount > 99 ? '99+' : $unreadNotifCount }}</span>
-            @endif
+            <span class="myads-nav-badge" data-notification-badge @if($unreadNotifCount === 0) hidden @endif>{{ $unreadNotifCount > 0 ? $formatNavCount($unreadNotifCount) : '' }}</span>
         </a>
     @else
         <a href="{{ route('login') }}" class="myads-nav-item {{ request()->is('login*') ? 'active' : '' }}">

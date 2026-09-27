@@ -15167,8 +15167,7 @@ figure > img {
     width: 80%;
   }
   .floaty-bar.logged-out {
-    display: -ms-flexbox;
-    display: flex;
+    display: none !important;
   }
 }
 
@@ -15200,8 +15199,7 @@ figure > img {
     display: flex;
   }
   .floaty-bar {
-    display: -ms-flexbox;
-    display: flex;
+    display: none !important;
   }
 }
 
