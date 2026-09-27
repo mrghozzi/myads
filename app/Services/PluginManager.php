@@ -401,6 +401,13 @@ class PluginManager
                                 }
                             }
                         } else {
+                            // Avoid self-referencing loopback calls to prevent cURL 28 timeouts on single-worker hosts
+                            $updateHost = parse_url($updateUrl, PHP_URL_HOST);
+                            $currentHost = request()->getHost();
+                            if ($updateHost && in_array(strtolower($updateHost), [strtolower($currentHost), 'www.' . strtolower($currentHost), str_replace('www.', '', strtolower($currentHost))], true)) {
+                                continue;
+                            }
+
                             // Standard JSON update check
                             $response = http_secure()
                                            ->connectTimeout(2)
@@ -418,7 +425,7 @@ class PluginManager
                             }
                         }
                     } catch (\Throwable $e) {
-                        Log::error("Failed to check updates for plugin {$plugin['slug']}: " . $e->getMessage());
+                        Log::warning("Failed to check updates for plugin {$plugin['slug']}: " . $e->getMessage());
                     }
                 }
 
@@ -429,6 +436,12 @@ class PluginManager
                             $adstnUrl = filter_var($adstnProduct, FILTER_VALIDATE_URL)
                                 ? $adstnProduct
                                 : 'https://www.adstn.ovh/api/marketplace/extensions/plugins';
+
+                            $targetHost = parse_url($adstnUrl, PHP_URL_HOST);
+                            $currentHost = request()->getHost();
+                            if ($targetHost && in_array(strtolower($targetHost), [strtolower($currentHost), 'www.' . strtolower($currentHost), str_replace('www.', '', strtolower($currentHost))], true)) {
+                                continue;
+                            }
 
                             $remoteSlug = filter_var($adstnProduct, FILTER_VALIDATE_URL)
                                 ? $plugin['slug']
@@ -461,7 +474,7 @@ class PluginManager
                                 }
                             }
                         } catch (\Throwable $e) {
-                            Log::error("Failed to check ADStn updates for plugin {$plugin['slug']}: " . $e->getMessage());
+                            Log::warning("Failed to check ADStn updates for plugin {$plugin['slug']}: " . $e->getMessage());
                         }
                     }
                 }

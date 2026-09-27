@@ -152,4 +152,43 @@ class AdminUsersAjaxTest extends TestCase
         // user3 must be deleted
         $this->assertDatabaseMissing('users', ['id' => 3]);
     }
+
+    public function test_users_index_page_loads_successfully(): void
+    {
+        $response = $this->actingAs($this->admin)
+            ->withSession(['security.admin_password_confirmed_at' => time()])
+            ->get(route('admin.users'));
+
+        $response->assertOk();
+    }
+
+    public function test_users_index_page_loads_when_site_admins_table_is_missing_is_active_column(): void
+    {
+        // Simulate legacy or incomplete site_admins table without is_active column
+        \Illuminate\Support\Facades\Schema::dropIfExists('site_admins');
+        \Illuminate\Support\Facades\Schema::create('site_admins', function (\Illuminate\Database\Schema\Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('user_id')->unique();
+            $table->timestamps();
+        });
+        $this->app->forgetInstance(\App\Services\V420SchemaService::class);
+
+        $response = $this->actingAs($this->admin)
+            ->withSession(['security.admin_password_confirmed_at' => time()])
+            ->get(route('admin.users'));
+
+        $response->assertOk();
+
+        // Also test filtering by role
+        $filterAdmin = $this->actingAs($this->admin)
+            ->withSession(['security.admin_password_confirmed_at' => time()])
+            ->get(route('admin.users', ['role' => 'admin']));
+        $filterAdmin->assertOk();
+
+        $filterMember = $this->actingAs($this->admin)
+            ->withSession(['security.admin_password_confirmed_at' => time()])
+            ->get(route('admin.users', ['role' => 'member']));
+        $filterMember->assertOk();
+    }
 }
+

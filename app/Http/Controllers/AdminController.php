@@ -1162,16 +1162,30 @@ class AdminController extends Controller
     {
         $query = User::select('users.*');
 
-        // Accurate Global KPI statistics
+        $schema = app(\App\Services\V420SchemaService::class);
+        $supportsSiteAdmins = $schema->supports('site_admins');
+        $hasActiveCol = $supportsSiteAdmins && $schema->hasColumn('site_admins', 'is_active');
+
+        // Accurate Global KPI statistics with resilient schema fallback
+        try {
+            $adminsCount = $supportsSiteAdmins
+                ? User::where(function($q) use ($hasActiveCol) {
+                    $q->where('id', 1);
+                    if ($hasActiveCol) {
+                        $q->orWhereHas('siteAdminEntry', fn($sub) => $sub->where('is_active', 1));
+                    }
+                })->count()
+                : User::where('id', 1)->count();
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('Failed calculating admin count in AdminController@users: ' . $e->getMessage());
+            $adminsCount = User::where('id', 1)->count();
+        }
+
         $stats = [
             'total' => User::count(),
             'online' => User::where('online', '>', time() - 240)->count(),
             'verified' => User::where('ucheck', 1)->count(),
-            'admins' => app(\App\Services\V420SchemaService::class)->supports('site_admins')
-                ? User::where(function($q) {
-                    $q->where('id', 1)->orWhereHas('siteAdminEntry', fn($sub) => $sub->where('is_active', 1));
-                })->count()
-                : User::where('id', 1)->count(),
+            'admins' => $adminsCount,
             'total_pts' => (float) User::sum('pts'),
         ];
 
@@ -1186,7 +1200,7 @@ class AdminController extends Controller
         $direction = strtolower($direction) === 'asc' ? 'asc' : 'desc';
 
         if ($sort === 'role') {
-            if (app(\App\Services\V420SchemaService::class)->supports('site_admins')) {
+            if ($supportsSiteAdmins && $schema->hasColumn('site_admins', 'user_id')) {
                 // Sort by role (super admin first, then site admins, then members)
                 $query->orderByRaw('users.id = 1 DESC')
                       ->leftJoin('site_admins', 'users.id', '=', 'site_admins.user_id')
@@ -1200,7 +1214,7 @@ class AdminController extends Controller
 
         if ($request->filled('search')) {
             $search = str_replace(['%', '_'], ['\%', '\_'], trim($request->search));
-            $hasPublicUid = app(\App\Services\V420SchemaService::class)->hasColumn('users', 'public_uid');
+            $hasPublicUid = $schema->hasColumn('users', 'public_uid');
             $query->where(function($q) use ($search, $hasPublicUid) {
                 $q->where('username', 'like', "%{$search}%")
                   ->orWhere('email', 'like', "%{$search}%");
@@ -1216,16 +1230,24 @@ class AdminController extends Controller
         if ($request->filled('role')) {
             // Filter by Role (Admin or Member)
             if ($request->role === 'admin') {
-                $query->where(function($q) {
+                $query->where(function($q) use ($supportsSiteAdmins, $hasActiveCol) {
                     $q->where('id', 1);
-                    if (app(\App\Services\V420SchemaService::class)->supports('site_admins')) {
-                        $q->orWhereHas('siteAdminEntry', fn($sub) => $sub->where('is_active', 1));
+                    if ($supportsSiteAdmins) {
+                        $q->orWhereHas('siteAdminEntry', function($sub) use ($hasActiveCol) {
+                            if ($hasActiveCol) {
+                                $sub->where('is_active', 1);
+                            }
+                        });
                     }
                 });
             } elseif ($request->role === 'member') {
                 $query->where('id', '!=', 1);
-                if (app(\App\Services\V420SchemaService::class)->supports('site_admins')) {
-                    $query->whereDoesntHave('siteAdminEntry', fn($sub) => $sub->where('is_active', 1));
+                if ($supportsSiteAdmins) {
+                    $query->whereDoesntHave('siteAdminEntry', function($sub) use ($hasActiveCol) {
+                        if ($hasActiveCol) {
+                            $sub->where('is_active', 1);
+                        }
+                    });
                 }
             }
         }

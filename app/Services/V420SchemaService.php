@@ -28,6 +28,12 @@ class V420SchemaService
         ],
     ];
 
+    public const FEATURE_COLUMNS = [
+        'site_admins' => [
+            'site_admins' => ['user_id', 'is_active'],
+        ],
+    ];
+
     private array $tableCache = [];
     private array $columnCache = [];
     private array $featureCache = [];
@@ -83,6 +89,20 @@ class V420SchemaService
             }
         }
 
+        // Auto-heal missing site_admins schema if table exists but required columns are missing
+        if ($feature === 'site_admins' && $this->hasTable('site_admins') && !$this->hasColumn('site_admins', 'is_active')) {
+            $this->ensureSiteAdminsSchema();
+        }
+
+        $requiredColumns = self::FEATURE_COLUMNS[$feature] ?? [];
+        foreach ($requiredColumns as $table => $columns) {
+            foreach ($columns as $column) {
+                if (!$this->hasColumn($table, $column)) {
+                    return $this->featureCache[$feature] = false;
+                }
+            }
+        }
+
         return $this->featureCache[$feature] = true;
     }
 
@@ -101,6 +121,52 @@ class V420SchemaService
         }
     }
 
+    public function ensureSiteAdminsSchema(): bool
+    {
+        try {
+            if (!Schema::hasTable('site_admins')) {
+                return false;
+            }
+
+            if (!Schema::hasColumn('site_admins', 'is_active')) {
+                Schema::table('site_admins', function (\Illuminate\Database\Schema\Blueprint $table) {
+                    if (!Schema::hasColumn('site_admins', 'user_id')) {
+                        $table->unsignedBigInteger('user_id')->nullable()->after('id');
+                    }
+                    if (!Schema::hasColumn('site_admins', 'is_super')) {
+                        $table->boolean('is_super')->default(false)->after('user_id');
+                    }
+                    if (!Schema::hasColumn('site_admins', 'has_full_access')) {
+                        $table->boolean('has_full_access')->default(false)->after('is_super');
+                    }
+                    if (!Schema::hasColumn('site_admins', 'permissions')) {
+                        $table->json('permissions')->nullable()->after('has_full_access');
+                    }
+                    if (!Schema::hasColumn('site_admins', 'is_active')) {
+                        $table->boolean('is_active')->default(true)->after('permissions');
+                    }
+                    if (!Schema::hasColumn('site_admins', 'created_by')) {
+                        $table->unsignedBigInteger('created_by')->nullable()->after('is_active');
+                    }
+                    if (!Schema::hasColumn('site_admins', 'created_at')) {
+                        $table->timestamp('created_at')->nullable()->after('created_by');
+                    }
+                    if (!Schema::hasColumn('site_admins', 'updated_at')) {
+                        $table->timestamp('updated_at')->nullable()->after('created_at');
+                    }
+                });
+
+                $this->columnCache = [];
+                $this->featureCache = [];
+                return true;
+            }
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('Automatic site_admins schema repair failed: ' . $e->getMessage());
+        }
+
+        return false;
+    }
+
     public function missingTablesFor(string|array $featureOrTables): array
     {
         $tables = is_array($featureOrTables)
@@ -113,10 +179,29 @@ class V420SchemaService
             ->all();
     }
 
+    public function missingColumnsFor(string $feature): array
+    {
+        $requiredColumns = self::FEATURE_COLUMNS[$feature] ?? [];
+        $missing = [];
+
+        foreach ($requiredColumns as $table => $columns) {
+            foreach ($columns as $column) {
+                if (!$this->hasColumn($table, $column)) {
+                    $missing[] = "{$table}.{$column}";
+                }
+            }
+        }
+
+        return $missing;
+    }
+
     public function notice(string|array $featureOrTables, string $featureLabel): ?array
     {
         $missingTables = $this->missingTablesFor($featureOrTables);
-        if ($missingTables === []) {
+        $missingColumns = is_string($featureOrTables) ? $this->missingColumnsFor($featureOrTables) : [];
+
+        $missingItems = array_merge($missingTables, $missingColumns);
+        if ($missingItems === []) {
             return null;
         }
 
@@ -124,9 +209,9 @@ class V420SchemaService
             'title' => __('messages.upgrade_incomplete_title'),
             'message' => __('messages.upgrade_incomplete_message', [
                 'feature' => $featureLabel,
-                'tables' => implode(', ', $missingTables),
+                'tables' => implode(', ', $missingItems),
             ]),
-            'tables' => $missingTables,
+            'tables' => $missingItems,
         ];
     }
 
