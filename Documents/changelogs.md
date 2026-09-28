@@ -19,6 +19,11 @@
 * **Localization**: Added missing `add_post` translation string across all 14 core localization dictionaries (`lang/*/messages.php`), standardizing on English source (`Create Post`) and localized Arabic (`إضافة منشور`) with zero hardcoded fallbacks.
 * **Realtime**: Added `data-notification-badge` and `data-message-unread-count` hooks with unread fallback bindings in `mobile_bottom_nav.blade.php` for live WebSocket/SSE badge count updates.
 
+### System Updates Execution & Release Session Schema Resilience
+* **Fix**: Resolved MySQL error `1406 Data too long for column 'o_valuer'` (`SQLSTATE[22001]: String data, right truncated`) in `ReleaseUpdateService::makeSession` and `saveSession`. Previously, storing full uncompacted GitHub release objects containing massive changelogs (`>68 KB`) exceeded the storage limit of `options.o_valuer`. Added `compactReleaseData` method to strip extraneous metadata and retain only essential attributes (`tag_name`, `name`, `zipball_url`, and compact `assets` array with `name`, `browser_download_url`, `size`), reducing the stored session footprint from `>68 KB` to `<2 KB`.
+* **Fix**: Placed backup acknowledgement checkboxes (`backup_ack_database` and `backup_ack_files`) inside `<form id="update-form">` in `admin_themes/default/views/admin/updates.blade.php`, ensuring form data is correctly serialized by JavaScript `FormData` during preflight and update initialization to prevent silent validation stalls.
+* **Test**: Added automated feature test `test_admin_update_compacts_large_release_notes_payload` in `UpdateSafetyFeatureTest.php` ensuring that releases with large payloads (`>100 KB`) are safely compacted and persist successfully in `options` with 100% test pass rate across the full update safety feature suite.
+
 
 
 # v4.6.0

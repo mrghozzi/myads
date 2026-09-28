@@ -233,7 +233,7 @@ class ReleaseUpdateService
             'target_version' => $latestVersion,
             'release_tag' => (string) ($releaseData['tag_name'] ?? ''),
             'release_name' => (string) ($releaseData['name'] ?? $releaseData['tag_name'] ?? ''),
-            'release_data' => $releaseData,
+            'release_data' => $this->compactReleaseData($releaseData),
             'download_url' => $downloadUrl,
             'download_size' => $this->getAssetSize($releaseData),
             'bytes_done' => 0,
@@ -1068,6 +1068,25 @@ class ReleaseUpdateService
         }
 
         return null;
+    }
+
+    private function compactReleaseData(array $releaseData): array
+    {
+        $compactAssets = [];
+        foreach ($releaseData['assets'] ?? [] as $asset) {
+            $compactAssets[] = [
+                'name' => (string) ($asset['name'] ?? ''),
+                'browser_download_url' => (string) ($asset['browser_download_url'] ?? ''),
+                'size' => isset($asset['size']) ? (int) $asset['size'] : null,
+            ];
+        }
+
+        return [
+            'tag_name' => (string) ($releaseData['tag_name'] ?? ''),
+            'name' => (string) ($releaseData['name'] ?? $releaseData['tag_name'] ?? ''),
+            'zipball_url' => (string) ($releaseData['zipball_url'] ?? ''),
+            'assets' => $compactAssets,
+        ];
     }
 
     private function createPreUpdateSnapshot(array &$session, array $incomingFiles, string $inner): void

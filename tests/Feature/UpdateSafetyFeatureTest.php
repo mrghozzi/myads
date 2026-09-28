@@ -512,4 +512,65 @@ PHP);
         $row->o_order = (int) $session['updated_at'];
         $row->save();
     }
+
+    public function test_admin_update_compacts_large_release_notes_payload(): void
+    {
+        $this->seedSiteSettings();
+
+        $admin = User::factory()->create([
+            'id' => 1,
+            'username' => 'rootsizecheck',
+        ]);
+
+        [$zipPath, $releaseRoot] = $this->makeReleaseZip('compact-release', [
+            'myads-release/storage/app/compact-marker.txt' => 'compact',
+        ]);
+
+        // Simulate huge GitHub release notes (> 100 KB)
+        $hugeChangelog = str_repeat("## Massive Changelog Feature Header\n- Feature detail and migration notice\n", 2500);
+
+        Http::fake([
+            'https://api.github.com/repos/mrghozzi/myads/releases/latest' => Http::response([
+                'tag_name' => 'v9.9.9',
+                'name' => 'v9.9.9',
+                'body' => $hugeChangelog,
+                'author' => ['login' => 'tester', 'id' => 12345],
+                'assets' => [
+                    [
+                        'name' => 'myads-update.zip',
+                        'browser_download_url' => 'https://downloads.example.test/myads-update.zip',
+                        'size' => filesize($zipPath),
+                    ],
+                ],
+            ], 200),
+            'https://downloads.example.test/myads-update.zip' => Http::response(file_get_contents($zipPath), 200, [
+                'Content-Type' => 'application/zip',
+            ]),
+        ]);
+
+        try {
+            $response = $this->actingAs($admin)->postJson(route('admin.updates.process'), [
+                'backup_ack_database' => '1',
+                'backup_ack_files' => '1',
+            ]);
+
+            $response->assertOk()->assertJsonPath('session.status', 'pending');
+            $token = $response->json('session.token');
+
+            $row = Option::where('name', $token)->first();
+            $this->assertNotNull($row);
+
+            // Stored payload must be compact (< 5 KB), well within MySQL TEXT limit (65 KB)
+            $this->assertLessThan(5000, strlen((string) $row->o_valuer));
+
+            $storedSession = json_decode((string) $row->o_valuer, true);
+            $this->assertArrayNotHasKey('body', $storedSession['release_data']);
+            $this->assertArrayNotHasKey('author', $storedSession['release_data']);
+            $this->assertSame('v9.9.9', $storedSession['release_data']['tag_name']);
+        } finally {
+            File::delete($zipPath);
+            File::deleteDirectory($releaseRoot);
+            File::deleteDirectory(storage_path('app/myads_updates'));
+        }
+    }
 }

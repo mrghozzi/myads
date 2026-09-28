@@ -499,29 +499,29 @@
                         </div>
                     </div>
 
-                    <!-- Explicit Checkboxes -->
-                    <div class="form-check mb-2">
-                        <input class="form-check-input" type="checkbox" value="1" id="backup_ack_database" name="backup_ack_database" form="update-form" {{ old('backup_ack_database') ? 'checked' : '' }}>
-                        <label class="form-check-label fw-semibold" for="backup_ack_database">
-                            {{ __('messages.backup_ack_database') ?? 'I have created a backup of the database.' }}
-                        </label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="1" id="backup_ack_files" name="backup_ack_files" form="update-form" {{ old('backup_ack_files') ? 'checked' : '' }}>
-                        <label class="form-check-label fw-semibold" for="backup_ack_files">
-                            {{ __('messages.backup_ack_files') ?? 'I have created a backup of the files.' }}
-                        </label>
-                    </div>
+                    <form action="{{ route('admin.updates.process') }}" method="POST" id="update-form">
+                        @csrf
+                        <!-- Explicit Checkboxes -->
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" value="1" id="backup_ack_database" name="backup_ack_database" required {{ old('backup_ack_database') ? 'checked' : '' }}>
+                            <label class="form-check-label fw-semibold" for="backup_ack_database">
+                                {{ __('messages.backup_ack_database') ?? 'I have created a backup of the database.' }}
+                            </label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" value="1" id="backup_ack_files" name="backup_ack_files" required {{ old('backup_ack_files') ? 'checked' : '' }}>
+                            <label class="form-check-label fw-semibold" for="backup_ack_files">
+                                {{ __('messages.backup_ack_files') ?? 'I have created a backup of the files.' }}
+                            </label>
+                        </div>
+                    </form>
                 </div>
 
                 <div class="modal-footer border-top pt-3">
                     <button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ __('messages.cancel') ?? 'Cancel' }}</button>
-                    <form action="{{ route('admin.updates.process') }}" method="POST" id="update-form">
-                        @csrf
-                        <button type="submit" class="btn btn-primary fw-bold px-4" id="btn-update" @disabled(!$preflightReport->isSafe())>
-                            <i class="feather-download me-1"></i>{{ __('messages.yes_update') }}
-                        </button>
-                    </form>
+                    <button type="submit" form="update-form" class="btn btn-primary fw-bold px-4" id="btn-update" @disabled(!$preflightReport->isSafe())>
+                        <i class="feather-download me-1"></i>{{ __('messages.yes_update') }}
+                    </button>
                 </div>
             </div>
         </div>
