@@ -17,7 +17,7 @@ class NotificationResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'title' => $this->name,
+            'title' => $this->display_name,
             'url' => $this->nurl,
             'logo' => $this->logo ? asset($this->logo) : null,
             'time' => $this->time,

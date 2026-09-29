@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\ProfileVerificationRequest;
+use App\Services\NotificationService;
 use App\Services\ProfileVerificationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -41,7 +42,7 @@ class AdminProfileVerificationController extends Controller
         return view('admin::admin.profile_verification.requests', compact('requests', 'selectedRequest', 'stats', 'status', 'search'));
     }
 
-    public function review(Request $request, ProfileVerificationRequest $verificationRequest)
+    public function review(Request $request, ProfileVerificationRequest $verificationRequest, NotificationService $notifications)
     {
         $this->ensureUserManagementAccess();
         $validated = $request->validate([
@@ -64,6 +65,19 @@ class AdminProfileVerificationController extends Controller
                 'reviewed_at' => now(),
             ]);
         });
+
+        $verificationRequest->load('user');
+        if ($verificationRequest->user) {
+            $notificationKey = $validated['decision'] === 'approved'
+                ? '@profile_verification_approved'
+                : '@profile_verification_rejected';
+            $notifications->send(
+                $verificationRequest->user,
+                $notificationKey,
+                route('profile.verification'),
+                'notification'
+            );
+        }
 
         return redirect()->route('admin.profile_verification.requests', ['status' => 'pending'])
             ->with('success', __('messages.verification_review_saved'));

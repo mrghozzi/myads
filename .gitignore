@@ -54,6 +54,7 @@ custom_variables.css
 !/tests/Feature/
 !/tests/Unit/
 /tests/Feature/*
+!/tests/Feature/ProfileVerificationTest.php
 !/tests/Unit/.gitkeep
 !/tests/Feature/SeoSystemTest.php
 !/tests/Feature/KnowledgebaseRouteCompatibilityTest.php

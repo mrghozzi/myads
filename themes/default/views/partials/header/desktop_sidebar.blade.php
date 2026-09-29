@@ -221,7 +221,7 @@
                                                     </div>
                                                 </div>
                                             </div>
-                                            <p class="user-status-title">{{ $headerNotif->name }}</p>
+                                            <p class="user-status-title">{{ $headerNotif->display_name }}</p>
                                             <p class="user-status-timestamp">{{ \Carbon\Carbon::createFromTimestamp($headerNotif->time)->diffForHumans() }}</p>
                                             <div class="user-status-icon">
                                                 <svg class="icon-{{ $headerNotif->logo ?: 'notification' }}">

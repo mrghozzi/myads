@@ -575,10 +575,15 @@ class DeveloperApiController extends Controller
             ->get();
 
         $unreadCount = \App\Models\Notification::where('uid', $user->id)->whereIn('state', [0, 3])->count();
+        $localizedNotifications = $notifications->map(function (\App\Models\Notification $notification): array {
+            $data = $notification->toArray();
+            $data['name'] = $notification->display_name;
+            return $data;
+        });
 
         return $this->successResponse([
             'unread_count' => $unreadCount,
-            'notifications' => $notifications,
+            'notifications' => $localizedNotifications,
         ]);
     }
 

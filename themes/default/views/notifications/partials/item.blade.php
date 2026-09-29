@@ -11,7 +11,7 @@
         </span>
 
         <span class="notification-card-body">
-            <span class="notification-card-title">{{ $notification->name }}</span>
+            <span class="notification-card-title">{{ $notification->display_name }}</span>
             <span class="notification-card-time">{{ \Carbon\Carbon::createFromTimestamp($notification->time)->diffForHumans() }}</span>
         </span>
 

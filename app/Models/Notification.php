@@ -21,6 +21,15 @@ class Notification extends Model
         'state',
     ];
 
+    public function getDisplayNameAttribute(): string
+    {
+        return match ($this->attributes['name'] ?? '') {
+            '@profile_verification_approved' => __('messages.profile_verification_approved'),
+            '@profile_verification_rejected' => __('messages.profile_verification_rejected'),
+            default => (string) ($this->attributes['name'] ?? ''),
+        };
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class, 'uid');

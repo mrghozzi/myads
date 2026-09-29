@@ -21,7 +21,7 @@ class NotificationController extends Controller
             return [
                 'id' => $notif->id,
                 'type' => 'general',
-                'text' => $notif->name,
+                'text' => $notif->display_name,
                 'time' => $notif->time,
                 'state' => $notif->state,
                 'is_unread' => in_array((int)$notif->state, [0, 3]),

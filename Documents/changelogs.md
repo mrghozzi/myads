@@ -5,6 +5,8 @@
 * **Add**: Added authenticated member profile-verification requests with a reason, up to five public evidence links, eligibility checks, terms acceptance, request status, reviewer notes, and rejected-request resubmission.
 * **Add**: Added administrative request review, eligibility settings, and terms management pages, protected by the existing user-management permission.
 * **Add**: Approved requests grant the existing `users.ucheck` verified badge; request records retain reviewer and decision timestamps.
+* **Add**: Added a permission-aware admin dashboard alert while verification requests are pending and member notifications when an application is approved or rejected.
+* **Add**: Verification decision notifications resolve their translation key using the recipient's active locale, with the configured English fallback for other languages.
 * **Add**: Added English source strings and Arabic translations for member and administrative verification workflows. Terms can be maintained per installed locale and fall back to English when a translation is missing.
 * **Add**: Added feature coverage for eligibility, duplicate pending requests, resubmission, admin decisions, settings, and permission enforcement.
 
