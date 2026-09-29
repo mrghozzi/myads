@@ -348,6 +348,9 @@
                                 @if($canAdmin('users'))
                                     <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.users') }}">{{ __('messages.users') }}</a></li>
                                     <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.pts_activities') }}">{{ __('messages.pts_activities') }}</a></li>
+                                    <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.profile_verification.requests') }}">{{ __('messages.verification_requests') }}</a></li>
+                                    <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.profile_verification.settings') }}">{{ __('messages.verification_settings') }}</a></li>
+                                    <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.profile_verification.terms') }}">{{ __('messages.verification_terms') }}</a></li>
                                 @endif
                                 @if($canAdmin('community'))
                                     <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.groups.index') }}">{{ __('messages.admin_groups_title') }}</a></li>

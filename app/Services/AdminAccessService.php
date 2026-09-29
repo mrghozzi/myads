@@ -84,6 +84,7 @@ class AdminAccessService
         return match (true) {
             in_array($routeName, ['admin.index', 'admin.stats'], true) => 'dashboard',
             str_starts_with($routeName, 'admin.users') => 'users',
+            str_starts_with($routeName, 'admin.profile_verification') => 'users',
             str_starts_with($routeName, 'admin.admins') => 'administrators',
             str_starts_with($routeName, 'admin.pages') => 'pages',
             str_starts_with($routeName, 'admin.seo') => 'seo',

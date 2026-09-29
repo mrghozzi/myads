@@ -453,6 +453,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/settings/privacy', [ProfileController::class, 'updatePrivacy'])->name('profile.privacy.update');
     Route::get('/settings/badges', [ProfileController::class, 'badges'])->name('profile.badges');
     Route::post('/settings/badges', [ProfileController::class, 'updateBadges'])->name('profile.badges.update');
+    Route::get('/settings/verification', [ProfileController::class, 'verification'])->name('profile.verification');
+    Route::post('/settings/verification', [ProfileController::class, 'submitVerification'])->name('profile.verification.submit');
     Route::get('/settings/social', [ProfileController::class, 'social'])->name('profile.social');
     Route::post('/settings/social', [ProfileController::class, 'updateSocial'])->name('profile.social.update');
     Route::get('/settings/sessions', [ProfileController::class, 'sessions'])->name('profile.sessions');
@@ -560,6 +562,12 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::post('/settings/mobile', [AdminController::class, 'updateMobileSettings'])->name('admin.settings.mobile.update');
     Route::get('/settings/performance', [AdminController::class, 'performanceSettings'])->name('admin.settings.performance');
     Route::post('/settings/performance', [AdminController::class, 'updatePerformanceSettings'])->name('admin.settings.performance.update');
+    Route::get('/profile-verification/requests', [App\Http\Controllers\AdminProfileVerificationController::class, 'index'])->name('admin.profile_verification.requests');
+    Route::post('/profile-verification/requests/{verificationRequest}/review', [App\Http\Controllers\AdminProfileVerificationController::class, 'review'])->name('admin.profile_verification.review');
+    Route::get('/profile-verification/settings', [App\Http\Controllers\AdminProfileVerificationController::class, 'settings'])->name('admin.profile_verification.settings');
+    Route::post('/profile-verification/settings', [App\Http\Controllers\AdminProfileVerificationController::class, 'updateSettings'])->name('admin.profile_verification.settings.update');
+    Route::get('/profile-verification/terms', [App\Http\Controllers\AdminProfileVerificationController::class, 'terms'])->name('admin.profile_verification.terms');
+    Route::post('/profile-verification/terms', [App\Http\Controllers\AdminProfileVerificationController::class, 'updateTerms'])->name('admin.profile_verification.terms.update');
     Route::get('/shared-hosting-guide', [AdminController::class, 'sharedHostingGuide'])->name('admin.shared_hosting_guide');
     Route::get('/site-health', [AdminController::class, 'siteHealth'])->name('admin.site_health');
     Route::get('/system-monitor', [AdminController::class, 'systemMonitor'])->name('admin.system_monitor');

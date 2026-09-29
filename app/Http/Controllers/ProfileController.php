@@ -9,6 +9,7 @@ use App\Models\ForumTopic;
 use App\Models\Like;
 use App\Models\Option;
 use App\Models\PointTransaction;
+use App\Models\ProfileVerificationRequest;
 use App\Models\Product;
 use App\Models\Status;
 use App\Models\User;
@@ -20,11 +21,13 @@ use App\Services\GamificationService;
 use App\Services\SecuritySessionService;
 use App\Services\StatusActivityService;
 use App\Services\UserPrivacyService;
+use App\Services\ProfileVerificationService;
 use App\Services\V420SchemaService;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -587,6 +590,58 @@ class ProfileController extends Controller
             : [];
 
         return view('theme::profile.badges', compact('user', 'earnedBadges', 'showcaseIds', 'featureAvailable', 'upgradeNotice'));
+    }
+
+    public function verification(ProfileVerificationService $verification)
+    {
+        $user = Auth::user();
+        $request = ProfileVerificationRequest::where('user_id', $user->id)->latest()->first();
+        $eligibility = $verification->eligibility($user);
+        $settings = $verification->settings();
+
+        return view('theme::profile.verification', compact('user', 'request', 'eligibility', 'settings'));
+    }
+
+    public function submitVerification(Request $request, ProfileVerificationService $verification)
+    {
+        $validated = $request->validate([
+            'reason' => ['required', 'string', 'min:20', 'max:3000'],
+            'evidence_links' => ['nullable', 'array', 'max:5'],
+            'evidence_links.*' => ['nullable', 'url', 'max:2048'],
+            'accept_terms' => ['accepted'],
+        ]);
+
+        $user = Auth::user();
+        $eligibility = $verification->eligibility($user);
+        if (!$eligibility['eligible']) {
+            return back()->withInput()->with('error', __('messages.verification_not_eligible'));
+        }
+
+        if ($user->ucheck) {
+            return back()->with('error', __('messages.verification_already_verified'));
+        }
+
+        $created = DB::transaction(function () use ($user, $validated): bool {
+            User::whereKey($user->id)->lockForUpdate()->firstOrFail();
+            if (ProfileVerificationRequest::where('user_id', $user->id)->where('status', 'pending')->exists()) {
+                return false;
+            }
+
+            ProfileVerificationRequest::create([
+                'user_id' => $user->id,
+                'reason' => $validated['reason'],
+                'evidence_links' => array_values(array_filter($validated['evidence_links'] ?? [])),
+                'status' => 'pending',
+            ]);
+
+            return true;
+        });
+
+        if (!$created) {
+            return back()->with('error', __('messages.verification_pending_exists'));
+        }
+
+        return redirect()->route('profile.verification')->with('success', __('messages.verification_request_submitted'));
     }
 
     public function updateBadges(Request $request)

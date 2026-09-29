@@ -1,6 +1,13 @@
 # v4.6.1
 > **Administrative User Management Schema Fault-Tolerance, Mobile Navigation Overhaul & Legacy Floaty Bar Removal, Context-Aware Quick Post Routing, Multi-Language Add Post Localization & Extension Update Timeout Protection Release** — Critical hotfix addressing HTTP 500 error on `/admin/users` caused by missing `is_active` column in legacy or incomplete `site_admins` database tables. Added `FEATURE_COLUMNS` verification, automatic on-the-fly table schema repair, defensive try/catch query execution with super-admin fallback, dedicated schema repair migration `2026_09_27_020000_repair_site_admins_table_schema.php`, recursive loopback self-call timeout protection in `PluginManager`, complete removal and CSS suppression of legacy `.floaty-bar` in favor of `.myads-mobile-bottom-nav`, context-aware quick-post FAB navigation (`#quick-post-box` on `/portal` and own member profile `/u/{auth_username}` with smooth focus scrolling, and fallback to `/share` elsewhere), and comprehensive 14-language dictionary additions for `messages.add_post`.
 
+### Profile Verification Requests
+* **Add**: Added authenticated member profile-verification requests with a reason, up to five public evidence links, eligibility checks, terms acceptance, request status, reviewer notes, and rejected-request resubmission.
+* **Add**: Added administrative request review, eligibility settings, and terms management pages, protected by the existing user-management permission.
+* **Add**: Approved requests grant the existing `users.ucheck` verified badge; request records retain reviewer and decision timestamps.
+* **Add**: Added English source strings and Arabic translations for member and administrative verification workflows. Terms can be maintained per installed locale and fall back to English when a translation is missing.
+* **Add**: Added feature coverage for eligibility, duplicate pending requests, resubmission, admin decisions, settings, and permission enforcement.
+
 ### Administrative User Management Schema Resilience & Fault Tolerance
 * **Fix**: Resolved HTTP `500` error on `/admin/users` caused by missing `is_active` column in legacy or incomplete `site_admins` tables (`SQLSTATE[42S22]: Column not found: 1054 Unknown column 'is_active' in 'where clause'`).
 * **Fix**: Enhanced `V420SchemaService` with `FEATURE_COLUMNS` schema validation, column presence checks (`is_active`, `user_id`), and automated on-the-fly table schema self-healing (`ensureSiteAdminsSchema()`).
