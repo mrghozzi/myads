@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🚀 MYADS v4.6.0
+# 🚀 MYADS v4.6.1
 
 ### The Ultimate Open-Source Social Network, Traffic & Ad Exchange Platform
 
@@ -10,7 +10,7 @@ Built with passion on **Laravel 12**, **PHP 8.2+**, and **Bootstrap 5 / Flutter*
 
 ---
 
-[![Release Version](https://img.shields.io/badge/Release-v4.6.0-3b82f6.svg?style=for-the-badge&logo=github)](https://github.com/mrghozzi/myads/releases)
+[![Release Version](https://img.shields.io/badge/Release-v4.6.1-3b82f6.svg?style=for-the-badge&logo=github)](https://github.com/mrghozzi/myads/releases)
 [![Laravel Version](https://img.shields.io/badge/Laravel-12.x-ff2d20.svg?style=for-the-badge&logo=laravel)](https://laravel.com)
 [![PHP Version](https://img.shields.io/badge/PHP-8.2%2B-777bb4.svg?style=for-the-badge&logo=php)](https://php.net)
 [![Flutter Mobile App](https://img.shields.io/badge/Flutter-3.27%2B-02569b.svg?style=for-the-badge&logo=flutter)](https://github.com/mrghozzi/myads_app)
@@ -160,6 +160,8 @@ graph TD
 - **Rich Text Editor Suite:** Seamless switching between **Quill.js v1.3.7** and **TinyMCE 7** (via plugin) with dark-mode parity and AJAX drag-and-drop image uploads.
 - **Real-Time Live Events Engine (`RT-04`):** Server-Sent Events (SSE) streaming (`/live/stream`) delivering instant message badges, notification toasts, and live community activity without battery-draining polling.
 - **Comprehensive Interactions:** Reactions, quote reposts, nested comments, `@mentions`, and hashtag filtering.
+- **Member Profile Verification:** Authenticated verification request workflow with eligibility checks, evidence links, reviewer audit notes, and automatic `users.ucheck` badge granting.
+- **Glassmorphism 2.0 Mobile Bottom Nav:** Ergonomic bottom navigation bar with real-time SSE badges and context-aware Quick Post FAB (smart-targeting composer or redirecting to share).
 - **Full-Featured Forum:** Categorized discussion boards, sticky topics, thread locking, moderation roles, and attachments.
 - **Gamification & Rewards:** 25+ dynamic unlockable achievement badges (Video Star, Clips Master, Audio Maestro), PTS direct transfers, voucher codes, and daily/weekly quests.
 
@@ -187,7 +189,9 @@ graph TD
 - **Modern Dark-Mode Dashboard (`/admin`):** Glassmorphic UI with single-pass SQL aggregations delivering a **95%+ reduction in load times**.
 - **Admin Advice Engine:** Rotating daily expert tips ("نصيحة اليوم للمدير") to help webmasters grow and secure their platform.
 - **Zero-Reload AJAX Extension Hub:** Activate or deactivate plugins and themes instantly with live category filter chips and dynamic counters.
-- **Automated Database Migrations:** Plugins containing database migrations automatically execute schema updates upon activation or upgrade.
+- **Automated Database Migrations & Schema Self-Healing:** Automatic on-the-fly table schema repair and defensive column inspections ensure zero crashes on legacy schemas.
+- **Verification Request Management:** Administrative review dashboard with eligibility criteria controls, customizable multilingual terms, audit logs, and instant notifications.
+- **Automated Safe Release Updater:** In-browser system upgrades with automatic release payload compaction, preflight safety verification, and zero-reload execution.
 - **Live Theme Customizer (`THEME-07`):** Interactive visual customizer adjusting brand colors, typography (Inter, Cairo, Tajawal, Roboto), surface styles, and glassmorphic blur with responsive split-screen preview.
 - **System Health Monitor:** Real-time diagnostics for table sizes, database index overhead (`OPTIMIZE TABLE`), plugin resource footprint, and selective cache pre-warming (`CacheWarmupService`).
 
