@@ -66,7 +66,8 @@ class Cloud
                 'bucket' => $disk['bucket'],
                 'url' => $disk['url'],
                 'endpoint' => $disk['endpoint'],
-                'region' => 'auto',
+                'region' => $disk['region'] ?? 'auto',
+                'credentials' => $disk['credentials'] ?? null,
                 'use_path_style_endpoint' => false,
                 'throw' => false,
                 'report' => false,
@@ -187,6 +188,7 @@ class Cloud
             'with' => [
                 'connectionString' => Cloud::socket(),
                 'persistent' => true,
+                'timeout' => 2.0,
             ],
         ]);
     }

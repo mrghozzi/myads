@@ -34,8 +34,13 @@
 * **Test**: Added automated feature test `test_admin_update_compacts_large_release_notes_payload` in `UpdateSafetyFeatureTest.php` ensuring that releases with large payloads (`>100 KB`) are safely compacted and persist successfully in `options` with 100% test pass rate across the full update safety feature suite.
 
 ### Security & Dependency Vulnerability Remediation
-* **Security**: Upgraded `phpseclib/phpseclib` from `3.0.55` to `3.0.57` in `composer.lock` to resolve Dependabot security advisory #71 (*non-constant-time X25519 scalar multiplication permits full private-key recovery*). This patch mitigates a potential side-channel timing attack vulnerability by ensuring constant-time execution during pure-PHP elliptic-curve scalar multiplication.
-* **Compatibility**: Verified seamless dependency compatibility across `laravel/socialite` and Laravel 12 core without breaking changes or regressions.
+* **Security (Dependabot Full Remediation)**: Resolved all 13 GitHub Dependabot security alerts across PHP and NPM dependencies with zero remaining vulnerabilities reported by `composer audit` and `npm audit`:
+  * **`axios` (1.18.0 => 1.20.0)**: Resolved 9 security advisories (#77, #78, #81, #82, #83, #84, #85, #86, #87) mitigating prototype pollution gadgets in `toFormData` and default instances, HTTP socket hijacking in Node adapter, fetch adapter header injection and outbound request manipulation, HTTP/2 proxy control bypass, CIDR `NO_PROXY` bypass, and redirect-based SSRF.
+  * **`league/commonmark` (2.10.0 => 2.10.3)**: Resolved 2 security advisories (#74, #75) addressing quadratic-time denial of service (DoS) in GitHub Flavored Markdown table block-start scans and disallowed raw-HTML literal boundary bypasses.
+  * **`league/flysystem` (3.34.0 => 3.36.0)**: Resolved security advisory #72 by correcting `WhitespacePathNormalizer` control-character checks against malformed UTF-8 path evasion.
+  * **`laravel/framework` (12.61.1 => 12.69.3)**: Resolved security advisory #73 addressing XSS exposure vectors in debug page error renderer information.
+  * **`phpseclib/phpseclib` (3.0.55 => 3.0.57)**: Resolved security advisory #71 (*non-constant-time X25519 scalar multiplication permits full private-key recovery*), guaranteeing constant-time execution during pure-PHP elliptic-curve operations.
+* **Compatibility & Quality Assurance**: Verified complete asset compilation (`vite build`), system diagnostics (`php artisan about`), and regression-free compatibility across all application endpoints and Laravel 12 core.
 
 
 
