@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
-        'name' => 'laravel/laravel',
+        'name' => 'mrghozzi/myads',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => 'bf95168bdca73895e2141940149e8d1b19ce73b8',
+        'reference' => 'a448510c000d9cd5cd245c967ff41684c3f3e347',
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -406,15 +406,6 @@
             'aliases' => array(),
             'dev_requirement' => false,
         ),
-        'laravel/laravel' => array(
-            'pretty_version' => 'dev-main',
-            'version' => 'dev-main',
-            'reference' => 'bf95168bdca73895e2141940149e8d1b19ce73b8',
-            'type' => 'project',
-            'install_path' => __DIR__ . '/../../',
-            'aliases' => array(),
-            'dev_requirement' => false,
-        ),
         'laravel/pail' => array(
             'pretty_version' => 'v1.2.6',
             'version' => '1.2.6.0',
@@ -577,6 +568,15 @@
             'aliases' => array(),
             'dev_requirement' => false,
         ),
+        'mrghozzi/myads' => array(
+            'pretty_version' => 'dev-main',
+            'version' => 'dev-main',
+            'reference' => 'a448510c000d9cd5cd245c967ff41684c3f3e347',
+            'type' => 'project',
+            'install_path' => __DIR__ . '/../../',
+            'aliases' => array(),
+            'dev_requirement' => false,
+        ),
         'mtdowling/cron-expression' => array(
             'dev_requirement' => false,
             'replaced' => array(
@@ -692,9 +692,9 @@
             'dev_requirement' => false,
         ),
         'phpseclib/phpseclib' => array(
-            'pretty_version' => '3.0.55',
-            'version' => '3.0.55.0',
-            'reference' => 'db9744e6d47e742b1f974e965ad49bdd041105af',
+            'pretty_version' => '3.0.57',
+            'version' => '3.0.57.0',
+            'reference' => 'd17e0ddaeaf6f22f7e007cbb437d78792fe2a0e4',
             'type' => 'library',
             'install_path' => __DIR__ . '/../phpseclib/phpseclib',
             'aliases' => array(),
