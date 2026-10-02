@@ -778,12 +778,13 @@ class StoreController extends Controller
             ->filter()
             ->values();
 
-        $products = Product::withoutGlobalScope('store')
-            ->where('o_type', 'store')
-            ->where('is_suspended', 0)
-            ->whereIn('name', $productNames)
-            ->with('user')
-            ->get();
+        $products = Product::whereIn('name', $productNames)
+            ->with(['user', 'statusOptions'])
+            ->get()
+            ->filter(function ($product) {
+                return !($product->is_suspended ?? false);
+            })
+            ->values();
 
         $articleCounts = Option::where('o_type', 'knowledgebase')
             ->where('o_order', 0)
