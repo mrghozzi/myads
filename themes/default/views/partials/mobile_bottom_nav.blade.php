@@ -16,13 +16,13 @@
     <!-- Home / Community Feed -->
     <a href="{{ url('/portal') }}" class="myads-nav-item {{ request()->is('portal*') || request()->is('/') ? 'active' : '' }}">
         <i class="fa-solid fa-house"></i>
-        <span>{{ __('messages.home') ?? 'الرئيسية' }}</span>
+        <span>{{ __('messages.home') ?? 'Home' }}</span>
     </a>
 
     <!-- Videos & Shorts Hub -->
     <a href="{{ url('/video') }}" class="myads-nav-item {{ request()->is('video*') || request()->is('clips*') ? 'active' : '' }}">
         <i class="fa-solid fa-play"></i>
-        <span>{{ __('messages.video') ?? 'فيديو' }}</span>
+        <span>{{ __('messages.video') ?? 'Video' }}</span>
     </a>
 
     <!-- Quick Post (+ FAB) -->
@@ -44,13 +44,13 @@
     @auth
         <a href="{{ url('/messages') }}" class="myads-nav-item {{ request()->is('messages*') ? 'active' : '' }}" data-message-action-trigger>
             <i class="fa-solid fa-comment-dots"></i>
-            <span>{{ __('messages.messages') ?? 'الرسائل' }}</span>
+            <span>{{ __('messages.messages') ?? 'Messages' }}</span>
             <span class="myads-nav-badge" data-message-unread-count @if($unreadMsgCount === 0) hidden @endif>{{ $unreadMsgCount > 0 ? $formatNavCount($unreadMsgCount) : '' }}</span>
         </a>
     @else
         <a href="{{ url('/forum') }}" class="myads-nav-item {{ request()->is('forum*') ? 'active' : '' }}">
             <i class="fa-solid fa-comments"></i>
-            <span>{{ __('messages.forum') ?? 'المنتدى' }}</span>
+            <span>{{ __('messages.forum') ?? 'Forum' }}</span>
         </a>
     @endauth
 
@@ -58,13 +58,13 @@
     @auth
         <a href="{{ url('/u/' . auth()->user()->username) }}" class="myads-nav-item {{ request()->is('u/' . auth()->user()->username . '*') ? 'active' : '' }}">
             <i class="fa-solid fa-user"></i>
-            <span>{{ __('messages.profile') ?? 'حسابي' }}</span>
+            <span>{{ __('messages.profile') ?? 'Profile' }}</span>
             <span class="myads-nav-badge" data-notification-badge @if($unreadNotifCount === 0) hidden @endif>{{ $unreadNotifCount > 0 ? $formatNavCount($unreadNotifCount) : '' }}</span>
         </a>
     @else
         <a href="{{ route('login') }}" class="myads-nav-item {{ request()->is('login*') ? 'active' : '' }}">
             <i class="fa-solid fa-user-lock"></i>
-            <span>{{ __('messages.login') ?? 'دخول' }}</span>
+            <span>{{ __('messages.login') ?? 'Login' }}</span>
         </a>
     @endauth
 </nav>
