@@ -4841,4 +4841,17 @@ return [
     "kb_back_to_docs" => "Back to Knowledgebase",
     "kb_all_products" => "All Products",
     "kb_contributors" => "Contributors",
+    "previous" => "Previous",
+    "next" => "Next",
+    "pending_revisions" => "Pending Revisions",
+    "kb_pending_desc" => "Review submissions proposed by contributors. Compare side-by-side diffs and safely approve or decline them.",
+    "kb_no_pending_revisions" => "No pending community revisions awaiting review.",
+    "submitted" => "Submitted",
+    "all_articles" => "All Articles",
+    "kb_approve" => "Approve",
+    "kb_reject" => "Reject",
+    "kb_diff_guide" => "Red lines (-) represent current content; Green lines (+) represent proposed contributor edits.",
+    "please_select_an_entry" => "Please select an entry.",
+    "reading_time" => "Reading Time",
 ];
+
