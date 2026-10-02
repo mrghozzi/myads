@@ -12,9 +12,10 @@
   * Implemented article voting endpoint (`StoreController@knowledgebaseFeedback`) allowing readers to vote whether an article was helpful.
   * Persisted feedback records within the existing `options` table (`o_type = 'kb_feedback'`, `o_mode = article_id`, `name = voter_identifier`) with zero schema alterations or database migrations.
   * Added instant feedback UI with live counters and immediate visual state transitions.
-* **Client-Side Rendering Security & FOUC Elimination**:
-  * Encapsulated raw Markdown content inside `<template class="kb-source-markdown">` tags, completely eliminating raw unparsed HTML flash-of-unstyled-content (FOUC) and preventing browser-level premature HTML injection.
-  * Client-side sanitization powered by `DOMPurify` paired with `marked.js` and server-side regex sanitization in `StoreController` removing script tags, inline frames, and malicious event handlers while preserving formatted code windows, Mermaid diagrams, and typography tokens.
+* **Client-Side Rendering Security & Script Breakout Immunity**:
+  * Encapsulated raw Markdown content and diff/revision templates inside `<script type="application/json">` payloads with strict JSON HEX escaping (`JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE`), completely preventing code examples containing closing tags (such as `</script>`) from prematurely terminating HTML script tags and leaking raw unparsed markdown into the visible page layout.
+  * Added resilient multi-format DOM payload parser (`getRawPayload()`) supporting JSON scripts, templates, and raw fallback with 100% fidelity for Unicode and code blocks.
+  * Client-side sanitization powered by `DOMPurify` paired with `marked.js` and server-side regex sanitization in `StoreController` removing dangerous script tags, inline frames, and malicious event handlers while preserving formatted code windows, Mermaid diagrams, and typography tokens.
 * **Sticky Table of Contents (TOC) & Reading Time**:
   * Added automatic reading time calculation displayed in article headers (`X min read`).
   * Implemented dynamic sticky Table of Contents (`#kb-toc-container`) generating heading links (`H1`-`H4`) with scrollspy observer automatically highlighting the active section during reading.

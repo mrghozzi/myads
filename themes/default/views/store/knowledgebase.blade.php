@@ -713,7 +713,7 @@
 
                     <!-- Article Body with Safe Template Hydration to prevent XSS & blank screen -->
                     <div class="kb-article-body markdown-content" id="kb-content-{{ $article->id }}" data-rendered="false">
-                        <template class="kb-source-markdown">{!! htmlspecialchars($processedContent ?? $article->o_valuer, ENT_NOQUOTES, 'UTF-8') !!}</template>
+                        <script type="application/json" class="kb-source-markdown">{!! json_encode((string)($processedContent ?? $article->o_valuer), JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE) !!}</script>
                         <div class="kb-skeleton-loader" style="padding: 10px 0;">
                             <div style="height: 20px; background: rgba(143,145,172,0.1); border-radius: 6px; width: 45%; margin-bottom: 14px;"></div>
                             <div style="height: 14px; background: rgba(143,145,172,0.08); border-radius: 6px; width: 90%; margin-bottom: 8px;"></div>
@@ -876,7 +876,7 @@
                                                                         title="{{ __('messages.kb_view_diff') }}">
                                                                     <i class="fa fa-exchange"></i>
                                                                 </button>
-                                                                <script type="text/template" id="entry-raw-{{ $entry->id }}">{!! $entry->o_valuer !!}</script>
+                                                                <script type="application/json" id="entry-raw-{{ $entry->id }}">{!! json_encode((string)$entry->o_valuer, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE) !!}</script>
                                                             </div>
                                                             <span style="font-size: 10px; color: var(--store-shell-muted);">{{ \Illuminate\Support\Str::limit(strip_tags((string)$entry->o_valuer), 40) }}</span>
                                                         </div>
@@ -941,7 +941,7 @@
 
 <!-- Raw template of the current article for client diff comparison -->
 @if(isset($article))
-    <script type="text/template" id="current-article-raw">{!! $article->o_valuer !!}</script>
+    <script type="application/json" id="current-article-raw">{!! json_encode((string)$article->o_valuer, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE) !!}</script>
 @endif
 
 @push('scripts')
@@ -951,13 +951,32 @@
 <script>
 (function() {
     function initKB() {
+        // Safe Content Parser for application/json, template, or raw elements
+        function getRawPayload(el) {
+            if (!el) return '';
+            if (el.tagName === 'SCRIPT' && (el.type === 'application/json' || el.type === 'text/template')) {
+                if (el.type === 'application/json') {
+                    try {
+                        return JSON.parse(el.textContent);
+                    } catch (e) {
+                        return el.textContent || '';
+                    }
+                }
+                return el.innerHTML || el.textContent || '';
+            }
+            if (el.tagName === 'TEMPLATE') {
+                return el.content && el.content.textContent ? el.content.textContent : (el.innerHTML || '');
+            }
+            return el.innerText || el.textContent || el.innerHTML || '';
+        }
+
         // Safe Markdown Rendering
         const renderMarkdown = () => {
             document.querySelectorAll('.markdown-content').forEach(el => {
                 if (el.getAttribute('data-rendered') !== 'true') {
                     try {
                         const template = el.querySelector('.kb-source-markdown');
-                        const rawText = template ? template.innerHTML : (el.innerText || el.innerHTML);
+                        const rawText = template ? getRawPayload(template) : (el.innerText || el.innerHTML);
                         const cleanHtml = DOMPurify.sanitize(marked.parse(rawText));
                         el.innerHTML = cleanHtml;
                         el.setAttribute('data-rendered', 'true');
@@ -1195,7 +1214,7 @@
 
         // Visual Diff Engine & Pending/History Review Actions
         const currentRawEl = document.getElementById('current-article-raw');
-        const currentRawText = currentRawEl ? currentRawEl.innerHTML : '';
+        const currentRawText = getRawPayload(currentRawEl);
         const diffBtn = document.getElementById('view-mode-diff');
         const previewBtn = document.getElementById('view-mode-preview');
         const ajaxPreviewBox = document.getElementById('kb-ajax-preview-content');
@@ -1249,7 +1268,7 @@
                 const rawTemplate = document.getElementById('entry-raw-' + id);
                 if (!rawTemplate) return;
 
-                activeEntryRaw = rawTemplate.innerHTML;
+                activeEntryRaw = getRawPayload(rawTemplate);
                 const title = btn.getAttribute('data-entry-title') || ('#' + id);
 
                 document.getElementById('ajax-preview-title').innerText = title;
