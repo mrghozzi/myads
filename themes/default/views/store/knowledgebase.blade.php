@@ -270,6 +270,77 @@
         color: #fff;
         border-color: var(--store-shell-accent);
     }
+
+    /* Category Filter Card & Superdesign Pills */
+    .kb-category-filter {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+    }
+    .kb-category-filter__label {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.82rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: var(--store-shell-muted, #8f94b5);
+    }
+    .kb-category-filter__label i {
+        color: var(--store-shell-accent, #615dfa);
+        font-size: 0.95rem;
+    }
+    .kb-category-filter__pills {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 8px 10px;
+    }
+    .kb-category-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 18px;
+        border-radius: 9999px;
+        font-size: 0.86rem;
+        font-weight: 600;
+        line-height: 1.2;
+        color: var(--store-shell-text, #5d607a);
+        background: var(--store-shell-soft, #f7f8fd);
+        border: 1px solid var(--store-shell-border, rgba(143, 145, 172, 0.22));
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        text-decoration: none !important;
+        cursor: pointer;
+        user-select: none;
+    }
+    .kb-category-pill i {
+        font-size: 0.85rem;
+        color: var(--store-shell-muted, #8f94b5);
+        transition: color 0.15s ease;
+    }
+    .kb-category-pill:hover {
+        color: var(--store-shell-accent, #615dfa);
+        background: var(--store-shell-accent-soft, rgba(97, 93, 250, 0.1));
+        border-color: var(--store-shell-accent, #615dfa);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(97, 93, 250, 0.16);
+    }
+    .kb-category-pill:hover i {
+        color: var(--store-shell-accent, #615dfa);
+    }
+    .kb-category-pill.active {
+        color: #ffffff !important;
+        background: linear-gradient(135deg, var(--store-shell-accent, #615dfa), #4e4ac8);
+        border-color: transparent;
+        box-shadow: 0 4px 14px rgba(97, 93, 250, 0.35);
+        font-weight: 700;
+        transform: translateY(-1px);
+    }
+    .kb-category-pill.active i {
+        color: #ffffff;
+    }
 </style>
 
 <div class="section-header">
@@ -385,15 +456,27 @@
             <div class="kb-empty-state">{{ __('messages.no_post') }}</div>
         @else
             @if($kbCategories->isNotEmpty())
-                <div class="widget-box kb-helper-card" style="padding: 16px 20px;">
+                <div class="widget-box kb-helper-card" style="padding: 18px 22px; border-radius: 18px; margin-bottom: 24px;">
                     <div class="kb-category-filter">
-                        <span class="kb-category-filter__label"><i class="fa fa-filter" aria-hidden="true"></i>&nbsp;{{ __('messages.kb_filter_by_category') }}:</span>
+                        <div class="kb-category-filter__label">
+                            <i class="fa fa-filter" aria-hidden="true"></i>
+                            <span>{{ __('messages.kb_filter_by_category') }}</span>
+                        </div>
                         <div class="kb-category-filter__pills">
-                            <a class="kb-category-pill {{ !$selectedCategory ? 'active' : '' }}" href="{{ route('kb.index', $product->name) }}">{{ __('messages.kb_all_categories') }}</a>
+                            <a class="kb-category-pill {{ !$selectedCategory ? 'active' : '' }}" href="{{ route('kb.index', $product->name) }}">
+                                <i class="fa fa-th-large" aria-hidden="true"></i>
+                                <span>{{ __('messages.kb_all_categories') }}</span>
+                            </a>
                             @foreach($kbCategories as $cat)
-                                <a class="kb-category-pill {{ $selectedCategory == $cat->id ? 'active' : '' }}" href="{{ route('kb.index', $product->name) }}?category={{ $cat->id }}">{{ $cat->name }}</a>
+                                <a class="kb-category-pill {{ $selectedCategory == $cat->id ? 'active' : '' }}" href="{{ route('kb.index', $product->name) }}?category={{ $cat->id }}">
+                                    <i class="fa fa-folder-o" aria-hidden="true"></i>
+                                    <span>{{ $cat->name }}</span>
+                                </a>
                             @endforeach
-                            <a class="kb-category-pill {{ $selectedCategory === 'uncategorized' ? 'active' : '' }}" href="{{ route('kb.index', $product->name) }}?category=uncategorized">{{ __('messages.kb_no_category') }}</a>
+                            <a class="kb-category-pill {{ $selectedCategory === 'uncategorized' ? 'active' : '' }}" href="{{ route('kb.index', $product->name) }}?category=uncategorized">
+                                <i class="fa fa-tag" aria-hidden="true"></i>
+                                <span>{{ __('messages.kb_no_category') }}</span>
+                            </a>
                         </div>
                     </div>
                 </div>
