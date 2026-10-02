@@ -26,7 +26,7 @@
     $shellSummary = $currentArticle
         ? \Illuminate\Support\Str::limit(strip_tags((string) $currentArticle->o_valuer), 240)
         : \Illuminate\Support\Str::limit((string) $product->o_valuer, 240);
-    $newTopicUrl = route('kb.index', $product->name) . '#kb-new-topic';
+    $newTopicUrl = route('kb.create', $product->name);
 @endphp
 
 @include('theme::store.partials.page-shell-styles')
@@ -479,7 +479,7 @@
     @endif
 
     @if($mode === 'create' || $mode === 'edit')
-        <div class="kb-editor-layout">
+        <div class="kb-editor-layout" id="kb-new-topic">
             <div class="widget-box kb-form-card">
                 <div class="d-flex align-items-center justify-content-between mb-3">
                     <p class="widget-box-title mb-0">{{ $mode === 'edit' ? ($canManageCurrentArticle ? __('messages.edit_topic') : __('messages.suggest_edit')) : __('messages.add') . ' ' . __('messages.topic') }}</p>
@@ -1253,6 +1253,18 @@
             captcha.addEventListener('click', function () {
                 this.src = '{{ route('kb.captcha') }}?t=' + Date.now();
             });
+        }
+
+        // Auto-handle #kb-new-topic hash navigation
+        if (window.location.hash === '#kb-new-topic') {
+            if ('{{ $mode }}' !== 'create') {
+                window.location.href = '{{ route("kb.create", $product->name) }}';
+            } else {
+                const targetEl = document.getElementById('kb-new-topic');
+                if (targetEl) {
+                    targetEl.scrollIntoView({ behavior: 'smooth' });
+                }
+            }
         }
     }
 

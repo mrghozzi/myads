@@ -1098,6 +1098,10 @@ class StoreController extends Controller
             ],
         ]);
 
+        if ($request->has('create')) {
+            return $this->knowledgebaseCreate($request, $name);
+        }
+
         if ($articleName) {
             $exists = Option::where('o_type', 'knowledgebase')
                 ->where('o_mode', $product->name)
@@ -1130,6 +1134,74 @@ class StoreController extends Controller
             'kbCategories' => $kbCategories,
             'selectedCategory' => $selectedCategory,
             'searchQuery' => $searchQuery,
+        ] + $shellData);
+    }
+
+    public function knowledgebaseCreate(Request $request, $name)
+    {
+        if (!Auth::check()) {
+            return redirect()->guest(route('login'))->with('error', __('messages.login_required') ?? 'Please login to add a topic.');
+        }
+
+        $product = $this->findKnowledgebaseProduct($name);
+
+        $kbCategories = collect();
+        try {
+            $kbCategories = KbCategory::orderBy('sort_order')->orderBy('name')->get();
+        } catch (\Throwable $e) {
+            $kbCategories = collect();
+        }
+
+        $articles = Option::where('o_type', 'knowledgebase')
+            ->where('o_mode', $product->name)
+            ->where('o_order', 0)
+            ->with('kbCategory')
+            ->orderByDesc('id')
+            ->paginate(12)
+            ->withQueryString();
+
+        $pendingCounts = Option::where('o_type', 'knowledgebase')
+            ->where('o_mode', $product->name)
+            ->where('o_order', 1)
+            ->selectRaw('name, COUNT(*) as total')
+            ->groupBy('name')
+            ->pluck('total', 'name');
+
+        $articleAuthors = User::whereIn('id', $articles->pluck('o_parent')->filter()->unique())
+            ->get()
+            ->keyBy('id');
+
+        $shellData = $this->buildKnowledgebaseShellData($product);
+        $articleName = $request->query('st') ?? old('name', '');
+
+        $this->seo([
+            'scope_key' => 'kb_create',
+            'content_type' => 'product',
+            'content_id' => $product->id,
+            'resource_title' => __('messages.add') . ' ' . __('messages.topic') . ' - ' . $product->name,
+            'description' => Str::limit(strip_tags((string) $product->o_valuer), 170, '') ?: __('messages.seo_kb_description', ['product' => $product->name]),
+            'image' => $product->product_image,
+            'indexable' => false,
+            'breadcrumbs' => [
+                ['name' => __('messages.home'), 'url' => url('/')],
+                ['name' => __('messages.store'), 'url' => route('store.index')],
+                ['name' => $product->name, 'url' => route('store.show', $product->name)],
+                ['name' => __('messages.knowledgebase'), 'url' => route('kb.index', $product->name)],
+                ['name' => __('messages.add') . ' ' . __('messages.topic'), 'url' => route('kb.create', $product->name)],
+            ],
+        ]);
+
+        return view('theme::store.knowledgebase', [
+            'product' => $product,
+            'mode' => 'create',
+            'articles' => $articles,
+            'pendingCounts' => $pendingCounts,
+            'articleAuthors' => $articleAuthors,
+            'articleName' => $articleName,
+            'editorText' => old('txt'),
+            'kbCategories' => $kbCategories,
+            'selectedCategory' => null,
+            'searchQuery' => '',
         ] + $shellData);
     }
 

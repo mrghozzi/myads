@@ -439,6 +439,7 @@ Route::post('/kb/community/publish', [StoreController::class, 'knowledgebasePubl
 Route::post('/kb/community/delete', [StoreController::class, 'knowledgebaseDeleteCommunityPost'])->name('kb.community.delete')->middleware('auth');
 Route::get('/kb/{name}/search', [StoreController::class, 'knowledgebaseSearch'])->name('kb.search')->where('name', '[^/:]+');
 Route::post('/kb/{name}/feedback', [StoreController::class, 'knowledgebaseFeedback'])->name('kb.feedback')->where('name', '[^/:]+');
+Route::get('/kb/{name}/create', [StoreController::class, 'knowledgebaseCreate'])->name('kb.create')->where('name', '[^/:]+');
 Route::get('/kb/{name}/{article}/edit', [StoreController::class, 'knowledgebaseEdit'])->name('kb.edit.clean')->where('name', '[^/:]+')->where('article', '[^/:]+');
 Route::get('/kb/{name}/{article}/pending', [StoreController::class, 'knowledgebasePending'])->name('kb.pending.clean')->where('name', '[^/:]+')->where('article', '[^/:]+');
 Route::get('/kb/{name}/{article}/history', [StoreController::class, 'knowledgebaseHistory'])->name('kb.history.clean')->where('name', '[^/:]+')->where('article', '[^/:]+');
