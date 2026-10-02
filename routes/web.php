@@ -430,11 +430,19 @@ Route::get('/store', [StoreController::class, 'index'])->name('store.index');
 Route::get('/store/{script}/{category}', [StoreController::class, 'index'])->name('store.script_category');
 Route::get('/store/{name}', [StoreController::class, 'show'])->name('store.show');
 Route::get('/download/{hash}', [StoreController::class, 'downloadByHash'])->name('store.download.hash');
+Route::get('/kb', [StoreController::class, 'knowledgebasePortal'])->name('kb.portal');
 Route::get('/kb/captcha', [StoreController::class, 'knowledgebaseCaptcha'])->name('kb.captcha');
 Route::post('/kb/store', [StoreController::class, 'knowledgebaseStore'])->name('kb.store')->middleware(['auth', 'throttle:10,1']);
 Route::post('/kb/approve', [StoreController::class, 'knowledgebaseApprove'])->name('kb.approve')->middleware(['auth', 'throttle:10,1']);
+Route::post('/kb/reject', [StoreController::class, 'knowledgebaseReject'])->name('kb.reject')->middleware(['auth', 'throttle:10,1']);
 Route::post('/kb/community/publish', [StoreController::class, 'knowledgebasePublishToCommunity'])->name('kb.community.publish')->middleware('auth');
 Route::post('/kb/community/delete', [StoreController::class, 'knowledgebaseDeleteCommunityPost'])->name('kb.community.delete')->middleware('auth');
+Route::get('/kb/{name}/search', [StoreController::class, 'knowledgebaseSearch'])->name('kb.search')->where('name', '[^/:]+');
+Route::post('/kb/{name}/feedback', [StoreController::class, 'knowledgebaseFeedback'])->name('kb.feedback')->where('name', '[^/:]+');
+Route::get('/kb/{name}/{article}/edit', [StoreController::class, 'knowledgebaseEdit'])->name('kb.edit.clean')->where('name', '[^/:]+')->where('article', '[^/:]+');
+Route::get('/kb/{name}/{article}/pending', [StoreController::class, 'knowledgebasePending'])->name('kb.pending.clean')->where('name', '[^/:]+')->where('article', '[^/:]+');
+Route::get('/kb/{name}/{article}/history', [StoreController::class, 'knowledgebaseHistory'])->name('kb.history.clean')->where('name', '[^/:]+')->where('article', '[^/:]+');
+Route::get('/kb/{name}/{article}', [StoreController::class, 'knowledgebaseShow'])->name('kb.show.clean')->where('name', '[^/:]+')->where('article', '[^/:]+');
 Route::get('/kb/{name}:{article}', [StoreController::class, 'knowledgebaseShow'])->name('kb.show')->where('name', '[^/:]+');
 Route::get('/edk/{name}:{article}', [StoreController::class, 'knowledgebaseEdit'])->name('kb.edit')->where('name', '[^/:]+');
 Route::get('/pgk/{name}:{article}', [StoreController::class, 'knowledgebasePending'])->name('kb.pending')->where('name', '[^/:]+');
@@ -728,6 +736,10 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::post('/knowledgebase', [AdminController::class, 'storeKnowledgebase'])->name('admin.knowledgebase.store');
     Route::post('/knowledgebase/{id}', [AdminController::class, 'updateKnowledgebase'])->name('admin.knowledgebase.update');
     Route::delete('/knowledgebase/{id}', [AdminController::class, 'deleteKnowledgebase'])->name('admin.knowledgebase.delete');
+    Route::post('/knowledgebase/approve-pending/{id}', [AdminController::class, 'approvePendingKnowledgebase'])->name('admin.knowledgebase.approve_pending');
+    Route::post('/knowledgebase/reject-pending/{id}', [AdminController::class, 'rejectPendingKnowledgebase'])->name('admin.knowledgebase.reject_pending');
+    Route::get('/knowledgebase/article-preview/{id}', [AdminController::class, 'previewKnowledgebaseArticle'])->name('admin.knowledgebase.preview');
+    Route::get('/knowledgebase/diff/{id}', [AdminController::class, 'diffKnowledgebaseArticle'])->name('admin.knowledgebase.diff');
 
     // KB Categories
     Route::get('/kb/categories', [AdminController::class, 'kbCategories'])->name('admin.kb_categories');

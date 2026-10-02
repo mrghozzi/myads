@@ -1,5 +1,41 @@
 # v4.6.1
-> **Administrative User Management Schema Fault-Tolerance, Mobile Navigation Overhaul & Legacy Floaty Bar Removal, Context-Aware Quick Post Routing, Multi-Language Add Post Localization, Extension Update Timeout Protection & Security Vulnerability Remediation Release** — Critical hotfix addressing HTTP 500 error on `/admin/users` caused by missing `is_active` column in legacy or incomplete `site_admins` database tables. Added `FEATURE_COLUMNS` verification, automatic on-the-fly table schema repair, defensive try/catch query execution with super-admin fallback, dedicated schema repair migration `2026_09_27_020000_repair_site_admins_table_schema.php`, recursive loopback self-call timeout protection in `PluginManager`, complete removal and CSS suppression of legacy `.floaty-bar` in favor of `.myads-mobile-bottom-nav`, context-aware quick-post FAB navigation (`#quick-post-box` on `/portal` and own member profile `/u/{auth_username}` with smooth focus scrolling, and fallback to `/share` elsewhere), comprehensive 14-language dictionary additions for `messages.add_post`, and patched Dependabot security advisory #71 by upgrading `phpseclib/phpseclib` to `3.0.57`.
+> **Administrative User Management Schema Fault-Tolerance, Mobile Navigation Overhaul & Legacy Floaty Bar Removal, Context-Aware Quick Post Routing, Multi-Language Add Post Localization, Knowledge Base (/kb/*) & Administrative Moderation Modernization Suite, Extension Update Timeout Protection & Security Vulnerability Remediation Release** — Critical hotfix addressing HTTP 500 error on `/admin/users` caused by missing `is_active` column in legacy or incomplete `site_admins` database tables. Added `FEATURE_COLUMNS` verification, automatic on-the-fly table schema repair, defensive try/catch query execution with super-admin fallback, dedicated schema repair migration `2026_09_27_020000_repair_site_admins_table_schema.php`, recursive loopback self-call timeout protection in `PluginManager`, complete removal and CSS suppression of legacy `.floaty-bar` in favor of `.myads-mobile-bottom-nav`, context-aware quick-post FAB navigation (`#quick-post-box` on `/portal` and own member profile `/u/{auth_username}` with smooth focus scrolling, and fallback to `/share` elsewhere), comprehensive 14-language dictionary additions for `messages.add_post`, and patched Dependabot security advisory #71 by upgrading `phpseclib/phpseclib` to `3.0.57`.
+
+### Knowledge Base (/kb/*) & Administrative Moderation Modernization Suite
+* **Knowledge Base Global Portal (`/kb`)**:
+  * Implemented a dedicated platform-wide Knowledge Base Portal landing page (`/kb`, `StoreController@knowledgebasePortal`, `knowledgebase_portal.blade.php`) presenting searchable documentation for all digital products, platform-wide metrics (total articles, documented products, contributors), recent updates, and category exploration.
+  * Preserved full responsiveness and glassmorphic cards according to `.superdesign` design tokens.
+* **Fast Debounced Real-Time AJAX Search (`/kb/{name}/search`)**:
+  * Implemented dedicated AJAX search endpoint (`StoreController@knowledgebaseSearch`) returning JSON structure with matching article IDs, titles, snippets, categories, and direct URLs.
+  * Added live debounced search input with dynamic dropdown suggestions and instant in-page topic card filtering without full page reloads.
+* **Interactive Helpful / Unhelpful Feedback System (`/kb/{name}/feedback`)**:
+  * Implemented article voting endpoint (`StoreController@knowledgebaseFeedback`) allowing readers to vote whether an article was helpful.
+  * Persisted feedback records within the existing `options` table (`o_type = 'kb_feedback'`, `o_mode = article_id`, `name = voter_identifier`) with zero schema alterations or database migrations.
+  * Added instant feedback UI with live counters and immediate visual state transitions.
+* **Client-Side Rendering Security & FOUC Elimination**:
+  * Encapsulated raw Markdown content inside `<template class="kb-source-markdown">` tags, completely eliminating raw unparsed HTML flash-of-unstyled-content (FOUC) and preventing browser-level premature HTML injection.
+  * Client-side sanitization powered by `DOMPurify` paired with `marked.js` and server-side regex sanitization in `StoreController` removing script tags, inline frames, and malicious event handlers while preserving formatted code windows, Mermaid diagrams, and typography tokens.
+* **Sticky Table of Contents (TOC) & Reading Time**:
+  * Added automatic reading time calculation displayed in article headers (`X min read`).
+  * Implemented dynamic sticky Table of Contents (`#kb-toc-container`) generating heading links (`H1`-`H4`) with scrollspy observer automatically highlighting the active section during reading.
+  * Added sibling article navigation cards (Previous / Next article shortcuts).
+* **Live Markdown Editor Tabs & Visual Line-by-Line Diff Viewer**:
+  * Enhanced topic authoring with tabbed mode switching: "Write", "Split View", and "Live Preview", alongside StackEdit modal integration.
+  * Created visual color-coded Diff viewer comparing pending contributor revisions with currently published articles, clearly delineating additions (green with `+`) and removals (red with `-`).
+* **Clean RESTful Routing & Non-Destructive Rejection**:
+  * Introduced clean RESTful URL aliases (`/kb/{name}/{article}`, `/kb/{name}/{article}/edit`, `/kb/{name}/{article}/pending`, `/kb/{name}/{article}/history`) while maintaining 100% backward compatibility for all legacy colon routes (`/kb/{name}:{article}`, `/edk/`, `/pgk/`, `/hkd/`).
+  * Upgraded suggestion review to mark rejected entries as `o_order = 3` in `options` table rather than hard-deleting them, providing audit trail history and non-destructive management.
+* **Overhauled Administrative Knowledge Base Moderation Dashboard (`/admin/knowledgebase`)**:
+  * Modernized the administrative interface with `.superdesign` cards and top KPIs: Total Articles, Pending Community Revisions, Product Store Categories, and Taxonomy Categories.
+  * Structured dashboard into 3 responsive tabs: "All Articles", "Pending Community Revisions", and "Documentation Structure".
+  * Integrated real-time debounced AJAX search and category filtering for administrative article management.
+  * Added dedicated moderation endpoints: Article Preview (`/admin/knowledgebase/article-preview/{id}`), Article Diff (`/admin/knowledgebase/diff/{id}`), One-Click Approve (`/admin/knowledgebase/approve-pending/{id}`), and One-Click Reject (`/admin/knowledgebase/reject-pending/{id}`).
+* **Taxonomy Category Management Overhaul (`/admin/kb/categories`)**:
+  * Modernized `/admin/kb/categories` with instant client-side search filtering, responsive category cards, and zero-reload AJAX create, update, and delete actions with instant DOM reconciliation and floating toast alerts.
+* **Full Multilingual Localization**:
+  * Added comprehensive localization dictionaries across `lang/en/messages.php` and `lang/ar/messages.php` for all new features, alerts, buttons, placeholders, and tooltips with zero hardcoded strings.
+* **Automated Test Coverage**:
+  * Created dedicated test suite `tests/Feature/KnowledgebaseModernizationTest.php` covering the portal, AJAX search, feedback voting, clean route compatibility, and administrative moderation flows (diff, preview, approval, and rejection), alongside 100% pass rate across existing suites `KnowledgebaseRouteCompatibilityTest.php` and `StoreProductKnowledgebaseUiTest.php` (28 tests, 173 assertions).
 
 ### Profile Verification Requests
 * **Add**: Added authenticated member profile-verification requests with a reason, up to five public evidence links, eligibility checks, terms acceptance, request status, reviewer notes, and rejected-request resubmission.

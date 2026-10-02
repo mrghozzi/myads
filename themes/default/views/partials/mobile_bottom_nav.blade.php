@@ -9,7 +9,7 @@
         request()->is('u/' . auth()->user()->username . '/*')
     );
     $hasQuickPostOnPage = auth()->check() && (request()->is('portal*') || request()->is('/') || $isOwnProfile);
-    $quickPostTarget = $hasQuickPostOnPage ? '#quick-post-box' : url('/share');
+    $quickPostTarget = $hasQuickPostOnPage ? '#quick-post-box' : '/share';
 @endphp
 
 <nav class="myads-mobile-bottom-nav" aria-label="Mobile Navigation">
@@ -90,7 +90,7 @@
                     }
                 } else if (quickPostBtn.getAttribute('href') === '#quick-post-box') {
                     e.preventDefault();
-                    window.location.href = '{{ url('/share') }}';
+                    window.location.href = '/share';
                 }
             });
         }

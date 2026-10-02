@@ -756,6 +756,228 @@ class StoreController extends Controller
         );
     }
 
+    private function sanitizeArticleContent(string $content): string
+    {
+        // Remove dangerous script, iframe, object, embed, applet tags and their content
+        $cleaned = preg_replace('/<\s*(script|style|iframe|object|embed|applet)[^>]*>.*?<\s*\/\s*\1\s*>/is', '', $content);
+        $cleaned = preg_replace('/<\s*(script|style|iframe|object|embed|applet)[^>]*>/is', '', $cleaned);
+        // Remove inline event handlers (onerror, onload, onclick, onmouseover, etc.)
+        $cleaned = preg_replace('/\s*on[a-z]+\s*=\s*(["\'][^"\']*["\']|[^\s>]+)/i', '', $cleaned);
+        // Remove javascript: and vbscript: pseudoprotocols
+        $cleaned = preg_replace('/(href|src)\s*=\s*(["\']\s*(?:javascript|vbscript|data):[^"\']*["\'])/i', '$1="#"', $cleaned);
+
+        return $cleaned;
+    }
+
+    public function knowledgebasePortal(Request $request)
+    {
+        $productNames = Option::where('o_type', 'knowledgebase')
+            ->where('o_order', 0)
+            ->distinct()
+            ->pluck('o_mode')
+            ->filter()
+            ->values();
+
+        $products = Product::withoutGlobalScope('store')
+            ->where('o_type', 'store')
+            ->where('is_suspended', 0)
+            ->whereIn('name', $productNames)
+            ->with('user')
+            ->get();
+
+        $articleCounts = Option::where('o_type', 'knowledgebase')
+            ->where('o_order', 0)
+            ->whereIn('o_mode', $productNames)
+            ->selectRaw('o_mode, COUNT(*) as total')
+            ->groupBy('o_mode')
+            ->pluck('total', 'o_mode');
+
+        $kbCategories = collect();
+        try {
+            $kbCategories = KbCategory::withCount('articles')->orderBy('sort_order')->orderBy('name')->get();
+        } catch (\Throwable $e) {
+            $kbCategories = collect();
+        }
+
+        $totalArticles = Option::where('o_type', 'knowledgebase')->where('o_order', 0)->count();
+        $totalContributors = Option::where('o_type', 'knowledgebase')
+            ->where('o_order', 0)
+            ->where('o_parent', '>', 0)
+            ->distinct('o_parent')
+            ->count('o_parent');
+
+        $searchQuery = trim((string) ($request->query('q') ?? $request->query('search')));
+        $searchResults = collect();
+
+        if ($searchQuery !== '') {
+            $searchResults = Option::where('o_type', 'knowledgebase')
+                ->where('o_order', 0)
+                ->where(function ($q) use ($searchQuery) {
+                    $q->where('name', 'like', "%{$searchQuery}%")
+                      ->orWhere('o_valuer', 'like', "%{$searchQuery}%");
+                })
+                ->with('kbCategory')
+                ->orderByDesc('id')
+                ->paginate(12)
+                ->withQueryString();
+
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'total' => $searchResults->total(),
+                    'articles' => $searchResults->map(function ($item) {
+                        return [
+                            'id' => $item->id,
+                            'name' => $item->name,
+                            'product' => $item->o_mode,
+                            'url' => route('kb.show', ['name' => $item->o_mode, 'article' => $item->name]),
+                            'category' => $item->kbCategory ? $item->kbCategory->name : null,
+                            'snippet' => Str::limit(strip_tags((string) $item->o_valuer), 130),
+                            'updated_at' => $item->updated_at ? \Carbon\Carbon::parse($item->updated_at)->diffForHumans() : null,
+                        ];
+                    }),
+                ]);
+            }
+        }
+
+        $recentArticles = Option::where('o_type', 'knowledgebase')
+            ->where('o_order', 0)
+            ->with('kbCategory')
+            ->orderByDesc('updated_at')
+            ->orderByDesc('id')
+            ->take(6)
+            ->get();
+
+        $this->seo([
+            'scope_key' => 'kb_portal',
+            'content_type' => 'knowledgebase',
+            'content_id' => 0,
+            'resource_title' => __('messages.kb_portal_title'),
+            'description' => __('messages.kb_portal_desc'),
+            'breadcrumbs' => [
+                ['name' => __('messages.home'), 'url' => url('/')],
+                ['name' => __('messages.store'), 'url' => route('store.index')],
+                ['name' => __('messages.knowledgebase'), 'url' => route('kb.portal')],
+            ],
+        ]);
+
+        return view('theme::store.knowledgebase_portal', compact(
+            'products',
+            'articleCounts',
+            'kbCategories',
+            'totalArticles',
+            'totalContributors',
+            'recentArticles',
+            'searchQuery',
+            'searchResults'
+        ));
+    }
+
+    public function knowledgebaseSearch(Request $request, $name)
+    {
+        $product = $this->findKnowledgebaseProduct($name);
+        $q = trim((string) $request->query('q'));
+
+        if ($q === '') {
+            return response()->json([
+                'success' => true,
+                'query' => '',
+                'count' => 0,
+                'articles' => [],
+                'results' => [],
+            ]);
+        }
+
+        $articles = Option::where('o_type', 'knowledgebase')
+            ->where('o_mode', $product->name)
+            ->where('o_order', 0)
+            ->where(function ($query) use ($q) {
+                $query->where('name', 'like', "%{$q}%")
+                      ->orWhere('o_valuer', 'like', "%{$q}%");
+            })
+            ->with('kbCategory')
+            ->orderByDesc('id')
+            ->take(10)
+            ->get()
+            ->map(function ($item) use ($product) {
+                return [
+                    'id' => $item->id,
+                    'name' => $item->name,
+                    'url' => route('kb.show', ['name' => $product->name, 'article' => $item->name]),
+                    'category' => $item->kbCategory ? $item->kbCategory->name : null,
+                    'snippet' => Str::limit(strip_tags((string) $item->o_valuer), 120),
+                    'updated_at' => $item->updated_at ? \Carbon\Carbon::parse($item->updated_at)->diffForHumans() : null,
+                ];
+            });
+
+        return response()->json([
+            'success' => true,
+            'query' => $q,
+            'count' => $articles->count(),
+            'articles' => $articles,
+            'results' => $articles,
+        ]);
+    }
+
+    public function knowledgebaseFeedback(Request $request, $name)
+    {
+        $request->validate([
+            'article_id' => 'required|integer',
+            'vote' => 'required|in:up,down',
+        ]);
+
+        $product = $this->findKnowledgebaseProduct($name);
+        $articleId = (int) $request->input('article_id');
+        $vote = $request->input('vote');
+        $voterKey = Auth::check() ? 'u_' . Auth::id() : 'ip_' . substr(md5($request->ip() . $request->userAgent()), 0, 16);
+        $orderVal = ($vote === 'up') ? 1 : -1;
+
+        $feedback = Option::where('o_type', 'kb_feedback')
+            ->where('o_mode', (string) $articleId)
+            ->where('name', $voterKey)
+            ->first();
+
+        if ($feedback) {
+            if ($feedback->o_order == $orderVal) {
+                $upCount = Option::where('o_type', 'kb_feedback')->where('o_mode', (string) $articleId)->where('o_order', 1)->count();
+                $downCount = Option::where('o_type', 'kb_feedback')->where('o_mode', (string) $articleId)->where('o_order', -1)->count();
+                return response()->json([
+                    'success' => true,
+                    'already' => true,
+                    'userVote' => $vote,
+                    'helpful' => $upCount,
+                    'unhelpful' => $downCount,
+                    'up' => $upCount,
+                    'down' => $downCount,
+                    'message' => __('messages.kb_feedback_already'),
+                ]);
+            }
+            $feedback->update(['o_order' => $orderVal]);
+        } else {
+            Option::create([
+                'name' => $voterKey,
+                'o_valuer' => $vote,
+                'o_type' => 'kb_feedback',
+                'o_parent' => Auth::id() ?? 0,
+                'o_order' => $orderVal,
+                'o_mode' => (string) $articleId,
+            ]);
+        }
+
+        $upCount = Option::where('o_type', 'kb_feedback')->where('o_mode', (string) $articleId)->where('o_order', 1)->count();
+        $downCount = Option::where('o_type', 'kb_feedback')->where('o_mode', (string) $articleId)->where('o_order', -1)->count();
+
+        return response()->json([
+            'success' => true,
+            'userVote' => $vote,
+            'helpful' => $upCount,
+            'unhelpful' => $downCount,
+            'up' => $upCount,
+            'down' => $downCount,
+            'message' => __('messages.kb_feedback_thanks'),
+        ]);
+    }
+
     public function knowledgebaseIndex(Request $request, $name)
     {
         $product = $this->findKnowledgebaseProduct($name);
@@ -776,10 +998,19 @@ class StoreController extends Controller
         }
 
         $selectedCategory = $request->query('category');
+        $searchQuery = trim((string) ($request->query('q') ?? $request->query('search')));
 
         $articlesQuery = Option::where('o_type', 'knowledgebase')
             ->where('o_mode', $product->name)
             ->where('o_order', 0);
+
+        // Apply real keyword search if present
+        if ($searchQuery !== '') {
+            $articlesQuery->where(function ($q) use ($searchQuery) {
+                $q->where('name', 'like', "%{$searchQuery}%")
+                  ->orWhere('o_valuer', 'like', "%{$searchQuery}%");
+            });
+        }
 
         // Apply category filter safely
         if ($hasCategoryCol) {
@@ -827,6 +1058,26 @@ class StoreController extends Controller
             ? collect()
             : User::whereIn('id', $articleAuthorIds)->get()->keyBy('id');
 
+        // AJAX response for fast live filtering without page reload
+        if ($request->ajax() && !$request->filled('st')) {
+            return response()->json([
+                'success' => true,
+                'total' => $articles->total(),
+                'articles' => $articles->map(function ($item) use ($product, $articleAuthors) {
+                    return [
+                        'id' => $item->id,
+                        'name' => $item->name,
+                        'url' => route('kb.show', ['name' => $product->name, 'article' => $item->name]),
+                        'category' => $item->kbCategory ? $item->kbCategory->name : null,
+                        'snippet' => Str::limit(strip_tags((string) $item->o_valuer), 140),
+                        'author' => ($item->o_parent > 0 && isset($articleAuthors[$item->o_parent])) ? $articleAuthors[$item->o_parent]->username : __('messages.guest'),
+                        'updated_at' => $item->updated_at ? \Carbon\Carbon::parse($item->updated_at)->diffForHumans() : null,
+                    ];
+                }),
+                'pagination' => (string) $articles->links('pagination::bootstrap-5'),
+            ]);
+        }
+
         $shellData = $this->buildKnowledgebaseShellData($product);
         $articleName = $request->query('st');
 
@@ -865,6 +1116,7 @@ class StoreController extends Controller
                 'editorText' => old('txt'),
                 'kbCategories' => $kbCategories,
                 'selectedCategory' => $selectedCategory,
+                'searchQuery' => $searchQuery,
             ] + $shellData);
         }
 
@@ -876,6 +1128,7 @@ class StoreController extends Controller
             'articleAuthors' => $articleAuthors,
             'kbCategories' => $kbCategories,
             'selectedCategory' => $selectedCategory,
+            'searchQuery' => $searchQuery,
         ] + $shellData);
     }
 
@@ -899,6 +1152,35 @@ class StoreController extends Controller
             ->count();
         $shellData = $this->buildKnowledgebaseShellData($product, $kbArticle);
 
+        // Feedback stats
+        $upVotes = Option::where('o_type', 'kb_feedback')->where('o_mode', (string) $kbArticle->id)->where('o_order', 1)->count();
+        $downVotes = Option::where('o_type', 'kb_feedback')->where('o_mode', (string) $kbArticle->id)->where('o_order', -1)->count();
+        $voterKey = Auth::check() ? 'u_' . Auth::id() : 'ip_' . substr(md5(request()->ip() . request()->userAgent()), 0, 16);
+        $userVote = Option::where('o_type', 'kb_feedback')->where('o_mode', (string) $kbArticle->id)->where('name', $voterKey)->value('o_order');
+
+        // Reading time calculation (average 200 words/min)
+        $wordCount = str_word_count(strip_tags((string) $kbArticle->o_valuer));
+        $readingTime = max(1, (int) ceil($wordCount / 200));
+
+        // Sibling articles navigation
+        $siblingArticles = Option::where('o_type', 'knowledgebase')
+            ->where('o_mode', $product->name)
+            ->where('o_order', 0)
+            ->orderBy('id')
+            ->get(['id', 'name']);
+        $currentIndex = $siblingArticles->search(fn ($item) => $item->id === $kbArticle->id);
+        $prevArticle = ($currentIndex !== false && $currentIndex > 0) ? $siblingArticles[$currentIndex - 1] : null;
+        $nextArticle = ($currentIndex !== false && $currentIndex < $siblingArticles->count() - 1) ? $siblingArticles[$currentIndex + 1] : null;
+
+        // Process WikiLinks: [[Target Article]] or [[Target Article|Label]]
+        $safeContent = $this->sanitizeArticleContent((string) $kbArticle->o_valuer);
+        $processedContent = preg_replace_callback('/\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/', function ($matches) use ($product) {
+            $targetArticle = trim($matches[1]);
+            $label = isset($matches[2]) && trim($matches[2]) !== '' ? trim($matches[2]) : $targetArticle;
+            $targetUrl = route('kb.show', ['name' => $product->name, 'article' => $targetArticle]);
+            return '<a class="kb-wikilink" href="' . e($targetUrl) . '"><i class="fa fa-book me-1"></i>' . e($label) . '</a>';
+        }, $safeContent);
+
         $this->seo([
             'scope_key' => 'kb_show',
             'content_type' => 'knowledgebase',
@@ -920,6 +1202,13 @@ class StoreController extends Controller
             'mode' => 'show',
             'article' => $kbArticle,
             'pendingCount' => $pendingCount,
+            'upVotes' => $upVotes,
+            'downVotes' => $downVotes,
+            'userVote' => $userVote,
+            'readingTime' => $readingTime,
+            'prevArticle' => $prevArticle,
+            'nextArticle' => $nextArticle,
+            'processedContent' => $processedContent,
         ] + $shellData);
     }
 
@@ -1077,9 +1366,10 @@ class StoreController extends Controller
                     ->update(['o_order' => 2]);
             }
 
+            $safeTxt = $this->sanitizeArticleContent($request->input('txt'));
             $article = Option::create([
                 'name' => $articleName,
-                'o_valuer' => $request->input('txt'),
+                'o_valuer' => $safeTxt,
                 'o_type' => 'knowledgebase',
                 'o_parent' => $userId,
                 'o_order' => $status,
@@ -1170,6 +1460,9 @@ class StoreController extends Controller
             ->firstOrFail();
         $isAuthorized = Auth::check() && (Auth::id() == $product->o_parent || Auth::user()->isAdmin() || ($kbArticle && Auth::id() == $kbArticle->o_parent));
         if (!$isAuthorized) {
+            if ($request->ajax()) {
+                return response()->json(['error' => __('messages.unauthorized')], 403);
+            }
             return redirect()->route('kb.show', ['name' => $product->name, 'article' => $request->input('article')]);
         }
 
@@ -1180,14 +1473,71 @@ class StoreController extends Controller
                 ->where('o_order', 0)
                 ->update(['o_order' => 2]);
             $entry->update(['o_order' => 0, 'updated_at' => now()]);
+            // Non-destructive: mark other pending edits as rejected (3) rather than deleting
             Option::where('o_type', 'knowledgebase')
                 ->where('o_mode', $product->name)
                 ->where('name', $request->input('article'))
                 ->where('o_order', 1)
-                ->delete();
+                ->where('id', '!=', $entry->id)
+                ->update(['o_order' => 3]);
         });
 
-        return redirect()->route('kb.show', ['name' => $product->name, 'article' => $request->input('article')]);
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => __('messages.kb_suggestion_approved'),
+            ]);
+        }
+
+        return redirect()->route('kb.show', ['name' => $product->name, 'article' => $request->input('article')])
+            ->with('success', __('messages.kb_suggestion_approved'));
+    }
+
+    public function knowledgebaseReject(Request $request)
+    {
+        $request->validate([
+            'store' => 'required|string',
+            'article' => 'required|string',
+            'entry' => 'required|integer',
+        ]);
+
+        $product = Product::withoutGlobalScope('store')->where('o_type', 'store')->where('name', $request->input('store'))->firstOrFail();
+        $entry = Option::where('o_type', 'knowledgebase')
+            ->where('o_mode', $product->name)
+            ->where('name', $request->input('article'))
+            ->where('id', $request->input('entry'))
+            ->firstOrFail();
+
+        $kbArticle = Option::where('o_type', 'knowledgebase')
+            ->where('o_mode', $product->name)
+            ->where('name', $request->input('article'))
+            ->where('o_order', 0)
+            ->first();
+
+        $isAuthorized = Auth::check() && (
+            Auth::id() == $product->o_parent
+            || Auth::user()->isAdmin()
+            || ($kbArticle && Auth::id() == $kbArticle->o_parent)
+        );
+
+        if (!$isAuthorized) {
+            if ($request->ajax()) {
+                return response()->json(['error' => __('messages.unauthorized')], 403);
+            }
+            return redirect()->route('kb.show', ['name' => $product->name, 'article' => $request->input('article')]);
+        }
+
+        $entry->update(['o_order' => 3]);
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => __('messages.kb_suggestion_rejected'),
+            ]);
+        }
+
+        return redirect()->route('kb.show', ['name' => $product->name, 'article' => $request->input('article')])
+            ->with('success', __('messages.kb_suggestion_rejected'));
     }
 
     public function knowledgebaseCaptcha()

@@ -3541,40 +3541,91 @@ class AdminController extends Controller
                 ];
             });
 
-        $latestArticles = Knowledgebase::orderBy('id', 'desc')->take(5)->get();
+        $latestArticles = Knowledgebase::with('kbCategory')->orderBy('id', 'desc')->take(8)->get();
         $totalArticles = Knowledgebase::count();
         $kbCategories = KbCategory::orderBy('sort_order')->orderBy('name')->get();
 
-        // If we are searching, we might pass the search results
-        $searchResults = null;
-        if ($request->has('search')) {
-            $searchResults = Knowledgebase::where('name', 'like', '%' . $request->search . '%')
-                  ->orWhere('o_valuer', 'like', '%' . $request->search . '%')
-                  ->paginate(20);
-        } elseif ($request->has('category')) {
-            $searchResults = Knowledgebase::where('o_mode', $request->category)
-                  ->orderBy('id', 'desc')
-                  ->paginate(20);
+        // Pending community revisions (o_order = 1)
+        $pendingRevisions = Option::where('o_type', 'knowledgebase')
+            ->where('o_order', 1)
+            ->with('kbCategory')
+            ->orderByDesc('id')
+            ->get();
+        $totalPending = $pendingRevisions->count();
+
+        // All articles with search, filter, and sorting
+        $articlesQuery = Knowledgebase::with('kbCategory');
+        if ($request->filled('search')) {
+            $s = trim((string) $request->search);
+            $articlesQuery->where(function ($q) use ($s) {
+                $q->where('name', 'like', "%{$s}%")
+                  ->orWhere('o_valuer', 'like', "%{$s}%")
+                  ->orWhere('o_mode', 'like', "%{$s}%");
+            });
+        }
+        if ($request->filled('category')) {
+            $articlesQuery->where('o_mode', $request->category);
+        }
+        if ($request->filled('kb_category_id')) {
+            $articlesQuery->where('kb_category_id', $request->kb_category_id);
         }
 
-        return view('admin::admin.knowledgebase', compact('categories', 'latestArticles', 'totalArticles', 'searchResults', 'kbCategories'));
+        $sort = $request->query('sort', 'recent');
+        if ($sort === 'oldest') {
+            $articlesQuery->orderBy('id', 'asc');
+        } elseif ($sort === 'az') {
+            $articlesQuery->orderBy('name', 'asc');
+        } else {
+            $articlesQuery->orderByDesc('id');
+        }
+
+        $allArticles = $articlesQuery->paginate(20)->withQueryString();
+
+        // If AJAX request for quick search / filter table update
+        if ($request->ajax() && ($request->filled('search') || $request->filled('category') || $request->filled('kb_category_id') || $request->filled('sort'))) {
+            return response()->json([
+                'success' => true,
+                'total' => $allArticles->total(),
+                'articles' => $allArticles->items(),
+                'pagination' => (string) $allArticles->links('pagination::bootstrap-5'),
+            ]);
+        }
+
+        return view('admin::admin.knowledgebase', compact(
+            'categories',
+            'latestArticles',
+            'totalArticles',
+            'kbCategories',
+            'pendingRevisions',
+            'totalPending',
+            'allArticles'
+        ));
     }
 
     public function storeKnowledgebase(Request $request)
     {
         $request->validate([
-            'name' => 'required|string',
+            'name' => 'required|string|max:150',
             'o_valuer' => 'required|string',
-            'o_mode' => 'nullable|string',
+            'o_mode' => 'nullable|string|max:150',
             'kb_category_id' => 'nullable|integer|exists:kb_categories,id',
         ]);
 
-        Knowledgebase::create([
+        $article = Knowledgebase::create([
             'name' => $request->input('name'),
             'o_valuer' => $request->input('o_valuer'),
             'o_mode' => $request->input('o_mode'),
             'kb_category_id' => $request->input('kb_category_id'),
+            'updated_at' => now(),
         ]);
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => __('article_created'),
+                'article' => $article,
+            ]);
+        }
 
         return redirect()->back()->with('success', __('article_created'));
     }
@@ -3584,9 +3635,9 @@ class AdminController extends Controller
         $article = Knowledgebase::findOrFail($id);
         
         $request->validate([
-            'name' => 'required|string',
+            'name' => 'required|string|max:150',
             'o_valuer' => 'required|string',
-            'o_mode' => 'nullable|string',
+            'o_mode' => 'nullable|string|max:150',
             'kb_category_id' => 'nullable|integer|exists:kb_categories,id',
         ]);
 
@@ -3595,17 +3646,133 @@ class AdminController extends Controller
             'o_valuer' => $request->input('o_valuer'),
             'o_mode' => $request->input('o_mode'),
             'kb_category_id' => $request->input('kb_category_id'),
+            'updated_at' => now(),
         ]);
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => __('article_updated'),
+                'article' => $article,
+            ]);
+        }
 
         return redirect()->back()->with('success', __('article_updated'));
     }
 
-    public function deleteKnowledgebase($id)
+    public function deleteKnowledgebase(Request $request, $id)
     {
         $article = Knowledgebase::findOrFail($id);
         $article->delete();
         
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => __('article_deleted'),
+            ]);
+        }
+
         return redirect()->back()->with('success', __('article_deleted'));
+    }
+
+    public function approvePendingKnowledgebase(Request $request, $id)
+    {
+        $entry = Option::where('o_type', 'knowledgebase')
+            ->where('o_order', 1)
+            ->where('id', $id)
+            ->firstOrFail();
+
+        DB::transaction(function () use ($entry) {
+            Option::where('o_type', 'knowledgebase')
+                ->where('o_mode', $entry->o_mode)
+                ->where('name', $entry->name)
+                ->where('o_order', 0)
+                ->update(['o_order' => 2]);
+
+            $entry->update(['o_order' => 0, 'updated_at' => now()]);
+
+            Option::where('o_type', 'knowledgebase')
+                ->where('o_mode', $entry->o_mode)
+                ->where('name', $entry->name)
+                ->where('o_order', 1)
+                ->where('id', '!=', $entry->id)
+                ->update(['o_order' => 3]);
+        });
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => __('messages.kb_suggestion_approved'),
+            ]);
+        }
+
+        return redirect()->back()->with('success', __('messages.kb_suggestion_approved'));
+    }
+
+    public function rejectPendingKnowledgebase(Request $request, $id)
+    {
+        $entry = Option::where('o_type', 'knowledgebase')
+            ->where('o_order', 1)
+            ->where('id', $id)
+            ->firstOrFail();
+
+        $entry->update(['o_order' => 3]);
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => __('messages.kb_suggestion_rejected'),
+            ]);
+        }
+
+        return redirect()->back()->with('success', __('messages.kb_suggestion_rejected'));
+    }
+
+    public function previewKnowledgebaseArticle(Request $request, $id)
+    {
+        $article = Option::where('o_type', 'knowledgebase')
+            ->where('id', $id)
+            ->with('kbCategory')
+            ->firstOrFail();
+
+        $author = $article->o_parent > 0 ? User::find($article->o_parent) : null;
+
+        return response()->json([
+            'success' => true,
+            'id' => $article->id,
+            'name' => $article->name,
+            'product' => $article->o_mode,
+            'status' => $article->o_order,
+            'content' => $article->o_valuer,
+            'category' => $article->kbCategory ? $article->kbCategory->name : null,
+            'author' => $author ? $author->username : __('messages.guest'),
+            'updated_at' => $article->updated_at ? \Carbon\Carbon::parse($article->updated_at)->diffForHumans() : null,
+        ]);
+    }
+
+    public function diffKnowledgebaseArticle(Request $request, $id)
+    {
+        $entry = Option::where('o_type', 'knowledgebase')
+            ->where('id', $id)
+            ->firstOrFail();
+
+        $current = Option::where('o_type', 'knowledgebase')
+            ->where('o_mode', $entry->o_mode)
+            ->where('name', $entry->name)
+            ->where('o_order', 0)
+            ->first();
+
+        $author = $entry->o_parent > 0 ? User::find($entry->o_parent) : null;
+
+        return response()->json([
+            'success' => true,
+            'articleName' => $entry->name,
+            'product' => $entry->o_mode,
+            'entryId' => $entry->id,
+            'author' => $author ? $author->username : __('messages.guest'),
+            'currentText' => $current ? (string) $current->o_valuer : '',
+            'newText' => (string) $entry->o_valuer,
+        ]);
     }
 
     // KB Categories Management
@@ -3627,11 +3794,19 @@ class AdminController extends Controller
             'sort_order' => 'nullable|integer|min:0',
         ]);
 
-        KbCategory::create([
+        $category = KbCategory::create([
             'name' => $request->input('name'),
             'description' => $request->input('description'),
             'sort_order' => (int) ($request->input('sort_order', 0)),
         ]);
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => __('messages.kb_category_created'),
+                'category' => $category,
+            ]);
+        }
 
         return redirect()->back()->with('success', __('messages.kb_category_created'));
     }
@@ -3653,10 +3828,18 @@ class AdminController extends Controller
             'sort_order' => (int) ($request->input('sort_order', 0)),
         ]);
 
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => __('messages.kb_category_updated'),
+                'category' => $category,
+            ]);
+        }
+
         return redirect()->back()->with('success', __('messages.kb_category_updated'));
     }
 
-    public function deleteKbCategory($id)
+    public function deleteKbCategory(Request $request, $id)
     {
         $category = KbCategory::findOrFail($id);
 
@@ -3664,6 +3847,13 @@ class AdminController extends Controller
         Option::where('kb_category_id', $id)->update(['kb_category_id' => null]);
 
         $category->delete();
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => __('messages.kb_category_deleted'),
+            ]);
+        }
 
         return redirect()->back()->with('success', __('messages.kb_category_deleted'));
     }
