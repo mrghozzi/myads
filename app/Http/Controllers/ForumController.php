@@ -338,8 +338,90 @@ class ForumController extends Controller
         }
 
         if ($status->s_type == 4) {
+            $topic->loadMissing(['attachments', 'user', 'category']);
+
+            $imageAttachments = $topic->attachments
+                ->filter(fn($att) => $att->isImage())
+                ->sortBy('sort_order')
+                ->values();
+
+            $primaryImage = null;
+            if ($imageAttachments->isNotEmpty()) {
+                $primaryImage = asset($imageAttachments->first()->file_path);
+            } else {
+                $imageOption = Option::where('o_parent', $topic->id)->where('o_type', 'image_post')->first();
+                $primaryImage = $imageOption && $imageOption->o_valuer ? asset($imageOption->o_valuer) : ($topic->image_url ?: null);
+            }
+
+            if ($primaryImage) {
+                $seoContext['image'] = $primaryImage;
+            }
+            $seoContext['schema_type'] = 'ImageGallery';
+
+            $viewer = auth()->user();
+            $isFollowing = ($viewer && $topic->user)
+                ? \App\Models\Like::where('uid', $viewer->id)->where('sid', $topic->user->id)->where('type', 1)->exists()
+                : false;
+
+            $isSaved = $viewer
+                ? DB::table('saved_statuses')->where('user_id', $viewer->id)->where('status_id', $status->id)->exists()
+                : false;
+
+            $viewerReaction = auth()->check()
+                ? \App\Models\Like::query()->where('uid', auth()->id())->where('sid', $topic->id)->where('type', 2)->first()
+                : null;
+            $viewerReactionType = $viewerReaction
+                ? (string) (Option::query()->where('o_parent', $viewerReaction->id)->where('o_type', 'data_reaction')->value('o_valuer') ?: 'like')
+                : 'like';
+
+            // Author's other gallery posts
+            $authorGalleries = Status::visible()
+                ->where('id', '!=', $status->id)
+                ->where('s_type', 4)
+                ->where('uid', $topic->uid)
+                ->orderBy('id', 'desc')
+                ->limit(4)
+                ->get();
+            app(\App\Services\StatusActivityService::class)->decorateMany($authorGalleries);
+
+            // Suggested galleries (same category or latest galleries)
+            $suggestedGalleries = Status::visible()
+                ->where('id', '!=', $status->id)
+                ->where('s_type', 4)
+                ->when($topic->cat, function ($q) use ($topic) {
+                    $q->whereHas('forumTopic', function ($ft) use ($topic) {
+                        $ft->where('cat', $topic->cat);
+                    });
+                })
+                ->orderBy('id', 'desc')
+                ->limit(6)
+                ->get();
+
+            if ($suggestedGalleries->isEmpty()) {
+                $suggestedGalleries = Status::visible()
+                    ->where('id', '!=', $status->id)
+                    ->where('s_type', 4)
+                    ->orderBy('id', 'desc')
+                    ->limit(6)
+                    ->get();
+            }
+            app(\App\Services\StatusActivityService::class)->decorateMany($suggestedGalleries);
+
             $this->seo($seoContext);
-            return view('theme::forum.image', compact('topic', 'status', 'forumSettings', 'group'));
+            return view('theme::forum.image', compact(
+                'topic',
+                'status',
+                'forumSettings',
+                'group',
+                'imageAttachments',
+                'primaryImage',
+                'isFollowing',
+                'isSaved',
+                'viewerReaction',
+                'viewerReactionType',
+                'authorGalleries',
+                'suggestedGalleries'
+            ));
         }
 
         $this->seo($seoContext);

@@ -417,7 +417,23 @@ class StatusController extends Controller
             $this->storeGalleryAssets($topic, $request, $user->id);
             $this->syncStatusType($topicId);
             DB::commit();
-            return response()->json(['success' => true]);
+
+            $attachments = ForumAttachment::where('topic_id', $topicId)->orderBy('sort_order', 'asc')->get()->map(function($att) {
+                return [
+                    'id' => $att->id,
+                    'url' => asset($att->file_path),
+                    'name' => $att->original_name,
+                    'size' => $att->human_size,
+                    'is_image' => $att->isImage(),
+                ];
+            });
+
+            return response()->json([
+                'success' => true,
+                'attachments' => $attachments,
+                'count' => $attachments->count(),
+                'message' => __('messages.upload_success') ?? 'Images uploaded successfully'
+            ]);
         } catch (\Throwable $e) {
             DB::rollBack();
             report($e);
@@ -444,7 +460,13 @@ class StatusController extends Controller
             $this->syncStatusType($topicId);
 
             DB::commit();
-            return response()->json(['success' => true]);
+
+            $remainingCount = ForumAttachment::where('topic_id', $topicId)->count();
+            return response()->json([
+                'success' => true,
+                'remaining_count' => $remainingCount,
+                'message' => __('messages.delete_success') ?? 'Image deleted successfully'
+            ]);
         } catch (\Throwable $e) {
             DB::rollBack();
             report($e);
@@ -472,7 +494,11 @@ class StatusController extends Controller
             $this->syncStatusType($topicId);
 
             DB::commit();
-            return response()->json(['success' => true]);
+            return response()->json([
+                'success' => true,
+                'remaining_count' => 0,
+                'message' => __('messages.clear_gallery_success') ?? 'Gallery cleared successfully'
+            ]);
         } catch (\Throwable $e) {
             DB::rollBack();
             report($e);

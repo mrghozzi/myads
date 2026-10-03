@@ -340,6 +340,13 @@ class ProfileController extends Controller
 
         if ($existing) {
             $existing->delete();
+            if ($request->wantsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'following' => false,
+                    'message' => __('messages.unfollowed_successfully') ?? 'Unfollowed successfully'
+                ]);
+            }
             return back()->with('success', __('unfollowed_successfully'));
         }
 
@@ -362,6 +369,13 @@ class ProfileController extends Controller
         app(GamificationService::class)->refreshBadges($targetUser->id);
         app(GamificationService::class)->recordEvent($currentUser->id, 'follow_created');
 
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'following' => true,
+                'message' => __('messages.followed_successfully') ?? 'Followed successfully'
+            ]);
+        }
         return back()->with('success', __('followed_successfully'));
     }
 
