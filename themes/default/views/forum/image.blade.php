@@ -145,15 +145,28 @@
                     <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 w-100">
                         <!-- CREATOR INFO -->
                         <div class="d-flex align-items-center gap-3">
-                            <a class="gallery-avatar-link" href="{{ route('profile.show', $topic->user->username) }}">
-                                <div class="gallery-user-avatar {{ $topic->user->isOnline() ? 'online' : 'offline' }}">
-                                    <img src="{{ $topic->user ? $topic->user->avatarUrl() : asset('upload/_avatar.png') }}"
-                                         alt="{{ $topic->user->username }}"
-                                         class="gallery-avatar-img">
+                            <a class="gallery-avatar-link user-status-avatar flex-shrink-0" href="{{ route('profile.show', $topic->user->username) }}">
+                                <div class="user-avatar small no-outline {{ $topic->user->isOnline() ? 'online' : 'offline' }}">
+                                    <div class="user-avatar-content">
+                                        <div class="hexagon-image-30-32" data-src="{{ $topic->user ? $topic->user->avatarUrl() : asset('upload/_avatar.png') }}" style="width: 30px; height: 32px; position: relative;">
+                                            <canvas style="position: absolute; top: 0px; left: 0px;" width="30" height="32"></canvas>
+                                        </div>
+                                    </div>
+                                    <div class="user-avatar-progress-border">
+                                        <div class="hexagon-border-40-44" data-line-color="{{ $topic->user->profileBadgeColor() }}" style="width: 40px; height: 44px; position: relative;">
+                                            <canvas width="40" height="44" style="position: absolute; top: 0px; left: 0px;"></canvas>
+                                        </div>
+                                    </div>
                                     @if($topic->user->hasVerifiedBadge())
-                                        <span class="gallery-verified-badge" title="حساب موثق">
-                                            <i class="fa fa-check"></i>
-                                        </span>
+                                        <div class="user-avatar-badge">
+                                            <div class="user-avatar-badge-border">
+                                                <div class="hexagon-22-24" style="width: 22px; height: 24px; position: relative;"></div>
+                                            </div>
+                                            <div class="user-avatar-badge-content">
+                                                <div class="hexagon-dark-16-18" style="width: 16px; height: 18px; position: relative;"></div>
+                                            </div>
+                                            <p class="user-avatar-badge-text"><i class="fa fa-fw fa-check"></i></p>
+                                        </div>
                                     @endif
                                 </div>
                             </a>
@@ -603,14 +616,32 @@
             <div class="gallery-sidebar-card shadow-sm mb-4">
                 <div class="creator-card-cover"></div>
                 <div class="creator-card-body text-center">
-                    <a href="{{ route('profile.show', $topic->user->username) }}" class="creator-avatar-wrap">
-                        <img src="{{ $topic->user ? $topic->user->avatarUrl() : asset('upload/_avatar.png') }}"
-                             alt="{{ $topic->user->username }}"
-                             class="creator-big-avatar">
+                    <a href="{{ route('profile.show', $topic->user->username) }}" class="user-short-description-avatar user-avatar medium {{ $topic->user->isOnline() ? 'online' : 'offline' }}" style="margin: -60px auto 16px; display: block; text-decoration: none;">
+                        <div class="user-avatar-border">
+                            <div class="hexagon-120-132" style="width: 120px; height: 132px; position: relative;">
+                                <canvas width="120" height="132" style="position: absolute; top: 0; left: 0;"></canvas>
+                            </div>
+                        </div>
+                        <div class="user-avatar-content">
+                            <div class="hexagon-image-82-90" data-src="{{ $topic->user ? $topic->user->avatarUrl() : asset('upload/_avatar.png') }}" style="width: 82px; height: 90px; position: relative;">
+                                <canvas width="82" height="90" style="position: absolute; top: 0; left: 0;"></canvas>
+                            </div>
+                        </div>
+                        <div class="user-avatar-progress-border">
+                            <div class="hexagon-border-100-110" data-line-color="{{ $topic->user->profileBadgeColor() }}" style="width: 100px; height: 110px; position: relative;">
+                                <canvas width="100" height="110" style="position: absolute; top: 0; left: 0;"></canvas>
+                            </div>
+                        </div>
                         @if($topic->user->hasVerifiedBadge())
-                            <span class="creator-verified-badge" title="موثق">
-                                <i class="fa fa-check"></i>
-                            </span>
+                            <div class="user-avatar-badge">
+                                <div class="user-avatar-badge-border">
+                                    <div class="hexagon-22-24" style="width: 22px; height: 24px; position: relative;"></div>
+                                </div>
+                                <div class="user-avatar-badge-content">
+                                    <div class="hexagon-dark-16-18" style="width: 16px; height: 18px; position: relative;"></div>
+                                </div>
+                                <p class="user-avatar-badge-text"><i class="fa fa-fw fa-check"></i></p>
+                            </div>
                         @endif
                     </a>
 
@@ -854,46 +885,17 @@ html.app-skin-dark .forum-rdx-gallery-page {
     border-bottom: 1px solid var(--gallery-border);
 }
 
-/* 3. AUTHOR HEADER */
-.gallery-user-avatar {
-    position: relative;
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
+/* 3. AUTHOR HEADER & HEXAGON AVATARS */
+.forum-rdx-gallery-page .user-avatar {
+    flex-shrink: 0;
 }
-.gallery-avatar-img {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid var(--gallery-surface);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-.gallery-user-avatar.online::after {
-    content: '';
-    position: absolute;
-    bottom: 2px;
-    right: 2px;
-    width: 12px;
-    height: 12px;
-    background: #17c666;
-    border: 2px solid var(--gallery-surface);
-    border-radius: 50%;
-}
-.gallery-verified-badge {
-    position: absolute;
-    top: -2px;
-    right: -2px;
-    width: 18px;
-    height: 18px;
-    background: #3454d1;
-    color: #fff;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 10px;
-    border: 2px solid var(--gallery-surface);
+.forum-rdx-gallery-page .user-avatar .hexagon-image-30-32,
+.forum-rdx-gallery-page .user-avatar .hexagon-image-40-44,
+.forum-rdx-gallery-page .user-avatar .hexagon-image-82-90 {
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    -webkit-clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    background-size: cover;
+    background-position: center;
 }
 
 .gallery-author-name {
@@ -1471,33 +1473,10 @@ html.app-skin-dark .forum-rdx-gallery-page {
     padding: 0 20px 20px;
     position: relative;
 }
-.creator-avatar-wrap {
-    display: inline-block;
-    position: relative;
-    margin-top: -42px;
-}
-.creator-big-avatar {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 3px solid var(--gallery-surface);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-}
-.creator-verified-badge {
-    position: absolute;
-    bottom: 2px;
-    right: 2px;
-    width: 22px;
-    height: 22px;
-    background: #3454d1;
-    color: #fff;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 11px;
-    border: 2px solid var(--gallery-surface);
+.creator-card-body .user-short-description-avatar {
+    margin: -60px auto 12px !important;
+    display: block !important;
+    text-decoration: none !important;
 }
 .creator-name a {
     color: var(--gallery-text);
@@ -2271,6 +2250,24 @@ document.addEventListener('DOMContentLoaded', function() {
     if (textEl && textEl.scrollHeight > 140) {
         textEl.classList.add('collapsed');
         if (btn) btn.classList.remove('d-none');
+    }
+
+    // Initialize hexagonal avatars if canvases not already drawn by global.hexagons.js
+    if (window.app && app.plugins && typeof app.plugins.createHexagon === 'function') {
+        const initHex = function(selector, config) {
+            document.querySelectorAll(selector).forEach(function(el) {
+                if (!el.querySelector('canvas')) {
+                    try {
+                        app.plugins.createHexagon(Object.assign({}, config, { containerElement: el }));
+                    } catch(e) {}
+                }
+            });
+        };
+        initHex('.forum-rdx-gallery-page .hexagon-image-30-32', { width: 30, height: 32, roundedCorners: true, roundedCornerRadius: 1, clip: true });
+        initHex('.forum-rdx-gallery-page .hexagon-border-40-44', { width: 40, height: 44, roundedCorners: true, roundedCornerRadius: 1, lineWidth: 3 });
+        initHex('.forum-rdx-gallery-page .hexagon-image-82-90', { width: 82, height: 90, roundedCorners: true, roundedCornerRadius: 3, clip: true });
+        initHex('.forum-rdx-gallery-page .hexagon-120-132', { width: 120, height: 132, roundedCorners: true, fill: true });
+        initHex('.forum-rdx-gallery-page .hexagon-border-100-110', { width: 100, height: 110, lineWidth: 6, roundedCorners: true });
     }
 });
 </script>
