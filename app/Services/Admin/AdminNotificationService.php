@@ -97,16 +97,20 @@ class AdminNotificationService
 
         // Profile verification requests (visible to user-management administrators only).
         if ($this->adminAccess->canAccess($user, null, 'users') && $schema->hasTable('profile_verification_requests')) {
-            $verificationCount = \App\Models\ProfileVerificationRequest::where('status', 'pending')->count();
-            if ($verificationCount > 0) {
-                $notifications[] = [
-                    'id' => 'profile_verification',
-                    'count' => $verificationCount,
-                    'label' => __('messages.new_profile_verification_requests', ['count' => $verificationCount]),
-                    'icon' => 'feather-user-check',
-                    'url' => route('admin.profile_verification.requests'),
-                    'module' => 'users',
-                ];
+            try {
+                $verificationCount = \App\Models\ProfileVerificationRequest::where('status', 'pending')->count();
+                if ($verificationCount > 0) {
+                    $notifications[] = [
+                        'id' => 'profile_verification',
+                        'count' => $verificationCount,
+                        'label' => __('messages.new_profile_verification_requests', ['count' => $verificationCount]),
+                        'icon' => 'feather-user-check',
+                        'url' => route('admin.profile_verification.requests'),
+                        'module' => 'users',
+                    ];
+                }
+            } catch (\Throwable $e) {
+                \Log::warning('Failed to load profile verification notifications: ' . $e->getMessage());
             }
         }
 
