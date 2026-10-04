@@ -10,7 +10,7 @@ We provide active security updates and maintenance for the following versions of
 
 | Version | Supported          | Security Maintenance Status |
 | ------- | ------------------ | --------------------------- |
-| 4.6.x   | :white_check_mark: | Active Development, Patches & Latest Features (Current: `v4.6.0`) |
+| 4.6.x   | :white_check_mark: | Active Development, Patches & Latest Features (Current: `v4.6.1`) |
 | 4.5.x   | :white_check_mark: | Active Security Patches Only |
 | 4.4.x   | :white_check_mark: | Critical Security Patches Only |
 | 4.3.x   | :white_check_mark: | Critical Security Patches Only |
@@ -22,6 +22,9 @@ We provide active security updates and maintenance for the following versions of
 
 MYADS includes multi-layered security controls across the core platform, API, and ad exchange ecosystem:
 
+- **Administrative Global Notification Resilience & Database Fault-Tolerance (v4.6.1)**: Defensive exception isolation (`try/catch \Throwable`) in `AdminNotificationService` and MySQL InnoDB tablespace desync remediation (errors 1932/1813), ensuring administrative routes never fail during database engine anomalies.
+- **Administrative User Management Schema Self-Healing & Recursion Shield (v4.6.1)**: Automatic runtime schema validation and repair migration `2026_09_27_020000` for `site_admins` table, alongside recursive loopback self-call timeout protection in `PluginManager`.
+- **Dependency Vulnerability Remediation (v4.6.1)**: Patched GitHub Dependabot security advisory #71 by upgrading `phpseclib/phpseclib` to `3.0.57`.
 - **Binary File Upload & Magic Bytes Verification (v4.6.0)**: Strict binary signature (magic bytes) verification (`FileUploadSecurityService`) for JPEG, PNG, GIF, WebP, ZIP, and PDF uploads, thwarting file extension spoofing and polyglot payloads.
 - **Native SVG Stored-XSS Sanitizer (v4.6.0)**: Built-in DOM and regex-backed SVG sanitizer stripping `<script>`, `<foreignObject>`, `<iframe>`, inline event listeners (`onload`, `onerror`), and dangerous URI schemes.
 - **Plugin ZIP Archive Traversal & Script Inspector (v4.6.0)**: Deep ZIP verification rejecting directory traversal (`../`, `..\`) and blocking hidden executable payloads (`.php*`, `.phar`, `.phtml`, `.exe`, `.sh`).

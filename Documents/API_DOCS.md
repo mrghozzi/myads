@@ -1,14 +1,14 @@
-# MYADS v4.6.0 REST & Real-Time API Documentation
-> **Specification Version:** `v4.6.0` (Stable Release)  
+# MYADS v4.6.1 REST & Real-Time API Documentation
+> **Specification Version:** `v4.6.1` (Stable Release)  
 > **Target Framework:** Laravel 12 (PHP 8.2+)  
 > **Authentication Engines:** Laravel Sanctum (Mobile & Web API), OAuth 2.0 (Developer Platform), and Server-Sent Events (SSE Live Stream).  
-> **Last Updated:** September 2026  
+> **Last Updated:** October 2026  
 
 ---
 
 ## 1. Overview & Architecture
 
-The MYADS v4.6.0 API ecosystem delivers high-performance, secure, and extensible interfaces connecting web clients, companion mobile applications (Flutter), and third-party developer integrations.
+The MYADS v4.6.1 API ecosystem delivers high-performance, secure, and extensible interfaces connecting web clients, companion mobile applications (Flutter), and third-party developer integrations.
 
 ### Primary API Subsystems
 1. **Internal Mobile & Web API (`/api/*`):** Powered by Laravel Sanctum for mobile app companion clients and web AJAX workflows.
@@ -607,7 +607,7 @@ Unified AJAX/REST endpoints managing contextual discussions across all platform 
   - **Payload:** `{"id": 142, "type": "forum_comment", "reaction": "like"}`
 
 ### J. Smart Partitioned XML Sitemaps
-MYADS v4.6.0 provides scalable, partitioned XML Sitemaps compliant with Google Sitemaps Protocol 0.9 and Schema.org standards:
+MYADS v4.6.1 provides scalable, partitioned XML Sitemaps compliant with Google Sitemaps Protocol 0.9 and Schema.org standards:
 
 | Endpoint | Content | Cache Strategy |
 |---|---|---|

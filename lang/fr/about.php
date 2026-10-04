@@ -7,19 +7,19 @@ return [
     'tab_changelog' => 'Journal des modifications',
     'tab_about' => 'À propos de MYADS',
     
-        // What's New Section (v4.6.0)
-    'feature_1_title' => 'Système de Design Visuel Moderne & Hub de Navigation Mobile',
-    'feature_1_desc' => 'Jetons CSS (theme-tokens.css), surfaces Glassmorphism 2.0, barre de navigation mobile ergonomique avec bouton FAB, sélecteur de réactions à ressort et collage d\'images (Ctrl+V).',
-    'feature_2_title' => 'Renforcement de la Sécurité des Téléchargements & de la Plateforme',
-    'feature_2_desc' => 'Vérification binaire stricte des magic bytes, assainisseur SVG natif contre XSS stocké, inspecteur d\'archives ZIP d\'extensions, en-têtes de sécurité HTTP renforcés et protection pré-démarrage.',
-    'feature_3_title' => 'Chiffrement de Bout en Bout des Messages Privés & Résilience des Sessions',
-    'feature_3_desc' => 'Protection de la clé APP_KEY contre les écrasements destructeurs, clés de routes symétriques pour le changement de compte, repli de texte chiffré et correction des déconnexions intempestives.',
-    'feature_4_title' => 'Démarrage Sécurisé Isolé des Plugins & Compatibilité Double Version',
-    'feature_4_desc' => 'Démarrage isolé des plugins évitant les erreurs 500, traductions automatiques avec espace de noms, crochets de cycle de vie (activation, désactivation, suppression) et badges de compatibilité.',
-    'feature_5_title' => 'Micro-Mise en Cache des Invités & Lancement AJAX Séquentiel du Tableau de Bord',
-    'feature_5_desc' => 'Micro-cache de 45 secondes pour les invités avec invalidation instantanée, support ETag 304, et rendu initial du tableau de bord admin en moins de 30ms via chargement AJAX séquentiel.',
-    'feature_6_title' => 'Suite Superdesign Administrative & Espace Utilisateur en AJAX Sans Rechargement',
-    'feature_6_desc' => 'Modernisation complète de la facturation, gestion des membres, centres de contrôle publicitaire et tableau de bord (/home) avec calculateur PTS en direct, générateur de coupons et standardisation en anglais.',
+        // What's New Section (v4.6.1)
+    'feature_1_title' => 'Modernisation de la Base de Connaissances & Recherche AJAX Instantanée',
+    'feature_1_desc' => 'Portail global de documentation (/kb), recherche AJAX debouncée en temps réel, système de vote d\'utilité des articles, table des matières flottante scrollspy et temps de lecture estimé.',
+    'feature_2_title' => 'Tableau de Modération Administrative & Moteur de Diff Visuel',
+    'feature_2_desc' => 'Refonte de /admin/knowledgebase avec 3 onglets, comparateur visuel de révisions ligne par ligne, approbation en 1 clic et rejet non destructif, et gestion AJAX des catégories.',
+    'feature_3_title' => 'Refonte des Publications Photo & Silhouette d\'Avatar Hexagonale',
+    'feature_3_desc' => 'Vue photo dédiée (s_type=4) avec surface glassmorphism, silhouette d\'avatar hexagonale emblématique, interactions AJAX sans rechargement (likes, commentaires, partages), zoom lightbox et balises SEO bilingues.',
+    'feature_4_title' => 'Résilience des Notifications Administratives & Tolérance aux Pannes SQL',
+    'feature_4_desc' => 'Résolution du conflit d\'espaces de tables MySQL InnoDB (erreurs 1932/1813) et tolérance défensive try/catch dans AdminNotificationService protégeant le shell d\'administration.',
+    'feature_5_title' => 'Auto-Réparation du Schéma d\'Administration des Utilisateurs',
+    'feature_5_desc' => 'Correction de l\'erreur 500 sur /admin/users via validation et auto-réparation automatique du schéma site_admins, migration 2026_09_27_020000 et protection anti-timeout dans PluginManager.',
+    'feature_6_title' => 'Refonte de la Navigation Mobile & Système de Vérification de Profil',
+    'feature_6_desc' => 'Suppression définitive de la floaty bar, bouton FAB contextuel ciblant #quick-post-box, localisation de add_post en 14 langues et flux complet de vérification de profil membre.',
 
     // About Section
     'about_description' => 'MYADS est une plateforme communautaire et un réseau d\'échange publicitaire tout-en-un. Elle permet aux propriétaires de sites de se connecter, d\'échanger du trafic, de négocier des services et de monétiser leurs plateformes.',

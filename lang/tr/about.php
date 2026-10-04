@@ -7,19 +7,19 @@ return [
     'tab_changelog' => 'Değişiklik Günlüğü',
     'tab_about' => 'MYADS Hakkında',
     
-        // What's New Section (v4.6.0)
-    'feature_1_title' => 'Modern Görsel Tasarım Sistemi ve Mobil Alt Gezinme Çubuğu',
-    'feature_1_desc' => 'CSS tasarım belirteçleri (theme-tokens.css), Glassmorphism 2.0 yüzeyleri, FAB hızlı gönderi butonlu sabit mobil alt gezinme çubuğu, yay mekanizmalı tepki seçici ve pano görsel yapıştırma (Ctrl+V).',
-    'feature_2_title' => 'Gelişmiş Platform ve Yükleme Güvenliği Güçlendirmesi',
-    'feature_2_desc' => 'Katı ikili magic bytes doğrulaması, depolanmış XSS\'e karşı yerel SVG temizleyici, eklentiler için ZIP dizin atlama denetçisi, gelişmiş HTTP güvenlik başlıkları ve hassas dizin kalkanı.',
-    'feature_3_title' => 'Uçtan Uca Özel Mesaj Şifreleme ve Oturum Dayanıklılığı',
-    'feature_3_desc' => 'APP_KEY anahtarının silinmesine karşı koruma, hesap geçişlerinde 404\'ü önleyen simetrik rota anahtarları, şifrelenmiş metin yedeği ve yanıt verirken yanlış oturum kapatmayı önleme.',
-    'feature_4_title' => 'Yalıtılmış Eklenti Güvenli Başlatma ve Çift Sürüm Uyumluluğu',
-    'feature_4_desc' => 'Üçüncü taraf hatalarında 500 çökmesini önleyen yalıtılmış başlatma motoru, otomatik çeviri ad alanları, yaşam döngüsü kancaları ve görsel rozetlerle uyumluluk sınırları.',
-    'feature_5_title' => 'Misafir Sayfası Mikro Önbellekleme ve Sıralı AJAX Panel Başlatma',
-    'feature_5_desc' => 'Anında geçersiz kılınan 45 saniyelik misafir mikro önbelleği, ETag 304 optimizasyonu ve sıralı AJAX veri yükleme hattı ile 30ms altında anında admin paneli açılışı.',
-    'feature_6_title' => 'Yeniden Yüklemesiz AJAX ile Yönetim ve Kullanıcı Superdesign Paketi',
-    'feature_6_desc' => 'Faturalandırma, Üye Yönetimi, Reklam Merkezleri ve Kullanıcı Paneli (/home) genelinde canlı PTS hesaplayıcı, kupon üretici ve %100 İngilizce kaynak kod standardizasyonu.',
+        // What's New Section (v4.6.1)
+    'feature_1_title' => 'Bilgi Bankası Modernizasyonu ve Anlık AJAX Arama',
+    'feature_1_desc' => 'Merkezi dokümantasyon portalı (/kb), gerçek zamanlı AJAX arama, makale faydalılık oylaması, sabit kaydırma izleyicili içindekiler tablosu ve tahmini okuma süresi.',
+    'feature_2_title' => 'Yönetici KB Moderasyon Paneli ve Görsel Fark Karşılaştırıcı (Diff)',
+    'feature_2_desc' => '3 sekmeli /admin/knowledgebase yenilemesi, satır satır revizyon karşılaştırma, tek tıkla onaylama/reddetme ve sıfır yeniden yüklemeli AJAX kategori yönetimi.',
+    'feature_3_title' => 'Fotoğraf Gönderileri Yenilemesi ve Altıgen Avatar Tasarımı',
+    'feature_3_desc' => 'Glassmorphism ile modern fotoğraf görünümü (s_type=4), altıgen profil silüeti, sayfa yenilenmeden AJAX beğenileri ve yorumları, lightbox yakınlaştırma ve SEO etiketleri.',
+    'feature_4_title' => 'Yönetici Bildirim Dayanıklılığı ve Veritabanı Hata Toleransı',
+    'feature_4_desc' => 'InnoDB tablo alanı eşzamanlama onarımı (hata 1932/1813) ve AdminNotificationService içindeki try/catch korumasıyla yönetim panelinin çökmesini engelleme.',
+    'feature_5_title' => 'Kullanıcı Yönetimi Şema Kendini İyileştirme ve Güvenlik',
+    'feature_5_desc' => '/admin/users sayfasındaki 500 hatasının site_admins otomatik şema doğrulaması ve onarımı ile çözümü, 2026_09_27_020000 migrasyonu ve PluginManager döngü koruması.',
+    'feature_6_title' => 'Mobil Navigasyon Yenilemesi ve Profil Doğrulama Talepleri',
+    'feature_6_desc' => 'Eski kayan çubuğun kalıcı olarak gizlenmesi, #quick-post-box odaklı akıllı FAB butonu, 14 dilde add_post çevirisi ve tam üye profil doğrulama iş akışı.',
 
     // About Section
     'about_description' => 'MYADS, güçlü bir topluluk platformu ve hepsi bir arada reklam değişim ağıdır.',

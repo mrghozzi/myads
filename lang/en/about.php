@@ -7,19 +7,19 @@ return [
     'tab_changelog' => 'Changelog',
     'tab_about' => 'About MYADS',
     
-    // What's New Section (v4.6.0)
-    'feature_1_title' => 'Modern Visual Design System & Mobile Navigation Hub',
-    'feature_1_desc' => 'CSS design tokens (theme-tokens.css), Glassmorphism 2.0 surfaces, ergonomic fixed mobile bottom nav with quick-post FAB, spring reaction picker, and clipboard image pasting (Ctrl+V).',
-    'feature_2_title' => 'Advanced Platform & Upload Security Hardening',
-    'feature_2_desc' => 'Strict binary magic bytes verification, native SVG stored-XSS sanitizer, plugin ZIP archive directory traversal & script inspector, enhanced HTTP headers, and pre-boot sensitive paths shield.',
-    'feature_3_title' => 'Private Messages End-to-End Encryption & Session Resilience',
-    'feature_3_desc' => 'APP_KEY invariant protection preventing destructive key overwrites, symmetric route keys for account switching, encrypted ciphertext fallback shielding, and session false revocation fix.',
-    'feature_4_title' => 'Isolated Plugin Safe Boot & Dual Version Compatibility',
-    'feature_4_desc' => 'Fault-isolated plugin booting preventing 500 fatal errors, automated translation namespacing, lifecycle hooks (activate, deactivate, delete), and dual version compatibility bounds with visual badges.',
-    'feature_5_title' => 'Guest Page Micro-Caching & Sequential AJAX Admin Launch',
-    'feature_5_desc' => '45-second guest page micro-caching with instant cache invalidation, ETag 304 optimization, and sub-30ms admin dashboard initial launch with chained sequential AJAX data loaders.',
-    'feature_6_title' => 'Administrative & User Superdesign Suite with Zero-Reload AJAX',
-    'feature_6_desc' => 'Comprehensive modernization across Billing Suite, User Management, Advertising Control Centers, and User Dashboard (/home) with live PTS calculator, voucher generator, and 100% English core.',
+    // What's New Section (v4.6.1)
+    'feature_1_title' => 'Knowledge Base Modernization Suite & Instant AJAX Search',
+    'feature_1_desc' => 'Centralized platform-wide Knowledge Base Portal (/kb), debounced real-time AJAX search, article helpfulness feedback voting, sticky scrollspy Table of Contents, and reading time estimation.',
+    'feature_2_title' => 'Administrative KB Moderation Dashboard & Visual Diff Engine',
+    'feature_2_desc' => 'Overhauled /admin/knowledgebase with 3 tabs, line-by-line visual revision diff viewer, one-click approvals and non-destructive rejections, and zero-reload AJAX taxonomy category management.',
+    'feature_3_title' => 'Standalone Photo Post Overhaul & Hexagonal Avatar Silhouette',
+    'feature_3_desc' => 'Modernized standalone photo posts (s_type=4) with glassmorphism surface, signature hexagonal author silhouette clip-path, zero-reload AJAX likes/comments/shares, lightbox zoom, and bilingual SEO meta tags.',
+    'feature_4_title' => 'Global Admin Notification Resilience & Database Fault-Tolerance',
+    'feature_4_desc' => 'MySQL InnoDB tablespace desync remediation (errors 1932/1813), and isolated try/catch defensive fault-tolerance in AdminNotificationService ensuring the administrative layout never crashes.',
+    'feature_5_title' => 'Administrative User Management Schema Self-Healing & Safety',
+    'feature_5_desc' => 'Resolved HTTP 500 on /admin/users via automatic site_admins schema validation and self-healing, migration 2026_09_27_020000, and loopback self-call timeout protection in PluginManager.',
+    'feature_6_title' => 'Mobile Navigation Overhaul & Profile Verification Suite',
+    'feature_6_desc' => 'Legacy floaty bar permanent suppression, context-aware quick-post FAB targeting #quick-post-box, 14-language add_post localization, and complete member profile verification requests workflow.',
 
     // About Section
     'about_description' => 'MYADS is a powerful, all-in-one community platform and ad exchange network. It empowers website owners to connect, exchange traffic, trade services, and monetize their platforms effectively.',

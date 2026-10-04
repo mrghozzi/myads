@@ -7,19 +7,19 @@ return [
     'tab_changelog' => 'Registro de cambios',
     'tab_about' => 'Acerca de MYADS',
     
-        // What's New Section (v4.6.0)
-    'feature_1_title' => 'Sistema de Diseño Visual Moderno y Barra de Navegación Móvil',
-    'feature_1_desc' => 'Tokens de diseño CSS (theme-tokens.css), superficies Glassmorphism 2.0, barra de navegación móvil fija con botón FAB, selector elástico de reacciones y pegado de imágenes (Ctrl+V).',
-    'feature_2_title' => 'Blindaje Avanzado de Seguridad de Subidas y de la Plataforma',
-    'feature_2_desc' => 'Verificación binaria estricta de magic bytes, sanitizador nativo de SVG contra XSS persistente, inspector de ZIPs contra directory traversal, cabeceras HTTP reforzadas y escudo de rutas sensibles.',
-    'feature_3_title' => 'Cifrado Extremo a Extremo de Mensajes Privados y Resiliencia de Sesiones',
-    'feature_3_desc' => 'Protección de clave APP_KEY contra sobreescrituras, claves de ruta simétricas para cambio de cuenta, respaldo de texto cifrado y corrección de cierres de sesión involuntarios.',
-    'feature_4_title' => 'Arranque Seguro Aislado de Plugins y Compatibilidad de Doble Versión',
-    'feature_4_desc' => 'Arranque aislado de extensiones que previene errores 500 fatales, nombres de espacio en traducciones, ganchos de ciclo de vida (activar, desactivar, borrar) y límites de versión con insignias visuales.',
-    'feature_5_title' => 'Micro-Caché de Invitados y Carga Secuencial AJAX del Panel de Control',
-    'feature_5_desc' => 'Micro-caché de 45 segundos para visitas con invalidación instantánea, soporte ETag 304 y renderizado del panel de administración en menos de 30ms mediante cargador AJAX secuencial.',
-    'feature_6_title' => 'Suite Superdesign Administrativa y Panel de Usuario con AJAX sin Recarga',
-    'feature_6_desc' => 'Modernización integral en Facturación, Usuarios, Anuncios y Panel (/home) con calculadora PTS en vivo, generador de cupones con copiado en 1 clic y estandarización del código en inglés.',
+        // What's New Section (v4.6.1)
+    'feature_1_title' => 'Modernización de Base de Conocimiento y Búsqueda AJAX Instantánea',
+    'feature_1_desc' => 'Portal centralizado de documentación (/kb), búsqueda AJAX en tiempo real, votación de utilidad de artículos, tabla de contenido fija con scrollspy y tiempo estimado de lectura.',
+    'feature_2_title' => 'Panel de Moderación de KB y Comparador Visual de Cambios (Diff)',
+    'feature_2_desc' => 'Renovación de /admin/knowledgebase con 3 pestañas, comparador visual de revisiones línea por línea, aprobación en 1 clic y rechazo no destructivo, y categorías con AJAX.',
+    'feature_3_title' => 'Publicaciones de Fotos Individuales y Silueta de Avatar Hexagonal',
+    'feature_3_desc' => 'Vista dedicada de fotos (s_type=4) con glassmorphism, silueta hexagonal de autor con clip-path, interacciones AJAX (likes, comentarios, compartir), zoom lightbox y etiquetas SEO.',
+    'feature_4_title' => 'Resiliencia de Notificaciones y Tolerancia a Fallos de Base de Datos',
+    'feature_4_desc' => 'Corrección del desajuste de tablespace InnoDB (errores 1932/1813) y tolerancia try/catch defensiva en AdminNotificationService que protege la consola administrativa.',
+    'feature_5_title' => 'Autoreparación de Esquema en Gestión de Usuarios y Protección de Bucles',
+    'feature_5_desc' => 'Resolución del error 500 en /admin/users mediante validación automática y autoreparación de site_admins, migración 2026_09_27_020000 y protección contra bucles en PluginManager.',
+    'feature_6_title' => 'Revisión de Navegación Móvil y Sistema de Verificación de Perfiles',
+    'feature_6_desc' => 'Supresión permanente de la barra flotante antigua, botón FAB contextual enfocado en #quick-post-box, traducción de add_post en 14 idiomas y flujo completo de verificación de perfil.',
 
     // About Section
     'about_description' => 'MYADS es una potente plataforma comunitaria y red de intercambio publicitario todo en uno.',

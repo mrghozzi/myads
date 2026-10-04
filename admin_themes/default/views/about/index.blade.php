@@ -491,7 +491,38 @@
                             <div class="timeline">
                                 <div class="timeline-item">
                                     <div class="timeline-icon"><i class="feather-box fs-12"></i></div>
-                                    <h6 class="fw-bold mb-1">v4.6.0 <span class="badge bg-soft-success text-success ms-2">Latest / Stable</span></h6>
+                                    <h6 class="fw-bold mb-1">v4.6.1 <span class="badge bg-soft-success text-success ms-2">Latest / Stable</span></h6>
+                                    <p class="text-muted fs-13 mb-3">Standalone Photo/Image Post Overhaul & Hexagonal Avatar Aesthetic, Administrative Global Notification Resilience & Engine Fault-Tolerance, Administrative User Management Schema Fault-Tolerance, Mobile Navigation Overhaul & Legacy Floaty Bar Removal, Context-Aware Quick Post Routing, Multi-Language Add Post Localization, Knowledge Base (/kb/*) & Administrative Moderation Modernization Suite, Profile Verification Requests, System Updates Large Payload Compacting, Extension Update Timeout Protection & Security Vulnerability Remediation Release.</p>
+                                    <div class="d-flex flex-column gap-2">
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-feature mt-1">Knowledge Base</span>
+                                            <span class="text-muted fs-13">Knowledge Base Global Portal (<code>/kb</code>), fast debounced real-time AJAX search (<code>/kb/{name}/search</code>), reader helpful/unhelpful feedback system, sticky Table of Contents with reading time, tabbed markdown editor (Write, Split View, Live Preview), visual line-by-line diff viewer, and clean RESTful routing.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-feature mt-1">Admin Moderation</span>
+                                            <span class="text-muted fs-13">Overhauled administrative Knowledge Base moderation dashboard (<code>/admin/knowledgebase</code>) with 3 responsive tabs, live filtering, 1-click approve/reject actions, and zero-reload AJAX taxonomy category management (<code>/admin/kb/categories</code>).</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-feature mt-1">Media & Social</span>
+                                            <span class="text-muted fs-13">Standalone photo/image post view (<code>s_type=4</code>) with modern glassmorphism card, platform-signature hexagonal author avatar clip-path, zero-reload AJAX reactions, comments, bookmarks, and sharing with high-res lightbox zoom.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-security mt-1">Admin Resilience</span>
+                                            <span class="text-muted fs-13">InnoDB tablespace desync repair (errors 1932/1813) on <code>profile_verification_requests</code>, defensive <code>try/catch</code> fault-tolerance in <code>AdminNotificationService</code> protecting the admin shell, and automated schema self-healing on <code>site_admins</code> table for <code>/admin/users</code>.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-optimization mt-1">Mobile & UI</span>
+                                            <span class="text-muted fs-13">Permanent CSS suppression and DOM removal of legacy <code>.floaty-bar</code>, context-aware quick-post FAB navigation (targeting <code>#quick-post-box</code> on portal/profile with autofocus, and <code>/share</code> fallback elsewhere), and 14-language dictionary sync for <code>messages.add_post</code>.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-security mt-1">Security & Updates</span>
+                                            <span class="text-muted fs-13">Patched Dependabot security advisory #71 by upgrading <code>phpseclib/phpseclib</code> to <code>3.0.57</code>, compacting large GitHub release notes payload in <code>ReleaseUpdateService</code>, and loopback self-call timeout protection in <code>PluginManager</code>.</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="timeline-item">
+                                    <div class="timeline-icon"><i class="feather-box fs-12"></i></div>
+                                    <h6 class="fw-bold mb-1">v4.6.0 <span class="badge bg-soft-secondary text-secondary ms-2">Previous</span></h6>
                                     <p class="text-muted fs-13 mb-3">Modern Visual Design System, Mobile Navigation Hub, Advanced File & Plugin Security Hardening, Private Messages Encryption & Key Invariant Hardening, Symmetric Route Keys & Account Switching Resilience, Security Member Session Expiration & False Revocation Fix, Isolated Plugin Boot Engine & Lifecycle Hooks, Dual Version Bounding & Compatibility Badges, Guest Page Micro-Caching with ETag 304 Optimization, Instantaneous Admin Dashboard Launch & Sequential AJAX Data Loading Pipeline, Points Ledger & Member History Resilience, Google Sitelinks Search Schema, Administrative Billing Suite Modernization, Administrative Member & User Management Superdesign Suite & Zero-Reload AJAX Overhaul, User Dashboard (/home) Superdesign Suite & Zero-Reload AJAX Operations Overhaul, Dual Banner Image Upload & Core English Standardization Release.</p>
                                     <div class="d-flex flex-column gap-2">
                                         <div class="d-flex align-items-start">

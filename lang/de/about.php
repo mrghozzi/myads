@@ -7,19 +7,19 @@ return [
     'tab_changelog' => 'Änderungsprotokoll',
     'tab_about' => 'Über MYADS',
     
-        // What's New Section (v4.6.0)
-    'feature_1_title' => 'Modernes visuelles Designsystem & Mobile Navigationsleiste',
-    'feature_1_desc' => 'CSS-Design-Tokens (theme-tokens.css), Glassmorphism 2.0-Oberflächen, ergonomische feste mobile Navigationsleiste mit FAB-Schnellpost-Button, Federreaktions-Wähler und Zwischenablagen-Bildeinfügen (Ctrl+V).',
-    'feature_2_title' => 'Umfassende Plattform- und Upload-Sicherheitshärtung',
-    'feature_2_desc' => 'Strikte binäre Magic-Bytes-Prüfung, nativer SVG-XSS-Bereiniger, ZIP-Archiv-Prüfung gegen Directory Traversal für Plugins, erweiterte HTTP-Sicherheits-Header und Schutz vor unbefugtem Pfadzugriff.',
-    'feature_3_title' => 'Ende-zu-Ende-Verschlüsselung für private Nachrichten & Sitzungsresilienz',
-    'feature_3_desc' => 'Schutz des APP_KEY vor unbeabsichtigtem Überschreiben, symmetrische Routenschlüssel für nahtlosen Kontowechsel, verschlüsselte Fallbacks und Beseitigung falscher Abmeldungen.',
-    'feature_4_title' => 'Isolierter Plugin-Sicherheitsstart & Doppelte Versionsgrenzen',
-    'feature_4_desc' => 'Fehlerisolierter Plugin-Start verhindert 500er-Abstürze bei Drittanbieterfehlern, automatische Übersetzungs-Namespaces, Lebenszyklus-Hooks und Kompatibilitätsgrenzen mit visuellen Badges.',
-    'feature_5_title' => 'Gäste-Micro-Caching & Sequenzieller AJAX-Admin-Dashboard-Start',
-    'feature_5_desc' => '45-Sekunden-Micro-Cache für Gäste mit sofortiger Entwertung, ETag-304-Unterstützung und Start des Admin-Dashboards in unter 30ms durch sequenzielle AJAX-Datenübertragung.',
-    'feature_6_title' => 'Administrative Superdesign-Suite & Benutzer-Dashboard ohne Neuladen',
-    'feature_6_desc' => 'Vollständige Modernisierung von Abrechnung, Benutzerverwaltung, Werbezentralen und Benutzer-Dashboard (/home) mit Live-PTS-Rechner, Gutschein-Generator und Standardisierung auf Englisch.',
+        // What's New Section (v4.6.1)
+    'feature_1_title' => 'Knowledge Base Modernisierung & Sofortige AJAX-Suche',
+    'feature_1_desc' => 'Zentrales Wissensdatenbank-Portal (/kb), debouncte Echtzeit-AJAX-Suche, Feedback-Bewertungssystem für Artikel, klebriges Scrollspy-Inhaltsverzeichnis und Lesezeitschätzung.',
+    'feature_2_title' => 'Administratives Moderations-Dashboard & Visueller Diff-Viewer',
+    'feature_2_desc' => 'Überarbeitung von /admin/knowledgebase mit 3 Tabs, zeilenweisem Revisionsvergleich, Ein-Klick-Freigabe, zerstörungsfreier Ablehnung und AJAX-Kategorienverwaltung.',
+    'feature_3_title' => 'Überholung von Foto-Beiträgen & Hexagonale Avatar-Silhouette',
+    'feature_3_desc' => 'Modernisierte Foto-Ansicht (s_type=4) mit Glassmorphismus, hexagonaler Silhouette passend zum Branding, AJAX-Interaktionen (Likes, Kommentare, Teilen), Lightbox-Zoom und SEO-Tags.',
+    'feature_4_title' => 'Resilienz der Admin-Benachrichtigungen & Datenbank-Fehlertoleranz',
+    'feature_4_desc' => 'Behebung von InnoDB-Tablespace-Fehlern (1932/1813) und defensive try/catch-Absicherung im AdminNotificationService zum Schutz des Administrationsbereichs vor Datenbankausfällen.',
+    'feature_5_title' => 'Selbstheilendes Schema für Benutzerverwaltung & Schleifenschutz',
+    'feature_5_desc' => 'Beseitigung von HTTP 500 auf /admin/users durch automatische Schema-Validierung der Tabelle site_admins, Migration 2026_09_27_020000 und Timeout-Schutz im PluginManager.',
+    'feature_6_title' => 'Mobile Navigation & Profil-Verifizierungsanfragen',
+    'feature_6_desc' => 'Dauerhafte Unterdrückung der alten Floaty-Bar, kontextbezogener Schnellbeitrag-FAB mit Fokus auf #quick-post-box, add_post-Übersetzung in 14 Sprachen und Profilverifizierungs-Workflow.',
 
     // About Section
     'about_description' => 'MYADS is a powerful, all-in-one community platform and ad exchange network. It empowers website owners to connect, exchange traffic, trade services, and monetize their platforms effectively.',
