@@ -1742,6 +1742,7 @@ return [
     'update_stage_cleanup_done' => 'Cleanup finished.',
     'update_stage_cleanup_removing_temp' => 'Removing temporary update files...',
     'update_stage_cleanup_repairing' => 'Repairing quest data...',
+    'live_execution' => 'Live-Ausführungspipeline',
     'update_stage_download' => 'Download package',
     'update_stage_download_detail' => 'Downloading: :downloaded / :total',
     'update_stage_download_done' => 'Downloaded :size.',

@@ -2023,6 +2023,7 @@ return [
     'update_stage_cleanup_done' => 'Чишћење је завршено.',
     'update_stage_cleanup_removing_temp' => 'Уклањање привремених датотека ажурирања...',
     'update_stage_cleanup_repairing' => 'Поправка података мисије...',
+    'live_execution' => 'Ток извршавања уживо',
     'update_stage_download' => 'Преузмите пакет',
     'update_stage_download_detail' => 'Преузимање: КСВАР0Кс / КСВАР1Кс',
     'update_stage_download_done' => 'Преузето КСВАР0Кс .',

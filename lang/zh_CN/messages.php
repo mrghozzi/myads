@@ -2023,6 +2023,7 @@ return [
     'update_stage_cleanup_done' => '清理完毕。',
     'update_stage_cleanup_removing_temp' => '正在删除临时更新文件...',
     'update_stage_cleanup_repairing' => '正在修复任务数据...',
+    'live_execution' => '实时执行流水线',
     'update_stage_download' => '下载包',
     'update_stage_download_detail' => '下载： :downloaded / :total',
     'update_stage_download_done' => '下载了 :size 。',

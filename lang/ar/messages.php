@@ -2304,6 +2304,7 @@ return [
     'update_stage_cleanup_done' => 'انتهت مرحلة التنظيف.',
     'update_stage_cleanup_removing_temp' => 'جاري حذف ملفات التحديث المؤقتة...',
     'update_stage_cleanup_repairing' => 'جاري إصلاح بيانات المهام...',
+    'live_execution' => 'مسار التنفيذ المباشر',
     'update_stage_download' => 'تحميل الحزمة',
     'update_stage_download_detail' => 'جاري التحميل: :downloaded / :total',
     'update_stage_download_done' => 'تم تحميل :size.',

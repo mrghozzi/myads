@@ -2023,6 +2023,7 @@ return [
     'update_stage_cleanup_done' => 'クリーンアップが完了しました。',
     'update_stage_cleanup_removing_temp' => '一時更新ファイルを削除しています...',
     'update_stage_cleanup_repairing' => 'クエストデータを修復しています...',
+    'live_execution' => 'ライブ実行パイプライン',
     'update_stage_download' => 'パッケージをダウンロード',
     'update_stage_download_detail' => 'ダウンロード： :downloaded / :total',
     'update_stage_download_done' => ':size をダウンロードしました。',

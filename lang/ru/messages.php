@@ -2023,6 +2023,7 @@ return [
     'update_stage_cleanup_done' => 'Уборка закончена.',
     'update_stage_cleanup_removing_temp' => 'Удаление временных файлов обновлений...',
     'update_stage_cleanup_repairing' => 'Восстановление данных квеста...',
+    'live_execution' => 'Конвейер прямого выполнения',
     'update_stage_download' => 'Скачать пакет',
     'update_stage_download_detail' => 'Загрузка: :downloaded / :total',
     'update_stage_download_done' => 'Скачал :size .',
