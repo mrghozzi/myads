@@ -102,6 +102,10 @@ class OrderApiController extends Controller
             return response()->json(['success' => false, 'message' => 'Order is not open for offers'], 400);
         }
 
+        if (!$request->has('content') && $request->has('txt')) {
+            $request->merge(['content' => $request->input('txt')]);
+        }
+
         $request->validate([
             'content' => ['required', 'string', 'max:5000'],
             'price' => ['nullable', 'numeric', 'min:0'],

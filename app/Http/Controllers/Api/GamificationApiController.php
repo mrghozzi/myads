@@ -21,49 +21,93 @@ class GamificationApiController extends Controller
 
     public function quests(Request $request)
     {
-        $userId = Auth::id();
-        $quests = Quest::active()->get();
-        $progress = QuestProgress::where('user_id', $userId)->get()->keyBy('quest_id');
+        $user = Auth::user();
+        $userId = $user?->id;
+        $quests = Quest::active()->orderBy('sort_order')->orderBy('id')->get();
+        $progress = $userId
+            ? QuestProgress::where('user_id', $userId)->get()->keyBy('quest_id')
+            : collect();
 
-        $data = $quests->map(function ($quest) use ($progress) {
+        $allQuests = $quests->map(function ($quest) use ($progress) {
             $prog = $progress->get($quest->id);
+            $targetCount = (int) ($quest->target_count ?? 1);
+            $rewardPoints = (int) ($quest->reward_points ?? 0);
+            $currentProgress = $prog ? (int) ($prog->progress ?? 0) : 0;
+            $isCompleted = $prog ? (bool) $prog->completed_at : ($currentProgress >= $targetCount);
+            $isClaimed = $prog ? (bool) $prog->rewarded_at : false;
+
+            $title = !empty($quest->name_key) && \Illuminate\Support\Facades\Lang::has('messages.' . $quest->name_key)
+                ? __('messages.' . $quest->name_key)
+                : ($quest->name_key ?? 'Quest #' . $quest->id);
+
+            $description = !empty($quest->description_key) && \Illuminate\Support\Facades\Lang::has('messages.' . $quest->description_key)
+                ? __('messages.' . $quest->description_key)
+                : ($quest->description_key ?? '');
+
             return [
                 'id' => $quest->id,
-                'name' => $quest->name,
-                'description' => $quest->description,
-                'type' => $quest->type,
-                'target_value' => $quest->target_value,
-                'reward_pts' => $quest->reward_pts,
-                'current_value' => $prog ? $prog->current_value : 0,
-                'is_completed' => $prog ? $prog->is_completed : false,
-                'is_claimed' => $prog ? $prog->is_claimed : false,
+                'title' => $title,
+                'name' => $title,
+                'description' => $description,
+                'type' => $quest->period ?? 'daily',
+                'period' => $quest->period ?? 'daily',
+                'reward' => $rewardPoints,
+                'reward_pts' => $rewardPoints,
+                'goal' => $targetCount,
+                'target_value' => $targetCount,
+                'progress' => $currentProgress,
+                'current_value' => $currentProgress,
+                'completed' => $isCompleted,
+                'is_completed' => $isCompleted,
+                'claimed' => $isClaimed,
+                'is_claimed' => $isClaimed,
             ];
         });
 
-        return response()->json(['success' => true, 'data' => $data]);
+        $dailyQuests = $allQuests->filter(fn ($q) => ($q['period'] ?? '') === 'daily')->values();
+        $weeklyQuests = $allQuests->filter(fn ($q) => ($q['period'] ?? '') !== 'daily')->values();
+
+        $userPts = (int) ($user?->pts ?? 0);
+
+        return response()->json([
+            'success' => true,
+            'user_pts' => $userPts,
+            'daily_quests' => $dailyQuests,
+            'weekly_quests' => $weeklyQuests,
+            'data' => [
+                'user_pts' => $userPts,
+                'daily_quests' => $dailyQuests,
+                'weekly_quests' => $weeklyQuests,
+                'quests' => $allQuests,
+            ],
+        ]);
     }
 
     public function claimQuest(Request $request, $id)
     {
-        $userId = Auth::id();
+        $user = Auth::user();
+        $userId = $user->id;
         $quest = Quest::active()->findOrFail($id);
         $progress = QuestProgress::where('user_id', $userId)->where('quest_id', $id)->first();
 
-        if (!$progress || !$progress->is_completed) {
+        $targetCount = (int) ($quest->target_count ?? 1);
+        $rewardPoints = (int) ($quest->reward_points ?? 0);
+
+        if (!$progress || (!$progress->completed_at && (int) $progress->progress < $targetCount)) {
             return response()->json(['success' => false, 'message' => __('messages.quest_not_completed')], 400);
         }
 
-        if ($progress->is_claimed) {
+        if ($progress->rewarded_at) {
             return response()->json(['success' => false, 'message' => __('messages.quest_already_claimed')], 400);
         }
 
         DB::beginTransaction();
         try {
-            $progress->is_claimed = true;
-            $progress->claimed_at = now();
+            $progress->completed_at = $progress->completed_at ?? now();
+            $progress->rewarded_at = now();
             $progress->save();
 
-            $this->ledger->award(Auth::user(), $quest->reward_pts, 'quest_reward', 'points_awarded', 'quest', $quest->id);
+            $this->ledger->award($user, $rewardPoints, 'quest_reward', $quest->slug ?? ('quest_' . $quest->id), 'quest', $quest->id);
 
             DB::commit();
             return response()->json(['success' => true, 'message' => __('messages.reward_claimed_successfully')]);

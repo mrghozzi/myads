@@ -52,6 +52,9 @@ class SettingsController extends Controller
     public function updateProfile(Request $request)
     {
         $user = Auth::user();
+        $email = $request->input('email', $user->email);
+        $request->merge(['email' => $email]);
+
         $request->validate([
             'email' => 'required|email|unique:users,email,' . $user->id,
             'password' => 'nullable|min:6|confirmed',
@@ -91,7 +94,19 @@ class SettingsController extends Controller
     {
         $user = Auth::user();
         $settings = app(UserPrivacyService::class)->settingsFor($user);
-        return response()->json(['settings' => $settings]);
+
+        // Map textual settings to numeric codes for mobile app convenience
+        $visibilityMap = ['public' => 0, 'followers' => 2, 'private' => 3];
+        $visibility = $visibilityMap[$settings->profile_visibility ?? 'public'] ?? 0;
+        $dm = $settings->allow_direct_messages ? 0 : 2;
+        $mention = $settings->allow_mentions ? 0 : 2;
+
+        return response()->json([
+            'settings' => $settings,
+            'visibility' => $visibility,
+            'dm' => $dm,
+            'mention' => $mention,
+        ]);
     }
 
     public function updatePrivacy(Request $request)
@@ -99,6 +114,41 @@ class SettingsController extends Controller
         $schema = app(V420SchemaService::class);
         if (!$schema->supports('privacy')) {
             return response()->json(['error' => 'Privacy feature not supported'], 400);
+        }
+
+        // Support mobile app shorthand integers (visibility, dm, mention)
+        if ($request->has('visibility') || $request->has('dm') || $request->has('mention')) {
+            $visInt = (int) $request->input('visibility', 0);
+            $dmInt = (int) $request->input('dm', 0);
+            $mentionInt = (int) $request->input('mention', 0);
+
+            $profileVis = match ($visInt) {
+                1, 2 => 'followers',
+                3 => 'private',
+                default => 'public',
+            };
+
+            $dmAllowed = ($dmInt !== 2);
+            $mentionAllowed = ($mentionInt !== 2);
+
+            $merged = [
+                'profile_visibility' => $profileVis,
+                'about_visibility' => $profileVis,
+                'photos_visibility' => $profileVis,
+                'followers_visibility' => $profileVis,
+                'following_visibility' => $profileVis,
+                'points_history_visibility' => 'private',
+                'allow_direct_messages' => $dmAllowed,
+                'allow_mentions' => $mentionAllowed,
+                'allow_reposts' => true,
+                'show_online_status' => true,
+            ];
+
+            foreach ($merged as $k => $v) {
+                if (!$request->has($k)) {
+                    $request->merge([$k => $v]);
+                }
+            }
         }
 
         $request->validate([
@@ -162,8 +212,20 @@ class SettingsController extends Controller
     {
         $user = Auth::user();
         $option = Option::where('o_type', 'user_social_links')->where('o_parent', $user->id)->first();
-        $links = $option ? json_decode($option->o_valuer, true) : [];
-        return response()->json(['links' => $links]);
+        $links = $option ? (json_decode($option->o_valuer, true) ?: []) : [];
+
+        $socials = [];
+        foreach ($links as $platform => $url) {
+            $socials[] = [
+                'platform' => $platform,
+                'url' => $url,
+            ];
+        }
+
+        return response()->json([
+            'links' => $links,
+            'socials' => $socials,
+        ]);
     }
 
     public function updateSocial(Request $request, SocialValidationService $socialService)
@@ -171,6 +233,12 @@ class SettingsController extends Controller
         $user = Auth::user();
         $platforms = $socialService->getSupportedPlatforms();
         $links = [];
+
+        // Support mobile app payload format {'socials': {'facebook': '...'}}
+        $socialsInput = $request->input('socials');
+        if (is_array($socialsInput)) {
+            $request->merge($socialsInput);
+        }
 
         foreach ($platforms as $platform) {
             $value = trim((string) $request->input($platform));
@@ -188,19 +256,63 @@ class SettingsController extends Controller
             ['o_valuer' => json_encode($links), 'name' => $user->username, 'o_order' => $user->id]
         );
 
-        return response()->json(['message' => 'Social links updated', 'links' => $links]);
+        $socials = [];
+        foreach ($links as $platform => $url) {
+            $socials[] = [
+                'platform' => $platform,
+                'url' => $url,
+            ];
+        }
+
+        return response()->json([
+            'message' => 'Social links updated',
+            'links' => $links,
+            'socials' => $socials,
+        ]);
     }
 
     public function getNotificationPreferences()
     {
         $user = Auth::user();
         $settings = $user->notificationSetting ?? new UserNotificationSetting();
-        return response()->json(['settings' => $settings]);
+
+        $mentionVal = (int) ($settings->email_mention ?? 1);
+        $messageVal = (int) ($settings->email_new_message ?? 1);
+        $followerVal = (int) ($settings->email_new_follower ?? 1);
+        $commentVal = (int) ($settings->email_new_comment ?? 1);
+
+        return response()->json([
+            'settings' => $settings,
+            // Mobile app shorthand keys
+            'email_mentions' => $mentionVal,
+            'email_messages' => $messageVal,
+            'email_follows' => $followerVal,
+            'email_comments' => $commentVal,
+            // Canonical schema keys
+            'email_mention' => (bool) $mentionVal,
+            'email_new_message' => (bool) $messageVal,
+            'email_new_follower' => (bool) $followerVal,
+            'email_new_comment' => (bool) $commentVal,
+        ]);
     }
 
     public function updateNotificationPreferences(Request $request)
     {
         $user = Auth::user();
+
+        // Support mobile app shorthand parameter aliases
+        $aliasMap = [
+            'email_mentions' => 'email_mention',
+            'email_messages' => 'email_new_message',
+            'email_follows' => 'email_new_follower',
+            'email_comments' => 'email_new_comment',
+        ];
+        foreach ($aliasMap as $mobileKey => $canonicalKey) {
+            if ($request->has($mobileKey) && !$request->has($canonicalKey)) {
+                $request->merge([$canonicalKey => $request->boolean($mobileKey)]);
+            }
+        }
+
         $fields = [
             'email_new_follower', 'email_new_comment', 'email_new_message', 
             'email_mention', 'email_repost', 'email_reaction', 
@@ -278,13 +390,31 @@ class SettingsController extends Controller
             ->orderBy('sort_order')
             ->get();
 
-        return response()->json(['earned' => $earnedBadges, 'showcase' => $showcase]);
+        $showcaseBadgeIds = $showcase->pluck('badge_id')->all();
+
+        $badges = $earnedBadges->map(function ($ub) use ($showcaseBadgeIds) {
+            $badge = $ub->badge;
+            return [
+                'id' => $ub->badge_id,
+                'name' => $badge?->name ?? ('Badge #' . $ub->badge_id),
+                'description' => $badge?->description ?? '',
+                'icon' => $badge?->icon_url ?? null,
+                'is_shown' => in_array($ub->badge_id, $showcaseBadgeIds, true),
+            ];
+        })->values();
+
+        return response()->json([
+            'earned' => $earnedBadges,
+            'showcase' => $showcase,
+            'badges' => $badges,
+        ]);
     }
 
     public function updateBadges(Request $request)
     {
         $user = Auth::user();
-        $badgeIds = collect($request->input('badge_ids', []))
+        $rawInput = $request->input('badge_ids', $request->input('showcase', []));
+        $badgeIds = collect($rawInput)
             ->filter(fn ($id) => is_numeric($id))
             ->map(fn ($id) => (int) $id)
             ->unique()

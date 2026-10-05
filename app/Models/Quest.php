@@ -27,4 +27,9 @@ class Quest extends Model
         'is_active' => 'boolean',
         'meta' => 'array',
     ];
+
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true);
+    }
 }

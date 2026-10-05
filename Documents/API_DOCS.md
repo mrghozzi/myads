@@ -1,5 +1,5 @@
-# MYADS v4.6.1 REST & Real-Time API Documentation
-> **Specification Version:** `v4.6.1` (Stable Release)  
+# MYADS v4.6.2 REST & Real-Time API Documentation
+> **Specification Version:** `v4.6.2` (Stable Release)  
 > **Target Framework:** Laravel 12 (PHP 8.2+)  
 > **Authentication Engines:** Laravel Sanctum (Mobile & Web API), OAuth 2.0 (Developer Platform), and Server-Sent Events (SSE Live Stream).  
 > **Last Updated:** October 2026  
@@ -8,7 +8,7 @@
 
 ## 1. Overview & Architecture
 
-The MYADS v4.6.1 API ecosystem delivers high-performance, secure, and extensible interfaces connecting web clients, companion mobile applications (Flutter), and third-party developer integrations.
+The MYADS v4.6.2 API ecosystem delivers high-performance, secure, and extensible interfaces connecting web clients, companion mobile applications (Flutter), and third-party developer integrations.
 
 ### Primary API Subsystems
 1. **Internal Mobile & Web API (`/api/*`):** Powered by Laravel Sanctum for mobile app companion clients and web AJAX workflows.
@@ -446,20 +446,31 @@ https://myads.com/share?text=Check+out+this+awesome+platform!+https://example.co
 ## 8. Mobile App API (Sanctum Endpoints)
 
 ### A. Settings & Account Management
+All settings mutation endpoints accept `POST`, `PUT`, and `PATCH` HTTP verbs for maximum client compatibility.
+
 - `GET /api/settings/profile`: Retrieve user's editable profile information.
-- `POST /api/settings/profile`: Update user profile details.
+- `POST|PUT|PATCH /api/settings/profile`: Update user profile details.
+  - *Payload:* `{"about_me": "User signature/bio", "email": "optional_email@example.com"}`. The `email` parameter is optional; when omitted, the backend preserves the authenticated member's active email.
 - `GET /api/settings/privacy`: Retrieve current privacy settings.
-- `PATCH /api/settings/privacy`: Update privacy configuration.
+  - *Returns:* Full schema strings (`profile_visibility`, `allow_direct_messages`, `allow_mentions`, etc.) as well as mobile shorthand integers (`visibility`, `dm`, `mention`).
+- `POST|PUT|PATCH /api/settings/privacy`: Update privacy configuration.
+  - *Payload:* Supports canonical schema strings (`profile_visibility: "public|followers|private"`, `allow_direct_messages: true|false`, etc.) or mobile integer shorthands (`visibility`: 0=Public, 1/2=Followers, 3=Private; `dm`: 2=Disabled; `mention`: 2=Disabled).
 - `GET /api/settings/social`: Retrieve connected social profile URLs.
-- `PATCH /api/settings/social`: Update social profile URLs.
-- `GET /api/settings/notification-preferences`: Retrieve push/email notification toggles.
-- `PATCH /api/settings/notification-preferences`: Update notification toggles.
+  - *Returns:* Both `links` dictionary map (`{"facebook": "...", "twitter": "..."}`) and `socials` list of objects (`[{"platform": "facebook", "url": "..."}]`).
+- `POST|PUT|PATCH /api/settings/social`: Update social profile URLs.
+  - *Payload:* Supports flat platform keys (`{"facebook": "https://facebook.com/user"}`) or nested objects (`{"socials": {"facebook": "https://facebook.com/user"}}`).
+- `GET /api/settings/notification-preferences` & `GET /api/settings/notifications`: Retrieve push/email notification toggles.
+  - *Returns:* Nested `settings` model, canonical boolean keys (`email_mention`, `email_new_message`, `email_new_follower`, `email_new_comment`), and mobile integer flags (`email_mentions`, `email_messages`, `email_follows`, `email_comments`).
+- `POST|PUT|PATCH /api/settings/notification-preferences` & `POST|PUT|PATCH /api/settings/notifications`: Update notification toggles.
+  - *Payload:* Accepts both mobile plural keys (`email_mentions`, `email_messages`, `email_follows`, `email_comments`) and core singular keys (`email_mention`, `email_new_message`, etc.), accepting boolean (`true`/`false`) or integer (`1`/`0`) values.
 - `GET /api/settings/sessions`: Retrieve active web sessions and active Sanctum device tokens.
 - `POST /api/settings/sessions/{id}/revoke`: Revoke a specific web session by ID.
 - `POST /api/settings/tokens/{id}/revoke`: Revoke a specific Sanctum API device token by ID.
 - `POST /api/settings/device-token`: Register FCM device token for mobile push notifications.
 - `GET /api/settings/badges`: Retrieve user earned badges and showcase progress.
-- `PATCH /api/settings/badges`: Update badge showcase order and display (`{"badges": [1, 2, 3]}`).
+  - *Returns:* `earned` collection, `showcase` collection, and computed `badges` list containing `id`, `name`, `description`, `icon`, and `is_shown` boolean flag.
+- `POST|PUT|PATCH /api/settings/badges`: Update badge showcase order and display.
+  - *Payload:* Accepts either `showcase` array (`{"showcase": [1, 2, 3]}`) or `badge_ids` (`{"badge_ids": [1, 2, 3]}`).
 - `GET /api/settings/history`: Retrieve paginated member Points (PTS) transaction ledger history with dynamic timestamp sorting and error resilience.
 - `GET /api/settings/apps`: Retrieve authorized third-party OAuth applications.
 - `POST /api/settings/apps/{id}/revoke`: Revoke authorization for a third-party application.
@@ -537,11 +548,21 @@ https://myads.com/share?text=Check+out+this+awesome+platform!+https://example.co
 ### F. Notifications & Gamification
 - `GET /api/notifications`: Retrieve user notifications (paginated).
 - `GET /api/notifications/unread-count`: Get integer count of unread notifications.
-- `POST /api/notifications/{id}/read`: Mark specific notification as read.
-- `POST /api/notifications/read-all`: Mark all notifications as read.
+- `POST|GET /api/notifications/{id}/read` & `POST|GET /api/notifications/{id}/mark-read`: Mark specific notification as read.
+- `POST|GET /api/notifications/read-all` & `POST|GET /api/notifications/mark-all-read`: Mark all notifications as read.
 - `GET /api/wallet/balance`: Get current Points (PTS) balance and credit balances.
-- `GET /api/quests`: Retrieve active gamification quests.
-- `POST /api/quests/{id}/claim`: Claim quest completion points.
+- `GET /api/gamification/quests` (and legacy alias `GET /api/quests`): Retrieve active gamification quests.
+  - *Returns:*
+    ```json
+    {
+        "daily_quests": [ ... ],
+        "weekly_quests": [ ... ],
+        "user_pts": 1500,
+        "quests": [ ... ]
+    }
+    ```
+  - *Quest Model Fields:* `id`, `name` (translated from `name_key`), `description` (translated from `description_key`), `period` (`daily` / `weekly`), `points` (mapped from `reward_points`), `target_count`, `current_count`, `is_completed`, `is_claimed`.
+- `POST /api/gamification/quests/{id}/claim` (and legacy alias `POST /api/quests/{id}/claim`): Claim quest completion points and update PTS balance.
 - `POST /api/pts/transfer`: Transfer PTS to another member.
 - `POST /api/pts/vouchers/create`: Create a PTS voucher code.
 - `POST /api/pts/vouchers/claim`: Redeem a PTS voucher code.
@@ -557,6 +578,7 @@ https://myads.com/share?text=Check+out+this+awesome+platform!+https://example.co
 - `GET /api/store/products/{id}/knowledgebase`: Get product knowledgebase articles.
 - `GET /api/orders`: Browse service requests.
 - `POST /api/orders/{id}/offers`: Submit an offer on a service request.
+  - *Payload:* Accepts either `content` or `txt` (automatically mapped to `content`), `price` (optional numeric), `currency` (optional string), `delivery_days` (optional integer).
 
 ### H. Clips System
 - `GET /api/clips`: Retrieve vertical short video clips feed.
@@ -607,7 +629,7 @@ Unified AJAX/REST endpoints managing contextual discussions across all platform 
   - **Payload:** `{"id": 142, "type": "forum_comment", "reaction": "like"}`
 
 ### J. Smart Partitioned XML Sitemaps
-MYADS v4.6.1 provides scalable, partitioned XML Sitemaps compliant with Google Sitemaps Protocol 0.9 and Schema.org standards:
+MYADS v4.6.2 provides scalable, partitioned XML Sitemaps compliant with Google Sitemaps Protocol 0.9 and Schema.org standards:
 
 | Endpoint | Content | Cache Strategy |
 |---|---|---|

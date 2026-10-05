@@ -1,3 +1,62 @@
+# v4.6.2
+> **Flutter Companion App (myads_app v1.8.0+22) Full API Parity & Synchronization Suite, Gamification Quests Architecture & Active Scope Engine, Bidirectional Settings Interoperability Suite (Privacy, Social Links, Notifications, Badges Showcase), Marketplace Orders Offer Proposal Resilience, Notifications Dual-Route Aliasing, and Dart 3.13 Codebase Modernization Release** — Comprehensive compatibility and synchronization release bridging the core MYADS web platform with the official Flutter companion application (`myads_app` v1.8.0+22). Implemented the missing `scopeActive` query scope on the `Quest` Eloquent model to eliminate fatal `BadMethodCallException` errors during active gamification quest queries, and overhauled `GamificationApiController` (`/api/gamification/quests` and `/api/gamification/quests/{id}/claim`) to deliver structured dual-schema payloads supporting both period-grouped (`daily_quests`, `weekly_quests`, and `user_pts`) and backward-compatible flat `quests` collections matching database columns (`reward_points`, `target_count`, `name_key`, `description_key`). Enhanced Settings API endpoints (`/settings/profile`, `/settings/privacy`, `/settings/social`, `/settings/notifications`, `/settings/notification-preferences`, `/settings/badges`) to natively support `POST`, `PUT`, and `PATCH` verbs with bidirectional schema translation for mobile shorthand integers (`visibility`, `dm`, `mention` mapped to `UserPrivacyService`), dual-format social links (flat key-value maps and structured `[{platform, url}]` lists), flexible email notification preferences (handling both mobile plural aliases `email_mentions`, `email_messages`, `email_follows`, `email_comments` and canonical singular database attributes), and computed `is_shown` boolean flags for earned badges with dual `showcase` / `badge_ids` payload persistence. Relaxed marketplace offer validation in `OrderApiController@submitOffer` to seamlessly accept either `content` or `txt` parameters, and established redundant notification read route aliases (`/notifications/read-all` & `/notifications/mark-all-read`, `/notifications/{id}/read` & `/notifications/{id}/mark-read`). Modernized mobile Dart code to Dart 3.13 standards, resolving deprecation notices, cleaning unused test imports, and achieving 100% test pass rate across all Flutter widget and Laravel mobile feature test suites.
+
+### Gamification Quests Architecture & Eloquent Scope Resilience
+* **Active Quest Query Scope (`app/Models/Quest.php`)**:
+  * Implemented missing `scopeActive($query)` scope on the `Quest` model (`$query->where('is_active', true)`), preventing fatal `BadMethodCallException` errors when querying active gamification tasks.
+* **Dual-Schema Quests API (`app/Http/Controllers/Api/GamificationApiController.php`)**:
+  * Overhauled `quests()` to format and return grouped collections (`daily_quests`, `weekly_quests`) along with authenticated user points (`user_pts`) for modern mobile interfaces, while simultaneously maintaining a flat `quests` list for backward compatibility with legacy endpoints.
+  * Mapped database schema columns (`reward_points`, `target_count`, `name_key`, `description_key`) directly to `QuestModel` properties in Flutter, resolving undefined field notices.
+  * Hardened `claimQuest()` endpoint with defensive validation, ensuring quest rewards are credited safely with real-time balance reconciliation.
+
+### Settings API Bidirectional Interoperability Suite
+* **HTTP Verbs Alignment (`routes/api.php`)**:
+  * Updated all settings routes (`/settings/profile`, `/settings/privacy`, `/settings/social`, `/settings/notifications`, `/settings/notification-preferences`, `/settings/badges`) to accept `POST`, `PUT`, and `PATCH` HTTP verbs, preventing `405 Method Not Allowed` exceptions across diverse REST client implementations.
+* **Privacy Settings Shorthand Translation (`SettingsController@updatePrivacy`)**:
+  * Implemented bidirectional mapping between mobile shorthand integers (`visibility`: 0=Public, 1/2=Followers, 3=Private; `dm`: 2=Disabled; `mention`: 2=Disabled) and the underlying `UserPrivacyService` schema (`profile_visibility`, `allow_direct_messages`, `allow_mentions`).
+* **Profile Update Flexibility (`SettingsController@updateProfile`)**:
+  * Made the `email` parameter optional during profile updates, defaulting to the authenticated user's current email if omitted, allowing mobile clients to update user bio/about text without resubmitting email credentials.
+* **Dual-Format Social Links (`SettingsController@getSocial`, `updateSocial`)**:
+  * Refactored `getSocial()` to return both a key-value dictionary (`links`) and an array of objects (`socials: [{platform, url}]`).
+  * Updated `updateSocial()` to accept both root-level platform keys and nested `{'socials': {...}}` payloads sent by the mobile app.
+* **Notification Preferences Key Translation (`SettingsController@getNotificationPreferences`, `updateNotificationPreferences`)**:
+  * Supported mobile plural parameter aliases (`email_mentions`, `email_messages`, `email_follows`, `email_comments`) mapping directly to internal database columns (`email_mention`, `email_new_message`, `email_new_follower`, `email_new_comment`).
+  * Returned both integer (`1`/`0`) and boolean representations for maximum client-side compatibility.
+* **Badges Showcase Integration (`SettingsController@getBadges`, `updateBadges`)**:
+  * Enhanced `getBadges()` to compute and include an `is_shown` boolean flag for each earned badge based on the user's active showcase.
+  * Updated `updateBadges()` to accept either `showcase` or `badge_ids` arrays, ensuring seamless mobile showcase customization.
+
+### Marketplace & Orders Offer Proposal Resilience
+* **Flexible Offer Parameter Mapping (`app/Http/Controllers/Api/OrderApiController.php`)**:
+  * Updated `submitOffer()` to automatically merge `txt` into `content` if `content` is not explicitly provided, satisfying required validation rules whether the request originates from web forms (`content`) or mobile providers (`txt`).
+* **Mobile Provider Synchronization (`myads_app/lib/features/orders/orders_provider.dart`)**:
+  * Updated `OrderActionNotifier.submitOffer` to send both `'content': txt` and `'txt': txt` for bulletproof cross-version safety.
+
+### Notifications API & Read-State Synchronization
+* **Redundant Route Aliases (`routes/api.php`)**:
+  * Added route aliases supporting both `/notifications/read-all` & `/notifications/mark-all-read`, as well as `/notifications/{id}/read` & `/notifications/{id}/mark-read`.
+* **Mobile Client Fallback (`myads_app/lib/features/notifications/screens/notifications_screen.dart`)**:
+  * Integrated automated try/catch fallback in `_markAllRead()` and `_markAsRead()` ensuring notifications are marked read seamlessly across legacy and modern backend installations.
+
+### Flutter Mobile Client Modernization (myads_app v1.8.0+22)
+* **Dart 3.13 Code Quality & Analyzer Cleanup**:
+  * Resolved `deprecated_member_use` warnings on `Share.share` in `post_details_screen.dart`.
+  * Replaced unnecessary double underscores with modern wildcard syntax `(_, _)` in `composer_screen.dart`.
+  * Removed unused `flutter_riverpod` import in `widget_test.dart`.
+  * Achieved 0 analyzer warnings and 0 errors across the entire Flutter project.
+* **Resilient Settings Screens**:
+  * Updated `social_settings_screen.dart`, `notifications_settings_screen.dart`, `badges_settings_screen.dart`, and `profile_settings_screen.dart` with dual response parsers and multi-key save payloads.
+* **Version Bump & Documentation**:
+  * Bumped `myads_app/pubspec.yaml` to `1.8.0+22`.
+  * Updated `myads_app/README.md` to reflect Flutter 3.27+ / Dart 3.13+ and backend requirement `v4.6.2+`.
+  * Documented all companion updates in `myads_app/CHANGELOG.md`.
+
+### Automated Verification & Test Coverage
+* **100% Pass on Flutter Test Suite**: All 9 unit and widget tests passed (`formatted_content_widget_test.dart`, `settings_hub_screen_test.dart`, `widget_test.dart`).
+* **100% Pass on Laravel Mobile Feature Tests**: All 17 feature tests (56 assertions) passed seamlessly across `MobileSettingsApiTest`, `MobileFeedApiTest`, and `AdminMobileSettingsTest`.
+
+---
+
 # v4.6.1
 > **Standalone Photo/Image Post Overhaul & Hexagonal Avatar Aesthetic, Administrative Global Notification Resilience & Engine Fault-Tolerance, Administrative User Management Schema Fault-Tolerance, Mobile Navigation Overhaul & Legacy Floaty Bar Removal, Context-Aware Quick Post Routing, Multi-Language Add Post Localization, Knowledge Base (/kb/*) & Administrative Moderation Modernization Suite, Extension Update Timeout Protection & Security Vulnerability Remediation Release** — Overhauled dedicated standalone photo/image posts (`s_type=4`, `themes/default/views/forum/image.blade.php`) with modern social-media aesthetics, glassmorphic layout, zero-reload AJAX interactions (reactions, comments, bookmarks, sharing), platform-signature hexagonal author avatar styling, SEO meta tags, and full bilingual localization. Resolved platform-wide administrative HTTP 500 error by repairing MySQL InnoDB tablespace desynchronization (errors 1932/1813) on `profile_verification_requests` and hardening `AdminNotificationService` with defensive `try/catch` fault-tolerance to protect the administrative shell against database engine failures. Critical hotfix addressing HTTP 500 error on `/admin/users` caused by missing `is_active` column in legacy or incomplete `site_admins` database tables. Added `FEATURE_COLUMNS` verification, automatic on-the-fly table schema repair, defensive try/catch query execution with super-admin fallback, dedicated schema repair migration `2026_09_27_020000_repair_site_admins_table_schema.php`, recursive loopback self-call timeout protection in `PluginManager`, complete removal and CSS suppression of legacy `.floaty-bar` in favor of `.myads-mobile-bottom-nav`, context-aware quick-post FAB navigation (`#quick-post-box` on `/portal` and own member profile `/u/{auth_username}` with smooth focus scrolling, and fallback to `/share` elsewhere), comprehensive 14-language dictionary additions for `messages.add_post`, and patched Dependabot security advisory #71 by upgrading `phpseclib/phpseclib` to `3.0.57`.
 
