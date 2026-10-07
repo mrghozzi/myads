@@ -147,6 +147,12 @@ Route::middleware(['api.key', 'auth:sanctum'])->group(function () {
     Route::get('/orders', [App\Http\Controllers\Api\OrderApiController::class, 'index']);
     Route::get('/orders/{id}', [App\Http\Controllers\Api\OrderApiController::class, 'show']);
     Route::post('/orders/{id}/offers', [App\Http\Controllers\Api\OrderApiController::class, 'submitOffer']);
+    Route::post('/orders/{id}/award', [App\Http\Controllers\Api\OrderApiController::class, 'award']);
+    Route::post('/orders/{id}/start', [App\Http\Controllers\Api\OrderApiController::class, 'start']);
+    Route::post('/orders/{id}/deliver', [App\Http\Controllers\Api\OrderApiController::class, 'deliver']);
+    Route::post('/orders/{id}/revision', [App\Http\Controllers\Api\OrderApiController::class, 'revision']);
+    Route::post('/orders/{id}/complete', [App\Http\Controllers\Api\OrderApiController::class, 'complete']);
+    Route::post('/orders/{id}/cancel', [App\Http\Controllers\Api\OrderApiController::class, 'cancel']);
 
     // Gamification API
     Route::get('/quests', [App\Http\Controllers\Api\GamificationApiController::class, 'quests']);

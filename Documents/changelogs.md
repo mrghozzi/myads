@@ -32,8 +32,25 @@
 * **Safe Order Deletion & Offer Moderation**:
   * Safe cascading deletion of orders (`admin.orders.destroy`) ensuring files and child contracts are safely removed without dangling records.
   * Added individual spam/inappropriate offer deletion (`admin.orders.offers.destroy`).
-* **Staff Internal Private Notes (`admin_notes`)**:
-  * Added private administrative notes field (`admin_notes`) allowing moderators to record investigation notes, verification statuses, or dispute logs hidden from regular users.
+### Theme & Alternative Layout Compatibility (`themes/bootstrap-sample`)
+* **Bootstrap Sample Theme Parity**:
+  * Implemented responsive platform disclaimer notice with dynamic database site name injection on `index.blade.php`, `form.blade.php`, and `show.blade.php`.
+  * Added badge indicators for attachments (`hasAttachment()`) and revision requests (`isRevisionRequested()`) in `partials/card.blade.php`.
+  * Enhanced milestone progress stepper (1 to 5) with deadline and overdue indicators in `show.blade.php`.
+  * Added requirements attachment download cards and deliverable work download cards with authenticated streams.
+  * Added revision request alert banners with detailed notes and round counters.
+  * Added dual client action buttons upon delivery: "Complete & Review" and "Request Revision".
+  * Added `enctype="multipart/form-data"` and file upload inputs for both project requirements and deliverable submissions.
+
+### Mobile Companion App Full Parity (`myads_app` v1.8.1+23)
+* **Orders Mobile API Architecture (`OrderApiController.php`, `routes/api.php`)**:
+  * Enriched order listings with buyer objects (`id`, `name`, `username`, `avatar`), delivery days, attachment indicators, and revision indicators.
+  * Added API endpoints for the complete order lifecycle: awarding offers (`/orders/{id}/award`), starting contracts (`/orders/{id}/start`), submitting deliverables (`/orders/{id}/deliver`), requesting revisions (`/orders/{id}/revision`), completing orders with ratings/reviews (`/orders/{id}/complete`), and cancelling orders (`/orders/{id}/cancel`).
+* **Flutter Mobile Experience (`myads_app`)**:
+  * Displayed the P2P disclaimer banner prominently on both `OrdersListScreen` and `OrderDetailScreen`.
+  * Added interactive 5-step milestone stepper, revision alert banner, attachment download cards, and deliverable cards to `OrderDetailScreen`.
+  * Integrated "Service Orders" into the Discover grid (`explore_screen.dart`).
+  * Achieved 0 warnings and 0 errors on `flutter analyze` and 100% test pass rate across all test suites.
 
 # v4.6.2
 > **Flutter Companion App (myads_app v1.8.0+22) Full API Parity Suite, Store Marketplace Overhaul & Customer Library Suite, Administrative Store Moderation Engine & Sales Intelligence Dashboard, Gamification Quests Architecture & Active Scope Engine, Bidirectional Settings Interoperability Suite, and Dart 3.13 Codebase Modernization Release** — Comprehensive platform update and compatibility release across MYADS web and mobile ecosystems. Overhauled the Store marketplace (`/store`) with real-time keyword search, 6 multi-criteria sorting modes, download counters, and pending moderation visibility controls; created the customer "My Purchases" buyer library (`/store/my-purchases`) with instant license key copy and authenticated downloads; modernized administrative store supervision (`/admin/products`) with responsive `.superdesign` KPI cards, dual table/grid views, and a 1-click approval/rejection moderation workflow; introduced administrative sales & licenses monitoring (`/admin/store/sales`) with KPI intelligence; synchronized 43 bilingual translation keys; achieved full synchronization with Flutter companion app (`myads_app` v1.8.0+22) with bidirectional settings interoperability, dual-schema quests API, and 100% test pass rate across all automated suites.
