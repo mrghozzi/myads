@@ -1,5 +1,5 @@
-# MYADS v4.6.2 REST & Real-Time API Documentation
-> **Specification Version:** `v4.6.2` (Stable Release)  
+# MYADS v4.6.3 REST & Real-Time API Documentation
+> **Specification Version:** `v4.6.3` (Stable Release)  
 > **Target Framework:** Laravel 12 (PHP 8.2+)  
 > **Authentication Engines:** Laravel Sanctum (Mobile & Web API), OAuth 2.0 (Developer Platform), and Server-Sent Events (SSE Live Stream).  
 > **Last Updated:** October 2026  
@@ -8,15 +8,19 @@
 
 ## 1. Overview & Architecture
 
-The MYADS v4.6.2 API ecosystem delivers high-performance, secure, and extensible interfaces connecting web clients, companion mobile applications (Flutter), and third-party developer integrations.
+The MYADS v4.6.3 API ecosystem delivers high-performance, secure, and extensible interfaces connecting web clients, companion mobile applications (Flutter), and third-party developer integrations.
 
 ### Primary API Subsystems
-1. **Internal Mobile & Web API (`/api/*`):** Powered by Laravel Sanctum for mobile app companion clients and web AJAX workflows.
+1. **Internal Mobile & Web API (`/api/*`):** Powered by Laravel Sanctum for mobile app companion clients (`myads_app` v1.8.0+22) and web AJAX workflows.
 2. **Real-Time Events Engine (`/live/stream` & `/api/live/stream` — RT-04):** Zero-overhead Server-Sent Events (SSE) streaming engine delivering instant unread counters (synchronized with `MessageConversationService`), live toasts, and feed updates.
-3. **Developer Platform & OAuth 2.0 (`/oauth/*` & `/api/developer/v1/*`):** 27 granular permissions for external applications registered at `/developer`.
-4. **Ad Serving & Exchange Engine (`/ads/*`):** High-throughput ad delivery, anti-click-farm validation, and conversion tracking.
-5. **Universal Media & Comments Ingestion Engine (`/comment/*`, `/api/statuses/*`):** Drag-and-drop & clipboard (`Ctrl+V`) media ingestion, binary MIME verification (`FileUploadSecurityService`), and automatic WebP image optimization.
-6. **Smart Partitioned Sitemaps & Discovery (`/sitemap.xml`, `/sitemap/*.xml`):** Partitioned XML sitemaps with ETag conditional HTTP 304 caching for enterprise SEO discovery.
+3. **Developer Platform & OAuth 2.0 (`/oauth/*` & `/api/developer/v1/*`):** 27 granular permissions across 7 categories for external applications registered at `/developer`.
+4. **Service Orders Marketplace Lifecycle Engine (`/api/orders/*` & `/orders/*`):** Peer-to-peer bulletin model with full contract lifecycle management: requirement attachments, proposal offers, contract awarding, milestone progression, deliverable file uploads, client revision workflows (`requestRevision`), 5-star ratings, and protected file downloads.
+5. **Store Marketplace, Ratings & Reviews Engine (`/api/store/*` & `/store/*`):** Rich digital marketplace with 5-star customer ratings, verified buyer badges, interactive screenshots lightbox gallery, live demo and video URL previews, Arabic & Unicode slug support, PTS checkout, and discount coupon codes.
+6. **Software Licensing & Extension Marketplace Feed (`/api/marketplace/extensions/*`, `/api/license/verify`):** Plugin and theme discovery feeds, automated update checking for WordPress and third-party CMSs, domain activation verification, and secure package downloads.
+7. **Ad Serving & Exchange Engine (`/ads/*`, `/bn.php`, `/link.php`, `/smart.php`, `/embed/*.js`):** High-throughput banner, link, smart, and custom member-to-member ads delivery, anti-click-farm validation, and conversion tracking.
+8. **Real-Time Search & Intelligence (`/api/search/live`, `/api/ads/stats`):** Multi-entity live search across members, store products, forum topics, and feed posts, alongside real-time advertising analytics.
+9. **Universal Media & Comments Ingestion Engine (`/comment/*`, `/api/statuses/*`):** Drag-and-drop & clipboard (`Ctrl+V`) media ingestion, binary MIME verification (`FileUploadSecurityService`), and automatic WebP image optimization.
+10. **Smart Partitioned Sitemaps & Discovery (`/sitemap.xml`, `/sitemap/*.xml`):** Partitioned XML sitemaps with ETag conditional HTTP 304 caching for enterprise SEO discovery.
 
 ---
 
@@ -36,10 +40,14 @@ Designed for the first-party Flutter mobile application and official platform co
 - **Response:**
   ```json
   {
-      "success": true,
-      "message": "Login successful",
+      "status": "success",
       "token": "1|sanctum_token_string...",
-      "user": { ... }
+      "user": {
+          "id": 42,
+          "username": "developer",
+          "name": "Developer Name",
+          "avatar_url": "https://domain.com/upload/avatar.png"
+      }
   }
   ```
 
@@ -50,8 +58,11 @@ Public and authenticated API endpoints are protected with sliding-window rate li
 |---|---|---|
 | `POST /api/login` | 5 req / min / IP | Brute-force credential stuffing |
 | `POST /api/register` | 3 req / min / IP | Automated spam registration |
-| `POST /api/license/verify` | 10 req / min / IP | License enumeration |
-| `GET /share` | 15 req / min / IP | External link preview scraping & spam protection |
+| `POST /api/license/verify` | 10 req / min / IP | License enumeration & brute-force |
+| `GET /api/search/live` & `GET /search/live` | 40 req / min / IP | Fulltext search DoS prevention |
+| `POST /status/create` & file uploads | 20 req / min | Disk-filling & media flooding |
+| `GET /share` | 15 req / min / IP | External link preview scraping & spam |
+| `POST /post` (Forum) | 15 req / min | Forum spam topic generation |
 | `GET/POST /api/developer/v1/*` | 30 req / min / IP | Developer API scraping & abuse |
 | `GET /api/live/stream` | 1 connection / user | Persistent streaming session |
 
@@ -63,7 +74,10 @@ All API responses, notification payloads, and validation error messages support 
 - **Default:** Site default locale (`ar` or `en`).
 
 ### D. Privacy & Member ID Obfuscation
-When `public_member_ids_enabled` is active in Admin Security Settings, all API resources (`UserResource`, `UserProfileResource`, `StatusResource`) automatically serve randomized public identifiers (`public_uid`) or usernames in place of numeric database IDs (`users.id`), neutralizing member enumeration attacks.
+When `public_member_ids_enabled` is active in Admin Security Settings, all API resources (`UserResource`, `UserProfileResource`, `StatusResource`, `SearchApiController`) automatically serve randomized public identifiers (`public_uid`) or usernames in place of numeric database IDs (`users.id`), neutralizing member enumeration attacks.
+
+### E. Peer-to-Peer Service Orders Non-Escrow Policy
+Under the platform's Terms of Service and Bulletin Architecture (v4.6.3), MYADS functions strictly as a peer-to-peer advertising, discovery, and networking platform. The platform does not act as an escrow agent, financial intermediary, or guarantor of deliverables for service orders negotiated at `/orders` or `/api/orders`.
 
 ---
 
@@ -97,7 +111,7 @@ data: {
     "unread_notifications": 3,
     "unread_messages": 1,
     "timestamp": 1787534000,
-    "server_time": "2026-08-24T01:13:20+00:00"
+    "server_time": "2026-10-07T22:00:00+00:00"
 }
 ```
 
@@ -221,7 +235,7 @@ Developers can register external applications at `/developer` to build third-par
 | | `owner.messages.read` | Read private message conversations belonging to authorized owner. | **Yes** |
 | | `owner.messages.write` | Send private messages on behalf of authorized owner. | **Yes** |
 
-### Application Management & Form Architecture (v4.5.5)
+### Application Management & Form Architecture
 - **Application Registration:** `POST /developer/apps`
   - **Headers:** `Content-Type: application/json`, `X-CSRF-TOKEN: {token}`, `Accept: application/json`
   - **Payload:**
@@ -234,20 +248,10 @@ Developers can register external applications at `/developer` to build third-par
       "requested_scopes": ["user.identity.read", "user.content.write"]
     }
     ```
-  - **Response:**
-    ```json
-    {
-      "success": true,
-      "message": "App created successfully",
-      "redirect": "/developer/apps/42"
-    }
-    ```
 - **Application Update:** `PUT /developer/apps/{id}`
-  - **Headers:** `Content-Type: application/json`, `X-CSRF-TOKEN: {token}`, `Accept: application/json`
-  - **Payload:** Includes `_method: "PUT"`, updated scopes array, redirect URIs, and metadata.
 - **Client Secret Rotation:** `POST /developer/apps/{id}/rotate-secret`
 - **Application Submission:** `POST /developer/apps/{id}/submit`
-- **Application Self-Service Deletion:** `DELETE /developer/apps/{id}` (Cascades across tokens and authorizations)
+- **Application Self-Service Deletion:** `DELETE /developer/apps/{id}`
 
 ### OAuth 2.0 Authorization Flow & RFC 6749 Compliance
 
@@ -255,31 +259,21 @@ Developers can register external applications at `/developer` to build third-par
 ```http
 GET /oauth/authorize?client_id={client_id}&redirect_uri={redirect_uri}&response_type=code&scope={scope}&state={state}
 ```
-- **`client_id`** *(required)*: The 32-character hexadecimal Client ID of the registered application.
-- **`redirect_uri`** *(required)*: Must match one of the registered URIs. Supports URIs with pre-existing query parameters (e.g. `https://example.com/wp-admin/admin.php?page=plugin&action=callback`).
+- **`client_id`** *(required)*: The 32-character hexadecimal Client ID.
+- **`redirect_uri`** *(required)*: Must match one of the registered URIs.
 - **`response_type`** *(required)*: Must be `code`.
-- **`scope`** *(optional)*: Space-delimited or comma-delimited list of requested permissions (e.g. `user.identity.read user.content.write`).
-- **`state`** *(recommended)*: CSRF protection token returned back to the client.
+- **`scope`** *(optional)*: Space- or comma-delimited permissions (e.g. `user.identity.read user.content.write`).
+- **`state`** *(recommended)*: CSRF protection token.
 
-> **RFC 6749 Section 4.1.2 URL Concatenation:** If the `redirect_uri` contains existing query parameters, the authorization response automatically appends parameters using `&` (e.g. `https://example.com/callback?page=plugin&code={code}&state={state}`).
+> **WAF / ModSecurity Rule 930120 Bypass & Extended Scope Aliases:** The platform normalizes sensitive dotfile patterns (`profile.read`, `user_profile.read`, `user_profile_read` &rarr; `user.profile.read`) and developer aliases (`content.write`, `posts.write`, `publish_posts` &rarr; `user.content.write`; `messages.write`, `dm.send` &rarr; `user.messages.write`).
 
-> **WAF / ModSecurity Rule 930120 Bypass & Extended Scope Aliases:** In addition to normalizing sensitive dotfile patterns (`profile.read`, `user_profile.read`, `user_profile_read`, `user-profile-read` &rarr; `user.profile.read`) to prevent web application firewalls from treating `.profile` as a Linux dotfile access attempt, the platform normalizes common WordPress and developer aliases:
->   - **Content Publishing:** `content.write`, `posts.write`, `publish_posts`, `posts.create`, `content.create`, `user.content.create`, `content` &rarr; `user.content.write`
->   - **Content Reading:** `content.read`, `posts.read` &rarr; `user.content.read`
->   - **Profile & Identity:** `profile`, `user.profile` &rarr; `user.profile.read`; `identity`, `user.identity` &rarr; `user.identity.read`
->   - **Interactions & Messaging:** `reactions.write`, `like.write` &rarr; `user.reactions.write`; `messages.write`, `dm.send` &rarr; `user.messages.write`; `messages.read`, `dm.read` &rarr; `user.messages.read`; `follows.write`, `follow.write` &rarr; `user.follows.write`
-
-> **Dynamic Catalog Scope Granting & Auto-Syncing (v4.5.6):** Third-party integrations (such as the ADStn Auto Poster WordPress plugin) can request any legitimate permissions cataloged in `DeveloperScopeCatalog` at authorization time. The authorization server evaluates requested scopes against the global system scope catalog and the user's explicit consent rather than strictly dropping scopes unselected during initial app registration. Newly approved valid scopes are automatically merged and synchronized into the application's `requested_scopes` record in `developer_apps`.
-
-> **Draft Application Development Mode:** Application owners can test their own applications while in `draft` mode without requiring administrative approval.
-
-#### 2. Token Exchange (RFC 6749 Section 4.1.3 & Section 2.3.1)
+#### 2. Token Exchange (RFC 6749 Section 4.1.3)
 ```http
 POST /oauth/token
 Content-Type: application/x-www-form-urlencoded (or application/json)
 Authorization: Basic {base64(client_id:client_secret)}
 ```
-Or with credentials in the request body:
+Or via body payload:
 ```json
 {
   "grant_type": "authorization_code",
@@ -320,102 +314,44 @@ Or with credentials in the request body:
 
 ## 5. Developer API v1 Endpoints
 
-### A. Authorization Protocol & Multi-Environment Token Extraction (v4.5.6)
-All Developer API requests require an active OAuth 2.0 access token issued via `/oauth/token`. In **v4.5.6**, token extraction is hardened across diverse web server daemons, reverse proxies, and constrained hosting environments (`DeveloperApiController::validateToken`):
+### A. Authorization Protocol & Multi-Environment Token Extraction
+All requests require an active OAuth 2.0 access token issued via `/oauth/token`. Tokens are extracted resiliently via:
+1. `Authorization: Bearer {access_token}`
+2. Server environment headers (`HTTP_AUTHORIZATION`, `REDIRECT_HTTP_AUTHORIZATION`)
+3. Fallback Query Parameter: `?access_token={access_token}` or JSON payload key `access_token`.
 
-1. **Standard HTTP Header (Recommended):**
-   ```http
-   Authorization: Bearer {access_token}
-   ```
-   *Case-insensitive matching (`Bearer` or `bearer`) with whitespace tolerance.*
+### B. Rate Limiting & Error Handling
+- Rate limited to 30 requests per minute per IP (`throttle:30,1`).
+- Structured JSON error envelopes (`401`, `403`, `422`, `500`) with backend logging in `storage/logs/laravel.log`.
 
-2. **Web Server & Reverse Proxy Environment Variables:**
-   If the hosting server daemon (Apache, Nginx, LiteSpeed, cPanel, FastCGI, FPM) strips or renames the standard `Authorization` header, the authentication pipeline automatically cascades through:
-   - `HTTP_AUTHORIZATION`
-   - `REDIRECT_HTTP_AUTHORIZATION`
-   - `REDIRECT_REDIRECT_HTTP_AUTHORIZATION`
-   - `apache_request_headers()['Authorization']`
-
-3. **Query Parameter or Request Body Fallback:**
-   For constrained clients, webhooks, or direct browser integrations unable to set custom HTTP headers:
-   - **Query String:** `GET /api/developer/v1/me?access_token={access_token}`
-   - **Request Payload:** `POST /api/developer/v1/me/content` with JSON `{"access_token": "{access_token}", ...}`
-
-### B. Multi-Delimiter Scope Flexibility & Runtime Alias Resolution (v4.5.6)
-Scopes are validated using resilient accessor and mutator normalization (`DeveloperAccessToken`) and canonical alias resolution (`DeveloperApiController::validateToken` & `DeveloperScopeCatalog::normalizeScopeId`):
-1. **Multi-Format Storage & Deserialization:** Scopes stored in database records formatted as JSON arrays (`["user.identity.read", "user.content.write"]`), comma-delimited strings (`user.identity.read,user.content.write`), or space-delimited strings (`user.identity.read user.content.write`) are transparently unpacked into uniform string arrays.
-2. **Runtime Alias Resolution:** When an API endpoint validates required permissions (such as `user.content.write` for publishing posts), `validateToken` normalizes both canonical scope IDs and accepted aliases. Tokens possessing aliases such as `content.write`, `posts.write`, or `publish_posts` seamlessly satisfy the required scope check without returning false-positive `403 Forbidden` ("Insufficient scope") errors.
-
-### C. Rate Limiting & Error Handling
-- **Rate Limit:** 30 requests per minute per client IP (`throttle:30,1`). Exceeding this limit returns HTTP `429 Too Many Requests`.
-- **Fault-Tolerant Exception Isolation:** All endpoints are wrapped in `try/catch (\Throwable $e)` handlers. Errors are recorded to `storage/logs/laravel.log` with complete debug traces, while returning structured JSON error envelopes (`401`, `403`, `422`, `500`) without exposing internal database structures or credentials.
-
-### D. User Identity & Profile Endpoints
-- `GET /api/developer/v1/me`: Returns basic member identity (numeric ID or public ID, username, creation date).  
-  *Required Scope:* `user.identity.read`
-- `GET /api/developer/v1/me/profile`: Returns full profile details, display name, bio, points balance, and avatar URL.  
-  *Required Scope:* `user.profile.read`
-- `GET /api/developer/v1/me/email`: Returns verified member email address.  
-  *Required Scope:* `user.email.read`
-- `GET /api/developer/v1/me/social-links`: Returns list of configured external social profile links.  
-  *Required Scope:* `user.social_links.read`
-- `GET /api/developer/v1/me/follows`: Returns counts and collections of followers and following members.  
-  *Required Scope:* `user.follows.read`
-- `POST /api/developer/v1/me/follows`: Follow or unfollow a target member.  
-  *Required Scope:* `user.follows.write`  
-  *Payload:* `{"target_user_id": 123, "action": "follow"}` (or `"unfollow"`)
-
-### E. Content, Community & Interaction Endpoints
-- `GET /api/developer/v1/me/content`: Returns recent community posts and updates authored by the authenticated member.  
-  *Required Scope:* `user.content.read`
-- `POST /api/developer/v1/me/content`: Publishes a new status update to the community feed.  
-  *Required Scope:* `user.content.write`  
-  *Payload:*
-  ```json
-  {
-      "text": "Hello world from the Developer Platform API!",
-      "title": "Optional Post Title",
-      "privacy": 0
-  }
-  ```
-  *(Note: In v4.5.6, the backend automatically provisions and links a corresponding `ForumTopic` record to guarantee strict database schema and foreign-key integrity).*
-- `POST /api/developer/v1/me/reactions`: Adds or toggles a reaction on a community post.  
-  *Required Scope:* `user.reactions.write`  
-  *Payload:* `{"status_id": 456, "reaction_name": "like"}`
-- `GET /api/developer/v1/me/messages`: Returns active direct message conversations.  
-  *Required Scope:* `user.messages.read`
-- `POST /api/developer/v1/me/messages`: Sends a private direct message to another member.  
-  *Required Scope:* `user.messages.write`  
-  *Payload:* `{"receiver_id": 789, "content": "Hello!"}`
-- `GET /api/developer/v1/me/notifications`: Returns user notification feed and unread count.  
-  *Required Scope:* `user.notifications.read`
-- `GET /api/developer/v1/forums`: Returns forum categories with topic and post counters.  
-  *Required Scope:* `user.forums.read`
-- `GET /api/developer/v1/me/clips`: Returns public vertical video clips feed.  
-  *Required Scope:* `user.clips.read`
-
-### F. Economy, Store & Advertising Endpoints
-- `GET /api/developer/v1/me/wallet`: Returns Points (PTS) wallet balance, credits, and earnings.  
-  *Required Scope:* `user.wallet.read`
-- `GET /api/developer/v1/me/badges`: Returns unlocked gamification badges and progress.  
-  *Required Scope:* `user.badges.read`
-- `GET /api/developer/v1/store/products`: Returns marketplace products with pricing and category metadata.  
-  *Required Scope:* `user.store.read`
-- `GET /api/developer/v1/me/orders`: Returns service orders and marketplace request history.  
-  *Required Scope:* `user.orders.read`
-- `GET /api/developer/v1/me/ads/stats`: Returns banner, link, and custom ad impression and click performance metrics.  
-  *Required Scope:* `user.ads.read`
-
-### G. Application Owner Endpoints
-Allows integrations on behalf of the application owner:
-- `GET /api/developer/v1/owner/profile`: Returns application owner's public profile metadata.  
-  *Required Scope:* `owner.profile.read`
-- `GET /api/developer/v1/owner/content`: Returns published posts and updates authored by the application owner.  
-  *Required Scope:* `owner.content.read`
-- `POST /api/developer/v1/owner/follow`: Follows the application owner on behalf of the member.  
-  *Required Scope:* `owner.follow.write`
-- `POST /api/developer/v1/owner/messages`: Sends a direct message directly to the application owner.  
-  *Required Scope:* `owner.messages.write`
+### C. Endpoints Catalog
+- **Identity & Profile:**
+  - `GET /api/developer/v1/me`: Basic member identity. *(Scope: `user.identity.read`)*
+  - `GET /api/developer/v1/me/profile`: Display name, bio, points, avatar. *(Scope: `user.profile.read`)*
+  - `GET /api/developer/v1/me/email`: Verified email address. *(Scope: `user.email.read`)*
+  - `GET /api/developer/v1/me/social-links`: External social links. *(Scope: `user.social_links.read`)*
+  - `GET /api/developer/v1/me/follows`: Followers and following counts and list. *(Scope: `user.follows.read`)*
+  - `POST /api/developer/v1/me/follows`: Follow or unfollow member (`{"target_user_id": 123, "action": "follow"}`). *(Scope: `user.follows.write`)*
+- **Content & Interaction:**
+  - `GET /api/developer/v1/me/content`: Recent authored posts. *(Scope: `user.content.read`)*
+  - `POST /api/developer/v1/me/content`: Publish post (`{"text": "...", "title": "...", "privacy": 0}`). Automatically links `ForumTopic` record for integrity. *(Scope: `user.content.write`)*
+  - `POST /api/developer/v1/me/reactions`: Add or toggle reaction (`{"status_id": 456, "reaction_name": "like"}`). *(Scope: `user.reactions.write`)*
+  - `GET /api/developer/v1/me/messages`: Active conversations. *(Scope: `user.messages.read`)*
+  - `POST /api/developer/v1/me/messages`: Send direct message (`{"receiver_id": 789, "content": "..."}`). *(Scope: `user.messages.write`)*
+  - `GET /api/developer/v1/me/notifications`: Alerts feed. *(Scope: `user.notifications.read`)*
+  - `GET /api/developer/v1/forums`: Categories with counters. *(Scope: `user.forums.read`)*
+  - `GET /api/developer/v1/me/clips`: Vertical video clips feed. *(Scope: `user.clips.read`)*
+- **Economy, Store & Advertising:**
+  - `GET /api/developer/v1/me/wallet`: Points (PTS) wallet details. *(Scope: `user.wallet.read`)*
+  - `GET /api/developer/v1/me/badges`: Unlocked badges and progress. *(Scope: `user.badges.read`)*
+  - `GET /api/developer/v1/store/products`: Marketplace products catalog. *(Scope: `user.store.read`)*
+  - `GET /api/developer/v1/me/orders`: Service order requests and history. *(Scope: `user.orders.read`)*
+  - `GET /api/developer/v1/me/ads/stats`: Ad impression and click metrics. *(Scope: `user.ads.read`)*
+- **Application Owner Endpoints:**
+  - `GET /api/developer/v1/owner/profile`: Owner public profile. *(Scope: `owner.profile.read`)*
+  - `GET /api/developer/v1/owner/content`: Owner posts feed. *(Scope: `owner.content.read`)*
+  - `POST /api/developer/v1/owner/follow`: Follow owner. *(Scope: `owner.follow.write`)*
+  - `POST /api/developer/v1/owner/messages`: Message owner. *(Scope: `owner.messages.write`)*
 
 ---
 
@@ -426,6 +362,12 @@ MYADS provides ready-to-use JavaScript embed widgets. Snippets with your specifi
 - **Profile Card Widget:** `GET /embed/developer/{app_id}/profile.js`
 - **Content Stream Widget:** `GET /embed/developer/{app_id}/content.js`
 
+### Advertising Embeds
+- **Banner Ad Embed:** `GET /embed/banner.js` (or `/bn.php`)
+- **Link Ad Embed:** `GET /embed/link.js` (or `/link.php`)
+- **Smart Ad Embed:** `GET /embed/smart.js` (or `/smart.php`)
+- **Custom Member-to-Member Ad Embed:** `GET /embed/custom.js` (or `/ads/custom/serve`)
+
 ---
 
 ## 7. External Web Share API (Public)
@@ -433,6 +375,7 @@ MYADS provides ready-to-use JavaScript embed widgets. Snippets with your specifi
 Allows any external website to pre-fill the MYADS post composer with text and links.
 
 **Endpoint:** `GET /share`  
+**Rate Limit:** 15 requests / min / IP  
 **Query Parameters:**
 - `text`: URL-encoded string for the post content.
 
@@ -443,80 +386,77 @@ https://myads.com/share?text=Check+out+this+awesome+platform!+https://example.co
 
 ---
 
-## 8. Mobile App API (Sanctum Endpoints)
+## 8. Mobile App API & REST Subsystems (Sanctum Endpoints)
+
+All endpoints in this section are prefixed with `/api/` (unless explicitly noted as web/AJAX routes) and require the global header:
+- `X-API-KEY: {YOUR_GLOBAL_KEY}`
+- `Authorization: Bearer {token}`
+
+---
 
 ### A. Settings & Account Management
 All settings mutation endpoints accept `POST`, `PUT`, and `PATCH` HTTP verbs for maximum client compatibility.
 
-- `GET /api/settings/profile`: Retrieve user's editable profile information.
+- `GET /api/settings/overview`: Retrieve high-level authenticated member overview:
+  ```json
+  {
+      "user": {
+          "id": 42,
+          "name": "Jane Doe",
+          "username": "janedoe",
+          "email": "jane@example.com",
+          "pts": 2500,
+          "avatar": "https://domain.com/upload/avatar.png",
+          "is_verified": true
+      }
+  }
+  ```
+- `GET /api/settings/profile`: Retrieve editable profile information (`email`, `about_me`, `avatar`).
 - `POST|PUT|PATCH /api/settings/profile`: Update user profile details.
-  - *Payload:* `{"about_me": "User signature/bio", "email": "optional_email@example.com"}`. The `email` parameter is optional; when omitted, the backend preserves the authenticated member's active email.
-- `GET /api/settings/privacy`: Retrieve current privacy settings.
-  - *Returns:* Full schema strings (`profile_visibility`, `allow_direct_messages`, `allow_mentions`, etc.) as well as mobile shorthand integers (`visibility`, `dm`, `mention`).
-- `POST|PUT|PATCH /api/settings/privacy`: Update privacy configuration.
-  - *Payload:* Supports canonical schema strings (`profile_visibility: "public|followers|private"`, `allow_direct_messages: true|false`, etc.) or mobile integer shorthands (`visibility`: 0=Public, 1/2=Followers, 3=Private; `dm`: 2=Disabled; `mention`: 2=Disabled).
-- `GET /api/settings/social`: Retrieve connected social profile URLs.
-  - *Returns:* Both `links` dictionary map (`{"facebook": "...", "twitter": "..."}`) and `socials` list of objects (`[{"platform": "facebook", "url": "..."}]`).
-- `POST|PUT|PATCH /api/settings/social`: Update social profile URLs.
-  - *Payload:* Supports flat platform keys (`{"facebook": "https://facebook.com/user"}`) or nested objects (`{"socials": {"facebook": "https://facebook.com/user"}}`).
-- `GET /api/settings/notification-preferences` & `GET /api/settings/notifications`: Retrieve push/email notification toggles.
-  - *Returns:* Nested `settings` model, canonical boolean keys (`email_mention`, `email_new_message`, `email_new_follower`, `email_new_comment`), and mobile integer flags (`email_mentions`, `email_messages`, `email_follows`, `email_comments`).
-- `POST|PUT|PATCH /api/settings/notification-preferences` & `POST|PUT|PATCH /api/settings/notifications`: Update notification toggles.
-  - *Payload:* Accepts both mobile plural keys (`email_mentions`, `email_messages`, `email_follows`, `email_comments`) and core singular keys (`email_mention`, `email_new_message`, etc.), accepting boolean (`true`/`false`) or integer (`1`/`0`) values.
+  - *Payload:* `{"about_me": "User signature/bio", "email": "optional_email@example.com", "password": "...", "avatar": file, "cover": file}`. The `email` parameter is optional; when omitted, the backend preserves the active email.
+- `POST /api/settings/2fa/enable`: Enable Two-Factor Authentication via email confirmation. Returns 8 emergency recovery codes (`recovery_codes: ["CODE1", "CODE2", ...]`).
+- `POST /api/settings/2fa/disable`: Disable Two-Factor Authentication.
+- `GET /api/settings/privacy`: Retrieve current privacy configuration. Returns full schema strings (`profile_visibility`, `allow_direct_messages`, `allow_mentions`, etc.) and mobile shorthand integers (`visibility`: 0=Public, 1/2=Followers, 3=Private; `dm`: 2=Disabled; `mention`: 2=Disabled).
+- `POST|PUT|PATCH /api/settings/privacy`: Update privacy configuration. Accepts canonical schema strings or mobile integer shorthands.
+- `GET /api/settings/social`: Retrieve connected social profile URLs. Returns both `links` dictionary map and `socials` list of objects.
+- `POST|PUT|PATCH /api/settings/social`: Update social profile URLs. Supports flat platform keys (`{"facebook": "..."}`) or nested `{"socials": {"facebook": "..."}}`.
+- `GET /api/settings/notification-preferences` & `GET /api/settings/notifications`: Retrieve push/email notification preferences. Returns nested `settings`, canonical boolean keys, and mobile integer flags (`email_mentions`, `email_messages`, `email_follows`, `email_comments`).
+- `POST|PUT|PATCH /api/settings/notification-preferences` & `POST|PUT|PATCH /api/settings/notifications`: Update notification preferences. Accepts mobile plural keys or canonical singular keys.
 - `GET /api/settings/sessions`: Retrieve active web sessions and active Sanctum device tokens.
 - `POST /api/settings/sessions/{id}/revoke`: Revoke a specific web session by ID.
 - `POST /api/settings/tokens/{id}/revoke`: Revoke a specific Sanctum API device token by ID.
-- `POST /api/settings/device-token`: Register FCM device token for mobile push notifications.
-- `GET /api/settings/badges`: Retrieve user earned badges and showcase progress.
-  - *Returns:* `earned` collection, `showcase` collection, and computed `badges` list containing `id`, `name`, `description`, `icon`, and `is_shown` boolean flag.
-- `POST|PUT|PATCH /api/settings/badges`: Update badge showcase order and display.
-  - *Payload:* Accepts either `showcase` array (`{"showcase": [1, 2, 3]}`) or `badge_ids` (`{"badge_ids": [1, 2, 3]}`).
-- `GET /api/settings/history`: Retrieve paginated member Points (PTS) transaction ledger history with dynamic timestamp sorting and error resilience.
+- `POST /api/settings/device-token`: Register FCM device token for mobile push notifications (`{"token": "fcm_token_string"}`).
+- `GET /api/settings/badges`: Retrieve user earned badges and showcase progress (`earned`, `showcase`, `badges`).
+- `POST|PUT|PATCH /api/settings/badges`: Update badge showcase order and display (`{"showcase": [1, 2, 3]}` or `{"badge_ids": [1, 2, 3]}`).
+- `GET /api/settings/history`: Retrieve paginated member Points (PTS) transaction ledger history with dynamic timestamp sorting.
 - `GET /api/settings/apps`: Retrieve authorized third-party OAuth applications.
 - `POST /api/settings/apps/{id}/revoke`: Revoke authorization for a third-party application.
 - `GET /api/settings/blocks`: Retrieve list of blocked users.
 
-#### Point Transactions Ledger History (`GET /api/settings/history`)
-- **Description:** Returns paginated Points (PTS) transaction ledger history for the authenticated member. Incorporates dynamic column sorting (sorting by `created_at` or falling back to `id` if timestamps are absent) and defensive error handling against schema inconsistencies.
-- **Headers:** `X-API-KEY: {YOUR_GLOBAL_KEY}`, `Authorization: Bearer {token}`, `Accept: application/json`
-- **Query Parameters:** `page` (integer, optional, default: `1`).
-- **Response (HTTP 200):**
-  ```json
-  {
-      "current_page": 1,
-      "data": [
-          {
-              "id": 14,
-              "user_id": 1,
-              "amount": "50.00",
-              "balance_after": "250.00",
-              "type": "reward",
-              "description_key": "quest_reward_daily_first_post",
-              "reference_type": null,
-              "reference_id": null,
-              "meta": null,
-              "created_at": "2026-09-20T00:10:00.000000Z",
-              "updated_at": "2026-09-20T00:10:00.000000Z"
-          }
-      ],
-      "first_page_url": "https://domain.com/api/settings/history?page=1",
-      "from": 1,
-      "last_page": 1,
-      "last_page_url": "https://domain.com/api/settings/history?page=1",
-      "next_page_url": null,
-      "path": "https://domain.com/api/settings/history",
-      "per_page": 20,
-      "prev_page_url": null,
-      "to": 1,
-      "total": 1
-  }
-  ```
+---
 
+### B. Community Feed, Media Posts & Video Hub
 
-### B. Community Feed & Multimedia Posts
 - `GET /api/portal/feed`: Retrieve the community feed (paginated).
   - *Attributes:* `user` (with `profile_badge_color`), `display_content`, `display_title`, `video_title`, `video_thumbnail`, `media`, `gallery`, `attachments`, `repost_record`, `grouped_reactions`, `has_liked`, `user_reaction`, `is_promoted_ad`, `s_type`.
-- `GET /api/video/feed`: Retrieve Video Hub content strictly scoped to video items (`whereIn('s_type', [10, 2, 4, 100])` for main videos and `14` for clips). Supports `filter` (`all`, `videos`, `clips`, `trending`, `latest`), search `q`, and pagination.
+- `GET /api/video/feed`: Retrieve Video Hub content strictly scoped to video items (`whereIn('s_type', [10, 2, 4, 100])` for main videos and `14` for clips).
+  - *Parameters:* `filter` (`all`, `trending`, `latest`, `videos`, `clips`), search query `q`, `per_page` (default: 12).
+  - *Response:*
+    ```json
+    {
+        "filter": "all",
+        "search_query": "",
+        "spotlight_video": { ... },
+        "clips": [ ... ],
+        "videos": [ ... ],
+        "meta": { "current_page": 1, "last_page": 5, "total": 60 }
+    }
+    ```
+- `GET /api/statuses/saved`: Retrieve paginated saved/bookmarked posts for the authenticated user.
+- `POST /api/statuses/save-toggle` and `POST /api/statuses/{id}/save-toggle`: Toggle bookmarked state for a status.
+  - *Response:* `{"success": true, "saved": true, "action": "added", "count": 12, "message": "Post saved successfully"}`
+- `GET /api/tags/suggest`: Query hashtag autocomplete suggestions (`?q=tag_keyword`).
+- `GET /api/mentions/users`: Query user mention autocomplete suggestions (`?q=username_keyword`). Returns user avatar, username, and name.
 - `GET /api/statuses/{id}`: Retrieve detailed post payload. For video posts, includes `suggested_videos` collection, `is_following`, and `is_saved`.
 - `GET /api/composer/options`: Retrieve post composer options (`groups`, `directory_categories`, `supported_kinds`).
 - `POST /api/statuses/link-preview`: Generate live metadata preview for a target URL (`{"link_url": "..."}`).
@@ -524,69 +464,383 @@ All settings mutation endpoints accept `POST`, `PUT`, and `PATCH` HTTP verbs for
 - `POST /api/statuses/{id}/update`: Update an existing status (requires post ownership).
 - `DELETE /api/statuses/{id}`: Delete a status (requires post ownership or admin permissions).
 
+---
+
 ### C. Comments & Reactions
+
 - `GET /api/statuses/{id}/comments`: Retrieve paginated comments for a status.
 - `POST /api/statuses/{id}/comments`: Post a new comment (`{"text": "..."}`).
 - `POST /api/reactions/toggle`: Toggle reaction on any supported entity.
   - *Payload:* `{"subject_id": 123, "type": 2, "reaction_name": "love"}`  
   - *Allowed Reactions:* `like`, `love`, `funny`, `wow`, `sad`, `angry`, `care`.
 
+---
+
 ### D. Profiles & Social Relationships
+
 - `GET /api/profile/{identifier}`: Fetch member profile details (`identifier` can be `'me'`, username, or `public_uid`).
 - `GET /api/profile/{identifier}/statuses`: Fetch user's published statuses.
 - `POST /api/profile/{identifier}/follow`: Toggle follow status.
 - `POST /api/profile/{identifier}/block`: Block user (`{"block_type": "full_platform|messages_only", "duration": 30}`).
 - `DELETE /api/profile/{identifier}/unblock`: Unblock user.
 
+---
+
 ### E. Private Messaging
+
 - `GET /api/messages`: List active direct message conversations with latest preview and unread counters.
 - `GET /api/messages/updates`: Poll message updates (`?conversation={route_key}&after_id={id}`).
 - `GET /api/messages/{identifier}`: Fetch message history with a specific conversation partner.
 - `POST /api/messages/{identifier}`: Send a direct message (`{"text": "..."}`).
 - `POST /api/messages/{identifier}/read`: Mark unread messages in conversation as read.
 
+---
+
 ### F. Notifications & Gamification
+
 - `GET /api/notifications`: Retrieve user notifications (paginated).
 - `GET /api/notifications/unread-count`: Get integer count of unread notifications.
 - `POST|GET /api/notifications/{id}/read` & `POST|GET /api/notifications/{id}/mark-read`: Mark specific notification as read.
 - `POST|GET /api/notifications/read-all` & `POST|GET /api/notifications/mark-all-read`: Mark all notifications as read.
 - `GET /api/wallet/balance`: Get current Points (PTS) balance and credit balances.
-- `GET /api/gamification/quests` (and legacy alias `GET /api/quests`): Retrieve active gamification quests.
+- `GET /api/quests` (and `/api/gamification/quests`): Retrieve active gamification quests.
   - *Returns:*
     ```json
     {
+        "success": true,
+        "user_pts": 1500,
         "daily_quests": [ ... ],
         "weekly_quests": [ ... ],
-        "user_pts": 1500,
-        "quests": [ ... ]
+        "data": {
+            "user_pts": 1500,
+            "daily_quests": [ ... ],
+            "weekly_quests": [ ... ],
+            "quests": [ ... ]
+        }
     }
     ```
-  - *Quest Model Fields:* `id`, `name` (translated from `name_key`), `description` (translated from `description_key`), `period` (`daily` / `weekly`), `points` (mapped from `reward_points`), `target_count`, `current_count`, `is_completed`, `is_claimed`.
-- `POST /api/gamification/quests/{id}/claim` (and legacy alias `POST /api/quests/{id}/claim`): Claim quest completion points and update PTS balance.
-- `POST /api/pts/transfer`: Transfer PTS to another member.
-- `POST /api/pts/vouchers/create`: Create a PTS voucher code.
-- `POST /api/pts/vouchers/claim`: Redeem a PTS voucher code.
+  - *Quest Fields:* `id`, `title`, `name`, `description`, `period`, `reward` (`reward_pts`), `goal` (`target_value`), `progress` (`current_value`), `completed` (`is_completed`), `claimed` (`is_claimed`).
+- `POST /api/quests/{id}/claim`: Claim quest completion points and credit PTS balance.
+- `POST /api/pts/transfer`: Transfer PTS to another member (`{"username": "recipient", "amount": 100}`).
+- `POST /api/pts/vouchers/create`: Create a PTS voucher code (`{"amount": 50}`). Returns 10-character code.
+- `POST /api/pts/vouchers/claim`: Redeem a PTS voucher code (`{"code": "ABC123XYZ4"}`).
 
-### G. Forum & Marketplace Store
-- `GET /api/forums/categories`: Get forum categories with topic counts.
-- `GET /api/forums/categories/{id}/topics`: Get topics within a category.
-- `POST /api/forums/categories/{id}/topics`: Create a new forum topic.
-- `GET /api/forums/topics/{id}`: Get topic details and replies.
-- `POST /api/forums/topics/{id}/replies`: Post a reply to a forum topic.
-- `GET /api/store/products`: Browse marketplace products ordered chronologically by status promotion date, modification date, and ID.
-- `GET /api/store/products/{id}`: Get product details with original/sale pricing.
-- `GET /api/store/products/{id}/knowledgebase`: Get product knowledgebase articles.
-- `GET /api/orders`: Browse service requests.
-- `POST /api/orders/{id}/offers`: Submit an offer on a service request.
-  - *Payload:* Accepts either `content` or `txt` (automatically mapped to `content`), `price` (optional numeric), `currency` (optional string), `delivery_days` (optional integer).
+---
 
-### H. Clips System
+### G. Store Marketplace, Ratings & Reviews Engine (v4.6.3)
+
+MYADS v4.6.3 provides an overhauled digital goods marketplace supporting 5-star customer ratings, verified buyer badges, screenshot gallery lightboxes, live demo previews, video embeds, and native Arabic & Unicode slug URL routing.
+
+#### 1. Store Catalog & Details API
+- `GET /api/store/products`: Browse products with multi-criteria filtering and sorting:
+  - **Query Parameters:**
+    - `category`: Filter by category slug or name (`all` for all categories).
+    - `q` or `search`: Search keyword across product name and description.
+    - `sort`: `latest` (default), `price_asc`, `price_desc`, `free`, `paid`.
+    - `per_page`: Products per page (default: 20, max: 100).
+- `GET /api/store/products/{id}`: Detailed product payload with seller info and media gallery:
+  ```json
+  {
+      "id": 12,
+      "title": "قالب الإعلانات الاحترافي",
+      "description": "قالب متكامل ومميز...",
+      "price": 100,
+      "original_price": 100,
+      "sale_price": 80,
+      "current_price": 80,
+      "is_on_sale": true,
+      "sales": 45,
+      "downloads": 45,
+      "downloads_count": 45,
+      "is_pending": false,
+      "moderation_status": "approved",
+      "thumbnail": "upload/store/thumb.jpg",
+      "rating": 4.8,
+      "average_rating": 4.8,
+      "reviews_count": 15,
+      "live_demo_url": "https://demo.example.com",
+      "video_preview_url": "https://youtube.com/watch?v=...",
+      "screenshots": [
+          {
+              "id": 101,
+              "url": "upload/screenshots/ss_1.jpg",
+              "full_url": "https://domain.com/upload/screenshots/ss_1.jpg",
+              "caption": "لوحة التحكم الرئيسية"
+          }
+      ],
+      "seller": {
+          "id": 7,
+          "username": "ahmed",
+          "name": "أحمد",
+          "avatar": "https://domain.com/upload/avatar.png"
+      },
+      "category_id": 3,
+      "created_at": "2026-10-01T12:00:00Z"
+  }
+  ```
+- `GET /api/store/products/{id}/knowledgebase`: Get product-associated documentation articles.
+
+#### 2. Customer Reviews & Ratings Engine (Web & AJAX Endpoints)
+- `POST /store/{id}/reviews`: Submit or update a 5-star review:
+  - **Headers:** `X-CSRF-TOKEN: {token}` or `Authorization: Bearer {token}`, `Accept: application/json`
+  - **Payload:**
+    ```json
+    {
+        "rating": 5,
+        "title": "منتج ممتاز ودعم رائع",
+        "comment": "تم تثبيت القالب ويعمل بسرعة فائقة وبدون أي أخطاء."
+    }
+    ```
+  - **Verified Buyer Badge:** If the member holds a license in `product_licenses`, the backend automatically marks `is_verified_buyer: true`.
+  - **Response (HTTP 200):**
+    ```json
+    {
+        "success": true,
+        "message": "تم إرسال التقييم بنجاح",
+        "review": {
+            "id": 31,
+            "rating": 5,
+            "title": "منتج ممتاز ودعم رائع",
+            "comment": "تم تثبيت القالب...",
+            "is_verified_buyer": true,
+            "created_at": "منذ دقيقة",
+            "user": { "id": 42, "username": "developer", "avatar": "..." }
+        },
+        "average_rating": 4.9,
+        "reviews_count": 16,
+        "rating_breakdown": {
+            "5": 90,
+            "4": 10,
+            "3": 0,
+            "2": 0,
+            "1": 0
+        }
+    }
+    ```
+- `DELETE /store/reviews/{id}`: Delete a customer review (allowed for review author, product owner, or administrator).
+
+#### 3. Product Media & Previews Management
+- `POST /store/upload-screenshot`: Upload a screenshot image asset via AJAX (Multipart Form-Data, max 10MB).
+  - *Response:* `{"success": true, "url": "upload/screenshots/ss_....jpg", "full_url": "..."}`
+- `POST /store/{name}/media`: Attach media item to a product:
+  - *Payload:* `{"media_type": "screenshot|video|demo_url", "url": "...", "caption": "...", "sort_order": 0}`
+- `DELETE /store/{name}/media/{id}`: Remove an attached media asset.
+
+#### 4. Instant Purchase & License Generation
+- `POST /store/{id}/purchase`: Instant product checkout with Points (PTS):
+  - *Payload:* `{"code": "OPTIONAL_DISCOUNT_COUPON"}`
+  - *Process:* Verifies point balance, applies discount percentage/fixed reduction, transfers PTS to seller, increments sales counter, generates a unique license key (`ADSTN-XXXX-XXXX-XXXX`), and returns the secure download URL.
+  - *Response:*
+    ```json
+    {
+        "success": true,
+        "message": "تم الشراء بنجاح!",
+        "download_url": "https://domain.com/download/a1b2c3d4"
+    }
+    ```
+- `POST /store/discounts/validate`: Check validity of a discount code before checkout (`{"code": "SAVE20", "product_id": 12}`).
+- `GET /download/{hash}`: Authenticated file download streaming based on verified license or ownership.
+
+---
+
+### H. Service Orders Marketplace (Peer-to-Peer Bulletin Overhaul — v4.6.3)
+
+The Service Orders engine at `/orders` and `/api/orders` provides end-to-end contract progression for freelance requests, custom software development, and design services based on a direct peer-to-peer bulletin model with explicit non-escrow disclaimers.
+
+#### Workflow Milestones Stepper
+$$\text{Open} \longrightarrow \text{Awarded} \longrightarrow \text{In Progress} \longrightarrow \text{Delivered} \longrightarrow \text{Completed}$$
+*(Alternative branches: `Cancelled` or `Revision Requested` reverting from Delivered back to In Progress).*
+
+#### 1. Browse & Search Orders
+- `GET /api/orders`:
+  - **Query Parameters:**
+    - `search`: Keyword search across request title and description.
+    - `category`: Filter by service category.
+    - `status`: `all` (default), `open`, `under_review`, `awarded`, `in_progress`, `delivered`, `completed`, `cancelled`.
+    - `sort`: `newest` (default), `active` (last activity), `popular` (offers count), `budget_high`, `budget_low`.
+  - **Item Payload Attributes:** Includes `buyer` object, `budget_min`, `budget_max`, `currency`, `offers_count`, `max_delivery_days`, `has_attachment`, `is_revision_requested`.
+
+#### 2. Order Details & Full Contract State
+- `GET /api/orders/{id}`:
+  - Returns complete contract payload including:
+    - `buyer`: `{ "id": 10, "name": "...", "username": "...", "avatar": "..." }`
+    - `has_attachment`: boolean indicating presence of client requirement files (PDF, DOCX, ZIP up to 25MB).
+    - `attachment_download_url`: secure link (`/orders/{id}/attachment`).
+    - `offers`: list of submitted proposals with `provider`, `price`, `delivery_days`, and proposal message (`txt` / `content`).
+    - `contract`: milestone stepper state:
+      - `workflow_status`: current contract state.
+      - `deadline`: calculated ISO 8601 deadline timestamp based on agreement start date and agreed delivery days.
+      - `is_overdue`: boolean flag indicating overdue status.
+      - `revision_count`: total iterations of requested revisions.
+      - `revision_note`: latest client revision feedback notes.
+      - `has_delivery_attachment`: boolean indicating deliverable files.
+      - `delivery_attachment_name`: original filename of deliverable.
+    - `viewer_offer`: current authenticated member's proposal if already submitted.
+
+#### 3. Submitting Proposals & Offers
+- `POST /api/orders/{id}/offers`:
+  - **Headers:** `Authorization: Bearer {token}`, `Content-Type: application/json`
+  - **Payload Parameters:**
+    | Parameter | Type | Required | Description |
+    |---|---|---|---|
+    | `content` / `txt` | string | **Yes** | Proposal description and deliverables explanation (max 5000 chars). Accepts either `content` or `txt`. |
+    | `price` | numeric | Optional | Quoted amount for the project. |
+    | `currency` | string | Optional | Currency symbol or ISO code (e.g. `USD`, `PTS`). |
+    | `delivery_days` | integer | Optional | Agreed execution duration in days (1–365). |
+  - **Response (HTTP 200):**
+    ```json
+    {
+        "success": true,
+        "message": "تم تقديم العرض بنجاح",
+        "data": { "id": 88, "quoted_amount": 150, "delivery_days": 5 }
+    }
+    ```
+
+#### 4. Awarding & Contracting Lifecycle
+- `POST /api/orders/{id}/award`: Client awards contract to a specific provider proposal (`{"offer_id": 88}`). Transitions order to `awarded`.
+- `POST /api/orders/{id}/start`: Provider commences work. Transitions order to `in_progress` and starts the deadline timer.
+- `POST /api/orders/{id}/deliver`: Provider submits completed deliverables:
+  - **Request Type:** `multipart/form-data`
+  - **Payload:**
+    - `delivery_note` (string, optional): Delivery summary notes (max 5000 chars).
+    - `delivery_attachment` (file, optional): Deliverable package (ZIP, RAR, PDF, images up to **25 MB**).
+  - Transitions order to `delivered`.
+- `POST /api/orders/{id}/revision`: Client requests contract revisions:
+  - **Payload:** `{"revision_note": "يرجى تعديل ألوان الواجهة وإصلاح استجابة الهاتف..."}`
+  - Automatically reverts status back to `in_progress`, increments `revision_count`, and notifies the provider.
+- `POST /api/orders/{id}/complete`: Client accepts final delivery and completes the contract:
+  - **Payload:** `{"rating": 5, "review": "عمل متقن وتسليم في الموعد المحدد."}` (rating: 1 to 5).
+  - Transitions order to `completed`.
+- `POST /api/orders/{id}/cancel`: Cancel contract with reason note (`{"note": "تم الاتفاق على الإلغاء بالتراضي."}`).
+
+#### 5. Protected File Downloads
+- `GET /orders/{order}/attachment`: Download project specifications attachment provided by client during order creation.
+- `GET /orders/{order}/deliverable`: Download completed deliverable uploaded by provider. Strictly restricted to contract participants (client, provider, or administrator).
+
+---
+
+### I. Clips System (Shorts)
+
 - `GET /api/clips`: Retrieve vertical short video clips feed.
 - `GET /api/clips/saved`: Retrieve user's saved clips list.
 - `POST /api/clips/{id}/save`: Save a clip.
 - `DELETE /api/clips/{id}/save`: Unsave a clip.
 
-### I. Unified Comments & Media Attachment API
+---
+
+### J. Forums API (Mobile Specific)
+
+- `GET /api/forums/categories`: Get forum categories with topic counts.
+- `GET /api/forums/categories/{categoryId}/topics`: Get topics within a category.
+- `POST /api/forums/categories/{categoryId}/topics`: Create a new forum topic.
+- `GET /api/forums/topics/{topicId}`: Get topic details and replies.
+- `POST /api/forums/topics/{topicId}/replies`: Post a reply to a forum topic.
+
+---
+
+### K. Live Search & Advertising Intelligence
+
+- `GET /api/search/live`: Unified real-time search across 4 platform entities:
+  - **Rate Limit:** 40 req / min / IP (`throttle:40,1`)
+  - **Query Parameters:** `q` (minimum 2 characters).
+  - **Entities Searched:**
+    1. Members (`type: "user"`): Matches usernames, returns `id` (or public UID), `identifier`, `title`, `img`, and `@username`.
+    2. Store Products (`type: "product"`): Boolean full-text search against product names and descriptions.
+    3. Forum Topics (`type: "forum"`): Boolean full-text search against topic titles and content.
+    4. Community Posts (`type: "post"`): Search across public text posts.
+  - **Response:**
+    ```json
+    {
+        "success": true,
+        "data": [
+            {
+                "type": "user",
+                "id": 42,
+                "identifier": "developer",
+                "title": "developer",
+                "img": "https://domain.com/upload/avatar.png",
+                "subtitle": "@developer"
+            },
+            {
+                "type": "product",
+                "id": 12,
+                "title": "قالب الإعلانات الاحترافي",
+                "img": "https://domain.com/upload/store/thumb.jpg",
+                "subtitle": "قالب متكامل ومميز..."
+            }
+        ]
+    }
+    ```
+- `GET /api/ads/stats`: Retrieve member advertising performance metrics:
+  - *Response:*
+    ```json
+    {
+        "success": true,
+        "data": {
+            "visits": { "today": 14, "total": 240 },
+            "ads": { "banner_impressions": 1250, "smart_impressions": 840 },
+            "wallet": { "pts": 3500 }
+        }
+    }
+    ```
+
+---
+
+### L. Software Licensing & Extension Marketplace Feed API
+
+Provides automated software licensing verification and update feeds for extensions, WordPress plugins, and CMS themes.
+
+#### 1. Software License Verification
+- **Endpoint:** `POST /api/license/verify`
+- **Rate Limit:** 10 requests / min / IP (`throttle:10,1`)
+- **Headers:** `Content-Type: application/json`, `Accept: application/json`
+- **Payload:**
+  ```json
+  {
+      "license_key": "ADSTN-XXXX-XXXX-XXXX",
+      "domain": "client-site.com",
+      "plugin": "adstn-auto-poster"
+  }
+  ```
+- **Validation Rules:**
+  - Verifies existence of the product in the store matching `plugin` slug.
+  - Verifies existence and validity of `license_key` in `product_licenses`.
+  - Normalizes target domain (strips `https://`, `http://`, `www.`, and trailing slashes).
+  - If license domain is empty, automatically binds and activates domain on first verification (`activated_at = now()`).
+  - If license is already registered to a different domain, returns HTTP `400 Bad Request`.
+- **Success Response (HTTP 200):**
+  ```json
+  {
+      "success": true,
+      "message": "License successfully verified and activated.",
+      "license_key": "ADSTN-XXXX-XXXX-XXXX",
+      "domain": "client-site.com"
+  }
+  ```
+
+#### 2. Extensions Feed & Automatic Update Checker
+- `GET|POST /api/marketplace/extensions/plugins`:
+  - **Feed Mode (No query params):** Returns JSON catalog of available plugins for external CMS marketplaces.
+  - **Update Check Mode (`slug` and `version` provided):**
+    - Parameters: `slug`, `version`, `license_key` (required for paid items), `domain`.
+    - If product is paid, validates license key and checks domain activation.
+    - Locates latest release file in `options` (`o_type = 'store_file'`).
+    - *Response:*
+      ```json
+      {
+          "success": true,
+          "version": "1.2.0",
+          "download_url": "https://domain.com/api/marketplace/extensions/download?slug=...&license_key=...&domain=...",
+          "changelog": "Added Arabic slugs and reviews support."
+      }
+      ```
+- `GET /api/marketplace/extensions/themes`: Returns marketplace themes catalog.
+- `GET /api/marketplace/extensions/download`: Authenticated extension package download stream. Validates license key and domain binding before streaming ZIP package.
+
+---
+
+### M. Unified Comments & Media Attachment API
+
 Unified AJAX/REST endpoints managing contextual discussions across all platform entities (Forum Topics, Directory Listings, Store Products, Knowledgebase Articles, and Service Orders):
 
 - `POST /comment/store`: Post a comment with optional inline image attachment.
@@ -612,24 +866,14 @@ Unified AJAX/REST endpoints managing contextual discussions across all platform 
         "media_url": "https://domain.com/upload/comments/comment-142.webp"
     }
     ```
-  - **Validation Error (HTTP 422 / 400):**
-    ```json
-    {
-        "error": "The uploaded file exceeds the maximum allowed size (5 MB)."
-    }
-    ```
+- `POST /comment/delete`: Remove an existing comment (`{"trashid": 142, "type": "forum"}`).
+- `POST /reaction/toggle`: Toggle emoji reaction on a post or comment (`{"id": 142, "type": "forum_comment", "reaction": "like"}`).
 
-- `POST /comment/delete`: Remove an existing comment.
-  - **Headers:** `X-CSRF-TOKEN: {token}`, `Content-Type: application/json`
-  - **Payload:** `{"trashid": 142, "type": "forum"}`
-  - **Permissions:** Comment author, Forum Moderator (`delete_comments` permission), or System Administrator.
+---
 
-- `POST /reaction/toggle`: Toggle an emoji reaction on a post or comment.
-  - **Headers:** `X-CSRF-TOKEN: {token}`, `Content-Type: application/json`
-  - **Payload:** `{"id": 142, "type": "forum_comment", "reaction": "like"}`
+### N. Smart Partitioned XML Sitemaps
 
-### J. Smart Partitioned XML Sitemaps
-MYADS v4.6.2 provides scalable, partitioned XML Sitemaps compliant with Google Sitemaps Protocol 0.9 and Schema.org standards:
+MYADS v4.6.3 provides scalable, partitioned XML Sitemaps compliant with Google Sitemaps Protocol 0.9 and Schema.org standards:
 
 | Endpoint | Content | Cache Strategy |
 |---|---|---|
@@ -674,9 +918,10 @@ MYADS v4.6.2 provides scalable, partitioned XML Sitemaps compliant with Google S
 |:---:|---|---|
 | `200` | OK | Request succeeded |
 | `201` | Created | Resource successfully created |
+| `304` | Not Modified | Conditional ETag match (sitemaps, static assets) |
 | `401` | Unauthorized | Missing or invalid API key / Bearer token |
 | `403` | Forbidden | Insufficient OAuth scope or access permissions |
 | `404` | Not Found | Target resource, post, or member does not exist |
 | `422` | Unprocessable Entity | Form validation error (payload details in `errors`) |
 | `429` | Too Many Requests | Rate limit threshold exceeded |
-| `500` | Server Error | Internal error (masked for security) |
+| `500` | Server Error | Internal server exception (masked for security) |
