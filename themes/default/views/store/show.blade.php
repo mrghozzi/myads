@@ -99,6 +99,9 @@
                         @if($subCategoryLabel)
                             <span class="store-pill">{{ $subCategoryLabel }}</span>
                         @endif
+                        <span class="store-pill" style="background: rgba(241, 196, 15, 0.15); color: #f1c40f; border: 1px solid rgba(241, 196, 15, 0.3); cursor: pointer;" onclick="var rt = document.querySelector('[data-tab=\'reviews-tab\']'); if(rt) rt.click();">
+                            <i class="fa fa-star"></i> <strong>{{ number_format($averageRating, 1) }}</strong> <small>({{ $reviewsCount }})</small>
+                        </span>
                     </div>
                     <h2 class="store-title" itemprop="name">{{ $product->name }}</h2>
                     <p class="store-subtitle">{{ $pageSummary }}</p>
@@ -111,6 +114,10 @@
                             <span>{{ __('messages.download') }}</span>
                             <strong>{{ $downloadCount }}</strong>
                         </div>
+                        <div class="store-stat-card" style="cursor: pointer;" onclick="var rt = document.querySelector('[data-tab=\'reviews-tab\']'); if(rt) rt.click();">
+                            <span>{{ __('messages.rating') }}</span>
+                            <strong style="color: #f1c40f;"><i class="fa fa-star"></i> {{ number_format($averageRating, 1) }}</strong>
+                        </div>
                         <div class="store-stat-card">
                             <span>{{ __('messages.comments') }}</span>
                             <strong>{{ $commentCount }}</strong>
@@ -121,6 +128,16 @@
                         </div>
                     </div>
                     <div class="store-inline-actions">
+                        @if($liveDemoUrl)
+                            <a href="{{ $liveDemoUrl }}" target="_blank" rel="noopener noreferrer" class="button primary" style="background: linear-gradient(135deg, #23d2e2 0%, #10a8b9 100%); color: #fff; box-shadow: 0 4px 14px rgba(35, 210, 226, 0.35);">
+                                <i class="fa fa-external-link"></i>&nbsp;{{ __('messages.live_preview_demo') }}
+                            </a>
+                        @endif
+                        @if($videoPreviewUrl)
+                            <a href="{{ $videoPreviewUrl }}" target="_blank" rel="noopener noreferrer" class="button tertiary" style="color: #fff;">
+                                <i class="fa fa-play-circle"></i>&nbsp;{{ __('messages.video_preview') }}
+                            </a>
+                        @endif
                         @if(auth()->check())
                             @if($license || $product->o_order == 0 || auth()->id() == $product->o_parent)
                                 @if($downloadHash)
@@ -142,6 +159,7 @@
                             <i class="fa fa-database" aria-hidden="true"></i>&nbsp;{{ __('messages.knowledgebase') }}
                         </a>
                     </div>
+
                     @if(auth()->check() && !$license && $product->o_order > 0)
                         <div id="inline-purchase-panel" style="display: none; margin-top: 20px; background: #1d2333; border: 1px solid #2f3749; border-radius: 12px; padding: 20px; text-align: left;">
                             <h4 style="margin-top: 0; color: #fff;">{{ __('messages.confirm_purchase') ?? 'Confirm Purchase' }}</h4>
@@ -315,11 +333,38 @@
         </div>
     </div>
 
+    @if($screenshots->isNotEmpty())
+    <div class="widget-box store-shell-card" style="margin-top: 20px; padding: 24px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+            <h3 style="margin: 0; font-size: 1.15rem; font-weight: 700; display: flex; align-items: center; gap: 8px;">
+                <i class="fa fa-camera-retro" style="color: #615dfa;"></i> {{ __('messages.screenshots_gallery') }}
+            </h3>
+            <span class="store-pill" style="font-size: 11px;">{{ $screenshots->count() }} {{ __('messages.screenshots') }}</span>
+        </div>
+        <div class="store-screenshots-grid">
+            @foreach($screenshots as $ss)
+                <div class="store-screenshot-item" onclick="openStoreLightbox('{{ asset($ss->url) }}', '{{ addslashes($ss->caption ?? $product->name) }}')">
+                    <img src="{{ asset($ss->url) }}" alt="{{ $ss->caption ?? $product->name }}" loading="lazy">
+                    <div class="store-screenshot-overlay">
+                        <i class="fa fa-search-plus"></i>
+                        @if($ss->caption)
+                            <span>{{ $ss->caption }}</span>
+                        @endif
+                    </div>
+                </div>
+            @endforeach
+        </div>
+    </div>
+    @endif
+
     <div class="widget-box store-content-card store-tabs">
         <div class="tab-box">
             <div class="tab-box-options">
                 <div class="tab-box-option active" data-tab="topic-tab">
                     <p class="tab-box-option-title">{{ __('messages.topic') }}</p>
+                </div>
+                <div class="tab-box-option" data-tab="reviews-tab">
+                    <p class="tab-box-option-title">{{ __('messages.reviews') }} <span class="highlighted" id="tab-reviews-count">{{ $reviewsCount }}</span></p>
                 </div>
                 <div class="tab-box-option" data-tab="comments-tab">
                     <p class="tab-box-option-title">{{ __('messages.comments') }} <span class="highlighted">{{ $commentCount }}</span></p>
@@ -366,6 +411,169 @@
                             <textarea id="store-topic-textarea" rows="15" class="form-control" style="width:100%;padding:10px;">{{ $topic?->txt ?? $product->o_valuer }}</textarea>
                         </div>
                         @endif
+                    </div>
+                </div>
+
+                {{-- Reviews Tab --}}
+                <div class="tab-box-item" id="reviews-tab" style="display: none; transition: none 0s ease 0s;">
+                    <div class="tab-box-item-content">
+                        {{-- Rating Summary & Breakdown --}}
+                        <div class="store-reviews-summary-card">
+                            <div class="store-rating-score-box">
+                                <div class="store-rating-big-num" id="reviews-avg-display">{{ number_format($averageRating, 1) }}</div>
+                                <div class="store-stars-visual">
+                                    @for($i = 1; $i <= 5; $i++)
+                                        <i class="fa {{ $i <= round($averageRating) ? 'fa-star' : 'fa-star-o' }}" style="color: #f1c40f;"></i>
+                                    @endfor
+                                </div>
+                                <p class="store-rating-total-label" id="reviews-total-label">
+                                    {{ __('messages.based_on_reviews', ['count' => $reviewsCount]) }}
+                                </p>
+                            </div>
+                            <div class="store-rating-breakdown-bars">
+                                @for($star = 5; $star >= 1; $star--)
+                                    <div class="store-breakdown-row">
+                                        <span class="store-breakdown-star">{{ $star }} <i class="fa fa-star" style="color: #f1c40f; font-size: 11px;"></i></span>
+                                        <div class="store-breakdown-track">
+                                            <div class="store-breakdown-fill" style="width: {{ $ratingBreakdown['percentages'][$star] ?? 0 }}%;"></div>
+                                        </div>
+                                        <span class="store-breakdown-count">{{ $ratingBreakdown['counts'][$star] ?? 0 }}</span>
+                                    </div>
+                                @endfor
+                            </div>
+                        </div>
+
+                        {{-- Review Form --}}
+                        <div class="store-review-form-card" style="margin-top: 24px;">
+                            @if(auth()->check())
+                                @if($hasReviewed && $userReview)
+                                    <div class="store-user-review-alert" id="user-review-box" style="background: rgba(97, 93, 250, 0.06); border: 1px solid rgba(97, 93, 250, 0.2); border-radius: 12px; padding: 20px;">
+                                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+                                            <div>
+                                                <h4 style="margin: 0 0 6px; font-size: 1rem; font-weight: 700;">
+                                                    <i class="fa fa-check-circle" style="color: #2ecc71;"></i> {{ __('messages.already_reviewed') }}
+                                                </h4>
+                                                <div class="store-stars-visual">
+                                                    @for($i = 1; $i <= 5; $i++)
+                                                        <i class="fa {{ $i <= $userReview->rating ? 'fa-star' : 'fa-star-o' }}" style="color: #f1c40f;"></i>
+                                                    @endfor
+                                                    <span style="font-weight: 700; margin-inline-start: 6px;">{{ $userReview->rating }}/5</span>
+                                                </div>
+                                            </div>
+                                            <button type="button" class="button small secondary delete-my-review-btn" data-id="{{ $userReview->id }}" style="background: #e74c3c; border-color: #e74c3c; color: #fff;">
+                                                <i class="fa fa-trash"></i>&nbsp;{{ __('messages.delete') }}
+                                            </button>
+                                        </div>
+                                        @if($userReview->title)
+                                            <p style="margin: 0 0 6px; font-weight: 700;">{{ $userReview->title }}</p>
+                                        @endif
+                                        <p style="margin: 0; color: #8f91ac; font-size: 0.95rem; line-height: 1.6;">{{ $userReview->comment }}</p>
+                                    </div>
+                                @else
+                                    <form id="store-review-form" style="background: rgba(97, 93, 250, 0.03); border: 1px solid rgba(140, 146, 182, 0.18); border-radius: 12px; padding: 24px;">
+                                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; flex-wrap: wrap; gap: 10px;">
+                                            <h4 style="margin: 0; font-size: 1.05rem; font-weight: 700;">
+                                                <i class="fa fa-pencil" style="color: #615dfa;"></i> {{ __('messages.write_review') }}
+                                            </h4>
+                                            @if($isVerifiedBuyer)
+                                                <span class="store-verified-pill">
+                                                    <i class="fa fa-shield"></i> {{ __('messages.verified_buyer') }}
+                                                </span>
+                                            @endif
+                                        </div>
+
+                                        <div style="margin-bottom: 18px;">
+                                            <label style="display: block; font-size: 13px; font-weight: 700; margin-bottom: 8px;">{{ __('messages.your_rating') }} <span style="color: #e74c3c;">*</span></label>
+                                            <div class="interactive-star-picker" id="star-picker">
+                                                @for($s = 1; $s <= 5; $s++)
+                                                    <i class="fa fa-star interactive-star" data-rating="{{ $s }}" style="color: #f1c40f; font-size: 24px; cursor: pointer; margin-inline-end: 4px;"></i>
+                                                @endfor
+                                                <span id="star-picker-label" style="font-weight: 700; margin-inline-start: 10px; font-size: 14px;">5/5</span>
+                                            </div>
+                                            <input type="hidden" name="rating" id="review-rating-value" value="5">
+                                        </div>
+
+                                        <div style="margin-bottom: 16px;">
+                                            <label style="display: block; font-size: 13px; font-weight: 700; margin-bottom: 6px;">{{ __('messages.review_title') }}</label>
+                                            <input type="text" name="title" id="review-title-input" class="form-control" placeholder="{{ __('messages.review_title') }}..." style="width: 100%; border-radius: 8px; padding: 10px 14px;">
+                                        </div>
+
+                                        <div style="margin-bottom: 20px;">
+                                            <label style="display: block; font-size: 13px; font-weight: 700; margin-bottom: 6px;">{{ __('messages.review_content') }} <span style="color: #e74c3c;">*</span></label>
+                                            <textarea name="comment" id="review-comment-input" rows="4" class="form-control" placeholder="{{ __('messages.review_content') }}..." required style="width: 100%; border-radius: 8px; padding: 12px 14px; line-height: 1.6;"></textarea>
+                                        </div>
+
+                                        <div id="review-form-error" class="alert alert-danger" style="display: none; margin-bottom: 16px;"></div>
+
+                                        <div style="display: flex; justify-content: flex-end;">
+                                            <button type="submit" id="submit-review-btn" class="button primary" style="padding: 10px 28px; border-radius: 8px;">
+                                                <span class="btn-text"><i class="fa fa-paper-plane"></i> {{ __('messages.submit_review') }}</span>
+                                                <span class="btn-spinner" style="display: none;"><i class="fa fa-spinner fa-spin"></i> {{ __('messages.saving') ?? 'Saving...' }}</span>
+                                            </button>
+                                        </div>
+                                    </form>
+                                @endif
+                            @else
+                                <div class="alert alert-info" style="border-radius: 10px; padding: 16px 20px;">
+                                    <i class="fa fa-info-circle"></i> <a href="{{ route('login') }}" style="font-weight: 700; text-decoration: underline;">{{ __('messages.login') }}</a> {{ __('messages.to_review_prompt') ?? 'to leave a review for this product.' }}
+                                </div>
+                            @endif
+                        </div>
+
+                        {{-- Reviews List --}}
+                        <div class="store-reviews-list-section" style="margin-top: 30px;">
+                            <h4 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 20px;">
+                                {{ __('messages.reviews') }} (<span id="reviews-header-count">{{ $reviewsCount }}</span>)
+                            </h4>
+                            <div id="store-reviews-container">
+                                @forelse($reviews as $rev)
+                                    @php
+                                        $revUser = $rev->user;
+                                        $revAvatar = $revUser ? $revUser->avatarUrl() : asset('upload/_avatar.png');
+                                        $canDeleteRev = auth()->check() && (auth()->id() == $rev->user_id || auth()->user()->isAdmin());
+                                    @endphp
+                                    <div class="store-review-item" id="review-item-{{ $rev->id }}">
+                                        <div class="store-review-user-col">
+                                            <img src="{{ $revAvatar }}" alt="{{ $revUser?->username ?? 'User' }}" class="store-review-avatar">
+                                        </div>
+                                        <div class="store-review-body-col">
+                                            <div class="store-review-meta">
+                                                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                                                    <span class="store-reviewer-name">{{ $revUser?->username ?? __('messages.unknown') }}</span>
+                                                    @if($rev->is_verified_buyer)
+                                                        <span class="store-verified-pill" title="{{ __('messages.verified_buyer') }}">
+                                                            <i class="fa fa-check-circle"></i> {{ __('messages.verified_buyer') }}
+                                                        </span>
+                                                    @endif
+                                                </div>
+                                                <div style="display: flex; align-items: center; gap: 12px;">
+                                                    <span class="store-review-date">{{ $rev->created_at ? $rev->created_at->diffForHumans() : '' }}</span>
+                                                    @if($canDeleteRev)
+                                                        <button type="button" class="store-review-del-btn" onclick="deleteStoreReview({{ $rev->id }})" title="{{ __('messages.delete') }}">
+                                                            <i class="fa fa-trash"></i>
+                                                        </button>
+                                                    @endif
+                                                </div>
+                                            </div>
+                                            <div class="store-stars-visual" style="margin: 6px 0 10px;">
+                                                @for($i = 1; $i <= 5; $i++)
+                                                    <i class="fa {{ $i <= $rev->rating ? 'fa-star' : 'fa-star-o' }}" style="color: #f1c40f; font-size: 14px;"></i>
+                                                @endfor
+                                            </div>
+                                            @if($rev->title)
+                                                <h5 class="store-review-title">{{ $rev->title }}</h5>
+                                            @endif
+                                            <p class="store-review-text">{{ $rev->comment }}</p>
+                                        </div>
+                                    </div>
+                                @empty
+                                    <div class="store-empty-reviews" id="empty-reviews-placeholder">
+                                        <i class="fa fa-star-o fa-3x" style="color: #f1c40f; opacity: 0.35; margin-bottom: 12px; display: block;"></i>
+                                        <p style="color: #8f91ac; font-size: 0.95rem; margin: 0;">{{ __('messages.no_reviews_yet') }}</p>
+                                    </div>
+                                @endforelse
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -757,5 +965,445 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 @endif
+
+{{-- Lightbox Modal for Screenshots --}}
+<div id="store-lightbox-modal" class="store-lightbox" style="display: none;" onclick="closeStoreLightbox(event)">
+    <div class="store-lightbox-dialog" onclick="event.stopPropagation()">
+        <button type="button" class="store-lightbox-close" onclick="closeStoreLightbox()">&times;</button>
+        <img id="store-lightbox-img" src="" alt="Screenshot">
+        <p id="store-lightbox-caption" class="store-lightbox-caption"></p>
+    </div>
+</div>
+
+<script>
+    // Lightbox functions
+    window.openStoreLightbox = function(url, caption) {
+        var modal = document.getElementById('store-lightbox-modal');
+        var img = document.getElementById('store-lightbox-img');
+        var cap = document.getElementById('store-lightbox-caption');
+        if (modal && img) {
+            img.src = url;
+            if (cap) cap.textContent = caption || '';
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+    };
+    window.closeStoreLightbox = function(e) {
+        var modal = document.getElementById('store-lightbox-modal');
+        if (modal) {
+            modal.style.display = 'none';
+            document.body.style.overflow = '';
+        }
+    };
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeStoreLightbox();
+    });
+
+    // Reviews Interactive Logic
+    document.addEventListener('DOMContentLoaded', function() {
+        // Star Picker
+        var starPicker = document.getElementById('star-picker');
+        if (starPicker) {
+            var stars = starPicker.querySelectorAll('.interactive-star');
+            var input = document.getElementById('review-rating-value');
+            var label = document.getElementById('star-picker-label');
+            stars.forEach(function(s) {
+                s.addEventListener('mouseenter', function() {
+                    var r = parseInt(s.dataset.rating);
+                    stars.forEach(function(st, idx) {
+                        if (idx < r) {
+                            st.classList.remove('fa-star-o');
+                            st.classList.add('fa-star');
+                        } else {
+                            st.classList.remove('fa-star');
+                            st.classList.add('fa-star-o');
+                        }
+                    });
+                    if (label) label.textContent = r + '/5';
+                });
+                s.addEventListener('click', function() {
+                    var r = parseInt(s.dataset.rating);
+                    if (input) input.value = r;
+                    if (label) label.textContent = r + '/5';
+                });
+            });
+            starPicker.addEventListener('mouseleave', function() {
+                var current = parseInt(input ? input.value : 5);
+                stars.forEach(function(st, idx) {
+                    if (idx < current) {
+                        st.classList.remove('fa-star-o');
+                        st.classList.add('fa-star');
+                    } else {
+                        st.classList.remove('fa-star');
+                        st.classList.add('fa-star-o');
+                    }
+                });
+                if (label) label.textContent = current + '/5';
+            });
+        }
+
+        // Review Form Submit (AJAX)
+        var reviewForm = document.getElementById('store-review-form');
+        if (reviewForm) {
+            reviewForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                var btn = document.getElementById('submit-review-btn');
+                var err = document.getElementById('review-form-error');
+                if (err) err.style.display = 'none';
+                if (btn) {
+                    btn.disabled = true;
+                    var bText = btn.querySelector('.btn-text');
+                    var bSpin = btn.querySelector('.btn-spinner');
+                    if (bText) bText.style.display = 'none';
+                    if (bSpin) bSpin.style.display = 'inline-block';
+                }
+
+                var ratingVal = document.getElementById('review-rating-value') ? document.getElementById('review-rating-value').value : 5;
+                var titleVal = document.getElementById('review-title-input') ? document.getElementById('review-title-input').value : '';
+                var commentVal = document.getElementById('review-comment-input') ? document.getElementById('review-comment-input').value : '';
+                var csrfMeta = document.querySelector('meta[name="csrf-token"]');
+
+                fetch("{{ route('store.reviews.store', $product->id) }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfMeta ? csrfMeta.content : '',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        rating: ratingVal,
+                        title: titleVal,
+                        comment: commentVal
+                    })
+                })
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    if (btn) {
+                        btn.disabled = false;
+                        var bText = btn.querySelector('.btn-text');
+                        var bSpin = btn.querySelector('.btn-spinner');
+                        if (bText) bText.style.display = 'inline-block';
+                        if (bSpin) bSpin.style.display = 'none';
+                    }
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        if (err) {
+                            err.textContent = data.message || (data.errors ? Object.values(data.errors).flat().join(', ') : 'Error submitting review');
+                            err.style.display = 'block';
+                        }
+                    }
+                })
+                .catch(function() {
+                    if (btn) {
+                        btn.disabled = false;
+                        var bText = btn.querySelector('.btn-text');
+                        var bSpin = btn.querySelector('.btn-spinner');
+                        if (bText) bText.style.display = 'inline-block';
+                        if (bSpin) bSpin.style.display = 'none';
+                    }
+                    if (err) {
+                        err.textContent = "{{ __('messages.network_error') ?? 'An error occurred. Please try again.' }}";
+                        err.style.display = 'block';
+                    }
+                });
+            });
+        }
+
+        // Delete Review Function
+        window.deleteStoreReview = function(id) {
+            if (!confirm("{{ __('messages.confirm_delete') ?? 'Are you sure you want to delete this review?' }}")) return;
+            var csrfMeta = document.querySelector('meta[name="csrf-token"]');
+            fetch("{{ url('/store/reviews') }}/" + id, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': csrfMeta ? csrfMeta.content : '',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert(data.error || 'Failed to delete');
+                }
+            })
+            .catch(function() { alert('Network error'); });
+        };
+
+        var deleteMyRevBtn = document.querySelector('.delete-my-review-btn');
+        if (deleteMyRevBtn) {
+            deleteMyRevBtn.addEventListener('click', function() {
+                deleteStoreReview(this.dataset.id);
+            });
+        }
+    });
+</script>
+
+<style>
+    /* Screenshots Gallery Styles */
+    .store-screenshots-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 16px;
+    }
+    .store-screenshot-item {
+        position: relative;
+        border-radius: 12px;
+        overflow: hidden;
+        cursor: pointer;
+        aspect-ratio: 16 / 10;
+        background: #111522;
+        border: 1px solid rgba(140, 146, 182, 0.2);
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+    .store-screenshot-item:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.35);
+        border-color: #615dfa;
+    }
+    .store-screenshot-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        transition: transform 0.3s ease;
+    }
+    .store-screenshot-item:hover img {
+        transform: scale(1.04);
+    }
+    .store-screenshot-overlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.45);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+        color: #fff;
+        padding: 12px;
+        text-align: center;
+        gap: 6px;
+    }
+    .store-screenshot-item:hover .store-screenshot-overlay {
+        opacity: 1;
+    }
+    .store-screenshot-overlay i {
+        font-size: 24px;
+    }
+    .store-screenshot-overlay span {
+        font-size: 12px;
+        font-weight: 600;
+        text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+    }
+
+    /* Lightbox Modal */
+    .store-lightbox {
+        position: fixed;
+        inset: 0;
+        background: rgba(8, 10, 18, 0.88);
+        backdrop-filter: blur(8px);
+        z-index: 99999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+        animation: fadeIn 0.2s ease;
+    }
+    .store-lightbox-dialog {
+        position: relative;
+        max-width: 90vw;
+        max-height: 90vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .store-lightbox-dialog img {
+        max-width: 100%;
+        max-height: 82vh;
+        border-radius: 10px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+        object-fit: contain;
+    }
+    .store-lightbox-close {
+        position: absolute;
+        top: -44px;
+        right: 0;
+        background: none;
+        border: none;
+        color: #fff;
+        font-size: 36px;
+        line-height: 1;
+        cursor: pointer;
+        opacity: 0.8;
+        transition: opacity 0.2s;
+    }
+    .store-lightbox-close:hover { opacity: 1; color: #ff5252; }
+    .store-lightbox-caption {
+        color: #fff;
+        margin-top: 12px;
+        font-size: 14px;
+        font-weight: 600;
+        text-align: center;
+    }
+
+    /* Reviews Styles */
+    .store-reviews-summary-card {
+        display: flex;
+        align-items: center;
+        gap: 36px;
+        background: rgba(97, 93, 250, 0.04);
+        border: 1px solid rgba(140, 146, 182, 0.18);
+        border-radius: 16px;
+        padding: 28px;
+        flex-wrap: wrap;
+    }
+    .store-rating-score-box {
+        text-align: center;
+        min-width: 160px;
+    }
+    .store-rating-big-num {
+        font-size: 3.6rem;
+        font-weight: 900;
+        color: #f1c40f;
+        line-height: 1;
+        margin-bottom: 8px;
+    }
+    .store-rating-total-label {
+        font-size: 12px;
+        color: #8f91ac;
+        margin: 6px 0 0;
+        font-weight: 600;
+    }
+    .store-rating-breakdown-bars {
+        flex: 1;
+        min-width: 240px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    .store-breakdown-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 13px;
+        font-weight: 600;
+    }
+    .store-breakdown-star {
+        width: 44px;
+        color: #8f91ac;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+    .store-breakdown-track {
+        flex: 1;
+        height: 10px;
+        background: rgba(140, 146, 182, 0.15);
+        border-radius: 99px;
+        overflow: hidden;
+    }
+    .store-breakdown-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #f1c40f 0%, #f39c12 100%);
+        border-radius: 99px;
+        transition: width 0.4s ease;
+    }
+    .store-breakdown-count {
+        width: 32px;
+        text-align: end;
+        color: #8f91ac;
+    }
+
+    /* Review Item Card */
+    .store-review-item {
+        display: flex;
+        gap: 18px;
+        padding: 20px 0;
+        border-bottom: 1px solid rgba(140, 146, 182, 0.14);
+    }
+    .store-review-avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid rgba(97, 93, 250, 0.3);
+    }
+    .store-review-body-col {
+        flex: 1;
+    }
+    .store-review-meta {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 4px;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    .store-reviewer-name {
+        font-weight: 700;
+        font-size: 15px;
+        color: #3e3f5e;
+    }
+    body[data-theme="css_d"] .store-reviewer-name {
+        color: #fff;
+    }
+    .store-verified-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        background: rgba(46, 204, 113, 0.12);
+        color: #2ecc71;
+        border: 1px solid rgba(46, 204, 113, 0.35);
+        padding: 2px 8px;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+    }
+    .store-review-date {
+        font-size: 12px;
+        color: #8f91ac;
+    }
+    .store-review-del-btn {
+        background: none;
+        border: none;
+        color: #8f91ac;
+        cursor: pointer;
+        font-size: 14px;
+        padding: 4px;
+        transition: color 0.2s;
+    }
+    .store-review-del-btn:hover {
+        color: #e74c3c;
+    }
+    .store-review-title {
+        margin: 6px 0;
+        font-size: 15px;
+        font-weight: 700;
+        color: #3e3f5e;
+    }
+    body[data-theme="css_d"] .store-review-title {
+        color: #fff;
+    }
+    .store-review-text {
+        margin: 0;
+        color: #616682;
+        font-size: 14px;
+        line-height: 1.6;
+    }
+    body[data-theme="css_d"] .store-review-text {
+        color: #9aa4bf;
+    }
+    .store-empty-reviews {
+        text-align: center;
+        padding: 40px 20px;
+    }
+</style>
 
 @endsection

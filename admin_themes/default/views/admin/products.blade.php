@@ -22,6 +22,10 @@
                     <i class="feather-dollar-sign me-1"></i>
                     <span>{{ __('messages.store_sales_licenses') ?? 'Sales & Licenses' }}</span>
                 </a>
+                <a href="{{ route('admin.store.reviews') }}" class="btn btn-outline-secondary">
+                    <i class="feather-star me-1"></i>
+                    <span>{{ __('messages.ratings_and_reviews') ?? 'Ratings & Reviews' }}</span>
+                </a>
                 <a href="{{ route('store.create') }}" target="_blank" class="btn btn-primary">
                     <i class="feather-plus me-1"></i>
                     <span>{{ __('messages.add_product') ?? 'Add Product' }}</span>
@@ -172,6 +176,7 @@
                                 <th>{{ __('messages.name') ?? 'Product Name' }}</th>
                                 <th>{{ __('messages.category') ?? 'Category' }}</th>
                                 <th>{{ __('messages.price') ?? 'Price' }}</th>
+                                <th style="width: 110px;">{{ __('messages.rating') ?? 'Rating' }}</th>
                                 <th>{{ __('messages.seller') ?? 'Seller' }}</th>
                                 <th>{{ __('messages.status') ?? 'Status' }}</th>
                                 <th class="text-end pe-3">{{ __('messages.actions') ?? 'Actions' }}</th>
@@ -195,9 +200,21 @@
                                         </div>
                                     </td>
                                     <td>
-                                        <a href="{{ route('store.show', $product->name) }}" target="_blank" class="fw-bold text-dark text-decoration-none">
-                                            {{ $product->name }}
-                                        </a>
+                                        <div class="d-flex align-items-center gap-1 flex-wrap">
+                                            <a href="{{ route('store.show', $product->name) }}" target="_blank" class="fw-bold text-dark text-decoration-none">
+                                                {{ $product->name }}
+                                            </a>
+                                            @if($product->live_demo_url)
+                                                <a href="{{ $product->live_demo_url }}" target="_blank" class="badge bg-soft-info text-info text-decoration-none" title="{{ __('messages.live_preview_demo') ?? 'Live Demo' }}">
+                                                    <i class="feather-external-link me-1"></i>Demo
+                                                </a>
+                                            @endif
+                                            @if($product->screenshots->count() > 0)
+                                                <span class="badge bg-soft-secondary text-secondary" title="{{ $product->screenshots->count() }} {{ __('messages.screenshots') ?? 'Screenshots' }}">
+                                                    <i class="feather-image me-1"></i>{{ $product->screenshots->count() }}
+                                                </span>
+                                            @endif
+                                        </div>
                                         <div class="fs-12 text-muted text-truncate" style="max-width: 250px;">
                                             {{ \Illuminate\Support\Str::limit($product->o_valuer, 50) }}
                                         </div>
@@ -212,6 +229,16 @@
                                             <span class="text-success fw-bold">{{ number_format((float)$product->productPrice) }} PTS</span>
                                         @else
                                             <span class="badge bg-soft-success text-success">{{ __('messages.free') ?? 'Free' }}</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($product->reviews_count > 0)
+                                            <a href="{{ route('admin.store.reviews', ['product_id' => $product->id]) }}" class="text-decoration-none d-flex align-items-center gap-1">
+                                                <span class="text-warning fw-bold"><i class="feather-star fs-12 text-warning"></i> {{ number_format($product->average_rating, 1) }}</span>
+                                                <span class="text-muted fs-11">({{ $product->reviews_count }})</span>
+                                            </a>
+                                        @else
+                                            <span class="text-muted fs-12">-</span>
                                         @endif
                                     </td>
                                     <td>
@@ -266,7 +293,7 @@
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="8" class="text-center py-5 text-muted">
+                                    <td colspan="9" class="text-center py-5 text-muted">
                                         <i class="feather-package fs-1 d-block mb-2"></i>
                                         {{ __('messages.no_products_found') ?? 'No products found.' }}
                                     </td>
@@ -303,6 +330,11 @@
                                 @elseif($isPending)
                                     <span class="badge bg-warning text-dark shadow-sm">{{ __('messages.pending_approval') ?? 'Pending Review' }}</span>
                                 @endif
+                                @if($product->live_demo_url)
+                                    <a href="{{ $product->live_demo_url }}" target="_blank" class="badge bg-info text-white shadow-sm text-decoration-none">
+                                        <i class="feather-external-link me-1"></i>Demo
+                                    </a>
+                                @endif
                             </div>
 
                             @if($product->o_order == 0)
@@ -325,6 +357,13 @@
                                         <span class="text-success fw-bold">{{ __('messages.free') ?? 'Free' }}</span>
                                     @endif
                                 </small>
+                                @if($product->reviews_count > 0)
+                                    <div class="fs-11 text-warning mt-1 d-flex align-items-center gap-1">
+                                        <i class="feather-star fs-11"></i>
+                                        <span class="fw-bold">{{ number_format($product->average_rating, 1) }}</span>
+                                        <span class="text-muted">({{ $product->reviews_count }})</span>
+                                    </div>
+                                @endif
                                 <div class="fs-11 text-muted mt-1 text-truncate-1-line">
                                     <i class="feather-user me-1"></i>
                                     @if($product->user)

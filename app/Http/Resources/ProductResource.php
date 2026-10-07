@@ -35,6 +35,17 @@ class ProductResource extends JsonResource
             'is_pending' => (bool) $this->is_pending,
             'moderation_status' => $this->moderation_status,
             'thumbnail' => $this->product_image,
+            'rating' => (float) $this->average_rating,
+            'average_rating' => (float) $this->average_rating,
+            'reviews_count' => (int) $this->reviews_count,
+            'live_demo_url' => $this->live_demo_url,
+            'video_preview_url' => $this->video_preview_url,
+            'screenshots' => $this->screenshots->map(fn($s) => [
+                'id' => $s->id,
+                'url' => $s->url,
+                'full_url' => asset($s->url),
+                'caption' => $s->caption,
+            ])->values(),
             'seller' => new UserResource($this->whenLoaded('user')),
             'is_featured' => false,
             'category_id' => $this->product_category,
@@ -43,4 +54,5 @@ class ProductResource extends JsonResource
             'date_formatted' => $this->updated_at ? $this->updated_at->diffForHumans() : '',
         ];
     }
+
 }

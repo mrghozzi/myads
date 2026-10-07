@@ -232,4 +232,97 @@ class Product extends Model
         }
         return (int) \App\Models\Short::where('sh_type', 7867)->whereIn('tp_id', $fileIds)->sum('clik');
     }
+
+    /**
+     * Relationship to product reviews.
+     */
+    public function reviews()
+    {
+        return $this->hasMany(ProductReview::class, 'product_id', 'id')->latest();
+    }
+
+    /**
+     * Relationship to product media assets.
+     */
+    public function media()
+    {
+        return $this->hasMany(ProductMedia::class, 'product_id', 'id')->orderBy('sort_order')->orderBy('id');
+    }
+
+    /**
+     * Screenshots media items.
+     */
+    public function screenshots()
+    {
+        return $this->hasMany(ProductMedia::class, 'product_id', 'id')
+            ->where('media_type', 'screenshot')
+            ->orderBy('sort_order')
+            ->orderBy('id');
+    }
+
+    /**
+     * Average 5-star rating (rounded to 1 decimal place).
+     */
+    public function getAverageRatingAttribute(): float
+    {
+        $avg = $this->reviews()->avg('rating');
+        return $avg ? round((float) $avg, 1) : 0.0;
+    }
+
+    /**
+     * Total number of reviews.
+     */
+    public function getReviewsCountAttribute(): int
+    {
+        return $this->reviews()->count();
+    }
+
+    /**
+     * Breakdown of ratings (counts and percentages for 1..5 stars).
+     */
+    public function getRatingBreakdownAttribute(): array
+    {
+        $counts = [5 => 0, 4 => 0, 3 => 0, 2 => 0, 1 => 0];
+        $reviews = $this->reviews;
+        $total = $reviews->count();
+
+        foreach ($reviews as $review) {
+            $r = (int) $review->rating;
+            if (isset($counts[$r])) {
+                $counts[$r]++;
+            }
+        }
+
+        $percentages = [];
+        foreach ($counts as $star => $count) {
+            $percentages[$star] = $total > 0 ? round(($count / $total) * 100) : 0;
+        }
+
+        return [
+            'total' => $total,
+            'counts' => $counts,
+            'percentages' => $percentages,
+        ];
+    }
+
+    /**
+     * Live preview / demo URL.
+     */
+    public function getLiveDemoUrlAttribute(): ?string
+    {
+        return $this->media()
+            ->where('media_type', 'demo_url')
+            ->value('url');
+    }
+
+    /**
+     * Video preview URL.
+     */
+    public function getVideoPreviewUrlAttribute(): ?string
+    {
+        return $this->media()
+            ->where('media_type', 'video')
+            ->value('url');
+    }
 }
+

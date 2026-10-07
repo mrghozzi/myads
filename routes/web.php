@@ -427,8 +427,14 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/store/discounts/{id}/update', [StoreController::class, 'discountsUpdate'])->name('store.discounts.update');
     Route::match(['get', 'delete'], '/store/discounts/{id}', [StoreController::class, 'discountsDestroy'])->name('store.discounts.destroy');
     Route::post('/store/discounts/validate', [StoreController::class, 'validateDiscount'])->name('store.discounts.validate');
+    Route::post('/store/upload-screenshot', [StoreController::class, 'uploadScreenshot'])->name('store.upload_screenshot');
+    Route::post('/store/{id}/reviews', [StoreController::class, 'storeReview'])->name('store.reviews.store');
+    Route::delete('/store/reviews/{id}', [StoreController::class, 'destroyReview'])->name('store.reviews.destroy');
+    Route::post('/store/{name}/media', [StoreController::class, 'storeMedia'])->name('store.media.store');
+    Route::delete('/store/{name}/media/{id}', [StoreController::class, 'destroyMedia'])->name('store.media.destroy');
     Route::post('/store/{id}/purchase', [StoreController::class, 'purchaseProduct'])->name('store.purchase');
 });
+
 
 Route::get('/store', [StoreController::class, 'index'])->name('store.index');
 Route::get('/store/{script}/{category}', [StoreController::class, 'index'])->name('store.script_category');
@@ -808,6 +814,10 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
 
     // Admin Store Sales & Licenses
     Route::get('/store/sales', [AdminController::class, 'storeSales'])->name('admin.store.sales');
+
+    // Admin Store Reviews & Ratings
+    Route::get('/store/reviews', [AdminController::class, 'storeReviews'])->name('admin.store.reviews');
+    Route::delete('/store/reviews/{id}', [AdminController::class, 'deleteStoreReview'])->name('admin.store.reviews.delete');
 
     // Admin Store Discount Codes
     Route::get('/store/discounts', [AdminController::class, 'discountsIndex'])->name('admin.store.discounts.index');

@@ -19,9 +19,22 @@ use App\Models\Emoji;
 use App\Services\KnowledgebaseCommunityService;
 use App\Support\StoreCategoryCatalog;
 use App\Models\KbCategory;
+use App\Models\ProductReview;
+use App\Models\ProductMedia;
 
 class StoreController extends Controller
 {
+    public function findProductByName(string $name): Product
+    {
+        $decoded = urldecode($name);
+        return Product::withoutGlobalScope('store')
+            ->where('o_type', 'store')
+            ->where(function ($q) use ($name, $decoded) {
+                $q->where('name', $name)->orWhere('name', $decoded);
+            })
+            ->firstOrFail();
+    }
+
     public function index(Request $request, ?string $script = null, ?string $category = null)
     {
         $category = StoreCategoryCatalog::normalize($category ?? $request->query('category'));
@@ -196,7 +209,7 @@ class StoreController extends Controller
 
     public function show($name)
     {
-        $product = Product::withoutGlobalScope('store')->where('o_type', 'store')->where('name', $name)->firstOrFail();
+        $product = $this->findProductByName($name);
         $status = Status::where('s_type', 7867)->where('tp_id', $product->id)->first();
         if ($status) {
             $status->related_content = $product;
@@ -304,8 +317,20 @@ class StoreController extends Controller
             ])),
         ]);
 
-        return view('theme::store.show', compact('product', 'status', 'type', 'topic', 'latestFile', 'downloadHash', 'downloadCount', 'files', 'canManageProduct', 'isSuspended', 'isPending', 'license'));
+        $reviews = $product->reviews()->with('user')->get();
+        $screenshots = $product->screenshots;
+        $averageRating = $product->average_rating;
+        $reviewsCount = $product->reviews_count;
+        $ratingBreakdown = $product->rating_breakdown;
+        $liveDemoUrl = $product->live_demo_url;
+        $videoPreviewUrl = $product->video_preview_url;
+        $hasReviewed = Auth::check() ? $product->reviews()->where('user_id', Auth::id())->exists() : false;
+        $userReview = Auth::check() ? $product->reviews()->where('user_id', Auth::id())->first() : null;
+        $isVerifiedBuyer = Auth::check() ? DB::table('product_licenses')->where('user_id', Auth::id())->where('product_id', $product->id)->exists() : false;
+
+        return view('theme::store.show', compact('product', 'status', 'type', 'topic', 'latestFile', 'downloadHash', 'downloadCount', 'files', 'canManageProduct', 'isSuspended', 'isPending', 'license', 'reviews', 'screenshots', 'averageRating', 'reviewsCount', 'ratingBreakdown', 'liveDemoUrl', 'videoPreviewUrl', 'hasReviewed', 'userReview', 'isVerifiedBuyer'));
     }
+
 
     public function create()
     {
@@ -320,7 +345,7 @@ class StoreController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => ['required', 'string', 'min:3', 'max:35', 'regex:/^[-a-zA-Z0-9_]+$/', 'unique:options,name,NULL,id,o_type,store'],
+            'name' => ['required', 'string', 'min:3', 'max:70', 'regex:/^[\p{L}\p{N}\s_\-\.]+$/u', 'unique:options,name,NULL,id,o_type,store'],
             'desc' => ['required', 'string', 'min:10', 'max:2400'],
             'vnbr' => ['required', 'string', 'min:2', 'max:12', 'regex:/^[-a-zA-Z0-9.]+$/'],
             'pts' => ['required', 'integer', 'min:0', 'max:999999'],
@@ -332,6 +357,9 @@ class StoreController extends Controller
             'sale_price' => ['nullable', 'integer', 'min:0', 'lt:pts'],
             'sale_start' => ['nullable', 'date'],
             'sale_end' => ['nullable', 'date', 'after_or_equal:sale_start'],
+            'demo_url' => ['nullable', 'string', 'max:2048'],
+            'video_url' => ['nullable', 'string', 'max:2048'],
+            'screenshots' => ['nullable'],
         ]);
 
         $user = Auth::user();
@@ -399,11 +427,58 @@ class StoreController extends Controller
                 ]);
             }
 
+            // Save demo_url if provided
+            if ($request->filled('demo_url')) {
+                ProductMedia::create([
+                    'product_id' => $product->id,
+                    'media_type' => 'demo_url',
+                    'url' => $request->input('demo_url'),
+                    'sort_order' => 0,
+                ]);
+            }
+
+            // Save video_url if provided
+            if ($request->filled('video_url')) {
+                ProductMedia::create([
+                    'product_id' => $product->id,
+                    'media_type' => 'video',
+                    'url' => $request->input('video_url'),
+                    'sort_order' => 0,
+                ]);
+            }
+
+            // Save screenshots if provided
+            $screenshots = $request->input('screenshots');
+            if (is_string($screenshots)) {
+                $screenshots = json_decode($screenshots, true) ?: array_filter(array_map('trim', explode(',', $screenshots)));
+            }
+            if (is_array($screenshots)) {
+                foreach ($screenshots as $idx => $sUrl) {
+                    if (!empty($sUrl) && is_string($sUrl)) {
+                        ProductMedia::create([
+                            'product_id' => $product->id,
+                            'media_type' => 'screenshot',
+                            'url' => $sUrl,
+                            'sort_order' => $idx,
+                        ]);
+                    }
+                }
+            }
+
             app(\App\Services\GamificationService::class)->recordEvent($user->id, 'product_created');
+
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json([
+                    'success' => true,
+                    'redirect_url' => route('store.show', $product->name),
+                    'message' => __('product_added_successfully'),
+                ]);
+            }
 
             return redirect()->route('store.show', $product->name)->with('success', __('product_added_successfully'));
         });
     }
+
 
     public function edit($id)
     {
@@ -538,12 +613,15 @@ class StoreController extends Controller
 
     public function update($name)
     {
-        $product = Product::withoutGlobalScope('store')->where('o_type', 'store')->where('name', $name)->firstOrFail();
+        $product = $this->findProductByName($name);
         if (!Auth::check() || (Auth::id() != $product->o_parent && !Auth::user()->isAdmin())) {
             return redirect()->route('store.show', $product->name);
         }
         $files = ProductFile::where('o_parent', $product->id)->orderBy('id', 'desc')->get();
-        return view('theme::store.update', compact('product', 'files'));
+        $screenshots = $product->screenshots;
+        $liveDemoUrl = $product->live_demo_url;
+        $videoPreviewUrl = $product->video_preview_url;
+        return view('theme::store.update', compact('product', 'files', 'screenshots', 'liveDemoUrl', 'videoPreviewUrl'));
     }
 
     /**
@@ -551,7 +629,7 @@ class StoreController extends Controller
      */
     public function updateTopic(Request $request, $name)
     {
-        $product = Product::withoutGlobalScope('store')->where('o_type', 'store')->where('name', $name)->firstOrFail();
+        $product = $this->findProductByName($name);
 
         if (!Auth::check() || (Auth::id() != $product->o_parent && !Auth::user()->isAdmin())) {
             return response()->json(['success' => false, 'message' => __('messages.unauthorized')], 403);
@@ -600,7 +678,7 @@ class StoreController extends Controller
      */
     public function updateDetails(Request $request, $name)
     {
-        $product = Product::withoutGlobalScope('store')->where('o_type', 'store')->where('name', $name)->firstOrFail();
+        $product = $this->findProductByName($name);
 
         if (!Auth::check() || (Auth::id() != $product->o_parent && !Auth::user()->isAdmin())) {
             return response()->json(['success' => false, 'message' => __('messages.unauthorized')], 403);
@@ -617,20 +695,26 @@ class StoreController extends Controller
 
     public function storeUpdate(Request $request, $name)
     {
-        $product = Product::withoutGlobalScope('store')->where('o_type', 'store')->where('name', $name)->firstOrFail();
+        $product = $this->findProductByName($name);
         if (!Auth::check() || (Auth::id() != $product->o_parent && !Auth::user()->isAdmin())) {
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json(['error' => __('messages.unauthorized')], 403);
+            }
             return redirect()->route('store.show', $product->name);
         }
 
         $request->validate([
-            'vnbr'    => ['required', 'string', 'min:2', 'max:12', 'regex:/^[-a-zA-Z0-9.]+$/'],
-            'desc'    => ['required', 'string', 'min:10', 'max:2400'],
-            'linkzip' => ['required', 'string'],
-            'pts'     => ['nullable', 'integer', 'min:0', 'max:999999'],
-            'img'     => ['nullable', 'string'],
+            'vnbr'       => ['required', 'string', 'min:2', 'max:12', 'regex:/^[-a-zA-Z0-9.]+$/'],
+            'desc'       => ['required', 'string', 'min:10', 'max:2400'],
+            'linkzip'    => ['required', 'string'],
+            'pts'        => ['nullable', 'integer', 'min:0', 'max:999999'],
+            'img'        => ['nullable', 'string'],
             'sale_price' => ['nullable', 'integer', 'min:0', 'lt:pts'],
             'sale_start' => ['nullable', 'date'],
             'sale_end'   => ['nullable', 'date', 'after_or_equal:sale_start'],
+            'demo_url'   => ['nullable', 'string', 'max:2048'],
+            'video_url'  => ['nullable', 'string', 'max:2048'],
+            'screenshots' => ['nullable'],
         ]);
 
         $fileOption = ProductFile::create([
@@ -670,11 +754,56 @@ class StoreController extends Controller
                 [
                     'sale_price' => $request->sale_price,
                     'start_date' => $request->sale_start,
-                    'end_date' => $request->sale_end,
+                    'end_date'   => $request->sale_end,
                 ]
             );
         } else {
             \App\Models\StoreSale::where('product_id', $product->id)->delete();
+        }
+
+        // Update demo URL
+        if ($request->has('demo_url')) {
+            ProductMedia::where('product_id', $product->id)->where('media_type', 'demo_url')->delete();
+            if ($request->filled('demo_url')) {
+                ProductMedia::create([
+                    'product_id' => $product->id,
+                    'media_type' => 'demo_url',
+                    'url' => $request->input('demo_url'),
+                ]);
+            }
+        }
+
+        // Update video URL
+        if ($request->has('video_url')) {
+            ProductMedia::where('product_id', $product->id)->where('media_type', 'video')->delete();
+            if ($request->filled('video_url')) {
+                ProductMedia::create([
+                    'product_id' => $product->id,
+                    'media_type' => 'video',
+                    'url' => $request->input('video_url'),
+                ]);
+            }
+        }
+
+        // Update screenshots
+        if ($request->has('screenshots')) {
+            $screenshots = $request->input('screenshots');
+            if (is_string($screenshots)) {
+                $screenshots = json_decode($screenshots, true) ?: array_filter(array_map('trim', explode(',', $screenshots)));
+            }
+            if (is_array($screenshots)) {
+                ProductMedia::where('product_id', $product->id)->where('media_type', 'screenshot')->delete();
+                foreach ($screenshots as $idx => $sUrl) {
+                    if (!empty($sUrl) && is_string($sUrl)) {
+                        ProductMedia::create([
+                            'product_id' => $product->id,
+                            'media_type' => 'screenshot',
+                            'url' => $sUrl,
+                            'sort_order' => $idx,
+                        ]);
+                    }
+                }
+            }
         }
 
         // [v4.2.0] Trigger community status update
@@ -686,15 +815,24 @@ class StoreController extends Controller
             'txt'    => 'update',
         ]);
 
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'redirect_url' => route('store.show', $product->name),
+                'message' => __('updated_successfully'),
+            ]);
+        }
+
         return redirect()->route('store.show', $product->name)->with('success', __('updated_successfully'));
     }
 
     public function updatePrice(Request $request, $name)
     {
-        $product = Product::withoutGlobalScope('store')->where('o_type', 'store')->where('name', $name)->firstOrFail();
+        $product = $this->findProductByName($name);
         if (!Auth::check() || (Auth::id() != $product->o_parent && !Auth::user()->isAdmin())) {
             return redirect()->route('store.show', $product->name);
         }
+
 
         $request->validate([
             'pts'        => ['nullable', 'integer', 'min:0', 'max:999999'],
@@ -764,25 +902,41 @@ class StoreController extends Controller
 
     public function verifyName(Request $request)
     {
-        $name = $request->input('sname');
-        if (!$name) {
+        $name = trim((string) $request->input('sname'));
+        if ($name === '') {
             return response('');
         }
 
-        $length = strlen($name);
-        if (!preg_match('/^[-a-zA-Z0-9_]+$/', $name)) {
-            return response("<div class=\"alert alert-danger\" role=\"alert\"><strong><i class=\"fa fa-exclamation-triangle\" aria-hidden=\"true\"></i></strong>&nbsp;".__('olanwas')."</div><input type=\"hidden\" value=\"\" name=\"vname\">");
+        $length = mb_strlen($name, 'UTF-8');
+        if (!preg_match('/^[\p{L}\p{N}\s_\-\.]+$/u', $name)) {
+            $msg = __('olanwas') ?? 'Invalid characters';
+            if ($request->expectsJson() || ($request->ajax() && $request->wantsJson())) {
+                return response()->json(['valid' => false, 'message' => $msg]);
+            }
+            return response("<div class=\"alert alert-danger\" role=\"alert\"><strong><i class=\"fa fa-exclamation-triangle\" aria-hidden=\"true\"></i></strong>&nbsp;".$msg."</div><input type=\"hidden\" value=\"\" name=\"vname\">");
         }
-        if ($length < 3 || $length > 35) {
-            return response("<div class=\"alert alert-danger\" role=\"alert\"><strong><i class=\"fa fa-exclamation-triangle\" aria-hidden=\"true\"></i></strong>&nbsp;".__('ttmbnlt')."</div><input type=\"hidden\" value=\"\" name=\"vname\">");
+        if ($length < 3 || $length > 70) {
+            $msg = __('ttmbnlt') ?? 'Name length must be between 3 and 70 characters';
+            if ($request->expectsJson() || ($request->ajax() && $request->wantsJson())) {
+                return response()->json(['valid' => false, 'message' => $msg]);
+            }
+            return response("<div class=\"alert alert-danger\" role=\"alert\"><strong><i class=\"fa fa-exclamation-triangle\" aria-hidden=\"true\"></i></strong>&nbsp;".$msg."</div><input type=\"hidden\" value=\"\" name=\"vname\">");
         }
         $exists = Option::where('o_type', 'store')->where('name', $name)->exists();
         if ($exists) {
-            return response("<div class=\"alert alert-danger\" role=\"alert\"><strong><i class=\"fa fa-exclamation-triangle\" aria-hidden=\"true\"></i></strong>&nbsp;".__('exists')."</div><input type=\"hidden\" value=\"\" name=\"vname\">");
+            $msg = __('exists') ?? 'This product name is already taken';
+            if ($request->expectsJson() || ($request->ajax() && $request->wantsJson())) {
+                return response()->json(['valid' => false, 'message' => $msg]);
+            }
+            return response("<div class=\"alert alert-danger\" role=\"alert\"><strong><i class=\"fa fa-exclamation-triangle\" aria-hidden=\"true\"></i></strong>&nbsp;".$msg."</div><input type=\"hidden\" value=\"\" name=\"vname\">");
         }
 
+        if ($request->expectsJson() || ($request->ajax() && $request->wantsJson())) {
+            return response()->json(['valid' => true]);
+        }
         return response('<input type="hidden" value="1" name="vname">');
     }
+
 
     public function loadCategories(Request $request)
     {
@@ -2202,7 +2356,7 @@ class StoreController extends Controller
 
     public function updates($name)
     {
-        $product = Product::withoutGlobalScope('store')->where('o_type', 'store')->where('name', $name)->firstOrFail();
+        $product = $this->findProductByName($name);
         
         if (!Auth::check() || (Auth::id() != $product->o_parent && !Auth::user()->isAdmin())) {
             return redirect()->route('store.show', $product->name);
@@ -2225,7 +2379,7 @@ class StoreController extends Controller
 
     public function destroyUpdate(Request $request, $name, $fileId)
     {
-        $product = Product::withoutGlobalScope('store')->where('o_type', 'store')->where('name', $name)->firstOrFail();
+        $product = $this->findProductByName($name);
         
         if (!Auth::check() || (Auth::id() != $product->o_parent && !Auth::user()->isAdmin())) {
             return response()->json(['error' => 'Unauthorized'], 403);
@@ -2299,4 +2453,157 @@ class StoreController extends Controller
 
         return view('theme::store.my_purchases', compact('purchases', 'user'));
     }
+
+    /**
+     * Submit or update a 5-star product review.
+     */
+    public function storeReview(Request $request, $id)
+    {
+        $product = Product::withoutGlobalScope('store')->where('o_type', 'store')->findOrFail($id);
+        $user = Auth::user();
+
+        $request->validate([
+            'rating'  => ['required', 'integer', 'min:1', 'max:5'],
+            'title'   => ['nullable', 'string', 'max:150'],
+            'comment' => ['required', 'string', 'min:3', 'max:3000'],
+        ]);
+
+        $isVerifiedBuyer = DB::table('product_licenses')
+            ->where('user_id', $user->id)
+            ->where('product_id', $product->id)
+            ->exists();
+
+        $review = ProductReview::updateOrCreate(
+            ['product_id' => $product->id, 'user_id' => $user->id],
+            [
+                'rating'            => (int) $request->rating,
+                'title'             => $request->title,
+                'comment'           => $request->comment,
+                'is_verified_buyer' => $isVerifiedBuyer,
+            ]
+        );
+
+        $product->load('reviews.user');
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'success'          => true,
+                'message'          => __('messages.review_submitted_successfully') ?? 'Review submitted successfully.',
+                'review'           => [
+                    'id'                => $review->id,
+                    'rating'            => $review->rating,
+                    'title'             => $review->title,
+                    'comment'           => $review->comment,
+                    'is_verified_buyer' => (bool) $review->is_verified_buyer,
+                    'created_at'        => $review->created_at ? $review->created_at->diffForHumans() : 'Just now',
+                    'user'              => [
+                        'id'       => $user->id,
+                        'username' => $user->username,
+                        'avatar'   => $user->avatarUrl(),
+                    ],
+                ],
+                'average_rating'   => $product->average_rating,
+                'reviews_count'    => $product->reviews_count,
+                'rating_breakdown' => $product->rating_breakdown,
+            ]);
+        }
+
+        return redirect()->back()->with('success', __('messages.review_submitted_successfully'));
+    }
+
+    /**
+     * Delete a product review.
+     */
+    public function destroyReview(Request $request, $id)
+    {
+        $review = ProductReview::findOrFail($id);
+        $user = Auth::user();
+
+        if ($user->id != $review->user_id && !$user->isAdmin()) {
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json(['error' => __('messages.unauthorized')], 403);
+            }
+            abort(403);
+        }
+
+        $review->delete();
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json(['success' => true, 'message' => __('messages.deleted_successfully')]);
+        }
+
+        return redirect()->back()->with('success', __('messages.deleted_successfully'));
+    }
+
+    /**
+     * Upload screenshot image asset via AJAX.
+     */
+    public function uploadScreenshot(Request $request)
+    {
+        $request->validate([
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:10240',
+        ]);
+
+        $file = $request->file('image');
+        $extension = $file->getClientOriginalExtension();
+        $filename = 'ss_' . time() . '_' . Str::random(8) . '.' . $extension;
+
+        $destinationPath = base_path('upload/screenshots');
+        if (!file_exists($destinationPath)) {
+            mkdir($destinationPath, 0755, true);
+        }
+
+        $file->move($destinationPath, $filename);
+        $relativePath = 'upload/screenshots/' . $filename;
+
+        return response()->json([
+            'success'  => true,
+            'url'      => $relativePath,
+            'full_url' => asset($relativePath),
+        ]);
+    }
+
+    /**
+     * Add a media asset (screenshot, video, or demo URL) for a product.
+     */
+    public function storeMedia(Request $request, $name)
+    {
+        $product = $this->findProductByName($name);
+        if (!Auth::check() || (Auth::id() != $product->o_parent && !Auth::user()->isAdmin())) {
+            return response()->json(['error' => __('messages.unauthorized')], 403);
+        }
+
+        $request->validate([
+            'media_type' => ['required', 'string', 'in:screenshot,video,demo_url'],
+            'url'        => ['required', 'string', 'max:2048'],
+            'caption'    => ['nullable', 'string', 'max:255'],
+        ]);
+
+        $media = ProductMedia::create([
+            'product_id' => $product->id,
+            'media_type' => $request->media_type,
+            'url'        => $request->url,
+            'caption'    => $request->caption,
+            'sort_order' => (int) $request->input('sort_order', 0),
+        ]);
+
+        return response()->json(['success' => true, 'media' => $media]);
+    }
+
+    /**
+     * Delete a media asset.
+     */
+    public function destroyMedia(Request $request, $name, $id)
+    {
+        $product = $this->findProductByName($name);
+        if (!Auth::check() || (Auth::id() != $product->o_parent && !Auth::user()->isAdmin())) {
+            return response()->json(['error' => __('messages.unauthorized')], 403);
+        }
+
+        $media = ProductMedia::where('product_id', $product->id)->findOrFail($id);
+        $media->delete();
+
+        return response()->json(['success' => true]);
+    }
 }
+

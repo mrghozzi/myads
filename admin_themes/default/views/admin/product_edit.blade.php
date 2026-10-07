@@ -211,6 +211,63 @@ function toggleFileVersion(id) {
                             </div>
                         @endif
                     </div>
+
+                    {{-- Media & Previews --}}
+                    <div class="card border border-light bg-light p-3 mb-3 rounded">
+                        <h6 class="fw-semibold mb-3 d-flex align-items-center gap-2">
+                            <i class="feather-video text-primary"></i>
+                            <span>{{ __('messages.media_and_demo') ?? 'Media & Live Previews' }}</span>
+                        </h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fs-12 fw-semibold text-muted">{{ __('messages.live_preview_url') ?? 'Live Preview / Demo URL' }}</label>
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text"><i class="feather-external-link"></i></span>
+                                    <input type="url" name="demo_url" class="form-control" value="{{ old('demo_url', $demoUrl) }}" placeholder="https://demo.example.com">
+                                    @if($demoUrl)
+                                        <a href="{{ $demoUrl }}" target="_blank" class="btn btn-outline-secondary">{{ __('messages.view') ?? 'Open' }}</a>
+                                    @endif
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fs-12 fw-semibold text-muted">{{ __('messages.video_preview_url') ?? 'Video Preview URL' }}</label>
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text"><i class="feather-video"></i></span>
+                                    <input type="url" name="video_url" class="form-control" value="{{ old('video_url', $videoUrl) }}" placeholder="https://youtube.com/watch?v=...">
+                                    @if($videoUrl)
+                                        <a href="{{ $videoUrl }}" target="_blank" class="btn btn-outline-secondary">{{ __('messages.view') ?? 'Open' }}</a>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+
+                        {{-- Screenshots Gallery --}}
+                        <div class="mt-3">
+                            <label class="form-label fs-12 fw-semibold text-muted">{{ __('messages.screenshots') ?? 'Screenshots' }}</label>
+                            @if(isset($screenshots) && $screenshots->isNotEmpty())
+                                <div class="d-flex flex-wrap gap-2 mb-2">
+                                    @foreach($screenshots as $shot)
+                                        <div class="position-relative border rounded p-1 bg-white" style="width: 100px;">
+                                            <a href="{{ $shot->url }}" target="_blank">
+                                                <img src="{{ $shot->url }}" class="rounded" style="width: 100%; height: 60px; object-fit: cover;" alt="screenshot">
+                                            </a>
+                                            <div class="form-check form-check-sm mt-1">
+                                                <input class="form-check-input" type="checkbox" name="remove_screenshot_ids[]" value="{{ $shot->id }}" id="del_shot_{{ $shot->id }}">
+                                                <label class="form-check-label fs-11 text-danger" for="del_shot_{{ $shot->id }}">
+                                                    {{ __('messages.delete') ?? 'Delete' }}
+                                                </label>
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @endif
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text"><i class="feather-plus"></i></span>
+                                <input type="text" name="new_screenshot_url" class="form-control" placeholder="{{ __('messages.screenshot_url') ?? 'Add new screenshot URL (https://...)' }}">
+                            </div>
+                        </div>
+                    </div>
+
                     {{-- Body Text (Forum Topic) --}}
                     @if($topic)
                     <div class="mb-3">
@@ -313,6 +370,98 @@ function toggleFileVersion(id) {
     </div>
 </div>
 </form>
+
+{{-- Ratings & Reviews Moderation --}}
+<div class="card border-0 shadow-sm mt-4">
+    <div class="card-header bg-white d-flex align-items-center justify-content-between">
+        <div class="fw-semibold d-flex align-items-center gap-2">
+            <i class="feather-star text-warning"></i>
+            <span>{{ __('messages.ratings_and_reviews') ?? 'Ratings & Reviews' }}</span>
+            <span class="badge bg-soft-primary text-primary">{{ isset($reviews) ? $reviews->count() : 0 }}</span>
+        </div>
+        @if(isset($reviews) && $reviews->count() > 0)
+            <div class="text-warning fw-bold fs-13 d-flex align-items-center gap-1">
+                <i class="feather-star fill-warning"></i>
+                <span>{{ number_format($product->average_rating, 1) }} / 5.0</span>
+            </div>
+        @endif
+    </div>
+    <div class="card-body p-0">
+        @if(isset($reviews) && $reviews->isNotEmpty())
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light fs-12">
+                        <tr>
+                            <th class="ps-3" style="width: 70px;">#ID</th>
+                            <th>{{ __('messages.buyer') ?? 'Buyer' }}</th>
+                            <th>{{ __('messages.rating') ?? 'Rating' }}</th>
+                            <th>{{ __('messages.verified_buyer') ?? 'Verified' }}</th>
+                            <th>{{ __('messages.review_content') ?? 'Comment' }}</th>
+                            <th>{{ __('messages.date') ?? 'Date' }}</th>
+                            <th class="text-end pe-3">{{ __('messages.actions') ?? 'Actions' }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($reviews as $rev)
+                            <tr>
+                                <td class="ps-3 text-muted">#{{ $rev->id }}</td>
+                                <td>
+                                    @if($rev->user)
+                                        <a href="{{ route('profile.show', $rev->user->username) }}" target="_blank" class="d-flex align-items-center gap-2 text-decoration-none text-dark">
+                                            <img src="{{ $rev->user->avatarUrl() }}" class="rounded-circle" width="24" height="24" alt="">
+                                            <span class="fw-semibold fs-13">{{ $rev->user->username }}</span>
+                                        </a>
+                                    @else
+                                        <span class="text-muted">{{ __('messages.unknown') ?? 'Unknown' }}</span>
+                                    @endif
+                                </td>
+                                <td>
+                                    <span class="badge bg-soft-warning text-warning fw-bold">
+                                        ★ {{ $rev->rating }}/5
+                                    </span>
+                                </td>
+                                <td>
+                                    @if($rev->is_verified_buyer)
+                                        <span class="badge bg-soft-success text-success">
+                                            <i class="feather-check-circle me-1"></i>{{ __('messages.verified_buyer') ?? 'Verified' }}
+                                        </span>
+                                    @else
+                                        <span class="text-muted fs-11">-</span>
+                                    @endif
+                                </td>
+                                <td>
+                                    @if($rev->title)
+                                        <div class="fw-semibold fs-12">{{ $rev->title }}</div>
+                                    @endif
+                                    <div class="fs-12 text-muted text-truncate" style="max-width: 300px;">
+                                        {{ $rev->comment }}
+                                    </div>
+                                </td>
+                                <td class="fs-12 text-muted">
+                                    {{ $rev->created_at ? $rev->created_at->format('Y-m-d') : '-' }}
+                                </td>
+                                <td class="text-end pe-3">
+                                    <form method="POST" action="{{ route('admin.store.reviews.delete', $rev->id) }}" class="d-inline" onsubmit="return confirm('{{ __('messages.confirm_delete_review') ?? 'Delete this review?' }}')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-soft-danger text-danger" title="{{ __('messages.delete') ?? 'Delete Review' }}">
+                                            <i class="feather-trash-2"></i>
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        @else
+            <div class="p-4 text-center text-muted">
+                <i class="feather-star fs-3 d-block mb-2 text-muted"></i>
+                {{ __('messages.no_reviews_yet') ?? 'No reviews yet for this product.' }}
+            </div>
+        @endif
+    </div>
+</div>
 
 @if($topic)
 <script src="https://unpkg.com/stackedit-js@1.0.7/docs/lib/stackedit.min.js"></script>

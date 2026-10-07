@@ -19,6 +19,8 @@ use App\Models\ForumTopic;
 use App\Models\ForumModerator;
 use App\Models\Directory;
 use App\Models\Product;
+use App\Models\ProductReview;
+use App\Models\ProductMedia;
 use App\Models\Like;
 use App\Models\Message;
 use App\Models\ForumComment;
@@ -4816,7 +4818,7 @@ class AdminController extends Controller
 
         $query = Product::withoutGlobalScope('store')
             ->where('o_type', 'store')
-            ->with(['user', 'type']);
+            ->with(['user', 'type', 'media', 'reviews']);
 
         // Search by ID, product name, description, or seller username
         if ($search !== '') {
@@ -4896,6 +4898,10 @@ class AdminController extends Controller
             // Delete related options (comments, files, type, reactions, etc.)
             Option::where('o_parent', $id)->whereIn('o_type', ['s_coment', 'store_file', 'store_type', 'data_reaction', 'hest_pts'])->delete();
 
+            // Delete reviews and media
+            ProductReview::where('product_id', $id)->delete();
+            ProductMedia::where('product_id', $id)->delete();
+
             // Delete product
             $product->delete();
         });
@@ -4946,9 +4952,15 @@ class AdminController extends Controller
             $genericCategoryOptions = Option::where('o_type', $selectedStoreCategory . 'cat')->orderBy('o_order')->get();
         }
 
+        $screenshots = $product->screenshots;
+        $demoUrl = $product->live_demo_url;
+        $videoUrl = $product->video_preview_url;
+        $reviews = $product->reviews()->with('user')->get();
+
         return view('admin::admin.product_edit', compact(
             'product', 'typeOption', 'files', 'latestFile', 'topic', 'storeCategories', 'isSuspended',
-            'selectedStoreCategory', 'selectedStoreSubcategory', 'scriptCategoryOptions', 'scriptProductOptions', 'genericCategoryOptions'
+            'selectedStoreCategory', 'selectedStoreSubcategory', 'scriptCategoryOptions', 'scriptProductOptions', 'genericCategoryOptions',
+            'screenshots', 'demoUrl', 'videoUrl', 'reviews'
         ));
     }
 
@@ -4974,6 +4986,11 @@ class AdminController extends Controller
             'sale_price' => ['nullable', 'integer', 'min:0', 'lt:pts'],
             'sale_start' => ['nullable', 'date'],
             'sale_end'   => ['nullable', 'date', 'after_or_equal:sale_start'],
+            'demo_url'   => ['nullable', 'url', 'max:255'],
+            'video_url'  => ['nullable', 'url', 'max:255'],
+            'new_screenshot_url' => ['nullable', 'string', 'max:2048'],
+            'remove_screenshot_ids' => ['nullable', 'array'],
+            'remove_screenshot_ids.*' => ['integer'],
         ]);
 
         $oldOwnerId = (int) $product->o_parent;
@@ -5083,6 +5100,51 @@ class AdminController extends Controller
             );
         } else {
             \App\Models\StoreSale::where('product_id', $product->id)->delete();
+        }
+
+        // Handle Media: Live Demo URL
+        if ($request->has('demo_url')) {
+            $demoUrl = trim((string) $request->input('demo_url'));
+            if ($demoUrl !== '') {
+                ProductMedia::updateOrCreate(
+                    ['product_id' => $product->id, 'media_type' => 'demo_url'],
+                    ['url' => $demoUrl, 'sort_order' => 0]
+                );
+            } else {
+                ProductMedia::where('product_id', $product->id)->where('media_type', 'demo_url')->delete();
+            }
+        }
+
+        // Handle Media: Video Preview URL
+        if ($request->has('video_url')) {
+            $videoUrl = trim((string) $request->input('video_url'));
+            if ($videoUrl !== '') {
+                ProductMedia::updateOrCreate(
+                    ['product_id' => $product->id, 'media_type' => 'video'],
+                    ['url' => $videoUrl, 'sort_order' => 0]
+                );
+            } else {
+                ProductMedia::where('product_id', $product->id)->where('media_type', 'video')->delete();
+            }
+        }
+
+        // Handle Media: Add New Screenshot
+        if ($request->filled('new_screenshot_url')) {
+            $maxOrder = (int) ProductMedia::where('product_id', $product->id)->where('media_type', 'screenshot')->max('sort_order');
+            ProductMedia::create([
+                'product_id' => $product->id,
+                'media_type' => 'screenshot',
+                'url'        => trim((string) $request->input('new_screenshot_url')),
+                'sort_order' => $maxOrder + 1,
+            ]);
+        }
+
+        // Handle Media: Remove Selected Screenshots
+        if ($request->has('remove_screenshot_ids') && is_array($request->remove_screenshot_ids)) {
+            ProductMedia::where('product_id', $product->id)
+                ->where('media_type', 'screenshot')
+                ->whereIn('id', $request->remove_screenshot_ids)
+                ->delete();
         }
 
         return redirect()->back()->with('success', __('messages.product_updated') ?? 'Product updated successfully.');
@@ -5241,6 +5303,62 @@ class AdminController extends Controller
         return view('admin::admin.store.sales', compact(
             'sales', 'totalSales', 'uniqueBuyers', 'totalPtsVolume', 'totalDiscountsRedeemed', 'totalPointsSaved', 'search', 'productId'
         ));
+    }
+
+    public function storeReviews(Request $request)
+    {
+        $search = trim((string) $request->input('search'));
+        $rating = $request->input('rating');
+        $verified = $request->input('verified');
+        $productId = $request->input('product_id');
+
+        $query = ProductReview::with(['product', 'user']);
+
+        if ($search !== '') {
+            $query->where(function ($q) use ($search) {
+                $q->where('comment', 'LIKE', "%{$search}%")
+                  ->orWhere('title', 'LIKE', "%{$search}%")
+                  ->orWhereHas('user', function ($u) use ($search) {
+                      $u->where('username', 'LIKE', "%{$search}%");
+                  })
+                  ->orWhereHas('product', function ($p) use ($search) {
+                      $p->where('options.name', 'LIKE', "%{$search}%");
+                  });
+            });
+        }
+
+        if ($rating && in_array((int) $rating, [1, 2, 3, 4, 5])) {
+            $query->where('rating', (int) $rating);
+        }
+
+        if ($verified === '1') {
+            $query->where('is_verified_buyer', true);
+        }
+
+        if ($productId) {
+            $query->where('product_id', (int) $productId);
+        }
+
+        $totalReviews = ProductReview::count();
+        $avgRating = round((float) (ProductReview::avg('rating') ?? 0), 1);
+        $verifiedCount = ProductReview::where('is_verified_buyer', true)->count();
+        $fiveStarCount = ProductReview::where('rating', 5)->count();
+
+        $reviews = $query->orderBy('id', 'desc')->paginate(20)
+            ->appends($request->query());
+
+        return view('admin::admin.store.reviews', compact(
+            'reviews', 'totalReviews', 'avgRating', 'verifiedCount', 'fiveStarCount',
+            'search', 'rating', 'verified', 'productId'
+        ));
+    }
+
+    public function deleteStoreReview($id)
+    {
+        $review = ProductReview::findOrFail($id);
+        $review->delete();
+
+        return redirect()->back()->with('success', __('messages.review_deleted') ?? 'Review deleted successfully.');
     }
 
     // Plugins Management

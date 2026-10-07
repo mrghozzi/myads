@@ -1,12 +1,50 @@
 # v4.6.3
-> **Service Orders Marketplace Peer-to-Peer Overhaul, Unambiguous Platform Disclaimer of Liability System, Contract Revision & Deliverable Architecture, and Administrative Supervision Intelligence Engine Release** — Overhauled the Service Orders system (`/orders`) and Administration Supervision (`/admin/orders`). Strictly enforced the peer-to-peer bulletin board model where the administration disclaims any financial or contractual liability, prominently notifying members across all order touchpoints. Implemented complete contract revision workflows (`requestRevision`), secure project specification attachments and deliverable uploads with authenticated downloads, interactive visual milestone steppers with deadline tracking, and modernized administrative supervision with responsive KPI cards, smart filtering, UTF-8 BOM CSV exports, safe order deletion, offer spam moderation, and staff internal notes.
+> **Store Marketplace Customer Reviews & Media Previews Suite, Arabic & Unicode Slugs Architecture, Administrative Store Supervision & Reviews Moderation Engine, Service Orders Marketplace Peer-to-Peer Overhaul, and Platform Disclaimer Architecture Release** — Comprehensive core platform update. Overhauled the Store digital marketplace with a 5-star customer ratings and reviews engine with automated Verified Buyer badge verification via product licenses, structured rating breakdown statistics, and rich reviews display; introduced product media galleries with multiple screenshots modal lightbox viewer, live demo URL testing, and video preview embeds; added full support for Arabic characters, spaces, and Unicode slugs in store product titles and URLs; modernized administrative store supervision (`/admin/products`) with star ratings, demo links, and screenshot indicators; established dedicated administrative store reviews moderation dashboard (`/admin/store/reviews`) with live KPI cards and 1-click review moderation; overhauled the Service Orders marketplace (`/orders`) with peer-to-peer non-escrow disclaimer architecture, contract revision workflows (`requestRevision`), project attachments and deliverable uploads with protected downloads, 5-step milestone steppers with deadline tracking, and modernized administrative supervision (`/admin/orders`) with KPI cards, dynamic filters, and Excel-compatible UTF-8 BOM CSV exports.
+
+### Store Marketplace Ratings & Reviews Architecture
+* **5-Star Rating & Customer Reviews Engine (`ProductReview.php`, `StoreController@review`)**:
+  * Implemented structured rating and review submission system supporting scores 1 to 5, review titles, and in-depth feedback text.
+  * Enforced single review per member per product to ensure authentic community ratings.
+  * Added rating calculation accessors (`average_rating`, `reviews_count`, `rating_breakdown`) providing score averages and percentage breakdowns across 1 to 5 stars.
+* **Automated Verified Buyer Verification**:
+  * Integrated automated verification against the `product_licenses` table: reviews left by members holding a valid digital product license automatically receive the Verified Buyer badge (`is_verified_buyer = true`).
+* **Zero Data Loss Database Schema**:
+  * Added migration `2026_10_07_000001_create_product_reviews_and_media_tables.php` creating indexed `product_reviews` and `product_media` tables while maintaining 100% backward compatibility with existing legacy tables.
+
+### Product Media Gallery & Live Previews
+* **Interactive Screenshots Gallery (`ProductMedia.php`)**:
+  * Added multiple product screenshots support with modal lightbox gallery viewer and responsive thumbnail carousel.
+  * Allowed sellers and administrators to add, preview, and delete product screenshots without impacting product files.
+* **Live Demo & Video Preview Integration**:
+  * Added dedicated Live Preview / Demo URL field (`demo_url`), enabling prospective buyers to test web applications, templates, and SaaS tools directly before purchase.
+  * Added Video Preview embed and URL support (`video_url`) for interactive video walkthroughs.
+
+### Arabic Characters & Unicode Slugs Compatibility
+* **Arabic Product Titles & Space Support**:
+  * Lifted restrictive alphanumeric character constraints on product titles (`pname`), providing full native support for Arabic letters, spaces, hyphens, and numbers during creation, updating, and administrative management.
+* **URL Decoding & Routing Resilience**:
+  * Enhanced product routing and lookups using `urldecode` and flexible slug matching, preventing 404 errors when navigating to products titled in Arabic or containing spaces.
+
+### Administrative Store Moderation & Reviews Supervision (`/admin/products`, `/admin/store/reviews`)
+* **Enhanced Admin Products Catalog (`/admin/products`)**:
+  * Enriched products table and grid views with star rating badges, review counts, live demo buttons, and screenshot counts.
+* **Dedicated Store Reviews Moderation Center (`/admin/store/reviews`)**:
+  * Created administrative reviews supervision interface with 4 real-time KPI metric cards: Total Reviews, Average Rating, Verified Buyers, and 5-Star Reviews.
+  * Added multi-field search and filters for star ratings (1 to 5 stars) and verified buyer status.
+  * Provided 1-click review deletion (`admin.store.reviews.delete`) with secure CSRF and confirmation protection.
+* **Admin Product Media Management (`/admin/products/{id}/edit`)**:
+  * Integrated Live Demo URL and Video URL inputs into the admin product edit form.
+  * Added screenshot gallery viewer with individual deletion toggles and new screenshot URL inputs.
+  * Added product reviews moderation table directly within the product edit view.
+* **Admin Navigation Integration (`layouts/admin.blade.php`)**:
+  * Added "Ratings & Reviews" direct navigation item under the Store section in the administrative sidebar menu.
 
 ### Unambiguous Platform Disclaimer of Liability System (Peer-to-Peer Bulletin Model)
 * **Prominent Multi-Surface Notices**:
   * Placed clear, non-intrusive yet impossible-to-miss disclaimer banners across `/orders`, `/orders/create`, `/orders/{order}`, and `/admin/orders`.
   * Clarifies to all members that the site does not act as an escrow agent or financial guarantor; each member is solely and directly responsible for their transactions, communications, deliverables, and financial agreements.
 * **Bilingual Terminology (`lang/ar/messages.php`, `lang/en/messages.php`)**:
-  * Added 32 comprehensive localization keys in Arabic and English explaining the platform's non-liability stance and direct member accountability.
+  * Added comprehensive localization keys in Arabic and English explaining the platform's non-liability stance and direct member accountability.
 
 ### Service Orders Marketplace Overhaul (`/orders`)
 * **Project Specifications & File Attachments**:
@@ -32,25 +70,6 @@
 * **Safe Order Deletion & Offer Moderation**:
   * Safe cascading deletion of orders (`admin.orders.destroy`) ensuring files and child contracts are safely removed without dangling records.
   * Added individual spam/inappropriate offer deletion (`admin.orders.offers.destroy`).
-### Theme & Alternative Layout Compatibility (`themes/bootstrap-sample`)
-* **Bootstrap Sample Theme Parity**:
-  * Implemented responsive platform disclaimer notice with dynamic database site name injection on `index.blade.php`, `form.blade.php`, and `show.blade.php`.
-  * Added badge indicators for attachments (`hasAttachment()`) and revision requests (`isRevisionRequested()`) in `partials/card.blade.php`.
-  * Enhanced milestone progress stepper (1 to 5) with deadline and overdue indicators in `show.blade.php`.
-  * Added requirements attachment download cards and deliverable work download cards with authenticated streams.
-  * Added revision request alert banners with detailed notes and round counters.
-  * Added dual client action buttons upon delivery: "Complete & Review" and "Request Revision".
-  * Added `enctype="multipart/form-data"` and file upload inputs for both project requirements and deliverable submissions.
-
-### Mobile Companion App Full Parity (`myads_app` v1.8.1+23)
-* **Orders Mobile API Architecture (`OrderApiController.php`, `routes/api.php`)**:
-  * Enriched order listings with buyer objects (`id`, `name`, `username`, `avatar`), delivery days, attachment indicators, and revision indicators.
-  * Added API endpoints for the complete order lifecycle: awarding offers (`/orders/{id}/award`), starting contracts (`/orders/{id}/start`), submitting deliverables (`/orders/{id}/deliver`), requesting revisions (`/orders/{id}/revision`), completing orders with ratings/reviews (`/orders/{id}/complete`), and cancelling orders (`/orders/{id}/cancel`).
-* **Flutter Mobile Experience (`myads_app`)**:
-  * Displayed the P2P disclaimer banner prominently on both `OrdersListScreen` and `OrderDetailScreen`.
-  * Added interactive 5-step milestone stepper, revision alert banner, attachment download cards, and deliverable cards to `OrderDetailScreen`.
-  * Integrated "Service Orders" into the Discover grid (`explore_screen.dart`).
-  * Achieved 0 warnings and 0 errors on `flutter analyze` and 100% test pass rate across all test suites.
 
 # v4.6.2
 > **Flutter Companion App (myads_app v1.8.0+22) Full API Parity Suite, Store Marketplace Overhaul & Customer Library Suite, Administrative Store Moderation Engine & Sales Intelligence Dashboard, Gamification Quests Architecture & Active Scope Engine, Bidirectional Settings Interoperability Suite, and Dart 3.13 Codebase Modernization Release** — Comprehensive platform update and compatibility release across MYADS web and mobile ecosystems. Overhauled the Store marketplace (`/store`) with real-time keyword search, 6 multi-criteria sorting modes, download counters, and pending moderation visibility controls; created the customer "My Purchases" buyer library (`/store/my-purchases`) with instant license key copy and authenticated downloads; modernized administrative store supervision (`/admin/products`) with responsive `.superdesign` KPI cards, dual table/grid views, and a 1-click approval/rejection moderation workflow; introduced administrative sales & licenses monitoring (`/admin/store/sales`) with KPI intelligence; synchronized 43 bilingual translation keys; achieved full synchronization with Flutter companion app (`myads_app` v1.8.0+22) with bidirectional settings interoperability, dual-schema quests API, and 100% test pass rate across all automated suites.
