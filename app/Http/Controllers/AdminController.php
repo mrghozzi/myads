@@ -4809,13 +4809,76 @@ class AdminController extends Controller
     // Products
     public function products(Request $request)
     {
-        $products = Product::withoutGlobalScope('store')
+        $search = trim((string) $request->input('search'));
+        $status = $request->input('status', 'all');
+        $category = $request->input('category');
+        $viewMode = $request->input('view', 'grid');
+
+        $query = Product::withoutGlobalScope('store')
             ->where('o_type', 'store')
-            ->with(['user', 'type'])
-            ->orderBy('id', 'desc')
-            ->paginate(20);
-            
-        return view('admin::admin.products', compact('products'));
+            ->with(['user', 'type']);
+
+        // Search by ID, product name, description, or seller username
+        if ($search !== '') {
+            $query->where(function ($q) use ($search) {
+                if (is_numeric($search)) {
+                    $q->where('options.id', (int) $search);
+                }
+                $q->orWhere('options.name', 'LIKE', "%{$search}%")
+                  ->orWhere('options.o_valuer', 'LIKE', "%{$search}%")
+                  ->orWhereHas('user', function ($u) use ($search) {
+                      $u->where('username', 'LIKE', "%{$search}%");
+                  });
+            });
+        }
+
+        // Status filter
+        if ($status === 'suspended') {
+            $query->whereHas('statusOptions', function ($q) {
+                $q->where('name', 'suspended');
+            });
+        } elseif ($status === 'pending') {
+            $query->whereHas('statusOptions', function ($q) {
+                $q->where('name', 'pending');
+            });
+        } elseif ($status === 'active') {
+            $query->whereDoesntHave('statusOptions', function ($q) {
+                $q->whereIn('name', ['suspended', 'pending']);
+            });
+        } elseif ($status === 'free') {
+            $query->where('o_order', 0);
+        } elseif ($status === 'paid') {
+            $query->where('o_order', '>', 0);
+        }
+
+        // Category filter
+        if ($category && $category !== 'all') {
+            $categoryNames = StoreCategoryCatalog::namesForFilter($category);
+            if (!empty($categoryNames)) {
+                $query->whereHas('type', function ($q) use ($categoryNames) {
+                    $q->whereIn('name', $categoryNames);
+                });
+            }
+        }
+
+        // Counts for KPI summary
+        $totalCount = Product::withoutGlobalScope('store')->where('o_type', 'store')->count();
+        $activeCount = Product::withoutGlobalScope('store')->where('o_type', 'store')
+            ->whereDoesntHave('statusOptions', fn($q) => $q->whereIn('name', ['suspended', 'pending']))->count();
+        $suspendedCount = Product::withoutGlobalScope('store')->where('o_type', 'store')
+            ->whereHas('statusOptions', fn($q) => $q->where('name', 'suspended'))->count();
+        $pendingCount = Product::withoutGlobalScope('store')->where('o_type', 'store')
+            ->whereHas('statusOptions', fn($q) => $q->where('name', 'pending'))->count();
+
+        $products = $query->orderBy('id', 'desc')->paginate(20)
+            ->appends($request->query());
+
+        $categories = StoreCategoryCatalog::selectable();
+
+        return view('admin::admin.products', compact(
+            'products', 'totalCount', 'activeCount', 'suspendedCount', 'pendingCount',
+            'search', 'status', 'category', 'viewMode', 'categories'
+        ));
     }
 
     public function deleteProduct(Request $request)
@@ -5064,6 +5127,120 @@ class AdminController extends Controller
         ]);
 
         return redirect()->route('admin.products')->with('success', $successMsg);
+    }
+
+    public function approveProduct(Request $request, $id)
+    {
+        $product = Product::withoutGlobalScope('store')->where('o_type', 'store')->findOrFail($id);
+
+        Option::where('o_type', 'store_status')
+            ->where('o_parent', $product->id)
+            ->whereIn('name', ['pending', 'suspended'])
+            ->delete();
+
+        if ($product->o_parent) {
+            $owner = User::find($product->o_parent);
+            if ($owner) {
+                $this->notifications->send(
+                    $owner,
+                    __('messages.product_approved_notification', ['product' => $product->name]),
+                    'store/' . $product->name,
+                    'store'
+                );
+            }
+        }
+
+        return redirect()->back()->with('success', __('messages.product_approved_successfully'));
+    }
+
+    public function rejectProduct(Request $request, $id)
+    {
+        $product = Product::withoutGlobalScope('store')->where('o_type', 'store')->findOrFail($id);
+        $reason = trim((string) $request->input('reason'));
+
+        // Mark as suspended
+        Option::updateOrCreate(
+            ['o_type' => 'store_status', 'o_parent' => $product->id, 'name' => 'suspended'],
+            ['o_valuer' => $reason ?: '1', 'o_order' => 0, 'o_mode' => time()]
+        );
+
+        // Remove pending flag
+        Option::where('o_type', 'store_status')
+            ->where('o_parent', $product->id)
+            ->where('name', 'pending')
+            ->delete();
+
+        if ($product->o_parent) {
+            $owner = User::find($product->o_parent);
+            if ($owner) {
+                $msg = $reason !== ''
+                    ? __('messages.product_rejected_with_reason', ['product' => $product->name, 'reason' => $reason])
+                    : __('messages.product_rejected_notification', ['product' => $product->name]);
+
+                $this->notifications->send(
+                    $owner,
+                    $msg,
+                    'store/' . $product->name,
+                    'store'
+                );
+            }
+        }
+
+        return redirect()->back()->with('success', __('messages.product_rejected_successfully'));
+    }
+
+    public function storeSales(Request $request)
+    {
+        $search = trim((string) $request->input('search'));
+        $productId = $request->input('product_id');
+
+        $query = DB::table('product_licenses')
+            ->join('options as products', function ($join) {
+                $join->on('product_licenses.product_id', '=', 'products.id')
+                     ->where('products.o_type', '=', 'store');
+            })
+            ->leftJoin('users as buyers', 'product_licenses.user_id', '=', 'buyers.id')
+            ->leftJoin('users as sellers', 'products.o_parent', '=', 'sellers.id')
+            ->select(
+                'product_licenses.id as license_id',
+                'product_licenses.license_key',
+                'product_licenses.created_at as purchased_at',
+                'products.id as product_id',
+                'products.name as product_name',
+                'products.o_order as product_price',
+                'buyers.id as buyer_id',
+                'buyers.username as buyer_username',
+                'buyers.img as buyer_avatar',
+                'sellers.id as seller_id',
+                'sellers.username as seller_username'
+            );
+
+        if ($search !== '') {
+            $query->where(function ($q) use ($search) {
+                $q->where('product_licenses.license_key', 'LIKE', "%{$search}%")
+                  ->orWhere('products.name', 'LIKE', "%{$search}%")
+                  ->orWhere('buyers.username', 'LIKE', "%{$search}%")
+                  ->orWhere('sellers.username', 'LIKE', "%{$search}%");
+            });
+        }
+
+        if ($productId) {
+            $query->where('products.id', (int) $productId);
+        }
+
+        // KPIs
+        $totalSales = DB::table('product_licenses')->count();
+        $uniqueBuyers = DB::table('product_licenses')->distinct('user_id')->count('user_id');
+        $totalPtsVolume = (int) Option::where('o_type', 'hest_pts')->where('name', 'Store')->where('o_valuer', 'LIKE', '+%')->sum(DB::raw('CAST(o_valuer AS SIGNED)'));
+        $totalDiscountsRedeemed = DB::table('store_discount_redemptions')->count();
+        $totalPointsSaved = (int) DB::table('store_discount_redemptions')->sum('points_saved');
+
+        $sales = $query->orderBy('product_licenses.id', 'desc')->paginate(20)
+            ->appends($request->query());
+
+        return view('admin::admin.store.sales', compact(
+            'sales', 'totalSales', 'uniqueBuyers', 'totalPtsVolume', 'totalDiscountsRedeemed', 'totalPointsSaved', 'search', 'productId'
+        ));
     }
 
     // Plugins Management

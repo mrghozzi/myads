@@ -28,6 +28,9 @@ class StoreController extends Controller
         $scriptName = $script ?? $request->query('script');
         $scriptId = null;
 
+        $search = trim((string) $request->query('q', $request->query('search')));
+        $sort = (string) $request->query('sort', 'latest');
+
         // Resolve script name to product ID for filtering
         if ($scriptName && $scriptName !== 'all') {
             $scriptProduct = Product::withoutGlobalScope('store')
@@ -40,15 +43,45 @@ class StoreController extends Controller
             }
         }
 
-        $query = Product::visible()
-            ->orderByDesc(
+        $query = Product::visible();
+
+        // Search by product name or description
+        if ($search !== '') {
+            $query->where(function ($q) use ($search) {
+                $q->where('options.name', 'LIKE', "%{$search}%")
+                  ->orWhere('options.o_valuer', 'LIKE', "%{$search}%");
+            });
+        }
+
+        // Apply sorting
+        if ($sort === 'downloads') {
+            $query->orderByDesc(
+                \App\Models\Short::selectRaw('COALESCE(SUM(clik), 0)')
+                    ->where('sh_type', 7867)
+                    ->whereIn('tp_id', function ($sub) {
+                        $sub->select('id')->from('options as files_opt')
+                            ->whereColumn('files_opt.o_parent', 'options.id')
+                            ->where('files_opt.o_type', 'store_file');
+                    })
+            )->orderBy('id', 'desc');
+        } elseif ($sort === 'price_asc') {
+            $query->orderBy('o_order', 'asc')->orderBy('id', 'desc');
+        } elseif ($sort === 'price_desc') {
+            $query->orderBy('o_order', 'desc')->orderBy('id', 'desc');
+        } elseif ($sort === 'free') {
+            $query->where('o_order', 0)->orderBy('id', 'desc');
+        } elseif ($sort === 'paid') {
+            $query->where('o_order', '>', 0)->orderBy('id', 'desc');
+        } else {
+            // Default: newest promotion or date
+            $query->orderByDesc(
                 \App\Models\Status::select('date')
                     ->whereColumn('tp_id', 'options.id')
                     ->where('s_type', 7867)
                     ->orderByDesc('date')
                     ->limit(1)
-            )
-            ->orderBy('id', 'desc');
+            )->orderBy('id', 'desc');
+        }
 
         $categoryNames = StoreCategoryCatalog::namesForFilter($category);
         if ($category !== null && $categoryNames === []) {
@@ -70,7 +103,12 @@ class StoreController extends Controller
             $query->whereIn('id', $productIds);
         }
 
-        $products = $query->paginate(12)->appends(['category' => $category, 'script' => $scriptName]);
+        $products = $query->paginate(12)->appends([
+            'category' => $category,
+            'script' => $scriptName,
+            'q' => $search !== '' ? $search : null,
+            'sort' => $sort !== 'latest' ? $sort : null,
+        ]);
         $user = Auth::user();
 
         // Count products per category (optionally filtered by script)
@@ -107,7 +145,7 @@ class StoreController extends Controller
             ]);
         }
 
-        return view('theme::store.index', compact('products', 'user', 'category', 'categoryCounts', 'scriptName'));
+        return view('theme::store.index', compact('products', 'user', 'category', 'categoryCounts', 'scriptName', 'search', 'sort'));
     }
 
     public function destroy(Request $request)
@@ -158,7 +196,7 @@ class StoreController extends Controller
 
     public function show($name)
     {
-        $product = Product::visible()->withoutGlobalScope('store')->where('o_type', 'store')->where('name', $name)->firstOrFail();
+        $product = Product::withoutGlobalScope('store')->where('o_type', 'store')->where('name', $name)->firstOrFail();
         $status = Status::where('s_type', 7867)->where('tp_id', $product->id)->first();
         if ($status) {
             $status->related_content = $product;
@@ -187,10 +225,11 @@ class StoreController extends Controller
         $files = ProductFile::where('o_parent', $product->id)->orderBy('id', 'desc')->get();
         $canManageProduct = Auth::check() && (Auth::id() == $product->o_parent || Auth::user()->isAdmin());
 
-        // [v4.2.0] Check if suspended
-        $isSuspended = $product->is_suspended;
-        if ($isSuspended && !$canManageProduct) {
-            abort(403, __('messages.product_suspended_notice'));
+        // Check if suspended or pending review
+        $isSuspended = (bool) $product->is_suspended;
+        $isPending = (bool) $product->is_pending;
+        if (($isSuspended || $isPending) && !$canManageProduct) {
+            abort(403, $isPending ? __('messages.pending_approval') : __('messages.product_suspended_notice'));
         }
 
         // Fetch license if purchased
@@ -265,7 +304,7 @@ class StoreController extends Controller
             ])),
         ]);
 
-        return view('theme::store.show', compact('product', 'status', 'type', 'topic', 'latestFile', 'downloadHash', 'downloadCount', 'files', 'canManageProduct', 'isSuspended', 'license'));
+        return view('theme::store.show', compact('product', 'status', 'type', 'topic', 'latestFile', 'downloadHash', 'downloadCount', 'files', 'canManageProduct', 'isSuspended', 'isPending', 'license'));
     }
 
     public function create()
@@ -2204,5 +2243,60 @@ class StoreController extends Controller
         }
 
         return redirect()->route('store.updates', $product->name)->with('success', __('messages.deleted_successfully') ?? 'Deleted successfully.');
+    }
+
+    /**
+     * User Library / My Purchases page.
+     */
+    public function myPurchases(Request $request)
+    {
+        $user = Auth::user();
+
+        $purchases = DB::table('product_licenses')
+            ->where('product_licenses.user_id', $user->id)
+            ->join('options as products', function ($join) {
+                $join->on('product_licenses.product_id', '=', 'products.id')
+                     ->where('products.o_type', '=', 'store');
+            })
+            ->leftJoin('users as sellers', 'products.o_parent', '=', 'sellers.id')
+            ->select(
+                'product_licenses.id as license_id',
+                'product_licenses.license_key',
+                'product_licenses.created_at as purchased_at',
+                'products.id as product_id',
+                'products.name as product_name',
+                'products.o_valuer as product_desc',
+                'products.o_mode as product_image',
+                'products.o_order as product_price',
+                'sellers.id as seller_id',
+                'sellers.username as seller_username'
+            )
+            ->orderBy('product_licenses.created_at', 'desc')
+            ->paginate(12);
+
+        // Transform collection to attach latest file hash, version, and category
+        $purchases->getCollection()->transform(function ($item) {
+            $latestFile = ProductFile::where('o_parent', $item->product_id)->orderBy('id', 'desc')->first();
+            $item->latest_version = $latestFile ? $latestFile->name : 'v1.0';
+            $item->download_hash = $latestFile ? hash('crc32', $latestFile->o_mode . $latestFile->id) : null;
+
+            $typeOption = Option::where('o_type', 'store_type')->where('o_parent', $item->product_id)->first();
+            $item->category = $typeOption ? $typeOption->name : null;
+
+            return $item;
+        });
+
+        $this->seo([
+            'scope_key' => 'store_my_purchases',
+            'resource_title' => __('messages.my_purchases') . ' - ' . __('messages.store'),
+            'description' => __('messages.my_purchases_desc'),
+            'breadcrumbs' => [
+                ['name' => __('messages.home'), 'url' => url('/')],
+                ['name' => __('messages.store'), 'url' => route('store.index')],
+                ['name' => __('messages.my_purchases'), 'url' => route('store.my_purchases')],
+            ],
+        ]);
+
+        return view('theme::store.my_purchases', compact('purchases', 'user'));
     }
 }

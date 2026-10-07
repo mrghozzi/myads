@@ -98,14 +98,36 @@ class Product extends Model
     }
 
     /**
-     * Override scopeVisible to handle suspension.
+     * Check if product is pending admin approval.
+     */
+    public function getIsPendingAttribute()
+    {
+        return $this->statusOptions()->where('name', 'pending')->exists();
+    }
+
+    /**
+     * Get computed moderation status string ('suspended', 'pending', or 'active').
+     */
+    public function getModerationStatusAttribute(): string
+    {
+        if ($this->is_suspended) {
+            return 'suspended';
+        }
+        if ($this->is_pending) {
+            return 'pending';
+        }
+        return 'active';
+    }
+
+    /**
+     * Override scopeVisible to handle suspension and pending moderation.
      */
     public function scopeVisible(Builder $query, ?User $viewer = null, ?string $column = null): Builder
     {
         $viewer = $viewer ?? Auth::user();
         $authorIdColumn = $column ?? $this->getAuthorIdColumn();
 
-        // 1. If viewer is Admin, they see everything (including suspended)
+        // 1. If viewer is Admin, they see everything (including suspended and pending)
         if ($viewer && $viewer->isAdmin()) {
             return $query;
         }
@@ -143,10 +165,10 @@ class Product extends Model
                 }
             });
 
-            // 3. AND it must NOT be suspended (unless owner)
+            // 3. AND it must NOT be suspended or pending (unless owner)
             $q->where(function ($s) use ($viewer, $authorIdColumn) {
                 $s->whereDoesntHave('statusOptions', function ($sub) {
-                    $sub->where('name', 'suspended');
+                    $sub->whereIn('name', ['suspended', 'pending']);
                 });
 
                 if ($viewer) {
@@ -197,5 +219,17 @@ class Product extends Model
                 ->value('name');
         }
         return null;
+    }
+
+    /**
+     * Get total downloads count for this product across all file versions.
+     */
+    public function getDownloadsCountAttribute(): int
+    {
+        $fileIds = $this->files()->pluck('id');
+        if ($fileIds->isEmpty()) {
+            return 0;
+        }
+        return (int) \App\Models\Short::where('sh_type', 7867)->whereIn('tp_id', $fileIds)->sum('clik');
     }
 }

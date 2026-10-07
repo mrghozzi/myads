@@ -69,6 +69,8 @@ custom_variables.css
 !/tests/Feature/StoreEditorPagesTest.php
 !/tests/Feature/CommunityFeedFeatureTest.php
 !/tests/Feature/StoreProductKnowledgebaseUiTest.php
+!/tests/Feature/StoreDiscountsFeatureTest.php
+!/tests/Feature/StoreEnhancementsFeatureTest.php
 !/tests/Feature/MessagesRealtimeFeatureTest.php
 !/tests/Feature/LiveEventStreamTest.php
 !/tests/Feature/AdminAboutPageTest.php

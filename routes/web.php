@@ -399,6 +399,7 @@ Route::get('/orders/{order}', [OrderRequestController::class, 'show'])->name('or
 
 // Store Routes
 Route::middleware(['auth'])->group(function () {
+    Route::get('/store/my-purchases', [StoreController::class, 'myPurchases'])->name('store.my_purchases');
     Route::get('/store/create', [StoreController::class, 'create'])->name('store.create');
     Route::post('/store/store', [StoreController::class, 'store'])->name('store.store');
     Route::post('/store/delete', [StoreController::class, 'destroy'])->name('store.delete');
@@ -421,7 +422,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/store/discounts/store', [StoreController::class, 'discountsStore'])->name('store.discounts.store');
     Route::get('/store/discounts/{id}/edit', [StoreController::class, 'discountsEdit'])->name('store.discounts.edit');
     Route::post('/store/discounts/{id}/update', [StoreController::class, 'discountsUpdate'])->name('store.discounts.update');
-    Route::delete('/store/discounts/{id}', [StoreController::class, 'discountsDestroy'])->name('store.discounts.destroy');
+    Route::match(['get', 'delete'], '/store/discounts/{id}', [StoreController::class, 'discountsDestroy'])->name('store.discounts.destroy');
     Route::post('/store/discounts/validate', [StoreController::class, 'validateDiscount'])->name('store.discounts.validate');
     Route::post('/store/{id}/purchase', [StoreController::class, 'purchaseProduct'])->name('store.purchase');
 });
@@ -799,6 +800,11 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/products/{id}/edit', [AdminController::class, 'editProduct'])->name('admin.products.edit');
     Route::post('/products/{id}', [AdminController::class, 'updateProduct'])->name('admin.products.update');
     Route::post('/products/{id}/suspend', [AdminController::class, 'suspendProduct'])->name('admin.products.suspend');
+    Route::post('/products/{id}/approve', [AdminController::class, 'approveProduct'])->name('admin.products.approve');
+    Route::post('/products/{id}/reject', [AdminController::class, 'rejectProduct'])->name('admin.products.reject');
+
+    // Admin Store Sales & Licenses
+    Route::get('/store/sales', [AdminController::class, 'storeSales'])->name('admin.store.sales');
 
     // Admin Store Discount Codes
     Route::get('/store/discounts', [AdminController::class, 'discountsIndex'])->name('admin.store.discounts.index');

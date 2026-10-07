@@ -148,6 +148,7 @@
                             </a>
                             <ul class="nxl-submenu">
                                 <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.products') }}">{{ __('messages.products') ?? 'Products' }}</a></li>
+                                <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.store.sales') }}">{{ __('messages.store_sales_licenses') ?? 'Sales & Licenses' }}</a></li>
                                 <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.store.discounts.index') }}">{{ __('messages.discount_codes') ?? 'Discount Codes' }}</a></li>
                                 <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.script_categories') }}">{{ __('messages.script_categories') ?? 'Script Subcategories' }}</a></li>
                                 <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.knowledgebase') }}">{{ __('messages.knowledgebase') }}</a></li>

@@ -347,6 +347,62 @@
     .badge-sale { background: #ef4444; color: #fff; display: flex; align-items: center; gap: 4px;}
     .badge-free { background: var(--myads-green); color: #fff; }
     .badge-suspended { background: var(--myads-dark); color: #fff; }
+    .badge-pending { background: #f59e0b; color: #fff; }
+    .badge-downloads { background: rgba(15, 23, 42, 0.7); color: #fff; display: flex; align-items: center; gap: 4px; }
+    
+    .store-filter-bar {
+        background: var(--card-bg);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 12px 16px;
+        margin-top: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+    }
+    .store-search-form {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-grow: 1;
+        flex-wrap: wrap;
+    }
+    .store-search-input-wrap {
+        position: relative;
+        flex-grow: 1;
+        min-width: 200px;
+    }
+    .store-search-input-wrap input {
+        width: 100%;
+        padding: 8px 12px 8px 36px;
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+        background: var(--surface-bg);
+        color: var(--text-color);
+        font-size: 13px;
+        outline: none;
+    }
+    .store-search-input-wrap i {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--myads-text-muted);
+        font-size: 13px;
+    }
+    .store-sort-select {
+        padding: 8px 12px;
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+        background: var(--surface-bg);
+        color: var(--text-color);
+        font-size: 13px;
+        outline: none;
+        min-width: 160px;
+    }
     
     .product-details {
         padding: 16px;
@@ -512,9 +568,15 @@
             <p>{{ __('messages.store_banner_desc') ?? 'Discover themes, scripts, and plugins.' }}</p>
         </div>
         @auth
-        <div class="modern-banner-action">
-            <i class="fa fa-coins" style="color: var(--myads-amber);"></i>
-            <span>{{ number_format((float) auth()->user()->pts, 2) }} PTS</span>
+        <div class="modern-banner-action" style="display: flex; gap: 10px; align-items: center;">
+            <a href="{{ route('store.my_purchases') }}" class="modern-btn" style="background: rgba(255,255,255,0.25); color: #fff; text-decoration: none; display: flex; align-items: center; gap: 6px; padding: 6px 14px; border-radius: 8px;">
+                <i class="fa fa-box-open"></i>
+                <span>{{ __('messages.my_purchases') ?? 'My Purchases' }}</span>
+            </a>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <i class="fa fa-coins" style="color: var(--myads-amber);"></i>
+                <span>{{ number_format((float) auth()->user()->pts, 2) }} PTS</span>
+            </div>
         </div>
         @endauth
     </div>
@@ -608,6 +670,43 @@
         </div>
     </div>
 
+    <!-- SEARCH & FILTER BAR -->
+    @php
+        $filterActionUrl = $isScriptSpecific 
+            ? ($category ? route('store.script_category', [$scriptName, $category]) : route('store.script_category', [$scriptName, 'all']))
+            : ($category ? route('store.index', ['category' => $category]) : route('store.index'));
+    @endphp
+    <div class="store-filter-bar">
+        <form method="GET" action="{{ $filterActionUrl }}" class="store-search-form">
+            @if(isset($category) && $category)
+                <input type="hidden" name="category" value="{{ $category }}">
+            @endif
+            @if(isset($scriptName) && $scriptName && $scriptName !== 'all')
+                <input type="hidden" name="script" value="{{ $scriptName }}">
+            @endif
+            <div class="store-search-input-wrap">
+                <i class="fa fa-search"></i>
+                <input type="text" name="q" value="{{ $search ?? '' }}" placeholder="{{ __('messages.search_store_placeholder') ?? 'Search products by name or keyword...' }}">
+            </div>
+            <select name="sort" class="store-sort-select" onchange="this.form.submit()">
+                <option value="latest" {{ ($sort ?? 'latest') === 'latest' ? 'selected' : '' }}>{{ __('messages.sort_latest') ?? 'Latest Products' }}</option>
+                <option value="downloads" {{ ($sort ?? '') === 'downloads' ? 'selected' : '' }}>{{ __('messages.sort_downloads') ?? 'Most Downloaded' }}</option>
+                <option value="price_asc" {{ ($sort ?? '') === 'price_asc' ? 'selected' : '' }}>{{ __('messages.sort_price_asc') ?? 'Price: Low to High' }}</option>
+                <option value="price_desc" {{ ($sort ?? '') === 'price_desc' ? 'selected' : '' }}>{{ __('messages.sort_price_desc') ?? 'Price: High to Low' }}</option>
+                <option value="free" {{ ($sort ?? '') === 'free' ? 'selected' : '' }}>{{ __('messages.sort_free') ?? 'Free Products Only' }}</option>
+                <option value="paid" {{ ($sort ?? '') === 'paid' ? 'selected' : '' }}>{{ __('messages.sort_paid') ?? 'Paid Products Only' }}</option>
+            </select>
+            <button type="submit" class="modern-btn modern-btn-primary" style="padding: 8px 16px;">
+                <i class="fa fa-search"></i> <span class="d-none d-sm-inline">{{ __('messages.search') }}</span>
+            </button>
+            @if(($search ?? '') !== '' || (($sort ?? 'latest') !== 'latest'))
+                <a href="{{ $filterActionUrl }}" class="modern-btn modern-btn-secondary" style="padding: 8px 12px;" title="{{ __('messages.clear_filters') ?? 'Clear Filters' }}">
+                    <i class="fa fa-times"></i>
+                </a>
+            @endif
+        </form>
+    </div>
+
     <!-- PRODUCTS GRID -->
     <div class="modern-product-grid">
         @php
@@ -649,6 +748,14 @@
                         
                         @if($product->is_suspended)
                             <span class="prod-badge badge-suspended">{{ __('messages.suspended') }}</span>
+                        @elseif($product->is_pending)
+                            <span class="prod-badge badge-pending">{{ __('messages.pending_approval') ?? 'Pending Review' }}</span>
+                        @endif
+
+                        @if($product->downloads_count > 0)
+                            <span class="prod-badge badge-downloads" title="{{ __('messages.download') }}">
+                                <i class="fa fa-download"></i> {{ $product->downloads_count }}
+                            </span>
                         @endif
                     </div>
                     <img src="{{ $productImage }}" alt="{{ $product->name }}" class="product-img-render" onerror="this.src='{{ theme_asset('img/error_plug.png') }}'">
@@ -692,8 +799,19 @@
             <div class="empty-state">
                 <i class="fa-solid fa-box-open"></i>
                 <h3>{{ __('messages.no_products_found') ?? 'No products found' }}</h3>
+                @if(($search ?? '') !== '' || ($sort ?? 'latest') !== 'latest')
+                    <a href="{{ $filterActionUrl }}" class="modern-btn modern-btn-primary mt-2">
+                        {{ __('messages.clear_filters') ?? 'Clear Filters' }}
+                    </a>
+                @endif
             </div>
         @endif
     </div>
+
+    @if($products->hasPages())
+        <div class="mt-4 d-flex justify-content-center">
+            {{ $products->links() }}
+        </div>
+    @endif
 </div>
 @endsection

@@ -1,5 +1,5 @@
 # v4.6.2
-> **Flutter Companion App (myads_app v1.8.0+22) Full API Parity & Synchronization Suite, Gamification Quests Architecture & Active Scope Engine, Bidirectional Settings Interoperability Suite (Privacy, Social Links, Notifications, Badges Showcase), Marketplace Orders Offer Proposal Resilience, Notifications Dual-Route Aliasing, and Dart 3.13 Codebase Modernization Release** — Comprehensive compatibility and synchronization release bridging the core MYADS web platform with the official Flutter companion application (`myads_app` v1.8.0+22). Implemented the missing `scopeActive` query scope on the `Quest` Eloquent model to eliminate fatal `BadMethodCallException` errors during active gamification quest queries, and overhauled `GamificationApiController` (`/api/gamification/quests` and `/api/gamification/quests/{id}/claim`) to deliver structured dual-schema payloads supporting both period-grouped (`daily_quests`, `weekly_quests`, and `user_pts`) and backward-compatible flat `quests` collections matching database columns (`reward_points`, `target_count`, `name_key`, `description_key`). Enhanced Settings API endpoints (`/settings/profile`, `/settings/privacy`, `/settings/social`, `/settings/notifications`, `/settings/notification-preferences`, `/settings/badges`) to natively support `POST`, `PUT`, and `PATCH` verbs with bidirectional schema translation for mobile shorthand integers (`visibility`, `dm`, `mention` mapped to `UserPrivacyService`), dual-format social links (flat key-value maps and structured `[{platform, url}]` lists), flexible email notification preferences (handling both mobile plural aliases `email_mentions`, `email_messages`, `email_follows`, `email_comments` and canonical singular database attributes), and computed `is_shown` boolean flags for earned badges with dual `showcase` / `badge_ids` payload persistence. Relaxed marketplace offer validation in `OrderApiController@submitOffer` to seamlessly accept either `content` or `txt` parameters, and established redundant notification read route aliases (`/notifications/read-all` & `/notifications/mark-all-read`, `/notifications/{id}/read` & `/notifications/{id}/mark-read`). Modernized mobile Dart code to Dart 3.13 standards, resolving deprecation notices, cleaning unused test imports, and achieving 100% test pass rate across all Flutter widget and Laravel mobile feature test suites.
+> **Flutter Companion App (myads_app v1.8.0+22) Full API Parity Suite, Store Marketplace Overhaul & Customer Library Suite, Administrative Store Moderation Engine & Sales Intelligence Dashboard, Gamification Quests Architecture & Active Scope Engine, Bidirectional Settings Interoperability Suite, and Dart 3.13 Codebase Modernization Release** — Comprehensive platform update and compatibility release across MYADS web and mobile ecosystems. Overhauled the Store marketplace (`/store`) with real-time keyword search, 6 multi-criteria sorting modes, download counters, and pending moderation visibility controls; created the customer "My Purchases" buyer library (`/store/my-purchases`) with instant license key copy and authenticated downloads; modernized administrative store supervision (`/admin/products`) with responsive `.superdesign` KPI cards, dual table/grid views, and a 1-click approval/rejection moderation workflow; introduced administrative sales & licenses monitoring (`/admin/store/sales`) with KPI intelligence; synchronized 43 bilingual translation keys; achieved full synchronization with Flutter companion app (`myads_app` v1.8.0+22) with bidirectional settings interoperability, dual-schema quests API, and 100% test pass rate across all automated suites.
 
 ### Gamification Quests Architecture & Eloquent Scope Resilience
 * **Active Quest Query Scope (`app/Models/Quest.php`)**:
@@ -51,9 +51,37 @@
   * Updated `myads_app/README.md` to reflect Flutter 3.27+ / Dart 3.13+ and backend requirement `v4.6.2+`.
   * Documented all companion updates in `myads_app/CHANGELOG.md`.
 
+### Store Marketplace Overhaul & Customer Library Suite (`/store` & `/store/my-purchases`)
+* **Real-Time Live Search & Multi-Criteria Sorting (`StoreController@index`, `themes/default/views/store/index.blade.php`)**:
+  * Implemented real-time keyword search across product titles and descriptions (`q`/`search`).
+  * Added 6 multi-criteria sorting modes: Latest (`latest`), Most Downloaded (`downloads`), Price: Low to High (`price_asc`), Price: High to Low (`price_desc`), Free (`free`), and Paid (`paid`), preserving active search and filter parameters across paginated links.
+  * Added dynamic download count badges (`messages.downloads_count`) and pending moderation status indicators (`messages.pending_approval`) to product cards.
+  * Maintained full backward compatibility with zero database schema migrations using existing options table architecture (`o_type = 'store'`).
+* **Customer "My Purchases" Buyer Library (`StoreController@myPurchases`, `themes/default/views/store/my_purchases.blade.php`)**:
+  * Introduced dedicated customer library page at `/store/my-purchases` for authenticated buyers.
+  * Displays purchased licenses, direct 1-click clipboard license key copying (`ADSTN-XXXX-XXXX-XXXX`), dynamic file version labels, and authenticated instant download links (`/download/{hash}`).
+  * Direct links to product documentation/knowledge base (`/kb/{name}`) and product store pages.
+* **Non-Destructive Moderation Visibility Engine (`app/Models/Product.php`)**:
+  * Enhanced `Product::scopeVisible` and computed accessors (`is_pending`, `moderation_status`, `downloads_count`) ensuring pending and suspended products are hidden from public store listings and general members, while remaining visible to product owners and platform administrators with status badges.
+  * Gated direct product detail access (`StoreController@show`) with HTTP 403 Forbidden checks for unauthorized access to pending or suspended products.
+
+### Administrative Store Moderation Engine & Sales Intelligence Dashboard (`/admin/products` & `/admin/store/sales`)
+* **Store Products Administrative Hub (`/admin/products`)**:
+  * Completely overhauled `/admin/products` according to `.superdesign` guidelines with responsive KPI metrics strip (Total Products, Active, Pending Review, Suspended, Total Downloads).
+  * Implemented instant filtering by status (`all`, `active`, `pending`, `suspended`, `free`, `paid`), category filtering, and keyword search across product names, descriptions, and seller usernames.
+  * Introduced dual-view toggle: Responsive Data Table view vs Interactive Grid Card view.
+  * Added 1-click approval workflow (`POST /admin/products/{id}/approve`) and rejection with reason workflow (`POST /admin/products/{id}/reject`) with seller notifications and non-destructive audit status storage (`o_type = 'store_status'`).
+* **Administrative Sales & Licenses Intelligence (`/admin/store/sales`)**:
+  * Introduced a centralized store sales intelligence dashboard at `/admin/store/sales` monitoring all transactions, purchased product licenses, buyers, sellers, and points volume.
+  * Added KPI metric cards (Total Sales, Total Revenue PTS, Active Licenses, Active Customers) and live search filtering.
+  * Integrated sidebar navigation shortcut under Store submenu in `admin_themes/default/views/layouts/admin.blade.php`.
+* **Multilingual Localization Parity (`lang/en/messages.php` & `lang/ar/messages.php`)**:
+  * Synchronized 43 new translation keys across English and Arabic covering all store search, sorting, moderation, library, and sales monitoring strings with English as the canonical source.
+
 ### Automated Verification & Test Coverage
 * **100% Pass on Flutter Test Suite**: All 9 unit and widget tests passed (`formatted_content_widget_test.dart`, `settings_hub_screen_test.dart`, `widget_test.dart`).
 * **100% Pass on Laravel Mobile Feature Tests**: All 17 feature tests (56 assertions) passed seamlessly across `MobileSettingsApiTest`, `MobileFeedApiTest`, and `AdminMobileSettingsTest`.
+* **100% Pass on Store Enhancements Feature Tests**: All 5 feature tests (41 assertions) passed seamlessly in `tests/Feature/StoreEnhancementsFeatureTest.php` covering search, sorting, visibility scopes, buyer library, admin moderation, and sales monitoring.
 
 ---
 
