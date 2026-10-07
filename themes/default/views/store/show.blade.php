@@ -53,6 +53,12 @@
 
 @include('theme::partials.ads', ['id' => 5])
 
+@if($isPending ?? $product->is_pending ?? false)
+    <div class="alert alert-warning" role="alert">
+        <strong><i class="fa fa-clock" aria-hidden="true"></i></strong>&nbsp; {{ __('messages.pending_approval') }}
+    </div>
+@endif
+
 @if($isSuspended)
     <div class="alert alert-danger" role="alert">
         <strong><i class="fa fa-exclamation-triangle" aria-hidden="true"></i></strong>&nbsp; {{ __('messages.product_suspended_notice') }}

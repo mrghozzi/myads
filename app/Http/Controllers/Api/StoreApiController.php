@@ -28,19 +28,39 @@ class StoreApiController extends Controller
             $query->whereIn('id', $categoryIds);
         }
 
-        // Order products chronologically by status date (last status promotion s_type = 7867),
-        // then updated_at (last modified date), then id DESC.
-        $products = $query
-            ->orderByDesc(
+        if ($request->filled('q') || $request->filled('search')) {
+            $search = trim((string) ($request->q ?: $request->search));
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('o_valuer', 'like', "%{$search}%");
+            });
+        }
+
+        $sort = (string) $request->query('sort', 'latest');
+        if ($sort === 'price_asc') {
+            $query->orderBy('o_order', 'asc');
+        } elseif ($sort === 'price_desc') {
+            $query->orderBy('o_order', 'desc');
+        } elseif ($sort === 'free') {
+            $query->where('o_order', 0);
+        } elseif ($sort === 'paid') {
+            $query->where('o_order', '>', 0);
+        }
+
+        if (!in_array($sort, ['price_asc', 'price_desc'], true)) {
+            // Order products chronologically by status date (last status promotion s_type = 7867),
+            // then updated_at (last modified date), then id DESC.
+            $query->orderByDesc(
                 \App\Models\Status::select('date')
                     ->whereColumn('tp_id', 'options.id')
                     ->where('s_type', 7867)
                     ->orderByDesc('date')
                     ->limit(1)
-            )
-            ->orderByDesc('updated_at')
-            ->orderBy('id', 'desc')
-            ->paginate(20);
+            )->orderByDesc('updated_at')->orderBy('id', 'desc');
+        }
+
+        $perPage = (int) $request->query('per_page', 20);
+        $products = $query->paginate($perPage > 0 && $perPage <= 100 ? $perPage : 20);
 
         return ProductResource::collection($products);
     }
