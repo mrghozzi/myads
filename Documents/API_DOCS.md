@@ -124,7 +124,7 @@ data: {
     "has_new": true,
     "latest": {
         "id": 105,
-        "name": "قام أحمد بالتعليق على منشورك",
+        "name": "Ahmed commented on your post",
         "url": "/post/123#comment-45",
         "logo": "comment",
         "time": 1787534015
@@ -144,7 +144,7 @@ data: {
         "sender_id": 15,
         "sender_name": "Sarah",
         "sender_avatar": "https://example.com/upload/avatar.jpg",
-        "text_preview": "مرحباً، هل يمكنك مراجعة العرض؟",
+        "text_preview": "Hello, could you please review the proposal?",
         "time": 1787534020
     }
 }
@@ -542,8 +542,8 @@ MYADS v4.6.3 provides an overhauled digital goods marketplace supporting 5-star 
   ```json
   {
       "id": 12,
-      "title": "قالب الإعلانات الاحترافي",
-      "description": "قالب متكامل ومميز...",
+      "title": "Pro Classifieds Marketplace Theme",
+      "description": "Comprehensive and responsive marketplace template...",
       "price": 100,
       "original_price": 100,
       "sale_price": 80,
@@ -565,13 +565,13 @@ MYADS v4.6.3 provides an overhauled digital goods marketplace supporting 5-star 
               "id": 101,
               "url": "upload/screenshots/ss_1.jpg",
               "full_url": "https://domain.com/upload/screenshots/ss_1.jpg",
-              "caption": "لوحة التحكم الرئيسية"
+              "caption": "Main Dashboard Overview"
           }
       ],
       "seller": {
           "id": 7,
           "username": "ahmed",
-          "name": "أحمد",
+          "name": "Ahmed",
           "avatar": "https://domain.com/upload/avatar.png"
       },
       "category_id": 3,
@@ -587,8 +587,8 @@ MYADS v4.6.3 provides an overhauled digital goods marketplace supporting 5-star 
     ```json
     {
         "rating": 5,
-        "title": "منتج ممتاز ودعم رائع",
-        "comment": "تم تثبيت القالب ويعمل بسرعة فائقة وبدون أي أخطاء."
+        "title": "Excellent product and great support",
+        "comment": "The template installed smoothly and works with blazingly fast performance."
     }
     ```
   - **Verified Buyer Badge:** If the member holds a license in `product_licenses`, the backend automatically marks `is_verified_buyer: true`.
@@ -596,14 +596,14 @@ MYADS v4.6.3 provides an overhauled digital goods marketplace supporting 5-star 
     ```json
     {
         "success": true,
-        "message": "تم إرسال التقييم بنجاح",
+        "message": "Review submitted successfully",
         "review": {
             "id": 31,
             "rating": 5,
-            "title": "منتج ممتاز ودعم رائع",
-            "comment": "تم تثبيت القالب...",
+            "title": "Excellent product and great support",
+            "comment": "The template installed smoothly...",
             "is_verified_buyer": true,
-            "created_at": "منذ دقيقة",
+            "created_at": "1 minute ago",
             "user": { "id": 42, "username": "developer", "avatar": "..." }
         },
         "average_rating": 4.9,
@@ -634,7 +634,7 @@ MYADS v4.6.3 provides an overhauled digital goods marketplace supporting 5-star 
     ```json
     {
         "success": true,
-        "message": "تم الشراء بنجاح!",
+        "message": "Purchase completed successfully!",
         "download_url": "https://domain.com/download/a1b2c3d4"
     }
     ```
@@ -691,7 +691,7 @@ $$\text{Open} \longrightarrow \text{Awarded} \longrightarrow \text{In Progress} 
     ```json
     {
         "success": true,
-        "message": "تم تقديم العرض بنجاح",
+        "message": "Offer submitted successfully",
         "data": { "id": 88, "quoted_amount": 150, "delivery_days": 5 }
     }
     ```
@@ -706,12 +706,12 @@ $$\text{Open} \longrightarrow \text{Awarded} \longrightarrow \text{In Progress} 
     - `delivery_attachment` (file, optional): Deliverable package (ZIP, RAR, PDF, images up to **25 MB**).
   - Transitions order to `delivered`.
 - `POST /api/orders/{id}/revision`: Client requests contract revisions:
-  - **Payload:** `{"revision_note": "يرجى تعديل ألوان الواجهة وإصلاح استجابة الهاتف..."}`
+  - **Payload:** `{"revision_note": "Please update the brand colors and enhance mobile responsiveness..."}`
   - Automatically reverts status back to `in_progress`, increments `revision_count`, and notifies the provider.
 - `POST /api/orders/{id}/complete`: Client accepts final delivery and completes the contract:
-  - **Payload:** `{"rating": 5, "review": "عمل متقن وتسليم في الموعد المحدد."}` (rating: 1 to 5).
+  - **Payload:** `{"rating": 5, "review": "Exceptional work delivered right on schedule."}` (rating: 1 to 5).
   - Transitions order to `completed`.
-- `POST /api/orders/{id}/cancel`: Cancel contract with reason note (`{"note": "تم الاتفاق على الإلغاء بالتراضي."}`).
+- `POST /api/orders/{id}/cancel`: Cancel contract with reason note (`{"note": "Cancelled by mutual agreement."}`).
 
 #### 5. Protected File Downloads
 - `GET /orders/{order}/attachment`: Download project specifications attachment provided by client during order creation.
@@ -764,9 +764,9 @@ $$\text{Open} \longrightarrow \text{Awarded} \longrightarrow \text{In Progress} 
             {
                 "type": "product",
                 "id": 12,
-                "title": "قالب الإعلانات الاحترافي",
+                "title": "Pro Classifieds Marketplace Theme",
                 "img": "https://domain.com/upload/store/thumb.jpg",
-                "subtitle": "قالب متكامل ومميز..."
+                "subtitle": "Comprehensive and responsive marketplace template..."
             }
         ]
     }
