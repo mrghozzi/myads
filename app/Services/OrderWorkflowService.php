@@ -89,7 +89,7 @@ class OrderWorkflowService
         });
     }
 
-    public function deliver(OrderRequest $order, User $actor, ?string $note = null): OrderRequest
+    public function deliver(OrderRequest $order, User $actor, ?string $note = null, ?array $attachment = null): OrderRequest
     {
         $contract = $order->contract()->firstOrFail();
         $this->assertProvider($contract, $actor);
@@ -100,12 +100,17 @@ class OrderWorkflowService
             ]);
         }
 
-        return DB::transaction(function () use ($order, $contract, $note) {
+        return DB::transaction(function () use ($order, $contract, $note, $attachment) {
             $order->syncLifecycleState(OrderRequest::WORKFLOW_DELIVERED);
             $order->save();
-            $this->contracts->transition($contract, OrderContract::STATUS_DELIVERED, [
-                'delivery_note' => $note,
-            ]);
+
+            $payload = ['delivery_note' => $note];
+            if ($attachment && !empty($attachment['path'])) {
+                $payload['delivery_attachment_path'] = $attachment['path'];
+                $payload['delivery_attachment_name'] = $attachment['name'] ?? null;
+            }
+
+            $this->contracts->transition($contract, OrderContract::STATUS_DELIVERED, $payload);
 
             $this->notifications->send(
                 $order->uid,
@@ -113,6 +118,40 @@ class OrderWorkflowService
                 route('orders.show', $order->id),
                 'notification',
                 $contract->provider_user_id
+            );
+
+            return $order->fresh(['contract', 'awardedOffer.user']);
+        });
+    }
+
+    public function requestRevision(OrderRequest $order, User $actor, string $revisionNote): OrderRequest
+    {
+        $contract = $order->contract()->firstOrFail();
+
+        if ((int) $order->uid !== (int) $actor->id) {
+            throw new AuthorizationException();
+        }
+
+        if ((string) $order->workflow_status !== OrderRequest::WORKFLOW_DELIVERED) {
+            throw ValidationException::withMessages([
+                'workflow' => __('messages.order_cannot_request_revision'),
+            ]);
+        }
+
+        return DB::transaction(function () use ($order, $contract, $revisionNote) {
+            $order->syncLifecycleState(OrderRequest::WORKFLOW_IN_PROGRESS);
+            $order->save();
+
+            $this->contracts->transition($contract, OrderContract::STATUS_IN_PROGRESS, [
+                'revision_note' => $revisionNote,
+            ]);
+
+            $this->notifications->send(
+                $contract->provider_user_id,
+                __('messages.order_revision_requested_notification', ['title' => $order->title]),
+                route('orders.show', $order->id),
+                'notification',
+                $order->uid
             );
 
             return $order->fresh(['contract', 'awardedOffer.user']);
@@ -275,6 +314,28 @@ class OrderWorkflowService
         } else {
             $this->gamification->refreshBadges($order->awardedOffer->user_id);
         }
+    }
+
+    public function updateAdminNotes(OrderRequest $order, ?string $notes): OrderRequest
+    {
+        $order->admin_notes = $notes;
+        $order->save();
+
+        return $order->fresh();
+    }
+
+    public function updateByAdmin(OrderRequest $order, array $attributes): OrderRequest
+    {
+        $order->fill($attributes);
+        $order->save();
+
+        if ($order->statusRecord) {
+            $order->statusRecord->update([
+                'txt' => $order->title,
+            ]);
+        }
+
+        return $order->fresh();
     }
 
     private function assertProvider(OrderContract $contract, User $actor): void

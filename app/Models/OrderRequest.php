@@ -36,12 +36,15 @@ class OrderRequest extends Model
         'budget_max',
         'budget_currency',
         'delivery_window_days',
+        'attachment_path',
+        'attachment_name',
         'date',
         'statu',
         'best_offer_id',
         'last_activity',
         'avg_rating',
         'workflow_status',
+        'admin_notes',
     ];
 
     protected $casts = [
@@ -193,6 +196,17 @@ class OrderRequest extends Model
             self::WORKFLOW_CANCELLED,
             self::WORKFLOW_CLOSED,
         ], true);
+    }
+
+    public function hasAttachment(): bool
+    {
+        return !empty($this->attachment_path);
+    }
+
+    public function isRevisionRequested(): bool
+    {
+        return (string) $this->workflow_status === self::WORKFLOW_IN_PROGRESS
+            && (int) optional($this->contract)->revision_count > 0;
     }
 
     public function syncLifecycleState(string $workflowStatus): void

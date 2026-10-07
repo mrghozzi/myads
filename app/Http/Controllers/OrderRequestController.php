@@ -156,6 +156,11 @@ class OrderRequestController extends Controller
         $payload = $this->normalizeOrderPayload($this->validateOrderPayload($request));
         $ledger = app(\App\Services\PointLedgerService::class);
 
+        $attachmentData = null;
+        if ($request->hasFile('attachment')) {
+            $attachmentData = $this->handleUploadedFile($request->file('attachment'), 'order_attachments');
+        }
+
         DB::beginTransaction();
 
         try {
@@ -171,6 +176,8 @@ class OrderRequestController extends Controller
                 'budget_max' => $payload['budget_max'],
                 'budget_currency' => $payload['budget_currency'],
                 'delivery_window_days' => $payload['delivery_window_days'],
+                'attachment_path' => $attachmentData['path'] ?? null,
+                'attachment_name' => $attachmentData['name'] ?? null,
                 'date' => $time,
                 'statu' => 1,
                 'best_offer_id' => null,
@@ -275,6 +282,13 @@ class OrderRequestController extends Controller
             'budget_currency' => $payload['budget_currency'],
             'delivery_window_days' => $payload['delivery_window_days'],
         ]);
+
+        if ($request->hasFile('attachment')) {
+            $attachmentData = $this->handleUploadedFile($request->file('attachment'), 'order_attachments');
+            $order->attachment_path = $attachmentData['path'];
+            $order->attachment_name = $attachmentData['name'];
+        }
+
         $order->syncLifecycleState(OrderRequest::WORKFLOW_OPEN);
         $order->save();
 
@@ -309,11 +323,71 @@ class OrderRequestController extends Controller
     {
         $request->validate([
             'delivery_note' => ['nullable', 'string', 'max:5000'],
+            'delivery_attachment' => ['nullable', 'file', 'max:25600'],
         ]);
 
-        $this->workflow->deliver($order, Auth::user(), $request->input('delivery_note'));
+        $attachmentData = null;
+        if ($request->hasFile('delivery_attachment')) {
+            $attachmentData = $this->handleUploadedFile($request->file('delivery_attachment'), 'order_deliverables');
+        }
+
+        $this->workflow->deliver($order, Auth::user(), $request->input('delivery_note'), $attachmentData);
 
         return back()->with('success', __('messages.order_delivered_successfully'));
+    }
+
+    public function revision(Request $request, OrderRequest $order)
+    {
+        $request->validate([
+            'revision_note' => ['required', 'string', 'max:3000'],
+        ]);
+
+        $this->workflow->requestRevision($order, Auth::user(), $request->input('revision_note'));
+
+        return back()->with('success', __('messages.order_revision_requested_successfully'));
+    }
+
+    public function downloadAttachment(OrderRequest $order)
+    {
+        if (!$order->hasAttachment()) {
+            abort(404);
+        }
+
+        $relativePath = ltrim((string) $order->attachment_path, '/\\');
+        $normalizedPath = str_replace(['..', '\\'], ['', '/'], $relativePath);
+        $filePath = storage_path('app/' . $normalizedPath);
+
+        if (!is_file($filePath)) {
+            abort(404);
+        }
+
+        return response()->download($filePath, $order->attachment_name ?: 'attachment');
+    }
+
+    public function downloadDeliverable(OrderRequest $order)
+    {
+        $contract = $order->contract;
+        if (!$contract || !$contract->hasDeliveryAttachment()) {
+            abort(404);
+        }
+
+        $isAuthorized = (int) $order->uid === (int) Auth::id()
+            || (int) $contract->provider_user_id === (int) Auth::id()
+            || (Auth::check() && Auth::user()->isAdmin());
+
+        if (!$isAuthorized) {
+            abort(403);
+        }
+
+        $relativePath = ltrim((string) $contract->delivery_attachment_path, '/\\');
+        $normalizedPath = str_replace(['..', '\\'], ['', '/'], $relativePath);
+        $filePath = storage_path('app/' . $normalizedPath);
+
+        if (!is_file($filePath)) {
+            abort(404);
+        }
+
+        return response()->download($filePath, $contract->delivery_attachment_name ?: 'deliverable');
     }
 
     public function complete(Request $request, OrderRequest $order)
@@ -421,6 +495,7 @@ class OrderRequestController extends Controller
             'budget_max' => ['nullable', 'numeric', 'min:0'],
             'budget_currency' => ['required', Rule::in(array_keys($this->currencies()))],
             'delivery_window_days' => ['nullable', 'integer', 'min:1', 'max:365'],
+            'attachment' => ['nullable', 'file', 'max:15360'],
         ]);
     }
 
@@ -489,6 +564,31 @@ class OrderRequestController extends Controller
             'EUR' => 'EUR',
             'GBP' => 'GBP',
             'PTS' => 'PTS',
+        ];
+    }
+
+    private function handleUploadedFile($file, string $subfolder): array
+    {
+        $originalName = $file->getClientOriginalName();
+        $extension = strtolower($file->getClientOriginalExtension() ?: $file->extension() ?: 'bin');
+
+        $blockedExtensions = ['php', 'phtml', 'php3', 'php4', 'php5', 'phps', 'phar', 'exe', 'bat', 'cmd', 'sh', 'cgi', 'pl', 'py', 'jsp', 'asp', 'aspx', 'vbs'];
+        if (in_array($extension, $blockedExtensions, true)) {
+            throw new \RuntimeException(__('messages.file_type_not_allowed') ?? 'File type not allowed.');
+        }
+
+        $filename = 'order_' . time() . '_' . \Illuminate\Support\Str::random(12) . ($extension ? '.' . $extension : '');
+        $destinationPath = storage_path('app/' . $subfolder);
+
+        if (!is_dir($destinationPath) && !mkdir($destinationPath, 0755, true) && !is_dir($destinationPath)) {
+            throw new \RuntimeException('Unable to create attachment directory.');
+        }
+
+        $file->move($destinationPath, $filename);
+
+        return [
+            'path' => $subfolder . '/' . $filename,
+            'name' => $originalName,
         ];
     }
 

@@ -16,6 +16,16 @@
 
     <div class="grid-column">
         <div class="orders-shell">
+            <div class="orders-disclaimer-card">
+                <div class="orders-disclaimer-icon">
+                    <i class="fa fa-shield-alt"></i>
+                </div>
+                <div class="orders-disclaimer-content">
+                    <h4 class="orders-disclaimer-title">{{ __('messages.order_disclaimer_title') }}</h4>
+                    <p class="orders-disclaimer-text">{{ __('messages.order_disclaimer_notice', ['site' => $site_settings->titer ?? config('app.name', 'MyAds')]) }}</p>
+                </div>
+            </div>
+
             <section class="orders-toolbar">
                 <div class="orders-toolbar-head">
                     <div>

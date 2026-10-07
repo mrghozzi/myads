@@ -387,6 +387,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/orders/{order}/award', [OrderRequestController::class, 'award'])->name('orders.award');
     Route::post('/orders/{order}/start', [OrderRequestController::class, 'start'])->name('orders.start');
     Route::post('/orders/{order}/deliver', [OrderRequestController::class, 'deliver'])->name('orders.deliver');
+    Route::post('/orders/{order}/revision', [OrderRequestController::class, 'revision'])->name('orders.revision');
     Route::post('/orders/{order}/complete', [OrderRequestController::class, 'complete'])->name('orders.complete');
     Route::post('/orders/{order}/cancel', [OrderRequestController::class, 'cancel'])->name('orders.cancel');
     Route::post('/orders/{order}/rate', [OrderRequestController::class, 'rate'])->name('orders.rate');
@@ -394,6 +395,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/orders/{order}/select-best', [OrderRequestController::class, 'award'])->name('orders.select_best');
     Route::post('/orders/{order}/close', [OrderRequestController::class, 'close'])->name('orders.close');
     Route::delete('/orders/{order}', [OrderRequestController::class, 'destroy'])->name('orders.destroy');
+    Route::get('/orders/{order}/attachment', [OrderRequestController::class, 'downloadAttachment'])->name('orders.attachment.download');
+    Route::get('/orders/{order}/deliverable', [OrderRequestController::class, 'downloadDeliverable'])->name('orders.deliverable.download');
 });
 Route::get('/orders/{order}', [OrderRequestController::class, 'show'])->name('orders.show');
 
@@ -895,9 +898,14 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
 
     Route::prefix('orders')->group(function () {
         Route::get('/', [AdminOrderController::class, 'index'])->name('admin.orders.index');
+        Route::get('/export', [AdminOrderController::class, 'export'])->name('admin.orders.export');
         Route::get('/{order}', [AdminOrderController::class, 'show'])->name('admin.orders.show');
+        Route::post('/{order}/update', [AdminOrderController::class, 'update'])->name('admin.orders.update');
+        Route::post('/{order}/admin-notes', [AdminOrderController::class, 'updateAdminNotes'])->name('admin.orders.admin_notes');
         Route::post('/{order}/close', [AdminOrderController::class, 'close'])->name('admin.orders.close');
         Route::post('/{order}/cancel', [AdminOrderController::class, 'cancel'])->name('admin.orders.cancel');
+        Route::delete('/{order}', [AdminOrderController::class, 'destroy'])->name('admin.orders.destroy');
+        Route::delete('/offers/{offer}', [AdminOrderController::class, 'destroyOffer'])->name('admin.orders.offers.destroy');
     });
 
     // Pages

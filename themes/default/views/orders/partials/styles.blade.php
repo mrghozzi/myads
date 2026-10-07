@@ -337,11 +337,193 @@
         margin: 0 auto 16px !important;
     }
 
+    /* Disclaimer Card */
+    .orders-disclaimer-card {
+        border-radius: 18px;
+        padding: 18px 22px;
+        background: linear-gradient(135deg, rgba(97, 93, 250, 0.06), rgba(35, 210, 226, 0.08));
+        border: 1px solid rgba(97, 93, 250, 0.2);
+        display: flex;
+        align-items: flex-start;
+        gap: 16px;
+        margin-bottom: 20px;
+    }
+
+    .orders-disclaimer-icon {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        background: #615dfa;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        flex-shrink: 0;
+    }
+
+    .orders-disclaimer-content {
+        flex: 1;
+    }
+
+    .orders-disclaimer-title {
+        color: #1f2440;
+        font-size: 0.95rem;
+        font-weight: 800;
+        margin-bottom: 4px;
+    }
+
+    .orders-disclaimer-text {
+        color: #616682;
+        font-size: 0.88rem;
+        line-height: 1.6;
+        margin: 0;
+    }
+
+    /* Stepper / Progress Tracker */
+    .orders-stepper {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: relative;
+        padding: 10px 0;
+        margin-bottom: 24px;
+    }
+
+    .orders-stepper::before {
+        content: "";
+        position: absolute;
+        top: 24px;
+        left: 30px;
+        right: 30px;
+        height: 4px;
+        background: #e7e8f5;
+        z-index: 1;
+    }
+
+    .orders-step {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+        z-index: 2;
+        text-align: center;
+        flex: 1;
+    }
+
+    .orders-step-circle {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: #fff;
+        border: 3px solid #d4d6ee;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+        font-weight: 800;
+        color: #8b90aa;
+        margin-bottom: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .orders-step.active .orders-step-circle {
+        border-color: #615dfa;
+        background: #615dfa;
+        color: #fff;
+        box-shadow: 0 0 12px rgba(97, 93, 250, 0.4);
+    }
+
+    .orders-step.completed .orders-step-circle {
+        border-color: #23d2e2;
+        background: #23d2e2;
+        color: #fff;
+    }
+
+    .orders-step-label {
+        font-size: 0.76rem;
+        font-weight: 700;
+        color: #8b90aa;
+    }
+
+    .orders-step.active .orders-step-label {
+        color: #615dfa;
+        font-weight: 800;
+    }
+
+    .orders-step.completed .orders-step-label {
+        color: #23d2e2;
+    }
+
+    /* Attachment & Deliverable cards */
+    .orders-attachment-card {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        padding: 14px 18px;
+        border-radius: 14px;
+        background: #f8f9ff;
+        border: 1px dashed rgba(97, 93, 250, 0.3);
+        margin-top: 14px;
+    }
+
+    .orders-attachment-icon {
+        font-size: 1.4rem;
+        color: #615dfa;
+    }
+
+    .orders-revision-box {
+        border-radius: 14px;
+        padding: 16px 20px;
+        background: rgba(255, 174, 0, 0.08);
+        border: 1px dashed #ffae00;
+        margin-top: 16px;
+    }
+
+    /* Dark Mode Adjustments */
+    body[data-theme="css_d"] .orders-disclaimer-card {
+        background: linear-gradient(135deg, rgba(97, 93, 250, 0.15), rgba(35, 210, 226, 0.1));
+        border-color: rgba(97, 93, 250, 0.3);
+    }
+
+    body[data-theme="css_d"] .orders-disclaimer-title {
+        color: #fff;
+    }
+
+    body[data-theme="css_d"] .orders-disclaimer-text {
+        color: #a4b0d1;
+    }
+
+    body[data-theme="css_d"] .orders-stepper::before {
+        background: #293249;
+    }
+
+    body[data-theme="css_d"] .orders-step-circle {
+        background: #1d2333;
+        border-color: #2f3852;
+        color: #7280a5;
+    }
+
+    body[data-theme="css_d"] .orders-attachment-card {
+        background: #1d2333;
+        border-color: rgba(97, 93, 250, 0.4);
+    }
+
     @media (max-width: 768px) {
         .orders-filters,
         .orders-form-grid,
         .orders-summary-grid {
             grid-template-columns: 1fr;
+        }
+
+        .orders-stepper {
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .orders-stepper::before {
+            display: none;
         }
     }
 </style>

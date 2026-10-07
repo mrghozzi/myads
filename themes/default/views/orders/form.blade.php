@@ -38,7 +38,7 @@
     <div class="superdesign-post-grid">
         <!-- Column 1: Main Order Form -->
         <div class="superdesign-composer-card">
-            <form action="{{ $isEditing ? route('orders.update', $order) : route('orders.store') }}" method="POST">
+            <form action="{{ $isEditing ? route('orders.update', $order) : route('orders.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 @if($isEditing)
                     @method('PATCH')
@@ -179,6 +179,32 @@
                                 placeholder="30"
                             >
                         </div>
+                    </div>
+                </div>
+
+                <div class="superdesign-field-group">
+                    <label for="attachment" class="superdesign-field-label">
+                        <i class="fa fa-paperclip"></i>
+                        {{ __('messages.order_attachment') }}
+                    </label>
+                    <div class="superdesign-input-wrapper">
+                        <input type="file" id="attachment" name="attachment" class="superdesign-input" style="padding-top: 10px;">
+                    </div>
+                    <small class="orders-muted" style="margin-top: 6px; font-size: 12px; display: block;">{{ __('messages.order_attachment_help') }}</small>
+                    @if($order->hasAttachment())
+                        <div style="margin-top: 8px; font-size: 13px;">
+                            <span class="badge bg-light text-dark border"><i class="fa fa-paperclip"></i> {{ $order->attachment_name }}</span>
+                        </div>
+                    @endif
+                </div>
+
+                <div class="orders-disclaimer-card" style="margin-top: 20px;">
+                    <div class="orders-disclaimer-icon">
+                        <i class="fa fa-shield-alt"></i>
+                    </div>
+                    <div class="orders-disclaimer-content">
+                        <h4 class="orders-disclaimer-title">{{ __('messages.order_disclaimer_title') }}</h4>
+                        <p class="orders-disclaimer-text">{{ __('messages.order_disclaimer_notice', ['site' => $site_settings->titer ?? config('app.name', 'MyAds')]) }}</p>
                     </div>
                 </div>
 

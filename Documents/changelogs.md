@@ -1,3 +1,40 @@
+# v4.6.3
+> **Service Orders Marketplace Peer-to-Peer Overhaul, Unambiguous Platform Disclaimer of Liability System, Contract Revision & Deliverable Architecture, and Administrative Supervision Intelligence Engine Release** — Overhauled the Service Orders system (`/orders`) and Administration Supervision (`/admin/orders`). Strictly enforced the peer-to-peer bulletin board model where the administration disclaims any financial or contractual liability, prominently notifying members across all order touchpoints. Implemented complete contract revision workflows (`requestRevision`), secure project specification attachments and deliverable uploads with authenticated downloads, interactive visual milestone steppers with deadline tracking, and modernized administrative supervision with responsive KPI cards, smart filtering, UTF-8 BOM CSV exports, safe order deletion, offer spam moderation, and staff internal notes.
+
+### Unambiguous Platform Disclaimer of Liability System (Peer-to-Peer Bulletin Model)
+* **Prominent Multi-Surface Notices**:
+  * Placed clear, non-intrusive yet impossible-to-miss disclaimer banners across `/orders`, `/orders/create`, `/orders/{order}`, and `/admin/orders`.
+  * Clarifies to all members that the site does not act as an escrow agent or financial guarantor; each member is solely and directly responsible for their transactions, communications, deliverables, and financial agreements.
+* **Bilingual Terminology (`lang/ar/messages.php`, `lang/en/messages.php`)**:
+  * Added 32 comprehensive localization keys in Arabic and English explaining the platform's non-liability stance and direct member accountability.
+
+### Service Orders Marketplace Overhaul (`/orders`)
+* **Project Specifications & File Attachments**:
+  * Enabled clients to attach requirement documents (PDF, DOCX, ZIP, TXT, images up to 25MB) during order creation and updates.
+  * Stored files securely in `storage/app/order_attachments` with protected download routes (`orders.attachment.download`).
+* **Contract Revision Workflow (`requestRevision`)**:
+  * Added client-side revision requests when an order is in `delivered` state.
+  * Allows the client to state revision notes, transitioning the order status back to `in_progress` with an incremented revision count (`revision_count`) and timestamp (`revision_requested_at`).
+* **Deliverable Upload & Protected Delivery Downloads**:
+  * Enabled service providers to upload deliverables (ZIP, images, documents) upon marking work as `delivered`.
+  * Secure download endpoint (`orders.deliverable.download`) strictly checks contract participant authorization before streaming files.
+* **Visual Progress Stepper & Deadline Intelligence**:
+  * Built an interactive 5-step milestone stepper (`Open` -> `Awarded` -> `In Progress` -> `Delivered` -> `Completed`).
+  * Added automated deadline calculation and overdue indicators based on contract start time and agreed delivery window.
+
+### Administrative Supervision Engine (`/admin/orders`)
+* **Live KPI Intelligence Metrics**:
+  * Added 6 responsive KPI metric cards: Total Orders, Open Requests, In-Progress Contracts, Delivered Awaiting Review, Completed Orders, and Cancelled/Closed.
+* **Advanced Multi-Criteria Filtering & Search**:
+  * Added filter bars supporting workflow status, dynamic category selection derived from database entries, and multi-field keyword search (title, description, client username).
+* **UTF-8 BOM CSV Export**:
+  * Implemented streamed CSV export (`/admin/orders/export`) with Excel-compatible UTF-8 BOM handling Arabic characters seamlessly.
+* **Safe Order Deletion & Offer Moderation**:
+  * Safe cascading deletion of orders (`admin.orders.destroy`) ensuring files and child contracts are safely removed without dangling records.
+  * Added individual spam/inappropriate offer deletion (`admin.orders.offers.destroy`).
+* **Staff Internal Private Notes (`admin_notes`)**:
+  * Added private administrative notes field (`admin_notes`) allowing moderators to record investigation notes, verification statuses, or dispute logs hidden from regular users.
+
 # v4.6.2
 > **Flutter Companion App (myads_app v1.8.0+22) Full API Parity Suite, Store Marketplace Overhaul & Customer Library Suite, Administrative Store Moderation Engine & Sales Intelligence Dashboard, Gamification Quests Architecture & Active Scope Engine, Bidirectional Settings Interoperability Suite, and Dart 3.13 Codebase Modernization Release** — Comprehensive platform update and compatibility release across MYADS web and mobile ecosystems. Overhauled the Store marketplace (`/store`) with real-time keyword search, 6 multi-criteria sorting modes, download counters, and pending moderation visibility controls; created the customer "My Purchases" buyer library (`/store/my-purchases`) with instant license key copy and authenticated downloads; modernized administrative store supervision (`/admin/products`) with responsive `.superdesign` KPI cards, dual table/grid views, and a 1-click approval/rejection moderation workflow; introduced administrative sales & licenses monitoring (`/admin/store/sales`) with KPI intelligence; synchronized 43 bilingual translation keys; achieved full synchronization with Flutter companion app (`myads_app` v1.8.0+22) with bidirectional settings interoperability, dual-schema quests API, and 100% test pass rate across all automated suites.
 

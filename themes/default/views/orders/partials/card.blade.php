@@ -6,6 +6,11 @@
                 <span class="orders-meta-pill">{{ $order->displayCategory() }}</span>
                 <span class="orders-meta-pill">{{ $order->displayBudget() }}</span>
                 <span class="orders-meta-pill">{{ __('messages.offers') }}: {{ $order->offers_count ?? 0 }}</span>
+                @if($order->hasAttachment())
+                    <span class="orders-meta-pill" title="{{ __('messages.order_attachment') }}">
+                        <i class="fa fa-paperclip"></i>
+                    </span>
+                @endif
             </div>
             <h3 class="orders-card-title">
                 <a href="{{ route('orders.show', $order) }}">{{ $order->title }}</a>
@@ -35,6 +40,11 @@
         <span class="orders-muted">{{ __('messages.delivery') }}: {{ $order->displayDeliveryWindow() }}</span>
         @if((float) $order->avg_rating > 0)
             <span class="orders-meta-pill">{{ __('messages.rating') }}: {{ number_format((float) $order->avg_rating, 1) }}/5</span>
+        @endif
+        @if($order->contract && (int) $order->contract->revision_count > 0)
+            <span class="orders-meta-pill" style="color: #e67e22; border-color: rgba(230, 126, 34, 0.3);">
+                <i class="fa fa-redo"></i> {{ __('messages.order_revision_badge', ['count' => $order->contract->revision_count]) }}
+            </span>
         @endif
     </div>
 </article>

@@ -27,6 +27,11 @@ class OrderContract extends Model
         'delivery_days',
         'snapshot_payload',
         'delivery_note',
+        'delivery_attachment_path',
+        'delivery_attachment_name',
+        'revision_note',
+        'revision_count',
+        'revision_requested_at',
         'completion_note',
         'awarded_at',
         'started_at',
@@ -38,9 +43,11 @@ class OrderContract extends Model
     protected $casts = [
         'quoted_amount' => 'decimal:2',
         'snapshot_payload' => 'array',
+        'revision_count' => 'integer',
         'awarded_at' => 'datetime',
         'started_at' => 'datetime',
         'delivered_at' => 'datetime',
+        'revision_requested_at' => 'datetime',
         'completed_at' => 'datetime',
         'cancelled_at' => 'datetime',
     ];
@@ -68,5 +75,34 @@ class OrderContract extends Model
     public function displayStatus(): string
     {
         return __('messages.order_status_' . $this->status);
+    }
+
+    public function hasDeliveryAttachment(): bool
+    {
+        return !empty($this->delivery_attachment_path);
+    }
+
+    public function hasRevision(): bool
+    {
+        return (int) $this->revision_count > 0 && !empty($this->revision_note);
+    }
+
+    public function getDeadlineAttribute(): ?\Carbon\Carbon
+    {
+        if ($this->started_at && $this->delivery_days) {
+            return (clone $this->started_at)->addDays((int) $this->delivery_days);
+        }
+
+        return null;
+    }
+
+    public function isOverdue(): bool
+    {
+        $deadline = $this->deadline;
+        if (!$deadline || in_array($this->status, [self::STATUS_COMPLETED, self::STATUS_CANCELLED], true)) {
+            return false;
+        }
+
+        return now()->isAfter($deadline);
     }
 }

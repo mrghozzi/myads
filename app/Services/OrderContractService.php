@@ -58,11 +58,20 @@ class OrderContractService
 
         if ($status === OrderContract::STATUS_IN_PROGRESS) {
             $payload['started_at'] = $contract->started_at ?: now();
+            if (isset($attributes['revision_note'])) {
+                $payload['revision_note'] = $attributes['revision_note'];
+                $payload['revision_count'] = ((int) $contract->revision_count) + 1;
+                $payload['revision_requested_at'] = now();
+            }
         }
 
         if ($status === OrderContract::STATUS_DELIVERED) {
             $payload['delivered_at'] = now();
             $payload['delivery_note'] = $attributes['delivery_note'] ?? $contract->delivery_note;
+            if (isset($attributes['delivery_attachment_path'])) {
+                $payload['delivery_attachment_path'] = $attributes['delivery_attachment_path'];
+                $payload['delivery_attachment_name'] = $attributes['delivery_attachment_name'] ?? null;
+            }
         }
 
         if ($status === OrderContract::STATUS_COMPLETED) {
