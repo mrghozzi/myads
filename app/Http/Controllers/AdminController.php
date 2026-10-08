@@ -4979,10 +4979,11 @@ class AdminController extends Controller
             'txt'     => ['nullable', 'string'],
             'vnbr'    => ['nullable', 'string', 'min:2', 'max:12', 'regex:/^[-a-zA-Z0-9.]+$/'],
             'linkzip' => ['nullable', 'string'],
+            'new_version_desc' => ['nullable', 'string'],
             'existing_files' => ['nullable', 'array'],
-            'existing_files.*.vnbr' => ['required_with:existing_files', 'string', 'min:2', 'max:12', 'regex:/^[-a-zA-Z0-9.]+$/'],
-            'existing_files.*.link' => ['required_with:existing_files', 'string'],
-            'existing_files.*.desc' => ['nullable', 'string', 'max:2400'],
+            'existing_files.*.vnbr' => ['nullable', 'string', 'min:2', 'max:12', 'regex:/^[-a-zA-Z0-9.]+$/'],
+            'existing_files.*.link' => ['nullable', 'string'],
+            'existing_files.*.desc' => ['nullable', 'string'],
             'sale_price' => ['nullable', 'integer', 'min:0', 'lt:pts'],
             'sale_start' => ['nullable', 'date'],
             'sale_end'   => ['nullable', 'date', 'after_or_equal:sale_start'],
@@ -5052,7 +5053,7 @@ class AdminController extends Controller
         if ($request->filled('vnbr') && $request->filled('linkzip')) {
             $fileOption = ProductFile::create([
                 'name'     => $request->vnbr,
-                'o_valuer' => $request->desc,
+                'o_valuer' => $request->filled('new_version_desc') ? $request->new_version_desc : ($request->desc ?? ''),
                 'o_type'   => 'store_file',
                 'o_parent' => $product->id,
                 'o_order'  => 0,
@@ -5148,6 +5149,84 @@ class AdminController extends Controller
         }
 
         return redirect()->back()->with('success', __('messages.product_updated') ?? 'Product updated successfully.');
+    }
+
+    public function updateProductFile(Request $request, $id, $fileId)
+    {
+        $product = Product::withoutGlobalScope('store')->where('o_type', 'store')->findOrFail($id);
+
+        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+            'vnbr' => ['required', 'string', 'min:2', 'max:12', 'regex:/^[-a-zA-Z0-9.]+$/'],
+            'link' => ['required', 'string'],
+            'desc' => ['nullable', 'string'],
+        ], [
+            'vnbr.required' => __('messages.version_required') ?? 'Version number is required.',
+            'vnbr.regex'    => __('messages.version_invalid') ?? 'Version number format is invalid.',
+            'link.required' => __('messages.link_required') ?? 'File link is required.',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => $validator->errors()->first(),
+                'errors'  => $validator->errors()->all(),
+            ], 422);
+        }
+
+        $file = ProductFile::where('o_parent', $product->id)->find($fileId);
+        if (!$file) {
+            return response()->json([
+                'success' => false,
+                'message' => __('messages.file_not_found') ?? 'File version not found.',
+            ], 404);
+        }
+
+        $file->update([
+            'name'     => $request->vnbr,
+            'o_mode'   => $request->link,
+            'o_valuer' => $request->desc ?? '',
+        ]);
+
+        // Update associated Short link if exists
+        $short = Short::where('tp_id', $file->id)->where('sh_type', 7867)->first();
+        if ($short) {
+            $short->update(['url' => $request->link]);
+        }
+
+        return response()->json([
+            'success' => true,
+            'message' => __('messages.file_updated') ?? 'File version updated successfully.',
+            'file' => [
+                'id'       => $file->id,
+                'vnbr'     => $file->name,
+                'link'     => $file->o_mode,
+                'desc_len' => mb_strlen($file->o_valuer ?? ''),
+            ],
+        ]);
+    }
+
+    public function deleteProductFile(Request $request, $id, $fileId)
+    {
+        $product = Product::withoutGlobalScope('store')->where('o_type', 'store')->findOrFail($id);
+
+        $file = ProductFile::where('o_parent', $product->id)->find($fileId);
+        if (!$file) {
+            return response()->json([
+                'success' => false,
+                'message' => __('messages.file_not_found') ?? 'File version not found.',
+            ], 404);
+        }
+
+        // Delete associated short link
+        Short::where('tp_id', $file->id)->where('sh_type', 7867)->delete();
+
+        // Delete the file version
+        $file->delete();
+
+        return response()->json([
+            'success' => true,
+            'message' => __('messages.file_deleted') ?? 'File version deleted successfully.',
+        ]);
     }
 
     public function suspendProduct(Request $request, $id)

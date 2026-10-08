@@ -65,7 +65,7 @@
                                             <i class="fa fa-pencil-square" aria-hidden="true"></i>&nbsp; {{ __('messages.edit_with_stackedit') ?? 'Edit with StackEdit' }}
                                         </button>
                                     </div>
-                                    <textarea id="upd-desc" name="desc" minlength="10" maxlength="2400" style="width:100%;padding:10px;" required>{{ old('desc') }}</textarea>
+                                    <textarea id="upd-desc" name="desc" minlength="10" maxlength="65535" style="width:100%;padding:10px;" required>{{ old('desc') }}</textarea>
                                 </div>
                             </div>
                         </div>

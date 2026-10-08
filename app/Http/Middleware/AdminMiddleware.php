@@ -21,6 +21,10 @@ class AdminMiddleware
             return $next($request);
         }
 
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json(['error' => __('access_denied')], 403);
+        }
+
         return redirect('/')->with('error', __('access_denied'));
     }
 }

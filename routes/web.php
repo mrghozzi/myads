@@ -808,6 +808,8 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::delete('/products/delete', [AdminController::class, 'deleteProduct'])->name('admin.products.delete');
     Route::get('/products/{id}/edit', [AdminController::class, 'editProduct'])->name('admin.products.edit');
     Route::post('/products/{id}', [AdminController::class, 'updateProduct'])->name('admin.products.update');
+    Route::post('/products/{id}/files/{fileId}', [AdminController::class, 'updateProductFile'])->name('admin.products.files.update');
+    Route::delete('/products/{id}/files/{fileId}', [AdminController::class, 'deleteProductFile'])->name('admin.products.files.delete');
     Route::post('/products/{id}/suspend', [AdminController::class, 'suspendProduct'])->name('admin.products.suspend');
     Route::post('/products/{id}/approve', [AdminController::class, 'approveProduct'])->name('admin.products.approve');
     Route::post('/products/{id}/reject', [AdminController::class, 'rejectProduct'])->name('admin.products.reject');

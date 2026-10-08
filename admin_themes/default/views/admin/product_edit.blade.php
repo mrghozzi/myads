@@ -30,6 +30,123 @@ function toggleFileVersion(id) {
         icon.classList.remove('rotated');
     }
 }
+
+function updateCharCount(id) {
+    const el = document.getElementById('file-desc-' + id);
+    const counter = document.getElementById('file-desc-count-' + id);
+    if (el && counter) {
+        counter.textContent = el.value.length.toLocaleString() + ' ' + (@json(__('messages.chars') ?? 'chars'));
+    }
+}
+
+function saveFileVersion(fileId) {
+    const btn = document.getElementById('btn-save-file-' + fileId);
+    const alertBox = document.getElementById('file-alert-' + fileId);
+    const vnbr = document.getElementById('file-vnbr-' + fileId).value.trim();
+    const link = document.getElementById('file-link-' + fileId).value.trim();
+    const desc = document.getElementById('file-desc-' + fileId).value;
+
+    alertBox.innerHTML = '';
+    const originalHtml = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span>' + @json(__('messages.saving') ?? 'Saving...');
+
+    fetch(@json(url('admin/products/' . $product->id . '/files')) + '/' + fileId, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': @json(csrf_token()),
+            'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+            vnbr: vnbr,
+            link: link,
+            desc: desc
+        })
+    })
+    .then(async (response) => {
+        const data = await response.json();
+        if (!response.ok) {
+            let errorMsg = data.message || @json(__('messages.error_occurred') ?? 'An error occurred.');
+            if (data.errors && Array.isArray(data.errors)) {
+                errorMsg = data.errors.join('<br>');
+            } else if (data.errors && typeof data.errors === 'object') {
+                errorMsg = Object.values(data.errors).flat().join('<br>');
+            }
+            throw new Error(errorMsg);
+        }
+        return data;
+    })
+    .then((data) => {
+        alertBox.innerHTML = '<div class="alert alert-success alert-dismissible fade show py-2 px-3 fs-12 mb-2"><i class="feather-check-circle me-1"></i> ' + (data.message || @json(__('messages.file_updated') ?? 'File updated successfully.')) + '<button type="button" class="btn-close py-2" data-bs-dismiss="alert"></button></div>';
+        
+        const headerName = document.getElementById('version-header-name-' + fileId);
+        if (headerName) headerName.textContent = vnbr;
+        
+        const testLink = document.getElementById('file-test-link-' + fileId);
+        if (testLink) {
+            testLink.href = link.startsWith('http://') || link.startsWith('https://') ? link : @json(url('/')) + '/' + link;
+        }
+
+        btn.disabled = false;
+        btn.innerHTML = '<i class="feather-check me-1"></i>' + @json(__('messages.saved') ?? 'Saved');
+        setTimeout(() => {
+            btn.innerHTML = originalHtml;
+        }, 2000);
+    })
+    .catch((err) => {
+        alertBox.innerHTML = '<div class="alert alert-danger alert-dismissible fade show py-2 px-3 fs-12 mb-2"><i class="feather-alert-circle me-1"></i> ' + err.message + '<button type="button" class="btn-close py-2" data-bs-dismiss="alert"></button></div>';
+        btn.disabled = false;
+        btn.innerHTML = originalHtml;
+    });
+}
+
+function deleteFileVersion(fileId) {
+    if (!confirm(@json(__('messages.confirm_delete_version') ?? 'Are you sure you want to delete this file version?'))) {
+        return;
+    }
+
+    const alertBox = document.getElementById('file-alert-' + fileId);
+    alertBox.innerHTML = '';
+
+    fetch(@json(url('admin/products/' . $product->id . '/files')) + '/' + fileId, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': @json(csrf_token()),
+            'Accept': 'application/json'
+        }
+    })
+    .then(async (response) => {
+        const data = await response.json();
+        if (!response.ok) {
+            throw new Error(data.message || @json(__('messages.error_occurred') ?? 'An error occurred.'));
+        }
+        return data;
+    })
+    .then((data) => {
+        const row = document.getElementById('file-version-row-' + fileId);
+        if (row) {
+            row.style.transition = 'opacity 0.3s ease';
+            row.style.opacity = '0';
+            setTimeout(() => {
+                row.remove();
+                const container = document.getElementById('file-versions-container');
+                const badge = document.getElementById('file-versions-count');
+                if (container && container.querySelectorAll('[id^="file-version-row-"]').length === 0) {
+                    container.innerHTML = '<div class="p-4 text-center text-muted" id="no-files-placeholder"><i class="feather-package fs-3 d-block mb-2"></i>' + @json(__('messages.no_files') ?? 'No file versions yet.') + '</div>';
+                }
+                if (badge) {
+                    const currentCount = parseInt(badge.textContent) || 1;
+                    badge.textContent = Math.max(0, currentCount - 1);
+                }
+            }, 300);
+        }
+    })
+    .catch((err) => {
+        alertBox.innerHTML = '<div class="alert alert-danger alert-dismissible fade show py-2 px-3 fs-12 mb-2"><i class="feather-alert-circle me-1"></i> ' + err.message + '<button type="button" class="btn-close py-2" data-bs-dismiss="alert"></button></div>';
+    });
+}
 </script>
 
 <section class="admin-hero">
@@ -80,11 +197,11 @@ function toggleFileVersion(id) {
     </div>
 @endif
 
-<form method="POST" action="{{ route('admin.products.update', $product->id) }}">
-    @csrf
-    <div class="row g-4">
-        {{-- Edit Form --}}
-        <div class="col-lg-8">
+<div class="row g-4">
+    {{-- Edit Form --}}
+    <div class="col-lg-8">
+        <form method="POST" action="{{ route('admin.products.update', $product->id) }}" id="product-main-form">
+            @csrf
             <div class="card border-0 shadow-sm">
                 <div class="card-header bg-white fw-semibold">{{ __('messages.product_details') ?? 'Product Details' }}</div>
                 <div class="card-body">
@@ -292,6 +409,10 @@ function toggleFileVersion(id) {
                             <label class="form-label">{{ __('messages.file') ?? 'File Link / URL' }}</label>
                             <input type="text" name="linkzip" class="form-control" placeholder="upload/file.zip or https://...">
                         </div>
+                        <div class="col-12">
+                            <label class="form-label">{{ __('messages.version_changelog') ?? 'Version Changelog / Notes' }} <small class="text-muted">({{ __('messages.optional') ?? 'Optional' }})</small></label>
+                            <textarea name="new_version_desc" class="form-control" rows="2" placeholder="{{ __('messages.version_changelog_placeholder') ?? 'Enter release notes / changelog for this new version...' }}"></textarea>
+                        </div>
                     </div>
 
                     <div class="mt-4">
@@ -300,43 +421,60 @@ function toggleFileVersion(id) {
                         </button>
                         <a href="{{ route('admin.products') }}" class="btn btn-outline-secondary ms-2">{{ __('messages.cancel') ?? 'Cancel' }}</a>
                     </div>
+                </div>
             </div>
-        </div>
+        </form>
     </div>
 
     {{-- Sidebar: File Versions --}}
     <div class="col-lg-4">
         <div class="card border-0 shadow-sm">
-            <div class="card-header bg-white fw-semibold">{{ __('messages.file_versions') ?? 'File Versions' }}</div>
-            <div class="card-body p-0">
+            <div class="card-header bg-white fw-semibold d-flex justify-content-between align-items-center">
+                <span>{{ __('messages.file_versions') ?? 'File Versions' }}</span>
+                <span class="badge bg-soft-primary text-primary" id="file-versions-count">{{ $files->count() }}</span>
+            </div>
+            <div class="card-body p-0" id="file-versions-container">
                 @forelse($files as $file)
-                    <div class="border-bottom border-light">
+                    <div class="border-bottom border-light" id="file-version-row-{{ $file->id }}">
                         <div class="p-3 cursor-pointer d-flex justify-content-between align-items-center file-version-header" onclick="toggleFileVersion({{ $file->id }})">
-                            <div class="fw-semibold fs-13">
+                            <div class="fw-semibold fs-13 d-flex align-items-center">
                                 <i class="feather-chevron-right me-2 text-muted collapse-icon" id="icon-{{ $file->id }}"></i>
-                                {{ $file->name }}
+                                <span id="version-header-name-{{ $file->id }}">{{ $file->name }}</span>
                             </div>
-                            <span class="badge bg-soft-primary text-primary fs-11">
+                            <span class="badge bg-soft-primary text-primary fs-11" title="{{ __('messages.downloads') ?? 'Downloads' }}">
                                 <i class="feather-download me-1"></i>{{ $file->shortLink->clik ?? 0 }}
                             </span>
                         </div>
                         
                         <div id="file-version-{{ $file->id }}" style="display: none;" class="file-version-content">
                             <div class="p-3 border-top border-light">
+                                <div id="file-alert-{{ $file->id }}"></div>
+
                                 <div class="mb-3">
                                     <label class="form-label fs-11 fw-bold text-uppercase text-muted mb-1">{{ __('messages.version_number') ?? 'Version Number' }}</label>
-                                    <input type="text" name="existing_files[{{ $file->id }}][vnbr]" class="form-control form-control-sm mb-3" value="{{ $file->name }}">
+                                    <input type="text" id="file-vnbr-{{ $file->id }}" class="form-control form-control-sm mb-2" value="{{ $file->name }}">
                                     
                                     <label class="form-label fs-11 fw-bold text-uppercase text-muted mb-1">{{ __('messages.file_link') ?? 'File Link' }}</label>
-                                    <input type="text" name="existing_files[{{ $file->id }}][link]" class="form-control form-control-sm mb-3" value="{{ $file->o_mode }}">
+                                    <input type="text" id="file-link-{{ $file->id }}" class="form-control form-control-sm mb-2" value="{{ $file->o_mode }}">
                                     
-                                    <label class="form-label fs-11 fw-bold text-uppercase text-muted mb-1">{{ __('messages.description') ?? 'Description' }}</label>
-                                    <textarea name="existing_files[{{ $file->id }}][desc]" class="form-control form-control-sm mb-3" rows="3">{{ $file->o_valuer }}</textarea>
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <label class="form-label fs-11 fw-bold text-uppercase text-muted mb-0">{{ __('messages.changelog_notes') ?? 'Changelog / Notes' }}</label>
+                                        <span class="text-muted fs-11" id="file-desc-count-{{ $file->id }}">{{ number_format(mb_strlen($file->o_valuer ?? '')) }} {{ __('messages.chars') ?? 'chars' }}</span>
+                                    </div>
+                                    <textarea id="file-desc-{{ $file->id }}" class="form-control form-control-sm mb-3 font-monospace fs-12" rows="4" oninput="updateCharCount({{ $file->id }})">{{ $file->o_valuer }}</textarea>
                                 </div>
                                 
-                                <div class="d-flex align-items-center justify-content-between">
+                                <div class="d-flex align-items-center justify-content-between pt-2 border-top border-light">
+                                    <div class="d-flex gap-1">
+                                        <button type="button" class="btn btn-primary btn-sm fs-11" id="btn-save-file-{{ $file->id }}" onclick="saveFileVersion({{ $file->id }})">
+                                            <i class="feather-save me-1"></i>{{ __('messages.save') ?? 'Save Version' }}
+                                        </button>
+                                        <button type="button" class="btn btn-soft-danger btn-sm fs-11" onclick="deleteFileVersion({{ $file->id }})" title="{{ __('messages.delete') ?? 'Delete Version' }}">
+                                            <i class="feather-trash-2"></i>
+                                        </button>
+                                    </div>
                                     @php $isUrl = filter_var($file->o_mode, FILTER_VALIDATE_URL); @endphp
-                                    <a href="{{ $isUrl ? $file->o_mode : url($file->o_mode) }}" target="_blank" class="btn btn-soft-info btn-sm fs-11">
+                                    <a href="{{ $isUrl ? $file->o_mode : url($file->o_mode) }}" target="_blank" class="btn btn-soft-info btn-sm fs-11" id="file-test-link-{{ $file->id }}">
                                         <i class="feather-external-link me-1"></i>{{ __('messages.test_link') ?? 'Test Link' }}
                                     </a>
                                 </div>
@@ -344,7 +482,7 @@ function toggleFileVersion(id) {
                         </div>
                     </div>
                 @empty
-                    <div class="p-4 text-center text-muted">
+                    <div class="p-4 text-center text-muted" id="no-files-placeholder">
                         <i class="feather-package fs-3 d-block mb-2"></i>
                         {{ __('messages.no_files') ?? 'No file versions yet.' }}
                     </div>
@@ -369,7 +507,6 @@ function toggleFileVersion(id) {
         @endif
     </div>
 </div>
-</form>
 
 {{-- Ratings & Reviews Moderation --}}
 <div class="card border-0 shadow-sm mt-4">

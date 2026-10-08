@@ -705,7 +705,7 @@ class StoreController extends Controller
 
         $request->validate([
             'vnbr'       => ['required', 'string', 'min:2', 'max:12', 'regex:/^[-a-zA-Z0-9.]+$/'],
-            'desc'       => ['required', 'string', 'min:10', 'max:2400'],
+            'desc'       => ['required', 'string', 'min:10', 'max:65535'],
             'linkzip'    => ['required', 'string'],
             'pts'        => ['nullable', 'integer', 'min:0', 'max:999999'],
             'img'        => ['nullable', 'string'],
