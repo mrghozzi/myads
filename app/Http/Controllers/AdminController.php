@@ -6075,14 +6075,40 @@ class AdminController extends Controller
 
     public function maintenance()
     {
-        $maintenanceSettings = $this->maintenanceMode->settings();
-        $maintenanceUsers = User::query()->whereIn('id', array_filter([
-            $maintenanceSettings['enabled_by'] ?? 0,
-            $maintenanceSettings['last_changed_by'] ?? 0,
-        ]))->get()->keyBy('id');
+        try {
+            $maintenanceSettings = $this->maintenanceMode->settings();
+        } catch (\Throwable $e) {
+            report($e);
+            $maintenanceSettings = [];
+        }
 
-        $orphanDiagnostics = $this->orphanCleanup->diagnoseOrphans();
-        $bypassUrl = $this->maintenanceMode->bypassUrl();
+        try {
+            $maintenanceUsers = User::query()->whereIn('id', array_filter([
+                $maintenanceSettings['enabled_by'] ?? 0,
+                $maintenanceSettings['last_changed_by'] ?? 0,
+            ]))->get()->keyBy('id');
+        } catch (\Throwable $e) {
+            report($e);
+            $maintenanceUsers = collect();
+        }
+
+        try {
+            $orphanDiagnostics = $this->orphanCleanup->diagnoseOrphans();
+        } catch (\Throwable $e) {
+            report($e);
+            $orphanDiagnostics = [
+                'records' => ['follows' => 0, 'user_reactions' => 0, 'notifications' => 0, 'total' => 0],
+                'content' => ['comments' => 0, 'reactions' => 0, 'data_reactions' => 0, 'aux_files' => 0, 'total' => 0],
+                'stats' => ['banner_stats' => 0, 'link_stats' => 0, 'smart_stats' => 0, 'orphaned_visits' => 0, 'total' => 0],
+            ];
+        }
+
+        try {
+            $bypassUrl = $this->maintenanceMode->bypassUrl();
+        } catch (\Throwable $e) {
+            report($e);
+            $bypassUrl = '';
+        }
 
         // Calculate diagnostics for session and log files
         $logPath = storage_path('logs');
