@@ -331,9 +331,11 @@
         </div>
     </section>
 </div>
+@endsection
 
+@section('modals')
 <!-- Executive Moderation Action Modal -->
-<div class="modal fade" id="moderationActionModal" tabindex="-1" aria-labelledby="moderationActionModalLabel" aria-hidden="true">
+<div class="modal fade" id="moderationActionModal" tabindex="-1" aria-labelledby="moderationActionModalLabel" aria-hidden="true" style="z-index: 1065;">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
             <div class="modal-header border-bottom px-4 py-3" style="background: linear-gradient(135deg, rgba(35, 210, 226, 0.08) 0%, rgba(56, 116, 255, 0.08) 100%);">
@@ -446,9 +448,19 @@
         </div>
     </div>
 </div>
+@endsection
 
+@push('scripts')
 <script>
     function openModerationModal(reportId, targetTitle, targetUser, category) {
+        const modalEl = document.getElementById('moderationActionModal');
+        if (!modalEl) return;
+
+        // Ensure modal is appended to body so it never inherits nxl-container blur or stacking filters
+        if (modalEl.parentElement !== document.body) {
+            document.body.appendChild(modalEl);
+        }
+
         const form = document.getElementById('moderationActionForm');
         form.action = '{{ url('/admin/reports') }}/' + reportId + '/action';
         document.getElementById('modalReportRef').textContent = '#' + reportId;
@@ -461,7 +473,6 @@
         if (defaultRadio) defaultRadio.checked = true;
         toggleModerationFields('dismiss');
 
-        const modalEl = document.getElementById('moderationActionModal');
         if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
             const modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
             modal.show();
@@ -484,4 +495,4 @@
         }
     }
 </script>
-@endsection
+@endpush

@@ -171,4 +171,16 @@
             width: 100%;
         }
     }
+
+    /* Modal Layering & Stacking Context Integrity */
+    #moderationActionModal {
+        z-index: 1065 !important;
+        filter: none !important;
+    }
+    body.modal-open #moderationActionModal {
+        filter: none !important;
+    }
+    .modal-backdrop {
+        z-index: 1055 !important;
+    }
 </style>
