@@ -19,9 +19,11 @@ class CommentResource extends JsonResource
             'id' => $this->id,
             'user' => new UserResource($this->whenLoaded('user')),
             'topic_id' => $this->tid, // tid usually represents the tp_id or topic id
+            'parent_id' => $this->parent_id,
             'text' => $this->txt,
             'date' => $this->date,
             'date_formatted' => $this->date ? Carbon::createFromTimestamp($this->date)->diffForHumans() : '',
+            'replies' => CommentResource::collection($this->whenLoaded('replies')),
         ];
     }
 }

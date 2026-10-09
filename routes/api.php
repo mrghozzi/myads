@@ -82,6 +82,7 @@ Route::middleware(['api.key', 'auth:sanctum'])->group(function () {
     Route::post('/statuses', [App\Http\Controllers\Api\StatusController::class, 'store']);
     Route::post('/statuses/{status}/update', [App\Http\Controllers\Api\StatusController::class, 'update']);
     Route::delete('/statuses/{status}', [App\Http\Controllers\Api\StatusController::class, 'destroy']);
+    Route::post('/statuses/{status}/report', [App\Http\Controllers\Api\StatusController::class, 'report']);
     
     // Suggestions & Autocomplete API
     Route::get('/tags/suggest', [App\Http\Controllers\TagController::class, 'suggest']);
@@ -109,6 +110,7 @@ Route::middleware(['api.key', 'auth:sanctum'])->group(function () {
     Route::post('/profile/{identifier}/follow', [App\Http\Controllers\Api\ProfileController::class, 'follow']);
     Route::post('/profile/{identifier}/block', [App\Http\Controllers\Api\ProfileController::class, 'block']);
     Route::delete('/profile/{identifier}/unblock', [App\Http\Controllers\Api\ProfileController::class, 'unblock']);
+    Route::post('/profile/{identifier}/report', [App\Http\Controllers\Api\ProfileController::class, 'report']);
 
     // Messages API
     Route::get('/messages', [App\Http\Controllers\Api\MessageController::class, 'index']);

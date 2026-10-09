@@ -132,4 +132,57 @@ class ProfileController extends Controller
 
         return response()->json(['message' => 'User unblocked successfully', 'blocked' => false]);
     }
+
+    /**
+     * Report a user profile to moderation suite.
+     */
+    public function report(Request $request, $identifier, \App\Services\ModerationService $moderation)
+    {
+        $request->validate([
+            'reason' => 'required|string|max:1000',
+            'category' => 'nullable|string|in:spam,harassment,inappropriate,copyright,misinformation,scam,other',
+        ]);
+
+        $targetUser = User::resolvePublicIdentifier($identifier) ?: User::where('username', $identifier)->first();
+        if (!$targetUser) {
+            return response()->json(['error' => 'User not found'], 404);
+        }
+
+        $userId = Auth::id();
+        if ((int) $userId === (int) $targetUser->id) {
+            return response()->json(['error' => 'You cannot report yourself'], 400);
+        }
+
+        $sType = 99;
+        $tpId = (int) $targetUser->id;
+
+        $existing = \App\Models\Report::where('uid', $userId)
+            ->where('s_type', $sType)
+            ->where('tp_id', $tpId)
+            ->where('statu', 1)
+            ->first();
+
+        if ($existing) {
+            return response()->json([
+                'message' => __('messages.report_already_submitted') ?? 'You have already submitted an active report for this member.',
+            ], 422);
+        }
+
+        $report = new \App\Models\Report();
+        $report->uid = $userId;
+        $report->s_type = $sType;
+        $report->tp_id = $tpId;
+        $report->txt = $request->input('reason');
+        $report->category = $request->input('category', 'other');
+        $report->statu = 1;
+        $report->save();
+
+        $moderation->checkAutoQuarantine($sType, $tpId);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => __('messages.report_submitted_successfully') ?? 'Your report has been submitted and is under review.',
+            'report_id' => $report->id,
+        ], 200);
+    }
 }

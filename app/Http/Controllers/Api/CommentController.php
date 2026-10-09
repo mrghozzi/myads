@@ -13,11 +13,16 @@ class CommentController extends Controller
 {
     public function index(Status $status)
     {
-        // For general statuses, comments are usually in f_coment with tid = status->tp_id
-        // This is a simplified fetch based on the most common status types (100, 2, 4)
-        
-        $comments = ForumComment::with('user')
-            ->where('tid', $status->tp_id)
+        $targetTid = (int) ($status->tp_id ?: $status->id);
+        $comments = ForumComment::with(['user', 'replies.user'])
+            ->where(function ($q) use ($status, $targetTid) {
+                if ($status->tp_id) {
+                    $q->where('tid', $status->tp_id);
+                } else {
+                    $q->where('tid', $targetTid);
+                }
+            })
+            ->whereNull('parent_id')
             ->orderBy('date', 'desc')
             ->paginate(20);
 
@@ -28,20 +33,55 @@ class CommentController extends Controller
     {
         $request->validate([
             'text' => 'required|string',
+            'parent_id' => 'nullable|integer',
         ]);
 
+        $text = trim((string) $request->input('text'));
+        if (app(\App\Services\ModerationService::class)->containsProfanity($text)) {
+            return response()->json([
+                'message' => __('messages.moderation_profanity_blocked') ?? 'Your comment contains prohibited words.',
+            ], 422);
+        }
+
         $user = Auth::user();
+        $targetTid = (int) ($status->tp_id ?: $status->id);
+        $parentId = $request->filled('parent_id') ? (int) $request->input('parent_id') : null;
+        $parentComment = null;
+        if ($parentId) {
+            $parentComment = ForumComment::where('id', $parentId)->first();
+            if (!$parentComment) {
+                $parentId = null;
+            }
+        }
 
         $comment = new ForumComment();
         $comment->uid = $user->id;
-        $comment->tid = $status->tp_id; 
-        $comment->txt = $request->input('text');
+        $comment->tid = $targetTid; 
+        $comment->parent_id = $parentId;
+        $comment->txt = $text;
         $comment->date = time();
         $comment->save();
 
+        if ($parentComment && (int) $parentComment->uid !== (int) $user->id) {
+            $parentAuthor = \App\Models\User::find($parentComment->uid);
+            if ($parentAuthor) {
+                app(\App\Services\NotificationService::class)->send(
+                    $parentAuthor,
+                    __('messages.user_replied_to_your_comment', ['user' => $user->username]),
+                    '',
+                    'reply',
+                    $user->id,
+                    'forum_reply'
+                );
+            }
+        }
+
+        $resource = new CommentResource($comment->load('user'));
+
         return response()->json([
             'message' => 'Comment added successfully',
-            'comment' => new CommentResource($comment)
+            'data' => $resource,
+            'comment' => $resource,
         ], 201);
     }
 }

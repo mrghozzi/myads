@@ -68,6 +68,16 @@ class ReportController extends Controller
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
+        if (!$request->has('txt') && $request->filled('reason')) {
+            $request->merge(['txt' => $request->reason]);
+        }
+        if (!$request->has('s_type') && $request->filled('type')) {
+            $request->merge(['s_type' => $request->type]);
+        }
+        if (!$request->has('tp_id') && $request->filled('id')) {
+            $request->merge(['tp_id' => $request->id]);
+        }
+
         $request->validate([
             'txt' => 'required|string|max:1000',
             's_type' => 'required|integer',

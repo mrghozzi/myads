@@ -231,4 +231,48 @@ class StatusController extends Controller
 
         return StatusResource::collection($statuses);
     }
+
+    /**
+     * Report a status post to moderation suite.
+     */
+    public function report(Request $request, Status $status, \App\Services\ModerationService $moderation)
+    {
+        $request->validate([
+            'reason' => 'required|string|max:1000',
+            'category' => 'nullable|string|in:spam,harassment,inappropriate,copyright,misinformation,scam,other',
+        ]);
+
+        $userId = Auth::id();
+        $sType = (int) $status->s_type;
+        $tpId = (int) ($status->tp_id ?: $status->id);
+
+        $existing = \App\Models\Report::where('uid', $userId)
+            ->where('s_type', $sType)
+            ->where('tp_id', $tpId)
+            ->where('statu', 1)
+            ->first();
+
+        if ($existing) {
+            return response()->json([
+                'message' => __('messages.report_already_submitted') ?? 'You have already submitted an active report for this content.',
+            ], 422);
+        }
+
+        $report = new \App\Models\Report();
+        $report->uid = $userId;
+        $report->s_type = $sType;
+        $report->tp_id = $tpId;
+        $report->txt = $request->input('reason');
+        $report->category = $request->input('category', 'other');
+        $report->statu = 1;
+        $report->save();
+
+        $moderation->checkAutoQuarantine($sType, $tpId);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => __('messages.report_submitted_successfully') ?? 'Your report has been submitted and is under review.',
+            'report_id' => $report->id,
+        ], 200);
+    }
 }
