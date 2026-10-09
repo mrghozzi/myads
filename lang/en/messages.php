@@ -5062,6 +5062,16 @@ return [
     "violates_community_standards" => "Violates community standards",
     "actioned" => "Actioned",
     "warnings" => "Warnings",
+
+    // Added missing keys
+    'Follow' => 'Follow',
+    'target' => 'Target',
+    'product' => 'Product',
+    'version_changelog' => 'Version Changelog / Notes',
+    'version_changelog_placeholder' => 'Enter release notes / changelog for this new version...',
+    'changelog_notes' => 'Changelog / Notes',
+    'chars' => 'chars',
+    'report_placeholder' => 'Explain why this violates community standards...',
 ];
 
 

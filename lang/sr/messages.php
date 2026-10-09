@@ -4166,4 +4166,14 @@ return [
     'reading_time' => 'Reading Time',
     'showing' => 'Showing',
     'submitted' => 'Submitted',
+
+    // Added missing keys
+    'Follow' => 'Прати',
+    'target' => 'Циљ',
+    'product' => 'Производ',
+    'version_changelog' => 'Дневник промена верзије / Белешке',
+    'version_changelog_placeholder' => 'Унесите белешке о издању / дневник промена за ову нову верзију...',
+    'changelog_notes' => 'Дневник промена / Белешке',
+    'chars' => 'знакова',
+    'report_placeholder' => 'Објасните зашто ово крши стандарде заједнице...',
 ];

@@ -4166,4 +4166,14 @@ return [
     'reading_time' => 'Reading Time',
     'showing' => 'Showing',
     'submitted' => 'Submitted',
+
+    // Added missing keys
+    'Follow' => 'フォロー',
+    'target' => '対象',
+    'product' => '製品',
+    'version_changelog' => 'バージョン更新履歴 / メモ',
+    'version_changelog_placeholder' => 'この新しいバージョンのリリースノート / 変更履歴を入力してください...',
+    'changelog_notes' => '変更履歴 / ノート',
+    'chars' => '文字',
+    'report_placeholder' => 'コミュニティ規約に違反している理由を説明してください...',
 ];

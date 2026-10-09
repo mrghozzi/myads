@@ -4177,4 +4177,14 @@ return [
     'reading_time' => 'Temps de lecture',
     'showing' => 'Affichage de',
     'submitted' => 'Soumis',
+
+    // Added missing keys
+    'Follow' => 'Suivre',
+    'target' => 'Cible',
+    'product' => 'Produit',
+    'version_changelog' => 'Journal des modifications / Notes de version',
+    'version_changelog_placeholder' => 'Entrez les notes de version / modifications pour cette nouvelle version...',
+    'changelog_notes' => 'Journal des modifications / Notes',
+    'chars' => 'caractères',
+    'report_placeholder' => 'Expliquez pourquoi cela enfreint les règles de la communauté...',
 ];

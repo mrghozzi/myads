@@ -4166,4 +4166,14 @@ return [
     'reading_time' => 'Reading Time',
     'showing' => 'Showing',
     'submitted' => 'Submitted',
+
+    // Added missing keys
+    'Follow' => 'Подписаться',
+    'target' => 'Цель',
+    'product' => 'Продукт',
+    'version_changelog' => 'Список изменений / Примечания к версии',
+    'version_changelog_placeholder' => 'Введите примечания к выпуску / список изменений для этой новой версии...',
+    'changelog_notes' => 'Журнал изменений / Примечания',
+    'chars' => 'символов',
+    'report_placeholder' => 'Объясните, почему это нарушает правила сообщества...',
 ];

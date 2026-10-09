@@ -5063,6 +5063,16 @@ return [
     "violates_community_standards" => "مخالفة معايير المجتمع",
     "actioned" => "تمت معالجتها",
     "warnings" => "الإنذارات",
+
+    // Added missing keys
+    'Follow' => 'متابعة',
+    'target' => 'المستهدف',
+    'product' => 'المنتج',
+    'version_changelog' => 'سجل التغييرات / ملاحظات الإصدار',
+    'version_changelog_placeholder' => 'أدخل ملاحظات الإصدار / سجل التغييرات لهذا الإصدار الجديد...',
+    'changelog_notes' => 'سجل التغييرات / ملاحظات',
+    'chars' => 'حرف',
+    'report_placeholder' => 'اشرح سبب انتهاك هذا المحتوى لمعايير المجتمع...',
 ];
 
 

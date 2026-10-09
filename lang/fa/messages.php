@@ -4168,4 +4168,14 @@ return [
     'reading_time' => 'Reading Time',
     'showing' => 'Showing',
     'submitted' => 'Submitted',
+
+    // Added missing keys
+    'Follow' => 'دنبال کردن',
+    'target' => 'هدف',
+    'product' => 'محصول',
+    'version_changelog' => 'گزارش تغییرات / یادداشت‌های نسخه',
+    'version_changelog_placeholder' => 'یادداشت‌های انتشار / گزارش تغییرات این نسخه جدید را وارد کنید...',
+    'changelog_notes' => 'گزارش تغییرات / یادداشت‌ها',
+    'chars' => 'کاراکتر',
+    'report_placeholder' => 'توضیح دهید چرا این مورد قوانین جامعه را نقض می‌کند...',
 ];

@@ -4173,4 +4173,14 @@ return [
     'reading_time' => 'Okuma Süresi',
     'showing' => 'Gösterilen',
     'submitted' => 'Gönderildi',
+
+    // Added missing keys
+    'Follow' => 'Takip Et',
+    'target' => 'Hedef',
+    'product' => 'Ürün',
+    'version_changelog' => 'Sürüm Değişiklik Günlüğü / Notlar',
+    'version_changelog_placeholder' => 'Bu yeni sürüm için sürüm notlarını / değişiklik günlüğünü girin...',
+    'changelog_notes' => 'Değişiklik Günlüğü / Notlar',
+    'chars' => 'karakter',
+    'report_placeholder' => 'Bunun topluluk kurallarını neden ihlal ettiğini açıklayın...',
 ];

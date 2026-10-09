@@ -4171,4 +4171,14 @@ return [
     'reading_time' => 'Reading Time',
     'showing' => 'Showing',
     'submitted' => 'Submitted',
+
+    // Added missing keys
+    'Follow' => '关注',
+    'target' => '目标',
+    'product' => '商品',
+    'version_changelog' => '版本更新日志 / 说明',
+    'version_changelog_placeholder' => '输入此新版本的发布说明 / 更新日志...',
+    'changelog_notes' => '更新日志 / 备注',
+    'chars' => '字符',
+    'report_placeholder' => '请说明违规或不符合社区准则的原因...',
 ];
