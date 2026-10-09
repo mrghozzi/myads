@@ -4030,16 +4030,33 @@ class AdminController extends Controller
             return redirect()->route('admin.reports');
         }
 
-        $reports = Report::with('reporter')->orderBy('id', 'desc')->paginate(20);
+        $query = Report::with(['reporter', 'moderator'])->orderBy('id', 'desc');
+
+        if (request()->filled('status')) {
+            if (request('status') === 'pending') {
+                $query->where('statu', 1);
+            } elseif (request('status') === 'reviewed') {
+                $query->where('statu', '!=', 1);
+            }
+        }
+
+        if (request()->filled('category') && request('category') !== 'all') {
+            $query->where('category', request('category'));
+        }
+
+        $reports = $query->paginate(20)->withQueryString();
         $reportItems = $this->buildAdminReportItems($reports->getCollection());
         $reportStats = [
             'total' => Report::query()->count(),
             'pending' => Report::query()->where('statu', 1)->count(),
             'reviewed' => Report::query()->where('statu', '!=', 1)->count(),
+            'actioned' => Report::query()->where('action_taken', '!=', 'none')->whereNotNull('action_taken')->count(),
+            'warnings' => \App\Models\UserWarning::query()->count(),
         ];
 
         return view('admin::admin.reports', compact('reports', 'reportItems', 'reportStats'));
     }
+
 
     /**
      * @param \Illuminate\Support\Collection<int, \App\Models\Report> $reports
@@ -4235,6 +4252,28 @@ class AdminController extends Controller
             return [
                 'id' => $report->id,
                 'reason' => $report->txt,
+                'category' => $report->category ?: 'other',
+                'category_label' => match($report->category) {
+                    'spam' => __('messages.report_category_spam'),
+                    'harassment' => __('messages.report_category_harassment'),
+                    'inappropriate' => __('messages.report_category_inappropriate'),
+                    'copyright' => __('messages.report_category_copyright'),
+                    'misinformation' => __('messages.report_category_misinformation'),
+                    'scam' => __('messages.report_category_scam'),
+                    default => __('messages.report_category_other'),
+                },
+                'action_taken' => $report->action_taken ?: 'none',
+                'action_taken_label' => match($report->action_taken) {
+                    'dismissed' => __('messages.moderation_action_dismissed'),
+                    'content_hidden' => __('messages.moderation_action_hidden'),
+                    'content_deleted' => __('messages.moderation_action_deleted'),
+                    'user_warned' => __('messages.moderation_action_warned'),
+                    'user_banned' => __('messages.moderation_action_banned'),
+                    default => __('messages.none'),
+                },
+                'action_notes' => $report->action_notes,
+                'moderator' => $report->moderator,
+                'resolved_at' => $report->resolved_at ? \Carbon\Carbon::createFromTimestamp($report->resolved_at)->diffForHumans() : null,
                 'is_pending' => (int) $report->statu === 1,
                 'status_label' => (int) $report->statu === 1 ? __('messages.pending') : __('messages.reviewed'),
                 'status_modifier' => (int) $report->statu === 1 ? 'pending' : 'reviewed',
@@ -4251,8 +4290,34 @@ class AdminController extends Controller
                 'target_user_profile_url' => $targetUser ? route('profile.show', $targetUser->username) : null,
                 'target_user_message_url' => $targetUser ? route('messages.create', ['recipient' => $targetUser->username]) : null,
                 'target_user_admin_url' => $targetUser ? route('admin.users.edit', $targetUser->id) : null,
+                's_type' => (int) $report->s_type,
+                'tp_id' => (int) $report->tp_id,
             ];
         })->values();
+    }
+
+    public function actionReport(Request $request, $id, \App\Services\ModerationService $moderation)
+    {
+        $report = Report::findOrFail($id);
+
+        $request->validate([
+            'action' => 'required|string|in:dismiss,hide_content,delete_content,warn_user,ban_user',
+            'notes' => 'nullable|string|max:1000',
+            'deduct_points' => 'nullable|integer|min:0|max:10000',
+            'warning_reason' => 'nullable|string|max:255',
+        ]);
+
+        $result = $moderation->takeAction($report, $request->action, $request->all(), auth()->user());
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json($result, $result['success'] ? 200 : 422);
+        }
+
+        if ($result['success']) {
+            return redirect()->back()->with('success', $result['message']);
+        }
+
+        return redirect()->back()->with('error', $result['message']);
     }
 
     public function storeReport(Request $request)
@@ -4261,6 +4326,7 @@ class AdminController extends Controller
             'txt' => 'required|string',
             's_type' => 'required|integer',
             'tp_id' => 'required|integer',
+            'category' => 'nullable|string|in:spam,harassment,inappropriate,copyright,misinformation,scam,other',
         ]);
 
         $report = Report::create([
@@ -4268,11 +4334,17 @@ class AdminController extends Controller
             'txt' => $request->txt,
             's_type' => $request->s_type,
             'tp_id' => $request->tp_id,
+            'category' => $request->category ?: 'other',
             'statu' => 1,
+            'action_taken' => 'none',
         ]);
+
+        // Auto-quarantine evaluation
+        app(\App\Services\ModerationService::class)->checkAutoQuarantine((int) $request->s_type, (int) $request->tp_id);
 
         return response()->json(['success' => true, 'id' => $report->id]);
     }
+
 
     public function deleteReport($id)
     {

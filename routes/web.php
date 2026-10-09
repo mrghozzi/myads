@@ -777,6 +777,7 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
 
     // Reports
     Route::get('/reports', [AdminController::class, 'reports'])->name('admin.reports');
+    Route::post('/reports/{id}/action', [AdminController::class, 'actionReport'])->name('admin.reports.action');
     Route::delete('/reports/{id}', [AdminController::class, 'deleteReport'])->name('admin.reports.delete');
 
     // Widgets

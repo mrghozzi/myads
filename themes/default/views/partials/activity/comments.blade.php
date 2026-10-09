@@ -170,7 +170,7 @@
                 @auth
                     @if($user && auth()->id() !== $user->id)
                         <div class="meta-line">
-                            <a class="meta-line-timestamp reply-comment-btn" href="javascript:void(0);" onclick="replyToComment('{{ $user->username }}', {{ $id }})" title="{{ __('messages.reply') }}">
+                            <a class="meta-line-timestamp reply-comment-btn" href="javascript:void(0);" onclick="replyToComment('{{ $user->username }}', {{ $id }}, {{ $comment->id }})" title="{{ __('messages.reply') }}">
                                 <i class="fa fa-reply" aria-hidden="true"></i> {{ __('messages.reply') }}
                             </a>
                         </div>
@@ -201,7 +201,72 @@
             </div>
         </div>
     </div>
+
+    @if($type === 'forum' && $comment->replies && $comment->replies->count() > 0)
+        <div class="post-comment-replies" style="margin-inline-start: 46px; margin-top: 6px; margin-bottom: 12px; border-inline-start: 2px solid rgba(130, 140, 170, 0.25); padding-inline-start: 14px;">
+            @foreach($comment->replies as $reply)
+                @php
+                    $replyUser = $reply->user;
+                    $replyDate = $reply->date;
+                    $replyFormatted = \App\Support\ForumCommentFormatter::format($reply->txt);
+                    $isReplyOwner = auth()->check() && $replyUser && (int) auth()->id() === (int) $replyUser->id;
+                    $canDeleteReply = auth()->check() && ($isReplyOwner || auth()->user()->isAdmin() || $canDeleteAsForumModerator);
+                @endphp
+                <div class="post-comment post-comment--nested coment{{ $reply->id }}" id="comment_{{ $reply->id }}" style="margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px dashed rgba(130, 140, 170, 0.15);">
+                    @if($replyUser)
+                        <a class="user-avatar small no-outline user-popover-trigger {{ $replyUser->isOnline() ? 'online' : 'offline' }}" data-username="{{ $replyUser->username }}" href="{{ route('profile.show', $replyUser->username) }}" style="width: 26px; height: 28px;">
+                            <div class="user-avatar-content">
+                                <div class="hexagon-image-30-32" data-src="{{ $replyUser->avatarUrl() }}" style="width: 26px; height: 28px; position: relative;">
+                                    <canvas style="position: absolute; top: 0px; left: 0px;" width="26" height="28"></canvas>
+                                </div>
+                            </div>
+                        </a>
+                    @else
+                        <div class="user-avatar small no-outline offline" style="width: 26px; height: 28px;">
+                            <div class="user-avatar-content">
+                                <div class="hexagon-image-30-32" data-src="{{ asset('upload/_avatar.png') }}" style="width: 26px; height: 28px; position: relative;">
+                                    <canvas style="position: absolute; top: 0px; left: 0px;" width="26" height="28"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+                    <div class="post-comment-text">
+                        @if($replyUser)
+                            <a class="post-comment-text-author user-popover-trigger" data-username="{{ $replyUser->username }}" href="{{ route('profile.show', $replyUser->username) }}">{{ $replyUser->username }}</a>
+                        @else
+                            <span class="post-comment-text-author">{{ __('messages.deleted_user') }}</span>
+                        @endif
+                        <div class="forum-rdx-comment-body">{!! $replyFormatted !!}</div>
+                    </div>
+                    <div class="content-actions">
+                        <div class="content-action">
+                            <div class="meta-line">
+                                <p class="meta-line-timestamp">{{ \Carbon\Carbon::createFromTimestamp((int) $replyDate)->diffForHumans() }}</p>
+                            </div>
+                            @auth
+                                @if($replyUser && auth()->id() !== $replyUser->id)
+                                    <div class="meta-line">
+                                        <a class="meta-line-timestamp reply-comment-btn" href="javascript:void(0);" onclick="replyToComment('{{ $replyUser->username }}', {{ $id }}, {{ $comment->id }})" title="{{ __('messages.reply') }}">
+                                            <i class="fa fa-reply" aria-hidden="true"></i> {{ __('messages.reply') }}
+                                        </a>
+                                    </div>
+                                @endif
+                            @endauth
+                            @if($canDeleteReply)
+                                <div class="meta-line trash_comment{{ $reply->id }}">
+                                    <a class="meta-line-timestamp" href="javascript:void(0);" onclick="deleteComment({{ $reply->id }}, 'forum')">
+                                        <i class="fa fa-trash" aria-hidden="true"></i>
+                                    </a>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+    @endif
 @endforeach
+
 
 @if(!isset($hide_form) || !$hide_form)
     <div class="comment_form{{ $id }}">
@@ -260,6 +325,11 @@
                                     <i class="fa fa-cloud-arrow-up" aria-hidden="true"></i>
                                     <span>{{ __('messages.drop_files_here') ?? 'أفلت الصورة هنا للإرفاق' }}</span>
                                 </div>
+                                <div id="reply_indicator_{{ $id }}" class="reply-indicator" style="display: none; align-items: center; justify-content: space-between; font-size: 12px; padding: 6px 12px; background: rgba(35, 210, 226, 0.12); border-radius: 6px; margin-bottom: 8px; color: #18a2b8;">
+                                    <span><i class="fa fa-reply"></i> {{ __('messages.replying_to') ?? 'Replying to' }} <strong>@<span id="reply_username_{{ $id }}"></span></strong></span>
+                                    <button type="button" onclick="cancelReply({{ $id }})" style="background: none; border: none; color: #dc3545; font-weight: bold; cursor: pointer;">&times; {{ __('messages.cancel') }}</button>
+                                </div>
+                                <input type="hidden" id="parent_comment_id_{{ $id }}" name="parent_id" value="">
                                 <textarea id="txt_comment{{ $id }}" name="comment_text" class="forum-rdx-comment-input" data-md-editor="1" placeholder="{{ __('messages.your_comment') }}"></textarea>
                                 <div class="forum-rdx-comment-media-preview is-hidden" id="comment_media_preview_{{ $id }}">
                                     <img src="" alt="preview" id="comment_media_thumb_{{ $id }}" class="comment-media-thumb">
@@ -299,21 +369,36 @@
 <script src="{{ theme_asset('js/global.hexagons.js') }}"></script>
 
 <script>
-    if (typeof window.replyToComment !== 'function') {
-        window.replyToComment = function(username, postId) {
-            const textarea = document.getElementById('txt_comment' + postId);
-            if (textarea) {
-                const mention = '@' + username + ' ';
-                if (!textarea.value.includes(mention)) {
-                    textarea.value = mention + textarea.value;
-                }
-                
-                // Focus and Scroll
-                textarea.focus();
-                textarea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    window.replyToComment = function(username, postId, parentId = null) {
+        const parentInput = document.getElementById('parent_comment_id_' + postId);
+        const indicator = document.getElementById('reply_indicator_' + postId);
+        const userSpan = document.getElementById('reply_username_' + postId);
+        const textarea = document.getElementById('txt_comment' + postId);
+
+        if (parentInput && parentId) {
+            parentInput.value = parentId;
+        }
+        if (indicator && userSpan) {
+            userSpan.textContent = username;
+            indicator.style.display = 'flex';
+        }
+        if (textarea) {
+            const mention = '@' + username + ' ';
+            if (!textarea.value.includes(mention)) {
+                textarea.value = mention + textarea.value;
             }
-        };
-    }
+            textarea.focus();
+            textarea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    };
+
+    window.cancelReply = function(postId) {
+        const parentInput = document.getElementById('parent_comment_id_' + postId);
+        const indicator = document.getElementById('reply_indicator_' + postId);
+        if (parentInput) parentInput.value = '';
+        if (indicator) indicator.style.display = 'none';
+    };
+
 
     window.commentPendingMedia = window.commentPendingMedia || {};
 

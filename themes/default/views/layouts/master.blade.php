@@ -1418,33 +1418,53 @@
             let container = document.getElementById('report' + containerId);
             if (!container) return null;
 
+            let selectId = 'report_cat_' + containerId;
             let textareaId = 'report_txt_' + containerId;
             let submitId = 'report_submit_' + containerId;
             let closeId = 'report_close_' + containerId;
 
             container.innerHTML = `
 <hr />
-<h4><i class="fa fa-flag" aria-hidden="true"></i>&nbsp;${title}</h4>
-<br />
-<textarea class="quicktext form-control" id="${textareaId}"></textarea>
-<hr />
-<center>
-<div class="btn-group">
-<button id="${submitId}" class="btn btn-warning">${REPORT_TEXTS.confirm}</button>&nbsp;
-<button id="${closeId}" class="btn btn-danger">${REPORT_TEXTS.close}</button>
+<div class="report-box p-3 rounded" style="background: rgba(130, 140, 170, 0.08); border: 1px solid rgba(130, 140, 170, 0.2);">
+    <h5 style="font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+        <i class="fa fa-flag text-warning" aria-hidden="true"></i> ${title}
+    </h5>
+    <div class="form-group mb-2">
+        <label for="${selectId}" style="font-weight: 600; font-size: 12px; margin-bottom: 4px; display: block; color: var(--text-color, #333);">${REPORT_TEXTS.category}:</label>
+        <select id="${selectId}" class="form-select form-control" style="font-size: 13px; height: 38px; border-radius: 6px;">
+            <option value="spam">${REPORT_TEXTS.catSpam}</option>
+            <option value="harassment">${REPORT_TEXTS.catHarassment}</option>
+            <option value="inappropriate">${REPORT_TEXTS.catInappropriate}</option>
+            <option value="copyright">${REPORT_TEXTS.catCopyright}</option>
+            <option value="misinformation">${REPORT_TEXTS.catMisinformation}</option>
+            <option value="scam">${REPORT_TEXTS.catScam}</option>
+            <option value="other" selected>${REPORT_TEXTS.catOther}</option>
+        </select>
+    </div>
+    <div class="form-group mb-3">
+        <label for="${textareaId}" style="font-weight: 600; font-size: 12px; margin-bottom: 4px; display: block; color: var(--text-color, #333);">${REPORT_TEXTS.details}:</label>
+        <textarea class="quicktext form-control" id="${textareaId}" style="border-radius: 6px; min-height: 80px;" placeholder="${REPORT_TEXTS.placeholder}"></textarea>
+    </div>
+    <div class="d-flex justify-content-end gap-2" style="gap: 8px;">
+        <button id="${closeId}" class="btn btn-sm btn-secondary" style="border-radius: 6px; padding: 6px 14px;">${REPORT_TEXTS.close}</button>
+        <button id="${submitId}" class="btn btn-sm btn-warning" style="border-radius: 6px; padding: 6px 14px; font-weight: 600;">${REPORT_TEXTS.confirm}</button>
+    </div>
 </div>
-</center>
 `;
 
-            return { container, textareaId, submitId, closeId };
+            return { container, selectId, textareaId, submitId, closeId };
         }
 
         function submitReportForm(form, tpId, sType) {
             let textarea = document.getElementById(form.textareaId);
+            let select = document.getElementById(form.selectId);
             if (!textarea) return;
 
             let reason = textarea.value.trim();
-            if (!reason) return;
+            let category = select ? select.value : 'other';
+            if (!reason) {
+                reason = select ? select.options[select.selectedIndex].text : 'Violation report';
+            }
 
             form.container.innerHTML = `<hr /><div class="alert alert-warning alert-dismissible fade show" role="alert">${REPORT_TEXTS.pending}<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button></div>`;
 
@@ -1454,7 +1474,7 @@
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': getCsrfToken()
                 },
-                body: JSON.stringify({ tp_id: tpId, s_type: sType, txt: reason })
+                body: JSON.stringify({ tp_id: tpId, s_type: sType, txt: reason, category: category })
             })
             .then(response => response.json().then(data => ({ ok: response.ok, data })))
             .then(({ ok, data }) => {
@@ -1476,7 +1496,18 @@
             close: @json(__('messages.close')),
             pending: @json(__('messages.pending')),
             errorPrefix: @json(__('messages.error_prefix')),
+            category: @json(__('messages.report_category') ?? 'Violation Category'),
+            details: @json(__('messages.details') ?? 'Details / Reason'),
+            placeholder: @json(__('messages.report_placeholder') ?? 'Explain why this violates community standards...'),
+            catSpam: @json(__('messages.report_category_spam')),
+            catHarassment: @json(__('messages.report_category_harassment')),
+            catInappropriate: @json(__('messages.report_category_inappropriate')),
+            catCopyright: @json(__('messages.report_category_copyright')),
+            catMisinformation: @json(__('messages.report_category_misinformation')),
+            catScam: @json(__('messages.report_category_scam')),
+            catOther: @json(__('messages.report_category_other')),
         };
+
 
         function reportPost(id, type, containerId = null) {
             let targetId = containerId || id;
@@ -1600,9 +1631,16 @@
             formData.append('id', id);
             formData.append('type', type);
             formData.append('comment', text);
+
+            let parentInput = document.getElementById('parent_comment_id_' + id);
+            if (parentInput && parentInput.value) {
+                formData.append('parent_id', parentInput.value);
+            }
+
             if (mediaFile) {
                 formData.append('attachment', mediaFile);
             }
+
 
             fetch('{{ route("comment.store") }}', {
                 method: 'POST',
@@ -1643,7 +1681,11 @@
                 if (window.clearCommentPendingMedia) {
                     window.clearCommentPendingMedia(id);
                 }
+                if (window.cancelReply) {
+                    window.cancelReply(id);
+                }
                 input.dispatchEvent(new Event('input', { bubbles: true }));
+
                 input.focus();
             })
             .catch(error => {

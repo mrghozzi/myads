@@ -57,7 +57,9 @@ class SecuritySettings
         'disable_new_registrations' => 0,
         'force_https' => 0,
         'captcha_enabled_for_login' => 0,
+        'moderation_banned_words' => '',
     ];
+
 
     public static function all(): array
     {
@@ -128,6 +130,7 @@ class SecuritySettings
             'disable_new_registrations' => !empty($values['disable_new_registrations']) ? 1 : 0,
             'force_https' => !empty($values['force_https']) ? 1 : 0,
             'captcha_enabled_for_login' => !empty($values['captcha_enabled_for_login']) ? 1 : 0,
+            'moderation_banned_words' => self::sanitizeList((string) ($values['moderation_banned_words'] ?? $defaults['moderation_banned_words'])),
         ]);
     }
 
@@ -179,6 +182,7 @@ class SecuritySettings
             'disable_new_registrations' => self::boolish($settings['disable_new_registrations'] ?? self::DEFAULTS['disable_new_registrations']),
             'force_https' => self::boolish($settings['force_https'] ?? self::DEFAULTS['force_https']),
             'captcha_enabled_for_login' => self::boolish($settings['captcha_enabled_for_login'] ?? self::DEFAULTS['captcha_enabled_for_login']),
+            'moderation_banned_words' => (string) ($settings['moderation_banned_words'] ?? self::DEFAULTS['moderation_banned_words']),
         ];
     }
 

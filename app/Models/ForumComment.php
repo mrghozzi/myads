@@ -17,6 +17,7 @@ class ForumComment extends Model
     protected $fillable = [
         'uid',
         'tid',
+        'parent_id',
         'txt',
         'date',
     ];
@@ -30,4 +31,15 @@ class ForumComment extends Model
     {
         return $this->belongsTo(ForumTopic::class, 'tid');
     }
+
+    public function parent()
+    {
+        return $this->belongsTo(ForumComment::class, 'parent_id');
+    }
+
+    public function replies()
+    {
+        return $this->hasMany(ForumComment::class, 'parent_id')->orderBy('id', 'asc');
+    }
 }
+

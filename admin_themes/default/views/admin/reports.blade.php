@@ -5,7 +5,9 @@
 
 @php
     $reportItems = $reportItems ?? collect();
-    $reportStats = $reportStats ?? ['total' => $reports->total() ?? 0, 'pending' => 0, 'reviewed' => 0];
+    $reportStats = $reportStats ?? ['total' => $reports->total() ?? 0, 'pending' => 0, 'reviewed' => 0, 'actioned' => 0, 'warnings' => 0];
+    $currentStatus = request('status', 'all');
+    $currentCategory = request('category', 'all');
 @endphp
 
 @section('content')
@@ -48,46 +50,97 @@
             </div>
         </div>
 
-        <div class="row g-4 extension-hub__stats mb-4">
-            <div class="col-md-4">
+        <!-- 5-Metric Executive KPI Strip -->
+        <div class="row g-3 extension-hub__stats mb-4">
+            <div class="col-sm-6 col-xl">
                 <div class="extension-hub__stat">
                     <div class="extension-hub__stat-label">
                         <span class="extension-hub__stat-icon"><i class="feather-layers"></i></span>
-                        {{ __('messages.total') }} {{ __('messages.reports') }}
+                        {{ __('messages.total') }}
                     </div>
                     <div class="extension-hub__stat-value">{{ $reportStats['total'] }}</div>
                 </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-sm-6 col-xl">
                 <div class="extension-hub__stat">
                     <div class="extension-hub__stat-label">
-                        <span class="extension-hub__stat-icon"><i class="feather-clock"></i></span>
+                        <span class="extension-hub__stat-icon text-warning"><i class="feather-clock"></i></span>
                         {{ __('messages.pending') }}
                     </div>
-                    <div class="extension-hub__stat-value">{{ $reportStats['pending'] }}</div>
+                    <div class="extension-hub__stat-value text-warning">{{ $reportStats['pending'] }}</div>
                 </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-sm-6 col-xl">
                 <div class="extension-hub__stat">
                     <div class="extension-hub__stat-label">
-                        <span class="extension-hub__stat-icon"><i class="feather-check-circle"></i></span>
+                        <span class="extension-hub__stat-icon text-success"><i class="feather-check-circle"></i></span>
                         {{ __('messages.reviewed') }}
                     </div>
-                    <div class="extension-hub__stat-value">{{ $reportStats['reviewed'] }}</div>
+                    <div class="extension-hub__stat-value text-success">{{ $reportStats['reviewed'] }}</div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl">
+                <div class="extension-hub__stat">
+                    <div class="extension-hub__stat-label">
+                        <span class="extension-hub__stat-icon text-primary"><i class="feather-shield"></i></span>
+                        {{ __('messages.actioned') }}
+                    </div>
+                    <div class="extension-hub__stat-value text-primary">{{ $reportStats['actioned'] ?? 0 }}</div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl">
+                <div class="extension-hub__stat">
+                    <div class="extension-hub__stat-label">
+                        <span class="extension-hub__stat-icon text-danger"><i class="feather-alert-triangle"></i></span>
+                        {{ __('messages.warnings') }}
+                    </div>
+                    <div class="extension-hub__stat-value text-danger">{{ $reportStats['warnings'] ?? 0 }}</div>
                 </div>
             </div>
         </div>
 
         <div class="extension-hub__surface p-4 p-xl-5">
+            <!-- Header & Filter Bar -->
             <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-3 mb-4">
                 <div>
                     <h2 class="extension-hub__section-title">{{ __('messages.reports_list') }}</h2>
                     <p class="extension-hub__section-subtitle">{{ __('messages.reports_desc') }}</p>
                 </div>
-                <span class="extension-hub__count-pill">
-                    <i class="feather-flag"></i>
-                    {{ $reports->total() }} {{ __('messages.reports') }}
-                </span>
+                <div class="d-flex flex-wrap align-items-center gap-2">
+                    <span class="extension-hub__count-pill">
+                        <i class="feather-flag"></i>
+                        {{ $reports->total() }} {{ __('messages.reports') }}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Filter Tabs & Category Filter -->
+            <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4 pb-3 border-bottom">
+                <div class="btn-group" role="group" aria-label="Status filters">
+                    <a href="{{ route('admin.reports', array_merge(request()->query(), ['status' => 'all'])) }}" class="btn btn-sm {{ $currentStatus === 'all' ? 'btn-primary' : 'btn-outline-secondary' }}">
+                        {{ __('messages.all') }}
+                    </a>
+                    <a href="{{ route('admin.reports', array_merge(request()->query(), ['status' => 'pending'])) }}" class="btn btn-sm {{ $currentStatus === 'pending' ? 'btn-warning' : 'btn-outline-secondary' }}">
+                        {{ __('messages.pending') }} ({{ $reportStats['pending'] }})
+                    </a>
+                    <a href="{{ route('admin.reports', array_merge(request()->query(), ['status' => 'reviewed'])) }}" class="btn btn-sm {{ $currentStatus === 'reviewed' ? 'btn-success' : 'btn-outline-secondary' }}">
+                        {{ __('messages.reviewed') }} ({{ $reportStats['reviewed'] }})
+                    </a>
+                </div>
+
+                <div class="d-flex align-items-center gap-2">
+                    <label for="categoryFilter" class="form-label mb-0 small text-muted"><i class="feather-filter"></i> {{ __('messages.filter_by_category') }}:</label>
+                    <select id="categoryFilter" class="form-select form-select-sm" style="width: auto; min-width: 170px;" onchange="window.location.href = this.value;">
+                        <option value="{{ route('admin.reports', array_merge(request()->query(), ['category' => 'all'])) }}" {{ $currentCategory === 'all' ? 'selected' : '' }}>
+                            {{ __('messages.all_categories') }}
+                        </option>
+                        @foreach(\App\Models\Report::CATEGORIES as $cat)
+                            <option value="{{ route('admin.reports', array_merge(request()->query(), ['category' => $cat])) }}" {{ $currentCategory === $cat ? 'selected' : '' }}>
+                                {{ __('messages.report_category_' . $cat) }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
             </div>
 
             @if($reportItems->isEmpty())
@@ -105,6 +158,8 @@
                             $reporter = $item['reporter'];
                             $targetUser = $item['target_user'];
                             $reporterInitial = $reporter && $reporter->username ? \Illuminate\Support\Str::upper(\Illuminate\Support\Str::substr($reporter->username, 0, 1)) : 'G';
+                            $category = $item['category'] ?? 'other';
+                            $actionTaken = $item['action_taken'] ?? 'none';
                         @endphp
 
                         <article class="extension-hub__list-card reports-hub__card {{ $item['is_pending'] ? 'reports-hub__card--pending' : '' }}">
@@ -120,6 +175,18 @@
                                             <span class="reports-hub__type-pill">
                                                 <i class="{{ $item['target_icon'] }}"></i>
                                                 {{ $item['target_label'] }}
+                                            </span>
+                                        @endif
+
+                                        <!-- Violation Category Badge -->
+                                        <span class="badge rounded-pill bg-danger-subtle text-danger border border-danger-subtle px-2 py-1" style="font-size: 11px;">
+                                            <i class="feather-tag"></i> {{ $item['category_label'] }}
+                                        </span>
+
+                                        <!-- Action Taken Badge -->
+                                        @if($actionTaken !== 'none')
+                                            <span class="badge rounded-pill bg-primary-subtle text-primary border border-primary-subtle px-2 py-1" style="font-size: 11px;">
+                                                <i class="feather-shield"></i> {{ $item['action_taken_label'] }}
                                             </span>
                                         @endif
                                     </div>
@@ -170,6 +237,16 @@
                                                 </div>
                                                 <p class="reports-hub__reason">{{ $item['reason'] }}</p>
 
+                                                @if(!empty($item['action_notes']))
+                                                    <div class="alert alert-secondary py-2 px-3 my-2" style="font-size: 12px; background: rgba(130, 140, 170, 0.08); border: 1px dashed rgba(130, 140, 170, 0.25);">
+                                                        <strong><i class="feather-info"></i> {{ __('messages.moderation_notes') }}:</strong>
+                                                        {{ $item['action_notes'] }}
+                                                        @if(!empty($item['moderator']))
+                                                            <span class="text-muted d-block mt-1">— {{ __('messages.moderated_by') }} {{ $item['moderator']->username }} ({{ $item['resolved_at'] }})</span>
+                                                        @endif
+                                                    </div>
+                                                @endif
+
                                                 <div class="reports-hub__label mt-4">
                                                     <i class="{{ $item['target_icon'] }}"></i>
                                                     {{ __('messages.report_content') }}
@@ -218,6 +295,12 @@
                                 </div>
 
                                 <div class="reports-hub__action-col">
+                                    <!-- Executive Moderation Suite Action Trigger -->
+                                    <button type="button" class="btn-extension-glass btn-extension-glass--primary" onclick="openModerationModal({{ $item['id'] }}, '{{ addslashes($item['target_title'] ?? '') }}', '{{ $targetUser ? addslashes($targetUser->username) : '' }}', '{{ $category }}')" title="{{ __('messages.take_moderation_action') }}">
+                                        <i class="feather-shield"></i>
+                                        <span>{{ __('messages.take_moderation_action') }}</span>
+                                    </button>
+
                                     @if($item['is_pending'])
                                         <a href="{{ route('admin.reports', ['wtid' => $item['id']]) }}" class="btn-extension-glass btn-extension-glass--warning" title="{{ __('messages.review') }}">
                                             <i class="feather-eye"></i>
@@ -248,4 +331,157 @@
         </div>
     </section>
 </div>
+
+<!-- Executive Moderation Action Modal -->
+<div class="modal fade" id="moderationActionModal" tabindex="-1" aria-labelledby="moderationActionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
+            <div class="modal-header border-bottom px-4 py-3" style="background: linear-gradient(135deg, rgba(35, 210, 226, 0.08) 0%, rgba(56, 116, 255, 0.08) 100%);">
+                <h5 class="modal-title d-flex align-items-center gap-2 fw-bold" id="moderationActionModalLabel">
+                    <i class="feather-shield text-primary"></i>
+                    {{ __('messages.moderation_actions') }}
+                    <span class="badge bg-primary-subtle text-primary border" id="modalReportRef"></span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="moderationActionForm" method="POST" action="">
+                @csrf
+                <div class="modal-body p-4">
+                    <!-- Report Target Summary -->
+                    <div class="p-3 mb-4 rounded-3 d-flex flex-wrap align-items-center justify-content-between gap-3" style="background: rgba(130, 140, 170, 0.07); border: 1px solid rgba(130, 140, 170, 0.15);">
+                        <div>
+                            <small class="text-muted d-block">{{ __('messages.target') }}:</small>
+                            <strong id="modalTargetTitle">-</strong>
+                        </div>
+                        <div>
+                            <small class="text-muted d-block">{{ __('messages.user') }}:</small>
+                            <span class="badge bg-secondary-subtle text-secondary" id="modalTargetUser">-</span>
+                        </div>
+                        <div>
+                            <small class="text-muted d-block">{{ __('messages.report_category') }}:</small>
+                            <span class="badge bg-danger-subtle text-danger" id="modalCategory">-</span>
+                        </div>
+                    </div>
+
+                    <!-- Action Selection Radios -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold mb-2">{{ __('messages.action_taken') }}:</label>
+                        <div class="row g-2">
+                            <div class="col-md-6">
+                                <label class="d-flex align-items-start p-3 rounded border h-100" style="cursor: pointer;">
+                                    <input type="radio" name="action" value="dismiss" checked class="form-check-input me-3 mt-1" onchange="toggleModerationFields(this.value)">
+                                    <div>
+                                        <strong>{{ __('messages.moderation_action_dismiss') }}</strong>
+                                        <small class="text-muted d-block">{{ __('messages.report_dismissed_unfounded') }}</small>
+                                    </div>
+                                </label>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="d-flex align-items-start p-3 rounded border h-100" style="cursor: pointer;">
+                                    <input type="radio" name="action" value="hide_content" class="form-check-input me-3 mt-1" onchange="toggleModerationFields(this.value)">
+                                    <div>
+                                        <strong class="text-warning">{{ __('messages.moderation_action_hide') }}</strong>
+                                        <small class="text-muted d-block">{{ __('messages.content_hidden_community_standards') }}</small>
+                                    </div>
+                                </label>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="d-flex align-items-start p-3 rounded border h-100" style="cursor: pointer;">
+                                    <input type="radio" name="action" value="delete_content" class="form-check-input me-3 mt-1" onchange="toggleModerationFields(this.value)">
+                                    <div>
+                                        <strong class="text-danger">{{ __('messages.moderation_action_delete') }}</strong>
+                                        <small class="text-muted d-block">{{ __('messages.content_deleted_community_standards') }}</small>
+                                    </div>
+                                </label>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="d-flex align-items-start p-3 rounded border h-100" style="cursor: pointer;">
+                                    <input type="radio" name="action" value="warn_user" class="form-check-input me-3 mt-1" onchange="toggleModerationFields(this.value)">
+                                    <div>
+                                        <strong class="text-warning">{{ __('messages.moderation_action_warn') }}</strong>
+                                        <small class="text-muted d-block">{{ __('messages.official_moderation_warning') }}</small>
+                                    </div>
+                                </label>
+                            </div>
+                            <div class="col-12">
+                                <label class="d-flex align-items-start p-3 rounded border" style="cursor: pointer;">
+                                    <input type="radio" name="action" value="ban_user" class="form-check-input me-3 mt-1" onchange="toggleModerationFields(this.value)">
+                                    <div>
+                                        <strong class="text-danger">{{ __('messages.moderation_action_ban') }}</strong>
+                                        <small class="text-muted d-block">{{ __('messages.repeated_community_violations') }}</small>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Warning Reason Group -->
+                    <div class="mb-3 d-none" id="warningReasonGroup">
+                        <label class="form-label fw-bold">{{ __('messages.moderation_warning_reason') }}:</label>
+                        <input type="text" name="warning_reason" class="form-control" placeholder="{{ __('messages.violates_community_standards') }}">
+                    </div>
+
+                    <!-- Deduct Points Group -->
+                    <div class="mb-3 d-none" id="deductPtsGroup">
+                        <label class="form-label fw-bold">{{ __('messages.moderation_deduct_pts') }}:</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="feather-award"></i> PTS</span>
+                            <input type="number" name="deduct_points" class="form-control" min="0" max="10000" value="0">
+                        </div>
+                    </div>
+
+                    <!-- Admin Notes / Reason -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">{{ __('messages.moderation_notes') }}:</label>
+                        <textarea name="notes" rows="3" class="form-control" placeholder="{{ __('messages.notes') }}..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer border-top px-4 py-3">
+                    <button type="button" class="btn btn-secondary rounded-pill px-4" data-bs-dismiss="modal">{{ __('messages.cancel') }}</button>
+                    <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold">
+                        <i class="feather-check-circle me-1"></i> {{ __('messages.confirm') }}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openModerationModal(reportId, targetTitle, targetUser, category) {
+        const form = document.getElementById('moderationActionForm');
+        form.action = '{{ url('/admin/reports') }}/' + reportId + '/action';
+        document.getElementById('modalReportRef').textContent = '#' + reportId;
+        document.getElementById('modalTargetTitle').textContent = targetTitle || '-';
+        document.getElementById('modalTargetUser').textContent = targetUser || '-';
+        document.getElementById('modalCategory').textContent = category || 'other';
+
+        // Reset radio and fields
+        const defaultRadio = document.querySelector('input[name="action"][value="dismiss"]');
+        if (defaultRadio) defaultRadio.checked = true;
+        toggleModerationFields('dismiss');
+
+        const modalEl = document.getElementById('moderationActionModal');
+        if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+            const modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+            modal.show();
+        }
+    }
+
+    function toggleModerationFields(action) {
+        const warnGroup = document.getElementById('warningReasonGroup');
+        const deductGroup = document.getElementById('deductPtsGroup');
+
+        if (action === 'warn_user') {
+            if (warnGroup) warnGroup.classList.remove('d-none');
+            if (deductGroup) deductGroup.classList.remove('d-none');
+        } else if (action === 'delete_content') {
+            if (warnGroup) warnGroup.classList.add('d-none');
+            if (deductGroup) deductGroup.classList.remove('d-none');
+        } else {
+            if (warnGroup) warnGroup.classList.add('d-none');
+            if (deductGroup) deductGroup.classList.add('d-none');
+        }
+    }
+</script>
 @endsection

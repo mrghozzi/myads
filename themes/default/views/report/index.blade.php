@@ -54,12 +54,28 @@
                     <input type="hidden" name="s_type" value="{{ $typeId }}">
                     <input type="hidden" name="tp_id" value="{{ $item->id }}">
                     
+                    <div class="form-item mb-3">
+                        <div class="form-select">
+                            <label for="category" class="form-label" style="font-weight: 600;">{{ __('messages.report_category') ?? 'Violation Category' }}</label>
+                            <select id="category" name="category" class="form-control form-select">
+                                <option value="spam">{{ __('messages.report_category_spam') }}</option>
+                                <option value="harassment">{{ __('messages.report_category_harassment') }}</option>
+                                <option value="inappropriate">{{ __('messages.report_category_inappropriate') }}</option>
+                                <option value="copyright">{{ __('messages.report_category_copyright') }}</option>
+                                <option value="misinformation">{{ __('messages.report_category_misinformation') }}</option>
+                                <option value="scam">{{ __('messages.report_category_scam') }}</option>
+                                <option value="other" selected>{{ __('messages.report_category_other') }}</option>
+                            </select>
+                        </div>
+                    </div>
+
                     <div class="form-item">
                         <div class="form-input small full">
                             <label for="txt">{{ __('messages.reason') }}</label>
                             <textarea id="txt" name="txt" rows="4" required placeholder="{{ __('messages.reason_desc') }}"></textarea>
                         </div>
                     </div>
+
                     
                     <br>
                     <div class="form-actions" style="text-align: center;">

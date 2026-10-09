@@ -54,11 +54,13 @@ class CommentController extends Controller
                     && (!Auth::check() || !$this->canUserCommentLockedTopic(Auth::user(), $topic));
             }
 
-            $comments = ForumComment::with('user')
+            $comments = ForumComment::with(['user', 'replies.user'])
                 ->where('tid', $id)
+                ->whereNull('parent_id')
                 ->orderBy('id', 'desc')
                 ->limit($limit)
                 ->get();
+
         } elseif ($type == 'directory') {
             $comments = Option::with('user')
                 ->where('o_parent', $id)
@@ -125,9 +127,14 @@ class CommentController extends Controller
             return response()->json(['error' => $violation], 422);
         }
 
+        if ($text !== '' && app(\App\Services\ModerationService::class)->containsProfanity($text)) {
+            return response()->json(['error' => __('messages.moderation_profanity_blocked') ?? 'Your comment contains prohibited words.'], 422);
+        }
+
         if ($cooldownMessage = $securityThrottle->actionMessage($user, 'comment')) {
             return response()->json(['error' => $cooldownMessage], 429);
         }
+
 
         if ($file) {
             $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'];
@@ -206,12 +213,22 @@ class CommentController extends Controller
             }
         }
 
+        $parentId = $request->filled('parent_id') ? (int) $request->input('parent_id') : null;
+        $parentComment = null;
+        if ($parentId && $type === 'forum') {
+            $parentComment = ForumComment::where('id', $parentId)->where('tid', $id)->first();
+            if (!$parentComment) {
+                $parentId = null;
+            }
+        }
+
         DB::beginTransaction();
         try {
             if ($type == 'forum') {
                 $comment = ForumComment::create([
                     'uid' => $uid,
                     'tid' => $id,
+                    'parent_id' => $parentId,
                     'txt' => $text,
                     'date' => $time
                 ]);
@@ -219,7 +236,22 @@ class CommentController extends Controller
                 $ownerId = $topic->uid;
                 $url = "/t" . $id; // Legacy URL format support (Root relative)
 
+                if ($parentComment && $parentComment->uid != $uid && $parentComment->uid != $ownerId) {
+                    $parentAuthor = User::find($parentComment->uid);
+                    if ($parentAuthor) {
+                        $notifications->send(
+                            $parentAuthor,
+                            __('messages.user_replied_to_your_comment', ['user' => $user->username]),
+                            $url,
+                            'reply',
+                            $uid,
+                            'forum_reply'
+                        );
+                    }
+                }
+
             } elseif ($type == 'directory') {
+
                 $comment = Option::create([
                     'name' => 'coment_dir',
                     'o_type' => 'd_coment',
