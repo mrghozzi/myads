@@ -1,5 +1,5 @@
-# MYADS v4.6.3 REST & Real-Time API Documentation
-> **Specification Version:** `v4.6.3` (Stable Release)  
+# MYADS v4.6.2 REST & Real-Time API Documentation
+> **Specification Version:** `v4.6.2` (Stable Release)  
 > **Target Framework:** Laravel 12 (PHP 8.2+)  
 > **Authentication Engines:** Laravel Sanctum (Mobile & Web API), OAuth 2.0 (Developer Platform), and Server-Sent Events (SSE Live Stream).  
 > **Last Updated:** October 2026  
@@ -8,7 +8,7 @@
 
 ## 1. Overview & Architecture
 
-The MYADS v4.6.3 API ecosystem delivers high-performance, secure, and extensible interfaces connecting web clients, companion mobile applications (Flutter), and third-party developer integrations.
+The MYADS v4.6.2 API ecosystem delivers high-performance, secure, and extensible interfaces connecting web clients, companion mobile applications (Flutter), and third-party developer integrations.
 
 ### Primary API Subsystems
 1. **Internal Mobile & Web API (`/api/*`):** Powered by Laravel Sanctum for mobile app companion clients (`myads_app` v1.8.0+22) and web AJAX workflows.
@@ -77,7 +77,7 @@ All API responses, notification payloads, and validation error messages support 
 When `public_member_ids_enabled` is active in Admin Security Settings, all API resources (`UserResource`, `UserProfileResource`, `StatusResource`, `SearchApiController`) automatically serve randomized public identifiers (`public_uid`) or usernames in place of numeric database IDs (`users.id`), neutralizing member enumeration attacks.
 
 ### E. Peer-to-Peer Service Orders Non-Escrow Policy
-Under the platform's Terms of Service and Bulletin Architecture (v4.6.3), MYADS functions strictly as a peer-to-peer advertising, discovery, and networking platform. The platform does not act as an escrow agent, financial intermediary, or guarantor of deliverables for service orders negotiated at `/orders` or `/api/orders`.
+Under the platform's Terms of Service and Bulletin Architecture (v4.6.2), MYADS functions strictly as a peer-to-peer advertising, discovery, and networking platform. The platform does not act as an escrow agent, financial intermediary, or guarantor of deliverables for service orders negotiated at `/orders` or `/api/orders`.
 
 ---
 
@@ -463,13 +463,94 @@ All settings mutation endpoints accept `POST`, `PUT`, and `PATCH` HTTP verbs for
 - `POST /api/statuses`: Publish a new post (Multipart Form-Data supporting `text`, `post_kind`, `video_title`, `video_thumbnail`, `images[]`, `videos[]`, `audios[]`, `files[]`, `link_url`, `group_id`).
 - `POST /api/statuses/{id}/update`: Update an existing status (requires post ownership).
 - `DELETE /api/statuses/{id}`: Delete a status (requires post ownership or admin permissions).
+- `POST /api/statuses/{id}/report`: Report a status post to the platform moderation suite (`/admin/reports`).
+  - *Headers:* `X-API-KEY: {key}`, `Authorization: Bearer {token}`, `Content-Type: application/json`
+  - *Payload Parameters:*
+    | Parameter | Type | Required | Description |
+    |---|---|---|---|
+    | `reason` | string | **Yes** | Detailed explanation of the violation (max 1000 characters). |
+    | `category` | string | Optional | Standardized violation category (`spam`, `harassment`, `inappropriate`, `copyright`, `misinformation`, `scam`, `other`). Defaults to `other`. |
+  - *Automated Quarantine:* If content accumulates $\ge 3$ active community reports, it is automatically hidden by the Quarantine Engine pending human moderator resolution.
+  - *Duplicate Prevention:* Returns HTTP 422 if an active report from the authenticated member is already pending.
+  - *Response (HTTP 200):*
+    ```json
+    {
+        "status": "success",
+        "message": "Your report has been submitted and is under review.",
+        "report_id": 105
+    }
+    ```
 
 ---
 
-### C. Comments & Reactions
+### C. Comments & Reactions (Threaded Discussions Engine)
 
-- `GET /api/statuses/{id}/comments`: Retrieve paginated comments for a status.
-- `POST /api/statuses/{id}/comments`: Post a new comment (`{"text": "..."}`).
+MYADS v4.6.2 introduces true threaded comments supporting recursive parent-child discussion trees, real-time profanity filtering, and parent-author notification feedback.
+
+- `GET /api/statuses/{id}/comments`: Retrieve paginated root comments with eagerly-loaded nested replies trees (`whereNull('parent_id')`).
+  - *Pagination:* 20 root comments per page (`current_page`, `last_page`, `total`).
+  - *Response Structure:*
+    ```json
+    {
+        "data": [
+            {
+                "id": 142,
+                "user": {
+                    "id": 42,
+                    "username": "developer",
+                    "name": "Developer Name",
+                    "avatar": "https://domain.com/upload/avatar.png"
+                },
+                "topic_id": 88,
+                "parent_id": null,
+                "text": "This is a root discussion comment.",
+                "date": 1728518400,
+                "date_formatted": "2 hours ago",
+                "replies": [
+                    {
+                        "id": 143,
+                        "user": {
+                            "id": 55,
+                            "username": "contributor",
+                            "name": "Contributor",
+                            "avatar": "https://domain.com/upload/avatar55.png"
+                        },
+                        "topic_id": 88,
+                        "parent_id": 142,
+                        "text": "This is a direct nested reply to comment #142.",
+                        "date": 1728522000,
+                        "date_formatted": "1 hour ago",
+                        "replies": []
+                    }
+                ]
+            }
+        ]
+    }
+    ```
+- `POST /api/statuses/{id}/comments`: Post a new root comment or nested reply.
+  - *Headers:* `X-API-KEY: {key}`, `Authorization: Bearer {token}`, `Content-Type: application/json`
+  - *Payload Parameters:*
+    | Parameter | Type | Required | Description |
+    |---|---|---|---|
+    | `text` | string | **Yes** | Comment content. Scanned against the `moderation_banned_words` dictionary; returns HTTP 422 if vulgar or prohibited language is detected. |
+    | `parent_id` | integer | Optional | Target parent comment ID for threaded replies. Automatically notifies the parent comment author (`messages.user_replied_to_your_comment`). |
+  - *Response (HTTP 201):* Returns both `data` and `comment` containing the created `CommentResource`.
+    ```json
+    {
+        "message": "Comment added successfully",
+        "data": {
+            "id": 143,
+            "user": { "id": 55, "username": "contributor", "avatar": "..." },
+            "topic_id": 88,
+            "parent_id": 142,
+            "text": "This is a direct nested reply to comment #142.",
+            "date": 1728522000,
+            "date_formatted": "1 second ago",
+            "replies": []
+        },
+        "comment": { ... }
+    }
+    ```
 - `POST /api/reactions/toggle`: Toggle reaction on any supported entity.
   - *Payload:* `{"subject_id": 123, "type": 2, "reaction_name": "love"}`  
   - *Allowed Reactions:* `like`, `love`, `funny`, `wow`, `sad`, `angry`, `care`.
@@ -483,6 +564,22 @@ All settings mutation endpoints accept `POST`, `PUT`, and `PATCH` HTTP verbs for
 - `POST /api/profile/{identifier}/follow`: Toggle follow status.
 - `POST /api/profile/{identifier}/block`: Block user (`{"block_type": "full_platform|messages_only", "duration": 30}`).
 - `DELETE /api/profile/{identifier}/unblock`: Unblock user.
+- `POST /api/profile/{identifier}/report`: Report a member profile to the moderation suite (`s_type = 99`).
+  - *Payload Parameters:*
+    | Parameter | Type | Required | Description |
+    |---|---|---|---|
+    | `reason` | string | **Yes** | Reason for reporting member profile (max 1000 characters). |
+    | `category` | string | Optional | Standardized category (`spam`, `harassment`, `inappropriate`, `copyright`, `misinformation`, `scam`, `other`). Defaults to `other`. |
+  - *Self-Reporting:* Returns HTTP 400 if user attempts to report their own profile.
+  - *Duplicate Prevention:* Returns HTTP 422 if an active report is already pending.
+  - *Response (HTTP 200):*
+    ```json
+    {
+        "status": "success",
+        "message": "Your report has been submitted and is under review.",
+        "report_id": 106
+    }
+    ```
 
 ---
 
@@ -527,9 +624,9 @@ All settings mutation endpoints accept `POST`, `PUT`, and `PATCH` HTTP verbs for
 
 ---
 
-### G. Store Marketplace, Ratings & Reviews Engine (v4.6.3)
+### G. Store Marketplace, Ratings & Reviews Engine (v4.6.2)
 
-MYADS v4.6.3 provides an overhauled digital goods marketplace supporting 5-star customer ratings, verified buyer badges, screenshot gallery lightboxes, live demo previews, video embeds, and native Arabic & Unicode slug URL routing.
+MYADS v4.6.2 provides an overhauled digital goods marketplace supporting 5-star customer ratings, verified buyer badges, screenshot gallery lightboxes, live demo previews, video embeds, and native Arabic & Unicode slug URL routing.
 
 #### 1. Store Catalog & Details API
 - `GET /api/store/products`: Browse products with multi-criteria filtering and sorting:
@@ -643,7 +740,7 @@ MYADS v4.6.3 provides an overhauled digital goods marketplace supporting 5-star 
 
 ---
 
-### H. Service Orders Marketplace (Peer-to-Peer Bulletin Overhaul — v4.6.3)
+### H. Service Orders Marketplace (Peer-to-Peer Bulletin Overhaul — v4.6.2)
 
 The Service Orders engine at `/orders` and `/api/orders` provides end-to-end contract progression for freelance requests, custom software development, and design services based on a direct peer-to-peer bulletin model with explicit non-escrow disclaimers.
 
@@ -873,7 +970,7 @@ Unified AJAX/REST endpoints managing contextual discussions across all platform 
 
 ### N. Smart Partitioned XML Sitemaps
 
-MYADS v4.6.3 provides scalable, partitioned XML Sitemaps compliant with Google Sitemaps Protocol 0.9 and Schema.org standards:
+MYADS v4.6.2 provides scalable, partitioned XML Sitemaps compliant with Google Sitemaps Protocol 0.9 and Schema.org standards:
 
 | Endpoint | Content | Cache Strategy |
 |---|---|---|

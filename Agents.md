@@ -1,4 +1,4 @@
-# Agents.md — MYADS v4.6.1
+# Agents.md — MYADS v4.6.2
 
 > **Purpose:** This file gives AI coding agents a fast, comprehensive understanding of the MYADS project — its architecture, conventions, key files, and rules — so they can work effectively from a fresh chat context.
 
@@ -6,7 +6,7 @@
 
 ## 1. Project Identity
 
-- **Name:** MYADS v4.6.1
+- **Name:** MYADS v4.6.2
 - **Type:** Social network + ad exchange platform for website owners
 - **Framework:** Laravel 12 (PHP 8.2+)
 - **Database:** MySQL 5.7+ / MariaDB 10.3+
@@ -23,9 +23,9 @@ MYADS is a community platform where website owners:
 1. **Exchange advertising** — banner ads, text/link ads, visit exchange (surf-to-earn), YouTube Views Exchange (watch-to-earn), Smart Ads (contextual/native), and Custom Ads (member-to-member placements/deals).
 2. **Socialize** — profiles, follow system, community feed (posts, galleries, link previews, quote reposts, @mentions), private messaging, reactions, comments.
 3. **Forum** — categories with visibility controls, topics, moderation (pin/lock), attachments, moderator roles.
-4. **Marketplace (Store)** — upload/download scripts, plugins, templates (PTS-based pricing). Wiki-style Knowledgebase per product with Markdown support, article categories, category filtering, and paginated listings ordered by last modification date.
+4. **Marketplace (Store)** — upload/download scripts, plugins, templates (PTS-based pricing). Customer 5-star ratings & reviews with verified buyer badges, interactive screenshot lightbox galleries, live demo URL testing, video preview embeds, customer "My Purchases" library (`/store/my-purchases`), and full support for Arabic characters, spaces, and Unicode slugs. Wiki-style Knowledgebase per product with Markdown support, article categories, category filtering, and paginated listings ordered by last modification date.
 5. **Web Directory** — submit/browse categorized website listings.
-6. **Services Marketplace** — publish service requests, receive structured provider offers, award a provider, track delivery workflow, and exchange completion ratings.
+6. **Services Marketplace** — publish service requests, receive structured provider offers, award a provider, track delivery workflow, contract revision requests (`requestRevision`), milestone deadline tracking, deliverable attachments up to 25MB with protected downloads, explicit peer-to-peer non-escrow disclaimers, and exchange completion ratings.
 7. **News** — admin-published articles posted to community feed.
 8. **Gamification** — points (PTS), badges, quests, point transactions ledger.
 9. **SEO Suite** — centralized SEO engine, redesigned `@.superdesign` admin SEO suite (`/admin/seo/*`) with real-time performance & DB cleanup integration, dynamic robots.txt, sitemap index, GA4 integration, custom rules engine, and a **Free SEO Checker** for webmasters to analyze speed, errors, and backlinks.
@@ -36,8 +36,8 @@ MYADS is a community platform where website owners:
 14. **Media Manager** — administrative hub for monitoring, drag-and-drop uploading, multi-media previewing (images, HTML5 video/audio, code), renaming, filtering, sorting, bulk deleting, and caching media files (`/admin/media`).
 15. **Multimedia Posts** — community feed support for Video, Audio, Files, Music, and Clips with dedicated players, YouTube-style Watch Page (`/t{id}`) for regular video posts (`s_type == 10`), custom HTML5 video controls, video title & cover thumbnail fields, suggested video recommendations, and tag-sticker indicators.
 16. **Custom Member Ads** — members create embeddable ad spaces, negotiate direct deals, track impressions/clicks, and settle daily PTS payouts or record external agreements.
-17. **Mobile App API & Client** — foundational Flutter app for Android (`myads_app`) with full community feed parity (Reactions with points/notification syncing, Comments, Multimedia posts with Video/Audio/Image gallery/File rendering, Promoted Posts, Share intent), Forums, Store, a native **Clips System**, a dedicated **YouTube-Style Video Watch Screen** (`post_details_screen.dart`), Video Title & Cover Thumbnail composer support, a premium **Member Profile & Social Navigation** experience with vertical hexagonal avatars matching the web theme, and a **Settings & Communication Hub** (Messages, Notifications, localized in English/Arabic), all powered by Laravel Sanctum and a secure Mobile API.
-18. **Modern UI/UX** — Progressive Web App (PWA) support with offline fallback, a Live Global Search engine, Skeleton load placeholders, Toast notifications, Hover Popovers for user profiles, intelligent OS-based Dark Mode detection, and refined micro-animations.
+17. **Mobile App API & Client** — companion Flutter app for Android (`myads_app` v1.8.0+22) with full community feed parity (Reactions with points/notification syncing, True Threaded Comments with nested replies and contextual indicators, in-app Post & Profile Reporting Dialog with 7 standardized categories, Multimedia posts with Video/Audio/Image gallery/File rendering, Promoted Posts, Share intent), Forums, Store, a native **Clips System**, a dedicated **YouTube-Style Video Watch Screen** (`post_details_screen.dart`), Video Title & Cover Thumbnail composer support, a premium **Member Profile & Social Navigation** experience with vertical hexagonal avatars matching the web theme, and a **Settings & Communication Hub** (Messages, Notifications, localized in English/Arabic, bidirectional settings interoperability, dual-schema quests API), all powered by Laravel Sanctum and a secure Mobile API.
+18. **Modern UI/UX** — Progressive Web App (PWA) support with offline fallback, a Live Global Search engine, Skeleton load placeholders, Toast notifications, Hover Popovers for user profiles, intelligent OS-based Dark Mode detection, refined micro-animations, and True Threaded Comments with visual nested trees and contextual "Replying to @user" banners.
 19. **Smart Widget Management & Admin Control** — permission-gated empty widget prompt (`<x-widget-column>`) displaying location-aware instructions and CTA redirection to a redesigned `@.superdesign` admin widget management hub (`/admin/widgets`) featuring location filter chips, target place pre-selection (`place` param), and drag-and-drop row reordering.
 20. **Admin Dashboard Superdesign & Performance Engine** — complete `@.superdesign` overhaul of `/admin` with glassmorphic hero header, dynamic rotating 16-tip Admin Advice Engine ("Daily Admin Advice Engine"), real-time System Health Bar, optimized single-pass SQL query aggregation (95%+ query reduction), interactive 30-day analytics charts, developer & community hub links, and project support block.
 21. **YouTube-Style Video Hub (`/video`) & Member Profile Media Tabs** — dedicated YouTube-style Video Hub page designed according to `@.superdesign` guidelines, featuring a glassmorphic hero header with `/share` publisher redirection, scrollable tag filter pills (`All`, `Shorts Clips`, `Videos`, `Trending`, `Latest`), a dedicated **YouTube Shorts Shelf** (9:16 vertical cards with play overlays, clip titles, view counts, and publisher Hexagon Avatars), a Spotlight Hero Video, a 16:9 main video grid with multi-source video thumbnail resolution (direct upload, topic covers, image attachments, YouTube URL embed images, link previews), navigation sidebar integration, modern `@.superdesign` profile videos/clips tabs (`/u/{username}?tab=videos` & `/u/{username}?tab=clips`), an automated silent YouTube-style **Hover Video Preview Snippet System** with frame sync (`playing` event) & YouTube iframe preview fallback, and complete PHPUnit test suite (`VideoHubTest.php`).
@@ -86,6 +86,12 @@ MYADS is a community platform where website owners:
 59. **Dual Image Upload & URL Resolution for Banner Advertising (v4.6.0)** — Comprehensive overhaul of banner ad creative inputs across all creation and editing touchpoints (`/ads/promote`, `/ads/banners/create`, `/ads/banners/{id}/edit`, and `/admin/banners/{id}/edit`).
     - **Banner Image Upload Service (`BannerImageUploadService`):** Unified service handling server-side file uploads to `upload/banners/` with cryptographic naming, strict MIME/extension whitelisting (`jpg, jpeg, png, gif, webp, svg`), 5MB size limits, and full public URL persistence (`url('upload/banners/...')`) for flawless third-party embed rendering. Features intelligent 3-tier fallback (Upload > URL > Existing Creative) and internal URL safety detection.
     - **Frontend & Admin UI Enhancements:** Modern tabbed pill controls switching between Image URL and Local Device Upload, drag-and-drop file dropzones, and instantaneous client-side preview via `URL.createObjectURL(file)`. Full support for both primary and A/B test variations with reactive admin preview panels and 100% multilingual translation parity across 14 locales.
+60. **Professional Social Moderation Suite & Executive Enforcement Actions (v4.6.2)** — Built a comprehensive community moderation suite at `/admin/reports` with 7 standardized violation categories (Spam, Harassment, Inappropriate, Copyright, Misinformation, Scam, Other), 5 live KPI metric cards, dynamic category and status filtering, and an executive Moderation Action Modal supporting 5 granular enforcement workflows: Dismiss/Unfounded with feedback notice, Hide Content, Delete Content with customizable PTS deduction penalty, Official User Warning/Strike with automated strike-level increments in `user_warnings`, and User Ban & IP Blacklisting in `banned_ips`.
+61. **Automated Content Quarantine Engine & Audit Accountability (v4.6.2)** — Content receiving $\ge 3$ active community reports is immediately hidden/quarantined prior to human moderator review. Backed by `moderation_logs` immutable audit trail recording all moderator enforcement decisions, alongside bidirectional notification feedback loops informing both reporters and penalized authors.
+62. **True Threaded Comments (Nested Replies) Engine (v4.6.2)** — Upgraded comments architecture across `ForumComment`, `CommentController`, and web/mobile views with true hierarchical threaded discussions via `parent_id` foreign key. Features eager-loaded `replies.user` relations, indented visual trees (`.post-comment-replies`), contextual "Replying to @user" banner with cancel controls, automated parent-author reply notifications (`messages.user_replied_to_your_comment`), and dictionary-driven profanity/offensive language filters (`moderation_banned_words`).
+63. **Store Marketplace 5-Star Reviews, Screenshots Lightbox & Unicode Slugs Architecture (v4.6.2)** — Overhauled Store digital goods ecosystem with a 5-star customer ratings and reviews engine with automated Verified Buyer badge verification via product licenses, structured rating breakdown statistics, rich reviews display, real-time keyword search, 6 multi-criteria sorting modes, customer "My Purchases" buyer library (`/store/my-purchases`), product media galleries with multiple screenshots modal lightbox viewer, live demo URL testing, video preview embeds, full Arabic and Unicode slug URL routing, dedicated administrative store reviews moderation dashboard (`/admin/store/reviews`), and sales intelligence dashboard (`/admin/store/sales`).
+64. **Service Orders Marketplace Peer-to-Peer Overhaul & Disclaimer Architecture (v4.6.2)** — Overhauled the Service Orders marketplace (`/orders`) with peer-to-peer non-escrow disclaimer architecture, contract revision workflows (`requestRevision`), project attachments and deliverable uploads with protected downloads up to 25MB, 5-step milestone steppers with deadline tracking, and modernized administrative supervision (`/admin/orders`) with KPI cards, dynamic filters, and Excel-compatible UTF-8 BOM CSV exports.
+65. **Mobile Companion App (`myads_app` v1.8.0+22) Full Parity & Modernization Release (v4.6.2)** — Upgraded mobile app with in-app reporting dialogs, recursive threaded comments, bidirectional settings interoperability, dual-schema quests API, and Dart 3.13 deprecation-free modernization.
 
 ---
 
@@ -206,12 +212,12 @@ myads/
 | `HomeController` | Dashboard (`/home`), zero-reload AJAX points conversion, peer transfer, and voucher generation/redemption |
 | `PortalController` | Community feed (`/portal`), smart feed algorithm |
 | `StatusController` | Create posts (text, link, gallery, repost, multimedia: video, audio, file, music, clips), image upload, link preview |
-| `CommentController` | Load, store, delete comments (optimized N+1 eager-loading) |
+| `CommentController` | Load, store, delete comments, true threaded replies (`parent_id`), eager-loaded `replies.user`, and profanity filter |
 | `ReactionController` | Toggle reactions |
 | `MentionController` | `@mention` user lookup |
 | `ForumController` | Forum index, categories, topics, CRUD, moderation |
 | `DirectoryController` | Web directory CRUD, categories, metadata fetch |
-| `StoreController` | Store products, knowledgebase, downloads |
+| `StoreController` | Store products, customer 5-star reviews submission/deletion, media preview attachments, downloads, knowledgebase, and buyer library (`/store/my-purchases`) |
 | `LicenseApiController` | Verification endpoint for paid plugins |
 | `MarketplaceExtensionFeedController` | Marketplace extension discovery feed and secure auto-update checker/download handlers |
 | `AdsController` | Banner/link ad management, embed codes, promote, referrals |
@@ -233,11 +239,11 @@ myads/
 | `OrderOfferController` | Structured marketplace offer create/update/withdraw flows |
 | `BillingController` | Member paid plans catalog, billing dashboard, purchases, receipts, returns, webhooks |
 | `NewsController` | Public news pages |
-| `ReportController` | Content reporting |
+| `ReportController` | Content and member profile reporting with 7 standardized categories, duplicate prevention, and automated quarantine evaluation |
 | `Api\SettingsController` | Mobile API endpoints for member settings, privacy, social links, sessions, and points ledger |
 | `TagController` | Tag/hashtag pages |
 | `PageController` | Static pages (privacy, terms, refund, custom) |
-| `AdminController` | **Main admin controller** — users (overhauled `@.superdesign` suite with 5 global KPIs, debounced search, sorting, inline verification, and 7 interactive modals), ads & traffic management (overhauled `@.superdesign` suite across banners, links, visits, smart ads, and ads hub with zero-reload AJAX, live previews, inline status toggles, and bulk operations), forum, directory, store, widgets (redesigned `@.superdesign` hub with `place` pre-selection & location filter chips), menus, plugins & themes (zero-reload AJAX activate/deactivate endpoints and asset serving), settings (including performance settings and system monitor), news, reports, emojis, knowledgebase, KB categories CRUD, maintenance mode settings, and the **Instant Admin Dashboard Sequential AJAX Endpoints** (`ajaxDashboardKpis`, `ajaxDashboardReactions`, `ajaxDashboardActivity`, `ajaxDashboardAdCharts`, `ajaxDashboardCommunityCharts`, `ajaxDashboardVersionCheck`) |
+| `AdminController` | **Main admin controller** — users (overhauled `@.superdesign` suite with 5 global KPIs, debounced search, sorting, inline verification, and 7 interactive modals), ads & traffic management (overhauled `@.superdesign` suite across banners, links, visits, smart ads, and ads hub with zero-reload AJAX, live previews, inline status toggles, and bulk operations), forum, directory, store (supervision, reviews moderation at `/admin/store/reviews`, and sales intelligence at `/admin/store/sales`), widgets (redesigned `@.superdesign` hub with `place` pre-selection & location filter chips), menus, plugins & themes (zero-reload AJAX activate/deactivate endpoints and asset serving), settings (including performance settings and system monitor), news, reports (professional moderation suite at `/admin/reports` with executive Action Modal and 5 enforcement actions), emojis, knowledgebase, KB categories CRUD, maintenance mode settings, and the **Instant Admin Dashboard Sequential AJAX Endpoints** (`ajaxDashboardKpis`, `ajaxDashboardReactions`, `ajaxDashboardActivity`, `ajaxDashboardAdCharts`, `ajaxDashboardCommunityCharts`, `ajaxDashboardVersionCheck`) |
 | `AdminAdminsController` | Admin ACL management |
 | `AdminBillingController` | Admin billing suite (`/admin/billing/*`): overview, settings, subscription plans, orders, order details & manual review (bank transfer receipts, admin notes, local test webhook simulation), transactions, currencies, and payment gateways |
 | `AdminOrderController` | Admin marketplace dashboard and moderation actions for service requests |
@@ -294,6 +300,8 @@ myads/
 | `Product` | `options` | Store products. Note: Maps to `options` table with `o_type=store`. Uses `current_price` (price), `product_description` (description), `product_image` (thumbnail), `product_category` (category). Does not have a `vu` (view count) column. |
 | `ProductFile` | `product_files` | Store file versions |
 | `ProductLicense` | `product_licenses` | Binds purchased products to license keys and active client domains |
+| `ProductReview` | `product_reviews` | 5-star customer ratings, verified buyer badge resolution via product licenses, review titles and comments |
+| `ProductMedia` | `product_media` | Store product screenshot galleries, live demo URL links, and video preview embeds |
 | `StoreSale` | `store_sales` | Temporary product sales with discounted price and start/end dates |
 | `StoreDiscountCode` | `store_discount_codes` | Promotional codes generated by sellers or admins for store items |
 | `StoreDiscountRedemption` | `store_discount_redemptions` | Log of used discount codes to enforce max usage limits |
@@ -302,7 +310,9 @@ myads/
 | `Message` | `message` | Private messages |
 | `Notification` | `notification` | User notifications |
 | `News` | `news` | News articles |
-| `Report` | `report` | Content reports |
+| `Report` | `report` | Content and profile reports with 7 standardized categories, quarantine status, and moderator resolutions |
+| `ModerationLog` | `moderation_logs` | Immutable audit trail of executive moderation enforcement actions |
+| `UserWarning` | `user_warnings` | Official user strikes, warnings history, and PTS point penalties |
 | `Like` | `like` | Reactions + follows |
 | `Menu` | `menu` | Navigation menus |
 | `Page` | `pages` | Custom static pages |
@@ -381,6 +391,7 @@ myads/
 | `MessageConversationService` | Manages message conversation resolution, partner lookup, pagination, unread counts, and read-state updates (optimized MAX(id_msg) memory fetching) |
 | `BannerImageUploadService` | Handles banner creative image uploads (validation, unique naming, `upload/banners/` storage) with intelligent fallback to image URLs or existing creatives for user and admin banner forms |
 | `MailConfigServiceProvider` | Boots early to override `config('mail.*')` from the `mail_settings` database table at runtime, with graceful fallback |
+| `ModerationService` | Centralized community moderation service handling report category normalization, automated quarantine checks ($\ge 3$ reports threshold), profanity/banned words dictionary detection (`moderation_banned_words`), and administrative enforcement actions (dismiss, hide, delete with PTS deduction, official strikes, IP banning) with immutable logging in `moderation_logs` |
 
 ---
 
@@ -447,6 +458,12 @@ myads/
 | `/admin/billing/transactions` | `/admin/billing/transactions` | Admin transaction log and audit timeline |
 | `/admin/billing/settings` | `/admin/billing/settings` | Admin global billing and subscription settings |
 | `/admin/orders` | `/admin/orders` | Admin marketplace moderation dashboard under the `community` ACL scope |
+| `/admin/reports` | `/admin/reports` | Professional social moderation suite, KPI cards, and executive action workflows |
+| `/store/my-purchases` | `/store/my-purchases` | Customer digital goods library with instant license keys and downloads |
+| `/admin/store/reviews` | `/admin/store/reviews` | Admin store reviews moderation dashboard |
+| `/admin/store/sales` | `/admin/store/sales` | Admin store sales & licenses intelligence dashboard |
+| `/api/statuses/{status}/report` | `/api/statuses/12/report` | Sanctum mobile/web status reporting endpoint |
+| `/api/profile/{identifier}/report` | `/api/profile/john/report` | Sanctum mobile/web member profile reporting endpoint |
 | `/admin/settings/mail` | `/admin/settings/mail` | Database-driven mail configuration (SMTP, sendmail, log, array) |
 | `/admin/security` | `/admin/security` | Admin security settings dashboard (HTTPS, CAPTCHA, IP blocks) |
 | `/admin/media` | `/admin/media` | Admin Media Manager dashboard and file operations |
@@ -1224,10 +1241,22 @@ If in doubt, update it. An outdated `Agents.md` causes future agents to make wro
   - **MySQL InnoDB Tablespace Desync Remediation:** Resolved global HTTP 500 error blocking all administrative routes (`/admin`, `/admin/plugins`, `/admin/users`, `/admin/settings`, `/admin/profile-verification/requests`) caused by MySQL error 1932 (`Table doesn't exist in engine`) and orphaned `.ibd` tablespace collision (error 1813). Cleaned orphaned tablespace files and re-ran migration `2026_09_29_000000_create_profile_verification_requests_table.php` via `artisan migrate --force`.
   - **Defensive Notification Service Fault-Tolerance:** Hardened `AdminNotificationService.php` by wrapping `ProfileVerificationRequest::count()` and notification checks in isolated `try ... catch (\Throwable $e)` blocks. Guaranteed that database engine or table anomalies will never cascade through `AdminNotificationComposer` to take down the administrative panel layout.
   - **Route & View Verification:** Verified 100% HTTP 200 OK responses across all administrative endpoints after clearing application and view caches.
+- **v4.6.2 Official Release — Store Marketplace Customer Reviews & Media Previews Suite, Arabic & Unicode Slugs Architecture, Administrative Store Supervision & Reviews Moderation Engine, Service Orders Marketplace Peer-to-Peer Overhaul, Platform Disclaimer Architecture, Administrative Maintenance Resilience Suite, Professional Social Moderation Suite, Automated Content Quarantine Engine, Member Warnings & Strikes Tracking, Audit Moderation Logging, Real-Time Reporter Feedback Loops, True Threaded Comments (Nested Replies) Engine, Companion Flutter App (myads_app v1.8.0+22) Full API Parity Suite, Store Marketplace Overhaul & Customer Library Suite, Administrative Store Moderation Engine & Sales Intelligence Dashboard, Gamification Quests Architecture & Active Scope Engine, Bidirectional Settings Interoperability Suite, and Dart 3.13 Codebase Modernization Release (2026-10-10):**
+  - **Professional Social Moderation Suite (`/admin/reports`, `ModerationService.php`):** Unified report reasons across the platform into 7 standardized violation categories (Spam, Harassment, Inappropriate, Copyright, Misinformation, Scam, Other). Upgraded `/admin/reports` with 5 real-time KPI metric cards (Total Reports, Pending Review, Quarantined Content, Resolved Cases, Active User Strikes), dynamic category and status filtering, and an executive Moderation Action Modal with 5 distinct workflows: Dismiss/Unfounded with feedback notice, Hide Content temporarily, Delete Content with customizable PTS deduction penalty, Official User Warning/Strike with automated strike counter increment in `user_warnings`, and User Ban & IP Blacklisting in `banned_ips`.
+  - **Automated Content Quarantine Engine:** Automatically quarantines and hides flagged content receiving $\ge 3$ active community reports prior to human moderator review.
+  - **Immutable Moderation Audit Trail & Warnings Tracking:** Created `moderation_logs` table recording moderator identity, target entity, action taken, and notes; created `user_warnings` table tracking official strikes, strike counts, points deductions, and admin notices per user.
+  - **Bidirectional Feedback Notifications:** Automatically notifies reporters upon report resolution to build community trust and dispatches official warnings/penalties to rule-breaking members.
+  - **True Threaded Comments (Nested Replies) Engine (`CommentController.php`, `ForumComment.php`):** Upgraded comments architecture to support multi-level nested replies through `parent_id` foreign key on `forum_comments` table with eager-loaded `replies.user`. Rendered indented visual reply trees in default and sample themes (`post-comment-replies`), contextual "Replying to @user" indicator with 1-click cancel button, automated parent-author reply notifications, and dictionary-driven profanity filter (`moderation_banned_words`).
+  - **Store Marketplace Ratings & Reviews Architecture (`ProductReview.php`, `StoreController@review`):** 5-star rating and customer review engine supporting scores 1 to 5, review titles, in-depth text, and single review per member per product. Integrated automated verification against `product_licenses` table conferring the Verified Buyer badge (`is_verified_buyer = true`). Added customer "My Purchases" buyer library (`/store/my-purchases`) with instant license key copy and authenticated downloads.
+  - **Product Media Gallery & Live Previews (`ProductMedia.php`):** Product media galleries with multiple screenshots modal lightbox viewer, live demo URL testing, and video preview embeds. Added full support for Arabic characters, spaces, and Unicode slugs in store product titles and URLs.
+  - **Administrative Store Moderation & Sales Intelligence:** Modernized administrative store supervision (`/admin/products`), dedicated store reviews moderation dashboard (`/admin/store/reviews`), and store sales & licenses intelligence dashboard (`/admin/store/sales`).
+  - **Service Orders Marketplace Peer-to-Peer Overhaul (`/orders`, `/admin/orders`):** Built peer-to-peer non-escrow disclaimer architecture, contract revision workflows (`requestRevision`), project attachments and deliverable uploads with protected downloads up to 25MB, 5-step milestone steppers with deadline tracking, and modernized administrative supervision (`/admin/orders`) with KPI cards, dynamic filters, and Excel-compatible UTF-8 BOM CSV exports.
+  - **Administrative Maintenance Resilience Suite (`/admin/maintenance`):** Hardened maintenance suite with active engine query validation (`isTableQueryable()`), diagnostic exception isolation, and zero-data-loss marketplace schema restoration.
+  - **Mobile Companion App (`myads_app` v1.8.0+22) Full Parity:** In-app report violation dialogs with 7 categories, threaded nested comments rendering and inline reply composer, bidirectional settings interoperability, dual-schema quests API, and 100% test pass rate across all automated suites.
 
 ---
 
-*Last updated: 2026-10-03 — MYADS v4.6.1*
+*Last updated: 2026-10-10 — MYADS v4.6.2*
 
 
 
