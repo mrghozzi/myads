@@ -117,6 +117,15 @@
                         <option value="clicks">{{ __('messages.sort_clicks') ?? 'Most Clicks' }}</option>
                         <option value="oldest">{{ __('messages.sort_oldest') ?? 'Oldest' }}</option>
                     </select>
+
+                    @include('admin::admin.partials.inventory_filter_dropdown', [
+                        'action' => route('admin.banners'),
+                        'resetUrl' => route('admin.banners', ['reset_filters' => 1]),
+                        'preferenceKey' => 'banners',
+                        'filterFields' => $filterFields,
+                        'filterState' => $filterState,
+                        'resultsCount' => $resultsCount,
+                    ])
                 </div>
             </div>
         </div>

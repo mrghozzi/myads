@@ -43,9 +43,9 @@ class AdminAboutPageTest extends TestCase
             ->assertSee(__('about.feature_4_title'))
             ->assertSee(__('about.feature_5_title'))
             ->assertSee(__('about.feature_6_title'))
-            ->assertSee('Knowledge Base Modernization Suite & Instant AJAX Search')
-            ->assertSee('Administrative KB Moderation Dashboard & Visual Diff Engine')
-            ->assertSee('Standalone Photo Post Overhaul & Hexagonal Avatar Silhouette')
+            ->assertSee('World-Class Marketplace Redesign & High-Speed Ajax Browsing Engine')
+            ->assertSee('Store 5-Star Customer Reviews, Buyer Library & Media Previews')
+            ->assertSee('Member Profile About Tab Overhaul & 3-Tier Privacy Architecture')
             ->assertSee('https://github.com/sponsors/mrghozzi')
             ->assertSee(__('about.sponsor_on_github'))
             ->assertSee(__('about.sponsor_project_title'));
@@ -66,9 +66,9 @@ class AdminAboutPageTest extends TestCase
         $response = $this->actingAs($admin)->get(route('admin.about', ['lang' => 'ar']));
 
         $response->assertOk()
-            ->assertSee('تطوير قاعدة المعرفة وبوابة التوثيق والبحث الفوري بتقنية AJAX')
-            ->assertSee('لوحة إشراف قاعدة المعرفة ومحرك مقارنة التعديلات البصري (Diff)')
-            ->assertSee('تحديث منشورات الصور الفردية والتصميم الهندسي السداسي للصورة الرمزية')
+            ->assertSee('إعادة تصميم سوق المتجر ومحرك التصفح فائق السرعة عبر AJAX')
+            ->assertSee('منظومة تقييمات المتجر 5 نجوم، مكتبة المشتريات ومعاينة الوسائط')
+            ->assertSee('تحديث ملف العضو الشخصي ومنظومة الخصوصية ثلاثية المستويات')
             ->assertSee('https://github.com/sponsors/mrghozzi')
             ->assertSee('رعاية المشروع عبر GitHub Sponsors')
             ->assertSee('برنامج الرعاية الرسمي عبر GitHub Sponsors');

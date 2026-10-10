@@ -108,6 +108,15 @@
                         <option value="clicks">{{ __('messages.sort_clicks') ?? 'Most Clicks' }}</option>
                         <option value="oldest">{{ __('messages.sort_oldest') ?? 'Oldest' }}</option>
                     </select>
+
+                    @include('admin::admin.partials.inventory_filter_dropdown', [
+                        'action' => route('admin.smart_ads'),
+                        'resetUrl' => route('admin.smart_ads', ['reset_filters' => 1]),
+                        'preferenceKey' => 'smart_ads',
+                        'filterFields' => $filterFields,
+                        'filterState' => $filterState,
+                        'resultsCount' => $resultsCount,
+                    ])
                 </div>
             </div>
         </div>

@@ -7,19 +7,19 @@ return [
     'tab_changelog' => 'Changelog',
     'tab_about' => 'About MYADS',
     
-    // What's New Section (v4.6.1)
-    'feature_1_title' => 'Knowledge Base Modernization Suite & Instant AJAX Search',
-    'feature_1_desc' => 'Centralized platform-wide Knowledge Base Portal (/kb), debounced real-time AJAX search, article helpfulness feedback voting, sticky scrollspy Table of Contents, and reading time estimation.',
-    'feature_2_title' => 'Administrative KB Moderation Dashboard & Visual Diff Engine',
-    'feature_2_desc' => 'Overhauled /admin/knowledgebase with 3 tabs, line-by-line visual revision diff viewer, one-click approvals and non-destructive rejections, and zero-reload AJAX taxonomy category management.',
-    'feature_3_title' => 'Standalone Photo Post Overhaul & Hexagonal Avatar Silhouette',
-    'feature_3_desc' => 'Modernized standalone photo posts (s_type=4) with glassmorphism surface, signature hexagonal author silhouette clip-path, zero-reload AJAX likes/comments/shares, lightbox zoom, and bilingual SEO meta tags.',
-    'feature_4_title' => 'Global Admin Notification Resilience & Database Fault-Tolerance',
-    'feature_4_desc' => 'MySQL InnoDB tablespace desync remediation (errors 1932/1813), and isolated try/catch defensive fault-tolerance in AdminNotificationService ensuring the administrative layout never crashes.',
-    'feature_5_title' => 'Administrative User Management Schema Self-Healing & Safety',
-    'feature_5_desc' => 'Resolved HTTP 500 on /admin/users via automatic site_admins schema validation and self-healing, migration 2026_09_27_020000, and loopback self-call timeout protection in PluginManager.',
-    'feature_6_title' => 'Mobile Navigation Overhaul & Profile Verification Suite',
-    'feature_6_desc' => 'Legacy floaty bar permanent suppression, context-aware quick-post FAB targeting #quick-post-box, 14-language add_post localization, and complete member profile verification requests workflow.',
+    // What's New Section (v4.6.2)
+    'feature_1_title' => 'World-Class Marketplace Redesign & High-Speed Ajax Browsing Engine',
+    'feature_1_desc' => 'Redesigned /store with luxury glassmorphic hero banner, 3D Category Showcase, responsive Grid & Developer List view switcher with client persistence, instant debounced Ajax search, category pills, and deep browser URL sync.',
+    'feature_2_title' => 'Store 5-Star Customer Reviews, Buyer Library & Media Previews',
+    'feature_2_desc' => '5-star customer ratings and reviews engine with automated Verified Buyer badge verification against product_licenses, rating breakdown stats, dedicated customer "My Purchases" library (/store/my-purchases), screenshot lightboxes, and Live Demo/Video URL previews.',
+    'feature_3_title' => 'Member Profile About Tab Overhaul & 3-Tier Privacy Architecture',
+    'feature_3_desc' => 'Expansive Profile Dossier overhaul at /u/{username}?tab=about, elimination of sidebar bio redundancy, dynamic metrics cards (Member Since, Posts, Followers, Views, Karma), and granular 3-tier privacy (Public, Followers, Private) with inline bio visibility selector on /profile/edit.',
+    'feature_4_title' => 'Professional Social Moderation Suite & Automated Content Quarantine',
+    'feature_4_desc' => 'Professional community moderation center at /admin/reports with 7 standardized violation categories, 5 KPI metrics, executive Moderation Action Modal (Dismiss, Hide, Delete with PTS penalty, User Strike/Warning, Ban/IP Blacklist), and automated quarantine threshold (>= 3 reports).',
+    'feature_5_title' => 'True Threaded Comments (Nested Replies) & Profanity Filter',
+    'feature_5_desc' => 'True hierarchical threaded comments with infinite nested replies via parent_id, indented visual trees, contextual "Replying to @user" banner with cancel controls, parent-author reply notifications, and dictionary-driven profanity filter.',
+    'feature_6_title' => 'Resilient Portal Search, Comment Deep-Linking & Mobile App Parity',
+    'feature_6_desc' => 'Universal portal search matching with clickable comment deep-linking to topic/directory anchors (#comment_{id}) with cyan pulse animation, hexagon member avatars with online dots, and full API parity with mobile companion app (myads_app v1.8.3+25).',
 
     // About Section
     'about_description' => 'MYADS is a powerful, all-in-one community platform and ad exchange network. It empowers website owners to connect, exchange traffic, trade services, and monetize their platforms effectively.',

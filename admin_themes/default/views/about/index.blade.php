@@ -491,7 +491,38 @@
                             <div class="timeline">
                                 <div class="timeline-item">
                                     <div class="timeline-icon"><i class="feather-box fs-12"></i></div>
-                                    <h6 class="fw-bold mb-1">v4.6.1 <span class="badge bg-soft-success text-success ms-2">Latest / Stable</span></h6>
+                                    <h6 class="fw-bold mb-1">v4.6.2 <span class="badge bg-soft-success text-success ms-2">Latest / Stable</span></h6>
+                                    <p class="text-muted fs-13 mb-3">Member Profile About Dossier & 3-Tier Privacy Architecture, Store Customer Reviews & Buyer Library, World-Class Marketplace Redesign with High-Speed Ajax Engine, Service Orders Marketplace Overhaul, Professional Social Moderation & Automated Content Quarantine, Threaded Nested Comments, and Resilient Portal Live Search with Member Avatars & Comment Deep-Linking.</p>
+                                    <div class="d-flex flex-column gap-2">
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-feature mt-1">Marketplace</span>
+                                            <span class="text-muted fs-13">Redesigned <code>/store</code> with glassmorphism hero banner, 3D Category Showcase, Grid & Developer List view switcher with <code>localStorage</code> persistence, debounced instant Ajax search, category pills, zero N+1 queries, and deep browser URL sync.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-feature mt-1">Customer Reviews</span>
+                                            <span class="text-muted fs-13">5-star customer ratings and reviews engine with automated Verified Buyer badge verification against <code>product_licenses</code>, rating breakdowns, customer "My Purchases" library (<code>/store/my-purchases</code>), screenshot lightbox gallery, and Live Demo/Video URL previews.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-feature mt-1">Profile & Privacy</span>
+                                            <span class="text-muted fs-13">Expansive Profile Dossier overhaul at <code>/u/{username}?tab=about</code>, elimination of sidebar bio redundancy, dynamic metrics cards (Member Since, Posts, Followers, Views, Karma), and granular 3-tier privacy (Public, Followers, Private) with inline bio visibility selector on <code>/profile/edit</code>.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-security mt-1">Moderation Suite</span>
+                                            <span class="text-muted fs-13">Professional community moderation center at <code>/admin/reports</code> with 7 standardized violation categories, 5 KPI metrics, executive Moderation Action Modal (Dismiss, Hide, Delete with PTS penalty, User Strike/Warning, Ban/IP Blacklist), and automated quarantine threshold (&ge; 3 reports).</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-feature mt-1">Threaded Comments</span>
+                                            <span class="text-muted fs-13">True hierarchical threaded comments with infinite nested replies via <code>parent_id</code>, indented visual trees, contextual "Replying to @user" banner with cancel controls, parent-author reply notifications, and dictionary-driven profanity filter.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-optimization mt-1">Search & Mobile</span>
+                                            <span class="text-muted fs-13">Universal portal search matching with clickable comment deep-linking to topic/directory anchors (<code>#comment_{id}</code>) with cyan pulse animation, hexagon member avatars with online dots, and full API parity with mobile companion app (myads_app v1.8.3+25).</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="timeline-item">
+                                    <div class="timeline-icon"><i class="feather-box fs-12"></i></div>
+                                    <h6 class="fw-bold mb-1">v4.6.1 <span class="badge bg-soft-secondary text-secondary ms-2">Previous</span></h6>
                                     <p class="text-muted fs-13 mb-3">Standalone Photo/Image Post Overhaul & Hexagonal Avatar Aesthetic, Administrative Global Notification Resilience & Engine Fault-Tolerance, Administrative User Management Schema Fault-Tolerance, Mobile Navigation Overhaul & Legacy Floaty Bar Removal, Context-Aware Quick Post Routing, Multi-Language Add Post Localization, Knowledge Base (/kb/*) & Administrative Moderation Modernization Suite, Profile Verification Requests, System Updates Large Payload Compacting, Extension Update Timeout Protection & Security Vulnerability Remediation Release.</p>
                                     <div class="d-flex flex-column gap-2">
                                         <div class="d-flex align-items-start">

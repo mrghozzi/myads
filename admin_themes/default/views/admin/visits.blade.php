@@ -113,6 +113,15 @@
                         <option value="views">{{ __('messages.sort_views') ?? 'Most Views' }}</option>
                         <option value="oldest">{{ __('messages.sort_oldest') ?? 'Oldest' }}</option>
                     </select>
+
+                    @include('admin::admin.partials.inventory_filter_dropdown', [
+                        'action' => route('admin.visits'),
+                        'resetUrl' => route('admin.visits', ['reset_filters' => 1]),
+                        'preferenceKey' => 'visits',
+                        'filterFields' => $filterFields,
+                        'filterState' => $filterState,
+                        'resultsCount' => $resultsCount,
+                    ])
                 </div>
             </div>
         </div>
