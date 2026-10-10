@@ -12,11 +12,7 @@
         <div class="results-count-box">
             <span class="count-badge">{{ $products->total() }}</span>
             <span class="count-label">
-                @if(app()->getLocale() === 'ar')
-                    {{ $products->total() == 1 ? 'منتج متاح' : 'منتجات متوفرة' }}
-                @else
-                    {{ $products->total() == 1 ? 'Product Available' : 'Products Available' }}
-                @endif
+                {{ $products->total() == 1 ? __('messages.product_available') : __('messages.products_available') }}
             </span>
         </div>
 

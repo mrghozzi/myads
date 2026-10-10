@@ -17,6 +17,9 @@
   * Seamless Ajax pagination with smooth scroll-to-top of product grid.
   * Synchronized browser URL using `history.pushState` ensuring shareable, bookmarkable URLs and full support for native browser Back/Forward navigation (`popstate`).
   * Designed an engaging Empty State with one-click filter reset and publisher call-to-action.
+* **Comprehensive 14-Language Localization Parity**:
+  * Synchronized all 29 marketplace keys and category descriptions across all 14 platform languages (`ar`, `en`, `de`, `es`, `fa`, `fr`, `it`, `ja`, `pt`, `ru`, `sr`, `tr`, `zh_CN`, `zh_TW`).
+  * Eliminated all hardcoded strings in blade views, fully binding them to standardized `messages.*` keys.
 
 
 ### Member Profile About Tab Overhaul, Granular Privacy Architecture & 14-Language i18n Suite (`/u/{username}?tab=about`, `/profile/edit`, `ProfileController.php`)

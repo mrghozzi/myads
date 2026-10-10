@@ -1574,17 +1574,6 @@
                     'software' => 'software.png',
                     'courses' => 'courses.png',
                 ];
-                $categoryDescs = [
-                    'script' => app()->getLocale() === 'ar' ? 'سكربتات وأنظمة برمجية متكاملة' : 'Full-stack Web Applications & Scripts',
-                    'themes' => app()->getLocale() === 'ar' ? 'قوالب وواجهات احترافية' : 'Responsive Templates & UI Kits',
-                    'plugins' => app()->getLocale() === 'ar' ? 'إضافات ومكونات توسيع' : 'Addons, Plugins & Extensions',
-                    'graphics' => app()->getLocale() === 'ar' ? 'شعارات وتصاميم فيكتور' : 'Logos, Vectors & UI Assets',
-                    'audio' => app()->getLocale() === 'ar' ? 'صوتيات ومؤثرات موسيقية' : 'Tracks & Sound Effects',
-                    'video' => app()->getLocale() === 'ar' ? 'قوالب فيديو ومونتاج' : 'Motion Graphics & Video Assets',
-                    'ebooks' => app()->getLocale() === 'ar' ? 'كتب وأدلة تقنية رقمية' : 'Digital Guides & Books',
-                    'software' => app()->getLocale() === 'ar' ? 'برامج وأدوات تشغيلية' : 'Desktop Tools & Utilities',
-                    'courses' => app()->getLocale() === 'ar' ? 'دورات ومسارات تعليمية' : 'Educational Courses & Tutorials',
-                ];
             @endphp
 
             @foreach($allCategories as $catKey)
@@ -1594,6 +1583,8 @@
                         ? route('store.script_category', [$scriptName, $catKey]) 
                         : route('store.index', ['category' => $catKey]);
                     $isCatActive = ($category ?? '') === $catKey;
+                    $catDescKey = 'messages.cat_desc_' . $catKey;
+                    $catDesc = __($catDescKey) !== $catDescKey ? __($catDescKey) : '';
                 @endphp
                 <a 
                     class="modern-category-card cat-{{ $catKey }} {{ $isCatActive ? 'active' : '' }}" 
@@ -1603,7 +1594,9 @@
                     <div class="cat-card-header">
                         <div class="cat-title-block">
                             <h3 class="cat-card-title">{{ __('messages.' . $catKey) != 'messages.' . $catKey ? __('messages.' . $catKey) : ucfirst($catKey) }}</h3>
-                            <p class="cat-card-desc">{{ $categoryDescs[$catKey] ?? '' }}</p>
+                            @if($catDesc)
+                                <p class="cat-card-desc">{{ $catDesc }}</p>
+                            @endif
                         </div>
                         <span class="cat-card-badge">{{ $categoryCounts[$catKey] ?? 0 }}</span>
                     </div>
