@@ -170,7 +170,7 @@ class PortalController extends Controller
                 $searchedCommentsForum = \App\Models\ForumComment::visible()
                     ->whereHas('topic', fn ($query) => $query->visible($user))
                     ->where('txt', 'LIKE', "%{$search}%")
-                    ->with('user')
+                    ->with(['user', 'topic'])
                     ->orderBy('date', 'desc')
                     ->limit(30)
                     ->get();
@@ -182,6 +182,8 @@ class PortalController extends Controller
                 $searchedCommentsDir = \App\Models\Option::where('o_type', '=', 'd_coment')
                     ->visible(null, 'o_order')
                     ->where('o_valuer', 'LIKE', "%{$search}%")
+                    ->with(['user', 'directory'])
+                    ->orderBy('id', 'desc')
                     ->limit(30)
                     ->get();
             } catch (\Throwable $e) {

@@ -40,4 +40,12 @@ class Option extends Model
     {
         return $this->belongsTo(User::class, 'o_order');
     }
+
+    /**
+     * Get the directory this comment belongs to (when o_type = 'd_coment').
+     */
+    public function directory()
+    {
+        return $this->belongsTo(Directory::class, 'o_parent');
+    }
 }

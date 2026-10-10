@@ -95,15 +95,20 @@
                 <div class="portal-users-grid">
                     @foreach($searchedUsers as $sUser)
                         <div class="portal-user-card">
-                            <div class="portal-user-cover" style="background-image: url('{{ asset('themes/default/assets/img/cover/01.jpg') }}');">
-                                <span class="portal-user-status-dot {{ $sUser->isOnline() ? 'online' : 'offline' }}" title="{{ $sUser->isOnline() ? 'Online' : 'Offline' }}"></span>
-                            </div>
+                            <div class="portal-user-cover" style="background-image: url('{{ asset('themes/default/assets/img/cover/01.jpg') }}');"></div>
                             <div class="portal-user-body">
                                 <div class="portal-user-avatar-wrapper">
-                                    <a href="{{ route('profile.show', $sUser->username) }}" class="user-avatar {{ $sUser->isOnline() ? 'online' : 'offline' }}">
-                                        <div class="user-avatar-border"><div class="hexagon-100-110"></div></div>
-                                        <div class="user-avatar-content"><div class="hexagon-image-68-74" data-src="{{ $sUser->avatarUrl() }}"></div></div>
-                                        <div class="user-avatar-progress-border"><div class="hexagon-border-84-92"></div></div>
+                                    <a href="{{ route('profile.show', $sUser->username) }}" class="portal-user-avatar-link">
+                                        <div class="portal-user-avatar-hex">
+                                            <img
+                                                src="{{ $sUser->avatarUrl() }}"
+                                                alt="{{ $sUser->username }}"
+                                                class="portal-avatar-img"
+                                                loading="lazy"
+                                                onerror="this.onerror=null;this.src='{{ asset('upload/avatar.png') }}';"
+                                            >
+                                            <span class="portal-user-status-dot {{ $sUser->isOnline() ? 'online' : 'offline' }}" title="{{ $sUser->isOnline() ? 'Online' : 'Offline' }}"></span>
+                                        </div>
                                     </a>
                                 </div>
                                 <a href="{{ route('profile.show', $sUser->username) }}" class="portal-user-username">
@@ -140,10 +145,16 @@
                             <div class="portal-group-cover" style="background-image: url('{{ $sGroup->coverUrl() }}');"></div>
                             <div class="portal-group-body">
                                 <div class="portal-group-avatar-wrapper">
-                                    <a href="{{ route('groups.show', $sGroup) }}" class="user-avatar">
-                                        <div class="user-avatar-border"><div class="hexagon-100-110"></div></div>
-                                        <div class="user-avatar-content"><div class="hexagon-image-68-74" data-src="{{ $sGroup->avatarUrl() }}"></div></div>
-                                        <div class="user-avatar-progress-border"><div class="hexagon-border-84-92"></div></div>
+                                    <a href="{{ route('groups.show', $sGroup) }}" class="portal-group-avatar-link">
+                                        <div class="portal-group-avatar-hex">
+                                            <img
+                                                src="{{ $sGroup->avatarUrl() }}"
+                                                alt="{{ $sGroup->name }}"
+                                                class="portal-avatar-img"
+                                                loading="lazy"
+                                                onerror="this.onerror=null;this.src='{{ asset('themes/default/assets/img/group/default.png') }}';"
+                                            >
+                                        </div>
                                     </a>
                                 </div>
                                 <a href="{{ route('groups.show', $sGroup) }}" class="portal-group-name">{{ $sGroup->name }}</a>
@@ -201,44 +212,92 @@
                 <div class="portal-comments-container">
                     @if(isset($searchedCommentsForum))
                         @foreach($searchedCommentsForum as $fComment)
-                            <div class="portal-comment-card">
+                            @php
+                                $fCommentUrl = route('forum.topic', $fComment->tid) . '#comment_' . $fComment->id;
+                                $fUser = $fComment->user;
+                                $fAuthorName = $fUser->username ?? __('messages.member');
+                                $fAuthorAvatar = $fUser ? $fUser->avatarUrl() : asset('upload/_avatar.png');
+                                $fTopicTitle = $fComment->topic ? $fComment->topic->name : ('#' . $fComment->tid);
+                            @endphp
+                            <a href="{{ $fCommentUrl }}" class="portal-comment-card" title="{{ __('messages.view_comment') ?? 'عرض التعليق' }}">
                                 <div class="portal-comment-avatar">
-                                    <div class="user-avatar small no-outline">
-                                        <div class="user-avatar-content">
-                                            <div class="hexagon-image-30-32" data-src="{{ $fComment->user ? $fComment->user->avatarUrl() : asset('upload/_avatar.png') }}"></div>
-                                        </div>
+                                    <div class="portal-comment-avatar-ring">
+                                        <img
+                                            src="{{ $fAuthorAvatar }}"
+                                            alt="{{ $fAuthorName }}"
+                                            class="portal-comment-avatar-img"
+                                            loading="lazy"
+                                            onerror="this.onerror=null;this.src='{{ asset('upload/_avatar.png') }}';"
+                                        >
                                     </div>
                                 </div>
                                 <div class="portal-comment-body">
                                     <div class="portal-comment-top">
-                                        <span class="portal-comment-author">{{ $fComment->user->username ?? 'Member' }}</span>
-                                        <span class="portal-comment-ctx">{{ __('messages.on_forum_topic') ?? 'on Topic' }} #{{ $fComment->tid }}</span>
-                                        <span class="portal-comment-date">{{ \Carbon\Carbon::createFromTimestamp($fComment->date)->diffForHumans() }}</span>
+                                        <div class="portal-comment-author-wrap">
+                                            <span class="portal-comment-author">{{ $fAuthorName }}</span>
+                                            <span class="portal-comment-ctx">
+                                                <i class="fas fa-comments"></i> {{ __('messages.forum') }}: <strong>{{ \Illuminate\Support\Str::limit($fTopicTitle, 45) }}</strong>
+                                            </span>
+                                        </div>
+                                        <span class="portal-comment-date">
+                                            <i class="far fa-clock"></i> {{ \Carbon\Carbon::createFromTimestamp($fComment->date)->diffForHumans() }}
+                                        </span>
                                     </div>
-                                    <p class="portal-comment-text">{{ \Illuminate\Support\Str::limit(strip_tags($fComment->txt), 140) }}</p>
+                                    <p class="portal-comment-text">"{{ \Illuminate\Support\Str::limit(strip_tags($fComment->txt), 150) }}"</p>
+                                    <div class="portal-comment-action-bar">
+                                        <span class="portal-comment-action-link">
+                                            {{ __('messages.view_comment') ?? 'الانتقال للتعليق' }} <i class="fas fa-arrow-left"></i>
+                                        </span>
+                                    </div>
                                 </div>
-                            </div>
+                            </a>
                         @endforeach
                     @endif
 
                     @if(isset($searchedCommentsDir))
                         @foreach($searchedCommentsDir as $dComment)
-                            <div class="portal-comment-card">
+                            @php
+                                $dCommentUrl = route('directory.show', $dComment->o_parent) . '#comment_' . $dComment->id;
+                                $dUser = $dComment->user;
+                                $dAuthorName = $dUser ? $dUser->username : __('messages.member');
+                                $dAuthorAvatar = $dUser ? $dUser->avatarUrl() : asset('upload/_avatar.png');
+                                $dDirTitle = $dComment->directory ? $dComment->directory->name : ('#' . $dComment->o_parent);
+                                $dDate = is_numeric($dComment->o_mode) ? \Carbon\Carbon::createFromTimestamp((int) $dComment->o_mode)->diffForHumans() : null;
+                            @endphp
+                            <a href="{{ $dCommentUrl }}" class="portal-comment-card" title="{{ __('messages.view_comment') ?? 'عرض التعليق' }}">
                                 <div class="portal-comment-avatar">
-                                    <div class="user-avatar small no-outline">
-                                        <div class="user-avatar-content">
-                                            <div class="hexagon-image-30-32" data-src="{{ asset('upload/_avatar.png') }}"></div>
-                                        </div>
+                                    <div class="portal-comment-avatar-ring">
+                                        <img
+                                            src="{{ $dAuthorAvatar }}"
+                                            alt="{{ $dAuthorName }}"
+                                            class="portal-comment-avatar-img"
+                                            loading="lazy"
+                                            onerror="this.onerror=null;this.src='{{ asset('upload/_avatar.png') }}';"
+                                        >
                                     </div>
                                 </div>
                                 <div class="portal-comment-body">
                                     <div class="portal-comment-top">
-                                        <span class="portal-comment-author">{{ __('messages.directory_comment') ?? 'Directory Comment' }}</span>
-                                        <span class="portal-comment-ctx">#{{ $dComment->o_parent }}</span>
+                                        <div class="portal-comment-author-wrap">
+                                            <span class="portal-comment-author">{{ $dAuthorName }}</span>
+                                            <span class="portal-comment-ctx">
+                                                <i class="fas fa-globe"></i> {{ __('messages.directory') }}: <strong>{{ \Illuminate\Support\Str::limit($dDirTitle, 45) }}</strong>
+                                            </span>
+                                        </div>
+                                        @if($dDate)
+                                            <span class="portal-comment-date">
+                                                <i class="far fa-clock"></i> {{ $dDate }}
+                                            </span>
+                                        @endif
                                     </div>
-                                    <p class="portal-comment-text">{{ \Illuminate\Support\Str::limit(strip_tags($dComment->o_valuer), 140) }}</p>
+                                    <p class="portal-comment-text">"{{ \Illuminate\Support\Str::limit(strip_tags($dComment->o_valuer), 150) }}"</p>
+                                    <div class="portal-comment-action-bar">
+                                        <span class="portal-comment-action-link">
+                                            {{ __('messages.view_comment') ?? 'الانتقال للتعليق' }} <i class="fas fa-arrow-left"></i>
+                                        </span>
+                                    </div>
                                 </div>
-                            </div>
+                            </a>
                         @endforeach
                     @endif
                 </div>

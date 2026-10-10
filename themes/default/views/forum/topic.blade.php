@@ -280,6 +280,9 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         initHexagons();
+        if (typeof window.highlightCommentFromHash === 'function') {
+            window.highlightCommentFromHash();
+        }
     });
 
     function initHexagons() {

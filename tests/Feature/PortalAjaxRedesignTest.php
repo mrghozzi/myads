@@ -179,4 +179,88 @@ class PortalAjaxRedesignTest extends TestCase
             ->assertSee('admin-save-bar')
             ->assertSee('admin-feed-settings-form');
     }
+
+    public function test_member_search_renders_user_avatar_image_and_status(): void
+    {
+        $member = User::factory()->create([
+            'username' => 'avatarhero',
+        ]);
+
+        $response = $this->getJson(route('portal.index', ['search' => 'avatarhero']));
+
+        $response->assertOk()
+            ->assertJsonPath('type', 'search')
+            ->assertJsonPath('search', 'avatarhero');
+
+        $html = $response->json('html');
+        $this->assertStringContainsString('avatarhero', $html);
+        $this->assertStringContainsString('portal-user-avatar-hex', $html);
+        $this->assertStringContainsString('portal-avatar-img', $html);
+        $this->assertStringContainsString($member->avatarUrl(), $html);
+    }
+
+    public function test_comment_search_renders_clickable_forum_and_directory_links_with_anchors(): void
+    {
+        $author = User::factory()->create(['username' => 'commentauthor']);
+
+        // 1. Forum Topic and Comment
+        $topic = ForumTopic::create([
+            'uid' => $author->id,
+            'name' => 'Searchable Forum Discussion',
+            'txt' => 'Discussion body',
+            'cat' => 0,
+            'statu' => 1,
+            'date' => time() - 100,
+            'reply' => 1,
+            'vu' => 5,
+        ]);
+
+        $forumComment = \App\Models\ForumComment::create([
+            'uid' => $author->id,
+            'tid' => $topic->id,
+            'txt' => 'This is a distinct forum query keyword matching target',
+            'date' => time() - 50,
+        ]);
+
+        // 2. Directory and Directory Comment Option
+        $directory = \App\Models\Directory::create([
+            'uid' => $author->id,
+            'name' => 'Distinct Directory Listing',
+            'url' => 'https://example.com',
+            'txt' => 'Directory details',
+            'cat' => 1,
+            'statu' => 1,
+            'date' => time() - 200,
+        ]);
+
+        $dirComment = \App\Models\Option::create([
+            'name' => 'coment_dir',
+            'o_type' => 'd_coment',
+            'o_order' => $author->id,
+            'o_parent' => $directory->id,
+            'o_valuer' => 'This is a distinct directory review with query keyword',
+            'o_mode' => time() - 30,
+        ]);
+
+        $response = $this->getJson(route('portal.index', ['search' => 'query keyword']));
+
+        $response->assertOk()
+            ->assertJsonPath('type', 'search');
+
+        $html = $response->json('html');
+
+        // Check forum comment link and anchor
+        $expectedForumUrl = route('forum.topic', $topic->id) . '#comment_' . $forumComment->id;
+        $this->assertStringContainsString($expectedForumUrl, $html);
+        $this->assertStringContainsString('Searchable Forum Discussion', $html);
+
+        // Check directory comment link and anchor
+        $expectedDirUrl = route('directory.show', $directory->id) . '#comment_' . $dirComment->id;
+        $this->assertStringContainsString($expectedDirUrl, $html);
+        $this->assertStringContainsString('Distinct Directory Listing', $html);
+
+        // Verify comment card avatar rendering
+        $this->assertStringContainsString('portal-comment-avatar-ring', $html);
+        $this->assertStringContainsString('portal-comment-avatar-img', $html);
+    }
 }

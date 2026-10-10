@@ -766,6 +766,43 @@
             font-weight: 600;
             line-height: 1.4;
         }
+
+        /* Comment Target Highlight */
+        .comment-target-highlight {
+            animation: commentGlowPulse 3.5s cubic-bezier(0.25, 1, 0.5, 1) forwards !important;
+            position: relative;
+            border-radius: 12px;
+        }
+
+        @keyframes commentGlowPulse {
+            0% {
+                outline: 3px solid #23d2e2;
+                outline-offset: 4px;
+                box-shadow: 0 0 25px rgba(35, 210, 226, 0.6);
+                background-color: rgba(35, 210, 226, 0.18) !important;
+                transform: scale(1.015);
+            }
+            20% {
+                outline: 3px solid #23d2e2;
+                outline-offset: 4px;
+                box-shadow: 0 0 20px rgba(35, 210, 226, 0.45);
+                background-color: rgba(35, 210, 226, 0.14) !important;
+                transform: scale(1.01);
+            }
+            60% {
+                outline: 2px solid rgba(35, 210, 226, 0.4);
+                outline-offset: 2px;
+                box-shadow: 0 0 10px rgba(35, 210, 226, 0.2);
+                background-color: rgba(35, 210, 226, 0.06) !important;
+            }
+            100% {
+                outline: 2px solid transparent;
+                outline-offset: 0px;
+                box-shadow: none;
+                background-color: transparent !important;
+                transform: scale(1);
+            }
+        }
     </style>
     <!-- Theme Customizer Dynamic Styles (THEME-07) -->
     @include('theme::partials._customizer_head')
@@ -1355,10 +1392,47 @@
                 if(el) {
                     el.innerHTML = html;
                     initHexagons();
+                    if (typeof window.highlightCommentFromHash === 'function') {
+                        window.highlightCommentFromHash();
+                    }
                 }
             })
             .catch(error => console.error('Error:', error));
         }
+
+        window.highlightCommentFromHash = function() {
+            var hash = window.location.hash;
+            if (!hash || hash.indexOf('#comment_') !== 0) return false;
+
+            var targetEl = document.querySelector(hash);
+            if (!targetEl) return false;
+
+            setTimeout(function() {
+                try {
+                    targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                } catch (e) {
+                    targetEl.scrollIntoView();
+                }
+                targetEl.classList.add('comment-target-highlight');
+                setTimeout(function() {
+                    targetEl.classList.remove('comment-target-highlight');
+                }, 4000);
+            }, 180);
+
+            return true;
+        };
+
+        window.addEventListener('DOMContentLoaded', function() {
+            window.highlightCommentFromHash();
+        });
+
+        window.addEventListener('load', function() {
+            window.highlightCommentFromHash();
+        });
+
+        window.addEventListener('hashchange', function() {
+            window.highlightCommentFromHash();
+        });
 
         function deletePost(id, type, containerSelector) {
             console.log("deletePost called with ID:", id, "Type:", type, "Selector:", containerSelector);

@@ -750,10 +750,73 @@
 
     .portal-user-avatar-wrapper,
     .portal-group-avatar-wrapper {
-        margin-top: -32px;
-        margin-bottom: 10px;
+        margin-top: -38px;
+        margin-bottom: 12px;
         position: relative;
-        z-index: 2;
+        z-index: 3;
+        display: flex;
+        justify-content: center;
+    }
+
+    .portal-user-avatar-link,
+    .portal-group-avatar-link {
+        display: inline-block;
+        text-decoration: none !important;
+        position: relative;
+        transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .portal-user-avatar-link:hover,
+    .portal-group-avatar-link:hover {
+        transform: scale(1.08) translateY(-2px);
+    }
+
+    .portal-user-avatar-hex,
+    .portal-group-avatar-hex {
+        width: 76px;
+        height: 76px;
+        border-radius: 50%;
+        padding: 3px;
+        background: linear-gradient(135deg, var(--portal-accent, #23d2e2), #615dfa);
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.16);
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .portal-avatar-img {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+        background: var(--portal-surface-alt, #fff);
+        border: 2px solid var(--portal-card-bg, #fff);
+        display: block;
+    }
+
+    .portal-user-avatar-hex .portal-user-status-dot {
+        position: absolute;
+        bottom: 2px;
+        right: 2px;
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        border: 2px solid var(--portal-card-bg, #fff);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    }
+
+    .portal-user-avatar-hex .portal-user-status-dot.online {
+        background-color: #10b981;
+    }
+
+    .portal-user-avatar-hex .portal-user-status-dot.offline {
+        background-color: #9ca3af;
+    }
+
+    html[dir="rtl"] .portal-user-avatar-hex .portal-user-status-dot {
+        right: auto;
+        left: 2px;
     }
 
     .portal-user-username,
@@ -868,21 +931,56 @@
         gap: 14px;
         box-shadow: var(--portal-shadow);
         transition: var(--portal-transition);
+        text-decoration: none !important;
+        color: inherit;
+        position: relative;
     }
 
     .portal-comment-card:hover {
-        border-color: var(--portal-border-strong);
+        border-color: var(--portal-accent);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(35, 210, 226, 0.12);
+    }
+
+    .portal-comment-avatar-ring {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        padding: 2px;
+        background: linear-gradient(135deg, var(--portal-accent, #23d2e2), #615dfa);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .portal-comment-avatar-img {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+        background: var(--portal-surface-alt, #fff);
+        border: 2px solid var(--portal-card-bg, #fff);
+        display: block;
     }
 
     .portal-comment-body {
         flex: 1;
+        min-width: 0;
     }
 
     .portal-comment-top {
         display: flex;
         align-items: center;
         gap: 8px;
-        margin-bottom: 4px;
+        margin-bottom: 6px;
+        flex-wrap: wrap;
+    }
+
+    .portal-comment-author-wrap {
+        display: flex;
+        align-items: center;
+        gap: 8px;
         flex-wrap: wrap;
     }
 
@@ -895,6 +993,10 @@
     .portal-comment-ctx {
         font-size: 0.82rem;
         color: var(--portal-muted);
+    }
+
+    .portal-comment-ctx strong {
+        color: var(--portal-heading);
     }
 
     .portal-comment-date {
@@ -913,6 +1015,28 @@
         color: var(--portal-text);
         line-height: 1.5;
         margin: 0;
+        word-break: break-word;
+    }
+
+    .portal-comment-action-bar {
+        margin-top: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+    }
+
+    .portal-comment-action-link {
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: var(--portal-accent);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        transition: var(--portal-transition);
+    }
+
+    .portal-comment-card:hover .portal-comment-action-link {
+        color: #1aa8b8;
     }
 
     /* ── Responsive adjustments ──────────────────────────────────── */
