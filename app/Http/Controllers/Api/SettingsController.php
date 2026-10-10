@@ -42,9 +42,11 @@ class SettingsController extends Controller
     public function getProfile()
     {
         $user = Auth::user();
+        $privacy = app(UserPrivacyService::class)->settingsFor($user);
         return response()->json([
             'email' => $user->email,
             'about_me' => $user->sig,
+            'about_visibility' => $privacy->about_visibility ?? 'public',
             'avatar' => $user->img,
         ]);
     }
@@ -61,10 +63,17 @@ class SettingsController extends Controller
             'avatar' => 'nullable|image|max:2048',
             'cover' => 'nullable|image|max:4096',
             'about_me' => 'nullable|string|max:4000',
+            'about_visibility' => 'nullable|in:public,followers,private',
         ]);
 
         $user->email = $request->email;
         $user->sig = $request->input('about_me', $user->sig);
+
+        if ($request->filled('about_visibility')) {
+            app(UserPrivacyService::class)->updateSettings($user, [
+                'about_visibility' => $request->about_visibility,
+            ]);
+        }
 
         if ($request->filled('password')) {
             $user->pass = Hash::make($request->password);

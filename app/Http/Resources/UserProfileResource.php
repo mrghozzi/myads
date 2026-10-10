@@ -70,6 +70,14 @@ class UserProfileResource extends JsonResource
             }
         }
 
+        $privacy = app(\App\Services\UserPrivacyService::class);
+        $privacySettings = $privacy->settingsFor($this->resource);
+        $canViewAbout = $privacy->canViewAbout($this->resource, $viewer);
+        $canViewFollowers = $privacy->canViewFollowers($this->resource, $viewer);
+        $canViewFollowing = $privacy->canViewFollowing($this->resource, $viewer);
+        $canViewPoints = $privacy->canViewPointsHistory($this->resource, $viewer);
+        $showOnlineStatus = $privacy->shouldShowOnlineStatus($this->resource, $viewer);
+
         return [
             'id' => $this->resource instanceof \App\Models\User && $this->resource->usesPublicMemberIds()
                 ? $this->resource->publicRouteIdentifier()
@@ -77,14 +85,16 @@ class UserProfileResource extends JsonResource
             'username' => $this->username,
             'name' => $this->name,
             'avatar' => $this->avatarUrl(),
-            'pts' => $this->pts,
+            'pts' => $canViewPoints ? $this->pts : 0,
             'verified' => $this->hasVerifiedBadge(),
-            'bio' => $this->sig,
-            'followers_count' => Like::where('sid', $this->id)->where('type', 1)->count(),
-            'following_count' => Like::where('uid', $this->id)->where('type', 1)->count(),
+            'bio' => $canViewAbout ? $this->sig : '',
+            'can_view_about' => $canViewAbout,
+            'about_visibility' => $privacySettings->about_visibility ?? 'public',
+            'followers_count' => $canViewFollowers ? Like::where('sid', $this->id)->where('type', 1)->count() : 0,
+            'following_count' => $canViewFollowing ? Like::where('uid', $this->id)->where('type', 1)->count() : 0,
             'posts_count' => Status::where('uid', $this->id)->where('s_type', '!=', 5)->count(),
             'created_at' => $this->created_at ? $this->created_at->toIso8601String() : null,
-            'online' => $this->isOnline(),
+            'online' => $showOnlineStatus && $this->isOnline(),
             'cover' => $coverUrl,
             'is_following' => $isFollowing,
             'subscription_badge' => $subscriptionProfileBadge,
