@@ -5079,6 +5079,7 @@ return [
     'not_verified' => 'Not Verified',
     'verification_status' => 'Verification Status',
     'member_id' => 'Member ID',
+    'view_comment' => 'View Comment',
 ];
 
 

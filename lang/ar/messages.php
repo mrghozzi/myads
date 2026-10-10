@@ -5080,6 +5080,7 @@ return [
     'not_verified' => 'غير موثق',
     'verification_status' => 'حالة التوثيق',
     'member_id' => 'معرّف العضو',
+    'view_comment' => 'عرض التعليق',
 ];
 
 

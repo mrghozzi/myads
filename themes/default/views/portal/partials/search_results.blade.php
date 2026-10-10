@@ -219,7 +219,7 @@
                                 $fAuthorAvatar = $fUser ? $fUser->avatarUrl() : asset('upload/_avatar.png');
                                 $fTopicTitle = $fComment->topic ? $fComment->topic->name : ('#' . $fComment->tid);
                             @endphp
-                            <a href="{{ $fCommentUrl }}" class="portal-comment-card" title="{{ __('messages.view_comment') ?? 'عرض التعليق' }}">
+                            <a href="{{ $fCommentUrl }}" class="portal-comment-card" title="{{ __('messages.view_comment') }}">
                                 <div class="portal-comment-avatar">
                                     <div class="portal-comment-avatar-ring">
                                         <img
@@ -246,7 +246,7 @@
                                     <p class="portal-comment-text">"{{ \Illuminate\Support\Str::limit(strip_tags($fComment->txt), 150) }}"</p>
                                     <div class="portal-comment-action-bar">
                                         <span class="portal-comment-action-link">
-                                            {{ __('messages.view_comment') ?? 'الانتقال للتعليق' }} <i class="fas fa-arrow-left"></i>
+                                            {{ __('messages.view_comment') }} <i class="fas {{ app()->getLocale() == 'ar' ? 'fa-arrow-left' : 'fa-arrow-right' }}"></i>
                                         </span>
                                     </div>
                                 </div>
@@ -264,7 +264,7 @@
                                 $dDirTitle = $dComment->directory ? $dComment->directory->name : ('#' . $dComment->o_parent);
                                 $dDate = is_numeric($dComment->o_mode) ? \Carbon\Carbon::createFromTimestamp((int) $dComment->o_mode)->diffForHumans() : null;
                             @endphp
-                            <a href="{{ $dCommentUrl }}" class="portal-comment-card" title="{{ __('messages.view_comment') ?? 'عرض التعليق' }}">
+                            <a href="{{ $dCommentUrl }}" class="portal-comment-card" title="{{ __('messages.view_comment') }}">
                                 <div class="portal-comment-avatar">
                                     <div class="portal-comment-avatar-ring">
                                         <img
@@ -293,7 +293,7 @@
                                     <p class="portal-comment-text">"{{ \Illuminate\Support\Str::limit(strip_tags($dComment->o_valuer), 150) }}"</p>
                                     <div class="portal-comment-action-bar">
                                         <span class="portal-comment-action-link">
-                                            {{ __('messages.view_comment') ?? 'الانتقال للتعليق' }} <i class="fas fa-arrow-left"></i>
+                                            {{ __('messages.view_comment') }} <i class="fas {{ app()->getLocale() == 'ar' ? 'fa-arrow-left' : 'fa-arrow-right' }}"></i>
                                         </span>
                                     </div>
                                 </div>
