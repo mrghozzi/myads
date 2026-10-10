@@ -56,7 +56,10 @@ class StoreController extends Controller
             }
         }
 
-        $query = Product::visible();
+        $query = Product::visible()
+            ->with(['user', 'type', 'sale', 'files', 'media'])
+            ->withAvg('reviews', 'rating')
+            ->withCount('reviews');
 
         // Search by product name or description
         if ($search !== '') {
@@ -85,6 +88,12 @@ class StoreController extends Controller
             $query->where('o_order', 0)->orderBy('id', 'desc');
         } elseif ($sort === 'paid') {
             $query->where('o_order', '>', 0)->orderBy('id', 'desc');
+        } elseif ($sort === 'sale') {
+            $query->whereHas('sale', function ($s) {
+                $s->where('is_active', true);
+            })->orderBy('id', 'desc');
+        } elseif ($sort === 'rating') {
+            $query->orderByDesc('reviews_avg_rating')->orderBy('id', 'desc');
         } else {
             // Default: newest promotion or date
             $query->orderByDesc(
@@ -155,6 +164,32 @@ class StoreController extends Controller
                     ['name' => __('messages.store'), 'url' => route('store.index')],
                     ['name' => $scriptName, 'url' => route('store.script_category', ['script' => $scriptName, 'category' => 'all'])],
                 ],
+            ]);
+        }
+
+        if ($request->ajax() || $request->wantsJson() || $request->header('X-Requested-With') === 'XMLHttpRequest' || $request->boolean('ajax')) {
+            $viewMode = (string) $request->query('view', 'grid');
+            $html = view('theme::store.partials.products_grid', compact('products', 'user', 'category', 'categoryCounts', 'scriptName', 'search', 'sort', 'viewMode'))->render();
+
+            if ($request->query('partial') === 'html') {
+                return response($html);
+            }
+
+            $pagination = $products->links()->render();
+            return response()->json([
+                'success' => true,
+                'html' => $html,
+                'pagination' => $pagination,
+                'total' => $products->total(),
+                'count' => $products->count(),
+                'has_pages' => $products->hasPages(),
+                'current_page' => $products->currentPage(),
+                'last_page' => $products->lastPage(),
+                'category' => $category,
+                'script' => $scriptName,
+                'search' => $search,
+                'sort' => $sort,
+                'view' => $viewMode,
             ]);
         }
 
