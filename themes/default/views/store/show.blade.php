@@ -343,8 +343,11 @@
         </div>
         <div class="store-screenshots-grid">
             @foreach($screenshots as $ss)
-                <div class="store-screenshot-item" onclick="openStoreLightbox('{{ asset($ss->url) }}', '{{ addslashes($ss->caption ?? $product->name) }}')">
-                    <img src="{{ asset($ss->url) }}" alt="{{ $ss->caption ?? $product->name }}" loading="lazy">
+                @php
+                    $ssUrl = Str::startsWith($ss->url, ['http://', 'https://']) ? $ss->url : asset($ss->url);
+                @endphp
+                <div class="store-screenshot-item" onclick="openStoreLightbox('{{ $ssUrl }}', '{{ addslashes($ss->caption ?? $product->name) }}')">
+                    <img src="{{ $ssUrl }}" alt="{{ $ss->caption ?? $product->name }}" loading="lazy" onerror="this.src='{{ theme_asset('img/error_plug.png') }}'">
                     <div class="store-screenshot-overlay">
                         <i class="fa fa-search-plus"></i>
                         @if($ss->caption)
