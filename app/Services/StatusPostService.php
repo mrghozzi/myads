@@ -711,7 +711,7 @@ class StatusPostService
         $file->move($destinationPath, $filename);
         $fullPath = $destinationPath . DIRECTORY_SEPARATOR . $filename;
 
-        $settings = $this->getFileUploadSettings();
+        $settings = $this->getUploadSettings();
         if (!empty($settings['auto_convert_webp']) && in_array($extension, ['jpg', 'jpeg', 'png', 'bmp'], true) && function_exists('imagewebp')) {
             $webpFilename = pathinfo($filename, PATHINFO_FILENAME) . '.webp';
             $webpFullPath = $destinationPath . DIRECTORY_SEPARATOR . $webpFilename;
@@ -920,7 +920,7 @@ class StatusPostService
         };
     }
 
-    private function getUploadSettings(): array
+    public function getUploadSettings(): array
     {
         $options = Option::where('o_type', 'file_upload_settings')->get()->keyBy('name');
         
@@ -938,5 +938,10 @@ class StatusPostService
             'allowed_extensions' => $options['allowed_extensions']->o_valuer ?? 'jpg,png,jpeg,gif,mp4,mp3,pdf,zip',
             'allowed_mime_types' => $options['allowed_mime_types']->o_valuer ?? 'image/jpeg,image/png,image/gif,video/mp4,audio/mpeg,application/pdf,application/zip',
         ];
+    }
+
+    public function getFileUploadSettings(): array
+    {
+        return $this->getUploadSettings();
     }
 }
