@@ -4183,4 +4183,9 @@ return [
     'changelog_notes' => 'Değişiklik Günlüğü / Notlar',
     'chars' => 'karakter',
     'report_placeholder' => 'Bunun topluluk kurallarını neden ihlal ettiğini açıklayın...',
+    'admin' => 'Yönetici',
+    'verified' => 'Doğrulanmış',
+    'not_verified' => 'Doğrulanmamış',
+    'verification_status' => 'Doğrulama Durumu',
+    'member_id' => 'Üye Kimliği',
 ];

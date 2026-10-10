@@ -4178,4 +4178,9 @@ return [
     'changelog_notes' => 'گزارش تغییرات / یادداشت‌ها',
     'chars' => 'کاراکتر',
     'report_placeholder' => 'توضیح دهید چرا این مورد قوانین جامعه را نقض می‌کند...',
+    'admin' => 'مدیر',
+    'verified' => 'تأیید شده',
+    'not_verified' => 'تأیید نشده',
+    'verification_status' => 'وضعیت تأیید',
+    'member_id' => 'شناسه کاربر',
 ];

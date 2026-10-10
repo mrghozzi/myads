@@ -4181,4 +4181,9 @@ return [
     'changelog_notes' => '更新日志 / 备注',
     'chars' => '字符',
     'report_placeholder' => '请说明违规或不符合社区准则的原因...',
+    'admin' => '管理员',
+    'verified' => '已验证',
+    'not_verified' => '未验证',
+    'verification_status' => '验证状态',
+    'member_id' => '会员ID',
 ];

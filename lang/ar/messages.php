@@ -5073,6 +5073,11 @@ return [
     'changelog_notes' => 'سجل التغييرات / ملاحظات',
     'chars' => 'حرف',
     'report_placeholder' => 'اشرح سبب انتهاك هذا المحتوى لمعايير المجتمع...',
+    'admin' => 'مدير',
+    'verified' => 'موثق',
+    'not_verified' => 'غير موثق',
+    'verification_status' => 'حالة التوثيق',
+    'member_id' => 'معرّف العضو',
 ];
 
 

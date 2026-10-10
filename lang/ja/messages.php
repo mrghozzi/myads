@@ -4176,4 +4176,9 @@ return [
     'changelog_notes' => '変更履歴 / ノート',
     'chars' => '文字',
     'report_placeholder' => 'コミュニティ規約に違反している理由を説明してください...',
+    'admin' => '管理者',
+    'verified' => '確認済み',
+    'not_verified' => '未確認',
+    'verification_status' => '認証ステータス',
+    'member_id' => 'メンバーID',
 ];

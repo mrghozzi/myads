@@ -4178,4 +4178,9 @@ return [
     'changelog_notes' => 'Registro modifiche / Note',
     'chars' => 'caratteri',
     'report_placeholder' => 'Spiega perché viola le linee guida della community...',
+    'admin' => 'Amministratore',
+    'verified' => 'Verificato',
+    'not_verified' => 'Non verificato',
+    'verification_status' => 'Stato di verifica',
+    'member_id' => 'ID membro',
 ];

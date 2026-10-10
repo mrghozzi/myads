@@ -5072,6 +5072,11 @@ return [
     'changelog_notes' => 'Changelog / Notes',
     'chars' => 'chars',
     'report_placeholder' => 'Explain why this violates community standards...',
+    'admin' => 'Admin',
+    'verified' => 'Verified',
+    'not_verified' => 'Not Verified',
+    'verification_status' => 'Verification Status',
+    'member_id' => 'Member ID',
 ];
 
 
