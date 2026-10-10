@@ -122,6 +122,8 @@ class StatusController extends Controller
             return redirect()->route('forum.topic', $status->tp_id);
         } catch (\Illuminate\Validation\ValidationException $e) {
             throw $e;
+        } catch (\RuntimeException $e) {
+            return back()->with('error', $e->getMessage())->withInput();
         } catch (\Throwable $e) {
             report($e);
             return back()->with('error', __('messages.error_occurred'))->withInput();
