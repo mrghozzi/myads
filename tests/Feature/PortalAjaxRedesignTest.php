@@ -87,6 +87,37 @@ class PortalAjaxRedesignTest extends TestCase
         $this->assertGreaterThanOrEqual(1, $response->json('total_count'));
     }
 
+    public function test_portal_search_renders_on_direct_get_request(): void
+    {
+        $user = User::factory()->create(['username' => 'directsearcheduser']);
+
+        $response = $this->get(route('portal.index', ['search' => 'directsearcheduser']));
+
+        $response->assertOk()
+            ->assertSee('portal-search-wrapper')
+            ->assertSee('directsearcheduser')
+            ->assertSee('portal-search-count');
+    }
+
+    public function test_portal_search_finds_status_post_content(): void
+    {
+        $author = User::factory()->create(['username' => 'postauthor']);
+        Status::create([
+            'uid' => $author->id,
+            'tp_id' => 0,
+            's_type' => 0,
+            'date' => time() - 50,
+            'txt' => 'UniqueSpecialKeywordInStatusText',
+        ]);
+
+        $response = $this->getJson(route('portal.index', ['search' => 'UniqueSpecialKeywordInStatusText']));
+
+        $response->assertOk();
+        $this->assertSame('search', $response->json('type'));
+        $this->assertGreaterThanOrEqual(1, $response->json('total_count'));
+        $this->assertStringContainsString('UniqueSpecialKeywordInStatusText', $response->json('html'));
+    }
+
     public function test_admin_can_update_new_algorithm_settings(): void
     {
         $admin = User::factory()->create(['username' => 'feedadmin']);

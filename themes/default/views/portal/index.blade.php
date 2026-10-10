@@ -656,6 +656,12 @@
         gap: 16px;
     }
 
+    .portal-activity-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
     .portal-search-section-header {
         display: flex;
         align-items: center;
@@ -1259,6 +1265,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 searchContainer.style.display = 'none';
                 feedContainer.style.display = 'block';
                 window.history.pushState({ portalType: 'feed', filter: currentFilter }, '', `${portalBaseUrl}?filter=${encodeURIComponent(currentFilter)}`);
+                if (streamContainer && !streamContainer.querySelector('.widget-box') && !streamContainer.querySelector('.activity-card')) {
+                    loadFeed(currentFilter, false);
+                }
                 return;
             }
 
@@ -1289,6 +1298,26 @@ document.addEventListener('DOMContentLoaded', function () {
             searchContainer.style.display = 'none';
             feedContainer.style.display = 'block';
             window.history.pushState({ portalType: 'feed', filter: currentFilter }, '', `${portalBaseUrl}?filter=${encodeURIComponent(currentFilter)}`);
+            if (streamContainer && !streamContainer.querySelector('.widget-box') && !streamContainer.querySelector('.activity-card')) {
+                loadFeed(currentFilter, false);
+            }
+        });
+    }
+
+    function initSearchHexagons(scope) {
+        if (!window.app || !window.app.plugins || !window.app.plugins.createHexagon) return;
+        const target = scope || document;
+        target.querySelectorAll('.hexagon-image-68-74:not(:has(canvas))').forEach(el => {
+            app.plugins.createHexagon({ containerElement: el, width: 68, height: 74, roundedCorners: true, clip: true });
+        });
+        target.querySelectorAll('.hexagon-image-30-32:not(:has(canvas))').forEach(el => {
+            app.plugins.createHexagon({ containerElement: el, width: 30, height: 32, roundedCorners: true, clip: true });
+        });
+        target.querySelectorAll('.hexagon-100-110:not(:has(canvas))').forEach(el => {
+            app.plugins.createHexagon({ containerElement: el, width: 100, height: 110, roundedCorners: true, fill: true });
+        });
+        target.querySelectorAll('.hexagon-border-84-92:not(:has(canvas))').forEach(el => {
+            app.plugins.createHexagon({ containerElement: el, width: 84, height: 92, lineWidth: 5, roundedCorners: true, lineColor: '#e7e8ee' });
         });
     }
 
@@ -1321,6 +1350,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             bindSearchSectionFilters();
             renderNewsMarkdown(searchContainer);
+            initSearchHexagons(searchContainer);
         } catch (error) {
             console.error('Search error:', error);
         } finally {
@@ -1369,6 +1399,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     bindSearchSectionFilters();
+    initSearchHexagons(searchContainer);
 
     // ── History Popstate Support ──────────────────────────────────
     window.addEventListener('popstate', function (e) {

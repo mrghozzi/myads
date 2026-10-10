@@ -21,10 +21,13 @@ class PortalController extends Controller
     public function index(Request $request)
     {
         $filter = $request->query('filter', 'all');
-        $search = $request->query('search', '');
+        $search = trim((string) $request->query('search', ''));
         $user = Auth::user();
         $activityService = app(StatusActivityService::class);
         $hiddenDirectoryStatusIds = $activityService->hiddenDirectoryStatusIds();
+
+        $configuredFeedMode = \App\Support\CommunityFeedSettings::get('feed_mode', 'smart');
+        $requestedMode = $request->query('mode', $configuredFeedMode);
 
         $this->seo([
             'scope_key' => 'portal',
@@ -40,130 +43,161 @@ class PortalController extends Controller
         ]);
 
         // ── Search ───────────────────────────────────────────────
-        if (!empty($search)) {
+        if ($search !== '') {
+            $searchedUsers         = collect();
+            $searchedStatuses      = collect();
+            $searchedGroups        = collect();
+            $searchedCommentsForum = collect();
+            $searchedCommentsDir   = collect();
+            $searchedProducts      = collect();
+
             try {
                 // User search with limit for performance
                 $searchedUsers = User::where('username', 'LIKE', "%{$search}%")->limit(30)->get();
+            } catch (\Throwable $e) {
+                \Log::warning('Search users failed: ' . $e->getMessage());
+            }
 
-                $isSqlite = \Illuminate\Support\Facades\DB::connection()->getDriverName() === 'sqlite';
-
-                if ($isSqlite) {
-                    $topicIds = ForumTopic::visible($user)
-                        ->where(function ($q) use ($search) {
-                            $q->where('name', 'LIKE', "%{$search}%")->orWhere('txt', 'LIKE', "%{$search}%");
-                        })
-                        ->limit(50)
-                        ->pluck('id');
-
-                    $dirIds = Directory::where(function ($q) use ($search) {
+            try {
+                $topicIds = ForumTopic::visible($user)
+                    ->where(function ($q) use ($search) {
                         $q->where('name', 'LIKE', "%{$search}%")->orWhere('txt', 'LIKE', "%{$search}%");
                     })
                     ->limit(50)
                     ->pluck('id');
 
-                    $newsIds = News::where(function ($q) use ($search) {
-                        $q->where('name', 'LIKE', "%{$search}%")->orWhere('text', 'LIKE', "%{$search}%");
+                $dirIds = Directory::where(function ($q) use ($search) {
+                    $q->where('name', 'LIKE', "%{$search}%")->orWhere('txt', 'LIKE', "%{$search}%");
+                })
+                ->limit(50)
+                ->pluck('id');
+
+                $newsIds = News::where(function ($q) use ($search) {
+                    $q->where('name', 'LIKE', "%{$search}%")->orWhere('text', 'LIKE', "%{$search}%");
+                })
+                ->limit(50)
+                ->pluck('id');
+
+                $kbIds = Option::where('o_type', 'knowledgebase')
+                    ->where('o_order', 0)
+                    ->where(function ($q) use ($search) {
+                        $q->where('name', 'LIKE', "%{$search}%")->orWhere('o_valuer', 'LIKE', "%{$search}%");
                     })
                     ->limit(50)
                     ->pluck('id');
 
-                    $kbIds = Option::where('o_type', 'knowledgebase')
-                        ->where('o_order', 0)
-                        ->where(function ($q) use ($search) {
-                            $q->where('name', 'LIKE', "%{$search}%")->orWhere('o_valuer', 'LIKE', "%{$search}%");
-                        })
-                        ->limit(50)
-                        ->pluck('id');
-                } else {
-                    $topicIds = ForumTopic::visible($user)
-                        ->whereRaw("MATCH(name, txt) AGAINST(? IN BOOLEAN MODE)", [$search])
-                        ->limit(50)
-                        ->pluck('id');
-
-                    $dirIds = Directory::whereRaw("MATCH(name, txt) AGAINST(? IN BOOLEAN MODE)", [$search])
-                        ->limit(50)
-                        ->pluck('id');
-
-                    $newsIds = News::whereRaw("MATCH(name, text) AGAINST(? IN BOOLEAN MODE)", [$search])
-                        ->limit(50)
-                        ->pluck('id');
-
-                    $kbIds = Option::where('o_type', 'knowledgebase')
-                        ->where('o_order', 0)
-                        ->whereRaw("MATCH(name, o_valuer) AGAINST(? IN BOOLEAN MODE)", [$search])
-                        ->limit(50)
-                        ->pluck('id');
-                }
-
                 $searchedStatuses = Status::visible()
-                ->when(!empty($hiddenDirectoryStatusIds), fn ($query) => $query->whereNotIn('id', $hiddenDirectoryStatusIds))
-                ->where(function ($q) use ($topicIds, $dirIds, $newsIds, $kbIds) {
-                    $q->whereIn('tp_id', $topicIds)->whereIn('s_type', [2, 4, 100, 10, 11, 12, 13, 14])
-                      ->orWhere(function ($q2) use ($dirIds) {
-                          $q2->whereIn('tp_id', $dirIds)->where('s_type', 1);
-                      })
-                      ->orWhere(function ($q3) use ($newsIds) {
-                          $q3->whereIn('tp_id', $newsIds)->where('s_type', 5);
-                      })
-                      ->orWhere(function ($q4) use ($kbIds) {
-                          $q4->whereIn('tp_id', $kbIds)->where('s_type', KnowledgebaseCommunityService::STATUS_TYPE);
-                      });
-                })
-                ->orderBy('date', 'desc')
-                ->limit(50)
-                ->get();
+                    ->when(!empty($hiddenDirectoryStatusIds), fn ($query) => $query->whereNotIn('id', $hiddenDirectoryStatusIds))
+                    ->where(function ($q) use ($topicIds, $dirIds, $newsIds, $kbIds, $search) {
+                        $hasCondition = false;
+                        if ($topicIds->isNotEmpty()) {
+                            $q->where(function ($q1) use ($topicIds) {
+                                $q1->whereIn('tp_id', $topicIds)->whereIn('s_type', [2, 4, 100, 10, 11, 12, 13, 14]);
+                            });
+                            $hasCondition = true;
+                        }
+
+                        if ($dirIds->isNotEmpty()) {
+                            if ($hasCondition) {
+                                $q->orWhere(function ($q2) use ($dirIds) {
+                                    $q2->whereIn('tp_id', $dirIds)->where('s_type', 1);
+                                });
+                            } else {
+                                $q->where(function ($q2) use ($dirIds) {
+                                    $q2->whereIn('tp_id', $dirIds)->where('s_type', 1);
+                                });
+                                $hasCondition = true;
+                            }
+                        }
+
+                        if ($newsIds->isNotEmpty()) {
+                            if ($hasCondition) {
+                                $q->orWhere(function ($q3) use ($newsIds) {
+                                    $q3->whereIn('tp_id', $newsIds)->where('s_type', 5);
+                                });
+                            } else {
+                                $q->where(function ($q3) use ($newsIds) {
+                                    $q3->whereIn('tp_id', $newsIds)->where('s_type', 5);
+                                });
+                                $hasCondition = true;
+                            }
+                        }
+
+                        if ($kbIds->isNotEmpty()) {
+                            if ($hasCondition) {
+                                $q->orWhere(function ($q4) use ($kbIds) {
+                                    $q4->whereIn('tp_id', $kbIds)->where('s_type', KnowledgebaseCommunityService::STATUS_TYPE);
+                                });
+                            } else {
+                                $q->where(function ($q4) use ($kbIds) {
+                                    $q4->whereIn('tp_id', $kbIds)->where('s_type', KnowledgebaseCommunityService::STATUS_TYPE);
+                                });
+                                $hasCondition = true;
+                            }
+                        }
+
+                        if ($hasCondition) {
+                            $q->orWhere('txt', 'LIKE', "%{$search}%");
+                        } else {
+                            $q->where('txt', 'LIKE', "%{$search}%");
+                        }
+                    })
+                    ->orderBy('date', 'desc')
+                    ->limit(50)
+                    ->get();
 
                 $activityService->decorateMany($searchedStatuses);
-
-                $searchedGroups = collect();
-                if (\App\Support\GroupSettings::isEnabled()) {
-                    $groupQuery = \App\Models\Group::where('status', \App\Models\Group::STATUS_ACTIVE);
-                    if ($isSqlite) {
-                        $groupQuery->where(function ($q) use ($search) {
-                            $q->where('name', 'LIKE', "%{$search}%")->orWhere('description', 'LIKE', "%{$search}%");
-                        });
-                    } else {
-                        $groupQuery->whereRaw("MATCH(name, description) AGAINST(? IN BOOLEAN MODE)", [$search]);
-                    }
-                    $searchedGroups = $groupQuery->limit(30)->get();
-                }
-
-                $commentsForumQuery = \App\Models\ForumComment::visible()
-                    ->whereHas('topic', fn ($query) => $query->visible($user));
-                if ($isSqlite) {
-                    $commentsForumQuery->where('txt', 'LIKE', "%{$search}%");
-                } else {
-                    $commentsForumQuery->whereRaw("MATCH(txt) AGAINST(? IN BOOLEAN MODE)", [$search]);
-                }
-                $searchedCommentsForum = $commentsForumQuery->orderBy('date', 'desc')->limit(30)->get();
-
-                $commentsDirQuery = \App\Models\Option::where('o_type', '=', 'd_coment')
-                    ->visible(null, 'o_order');
-                if ($isSqlite) {
-                    $commentsDirQuery->where('o_valuer', 'LIKE', "%{$search}%");
-                } else {
-                    $commentsDirQuery->whereRaw("MATCH(o_valuer) AGAINST(? IN BOOLEAN MODE)", [$search]);
-                }
-                $searchedCommentsDir = $commentsDirQuery->limit(30)->get();
-
-                $productsQuery = Product::visible();
-                if ($isSqlite) {
-                    $productsQuery->where(function ($q) use ($search) {
-                        $q->where('name', 'LIKE', "%{$search}%")->orWhere('o_valuer', 'LIKE', "%{$search}%");
-                    });
-                } else {
-                    $productsQuery->whereRaw("MATCH(name, o_valuer) AGAINST(? IN BOOLEAN MODE)", [$search]);
-                }
-                $searchedProducts = $productsQuery->limit(30)->get();
-
             } catch (\Throwable $e) {
-                \Log::error('Search failed: ' . $e->getMessage());
-                $searchedUsers         = collect();
-                $searchedStatuses      = collect();
-                $searchedGroups        = collect();
-                $searchedCommentsForum = collect();
-                $searchedCommentsDir   = collect();
-                $searchedProducts      = collect();
+                \Log::warning('Search statuses failed: ' . $e->getMessage());
+            }
+
+            try {
+                if (\App\Support\GroupSettings::isEnabled()) {
+                    $searchedGroups = \App\Models\Group::where('status', \App\Models\Group::STATUS_ACTIVE)
+                        ->where(function ($q) use ($search) {
+                            $q->where('name', 'LIKE', "%{$search}%")
+                              ->orWhere('short_description', 'LIKE', "%{$search}%")
+                              ->orWhere('description', 'LIKE', "%{$search}%");
+                        })
+                        ->limit(30)
+                        ->get();
+                }
+            } catch (\Throwable $e) {
+                \Log::warning('Search groups failed: ' . $e->getMessage());
+            }
+
+            try {
+                $searchedCommentsForum = \App\Models\ForumComment::visible()
+                    ->whereHas('topic', fn ($query) => $query->visible($user))
+                    ->where('txt', 'LIKE', "%{$search}%")
+                    ->with('user')
+                    ->orderBy('date', 'desc')
+                    ->limit(30)
+                    ->get();
+            } catch (\Throwable $e) {
+                \Log::warning('Search forum comments failed: ' . $e->getMessage());
+            }
+
+            try {
+                $searchedCommentsDir = \App\Models\Option::where('o_type', '=', 'd_coment')
+                    ->visible(null, 'o_order')
+                    ->where('o_valuer', 'LIKE', "%{$search}%")
+                    ->limit(30)
+                    ->get();
+            } catch (\Throwable $e) {
+                \Log::warning('Search directory comments failed: ' . $e->getMessage());
+            }
+
+            try {
+                $searchedProducts = Product::visible()
+                    ->where(function ($q) use ($search) {
+                        $q->where('name', 'LIKE', "%{$search}%")
+                          ->orWhere('o_valuer', 'LIKE', "%{$search}%");
+                    })
+                    ->limit(30)
+                    ->get();
+            } catch (\Throwable $e) {
+                \Log::warning('Search products failed: ' . $e->getMessage());
             }
 
             if ($request->ajax() || $request->wantsJson()) {
@@ -184,8 +218,24 @@ class PortalController extends Controller
                 ]);
             }
 
+            $portalStats = \Illuminate\Support\Facades\Cache::remember('portal_stats_summary', 300, function () {
+                try {
+                    return [
+                        'members_count' => User::count(),
+                        'posts_today' => Status::where('date', '>=', strtotime('today'))->count(),
+                        'feed_mode' => \App\Support\CommunityFeedSettings::get('feed_mode', 'smart'),
+                    ];
+                } catch (\Throwable) {
+                    return [
+                        'members_count' => 0,
+                        'posts_today' => 0,
+                        'feed_mode' => 'smart',
+                    ];
+                }
+            });
+
             return view('theme::portal.index', compact(
-                'filter', 'search',
+                'filter', 'search', 'portalStats', 'requestedMode',
                 'searchedUsers', 'searchedStatuses', 'searchedGroups',
                 'searchedCommentsForum', 'searchedCommentsDir', 'searchedProducts'
             ));
