@@ -372,7 +372,7 @@
 
 <div class="grid grid-3-6-3 mobile-prefer-content">
     <div class="grid-column">
-        @if($canViewAbout)
+        @if($canViewAbout && $selectedTab !== 'about')
             <div class="widget-box">
                 <p class="widget-box-title">{{ __('messages.about_me') }}</p>
                 <div class="widget-box-content">
@@ -475,16 +475,24 @@
         @endif
 
         @if($selectedTab === 'about')
-            <div class="widget-box">
-                <p class="widget-box-title">{{ __('messages.about_me') }}</p>
-                <div class="widget-box-content">
-                    @if($canViewAbout)
-                        <p class="paragraph" style="white-space: pre-line;">{{ trim((string) $user->sig) !== '' ? $user->sig : __('messages.about_me_empty') }}</p>
-                    @else
-                        <p class="text-center">{{ __('messages.section_private') }}</p>
-                    @endif
-                </div>
-            </div>
+            @include('theme::profile.partials.about_tab', [
+                'user' => $user,
+                'isOwnProfile' => $isOwnProfile,
+                'canViewAbout' => $canViewAbout,
+                'canViewFollowers' => $canViewFollowers,
+                'canViewFollowing' => $canViewFollowing,
+                'canViewPoints' => $canViewPoints ?? true,
+                'privacySettings' => $privacySettings ?? null,
+                'communityStats' => $communityStats ?? [],
+                'postsCount' => $postsCount,
+                'followersCount' => $followersCount,
+                'followingCount' => $followingCount,
+                'badgeShowcase' => $badgeShowcase,
+                'socialLinks' => $socialLinks,
+                'subscriptionProfileBadge' => $subscriptionProfileBadge ?? null,
+                'profileContentNotice' => $profileContentNotice ?? null,
+                'isFollowing' => $isFollowing ?? false,
+            ])
         @elseif($selectedTab === 'photos')
             <div class="widget-box">
                 <p class="widget-box-title">{{ __('messages.Photos') }}</p>
@@ -559,7 +567,7 @@
     </div>
 
     <div class="grid-column">
-        @if($canViewAbout && trim((string) $user->sig) !== '')
+        @if($canViewAbout && trim((string) $user->sig) !== '' && $selectedTab !== 'about')
             <div class="widget-box">
                 <p class="widget-box-title">{{ __('messages.profile_highlights') }}</p>
                 <div class="widget-box-content">

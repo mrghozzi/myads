@@ -173,6 +173,14 @@ class ProfileController extends Controller
         $subscriptionProfileBadge = app(SubscriptionEntitlementService::class)->activeProfileBadgeForUserId($user->id);
         $hasPinnedPost = Status::where('uid', $user->id)->where('is_pinned', true)->exists();
         $isOwnProfile = (Auth::check() && Auth::id() === $user->id);
+        $canViewPoints = $privacy->canViewPointsHistory($user, $viewer);
+        $communityStats = [];
+        if ($selectedTab === 'about') {
+            $communityStats = [
+                'topics_count' => \Illuminate\Support\Facades\Schema::hasTable('forum_topics') ? $user->topics()->count() : 0,
+                'comments_count' => \Illuminate\Support\Facades\Schema::hasTable('forum_comments') ? $user->comments()->count() : 0,
+            ];
+        }
 
         if ($request->ajax() || $request->wantsJson()) {
             $ajaxView = match($selectedTab) {
@@ -205,6 +213,9 @@ class ProfileController extends Controller
             'canViewProfileContent',
             'canViewFollowers',
             'canViewFollowing',
+            'canViewPoints',
+            'privacySettings',
+            'communityStats',
             'canSendMessage',
             'showOnlineStatus',
             'profileContentNotice',
@@ -930,10 +941,17 @@ class ProfileController extends Controller
             'avatar' => 'nullable|image|max:2048',
             'cover' => 'nullable|image|max:4096',
             'about_me' => 'nullable|string|max:4000',
+            'about_visibility' => 'nullable|string|in:public,followers,private',
         ]);
 
         $user->email = $request->email;
         $user->sig = $request->input('about_me', $user->sig);
+
+        if ($request->filled('about_visibility') && app(\App\Services\V420SchemaService::class)->supports('privacy')) {
+            app(UserPrivacyService::class)->updateSettings($user, [
+                'about_visibility' => $request->about_visibility,
+            ]);
+        }
 
         if ($request->filled('password')) {
             $user->pass = Hash::make($request->password);

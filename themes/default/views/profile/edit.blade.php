@@ -109,9 +109,14 @@
 
                         <hr style="border: none; border-top: 1px solid var(--border-color, #ebebeb); margin: 32px 0;">
 
-                        <div class="section-header" style="margin-bottom: 24px;">
-                            <h4 style="font-size: 16px; font-weight: 700; margin: 0; color: var(--text-color, #3e3f5e);">{{ __('messages.about_me') }}</h4>
-                            <p style="color: var(--text-color-alt, #8f91ac); font-size: 13px; margin-top: 4px;">{{ __('messages.about_me_placeholder') }}</p>
+                        <div class="section-header" style="margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+                            <div>
+                                <h4 style="font-size: 16px; font-weight: 700; margin: 0; color: var(--text-color, #3e3f5e);">{{ __('messages.about_me') }}</h4>
+                                <p style="color: var(--text-color-alt, #8f91ac); font-size: 13px; margin-top: 4px;">{{ __('messages.about_me_placeholder') }}</p>
+                            </div>
+                            <a href="{{ route('profile.privacy') }}" class="button small secondary" style="border-radius: 8px; font-size: 12px; height: 32px; line-height: 32px; padding: 0 14px; text-decoration: none;">
+                                <i class="fa-solid fa-shield-halved me-1"></i> {{ __('messages.privacy_settings') }}
+                            </a>
                         </div>
 
                         <div class="form-row">
@@ -122,6 +127,27 @@
                                 </div>
                             </div>
                         </div>
+
+                        @if(isset($privacySettings))
+                        <div class="form-row" style="margin-top: 16px;">
+                            <div class="form-item">
+                                <label for="about_visibility" style="font-size: 13px; font-weight: 700; color: var(--text-color, #3e3f5e); margin-bottom: 8px; display: block;">
+                                    <i class="fa-solid fa-eye me-1" style="color: var(--primary-color, #615dfa);"></i> {{ __('messages.about_visibility') ?? 'Who can view your About Me?' }}
+                                </label>
+                                <select id="about_visibility" name="about_visibility" class="form-select" style="border-radius: 12px; height: 44px; padding: 0 16px; background-color: var(--widget-box-bg, #fff); color: var(--text-color, #333); border: 1px solid var(--border-color, #ebebeb);">
+                                    <option value="public" {{ (old('about_visibility', $privacySettings->about_visibility) === 'public') ? 'selected' : '' }}>
+                                        🌍 {{ __('messages.visibility_public') }} ({{ __('messages.ip_visibility_everyone') ?? 'Everyone' }})
+                                    </option>
+                                    <option value="followers" {{ (old('about_visibility', $privacySettings->about_visibility) === 'followers') ? 'selected' : '' }}>
+                                        👥 {{ __('messages.visibility_followers') }}
+                                    </option>
+                                    <option value="private" {{ (old('about_visibility', $privacySettings->about_visibility) === 'private') ? 'selected' : '' }}>
+                                        🔒 {{ __('messages.visibility_private') }}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                        @endif
 
                         <div class="form-row" style="margin-top: 32px; display: flex; justify-content: flex-end;">
                             <div class="form-item" style="min-width: 200px;">
