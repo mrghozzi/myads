@@ -693,6 +693,91 @@ class StoreController extends Controller
         return response()->json(['success' => true, 'message' => __('messages.updated_successfully') ?? 'Updated successfully']);
     }
 
+    /**
+     * Update product media (screenshots, live demo URL, video preview, and optional cover image)
+     * without publishing a new product version release.
+     */
+    public function updateMedia(Request $request, $name)
+    {
+        $product = $this->findProductByName($name);
+        if (!Auth::check() || (Auth::id() != $product->o_parent && !Auth::user()->isAdmin())) {
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json(['error' => __('messages.unauthorized')], 403);
+            }
+            return redirect()->route('store.show', $product->name);
+        }
+
+        $request->validate([
+            'demo_url'    => ['nullable', 'string', 'max:2048'],
+            'video_url'   => ['nullable', 'string', 'max:2048'],
+            'screenshots' => ['nullable'],
+            'img'         => ['nullable', 'string', 'max:2048'],
+        ]);
+
+        // Optional: update cover image
+        if ($request->filled('img')) {
+            $product->update(['o_mode' => $request->input('img')]);
+        }
+
+        // Update live demo URL
+        if ($request->exists('demo_url')) {
+            ProductMedia::where('product_id', $product->id)->where('media_type', 'demo_url')->delete();
+            if ($request->filled('demo_url')) {
+                ProductMedia::create([
+                    'product_id' => $product->id,
+                    'media_type' => 'demo_url',
+                    'url'        => $request->input('demo_url'),
+                ]);
+            }
+        }
+
+        // Update video preview URL
+        if ($request->exists('video_url')) {
+            ProductMedia::where('product_id', $product->id)->where('media_type', 'video')->delete();
+            if ($request->filled('video_url')) {
+                ProductMedia::create([
+                    'product_id' => $product->id,
+                    'media_type' => 'video',
+                    'url'        => $request->input('video_url'),
+                ]);
+            }
+        }
+
+        // Update screenshots gallery
+        if ($request->exists('screenshots') || $request->has('has_screenshots_section')) {
+            $screenshots = $request->input('screenshots', []);
+            if (is_string($screenshots)) {
+                $screenshots = json_decode($screenshots, true) ?: array_filter(array_map('trim', explode(',', $screenshots)));
+            }
+            if (!is_array($screenshots)) {
+                $screenshots = [];
+            }
+
+            ProductMedia::where('product_id', $product->id)->where('media_type', 'screenshot')->delete();
+            foreach ($screenshots as $idx => $sUrl) {
+                if (!empty($sUrl) && is_string($sUrl)) {
+                    ProductMedia::create([
+                        'product_id' => $product->id,
+                        'media_type' => 'screenshot',
+                        'url'        => trim($sUrl),
+                        'sort_order' => $idx,
+                    ]);
+                }
+            }
+        }
+
+        $msg = __('messages.media_updated_successfully') ?? 'تم تحديث الوسائط والمعاينة الحية بنجاح';
+
+        if ($request->expectsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => $msg,
+            ]);
+        }
+
+        return redirect()->back()->with('success', $msg);
+    }
+
     public function storeUpdate(Request $request, $name)
     {
         $product = $this->findProductByName($name);
@@ -786,22 +871,23 @@ class StoreController extends Controller
         }
 
         // Update screenshots
-        if ($request->has('screenshots')) {
-            $screenshots = $request->input('screenshots');
+        if ($request->exists('screenshots') || $request->has('has_screenshots_section')) {
+            $screenshots = $request->input('screenshots', []);
             if (is_string($screenshots)) {
                 $screenshots = json_decode($screenshots, true) ?: array_filter(array_map('trim', explode(',', $screenshots)));
             }
-            if (is_array($screenshots)) {
-                ProductMedia::where('product_id', $product->id)->where('media_type', 'screenshot')->delete();
-                foreach ($screenshots as $idx => $sUrl) {
-                    if (!empty($sUrl) && is_string($sUrl)) {
-                        ProductMedia::create([
-                            'product_id' => $product->id,
-                            'media_type' => 'screenshot',
-                            'url' => $sUrl,
-                            'sort_order' => $idx,
-                        ]);
-                    }
+            if (!is_array($screenshots)) {
+                $screenshots = [];
+            }
+            ProductMedia::where('product_id', $product->id)->where('media_type', 'screenshot')->delete();
+            foreach ($screenshots as $idx => $sUrl) {
+                if (!empty($sUrl) && is_string($sUrl)) {
+                    ProductMedia::create([
+                        'product_id' => $product->id,
+                        'media_type' => 'screenshot',
+                        'url'        => trim($sUrl),
+                        'sort_order' => $idx,
+                    ]);
                 }
             }
         }

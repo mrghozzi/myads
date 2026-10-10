@@ -4993,6 +4993,8 @@ return [
     "screenshot_url" => "رابط أو مسار لقطة الشاشة",
     "remove_screenshot" => "حذف لقطة الشاشة",
     "media_and_demo" => "الوسائط والمعاينة الحية",
+    "save_media" => "حفظ الوسائط والمعاينة",
+    "media_updated_successfully" => "تم حفظ الوسائط والمعاينة الحية بنجاح.",
     "product_details_tab" => "تفاصيل المنتج",
     "product_added_successfully" => "تمت إضافة المنتج بنجاح!",
     "product_name_arabic_hint" => "يدعم الأحرف العربية، المسافات، الأرقام والرموز.",

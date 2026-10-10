@@ -408,6 +408,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/store/delete', [StoreController::class, 'destroy'])->name('store.delete');
     Route::get('/store/{name}/update', [StoreController::class, 'update'])->name('store.update');
     Route::post('/store/{name}/update', [StoreController::class, 'storeUpdate'])->name('store.update.store');
+    Route::post('/store/{name}/update-media', [StoreController::class, 'updateMedia'])->name('store.update.media');
     Route::post('/store/{name}/update-price', [StoreController::class, 'updatePrice'])->name('store.update.price');
     Route::post('/store/{name}/update-topic', [StoreController::class, 'updateTopic'])->name('store.update.topic');
     Route::post('/store/{name}/update-details', [StoreController::class, 'updateDetails'])->name('store.update.details');

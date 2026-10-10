@@ -4992,6 +4992,8 @@ return [
     "screenshot_url" => "Screenshot URL or Path",
     "remove_screenshot" => "Remove Screenshot",
     "media_and_demo" => "Media & Live Demo",
+    "save_media" => "Save Media & Preview",
+    "media_updated_successfully" => "Media and live preview updated successfully.",
     "product_details_tab" => "Product Details",
     "product_added_successfully" => "Product added successfully!",
     "product_name_arabic_hint" => "Arabic letters, spaces, numbers, and hyphens are supported.",
