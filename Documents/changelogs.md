@@ -1,3 +1,152 @@
+# v4.6.3
+> **Major Forum Architecture & Experience Release** — Rebuilt and modernized the MYADS Community Forum (`/forum`, `/f{id}`, `/t{id}`) with proprietary high-performance modern discussion architecture while maintaining 100% backward compatibility and data integrity across existing topics, categories, comments, and attachments. Integrated a multi-editor suite (MyAds Markdown with live preview, Quill.js, and SCEditor) across topic creation, editing, and comments.
+
+### Fix Comment Box Editor In Non-Forum Media Posts in `/portal` (`CommentController.php`, `master.blade.php`, `topic_comments.blade.php`)
+* **Scoped Modern Markdown Composer to Dedicated Forum Discussions (`s_type == 2`)**:
+  * Resolved an issue where non-forum media posts (photos `s_type=4`, videos `s_type=10`, audio `s_type=11,13`, clips `s_type=14`, files `s_type=12`, text statuses `s_type=100`) in the `/portal` feed incorrectly rendered the Discussion Markdown Composer (`forum-modern-reply-card`, `forum-modern-editor-box`, and Markdown toolbar) because their comments are stored under the shared forum table with `type='forum'`.
+  * Updated `CommentController::load` and `CommentController::store` to distinguish dedicated forum discussion topics (`s_type == 2` on `/t/{id}`) from media activity posts (`s_type != 2`). Media posts now cleanly render standard social activity comments (`theme::partials.activity.comments`), matching the healthy behavior of Store, Knowledgebase, and Directory posts.
+  * Added explicit `view` parameter negotiation (`view=topic_comments` for `/t/{id}` discussions vs `view=activity` for portal stream comment cards) in `master.blade.php` and `topic_comments.blade.php`.
+  * Added automated test coverage in `PortalAjaxRedesignTest` ensuring media post comments load standard activity comments without any dedicated forum composer artifacts.
+
+### Modern Discussion Forum Architecture & Zero-Reload Browsing (`/forum`, `/f{id}`, `ForumController.php`)
+* **Two-Pane Responsive Layout & Category Navigation**:
+  * Designed a two-pane desktop and responsive mobile layout matching modern community discussion standards: sticky category/tags sidebar on the left and dynamic discussion stream on the right.
+  * Added distinct, vibrant color bullets and badges to each category tag (`f_cat.color`), customizable directly from the Admin Panel.
+  * Embedded community statistics widget displaying total categories, total topics, and registered members.
+* **Ajax Discussion Stream & High-Speed Live Filtering**:
+  * Implemented instant Ajax filtering with zero full-page reloads across discussion filter tabs: **Latest Activity**, **Top** (most replied/active), **Newest**, and **Unanswered**.
+  * Added live debounced search input with instantaneous client filtering.
+  * Seamless Ajax stream pagination with a "Load More" stream loader button.
+  * Synchronized browser navigation state using HTML5 `history.pushState` for bookmarkable, shareable URLs.
+* **Modern Discussion Card Component (`discussion_item.blade.php`)**:
+  * Signature Vikinger hexagonal user avatars with real-time online status indicators and verified badges.
+  * Color-coded category tag pills, pinned badges, and locked badges.
+  * Discussion preview snippet, author metadata, and latest reply indicator ("replied X minutes ago").
+  * Clean reply counter pill badge.
+
+### Hexagonal Avatar System Integration across Forum (`discussion_item.blade.php`, `topic.blade.php`, `forum-modern.css`)
+* **Signature Hexagonal Member Avatars**:
+  * Integrated the Vikinger design system's signature hexagonal avatar components (`user-avatar small no-outline`, `hexagon-image-30-32`, `hexagon-border-40-44`, and `user-avatar-badge`) across the forum discussion stream (`/forum` and `/f{id}`) and topic discussion view (`/t{id}`).
+  * Added CSS polygon clip-path fallback (`polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)`) in both light and dark mode stylesheets (`css/forum-modern.css` and `css_d/forum-modern.css`) to guarantee instant hexagonal shaping across all browsers before canvas rendering.
+  * Connected `initHexagons()` to dynamic Ajax discussion streams, filter switching, and "Load More" pagination to ensure newly loaded cards automatically render crisp hexagonal canvas borders.
+  * Preserved online/offline presence indicators, verified member badges, and fallback handling for deleted users.
+
+### Docked/Floating Modern Discussion Composer (`discussion_composer.blade.php`, `forum-modern.js`)
+* **Floating Bottom Composer Drawer**:
+  * Built a persistent bottom drawer composer that opens instantly on "Start a Discussion" or "Reply".
+  * Supports minimizing to a compact bottom pill, toggling fullscreen mode, or docking while browsing the forum without losing unsaved drafts.
+  * Category selector, topic title input, and rich text area with live client-side Markdown preview renderer.
+  * Asynchronous Ajax submission with instant stream updates and automatic redirection.
+
+### Modern Discussion View, Comment Stream & Sticky Timeline Scrubber (`/t{id}`, `topic.blade.php`, `topic_comments.blade.php`)
+* **Post Stream Architecture & Discussion Comment Cards**:
+  * Formatted original topic card (`#post-1`) and all discussion replies as modern post cards (`#post-2`, `#post-3`, ...) with author role badges (Admin, Moderator, Member), posting date, moderation actions (Edit, Delete, Pin, Lock, Report), and verified badges.
+  * Replaced the generic social activity comments partial with a dedicated MyAds Modern Forum discussion comment stream component (`theme::forum.partials.topic_comments`).
+  * Enforced chronological order (`id` `asc`) so discussion replies read naturally from top to bottom.
+* **Threaded & Nested Comment Architecture**:
+  * Implemented true nested reply support (`parent_id`) with a visual connecting tree line (`.forum-modern-replies-tree`), compact hexagonal avatars, parent mention badge (`@ParentAuthor`), formatted content, and per-reply like and reply actions.
+  * Added automated hierarchy normalization: replying to a nested reply attaches to the root comment of that thread, guaranteeing a clean 2-level hierarchy.
+  * Added cascading deletion: deleting a parent comment cleans up child replies automatically.
+* **Modern Reply Composer Card**:
+  * Replaced the plain comment box with a dedicated Modern Reply Composer Card (`.forum-modern-reply-card`) at the base of the discussion.
+  * Added active "Replying to @username" banner with 1-click cancel button (`cancelReply`).
+  * Full Markdown Formatting Toolbar with Live Preview toggle, Emoji picker, image attachment dropzone, and primary "Post Reply" button with loading spinner.
+  * Seamless Ajax submission updating the post stream without page reloads.
+* **Sticky Timeline Scrubber Component**:
+  * Created a sticky desktop sidebar widget tracking post stream progression (`Post X of Y`).
+  * Jump to Original Post (`#post-1`) and Jump to Latest Reply buttons.
+  * Discussion metadata card showing creation date, total replies, views, and category link.
+  * **Moderator Tools Sidebar Widget (`.forum-modern-mod-tools-card`)**: Integrated a dedicated, permission-gated moderation toolset inside the sticky scrubber sidebar visible strictly to forum moderators and administrators. Provides 1-click Pin/Unpin, Lock/Unlock with real-time state badges, direct topic editing, and topic deletion with automatic redirect to the parent category.
+
+### Forum Topic Sharing, Pinned Comments & Best Answer System (`topic.blade.php`, `topic_comments.blade.php`, `ForumController.php`)
+* **Modernized Share Popover (`topic.blade.php`, `forum-modern.css`, `css_d/forum-modern.css`)**:
+  * Fixed misplaced/overlapping share popover in RTL/LTR layouts: relocated to open gracefully below the Share button (`top: calc(100% + 8px); inset-inline-end: 0;`).
+  * Integrated a 1-click **Copy Topic Link** button with animated visual confirmation ("Copied!") and fallback for non-secure contexts.
+  * Added outside-click dismissal and responsive styling supporting both light and dark modes without obscuring post content.
+* **Pinned Comment Capability (`is_pinned`, `pinned_comment_id`)**:
+  * Added the ability for the topic author OR forum moderators to pin/unpin any comment (`POST /forum/comment/{id}/pin`).
+  * Pinned comments automatically float to the top of the replies stream (`orderByDesc('is_pinned')`).
+  * Rendered distinct amber/gold badge (`.forum-modern-badge-pinned-comment`) and border highlight (`.is-pinned-comment`).
+* **Best Answer Selection (`is_best_answer`, `best_comment_id`)**:
+  * Added Modern Best Answer functionality for topic authors and forum moderators (`POST /forum/comment/{id}/best-answer`).
+  * Best answers sort to the top of the discussion, display an emerald badge (`.forum-modern-badge-best-answer`), and highlight the comment card (`.is-best-answer`).
+  * Awards reputation points (10 PTS) to the comment author and triggers an on-site notification linking directly to the solution.
+* **Comment Deletion by Comment Owner or Moderator (`topic_comments.blade.php`, `CommentController.php`)**:
+  * Added direct deletion capability allowing comment authors and forum moderators/administrators to delete comments and nested replies (`POST /comment/delete`).
+  * Displayed intuitive action buttons (`.forum-modern-delete-btn`) in both root comment actions and nested reply actions, with confirmation and smooth exit transitions.
+  * Secured server-side authorization ensuring only the comment owner, section/global moderator, or admin can delete the comment, with automatic cleanup of parent/reply associations, likes, reaction data, and topic comment counters.
+
+
+### Multi-Editor Suite for Topics & Comments (`RichTextEditorService.php`, `comments.blade.php`, `create.blade.php`, `edit.blade.php`)
+* **MyAds Markdown Live Preview Editor**:
+  * Integrated `myads_markdown` editor with a dedicated toolbar (Bold, Italic, Strikethrough, Heading, Blockquote, Inline Code, Code Block, Bullet List, Link, Emojis, and Image Upload).
+  * Built an instant client-side live preview renderer (`ForumEditor.renderMarkdown`) allowing users to preview formatted posts without roundtrips to the server.
+* **Unified Editor Parity for Comments**:
+  * Applied the same editing engine and toolbar options to the comment composer inside `comments.blade.php`, supporting markdown formatting, emoji picker, media upload, and toggleable live preview.
+* **Admin Switcher & Preservation of Existing Editors**:
+  * Preserved full support for **Quill.js** (modern WYSIWYG) and **SCEditor** (classic BBCode/WYSIWYG).
+  * Added an editor preference selector in `/admin/forum/settings` allowing administrators to choose their preferred writing editor across the forum.
+
+### Database Architecture & Category Color Picker (`2026_10_12_160000_enhance_forum_modern_architecture.php`, `AdminController.php`)
+* **Database Enhancement (Zero Data Loss)**:
+  * Enhanced `f_cat` table with `slug` and `color` columns, backfilling default palette colors across existing categories.
+  * Enhanced `forum` table with `slug`, `last_posted_at`, `last_poster_id`, and `comments_count`, safely backfilled from existing comments.
+  * Synchronized `CommentController@store` to update `last_posted_at`, `last_poster_id`, and `comments_count` upon receiving new replies.
+* **Admin Category Color Picker**:
+  * Added an intuitive color picker and hex code input to Add and Edit category modals in `/admin/forum/categories`.
+  * Displayed colored category icon boxes and hex badges in the Admin categories data table.
+
+### Interactive Drag & Drop Category Tree & Sub-Forums Architecture (`/admin/forum/categories`, `ForumCategory.php`, `AdminController.php`, `ForumController.php`)
+* **Hierarchical Sub-Forums Database & Model Architecture (`f_cat.parent_id`, `ForumCategory.php`)**:
+  * Added `parent_id` (nullable unsigned big integer with index) to `f_cat` table with clean migration `2026_10_12_190000_add_parent_id_to_forum_categories_table.php`.
+  * Added Eloquent relationships `parent()` and `children()` (`subCategories()`), alongside helper methods `scopeRoot()`, `isRoot()`, `isSubCategory()`, `depth()`, `allChildIds()`, and `getAncestors()`.
+  * Enforced server-side cycle detection preventing categories from being parented to themselves or to any of their descendants.
+* **Modern Admin Category Hierarchy Tree with AJAX Drag & Drop (`/admin/forum/categories`)**:
+  * Completely rebuilt `/admin/forum/categories` with an interactive, responsive hierarchy tree view replacing the static flat table.
+  * Native HTML5 drag-and-drop engine with real-time drop cues: drag items before, after, or directly inside another category to convert it into a nested sub-forum.
+  * Instant AJAX auto-saving via `POST /admin/forum/categories/reorder` with animated floating status toasts and zero page reloads.
+  * Added "+ Sub Forum" (Quick Add Sub-Forum) action per card, preselecting the parent category and updating modal context dynamically.
+  * Added accessible one-click "Make Root Category" button on child nodes, real-time live search filter, expand all / collapse all toggles, and view switcher between Tree and Table layouts.
+  * Protected category deletion: reassigns child sub-forums to the parent level to prevent orphaned records, with option to migrate existing topics.
+* **Public Forum Compatibility (`/forum`, `/f{id}`, `/t{id}`, `ForumController.php`, `forum-modern.css`)**:
+  * **Sidebar Sub-Forums**: Rendered indented sub-forum items under parent categories in the left navigation sidebar with connecting tree guides and active indicators.
+  * **Category Sub-Forums Grid**: Added a dedicated, color-coded Sub-Forums card grid on category pages (`/f{id}`) displaying sub-forum badges, topic counts, descriptions, and direct links.
+  * **Sub-Forum Topic Aggregation**: Parent category views automatically aggregate topic listings across the parent and all descendant sub-categories.
+  * **Multi-Level Breadcrumbs**: Updated topic and category breadcrumbs to display the complete hierarchical ancestor chain (`Home > Forum > Parent Forum > Sub-Forum > Topic`).
+  * **Hierarchical Category Selection**: Updated Discussion Composer drawer, topic creation, and edit forms with indented tree hierarchy in category select dropdowns.
+
+### Strict Forum Isolation to Dedicated Discussion Topics (`s_type = 2`)
+* **Separation of Forum Topics from Community Social Posts (`ForumTopic.php`, `ForumController.php`, `ForumApiController.php`)**:
+  * Implemented `ForumTopic::scopeForumOnly(Builder $query)` ensuring forum index streams (`/forum`), category boards (`/f{id}`), and REST API feeds strictly query topics having an associated `status` record with `s_type = 2`.
+  * Excluded all other social and media content stored in the shared `forum` table (e.g. community blog articles `s_type=100`, photo galleries `s_type=4`, videos `s_type=10`, audio tracks `s_type=11,13`, clips reels `s_type=14`, directory listings `s_type=1`, and digital products `s_type=7867`).
+  * Updated category metrics (`attachCategoryMetrics`) and index summary metrics (`$forumStats`) so topic counts, reply counts, and latest active topics strictly calculate and reflect `s_type = 2` forum discussions.
+  * Ensured `ForumController::store` and `ForumApiController::storeTopic` strictly assign `s_type = 2` to the created `Status` record when publishing new topics via the discussion composer or forum form.
+  * Added compound database index `status_tp_id_stype_idx` on `status(tp_id, s_type)` in migration `2026_10_12_170000_add_forum_status_link_index.php` for lightning-fast subqueries and zero latency.
+### Modernized Forum Discussion Feed Cards in Community Stream (`/portal`, `topic.blade.php`, `StatusActivityService.php`, `forum-activity-superdesign.css`)
+* **World-Class Forum Activity Card (`.forum-feed-card`, `topic.blade.php`)**:
+  * Completely rebuilt community forum activity post cards (`s_type == 2`) across `/portal`, member profiles, and groups with modern, high-engagement discussion card styling.
+  * Replaced legacy generic background images (`img/background_topic.jpg`) with a clean, structured discussion card layout with responsive elevation, subtle borders, and smooth hover micro-interactions.
+  * Added distinct Forum Origin chip in the post header (`forum-origin-chip`) identifying discussions seamlessly within the social stream.
+  * Integrated vibrant category pill badges featuring real-time custom category colors (`--cat-color`) and bullet dots, linking directly to `/f/{cat_id}`.
+  * Added prominent status pill badges: **Pinned** (amber/gold), **Locked** (slate), and **Solved** (emerald checkmark).
+  * Implemented rich content extraction with Markdown/HTML sanitization and an optional responsive media showcase with zoom preview.
+  * Added file attachments indicator pill (`fa-paperclip`) with dynamic file count.
+  * Built an interactive discussion metrics bar displaying views (`fa-eye`), replies (`fa-comments`), and an action CTA button ("View Discussion" / "عرض النقاش").
+  * **Direct Reply Deep-Linking (`#reply`)**: Connected the comment action button, replies metric badge, and comments count link to open the topic discussion directly at `#reply`, with automatic smooth scrolling and textarea focus on the discussion reply composer.
+* **Performance Optimization & N+1 Query Elimination (`StatusActivityService.php`)**:
+  * Updated `StatusActivityService::decorate` and `StatusActivityService::decorateMany` to eager-load `category` and `lastPoster` on `ForumTopic` instances linked to `s_type == 2` status records.
+  * Prevents N+1 database queries when rendering community activity feeds with mixed post types.
+* **Responsive Styling, Dark Mode & RTL Support (`forum-activity-superdesign.css`, `css_d/`)**:
+  * Authored comprehensive modern CSS rules in both light (`css/forum-activity-superdesign.css`) and dark (`css_d/forum-activity-superdesign.css`) mode stylesheets.
+  * Fixed dark-mode color tokens (`#1d2333` surface, `#293249` border, `#ffffff` title, `#9aa4bf` excerpt) ensuring seamless visual consistency.
+  * Guaranteed 100% RTL and Arabic typography alignment.
+* **Social Actions Compatibility & Testing**:
+  * Fully preserved native Vikinger activity actions (Reactions/Likes, inline commenting toggle, social sharing, post settings dropdown, and content moderation).
+  * Added feature test `test_portal_renders_modern_forum_feed_card` to `ForumModernizationTest.php` with 100% passing test assertions.
+
+---
+
+
 # v4.6.2
 > **Major Release (Stable)** — Member Profile About Dossier & 3-Tier Privacy Architecture, Store Customer Reviews & Buyer Library, World-Class Marketplace Redesign with High-Speed Ajax Engine, Service Orders Marketplace Overhaul, Professional Social Moderation & Automated Content Quarantine, Threaded Nested Comments, and Resilient Portal Live Search with Member Avatars & Comment Deep-Linking.
 

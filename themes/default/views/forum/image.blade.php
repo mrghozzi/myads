@@ -197,12 +197,12 @@
 
                                 <div class="gallery-submeta d-flex align-items-center gap-2">
                                     <span class="gallery-time" title="{{ \Carbon\Carbon::createFromTimestamp($status->date)->toDayDateTimeString() }}">
-                                        <i class="fa fa-clock-o"></i> {{ \Carbon\Carbon::createFromTimestamp($status->date)->diffForHumans() }}
+                                        <i class="fa-regular fa-clock fa-clock-o"></i> {{ \Carbon\Carbon::createFromTimestamp($status->date)->diffForHumans() }}
                                     </span>
                                     <span class="gallery-meta-dot">•</span>
                                     @if($topic->category)
                                         <a href="{{ route('forum.category', $topic->cat) }}" class="gallery-category-pill">
-                                            <i class="fa fa-folder-open-o"></i> {{ $topic->category->name }}
+                                            <i class="fa-regular fa-folder-open fa-folder-open-o"></i> {{ $topic->category->name }}
                                         </a>
                                         <span class="gallery-meta-dot">•</span>
                                     @endif
@@ -254,7 +254,7 @@
                                             <i class="fa fa-trash"></i> {{ __('messages.delete') }}
                                         </button>
                                         <button type="button" class="gallery-menu-item text-danger" onclick="ajaxClearGallery({{ $topic->id }})">
-                                            <i class="fa fa-trash-o"></i> {{ __('messages.clear_gallery') ?? 'تفريغ كافة الصور' }}
+                                            <i class="fa fa-trash"></i> {{ __('messages.clear_gallery') ?? 'تفريغ كافة الصور' }}
                                         </button>
                                     @endif
 
@@ -365,7 +365,7 @@
                                                     class="btn-tile-tool btn-tile-delete"
                                                     onclick="ajaxDeleteGalleryImage({{ $image->id }}, this, event)"
                                                     title="{{ Lang::has('messages.delete') ? __('messages.delete') : 'حذف' }}">
-                                                <i class="fa fa-trash-o"></i>
+                                                <i class="fa fa-trash"></i>
                                             </button>
                                             @if($totalImagesCount > 1)
                                                 <span class="btn-tile-tool btn-tile-drag" title="{{ Lang::has('messages.drag_to_reorder') ? __('messages.drag_to_reorder') : 'اسحب للترتيب' }}">
@@ -386,7 +386,7 @@
                         <!-- EMPTY STATE -->
                         <div class="gallery-empty-state" id="galleryEmptyState">
                             <div class="empty-icon-circle">
-                                <i class="fa fa-picture-o"></i>
+                                <i class="fa-regular fa-image fa-picture-o"></i>
                             </div>
                             <h4 class="mt-3 fw-bold">{{ __('messages.no_photos_yet') ?? 'لا توجد صور في هذا المعرض بعد' }}</h4>
                             <p class="text-muted small">{{ __('messages.add_photos_to_showcase') ?? 'يمكن لكاتب المنشور إضافة ما يصل إلى 10 صور عالية الدقة.' }}</p>
@@ -459,7 +459,7 @@
                         <div class="d-flex flex-wrap gap-2">
                             @foreach($nonImageAttachments as $att)
                                 <a href="{{ route('forum.attachment.download', $att->id) }}" class="attachment-file-chip">
-                                    <i class="fa fa-file-text-o text-primary"></i>
+                                    <i class="fa-regular fa-file-lines fa-file-text-o text-primary"></i>
                                     <span class="attachment-name">{{ $att->original_name }}</span>
                                     <span class="attachment-size">({{ $att->human_size }})</span>
                                 </a>
@@ -524,7 +524,7 @@
 
                         <!-- COMMENT BUTTON -->
                         <button type="button" class="btn-gallery-action" onclick="focusCommentSection({{ $topic->id }})">
-                            <i class="fa fa-commenting-o text-success"></i>
+                            <i class="fa-regular fa-comment-dots fa-commenting-o text-success"></i>
                             <span>{{ Lang::has('messages.comment') ? __('messages.comment') : 'تعليق' }}</span>
                             <span class="action-count-badge">{{ $topic->comments()->count() }}</span>
                         </button>
@@ -535,7 +535,7 @@
                                     class="btn-gallery-action {{ $isSaved ? 'is-saved' : '' }}"
                                     id="btnSaveGallery"
                                     onclick="ajaxToggleSaveStatus({{ $status->id }}, this)">
-                                <i class="fa {{ $isSaved ? 'fa-bookmark text-primary' : 'fa-bookmark-o' }}"></i>
+                                <i class="{{ $isSaved ? 'fa-solid fa-bookmark text-primary' : 'fa-regular fa-bookmark fa-bookmark-o' }}"></i>
                                 <span class="save-btn-label">{{ $isSaved ? (Lang::has('messages.saved') ? __('messages.saved') : 'محفوظ') : (Lang::has('messages.save') ? __('messages.save') : 'حفظ') }}</span>
                             </button>
                         @endauth
@@ -2097,7 +2097,7 @@ function ajaxToggleSaveStatus(statusId, btn) {
                 showToast(data.message || 'تم حفظ المنشور في محفوظاتك');
             } else {
                 btn.classList.remove('is-saved');
-                if (icon) icon.className = 'fa fa-bookmark-o';
+                if (icon) icon.className = 'fa-regular fa-bookmark fa-bookmark-o';
                 if (label) label.textContent = '{{ __("messages.save") ?? "حفظ" }}';
                 showToast(data.message || 'تمت الإزالة من المحفوظات');
             }

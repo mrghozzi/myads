@@ -7,8 +7,22 @@
     $activityUserIsAdmin = $activityUser?->isAdmin() ?? false;
     $activityUserHasVerifiedBadge = $activityUser?->hasVerifiedBadge() ?? false;
     $statusUserHasVerifiedBadge = $statusUser?->hasVerifiedBadge() ?? false;
-    $repostExcerpt = \Illuminate\Support\Str::limit(strip_tags($activity->related_content->name ?? ''), 80);
+    
+    $topic = $activity->related_content;
+    $repostExcerpt = \Illuminate\Support\Str::limit(strip_tags($topic?->name ?? ''), 80);
     $repostAuthorName = addslashes($activityUserName);
+
+    // Topic Rich Meta & Styling
+    $topicCategory = $topic?->category;
+    $catColor = $topicCategory?->color ?: '#6366f1';
+    $catIcon = $topicCategory?->icons ?: 'fa-folder';
+    $topicImageUrl = $topic?->imageOption ? asset($topic->imageOption->o_valuer) : ($topic?->image_url ? asset($topic->image_url) : null);
+    $hasImage = !empty($topicImageUrl);
+    $rawTopicText = $topic?->txt ?? '';
+    $topicExcerpt = \Illuminate\Support\Str::limit(strip_tags(\App\Support\ContentFormatter::formatForum($rawTopicText)), 220);
+    $topicCommentsCount = $activity->comments_count ?? $topic?->comments_count ?? 0;
+    $topicViews = $topic?->vu ?? 0;
+    $topicDate = $activity->date ?? $topic?->date ?? time();
 @endphp
 
 <div class="widget-box no-padding activity-post-card post{{ $activity->id }}">
@@ -22,21 +36,29 @@
             <div class="simple-dropdown widget-box-post-settings-dropdown" style="position: absolute; z-index: 9999; top: 30px; right: 9px; opacity: 0; visibility: hidden; transform: translate(0px, -20px); transition: transform 0.3s ease-in-out 0s, opacity 0.3s ease-in-out 0s, visibility 0.3s ease-in-out 0s;">
                 @auth
                     @if(auth()->id() == $activity->uid || auth()->user()->isAdmin())
-                        <p class="simple-dropdown-link post_edit{{ $activity->id }}" onclick="postEdit({{ $activity->tp_id }}, 2)"><i class="fa fa-edit" aria-hidden="true"></i>&nbsp;{{ __('messages.edit') }}</p>
-                        <p class="simple-dropdown-link post_delete{{ $activity->id }}" onclick="deletePost({{ $activity->tp_id }}, 2, '.post{{ $activity->id }}')"><i class="fa fa-trash" aria-hidden="true"></i>&nbsp;{{ __('messages.delete') }}</p>
-                                        @endif
-                    @if(isset($isOwnProfile) && $isOwnProfile && auth()->id() == $activity->uid)
-                        <!-- SIMPLE DROPDOWN LINK -->
-                        <p class="simple-dropdown-link" onclick="togglePinPost({{ $activity->id }}, {{ $activity->is_pinned ? 'true' : 'false' }}, {{ isset($hasPinnedPost) && $hasPinnedPost ? 'true' : 'false' }})" style="cursor: pointer;">
-                            <i class="fa fa-thumb-tack" aria-hidden="true"></i>&nbsp;{{ $activity->is_pinned ? __('messages.unpin_post') ?? 'Unpin' : __('messages.pin_post') ?? 'Pin to profile' }}
+                        <p class="simple-dropdown-link post_edit{{ $activity->id }}" onclick="postEdit({{ $activity->tp_id }}, 2)">
+                            <i class="fa-solid fa-pen-to-square me-2"></i>{{ __('messages.edit') }}
                         </p>
-                        <!-- /SIMPLE DROPDOWN LINK -->
+                        <p class="simple-dropdown-link post_delete{{ $activity->id }}" onclick="deletePost({{ $activity->tp_id }}, 2, '.post{{ $activity->id }}')">
+                            <i class="fa-solid fa-trash me-2"></i>{{ __('messages.delete') }}
+                        </p>
+                    @endif
+                    @if(isset($isOwnProfile) && $isOwnProfile && auth()->id() == $activity->uid)
+                        <p class="simple-dropdown-link" onclick="togglePinPost({{ $activity->id }}, {{ $activity->is_pinned ? 'true' : 'false' }}, {{ isset($hasPinnedPost) && $hasPinnedPost ? 'true' : 'false' }})" style="cursor: pointer;">
+                            <i class="fa-solid fa-thumbtack me-2"></i>{{ $activity->is_pinned ? __('messages.unpin_post') ?? 'Unpin' : __('messages.pin_post') ?? 'Pin to profile' }}
+                        </p>
                     @endif
                     @include('theme::partials.activity.promotion_link', ['activity' => $activity])
-                    <p class="simple-dropdown-link post_report{{ $activity->id }}" onclick="reportPost({{ $activity->tp_id }}, 2, {{ $activity->related_content->id }})"><i class="fa fa-flag" aria-hidden="true"></i>&nbsp;{{ __('messages.report') }}</p>
-                    <p class="simple-dropdown-link author_report{{ $activity->id }}" onclick="reportUser({{ $activity->uid }}, {{ $activity->related_content->id }})"><i class="fa fa-flag" aria-hidden="true"></i>&nbsp;{{ __('messages.report_author') }}</p>
+                    <p class="simple-dropdown-link post_report{{ $activity->id }}" onclick="reportPost({{ $activity->tp_id }}, 2, {{ $activity->related_content->id }})">
+                        <i class="fa-solid fa-flag text-warning me-2"></i>{{ __('messages.report') }}
+                    </p>
+                    <p class="simple-dropdown-link author_report{{ $activity->id }}" onclick="reportUser({{ $activity->uid }}, {{ $activity->related_content->id }})">
+                        <i class="fa-solid fa-flag text-warning me-2"></i>{{ __('messages.report_author') }}
+                    </p>
                 @endauth
-                <p class="simple-dropdown-link copy_link" onclick="navigator.clipboard.writeText('{{ route('forum.topic', $activity->tp_id) }}'); var notif = document.getElementById('notif{{ $activity->related_content->id }}'); notif.innerHTML = '<div class=\'alert alert-success\' role=\'alert\'>{{ __('messages.link_copied') }}</div>'; notif.style.display = 'block'; setTimeout(function() { notif.style.display = 'none'; }, 5000);"><i class="fa fa-link" aria-hidden="true"></i>&nbsp;{{ __('messages.copy_link') }}</p>
+                <p class="simple-dropdown-link copy_link" onclick="navigator.clipboard.writeText('{{ route('forum.topic', $activity->tp_id) }}'); var notif = document.getElementById('notif{{ $activity->related_content->id }}'); notif.innerHTML = '<div class=\'alert alert-success\' role=\'alert\'>{{ __('messages.link_copied') }}</div>'; notif.style.display = 'block'; setTimeout(function() { notif.style.display = 'none'; }, 5000);">
+                    <i class="fa-solid fa-link me-2"></i>{{ __('messages.copy_link') }}
+                </p>
             </div>
         </div>
     </div>
@@ -62,7 +84,7 @@
                                 <div class="user-avatar-badge-content">
                                     <div class="hexagon-dark-16-18" style="width: 16px; height: 18px; position: relative;"></div>
                                 </div>
-                                <p class="user-avatar-badge-text"><i class="fa fa-fw fa-check"></i></p>
+                                <p class="user-avatar-badge-text"><i class="fa-solid fa-check"></i></p>
                             </div>
                         @endif
                     </div>
@@ -70,8 +92,13 @@
                 <p class="user-status-title medium">
                     <a class="bold" href="{{ $activityUserProfileUrl }}">{{ $activityUserName }}</a>
                 </p>
-                <p class="user-status-text small">
-                    <i class="fa fa-clock-o"></i>&nbsp;{{ __('messages.ago') }}&nbsp; {{ $activity->date_formatted }}
+                <p class="user-status-text small d-flex align-items-center flex-wrap gap-2">
+                    <span>
+                        <i class="fa-regular fa-clock me-1"></i>{{ __('messages.ago') }} {{ $activity->date_formatted }}
+                    </span>
+                    <span class="forum-origin-chip">
+                        <i class="fa-solid fa-comments me-1"></i>{{ __('messages.forum_discussion') ?? 'Forum' }}
+                    </span>
                 </p>
 
                 @if($activity->group)
@@ -91,44 +118,110 @@
 
             <div class="widget-box-status-text post_text{{ $activity->related_content->id }}">
                 <div class="textpost" id="post_form{{ $activity->related_content->id }}">
-                    @php
-                        $topicExcerpt = strip_tags($activity->related_content->txt);
-                        $topicExcerpt = \Illuminate\Support\Str::limit($topicExcerpt, 180);
-                        $topicBanner = $activity->related_content->image_url ? asset($activity->related_content->image_url) : theme_asset('img/background_topic.jpg');
-                    @endphp
-                    <a class="activity-super" href="{{ route('forum.topic', $activity->tp_id) }}">
-                        <div class="activity-super-banner" style="background-image: url({{ $topicBanner }});">
-                            <span class="activity-super-category">
-                                @if($activity->group)
-                                    <i class="fa fa-users" aria-hidden="true"></i>
-                                    {{ $activity->group->name }}
+                    <!-- Modern Forum-Style Forum Discussion Feed Card -->
+                    <div class="forum-feed-card">
+                        <!-- Top Metadata / Category / Badges Bar -->
+                        <div class="forum-feed-top-bar">
+                            <div class="forum-feed-pills">
+                                @if($topicCategory)
+                                    <a href="{{ route('forum.category', $topic->cat) }}" class="forum-feed-cat-pill" style="--cat-color: {{ $catColor }};">
+                                        <span class="forum-feed-cat-bullet" style="background-color: {{ $catColor }};"></span>
+                                        <i class="fa {{ $catIcon }}"></i>
+                                        <span>{{ $topicCategory->name }}</span>
+                                    </a>
                                 @else
-                                    <i class="fa {{ $activity->related_content->category->icon ?? 'fa-folder' }}" aria-hidden="true"></i>
-                                    {{ $activity->related_content->category->name ?? '' }}
+                                    <span class="forum-feed-cat-pill default">
+                                        <i class="fa-solid fa-comments"></i>
+                                        <span>{{ __('messages.forum') ?? 'Forum' }}</span>
+                                    </span>
                                 @endif
-                            </span>
-                        </div>
-                        <div class="activity-super-content">
-                            <h3 class="activity-super-title">{{ $activity->related_content->name }}</h3>
-                            <p class="activity-super-excerpt">{{ $topicExcerpt }}</p>
-                            <div class="activity-super-footer">
-                                <div class="activity-super-stats">
-                                    <div class="activity-super-stat">
-                                        <i class="fa fa-eye"></i>
-                                        {{ $activity->related_content->vu }}
-                                    </div>
-                                    <div class="activity-super-stat">
-                                        <i class="fa fa-comment"></i>
-                                        {{ $activity->comments_count }}
-                                    </div>
-                                </div>
-                                <span class="activity-super-more">
-                                    {{ __('messages.read_more') }}
-                                    <i class="fa fa-arrow-right"></i>
-                                </span>
+
+                                @if($activity->group)
+                                    <span class="forum-feed-group-pill">
+                                        <i class="fa-solid fa-users me-1"></i>
+                                        <span>{{ $activity->group->name }}</span>
+                                    </span>
+                                @endif
+                            </div>
+
+                            <div class="forum-feed-status-badges">
+                                @if($topic->is_pinned)
+                                    <span class="forum-status-pill pinned" title="{{ __('messages.pinned') }}">
+                                        <i class="fa-solid fa-thumbtack me-1"></i>
+                                        <span>{{ __('messages.pinned') }}</span>
+                                    </span>
+                                @endif
+                                @if($topic->is_locked)
+                                    <span class="forum-status-pill locked" title="{{ __('messages.locked') }}">
+                                        <i class="fa-solid fa-lock me-1"></i>
+                                        <span>{{ __('messages.locked') }}</span>
+                                    </span>
+                                @endif
+                                @if($topic->best_comment_id)
+                                    <span class="forum-status-pill solved" title="{{ __('messages.best_answer') }}">
+                                        <i class="fa-solid fa-circle-check me-1"></i>
+                                        <span>{{ __('messages.best_answer') }}</span>
+                                    </span>
+                                @endif
                             </div>
                         </div>
-                    </a>
+
+                        <!-- Discussion Title & Content Excerpt -->
+                        <div class="forum-feed-body">
+                            <h3 class="forum-feed-title">
+                                <a href="{{ route('forum.topic', $activity->tp_id) }}">{{ $topic->name }}</a>
+                            </h3>
+
+                            @if(!empty(trim($topicExcerpt)))
+                                <p class="forum-feed-excerpt">{{ $topicExcerpt }}</p>
+                            @endif
+
+                            @if($hasImage)
+                                <div class="forum-feed-media">
+                                    <a href="{{ route('forum.topic', $activity->tp_id) }}" class="forum-feed-media-link">
+                                        <img src="{{ $topicImageUrl }}" alt="{{ $topic->name }}" class="forum-feed-media-img" loading="lazy">
+                                    </a>
+                                </div>
+                            @endif
+
+                            @if($topic->attachments && $topic->attachments->isNotEmpty())
+                                <div class="forum-feed-attachments">
+                                    <span class="forum-feed-attachment-pill">
+                                        <i class="fa-solid fa-paperclip me-1 text-primary"></i>
+                                        <span>{{ $topic->attachments->count() }} {{ __('messages.topic_attachments') ?? 'Attachments' }}</span>
+                                    </span>
+                                </div>
+                            @endif
+                        </div>
+
+                        <!-- Footer Stats & CTA Action -->
+                        <div class="forum-feed-footer">
+                            <div class="forum-feed-metrics">
+                                <span class="forum-metric-item" title="{{ __('messages.views') }}">
+                                    <i class="fa-regular fa-eye me-1 text-primary"></i>
+                                    <span class="metric-val">{{ number_format($topicViews) }}</span>
+                                    <span class="d-none d-md-inline">{{ __('messages.views') }}</span>
+                                </span>
+                                <a href="{{ route('forum.topic', $activity->tp_id) }}#reply" class="forum-metric-item" title="{{ __('messages.replies') }}">
+                                    <i class="fa-regular fa-comment-dots me-1 text-info"></i>
+                                    <span class="metric-val">{{ number_format($topicCommentsCount) }}</span>
+                                    <span class="d-none d-sm-inline">{{ __('messages.replies') }}</span>
+                                </a>
+                                @if($topic->last_posted_at && $topic->last_posted_at != $topicDate)
+                                    <span class="forum-metric-item forum-last-activity d-none d-lg-inline" title="{{ __('messages.latest_reply') }}">
+                                        <i class="fa-solid fa-clock-rotate-left me-1 text-muted"></i>
+                                        <span>{{ \Carbon\Carbon::createFromTimestamp($topic->last_posted_at)->diffForHumans() }}</span>
+                                    </span>
+                                @endif
+                            </div>
+
+                            <a href="{{ route('forum.topic', $activity->tp_id) }}" class="forum-feed-join-btn">
+                                <span>{{ __('messages.view_discussion') ?? 'View Discussion' }}</span>
+                                <i class="fa-solid fa-arrow-right forum-arrow-icon ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+
                     <div id="report{{ $activity->related_content->id }}"></div>
                 </div>
             </div>
@@ -144,7 +237,7 @@
                 <div class="content-action">
                     <div class="meta-line">
                         <p class="meta-line-link">
-                            <a href="{{ route('forum.topic', $activity->tp_id) }}">{{ $activity->comments_count }} {{ __('messages.comments') }}</a>
+                            <a href="{{ route('forum.topic', $activity->tp_id) }}#reply">{{ $activity->comments_count }} {{ __('messages.comments') }}</a>
                         </p>
                     </div>
                 </div>
@@ -202,18 +295,13 @@
             </div>
             <!-- /REACTION OPTION -->
         @endauth
-        @auth
-            <div class="post-option"
-                 data-activity-comment
-                 data-comment-id="{{ $activity->related_content->id }}"
-                 data-comment-type="forum"
-                 data-comment-focus="1">
-                <svg class="post-option-icon icon-comment">
-                    <use xlink:href="#svg-comment"></use>
-                </svg>
-                <p class="post-option-text">{{ __('messages.comment') }}</p>
-            </div>
-        @endauth
+        <!-- COMMENT / REPLY OPTION (ينتقل مباشرة إلى صندوق الرد في صفحة الموضوع) -->
+        <a href="{{ route('forum.topic', $activity->tp_id) }}#reply" class="post-option forum-comment-link" title="{{ __('messages.comment') }}">
+            <svg class="post-option-icon icon-comment">
+                <use xlink:href="#svg-comment"></use>
+            </svg>
+            <p class="post-option-text">{{ __('messages.comment') }}</p>
+        </a>
         <div class="post-option-wrap" style="position: relative;" data-activity-menu-wrap>
             <div class="post-option"
                  data-activity-menu-trigger
@@ -238,7 +326,7 @@
                     <div class="reaction-option text-tooltip-tft" data-title="{{ __('messages.quote_repost') }}" style="position: relative;">
                         <a href="javascript:void(0);" onclick="openRepostComposer({{ $activity->id }}, '{{ $repostAuthorName }}', '{{ addslashes($repostExcerpt) }}')">
                             <span style="width: 40px; height: 40px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: #615dfa; color: #fff;">
-                                <i class="fa fa-retweet" aria-hidden="true"></i>
+                                <i class="fa-solid fa-retweet" aria-hidden="true"></i>
                             </span>
                         </a>
                     </div>

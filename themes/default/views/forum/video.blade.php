@@ -293,7 +293,7 @@
                         @auth
                             <div class="v-flyout-wrap">
                                 <button type="button" class="v-action-btn" onclick="toggleSaveVideo({{ $status->id }}, this)">
-                                    <i class="fa {{ $isSaved ? 'fa-bookmark text-primary' : 'fa-bookmark-o' }} me-1"></i>
+                                    <i class="{{ $isSaved ? 'fa-solid fa-bookmark text-primary' : 'fa-regular fa-bookmark fa-bookmark-o' }} me-1"></i>
                                     <span class="btn-save-text">{{ $isSaved ? 'تم الحفظ' : 'حفظ' }}</span>
                                 </button>
                             </div>
@@ -354,7 +354,7 @@
                         {{ number_format($topic->vu ?? 0) }} مشاهدة
                     </span>
                     <span>
-                        <i class="fa fa-clock-o me-1"></i>
+                        <i class="fa-regular fa-clock fa-clock-o me-1"></i>
                         {{ \Carbon\Carbon::createFromTimestamp($status->date)->diffForHumans() }}
                     </span>
                     @if($topic->category)
@@ -1068,7 +1068,7 @@ function toggleSaveVideo(statusId, btn) {
                 if (label) label.textContent = 'تم الحفظ';
                 showToast('تم حفظ الفيديو بنجاح');
             } else {
-                if (icon) icon.className = 'fa fa-bookmark-o me-1';
+                if (icon) icon.className = 'fa-regular fa-bookmark fa-bookmark-o me-1';
                 if (label) label.textContent = 'حفظ';
                 showToast('تم إزالة الفيديو من المحفوظات');
             }

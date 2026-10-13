@@ -421,6 +421,7 @@ class SitemapController extends Controller
     private function publishedTopicsQuery(): Builder
     {
         $query = ForumTopic::query()
+            ->forumOnly()
             ->where('statu', 1)
             ->whereNull('group_id')
             ->visible(); // Respect author privacy

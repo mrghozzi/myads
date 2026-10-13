@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\ForumCategory;
 use App\Models\ForumTopic;
+use App\Models\Status;
 use App\Http\Resources\ForumCategoryResource;
 use App\Http\Resources\ForumTopicResource;
 
@@ -52,7 +53,10 @@ class ForumApiController extends Controller
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
-        $topics = ForumTopic::where('cat', $categoryId)
+        $topics = ForumTopic::forumOnly()
+            ->where('cat', $categoryId)
+            ->where('statu', 1)
+            ->whereNull('group_id')
             ->with(['user'])
             ->orderBy('is_pinned', 'desc')
             ->orderBy('date', 'desc')
@@ -100,13 +104,20 @@ class ForumApiController extends Controller
         }
 
         $topic = ForumTopic::create([
-            'id_cat' => $categoryId,
+            'cat' => $categoryId,
             'uid' => Auth::id(),
             'name' => $request->title,
             'txt' => $request->input('content'),
             'date' => time(),
             'statu' => 1,
             'is_pinned' => false
+        ]);
+
+        Status::create([
+            'uid' => Auth::id(),
+            'date' => time(),
+            's_type' => 2,
+            'tp_id' => $topic->id,
         ]);
 
         app(\App\Services\GamificationService::class)->recordEvent(Auth::id(), 'forum_topic_created');

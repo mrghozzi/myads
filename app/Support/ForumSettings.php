@@ -9,7 +9,7 @@ class ForumSettings
     public const OPTION_TYPE = 'forum_settings';
 
     public const DEFAULTS = [
-        'topics_per_page' => 21,
+        'topics_per_page' => 20,
         'attachments_enabled' => 1,
         'max_attachments_per_topic' => 5,
         'max_attachment_size_kb' => 10240,

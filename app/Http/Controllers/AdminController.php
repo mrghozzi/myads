@@ -3189,9 +3189,17 @@ class AdminController extends Controller
     // Forum Categories
     public function forumCategories()
     {
-        $categories = ForumCategory::orderBy('ordercat', 'asc')->paginate(20);
+        $rootCategories = ForumCategory::whereNull('parent_id')
+            ->with(['children' => function($q) {
+                $q->with('children')->orderBy('ordercat', 'asc');
+            }])
+            ->orderBy('ordercat', 'asc')
+            ->get();
+
         $allCategories = ForumCategory::orderBy('ordercat', 'asc')->get();
-        return view('admin::admin.forum_categories', compact('categories', 'allCategories'));
+        $categories = ForumCategory::orderBy('ordercat', 'asc')->paginate(50);
+
+        return view('admin::admin.forum_categories', compact('rootCategories', 'allCategories', 'categories'));
     }
 
     public function storeForumCategory(Request $request)
@@ -3199,18 +3207,42 @@ class AdminController extends Controller
         $request->validate([
             'name' => 'required|string',
             'icons' => 'required|string',
-            'ordercat' => 'required|integer',
+            'ordercat' => 'nullable|integer',
             'visibility' => 'required|integer|in:0,1,2',
             'txt' => 'nullable|string',
+            'color' => ['nullable', 'string'],
+            'parent_id' => 'nullable|integer',
         ]);
 
-        ForumCategory::create([
+        $parentId = $request->filled('parent_id') && (int) $request->parent_id > 0
+            ? (int) $request->parent_id
+            : null;
+
+        $color = $request->input('color') ?: '#615dfa';
+        $slug = \Illuminate\Support\Str::slug($request->name) ?: 'category-' . time();
+
+        $ordercat = $request->filled('ordercat')
+            ? (int) $request->ordercat
+            : (ForumCategory::where('parent_id', $parentId)->max('ordercat') ?? -1) + 1;
+
+        $category = ForumCategory::create([
+            'parent_id' => $parentId,
             'name' => $request->name,
+            'slug' => $slug,
+            'color' => $color,
             'icons' => $request->icons,
-            'ordercat' => $request->ordercat,
+            'ordercat' => $ordercat,
             'visibility' => $request->visibility,
             'txt' => $request->input('txt') ?? '',
         ]);
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'category' => $category,
+                'message' => __('messages.category_created'),
+            ]);
+        }
 
         return redirect()->back()->with('success', __('messages.category_created'));
     }
@@ -3222,20 +3254,93 @@ class AdminController extends Controller
         $request->validate([
             'name' => 'required|string',
             'icons' => 'required|string',
-            'ordercat' => 'required|integer',
+            'ordercat' => 'nullable|integer',
             'visibility' => 'required|integer|in:0,1,2',
             'txt' => 'nullable|string',
+            'color' => ['nullable', 'string'],
+            'parent_id' => 'nullable|integer',
         ]);
 
+        $parentId = $request->filled('parent_id') && (int) $request->parent_id > 0
+            ? (int) $request->parent_id
+            : null;
+
+        if ($parentId !== null) {
+            if ($parentId === (int) $id) {
+                return redirect()->back()->withErrors(['parent_id' => __('messages.cannot_set_self_as_parent') ?? 'Cannot set category as its own parent.']);
+            }
+            $descendantIds = $category->allChildIds();
+            if (in_array($parentId, $descendantIds, true)) {
+                if ($request->wantsJson() || $request->ajax()) {
+                    return response()->json(['error' => __('messages.cannot_set_descendant_as_parent') ?? 'Cannot set a sub-category as parent.'], 422);
+                }
+                return redirect()->back()->withErrors(['parent_id' => __('messages.cannot_set_descendant_as_parent') ?? 'Cannot set a sub-category as parent.']);
+            }
+        }
+
+        $color = $request->input('color') ?: ($category->color ?: '#615dfa');
+        $slug = $category->slug ?: (\Illuminate\Support\Str::slug($request->name) ?: 'category-' . $category->id);
+        $ordercat = $request->filled('ordercat') ? (int) $request->ordercat : (int) $category->ordercat;
+
         $category->update([
+            'parent_id' => $parentId,
             'name' => $request->name,
+            'slug' => $slug,
+            'color' => $color,
             'icons' => $request->icons,
-            'ordercat' => $request->ordercat,
+            'ordercat' => $ordercat,
             'visibility' => $request->visibility,
             'txt' => $request->input('txt') ?? '',
         ]);
 
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'category' => $category,
+                'message' => __('messages.category_updated'),
+            ]);
+        }
+
         return redirect()->back()->with('success', __('messages.category_updated'));
+    }
+
+    public function reorderForumCategories(Request $request)
+    {
+        $request->validate([
+            'items' => 'required|array',
+            'items.*.id' => 'required|integer|exists:f_cat,id',
+            'items.*.parent_id' => 'nullable',
+            'items.*.order' => 'required|integer',
+        ]);
+
+        \Illuminate\Support\Facades\DB::beginTransaction();
+        try {
+            foreach ($request->input('items') as $item) {
+                $parentId = (!empty($item['parent_id']) && (int) $item['parent_id'] > 0)
+                    ? (int) $item['parent_id']
+                    : null;
+
+                if ($parentId !== null && $parentId === (int) $item['id']) {
+                    $parentId = null;
+                }
+
+                ForumCategory::where('id', $item['id'])->update([
+                    'parent_id' => $parentId,
+                    'ordercat' => (int) $item['order'],
+                ]);
+            }
+
+            \Illuminate\Support\Facades\DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => __('messages.categories_reordered') ?? 'Categories order and hierarchy updated successfully.',
+            ]);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\DB::rollBack();
+            report($e);
+            return response()->json(['error' => __('messages.error_occurred')], 500);
+        }
     }
 
     public function deleteForumCategory(Request $request, $id)
@@ -3256,15 +3361,26 @@ class AdminController extends Controller
             ForumTopic::where('cat', $id)->update(['cat' => $moveToId]);
         }
 
+        // Reassign child categories to parent category so they don't get orphaned
+        ForumCategory::where('parent_id', $id)->update([
+            'parent_id' => $category->parent_id,
+        ]);
+
         $category->delete();
         
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json(['success' => true, 'message' => __('messages.category_deleted')]);
+        }
+
         return redirect()->back()->with('success', __('messages.category_deleted'));
     }
 
     public function forumSettings()
     {
         $forumSettings = ForumSettings::all();
-        return view('admin::admin.forum_settings', compact('forumSettings'));
+        $availableEditors = \App\Services\RichTextEditorService::getAvailableEditors();
+        $activeEditor = \App\Services\RichTextEditorService::getActiveEditor();
+        return view('admin::admin.forum_settings', compact('forumSettings', 'availableEditors', 'activeEditor'));
     }
 
     public function updateForumSettings(Request $request)
@@ -3276,7 +3392,12 @@ class AdminController extends Controller
             'allowed_attachment_extensions' => 'required|string|max:500',
             'attachments_enabled' => 'nullable|in:1',
             'show_role_badges' => 'nullable|in:1',
+            'rich_text_editor' => 'nullable|string',
         ]);
+
+        if ($request->filled('rich_text_editor')) {
+            \App\Services\RichTextEditorService::setActiveEditor($request->input('rich_text_editor'));
+        }
 
         $values = ForumSettings::normalizeIncoming($request->all());
         ForumSettings::save($values);

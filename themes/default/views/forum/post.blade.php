@@ -183,7 +183,7 @@
 
                     <!-- USER STATUS TEXT -->
                     <p class="user-status-text small">
-                        <i class="fa fa-clock-o"></i>&nbsp;{{ __('messages.ago') }}&nbsp; {{ \Carbon\Carbon::createFromTimestamp($status->date)->diffForHumans() }}
+                        <i class="fa-regular fa-clock fa-clock-o"></i>&nbsp;{{ __('messages.ago') }}&nbsp; {{ \Carbon\Carbon::createFromTimestamp($status->date)->diffForHumans() }}
                     </p>
                     <!-- /USER STATUS TEXT -->
                     @if($topic->is_pinned || $topic->is_locked)

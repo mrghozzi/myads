@@ -240,6 +240,8 @@ Route::post('/forum/{topic}/pin', [ForumController::class, 'togglePin'])->name('
 Route::post('/forum/{topic}/lock', [ForumController::class, 'toggleLock'])->name('forum.lock')->middleware('auth');
 Route::get('/forum/attachment/{attachment}', [ForumController::class, 'downloadAttachment'])->name('forum.attachment.download');
 Route::post('/forum/report', [AdminController::class, 'storeReport'])->name('forum.report');
+Route::post('/forum/comment/{id}/pin', [ForumController::class, 'togglePinComment'])->name('forum.comment.pin')->middleware('auth');
+Route::post('/forum/comment/{id}/best-answer', [ForumController::class, 'toggleBestAnswer'])->name('forum.comment.best_answer')->middleware('auth');
 
 // Directory Routes
 Route::get('/directory', [DirectoryController::class, 'index'])->name('directory.index');
@@ -688,6 +690,7 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     // Forum Categories
     Route::get('/forum/categories', [AdminController::class, 'forumCategories'])->name('admin.forum_categories');
     Route::post('/forum/categories', [AdminController::class, 'storeForumCategory'])->name('admin.forum_categories.store');
+    Route::post('/forum/categories/reorder', [AdminController::class, 'reorderForumCategories'])->name('admin.forum_categories.reorder');
     Route::post('/forum/categories/{id}', [AdminController::class, 'updateForumCategory'])->name('admin.forum_categories.update');
     Route::delete('/forum/categories/{id}', [AdminController::class, 'deleteForumCategory'])->name('admin.forum_categories.delete');
     Route::get('/community/feed/settings', [AdminCommunityFeedController::class, 'settings'])->name('admin.community.feed.settings');
