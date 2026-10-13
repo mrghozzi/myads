@@ -55,6 +55,7 @@ class VideoApiTest extends TestCase
                 'search_query',
                 'clips',
                 'videos',
+                'categories',
                 'meta' => [
                     'current_page',
                     'last_page',
@@ -106,5 +107,50 @@ class VideoApiTest extends TestCase
 
         $this->assertNotContains($directoryPost->id, $videoIds, 'Directory post must be excluded from Video API feed.');
         $this->assertNotContains($storePost->id, $videoIds, 'Store product must be excluded from Video API feed.');
+    }
+
+    public function test_video_api_feed_supports_shorts_alias_and_categories()
+    {
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user, 'sanctum')
+            ->withHeaders(['X-API-KEY' => 'test-api-key'])
+            ->getJson('/api/video/feed?filter=shorts');
+
+        $response->assertStatus(200);
+        $this->assertSame('clips', $response->json('filter'));
+        $this->assertIsArray($response->json('categories'));
+    }
+
+    public function test_video_api_watch_endpoint_returns_video_details()
+    {
+        $user = User::factory()->create();
+
+        $videoPost = Status::create([
+            'uid' => $user->id,
+            's_type' => 10,
+            'txt' => 'Cinema Watch Video API Post',
+            'date' => time(),
+        ]);
+
+        $response = $this->actingAs($user, 'sanctum')
+            ->withHeaders(['X-API-KEY' => 'test-api-key'])
+            ->getJson('/api/video/watch/' . $videoPost->id);
+
+        $response->assertStatus(200)
+            ->assertJsonStructure([
+                'status' => ['id', 'text', 'type', 'user'],
+                'suggested_videos',
+            ]);
+
+        $this->assertSame($videoPost->id, $response->json('status.id'));
+
+        // Also test numeric route alias /api/video/{id}
+        $numResponse = $this->actingAs($user, 'sanctum')
+            ->withHeaders(['X-API-KEY' => 'test-api-key'])
+            ->getJson('/api/video/' . $videoPost->id);
+
+        $numResponse->assertStatus(200);
+        $this->assertSame($videoPost->id, $numResponse->json('status.id'));
     }
 }

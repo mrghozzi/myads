@@ -97,6 +97,8 @@ Route::middleware(['api.key', 'auth:sanctum'])->group(function () {
 
     // Video Hub API
     Route::get('/video/feed', [App\Http\Controllers\Api\VideoApiController::class, 'index']);
+    Route::get('/video/watch/{id}', [App\Http\Controllers\Api\VideoApiController::class, 'show']);
+    Route::get('/video/{id}', [App\Http\Controllers\Api\VideoApiController::class, 'show'])->whereNumber('id');
 
     // Clips API
     Route::get('/clips', [App\Http\Controllers\Api\ClipsController::class, 'index']);
