@@ -1,19 +1,19 @@
 <div align="center">
 
-# 🚀 MYADS v4.6.1
+# 🚀 MYADS v4.6.3
 
 ### The Ultimate Open-Source Social Network, Traffic & Ad Exchange Platform
 
-**Empower your digital community with cutting-edge social engagement, peer-to-peer ad exchange, YouTube-style video hub & clips, a multi-vendor digital marketplace, and a first-party native Flutter mobile app.**
+**Empower your digital community with cutting-edge social engagement, modern community forums with multi-editor suite, peer-to-peer ad exchange, cinema-grade video hub & shorts, a multi-vendor digital marketplace with reviews, and a first-party native Flutter mobile app.**
 
 Built with passion on **Laravel 12**, **PHP 8.2+**, and **Bootstrap 5 / Flutter**.
 
 ---
 
-[![Release Version](https://img.shields.io/badge/Release-v4.6.1-3b82f6.svg?style=for-the-badge&logo=github)](https://github.com/mrghozzi/myads/releases)
+[![Release Version](https://img.shields.io/badge/Release-v4.6.3-3b82f6.svg?style=for-the-badge&logo=github)](https://github.com/mrghozzi/myads/releases)
 [![Laravel Version](https://img.shields.io/badge/Laravel-12.x-ff2d20.svg?style=for-the-badge&logo=laravel)](https://laravel.com)
 [![PHP Version](https://img.shields.io/badge/PHP-8.2%2B-777bb4.svg?style=for-the-badge&logo=php)](https://php.net)
-[![Flutter Mobile App](https://img.shields.io/badge/Flutter-3.27%2B-02569b.svg?style=for-the-badge&logo=flutter)](https://github.com/mrghozzi/myads_app)
+[![Flutter Mobile App](https://img.shields.io/badge/Flutter-3.27%2B_v1.8.5-02569b.svg?style=for-the-badge&logo=flutter)](https://github.com/mrghozzi/myads_app)
 [![CI Tests](https://img.shields.io/github/actions/workflow/status/mrghozzi/myads/tests.yml?branch=main&style=for-the-badge&logo=githubactions&label=Tests&color=22c55e)](https://github.com/mrghozzi/myads/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-10b981.svg?style=for-the-badge)](LICENSE)
 
@@ -51,24 +51,24 @@ MYADS is an enterprise-ready, all-in-one ecosystem that eliminates the need for 
       <p>Banner ads, text links, surf traffic exchange, YouTube views exchange, Smart Ads, and peer-to-peer custom ad deals with daily PTS settlements and fraud protection.</p>
     </td>
     <td width="50%">
-      <h3>📺 Video Hub & Shorts Clips</h3>
-      <p>YouTube-inspired video platform with Spotlight Hero, 16:9 grid, floating Picture-in-Picture (PIP) mini-player, and 9:16 vertical Shorts with touch swipe gestures.</p>
+      <h3>📺 Video Hub & Cinema Watch</h3>
+      <p>YouTube-inspired video platform with Spotlight Hero, category pills, multi-criteria sorting, 16:9 grid, standalone Cinema Watch page with Ambient Glow & Theater Mode, and 9:16 vertical Shorts reels.</p>
     </td>
   </tr>
   <tr>
     <td width="50%">
-      <h3>💬 Next-Gen Social Community</h3>
-      <p>N+1 optimized timeline feed with multimedia posts (Video, Audio, Music, Files, Clips), reactions, reposts, mentions, forums, and SSE real-time notifications.</p>
+      <h3>💬 Modern Forum & Social Community</h3>
+      <p>Proprietary forum architecture with two-pane AJAX browsing, multi-editor suite (Markdown, Quill, SCEditor), threaded discussion tree, best answer badges, Groq AI moderation, and SSE live streams.</p>
     </td>
     <td width="50%">
-      <h3>📱 Native Flutter Mobile App</h3>
-      <p>First-party Android & iOS client (<code>myads_app</code>) featuring 100% feed parity, Clips reels, Hexagon publisher avatars, and 14-language internationalization.</p>
+      <h3>📱 Native Flutter Mobile App (v1.8.5)</h3>
+      <p>First-party Android & iOS client (<code>myads_app</code>) with 100% parity: Video Hub & Watch routing, Modern Forum discussions & replies, Store reviews, universal bookmarks, and P2P service orders.</p>
     </td>
   </tr>
   <tr>
     <td width="50%">
-      <h3>🛍️ Digital Store & Freelance Services</h3>
-      <p>Digital marketplace for scripts, plugins, and themes with PTS pricing, wiki-style documentation per product, and a full freelance services bidding marketplace.</p>
+      <h3>🛍️ Digital Store & Freelance Marketplace</h3>
+      <p>Multi-vendor digital store with 5-star customer reviews, verified buyer badges, lightbox screenshot gallery, live demo previews, PTS checkout, and milestone-tracked P2P service orders.</p>
     </td>
     <td width="50%">
       <h3>⚡ Superdesign Admin & Extensibility</h3>
@@ -148,27 +148,39 @@ graph TD
   - Real-time **Human Behavior Fingerprinting** (`mousemove` trajectory velocity, mobile touch tap duration, headless browser detection via `navigator.webdriver`, and WebGL checks).
   - Rate limiting (24h per anonymous fingerprint) and reason-tagged impression protection (`RAPID_CLICK`, `BOT_FINGERPRINT`, `HIDDEN_TAB`, `DWELL_TOO_SHORT`).
 
-### 📺 2. YouTube-Style Video Hub & Shorts Engine
-- **Dedicated Video Hub (`/video`):** Sleek YouTube-inspired interface featuring a Spotlight Hero card, category filter pills (`All`, `Videos`, `Shorts Clips`, `Trending`, `Latest`), and a responsive 16:9 video grid.
-- **Dedicated Watch Page (`/t{id}`):** Custom HTML5 player, suggested videos sidebar, Hexagon publisher avatars, and standalone popovers.
-- **Mini Floating Picture-in-Picture (PIP) Player:** Seamlessly transitions playing videos into a floating corner player when users scroll down the page, preserving playback state.
-- **Shorts Clips Engine (`/clips`):** 9:16 vertical video reels with native touch swipe gestures (`touchstart`/`touchend`), mouse wheel scrolling, and original audio disc animation (`messages.original_audio`).
-- **Continuous Audio Player Bar:** Persistent bottom player with HTML5 waveform visualization and `sessionStorage` playback memory across page transitions.
+### 📺 2. Cinema-Grade Video Hub & Shorts Engine
+- **Next-Gen YouTube-Style Video Hub (`/video` & `/video/*`):** Rebuilt with `@.superdesign` standards, dynamic category filter pills, Spotlight Hero 16:9 marquee banner, multi-criteria sorting (Newest, Most Viewed, Top Rated, Oldest), Shorts/Clips shelf with silent hover video snippets, and smooth AJAX Load More pagination.
+- **Cinema-Grade Watch Page (`/video/watch/{id}`, `/video/{id}`, `/t{id}`):**
+  - **Cinema Theater Mode:** 1-tap full-width expander (`#btnTheater`, keyboard shortcut `T`) with `localStorage` state persistence.
+  - **Dynamic Ambient Glow (YouTube Ambient Mode):** Immersive ambient color diffusion backdrop (`.v-ambient-backdrop`) behind the video stage.
+  - **Advanced HTML5 Custom Video Player:** Auto-hiding controls bar on idle (2.5s timer), buffered progress scrubber with hover timestamp preview, playback speed flyout (0.5x–2.0x), volume slider with mute toggle, keyboard shortcuts (`Space`/`K`, `F`, `T`, `M`, `J`/`L`, arrows), and double-tap +/-10s seek.
+  - **Dual Picture-in-Picture (PiP):** Native browser PiP API paired with an automatic floating mini player (`.v-mini-floating-player`) driven by `IntersectionObserver` when scrolling down past the stage.
+  - **Creator Card & Social Actions:** Hexagonal avatars with verified badges, AJAX Follow/Unfollow, animated 8-emoji reactions dropdown, Watch Later / Save video toggle, rich Share flyout, and suggested videos sidebar with autoplay switch.
+- **Shorts Clips Engine (`/clips`):** 9:16 vertical video reels with native touch swipe gestures, mouse wheel scrolling, silent hover playback snippets, and original audio disc animation (`messages.original_audio`).
+- **Dedicated Video Hub API (`/api/video/feed`, `/api/video/watch/{id}`):** Content-isolated video feeds, category lists, and suggested video collections for companion apps.
 
-### 💬 3. Next-Gen Social Networking & Real-Time Engine
-- **High-Performance Feed:** Zero N+1 query overhead, supporting rich multimedia attachments (Video, Audio, Music, Image Galleries, Files, and Clips).
-- **Rich Text Editor Suite:** Seamless switching between **Quill.js v1.3.7** and **TinyMCE 7** (via plugin) with dark-mode parity and AJAX drag-and-drop image uploads.
-- **Real-Time Live Events Engine (`RT-04`):** Server-Sent Events (SSE) streaming (`/live/stream`) delivering instant message badges, notification toasts, and live community activity without battery-draining polling.
-- **Comprehensive Interactions:** Reactions, quote reposts, nested comments, `@mentions`, and hashtag filtering.
-- **Member Profile Verification:** Authenticated verification request workflow with eligibility checks, evidence links, reviewer audit notes, and automatic `users.ucheck` badge granting.
-- **Glassmorphism 2.0 Mobile Bottom Nav:** Ergonomic bottom navigation bar with real-time SSE badges and context-aware Quick Post FAB (smart-targeting composer or redirecting to share).
-- **Full-Featured Forum:** Categorized discussion boards, sticky topics, thread locking, moderation roles, and attachments.
-- **Gamification & Rewards:** 25+ dynamic unlockable achievement badges (Video Star, Clips Master, Audio Maestro), PTS direct transfers, voucher codes, and daily/weekly quests.
+### 💬 3. Next-Gen Social Networking & Modern Forum Architecture
+- **Modern Community Forum Architecture (`/forum`, `/f{id}`, `/t{id}`):**
+  - **Two-Pane Responsive Layout:** Sticky category navigation on desktop with Admin-customizable tag color bullets (`f_cat.color`) and live community stats.
+  - **Zero-Reload AJAX Discussion Streams:** Instant filtering across **Latest Activity**, **Top** (most replied/active), **Newest**, and **Unanswered** with debounced live search and HTML5 `pushState` bookmarkable URLs.
+  - **Multi-Editor Suite:** Seamless authoring across **MyAds Markdown** with live side-by-side preview, **Quill.js v1.3.7**, and **SCEditor** with dark-mode parity and AJAX image attachments.
+  - **Docked Floating Discussion Composer:** Bottom drawer composer with minimize/fullscreen toggles, keeping drafts intact while browsing.
+  - **Threaded & Nested Discussion Stream:** Chronological post cards (`#post-1`, `#post-2`, ...), 2-level hierarchical reply tree (`parent_id`) with visual connecting lines, parent mention badges (`@User`), and cascading deletion.
+  - **Pinned Comments & Best Answer System:** Authors and moderators can pin important replies to the top or mark the verified "Best Answer" (awarding 10 PTS reputation and trigger alerts).
+  - **Sticky Timeline Scrubber & Moderator Sidebar:** Sticky progression widget (`Post X of Y`) with 1-click Pin/Lock/Edit/Delete moderation tools.
+  - **AI Moderation:** Optional Groq AI Forum Moderator plugin automatically analyzing topic quality and compliance.
+- **High-Performance Social Feed:** Zero N+1 query overhead, supporting rich multimedia attachments (Video, Audio, Music, Image Galleries, Files, and Clips).
+- **Universal Bookmarks & Autocomplete:** 1-tap post saving (`/statuses/save-toggle`) with dedicated `/statuses/saved` feed, plus real-time smart `@mentions` and `#tags` autocomplete.
+- **Member Profile Privacy Suite:** Granular `about_visibility` controls (`public`, `followers`, `private`) preventing bio leakage, paired with hexagonal avatars and verification requests.
+- **Real-Time Live Events Engine (`RT-04`):** Server-Sent Events (SSE) streaming (`/live/stream`) delivering instant message badges, notification toasts, and live community activity.
+- **Gamification & Rewards:** 25+ dynamic achievement badges, daily/weekly quests, PTS transfers, and voucher codes.
 
 ### 🛍️ 4. Digital Store, Services Marketplace & Knowledgebase
-- **Digital Products Marketplace:** Publish and sell scripts, themes, templates, and plugins with PTS or fiat pricing, download tracking, and version management.
-- **Wiki-Style Knowledgebase:** Rich documentation hub per product with Markdown rendering, interactive Mermaid diagrams, category filtering, and instant search.
-- **Freelance Services Marketplace:** Post custom service requests, receive structured provider offers, award milestones, and exchange verified client reviews.
+- **Digital Products Marketplace:** Publish and sell scripts, themes, and plugins with PTS or fiat pricing, Arabic & Unicode slug support, and version management.
+- **Customer Ratings & Reviews Engine:** 5-star customer ratings with overall averages, rating distribution percentage progress bars, verified buyer badges (`is_verified_buyer`), and customer review feeds.
+- **Screenshots Lightbox & Previews:** Interactive screenshot carousels with zoomable full-screen modal lightbox, plus external launcher buttons for Live Demo web previews and video walkthroughs.
+- **Wiki-Style Knowledgebase (`/kb`):** Rich documentation hub per product with Markdown rendering, interactive Mermaid diagrams, category filtering, and eager-loading relation isolation.
+- **P2P Service Orders Marketplace (`/orders`):** Bulletin bidding marketplace with 5-step milestone progression (Matching → Awarded → In Progress → Delivered → Completed), requirement attachments, client revision rounds, deliverable downloads, and explicit non-escrow platform terms.
 - **Web Directory:** Categorized webmaster directory with SEO backlinks, thumbnail scraping, and traffic statistics.
 
 ### 💳 5. Paid Subscriptions & Multi-Currency Billing
@@ -199,7 +211,7 @@ graph TD
 
 ## 📱 Official Flutter Mobile App
 
-MYADS features a first-party, cross-platform mobile client built with **Flutter 3.27+** for Android and iOS.
+MYADS features a first-party, cross-platform mobile client built with **Flutter 3.27+** for Android and iOS (**`myads_app` v1.8.5+27**).
 
 <div align="center">
   <a href="https://github.com/mrghozzi/myads_app">
@@ -208,11 +220,14 @@ MYADS features a first-party, cross-platform mobile client built with **Flutter 
 </div>
 
 ### Mobile Highlights:
-- **Feed & Multimedia:** Full parity with the web social feed — 16:9 videos, vertical Clips player, audio cards with waveform visualization, image grids, and file attachments.
-- **Video Hub Screen:** Dedicated YouTube-styled video screen with filter pills, Spotlight Hero, and Shorts shelf.
-- **Premium Member Profiles:** Vertical Hexagon avatars with dynamic tier border colors matching the web theme, earned badges, and parallax headers.
+- **Video Hub & Cinema Watch (`v1.8.5`):** Dedicated `VideoHubScreen` with dynamic category pills, multi-criteria sorting (Latest, Most Viewed, Most Reacted, Oldest), direct routing (`/video/watch/:id`), and Shorts shelf.
+- **Modern Forum Engine (`v1.8.4`):** Hierarchical sub-forums with color badges, filter chips (Latest, Top, Newest, Unanswered), threaded discussion tree, pinned comments, best answers, and quick Markdown composer.
+- **Profile Privacy Suite (`v1.8.3`):** Granular About tab privacy (`canViewAbout`, `aboutVisibility`), locked container view, and profile settings dropdown.
+- **Store Reviews & Media Gallery (`v1.8.2`):** 5-star ratings, verified buyer badges, rating breakdown bars, tap-to-expand lightbox screenshot viewer, and Live Demo / Video launchers.
+- **Service Orders Marketplace (`v1.8.1`):** P2P disclaimer banner, 5-step milestone stepper, requirement attachments, revision request modal, deliverable downloads, and complete contract lifecycle actions.
+- **Universal Bookmarks & Smart Autocomplete (`v1.7.9`):** 1-tap post bookmarking with infinite pagination (`SavedPostsScreen`), and real-time `@mentions` and `#hashtags` autocomplete overlay in post composer.
 - **Security & Privacy:** Hardware-backed encrypted keystore storage (`flutter_secure_storage`), Sanctum Bearer token validation, HTTPS enforcement, and member ID anti-enumeration.
-- **Global Localization:** Native Arabic (RTL) and English support with automatic device locale synchronization.
+- **Global Localization:** Native Arabic (RTL) and English support with dynamic device locale synchronization.
 
 > 📖 Check out the complete [Mobile App Guide](Documents/MOBILE_APP_GUIDE.md) and [Mobile Repository](https://github.com/mrghozzi/myads_app).
 

@@ -1,26 +1,30 @@
-# MYADS v4.6.2 REST & Real-Time API Documentation
-> **Specification Version:** `v4.6.2` (Stable Release)  
+# MYADS v4.6.3 REST & Real-Time API Documentation
+> **Specification Version:** `v4.6.3` (Stable Release)  
 > **Target Framework:** Laravel 12 (PHP 8.2+)  
 > **Authentication Engines:** Laravel Sanctum (Mobile & Web API), OAuth 2.0 (Developer Platform), and Server-Sent Events (SSE Live Stream).  
+> **Mobile Companion Client:** `myads_app` (v1.8.5+27)  
 > **Last Updated:** October 2026  
 
 ---
 
 ## 1. Overview & Architecture
 
-The MYADS v4.6.2 API ecosystem delivers high-performance, secure, and extensible interfaces connecting web clients, companion mobile applications (Flutter), and third-party developer integrations.
+The MYADS v4.6.3 API ecosystem delivers high-performance, secure, and extensible interfaces connecting web clients, companion mobile applications (Flutter), and third-party developer integrations.
 
 ### Primary API Subsystems
-1. **Internal Mobile & Web API (`/api/*`):** Powered by Laravel Sanctum for mobile app companion clients (`myads_app` v1.8.0+22) and web AJAX workflows.
-2. **Real-Time Events Engine (`/live/stream` & `/api/live/stream` — RT-04):** Zero-overhead Server-Sent Events (SSE) streaming engine delivering instant unread counters (synchronized with `MessageConversationService`), live toasts, and feed updates.
-3. **Developer Platform & OAuth 2.0 (`/oauth/*` & `/api/developer/v1/*`):** 27 granular permissions across 7 categories for external applications registered at `/developer`.
-4. **Service Orders Marketplace Lifecycle Engine (`/api/orders/*` & `/orders/*`):** Peer-to-peer bulletin model with full contract lifecycle management: requirement attachments, proposal offers, contract awarding, milestone progression, deliverable file uploads, client revision workflows (`requestRevision`), 5-star ratings, and protected file downloads.
-5. **Store Marketplace, Ratings & Reviews Engine (`/api/store/*` & `/store/*`):** Rich digital marketplace with 5-star customer ratings, verified buyer badges, interactive screenshots lightbox gallery, live demo and video URL previews, Arabic & Unicode slug support, PTS checkout, and discount coupon codes.
-6. **Software Licensing & Extension Marketplace Feed (`/api/marketplace/extensions/*`, `/api/license/verify`):** Plugin and theme discovery feeds, automated update checking for WordPress and third-party CMSs, domain activation verification, and secure package downloads.
-7. **Ad Serving & Exchange Engine (`/ads/*`, `/bn.php`, `/link.php`, `/smart.php`, `/embed/*.js`):** High-throughput banner, link, smart, and custom member-to-member ads delivery, anti-click-farm validation, and conversion tracking.
-8. **Real-Time Search & Intelligence (`/api/search/live`, `/api/ads/stats`):** Multi-entity live search across members, store products, forum topics, and feed posts, alongside real-time advertising analytics.
-9. **Universal Media & Comments Ingestion Engine (`/comment/*`, `/api/statuses/*`):** Drag-and-drop & clipboard (`Ctrl+V`) media ingestion, binary MIME verification (`FileUploadSecurityService`), and automatic WebP image optimization.
-10. **Smart Partitioned Sitemaps & Discovery (`/sitemap.xml`, `/sitemap/*.xml`):** Partitioned XML sitemaps with ETag conditional HTTP 304 caching for enterprise SEO discovery.
+1. **Internal Mobile & Web API (`/api/*`):** Powered by Laravel Sanctum for mobile app companion clients (`myads_app` v1.8.5+27) and web AJAX workflows.
+2. **Video Hub & Cinema Watch Engine (`/api/video/*`, `/video/watch/{id}`, `/video/{id}`):** Dedicated video endpoints providing content-isolated feeds, dynamic categories, multi-criteria sorting, and cinema watch pages with suggested videos collections.
+3. **Modern Community Forum & Moderation API (`/api/forums/*`, `/forum/*`):** Hierarchical category discovery with custom colors, real-time filtered topic streams, threaded 2-level comment trees, pinned comments, best answer resolution, and topic lock/pin controls.
+4. **Real-Time Events Engine (`/live/stream` & `/api/live/stream` — RT-04):** Zero-overhead Server-Sent Events (SSE) streaming engine delivering instant unread counters (synchronized with `MessageConversationService`), live toasts, and feed updates.
+5. **Developer Platform & OAuth 2.0 (`/oauth/*` & `/api/developer/v1/*`):** 27 granular permissions across 7 categories for external applications registered at `/developer`.
+6. **Service Orders Marketplace Lifecycle Engine (`/api/orders/*` & `/orders/*`):** Peer-to-peer bulletin model with full contract lifecycle management: requirement attachments, proposal offers, contract awarding, milestone progression, deliverable file uploads, client revision workflows (`requestRevision`), 5-star ratings, and protected file downloads.
+7. **Store Marketplace, Ratings & Reviews Engine (`/api/store/*` & `/store/*`):** Rich digital marketplace with 5-star customer ratings, verified buyer badges, interactive screenshots lightbox gallery, live demo and video URL previews, Arabic & Unicode slug support, PTS checkout, and discount coupon codes.
+8. **Universal Bookmarking & Smart Autocomplete Engine (`/api/statuses/saved`, `/api/statuses/save-toggle`, `/api/mentions/users`, `/api/tags/suggest`):** 1-tap post bookmarking across feed types, alongside real-time `@mentions` and `#tags` suggestion overlays.
+9. **Software Licensing & Extension Marketplace Feed (`/api/marketplace/extensions/*`, `/api/license/verify`):** Plugin and theme discovery feeds, automated update checking for WordPress and third-party CMSs, domain activation verification, and secure package downloads.
+10. **Ad Serving & Exchange Engine (`/ads/*`, `/bn.php`, `/link.php`, `/smart.php`, `/embed/*.js`):** High-throughput banner, link, smart, and custom member-to-member ads delivery, anti-click-farm validation, and conversion tracking.
+11. **Real-Time Search & Intelligence (`/api/search/live`, `/api/ads/stats`):** Multi-entity live search across members, store products, forum topics, and feed posts, alongside real-time advertising analytics.
+12. **Universal Media & Comments Ingestion Engine (`/comment/*`, `/api/statuses/*`):** Drag-and-drop & clipboard (`Ctrl+V`) media ingestion, binary MIME verification (`FileUploadSecurityService`), and automatic WebP image optimization.
+13. **Smart Partitioned Sitemaps & Discovery (`/sitemap.xml`, `/sitemap/*.xml`):** Partitioned XML sitemaps with ETag conditional HTTP 304 caching for enterprise SEO discovery.
 
 ---
 
@@ -439,17 +443,72 @@ All settings mutation endpoints accept `POST`, `PUT`, and `PATCH` HTTP verbs for
 
 - `GET /api/portal/feed`: Retrieve the community feed (paginated).
   - *Attributes:* `user` (with `profile_badge_color`), `display_content`, `display_title`, `video_title`, `video_thumbnail`, `media`, `gallery`, `attachments`, `repost_record`, `grouped_reactions`, `has_liked`, `user_reaction`, `is_promoted_ad`, `s_type`.
-- `GET /api/video/feed`: Retrieve Video Hub content strictly scoped to video items (`whereIn('s_type', [10, 2, 4, 100])` for main videos and `14` for clips).
-  - *Parameters:* `filter` (`all`, `trending`, `latest`, `videos`, `clips`), search query `q`, `per_page` (default: 12).
-  - *Response:*
+- `GET /api/video/feed`: Retrieve Video Hub discovery feed strictly isolated to video content (`s_type` 10, 2, 4, 100 with video attachments/embeds, and 14 for clips).
+  - *Query Parameters:*
+    - `filter`: Feed filter category (`all`, `trending`, `latest`, `videos`, `clips`, `shorts`). Defaults to `all`.
+    - `cat` or `category`: Category identifier (numeric ID or slug) filtering via `ForumCategory`.
+    - `sort`: Multi-criteria sorting (`views` for most viewed/trending, `reactions` for most liked, `oldest`, or default date descending).
+    - `q`: Search keyword querying post text and linked discussion topic titles.
+    - `per_page`: Number of video cards per page (default: 12).
+  - *Response Schema:*
     ```json
     {
         "filter": "all",
         "search_query": "",
-        "spotlight_video": { ... },
+        "spotlight_video": {
+            "id": 102,
+            "title": "Mastering Modern CSS Grid & Ambient Glow",
+            "video_title": "Mastering Modern CSS Grid & Ambient Glow",
+            "video_thumbnail": "https://domain.com/upload/videos/thumb_102.jpg",
+            "user": { "id": 42, "username": "developer", "name": "Jane", "avatar": "..." },
+            "views": 1540,
+            "likes_count": 89
+        },
         "clips": [ ... ],
         "videos": [ ... ],
-        "meta": { "current_page": 1, "last_page": 5, "total": 60 }
+        "categories": [
+            { "id": 1, "name": "Technology", "slug": "technology" },
+            { "id": 2, "name": "Design", "slug": "design" }
+        ],
+        "meta": {
+            "current_page": 1,
+            "last_page": 4,
+            "per_page": 12,
+            "total": 48
+        }
+    }
+    ```
+- `GET /api/video/watch/{id}` & `GET /api/video/{id}`: Retrieve dedicated Cinema Watch payload for a video item.
+  - *Resolution:* Accepts either a `ForumTopic` ID (`tp_id`) or direct `Status` ID. Automatically decorates the record, attaches high-resolution thumbnails, and computes 10 related suggested videos.
+  - *Response Schema:*
+    ```json
+    {
+        "status": {
+            "id": 102,
+            "s_type": 10,
+            "text": "Full video description...",
+            "video_title": "Mastering Modern CSS Grid",
+            "video_thumbnail": "https://domain.com/upload/videos/thumb_102.jpg",
+            "is_following": true,
+            "is_saved": false,
+            "user": {
+                "id": 42,
+                "username": "developer",
+                "name": "Jane",
+                "avatar": "https://domain.com/upload/avatar.png",
+                "verified": true
+            },
+            "likes_count": 89,
+            "comments_count": 24
+        },
+        "suggested_videos": [
+            {
+                "id": 98,
+                "video_title": "Building Reactive Mobile Apps with Flutter 3.27",
+                "video_thumbnail": "https://domain.com/upload/videos/thumb_98.jpg",
+                "user": { "username": "alex", "name": "Alex" }
+            }
+        ]
     }
     ```
 - `GET /api/statuses/saved`: Retrieve paginated saved/bookmarked posts for the authenticated user.
@@ -560,6 +619,9 @@ MYADS v4.6.2 introduces true threaded comments supporting recursive parent-child
 ### D. Profiles & Social Relationships
 
 - `GET /api/profile/{identifier}`: Fetch member profile details (`identifier` can be `'me'`, username, or `public_uid`).
+  - *Privacy & Anti-Enumeration:* If member IDs are obfuscated (`public_member_ids_enabled`), `id` returns the public UID string.
+  - *About Section Privacy:* Respects `about_visibility` (`public`, `followers`, `private`). If the authenticated viewer is not authorized according to privacy rules, `can_view_about` is returned as `false` and `bio` is empty (`""`), preventing data leakage.
+  - *Response Attributes:* `id`, `username`, `name`, `avatar`, `cover`, `pts`, `verified`, `bio`, `can_view_about`, `about_visibility`, `followers_count`, `following_count`, `posts_count`, `online`, `is_following`, `subscription_badge`, `social_links`, `badges`, `profile_badge_color`.
 - `GET /api/profile/{identifier}/statuses`: Fetch user's published statuses.
 - `POST /api/profile/{identifier}/follow`: Toggle follow status.
 - `POST /api/profile/{identifier}/block`: Block user (`{"block_type": "full_platform|messages_only", "duration": 30}`).
@@ -825,13 +887,53 @@ $$\text{Open} \longrightarrow \text{Awarded} \longrightarrow \text{In Progress} 
 
 ---
 
-### J. Forums API (Mobile Specific)
+### J. Modern Forums API Architecture (v4.6.3)
 
-- `GET /api/forums/categories`: Get forum categories with topic counts.
-- `GET /api/forums/categories/{categoryId}/topics`: Get topics within a category.
-- `POST /api/forums/categories/{categoryId}/topics`: Create a new forum topic.
-- `GET /api/forums/topics/{topicId}`: Get topic details and replies.
-- `POST /api/forums/topics/{topicId}/replies`: Post a reply to a forum topic.
+MYADS v4.6.3 introduces a dedicated, high-performance API suite powering the modernized community forum architecture on both mobile (`myads_app`) and web clients:
+
+#### 1. Forum Categories Directory
+- `GET /api/forums/categories`: Retrieve hierarchical root forum categories with sub-categories.
+  - *Visibility Enforcement:* Filters categories by privacy level (`0` = public, `1` = authenticated members, `2` = moderators/admins).
+  - *Attributes:* `id`, `name`, `description`, `color` (hex badge indicator e.g. `#3b82f6`), `ordercat`, `topics_count` (recursive aggregate across sub-forums), and `children` (collection of sub-category objects with child `topics_count`).
+
+#### 2. Topics Stream & Filter Engine
+- `GET /api/forums/categories/{categoryId}/topics`: Retrieve paginated topics within a category (and its child sub-forums).
+  - *Query Parameters:*
+    - `filter`: Live filter choice (`latest` for last activity/post, `top` for most replies, `newest` for creation date, `unanswered` for zero replies). Defaults to `latest`.
+    - `q`: Search keyword querying topic title and content.
+    - `page`: Page number (paginated at 20 topics per page).
+  - *Sorting:* Pinned topics (`is_pinned = 1`) automatically float to the top of the stream.
+  - *Topic Payload Attributes:* `id`, `title`, `slug`, `content_preview`, `is_pinned`, `is_locked`, `views` (`vu`), `replies_count`, `last_posted_at`, `user` (author profile with avatar and verified status), and `last_poster`.
+
+#### 3. Topic Creation
+- `POST /api/forums/categories/{categoryId}/topics`: Publish a new discussion topic.
+  - *Payload Parameters:*
+    - `title` (string, required, max: 255): Topic subject line.
+    - `content` (string, required, min: 10): Topic discussion body (supports Markdown/BBCode).
+  - *Lifecycle:* Creates the `ForumTopic` record, creates an activity link status (`s_type = 2`), and awards gamification reputation via the `forum_topic_created` event.
+  - *Response (HTTP 200):* Returns `success: true` and the created `ForumTopicResource`.
+
+#### 4. Discussion Details & Threaded Comments Stream
+- `GET /api/forums/topics/{topicId}`: Retrieve complete topic payload with full discussion comments stream.
+  - *View Counter:* Automatically increments topic view count (`vu`).
+  - *Eager Loaded Stream:* Fetches root comments (`parent_id = null`) ordered with pinned comments (`is_pinned`) and best answers (`is_best_answer`) at the top, followed by chronological discussion order (`id asc`).
+  - *Threaded Replies Tree:* Each root comment includes its nested `replies` collection (complete with `user` avatars and author tags), delivering a true 2-level threaded discussion hierarchy.
+
+#### 5. Discussion Replies (Threaded & Markdown)
+- `POST /api/forums/topics/{topicId}/replies`: Post a reply or nested response.
+  - *Payload Parameters:*
+    - `content` (string, required, min: 2): Comment content (supports Markdown).
+    - `parent_id` (integer, optional): ID of the parent comment to create a nested reply. Automatically normalizes nested replies to attach to the root comment.
+  - *Lock Enforcement:* If `is_locked = 1`, rejections are returned with HTTP 403 unless the member holds topic moderation permissions (`canModerateForum('lock_topics')`).
+  - *Gamification:* Increments topic replies counter, updates `last_poster_id`, and triggers the `forum_reply_created` reputation event.
+  - *Response (HTTP 200):* Returns `CommentResource` with populated user data and empty replies array.
+
+#### 6. Moderation Suite Endpoints
+- `POST /api/forums/topics/{topicId}/pin`: Toggle topic pinned state (`is_pinned`). Gated to section/global moderators and administrators.
+- `POST /api/forums/topics/{topicId}/lock`: Toggle topic locked state (`is_locked`). Prevents further replies from regular members.
+- `POST /api/forums/comments/{commentId}/pin`: Toggle pinned state on a specific discussion comment. Pinned comments float to the top of the discussion. Available to the topic author or forum moderators.
+- `POST /api/forums/comments/{commentId}/best-answer`: Toggle Best Answer status on a discussion comment. Highlights the comment card, awards **10 PTS** to the author, and triggers an on-site solution notification. Available to the topic author or forum moderators.
+- `DELETE /api/forums/comments/{commentId}`: Delete a comment or nested reply. Secured to ensure only the comment owner, section moderator, or admin can delete the comment, with automatic cleanup of child replies, likes, and topic comment counters.
 
 ---
 
