@@ -53,6 +53,21 @@
                 </div>
                 <div class="col-md-6">
                     <div class="admin-utility-card h-100">
+                        <label class="form-label fw-bold mb-2"><i class="feather-edit me-1 text-primary"></i>{{ __('messages.rich_text_editor') }}</label>
+                        <select name="rich_text_editor" class="form-select mb-2">
+                            @foreach($availableEditors as $key => $label)
+                                <option value="{{ $key }}" {{ ($activeEditor ?? 'quill') === $key ? 'selected' : '' }}>
+                                    {{ $label }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <small class="text-muted d-block">
+                            {{ __('messages.rich_text_editor_forum_desc') }}
+                        </small>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="admin-utility-card h-100">
                         <div class="form-check mb-3">
                             <input class="form-check-input" type="checkbox" id="attachments_enabled" name="attachments_enabled" value="1" {{ old('attachments_enabled', $forumSettings['attachments_enabled'] ?? 1) ? 'checked' : '' }}>
                             <label class="form-check-label" for="attachments_enabled">{{ __('messages.attachments_enabled') }}</label>

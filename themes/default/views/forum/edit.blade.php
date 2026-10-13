@@ -761,7 +761,32 @@ html.app-skin-dark .ql-toolbar.ql-snow button:hover,
                         {{ __('messages.content') }}
                     </label>
                     <div class="superdesign-editor-box">
-                        <textarea id="editor1" name="txt" rows="16" required>{{ old('txt', $topic->txt ?? '') }}</textarea>
+                        @if($activeEditor === 'myads_markdown')
+                            <div class="forum-modern-editor-box">
+                                <div class="forum-modern-editor-toolbar">
+                                    <button type="button" class="forum-modern-tool-btn" onclick="ForumEditor.wrap(document.getElementById('editor1'), '**', '**', 'bold text')" title="Bold"><i class="fa fa-bold"></i></button>
+                                    <button type="button" class="forum-modern-tool-btn" onclick="ForumEditor.wrap(document.getElementById('editor1'), '*', '*', 'italic text')" title="Italic"><i class="fa fa-italic"></i></button>
+                                    <button type="button" class="forum-modern-tool-btn" onclick="ForumEditor.wrap(document.getElementById('editor1'), '~~', '~~', 'strikethrough')" title="Strike"><i class="fa fa-strikethrough"></i></button>
+                                    <div class="forum-modern-tool-separator"></div>
+                                    <button type="button" class="forum-modern-tool-btn" onclick="ForumEditor.wrap(document.getElementById('editor1'), '# ', '', 'Heading 1')" title="Heading 1"><i class="fa fa-heading"></i></button>
+                                    <button type="button" class="forum-modern-tool-btn" onclick="ForumEditor.wrap(document.getElementById('editor1'), '`', '`', 'code')" title="Inline Code"><i class="fa fa-code"></i></button>
+                                    <button type="button" class="forum-modern-tool-btn" onclick="ForumEditor.wrap(document.getElementById('editor1'), '\n```php\n', '\n```\n', 'echo \"hello\";')" title="Code Block"><i class="fa-regular fa-file-code fa-file-code-o"></i></button>
+                                    <button type="button" class="forum-modern-tool-btn" onclick="ForumEditor.wrap(document.getElementById('editor1'), '> ', '', 'quote text')" title="Quote"><i class="fa fa-quote-left"></i></button>
+                                    <div class="forum-modern-tool-separator"></div>
+                                    <button type="button" class="forum-modern-tool-btn" onclick="ForumEditor.wrap(document.getElementById('editor1'), '[', '](https://)', 'link title')" title="Link"><i class="fa fa-link"></i></button>
+                                    <button type="button" class="forum-modern-tool-btn" onclick="ForumEditor.wrap(document.getElementById('editor1'), '![image](', ')', 'https://')" title="Image"><i class="fa fa-image"></i></button>
+                                    <button type="button" class="forum-modern-tool-btn" onclick="ForumEditor.insert(document.getElementById('editor1'), '\n- Item 1\n- Item 2\n')" title="List"><i class="fa fa-list-ul"></i></button>
+                                    <div class="forum-modern-tool-separator"></div>
+                                    <button type="button" class="forum-modern-tool-btn" id="forumToggleSplitPreview" title="Toggle Live Preview"><i class="fa fa-eye"></i></button>
+                                </div>
+                                <div class="forum-modern-editor-split">
+                                    <textarea id="editor1" name="txt" rows="16" class="forum-modern-editor-textarea" placeholder="{{ __('messages.forum_post_composer_placeholder') ?? 'Write your discussion content using Markdown...' }}" required>{{ old('txt', $topic->txt ?? '') }}</textarea>
+                                    <div id="forumTopicPreview" class="forum-modern-editor-preview"></div>
+                                </div>
+                            </div>
+                        @else
+                            <textarea id="editor1" name="txt" rows="16" required>{{ old('txt', $topic->txt ?? '') }}</textarea>
+                        @endif
                     </div>
                 </div>
 
@@ -776,6 +801,13 @@ html.app-skin-dark .ql-toolbar.ql-snow button:hover,
                                 <option value="{{ $category->id }}" {{ (old('cat', $topic->cat ?? '') == $category->id) ? 'selected' : '' }}>
                                     {{ $category->name }}
                                 </option>
+                                @if($category->children && $category->children->isNotEmpty())
+                                    @foreach($category->children as $sub)
+                                        <option value="{{ $sub->id }}" {{ (old('cat', $topic->cat ?? '') == $sub->id) ? 'selected' : '' }}>
+                                            &nbsp;&nbsp;&nbsp;↳ {{ $sub->name }}
+                                        </option>
+                                    @endforeach
+                                @endif
                             @endforeach
                         </select>
                     </div>
@@ -1001,6 +1033,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 var inst = sceditor.instance(textarea);
                 if (inst) {
                     inst.updateOriginal();
+                }
+            });
+        }
+    } else if (activeEditor === 'myads_markdown') {
+        var previewBtn = document.getElementById('forumToggleSplitPreview');
+        var previewDiv = document.getElementById('forumTopicPreview');
+        if (previewBtn && previewDiv) {
+            previewBtn.addEventListener('click', function() {
+                var isActive = previewDiv.classList.toggle('is-active');
+                if (isActive) {
+                    previewDiv.innerHTML = window.ForumEditor ? window.ForumEditor.renderMarkdown(textarea.value) : textarea.value;
+                }
+            });
+            textarea.addEventListener('input', function() {
+                if (previewDiv.classList.contains('is-active')) {
+                    previewDiv.innerHTML = window.ForumEditor ? window.ForumEditor.renderMarkdown(textarea.value) : textarea.value;
                 }
             });
         }

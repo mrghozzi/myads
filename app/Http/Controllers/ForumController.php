@@ -25,7 +25,8 @@ class ForumController extends Controller
 {
     public function index()
     {
-        $categories = ForumCategory::where(function($query) {
+        $categories = ForumCategory::whereNull('parent_id')
+            ->where(function($query) {
                 $user = auth()->user();
                 $query->where('visibility', 0); // Everyone
                 if ($user) {
@@ -35,92 +36,74 @@ class ForumController extends Controller
                     }
                 }
             })
-            ->orderBy('ordercat', 'desc')
+            ->with(['children' => function($q) {
+                $user = auth()->user();
+                $q->where('visibility', 0);
+                if ($user) {
+                    $q->orWhere('visibility', 1);
+                    if ($user->canModerateForum()) {
+                        $q->orWhere('visibility', 2);
+                    }
+                }
+                $q->orderBy('ordercat', 'asc');
+            }])
+            ->orderBy('ordercat', 'asc')
             ->get();
 
-        $categoryIds = $categories->modelKeys();
-        $categoryMetrics = collect();
-        if ($categoryIds !== []) {
-            $categoryMetrics = \Illuminate\Support\Facades\Cache::remember(
-                'forum:index:category-metrics:v1:' . md5(implode(',', $categoryIds)),
-                now()->addMinute(),
-                function () use ($categoryIds) {
-                    $topicCounts = ForumTopic::query()
-                        ->selectRaw('cat, COUNT(*) AS topic_count')
-                        ->whereIn('cat', $categoryIds)
-                        ->where('statu', 1)
-                        ->groupBy('cat')
-                        ->get()
-                        ->keyBy('cat');
-
-                    $replyCounts = DB::table('f_coment')
-                        ->join('forum', 'forum.id', '=', 'f_coment.tid')
-                        ->whereIn('forum.cat', $categoryIds)
-                        ->selectRaw('forum.cat, COUNT(*) AS reply_count')
-                        ->groupBy('forum.cat')
-                        ->pluck('reply_count', 'cat');
-
-                    $latestTopics = DB::table('forum as topics')
-                        ->joinSub(
-                            DB::table('forum')
-                                ->selectRaw('cat, MAX(id) AS topic_id')
-                                ->whereIn('cat', $categoryIds)
-                                ->where('statu', 1)
-                                ->groupBy('cat'),
-                            'latest_topics',
-                            fn ($join) => $join->on('latest_topics.topic_id', '=', 'topics.id')
-                        )
-                        ->leftJoinSub(
-                            DB::table('status')
-                                ->selectRaw('tp_id, MAX(id) AS status_id')
-                                ->where('s_type', 2)
-                                ->groupBy('tp_id'),
-                            'latest_statuses',
-                            fn ($join) => $join->on('latest_statuses.tp_id', '=', 'topics.id')
-                        )
-                        ->leftJoin('status as latest_status', 'latest_status.id', '=', 'latest_statuses.status_id')
-                        ->get([
-                            'topics.cat',
-                            'topics.id as topic_id',
-                            'topics.name as topic_name',
-                            'latest_status.date as status_date',
-                        ])
-                        ->keyBy('cat');
-
-                    return collect($categoryIds)->mapWithKeys(function ($categoryId) use ($topicCounts, $replyCounts, $latestTopics) {
-                        $latestTopic = $latestTopics->get($categoryId);
-
-                        return [$categoryId => [
-                            'topics' => (int) ($topicCounts->get($categoryId)?->topic_count ?? 0),
-                            'replies' => (int) ($replyCounts[$categoryId] ?? 0),
-                            'latest_topic_id' => $latestTopic?->topic_id,
-                            'latest_topic_name' => $latestTopic?->topic_name,
-                            'latest_status_date' => $latestTopic?->status_date,
-                        ]];
-                    });
-                }
-            );
-        }
-
-        foreach ($categories as $category) {
-            $metrics = $categoryMetrics->get($category->id, []);
-            $category->setAttribute('topic_count', $metrics['topics'] ?? 0);
-            $category->setAttribute('reply_count', $metrics['replies'] ?? 0);
-            $category->setAttribute('latest_topic_id', $metrics['latest_topic_id'] ?? null);
-            $category->setAttribute('latest_topic_name', $metrics['latest_topic_name'] ?? null);
-            $category->setAttribute('latest_status_date', $metrics['latest_status_date'] ?? null);
-        }
+        $this->attachCategoryMetrics($categories);
 
         $forumStats = \Illuminate\Support\Facades\Cache::remember(
-            'forum:index:summary:v1',
+            'forum:index:summary:v3',
             now()->addMinutes(2),
             fn () => [
-                'topics' => ForumTopic::count(),
-                'replies' => ForumComment::count(),
+                'topics' => ForumTopic::forumOnly()->where('statu', 1)->whereNull('group_id')->count(),
+                'replies' => DB::table('f_coment')
+                    ->join('forum', 'forum.id', '=', 'f_coment.tid')
+                    ->whereExists(function ($sub) {
+                        $sub->select(DB::raw(1))
+                            ->from('status')
+                            ->whereColumn('status.tp_id', 'forum.id')
+                            ->where('status.s_type', 2);
+                    })
+                    ->count(),
                 'members' => \App\Models\User::count(),
                 'latest_member' => \App\Models\User::query()->latest('id')->first(),
             ]
         );
+
+        $filter = request()->input('filter', 'latest');
+        $search = request()->input('q');
+
+        $topicsQuery = ForumTopic::visible()
+            ->forumOnly()
+            ->with(['user', 'category', 'lastPoster'])
+            ->where('statu', 1)
+            ->whereNull('group_id');
+
+        if ($search) {
+            $topicsQuery->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('txt', 'like', "%{$search}%");
+            });
+        }
+
+        // Modern forum sorting
+        if (Schema::hasColumn('forum', 'is_pinned')) {
+            $topicsQuery->orderBy('is_pinned', 'desc');
+        }
+        $topicsQuery->filterModern($filter);
+        $perPage = (int) \App\Support\ForumSettings::get('topics_per_page', 20);
+        $topics = $topicsQuery->paginate($perPage)->withQueryString();
+
+        if (request()->ajax() || request()->wantsJson()) {
+            return response()->json([
+                'html' => view('theme::forum.partials.discussion_stream', compact('topics'))->render(),
+                'has_more' => $topics->hasMorePages(),
+                'next_page_url' => $topics->nextPageUrl(),
+                'current_page' => $topics->currentPage(),
+                'total' => $topics->total(),
+            ]);
+        }
 
         $this->seo([
             'scope_key' => 'forum_index',
@@ -134,13 +117,25 @@ class ForumController extends Controller
 
         return view('theme::forum.index', [
             'categories' => $categories,
+            'topics' => $topics,
+            'currentFilter' => $filter,
             'forumStats' => $forumStats,
         ]);
     }
 
     public function category($id)
     {
-        $category = ForumCategory::findOrFail($id);
+        $category = ForumCategory::with(['parent', 'children' => function($q) {
+            $user = auth()->user();
+            $q->where('visibility', 0);
+            if ($user) {
+                $q->orWhere('visibility', 1);
+                if ($user->canModerateForum()) {
+                    $q->orWhere('visibility', 2);
+                }
+            }
+            $q->orderBy('ordercat', 'asc');
+        }])->findOrFail($id);
 
         $user = auth()->user();
         if ($category->visibility == 1 && !$user) {
@@ -150,49 +145,80 @@ class ForumController extends Controller
             abort(403);
         }
 
-        $settings = ForumSettings::all();
-        $time = time();
-        $sidebarCategories = $this->buildCategorySidebar((int) $category->id);
+        $filter = request()->input('filter', 'latest');
+        $search = request()->input('q');
 
-        $statuses = Status::visible()
-            ->whereIn('s_type', [2, 4, 100, 10, 11, 12, 13, 14])
-            ->where('date', '<=', $time)
-            ->whereIn('tp_id', function ($query) use ($id) {
-                $query->select('id')
-                    ->from('forum')
-                    ->where('cat', $id)
-                    ->whereNull('group_id')
-                    ->where('statu', 1);
+        $categoryIds = array_merge([(int) $category->id], $category->allChildIds());
+
+        $topicsQuery = ForumTopic::visible()
+            ->forumOnly()
+            ->with(['user', 'category', 'lastPoster'])
+            ->whereIn('cat', $categoryIds)
+            ->where('statu', 1)
+            ->whereNull('group_id');
+
+        if ($search) {
+            $topicsQuery->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('txt', 'like', "%{$search}%");
             });
+        }
 
         if (Schema::hasColumn('forum', 'is_pinned')) {
-            $statuses->orderByRaw('(SELECT is_pinned FROM forum WHERE forum.id = status.tp_id) DESC');
+            $topicsQuery->orderBy('is_pinned', 'desc');
         }
-
-        $statuses = $statuses
-            ->orderBy('id', 'desc')
-            ->paginate($settings['topics_per_page']);
-
-        $topicIds = $statuses->pluck('tp_id');
-        $topics = ForumTopic::with(['user', 'category'])
-            ->withCount(['comments', 'likes'])
-            ->whereIn('id', $topicIds)
-            ->get()
-            ->keyBy('id');
+        $topicsQuery->filterModern($filter);
+        $perPage = (int) \App\Support\ForumSettings::get('topics_per_page', 20);
+        $topics = $topicsQuery->paginate($perPage)->withQueryString();
 
         if (request()->ajax() || request()->wantsJson()) {
-            $html = '';
-            foreach ($statuses as $status) {
-                $topic = $topics->get($status->tp_id);
-                if ($topic) {
-                    $html .= view('theme::partials.forum.topic_card', compact('topic', 'status'))->render();
-                }
-            }
             return response()->json([
-                'html' => $html,
-                'next_page_url' => $statuses->nextPageUrl(),
+                'html' => view('theme::forum.partials.discussion_stream', compact('topics'))->render(),
+                'has_more' => $topics->hasMorePages(),
+                'next_page_url' => $topics->nextPageUrl(),
+                'current_page' => $topics->currentPage(),
+                'total' => $topics->total(),
             ]);
         }
+
+        $categories = ForumCategory::whereNull('parent_id')
+            ->where(function($query) {
+                $user = auth()->user();
+                $query->where('visibility', 0);
+                if ($user) {
+                    $query->orWhere('visibility', 1);
+                    if ($user->canModerateForum()) {
+                        $query->orWhere('visibility', 2);
+                    }
+                }
+            })
+            ->with(['children' => function($q) {
+                $user = auth()->user();
+                $q->where('visibility', 0);
+                if ($user) {
+                    $q->orWhere('visibility', 1);
+                    if ($user->canModerateForum()) {
+                        $q->orWhere('visibility', 2);
+                    }
+                }
+                $q->orderBy('ordercat', 'asc');
+            }])
+            ->orderBy('ordercat', 'asc')
+            ->get();
+
+        $this->attachCategoryMetrics($categories);
+        if ($category->children->isNotEmpty()) {
+            $this->attachCategoryMetrics($category->children);
+        }
+
+        $breadcrumbs = [
+            ['name' => __('messages.home'), 'url' => url('/')],
+            ['name' => __('messages.forum'), 'url' => route('forum.index')],
+        ];
+        foreach ($category->getAncestors() as $ancestor) {
+            $breadcrumbs[] = ['name' => $ancestor->name, 'url' => route('forum.category', $ancestor->id)];
+        }
+        $breadcrumbs[] = ['name' => $category->name, 'url' => route('forum.category', $category->id)];
 
         $this->seo([
             'scope_key' => 'forum_category',
@@ -201,14 +227,24 @@ class ForumController extends Controller
             'resource_title' => $category->name,
             'category_name' => $category->name,
             'description' => Str::limit(trim(preg_replace('/\s+/', ' ', strip_tags((string) $category->txt))), 170, '') ?: __('messages.seo_forum_category_description', ['category' => $category->name]),
-            'breadcrumbs' => [
-                ['name' => __('messages.home'), 'url' => url('/')],
-                ['name' => __('messages.forum'), 'url' => route('forum.index')],
-                ['name' => $category->name, 'url' => route('forum.category', $category->id)],
-            ],
+            'breadcrumbs' => $breadcrumbs,
         ]);
 
-        return view('theme::forum.category', compact('category', 'statuses', 'topics', 'sidebarCategories'));
+        $forumStats = \Illuminate\Support\Facades\Cache::remember(
+            'forum:index:summary:v1',
+            now()->addMinutes(2),
+            fn () => [
+                'topics' => ForumTopic::count(),
+                'replies' => ForumComment::count(),
+                'members' => \App\Models\User::count(),
+                'latest_member' => \App\Models\User::query()->latest('id')->first(),
+            ]
+        );
+
+        $currentFilter = $filter;
+        $sidebarCategories = $categories;
+
+        return view('theme::forum.category', compact('category', 'categories', 'topics', 'filter', 'currentFilter', 'sidebarCategories', 'forumStats'));
     }
 
     public function topic($id)
@@ -249,6 +285,25 @@ class ForumController extends Controller
             }
         }
 
+        $categoryBreadcrumbs = [];
+        if ($topic->category) {
+            foreach ($topic->category->getAncestors() as $ancestor) {
+                $categoryBreadcrumbs[] = [
+                    'name' => $ancestor->name,
+                    'url' => route('forum.category', $ancestor->id),
+                ];
+            }
+            $categoryBreadcrumbs[] = [
+                'name' => $topic->category->name,
+                'url' => route('forum.category', $topic->category->id),
+            ];
+        } else {
+            $categoryBreadcrumbs[] = [
+                'name' => __('messages.category_fallback'),
+                'url' => route('forum.index'),
+            ];
+        }
+
         $seoContext = [
             'scope_key' => 'forum_topic',
             'content_type' => 'forum_topic',
@@ -268,12 +323,16 @@ class ForumController extends Controller
                     ['name' => $group->name, 'url' => route('groups.show', $group)],
                     ['name' => $topic->name, 'url' => route('forum.topic', $topic->id)],
                 ]
-                : [
-                    ['name' => __('messages.home'), 'url' => url('/')],
-                    ['name' => __('messages.forum'), 'url' => route('forum.index')],
-                    ['name' => $topic->category?->name ?: __('messages.category_fallback'), 'url' => route('forum.category', $topic->cat)],
-                    ['name' => $topic->name, 'url' => route('forum.topic', $topic->id)],
-                ],
+                : array_merge(
+                    [
+                        ['name' => __('messages.home'), 'url' => url('/')],
+                        ['name' => __('messages.forum'), 'url' => route('forum.index')],
+                    ],
+                    $categoryBreadcrumbs,
+                    [
+                        ['name' => $topic->name, 'url' => route('forum.topic', $topic->id)],
+                    ]
+                ),
         ];
 
         // Dedicated YouTube-style Video Watch Page for Video posts (s_type == 10 or post_kind === 'video', excluding clips s_type == 14)
@@ -427,7 +486,16 @@ class ForumController extends Controller
         $this->seo($seoContext);
 
         $topicComments = $topic->comments()
-            ->with('user')
+            ->whereNull('parent_id')
+            ->with([
+                'user',
+                'replies' => function ($q) {
+                    $q->with('user')->orderBy('id', 'asc');
+                }
+            ])
+            ->orderByDesc('is_pinned')
+            ->orderByDesc('is_best_answer')
+            ->orderBy('id', 'asc')
             ->get();
         $viewerReaction = auth()->check()
             ? \App\Models\Like::query()->where('uid', auth()->id())->where('sid', $topic->id)->where('type', 2)->first()
@@ -476,7 +544,7 @@ class ForumController extends Controller
         }
 
         if (!$request->has('type')) {
-            $request->merge(['type' => 100]);
+            $request->merge(['type' => 2]);
         }
 
         $settings = ForumSettings::all();
@@ -485,7 +553,7 @@ class ForumController extends Controller
             'name' => 'required|string|max:255',
             'txt' => 'required|string',
             'cat' => 'required|integer|exists:f_cat,id',
-            'type' => 'required|in:100,4',
+            'type' => 'nullable|in:2,4,100',
             'img' => 'nullable|image|max:2048',
         ];
 
@@ -555,7 +623,7 @@ class ForumController extends Controller
             $status = Status::create([
                 'uid' => $uid,
                 'date' => $time,
-                's_type' => (int) $request->type === 4 ? 4 : 2,
+                's_type' => 2,
                 'tp_id' => $topic->id,
             ]);
 
@@ -568,8 +636,6 @@ class ForumController extends Controller
                     'o_order' => $uid,
                     'o_mode' => 'file',
                 ]);
-
-                $status->update(['s_type' => 4]);
             }
 
             $this->storeTopicAttachments($topic, $request, $settings);
@@ -860,6 +926,105 @@ class ForumController extends Controller
         return back()->with('success', $topic->is_locked ? __('messages.topic_locked') : __('messages.topic_unlocked'));
     }
 
+    public function togglePinComment(Request $request, $id)
+    {
+        $comment = ForumComment::findOrFail($id);
+        $topic = ForumTopic::findOrFail($comment->tid);
+        $user = auth()->user();
+
+        $isAuthor = $user && (int) $user->id === (int) $topic->uid;
+        $isModerator = $user && ($user->isAdmin() || $this->canPinOrLockTopic($topic, $user, 'pin_topics'));
+
+        if (!$isAuthor && !$isModerator) {
+            return response()->json(['error' => __('messages.forum_unauthorized')], 403);
+        }
+
+        $comment->is_pinned = !$comment->is_pinned;
+        $comment->save();
+
+        if ($comment->is_pinned) {
+            ForumComment::where('tid', $topic->id)
+                ->where('id', '!=', $comment->id)
+                ->where('is_pinned', true)
+                ->update(['is_pinned' => false]);
+
+            $topic->update(['pinned_comment_id' => $comment->id]);
+        } else {
+            if ((int) $topic->pinned_comment_id === (int) $comment->id) {
+                $topic->update(['pinned_comment_id' => null]);
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'is_pinned' => (bool) $comment->is_pinned,
+            'message' => $comment->is_pinned
+                ? (__('messages.comment_pinned_success') ?? 'Comment pinned successfully.')
+                : (__('messages.comment_unpinned_success') ?? 'Comment unpinned successfully.'),
+        ]);
+    }
+
+    public function toggleBestAnswer(Request $request, $id)
+    {
+        $comment = ForumComment::findOrFail($id);
+        $topic = ForumTopic::findOrFail($comment->tid);
+        $user = auth()->user();
+
+        $isAuthor = $user && (int) $user->id === (int) $topic->uid;
+        $isModerator = $user && ($user->isAdmin() || $this->canPinOrLockTopic($topic, $user, 'edit_topics'));
+
+        if (!$isAuthor && !$isModerator) {
+            return response()->json(['error' => __('messages.forum_unauthorized')], 403);
+        }
+
+        $comment->is_best_answer = !$comment->is_best_answer;
+        $comment->save();
+
+        if ($comment->is_best_answer) {
+            ForumComment::where('tid', $topic->id)
+                ->where('id', '!=', $comment->id)
+                ->where('is_best_answer', true)
+                ->update(['is_best_answer' => false]);
+
+            $topic->update(['best_comment_id' => $comment->id]);
+
+            if ($comment->uid && $comment->uid != $user->id) {
+                app(\App\Services\PointLedgerService::class)->award(
+                    $comment->uid,
+                    10,
+                    'best_answer_awarded',
+                    'points_awarded',
+                    'forum_comment',
+                    (int) $comment->id
+                );
+
+                $commentAuthor = \App\Models\User::find($comment->uid);
+                if ($commentAuthor) {
+                    app(\App\Services\NotificationService::class)->send(
+                        $commentAuthor,
+                        __('messages.your_reply_marked_best_answer', ['title' => $topic->name]),
+                        route('forum.topic', $topic->id) . '#post-' . $comment->id,
+                        'best_answer',
+                        $user->id,
+                        'best_answer'
+                    );
+                }
+            }
+        } else {
+            if ((int) $topic->best_comment_id === (int) $comment->id) {
+                $topic->update(['best_comment_id' => null]);
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'is_best_answer' => (bool) $comment->is_best_answer,
+            'message' => $comment->is_best_answer
+                ? (__('messages.best_answer_selected_success') ?? 'Comment selected as Best Answer.')
+                : (__('messages.best_answer_removed_success') ?? 'Best Answer removed.'),
+        ]);
+    }
+
     public function downloadAttachment(Request $request, $attachmentId)
     {
         $attachment = ForumAttachment::findOrFail($attachmentId);
@@ -1091,5 +1256,123 @@ class ForumController extends Controller
         }
 
         return $user->canModerateForum($forumPermission, (int) $topic->cat);
+    }
+
+    protected function attachCategoryMetrics($categories): void
+    {
+        $allCategories = collect();
+        foreach ($categories as $cat) {
+            $allCategories->push($cat);
+            if ($cat->relationLoaded('children') && $cat->children) {
+                foreach ($cat->children as $child) {
+                    $allCategories->push($child);
+                }
+            }
+        }
+
+        $categoryIds = $allCategories->pluck('id')->unique()->filter()->values()->all();
+        $categoryMetrics = collect();
+        if ($categoryIds !== []) {
+            $categoryMetrics = \Illuminate\Support\Facades\Cache::remember(
+                'forum:index:category-metrics:v4:' . md5(implode(',', $categoryIds)),
+                now()->addMinute(),
+                function () use ($categoryIds) {
+                    $topicCounts = ForumTopic::forumOnly()
+                        ->selectRaw('cat, COUNT(*) AS topic_count')
+                        ->whereIn('cat', $categoryIds)
+                        ->where('statu', 1)
+                        ->whereNull('group_id')
+                        ->groupBy('cat')
+                        ->get()
+                        ->keyBy('cat');
+
+                    $replyCounts = DB::table('f_coment')
+                        ->join('forum', 'forum.id', '=', 'f_coment.tid')
+                        ->whereIn('forum.cat', $categoryIds)
+                        ->whereExists(function ($sub) {
+                            $sub->select(DB::raw(1))
+                                ->from('status')
+                                ->whereColumn('status.tp_id', 'forum.id')
+                                ->where('status.s_type', 2);
+                        })
+                        ->selectRaw('forum.cat, COUNT(*) AS reply_count')
+                        ->groupBy('forum.cat')
+                        ->pluck('reply_count', 'cat');
+
+                    $latestTopics = DB::table('forum as topics')
+                        ->joinSub(
+                            DB::table('forum')
+                                ->selectRaw('cat, MAX(id) AS topic_id')
+                                ->whereIn('cat', $categoryIds)
+                                ->where('statu', 1)
+                                ->whereNull('group_id')
+                                ->whereExists(function ($sub) {
+                                    $sub->select(DB::raw(1))
+                                        ->from('status')
+                                        ->whereColumn('status.tp_id', 'forum.id')
+                                        ->where('status.s_type', 2);
+                                })
+                                ->groupBy('cat'),
+                            'latest_topics',
+                            fn ($join) => $join->on('latest_topics.topic_id', '=', 'topics.id')
+                        )
+                        ->leftJoinSub(
+                            DB::table('status')
+                                ->selectRaw('tp_id, MAX(id) AS status_id')
+                                ->where('s_type', 2)
+                                ->groupBy('tp_id'),
+                            'latest_statuses',
+                            fn ($join) => $join->on('latest_statuses.tp_id', '=', 'topics.id')
+                        )
+                        ->leftJoin('status as latest_status', 'latest_status.id', '=', 'latest_statuses.status_id')
+                        ->get([
+                            'topics.cat',
+                            'topics.id as topic_id',
+                            'topics.name as topic_name',
+                            'latest_status.date as status_date',
+                        ])
+                        ->keyBy('cat');
+
+                    return collect($categoryIds)->mapWithKeys(function ($categoryId) use ($topicCounts, $replyCounts, $latestTopics) {
+                        $latestTopic = $latestTopics->get($categoryId);
+
+                        return [$categoryId => [
+                            'topics' => (int) ($topicCounts->get($categoryId)?->topic_count ?? 0),
+                            'replies' => (int) ($replyCounts[$categoryId] ?? 0),
+                            'latest_topic_id' => $latestTopic?->topic_id,
+                            'latest_topic_name' => $latestTopic?->topic_name,
+                            'latest_status_date' => $latestTopic?->status_date,
+                        ]];
+                    });
+                }
+            );
+        }
+
+        foreach ($allCategories as $category) {
+            $metrics = $categoryMetrics->get($category->id, []);
+            $category->setAttribute('topic_count', $metrics['topics'] ?? 0);
+            $category->setAttribute('reply_count', $metrics['replies'] ?? 0);
+            $category->setAttribute('latest_topic_id', $metrics['latest_topic_id'] ?? null);
+            $category->setAttribute('latest_topic_name', $metrics['latest_topic_name'] ?? null);
+            $category->setAttribute('latest_status_date', $metrics['latest_status_date'] ?? null);
+        }
+
+        // Aggregate counts for parent categories with sub-forums
+        foreach ($categories as $category) {
+            if ($category->relationLoaded('children') && $category->children->isNotEmpty()) {
+                $descendantIds = $category->allChildIds();
+                if (!empty($descendantIds)) {
+                    $aggTopics = (int) ($category->topic_count ?? 0);
+                    $aggReplies = (int) ($category->reply_count ?? 0);
+                    foreach ($descendantIds as $cid) {
+                        $cMetrics = $categoryMetrics->get($cid, []);
+                        $aggTopics += (int) ($cMetrics['topics'] ?? 0);
+                        $aggReplies += (int) ($cMetrics['replies'] ?? 0);
+                    }
+                    $category->setAttribute('topic_count', $aggTopics);
+                    $category->setAttribute('reply_count', $aggReplies);
+                }
+            }
+        }
     }
 }

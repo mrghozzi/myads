@@ -295,11 +295,17 @@
                                     <button type="button" class="forum-rdx-tool-btn" data-md-action="italic" data-target="txt_comment{{ $id }}" title="{{ __('messages.markdown_italic') }}">
                                         <i class="fa fa-italic" aria-hidden="true"></i>
                                     </button>
+                                    <button type="button" class="forum-rdx-tool-btn" data-md-action="strike" data-target="txt_comment{{ $id }}" title="Strikethrough">
+                                        <i class="fa fa-strikethrough" aria-hidden="true"></i>
+                                    </button>
                                     <button type="button" class="forum-rdx-tool-btn" data-md-action="quote" data-target="txt_comment{{ $id }}" title="{{ __('messages.markdown_quote') }}">
                                         <i class="fa fa-quote-left" aria-hidden="true"></i>
                                     </button>
                                     <button type="button" class="forum-rdx-tool-btn" data-md-action="code" data-target="txt_comment{{ $id }}" title="{{ __('messages.markdown_code') }}">
                                         <i class="fa fa-code" aria-hidden="true"></i>
+                                    </button>
+                                    <button type="button" class="forum-rdx-tool-btn" data-md-action="list" data-target="txt_comment{{ $id }}" title="List">
+                                        <i class="fa fa-list-ul" aria-hidden="true"></i>
                                     </button>
                                     <button
                                         type="button"
@@ -319,6 +325,9 @@
                                     <button type="button" class="forum-rdx-tool-btn" data-comment-media-btn="{{ $id }}" title="{{ __('messages.image') ?? 'إرفاق صورة' }}">
                                         <i class="fa fa-image" aria-hidden="true"></i>
                                     </button>
+                                    <button type="button" class="forum-rdx-tool-btn forum-modern-comment-preview-btn ms-auto" data-target="txt_comment{{ $id }}" data-preview="comment_preview_{{ $id }}" title="{{ __('messages.preview') ?? 'Live Preview' }}">
+                                        <i class="fa fa-eye" aria-hidden="true"></i>
+                                    </button>
                                 </div>
                                 <input type="file" id="comment_media_file_{{ $id }}" class="d-none" accept=".jpg,.jpeg,.png,.gif,.webp,.bmp" style="display: none;">
                                 <div class="forum-rdx-comment-dropzone-indicator" id="comment_drop_indicator_{{ $id }}">
@@ -331,6 +340,7 @@
                                 </div>
                                 <input type="hidden" id="parent_comment_id_{{ $id }}" name="parent_id" value="">
                                 <textarea id="txt_comment{{ $id }}" name="comment_text" class="forum-rdx-comment-input" data-md-editor="1" placeholder="{{ __('messages.your_comment') }}"></textarea>
+                                <div id="comment_preview_{{ $id }}" class="forum-modern-editor-preview" style="display: none; padding: 12px 14px; margin-top: 6px; border-radius: 8px; border: 1px solid var(--forum-border, #eaeaf5); background: var(--forum-surface-alt, #fafafc);"></div>
                                 <div class="forum-rdx-comment-media-preview is-hidden" id="comment_media_preview_{{ $id }}">
                                     <img src="" alt="preview" id="comment_media_thumb_{{ $id }}" class="comment-media-thumb">
                                     <span class="comment-media-name" id="comment_media_name_{{ $id }}"></span>

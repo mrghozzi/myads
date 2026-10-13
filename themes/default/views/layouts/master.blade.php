@@ -127,12 +127,96 @@
             src: url('{{ theme_asset('webfonts/fa-solid-900.woff2') }}') format('woff2');
         }
         @font-face {
+            font-family: 'Font Awesome 6 Free';
+            font-style: normal;
+            font-weight: 400;
+            font-display: swap;
+            src: url('{{ theme_asset('webfonts/fa-regular-400.woff2') }}') format('woff2');
+        }
+        @font-face {
+            font-family: 'Font Awesome 6 Brands';
+            font-style: normal;
+            font-weight: 400;
+            font-display: swap;
+            src: url('{{ theme_asset('webfonts/fa-brands-400.woff2') }}') format('woff2');
+        }
+        @font-face {
+            font-family: 'Font Awesome 7 Free';
+            font-style: normal;
+            font-weight: 900;
+            font-display: swap;
+            src: url('{{ theme_asset('webfonts/fa-solid-900.woff2') }}') format('woff2');
+        }
+        @font-face {
+            font-family: 'Font Awesome 7 Free';
+            font-style: normal;
+            font-weight: 400;
+            font-display: swap;
+            src: url('{{ theme_asset('webfonts/fa-regular-400.woff2') }}') format('woff2');
+        }
+        @font-face {
+            font-family: 'Font Awesome 7 Brands';
+            font-style: normal;
+            font-weight: 400;
+            font-display: swap;
+            src: url('{{ theme_asset('webfonts/fa-brands-400.woff2') }}') format('woff2');
+        }
+        @font-face {
             font-family: 'FontAwesome';
             font-style: normal;
             font-weight: normal;
             font-display: swap;
             src: url('{{ theme_asset('fonts/fontawesome-webfont.woff2?v=4.7.0') }}') format('woff2');
         }
+
+        /* Font Awesome 4 Shims & Brand Auto-detection */
+        .fa-markdown, .fa.fa-markdown, i.fa-markdown {
+            --fa: "\f60f" !important;
+            --fa-family: "Font Awesome 7 Brands", "Font Awesome 6 Brands", sans-serif !important;
+            --_fa-family: "Font Awesome 7 Brands", "Font Awesome 6 Brands", sans-serif !important;
+            font-family: "Font Awesome 7 Brands", "Font Awesome 6 Brands", sans-serif !important;
+            --fa-style: 400 !important;
+            font-weight: 400 !important;
+        }
+        .fa-markdown:before, .fa.fa-markdown:before { content: "\f60f" !important; }
+        .fa-comment-o, .fa.fa-comment-o, i.fa-comment-o {
+            --fa: "\f075" !important;
+            font-family: "Font Awesome 7 Free", "Font Awesome 6 Free", "FontAwesome", sans-serif !important;
+            --_fa-family: "Font Awesome 7 Free", "Font Awesome 6 Free", "FontAwesome", sans-serif !important;
+            --fa-style: 400 !important;
+            font-weight: 400 !important;
+        }
+        .fa-comment-o:before, .fa.fa-comment-o:before { content: "\f075" !important; }
+        .fa-comments-o, .fa.fa-comments-o { --fa: "\f086" !important; --fa-style: 400 !important; font-weight: 400 !important; }
+        .fa-comments-o:before, .fa.fa-comments-o:before { content: "\f086" !important; }
+        .fa-clock-o, .fa.fa-clock-o { --fa: "\f017" !important; --fa-style: 400 !important; font-weight: 400 !important; }
+        .fa-clock-o:before { content: "\f017" !important; }
+        .fa-user-o, .fa.fa-user-o { --fa: "\f007" !important; --fa-style: 400 !important; font-weight: 400 !important; }
+        .fa-user-o:before { content: "\f007" !important; }
+        .fa-trash-o, .fa.fa-trash-o { --fa: "\f1f8" !important; }
+        .fa-trash-o:before { content: "\f1f8" !important; }
+        .fa-file-code-o, .fa.fa-file-code-o { --fa: "\f1c9" !important; }
+        .fa-file-code-o:before { content: "\f1c9" !important; }
+        .fa-file-text-o, .fa.fa-file-text-o { --fa: "\f15c" !important; }
+        .fa-file-text-o:before { content: "\f15c" !important; }
+        .fa-pencil-square-o, .fa.fa-pencil-square-o { --fa: "\f044" !important; }
+        .fa-pencil-square-o:before { content: "\f044" !important; }
+        .fa-thumbs-o-up, .fa.fa-thumbs-o-up { --fa: "\f164" !important; --fa-style: 400 !important; font-weight: 400 !important; }
+        .fa-thumbs-o-up:before { content: "\f164" !important; }
+        .fa-smile-o, .fa.fa-smile-o { --fa: "\f118" !important; --fa-style: 400 !important; font-weight: 400 !important; }
+        .fa-smile-o:before { content: "\f118" !important; }
+        .fa-bookmark-o, .fa.fa-bookmark-o { --fa: "\f02e" !important; --fa-style: 400 !important; font-weight: 400 !important; }
+        .fa-bookmark-o:before { content: "\f02e" !important; }
+        .fa-check-circle-o, .fa.fa-check-circle-o { --fa: "\f058" !important; --fa-style: 400 !important; font-weight: 400 !important; }
+        .fa-check-circle-o:before { content: "\f058" !important; }
+        .fa-flag-o, .fa.fa-flag-o { --fa: "\f024" !important; --fa-style: 400 !important; font-weight: 400 !important; }
+        .fa-flag-o:before { content: "\f024" !important; }
+        .fa-folder-open-o, .fa.fa-folder-open-o { --fa: "\f115" !important; --fa-style: 400 !important; font-weight: 400 !important; }
+        .fa-folder-open-o:before { content: "\f115" !important; }
+        .fa-commenting-o, .fa.fa-commenting-o { --fa: "\f27b" !important; --fa-style: 400 !important; font-weight: 400 !important; }
+        .fa-commenting-o:before { content: "\f27b" !important; }
+        .fa-picture-o, .fa.fa-picture-o { --fa: "\f03e" !important; --fa-style: 400 !important; font-weight: 400 !important; }
+        .fa-picture-o:before { content: "\f03e" !important; }
     </style>
 
     <link href="{{ theme_asset('css/fontawesome6.min.css') }}" rel="stylesheet">
@@ -1383,7 +1467,8 @@
                 body: JSON.stringify({
                     id: id,
                     type: type,
-                    limit: limit
+                    limit: limit,
+                    view: 'activity'
                 })
             })
             .then(response => response.text())
@@ -1705,6 +1790,7 @@
             formData.append('id', id);
             formData.append('type', type);
             formData.append('comment', text);
+            formData.append('view', 'activity');
 
             let parentInput = document.getElementById('parent_comment_id_' + id);
             if (parentInput && parentInput.value) {

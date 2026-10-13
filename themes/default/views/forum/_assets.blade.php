@@ -14,10 +14,18 @@
             rel="stylesheet"
             type="text/css"
         />
+        <link
+            id="theme-forum-modern"
+            data-theme-link="true"
+            href="{{ theme_asset($cssPath . '/forum-modern.css') }}"
+            rel="stylesheet"
+            type="text/css"
+        />
     @endpush
 
     @push('scripts')
         <script src="{{ theme_asset('js/forum-redesign.js') }}"></script>
+        <script src="{{ theme_asset('js/forum-modern.js') }}"></script>
         <script>
             document.addEventListener('DOMContentLoaded', function() {
                 function enhanceForumCodeBlocks() {

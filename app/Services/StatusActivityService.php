@@ -71,7 +71,7 @@ class StatusActivityService
             case 13:
             case 14:
             case 100:
-                $topic = ForumTopic::with(['attachments', 'imageOption'])->find($activity->tp_id);
+                $topic = ForumTopic::with(['attachments', 'imageOption', 'category', 'lastPoster'])->find($activity->tp_id);
                 $activity->setRelation('forumTopic', $topic);
                 $activity->related_content = $topic;
                 $activity->type_label = match((int) $activity->s_type) {
@@ -228,7 +228,7 @@ class StatusActivityService
         }
 
         $directories = !empty($directoryIds) ? Directory::whereIn('id', array_unique($directoryIds))->get()->keyBy('id') : collect();
-        $forums = !empty($forumIds) ? ForumTopic::with(['attachments', 'imageOption'])->whereIn('id', array_unique($forumIds))->get()->keyBy('id') : collect();
+        $forums = !empty($forumIds) ? ForumTopic::with(['attachments', 'imageOption', 'category', 'lastPoster'])->whereIn('id', array_unique($forumIds))->get()->keyBy('id') : collect();
         $stores = !empty($storeIds) ? Product::withoutGlobalScope('store')->whereIn('id', array_unique($storeIds))->get()->keyBy('id') : collect();
         $news = !empty($newsIds) ? News::whereIn('id', array_unique($newsIds))->get()->keyBy('id') : collect();
         $orders = !empty($orderIds) ? OrderRequest::with(['user', 'awardedOffer.user', 'contract.provider'])->withCount(['offers as offers_count' => fn ($query) => $query->marketplaceVisible()])->whereIn('id', array_unique($orderIds))->get()->keyBy('id') : collect();

@@ -54,12 +54,50 @@ class CommentController extends Controller
                     && (!Auth::check() || !$this->canUserCommentLockedTopic(Auth::user(), $topic));
             }
 
-            $comments = ForumComment::with(['user', 'replies.user'])
+            // Distinguish dedicated forum discussion topics (s_type == 2) from media/social posts (photos, videos, audio, text, clips, files)
+            $status = Status::where('tp_id', $id)->first();
+            $isMediaPost = ($status && (int) $status->s_type !== 2)
+                || (!$status && $topic && (int) $topic->cat === 0);
+
+            if ($request->input('view') === 'topic_comments' || $request->input('view') === 'modern') {
+                $isMediaPost = false;
+            } elseif ($request->input('view') === 'activity') {
+                $isMediaPost = true;
+            }
+
+            if ($isMediaPost) {
+                $comments = ForumComment::with([
+                        'user',
+                        'replies' => function ($q) {
+                            $q->with('user')->orderBy('id', 'asc');
+                        }
+                    ])
+                    ->where('tid', $id)
+                    ->whereNull('parent_id')
+                    ->orderBy('id', 'desc')
+                    ->limit($limit)
+                    ->get();
+
+                return view('theme::partials.activity.comments', compact('comments', 'id', 'type', 'limit', 'hide_form', 'locked_topic', 'forum_category_id'));
+            }
+
+            $limit = (int) $request->input('limit', 100);
+
+            $comments = ForumComment::with([
+                    'user',
+                    'replies' => function ($q) {
+                        $q->with('user')->orderBy('id', 'asc');
+                    }
+                ])
                 ->where('tid', $id)
                 ->whereNull('parent_id')
-                ->orderBy('id', 'desc')
+                ->orderByDesc('is_pinned')
+                ->orderByDesc('is_best_answer')
+                ->orderBy('id', 'asc')
                 ->limit($limit)
                 ->get();
+
+            return view('theme::forum.partials.topic_comments', compact('comments', 'id', 'type', 'limit', 'hide_form', 'locked_topic', 'forum_category_id', 'topic'));
 
         } elseif ($type == 'directory') {
             $comments = Option::with('user')
@@ -219,6 +257,11 @@ class CommentController extends Controller
             $parentComment = ForumComment::where('id', $parentId)->where('tid', $id)->first();
             if (!$parentComment) {
                 $parentId = null;
+            } else {
+                // If replying to a nested reply, attach to the root comment of that thread
+                if ($parentComment->parent_id) {
+                    $parentId = (int) $parentComment->parent_id;
+                }
             }
         }
 
@@ -235,6 +278,14 @@ class CommentController extends Controller
 
                 $ownerId = $topic->uid;
                 $url = "/t" . $id; // Legacy URL format support (Root relative)
+
+                // Update topic metadata for modern discussion stream
+                $topic->update([
+                    'last_posted_at' => $time,
+                    'last_poster_id' => $uid,
+                    'comments_count' => ForumComment::where('tid', $id)->count(),
+                    'reply' => ForumComment::where('tid', $id)->count(),
+                ]);
 
                 if ($parentComment && $parentComment->uid != $uid && $parentComment->uid != $ownerId) {
                     $parentAuthor = User::find($parentComment->uid);
@@ -377,6 +428,22 @@ class CommentController extends Controller
             // No, better to just return the new comment HTML to append, OR reload the whole comment section via JS.
             // Let's stick to reloading the comments section.
             
+            if ($type === 'forum') {
+                $status = Status::where('tp_id', $id)->first();
+                $isMediaPost = ($status && (int) $status->s_type !== 2)
+                    || (!$status && ($t = ForumTopic::find($id)) && (int) $t->cat === 0);
+
+                if ($request->input('view') === 'topic_comments' || $request->input('view') === 'modern') {
+                    $isMediaPost = false;
+                } elseif ($request->input('view') === 'activity') {
+                    $isMediaPost = true;
+                }
+
+                if (!$isMediaPost) {
+                    $request->merge(['limit' => (int) $request->input('limit', 100)]);
+                }
+            }
+
             return $this->load($request);
 
         } catch (\Exception $e) {
@@ -430,7 +497,7 @@ class CommentController extends Controller
         }
 
         $ownerId = ($type == 'forum') ? $comment->uid : $comment->o_order;
-        $isOwner = ($ownerId == $uid);
+        $isOwner = ((int) $ownerId === (int) $uid);
 
         $canDeleteAsForumModerator = false;
         if ($type === 'forum' && $comment instanceof ForumComment) {
@@ -439,7 +506,9 @@ class CommentController extends Controller
                 if ((int) $topic->group_id > 0) {
                     $canDeleteAsForumModerator = app(GroupAccessService::class)->canManageGroup($topic->group()->first(), Auth::user());
                 } else {
-                    $canDeleteAsForumModerator = Auth::user()->canModerateForum('delete_comments', (int) $topic->cat);
+                    $catId = (int) $topic->cat;
+                    $canDeleteAsForumModerator = Auth::user()->canModerateForum('delete_comments', $catId)
+                        || Auth::user()->canModerateForum(null, $catId);
                 }
             }
         }
@@ -458,6 +527,24 @@ class CommentController extends Controller
                 }
             }
 
+            if ($type === 'forum') {
+                ForumComment::where('parent_id', $id)->delete();
+                $topic = ForumTopic::find($comment->tid);
+                if ($topic) {
+                    if ((int) $topic->pinned_comment_id === (int) $id) {
+                        $topic->update(['pinned_comment_id' => null]);
+                    }
+                    if ((int) $topic->best_comment_id === (int) $id) {
+                        $topic->update(['best_comment_id' => null]);
+                    }
+                    $commentCount = ForumComment::where('tid', $topic->id)->where('id', '!=', $id)->count();
+                    $topic->update([
+                        'comments_count' => $commentCount,
+                        'reply' => $commentCount,
+                    ]);
+                }
+            }
+
             $comment->delete();
 
             if ($isOwner) {
@@ -465,7 +552,7 @@ class CommentController extends Controller
             }
 
             DB::commit();
-            return response()->json(['status' => 'success']);
+            return response()->json(['status' => 'success', 'success' => true]);
         } catch (\Exception $e) {
             DB::rollBack();
             report($e);

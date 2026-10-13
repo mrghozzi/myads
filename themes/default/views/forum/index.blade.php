@@ -2,105 +2,264 @@
 @include('theme::forum._assets')
 
 @section('content')
-<main class="forum-rdx forum-rdx-index forum-index-page">
-    <section class="forum-index-hero" aria-labelledby="forum-index-title">
-        <div class="forum-index-hero-copy">
-            <span class="forum-index-eyebrow"><i class="fa fa-comments" aria-hidden="true"></i> {{ __('messages.community') }}</span>
-            <h1 id="forum-index-title">{{ __('messages.forum') }}</h1>
-            <p>{{ __('messages.forum_index_intro') }}</p>
+<main class="forum-modern-forum-wrapper forum-rdx-index">
+    <!-- Hero Banner with Stats -->
+    <section class="forum-modern-hero">
+        <div class="forum-modern-hero-copy">
+            <h1 class="forum-modern-hero-title">
+                <i class="fa fa-comments text-primary"></i>
+                <span>{{ __('messages.forum') ?? 'Community Discussions' }}</span>
+            </h1>
+            <p class="forum-modern-hero-desc">
+                {{ __('messages.forum_index_intro') ?? 'Browse discussions, participate with webmasters, and share knowledge across digital channels.' }}
+            </p>
         </div>
-        @auth
-            <a href="{{ route('forum.create') }}" class="forum-index-primary-action">
-                <i class="fa fa-plus" aria-hidden="true"></i>
-                <span>{{ __('messages.w_new_tpc') }}</span>
-            </a>
-        @endauth
-        <div class="forum-index-summary" aria-label="{{ __('messages.forum_statistics') }}">
-            <div class="forum-index-summary-item">
-                <i class="fa fa-folder-open" aria-hidden="true"></i>
-                <span><strong>{{ $categories->count() }}</strong><small>{{ __('messages.cat_s') }}</small></span>
-            </div>
-            <div class="forum-index-summary-item">
-                <i class="fa fa-comments" aria-hidden="true"></i>
-                <span><strong>{{ number_format($forumStats['topics']) }}</strong><small>{{ __('messages.topics') }}</small></span>
-            </div>
-            <div class="forum-index-summary-item">
-                <i class="fa fa-users" aria-hidden="true"></i>
-                <span><strong>{{ number_format($forumStats['members']) }}</strong><small>{{ __('messages.members') }}</small></span>
-            </div>
+        <div class="forum-modern-hero-actions">
+            @auth
+                <button type="button" class="forum-modern-start-btn" onclick="ForumComposer.open('topic')">
+                    <i class="fa fa-pencil"></i>
+                    <span>{{ __('messages.w_new_tpc') ?? 'Start a Discussion' }}</span>
+                </button>
+            @else
+                <a href="{{ route('login') }}" class="forum-modern-start-btn">
+                    <i class="fa fa-sign-in"></i>
+                    <span>{{ __('messages.login_to_participate') ?? 'Login to Participate' }}</span>
+                </a>
+            @endauth
         </div>
     </section>
 
-    @include('theme::partials.ads', ['id' => 4])
+    <!-- Two-Pane Forum Layout -->
+    <div class="forum-modern-layout">
+        <!-- Left Sidebar: Tags / Categories Navigation -->
+        <aside class="forum-modern-sidebar">
+            @auth
+                <button type="button" class="forum-modern-start-btn d-none d-lg-flex" onclick="ForumComposer.open('topic')">
+                    <i class="fa fa-plus"></i>
+                    <span>{{ __('messages.w_new_tpc') ?? 'Start a Discussion' }}</span>
+                </button>
+            @endauth
 
-    <section class="forum-index-toolbar" aria-label="{{ __('messages.forum_categories') }}">
-        <div>
-            <span class="forum-index-eyebrow">{{ __('messages.explore') }}</span>
-            <h2>{{ __('messages.forum_categories') }}</h2>
-        </div>
-        <label class="forum-index-search">
-            <i class="fa fa-search" aria-hidden="true"></i>
-            <span class="sr-only">{{ __('messages.search_categories') }}</span>
-            <input type="search" data-forum-category-search placeholder="{{ __('messages.search_categories') }}" autocomplete="off">
-        </label>
-    </section>
-
-    @if($categories->isNotEmpty())
-        <div class="forum-index-category-grid" data-forum-category-list>
-            @foreach($categories as $category)
-                @php
-                    $latestActivity = $category->latest_status_date
-                        ? \Carbon\Carbon::createFromTimestamp((int) $category->latest_status_date)->diffForHumans()
-                        : null;
-                @endphp
-                <article class="forum-index-category-card" data-forum-category-item data-search-text="{{ \Illuminate\Support\Str::lower($category->name . ' ' . strip_tags((string) $category->txt)) }}">
-                    <div class="forum-index-category-heading">
-                        <a class="forum-index-category-icon" href="{{ route('forum.category', $category->id) }}" aria-label="{{ $category->name }}">
-                            <i class="fa {{ $category->icons ?: 'fa-comments' }}" aria-hidden="true"></i>
+            <div class="forum-modern-nav-card">
+                <div class="forum-modern-nav-title">{{ __('messages.categories') ?? 'Tags & Categories' }}</div>
+                <ul class="forum-modern-nav-list">
+                    <li class="forum-modern-nav-item {{ !isset($category) ? 'is-active' : '' }}">
+                        <a href="{{ route('forum.index') }}">
+                            <span class="forum-modern-tag-badge">
+                                <i class="fa fa-comments text-primary"></i>
+                                <span>{{ __('messages.all_discussions') ?? 'All Discussions' }}</span>
+                            </span>
+                            <span class="forum-modern-nav-count">{{ number_format($forumStats['topics'] ?? 0) }}</span>
                         </a>
-                        <div class="forum-index-category-title-wrap">
-                            <h3><a href="{{ route('forum.category', $category->id) }}">{{ $category->name }}</a></h3>
-                            <p>{{ trim(strip_tags((string) $category->txt)) ?: __('messages.forum_category_description_fallback') }}</p>
-                        </div>
-                        <a class="forum-index-open" href="{{ route('forum.category', $category->id) }}" aria-label="{{ __('messages.open_category', ['category' => $category->name]) }}">
-                            <i class="fa fa-arrow-up" aria-hidden="true"></i>
-                        </a>
-                    </div>
+                    </li>
+                    @foreach($categories as $cat)
+                        @php
+                            $catColor = $cat->color ?: '#615dfa';
+                            $isActive = isset($category) && $category->id == $cat->id;
+                            $hasChildren = $cat->children && $cat->children->isNotEmpty();
+                        @endphp
+                        <li class="forum-modern-nav-item {{ $isActive ? 'is-active' : '' }} {{ $hasChildren ? 'has-subforums' : '' }}">
+                            <a href="{{ route('forum.category', $cat->id) }}" data-cat-id="{{ $cat->id }}">
+                                <span class="forum-modern-tag-badge">
+                                    <span class="forum-modern-tag-bullet" style="background-color: {{ $catColor }};"></span>
+                                    <span>{{ $cat->name }}</span>
+                                </span>
+                                @if(isset($cat->topic_count))
+                                    <span class="forum-modern-nav-count">{{ number_format($cat->topic_count) }}</span>
+                                @endif
+                            </a>
+                            @if($hasChildren)
+                                <ul class="forum-modern-subcat-list">
+                                    @foreach($cat->children as $sub)
+                                        @php
+                                            $subColor = $sub->color ?: $catColor;
+                                            $isSubActive = isset($category) && $category->id == $sub->id;
+                                        @endphp
+                                        <li class="forum-modern-subcat-item {{ $isSubActive ? 'is-active' : '' }}">
+                                            <a href="{{ route('forum.category', $sub->id) }}" data-cat-id="{{ $sub->id }}">
+                                                <span class="forum-modern-tag-badge">
+                                                    <span class="forum-modern-tag-bullet" style="background-color: {{ $subColor }};"></span>
+                                                    <span>{{ $sub->name }}</span>
+                                                </span>
+                                                @if(isset($sub->topic_count))
+                                                    <span class="forum-modern-nav-count">{{ number_format($sub->topic_count) }}</span>
+                                                @endif
+                                            </a>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            @endif
+                        </li>
+                    @endforeach
+                </ul>
+            </div>
 
-                    <div class="forum-index-category-metrics">
-                        <span><strong>{{ number_format($category->topic_count) }}</strong> {{ __('messages.topics') }}</span>
-                        <span><strong>{{ number_format($category->reply_count) }}</strong> {{ __('messages.replies') }}</span>
+            <!-- Quick Forum Stats -->
+            <div class="forum-modern-nav-card">
+                <div class="forum-modern-nav-title">{{ __('messages.forum_statistics') ?? 'Community Stats' }}</div>
+                <div class="p-2 d-flex flex-column gap-2 fs-13 text-muted">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span><i class="fa fa-folder-open me-2 text-primary"></i>{{ __('messages.cat_s') }}</span>
+                        <strong class="text-dark">{{ $categories->count() }}</strong>
                     </div>
-
-                    <div class="forum-index-latest">
-                        <i class="fa fa-clock-o" aria-hidden="true"></i>
-                        @if($category->latest_topic_id)
-                            <a href="{{ route('forum.topic', $category->latest_topic_id) }}">{{ $category->latest_topic_name }}</a>
-                            <time>{{ $latestActivity }}</time>
-                        @else
-                            <span>{{ __('messages.forum_no_activity') }}</span>
-                        @endif
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span><i class="fa fa-comment me-2 text-info"></i>{{ __('messages.topics') }}</span>
+                        <strong class="text-dark">{{ number_format($forumStats['topics'] ?? 0) }}</strong>
                     </div>
-                </article>
-            @endforeach
-        </div>
-        <p class="forum-index-empty-search" data-forum-category-empty hidden>{{ __('messages.forum_search_no_results') }}</p>
-    @else
-        <div class="forum-index-empty" role="status">
-            <i class="fa fa-comments-o" aria-hidden="true"></i>
-            <h2>{{ __('messages.forum_no_categories') }}</h2>
-            <p>{{ __('messages.forum_no_categories_desc') }}</p>
-        </div>
-    @endif
-
-    @if($forumStats['latest_member'])
-        <aside class="forum-index-new-member">
-            <span class="forum-index-new-member-icon"><i class="fa fa-user-plus" aria-hidden="true"></i></span>
-            <div>
-                <span>{{ __('messages.forum_newest_member') }}</span>
-                <a href="{{ route('profile.show', $forumStats['latest_member']->username) }}">{{ $forumStats['latest_member']->username }}</a>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span><i class="fa fa-users me-2 text-success"></i>{{ __('messages.members') }}</span>
+                        <strong class="text-dark">{{ number_format($forumStats['members'] ?? 0) }}</strong>
+                    </div>
+                </div>
             </div>
         </aside>
-    @endif
+
+        <!-- Right Pane: Discussion Stream & Filter Toolbar -->
+        <section class="forum-modern-stream-container">
+            <!-- Filter Toolbar -->
+            <div class="forum-modern-toolbar">
+                <div class="forum-modern-filter-tabs">
+                    <a href="?filter=latest" class="forum-modern-filter-btn {{ ($currentFilter ?? 'latest') === 'latest' ? 'is-active' : '' }}" data-filter="latest">
+                        <i class="fa-regular fa-clock fa-clock-o"></i>
+                        <span>{{ __('messages.filter_latest') ?? 'Latest Activity' }}</span>
+                    </a>
+                    <a href="?filter=top" class="forum-modern-filter-btn {{ ($currentFilter ?? '') === 'top' ? 'is-active' : '' }}" data-filter="top">
+                        <i class="fa fa-fire"></i>
+                        <span>{{ __('messages.filter_top') ?? 'Top' }}</span>
+                    </a>
+                    <a href="?filter=newest" class="forum-modern-filter-btn {{ ($currentFilter ?? '') === 'newest' ? 'is-active' : '' }}" data-filter="newest">
+                        <i class="fa fa-calendar"></i>
+                        <span>{{ __('messages.filter_newest') ?? 'Newest' }}</span>
+                    </a>
+                    <a href="?filter=unanswered" class="forum-modern-filter-btn {{ ($currentFilter ?? '') === 'unanswered' ? 'is-active' : '' }}" data-filter="unanswered">
+                        <i class="fa fa-comment-slash"></i>
+                        <span>{{ __('messages.filter_unanswered') ?? 'Unanswered' }}</span>
+                    </a>
+                </div>
+
+                <div class="forum-modern-search-box">
+                    <i class="fa fa-search forum-modern-search-icon"></i>
+                    <input type="search" id="forumSearchInput" class="forum-modern-search-input" placeholder="{{ __('messages.search_forum') ?? 'Search discussions...' }}" autocomplete="off">
+                </div>
+            </div>
+
+            <!-- Discussion Stream Content -->
+            <div id="forumStreamWrapper">
+                @include('theme::forum.partials.discussion_stream', ['topics' => $topics])
+            </div>
+        </section>
+    </div>
+
+    <!-- Floating Forum Composer Drawer -->
+    @include('theme::forum.partials.discussion_composer', ['categories' => $categories])
 </main>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    let currentFilter = '{{ $currentFilter ?? "latest" }}';
+    let currentCatId = null;
+    let searchTimer = null;
+
+    // Filter switching via Ajax
+    document.querySelectorAll('.forum-modern-filter-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            document.querySelectorAll('.forum-modern-filter-btn').forEach(b => b.classList.remove('is-active'));
+            this.classList.add('is-active');
+            currentFilter = this.dataset.filter;
+            fetchDiscussions();
+        });
+    });
+
+    // Live search debounced
+    const searchInput = document.getElementById('forumSearchInput');
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimer);
+            searchTimer = setTimeout(() => {
+                fetchDiscussions();
+            }, 300);
+        });
+    }
+
+    function fetchDiscussions() {
+        const streamWrapper = document.getElementById('forumStreamWrapper');
+        streamWrapper.style.opacity = '0.5';
+
+        const query = searchInput ? searchInput.value.trim() : '';
+        const params = new URLSearchParams();
+        if (currentFilter) params.set('filter', currentFilter);
+        if (query) params.set('q', query);
+
+        const url = window.location.pathname + '?' + params.toString();
+
+        fetch(url, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            streamWrapper.innerHTML = data.html;
+            streamWrapper.style.opacity = '1';
+            window.history.pushState({}, '', url);
+            if (typeof initHexagons === 'function') {
+                initHexagons(streamWrapper);
+            }
+            bindLoadMore();
+        })
+        .catch(err => {
+            streamWrapper.style.opacity = '1';
+            console.error('Failed to load discussions:', err);
+        });
+    }
+
+    function bindLoadMore() {
+        const loadMoreBtn = document.getElementById('forumLoadMoreBtn');
+        if (!loadMoreBtn) return;
+
+        loadMoreBtn.addEventListener('click', function() {
+            const nextUrl = this.dataset.nextUrl;
+            if (!nextUrl) return;
+
+            loadMoreBtn.disabled = true;
+            loadMoreBtn.innerHTML = '<i class="fa fa-spinner fa-spin me-1"></i> Loading...';
+
+            fetch(nextUrl, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            })
+            .then(res => res.json())
+            .then(data => {
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = data.html;
+                const newItems = tempDiv.querySelectorAll('.forum-modern-discussion-card');
+                const list = document.getElementById('forumDiscussionList');
+                newItems.forEach(item => list.appendChild(item));
+
+                if (typeof initHexagons === 'function') {
+                    initHexagons(list);
+                }
+
+                if (data.has_more) {
+                    loadMoreBtn.dataset.nextUrl = data.next_page_url;
+                    loadMoreBtn.disabled = false;
+                    loadMoreBtn.innerHTML = '<i class="fa fa-chevron-down me-1"></i> Load More Discussions';
+                } else {
+                    loadMoreBtn.remove();
+                }
+            })
+            .catch(err => {
+                loadMoreBtn.disabled = false;
+                loadMoreBtn.innerHTML = '<i class="fa fa-exclamation-triangle me-1"></i> Try Again';
+            });
+        });
+    }
+
+    if (typeof initHexagons === 'function') {
+        initHexagons(document.getElementById('forumStreamWrapper'));
+    }
+
+    bindLoadMore();
+});
+</script>
 @endsection

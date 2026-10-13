@@ -60,6 +60,7 @@ class SearchApiController extends Controller
 
             // Search Forum Topics
             $topicIds = ForumTopic::visible()
+                ->forumOnly()
                 ->whereRaw("MATCH(name, txt) AGAINST(? IN BOOLEAN MODE)", [$query])
                 ->limit(3)
                 ->pluck('id');

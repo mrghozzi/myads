@@ -20,7 +20,24 @@ class ForumComment extends Model
         'parent_id',
         'txt',
         'date',
+        'is_pinned',
+        'is_best_answer',
     ];
+
+    protected $casts = [
+        'is_pinned' => 'boolean',
+        'is_best_answer' => 'boolean',
+    ];
+
+    public function isPinned(): bool
+    {
+        return (bool) $this->is_pinned;
+    }
+
+    public function isBestAnswer(): bool
+    {
+        return (bool) $this->is_best_answer;
+    }
 
     public function user()
     {

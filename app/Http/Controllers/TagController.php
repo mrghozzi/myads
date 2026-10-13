@@ -21,6 +21,7 @@ class TagController extends Controller
         $query = '#' . $tag;
 
         $topics = ForumTopic::visible()
+            ->forumOnly()
             ->where('txt', 'LIKE', "%{$query}%")
             ->orderBy('date', 'desc')
             ->paginate(15, ['*'], 'topics_page');

@@ -263,4 +263,96 @@ class PortalAjaxRedesignTest extends TestCase
         $this->assertStringContainsString('portal-comment-avatar-ring', $html);
         $this->assertStringContainsString('portal-comment-avatar-img', $html);
     }
+
+    public function test_media_post_comments_load_standard_activity_comments_view_without_modern_composer(): void
+    {
+        $user = User::factory()->create();
+        $mediaTypes = [
+            4   => 'Image Post',
+            10  => 'Video Post',
+            11  => 'Audio Post',
+            100 => 'Text Post',
+        ];
+
+        foreach ($mediaTypes as $sType => $title) {
+            $topic = ForumTopic::create([
+                'uid' => $user->id,
+                'name' => $title,
+                'txt' => 'Body of ' . $title,
+                'cat' => 0,
+                'statu' => 1,
+                'date' => time(),
+            ]);
+
+            Status::create([
+                'uid' => $user->id,
+                'tp_id' => $topic->id,
+                's_type' => $sType,
+                'date' => time(),
+                'txt' => 'Status for ' . $title,
+            ]);
+
+            $response = $this->actingAs($user)->postJson(route('comment.load'), [
+                'id' => $topic->id,
+                'type' => 'forum',
+                'limit' => 5,
+            ]);
+
+            $response->assertOk();
+            $content = $response->getContent();
+
+            // Must NOT render Modern forum discussion editor card or tools
+            $this->assertStringNotContainsString('forum-modern-reply-card', $content);
+            $this->assertStringNotContainsString('forum-modern-editor-box', $content);
+            $this->assertStringNotContainsString('forum-modern-post-stream', $content);
+
+            // Must render standard activity comments box
+            $this->assertStringContainsString('post-comment-form', $content);
+            $this->assertStringContainsString('comment_form' . $topic->id, $content);
+        }
+    }
+
+    public function test_forum_topic_comments_load_modern_comments(): void
+    {
+        $user = User::factory()->create();
+        $cat = \App\Models\ForumCategory::create([
+            'name' => 'General Forum Discussion',
+            'icons' => 'fa-comments',
+            'ordercat' => 1,
+            'visibility' => 0,
+            'color' => '#615dfa',
+            'slug' => 'general-discussion',
+        ]);
+
+        $topic = ForumTopic::create([
+            'uid' => $user->id,
+            'name' => 'Dedicated Forum Discussion',
+            'txt' => 'Discussion topic content',
+            'cat' => $cat->id,
+            'statu' => 1,
+            'date' => time(),
+        ]);
+
+        Status::create([
+            'uid' => $user->id,
+            'tp_id' => $topic->id,
+            's_type' => 2,
+            'date' => time(),
+            'txt' => 'Forum status',
+        ]);
+
+        // Load as forum discussion page does
+        $response = $this->actingAs($user)->postJson(route('comment.load'), [
+            'id' => $topic->id,
+            'type' => 'forum',
+            'limit' => 100,
+            'view' => 'topic_comments',
+        ]);
+
+        $response->assertOk();
+        $content = $response->getContent();
+
+        $this->assertStringContainsString('forum-modern-post-stream', $content);
+        $this->assertStringContainsString('forum-modern-reply-card', $content);
+    }
 }

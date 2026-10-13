@@ -23,12 +23,14 @@ class ForumTopic extends Model
     protected $fillable = [
         'uid',
         'name',
+        'slug',
         'txt',
         'cat',
         'group_id',
         'statu',
         'date',
         'reply',
+        'comments_count',
         'vu',
         'is_pinned',
         'pinned_at',
@@ -36,6 +38,10 @@ class ForumTopic extends Model
         'is_locked',
         'locked_at',
         'locked_by',
+        'last_posted_at',
+        'last_poster_id',
+        'best_comment_id',
+        'pinned_comment_id',
     ];
 
     protected $casts = [
@@ -44,6 +50,8 @@ class ForumTopic extends Model
         'group_id' => 'integer',
         'pinned_at' => 'integer',
         'locked_at' => 'integer',
+        'last_posted_at' => 'integer',
+        'comments_count' => 'integer',
     ];
 
     public function scopeVisible(Builder $query, ?User $viewer = null, ?string $column = null): Builder
@@ -76,6 +84,21 @@ class ForumTopic extends Model
         });
 
         return $query;
+    }
+
+    public function scopeForumOnly(Builder $query): Builder
+    {
+        return $query->whereExists(function ($sub) {
+            $sub->select(\Illuminate\Support\Facades\DB::raw(1))
+                ->from('status')
+                ->whereColumn('status.tp_id', 'forum.id')
+                ->where('status.s_type', 2);
+        });
+    }
+
+    public function status()
+    {
+        return $this->hasOne(Status::class, 'tp_id', 'id')->where('s_type', 2);
     }
 
     public function user()
@@ -126,6 +149,36 @@ class ForumTopic extends Model
     public function attachments()
     {
         return $this->hasMany(ForumAttachment::class, 'topic_id')->orderBy('sort_order', 'asc')->orderBy('id', 'asc');
+    }
+
+    public function lastPoster()
+    {
+        return $this->belongsTo(User::class, 'last_poster_id');
+    }
+
+    public function lastComment()
+    {
+        return $this->hasOne(ForumComment::class, 'tid')->latest('id');
+    }
+
+    public function bestComment()
+    {
+        return $this->belongsTo(ForumComment::class, 'best_comment_id');
+    }
+
+    public function pinnedComment()
+    {
+        return $this->belongsTo(ForumComment::class, 'pinned_comment_id');
+    }
+
+    public function scopeFilterModern(Builder $query, string $filter = 'latest'): Builder
+    {
+        return match ($filter) {
+            'top' => $query->orderByDesc('comments_count')->orderByDesc('date'),
+            'newest' => $query->orderByDesc('date')->orderByDesc('id'),
+            'unanswered' => $query->where('comments_count', 0)->orderByDesc('date'),
+            default => $query->orderByDesc('last_posted_at')->orderByDesc('id'),
+        };
     }
 
     public function supportsPromotion(): bool

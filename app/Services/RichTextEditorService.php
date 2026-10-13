@@ -16,7 +16,8 @@ class RichTextEditorService
     public static function getAvailableEditors(): array
     {
         $editors = [
-            'quill' => 'Quill.js (Modern WYSIWYG)',
+            'myads_markdown' => 'MyAds Markdown (Modern Live Preview & Toolbar)',
+            'quill' => 'Quill.js (Modern Rich Text WYSIWYG)',
             'sceditor' => 'SCEditor (Classic BBCode/WYSIWYG)',
         ];
 
