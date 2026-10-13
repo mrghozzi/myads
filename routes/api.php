@@ -139,6 +139,11 @@ Route::middleware(['api.key', 'auth:sanctum'])->group(function () {
     Route::post('/forums/categories/{categoryId}/topics', [App\Http\Controllers\Api\ForumApiController::class, 'storeTopic']);
     Route::get('/forums/topics/{topicId}', [App\Http\Controllers\Api\ForumApiController::class, 'show']);
     Route::post('/forums/topics/{topicId}/replies', [App\Http\Controllers\Api\ForumApiController::class, 'storeReply']);
+    Route::post('/forums/topics/{topicId}/pin', [App\Http\Controllers\Api\ForumApiController::class, 'togglePinTopic']);
+    Route::post('/forums/topics/{topicId}/lock', [App\Http\Controllers\Api\ForumApiController::class, 'toggleLockTopic']);
+    Route::post('/forums/comments/{commentId}/pin', [App\Http\Controllers\Api\ForumApiController::class, 'togglePinComment']);
+    Route::post('/forums/comments/{commentId}/best-answer', [App\Http\Controllers\Api\ForumApiController::class, 'toggleBestAnswer']);
+    Route::delete('/forums/comments/{commentId}', [App\Http\Controllers\Api\ForumApiController::class, 'deleteComment']);
 
     // Store API (Mobile specific)
     Route::get('/store/products', [App\Http\Controllers\Api\StoreApiController::class, 'index']);

@@ -15,13 +15,21 @@ class CommentResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $user = $this->whenLoaded('user');
+        $userResource = $user ? new UserResource($user) : null;
+
         return [
             'id' => $this->id,
-            'user' => new UserResource($this->whenLoaded('user')),
-            'topic_id' => $this->tid, // tid usually represents the tp_id or topic id
+            'user' => $userResource,
+            'author' => $userResource,
+            'topic_id' => $this->tid,
             'parent_id' => $this->parent_id,
             'text' => $this->txt,
+            'content' => $this->txt,
+            'is_pinned' => (bool) $this->is_pinned,
+            'is_best_answer' => (bool) $this->is_best_answer,
             'date' => $this->date,
+            'created_at' => $this->date ? Carbon::createFromTimestamp($this->date)->diffForHumans() : '',
             'date_formatted' => $this->date ? Carbon::createFromTimestamp($this->date)->diffForHumans() : '',
             'replies' => CommentResource::collection($this->whenLoaded('replies')),
         ];

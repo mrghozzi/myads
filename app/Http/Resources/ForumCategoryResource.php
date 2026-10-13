@@ -16,11 +16,16 @@ class ForumCategoryResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'parent_id' => $this->parent_id,
             'name' => $this->name,
-            'description' => $this->des,
-            'icon' => $this->icon,
-            'topics_count' => $this->topics_count ?? 0, // Assuming loaded with count
+            'slug' => $this->slug,
+            'color' => $this->color ?: '#615dfa',
+            'description' => $this->txt ?: ($this->des ?? ''),
+            'icon' => $this->icons ?: ($this->icon ?? 'fa-comments'),
+            'topics_count' => $this->topics_count ?? $this->forum_topics_count ?? ($this->topic_count ?? 0),
             'visibility' => $this->visibility,
+            'children' => ForumCategoryResource::collection($this->whenLoaded('children')),
+            'subcategories' => ForumCategoryResource::collection($this->whenLoaded('children')),
         ];
     }
 }
