@@ -151,6 +151,8 @@ Route::get('/share', [PortalController::class, 'share'])->name('portal.share')->
 
 // Video Hub Routes
 Route::get('/video', [App\Http\Controllers\VideoHubController::class, 'index'])->name('video.index');
+Route::get('/video/watch/{id}', [App\Http\Controllers\VideoHubController::class, 'watch'])->name('video.watch');
+Route::get('/video/{id}', [App\Http\Controllers\VideoHubController::class, 'watch'])->whereNumber('id');
 Route::get('/video/{filter}', [App\Http\Controllers\VideoHubController::class, 'index'])->name('video.filter');
 
 // Clips Routes

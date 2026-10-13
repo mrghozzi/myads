@@ -1,6 +1,29 @@
 # v4.6.3
 > **Major Forum Architecture & Experience Release** — Rebuilt and modernized the MYADS Community Forum (`/forum`, `/f{id}`, `/t{id}`) with proprietary high-performance modern discussion architecture while maintaining 100% backward compatibility and data integrity across existing topics, categories, comments, and attachments. Integrated a multi-editor suite (MyAds Markdown with live preview, Quill.js, and SCEditor) across topic creation, editing, and comments.
 
+### Complete Overhaul & Rebuild of Video Hub (`/video`, `/video/*`) and Standalone Video Watch Pages (`/video/watch/{id}`, `/t{id}`, `video.blade.php`, `VideoHubController.php`)
+* **Next-Generation YouTube-Style Video Hub (`/video` & `/video/*`)**:
+  * Completely rebuilt the primary Video Hub (`/video`) and all filter sub-pages (`/video/all`, `/video/videos`, `/video/clips`, `/video/shorts`, `/video/trending`, `/video/latest`) according to `@.superdesign` standards with glassmorphic cards, glowing ambient mesh accents, and dark mode parity.
+  * **Interactive Filter & Category Navigation Strip**: Introduced scrollable filter chips with active indicator badges, vibrant category pills with database-backed category colors (`ForumCategory`), and a multi-criteria Sort By dropdown (Newest, Most Viewed, Top Rated).
+  * **Shorts / Clips Shelf**: Upgraded the 9:16 vertical video carousel with glowing neon borders, high-performance silent hover video snippet playback with frame sync, creator hexagonal avatars, clip titles, view counts, and direct `/clips` redirection.
+  * **Cinematic Spotlight Hero Video**: Featured widescreen 16:9 marquee banner with glowing ambient blur, interactive play teaser, creator identity badge with verified checkmark, and quick actions.
+  * **Modern 16:9 Video Grid & Multi-Source Engine**: Redesigned video cards with 16:9 aspect ratio, multi-source thumbnail resolution (direct cover, attachment, YouTube HQ fallback, link preview, SVG placeholder), duration/CLIP stickers, creator hexagonal avatars with online indicators, and floating quick action dropdown (Watch Now, Copy Link, Save for Later).
+  * **AJAX Load More Pagination**: Built smooth non-blocking AJAX pagination (`btnLoadMoreVideos`) that dynamically fetches and appends next-page video cards to `#videoGridItems` with animated loaders and zero page reload.
+* **Cinema-Grade Standalone Video Watch Page (`/video/watch/{id}`, `/video/{id}`, `/t{id}`, `video.blade.php`)**:
+  * **Dedicated Watch Routes**: Added dedicated direct routes `Route::get('/video/watch/{id}')` and numeric shortcut `Route::get('/video/{id}')` mapped to `VideoHubController::watch()` alongside existing topic watch route `/t{id}`.
+  * **Cinema Theater Mode**: Built an interactive Theater Mode toggle (`#btnTheater`, shortcut `T`) that smoothly expands the player container to full-width 12 columns with client-side persistence in `localStorage`.
+  * **Dynamic Ambient Glow (YouTube Ambient Mode)**: Added dynamic ambient color diffusion backdrop (`.v-ambient-backdrop`) behind `#videoStageCard` creating an immersive cinema theater atmosphere.
+  * **Advanced Custom HTML5 Video Player**: Equipped with auto-hiding controls bar on idle (2.5s timer), buffered progress scrubber with hover timestamp preview, big center play ripple icon, volume slider with mute toggle, and playback speed flyout (0.5x, 0.75x, 1.0x Normal, 1.25x, 1.5x, 2.0x).
+  * **Keyboard & Gesture Navigation**: Full keyboard shortcuts support (`Space`/`K` play/pause, `F` fullscreen, `T` theater mode, `M` mute, `Left`/`Right`/`J`/`L` seek, `Up`/`Down` volume) and double-click/tap to seek +/-10s.
+  * **Dual Picture-in-Picture (PiP)**: Native `requestPictureInPicture()` API support paired with the custom floating mini PIP video player (`.v-mini-floating-player`) driven by `IntersectionObserver` when scrolling down past the stage.
+  * **Creator Header & Interactive Action Bar**: Integrated Vikinger hexagonal avatars with level ring and verified badges, AJAX Follow/Unfollow button, animated 8-emoji reactions dropdown, Watch Later / Save video toggle with toast notification, and rich Share flyout (Copy link, WhatsApp, Telegram, X, Facebook, LinkedIn).
+  * **Expandable Description & Suggested Videos Sidebar**: Auto-collapsing description box with formatted BBCode/Markdown and "Show more" / "Show less" toggle, paired with a suggested videos sidebar featuring 16:9 thumbnails, duration badges, and an autoplay toggle switch.
+* **100% Bilingual Translation Parity & Comprehensive Test Coverage**:
+  * Synchronized all 28 new video and watch page keys across `lang/en/messages.php` and `lang/ar/messages.php` with 100% key parity and zero hardcoded strings.
+  * Synchronized view templates across both `themes/default` and `themes/bootstrap-sample`.
+  * Fully covered by automated feature test suites in `VideoHubTest.php` and `VideoWatchPageTest.php` (13 passed, 69 assertions, and 21 passed across all video suites with 118 assertions).
+
+
 ### Fix Comment Box Editor In Non-Forum Media Posts in `/portal` (`CommentController.php`, `master.blade.php`, `topic_comments.blade.php`)
 * **Scoped Modern Markdown Composer to Dedicated Forum Discussions (`s_type == 2`)**:
   * Resolved an issue where non-forum media posts (photos `s_type=4`, videos `s_type=10`, audio `s_type=11,13`, clips `s_type=14`, files `s_type=12`, text statuses `s_type=100`) in the `/portal` feed incorrectly rendered the Discussion Markdown Composer (`forum-modern-reply-card`, `forum-modern-editor-box`, and Markdown toolbar) because their comments are stored under the shared forum table with `type='forum'`.

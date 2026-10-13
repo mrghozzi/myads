@@ -9,13 +9,25 @@ use Illuminate\Http\Request;
 
 class VideoHubController extends Controller
 {
+    /**
+     * Direct standalone video watch endpoint (/video/watch/{id} or /video/{id}).
+     */
+    public function watch(Request $request, $id)
+    {
+        return app(ForumController::class)->topic($id);
+    }
+
     public function index(Request $request, string $filter = 'all')
     {
         $searchQuery = trim((string) $request->input('q', ''));
-        $validFilters = ['all', 'trending', 'latest', 'videos', 'clips'];
+        $categoryFilter = $request->input('category') ?: $request->input('cat');
+        $sort = (string) $request->input('sort', '');
+
+        $validFilters = ['all', 'trending', 'latest', 'videos', 'clips', 'shorts'];
         if (!in_array($filter, $validFilters, true)) {
             $filter = 'all';
         }
+        $isClipsFilter = in_array($filter, ['clips', 'shorts'], true);
 
         // 1. Fetch Clips (YouTube Shorts shelf) - Top 8 latest/popular clips
         $clipsQuery = Status::visible()->with(['user', 'forumTopic'])->where('s_type', 14);
@@ -40,7 +52,7 @@ class VideoHubController extends Controller
         $videosQuery = Status::visible()->with(['user', 'forumTopic']);
 
         // Filter type handling
-        if ($filter === 'clips') {
+        if ($isClipsFilter) {
             $videosQuery->where('s_type', 14);
         } else {
             // 'all', 'videos', 'trending', 'latest' -> Exclude Clips (s_type = 14) from main video grid
@@ -85,14 +97,29 @@ class VideoHubController extends Controller
             });
         }
 
+        // Category filtering
+        if ($categoryFilter) {
+            $videosQuery->whereHas('forumTopic', function ($ft) use ($categoryFilter) {
+                if (is_numeric($categoryFilter)) {
+                    $ft->where('cat', (int) $categoryFilter);
+                } else {
+                    $ft->whereHas('category', fn($c) => $c->where('slug', $categoryFilter));
+                }
+            });
+        }
+
         // Sorting
-        if ($filter === 'trending') {
+        if ($sort === 'views' || $filter === 'trending') {
             $videosQuery->orderBy(
                 \App\Models\ForumTopic::select('vu')
                     ->whereColumn('forum.id', 'status.tp_id')
                     ->limit(1),
                 'desc'
             )->orderBy('status.date', 'desc');
+        } elseif ($sort === 'reactions') {
+            $videosQuery->orderBy('status.reactions_count', 'desc')->orderBy('status.date', 'desc');
+        } elseif ($sort === 'oldest') {
+            $videosQuery->orderBy('status.date', 'asc');
         } else {
             $videosQuery->orderBy('status.date', 'desc');
         }
@@ -103,9 +130,15 @@ class VideoHubController extends Controller
 
         // 3. Featured / Spotlight Video (Top Video on 'all' or 'trending')
         $spotlightVideo = null;
-        if (in_array($filter, ['all', 'trending'], true) && $videos->isNotEmpty() && $searchQuery === '') {
+        if (in_array($filter, ['all', 'trending'], true) && $videos->isNotEmpty() && $searchQuery === '' && !$categoryFilter) {
             $spotlightVideo = collect($videos->items())->first(fn ($item) => (int) $item->s_type === 10) ?: $videos->first();
         }
+
+        // 4. Forum categories for filtering
+        $categories = \App\Models\ForumCategory::whereNull('parent_id')
+            ->where('visibility', 0)
+            ->orderBy('ordercat', 'asc')
+            ->get(['id', 'name', 'slug', 'color']);
 
         // Configure SEO metadata
         app(SeoManager::class)->setContext([
@@ -118,14 +151,14 @@ class VideoHubController extends Controller
             ],
         ]);
 
-        if ($request->ajax()) {
+        if ($request->ajax() || $request->wantsJson()) {
             return response()->json([
                 'html' => view('theme::video.partials.video_grid', compact('videos'))->render(),
                 'next_page_url' => $videos->nextPageUrl(),
             ]);
         }
 
-        return view('theme::video.index', compact('videos', 'clips', 'spotlightVideo', 'filter', 'searchQuery'));
+        return view('theme::video.index', compact('videos', 'clips', 'spotlightVideo', 'filter', 'searchQuery', 'categories', 'categoryFilter', 'sort'));
     }
 
     /**
