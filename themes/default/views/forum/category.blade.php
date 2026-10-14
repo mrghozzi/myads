@@ -66,8 +66,9 @@
                             $isActive = $category->id == $cat->id;
                             $hasChildren = $cat->children && $cat->children->isNotEmpty();
                             $isChildActive = $hasChildren && $cat->children->contains('id', $category->id);
+                            $itemClass = trim('forum-category-board-item' . ($isActive ? ' is-active' : '') . ($isChildActive ? ' has-active-child' : ''));
                         @endphp
-                        <li class="forum-category-board-item {{ $isActive ? 'is-active' : '' }} {{ $isChildActive ? 'has-active-child' : '' }}" data-forum-category-id="{{ $cat->id }}" data-topic-count="{{ $cat->topic_count ?? 0 }}" {!! $isActive ? 'aria-current="page"' : '' !!}>
+                        <li class="{{ $itemClass }}" data-forum-category-id="{{ $cat->id }}" data-topic-count="{{ $cat->topic_count ?? 0 }}" {!! $isActive ? 'aria-current="page"' : '' !!}>
                             <a href="{{ route('forum.category', $cat->id) }}" data-cat-id="{{ $cat->id }}">
                                 <span class="forum-modern-tag-badge">
                                     <span class="forum-modern-tag-bullet" style="background-color: {{ $cColor }};"></span>

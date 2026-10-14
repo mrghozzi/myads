@@ -1,7 +1,7 @@
 @php
     $level = $level ?? 0;
     $hasChildren = $category->children && $category->children->isNotEmpty();
-    $topicCount = \App\Models\ForumTopic::where('cat', $category->id)->count();
+    $topicCount = \App\Models\ForumTopic::forumOnly()->where('cat', $category->id)->where('statu', 1)->whereNull('group_id')->count();
     $catColor = $category->color ?: '#615dfa';
 @endphp
 

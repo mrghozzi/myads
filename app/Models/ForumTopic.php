@@ -93,7 +93,7 @@ class ForumTopic extends Model
                 ->from('status')
                 ->whereColumn('status.tp_id', 'forum.id')
                 ->where('status.s_type', 2);
-        });
+        })->where('forum.cat', '>', 0);
     }
 
     public function status()

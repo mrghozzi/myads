@@ -231,11 +231,19 @@ class ForumController extends Controller
         ]);
 
         $forumStats = \Illuminate\Support\Facades\Cache::remember(
-            'forum:index:summary:v1',
+            'forum:index:summary:v3',
             now()->addMinutes(2),
             fn () => [
-                'topics' => ForumTopic::count(),
-                'replies' => ForumComment::count(),
+                'topics' => ForumTopic::forumOnly()->where('statu', 1)->whereNull('group_id')->count(),
+                'replies' => DB::table('f_coment')
+                    ->join('forum', 'forum.id', '=', 'f_coment.tid')
+                    ->whereExists(function ($sub) {
+                        $sub->select(DB::raw(1))
+                            ->from('status')
+                            ->whereColumn('status.tp_id', 'forum.id')
+                            ->where('status.s_type', 2);
+                    })
+                    ->count(),
                 'members' => \App\Models\User::count(),
                 'latest_member' => \App\Models\User::query()->latest('id')->first(),
             ]
@@ -283,6 +291,14 @@ class ForumController extends Controller
             if ($product) {
                 return redirect()->route('store.show', $product->name);
             }
+        }
+
+        if ((int) $status->s_type === 10) {
+            return redirect()->route('video.watch', $status->id);
+        }
+
+        if ((int) $status->s_type === 14) {
+            return redirect()->route('clips.index');
         }
 
         $categoryBreadcrumbs = [];
