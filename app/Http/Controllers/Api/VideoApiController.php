@@ -78,17 +78,10 @@ class VideoApiController extends Controller
                 });
         }
 
-        // Category filter
+        // Category filter using VideoCategoryCatalog
         $categoryParam = $request->input('cat') ?: $request->input('category');
         if ($categoryParam) {
-            $cat = is_numeric($categoryParam)
-                ? \App\Models\ForumCategory::find((int) $categoryParam)
-                : \App\Models\ForumCategory::where('slug', $categoryParam)->first();
-            if ($cat) {
-                $videosQuery->whereHas('forumTopic', function ($ft) use ($cat) {
-                    $ft->where('cat', $cat->id);
-                });
-            }
+            \App\Support\VideoCategoryCatalog::applyCategoryFilter($videosQuery, $categoryParam);
         }
 
         if ($searchQuery !== '') {
@@ -128,13 +121,13 @@ class VideoApiController extends Controller
             $spotlightVideo = collect($videos->items())->first(fn ($item) => (int) $item->s_type === 10) ?: $videos->first();
         }
 
-        $categories = \App\Models\ForumCategory::orderBy('name')->get()->map(function ($c) {
+        $categories = collect(\App\Support\VideoCategoryCatalog::all())->map(function ($c) {
             return [
                 'id' => $c->id,
-                'name' => $c->name,
-                'slug' => $c->slug ?? (string) $c->id,
+                'name' => $c->display_name ?? $c->name,
+                'slug' => $c->slug,
             ];
-        });
+        })->toArray();
 
         return response()->json([
             'filter' => $filter,

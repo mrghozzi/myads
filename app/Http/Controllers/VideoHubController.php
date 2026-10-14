@@ -2,10 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ForumComment;
+use App\Models\ForumTopic;
+use App\Models\Like;
 use App\Models\Status;
 use App\Services\SeoManager;
 use App\Services\StatusActivityService;
+use App\Support\VideoCategoryCatalog;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class VideoHubController extends Controller
 {
@@ -14,7 +21,158 @@ class VideoHubController extends Controller
      */
     public function watch(Request $request, $id)
     {
-        return app(ForumController::class)->topic($id);
+        // 1. Resolve Status & Topic
+        $status = Status::visible()->with(['user', 'forumTopic.attachments', 'linkPreviewRecord'])->find($id);
+        $topic = null;
+
+        if ($status && $status->tp_id) {
+            $topic = $status->forumTopic;
+        }
+
+        if (!$status) {
+            $topic = ForumTopic::with(['attachments', 'user'])->find($id);
+            if ($topic) {
+                $status = Status::where('tp_id', $topic->id)->whereIn('s_type', [10, 2, 4, 100, 14])->first();
+            }
+        }
+
+        if (!$status && !$topic) {
+            abort(404, __('messages.video_not_found') ?? 'Video not found');
+        }
+
+        if (!$status) {
+            $status = new Status([
+                'id' => $topic->id,
+                'uid' => $topic->uid,
+                'tp_id' => $topic->id,
+                's_type' => 10,
+                'date' => $topic->date,
+                'txt' => $topic->name,
+            ]);
+            $status->setRelation('forumTopic', $topic);
+            $status->setRelation('user', $topic->user);
+        }
+
+        if (!$topic && $status->tp_id) {
+            $topic = $status->forumTopic;
+        }
+
+        // Increment view count
+        if ($topic) {
+            $topic->increment('vu');
+        }
+
+        // Decorate Status
+        app(StatusActivityService::class)->decorate($status);
+        static::attachThumbnailAndTitle([$status]);
+
+        // Video Assets & Embeds
+        $videoFile = null;
+        if ($topic && $topic->relationLoaded('attachments') && $topic->attachments) {
+            $videoFile = $topic->attachments->first(function ($att) {
+                $mime = (string) ($att->mime_type ?? '');
+                $ext = strtolower(pathinfo((string) ($att->file_path ?? ''), PATHINFO_EXTENSION));
+                return str_starts_with($mime, 'video/') || in_array($ext, ['mp4', 'webm', 'ogg', 'mov', 'm4v', 'mkv'], true);
+            });
+        }
+
+        $videoUrl = $status->resolved_video_url ?: static::resolveVideoUrl($status);
+        $thumbUrl = $status->resolved_thumbnail ?: static::resolveVideoThumbnailUrl($status);
+        $videoTitle = $status->resolved_title ?: static::resolveVideoTitle($status);
+        $category = $status->resolved_video_category ?: static::resolveVideoCategory($status);
+
+        $ytId = static::extractYoutubeId($videoUrl) ?: static::extractYoutubeId($topic?->txt) ?: static::extractYoutubeId($status->linkPreviewRecord?->url);
+        $ytEmbedUrl = $ytId ? 'https://www.youtube.com/embed/' . $ytId . '?autoplay=1&rel=0&enablejsapi=1' : null;
+
+        // Suggested / Up Next Videos
+        $suggestedQuery = Status::visible()
+            ->with(['user', 'forumTopic'])
+            ->where('id', '!=', $status->id)
+            ->whereIn('s_type', [10, 2, 4, 100])
+            ->where(function ($q) {
+                $q->where('s_type', 10)
+                  ->orWhereHas('forumTopic', function ($ft) {
+                      $ft->whereHas('attachments', function ($att) {
+                          $att->where('mime_type', 'like', 'video/%')
+                              ->orWhere('original_name', 'like', '%.mp4')
+                              ->orWhere('original_name', 'like', '%.webm');
+                      });
+                  })
+                  ->orWhereHas('linkPreviewRecord', function ($lp) {
+                      $lp->where('url', 'like', '%youtube.com%')
+                         ->orWhere('url', 'like', '%youtu.be%');
+                  });
+            })
+            ->orderBy('date', 'desc')
+            ->limit(10)
+            ->get();
+
+        if ($suggestedQuery->isEmpty()) {
+            $suggestedQuery = Status::visible()
+                ->where('id', '!=', $status->id)
+                ->where('s_type', 10)
+                ->orderBy('id', 'desc')
+                ->limit(8)
+                ->get();
+        }
+
+        app(StatusActivityService::class)->decorateMany($suggestedQuery);
+        static::attachThumbnailAndTitle($suggestedQuery);
+        $suggestedVideos = $suggestedQuery;
+
+        // User states
+        $viewer = Auth::user();
+        $user = $status->user ?? $topic?->user;
+        $isFollowing = ($viewer && $user)
+            ? Like::where('uid', $viewer->id)->where('sid', $user->id)->where('type', 1)->exists()
+            : false;
+        $isSaved = $viewer
+            ? DB::table('saved_statuses')->where('user_id', $viewer->id)->where('status_id', $status->id)->exists()
+            : false;
+        $isLiked = ($viewer && $topic)
+            ? Like::where('uid', $viewer->id)->where('sid', $topic->id)->where('type', 2)->exists()
+            : false;
+
+        // Comments
+        $comments = $topic
+            ? ForumComment::with(['user', 'replies.user'])
+                ->where('tid', $topic->id)
+                ->whereNull('parent_id')
+                ->orderBy('id', 'desc')
+                ->limit(50)
+                ->get()
+            : collect();
+
+        // SEO Configuration
+        app(SeoManager::class)->setContext([
+            'scope_key' => 'video_watch',
+            'resource_title' => $videoTitle,
+            'description' => Str::limit(strip_tags((string) ($topic?->txt ?? $status->txt)), 160),
+            'image' => $thumbUrl,
+            'breadcrumbs' => [
+                ['name' => __('messages.home'), 'url' => url('/')],
+                ['name' => __('messages.video_hub'), 'url' => route('video.index')],
+                ['name' => $videoTitle, 'url' => route('video.watch', $status->id)],
+            ],
+        ]);
+
+        return view('theme::video.watch', compact(
+            'status',
+            'topic',
+            'user',
+            'videoFile',
+            'ytEmbedUrl',
+            'videoUrl',
+            'thumbUrl',
+            'videoTitle',
+            'suggestedVideos',
+            'isLiked',
+            'isSaved',
+            'isFollowing',
+            'category',
+            'comments',
+            'ytId'
+        ));
     }
 
     public function index(Request $request, string $filter = 'all')
@@ -55,8 +213,7 @@ class VideoHubController extends Controller
         if ($isClipsFilter) {
             $videosQuery->where('s_type', 14);
         } else {
-            // 'all', 'videos', 'trending', 'latest' -> Exclude Clips (s_type = 14) from main video grid
-            // Strictly scope to forum & video status types (excludes directory s_type=1, store s_type=7867, news s_type=5, orders s_type=6, kb s_type=205)
+            // Exclude Clips (s_type = 14) from main video grid
             $videosQuery->where('s_type', '!=', 14)
                 ->whereIn('s_type', [10, 2, 4, 100])
                 ->where(function ($q) {
@@ -97,21 +254,15 @@ class VideoHubController extends Controller
             });
         }
 
-        // Category filtering
+        // Dedicated Video Category filtering (Separated completely from forum categories)
         if ($categoryFilter) {
-            $videosQuery->whereHas('forumTopic', function ($ft) use ($categoryFilter) {
-                if (is_numeric($categoryFilter)) {
-                    $ft->where('cat', (int) $categoryFilter);
-                } else {
-                    $ft->whereHas('category', fn($c) => $c->where('slug', $categoryFilter));
-                }
-            });
+            VideoCategoryCatalog::applyCategoryFilter($videosQuery, $categoryFilter);
         }
 
         // Sorting
         if ($sort === 'views' || $filter === 'trending') {
             $videosQuery->orderBy(
-                \App\Models\ForumTopic::select('vu')
+                ForumTopic::select('vu')
                     ->whereColumn('forum.id', 'status.tp_id')
                     ->limit(1),
                 'desc'
@@ -134,11 +285,8 @@ class VideoHubController extends Controller
             $spotlightVideo = collect($videos->items())->first(fn ($item) => (int) $item->s_type === 10) ?: $videos->first();
         }
 
-        // 4. Forum categories for filtering
-        $categories = \App\Models\ForumCategory::whereNull('parent_id')
-            ->where('visibility', 0)
-            ->orderBy('ordercat', 'asc')
-            ->get(['id', 'name', 'slug', 'color']);
+        // 4. Dedicated Modern Video Categories (NO Forum Categories)
+        $categories = collect(VideoCategoryCatalog::all());
 
         // Configure SEO metadata
         app(SeoManager::class)->setContext([
@@ -162,7 +310,7 @@ class VideoHubController extends Controller
     }
 
     /**
-     * Attach resolved thumbnail URL, video URL, and display title to status models.
+     * Attach resolved thumbnail URL, video URL, display title, category, and watch URL to status models.
      */
     public static function attachThumbnailAndTitle(iterable $statuses): void
     {
@@ -170,7 +318,38 @@ class VideoHubController extends Controller
             $status->resolved_thumbnail = static::resolveVideoThumbnailUrl($status);
             $status->resolved_video_url = static::resolveVideoUrl($status);
             $status->resolved_title = static::resolveVideoTitle($status);
+            $status->resolved_video_category = static::resolveVideoCategory($status);
+            $status->resolved_watch_url = static::resolveWatchUrl($status);
         }
+    }
+
+    /**
+     * Resolve dedicated watch route URL for a video status.
+     */
+    public static function resolveWatchUrl($status): string
+    {
+        if (!empty($status->id)) {
+            return route('video.watch', $status->id);
+        }
+        if (!empty($status->tp_id)) {
+            return route('video.watch', $status->tp_id);
+        }
+        return route('video.index');
+    }
+
+    /**
+     * Resolve dedicated video category metadata.
+     */
+    public static function resolveVideoCategory($status): object
+    {
+        $title = static::resolveVideoTitle($status);
+        $text = (string) ($status->txt ?? '');
+        $topic = $status->forumTopic ?? ($status->related_content instanceof ForumTopic ? $status->related_content : null);
+        if ($topic && !empty($topic->txt)) {
+            $text .= ' ' . $topic->txt;
+        }
+        $sType = (int) ($status->s_type ?? 10);
+        return VideoCategoryCatalog::inferCategory($text, $title, $sType);
     }
 
     /**
@@ -186,7 +365,7 @@ class VideoHubController extends Controller
                 : asset($thumb);
         }
 
-        $topic = $status->forumTopic ?? ($status->related_content instanceof \App\Models\ForumTopic ? $status->related_content : null);
+        $topic = $status->forumTopic ?? ($status->related_content instanceof ForumTopic ? $status->related_content : null);
 
         if ($topic) {
             // 2. Topic image_url attribute
@@ -249,7 +428,7 @@ class VideoHubController extends Controller
      */
     public static function resolveVideoUrl($status): ?string
     {
-        $topic = $status->forumTopic ?? ($status->related_content instanceof \App\Models\ForumTopic ? $status->related_content : null);
+        $topic = $status->forumTopic ?? ($status->related_content instanceof ForumTopic ? $status->related_content : null);
 
         if ($topic) {
             $attachments = $topic->relationLoaded('attachments')
@@ -321,7 +500,7 @@ class VideoHubController extends Controller
             return (string) $status->video_title;
         }
 
-        $topic = $status->forumTopic ?? ($status->related_content instanceof \App\Models\ForumTopic ? $status->related_content : null);
+        $topic = $status->forumTopic ?? ($status->related_content instanceof ForumTopic ? $status->related_content : null);
         if ($topic && !empty($topic->name) && !in_array(strtolower(trim($topic->name)), ['video', 'text', 'gallery', 'clips', 'audio', 'file', 'music'], true)) {
             return (string) $topic->name;
         }

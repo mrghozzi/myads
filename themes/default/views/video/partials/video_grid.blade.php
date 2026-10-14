@@ -4,12 +4,13 @@
             @php
                 $topic = $status->forumTopic;
                 $user = $status->user;
-                $watchUrl = $topic ? route('forum.topic', $topic->id) : url('/portal');
+                $watchUrl = route('video.watch', $status->id);
                 
                 // Multi-source resolved Thumbnail & Video URL & Title
                 $thumbUrl = $status->resolved_thumbnail ?: \App\Http\Controllers\VideoHubController::resolveVideoThumbnailUrl($status);
                 $videoUrl = $status->resolved_video_url ?: \App\Http\Controllers\VideoHubController::resolveVideoUrl($status);
                 $videoTitle = $status->resolved_title ?: \App\Http\Controllers\VideoHubController::resolveVideoTitle($status);
+                $videoCategory = $status->resolved_video_category ?: \App\Support\VideoCategoryCatalog::inferCategory((string) ($status->txt ?? ''), $videoTitle, (int) ($status->s_type ?? 10));
 
                 // Views / Reactions / Date
                 $viewsCount = $topic ? (int) ($topic->vu ?? 0) : (int) ($status->views_count ?? 0);
@@ -18,20 +19,17 @@
                 $isClip = (int) $status->s_type === 14;
                 $hasCustomThumb = $thumbUrl && !str_contains($thumbUrl, 'video-placeholder');
                 $ytId = \App\Http\Controllers\VideoHubController::extractYoutubeId($videoUrl);
-
-                $categoryName = $topic?->category?->name;
-                $categoryColor = $topic?->category?->color;
             @endphp
 
             <div class="col-12 col-sm-6 col-md-4 col-xl-3 video-grid-col" data-status-id="{{ $status->id }}">
-                <div class="yt-video-card h-100 shadow-sm d-flex flex-column" data-id="{{ $status->id }}">
+                <div class="yt-video-card h-100 shadow-sm d-flex flex-column rounded-4 overflow-hidden border bg-surface transition-all" data-id="{{ $status->id }}">
                     <!-- Thumbnail Stage 16:9 -->
                     <a href="{{ $watchUrl }}" class="yt-thumb-stage d-block text-decoration-none position-relative" aria-label="{{ $videoTitle }}">
-                        <div class="yt-thumb-wrapper ratio ratio-16x9 position-relative overflow-hidden rounded-3 bg-dark" @if($videoUrl) data-video-url="{{ $videoUrl }}" @endif @if($ytId) data-yt-id="{{ $ytId }}" @endif>
+                        <div class="yt-thumb-wrapper ratio ratio-16x9 position-relative overflow-hidden bg-dark" @if($videoUrl) data-video-url="{{ $videoUrl }}" @endif @if($ytId) data-yt-id="{{ $ytId }}" @endif>
                             @if($hasCustomThumb)
-                                <img src="{{ $thumbUrl }}" alt="{{ $videoTitle }}" class="yt-thumb-img img-fluid w-100 h-100 object-fit-cover lazyload" style="transition: opacity 0.25s ease;" onError="this.onerror=null;this.src='{{ theme_asset('img/video-placeholder.svg') }}';">
+                                <img src="{{ $thumbUrl }}" alt="{{ $videoTitle }}" class="yt-thumb-img img-fluid w-100 h-100 object-fit-cover lazyload transition-transform" onError="this.onerror=null;this.src='{{ theme_asset('img/video-placeholder.svg') }}';">
                             @else
-                                <img src="{{ theme_asset('img/video-placeholder.svg') }}" alt="{{ $videoTitle }}" class="yt-thumb-img img-fluid w-100 h-100 object-fit-cover" style="transition: opacity 0.25s ease;">
+                                <img src="{{ theme_asset('img/video-placeholder.svg') }}" alt="{{ $videoTitle }}" class="yt-thumb-img img-fluid w-100 h-100 object-fit-cover transition-transform">
                             @endif
 
                             @if($videoUrl && !$ytId)
@@ -45,11 +43,12 @@
                                 </span>
                             </div>
 
-                            <!-- Category / Type Badges -->
+                            <!-- Dedicated Video Genre Badge (NO Forum Category) -->
                             <div class="position-absolute top-0 start-0 m-2 d-flex gap-1" style="z-index: 4;">
-                                @if($categoryName)
-                                    <span class="badge rounded-pill px-2 py-1 fs-8 fw-semibold text-white shadow-xs" style="background-color: {{ $categoryColor ?: 'rgba(0,0,0,0.65)' }}; backdrop-filter: blur(4px);">
-                                        {{ $categoryName }}
+                                @if($videoCategory)
+                                    <span class="badge rounded-pill px-2 py-1 fs-8 fw-semibold text-white shadow-xs d-inline-flex align-items-center gap-1" style="background-color: {{ $videoCategory->color ?? '#6366f1' }}; backdrop-filter: blur(6px);">
+                                        <i class="{{ $videoCategory->icon ?? 'fa-solid fa-film' }}" style="font-size: 10px;"></i>
+                                        <span>{{ $videoCategory->display_name ?? $videoCategory->name }}</span>
                                     </span>
                                 @endif
                             </div>
@@ -70,7 +69,7 @@
                     </a>
 
                     <!-- Video Details & Publisher -->
-                    <div class="yt-card-body pt-3 d-flex align-items-start gap-2 flex-grow-1">
+                    <div class="yt-card-body p-3 d-flex align-items-start gap-2 flex-grow-1">
                         <!-- Publisher Avatar (MYADS Hexagon Standard) -->
                         @if($user)
                             <a href="{{ route('profile.short', $user->publicRouteIdentifier()) }}" class="user-avatar small no-outline flex-shrink-0" style="width: 36px; height: 40px; text-decoration: none;" title="{{ $user->username }}">
@@ -148,30 +147,31 @@
         @endforeach
     </div>
 
-    <!-- Pagination / Load More -->
-    @if($videos->hasPages())
-        <div class="yt-pagination-wrap mt-5 d-flex flex-column align-items-center gap-3">
-            <button type="button" class="btn btn-outline-primary rounded-pill px-4 py-2 fw-bold shadow-xs d-inline-flex align-items-center gap-2" id="btnLoadMoreVideos" data-next-url="{{ $videos->nextPageUrl() }}">
-                <i class="fa-solid fa-spinner fa-spin d-none" id="loadMoreSpinner"></i>
-                <i class="fa-solid fa-arrow-down" id="loadMoreIcon"></i>
-                <span>{{ __('messages.load_more_videos') }}</span>
-            </button>
-            <div class="d-none" id="standardPagination">
-                {{ $videos->links() }}
-            </div>
-        </div>
-    @endif
+    <!-- Pagination -->
+    <div class="d-flex justify-content-center mt-5" id="videoPagination">
+        {{ $videos->links() }}
+    </div>
 @else
-    <div class="yt-empty-state text-center py-5 px-3 rounded-4 shadow-sm bg-surface border">
-        <div class="yt-empty-icon mb-3 text-primary display-4">
-            <i class="fa-solid fa-video-slash"></i>
+    <!-- Empty State -->
+    <div class="yt-empty-state text-center py-5 rounded-4 p-5 bg-surface border shadow-xs">
+        <div class="yt-empty-icon mb-3">
+            <span class="d-inline-flex align-items-center justify-content-center rounded-circle p-4 bg-primary-subtle text-primary" style="width: 80px; height: 80px;">
+                <i class="fa-solid fa-film fa-2x"></i>
+            </span>
         </div>
-        <h4 class="fw-bold mb-2">{{ __('messages.no_videos_found') }}</h4>
-        <p class="text-muted mb-4 max-w-md mx-auto">{{ __('messages.no_videos_desc') }}</p>
-        @auth
-            <a href="{{ url('/share') }}" class="btn btn-primary px-4 py-2 rounded-pill fw-bold shadow-xs d-inline-flex align-items-center gap-2">
-                <i class="fa-solid fa-cloud-arrow-up"></i> {{ __('messages.create_video') }}
+        <h3 class="h5 fw-bold mb-2">{{ __('messages.no_videos_found') }}</h3>
+        <p class="text-muted max-w-md mx-auto mb-4 fs-6">
+            {{ __('messages.no_videos_desc') }}
+        </p>
+        <div class="d-flex justify-content-center gap-2">
+            <a href="{{ route('video.index') }}" class="btn btn-outline-primary rounded-pill px-4 fw-bold">
+                {{ __('messages.clear_filter') ?? 'Clear Filter' }}
             </a>
-        @endauth
+            @auth
+                <a href="{{ url('/share') }}" class="btn btn-primary rounded-pill px-4 fw-bold shadow-xs">
+                    <i class="fa-solid fa-cloud-arrow-up me-1"></i> {{ __('messages.create_video') }}
+                </a>
+            @endauth
+        </div>
     </div>
 @endif

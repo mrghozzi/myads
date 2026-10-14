@@ -5,7 +5,7 @@
     <!-- ADS placement -->
     @include('theme::partials.ads', ['id' => 5])
 
-    <!-- 1. HERO & SEARCH BANNER (.superdesign) -->
+    <!-- 1. HERO & SEARCH BANNER (World-Class Video Platform Design) -->
     <div class="yt-hero-card rounded-4 p-4 p-md-5 mb-4 position-relative overflow-hidden shadow-sm">
         <div class="yt-hero-ambient-glow position-absolute"></div>
         <div class="row align-items-center g-4 position-relative" style="z-index: 2;">
@@ -29,13 +29,13 @@
                     @if(request('sort'))
                         <input type="hidden" name="sort" value="{{ request('sort') }}">
                     @endif
-                    <div class="input-group input-group-lg shadow-xs rounded-pill overflow-hidden border yt-search-input-group">
+                    <div class="input-group input-group-lg shadow-xs rounded-pill overflow-hidden border yt-search-input-group bg-surface">
                         <span class="input-group-text bg-surface border-0 ps-3 text-muted">
                             <i class="fa-solid fa-magnifying-glass"></i>
                         </span>
                         <input type="text" name="q" id="videoSearchInput" value="{{ $searchQuery }}" class="form-control bg-surface border-0 fs-6 shadow-none" placeholder="{{ __('messages.search_videos_placeholder') }}" autocomplete="off">
                         @if($searchQuery !== '')
-                            <a href="{{ route('video.index') }}" class="input-group-text bg-surface border-0 text-muted" title="{{ __('messages.clear_filter') }}">
+                            <a href="{{ route('video.index') }}" class="input-group-text bg-surface border-0 text-muted" title="{{ __('messages.clear_filter') ?? 'Clear' }}">
                                 <i class="fa-solid fa-xmark"></i>
                             </a>
                         @endif
@@ -50,7 +50,6 @@
             <div class="col-lg-5 text-lg-end">
                 <div class="d-flex flex-wrap gap-2 justify-content-lg-end">
                     @auth
-                        <!-- Post Video button pointing to /share as required -->
                         <a href="{{ url('/share') }}" class="btn btn-post-video btn-lg rounded-pill px-4 fw-bold shadow-sm d-inline-flex align-items-center gap-2">
                             <i class="fa-solid fa-cloud-arrow-up"></i> {{ __('messages.create_video') }}
                         </a>
@@ -67,40 +66,56 @@
         </div>
     </div>
 
-    <!-- 2. FILTER NAVIGATION STRIP (Type Filters, Categories, Sorting) -->
+    <!-- 2. FILTER NAVIGATION STRIP (Pure Video Categories, NO Forum Categories) -->
     <div class="yt-filter-bar mb-4">
         <div class="d-flex align-items-center justify-content-between gap-3 flex-wrap">
-            <!-- Scrollable Filter Pills -->
+            <!-- Scrollable Video Category Pills -->
             <div class="yt-filter-chips-wrap overflow-x-auto pb-2 scrollbar-none flex-grow-1">
                 <div class="d-flex gap-2 align-items-center flex-nowrap" id="videoFilterPills">
+                    <!-- All Videos -->
                     <a href="{{ route('video.index') }}" class="btn btn-sm rounded-pill px-3 py-2 fw-semibold text-nowrap {{ $filter === 'all' && !request('cat') ? 'btn-primary shadow-xs' : 'btn-outline-secondary' }}">
                         <i class="fa-solid fa-border-all me-1"></i> {{ __('messages.all_videos') }}
                     </a>
+
+                    <!-- Shorts / Clips Filter -->
                     <a href="{{ route('video.filter', 'clips') }}" class="btn btn-sm rounded-pill px-3 py-2 fw-semibold text-nowrap {{ in_array($filter, ['clips', 'shorts'], true) ? 'btn-danger text-white shadow-xs' : 'btn-outline-danger' }}">
                         <i class="fa-solid fa-bolt me-1"></i> {{ __('messages.shorts_clips') }}
                     </a>
+
+                    <!-- Standard Videos Only -->
                     <a href="{{ route('video.filter', 'videos') }}" class="btn btn-sm rounded-pill px-3 py-2 fw-semibold text-nowrap {{ $filter === 'videos' ? 'btn-primary shadow-xs' : 'btn-outline-secondary' }}">
                         <i class="fa-solid fa-video me-1"></i> {{ __('messages.only_videos') }}
                     </a>
+
+                    <!-- Trending -->
                     <a href="{{ route('video.filter', 'trending') }}" class="btn btn-sm rounded-pill px-3 py-2 fw-semibold text-nowrap {{ $filter === 'trending' ? 'btn-warning text-dark fw-bold shadow-xs' : 'btn-outline-warning' }}">
                         <i class="fa-solid fa-fire me-1"></i> {{ __('messages.trending_videos') }}
                     </a>
+
+                    <!-- Latest -->
                     <a href="{{ route('video.filter', 'latest') }}" class="btn btn-sm rounded-pill px-3 py-2 fw-semibold text-nowrap {{ $filter === 'latest' ? 'btn-primary shadow-xs' : 'btn-outline-secondary' }}">
                         <i class="fa-solid fa-clock me-1"></i> {{ __('messages.latest_videos') }}
                     </a>
 
-                    <!-- Category Pills -->
+                    <!-- Dedicated Video Genres (Technology, Gaming, Entertainment, Music, Tutorials, etc.) -->
                     @if(isset($categories) && $categories->isNotEmpty())
                         <div class="vr mx-1 opacity-25"></div>
                         @foreach($categories as $category)
+                            @if(in_array($category->slug, ['all', 'trending', 'shorts'], true))
+                                @continue
+                            @endif
                             @php
-                                $isCatActive = (string) request('cat') === (string) $category->id || (string) request('category') === (string) $category->slug;
+                                $isCatActive = (string) request('cat') === (string) $category->slug 
+                                    || (string) request('cat') === (string) $category->id 
+                                    || (string) request('category') === (string) $category->slug;
                             @endphp
-                            <a href="{{ route('video.index', ['cat' => $category->id]) }}" class="btn btn-sm rounded-pill px-3 py-2 fw-semibold text-nowrap {{ $isCatActive ? 'btn-primary shadow-xs' : 'btn-outline-secondary' }}">
-                                @if($category->color)
+                            <a href="{{ route('video.index', ['cat' => $category->slug]) }}" class="btn btn-sm rounded-pill px-3 py-2 fw-semibold text-nowrap {{ $isCatActive ? 'btn-primary shadow-xs' : 'btn-outline-secondary' }}">
+                                @if(!empty($category->icon))
+                                    <i class="{{ $category->icon }} me-1" @if($category->color) style="color: {{ $isCatActive ? '#fff' : $category->color }};" @endif></i>
+                                @elseif(!empty($category->color))
                                     <span class="d-inline-block rounded-circle me-1" style="width: 8px; height: 8px; background-color: {{ $category->color }};"></span>
                                 @endif
-                                {{ $category->name }}
+                                {{ $category->display_name ?? $category->name }}
                             </a>
                         @endforeach
                     @endif
@@ -111,22 +126,22 @@
             <div class="dropdown flex-shrink-0">
                 <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 py-2 fw-semibold dropdown-toggle d-inline-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="fa-solid fa-arrow-down-short-wide"></i>
-                    <span>{{ __('messages.sort_by') }}</span>
+                    <span>{{ __('messages.sort_by') ?? 'Sort by' }}</span>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-end shadow-sm border rounded-3 fs-7 py-1">
                     <li>
                         <a class="dropdown-item py-2 {{ empty($sort) || $sort === 'latest' ? 'active fw-bold' : '' }}" href="{{ request()->fullUrlWithQuery(['sort' => 'latest']) }}">
-                            <i class="fa-solid fa-clock me-2"></i> {{ __('messages.sort_newest') }}
+                            <i class="fa-solid fa-clock me-2"></i> {{ __('messages.sort_newest') ?? 'Newest' }}
                         </a>
                     </li>
                     <li>
                         <a class="dropdown-item py-2 {{ $sort === 'views' ? 'active fw-bold' : '' }}" href="{{ request()->fullUrlWithQuery(['sort' => 'views']) }}">
-                            <i class="fa-solid fa-fire me-2"></i> {{ __('messages.sort_most_viewed') }}
+                            <i class="fa-solid fa-fire me-2"></i> {{ __('messages.sort_most_viewed') ?? 'Most Viewed' }}
                         </a>
                     </li>
                     <li>
                         <a class="dropdown-item py-2 {{ $sort === 'reactions' ? 'active fw-bold' : '' }}" href="{{ request()->fullUrlWithQuery(['sort' => 'reactions']) }}">
-                            <i class="fa-solid fa-heart me-2 text-danger"></i> {{ __('messages.sort_top_rated') }}
+                            <i class="fa-solid fa-heart me-2 text-danger"></i> {{ __('messages.sort_top_rated') ?? 'Top Rated' }}
                         </a>
                     </li>
                 </ul>
@@ -219,7 +234,7 @@
         @php
             $spTopic = $spotlightVideo->forumTopic;
             $spUser = $spotlightVideo->user;
-            $spWatchUrl = $spTopic ? route('forum.topic', $spTopic->id) : url('/portal');
+            $spWatchUrl = route('video.watch', $spotlightVideo->id);
             
             $spThumb = $spotlightVideo->resolved_thumbnail ?: \App\Http\Controllers\VideoHubController::resolveVideoThumbnailUrl($spotlightVideo);
             $spVideoUrl = $spotlightVideo->resolved_video_url ?: \App\Http\Controllers\VideoHubController::resolveVideoUrl($spotlightVideo);
@@ -314,14 +329,14 @@
 </div>
 
 <style>
-/* Modern YouTube Hub Superdesign Styling */
+/* Modern Video Platform Hub Superdesign Styling */
 .text-gradient-primary {
-    background: linear-gradient(135deg, #615dfa 0%, #23d2e2 100%);
+    background: linear-gradient(135deg, #6366f1 0%, #06b6d4 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 .yt-hero-card {
-    background: linear-gradient(135deg, rgba(97, 93, 250, 0.16) 0%, rgba(35, 210, 226, 0.12) 100%), var(--notification-ui-card-bg);
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.16) 0%, rgba(6, 182, 212, 0.12) 100%), var(--notification-ui-card-bg);
     border: 1px solid var(--notification-ui-card-border);
     backdrop-filter: blur(14px);
 }
@@ -330,7 +345,7 @@
     inset-inline-end: -50px;
     width: 320px;
     height: 320px;
-    background: radial-gradient(circle, rgba(97, 93, 250, 0.35) 0%, rgba(35, 210, 226, 0.1) 70%, transparent 100%);
+    background: radial-gradient(circle, rgba(99, 102, 241, 0.35) 0%, rgba(6, 182, 212, 0.1) 70%, transparent 100%);
     filter: blur(50px);
     pointer-events: none;
     z-index: 1;
@@ -349,25 +364,25 @@
     50% { opacity: 0.4; transform: scale(0.85); }
 }
 .btn-post-video {
-    background: linear-gradient(135deg, #615dfa 0%, #4b45e4 100%);
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
     color: #fff !important;
     border: none;
-    box-shadow: 0 6px 20px rgba(97, 93, 250, 0.35);
+    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.35);
     transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 .btn-post-video:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 26px rgba(97, 93, 250, 0.55);
+    box-shadow: 0 8px 26px rgba(99, 102, 241, 0.55);
 }
 .yt-shorts-shelf-card {
-    background: linear-gradient(135deg, rgba(255, 0, 51, 0.05) 0%, rgba(255, 0, 51, 0.02) 100%), var(--notification-ui-card-bg);
-    border: 1px solid rgba(255, 0, 51, 0.2) !important;
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.05) 0%, rgba(239, 68, 68, 0.02) 100%), var(--notification-ui-card-bg);
+    border: 1px solid rgba(239, 68, 68, 0.2) !important;
 }
 .yt-shorts-badge {
-    background: linear-gradient(135deg, #ff0033 0%, #f03355 100%);
+    background: linear-gradient(135deg, #ef4444 0%, #f43f5e 100%);
 }
 .yt-spotlight-card {
-    background: linear-gradient(135deg, rgba(97, 93, 250, 0.08) 0%, rgba(15, 17, 26, 0.95) 100%), var(--notification-ui-card-bg);
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(15, 17, 26, 0.95) 100%), var(--notification-ui-card-bg);
     border: 1px solid var(--notification-ui-card-border);
 }
 .yt-thumb-stage {
@@ -378,13 +393,13 @@
 .yt-thumb-stage .yt-play-btn-circle {
     width: 48px;
     height: 48px;
-    background: rgba(97, 93, 250, 0.9);
+    background: rgba(99, 102, 241, 0.9);
     backdrop-filter: blur(4px);
     transition: transform 0.25s ease, background 0.25s ease;
 }
 .yt-thumb-stage:hover .yt-play-btn-circle {
     transform: scale(1.15);
-    background: #615dfa;
+    background: #6366f1;
 }
 .yt-thumb-img {
     transition: transform 0.35s ease;
@@ -409,16 +424,16 @@
 }
 .yt-video-card:hover {
     transform: translateY(-6px);
-    box-shadow: 0 16px 32px rgba(0,0,0,0.18), 0 0 20px rgba(97, 93, 250, 0.15) !important;
-    border-color: rgba(97, 93, 250, 0.45);
+    box-shadow: 0 16px 32px rgba(0,0,0,0.18), 0 0 20px rgba(99, 102, 241, 0.15) !important;
+    border-color: rgba(99, 102, 241, 0.45);
 }
 .yt-shorts-card {
     transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease, border-color 0.3s ease;
 }
 .yt-shorts-card:hover {
     transform: scale(1.04);
-    box-shadow: 0 14px 30px rgba(255, 0, 51, 0.35);
-    border: 1px solid rgba(255, 0, 51, 0.6);
+    box-shadow: 0 14px 30px rgba(239, 68, 68, 0.35);
+    border: 1px solid rgba(239, 68, 68, 0.6);
 }
 .text-truncate-2, .line-clamp-2 {
     display: -webkit-box;
@@ -542,65 +557,8 @@ function initVideoHoverPreviews() {
     });
 }
 
-/**
- * AJAX Load More Videos Pagination
- */
-function initLoadMoreVideos() {
-    const btn = document.getElementById('btnLoadMoreVideos');
-    if (!btn) return;
-
-    btn.addEventListener('click', function(e) {
-        e.preventDefault();
-        const nextUrl = btn.dataset.nextUrl;
-        if (!nextUrl) return;
-
-        const spinner = document.getElementById('loadMoreSpinner');
-        const icon = document.getElementById('loadMoreIcon');
-        if (spinner) spinner.classList.remove('d-none');
-        if (icon) icon.classList.add('d-none');
-        btn.disabled = true;
-
-        fetch(nextUrl, {
-            headers: {
-                'X-Requested-With': 'XMLHttpRequest',
-                'Accept': 'application/json'
-            }
-        })
-        .then(res => res.json())
-        .then(data => {
-            if (data.html) {
-                const tempDiv = document.createElement('div');
-                tempDiv.innerHTML = data.html;
-                const newItems = tempDiv.querySelectorAll('#videoGridItems > .video-grid-col');
-                const targetGrid = document.querySelector('#videoGridItems');
-
-                if (targetGrid && newItems.length > 0) {
-                    newItems.forEach(item => targetGrid.appendChild(item));
-                    initVideoHoverPreviews();
-                }
-
-                if (data.next_page_url) {
-                    btn.dataset.nextUrl = data.next_page_url;
-                    btn.disabled = false;
-                } else {
-                    btn.remove();
-                }
-            }
-        })
-        .catch(err => {
-            console.error('Error loading videos:', err);
-            btn.disabled = false;
-        })
-        .finally(() => {
-            if (spinner) spinner.classList.add('d-none');
-            if (icon) icon.classList.remove('d-none');
-        });
-    });
-}
-
 document.addEventListener('DOMContentLoaded', function() {
     initVideoHoverPreviews();
-    initLoadMoreVideos();
 });
 </script>
 @endsection
