@@ -169,7 +169,12 @@ final class VideoCategoryCatalog
         $list = [];
         $isArabic = app()->getLocale() === 'ar';
         foreach (self::categories() as $cat) {
-            $displayName = $isArabic ? ($cat['name_ar'] ?? $cat['name']) : $cat['name'];
+            $transKey = 'messages.video_cat_' . $cat['slug'];
+            $translated = __($transKey);
+            $displayName = ($translated !== $transKey)
+                ? $translated
+                : ($isArabic ? ($cat['name_ar'] ?? $cat['name']) : $cat['name']);
+
             $list[] = (object) array_merge($cat, [
                 'display_name' => $displayName,
             ]);
@@ -192,7 +197,12 @@ final class VideoCategoryCatalog
         if (isset($cats[$slug])) {
             $isArabic = app()->getLocale() === 'ar';
             $cat = $cats[$slug];
-            $cat['display_name'] = $isArabic ? ($cat['name_ar'] ?? $cat['name']) : $cat['name'];
+            $transKey = 'messages.video_cat_' . $cat['slug'];
+            $translated = __($transKey);
+            $cat['display_name'] = ($translated !== $transKey)
+                ? $translated
+                : ($isArabic ? ($cat['name_ar'] ?? $cat['name']) : $cat['name']);
+
             return (object) $cat;
         }
 

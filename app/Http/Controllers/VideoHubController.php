@@ -506,9 +506,28 @@ class VideoHubController extends Controller
         }
 
         if (!empty($status->txt)) {
-            return (string) $status->txt;
+            $txt = trim((string) $status->txt);
+            $firstLine = trim(explode("\n", $txt)[0]);
+            if ($firstLine !== '' && !in_array(strtolower($firstLine), ['video', 'clips', 'text', 'gallery'], true)) {
+                return Str::limit(strip_tags($firstLine), 70);
+            }
         }
 
-        return __('messages.video_hub');
+        if ($topic && !empty($topic->txt)) {
+            $tTxt = trim((string) $topic->txt);
+            $firstLine = trim(explode("\n", $tTxt)[0]);
+            if ($firstLine !== '' && !in_array(strtolower($firstLine), ['video', 'clips', 'text', 'gallery'], true)) {
+                return Str::limit(strip_tags($firstLine), 70);
+            }
+        }
+
+        $user = $status->user ?? $topic?->user;
+        if ($user && !empty($user->username)) {
+            return __('messages.video_by_user', ['user' => $user->username]);
+        }
+
+        return (int) ($status->s_type ?? 10) === 14 
+            ? (__('messages.shorts_clips') ?? 'Clip')
+            : (__('messages.main_videos') ?? 'Video');
     }
 }

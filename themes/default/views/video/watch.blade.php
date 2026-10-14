@@ -14,7 +14,8 @@
         $isArabic = app()->getLocale() === 'ar';
         $categoryName = $category->display_name ?? $category->name ?? 'Technology';
         $categoryIcon = $category->icon ?? 'fa-solid fa-film';
-        $categoryColor = $category->color ?? '#6366f1';
+        $categoryColor = $category->color ?? '#615dfa';
+        $commentsCount = $topic ? $topic->comments()->count() : $comments->count();
     @endphp
 
     <div class="video-watch-page" id="videoWatchPage">
@@ -97,7 +98,7 @@
                                             <div class="v-speed-flyout shadow-lg rounded-3" id="speedFlyout_{{ $status->id }}" style="display:none;">
                                                 <div class="v-speed-option" onclick="setSpeed(0.5, '{{ $status->id }}')">0.5x</div>
                                                 <div class="v-speed-option" onclick="setSpeed(0.75, '{{ $status->id }}')">0.75x</div>
-                                                <div class="v-speed-option active" onclick="setSpeed(1.0, '{{ $status->id }}')">1.0x (Normal)</div>
+                                                <div class="v-speed-option active" onclick="setSpeed(1.0, '{{ $status->id }}')">1.0x ({{ __('messages.speed_normal') ?? 'Normal' }})</div>
                                                 <div class="v-speed-option" onclick="setSpeed(1.25, '{{ $status->id }}')">1.25x</div>
                                                 <div class="v-speed-option" onclick="setSpeed(1.5, '{{ $status->id }}')">1.5x</div>
                                                 <div class="v-speed-option" onclick="setSpeed(2.0, '{{ $status->id }}')">2.0x</div>
@@ -130,135 +131,134 @@
                         <div class="ratio ratio-16x9 video-placeholder-box rounded-4 overflow-hidden position-relative d-flex flex-column align-items-center justify-content-center text-center p-5 bg-dark" style="z-index: 1;">
                             <img src="{{ $thumbUrl }}" alt="{{ $videoTitle }}" class="position-absolute top-0 start-0 w-100 h-100 object-fit-cover opacity-25">
                             <i class="fa-solid fa-film fa-3x text-primary mb-3 position-relative" style="z-index: 2;"></i>
-                            <p class="text-white fw-bold mb-0 position-relative" style="z-index: 2;">{{ __('messages.no_video_stream') ?? 'No playable stream detected' }}</p>
+                            <p class="text-white fw-bold mb-0 position-relative" style="z-index: 2;">{{ __('messages.no_video_stream') }}</p>
                         </div>
                     @endif
                 </div>
 
                 <!-- 2. VIDEO TITLE (H1) -->
-                <div class="video-watch-headline mb-3">
-                    <h1 class="h3 fw-extrabold text-light-emphasis line-clamp-2 mb-2" style="line-height: 1.35;">
+                <div class="video-watch-headline my-3">
+                    <h1 class="h4 fw-extrabold text-light-emphasis line-clamp-2 mb-0" style="line-height: 1.4;">
                         {{ $videoTitle }}
                     </h1>
                 </div>
 
                 <!-- 3. CREATOR CHANNEL BAR & ACTION TOOLBAR (YOUTUBE STANDARD) -->
-                <div class="video-channel-action-card p-3 rounded-4 mb-4 shadow-sm border bg-surface">
-                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
-                        <!-- Creator Channel Profile -->
-                        <div class="d-flex align-items-center gap-3">
-                            @if($user)
-                                <a href="{{ route('profile.short', $user->publicRouteIdentifier()) }}" class="user-avatar small no-outline flex-shrink-0" style="width: 44px; height: 48px; text-decoration: none;">
-                                    <div class="user-avatar-content">
-                                        <div class="hexagon-image-30-32" data-src="{{ $user->img ? url($user->img) : theme_asset('img/avatar.jpg') }}"></div>
-                                    </div>
-                                    <div class="user-avatar-progress-border">
-                                        <div class="hexagon-border-40-44" data-line-color="{{ $user->profileBadgeColor() }}"></div>
-                                    </div>
-                                </a>
-
-                                <div>
-                                    <h2 class="h6 mb-0 fw-bold d-flex align-items-center gap-1">
-                                        <a href="{{ route('profile.short', $user->publicRouteIdentifier()) }}" class="text-reset text-decoration-none">
-                                            {{ $user->username }}
-                                        </a>
-                                        @if($user->verified)
-                                            <i class="fa-solid fa-circle-check text-primary fs-7" title="{{ __('messages.verified') }}"></i>
-                                        @endif
-                                    </h2>
-                                    <span class="fs-8 text-muted">
-                                        {{ $user->videos_count ?? 1 }} {{ __('messages.videos') ?? 'Videos' }}
-                                    </span>
+                <div class="v-author-toolbar shadow-sm mb-4">
+                    <!-- Creator Channel Profile (Start) -->
+                    <div class="v-author-identity">
+                        @if($user)
+                            <a href="{{ route('profile.short', $user->publicRouteIdentifier()) }}" class="user-avatar small no-outline flex-shrink-0" style="width: 44px; height: 48px; text-decoration: none;">
+                                <div class="user-avatar-content">
+                                    <div class="hexagon-image-30-32" data-src="{{ $user->img ? url($user->img) : theme_asset('img/avatar.jpg') }}"></div>
                                 </div>
+                                <div class="user-avatar-progress-border">
+                                    <div class="hexagon-border-40-44" data-line-color="{{ $user->profileBadgeColor() }}"></div>
+                                </div>
+                            </a>
 
-                                <!-- Follow / Subscribe Button -->
-                                @auth
-                                    @if(auth()->id() !== $user->id)
-                                        <form action="{{ route('profile.follow', $user->username) }}" method="POST" class="d-inline ms-2">
-                                            @csrf
-                                            <button type="submit" class="btn btn-sm {{ $isFollowing ? 'btn-secondary' : 'btn-primary' }} rounded-pill px-3 fw-bold shadow-xs d-inline-flex align-items-center gap-1">
-                                                <i class="fa-solid {{ $isFollowing ? 'fa-check' : 'fa-user-plus' }}"></i>
-                                                <span>{{ $isFollowing ? __('messages.following') : __('messages.follow') }}</span>
-                                            </button>
-                                        </form>
-                                    @endif
-                                @else
-                                    <a href="{{ route('login') }}" class="btn btn-sm btn-primary rounded-pill px-3 fw-bold shadow-xs ms-2">
-                                        + {{ __('messages.follow') }}
+                            <div class="min-w-0">
+                                <h2 class="h6 mb-0 fw-bold d-flex align-items-center gap-1 text-truncate">
+                                    <a href="{{ route('profile.short', $user->publicRouteIdentifier()) }}" class="text-reset text-decoration-none">
+                                        {{ $user->username }}
                                     </a>
-                                @endauth
-                            @endif
-                        </div>
+                                    @if($user->verified)
+                                        <i class="fa-solid fa-circle-check text-primary fs-7" title="{{ __('messages.verified') ?? 'Verified' }}"></i>
+                                    @endif
+                                </h2>
+                                <span class="fs-8 text-muted d-block">
+                                    {{ $user->videos_count ?? 1 }} {{ __('messages.videos') ?? 'Videos' }}
+                                </span>
+                            </div>
 
-                        <!-- Action Toolbar (Like, Share, Save, Options) -->
-                        <div class="d-flex align-items-center gap-2 flex-wrap">
-                            <!-- Reactions / Like Button -->
+                            <!-- Follow / Subscribe Button -->
                             @auth
-                                <div class="position-relative">
-                                    <button type="button" class="btn btn-sm btn-light bg-surface border rounded-pill px-3 py-2 fw-semibold d-inline-flex align-items-center gap-2 shadow-xs" onclick="toggleReactionMenu(this)">
-                                        <i class="fa-solid fa-heart {{ $isLiked ? 'text-danger' : 'text-muted' }}" id="likeIcon_{{ $status->id }}"></i>
-                                        <span id="reactionsCount_{{ $status->id }}" class="fw-bold">{{ (int) ($status->reactions_count ?? 0) }}</span>
-                                    </button>
-                                    <!-- Reaction Dropdown Palette -->
-                                    <div class="v-reactions-palette shadow-lg rounded-pill p-1 position-absolute" id="reactionsPalette_{{ $status->id }}" style="display:none; bottom: 44px; inset-inline-start: 0; z-index: 9999;">
-                                        @foreach(['like' => '👍', 'love' => '❤️', 'happy' => '😄', 'wow' => '😮', 'sad' => '😢', 'angry' => '😡'] as $reactionKey => $reactionEmoji)
-                                            <button type="button" class="btn btn-icon rounded-circle p-1 v-reaction-bubble" onclick="submitVideoReaction({{ $status->tp_id ?: $status->id }}, '{{ $reactionKey }}', '{{ $status->id }}')">
-                                                <span class="fs-5">{{ $reactionEmoji }}</span>
-                                            </button>
-                                        @endforeach
-                                    </div>
-                                </div>
+                                @if(auth()->id() !== $user->id)
+                                    <form action="{{ route('profile.follow', $user->username) }}" method="POST" class="d-inline ms-2">
+                                        @csrf
+                                        <button type="submit" class="v-subscribe-btn {{ $isFollowing ? 'following' : '' }}">
+                                            <i class="fa-solid {{ $isFollowing ? 'fa-check' : 'fa-user-plus' }}"></i>
+                                            <span>{{ $isFollowing ? __('messages.following') : __('messages.follow') }}</span>
+                                        </button>
+                                    </form>
+                                @endif
                             @else
-                                <a href="{{ route('login') }}" class="btn btn-sm btn-light bg-surface border rounded-pill px-3 py-2 fw-semibold d-inline-flex align-items-center gap-2 shadow-xs">
-                                    <i class="fa-solid fa-heart text-danger"></i>
-                                    <span>{{ (int) ($status->reactions_count ?? 0) }}</span>
+                                <a href="{{ route('login') }}" class="v-subscribe-btn ms-2">
+                                    <i class="fa-solid fa-user-plus"></i>
+                                    <span>{{ __('messages.follow') }}</span>
                                 </a>
                             @endauth
+                        @endif
+                    </div>
 
-                            <!-- Share Button -->
-                            <button type="button" class="btn btn-sm btn-light bg-surface border rounded-pill px-3 py-2 fw-semibold d-inline-flex align-items-center gap-2 shadow-xs" onclick="openShareModal()">
-                                <i class="fa-solid fa-share-nodes text-primary"></i>
-                                <span>{{ __('messages.share_video') ?? 'Share' }}</span>
-                            </button>
-
-                            <!-- Save to Watch Later / Favorites -->
-                            @auth
-                                <button type="button" class="btn btn-sm btn-light bg-surface border rounded-pill px-3 py-2 fw-semibold d-inline-flex align-items-center gap-2 shadow-xs" onclick="toggleSaveVideo({{ $status->id }}, this)">
-                                    <i class="{{ $isSaved ? 'fa-solid fa-bookmark text-warning' : 'fa-regular fa-bookmark' }}"></i>
-                                    <span class="btn-save-text">{{ $isSaved ? __('messages.saved_video') : __('messages.save_video') }}</span>
+                    <!-- Action Toolbar (Like, Share, Save, Theater, Options) (End) -->
+                    <div class="v-action-buttons-group">
+                        <!-- Reactions / Like Button -->
+                        @auth
+                            <div class="position-relative">
+                                <button type="button" class="v-btn-pill" onclick="toggleReactionMenu(this)">
+                                    <i class="fa-solid fa-heart {{ $isLiked ? 'text-danger' : 'text-muted' }}" id="likeIcon_{{ $status->id }}"></i>
+                                    <span id="reactionsCount_{{ $status->id }}">{{ (int) ($status->reactions_count ?? 0) }}</span>
                                 </button>
-                            @endauth
-
-                            <!-- Theater Mode Button -->
-                            <button type="button" class="btn btn-sm btn-light bg-surface border rounded-circle p-2 shadow-xs d-none d-md-inline-flex" onclick="toggleTheaterMode()" title="{{ __('messages.theater_mode') ?? 'Theater Mode' }}">
-                                <i class="fa-solid fa-desktop text-muted"></i>
-                            </button>
-
-                            <!-- 3-Dots Quick Menu -->
-                            <div class="dropdown">
-                                <button type="button" class="btn btn-sm btn-light bg-surface border rounded-circle p-2 shadow-xs" data-bs-toggle="dropdown" aria-expanded="false" title="{{ __('messages.options') }}">
-                                    <i class="fa-solid fa-ellipsis-vertical text-muted"></i>
-                                </button>
-                                <ul class="dropdown-menu dropdown-menu-end shadow-sm border rounded-3 fs-7 py-1">
-                                    <li>
-                                        <button class="dropdown-item py-2 d-flex align-items-center gap-2" type="button" onclick="navigator.clipboard.writeText(window.location.href); showToast('{{ __('messages.link_copied') }}');">
-                                            <i class="fa-solid fa-link text-info"></i> {{ __('messages.copy_video_link') }}
+                                <!-- Reaction Dropdown Palette -->
+                                <div class="v-reactions-palette shadow-lg rounded-pill p-1 position-absolute" id="reactionsPalette_{{ $status->id }}" style="display:none; bottom: 44px; inset-inline-start: 0; z-index: 9999;">
+                                    @foreach(['like' => '👍', 'love' => '❤️', 'happy' => '😄', 'wow' => '😮', 'sad' => '😢', 'angry' => '😡'] as $reactionKey => $reactionEmoji)
+                                        <button type="button" class="v-reaction-bubble" onclick="submitVideoReaction({{ $status->tp_id ?: $status->id }}, '{{ $reactionKey }}', '{{ $status->id }}')">
+                                            <span>{{ $reactionEmoji }}</span>
                                         </button>
-                                    </li>
-                                    @if($videoFile)
-                                        <li>
-                                            <a class="dropdown-item py-2 d-flex align-items-center gap-2" href="{{ asset($videoFile->file_path) }}" download>
-                                                <i class="fa-solid fa-download text-success"></i> {{ __('messages.download') ?? 'Download' }}
-                                            </a>
-                                        </li>
-                                    @endif
-                                    <li>
-                                        <button class="dropdown-item py-2 d-flex align-items-center gap-2 text-danger" type="button" onclick="reportPost({{ $topic?->id ?? $status->id }}, 2)">
-                                            <i class="fa-solid fa-flag"></i> {{ __('messages.report') ?? 'Report' }}
-                                        </button>
-                                    </li>
-                                </ul>
+                                    @endforeach
+                                </div>
                             </div>
+                        @else
+                            <a href="{{ route('login') }}" class="v-btn-pill">
+                                <i class="fa-solid fa-heart text-danger"></i>
+                                <span>{{ (int) ($status->reactions_count ?? 0) }}</span>
+                            </a>
+                        @endauth
+
+                        <!-- Share Button -->
+                        <button type="button" class="v-btn-pill" onclick="openShareModal()">
+                            <i class="fa-solid fa-share-nodes text-primary"></i>
+                            <span>{{ __('messages.share_video') }}</span>
+                        </button>
+
+                        <!-- Save to Watch Later / Favorites -->
+                        @auth
+                            <button type="button" class="v-btn-pill" onclick="toggleSaveVideo({{ $status->id }}, this)">
+                                <i class="{{ $isSaved ? 'fa-solid fa-bookmark text-warning' : 'fa-regular fa-bookmark' }}"></i>
+                                <span class="btn-save-text">{{ $isSaved ? __('messages.saved_video') : __('messages.save_video') }}</span>
+                            </button>
+                        @endauth
+
+                        <!-- Theater Mode Button -->
+                        <button type="button" class="v-btn-icon-circle d-none d-md-inline-flex" onclick="toggleTheaterMode()" title="{{ __('messages.theater_mode') }}">
+                            <i class="fa-solid fa-desktop"></i>
+                        </button>
+
+                        <!-- 3-Dots Quick Menu -->
+                        <div class="dropdown">
+                            <button type="button" class="v-btn-icon-circle" data-bs-toggle="dropdown" aria-expanded="false" title="{{ __('messages.options') ?? 'Options' }}">
+                                <i class="fa-solid fa-ellipsis-vertical"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end shadow-sm border rounded-3 fs-7 py-1">
+                                <li>
+                                    <button class="dropdown-item py-2 d-flex align-items-center gap-2" type="button" onclick="navigator.clipboard.writeText(window.location.href); showToast('{{ __('messages.link_copied') }}');">
+                                        <i class="fa-solid fa-link text-info"></i> {{ __('messages.copy_video_link') }}
+                                    </button>
+                                </li>
+                                @if($videoFile)
+                                    <li>
+                                        <a class="dropdown-item py-2 d-flex align-items-center gap-2" href="{{ asset($videoFile->file_path) }}" download>
+                                            <i class="fa-solid fa-download text-success"></i> {{ __('messages.download') }}
+                                        </a>
+                                    </li>
+                                @endif
+                                <li>
+                                    <button class="dropdown-item py-2 d-flex align-items-center gap-2 text-danger" type="button" onclick="reportPost({{ $topic?->id ?? $status->id }}, 2)">
+                                        <i class="fa-solid fa-flag"></i> {{ __('messages.report') }}
+                                    </button>
+                                </li>
+                            </ul>
                         </div>
                     </div>
                 </div>
@@ -269,7 +269,7 @@
                     <div class="d-flex align-items-center gap-3 flex-wrap mb-3 pb-3 border-bottom fs-7">
                         <span class="fw-bold text-light-emphasis d-inline-flex align-items-center gap-1">
                             <i class="fa-solid fa-eye text-primary"></i>
-                            {{ number_format($viewsCount) }} {{ __('messages.views') ?? 'views' }}
+                            {{ __('messages.video_views_count', ['count' => number_format($viewsCount)]) }}
                         </span>
                         <span class="text-muted">•</span>
                         <span class="text-muted d-inline-flex align-items-center gap-1">
@@ -277,7 +277,7 @@
                             {{ $timeAgo }}
                         </span>
                         <span class="text-muted">•</span>
-                        <!-- Dedicated Video Genre Badge (NOT Forum Category) -->
+                        <!-- Dedicated Video Genre Badge -->
                         <span class="badge rounded-pill px-3 py-1 shadow-xs fw-semibold" style="background-color: {{ $categoryColor }}; color: #fff;">
                             <i class="{{ $categoryIcon }} me-1"></i> {{ $categoryName }}
                         </span>
@@ -291,11 +291,11 @@
                             @elseif(!empty($status->txt))
                                 {!! nl2br(e($status->txt)) !!}
                             @else
-                                <p class="text-muted fst-italic mb-0">{{ __('messages.no_description_provided') ?? 'No description provided for this video.' }}</p>
+                                <p class="text-muted fst-italic mb-0">{{ __('messages.no_description_provided') }}</p>
                             @endif
                         </div>
                         <button type="button" class="btn btn-link btn-sm p-0 mt-2 text-primary fw-bold text-decoration-none d-none" id="btnToggleDesc" onclick="toggleDescExpand()">
-                            {{ __('messages.show_more') ?? 'Show more' }}
+                            {{ __('messages.show_more') }}
                         </button>
                     </div>
                 </div>
@@ -307,19 +307,19 @@
                             <i class="fa-solid fa-comments text-primary"></i>
                             <span>{{ __('messages.comments') ?? 'Comments' }}</span>
                             <span class="badge bg-primary-subtle text-primary rounded-pill px-2 py-1 fs-7" id="videoCommentCountBadge">
-                                {{ $topic ? $topic->comments()->count() : $comments->count() }}
+                                {{ $commentsCount }}
                             </span>
                         </h3>
                     </div>
 
                     <!-- Add Comment Form -->
                     @auth
-                        <form action="{{ route('comment.store') }}" method="POST" class="video-comment-form mb-4" id="videoCommentForm" onsubmit="submitVideoComment(event)">
+                        <form action="{{ route('comment.store') }}" method="POST" class="mb-4" id="videoCommentForm" onsubmit="submitVideoComment(event)">
                             @csrf
                             <input type="hidden" name="id" value="{{ $topic?->id ?? $status->id }}">
                             <input type="hidden" name="type" value="forum">
-                            <div class="d-flex gap-3 align-items-start">
-                                <div class="user-avatar small no-outline flex-shrink-0" style="width: 36px; height: 40px;">
+                            <div class="v-comment-input-card">
+                                <div class="user-avatar small no-outline flex-shrink-0" style="width: 40px; height: 44px;">
                                     <div class="user-avatar-content">
                                         <div class="hexagon-image-30-32" data-src="{{ auth()->user()->img ? url(auth()->user()->img) : theme_asset('img/avatar.jpg') }}"></div>
                                     </div>
@@ -328,10 +328,11 @@
                                     </div>
                                 </div>
                                 <div class="flex-grow-1">
-                                    <textarea name="text" id="videoCommentTextarea" class="form-control bg-surface border rounded-3 p-3 fs-6 shadow-none" rows="2" placeholder="{{ __('messages.add_comment_placeholder') ?? 'Add a comment...' }}" required></textarea>
-                                    <div class="d-flex justify-content-end gap-2 mt-2">
-                                        <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold shadow-xs">
-                                            <i class="fa-solid fa-paper-plane me-1"></i> {{ __('messages.comment') ?? 'Comment' }}
+                                    <textarea name="text" id="videoCommentTextarea" class="v-comment-textarea" rows="2" placeholder="{{ __('messages.add_comment_placeholder') }}" required></textarea>
+                                    <div class="d-flex justify-content-end mt-2">
+                                        <button type="submit" class="v-comment-submit-btn">
+                                            <i class="fa-solid fa-paper-plane"></i>
+                                            <span>{{ __('messages.comment') ?? 'Comment' }}</span>
                                         </button>
                                     </div>
                                 </div>
@@ -339,9 +340,9 @@
                         </form>
                     @else
                         <div class="alert alert-light border rounded-4 text-center p-4 mb-4">
-                            <p class="mb-2 fw-semibold">{{ __('messages.login_to_comment') ?? 'Please sign in to join the discussion.' }}</p>
+                            <p class="mb-2 fw-semibold">{{ __('messages.login_to_comment') }}</p>
                             <a href="{{ route('login') }}" class="btn btn-primary rounded-pill px-4 fw-bold shadow-xs">
-                                <i class="fa-solid fa-right-to-bracket me-1"></i> {{ __('messages.login') }}
+                                <i class="fa-solid fa-right-to-bracket me-1"></i> {{ __('messages.login') ?? 'Sign In' }}
                             </a>
                         </div>
                     @endauth
@@ -355,7 +356,7 @@
                             @endphp
                             <div class="video-comment-item d-flex gap-3 py-3 border-bottom" id="comment_{{ $comment->id }}">
                                 @if($cUser)
-                                    <a href="{{ route('profile.short', $cUser->publicRouteIdentifier()) }}" class="user-avatar small no-outline flex-shrink-0" style="width: 34px; height: 38px;">
+                                    <a href="{{ route('profile.short', $cUser->publicRouteIdentifier()) }}" class="user-avatar small no-outline flex-shrink-0" style="width: 36px; height: 40px;">
                                         <div class="user-avatar-content">
                                             <div class="hexagon-image-30-32" data-src="{{ $cUser->img ? url($cUser->img) : theme_asset('img/avatar.jpg') }}"></div>
                                         </div>
@@ -384,31 +385,33 @@
                         @empty
                             <div class="text-center py-4 text-muted" id="noCommentsPlaceholder">
                                 <i class="fa-regular fa-comment-dots fs-3 mb-2 opacity-50"></i>
-                                <p class="mb-0 fs-7">{{ __('messages.no_comments_yet') ?? 'No comments yet. Be the first to comment!' }}</p>
+                                <p class="mb-0 fs-7">{{ __('messages.no_comments_yet') }}</p>
                             </div>
                         @endforelse
                     </div>
                 </div>
             </div>
 
-            <!-- 2. "UP NEXT" / SUGGESTED VIDEOS SIDEBAR (YOUTUBE STANDARD) -->
+            <!-- 2. "UP NEXT" / SUGGESTED VIDEOS SIDEBAR -->
             <div class="col-lg-4 col-xl-4 transition-all" id="videoSidebarCol">
                 <div class="suggested-videos-card rounded-4 p-3 shadow-sm border bg-surface">
                     <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom">
                         <h4 class="h6 fw-extrabold mb-0 d-flex align-items-center gap-2">
                             <i class="fa-solid fa-play text-primary"></i>
-                            <span>{{ __('messages.up_next') ?? 'Up Next' }}</span>
+                            <span>{{ __('messages.up_next') }}</span>
                         </h4>
 
-                        <!-- Autoplay Toggle Switch -->
-                        <div class="form-check form-switch mb-0 d-flex align-items-center gap-2">
-                            <label class="form-check-label fs-8 text-muted" for="autoplayToggle">{{ __('messages.autoplay') ?? 'Autoplay' }}</label>
-                            <input class="form-check-input shadow-none cursor-pointer" type="checkbox" role="switch" id="autoplayToggle" checked>
+                        <!-- Custom Robust Autoplay Switch (Immune to theme CSS bugs) -->
+                        <div class="v-autoplay-wrap">
+                            <span class="v-autoplay-text">{{ __('messages.autoplay') }}</span>
+                            <button type="button" class="v-custom-switch active" id="autoplayCustomSwitch" onclick="toggleCustomAutoplay(this)" title="{{ __('messages.autoplay') }}" aria-label="{{ __('messages.autoplay') }}">
+                                <span class="v-custom-switch-knob"></span>
+                            </button>
                         </div>
                     </div>
 
                     <!-- Suggested Videos List -->
-                    <div class="suggested-videos-list d-flex flex-column gap-3" id="suggestedVideosList">
+                    <div class="suggested-videos-list d-flex flex-column gap-2" id="suggestedVideosList">
                         @foreach($suggestedVideos as $suggested)
                             @php
                                 $sTopic = $suggested->forumTopic;
@@ -419,34 +422,33 @@
                                 $sViews = $sTopic ? (int) ($sTopic->vu ?? 0) : (int) ($suggested->views_count ?? 0);
                                 $sTimeAgo = \Carbon\Carbon::createFromTimestamp($suggested->date)->diffForHumans();
                                 $sIsClip = (int) $suggested->s_type === 14;
-                                $sCategory = $suggested->resolved_video_category ?: \App\Http\Controllers\VideoHubController::resolveVideoCategory($suggested);
                             @endphp
-                            <a href="{{ $sWatchUrl }}" class="suggested-video-row d-flex gap-2 text-decoration-none group rounded-3 p-1 transition-all">
+                            <a href="{{ $sWatchUrl }}" class="v-suggested-card suggested-video-row">
                                 <!-- 16:9 Thumbnail -->
-                                <div class="suggested-thumb-wrap ratio ratio-16x9 rounded-3 overflow-hidden flex-shrink-0 bg-dark" style="width: 140px;">
-                                    <img src="{{ $sThumb }}" alt="{{ $sTitle }}" class="w-100 h-100 object-fit-cover transition-transform" onError="this.onerror=null;this.src='{{ theme_asset('img/video-placeholder.svg') }}';">
+                                <div class="v-suggested-thumb flex-shrink-0 bg-dark">
+                                    <img src="{{ $sThumb }}" alt="{{ $sTitle }}" onError="this.onerror=null;this.src='{{ theme_asset('img/video-placeholder.svg') }}';">
                                     <div class="position-absolute bottom-0 end-0 m-1">
-                                        <span class="badge bg-dark bg-opacity-75 text-white fs-9 px-1 py-0 rounded">
+                                        <span class="badge bg-dark bg-opacity-80 text-white px-1 py-0 rounded" style="font-size: 10px; font-weight: 700;">
                                             {{ $sIsClip ? 'CLIP' : 'HD' }}
                                         </span>
                                     </div>
                                 </div>
 
                                 <!-- Metadata -->
-                                <div class="suggested-meta min-w-0 flex-grow-1">
-                                    <h5 class="h6 mb-1 fs-7 fw-bold text-light-emphasis line-clamp-2 suggested-title" style="line-height: 1.3;">
+                                <div class="v-suggested-meta min-w-0">
+                                    <h5 class="v-suggested-title suggested-title">
                                         {{ $sTitle }}
                                     </h5>
                                     @if($sUser)
-                                        <div class="fs-8 text-muted text-truncate mb-1">
+                                        <div class="v-suggested-author">
                                             {{ $sUser->username }}
                                             @if($sUser->verified)
-                                                <i class="fa-solid fa-circle-check text-primary fs-9"></i>
+                                                <i class="fa-solid fa-circle-check text-primary" style="font-size: 10px;"></i>
                                             @endif
                                         </div>
                                     @endif
-                                    <div class="fs-8 text-muted d-flex align-items-center gap-1">
-                                        <span>{{ number_format($sViews) }} {{ __('messages.views') ?? 'views' }}</span>
+                                    <div class="v-suggested-stats">
+                                        <span>{{ __('messages.video_views_count', ['count' => number_format($sViews)]) }}</span>
                                         <span>•</span>
                                         <span>{{ $sTimeAgo }}</span>
                                     </div>
@@ -466,7 +468,7 @@
         <div class="modal-content rounded-4 border bg-surface shadow-lg">
             <div class="modal-header border-0 pb-0">
                 <h5 class="modal-title fw-bold">
-                    <i class="fa-solid fa-share-nodes text-primary me-2"></i> {{ __('messages.share_video') ?? 'Share Video' }}
+                    <i class="fa-solid fa-share-nodes text-primary me-2"></i> {{ __('messages.share_video') }}
                 </h5>
                 <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -488,7 +490,7 @@
                 </div>
 
                 <!-- Copy Link Input Group -->
-                <label class="form-label fs-7 fw-bold text-muted">{{ __('messages.copy_video_link') ?? 'Copy Link' }}</label>
+                <label class="form-label fs-7 fw-bold text-muted">{{ __('messages.copy_video_link') }}</label>
                 <div class="input-group mb-3 rounded-pill overflow-hidden border">
                     <input type="text" id="shareUrlInput" class="form-control bg-surface border-0 fs-7 shadow-none" readonly value="{{ url()->current() }}">
                     <button class="btn btn-primary px-3 fw-bold" type="button" onclick="copyShareUrl()">
@@ -497,7 +499,7 @@
                 </div>
 
                 <!-- Embed Code Box -->
-                <label class="form-label fs-7 fw-bold text-muted">{{ __('messages.embed_video') ?? 'Embed Code' }}</label>
+                <label class="form-label fs-7 fw-bold text-muted">{{ __('messages.embed_video') }}</label>
                 <textarea class="form-control bg-surface border rounded-3 fs-8 font-monospace shadow-none" rows="2" readonly>&lt;iframe src="{{ route('video.watch', $status->id) }}" width="560" height="315" frameborder="0" allowfullscreen&gt;&lt;/iframe&gt;</textarea>
             </div>
         </div>
@@ -505,10 +507,23 @@
 </div>
 
 <style>
-/* ULTRA-MODERN VIDEO WATCH PAGE DESIGN SYSTEM */
+/* SCOPED VIDEO DESIGN SYSTEM WITH BULLETPROOF OVERRIDES */
 .video-hub-watch-wrapper {
     max-width: 1480px;
     margin: 0 auto;
+}
+
+/* OVERRIDE VIKINGER FULL-WIDTH BUTTON DEFAULTS */
+.video-watch-page button,
+.video-watch-page .btn,
+.video-watch-page .v-btn-pill,
+.video-watch-page .v-subscribe-btn,
+.video-watch-page .v-ctrl-btn,
+.video-watch-page .v-btn-icon-circle {
+    width: auto !important;
+    display: inline-flex !important;
+    flex: 0 0 auto !important;
+    margin: 0 !important;
 }
 
 /* THEATER MODE */
@@ -638,25 +653,25 @@
 
 /* BUTTONS IN CONTROLS */
 .v-ctrl-btn {
-    background: transparent;
-    border: none;
-    color: #fff;
-    width: 34px;
-    height: 34px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-    cursor: pointer;
-    transition: transform 0.15s ease, background 0.15s ease;
+    background: transparent !important;
+    border: none !important;
+    color: #fff !important;
+    width: 34px !important;
+    height: 34px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 50% !important;
+    cursor: pointer !important;
+    transition: transform 0.15s ease, background 0.15s ease !important;
 }
 .v-ctrl-btn:hover {
-    background: rgba(255, 255, 255, 0.15);
-    transform: scale(1.1);
+    background: rgba(255, 255, 255, 0.15) !important;
+    transform: scale(1.1) !important;
 }
 .v-ctrl-btn.subtle {
-    font-size: 13px;
-    color: rgba(255, 255, 255, 0.8);
+    font-size: 13px !important;
+    color: rgba(255, 255, 255, 0.8) !important;
 }
 .v-volume-slider {
     -webkit-appearance: none;
@@ -722,25 +737,290 @@
     display: flex !important;
 }
 .v-pip-btn {
-    width: 32px; height: 32px;
-    border-radius: 50%;
-    background: rgba(0, 0, 0, 0.7);
-    color: #fff;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer;
-    font-size: 12px;
+    width: 32px !important; height: 32px !important;
+    border-radius: 50% !important;
+    background: rgba(0, 0, 0, 0.7) !important;
+    color: #fff !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    display: flex !important; align-items: center !important; justify-content: center !important;
+    cursor: pointer !important;
+    font-size: 12px !important;
 }
 
-/* SUGGESTED ROW HOVER */
-.suggested-video-row:hover {
-    background: rgba(99, 102, 241, 0.08);
+/* AUTHOR TOOLBAR & BUTTONS (PERFECT ROW ALIGNMENT) */
+.v-author-toolbar {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    flex-wrap: wrap !important;
+    gap: 16px !important;
+    padding: 14px 18px !important;
+    border-radius: 18px !important;
+    background: var(--notification-ui-card-bg, #fff) !important;
+    border: 1px solid var(--notification-ui-card-border, #e5e7eb) !important;
 }
-.suggested-video-row:hover .suggested-title {
-    color: #6366f1 !important;
+.v-author-toolbar button,
+.v-author-toolbar form {
+    width: auto !important;
+    margin: 0 !important;
 }
-.suggested-video-row:hover img {
-    transform: scale(1.05);
+.v-author-identity {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    flex: 0 0 auto !important;
+}
+.v-subscribe-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+    height: 36px !important;
+    padding: 0 18px !important;
+    border-radius: 9999px !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    background: #615dfa !important;
+    color: #fff !important;
+    border: none !important;
+    box-shadow: 0 3px 12px rgba(97, 93, 250, 0.35) !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    width: auto !important;
+    margin: 0 !important;
+}
+.v-subscribe-btn.following {
+    background: rgba(0, 0, 0, 0.08) !important;
+    color: inherit !important;
+    box-shadow: none !important;
+}
+[data-theme="css_d"] .v-subscribe-btn.following {
+    background: rgba(255, 255, 255, 0.12) !important;
+    color: #fff !important;
+}
+.v-action-buttons-group {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    flex-wrap: wrap !important;
+}
+.v-action-buttons-group > *,
+.v-action-buttons-group button,
+.v-action-buttons-group .dropdown,
+.v-action-buttons-group form {
+    width: auto !important;
+    margin: 0 !important;
+}
+.v-btn-pill {
+    width: auto !important;
+    margin: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    padding: 8px 16px !important;
+    height: 38px !important;
+    border-radius: 9999px !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    background: rgba(0, 0, 0, 0.04) !important;
+    color: inherit !important;
+    border: 1px solid rgba(0, 0, 0, 0.08) !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+    white-space: nowrap !important;
+    text-decoration: none !important;
+}
+[data-theme="css_d"] .v-btn-pill {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border-color: rgba(255, 255, 255, 0.12) !important;
+    color: #f1f5f9 !important;
+}
+.v-btn-pill:hover {
+    background: rgba(97, 93, 250, 0.15) !important;
+    border-color: rgba(97, 93, 250, 0.4) !important;
+    color: #615dfa !important;
+    transform: translateY(-1px) !important;
+}
+.v-btn-icon-circle {
+    width: 38px !important;
+    height: 38px !important;
+    padding: 0 !important;
+    border-radius: 50% !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: rgba(0, 0, 0, 0.04) !important;
+    border: 1px solid rgba(0, 0, 0, 0.08) !important;
+    color: inherit !important;
+    cursor: pointer !important;
+    transition: all 0.2s ease !important;
+}
+[data-theme="css_d"] .v-btn-icon-circle {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border-color: rgba(255, 255, 255, 0.12) !important;
+    color: #f1f5f9 !important;
+}
+.v-btn-icon-circle:hover {
+    background: rgba(97, 93, 250, 0.15) !important;
+    border-color: rgba(97, 93, 250, 0.4) !important;
+    color: #615dfa !important;
+}
+
+/* CUSTOM AUTOPLAY SWITCH */
+.v-autoplay-wrap {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+}
+.v-autoplay-text {
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    color: #888 !important;
+    white-space: nowrap !important;
+}
+.v-custom-switch {
+    width: 44px !important;
+    height: 24px !important;
+    background: #cbd5e1 !important;
+    border-radius: 9999px !important;
+    padding: 2px !important;
+    cursor: pointer !important;
+    border: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    transition: background 0.25s ease !important;
+    position: relative !important;
+}
+.v-custom-switch.active {
+    background: #615dfa !important;
+}
+.v-custom-switch-knob {
+    width: 20px !important;
+    height: 20px !important;
+    background: #fff !important;
+    border-radius: 50% !important;
+    display: block !important;
+    transition: transform 0.25s ease !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3) !important;
+}
+.v-custom-switch.active .v-custom-switch-knob {
+    transform: translateX(20px) !important;
+}
+html[dir="rtl"] .v-custom-switch.active .v-custom-switch-knob {
+    transform: translateX(-20px) !important;
+}
+
+/* COMMENT SECTION */
+.v-comment-input-card {
+    display: flex !important;
+    gap: 14px !important;
+    align-items: flex-start !important;
+}
+.v-comment-textarea {
+    width: 100% !important;
+    border-radius: 14px !important;
+    padding: 14px 16px !important;
+    font-size: 14px !important;
+    background: var(--notification-ui-card-bg, #fff) !important;
+    border: 1px solid var(--notification-ui-card-border, #e5e7eb) !important;
+    color: inherit !important;
+    min-height: 80px !important;
+    resize: vertical !important;
+    outline: none !important;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+}
+.v-comment-textarea:focus {
+    border-color: #615dfa !important;
+    box-shadow: 0 0 0 3px rgba(97, 93, 250, 0.15) !important;
+}
+.v-comment-submit-btn {
+    width: auto !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    height: 38px !important;
+    padding: 0 22px !important;
+    border-radius: 9999px !important;
+    background: linear-gradient(135deg, #615dfa 0%, #4b45e4 100%) !important;
+    color: #fff !important;
+    font-weight: 700 !important;
+    font-size: 13px !important;
+    box-shadow: 0 4px 14px rgba(97, 93, 250, 0.3) !important;
+    cursor: pointer !important;
+    border: none !important;
+    transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+}
+.v-comment-submit-btn:hover {
+    transform: translateY(-1px) !important;
+    box-shadow: 0 6px 18px rgba(97, 93, 250, 0.45) !important;
+}
+
+/* SUGGESTED VIDEOS SIDEBAR */
+.v-suggested-card {
+    display: flex !important;
+    gap: 12px !important;
+    align-items: flex-start !important;
+    padding: 8px !important;
+    border-radius: 12px !important;
+    text-decoration: none !important;
+    color: inherit !important;
+    transition: background 0.2s ease !important;
+}
+.v-suggested-card:hover {
+    background: rgba(97, 93, 250, 0.08) !important;
+}
+.v-suggested-thumb {
+    width: 140px !important;
+    height: 79px !important;
+    border-radius: 10px !important;
+    overflow: hidden !important;
+    position: relative !important;
+    flex-shrink: 0 !important;
+    background: #000 !important;
+}
+.v-suggested-thumb img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    transition: transform 0.25s ease !important;
+}
+.v-suggested-card:hover .v-suggested-thumb img {
+    transform: scale(1.06) !important;
+}
+.v-suggested-meta {
+    flex: 1 1 auto !important;
+    min-width: 0 !important;
+}
+.v-suggested-title {
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    line-height: 1.35 !important;
+    margin-bottom: 4px !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+    color: inherit !important;
+}
+.v-suggested-card:hover .v-suggested-title {
+    color: #615dfa !important;
+}
+.v-suggested-author {
+    font-size: 12px !important;
+    color: #888 !important;
+    margin-bottom: 2px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+.v-suggested-stats {
+    font-size: 11px !important;
+    color: #999 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 4px !important;
 }
 
 /* REACTIONS PALETTE */
@@ -751,14 +1031,19 @@
     gap: 4px;
 }
 .v-reaction-bubble {
-    width: 34px; height: 34px;
-    transition: transform 0.15s ease;
+    width: 34px !important; height: 34px !important;
+    border-radius: 50% !important;
+    background: transparent !important;
+    border: none !important;
+    display: flex !important; align-items: center !important; justify-content: center !important;
+    cursor: pointer !important;
+    font-size: 18px !important;
+    transition: transform 0.15s ease !important;
 }
 .v-reaction-bubble:hover {
-    transform: scale(1.3);
+    transform: scale(1.3) !important;
 }
 
-.fs-9 { font-size: 10px; }
 .fs-8 { font-size: 12px; }
 .fs-7 { font-size: 13px; }
 </style>
@@ -886,8 +1171,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Autoplay next when ended
         video.addEventListener('ended', function() {
-            const toggle = document.getElementById('autoplayToggle');
-            if (toggle && toggle.checked) {
+            const sw = document.getElementById('autoplayCustomSwitch');
+            if (sw && sw.classList.contains('active')) {
                 const nextRow = document.querySelector('.suggested-video-row');
                 if (nextRow && nextRow.href) {
                     window.location.href = nextRow.href;
@@ -918,11 +1203,16 @@ function toggleDescExpand() {
     if (!descContent || !btnToggle) return;
     if (descContent.style.maxHeight === 'none') {
         descContent.style.maxHeight = '100px';
-        btnToggle.textContent = '{{ __('messages.show_more') ?? 'Show more' }}';
+        btnToggle.textContent = '{{ __('messages.show_more') }}';
     } else {
         descContent.style.maxHeight = 'none';
-        btnToggle.textContent = '{{ __('messages.show_less') ?? 'Show less' }}';
+        btnToggle.textContent = '{{ __('messages.show_less') }}';
     }
+}
+
+// CUSTOM AUTOPLAY TOGGLE
+function toggleCustomAutoplay(btn) {
+    btn.classList.toggle('active');
 }
 
 // REACTIONS
@@ -945,7 +1235,7 @@ function submitVideoReaction(topicId, reaction, statusId) {
         const countEl = document.getElementById('reactionsCount_' + statusId);
         const iconEl = document.getElementById('likeIcon_' + statusId);
         if (iconEl) iconEl.classList.add('text-danger');
-        if (countEl && data.count) countEl.textContent = data.count;
+        if (countEl && data.count !== undefined) countEl.textContent = data.count;
     }).catch(() => {});
 }
 
@@ -962,7 +1252,7 @@ function copyShareUrl() {
     if (input) {
         input.select();
         navigator.clipboard.writeText(input.value);
-        showToast('{{ __('messages.link_copied') ?? 'Link copied!' }}');
+        showToast('{{ __('messages.link_copied') }}');
     }
 }
 function shareSocial(network) {
@@ -1016,7 +1306,7 @@ function submitVideoComment(e) {
             const tempDiv = document.createElement('div');
             tempDiv.className = 'video-comment-item d-flex gap-3 py-3 border-bottom animate__animated animate__fadeIn';
             tempDiv.innerHTML = `
-                <div class="user-avatar small no-outline flex-shrink-0" style="width: 34px; height: 38px;">
+                <div class="user-avatar small no-outline flex-shrink-0" style="width: 36px; height: 40px;">
                     <div class="user-avatar-content">
                         <div class="hexagon-image-30-32" data-src="{{ auth()->check() && auth()->user()->img ? url(auth()->user()->img) : theme_asset('img/avatar.jpg') }}"></div>
                     </div>
@@ -1024,7 +1314,7 @@ function submitVideoComment(e) {
                 <div class="flex-grow-1 min-w-0">
                     <div class="d-flex align-items-center gap-2 mb-1">
                         <span class="fw-bold fs-7">{{ auth()->check() ? auth()->user()->username : 'Me' }}</span>
-                        <span class="text-muted fs-8">{{ __('messages.just_now') ?? 'Just now' }}</span>
+                        <span class="text-muted fs-8">{{ __('messages.just_now') }}</span>
                     </div>
                     <div class="comment-text fs-7 text-light-emphasis">${text.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</div>
                 </div>

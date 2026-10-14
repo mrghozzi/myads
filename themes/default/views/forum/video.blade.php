@@ -652,6 +652,19 @@
 }
 
 /* ACTION BUTTONS */
+.v-action-buttons-wrap {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    flex-wrap: wrap !important;
+}
+.v-action-buttons-wrap > *,
+.v-action-buttons-wrap button,
+.v-flyout-wrap,
+.v-action-btn {
+    width: auto !important;
+    margin: 0 !important;
+}
 .v-action-btn {
     background: var(--button-background-color, #f0f2f5) !important;
     border: 1px solid var(--border-color, #e0e6ed) !important;
