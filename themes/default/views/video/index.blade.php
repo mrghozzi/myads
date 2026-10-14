@@ -536,6 +536,74 @@
     color: #6366f1 !important;
 }
 
+/* ZERO-DEPENDENCY STANDALONE DROPDOWN STYLING */
+.dropdown {
+    position: relative !important;
+}
+.dropdown:has(.dropdown-menu.show),
+.dropdown.show {
+    z-index: 1060 !important;
+}
+.dropdown-menu {
+    position: absolute !important;
+    top: 100% !important;
+    inset-inline-end: 0 !important;
+    inset-inline-start: auto !important;
+    z-index: 1050 !important;
+    display: none;
+    min-width: 190px !important;
+    margin-top: 6px !important;
+    background: var(--notification-ui-card-bg, #ffffff) !important;
+    border: 1px solid var(--notification-ui-card-border, #e2e8f0) !important;
+    border-radius: 14px !important;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18) !important;
+    padding: 6px 0 !important;
+}
+.dropdown-menu.show {
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+}
+.dropdown-item {
+    display: flex !important;
+    align-items: center !important;
+    width: 100% !important;
+    padding: 9px 16px !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    color: inherit !important;
+    background: transparent !important;
+    border: none !important;
+    text-decoration: none !important;
+    cursor: pointer !important;
+    transition: background 0.15s ease, color 0.15s ease !important;
+}
+.dropdown-item:hover, .dropdown-item:focus {
+    background: rgba(99, 102, 241, 0.1) !important;
+    color: #6366f1 !important;
+}
+.dropdown-item.active {
+    background: rgba(99, 102, 241, 0.15) !important;
+    color: #6366f1 !important;
+}
+[data-theme="css_d"] .dropdown-menu {
+    background: #1c2233 !important;
+    border-color: rgba(255, 255, 255, 0.12) !important;
+    color: #f1f5f9 !important;
+}
+[data-theme="css_d"] .dropdown-item {
+    color: #cbd5e1 !important;
+}
+[data-theme="css_d"] .dropdown-item:hover {
+    background: rgba(255, 255, 255, 0.08) !important;
+    color: #fff !important;
+}
+[data-theme="css_d"] .dropdown-item.active {
+    background: rgba(99, 102, 241, 0.25) !important;
+    color: #818cf8 !important;
+}
+
 .yt-shorts-shelf-card {
     background: linear-gradient(135deg, rgba(239, 68, 68, 0.05) 0%, rgba(239, 68, 68, 0.02) 100%), var(--notification-ui-card-bg);
     border: 1px solid rgba(239, 68, 68, 0.2) !important;
@@ -719,8 +787,123 @@ function initVideoHoverPreviews() {
     });
 }
 
+// ZERO-DEPENDENCY DROPDOWNS ENGINE
+function closeAllDropdowns() {
+    document.querySelectorAll('.dropdown-menu.show').forEach(m => {
+        m.classList.remove('show');
+        const trigger = m.closest('.dropdown')?.querySelector('[data-bs-toggle="dropdown"], [data-toggle="dropdown"], .dropdown-toggle');
+        if (trigger) trigger.setAttribute('aria-expanded', 'false');
+    });
+}
+
+function initDropdownToggles() {
+    document.addEventListener('click', function(e) {
+        const toggleBtn = e.target.closest('[data-bs-toggle="dropdown"], [data-toggle="dropdown"], .dropdown-toggle');
+        if (toggleBtn) {
+            e.preventDefault();
+            e.stopPropagation();
+            const dropdown = toggleBtn.closest('.dropdown');
+            if (!dropdown) return;
+            const menu = dropdown.querySelector('.dropdown-menu');
+            if (!menu) return;
+            
+            const isCurrentlyShown = menu.classList.contains('show');
+            closeAllDropdowns();
+            
+            if (!isCurrentlyShown) {
+                menu.classList.add('show');
+                toggleBtn.setAttribute('aria-expanded', 'true');
+            }
+            return;
+        }
+
+        const item = e.target.closest('.dropdown-item');
+        if (item) {
+            closeAllDropdowns();
+            return;
+        }
+
+        if (!e.target.closest('.dropdown-menu')) {
+            closeAllDropdowns();
+        }
+    });
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeAllDropdowns();
+        }
+    });
+}
+
+// MODERN STANDALONE TOAST NOTIFICATION
+function showToast(msg) {
+    let toast = document.getElementById('vToastNotification');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'vToastNotification';
+        toast.style.cssText = `
+            position: fixed;
+            bottom: 24px;
+            inset-inline-start: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: rgba(15, 23, 42, 0.94);
+            color: #ffffff;
+            padding: 10px 22px;
+            border-radius: 9999px;
+            font-size: 14px;
+            font-weight: 600;
+            z-index: 100000;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            backdrop-filter: blur(8px);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        `;
+        document.body.appendChild(toast);
+    }
+    toast.innerHTML = `<i class="fa-solid fa-circle-check" style="color: #10b981;"></i> <span>${msg}</span>`;
+    toast.style.opacity = '1';
+    toast.style.transform = 'translateX(-50%) translateY(0)';
+    
+    if (window._vToastTimer) clearTimeout(window._vToastTimer);
+    window._vToastTimer = setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(-50%) translateY(20px)';
+    }, 2800);
+}
+
+// SAVE TO WATCH LATER / FAVORITES
+function toggleSaveVideo(statusId, btn) {
+    fetch("{{ route('clips.save.toggle') }}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-TOKEN": "{{ csrf_token() }}"
+        },
+        body: JSON.stringify({ status_id: statusId })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            const icon = btn.querySelector('i');
+            if (data.action === 'added') {
+                if (icon) icon.className = 'fa-solid fa-bookmark text-warning';
+                showToast("{{ __('messages.video_saved_toast') ?? __('messages.saved_video') }}");
+            } else {
+                if (icon) icon.className = 'fa-regular fa-bookmark';
+                showToast("{{ __('messages.video_unsaved_toast') ?? __('messages.save_video') }}");
+            }
+        }
+    })
+    .catch(() => {});
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     initVideoHoverPreviews();
+    initDropdownToggles();
 });
 </script>
 @endsection

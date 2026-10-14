@@ -463,14 +463,14 @@
 </div>
 
 <!-- MODERN SHARE MODAL -->
-<div class="modal fade" id="videoShareModal" tabindex="-1" aria-hidden="true">
+<div class="modal fade" id="videoShareModal" tabindex="-1" aria-hidden="true" style="display: none;">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content rounded-4 border bg-surface shadow-lg">
-            <div class="modal-header border-0 pb-0">
-                <h5 class="modal-title fw-bold">
+            <div class="modal-header border-0 pb-0 d-flex align-items-center justify-content-between">
+                <h5 class="modal-title fw-bold mb-0">
                     <i class="fa-solid fa-share-nodes text-primary me-2"></i> {{ __('messages.share_video') }}
                 </h5>
-                <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close shadow-none" onclick="closeShareModal()" aria-label="Close"></button>
             </div>
             <div class="modal-body p-4">
                 <!-- Social Sharing Buttons Grid -->
@@ -867,6 +867,139 @@
     color: #615dfa !important;
 }
 
+/* UNIVERSAL STANDALONE DROPDOWN STYLING */
+.dropdown {
+    position: relative !important;
+}
+.dropdown:has(.dropdown-menu.show),
+.dropdown.show {
+    z-index: 1060 !important;
+}
+.dropdown-menu {
+    position: absolute !important;
+    top: 100% !important;
+    inset-inline-end: 0 !important;
+    inset-inline-start: auto !important;
+    z-index: 1050 !important;
+    display: none;
+    min-width: 180px !important;
+    margin-top: 6px !important;
+    background: var(--notification-ui-card-bg, #ffffff) !important;
+    border: 1px solid var(--notification-ui-card-border, #e2e8f0) !important;
+    border-radius: 14px !important;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18) !important;
+    padding: 6px 0 !important;
+}
+.dropdown-menu.show {
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+}
+.dropdown-item {
+    display: flex !important;
+    align-items: center !important;
+    width: 100% !important;
+    padding: 9px 16px !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    color: inherit !important;
+    background: transparent !important;
+    border: none !important;
+    text-decoration: none !important;
+    cursor: pointer !important;
+    transition: background 0.15s ease, color 0.15s ease !important;
+}
+.dropdown-item:hover, .dropdown-item:focus {
+    background: rgba(97, 93, 250, 0.1) !important;
+    color: #615dfa !important;
+}
+[data-theme="css_d"] .dropdown-menu {
+    background: #1c2233 !important;
+    border-color: rgba(255, 255, 255, 0.12) !important;
+    color: #f1f5f9 !important;
+}
+[data-theme="css_d"] .dropdown-item {
+    color: #cbd5e1 !important;
+}
+[data-theme="css_d"] .dropdown-item:hover {
+    background: rgba(255, 255, 255, 0.08) !important;
+    color: #fff !important;
+}
+
+/* STANDALONE MODAL ENGINE */
+.modal {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    outline: 0 !important;
+    z-index: 99999 !important;
+    display: none;
+}
+.modal.fade {
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+}
+.modal.show {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    opacity: 1 !important;
+}
+.modal-backdrop {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    background-color: rgba(0, 0, 0, 0.65) !important;
+    backdrop-filter: blur(6px) !important;
+    z-index: 99990 !important;
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+}
+.modal-backdrop.show {
+    opacity: 1 !important;
+}
+.modal-dialog {
+    max-width: 520px !important;
+    width: 90% !important;
+    margin: 1.75rem auto !important;
+    z-index: 99999 !important;
+    position: relative !important;
+}
+.modal-content {
+    background: var(--notification-ui-card-bg, #ffffff) !important;
+    border: 1px solid var(--notification-ui-card-border, #e2e8f0) !important;
+}
+[data-theme="css_d"] .modal-content {
+    background: #1a202c !important;
+    border-color: rgba(255, 255, 255, 0.12) !important;
+    color: #f1f5f9 !important;
+}
+.btn-close {
+    background: transparent !important;
+    border: 0 !important;
+    cursor: pointer !important;
+    font-size: 1.25rem !important;
+    line-height: 1 !important;
+    padding: 0.5rem !important;
+    color: inherit !important;
+    opacity: 0.7 !important;
+}
+.btn-close:hover {
+    opacity: 1 !important;
+}
+.btn-close::before {
+    content: "✕";
+    font-family: inherit;
+    font-weight: bold;
+}
+
 /* CUSTOM AUTOPLAY SWITCH */
 .v-autoplay-wrap {
     display: flex !important;
@@ -1239,14 +1372,45 @@ function submitVideoReaction(topicId, reaction, statusId) {
     }).catch(() => {});
 }
 
-// SHARE MODAL
+// SHARE MODAL (ZERO-DEPENDENCY ENGINE)
 function openShareModal() {
-    const modalEl = document.getElementById('videoShareModal');
-    if (modalEl) {
-        const modal = new bootstrap.Modal(modalEl);
-        modal.show();
+    const modal = document.getElementById('videoShareModal');
+    if (!modal) return;
+    
+    let backdrop = document.getElementById('videoModalBackdrop');
+    if (!backdrop) {
+        backdrop = document.createElement('div');
+        backdrop.id = 'videoModalBackdrop';
+        backdrop.className = 'modal-backdrop fade';
+        document.body.appendChild(backdrop);
+        backdrop.addEventListener('click', closeShareModal);
     }
+    
+    document.body.classList.add('modal-open');
+    modal.style.display = 'flex';
+    void modal.offsetWidth; // Force reflow
+    modal.classList.add('show');
+    backdrop.classList.add('show');
 }
+
+function closeShareModal() {
+    const modal = document.getElementById('videoShareModal');
+    const backdrop = document.getElementById('videoModalBackdrop');
+    if (modal) {
+        modal.classList.remove('show');
+        setTimeout(() => {
+            modal.style.display = 'none';
+        }, 200);
+    }
+    if (backdrop) {
+        backdrop.classList.remove('show');
+        setTimeout(() => {
+            backdrop.remove();
+        }, 200);
+    }
+    document.body.classList.remove('modal-open');
+}
+
 function copyShareUrl() {
     const input = document.getElementById('shareUrlInput');
     if (input) {
@@ -1255,6 +1419,7 @@ function copyShareUrl() {
         showToast('{{ __('messages.link_copied') }}');
     }
 }
+
 function shareSocial(network) {
     const url = encodeURIComponent(window.location.href);
     const title = encodeURIComponent(document.title);
@@ -1264,6 +1429,92 @@ function shareSocial(network) {
     if (network === 'facebook') shareLink = 'https://www.facebook.com/sharer/sharer.php?u=' + url;
     if (network === 'telegram') shareLink = 'https://t.me/share/url?url=' + url + '&text=' + title;
     if (shareLink) window.open(shareLink, '_blank', 'width=600,height=400');
+}
+
+// SAVE TO WATCH LATER / FAVORITES
+function toggleSaveVideo(statusId, btn) {
+    fetch("{{ route('clips.save.toggle') }}", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-TOKEN": "{{ csrf_token() }}"
+        },
+        body: JSON.stringify({ status_id: statusId })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            const icon = btn.querySelector('i');
+            const label = btn.querySelector('.btn-save-text');
+            if (data.action === 'added') {
+                if (icon) icon.className = 'fa-solid fa-bookmark text-warning';
+                if (label) label.textContent = "{{ __('messages.saved_video') }}";
+                showToast("{{ __('messages.video_saved_toast') ?? __('messages.saved_video') }}");
+            } else {
+                if (icon) icon.className = 'fa-regular fa-bookmark';
+                if (label) label.textContent = "{{ __('messages.save_video') }}";
+                showToast("{{ __('messages.video_unsaved_toast') ?? __('messages.save_video') }}");
+            }
+        }
+    })
+    .catch(() => {});
+}
+
+// ZERO-DEPENDENCY DROPDOWNS ENGINE
+function closeAllDropdowns() {
+    document.querySelectorAll('.dropdown-menu.show').forEach(m => {
+        m.classList.remove('show');
+        const trigger = m.closest('.dropdown')?.querySelector('[data-bs-toggle="dropdown"], [data-toggle="dropdown"], .dropdown-toggle');
+        if (trigger) trigger.setAttribute('aria-expanded', 'false');
+    });
+}
+
+function initDropdownToggles() {
+    document.addEventListener('click', function(e) {
+        const toggleBtn = e.target.closest('[data-bs-toggle="dropdown"], [data-toggle="dropdown"], .dropdown-toggle');
+        if (toggleBtn) {
+            e.preventDefault();
+            e.stopPropagation();
+            const dropdown = toggleBtn.closest('.dropdown');
+            if (!dropdown) return;
+            const menu = dropdown.querySelector('.dropdown-menu');
+            if (!menu) return;
+            
+            const isCurrentlyShown = menu.classList.contains('show');
+            closeAllDropdowns();
+            
+            if (!isCurrentlyShown) {
+                menu.classList.add('show');
+                toggleBtn.setAttribute('aria-expanded', 'true');
+            }
+            return;
+        }
+
+        const item = e.target.closest('.dropdown-item');
+        if (item) {
+            closeAllDropdowns();
+            return;
+        }
+
+        if (!e.target.closest('.dropdown-menu')) {
+            closeAllDropdowns();
+        }
+    });
+
+    // Close on Escape or click on modal backdrop
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            closeShareModal();
+            closeAllDropdowns();
+        }
+    });
+
+    document.addEventListener('click', function(e) {
+        const modal = document.getElementById('videoShareModal');
+        if (modal && modal.classList.contains('show') && e.target === modal) {
+            closeShareModal();
+        }
+    });
 }
 
 // COMMENTS AJAX SUBMIT
@@ -1326,12 +1577,49 @@ function submitVideoComment(e) {
     });
 }
 
+// MODERN STANDALONE TOAST NOTIFICATION
 function showToast(msg) {
-    if (typeof window.showToast === 'function') {
-        window.showToast(msg);
-    } else {
-        alert(msg);
+    let toast = document.getElementById('vToastNotification');
+    if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'vToastNotification';
+        toast.style.cssText = `
+            position: fixed;
+            bottom: 24px;
+            inset-inline-start: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: rgba(15, 23, 42, 0.94);
+            color: #ffffff;
+            padding: 10px 22px;
+            border-radius: 9999px;
+            font-size: 14px;
+            font-weight: 600;
+            z-index: 100000;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            backdrop-filter: blur(8px);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        `;
+        document.body.appendChild(toast);
     }
+    toast.innerHTML = `<i class="fa-solid fa-circle-check" style="color: #10b981;"></i> <span>${msg}</span>`;
+    toast.style.opacity = '1';
+    toast.style.transform = 'translateX(-50%) translateY(0)';
+    
+    if (window._vToastTimer) clearTimeout(window._vToastTimer);
+    window._vToastTimer = setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(-50%) translateY(20px)';
+    }, 2800);
 }
+
+// INITIALIZE ON LOAD
+document.addEventListener('DOMContentLoaded', function() {
+    initDropdownToggles();
+});
 </script>
 @endsection
