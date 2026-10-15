@@ -139,6 +139,38 @@
                             >
                         </div>
                     </div>
+                <!-- Pricing & Features Row -->
+                <div class="superdesign-fields-row">
+                    <div class="superdesign-field-group">
+                        <label for="pricing_type" class="superdesign-field-label">
+                            <i class="fa fa-dollar-sign"></i>
+                            {{ __('messages.pricing') ?? 'نموذج التسعير' }}
+                        </label>
+                        <select id="pricing_type" name="pricing_type" class="superdesign-select">
+                            <option value="free" {{ old('pricing_type', $listing->pricing_type) == 'free' ? 'selected' : '' }}>{{ __('messages.pricing_free') ?? 'مجاني / Free' }}</option>
+                            <option value="freemium" {{ old('pricing_type', $listing->pricing_type) == 'freemium' ? 'selected' : '' }}>{{ __('messages.pricing_freemium') ?? 'فريميوم / Freemium' }}</option>
+                            <option value="paid" {{ old('pricing_type', $listing->pricing_type) == 'paid' ? 'selected' : '' }}>{{ __('messages.pricing_paid') ?? 'مدفوع / Paid' }}</option>
+                            <option value="open_source" {{ old('pricing_type', $listing->pricing_type) == 'open_source' ? 'selected' : '' }}>{{ __('messages.pricing_open_source') ?? 'مفتوح المصدر / Open Source' }}</option>
+                            <option value="free_trial" {{ old('pricing_type', $listing->pricing_type) == 'free_trial' ? 'selected' : '' }}>{{ __('messages.pricing_free_trial') ?? 'تجربة مجانية / Free Trial' }}</option>
+                        </select>
+                    </div>
+
+                    <div class="superdesign-field-group">
+                        <label for="features" class="superdesign-field-label">
+                            <i class="fa fa-list-check"></i>
+                            {{ __('messages.key_features') ?? 'أبرز مميزات الموقع (مفصولة بفواصل)' }}
+                        </label>
+                        <div class="superdesign-input-wrapper">
+                            <input 
+                                type="text" 
+                                id="features" 
+                                name="features" 
+                                class="superdesign-input" 
+                                value="{{ old('features', $listing->features) }}" 
+                                placeholder="دعم الذكاء الاصطناعي, واجهة سريعة, مجاني للاستخدام..."
+                            >
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Action Buttons Bar -->

@@ -41,7 +41,8 @@
         </div>
 
         <div class="grid-column">
-            <div class="widget-box directory-feed-shell">
+            {{-- Modern Directory Discovery Control Center --}}
+            <div class="widget-box directory-feed-shell directory-discovery-shell">
                 <div class="widget-box-content">
                     <div class="directory-feed-header">
                         <div class="directory-feed-copy">
@@ -67,8 +68,81 @@
                             </div>
                         </div>
                     </div>
+
+                    {{-- Live Search Input --}}
+                    <div class="directory-discovery-search-wrap">
+                        <div class="directory-search-input-box">
+                            <i class="fa fa-search directory-search-icon"></i>
+                            <input type="text" 
+                                   id="directory-search-input" 
+                                   class="directory-search-input" 
+                                   placeholder="{{ __('messages.directory_search_placeholder') ?? 'ابحث في دليل المواقع والخدمات...' }}" 
+                                   value="{{ $filters['search'] ?? '' }}"
+                                   autocomplete="off">
+                            <button type="button" class="directory-search-clear" id="directory-search-clear" style="{{ empty($filters['search']) ? 'display: none;' : '' }}">
+                                <i class="fa fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    {{-- Sort Tabs (Product Hunt style) --}}
+                    <div class="directory-filter-bar-group">
+                        <div class="directory-nav-tabs">
+                            <button type="button" class="directory-tab-btn {{ ($filters['sort'] ?? 'latest') === 'trending' ? 'active' : '' }}" data-sort="trending">
+                                <i class="fa fa-fire text-warning"></i> {{ __('messages.trending') ?? 'الرائج' }}
+                            </button>
+                            <button type="button" class="directory-tab-btn {{ ($filters['sort'] ?? 'latest') === 'latest' ? 'active' : '' }}" data-sort="latest">
+                                <i class="fa fa-clock-o"></i> {{ __('messages.latest') ?? 'الأحدث' }}
+                            </button>
+                            <button type="button" class="directory-tab-btn {{ ($filters['sort'] ?? 'latest') === 'popular' ? 'active' : '' }}" data-sort="popular">
+                                <i class="fa fa-star text-gold"></i> {{ __('messages.most_visited') ?? 'الأكثر زيارة' }}
+                            </button>
+                            <button type="button" class="directory-tab-btn {{ ($filters['sort'] ?? 'latest') === 'featured' ? 'active' : '' }}" data-sort="featured">
+                                <i class="fa fa-gem text-primary"></i> {{ __('messages.featured') ?? 'المميزة' }}
+                            </button>
+                        </div>
+
+                        {{-- Pricing Chips --}}
+                        <div class="directory-pricing-filter-bar">
+                            <button type="button" class="directory-filter-chip {{ empty($filters['pricing']) || $filters['pricing'] === 'all' ? 'active' : '' }}" data-pricing="">
+                                {{ __('messages.all') ?? 'الكل' }}
+                            </button>
+                            <button type="button" class="directory-filter-chip {{ ($filters['pricing'] ?? '') === 'free' ? 'active' : '' }}" data-pricing="free">
+                                {{ __('messages.pricing_free') ?? 'مجاني' }}
+                            </button>
+                            <button type="button" class="directory-filter-chip {{ ($filters['pricing'] ?? '') === 'freemium' ? 'active' : '' }}" data-pricing="freemium">
+                                {{ __('messages.pricing_freemium') ?? 'فريميوم' }}
+                            </button>
+                            <button type="button" class="directory-filter-chip {{ ($filters['pricing'] ?? '') === 'paid' ? 'active' : '' }}" data-pricing="paid">
+                                {{ __('messages.pricing_paid') ?? 'مدفوع' }}
+                            </button>
+                            <button type="button" class="directory-filter-chip {{ ($filters['pricing'] ?? '') === 'open_source' ? 'active' : '' }}" data-pricing="open_source">
+                                {{ __('messages.pricing_open_source') ?? 'مفتوح المصدر' }}
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
+
+            {{-- Featured Sites Showcase Carousel / Banner --}}
+            @if(isset($featuredSites) && $featuredSites->isNotEmpty() && empty($filters['search']))
+                <div class="widget-box directory-featured-strip">
+                    <p class="widget-box-title"><i class="fa fa-trophy text-warning"></i> {{ __('messages.featured_sites_of_week') ?? 'أبرز المواقع المتصدرة هذا الأسبوع' }}</p>
+                    <div class="widget-box-content directory-featured-strip-content">
+                        @foreach($featuredSites as $featuredSite)
+                            <a href="{{ route('directory.show', $featuredSite->id) }}" class="directory-featured-mini-card">
+                                <div class="directory-featured-mini-media">
+                                    <img src="{{ $featuredSite->prominent_image ?: theme_asset('img/dir_image.png') }}" alt="{{ $featuredSite->name }}">
+                                </div>
+                                <div class="directory-featured-mini-info">
+                                    <h4 class="directory-featured-mini-title">{{ $featuredSite->name }}</h4>
+                                    <span class="directory-featured-mini-badge">▲ {{ $featuredSite->upvotes_count }}</span>
+                                </div>
+                            </a>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
 
             <div id="infinite-scroll-container" class="directory-feed-list">
                 <div id="timeline-content" class="directory-feed-items">

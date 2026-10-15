@@ -48,6 +48,18 @@
                         <i class="fa fa-clock-o" aria-hidden="true"></i>&nbsp;{{ $card['published_diff'] }}
                     </p>
                 </div>
+
+                {{-- Upvote Button in Header / Corner --}}
+                <div class="directory-listing-head-actions">
+                    <button type="button" 
+                            class="directory-upvote-btn {{ $card['has_upvoted'] ? 'is-upvoted' : '' }}" 
+                            data-directory-upvote="{{ $listing->id }}"
+                            @guest onclick="window.location='{{ route('login') }}'" @endguest
+                            aria-label="{{ __('messages.upvote') ?? 'تصويت' }}">
+                        <span class="directory-upvote-arrow">▲</span>
+                        <span class="directory-upvote-count" data-count="{{ $card['upvotes_count'] }}">{{ $card['upvotes_count'] }}</span>
+                    </button>
+                </div>
             </div>
 
             <div class="directory-listing-layout">
@@ -59,7 +71,19 @@
                 </a>
 
                 <div class="directory-listing-content">
-                    <p class="directory-listing-domain">{{ $card['display_domain'] }}</p>
+                    <div class="directory-listing-meta-row">
+                        <p class="directory-listing-domain">
+                            {{ $card['display_domain'] }}
+                            @if($card['is_verified'])
+                                <span class="directory-verified-badge" title="{{ __('messages.verified_site') ?? 'موقع موثق' }}"><i class="fa fa-check-circle"></i></span>
+                            @endif
+                            @if($card['is_featured'])
+                                <span class="directory-featured-badge" title="{{ __('messages.featured_site') ?? 'موقع مميز' }}"><i class="fa fa-star"></i></span>
+                            @endif
+                        </p>
+
+                        <span class="{{ $card['pricing_class'] }}">{{ $card['pricing_label'] }}</span>
+                    </div>
 
                     <h3 class="directory-listing-title">
                         <a href="{{ $card['detail_url'] }}">{{ $card['title'] }}</a>
@@ -83,6 +107,14 @@
                         <p class="directory-listing-excerpt" dir="auto">{{ $card['excerpt'] }}</p>
                     @endif
 
+                    @if(!empty($card['features']))
+                        <div class="directory-listing-features">
+                            @foreach(array_slice($card['features'], 0, 3) as $feature)
+                                <span class="directory-feature-pill"><i class="fa fa-check"></i> {{ $feature }}</span>
+                            @endforeach
+                        </div>
+                    @endif
+
                     <div class="directory-listing-cta">
                         <a class="button small secondary directory-visit-button" href="{{ $card['visit_url'] }}" target="_blank" rel="noopener">
                             <i class="fa fa-external-link" aria-hidden="true"></i>&nbsp;{{ __('messages.visit_site') }}
@@ -100,6 +132,7 @@
             </div>
 
             <div class="directory-listing-stats">
+                <span><i class="fa fa-arrow-up" aria-hidden="true"></i><strong class="upvote-stat-val">{{ $card['upvotes_count'] }}</strong> {{ __('messages.upvotes') ?? 'تصويت' }}</span>
                 <span><i class="fa fa-eye" aria-hidden="true"></i>{{ $card['views'] }}</span>
                 <span><i class="fa fa-bolt" aria-hidden="true"></i>{{ $card['reactions_count'] }} {{ __('messages.reactions') }}</span>
                 <span><i class="fa fa-comments" aria-hidden="true"></i>{{ $card['comments_count'] }} {{ __('messages.comments') }}</span>

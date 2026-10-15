@@ -1,3 +1,28 @@
+# v4.6.4
+> **Major Directory 2.0 Modernization Release** — Rebuilt the MYADS Web & Tools Directory (`/directory`, `/directory/site/*`, `/directory/c/*`) into a modern Product Hunt and AlternativeTo grade discovery platform. Introduced community upvoting, faceted pricing models (Free, Freemium, Paid, Open Source, Free Trial), real-time live search, SVG dynamic embed badges, automated site verification claims, rich JSON-LD Schema.org SEO structured data, and human-friendly slug URLs with 100% backward compatibility.
+
+### Complete Modernization of Directory System (`/directory`, `/directory/*`, `DirectoryController.php`, `DirectoryPresenter.php`)
+* **Community Upvoting Engine (Product Hunt Style)**:
+  * Created dedicated `directory_upvotes` schema and `DirectoryUpvote` model with fast indexed lookup (`directory_id`, `user_id`).
+  * Implemented atomic upvote/un-upvote toggling (`POST /directory/{id}/upvote`) with live AJAX feedback, counter micro-animations, and anti-spam throttling.
+  * Integrated gamification events (`directory_site_upvoted`) to reward member engagement.
+* **Faceted Pricing Models & Key Features Highlights**:
+  * Added `pricing_type` supporting `free`, `freemium`, `paid`, `open_source`, and `free_trial`.
+  * Added `features` JSON column to highlight key product capabilities as badge pills.
+  * Provided faceted quick filter chips across the directory index (`All`, `Free`, `Freemium`, `Paid`, `Open Source`).
+  * Added sorting algorithms: **Trending** (upvotes + activity recency), **Popular** (total upvotes), **Latest**, and **Featured**.
+* **Dynamic SVG Embed Badges (`/directory/{id}/badge`)**:
+  * Generated lightweight, cacheable, embeddable vector badges showing live upvote counts and "Featured on MYADS".
+  * Integrated one-click copyable HTML and Markdown snippets in the directory detail page.
+* **Site Ownership Claim & Verification Engine**:
+  * Created `directory_claims` schema and `DirectoryClaim` model.
+  * Added automated meta tag verification (`<meta name="myads-verification" content="...">`) enabling webmasters to claim ownership and obtain verified badges (`is_verified`).
+* **SEO Optimization & JSON-LD Structured Data**:
+  * Injected Google-compliant Schema.org `SoftwareApplication` JSON-LD structured data with offers, ratings, and category classification.
+  * Added human-friendly SEO slug URLs (`/directory/item/{slug}` and `/directory/c/{slug}`) alongside legacy routes.
+* **100% Comprehensive Automated Test Suite**:
+  * Added full automated coverage in `tests/Feature/DirectoryRedesignTest.php` covering upvoting, SVG badges, slug routing, filters, and claim verification (8 tests, 60 assertions, 100% pass rate).
+
 # v4.6.3
 > **Major Forum Architecture & Experience Release** — Rebuilt and modernized the MYADS Community Forum (`/forum`, `/f{id}`, `/t{id}`) with proprietary high-performance modern discussion architecture while maintaining 100% backward compatibility and data integrity across existing topics, categories, comments, and attachments. Integrated a multi-editor suite (MyAds Markdown with live preview, Quill.js, and SCEditor) across topic creation, editing, and comments.
 

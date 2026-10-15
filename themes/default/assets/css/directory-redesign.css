@@ -975,3 +975,517 @@
   }
 }
 
+/* ==========================================================================
+   Directory 2.0 Modern Discovery & Product Hunt Experience
+   ========================================================================== */
+
+/* Upvote Button (Product Hunt Style) */
+.directory-listing-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.directory-upvote-btn {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 52px;
+  min-height: 54px;
+  padding: 6px 10px;
+  border: 1.5px solid #e1e4ec;
+  border-radius: 12px;
+  background-color: #ffffff;
+  color: #3e3f5e;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
+}
+
+.directory-upvote-btn:hover {
+  border-color: #f97316;
+  background: linear-gradient(180deg, #fffaf5 0%, #fff 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 14px rgba(249, 115, 22, 0.16);
+}
+
+.directory-upvote-btn .directory-upvote-arrow {
+  font-size: 0.95rem;
+  line-height: 1;
+  color: #8f91ac;
+  transition: all 0.2s ease;
+}
+
+.directory-upvote-btn:hover .directory-upvote-arrow {
+  color: #f97316;
+  transform: translateY(-1px);
+}
+
+.directory-upvote-btn .directory-upvote-count {
+  font-size: 0.88rem;
+  font-weight: 700;
+  line-height: 1.2;
+  margin-top: 3px;
+  color: #232838;
+}
+
+.directory-upvote-btn.is-upvoted {
+  border-color: #f97316;
+  background: linear-gradient(135deg, #ff7a18 0%, #ea580c 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 16px rgba(234, 88, 12, 0.35);
+}
+
+.directory-upvote-btn.is-upvoted .directory-upvote-arrow,
+.directory-upvote-btn.is-upvoted .directory-upvote-count {
+  color: #ffffff;
+}
+
+.directory-upvote-btn-hero {
+  flex-direction: row;
+  min-height: 44px;
+  padding: 8px 18px;
+  gap: 8px;
+}
+
+.directory-upvote-btn-hero .directory-upvote-text {
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+/* Pricing Chips */
+.pricing-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  text-transform: uppercase;
+}
+
+.pricing-chip.is-free {
+  background-color: rgba(16, 185, 129, 0.12);
+  color: #059669;
+  border: 1px solid rgba(16, 185, 129, 0.28);
+}
+
+.pricing-chip.is-freemium {
+  background-color: rgba(99, 102, 241, 0.12);
+  color: #4f46e5;
+  border: 1px solid rgba(99, 102, 241, 0.28);
+}
+
+.pricing-chip.is-paid {
+  background-color: rgba(245, 158, 11, 0.12);
+  color: #d97706;
+  border: 1px solid rgba(245, 158, 11, 0.28);
+}
+
+.pricing-chip.is-opensource {
+  background-color: rgba(168, 85, 247, 0.12);
+  color: #9333ea;
+  border: 1px solid rgba(168, 85, 247, 0.28);
+}
+
+.pricing-chip.is-freetrial {
+  background-color: rgba(14, 165, 233, 0.12);
+  color: #0284c7;
+  border: 1px solid rgba(14, 165, 233, 0.28);
+}
+
+/* Meta row in card & detail */
+.directory-listing-meta-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.directory-detail-top-badges {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.directory-verified-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-inline-start: 6px;
+  color: #10b981;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.directory-featured-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-inline-start: 6px;
+  color: #f59e0b;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+/* Feature tags */
+.directory-listing-features {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.directory-feature-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  background-color: #f3f5f9;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  color: #4e5d78;
+}
+
+.directory-feature-pill i {
+  color: #10b981;
+  font-size: 0.72rem;
+}
+
+.directory-features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+  padding: 6px 0;
+}
+
+.directory-feature-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background-color: #fcfdff;
+  border: 1px solid #edf0f5;
+  border-radius: 10px;
+  font-weight: 600;
+  color: #3e3f5e;
+}
+
+/* Live Search & Filter Bar Group */
+.directory-discovery-shell {
+  margin-bottom: 20px;
+}
+
+.directory-discovery-search-wrap {
+  margin-top: 18px;
+}
+
+.directory-search-input-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.directory-search-icon {
+  position: absolute;
+  left: 18px;
+  color: #8f91ac;
+  font-size: 1rem;
+  pointer-events: none;
+}
+
+.rtl .directory-search-icon {
+  left: auto;
+  right: 18px;
+}
+
+.directory-search-input {
+  width: 100%;
+  height: 50px;
+  padding: 0 46px 0 48px;
+  border: 1.5px solid #e1e4ec;
+  border-radius: 12px;
+  background-color: #fcfdff;
+  color: #3e3f5e;
+  font-size: 0.95rem;
+  font-weight: 600;
+  transition: all 0.25s ease;
+}
+
+.rtl .directory-search-input {
+  padding: 0 48px 0 46px;
+}
+
+.directory-search-input:focus {
+  border-color: #615dfa;
+  background-color: #ffffff;
+  box-shadow: 0 0 0 4px rgba(97, 93, 250, 0.12);
+  outline: none;
+}
+
+.directory-search-clear {
+  position: absolute;
+  right: 14px;
+  background: none;
+  border: none;
+  color: #8f91ac;
+  cursor: pointer;
+  padding: 6px;
+  font-size: 0.9rem;
+}
+
+.rtl .directory-search-clear {
+  right: auto;
+  left: 14px;
+}
+
+/* Nav Tabs */
+.directory-filter-bar-group {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.directory-nav-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.directory-tab-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: 1px solid #e1e4ec;
+  border-radius: 10px;
+  background-color: #ffffff;
+  color: #555770;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.directory-tab-btn:hover {
+  background-color: #f7f8fb;
+  border-color: #cbcfdc;
+}
+
+.directory-tab-btn.active {
+  background: linear-gradient(135deg, #615dfa 0%, #4642dd 100%);
+  border-color: #615dfa;
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(97, 93, 250, 0.25);
+}
+
+.directory-tab-btn.active i {
+  color: #ffffff !important;
+}
+
+/* Pricing Filter Bar */
+.directory-pricing-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.directory-filter-chip {
+  padding: 5px 12px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background-color: #f0f2f7;
+  color: #61647a;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.directory-filter-chip:hover {
+  background-color: #e2e5ee;
+}
+
+.directory-filter-chip.active {
+  background-color: #3e3f5e;
+  color: #ffffff;
+}
+
+/* Featured Strip */
+.directory-featured-strip {
+  margin-bottom: 20px;
+}
+
+.directory-featured-strip-content {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 12px;
+}
+
+.directory-featured-mini-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border: 1px solid #edf0f5;
+  border-radius: 12px;
+  background-color: #ffffff;
+  text-decoration: none;
+  transition: all 0.25s ease;
+}
+
+.directory-featured-mini-card:hover {
+  border-color: #f59e0b;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(245, 158, 11, 0.12);
+}
+
+.directory-featured-mini-media img {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  object-fit: cover;
+  border: 1px solid #e1e4ec;
+}
+
+.directory-featured-mini-info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.directory-featured-mini-title {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #232838;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.directory-featured-mini-badge {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #ea580c;
+  margin-top: 2px;
+}
+
+/* Modals */
+.directory-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.directory-modal-backdrop {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(11, 15, 25, 0.7);
+  backdrop-filter: blur(4px);
+}
+
+.directory-modal-content {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 540px;
+  background-color: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+  animation: modalPop 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes modalPop {
+  0% { transform: scale(0.94); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.directory-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 24px;
+  border-bottom: 1px solid #edf0f5;
+}
+
+.directory-modal-header h3 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #232838;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.directory-modal-close-btn {
+  background: none;
+  border: none;
+  font-size: 1.4rem;
+  color: #8f91ac;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.directory-modal-body {
+  padding: 24px;
+}
+
+.directory-badge-preview-box {
+  display: flex;
+  justify-content: center;
+  padding: 18px;
+  background-color: #f7f9fc;
+  border: 1px dashed #d6daf0;
+  border-radius: 12px;
+  margin-top: 14px;
+}
+
+.directory-code-copy-box {
+  position: relative;
+  display: flex;
+  margin-top: 8px;
+}
+
+.directory-code-textarea {
+  width: 100%;
+  height: 70px;
+  padding: 10px 14px;
+  border: 1.5px solid #e1e4ec;
+  border-radius: 10px;
+  font-family: monospace;
+  font-size: 0.8rem;
+  background-color: #fcfdff;
+  color: #3e3f5e;
+  resize: none;
+}
+
+.directory-copy-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+}
+
+.rtl .directory-copy-btn {
+  right: auto;
+  left: 8px;
+}
+
+

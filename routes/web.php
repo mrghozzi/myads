@@ -251,13 +251,22 @@ Route::get('/directory', [DirectoryController::class, 'index'])->name('directory
 Route::get('/directory/seo-checker', [\App\Http\Controllers\SeoCheckerController::class, 'index'])->name('seo_checker.index');
 Route::post('/directory/seo-checker', [\App\Http\Controllers\SeoCheckerController::class, 'analyze'])->name('seo_checker.analyze');
 
+// SEO Slug URLs
+Route::get('/directory/item/{slug}', [DirectoryController::class, 'showBySlug'])->name('directory.show.item_slug');
+Route::get('/directory/site/{id}-{slug?}', [DirectoryController::class, 'showBySlug'])->name('directory.show.slug');
+Route::get('/directory/c/{slug}', [DirectoryController::class, 'categoryBySlug'])->name('directory.category.slug');
+
 Route::get('/directory/{id}', [DirectoryController::class, 'show'])->name('directory.show');
 Route::get('/dr{id}', [DirectoryController::class, 'showShort'])->name('directory.show.short');
 Route::get('/site-{hash}', [DirectoryController::class, 'redirectShort'])->name('directory.redirect.short');
 Route::post('/directory/store', [DirectoryController::class, 'store'])->name('directory.store')->middleware(['auth', 'throttle:10,1']);
-    Route::get('/directory/{id}/edit', [DirectoryController::class, 'edit'])->name('directory.edit')->middleware('auth');
-    Route::put('/directory/{id}', [DirectoryController::class, 'update'])->name('directory.update')->middleware('auth');
-    Route::post('/directory/delete', [DirectoryController::class, 'destroy'])->name('directory.delete')->middleware('auth');
+Route::get('/directory/{id}/edit', [DirectoryController::class, 'edit'])->name('directory.edit')->middleware('auth');
+Route::put('/directory/{id}', [DirectoryController::class, 'update'])->name('directory.update')->middleware('auth');
+Route::post('/directory/delete', [DirectoryController::class, 'destroy'])->name('directory.delete')->middleware('auth');
+Route::post('/directory/{id}/upvote', [DirectoryController::class, 'upvote'])->name('directory.upvote')->middleware(['auth', 'throttle:30,1']);
+Route::get('/directory/{id}/badge', [DirectoryController::class, 'badge'])->name('directory.badge');
+Route::get('/directory/badge/{id}.svg', [DirectoryController::class, 'badge'])->name('directory.badge.svg');
+Route::post('/directory/{id}/claim', [DirectoryController::class, 'claim'])->name('directory.claim')->middleware('auth');
 Route::get('/directory/category/{id}', [DirectoryController::class, 'category'])->name('directory.category');
 Route::get('/cat/{id}', [DirectoryController::class, 'category'])->name('directory.category.legacy');
 Route::get('/add-site.html', [DirectoryController::class, 'create'])->name('directory.create');

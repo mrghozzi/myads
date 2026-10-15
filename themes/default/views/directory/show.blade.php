@@ -1,6 +1,31 @@
 @extends('theme::layouts.master')
 @include('theme::directory._assets')
 
+@push('head')
+{{-- Google Schema.org Structured Data --}}
+<script type="application/ld+json">
+{!! json_encode([
+    '@context' => 'https://schema.org',
+    '@type' => 'SoftwareApplication',
+    'name' => $detail['title'],
+    'url' => $listing->url,
+    'description' => $detail['excerpt'],
+    'applicationCategory' => $detail['category_name'],
+    'operatingSystem' => 'All',
+    'offers' => [
+        '@type' => 'Offer',
+        'price' => in_array($detail['pricing_type'], ['free', 'open_source']) ? '0' : '',
+        'priceCurrency' => 'USD',
+    ],
+    'aggregateRating' => [
+        '@type' => 'AggregateRating',
+        'ratingValue' => (string) min(5.0, max(4.0, 4.0 + ($detail['upvotes_count'] > 0 ? 0.9 : 0.0))),
+        'reviewCount' => (string) max(1, $detail['upvotes_count'] + $detail['reactions_count'] + $detail['comments_count']),
+    ],
+], JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) !!}
+</script>
+@endpush
+
 @section('content')
 <div class="directory-rdx directory-detail-page">
     <div class="section-banner directory-hub-banner directory-detail-banner">
@@ -38,6 +63,11 @@
 
                 <div class="widget-box-content">
                     <div class="directory-side-stat-list">
+                        <div class="directory-side-stat-item">
+                            <span>{{ __('messages.upvotes') ?? 'التصويتات' }}</span>
+                            <strong class="upvote-stat-val">{{ $detail['upvotes_count'] }}</strong>
+                        </div>
+
                         <div class="directory-side-stat-item">
                             <span>{{ __('messages.visits') }}</span>
                             <strong>{{ $detail['views'] }}</strong>
@@ -120,14 +150,42 @@
                     </div>
 
                     <a class="button secondary directory-sidebar-visit" href="{{ $detail['visit_url'] }}" target="_blank" rel="noopener">
-                        {{ __('messages.visit_site') }}
+                        <i class="fa fa-external-link"></i>&nbsp;{{ __('messages.visit_site') }}
                     </a>
+
+                    <div style="margin-top: 12px; display: flex; flex-direction: column; gap: 8px;">
+                        <button type="button" class="button white-outline" data-directory-modal-open="embed-badge-modal" style="width: 100%;">
+                            <i class="fa fa-code"></i>&nbsp;{{ __('messages.embed_badge') ?? 'شارة التضمين' }}
+                        </button>
+
+                        @if(!$detail['is_verified'])
+                            <button type="button" class="button white-outline" data-directory-modal-open="claim-modal" style="width: 100%;">
+                                <i class="fa fa-shield"></i>&nbsp;{{ __('messages.claim_listing') ?? 'توثيق الملكية' }}
+                            </button>
+                        @endif
+                    </div>
                 </div>
             </div>
         </div>
 
         <div class="grid-column">
             @include('theme::directory.partials.detail_hero', ['card' => $detail, 'activity' => $activity])
+
+            @if(!empty($detail['features']))
+                <div class="widget-box directory-features-section">
+                    <p class="widget-box-title">{{ __('messages.key_features') ?? 'أبرز مميزات الموقع' }}</p>
+                    <div class="widget-box-content">
+                        <div class="directory-features-grid">
+                            @foreach($detail['features'] as $feature)
+                                <div class="directory-feature-item">
+                                    <i class="fa fa-check-circle text-success"></i>
+                                    <span>{{ $feature }}</span>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+            @endif
 
             <div class="widget-box directory-detail-copy-card">
                 <p class="widget-box-title">{{ __('messages.desc') }}</p>
@@ -158,6 +216,17 @@
             <div class="widget-box no-padding directory-detail-interactions">
                 <div class="widget-box-content">
                     <div class="directory-listing-stats directory-listing-stats-detail">
+                        <div class="directory-detail-stat-tile is-upvotes">
+                            <span class="directory-detail-stat-tile-icon">
+                                <i class="fa fa-arrow-up" aria-hidden="true"></i>
+                            </span>
+
+                            <div class="directory-detail-stat-tile-copy">
+                                <strong class="directory-detail-stat-tile-value upvote-stat-val">{{ $detail['upvotes_count'] }}</strong>
+                                <span class="directory-detail-stat-tile-label">{{ __('messages.upvotes') ?? 'تصويت' }}</span>
+                            </div>
+                        </div>
+
                         <div class="directory-detail-stat-tile is-views">
                             <span class="directory-detail-stat-tile-icon">
                                 <i class="fa fa-eye" aria-hidden="true"></i>
@@ -221,6 +290,78 @@
 
         <div class="grid-column">
             <x-widget-column side="directory_right" />
+        </div>
+    </div>
+</div>
+
+{{-- Modal 1: Embed Badge Modal --}}
+<div class="directory-modal" id="embed-badge-modal" style="display: none;">
+    <div class="directory-modal-backdrop" data-directory-modal-close="embed-badge-modal"></div>
+    <div class="directory-modal-content">
+        <div class="directory-modal-header">
+            <h3><i class="fa fa-code"></i> {{ __('messages.embed_badge_title') ?? 'شارة التضمين لموقعك' }}</h3>
+            <button type="button" class="directory-modal-close-btn" data-directory-modal-close="embed-badge-modal">&times;</button>
+        </div>
+        <div class="directory-modal-body">
+            <p>{{ __('messages.embed_badge_desc') ?? 'ضع هذه الشارة في موقعك ليتمكن زوارك من رؤية تقييم وتصويت موقعك على دليل MYADS:' }}</p>
+            
+            <div class="directory-badge-preview-box">
+                <img src="{{ route('directory.badge', $listing->id) }}" alt="Featured on MYADS">
+            </div>
+
+            <label class="form-label font-bold" style="margin-top: 15px;">HTML Code:</label>
+            <div class="directory-code-copy-box">
+                <textarea readonly class="directory-code-textarea" id="html-badge-code">&lt;a href="{{ route('directory.show', $listing->id) }}" target="_blank" rel="noopener"&gt;&lt;img src="{{ route('directory.badge', $listing->id) }}" alt="Featured on MYADS Directory" /&gt;&lt;/a&gt;</textarea>
+                <button type="button" class="button small primary directory-copy-btn" data-copy-target="html-badge-code">
+                    <i class="fa fa-copy"></i> {{ __('messages.copy') ?? 'نسخ' }}
+                </button>
+            </div>
+
+            <label class="form-label font-bold" style="margin-top: 15px;">Markdown Code:</label>
+            <div class="directory-code-copy-box">
+                <textarea readonly class="directory-code-textarea" id="md-badge-code">[![Featured on MYADS Directory]({{ route('directory.badge', $listing->id) }})]({{ route('directory.show', $listing->id) }})</textarea>
+                <button type="button" class="button small secondary directory-copy-btn" data-copy-target="md-badge-code">
+                    <i class="fa fa-copy"></i> {{ __('messages.copy') ?? 'نسخ' }}
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{-- Modal 2: Claim Listing Modal --}}
+<div class="directory-modal" id="claim-modal" style="display: none;">
+    <div class="directory-modal-backdrop" data-directory-modal-close="claim-modal"></div>
+    <div class="directory-modal-content">
+        <div class="directory-modal-header">
+            <h3><i class="fa fa-shield"></i> {{ __('messages.claim_listing_title') ?? 'توثيق ملكية الموقع' }}</h3>
+            <button type="button" class="directory-modal-close-btn" data-directory-modal-close="claim-modal">&times;</button>
+        </div>
+        <div class="directory-modal-body">
+            @if(auth()->check())
+                <p>{{ __('messages.claim_listing_desc') ?? 'لإثبات أنك مالك أو مطور هذا الموقع، ضع وسم الميتا التالي في ترويسة (<head>) صفحة موقعك الرئيسية:' }}</p>
+                
+                @php
+                    $verificationToken = 'myads-verify-' . hash('crc32', $listing->id . '-' . auth()->id());
+                @endphp
+
+                <div class="directory-code-copy-box">
+                    <textarea readonly class="directory-code-textarea" id="meta-tag-code">&lt;meta name="myads-verification" content="{{ $verificationToken }}"&gt;</textarea>
+                    <button type="button" class="button small primary directory-copy-btn" data-copy-target="meta-tag-code">
+                        <i class="fa fa-copy"></i> {{ __('messages.copy') ?? 'نسخ' }}
+                    </button>
+                </div>
+
+                <div id="claim-status-message" style="margin-top: 15px; display: none;"></div>
+
+                <div style="margin-top: 20px; text-align: end;">
+                    <button type="button" class="button secondary" id="btn-verify-claim" data-listing-id="{{ $listing->id }}">
+                        <i class="fa fa-check-circle"></i> {{ __('messages.verify_now') ?? 'تحقق من الموقع الآن' }}
+                    </button>
+                </div>
+            @else
+                <p>{{ __('messages.login_to_claim') ?? 'يرجى تسجيل الدخول أولاً لتتمكن من توثيق ملكية هذا الموقع.' }}</p>
+                <a href="{{ route('login') }}" class="button primary" style="margin-top: 12px;">{{ __('messages.login') }}</a>
+            @endif
         </div>
     </div>
 </div>

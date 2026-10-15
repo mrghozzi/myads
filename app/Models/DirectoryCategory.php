@@ -14,6 +14,8 @@ class DirectoryCategory extends Model
 
     protected $fillable = [
         'name',
+        'slug',
+        'icon',
         'sub',
         'ordercat',
         'statu',

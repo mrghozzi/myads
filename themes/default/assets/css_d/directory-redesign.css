@@ -879,3 +879,105 @@
     left: 14px;
   }
 }
+
+/* Dark Mode Directory 2.0 */
+.directory-upvote-btn {
+  background-color: #1d2333;
+  border-color: #2f3749;
+  color: #fff;
+}
+
+.directory-upvote-btn:hover {
+  border-color: #f97316;
+  background: #252b3d;
+}
+
+.directory-upvote-btn .directory-upvote-count {
+  color: #fff;
+}
+
+.directory-feature-pill {
+  background-color: #21283b;
+  color: #9aa4bf;
+}
+
+.directory-feature-item {
+  background-color: #1d2333;
+  border-color: #2f3749;
+  color: #fff;
+}
+
+.directory-search-input {
+  background-color: #1d2333;
+  border-color: #2f3749;
+  color: #fff;
+}
+
+.directory-search-input:focus {
+  background-color: #21283b;
+  border-color: #7750f8;
+}
+
+.directory-tab-btn {
+  background-color: #1d2333;
+  border-color: #2f3749;
+  color: #9aa4bf;
+}
+
+.directory-tab-btn:hover {
+  background-color: #252b3d;
+  color: #fff;
+}
+
+.directory-filter-chip {
+  background-color: #21283b;
+  color: #9aa4bf;
+}
+
+.directory-filter-chip:hover {
+  background-color: #2a334a;
+  color: #fff;
+}
+
+.directory-filter-chip.active {
+  background-color: #7750f8;
+  color: #fff;
+}
+
+.directory-featured-mini-card {
+  background-color: #1d2333;
+  border-color: #2f3749;
+}
+
+.directory-featured-mini-title {
+  color: #fff;
+}
+
+.directory-featured-mini-media img {
+  border-color: #2f3749;
+}
+
+.directory-modal-content {
+  background-color: #1d2333;
+  border: 1px solid #2f3749;
+}
+
+.directory-modal-header {
+  border-bottom-color: #2f3749;
+}
+
+.directory-modal-header h3 {
+  color: #fff;
+}
+
+.directory-badge-preview-box {
+  background-color: #161b28;
+  border-color: #2f3749;
+}
+
+.directory-code-textarea {
+  background-color: #161b28;
+  border-color: #2f3749;
+  color: #9aa4bf;
+}
+

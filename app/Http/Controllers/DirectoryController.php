@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Directory;
 use App\Models\DirectoryCategory;
+use App\Models\DirectoryUpvote;
+use App\Models\DirectoryClaim;
 use App\Models\Like;
 use App\Models\Option;
 use App\Models\Short;
@@ -15,6 +17,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 
 class DirectoryController extends Controller
 {
@@ -23,8 +26,14 @@ class DirectoryController extends Controller
         $categoryBoard = $this->buildDirectoryBoard();
         $directoryStats = $this->buildDirectoryStats();
 
+        $filters = [
+            'search' => request('search'),
+            'pricing' => request('pricing'),
+            'sort' => request('sort', 'latest'),
+        ];
+
         try {
-            ['activities' => $activities, 'cards' => $cards] = $this->buildDirectoryFeed();
+            ['activities' => $activities, 'cards' => $cards] = $this->buildDirectoryFeed(null, $filters);
         } catch (\Throwable $e) {
             $activities = new LengthAwarePaginator([], 0, 15);
             $cards = collect();
@@ -34,8 +43,18 @@ class DirectoryController extends Controller
             return response()->json([
                 'html' => view('theme::directory.partials.feed_items', compact('cards'))->render(),
                 'next_page_url' => $activities->nextPageUrl(),
+                'total_count' => $activities->total(),
             ]);
         }
+
+        $featuredSites = Directory::where('statu', 1)
+            ->where(function ($q) {
+                $q->where('is_featured', 1)->orWhere('upvotes_count', '>', 0);
+            })
+            ->orderBy('is_featured', 'desc')
+            ->orderBy('upvotes_count', 'desc')
+            ->take(4)
+            ->get();
 
         $this->seo([
             'scope_key' => 'directory_index',
@@ -47,7 +66,7 @@ class DirectoryController extends Controller
             ],
         ]);
 
-        return view('theme::directory.index', compact('categoryBoard', 'directoryStats', 'activities', 'cards'));
+        return view('theme::directory.index', compact('categoryBoard', 'directoryStats', 'activities', 'cards', 'filters', 'featuredSites'));
     }
 
     public function category($id)
@@ -59,7 +78,13 @@ class DirectoryController extends Controller
                 ->orderBy('ordercat', 'asc')
                 ->get();
 
-            ['activities' => $activities, 'cards' => $cards] = $this->buildDirectoryFeed((int) $id);
+            $filters = [
+                'search' => request('search'),
+                'pricing' => request('pricing'),
+                'sort' => request('sort', 'latest'),
+            ];
+
+            ['activities' => $activities, 'cards' => $cards] = $this->buildDirectoryFeed((int) $id, $filters);
             $categorySummary = $this->buildCategorySummary($category, $subCategories);
             $categoryBoard = $this->buildDirectoryBoard();
         } catch (\Throwable $e) {
@@ -70,6 +95,7 @@ class DirectoryController extends Controller
             return response()->json([
                 'html' => view('theme::directory.partials.feed_items', compact('cards'))->render(),
                 'next_page_url' => $activities->nextPageUrl(),
+                'total_count' => $activities->total(),
             ]);
         }
 
@@ -88,7 +114,7 @@ class DirectoryController extends Controller
             ],
         ]);
 
-        return view('theme::directory.category', compact('category', 'subCategories', 'activities', 'cards', 'categorySummary', 'categoryBoard'));
+        return view('theme::directory.category', compact('category', 'subCategories', 'activities', 'cards', 'categorySummary', 'categoryBoard', 'filters'));
     }
 
     public function show($id)
@@ -110,10 +136,13 @@ class DirectoryController extends Controller
 
             $activity->related_content = $listing;
             $metrics = $this->buildListingMetrics(collect([$listing->id]));
+            $hasUpvoted = isset($metrics['upvotedIds'][$listing->id]);
+
             $detail = DirectoryPresenter::presentListing($listing, $activity, [
                 'reactions_count' => (int) $metrics['reactionCounts']->get($listing->id, 0),
                 'comments_count' => (int) $metrics['commentCounts']->get($listing->id, 0),
                 'current_reaction' => $metrics['currentReactions']->get($listing->id),
+                'has_upvoted' => $hasUpvoted,
                 'can_manage' => $this->canManageListing($listing),
             ]);
 
@@ -138,6 +167,197 @@ class DirectoryController extends Controller
         } catch (\Throwable $e) {
             abort(404);
         }
+    }
+
+    public function showBySlug($id, $slug = null)
+    {
+        if (is_numeric($id)) {
+            return $this->show($id);
+        }
+
+        $listing = Directory::where('slug', $id)->first();
+        if ($listing) {
+            return $this->show($listing->id);
+        }
+
+        $parts = explode('-', $id);
+        if (is_numeric($parts[0])) {
+            $listing = Directory::find($parts[0]);
+            if ($listing) {
+                return $this->show($listing->id);
+            }
+        }
+
+        abort(404);
+    }
+
+    public function categoryBySlug($id, $slug = null)
+    {
+        if (is_numeric($id)) {
+            return $this->category($id);
+        }
+
+        $cat = DirectoryCategory::where('slug', $id)->first();
+        if ($cat) {
+            return $this->category($cat->id);
+        }
+
+        $parts = explode('-', $id);
+        if (is_numeric($parts[0])) {
+            $cat = DirectoryCategory::find($parts[0]);
+            if ($cat) {
+                return $this->category($cat->id);
+            }
+        }
+
+        abort(404);
+    }
+
+    public function upvote($id)
+    {
+        if (!Auth::check()) {
+            return response()->json(['error' => 'Unauthenticated'], 401);
+        }
+
+        $listing = Directory::findOrFail($id);
+        $userId = (int) Auth::id();
+
+        $existing = DirectoryUpvote::where('directory_id', $listing->id)
+            ->where('user_id', $userId)
+            ->first();
+
+        if ($existing) {
+            $existing->delete();
+            $listing->decrement('upvotes_count');
+            $upvoted = false;
+        } else {
+            DirectoryUpvote::create([
+                'directory_id' => $listing->id,
+                'user_id' => $userId,
+                'created_at' => time(),
+            ]);
+            $listing->increment('upvotes_count');
+            $upvoted = true;
+
+            try {
+                app(\App\Services\GamificationService::class)->recordEvent($userId, 'directory_site_upvoted');
+            } catch (\Throwable $e) {
+                // Ignore gamification failures
+            }
+        }
+
+        $listing->refresh();
+
+        return response()->json([
+            'success' => true,
+            'upvoted' => $upvoted,
+            'upvotes_count' => max(0, (int) $listing->upvotes_count),
+        ]);
+    }
+
+    public function badge($id)
+    {
+        $listing = Directory::findOrFail($id);
+        $upvotes = (int) ($listing->upvotes_count ?? 0);
+        $badgeText = $upvotes > 0 ? ("▲ " . $upvotes . " UPVOTES") : "FEATURED";
+
+        $svg = '<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="220" height="34" viewBox="0 0 220 34" fill="none">
+  <defs>
+    <linearGradient id="bg_grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1f2937" />
+      <stop offset="100%" stop-color="#111827" />
+    </linearGradient>
+    <linearGradient id="accent_grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6366f1" />
+      <stop offset="100%" stop-color="#4f46e5" />
+    </linearGradient>
+  </defs>
+  <rect width="220" height="34" rx="8" fill="url(#bg_grad)" stroke="#374151" stroke-width="1"/>
+  <rect x="120" y="3" width="97" height="28" rx="6" fill="url(#accent_grad)"/>
+  <text x="14" y="21" font-family="-apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, sans-serif" font-size="11" font-weight="700" fill="#9ca3af" letter-spacing="0.5">MYADS</text>
+  <text x="64" y="21" font-family="-apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, sans-serif" font-size="11" font-weight="600" fill="#f3f4f6">DIR</text>
+  <text x="168" y="21" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, sans-serif" font-size="11" font-weight="700" fill="#ffffff" letter-spacing="0.3">' . htmlspecialchars($badgeText) . '</text>
+</svg>';
+
+        return response($svg, 200)
+            ->header('Content-Type', 'image/svg+xml')
+            ->header('Cache-Control', 'public, max-age=600');
+    }
+
+    public function claim(Request $request, $id)
+    {
+        if (!Auth::check()) {
+            return response()->json(['error' => 'Unauthenticated'], 401);
+        }
+
+        $listing = Directory::findOrFail($id);
+        $user = Auth::user();
+
+        if ((int) $listing->uid === (int) $user->id || (int) $listing->claimed_by === (int) $user->id) {
+            return response()->json([
+                'success' => true,
+                'verified' => true,
+                'message' => __('messages.already_owner_of_site') ?? 'أنت بالفعل مالك أو موثق هذا الموقع.',
+            ]);
+        }
+
+        $token = 'myads-verify-' . hash('crc32', $listing->id . '-' . $user->id);
+
+        $verified = false;
+        try {
+            $response = Http::timeout(5)->get($listing->url);
+            if ($response->successful()) {
+                $html = $response->body();
+                if (str_contains($html, $token) || str_contains($html, 'myads-verification')) {
+                    $verified = true;
+                }
+            }
+        } catch (\Throwable $e) {
+            // Http check failed or timed out
+        }
+
+        if ($verified) {
+            $listing->update([
+                'is_verified' => 1,
+                'claimed_by' => $user->id,
+            ]);
+
+            DirectoryClaim::create([
+                'directory_id' => $listing->id,
+                'user_id' => $user->id,
+                'verification_method' => 'meta_tag',
+                'verification_token' => $token,
+                'status' => 'approved',
+                'notes' => 'Auto-verified via meta tag',
+                'created_at' => time(),
+                'updated_at' => time(),
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'verified' => true,
+                'message' => __('messages.site_verified_success') ?? 'تم توثيق ملكيتك للموقع بنجاح!',
+            ]);
+        }
+
+        DirectoryClaim::updateOrCreate(
+            ['directory_id' => $listing->id, 'user_id' => $user->id],
+            [
+                'verification_method' => 'meta_tag',
+                'verification_token' => $token,
+                'status' => 'pending',
+                'created_at' => time(),
+            ]
+        );
+
+        return response()->json([
+            'success' => true,
+            'verified' => false,
+            'token' => $token,
+            'meta_tag' => '<meta name="myads-verification" content="' . $token . '">',
+            'message' => __('messages.site_verification_pending') ?? 'يرجى وضع كود الميتا في صفحة موقعك الرئيسية ثم إعادة المحاولة للتوثيق الفوري.',
+        ]);
     }
 
     public function showShort($id)
@@ -194,19 +414,30 @@ class DirectoryController extends Controller
             'categ' => 'required|integer',
             'txt' => 'nullable|string',
             'tag' => 'nullable|string',
+            'pricing_type' => 'nullable|string|in:free,freemium,paid,open_source,free_trial',
+            'features' => 'nullable|string',
         ]);
 
         try {
+            $slug = Str::slug($request->name) ?: ('site-' . time());
+            if (Directory::where('slug', $slug)->exists()) {
+                $slug .= '-' . Str::random(4);
+            }
+
             $listing = Directory::create([
                 'uid' => auth()->id(),
                 'name' => $request->name,
+                'slug' => $slug,
                 'url' => $request->url,
                 'cat' => $request->categ,
+                'pricing_type' => $request->pricing_type ?: 'free',
+                'features' => $request->features ?? '',
                 'txt' => $request->txt ?? '',
                 'metakeywords' => $request->tag ?? '',
                 'date' => time(),
                 'statu' => 1,
                 'vu' => 0,
+                'upvotes_count' => 0,
             ]);
 
             Status::create([
@@ -268,15 +499,25 @@ class DirectoryController extends Controller
             'categ' => 'required|integer',
             'txt' => 'nullable|string',
             'tag' => 'nullable|string',
+            'pricing_type' => 'nullable|string|in:free,freemium,paid,open_source,free_trial',
+            'features' => 'nullable|string',
         ]);
 
-        $listing->update([
+        $updateData = [
             'name' => $request->name,
             'url' => $request->url,
             'cat' => $request->categ,
             'txt' => $request->txt ?? '',
             'metakeywords' => $request->tag ?? '',
-        ]);
+            'pricing_type' => $request->pricing_type ?: 'free',
+            'features' => $request->features ?? '',
+        ];
+
+        if (empty($listing->slug)) {
+            $updateData['slug'] = Str::slug($request->name) ?: ('site-' . $listing->id);
+        }
+
+        $listing->update($updateData);
 
         $hash = hash('crc32', $listing->url . $listing->id);
         Short::updateOrCreate(
@@ -314,26 +555,74 @@ class DirectoryController extends Controller
                 ->whereIn('o_type', ['d_coment', 'data_reaction'])
                 ->delete();
 
+            DirectoryUpvote::where('directory_id', $id)->delete();
+            DirectoryClaim::where('directory_id', $id)->delete();
+
             $listing->delete();
         });
 
         return response()->json(['success' => true]);
     }
 
-    private function buildDirectoryFeed(?int $categoryId = null): array
+    private function buildDirectoryFeed(?int $categoryId = null, array $filters = []): array
     {
         $query = Status::visible()
             ->with('user')
             ->where('s_type', 1)
-            ->where('date', '<', time())
-            ->orderBy('date', 'desc');
+            ->where('date', '<', time());
 
-        if ($categoryId !== null) {
-            $directoryIds = Directory::where('cat', $categoryId)
-                ->where('statu', 1)
-                ->pluck('id');
+        $hasFilters = $categoryId !== null || !empty($filters['search']) || !empty($filters['pricing']);
+        $sort = $filters['sort'] ?? 'latest';
 
+        if ($hasFilters || in_array($sort, ['trending', 'popular', 'featured'])) {
+            $dirQuery = Directory::where('statu', 1);
+
+            if ($categoryId !== null) {
+                $subCategoryIds = DirectoryCategory::where('sub', $categoryId)->where('statu', 1)->pluck('id');
+                $allCategoryIds = collect([$categoryId])->merge($subCategoryIds)->all();
+                $dirQuery->whereIn('cat', $allCategoryIds);
+            }
+
+            if (!empty($filters['search'])) {
+                $search = trim((string) $filters['search']);
+                $dirQuery->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                      ->orWhere('txt', 'like', "%{$search}%")
+                      ->orWhere('metakeywords', 'like', "%{$search}%")
+                      ->orWhere('url', 'like', "%{$search}%");
+                });
+            }
+
+            if (!empty($filters['pricing']) && in_array($filters['pricing'], ['free', 'freemium', 'paid', 'open_source', 'free_trial'])) {
+                $dirQuery->where('pricing_type', $filters['pricing']);
+            }
+
+            if ($sort === 'trending') {
+                $dirQuery->orderBy('upvotes_count', 'desc')->orderBy('date', 'desc');
+            } elseif ($sort === 'popular') {
+                $dirQuery->orderBy('vu', 'desc')->orderBy('date', 'desc');
+            } elseif ($sort === 'featured') {
+                $dirQuery->orderBy('is_featured', 'desc')->orderBy('upvotes_count', 'desc')->orderBy('date', 'desc');
+            } else {
+                $dirQuery->orderBy('date', 'desc');
+            }
+
+            $directoryIds = $dirQuery->pluck('id');
             $query->whereIn('tp_id', $directoryIds->all());
+
+            if (in_array($sort, ['trending', 'popular', 'featured']) && $directoryIds->isNotEmpty()) {
+                $orderCases = [];
+                $bindings = [];
+                foreach ($directoryIds->values() as $index => $id) {
+                    $orderCases[] = "WHEN ? THEN {$index}";
+                    $bindings[] = $id;
+                }
+                $query->orderByRaw("CASE tp_id " . implode(' ', $orderCases) . " ELSE 999999 END", $bindings);
+            } else {
+                $query->orderBy('date', 'desc');
+            }
+        } else {
+            $query->orderBy('date', 'desc');
         }
 
         $activities = $query->paginate(15);
@@ -343,10 +632,12 @@ class DirectoryController extends Controller
         $cards = collect();
 
         foreach ($activities as $activity) {
+            $hasUpvoted = isset($metrics['upvotedIds'][$activity->tp_id]);
             $cards->push(DirectoryPresenter::presentFeedItem($activity, [
                 'reactions_count' => (int) $metrics['reactionCounts']->get($activity->tp_id, 0),
                 'comments_count' => (int) $metrics['commentCounts']->get($activity->tp_id, 0),
                 'current_reaction' => $metrics['currentReactions']->get($activity->tp_id),
+                'has_upvoted' => $hasUpvoted,
                 'can_manage' => $this->canManageListing($activity->related_content),
             ]));
         }
@@ -387,6 +678,7 @@ class DirectoryController extends Controller
                 'reactionCounts' => collect(),
                 'commentCounts' => collect(),
                 'currentReactions' => collect(),
+                'upvotedIds' => collect(),
             ];
         }
 
@@ -405,6 +697,7 @@ class DirectoryController extends Controller
             ->pluck('aggregate', 'o_parent');
 
         $currentReactions = collect();
+        $upvotedIds = collect();
 
         if (Auth::check()) {
             $likes = Like::query()
@@ -421,12 +714,18 @@ class DirectoryController extends Controller
             $currentReactions = $likes->mapWithKeys(static function ($like) use ($reactionOptions) {
                 return [$like->sid => $reactionOptions->get($like->id, 'like')];
             });
+
+            $upvotedIds = DirectoryUpvote::where('user_id', Auth::id())
+                ->whereIn('directory_id', $listingIds)
+                ->pluck('directory_id')
+                ->flip();
         }
 
         return [
             'reactionCounts' => $reactionCounts,
             'commentCounts' => $commentCounts,
             'currentReactions' => $currentReactions,
+            'upvotedIds' => $upvotedIds,
         ];
     }
 
@@ -554,7 +853,6 @@ class DirectoryController extends Controller
 
         if ($newUrl !== $listing->prominent_image_url) {
             $listing->update(['prominent_image_url' => $newUrl]);
-            // Also update cache to stay in sync if accessor used it
             cache()->put('directory_image_' . $listing->id, $newUrl, 86400);
         }
 
