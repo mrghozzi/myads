@@ -85,6 +85,11 @@
   align-items: start;
 }
 
+.directory-hub-grid > .grid-column {
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
 .directory-side-card {
   overflow: hidden;
 }
@@ -287,27 +292,96 @@
 .directory-feed-items {
   display: grid;
   gap: 16px;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  width: 100% !important;
 }
 
 .directory-listing-card {
-  overflow: hidden;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+  position: relative !important;
   border: 1px solid #edf0f7;
+  border-radius: 12px;
+  background-color: #ffffff;
   box-shadow: 0 18px 38px rgba(94, 92, 154, 0.08);
+  transition: box-shadow 0.25s ease;
 }
 
 .directory-listing-card:hover {
   box-shadow: 0 26px 44px rgba(94, 92, 154, 0.14);
 }
 
+.directory-listing-card .widget-box-status,
 .directory-listing-card .widget-box-status-content {
-  padding: 28px 28px 0;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+}
+
+.directory-listing-card .widget-box-status-content {
+  padding: 24px 24px 0 !important;
 }
 
 .directory-listing-head {
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  align-items: flex-start;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  position: relative !important;
+}
+
+.directory-listing-head .user-status {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  padding: 2px 0 0 52px !important;
+  padding-right: 0 !important;
+  position: relative !important;
+}
+
+.directory-listing-head .user-status .user-status-avatar {
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: auto !important;
+}
+
+.directory-listing-head .user-status .user-status-title {
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.directory-listing-head .user-status .user-status-text {
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+html[dir="rtl"] .directory-listing-head .user-status,
+.rtl .directory-listing-head .user-status {
+  padding: 2px 52px 0 0 !important;
+  padding-left: 0 !important;
+  text-align: right !important;
+}
+
+html[dir="rtl"] .directory-listing-head .user-status .user-status-avatar,
+.rtl .directory-listing-head .user-status .user-status-avatar {
+  left: auto !important;
+  right: 0 !important;
+}
+
+.directory-listing-head-actions {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  flex: 0 0 auto !important;
+  position: relative !important;
 }
 
 .directory-visit-button,
@@ -318,8 +392,8 @@
 .directory-listing-cta {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 18px;
+  gap: 10px;
+  margin-top: 14px;
 }
 
 .directory-visit-button {
@@ -328,7 +402,7 @@
   justify-content: center;
   align-self: flex-start;
   gap: 8px;
-  min-height: 44px;
+  min-height: 42px;
   padding: 0 20px;
   color: #ffffff;
   border: 1px solid rgba(0, 168, 191, 0.18);
@@ -345,18 +419,25 @@
 }
 
 .directory-listing-layout {
-  display: grid;
-  grid-template-columns: 112px minmax(0, 1fr);
-  gap: 18px;
-  margin-top: 18px;
+  display: grid !important;
+  grid-template-columns: 112px minmax(0, 1fr) !important;
+  gap: 16px !important;
+  margin-top: 16px !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
 }
 
 .directory-listing-media {
-  display: block;
-  border-radius: 20px;
-  overflow: hidden;
-  background: #eef1fb;
-  border: 1px solid #edf0f7;
+  display: block !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  height: 112px !important;
+  border-radius: 18px !important;
+  overflow: hidden !important;
+  background: #eef1fb !important;
+  border: 1px solid #edf0f7 !important;
+  flex-shrink: 0 !important;
 }
 
 .directory-listing-media img,
@@ -368,9 +449,10 @@
 }
 
 .directory-listing-content {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
+  display: flex !important;
+  flex-direction: column !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
 }
 
 .directory-listing-domain {
@@ -466,35 +548,83 @@
 }
 
 .directory-listing-stats {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 18px;
-  margin-top: 20px;
-  padding-top: 18px;
-  border-top: 1px solid #edf0f7;
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 10px 16px !important;
+  margin-top: 16px !important;
+  padding-top: 14px !important;
+  border-top: 1px solid #edf0f7 !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
 }
 
 .directory-listing-stats > span {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  color: #7f85a3;
-  font-size: 0.8125rem;
-  font-weight: 700;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  color: #7f85a3 !important;
+  font-size: 0.78rem !important;
+  font-weight: 700 !important;
+  white-space: nowrap !important;
 }
 
 .directory-post-options {
-  margin-top: 22px;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 4px !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+  height: 52px !important;
+  padding: 0 14px !important;
+  margin-top: 16px !important;
+  border-top: 1px solid #eaeaf5 !important;
+  background-color: #fcfcfd !important;
+  border-bottom-left-radius: 12px !important;
+  border-bottom-right-radius: 12px !important;
+}
+
+.directory-post-options .post-option,
+.directory-post-options .reaction-options-dropdown-trigger {
+  width: auto !important;
+  min-width: 0 !important;
+  flex: 1 1 0 !important;
+  height: 38px !important;
+  padding: 0 6px !important;
+  gap: 6px !important;
+  border-radius: 8px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  box-sizing: border-box !important;
+}
+
+.directory-post-options .post-option .post-option-text {
+  font-size: 0.78rem !important;
+  font-weight: 700 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.directory-post-options .post-option .post-option-icon {
+  width: 18px !important;
+  height: 18px !important;
+  flex-shrink: 0 !important;
 }
 
 .directory-post-option-link {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px;
-  width: 100%;
-  height: 100%;
-  color: inherit;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  width: 100% !important;
+  height: 100% !important;
+  color: inherit !important;
+  text-decoration: none !important;
 }
 
 .directory-post-option-link:hover {
@@ -775,6 +905,16 @@
   }
 }
 
+@media screen and (max-width: 1150px) {
+  .directory-listing-layout {
+    grid-template-columns: 1fr !important;
+  }
+  .directory-listing-media {
+    max-width: 180px !important;
+    height: 120px !important;
+  }
+}
+
 @media screen and (max-width: 960px) {
   .directory-hub-banner {
     min-height: 170px;
@@ -869,6 +1009,19 @@
     grid-template-columns: 1fr;
   }
 
+  .directory-listing-media {
+    max-width: 100% !important;
+    height: 160px !important;
+  }
+
+  .directory-post-options {
+    padding: 0 8px !important;
+  }
+
+  .directory-post-options .post-option {
+    padding: 0 4px !important;
+  }
+
   .rtl .directory-hub-banner .section-banner-title,
   .rtl .directory-hub-banner .section-banner-text {
     max-width: calc(100% - 78px);
@@ -877,6 +1030,15 @@
   .rtl .directory-hub-banner .section-banner-icon {
     right: auto;
     left: 14px;
+  }
+}
+
+@media screen and (max-width: 520px) {
+  .directory-post-options .post-option-text {
+    display: none !important;
+  }
+  .directory-post-options .post-option {
+    padding: 0 !important;
   }
 }
 
@@ -982,74 +1144,66 @@
 /* Upvote Button & Action Menu (Product Hunt Style) */
 .directory-listing-card,
 .directory-listing-card .widget-box-status,
-.directory-listing-card .widget-box-status-content {
+.directory-listing-card .widget-box-status-content,
+.directory-listing-head,
+.directory-listing-head-actions,
+.directory-card-actions-menu {
   overflow: visible !important;
 }
 
-.directory-listing-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  position: relative;
-}
-
-.directory-listing-head-actions {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-shrink: 0;
-}
-
 .directory-card-actions-menu {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
+  position: relative !important;
+  display: inline-flex !important;
+  align-items: center !important;
 }
 
 .directory-card-actions-menu .post-settings-wrap {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
+  position: relative !important;
+  display: inline-flex !important;
+  align-items: center !important;
 }
 
 .directory-card-actions-menu .post-settings {
   display: inline-flex !important;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  cursor: pointer;
-  background-color: transparent;
-  transition: background-color 0.2s ease;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: 10px !important;
+  cursor: pointer !important;
+  background-color: transparent !important;
+  transition: background-color 0.2s ease !important;
 }
 
 .directory-card-actions-menu .post-settings:hover {
-  background-color: rgba(97, 93, 250, 0.08);
+  background-color: rgba(97, 93, 250, 0.08) !important;
 }
 
 .directory-card-actions-menu .post-settings-icon {
-  fill: #8f91ac;
-  width: 18px;
-  height: 18px;
-  transition: fill 0.2s ease;
+  fill: #8f91ac !important;
+  width: 18px !important;
+  height: 18px !important;
+  transition: fill 0.2s ease !important;
 }
 
 .directory-card-actions-menu .post-settings:hover .post-settings-icon {
-  fill: #615dfa;
+  fill: #615dfa !important;
 }
 
 .directory-card-actions-menu .directory-card-settings-dropdown {
+  position: absolute !important;
   top: 40px !important;
   right: 0 !important;
   left: auto !important;
-  min-width: 170px;
-  border-radius: 12px;
+  min-width: 170px !important;
+  border-radius: 12px !important;
   box-shadow: 0 14px 32px rgba(35, 40, 56, 0.16) !important;
-  border: 1px solid #edf0f5;
+  border: 1px solid #edf0f5 !important;
+  z-index: 1000 !important;
 }
 
-html[dir="rtl"] .directory-card-actions-menu .directory-card-settings-dropdown {
+html[dir="rtl"] .directory-card-actions-menu .directory-card-settings-dropdown,
+.rtl .directory-card-actions-menu .directory-card-settings-dropdown {
   right: auto !important;
   left: 0 !important;
 }
@@ -1057,19 +1211,21 @@ html[dir="rtl"] .directory-card-actions-menu .directory-card-settings-dropdown {
 .directory-upvote-btn {
   display: inline-flex !important;
   width: auto !important;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-width: 50px;
-  min-height: 52px;
-  padding: 6px 10px;
-  border: 1.5px solid #e1e4ec;
-  border-radius: 12px;
-  background-color: #ffffff;
-  color: #3e3f5e;
-  cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  user-select: none;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-width: 48px !important;
+  min-height: 50px !important;
+  padding: 4px 8px !important;
+  border: 1.5px solid #e1e4ec !important;
+  border-radius: 12px !important;
+  background-color: #ffffff !important;
+  color: #3e3f5e !important;
+  cursor: pointer !important;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  user-select: none !important;
+  box-sizing: border-box !important;
+  flex: 0 0 auto !important;
 }
 
 .directory-upvote-btn:hover {

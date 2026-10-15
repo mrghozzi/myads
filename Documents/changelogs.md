@@ -23,6 +23,12 @@
 * **Card Header Layout Alignment & RTL/LTR Dropdown Fix**:
   * Moved the 3-dots post settings action menu into the flex `directory-listing-head-actions` group alongside the upvote button, eliminating the LTR overlap where the 3-dots button previously sat on top of the upvote button.
   * Added contextual directional alignment (`left: 0` in RTL, `right: 0` in LTR) and ensured card container `overflow: visible`, eliminating the menu clipping issue in RTL mode.
+* **Listing Card Responsiveness & Strict Grid Column Containment**:
+  * Fixed an issue where `.directory-listing-card` became unresponsive and bled horizontally into the adjacent `.grid-column` (overlapping the widget area).
+  * Neutralized the hardcoded 160px width on `.post-option` items in `.directory-post-options`, implementing flexible proportional flex sizing (`flex: 1 1 0; min-width: 0`) across reaction, comment, share, and detail actions.
+  * Added strict grid item containment (`min-width: 0 !important; max-width: 100% !important;`) across `.directory-hub-grid > .grid-column`, `.directory-feed-list`, `.directory-feed-items`, `.directory-listing-card`, and `.widget-box-status-content`.
+  * Neutralized Vikinger's aggressive 70px right padding on `.user-status` inside widget status headers, properly establishing bidirectional padding (`padding-right: 52px; padding-left: 0` in RTL and `padding-left: 52px; padding-right: 0` in LTR) for user avatars.
+  * Introduced responsive breakpoints (`<= 1150px`, `<= 680px`, `<= 520px`) for `.directory-listing-layout` and `.directory-post-options`, ensuring seamless scaling across laptops, tablets, and mobile devices.
 * **Streamlined Discovery Shell Toolbar & Language Synchronization**:
   * Redesigned the bulky `directory-discovery-shell` into a compact, elegant discovery control bar with a clean stats topbar and 40px search bar, drastically reducing vertical footprint.
   * Neutralized theme-level button width overrides (`width: 100% !important; display: block !important;`) on tabs and pricing filter chips, allowing them to flow neatly as inline horizontal pills with mobile horizontal swipe support.
