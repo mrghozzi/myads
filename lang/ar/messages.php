@@ -5317,7 +5317,14 @@ return [
     'popular' => 'الأكثر تصويتاً',
     'latest' => 'الأحدث',
     'filter_all' => 'الكل',
+    'all' => 'الكل',
     'search_directory_placeholder' => 'ابحث عن مواقع وأدوات ومنتجات برمجية...',
+    'directory_search_placeholder' => 'ابحث عن مواقع وأدوات ومنتجات برمجية...',
+    'most_visited' => 'الأكثر زيارة',
+    'explore_directory' => 'استكشاف الدليل',
+    'sites' => 'مواقع',
+    'categories' => 'أقسام',
+    'filter_pricing' => 'التسعير',
 ];
 
 

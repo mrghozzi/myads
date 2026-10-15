@@ -881,18 +881,124 @@
 }
 
 /* Dark Mode Directory 2.0 */
+.directory-listing-card,
+.directory-listing-card .widget-box-status,
+.directory-listing-card .widget-box-status-content {
+  overflow: visible !important;
+}
+
+.directory-listing-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+}
+
+.directory-listing-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.directory-card-actions-menu {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.directory-card-actions-menu .post-settings-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.directory-card-actions-menu .post-settings {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  cursor: pointer;
+  background-color: transparent;
+  transition: background-color 0.2s ease;
+}
+
+.directory-card-actions-menu .post-settings:hover {
+  background-color: rgba(119, 80, 248, 0.14);
+}
+
+.directory-card-actions-menu .post-settings-icon {
+  fill: #8f91ac;
+  width: 18px;
+  height: 18px;
+  transition: fill 0.2s ease;
+}
+
+.directory-card-actions-menu .post-settings:hover .post-settings-icon {
+  fill: #7750f8;
+}
+
+.directory-card-actions-menu .directory-card-settings-dropdown {
+  top: 40px !important;
+  right: 0 !important;
+  left: auto !important;
+  min-width: 170px;
+  border-radius: 12px;
+  background-color: #1d2333 !important;
+  border: 1px solid #2f3749 !important;
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.4) !important;
+}
+
+html[dir="rtl"] .directory-card-actions-menu .directory-card-settings-dropdown {
+  right: auto !important;
+  left: 0 !important;
+}
+
 .directory-upvote-btn {
+  display: inline-flex !important;
+  width: auto !important;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 50px;
+  min-height: 52px;
+  padding: 6px 10px;
   background-color: #1d2333;
-  border-color: #2f3749;
+  border: 1.5px solid #2f3749;
+  border-radius: 12px;
   color: #fff;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  user-select: none;
 }
 
 .directory-upvote-btn:hover {
   border-color: #f97316;
   background: #252b3d;
+  transform: translateY(-2px);
 }
 
 .directory-upvote-btn .directory-upvote-count {
+  color: #fff;
+}
+
+.directory-discovery-shell .widget-box-content {
+  padding: 16px 20px 18px !important;
+}
+
+.directory-discovery-title {
+  color: #fff;
+}
+
+.directory-stat-pill {
+  background-color: #1d2333;
+  border: 1px solid #2f3749;
+  color: #9aa4bf;
+}
+
+.directory-stat-pill strong {
   color: #fff;
 }
 
@@ -908,9 +1014,12 @@
 }
 
 .directory-search-input {
+  width: 100% !important;
+  height: 40px !important;
   background-color: #1d2333;
-  border-color: #2f3749;
+  border: 1.5px solid #2f3749;
   color: #fff;
+  border-radius: 10px;
 }
 
 .directory-search-input:focus {
@@ -918,10 +1027,37 @@
   border-color: #7750f8;
 }
 
+.directory-search-clear {
+  color: #8f91ac;
+  width: auto !important;
+  display: inline-flex !important;
+}
+
+.directory-nav-tabs,
+.directory-pricing-filter-bar {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  gap: 6px !important;
+}
+
 .directory-tab-btn {
+  display: inline-flex !important;
+  width: auto !important;
+  flex: 0 0 auto !important;
+  align-items: center;
+  gap: 6px;
+  height: 34px !important;
+  padding: 0 14px !important;
   background-color: #1d2333;
-  border-color: #2f3749;
+  border: 1px solid #2f3749;
+  border-radius: 8px;
   color: #9aa4bf;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
 }
 
 .directory-tab-btn:hover {
@@ -929,9 +1065,28 @@
   color: #fff;
 }
 
+.directory-tab-btn.active {
+  background: linear-gradient(135deg, #7750f8 0%, #5838cc 100%) !important;
+  border-color: #7750f8 !important;
+  color: #fff !important;
+}
+
 .directory-filter-chip {
+  display: inline-flex !important;
+  width: auto !important;
+  flex: 0 0 auto !important;
+  align-items: center;
+  height: 28px !important;
+  padding: 0 11px !important;
   background-color: #21283b;
+  border: 1px solid #2f3749;
+  border-radius: 20px;
   color: #9aa4bf;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
 }
 
 .directory-filter-chip:hover {
@@ -940,8 +1095,9 @@
 }
 
 .directory-filter-chip.active {
-  background-color: #7750f8;
-  color: #fff;
+  background-color: #7750f8 !important;
+  border-color: #7750f8 !important;
+  color: #fff !important;
 }
 
 .directory-featured-mini-card {

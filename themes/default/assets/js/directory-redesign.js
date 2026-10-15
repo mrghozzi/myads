@@ -34,16 +34,18 @@
     }
 
     function hydrateDirectoryDropdowns(scope) {
+        var isRtl = document.documentElement.getAttribute('dir') === 'rtl';
         initDropdownGroup(scope, '.widget-box-post-settings-dropdown-trigger', '.widget-box-post-settings-dropdown', {
             offset: {
-                top: 30,
-                right: 9
+                top: 36,
+                right: isRtl ? undefined : 0,
+                left: isRtl ? 0 : undefined
             },
             animation: {
                 type: 'translate-top',
-                speed: 0.3,
+                speed: 0.25,
                 translateOffset: {
-                    vertical: 20
+                    vertical: 15
                 }
             }
         });

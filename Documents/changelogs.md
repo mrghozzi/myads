@@ -20,6 +20,13 @@
 * **SEO Optimization & JSON-LD Structured Data**:
   * Injected Google-compliant Schema.org `SoftwareApplication` JSON-LD structured data with offers, ratings, and category classification.
   * Added human-friendly SEO slug URLs (`/directory/item/{slug}` and `/directory/c/{slug}`) alongside legacy routes.
+* **Card Header Layout Alignment & RTL/LTR Dropdown Fix**:
+  * Moved the 3-dots post settings action menu into the flex `directory-listing-head-actions` group alongside the upvote button, eliminating the LTR overlap where the 3-dots button previously sat on top of the upvote button.
+  * Added contextual directional alignment (`left: 0` in RTL, `right: 0` in LTR) and ensured card container `overflow: visible`, eliminating the menu clipping issue in RTL mode.
+* **Streamlined Discovery Shell Toolbar & Language Synchronization**:
+  * Redesigned the bulky `directory-discovery-shell` into a compact, elegant discovery control bar with a clean stats topbar and 40px search bar, drastically reducing vertical footprint.
+  * Neutralized theme-level button width overrides (`width: 100% !important; display: block !important;`) on tabs and pricing filter chips, allowing them to flow neatly as inline horizontal pills with mobile horizontal swipe support.
+  * Synchronized all missing translation strings in `lang/ar/messages.php` and `lang/en/messages.php` (`directory_search_placeholder`, `most_visited`, `all`, `explore_directory`, `sites`, `categories`, `filter_pricing`).
 * **100% Comprehensive Automated Test Suite**:
   * Added full automated coverage in `tests/Feature/DirectoryRedesignTest.php` covering upvoting, SVG badges, slug routing, filters, and claim verification (8 tests, 60 assertions, 100% pass rate).
 

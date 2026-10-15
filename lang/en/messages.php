@@ -5316,7 +5316,14 @@ return [
     'popular' => 'Popular',
     'latest' => 'Latest',
     'filter_all' => 'All',
+    'all' => 'All',
     'search_directory_placeholder' => 'Search products, tools, and websites...',
+    'directory_search_placeholder' => 'Search products, tools, and websites...',
+    'most_visited' => 'Most Visited',
+    'explore_directory' => 'Explore Directory',
+    'sites' => 'Sites',
+    'categories' => 'Categories',
+    'filter_pricing' => 'Pricing',
 ];
 
 

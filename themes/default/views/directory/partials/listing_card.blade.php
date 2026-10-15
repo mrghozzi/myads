@@ -4,10 +4,6 @@
 @endphp
 
 <article class="widget-box no-padding directory-listing-card directory-listing post{{ $activity?->id ?? $listing->id }}">
-    <div class="widget-box-settings">
-        @include('theme::directory.partials.site_action_menu', ['card' => $card])
-    </div>
-
     <div class="widget-box-status">
         <div class="widget-box-status-content">
             <div class="directory-listing-head">
@@ -49,8 +45,12 @@
                     </p>
                 </div>
 
-                {{-- Upvote Button in Header / Corner --}}
+                {{-- Action Menu & Upvote Button in Header --}}
                 <div class="directory-listing-head-actions">
+                    <div class="directory-card-actions-menu">
+                        @include('theme::directory.partials.site_action_menu', ['card' => $card])
+                    </div>
+
                     <button type="button" 
                             class="directory-upvote-btn {{ $card['has_upvoted'] ? 'is-upvoted' : '' }}" 
                             data-directory-upvote="{{ $listing->id }}"

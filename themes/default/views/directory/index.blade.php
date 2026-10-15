@@ -41,31 +41,23 @@
         </div>
 
         <div class="grid-column">
-            {{-- Modern Directory Discovery Control Center --}}
+            {{-- Modern Compact Directory Discovery Control Center --}}
             <div class="widget-box directory-feed-shell directory-discovery-shell">
                 <div class="widget-box-content">
-                    <div class="directory-feed-header">
-                        <div class="directory-feed-copy">
-                            <p class="directory-feed-eyebrow">{{ __('messages.directory') }}</p>
-                            <h2 class="directory-feed-title">{{ __('messages.latest_sites') }}</h2>
-                            <p class="directory-feed-text">{{ __('messages.landing_community_directory_desc') }}</p>
+                    <div class="directory-discovery-topbar">
+                        <div class="directory-discovery-title-group">
+                            <h2 class="directory-discovery-title">
+                                <i class="fa fa-compass text-primary"></i> {{ __('messages.explore_directory') ?? 'استكشاف الدليل' }}
+                            </h2>
                         </div>
 
-                        <div class="directory-feed-summary">
-                            <div class="directory-feed-summary-item">
-                                <span>{{ __('messages.latest_sites') }}</span>
-                                <strong>{{ $directoryStats['listing_count'] }}</strong>
-                            </div>
-
-                            <div class="directory-feed-summary-item">
-                                <span>{{ __('messages.cat_s') }}</span>
-                                <strong>{{ $directoryStats['category_count'] }}</strong>
-                            </div>
-
-                            <div class="directory-feed-summary-item">
-                                <span>{{ __('messages.subcategories') }}</span>
-                                <strong>{{ $directoryStats['subcategory_count'] }}</strong>
-                            </div>
+                        <div class="directory-discovery-stats-pills">
+                            <span class="directory-stat-pill">
+                                <i class="fa fa-globe"></i> <strong>{{ $directoryStats['listing_count'] }}</strong> {{ __('messages.sites') ?? 'موقع' }}
+                            </span>
+                            <span class="directory-stat-pill">
+                                <i class="fa fa-folder-open"></i> <strong>{{ $directoryStats['category_count'] }}</strong> {{ __('messages.categories') ?? 'أقسام' }}
+                            </span>
                         </div>
                     </div>
 
@@ -76,7 +68,7 @@
                             <input type="text" 
                                    id="directory-search-input" 
                                    class="directory-search-input" 
-                                   placeholder="{{ __('messages.directory_search_placeholder') ?? 'ابحث في دليل المواقع والخدمات...' }}" 
+                                   placeholder="{{ __('messages.directory_search_placeholder') }}" 
                                    value="{{ $filters['search'] ?? '' }}"
                                    autocomplete="off">
                             <button type="button" class="directory-search-clear" id="directory-search-clear" style="{{ empty($filters['search']) ? 'display: none;' : '' }}">
@@ -85,7 +77,7 @@
                         </div>
                     </div>
 
-                    {{-- Sort Tabs (Product Hunt style) --}}
+                    {{-- Filter & Sort Toolbar --}}
                     <div class="directory-filter-bar-group">
                         <div class="directory-nav-tabs">
                             <button type="button" class="directory-tab-btn {{ ($filters['sort'] ?? 'latest') === 'trending' ? 'active' : '' }}" data-sort="trending">
@@ -104,6 +96,7 @@
 
                         {{-- Pricing Chips --}}
                         <div class="directory-pricing-filter-bar">
+                            <span class="directory-pricing-label"><i class="fa fa-tags"></i></span>
                             <button type="button" class="directory-filter-chip {{ empty($filters['pricing']) || $filters['pricing'] === 'all' ? 'active' : '' }}" data-pricing="">
                                 {{ __('messages.all') ?? 'الكل' }}
                             </button>

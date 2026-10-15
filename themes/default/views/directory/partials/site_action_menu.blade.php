@@ -5,7 +5,7 @@
         </svg>
     </div>
 
-    <div class="simple-dropdown widget-box-post-settings-dropdown" style="position: absolute; z-index: 9999; top: 30px; right: 9px; opacity: 0; visibility: hidden; transform: translate(0px, -20px); transition: transform 0.3s ease-in-out 0s, opacity 0.3s ease-in-out 0s, visibility 0.3s ease-in-out 0s;">
+    <div class="simple-dropdown widget-box-post-settings-dropdown directory-card-settings-dropdown" style="position: absolute; z-index: 9999; top: 32px; opacity: 0; visibility: hidden; transform: translate(0px, -15px); transition: transform 0.3s ease-in-out 0s, opacity 0.3s ease-in-out 0s, visibility 0.3s ease-in-out 0s;">
         @if($card['can_manage'])
             <a class="simple-dropdown-link" href="{{ route('directory.edit', $card['listing']->id) }}">
                 <i class="fa fa-edit" aria-hidden="true"></i>&nbsp;{{ __('messages.edit') }}
