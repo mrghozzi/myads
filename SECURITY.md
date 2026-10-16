@@ -10,7 +10,7 @@ We provide active security updates and maintenance for the following versions of
 
 | Version | Supported          | Security Maintenance Status |
 | ------- | ------------------ | --------------------------- |
-| 4.6.x   | :white_check_mark: | Active Development, Patches & Latest Features (Current: `v4.6.1`) |
+| 4.6.x   | :white_check_mark: | Active Development, Patches & Latest Features (Current: `v4.6.3`) |
 | 4.5.x   | :white_check_mark: | Active Security Patches Only |
 | 4.4.x   | :white_check_mark: | Critical Security Patches Only |
 | 4.3.x   | :white_check_mark: | Critical Security Patches Only |
@@ -22,6 +22,7 @@ We provide active security updates and maintenance for the following versions of
 
 MYADS includes multi-layered security controls across the core platform, API, and ad exchange ecosystem:
 
+- **Referral Anti-Fraud & Self-Referral Prevention Engine (v4.6.3)**: Strict self-referral blocking (`$referrer->id !== $user->id`), duplicate referral prevention, and query parameter sanitization (`CaptureReferral` middleware) strictly constraining referral inputs (`^[a-zA-Z0-9_\-\.]+$`, length <= 64) before queuing encrypted cookies or session fallbacks.
 - **Administrative Global Notification Resilience & Database Fault-Tolerance (v4.6.1)**: Defensive exception isolation (`try/catch \Throwable`) in `AdminNotificationService` and MySQL InnoDB tablespace desync remediation (errors 1932/1813), ensuring administrative routes never fail during database engine anomalies.
 - **Administrative User Management Schema Self-Healing & Recursion Shield (v4.6.1)**: Automatic runtime schema validation and repair migration `2026_09_27_020000` for `site_admins` table, alongside recursive loopback self-call timeout protection in `PluginManager`.
 - **Dependency Vulnerability Remediation (v4.6.1)**: Patched GitHub Dependabot security advisory #71 by upgrading `phpseclib/phpseclib` to `3.0.57`.

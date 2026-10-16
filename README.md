@@ -143,6 +143,7 @@ graph TD
 - **YouTube Views Exchange:** Watch-to-earn exchange engine boosting real views and engagement for video creators.
 - **Custom Member Ads (`/ads/custom`):** Direct peer-to-peer ad marketplace. Publishers generate embed scripts (`/embed/custom.js`), negotiate deals, and receive automated daily PTS payouts.
 - **Smart Ads with Geo-Targeting & A/B Testing:** Dynamic contextual ads tailored by country, device, and performance metrics with hourly click heatmaps.
+- **Growth & Referral Affiliate Engine (`/ads/referrals`, `/referral`, `/badges`):** Complete referral ecosystem with global 30-day cookie tracking middleware (`CaptureReferral`), multi-format identifier resolution (username, ID, Public UID), anti-fraud self-referral prevention, two-sided welcome bonuses (+10 PTS to referee, +10 PTS to referrer), in-app notifications, and 4 tiered community milestone badges (`Referral Pioneer`, `Community Builder`, `Super Promoter`, `Referral Legend`) in `/badges`.
 - **Anti-Fraud Shield v2 (`ADS-05`):**
   - Compliant with **IAB Viewability Standards** (requires ≥ 50% viewport visibility for ≥ 1 continuous second).
   - Real-time **Human Behavior Fingerprinting** (`mousemove` trajectory velocity, mobile touch tap duration, headless browser detection via `navigator.webdriver`, and WebGL checks).
@@ -173,7 +174,7 @@ graph TD
 - **Universal Bookmarks & Autocomplete:** 1-tap post saving (`/statuses/save-toggle`) with dedicated `/statuses/saved` feed, plus real-time smart `@mentions` and `#tags` autocomplete.
 - **Member Profile Privacy Suite:** Granular `about_visibility` controls (`public`, `followers`, `private`) preventing bio leakage, paired with hexagonal avatars and verification requests.
 - **Real-Time Live Events Engine (`RT-04`):** Server-Sent Events (SSE) streaming (`/live/stream`) delivering instant message badges, notification toasts, and live community activity.
-- **Gamification & Rewards:** 25+ dynamic achievement badges, daily/weekly quests, PTS transfers, and voucher codes.
+- **Gamification & Rewards:** 30+ dynamic achievement badges (including 4 new referral milestones), daily/weekly quests, PTS transfers, and voucher codes.
 
 ### 🛍️ 4. Digital Store, Services Marketplace & Knowledgebase
 - **Digital Products Marketplace:** Publish and sell scripts, themes, and plugins with PTS or fiat pricing, Arabic & Unicode slug support, and version management.
@@ -181,7 +182,7 @@ graph TD
 - **Screenshots Lightbox & Previews:** Interactive screenshot carousels with zoomable full-screen modal lightbox, plus external launcher buttons for Live Demo web previews and video walkthroughs.
 - **Wiki-Style Knowledgebase (`/kb`):** Rich documentation hub per product with Markdown rendering, interactive Mermaid diagrams, category filtering, and eager-loading relation isolation.
 - **P2P Service Orders Marketplace (`/orders`):** Bulletin bidding marketplace with 5-step milestone progression (Matching → Awarded → In Progress → Delivered → Completed), requirement attachments, client revision rounds, deliverable downloads, and explicit non-escrow platform terms.
-- **Web Directory:** Categorized webmaster directory with SEO backlinks, thumbnail scraping, and traffic statistics.
+- **Web Directory 2.0 (`/directory`):** Product Hunt-grade discovery platform with community upvoting, faceted pricing models (Free, Freemium, Paid, Open Source, Free Trial), dynamic SVG embed badges (`/directory/{id}/badge`), site claim & verification engine, Schema.org SEO structured data, and responsive layout.
 
 ### 💳 5. Paid Subscriptions & Multi-Currency Billing
 - **Tiered Membership Plans:** Custom plan durations, recurring benefits, ad credits, discount entitlements, and glowing tier badges.

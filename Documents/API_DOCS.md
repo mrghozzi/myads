@@ -25,6 +25,8 @@ The MYADS v4.6.3 API ecosystem delivers high-performance, secure, and extensible
 11. **Real-Time Search & Intelligence (`/api/search/live`, `/api/ads/stats`):** Multi-entity live search across members, store products, forum topics, and feed posts, alongside real-time advertising analytics.
 12. **Universal Media & Comments Ingestion Engine (`/comment/*`, `/api/statuses/*`):** Drag-and-drop & clipboard (`Ctrl+V`) media ingestion, binary MIME verification (`FileUploadSecurityService`), and automatic WebP image optimization.
 13. **Smart Partitioned Sitemaps & Discovery (`/sitemap.xml`, `/sitemap/*.xml`):** Partitioned XML sitemaps with ETag conditional HTTP 304 caching for enterprise SEO discovery.
+14. **Gamification & Badges Engine (`/api/settings/badges`, `/api/developer/v1/me/badges`, `/badges`):** Earned and showcase badge retrieval, progress tracking, showcase configuration (up to 6 badges), and referral milestone badges with automated points rewarding.
+15. **Referral Tracking & Growth Engine (`?ref=`, `/ads/referrals`, `/referral`):** Global referral capture with 30-day cookie persistence (`CaptureReferral`), multi-format identifier resolution (username, Public UID, ID), anti-fraud self-referral protection, and two-sided bonus allocation (+10 PTS referee welcome bonus, +10 PTS referrer reward).
 
 ---
 

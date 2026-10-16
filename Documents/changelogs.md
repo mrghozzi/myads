@@ -1,5 +1,27 @@
-# v4.6.4
-> **Major Directory 2.0 Modernization Release** — Rebuilt the MYADS Web & Tools Directory (`/directory`, `/directory/site/*`, `/directory/c/*`) into a modern Product Hunt and AlternativeTo grade discovery platform. Introduced community upvoting, faceted pricing models (Free, Freemium, Paid, Open Source, Free Trial), real-time live search, SVG dynamic embed badges, automated site verification claims, rich JSON-LD Schema.org SEO structured data, and human-friendly slug URLs with 100% backward compatibility.
+# v4.6.3
+> **Major Ecosystem, Modern Discussion, Directory 2.0 & Referral Growth Release** — Rebuilt and modernized the MYADS Community Forum (`/forum`, `/f{id}`, `/t{id}`) with proprietary high-performance modern discussion architecture, multi-editor suite (MyAds Markdown, Quill.js, SCEditor), and cinema-grade video watch pages; transformed the Web & Tools Directory (`/directory`) into an interactive Product Hunt-grade discovery platform with community upvoting and SVG embed badges; and completely overhauled the Referral & Affiliate Growth Engine (`/ads/referrals`, `/referral`, `/badges`) with 30-day cookie tracking middleware, two-sided welcome bonuses, anti-fraud self-referral protections, and 4 tiered community milestone badges.
+
+### Complete Referral & Growth Engine Overhaul (`/ads/referrals`, `/referral`, `/badges`, `CaptureReferral.php`, `AdsController.php`, `AuthController.php`, `GamificationService.php`)
+* **30-Day Referral Cookie & Session Tracking Middleware (`CaptureReferral.php`, `bootstrap/app.php`)**:
+  * Built and registered dedicated `CaptureReferral` middleware in the global `web` pipeline. Automatically captures incoming `?ref=` query parameters on any route across the site (homepage, register, forum, portal, directory), validates and sanitizes them (`^[a-zA-Z0-9_\-\.]+$`, length <= 64), and queues a 30-day encrypted cookie alongside session storage.
+  * Solved the critical legacy tracking bug where visitors arriving via referral links had their referrer information lost before completing registration.
+* **Multi-Format Identifier Resolution & Anti-Fraud Self-Referral Prevention (`AuthController.php`)**:
+  * Enhanced `AuthController::register` to resolve referrers gracefully from Cookie, Session, or direct form input across username, Public UID, or numeric ID.
+  * Strictly prevents self-referrals (`$referrer->id !== $user->id`) and duplicate referral awards, eliminating point farming and multi-accounting exploits.
+* **Two-Sided Incentive (Welcome Bonus for New Members)**:
+  * In addition to rewarding the referrer (+10 PTS, +10 views/clicks, in-app notification), the newly registered member automatically receives a special referral welcome bonus (+10 bonus PTS, starting with 20 PTS total) recorded in their points transaction history.
+* **Referral Badges Suite in `/badges` & Gamification Integration (`GamificationService.php`, Migration `2026_10_16_030000_add_referral_badges.php`)**:
+  * Introduced 4 tiered referral milestone badges visible in the community Badges Hub (`/badges`):
+    * **Referral Pioneer** (`referral_rookie`): 1 referral (+50 PTS reward, `fa-user-plus`, blue).
+    * **Community Builder** (`network_builder`): 5 referrals (+150 PTS reward, `fa-share-nodes`, teal).
+    * **Super Promoter** (`super_promoter`): 20 referrals (+500 PTS reward, `fa-bullhorn`, purple).
+    * **Referral Legend** (`referral_legend`): 50 referrals (+1500 PTS reward, `fa-crown`, gold).
+  * Connected `referrals_count` criteria to `GamificationService::recordEvent()` and `refreshBadges()` to unlock badges and award bonus points automatically upon referral completion.
+* **Modern Referral Hub & List Interface Updates (`referrals.blade.php`, `referrals_list.blade.php`, `AdsController.php`)**:
+  * Added a dedicated glassmorphic "Referral Badges & Achievements" card showcasing unlock status, criteria targets, progress bars, point rewards, and a 1-click shortcut to `/badges`.
+  * Added two-sided bonus notices and full Arabic/English localization in `lang/ar/messages.php` and `lang/en/messages.php`.
+* **Automated Feature Test Coverage (`ReferralSystemTest.php`)**:
+  * 100% automated test suite passing (7 tests, 33 assertions) covering cookie tracking, two-sided point awards, badge unlock triggers, self-referral prevention, and badge listing in `/badges`.
 
 ### Complete Modernization of Directory System (`/directory`, `/directory/*`, `DirectoryController.php`, `DirectoryPresenter.php`)
 * **Community Upvoting Engine (Product Hunt Style)**:
@@ -35,9 +57,6 @@
   * Synchronized all missing translation strings in `lang/ar/messages.php` and `lang/en/messages.php` (`directory_search_placeholder`, `most_visited`, `all`, `explore_directory`, `sites`, `categories`, `filter_pricing`).
 * **100% Comprehensive Automated Test Suite**:
   * Added full automated coverage in `tests/Feature/DirectoryRedesignTest.php` covering upvoting, SVG badges, slug routing, filters, and claim verification (8 tests, 60 assertions, 100% pass rate).
-
-# v4.6.3
-> **Major Forum Architecture & Experience Release** — Rebuilt and modernized the MYADS Community Forum (`/forum`, `/f{id}`, `/t{id}`) with proprietary high-performance modern discussion architecture while maintaining 100% backward compatibility and data integrity across existing topics, categories, comments, and attachments. Integrated a multi-editor suite (MyAds Markdown with live preview, Quill.js, and SCEditor) across topic creation, editing, and comments.
 
 ### Complete Overhaul & Rebuild of Video Hub (`/video`, `/video/*`) and Standalone Video Watch Pages (`/video/watch/{id}`, `/t{id}`, `video.blade.php`, `VideoHubController.php`)
 * **Complete Separation from Forum Categories (`VideoCategoryCatalog.php`)**:
