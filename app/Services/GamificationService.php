@@ -147,6 +147,7 @@ class GamificationService
                     'five_star_rating_received' => ['five_star_ratings'],
                     'forum_topic_created' => ['forum_topics_count', 'unique_categories_topics'],
                     'forum_reply_created' => ['forum_replies_count', 'comment_count'],
+                    'referral_registered' => ['referrals_count'],
                     default => [],
                 };
 
@@ -253,6 +254,7 @@ class GamificationService
             'moderation_actions_count' => Option::where('o_order', $user->id)
                 ->whereIn('o_type', ['forum_pin', 'forum_lock'])
                 ->count(),
+            'referrals_count' => DB::table('referral')->where('uid', $user->id)->count(),
             default => 0,
         };
     }

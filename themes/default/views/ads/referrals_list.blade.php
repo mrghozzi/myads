@@ -136,5 +136,64 @@
 
     </div>
 
+    <!-- Referral Badges & Achievements Section -->
+    @if(isset($referralBadges) && $referralBadges->isNotEmpty())
+    <div class="modern-card" style="background: var(--admin-premium-surface, #fff); border: 1px solid var(--border-color, rgba(0,0,0,0.08)); border-radius: 20px; padding: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.04); margin-top: 24px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; margin-bottom: 20px;">
+            <div>
+                <h3 style="font-size: 18px; font-weight: 800; margin: 0; display: flex; align-items: center; gap: 10px;">
+                    <i class="fa-solid fa-award" style="color: #ffa21d;"></i>
+                    {{ __('messages.referral_badges_title') }}
+                </h3>
+                <p style="margin: 4px 0 0 0; opacity: 0.7; font-size: 13px;">
+                    {{ __('messages.referral_badges_desc') }}
+                </p>
+            </div>
+            <a href="{{ route('badges.all') }}" style="background: rgba(97, 93, 250, 0.1); color: #615dfa; border: 1px solid rgba(97, 93, 250, 0.25); padding: 8px 16px; border-radius: 12px; font-weight: 700; font-size: 13px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s;">
+                <i class="fa-solid fa-medal"></i> {{ __('messages.view_all_badges') }}
+            </a>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px;">
+            @foreach($referralBadges as $badge)
+                @php
+                    $isUnlocked = $badge->is_unlocked;
+                    $pct = min(100, round(($badge->progress / max(1, $badge->criteria_target)) * 100));
+                @endphp
+                <div class="ref-badge-card" style="background: var(--input-bg, rgba(128,128,128,0.04)); border: 1px solid {{ $isUnlocked ? 'rgba(23, 198, 102, 0.4)' : 'var(--border-color, rgba(0,0,0,0.08))' }}; border-radius: 16px; padding: 18px; position: relative; transition: transform 0.2s; {{ $isUnlocked ? 'box-shadow: 0 4px 14px rgba(23, 198, 102, 0.12);' : '' }}">
+                    @if($isUnlocked)
+                        <span style="position: absolute; top: 12px; {{ is_locale_rtl() ? 'left: 12px;' : 'right: 12px;' }} background: rgba(23, 198, 102, 0.15); color: #17c666; font-size: 11px; font-weight: 800; padding: 3px 8px; border-radius: 20px;">
+                            <i class="fa-solid fa-check-circle me-1"></i> {{ __('messages.badge_unlocked') }}
+                        </span>
+                    @else
+                        <span style="position: absolute; top: 12px; {{ is_locale_rtl() ? 'left: 12px;' : 'right: 12px;' }} background: rgba(128, 128, 128, 0.15); color: var(--text-color); opacity: 0.6; font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: 20px;">
+                            <i class="fa-solid fa-lock me-1"></i> {{ $badge->progress }}/{{ $badge->criteria_target }}
+                        </span>
+                    @endif
+
+                    <div style="display: flex; align-items: center; gap: 14px; margin-bottom: 12px;">
+                        <div style="width: 48px; height: 48px; border-radius: 14px; background: {{ $isUnlocked ? 'linear-gradient(135deg, #17c666, #109a4e)' : 'linear-gradient(135deg, #3454d1, #615dfa)' }}; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.12);">
+                            <i class="fa-solid {{ $badge->icon }}"></i>
+                        </div>
+                        <div>
+                            <h4 style="font-size: 15px; font-weight: 700; margin: 0;">{{ __('messages.' . $badge->name_key) }}</h4>
+                            <span style="font-size: 12px; color: #ffa21d; font-weight: 700;">+{{ number_format($badge->points_reward) }} PTS</span>
+                        </div>
+                    </div>
+
+                    <p style="font-size: 12px; opacity: 0.75; margin: 0 0 12px 0; min-height: 34px; line-height: 1.4;">
+                        {{ __('messages.' . $badge->description_key) }}
+                    </p>
+
+                    <!-- Progress Bar -->
+                    <div style="background: rgba(128,128,128,0.15); height: 6px; border-radius: 10px; overflow: hidden;">
+                        <div style="width: {{ $pct }}%; height: 100%; background: {{ $isUnlocked ? '#17c666' : 'linear-gradient(90deg, #3454d1, #615dfa)' }}; border-radius: 10px; transition: width 0.3s ease;"></div>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+    </div>
+    @endif
+
 </div>
 @endsection

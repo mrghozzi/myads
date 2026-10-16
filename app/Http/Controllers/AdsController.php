@@ -407,8 +407,10 @@ class AdsController extends Controller
             ->with('referredUser')
             ->orderBy('id', 'desc')
             ->paginate(20);
+
+        $referralBadges = $this->getReferralBadgesForUser($user, $totalReferrals);
             
-        return view('theme::ads.referrals_list', compact('user', 'referrals', 'totalReferrals', 'totalEarnedPts'));
+        return view('theme::ads.referrals_list', compact('user', 'referrals', 'totalReferrals', 'totalEarnedPts', 'referralBadges'));
     }
 
     // Referral Codes/Banners (r_code.php)
@@ -418,7 +420,30 @@ class AdsController extends Controller
         $totalReferrals = \App\Models\Referral::where('uid', $user->id)->count();
         $totalEarnedPts = $totalReferrals * 10;
         $extensions_code = \App\Models\Option::where('o_type', 'extensions_code')->value('o_valuer');
-        return view('theme::ads.referrals', compact('user', 'extensions_code', 'totalReferrals', 'totalEarnedPts'));
+        $referralBadges = $this->getReferralBadgesForUser($user, $totalReferrals);
+
+        return view('theme::ads.referrals', compact('user', 'extensions_code', 'totalReferrals', 'totalEarnedPts', 'referralBadges'));
+    }
+
+    private function getReferralBadgesForUser($user, int $totalReferrals)
+    {
+        $badges = \App\Models\Badge::where('criteria_type', 'referrals_count')
+            ->where('is_active', true)
+            ->orderBy('sort_order')
+            ->get();
+
+        $userBadges = \App\Models\UserBadge::where('user_id', $user->id)
+            ->whereIn('badge_id', $badges->pluck('id'))
+            ->get()
+            ->keyBy('badge_id');
+
+        return $badges->map(function ($badge) use ($userBadges, $totalReferrals) {
+            $userBadge = $userBadges->get($badge->id);
+            $badge->is_unlocked = ($userBadge && $userBadge->unlocked_at !== null) || ($totalReferrals >= (int) $badge->criteria_target);
+            $badge->progress = $userBadge ? $userBadge->progress : min($totalReferrals, (int) $badge->criteria_target);
+            $badge->unlocked_at = $userBadge ? $userBadge->unlocked_at : null;
+            return $badge;
+        });
     }
 
     public function state(Request $request)

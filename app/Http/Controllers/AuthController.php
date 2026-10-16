@@ -132,24 +132,33 @@ class AuthController extends Controller
         ]);
 
         // Referral Logic
-        if ($request->hasCookie('ref')) {
-            $referrerIdentifier = trim((string) $request->cookie('ref'));
-            if ($referrerIdentifier === '' || $referrerIdentifier === '0') {
-                Cookie::queue(Cookie::forget('ref'));
-            } else {
-                // Resolve referrer via public_uid, username, or numeric ID (backward compat)
-                $referrer = User::resolvePublicIdentifier($referrerIdentifier)
-                    ?? (ctype_digit($referrerIdentifier) ? User::find((int) $referrerIdentifier) : null);
-                
-                if ($referrer) {
+        $referrerIdentifier = trim((string) (
+            $request->cookie('ref')
+            ?? ($request->hasSession() ? $request->session()->get('ref') : null)
+            ?? $request->input('ref')
+            ?? $request->query('ref')
+        ));
+
+        if ($referrerIdentifier !== '' && $referrerIdentifier !== '0') {
+            // Resolve referrer via public_uid, username, or numeric ID (backward compat)
+            $referrer = User::resolvePublicIdentifier($referrerIdentifier)
+                ?? User::where('username', $referrerIdentifier)->first()
+                ?? (ctype_digit($referrerIdentifier) ? User::find((int) $referrerIdentifier) : null);
+
+            // Self-referral protection: cannot refer oneself
+            if ($referrer && (int) $referrer->id !== (int) $user->id) {
+                // Check if user is already referred
+                $alreadyReferred = Referral::where('ruid', $user->id)->exists();
+
+                if (!$alreadyReferred) {
                     // 1. Insert into referral table
                     Referral::create([
                         'uid' => $referrer->id,
                         'ruid' => $user->id,
                         'date' => date('Y-m-d'),
                     ]);
-                    
-                    // 2. Insert into options (History/Notification)
+
+                    // 2. Insert into options for Referrer history
                     Option::create([
                         'name' => 'referal',
                         'o_valuer' => '10',
@@ -158,17 +167,51 @@ class AuthController extends Controller
                         'o_order' => $user->id,
                         'o_mode' => time(),
                     ]);
-                    
+
                     // 3. Update referrer stats
                     $referrer->increment('pts', 10);
                     $referrer->increment('vu', 10);
                     $referrer->increment('nvu', 10);
                     $referrer->increment('nlink', 10);
-                    
-                    // 4. Clear cookie
-                    Cookie::queue(Cookie::forget('ref'));
+
+                    // 4. Two-Sided Welcome Bonus: Award the new user bonus points for using a referral link!
+                    $welcomeBonus = 10;
+                    $user->increment('pts', $welcomeBonus);
+                    Option::create([
+                        'name' => 'referal_welcome',
+                        'o_valuer' => (string) $welcomeBonus,
+                        'o_type' => 'hest_pts',
+                        'o_parent' => $user->id,
+                        'o_order' => $referrer->id,
+                        'o_mode' => time(),
+                    ]);
+
+                    // 5. Trigger Gamification & Badges for Referrer
+                    try {
+                        app(\App\Services\GamificationService::class)->recordEvent($referrer->id, 'referral_registered', 1);
+                    } catch (\Throwable $e) {
+                        \Illuminate\Support\Facades\Log::warning('Referral gamification trigger error: ' . $e->getMessage());
+                    }
+
+                    // 6. Notify Referrer
+                    try {
+                        app(\App\Services\NotificationService::class)->send(
+                            $referrer->id,
+                            __('messages.new_referral_joined', ['username' => $user->username]),
+                            '/referral',
+                            'notification'
+                        );
+                    } catch (\Throwable $e) {
+                        // ignore notification failure
+                    }
                 }
             }
+        }
+
+        // Clear referral cookie & session
+        Cookie::queue(Cookie::forget('ref'));
+        if ($request->hasSession()) {
+            $request->session()->forget('ref');
         }
 
         Auth::login($user);

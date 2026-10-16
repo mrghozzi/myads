@@ -83,6 +83,7 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\CheckSystemVersion::class,
             \App\Http\Middleware\TrackSeoMetrics::class,
             \App\Http\Middleware\TwoFactorMiddleware::class,
+            \App\Http\Middleware\CaptureReferral::class,
         ]);
         $middleware->api(append: [
             \App\Http\Middleware\SecurityHeaders::class,
