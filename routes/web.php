@@ -159,6 +159,8 @@ Route::get('/video/{filter}', [App\Http\Controllers\VideoHubController::class, '
 Route::get('/clips', [App\Http\Controllers\ClipsController::class, 'index'])->name('clips.index');
 Route::get('/clips/saved', [App\Http\Controllers\ClipsController::class, 'saved'])->name('clips.saved')->middleware('auth');
 Route::post('/clips/save/toggle', [App\Http\Controllers\ClipsController::class, 'toggleSave'])->name('clips.save.toggle')->middleware('auth');
+Route::post('/clips/view', [App\Http\Controllers\ClipsController::class, 'recordView'])->name('clips.view');
+Route::get('/clips/{status}', [App\Http\Controllers\ClipsController::class, 'show'])->name('clips.show')->whereNumber('status');
 
 // Developer Platform
 Route::prefix('developer')->group(function () {

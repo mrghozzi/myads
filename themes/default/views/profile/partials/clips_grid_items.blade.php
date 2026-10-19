@@ -1,7 +1,7 @@
 @foreach($activities as $clip)
     @php
         $clipTopic = $clip->forumTopic;
-        $clipUrl = route('clips.index') . '#' . $clip->id;
+        $clipUrl = route('clips.show', $clip->id);
         
         $clipThumb = $clip->resolved_thumbnail ?: \App\Http\Controllers\VideoHubController::resolveVideoThumbnailUrl($clip);
         $clipVideoUrl = $clip->resolved_video_url ?: \App\Http\Controllers\VideoHubController::resolveVideoUrl($clip);

@@ -119,6 +119,16 @@ class StatusController extends Controller
                     ->route('groups.show', ['group' => $group->slug, 'tab' => 'feed'])
                     ->with('success', __('messages.groups_post_created'));
             }
+            if ((int) $status->s_type === Status::TYPE_CLIPS) {
+                if ($request->ajax() || $request->wantsJson()) {
+                    return response()->json([
+                        'success' => true,
+                        'redirect_url' => route('clips.show', $status->id),
+                        'clip_id' => $status->id,
+                    ]);
+                }
+                return redirect()->route('clips.show', $status->id)->with('success', __('messages.clip_published_successfully') ?? 'Clip published successfully!');
+            }
             return redirect()->route('forum.topic', $status->tp_id);
         } catch (\Illuminate\Validation\ValidationException $e) {
             throw $e;

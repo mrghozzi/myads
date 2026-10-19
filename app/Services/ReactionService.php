@@ -225,7 +225,10 @@ class ReactionService
     {
         if ($type == 2) return "/t" . $postId;
         if ($type == 22) return "/dr" . $postId;
-        if ($type == 14) return "/clips";
+        if ($type == 14) {
+            $statusId = Status::where('tp_id', $postId)->where('s_type', 14)->value('id');
+            return $statusId ? "/clips/" . $statusId : "/clips";
+        }
         if ($type == 6) return "/orders/" . $postId;
 
         if ($type == 3) {

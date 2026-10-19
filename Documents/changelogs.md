@@ -1,6 +1,33 @@
 # v4.6.3
 > **Major Ecosystem, Modern Discussion, Directory 2.0 & Referral Growth Release** — Rebuilt and modernized the MYADS Community Forum (`/forum`, `/f{id}`, `/t{id}`) with proprietary high-performance modern discussion architecture, multi-editor suite (MyAds Markdown, Quill.js, SCEditor), and cinema-grade video watch pages; transformed the Web & Tools Directory (`/directory`) into an interactive Product Hunt-grade discovery platform with community upvoting and SVG embed badges; and completely overhauled the Referral & Affiliate Growth Engine (`/ads/referrals`, `/referral`, `/badges`) with 30-day cookie tracking middleware, two-sided welcome bonuses, anti-fraud self-referral protections, and 4 tiered community milestone badges.
 
+### Complete Short Video Clips 2.0 & Reels Overhaul (`/clips`, `/clips/{status}`, `ClipsController.php`, `clips/index.blade.php`, `ClipsTest.php`)
+* **Deep Linking & Direct Clip Routing (`/clips/{status}`, `ClipsController.php`, `ReactionService.php`)**:
+  * Added dedicated direct route `GET /clips/{status}` (`clips.show`), guaranteeing that shared links or in-app notifications directly target and prioritize the specified clip at the top of the feed regardless of publication date or pagination depth.
+  * Updated notification URL resolution in `ReactionService::resolvePostUrl()` so clip reactions link directly to `/clips/{statusId}` instead of generic `/clips`.
+  * Updated direct link references across profile clip grids (`clips_grid_items.blade.php`), video hub shorts shelf (`video/index.blade.php`), and saved clips grid (`clips_grid.blade.php`).
+* **Automated View Tracking & Anti-Spam Session Protection (`POST /clips/view`, `ClipsController.php`)**:
+  * Built an automated view tracking endpoint (`POST /clips/view`) that increments topic `vu` counters when a viewer watches a clip continuously for >= 2.5 seconds.
+  * Added session deduplication (`clip_viewed_{id}`) preventing duplicate view inflation within the same session.
+  * Added real-time view counter badges to the right actions sidebar of each clip.
+* **Feed Discovery Tabs (`Latest`, `Trending`, `Following`)**:
+  * Implemented 3 dedicated feed modes on `/clips` with sleek glassmorphic pill tabs:
+    * **Latest**: default chronological order.
+    * **Trending**: engagement-based ranking using subquery calculation of views and replies without table lock or column collisions.
+    * **Following**: displays clips authored exclusively by creators the authenticated viewer follows (`type = 1` in `likes` table).
+* **Keyboard Navigation & Instagram-Style Double-Tap to Like**:
+  * Added desktop keyboard shortcuts: `↑` / `k` (previous clip), `↓` / `j` (next clip), `Space` (play/pause active video), `m` (mute/unmute), and `l` (like active clip).
+  * Implemented double-tap / double-click gesture on video elements spawning a bouncy animated heart pop (`@keyframes heartPop`) and automatically liking the clip.
+  * Made the progress bar interactive and seekable (clicking seeks video to clicked timestamp).
+  * Stored user mute preferences across sessions using `localStorage('clips_muted')` with graceful autoplay fallback.
+  * Optimized video preloading from blanket `preload="auto"` to smart viewport proximity loading (`preload="none"` by default).
+* **Direct Clip Upload Modal on `/clips`**:
+  * Added a prominent "Create Clip" action button directly in the `/clips` header.
+  * Designed a native dark-aesthetic upload modal with live video duration/preview inspection, caption textarea, custom sound title, thumbnail upload, and submission feedback.
+  * Updated `StatusController::create` to redirect newly published clips directly to `route('clips.show', $status->id)` instead of forum topics.
+* **Automated Feature Test Coverage (`ClipsTest.php`)**:
+  * 100% passing automated test suite (7 tests, 29 assertions) covering index rendering, direct clip prioritization, view incrementing, session deduplication, save toggling, trending/following tabs, and creation redirects.
+
 ### Complete Referral & Growth Engine Overhaul (`/ads/referrals`, `/referral`, `/badges`, `CaptureReferral.php`, `AdsController.php`, `AuthController.php`, `GamificationService.php`)
 * **30-Day Referral Cookie & Session Tracking Middleware (`CaptureReferral.php`, `bootstrap/app.php`)**:
   * Built and registered dedicated `CaptureReferral` middleware in the global `web` pipeline. Automatically captures incoming `?ref=` query parameters on any route across the site (homepage, register, forum, portal, directory), validates and sanitizes them (`^[a-zA-Z0-9_\-\.]+$`, length <= 64), and queues a 30-day encrypted cookie alongside session storage.
@@ -64,12 +91,12 @@
   * Implemented automatic genre inference and category filter matching based on video keywords, post content, and tags.
 * **Ultra-Modern Cinema Hero Banner & Single-Row Filter Bar (`index.blade.php`)**:
   * Replaced the washed-out pale blue hero card with a deep obsidian glassmorphic cinema showcase banner (`#0b0f19` to `#1e1b4b`) featuring ambient violet/cyan mesh glows, crystal-clear typography, a floating search bar with magnifying glass submit action, and glowing quick action pills (`btn-post-video` & `btn-post-clip`).
-  * Fixed filter bar flexbox layout (`yt-filter-bar-inner` with `flex-nowrap`, scrollable category pills container `yt-filter-chips-wrap`, and pinned `yt-sort-dropdown`), eliminating the awkward line wrap where the "ترتيب حسب" dropdown previously dropped onto its own line.
+  * Fixed filter bar flexbox layout (`yt-filter-bar-inner` with `flex-nowrap`, scrollable category pills container `yt-filter-chips-wrap`, and pinned `yt-sort-dropdown`), eliminating the awkward line wrap where the "Sort By" dropdown previously dropped onto its own line.
   * Styled category chips as YouTube-grade pills (`.yt-chip`) with active gradients and dedicated glow accents for Shorts and Trending.
 * **Cinema-Grade Standalone Video Watch Page (`watch.blade.php` & `forum/video.blade.php`)**:
   * **Theme CSS Conflict Elimination**: Completely neutralized Vikinger theme's global `button, .button { width: 100% !important; display: block !important; }` bug that previously forced action buttons (`Like`, `Share`, `Save`, `Theater`, `Options`) to stack as giant full-width vertical blocks. Buttons now display as a sleek horizontal pill toolbar (`.v-btn-pill`, `.v-btn-icon-circle`).
   * **Resilient Autoplay Switch**: Replaced theme-conflicted Bootstrap `.form-switch` with custom `.v-custom-switch` and un-squashed text, fixing the overlapping text bug in the "Up Next" sidebar.
-  * **Smart Video Title Resolution**: Revamped `resolveVideoTitle()` in `VideoHubController` to fall back to post text or "فيديو بواسطة :user" instead of defaulting to generic "مركز الفيديوهات".
+  * **Smart Video Title Resolution**: Revamped `resolveVideoTitle()` in `VideoHubController` to fall back to post text or "Video by :user" instead of defaulting to generic "Video Hub".
   * **Compact Comment Form**: Restructured the comment box with right-aligned (RTL) submit button and verified localized placeholder.
 * **100% Comprehensive Translation Key Synchronization (`lang/ar/messages.php` & `lang/en/messages.php`)**:
   * Added all missing translation keys: `add_comment_placeholder`, `video_cat_all`, `video_cat_trending`, `video_cat_shorts`, `up_next`, `autoplay`, `comments_count`, `no_comments_yet`, `video_by_user`, `video_not_found`, `login_to_comment`, `no_description_provided`, `no_video_stream`, `just_now`, `show_more`, `show_less`, `link_copied`.
@@ -206,7 +233,7 @@
   * Added prominent status pill badges: **Pinned** (amber/gold), **Locked** (slate), and **Solved** (emerald checkmark).
   * Implemented rich content extraction with Markdown/HTML sanitization and an optional responsive media showcase with zoom preview.
   * Added file attachments indicator pill (`fa-paperclip`) with dynamic file count.
-  * Built an interactive discussion metrics bar displaying views (`fa-eye`), replies (`fa-comments`), and an action CTA button ("View Discussion" / "عرض النقاش").
+  * Built an interactive discussion metrics bar displaying views (`fa-eye`), replies (`fa-comments`), and an action CTA button ("View Discussion").
   * **Direct Reply Deep-Linking (`#reply`)**: Connected the comment action button, replies metric badge, and comments count link to open the topic discussion directly at `#reply`, with automatic smooth scrolling and textarea focus on the discussion reply composer.
 * **Performance Optimization & N+1 Query Elimination (`StatusActivityService.php`)**:
   * Updated `StatusActivityService::decorate` and `StatusActivityService::decorateMany` to eager-load `category` and `lastPoster` on `ForumTopic` instances linked to `s_type == 2` status records.
@@ -306,7 +333,7 @@
   * Upgraded comments architecture to support infinite/multi-level nested replies through `parent_id` foreign key on `forum_comments` table.
   * Eager-loads `replies.user` relations for root comments while keeping parent comments cleanly organized.
 * **Contextual Reply UI & Indented Hierarchy**:
-  * Rendered indented visual reply trees in default and sample themes (`post-comment-replies`) with dedicated reply markers and action controls.
+  * Rendered indented visual reply trees (`post-comment-replies`) with dedicated reply markers and action controls.
   * Added visual "Replying to @user" contextual indicator banner with 1-click cancel button (`cancelReply`) and hidden `parent_id` parameter input.
 * **Parent Author Reply Notifications**:
   * Automatically dispatches notification to the author of the parent comment when a reply is posted (`messages.user_replied_to_your_comment`).
@@ -718,7 +745,7 @@
   * Updated `/admin/plugins` and `/admin/themes` cards to calculate real-time compatibility states (`is_compatible`, `compatibility_status`, `compatibility_message`).
   * Cards render vibrant status badges: green compatibility pills (`Compatible with this version`) or red incompatibility warnings (`Incompatible with this version - requires a newer or older release`) along with explicit version badges (`min_myads` & `max_myads`).
 * **Comprehensive Programmatic Compatibility Audit Across All Plugins & Themes:**
-  * Audited all 22 plugins and 2 themes (`default` and `bootstrap-sample`) based on their real programmatic dependencies (core hooks, database migrations, asset tokens, and modern layouts) rather than arbitrary manifest strings.
+  * Audited all plugins and active themes based on their real programmatic dependencies (core hooks, database migrations, asset tokens, and modern layouts) rather than arbitrary manifest strings.
   * Synchronized manifests with exact minimum versions (`min_myads: 4.5.0` for hook consumers, `4.5.6` for auto-migration extensions, `4.6.0` for theme token consumers) and set semantic upper bound `max_myads: 4.6.x` (with automatic resolution for `4.6`, `4.6.x`, and `4.6.*`).
 * **Direct Settings Action & Diagnostic UI (`admin_themes/default/views/admin/plugins.blade.php`):**
   * Exposed `settings_url` in plugin manifest allowing active cards to render a direct **Settings** button linking to their management dashboard.

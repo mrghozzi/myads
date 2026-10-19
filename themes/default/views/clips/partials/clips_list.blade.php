@@ -17,6 +17,9 @@
         $clipCaptionFormatted = \App\Support\ContentFormatter::format($clipCaption);
         $clipCaptionPlain = strip_tags($clipCaptionFormatted);
         $isCaptionLong = mb_strlen($clipCaptionPlain) > 80;
+        $clipTopic = $activity->forumTopic;
+        $clipViews = $clipTopic ? (int) ($clipTopic->vu ?? 0) : (int) ($activity->views_count ?? 0);
+        $clipDirectUrl = route('clips.show', $activity->id);
     @endphp
     @if($mediaUrl)
         <!-- SEO Structured Data for Short Video Clip -->
@@ -31,7 +34,7 @@
             ],
             "uploadDate": "{{ $activity->created_at?->toIso8601String() ?? now()->toIso8601String() }}",
             "contentUrl": "{{ $mediaUrl }}",
-            "url": "{{ url('/clips#' . $activity->id) }}",
+            "url": "{{ $clipDirectUrl }}",
             "author": {
                 "@@type": "Person",
                 "name": "{{ $clipUser->username ?? 'Unknown' }}",
@@ -52,8 +55,13 @@
         }
         </script>
         <div class="reel-item" data-id="{{ $activity->id }}" data-tp-id="{{ $activity->tp_id }}" data-s-type="{{ $activity->s_type }}" data-related-id="{{ $activity->related_content->id }}">
-            <video class="reel-video" loop muted playsinline src="{{ $mediaUrl }}" @if($posterUrl) poster="{{ $posterUrl }}" @endif preload="auto"></video>
+            <video class="reel-video" loop muted playsinline src="{{ $mediaUrl }}" @if($posterUrl) poster="{{ $posterUrl }}" @endif preload="none"></video>
             
+            <!-- Instagram-style Double-tap Heart Animation -->
+            <div class="reel-heart-pop-container">
+                <svg class="pop-heart-icon" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+            </div>
+
             <div class="reel-overlay">
                 <!-- Play/Pause Indicator -->
                 <div class="reel-play-indicator">
@@ -61,7 +69,7 @@
                 </div>
 
                 <!-- Mute Toggle -->
-                <div class="reel-mute-toggle">
+                <div class="reel-mute-toggle" title="Mute / Unmute">
                     <svg class="icon-mute" viewBox="0 0 24 24" width="24" height="24" fill="#fff">
                         <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>
                     </svg>
@@ -122,6 +130,12 @@
 
                 <!-- Right Actions Sidebar -->
                 <div class="reel-actions">
+                    <!-- Views Count Badge -->
+                    <div class="reel-action-btn clip-views-badge" title="{{ __('messages.video_views_count', ['count' => number_format($clipViews)]) }}">
+                        <svg class="icon" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+                        <span class="view-count-text">{{ number_format($clipViews) }}</span>
+                    </div>
+
                     <!-- Like -->
                     @php
                         $hasLiked = false;
@@ -130,13 +144,13 @@
                             $hasLiked = \App\Models\Like::where('uid', auth()->id())->where('sid', $activity->interactionSubjectId())->where('type', $reactionType)->exists();
                         }
                     @endphp
-                    <button class="reel-action-btn toggle-reaction {{ $hasLiked ? 'active' : '' }}" data-id="{{ $activity->interactionSubjectId() }}" data-type="clips" data-reaction="like">
+                    <button class="reel-action-btn toggle-reaction {{ $hasLiked ? 'active' : '' }}" data-id="{{ $activity->interactionSubjectId() }}" data-type="clips" data-reaction="like" title="{{ __('messages.like') ?? 'Like' }}">
                         <svg class="icon" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
                         <span class="reaction-count">{{ $activity->reactions_count }}</span>
                     </button>
 
                     <!-- Comment -->
-                    <button class="reel-action-btn open-comments" data-id="{{ $activity->id }}" data-tp-id="{{ $activity->tp_id }}">
+                    <button class="reel-action-btn open-comments" data-id="{{ $activity->id }}" data-tp-id="{{ $activity->tp_id }}" title="{{ __('messages.comments') ?? 'Comments' }}">
                         <svg class="icon" viewBox="0 0 24 24"><path d="M21.99 4c0-1.1-.89-2-1.99-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4-.01-18zM18 14H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/></svg>
                         <span>{{ $activity->comments_count }}</span>
                     </button>
@@ -149,21 +163,21 @@
                             $hasSaved = \Illuminate\Support\Facades\DB::table('saved_statuses')->where('user_id', auth()->id())->where('status_id', $activity->id)->exists();
                         }
                     @endphp
-                    <button class="reel-action-btn toggle-save {{ $hasSaved ? 'active' : '' }}" data-id="{{ $activity->id }}">
+                    <button class="reel-action-btn toggle-save {{ $hasSaved ? 'active' : '' }}" data-id="{{ $activity->id }}" title="{{ __('messages.saved') ?? 'Save' }}">
                         <svg class="icon" viewBox="0 0 24 24"><path d="M17 3H7c-1.1 0-1.99.9-1.99 2L5 21l7-3 7 3V5c0-1.1-.9-2-2-2z"/></svg>
                         <span class="save-count">{{ $savedCount }}</span>
                     </button>
 
                     <!-- Share -->
-                    <button class="reel-action-btn share-reel" data-url="{{ url('/clips#'.$activity->id) }}">
+                    <button class="reel-action-btn share-reel" data-url="{{ $clipDirectUrl }}" title="{{ __('messages.share') ?? 'Share' }}">
                         <svg class="icon" viewBox="0 0 24 24"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z"/></svg>
                         <span>{{ __('messages.share') ?? 'Share' }}</span>
                     </button>
                 </div>
             </div>
             
-            <!-- Progress Bar -->
-            <div class="reel-progress">
+            <!-- Seekable Interactive Progress Bar -->
+            <div class="reel-progress" title="Click to seek">
                 <div class="reel-progress-filled"></div>
             </div>
         </div>
