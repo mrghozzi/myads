@@ -1464,6 +1464,7 @@
 ### Dependencies
 * **chore(deps)**: bump guzzlehttp/guzzle from 7.12.1 to 7.15.1 in the composer group across 1 directory.
 * **chore(deps-dev)**: bump shell-quote from 1.10.0 to 1.12.0 in the npm_and_yarn group across 1 directory.
+* **chore(deps-dev)**: bump source-map-js from 1.2.1 to 1.2.2 in the npm_and_yarn group across 1 directory (resolves Dependabot alert #89 / event-loop DoS).
 
 # v4.4.5
 > **Stable Release** — Mobile API Community Feed Enhancements & Authorization Fixes.
