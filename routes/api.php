@@ -103,6 +103,8 @@ Route::middleware(['api.key', 'auth:sanctum'])->group(function () {
     // Clips API
     Route::get('/clips', [App\Http\Controllers\Api\ClipsController::class, 'index']);
     Route::get('/clips/saved', [App\Http\Controllers\Api\ClipsController::class, 'saved']);
+    Route::post('/clips/view', [App\Http\Controllers\Api\ClipsController::class, 'recordView']);
+    Route::get('/clips/{status}', [App\Http\Controllers\Api\ClipsController::class, 'show'])->whereNumber('status');
     Route::post('/clips/{status}/save', [App\Http\Controllers\Api\ClipsController::class, 'save']);
     Route::delete('/clips/{status}/save', [App\Http\Controllers\Api\ClipsController::class, 'unsave']);
 

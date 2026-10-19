@@ -80,6 +80,7 @@ class StatusResource extends JsonResource
             'text' => $this->txt,
             'video_title' => $videoTitle ?: $this->getDisplayTitle(),
             'video_thumbnail' => $videoThumbnail ?: $this->getDisplayImage(),
+            'views_count' => $topic ? (int) ($topic->vu ?? 0) : (int) ($this->views_count ?? 0),
             'date' => $this->date,
             'date_formatted' => $this->date_formatted,
             'reactions_count' => $this->reactions_count,

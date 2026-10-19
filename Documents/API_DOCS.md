@@ -27,6 +27,8 @@ The MYADS v4.6.3 API ecosystem delivers high-performance, secure, and extensible
 13. **Smart Partitioned Sitemaps & Discovery (`/sitemap.xml`, `/sitemap/*.xml`):** Partitioned XML sitemaps with ETag conditional HTTP 304 caching for enterprise SEO discovery.
 14. **Gamification & Badges Engine (`/api/settings/badges`, `/api/developer/v1/me/badges`, `/badges`):** Earned and showcase badge retrieval, progress tracking, showcase configuration (up to 6 badges), and referral milestone badges with automated points rewarding.
 15. **Referral Tracking & Growth Engine (`?ref=`, `/ads/referrals`, `/referral`):** Global referral capture with 30-day cookie persistence (`CaptureReferral`), multi-format identifier resolution (username, Public UID, ID), anti-fraud self-referral protection, and two-sided bonus allocation (+10 PTS referee welcome bonus, +10 PTS referrer reward).
+16. **Clips 2.0 Short-Form Vertical Video Engine (`/api/clips/*`, `/clips/*`):** TikTok/Reels-style vertical video discovery with feed tabs (`latest`, `trending`, `following`), deep-link targeting, continuous watch view recording (`POST /api/clips/view`), double-tap heart pops, and saved clips collections.
+17. **Directory 2.0 & Developer Upvoting Platform (`/directory/*`, `/api/directory/*`):** Web discovery and curation suite featuring community upvoting (`POST /directory/{id}/upvote`), dynamic SVG badges (`/directory/{id}/badge`), ownership claim verification (`POST /directory/{id}/claim`), and Schema.org JSON-LD structured data.
 
 ---
 
@@ -1087,6 +1089,171 @@ MYADS v4.6.2 provides scalable, partitioned XML Sitemaps compliant with Google S
 
 - **HTTP 304 Conditional Support:** Endpoints calculate an `ETag` and check incoming `If-None-Match` request headers. If content has not changed, the server returns an immediate `HTTP 304 Not Modified` without transferring payload bytes.
 - **Content-Type:** `application/xml; charset=utf-8` with XML declaration and standard `<urlset>` / `<sitemapindex>` roots.
+
+---
+
+### O. Clips 2.0 Short-Form Vertical Video API
+
+The Clips 2.0 engine powers vertical, short-form video discovery across web and mobile companion apps (`myads_app`).
+
+#### 1. Endpoints Catalog
+- `GET /api/clips`: Retrieve vertical clips feed with multi-tab discovery and deep-linking support:
+  - **Query Parameters:**
+    | Parameter | Type | Required | Description |
+    |---|---|---|---|
+    | `tab` | string | Optional | Discovery tab: `latest` (default), `trending` (ordered by views & reactions), `following` (clips from followed creators). |
+    | `clip` | integer | Optional | Target clip ID for deep-linking. Prioritizes the specified clip as the first item in the collection. |
+    | `page` | integer | Optional | Page number for cursor/offset pagination (default: 1). |
+    | `per_page` | integer | Optional | Items per page (default: 10, max: 50). |
+  - **Response Structure (HTTP 200):**
+    ```json
+    {
+        "data": [
+            {
+                "id": 105,
+                "s_type": 14,
+                "text": "Check out this amazing short clip! #tech #flutter",
+                "video_title": null,
+                "views_count": 1420,
+                "likes_count": 86,
+                "comments_count": 14,
+                "is_liked": false,
+                "is_saved": false,
+                "user": {
+                    "id": 42,
+                    "username": "developer",
+                    "name": "Jane",
+                    "avatar": "https://domain.com/upload/avatar.png",
+                    "verified": true
+                },
+                "videos": [
+                    {
+                        "id": 88,
+                        "file_path": "upload/videos/clip_105.mp4",
+                        "mime_type": "video/mp4"
+                    }
+                ],
+                "created_at": "2 hours ago"
+            }
+        ],
+        "meta": {
+            "current_page": 1,
+            "last_page": 5,
+            "per_page": 10,
+            "total": 48
+        }
+    }
+    ```
+- `GET /api/clips/{status}`: Retrieve single clip detail payload:
+  - **Headers:** `X-API-KEY: {key}`, `Authorization: Bearer {token}` (Optional)
+  - **Response:** Returns `StatusResource` with `views_count`, media paths, creator profile, and viewer reaction state.
+- `POST /api/clips/view`: Automated continuous-play view tracking:
+  - **Mechanism:** Triggered automatically after continuous playback of $\ge 2.5\text{ seconds}$. Uses session and cache deduplication (`clips_viewed_{ip}_{statusId}`) to prevent artificial view inflation.
+  - **Headers:** `X-API-KEY: {key}`, `Content-Type: application/json`
+  - **Payload:**
+    ```json
+    {
+        "status_id": 105
+    }
+    ```
+  - **Response (HTTP 200):**
+    ```json
+    {
+        "success": true,
+        "views_count": 1421
+    }
+    ```
+- `GET /api/clips/saved`: Retrieve paginated collection of bookmarked clips for the authenticated user.
+- `POST /api/clips/{id}/save`: Bookmark a clip.
+- `DELETE /api/clips/{id}/save`: Remove clip bookmark.
+
+---
+
+### P. Web Directory 2.0 & Developer Upvoting Platform
+
+The Directory 2.0 subsystem transforms the traditional web directory into an interactive, community-ranked showcase with dynamic SVG badges and site verification.
+
+#### 1. Discovery & Search Endpoints
+- `GET /directory`: Browse directory catalog with multi-axis filtering:
+  - **Query Parameters:**
+    | Parameter | Type | Required | Description |
+    |---|---|---|---|
+    | `sort` | string | Optional | `latest` (default), `trending` (upvote velocity), `popular` (most visits), `featured`. |
+    | `pricing` | string | Optional | Filter by business model: `all`, `free`, `freemium`, `paid`, `open_source`. |
+    | `search` | string | Optional | Substring keyword search across site title, description, and domain. |
+    | `cat` | integer | Optional | Category ID filter. |
+- `GET /directory/{id}` (or `/directory/{id}/{slug}`): Detailed directory listing page with Schema.org JSON-LD `SoftwareApplication` structured data.
+
+#### 2. Community Upvoting API
+- `POST /directory/{id}/upvote`: Instant toggle upvoting:
+  - **Headers:** `X-CSRF-TOKEN: {token}` or `Authorization: Bearer {token}`, `Accept: application/json`
+  - **Behavior:** Toggles the upvote state for the authenticated user and increments/decrements `directory.upvotes_count`.
+  - **Response (HTTP 200):**
+    ```json
+    {
+        "success": true,
+        "upvoted": true,
+        "upvotes_count": 42
+    }
+    ```
+
+#### 3. Dynamic SVG Embed Badges
+- `GET /directory/{id}/badge`: Generates a dynamic SVG badge for third-party websites:
+  - **Headers:** `Content-Type: image/svg+xml; charset=utf-8`, `Cache-Control: public, max-age=300`
+  - **Output:** Flat SVG badge showing platform logo, star rating, and real-time upvotes count.
+  - **Embedding Example:**
+    ```html
+    <a href="https://domain.com/directory/42" target="_blank" rel="noopener">
+        <img src="https://domain.com/directory/42/badge" alt="Featured on MYADS Directory">
+    </a>
+    ```
+
+#### 4. Domain Ownership Claim & Verification
+- `POST /directory/{id}/claim`: Automated ownership verification:
+  - **Verification Method:** Inspects the external target URL's HTML `<head>` for the verification meta tag:
+    `<meta name="myads-verification" content="myads-verify-{hash}">`
+  - **Response (HTTP 200 on Success):**
+    ```json
+    {
+        "success": true,
+        "message": "Ownership verified successfully! Your listing now features the Verified badge."
+    }
+    ```
+  - **Response (HTTP 422 on Failure):**
+    ```json
+    {
+        "success": false,
+        "message": "Verification tag not found in website HTML header."
+    }
+    ```
+
+---
+
+### Q. Referral Engine & Milestone Achievements
+
+The Referral Growth Engine tracks user invitations, allocates two-sided signup bonuses, and rewards creators with tiered achievement badges.
+
+#### 1. Tracking Protocol
+- **URL Parameter:** `?ref={identifier}` where `{identifier}` can be:
+  - Username (e.g. `?ref=developer`)
+  - Obfuscated Public UID (e.g. `?ref=usr_9a8b7c6d5e`)
+  - Numeric User ID (fallback)
+- **Cookie Persistence:** 30 days via `myads_referrer` cookie (`CaptureReferral` middleware).
+- **Two-Sided Incentive:**
+  - **Referee (New Member):** Receives welcome bonus points (+10 PTS) upon successful registration.
+  - **Referrer (Inviting Member):** Receives referral reward points (+10 PTS) upon completed registration.
+  - **Anti-Fraud Guard:** Self-referrals, matching IP registrations, and duplicate accounts are automatically rejected.
+
+#### 2. Referral Milestone Badges
+Referral counts automatically increment badge progress and award bonus PTS upon reaching achievement milestones:
+| Badge Key | Criteria | Points Reward | Milestone Name |
+|---|---|:---:|---|
+| `referral_scout` | 5 Referrals | +100 PTS | Referral Scout |
+| `referral_specialist` | 25 Referrals | +500 PTS | Referral Specialist |
+| `referral_master` | 100 Referrals | +2,500 PTS | Referral Master |
+| `referral_legend` | 500 Referrals | +15,000 PTS | Referral Legend |
+
+- Milestone badges are queryable via `GET /api/settings/badges` and `GET /api/developer/v1/me/badges`.
 
 ---
 

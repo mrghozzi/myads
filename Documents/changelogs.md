@@ -27,6 +27,12 @@
   * Updated `StatusController::create` to redirect newly published clips directly to `route('clips.show', $status->id)` instead of forum topics.
 * **Automated Feature Test Coverage (`ClipsTest.php`)**:
   * 100% passing automated test suite (7 tests, 29 assertions) covering index rendering, direct clip prioritization, view incrementing, session deduplication, save toggling, trending/following tabs, and creation redirects.
+* **Mobile & Companion REST API Engine (`/api/clips`, `/api/clips/{status}`, `/api/clips/view`, `ClipsController.php`, `StatusResource.php`, `routes/api.php`, `ClipsApiTest.php`)**:
+  * Added dedicated REST discovery endpoint `GET /api/clips` supporting multi-mode feed switching via `tab` (`latest`, `trending`, `following`) and targeted deep-link prioritization via `clip={id}`.
+  * Added single clip retrieval endpoint `GET /api/clips/{status}` resolving `StatusResource` payload with author info and interaction state.
+  * Implemented automated background view tracking endpoint `POST /api/clips/view` with session and cache-based deduplication to prevent view count manipulation.
+  * Enhanced `StatusResource` to expose calculated `views_count` attribute mapped from associated forum topic view counters or direct status counters.
+  * Authored automated API test suite (`ClipsApiTest.php`) with 100% pass rate (5 tests, 30 assertions) validating all API routes, pagination, view counter increments, and tab filtering.
 
 ### Complete Referral & Growth Engine Overhaul (`/ads/referrals`, `/referral`, `/badges`, `CaptureReferral.php`, `AdsController.php`, `AuthController.php`, `GamificationService.php`)
 * **30-Day Referral Cookie & Session Tracking Middleware (`CaptureReferral.php`, `bootstrap/app.php`)**:
