@@ -748,4 +748,94 @@
             height: calc(100% - 60px);
         }
     }
+
+    /* Snippets Toolbar Compact & Inline Buttons */
+    .kb-snippets-toolbar {
+        display: flex !important;
+        align-items: center !important;
+        flex-wrap: wrap !important;
+        gap: 6px !important;
+        padding: 6px 10px !important;
+        margin-bottom: 10px !important;
+        background: var(--store-shell-soft, #f7f8fd);
+        border: 1px solid var(--store-shell-border, rgba(143, 145, 172, 0.18));
+        border-radius: 10px;
+    }
+
+    body[data-theme="css_d"] .kb-snippets-toolbar {
+        background: var(--store-shell-soft, #242d40);
+        border-color: rgba(255, 255, 255, 0.08);
+    }
+
+    .kb-snippets-toolbar__label {
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 5px !important;
+        font-size: 0.72rem !important;
+        font-weight: 800 !important;
+        color: var(--store-shell-muted, #8f91ac) !important;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+        margin-inline-end: 4px !important;
+        white-space: nowrap !important;
+        line-height: 1 !important;
+    }
+
+    .kb-snippets-toolbar__items {
+        display: inline-flex !important;
+        align-items: center !important;
+        flex-wrap: wrap !important;
+        gap: 5px !important;
+    }
+
+    .kb-snippets-toolbar button.kb-snippet-btn,
+    .kb-snippet-btn {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: auto !important;
+        max-width: max-content !important;
+        height: 28px !important;
+        min-height: unset !important;
+        line-height: 26px !important;
+        flex: 0 0 auto !important;
+        padding: 0 10px !important;
+        border-radius: 6px !important;
+        background: var(--store-shell-surface, #ffffff) !important;
+        border: 1px solid var(--store-shell-border, rgba(143, 145, 172, 0.22)) !important;
+        color: var(--store-shell-title, #3e3f5e) !important;
+        font-size: 0.72rem !important;
+        font-weight: 700 !important;
+        cursor: pointer !important;
+        gap: 5px !important;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+        transition: all 0.15s ease-in-out !important;
+        white-space: nowrap !important;
+    }
+
+    body[data-theme="css_d"] .kb-snippets-toolbar button.kb-snippet-btn,
+    body[data-theme="css_d"] .kb-snippet-btn {
+        background: #1f2637 !important;
+        color: #c8d1e8 !important;
+        border-color: rgba(255, 255, 255, 0.1) !important;
+    }
+
+    .kb-snippets-toolbar button.kb-snippet-btn:hover,
+    .kb-snippet-btn:hover {
+        transform: translateY(-1px) !important;
+        box-shadow: 0 3px 8px rgba(97, 93, 250, 0.2) !important;
+        border-color: var(--store-shell-accent, #615dfa) !important;
+        color: var(--store-shell-accent, #615dfa) !important;
+    }
+
+    .kb-snippets-toolbar button.kb-snippet-btn:active,
+    .kb-snippet-btn:active {
+        transform: translateY(0) !important;
+        box-shadow: none !important;
+    }
+
+    .kb-snippet-btn i {
+        font-size: 0.72rem !important;
+        line-height: 1 !important;
+    }
 </style>

@@ -437,61 +437,95 @@
        Editor Quick-Insert Snippets Toolbar
        ============================================================ */
     .kb-snippets-toolbar {
-        display: flex;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 8px;
-        padding: 12px 14px;
-        margin-bottom: 12px;
+        display: flex !important;
+        align-items: center !important;
+        flex-wrap: wrap !important;
+        gap: 6px !important;
+        padding: 6px 10px !important;
+        margin-bottom: 10px !important;
         background: var(--store-shell-soft, #f7f8fd);
         border: 1px solid var(--store-shell-border, rgba(143, 145, 172, 0.18));
-        border-radius: 14px;
+        border-radius: 10px;
     }
 
     body[data-theme="css_d"] .kb-snippets-toolbar {
         background: var(--store-shell-soft, #242d40);
+        border-color: rgba(255, 255, 255, 0.08);
     }
 
     .kb-snippets-toolbar__label {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        font-size: 0.76rem;
-        font-weight: 800;
-        color: var(--store-shell-muted, #8f91ac);
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 5px !important;
+        font-size: 0.72rem !important;
+        font-weight: 800 !important;
+        color: var(--store-shell-muted, #8f91ac) !important;
         text-transform: uppercase;
-        letter-spacing: 0.05em;
-        margin-inline-end: 4px;
+        letter-spacing: 0.04em;
+        margin-inline-end: 4px !important;
+        white-space: nowrap !important;
+        line-height: 1 !important;
+        user-select: none;
     }
 
+    .kb-snippets-toolbar__items {
+        display: inline-flex !important;
+        align-items: center !important;
+        flex-wrap: wrap !important;
+        gap: 5px !important;
+    }
+
+    .kb-snippets-toolbar button.kb-snippet-btn,
     .kb-snippet-btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
-        padding: 5px 11px;
-        border-radius: 8px;
-        background: var(--store-shell-surface, #ffffff);
-        border: 1px solid var(--store-shell-border, rgba(143, 145, 172, 0.2));
-        color: var(--store-shell-title, #3e3f5e);
-        font-size: 0.76rem;
-        font-weight: 700;
-        cursor: pointer;
-        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: auto !important;
+        max-width: max-content !important;
+        height: 28px !important;
+        min-height: unset !important;
+        line-height: 26px !important;
+        flex: 0 0 auto !important;
+        padding: 0 10px !important;
+        border-radius: 6px !important;
+        background: var(--store-shell-surface, #ffffff) !important;
+        border: 1px solid var(--store-shell-border, rgba(143, 145, 172, 0.22)) !important;
+        color: var(--store-shell-title, #3e3f5e) !important;
+        font-size: 0.72rem !important;
+        font-weight: 700 !important;
+        cursor: pointer !important;
+        gap: 5px !important;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+        transition: all 0.15s ease-in-out !important;
+        white-space: nowrap !important;
+        user-select: none !important;
     }
 
+    body[data-theme="css_d"] .kb-snippets-toolbar button.kb-snippet-btn,
     body[data-theme="css_d"] .kb-snippet-btn {
-        background: #1f2637;
-        color: #c8d1e8;
+        background: #1f2637 !important;
+        color: #c8d1e8 !important;
+        border-color: rgba(255, 255, 255, 0.1) !important;
     }
 
+    .kb-snippets-toolbar button.kb-snippet-btn:hover,
     .kb-snippet-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(97, 93, 250, 0.18);
-        border-color: var(--store-shell-accent, #615dfa);
-        color: var(--store-shell-accent, #615dfa);
+        transform: translateY(-1px) !important;
+        box-shadow: 0 3px 8px rgba(97, 93, 250, 0.2) !important;
+        border-color: var(--store-shell-accent, #615dfa) !important;
+        color: var(--store-shell-accent, #615dfa) !important;
     }
 
-    .kb-snippet-btn i { font-size: 0.8rem; }
+    .kb-snippets-toolbar button.kb-snippet-btn:active,
+    .kb-snippet-btn:active {
+        transform: translateY(0) !important;
+        box-shadow: none !important;
+    }
+
+    .kb-snippet-btn i {
+        font-size: 0.72rem !important;
+        line-height: 1 !important;
+    }
 </style>
 
 {{-- Highlighting and Mermaid CDN libraries --}}
@@ -829,14 +863,16 @@
             toolbar.className = 'kb-snippets-toolbar';
             toolbar.innerHTML = `
                 <span class="kb-snippets-toolbar__label"><i class="fa fa-magic"></i> {{ __('messages.insert_code_template') ?? 'Quick Code & Diagram:' }}</span>
-                <button type="button" class="kb-snippet-btn" data-snippet="mermaid"><i class="fa fa-sitemap" style="color: #38bdf8;"></i> Mermaid</button>
-                <button type="button" class="kb-snippet-btn" data-snippet="php"><i class="fa fa-code" style="color: #a5b4fc;"></i> PHP</button>
-                <button type="button" class="kb-snippet-btn" data-snippet="blade"><i class="fa fa-bolt" style="color: #fb7185;"></i> Blade</button>
-                <button type="button" class="kb-snippet-btn" data-snippet="html"><i class="fa fa-html5" style="color: #fb923c;"></i> HTML</button>
-                <button type="button" class="kb-snippet-btn" data-snippet="css"><i class="fa fa-css3" style="color: #60a5fa;"></i> CSS</button>
-                <button type="button" class="kb-snippet-btn" data-snippet="json"><i class="fa fa-code" style="color: #fcd34d;"></i> JSON</button>
-                <button type="button" class="kb-snippet-btn" data-snippet="text"><i class="fa fa-file-text-o" style="color: #cbd5e1;"></i> Text</button>
-                <button type="button" class="kb-snippet-btn" data-snippet="code"><i class="fa fa-terminal" style="color: #c4b5fd;"></i> Code</button>
+                <div class="kb-snippets-toolbar__items">
+                    <button type="button" class="kb-snippet-btn" data-snippet="mermaid"><i class="fa fa-sitemap" style="color: #38bdf8;"></i> Mermaid</button>
+                    <button type="button" class="kb-snippet-btn" data-snippet="php"><i class="fa fa-code" style="color: #a5b4fc;"></i> PHP</button>
+                    <button type="button" class="kb-snippet-btn" data-snippet="blade"><i class="fa fa-bolt" style="color: #fb7185;"></i> Blade</button>
+                    <button type="button" class="kb-snippet-btn" data-snippet="html"><i class="fa fa-html5" style="color: #fb923c;"></i> HTML</button>
+                    <button type="button" class="kb-snippet-btn" data-snippet="css"><i class="fa fa-css3" style="color: #60a5fa;"></i> CSS</button>
+                    <button type="button" class="kb-snippet-btn" data-snippet="json"><i class="fa fa-code" style="color: #fcd34d;"></i> JSON</button>
+                    <button type="button" class="kb-snippet-btn" data-snippet="text"><i class="fa fa-file-text-o" style="color: #cbd5e1;"></i> Text</button>
+                    <button type="button" class="kb-snippet-btn" data-snippet="code"><i class="fa fa-terminal" style="color: #c4b5fd;"></i> Code</button>
+                </div>
             `;
 
             textarea.parentNode.insertBefore(toolbar, textarea);
