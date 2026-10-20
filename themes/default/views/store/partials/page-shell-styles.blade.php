@@ -838,4 +838,24 @@
         font-size: 0.72rem !important;
         line-height: 1 !important;
     }
+
+    .kb-snippets-toolbar .fa-html5,
+    .kb-snippets-toolbar .fa-css3,
+    .kb-snippets-toolbar .fa-css3-alt,
+    .fa-html5, .fa.fa-html5, i.fa-html5,
+    .fa-css3, .fa.fa-css3, i.fa-css3,
+    .fa-css3-alt, .fa.fa-css3-alt, i.fa-css3-alt {
+        font-family: "Font Awesome 7 Brands", "Font Awesome 6 Brands", "Font Awesome 5 Brands", "FontAwesome", sans-serif !important;
+        --_fa-family: "Font Awesome 7 Brands", "Font Awesome 6 Brands", "Font Awesome 5 Brands", "FontAwesome", sans-serif !important;
+        --fa-family: "Font Awesome 7 Brands", "Font Awesome 6 Brands", "Font Awesome 5 Brands", "FontAwesome", sans-serif !important;
+        --fa-style: 400 !important;
+        font-weight: 400 !important;
+        font-style: normal !important;
+    }
+    .fa-html5, .fa.fa-html5, i.fa-html5 { --fa: "\f13b" !important; }
+    .fa-html5:before, .fa.fa-html5:before, i.fa-html5:before { content: "\f13b" !important; }
+    .fa-css3, .fa.fa-css3, i.fa-css3 { --fa: "\f13c" !important; }
+    .fa-css3:before, .fa.fa-css3:before, i.fa-css3:before { content: "\f13c" !important; }
+    .fa-css3-alt, .fa.fa-css3-alt, i.fa-css3-alt { --fa: "\f38b" !important; }
+    .fa-css3-alt:before, .fa.fa-css3-alt:before, i.fa-css3-alt:before { content: "\f38b" !important; }
 </style>

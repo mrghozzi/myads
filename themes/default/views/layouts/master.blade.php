@@ -179,6 +179,36 @@
             font-weight: 400 !important;
         }
         .fa-markdown:before, .fa.fa-markdown:before { content: "\f60f" !important; }
+
+        .fa-html5, .fa.fa-html5, i.fa-html5 {
+            --fa: "\f13b" !important;
+            --fa-family: "Font Awesome 7 Brands", "Font Awesome 6 Brands", sans-serif !important;
+            --_fa-family: "Font Awesome 7 Brands", "Font Awesome 6 Brands", sans-serif !important;
+            font-family: "Font Awesome 7 Brands", "Font Awesome 6 Brands", sans-serif !important;
+            --fa-style: 400 !important;
+            font-weight: 400 !important;
+        }
+        .fa-html5:before, .fa.fa-html5:before { content: "\f13b" !important; }
+
+        .fa-css3, .fa.fa-css3, i.fa-css3 {
+            --fa: "\f13c" !important;
+            --fa-family: "Font Awesome 7 Brands", "Font Awesome 6 Brands", sans-serif !important;
+            --_fa-family: "Font Awesome 7 Brands", "Font Awesome 6 Brands", sans-serif !important;
+            font-family: "Font Awesome 7 Brands", "Font Awesome 6 Brands", sans-serif !important;
+            --fa-style: 400 !important;
+            font-weight: 400 !important;
+        }
+        .fa-css3:before, .fa.fa-css3:before { content: "\f13c" !important; }
+
+        .fa-css3-alt, .fa.fa-css3-alt, i.fa-css3-alt {
+            --fa: "\f38b" !important;
+            --fa-family: "Font Awesome 7 Brands", "Font Awesome 6 Brands", sans-serif !important;
+            --_fa-family: "Font Awesome 7 Brands", "Font Awesome 6 Brands", sans-serif !important;
+            font-family: "Font Awesome 7 Brands", "Font Awesome 6 Brands", sans-serif !important;
+            --fa-style: 400 !important;
+            font-weight: 400 !important;
+        }
+        .fa-css3-alt:before, .fa.fa-css3-alt:before { content: "\f38b" !important; }
         .fa-comment-o, .fa.fa-comment-o, i.fa-comment-o {
             --fa: "\f075" !important;
             font-family: "Font Awesome 7 Free", "Font Awesome 6 Free", "FontAwesome", sans-serif !important;
@@ -226,8 +256,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdn.datatables.net">
-    <link rel="dns-prefetch" href="https://ads.hsoubcdn.com">
     <link rel="preload" href="{{ theme_asset('fonts/fontawesome-webfont.woff2?v=4.7.0') }}" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="{{ theme_asset('webfonts/fa-solid-900.woff2') }}" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="{{ theme_asset('webfonts/fa-brands-400.woff2') }}" as="font" type="font/woff2" crossorigin>
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
 

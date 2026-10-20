@@ -673,6 +673,36 @@ class StoreProductKnowledgebaseUiTest extends TestCase
         $this->assertStringContainsString('calc(100% - ${headerHeight}px)', $html);
     }
 
+    public function test_knowledgebase_editor_renders_compact_snippets_toolbar_and_brand_icon_classes_and_shims(): void
+    {
+        $this->seedThemeSetting();
+        $user = User::factory()->create();
+        $product = $this->createStoreProduct($user, 'kb-snippets-test-product');
+
+        $response = $this->actingAs($user)->get(route('kb.create', $product->name));
+        $html = $response->getContent();
+
+        $response->assertOk();
+
+        // 1. Snippets toolbar initialized and present
+        $this->assertStringContainsString('initKbSnippetsToolbar', $html);
+        $this->assertStringContainsString('kb-snippets-toolbar', $html);
+        $this->assertStringContainsString('kb-snippets-toolbar__items', $html);
+        $this->assertStringContainsString('kb-snippet-btn', $html);
+
+        // 2. Compact side-by-side styling rules present
+        $this->assertStringContainsString('display: inline-flex !important', $html);
+        $this->assertStringContainsString('width: auto !important', $html);
+        $this->assertStringContainsString('height: 28px !important', $html);
+
+        // 3. Brand icons for HTML5 and CSS3 use proper brand classes and shims
+        $this->assertStringContainsString('fa-brands fab fa-html5', $html);
+        $this->assertStringContainsString('fa-brands fab fa-css3', $html);
+        $this->assertStringContainsString('Font Awesome 7 Brands', $html);
+        $this->assertStringContainsString('.fa-html5', $html);
+        $this->assertStringContainsString('.fa-css3', $html);
+    }
+
     private function seedThemeSetting(): void
     {
         Setting::create([
