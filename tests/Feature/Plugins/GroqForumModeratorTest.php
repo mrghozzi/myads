@@ -284,4 +284,183 @@ class GroqForumModeratorTest extends TestCase
         $exitCode = Artisan::call('groq-moderator:run', ['--action' => 'heal']);
         $this->assertEquals(0, $exitCode);
     }
+
+    public function test_mention_reply_creates_single_reply_and_prevents_duplicate_loop(): void
+    {
+        $this->createAdmin();
+        $this->enablePlugin();
+
+        $category = ForumCategory::create([
+            'name' => 'General',
+            'slug' => 'general',
+            'color' => '#615dfa',
+            'ordercat' => 1,
+            'visibility' => 0,
+        ]);
+
+        $service = groq_forum_moderator_service();
+        $bot = $service->syncBotUser(['bot_name' => 'SmartMod']);
+        $service->saveConfig([
+            'is_enabled' => 1,
+            'api_key' => 'gsk_test',
+            'cooldown_minutes' => 0,
+            'enable_mentions' => 1,
+            'max_mentions_replies_per_thread' => 2,
+        ]);
+
+        $user = User::factory()->create(['username' => 'member1']);
+
+        $topic = ForumTopic::create([
+            'cat' => $category->id,
+            'uid' => $user->id,
+            'name' => 'Help needed with API',
+            'slug' => 'help-needed-api',
+            'txt' => 'Discussion content...',
+            'date' => time() - 100,
+            'statu' => 1,
+        ]);
+
+        // Member mentions the bot asking a question
+        ForumComment::create([
+            'uid' => $user->id,
+            'tid' => $topic->id,
+            'txt' => 'مرحباً @SmartMod كيف أقوم بإعداد واجهة برمجة التطبيقات؟',
+            'date' => time() - 50,
+        ]);
+
+        Http::fake([
+            'api.groq.com/*' => Http::response([
+                'choices' => [
+                    [
+                        'message' => [
+                            'content' => 'يمكنك إعداد واجهة التطبيقات باتباع التوثيق الرسمي.',
+                        ],
+                    ],
+                ],
+            ], 200),
+        ]);
+
+        // First tick: bot should reply
+        $firstAction = $service->runForceTick();
+        $this->assertEquals('success', $firstAction['status']);
+
+        // Assert 1 bot comment created
+        $botComments = ForumComment::where('tid', $topic->id)->where('uid', $bot->id)->get();
+        $this->assertCount(1, $botComments);
+        $this->assertStringContainsString('@member1', $botComments->first()->txt);
+
+        // Second tick: should NOT reply again to the same comment
+        $secondAction = $service->runForceTick();
+        $this->assertEquals('info', $secondAction['status']);
+
+        // Assert count remains 1 (no duplicate replies!)
+        $this->assertEquals(1, ForumComment::where('tid', $topic->id)->where('uid', $bot->id)->count());
+    }
+
+    public function test_mention_reply_skips_gratitude_comments(): void
+    {
+        $this->createAdmin();
+        $this->enablePlugin();
+
+        $category = ForumCategory::create([
+            'name' => 'General',
+            'slug' => 'general',
+            'color' => '#615dfa',
+            'ordercat' => 1,
+            'visibility' => 0,
+        ]);
+
+        $service = groq_forum_moderator_service();
+        $bot = $service->syncBotUser(['bot_name' => 'SmartMod']);
+        $service->saveConfig([
+            'is_enabled' => 1,
+            'api_key' => 'gsk_test',
+            'cooldown_minutes' => 0,
+            'enable_mentions' => 1,
+            'max_mentions_replies_per_thread' => 2,
+        ]);
+
+        $user = User::factory()->create(['username' => 'member2']);
+
+        $topic = ForumTopic::create([
+            'cat' => $category->id,
+            'uid' => $user->id,
+            'name' => 'Another topic',
+            'slug' => 'another-topic',
+            'txt' => 'Discussion...',
+            'date' => time() - 100,
+            'statu' => 1,
+        ]);
+
+        // User says only thanks
+        ForumComment::create([
+            'uid' => $user->id,
+            'tid' => $topic->id,
+            'txt' => 'شكراً لك @SmartMod يعطيك العافية',
+            'date' => time() - 50,
+        ]);
+
+        $this->assertTrue($service->isGratitudeOrAcknowledgement('شكراً لك @SmartMod يعطيك العافية', 'SmartMod'));
+
+        $service->runForceTick();
+        // Since it's pure gratitude, bot should NOT post any comment
+        $this->assertEquals(0, ForumComment::where('tid', $topic->id)->where('uid', $bot->id)->count());
+    }
+
+    public function test_mention_reply_enforces_strict_max_replies_cap(): void
+    {
+        $this->createAdmin();
+        $this->enablePlugin();
+
+        $category = ForumCategory::create([
+            'name' => 'General',
+            'slug' => 'general',
+            'color' => '#615dfa',
+            'ordercat' => 1,
+            'visibility' => 0,
+        ]);
+
+        $service = groq_forum_moderator_service();
+        $bot = $service->syncBotUser(['bot_name' => 'SmartMod']);
+        $service->saveConfig([
+            'is_enabled' => 1,
+            'api_key' => 'gsk_test',
+            'cooldown_minutes' => 0,
+            'enable_mentions' => 1,
+            'max_mentions_replies_per_thread' => 1, // Cap at 1 reply
+        ]);
+
+        $user = User::factory()->create(['username' => 'member3']);
+
+        $topic = ForumTopic::create([
+            'cat' => $category->id,
+            'uid' => $user->id,
+            'name' => 'Strict cap topic',
+            'slug' => 'strict-cap-topic',
+            'txt' => 'Discussion...',
+            'date' => time() - 200,
+            'statu' => 1,
+        ]);
+
+        // Simulate that bot has already replied once to member3 in this topic
+        ForumComment::create([
+            'uid' => $bot->id,
+            'tid' => $topic->id,
+            'txt' => '@member3 الإجابة الأولى الكاملة.',
+            'date' => time() - 150,
+        ]);
+
+        // Member asks a 2nd question in the same topic
+        ForumComment::create([
+            'uid' => $user->id,
+            'tid' => $topic->id,
+            'txt' => '@SmartMod هل هناك تفاصيل أخرى؟',
+            'date' => time() - 50,
+        ]);
+
+        $service->runForceTick();
+
+        // Bot should NOT reply because cap is 1 and bot already replied once
+        $this->assertEquals(1, ForumComment::where('tid', $topic->id)->where('uid', $bot->id)->count());
+    }
 }
