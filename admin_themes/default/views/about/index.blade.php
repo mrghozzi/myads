@@ -431,7 +431,7 @@
                             <div class="col-md-6 col-lg-4">
                                 <div class="feature-card p-4">
                                     <div class="feature-icon-wrapper" style="background: linear-gradient(135deg, rgba(79, 70, 229, 0.1) 0%, rgba(124, 58, 237, 0.1) 100%); color: #6366f1;">
-                                        <i class="feather-code"></i>
+                                        <i class="feather-film"></i>
                                     </div>
                                     <h5 class="fw-bold mb-3">{{ __('about.feature_1_title') }}</h5>
                                     <p class="text-muted mb-0 fs-13">{{ __('about.feature_1_desc') }}</p>
@@ -440,7 +440,7 @@
                             <div class="col-md-6 col-lg-4">
                                 <div class="feature-card p-4">
                                     <div class="feature-icon-wrapper" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">
-                                        <i class="feather-cloud"></i>
+                                        <i class="feather-user-plus"></i>
                                     </div>
                                     <h5 class="fw-bold mb-3">{{ __('about.feature_2_title') }}</h5>
                                     <p class="text-muted mb-0 fs-13">{{ __('about.feature_2_desc') }}</p>
@@ -449,7 +449,7 @@
                             <div class="col-md-6 col-lg-4">
                                 <div class="feature-card p-4">
                                     <div class="feature-icon-wrapper" style="background: rgba(16,185,129,0.1); color: #10b981;">
-                                        <i class="feather-layers"></i>
+                                        <i class="feather-compass"></i>
                                     </div>
                                     <h5 class="fw-bold mb-3">{{ __('about.feature_3_title') }}</h5>
                                     <p class="text-muted mb-0 fs-13">{{ __('about.feature_3_desc') }}</p>
@@ -458,7 +458,7 @@
                             <div class="col-md-6 col-lg-4">
                                 <div class="feature-card p-4">
                                     <div class="feature-icon-wrapper" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;">
-                                        <i class="feather-sliders"></i>
+                                        <i class="feather-play-circle"></i>
                                     </div>
                                     <h5 class="fw-bold mb-3">{{ __('about.feature_4_title') }}</h5>
                                     <p class="text-muted mb-0 fs-13">{{ __('about.feature_4_desc') }}</p>
@@ -476,7 +476,7 @@
                             <div class="col-md-6 col-lg-4">
                                 <div class="feature-card p-4">
                                     <div class="feature-icon-wrapper" style="background: rgba(6, 182, 212, 0.1); color: #06b6d4;">
-                                        <i class="feather-shield"></i>
+                                        <i class="feather-check-circle"></i>
                                     </div>
                                     <h5 class="fw-bold mb-3">{{ __('about.feature_6_title') }}</h5>
                                     <p class="text-muted mb-0 fs-13">{{ __('about.feature_6_desc') }}</p>
@@ -491,7 +491,38 @@
                             <div class="timeline">
                                 <div class="timeline-item">
                                     <div class="timeline-icon"><i class="feather-box fs-12"></i></div>
-                                    <h6 class="fw-bold mb-1">v4.6.2 <span class="badge bg-soft-success text-success ms-2">Latest / Stable</span></h6>
+                                    <h6 class="fw-bold mb-1">v4.6.3 <span class="badge bg-soft-success text-success ms-2">Latest / Stable</span></h6>
+                                    <p class="text-muted fs-13 mb-3">Clips 2.0 Short Video Discovery Engine &amp; Companion REST API, Web &amp; Tools Directory 2.0 with Community Upvoting &amp; Embed Badges, Referral Growth &amp; Affiliate Engine with 30-Day Cookie Tracking &amp; Welcome Bonuses, Cinema Video Hub &amp; Standalone Watch Pages, Modern Forum Architecture with Multi-Editor Suite, Drag &amp; Drop Category Hierarchy Tree, Pinned Comments, Best Answers, and Store Product Knowledge Base UI Overhaul.</p>
+                                    <div class="d-flex flex-column gap-2">
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-feature mt-1">Clips 2.0</span>
+                                            <span class="text-muted fs-13">Rebuilt <code>/clips</code> with deep-linking (<code>/clips/{status}</code>), multi-stream tabs (Latest, Trending, Following), 2.5s continuous playback view tracking with session deduplication, double-tap animated heart pop, keyboard navigation, and companion REST API (<code>/api/clips</code>).</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-feature mt-1">Referral Engine</span>
+                                            <span class="text-muted fs-13">Overhauled affiliate system with <code>CaptureReferral</code> 30-day cookie tracking middleware, multi-identifier resolution, self-referral anti-fraud protection, two-sided welcome points (+10 PTS bonus), and 4 tiered milestone achievement badges in <code>/badges</code>.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-feature mt-1">Directory 2.0</span>
+                                            <span class="text-muted fs-13">Transformed <code>/directory</code> into a Product Hunt-grade discovery platform with real-time atomic upvoting, dynamic SVG embed badges (<code>/directory/{id}/badge</code>), faceted pricing filters (Free, Freemium, Paid, Open Source), website ownership meta tag verification, and compact control bar.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-feature mt-1">Video Hub</span>
+                                            <span class="text-muted fs-13">Decoupled video ecosystem from forum categories across 13 dedicated video genres (<code>VideoCategoryCatalog</code>), single-row YouTube-style filter bar, obsidian cinema hero banner, standalone cinema watch pages (<code>/video/watch/{id}</code>) with horizontal pill toolbars, and resilient autoplay switch.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-feature mt-1">Modern Forum</span>
+                                            <span class="text-muted fs-13">Modernized <code>/forum</code> with two-pane layout, colored category tags, zero-reload Ajax stream filters (Latest, Top, Newest, Unanswered), floating composer drawer with live markdown preview, sticky timeline scrubber, multi-editor suite (MyAds Markdown, Quill.js, SCEditor), and interactive AJAX drag-and-drop category tree in <code>/admin/forum/categories</code>.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-optimization mt-1">KB &amp; Discussions</span>
+                                            <span class="text-muted fs-13">Topic pinned comments, emerald Best Answer badges with +10 PTS reward, 1-click topic link share popover, fixed StackEdit header occlusion in <code>/kb</code>, compact single-row diagram/code snippet toolbars, and universal Font Awesome Brands font shims.</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="timeline-item">
+                                    <div class="timeline-icon"><i class="feather-box fs-12"></i></div>
+                                    <h6 class="fw-bold mb-1">v4.6.2 <span class="badge bg-soft-secondary text-secondary ms-2">Previous</span></h6>
                                     <p class="text-muted fs-13 mb-3">Member Profile About Dossier & 3-Tier Privacy Architecture, Store Customer Reviews & Buyer Library, World-Class Marketplace Redesign with High-Speed Ajax Engine, Service Orders Marketplace Overhaul, Professional Social Moderation & Automated Content Quarantine, Threaded Nested Comments, and Resilient Portal Live Search with Member Avatars & Comment Deep-Linking.</p>
                                     <div class="d-flex flex-column gap-2">
                                         <div class="d-flex align-items-start">

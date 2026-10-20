@@ -7,19 +7,19 @@ return [
     'tab_changelog' => 'Journal des modifications',
     'tab_about' => 'À propos de MYADS',
     
-        // What's New Section (v4.6.1)
-    'feature_1_title' => 'Modernisation de la Base de Connaissances & Recherche AJAX Instantanée',
-    'feature_1_desc' => 'Portail global de documentation (/kb), recherche AJAX debouncée en temps réel, système de vote d\'utilité des articles, table des matières flottante scrollspy et temps de lecture estimé.',
-    'feature_2_title' => 'Tableau de Modération Administrative & Moteur de Diff Visuel',
-    'feature_2_desc' => 'Refonte de /admin/knowledgebase avec 3 onglets, comparateur visuel de révisions ligne par ligne, approbation en 1 clic et rejet non destructif, et gestion AJAX des catégories.',
-    'feature_3_title' => 'Refonte des Publications Photo & Silhouette d\'Avatar Hexagonale',
-    'feature_3_desc' => 'Vue photo dédiée (s_type=4) avec surface glassmorphism, silhouette d\'avatar hexagonale emblématique, interactions AJAX sans rechargement (likes, commentaires, partages), zoom lightbox et balises SEO bilingues.',
-    'feature_4_title' => 'Résilience des Notifications Administratives & Tolérance aux Pannes SQL',
-    'feature_4_desc' => 'Résolution du conflit d\'espaces de tables MySQL InnoDB (erreurs 1932/1813) et tolérance défensive try/catch dans AdminNotificationService protégeant le shell d\'administration.',
-    'feature_5_title' => 'Auto-Réparation du Schéma d\'Administration des Utilisateurs',
-    'feature_5_desc' => 'Correction de l\'erreur 500 sur /admin/users via validation et auto-réparation automatique du schéma site_admins, migration 2026_09_27_020000 et protection anti-timeout dans PluginManager.',
-    'feature_6_title' => 'Refonte de la Navigation Mobile & Système de Vérification de Profil',
-    'feature_6_desc' => 'Suppression définitive de la floaty bar, bouton FAB contextuel ciblant #quick-post-box, localisation de add_post en 14 langues et flux complet de vérification de profil membre.',
+    // What's New Section (v4.6.3)
+    'feature_1_title' => 'Clips Vidéo Courts 2.0 & Moteur de Découverte de Reels Interactifs',
+    'feature_1_desc' => 'Refonte complète de /clips avec routage direct (/clips/{status}), flux multi-onglets (Récents, Tendances, Abonnements), suivi automatique des vues après 2,5s avec déduplication, raccourcis clavier, double-tap heart pop et API REST compagnon.',
+    'feature_2_title' => 'Moteur de Parrainage & Affiliation avec Suivi 30 Jours et Badges de Réussite',
+    'feature_2_desc' => 'Système d\'affiliation repensé avec middleware CaptureReferral de suivi par cookie 30 jours, résolution multi-identifiants, blocage de l\'auto-parrainage frauduleux, bonus de bienvenue bilatéral (+10 PTS pour les deux) et 4 badges de palier dans /badges.',
+    'feature_3_title' => 'Annuaire Web & Outils 2.0 avec Upvotes Communautaires et Badges SVG Intégrables',
+    'feature_3_desc' => 'Transformation de /directory en hub interactif style Product Hunt avec votes atomiques en direct, badges vectoriels SVG dynamiques ("Featured on MYADS"), filtres de tarification, vérification de propriété par balise meta et barre de contrôle compacte.',
+    'feature_4_title' => 'Hub Vidéo Cinéma & Expérience de Visionnage Dédiée Obsidienne',
+    'feature_4_desc' => 'Découplage complet du catalogue vidéo des catégories du forum en 13 genres dédiés, barre de filtres YouTube sur une ligne, bannière cinéma obsidienne, pages de lecture dédiées (/video/watch/{id}) avec barre d\'actions horizontale et autoplay fluide.',
+    'feature_5_title' => 'Architecture de Forum Moderne, Suite Multi-Éditeurs & Arbre de Catégories',
+    'feature_5_desc' => 'Reconstruction de /forum avec disposition responsive à deux volets, filtres AJAX instantanés sans rechargement (Récents, Top, Nouveaux, Sans réponse), tiroir de rédaction flottant avec aperçu direct, scrubber chronologique, suite multi-éditeurs et arbre drag & drop dans l\'administration.',
+    'feature_6_title' => 'Commentaires Épinglés, Meilleures Réponses, Partage & UI Base de Connaissances',
+    'feature_6_desc' => 'Épinglage des commentaires flottant en haut, badge Meilleure Réponse avec récompense de +10 PTS, popover de partage avec copie en 1 clic, correction du décalage de StackEdit sous l\'en-tête fixe dans /kb, barre d\'outils d\'extraits compacte et shims Font Awesome Brands.',
 
     // About Section
     'about_description' => 'MYADS est une plateforme communautaire et un réseau d\'échange publicitaire tout-en-un. Elle permet aux propriétaires de sites de se connecter, d\'échanger du trafic, de négocier des services et de monétiser leurs plateformes.',

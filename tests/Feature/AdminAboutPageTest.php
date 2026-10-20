@@ -43,9 +43,9 @@ class AdminAboutPageTest extends TestCase
             ->assertSee(__('about.feature_4_title'))
             ->assertSee(__('about.feature_5_title'))
             ->assertSee(__('about.feature_6_title'))
-            ->assertSee('World-Class Marketplace Redesign & High-Speed Ajax Browsing Engine')
-            ->assertSee('Store 5-Star Customer Reviews, Buyer Library & Media Previews')
-            ->assertSee('Member Profile About Tab Overhaul & 3-Tier Privacy Architecture')
+            ->assertSee('Short Video Clips 2.0 & Interactive Reels Discovery Engine')
+            ->assertSee('Referral & Affiliate Growth Engine with 30-Day Tracking & Milestone Badges')
+            ->assertSee('Web & Tools Directory 2.0 with Community Upvotes & Live SVG Embed Badges')
             ->assertSee('https://github.com/sponsors/mrghozzi')
             ->assertSee(__('about.sponsor_on_github'))
             ->assertSee(__('about.sponsor_project_title'));
@@ -66,9 +66,9 @@ class AdminAboutPageTest extends TestCase
         $response = $this->actingAs($admin)->get(route('admin.about', ['lang' => 'ar']));
 
         $response->assertOk()
-            ->assertSee('إعادة تصميم سوق المتجر ومحرك التصفح فائق السرعة عبر AJAX')
-            ->assertSee('منظومة تقييمات المتجر 5 نجوم، مكتبة المشتريات ومعاينة الوسائط')
-            ->assertSee('تحديث ملف العضو الشخصي ومنظومة الخصوصية ثلاثية المستويات')
+            ->assertSee('محرك مقاطع الفيديو القصيرة Clips 2.0 واكتشاف الريلز التفاعلي')
+            ->assertSee('محرك نمو الإحالة والتسويق بالعمولة بتتبع 30 يوماً وشارات الإنجاز')
+            ->assertSee('دليل المواقع والأدوات البرمجية 2.0 بالتصويت المجتمعي وشارات SVG الحية')
             ->assertSee('https://github.com/sponsors/mrghozzi')
             ->assertSee('رعاية المشروع عبر GitHub Sponsors')
             ->assertSee('برنامج الرعاية الرسمي عبر GitHub Sponsors');

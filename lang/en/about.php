@@ -7,19 +7,19 @@ return [
     'tab_changelog' => 'Changelog',
     'tab_about' => 'About MYADS',
     
-    // What's New Section (v4.6.2)
-    'feature_1_title' => 'World-Class Marketplace Redesign & High-Speed Ajax Browsing Engine',
-    'feature_1_desc' => 'Redesigned /store with luxury glassmorphic hero banner, 3D Category Showcase, responsive Grid & Developer List view switcher with client persistence, instant debounced Ajax search, category pills, and deep browser URL sync.',
-    'feature_2_title' => 'Store 5-Star Customer Reviews, Buyer Library & Media Previews',
-    'feature_2_desc' => '5-star customer ratings and reviews engine with automated Verified Buyer badge verification against product_licenses, rating breakdown stats, dedicated customer "My Purchases" library (/store/my-purchases), screenshot lightboxes, and Live Demo/Video URL previews.',
-    'feature_3_title' => 'Member Profile About Tab Overhaul & 3-Tier Privacy Architecture',
-    'feature_3_desc' => 'Expansive Profile Dossier overhaul at /u/{username}?tab=about, elimination of sidebar bio redundancy, dynamic metrics cards (Member Since, Posts, Followers, Views, Karma), and granular 3-tier privacy (Public, Followers, Private) with inline bio visibility selector on /profile/edit.',
-    'feature_4_title' => 'Professional Social Moderation Suite & Automated Content Quarantine',
-    'feature_4_desc' => 'Professional community moderation center at /admin/reports with 7 standardized violation categories, 5 KPI metrics, executive Moderation Action Modal (Dismiss, Hide, Delete with PTS penalty, User Strike/Warning, Ban/IP Blacklist), and automated quarantine threshold (>= 3 reports).',
-    'feature_5_title' => 'True Threaded Comments (Nested Replies) & Profanity Filter',
-    'feature_5_desc' => 'True hierarchical threaded comments with infinite nested replies via parent_id, indented visual trees, contextual "Replying to @user" banner with cancel controls, parent-author reply notifications, and dictionary-driven profanity filter.',
-    'feature_6_title' => 'Resilient Portal Search, Comment Deep-Linking & Mobile App Parity',
-    'feature_6_desc' => 'Universal portal search matching with clickable comment deep-linking to topic/directory anchors (#comment_{id}) with cyan pulse animation, hexagon member avatars with online dots, and full API parity with mobile companion app (myads_app v1.8.3+25).',
+    // What's New Section (v4.6.3)
+    'feature_1_title' => 'Short Video Clips 2.0 & Interactive Reels Discovery Engine',
+    'feature_1_desc' => 'Full revamp of /clips with dedicated deep-link routing (/clips/{status}), multi-stream feed switching (Latest, Trending, Following), 2.5s automated continuous-watch view tracking with session deduplication, desktop shortcuts, double-tap heart pop, and high-performance companion REST API.',
+    'feature_2_title' => 'Referral & Affiliate Growth Engine with 30-Day Tracking & Milestone Badges',
+    'feature_2_desc' => 'Overhauled affiliate system with dedicated CaptureReferral 30-day cookie & session tracking middleware, multi-identifier resolver (Username, Public UID, ID), anti-fraud self-referral blocking, two-sided welcome bonus (+10 PTS for both parties), and 4 tiered milestone achievement badges in /badges.',
+    'feature_3_title' => 'Web & Tools Directory 2.0 with Community Upvotes & Live SVG Embed Badges',
+    'feature_3_desc' => 'Transformed /directory into an interactive discovery hub featuring real-time atomic upvoting, dynamic cacheable SVG embed badges ("Featured on MYADS"), faceted pricing filters (Free, Freemium, Paid, Open Source), website ownership meta tag verification, Schema.org SEO, and compact discovery control bar.',
+    'feature_4_title' => 'Cinema-Grade Video Hub & Standalone Obsidian Watch Experience',
+    'feature_4_desc' => 'Complete separation of video catalog from forum categories across 13 dedicated video genres, single-row YouTube-style filter bar, obsidian cinema hero banner, standalone cinema watch pages (/video/watch/{id}) with custom horizontal pill actions, resilient autoplay switch, and smart title fallbacks.',
+    'feature_5_title' => 'Modern Community Forum Architecture, Multi-Editor Suite & Category Tree',
+    'feature_5_desc' => 'Rebuilt /forum with two-pane responsive layout, colored category tags, instant zero-reload Ajax stream filtering (Latest, Top, Newest, Unanswered), floating composer drawer with live markdown preview, sticky timeline scrubber, multi-editor suite (MyAds Markdown, Quill.js, SCEditor), and drag-and-drop hierarchy tree in admin categories.',
+    'feature_6_title' => 'Pinned Comments, Best Answers, Topic Share & Store Knowledge Base UI',
+    'feature_6_desc' => 'Author/moderator pinned comments floating to top, emerald Best Answer badge with +10 PTS reputation reward, 1-click share popover with URL copy feedback, StackEdit fixed header offset resolution, compact single-row diagram/code snippet toolbars, and universal Font Awesome Brands font shims.',
 
     // About Section
     'about_description' => 'MYADS is a powerful, all-in-one community platform and ad exchange network. It empowers website owners to connect, exchange traffic, trade services, and monetize their platforms effectively.',

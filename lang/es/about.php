@@ -7,19 +7,19 @@ return [
     'tab_changelog' => 'Registro de cambios',
     'tab_about' => 'Acerca de MYADS',
     
-        // What's New Section (v4.6.1)
-    'feature_1_title' => 'Modernización de Base de Conocimiento y Búsqueda AJAX Instantánea',
-    'feature_1_desc' => 'Portal centralizado de documentación (/kb), búsqueda AJAX en tiempo real, votación de utilidad de artículos, tabla de contenido fija con scrollspy y tiempo estimado de lectura.',
-    'feature_2_title' => 'Panel de Moderación de KB y Comparador Visual de Cambios (Diff)',
-    'feature_2_desc' => 'Renovación de /admin/knowledgebase con 3 pestañas, comparador visual de revisiones línea por línea, aprobación en 1 clic y rechazo no destructivo, y categorías con AJAX.',
-    'feature_3_title' => 'Publicaciones de Fotos Individuales y Silueta de Avatar Hexagonal',
-    'feature_3_desc' => 'Vista dedicada de fotos (s_type=4) con glassmorphism, silueta hexagonal de autor con clip-path, interacciones AJAX (likes, comentarios, compartir), zoom lightbox y etiquetas SEO.',
-    'feature_4_title' => 'Resiliencia de Notificaciones y Tolerancia a Fallos de Base de Datos',
-    'feature_4_desc' => 'Corrección del desajuste de tablespace InnoDB (errores 1932/1813) y tolerancia try/catch defensiva en AdminNotificationService que protege la consola administrativa.',
-    'feature_5_title' => 'Autoreparación de Esquema en Gestión de Usuarios y Protección de Bucles',
-    'feature_5_desc' => 'Resolución del error 500 en /admin/users mediante validación automática y autoreparación de site_admins, migración 2026_09_27_020000 y protección contra bucles en PluginManager.',
-    'feature_6_title' => 'Revisión de Navegación Móvil y Sistema de Verificación de Perfiles',
-    'feature_6_desc' => 'Supresión permanente de la barra flotante antigua, botón FAB contextual enfocado en #quick-post-box, traducción de add_post en 14 idiomas y flujo completo de verificación de perfil.',
+    // What's New Section (v4.6.3)
+    'feature_1_title' => 'Clips de Video Cortos 2.0 y Motor de Descubrimiento de Reels Interactivos',
+    'feature_1_desc' => 'Renovación total de /clips con enlaces directos (/clips/{status}), pestañas múltiples (Recientes, Tendencias, Siguiendo), registro automático de vistas tras 2.5s con deduplicación, atajos de teclado, doble toque de me gusta y API REST complementaria.',
+    'feature_2_title' => 'Motor de Afiliados y Referidos con Seguimiento de 30 Días e Insignias de Hitos',
+    'feature_2_desc' => 'Sistema de afiliados rediseñado con middleware CaptureReferral de seguimiento de cookies de 30 días, resolución multi-identificador, bloqueo de auto-referidos, bono de bienvenida mutuo (+10 PTS para ambas partes) y 4 insignias de hitos en /badges.',
+    'feature_3_title' => 'Directorio de Sitios y Herramientas 2.0 con Votos Comunitarios e Insignias SVG',
+    'feature_3_desc' => 'Transformación de /directory en plataforma interactiva con votación atómica en tiempo real, insignias vectoriales SVG dinámicas, filtros facetados de precios (Gratis, Freemium, Pago, Código Abierto), verificación de propiedad y barra de control compacta.',
+    'feature_4_title' => 'Video Hub Cinematográfico y Experiencia de Reproducción Dedicada',
+    'feature_4_desc' => 'Separación total del catálogo de videos de las categorías del foro en 13 géneros especializados, barra de filtros estilo YouTube en una línea, banner cinematográfico obsidiana, páginas de reproducción dedicadas (/video/watch/{id}) y conmutador de reproducción automática.',
+    'feature_5_title' => 'Arquitectura de Foro Moderno, Suite Multi-Editor y Árbol de Categorías',
+    'feature_5_desc' => 'Reconstrucción de /forum con diseño adaptable de dos paneles, filtros AJAX instantáneos (Recientes, Populares, Nuevos, Sin respuesta), editor flotante con vista previa en vivo, barra de progreso cronológica, suite multieditor y árbol drag & drop en categorías administrativas.',
+    'feature_6_title' => 'Comentarios Fijados, Mejores Respuestas, Compartir Temas e Interfaz de KB',
+    'feature_6_desc' => 'Fijación de comentarios destacados, insignia esmeralda de Mejor Respuesta con +10 PTS de reputación, ventana emergente para compartir enlace con confirmación visual, ajuste dinámico de StackEdit en /kb, barra compacta de fragmentos de código y compatibilidad Font Awesome Brands.',
 
     // About Section
     'about_description' => 'MYADS es una potente plataforma comunitaria y red de intercambio publicitario todo en uno.',

@@ -7,19 +7,19 @@ return [
     'tab_changelog' => 'Değişiklik Günlüğü',
     'tab_about' => 'MYADS Hakkında',
     
-        // What's New Section (v4.6.1)
-    'feature_1_title' => 'Bilgi Bankası Modernizasyonu ve Anlık AJAX Arama',
-    'feature_1_desc' => 'Merkezi dokümantasyon portalı (/kb), gerçek zamanlı AJAX arama, makale faydalılık oylaması, sabit kaydırma izleyicili içindekiler tablosu ve tahmini okuma süresi.',
-    'feature_2_title' => 'Yönetici KB Moderasyon Paneli ve Görsel Fark Karşılaştırıcı (Diff)',
-    'feature_2_desc' => '3 sekmeli /admin/knowledgebase yenilemesi, satır satır revizyon karşılaştırma, tek tıkla onaylama/reddetme ve sıfır yeniden yüklemeli AJAX kategori yönetimi.',
-    'feature_3_title' => 'Fotoğraf Gönderileri Yenilemesi ve Altıgen Avatar Tasarımı',
-    'feature_3_desc' => 'Glassmorphism ile modern fotoğraf görünümü (s_type=4), altıgen profil silüeti, sayfa yenilenmeden AJAX beğenileri ve yorumları, lightbox yakınlaştırma ve SEO etiketleri.',
-    'feature_4_title' => 'Yönetici Bildirim Dayanıklılığı ve Veritabanı Hata Toleransı',
-    'feature_4_desc' => 'InnoDB tablo alanı eşzamanlama onarımı (hata 1932/1813) ve AdminNotificationService içindeki try/catch korumasıyla yönetim panelinin çökmesini engelleme.',
-    'feature_5_title' => 'Kullanıcı Yönetimi Şema Kendini İyileştirme ve Güvenlik',
-    'feature_5_desc' => '/admin/users sayfasındaki 500 hatasının site_admins otomatik şema doğrulaması ve onarımı ile çözümü, 2026_09_27_020000 migrasyonu ve PluginManager döngü koruması.',
-    'feature_6_title' => 'Mobil Navigasyon Yenilemesi ve Profil Doğrulama Talepleri',
-    'feature_6_desc' => 'Eski kayan çubuğun kalıcı olarak gizlenmesi, #quick-post-box odaklı akıllı FAB butonu, 14 dilde add_post çevirisi ve tam üye profil doğrulama iş akışı.',
+    // What's New Section (v4.6.3)
+    'feature_1_title' => 'Kısa Video Klipleri 2.0 ve Etkileşimli Reels Keşif Motoru',
+    'feature_1_desc' => '/clips sayfasının doğrudan bağlantılarla (/clips/{status}), çoklu akış sekmeleriyle (En Yeniler, Trendler, Takip Edilenler), 2,5 sn otomatik izleme takibi ve tekilleştirme ile, klavye kısayolları, çift tıklama beğenisi ve REST API ile tam revizyonu.',
+    'feature_2_title' => '30 Günlük Takip ve Başarı Rozetleri ile Referans ve Ortaklık Büyüme Motoru',
+    'feature_2_desc' => 'CaptureReferral 30 günlük çerez takip ara yazılımı, çoklu kimlik çözümleyici, sahte referans engelleme, iki taraflı hoş geldin bonusu (+10 PTS) ve /badges sayfasında 4 seviyeli başarı rozeti ile yenilenmiş ortaklık sistemi.',
+    'feature_3_title' => 'Topluluk Oyları ve Canlı SVG Rozetleri ile Web ve Araçlar Dizini 2.0',
+    'feature_3_desc' => '/directory sayfasının gerçek zamanlı oylama, dinamik SVG yerleştirme rozetleri ("Featured on MYADS"), fiyatlandırma filtreleri (Ücretsiz, Freemium, Ücretli, Açık Kaynak) ve meta etiket ile site doğrulama içeren modern keşif merkezine dönüşümü.',
+    'feature_4_title' => 'Sinematik Video Hub ve Bağımsız Obsidian İzleme Sayfaları',
+    'feature_4_desc' => 'Video kataloğunun forum kategorilerinden 13 özel türe ayrılması, tek satırlı YouTube tarzı filtre çubuğu, obsidyen sinema başlığı, yatay buton çubuklu bağımsız izleme sayfaları (/video/watch/{id}) ve akıllı otomatik oynatma anahtarı.',
+    'feature_5_title' => 'Modern Topluluk Forumu Mimarisi, Çoklu Editör Paketi ve Kategori Ağacı',
+    'feature_5_desc' => 'İki panelli düzen, anında AJAX filtreleme (Son, Popüler, Yeni, Yanıtsız), canlı önizlemeli kayan yazı kutusu, yapışkan zaman çizelgesi, çoklu editör desteği (MyAds Markdown, Quill, SCEditor) ve admin panelinde sürükle-bırak kategori ağacı ile /forum sayfasının yenilenmesi.',
+    'feature_6_title' => 'Sabitlenen Yorumlar, En İyi Cevaplar, Konu Paylaşımı ve Mağaza KB Arayüzü',
+    'feature_6_desc' => 'Üste sabitlenen yorumlar, +10 PTS ödüllü zümrüt En İyi Cevap rozeti, tek tıkla bağlantı kopyalama penceresi, /kb sayfasında StackEdit başlık çakışması düzeltmesi, kompakt tek satırlı kod/diyagram araç çubuğu ve Font Awesome Brands uyumluluğu.',
 
     // About Section
     'about_description' => 'MYADS, güçlü bir topluluk platformu ve hepsi bir arada reklam değişim ağıdır.',

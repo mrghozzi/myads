@@ -7,19 +7,19 @@ return [
     'tab_changelog' => 'Änderungsprotokoll',
     'tab_about' => 'Über MYADS',
     
-        // What's New Section (v4.6.1)
-    'feature_1_title' => 'Knowledge Base Modernisierung & Sofortige AJAX-Suche',
-    'feature_1_desc' => 'Zentrales Wissensdatenbank-Portal (/kb), debouncte Echtzeit-AJAX-Suche, Feedback-Bewertungssystem für Artikel, klebriges Scrollspy-Inhaltsverzeichnis und Lesezeitschätzung.',
-    'feature_2_title' => 'Administratives Moderations-Dashboard & Visueller Diff-Viewer',
-    'feature_2_desc' => 'Überarbeitung von /admin/knowledgebase mit 3 Tabs, zeilenweisem Revisionsvergleich, Ein-Klick-Freigabe, zerstörungsfreier Ablehnung und AJAX-Kategorienverwaltung.',
-    'feature_3_title' => 'Überholung von Foto-Beiträgen & Hexagonale Avatar-Silhouette',
-    'feature_3_desc' => 'Modernisierte Foto-Ansicht (s_type=4) mit Glassmorphismus, hexagonaler Silhouette passend zum Branding, AJAX-Interaktionen (Likes, Kommentare, Teilen), Lightbox-Zoom und SEO-Tags.',
-    'feature_4_title' => 'Resilienz der Admin-Benachrichtigungen & Datenbank-Fehlertoleranz',
-    'feature_4_desc' => 'Behebung von InnoDB-Tablespace-Fehlern (1932/1813) und defensive try/catch-Absicherung im AdminNotificationService zum Schutz des Administrationsbereichs vor Datenbankausfällen.',
-    'feature_5_title' => 'Selbstheilendes Schema für Benutzerverwaltung & Schleifenschutz',
-    'feature_5_desc' => 'Beseitigung von HTTP 500 auf /admin/users durch automatische Schema-Validierung der Tabelle site_admins, Migration 2026_09_27_020000 und Timeout-Schutz im PluginManager.',
-    'feature_6_title' => 'Mobile Navigation & Profil-Verifizierungsanfragen',
-    'feature_6_desc' => 'Dauerhafte Unterdrückung der alten Floaty-Bar, kontextbezogener Schnellbeitrag-FAB mit Fokus auf #quick-post-box, add_post-Übersetzung in 14 Sprachen und Profilverifizierungs-Workflow.',
+    // What's New Section (v4.6.3)
+    'feature_1_title' => 'Kurzvideo-Clips 2.0 & Interaktive Reels-Discovery-Engine',
+    'feature_1_desc' => 'Komplette Neugestaltung von /clips mit Deep-Link-Routing (/clips/{status}), Multi-Feed-Tabs (Neueste, Trends, Folgen), automatischem View-Tracking nach 2,5s mit Deduplizierung, Tastaturkürzeln, Doppel-Tap-Like und Begleit-REST-API.',
+    'feature_2_title' => 'Empfehlungs- & Affiliate-Engine mit 30-Tage-Tracking und Meilenstein-Abzeichen',
+    'feature_2_desc' => 'Überarbeitetes Partnerprogramm mit CaptureReferral 30-Tage-Cookie-Middleware, Multi-ID-Auflösung, Anti-Betrugs-Sperre für Selbstreferenzen, beidseitigem Willkommensbonus (+10 PTS) und 4 Meilenstein-Abzeichen in /badges.',
+    'feature_3_title' => 'Web- & Tools-Verzeichnis 2.0 mit Community-Upvotes & Live-SVG-Einbettungs-Badges',
+    'feature_3_desc' => '/directory als interaktive Discovery-Plattform mit Echtzeit-Upvoting, dynamischen SVG-Badges, facettierten Preisfiltern (Kostenlos, Freemium, Kostenpflichtig, Open Source), Website-Inhaberschafts-Meta-Verifizierung und kompakter Kontrollleiste.',
+    'feature_4_title' => 'Kino-Video-Hub & Eigenständiges Obsidian-Wiedergabeerlebnis',
+    'feature_4_desc' => 'Vollständige Trennung des Videokatalogs von Forum-Kategorien in 13 Genres, einzeilige YouTube-Filterleiste, Obsidian-Kino-Hero-Banner, dedizierte Wiedergabeseiten (/video/watch/{id}) mit horizontaler Button-Leiste und stabiler Autoplay-Umschaltung.',
+    'feature_5_title' => 'Moderne Community-Forum-Architektur, Multi-Editor-Suite & Kategorie-Baum',
+    'feature_5_desc' => 'Neues /forum mit responsivem Zwei-Spalten-Layout, sofortiger AJAX-Stream-Filterung (Aktivität, Top, Neu, Unbeantwortet), schwebender Editor-Schublade mit Live-Vorschau, Timeline-Scrubber, Multi-Editor-Suite (Markdown, Quill, SCEditor) und Drag-and-Drop-Kategorie-Hierarchiebaum.',
+    'feature_6_title' => 'Angeheftete Kommentare, Beste Antworten, Themen-Sharing & Store-KB-UI',
+    'feature_6_desc' => 'Anheften von Kommentaren ganz oben, smaragdgrünes Beste-Antwort-Abzeichen mit +10 PTS Belohnung, 1-Klick-Share-Popover mit Kopierbestätigung, Korrektur der StackEdit-Kopfzeilenüberdeckung in /kb, kompakte Code-Snippet-Leiste und Font Awesome Brands Font-Shims.',
 
     // About Section
     'about_description' => 'MYADS is a powerful, all-in-one community platform and ad exchange network. It empowers website owners to connect, exchange traffic, trade services, and monetize their platforms effectively.',

@@ -7,19 +7,19 @@ return [
     'tab_changelog' => 'Registro Modifiche',
     'tab_about' => 'Informazioni su MYADS',
     
-        // What's New Section (v4.6.1)
-    'feature_1_title' => 'Modernizzazione della Knowledge Base e Ricerca AJAX Istantanea',
-    'feature_1_desc' => 'Portale documentazione centralizzato (/kb), ricerca AJAX in tempo reale, votazione dell\'utilità degli articoli, indice sticky con scrollspy e stima del tempo di lettura.',
-    'feature_2_title' => 'Pannello di Moderazione KB e Motore di Diff Visivo',
-    'feature_2_desc' => 'Rinnovamento di /admin/knowledgebase a 3 schede, comparatore visivo linea per linea delle revisioni, approvazione rapida, rifiuto non distruttivo e categorie in AJAX.',
-    'feature_3_title' => 'Restyling Post Fotografici e Silhouette Esagonale dell\'Avatar',
-    'feature_3_desc' => 'Visualizzazione dedicata delle foto (s_type=4) con superficie glassmorphism, avatar esagonale coordinato con il brand, reazioni e commenti AJAX, zoom lightbox e meta tag SEO.',
-    'feature_4_title' => 'Resilienza Notifiche Admin e Tolleranza agli Errori del Database',
-    'feature_4_desc' => 'Risoluzione della mancata sincronizzazione InnoDB (errori 1932/1813) e isolamento try/catch in AdminNotificationService per proteggere il pannello di controllo.',
-    'feature_5_title' => 'Autoriparazione dello Schema Utenti e Protezione da Timeout',
-    'feature_5_desc' => 'Risoluzione dell\'errore 500 su /admin/users con convalida e autoriparazione dello schema site_admins, migrazione 2026_09_27_020000 e protezione loopback in PluginManager.',
-    'feature_6_title' => 'Rinnovamento Navigazione Mobile e Richieste di Verifica Profilo',
-    'feature_6_desc' => 'Soppressione definitiva della barra mobile legacy, pulsante rapido FAB contestuale su #quick-post-box, localizzazione di add_post in 14 lingue e verifiche profilo utente.',
+    // What's New Section (v4.6.3)
+    'feature_1_title' => 'Clip Video Brevi 2.0 & Motore di Scoperta Reels Interattivo',
+    'feature_1_desc' => 'Rinnovamento completo di /clips con routing diretto (/clips/{status}), feed a schede multiple (Recenti, Tendenze, Seguiti), tracciamento automatico visualizzazioni dopo 2,5s con deduplicazione, scorciatoie da tastiera, doppio tap like e API REST compagna.',
+    'feature_2_title' => 'Motore di Affiliazione & Referral con Tracciamento 30 Giorni e Badge Traguardo',
+    'feature_2_desc' => 'Sistema di affiliazione rinnovato con middleware CaptureReferral di tracciamento cookie a 30 giorni, risoluzione multi-identificatore, blocco auto-referral fraudolento, bonus di benvenuto bilaterale (+10 PTS) e 4 badge traguardo in /badges.',
+    'feature_3_title' => 'Directory Web & Strumenti 2.0 con Upvote della Community e Badge SVG Dinamici',
+    'feature_3_desc' => 'Trasformazione di /directory in un hub di scoperta interattivo con upvoting atomico in tempo reale, badge SVG dinamici incorporabili, filtri per prezzi (Gratis, Freemium, A pagamento, Open Source) e verifica di proprietà del sito.',
+    'feature_4_title' => 'Video Hub Cinematografico ed Esperienza di Visione Standalone',
+    'feature_4_desc' => 'Separazione completa del catalogo video dalle categorie del forum in 13 generi dedicati, barra filtri stile YouTube a riga singola, banner cinema ossidiana, pagine di visualizzazione standalone (/video/watch/{id}) e switch autoplay resiliente.',
+    'feature_5_title' => 'Architettura Forum Moderna, Suite Multi-Editor e Albero Categorie Drag & Drop',
+    'feature_5_desc' => 'Ricostruzione di /forum con layout responsive a due riquadri, filtri AJAX istantanei senza ricaricamento (Recenti, Top, Nuovi, Senza risposta), cassetto di composizione fluttuante con anteprima live, scrubber cronologico e albero delle categorie drag & drop.',
+    'feature_6_title' => 'Commenti In Evidenza, Migliori Risposte, Condivisione Topic e UI Knowledge Base',
+    'feature_6_desc' => 'Possibilità di fissare commenti in cima, badge verde smeraldo Migliore Risposta con +10 PTS di reputazione, popover di condivisione con copia link istantanea, risoluzione overlap StackEdit in /kb, barra snippet compatta e supporto Font Awesome Brands.',
 
     // About Section
     'about_description' => 'MYADS è una potente piattaforma comunitaria e rete di scambio pubblicitario all-in-one.',
