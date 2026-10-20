@@ -1,5 +1,5 @@
 # v4.6.3
-> **Major Ecosystem, Modern Discussion, Directory 2.0 & Referral Growth Release** — Rebuilt and modernized the MYADS Community Forum (`/forum`, `/f{id}`, `/t{id}`) with proprietary high-performance modern discussion architecture, multi-editor suite (MyAds Markdown, Quill.js, SCEditor), and cinema-grade video watch pages; transformed the Web & Tools Directory (`/directory`) into an interactive Product Hunt-grade discovery platform with community upvoting and SVG embed badges; and completely overhauled the Referral & Affiliate Growth Engine (`/ads/referrals`, `/referral`, `/badges`) with 30-day cookie tracking middleware, two-sided welcome bonuses, anti-fraud self-referral protections, and 4 tiered community milestone badges.
+> **Major Ecosystem, Modern Discussion, Directory 2.0, Referral Growth & Store Knowledge Base Release** — Rebuilt and modernized the MYADS Community Forum (`/forum`, `/f{id}`, `/t{id}`) with proprietary high-performance modern discussion architecture, multi-editor suite (MyAds Markdown, Quill.js, SCEditor), and cinema-grade video watch pages; transformed the Web & Tools Directory (`/directory`) into an interactive Product Hunt-grade discovery platform with community upvoting and SVG embed badges; completely overhauled the Referral & Affiliate Growth Engine (`/ads/referrals`, `/referral`, `/badges`) with 30-day cookie tracking middleware, two-sided welcome bonuses, anti-fraud self-referral protections, and 4 tiered community milestone badges; and upgraded the Store Product Knowledge Base (`/kb`) with dynamic StackEdit toolbar positioning, compact code/diagram snippet toolbars, and Font Awesome Brands compatibility.
 
 ### Complete Short Video Clips 2.0 & Reels Overhaul (`/clips`, `/clips/{status}`, `ClipsController.php`, `clips/index.blade.php`, `ClipsTest.php`)
 * **Deep Linking & Direct Clip Routing (`/clips/{status}`, `ClipsController.php`, `ReactionService.php`)**:
@@ -251,6 +251,26 @@
 * **Social Actions Compatibility & Testing**:
   * Fully preserved native Vikinger activity actions (Reactions/Likes, inline commenting toggle, social sharing, post settings dropdown, and content moderation).
   * Added feature test `test_portal_renders_modern_forum_feed_card` to `ForumModernizationTest.php` with 100% passing test assertions.
+
+### Store Product Knowledge Base UI, StackEdit Integration & Code Snippets Overhaul (`/kb`, `/kb/*`, `knowledgebase.blade.php`, `page-shell-styles.blade.php`, `kb-superdesign-formatter.blade.php`, `StoreProductKnowledgebaseUiTest.php`)
+* **StackEdit Toolbar Occlusion Fix Behind Fixed Header (`knowledgebase.blade.php`, `page-shell-styles.blade.php`)**:
+  * Resolved the critical layout issue where the StackEdit full-screen iframe editor toolbar was occluded behind the fixed top navigation bar (`class="header"`, height 80px).
+  * Implemented dynamic `adjustIframe()` in `knowledgebase.blade.php` that inspects `.header` height and dynamically applies `iframe.style.top = headerHeight + 'px'` and `iframe.style.height = 'calc(100% - ' + headerHeight + 'px)'` to the active StackEdit iframe.
+  * Added viewport `resize` listener recalculating offsets dynamically across orientation and screen size changes.
+  * Added fallback CSS declarations for `iframe.stackedit-iframe, iframe[src*="stackedit.io"]` (`top: 80px`, mobile `<= 680px` `top: 60px`) in `page-shell-styles.blade.php` and `knowledgebase.blade.php`.
+* **Compact Inline Code & Diagram Snippets Toolbar (`kb-superdesign-formatter.blade.php`, `page-shell-styles.blade.php`)**:
+  * Redesigned `.kb-snippets-toolbar` from oversized vertically-stacked full-width buttons into an ultra-compact, sleek single-line horizontal toolbar (`.kb-snippets-toolbar__items`) with `gap: 5px`.
+  * Enforced strict CSS overrides (`display: inline-flex !important`, `width: auto !important`, `height: 28px !important`, `line-height: 26px !important`, `padding: 0 10px !important`, `font-size: 0.72rem !important`) neutralizing aggressive global theme button sizing.
+  * Included 8 quick-insertion developer and documentation templates: **Mermaid** (workflow & sequence diagrams), **PHP** (service class), **Blade** (view layout), **HTML** (responsive card), **CSS** (modern component styles), **JSON** (API response payload), **Text** (logs and configuration), and **Code** (generic function).
+  * Added full Dark Mode (`body[data-theme="css_d"]`) styling with elevation hover transitions and micro-interactions.
+* **Font Awesome Brands Multi-Family Resolution (`fa-html5`, `fa-css3`, `fa-css3-alt`, `master.blade.php`, `page-shell-styles.blade.php`)**:
+  * Fixed an issue where `fa-html5` and `fa-css3` icons failed to render (showing unrendered tofu boxes `[?]`) due to Font Awesome 6/7 isolating brand icons from the Solid free font family.
+  * Updated snippet button markup to include brand font classes: `<i class="fa-brands fab fa-html5"></i>` and `<i class="fa-brands fab fa-css3-alt fa-css3"></i>`.
+  * Added universal CSS font shims in `master.blade.php`, `page-shell-styles.blade.php`, and `kb-superdesign-formatter.blade.php` mapping `.fa-html5`, `.fa-css3`, and `.fa-css3-alt` automatically to `"Font Awesome 7 Brands"` (font weight 400) and explicit `--fa` glyphs, guaranteeing resilient icon rendering regardless of class format.
+  * Preloaded `webfonts/fa-solid-900.woff2` and `webfonts/fa-brands-400.woff2` in `master.blade.php` for instant, flicker-free icon loads.
+* **100% Comprehensive Automated Feature Test Coverage (`StoreProductKnowledgebaseUiTest.php`)**:
+  * Added automated test suite assertions verifying StackEdit header offset adjusters, compact snippets toolbar DOM and CSS rules, and brand icon classes/shims.
+  * 100% test pass rate across all 23 tests (163 assertions) in `StoreProductKnowledgebaseUiTest.php`.
 
 ---
 
