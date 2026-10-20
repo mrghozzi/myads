@@ -733,4 +733,19 @@
         padding-left: 0;
         text-align: right;
     }
+
+    /* StackEdit editor modal offset to ensure toolbar is not covered by fixed header */
+    iframe.stackedit-iframe,
+    iframe[src*="stackedit.io"] {
+        top: 80px;
+        height: calc(100% - 80px);
+    }
+
+    @media screen and (max-width: 680px) {
+        iframe.stackedit-iframe,
+        iframe[src*="stackedit.io"] {
+            top: 60px;
+            height: calc(100% - 60px);
+        }
+    }
 </style>

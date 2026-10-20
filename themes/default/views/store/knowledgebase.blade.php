@@ -341,6 +341,20 @@
     .kb-category-pill.active i {
         color: #ffffff;
     }
+
+    /* StackEdit editor modal offset to ensure toolbar is not covered by fixed header */
+    iframe.stackedit-iframe,
+    iframe[src*="stackedit.io"] {
+        top: 80px;
+        height: calc(100% - 80px);
+    }
+    @media screen and (max-width: 680px) {
+        iframe.stackedit-iframe,
+        iframe[src*="stackedit.io"] {
+            top: 60px;
+            height: calc(100% - 60px);
+        }
+    }
 </style>
 
 <div class="section-header">
@@ -1139,11 +1153,44 @@
                 `;
                 textarea.parentNode.insertBefore(editorWrapper, textarea);
 
+                let adjustAttempts = 0;
+                const adjustIframe = () => {
+                    const iframe = document.querySelector('iframe[src*="stackedit.io"], .stackedit-iframe');
+                    if (iframe) {
+                        const header = document.querySelector('.header, .nxl-header');
+                        if (header) {
+                            const headerHeight = header.offsetHeight;
+                            iframe.style.top = headerHeight + 'px';
+                            iframe.style.height = `calc(100% - ${headerHeight}px)`;
+                        } else {
+                            iframe.style.top = '80px';
+                            iframe.style.height = 'calc(100% - 80px)';
+                        }
+                    } else if (adjustAttempts < 60) {
+                        adjustAttempts++;
+                        setTimeout(adjustIframe, 50);
+                    }
+                };
+
                 document.getElementById('open-stackedit').addEventListener('click', () => {
+                    adjustAttempts = 0;
                     stackedit.openFile({
                         name: '{{ $articleName ?? $shellTitle }}',
                         content: { text: textarea.value }
                     });
+                    adjustIframe();
+                });
+
+                window.addEventListener('resize', () => {
+                    const iframe = document.querySelector('iframe[src*="stackedit.io"], .stackedit-iframe');
+                    if (iframe) {
+                        const header = document.querySelector('.header, .nxl-header');
+                        if (header) {
+                            const headerHeight = header.offsetHeight;
+                            iframe.style.top = headerHeight + 'px';
+                            iframe.style.height = `calc(100% - ${headerHeight}px)`;
+                        }
+                    }
                 });
 
                 stackedit.on('fileChange', (file) => {

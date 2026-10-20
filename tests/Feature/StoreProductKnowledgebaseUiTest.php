@@ -630,6 +630,49 @@ class StoreProductKnowledgebaseUiTest extends TestCase
         $response->assertSee('search_author');
     }
 
+    public function test_knowledgebase_create_page_renders_stackedit_with_header_offset_adjuster(): void
+    {
+        $this->seedThemeSetting();
+        $user = User::factory()->create();
+        $product = $this->createStoreProduct($user, 'kb-create-test-product');
+
+        $response = $this->actingAs($user)->get(route('kb.create', $product->name));
+        $html = $response->getContent();
+
+        $response->assertOk()
+            ->assertSee('id="kb-editor"', false)
+            ->assertSee('new Stackedit()', false)
+            ->assertSee('stackedit.min.js', false)
+            ->assertSee('id="open-stackedit"', false)
+            ->assertSee('adjustIframe', false)
+            ->assertSee('iframe.stackedit-iframe', false);
+
+        $this->assertStringContainsString('iframe[src*="stackedit.io"]', $html);
+        $this->assertStringContainsString('calc(100% - ${headerHeight}px)', $html);
+    }
+
+    public function test_knowledgebase_edit_page_renders_stackedit_with_header_offset_adjuster(): void
+    {
+        $this->seedThemeSetting();
+        $user = User::factory()->create();
+        $product = $this->createStoreProduct($user, 'kb-edit-test-product');
+        $article = $this->createKnowledgebaseArticle($product, 'sample-topic', $user->id);
+
+        $response = $this->actingAs($user)->get(route('kb.edit.clean', ['name' => $product->name, 'article' => $article->name]));
+        $html = $response->getContent();
+
+        $response->assertOk()
+            ->assertSee('id="kb-editor"', false)
+            ->assertSee('new Stackedit()', false)
+            ->assertSee('stackedit.min.js', false)
+            ->assertSee('id="open-stackedit"', false)
+            ->assertSee('adjustIframe', false)
+            ->assertSee('iframe.stackedit-iframe', false);
+
+        $this->assertStringContainsString('iframe[src*="stackedit.io"]', $html);
+        $this->assertStringContainsString('calc(100% - ${headerHeight}px)', $html);
+    }
+
     private function seedThemeSetting(): void
     {
         Setting::create([
