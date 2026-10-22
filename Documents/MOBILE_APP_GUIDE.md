@@ -4,13 +4,13 @@ The official mobile client for the MYADS ecosystem is built using **Flutter (v3.
 
 - **Repository:** [https://github.com/mrghozzi/myads_app](https://github.com/mrghozzi/myads_app)
 - **Supported Platforms:** Android (SDK 21+) & iOS (iOS 13+)
-- **Target App Version:** `v1.8.5+27` (Synchronized with MYADS Web Core `v4.6.3`)
+- **Target App Version:** `v1.8.5+27` (Synchronized with MYADS Web Core `v4.6.4`)
 
 ---
 
 ## 1. Feature Parity & Architecture
 
-The Flutter mobile application (`myads_app`) provides 100% feature parity with the MYADS v4.6.3 web script across all core modules:
+The Flutter mobile application (`myads_app`) provides 100% feature parity with the MYADS v4.6.4 web script across all core modules:
 
 ### 1.1 Community & Social Experience
 - **Full Social Feed Parity (`portal/feed`):** High-speed feed supporting 9 post kinds: Text, Image Gallery (up to 10 photos with grid preview), Video, Audio (with waveform visualizer), Music, File Attachments, Clips, Live Link Previews, and Quote Reposts.
@@ -81,7 +81,7 @@ The Flutter mobile application (`myads_app`) provides 100% feature parity with t
 
 ## 2. Requirements
 
-1. **MYADS Website:** Version **v4.6.3** or higher running over HTTPS.
+1. **MYADS Website:** Version **v4.6.4** or higher running over HTTPS.
 2. **Flutter SDK:** Version `3.27.0` or higher (Dart 3.6+).
 3. **Android Studio / Android SDK:** Platform SDK 34 / 35 with Kotlin Gradle Plugin `2.2.20`.
 4. **Xcode:** For compiling and testing iOS applications (macOS only, iOS 13+).

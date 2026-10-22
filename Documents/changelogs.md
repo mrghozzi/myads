@@ -1,3 +1,17 @@
+# v4.6.4
+> **In Development / Work in Progress** — Initialized release cycle for MYADS v4.6.4.
+
+### Release Groundwork & Baseline Synchronization
+* **Core Version Synchronization (`app/Support/SystemVersion.php`)**:
+  * Bumped canonical platform version constant (`SystemVersion::CURRENT`) to `4.6.4`.
+  * Synchronized version identifiers across default theme metadata (`theme.json`), system documentation (`README.md`, `README_AR.md`, `Agents.md`, `SECURITY.md`, `API_DOCS.md`, `API_DOCS_AR.md`, `MOBILE_APP_GUIDE.md`), companion mobile app references (`myads_app/README.md`), and fallback strings.
+  * Verified database and options version auto-synchronization pipeline via `CheckSystemVersion` middleware.
+* **Sitemap XSL Stylesheet Modernization & Auto-Synchronization (`public/sitemap.xsl`, `SitemapController.php`, `CheckSystemVersion.php`, `SeoSystemTest.php`)**:
+  * Resolved outdated legacy version tag (`v4.2.0`) hardcoded in `public/sitemap.xsl`, updating it to `v4.6.4`.
+  * Added dynamic `/sitemap.xsl` route and `SitemapController@stylesheet` handler guaranteeing real-time version synchronization via `SystemVersion::tag()`.
+  * Enhanced `CheckSystemVersion` middleware to automatically synchronize the physical `public/sitemap.xsl` file whenever a version bump occurs, preventing future version drift.
+  * Added dedicated automated test coverage in `SeoSystemTest.php` (8 tests, 84 assertions, 100% pass rate).
+
 # v4.6.3
 > **Major Ecosystem, Modern Discussion, Directory 2.0, Referral Growth & Store Knowledge Base Release** — Rebuilt and modernized the MYADS Community Forum (`/forum`, `/f{id}`, `/t{id}`) with proprietary high-performance modern discussion architecture, multi-editor suite (MyAds Markdown, Quill.js, SCEditor), and cinema-grade video watch pages; transformed the Web & Tools Directory (`/directory`) into an interactive Product Hunt-grade discovery platform with community upvoting and SVG embed badges; completely overhauled the Referral & Affiliate Growth Engine (`/ads/referrals`, `/referral`, `/badges`) with 30-day cookie tracking middleware, two-sided welcome bonuses, anti-fraud self-referral protections, and 4 tiered community milestone badges; and upgraded the Store Product Knowledge Base (`/kb`) with dynamic StackEdit toolbar positioning, compact code/diagram snippet toolbars, and Font Awesome Brands compatibility.
 

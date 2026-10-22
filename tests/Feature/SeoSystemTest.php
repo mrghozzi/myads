@@ -10,6 +10,7 @@ use App\Models\Setting;
 use App\Models\Status;
 use App\Models\User;
 use App\Services\MaintenanceModeManager;
+use App\Support\SystemVersion;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -301,6 +302,15 @@ class SeoSystemTest extends TestCase
         $this->get('/')
             ->assertStatus(503)
             ->assertHeader('Retry-After', (string) app(MaintenanceModeManager::class)->retryAfter());
+    }
+
+    public function test_sitemap_stylesheet_renders_current_system_version(): void
+    {
+        $response = $this->get('/sitemap.xsl');
+
+        $response->assertOk()
+            ->assertSee('Powered by MyAds SEO Engine | ' . SystemVersion::tag(), false)
+            ->assertHeader('Content-Type', 'text/xsl; charset=UTF-8');
     }
 
     private function seedThemeSetting(): void

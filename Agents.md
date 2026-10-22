@@ -1,4 +1,4 @@
-# Agents.md — MYADS v4.6.3
+# Agents.md — MYADS v4.6.4
 
 > **Purpose:** This file gives AI coding agents a fast, comprehensive understanding of the MYADS project — its architecture, conventions, key files, and rules — so they can work effectively from a fresh chat context.
 
@@ -6,7 +6,7 @@
 
 ## 1. Project Identity
 
-- **Name:** MYADS v4.6.3
+- **Name:** MYADS v4.6.4
 - **Type:** Social network + ad exchange platform for website owners
 - **Framework:** Laravel 12 (PHP 8.2+)
 - **Database:** MySQL 5.7+ / MariaDB 10.3+
@@ -1258,11 +1258,11 @@ If in doubt, update it. An outdated `Agents.md` causes future agents to make wro
   - **Short Video Clips 2.0 & Mobile REST API Suite (`routes/api.php`, `ClipsController.php`, `StatusResource.php`, `ClipsApiTest.php`):** Rebuilt vertical video clips engine with multi-mode discovery tabs (`latest`, engagement-ranked `trending`, and creator `following`). Added deep-link prioritization via dedicated route `GET /clips/{status}` and API endpoint `GET /api/clips/{status}`. Engineered automated continuous playback view tracking (`POST /api/clips/view` at $\ge 2.5\text{s}$) with session and cache-based anti-inflation protection. Exposed calculated `views_count` on `StatusResource` across shorts and video feeds. Verified 100% test pass rate across `ClipsTest` and `ClipsApiTest`.
   - **Referral & Affiliate Growth Engine (`CaptureReferral.php`, `bootstrap/app.php`, `AuthController.php`, `GamificationService.php`):** Implemented global `CaptureReferral` middleware in web pipeline capturing `?ref=` parameters across any URL with 30-day encrypted cookie and session persistence. Added multi-format referrer resolution (username, Public UID, numeric ID) with strict self-referral and duplicate prevention. Engineered two-sided registration incentive awarding +10 PTS to the new referee and +10 PTS to the referrer. Created 4 tiered referral milestone badges (`referral_scout`, `referral_specialist`, `referral_master`, `referral_legend`) with automated progress increments and reward points.
   - **Web Directory 2.0 & Community Upvoting Platform (`DirectoryController.php`, `DirectoryPresenter.php`, `DirectoryUpvote.php`):** Rebuilt directory architecture with atomic community upvoting (`POST /directory/{id}/upvote`), dynamic SVG shields badges (`GET /directory/{id}/badge`) for external site embeds, automated domain claim verification (`POST /directory/{id}/claim`) checking `<meta name="myads-verification">`, faceted business model filters (`free`, `freemium`, `paid`, `open_source`), and Schema.org JSON-LD structured data.
-  - **Video Hub Cinema Watch Engine (`VideoHubController.php`):** Added dedicated standalone cinema watch route `/video/watch/{id}` with ambient lighting backdrop, custom playback controls bar, theater mode, speed adjustments, Picture-in-Picture, autoplay next queue, and threaded comments stream.
+- **v4.6.4 Groundwork Initialization (2026-10-22):** Initialized release cycle for MYADS v4.6.4. Bumped canonical version constant (`SystemVersion::CURRENT`), synchronized theme manifests (`theme.json`), system documentation (`README.md`, `README_AR.md`, `Agents.md`, `SECURITY.md`, `API_DOCS.md`, `API_DOCS_AR.md`, `MOBILE_APP_GUIDE.md`), companion app references (`myads_app/README.md`), fallback strings, and modernized the Sitemap XSL stylesheet (`sitemap.xsl`) with automated version synchronization and test coverage.
 
 ---
 
-*Last updated: 2026-10-19 — MYADS v4.6.3*
+*Last updated: 2026-10-22 — MYADS v4.6.4*
 
 
 

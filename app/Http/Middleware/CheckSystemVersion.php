@@ -48,7 +48,21 @@ class CheckSystemVersion
                         'o_mode' => '0'
                     ]);
                 }
-                
+
+                // Synchronize public/sitemap.xsl version tag automatically
+                $sitemapXslPath = public_path('sitemap.xsl');
+                if (file_exists($sitemapXslPath) && is_writable($sitemapXslPath)) {
+                    $xslContent = file_get_contents($sitemapXslPath);
+                    $newXsl = preg_replace(
+                        '/Powered by MyAds SEO Engine \| v[0-9\.]+/',
+                        'Powered by MyAds SEO Engine | ' . SystemVersion::tag(),
+                        $xslContent
+                    );
+                    if ($newXsl && $newXsl !== $xslContent) {
+                        @file_put_contents($sitemapXslPath, $newXsl);
+                    }
+                }
+
                 Cache::put($cacheKey, true, 60 * 60); // Cache for 1 hour
 
             } catch (\Exception $e) {

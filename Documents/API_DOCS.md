@@ -1,5 +1,5 @@
-# MYADS v4.6.3 REST & Real-Time API Documentation
-> **Specification Version:** `v4.6.3` (Stable Release)  
+# MYADS v4.6.4 REST & Real-Time API Documentation
+> **Specification Version:** `v4.6.4` (Active Development / Current Release)  
 > **Target Framework:** Laravel 12 (PHP 8.2+)  
 > **Authentication Engines:** Laravel Sanctum (Mobile & Web API), OAuth 2.0 (Developer Platform), and Server-Sent Events (SSE Live Stream).  
 > **Mobile Companion Client:** `myads_app` (v1.8.5+27)  
@@ -9,7 +9,7 @@
 
 ## 1. Overview & Architecture
 
-The MYADS v4.6.3 API ecosystem delivers high-performance, secure, and extensible interfaces connecting web clients, companion mobile applications (Flutter), and third-party developer integrations.
+The MYADS v4.6.4 API ecosystem delivers high-performance, secure, and extensible interfaces connecting web clients, companion mobile applications (Flutter), and third-party developer integrations.
 
 ### Primary API Subsystems
 1. **Internal Mobile & Web API (`/api/*`):** Powered by Laravel Sanctum for mobile app companion clients (`myads_app` v1.8.5+27) and web AJAX workflows.

@@ -57,6 +57,26 @@ class SitemapController extends Controller
         }
     }
 
+    public function stylesheet()
+    {
+        $path = public_path('sitemap.xsl');
+        if (File::exists($path)) {
+            $content = File::get($path);
+        } else {
+            $content = '<?xml version="1.0" encoding="UTF-8"?><xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"></xsl:stylesheet>';
+        }
+
+        $content = preg_replace(
+            '/Powered by MyAds SEO Engine \| v[0-9\.]+/',
+            'Powered by MyAds SEO Engine | ' . \App\Support\SystemVersion::tag(),
+            $content
+        );
+
+        return response($content, 200, [
+            'Content-Type' => 'text/xsl; charset=UTF-8',
+        ]);
+    }
+
     public function smartSection($type)
     {
         $aliases = [
