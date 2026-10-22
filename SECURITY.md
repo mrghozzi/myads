@@ -22,6 +22,7 @@ We provide active security updates and maintenance for the following versions of
 
 MYADS includes multi-layered security controls across the core platform, API, and ad exchange ecosystem:
 
+- **Dependency Vulnerability Remediation (v4.6.4)**: Patched GitHub Dependabot security advisory PR #141 by upgrading `follow-redirects` to `1.16.1`, preventing sensitive header leaks and proxy bypass exploits during redirected HTTP requests.
 - **Referral Anti-Fraud & Self-Referral Prevention Engine (v4.6.3)**: Strict self-referral blocking (`$referrer->id !== $user->id`), duplicate referral prevention, and query parameter sanitization (`CaptureReferral` middleware) strictly constraining referral inputs (`^[a-zA-Z0-9_\-\.]+$`, length <= 64) before queuing encrypted cookies or session fallbacks.
 - **Administrative Global Notification Resilience & Database Fault-Tolerance (v4.6.1)**: Defensive exception isolation (`try/catch \Throwable`) in `AdminNotificationService` and MySQL InnoDB tablespace desync remediation (errors 1932/1813), ensuring administrative routes never fail during database engine anomalies.
 - **Administrative User Management Schema Self-Healing & Recursion Shield (v4.6.1)**: Automatic runtime schema validation and repair migration `2026_09_27_020000` for `site_admins` table, alongside recursive loopback self-call timeout protection in `PluginManager`.

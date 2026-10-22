@@ -12,6 +12,11 @@
   * Enhanced `CheckSystemVersion` middleware to automatically synchronize the physical `public/sitemap.xsl` file whenever a version bump occurs, preventing future version drift.
   * Added dedicated automated test coverage in `SeoSystemTest.php` (8 tests, 84 assertions, 100% pass rate).
 
+### Security Hardening & Dependency Updates
+* **Dependency Vulnerability Remediation (`follow-redirects`, PR #141, `package-lock.json`)**:
+  * Upgraded `follow-redirects` from `1.16.0` to `1.16.1` resolving GitHub Dependabot security advisory PR #141.
+  * Mitigated sensitive request header leaks and proxy bypass risks during redirected HTTP requests.
+
 # v4.6.3
 > **Major Ecosystem, Modern Discussion, Directory 2.0, Referral Growth & Store Knowledge Base Release** — Rebuilt and modernized the MYADS Community Forum (`/forum`, `/f{id}`, `/t{id}`) with proprietary high-performance modern discussion architecture, multi-editor suite (MyAds Markdown, Quill.js, SCEditor), and cinema-grade video watch pages; transformed the Web & Tools Directory (`/directory`) into an interactive Product Hunt-grade discovery platform with community upvoting and SVG embed badges; completely overhauled the Referral & Affiliate Growth Engine (`/ads/referrals`, `/referral`, `/badges`) with 30-day cookie tracking middleware, two-sided welcome bonuses, anti-fraud self-referral protections, and 4 tiered community milestone badges; and upgraded the Store Product Knowledge Base (`/kb`) with dynamic StackEdit toolbar positioning, compact code/diagram snippet toolbars, and Font Awesome Brands compatibility.
 
