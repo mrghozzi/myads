@@ -24,6 +24,9 @@ Schedule::command('myads:db-cleanup --force')->dailyAt('03:00');
 Schedule::command('myads:prune-storage')->dailyAt('03:30');
 Schedule::command('myads:log-cleanup')->dailyAt('04:00');
 
+// MyAds Bot: Autonomous AI operations & GitHub release sync
+Schedule::command('myads-bot:tick')->everyFiveMinutes()->withoutOverlapping();
+
 // v4.5.1: Record the last time the scheduler actually ran, so the System
 // Monitor admin page can show it. This only fires from the CLI `schedule:run`
 // process (i.e. your server's cron job), never during a web request, so it
