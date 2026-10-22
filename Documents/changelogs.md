@@ -13,6 +13,14 @@
   * Added dedicated automated test coverage in `SeoSystemTest.php` (8 tests, 84 assertions, 100% pass rate).
 
 ### Security Hardening & Dependency Updates
+* **Vite Ecosystem Security Remediation & Advisory Elimination (`vite` 8.3.5, `package.json`, `package-lock.json`)**:
+  * Upgraded `vite` from `8.0.16` to `8.3.5` resolving all 5 active GitHub Dependabot security advisories:
+    * **#93 (High)**: Fixed Windows `fs.existsSync()` existence check bypass in `launch-editor`.
+    * **#95 (Moderate)**: Prevented unauthorized file disclosure outside `server.fs.allow` when project paths match system paths on non-Windows machines.
+    * **#94 (Moderate)**: Remediated editor CLI flag misinterpretation preventing arbitrary command execution in `launch-editor`.
+    * **#92 (Moderate)**: Fixed `escapeCmdArgs()` omitting `%` escaping on Windows in `launch-editor`.
+    * **#96 (Low)**: Prevented cross-origin script execution vulnerabilities through Vite custom middleware.
+  * Verified production asset compilation (`npm run build`) and achieved clean zero-vulnerability audit report (`found 0 vulnerabilities`).
 * **Dependency Vulnerability Remediation (`follow-redirects`, PR #141, `package-lock.json`)**:
   * Upgraded `follow-redirects` from `1.16.0` to `1.16.1` resolving GitHub Dependabot security advisory PR #141.
   * Mitigated sensitive request header leaks and proxy bypass risks during redirected HTTP requests.
