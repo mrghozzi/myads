@@ -25,6 +25,8 @@ class OAuthController extends Controller
                 'response_type' => 'required|in:code',
                 'state' => 'required|string',
                 'scope' => 'required|string',
+                'code_challenge' => 'nullable|string|max:128',
+                'code_challenge_method' => 'nullable|string|in:S256,plain,s256,PLAIN',
             ]);
 
             if (!auth()->check()) {
@@ -91,6 +93,8 @@ class OAuthController extends Controller
                 'state' => 'required|string',
                 'scope' => 'required|string',
                 'action' => 'required|in:accept,reject',
+                'code_challenge' => 'nullable|string|max:128',
+                'code_challenge_method' => 'nullable|string|in:S256,plain,s256,PLAIN',
             ]);
 
             if (!auth()->check()) {
@@ -137,7 +141,14 @@ class OAuthController extends Controller
                 }
             } catch (\Throwable $ignored) {}
 
-            $authData = $this->oauthService->generateAuthorizationCode($app, auth()->user(), $request->redirect_uri, $validScopes);
+            $authData = $this->oauthService->generateAuthorizationCode(
+                $app,
+                auth()->user(),
+                $request->redirect_uri,
+                $validScopes,
+                $request->input('code_challenge'),
+                $request->input('code_challenge_method')
+            );
 
             $redirect = $this->buildRedirectUri($request->redirect_uri, [
                 'code' => $authData['plain_code'],
@@ -175,15 +186,23 @@ class OAuthController extends Controller
         $request->validate([
             'grant_type' => 'required|in:authorization_code,refresh_token',
             'client_id' => 'required|string',
-            'client_secret' => 'required|string',
+            'client_secret' => 'nullable|string',
+            'code_verifier' => 'nullable|string',
         ]);
 
-        // SECURITY: Do not query by client_secret directly (leaks timing info).
-        // Fetch by client_id only, then compare secret with constant-time hash_equals().
         $app = DeveloperApp::where('client_id', $request->client_id)->first();
 
-        if (!$app || $app->status === 'suspended' || !hash_equals((string) $app->client_secret, (string) $request->client_secret)) {
+        if (!$app || $app->status === 'suspended') {
             return response()->json(['error' => 'invalid_client'], 401);
+        }
+
+        $isPublicApp = !$app->isConfidential();
+
+        // If confidential app or if client_secret is provided, verify it
+        if (!$isPublicApp || $request->filled('client_secret')) {
+            if (!hash_equals((string) $app->client_secret, (string) $request->client_secret)) {
+                return response()->json(['error' => 'invalid_client'], 401);
+            }
         }
 
         if ($request->grant_type === 'authorization_code') {
@@ -192,7 +211,12 @@ class OAuthController extends Controller
                 'redirect_uri' => 'required|url',
             ]);
 
-            $tokens = $this->oauthService->exchangeCodeForTokens($app, $request->code, $request->redirect_uri);
+            $tokens = $this->oauthService->exchangeCodeForTokens(
+                $app,
+                $request->code,
+                $request->redirect_uri,
+                $request->input('code_verifier')
+            );
 
             if (!$tokens) {
                 return response()->json(['error' => 'invalid_grant'], 400);
@@ -216,6 +240,42 @@ class OAuthController extends Controller
         }
 
         return response()->json(['error' => 'unsupported_grant_type'], 400);
+    }
+
+    /**
+     * RFC 7009 OAuth 2.0 Token Revocation.
+     */
+    public function revoke(Request $request)
+    {
+        // Support HTTP Basic Authentication
+        if (!$request->has('client_id') && $request->getUser()) {
+            $request->merge([
+                'client_id' => $request->getUser(),
+                'client_secret' => $request->getPassword(),
+            ]);
+        }
+
+        $request->validate([
+            'token' => 'required|string',
+            'token_type_hint' => 'nullable|string|in:access_token,refresh_token',
+            'client_id' => 'required|string',
+            'client_secret' => 'nullable|string',
+        ]);
+
+        $app = DeveloperApp::where('client_id', $request->client_id)->first();
+        if (!$app || $app->status === 'suspended') {
+            return response()->json(['error' => 'invalid_client'], 401);
+        }
+
+        if ($app->isConfidential() || $request->filled('client_secret')) {
+            if (!hash_equals((string) $app->client_secret, (string) $request->client_secret)) {
+                return response()->json(['error' => 'invalid_client'], 401);
+            }
+        }
+
+        $this->oauthService->revokeToken($request->token, $request->token_type_hint);
+
+        return response()->json(['status' => 'success', 'revoked' => true, 'message' => 'Token revoked successfully']);
     }
 
     /**

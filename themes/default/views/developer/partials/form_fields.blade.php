@@ -58,6 +58,38 @@
             @enderror
         </div>
 
+        <div class="dev-field">
+            <label for="app_type">{{ __('messages.app_type') ?? 'Application Type' }}</label>
+            <select id="app_type" name="app_type" class="form-control dev-control">
+                <option value="confidential" {{ old('app_type', $developerApp->app_type ?? 'confidential') === 'confidential' ? 'selected' : '' }}>
+                    {{ __('messages.app_type_confidential') ?? 'Confidential (Web Server with Secret)' }}
+                </option>
+                <option value="public" {{ old('app_type', $developerApp->app_type ?? '') === 'public' ? 'selected' : '' }}>
+                    {{ __('messages.app_type_public') ?? 'Public Client (SPA / Mobile with PKCE)' }}
+                </option>
+            </select>
+            <span class="dev-help-text" style="font-size: 11px;">Public applications authenticate with PKCE (RFC 7636).</span>
+        </div>
+
+        <div class="dev-field">
+            <label for="app_category">{{ __('messages.category') ?? 'Category' }}</label>
+            <select id="app_category" name="category" class="form-control dev-control">
+                <option value="">-- {{ __('messages.select_category') ?? 'Select Category' }} --</option>
+                <option value="social" {{ old('category', $developerApp->category ?? '') === 'social' ? 'selected' : '' }}>Social & Community</option>
+                <option value="tools" {{ old('category', $developerApp->category ?? '') === 'tools' ? 'selected' : '' }}>Productivity & Tools</option>
+                <option value="content" {{ old('category', $developerApp->category ?? '') === 'content' ? 'selected' : '' }}>Content & Media</option>
+                <option value="marketplace" {{ old('category', $developerApp->category ?? '') === 'marketplace' ? 'selected' : '' }}>Marketplace & Orders</option>
+                <option value="bots" {{ old('category', $developerApp->category ?? '') === 'bots' ? 'selected' : '' }}>Bots & Automation</option>
+            </select>
+        </div>
+
+        <div class="dev-field dev-form-grid__full">
+            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                <input type="checkbox" name="public_listed" value="1" {{ old('public_listed', $developerApp->public_listed ?? false) ? 'checked' : '' }} style="width: 18px; height: 18px;">
+                <span><strong>{{ __('messages.list_in_app_directory') ?? 'Publish this application to the Public App Directory' }}</strong></span>
+            </label>
+        </div>
+
         <div class="dev-field dev-form-grid__full">
             <label for="app_description">{{ __('messages.description') }} <span class="text-danger">*</span></label>
             <textarea

@@ -272,14 +272,23 @@ GET /oauth/authorize?client_id={client_id}&redirect_uri={redirect_uri}&response_
 - **`response_type`** *(required)*: Must be `code`.
 - **`scope`** *(optional)*: Space- or comma-delimited permissions (e.g. `user.identity.read user.content.write`).
 - **`state`** *(recommended)*: CSRF protection token.
+- **`code_challenge`** *(OAuth 2.1 / PKCE RFC 7636)*: Base64URL-encoded SHA-256 hash of a cryptographically random `code_verifier` string (43 to 128 characters).
+- **`code_challenge_method`** *(OAuth 2.1 / PKCE)*: Must be `S256` (recommended) or `plain`.
+
+> **PKCE Example (RFC 7636):**
+> ```text
+> code_verifier = "dBjftJeZ4CVP-mB92K27uhbUJU1p1r_wW1gFWFOEjXk"
+> code_challenge = BASE64URL(SHA256(code_verifier)) = "E9Melhoa2OwvFrEMTJguCHaoeK1t8URWbuGJSstw-cM"
+> ```
+> For **Public Clients** (Single Page Applications / Mobile Apps where `app_type = public`), PKCE is mandatory and `client_secret` is completely omitted, preventing credential leaks in client bundles.
 
 > **WAF / ModSecurity Rule 930120 Bypass & Extended Scope Aliases:** The platform normalizes sensitive dotfile patterns (`profile.read`, `user_profile.read`, `user_profile_read` &rarr; `user.profile.read`) and developer aliases (`content.write`, `posts.write`, `publish_posts` &rarr; `user.content.write`; `messages.write`, `dm.send` &rarr; `user.messages.write`).
 
-#### 2. Token Exchange (RFC 6749 Section 4.1.3)
+#### 2. Token Exchange (RFC 6749 Section 4.1.3 & RFC 7636)
 ```http
 POST /oauth/token
 Content-Type: application/x-www-form-urlencoded (or application/json)
-Authorization: Basic {base64(client_id:client_secret)}
+Authorization: Basic {base64(client_id:client_secret)}   [Confidential Clients]
 ```
 Or via body payload:
 ```json
@@ -288,9 +297,11 @@ Or via body payload:
   "client_id": "{client_id}",
   "client_secret": "{client_secret}",
   "redirect_uri": "{redirect_uri}",
-  "code": "{authorization_code}"
+  "code": "{authorization_code}",
+  "code_verifier": "{code_verifier}"
 }
 ```
+*(Note: For `public` clients, `client_secret` is omitted, and `code_verifier` is validated directly against the code challenge).*
 
 **Successful Response (HTTP 200 OK):**
 ```json
@@ -313,10 +324,84 @@ Or via body payload:
 }
 ```
 
-#### 4. Token Validity Lifecycles
+#### 4. Token Revocation (RFC 7009)
+Allows clients to immediately revoke an access token or refresh token upon logout or session termination:
+```http
+POST /oauth/revoke
+Content-Type: application/json (or application/x-www-form-urlencoded)
+```
+**Payload:**
+```json
+{
+  "token": "DbMYZk4zAq5iZ4KNRBCceUyhnwZw5SbYp4fRIMRAXz40JzMjalN6XjsuuCAU",
+  "token_type_hint": "access_token",
+  "client_id": "{client_id}",
+  "client_secret": "{client_secret}"
+}
+```
+*(Supports HTTP Basic Auth for `client_id` and `client_secret`. Exempt from CSRF).*
+
+**Response (HTTP 200 OK):**
+```json
+{
+  "status": "success",
+  "revoked": true,
+  "message": "Token revoked successfully"
+}
+```
+
+#### 5. Personal Access Tokens (PAT)
+Developers can generate personal API tokens directly via `/developer/tokens` without configuring an OAuth 2.0 application or authorization redirect flows:
+- **Token Prefix:** `pat_...` (e.g. `pat_7f2b9a81c0d4...`)
+- **Storage:** Securely hashed with SHA-256 in `developer_personal_tokens` table. Plain token is displayed only once upon generation.
+- **Usage:** Send as standard HTTP Bearer token:
+  ```http
+  Authorization: Bearer pat_7f2b9a81c0d4...
+  ```
+- **Granular Scopes:** Scoped during creation (e.g., `user.profile.read`, `user.content.write`).
+
+#### 6. Webhooks Engine & Event Dispatcher (HMAC-SHA256)
+External applications can register webhook endpoints at `/developer/apps/{id}/webhooks` to receive real-time HTTP POST notifications.
+
+**Signature Verification:**
+Every outgoing webhook request includes a cryptographic HMAC-SHA256 signature in the `X-MYADS-Signature-256` header calculated using the webhook's secret key:
+```text
+X-MYADS-Signature-256: sha256=d58d9e6...
+X-MYADS-Delivery: a73f4e1b-8210-482a-921c-5296e812d1c9
+X-MYADS-Event: user.created
+Content-Type: application/json
+```
+
+**PHP Signature Verification Example:**
+```php
+$signature = $_SERVER['HTTP_X_MYADS_SIGNATURE_256'] ?? '';
+$payload = file_get_contents('php://input');
+$expectedSignature = 'sha256=' . hash_hmac('sha256', $payload, $webhookSecret);
+
+if (hash_equals($expectedSignature, $signature)) {
+    // Signature verified! Process event payload...
+    $event = json_decode($payload, true);
+} else {
+    http_response_code(401);
+    exit('Invalid signature');
+}
+```
+
+**Supported Webhook Events:**
+- `user.created`: Fired when a new user joins.
+- `content.published`: Fired when a new post or status is published.
+- `status.liked`: Fired when content receives a like or reaction.
+- `comment.created`: Fired when a new comment is posted.
+- `order.created`: Fired when a new service order is requested.
+- `order.awarded`: Fired when an order proposal is accepted.
+- `forum.topic_created`: Fired when a new forum discussion is opened.
+- `ping`: Test ping event sent via `/developer/apps/{app}/webhooks/{webhook}/test`.
+
+#### 7. Token Validity Lifecycles
 - **Authorization Code:** 10 minutes (single-use).
 - **Access Token:** 30 days (`2592000` seconds).
 - **Refresh Token:** 90 days.
+- **Personal Access Token:** Configurable expiration (30 days, 90 days, 1 year, or never).
 
 ---
 
@@ -328,11 +413,32 @@ All requests require an active OAuth 2.0 access token issued via `/oauth/token`.
 2. Server environment headers (`HTTP_AUTHORIZATION`, `REDIRECT_HTTP_AUTHORIZATION`)
 3. Fallback Query Parameter: `?access_token={access_token}` or JSON payload key `access_token`.
 
-### B. Rate Limiting & Error Handling
-- Rate limited to 30 requests per minute per IP (`throttle:30,1`).
-- Structured JSON error envelopes (`401`, `403`, `422`, `500`) with backend logging in `storage/logs/laravel.log`.
+### B. Rate Limiting & Developer Telemetry
+- **Rate Limit:** 30 requests per minute per IP / token.
+- **RFC Standard Rate Limit Headers:** Every response from the Developer API v1 includes live quota metadata:
+  ```http
+  X-RateLimit-Limit: 30
+  X-RateLimit-Remaining: 29
+  X-RateLimit-Reset: 1787534060
+  ```
+- **Real-Time Telemetry Logging:** Every incoming request is automatically recorded in `developer_api_logs` with HTTP method, endpoint, status code, response duration (in milliseconds), client IP address, and User-Agent.
+- **Analytics & Logs Dashboard:** App owners can monitor 7-day request volume, error rates, average latency, and live inspect recent request logs directly via:
+  - `GET /developer/apps/{id}/analytics`
+  - `GET /developer/apps/{id}/logs`
 
-### C. Endpoints Catalog
+### C. Interactive Playground & OpenAPI 3.1 Specification
+- **In-Browser Playground (`/developer/playground`):** Allows developers to live-test endpoints with auto-filled credentials or custom Personal Access Tokens (PAT).
+- **OpenAPI 3.1 Specification (`/developer/openapi.json`):** Machine-readable, strictly-typed OpenAPI 3.1 document ready for Postman, Swagger UI, Insomnia, or code-generation tools:
+  ```http
+  GET /developer/openapi.json
+  Content-Type: application/json
+  ```
+
+### D. Public App Directory (`/developer/directory`)
+- **Discovery Portal:** Verified applications with `public_listed = true` are showcased in the public catalog at `/developer/directory` categorized by use case (`Social`, `Productivity`, `Commerce`, etc.).
+- **App Profile:** `/developer/directory/{id}` displays verified app information, author, and website.
+
+### E. Endpoints Catalog
 - **Identity & Profile:**
   - `GET /api/developer/v1/me`: Basic member identity. *(Scope: `user.identity.read`)*
   - `GET /api/developer/v1/me/profile`: Display name, bio, points, avatar. *(Scope: `user.profile.read`)*
@@ -365,10 +471,32 @@ All requests require an active OAuth 2.0 access token issued via `/oauth/token`.
 
 ## 6. Embed Widgets Catalog
 
-MYADS provides ready-to-use JavaScript embed widgets. Snippets with your specific `app_id` are available in `/developer/apps/{id}`:
-- **Follow Button Widget:** `GET /embed/developer/{app_id}/follow.js`
-- **Profile Card Widget:** `GET /embed/developer/{app_id}/profile.js`
-- **Content Stream Widget:** `GET /embed/developer/{app_id}/content.js`
+MYADS provides ready-to-use JavaScript embed widgets and rendered HTML iframe targets. Snippets with your specific `app_id` are available in `/developer/apps/{id}`:
+
+### Developer Widgets (Scripts & Rendered Frames)
+- **Follow Button Widget:**
+  - Script Embed: `GET /embed/developer/{app_id}/follow.js`
+  - HTML Frame: `GET /embed/developer/{app_id}/follow`
+  - Follow Toggle (AJAX): `POST /embed/developer/{app_id}/follow-toggle`
+- **Profile Card Widget:**
+  - Script Embed: `GET /embed/developer/{app_id}/profile.js`
+  - HTML Frame: `GET /embed/developer/{app_id}/profile`
+- **Content Stream Widget:**
+  - Script Embed: `GET /embed/developer/{app_id}/content.js`
+  - HTML Frame: `GET /embed/developer/{app_id}/content`
+
+### Responsive `postMessage` Resizing Protocol
+Embedded widget frames automatically calculate their scroll height and transmit an event to the host window to adjust the iframe height with zero layout shift:
+```javascript
+window.addEventListener('message', function(event) {
+    if (event.data && event.data.type === 'myads:widget:resize') {
+        const iframe = document.querySelector('iframe[src*="/embed/developer/"]');
+        if (iframe && event.data.height) {
+            iframe.style.height = event.data.height + 'px';
+        }
+    }
+});
+```
 
 ### Advertising Embeds
 - **Banner Ad Embed:** `GET /embed/banner.js` (or `/bn.php`)

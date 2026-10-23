@@ -25,6 +25,39 @@
   * Upgraded `follow-redirects` from `1.16.0` to `1.16.1` resolving GitHub Dependabot security advisory PR #141.
   * Mitigated sensitive request header leaks and proxy bypass risks during redirected HTTP requests.
 
+### Complete Developer Platform & Ecosystem Modernization (`/developer`, `/oauth/*`, `/embed/*`)
+* **OAuth 2.1 & PKCE Compliance (RFC 7636, RFC 6749, `OAuthController.php`, `DeveloperOAuthService.php`)**:
+  * Added full Proof Key for Code Exchange (PKCE) with `S256` and `plain` code challenge methods across `/oauth/authorize` and `/oauth/token`.
+  * Implemented public client architecture (`app_type = 'public'`) allowing Single Page Applications (SPAs) and mobile companion applications to authenticate securely without storing or exposing client secrets.
+  * Preserved 100% backward compatibility for confidential server-side clients and existing OAuth 2.0 flows.
+* **RFC 7009 Token Revocation (`POST /oauth/revoke`, `OAuthController.php`, `DeveloperOAuthService.php`, `bootstrap/app.php`)**:
+  * Built standard token revocation endpoint (`POST /oauth/revoke`) accepting `token` and `token_type_hint` (`access_token` or `refresh_token`), supporting both HTTP Basic Auth and JSON payload credentials.
+  * Added route exemption in `bootstrap/app.php` ensuring stateless programmatic token invalidation without CSRF token friction.
+* **Personal Access Tokens Engine (PAT, `/developer/tokens`, `DeveloperTokenController.php`, `DeveloperPersonalToken.php`)**:
+  * Allowed developers and members to generate direct API tokens (`pat_...`) scoped to specific capabilities without setting up an OAuth application or undergoing redirect flows.
+  * Stored tokens securely using SHA-256 hashing (`developer_personal_tokens`), displaying plaintext tokens only once upon generation with 1-click clipboard copy.
+* **Real-Time Webhooks Engine & HMAC-SHA256 Dispatcher (`/developer/apps/{app}/webhooks`, `WebhookDispatcherService.php`, `DeveloperWebhookController.php`)**:
+  * Built complete event-driven webhook architecture with HMAC-SHA256 cryptographic signatures (`X-MYADS-Signature-256: sha256={hmac}`), delivery UUIDs (`X-MYADS-Delivery`), and event headers (`X-MYADS-Event`).
+  * Created endpoint management UI for registering, modifying, testing (`POST .../test` ping), and manually redelivering failed webhook dispatches.
+  * Catalogued 8 major lifecycle events (`user.created`, `content.published`, `status.liked`, `comment.created`, `order.created`, `order.awarded`, `forum.topic_created`, `ping`).
+* **API Telemetry, Standard Rate Limit Headers & Analytics Dashboard (`DeveloperApiController.php`, `DeveloperPlatformController.php`, `developer_api_logs`)**:
+  * Instrumented `/api/developer/v1/*` to emit standard RFC rate limit headers (`X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset`).
+  * Added automated request telemetry recording every incoming API call, execution latency (in milliseconds), HTTP status code, client IP, and User-Agent.
+  * Created dedicated Analytics (`/developer/apps/{id}/analytics`) and Live Logs (`/developer/apps/{id}/logs`) dashboards with 4 key KPI cards, 7-day request volume breakdown, and real-time inspector.
+* **Interactive In-Browser API Playground & OpenAPI 3.1 Specification (`/developer/playground`, `/developer/openapi.json`)**:
+  * Built interactive developer playground allowing live testing of API endpoints with automated credential injection, custom PAT entry, and formatted JSON response viewer.
+  * Implemented strictly-typed, machine-readable `GET /developer/openapi.json` specification (OpenAPI 3.1.0) defining all authentication schemes, endpoints, schemas, and responses.
+* **Embed Widgets Fix, HTML Frame Targets & Auto-Resizing Protocol (`DeveloperWidgetController.php`, `DeveloperWidgetService.php`)**:
+  * Resolved critical 404 bug in legacy iframe embeddings by creating real HTML frame endpoints: `/embed/developer/{app}/follow`, `/embed/developer/{app}/profile`, and `/embed/developer/{app}/content`.
+  * Implemented zero-layout-shift responsive auto-resizing protocol via `window.parent.postMessage({ type: 'myads:widget:resize', widget: '...', height: ... }, '*')`.
+  * Added authenticated interactive follow toggle AJAX endpoint (`POST /embed/developer/{app}/follow-toggle`) with live counter updates.
+* **Public App Directory (`/developer/directory`, `DeveloperDirectoryController.php`)**:
+  * Created public discovery portal allowing members to browse verified community integrations filtered by use case category (`Social`, `Productivity`, `Commerce`, etc.).
+  * Added dedicated application showcase view (`/developer/directory/{id}`) with developer attribution and launch links.
+* **Dedicated Migration & High-Coverage Test Suite (`2026_10_23_010000_modernize_developer_platform.php`, `DeveloperModernizationTest.php`)**:
+  * Consolidated all new database tables (`developer_webhooks`, `developer_webhook_deliveries`, `developer_api_logs`, `developer_personal_tokens`) and columns into a structured migration, eliminating runtime DDL overhead.
+  * Created comprehensive feature test suite (`DeveloperModernizationTest.php`, 9 tests, 52 assertions) bringing total developer ecosystem test coverage to 34 tests and 152 assertions with 100% pass rate.
+
 # v4.6.3
 > **Major Ecosystem, Modern Discussion, Directory 2.0, Referral Growth & Store Knowledge Base Release** — Rebuilt and modernized the MYADS Community Forum (`/forum`, `/f{id}`, `/t{id}`) with proprietary high-performance modern discussion architecture, multi-editor suite (MyAds Markdown, Quill.js, SCEditor), and cinema-grade video watch pages; transformed the Web & Tools Directory (`/directory`) into an interactive Product Hunt-grade discovery platform with community upvoting and SVG embed badges; completely overhauled the Referral & Affiliate Growth Engine (`/ads/referrals`, `/referral`, `/badges`) with 30-day cookie tracking middleware, two-sided welcome bonuses, anti-fraud self-referral protections, and 4 tiered community milestone badges; and upgraded the Store Product Knowledge Base (`/kb`) with dynamic StackEdit toolbar positioning, compact code/diagram snippet toolbars, and Font Awesome Brands compatibility.
 

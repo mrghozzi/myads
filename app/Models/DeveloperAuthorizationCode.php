@@ -15,6 +15,8 @@ class DeveloperAuthorizationCode extends Model
         'developer_app_id',
         'user_id',
         'code',
+        'code_challenge',
+        'code_challenge_method',
         'redirect_uri',
         'scopes',
         'expires_at',

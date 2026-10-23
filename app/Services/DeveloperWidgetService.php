@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Models\DeveloperApp;
-use App\Models\User;
 
 class DeveloperWidgetService
 {
@@ -14,9 +13,16 @@ class DeveloperWidgetService
     {
         $domain = request()->getSchemeAndHttpHost();
         $appId = $app->id;
-        $ownerId = $app->user_id;
 
-        $js = "
+        $heights = [
+            'follow' => '44px',
+            'profile' => '190px',
+            'content' => '480px',
+        ];
+
+        $defaultHeight = $heights[$type] ?? '200px';
+
+        return "
 (function() {
     var container = document.getElementById('myads-widget-{$type}-{$appId}');
     if (!container) return;
@@ -26,12 +32,20 @@ class DeveloperWidgetService
     iframe.style.border = 'none';
     iframe.style.overflow = 'hidden';
     iframe.style.width = '100%';
-    iframe.style.height = '100%';
+    iframe.style.height = '{$defaultHeight}';
+    iframe.style.transition = 'height 0.2s ease';
+    iframe.setAttribute('loading', 'lazy');
+    iframe.setAttribute('title', 'MYADS Widget');
     
+    window.addEventListener('message', function(e) {
+        if (e.data && e.data.type === 'myads:widget:resize' && e.data.widgetId === '{$appId}:{$type}') {
+            iframe.style.height = e.data.height + 'px';
+        }
+    });
+
+    container.innerHTML = '';
     container.appendChild(iframe);
 })();
 ";
-
-        return $js;
     }
 }

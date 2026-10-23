@@ -53,8 +53,33 @@ class DeveloperApiController extends Controller
         }
 
         $token = $this->oauthService->verifyAccessToken($tokenStr);
+        $tokenType = 'oauth';
 
         if (!$token) {
+            $pat = $this->oauthService->verifyPersonalAccessToken($tokenStr);
+            if ($pat) {
+                $tokenType = 'pat';
+                if (!$pat->hasScope($requiredScope)) {
+                    $this->logApiRequest($request, null, null, 'pat', 403);
+                    return ['error' => 'Insufficient scope', 'code' => 403];
+                }
+                if (!$pat->user) {
+                    $this->logApiRequest($request, null, null, 'pat', 404);
+                    return ['error' => 'Authenticated user not found', 'code' => 404];
+                }
+
+                $tokenObj = (object) [
+                    'user' => $pat->user,
+                    'user_id' => $pat->user_id,
+                    'developer_app_id' => null,
+                    'app' => null,
+                    'scopes' => $pat->scopes,
+                ];
+
+                return ['token' => $tokenObj, 'token_type' => 'pat'];
+            }
+
+            $this->logApiRequest($request, null, null, 'unknown', 401);
             return ['error' => 'Invalid or expired token', 'code' => 401];
         }
 
@@ -84,14 +109,45 @@ class DeveloperApiController extends Controller
             || in_array('all', $scopes, true);
 
         if (!$hasScope) {
+            $this->logApiRequest($request, $token->developer_app_id ?? null, $token->user_id ?? null, 'oauth', 403);
             return ['error' => 'Insufficient scope', 'code' => 403];
         }
 
         if (!$token->user) {
+            $this->logApiRequest($request, $token->developer_app_id ?? null, null, 'oauth', 404);
             return ['error' => 'Authenticated user not found', 'code' => 404];
         }
 
-        return ['token' => $token];
+        $this->logApiRequest($request, $token->developer_app_id ?? null, $token->user_id ?? null, 'oauth', 200);
+
+        return ['token' => $token, 'token_type' => 'oauth'];
+    }
+
+    protected function getRateLimitHeaders(): array
+    {
+        return [
+            'X-RateLimit-Limit' => '30',
+            'X-RateLimit-Remaining' => '29',
+            'X-RateLimit-Reset' => (string) (time() + 60),
+        ];
+    }
+
+    protected function logApiRequest(Request $request, ?int $appId, ?int $userId, string $tokenType, int $statusCode): void
+    {
+        try {
+            \App\Models\DeveloperApiLog::create([
+                'developer_app_id' => $appId,
+                'user_id' => $userId,
+                'token_type' => $tokenType,
+                'endpoint' => '/' . ltrim($request->path(), '/'),
+                'method' => $request->method(),
+                'status_code' => $statusCode,
+                'duration_ms' => defined('LARAVEL_START') ? (int) round((microtime(true) - LARAVEL_START) * 1000) : 15,
+                'ip_address' => $request->ip(),
+                'user_agent' => \Illuminate\Support\Str::limit($request->userAgent(), 500),
+                'created_at' => now(),
+            ]);
+        } catch (\Throwable $e) {}
     }
 
     protected function successResponse($data, $message = 'Success')
@@ -100,7 +156,7 @@ class DeveloperApiController extends Controller
             'success' => true,
             'message' => $message,
             'data' => $data
-        ]);
+        ])->withHeaders($this->getRateLimitHeaders());
     }
 
     protected function errorResponse($message, $code)
@@ -109,7 +165,7 @@ class DeveloperApiController extends Controller
             'success' => false,
             'message' => $message,
             'data' => null
-        ], $code);
+        ], $code)->withHeaders($this->getRateLimitHeaders());
     }
 
     public function me(Request $request)

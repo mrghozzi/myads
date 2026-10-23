@@ -221,34 +221,87 @@ data: {
 - **تحديث التطبيق:** `PUT /developer/apps/{id}`
 - **تدوير المفتاح السري (Client Secret):** `POST /developer/apps/{id}/rotate-secret`
 - **حذف التطبيق:** `DELETE /developer/apps/{id}`
-- **طلب التفويض:**
+- **طلب التفويض (OAuth 2.1 & PKCE RFC 7636):**
   ```http
-  GET /oauth/authorize?client_id={client_id}&redirect_uri={redirect_uri}&response_type=code&scope={scope}&state={state}
+  GET /oauth/authorize?client_id={client_id}&redirect_uri={redirect_uri}&response_type=code&scope={scope}&state={state}&code_challenge={code_challenge}&code_challenge_method=S256
   ```
+  - `code_challenge`: ناتج تشفير SHA-256 لسلسلة عشوائية آمنة `code_verifier` بصيغة Base64URL.
+  - `code_challenge_method`: القيمة الموصى بها هي `S256` (أو `plain`).
+  - **التطبيقات العامة (Public Clients / SPA / Mobile Apps):** للتطبيقات من نوع `public` لا يُشترط ولا يُرسل المفتاح السري `client_secret` لحمايته من التسرب في متصفحات أو كتل الهواتف.
+
 - **تبادل الرمز المميز:**
   ```http
   POST /oauth/token
-  Content-Type: application/json
+  Content-Type: application/json (أو application/x-www-form-urlencoded)
 
   {
     "grant_type": "authorization_code",
     "client_id": "{client_id}",
     "client_secret": "{client_secret}",
     "redirect_uri": "{redirect_uri}",
-    "code": "{authorization_code}"
+    "code": "{authorization_code}",
+    "code_verifier": "{code_verifier}"
   }
   ```
+  *(ملاحظة: في تطبيقات `public` يتم استبعاد `client_secret` والاعتماد حصراً على التحقق من `code_verifier`)*.
+
+- **إلغاء وإبطال الرموز (RFC 7009 Token Revocation):**
+  ```http
+  POST /oauth/revoke
+  Content-Type: application/json
+
+  {
+    "token": "{access_token_or_refresh_token}",
+    "token_type_hint": "access_token",
+    "client_id": "{client_id}",
+    "client_secret": "{client_secret}"
+  }
+  ```
+  - الاستجابة الناجحة: `{"status": "success", "revoked": true, "message": "Token revoked successfully"}`.
+
+- **رموز الوصول الشخصية (Personal Access Tokens - PAT):**
+  - إنشاء الرموز عبر لوحة التحكم: `GET /developer/tokens`.
+  - تبدأ بصيغة `pat_...` وتُحفظ مشفرة بخوارزمية SHA-256 مع ظهور الرمز الأصلي لمرة واحدة فقط للمطور.
+  - الاستخدام المباشر دون الحاجة لتدفق إعادة التوجيه OAuth:
+    ```http
+    Authorization: Bearer pat_...
+    ```
+
+- **محرك الويب هوك (Webhooks Engine & HMAC-SHA256):**
+  - إدارة الويب هوك: عبر `/developer/apps/{app}/webhooks` (إضافة، تعديل، حذف، فحص تجريبي ping، وإعادة إرسال).
+  - توقيع الترويسة الرقمي: كل طلب مرسل يحمل الترويسة `X-MYADS-Signature-256: sha256={hash}` المحسوب باستخدام المفتاح السري المشترك للويب هوك.
+  - الأحداث المدعومة: `user.created`, `content.published`, `status.liked`, `comment.created`, `order.created`, `order.awarded`, `forum.topic_created`, `ping`.
 
 ---
 
 ## 5. واجهات منصة المطورين (Developer API v1)
 
-تتطلب جميع نقاط النهاية في هذا القسم ترويسة المصادقة القياسية:
+تتطلب جميع نقاط النهاية في هذا القسم ترويسة المصادقة القياسية (OAuth 2.0 أو PAT):
 ```http
-Authorization: Bearer {access_token}
+Authorization: Bearer {access_token_or_pat}
 ```
-مع معدل طلبات أقصاه 30 طلباً / دقيقة (`throttle:30,1`).
 
+### أ. ترويسات حدود الطلبات وسجلات التتبع اللحظية (Telemetry & Rate Limits)
+- الحد الأقصى للطلبات: 30 طلباً / دقيقة.
+- **ترويسات المعايير الدولية:**
+  ```http
+  X-RateLimit-Limit: 30
+  X-RateLimit-Remaining: 29
+  X-RateLimit-Reset: 1787534060
+  ```
+- **سجلات التتبع الذاتية (`developer_api_logs`):** تسجيل تلقائي لكل طلب مع وقت الاستجابة بالمللي ثانية، كود الحالة، وعنوان IP.
+- **لوحة التحليلات والسجلات:**
+  - `GET /developer/apps/{id}/analytics`: رسوم بيانية ومؤشرات الطلبات ونسب الخطأ لآخر 7 أيام.
+  - `GET /developer/apps/{id}/logs`: سجلات فحص الطلبات اللحظية.
+
+### ب. مختبر التجارب ومواصفة OpenAPI 3.1
+- **المختبر التفاعلي (`/developer/playground`):** تجربة نقاط النهاية مباشرة من المتصفح مع تعبئة الاعتمادات تلقائياً.
+- **مواصفة OpenAPI 3.1 (`GET /developer/openapi.json`):** ملف JSON قياسي متوافق مع Postman و Swagger UI وأدوات توليد الأكواد.
+
+### ج. دليل التطبيقات العام (`/developer/directory`)
+- استكشاف التطبيقات المصرحة والمدرجة للمجتمع مصنفة حسب الفئة (`اجتماعي`، `إنتاجية`، `تجارة`، إلخ).
+
+### د. قائمة نقاط النهاية (Endpoints Catalog)
 - **الهوية والملف الشخصي:**
   - `GET /api/developer/v1/me`: المعرف الأساسي، اسم المستخدم، وتاريخ التسجيل *(التصريح: `user.identity.read`)*.
   - `GET /api/developer/v1/me/profile`: الاسم الظاهر، النبذة، النقاط، والصورة *(التصريح: `user.profile.read`)*.
@@ -281,10 +334,34 @@ Authorization: Bearer {access_token}
 
 ## 6. عناصر التضمين الخارجية (Embed Widgets Catalog)
 
-أكواد JavaScript جاهزة لتضمين وظائف المنصة في المواقع الخارجية:
-- **زر المتابعة:** `GET /embed/developer/{app_id}/follow.js`
-- **بطاقة الملف الشخصي:** `GET /embed/developer/{app_id}/profile.js`
-- **خلاصة المنشورات:** `GET /embed/developer/{app_id}/content.js`
+أكواد JavaScript وصفحات HTML Frame جاهزة لتضمين وظائف المنصة في المواقع الخارجية:
+
+### أدوات المطورين التفاعلية (Widgets)
+- **زر المتابعة:**
+  - كود السكربت: `GET /embed/developer/{app_id}/follow.js`
+  - إطار الـ HTML: `GET /embed/developer/{app_id}/follow`
+  - زر تبديل المتابعة: `POST /embed/developer/{app_id}/follow-toggle`
+- **بطاقة الملف الشخصي:**
+  - كود السكربت: `GET /embed/developer/{app_id}/profile.js`
+  - إطار الـ HTML: `GET /embed/developer/{app_id}/profile`
+- **خلاصة المنشورات:**
+  - كود السكربت: `GET /embed/developer/{app_id}/content.js`
+  - إطار الـ HTML: `GET /embed/developer/{app_id}/content`
+
+### بروتوكول التوافقية وإعادة التحجيم التلقائي (`postMessage`)
+تُرسل إطارات التضمين حدثاً تلقائياً لنافذة الموقع المستضيف لضبط ارتفاع الـ iframe دون فراغات أو أشرطة تمرير مزعجة:
+```javascript
+window.addEventListener('message', function(event) {
+    if (event.data && event.data.type === 'myads:widget:resize') {
+        const iframe = document.querySelector('iframe[src*="/embed/developer/"]');
+        if (iframe && event.data.height) {
+            iframe.style.height = event.data.height + 'px';
+        }
+    }
+});
+```
+
+### إعلانات المنصة
 - **إعلانات البانر:** `GET /embed/banner.js` (أو `/bn.php`)
 - **إعلانات الروابط:** `GET /embed/link.js` (أو `/link.php`)
 - **الإعلانات الذكية:** `GET /embed/smart.js` (أو `/smart.php`)

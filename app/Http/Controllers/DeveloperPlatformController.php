@@ -92,6 +92,9 @@ class DeveloperPlatformController extends Controller
                 'description' => 'required|string|max:1000',
                 'redirect_uris' => 'required|string',
                 'requested_scopes' => 'nullable|array',
+                'app_type' => 'nullable|string|in:confidential,public',
+                'public_listed' => 'nullable',
+                'category' => 'nullable|string|max:60',
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
             if ($request->expectsJson() || $request->ajax()) {
@@ -129,6 +132,9 @@ class DeveloperPlatformController extends Controller
                 'client_secret' => $clientSecret,
                 'redirect_uris' => $redirectUris,
                 'requested_scopes' => is_array($request->requested_scopes) ? array_values(array_filter($request->requested_scopes)) : [],
+                'app_type' => $request->input('app_type', 'confidential'),
+                'public_listed' => $request->boolean('public_listed'),
+                'category' => $request->input('category'),
                 'status' => 'draft',
             ]);
         } catch (\Throwable $e) {
@@ -189,6 +195,9 @@ class DeveloperPlatformController extends Controller
                 'description' => 'required|string|max:1000',
                 'redirect_uris' => 'required|string',
                 'requested_scopes' => 'nullable|array',
+                'app_type' => 'nullable|string|in:confidential,public',
+                'public_listed' => 'nullable',
+                'category' => 'nullable|string|max:60',
             ]);
         } catch (\Illuminate\Validation\ValidationException $e) {
             \Log::error('[DevApp:update] Step 2: Validation FAILED', [
@@ -230,6 +239,11 @@ class DeveloperPlatformController extends Controller
         $app->description = trim($request->description);
         $app->redirect_uris = $redirectUris;
         $app->requested_scopes = $scopes;
+        $app->app_type = $request->input('app_type', $app->app_type ?? 'confidential');
+        $app->public_listed = $request->boolean('public_listed');
+        if ($request->has('category')) {
+            $app->category = $request->input('category');
+        }
 
         if ($sensitiveFieldsChanged && in_array($app->status, ['active', 'rejected'])) {
             $app->status = 'pending_review';
@@ -313,5 +327,283 @@ class DeveloperPlatformController extends Controller
         $categories = DeveloperScopeCatalog::getCategories();
 
         return view('theme::developer.guides', compact('scopes', 'categories'));
+    }
+
+    public function analytics(DeveloperApp $app)
+    {
+        if ((int) $app->user_id !== (int) auth()->id()) {
+            abort(403);
+        }
+
+        $now = now();
+        $totalRequests = \App\Models\DeveloperApiLog::where('developer_app_id', $app->id)->count();
+        $todayRequests = \App\Models\DeveloperApiLog::where('developer_app_id', $app->id)
+            ->where('created_at', '>=', $now->copy()->startOfDay())
+            ->count();
+
+        $errorCount = \App\Models\DeveloperApiLog::where('developer_app_id', $app->id)
+            ->where('status_code', '>=', 400)
+            ->count();
+
+        $errorRate = $totalRequests > 0 ? round(($errorCount / $totalRequests) * 100, 1) : 0;
+        $avgDuration = (int) round(\App\Models\DeveloperApiLog::where('developer_app_id', $app->id)->avg('duration_ms') ?: 0);
+
+        $topEndpoints = \App\Models\DeveloperApiLog::where('developer_app_id', $app->id)
+            ->select('endpoint', \Illuminate\Support\Facades\DB::raw('count(*) as count'))
+            ->groupBy('endpoint')
+            ->orderByDesc('count')
+            ->limit(5)
+            ->get();
+
+        $daysData = [];
+        for ($i = 6; $i >= 0; $i--) {
+            $date = $now->copy()->subDays($i)->format('Y-m-d');
+            $count = \App\Models\DeveloperApiLog::where('developer_app_id', $app->id)
+                ->whereDate('created_at', $date)
+                ->count();
+            $daysData[$date] = $count;
+        }
+
+        return view('theme::developer.apps.analytics', compact(
+            'app',
+            'totalRequests',
+            'todayRequests',
+            'errorRate',
+            'avgDuration',
+            'topEndpoints',
+            'daysData'
+        ));
+    }
+
+    public function logs(DeveloperApp $app)
+    {
+        if ((int) $app->user_id !== (int) auth()->id()) {
+            abort(403);
+        }
+
+        $logs = \App\Models\DeveloperApiLog::where('developer_app_id', $app->id)
+            ->orderBy('id', 'desc')
+            ->paginate(30);
+
+        return view('theme::developer.apps.logs', compact('app', 'logs'));
+    }
+
+    public function playground()
+    {
+        $apps = auth()->check() ? DeveloperApp::where('user_id', auth()->id())->get() : collect();
+        $tokens = auth()->check() ? \App\Models\DeveloperPersonalToken::where('user_id', auth()->id())->get() : collect();
+        $scopes = DeveloperScopeCatalog::getAllScopes();
+
+        return view('theme::developer.playground', compact('apps', 'tokens', 'scopes'));
+    }
+
+    public function openapi()
+    {
+        $scopes = DeveloperScopeCatalog::getAllScopes();
+        $oauthScopes = [];
+        foreach ($scopes as $scopeId => $meta) {
+            $oauthScopes[$scopeId] = __($meta['name']);
+        }
+
+        $spec = [
+            'openapi' => '3.1.0',
+            'info' => [
+                'title' => (config('app.name', 'MYADS')) . ' Developer API v1',
+                'version' => '1.0.0',
+                'description' => 'Complete REST API specification and OAuth 2.0 authorization endpoints for third-party integrations and developer applications.',
+                'contact' => [
+                    'name' => 'Developer Support',
+                    'url' => url('/developer'),
+                ],
+            ],
+            'servers' => [
+                ['url' => url('/'), 'description' => 'Production Server'],
+            ],
+            'components' => [
+                'securitySchemes' => [
+                    'OAuth2' => [
+                        'type' => 'oauth2',
+                        'description' => 'Standard OAuth 2.0 Authorization Code Flow with PKCE support.',
+                        'flows' => [
+                            'authorizationCode' => [
+                                'authorizationUrl' => url('/oauth/authorize'),
+                                'tokenUrl' => url('/oauth/token'),
+                                'refreshUrl' => url('/oauth/token'),
+                                'scopes' => $oauthScopes,
+                            ],
+                        ],
+                    ],
+                    'BearerAuth' => [
+                        'type' => 'http',
+                        'scheme' => 'bearer',
+                        'bearerFormat' => 'JWT / PAT',
+                        'description' => 'Personal Access Token or OAuth Access Token passed in the Authorization header.',
+                    ],
+                ],
+            ],
+            'security' => [
+                ['OAuth2' => []],
+                ['BearerAuth' => []],
+            ],
+            'paths' => [
+                '/oauth/authorize' => [
+                    'get' => [
+                        'summary' => 'Request OAuth 2.0 Authorization Code',
+                        'parameters' => [
+                            ['name' => 'client_id', 'in' => 'query', 'required' => true, 'schema' => ['type' => 'string']],
+                            ['name' => 'redirect_uri', 'in' => 'query', 'required' => true, 'schema' => ['type' => 'string', 'format' => 'uri']],
+                            ['name' => 'response_type', 'in' => 'query', 'required' => true, 'schema' => ['type' => 'string', 'enum' => ['code']]],
+                            ['name' => 'scope', 'in' => 'query', 'required' => true, 'schema' => ['type' => 'string']],
+                            ['name' => 'state', 'in' => 'query', 'required' => true, 'schema' => ['type' => 'string']],
+                            ['name' => 'code_challenge', 'in' => 'query', 'required' => false, 'schema' => ['type' => 'string']],
+                            ['name' => 'code_challenge_method', 'in' => 'query', 'required' => false, 'schema' => ['type' => 'string', 'enum' => ['S256', 'plain']]],
+                        ],
+                        'responses' => [
+                            '200' => ['description' => 'Consent screen rendered'],
+                            '302' => ['description' => 'Redirect to callback URI with code or error'],
+                        ],
+                    ],
+                ],
+                '/oauth/token' => [
+                    'post' => [
+                        'summary' => 'Exchange Authorization Code for Access & Refresh Tokens',
+                        'requestBody' => [
+                            'required' => true,
+                            'content' => [
+                                'application/x-www-form-urlencoded' => [
+                                    'schema' => [
+                                        'type' => 'object',
+                                        'properties' => [
+                                            'grant_type' => ['type' => 'string', 'enum' => ['authorization_code', 'refresh_token']],
+                                            'client_id' => ['type' => 'string'],
+                                            'client_secret' => ['type' => 'string'],
+                                            'code' => ['type' => 'string'],
+                                            'redirect_uri' => ['type' => 'string', 'format' => 'uri'],
+                                            'code_verifier' => ['type' => 'string'],
+                                            'refresh_token' => ['type' => 'string'],
+                                        ],
+                                        'required' => ['grant_type', 'client_id'],
+                                    ],
+                                ],
+                            ],
+                        ],
+                        'responses' => [
+                            '200' => ['description' => 'OAuth tokens returned successfully'],
+                            '400' => ['description' => 'Invalid grant or verifier'],
+                            '401' => ['description' => 'Invalid client credentials'],
+                        ],
+                    ],
+                ],
+                '/oauth/revoke' => [
+                    'post' => [
+                        'summary' => 'RFC 7009 Token Revocation',
+                        'requestBody' => [
+                            'required' => true,
+                            'content' => [
+                                'application/x-www-form-urlencoded' => [
+                                    'schema' => [
+                                        'type' => 'object',
+                                        'properties' => [
+                                            'token' => ['type' => 'string'],
+                                            'token_type_hint' => ['type' => 'string', 'enum' => ['access_token', 'refresh_token']],
+                                            'client_id' => ['type' => 'string'],
+                                            'client_secret' => ['type' => 'string'],
+                                        ],
+                                        'required' => ['token', 'client_id'],
+                                    ],
+                                ],
+                            ],
+                        ],
+                        'responses' => [
+                            '200' => ['description' => 'Token revoked successfully'],
+                        ],
+                    ],
+                ],
+                '/api/developer/v1/me' => [
+                    'get' => [
+                        'summary' => 'Get Authenticated Member Identity',
+                        'security' => [['OAuth2' => ['user.identity.read']], ['BearerAuth' => []]],
+                        'responses' => [
+                            '200' => ['description' => 'User identity details'],
+                            '401' => ['description' => 'Unauthorized'],
+                            '403' => ['description' => 'Insufficient scope'],
+                        ],
+                    ],
+                ],
+                '/api/developer/v1/me/profile' => [
+                    'get' => [
+                        'summary' => 'Get Authenticated Member Profile',
+                        'security' => [['OAuth2' => ['user.profile.read']], ['BearerAuth' => []]],
+                        'responses' => ['200' => ['description' => 'Profile details']],
+                    ],
+                ],
+                '/api/developer/v1/me/content' => [
+                    'get' => [
+                        'summary' => 'List Recent Member Posts',
+                        'security' => [['OAuth2' => ['user.content.read']], ['BearerAuth' => []]],
+                        'responses' => ['200' => ['description' => 'List of status posts']],
+                    ],
+                    'post' => [
+                        'summary' => 'Create a New Community Post',
+                        'security' => [['OAuth2' => ['user.content.write']], ['BearerAuth' => []]],
+                        'requestBody' => [
+                            'required' => true,
+                            'content' => [
+                                'application/json' => [
+                                    'schema' => [
+                                        'type' => 'object',
+                                        'properties' => ['content' => ['type' => 'string', 'maxLength' => 10000]],
+                                        'required' => ['content'],
+                                    ],
+                                ],
+                            ],
+                        ],
+                        'responses' => ['200' => ['description' => 'Post created successfully']],
+                    ],
+                ],
+                '/api/developer/v1/me/messages' => [
+                    'get' => [
+                        'summary' => 'List Recent Direct Messages',
+                        'security' => [['OAuth2' => ['user.messages.read']], ['BearerAuth' => []]],
+                        'responses' => ['200' => ['description' => 'Recent messages']],
+                    ],
+                    'post' => [
+                        'summary' => 'Send Direct Message to Member',
+                        'security' => [['OAuth2' => ['user.messages.write']], ['BearerAuth' => []]],
+                        'responses' => ['200' => ['description' => 'Message sent successfully']],
+                    ],
+                ],
+                '/api/developer/v1/me/notifications' => [
+                    'get' => [
+                        'summary' => 'List Member Notifications & Unread Count',
+                        'security' => [['OAuth2' => ['user.notifications.read']], ['BearerAuth' => []]],
+                        'responses' => ['200' => ['description' => 'Notifications collection']],
+                    ],
+                ],
+                '/api/developer/v1/me/wallet' => [
+                    'get' => [
+                        'summary' => 'Retrieve Member Points (PTS) Balance',
+                        'security' => [['OAuth2' => ['user.wallet.read']], ['BearerAuth' => []]],
+                        'responses' => ['200' => ['description' => 'Points balance']],
+                    ],
+                ],
+                '/api/developer/v1/store/products' => [
+                    'get' => [
+                        'summary' => 'Browse Store Digital Products',
+                        'security' => [['OAuth2' => ['user.store.read']], ['BearerAuth' => []]],
+                        'responses' => ['200' => ['description' => 'Digital products collection']],
+                    ],
+                ],
+                '/api/developer/v1/me/orders' => [
+                    'get' => [
+                        'summary' => 'List Service Marketplace Orders',
+                        'security' => [['OAuth2' => ['user.orders.read']], ['BearerAuth' => []]],
+                        'responses' => ['200' => ['description' => 'Service orders']],
+                    ],
+                ],
+            ],
+        ];
+
+        return response()->json($spec, 200, ['Content-Type' => 'application/json']);
     }
 }

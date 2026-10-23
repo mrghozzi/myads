@@ -147,6 +147,12 @@
                 <input type="hidden" name="response_type" value="{{ request('response_type') }}">
                 <input type="hidden" name="state" value="{{ request('state') }}">
                 <input type="hidden" name="scope" value="{{ request('scope') }}">
+                @if(request('code_challenge'))
+                    <input type="hidden" name="code_challenge" value="{{ request('code_challenge') }}">
+                @endif
+                @if(request('code_challenge_method'))
+                    <input type="hidden" name="code_challenge_method" value="{{ request('code_challenge_method') }}">
+                @endif
 
                 <div class="oauth-consent-actions">
                     <button type="submit" name="action" value="accept" class="button primary">

@@ -69,6 +69,8 @@
             </div>
         </div>
 
+        @include('theme::developer.partials.app_tabs', ['activeTab' => 'general'])
+
         @if($app->status === 'draft')
             <div class="dev-note dev-note--info">
                 <strong>{{ __('messages.app_draft_notice') }}</strong>

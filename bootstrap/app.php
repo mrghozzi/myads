@@ -109,6 +109,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'install/*',
             'billing/webhook/*',
             'oauth/token',
+            'oauth/revoke',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) use ($isTestingContext): void {

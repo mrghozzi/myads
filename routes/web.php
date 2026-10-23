@@ -166,6 +166,19 @@ Route::get('/clips/{status}', [App\Http\Controllers\ClipsController::class, 'sho
 Route::prefix('developer')->group(function () {
     Route::get('/', [App\Http\Controllers\DeveloperPlatformController::class, 'index'])->name('developer.index');
     Route::get('/guides', [App\Http\Controllers\DeveloperPlatformController::class, 'guides'])->name('developer.guides');
+    Route::get('/playground', [App\Http\Controllers\DeveloperPlatformController::class, 'playground'])->name('developer.playground');
+    Route::get('/openapi.json', [App\Http\Controllers\DeveloperPlatformController::class, 'openapi'])->name('developer.openapi');
+
+    // Public App Directory
+    Route::get('/directory', [App\Http\Controllers\DeveloperDirectoryController::class, 'index'])->name('developer.directory.index');
+    Route::get('/directory/{app}', [App\Http\Controllers\DeveloperDirectoryController::class, 'show'])->name('developer.directory.show')->whereNumber('app');
+
+    // Personal Access Tokens (PAT)
+    Route::get('/tokens', [App\Http\Controllers\DeveloperTokenController::class, 'index'])->name('developer.tokens.index');
+    Route::post('/tokens', [App\Http\Controllers\DeveloperTokenController::class, 'store'])->name('developer.tokens.store');
+    Route::delete('/tokens/{token}', [App\Http\Controllers\DeveloperTokenController::class, 'destroy'])->name('developer.tokens.destroy')->whereNumber('token');
+
+    // App Management
     Route::get('/apps', [App\Http\Controllers\DeveloperPlatformController::class, 'apps'])->name('developer.apps.index');
     Route::get('/apps/create', [App\Http\Controllers\DeveloperPlatformController::class, 'create'])->name('developer.apps.create');
     Route::post('/apps', [App\Http\Controllers\DeveloperPlatformController::class, 'store'])->name('developer.apps.store');
@@ -174,17 +187,34 @@ Route::prefix('developer')->group(function () {
     Route::post('/apps/{app}/rotate-secret', [App\Http\Controllers\DeveloperPlatformController::class, 'rotateSecret'])->name('developer.apps.rotate_secret')->whereNumber('app');
     Route::post('/apps/{app}/submit', [App\Http\Controllers\DeveloperPlatformController::class, 'submit'])->name('developer.apps.submit')->whereNumber('app');
     Route::delete('/apps/{app}', [App\Http\Controllers\DeveloperPlatformController::class, 'destroy'])->name('developer.apps.destroy')->whereNumber('app');
+
+    // App Telemetry Analytics & Live Logs
+    Route::get('/apps/{app}/analytics', [App\Http\Controllers\DeveloperPlatformController::class, 'analytics'])->name('developer.apps.analytics')->whereNumber('app');
+    Route::get('/apps/{app}/logs', [App\Http\Controllers\DeveloperPlatformController::class, 'logs'])->name('developer.apps.logs')->whereNumber('app');
+
+    // App Webhooks
+    Route::get('/apps/{app}/webhooks', [App\Http\Controllers\DeveloperWebhookController::class, 'index'])->name('developer.apps.webhooks.index')->whereNumber('app');
+    Route::post('/apps/{app}/webhooks', [App\Http\Controllers\DeveloperWebhookController::class, 'store'])->name('developer.apps.webhooks.store')->whereNumber('app');
+    Route::put('/apps/{app}/webhooks/{webhook}', [App\Http\Controllers\DeveloperWebhookController::class, 'update'])->name('developer.apps.webhooks.update')->whereNumber('app')->whereNumber('webhook');
+    Route::delete('/apps/{app}/webhooks/{webhook}', [App\Http\Controllers\DeveloperWebhookController::class, 'destroy'])->name('developer.apps.webhooks.destroy')->whereNumber('app')->whereNumber('webhook');
+    Route::post('/apps/{app}/webhooks/{webhook}/test', [App\Http\Controllers\DeveloperWebhookController::class, 'test'])->name('developer.apps.webhooks.test')->whereNumber('app')->whereNumber('webhook');
+    Route::post('/apps/{app}/webhooks/deliveries/{delivery}/resend', [App\Http\Controllers\DeveloperWebhookController::class, 'resend'])->name('developer.apps.webhooks.resend')->whereNumber('app')->whereNumber('delivery');
 });
 
-// OAuth
+// OAuth 2.0 (RFC 6749, RFC 7636 PKCE, RFC 7009 Revocation)
 Route::get('/oauth/authorize', [App\Http\Controllers\OAuthController::class, 'authorizeRequest'])->name('oauth.authorize');
 Route::post('/oauth/authorize', [App\Http\Controllers\OAuthController::class, 'authorizeResponse'])->name('oauth.authorize.post');
 Route::post('/oauth/token', [App\Http\Controllers\OAuthController::class, 'token'])->name('oauth.token');
+Route::post('/oauth/revoke', [App\Http\Controllers\OAuthController::class, 'revoke'])->name('oauth.revoke');
 
-// Developer Embed Widgets
-Route::get('/embed/developer/{app}/follow.js', [App\Http\Controllers\DeveloperWidgetController::class, 'follow'])->name('developer.widget.follow');
-Route::get('/embed/developer/{app}/profile.js', [App\Http\Controllers\DeveloperWidgetController::class, 'profile'])->name('developer.widget.profile');
-Route::get('/embed/developer/{app}/content.js', [App\Http\Controllers\DeveloperWidgetController::class, 'content'])->name('developer.widget.content');
+// Developer Embed Widgets (Scripts & Rendered Frames)
+Route::get('/embed/developer/{app}/follow.js', [App\Http\Controllers\DeveloperWidgetController::class, 'follow'])->name('developer.widget.follow')->whereNumber('app');
+Route::get('/embed/developer/{app}/profile.js', [App\Http\Controllers\DeveloperWidgetController::class, 'profile'])->name('developer.widget.profile')->whereNumber('app');
+Route::get('/embed/developer/{app}/content.js', [App\Http\Controllers\DeveloperWidgetController::class, 'content'])->name('developer.widget.content')->whereNumber('app');
+Route::get('/embed/developer/{app}/follow', [App\Http\Controllers\DeveloperWidgetController::class, 'followFrame'])->name('developer.widget.follow.frame')->whereNumber('app');
+Route::get('/embed/developer/{app}/profile', [App\Http\Controllers\DeveloperWidgetController::class, 'profileFrame'])->name('developer.widget.profile.frame')->whereNumber('app');
+Route::get('/embed/developer/{app}/content', [App\Http\Controllers\DeveloperWidgetController::class, 'contentFrame'])->name('developer.widget.content.frame')->whereNumber('app');
+Route::post('/embed/developer/{app}/follow-toggle', [App\Http\Controllers\DeveloperWidgetController::class, 'followToggle'])->name('developer.widget.follow.toggle')->whereNumber('app');
 Route::get('/badges', [ProfileController::class, 'allBadges'])->name('badges.all');
 
 // Groups Routes

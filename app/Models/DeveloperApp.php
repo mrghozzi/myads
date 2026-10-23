@@ -16,6 +16,9 @@ class DeveloperApp extends Model
         'description',
         'logo',
         'status',
+        'app_type',
+        'public_listed',
+        'category',
         'client_id',
         'client_secret',
         'redirect_uris',
@@ -27,6 +30,7 @@ class DeveloperApp extends Model
         'redirect_uris' => 'array',
         'requested_scopes' => 'array',
         'widget_capabilities' => 'array',
+        'public_listed' => 'boolean',
     ];
 
     /**
@@ -43,6 +47,38 @@ class DeveloperApp extends Model
     public function authorizations()
     {
         return $this->hasMany(DeveloperAuthorization::class);
+    }
+
+    /**
+     * Webhooks configured for this app.
+     */
+    public function webhooks()
+    {
+        return $this->hasMany(DeveloperWebhook::class, 'developer_app_id');
+    }
+
+    /**
+     * Webhook delivery logs for this app.
+     */
+    public function webhookDeliveries()
+    {
+        return $this->hasMany(DeveloperWebhookDelivery::class, 'developer_app_id');
+    }
+
+    /**
+     * API telemetry logs for this app.
+     */
+    public function apiLogs()
+    {
+        return $this->hasMany(DeveloperApiLog::class, 'developer_app_id');
+    }
+
+    /**
+     * Whether the application is confidential (must provide client_secret) or public (SPA/Mobile with PKCE).
+     */
+    public function isConfidential(): bool
+    {
+        return ($this->app_type ?? 'confidential') !== 'public';
     }
 
     /**

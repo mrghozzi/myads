@@ -33,28 +33,26 @@ class DeveloperOAuthService
     }
 
     /**
-     * Generate an authorization code for the user and app.
+     * Generate an authorization code for the user and app with optional PKCE challenge.
      */
-    public function generateAuthorizationCode(DeveloperApp $app, User $user, string $redirectUri, array $scopes): array
+    public function generateAuthorizationCode(
+        DeveloperApp $app,
+        User $user,
+        string $redirectUri,
+        array $scopes,
+        ?string $codeChallenge = null,
+        ?string $codeChallengeMethod = null
+    ): array
     {
         $plainCode = Str::random(40);
         $existingColumns = $this->getTableColumns('developer_authorization_codes');
-
-        // Attempt to add missing columns via direct SQL if possible
-        foreach (['expires_at', 'scopes', 'used', 'redirect_uri', 'created_at', 'updated_at'] as $col) {
-            if (!empty($existingColumns) && !in_array($col, $existingColumns)) {
-                try {
-                    $type = ($col === 'scopes') ? 'JSON NULL' : (($col === 'used') ? 'TINYINT(1) DEFAULT 0' : (($col === 'redirect_uri') ? 'TEXT NULL' : 'TIMESTAMP NULL'));
-                    DB::statement("ALTER TABLE developer_authorization_codes ADD COLUMN {$col} {$type}");
-                    $existingColumns[] = $col;
-                } catch (\Throwable $ignored) {}
-            }
-        }
 
         $payload = [
             'developer_app_id' => $app->id,
             'user_id' => $user->id,
             'code' => hash('sha256', $plainCode), // Store hashed
+            'code_challenge' => $codeChallenge,
+            'code_challenge_method' => $codeChallengeMethod,
             'redirect_uri' => $redirectUri,
             'scopes' => is_array($scopes) ? json_encode($scopes) : $scopes,
             'expires_at' => now()->addMinutes(10), // Short lived
@@ -74,24 +72,11 @@ class DeveloperOAuthService
             $id = DB::table('developer_authorization_codes')->insertGetId($insertData);
             $record = DeveloperAuthorizationCode::find($id);
         } catch (\Illuminate\Database\QueryException $e) {
-            // If unknown column error occurred, filter out the offending column dynamically and retry
             if (preg_match("/Unknown column '([^']+)'/i", $e->getMessage(), $m) || preg_match("/no such column: ([^\s]+)/i", $e->getMessage(), $m)) {
                 $badCol = str_replace('developer_authorization_codes.', '', $m[1]);
                 unset($insertData[$badCol]);
-                unset($payload[$badCol]);
-                try {
-                    $id = DB::table('developer_authorization_codes')->insertGetId($insertData);
-                    $record = DeveloperAuthorizationCode::find($id);
-                } catch (\Throwable $e2) {
-                    $bareData = [
-                        'developer_app_id' => $app->id,
-                        'user_id' => $user->id,
-                        'code' => hash('sha256', $plainCode),
-                        'redirect_uri' => $redirectUri,
-                    ];
-                    $id = DB::table('developer_authorization_codes')->insertGetId($bareData);
-                    $record = DeveloperAuthorizationCode::find($id);
-                }
+                $id = DB::table('developer_authorization_codes')->insertGetId($insertData);
+                $record = DeveloperAuthorizationCode::find($id);
             } else {
                 throw $e;
             }
@@ -104,9 +89,9 @@ class DeveloperOAuthService
     }
 
     /**
-     * Verify an authorization code and exchange it for tokens.
+     * Verify an authorization code and exchange it for tokens with PKCE check.
      */
-    public function exchangeCodeForTokens(DeveloperApp $app, string $code, string $redirectUri): ?array
+    public function exchangeCodeForTokens(DeveloperApp $app, string $code, string $redirectUri, ?string $codeVerifier = null): ?array
     {
         $hashedCode = hash('sha256', $code);
 
@@ -131,6 +116,27 @@ class DeveloperOAuthService
         $storedUri = trim((string) $authCode->redirect_uri);
         if ($targetUri !== $storedUri && urldecode($targetUri) !== urldecode($storedUri)) {
             return null;
+        }
+
+        // PKCE verification (RFC 7636)
+        if (!empty($authCode->code_challenge)) {
+            if (empty($codeVerifier)) {
+                return null;
+            }
+
+            $method = strtoupper((string) ($authCode->code_challenge_method ?: 'PLAIN'));
+            if ($method === 'S256') {
+                $calculated = rtrim(strtr(base64_encode(hash('sha256', $codeVerifier, true)), '+/', '-_'), '=');
+                if (!hash_equals((string) $authCode->code_challenge, (string) $calculated)) {
+                    return null;
+                }
+            } elseif ($method === 'PLAIN') {
+                if (!hash_equals((string) $authCode->code_challenge, (string) $codeVerifier)) {
+                    return null;
+                }
+            } else {
+                return null;
+            }
         }
 
         // Mark as used safely
@@ -322,6 +328,58 @@ class DeveloperOAuthService
 
         if ($token && (!isset($token->revoked) || !$token->revoked) && !$token->isExpired()) {
             return $token;
+        }
+
+        return null;
+    }
+
+    /**
+     * Revoke an access token or refresh token (RFC 7009).
+     */
+    public function revokeToken(string $tokenStr, ?string $tokenTypeHint = null): bool
+    {
+        $hashed = hash('sha256', trim($tokenStr));
+        $revokedAny = false;
+
+        if ($tokenTypeHint === 'refresh_token') {
+            $rf = DeveloperRefreshToken::where('refresh_token', $hashed)->first();
+            if ($rf) {
+                $rf->update(['revoked' => true]);
+                $revokedAny = true;
+            }
+        } elseif ($tokenTypeHint === 'access_token') {
+            $at = DeveloperAccessToken::where('access_token', $hashed)->first();
+            if ($at) {
+                $at->update(['revoked' => true]);
+                $revokedAny = true;
+            }
+        } else {
+            $at = DeveloperAccessToken::where('access_token', $hashed)->first();
+            if ($at) {
+                $at->update(['revoked' => true]);
+                $revokedAny = true;
+            }
+            $rf = DeveloperRefreshToken::where('refresh_token', $hashed)->first();
+            if ($rf) {
+                $rf->update(['revoked' => true]);
+                $revokedAny = true;
+            }
+        }
+
+        return $revokedAny;
+    }
+
+    /**
+     * Verify a Personal Access Token (PAT).
+     */
+    public function verifyPersonalAccessToken(string $plainToken): ?\App\Models\DeveloperPersonalToken
+    {
+        $hashed = hash('sha256', trim($plainToken));
+        $pat = \App\Models\DeveloperPersonalToken::where('token', $hashed)->first();
+
+        if ($pat && !$pat->isExpired()) {
+            $pat->update(['last_used_at' => now()]);
+            return $pat;
         }
 
         return null;
