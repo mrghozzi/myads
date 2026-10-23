@@ -29,11 +29,11 @@ class DeveloperDirectoryController extends Controller
         $apps = $query->orderBy('id', 'desc')->paginate(12);
 
         $categories = [
-            'social' => 'Social & Community',
-            'tools' => 'Productivity & Tools',
-            'content' => 'Content & Media',
-            'marketplace' => 'E-Commerce & Orders',
-            'bots' => 'Automations & Bots',
+            'social' => __('messages.dev_cat_social'),
+            'tools' => __('messages.dev_cat_tools'),
+            'content' => __('messages.dev_cat_content'),
+            'marketplace' => __('messages.dev_cat_marketplace'),
+            'bots' => __('messages.dev_cat_bots'),
         ];
 
         return view('theme::developer.directory.index', compact('apps', 'categories'));

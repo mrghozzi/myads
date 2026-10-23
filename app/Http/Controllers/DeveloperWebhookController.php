@@ -41,6 +41,43 @@ class DeveloperWebhookController extends Controller
         return view('theme::developer.apps.webhooks', compact('app', 'webhooks', 'supportedEvents', 'recentDeliveries'));
     }
 
+    protected function validateWebhookUrl(string $url): ?string
+    {
+        $parts = parse_url($url);
+        if (!$parts || empty($parts['host'])) {
+            return 'Invalid webhook URL format.';
+        }
+
+        $scheme = strtolower($parts['scheme'] ?? '');
+        if (!in_array($scheme, ['http', 'https'], true)) {
+            return 'Webhook URL scheme must be HTTP or HTTPS.';
+        }
+
+        if (!empty($parts['user']) || !empty($parts['pass'])) {
+            return 'Webhook URL must not contain embedded user credentials.';
+        }
+
+        $host = strtolower(trim($parts['host']));
+
+        if ($host === '169.254.169.254' || str_starts_with($host, '169.254.')) {
+            return 'Cloud metadata addresses (169.254.169.254) are prohibited.';
+        }
+
+        if (app()->isProduction()) {
+            if ($host === 'localhost' || str_ends_with($host, '.localhost')) {
+                return 'Localhost webhook destinations are not permitted in production.';
+            }
+
+            if (filter_var($host, FILTER_VALIDATE_IP)) {
+                if (filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) === false) {
+                    return 'Private or local network IP addresses are not permitted as webhook endpoints.';
+                }
+            }
+        }
+
+        return null;
+    }
+
     public function store(Request $request, DeveloperApp $app)
     {
         $this->checkAppOwnership($app);
@@ -50,6 +87,14 @@ class DeveloperWebhookController extends Controller
             'events' => 'required|array|min:1',
             'events.*' => 'string',
         ]);
+
+        $urlError = $this->validateWebhookUrl(trim($request->url));
+        if ($urlError) {
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json(['success' => false, 'message' => $urlError], 422);
+            }
+            return back()->withInput()->with('error', $urlError);
+        }
 
         $secret = 'whsec_' . bin2hex(random_bytes(24));
 
@@ -86,6 +131,14 @@ class DeveloperWebhookController extends Controller
             'events' => 'required|array|min:1',
             'is_active' => 'nullable|boolean',
         ]);
+
+        $urlError = $this->validateWebhookUrl(trim($request->url));
+        if ($urlError) {
+            if ($request->expectsJson() || $request->ajax()) {
+                return response()->json(['success' => false, 'message' => $urlError], 422);
+            }
+            return back()->withInput()->with('error', $urlError);
+        }
 
         $webhook->update([
             'url' => trim($request->url),

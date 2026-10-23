@@ -129,8 +129,27 @@ class WebhookDispatcherService
 
         $signature = 'sha256=' . hash_hmac('sha256', $jsonPayload, $webhook->secret);
 
+        $host = strtolower(parse_url($webhook->url, PHP_URL_HOST) ?? '');
+        if ($host === '169.254.169.254' || str_starts_with($host, '169.254.')) {
+            $delivery->status_code = 0;
+            $delivery->error_message = 'Blocked: Link-local and cloud metadata endpoints are prohibited.';
+            $delivery->duration_ms = 0;
+            $delivery->delivered_at = now();
+            $delivery->save();
+            return $delivery;
+        }
+
+        if (app()->isProduction()) {
+            if ($host === 'localhost' || str_ends_with($host, '.localhost') || (filter_var($host, FILTER_VALIDATE_IP) && filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) === false)) {
+                $delivery->status_code = 0;
+                $delivery->error_message = 'Blocked: Private or local destinations are prohibited in production.';
+                $delivery->duration_ms = 0;
+                $delivery->delivered_at = now();
+                $delivery->save();
+                return $delivery;
+            }
+        }
         $startTime = microtime(true);
-        $statusCode = null;
         $responseBody = null;
         $errorMessage = null;
 
