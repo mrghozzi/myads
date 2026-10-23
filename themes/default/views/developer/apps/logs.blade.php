@@ -1,6 +1,6 @@
 @extends('theme::layouts.master')
 
-@section('title', 'API Request Logs - ' . $app->name)
+@section('title', __('messages.request_logs') . ' - ' . $app->name)
 
 @push('head')
     @include('theme::developer.partials.styles')
@@ -11,8 +11,8 @@
     <div class="section-banner-icon" style="display: flex; align-items: center; justify-content: center;">
         <i class="fa fa-stream" style="font-size: 26px; color: #fff;"></i>
     </div>
-    <p class="section-banner-title">Live Request Logs - {{ $app->name }}</p>
-    <p class="section-banner-text">Real-time inspection of API calls, response codes, and latency for debugging.</p>
+    <p class="section-banner-title">{{ __('messages.request_logs') }} - {{ $app->name }}</p>
+    <p class="section-banner-text">{{ __('messages.request_logs_subtitle') }}</p>
 </div>
 
 <div class="grid grid-3-6-3 mobile-prefer-content">
@@ -31,19 +31,19 @@
                 @if($logs->isEmpty())
                     <div style="text-align: center; padding: 40px; color: var(--dev-muted);">
                         <i class="fa fa-stream" style="font-size: 32px; margin-bottom: 12px; opacity: 0.5;"></i>
-                        <p>No requests recorded yet for this app. Calls made via API will stream here automatically.</p>
+                        <p>{{ __('messages.no_logs_yet') }}</p>
                     </div>
                 @else
                     <div style="overflow-x: auto;">
                         <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
                             <thead>
                                 <tr style="border-bottom: 1px solid var(--dev-border); text-align: left; background: var(--dev-surface-soft);">
-                                    <th style="padding: 12px 16px;">Method</th>
-                                    <th style="padding: 12px 16px;">Status</th>
-                                    <th style="padding: 12px 16px;">Endpoint</th>
-                                    <th style="padding: 12px 16px;">Latency</th>
-                                    <th style="padding: 12px 16px;">IP Address</th>
-                                    <th style="padding: 12px 16px; text-align: right;">Time</th>
+                                    <th style="padding: 12px 16px;">{{ __('messages.method') }}</th>
+                                    <th style="padding: 12px 16px;">{{ __('messages.status') }}</th>
+                                    <th style="padding: 12px 16px;">{{ __('messages.endpoint') }}</th>
+                                    <th style="padding: 12px 16px;">{{ __('messages.latency') }}</th>
+                                    <th style="padding: 12px 16px;">{{ __('messages.ip_address') }}</th>
+                                    <th style="padding: 12px 16px; text-align: right;">{{ __('messages.time') }}</th>
                                 </tr>
                             </thead>
                             <tbody>

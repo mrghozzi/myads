@@ -109,15 +109,15 @@
                     <i class="fa fa-circle-check" style="color: #23d2e2; font-size: 13px;"></i>
                 @endif
             </a>
-            <p class="bio">{{ $owner->about_me ?: 'MYADS Community Member' }}</p>
+            <p class="bio">{{ $owner->about_me ?: __('messages.community_member') }}</p>
             <div class="stats">
-                <span><strong>{{ $followersCount }}</strong> Followers</span>
+                <span><strong>{{ $followersCount }}</strong> {{ __('messages.followers') }}</span>
                 <span><strong>{{ number_format($owner->pts ?? 0) }}</strong> PTS</span>
             </div>
         </div>
     </div>
     <div class="powered-by">
-        Powered by <a href="{{ url('/') }}" target="_blank">MYADS</a>
+        {{ __('messages.powered_by') }} <a href="{{ url('/') }}" target="_blank">MYADS</a>
     </div>
 
     <script>

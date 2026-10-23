@@ -12,7 +12,7 @@
         <i class="fa fa-bolt" style="font-size: 26px; color: #fff;"></i>
     </div>
     <p class="section-banner-title">{{ __('messages.webhooks') ?? 'Webhooks' }} - {{ $app->name }}</p>
-    <p class="section-banner-text">Real-time HTTP event callbacks delivered with HMAC-SHA256 signature verification.</p>
+    <p class="section-banner-text">{{ __('messages.webhooks_subtitle') }}</p>
 </div>
 
 <div class="grid grid-3-6-3 mobile-prefer-content">
@@ -45,13 +45,13 @@
                 <form action="{{ route('developer.apps.webhooks.store', $app->id) }}" method="POST">
                     @csrf
                     <div class="dev-field" style="margin-bottom: 16px;">
-                        <label for="webhook_url"><strong>Endpoint URL (HTTPS)</strong> <span class="text-danger">*</span></label>
+                        <label for="webhook_url"><strong>{{ __('messages.webhook_endpoint_url') }}</strong> <span class="text-danger">*</span></label>
                         <input id="webhook_url" type="url" name="url" class="form-control dev-control" placeholder="https://example.com/api/myads-webhook" required>
-                        <span class="dev-help-text">Your server endpoint that will receive POST event notifications.</span>
+                        <span class="dev-help-text">{{ __('messages.webhook_url_help') }}</span>
                     </div>
 
                     <div class="dev-field" style="margin-bottom: 20px;">
-                        <label><strong>Subscribe to Events</strong> <span class="text-danger">*</span></label>
+                        <label><strong>{{ __('messages.subscribe_to_events') }}</strong> <span class="text-danger">*</span></label>
                         <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; margin-top: 8px;">
                             @foreach($supportedEvents as $eventKey => $eventMeta)
                                 <label style="display: flex; align-items: flex-start; gap: 8px; padding: 10px; border: 1px solid var(--dev-border); border-radius: 8px; cursor: pointer; background: var(--dev-surface-soft);">
@@ -66,7 +66,7 @@
                     </div>
 
                     <button type="submit" class="button primary">
-                        <i class="fa fa-plus me-1"></i> Register Webhook
+                        <i class="fa fa-plus me-1"></i> {{ __('messages.register_webhook') }}
                     </button>
                 </form>
             </div>
@@ -74,12 +74,12 @@
 
         <!-- Active Webhooks List -->
         <div class="widget-box dev-panel" style="margin-bottom: 24px;">
-            <p class="widget-box-title">Configured Webhooks ({{ $webhooks->count() }})</p>
+            <p class="widget-box-title">{{ __('messages.configured_webhooks') }} ({{ $webhooks->count() }})</p>
             <div class="widget-box-content" style="padding: 24px;">
                 @if($webhooks->isEmpty())
                     <div style="text-align: center; padding: 30px; color: var(--dev-muted);">
                         <i class="fa fa-bolt" style="font-size: 32px; margin-bottom: 12px; opacity: 0.5;"></i>
-                        <p>No webhooks configured yet. Register an endpoint above to receive instant notifications.</p>
+                        <p>{{ __('messages.no_webhooks_yet') }}</p>
                     </div>
                 @else
                     <div style="display: grid; gap: 16px;">
@@ -89,13 +89,13 @@
                                     <div style="flex: 1; min-width: 250px;">
                                         <span class="dev-chip" style="font-size: 11px; margin-bottom: 6px; display: inline-block;">
                                             <i class="fa {{ $wh->is_active ? 'fa-check-circle text-success' : 'fa-times-circle text-danger' }} me-1"></i>
-                                            {{ $wh->is_active ? 'Active' : 'Disabled' }}
+                                            {{ $wh->is_active ? __('messages.active') : __('messages.disabled') }}
                                         </span>
                                         <div style="font-family: monospace; font-size: 14px; font-weight: 700; color: var(--dev-title); word-break: break-all;">
                                             {{ $wh->url }}
                                         </div>
                                         <div style="font-size: 12px; color: var(--dev-muted); margin-top: 6px;">
-                                            Signing Secret: <code style="background: var(--dev-code-bg); color: var(--dev-code-text); padding: 2px 6px; border-radius: 4px;">{{ $wh->secret }}</code>
+                                            {{ __('messages.signing_secret') }}: <code style="background: var(--dev-code-bg); color: var(--dev-code-text); padding: 2px 6px; border-radius: 4px;">{{ $wh->secret }}</code>
                                         </div>
                                         <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 10px;">
                                             @foreach((array) $wh->events as $ev)
@@ -106,9 +106,9 @@
 
                                     <div style="display: flex; gap: 8px;">
                                         <button type="button" class="button white btn-test-webhook" data-test-url="{{ route('developer.apps.webhooks.test', ['app' => $app->id, 'webhook' => $wh->id]) }}" style="font-size: 12px; height: 32px; line-height: 32px; padding: 0 12px;">
-                                            <i class="fa fa-paper-plane me-1"></i> Test Ping
+                                            <i class="fa fa-paper-plane me-1"></i> {{ __('messages.test_ping') }}
                                         </button>
-                                        <form action="{{ route('developer.apps.webhooks.destroy', ['app' => $app->id, 'webhook' => $wh->id]) }}" method="POST" onsubmit="return confirm('Delete this webhook endpoint?')">
+                                        <form action="{{ route('developer.apps.webhooks.destroy', ['app' => $app->id, 'webhook' => $wh->id]) }}" method="POST" onsubmit="return confirm('{{ __('messages.delete_webhook_confirm') }}')">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="button white text-danger" style="font-size: 12px; height: 32px; line-height: 32px; padding: 0 12px;">
@@ -126,22 +126,22 @@
 
         <!-- Recent Deliveries Logs -->
         <div class="widget-box dev-panel">
-            <p class="widget-box-title">Recent Delivery History</p>
+            <p class="widget-box-title">{{ __('messages.recent_delivery_history') }}</p>
             <div class="widget-box-content padding-none">
                 @if($recentDeliveries->isEmpty())
                     <div style="text-align: center; padding: 28px; color: var(--dev-muted);">
-                        No delivery events recorded yet. Click "Test Ping" above to test your endpoint.
+                        {{ __('messages.no_deliveries_yet') }}
                     </div>
                 @else
                     <div style="overflow-x: auto;">
                         <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
                             <thead>
                                 <tr style="border-bottom: 1px solid var(--dev-border); text-align: left; background: var(--dev-surface-soft);">
-                                    <th style="padding: 12px 16px;">Status</th>
-                                    <th style="padding: 12px 16px;">Event</th>
-                                    <th style="padding: 12px 16px;">Latency</th>
-                                    <th style="padding: 12px 16px;">Time</th>
-                                    <th style="padding: 12px 16px; text-align: right;">Action</th>
+                                    <th style="padding: 12px 16px;">{{ __('messages.status') }}</th>
+                                    <th style="padding: 12px 16px;">{{ __('messages.event') }}</th>
+                                    <th style="padding: 12px 16px;">{{ __('messages.latency') }}</th>
+                                    <th style="padding: 12px 16px;">{{ __('messages.time') }}</th>
+                                    <th style="padding: 12px 16px; text-align: right;">{{ __('messages.action') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -163,7 +163,7 @@
                                         </td>
                                         <td style="padding: 12px 16px; text-align: right;">
                                             <button type="button" class="button white btn-resend-webhook" data-resend-url="{{ route('developer.apps.webhooks.resend', ['app' => $app->id, 'delivery' => $deliv->id]) }}" style="font-size: 11px; height: 26px; line-height: 26px; padding: 0 8px;">
-                                                <i class="fa fa-rotate-right me-1"></i> Resend
+                                                <i class="fa fa-rotate-right me-1"></i> {{ __('messages.resend') }}
                                             </button>
                                         </td>
                                     </tr>

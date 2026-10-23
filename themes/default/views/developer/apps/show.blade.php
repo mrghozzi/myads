@@ -115,7 +115,7 @@
                 </div>
 
                 <div class="dev-credential-field" style="margin-top: 18px;">
-                    <label for="developer-client-secret">Client Secret</label>
+                    <label for="developer-client-secret">{{ __('messages.client_secret') }}</label>
                     <div class="dev-credential-input">
                         <input id="developer-client-secret" type="password" class="form-control dev-control" value="{{ $app->client_secret }}" readonly>
                         <button type="button" class="js-dev-toggle-secret dev-inline-icon-btn" data-target="#developer-client-secret">

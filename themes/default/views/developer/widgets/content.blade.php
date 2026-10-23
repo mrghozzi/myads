@@ -62,8 +62,8 @@
 </head>
 <body>
     <div class="feed-header">
-        <span class="feed-title"><i class="fa fa-newspaper me-1" style="color: #615dfa;"></i> {{ $owner->username }}'s Posts</span>
-        <a href="{{ url('/' . $owner->username) }}" target="_blank" style="font-size: 12px; color: #615dfa; text-decoration: none; font-weight: 700;">View Profile</a>
+        <span class="feed-title"><i class="fa fa-newspaper me-1" style="color: #615dfa;"></i> {{ $owner->username }}</span>
+        <a href="{{ url('/' . $owner->username) }}" target="_blank" style="font-size: 12px; color: #615dfa; text-decoration: none; font-weight: 700;">{{ __('messages.view_profile') }}</a>
     </div>
 
     @forelse($posts as $post)
@@ -71,17 +71,17 @@
             <p class="post-text">{{ \Illuminate\Support\Str::limit($post->txt, 140) }}</p>
             <div class="post-meta">
                 <span>{{ $post->date ? date('M d, Y', $post->date) : '' }}</span>
-                <a href="{{ url('/status/' . $post->id) }}" target="_blank" style="color: #615dfa; text-decoration: none; font-weight: 600;">Read <i class="fa fa-arrow-right"></i></a>
+                <a href="{{ url('/status/' . $post->id) }}" target="_blank" style="color: #615dfa; text-decoration: none; font-weight: 600;">{{ __('messages.read_more') }} <i class="fa fa-arrow-right"></i></a>
             </div>
         </div>
     @empty
         <div style="text-align: center; padding: 30px; color: #8e93b4; font-size: 13px;">
-            No public posts to display.
+            {{ __('messages.no_posts_to_display') }}
         </div>
     @endforelse
 
     <div class="powered-by">
-        Powered by <a href="{{ url('/') }}" target="_blank">MYADS</a>
+        {{ __('messages.powered_by') }} <a href="{{ url('/') }}" target="_blank">MYADS</a>
     </div>
 
     <script>

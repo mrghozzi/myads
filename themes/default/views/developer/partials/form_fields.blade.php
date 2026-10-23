@@ -68,18 +68,18 @@
                     {{ __('messages.app_type_public') ?? 'Public Client (SPA / Mobile with PKCE)' }}
                 </option>
             </select>
-            <span class="dev-help-text" style="font-size: 11px;">Public applications authenticate with PKCE (RFC 7636).</span>
+            <span class="dev-help-text" style="font-size: 11px;">{{ __('messages.app_type_public_hint') }}</span>
         </div>
 
         <div class="dev-field">
             <label for="app_category">{{ __('messages.category') ?? 'Category' }}</label>
             <select id="app_category" name="category" class="form-control dev-control">
                 <option value="">-- {{ __('messages.select_category') ?? 'Select Category' }} --</option>
-                <option value="social" {{ old('category', $developerApp->category ?? '') === 'social' ? 'selected' : '' }}>Social & Community</option>
-                <option value="tools" {{ old('category', $developerApp->category ?? '') === 'tools' ? 'selected' : '' }}>Productivity & Tools</option>
-                <option value="content" {{ old('category', $developerApp->category ?? '') === 'content' ? 'selected' : '' }}>Content & Media</option>
-                <option value="marketplace" {{ old('category', $developerApp->category ?? '') === 'marketplace' ? 'selected' : '' }}>Marketplace & Orders</option>
-                <option value="bots" {{ old('category', $developerApp->category ?? '') === 'bots' ? 'selected' : '' }}>Bots & Automation</option>
+                <option value="social" {{ old('category', $developerApp->category ?? '') === 'social' ? 'selected' : '' }}>{{ __('messages.dev_cat_social') }}</option>
+                <option value="tools" {{ old('category', $developerApp->category ?? '') === 'tools' ? 'selected' : '' }}>{{ __('messages.dev_cat_tools') }}</option>
+                <option value="content" {{ old('category', $developerApp->category ?? '') === 'content' ? 'selected' : '' }}>{{ __('messages.dev_cat_content') }}</option>
+                <option value="marketplace" {{ old('category', $developerApp->category ?? '') === 'marketplace' ? 'selected' : '' }}>{{ __('messages.dev_cat_marketplace') }}</option>
+                <option value="bots" {{ old('category', $developerApp->category ?? '') === 'bots' ? 'selected' : '' }}>{{ __('messages.dev_cat_bots') }}</option>
             </select>
         </div>
 

@@ -1,6 +1,6 @@
 @extends('theme::layouts.master')
 
-@section('title', 'API Analytics - ' . $app->name)
+@section('title', __('messages.analytics') . ' - ' . $app->name)
 
 @push('head')
     @include('theme::developer.partials.styles')
@@ -11,8 +11,8 @@
     <div class="section-banner-icon" style="display: flex; align-items: center; justify-content: center;">
         <i class="fa fa-chart-line" style="font-size: 26px; color: #fff;"></i>
     </div>
-    <p class="section-banner-title">API Analytics & Telemetry - {{ $app->name }}</p>
-    <p class="section-banner-text">Real-time performance metrics, error rates, and endpoint consumption analysis.</p>
+    <p class="section-banner-title">{{ __('messages.analytics') }} - {{ $app->name }}</p>
+    <p class="section-banner-text">{{ __('messages.api_analytics_subtitle') }}</p>
 </div>
 
 <div class="grid grid-3-6-3 mobile-prefer-content">
@@ -29,30 +29,30 @@
         <!-- Metrics 4-Grid -->
         <div class="dev-stat-grid" style="margin-bottom: 24px;">
             <div class="dev-stat-card">
-                <span>Total Calls</span>
+                <span>{{ __('messages.total_calls') }}</span>
                 <strong style="color: var(--dev-accent);">{{ number_format($totalRequests) }}</strong>
-                <p style="font-size: 11px; color: var(--dev-muted); margin: 4px 0 0;">All-time requests</p>
+                <p style="font-size: 11px; color: var(--dev-muted); margin: 4px 0 0;">{{ __('messages.all_time_requests') }}</p>
             </div>
             <div class="dev-stat-card">
-                <span>Today</span>
+                <span>{{ __('messages.today') }}</span>
                 <strong style="color: #23d2e2;">{{ number_format($todayRequests) }}</strong>
-                <p style="font-size: 11px; color: var(--dev-muted); margin: 4px 0 0;">Last 24 hours</p>
+                <p style="font-size: 11px; color: var(--dev-muted); margin: 4px 0 0;">{{ __('messages.last_24_hours') }}</p>
             </div>
             <div class="dev-stat-card">
-                <span>Error Rate</span>
+                <span>{{ __('messages.error_rate') }}</span>
                 <strong style="color: {{ $errorRate > 5 ? '#d94b63' : '#1f9d62' }};">{{ $errorRate }}%</strong>
-                <p style="font-size: 11px; color: var(--dev-muted); margin: 4px 0 0;">4xx & 5xx responses</p>
+                <p style="font-size: 11px; color: var(--dev-muted); margin: 4px 0 0;">{{ __('messages.error_responses') }}</p>
             </div>
             <div class="dev-stat-card">
-                <span>Avg Latency</span>
+                <span>{{ __('messages.avg_latency') }}</span>
                 <strong style="color: var(--dev-title);">{{ $avgDuration }} ms</strong>
-                <p style="font-size: 11px; color: var(--dev-muted); margin: 4px 0 0;">Response time</p>
+                <p style="font-size: 11px; color: var(--dev-muted); margin: 4px 0 0;">{{ __('messages.response_time') }}</p>
             </div>
         </div>
 
         <!-- 7-Day Chart Box -->
         <div class="widget-box dev-panel" style="margin-bottom: 24px;">
-            <p class="widget-box-title">Requests (Past 7 Days)</p>
+            <p class="widget-box-title">{{ __('messages.requests_past_7_days') }}</p>
             <div class="widget-box-content" style="padding: 24px;">
                 <div style="display: flex; align-items: flex-end; justify-content: space-between; height: 160px; gap: 12px; padding-top: 20px;">
                     @php
@@ -74,19 +74,19 @@
 
         <!-- Top Endpoints Table -->
         <div class="widget-box dev-panel">
-            <p class="widget-box-title">Top Requested Endpoints</p>
+            <p class="widget-box-title">{{ __('messages.top_endpoints') }}</p>
             <div class="widget-box-content padding-none">
                 @if($topEndpoints->isEmpty())
                     <div style="text-align: center; padding: 28px; color: var(--dev-muted);">
-                        No endpoint telemetry captured yet.
+                        {{ __('messages.no_telemetry_yet') }}
                     </div>
                 @else
                     <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
                         <thead>
                             <tr style="border-bottom: 1px solid var(--dev-border); text-align: left; background: var(--dev-surface-soft);">
-                                <th style="padding: 12px 16px;">Endpoint</th>
-                                <th style="padding: 12px 16px; text-align: right;">Requests</th>
-                                <th style="padding: 12px 16px; text-align: right;">Share</th>
+                                <th style="padding: 12px 16px;">{{ __('messages.endpoint') }}</th>
+                                <th style="padding: 12px 16px; text-align: right;">{{ __('messages.requests_past_7_days') }}</th>
+                                <th style="padding: 12px 16px; text-align: right;">%</th>
                             </tr>
                         </thead>
                         <tbody>

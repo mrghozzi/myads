@@ -25,17 +25,17 @@
 
     <div class="grid-column">
         <div class="widget-box dev-panel" style="margin-bottom: 24px;">
-            <p class="widget-box-title">Request Console</p>
+            <p class="widget-box-title">{{ __('messages.request_console') }}</p>
             <div class="widget-box-content" style="padding: 26px;">
                 <div style="display: grid; gap: 16px;">
                     <!-- Authentication Token -->
                     <div class="dev-field">
-                        <label for="pg_token"><strong>Authorization (Bearer Token)</strong> <span class="text-danger">*</span></label>
+                        <label for="pg_token"><strong>{{ __('messages.authorization_bearer') }}</strong> <span class="text-danger">*</span></label>
                         <div style="display: flex; gap: 8px;">
-                            <input id="pg_token" type="text" class="form-control dev-control" placeholder="Enter Bearer Token (PAT or OAuth Access Token)" style="font-family: monospace;">
+                            <input id="pg_token" type="text" class="form-control dev-control" placeholder="{{ __('messages.enter_bearer_token') }}" style="font-family: monospace;">
                             @if($tokens->isNotEmpty())
                                 <select id="pg_token_select" class="form-control dev-control" style="max-width: 200px;">
-                                    <option value="">-- Quick PAT --</option>
+                                    <option value="">-- {{ __('messages.quick_pat') }} --</option>
                                     @foreach($tokens as $t)
                                         <option value="{{ $t->name }}">PAT: {{ $t->name }}</option>
                                     @endforeach
@@ -46,7 +46,7 @@
 
                     <!-- Endpoint Selector -->
                     <div class="dev-field">
-                        <label for="pg_endpoint"><strong>Endpoint Selection</strong></label>
+                        <label for="pg_endpoint"><strong>{{ __('messages.endpoint_selection') }}</strong></label>
                         <select id="pg_endpoint" class="form-control dev-control" style="font-weight: 600;">
                             <option value="GET|/api/developer/v1/me">GET /api/developer/v1/me (Identity)</option>
                             <option value="GET|/api/developer/v1/me/profile">GET /api/developer/v1/me/profile (Profile)</option>
@@ -65,14 +65,14 @@
 
                     <!-- Payload Box for POST -->
                     <div id="pg_body_group" class="dev-field" style="display: none;">
-                        <label for="pg_body"><strong>JSON Request Body</strong></label>
+                        <label for="pg_body"><strong>{{ __('messages.json_request_body') }}</strong></label>
                         <textarea id="pg_body" rows="4" class="form-control dev-control" style="font-family: monospace; font-size: 13px;">{"content": "Hello from the interactive API Playground!"}</textarea>
                     </div>
 
                     <!-- Submit Button -->
                     <div>
                         <button type="button" id="btn-send-pg" class="button primary" style="padding: 0 24px;">
-                            <i class="fa fa-play me-1"></i> Send Request
+                            <i class="fa fa-play me-1"></i> {{ __('messages.send_request') }}
                         </button>
                     </div>
                 </div>
@@ -82,14 +82,14 @@
         <!-- Live Response Viewer -->
         <div class="widget-box dev-panel">
             <div style="display: flex; justify-content: space-between; align-items: center; padding: 18px 24px; border-bottom: 1px solid var(--dev-border);">
-                <p class="widget-box-title" style="margin: 0; padding: 0;">Response Output</p>
+                <p class="widget-box-title" style="margin: 0; padding: 0;">{{ __('messages.response_output') }}</p>
                 <div id="pg_meta_badges" style="display: flex; gap: 8px;">
                     <span id="pg_status_badge" style="display: none; padding: 2px 8px; border-radius: 4px; font-weight: 700; font-size: 12px;"></span>
                     <span id="pg_time_badge" style="display: none; padding: 2px 8px; border-radius: 4px; font-size: 12px; background: rgba(255,255,255,0.06); color: var(--dev-muted);"></span>
                 </div>
             </div>
             <div class="widget-box-content" style="padding: 0;">
-                <pre id="pg_response_pre" style="margin: 0; padding: 24px; background: var(--dev-code-bg); color: var(--dev-code-text); font-family: monospace; font-size: 13px; max-height: 480px; overflow: auto; border-radius: 0 0 12px 12px;">// Click "Send Request" to inspect the JSON response...</pre>
+                <pre id="pg_response_pre" style="margin: 0; padding: 24px; background: var(--dev-code-bg); color: var(--dev-code-text); font-family: monospace; font-size: 13px; max-height: 480px; overflow: auto; border-radius: 0 0 12px 12px;">// {{ __('messages.click_send_request') }}</pre>
             </div>
         </div>
     </div>

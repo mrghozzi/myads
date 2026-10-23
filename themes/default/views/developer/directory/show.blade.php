@@ -21,13 +21,13 @@
             @include('theme::developer.partials.nav', ['active' => 'directory'])
 
             <div class="widget-box dev-panel">
-                <p class="widget-box-title">Developer Info</p>
+                <p class="widget-box-title">{{ __('messages.dev_info') }}</p>
                 <div class="widget-box-content" style="padding: 20px;">
-                    <p style="font-size: 13px; color: var(--dev-muted); margin-bottom: 8px;">Published by:</p>
+                    <p style="font-size: 13px; color: var(--dev-muted); margin-bottom: 8px;">{{ __('messages.published_by') }}:</p>
                     <strong style="color: var(--dev-title); font-size: 15px;">{{ $app->user->username ?? 'Developer' }}</strong>
                     <div style="margin-top: 14px;">
                         <a href="{{ $app->domain }}" target="_blank" rel="noopener noreferrer" class="button white" style="width: 100%; text-align: center; font-size: 12px;">
-                            <i class="fa fa-external-link-alt me-1"></i> Visit Website
+                            <i class="fa fa-external-link-alt me-1"></i> {{ __('messages.visit_website') }}
                         </a>
                     </div>
                 </div>
@@ -57,7 +57,7 @@
                 </div>
 
                 <div style="border-top: 1px solid var(--dev-border); padding-top: 20px; margin-bottom: 20px;">
-                    <h4 style="font-size: 15px; font-weight: 700; color: var(--dev-title); margin-bottom: 10px;">About this Application</h4>
+                    <h4 style="font-size: 15px; font-weight: 700; color: var(--dev-title); margin-bottom: 10px;">{{ __('messages.app_about') }}</h4>
                     <p style="font-size: 14px; line-height: 1.6; color: var(--dev-text);">
                         {{ $app->description }}
                     </p>
@@ -77,10 +77,10 @@
 
                 <div style="display: flex; gap: 12px; align-items: center; margin-top: 24px;">
                     <a href="{{ $oauthConnectUrl }}" class="button primary" style="padding: 0 24px;">
-                        <i class="fa fa-plug me-2"></i> Connect with MYADS
+                        <i class="fa fa-plug me-2"></i> {{ __('messages.authorize') }}
                     </a>
                     <a href="{{ route('developer.directory.index') }}" class="button white">
-                        <i class="fa fa-arrow-left me-1"></i> Back to Directory
+                        <i class="fa fa-arrow-left me-1"></i> {{ __('messages.app_directory') }}
                     </a>
                 </div>
             </div>
@@ -88,10 +88,10 @@
 
         <!-- Permissions Required Box -->
         <div class="widget-box dev-panel">
-            <p class="widget-box-title">Required Permissions ({{ count($scopes) }})</p>
+            <p class="widget-box-title">{{ __('messages.requested_permissions') }} ({{ count($scopes) }})</p>
             <div class="widget-box-content" style="padding: 24px;">
                 @if(empty($scopes))
-                    <p style="color: var(--dev-muted); font-size: 13px;">This application requires basic profile identity access.</p>
+                    <p style="color: var(--dev-muted); font-size: 13px;">{{ __('messages.app_basic_identity_req') }}</p>
                 @else
                     <div style="display: grid; gap: 10px;">
                         @foreach($scopes as $sc)
