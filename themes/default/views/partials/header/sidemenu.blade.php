@@ -101,6 +101,12 @@
                 {{ __('messages.news') }}
             </a>
         </li>
+        <li class="menu-item {{ Request::is('help*') ? 'active' : '' }}">
+            <a class="menu-item-link text-tooltip-tfr" href="{{ route('help.index') }}">
+                <i class="fa-solid fa-circle-question" style="font-size: 19px; width: 24px; display: inline-flex; align-items: center; justify-content: center; color: #615dfa;"></i>
+                {{ __('help.help_center') ?? 'Help Center' }}
+            </a>
+        </li>
         @auth
         <li class="menu-item {{ Request::is('ads*', 'promote*') ? 'active' : '' }}">
             <a class="menu-item-link text-tooltip-tfr" href="{{ route('ads.index') }}">

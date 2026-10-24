@@ -90,6 +90,10 @@
             <i class="fa-solid fa-sitemap"></i>
             {{ __('messages.sitemap') }}
         </a>
+        <a href="{{ route('help.index') }}">
+            <i class="fa-solid fa-circle-question"></i>
+            {{ __('help.help_center') }}
+        </a>
         <a href="{{ route('developer.index') }}">
             <i class="fa-solid fa-code"></i>
             {{ __('messages.developers') }}

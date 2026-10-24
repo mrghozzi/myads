@@ -49,6 +49,7 @@
 <footer class="standalone-footer">
     <div class="footer-links">
         <a href="{{ url('/sitemap.xml') }}"><i class="fa-solid fa-sitemap"></i> {{ __('messages.sitemap') ?? 'Sitemap' }}</a>
+        <a href="{{ url('/help') }}"><i class="fa-solid fa-circle-question"></i> {{ __('help.help_center') ?? 'Help Center' }}</a>
         <a href="{{ url('/developer') }}"><i class="fa-solid fa-code"></i> {{ __('messages.developers') ?? 'Developers' }}</a>
         <a href="{{ url('/privacy') }}"><i class="fa-solid fa-shield-halved"></i> {{ __('messages.privacy_policy') ?? 'Privacy Policy' }}</a>
         <a href="{{ url('/terms') }}"><i class="fa-solid fa-file-contract"></i> {{ __('messages.terms_conditions') ?? 'Terms & Conditions' }}</a>

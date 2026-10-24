@@ -62,6 +62,30 @@
   * Added dedicated translations for webhook management, telemetry metrics, PAT expiration durations, eligibility reasons, application categories, and embed widgets.
   * Localized all developer blade views (`webhooks.blade.php`, `playground.blade.php`, `tokens/index.blade.php`, `directory/index.blade.php`, `directory/show.blade.php`, `analytics.blade.php`, `logs.blade.php`, `widgets/*.blade.php`), eliminating hardcoded English UI strings.
 
+### Comprehensive Help & Documentation Center (`/help`, `HelpController.php`, `HelpContentService.php`, `HelpRating.php`)
+* **Dedicated Help Center Architecture & Dynamic Site Name Resolution**:
+  * Implemented full `/help` knowledge base ecosystem with dedicated routing (`/help`, `/help/{category}`, `/help/{category}/{article}`, `/help/search`, `POST /help/vote`).
+  * Built `HelpContentService` dynamically resolving site title from the database (`Setting::query()->value('titer')`), strictly eliminating hardcoded "myads" branding across all tutorials, titles, summaries, steps, pro-tips, and notes.
+  * Supported the platform's multi-language system (`lang/` directory) with full RTL/LTR directionality across all 14 platform languages (`ar`, `en`, `de`, `es`, `fa`, `fr`, `it`, `ja`, `pt`, `ru`, `sr`, `tr`, `zh_CN`, `zh_TW`).
+* **Comprehensive 10-Category, 27-Tutorial Member Knowledge Base**:
+  * Published 27 in-depth, step-by-step guides covering every aspect of the platform for members:
+    * **Getting Started & Account**: Registration, email verification, 2FA security, profile customization, privacy controls, PTS wallet economy & member transfers, daily quests, and badges.
+    * **Ad Exchange & Campaigns**: Banner advertising (728x90, 300x250, 160x600, 468x60), direct member custom ads, smart ads with geo-targeting and A/B testing, and Anti-Fraud Shield v2 with IAB viewability standards.
+    * **Surf-to-Earn & Video Views**: High-speed traffic exchange, countdown timers, Captcha verification, and YouTube video views exchange.
+    * **Video Hub & Short Clips**: 13-genre video catalog, cinema-style Spotlight Hero, Theater Mode with ambient glow, keyboard shortcuts, Picture-in-Picture, and 9:16 vertical short clips.
+    * **Community & Modern Forums**: Multimedia status updates, photo galleries, link previews, zero-reload AJAX forum streams, multi-editor suite (Markdown, Quill.js, SCEditor), best answers, and pinned comments.
+    * **Digital Store & Freelance**: Software marketplace, downloads & licensing, product wiki documentation, and 5-stage freelance order tenders.
+    * **Directory 2.0**: Website submissions, ownership meta tag verification, community upvoting, and live dynamic SVG embed badges.
+    * **Referrals & Affiliates**: 30-day tracking cookie engine, mutual welcome bonuses (+10 PTS), and 4 milestone ambassador badges.
+    * **Billing & Memberships**: VIP subscription tiers, automatic ad credits, and 8+ payment gateways (Stripe, PayPal, Bank Wire, Tabby, etc.).
+    * **Developer Platform & REST API**: OAuth 2.0 client apps, 27 granular scopes, and REST API v1 endpoints.
+* **Interactive Helpfulness Rating Engine (`POST /help/vote`, `HelpRating.php`, `2026_10_24_190000_create_help_ratings_table.php`)**:
+  * Created database migration and `HelpRating` model tracking member and visitor feedback per article with duplicate vote prevention.
+  * Added asynchronous AJAX voting ("👍 Yes / 👎 No") with instant percentage recalculation, progress bar animation, and feedback confirmation toasts.
+* **Universal Search & Navigation Integration**:
+  * Built real-time autocomplete search with debounce query matching across titles, summaries, and tags.
+  * Integrated `/help` into sidebar menus (`sidemenu.blade.php`, `mobile_sidebar.blade.php`) and site footers (`footer.blade.php`, `_standalone_footer.blade.php`).
+
 # v4.6.3
 > **Major Ecosystem, Modern Discussion, Directory 2.0, Referral Growth & Store Knowledge Base Release** — Rebuilt and modernized the MYADS Community Forum (`/forum`, `/f{id}`, `/t{id}`) with proprietary high-performance modern discussion architecture, multi-editor suite (MyAds Markdown, Quill.js, SCEditor), and cinema-grade video watch pages; transformed the Web & Tools Directory (`/directory`) into an interactive Product Hunt-grade discovery platform with community upvoting and SVG embed badges; completely overhauled the Referral & Affiliate Growth Engine (`/ads/referrals`, `/referral`, `/badges`) with 30-day cookie tracking middleware, two-sided welcome bonuses, anti-fraud self-referral protections, and 4 tiered community milestone badges; and upgraded the Store Product Knowledge Base (`/kb`) with dynamic StackEdit toolbar positioning, compact code/diagram snippet toolbars, and Font Awesome Brands compatibility.
 

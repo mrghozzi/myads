@@ -111,6 +111,15 @@ Route::get('/privacy', [App\Http\Controllers\PageController::class, 'privacy'])-
 Route::get('/terms', [App\Http\Controllers\PageController::class, 'terms'])->name('terms');
 Route::get('/refund', [App\Http\Controllers\PageController::class, 'refund'])->name('refund');
 
+// Help & Documentation Center
+Route::prefix('help')->name('help.')->group(function () {
+    Route::get('/', [App\Http\Controllers\HelpController::class, 'index'])->name('index');
+    Route::get('/search', [App\Http\Controllers\HelpController::class, 'search'])->name('search');
+    Route::post('/vote', [App\Http\Controllers\HelpController::class, 'vote'])->name('vote')->middleware('throttle:60,1');
+    Route::get('/{category}', [App\Http\Controllers\HelpController::class, 'category'])->name('category');
+    Route::get('/{category}/{article}', [App\Http\Controllers\HelpController::class, 'article'])->name('article');
+});
+
 Route::get('/', function () {
     // Redirect to installer if DB tables are missing (e.g. fresh install with stale installed marker)
     try {

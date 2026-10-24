@@ -48,6 +48,7 @@
         <li class="menu-item {{ Request::is('orders*') ? 'active' : '' }}"><a class="menu-item-link text-tooltip-tfr" href="{{ url('/orders') }}">@include('theme::partials.header.menu_icon', ['icon' => 'orders']){{ __('messages.order_requests') }}</a></li>
         <li class="menu-item {{ Request::is('store*', 'kb*', 'download*') ? 'active' : '' }}"><a class="menu-item-link text-tooltip-tfr" href="{{ url('/store') }}"><svg class="menu-item-link-icon icon-marketplace"><use xlink:href="#svg-marketplace"></use></svg>{{ __('messages.store') }}</a></li>
         <li class="menu-item {{ Request::is('news*') ? 'active' : '' }}"><a class="menu-item-link text-tooltip-tfr" href="{{ url('/news') }}">@include('theme::partials.header.menu_icon', ['icon' => 'news']){{ __('messages.news') }}</a></li>
+        <li class="menu-item {{ Request::is('help*') ? 'active' : '' }}"><a class="menu-item-link text-tooltip-tfr" href="{{ route('help.index') }}"><i class="fa-solid fa-circle-question" style="font-size: 18px; width: 20px; text-align: center; color: #615dfa; margin-right: 10px;"></i>{{ __('help.help_center') ?? 'Help Center' }}</a></li>
         @auth
         <li class="menu-item {{ Request::is('ads*', 'promote*') ? 'active' : '' }}"><a class="menu-item-link text-tooltip-tfr" href="{{ route('ads.index') }}">@include('theme::partials.header.menu_icon', ['icon' => 'megaphone']){{ __('messages.advertising') }}</a></li>
         @endauth
