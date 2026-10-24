@@ -86,6 +86,21 @@
   * Built real-time autocomplete search with debounce query matching across titles, summaries, and tags.
   * Integrated `/help` into sidebar menus (`sidemenu.blade.php`, `mobile_sidebar.blade.php`) and site footers (`footer.blade.php`, `_standalone_footer.blade.php`).
 
+### Landing Footer Widget Modernization & Full Admin Customizer (`/admin/widgets`, `widget_landing_footer.blade.php`, `widget_landing_footer_customizer.blade.php`)
+* **Widget Content Refresh & Modernization (`widget_landing_footer.blade.php`)**:
+  * Overhauled `widget_landing_footer` with Superdesign glassmorphism tokens, micro-animations, and dynamic theme switching (`[data-theme="css_d"]`).
+  * Added primary links including the new Help Center (`/help`), Sitemap (`/sitemap.xml`), Developers (`/developer`), Privacy Policy (`/privacy`), Terms & Conditions (`/terms`), and Refund Policy (`/refund`).
+  * Added branded social media icon bar (Facebook, X/Twitter, LinkedIn, Telegram, YouTube, GitHub) with hover glows and lift effects.
+  * Fully replaced hardcoded branding with database dynamic site title (`$site_settings->titer`), current year `:year`, and system version `:version`.
+* **Full In-Admin Customizability (`/admin/widgets`, `AdminController.php`, `widgets_form.blade.php`)**:
+  * Added dedicated `widget_landing_footer_customizer.blade.php` sub-form dynamically rendered when creating or editing a `widget_landing_footer` widget.
+  * Supported toggle switches for all primary navigation links (`show_help`, `show_sitemap`, `show_developer`, `show_privacy`, `show_terms`, `show_refund`).
+  * Supported custom multi-line extra links (`Label | URL` format).
+  * Supported social media URLs with auto-fallback to site settings.
+  * Supported custom copyright notices and customizable "Powered by" tagline.
+  * Added layout style selector (`centered`, `columns`, `compact`) and background surface selector (`card`, `subtle` glassmorphism, `transparent`).
+  * Enhanced `AdminController@storeWidget` and `AdminController@updateWidget` to safely serialize and preserve JSON configuration in `o_valuer`.
+
 # v4.6.3
 > **Major Ecosystem, Modern Discussion, Directory 2.0, Referral Growth & Store Knowledge Base Release** — Rebuilt and modernized the MYADS Community Forum (`/forum`, `/f{id}`, `/t{id}`) with proprietary high-performance modern discussion architecture, multi-editor suite (MyAds Markdown, Quill.js, SCEditor), and cinema-grade video watch pages; transformed the Web & Tools Directory (`/directory`) into an interactive Product Hunt-grade discovery platform with community upvoting and SVG embed badges; completely overhauled the Referral & Affiliate Growth Engine (`/ads/referrals`, `/referral`, `/badges`) with 30-day cookie tracking middleware, two-sided welcome bonuses, anti-fraud self-referral protections, and 4 tiered community milestone badges; and upgraded the Store Product Knowledge Base (`/kb`) with dynamic StackEdit toolbar positioning, compact code/diagram snippet toolbars, and Font Awesome Brands compatibility.
 

@@ -68,6 +68,9 @@
                     <textarea name="o_valuer" rows="7" class="form-control admin-form-control font-monospace" placeholder="<div class=&quot;custom-widget&quot;>...</div>" style="border-radius: 12px; font-family: SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 13px; background: var(--admin-input-bg, #f8fafc);">{{ $widget?->o_valuer ?? '' }}</textarea>
                 </div>
             @endif
+            @if($type === 'widget_landing_footer')
+                @include('admin::admin.partials.widget_landing_footer_customizer', ['widget' => $widget])
+            @endif
         </div>
 
         <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mt-4 pt-3 border-top border-light-subtle">

@@ -4767,7 +4767,19 @@ class AdminController extends Controller
 
         $data = $request->only(['name', 'o_parent', 'o_order', 'o_valuer', 'o_mode']);
         $data['o_type'] = 'box_widget';
-        if ($type !== 'widget_html') {
+        if ($type === 'widget_html') {
+            $data['o_valuer'] = (string) $request->input('o_valuer', '');
+        } elseif ($type === 'widget_landing_footer') {
+            $footerConfig = $request->input('landing_footer', []);
+            if (!is_array($footerConfig)) {
+                $footerConfig = [];
+            }
+            $boolKeys = ['show_title', 'show_help', 'show_sitemap', 'show_developer', 'show_privacy', 'show_terms', 'show_refund', 'show_social', 'show_powered_by'];
+            foreach ($boolKeys as $bKey) {
+                $footerConfig[$bKey] = $request->has("landing_footer.{$bKey}");
+            }
+            $data['o_valuer'] = json_encode($footerConfig, JSON_UNESCAPED_UNICODE);
+        } else {
             $data['o_valuer'] = '';
         }
 
@@ -4779,6 +4791,7 @@ class AdminController extends Controller
     public function updateWidget(Request $request, $id)
     {
         $widget = Option::where('o_type', 'box_widget')->where('id', $id)->firstOrFail();
+        $type = $widget->o_mode;
         $allowedPlaceIds = implode(',', $this->getAllowedPlaceIds($widget->o_mode));
         $request->validate([
             'name' => 'required|string',
@@ -4788,7 +4801,19 @@ class AdminController extends Controller
         ]);
 
         $data = $request->only(['name', 'o_parent', 'o_order', 'o_valuer']);
-        if ($widget->o_mode !== 'widget_html') {
+        if ($type === 'widget_html') {
+            $data['o_valuer'] = (string) $request->input('o_valuer', '');
+        } elseif ($type === 'widget_landing_footer') {
+            $footerConfig = $request->input('landing_footer', []);
+            if (!is_array($footerConfig)) {
+                $footerConfig = [];
+            }
+            $boolKeys = ['show_title', 'show_help', 'show_sitemap', 'show_developer', 'show_privacy', 'show_terms', 'show_refund', 'show_social', 'show_powered_by'];
+            foreach ($boolKeys as $bKey) {
+                $footerConfig[$bKey] = $request->has("landing_footer.{$bKey}");
+            }
+            $data['o_valuer'] = json_encode($footerConfig, JSON_UNESCAPED_UNICODE);
+        } else {
             $data['o_valuer'] = '';
         }
         $widget->update($data);
