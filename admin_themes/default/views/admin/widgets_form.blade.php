@@ -71,6 +71,14 @@
             @if($type === 'widget_landing_footer')
                 @include('admin::admin.partials.widget_landing_footer_customizer', ['widget' => $widget])
             @endif
+            @if(in_array($type, [
+                'widget_members', 'widget_online_members', 'widget_forum_latest', 'widget_news_latest',
+                'widget_recent_comments', 'widget_stats_box', 'widget_points_leaderboard',
+                'widget_store_latest', 'widget_directory_latest', 'widget_orders_latest',
+                'widget_badges_showcase', 'widget_quests_daily'
+            ], true))
+                @include('admin::admin.partials.widget_generic_customizer', ['widget' => $widget, 'type' => $type])
+            @endif
         </div>
 
         <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mt-4 pt-3 border-top border-light-subtle">

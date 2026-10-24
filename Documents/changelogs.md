@@ -99,7 +99,25 @@
   * Supported social media URLs with auto-fallback to site settings.
   * Supported custom copyright notices and customizable "Powered by" tagline.
   * Added layout style selector (`centered`, `columns`, `compact`) and background surface selector (`card`, `subtle` glassmorphism, `transparent`).
-  * Enhanced `AdminController@storeWidget` and `AdminController@updateWidget` to safely serialize and preserve JSON configuration in `o_valuer`.
+### Universal Widget Customizer Engine (`/admin/widgets`, `widgets_form.blade.php`, `widget_generic_customizer.blade.php`, `AdminController.php`)
+* **Full In-Admin Customizability Across All 12 Native Widgets**:
+  * Added `widget_generic_customizer.blade.php` to dynamically present tailored configuration controls for each supported widget type when creating or editing in `/admin/widgets`.
+  * **Suggest Members (`widget_members`)**: Configurable item count (3–20), sort order (`random`, `popular` by points, `newest`, `active`), toggle for verified members only, toggle for stats counters, and toggle for follow button.
+  * **Online Members (`widget_online_members`)**: Configurable item count, active time window threshold (5, 10, 15, 30, 60 minutes), toggle for stats counters, and toggle for direct message button.
+  * **Latest Forum Topics (`widget_forum_latest`)**: Configurable item count, category filter (all categories or specific `f_cat`), toggles for author info, category badge, relative date, and customizable "See All" button text.
+  * **Latest News (`widget_news_latest`)**: Configurable item count, toggle for date timestamp, and customizable "See All" button text.
+  * **Recent Comments (`widget_recent_comments`)**: Configurable item count, snippet max length (25–100 chars), toggle for commenter avatar, and toggle for relative timestamp.
+  * **Platform Stats Box (`widget_stats_box`)**: Multi-toggle metrics selector (banners, links, registered members, forum topics, service orders) and slider animation vs static card modes.
+  * **Points Leaderboard (`widget_points_leaderboard`)**: Configurable item count, toggle for ranking badges (#1, #2, #3), toggle for points balance, and customizable action button.
+  * **Latest Store Products (`widget_store_latest`)**: Configurable item count, toggle for price in points, toggle for seller username, and customizable action button.
+  * **Latest Directory Sites (`widget_directory_latest`)**: Configurable item count, category filter (`DirectoryCategory`), toggle for category badge, toggle for date, and customizable action button.
+  * **Latest Service Orders (`widget_orders_latest`)**: Configurable item count, toggle for budget/category, toggle for offers count, toggle for date, and customizable action button.
+  * **Badges Showcase (`widget_badges_showcase`)**: Configurable max badges count (4–24), badge icon sizing (`small` 32px, `medium` 40px, `large` 48px), toggle for manage button, and guest sign-up prompt visibility.
+  * **Daily Quests (`widget_quests_daily`)**: Configurable quest period filter (`daily` vs `all` active), toggle for progress bar visual, and toggle for footer action buttons.
+* **Unified Controller & Storage Layer (`AdminController@formatWidgetConfig`)**:
+  * Unified JSON serialization into `o_valuer` with strict boolean normalization for all checkboxes (`widget_config`), preserving full backward compatibility with uncustomized widgets.
+* **Bilingual Localization (`lang/ar/messages.php`, `lang/en/messages.php`)**:
+  * Added 43 new translation keys covering all widget customization labels, sort orders, thresholds, and element visibility toggles.
 
 # v4.6.3
 > **Major Ecosystem, Modern Discussion, Directory 2.0, Referral Growth & Store Knowledge Base Release** — Rebuilt and modernized the MYADS Community Forum (`/forum`, `/f{id}`, `/t{id}`) with proprietary high-performance modern discussion architecture, multi-editor suite (MyAds Markdown, Quill.js, SCEditor), and cinema-grade video watch pages; transformed the Web & Tools Directory (`/directory`) into an interactive Product Hunt-grade discovery platform with community upvoting and SVG embed badges; completely overhauled the Referral & Affiliate Growth Engine (`/ads/referrals`, `/referral`, `/badges`) with 30-day cookie tracking middleware, two-sided welcome bonuses, anti-fraud self-referral protections, and 4 tiered community milestone badges; and upgraded the Store Product Knowledge Base (`/kb`) with dynamic StackEdit toolbar positioning, compact code/diagram snippet toolbars, and Font Awesome Brands compatibility.

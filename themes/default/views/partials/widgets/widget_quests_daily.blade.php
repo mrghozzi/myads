@@ -1,10 +1,25 @@
 @php
+    $config = [];
+    if (!empty($widget?->o_valuer)) {
+        if (is_array($widget->o_valuer)) {
+            $config = $widget->o_valuer;
+        } else {
+            $decoded = json_decode((string) $widget->o_valuer, true);
+            $config = is_array($decoded) ? $decoded : [];
+        }
+    }
+
+    $period = $config['period'] ?? 'daily';
+    $showProgress = isset($config['show_progress']) ? (bool) $config['show_progress'] : true;
+    $showButtons = isset($config['show_buttons']) ? (bool) $config['show_buttons'] : true;
+
     $activeQuests = [];
     if (auth()->check()) {
-        $activeQuests = \App\Models\Quest::where('is_active', true)
-            ->where('period', 'daily')
-            ->orderBy('sort_order', 'asc')
-            ->get();
+        $query = \App\Models\Quest::where('is_active', true)->orderBy('sort_order', 'asc');
+        if ($period === 'daily') {
+            $query->where('period', 'daily');
+        }
+        $activeQuests = $query->get();
             
         $today = now()->format('Y-m-d');
         $progressMap = \App\Models\QuestProgress::where('user_id', auth()->id())
@@ -35,18 +50,22 @@
                             </p>
                             <p class="quest-item-text" style="font-size: 11px; color: #8f919d;">{{ $current }}/{{ $target }}</p>
                         </div>
-                        <div class="progress-bar-wrap" style="height: 6px; background: #eaeaf5; border-radius: 10px; position: relative; overflow: hidden;">
-                            <div class="progress-bar" style="width: {{ $percent }}%; height: 100%; background: {{ $isCompleted ? '#10b981' : '#615dfa' }}; transition: width 0.3s ease;"></div>
-                        </div>
+                        @if($showProgress)
+                            <div class="progress-bar-wrap" style="height: 6px; background: #eaeaf5; border-radius: 10px; position: relative; overflow: hidden;">
+                                <div class="progress-bar" style="width: {{ $percent }}%; height: 100%; background: {{ $isCompleted ? '#10b981' : '#615dfa' }}; transition: width 0.3s ease;"></div>
+                            </div>
+                        @endif
                     </div>
                 @empty
-                    <p class="text-center">{{ __('messages.no_active_quests') ?? 'No active quests today.' }}</p>
+                    <p class="text-center text-muted small my-2">{{ __('messages.no_active_quests') ?? 'No active quests today.' }}</p>
                 @endforelse
             </div>
-            <div class="quest-footer" style="display: flex; gap: 8px; margin-top: 16px;">
-                <a class="button small primary" href="/quests" style="flex: 1; text-align: center; font-size: 11px; padding: 0 12px; height: 32px; line-height: 32px;">{{ __('messages.all_quests') ?? 'All Quests' }}</a>
-                <a class="button small white" href="{{ route('profile.show', ['username' => auth()->user()->username, 'tab' => 'history']) }}" style="flex: 1; text-align: center; font-size: 11px; padding: 0 12px; height: 32px; line-height: 32px;">{{ __('messages.history') ?? 'History' }}</a>
-            </div>
+            @if($showButtons)
+                <div class="quest-footer" style="display: flex; gap: 8px; margin-top: 16px;">
+                    <a class="button small primary" href="/quests" style="flex: 1; text-align: center; font-size: 11px; padding: 0 12px; height: 32px; line-height: 32px;">{{ __('messages.all_quests') ?? 'All Quests' }}</a>
+                    <a class="button small white" href="{{ route('profile.show', ['username' => auth()->user()->username, 'tab' => 'history']) }}" style="flex: 1; text-align: center; font-size: 11px; padding: 0 12px; height: 32px; line-height: 32px;">{{ __('messages.history') ?? 'History' }}</a>
+                </div>
+            @endif
         @else
             <p class="text-center" style="font-size: 13px; color: #8f919d;">{{ __('messages.login_to_start_quests') ?? 'Login to start earning points from daily quests!' }}</p>
             <a class="widget-box-button button small primary" href="{{ route('login') }}" style="margin-top: 16px;">{{ __('messages.login') }}</a>

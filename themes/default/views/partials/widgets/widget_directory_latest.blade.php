@@ -1,11 +1,32 @@
+@php
+    $config = [];
+    if (!empty($widget?->o_valuer)) {
+        if (is_array($widget->o_valuer)) {
+            $config = $widget->o_valuer;
+        } else {
+            $decoded = json_decode((string) $widget->o_valuer, true);
+            $config = is_array($decoded) ? $decoded : [];
+        }
+    }
+
+    $limit = (int) ($config['limit'] ?? 5);
+    $categoryId = (int) ($config['category_id'] ?? 0);
+    $showCategory = isset($config['show_category']) ? (bool) $config['show_category'] : true;
+    $showDate = isset($config['show_date']) ? (bool) $config['show_date'] : true;
+    $showButton = isset($config['show_button']) ? (bool) $config['show_button'] : true;
+    $buttonText = !empty($config['button_text']) ? $config['button_text'] : __('messages.see_all');
+
+    $query = \App\Models\Directory::where('statu', 1)->latest('id');
+    if ($categoryId > 0) {
+        $query->where('cat', $categoryId);
+    }
+    $listings = $query->limit($limit)->get();
+@endphp
+
 <div class="widget-box">
     <p class="widget-box-title">{{ $widget->name }}</p>
     <div class="widget-box-content">
         <div class="user-status-list">
-            @php
-                $listings = \App\Models\Directory::where('statu', 1)->latest('id')->limit(5)->get();
-            @endphp
-
             @foreach($listings as $listing)
                 <div class="user-status request-small">
                     <!-- SITE ICON -->
@@ -20,15 +41,25 @@
                         <a class="bold" href="{{ route('directory.show', $listing->id) }}">{{ Str::limit($listing->name, 25) }}</a>
                     </p>
                     <p class="user-status-text small">
-                        {{ $listing->category?->name ?? __('messages.directory') }} | {{ \Carbon\Carbon::createFromTimestamp($listing->date)->diffForHumans() }}
+                        @if($showCategory)
+                            {{ $listing->category?->name ?? __('messages.directory') }}
+                        @endif
+                        @if($showCategory && $showDate)
+                            |
+                        @endif
+                        @if($showDate)
+                            {{ \Carbon\Carbon::createFromTimestamp($listing->date)->diffForHumans() }}
+                        @endif
                     </p>
                 </div>
             @endforeach
 
             @if($listings->isEmpty())
-                <p class="text-center small">{{ __('messages.no_listings_found') }}</p>
+                <p class="text-center small text-muted my-2">{{ __('messages.no_listings_found') }}</p>
             @endif
         </div>
-        <a href="{{ route('directory.index') }}" class="button primary full" style="margin-top: 20px;">{{ __('messages.see_all') }}</a>
+        @if($showButton)
+            <a href="{{ route('directory.index') }}" class="button primary full" style="margin-top: 20px;">{{ $buttonText }}</a>
+        @endif
     </div>
 </div>

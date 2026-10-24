@@ -4753,6 +4753,56 @@ class AdminController extends Controller
         ]);
     }
 
+    /**
+     * Format widget configuration payload into string for o_valuer.
+     */
+    private function formatWidgetConfig(string $type, Request $request): string
+    {
+        if ($type === 'widget_html') {
+            return (string) $request->input('o_valuer', '');
+        }
+
+        if ($type === 'widget_landing_footer') {
+            $footerConfig = $request->input('landing_footer', []);
+            if (!is_array($footerConfig)) {
+                $footerConfig = [];
+            }
+            $boolKeys = ['show_title', 'show_help', 'show_sitemap', 'show_developer', 'show_privacy', 'show_terms', 'show_refund', 'show_social', 'show_powered_by'];
+            foreach ($boolKeys as $bKey) {
+                $footerConfig[$bKey] = $request->has("landing_footer.{$bKey}");
+            }
+            return json_encode($footerConfig, JSON_UNESCAPED_UNICODE);
+        }
+
+        if ($request->has('widget_config') && is_array($request->input('widget_config'))) {
+            $config = $request->input('widget_config', []);
+            $booleanKeysMap = [
+                'widget_members' => ['show_stats', 'show_follow_btn', 'verified_only'],
+                'widget_online_members' => ['show_stats', 'show_message_btn'],
+                'widget_forum_latest' => ['show_author', 'show_category', 'show_date', 'show_button'],
+                'widget_news_latest' => ['show_date', 'show_button'],
+                'widget_recent_comments' => ['show_avatar', 'show_date'],
+                'widget_stats_box' => ['show_banners', 'show_links', 'show_users', 'show_topics', 'show_orders', 'enable_slider'],
+                'widget_points_leaderboard' => ['show_ranks', 'show_points', 'show_button'],
+                'widget_store_latest' => ['show_price', 'show_seller', 'show_button'],
+                'widget_directory_latest' => ['show_category', 'show_date', 'show_button'],
+                'widget_orders_latest' => ['show_budget', 'show_offers', 'show_date', 'show_button'],
+                'widget_badges_showcase' => ['show_button', 'guest_visibility'],
+                'widget_quests_daily' => ['show_progress', 'show_buttons'],
+            ];
+
+            if (isset($booleanKeysMap[$type])) {
+                foreach ($booleanKeysMap[$type] as $bKey) {
+                    $config[$bKey] = $request->has("widget_config.{$bKey}") && ($request->input("widget_config.{$bKey}") == '1' || $request->input("widget_config.{$bKey}") === true);
+                }
+            }
+
+            return json_encode($config, JSON_UNESCAPED_UNICODE);
+        }
+
+        return '';
+    }
+
     public function storeWidget(Request $request)
     {
         $type = $request->input('o_mode');
@@ -4765,23 +4815,9 @@ class AdminController extends Controller
             'o_mode' => 'required|in:widget_html,widget_members,widget_online_members,widget_recent_comments,widget_stats_box,widget_forum_latest,widget_news_latest,widget_points_leaderboard,widget_store_latest,widget_directory_latest,widget_orders_latest,widget_badges_showcase,widget_quests_daily,widget_landing_footer',
         ]);
 
-        $data = $request->only(['name', 'o_parent', 'o_order', 'o_valuer', 'o_mode']);
+        $data = $request->only(['name', 'o_parent', 'o_order', 'o_mode']);
         $data['o_type'] = 'box_widget';
-        if ($type === 'widget_html') {
-            $data['o_valuer'] = (string) $request->input('o_valuer', '');
-        } elseif ($type === 'widget_landing_footer') {
-            $footerConfig = $request->input('landing_footer', []);
-            if (!is_array($footerConfig)) {
-                $footerConfig = [];
-            }
-            $boolKeys = ['show_title', 'show_help', 'show_sitemap', 'show_developer', 'show_privacy', 'show_terms', 'show_refund', 'show_social', 'show_powered_by'];
-            foreach ($boolKeys as $bKey) {
-                $footerConfig[$bKey] = $request->has("landing_footer.{$bKey}");
-            }
-            $data['o_valuer'] = json_encode($footerConfig, JSON_UNESCAPED_UNICODE);
-        } else {
-            $data['o_valuer'] = '';
-        }
+        $data['o_valuer'] = $this->formatWidgetConfig($type, $request);
 
         Option::create($data);
 
@@ -4800,22 +4836,8 @@ class AdminController extends Controller
             'o_valuer' => 'nullable|string',
         ]);
 
-        $data = $request->only(['name', 'o_parent', 'o_order', 'o_valuer']);
-        if ($type === 'widget_html') {
-            $data['o_valuer'] = (string) $request->input('o_valuer', '');
-        } elseif ($type === 'widget_landing_footer') {
-            $footerConfig = $request->input('landing_footer', []);
-            if (!is_array($footerConfig)) {
-                $footerConfig = [];
-            }
-            $boolKeys = ['show_title', 'show_help', 'show_sitemap', 'show_developer', 'show_privacy', 'show_terms', 'show_refund', 'show_social', 'show_powered_by'];
-            foreach ($boolKeys as $bKey) {
-                $footerConfig[$bKey] = $request->has("landing_footer.{$bKey}");
-            }
-            $data['o_valuer'] = json_encode($footerConfig, JSON_UNESCAPED_UNICODE);
-        } else {
-            $data['o_valuer'] = '';
-        }
+        $data = $request->only(['name', 'o_parent', 'o_order']);
+        $data['o_valuer'] = $this->formatWidgetConfig($type, $request);
         $widget->update($data);
 
         return redirect()->back()->with('success', __('widget_updated'));

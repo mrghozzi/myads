@@ -1,3 +1,29 @@
+@php
+    $config = [];
+    if (!empty($widget?->o_valuer)) {
+        if (is_array($widget->o_valuer)) {
+            $config = $widget->o_valuer;
+        } else {
+            $decoded = json_decode((string) $widget->o_valuer, true);
+            $config = is_array($decoded) ? $decoded : [];
+        }
+    }
+
+    $limit = (int) ($config['limit'] ?? 5);
+    $thresholdMinutes = (int) ($config['active_threshold'] ?? 15);
+    $showStats = isset($config['show_stats']) ? (bool) $config['show_stats'] : true;
+    $showMessageBtn = isset($config['show_message_btn']) ? (bool) $config['show_message_btn'] : true;
+
+    $userId = auth()->id() ?? 0;
+    $activeThreshold = time() - ($thresholdMinutes * 60);
+    
+    $onlineUsers = \App\Models\User::where('online', '>', $activeThreshold)
+        ->where('id', '!=', $userId)
+        ->orderBy('online', 'desc')
+        ->limit($limit)
+        ->get();
+@endphp
+
 <div class="widget-box">
     <!-- WIDGET BOX TITLE -->
     <p class="widget-box-title">{{ $widget->name }}</p>
@@ -6,17 +32,6 @@
     <!-- WIDGET BOX CONTENT -->
     <div class="widget-box-content">
         <div class="user-status-list">
-            @php
-                $userId = auth()->id() ?? 0;
-                $activeThreshold = time() - 900; // 15 minutes
-                
-                $onlineUsers = \App\Models\User::where('online', '>', $activeThreshold)
-                    ->where('id', '!=', $userId)
-                    ->orderBy('online', 'desc')
-                    ->limit(5)
-                    ->get();
-            @endphp
-
             @if($onlineUsers->isEmpty())
                 <p class="text-center text-muted mb-0"><small>{{ __('messages.no_users_online_right_now') ?? 'No users online right now.' }}</small></p>
             @else
@@ -80,19 +95,23 @@
                         <p class="user-status-title"><a class="bold" href="{{ route('profile.short', $user->publicRouteIdentifier()) }}">{{ Str::limit($user->username, 15) }}</a></p>
                         <!-- /USER STATUS TITLE -->
 
-                        <!-- USER STATUS TEXT -->
-                        <p class="user-status-text small">{{ __('messages.Followers') }}&nbsp;{{ $followersCount }}&nbsp;|&nbsp;{{ __('messages.Posts') }}&nbsp;{{ $postsCount }}</p>
-                        <!-- /USER STATUS TEXT -->
+                        @if($showStats)
+                            <!-- USER STATUS TEXT -->
+                            <p class="user-status-text small">{{ __('messages.Followers') }}&nbsp;{{ $followersCount }}&nbsp;|&nbsp;{{ __('messages.Posts') }}&nbsp;{{ $postsCount }}</p>
+                            <!-- /USER STATUS TEXT -->
+                        @endif
 
-                        <!-- ACTION REQUEST LIST -->
-                        <div class="action-request-list">
-                            <!-- ACTION REQUEST -->
-                            <a href="{{ route('messages.show', $user->username) }}" class="action-request accept" style="border:none; cursor:pointer;" title="{{ __('messages.Message') }}">
-                                <i class="fa-regular fa-envelope"></i>
-                            </a>
-                            <!-- /ACTION REQUEST -->
-                        </div>
-                        <!-- ACTION REQUEST LIST -->
+                        @if($showMessageBtn)
+                            <!-- ACTION REQUEST LIST -->
+                            <div class="action-request-list">
+                                <!-- ACTION REQUEST -->
+                                <a href="{{ route('messages.show', $user->username) }}" class="action-request accept" style="border:none; cursor:pointer;" title="{{ __('messages.Message') }}">
+                                    <i class="fa-regular fa-envelope"></i>
+                                </a>
+                                <!-- /ACTION REQUEST -->
+                            </div>
+                            <!-- ACTION REQUEST LIST -->
+                        @endif
                     </div>
                 @endforeach
             @endif

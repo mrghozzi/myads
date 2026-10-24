@@ -1,3 +1,26 @@
+@php
+    $config = [];
+    if (!empty($widget?->o_valuer)) {
+        if (is_array($widget->o_valuer)) {
+            $config = $widget->o_valuer;
+        } else {
+            $decoded = json_decode((string) $widget->o_valuer, true);
+            $config = is_array($decoded) ? $decoded : [];
+        }
+    }
+
+    $limit = (int) ($config['limit'] ?? 5);
+    $snippetLength = (int) ($config['snippet_length'] ?? 35);
+    $showAvatar = isset($config['show_avatar']) ? (bool) $config['show_avatar'] : true;
+    $showDate = isset($config['show_date']) ? (bool) $config['show_date'] : true;
+
+    // Fetch recent comments joined with user and topic, ordered by id DESC
+    $recentComments = \App\Models\ForumComment::with(['user', 'topic'])
+        ->orderBy('id', 'desc')
+        ->limit($limit)
+        ->get();
+@endphp
+
 <div class="widget-box">
     <!-- WIDGET BOX TITLE -->
     <p class="widget-box-title">{{ $widget->name }}</p>
@@ -6,14 +29,6 @@
     <!-- WIDGET BOX CONTENT -->
     <div class="widget-box-content">
         <div class="user-status-list">
-            @php
-                // Fetch recent comments joined with user and topic, ordered by id DESC
-                $recentComments = \App\Models\ForumComment::with(['user', 'topic'])
-                    ->orderBy('id', 'desc')
-                    ->limit(5)
-                    ->get();
-            @endphp
-
             @if($recentComments->isEmpty())
                 <p class="text-center text-muted mb-0"><small>{{ __('messages.no_comments_found') ?? 'No comments found.' }}</small></p>
             @else
@@ -26,29 +41,31 @@
                         $snippet = strip_tags(preg_replace('/\[.*?\]/', '', $comment->txt));
                     @endphp
                     <div class="user-status request-small">
-                        <!-- USER STATUS AVATAR -->
-                        <a class="user-status-avatar" href="{{ route('profile.short', $user->publicRouteIdentifier()) }}">
-                            <!-- USER AVATAR -->
-                            <div class="user-avatar small no-outline {{ $user->isOnline() ? 'online' : '' }}">
-                                <!-- USER AVATAR CONTENT -->
-                                <div class="user-avatar-content">
-                                    <!-- HEXAGON -->
-                                    <div class="hexagon-image-30-32" data-src="{{ $user->avatarUrl() }}"></div>
-                                    <!-- /HEXAGON -->
-                                </div>
-                                <!-- /USER AVATAR CONTENT -->
+                        @if($showAvatar)
+                            <!-- USER STATUS AVATAR -->
+                            <a class="user-status-avatar" href="{{ route('profile.short', $user->publicRouteIdentifier()) }}">
+                                <!-- USER AVATAR -->
+                                <div class="user-avatar small no-outline {{ $user->isOnline() ? 'online' : '' }}">
+                                    <!-- USER AVATAR CONTENT -->
+                                    <div class="user-avatar-content">
+                                        <!-- HEXAGON -->
+                                        <div class="hexagon-image-30-32" data-src="{{ $user->avatarUrl() }}"></div>
+                                        <!-- /HEXAGON -->
+                                    </div>
+                                    <!-- /USER AVATAR CONTENT -->
 
-                                <!-- USER AVATAR PROGRESS BORDER -->
-                                <div class="user-avatar-progress-border">
-                                    <!-- HEXAGON -->
-                                    <div class="hexagon-border-40-44" data-line-color="{{ $user->profileBadgeColor() }}"></div>
-                                    <!-- /HEXAGON -->
+                                    <!-- USER AVATAR PROGRESS BORDER -->
+                                    <div class="user-avatar-progress-border">
+                                        <!-- HEXAGON -->
+                                        <div class="hexagon-border-40-44" data-line-color="{{ $user->profileBadgeColor() }}"></div>
+                                        <!-- /HEXAGON -->
+                                    </div>
+                                    <!-- /USER AVATAR PROGRESS BORDER -->
                                 </div>
-                                <!-- /USER AVATAR PROGRESS BORDER -->
-                            </div>
-                            <!-- /USER AVATAR -->
-                        </a>
-                        <!-- /USER STATUS AVATAR -->
+                                <!-- /USER AVATAR -->
+                            </a>
+                            <!-- /USER STATUS AVATAR -->
+                        @endif
 
                         <!-- USER STATUS TITLE -->
                         <p class="user-status-title"><a class="bold" href="{{ route('profile.short', $user->publicRouteIdentifier()) }}">{{ Str::limit($user->username, 15) }}</a></p>
@@ -57,16 +74,18 @@
                         <!-- USER STATUS TEXT -->
                         <p class="user-status-text small">
                             <a href="{{ $topicUrl }}" class="text-muted text-decoration-none">
-                                &quot;{{ Str::limit($snippet, 35) }}&quot;
+                                &quot;{{ Str::limit($snippet, $snippetLength) }}&quot;
                             </a>
                         </p>
                         <!-- /USER STATUS TEXT -->
                         
-                        <!-- ACTION REQUEST LIST -->
-                        <div class="action-request-list">
-                            <p class="user-status-text small timestamp" style="margin-top: 4px;">{{ \Carbon\Carbon::createFromTimestamp($comment->date)->diffForHumans() }}</p>
-                        </div>
-                        <!-- /ACTION REQUEST LIST -->
+                        @if($showDate)
+                            <!-- ACTION REQUEST LIST -->
+                            <div class="action-request-list">
+                                <p class="user-status-text small timestamp" style="margin-top: 4px;">{{ \Carbon\Carbon::createFromTimestamp($comment->date)->diffForHumans() }}</p>
+                            </div>
+                            <!-- /ACTION REQUEST LIST -->
+                        @endif
                     </div>
                 @endforeach
             @endif
