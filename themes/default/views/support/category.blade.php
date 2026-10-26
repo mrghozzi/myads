@@ -276,7 +276,7 @@
     <!-- Breadcrumb -->
     <div class="cat-nav-crumbs">
         <a href="{{ route('support.index') }}"><i class="fa-solid fa-house"></i> {{ __('support.support_forum') }}</a>
-        <i class="fa-solid fa-chevron-left" style="font-size: 0.75rem;"></i>
+        <i class="fa-solid {{ app()->getLocale() === 'ar' ? 'fa-chevron-left' : 'fa-chevron-right' }}" style="font-size: 0.75rem;"></i>
         <span>{{ $category->name }}</span>
     </div>
 
@@ -352,11 +352,11 @@
                     <div class="support-topic-stats">
                         <div class="support-counter-box">
                             <span class="support-counter-num">{{ $topic->replies_count }}</span>
-                            <span class="support-counter-label">{{ __('support.replies_count', ['count' => '']) }}</span>
+                            <span class="support-counter-label">{{ __('support.replies') }}</span>
                         </div>
                         <div class="support-counter-box">
                             <span class="support-counter-num">{{ $topic->views_count }}</span>
-                            <span class="support-counter-label">{{ __('support.views_count', ['count' => '']) }}</span>
+                            <span class="support-counter-label">{{ __('support.views') }}</span>
                         </div>
                     </div>
                 </a>

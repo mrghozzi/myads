@@ -32,11 +32,11 @@
             <table class="table table-hover align-middle mb-0">
                 <thead class="bg-light">
                     <tr>
-                        <th class="ps-4">القسم</th>
-                        <th>الرابط (Slug)</th>
-                        <th>عدد المواضيع</th>
-                        <th>الترتيب</th>
-                        <th>الحالة</th>
+                        <th class="ps-4">{{ __('support.category') }}</th>
+                        <th>{{ __('support.category_slug') }}</th>
+                        <th>{{ __('support.topics_count', ['count' => '']) }}</th>
+                        <th>{{ __('support.category_order') }}</th>
+                        <th>{{ __('support.status') }}</th>
                         <th class="text-end pe-4">{{ __('support.actions') }}</th>
                     </tr>
                 </thead>
@@ -59,7 +59,7 @@
                             </td>
                             <td>
                                 <span class="badge bg-light text-dark border">
-                                    {{ $cat->topics_count }} سؤال
+                                    {{ $cat->topics_count }} {{ __('support.questions') }}
                                 </span>
                             </td>
                             <td>
@@ -67,19 +67,19 @@
                             </td>
                             <td>
                                 @if($cat->is_active)
-                                    <span class="badge bg-success">نشط</span>
+                                    <span class="badge bg-success">{{ __('support.active') }}</span>
                                 @else
-                                    <span class="badge bg-secondary">معطل</span>
+                                    <span class="badge bg-secondary">{{ __('support.disabled') }}</span>
                                 @endif
                             </td>
                             <td class="text-end pe-4">
                                 <div class="btn-group">
-                                    <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editModal{{ $cat->id }}" title="تعديل">
+                                    <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editModal{{ $cat->id }}" title="{{ __('support.edit') }}">
                                         <i class="feather-edit"></i>
                                     </button>
-                                    <form action="{{ route('admin.support.forum.categories.delete', $cat->id) }}" method="POST" class="d-inline" onsubmit="return confirm('هل أنت متأكد من حذف هذا القسم؟');">
+                                    <form action="{{ route('admin.support.forum.categories.delete', $cat->id) }}" method="POST" class="d-inline" onsubmit="return confirm('{{ __('support.confirm_delete_category') }}');">
                                         @csrf
-                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="حذف">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="{{ __('support.delete') }}">
                                             <i class="feather-trash-2"></i>
                                         </button>
                                     </form>
@@ -89,7 +89,7 @@
                     @empty
                         <tr>
                             <td colspan="6" class="text-center py-4 text-muted">
-                                لا توجد أقسام منتدى دعم مضافة حتى الآن.
+                                {{ __('support.no_categories_found') }}
                             </td>
                         </tr>
                     @endforelse
@@ -116,15 +116,15 @@
                 <div class="modal-body p-4">
                     <div class="mb-3">
                         <label class="form-label fw-bold">{{ __('support.category_name') }} <span class="text-danger">*</span></label>
-                        <input type="text" name="name" class="form-control" placeholder="مثال: مشاكل الدفع والسحب" required>
+                        <input type="text" name="name" class="form-control" placeholder="{{ __('support.category_name_placeholder') }}" required>
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-bold">{{ __('support.category_slug') }}</label>
-                        <input type="text" name="slug" class="form-control" placeholder="billing-issues (اختياري)">
+                        <input type="text" name="slug" class="form-control" placeholder="{{ __('support.category_slug_placeholder') }}">
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-bold">{{ __('support.category_desc') }}</label>
-                        <textarea name="description" rows="2" class="form-control" placeholder="وصف موجز لنوع الاستفسارات في هذا القسم"></textarea>
+                        <textarea name="description" rows="2" class="form-control" placeholder="{{ __('support.category_desc_placeholder') }}"></textarea>
                     </div>
                     <div class="row g-2 mb-3">
                         <div class="col-6">
@@ -150,8 +150,8 @@
                     </div>
                 </div>
                 <div class="modal-footer border-0 pt-0 px-4 pb-4">
-                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">إلغاء</button>
-                    <button type="submit" class="btn btn-primary fw-bold px-4">إضافة القسم</button>
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ __('support.cancel') }}</button>
+                    <button type="submit" class="btn btn-primary fw-bold px-4">{{ __('support.add_category_btn') }}</button>
                 </div>
             </form>
         </div>
@@ -208,8 +208,8 @@
                     </div>
                 </div>
                 <div class="modal-footer border-0 pt-0 px-4 pb-4">
-                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">إلغاء</button>
-                    <button type="submit" class="btn btn-primary fw-bold px-4">حفظ التعديلات</button>
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ __('support.cancel') }}</button>
+                    <button type="submit" class="btn btn-primary fw-bold px-4">{{ __('support.save_changes') }}</button>
                 </div>
             </form>
         </div>

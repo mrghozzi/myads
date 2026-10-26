@@ -511,7 +511,7 @@
                 <p class="support-cat-desc">{{ $cat->description }}</p>
                 <div class="support-cat-footer">
                     <span>{{ __('support.topics_count', ['count' => $cat->topics_count]) }}</span>
-                    <span><i class="fa-solid fa-arrow-left"></i></span>
+                    <span><i class="fa-solid {{ app()->getLocale() === 'ar' ? 'fa-arrow-left' : 'fa-arrow-right' }}"></i></span>
                 </div>
             </a>
         @endforeach
@@ -590,11 +590,11 @@
                     <div class="support-topic-stats">
                         <div class="support-counter-box">
                             <span class="support-counter-num">{{ $topic->replies_count }}</span>
-                            <span class="support-counter-label">{{ __('support.replies_count', ['count' => '']) }}</span>
+                            <span class="support-counter-label">{{ __('support.replies') }}</span>
                         </div>
                         <div class="support-counter-box">
                             <span class="support-counter-num">{{ $topic->views_count }}</span>
-                            <span class="support-counter-label">{{ __('support.views_count', ['count' => '']) }}</span>
+                            <span class="support-counter-label">{{ __('support.views') }}</span>
                         </div>
                     </div>
                 </a>

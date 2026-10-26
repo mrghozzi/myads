@@ -8,7 +8,7 @@
         <div>
             <div class="d-flex align-items-center gap-2 mb-1">
                 <a href="{{ route('admin.tickets.index') }}" class="btn btn-sm btn-light border text-muted">
-                    <i class="feather-arrow-right"></i> {{ __('support.admin_support_management') }}
+                    <i class="{{ app()->getLocale() === 'ar' ? 'feather-arrow-right' : 'feather-arrow-left' }}"></i> {{ __('support.admin_support_management') }}
                 </a>
             </div>
             <h3 class="fw-bold mb-0 text-dark">
@@ -32,12 +32,12 @@
         <div class="card-body p-3">
             <form action="{{ route('admin.support.forum.topics') }}" method="GET" class="row g-2 align-items-center">
                 <div class="col-md-5">
-                    <input type="text" name="search" value="{{ request('search') }}" class="form-control" placeholder="بحث بعنوان السؤال أو الاستفسار...">
+                    <input type="text" name="search" value="{{ request('search') }}" class="form-control" placeholder="{{ __('support.search_topics_placeholder') }}">
                 </div>
 
                 <div class="col-md-4">
                     <select name="category_id" class="form-select">
-                        <option value="">-- كافة الأقسام --</option>
+                        <option value="">{{ __('support.all_departments') }}</option>
                         @foreach($categories as $c)
                             <option value="{{ $c->id }}" {{ request('category_id') == $c->id ? 'selected' : '' }}>{{ $c->name }}</option>
                         @endforeach
@@ -46,10 +46,10 @@
 
                 <div class="col-md-3 d-flex gap-2">
                     <button type="submit" class="btn btn-primary w-100">
-                        <i class="feather-filter me-1"></i> تصفية
+                        <i class="feather-filter me-1"></i> {{ __('support.filter') }}
                     </button>
                     @if(request()->hasAny(['search', 'category_id']))
-                        <a href="{{ route('admin.support.forum.topics') }}" class="btn btn-outline-secondary" title="إلغاء التصفية">
+                        <a href="{{ route('admin.support.forum.topics') }}" class="btn btn-outline-secondary" title="{{ __('support.clear_filter') }}">
                             <i class="feather-x"></i>
                         </a>
                     @endif
@@ -64,12 +64,12 @@
             <table class="table table-hover align-middle mb-0">
                 <thead class="bg-light">
                     <tr>
-                        <th class="ps-4">عنوان الموضوع</th>
-                        <th>القسم</th>
-                        <th>الكاتب</th>
-                        <th>الحالة</th>
-                        <th>الردود / المشاهدات</th>
-                        <th>التاريخ</th>
+                        <th class="ps-4">{{ __('support.topic_title') }}</th>
+                        <th>{{ __('support.category') }}</th>
+                        <th>{{ __('support.author') }}</th>
+                        <th>{{ __('support.status') }}</th>
+                        <th>{{ __('support.replies_and_views') }}</th>
+                        <th>{{ __('support.date') }}</th>
                         <th class="text-end pe-4">{{ __('support.actions') }}</th>
                     </tr>
                 </thead>
@@ -81,10 +81,10 @@
                                     {{ $t->title }}
                                 </a>
                                 @if($t->is_pinned)
-                                    <span class="badge bg-primary bg-opacity-10 text-primary ms-1"><i class="feather-anchor"></i> مثبت</span>
+                                    <span class="badge bg-primary bg-opacity-10 text-primary ms-1"><i class="feather-anchor"></i> {{ __('support.pinned') }}</span>
                                 @endif
                                 @if($t->is_locked)
-                                    <span class="badge bg-warning bg-opacity-10 text-warning ms-1"><i class="feather-lock"></i> مغلق</span>
+                                    <span class="badge bg-warning bg-opacity-10 text-warning ms-1"><i class="feather-lock"></i> {{ __('support.locked') }}</span>
                                 @endif
                             </td>
                             <td>
@@ -119,25 +119,25 @@
                             </td>
                             <td class="text-end pe-4">
                                 <div class="btn-group">
-                                    <a href="{{ route('support.topic', ['id' => $t->id, 'slug' => $t->slug]) }}" target="_blank" class="btn btn-sm btn-outline-secondary" title="معاينة في الموقع">
+                                    <a href="{{ route('support.topic', ['id' => $t->id, 'slug' => $t->slug]) }}" target="_blank" class="btn btn-sm btn-outline-secondary" title="{{ __('support.preview_on_site') }}">
                                         <i class="feather-external-link"></i>
                                     </a>
                                     <form action="{{ route('admin.support.forum.topics.pin', $t->id) }}" method="POST" class="d-inline">
                                         @csrf
-                                        <button type="submit" class="btn btn-sm {{ $t->is_pinned ? 'btn-primary' : 'btn-outline-primary' }}" title="{{ $t->is_pinned ? 'إلغاء التثبيت' : 'تثبيت' }}">
+                                        <button type="submit" class="btn btn-sm {{ $t->is_pinned ? 'btn-primary' : 'btn-outline-primary' }}" title="{{ $t->is_pinned ? __('support.unpin_topic') : __('support.pin_topic') }}">
                                             <i class="feather-anchor"></i>
                                         </button>
                                     </form>
                                     <form action="{{ route('admin.support.forum.topics.lock', $t->id) }}" method="POST" class="d-inline">
                                         @csrf
-                                        <button type="submit" class="btn btn-sm {{ $t->is_locked ? 'btn-warning' : 'btn-outline-warning' }}" title="{{ $t->is_locked ? 'فتح الموضوع' : 'إغلاق الموضوع' }}">
+                                        <button type="submit" class="btn btn-sm {{ $t->is_locked ? 'btn-warning' : 'btn-outline-warning' }}" title="{{ $t->is_locked ? __('support.unlock_topic') : __('support.lock_topic') }}">
                                             <i class="feather-lock"></i>
                                         </button>
                                     </form>
-                                    <form action="{{ route('admin.support.forum.topics.delete', $t->id) }}" method="POST" class="d-inline" onsubmit="return confirm('هل أنت متأكد من حذف هذا الموضوع وجميع الردود التابعة له؟');">
+                                    <form action="{{ route('admin.support.forum.topics.delete', $t->id) }}" method="POST" class="d-inline" onsubmit="return confirm('{{ __('support.confirm_delete_topic') }}');">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="حذف">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="{{ __('support.delete') }}">
                                             <i class="feather-trash-2"></i>
                                         </button>
                                     </form>
@@ -147,7 +147,7 @@
                     @empty
                         <tr>
                             <td colspan="7" class="text-center py-4 text-muted">
-                                لا توجد مواضيع دعم تطابق معايير البحث.
+                                {{ __('support.no_topics_found') }}
                             </td>
                         </tr>
                     @endforelse

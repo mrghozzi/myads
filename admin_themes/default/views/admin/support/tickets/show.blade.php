@@ -8,18 +8,18 @@
         <div>
             <div class="d-flex align-items-center gap-2 mb-1">
                 <a href="{{ route('admin.tickets.index') }}" class="btn btn-sm btn-light border text-muted">
-                    <i class="feather-arrow-right"></i> العودة للتذاكر
+                    <i class="{{ app()->getLocale() === 'ar' ? 'feather-arrow-right' : 'feather-arrow-left' }}"></i> {{ __('support.back_to_tickets') }}
                 </a>
                 <span class="badge bg-primary font-monospace fs-7">#{{ $ticket->ticket_number }}</span>
             </div>
             <h3 class="fw-bold mb-0 text-dark">{{ $ticket->subject }}</h3>
         </div>
         <div class="d-flex gap-2">
-            <form action="{{ route('admin.tickets.delete', $ticket->id) }}" method="POST" onsubmit="return confirm('هل أنت متأكد من حذف هذه التذكرة؟');">
+            <form action="{{ route('admin.tickets.delete', $ticket->id) }}" method="POST" onsubmit="return confirm('{{ __('support.confirm_delete_ticket') }}');">
                 @csrf
                 @method('DELETE')
                 <button type="submit" class="btn btn-outline-danger">
-                    <i class="feather-trash-2 me-1"></i> حذف التذكرة
+                    <i class="feather-trash-2 me-1"></i> {{ __('support.delete_ticket') }}
                 </button>
             </form>
         </div>
@@ -59,7 +59,7 @@
                                                         <i class="feather-shield me-1"></i> {{ __('support.staff_member') }}
                                                     </span>
                                                 @else
-                                                    <span class="badge bg-secondary fs-8">صاحب التذكرة</span>
+                                                    <span class="badge bg-secondary fs-8">{{ __('support.ticket_owner') }}</span>
                                                 @endif
                                             </div>
                                             <div class="text-muted small" style="font-size: 0.78rem;">
@@ -76,7 +76,7 @@
                                 @if($msg->attachment)
                                     <div class="mt-3 pt-2 border-top border-secondary border-opacity-10">
                                         <a href="{{ asset('storage/' . $msg->attachment) }}" target="_blank" class="btn btn-sm btn-light border">
-                                            <i class="feather-paperclip me-1 text-primary"></i> عرض المرفق المرفوع
+                                            <i class="feather-paperclip me-1 text-primary"></i> {{ __('support.view_attachment') }}
                                         </a>
                                     </div>
                                 @endif
@@ -100,7 +100,7 @@
 
                         <div class="mb-3">
                             <label class="form-label fw-bold">{{ __('support.message') }}</label>
-                            <textarea name="message" rows="5" class="form-control" placeholder="اكتب ردك الرسمي للعضو هنا..." required></textarea>
+                            <textarea name="message" rows="5" class="form-control" placeholder="{{ __('support.admin_reply_placeholder') }}" required></textarea>
                         </div>
 
                         <div class="row g-3 align-items-center mb-3">
@@ -121,7 +121,7 @@
                         </div>
 
                         <button type="submit" class="btn btn-primary px-4 py-2 fw-bold">
-                            <i class="feather-send me-1"></i> إرسال الرد وإشعار العضو
+                            <i class="feather-send me-1"></i> {{ __('support.send_reply_and_notify') }}
                         </button>
                     </form>
                 </div>
@@ -164,7 +164,7 @@
                         </div>
 
                         <button type="submit" class="btn btn-outline-primary btn-sm w-100 mb-3">
-                            <i class="feather-save me-1"></i> حفظ وتحديث الحالة
+                            <i class="feather-save me-1"></i> {{ __('support.save_and_update_status') }}
                         </button>
                     </form>
 
@@ -193,7 +193,7 @@
             <div class="card border-0 shadow-sm rounded-4">
                 <div class="card-header bg-white p-4 border-0 pb-0">
                     <h5 class="fw-bold mb-0 text-dark">
-                        <i class="feather-user text-primary me-2"></i> بيانات صاحب التذكرة
+                        <i class="feather-user text-primary me-2"></i> {{ __('support.ticket_owner_info') }}
                     </h5>
                 </div>
 
@@ -206,19 +206,19 @@
 
                     <div class="d-flex justify-content-around bg-light rounded-3 p-3 mb-3 text-center">
                         <div>
-                            <div class="text-muted small">رصيد النقاط</div>
+                            <div class="text-muted small">{{ __('support.pts_balance') }}</div>
                             <div class="fw-bold text-primary">{{ number_format($ticket->user->pts ?? 0) }}</div>
                         </div>
                         <div class="border-end"></div>
                         <div>
-                            <div class="text-muted small">المشاهدات</div>
+                            <div class="text-muted small">{{ __('support.views') }}</div>
                             <div class="fw-bold text-success">{{ number_format($ticket->user->vu ?? 0) }}</div>
                         </div>
                     </div>
 
                     @if(!empty($ticket->user->id))
                         <a href="{{ route('admin.users.edit', $ticket->user->id) }}" class="btn btn-outline-secondary btn-sm w-100" target="_blank">
-                            <i class="feather-external-link me-1"></i> ملف العضو في لوحة الإدارة
+                            <i class="feather-external-link me-1"></i> {{ __('support.user_profile_admin') }}
                         </a>
                     @endif
                 </div>

@@ -92,12 +92,12 @@
         <div class="card-body p-3">
             <form action="{{ route('admin.tickets.index') }}" method="GET" class="row g-2 align-items-center">
                 <div class="col-md-3">
-                    <input type="text" name="search" value="{{ request('search') }}" class="form-control" placeholder="بحث برقم التذكرة أو الموضوع أو العضو...">
+                    <input type="text" name="search" value="{{ request('search') }}" class="form-control" placeholder="{{ __('support.search_tickets_placeholder') }}">
                 </div>
 
                 <div class="col-md-3">
                     <select name="status" class="form-select">
-                        <option value="">-- كافة الحالات --</option>
+                        <option value="">{{ __('support.all_statuses') }}</option>
                         <option value="open" {{ request('status') === 'open' ? 'selected' : '' }}>{{ __('support.status_open') }}</option>
                         <option value="in_progress" {{ request('status') === 'in_progress' ? 'selected' : '' }}>{{ __('support.status_in_progress') }}</option>
                         <option value="answered" {{ request('status') === 'answered' ? 'selected' : '' }}>{{ __('support.status_answered') }}</option>
@@ -108,7 +108,7 @@
 
                 <div class="col-md-2">
                     <select name="department" class="form-select">
-                        <option value="">-- كافة الأقسام --</option>
+                        <option value="">{{ __('support.all_departments') }}</option>
                         <option value="technical" {{ request('department') === 'technical' ? 'selected' : '' }}>{{ __('support.dept_technical') }}</option>
                         <option value="billing" {{ request('department') === 'billing' ? 'selected' : '' }}>{{ __('support.dept_billing') }}</option>
                         <option value="account" {{ request('department') === 'account' ? 'selected' : '' }}>{{ __('support.dept_account') }}</option>
@@ -118,7 +118,7 @@
 
                 <div class="col-md-2">
                     <select name="priority" class="form-select">
-                        <option value="">-- الأولوية --</option>
+                        <option value="">{{ __('support.all_priorities') }}</option>
                         <option value="urgent" {{ request('priority') === 'urgent' ? 'selected' : '' }}>{{ __('support.priority_urgent') }}</option>
                         <option value="high" {{ request('priority') === 'high' ? 'selected' : '' }}>{{ __('support.priority_high') }}</option>
                         <option value="medium" {{ request('priority') === 'medium' ? 'selected' : '' }}>{{ __('support.priority_medium') }}</option>
@@ -128,10 +128,10 @@
 
                 <div class="col-md-2 d-flex gap-2">
                     <button type="submit" class="btn btn-primary w-100">
-                        <i class="feather-filter me-1"></i> تصفية
+                        <i class="feather-filter me-1"></i> {{ __('support.filter') }}
                     </button>
                     @if(request()->hasAny(['search', 'status', 'department', 'priority']))
-                        <a href="{{ route('admin.tickets.index') }}" class="btn btn-outline-secondary" title="إلغاء التصفية">
+                        <a href="{{ route('admin.tickets.index') }}" class="btn btn-outline-secondary" title="{{ __('support.clear_filter') }}">
                             <i class="feather-x"></i>
                         </a>
                     @endif
@@ -147,7 +147,7 @@
                 <thead class="bg-light">
                     <tr>
                         <th class="ps-4">{{ __('support.ticket_number') }}</th>
-                        <th>العضو</th>
+                        <th>{{ __('support.member') }}</th>
                         <th>{{ __('support.subject') }}</th>
                         <th>{{ __('support.department') }}</th>
                         <th>{{ __('support.priority') }}</th>
@@ -181,7 +181,7 @@
                                     {{ $t->subject }}
                                 </a>
                                 <div class="text-muted small">
-                                    <i class="feather-message-square me-1"></i> {{ $t->messages->count() }} رسائل
+                                    <i class="feather-message-square me-1"></i> {{ $t->messages->count() }} {{ __('support.messages') }}
                                 </div>
                             </td>
                             <td>
@@ -218,13 +218,13 @@
                             </td>
                             <td class="text-end pe-4">
                                 <div class="btn-group">
-                                    <a href="{{ route('admin.tickets.show', $t->id) }}" class="btn btn-sm btn-outline-primary" title="عرض ومراسلة">
+                                    <a href="{{ route('admin.tickets.show', $t->id) }}" class="btn btn-sm btn-outline-primary" title="{{ __('support.view_ticket') }}">
                                         <i class="feather-eye"></i>
                                     </a>
-                                    <form action="{{ route('admin.tickets.delete', $t->id) }}" method="POST" class="d-inline" onsubmit="return confirm('هل أنت متأكد من حذف هذه التذكرة نهائياً؟');">
+                                    <form action="{{ route('admin.tickets.delete', $t->id) }}" method="POST" class="d-inline" onsubmit="return confirm('{{ __('support.confirm_delete_ticket') }}');">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="حذف">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="{{ __('support.delete') }}">
                                             <i class="feather-trash-2"></i>
                                         </button>
                                     </form>
@@ -235,7 +235,7 @@
                         <tr>
                             <td colspan="8" class="text-center py-5 text-muted">
                                 <i class="feather-inbox fs-1 d-block mb-2 text-secondary"></i>
-                                لا توجد تذاكر دعم تطابق معايير البحث.
+                                {{ __('support.no_tickets_match') }}
                             </td>
                         </tr>
                     @endforelse

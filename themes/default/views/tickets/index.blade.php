@@ -276,7 +276,7 @@
     <!-- Breadcrumb -->
     <div class="crumbs">
         <a href="{{ route('help.index') }}"><i class="fa-solid fa-house"></i> {{ __('help.help_center') }}</a>
-        <i class="fa-solid fa-chevron-left" style="font-size: 0.75rem;"></i>
+        <i class="fa-solid {{ app()->getLocale() === 'ar' ? 'fa-chevron-left' : 'fa-chevron-right' }}" style="font-size: 0.75rem;"></i>
         <span>{{ __('support.support_tickets') }}</span>
     </div>
 
@@ -424,7 +424,7 @@
                             <td>
                                 <a href="{{ route('tickets.show', $ticket->ticket_number) }}" class="btn-view-ticket">
                                     <span>{{ __('support.view_ticket') }}</span>
-                                    <i class="fa-solid fa-arrow-left"></i>
+                                    <i class="fa-solid {{ app()->getLocale() === 'ar' ? 'fa-arrow-left' : 'fa-arrow-right' }}"></i>
                                 </a>
                             </td>
                         </tr>
@@ -439,10 +439,10 @@
             <div style="text-align: center; padding: 60px 20px; color: var(--myads-text-muted, #64748b);">
                 <i class="fa-solid fa-ticket-simple" style="font-size: 3rem; color: #cbd5e1; margin-bottom: 14px;"></i>
                 <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--myads-text-main, #1e293b); margin-bottom: 8px;">
-                    لا توجد أي تذاكر دعم مفتوحة حالياً
+                    {{ __('support.no_tickets_found') }}
                 </h3>
                 <p style="margin-bottom: 20px; font-size: 0.9rem;">
-                    إذا كنت بحاجة لمساعدة تقنية أو لديك استفسار بخصوص حسابك، يسعدنا تواصلك معنا مباشرة.
+                    {{ __('support.no_tickets_desc') }}
                 </p>
                 <a href="{{ route('tickets.create') }}" class="btn-create-ticket">
                     <i class="fa-solid fa-plus-circle"></i>

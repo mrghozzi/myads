@@ -166,7 +166,7 @@
     <!-- Breadcrumb -->
     <div class="crumbs">
         <a href="{{ route('support.index') }}"><i class="fa-solid fa-house"></i> {{ __('support.support_forum') }}</a>
-        <i class="fa-solid fa-chevron-left" style="font-size: 0.75rem;"></i>
+        <i class="fa-solid {{ app()->getLocale() === 'ar' ? 'fa-chevron-left' : 'fa-chevron-right' }}" style="font-size: 0.75rem;"></i>
         <span>{{ __('support.ask_question') }}</span>
     </div>
 
@@ -217,7 +217,7 @@
                            name="title"
                            id="title"
                            class="support-form-input"
-                           placeholder="مثال: كيف يمكنني ربط حساب بنكي لسحب رصيد النقاط؟"
+                           placeholder="{{ __('support.topic_title_placeholder') }}"
                            value="{{ old('title') }}"
                            required>
                 </div>
@@ -229,7 +229,7 @@
                     <textarea name="content"
                               id="content"
                               class="support-form-textarea"
-                              placeholder="اشرح مشكلتك أو استفسارك بالتفصيل مع ذكر الخطوات التي قمت بها..."
+                              placeholder="{{ __('support.topic_content_placeholder') }}"
                               required>{{ old('content') }}</textarea>
                 </div>
 
@@ -245,34 +245,34 @@
             <div class="support-tips-card">
                 <h3 class="support-tips-title">
                     <i class="fa-solid fa-lightbulb" style="color: #f59e0b;"></i>
-                    نصائح لكتابة سؤال واضح
+                    {{ __('support.question_guidelines') }}
                 </h3>
                 <ul class="support-tips-list">
                     <li>
                         <i class="fa-solid fa-circle-check"></i>
-                        <span>اختر عنواناً محدداً وموجزاً يلخص صلب المشكلة أو الاستفسار.</span>
+                        <span>{{ __('support.tip_title_specific') }}</span>
                     </li>
                     <li>
                         <i class="fa-solid fa-circle-check"></i>
-                        <span>حدد القسم الصحيح ليتمكن الأعضاء وفريق الدعم المتخصص من إجابتك بسرعة.</span>
+                        <span>{{ __('support.tip_dept_accurate') }}</span>
                     </li>
                     <li>
                         <i class="fa-solid fa-circle-check"></i>
-                        <span>قدم شرحاً كافياً وتجنب الكلمات الغامضة أو العناوين غير الدقيقة مثل "ساعدوني".</span>
+                        <span>{{ __('support.tip_clear_description') }}</span>
                     </li>
                     <li>
                         <i class="fa-solid fa-circle-check"></i>
-                        <span>لا تشارك أي معلومات حساسة ككلمات المرور أو المفاتيح السرية في منتدى الدعم العام.</span>
+                        <span>{{ __('support.tip_no_passwords') }}</span>
                     </li>
                 </ul>
 
                 <div style="margin-top: 24px; padding-top: 18px; border-top: 1px solid rgba(97, 93, 250, 0.15); text-align: center;">
                     <p style="font-size: 0.85rem; color: var(--myads-text-muted, #64748b); margin-bottom: 12px;">
-                        هل مسألتك خاصة أو تتعلق ببيانات سرية وحسابات مالية؟
+                        {{ __('support.is_private_issue') }}
                     </p>
                     <a href="{{ route('tickets.create') }}" style="color: var(--myads-primary, #615dfa); font-weight: 700; text-decoration: none; font-size: 0.88rem; display: inline-flex; align-items: center; gap: 6px;">
                         <i class="fa-solid fa-ticket"></i>
-                        <span>افتح تذكرة دعم فني خاصة</span>
+                        <span>{{ __('support.open_private_ticket') }}</span>
                     </a>
                 </div>
             </div>

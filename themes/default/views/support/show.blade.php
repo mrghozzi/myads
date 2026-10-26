@@ -340,10 +340,10 @@
     <!-- Breadcrumb -->
     <div class="crumbs">
         <a href="{{ route('support.index') }}"><i class="fa-solid fa-house"></i> {{ __('support.support_forum') }}</a>
-        <i class="fa-solid fa-chevron-left" style="font-size: 0.75rem;"></i>
+        <i class="fa-solid {{ app()->getLocale() === 'ar' ? 'fa-chevron-left' : 'fa-chevron-right' }}" style="font-size: 0.75rem;"></i>
         @if($topic->category)
             <a href="{{ route('support.category', $topic->category->slug) }}">{{ $topic->category->name }}</a>
-            <i class="fa-solid fa-chevron-left" style="font-size: 0.75rem;"></i>
+            <i class="fa-solid {{ app()->getLocale() === 'ar' ? 'fa-chevron-left' : 'fa-chevron-right' }}" style="font-size: 0.75rem;"></i>
         @endif
         <span>#{{ $topic->id }}</span>
     </div>
@@ -483,7 +483,7 @@
             @empty
                 <div style="background: var(--myads-surface, #ffffff); border-radius: 16px; padding: 24px; text-align: center; color: var(--myads-text-muted, #64748b); border: 1px dashed var(--myads-surface-border, #cbd5e1);">
                     <i class="fa-solid fa-comment-dots" style="font-size: 2rem; margin-bottom: 8px; color: #cbd5e1;"></i>
-                    <p style="margin: 0;">لا توجد أي ردود حتى الآن. كن أول من يساعد بالإجابة!</p>
+                    <p style="margin: 0;">{{ __('support.no_replies_yet') }}</p>
                 </div>
             @endforelse
 
@@ -506,13 +506,13 @@
                     </div>
                 @else
                     <div style="padding: 16px; background: rgba(245, 158, 11, 0.1); border-radius: 14px; color: #d97706; font-weight: 700; margin-top: 20px; text-align: center;">
-                        <i class="fa-solid fa-lock"></i> هذا الموضوع مغلق ولا يقبل ردوداً جديدة.
+                        <i class="fa-solid fa-lock"></i> {{ __('support.topic_locked_notice') }}
                     </div>
                 @endif
             @else
                 <div style="padding: 24px; background: var(--myads-surface, #ffffff); border-radius: 18px; text-align: center; margin-top: 24px; border: 1px solid var(--myads-surface-border, #e2e8f0);">
                     <p style="color: var(--myads-text-muted, #64748b); margin-bottom: 12px; font-weight: 600;">
-                        يرجى تسجيل الدخول لتتمكن من إضافة إجابتك أو استفسارك.
+                        {{ __('support.login_to_reply') }}
                     </p>
                     <a href="{{ route('login') }}" class="btn-reply-submit">
                         <i class="fa-solid fa-arrow-right-to-bracket"></i>
@@ -528,12 +528,12 @@
                 <div class="sidebar-box">
                     <h4 class="sidebar-title">
                         <i class="fa-solid fa-signs-post" style="color: var(--myads-primary, #615dfa);"></i>
-                        أسئلة مشابهة في نفس القسم
+                        {{ __('support.related_questions') }}
                     </h4>
                     <div class="related-list">
                         @foreach($relatedTopics as $rel)
                             <a href="{{ route('support.topic', ['id' => $rel->id, 'slug' => $rel->slug]) }}">
-                                <i class="fa-solid fa-arrow-left" style="font-size: 0.75rem; color: #94a3b8; margin-left: 4px;"></i>
+                                <i class="fa-solid {{ app()->getLocale() === 'ar' ? 'fa-arrow-left' : 'fa-arrow-right' }}" style="font-size: 0.75rem; color: #94a3b8; margin-left: 4px;"></i>
                                 {{ $rel->title }}
                             </a>
                         @endforeach
@@ -544,10 +544,10 @@
             <div class="sidebar-box" style="background: linear-gradient(135deg, rgba(97, 93, 250, 0.08) 0%, rgba(35, 210, 226, 0.06) 100%); border-color: rgba(97, 93, 250, 0.2);">
                 <h4 class="sidebar-title">
                     <i class="fa-solid fa-headset" style="color: var(--myads-primary, #615dfa);"></i>
-                    لم تجد حلاً لمشكلتك؟
+                    {{ __('support.cant_find_solution') }}
                 </h4>
                 <p style="font-size: 0.88rem; color: var(--myads-text-muted, #64748b); line-height: 1.5; margin-bottom: 16px;">
-                    يمكنك فتح تذكرة دعم فني مباشرة مع فريق الإدارة لمتابعة المسائل المالية والتقنية الخاصة.
+                    {{ __('support.cant_find_solution_desc') }}
                 </p>
                 <a href="{{ route('tickets.create') }}" style="background: linear-gradient(135deg, #615dfa 0%, #4e4ac8 100%); color: #ffffff; padding: 10px 20px; border-radius: 9999px; text-decoration: none; font-weight: 700; font-size: 0.88rem; display: inline-flex; align-items: center; gap: 8px;">
                     <i class="fa-solid fa-ticket"></i>

@@ -302,7 +302,7 @@
     <!-- Breadcrumb -->
     <div class="crumbs">
         <a href="{{ route('tickets.index') }}"><i class="fa-solid fa-ticket"></i> {{ __('support.my_tickets') }}</a>
-        <i class="fa-solid fa-chevron-left" style="font-size: 0.75rem;"></i>
+        <i class="fa-solid {{ app()->getLocale() === 'ar' ? 'fa-chevron-left' : 'fa-chevron-right' }}" style="font-size: 0.75rem;"></i>
         <span>#{{ $ticket->ticket_number }}</span>
     </div>
 
@@ -383,7 +383,7 @@
                                 <div class="ticket-attachment-box">
                                     <a href="{{ asset('storage/' . $msg->attachment) }}" target="_blank" class="attachment-link">
                                         <i class="fa-solid fa-paperclip"></i>
-                                        <span>عرض أو تحميل المرفق</span>
+                                        <span>{{ __('support.view_attachment') }}</span>
                                     </a>
                                 </div>
                             @endif
@@ -426,7 +426,7 @@
                     </p>
                     <form action="{{ route('tickets.reply', $ticket->ticket_number) }}" method="POST">
                         @csrf
-                        <input type="hidden" name="message" value="أرغب في إعادة فتح هذه التذكرة لمتابعة الاستفسار.">
+                        <input type="hidden" name="message" value="{{ __('support.reopen_default_message') }}">
                         <button type="submit" class="btn-ticket-reply">
                             <i class="fa-solid fa-lock-open"></i>
                             <span>{{ __('support.reopen_ticket') }}</span>
@@ -479,7 +479,7 @@
                 </div>
 
                 @if(!$ticket->isClosed())
-                    <form action="{{ route('tickets.close', $ticket->ticket_number) }}" method="POST" onsubmit="return confirm('هل أنت متأكد من رغبتك في إغلاق هذه التذكرة؟');">
+                    <form action="{{ route('tickets.close', $ticket->ticket_number) }}" method="POST" onsubmit="return confirm('{{ __('support.confirm_close_ticket') }}');">
                         @csrf
                         <button type="submit" class="btn-close-ticket">
                             <i class="fa-solid fa-circle-check"></i>
@@ -492,17 +492,17 @@
             <div class="ticket-info-card" style="background: linear-gradient(135deg, rgba(97, 93, 250, 0.08) 0%, rgba(35, 210, 226, 0.06) 100%);">
                 <h4 class="ticket-info-title">
                     <i class="fa-solid fa-headset" style="color: var(--myads-primary, #615dfa);"></i>
-                    مركز المساعدة والمنتدى
+                    {{ __('support.help_and_forum_box') }}
                 </h4>
                 <p style="font-size: 0.88rem; color: var(--myads-text-muted, #64748b); line-height: 1.5; margin-bottom: 14px;">
-                    يمكنك أيضاً البحث في الشروحات التوثيقية أو طرح أسئلتك في منتدى الدعم العام.
+                    {{ __('support.help_and_forum_desc') }}
                 </p>
                 <div style="display: flex; flex-direction: column; gap: 8px;">
                     <a href="{{ route('support.index') }}" style="color: var(--myads-primary, #615dfa); font-weight: 700; text-decoration: none; font-size: 0.88rem;">
-                        <i class="fa-solid fa-comments"></i> منتدى الدعم الفني
+                        <i class="fa-solid fa-comments"></i> {{ __('support.support_forum') }}
                     </a>
                     <a href="{{ route('help.index') }}" style="color: var(--myads-primary, #615dfa); font-weight: 700; text-decoration: none; font-size: 0.88rem;">
-                        <i class="fa-solid fa-book-bookmark"></i> مركز المساعدة والتوثيق
+                        <i class="fa-solid fa-book-bookmark"></i> {{ __('help.help_center') }}
                     </a>
                 </div>
             </div>

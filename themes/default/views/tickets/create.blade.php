@@ -189,7 +189,7 @@
     <!-- Breadcrumb -->
     <div class="crumbs">
         <a href="{{ route('tickets.index') }}"><i class="fa-solid fa-ticket"></i> {{ __('support.my_tickets') }}</a>
-        <i class="fa-solid fa-chevron-left" style="font-size: 0.75rem;"></i>
+        <i class="fa-solid {{ app()->getLocale() === 'ar' ? 'fa-chevron-left' : 'fa-chevron-right' }}" style="font-size: 0.75rem;"></i>
         <span>{{ __('support.open_new_ticket') }}</span>
     </div>
 
@@ -254,7 +254,7 @@
                            name="subject"
                            id="subject"
                            class="ticket-form-input"
-                           placeholder="مثال: استفسار بخصوص عدم وصول دفعة أرباح الإعلانات الذكية"
+                           placeholder="{{ __('support.subject_placeholder') }}"
                            value="{{ old('subject') }}"
                            required>
                 </div>
@@ -266,7 +266,7 @@
                     <textarea name="message"
                               id="message"
                               class="ticket-form-textarea"
-                              placeholder="اشرح مشكلتك بدقة، اذكر أرقام العمليات أو الصفحات أو رسائل الخطأ التي ظهرت لك..."
+                              placeholder="{{ __('support.message_placeholder') }}"
                               required>{{ old('message') }}</textarea>
                 </div>
 
@@ -292,34 +292,34 @@
             <div class="ticket-sidebar-box">
                 <h3 class="ticket-sidebar-title">
                     <i class="fa-solid fa-shield-check" style="color: #10b981;"></i>
-                    إرشادات الدعم الفني
+                    {{ __('support.support_guidelines') }}
                 </h3>
                 <ul class="ticket-sidebar-list">
                     <li>
                         <i class="fa-solid fa-circle-check"></i>
-                        <span>تأكد من اختيار القسم المعني بشكل صحيح لسرعة تحويل تذكرتك للمسؤول المختص.</span>
+                        <span>{{ __('support.guide_dept_correct') }}</span>
                     </li>
                     <li>
                         <i class="fa-solid fa-circle-check"></i>
-                        <span>إرفاق لقطة شاشة توضيحية يساعد فريق الدعم على فحص المشكلة وحلها فوراً.</span>
+                        <span>{{ __('support.guide_attach_screenshot') }}</span>
                     </li>
                     <li>
                         <i class="fa-solid fa-circle-check"></i>
-                        <span>ستتلقى إشعاراً فورياً في حسابك بمجرد قيام فريق الدعم بالرد على تذكرتك.</span>
+                        <span>{{ __('support.guide_instant_notification') }}</span>
                     </li>
                     <li>
                         <i class="fa-solid fa-circle-check"></i>
-                        <span>متوسط وقت الرد على التذاكر يتراوح بين دقائق معدودة إلى 24 ساعة كحد أقصى.</span>
+                        <span>{{ __('support.guide_response_time') }}</span>
                     </li>
                 </ul>
 
                 <div style="margin-top: 24px; padding-top: 18px; border-top: 1px solid rgba(97, 93, 250, 0.15); text-align: center;">
                     <p style="font-size: 0.85rem; color: var(--myads-text-muted, #64748b); margin-bottom: 12px;">
-                        هل تبحث عن إجابات عامة سريعة من المجتمع؟
+                        {{ __('support.looking_for_community') }}
                     </p>
                     <a href="{{ route('support.index') }}" style="color: var(--myads-primary, #615dfa); font-weight: 700; text-decoration: none; font-size: 0.88rem; display: inline-flex; align-items: center; gap: 6px;">
                         <i class="fa-solid fa-comments"></i>
-                        <span>تصفح منتدى الدعم الفني</span>
+                        <span>{{ __('support.browse_support_forum') }}</span>
                     </a>
                 </div>
             </div>
