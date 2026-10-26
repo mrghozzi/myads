@@ -54,24 +54,33 @@
         }
 
         .help-search-input {
-            flex: 1;
+            flex: 1 1 auto;
+            min-width: 0;
+            width: auto;
             border: none;
             outline: none;
             background: transparent;
             font-size: 1rem;
             color: var(--myads-text-main, #1e293b);
-            padding: 8px;
+            padding: 8px 12px;
         }
 
         .help-search-btn {
+            width: auto !important;
+            flex: 0 0 auto !important;
+            white-space: nowrap;
             background: linear-gradient(135deg, #615dfa 0%, #4e4ac8 100%);
             color: #ffffff;
             border: none;
-            padding: 10px 24px;
+            padding: 10px 22px;
             border-radius: 9999px;
             font-weight: 700;
             font-size: 0.9rem;
             cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
         }
 
         .help-search-layout {
