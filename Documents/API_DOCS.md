@@ -29,6 +29,7 @@ The MYADS v4.6.4 API ecosystem delivers high-performance, secure, and extensible
 15. **Referral Tracking & Growth Engine (`?ref=`, `/ads/referrals`, `/referral`):** Global referral capture with 30-day cookie persistence (`CaptureReferral`), multi-format identifier resolution (username, Public UID, ID), anti-fraud self-referral protection, and two-sided bonus allocation (+10 PTS referee welcome bonus, +10 PTS referrer reward).
 16. **Clips 2.0 Short-Form Vertical Video Engine (`/api/clips/*`, `/clips/*`):** TikTok/Reels-style vertical video discovery with feed tabs (`latest`, `trending`, `following`), deep-link targeting, continuous watch view recording (`POST /api/clips/view`), double-tap heart pops, and saved clips collections.
 17. **Directory 2.0 & Developer Upvoting Platform (`/directory/*`, `/api/directory/*`):** Web discovery and curation suite featuring community upvoting (`POST /directory/{id}/upvote`), dynamic SVG badges (`/directory/{id}/badge`), ownership claim verification (`POST /directory/{id}/claim`), and Schema.org JSON-LD structured data.
+18. **Dedicated Support Forum & Technical Support Tickets System (`/support/*`, `/tickets/*`, `/admin/tickets/*`, `/admin/support/*`):** Autonomous, enterprise support ecosystem separating public community discussions from direct technical tickets. Features dedicated support categories, solution marking (`is_solution`), collision-free ticket reference codes (`TKT-YYYYMMDD-XXXX`), 4-department/priority workflows, secure file attachments, and notification webhooks.
 
 ---
 
@@ -1382,6 +1383,104 @@ Referral counts automatically increment badge progress and award bonus PTS upon 
 | `referral_legend` | 500 Referrals | +15,000 PTS | Referral Legend |
 
 - Milestone badges are queryable via `GET /api/settings/badges` and `GET /api/developer/v1/me/badges`.
+
+---
+
+### R. Dedicated Support Forum & Technical Support Tickets System (v4.6.4)
+
+The Support Ecosystem provides two complementary channels: a public knowledge-sharing Support Forum (`/support`) and a private Technical Support Tickets System (`/tickets`).
+
+#### 1. Support Forum Endpoints
+
+##### A. Browse Support Categories & Topics
+- `GET /support`: Renders support forum homepage.
+  - **Query Parameters:** `page` (int, default 1), `filter` (`latest` | `unsolved` | `solved`).
+  - **Returns:** Paginated active categories (`support_categories`), pinned topics, and categorized discussions.
+
+##### B. Filter by Category
+- `GET /support/category/{slug}`:
+  - **Parameters:** `slug` (string, e.g. `technical-questions`, `billing-payments`).
+  - **Query Parameters:** `page` (int), `status` (`all` | `unsolved` | `solved`).
+
+##### C. Submit Support Question
+- `POST /support/ask`: (Auth required)
+  - **Payload:**
+    ```json
+    {
+        "title": "How to configure custom webhook endpoints?",
+        "category_id": 2,
+        "content": "Detailed question markdown or HTML text..."
+    }
+    ```
+  - **Validation:** `title` (required, string, 5-255 chars), `category_id` (required, exists:support_categories,id), `content` (required, string, min 10 chars).
+  - **Response:** Redirects to created topic with flash status.
+
+##### D. View Topic & Discussion Stream
+- `GET /support/topic/{id}/{slug?}`: Returns topic details, author information, solved status, and chronologically ordered replies. Increments topic `views_count`.
+
+##### E. Post Topic Reply
+- `POST /support/topic/{id}/reply`: (Auth required)
+  - **Payload:** `{"content": "Here is the solution to resolve..."}`
+  - **Triggers:** Dispatches notification to topic author via `NotificationService`.
+
+##### F. Mark Solution
+- `POST /support/reply/{id}/solution`: (Admin/Staff only)
+  - **Action:** Toggles `is_solution` flag on `support_replies` and sets `is_solved` on parent `support_topics`.
+  - **Triggers:** Dispatches `support_solution_marked` notification to reply author.
+
+---
+
+#### 2. Technical Support Tickets Endpoints
+
+##### A. List Member Tickets
+- `GET /tickets`: (Auth required)
+  - **Returns:** Chronological listing of authenticated user's tickets with status badges (`open`, `in_progress`, `answered`, `closed`), department tags, and reference numbers.
+
+##### B. Open New Support Ticket
+- `POST /tickets`: (Auth required)
+  - **Headers:** `Content-Type: multipart/form-data`
+  - **Payload:**
+    ```
+    department: "technical" | "billing" | "customer_service" | "abuse"
+    priority: "low" | "medium" | "high" | "urgent"
+    subject: "Issue with points ledger synchronization"
+    message: "Description of the issue encountered..."
+    attachment: (optional binary file: jpg, jpeg, png, pdf, zip, txt <= 5MB)
+    ```
+  - **Reference Generator:** Collision-free ticket code generated in format `TKT-YYYYMMDD-XXXX`.
+  - **Storage:** Attachments saved securely to `upload/support/`.
+
+##### C. Ticket Conversation & Status
+- `GET /tickets/{ticketNumber}`: (Auth required, owner or admin)
+  - **Returns:** Complete ticket conversation thread with author avatars, timestamp, attachment download links, and current resolution status.
+
+##### D. Reply to Ticket
+- `POST /tickets/{ticketNumber}/reply`: (Auth required)
+  - **Payload:** `message` (required, string), `attachment` (optional, max 5MB).
+  - **Status Transition:** Automatically switches ticket status to `open` (customer reply) or `answered` (staff reply).
+
+##### E. Close Ticket
+- `POST /tickets/{ticketNumber}/close`: (Auth required)
+  - **Action:** Sets `status = 'closed'` and updates `updated_at`.
+
+---
+
+#### 3. Admin Support Management Endpoints
+
+All admin endpoints require `admin` middleware and permission verification:
+- `GET /admin/tickets`: Ticket supervision dashboard with KPI cards and department/status filters.
+- `GET /admin/tickets/{id}`: Detailed inspection and reply console.
+- `POST /admin/tickets/{id}/reply`: Staff reply with optional attachment and status transition override (`open`, `in_progress`, `answered`, `closed`).
+- `POST /admin/tickets/{id}/status`: Manual status update.
+- `MATCH ['POST', 'DELETE'] /admin/tickets/{id}`: Soft/permanent deletion of support ticket.
+- `GET /admin/support/categories`: Forum categories management.
+- `POST /admin/support/categories`: Create category (`name_en`, `name_ar`, `slug`, `icon`, `color`, `order`).
+- `PUT /admin/support/categories/{id}`: Update category attributes and active state.
+- `MATCH ['POST', 'DELETE'] /admin/support/categories/{id}`: Delete category.
+- `GET /admin/support/topics`: Forum topics list with search and category filters.
+- `POST /admin/support/topics/{id}/pin`: Toggle topic sticky status (`is_pinned`).
+- `POST /admin/support/topics/{id}/lock`: Toggle topic discussion lock (`is_locked`).
+- `MATCH ['POST', 'DELETE'] /admin/support/topics/{id}`: Delete support topic.
 
 ---
 

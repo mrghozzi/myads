@@ -208,6 +208,12 @@ graph TD
 - **Live Theme Customizer (`THEME-07`):** Interactive visual customizer adjusting brand colors, typography (Inter, Cairo, Tajawal, Roboto), surface styles, and glassmorphic blur with responsive split-screen preview.
 - **System Health Monitor:** Real-time diagnostics for table sizes, database index overhead (`OPTIMIZE TABLE`), plugin resource footprint, and selective cache pre-warming (`CacheWarmupService`).
 
+### 🎫 8. Dedicated Support Forum & Technical Support Tickets (v4.6.4)
+- **Independent Support Forum (`/support`):** Autonomous support forum decoupled from general discussions with dedicated database schema (`support_categories`, `support_topics`, `support_replies`). Seeded with 5 technical support categories, interactive question submission with live guidelines (`/support/ask`), staff solution marking (`is_solution`), sticky pinned topics, locking controls, and view counters.
+- **Technical Support Tickets System (`/tickets`):** Private customer helpdesk with collision-free ticket reference codes (`TKT-YYYYMMDD-XXXX`), 4 specialized departments (Technical Support, Billing & Payments, Customer Service, Security & Abuse), 4 priority levels (Low, Medium, High, Urgent), secure file attachments up to 5MB, and member closure controls.
+- **Duralux Admin Management (`/admin/tickets` & `/admin/support/*`):** Administrative ticket resolution console with KPI cards, department and status filters, admin replies with status transition controls, forum categories CRUD with modal backdrop isolation, and topic moderation (pinning, locking, deletion).
+- **Bilingual & Notification Integration:** 100% Arabic and English translation parity in `lang/ar/support.php` and `lang/en/support.php`, linked directly from Help Center (`/help`), and integrated with `NotificationService` across all ticket and forum lifecycle actions.
+
 ---
 
 ## 📱 Official Flutter Mobile App

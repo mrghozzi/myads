@@ -93,6 +93,11 @@ MYADS is a community platform where website owners:
 64. **Service Orders Marketplace Peer-to-Peer Overhaul & Disclaimer Architecture (v4.6.2)** — Overhauled the Service Orders marketplace (`/orders`) with peer-to-peer non-escrow disclaimer architecture, contract revision workflows (`requestRevision`), project attachments and deliverable uploads with protected downloads up to 25MB, 5-step milestone steppers with deadline tracking, and modernized administrative supervision (`/admin/orders`) with KPI cards, dynamic filters, and Excel-compatible UTF-8 BOM CSV exports.
 65. **Mobile Companion App (`myads_app` v1.8.0+22) Full Parity & Modernization Release (v4.6.2)** — Upgraded mobile app with in-app reporting dialogs, recursive threaded comments, bidirectional settings interoperability, dual-schema quests API, and Dart 3.13 deprecation-free modernization.
 66. **MyAds Modern Community Forum Architecture, Multi-Editor Suite & 14-Language Parity (v4.6.3)** — Rebuilt and modernized the MYADS Community Forum (`/forum`, `/f{id}`, `/t{id}`) with a proprietary modern discussion architecture while maintaining 100% backward compatibility and data integrity across existing topics, categories, comments, and attachments. Features a two-pane responsive layout with colored category tags (`f_cat.color`), instant Ajax stream filtering across modern discussion tabs (Latest Activity, Top, Newest, Unanswered), debounced live search, a persistent floating/docked modern composer drawer (`.forum-modern-composer`) with client-side live markdown preview, and a post stream view with a sticky desktop timeline scrubber (`.forum-modern-scrubber`) tracking post progression (`Post X of Y`). Integrated a unified multi-editor engine (`RichTextEditorService`) supporting MyAds Markdown (with formatting toolbar, emojis, file upload, and live preview) alongside existing Quill.js and SCEditor engines across topic creation, editing, and topic comments, configurable directly from `/admin/forum/settings` and paired with tag color pickers in `/admin/forum/categories`. Backed by 100% multilingual key synchronization across all 14 platform languages (`lang/*/messages.php`) with zero missing keys, and supported by dedicated automated PHPUnit test suites (`ForumModernizationTest.php`, `ForumCategorySidebarTest.php`, `ForumUiRenderingTest.php`).
+67. **Dedicated Support Forum & Technical Support Tickets System (v4.6.4)** — Autonomous, independent customer support ecosystem separating technical assistance and inquiries from general community discussions.
+    - **Independent Support Forum (`/support`):** Completely separated from the general community forum with dedicated database schema (`support_categories`, `support_topics`, `support_replies`). Seeded with 5 technical support categories (General Support, Technical Questions, Account & Security, Billing & Payments, Bug Reports & Feedback). Features question submission with live dynamic guidance (`/support/ask`), solution marking by staff/admins (`is_solution`) with distinctive styling, sticky pinned topics, locking controls, view counting, and instant category filtering.
+    - **Technical Support Tickets System (`/tickets`):** Structured private ticketing workflow with collision-free ticket reference codes (`TKT-YYYYMMDD-XXXX`), 4 specialized departments (Technical Support, Billing & Payments, Customer Service, Security & Abuse), 4 priority levels (Low, Medium, High, Urgent), secure file attachments up to 5MB (`upload/support/`), real-time status progression (`open`, `in_progress`, `answered`, `closed`), and member ticket close capabilities.
+    - **Administrative Support Hub & Duralux Integration (`/admin/tickets` & `/admin/support/*`):** Comprehensive moderation and ticket resolution suite in the admin panel with KPI metric cards, status/priority/department filtering, admin reply forms with status transition controls, category management with modal-backdrop isolation outside container stacking contexts, and topic moderation (pinning, locking, deletion).
+    - **Bilingual Translation & Notification Parity:** 100% Arabic and English translation parity in `lang/ar/support.php` and `lang/en/support.php`, linked directly from Help Center (`/help`), and integrated with `NotificationService` for ticket reply, ticket status change, topic reply, and solution marked events.
 
 ---
 
@@ -263,6 +268,9 @@ myads/
 | `AdminSeoCheckerController` | Admin settings for SEO Checker permissions |
 | `CaptchaController` | CAPTCHA image generation |
 | `InstallerController` | Visual web installer |
+| `SupportForumController` | Dedicated Support Forum (`/support`): category filtering, ask question, topic view, reply submission, mark solution |
+| `SupportTicketController` | Technical Support Tickets (`/tickets`): ticket creation with collision-free reference numbers, member ticket conversation, attachments, close ticket |
+| `AdminSupportController` | Support Admin Hub: tickets management (`/admin/tickets`), replies, status/priority updates, support forum categories CRUD (`/admin/support/categories`), topic pinning/locking/deletion (`/admin/support/topics`) |
 
 ---
 
@@ -338,6 +346,11 @@ myads/
 | `DeveloperRefreshToken` | `developer_refresh_tokens` | Refresh tokens for renewing developer access tokens |
 | `DeveloperAuthorization` | `developer_authorizations` | User-authorized app permissions record for third-party OAuth access |
 | `DeveloperAuthorizationCode` | `developer_authorization_codes` | Short-lived OAuth authorization codes exchanged for tokens |
+| `SupportCategory` | `support_categories` | Dedicated support forum categories with bilingual names, description, icons, colors, sort orders, and active toggle |
+| `SupportTopic` | `support_topics` | Dedicated support questions/topics with views, pinned/locked status, replies count, and solution resolution |
+| `SupportReply` | `support_replies` | Support replies with solution flag (`is_solution`) and rich content |
+| `SupportTicket` | `support_tickets` | Technical support tickets with unique reference code (`TKT-YYYYMMDD-XXXX`), department, priority, status, and last reply tracker |
+| `SupportTicketMessage` | `support_ticket_messages` | Individual ticket messages, admin reply flag (`is_admin_reply`), and file attachments (`upload/support/`) |
 
 ---
 
@@ -482,6 +495,17 @@ myads/
 | `/oauth/token` | `POST /oauth/token` | OAuth 2.0 authorization code and refresh token exchange endpoint |
 | `/api/developer/v1/*` | `GET/POST /api/developer/v1/*` | Developer API v1 endpoints with Bearer token authentication |
 | `/refund` | `/refund` | Refund policy legal page |
+| `/support` | `/support` | Dedicated Support Forum homepage with category cards, latest questions, and solved filters |
+| `/support/category/{slug}` | `/support/category/technical` | Support questions filtered by category |
+| `/support/ask` | `/support/ask` | Submit new technical support inquiry with category selection and guidelines |
+| `/support/topic/{id}/{slug?}` | `/support/topic/15` | Support topic discussion, replies stream, and solution marking |
+| `/tickets` | `/tickets` | Member Technical Support Tickets dashboard with status badges and department tags |
+| `/tickets/create` | `/tickets/create` | Open new support ticket with department, priority, and attachments |
+| `/tickets/{ticketNumber}` | `/tickets/TKT-20261026-A1B2` | Ticket conversation view, member replies, and ticket close action |
+| `/admin/tickets` | `/admin/tickets` | Admin Technical Support Tickets management dashboard with filters and KPI cards |
+| `/admin/tickets/{id}` | `/admin/tickets/4` | Admin ticket reply, status transitions, and priority controls |
+| `/admin/support/categories` | `/admin/support/categories` | Admin support categories management (CRUD) |
+| `/admin/support/topics` | `/admin/support/topics` | Admin support topics moderation (pin, lock, delete) |
 
 ### Middleware Groups
 - **`auth`** — Standard Laravel auth

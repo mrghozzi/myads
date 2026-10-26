@@ -119,6 +119,49 @@
 * **Bilingual Localization (`lang/ar/messages.php`, `lang/en/messages.php`)**:
   * Added 43 new translation keys covering all widget customization labels, sort orders, thresholds, and element visibility toggles.
 
+### Dedicated Support Forum (`/support`) & Technical Support Tickets System (`/tickets`)
+* **Independent Support Forum Architecture (`/support`, `SupportForumController.php`, `SupportCategory.php`, `SupportTopic.php`, `SupportReply.php`)**:
+  * Implemented an autonomous, dedicated support forum completely decoupled from the general community forum (`/forum`), powered by distinct database tables (`support_categories`, `support_topics`, `support_replies`).
+  * Pre-seeded 5 structured support categories with distinct icons and colors:
+    * **Account & Registration** (`account-registration`, `fa-solid fa-user-shield`, `#615dfa`): Account verification, 2FA, password recovery, profile settings.
+    * **Ads & Promotion Campaigns** (`ads-campaigns`, `fa-solid fa-bullhorn`, `#23d2e2`): Banners, text ads, smart ads, surf-to-earn, and video campaigns.
+    * **Billing, Payments & Withdrawals** (`billing-payments`, `fa-solid fa-credit-card`, `#00c07f`): Points wallet, payment gateway deposits, payout requests.
+    * **Technical Issues & Bug Reports** (`technical-issues`, `fa-solid fa-screwdriver-wrench`, `#ff7360`): Bug tracking, performance, platform errors.
+    * **Suggestions & Platform Development** (`suggestions`, `fa-solid fa-lightbulb`, `#ffbc00`): Community proposals and feature requests.
+  * Built complete forum features:
+    * **Homepage (`/support`)**: Platform support stats (total questions, solved ratio, category count), category showcase cards, live status filter tabs (`All`, `Solved`, `Unsolved`), debounced real-time keyword search, and responsive topic stream.
+    * **Category View (`/support/category/{slug}`)**: Dedicated category feed with filter tabs and pagination.
+    * **Ask Question Flow (`/support/ask`)**: Question composer with category selector, dynamic guidance sidebar, and community etiquette rules.
+    * **Question Thread (`/support/topic/{id}/{slug}`)**: Discussion thread with verified staff badge (`is_staff`), official solution badge (`is_solution`), and member/staff 1-click "Mark as Solution" action.
+* **Direct Technical Support Ticket System (`/tickets`, `SupportTicketController.php`, `SupportTicket.php`, `SupportTicketMessage.php`)**:
+  * Built a private, direct-to-staff technical ticketing engine with dedicated database tables (`support_tickets`, `support_ticket_messages`).
+  * Features standardized ticket numbering with auto-generated collision-free reference codes (`TKT-YYYYMMDD-XXXX`).
+  * Supported 4 specialized departments: Technical Support (`technical`), Billing & Accounting (`billing`), Account Services (`account`), and General Inquiries (`general`).
+  * Supported 4 urgency priority levels: Low (`low`), Medium (`medium`), High (`high`), and Urgent (`urgent`).
+  * Supported secure file attachments up to 5MB (JPG, PNG, PDF, ZIP) with protected storage in `storage/app/public/support_attachments/`.
+  * **Member Tickets Dashboard (`/tickets`)**: Real-time status cards (Total, Open & In Progress, Answered, Closed & Resolved), status filter tabs, and responsive ticket table with department and priority pills.
+  * **Ticket Conversation View (`/tickets/{ticketNumber}`)**: Sequential message timeline with staff vs member badges, attachment preview/download links, reply composer, and self-service ticket closure.
+* **Help Center Integration (`/help`, `themes/default/views/help/*`, `lang/*/help.php`)**:
+  * Updated `/help` and `/help/{category}/{article}` support callout widgets:
+    * Re-routed **"Ask in Support Forum"** from generic `/forum` to dedicated `/support`.
+    * Re-routed **"Contact Support"** from internal messaging (`/messages`) to technical support tickets (`/tickets` and `/tickets/create`).
+  * Synchronized Arabic and English translations in `lang/ar/help.php` and `lang/en/help.php`.
+* **Administrative Support & Moderation Suite (`/admin/tickets`, `/admin/support/*`, `AdminSupportController.php`)**:
+  * Added dedicated **Support & Tickets** navigation dropdown in the Duralux Admin sidebar (`admin.blade.php`).
+  * **Ticket Management Hub (`/admin/tickets`)**: 4-KPI statistics strip (Total, Open, In Progress, Answered, Closed), multi-criteria filters (Status, Department, Priority), and keyword search.
+  * **Ticket Moderator & Inspection (`/admin/tickets/{id}`)**: Full conversation history, member dossier card, 1-click status & priority changer, and official staff reply composer with file attachments.
+  * **Support Forum Category Manager (`/admin/support/categories`)**: Create, edit, reorder, and delete categories with color pickers and icon selectors. Resolved Bootstrap 5 modal backdrop stacking context issue by cleanly hoisting all modals into `@section('modals')` at root layout level.
+  * **Support Forum Topic Moderation (`/admin/support/topics`)**: Moderate topics with 1-click Pin/Unpin, Lock/Unlock, and Delete actions.
+* **Real-Time Notification Integration (`NotificationService`)**:
+  * Automated real-time notifications for:
+    * New ticket opened &rarr; alerts all active administrators and super-admins with direct ticket link.
+    * Staff reply posted &rarr; alerts ticket author with link to conversation.
+    * Ticket status updated &rarr; alerts member of status change (Open, In Progress, Answered, Resolved, Closed).
+    * Forum reply added &rarr; alerts topic author when receiving new community or staff replies.
+    * Reply marked as solution &rarr; alerts reply author with achievement notification.
+* **Full Bilingual Parity & Localization (`lang/ar/support.php`, `lang/en/support.php`)**:
+  * Created dedicated `support.php` translation catalogs in Arabic and English covering all terms, department names, priority levels, statuses, admin labels, form placeholders, notifications, and tooltips.
+
 # v4.6.3
 > **Major Ecosystem, Modern Discussion, Directory 2.0, Referral Growth & Store Knowledge Base Release** — Rebuilt and modernized the MYADS Community Forum (`/forum`, `/f{id}`, `/t{id}`) with proprietary high-performance modern discussion architecture, multi-editor suite (MyAds Markdown, Quill.js, SCEditor), and cinema-grade video watch pages; transformed the Web & Tools Directory (`/directory`) into an interactive Product Hunt-grade discovery platform with community upvoting and SVG embed badges; completely overhauled the Referral & Affiliate Growth Engine (`/ads/referrals`, `/referral`, `/badges`) with 30-day cookie tracking middleware, two-sided welcome bonuses, anti-fraud self-referral protections, and 4 tiered community milestone badges; and upgraded the Store Product Knowledge Base (`/kb`) with dynamic StackEdit toolbar positioning, compact code/diagram snippet toolbars, and Font Awesome Brands compatibility.
 
