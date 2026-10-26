@@ -1052,19 +1052,19 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
         Route::get('/{id}', [App\Http\Controllers\AdminSupportController::class, 'showTicket'])->name('admin.tickets.show');
         Route::post('/{id}/reply', [App\Http\Controllers\AdminSupportController::class, 'replyTicket'])->name('admin.tickets.reply');
         Route::post('/{id}/status', [App\Http\Controllers\AdminSupportController::class, 'updateTicketStatus'])->name('admin.tickets.status');
-        Route::post('/{id}/delete', [App\Http\Controllers\AdminSupportController::class, 'deleteTicket'])->name('admin.tickets.delete');
+        Route::match(['POST', 'DELETE'], '/{id}/delete', [App\Http\Controllers\AdminSupportController::class, 'deleteTicket'])->name('admin.tickets.delete');
     });
 
     Route::prefix('support')->group(function () {
         Route::get('/categories', [App\Http\Controllers\AdminSupportController::class, 'forumCategories'])->name('admin.support.forum.categories');
         Route::post('/categories', [App\Http\Controllers\AdminSupportController::class, 'storeCategory'])->name('admin.support.forum.categories.store');
         Route::post('/categories/{id}', [App\Http\Controllers\AdminSupportController::class, 'updateCategory'])->name('admin.support.forum.categories.update');
-        Route::post('/categories/{id}/delete', [App\Http\Controllers\AdminSupportController::class, 'deleteCategory'])->name('admin.support.forum.categories.delete');
+        Route::match(['POST', 'DELETE'], '/categories/{id}/delete', [App\Http\Controllers\AdminSupportController::class, 'deleteCategory'])->name('admin.support.forum.categories.delete');
 
         Route::get('/topics', [App\Http\Controllers\AdminSupportController::class, 'forumTopics'])->name('admin.support.forum.topics');
         Route::post('/topics/{id}/pin', [App\Http\Controllers\AdminSupportController::class, 'togglePinTopic'])->name('admin.support.forum.topics.pin');
         Route::post('/topics/{id}/lock', [App\Http\Controllers\AdminSupportController::class, 'toggleLockTopic'])->name('admin.support.forum.topics.lock');
-        Route::post('/topics/{id}/delete', [App\Http\Controllers\AdminSupportController::class, 'deleteTopic'])->name('admin.support.forum.topics.delete');
+        Route::match(['POST', 'DELETE'], '/topics/{id}/delete', [App\Http\Controllers\AdminSupportController::class, 'deleteTopic'])->name('admin.support.forum.topics.delete');
     });
     });
 });

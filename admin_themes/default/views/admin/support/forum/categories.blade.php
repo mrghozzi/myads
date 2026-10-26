@@ -79,66 +79,10 @@
                                     </button>
                                     <form action="{{ route('admin.support.forum.categories.delete', $cat->id) }}" method="POST" class="d-inline" onsubmit="return confirm('هل أنت متأكد من حذف هذا القسم؟');">
                                         @csrf
-                                        @method('DELETE')
                                         <button type="submit" class="btn btn-sm btn-outline-danger" title="حذف">
                                             <i class="feather-trash-2"></i>
                                         </button>
                                     </form>
-                                </div>
-
-                                <!-- Edit Modal -->
-                                <div class="modal fade text-start" id="editModal{{ $cat->id }}" tabindex="-1" aria-hidden="true">
-                                    <div class="modal-dialog">
-                                        <div class="modal-content rounded-4 border-0 shadow">
-                                            <form action="{{ route('admin.support.forum.categories.update', $cat->id) }}" method="POST">
-                                                @csrf
-                                                <div class="modal-header border-0 pb-0">
-                                                    <h5 class="modal-title fw-bold">{{ __('support.edit_category') }}</h5>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                </div>
-                                                <div class="modal-body">
-                                                    <div class="mb-3">
-                                                        <label class="form-label fw-bold">{{ __('support.category_name') }}</label>
-                                                        <input type="text" name="name" value="{{ $cat->name }}" class="form-control" required>
-                                                    </div>
-                                                    <div class="mb-3">
-                                                        <label class="form-label fw-bold">{{ __('support.category_slug') }}</label>
-                                                        <input type="text" name="slug" value="{{ $cat->slug }}" class="form-control">
-                                                    </div>
-                                                    <div class="mb-3">
-                                                        <label class="form-label fw-bold">{{ __('support.category_desc') }}</label>
-                                                        <textarea name="description" rows="2" class="form-control">{{ $cat->description }}</textarea>
-                                                    </div>
-                                                    <div class="row g-2 mb-3">
-                                                        <div class="col-6">
-                                                            <label class="form-label fw-bold">{{ __('support.category_icon') }}</label>
-                                                            <input type="text" name="icon" value="{{ $cat->icon }}" class="form-control">
-                                                        </div>
-                                                        <div class="col-6">
-                                                            <label class="form-label fw-bold">{{ __('support.category_color') }}</label>
-                                                            <input type="color" name="color" value="{{ $cat->color ?: '#615dfa' }}" class="form-control form-control-color w-100">
-                                                        </div>
-                                                    </div>
-                                                    <div class="row g-2 mb-3">
-                                                        <div class="col-6">
-                                                            <label class="form-label fw-bold">{{ __('support.category_order') }}</label>
-                                                            <input type="number" name="sort_order" value="{{ $cat->sort_order }}" class="form-control">
-                                                        </div>
-                                                        <div class="col-6 d-flex align-items-end">
-                                                            <div class="form-check form-switch mb-2">
-                                                                <input class="form-check-input" type="checkbox" name="is_active" id="active{{ $cat->id }}" {{ $cat->is_active ? 'checked' : '' }}>
-                                                                <label class="form-check-label fw-bold" for="active{{ $cat->id }}">{{ __('support.category_active') }}</label>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="modal-footer border-0 pt-0">
-                                                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">إلغاء</button>
-                                                    <button type="submit" class="btn btn-primary fw-bold">حفظ التعديلات</button>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </div>
                                 </div>
                             </td>
                         </tr>
@@ -153,60 +97,123 @@
             </table>
         </div>
     </div>
+</div>
+@endsection
 
-    <!-- Add Category Modal -->
-    <div class="modal fade" id="addCategoryModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content rounded-4 border-0 shadow">
-                <form action="{{ route('admin.support.forum.categories.store') }}" method="POST">
-                    @csrf
-                    <div class="modal-header border-0 pb-0">
-                        <h5 class="modal-title fw-bold">{{ __('support.add_category') }}</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+@section('modals')
+<!-- Add Category Modal -->
+<div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow">
+            <form action="{{ route('admin.support.forum.categories.store') }}" method="POST">
+                @csrf
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold" id="addCategoryModalLabel">
+                        <i class="feather-folder-plus text-primary me-2"></i>{{ __('support.add_category') }}
+                    </h5>
+                    <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">{{ __('support.category_name') }} <span class="text-danger">*</span></label>
+                        <input type="text" name="name" class="form-control" placeholder="مثال: مشاكل الدفع والسحب" required>
                     </div>
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">{{ __('support.category_name') }} <span class="text-danger">*</span></label>
-                            <input type="text" name="name" class="form-control" placeholder="مثال: مشاكل الدفع والسحب" required>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">{{ __('support.category_slug') }}</label>
+                        <input type="text" name="slug" class="form-control" placeholder="billing-issues (اختياري)">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">{{ __('support.category_desc') }}</label>
+                        <textarea name="description" rows="2" class="form-control" placeholder="وصف موجز لنوع الاستفسارات في هذا القسم"></textarea>
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <label class="form-label fw-bold">{{ __('support.category_icon') }}</label>
+                            <input type="text" name="icon" class="form-control" value="fa-solid fa-circle-question">
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">{{ __('support.category_slug') }}</label>
-                            <input type="text" name="slug" class="form-control" placeholder="billing-issues (اختياري)">
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">{{ __('support.category_desc') }}</label>
-                            <textarea name="description" rows="2" class="form-control" placeholder="وصف موجز لنوع الاستفسارات في هذا القسم"></textarea>
-                        </div>
-                        <div class="row g-2 mb-3">
-                            <div class="col-6">
-                                <label class="form-label fw-bold">{{ __('support.category_icon') }}</label>
-                                <input type="text" name="icon" class="form-control" value="fa-solid fa-circle-question">
-                            </div>
-                            <div class="col-6">
-                                <label class="form-label fw-bold">{{ __('support.category_color') }}</label>
-                                <input type="color" name="color" class="form-control form-control-color w-100" value="#615dfa">
-                            </div>
-                        </div>
-                        <div class="row g-2 mb-3">
-                            <div class="col-6">
-                                <label class="form-label fw-bold">{{ __('support.category_order') }}</label>
-                                <input type="number" name="sort_order" class="form-control" value="0">
-                            </div>
-                            <div class="col-6 d-flex align-items-end">
-                                <div class="form-check form-switch mb-2">
-                                    <input class="form-check-input" type="checkbox" name="is_active" id="activeNew" checked>
-                                    <label class="form-check-label fw-bold" for="activeNew">{{ __('support.category_active') }}</label>
-                                </div>
-                            </div>
+                        <div class="col-6">
+                            <label class="form-label fw-bold">{{ __('support.category_color') }}</label>
+                            <input type="color" name="color" class="form-control form-control-color w-100" value="#615dfa">
                         </div>
                     </div>
-                    <div class="modal-footer border-0 pt-0">
-                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">إلغاء</button>
-                        <button type="submit" class="btn btn-primary fw-bold">إضافة القسم</button>
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <label class="form-label fw-bold">{{ __('support.category_order') }}</label>
+                            <input type="number" name="sort_order" class="form-control" value="0">
+                        </div>
+                        <div class="col-6 d-flex align-items-end">
+                            <div class="form-check form-switch mb-2">
+                                <input class="form-check-input" type="checkbox" name="is_active" id="activeNew" checked>
+                                <label class="form-check-label fw-bold" for="activeNew">{{ __('support.category_active') }}</label>
+                            </div>
+                        </div>
                     </div>
-                </form>
-            </div>
+                </div>
+                <div class="modal-footer border-0 pt-0 px-4 pb-4">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="submit" class="btn btn-primary fw-bold px-4">إضافة القسم</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
+
+<!-- Edit Category Modals -->
+@foreach($categories as $cat)
+<div class="modal fade" id="editModal{{ $cat->id }}" tabindex="-1" aria-labelledby="editModalLabel{{ $cat->id }}" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow">
+            <form action="{{ route('admin.support.forum.categories.update', $cat->id) }}" method="POST">
+                @csrf
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title fw-bold" id="editModalLabel{{ $cat->id }}">
+                        <i class="feather-edit text-primary me-2"></i>{{ __('support.edit_category') }}
+                    </h5>
+                    <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4 text-start">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">{{ __('support.category_name') }}</label>
+                        <input type="text" name="name" value="{{ $cat->name }}" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">{{ __('support.category_slug') }}</label>
+                        <input type="text" name="slug" value="{{ $cat->slug }}" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">{{ __('support.category_desc') }}</label>
+                        <textarea name="description" rows="2" class="form-control">{{ $cat->description }}</textarea>
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <label class="form-label fw-bold">{{ __('support.category_icon') }}</label>
+                            <input type="text" name="icon" value="{{ $cat->icon }}" class="form-control">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label fw-bold">{{ __('support.category_color') }}</label>
+                            <input type="color" name="color" value="{{ $cat->color ?: '#615dfa' }}" class="form-control form-control-color w-100">
+                        </div>
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-6">
+                            <label class="form-label fw-bold">{{ __('support.category_order') }}</label>
+                            <input type="number" name="sort_order" value="{{ $cat->sort_order }}" class="form-control">
+                        </div>
+                        <div class="col-6 d-flex align-items-end">
+                            <div class="form-check form-switch mb-2">
+                                <input class="form-check-input" type="checkbox" name="is_active" id="active{{ $cat->id }}" {{ $cat->is_active ? 'checked' : '' }}>
+                                <label class="form-check-label fw-bold" for="active{{ $cat->id }}">{{ __('support.category_active') }}</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0 px-4 pb-4">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="submit" class="btn btn-primary fw-bold px-4">حفظ التعديلات</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@endforeach
 @endsection

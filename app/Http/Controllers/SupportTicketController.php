@@ -16,11 +16,6 @@ use Illuminate\Support\Str;
 
 class SupportTicketController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth');
-    }
-
     protected function getSiteName(): string
     {
         return Option::where('name', 'titer')->value('o_valuer')

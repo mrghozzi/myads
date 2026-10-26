@@ -14,11 +14,6 @@ use Illuminate\Support\Str;
 
 class AdminSupportController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware(['auth', 'admin']);
-    }
-
     /* -------------------------------------------------------------------------
      * SUPPORT TICKETS
      * ------------------------------------------------------------------------- */
