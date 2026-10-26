@@ -1,0 +1,131 @@
+<?php
+
+return [
+    /*
+    |--------------------------------------------------------------------------
+    | Support Forum & Ticket System Language Lines (English)
+    |--------------------------------------------------------------------------
+    */
+
+    // Support Hub & Forum
+    'support_center' => 'Help & Technical Support',
+    'support_forum' => 'Support & Assistance Forum',
+    'support_forum_desc' => 'The standalone support forum for :site to ask questions, share solutions, and connect with technical staff and community.',
+    'ask_question' => 'Ask a Question',
+    'search_support_placeholder' => 'Search support questions and solutions...',
+    'support_categories' => 'Support Forum Categories',
+    'all_topics' => 'All Support Topics',
+    'latest_topics' => 'Latest Questions',
+    'solved_topics' => 'Solved Questions',
+    'unsolved_topics' => 'Unsolved Questions',
+    'topics_count' => ':count questions',
+    'replies_count' => ':count replies',
+    'views_count' => ':count views',
+    'category' => 'Category',
+    'status' => 'Status',
+    'solved' => 'Solved',
+    'unsolved' => 'Open',
+    'pinned' => 'Pinned',
+    'locked' => 'Locked',
+    'official_solution' => 'Official Solution',
+    'mark_as_solution' => 'Mark as Solution',
+    'unmark_solution' => 'Unmark Solution',
+    'staff_member' => 'Support Staff',
+    'staff_reply' => 'Official Staff Reply',
+    'topic_title' => 'Question Title',
+    'topic_content' => 'Question Details',
+    'select_category' => 'Select Category',
+    'post_topic' => 'Post Question to Support',
+    'write_reply' => 'Write your reply or solution...',
+    'post_reply' => 'Submit Reply',
+    'no_topics_found' => 'No support questions found in this category yet.',
+    'be_first_to_ask' => 'Be the first to ask a question here!',
+    'topic_created_success' => 'Your support question has been published successfully.',
+    'reply_added_success' => 'Your reply has been posted successfully.',
+    'solution_marked_success' => 'The reply has been marked as the official solution.',
+
+    // Support Tickets System
+    'tickets' => 'Support Tickets',
+    'support_tickets' => 'Direct Support Ticket System',
+    'tickets_desc' => 'Open a private support ticket directly with our administration team for account, technical, or billing inquiries.',
+    'my_tickets' => 'My Tickets',
+    'open_new_ticket' => 'Open New Ticket',
+    'ticket_number' => 'Ticket #',
+    'subject' => 'Subject',
+    'department' => 'Department',
+    'priority' => 'Priority',
+    'last_update' => 'Last Update',
+    'created_at' => 'Created Date',
+    'actions' => 'Actions',
+    'view_ticket' => 'View Ticket',
+    'ticket_details' => 'Ticket Details',
+    'ticket_conversation' => 'Conversation Thread',
+    'reply_to_ticket' => 'Reply to Ticket',
+    'close_ticket' => 'Close Ticket',
+    'reopen_ticket' => 'Reopen Ticket',
+    'ticket_closed' => 'This ticket is currently closed.',
+    'ticket_closed_desc' => 'This issue has been resolved and marked as closed. You can reply at any time to reopen it if you still need assistance.',
+    'attachment' => 'Attachment or Screenshot (Optional)',
+    'attachment_hint' => 'Allowed formats: PNG, JPG, JPEG, PDF up to 5MB.',
+    'message' => 'Message & Details',
+    'submit_ticket' => 'Submit Ticket',
+    'send_reply' => 'Send Reply',
+    'ticket_created_success' => 'Your support ticket #:number has been submitted. Our team will review and respond shortly.',
+    'ticket_reply_success' => 'Your reply has been sent successfully.',
+    'ticket_closed_success' => 'Ticket has been closed.',
+
+    // Departments
+    'dept_technical' => 'Technical & Script Support',
+    'dept_billing' => 'Billing, Payments & Wallet',
+    'dept_account' => 'Account, Security & Login',
+    'dept_general' => 'General Inquiries & Advertising',
+
+    // Priorities
+    'priority_low' => 'Low',
+    'priority_medium' => 'Medium',
+    'priority_high' => 'High',
+    'priority_urgent' => 'Urgent',
+
+    // Statuses
+    'status_open' => 'Open (Awaiting Staff)',
+    'status_in_progress' => 'In Progress',
+    'status_answered' => 'Answered by Support',
+    'status_resolved' => 'Resolved',
+    'status_closed' => 'Closed',
+
+    // Stats
+    'total_tickets' => 'Total Tickets',
+    'open_tickets' => 'Open Tickets',
+    'answered_tickets' => 'Awaiting Your Reply',
+    'resolved_tickets' => 'Resolved Tickets',
+
+    // Notifications
+    'notif_ticket_created' => 'New Support Ticket (:number): :subject',
+    'notif_ticket_replied_admin' => 'Support Staff replied to your ticket (:number)',
+    'notif_ticket_replied_user' => 'Member replied to ticket (:number)',
+    'notif_ticket_status' => 'Your ticket (:number) status was updated to: :status',
+    'notif_forum_reply' => 'New reply to your question in Support Forum: :title',
+    'notif_forum_solution' => 'Congratulations! Your answer was marked as the official solution.',
+
+    // Admin Panel
+    'admin_support_management' => 'Support & Ticket Management',
+    'admin_tickets_list' => 'Incoming Support Tickets',
+    'admin_forum_management' => 'Support Forum Management',
+    'admin_manage_categories' => 'Support Categories',
+    'admin_reply_as_staff' => 'Reply as Support Staff',
+    'admin_update_status' => 'Update Ticket Status',
+    'admin_update_priority' => 'Update Priority',
+    'admin_quick_status_change' => 'Quick Status',
+    'admin_ticket_saved' => 'Ticket updated successfully.',
+    'category_name' => 'Category Name',
+    'category_slug' => 'Slug',
+    'category_desc' => 'Description',
+    'category_icon' => 'Icon (FontAwesome)',
+    'category_color' => 'Theme Color',
+    'category_order' => 'Sort Order',
+    'category_active' => 'Active Status',
+    'add_category' => 'Add Support Category',
+    'edit_category' => 'Edit Support Category',
+    'category_saved' => 'Category saved successfully.',
+    'category_deleted' => 'Category deleted successfully.',
+];

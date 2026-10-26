@@ -1,0 +1,131 @@
+<?php
+
+return [
+    /*
+    |--------------------------------------------------------------------------
+    | Support Forum & Ticket System Language Lines (Arabic)
+    |--------------------------------------------------------------------------
+    */
+
+    // Support Hub & Forum
+    'support_center' => 'مركز الدعم الفني والمساعدة',
+    'support_forum' => 'منتدى الدعم والمساعدة',
+    'support_forum_desc' => 'منتدى الدعم المستقل لمنصة :site لطرح الأسئلة ومشاركة الحلول والمشكلات مع فريق الدعم والمجتمع.',
+    'ask_question' => 'طرح استفسار أو سؤال جديد',
+    'search_support_placeholder' => 'ابحث في مواضيع وحلول منتدى الدعم...',
+    'support_categories' => 'أقسام منتدى الدعم',
+    'all_topics' => 'كافة مواضيع الدعم',
+    'latest_topics' => 'أحدث الأسئلة والمشاركات',
+    'solved_topics' => 'الأسئلة المحلولة',
+    'unsolved_topics' => 'الأسئلة بانتظار إجابة',
+    'topics_count' => ':count سؤال',
+    'replies_count' => ':count إجابة',
+    'views_count' => ':count مشاهدة',
+    'category' => 'القسم',
+    'status' => 'الحالة',
+    'solved' => 'تم الحل',
+    'unsolved' => 'مفتوح',
+    'pinned' => 'مثبت',
+    'locked' => 'مغلق',
+    'official_solution' => 'الحل المعتمد',
+    'mark_as_solution' => 'تحديد كأفضل حل',
+    'unmark_solution' => 'إلغاء التحديد كحل',
+    'staff_member' => 'فريق الدعم الفني',
+    'staff_reply' => 'رد رسمي من الإدارة',
+    'topic_title' => 'عنوان السؤال أو الاستفسار',
+    'topic_content' => 'تفاصيل المشكلة أو السؤال',
+    'select_category' => 'اختر القسم المناسب',
+    'post_topic' => 'نشر السؤال في منتدى الدعم',
+    'write_reply' => 'أضف إجابتك أو مساعدتك...',
+    'post_reply' => 'إرسال الرد',
+    'no_topics_found' => 'لم يتم العثور على أي مواضيع في هذا القسم حالياً.',
+    'be_first_to_ask' => 'كن أول من يطرح استفساراً في هذا القسم!',
+    'topic_created_success' => 'تم نشر موضوعك بنجاح في منتدى الدعم.',
+    'reply_added_success' => 'تمت إضافة ردك بنجاح.',
+    'solution_marked_success' => 'تم تحديد الرد كحل معتمد للموضوع.',
+
+    // Support Tickets System
+    'tickets' => 'تذاكر الدعم الفني',
+    'support_tickets' => 'نظام تذاكر الدعم الفني المباشر',
+    'tickets_desc' => 'تواصل بشكل خاص ومباشر مع مسؤولي وفريق الدعم الفني لحل مشكلات حسابك والمدفوعات والأعطال.',
+    'my_tickets' => 'تذاكري',
+    'open_new_ticket' => 'فتح تذكرة دعم جديدة',
+    'ticket_number' => 'رقم التذكرة',
+    'subject' => 'موضوع التذكرة',
+    'department' => 'القسم المعني',
+    'priority' => 'درجة الأولوية',
+    'last_update' => 'آخر تحديث',
+    'created_at' => 'تاريخ الإنشاء',
+    'actions' => 'الإجراءات',
+    'view_ticket' => 'عرض التذكرة',
+    'ticket_details' => 'تفاصيل التذكرة',
+    'ticket_conversation' => 'سجل المراسلات',
+    'reply_to_ticket' => 'إضافة رد على التذكرة',
+    'close_ticket' => 'إغلاق التذكرة',
+    'reopen_ticket' => 'إعادة فتح التذكرة',
+    'ticket_closed' => 'هذه التذكرة مغلقة حالياً.',
+    'ticket_closed_desc' => 'تم حل المشكلة وإغلاق التذكرة. يمكنك إضافة رد جديد لإعادة فتحها إذا احتجت لمساعدة إضافية.',
+    'attachment' => 'مرفق أو لقطة شاشة (اختياري)',
+    'attachment_hint' => 'يُسمح برفع الصور والملفات بصيغ (PNG, JPG, PDF) بحد أقصى 5 ميجابايت.',
+    'message' => 'الرسالة أو تفاصيل الطلب',
+    'submit_ticket' => 'إرسال التذكرة إلى الدعم',
+    'send_reply' => 'إرسال الرد',
+    'ticket_created_success' => 'تم إنشاء تذكرتك بنجاح برقم :number، وسيقوم فريق الدعم بالرد عليك في أقرب وقت.',
+    'ticket_reply_success' => 'تم إرسال ردك على التذكرة بنجاح.',
+    'ticket_closed_success' => 'تم إغلاق التذكرة بنجاح.',
+
+    // Departments
+    'dept_technical' => 'الدعم الفني والبرمجي',
+    'dept_billing' => 'الفواتير والمدفوعات والمحفظة',
+    'dept_account' => 'الحسابات والأمان وتسجيل الدخول',
+    'dept_general' => 'استفسارات عامة وإعلانات',
+
+    // Priorities
+    'priority_low' => 'منخفضة',
+    'priority_medium' => 'متوسطة',
+    'priority_high' => 'مرتفعة',
+    'priority_urgent' => 'عاجلة جداً',
+
+    // Statuses
+    'status_open' => 'مفتوحة (بانتظار الدعم)',
+    'status_in_progress' => 'قيد المعالجة',
+    'status_answered' => 'تم الرد من الدعم',
+    'status_resolved' => 'تم الحل',
+    'status_closed' => 'مغلقة',
+
+    // Stats
+    'total_tickets' => 'إجمالي التذاكر',
+    'open_tickets' => 'تذاكر مفتوحة',
+    'answered_tickets' => 'بانتظار ردك',
+    'resolved_tickets' => 'تذاكر منتهية',
+
+    // Notifications
+    'notif_ticket_created' => 'تذكرة دعم فني جديدة (:number): :subject',
+    'notif_ticket_replied_admin' => 'رد جديد من فريق الدعم على تذكرتك (:number)',
+    'notif_ticket_replied_user' => 'رد جديد من العضو على التذكرة (:number)',
+    'notif_ticket_status' => 'تم تغيير حالة تذكرتك (:number) إلى: :status',
+    'notif_forum_reply' => 'رد جديد على سؤالك في منتدى الدعم: :title',
+    'notif_forum_solution' => 'تهانينا! تم اختيار إجابتك كأفضل حل في منتدى الدعم.',
+
+    // Admin Panel
+    'admin_support_management' => 'إدارة الدعم الفني والتذاكر',
+    'admin_tickets_list' => 'قائمة التذاكر الواردة',
+    'admin_forum_management' => 'إدارة منتدى الدعم',
+    'admin_manage_categories' => 'أقسام منتدى الدعم',
+    'admin_reply_as_staff' => 'الرد باسم فريق الدعم',
+    'admin_update_status' => 'تحديث حالة التذكرة',
+    'admin_update_priority' => 'تحديث درجة الأولوية',
+    'admin_quick_status_change' => 'تغيير الحالة سريعاً',
+    'admin_ticket_saved' => 'تم حفظ التعديلات على التذكرة بنجاح.',
+    'category_name' => 'اسم القسم',
+    'category_slug' => 'الرابط اللطيف (Slug)',
+    'category_desc' => 'وصف القسم',
+    'category_icon' => 'الأيقونة (FontAwesome)',
+    'category_color' => 'اللون التعريفي',
+    'category_order' => 'ترتيب العرض',
+    'category_active' => 'حالة النشاط',
+    'add_category' => 'إضافة قسم دعم جديد',
+    'edit_category' => 'تعديل قسم الدعم',
+    'category_saved' => 'تم حفظ قسم الدعم بنجاح.',
+    'category_deleted' => 'تم حذف قسم الدعم بنجاح.',
+];

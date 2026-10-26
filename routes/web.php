@@ -120,6 +120,27 @@ Route::prefix('help')->name('help.')->group(function () {
     Route::get('/{category}/{article}', [App\Http\Controllers\HelpController::class, 'article'])->name('article');
 });
 
+// Support Forum (/support)
+Route::prefix('support')->name('support.')->group(function () {
+    Route::get('/', [App\Http\Controllers\SupportForumController::class, 'index'])->name('index');
+    Route::get('/category/{slug}', [App\Http\Controllers\SupportForumController::class, 'category'])->name('category');
+    Route::get('/ask', [App\Http\Controllers\SupportForumController::class, 'create'])->name('create')->middleware('auth');
+    Route::post('/ask', [App\Http\Controllers\SupportForumController::class, 'store'])->name('store')->middleware('auth');
+    Route::get('/topic/{id}/{slug?}', [App\Http\Controllers\SupportForumController::class, 'show'])->name('topic');
+    Route::post('/topic/{id}/reply', [App\Http\Controllers\SupportForumController::class, 'reply'])->name('reply')->middleware('auth');
+    Route::post('/topic/{topicId}/reply/{replyId}/solution', [App\Http\Controllers\SupportForumController::class, 'markSolution'])->name('mark_solution')->middleware('auth');
+});
+
+// Support Tickets (/tickets)
+Route::prefix('tickets')->name('tickets.')->middleware('auth')->group(function () {
+    Route::get('/', [App\Http\Controllers\SupportTicketController::class, 'index'])->name('index');
+    Route::get('/create', [App\Http\Controllers\SupportTicketController::class, 'create'])->name('create');
+    Route::post('/', [App\Http\Controllers\SupportTicketController::class, 'store'])->name('store');
+    Route::get('/{ticketNumber}', [App\Http\Controllers\SupportTicketController::class, 'show'])->name('show');
+    Route::post('/{ticketNumber}/reply', [App\Http\Controllers\SupportTicketController::class, 'reply'])->name('reply');
+    Route::post('/{ticketNumber}/close', [App\Http\Controllers\SupportTicketController::class, 'close'])->name('close');
+});
+
 Route::get('/', function () {
     // Redirect to installer if DB tables are missing (e.g. fresh install with stale installed marker)
     try {
@@ -1024,6 +1045,27 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::delete('/security/ip-bans/{id}', [AdminSecurityController::class, 'destroyIpBan'])->name('admin.security.ip-bans.delete');
     Route::get('/security/sessions', [AdminSecurityController::class, 'sessions'])->name('admin.security.sessions');
     Route::post('/security/sessions/{id}/revoke', [AdminSecurityController::class, 'revokeSession'])->name('admin.security.sessions.revoke');
+
+    // Support Tickets & Forum Management
+    Route::prefix('tickets')->group(function () {
+        Route::get('/', [App\Http\Controllers\AdminSupportController::class, 'tickets'])->name('admin.tickets.index');
+        Route::get('/{id}', [App\Http\Controllers\AdminSupportController::class, 'showTicket'])->name('admin.tickets.show');
+        Route::post('/{id}/reply', [App\Http\Controllers\AdminSupportController::class, 'replyTicket'])->name('admin.tickets.reply');
+        Route::post('/{id}/status', [App\Http\Controllers\AdminSupportController::class, 'updateTicketStatus'])->name('admin.tickets.status');
+        Route::post('/{id}/delete', [App\Http\Controllers\AdminSupportController::class, 'deleteTicket'])->name('admin.tickets.delete');
+    });
+
+    Route::prefix('support')->group(function () {
+        Route::get('/categories', [App\Http\Controllers\AdminSupportController::class, 'forumCategories'])->name('admin.support.forum.categories');
+        Route::post('/categories', [App\Http\Controllers\AdminSupportController::class, 'storeCategory'])->name('admin.support.forum.categories.store');
+        Route::post('/categories/{id}', [App\Http\Controllers\AdminSupportController::class, 'updateCategory'])->name('admin.support.forum.categories.update');
+        Route::post('/categories/{id}/delete', [App\Http\Controllers\AdminSupportController::class, 'deleteCategory'])->name('admin.support.forum.categories.delete');
+
+        Route::get('/topics', [App\Http\Controllers\AdminSupportController::class, 'forumTopics'])->name('admin.support.forum.topics');
+        Route::post('/topics/{id}/pin', [App\Http\Controllers\AdminSupportController::class, 'togglePinTopic'])->name('admin.support.forum.topics.pin');
+        Route::post('/topics/{id}/lock', [App\Http\Controllers\AdminSupportController::class, 'toggleLockTopic'])->name('admin.support.forum.topics.lock');
+        Route::post('/topics/{id}/delete', [App\Http\Controllers\AdminSupportController::class, 'deleteTopic'])->name('admin.support.forum.topics.delete');
+    });
     });
 });
 

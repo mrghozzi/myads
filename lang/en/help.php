@@ -45,10 +45,10 @@ return [
     // Need More Help Widget
     'need_more_help' => 'Still have questions or need assistance?',
     'need_more_help_desc' => 'The :site support team and member community are always here to help.',
-    'ask_community' => 'Ask in the Forums',
-    'ask_community_desc' => 'Connect with the active :site community and get quick, reliable solutions.',
-    'contact_support' => 'Contact Support',
-    'contact_support_desc' => 'The :site administration team is available to assist with any technical or billing inquiries.',
+    'ask_community' => 'Ask in Support Forum',
+    'ask_community_desc' => 'Post your question in the dedicated support forum to get fast community and staff assistance.',
+    'contact_support' => 'Support Tickets',
+    'contact_support_desc' => 'Open a private support ticket to communicate directly with our technical support team.',
 
     // Empty States
     'no_results' => 'No guides found matching ":query"',

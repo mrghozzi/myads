@@ -633,10 +633,16 @@
                 <p style="font-size: 0.85rem; color: var(--myads-text-muted, #64748b); line-height: 1.5; margin-bottom: 16px;">
                     {{ __('help.need_more_help_desc', ['site' => $siteName]) }}
                 </p>
-                <a href="{{ url('/forum') }}" class="btn-shortcut-action" style="width: 100%; justify-content: center;">
-                    <i class="fa-solid fa-comments"></i>
-                    {{ __('help.ask_community') }}
-                </a>
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <a href="{{ route('support.index') }}" class="btn-shortcut-action" style="width: 100%; justify-content: center;">
+                        <i class="fa-solid fa-comments"></i>
+                        {{ __('help.ask_community') }}
+                    </a>
+                    <a href="{{ route('tickets.index') }}" class="btn-shortcut-action" style="width: 100%; justify-content: center; background: linear-gradient(135deg, #615dfa, #23d2e2); color: #fff; border-color: transparent;">
+                        <i class="fa-solid fa-headset"></i>
+                        {{ __('help.contact_support') }}
+                    </a>
+                </div>
             </div>
         </aside>
     </div>

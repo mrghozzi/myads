@@ -605,19 +605,19 @@
             <p>{{ __('help.need_more_help_desc', ['site' => $siteName]) }}</p>
         </div>
         <div class="help-support-actions">
-            <a href="{{ url('/forum') }}" class="btn-help-outline">
+            <a href="{{ route('support.index') }}" class="btn-help-outline">
                 <i class="fa-solid fa-comments"></i>
                 {{ __('help.ask_community') }}
             </a>
             @auth
-                <a href="{{ url('/messages') }}" class="btn-help-primary">
+                <a href="{{ route('tickets.index') }}" class="btn-help-primary">
                     <i class="fa-solid fa-headset"></i>
                     {{ __('help.contact_support') }}
                 </a>
             @else
-                <a href="{{ url('/login') }}" class="btn-help-primary">
-                    <i class="fa-solid fa-arrow-right-to-bracket"></i>
-                    {{ __('messages.login') }}
+                <a href="{{ route('login') }}" class="btn-help-primary">
+                    <i class="fa-solid fa-headset"></i>
+                    {{ __('help.contact_support') }}
                 </a>
             @endauth
         </div>

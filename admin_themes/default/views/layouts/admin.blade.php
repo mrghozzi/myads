@@ -169,6 +169,19 @@
                             </ul>
                         </li>
 
+                        <!-- Support & Tickets System -->
+                        <li class="nxl-item nxl-hasmenu">
+                            <a href="javascript:void(0);" class="nxl-link">
+                                <span class="nxl-micon"><i class="feather-headphones"></i></span>
+                                <span class="nxl-mtext">{{ __('support.admin_support_management') }}</span><span class="nxl-arrow"><i class="feather-chevron-right"></i></span>
+                            </a>
+                            <ul class="nxl-submenu">
+                                <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.tickets.index') }}">{{ __('support.support_tickets') }}</a></li>
+                                <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.support.forum.categories') }}">{{ __('support.admin_manage_categories') }}</a></li>
+                                <li class="nxl-item"><a class="nxl-link" href="{{ route('admin.support.forum.topics') }}">{{ __('support.admin_forum_management') }}</a></li>
+                            </ul>
+                        </li>
+
                         <li class="nxl-item nxl-hasmenu">
                             <a href="javascript:void(0);" class="nxl-link">
                                 <span class="nxl-micon"><i class="feather-users"></i></span>
