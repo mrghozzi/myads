@@ -183,4 +183,80 @@ class MyAdsBotTasksTest extends TestCase
         $this->assertNotNull($latestStatus);
         $this->assertEquals($latestTopic->id, $latestStatus->tp_id);
     }
+
+    public function test_admin_can_view_and_execute_support_topic_task(): void
+    {
+        $admin = $this->createAdminUser();
+        $botUser = myads_bot_service()->getBotUser();
+        $author = User::factory()->create();
+
+        $category = \App\Models\SupportCategory::create([
+            'name' => 'Installation & Setup',
+            'slug' => 'installation-setup',
+            'is_active' => 1,
+        ]);
+
+        $topic = \App\Models\SupportTopic::create([
+            'user_id' => $author->id,
+            'category_id' => $category->id,
+            'title' => 'How to configure SSL and HTTPS on MyAds?',
+            'slug' => 'how-to-configure-ssl-and-https-on-myads',
+            'content' => 'I am setting up a production instance and need to know the proper config steps for SSL.',
+            'status' => 'open',
+            'is_locked' => 0,
+        ]);
+
+        $service = myads_bot_service();
+        $service->saveConfig([
+            'is_enabled' => 1,
+            'api_key' => 'test_key',
+            'enable_support_forum_replies' => 1,
+        ]);
+
+        // 1. Verify it appears in pending tasks
+        $response = $this->actingAs($admin)
+            ->withSession(['admin_password_confirmed_at' => time()])
+            ->get('/admin/myads-bot');
+
+        $response->assertStatus(200);
+        $response->assertSee('Support Forum Topic');
+        $response->assertSee('How to configure SSL and HTTPS on MyAds?');
+
+        // 2. Mock Gemini API
+        \Illuminate\Support\Facades\Http::fake([
+            'generativelanguage.googleapis.com/*' => \Illuminate\Support\Facades\Http::response([
+                'candidates' => [
+                    [
+                        'content' => [
+                            'parts' => [
+                                ['text' => "To configure SSL on MyAds:\n1. Update `APP_URL` in your `.env` to `https://...`.\n2. Ensure Apache or Nginx has valid certificates configured.\n3. Clear configuration cache via `php artisan config:cache`."]
+                            ]
+                        ]
+                    ]
+                ]
+            ], 200),
+        ]);
+
+        // 3. Execute task via admin endpoint
+        $execResponse = $this->actingAs($admin)
+            ->withSession(['admin_password_confirmed_at' => time()])
+            ->postJson('/admin/myads-bot/tasks/execute', [
+                'task_id' => "support_topic:{$topic->id}",
+            ]);
+
+        $execResponse->assertStatus(200);
+        $execResponse->assertJson(['success' => true]);
+
+        // 4. Verify reply was posted by bot
+        $reply = \App\Models\SupportReply::where('topic_id', $topic->id)->where('user_id', $botUser->id)->first();
+        $this->assertNotNull($reply);
+        $this->assertTrue((bool)$reply->is_staff);
+        $this->assertStringContainsString('Update `APP_URL` in your `.env`', $reply->content);
+
+        // 5. Verify topic metadata updated
+        $topic->refresh();
+        $this->assertEquals(1, $topic->replies_count);
+        $this->assertEquals($botUser->id, $topic->last_reply_user_id);
+    }
 }
+
