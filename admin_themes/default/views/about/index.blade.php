@@ -431,7 +431,7 @@
                             <div class="col-md-6 col-lg-4">
                                 <div class="feature-card p-4">
                                     <div class="feature-icon-wrapper" style="background: linear-gradient(135deg, rgba(79, 70, 229, 0.1) 0%, rgba(124, 58, 237, 0.1) 100%); color: #6366f1;">
-                                        <i class="feather-film"></i>
+                                        <i class="feather-code"></i>
                                     </div>
                                     <h5 class="fw-bold mb-3">{{ __('about.feature_1_title') }}</h5>
                                     <p class="text-muted mb-0 fs-13">{{ __('about.feature_1_desc') }}</p>
@@ -440,7 +440,7 @@
                             <div class="col-md-6 col-lg-4">
                                 <div class="feature-card p-4">
                                     <div class="feature-icon-wrapper" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">
-                                        <i class="feather-user-plus"></i>
+                                        <i class="feather-life-buoy"></i>
                                     </div>
                                     <h5 class="fw-bold mb-3">{{ __('about.feature_2_title') }}</h5>
                                     <p class="text-muted mb-0 fs-13">{{ __('about.feature_2_desc') }}</p>
@@ -449,7 +449,7 @@
                             <div class="col-md-6 col-lg-4">
                                 <div class="feature-card p-4">
                                     <div class="feature-icon-wrapper" style="background: rgba(16,185,129,0.1); color: #10b981;">
-                                        <i class="feather-compass"></i>
+                                        <i class="feather-headphones"></i>
                                     </div>
                                     <h5 class="fw-bold mb-3">{{ __('about.feature_3_title') }}</h5>
                                     <p class="text-muted mb-0 fs-13">{{ __('about.feature_3_desc') }}</p>
@@ -458,7 +458,7 @@
                             <div class="col-md-6 col-lg-4">
                                 <div class="feature-card p-4">
                                     <div class="feature-icon-wrapper" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;">
-                                        <i class="feather-play-circle"></i>
+                                        <i class="feather-book-open"></i>
                                     </div>
                                     <h5 class="fw-bold mb-3">{{ __('about.feature_4_title') }}</h5>
                                     <p class="text-muted mb-0 fs-13">{{ __('about.feature_4_desc') }}</p>
@@ -467,7 +467,7 @@
                             <div class="col-md-6 col-lg-4">
                                 <div class="feature-card p-4">
                                     <div class="feature-icon-wrapper" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6;">
-                                        <i class="feather-message-square"></i>
+                                        <i class="feather-sliders"></i>
                                     </div>
                                     <h5 class="fw-bold mb-3">{{ __('about.feature_5_title') }}</h5>
                                     <p class="text-muted mb-0 fs-13">{{ __('about.feature_5_desc') }}</p>
@@ -476,7 +476,7 @@
                             <div class="col-md-6 col-lg-4">
                                 <div class="feature-card p-4">
                                     <div class="feature-icon-wrapper" style="background: rgba(6, 182, 212, 0.1); color: #06b6d4;">
-                                        <i class="feather-check-circle"></i>
+                                        <i class="feather-shield"></i>
                                     </div>
                                     <h5 class="fw-bold mb-3">{{ __('about.feature_6_title') }}</h5>
                                     <p class="text-muted mb-0 fs-13">{{ __('about.feature_6_desc') }}</p>
@@ -491,7 +491,38 @@
                             <div class="timeline">
                                 <div class="timeline-item">
                                     <div class="timeline-icon"><i class="feather-box fs-12"></i></div>
-                                    <h6 class="fw-bold mb-1">v4.6.3 <span class="badge bg-soft-success text-success ms-2">Latest / Stable</span></h6>
+                                    <h6 class="fw-bold mb-1">v4.6.4 <span class="badge bg-soft-success text-success ms-2">Latest / Stable</span></h6>
+                                    <p class="text-muted fs-13 mb-3">Developer Platform &amp; REST API Ecosystem (OAuth 2.1 &amp; PKCE, PAT Tokens, Webhooks with HMAC-SHA256, OpenAPI 3.1 &amp; Interactive Playground, Embed Widgets), Dedicated Support Forum (/support) with 5 Categorized Channels &amp; Solution Badges, Direct Technical Support Tickets Engine (/tickets &amp; /admin/tickets), Comprehensive Help &amp; Knowledge Center (/help) with Dynamic Site Name Resolution &amp; AJAX Voting, Universal In-Admin Widget Customizer Engine across All 12 Native Widgets, Glassmorphic Landing Footer Customizer, Zero-Vulnerability Security Remediation (Vite 8.3.5 &amp; Dependabot Patches), and Full 14-Language Localization Parity.</p>
+                                    <div class="d-flex flex-column gap-2">
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-feature mt-1">Developer API</span>
+                                            <span class="text-muted fs-13">Modernized developer platform with OAuth 2.1 &amp; PKCE compliance (RFC 7636/6749) for public/confidential clients, token revocation (RFC 7009), personal access tokens (PAT), event-driven Webhooks with HMAC-SHA256 signatures, API telemetry &amp; RFC rate limit headers, in-browser API Playground with OpenAPI 3.1.0 specifications, and auto-resizing HTML embed widgets.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-feature mt-1">Support Forum</span>
+                                            <span class="text-muted fs-13">Autonomous dedicated support forum (<code>/support</code>) completely decoupled from general community discussions, pre-seeded with 5 structured channels, solved/unsolved status filtering, staff response badges, and 1-click verified solution badges with +10 PTS reputation awards.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-feature mt-1">Tickets Engine</span>
+                                            <span class="text-muted fs-13">Private, direct-to-staff technical support ticketing suite (<code>/tickets</code>, <code>/admin/tickets</code>) with collision-free ticket reference numbering (<code>TKT-YYYYMMDD-XXXX</code>), 4 specialized departments, 4 urgency priority levels, secure file attachments up to 5MB, and admin moderation hub.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-feature mt-1">Help Center</span>
+                                            <span class="text-muted fs-13">10-category, 27-tutorial interactive Help Center (<code>/help</code>) with dynamic database site title resolution eliminating hardcoded branding, debounced real-time keyword search, and AJAX helpfulness rating engine ("👍 Yes / 👎 No").</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-feature mt-1">Widget Customizer</span>
+                                            <span class="text-muted fs-13">Universal in-admin customizer engine across all 12 native widgets in <code>/admin/widgets</code>, unified JSON config serialization, and overhauled glassmorphic Landing Footer widget (<code>widget_landing_footer.blade.php</code>) with social links and customizable footer sections.</span>
+                                        </div>
+                                        <div class="d-flex align-items-start">
+                                            <span class="changelog-badge badge-security mt-1">Security &amp; i18n</span>
+                                            <span class="text-muted fs-13">Upgraded <code>vite</code> to 8.3.5 and <code>follow-redirects</code> to 1.16.1 eliminating all GitHub Dependabot security advisories, dynamic sitemap stylesheet auto-synchronization, and achieved 100% key parity across all 14 supported languages and 8 localization catalogs.</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="timeline-item">
+                                    <div class="timeline-icon"><i class="feather-box fs-12"></i></div>
+                                    <h6 class="fw-bold mb-1">v4.6.3 <span class="badge bg-soft-secondary text-secondary ms-2">Previous</span></h6>
                                     <p class="text-muted fs-13 mb-3">Clips 2.0 Short Video Discovery Engine &amp; Companion REST API, Web &amp; Tools Directory 2.0 with Community Upvoting &amp; Embed Badges, Referral Growth &amp; Affiliate Engine with 30-Day Cookie Tracking &amp; Welcome Bonuses, Cinema Video Hub &amp; Standalone Watch Pages, Modern Forum Architecture with Multi-Editor Suite, Drag &amp; Drop Category Hierarchy Tree, Pinned Comments, Best Answers, and Store Product Knowledge Base UI Overhaul.</p>
                                     <div class="d-flex flex-column gap-2">
                                         <div class="d-flex align-items-start">

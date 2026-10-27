@@ -7,19 +7,19 @@ return [
     'tab_changelog' => 'Änderungsprotokoll',
     'tab_about' => 'Über MYADS',
     
-    // What's New Section (v4.6.3)
-    'feature_1_title' => 'Kurzvideo-Clips 2.0 & Interaktive Reels-Discovery-Engine',
-    'feature_1_desc' => 'Komplette Neugestaltung von /clips mit Deep-Link-Routing (/clips/{status}), Multi-Feed-Tabs (Neueste, Trends, Folgen), automatischem View-Tracking nach 2,5s mit Deduplizierung, Tastaturkürzeln, Doppel-Tap-Like und Begleit-REST-API.',
-    'feature_2_title' => 'Empfehlungs- & Affiliate-Engine mit 30-Tage-Tracking und Meilenstein-Abzeichen',
-    'feature_2_desc' => 'Überarbeitetes Partnerprogramm mit CaptureReferral 30-Tage-Cookie-Middleware, Multi-ID-Auflösung, Anti-Betrugs-Sperre für Selbstreferenzen, beidseitigem Willkommensbonus (+10 PTS) und 4 Meilenstein-Abzeichen in /badges.',
-    'feature_3_title' => 'Web- & Tools-Verzeichnis 2.0 mit Community-Upvotes & Live-SVG-Einbettungs-Badges',
-    'feature_3_desc' => '/directory als interaktive Discovery-Plattform mit Echtzeit-Upvoting, dynamischen SVG-Badges, facettierten Preisfiltern (Kostenlos, Freemium, Kostenpflichtig, Open Source), Website-Inhaberschafts-Meta-Verifizierung und kompakter Kontrollleiste.',
-    'feature_4_title' => 'Kino-Video-Hub & Eigenständiges Obsidian-Wiedergabeerlebnis',
-    'feature_4_desc' => 'Vollständige Trennung des Videokatalogs von Forum-Kategorien in 13 Genres, einzeilige YouTube-Filterleiste, Obsidian-Kino-Hero-Banner, dedizierte Wiedergabeseiten (/video/watch/{id}) mit horizontaler Button-Leiste und stabiler Autoplay-Umschaltung.',
-    'feature_5_title' => 'Moderne Community-Forum-Architektur, Multi-Editor-Suite & Kategorie-Baum',
-    'feature_5_desc' => 'Neues /forum mit responsivem Zwei-Spalten-Layout, sofortiger AJAX-Stream-Filterung (Aktivität, Top, Neu, Unbeantwortet), schwebender Editor-Schublade mit Live-Vorschau, Timeline-Scrubber, Multi-Editor-Suite (Markdown, Quill, SCEditor) und Drag-and-Drop-Kategorie-Hierarchiebaum.',
-    'feature_6_title' => 'Angeheftete Kommentare, Beste Antworten, Themen-Sharing & Store-KB-UI',
-    'feature_6_desc' => 'Anheften von Kommentaren ganz oben, smaragdgrünes Beste-Antwort-Abzeichen mit +10 PTS Belohnung, 1-Klick-Share-Popover mit Kopierbestätigung, Korrektur der StackEdit-Kopfzeilenüberdeckung in /kb, kompakte Code-Snippet-Leiste und Font Awesome Brands Font-Shims.',
+    // What's New Section (v4.6.4)
+    'feature_1_title' => 'Entwicklerplattform & REST-API-Ökosystem',
+    'feature_1_desc' => 'Vollständige Modernisierung von /developer mit OAuth 2.1 & PKCE (RFC 7636/6749), Token-Widerruf (RFC 7009), Personal Access Tokens (PAT), Webhooks mit HMAC-SHA256-Signaturen, API-Telemetrie & RFC-Ratenbegrenzungs-Headern, OpenAPI 3.1 Playground und responsiven HTML-Embed-Widgets.',
+    'feature_2_title' => 'Dediziertes Support-Forum & Lösungs-Badges',
+    'feature_2_desc' => 'Autonomes Support-Forum (/support), getrennt von allgemeinen Diskussionen, mit 5 Fachkategorien, Live-Suche, Statusfiltern (Gelöst/Ungelöst), Team-Badges und 1-Klick-Lösungsmarkierung mit PTS-Reputationsbelohnung.',
+    'feature_3_title' => 'Technisches Support-Ticket-System',
+    'feature_3_desc' => 'Privates Direkt-Support-Ticketsystem (/tickets, /admin/tickets) mit automatischer Referenznummerierung (TKT-YYYYMMDD-XXXX), 4 Abteilungen, 4 Prioritätsstufen, sicheren Anhängen bis zu 5 MB, Konversationsverlauf und Admin-Moderation.',
+    'feature_4_title' => 'Umfassendes Hilfe- & Dokumentationszentrum',
+    'feature_4_desc' => 'Vollständige Wissensdatenbank (/help) mit 10 Kategorien und 27 Leitfäden, dynamischer Website-Titel-Auflösung ohne feste Markennamen, Echtzeitsuche und interaktiver AJAX-Hilfebewertung („👍 Ja / 👎 Nein").',
+    'feature_5_title' => 'Universelle In-Admin-Widget-Konfiguration',
+    'feature_5_desc' => 'Maßgeschneiderte Admin-Steuerungen für alle 12 nativen Widgets in /admin/widgets mit einheitlicher JSON-Serialisierung sowie modernes, gläsernes Landing-Footer-Widget mit benutzerdefinierten Links und Social-Media-Leiste.',
+    'feature_6_title' => 'Sicherheits-Hardening & 14-Sprachen-Parität',
+    'feature_6_desc' => 'Behebung aller Dependabot-Sicherheitswarnungen durch Upgrades auf Vite 8.3.5 und follow-redirects 1.16.1, automatische Sitemap-Synchronisierung und 100%ige Schlüsselparität über alle 14 Sprachen und 8 Kataloge.',
 
     // About Section
     'about_description' => 'MYADS is a powerful, all-in-one community platform and ad exchange network. It empowers website owners to connect, exchange traffic, trade services, and monetize their platforms effectively.',

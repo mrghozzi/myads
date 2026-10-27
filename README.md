@@ -13,7 +13,7 @@ Built with passion on **Laravel 12**, **PHP 8.2+**, and **Bootstrap 5 / Flutter*
 [![Release Version](https://img.shields.io/badge/Release-v4.6.4-3b82f6.svg?style=for-the-badge&logo=github)](https://github.com/mrghozzi/myads/releases)
 [![Laravel Version](https://img.shields.io/badge/Laravel-12.x-ff2d20.svg?style=for-the-badge&logo=laravel)](https://laravel.com)
 [![PHP Version](https://img.shields.io/badge/PHP-8.2%2B-777bb4.svg?style=for-the-badge&logo=php)](https://php.net)
-[![Flutter Mobile App](https://img.shields.io/badge/Flutter-3.27%2B_v1.8.5-02569b.svg?style=for-the-badge&logo=flutter)](https://github.com/mrghozzi/myads_app)
+[![Flutter Mobile App](https://img.shields.io/badge/Flutter-3.27%2B_v1.8.7-02569b.svg?style=for-the-badge&logo=flutter)](https://github.com/mrghozzi/myads_app)
 [![CI Tests](https://img.shields.io/github/actions/workflow/status/mrghozzi/myads/tests.yml?branch=main&style=for-the-badge&logo=githubactions&label=Tests&color=22c55e)](https://github.com/mrghozzi/myads/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-10b981.svg?style=for-the-badge)](LICENSE)
 
@@ -61,8 +61,8 @@ MYADS is an enterprise-ready, all-in-one ecosystem that eliminates the need for 
       <p>Proprietary forum architecture with two-pane AJAX browsing, multi-editor suite (Markdown, Quill, SCEditor), threaded discussion tree, best answer badges, Groq AI moderation, and SSE live streams.</p>
     </td>
     <td width="50%">
-      <h3>📱 Native Flutter Mobile App (v1.8.5)</h3>
-      <p>First-party Android & iOS client (<code>myads_app</code>) with 100% parity: Video Hub & Watch routing, Modern Forum discussions & replies, Store reviews, universal bookmarks, and P2P service orders.</p>
+      <h3>📱 Native Flutter Mobile App (v1.8.7)</h3>
+      <p>First-party Android & iOS client (<code>myads_app</code>) with 100% parity: Help Center &amp; Support Tickets integration, Clips 2.0 discovery engine, Video Hub & Watch routing, Modern Forum discussions & replies, Store reviews, universal bookmarks, and P2P service orders.</p>
     </td>
   </tr>
   <tr>
@@ -218,7 +218,7 @@ graph TD
 
 ## 📱 Official Flutter Mobile App
 
-MYADS features a first-party, cross-platform mobile client built with **Flutter 3.27+** for Android and iOS (**`myads_app` v1.8.5+27**).
+MYADS features a first-party, cross-platform mobile client built with **Flutter 3.27+** for Android and iOS (**`myads_app` v1.8.7+29**).
 
 <div align="center">
   <a href="https://github.com/mrghozzi/myads_app">
@@ -227,6 +227,8 @@ MYADS features a first-party, cross-platform mobile client built with **Flutter 
 </div>
 
 ### Mobile Highlights:
+- **Help Center, Support Forum & Tickets (`v1.8.7`):** Direct in-app access to `/help`, `/support`, and `/tickets` via authenticated `SupportWebviewScreen` with token injection and external browser fallback.
+- **Clips 2.0 & Reels Discovery Engine (`v1.8.6`):** Multi-tab discovery streams (Following, Trending, Latest), direct clip routing (`/clips/:id`), automated 2.5-second continuous-playback view registration with deduplication, and double-tap heart pop animation.
 - **Video Hub & Cinema Watch (`v1.8.5`):** Dedicated `VideoHubScreen` with dynamic category pills, multi-criteria sorting (Latest, Most Viewed, Most Reacted, Oldest), direct routing (`/video/watch/:id`), and Shorts shelf.
 - **Modern Forum Engine (`v1.8.4`):** Hierarchical sub-forums with color badges, filter chips (Latest, Top, Newest, Unanswered), threaded discussion tree, pinned comments, best answers, and quick Markdown composer.
 - **Profile Privacy Suite (`v1.8.3`):** Granular About tab privacy (`canViewAbout`, `aboutVisibility`), locked container view, and profile settings dropdown.

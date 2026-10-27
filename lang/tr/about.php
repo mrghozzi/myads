@@ -7,19 +7,19 @@ return [
     'tab_changelog' => 'Değişiklik Günlüğü',
     'tab_about' => 'MYADS Hakkında',
     
-    // What's New Section (v4.6.3)
-    'feature_1_title' => 'Kısa Video Klipleri 2.0 ve Etkileşimli Reels Keşif Motoru',
-    'feature_1_desc' => '/clips sayfasının doğrudan bağlantılarla (/clips/{status}), çoklu akış sekmeleriyle (En Yeniler, Trendler, Takip Edilenler), 2,5 sn otomatik izleme takibi ve tekilleştirme ile, klavye kısayolları, çift tıklama beğenisi ve REST API ile tam revizyonu.',
-    'feature_2_title' => '30 Günlük Takip ve Başarı Rozetleri ile Referans ve Ortaklık Büyüme Motoru',
-    'feature_2_desc' => 'CaptureReferral 30 günlük çerez takip ara yazılımı, çoklu kimlik çözümleyici, sahte referans engelleme, iki taraflı hoş geldin bonusu (+10 PTS) ve /badges sayfasında 4 seviyeli başarı rozeti ile yenilenmiş ortaklık sistemi.',
-    'feature_3_title' => 'Topluluk Oyları ve Canlı SVG Rozetleri ile Web ve Araçlar Dizini 2.0',
-    'feature_3_desc' => '/directory sayfasının gerçek zamanlı oylama, dinamik SVG yerleştirme rozetleri ("Featured on MYADS"), fiyatlandırma filtreleri (Ücretsiz, Freemium, Ücretli, Açık Kaynak) ve meta etiket ile site doğrulama içeren modern keşif merkezine dönüşümü.',
-    'feature_4_title' => 'Sinematik Video Hub ve Bağımsız Obsidian İzleme Sayfaları',
-    'feature_4_desc' => 'Video kataloğunun forum kategorilerinden 13 özel türe ayrılması, tek satırlı YouTube tarzı filtre çubuğu, obsidyen sinema başlığı, yatay buton çubuklu bağımsız izleme sayfaları (/video/watch/{id}) ve akıllı otomatik oynatma anahtarı.',
-    'feature_5_title' => 'Modern Topluluk Forumu Mimarisi, Çoklu Editör Paketi ve Kategori Ağacı',
-    'feature_5_desc' => 'İki panelli düzen, anında AJAX filtreleme (Son, Popüler, Yeni, Yanıtsız), canlı önizlemeli kayan yazı kutusu, yapışkan zaman çizelgesi, çoklu editör desteği (MyAds Markdown, Quill, SCEditor) ve admin panelinde sürükle-bırak kategori ağacı ile /forum sayfasının yenilenmesi.',
-    'feature_6_title' => 'Sabitlenen Yorumlar, En İyi Cevaplar, Konu Paylaşımı ve Mağaza KB Arayüzü',
-    'feature_6_desc' => 'Üste sabitlenen yorumlar, +10 PTS ödüllü zümrüt En İyi Cevap rozeti, tek tıkla bağlantı kopyalama penceresi, /kb sayfasında StackEdit başlık çakışması düzeltmesi, kompakt tek satırlı kod/diyagram araç çubuğu ve Font Awesome Brands uyumluluğu.',
+    // What's New Section (v4.6.4)
+    'feature_1_title' => 'Geliştirici Platformu ve REST API Ekosistemi',
+    'feature_1_desc' => 'OAuth 2.1 ve PKCE uyumluluğu (RFC 7636/6749), standart belirteç iptali (RFC 7009), Kişisel Erişim Belirteçleri (PAT), HMAC-SHA256 imzalı Webhook\'lar, API telemetrisi, OpenAPI 3.1 Deneme Alanı ve duyarlı gömülebilir widget\'lar ile /developer platformunun baştan sona modernizasyonu.',
+    'feature_2_title' => 'Özel Destek Forumu ve Çözüm Rozetleri',
+    'feature_2_desc' => 'Genel tartışmalardan ayrılmış bağımsız destek forumu (/support); 5 uzmanlık kanalı, anlık arama, çözüldü/çözülmedi filtreleri, personel rozetleri ve PTS ödüllü tek tıkla onaylı çözüm işaretleme.',
+    'feature_3_title' => 'Teknik Destek Destek Talebi (Ticket) Motoru',
+    'feature_3_desc' => 'Otomatik referans kodlu (TKT-YYYYMMDD-XXXX), 4 departmanlı, 4 öncelik seviyeli, 5 MB\'a kadar güvenli dosya eklemeli ve yönetici merkezli özel teknik destek talebi sistemi (/tickets, /admin/tickets).',
+    'feature_4_title' => 'Kapsamlı Yardım ve Bilgi Merkezi',
+    'feature_4_desc' => '10 kategori ve 27 ayrıntılı kılavuzdan oluşan bilgi merkezi (/help), veritabanından dinamik site başlığı çözünürlüğü, anlık anahtar kelime araması ve canlı AJAX yararlılık oylaması ("👍 Evet / 👎 Hayır").',
+    'feature_5_title' => 'Yönetim Panelinde Evrensel Bileşen (Widget) Özelleştirici',
+    'feature_5_desc' => '/admin/widgets altında 12 yerel bileşenin tümü için özel kontroller ve birleşik JSON kaydı, ayrıca özel bağlantılar ve sosyal medya çubuğu içeren cam tasarımlı Landing Footer bileşeni.',
+    'feature_6_title' => 'Sıfır Güvenlik Açığı ve 14 Dil Eşitliği',
+    'feature_6_desc' => 'Vite 8.3.5 ve follow-redirects 1.16.1 güncellemeleriyle tüm Dependabot uyarılarının giderilmesi, dinamik site haritası senkronizasyonu ve 14 dilde 8 katalog boyunca %100 anahtar uyumu.',
 
     // About Section
     'about_description' => 'MYADS, güçlü bir topluluk platformu ve hepsi bir arada reklam değişim ağıdır.',

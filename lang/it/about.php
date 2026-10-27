@@ -7,19 +7,19 @@ return [
     'tab_changelog' => 'Registro Modifiche',
     'tab_about' => 'Informazioni su MYADS',
     
-    // What's New Section (v4.6.3)
-    'feature_1_title' => 'Clip Video Brevi 2.0 & Motore di Scoperta Reels Interattivo',
-    'feature_1_desc' => 'Rinnovamento completo di /clips con routing diretto (/clips/{status}), feed a schede multiple (Recenti, Tendenze, Seguiti), tracciamento automatico visualizzazioni dopo 2,5s con deduplicazione, scorciatoie da tastiera, doppio tap like e API REST compagna.',
-    'feature_2_title' => 'Motore di Affiliazione & Referral con Tracciamento 30 Giorni e Badge Traguardo',
-    'feature_2_desc' => 'Sistema di affiliazione rinnovato con middleware CaptureReferral di tracciamento cookie a 30 giorni, risoluzione multi-identificatore, blocco auto-referral fraudolento, bonus di benvenuto bilaterale (+10 PTS) e 4 badge traguardo in /badges.',
-    'feature_3_title' => 'Directory Web & Strumenti 2.0 con Upvote della Community e Badge SVG Dinamici',
-    'feature_3_desc' => 'Trasformazione di /directory in un hub di scoperta interattivo con upvoting atomico in tempo reale, badge SVG dinamici incorporabili, filtri per prezzi (Gratis, Freemium, A pagamento, Open Source) e verifica di proprietà del sito.',
-    'feature_4_title' => 'Video Hub Cinematografico ed Esperienza di Visione Standalone',
-    'feature_4_desc' => 'Separazione completa del catalogo video dalle categorie del forum in 13 generi dedicati, barra filtri stile YouTube a riga singola, banner cinema ossidiana, pagine di visualizzazione standalone (/video/watch/{id}) e switch autoplay resiliente.',
-    'feature_5_title' => 'Architettura Forum Moderna, Suite Multi-Editor e Albero Categorie Drag & Drop',
-    'feature_5_desc' => 'Ricostruzione di /forum con layout responsive a due riquadri, filtri AJAX istantanei senza ricaricamento (Recenti, Top, Nuovi, Senza risposta), cassetto di composizione fluttuante con anteprima live, scrubber cronologico e albero delle categorie drag & drop.',
-    'feature_6_title' => 'Commenti In Evidenza, Migliori Risposte, Condivisione Topic e UI Knowledge Base',
-    'feature_6_desc' => 'Possibilità di fissare commenti in cima, badge verde smeraldo Migliore Risposta con +10 PTS di reputazione, popover di condivisione con copia link istantanea, risoluzione overlap StackEdit in /kb, barra snippet compatta e supporto Font Awesome Brands.',
+    // What's New Section (v4.6.4)
+    'feature_1_title' => 'Piattaforma Sviluppatori ed Ecosistema API REST',
+    'feature_1_desc' => 'Modernizzazione completa di /developer con conformità OAuth 2.1 e PKCE (RFC 7636/6749), revoca token (RFC 7009), Personal Access Tokens (PAT), Webhook con firme HMAC-SHA256, telemetria API, playground OpenAPI 3.1 e widget incorporabili adattabili.',
+    'feature_2_title' => 'Forum di Supporto Dedicato e Badge Soluzione',
+    'feature_2_desc' => 'Forum di supporto comunitario autonomo (/support) separato dalle discussioni generali, con 5 canali specializzati, ricerca in tempo reale, filtri stato risolto/non risolto, badge staff e contrassegno soluzione in 1 clic con premio PTS.',
+    'feature_3_title' => 'Motore Ticket di Supporto Tecnico',
+    'feature_3_desc' => 'Sistema di ticketing privato diretto allo staff (/tickets, /admin/tickets) con codici di riferimento automatici (TKT-YYYYMMDD-XXXX), 4 dipartimenti, 4 livelli di priorità, allegati protetti fino a 5 MB e suite di moderazione amministrativa.',
+    'feature_4_title' => 'Centro Assistenza e Documentazione Completa',
+    'feature_4_desc' => 'Knowledge base esaustiva (/help) con 10 categorie e 27 guide approfondite, risoluzione dinamica del titolo del sito dal database senza marchi fissi, ricerca istantanea e votazione di utilità AJAX ("👍 Sì / 👎 No").',
+    'feature_5_title' => 'Motore Universale di Personalizzazione Widget in Admin',
+    'feature_5_desc' => 'Controlli personalizzati in /admin/widgets per tutti i 12 widget nativi con serializzazione JSON unificata, insieme al widget piè di pagina (Landing Footer) in vetro smerigliato con link personalizzati e barra social.',
+    'feature_6_title' => 'Sicurezza Avanzata e Parità Totale in 14 Lingue',
+    'feature_6_desc' => 'Risoluzione di tutti gli avvisi Dependabot aggiornando Vite a 8.3.5 e follow-redirects a 1.16.1, sincronizzazione automatica del foglio di stile sitemap e parità al 100% delle chiavi per tutte le 14 lingue supportate.',
 
     // About Section
     'about_description' => 'MYADS è una potente piattaforma comunitaria e rete di scambio pubblicitario all-in-one.',

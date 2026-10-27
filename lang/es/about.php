@@ -7,19 +7,19 @@ return [
     'tab_changelog' => 'Registro de cambios',
     'tab_about' => 'Acerca de MYADS',
     
-    // What's New Section (v4.6.3)
-    'feature_1_title' => 'Clips de Video Cortos 2.0 y Motor de Descubrimiento de Reels Interactivos',
-    'feature_1_desc' => 'Renovación total de /clips con enlaces directos (/clips/{status}), pestañas múltiples (Recientes, Tendencias, Siguiendo), registro automático de vistas tras 2.5s con deduplicación, atajos de teclado, doble toque de me gusta y API REST complementaria.',
-    'feature_2_title' => 'Motor de Afiliados y Referidos con Seguimiento de 30 Días e Insignias de Hitos',
-    'feature_2_desc' => 'Sistema de afiliados rediseñado con middleware CaptureReferral de seguimiento de cookies de 30 días, resolución multi-identificador, bloqueo de auto-referidos, bono de bienvenida mutuo (+10 PTS para ambas partes) y 4 insignias de hitos en /badges.',
-    'feature_3_title' => 'Directorio de Sitios y Herramientas 2.0 con Votos Comunitarios e Insignias SVG',
-    'feature_3_desc' => 'Transformación de /directory en plataforma interactiva con votación atómica en tiempo real, insignias vectoriales SVG dinámicas, filtros facetados de precios (Gratis, Freemium, Pago, Código Abierto), verificación de propiedad y barra de control compacta.',
-    'feature_4_title' => 'Video Hub Cinematográfico y Experiencia de Reproducción Dedicada',
-    'feature_4_desc' => 'Separación total del catálogo de videos de las categorías del foro en 13 géneros especializados, barra de filtros estilo YouTube en una línea, banner cinematográfico obsidiana, páginas de reproducción dedicadas (/video/watch/{id}) y conmutador de reproducción automática.',
-    'feature_5_title' => 'Arquitectura de Foro Moderno, Suite Multi-Editor y Árbol de Categorías',
-    'feature_5_desc' => 'Reconstrucción de /forum con diseño adaptable de dos paneles, filtros AJAX instantáneos (Recientes, Populares, Nuevos, Sin respuesta), editor flotante con vista previa en vivo, barra de progreso cronológica, suite multieditor y árbol drag & drop en categorías administrativas.',
-    'feature_6_title' => 'Comentarios Fijados, Mejores Respuestas, Compartir Temas e Interfaz de KB',
-    'feature_6_desc' => 'Fijación de comentarios destacados, insignia esmeralda de Mejor Respuesta con +10 PTS de reputación, ventana emergente para compartir enlace con confirmación visual, ajuste dinámico de StackEdit en /kb, barra compacta de fragmentos de código y compatibilidad Font Awesome Brands.',
+    // What's New Section (v4.6.4)
+    'feature_1_title' => 'Plataforma para Desarrolladores y Ecosistema de API REST',
+    'feature_1_desc' => 'Modernización integral de /developer con compatibilidad OAuth 2.1 y PKCE (RFC 7636/6749), revocación de tokens (RFC 7009), tokens de acceso personal (PAT), Webhooks con firmas HMAC-SHA256, telemetría y cabeceras de límite de tasa RFC, OpenAPI 3.1 Playground y widgets embebidos adaptables.',
+    'feature_2_title' => 'Foro de Soporte Dedicado e Insignias de Solución',
+    'feature_2_desc' => 'Foro comunitario de soporte autónomo (/support) separado de las discusiones generales, con 5 canales especializados, búsqueda en tiempo real, filtros de estado resuelto/no resuelto, insignias de equipo y marcado de solución en 1 clic con bonificación de PTS.',
+    'feature_3_title' => 'Motor de Tickets de Soporte Técnico',
+    'feature_3_desc' => 'Sistema privado de tickets directo al equipo (/tickets, /admin/tickets) con numeración de referencia automática (TKT-YYYYMMDD-XXXX), 4 departamentos, 4 niveles de prioridad, adjuntos seguros de hasta 5 MB, cronología de conversación y panel administrativo.',
+    'feature_4_title' => 'Centro de Ayuda y Documentación Integral',
+    'feature_4_desc' => 'Base de conocimientos completa (/help) con 10 categorías y 27 tutoriales detallados, resolución dinámica del nombre del sitio desde la base de datos sin marcas fijas, búsqueda en tiempo real y votación de utilidad AJAX ("👍 Sí / 👎 No").',
+    'feature_5_title' => 'Motor Universal de Personalización de Widgets en Admin',
+    'feature_5_desc' => 'Controles adaptados en /admin/widgets para los 12 widgets nativos con serialización JSON unificada, junto con el widget de pie de página (Landing Footer) con diseño de cristal, enlaces personalizados y barra de redes sociales.',
+    'feature_6_title' => 'Seguridad Reforzada y Paridad Total en 14 Idiomas',
+    'feature_6_desc' => 'Resolución de todas las alertas de Dependabot actualizando Vite a 8.3.5 y follow-redirects a 1.16.1, sincronización automática de estilos del sitemap y 100% de paridad de claves en los 14 idiomas y 8 catálogos.',
 
     // About Section
     'about_description' => 'MYADS es una potente plataforma comunitaria y red de intercambio publicitario todo en uno.',

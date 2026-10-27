@@ -2,7 +2,7 @@
 > **Specification Version:** `v4.6.4` (Active Development / Current Release)  
 > **Target Framework:** Laravel 12 (PHP 8.2+)  
 > **Authentication Engines:** Laravel Sanctum (Mobile & Web API), OAuth 2.0 (Developer Platform), and Server-Sent Events (SSE Live Stream).  
-> **Mobile Companion Client:** `myads_app` (v1.8.5+27)  
+> **Mobile Companion Client:** `myads_app` (v1.8.7+29)  
 > **Last Updated:** October 2026  
 
 ---
@@ -12,7 +12,7 @@
 The MYADS v4.6.4 API ecosystem delivers high-performance, secure, and extensible interfaces connecting web clients, companion mobile applications (Flutter), and third-party developer integrations.
 
 ### Primary API Subsystems
-1. **Internal Mobile & Web API (`/api/*`):** Powered by Laravel Sanctum for mobile app companion clients (`myads_app` v1.8.5+27) and web AJAX workflows.
+1. **Internal Mobile & Web API (`/api/*`):** Powered by Laravel Sanctum for mobile app companion clients (`myads_app` v1.8.7+29) and web AJAX workflows.
 2. **Video Hub & Cinema Watch Engine (`/api/video/*`, `/video/watch/{id}`, `/video/{id}`):** Dedicated video endpoints providing content-isolated feeds, dynamic categories, multi-criteria sorting, and cinema watch pages with suggested videos collections.
 3. **Modern Community Forum & Moderation API (`/api/forums/*`, `/forum/*`):** Hierarchical category discovery with custom colors, real-time filtered topic streams, threaded 2-level comment trees, pinned comments, best answer resolution, and topic lock/pin controls.
 4. **Real-Time Events Engine (`/live/stream` & `/api/live/stream` — RT-04):** Zero-overhead Server-Sent Events (SSE) streaming engine delivering instant unread counters (synchronized with `MessageConversationService`), live toasts, and feed updates.

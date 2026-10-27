@@ -43,9 +43,9 @@ class AdminAboutPageTest extends TestCase
             ->assertSee(__('about.feature_4_title'))
             ->assertSee(__('about.feature_5_title'))
             ->assertSee(__('about.feature_6_title'))
-            ->assertSee('Short Video Clips 2.0 & Interactive Reels Discovery Engine')
-            ->assertSee('Referral & Affiliate Growth Engine with 30-Day Tracking & Milestone Badges')
-            ->assertSee('Web & Tools Directory 2.0 with Community Upvotes & Live SVG Embed Badges')
+            ->assertSee('Developer Platform & REST API Ecosystem')
+            ->assertSee('Dedicated Support Forum & Solution Badges')
+            ->assertSee('Technical Support Ticketing Engine')
             ->assertSee('https://github.com/sponsors/mrghozzi')
             ->assertSee(__('about.sponsor_on_github'))
             ->assertSee(__('about.sponsor_project_title'));
@@ -66,9 +66,9 @@ class AdminAboutPageTest extends TestCase
         $response = $this->actingAs($admin)->get(route('admin.about', ['lang' => 'ar']));
 
         $response->assertOk()
-            ->assertSee('محرك مقاطع الفيديو القصيرة Clips 2.0 واكتشاف الريلز التفاعلي')
-            ->assertSee('محرك نمو الإحالة والتسويق بالعمولة بتتبع 30 يوماً وشارات الإنجاز')
-            ->assertSee('دليل المواقع والأدوات البرمجية 2.0 بالتصويت المجتمعي وشارات SVG الحية')
+            ->assertSee('منصة المطورين وبيئة واجهات البرمجة REST API')
+            ->assertSee('منتدى الدعم الفني المخصص وشارات الحلول النموذجية')
+            ->assertSee('نظام تذاكر الدعم الفني المباشر')
             ->assertSee('https://github.com/sponsors/mrghozzi')
             ->assertSee('رعاية المشروع عبر GitHub Sponsors')
             ->assertSee('برنامج الرعاية الرسمي عبر GitHub Sponsors');

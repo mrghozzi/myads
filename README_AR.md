@@ -13,7 +13,7 @@
 [![إصدار المشروع](https://img.shields.io/badge/الإصدار-v4.6.4-3b82f6.svg?style=for-the-badge&logo=github)](https://github.com/mrghozzi/myads/releases)
 [![إطار العمل](https://img.shields.io/badge/Laravel-12.x-ff2d20.svg?style=for-the-badge&logo=laravel)](https://laravel.com)
 [![بيئة التشغيل](https://img.shields.io/badge/PHP-8.2%2B-777bb4.svg?style=for-the-badge&logo=php)](https://php.net)
-[![تطبيق الموبايل](https://img.shields.io/badge/تطبيق_الموبايل-Flutter_3.27%2B_v1.8.5-02569b.svg?style=for-the-badge&logo=flutter)](https://github.com/mrghozzi/myads_app)
+[![تطبيق الموبايل](https://img.shields.io/badge/تطبيق_الموبايل-Flutter_3.27%2B_v1.8.7-02569b.svg?style=for-the-badge&logo=flutter)](https://github.com/mrghozzi/myads_app)
 [![فحص الاختبارات](https://img.shields.io/github/actions/workflow/status/mrghozzi/myads/tests.yml?branch=main&style=for-the-badge&logo=githubactions&label=الاختبارات&color=22c55e)](https://github.com/mrghozzi/myads/actions)
 [![الترخيص](https://img.shields.io/badge/الترخيص-MIT-10b981.svg?style=for-the-badge)](LICENSE)
 
@@ -62,8 +62,8 @@
       <p>هندسة منتديات عصرية ثنائية التقسيم وتصفح سلس بدون إعادة تحميل، محررات متقدمة (Markdown، Quill، SCEditor)، شجرة تعليقات متداخلة، شارة أفضل إجابة، إشراف ذكي بـ Groq AI، وبث لحظي بـ SSE.</p>
     </td>
     <td width="50%">
-      <h3>📱 تطبيق الموبايل الأصلي (Flutter v1.8.5)</h3>
-      <p>تطبيق رسمي احترافي لأنظمة أندرويد و iOS عبر (<code>myads_app</code>)، يطابق الويب 100%: مركز الفيديو والمشاهدة السينمائية، المنتديات الحديثة والردود، مراجعات المتجر، حفظ المنشورات، وطلبات الخدمات.</p>
+      <h3>📱 تطبيق الموبايل الأصلي (Flutter v1.8.7)</h3>
+      <p>تطبيق رسمي احترافي لأنظمة أندرويد و iOS عبر (<code>myads_app</code>)، يطابق الويب 100%: مركز المساعدة وتذاكر الدعم الفني، محرك الشورتس Clips 2.0، مركز الفيديو والمشاهدة السينمائية، المنتديات الحديثة والردود، مراجعات المتجر، حفظ المنشورات، وطلبات الخدمات.</p>
     </td>
   </tr>
   <tr>
@@ -219,9 +219,9 @@ graph TD
 
 ---
 
-## 📱 تطبيق الموبايل الرسمي (Flutter v1.8.5+27)
+## 📱 تطبيق الموبايل الرسمي (Flutter v1.8.7+29)
 
-تقدم المنصة تطبيق موبايل رسمي مفتوح المصدر تم بناؤه باستخدام إطار العمل الحديث **Flutter 3.27+** ليعمل بكفاءة على نظامي أندرويد و iOS (**`myads_app` v1.8.5+27**).
+تقدم المنصة تطبيق موبايل رسمي مفتوح المصدر تم بناؤه باستخدام إطار العمل الحديث **Flutter 3.27+** ليعمل بكفاءة على نظامي أندرويد و iOS (**`myads_app` v1.8.7+29**).
 
 <div align="center">
   <a href="https://github.com/mrghozzi/myads_app">
@@ -230,6 +230,8 @@ graph TD
 </div>
 
 ### أبرز مميزات تطبيق الموبايل:
+- **مركز المساعدة وتذاكر الدعم الفني (`v1.8.7`):** وصول مباشر داخل التطبيق إلى مركز المساعدة `/help`، منتدى الدعم `/support`، وتذاكر الدعم الفني `/tickets` عبر متصفح ويب مدمج وآمن `SupportWebviewScreen` مع حقن توكن المصادقة.
+- **محرك اكتشاف الشورتس Clips 2.0 والريلز (`v1.8.6`):** قنوات استكشاف متعددة (المتابَعون، الرائجة، الأحدث)، توجيه مباشر `/clips/:id`، تسجيل مشاهدات تلقائي بعد 2.5 ثانية مع منع التكرار، وأنيميشن الإعجاب السريع بالنقر المزدوج.
 - **مركز الفيديو والمشاهدة السينمائية (`v1.8.5`):** شاشة مخصصة `VideoHubScreen` بفلاتر تصنيف ديناميكية، ترتيب متعدد (الأحدث، الأكثر مشاهدة، الأكثر تفاعلاً، الأقدم)، توجيه مباشر `/video/watch/:id`، ورف مقاطع الشورتس.
 - **محرك المنتديات الحديثة (`v1.8.4`):** تصفح الأقسام الفرعية بالألوان المخصصة، فلاتر المواضيع (أحدث نشاط، الأبرز، الأحدث، بلا ردود)، شجرة ردود متداخلة، تثبيت التعليقات، أفضل إجابة، ومحرر Markdown سريع.
 - **خصوصية الملف الشخصي (`v1.8.3`):** إدراك تام لحالة خصوصية النبذة (`canViewAbout`، `aboutVisibility`)، إخفاء البيانات المحمية، وقائمة اختيار الخصوصية في الإعدادات.

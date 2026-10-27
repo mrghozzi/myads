@@ -7,19 +7,19 @@ return [
     'tab_changelog' => 'Changelog',
     'tab_about' => 'About MYADS',
     
-    // What's New Section (v4.6.3)
-    'feature_1_title' => 'Short Video Clips 2.0 & Interactive Reels Discovery Engine',
-    'feature_1_desc' => 'Full revamp of /clips with dedicated deep-link routing (/clips/{status}), multi-stream feed switching (Latest, Trending, Following), 2.5s automated continuous-watch view tracking with session deduplication, desktop shortcuts, double-tap heart pop, and high-performance companion REST API.',
-    'feature_2_title' => 'Referral & Affiliate Growth Engine with 30-Day Tracking & Milestone Badges',
-    'feature_2_desc' => 'Overhauled affiliate system with dedicated CaptureReferral 30-day cookie & session tracking middleware, multi-identifier resolver (Username, Public UID, ID), anti-fraud self-referral blocking, two-sided welcome bonus (+10 PTS for both parties), and 4 tiered milestone achievement badges in /badges.',
-    'feature_3_title' => 'Web & Tools Directory 2.0 with Community Upvotes & Live SVG Embed Badges',
-    'feature_3_desc' => 'Transformed /directory into an interactive discovery hub featuring real-time atomic upvoting, dynamic cacheable SVG embed badges ("Featured on MYADS"), faceted pricing filters (Free, Freemium, Paid, Open Source), website ownership meta tag verification, Schema.org SEO, and compact discovery control bar.',
-    'feature_4_title' => 'Cinema-Grade Video Hub & Standalone Obsidian Watch Experience',
-    'feature_4_desc' => 'Complete separation of video catalog from forum categories across 13 dedicated video genres, single-row YouTube-style filter bar, obsidian cinema hero banner, standalone cinema watch pages (/video/watch/{id}) with custom horizontal pill actions, resilient autoplay switch, and smart title fallbacks.',
-    'feature_5_title' => 'Modern Community Forum Architecture, Multi-Editor Suite & Category Tree',
-    'feature_5_desc' => 'Rebuilt /forum with two-pane responsive layout, colored category tags, instant zero-reload Ajax stream filtering (Latest, Top, Newest, Unanswered), floating composer drawer with live markdown preview, sticky timeline scrubber, multi-editor suite (MyAds Markdown, Quill.js, SCEditor), and drag-and-drop hierarchy tree in admin categories.',
-    'feature_6_title' => 'Pinned Comments, Best Answers, Topic Share & Store Knowledge Base UI',
-    'feature_6_desc' => 'Author/moderator pinned comments floating to top, emerald Best Answer badge with +10 PTS reputation reward, 1-click share popover with URL copy feedback, StackEdit fixed header offset resolution, compact single-row diagram/code snippet toolbars, and universal Font Awesome Brands font shims.',
+    // What's New Section (v4.6.4)
+    'feature_1_title' => 'Developer Platform & REST API Ecosystem',
+    'feature_1_desc' => 'Complete modernization of /developer with OAuth 2.1 & PKCE compliance (RFC 7636/6749), standard token revocation (RFC 7009), Personal Access Tokens (PAT), Webhooks with HMAC-SHA256 signatures, API telemetry & RFC rate limit headers, in-browser OpenAPI 3.1 Playground, and auto-resizing HTML embed widgets.',
+    'feature_2_title' => 'Dedicated Support Forum & Solution Badges',
+    'feature_2_desc' => 'Autonomous community support forum (/support) decoupled from general discussions, featuring 5 specialized channels, debounced search, solved/unsolved status filtering, staff response badges, and 1-click verified solution badges with reputation PTS awards.',
+    'feature_3_title' => 'Technical Support Ticketing Engine',
+    'feature_3_desc' => 'Private, direct-to-staff ticketing engine (/tickets, /admin/tickets) with automated reference numbering (TKT-YYYYMMDD-XXXX), 4 specialized departments, 4 urgency priority levels, secure file attachments up to 5MB, conversation timelines, and administrative moderation suite.',
+    'feature_4_title' => 'Comprehensive Help & Knowledge Center',
+    'feature_4_desc' => 'Full knowledge base (/help) featuring 10 categories and 27 in-depth guides covering every platform feature, dynamic database site title resolution eliminating hardcoded branding, debounced real-time keyword search, and live AJAX helpfulness voting ("👍 Yes / 👎 No").',
+    'feature_5_title' => 'Universal In-Admin Widget Customizer Engine',
+    'feature_5_desc' => 'Tailored in-admin configuration controls across all 12 native widgets in /admin/widgets with unified JSON serialization, alongside a modernized glassmorphic Landing Footer widget with custom multi-line links, layout selectors, and social media icon bar.',
+    'feature_6_title' => 'Zero-Vulnerability Security & 14-Language Parity',
+    'feature_6_desc' => 'Remediated all GitHub Dependabot advisories with Vite 8.3.5 and follow-redirects 1.16.1 upgrades, dynamic sitemap stylesheet auto-synchronization, and achieved 100% key parity across all 14 supported languages and 8 localization catalogs.',
 
     // About Section
     'about_description' => 'MYADS is a powerful, all-in-one community platform and ad exchange network. It empowers website owners to connect, exchange traffic, trade services, and monetize their platforms effectively.',
