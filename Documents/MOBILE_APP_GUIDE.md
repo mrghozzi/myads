@@ -4,7 +4,7 @@ The official mobile client for the MYADS ecosystem is built using **Flutter (v3.
 
 - **Repository:** [https://github.com/mrghozzi/myads_app](https://github.com/mrghozzi/myads_app)
 - **Supported Platforms:** Android (SDK 21+) & iOS (iOS 13+)
-- **Target App Version:** `v1.8.5+27` (Synchronized with MYADS Web Core `v4.6.4`)
+- **Target App Version:** `v1.8.7+29` (Synchronized with MYADS Web Core `v4.6.4`)
 
 ---
 
