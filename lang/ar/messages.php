@@ -920,6 +920,8 @@ return [
     'landing_stats_members' => 'إجمالي الأعضاء',
     'landing_stats_posts' => 'المنشورات',
     'landing_stats_interaction' => 'التفاعلات',
+    'landing_stats_points' => 'النقاط المتبادلة',
+    'landing_stats_sites' => 'المواقع المسجلة',
     'landing_footer' => 'متذيّل صفحة البداية',
     'landing_footer_customizer' => 'تخصيص متذيّل صفحة البداية (Landing Footer)',
     'footer_links_settings' => 'روابط التذييل الأساسية',

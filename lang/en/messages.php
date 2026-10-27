@@ -916,6 +916,8 @@ return [
     'landing_stats_members' => 'Total Members',
     'landing_stats_posts' => 'Total Posts',
     'landing_stats_interaction' => 'Engagement',
+    'landing_stats_points' => 'Exchanged Points',
+    'landing_stats_sites' => 'Registered Sites',
     'landing_footer' => 'Landing Footer',
     'landing_footer_customizer' => 'Landing Footer Customizer',
     'footer_links_settings' => 'Primary Footer Links',
