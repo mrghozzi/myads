@@ -438,6 +438,8 @@
 
         <!-- Sidebar Info -->
         <div>
+            {!! \App\Helpers\Hooks::do_action('ticket_show_sidebar', $ticket) !!}
+
             <div class="ticket-info-card">
                 <h4 class="ticket-info-title">
                     <i class="fa-solid fa-circle-info" style="color: var(--myads-primary, #615dfa);"></i>

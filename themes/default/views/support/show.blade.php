@@ -524,6 +524,8 @@
 
         <!-- Sidebar -->
         <div>
+            {!! \App\Helpers\Hooks::do_action('support_forum_topic_sidebar', $topic) !!}
+
             @if($relatedTopics->count() > 0)
                 <div class="sidebar-box">
                     <h4 class="sidebar-title">

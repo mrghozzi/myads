@@ -663,5 +663,6 @@
             });
         })();
     </script>
+    {!! \App\Helpers\Hooks::do_action('admin_master_before_body_close') !!}
 </body>
 </html>
