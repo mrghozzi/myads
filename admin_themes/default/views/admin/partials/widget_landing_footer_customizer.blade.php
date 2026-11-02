@@ -226,7 +226,7 @@
                                 <label class="form-check-label" for="lf_show_powered" style="font-size: 11px;">{{ __('messages.show_powered_by_tag') }}</label>
                             </div>
                         </div>
-                        <input type="text" name="landing_footer[powered_by_text]" class="form-control admin-form-control" value="{{ $poweredByText }}" placeholder="Powered by :site SEO Engine | :version" style="border-radius: 10px; font-size: 12px;">
+                        <input type="text" name="landing_footer[powered_by_text]" class="form-control admin-form-control" value="{{ $poweredByText }}" placeholder="Powered by :site (MrGhozzi)" style="border-radius: 10px; font-size: 12px;">
                     </div>
                 </div>
             </div>

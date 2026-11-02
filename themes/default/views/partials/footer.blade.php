@@ -62,6 +62,19 @@
 [data-theme="css"] .site-footer-brand {
     opacity: 0.8;
 }
+.site-footer-brand a {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    transition: color 0.2s ease, opacity 0.2s ease;
+}
+.site-footer-brand a:hover {
+    color: #fff;
+    opacity: 1;
+}
+[data-theme="css"] .site-footer-brand a:hover {
+    color: #615dfa;
+}
 
 /* Scroll Animations */
 .footer-fade-up {
@@ -113,7 +126,7 @@
     </div>
     <p class="footer-fade-up">&copy; {{ date('Y') }} {{ $site_settings->titer ?? 'MyAds' }}. {{ __('messages.all_rights_reserved') }}</p>
     <p class="footer-fade-up site-footer-brand">
-        Powered by <strong>MyAds SEO Engine</strong> | {{ \App\Support\SystemVersion::tag() }}
+        Powered by <a href="https://github.com/mrghozzi/myads" target="_blank" rel="noopener noreferrer"><strong>MyAds</strong></a> (<a href="https://github.com/mrghozzi" target="_blank" rel="noopener noreferrer">MrGhozzi</a>)
     </p>
 </div>
 

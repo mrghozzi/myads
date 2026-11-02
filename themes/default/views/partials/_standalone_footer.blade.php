@@ -44,6 +44,15 @@
     .standalone-footer .footer-links a:hover {
         color: var(--primary);
     }
+    .standalone-footer .standalone-footer-brand a {
+        color: inherit;
+        text-decoration: underline;
+        text-underline-offset: 2px;
+        transition: color 0.2s ease;
+    }
+    .standalone-footer .standalone-footer-brand a:hover {
+        color: var(--primary);
+    }
 </style>
 
 <footer class="standalone-footer">
@@ -56,5 +65,7 @@
         <a href="{{ url('/refund') }}"><i class="fa-solid fa-arrow-rotate-left"></i> {{ __('messages.refund_policy') ?? 'Refund Policy' }}</a>
     </div>
     <p>&copy; {{ date('Y') }} {{ $site_settings->titer ?? 'MyAds' }}. {{ __('messages.all_rights_reserved') ?? 'All rights reserved.' }}</p>
-    <p style="margin-top: 10px; font-size: 0.85rem; opacity: 0.7;">Powered by <strong>MyAds</strong> | v{{ \App\Support\SystemVersion::CURRENT ?? '4.6.4' }}</p>
+    <p class="standalone-footer-brand" style="margin-top: 10px; font-size: 0.85rem; opacity: 0.7;">
+        Powered by <a href="https://github.com/mrghozzi/myads" target="_blank" rel="noopener noreferrer"><strong>MyAds</strong></a> (<a href="https://github.com/mrghozzi" target="_blank" rel="noopener noreferrer">MrGhozzi</a>)
+    </p>
 </footer>

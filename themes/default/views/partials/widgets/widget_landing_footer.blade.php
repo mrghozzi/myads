@@ -54,7 +54,7 @@
     // Powered By Text
     $poweredByText = !empty($config['powered_by_text'])
         ? str_replace([':site', ':version'], [$siteTitle, \App\Support\SystemVersion::tag()], $config['powered_by_text'])
-        : ('Powered by <strong>' . $siteTitle . ' SEO Engine</strong> | ' . \App\Support\SystemVersion::tag());
+        : ('Powered by <a href="https://github.com/mrghozzi/myads" target="_blank" rel="noopener noreferrer"><strong>' . $siteTitle . '</strong></a> (<a href="https://github.com/mrghozzi" target="_blank" rel="noopener noreferrer">MrGhozzi</a>)');
 @endphp
 
 <div class="widget-box landing-footer-widget-box landing-footer-bg-{{ $bgStyle }}">
@@ -309,6 +309,17 @@
         .landing-footer-powered strong {
             color: var(--myads-text-main, #3e3f5e);
             font-weight: 700;
+        }
+
+        .landing-footer-powered a {
+            color: inherit;
+            text-decoration: underline;
+            text-underline-offset: 2px;
+            transition: color 0.2s ease;
+        }
+
+        .landing-footer-powered a:hover {
+            color: var(--primary, #615dfa);
         }
 
         /* Dark Mode */
