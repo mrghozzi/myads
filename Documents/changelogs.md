@@ -1,5 +1,15 @@
 # v4.7.0
-> *Coming soon...*
+> *In progress...*
+
+### Security Hardening & Dependency Updates
+* **Composer Dependency Maintenance (`symfony/http-foundation`, PR #143, `composer.lock`)**:
+  * Upgraded `symfony/http-foundation` from `7.4.13` to `7.4.22` in the composer group across 1 directory (`/`).
+  * Updated associated indirect dependencies and polyfill packages in the composer group:
+    * Upgraded `symfony/polyfill-mbstring` from `v1.38.2` to `v1.43.3`.
+    * Upgraded `symfony/polyfill-php80` from `v1.37.0` to `v1.43.0`.
+    * Upgraded `symfony/polyfill-php83` from `v1.38.2` to `v1.43.0`.
+    * Synchronized Composer `plugin-api-version` from `2.6.0` to `2.9.0`.
+  * Verified HTTP request/response handling lifecycle, header parsing, session management security, and regression-free compatibility with Laravel 12 on PHP 8.2+.
 
 ---
 
