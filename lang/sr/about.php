@@ -6,7 +6,7 @@ return [
   'tab_whats_new' => 'What\'s New',
   'tab_changelog' => 'Changelog',
   'tab_about' => 'About MYADS',
-  // What's New Section (v4.6.4)
+  // What's New Section (v4.7.0)
   'feature_1_title' => 'Platforma za programere i REST API ekosistem',
   'feature_1_desc' => 'Potpuna modernizacija /developer sa OAuth 2.1 i PKCE (RFC 7636/6749), opozivom tokena (RFC 7009), ličnim pristupnim tokenima (PAT), vebhukovima sa HMAC-SHA256 potpisima, API telemetrijom, OpenAPI 3.1 okruženjem i prilagodljivim vidžetima.',
   'feature_2_title' => 'Namenski forum za podršku i bedževi rešenja',

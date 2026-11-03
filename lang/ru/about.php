@@ -6,7 +6,7 @@ return [
   'tab_whats_new' => 'What\'s New',
   'tab_changelog' => 'Changelog',
   'tab_about' => 'About MYADS',
-  // What's New Section (v4.6.4)
+  // What's New Section (v4.7.0)
   'feature_1_title' => 'Платформа разработчиков и экосистема REST API',
   'feature_1_desc' => 'Полная модернизация /developer с поддержкой OAuth 2.1 и PKCE (RFC 7636/6749), отзывом токенов (RFC 7009), персональными токенами (PAT), вебхуками с HMAC-SHA256, телеметрией API, интерактивной песочницей OpenAPI 3.1 и адаптивными HTML-виджетами.',
   'feature_2_title' => 'Выделенный форум поддержки и значки решений',

@@ -491,7 +491,7 @@
                             <div class="timeline">
                                 <div class="timeline-item">
                                     <div class="timeline-icon"><i class="feather-box fs-12"></i></div>
-                                    <h6 class="fw-bold mb-1">v4.6.4 <span class="badge bg-soft-success text-success ms-2">Latest / Stable</span></h6>
+                                    <h6 class="fw-bold mb-1">v4.7.0 <span class="badge bg-soft-success text-success ms-2">Latest / Stable</span></h6>
                                     <p class="text-muted fs-13 mb-3">Developer Platform &amp; REST API Ecosystem (OAuth 2.1 &amp; PKCE, PAT Tokens, Webhooks with HMAC-SHA256, OpenAPI 3.1 &amp; Interactive Playground, Embed Widgets), Dedicated Support Forum (/support) with 5 Categorized Channels &amp; Solution Badges, Direct Technical Support Tickets Engine (/tickets &amp; /admin/tickets), Comprehensive Help &amp; Knowledge Center (/help) with Dynamic Site Name Resolution &amp; AJAX Voting, Universal In-Admin Widget Customizer Engine across All 12 Native Widgets, Glassmorphic Landing Footer Customizer, Zero-Vulnerability Security Remediation (Vite 8.3.5 &amp; Dependabot Patches), and Full 14-Language Localization Parity.</p>
                                     <div class="d-flex flex-column gap-2">
                                         <div class="d-flex align-items-start">

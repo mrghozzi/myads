@@ -6,7 +6,7 @@ return [
   'tab_whats_new' => 'What\'s New',
   'tab_changelog' => 'Changelog',
   'tab_about' => 'About MYADS',
-  // What's New Section (v4.6.4)
+  // What's New Section (v4.7.0)
   'feature_1_title' => '開発者プラットフォーム＆REST APIエコシステム',
   'feature_1_desc' => 'OAuth 2.1およびPKCE（RFC 7636/6749）、標準トークン失効（RFC 7009）、パーソナルアクセストークン（PAT）、HMAC-SHA256署名付きWebhook、APIテレメトリ、ブラウザ内OpenAPI 3.1プレイグラウンド、自動リサイズ埋め込みウィジェットを備えた/developerの全面刷新。',
   'feature_2_title' => '専用サポートフォーラム＆ベストアンサーバッジ',

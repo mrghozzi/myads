@@ -7,7 +7,7 @@ return [
     'tab_changelog' => 'سجل التغييرات',
     'tab_about' => 'عن MYADS',
     
-    // What's New Section (v4.6.4)
+    // What's New Section (v4.7.0)
     'feature_1_title' => 'منصة المطورين وبيئة واجهات البرمجة REST API',
     'feature_1_desc' => 'تطوير شامل لمنصة المطورين /developer بدعم OAuth 2.1 وPKCE (RFC 7636/6749)، إبطال الرموز القياسي (RFC 7009)، رموز الوصول الشخصية (PAT)، خطافات الويب Webhooks بتواقيع HMAC-SHA256، قياسات الاتصال وترويسات معدل الطلب RFC، بيئة تجارب OpenAPI 3.1، وعناصر التضمين التفاعلية التلقائية.',
     'feature_2_title' => 'منتدى الدعم الفني المخصص وشارات الحلول النموذجية',

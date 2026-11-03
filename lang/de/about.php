@@ -7,7 +7,7 @@ return [
     'tab_changelog' => 'Änderungsprotokoll',
     'tab_about' => 'Über MYADS',
     
-    // What's New Section (v4.6.4)
+    // What's New Section (v4.7.0)
     'feature_1_title' => 'Entwicklerplattform & REST-API-Ökosystem',
     'feature_1_desc' => 'Vollständige Modernisierung von /developer mit OAuth 2.1 & PKCE (RFC 7636/6749), Token-Widerruf (RFC 7009), Personal Access Tokens (PAT), Webhooks mit HMAC-SHA256-Signaturen, API-Telemetrie & RFC-Ratenbegrenzungs-Headern, OpenAPI 3.1 Playground und responsiven HTML-Embed-Widgets.',
     'feature_2_title' => 'Dediziertes Support-Forum & Lösungs-Badges',

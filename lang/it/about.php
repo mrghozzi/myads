@@ -7,7 +7,7 @@ return [
     'tab_changelog' => 'Registro Modifiche',
     'tab_about' => 'Informazioni su MYADS',
     
-    // What's New Section (v4.6.4)
+    // What's New Section (v4.7.0)
     'feature_1_title' => 'Piattaforma Sviluppatori ed Ecosistema API REST',
     'feature_1_desc' => 'Modernizzazione completa di /developer con conformità OAuth 2.1 e PKCE (RFC 7636/6749), revoca token (RFC 7009), Personal Access Tokens (PAT), Webhook con firme HMAC-SHA256, telemetria API, playground OpenAPI 3.1 e widget incorporabili adattabili.',
     'feature_2_title' => 'Forum di Supporto Dedicato e Badge Soluzione',

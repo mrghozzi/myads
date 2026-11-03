@@ -7,7 +7,7 @@ return [
     'tab_changelog' => 'Değişiklik Günlüğü',
     'tab_about' => 'MYADS Hakkında',
     
-    // What's New Section (v4.6.4)
+    // What's New Section (v4.7.0)
     'feature_1_title' => 'Geliştirici Platformu ve REST API Ekosistemi',
     'feature_1_desc' => 'OAuth 2.1 ve PKCE uyumluluğu (RFC 7636/6749), standart belirteç iptali (RFC 7009), Kişisel Erişim Belirteçleri (PAT), HMAC-SHA256 imzalı Webhook\'lar, API telemetrisi, OpenAPI 3.1 Deneme Alanı ve duyarlı gömülebilir widget\'lar ile /developer platformunun baştan sona modernizasyonu.',
     'feature_2_title' => 'Özel Destek Forumu ve Çözüm Rozetleri',

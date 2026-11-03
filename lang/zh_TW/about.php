@@ -6,7 +6,7 @@ return [
   'tab_whats_new' => 'What\'s New',
   'tab_changelog' => 'Changelog',
   'tab_about' => 'About MYADS',
-  // What's New Section (v4.6.4)
+  // What's New Section (v4.7.0)
   'feature_1_title' => '開發者平台與 REST API 生態系統',
   'feature_1_desc' => '全面現代化 /developer：支援 OAuth 2.1 與 PKCE 規範（RFC 7636/6749）、標準權杖撤銷（RFC 7009）、個人存取權杖（PAT）、具備 HMAC-SHA256 簽章的 Webhooks、API 遙測與速率限制標頭、瀏覽器內 OpenAPI 3.1 測試場及自適應 HTML 嵌入小工具。',
   'feature_2_title' => '專屬技術支援論壇與最佳解答徽章',

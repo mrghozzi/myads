@@ -7,7 +7,7 @@ return [
     'tab_changelog' => 'گزارش تغییرات',
     'tab_about' => 'درباره MYADS',
     
-    // What's New Section (v4.6.4)
+    // What's New Section (v4.7.0)
     'feature_1_title' => 'پلتفرم توسعه‌دهندگان و اکوسیستم REST API',
     'feature_1_desc' => 'نوسازی جامع بخش /developer با پشتیبانی از OAuth 2.1 و PKCE (RFC 7636/6749)، ابطال استاندارد توکن (RFC 7009)، توکن‌های دسترسی شخصی (PAT)، وب‌هوک‌ها با امضای HMAC-SHA256، تله‌متری API، محیط آزمایش OpenAPI 3.1 و ابزارک‌های جاسازی خودکار.',
     'feature_2_title' => 'انجمن پشتیبانی اختصاصی و نشان‌های راه‌حل تاییدشده',

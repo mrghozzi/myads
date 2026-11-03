@@ -158,7 +158,7 @@ class WebhookDispatcherService
                 ->withHeaders([
                     'Content-Type' => 'application/json',
                     'Accept' => 'application/json',
-                    'User-Agent' => 'MYADS-Webhook/4.6.4',
+                    'User-Agent' => 'MYADS-Webhook/4.7.0',
                     'X-MYADS-Signature-256' => $signature,
                     'X-MYADS-Event' => $event,
                     'X-MYADS-Delivery' => $eventId,
