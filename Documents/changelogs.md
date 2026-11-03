@@ -2,6 +2,12 @@
 > *In progress...*
 
 ### Security Hardening & Dependency Updates
+* **Symfony Ecosystem Security Remediation & DoS Prevention (`symfony/yaml`, Dependabot #98, `composer.lock`)**:
+  * Upgraded `symfony/yaml` and `symfony/mime` from `7.4.13` to `7.4.22` resolving GitHub Dependabot security alert #98 (`CVE-2026-109413`) and email header advisory (`CVE-2026-45070`).
+  * Fixed unbounded recursion in YAML inline lexer (`lexInlineStructure()`) where deeply nested inline sequences or mappings crashed PHP processes due to stack exhaustion.
+* **NPM Dependency Vulnerability Remediation (`follow-redirects`, Dependabot #99, `package-lock.json`)**:
+  * Upgraded `follow-redirects` from `1.16.1` to `1.16.2` resolving GitHub Dependabot security alert #99 (`CVE-2026-116689`).
+  * Fixed cross-realm `sensitiveHeaders` array validation bug where `instanceof Array` discarded custom sensitive headers in multi-realm execution contexts, preventing accidental forwarding of credentials during cross-origin redirects.
 * **Composer Dependency Maintenance (`symfony/http-foundation`, PR #143, `composer.lock`)**:
   * Upgraded `symfony/http-foundation` from `7.4.13` to `7.4.22` in the composer group across 1 directory (`/`).
   * Updated associated indirect dependencies and polyfill packages in the composer group:
@@ -10,6 +16,7 @@
     * Upgraded `symfony/polyfill-php83` from `v1.38.2` to `v1.43.0`.
     * Synchronized Composer `plugin-api-version` from `2.6.0` to `2.9.0`.
   * Verified HTTP request/response handling lifecycle, header parsing, session management security, and regression-free compatibility with Laravel 12 on PHP 8.2+.
+  * Achieved zero reported security vulnerabilities across both `composer audit` and `npm audit`.
 
 ---
 
