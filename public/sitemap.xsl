@@ -81,7 +81,7 @@
                         </xsl:otherwise>
                     </xsl:choose>
                     <div class="footer">
-                        Powered by MyAds SEO Engine | v4.6.4
+                        Powered by MyAds SEO Engine | v4.7.0
                     </div>
                 </div>
             </body>

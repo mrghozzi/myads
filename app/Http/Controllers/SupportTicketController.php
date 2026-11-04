@@ -9,6 +9,7 @@ use App\Models\SupportTicketMessage;
 use App\Services\AdminAccessService;
 use App\Services\NotificationService;
 use App\Services\SeoManager;
+use App\Services\SupportDeflectionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -272,5 +273,18 @@ class SupportTicketController extends Controller
 
         return redirect()->route('tickets.show', $ticket->ticket_number)
             ->with('success', __('support.ticket_closed_success'));
+    }
+
+    /**
+     * Provide instant AI Support Deflection recommendations matching articles & solved topics.
+     */
+    public function deflect(Request $request, SupportDeflectionService $deflectionService)
+    {
+        $query = (string) ($request->input('query') ?: $request->input('subject') ?: $request->input('q') ?: '');
+        $department = (string) $request->input('department', '');
+
+        $result = $deflectionService->deflect($query, $department);
+
+        return response()->json($result);
     }
 }

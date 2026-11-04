@@ -9,6 +9,7 @@ use App\Models\SupportReply;
 use App\Services\AdminAccessService;
 use App\Services\NotificationService;
 use App\Services\SeoManager;
+use App\Services\SupportDeflectionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
@@ -291,5 +292,18 @@ class SupportForumController extends Controller
 
         return redirect()->route('support.topic', ['id' => $topic->id, 'slug' => $topic->slug])
             ->with('success', $message);
+    }
+
+    /**
+     * Provide instant AI Support Deflection recommendations matching articles & solved topics.
+     */
+    public function deflect(Request $request, SupportDeflectionService $deflectionService)
+    {
+        $query = (string) ($request->input('query') ?: $request->input('title') ?: $request->input('q') ?: '');
+        $category = (string) $request->input('category', '');
+
+        $result = $deflectionService->deflect($query, $category);
+
+        return response()->json($result);
     }
 }

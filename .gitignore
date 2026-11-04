@@ -96,6 +96,7 @@ custom_variables.css
 !/tests/Feature/PortalAjaxRedesignTest.php
 !/tests/Feature/ForumModernizationTest.php
 !/tests/Feature/AllLanguagesCompatibilityTest.php
+!/tests/Feature/V470RoadmapHardeningTest.php
 ~/.pi/
 /wiki/
 /brain/

@@ -58,6 +58,14 @@ class SecuritySettings
         'force_https' => 0,
         'captcha_enabled_for_login' => 0,
         'moderation_banned_words' => '',
+        // v4.7.0 Enhancements: Cloudflare Turnstile, AI Support Deflection & Strict Nonce-based CSP
+        'turnstile_enabled' => 0,
+        'turnstile_site_key' => '',
+        'turnstile_secret_key' => '',
+        'turnstile_mode' => 'managed',
+        'turnstile_forms' => 'login,register',
+        'support_ai_deflection_enabled' => 1,
+        'csp_nonce_enabled' => 0,
     ];
 
 
@@ -131,6 +139,14 @@ class SecuritySettings
             'force_https' => !empty($values['force_https']) ? 1 : 0,
             'captcha_enabled_for_login' => !empty($values['captcha_enabled_for_login']) ? 1 : 0,
             'moderation_banned_words' => self::sanitizeList((string) ($values['moderation_banned_words'] ?? $defaults['moderation_banned_words'])),
+            // Turnstile & AI Deflection settings
+            'turnstile_enabled' => !empty($values['turnstile_enabled']) ? 1 : 0,
+            'turnstile_site_key' => trim((string) ($values['turnstile_site_key'] ?? $defaults['turnstile_site_key'])),
+            'turnstile_secret_key' => trim((string) ($values['turnstile_secret_key'] ?? $defaults['turnstile_secret_key'])),
+            'turnstile_mode' => in_array($values['turnstile_mode'] ?? '', ['managed', 'non-interactive', 'invisible'], true) ? $values['turnstile_mode'] : 'managed',
+            'turnstile_forms' => trim((string) ($values['turnstile_forms'] ?? $defaults['turnstile_forms'])),
+            'support_ai_deflection_enabled' => !empty($values['support_ai_deflection_enabled']) ? 1 : 0,
+            'csp_nonce_enabled' => !empty($values['csp_nonce_enabled']) ? 1 : 0,
         ]);
     }
 
@@ -183,6 +199,14 @@ class SecuritySettings
             'force_https' => self::boolish($settings['force_https'] ?? self::DEFAULTS['force_https']),
             'captcha_enabled_for_login' => self::boolish($settings['captcha_enabled_for_login'] ?? self::DEFAULTS['captcha_enabled_for_login']),
             'moderation_banned_words' => (string) ($settings['moderation_banned_words'] ?? self::DEFAULTS['moderation_banned_words']),
+            // Turnstile & AI Deflection settings
+            'turnstile_enabled' => self::boolish($settings['turnstile_enabled'] ?? self::DEFAULTS['turnstile_enabled']),
+            'turnstile_site_key' => trim((string) ($settings['turnstile_site_key'] ?? '')),
+            'turnstile_secret_key' => trim((string) ($settings['turnstile_secret_key'] ?? '')),
+            'turnstile_mode' => in_array($settings['turnstile_mode'] ?? '', ['managed', 'non-interactive', 'invisible'], true) ? $settings['turnstile_mode'] : 'managed',
+            'turnstile_forms' => (string) ($settings['turnstile_forms'] ?? self::DEFAULTS['turnstile_forms']),
+            'support_ai_deflection_enabled' => self::boolish($settings['support_ai_deflection_enabled'] ?? self::DEFAULTS['support_ai_deflection_enabled']),
+            'csp_nonce_enabled' => self::boolish($settings['csp_nonce_enabled'] ?? self::DEFAULTS['csp_nonce_enabled']),
         ];
     }
 

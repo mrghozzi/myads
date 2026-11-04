@@ -63,19 +63,33 @@ class AuthController extends Controller
             abort(403, __('messages.security_registrations_disabled_message'));
         }
 
-        $request->validate([
+        $turnstile = app(\App\Services\TurnstileService::class);
+        $turnstileActiveForRegister = $turnstile->isEnabled('register');
+
+        $rules = [
             // SECURITY: Restrict username to safe characters to prevent XSS via username display.
             // Allows: letters (Latin + Arabic), digits, underscores, hyphens, dots.
             'username' => ['required', 'string', 'max:255', 'unique:users', 'regex:/^[\p{L}\p{N}_\-\.]+$/u'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'agree_terms' => ['required', 'accepted'],
-            'capt' => ['required', function ($attribute, $value, $fail) {
+        ];
+
+        if ($turnstileActiveForRegister) {
+            $rules['cf-turnstile-response'] = ['required', function ($attribute, $value, $fail) use ($turnstile, $request) {
+                if (!$turnstile->verify($value, $request->ip())) {
+                    $fail(__('messages.turnstile_failed'));
+                }
+            }];
+        } else {
+            $rules['capt'] = ['required', function ($attribute, $value, $fail) {
                 if ((string) $value !== (string) session('captcha_result')) {
                     $fail(__('captcha_error'));
                 }
-            }],
-        ], [
+            }];
+        }
+
+        $request->validate($rules, [
             'agree_terms.required' => __('messages.agree_terms_required'),
             'agree_terms.accepted' => __('messages.agree_terms_required'),
         ]);
@@ -233,7 +247,14 @@ class AuthController extends Controller
             'password' => ['required'],
         ];
 
-        if (\App\Support\SecuritySettings::get('captcha_enabled_for_login')) {
+        $turnstile = app(\App\Services\TurnstileService::class);
+        if ($turnstile->isEnabled('login')) {
+            $rules['cf-turnstile-response'] = ['required', function ($attribute, $value, $fail) use ($turnstile, $request) {
+                if (!$turnstile->verify($value, $request->ip())) {
+                    $fail(__('messages.turnstile_failed'));
+                }
+            }];
+        } elseif (\App\Support\SecuritySettings::get('captcha_enabled_for_login')) {
             $rules['capt'] = ['required', function ($attribute, $value, $fail) {
                 if ((string) $value !== (string) session('captcha_result')) {
                     $fail(__('captcha_error') ?? 'Invalid CAPTCHA');

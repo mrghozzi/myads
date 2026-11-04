@@ -269,10 +269,10 @@ data: {
     Authorization: Bearer pat_...
     ```
 
-- **محرك الويب هوك (Webhooks Engine & HMAC-SHA256):**
+- **محرك الويب هوك (Webhooks Engine & HMAC-SHA256 Replay Defense v2):**
   - إدارة الويب هوك: عبر `/developer/apps/{app}/webhooks` (إضافة، تعديل، حذف، فحص تجريبي ping، وإعادة إرسال).
-  - توقيع الترويسة الرقمي: كل طلب مرسل يحمل الترويسة `X-MYADS-Signature-256: sha256={hash}` المحسوب باستخدام المفتاح السري المشترك للويب هوك.
-  - الأحداث المدعومة: `user.created`, `content.published`, `status.liked`, `comment.created`, `order.created`, `order.awarded`, `forum.topic_created`, `ping`.
+  - توقيع الترويسة الرقمي والحماية من إعادة الإرسال: كل طلب يحمل الترويسات `X-MYADS-Timestamp: {epoch}`, `X-MYADS-Signature: t={epoch},v1={hash}` إلى جانب `X-MYADS-Signature-256: sha256={hash}` مع فترة سماح 300 ثانية لتأمين الأنظمة من هجمات التنصت وإعادة الإرسال Replay Attacks.
+  - الأحداث المدعومة: `user.followed`, `post.created`, `post.reacted`, `message.sent`, `order.created`, `order.completed`, `wallet.points_updated`, `ping`.
 
 ---
 

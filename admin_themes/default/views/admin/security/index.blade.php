@@ -17,6 +17,9 @@
         'disable_new_registrations' => __('messages.security_disable_new_registrations'),
         'force_https' => __('messages.security_force_https'),
         'captcha_enabled_for_login' => __('messages.security_captcha_enabled_for_login'),
+        'turnstile_enabled' => __('messages.security_turnstile_enabled'),
+        'support_ai_deflection_enabled' => __('messages.security_support_ai_deflection'),
+        'csp_nonce_enabled' => __('messages.security_csp_nonce_enabled'),
     ];
 @endphp
 
@@ -260,6 +263,83 @@
                 </div>
             </div>
             <small class="text-muted d-block mt-3">{{ __('messages.security_privacy_section_help') }}</small>
+        </div>
+    </div>
+
+    <!-- Cloudflare Turnstile & Advanced Bot Protection -->
+    <div class="card stretch stretch-full mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">
+                <i class="fa-solid fa-shield-halved text-primary me-2"></i>
+                {{ __('messages.security_turnstile_section') }}
+            </h5>
+            <span class="badge {{ !empty($settings['turnstile_enabled']) ? 'bg-soft-success text-success' : 'bg-soft-secondary text-secondary' }}">
+                {{ !empty($settings['turnstile_enabled']) ? __('messages.enabled') : __('messages.disabled') }}
+            </span>
+        </div>
+        <div class="card-body">
+            <p class="text-muted small mb-4">{{ __('messages.security_turnstile_desc') }}</p>
+            <div class="row g-4">
+                <div class="col-lg-6">
+                    <div class="form-check form-switch pt-2">
+                        <input class="form-check-input" type="checkbox" id="turnstile_enabled" name="turnstile_enabled" value="1" @checked(old('turnstile_enabled', $settings['turnstile_enabled'] ?? 0))>
+                        <label class="form-check-label font-weight-bold" for="turnstile_enabled">{{ $toggleFields['turnstile_enabled'] }}</label>
+                    </div>
+                    <small class="text-muted d-block mt-1">{{ __('messages.security_turnstile_help') }}</small>
+                </div>
+                <div class="col-lg-6">
+                    <label class="form-label">{{ __('messages.security_turnstile_mode') }}</label>
+                    <select name="turnstile_mode" class="form-select">
+                        <option value="managed" @selected(old('turnstile_mode', $settings['turnstile_mode'] ?? 'managed') === 'managed')>{{ __('messages.security_turnstile_mode_managed') }}</option>
+                        <option value="non-interactive" @selected(old('turnstile_mode', $settings['turnstile_mode'] ?? '') === 'non-interactive')>{{ __('messages.security_turnstile_mode_non_interactive') }}</option>
+                        <option value="invisible" @selected(old('turnstile_mode', $settings['turnstile_mode'] ?? '') === 'invisible')>{{ __('messages.security_turnstile_mode_invisible') }}</option>
+                    </select>
+                </div>
+                <div class="col-lg-6">
+                    <label class="form-label">{{ __('messages.security_turnstile_site_key') }}</label>
+                    <input type="text" name="turnstile_site_key" class="form-control font-monospace" placeholder="0x4AAAAAA..." value="{{ old('turnstile_site_key', $settings['turnstile_site_key'] ?? '') }}">
+                </div>
+                <div class="col-lg-6">
+                    <label class="form-label">{{ __('messages.security_turnstile_secret_key') }}</label>
+                    <input type="password" name="turnstile_secret_key" class="form-control font-monospace" placeholder="0x4AAAAAA..." value="{{ old('turnstile_secret_key', $settings['turnstile_secret_key'] ?? '') }}">
+                </div>
+                <div class="col-lg-12">
+                    <label class="form-label">{{ __('messages.security_turnstile_forms') }}</label>
+                    <input type="text" name="turnstile_forms" class="form-control" placeholder="login,register" value="{{ old('turnstile_forms', $settings['turnstile_forms'] ?? 'login,register') }}">
+                    <small class="text-muted">{{ __('messages.security_turnstile_forms_help') }}</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Support Deflection & Defense -->
+    <div class="card stretch stretch-full mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">
+                <i class="fa-solid fa-robot text-primary me-2"></i>
+                {{ __('messages.security_ai_deflection_section') }}
+            </h5>
+            <span class="badge {{ !empty($settings['support_ai_deflection_enabled']) ? 'bg-soft-success text-success' : 'bg-soft-secondary text-secondary' }}">
+                {{ !empty($settings['support_ai_deflection_enabled']) ? __('messages.enabled') : __('messages.disabled') }}
+            </span>
+        </div>
+        <div class="card-body">
+            <div class="row g-4">
+                <div class="col-lg-8">
+                    <div class="form-check form-switch pt-2">
+                        <input class="form-check-input" type="checkbox" id="support_ai_deflection_enabled" name="support_ai_deflection_enabled" value="1" @checked(old('support_ai_deflection_enabled', $settings['support_ai_deflection_enabled'] ?? 1))>
+                        <label class="form-check-label font-weight-bold" for="support_ai_deflection_enabled">{{ $toggleFields['support_ai_deflection_enabled'] }}</label>
+                    </div>
+                    <small class="text-muted d-block mt-2">{{ __('messages.security_support_ai_deflection_help') }}</small>
+                </div>
+                <div class="col-lg-4">
+                    <div class="form-check form-switch pt-2">
+                        <input class="form-check-input" type="checkbox" id="csp_nonce_enabled" name="csp_nonce_enabled" value="1" @checked(old('csp_nonce_enabled', $settings['csp_nonce_enabled'] ?? 1))>
+                        <label class="form-check-label font-weight-bold" for="csp_nonce_enabled">{{ $toggleFields['csp_nonce_enabled'] }}</label>
+                    </div>
+                    <small class="text-muted d-block mt-2">{{ __('messages.security_csp_nonce_help') }}</small>
+                </div>
+            </div>
         </div>
     </div>
 

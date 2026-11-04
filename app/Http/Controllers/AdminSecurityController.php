@@ -55,6 +55,13 @@ class AdminSecurityController extends Controller
             'login_max_attempts_per_ip_15m' => ['nullable', 'integer', 'min:0'],
             'login_max_attempts_per_account_15m' => ['nullable', 'integer', 'min:0'],
             'max_active_sessions_per_user' => ['nullable', 'integer', 'min:0'],
+            'turnstile_enabled' => ['nullable', 'boolean'],
+            'turnstile_site_key' => ['nullable', 'string', 'max:255'],
+            'turnstile_secret_key' => ['nullable', 'string', 'max:255'],
+            'turnstile_mode' => ['nullable', 'string', 'in:managed,non-interactive,invisible'],
+            'turnstile_forms' => ['nullable', 'string', 'max:255'],
+            'support_ai_deflection_enabled' => ['nullable', 'boolean'],
+            'csp_nonce_enabled' => ['nullable', 'boolean'],
         ]);
 
         SecuritySettings::save($request->all());

@@ -361,30 +361,42 @@ Developers can generate personal API tokens directly via `/developer/tokens` wit
   ```
 - **Granular Scopes:** Scoped during creation (e.g., `user.profile.read`, `user.content.write`).
 
-#### 6. Webhooks Engine & Event Dispatcher (HMAC-SHA256)
+#### 6. Webhooks Engine & Event Dispatcher (HMAC-SHA256 & Replay Defense v2)
 External applications can register webhook endpoints at `/developer/apps/{id}/webhooks` to receive real-time HTTP POST notifications.
 
-**Signature Verification:**
-Every outgoing webhook request includes a cryptographic HMAC-SHA256 signature in the `X-MYADS-Signature-256` header calculated using the webhook's secret key:
+**Headers & Signature Verification:**
+Every outgoing webhook request includes cryptographic HMAC-SHA256 signatures with replay-attack protection (`X-MYADS-Timestamp` & `X-MYADS-Signature`) alongside backward-compatible `X-MYADS-Signature-256`:
 ```text
+X-MYADS-Timestamp: 1730682000
+X-MYADS-Signature: t=1730682000,v1=9c4a8f...
 X-MYADS-Signature-256: sha256=d58d9e6...
-X-MYADS-Delivery: a73f4e1b-8210-482a-921c-5296e812d1c9
+X-MYADS-Delivery: evt_7f2b9a81c0d4...
 X-MYADS-Event: user.created
 Content-Type: application/json
 ```
 
-**PHP Signature Verification Example:**
+**PHP Signature Verification Example (v2 with Replay Attack Defense):**
 ```php
-$signature = $_SERVER['HTTP_X_MYADS_SIGNATURE_256'] ?? '';
-$payload = file_get_contents('php://input');
-$expectedSignature = 'sha256=' . hash_hmac('sha256', $payload, $webhookSecret);
+$signatureHeader = $_SERVER['HTTP_X_MYADS_SIGNATURE'] ?? '';
+$rawPayload = file_get_contents('php://input');
 
-if (hash_equals($expectedSignature, $signature)) {
-    // Signature verified! Process event payload...
-    $event = json_decode($payload, true);
-} else {
-    http_response_code(401);
-    exit('Invalid signature');
+// Verify with 300s replay tolerance using built-in verification logic:
+// parse t={timestamp},v1={hash}
+if (preg_match('/t=(\d+),v1=([a-f0-9]+)/', $signatureHeader, $matches)) {
+    $timestamp = (int) $matches[1];
+    $receivedHash = $matches[2];
+
+    // Reject replays older than 5 minutes (300 seconds)
+    if (abs(time() - $timestamp) > 300) {
+        http_response_code(401);
+        exit('Webhook timestamp expired (replay detected)');
+    }
+
+    $expectedHash = hash_hmac('sha256', "{$timestamp}.{$rawPayload}", $webhookSecret);
+    if (!hash_equals($expectedHash, $receivedHash)) {
+        http_response_code(401);
+        exit('Invalid signature');
+    }
 }
 ```
 

@@ -127,7 +127,12 @@ class WebhookDispatcherService
         $delivery->payload = $envelope;
         $jsonPayload = json_encode($envelope, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 
-        $signature = 'sha256=' . hash_hmac('sha256', $jsonPayload, $webhook->secret);
+        // Webhook Signature v1 (legacy HMAC-SHA256 of payload)
+        $signatureV1 = 'sha256=' . hash_hmac('sha256', $jsonPayload, $webhook->secret);
+
+        // Webhook Signature v2 (Replay attack defense: binds timestamp + raw payload)
+        $signatureV2Hash = hash_hmac('sha256', "{$timestamp}.{$jsonPayload}", $webhook->secret);
+        $signatureV2 = "t={$timestamp},v1={$signatureV2Hash}";
 
         $host = strtolower(parse_url($webhook->url, PHP_URL_HOST) ?? '');
         if ($host === '169.254.169.254' || str_starts_with($host, '169.254.')) {
@@ -159,7 +164,9 @@ class WebhookDispatcherService
                     'Content-Type' => 'application/json',
                     'Accept' => 'application/json',
                     'User-Agent' => 'MYADS-Webhook/4.7.0',
-                    'X-MYADS-Signature-256' => $signature,
+                    'X-MYADS-Timestamp' => (string) $timestamp,
+                    'X-MYADS-Signature' => $signatureV2,
+                    'X-MYADS-Signature-256' => $signatureV1,
                     'X-MYADS-Event' => $event,
                     'X-MYADS-Delivery' => $eventId,
                 ])
@@ -220,5 +227,70 @@ class WebhookDispatcherService
 
         $payload = $pastDelivery->payload['data'] ?? $pastDelivery->payload ?? [];
         return $this->deliver($webhook, $pastDelivery->event, $payload, $pastDelivery->attempts + 1);
+    }
+
+    /**
+     * Verify an incoming or outgoing webhook signature (supports both v2 with timestamp and legacy v1).
+     *
+     * @param string $rawPayload The raw request body
+     * @param string $signatureHeader The X-MYADS-Signature or X-MYADS-Signature-256 header value
+     * @param string|int|null $timestampHeader The X-MYADS-Timestamp header (or extracted from signature if v2)
+     * @param string $secret The webhook secret key
+     * @param int $tolerance Maximum allowed age in seconds (default: 300; 0 to disable tolerance check)
+     * @return bool
+     */
+    public static function verifySignature(
+        string $rawPayload,
+        string $signatureHeader,
+        string|int|null $timestampHeader,
+        string $secret,
+        int $tolerance = 300
+    ): bool {
+        if (empty($signatureHeader) || empty($secret)) {
+            return false;
+        }
+
+        // Check if signature is v2 format: t={timestamp},v1={hash}
+        if (str_starts_with($signatureHeader, 't=') && str_contains($signatureHeader, ',v1=')) {
+            $parts = explode(',', $signatureHeader);
+            $parsedTimestamp = null;
+            $v1Hash = null;
+
+            foreach ($parts as $part) {
+                if (str_starts_with($part, 't=')) {
+                    $parsedTimestamp = (int) substr($part, 2);
+                } elseif (str_starts_with($part, 'v1=')) {
+                    $v1Hash = substr($part, 3);
+                }
+            }
+
+            if (!$parsedTimestamp || !$v1Hash) {
+                return false;
+            }
+
+            // Check replay tolerance (default 300s / 5 minutes)
+            if ($tolerance > 0 && abs(time() - $parsedTimestamp) > $tolerance) {
+                return false;
+            }
+
+            $expectedHash = hash_hmac('sha256', "{$parsedTimestamp}.{$rawPayload}", $secret);
+            return hash_equals($expectedHash, $v1Hash);
+        }
+
+        // If timestamp is provided separately with v1 or direct sha256
+        if ($timestampHeader !== null && $tolerance > 0) {
+            $ts = (int) $timestampHeader;
+            if ($ts > 0 && abs(time() - $ts) > $tolerance) {
+                return false;
+            }
+        }
+
+        // Legacy v1 signature: sha256={hash}
+        $cleanSignature = str_starts_with($signatureHeader, 'sha256=')
+            ? substr($signatureHeader, 7)
+            : $signatureHeader;
+
+        $expectedSignature = hash_hmac('sha256', $rawPayload, $secret);
+        return hash_equals($expectedSignature, $cleanSignature);
     }
 }

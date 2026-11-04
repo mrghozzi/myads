@@ -226,4 +226,10 @@ return [
     'cant_find_solution_desc' => 'You can open a private support ticket directly with our administration team for private billing and technical assistance.',
     'help_and_forum_box' => 'Help Center & Forum',
     'help_and_forum_desc' => 'You can also search documentation articles or ask questions in the community forum.',
+    'ai_deflection_heading' => 'Instant AI Solution Suggestions',
+    'ai_deflection_badge' => 'Instant Solution',
+    'ai_deflection_desc' => 'Based on what you wrote, here are official guides and solved community answers that might resolve your inquiry immediately:',
+    'view_solution' => 'View Solution',
+    'guide_article' => 'Knowledge Guide',
+    'solved_topic' => 'Official Solved Topic',
 ];

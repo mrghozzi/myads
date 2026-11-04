@@ -147,3 +147,29 @@ if (!function_exists('http_secure')) {
         return $http;
     }
 }
+
+if (!function_exists('csp_nonce')) {
+    /**
+     * Get the cryptographically random CSP nonce for the current request.
+     * Used for strict Nonce-based Content-Security-Policy script and style execution.
+     *
+     * @return string
+     */
+    function csp_nonce(): string
+    {
+        try {
+            if (app()->bound('request')) {
+                $nonce = request()->attributes->get('csp_nonce');
+                if (!empty($nonce)) {
+                    return (string) $nonce;
+                }
+            }
+            if (function_exists('view') && view()->shared('cspNonce')) {
+                return (string) view()->shared('cspNonce');
+            }
+        } catch (\Throwable) {
+            // Safe fallback
+        }
+        return '';
+    }
+}

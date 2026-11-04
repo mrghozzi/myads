@@ -233,6 +233,25 @@
                               required>{{ old('content') }}</textarea>
                 </div>
 
+                <!-- AI Support Deflection Suggestions -->
+                <div id="aiDeflectionCard" style="display: none; margin-bottom: 24px; background: linear-gradient(135deg, rgba(97, 93, 250, 0.05) 0%, rgba(35, 210, 226, 0.05) 100%); border: 1px solid rgba(97, 93, 250, 0.25); border-radius: 16px; padding: 20px;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                        <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; color: var(--myads-primary, #615dfa); font-size: 0.95rem;">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                            <span>{{ __('support.ai_deflection_heading') }}</span>
+                        </div>
+                        <span style="font-size: 0.75rem; background: rgba(97, 93, 250, 0.12); color: var(--myads-primary, #615dfa); padding: 4px 10px; border-radius: 9999px; font-weight: 700;">
+                            {{ __('support.ai_deflection_badge') }}
+                        </span>
+                    </div>
+                    <p style="font-size: 0.85rem; color: var(--myads-text-muted, #64748b); margin-bottom: 14px;">
+                        {{ __('support.ai_deflection_desc') }}
+                    </p>
+                    <div id="aiDeflectionList" style="display: flex; flex-direction: column; gap: 10px;"></div>
+                </div>
+
+                <x-turnstile :form="'support'" />
+
                 <button type="submit" class="btn-submit-support">
                     <i class="fa-solid fa-paper-plane"></i>
                     <span>{{ __('support.post_topic') }}</span>
@@ -279,4 +298,90 @@
         </div>
     </div>
 </div>
+
+<script nonce="{{ csp_nonce() }}">
+document.addEventListener('DOMContentLoaded', function () {
+    const titleInput = document.getElementById('title');
+    const contentInput = document.getElementById('content');
+    const catSelect = document.getElementById('category_id');
+    const deflectionCard = document.getElementById('aiDeflectionCard');
+    const deflectionList = document.getElementById('aiDeflectionList');
+
+    let debounceTimer = null;
+
+    function checkDeflection() {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => {
+            const title = titleInput ? titleInput.value.trim() : '';
+            const content = contentInput ? contentInput.value.trim() : '';
+            const query = (title + ' ' + content).trim();
+            const cat = catSelect ? catSelect.value : '';
+
+            if (query.length < 4) {
+                if (deflectionCard) deflectionCard.style.display = 'none';
+                return;
+            }
+
+            fetch('{{ route("support.deflect") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ query: query, category: cat })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (!data || !data.has_matches || (!data.articles?.length && !data.topics?.length)) {
+                    if (deflectionCard) deflectionCard.style.display = 'none';
+                    return;
+                }
+
+                deflectionList.innerHTML = '';
+                const items = [...(data.articles || []), ...(data.topics || [])].slice(0, 3);
+
+                items.forEach(item => {
+                    const row = document.createElement('div');
+                    row.style.cssText = 'background: var(--myads-surface, #ffffff); border: 1px solid rgba(97,93,250,0.18); border-radius: 12px; padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; gap: 12px;';
+                    
+                    const isArticle = item.type === 'article';
+                    const iconClass = isArticle ? 'fa-solid fa-book-open' : 'fa-solid fa-circle-check';
+                    const iconColor = isArticle ? 'color: var(--myads-primary, #615dfa);' : 'color: #10b981;';
+                    const badgeText = isArticle ? (item.category || 'Guide') : 'Solved Topic';
+                    const badgeColor = isArticle ? 'rgba(97,93,250,0.1)' : 'rgba(16,185,129,0.1)';
+                    const badgeTextColor = isArticle ? '#615dfa' : '#10b981';
+
+                    row.innerHTML = `
+                        <div style="display: flex; align-items: flex-start; gap: 10px; flex: 1; min-width: 0;">
+                            <i class="${iconClass}" style="${iconColor} margin-top: 4px; font-size: 1rem;"></i>
+                            <div style="min-width: 0;">
+                                <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 3px;">
+                                    <span style="font-size: 0.72rem; font-weight: 700; background: ${badgeColor}; color: ${badgeTextColor}; padding: 2px 8px; border-radius: 6px;">${badgeText}</span>
+                                </div>
+                                <a href="${item.url}" target="_blank" rel="noopener" style="font-size: 0.9rem; font-weight: 700; color: var(--myads-text-main, #1e293b); text-decoration: none; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                    ${item.title} <i class="fa-solid fa-arrow-up-right-from-square" style="font-size: 0.75rem; color: #94a3b8; margin-left: 4px;"></i>
+                                </a>
+                                <p style="font-size: 0.8rem; color: var(--myads-text-muted, #64748b); margin: 3px 0 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${item.summary || ''}</p>
+                            </div>
+                        </div>
+                        <a href="${item.url}" target="_blank" rel="noopener" class="btn btn-sm" style="background: rgba(97,93,250,0.1); color: var(--myads-primary, #615dfa); font-weight: 700; border-radius: 8px; font-size: 0.8rem; white-space: nowrap; padding: 6px 12px; text-decoration: none;">
+                            <i class="fa-solid fa-eye me-1"></i> {{ __('support.view_solution') }}
+                        </a>
+                    `;
+                    deflectionList.appendChild(row);
+                });
+
+                if (deflectionCard) deflectionCard.style.display = 'block';
+            })
+            .catch(() => {
+                if (deflectionCard) deflectionCard.style.display = 'none';
+            });
+        }, 350);
+    }
+
+    if (titleInput) titleInput.addEventListener('input', checkDeflection);
+    if (contentInput) contentInput.addEventListener('input', checkDeflection);
+});
+</script>
 @endsection

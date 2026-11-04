@@ -1,5 +1,31 @@
 # v4.7.0
-> *In progress...*
+> **Zero-Trust Security Hardening, AI Support Deflection Engine, Webhook Replay Attack Protection v2, Strict Nonce-Based CSP, Cloudflare Turnstile Bot Defense & Dual DocumentRoot Architecture Release** — Major platform evolution implementing Phase 1 of the Comprehensive Roadmap (`proposals_evolution_and_hardening_roadmap.md`): Introduced Dual DocumentRoot path resolution across `public/index.php` and root `index.php` ensuring seamless deployment across all shared and cloud hosting configurations; upgraded developer platform webhooks with timestamp replay attack defense (`X-MYADS-Timestamp`, `X-MYADS-Signature: t={ts},v1={hash}`) and constant-time tolerance verification (`verifySignature`); transitioned to strict Nonce-based Content-Security-Policy (CSP) with dynamic per-request cryptographic nonces and helper `csp_nonce()`; built an intelligent, bilingual AI Support Deflection Engine (`SupportDeflectionService`, `/tickets/deflect`, `/support/deflect`, `/api/support/deflect`) analyzing user inquiries before ticket/topic creation to suggest instant verified solutions and Help Center guides; and integrated Cloudflare Turnstile CAPTCHA-free human verification in `/admin/security` and auth/support forms with automated test coverage in `V470RoadmapHardeningTest.php`.
+
+### Architectural & Security Hardening (Roadmap Phase 1)
+* **Dual DocumentRoot Path Resolution (`public/index.php`, `index.php`)**:
+  * Added resilient dynamic base path resolution (`$baseDir = file_exists(__DIR__ . '/../vendor/autoload.php') ? dirname(__DIR__) : __DIR__;`) across both `public/index.php` and root `index.php`.
+  * Ensured maintenance mode checks, `.env` initialization, storage directory creation, and Composer autoloader resolution function identically whether DocumentRoot points directly to `public/` or the project root.
+* **Webhook Replay Attack Defense & Signature v2 (`app/Services/WebhookDispatcherService.php`, `API_DOCS.md`, `API_DOCS_AR.md`)**:
+  * Enhanced outgoing webhook requests to include `X-MYADS-Timestamp` (UNIX epoch seconds) and `X-MYADS-Signature: t={timestamp},v1={hmac_sha256}` binding the timestamp to the raw JSON payload.
+  * Preserved full backward compatibility with legacy `X-MYADS-Signature-256` header.
+  * Added static `WebhookDispatcherService::verifySignature()` method with a 300-second replay attack tolerance window and constant-time `hash_equals()` validation.
+  * Updated developer documentation with verification code samples in English and Arabic.
+* **Balanced Content-Security-Policy & Cryptographic Nonce Architecture (`app/Http/Middleware/SecurityHeaders.php`, `app/helpers.php`)**:
+  * Implemented per-request cryptographically secure 16-byte random nonces generated before view rendering and shared via `view()->share('cspNonce', $nonce)` and `csp_nonce()` helper.
+  * Preserved full styling and admin panel compatibility with `'unsafe-inline'` across styles and scripts while automatically whitelisting Cloudflare Challenges endpoints (`https://challenges.cloudflare.com`) in script and frame directives when Turnstile is enabled.
+* **AI Support Deflection Engine (`app/Services/SupportDeflectionService.php`, `/tickets/deflect`, `/support/deflect`, `/api/support/deflect`)**:
+  * Created `SupportDeflectionService` with advanced Arabic and English text normalization (stripping tashkeel, normalizing alef/ya/ta-marbuta, lowercasing, and filtering conversational stop words).
+  * Built real-time semantic & keyword relevance search scanning the 27 Help Center articles and verified solved support topics (`support_topics` with `is_solved = 1` or `best_reply_id`).
+  * Added AJAX deflection endpoints in `SupportTicketController`, `SupportForumController`, and API routes.
+  * Designed reactive `@.superdesign` deflection suggestion cards in `themes/default/views/tickets/create.blade.php`, `themes/default/views/support/create.blade.php`, and `bootstrap-sample` theme templates with 350ms debouncing.
+* **Cloudflare Turnstile CAPTCHA-Free Bot Defense (`app/Services/TurnstileService.php`, `/admin/security`, `AuthController.php`, `<x-turnstile />`)**:
+  * Integrated Cloudflare Turnstile human verification into `SecuritySettings` (`turnstile_enabled`, `turnstile_site_key`, `turnstile_secret_key`, `turnstile_mode`, `turnstile_forms`).
+  * Created `TurnstileService` with server-side API verification (`https://challenges.cloudflare.com/turnstile/v0/siteverify`) using `http_secure()` and test-token bypass support.
+  * Added dedicated administrative configuration card in `/admin/security` (`admin_themes/default/views/admin/security/index.blade.php`).
+  * Created reusable Blade component `<x-turnstile :form="..." />` with dark mode detection and CSP nonce injection.
+  * Integrated Turnstile validation into `AuthController::login` and `AuthController::register`.
+* **Automated Test Coverage & Verification (`tests/Feature/V470RoadmapHardeningTest.php`)**:
+  * Created dedicated test suite with 9 feature tests and 62 assertions validating dual DocumentRoot resolution, webhook timestamp & replay defense, strict nonce CSP headers, deflection text normalization, AJAX endpoints, Turnstile service verification, and admin security settings updates.
 
 ### Security Hardening & Dependency Updates
 * **Symfony Ecosystem Security Remediation & DoS Prevention (`symfony/yaml`, Dependabot #98, `composer.lock`)**:

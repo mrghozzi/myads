@@ -129,6 +129,7 @@ Route::prefix('support')->name('support.')->group(function () {
     Route::get('/topic/{id}/{slug?}', [App\Http\Controllers\SupportForumController::class, 'show'])->name('topic');
     Route::post('/topic/{id}/reply', [App\Http\Controllers\SupportForumController::class, 'reply'])->name('reply')->middleware('auth');
     Route::post('/topic/{topicId}/reply/{replyId}/solution', [App\Http\Controllers\SupportForumController::class, 'markSolution'])->name('mark_solution')->middleware('auth');
+    Route::post('/deflect', [App\Http\Controllers\SupportForumController::class, 'deflect'])->name('deflect');
 });
 
 // Support Tickets (/tickets)
@@ -136,6 +137,7 @@ Route::prefix('tickets')->name('tickets.')->middleware('auth')->group(function (
     Route::get('/', [App\Http\Controllers\SupportTicketController::class, 'index'])->name('index');
     Route::get('/create', [App\Http\Controllers\SupportTicketController::class, 'create'])->name('create');
     Route::post('/', [App\Http\Controllers\SupportTicketController::class, 'store'])->name('store');
+    Route::post('/deflect', [App\Http\Controllers\SupportTicketController::class, 'deflect'])->name('deflect');
     Route::get('/{ticketNumber}', [App\Http\Controllers\SupportTicketController::class, 'show'])->name('show');
     Route::post('/{ticketNumber}/reply', [App\Http\Controllers\SupportTicketController::class, 'reply'])->name('reply');
     Route::post('/{ticketNumber}/close', [App\Http\Controllers\SupportTicketController::class, 'close'])->name('close');
