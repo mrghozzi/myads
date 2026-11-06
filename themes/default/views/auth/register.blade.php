@@ -399,6 +399,8 @@
                     @enderror
                 </div>
 
+                <x-turnstile :form="'register'" />
+
                 <button class="btn-submit" name="submit" type="submit">{{ __('messages.sign_up') }}</button>
             </form>
 

@@ -385,6 +385,8 @@
                     <a href="{{ route('password.request') }}">{{ __('messages.forgot_password') }}</a>
                 </div>
 
+                <x-turnstile :form="'login'" />
+
                 <button class="btn-submit" name="login" type="submit">{{ __('messages.login') }}</button>
             </form>
 
