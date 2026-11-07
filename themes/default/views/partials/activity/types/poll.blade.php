@@ -15,6 +15,8 @@
     $votedOptionId = $poll ? $poll->getUserVotedOptionId($currentUserId) : null;
     $isExpired = $poll ? $poll->is_expired : false;
     $totalVotes = $poll ? $poll->total_votes : 0;
+    $repostExcerpt = \Illuminate\Support\Str::limit(strip_tags($poll?->question ?? $formattedText), 80);
+    $repostAuthorName = addslashes($activityUserName);
 @endphp
 
 <div class="widget-box no-padding activity-post-card post{{ $activity->id }}" data-poll-id="{{ $poll?->id }}">
@@ -219,38 +221,16 @@
             @endif
 
             <div id="notif{{ $relatedId }}"></div>
-
-            <!-- CONTENT ACTIONS -->
-            <div class="content-actions">
-                <div class="content-action">
-                    @include('theme::partials.activity.reaction-list', ['activity' => $activity])
-                    <div class="meta-line">
-                        <p class="meta-line-text">{{ $activity->reactions_count }} {{ __('messages.reactions') }}</p>
-                    </div>
-                </div>
-
-                <div class="content-action">
-                    <div class="meta-line">
-                        <p class="meta-line-link">
-                            <a href="{{ route('forum.topic', $activity->tp_id) }}">{{ $activity->comments_count }} {{ __('messages.comments') }}</a>
-                        </p>
-                    </div>
-                </div>
-
-                <div class="content-action">
-                    @include('theme::partials.activity.repost_button', ['activity' => $activity])
-                </div>
-            </div>
-            <!-- /CONTENT ACTIONS -->
         </div>
         <!-- /WIDGET BOX STATUS CONTENT -->
     </div>
     <!-- /WIDGET BOX STATUS -->
 
-    <!-- POST COMMENTS -->
-    <div class="post-comment-list" id="post-comment-list{{ $relatedId }}">
-        @include('theme::partials.activity.comments', ['activity' => $activity])
-    </div>
+    @include('theme::partials.activity.post_footer_shared', [
+        'activity' => $activity,
+        'repostAuthorName' => $repostAuthorName,
+        'repostExcerpt' => $repostExcerpt
+    ])
 </div>
 
 @once

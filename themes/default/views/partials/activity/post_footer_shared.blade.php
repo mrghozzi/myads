@@ -1,6 +1,8 @@
 @php
     $repostExcerpt = $repostExcerpt ?? '';
     $repostAuthorName = $repostAuthorName ?? '';
+    $relatedId = $activity->related_content?->id ?? $activity->tp_id ?? $activity->id;
+    $relatedName = $activity->related_content?->name ?? '';
 @endphp
 
 <!-- CONTENT ACTIONS -->
@@ -32,7 +34,7 @@
     @auth
         <div class="post-option-wrap" style="position: relative;" data-activity-menu-wrap>
             <div class="post-option" data-activity-menu-trigger data-activity-menu-type="reaction">
-                <div id="reaction-btn-{{ $activity->related_content->id }}">
+                <div id="reaction-btn-{{ $relatedId }}">
                 @php
                     $userReactData = $activity->user_reaction_data ?? null;
                     if ($userReactData !== null) {
@@ -40,7 +42,7 @@
                         $myReactionOption = $userReactData['option'] ?? null;
                     } else {
                         $myReaction = \App\Models\Like::where('uid', auth()->id())
-                            ->where('sid', $activity->related_content->id)
+                            ->where('sid', $relatedId)
                             ->where('type', $activity->getReactionType() ?? 2)
                             ->first();
                         $myReactionOption = $myReaction ? \App\Models\Option::where('o_parent', $myReaction->id)->where('o_type', 'data_reaction')->first() : null;
@@ -58,14 +60,14 @@
             </div>
             <div class="reaction-options reaction-options-dropdown" data-activity-menu-panel style="position: absolute; z-index: 9999; bottom: 54px; left: -16px; opacity: 0; visibility: hidden; transform: translate(0px, 20px); transition: transform 0.3s ease-in-out 0s, opacity 0.3s ease-in-out 0s, visibility 0.3s ease-in-out 0s;">
                 @foreach(['like', 'love', 'dislike', 'happy', 'funny', 'wow', 'angry', 'sad'] as $reaction)
-                    <div class="reaction-option text-tooltip-tft" data-title="{{ $reaction }}" onclick="toggleReaction({{ $activity->related_content->id }}, 'forum', '{{ $reaction }}')">
+                    <div class="reaction-option text-tooltip-tft" data-title="{{ $reaction }}" onclick="toggleReaction({{ $relatedId }}, 'forum', '{{ $reaction }}')">
                         <img class="reaction-option-image" src="{{ theme_asset('img/reaction/'.$reaction.'.png') }}" alt="reaction-{{ $reaction }}">
                     </div>
                 @endforeach
             </div>
         </div>
         
-        <div class="post-option" data-activity-comment data-comment-id="{{ $activity->related_content->id }}" data-comment-type="forum">
+        <div class="post-option" data-activity-comment data-comment-id="{{ $relatedId }}" data-comment-type="forum">
             <svg class="post-option-icon icon-comment">
                 <use xlink:href="#svg-comment"></use>
             </svg>
@@ -89,7 +91,7 @@
         <div class="reaction-options reaction-options-dropdown" data-activity-menu-panel style="position: absolute; z-index: 9999; bottom: 54px; left: -16px; opacity: 0; visibility: hidden; transform: translate(0px, 20px); transition: transform 0.3s ease-in-out 0s, opacity 0.3s ease-in-out 0s, visibility 0.3s ease-in-out 0s;">
              @foreach(['facebook', 'twitter', 'linkedin', 'telegram'] as $social)
                 <div class="reaction-option text-tooltip-tft" data-title="{{ $social }}" style="position: relative;">
-                    <a href="javascript:void(0);" onclick="sharePost('{{ $social }}', '{{ route('forum.topic', $activity->tp_id) }}', '{{ $activity->related_content->name ?? '' }}')">
+                    <a href="javascript:void(0);" onclick="sharePost('{{ $social }}', '{{ route('forum.topic', $activity->tp_id) }}', '{{ $relatedName }}')">
                         <img class="reaction-option-image" src="{{ theme_asset('img/icons/'.$social.'-icon.png') }}">
                     </a>
                 </div>
@@ -108,4 +110,4 @@
         </div>
     </div>
 </div>
-<div class="post-comment-list post-comment-list-{{ $activity->related_content->id }}"></div>
+<div class="post-comment-list post-comment-list-{{ $relatedId }}"></div>
