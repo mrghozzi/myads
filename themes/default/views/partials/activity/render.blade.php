@@ -24,6 +24,8 @@
         $type = 'audio'; // Music uses same player as audio
     } elseif ($activity->s_type == 14) {
         $type = 'video'; // Clips uses same player as video
+    } elseif ($activity->s_type == 15 || $activity->post_kind === 'poll') {
+        $type = 'poll';
     }
     
     // Check if related content exists before including

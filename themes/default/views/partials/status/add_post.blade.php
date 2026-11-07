@@ -58,6 +58,7 @@
         @csrf
         <input type="hidden" name="post_kind" id="composer-post-kind" value="{{ $oldPostKind }}">
         <input type="hidden" name="repost_status_id" id="composer-repost-status-id" value="{{ $oldRepostStatusId }}">
+        <input type="hidden" name="source_page" value="{{ request()->routeIs('portal.*') ? 'portal' : '' }}">
         @if($isGroupComposer)
             <input type="hidden" name="group_id" value="{{ $composerGroupId }}">
         @endif
@@ -302,6 +303,60 @@
             </div>
             @endif
 
+            <div id="composer-poll-block" class="widget-box composer-refresh__panel" style="display:none;">
+                <div class="widget-box-content composer-refresh__panel-content p-3">
+                    <div class="composer-refresh__field mb-3">
+                        <label class="composer-refresh__label fw-bold mb-1" for="composer-poll-question">
+                            <i class="fa fa-question-circle text-primary me-1"></i> {{ __('messages.poll_question') ?? 'سؤال الاستطلاع' }}
+                        </label>
+                        <input
+                            type="text"
+                            id="composer-poll-question"
+                            name="poll_question"
+                            class="composer-refresh__control form-control"
+                            placeholder="{{ __('messages.poll_question_placeholder') ?? 'ما الذي تود طرحه للتصويت؟' }}"
+                            value="{{ old('poll_question', '') }}"
+                        >
+                    </div>
+
+                    <div class="composer-refresh__field mb-3">
+                        <label class="composer-refresh__label fw-bold mb-1">
+                            <i class="fa fa-list-ol text-primary me-1"></i> {{ __('messages.poll_options') ?? 'خيارات التصويت' }}
+                        </label>
+                        <div id="composer-poll-options-container" class="d-flex flex-column gap-2">
+                            <div class="input-group poll-option-row">
+                                <span class="input-group-text bg-light text-muted">1</span>
+                                <input type="text" name="poll_options[]" class="form-control" placeholder="{{ __('messages.option') ?? 'الخيار' }} 1" value="{{ old('poll_options.0', '') }}">
+                            </div>
+                            <div class="input-group poll-option-row">
+                                <span class="input-group-text bg-light text-muted">2</span>
+                                <input type="text" name="poll_options[]" class="form-control" placeholder="{{ __('messages.option') ?? 'الخيار' }} 2" value="{{ old('poll_options.1', '') }}">
+                            </div>
+                        </div>
+                        <div class="mt-2 d-flex justify-content-between align-items-center">
+                            <button type="button" id="composer-poll-add-option" class="btn btn-sm btn-outline-primary" style="border-radius: 16px;">
+                                <i class="fa fa-plus me-1"></i> {{ __('messages.poll_add_option') ?? 'إضافة خيار' }}
+                            </button>
+                            <small class="text-muted">{{ __('messages.poll_options_limit_hint') ?? 'الحد الأقصى 6 خيارات' }}</small>
+                        </div>
+                    </div>
+
+                    <div class="composer-refresh__field">
+                        <label class="composer-refresh__label fw-bold mb-1" for="composer-poll-duration">
+                            <i class="fa fa-clock text-primary me-1"></i> {{ __('messages.poll_duration') ?? 'مدة الاستطلاع' }}
+                        </label>
+                        <select id="composer-poll-duration" name="poll_duration_days" class="form-select form-control composer-refresh__control--select">
+                            <option value="1">1 {{ __('messages.day') ?? 'يوم' }}</option>
+                            <option value="3">3 {{ __('messages.days') ?? 'أيام' }}</option>
+                            <option value="7" selected>7 {{ __('messages.days') ?? 'أيام (أسبوع)' }}</option>
+                            <option value="14">14 {{ __('messages.days') ?? 'يوماً (أسبوعان)' }}</option>
+                            <option value="30">30 {{ __('messages.days') ?? 'يوماً (شهر)' }}</option>
+                            <option value="">{{ __('messages.poll_unlimited') ?? 'دائم (بلا انتهاء)' }}</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
             <input type="file" id="imgupload" name="fimg" accept=".jpg, .jpeg, .png, .gif, .webp" style="display:none"/>
         </div>
 
@@ -361,7 +416,7 @@
                     </button>
                 @endif
 
-                <button type="button" class="quick-post-footer-action composer-refresh__tool composer-refresh__tool--extra disabled" data-title="{{ __('messages.create_poll') }}">
+                <button type="button" class="quick-post-footer-action composer-refresh__tool composer-refresh__tool--extra" data-title="{{ __('messages.create_poll') }}" id="composer-mode-poll" aria-pressed="false">
                     <i class="fa fa-tasks" aria-hidden="true" style="color: #3b5998;"></i>
                     <span class="composer-refresh__tool-label">{{ __('messages.create_poll') }}</span>
                 </button>
@@ -1077,8 +1132,14 @@
         const modeMusicButton = document.getElementById('composer-mode-music');
         const modeFileButton = document.getElementById('composer-mode-file');
         const modeClipsButton = document.getElementById('composer-mode-clips');
+        const modePollButton = document.getElementById('composer-mode-poll');
         const moreToggle = document.getElementById('composer-more-toggle');
         const toolbar = document.getElementById('composer-toolbar');
+
+        const pollBlock = document.getElementById('composer-poll-block');
+        const pollQuestionInput = document.getElementById('composer-poll-question');
+        const pollOptionsContainer = document.getElementById('composer-poll-options-container');
+        const pollAddOptionBtn = document.getElementById('composer-poll-add-option');
 
         const videoBlock = document.getElementById('composer-video-block');
         const videoInput = document.getElementById('composer-videos');
@@ -1161,7 +1222,8 @@
             const hasFiles = fileInput ? (fileInput.files || []).length > 0 : false;
 
             const linkActive = manualLinkOpen || hasResolvedLink() || autoDetectedLink !== '';
-            const textActive = !hasGallery && !hasVideo && !hasAudio && !hasFiles && !linkActive;
+            const pollActive = postKind.value === 'poll' || (pollBlock && pollBlock.style.display !== 'none');
+            const textActive = !hasGallery && !hasVideo && !hasAudio && !hasFiles && !linkActive && !pollActive;
 
             toggleTool(modeTextButton, textActive);
             toggleTool(modeGalleryButton, hasGallery);
@@ -1171,12 +1233,14 @@
             toggleTool(modeFileButton, hasFiles);
             toggleTool(modeClipsButton, hasVideo && (postKind.value === 'clips'));
             toggleTool(modeLinkButton, linkActive);
+            toggleTool(modePollButton, pollActive);
 
             composerRoot.classList.toggle('has-gallery', hasGallery);
             composerRoot.classList.toggle('has-video', hasVideo);
             composerRoot.classList.toggle('has-audio', hasAudio);
             composerRoot.classList.toggle('has-files', hasFiles);
             composerRoot.classList.toggle('has-link', linkActive);
+            composerRoot.classList.toggle('has-poll', pollActive);
             composerRoot.classList.toggle('has-repost', repostEnabled && repostStatusId && repostStatusId.value !== '');
         }
 
@@ -1481,6 +1545,9 @@
                 fileList.innerHTML = '';
                 fileBlock.style.display = 'none';
             }
+            if (pollBlock && exclude !== 'poll') {
+                pollBlock.style.display = 'none';
+            }
             
             syncPostKind();
             syncToolStates();
@@ -1550,6 +1617,50 @@
                 clearMediaSelections('clips');
                 postKind.value = 'clips';
                 videoInput.click();
+            });
+        }
+
+        if (modePollButton && pollBlock) {
+            modePollButton.addEventListener('click', function () {
+                if (pollBlock.style.display !== 'none') {
+                    clearMediaSelections();
+                    postKind.value = 'text';
+                    syncToolStates();
+                } else {
+                    clearMediaSelections('poll');
+                    postKind.value = 'poll';
+                    pollBlock.style.display = 'block';
+                    syncToolStates();
+                    if (pollQuestionInput) {
+                        pollQuestionInput.focus();
+                    }
+                }
+            });
+        }
+
+        if (pollAddOptionBtn && pollOptionsContainer) {
+            pollAddOptionBtn.addEventListener('click', function () {
+                const currentRows = pollOptionsContainer.querySelectorAll('.poll-option-row').length;
+                if (currentRows < 6) {
+                    const nextNum = currentRows + 1;
+                    const row = document.createElement('div');
+                    row.className = 'input-group poll-option-row';
+                    row.innerHTML = `
+                        <span class="input-group-text bg-light text-muted">${nextNum}</span>
+                        <input type="text" name="poll_options[]" class="form-control" placeholder="${@json(__('messages.option') ?? 'Option')} ${nextNum}">
+                        <button type="button" class="btn btn-outline-danger btn-sm remove-poll-option"><i class="fa fa-times"></i></button>
+                    `;
+                    pollOptionsContainer.appendChild(row);
+
+                    row.querySelector('.remove-poll-option').addEventListener('click', function () {
+                        row.remove();
+                        pollOptionsContainer.querySelectorAll('.poll-option-row').forEach((r, idx) => {
+                            r.querySelector('.input-group-text').textContent = idx + 1;
+                        });
+                    });
+                } else {
+                    alert(@json(__('messages.poll_options_limit_reached') ?? 'Maximum 6 options allowed.'));
+                }
             });
         }
 

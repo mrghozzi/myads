@@ -1149,6 +1149,148 @@
 
             <!-- FEED CONTAINER (Shown when not actively searching) -->
             <div id="portal-feed-container" style="{{ !empty($search) ? 'display: none;' : '' }}">
+                @if(isset($portalClips) && $portalClips->isNotEmpty())
+                    <!-- FAST CLIPS / STORIES SHELF -->
+                    <div class="portal-clips-reel-card mb-4" style="
+                        background: var(--portal-card-bg, #ffffff);
+                        border: 1px solid var(--portal-border, #eaeaf5);
+                        border-radius: var(--portal-radius, 20px);
+                        padding: 16px 20px;
+                        box-shadow: var(--portal-shadow);
+                    ">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <div class="d-flex align-items-center gap-2">
+                                <span style="
+                                    width: 32px;
+                                    height: 32px;
+                                    border-radius: 10px;
+                                    background: linear-gradient(135deg, #ff5e3a, #ffb100);
+                                    color: #ffffff;
+                                    display: inline-flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    font-size: 0.9rem;
+                                ">
+                                    <i class="fas fa-bolt"></i>
+                                </span>
+                                <h4 class="m-0 fw-bold" style="font-size: 1.05rem; color: var(--portal-heading, #1f2937);">
+                                    {{ __('messages.portal_clips_reel_title') ?? 'مقاطع سريعة' }}
+                                </h4>
+                            </div>
+                            <a href="{{ route('clips.index') }}" class="small fw-bold text-decoration-none" style="color: var(--portal-accent, #615dfa);">
+                                {{ __('messages.view_all') ?? 'عرض الكل' }} <i class="fas fa-angle-left ms-1"></i>
+                            </a>
+                        </div>
+
+                        <!-- Horizontal Scrolling Container -->
+                        <div class="portal-clips-scroll-wrapper" style="
+                            display: flex;
+                            gap: 14px;
+                            overflow-x: auto;
+                            padding-bottom: 6px;
+                            scrollbar-width: thin;
+                        ">
+                            <!-- Add Clip Card for Auth -->
+                            @auth
+                                <a href="{{ route('clips.index') }}" class="portal-clip-item portal-clip-add" style="
+                                    flex: 0 0 110px;
+                                    height: 160px;
+                                    border-radius: 14px;
+                                    background: var(--portal-surface-alt, #f7f8fc);
+                                    border: 2px dashed var(--portal-border-strong, rgba(97, 93, 250, 0.25));
+                                    display: flex;
+                                    flex-direction: column;
+                                    align-items: center;
+                                    justify-content: center;
+                                    text-decoration: none;
+                                    color: var(--portal-accent, #615dfa);
+                                    transition: all 0.25s ease;
+                                    text-align: center;
+                                    padding: 10px;
+                                ">
+                                    <div style="
+                                        width: 42px;
+                                        height: 42px;
+                                        border-radius: 50%;
+                                        background: var(--portal-accent-soft, rgba(97, 93, 250, 0.12));
+                                        display: flex;
+                                        align-items: center;
+                                        justify-content: center;
+                                        font-size: 1.2rem;
+                                        margin-bottom: 8px;
+                                    ">
+                                        <i class="fas fa-plus"></i>
+                                    </div>
+                                    <span class="small fw-bold">{{ __('messages.upload_clips') ?? 'أضف مقطع' }}</span>
+                                </a>
+                            @endauth
+
+                            @foreach($portalClips as $clip)
+                                @php
+                                    $clipUser = $clip->user;
+                                    $clipTitle = $clip->forumTopic?->name ?? ($clip->forumTopic?->txt ? \Illuminate\Support\Str::limit(strip_tags($clip->forumTopic->txt), 28) : __('messages.clip'));
+                                @endphp
+                                <a href="{{ route('clips.show', $clip->id) }}" class="portal-clip-item position-relative overflow-hidden" style="
+                                    flex: 0 0 110px;
+                                    height: 160px;
+                                    border-radius: 14px;
+                                    background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.85) 100%), #1d2333;
+                                    display: flex;
+                                    flex-direction: column;
+                                    justify-content: space-between;
+                                    padding: 10px;
+                                    text-decoration: none;
+                                    color: #ffffff;
+                                    box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+                                    transition: transform 0.25s ease, box-shadow 0.25s ease;
+                                ">
+                                    <!-- Creator Mini Avatar -->
+                                    <div class="portal-clip-avatar" style="
+                                        width: 32px;
+                                        height: 32px;
+                                        border-radius: 50%;
+                                        border: 2px solid #ffffff;
+                                        overflow: hidden;
+                                        box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+                                    ">
+                                        <img src="{{ $clipUser ? $clipUser->avatarUrl() : asset('upload/_avatar.png') }}" alt="{{ $clipUser?->username }}" style="width: 100%; height: 100%; object-fit: cover;">
+                                    </div>
+
+                                    <!-- Play icon overlay -->
+                                    <div style="
+                                        position: absolute;
+                                        top: 50%;
+                                        left: 50%;
+                                        transform: translate(-50%, -50%);
+                                        width: 32px;
+                                        height: 32px;
+                                        border-radius: 50%;
+                                        background: rgba(255, 255, 255, 0.25);
+                                        backdrop-filter: blur(4px);
+                                        display: flex;
+                                        align-items: center;
+                                        justify-content: center;
+                                        font-size: 0.85rem;
+                                        color: #ffffff;
+                                    ">
+                                        <i class="fas fa-play" style="margin-inline-start: 2px;"></i>
+                                    </div>
+
+                                    <!-- Clip title & author -->
+                                    <div class="portal-clip-meta" style="z-index: 2;">
+                                        <span class="d-block text-truncate fw-bold" style="font-size: 0.76rem; line-height: 1.2; text-shadow: 0 1px 3px rgba(0,0,0,0.8);">
+                                            {{ $clipTitle }}
+                                        </span>
+                                        <span class="d-block text-truncate text-white-50" style="font-size: 0.68rem;">
+                                            {{ '@' . ($clipUser?->username ?? 'user') }}
+                                        </span>
+                                    </div>
+                                </a>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
+
                 <!-- POST COMPOSER -->
                 <div id="quick-post-box">
                     @include('theme::partials.status.add_post')
@@ -1161,10 +1303,20 @@
                         <span>{{ __('messages.portal_filter_all') }}</span>
                     </a>
 
+                    <a href="{{ route('portal.index', ['filter' => 'trending']) }}" class="portal-tab-btn {{ ($filter ?? '') === 'trending' ? 'active' : '' }}" data-portal-filter="trending">
+                        <i class="fas fa-fire" style="color: #ff5e3a;"></i>
+                        <span>{{ __('messages.portal_filter_trending') ?? 'الأكثر رواجاً' }}</span>
+                    </a>
+
                     @auth
                         <a href="{{ route('portal.index', ['filter' => 'me']) }}" class="portal-tab-btn {{ ($filter ?? '') === 'me' ? 'active' : '' }}" data-portal-filter="me">
                             <i class="fas fa-user-friends"></i>
                             <span>{{ __('messages.portal_filter_following') }}</span>
+                        </a>
+
+                        <a href="{{ route('portal.index', ['filter' => 'my_posts']) }}" class="portal-tab-btn {{ ($filter ?? '') === 'my_posts' ? 'active' : '' }}" data-portal-filter="my_posts">
+                            <i class="fas fa-user-edit"></i>
+                            <span>{{ __('messages.portal_filter_my_posts') ?? 'منشوراتي' }}</span>
                         </a>
 
                         @if(\App\Support\GroupSettings::isEnabled())
@@ -1173,6 +1325,11 @@
                                 <span>{{ __('messages.portal_filter_groups') }}</span>
                             </a>
                         @endif
+
+                        <a href="{{ route('portal.index', ['filter' => 'saved']) }}" class="portal-tab-btn {{ ($filter ?? '') === 'saved' ? 'active' : '' }}" data-portal-filter="saved">
+                            <i class="fas fa-bookmark"></i>
+                            <span>{{ __('messages.portal_filter_saved') ?? 'المحفوظات' }}</span>
+                        </a>
                     @endauth
 
                     <a href="{{ route('portal.index', ['filter' => 'media']) }}" class="portal-tab-btn {{ ($filter ?? '') === 'media' ? 'active' : '' }}" data-portal-filter="media">
@@ -1180,6 +1337,30 @@
                         <span>{{ __('messages.portal_filter_media') }}</span>
                     </a>
                 </nav>
+
+                <!-- LIVE FEED NEW POSTS ALERT BANNER -->
+                <div id="portal-live-feed-banner" style="display: none; margin-bottom: 16px;">
+                    <button type="button" id="portal-live-feed-refresh-cta" style="
+                        width: 100%;
+                        background: linear-gradient(135deg, var(--portal-accent, #615dfa), var(--portal-teal, #23d2e2));
+                        color: #ffffff;
+                        border: none;
+                        border-radius: 20px;
+                        padding: 10px 20px;
+                        font-weight: 700;
+                        font-size: 0.9rem;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        gap: 10px;
+                        cursor: pointer;
+                        box-shadow: 0 6px 18px rgba(97, 93, 250, 0.3);
+                        transition: transform 0.2s ease, box-shadow 0.2s ease;
+                    ">
+                        <i class="fas fa-arrow-up"></i>
+                        <span id="portal-live-feed-banner-text">{{ __('messages.portal_new_posts_available') ?? 'منشورات جديدة متاحة — انقر للتحديث' }}</span>
+                    </button>
+                </div>
 
                 <!-- FEED STREAM (INFINITE SCROLL) -->
                 <div id="infinite-scroll-container">
@@ -1367,6 +1548,32 @@ document.addEventListener('DOMContentLoaded', function () {
             loadFeed(currentFilter, false).finally(() => {
                 if (icon) icon.classList.remove('fa-spin');
             });
+        });
+    }
+
+    // ── Live Feed Stream Listener ────────────────────────────────
+    window.addEventListener('myads:live-feed', function (e) {
+        const detail = e.detail || {};
+        const count = parseInt(detail.new_posts_count, 10) || 0;
+        if (count > 0 && currentFilter === 'all') {
+            const liveBanner = document.getElementById('portal-live-feed-banner');
+            const liveText = document.getElementById('portal-live-feed-banner-text');
+            if (liveBanner) {
+                if (liveText) {
+                    liveText.textContent = `${count} ${@json(__('messages.portal_new_posts_available') ?? 'منشورات جديدة متاحة — انقر للتحديث')}`;
+                }
+                liveBanner.style.display = 'block';
+            }
+        }
+    });
+
+    const refreshCta = document.getElementById('portal-live-feed-refresh-cta');
+    if (refreshCta) {
+        refreshCta.addEventListener('click', function () {
+            const liveBanner = document.getElementById('portal-live-feed-banner');
+            if (liveBanner) liveBanner.style.display = 'none';
+            loadFeed('all', false);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         });
     }
 

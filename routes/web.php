@@ -66,6 +66,7 @@ Route::get('/statuses/{status}/edit', [App\Http\Controllers\StatusController::cl
 Route::post('/statuses/{status}/update', [App\Http\Controllers\StatusController::class, 'update'])->name('status.update')->middleware('auth');
 Route::delete('/statuses/{status}', [App\Http\Controllers\StatusController::class, 'destroy'])->name('status.destroy')->middleware('auth');
 Route::post('/statuses/{status}/pin', [App\Http\Controllers\StatusController::class, 'togglePin'])->name('status.pin')->middleware('auth');
+Route::post('/polls/{poll}/vote', [App\Http\Controllers\PollController::class, 'vote'])->name('polls.vote')->middleware('auth');
 Route::post('/status/gallery/delete-image/{attachmentId}', [App\Http\Controllers\StatusController::class, 'deleteGalleryImage'])->name('status.gallery.delete_image')->middleware('auth');
 Route::post('/status/gallery/clear/{topicId}', [App\Http\Controllers\StatusController::class, 'clearGallery'])->name('status.gallery.clear')->middleware('auth');
 Route::post('/status/gallery/reorder/{topicId}', [App\Http\Controllers\StatusController::class, 'reorderGalleryImages'])->name('status.gallery.reorder')->middleware('auth');

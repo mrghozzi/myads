@@ -125,6 +125,7 @@ class StatusResource extends JsonResource
                 : null,
             'link_preview' => $this->whenLoaded('linkPreviewRecord'),
             'is_promoted_ad' => $this->is_promoted_ad ?? false,
+            'poll' => (in_array((int) $this->s_type, [\App\Models\Status::TYPE_POLL, 15], true) || $this->post_kind === 'poll') ? $this->getPollData($viewer) : null,
         ];
     }
 
@@ -461,6 +462,31 @@ class StatusResource extends JsonResource
             ],
             'meta'         => [],
             'price'        => null,
+        ];
+    }
+
+    protected function getPollData(?\App\Models\User $viewer = null): ?array
+    {
+        $poll = $this->poll ?? \App\Models\Poll::where('status_id', $this->id)->with('options')->first();
+        if (!$poll) {
+            return null;
+        }
+
+        $userId = $viewer ? $viewer->id : null;
+        return [
+            'id' => $poll->id,
+            'question' => $poll->question,
+            'total_votes' => $poll->total_votes,
+            'is_expired' => $poll->is_expired,
+            'expires_at' => $poll->expires_at ? $poll->expires_at->toIso8601String() : null,
+            'has_voted' => $poll->hasUserVoted($userId),
+            'user_voted_option_id' => $poll->getUserVotedOptionId($userId),
+            'options' => $poll->options->map(fn ($opt) => [
+                'id' => $opt->id,
+                'option_text' => $opt->option_text,
+                'votes_count' => $opt->votes_count,
+                'percentage' => $opt->percentage,
+            ])->toArray(),
         ];
     }
 }

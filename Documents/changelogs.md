@@ -27,7 +27,26 @@
 * **Automated Test Coverage & Verification (`tests/Feature/V470RoadmapHardeningTest.php`)**:
   * Created dedicated test suite with 9 feature tests and 62 assertions validating dual DocumentRoot resolution, webhook timestamp & replay defense, strict nonce CSP headers, deflection text normalization, AJAX endpoints, Turnstile service verification, and admin security settings updates.
 
-### Security Hardening & Dependency Updates
+### Community Portal Modernization & Interactive Polls Engine (`/portal`)
+* **Interactive Community Polls Post Type & Real-Time Voting Engine (`polls`, `poll_options`, `poll_votes`, `TYPE_POLL = 15`)**:
+  * Activated the previously disabled `create_poll` tool in the social feed composer (`add_post.blade.php`), enabling community webmasters to craft interactive polls with custom questions, dynamic 2–6 voting options, and configurable expiration periods (1, 3, 7, 14, 30 days, or unlimited).
+  * Built database architecture (`2026_11_07_000000_create_polls_tables.php`) for `polls`, `poll_options`, and `poll_votes` with cascade deletion and unique user voting constraints (`[poll_id, user_id]`).
+  * Created dedicated Eloquent models (`Poll`, `PollOption`, `PollVote`) and controller (`PollController@vote`) supporting instant AJAX voting with real-time percentage recalculation, anti-duplicate vote prevention, expiration validation, and optional gamification rewards (+1 PTS).
+  * Designed interactive feed poll cards (`poll.blade.php`) with animated percentage progress bars, checkmark indicators on selected options, and guest login CTA.
+* **Community Post Submission Flow & Portal Retention UX (`StatusController.php`)**:
+  * Eliminated post-creation redirect friction where posting from `/portal` navigated users to individual forum topic pages (`/t{id}`).
+  * Introduced seamless `/portal` return routing with success flash toasts and JSON AJAX responses, preserving user context on the social feed.
+* **Fast Clips & Stories Shelf (`portal_clips_reel_v1`, `/portal`)**:
+  * Implemented a horizontal scrolling clips carousel right above the community feed displaying the latest vertical clips (`s_type = 14`) with creator avatar badges, silent hover previews, view counters, and direct quick-publish shortcuts for logged-in members.
+* **Expanded Feed Filter Tabs (`trending`, `my_posts`, `saved`)**:
+  * Added "Trending" (`filter=trending`) with flame icon rendering high-engagement community discussions.
+  * Added "My Posts" (`filter=my_posts`) allowing authenticated members to isolate their own status updates with one click.
+  * Added "Saved" (`filter=saved`) leveraging `saved_statuses` to display bookmarked content directly within the portal feed.
+* **Live SSE Community Feed Stream Integration (`LiveEventStreamService.php`)**:
+  * Integrated feed update notices into the Server-Sent Events engine with `Status::visible()` scoping, surfacing a smooth floating notification banner ("🔔 New posts available — Click to refresh") without requiring full page reloads.
+* **Mobile API Parity & Dedicated Test Coverage (`Api/PortalController.php`, `PortalPollsAndEnhancementsTest.php`)**:
+  * Synchronized API portal feed parameters (`trending`, `saved`, `my_posts`, `media`, `groups`) with mobile clients and formatted poll payloads in `StatusResource.php`.
+  * Verified all functionality with dedicated PHPUnit feature tests in `PortalPollsAndEnhancementsTest.php` (8 tests, 44 assertions, 100% pass rate).
 * **Symfony Ecosystem Security Remediation & DoS Prevention (`symfony/yaml`, Dependabot #98, `composer.lock`)**:
   * Upgraded `symfony/yaml` and `symfony/mime` from `7.4.13` to `7.4.22` resolving GitHub Dependabot security alert #98 (`CVE-2026-109413`) and email header advisory (`CVE-2026-45070`).
   * Fixed unbounded recursion in YAML inline lexer (`lexInlineStructure()`) where deeply nested inline sequences or mappings crashed PHP processes due to stack exhaustion.
@@ -60,7 +79,26 @@
   * Enhanced `CheckSystemVersion` middleware to automatically synchronize the physical `public/sitemap.xsl` file whenever a version bump occurs, preventing future version drift.
   * Added dedicated automated test coverage in `SeoSystemTest.php` (8 tests, 84 assertions, 100% pass rate).
 
-### Security Hardening & Dependency Updates
+### Community Portal Modernization & Interactive Polls Engine (`/portal`)
+* **Interactive Community Polls Post Type & Real-Time Voting Engine (`polls`, `poll_options`, `poll_votes`, `TYPE_POLL = 15`)**:
+  * Activated the previously disabled `create_poll` tool in the social feed composer (`add_post.blade.php`), enabling community webmasters to craft interactive polls with custom questions, dynamic 2–6 voting options, and configurable expiration periods (1, 3, 7, 14, 30 days, or unlimited).
+  * Built database architecture (`2026_11_07_000000_create_polls_tables.php`) for `polls`, `poll_options`, and `poll_votes` with cascade deletion and unique user voting constraints (`[poll_id, user_id]`).
+  * Created dedicated Eloquent models (`Poll`, `PollOption`, `PollVote`) and controller (`PollController@vote`) supporting instant AJAX voting with real-time percentage recalculation, anti-duplicate vote prevention, expiration validation, and optional gamification rewards (+1 PTS).
+  * Designed interactive feed poll cards (`poll.blade.php`) with animated percentage progress bars, checkmark indicators on selected options, and guest login CTA.
+* **Community Post Submission Flow & Portal Retention UX (`StatusController.php`)**:
+  * Eliminated post-creation redirect friction where posting from `/portal` navigated users to individual forum topic pages (`/t{id}`).
+  * Introduced seamless `/portal` return routing with success flash toasts and JSON AJAX responses, preserving user context on the social feed.
+* **Fast Clips & Stories Shelf (`portal_clips_reel_v1`, `/portal`)**:
+  * Implemented a horizontal scrolling clips carousel right above the community feed displaying the latest vertical clips (`s_type = 14`) with creator avatar badges, silent hover previews, view counters, and direct quick-publish shortcuts for logged-in members.
+* **Expanded Feed Filter Tabs (`trending`, `my_posts`, `saved`)**:
+  * Added "Trending" (`filter=trending`) with flame icon rendering high-engagement community discussions.
+  * Added "My Posts" (`filter=my_posts`) allowing authenticated members to isolate their own status updates with one click.
+  * Added "Saved" (`filter=saved`) leveraging `saved_statuses` to display bookmarked content directly within the portal feed.
+* **Live SSE Community Feed Stream Integration (`LiveEventStreamService.php`)**:
+  * Integrated feed update notices into the Server-Sent Events engine with `Status::visible()` scoping, surfacing a smooth floating notification banner ("🔔 New posts available — Click to refresh") without requiring full page reloads.
+* **Mobile API Parity & Dedicated Test Coverage (`Api/PortalController.php`, `PortalPollsAndEnhancementsTest.php`)**:
+  * Synchronized API portal feed parameters (`trending`, `saved`, `my_posts`, `media`, `groups`) with mobile clients and formatted poll payloads in `StatusResource.php`.
+  * Verified all functionality with dedicated PHPUnit feature tests in `PortalPollsAndEnhancementsTest.php` (8 tests, 44 assertions, 100% pass rate).
 * **Vite Ecosystem Security Remediation & Advisory Elimination (`vite` 8.3.5, `package.json`, `package-lock.json`)**:
   * Upgraded `vite` from `8.0.16` to `8.3.5` resolving all 5 active GitHub Dependabot security advisories:
     * **#93 (High)**: Fixed Windows `fs.existsSync()` existence check bypass in `launch-editor`.

@@ -162,15 +162,21 @@ class Status extends Model
             ->where('status', StatusPromotion::STATUS_ACTIVE);
     }
 
+    public function poll()
+    {
+        return $this->hasOne(Poll::class, 'status_id');
+    }
+
     const TYPE_VIDEO = 10;
     const TYPE_AUDIO = 11;
     const TYPE_FILE = 12;
     const TYPE_MUSIC = 13;
     const TYPE_CLIPS = 14;
+    const TYPE_POLL = 15;
 
     public function supportsPromotion(): bool
     {
-        return in_array((int) $this->s_type, [1, 2, 4, 100, 7867, 6, 10, 11, 12, 13, 14], true);
+        return in_array((int) $this->s_type, [1, 2, 4, 100, 7867, 6, 10, 11, 12, 13, 14, 15], true);
     }
 
     public function promotionDestinationUrl(): string
@@ -240,7 +246,7 @@ class Status extends Model
             return OrderRequest::find($this->tp_id);
         }
 
-        if (in_array($sType, [100, 4, 2, 10, 11, 12, 13, 14], true)) {
+        if (in_array($sType, [100, 4, 2, 10, 11, 12, 13, 14, 15], true)) {
             if ($this->relationLoaded('forumTopic') && $this->forumTopic) {
                 return $this->forumTopic;
             }
@@ -292,7 +298,7 @@ class Status extends Model
                     ->count();
             }
 
-            if (in_array($this->s_type, [2, 4, 100, 10, 11, 12, 13, 14])) {
+            if (in_array($this->s_type, [2, 4, 100, 10, 11, 12, 13, 14, 15])) {
                 return ForumComment::where('tid', $this->tp_id)->count();
             }
 
@@ -435,6 +441,10 @@ class Status extends Model
             return 'clips';
         }
 
+        if ((int) $this->s_type === self::TYPE_POLL) {
+            return 'poll';
+        }
+
         return 'text';
     }
 
@@ -448,7 +458,7 @@ class Status extends Model
             return 14;
         }
 
-        if (in_array($this->s_type, [2, 4, 100, 10, 11, 12, 13])) {
+        if (in_array($this->s_type, [2, 4, 100, 10, 11, 12, 13, 15])) {
             return 2;
         }
 

@@ -79,7 +79,11 @@ class StatusPostService
             'files.*' => "file|max:{$maxSizeKb}",
             'link_url' => 'nullable|string|max:2048',
             'publish_mode' => 'nullable|in:post,directory_only',
-            'post_kind' => 'nullable|string|in:text,gallery,link,repost,video,audio,file,music,clips',
+            'post_kind' => 'nullable|string|in:text,gallery,link,repost,video,audio,file,music,clips,poll',
+            'poll_question' => 'nullable|string|max:500',
+            'poll_options' => 'nullable|array|min:2|max:10',
+            'poll_options.*' => 'nullable|string|max:255',
+            'poll_duration_days' => 'nullable|integer|in:1,3,7,14,30',
             'save_to_directory' => 'nullable|boolean',
             'directory_name' => 'nullable|string|max:255',
             'directory_category_id' => 'nullable|integer|exists:cat_dir,id',
@@ -116,6 +120,7 @@ class StatusPostService
             'file' => Status::TYPE_FILE,
             'music' => Status::TYPE_MUSIC,
             'clips' => Status::TYPE_CLIPS,
+            'poll' => Status::TYPE_POLL,
             default => 100,
         };
         $publishMode = (string) $request->input('publish_mode', 'post');
@@ -190,6 +195,25 @@ class StatusPostService
             throw new \RuntimeException($this->schema->blockedActionMessage('mentions', __('messages.mentions')));
         }
 
+        $pollQuestion = '';
+        $pollOptions = [];
+        $pollExpiresAt = null;
+        if ($postKind === 'poll') {
+            $pollQuestion = trim((string) ($request->input('poll_question') ?: $text));
+            if ($pollQuestion === '') {
+                throw new \RuntimeException(__('messages.poll_question_required') ?? 'Poll question is required.');
+            }
+            $rawOptions = (array) $request->input('poll_options', []);
+            $pollOptions = array_values(array_filter(array_map('trim', $rawOptions), fn ($val) => $val !== ''));
+            if (count($pollOptions) < 2) {
+                throw new \RuntimeException(__('messages.poll_min_two_options') ?? 'Poll requires at least two valid options.');
+            }
+            $durationDays = $request->input('poll_duration_days');
+            if ($durationDays && in_array((int) $durationDays, [1, 3, 7, 14, 30], true)) {
+                $pollExpiresAt = now()->addDays((int) $durationDays);
+            }
+        }
+
         DB::beginTransaction();
         try {
             $videoTitle = trim((string) ($request->input('video_title') ?: $request->input('title') ?: $request->input('name', '')));
@@ -223,6 +247,24 @@ class StatusPostService
 
             if (in_array($postKind, ['video', 'audio', 'file', 'music', 'clips'])) {
                 $this->storeMediaAssets($topic, $request, $user->id, $postKind);
+            }
+
+            if ($postKind === 'poll') {
+                $poll = \App\Models\Poll::create([
+                    'status_id' => $status->id,
+                    'user_id' => $user->id,
+                    'question' => $pollQuestion,
+                    'expires_at' => $pollExpiresAt,
+                ]);
+
+                foreach ($pollOptions as $index => $optionText) {
+                    \App\Models\PollOption::create([
+                        'poll_id' => $poll->id,
+                        'option_text' => $optionText,
+                        'order' => $index,
+                        'votes_count' => 0,
+                    ]);
+                }
             }
 
             if ($linkUrl) {
@@ -362,6 +404,25 @@ class StatusPostService
         $hasMentions = \App\Support\ContentFormatter::extractMentionUsernames($text) !== [];
         if ($hasMentions && !$this->schema->supports('mentions')) {
             throw new \RuntimeException($this->schema->blockedActionMessage('mentions', __('messages.mentions')));
+        }
+
+        $pollQuestion = '';
+        $pollOptions = [];
+        $pollExpiresAt = null;
+        if ($postKind === 'poll') {
+            $pollQuestion = trim((string) ($request->input('poll_question') ?: $text));
+            if ($pollQuestion === '') {
+                throw new \RuntimeException(__('messages.poll_question_required') ?? 'Poll question is required.');
+            }
+            $rawOptions = (array) $request->input('poll_options', []);
+            $pollOptions = array_values(array_filter(array_map('trim', $rawOptions), fn ($val) => $val !== ''));
+            if (count($pollOptions) < 2) {
+                throw new \RuntimeException(__('messages.poll_min_two_options') ?? 'Poll requires at least two valid options.');
+            }
+            $durationDays = $request->input('poll_duration_days');
+            if ($durationDays && in_array((int) $durationDays, [1, 3, 7, 14, 30], true)) {
+                $pollExpiresAt = now()->addDays((int) $durationDays);
+            }
         }
 
         DB::beginTransaction();

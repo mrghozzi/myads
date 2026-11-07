@@ -79,6 +79,7 @@ Route::middleware(['api.key', 'auth:sanctum'])->group(function () {
     Route::get('/statuses/saved', [App\Http\Controllers\Api\StatusController::class, 'savedStatuses']);
     Route::post('/statuses/save-toggle', [App\Http\Controllers\Api\StatusController::class, 'toggleSave']);
     Route::post('/statuses/{status}/save-toggle', [App\Http\Controllers\Api\StatusController::class, 'toggleSave']);
+    Route::post('/polls/{poll}/vote', [App\Http\Controllers\PollController::class, 'vote']);
     Route::get('/statuses/{status}', [App\Http\Controllers\Api\StatusController::class, 'show']);
     Route::post('/statuses', [App\Http\Controllers\Api\StatusController::class, 'store']);
     Route::post('/statuses/{status}/update', [App\Http\Controllers\Api\StatusController::class, 'update']);

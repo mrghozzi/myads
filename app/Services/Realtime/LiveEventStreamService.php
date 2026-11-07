@@ -112,7 +112,7 @@ class LiveEventStreamService
         ];
 
         // 3. Community Feed Updates Check
-        $newFeedPostsCount = Status::where('statu', 0)
+        $newFeedPostsCount = Status::visible($user)
             ->where('uid', '!=', $user->id)
             ->where('date', '>=', $lastCheckTimestamp)
             ->count();

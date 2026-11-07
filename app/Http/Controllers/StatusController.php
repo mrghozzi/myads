@@ -129,6 +129,23 @@ class StatusController extends Controller
                 }
                 return redirect()->route('clips.show', $status->id)->with('success', __('messages.clip_published_successfully') ?? 'Clip published successfully!');
             }
+
+            $isFromPortal = $request->input('source_page') === 'portal'
+                || str_contains((string) $request->headers->get('referer'), '/portal');
+
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'redirect_url' => $isFromPortal ? route('portal.index') : route('forum.topic', $status->tp_id),
+                    'status_id' => $status->id,
+                    'message' => __('messages.post_created_successfully') ?? 'Post created successfully!',
+                ]);
+            }
+
+            if ($isFromPortal) {
+                return redirect()->route('portal.index')->with('success', __('messages.post_created_successfully') ?? 'Post created successfully!');
+            }
+
             return redirect()->route('forum.topic', $status->tp_id);
         } catch (\Illuminate\Validation\ValidationException $e) {
             throw $e;

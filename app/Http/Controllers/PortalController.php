@@ -236,10 +236,13 @@ class PortalController extends Controller
                 }
             });
 
+            $portalClips = \Illuminate\Support\Facades\Cache::get('portal_clips_reel_v1', collect());
+
             return view('theme::portal.index', compact(
                 'filter', 'search', 'portalStats', 'requestedMode',
                 'searchedUsers', 'searchedStatuses', 'searchedGroups',
-                'searchedCommentsForum', 'searchedCommentsDir', 'searchedProducts'
+                'searchedCommentsForum', 'searchedCommentsDir', 'searchedProducts',
+                'portalClips'
             ));
         }
 
@@ -293,6 +296,44 @@ class PortalController extends Controller
                 $activities = Status::visible($user)
                     ->where('date', '<=', time())
                     ->whereIn('s_type', $mediaTypes)
+                    ->when(!empty($hiddenDirectoryStatusIds), fn ($query) => $query->whereNotIn('id', $hiddenDirectoryStatusIds))
+                    ->orderBy('date', 'desc')
+                    ->paginate($pageSize);
+
+                $activityService->decorateMany($activities);
+            } elseif ($filter === 'trending') {
+                // Trending feed: high engagement ranked feed
+                $page       = (int) $request->query('page', 1);
+                $activities = \App\Services\FeedService::getRankedFeed(
+                    null,
+                    $page,
+                    $pageSize
+                );
+
+                $activityService->decorateMany($activities);
+            } elseif ($user && $filter === 'saved') {
+                // Saved / bookmarked posts
+                $savedStatusIds = \Illuminate\Support\Facades\DB::table('saved_statuses')
+                    ->where('user_id', $user->id)
+                    ->orderBy('id', 'desc')
+                    ->pluck('status_id')
+                    ->toArray();
+
+                if (empty($savedStatusIds)) {
+                    $activities = new \Illuminate\Pagination\LengthAwarePaginator([], 0, $pageSize);
+                } else {
+                    $activities = Status::visible($user)
+                        ->whereIn('id', $savedStatusIds)
+                        ->when(!empty($hiddenDirectoryStatusIds), fn ($query) => $query->whereNotIn('id', $hiddenDirectoryStatusIds))
+                        ->orderByRaw('FIELD(id, ' . implode(',', array_map('intval', $savedStatusIds)) . ')')
+                        ->paginate($pageSize);
+                }
+
+                $activityService->decorateMany($activities);
+            } elseif ($user && $filter === 'my_posts') {
+                // Current user's own posts
+                $activities = Status::visible($user)
+                    ->where('uid', $user->id)
                     ->when(!empty($hiddenDirectoryStatusIds), fn ($query) => $query->whereNotIn('id', $hiddenDirectoryStatusIds))
                     ->orderBy('date', 'desc')
                     ->paginate($pageSize);
@@ -358,7 +399,21 @@ class PortalController extends Controller
             }
         });
 
-        return view('theme::portal.index', compact('activities', 'filter', 'search', 'portalStats', 'requestedMode'));
+        // Fast reel of recent active clips for portal community shelf
+        $portalClips = \Illuminate\Support\Facades\Cache::remember('portal_clips_reel_v1', 180, function () {
+            try {
+                return Status::visible()
+                    ->where('s_type', Status::TYPE_CLIPS)
+                    ->with(['user', 'forumTopic'])
+                    ->orderBy('date', 'desc')
+                    ->limit(10)
+                    ->get();
+            } catch (\Throwable) {
+                return collect();
+            }
+        });
+
+        return view('theme::portal.index', compact('activities', 'filter', 'search', 'portalStats', 'requestedMode', 'portalClips'));
     }
 
     public function share(Request $request)

@@ -105,6 +105,13 @@ MYADS is a community platform where website owners:
     - **AI Support Deflection Engine (`SupportDeflectionService`, `/tickets/deflect`, `/support/deflect`, `/api/support/deflect`):** Semantic & keyword solution matcher scanning the 27 Help Center guides and verified solved community topics (`support_topics` with `is_solved = 1`), with Arabic & English text normalization (stripping tashkeel, normalizing alef/ya/ta-marbuta, stop-word removal) and debounced `@.superdesign` deflection cards in ticket and topic creation views.
     - **Cloudflare Turnstile Bot Defense (`TurnstileService`, `/admin/security`, `AuthController`, `<x-turnstile />`):** Integrated Turnstile into `SecuritySettings`, providing Frictionless CAPTCHA-free human verification across login, registration, and support forms with administrative controls and test-token bypass support.
     - **100% Automated Test Coverage:** Validated by `V470RoadmapHardeningTest.php` (9 tests, 62 assertions, 100% pass rate).
+69. **Community Portal Modernization, Interactive Polls & Engagement Engine (v4.7.0)** — Comprehensive overhaul and modernization of `/portal`:
+    - **Interactive Community Polls System (`polls`, `poll_options`, `poll_votes`, `TYPE_POLL = 15`):** Activated the previously disabled `create_poll` tool in the social feed composer, enabling custom poll questions, dynamic 2–6 options, configurable expiration periods, unique voting protection, animated progress bar cards (`poll.blade.php`), and instant AJAX voting with gamification integration.
+    - **Portal Context Retention UX (`StatusController`):** Resolved posting redirect friction by preserving users on the `/portal` feed upon status creation with success toasts and AJAX responses instead of navigating to the forum topic view.
+    - **Fast Clips & Stories Carousel (`portal_clips_reel_v1`):** Horizontal scrollable stories carousel above the feed featuring latest vertical clips, publisher avatar hexagons, hover silent previews, and 1-click quick upload shortcuts.
+    - **Expanded Feed Filtering (`trending`, `my_posts`, `saved`):** Added dedicated tabs for engagement-ranked trending discussions, personal posts, and bookmarked statuses (`saved_statuses`).
+    - **Live SSE Feed Stream Integration (`LiveEventStreamService`):** Real-time notice banner ("🔔 New posts available — Click to refresh") alerting active members of incoming community posts without page reloads.
+    - **100% Automated Test Coverage:** Supported by `PortalPollsAndEnhancementsTest.php` (8 tests, 44 assertions, 100% pass rate).
 
 ---
 
