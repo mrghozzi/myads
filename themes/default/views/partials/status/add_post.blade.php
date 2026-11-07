@@ -34,6 +34,7 @@
         $allowFiles ? 'file' : null,
         $allowAudio ? 'music' : null,
         $allowClips ? 'clips' : null,
+        'poll',
     ]), true)) {
         $oldPostKind = 'text';
     }
@@ -1259,6 +1260,11 @@
         }
 
         function syncPostKind() {
+            if (pollBlock && pollBlock.style.display !== 'none') {
+                postKind.value = 'poll';
+                return;
+            }
+
             if (galleryInput && (galleryInput.files || []).length > 0) {
                 postKind.value = 'gallery';
                 return;
@@ -1874,7 +1880,11 @@
                 setPublishMode('post');
             }
 
-            syncPostKind();
+            if (pollBlock && pollBlock.style.display !== 'none') {
+                postKind.value = 'poll';
+            } else {
+                syncPostKind();
+            }
         });
 
         window.openRepostComposer = function (statusId, authorName, excerpt) {
@@ -1893,6 +1903,11 @@
 
         if (repostEnabled && repostStatusId && repostCard && repostStatusId.value) {
             repostCard.style.display = 'block';
+        }
+
+        if ((postKind.value === 'poll' || @json($oldPostKind === 'poll')) && pollBlock) {
+            pollBlock.style.display = 'block';
+            postKind.value = 'poll';
         }
 
         if (hasResolvedLink()) {

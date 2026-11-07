@@ -445,6 +445,18 @@ class Status extends Model
             return 'poll';
         }
 
+        try {
+            $hasPoll = $this->relationLoaded('poll')
+                ? $this->getRelation('poll') !== null
+                : $this->poll()->exists();
+
+            if ($hasPoll) {
+                return 'poll';
+            }
+        } catch (\Throwable) {
+            // Keep falling back
+        }
+
         return 'text';
     }
 

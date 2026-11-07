@@ -2693,6 +2693,7 @@ return [
     'upload_clips' => 'Upload Clips',
     'upload_photos' => 'Upload Photos',
     'create_poll' => 'Create Poll',
+    'option' => 'Opção',
     'gif' => 'GIF',
     'feelings' => 'Feelings',
     'sell_product' => 'Sell Product',

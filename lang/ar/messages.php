@@ -288,6 +288,7 @@ return [
     'create_poll' => 'إنشاء استطلاع',
     'poll' => 'استطلاع رأي',
     'polls' => 'استطلاعات الرأي',
+    'option' => 'الخيار',
     'poll_question' => 'سؤال الاستطلاع',
     'poll_question_placeholder' => 'ما الذي تود طرحه للتصويت؟',
     'poll_options' => 'خيارات التصويت',

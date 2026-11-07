@@ -170,6 +170,7 @@ return [
     'upload_clips' => 'Загрузить клипы',
     'upload_photos' => 'Загрузить фотографии',
     'create_poll' => 'Создать опрос',
+    'option' => 'Вариант',
     'gif' => 'гифка',
     'feelings' => 'Чувства',
     'sell_product' => 'Продать продукт',

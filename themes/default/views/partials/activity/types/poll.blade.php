@@ -6,7 +6,8 @@
     $activityUserPresence = $activityUser?->isOnline() ? 'online' : 'offline';
     $activityUserIsAdmin = $activityUser?->isAdmin() ?? false;
     $activityUserHasVerifiedBadge = $activityUser?->hasVerifiedBadge() ?? false;
-    $formattedText = \App\Support\ContentFormatter::format($activity->related_content->txt ?? '');
+    $relatedId = $activity->related_content?->id ?? $activity->tp_id ?? $activity->id;
+    $formattedText = \App\Support\ContentFormatter::format($activity->related_content?->txt ?? ($activity->txt ?? ''));
     
     $poll = $activity->poll ?? \App\Models\Poll::where('status_id', $activity->id)->with('options')->first();
     $currentUserId = auth()->id();
@@ -37,9 +38,9 @@
                         </p>
                     @endif
                     @include('theme::partials.activity.promotion_link', ['activity' => $activity])
-                    <p class="simple-dropdown-link post_report{{ $activity->id }}" onclick="reportPost({{ $activity->tp_id }}, 100, {{ $activity->related_content->id }})"><i class="fa fa-flag" aria-hidden="true"></i>&nbsp;{{ __('messages.report') }}</p>
+                    <p class="simple-dropdown-link post_report{{ $activity->id }}" onclick="reportPost({{ $activity->tp_id }}, 100, {{ $relatedId }})"><i class="fa fa-flag" aria-hidden="true"></i>&nbsp;{{ __('messages.report') }}</p>
                 @endauth
-                <p class="simple-dropdown-link copy_link" onclick="navigator.clipboard.writeText('{{ route('forum.topic', $activity->tp_id) }}'); var notif = document.getElementById('notif{{ $activity->related_content->id }}'); notif.innerHTML = '<div class=\'alert alert-success\' role=\'alert\'>{{ __('messages.link_copied') }}</div>'; notif.style.display = 'block'; setTimeout(function() { notif.style.display = 'none'; }, 5000);"><i class="fa fa-link" aria-hidden="true"></i>&nbsp;{{ __('messages.copy_link') }}</p>
+                <p class="simple-dropdown-link copy_link" onclick="navigator.clipboard.writeText('{{ route('forum.topic', $activity->tp_id) }}'); var notif = document.getElementById('notif{{ $relatedId }}'); notif.innerHTML = '<div class=\'alert alert-success\' role=\'alert\'>{{ __('messages.link_copied') }}</div>'; notif.style.display = 'block'; setTimeout(function() { notif.style.display = 'none'; }, 5000);"><i class="fa fa-link" aria-hidden="true"></i>&nbsp;{{ __('messages.copy_link') }}</p>
             </div>
         </div>
     </div>
@@ -96,7 +97,7 @@
 
             <!-- POST TEXT IF ANY -->
             @if(trim(strip_tags($formattedText)) !== '' && (!isset($poll) || $formattedText !== ($poll->question ?? '')))
-                <div class="widget-box-status-text post_text{{ $activity->related_content->id }} mb-3">
+                <div class="widget-box-status-text post_text{{ $relatedId }} mb-3">
                     <div class="textpost">
                         {!! $formattedText !!}
                     </div>
@@ -217,7 +218,7 @@
                 </div>
             @endif
 
-            <div id="notif{{ $activity->related_content->id }}"></div>
+            <div id="notif{{ $relatedId }}"></div>
 
             <!-- CONTENT ACTIONS -->
             <div class="content-actions">
@@ -247,7 +248,7 @@
     <!-- /WIDGET BOX STATUS -->
 
     <!-- POST COMMENTS -->
-    <div class="post-comment-list" id="post-comment-list{{ $activity->related_content->id }}">
+    <div class="post-comment-list" id="post-comment-list{{ $relatedId }}">
         @include('theme::partials.activity.comments', ['activity' => $activity])
     </div>
 </div>

@@ -288,6 +288,7 @@ return [
     'create_poll' => 'Create Poll',
     'poll' => 'Poll',
     'polls' => 'Polls',
+    'option' => 'Option',
     'poll_question' => 'Poll Question',
     'poll_question_placeholder' => 'Ask a question for voting...',
     'poll_options' => 'Poll Options',

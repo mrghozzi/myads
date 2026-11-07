@@ -170,6 +170,7 @@ return [
     'upload_clips' => '上傳剪輯',
     'upload_photos' => '上傳照片',
     'create_poll' => '創建投票',
+    'option' => '選項',
     'gif' => '動圖',
     'feelings' => '情懷',
     'sell_product' => '銷售產品',

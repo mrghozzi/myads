@@ -170,6 +170,7 @@ return [
     'upload_clips' => '上传剪辑',
     'upload_photos' => '上传照片',
     'create_poll' => '创建投票',
+    'option' => '选项',
     'gif' => '动图',
     'feelings' => '情怀',
     'sell_product' => '销售产品',

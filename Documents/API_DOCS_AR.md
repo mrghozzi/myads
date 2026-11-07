@@ -435,9 +435,72 @@ https://myads.com/share?text=Check+out+this+awesome+platform!+https://example.co
 
 ---
 
-### ب. الخلاصة والوسائط ومركز الفيديو (Community Feed & Video Hub)
+### ب. الخلاصة والوسائط واستطلاعات الرأي ومركز الفيديو (Community Feed, Polls & Video Hub)
 
-- `GET /api/portal/feed`: استرجاع خلاصة المنشورات مع التفاعلات والوسائط وإعلانات الترويج.
+- `GET /api/portal/feed`: استرجاع خلاصة المجتمع والمنشورات التفاعلية مع دعم تقسيم الصفحات والتصفية المتقدمة.
+  - *المعلمات (Query Parameters):*
+    - `filter`: تصفية الخلاصة (`all` الخلاصة العامة المرتبة بالخوارزمية، `trending` المنشورات الشائعة الساخنة عالمياً، `me` منشورات من تتابعهم، `groups` منشورات المجموعات المشترك بها، `media` وسائط فقط [فيديو، صوت، معرض صور، مقاطع]، `saved` المنشورات المحفوظة/المفضلة، `my_posts` منشورات المستخدم المسجل فقط). القيمة الافتراضية: `all`.
+    - `per_page`: عدد المنشورات في الصفحة (الافتراضي: 20).
+    - `page`: رقم الصفحة (الافتراضي: 1).
+  - *الحقول المرجعة لكل منشور:* يشمل كائن `user`، `display_content`، `display_title`، `video_title`، `video_thumbnail`، `media`، `gallery`، `attachments`، `repost_record`، `grouped_reactions`، `has_liked`، `user_reaction`، `is_promoted_ad`، `s_type`، وكائن استطلاع الرأي `poll` (عندما يكون `s_type = 15`).
+  - *هيكل كائن استطلاع الرأي (`poll`):*
+    ```json
+    {
+        "id": 14,
+        "question": "ما هي لغة البرمجة المفضلة لديك لتطوير تطبيقات الويب؟",
+        "total_votes": 42,
+        "is_expired": false,
+        "expires_at": "2026-11-14T12:00:00.000000Z",
+        "has_voted": true,
+        "user_voted_option_id": 52,
+        "options": [
+            {
+                "id": 51,
+                "option_text": "PHP / Laravel",
+                "votes_count": 26,
+                "percentage": 61.9
+            },
+            {
+                "id": 52,
+                "option_text": "Python / Django",
+                "votes_count": 16,
+                "percentage": 38.1
+            }
+        ]
+    }
+    ```
+- `POST /api/polls/{poll}/vote`: تسجيل تصويت العضو على أحد خيارات استطلاع الرأي (`s_type = 15`).
+  - *الترويسات:* `Authorization: Bearer {token}`, `Accept: application/json`
+  - *جسم الطلب:*
+    | المعلمة | النوع | مطلوب | الوصف |
+    |---|---|---|---|
+    | `poll_option_id` | integer | **نعم** | المعرف الرقمي للخيار المختار التابع لهذا الاستطلاع. |
+  - *الاستجابة الناجحة (HTTP 200):*
+    ```json
+    {
+        "success": true,
+        "message": "تم تسجيل تصويتك بنجاح!",
+        "total_votes": 43,
+        "user_voted_option_id": 52,
+        "options": [
+            {
+                "id": 51,
+                "option_text": "PHP / Laravel",
+                "votes_count": 26,
+                "percentage": 60.5
+            },
+            {
+                "id": 52,
+                "option_text": "Python / Django",
+                "votes_count": 17,
+                "percentage": 39.5
+            }
+        ]
+    }
+    ```
+  - *الأخطاء المحتملة:*
+    - `401 Unauthorized`: يتطلب تسجيل الدخول.
+    - `422 Unprocessable Entity`: الاستطلاع منتهٍ أو سبق للمستخدم التصويت.
 - `GET /api/video/feed`: تصفح مركز الفيديو المخصص لمقاطع الفيديو والمقاطع القصيرة (`s_type` 10 و 2 و 4 و 100 و 14).
   - المعلمات: `filter` (`all`, `trending`, `latest`, `videos`, `clips`)، استعلام البحث `q`، والصفحة.
   - يُرجع كائن الفيديو المميز (`spotlight_video`)، ورف المقاطع القصيرة (`clips`)، ومقاطع الفيديو المتوافقة مع البحث.
@@ -448,7 +511,11 @@ https://myads.com/share?text=Check+out+this+awesome+platform!+https://example.co
 - `GET /api/statuses/{id}`: استرجاع تفاصيل منشور محدد. لمنشورات الفيديو يتضمن الفيديوهات المقترحة (`suggested_videos`).
 - `GET /api/composer/options`: استرجاع خيارات صندوق النشر (المجموعات، التصنيفات، وأنواع المنشورات).
 - `POST /api/statuses/link-preview`: فحص وجلب المعاينة الفورية لعنوان URL (`{"link_url": "..."}`).
-- `POST /api/statuses`: نشر منشور جديد متعدد الوسائط (صور، فيديو، صوت، ملفات، وروابط).
+- `POST /api/statuses`: نشر منشور جديد متعدد الوسائط (صور، فيديو، صوت، ملفات، استطلاعات رأي، وروابط).
+  - يدعم معلمات الاستطلاع عند اختيار `post_kind = "poll"`:
+    - `poll_question`: نص سؤال الاستطلاع (إلزامي).
+    - `poll_options`: مصفوفة نصوص الخيارات (بين 2 و 10 خيارات).
+    - `poll_duration_days`: مدة الاستطلاع بالأيام (`1`, `3`, `7`, `14`, `30`, الافتراضي: `7`). ينشئ منشوراً بنوع `s_type = 15`.
 - `POST /api/statuses/{id}/update`: تعديل منشور موجود.
 - `DELETE /api/statuses/{id}`: حذف المنشور.
 

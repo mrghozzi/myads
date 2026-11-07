@@ -587,7 +587,69 @@ All settings mutation endpoints accept `POST`, `PUT`, and `PATCH` HTTP verbs for
 ### B. Community Feed, Media Posts & Video Hub
 
 - `GET /api/portal/feed`: Retrieve the community feed (paginated).
-  - *Attributes:* `user` (with `profile_badge_color`), `display_content`, `display_title`, `video_title`, `video_thumbnail`, `media`, `gallery`, `attachments`, `repost_record`, `grouped_reactions`, `has_liked`, `user_reaction`, `is_promoted_ad`, `s_type`.
+  - *Query Parameters:*
+    - `filter`: Feed filter category (`all` [ranked algorithm], `trending` [global hot posts], `me` [following + self], `groups` [joined group posts], `media` [video/audio/clips/galleries], `saved` [bookmarked posts], `my_posts` [authenticated user posts]). Defaults to `all`.
+    - `per_page`: Number of activity records per page (default: 20).
+    - `page`: Page number for pagination (default: 1).
+  - *Attributes:* `user` (with `profile_badge_color`), `display_content`, `display_title`, `video_title`, `video_thumbnail`, `media`, `gallery`, `attachments`, `poll`, `repost_record`, `grouped_reactions`, `has_liked`, `user_reaction`, `is_promoted_ad`, `s_type`.
+  - *Poll Object Schema (`s_type = 15`):*
+    ```json
+    {
+        "id": 14,
+        "question": "What is your primary programming language for web apps?",
+        "total_votes": 42,
+        "is_expired": false,
+        "expires_at": "2026-11-14T12:00:00.000000Z",
+        "has_voted": true,
+        "user_voted_option_id": 52,
+        "options": [
+            {
+                "id": 51,
+                "option_text": "PHP / Laravel",
+                "votes_count": 26,
+                "percentage": 61.9
+            },
+            {
+                "id": 52,
+                "option_text": "Python / Django",
+                "votes_count": 16,
+                "percentage": 38.1
+            }
+        ]
+    }
+    ```
+- `POST /api/polls/{poll}/vote`: Cast a vote on an active community poll option (`s_type = 15`).
+  - *Headers:* `Authorization: Bearer {token}`, `Accept: application/json`
+  - *Payload Parameters:*
+    | Parameter | Type | Required | Description |
+    |---|---|---|---|
+    | `poll_option_id` | integer | **Yes** | The numeric ID of the selected `PollOption` belonging to this poll. |
+  - *Response (HTTP 200):*
+    ```json
+    {
+        "success": true,
+        "message": "Your vote has been recorded!",
+        "total_votes": 43,
+        "user_voted_option_id": 52,
+        "options": [
+            {
+                "id": 51,
+                "option_text": "PHP / Laravel",
+                "votes_count": 26,
+                "percentage": 60.5
+            },
+            {
+                "id": 52,
+                "option_text": "Python / Django",
+                "votes_count": 17,
+                "percentage": 39.5
+            }
+        ]
+    }
+    ```
+  - *Errors:*
+    - `401 Unauthorized`: Member authentication required.
+    - `422 Unprocessable Entity`: Poll expired (`poll_ended`) or member has already voted (`poll_already_voted`).
 - `GET /api/video/feed`: Retrieve Video Hub discovery feed strictly isolated to video content (`s_type` 10, 2, 4, 100 with video attachments/embeds, and 14 for clips).
   - *Query Parameters:*
     - `filter`: Feed filter category (`all`, `trending`, `latest`, `videos`, `clips`, `shorts`). Defaults to `all`.
@@ -664,7 +726,11 @@ All settings mutation endpoints accept `POST`, `PUT`, and `PATCH` HTTP verbs for
 - `GET /api/statuses/{id}`: Retrieve detailed post payload. For video posts, includes `suggested_videos` collection, `is_following`, and `is_saved`.
 - `GET /api/composer/options`: Retrieve post composer options (`groups`, `directory_categories`, `supported_kinds`).
 - `POST /api/statuses/link-preview`: Generate live metadata preview for a target URL (`{"link_url": "..."}`).
-- `POST /api/statuses`: Publish a new post (Multipart Form-Data supporting `text`, `post_kind`, `video_title`, `video_thumbnail`, `images[]`, `videos[]`, `audios[]`, `files[]`, `link_url`, `group_id`).
+- `POST /api/statuses`: Publish a new post (Multipart Form-Data supporting `text`, `post_kind`, `video_title`, `video_thumbnail`, `images[]`, `videos[]`, `audios[]`, `files[]`, `link_url`, `group_id`, `poll_question`, `poll_options[]`, `poll_duration_days`).
+  - *Poll Parameters (when `post_kind` is `"poll"`):*
+    - `poll_question`: Question string (required).
+    - `poll_options`: Array of option strings (minimum 2, maximum 10).
+    - `poll_duration_days`: Expiration days (`1`, `3`, `7`, `14`, `30`, default: `7`). Sets `s_type = 15`.
 - `POST /api/statuses/{id}/update`: Update an existing status (requires post ownership).
 - `DELETE /api/statuses/{id}`: Delete a status (requires post ownership or admin permissions).
 - `POST /api/statuses/{id}/report`: Report a status post to the platform moderation suite (`/admin/reports`).

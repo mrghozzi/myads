@@ -170,6 +170,7 @@ return [
     'upload_clips' => 'Уплоад Цлипс',
     'upload_photos' => 'Уплоад Пхотос',
     'create_poll' => 'Креирајте анкету',
+    'option' => 'Опција',
     'gif' => 'ГИФ',
     'feelings' => 'Осећања',
     'sell_product' => 'Продај производ',

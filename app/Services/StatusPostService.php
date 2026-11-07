@@ -45,6 +45,12 @@ class StatusPostService
             $postKind = 'repost';
         }
 
+        $rawPollOptions = (array) $request->input('poll_options', []);
+        $hasValidPollOptions = !empty(array_filter(array_map('trim', $rawPollOptions)));
+        if (($postKind === '' || $postKind === 'text') && ($request->filled('poll_question') || $hasValidPollOptions || $legacyType === Status::TYPE_POLL || $postKind === 'poll')) {
+            $postKind = 'poll';
+        }
+
         if ($postKind === '' && $legacyType === 1) {
             return $this->createLegacyDirectoryPost($request, $user);
         }
@@ -112,7 +118,15 @@ class StatusPostService
 
         $text = trim((string) $request->input('text', $request->input('txt', '')));
         $time = time();
-        $postKind = (string) $request->input('post_kind', $postKind);
+        if ($postKind === 'poll' || $request->input('post_kind') === 'poll' || $request->filled('poll_question') || $hasValidPollOptions) {
+            $postKind = 'poll';
+        } else {
+            $postKind = (string) $request->input('post_kind', $postKind);
+        }
+
+        if ($postKind === 'poll' && $text === '') {
+            $text = trim((string) $request->input('poll_question', ''));
+        }
         $statusType = match ($postKind) {
             'gallery' => 4,
             'video' => Status::TYPE_VIDEO,

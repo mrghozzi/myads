@@ -170,6 +170,7 @@ return [
     'upload_clips' => 'クリップをアップロードする',
     'upload_photos' => '写真をアップロードする',
     'create_poll' => '投票の作成',
+    'option' => '選択肢',
     'gif' => 'GIF',
     'feelings' => '感情',
     'sell_product' => '製品を販売する',

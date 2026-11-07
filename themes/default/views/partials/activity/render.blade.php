@@ -37,7 +37,7 @@
     }
 @endphp
 
-@if($activity->related_content)
+@if($activity->related_content || $type === 'poll')
     @include('theme::partials.activity.types.' . $type, ['activity' => $activity, 'detailView' => $detailView ?? false])
 @endif
 
