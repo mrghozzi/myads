@@ -58,8 +58,9 @@ class DirectoryPresenter
             'owner_avatar' => $owner?->img ? asset($owner->img) : theme_asset('img/avatar.jpg'),
             'category' => $category,
             'category_name' => $category?->name ?? __('messages.category_fallback'),
-            'category_url' => $category ? route('directory.category.legacy', $category->id) : null,
-            'category_seo_url' => $category ? route('directory.category.slug', ['id' => $category->id, 'slug' => $categorySlug ?: 'cat']) : null,
+            'category_icon' => $category?->display_icon ?: 'fa fa-folder-open',
+            'category_url' => $category ? route('directory.category', $category->slug ?: $category->id) : null,
+            'category_seo_url' => $category ? route('directory.category', $category->slug ?: $category->id) : null,
             'published_timestamp' => $publishedAt,
             'published_diff' => $publishedAt ? Carbon::createFromTimestamp((int) $publishedAt)->diffForHumans() : '',
             'views' => (int) ($listing->vu ?? 0),
@@ -100,7 +101,7 @@ class DirectoryPresenter
         }
 
         return collect(preg_split('/[,;\r\n]+/', $keywords) ?: [])
-            ->map(static fn ($tag) => trim((string) $tag))
+            ->map(static fn($tag) => trim((string) $tag))
             ->filter()
             ->unique()
             ->values()
@@ -122,7 +123,7 @@ class DirectoryPresenter
 
         // Split by newlines or pipes or commas
         return collect(preg_split('/[\r\n|,]+/', $features) ?: [])
-            ->map(static fn ($f) => trim((string) $f))
+            ->map(static fn($f) => trim((string) $f))
             ->filter()
             ->unique()
             ->values()

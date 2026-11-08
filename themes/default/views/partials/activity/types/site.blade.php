@@ -23,48 +23,66 @@
                     <use xlink:href="#svg-more-dots"></use>
                 </svg>
             </div>
-            <div class="simple-dropdown widget-box-post-settings-dropdown" style="position: absolute; z-index: 9999; top: 30px; right: 9px; opacity: 0; visibility: hidden; transform: translate(0px, -20px); transition: transform 0.3s ease-in-out 0s, opacity 0.3s ease-in-out 0s, visibility 0.3s ease-in-out 0s;">
+            <div class="simple-dropdown widget-box-post-settings-dropdown"
+                style="position: absolute; z-index: 9999; top: 30px; right: 9px; opacity: 0; visibility: hidden; transform: translate(0px, -20px); transition: transform 0.3s ease-in-out 0s, opacity 0.3s ease-in-out 0s, visibility 0.3s ease-in-out 0s;">
                 @auth
                     @if(auth()->id() == $activity->uid || auth()->user()->isAdmin())
-                        <p class="simple-dropdown-link post_edit{{ $activity->id }}" onclick="postEdit({{ $activity->tp_id }}, 1)"><i class="fa fa-edit" aria-hidden="true"></i>&nbsp;{{ __('messages.edit') }}</p>
-                        <p class="simple-dropdown-link post_delete{{ $activity->id }}" onclick="deletePost({{ $activity->tp_id }}, 1, '.post{{ $activity->id }}')"><i class="fa fa-trash" aria-hidden="true"></i>&nbsp;{{ __('messages.delete') }}</p>
-                                        @endif
+                        <p class="simple-dropdown-link post_edit{{ $activity->id }}"
+                            onclick="postEdit({{ $activity->tp_id }}, 1)"><i class="fa fa-edit"
+                                aria-hidden="true"></i>&nbsp;{{ __('messages.edit') }}</p>
+                        <p class="simple-dropdown-link post_delete{{ $activity->id }}"
+                            onclick="deletePost({{ $activity->tp_id }}, 1, '.post{{ $activity->id }}')"><i class="fa fa-trash"
+                                aria-hidden="true"></i>&nbsp;{{ __('messages.delete') }}</p>
+                    @endif
                     @if(isset($isOwnProfile) && $isOwnProfile && auth()->id() == $activity->uid)
                         <!-- SIMPLE DROPDOWN LINK -->
-                        <p class="simple-dropdown-link" onclick="togglePinPost({{ $activity->id }}, {{ $activity->is_pinned ? 'true' : 'false' }}, {{ isset($hasPinnedPost) && $hasPinnedPost ? 'true' : 'false' }})" style="cursor: pointer;">
-                            <i class="fa fa-thumb-tack" aria-hidden="true"></i>&nbsp;{{ $activity->is_pinned ? __('messages.unpin_post') ?? 'Unpin' : __('messages.pin_post') ?? 'Pin to profile' }}
+                        <p class="simple-dropdown-link"
+                            onclick="togglePinPost({{ $activity->id }}, {{ $activity->is_pinned ? 'true' : 'false' }}, {{ isset($hasPinnedPost) && $hasPinnedPost ? 'true' : 'false' }})"
+                            style="cursor: pointer;">
+                            <i class="fa fa-thumb-tack"
+                                aria-hidden="true"></i>&nbsp;{{ $activity->is_pinned ? __('messages.unpin_post') ?? 'Unpin' : __('messages.pin_post') ?? 'Pin to profile' }}
                         </p>
                         <!-- /SIMPLE DROPDOWN LINK -->
                     @endif
                     @include('theme::partials.activity.promotion_link', ['activity' => $activity])
-                    <p class="simple-dropdown-link post_report{{ $activity->id }}" onclick="reportPost({{ $activity->tp_id }}, 1, {{ $activity->related_content->id }})"><i class="fa fa-flag" aria-hidden="true"></i>&nbsp;{{ __('messages.report') }}</p>
-                    <p class="simple-dropdown-link author_report{{ $activity->id }}" onclick="reportUser({{ $activity->uid }}, {{ $activity->related_content->id }})"><i class="fa fa-flag" aria-hidden="true"></i>&nbsp;{{ __('messages.report_author') }}</p>
+                    <p class="simple-dropdown-link post_report{{ $activity->id }}"
+                        onclick="reportPost({{ $activity->tp_id }}, 1, {{ $activity->related_content->id }})"><i
+                            class="fa fa-flag" aria-hidden="true"></i>&nbsp;{{ __('messages.report') }}</p>
+                    <p class="simple-dropdown-link author_report{{ $activity->id }}"
+                        onclick="reportUser({{ $activity->uid }}, {{ $activity->related_content->id }})"><i
+                            class="fa fa-flag" aria-hidden="true"></i>&nbsp;{{ __('messages.report_author') }}</p>
                 @endauth
-                <p class="simple-dropdown-link copy_link" onclick="navigator.clipboard.writeText('{{ route('directory.show', $activity->tp_id) }}'); var notif = document.getElementById('notif{{ $activity->related_content->id }}'); notif.innerHTML = '<div class=\'alert alert-success\' role=\'alert\'>{{ __('messages.link_copied') }}</div>'; notif.style.display = 'block'; setTimeout(function() { notif.style.display = 'none'; }, 5000);"><i class="fa fa-link" aria-hidden="true"></i>&nbsp;{{ __('messages.copy_link') }}</p>
+                <p class="simple-dropdown-link copy_link"
+                    onclick="navigator.clipboard.writeText('{{ route('directory.show', $activity->tp_id) }}'); var notif = document.getElementById('notif{{ $activity->related_content->id }}'); notif.innerHTML = '<div class=\'alert alert-success\' role=\'alert\'>{{ __('messages.link_copied') }}</div>'; notif.style.display = 'block'; setTimeout(function() { notif.style.display = 'none'; }, 5000);">
+                    <i class="fa fa-link" aria-hidden="true"></i>&nbsp;{{ __('messages.copy_link') }}</p>
             </div>
         </div>
     </div>
 
-            @php
-                $detailView = $detailView ?? false;
-                $shortUrl = null;
-                $listing = $activity->related_content;
-                // Generate hash exactly as old system: crc32(url . id)
-                $hash = hash('crc32', $listing->url . $listing->id);
-                $shortUrl = route('directory.redirect.short', 'site-'.$hash);
-            @endphp
-            <div class="widget-box-status">
-                <div class="widget-box-status-content">
-                    <div class="user-status">
+    @php
+        $detailView = $detailView ?? false;
+        $shortUrl = null;
+        $listing = $activity->related_content;
+        // Generate hash exactly as old system: crc32(url . id)
+        $hash = hash('crc32', $listing->url . $listing->id);
+        $shortUrl = route('directory.redirect.short', 'site-' . $hash);
+    @endphp
+    <div class="widget-box-status">
+        <div class="widget-box-status-content">
+            <div class="user-status">
                 <a class="user-status-avatar" href="{{ $activityUserProfileUrl }}">
                     <div class="user-avatar small no-outline {{ $activityUserPresence }}">
                         <div class="user-avatar-content">
-                            <div class="hexagon-image-30-32" data-src="{{ $activityUserAvatar }}" style="width: 30px; height: 32px; position: relative;">
-                                <canvas style="position: absolute; top: 0px; left: 0px;" width="30" height="32"></canvas>
+                            <div class="hexagon-image-30-32" data-src="{{ $activityUserAvatar }}"
+                                style="width: 30px; height: 32px; position: relative;">
+                                <canvas style="position: absolute; top: 0px; left: 0px;" width="30"
+                                    height="32"></canvas>
                             </div>
                         </div>
                         <div class="user-avatar-progress-border">
-                            <div class="hexagon-border-40-44" data-line-color="{{ $activityUser ? $activityUser->profileBadgeColor() : '' }}" style="width: 40px; height: 44px; position: relative;"></div>
+                            <div class="hexagon-border-40-44"
+                                data-line-color="{{ $activityUser ? $activityUser->profileBadgeColor() : '' }}"
+                                style="width: 40px; height: 44px; position: relative;"></div>
                         </div>
                         @if($activityUserHasVerifiedBadge)
                             <div class="user-avatar-badge">
@@ -72,7 +90,8 @@
                                     <div class="hexagon-22-24" style="width: 22px; height: 24px; position: relative;"></div>
                                 </div>
                                 <div class="user-avatar-badge-content">
-                                    <div class="hexagon-dark-16-18" style="width: 16px; height: 18px; position: relative;"></div>
+                                    <div class="hexagon-dark-16-18" style="width: 16px; height: 18px; position: relative;">
+                                    </div>
                                 </div>
                                 <p class="user-avatar-badge-text"><i class="fa fa-fw fa-check"></i></p>
                             </div>
@@ -96,52 +115,54 @@
             </div>
 
             <p class="widget-box-status-text post_text{{ $activity->related_content->id }}">
-                <div class="textpost" id="post_form{{ $activity->related_content->id }}">
-                    @php
-                        $domain = parse_url($activity->related_content->url, PHP_URL_HOST);
-                    @endphp
-                    @if($detailView)
-                        <br/>
-                        <div class="event-info">
-                            <h1 class="event-title" style="text-align: center">{{ $activity->related_content->name }}</h1>
-                            <br/>
-                            <div class="decorated-feature-list" style="display: block;">
-                                <div class="decorated-feature">
-                                    <svg class="decorated-feature-icon icon-public">
-                                        <use xlink:href="#svg-public"></use>
-                                    </svg>
-                                    <div class="decorated-feature-info">
-                                        <a class="decorated-feature-title" href="{{ $shortUrl }}" target="_blank">{{ $activity->related_content->name }}</a>
-                                        <p class="decorated-feature-text">{{ $domain }}</p>
-                                    </div>
-                                </div>
-                                @if($activity->related_content->category)
-                                    <div class="decorated-feature">
-                                        <svg class="decorated-feature-icon icon-forum">
-                                            <use xlink:href="#svg-forum"></use>
-                                        </svg>
-                                        <div class="decorated-feature-info">
-                                            <a class="decorated-feature-title" href="{{ route('directory.category.legacy', $activity->related_content->category->id) }}">{{ $activity->related_content->category->name }}</a>
-                                        </div>
-                                    </div>
-                                @endif
-                                <div class="decorated-feature">
-                                    <svg class="decorated-feature-icon icon-info">
-                                        <use xlink:href="#svg-info"></use>
-                                    </svg>
-                                    <div class="decorated-feature-info">
-                                        <p class="decorated-feature-title">{{ __('messages.desc') }}</p>
-                                    </div>
+            <div class="textpost" id="post_form{{ $activity->related_content->id }}">
+                @php
+                    $domain = parse_url($activity->related_content->url, PHP_URL_HOST);
+                @endphp
+                @if($detailView)
+                    <br />
+                    <div class="event-info">
+                        <h1 class="event-title" style="text-align: center">{{ $activity->related_content->name }}</h1>
+                        <br />
+                        <div class="decorated-feature-list" style="display: block;">
+                            <div class="decorated-feature">
+                                <svg class="decorated-feature-icon icon-public">
+                                    <use xlink:href="#svg-public"></use>
+                                </svg>
+                                <div class="decorated-feature-info">
+                                    <a class="decorated-feature-title" href="{{ $shortUrl }}"
+                                        target="_blank">{{ $activity->related_content->name }}</a>
+                                    <p class="decorated-feature-text">{{ $domain }}</p>
                                 </div>
                             </div>
-                            <br/>
-                            <div class="event-text" style="text-align: center">{!! $formattedText !!}</div>
+                            @if($activity->related_content->category)
+                                <div class="decorated-feature">
+                                    <svg class="decorated-feature-icon icon-forum">
+                                        <use xlink:href="#svg-forum"></use>
+                                    </svg>
+                                    <div class="decorated-feature-info">
+                                        <a class="decorated-feature-title"
+                                            href="{{ route('directory.category', $activity->related_content->category->slug ?: $activity->related_content->category->id) }}">{{ $activity->related_content->category->name }}</a>
+                                    </div>
+                                </div>
+                            @endif
+                            <div class="decorated-feature">
+                                <svg class="decorated-feature-icon icon-info">
+                                    <use xlink:href="#svg-info"></use>
+                                </svg>
+                                <div class="decorated-feature-info">
+                                    <p class="decorated-feature-title">{{ __('messages.desc') }}</p>
+                                </div>
+                            </div>
                         </div>
-                    @else
-                        {!! $formattedText !!}
-                    @endif
-                    <div id="report{{ $activity->related_content->id }}"></div>
-                </div>
+                        <br />
+                        <div class="event-text" style="text-align: center">{!! $formattedText !!}</div>
+                    </div>
+                @else
+                    {!! $formattedText !!}
+                @endif
+                <div id="report{{ $activity->related_content->id }}"></div>
+            </div>
             </p>
             <div id="notif{{ $activity->related_content->id }}"></div>
 
@@ -153,9 +174,11 @@
                 @include('theme::partials.directory.lazy_image_script')
             @endonce
             <a class="activity-super mt-3" href="{{ $shortUrl }}" target="_blank">
-                <div class="activity-super-banner" style="background-image: url({{ $siteBanner }});" data-lazy-fetch-url="{{ route('directory.image.fetch', $activity->related_content->id) }}">
+                <div class="activity-super-banner" style="background-image: url({{ $siteBanner }});"
+                    data-lazy-fetch-url="{{ route('directory.image.fetch', $activity->related_content->id) }}">
                     <span class="activity-super-category">
-                        <i class="fa {{ $activity->related_content->category->icon ?? 'fa-globe' }}" aria-hidden="true"></i>
+                        <i class="fa {{ $activity->related_content->category->icon ?? 'fa-globe' }}"
+                            aria-hidden="true"></i>
                         {{ $activity->related_content->category->name ?? '' }}
                     </span>
                 </div>
@@ -179,8 +202,10 @@
 
             @if(!$detailView)
                 <div class="tag-list">
-                    <a class="tag-item secondary" href="{{ route('directory.show', $activity->tp_id) }}">{{ $activity->related_content->name }}</a>
-                    <a class="tag-item secondary" href="{{ route('directory.category', $activity->related_content->category->id ?? 0) }}">{{ $activity->related_content->category->name ?? '' }}</a>
+                    <a class="tag-item secondary"
+                        href="{{ route('directory.show', $activity->tp_id) }}">{{ $activity->related_content->name }}</a>
+                    <a class="tag-item secondary"
+                        href="{{ route('directory.category', $activity->related_content->category->id ?? 0) }}">{{ $activity->related_content->category->name ?? '' }}</a>
                 </div>
             @endif
 
@@ -193,20 +218,23 @@
                 </div>
                 <div class="content-action">
                     <div class="meta-line">
-                        <p class="meta-line-text"><i class="fa fa-eye" aria-hidden="true"></i>&nbsp;{{ $activity->related_content->vu }}</p>
+                        <p class="meta-line-text"><i class="fa fa-eye"
+                                aria-hidden="true"></i>&nbsp;{{ $activity->related_content->vu }}</p>
                     </div>
                 </div>
                 <div class="content-action">
                     <div class="meta-line">
                         <p class="meta-line-link">
-                            <a href="{{ route('directory.show', $activity->tp_id) }}">{{ $activity->comments_count }} {{ __('messages.comments') }}</a>
+                            <a href="{{ route('directory.show', $activity->tp_id) }}">{{ $activity->comments_count }}
+                                {{ __('messages.comments') }}</a>
                         </p>
                     </div>
                 </div>
                 <div class="content-action">
                     <div class="meta-line">
                         <p class="meta-line-link">
-                            <a href="{{ route('directory.show', $activity->tp_id) }}">{{ $activity->reposts_count }} {{ __('messages.reposts') }}</a>
+                            <a href="{{ route('directory.show', $activity->tp_id) }}">{{ $activity->reposts_count }}
+                                {{ __('messages.reposts') }}</a>
                         </p>
                     </div>
                 </div>
@@ -218,38 +246,39 @@
         @auth
             <!-- REACTION OPTION -->
             <div class="post-option-wrap" style="position: relative;" data-activity-menu-wrap>
-                <div class="post-option"
-                     data-activity-menu-trigger
-                     data-activity-menu-type="reaction">
+                <div class="post-option" data-activity-menu-trigger data-activity-menu-type="reaction">
                     <div id="reaction-btn-{{ $activity->related_content->id }}">
-                    @php
-                        $myReaction = \App\Models\Like::where('uid', auth()->id())
-                            ->where('sid', $activity->related_content->id)
-                            ->where('type', 22) // Directory type
-                            ->first();
-                        $myReactionOption = null;
-                        if($myReaction){
-                             $myReactionOption = \App\Models\Option::where('o_parent', $myReaction->id)->where('o_type', 'data_reaction')->first();
-                        }
-                    @endphp
-                    @if($myReactionOption)
-                        <img class="reaction-option-image" src="{{ theme_asset('img/reaction/'.$myReactionOption->o_valuer.'.png') }}" width="30" alt="reaction-{{ $myReactionOption->o_valuer }}">
-                    @else
-                        <svg class="post-option-icon icon-thumbs-up">
-                            <use xlink:href="#svg-thumbs-up"></use>
-                        </svg>
-                        <p class="post-option-text">{{ __('messages.react') }}</p>
-                    @endif
+                        @php
+                            $myReaction = \App\Models\Like::where('uid', auth()->id())
+                                ->where('sid', $activity->related_content->id)
+                                ->where('type', 22) // Directory type
+                                ->first();
+                            $myReactionOption = null;
+                            if ($myReaction) {
+                                $myReactionOption = \App\Models\Option::where('o_parent', $myReaction->id)->where('o_type', 'data_reaction')->first();
+                            }
+                        @endphp
+                        @if($myReactionOption)
+                            <img class="reaction-option-image"
+                                src="{{ theme_asset('img/reaction/' . $myReactionOption->o_valuer . '.png') }}" width="30"
+                                alt="reaction-{{ $myReactionOption->o_valuer }}">
+                        @else
+                            <svg class="post-option-icon icon-thumbs-up">
+                                <use xlink:href="#svg-thumbs-up"></use>
+                            </svg>
+                            <p class="post-option-text">{{ __('messages.react') }}</p>
+                        @endif
                     </div>
                 </div>
 
                 <!-- REACTION OPTIONS DROPDOWN -->
-                <div class="reaction-options reaction-options-dropdown"
-                     data-activity-menu-panel
-                     style="position: absolute; z-index: 9999; bottom: 54px; left: -16px; opacity: 0; visibility: hidden; transform: translate(0px, 20px); transition: transform 0.3s ease-in-out 0s, opacity 0.3s ease-in-out 0s, visibility 0.3s ease-in-out 0s;">
+                <div class="reaction-options reaction-options-dropdown" data-activity-menu-panel
+                    style="position: absolute; z-index: 9999; bottom: 54px; left: -16px; opacity: 0; visibility: hidden; transform: translate(0px, 20px); transition: transform 0.3s ease-in-out 0s, opacity 0.3s ease-in-out 0s, visibility 0.3s ease-in-out 0s;">
                     @foreach(['like', 'love', 'dislike', 'happy', 'funny', 'wow', 'angry', 'sad'] as $reaction)
-                        <div class="reaction-option text-tooltip-tft" data-title="{{ $reaction }}" onclick="toggleReaction({{ $activity->related_content->id }}, 'directory', '{{ $reaction }}')">
-                            <img class="reaction-option-image" src="{{ theme_asset('img/reaction/'.$reaction.'.png') }}" alt="reaction-{{ $reaction }}">
+                        <div class="reaction-option text-tooltip-tft" data-title="{{ $reaction }}"
+                            onclick="toggleReaction({{ $activity->related_content->id }}, 'directory', '{{ $reaction }}')">
+                            <img class="reaction-option-image" src="{{ theme_asset('img/reaction/' . $reaction . '.png') }}"
+                                alt="reaction-{{ $reaction }}">
                         </div>
                     @endforeach
                 </div>
@@ -258,10 +287,8 @@
             <!-- /REACTION OPTION -->
         @endauth
         @auth
-            <div class="post-option"
-                 data-activity-comment
-                 data-comment-id="{{ $activity->related_content->id }}"
-                 data-comment-type="directory">
+            <div class="post-option" data-activity-comment data-comment-id="{{ $activity->related_content->id }}"
+                data-comment-type="directory">
                 <svg class="post-option-icon icon-comment">
                     <use xlink:href="#svg-comment"></use>
                 </svg>
@@ -269,33 +296,34 @@
             </div>
         @endauth
         <div class="post-option-wrap" style="position: relative;" data-activity-menu-wrap>
-            <div class="post-option"
-                 data-activity-menu-trigger
-                 data-activity-menu-type="share">
+            <div class="post-option" data-activity-menu-trigger data-activity-menu-type="share">
                 <svg class="post-option-icon icon-share">
                     <use xlink:href="#svg-share"></use>
                 </svg>
                 <p class="post-option-text">{{ __('messages.share') }}</p>
             </div>
-            <div class="reaction-options reaction-options-dropdown"
-                 data-activity-menu-panel
-                 style="position: absolute; z-index: 9999; bottom: 54px; left: -16px; opacity: 0; visibility: hidden; transform: translate(0px, 20px); transition: transform 0.3s ease-in-out 0s, opacity 0.3s ease-in-out 0s, visibility 0.3s ease-in-out 0s;">
-                 @foreach(['facebook', 'twitter', 'linkedin', 'telegram'] as $social)
+            <div class="reaction-options reaction-options-dropdown" data-activity-menu-panel
+                style="position: absolute; z-index: 9999; bottom: 54px; left: -16px; opacity: 0; visibility: hidden; transform: translate(0px, 20px); transition: transform 0.3s ease-in-out 0s, opacity 0.3s ease-in-out 0s, visibility 0.3s ease-in-out 0s;">
+                @foreach(['facebook', 'twitter', 'linkedin', 'telegram'] as $social)
                     <div class="reaction-option text-tooltip-tft" data-title="{{ $social }}" style="position: relative;">
-                        <a href="javascript:void(0);" onclick="sharePost('{{ $social }}', '{{ route('directory.show', $activity->tp_id) }}', '{{ $activity->related_content->name ?? '' }}')">
-                            <img class="reaction-option-image" src="{{ theme_asset('img/icons/'.$social.'-icon.png') }}">
+                        <a href="javascript:void(0);"
+                            onclick="sharePost('{{ $social }}', '{{ route('directory.show', $activity->tp_id) }}', '{{ $activity->related_content->name ?? '' }}')">
+                            <img class="reaction-option-image" src="{{ theme_asset('img/icons/' . $social . '-icon.png') }}">
                         </a>
                     </div>
-                 @endforeach
-                 @auth
-                    <div class="reaction-option text-tooltip-tft" data-title="{{ __('messages.quote_repost') }}" style="position: relative;">
-                        <a href="javascript:void(0);" onclick="openRepostComposer({{ $activity->id }}, '{{ $repostAuthorName }}', '{{ addslashes($repostExcerpt) }}')">
-                            <span style="width: 40px; height: 40px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: #615dfa; color: #fff;">
+                @endforeach
+                @auth
+                    <div class="reaction-option text-tooltip-tft" data-title="{{ __('messages.quote_repost') }}"
+                        style="position: relative;">
+                        <a href="javascript:void(0);"
+                            onclick="openRepostComposer({{ $activity->id }}, '{{ $repostAuthorName }}', '{{ addslashes($repostExcerpt) }}')">
+                            <span
+                                style="width: 40px; height: 40px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: #615dfa; color: #fff;">
                                 <i class="fa fa-retweet" aria-hidden="true"></i>
                             </span>
                         </a>
                     </div>
-                 @endauth
+                @endauth
             </div>
         </div>
     </div>

@@ -72,8 +72,24 @@ class DirectoryController extends Controller
     public function category($id)
     {
         try {
-            $category = DirectoryCategory::findOrFail($id);
-            $subCategories = DirectoryCategory::where('sub', $id)
+            if (is_numeric($id)) {
+                $category = DirectoryCategory::where('id', (int) $id)->first();
+            } else {
+                $category = DirectoryCategory::where('slug', $id)->first();
+            }
+
+            if (!$category) {
+                $parts = explode('-', (string) $id);
+                if (is_numeric($parts[0])) {
+                    $category = DirectoryCategory::find((int) $parts[0]);
+                }
+            }
+
+            if (!$category || (int) $category->statu !== 1) {
+                abort(404);
+            }
+
+            $subCategories = DirectoryCategory::where('sub', $category->id)
                 ->where('statu', 1)
                 ->orderBy('ordercat', 'asc')
                 ->get();
@@ -84,7 +100,7 @@ class DirectoryController extends Controller
                 'sort' => request('sort', 'latest'),
             ];
 
-            ['activities' => $activities, 'cards' => $cards] = $this->buildDirectoryFeed((int) $id, $filters);
+            ['activities' => $activities, 'cards' => $cards] = $this->buildDirectoryFeed((int) $category->id, $filters);
             $categorySummary = $this->buildCategorySummary($category, $subCategories);
             $categoryBoard = $this->buildDirectoryBoard();
         } catch (\Throwable $e) {
@@ -99,6 +115,23 @@ class DirectoryController extends Controller
             ]);
         }
 
+        $breadcrumbs = [
+            ['name' => __('messages.home'), 'url' => url('/')],
+            ['name' => __('messages.directory'), 'url' => route('directory.index')],
+        ];
+
+        if ($category->parent) {
+            $breadcrumbs[] = [
+                'name' => $category->parent->name,
+                'url' => route('directory.category', $category->parent->slug ?: $category->parent->id),
+            ];
+        }
+
+        $breadcrumbs[] = [
+            'name' => $category->name,
+            'url' => route('directory.category', $category->slug ?: $category->id),
+        ];
+
         $this->seo([
             'scope_key' => 'directory_category',
             'content_type' => 'directory_category',
@@ -107,11 +140,7 @@ class DirectoryController extends Controller
             'category_name' => $category->name,
             'description' => trim((string) ($category->txt ?: __('messages.seo_directory_category_description', ['category' => $category->name]))),
             'keywords' => $category->metakeywords,
-            'breadcrumbs' => [
-                ['name' => __('messages.home'), 'url' => url('/')],
-                ['name' => __('messages.directory'), 'url' => route('directory.index')],
-                ['name' => $category->name, 'url' => route('directory.category.legacy', $category->id)],
-            ],
+            'breadcrumbs' => $breadcrumbs,
         ]);
 
         return view('theme::directory.category', compact('category', 'subCategories', 'activities', 'cards', 'categorySummary', 'categoryBoard', 'filters'));
@@ -146,6 +175,30 @@ class DirectoryController extends Controller
                 'can_manage' => $this->canManageListing($listing),
             ]);
 
+            $breadcrumbs = [
+                ['name' => __('messages.home'), 'url' => url('/')],
+                ['name' => __('messages.directory'), 'url' => route('directory.index')],
+            ];
+
+            if ($listing->category && $listing->category->parent) {
+                $breadcrumbs[] = [
+                    'name' => $listing->category->parent->name,
+                    'url' => route('directory.category', $listing->category->parent->slug ?: $listing->category->parent->id),
+                ];
+            }
+
+            if ($listing->category) {
+                $breadcrumbs[] = [
+                    'name' => $listing->category->name,
+                    'url' => route('directory.category', $listing->category->slug ?: $listing->category->id),
+                ];
+            }
+
+            $breadcrumbs[] = [
+                'name' => $listing->name,
+                'url' => route('directory.show', $listing->id),
+            ];
+
             $this->seo([
                 'scope_key' => 'directory_show',
                 'content_type' => 'directory',
@@ -155,12 +208,7 @@ class DirectoryController extends Controller
                 'description' => trim((string) ($listing->txt ?: __('messages.seo_directory_listing_description', ['title' => $listing->name]))),
                 'keywords' => $listing->metakeywords,
                 'lastmod' => $listing->date,
-                'breadcrumbs' => [
-                    ['name' => __('messages.home'), 'url' => url('/')],
-                    ['name' => __('messages.directory'), 'url' => route('directory.index')],
-                    ['name' => $listing->category?->name ?: __('messages.category_fallback'), 'url' => route('directory.category.legacy', $listing->cat)],
-                    ['name' => $listing->name, 'url' => route('directory.show', $listing->id)],
-                ],
+                'breadcrumbs' => $breadcrumbs,
             ]);
 
             return view('theme::directory.show', compact('listing', 'activity', 'detail'));
@@ -193,24 +241,7 @@ class DirectoryController extends Controller
 
     public function categoryBySlug($id, $slug = null)
     {
-        if (is_numeric($id)) {
-            return $this->category($id);
-        }
-
-        $cat = DirectoryCategory::where('slug', $id)->first();
-        if ($cat) {
-            return $this->category($cat->id);
-        }
-
-        $parts = explode('-', $id);
-        if (is_numeric($parts[0])) {
-            $cat = DirectoryCategory::find($parts[0]);
-            if ($cat) {
-                return $this->category($cat->id);
-            }
-        }
-
-        abort(404);
+        return $this->category($id);
     }
 
     public function upvote($id)
@@ -587,9 +618,9 @@ class DirectoryController extends Controller
                 $search = trim((string) $filters['search']);
                 $dirQuery->where(function ($q) use ($search) {
                     $q->where('name', 'like', "%{$search}%")
-                      ->orWhere('txt', 'like', "%{$search}%")
-                      ->orWhere('metakeywords', 'like', "%{$search}%")
-                      ->orWhere('url', 'like', "%{$search}%");
+                        ->orWhere('txt', 'like', "%{$search}%")
+                        ->orWhere('metakeywords', 'like', "%{$search}%")
+                        ->orWhere('url', 'like', "%{$search}%");
                 });
             }
 
@@ -813,7 +844,7 @@ class DirectoryController extends Controller
                 return [
                     'category' => $subCategory,
                     'listing_count' => (int) $counts->get($subCategory->id, 0),
-                    'url' => route('directory.category.legacy', $subCategory->id),
+                    'url' => route('directory.category', $subCategory->slug ?: $subCategory->id),
                 ];
             })->values(),
         ];
@@ -841,10 +872,10 @@ class DirectoryController extends Controller
     public function fetchImage($id)
     {
         $listing = Directory::findOrFail($id);
-        
+
         $preview = app(\App\Services\LinkPreviewService::class)->fetch($listing->url);
         $newUrl = null;
-        
+
         if (isset($preview['status_code']) && $preview['status_code'] >= 400) {
             $newUrl = theme_asset('img/dir_link.png');
         } else {

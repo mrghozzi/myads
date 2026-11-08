@@ -17,12 +17,16 @@
                                 {{ __('messages.All') }} {{ __('messages.cat_s') }}
                             </option>
                             @foreach($categoryBoard as $entry)
-                                <option value="{{ route('directory.category.legacy', $entry['category']->id) }}" {{ $currentCategoryId == $entry['category']->id ? 'selected' : '' }}>
+                                <option
+                                    value="{{ route('directory.category', $entry['category']->slug ?: $entry['category']->id) }}"
+                                    {{ $currentCategoryId == $entry['category']->id ? 'selected' : '' }}>
                                     {{ $entry['category']->name }}
                                 </option>
                                 @if($entry['children']->isNotEmpty())
                                     @foreach($entry['children'] as $child)
-                                        <option value="{{ route('directory.category.legacy', $child['category']->id) }}" {{ $currentCategoryId == $child['category']->id ? 'selected' : '' }}>
+                                        <option
+                                            value="{{ route('directory.category', $child['category']->slug ?: $child['category']->id) }}"
+                                            {{ $currentCategoryId == $child['category']->id ? 'selected' : '' }}>
                                             &nbsp;&nbsp;— {{ $child['category']->name }}
                                         </option>
                                     @endforeach

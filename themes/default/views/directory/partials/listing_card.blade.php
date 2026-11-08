@@ -92,7 +92,7 @@
                     <div class="directory-listing-badges">
                         @if($card['category_url'])
                             <a class="directory-meta-chip" href="{{ $card['category_url'] }}">
-                                <i class="fa fa-folder-open" aria-hidden="true"></i>
+                                <i class="{{ $card['category_icon'] ?? 'fa fa-folder-open' }}" aria-hidden="true"></i>
                                 {{ $card['category_name'] }}
                             </a>
                         @endif

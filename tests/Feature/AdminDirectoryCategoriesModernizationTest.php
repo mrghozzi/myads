@@ -257,4 +257,69 @@ class AdminDirectoryCategoriesModernizationTest extends TestCase
         $this->post(route('admin.directory_categories.store'), ['name' => 'Guest Cat'])->assertRedirect();
         $this->post(route('admin.directory_categories.reorder'), ['items' => []])->assertRedirect();
     }
+
+    public function test_public_directory_pages_render_custom_category_icon_and_slug(): void
+    {
+        $category = DirectoryCategory::create([
+            'name' => 'AI Innovations',
+            'slug' => 'ai-innovations-' . time(),
+            'icon' => 'fa-solid fa-robot',
+            'sub' => 0,
+            'ordercat' => 1,
+            'statu' => 1,
+            'txt' => 'Cutting edge artificial intelligence tools.',
+            'metakeywords' => 'ai, ml, robots',
+        ]);
+
+        $child = DirectoryCategory::create([
+            'name' => 'LLM Models',
+            'slug' => 'llm-models-' . time(),
+            'icon' => 'fa-solid fa-brain',
+            'sub' => $category->id,
+            'ordercat' => 1,
+            'statu' => 1,
+            'txt' => 'Large language model services.',
+        ]);
+
+        // 1. Check directory index page
+        $resIndex = $this->get(route('directory.index'));
+        $resIndex->assertOk();
+        $resIndex->assertSee('AI Innovations');
+        $resIndex->assertSee('fa-solid fa-robot', false);
+        $resIndex->assertSee($category->slug);
+
+        // 2. Check directory category page by slug
+        $resCat = $this->get(route('directory.category', $category->slug));
+        $resCat->assertOk();
+        $resCat->assertSee('AI Innovations');
+        $resCat->assertSee('Cutting edge artificial intelligence tools.');
+        $resCat->assertSee('fa-solid fa-robot', false);
+        $resCat->assertSee('LLM Models');
+        $resCat->assertSee('fa-solid fa-brain', false);
+
+        // 3. Check categoryBySlug route (/directory/c/{slug})
+        $resSlug = $this->get(route('directory.category.slug', $category->slug));
+        $resSlug->assertOk();
+        $resSlug->assertSee('AI Innovations');
+    }
+
+    public function test_inactive_category_is_hidden_from_public_directory(): void
+    {
+        $inactiveCat = DirectoryCategory::create([
+            'name' => 'Hidden Secret Category',
+            'slug' => 'hidden-secret-' . time(),
+            'icon' => 'fa-solid fa-lock',
+            'sub' => 0,
+            'ordercat' => 1,
+            'statu' => 0, // Inactive
+        ]);
+
+        $resIndex = $this->get(route('directory.index'));
+        $resIndex->assertOk();
+        $resIndex->assertDontSee('Hidden Secret Category');
+
+        // Accessing inactive category directly returns 404
+        $resCat = $this->get(route('directory.category', $inactiveCat->slug));
+        $resCat->assertNotFound();
+    }
 }
