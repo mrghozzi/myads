@@ -1,6 +1,8 @@
 <?php
 
 return [
+    'refresh_statistics' => 'Refresh Statistics',
+    'statistics_refreshed_successfully' => 'All statistics have been recalculated and refreshed successfully.',
     'profile_verification' => 'Profile Verification',
     'verification_requests' => 'Verification Requests',
     'verification_settings' => 'Verification Settings',

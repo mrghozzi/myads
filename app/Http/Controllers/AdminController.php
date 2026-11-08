@@ -140,7 +140,7 @@ class AdminController extends Controller
             'posts' => 0,
             'posts_breakdown' => [
                 'text' => 0, 'link' => 0, 'gallery' => 0, 'video' => 0, 'clip' => 0,
-                'audio' => 0, 'voice' => 0, 'file' => 0, 'music' => 0, 'repost' => 0,
+                'audio' => 0, 'voice' => 0, 'file' => 0, 'music' => 0, 'poll' => 0, 'repost' => 0,
                 'knowledgebase' => 0,
             ],
             'topics' => 0,
@@ -165,7 +165,7 @@ class AdminController extends Controller
 
         $communityChartData = [
             'labels' => [],
-            'posts' => ['text' => [], 'link' => [], 'gallery' => [], 'forum' => [], 'store' => [], 'orders' => [], 'news' => [], 'video' => [], 'clips' => [], 'audio' => [], 'file' => [], 'music' => [], 'knowledgebase' => []],
+            'posts' => ['text' => [], 'link' => [], 'gallery' => [], 'forum' => [], 'store' => [], 'orders' => [], 'news' => [], 'video' => [], 'clips' => [], 'audio' => [], 'file' => [], 'music' => [], 'poll' => [], 'knowledgebase' => []],
             'comments' => ['forum' => [], 'store' => [], 'orders' => [], 'directory' => [], 'knowledgebase' => []],
             'reactions' => ['forum' => [], 'store' => [], 'directory' => [], 'orders' => [], 'follows' => [], 'clips' => [], 'knowledgebase' => []],
         ];
@@ -353,8 +353,12 @@ class AdminController extends Controller
         return view('admin::admin.index', compact('stats', 'currentVersion', 'latestVersion', 'chartData', 'communityChartData', 'reactionsSummary', 'adminTips', 'currentTip'));
     }
 
-    public function ajaxDashboardKpis()
+    public function ajaxDashboardKpis(Request $request)
     {
+        if ($request->boolean('refresh') || $request->boolean('fresh')) {
+            Cache::forget('admin_dashboard_kpis_data');
+        }
+
         $kpis = Cache::remember('admin_dashboard_kpis_data', 15, function () {
             try {
                 return [
@@ -393,8 +397,12 @@ class AdminController extends Controller
         return view('admin::admin.partials.dashboard_kpis', ['stats' => $kpis]);
     }
 
-    public function ajaxDashboardReactions()
+    public function ajaxDashboardReactions(Request $request)
     {
+        if ($request->boolean('refresh') || $request->boolean('fresh')) {
+            Cache::forget('admin_dashboard_reactions_data');
+        }
+
         $reactionsData = Cache::remember('admin_dashboard_reactions_data', 30, function () {
             try {
                 $detailedReactions = Option::where('o_type', 'data_reaction')
@@ -441,8 +449,12 @@ class AdminController extends Controller
         ]);
     }
 
-    public function ajaxDashboardActivity()
+    public function ajaxDashboardActivity(Request $request)
     {
+        if ($request->boolean('refresh') || $request->boolean('fresh')) {
+            Cache::forget('admin_dashboard_activity_data');
+        }
+
         $activityData = Cache::remember('admin_dashboard_activity_data', 20, function () {
             try {
                 $lastUser = User::orderBy('id', 'desc')->first();
@@ -462,14 +474,19 @@ class AdminController extends Controller
                     'audio' => Status::where('s_type', 11)->count(),
                     'file' => Status::where('s_type', 12)->count(),
                     'music' => Status::where('s_type', 13)->count(),
+                    'poll' => Status::where('s_type', 15)->count(),
                     'link' => \App\Models\StatusLinkPreview::count(),
                     'repost' => \App\Models\StatusRepost::count(),
                     'knowledgebase' => \App\Models\Knowledgebase::count(),
                 ];
                 $specialCount = $breakdown['gallery'] + $breakdown['video'] + $breakdown['clip'] 
-                    + $breakdown['audio'] + $breakdown['file'] + $breakdown['music'] 
+                    + $breakdown['audio'] + $breakdown['file'] + $breakdown['music'] + $breakdown['poll']
                     + $breakdown['link'] + $breakdown['repost'];
                 $breakdown['text'] = max(0, $totalPosts - $specialCount);
+
+                $ordersCount = OrderRequest::count();
+                $pollsCount = \App\Models\Poll::count();
+                $developerAppsCount = \App\Models\DeveloperApp::count();
 
                 return [
                     'last_user' => $lastUser,
@@ -479,6 +496,9 @@ class AdminController extends Controller
                     'topics' => $topicsCount,
                     'listings' => $listingsCount,
                     'products' => $productsCount,
+                    'orders' => $ordersCount,
+                    'polls' => $pollsCount,
+                    'developer_apps' => $developerAppsCount,
                     'pending_reports' => $pendingReportsCount,
                     'posts_total' => $totalPosts,
                     'posts_breakdown' => $breakdown,
@@ -492,11 +512,14 @@ class AdminController extends Controller
                     'topics' => 0,
                     'listings' => 0,
                     'products' => 0,
+                    'orders' => 0,
+                    'polls' => 0,
+                    'developer_apps' => 0,
                     'pending_reports' => 0,
                     'posts_total' => 0,
                     'posts_breakdown' => [
                         'text' => 0, 'link' => 0, 'gallery' => 0, 'video' => 0, 'clip' => 0,
-                        'audio' => 0, 'file' => 0, 'music' => 0, 'repost' => 0, 'knowledgebase' => 0,
+                        'audio' => 0, 'file' => 0, 'music' => 0, 'poll' => 0, 'repost' => 0, 'knowledgebase' => 0,
                     ],
                 ];
             }
@@ -509,8 +532,12 @@ class AdminController extends Controller
         return view('admin::admin.partials.dashboard_activity', $activityData);
     }
 
-    public function ajaxDashboardAdCharts()
+    public function ajaxDashboardAdCharts(Request $request)
     {
+        if ($request->boolean('refresh') || $request->boolean('fresh')) {
+            Cache::forget('admin_dashboard_ad_charts_data');
+        }
+
         $chartData = Cache::remember('admin_dashboard_ad_charts_data', 60, function () {
             try {
                 $bannerTotal = Banner::count();
@@ -579,8 +606,12 @@ class AdminController extends Controller
         return response()->json($chartData);
     }
 
-    public function ajaxDashboardCommunityCharts()
+    public function ajaxDashboardCommunityCharts(Request $request)
     {
+        if ($request->boolean('refresh') || $request->boolean('fresh')) {
+            Cache::forget('admin_dashboard_community_charts_data');
+        }
+
         $communityData = Cache::remember('admin_dashboard_community_charts_data', 180, function () {
             try {
                 $days = 30;
@@ -597,12 +628,12 @@ class AdminController extends Controller
 
                 // Posts by type
                 $postTypesRaw = Status::where('date', '>=', $startDate)
-                    ->whereIn('s_type', [100, 2, 4, 10, 7867, 6, 5, 11, 12, 13, 14, \App\Services\KnowledgebaseCommunityService::STATUS_TYPE])
+                    ->whereIn('s_type', [100, 2, 4, 10, 7867, 6, 5, 11, 12, 13, 14, 15, \App\Services\KnowledgebaseCommunityService::STATUS_TYPE])
                     ->select(DB::raw($dayDateExpr), 's_type', DB::raw('count(*) as count'))
                     ->groupBy('day', 's_type')
                     ->get();
 
-                $postTypes = ['100' => [], '2' => [], '4' => [], '10' => [], '7867' => [], '6' => [], '5' => [], '11' => [], '12' => [], '13' => [], '14' => [], \App\Services\KnowledgebaseCommunityService::STATUS_TYPE => []];
+                $postTypes = ['100' => [], '2' => [], '4' => [], '10' => [], '7867' => [], '6' => [], '5' => [], '11' => [], '12' => [], '13' => [], '14' => [], '15' => [], \App\Services\KnowledgebaseCommunityService::STATUS_TYPE => []];
                 foreach ($postTypesRaw as $row) {
                     $postTypes[$row->s_type][$row->day] = $row->count;
                 }
@@ -667,6 +698,7 @@ class AdminController extends Controller
                         'audio' => array_map(fn($l) => $postTypes['11'][$l] ?? 0, $labels),
                         'file' => array_map(fn($l) => $postTypes['12'][$l] ?? 0, $labels),
                         'music' => array_map(fn($l) => $postTypes['13'][$l] ?? 0, $labels),
+                        'poll' => array_map(fn($l) => $postTypes['15'][$l] ?? 0, $labels),
                         'knowledgebase' => array_map(fn($l) => $postTypes[\App\Services\KnowledgebaseCommunityService::STATUS_TYPE][$l] ?? 0, $labels),
                     ],
                     'comments' => [
@@ -688,7 +720,7 @@ class AdminController extends Controller
             } catch (\Throwable $e) {
                 return [
                     'labels' => [],
-                    'posts' => ['text' => [], 'link' => [], 'gallery' => [], 'forum' => [], 'store' => [], 'orders' => [], 'news' => [], 'video' => [], 'clips' => [], 'audio' => [], 'file' => [], 'music' => [], 'knowledgebase' => []],
+                    'posts' => ['text' => [], 'link' => [], 'gallery' => [], 'forum' => [], 'store' => [], 'orders' => [], 'news' => [], 'video' => [], 'clips' => [], 'audio' => [], 'file' => [], 'music' => [], 'poll' => [], 'knowledgebase' => []],
                     'comments' => ['forum' => [], 'store' => [], 'directory' => [], 'knowledgebase' => []],
                     'reactions' => ['forum' => [], 'store' => [], 'directory' => [], 'orders' => [], 'follows' => [], 'clips' => [], 'knowledgebase' => []],
                 ];
@@ -7935,9 +7967,10 @@ class AdminController extends Controller
     /**
      * AJAX endpoint for Site Health in dashboard / monitoring widgets.
      */
-    public function ajaxDashboardSiteHealth(\App\Services\SiteHealthService $healthService)
+    public function ajaxDashboardSiteHealth(Request $request, \App\Services\SiteHealthService $healthService)
     {
-        $audit = $healthService->audit();
+        $fresh = $request->boolean('fresh') || $request->boolean('refresh');
+        $audit = $healthService->audit($fresh);
 
         return response()->json([
             'success' => true,
@@ -7947,6 +7980,27 @@ class AdminController extends Controller
             'checks' => $audit['checks'],
             'recommendations' => $audit['recommendations'],
             'audited_at' => $audit['audited_at'],
+        ]);
+    }
+
+    /**
+     * AJAX endpoint to flush all cached dashboard statistics and health audit.
+     */
+    public function ajaxDashboardRefresh()
+    {
+        Cache::forget('admin_dashboard_kpis_data');
+        Cache::forget('admin_dashboard_reactions_data');
+        Cache::forget('admin_dashboard_activity_data');
+        Cache::forget('admin_dashboard_ad_charts_data');
+        Cache::forget('admin_dashboard_community_charts_data');
+        Cache::forget(\App\Services\SiteHealthService::CACHE_KEY);
+        Cache::forget('system_monitor_db_tables_health');
+        Cache::forget('system_monitor_active_plugins_diagnostic');
+        Cache::forget('latest_version');
+
+        return response()->json([
+            'success' => true,
+            'message' => __('messages.statistics_refreshed_successfully'),
         ]);
     }
 }

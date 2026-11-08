@@ -653,6 +653,7 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/ajax/dashboard/community-charts', [AdminController::class, 'ajaxDashboardCommunityCharts'])->name('admin.ajax.community_charts');
     Route::get('/ajax/dashboard/version-check', [AdminController::class, 'ajaxDashboardVersionCheck'])->name('admin.ajax.version_check');
     Route::get('/ajax/dashboard/site-health', [AdminController::class, 'ajaxDashboardSiteHealth'])->name('admin.ajax.site_health');
+    Route::post('/ajax/dashboard/refresh', [AdminController::class, 'ajaxDashboardRefresh'])->name('admin.ajax.refresh');
     Route::get('/settings', [AdminController::class, 'settings'])->name('admin.settings');
     Route::post('/settings', [AdminController::class, 'updateSettings'])->name('admin.settings.update');
     Route::get('/settings/system', [AdminController::class, 'systemSettings'])->name('admin.settings.system');

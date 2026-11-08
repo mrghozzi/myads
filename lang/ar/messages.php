@@ -1,6 +1,8 @@
 <?php
 
 return [
+    'refresh_statistics' => 'تحيين الإحصائيات',
+    'statistics_refreshed_successfully' => 'تم تحيين وإعادة احتساب كافة الإحصائيات بنجاح.',
     'profile_verification' => 'توثيق الملف الشخصي',
     'verification_requests' => 'طلبات التوثيق',
     'verification_settings' => 'إعدادات التوثيق',

@@ -105,10 +105,34 @@ class AdminDashboardAjaxTest extends TestCase
         $response->assertOk();
         $response->assertJsonStructure([
             'labels',
-            'posts' => ['text', 'link', 'gallery', 'video', 'clips'],
+            'posts' => ['text', 'link', 'gallery', 'video', 'clips', 'poll'],
             'comments' => ['forum', 'store', 'directory', 'knowledgebase'],
             'reactions' => ['forum', 'store', 'directory', 'orders', 'follows', 'clips', 'knowledgebase'],
         ]);
+    }
+
+    public function test_ajax_dashboard_refresh_endpoint_clears_caches_and_returns_success(): void
+    {
+        // Pre-populate some dashboard cache
+        \Illuminate\Support\Facades\Cache::put('admin_dashboard_kpis_data', ['test' => 123], 60);
+
+        $response = $this->actingAs($this->admin)
+            ->withSession(['admin_password_confirmed_at' => time()])
+            ->postJson(route('admin.ajax.refresh'));
+
+        $response->assertOk();
+        $response->assertJson(['success' => true]);
+        $this->assertFalse(\Illuminate\Support\Facades\Cache::has('admin_dashboard_kpis_data'));
+    }
+
+    public function test_ajax_dashboard_endpoints_support_refresh_parameter(): void
+    {
+        $response = $this->actingAs($this->admin)
+            ->withSession(['admin_password_confirmed_at' => time()])
+            ->get(route('admin.ajax.kpis', ['refresh' => 1]));
+
+        $response->assertOk();
+        $response->assertSee('kpis-row', false);
     }
 
     public function test_ajax_dashboard_version_check_endpoint_returns_valid_json(): void

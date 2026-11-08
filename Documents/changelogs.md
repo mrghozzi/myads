@@ -47,6 +47,14 @@
 * **Mobile API Parity & Dedicated Test Coverage (`Api/PortalController.php`, `PortalPollsAndEnhancementsTest.php`)**:
   * Synchronized API portal feed parameters (`trending`, `saved`, `my_posts`, `media`, `groups`) with mobile clients and formatted poll payloads in `StatusResource.php`.
   * Verified all functionality with dedicated PHPUnit feature tests in `PortalPollsAndEnhancementsTest.php` (8 tests, 44 assertions, 100% pass rate).
+* **Admin Panel Dashboard Statistics Overhaul & Live Refresh Engine (`/admin`, `AdminController.php`, `AdminDashboardAjaxTest.php`)**:
+  * Overhauled all administrative statistics and breakdown aggregations across `/admin` with support for the interactive Polls ecosystem (`s_type = 15`), accurately isolating polls from text posts.
+  * Added secondary KPI counters in `dashboard_activity.blade.php` displaying Services/Orders (`OrderRequest`), Interactive Polls (`Poll`), and Developer Applications (`DeveloperApp`) alongside Forum Topics, Directory Listings, and Store Products.
+  * Integrated interactive Polls timeseries data into 30-day community trend charts (`postsCommunityChart`) in `index.blade.php` and `ajaxDashboardCommunityCharts`.
+  * Implemented a real-time "Refresh Statistics" action button (`#btn-refresh-dashboard-stats`) and dedicated endpoint (`POST /admin/ajax/dashboard/refresh`) enabling instant cache flushing and live recalculation across all dashboard widgets without full page reloads.
+  * Extended all AJAX dashboard endpoints (`kpis`, `reactions`, `activity`, `ad-charts`, `community-charts`, `site-health`) with support for dynamic `?refresh=1` cache bypass.
+  * Expanded automated test suite `AdminDashboardAjaxTest.php` with 10 feature tests and 58 assertions covering live refresh and new metric structures.
+
 * **Symfony Ecosystem Security Remediation & DoS Prevention (`symfony/yaml`, Dependabot #98, `composer.lock`)**:
   * Upgraded `symfony/yaml` and `symfony/mime` from `7.4.13` to `7.4.22` resolving GitHub Dependabot security alert #98 (`CVE-2026-109413`) and email header advisory (`CVE-2026-45070`).
   * Fixed unbounded recursion in YAML inline lexer (`lexInlineStructure()`) where deeply nested inline sequences or mappings crashed PHP processes due to stack exhaustion.
