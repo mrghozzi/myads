@@ -401,7 +401,9 @@
         </div>
     </div>
 </div>
+@endsection
 
+@section('modals')
 <!-- ========================================== -->
 <!-- Reusable Dynamic Category Modal (Add / Edit) -->
 <!-- ========================================== -->
@@ -1298,6 +1300,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
 @push('styles')
 <style>
+/* Ensure Bootstrap Modals sit above layout backdrop without interference */
+.modal {
+    z-index: 1060 !important;
+}
+.modal-backdrop {
+    z-index: 1055 !important;
+}
+
 /* --- Directory Category Tree Modern Styling --- */
 .dir-tree-root {
     display: flex;
