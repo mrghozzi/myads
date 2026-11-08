@@ -72,5 +72,34 @@ class AdminEmojiRemovalTest extends TestCase
         $response->assertSee('System Update Announcement');
         $response->assertDontSee('/admin/emojis');
     }
+
+    public function test_post_creation_and_store_creation_pages_render_without_500_error(): void
+    {
+        \App\Models\ForumCategory::create([
+            'name' => 'General Discussion',
+            'ordercat' => 1,
+            'statu' => 1,
+            'sub' => 0,
+        ]);
+
+        // /post page
+        $postResponse = $this->actingAsAdmin()->get('/post');
+        $postResponse->assertOk();
+
+        // /store/create page
+        $storeResponse = $this->actingAsAdmin()->get('/store/create');
+        $storeResponse->assertOk();
+
+        // /editor/{id} page
+        $topic = \App\Models\ForumTopic::create([
+            'title' => 'Test Topic',
+            'body' => 'Test topic content',
+            'cat' => 1,
+            'uid' => $this->admin->id,
+            'date' => time(),
+        ]);
+        $editorResponse = $this->actingAsAdmin()->get('/editor/' . $topic->id);
+        $editorResponse->assertOk();
+    }
 }
 

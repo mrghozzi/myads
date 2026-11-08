@@ -15,7 +15,6 @@ use App\Models\Option;
 use App\Models\User;
 use App\Models\Status;
 use App\Models\ForumTopic;
-use App\Models\Emoji;
 use App\Services\KnowledgebaseCommunityService;
 use App\Support\StoreCategoryCatalog;
 use App\Models\KbCategory;
@@ -369,12 +368,7 @@ class StoreController extends Controller
 
     public function create()
     {
-        $emojis = Emoji::all();
-
-        return view('theme::store.create', array_merge(
-            $this->buildStoreCategorySelectorViewData(old('cat_s'), old('sc_cat')),
-            compact('emojis')
-        ));
+        return view('theme::store.create', $this->buildStoreCategorySelectorViewData(old('cat_s'), old('sc_cat')));
     }
 
     public function store(Request $request)

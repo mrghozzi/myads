@@ -1011,14 +1011,7 @@ document.addEventListener('DOMContentLoaded', function() {
             style: '{{ $sceditorContentCss }}',
             width: '100%',
             height: '350px',
-            resizeEnabled: true,
-            emoticons: {
-                dropdown: {
-                    @foreach(\App\Models\Emoji::limit(10)->get() as $emoji)
-                        '{{ $emoji->name }}': '{{ asset($emoji->img) }}',
-                    @endforeach
-                }
-            }
+            resizeEnabled: true
         };
 
         if (currentLocale !== 'en' && sceditor.locale && sceditor.locale[currentLocale]) {

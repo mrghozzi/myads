@@ -269,7 +269,7 @@ class InstallerController extends Controller
                     'users', 'options', 'status', 'forum', 'f_coment',
                     'like', 'news', 'state', 'short', 'referral',
                     'banner', 'link', 'visits', 'directory', 'report',
-                    'messages', 'notif', 'emojis', 'menu', 'ads',
+                    'messages', 'notif', 'menu', 'ads',
                     'cat_dir', 'f_cat', 'setting',
                 ];
 

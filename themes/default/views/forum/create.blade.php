@@ -921,11 +921,6 @@ html.app-skin-dark .ql-toolbar.ql-snow button:hover,
     </div>
 </div>
 
-@php
-    $dropdownEmojis = ($emojis ?? collect())->take(10);
-    $moreEmojis = ($emojis ?? collect())->slice(10);
-@endphp
-
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     var activeEditor = '{{ $activeEditor }}';
@@ -1005,18 +1000,6 @@ document.addEventListener('DOMContentLoaded', function() {
         var currentLocale = '{{ app()->getLocale() }}';
         var opts = {
             format: 'xhtml',
-            emoticons: {
-                dropdown: {
-                    @foreach($dropdownEmojis as $emoji)
-                        '{{ $emoji->name }}': '{{ asset($emoji->img) }}',
-                    @endforeach
-                }@if($moreEmojis->isNotEmpty()),
-                more: {
-                    @foreach($moreEmojis as $emoji)
-                        '{{ $emoji->name }}': '{{ asset($emoji->img) }}',
-                    @endforeach
-                }@endif
-            },
             style: '{{ $sceditorContentCss }}',
             width: '100%',
             height: '350px',

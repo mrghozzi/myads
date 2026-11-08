@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Emoji;
 use App\Models\ForumAttachment;
 use App\Models\ForumCategory;
 use App\Models\ForumComment;
@@ -530,7 +529,6 @@ class ForumController extends Controller
         }
 
         $categories = ForumCategory::orderBy('ordercat', 'asc')->get();
-        $emojis = Emoji::orderBy('id', 'asc')->get();
         $forumSettings = ForumSettings::all();
         $topic = null;
         $editType = null;
@@ -546,7 +544,7 @@ class ForumController extends Controller
             $editType = $status?->s_type ?? 2;
         }
 
-        return view('theme::forum.create', compact('categories', 'emojis', 'topic', 'editType', 'forumSettings'));
+        return view('theme::forum.create', compact('categories', 'topic', 'editType', 'forumSettings'));
     }
 
     public function store(
