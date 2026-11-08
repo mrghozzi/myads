@@ -63,6 +63,7 @@ custom_variables.css
 !/tests/Feature/LocaleDirectionRenderingTest.php
 !/tests/Feature/ComposerRenderingTest.php
 !/tests/Feature/SiteAdPlacementTest.php
+!/tests/Feature/AdminDirectoryCategoriesModernizationTest.php
 !/tests/Feature/UpdateSafetyFeatureTest.php
 !/tests/Feature/AdminExtensionsUiTest.php
 !/tests/Feature/MarketplaceExtensionFeedTest.php

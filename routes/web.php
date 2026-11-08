@@ -801,6 +801,8 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     // Directory Categories
     Route::get('/directory/categories', [AdminController::class, 'directoryCategories'])->name('admin.directory_categories');
     Route::post('/directory/categories', [AdminController::class, 'storeDirectoryCategory'])->name('admin.directory_categories.store');
+    Route::post('/directory/categories/reorder', [AdminController::class, 'reorderDirectoryCategories'])->name('admin.directory_categories.reorder');
+    Route::post('/directory/categories/{id}/toggle-status', [AdminController::class, 'toggleDirectoryCategoryStatus'])->name('admin.directory_categories.toggle_status');
     Route::post('/directory/categories/{id}', [AdminController::class, 'updateDirectoryCategory'])->name('admin.directory_categories.update');
     Route::delete('/directory/categories/{id}', [AdminController::class, 'deleteDirectoryCategory'])->name('admin.directory_categories.delete');
 

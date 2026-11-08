@@ -531,6 +531,8 @@ return [
     'category_fallback' => 'Category',
     'category_not_empty' => 'This category contains topics, you must select a category to move them to before deletion.',
     'category_updated' => 'Category updated successfully',
+    'category_activated' => 'Category activated successfully',
+    'category_deactivated' => 'Category deactivated successfully',
     'change_avatar_cover' => 'Change avatar cover',
     'changelog' => 'changelog',
     'check' => 'Check',

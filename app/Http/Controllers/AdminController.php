@@ -3544,32 +3544,85 @@ class AdminController extends Controller
     }
 
     // Directory Categories
-    public function directoryCategories()
+    public function directoryCategories(Request $request)
     {
-        $categories = DirectoryCategory::with('parent')->orderBy('sub', 'asc')->orderBy('ordercat', 'asc')->paginate(20);
-        $parents = DirectoryCategory::where('sub', 0)->get();
-        return view('admin::admin.directory_categories', compact('categories', 'parents'));
+        $rootCategories = DirectoryCategory::where('sub', 0)
+            ->withCount(['directories as listings_count', 'children as subcategories_count'])
+            ->with(['children' => function ($query) {
+                $query->withCount('directories as listings_count')->orderBy('ordercat', 'asc');
+            }])
+            ->orderBy('ordercat', 'asc')
+            ->get();
+
+        $allCategories = DirectoryCategory::withCount('directories as listings_count')
+            ->with('parent')
+            ->orderBy('sub', 'asc')
+            ->orderBy('ordercat', 'asc')
+            ->get();
+
+        $stats = [
+            'total_categories' => $allCategories->count(),
+            'root_categories' => $rootCategories->count(),
+            'sub_categories' => $allCategories->where('sub', '>', 0)->count(),
+            'active_categories' => $allCategories->where('statu', 1)->count(),
+            'total_listings' => Directory::count(),
+        ];
+
+        $parents = DirectoryCategory::where('sub', 0)->orderBy('ordercat', 'asc')->get();
+        $categories = $allCategories;
+
+        return view('admin::admin.directory_categories', compact('rootCategories', 'allCategories', 'categories', 'stats', 'parents'));
     }
 
     public function storeDirectoryCategory(Request $request)
     {
         $request->validate([
-            'name' => 'required|string',
+            'name' => 'required|string|max:255',
+            'slug' => 'nullable|string|max:255',
+            'icon' => 'nullable|string|max:100',
             'sub' => 'required|integer',
-            'ordercat' => 'required|integer',
-            'statu' => 'nullable|integer',
+            'ordercat' => 'nullable|integer',
+            'statu' => 'nullable|integer|in:0,1',
             'txt' => 'nullable|string',
             'metakeywords' => 'nullable|string',
         ]);
 
-        DirectoryCategory::create([
+        $sub = max(0, (int) $request->sub);
+        if ($sub > 0 && !DirectoryCategory::where('id', $sub)->exists()) {
+            $sub = 0;
+        }
+
+        // Slug generation and uniqueness
+        $rawSlug = $request->filled('slug') ? $request->slug : $request->name;
+        $baseSlug = Str::slug($rawSlug) ?: ('cat-' . time());
+        $slug = $baseSlug;
+        $counter = 1;
+        while (DirectoryCategory::where('slug', $slug)->exists()) {
+            $slug = $baseSlug . '-' . $counter++;
+        }
+
+        $ordercat = $request->filled('ordercat')
+            ? (int) $request->ordercat
+            : ((int) DirectoryCategory::where('sub', $sub)->max('ordercat') + 1);
+
+        $category = DirectoryCategory::create([
             'name' => $request->name,
-            'sub' => (int) $request->sub,
-            'ordercat' => (int) $request->ordercat,
-            'statu' => (int) ($request->statu ?? 1),
+            'slug' => $slug,
+            'icon' => $request->input('icon') ?: null,
+            'sub' => $sub,
+            'ordercat' => $ordercat,
+            'statu' => (int) ($request->input('statu', 1)),
             'txt' => $request->input('txt') ?? '',
             'metakeywords' => $request->input('metakeywords') ?? '',
         ]);
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'category' => $category,
+                'message' => __('messages.category_created'),
+            ]);
+        }
 
         return redirect()->back()->with('success', __('messages.category_created'));
     }
@@ -3577,33 +3630,140 @@ class AdminController extends Controller
     public function updateDirectoryCategory(Request $request, $id)
     {
         $category = DirectoryCategory::findOrFail($id);
-        
+
         $request->validate([
-            'name' => 'required|string',
+            'name' => 'required|string|max:255',
+            'slug' => 'nullable|string|max:255',
+            'icon' => 'nullable|string|max:100',
             'sub' => 'required|integer',
-            'ordercat' => 'required|integer',
-            'statu' => 'nullable|integer',
+            'ordercat' => 'nullable|integer',
+            'statu' => 'nullable|integer|in:0,1',
             'txt' => 'nullable|string',
             'metakeywords' => 'nullable|string',
         ]);
 
+        $sub = max(0, (int) $request->sub);
+        if ($sub === (int) $id) {
+            $sub = 0;
+        }
+
+        // Handle slug
+        $rawSlug = $request->filled('slug') ? $request->slug : ($category->slug ?: $request->name);
+        $baseSlug = Str::slug($rawSlug) ?: ('cat-' . $category->id);
+        $slug = $baseSlug;
+        $counter = 1;
+        while (DirectoryCategory::where('slug', $slug)->where('id', '!=', $id)->exists()) {
+            $slug = $baseSlug . '-' . $counter++;
+        }
+
         $category->update([
             'name' => $request->name,
-            'sub' => (int) $request->sub,
-            'ordercat' => (int) $request->ordercat,
-            'statu' => (int) ($request->statu ?? 1),
+            'slug' => $slug,
+            'icon' => $request->input('icon') ?: null,
+            'sub' => $sub,
+            'ordercat' => (int) ($request->ordercat ?? $category->ordercat),
+            'statu' => (int) ($request->input('statu', $category->statu)),
             'txt' => $request->input('txt') ?? '',
             'metakeywords' => $request->input('metakeywords') ?? '',
         ]);
 
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'category' => $category,
+                'message' => __('messages.category_updated'),
+            ]);
+        }
+
         return redirect()->back()->with('success', __('messages.category_updated'));
     }
 
-    public function deleteDirectoryCategory($id)
+    public function reorderDirectoryCategories(Request $request)
+    {
+        $request->validate([
+            'items' => 'required|array',
+            'items.*.id' => 'required|integer|exists:cat_dir,id',
+            'items.*.parent_id' => 'nullable',
+            'items.*.order' => 'required|integer',
+        ]);
+
+        \Illuminate\Support\Facades\DB::beginTransaction();
+        try {
+            foreach ($request->input('items') as $item) {
+                $parentId = (!empty($item['parent_id']) && (int) $item['parent_id'] > 0)
+                    ? (int) $item['parent_id']
+                    : 0;
+
+                if ($parentId === (int) $item['id']) {
+                    $parentId = 0;
+                }
+
+                DirectoryCategory::where('id', $item['id'])->update([
+                    'sub' => $parentId,
+                    'ordercat' => (int) $item['order'],
+                ]);
+            }
+
+            \Illuminate\Support\Facades\DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => __('messages.categories_reordered') ?? 'Categories order and hierarchy updated successfully.',
+            ]);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\DB::rollBack();
+            report($e);
+            return response()->json(['error' => __('messages.error_occurred') ?? 'Failed to update order.'], 500);
+        }
+    }
+
+    public function toggleDirectoryCategoryStatus($id)
     {
         $category = DirectoryCategory::findOrFail($id);
+        $category->statu = (int) $category->statu === 1 ? 0 : 1;
+        $category->save();
+
+        if (request()->wantsJson() || request()->ajax()) {
+            return response()->json([
+                'success' => true,
+                'statu' => $category->statu,
+                'message' => $category->statu === 1 ? (__('messages.category_activated') ?? 'Category activated') : (__('messages.category_deactivated') ?? 'Category deactivated'),
+            ]);
+        }
+
+        return redirect()->back()->with('success', __('messages.category_updated'));
+    }
+
+    public function deleteDirectoryCategory(Request $request, $id)
+    {
+        $category = DirectoryCategory::findOrFail($id);
+
+        $listingsCount = Directory::where('cat', $id)->count();
+        $moveListingsTo = $request->input('move_to_id');
+
+        if ($listingsCount > 0 && !empty($moveListingsTo)) {
+            $request->validate([
+                'move_to_id' => 'required|integer|exists:cat_dir,id|different:id',
+            ]);
+            Directory::where('cat', $id)->update(['cat' => (int) $moveListingsTo]);
+        } elseif ($listingsCount > 0) {
+            Directory::where('cat', $id)->update(['cat' => 0]);
+        }
+
+        // Reassign child categories to parent category so they don't get orphaned
+        DirectoryCategory::where('sub', $id)->update([
+            'sub' => (int) $category->sub,
+        ]);
+
         $category->delete();
-        
+
+        if ($request->wantsJson() || $request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => __('messages.category_deleted'),
+            ]);
+        }
+
         return redirect()->back()->with('success', __('messages.category_deleted'));
     }
 

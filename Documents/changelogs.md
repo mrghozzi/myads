@@ -27,6 +27,22 @@
 * **Automated Test Coverage & Verification (`tests/Feature/V470RoadmapHardeningTest.php`)**:
   * Created dedicated test suite with 9 feature tests and 62 assertions validating dual DocumentRoot resolution, webhook timestamp & replay defense, strict nonce CSP headers, deflection text normalization, AJAX endpoints, Turnstile service verification, and admin security settings updates.
 
+### Directory Categories & Taxonomy Management Overhaul (`/admin/directory/categories`)
+* **Next-Gen Directory Taxonomy Engine (`DirectoryCategory.php`, `AdminController.php`, `routes/web.php`)**:
+  * Added `directories()` and `listings()` relationships to `DirectoryCategory` model with automatic eager-loading and `withCount('directories as listings_count')`.
+  * Implemented automated Unicode & multilingual SEO slug generation on create/update with collision avoidance loop (`Str::slug()`), resolving 404 broken routes when routing by category slug (`/directory/category/{slug}`).
+  * Added dynamic display icon accessor (`getDisplayIconAttribute`) and integrated the standard admin icon picker partial with FontAwesome & Feather icons support.
+  * Added atomic status toggling (`POST /directory/categories/{id}/toggle-status`) with instantaneous UI feedback and toast notification.
+  * Built an AJAX tree hierarchy & reordering endpoint (`POST /directory/categories/reorder`) supporting nested drag-and-drop category restructuring with database transactions.
+  * Implemented smart safe deletion (`deleteDirectoryCategory`) allowing administrators to reassign existing directory listings to an alternative category before deletion, automatically moving subcategories to root level to prevent orphaned listings and broken database foreign keys.
+* **Modern `@.superdesign` Directory Categories Interface (`directory_categories.blade.php`)**:
+  * Replaced the legacy flat table with a dual-view interface: an interactive **Nestable Tree View** with drag-and-drop handles, expand/collapse toggles, subcategory nesting, and live count badges; alongside a comprehensive **Table View** with search and filter capabilities.
+  * Added a 4-KPI Global Stat Strip in the hero header displaying Total Categories, Root Categories, Subcategories, and Directory Listings in real-time.
+  * Built live client-side search filtering across both Tree and Table views simultaneously, plus filter chips for All, Root Only, Subcategories Only, Active Only, and Inactive Only.
+  * Eliminated DOM modal bloat by consolidating 40+ looping modals into a single lightweight, reusable dynamic modal for Add/Edit (`#categoryModal`) and a smart deletion confirmation modal (`#deleteCategoryModal`).
+  * Ensured 100% theme compatibility with Duralux dark mode (`app-skin-dark`), RTL layout, and `--admin-premium-*` design variables.
+  * Added comprehensive automated test suite (`tests/Feature/AdminDirectoryCategoriesModernizationTest.php`) with 8 feature tests and 46 assertions.
+
 ### Community Portal Modernization & Interactive Polls Engine (`/portal`)
 * **Interactive Community Polls Post Type & Real-Time Voting Engine (`polls`, `poll_options`, `poll_votes`, `TYPE_POLL = 15`)**:
   * Activated the previously disabled `create_poll` tool in the social feed composer (`add_post.blade.php`), enabling community webmasters to craft interactive polls with custom questions, dynamic 2–6 voting options, and configurable expiration periods (1, 3, 7, 14, 30 days, or unlimited).

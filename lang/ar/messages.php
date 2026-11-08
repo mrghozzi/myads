@@ -532,6 +532,8 @@ return [
     'category_fallback' => 'القسم',
     'category_not_empty' => 'هذا القسم يحتوي على مواضيع، يجب اختيار قسم لنقلها إليه قبل الحذف.',
     'category_updated' => 'تم تحديث القسم بنجاح',
+    'category_activated' => 'تم تفعيل القسم بنجاح',
+    'category_deactivated' => 'تم إلغاء تفعيل القسم بنجاح',
     'change_avatar_cover' => 'تعديل صورة العرض / الغلاف',
     'changelog' => 'سجل التغييرات',
     'check' => 'فحص',
