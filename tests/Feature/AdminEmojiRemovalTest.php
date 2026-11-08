@@ -92,8 +92,8 @@ class AdminEmojiRemovalTest extends TestCase
 
         // /editor/{id} page
         $topic = \App\Models\ForumTopic::create([
-            'title' => 'Test Topic',
-            'body' => 'Test topic content',
+            'name' => 'Test Topic',
+            'text' => 'Test topic content',
             'cat' => 1,
             'uid' => $this->admin->id,
             'date' => time(),
