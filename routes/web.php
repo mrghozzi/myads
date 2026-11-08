@@ -848,11 +848,6 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::post('/store/script-categories/{id}', [AdminController::class, 'updateScriptCategory'])->name('admin.script_categories.update');
     Route::delete('/store/script-categories/{id}', [AdminController::class, 'deleteScriptCategory'])->name('admin.script_categories.delete');
 
-    // Emojis
-    Route::get('/emojis', [AdminController::class, 'emojis'])->name('admin.emojis');
-    Route::post('/emojis', [AdminController::class, 'storeEmoji'])->name('admin.emojis.store');
-    Route::delete('/emojis/{id}', [AdminController::class, 'deleteEmoji'])->name('admin.emojis.delete');
-
     // News
     Route::get('/news', [AdminController::class, 'news'])->name('admin.news');
     Route::post('/news', [AdminController::class, 'storeNews'])->name('admin.news.store');

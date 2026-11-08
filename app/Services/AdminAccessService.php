@@ -112,7 +112,6 @@ class AdminAccessService
             str_starts_with($routeName, 'admin.forum'),
             str_starts_with($routeName, 'admin.directory'),
             str_starts_with($routeName, 'admin.knowledgebase'),
-            str_starts_with($routeName, 'admin.emojis'),
             str_starts_with($routeName, 'admin.news'),
             str_starts_with($routeName, 'admin.reports'),
             str_starts_with($routeName, 'admin.products') => 'community',

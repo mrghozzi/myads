@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Schema;
 /**
  * Create all core application tables that are missing from the base migrations.
  * Tables covered: setting, menu, f_cat, forum, f_coment, ads, like, notif,
- *                 messages, report, short, news, emojis, status, cat_dir, referral
+ *                 messages, report, short, news, status, cat_dir, referral
  */
 return new class extends Migration
 {
@@ -163,15 +163,6 @@ return new class extends Migration
             });
         }
 
-        // ── Emojis ─────────────────────────────────────────────────
-        if (!Schema::hasTable('emojis')) {
-            Schema::create('emojis', function (Blueprint $table) {
-                $table->id();
-                $table->string('name');
-                $table->string('img');
-            });
-        }
-
         // ── Status Feed ────────────────────────────────────────────
         if (!Schema::hasTable('status')) {
             Schema::create('status', function (Blueprint $table) {
@@ -230,7 +221,6 @@ return new class extends Migration
         Schema::dropIfExists('referral');
         Schema::dropIfExists('cat_dir');
         Schema::dropIfExists('status');
-        Schema::dropIfExists('emojis');
         Schema::dropIfExists('news');
         Schema::dropIfExists('short');
         Schema::dropIfExists('report');

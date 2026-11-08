@@ -171,7 +171,6 @@ return array(
     'App\\Models\\DirectoryCategory' => $baseDir . '/app/Models/DirectoryCategory.php',
     'App\\Models\\DirectoryClaim' => $baseDir . '/app/Models/DirectoryClaim.php',
     'App\\Models\\DirectoryUpvote' => $baseDir . '/app/Models/DirectoryUpvote.php',
-    'App\\Models\\Emoji' => $baseDir . '/app/Models/Emoji.php',
     'App\\Models\\ForumAttachment' => $baseDir . '/app/Models/ForumAttachment.php',
     'App\\Models\\ForumCategory' => $baseDir . '/app/Models/ForumCategory.php',
     'App\\Models\\ForumComment' => $baseDir . '/app/Models/ForumComment.php',

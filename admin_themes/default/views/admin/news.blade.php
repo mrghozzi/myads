@@ -28,8 +28,8 @@
                     <span class="admin-stat-value">{{ $latestNews ? date('Y-m-d', $latestNews->date) : '--' }}</span>
                 </div>
                 <div class="admin-stat-card">
-                    <span class="admin-stat-label">{{ __('messages.emojis') }}</span>
-                    <span class="admin-stat-value">{{ number_format(($emojis ?? collect())->count()) }}</span>
+                    <span class="admin-stat-label">{{ __('messages.active') ?? 'Active' }}</span>
+                    <span class="admin-stat-value">{{ number_format($news->where('statu', 1)->count()) }}</span>
                 </div>
             </div>
         </div>

@@ -43,6 +43,14 @@
   * Ensured 100% theme compatibility with Duralux dark mode (`app-skin-dark`), RTL layout, and `--admin-premium-*` design variables.
   * Added comprehensive automated test suite (`tests/Feature/AdminDirectoryCategoriesModernizationTest.php`) with 8 feature tests and 46 assertions.
 
+### Legacy Emojis System Removal & Database Pruning
+* **Complete Deprecation & Deletion of `/admin/emojis` Ecosystem**:
+  * Safely dropped the obsolete `emojis` database table via migration (`2026_11_08_010000_drop_emojis_table.php`) and pruned legacy table definitions from core migrations.
+  * Deleted obsolete `App\Models\Emoji` Eloquent model and removed associated admin routes (`admin.emojis`, `admin.emojis.store`, `admin.emojis.delete`).
+  * Removed emoji CRUD controller methods (`emojis`, `storeEmoji`, `deleteEmoji`) from `AdminController.php` and deleted the legacy admin view (`admin_themes/default/views/admin/emojis.blade.php`).
+  * Removed the `/admin/emojis` menu item from the admin navigation sidebar (`admin.blade.php`) and pruned route access rules in `AdminAccessService.php`.
+  * Replaced the obsolete emojis count stat in `/admin/news` (`admin_themes/default/views/admin/news.blade.php`) with an active news KPI counter.
+
 ### Community Portal Modernization & Interactive Polls Engine (`/portal`)
 * **Interactive Community Polls Post Type & Real-Time Voting Engine (`polls`, `poll_options`, `poll_votes`, `TYPE_POLL = 15`)**:
   * Activated the previously disabled `create_poll` tool in the social feed composer (`add_post.blade.php`), enabling community webmasters to craft interactive polls with custom questions, dynamic 2–6 voting options, and configurable expiration periods (1, 3, 7, 14, 30 days, or unlimited).
@@ -102,6 +110,14 @@
   * Added dynamic `/sitemap.xsl` route and `SitemapController@stylesheet` handler guaranteeing real-time version synchronization via `SystemVersion::tag()`.
   * Enhanced `CheckSystemVersion` middleware to automatically synchronize the physical `public/sitemap.xsl` file whenever a version bump occurs, preventing future version drift.
   * Added dedicated automated test coverage in `SeoSystemTest.php` (8 tests, 84 assertions, 100% pass rate).
+
+### Legacy Emojis System Removal & Database Pruning
+* **Complete Deprecation & Deletion of `/admin/emojis` Ecosystem**:
+  * Safely dropped the obsolete `emojis` database table via migration (`2026_11_08_010000_drop_emojis_table.php`) and pruned legacy table definitions from core migrations.
+  * Deleted obsolete `App\Models\Emoji` Eloquent model and removed associated admin routes (`admin.emojis`, `admin.emojis.store`, `admin.emojis.delete`).
+  * Removed emoji CRUD controller methods (`emojis`, `storeEmoji`, `deleteEmoji`) from `AdminController.php` and deleted the legacy admin view (`admin_themes/default/views/admin/emojis.blade.php`).
+  * Removed the `/admin/emojis` menu item from the admin navigation sidebar (`admin.blade.php`) and pruned route access rules in `AdminAccessService.php`.
+  * Replaced the obsolete emojis count stat in `/admin/news` (`admin_themes/default/views/admin/news.blade.php`) with an active news KPI counter.
 
 ### Community Portal Modernization & Interactive Polls Engine (`/portal`)
 * **Interactive Community Polls Post Type & Real-Time Voting Engine (`polls`, `poll_options`, `poll_votes`, `TYPE_POLL = 15`)**:

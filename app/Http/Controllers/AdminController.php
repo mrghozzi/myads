@@ -38,7 +38,6 @@ use App\Models\DirectoryCategory;
 use App\Models\News;
 use App\Models\Ad;
 use App\Models\Report;
-use App\Models\Emoji;
 use App\Models\Menu;
 use App\Models\Knowledgebase;
 use App\Models\KbCategory;
@@ -3771,8 +3770,7 @@ class AdminController extends Controller
     public function news()
     {
         $news = News::orderBy('id', 'desc')->get();
-        $emojis = Emoji::orderBy('id', 'asc')->get();
-        return view('admin::admin.news', compact('news', 'emojis'));
+        return view('admin::admin.news', compact('news'));
     }
 
     public function storeNews(Request $request)
@@ -4665,33 +4663,6 @@ class AdminController extends Controller
         $report->delete();
         
         return redirect()->back()->with('success', __('report_deleted'));
-    }
-
-    // Emojis Management
-    public function emojis()
-    {
-        $emojis = Emoji::orderBy('id', 'desc')->paginate(20);
-        return view('admin::admin.emojis', compact('emojis'));
-    }
-
-    public function storeEmoji(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|string',
-            'img' => 'required|string',
-        ]);
-
-        Emoji::create($request->all());
-
-        return redirect()->back()->with('success', __('emoji_created'));
-    }
-
-    public function deleteEmoji($id)
-    {
-        $emoji = Emoji::findOrFail($id);
-        $emoji->delete();
-        
-        return redirect()->back()->with('success', __('emoji_deleted'));
     }
 
     // Menu Management
