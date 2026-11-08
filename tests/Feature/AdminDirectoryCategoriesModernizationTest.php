@@ -70,6 +70,8 @@ class AdminDirectoryCategoriesModernizationTest extends TestCase
         $response->assertSee('kpiTotalCategories');
         $response->assertSee('dirTreeRoot');
         $response->assertSee('categoryModal');
+        $response->assertSee('const baseCategoryUrl = \'' . route('admin.directory_categories') . '\'', false);
+        $response->assertDontSee('url("/directory/categories")', false);
     }
 
     public function test_admin_can_create_category_with_auto_generated_slug_and_icon(): void

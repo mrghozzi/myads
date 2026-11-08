@@ -3624,7 +3624,7 @@ class AdminController extends Controller
             ]);
         }
 
-        return redirect()->back()->with('success', __('messages.category_created'));
+        return redirect()->route('admin.directory_categories')->with('success', __('messages.category_created'));
     }
 
     public function updateDirectoryCategory(Request $request, $id)
@@ -3675,7 +3675,7 @@ class AdminController extends Controller
             ]);
         }
 
-        return redirect()->back()->with('success', __('messages.category_updated'));
+        return redirect()->route('admin.directory_categories')->with('success', __('messages.category_updated'));
     }
 
     public function reorderDirectoryCategories(Request $request)
@@ -3764,7 +3764,7 @@ class AdminController extends Controller
             ]);
         }
 
-        return redirect()->back()->with('success', __('messages.category_deleted'));
+        return redirect()->route('admin.directory_categories')->with('success', __('messages.category_deleted'));
     }
 
     // News Management

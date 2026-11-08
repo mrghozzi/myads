@@ -567,6 +567,7 @@
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     const reorderUrl = '{{ route("admin.directory_categories.reorder") }}';
+    const baseCategoryUrl = '{{ route("admin.directory_categories") }}';
     const csrfToken = document.querySelector('meta[name="csrf-token"]') ? document.querySelector('meta[name="csrf-token"]').getAttribute('content') : '{{ csrf_token() }}';
 
     // -------------------------------------------------------------
@@ -781,7 +782,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             showToast('saving', '{{ __("messages.saving") ?? "Updating status..." }}');
 
-            fetch('{{ url("/directory/categories") }}/' + catId + '/toggle-status', {
+            fetch(baseCategoryUrl + '/' + catId + '/toggle-status', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -900,7 +901,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const metakeywords = this.getAttribute('data-metakeywords') || '';
 
             categoryForm.setAttribute('data-mode', 'edit');
-            categoryForm.action = '{{ url("/directory/categories") }}/' + id;
+            categoryForm.action = baseCategoryUrl + '/' + id;
             modalTitle.innerText = '{{ __("messages.edit_category") }}';
 
             fieldName.value = name;
@@ -953,7 +954,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const childrenCount = parseInt(this.getAttribute('data-children-count') || 0, 10);
             const listingsCount = parseInt(this.getAttribute('data-listings-count') || 0, 10);
 
-            deleteForm.action = '{{ url("/directory/categories") }}/' + id;
+            deleteForm.action = baseCategoryUrl + '/' + id;
             deleteName.innerText = name;
 
             // Show/hide subcategories warning
