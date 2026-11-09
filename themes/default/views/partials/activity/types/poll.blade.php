@@ -9,7 +9,11 @@
     $relatedId = $activity->related_content?->id ?? $activity->tp_id ?? $activity->id;
     $formattedText = \App\Support\ContentFormatter::format($activity->related_content?->txt ?? ($activity->txt ?? ''));
     
-    $poll = $activity->poll ?? \App\Models\Poll::where('status_id', $activity->id)->with('options')->first();
+    try {
+        $poll = $activity->poll ?? \App\Models\Poll::where('status_id', $activity->id)->with('options')->first();
+    } catch (\Throwable) {
+        $poll = null;
+    }
     $currentUserId = auth()->id();
     $hasVoted = $poll ? $poll->hasUserVoted($currentUserId) : false;
     $votedOptionId = $poll ? $poll->getUserVotedOptionId($currentUserId) : null;
