@@ -1,5 +1,5 @@
 # v4.7.0
-> **Zero-Trust Security Hardening, AI Support Deflection Engine, Webhook Replay Attack Protection v2, Strict Nonce-Based CSP, Cloudflare Turnstile Bot Defense & Dual DocumentRoot Architecture Release** — Major platform evolution implementing Phase 1 of the Comprehensive Roadmap (`proposals_evolution_and_hardening_roadmap.md`): Introduced Dual DocumentRoot path resolution across `public/index.php` and root `index.php` ensuring seamless deployment across all shared and cloud hosting configurations; upgraded developer platform webhooks with timestamp replay attack defense (`X-MYADS-Timestamp`, `X-MYADS-Signature: t={ts},v1={hash}`) and constant-time tolerance verification (`verifySignature`); transitioned to strict Nonce-based Content-Security-Policy (CSP) with dynamic per-request cryptographic nonces and helper `csp_nonce()`; built an intelligent, bilingual AI Support Deflection Engine (`SupportDeflectionService`, `/tickets/deflect`, `/support/deflect`, `/api/support/deflect`) analyzing user inquiries before ticket/topic creation to suggest instant verified solutions and Help Center guides; and integrated Cloudflare Turnstile CAPTCHA-free human verification in `/admin/security` and auth/support forms with automated test coverage in `V470RoadmapHardeningTest.php`.
+> **Zero-Trust Security Hardening, AI Support Deflection Engine, Webhook Replay Attack Protection v2, Strict Nonce-Based CSP, Cloudflare Turnstile Bot Defense, Limitless & Secure Plugin Architecture Overhaul & Dual DocumentRoot Architecture Release** — Major platform evolution implementing Phase 1 of the Comprehensive Roadmap (`proposals_evolution_and_hardening_roadmap.md`): Introduced Dual DocumentRoot path resolution across `public/index.php` and root `index.php` ensuring seamless deployment across all shared and cloud hosting configurations; modernized the platform's extension subsystem with a Limitless & Secure Plugin Architecture featuring WordPress-grade global hook functions, custom Blade directives (`@action`, `@filter`), zero-configuration PSR-4 autoloading, dynamic view overrides (`views/overrides/theme/`, `views/overrides/admin/`), pre-activation PHP syntax parsing (`token_get_all(TOKEN_PARSE)`), and safe-mode crash quarantine; upgraded developer platform webhooks with timestamp replay attack defense (`X-MYADS-Timestamp`, `X-MYADS-Signature: t={ts},v1={hash}`) and constant-time tolerance verification (`verifySignature`); transitioned to strict Nonce-based Content-Security-Policy (CSP) with dynamic per-request cryptographic nonces and helper `csp_nonce()`; built an intelligent, bilingual AI Support Deflection Engine (`SupportDeflectionService`, `/tickets/deflect`, `/support/deflect`, `/api/support/deflect`) analyzing user inquiries before ticket/topic creation to suggest instant verified solutions and Help Center guides; and integrated Cloudflare Turnstile CAPTCHA-free human verification in `/admin/security` and auth/support forms with automated test coverage in `V470RoadmapHardeningTest.php` and `LimitlessPluginSystemTest.php`.
 
 ### Architectural & Security Hardening (Roadmap Phase 1)
 * **Dual DocumentRoot Path Resolution (`public/index.php`, `index.php`)**:
@@ -94,6 +94,37 @@
     * Synchronized Composer `plugin-api-version` from `2.6.0` to `2.9.0`.
   * Verified HTTP request/response handling lifecycle, header parsing, session management security, and regression-free compatibility with Laravel 12 on PHP 8.2+.
   * Achieved zero reported security vulnerabilities across both `composer audit` and `npm audit`.
+
+### Limitless & Secure Plugin Architecture Overhaul (`PluginServiceProvider`, `Hooks`, `PluginManager`, `PLUGIN_GUIDE.md`)
+* **Global Hooks & Filters Engine (`app/Helpers/Hooks.php`, `app/helpers.php`)**:
+  * Implemented first-class global helper functions (`add_action`, `do_action`, `add_filter`, `apply_filters`, `has_action`, `has_filter`, `remove_action`, `remove_filter`) eliminating verbose facade calls for third-party developers.
+  * Added custom Blade directives `@action('hook_name', ...$args)` and `@filter('filter_name', $value, ...$args)` for clean, idiomatic template hook execution.
+  * Ensured hook helpers are universally available throughout the Laravel application lifecycle via `app/helpers.php`.
+* **Zero-Configuration PSR-4 Autoloading & Global Helpers (`app/Providers/PluginServiceProvider.php`)**:
+  * Added dynamic PSR-4 class autoloading for all active plugins: automatically maps `MyAds\Plugins\<StudlySlug>\` and `Plugins\<StudlySlug>\` to the plugin's `src/` directory, while supporting custom namespace mappings declared under `"autoload": { "psr-4": { ... } }` in `plugin.json`.
+  * Eliminated boilerplate `spl_autoload_register` calls from individual plugin `boot.php` files.
+  * Added automated `require_once` inclusion of `helpers.php` located in any active plugin's root directory.
+* **Dynamic View Overrides Architecture (Limitless UI Customization)**:
+  * Implemented an in-memory view resolution prepender allowing plugins to override any template across the platform without altering core files:
+    * `views/overrides/theme/` prepended to the `theme::` namespace (e.g. `views/overrides/theme/forum/video.blade.php`).
+    * `views/overrides/admin/` prepended to the `admin::` namespace (e.g. `views/overrides/admin/admin/dashboard.blade.php`).
+    * `views/overrides/` prepended to global view locations.
+  * Guaranteed instant, zero-risk fallback to original core templates whenever an overriding plugin is deactivated or uninstalled.
+  * Added dual namespace support for plugin views and translations (`loadViewsFrom` and `loadTranslationsFrom` by both physical directory name and manifest slug).
+* **Pre-Activation PHP Syntax Validation & Security Quarantine (`app/Services/PluginManager.php`, `lang/*/messages.php`)**:
+  * Integrated static pre-activation PHP parsing via `PluginManager::validatePluginSyntax()` utilizing `token_get_all(TOKEN_PARSE)` across all entry files (`boot.php`, `routes.php`, `activate.php`, migrations, and `src/`).
+  * Prevents White Screen of Death (WSOD) or fatal compile crashes by rejecting activation of corrupt code with detailed line-by-line syntax error messages.
+  * Added localized bilingual error notifications (`messages.plugin_syntax_error`) in Arabic and English.
+  * Preserved and strengthened the automated Safe-Mode crash isolation quarantining failing plugins without bringing down the platform.
+* **Strategic Core Lifecycle Hooks Integration**:
+  * **Content & Feed Lifecycle:** Added automatic hook dispatches inside Eloquent model events (`Status::booted()`) for `post_created`, `post_updated`, `post_deleted`, `status_created`, `status_updated`, and `status_deleted`.
+  * **User & Auth Lifecycle:** Added automatic hook dispatches inside `User::booted()` for `user_registered`, `after_user_register`, `user_updated`, and `user_deleted`, as well as Laravel `Login` and `Logout` event listeners for `user_logged_in` and `user_logged_out`.
+  * **Feed Card Injection Hooks:** Added `@action('post_card_header', $activity)`, `@action('post_card_footer', $activity)`, `@action('post_card_actions', $activity)`, and `@action('post_card_options', $activity)` in `wrapper.blade.php` and `post_footer_shared.blade.php`.
+  * **Profile Hub Injection Hooks:** Added `@action('user_profile_header', $user)`, `@action('user_profile_navigation_tabs', $user, $tab)`, and `@action('user_profile_content', $user)` in `themes/default/views/profile/`.
+  * **Theme Navigation Hooks:** Added `@action('theme_sidebar_nav_start')`, `@action('theme_sidebar_nav_end')`, `@action('theme_sidebar_menu_start')`, `@action('theme_sidebar_menu_end')`, and `@action('admin_head')`.
+* **Developer Documentation & Automated Test Coverage (`Documents/PLUGIN_GUIDE.md`, `LimitlessPluginSystemTest.php`)**:
+  * Fully rewrote `Documents/PLUGIN_GUIDE.md` with complete directory schemas, hook catalogs, manifest specifications, view override blueprints, security guidelines, and an end-to-end tutorial.
+  * Created dedicated test suite `tests/Feature/Plugins/LimitlessPluginSystemTest.php` with 4 feature tests and 17 assertions covering global hooks, Blade directives, syntax validation, and view overrides (100% pass rate).
 
 ---
 
