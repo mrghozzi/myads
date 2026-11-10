@@ -14,50 +14,72 @@ if (!function_exists('theme_asset')) {
      */
     function theme_asset($path)
     {
-        static $resolvedTheme = null;
+        $cleanPath = ltrim((string) $path, '/\\');
+        $activeTheme = $GLOBALS['MYADS_ACTIVE_THEME'] ?? null;
 
-        if ($resolvedTheme === null) {
-            $theme = $GLOBALS['MYADS_ACTIVE_THEME'] ?? null;
-
-            if (!$theme) {
-                try {
-                    if (app()->bound('request')) {
-                        $req = request();
-                        if ($req->has('preview_theme') && is_dir(base_path('themes/' . $req->query('preview_theme')))) {
-                            $theme = (string) $req->query('preview_theme');
-                        } elseif ($req->has('theme_preview') && $req->has('theme') && is_dir(base_path('themes/' . $req->query('theme')))) {
-                            $theme = (string) $req->query('theme');
-                        }
+        if (!$activeTheme) {
+            try {
+                if (isset($_GET['preview_theme']) && is_string($_GET['preview_theme'])) {
+                    $activeTheme = trim($_GET['preview_theme']);
+                } elseif (isset($_COOKIE['preview_theme']) && is_string($_COOKIE['preview_theme'])) {
+                    $activeTheme = trim($_COOKIE['preview_theme']);
+                } elseif (app()->bound('request')) {
+                    $req = request();
+                    if ($req->has('preview_theme') && is_dir(base_path('themes/' . $req->query('preview_theme')))) {
+                        $activeTheme = (string) $req->query('preview_theme');
+                    } elseif ($req->has('theme_preview') && $req->has('theme') && is_dir(base_path('themes/' . $req->query('theme')))) {
+                        $activeTheme = (string) $req->query('theme');
+                    } elseif ($req->cookie('preview_theme') && is_dir(base_path('themes/' . $req->cookie('preview_theme')))) {
+                        $activeTheme = (string) $req->cookie('preview_theme');
                     }
-                } catch (\Throwable $e) {
-                    // Ignore container resolution edge cases
                 }
+            } catch (\Throwable $e) {
+                // Ignore container resolution edge cases
             }
-
-            if (!$theme) {
-                try {
-                    $schema = app()->bound(App\Services\V420SchemaService::class)
-                        ? app(App\Services\V420SchemaService::class)
-                        : null;
-
-                    $hasSettingTable = $schema ? $schema->hasTable('setting') : Schema::hasTable('setting');
-
-                    if ($hasSettingTable) {
-                        $setting = Setting::first();
-                        if ($setting && !empty($setting->styles)) {
-                            $theme = $setting->styles;
-                        }
-                    }
-                } catch (\Throwable $e) {
-                    // Fallback to default
-                }
-            }
-
-            $resolvedTheme = $theme ?: 'default';
-            $GLOBALS['MYADS_ACTIVE_THEME'] = $resolvedTheme;
         }
 
-        return asset("themes/{$resolvedTheme}/assets/{$path}");
+        if (!$activeTheme) {
+            try {
+                $schema = app()->bound(App\Services\V420SchemaService::class)
+                    ? app(App\Services\V420SchemaService::class)
+                    : null;
+
+                $hasSettingTable = $schema ? $schema->hasTable('setting') : Schema::hasTable('setting');
+
+                if ($hasSettingTable) {
+                    $setting = Setting::first();
+                    if ($setting && !empty($setting->styles)) {
+                        $activeTheme = $setting->styles;
+                    }
+                }
+            } catch (\Throwable $e) {
+                // Fallback to default
+            }
+        }
+
+        $activeTheme = $activeTheme ?: 'default';
+        $parentTheme = $GLOBALS['MYADS_PARENT_THEME'] ?? null;
+
+        // 1. Check if active theme has the asset physically in public/themes/{activeTheme}/assets/ or themes/{activeTheme}/assets/
+        if (file_exists(public_path("themes/{$activeTheme}/assets/{$cleanPath}")) || file_exists(base_path("themes/{$activeTheme}/assets/{$cleanPath}"))) {
+            return asset("themes/{$activeTheme}/assets/{$cleanPath}");
+        }
+
+        // 2. Check parent theme asset if defined
+        if (!empty($parentTheme)) {
+            if (file_exists(public_path("themes/{$parentTheme}/assets/{$cleanPath}")) || file_exists(base_path("themes/{$parentTheme}/assets/{$cleanPath}"))) {
+                return asset("themes/{$parentTheme}/assets/{$cleanPath}");
+            }
+        }
+
+        // 3. Fallback to default theme asset
+        if ($activeTheme !== 'default' && $parentTheme !== 'default') {
+            if (file_exists(public_path("themes/default/assets/{$cleanPath}")) || file_exists(base_path("themes/default/assets/{$cleanPath}"))) {
+                return asset("themes/default/assets/{$cleanPath}");
+            }
+        }
+
+        return asset("themes/{$activeTheme}/assets/{$cleanPath}");
     }
 }
 

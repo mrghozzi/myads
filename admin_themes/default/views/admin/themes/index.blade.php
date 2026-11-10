@@ -583,6 +583,19 @@
                 <div class="d-flex align-items-center gap-3">
                     <h6 class="modal-title fw-bold mb-0 text-white" id="theme-preview-modal-title">Live Preview</h6>
                     <span class="badge bg-primary" id="theme-preview-modal-slug"></span>
+                    <div class="d-inline-flex align-items-center gap-2 ms-2">
+                        <select id="preview-page-select" class="form-select form-select-sm bg-dark text-light border-secondary" style="width: auto; min-width: 140px;">
+                            <option value="/">{{ __('messages.home') ?? 'Landing Page' }}</option>
+                            <option value="/portal">{{ __('messages.portal') ?? 'Community Feed' }}</option>
+                            <option value="/forum">{{ __('messages.forum') ?? 'Forum' }}</option>
+                            <option value="/video">{{ __('messages.video') ?? 'Video Hub' }}</option>
+                            <option value="/store">{{ __('messages.store') ?? 'Marketplace' }}</option>
+                            <option value="/directory">{{ __('messages.directory') ?? 'Directory' }}</option>
+                        </select>
+                        <button type="button" class="btn btn-sm btn-outline-secondary text-light" id="preview-reload-btn" title="Reload Preview">
+                            <i class="feather-rotate-cw"></i>
+                        </button>
+                    </div>
                 </div>
                 <div class="d-flex align-items-center gap-2 mx-auto" id="preview-viewport-controls">
                     <button type="button" class="btn btn-sm btn-outline-light active preview-device-btn" data-width="100%" title="{{ __('messages.device_desktop') }}">
@@ -1008,19 +1021,39 @@ document.addEventListener('DOMContentLoaded', function () {
         var previewTitle = document.getElementById('theme-preview-modal-title');
         var previewSlugBadge = document.getElementById('theme-preview-modal-slug');
         var previewOpenTabBtn = document.getElementById('preview-open-tab-btn');
+        var previewPageSelect = document.getElementById('preview-page-select');
+        var previewReloadBtn = document.getElementById('preview-reload-btn');
         var deviceButtons = themePreviewModal.querySelectorAll('.preview-device-btn');
+        var currentPreviewSlug = '';
+
+        function buildPreviewUrl(path) {
+            var url = new URL(path, window.location.origin);
+            if (currentPreviewSlug) {
+                url.searchParams.set('preview_theme', currentPreviewSlug);
+            }
+            return url.toString();
+        }
+
+        function loadPreviewPage(path) {
+            if (!currentPreviewSlug) return;
+            var targetUrl = buildPreviewUrl(path);
+            if (previewSpinner) previewSpinner.style.display = 'block';
+            if (previewOpenTabBtn) previewOpenTabBtn.href = targetUrl;
+            if (previewIframe) {
+                previewIframe.src = targetUrl;
+            }
+        }
 
         themePreviewModal.addEventListener('show.bs.modal', function (event) {
             var button = event.relatedTarget;
             if (!button) return;
 
-            var slug = button.getAttribute('data-slug') || '';
-            var name = button.getAttribute('data-name') || slug;
-            var previewUrl = button.getAttribute('data-preview-url') || (window.location.origin + '/?preview_theme=' + slug);
+            currentPreviewSlug = button.getAttribute('data-slug') || '';
+            var name = button.getAttribute('data-name') || currentPreviewSlug;
 
             if (previewTitle) previewTitle.textContent = name;
-            if (previewSlugBadge) previewSlugBadge.textContent = slug;
-            if (previewOpenTabBtn) previewOpenTabBtn.href = previewUrl;
+            if (previewSlugBadge) previewSlugBadge.textContent = currentPreviewSlug;
+            if (previewPageSelect) previewPageSelect.value = '/';
 
             // Reset container width to desktop
             if (previewContainer) previewContainer.style.width = '100%';
@@ -1032,12 +1065,21 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             });
 
-            // Show spinner & load iframe
-            if (previewSpinner) previewSpinner.style.display = 'block';
-            if (previewIframe) {
-                previewIframe.src = previewUrl;
-            }
+            loadPreviewPage('/');
         });
+
+        if (previewPageSelect) {
+            previewPageSelect.addEventListener('change', function () {
+                loadPreviewPage(this.value);
+            });
+        }
+
+        if (previewReloadBtn) {
+            previewReloadBtn.addEventListener('click', function () {
+                var selectedPath = previewPageSelect ? previewPageSelect.value : '/';
+                loadPreviewPage(selectedPath);
+            });
+        }
 
         themePreviewModal.addEventListener('hidden.bs.modal', function () {
             // Free memory and prevent ongoing playback
@@ -1045,6 +1087,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 previewIframe.src = 'about:blank';
             }
             if (previewSpinner) previewSpinner.style.display = 'block';
+            // Clear the preview cookie so regular browsing outside the modal is unaffected
+            document.cookie = "preview_theme=; path=/; max-age=0;";
         });
 
         // Responsive Device Switching

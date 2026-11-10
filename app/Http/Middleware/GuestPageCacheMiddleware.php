@@ -46,8 +46,9 @@ class GuestPageCacheMiddleware
             return $next($request);
         }
 
-        // 3. Skip if request has sensitive authentication or transaction query parameters
-        if ($request->hasAny(['token', 'code', 'auth', 'redirect', 'session', 'signature', 'state'])) {
+        // 3. Skip if request has sensitive authentication or transaction query parameters, or live theme preview
+        if ($request->hasAny(['token', 'code', 'auth', 'redirect', 'session', 'signature', 'state', 'preview_theme', 'theme_preview', 'preview'])
+            || $request->hasCookie('preview_theme')) {
             return $next($request);
         }
 

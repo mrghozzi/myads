@@ -154,7 +154,9 @@ Route::get('/', function () {
         return redirect('/install');
     }
 
-    if (auth()->check()) {
+    $isPreviewing = request()->has('preview_theme') || request()->has('theme_preview') || request()->has('preview') || request()->cookie('preview_theme');
+
+    if (auth()->check() && !$isPreviewing) {
         return redirect()->route('portal.index');
     }
 

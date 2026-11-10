@@ -144,11 +144,14 @@
   * Added "Upload Theme" modal (`#uploadThemeModal`) with ZIP file selection, CSRF protection, and real-time validation via `POST /admin/themes/upload`.
   * Built Live Theme Responsive Preview mode (`#themePreviewModal`) featuring interactive device viewport toggles (**Desktop 100%**, **Tablet 768px**, **Mobile 375px**) and external tab preview without activating the theme.
   * Added administrative preview query parameter `?preview_theme=<slug>` and shortcut route `GET /admin/themes/preview/{slug}`.
+  * Implemented `ThemePreviewMiddleware` and dynamic request/cookie resolution (`ThemeServiceProvider::applyTheme()`), ensuring live preview loads the target previewed theme seamlessly across internal page navigation without losing state or caching conflicts (`GuestPageCacheMiddleware`).
+  * Enhanced root landing page route `GET /` to permit authenticated administrators to preview the target theme landing view (`view('theme::welcome')`) rather than redirecting to `/portal`.
+  * Added real-time page switcher dropdown (Landing `/`, Portal `/portal`, Forum `/forum`, Video `/video`, Store `/store`, Directory `/directory`) and a 1-click reload button inside the Live Preview modal toolbar.
   * Displayed parent/child inheritance badges (`Inherits from: {parent}`) and template counter tokens on theme cards.
   * Connected theme deletion to `#extensionDeleteModal` via `POST /admin/themes/delete`.
 * **Developer Documentation & Automated Test Coverage (`Documents/THEME_GUIDE.md`, `AdvancedThemeSystemTest.php`)**:
   * Completely updated `Documents/THEME_GUIDE.md` detailing the modern parent/child inheritance system, manifest specification, CLI tools, lifecycle hooks, and security standards.
-  * Created dedicated test suite `tests/Feature/Themes/AdvancedThemeSystemTest.php` with 9 feature tests and 44 assertions covering scaffolding, inheritance, syntax validation, deletion safeguards, archive hardening, and admin endpoints (100% pass rate).
+  * Created dedicated test suite `tests/Feature/Themes/AdvancedThemeSystemTest.php` with 9 feature tests and 54 assertions covering scaffolding, inheritance, syntax validation, deletion safeguards, archive hardening, live preview routing, cookie persistence, and admin endpoints (100% pass rate).
 
 ---
 

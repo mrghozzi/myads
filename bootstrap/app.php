@@ -77,6 +77,7 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\BlockBannedIp::class,
             \App\Http\Middleware\SetLocale::class,
             \App\Http\Middleware\CheckForMaintenanceMode::class,
+            \App\Http\Middleware\ThemePreviewMiddleware::class,
             \App\Http\Middleware\GuestPageCacheMiddleware::class,
             \App\Http\Middleware\UpdateUserOnline::class,
             \App\Http\Middleware\TrackMemberSecuritySession::class,

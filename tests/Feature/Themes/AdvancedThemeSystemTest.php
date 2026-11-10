@@ -291,11 +291,30 @@ class AdvancedThemeSystemTest extends TestCase
         // 1. Preview redirect endpoint
         $response = $this->actingAs($this->admin)
             ->withSession(['admin_password_confirmed_at' => time()])
-            ->get('/admin/themes/preview/default');
+            ->get('/admin/themes/preview/bootstrap-sample');
 
-        $response->assertRedirect(url('/?preview_theme=default'));
+        $response->assertRedirect(url('/?preview_theme=bootstrap-sample'));
 
-        // 2. Admin themes index page shows preview buttons and modals
+        // 2. Landing page with preview_theme does NOT redirect authenticated admin to portal
+        $landingResponse = $this->actingAs($this->admin)->get('/?preview_theme=bootstrap-sample');
+        $landingResponse->assertStatus(200);
+        $landingResponse->assertCookie('preview_theme', 'bootstrap-sample');
+        $this->assertEquals('bootstrap-sample', $GLOBALS['MYADS_ACTIVE_THEME']);
+
+        // 3. Portal with preview cookie retains preview theme
+        $portalResponse = $this->actingAs($this->admin)
+            ->withCookie('preview_theme', 'bootstrap-sample')
+            ->get('/portal');
+        $portalResponse->assertStatus(200);
+        $this->assertEquals('bootstrap-sample', $GLOBALS['MYADS_ACTIVE_THEME']);
+
+        // 4. Clearing preview resets cookie
+        $clearResponse = $this->actingAs($this->admin)
+            ->withCookie('preview_theme', 'bootstrap-sample')
+            ->get('/?preview_theme=clear');
+        $clearResponse->assertCookieExpired('preview_theme');
+
+        // 5. Admin themes index page shows preview buttons, page selector and reload controls
         $response = $this->actingAs($this->admin)
             ->withSession(['admin_password_confirmed_at' => time()])
             ->get('/admin/themes');
@@ -304,6 +323,8 @@ class AdvancedThemeSystemTest extends TestCase
         $response->assertSee('id="uploadThemeModal"', false);
         $response->assertSee('id="createThemeModal"', false);
         $response->assertSee('id="themePreviewModal"', false);
+        $response->assertSee('id="preview-page-select"', false);
+        $response->assertSee('id="preview-reload-btn"', false);
         $response->assertSee('btn-theme-live-preview', false);
     }
 

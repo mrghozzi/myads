@@ -37,24 +37,48 @@ namespace App\Providers {
                 // Fallback to default
             }
 
-            // Support live previewing other themes when requested via query, request, or $_GET
-            $previewTheme = null;
-            if (isset($_GET['preview_theme']) && is_string($_GET['preview_theme'])) {
-                $previewTheme = trim($_GET['preview_theme']);
-            } elseif (isset($_GET['theme_preview']) && isset($_GET['theme']) && is_string($_GET['theme'])) {
-                $previewTheme = trim($_GET['theme']);
-            } elseif (isset($_REQUEST['preview_theme']) && is_string($_REQUEST['preview_theme'])) {
-                $previewTheme = trim($_REQUEST['preview_theme']);
+            // Support live previewing other themes when requested via query, cookie, or container request
+            $previewTheme = self::resolvePreviewTheme();
+
+            if ($previewTheme) {
+                $activeTheme = $previewTheme;
             }
 
-            if (!$previewTheme) {
+            // Safe fallback if active theme directory is missing
+            if (!is_dir(base_path("themes/{$activeTheme}")) && is_dir(base_path("themes/default"))) {
+                $activeTheme = 'default';
+            }
+
+            self::applyTheme($activeTheme);
+        }
+
+        /**
+         * Resolve any requested preview theme from query, cookie, or container request.
+         */
+        public static function resolvePreviewTheme(): ?string
+        {
+            $candidate = null;
+
+            if (isset($_GET['preview_theme']) && is_string($_GET['preview_theme'])) {
+                $candidate = trim($_GET['preview_theme']);
+            } elseif (isset($_GET['theme_preview']) && isset($_GET['theme']) && is_string($_GET['theme'])) {
+                $candidate = trim($_GET['theme']);
+            } elseif (isset($_REQUEST['preview_theme']) && is_string($_REQUEST['preview_theme'])) {
+                $candidate = trim($_REQUEST['preview_theme']);
+            } elseif (isset($_COOKIE['preview_theme']) && is_string($_COOKIE['preview_theme'])) {
+                $candidate = trim($_COOKIE['preview_theme']);
+            }
+
+            if (!$candidate) {
                 try {
-                    if ($this->app->bound('request')) {
-                        $req = $this->app->make('request');
-                        if ($req && $req->has('preview_theme')) {
-                            $previewTheme = (string) $req->query('preview_theme', $req->input('preview_theme'));
-                        } elseif ($req && $req->has('theme_preview') && $req->has('theme')) {
-                            $previewTheme = (string) $req->query('theme', $req->input('theme'));
+                    if (app()->bound('request')) {
+                        $req = request();
+                        if ($req->has('preview_theme')) {
+                            $candidate = (string) $req->query('preview_theme', $req->input('preview_theme'));
+                        } elseif ($req->has('theme_preview') && $req->has('theme')) {
+                            $candidate = (string) $req->query('theme', $req->input('theme'));
+                        } elseif ($req->cookie('preview_theme')) {
+                            $candidate = (string) $req->cookie('preview_theme');
                         }
                     }
                 } catch (\Throwable $e) {
@@ -62,28 +86,40 @@ namespace App\Providers {
                 }
             }
 
-            // Validate requested preview theme
-            if ($previewTheme && preg_match('/^[a-z0-9\-_]+$/i', $previewTheme) && is_dir(base_path("themes/{$previewTheme}/views"))) {
-                $activeTheme = $previewTheme;
+            if ($candidate && preg_match('/^[a-z0-9\-_]+$/i', $candidate)) {
+                $clean = strtolower($candidate);
+                if (is_dir(base_path("themes/{$clean}")) && File::exists(base_path("themes/{$clean}/theme.json"))) {
+                    return $clean;
+                }
             }
 
-            // Safe fallback if active theme directory is missing
-            if (!is_dir(base_path("themes/{$activeTheme}/views")) && is_dir(base_path("themes/default/views"))) {
-                $activeTheme = 'default';
+            return null;
+        }
+
+        /**
+         * Apply and bind a theme dynamically to Laravel's View finder and globals.
+         */
+        public static function applyTheme(string $activeTheme): void
+        {
+            $cleanTheme = trim($activeTheme);
+            $themePath = base_path("themes/{$cleanTheme}");
+
+            if (!is_dir($themePath) || !File::exists("{$themePath}/theme.json")) {
+                $cleanTheme = 'default';
+                $themePath = base_path("themes/default");
             }
 
-            $GLOBALS['MYADS_ACTIVE_THEME'] = $activeTheme;
+            $GLOBALS['MYADS_ACTIVE_THEME'] = $cleanTheme;
 
-            $themePath = base_path("themes/{$activeTheme}");
             $viewsPath = "{$themePath}/views";
             $manifestFile = "{$themePath}/theme.json";
             $themeData = File::exists($manifestFile) ? (json_decode(File::get($manifestFile), true) ?: []) : [];
 
             // Parent/Child Theme Inheritance
             $parentTheme = null;
-            if (!empty($themeData['parent']) && is_string($themeData['parent']) && $themeData['parent'] !== $activeTheme) {
+            if (!empty($themeData['parent']) && is_string($themeData['parent']) && $themeData['parent'] !== $cleanTheme) {
                 $candidateParent = trim($themeData['parent']);
-                if (is_dir(base_path("themes/{$candidateParent}/views"))) {
+                if (is_dir(base_path("themes/{$candidateParent}"))) {
                     $parentTheme = $candidateParent;
                 }
             }
@@ -103,14 +139,26 @@ namespace App\Providers {
             }
 
             // 3. Default theme fallback (Priority 3)
-            if ($activeTheme !== 'default' && $parentTheme !== 'default' && is_dir(base_path("themes/default/views"))) {
+            if ($cleanTheme !== 'default' && $parentTheme !== 'default' && is_dir(base_path("themes/default/views"))) {
                 $themePaths[] = base_path("themes/default/views");
             }
 
             View::replaceNamespace('theme', $themePaths);
 
+            // Preserve top precedence for any active plugins that registered view overrides for 'theme'
+            $pluginsDir = base_path('plugins');
+            if (File::isDirectory($pluginsDir)) {
+                $activePluginDirs = \Illuminate\Support\Facades\Cache::get('myads_active_plugin_dirs', []);
+                foreach ($activePluginDirs as $pDir) {
+                    $override = $pluginsDir . '/' . $pDir . '/views/overrides/theme';
+                    if (File::isDirectory($override)) {
+                        View::prependNamespace('theme', $override);
+                    }
+                }
+            }
+
             // Share theme data globally
-            View::share('theme_name', $activeTheme);
+            View::share('theme_name', $cleanTheme);
             View::share('theme_path', $themePath);
             View::share('parent_theme', $parentTheme);
             View::share('theme_manifest', $themeData);
@@ -119,54 +167,6 @@ namespace App\Providers {
 }
 
 namespace {
-    // Global Helper for Theme Assets with Child/Parent inheritance
-    if (!function_exists('theme_asset')) {
-        function theme_asset($path)
-        {
-            $cleanPath = ltrim((string) $path, '/\\');
-            $activeTheme = $GLOBALS['MYADS_ACTIVE_THEME'] ?? null;
-
-            if (!$activeTheme) {
-                try {
-                    if (isset($_GET['preview_theme']) && is_dir(base_path('themes/' . $_GET['preview_theme']))) {
-                        $activeTheme = (string) $_GET['preview_theme'];
-                    } elseif (\Illuminate\Support\Facades\Schema::hasTable('setting')) {
-                        $setting = \App\Models\Setting::first();
-                        if ($setting && !empty($setting->styles)) {
-                            $activeTheme = $setting->styles;
-                        }
-                    }
-                } catch (\Throwable $e) {
-                    // Fallback to default
-                }
-            }
-
-            $activeTheme = $activeTheme ?: 'default';
-            $parentTheme = $GLOBALS['MYADS_PARENT_THEME'] ?? null;
-
-            // Check if active theme has the asset physically in public/themes/{activeTheme}/assets/ or themes/{activeTheme}/assets/
-            if (file_exists(public_path("themes/{$activeTheme}/assets/{$cleanPath}")) || file_exists(base_path("themes/{$activeTheme}/assets/{$cleanPath}"))) {
-                return asset("themes/{$activeTheme}/assets/{$cleanPath}");
-            }
-
-            // Check parent theme asset if defined
-            if (!empty($parentTheme)) {
-                if (file_exists(public_path("themes/{$parentTheme}/assets/{$cleanPath}")) || file_exists(base_path("themes/{$parentTheme}/assets/{$cleanPath}"))) {
-                    return asset("themes/{$parentTheme}/assets/{$cleanPath}");
-                }
-            }
-
-            // Check default theme asset as ultimate fallback
-            if ($activeTheme !== 'default' && $parentTheme !== 'default') {
-                if (file_exists(public_path("themes/default/assets/{$cleanPath}")) || file_exists(base_path("themes/default/assets/{$cleanPath}"))) {
-                    return asset("themes/default/assets/{$cleanPath}");
-                }
-            }
-
-            return asset("themes/{$activeTheme}/assets/{$cleanPath}");
-        }
-    }
-
     // Global Helper for Admin Assets
     if (!function_exists('admin_asset')) {
         function admin_asset($path)
