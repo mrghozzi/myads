@@ -187,6 +187,76 @@ class FileUploadSecurityService
     }
 
     /**
+     * Validate an uploaded theme ZIP package against path traversal, forbidden files, and schema.
+     *
+     * @param string $zipFilePath
+     * @return array{valid: bool, error: ?string, manifest: ?array}
+     */
+    public function validateThemeArchive(string $zipFilePath): array
+    {
+        if (!file_exists($zipFilePath) || !is_readable($zipFilePath)) {
+            return ['valid' => false, 'error' => 'messages.theme_zip_open_failed', 'manifest' => null];
+        }
+
+        $zip = new ZipArchive();
+        $openResult = $zip->open($zipFilePath, ZipArchive::CHECKCONS);
+
+        if ($openResult !== true) {
+            return ['valid' => false, 'error' => 'messages.theme_zip_open_failed', 'manifest' => null];
+        }
+
+        $manifestContent = null;
+        $manifestPath = null;
+        $totalFiles = $zip->numFiles;
+
+        for ($i = 0; $i < $totalFiles; $i++) {
+            $filename = $zip->getNameIndex($i);
+
+            // Path Traversal Protection
+            if (str_contains($filename, '..') || str_starts_with($filename, '/') || str_starts_with($filename, '\\')) {
+                $zip->close();
+                Log::warning("Security Alert: Malicious path traversal entry in theme zip: {$filename}");
+                return ['valid' => false, 'error' => 'messages.theme_zip_malicious_path', 'manifest' => null];
+            }
+
+            // Forbidden executable extensions protection
+            $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+            if (in_array($ext, self::FORBIDDEN_EXTENSIONS, true)) {
+                $zip->close();
+                Log::warning("Security Alert: Forbidden executable file in theme zip: {$filename}");
+                return ['valid' => false, 'error' => 'messages.theme_zip_forbidden_file', 'manifest' => null];
+            }
+
+            // Check for theme.json (either root or exactly 1 level down)
+            if (basename($filename) === 'theme.json') {
+                $depth = substr_count(trim($filename, '/\\'), '/');
+                if ($depth <= 1 && $manifestContent === null) {
+                    $manifestPath = $filename;
+                    $manifestContent = $zip->getFromIndex($i);
+                }
+            }
+        }
+
+        $zip->close();
+
+        if (empty($manifestContent)) {
+            return ['valid' => false, 'error' => 'messages.theme_zip_structure_invalid', 'manifest' => null];
+        }
+
+        $manifestData = json_decode($manifestContent, true);
+        if (!is_array($manifestData) || empty($manifestData['slug'])) {
+            return ['valid' => false, 'error' => 'messages.theme_manifest_slug_required', 'manifest' => null];
+        }
+
+        // Validate slug characters (alphanumeric and hyphens only)
+        if (!preg_match('/^[a-z0-9\-_]+$/i', $manifestData['slug'])) {
+            return ['valid' => false, 'error' => 'messages.theme_invalid_slug_characters', 'manifest' => null];
+        }
+
+        return ['valid' => true, 'error' => null, 'manifest' => $manifestData];
+    }
+
+    /**
      * Sanitize an SVG string by stripping dangerous scripts, event handlers, and external entities.
      *
      * @param string $svgContent

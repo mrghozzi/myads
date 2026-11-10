@@ -17,7 +17,7 @@
   * Created `SupportDeflectionService` with advanced Arabic and English text normalization (stripping tashkeel, normalizing alef/ya/ta-marbuta, lowercasing, and filtering conversational stop words).
   * Built real-time semantic & keyword relevance search scanning the 27 Help Center articles and verified solved support topics (`support_topics` with `is_solved = 1` or `best_reply_id`).
   * Added AJAX deflection endpoints in `SupportTicketController`, `SupportForumController`, and API routes.
-  * Designed reactive `@.superdesign` deflection suggestion cards in `themes/default/views/tickets/create.blade.php`, `themes/default/views/support/create.blade.php`, and `bootstrap-sample` theme templates with 350ms debouncing.
+  * Designed reactive `@.superdesign` deflection suggestion cards in `themes/default/views/tickets/create.blade.php` and `themes/default/views/support/create.blade.php` with 350ms debouncing.
 * **Cloudflare Turnstile CAPTCHA-Free Bot Defense (`app/Services/TurnstileService.php`, `/admin/security`, `AuthController.php`, `<x-turnstile />`)**:
   * Integrated Cloudflare Turnstile human verification into `SecuritySettings` (`turnstile_enabled`, `turnstile_site_key`, `turnstile_secret_key`, `turnstile_mode`, `turnstile_forms`).
   * Created `TurnstileService` with server-side API verification (`https://challenges.cloudflare.com/turnstile/v0/siteverify`) using `http_secure()` and test-token bypass support.
@@ -125,6 +125,30 @@
 * **Developer Documentation & Automated Test Coverage (`Documents/PLUGIN_GUIDE.md`, `LimitlessPluginSystemTest.php`)**:
   * Fully rewrote `Documents/PLUGIN_GUIDE.md` with complete directory schemas, hook catalogs, manifest specifications, view override blueprints, security guidelines, and an end-to-end tutorial.
   * Created dedicated test suite `tests/Feature/Plugins/LimitlessPluginSystemTest.php` with 4 feature tests and 17 assertions covering global hooks, Blade directives, syntax validation, and view overrides (100% pass rate).
+
+### Advanced, Secure & Hierarchical Theme Architecture Overhaul (`ThemeServiceProvider`, `ThemeManager`, `theme:create`, `Documents/THEME_GUIDE.md`)
+* **Hierarchical Parent/Child Theme Inheritance (`ThemeServiceProvider`, `theme.json`)**:
+  * Implemented declarative `"parent": "default"` inheritance in `theme.json`, eliminating the need for child themes to duplicate over 100 core Blade templates.
+  * Established multi-tier view resolution: Priority 1 = Active Child Theme (`themes/{child}/views`), Priority 2 = Parent Theme (`themes/{parent}/views`), Priority 3 = Core Fallback (`themes/default/views`), while preserving top precedence for plugin overrides prepended via `View::prependNamespace('theme', ...)`.
+  * Added multi-tier asset resolution in the global `theme_asset()` helper, automatically resolving static assets from active child theme $\rightarrow$ parent theme $\rightarrow$ core default assets.
+  * Added resilient safe-mode fallback to `default` if the configured active theme directory is missing, damaged, or corrupted.
+  * Shared `theme_name`, `theme_path`, `parent_theme`, and `theme_manifest` globally with all views.
+* **Enterprise-Grade Theme Security & Archive Hardening (`FileUploadSecurityService`, `ThemeManager`)**:
+  * Enhanced `FileUploadSecurityService` with `validateThemeArchive()`: enforcing strict directory traversal defense (`..`), blacklisting forbidden executable file extensions (`.exe`, `.sh`, `.bat`, `.cmd`, `.pif`, `.scr`, `.msi`, `.dll`), and verifying root `theme.json` structure.
+  * Added pre-activation static PHP syntax parsing in `ThemeManager::validateThemeSyntax()` utilizing `token_get_all(TOKEN_PARSE)` across all theme scripts, preventing White Screen of Death (WSOD) crashes by rejecting activation of broken code.
+  * Integrated multi-layered deletion safeguards: prohibiting deletion of `default`, active themes, and parent themes upon which child themes depend.
+* **Instant CLI & Web UI Scaffolding (`theme:create`, `#createThemeModal`)**:
+  * Created new Artisan console command `php artisan theme:create <slug> [--name=] [--parent=default] [--author=] [--description=]` scaffolding complete theme folder, `theme.json`, starter CSS/JS assets, and view partial overrides.
+  * Built an interactive Admin Web UI modal `#createThemeModal` allowing administrators to scaffold starter child themes with a single click directly from `/admin/themes`.
+* **Administrative Hub Modernization & Live Responsive Preview (`/admin/themes`, `index.blade.php`, `routes/web.php`)**:
+  * Added "Upload Theme" modal (`#uploadThemeModal`) with ZIP file selection, CSRF protection, and real-time validation via `POST /admin/themes/upload`.
+  * Built Live Theme Responsive Preview mode (`#themePreviewModal`) featuring interactive device viewport toggles (**Desktop 100%**, **Tablet 768px**, **Mobile 375px**) and external tab preview without activating the theme.
+  * Added administrative preview query parameter `?preview_theme=<slug>` and shortcut route `GET /admin/themes/preview/{slug}`.
+  * Displayed parent/child inheritance badges (`Inherits from: {parent}`) and template counter tokens on theme cards.
+  * Connected theme deletion to `#extensionDeleteModal` via `POST /admin/themes/delete`.
+* **Developer Documentation & Automated Test Coverage (`Documents/THEME_GUIDE.md`, `AdvancedThemeSystemTest.php`)**:
+  * Completely updated `Documents/THEME_GUIDE.md` detailing the modern parent/child inheritance system, manifest specification, CLI tools, lifecycle hooks, and security standards.
+  * Created dedicated test suite `tests/Feature/Themes/AdvancedThemeSystemTest.php` with 9 feature tests and 44 assertions covering scaffolding, inheritance, syntax validation, deletion safeguards, archive hardening, and admin endpoints (100% pass rate).
 
 ---
 

@@ -6463,6 +6463,78 @@ class AdminController extends Controller
         }
     }
 
+    public function uploadTheme(Request $request, ThemeManager $themeManager)
+    {
+        $request->validate([
+            'theme_zip' => 'required|file|mimes:zip',
+        ]);
+
+        $this->maintenanceMode->enable(Auth::user(), 'theme_upload');
+        try {
+            $result = $themeManager->install($request->file('theme_zip'));
+
+            if ($result === true) {
+                $this->maintenanceMode->disable(Auth::user(), 'theme_upload_success');
+                return redirect()->back()->with('success', __('messages.theme_installed_successfully'));
+            }
+
+            $this->maintenanceMode->disable(Auth::user(), 'theme_upload_failed');
+            return redirect()->back()->with('error', $result);
+        } catch (\Throwable $e) {
+            $this->maintenanceMode->disable(Auth::user(), 'theme_upload_error');
+            report($e);
+            return redirect()->back()->with('error', __('messages.error_occurred'));
+        }
+    }
+
+    public function deleteTheme(Request $request, ThemeManager $themeManager)
+    {
+        $request->validate(['slug' => 'required|string']);
+
+        $result = $themeManager->delete($request->slug);
+
+        if ($result === true) {
+            return redirect()->back()->with('success', __('messages.theme_deleted_successfully'));
+        }
+
+        return redirect()->back()->with('error', is_string($result) ? $result : __('messages.theme_delete_failed'));
+    }
+
+    public function createTheme(Request $request, ThemeManager $themeManager)
+    {
+        $request->validate([
+            'name' => 'required|string|max:100',
+            'slug' => 'nullable|string|max:50|regex:/^[a-zA-Z0-9_\-]+$/',
+            'parent' => 'nullable|string|max:50',
+            'description' => 'nullable|string|max:255',
+            'author' => 'nullable|string|max:100',
+        ]);
+
+        $result = $themeManager->createStarterTheme([
+            'name' => $request->input('name'),
+            'slug' => $request->input('slug'),
+            'parent' => $request->input('parent') ?: 'default',
+            'description' => $request->input('description'),
+            'author' => $request->input('author') ?: (Auth::user() ? Auth::user()->username : 'MYADS'),
+        ]);
+
+        if (!empty($result['success'])) {
+            return redirect()->back()->with('success', __('messages.theme_created_successfully', ['slug' => $result['slug']]));
+        }
+
+        return redirect()->back()->with('error', $result['message'] ?? __('messages.error_occurred'));
+    }
+
+    public function previewTheme($slug, ThemeManager $themeManager)
+    {
+        $themeDir = $themeManager->findDirectoryBySlug($slug);
+        if (!$themeDir) {
+            return redirect()->route('admin.themes')->with('error', __('messages.extension_not_installed'));
+        }
+
+        return redirect()->to(url('/?preview_theme=' . $slug));
+    }
+
 
     private function validatedBannerSize(null|string|int $value): string
     {

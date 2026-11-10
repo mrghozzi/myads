@@ -49,7 +49,7 @@
                             <p class="extension-hub__hero-desc">{{ __('messages.themes_desc') }}</p>
                         </div>
                         <div class="col-xl-5 text-xl-end">
-                            <div class="d-flex flex-column flex-sm-row align-items-xl-end justify-content-xl-end gap-2">
+                            <div class="d-flex flex-column flex-sm-row align-items-xl-end justify-content-xl-end gap-2 flex-wrap">
                                 <div class="extension-hub__hero-panel">
                                     <span class="extension-hub__hero-panel-icon">
                                         <i class="feather-star"></i>
@@ -59,6 +59,14 @@
                                         <span class="extension-hub__hero-panel-value" id="hero-current-theme-name">{{ $activeTheme['name'] ?? __('messages.unknown') }}</span>
                                     </span>
                                 </div>
+                                <button type="button" class="btn btn-light rounded-pill px-3 py-2 shadow-sm d-inline-flex align-items-center gap-2 fw-semibold text-primary" data-bs-toggle="modal" data-bs-target="#uploadThemeModal">
+                                    <i class="feather-upload-cloud"></i>
+                                    <span>{{ __('messages.upload_theme') }}</span>
+                                </button>
+                                <button type="button" class="btn btn-light rounded-pill px-3 py-2 shadow-sm d-inline-flex align-items-center gap-2 fw-semibold text-primary" data-bs-toggle="modal" data-bs-target="#createThemeModal">
+                                    <i class="feather-plus-circle"></i>
+                                    <span>{{ __('messages.create_starter_theme') }}</span>
+                                </button>
                                 <a id="hero-theme-customizer-btn" href="{{ route('admin.themes.customizer', ['theme' => $activeTheme['slug'] ?? 'default']) }}" class="btn btn-light rounded-pill px-3 py-2 shadow-sm d-inline-flex align-items-center gap-2 fw-semibold text-primary">
                                     <i class="fa-solid fa-wand-magic-sparkles"></i>
                                     <span>{{ __('messages.theme_customizer') ?? 'تخصيص القالب' }}</span>
@@ -201,6 +209,13 @@
                                                     {{ __('messages.active') }}
                                                 </span>
 
+                                                @if($theme['is_child'] ?? false)
+                                                    <span class="extension-hub__update-badge bg-info-subtle text-info border border-info-subtle d-inline-flex align-items-center gap-1" title="{{ __('messages.theme_inherits_from', ['parent' => $theme['parent_name'] ?? $theme['parent']]) }}">
+                                                        <i class="feather-git-merge"></i>
+                                                        {{ __('messages.child_theme') }} ({{ $theme['parent_name'] ?? $theme['parent'] }})
+                                                    </span>
+                                                @endif
+
                                                 @if($themeUpdate)
                                                     <span class="extension-hub__update-badge">
                                                         <i class="feather-arrow-up-circle"></i>
@@ -240,6 +255,10 @@
                                                 <i class="feather-user"></i>
                                                 {{ __('messages.by') }} {{ $themeAuthor }}
                                             </span>
+                                            <span class="extension-hub__token" title="Template Files">
+                                                <i class="feather-file-text"></i>
+                                                {{ $theme['template_count'] ?? 0 }} {{ __('messages.templates') ?? 'views' }}
+                                            </span>
                                             @if(!empty($theme['min_myads']))
                                                 <span class="extension-hub__token">
                                                     <i class="feather-shield"></i>
@@ -266,6 +285,47 @@
                                                 <i class="feather-info"></i>
                                                 <span>{{ __('messages.details') ?? 'Details' }}</span>
                                             </button>
+
+                                            <button
+                                                type="button"
+                                                class="btn-extension-glass btn-extension-glass--primary btn-theme-live-preview"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#themePreviewModal"
+                                                data-slug="{{ $theme['slug'] }}"
+                                                data-name="{{ $theme['name'] }}"
+                                                data-preview-url="{{ url('/?preview_theme=' . $theme['slug']) }}"
+                                                title="{{ __('messages.live_preview') }}"
+                                            >
+                                                <i class="feather-eye"></i>
+                                                <span>{{ __('messages.preview') }}</span>
+                                            </button>
+
+                                            @if($theme['is_active'])
+                                                <a href="{{ route('admin.themes.customizer', ['theme' => $theme['slug']]) }}" class="btn-extension-glass btn-extension-glass--primary" title="{{ __('messages.customize') }}">
+                                                    <i class="feather-sliders"></i>
+                                                    <span>{{ __('messages.customize') }}</span>
+                                                </a>
+                                            @endif
+
+                                            @if(!$theme['is_active'] && $theme['slug'] !== 'default')
+                                                <button
+                                                    type="button"
+                                                    class="btn-extension-glass btn-extension-glass--danger btn-theme-delete"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#extensionDeleteModal"
+                                                    data-action="{{ route('admin.themes.delete') }}"
+                                                    data-slug="{{ $theme['slug'] }}"
+                                                    data-name="{{ $theme['name'] }}"
+                                                    data-identifier="{{ $theme['slug'] }}"
+                                                    data-warning="{{ __('messages.delete_theme_warning') }}"
+                                                    data-is-active="{{ $theme['is_active'] ? '1' : '0' }}"
+                                                    data-active-error="{{ __('messages.theme_delete_active_forbidden') }}"
+                                                    title="{{ __('messages.delete') }}"
+                                                >
+                                                    <i class="feather-trash-2"></i>
+                                                    <span>{{ __('messages.delete') }}</span>
+                                                </button>
+                                            @endif
 
                                             @if($themeUpdate && !empty($themeUpdate['changelog']))
                                                 <button
@@ -351,7 +411,7 @@
 @endsection
 
 @section('modals')
-@php($showExtensionDeleteModal = false)
+@php($showExtensionDeleteModal = true)
 @include('admin::admin.partials.extension_hub_modal_scripts')
 
 <div class="modal fade" id="themeDetailsModal" tabindex="-1" aria-hidden="true">
@@ -425,6 +485,130 @@
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Upload Theme Modal -->
+<div class="modal fade" id="uploadThemeModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
+            <div class="modal-header border-0 pb-0 pt-4 px-4">
+                <h5 class="modal-title fw-bold fs-18 text-dark">{{ __('messages.upload_theme') }}</h5>
+                <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ route('admin.themes.upload') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <div class="modal-body p-4">
+                    <div class="alert alert-info mb-4">
+                        <i class="feather-info me-2"></i> {{ __('messages.upload_theme_info') }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold text-dark">{{ __('messages.theme_zip_file') }}</label>
+                        <input type="file" name="theme_zip" class="form-control" accept=".zip" required>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0 pb-4 px-4">
+                    <button type="button" class="btn btn-light fw-bold px-4 py-2" data-bs-dismiss="modal" style="border-radius: 10px;">{{ __('messages.cancel') }}</button>
+                    <button type="submit" class="btn btn-primary fw-bold px-4 py-2 shadow-sm" style="border-radius: 10px;">
+                        <i class="feather-upload-cloud me-2"></i>{{ __('messages.upload_theme') }}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Create Starter Theme Modal -->
+<div class="modal fade" id="createThemeModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
+            <div class="modal-header border-0 pb-0 pt-4 px-4">
+                <h5 class="modal-title fw-bold fs-18 text-dark">{{ __('messages.create_starter_theme') }}</h5>
+                <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ route('admin.themes.create') }}" method="POST">
+                @csrf
+                <div class="modal-body p-4">
+                    <p class="text-muted small mb-4">{{ __('messages.create_starter_theme_desc') }}</p>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold text-dark">{{ __('messages.name') }} <span class="text-danger">*</span></label>
+                        <input type="text" name="name" class="form-control" placeholder="e.g. Modern Dark" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold text-dark">{{ __('messages.slug') }}</label>
+                        <input type="text" name="slug" class="form-control" placeholder="e.g. modern-dark (optional)">
+                        <small class="text-muted">Alphanumeric characters and dashes only.</small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold text-dark">{{ __('messages.parent_theme') }}</label>
+                        <select name="parent" class="form-select">
+                            @foreach($themes as $candidateParent)
+                                @if(!($candidateParent['is_child'] ?? false))
+                                    <option value="{{ $candidateParent['slug'] }}" {{ $candidateParent['slug'] === 'default' ? 'selected' : '' }}>
+                                        {{ $candidateParent['name'] }} ({{ $candidateParent['slug'] }})
+                                    </option>
+                                @endif
+                            @endforeach
+                        </select>
+                        <small class="text-muted">Child themes inherit all templates and assets, only overriding customized files.</small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold text-dark">{{ __('messages.description') }}</label>
+                        <textarea name="description" class="form-control" rows="2" placeholder="Theme description..."></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold text-dark">{{ __('messages.author') }}</label>
+                        <input type="text" name="author" class="form-control" value="{{ auth()->user()->username ?? 'MYADS' }}">
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0 pb-4 px-4">
+                    <button type="button" class="btn btn-light fw-bold px-4 py-2" data-bs-dismiss="modal" style="border-radius: 10px;">{{ __('messages.cancel') }}</button>
+                    <button type="submit" class="btn btn-primary fw-bold px-4 py-2 shadow-sm" style="border-radius: 10px;">
+                        <i class="feather-plus-circle me-2"></i>{{ __('messages.create_starter_theme') }}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Theme Live Preview Modal -->
+<div class="modal fade" id="themePreviewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen">
+        <div class="modal-content border-0 bg-dark text-white">
+            <div class="modal-header border-bottom border-secondary py-2 px-4 bg-dark">
+                <div class="d-flex align-items-center gap-3">
+                    <h6 class="modal-title fw-bold mb-0 text-white" id="theme-preview-modal-title">Live Preview</h6>
+                    <span class="badge bg-primary" id="theme-preview-modal-slug"></span>
+                </div>
+                <div class="d-flex align-items-center gap-2 mx-auto" id="preview-viewport-controls">
+                    <button type="button" class="btn btn-sm btn-outline-light active preview-device-btn" data-width="100%" title="{{ __('messages.device_desktop') }}">
+                        <i class="feather-monitor"></i> <span class="d-none d-md-inline ms-1">{{ __('messages.device_desktop') }}</span>
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-light preview-device-btn" data-width="768px" title="{{ __('messages.device_tablet') }}">
+                        <i class="feather-tablet"></i> <span class="d-none d-md-inline ms-1">{{ __('messages.device_tablet') }}</span>
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-light preview-device-btn" data-width="375px" title="{{ __('messages.device_mobile') }}">
+                        <i class="feather-smartphone"></i> <span class="d-none d-md-inline ms-1">{{ __('messages.device_mobile') }}</span>
+                    </button>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                    <a href="#" target="_blank" class="btn btn-sm btn-outline-light" id="preview-open-tab-btn" title="{{ __('messages.open_in_new_tab') }}">
+                        <i class="feather-external-link"></i> <span class="d-none d-md-inline ms-1">{{ __('messages.open_in_new_tab') }}</span>
+                    </a>
+                    <button type="button" class="btn-close btn-close-white shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+            </div>
+            <div class="modal-body p-0 d-flex justify-content-center align-items-center bg-black position-relative" style="overflow: hidden;">
+                <div id="preview-spinner" class="position-absolute top-50 start-50 translate-middle text-center text-white" style="z-index: 10;">
+                    <div class="spinner-border text-primary" role="status"></div>
+                    <div class="mt-2 small opacity-75">Loading Theme Preview...</div>
+                </div>
+                <div id="preview-frame-container" style="width: 100%; height: 100%; transition: width 0.3s ease; display: flex; justify-content: center;">
+                    <iframe id="theme-preview-iframe" src="" style="width: 100%; height: 100%; border: none; background: white;" onload="document.getElementById('preview-spinner').style.display='none';"></iframe>
                 </div>
             </div>
         </div>
@@ -814,6 +998,67 @@ document.addEventListener('DOMContentLoaded', function () {
             showExtensionToast(err.message || themeLabels.errorOccurred, 'danger');
         });
     });
+
+    // Theme Live Preview Modal Handlers
+    var themePreviewModal = document.getElementById('themePreviewModal');
+    if (themePreviewModal) {
+        var previewIframe = document.getElementById('theme-preview-iframe');
+        var previewContainer = document.getElementById('preview-frame-container');
+        var previewSpinner = document.getElementById('preview-spinner');
+        var previewTitle = document.getElementById('theme-preview-modal-title');
+        var previewSlugBadge = document.getElementById('theme-preview-modal-slug');
+        var previewOpenTabBtn = document.getElementById('preview-open-tab-btn');
+        var deviceButtons = themePreviewModal.querySelectorAll('.preview-device-btn');
+
+        themePreviewModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget;
+            if (!button) return;
+
+            var slug = button.getAttribute('data-slug') || '';
+            var name = button.getAttribute('data-name') || slug;
+            var previewUrl = button.getAttribute('data-preview-url') || (window.location.origin + '/?preview_theme=' + slug);
+
+            if (previewTitle) previewTitle.textContent = name;
+            if (previewSlugBadge) previewSlugBadge.textContent = slug;
+            if (previewOpenTabBtn) previewOpenTabBtn.href = previewUrl;
+
+            // Reset container width to desktop
+            if (previewContainer) previewContainer.style.width = '100%';
+            deviceButtons.forEach(function (btn) {
+                if (btn.getAttribute('data-width') === '100%') {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+
+            // Show spinner & load iframe
+            if (previewSpinner) previewSpinner.style.display = 'block';
+            if (previewIframe) {
+                previewIframe.src = previewUrl;
+            }
+        });
+
+        themePreviewModal.addEventListener('hidden.bs.modal', function () {
+            // Free memory and prevent ongoing playback
+            if (previewIframe) {
+                previewIframe.src = 'about:blank';
+            }
+            if (previewSpinner) previewSpinner.style.display = 'block';
+        });
+
+        // Responsive Device Switching
+        deviceButtons.forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                deviceButtons.forEach(function (b) { b.classList.remove('active'); });
+                btn.classList.add('active');
+                var targetWidth = btn.getAttribute('data-width') || '100%';
+                if (previewContainer) {
+                    previewContainer.style.width = targetWidth;
+                }
+            });
+        });
+    }
 });
 </script>
 

@@ -954,6 +954,10 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
 
     // Themes
     Route::get('/themes', [AdminController::class, 'themes'])->name('admin.themes');
+    Route::post('/themes/upload', [AdminController::class, 'uploadTheme'])->name('admin.themes.upload');
+    Route::post('/themes/delete', [AdminController::class, 'deleteTheme'])->name('admin.themes.delete');
+    Route::post('/themes/create', [AdminController::class, 'createTheme'])->name('admin.themes.create');
+    Route::get('/themes/preview/{slug}', [AdminController::class, 'previewTheme'])->name('admin.themes.preview');
     Route::get('/themes/customizer', [AdminController::class, 'themeCustomizer'])->name('admin.themes.customizer');
     Route::post('/themes/customizer', [AdminController::class, 'updateThemeCustomizer'])->name('admin.themes.customizer.update');
     Route::post('/themes/customizer/reset', [AdminController::class, 'resetThemeCustomizer'])->name('admin.themes.customizer.reset');
