@@ -37,6 +37,30 @@ class Status extends Model
     protected $table = 'status';
     public $timestamps = false;
 
+    protected static function booted(): void
+    {
+        static::created(function ($status) {
+            if (function_exists('do_action')) {
+                do_action('status_created', $status);
+                do_action('post_created', $status);
+            }
+        });
+
+        static::updated(function ($status) {
+            if (function_exists('do_action')) {
+                do_action('status_updated', $status);
+                do_action('post_updated', $status);
+            }
+        });
+
+        static::deleted(function ($status) {
+            if (function_exists('do_action')) {
+                do_action('status_deleted', $status);
+                do_action('post_deleted', $status);
+            }
+        });
+    }
+
     /**
      * Override scopeVisible to handle suspended product activity.
      */

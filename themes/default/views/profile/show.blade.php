@@ -276,6 +276,8 @@
     </div>
 </div>
 
+@action('user_profile_header', $user)
+
 @include('theme::profile.navigation')
 
 <style>
@@ -593,7 +595,7 @@
     </div>
 </div>
 
-
+@action('user_profile_content', $user)
 
 @endsection
 

@@ -2623,6 +2623,7 @@ return [
     'plugin_zip_malicious_path' => 'خطأ أمني: تحتوي حزمة ZIP على مسارات غير مصرح بها.',
     'plugin_zip_forbidden_file' => 'خطأ أمني: تحتوي حزمة ZIP على ملفات برمجية تنفيذية محظورة.',
     'plugin_invalid_slug_characters' => 'خطأ أمني: يحتوي معرّف الإضافة (slug) على رموز غير صالحة.',
+    'plugin_syntax_error' => 'خطأ أمني: تحتوي الإضافة ":plugin" على أخطاء برمجية في الصياغة (:error). تم إيقاف التفعيل لحماية استقرار المنصة.',
     'plugin_settings' => 'الإعدادات',
     'plugin_boot_error_alert' => 'واجهت الإضافة ":plugin" خطأً برمجياً وتم عزلها بأمان: :error',
     'plugin_zip_open_failed' => 'تعذر فتح ملف ZIP المرفوع.',

@@ -105,6 +105,7 @@
             <svg class="section-menu-item-icon icon-forum"><use xlink:href="#svg-forum"></use></svg>
             <p class="section-menu-item-text">{{ __('messages.forum') }}</p>
         </a>
+        @action('user_profile_navigation_tabs', $user, $selectedTab ?? request('tab', 'timeline'))
     </div>
     
     <div id="section-navigation-slider-controls" class="slider-controls">

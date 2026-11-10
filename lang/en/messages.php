@@ -2620,6 +2620,7 @@ return [
     'plugin_zip_malicious_path' => 'Security Error: The ZIP package contains dangerous path traversal entries.',
     'plugin_zip_forbidden_file' => 'Security Error: The ZIP package contains forbidden executable scripts.',
     'plugin_invalid_slug_characters' => 'Security Error: The plugin slug contains invalid characters.',
+    'plugin_syntax_error' => 'Security Error: Plugin ":plugin" contains PHP syntax errors (:error). Activation aborted to protect system stability.',
     'plugin_settings' => 'Settings',
     'plugin_boot_error_alert' => 'Plugin ":plugin" encountered an error and was safely isolated: :error',
     'plugin_zip_open_failed' => 'Failed to open the uploaded ZIP file.',

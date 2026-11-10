@@ -109,5 +109,6 @@
              @endauth
         </div>
     </div>
+    @action('post_card_options', $activity)
 </div>
 <div class="post-comment-list post-comment-list-{{ $relatedId }}"></div>

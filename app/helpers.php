@@ -173,3 +173,9 @@ if (!function_exists('csp_nonce')) {
         return '';
     }
 }
+
+// Ensure Hook helper functions and facade are always loaded
+if (!class_exists(\App\Helpers\Hooks::class, false)) {
+    require_once __DIR__ . '/Helpers/Hooks.php';
+}
+

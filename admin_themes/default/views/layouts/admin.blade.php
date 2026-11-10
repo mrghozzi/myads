@@ -77,6 +77,7 @@
         }
     </script>
     @stack('styles')
+    {!! \App\Helpers\Hooks::do_action('admin_head') !!}
 </head>
 <body data-dir="{{ $pageDirection }}" class="{{ $pageDirection }} admin-premium-shell">
     <nav class="nxl-navigation">

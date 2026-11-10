@@ -130,6 +130,14 @@ class PluginManager
             }
         }
 
+        // Security & Integrity: Validate PHP syntax of files before activation
+        $syntaxErrors = $this->validatePluginSyntax($pluginDir);
+        if (!empty($syntaxErrors)) {
+            $errDetail = implode(', ', $syntaxErrors);
+            $msg = __('messages.plugin_syntax_error', ['plugin' => $pluginData['name'] ?? $slug, 'error' => $errDetail]);
+            throw new \RuntimeException($msg !== 'messages.plugin_syntax_error' ? $msg : "Plugin [{$slug}] contains PHP syntax errors: {$errDetail}");
+        }
+
         // Run migrations if plugin has database/migrations directory
         $this->runMigrations($slug);
 
@@ -754,5 +762,51 @@ class PluginManager
 
             return $menus;
         });
+    }
+
+    /**
+     * Validate PHP syntax of plugin files to prevent parse error crashes.
+     *
+     * @param string $pluginDir
+     * @return array
+     */
+    public function validatePluginSyntax(string $pluginDir): array
+    {
+        $errors = [];
+        $filesToCheck = [];
+
+        foreach (['boot.php', 'routes.php', 'helpers.php', 'activate.php', 'deactivate.php', 'uninstall.php'] as $entry) {
+            $f = $pluginDir . '/' . $entry;
+            if (File::exists($f)) {
+                $filesToCheck[] = $f;
+            }
+        }
+
+        // Also check migrations and src recursively
+        foreach (['database/migrations', 'src'] as $sub) {
+            $path = $pluginDir . '/' . $sub;
+            if (File::isDirectory($path)) {
+                $files = File::allFiles($path);
+                foreach ($files as $file) {
+                    if ($file->getExtension() === 'php') {
+                        $filesToCheck[] = $file->getPathname();
+                    }
+                }
+            }
+        }
+
+        foreach ($filesToCheck as $filePath) {
+            try {
+                $code = File::get($filePath);
+                token_get_all($code, TOKEN_PARSE);
+            } catch (\ParseError $e) {
+                $relName = str_replace($pluginDir, '', $filePath);
+                $errors[] = basename($pluginDir) . $relName . ' (Line ' . $e->getLine() . '): ' . $e->getMessage();
+            } catch (\Throwable $e) {
+                // Ignore non-parse runtime issues
+            }
+        }
+
+        return $errors;
     }
 }

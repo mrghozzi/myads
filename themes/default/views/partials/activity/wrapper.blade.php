@@ -137,6 +137,8 @@
         </div>
         <!-- /WIDGET BOX STATUS CONTENT -->
 
+        @action('post_card_footer', $activity)
+
         <!-- CONTENT ACTIONS -->
         <div class="content-actions">
             <div class="content-action">
@@ -175,6 +177,7 @@
                     <p class="meta-line-text">0</p>
                 </div>
             </div>
+            @action('post_card_actions', $activity)
         </div>
         <!-- /CONTENT ACTIONS -->
     </div>

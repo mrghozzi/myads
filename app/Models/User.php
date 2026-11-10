@@ -68,6 +68,25 @@ class User extends Authenticatable
 
             $user->public_uid = self::generatePublicUid();
         });
+
+        static::created(function (self $user): void {
+            if (function_exists('do_action')) {
+                do_action('user_registered', $user);
+                do_action('after_user_register', $user);
+            }
+        });
+
+        static::updated(function (self $user): void {
+            if (function_exists('do_action')) {
+                do_action('user_updated', $user);
+            }
+        });
+
+        static::deleted(function (self $user): void {
+            if (function_exists('do_action')) {
+                do_action('user_deleted', $user);
+            }
+        });
     }
 
     public function sendPasswordResetNotification($token)

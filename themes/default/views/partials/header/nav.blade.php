@@ -29,6 +29,7 @@
     </a>
 
     <ul class="menu small">
+        @action('theme_sidebar_nav_start')
         <li class="menu-item {{ Request::is('portal*', 'tag*') ? 'active' : '' }}">
             <a class="menu-item-link text-tooltip-tfr" href="{{ url('/portal') }}" data-title="{{ __('messages.community') }}">
                 <svg class="menu-item-link-icon icon-newsfeed">
@@ -98,5 +99,6 @@
             </li>
         @endauth
 
+        @action('theme_sidebar_nav_end')
     </ul>
 </nav>

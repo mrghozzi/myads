@@ -1,5 +1,6 @@
 <nav id="navigation-widget" class="navigation-widget navigation-widget-desktop sidebar left hidden" data-simplebar>
     <ul class="menu">
+        @action('theme_sidebar_menu_start')
         <li class="menu-item {{ Request::is('portal*', 'tag*') ? 'active' : '' }}">
             <a class="menu-item-link text-tooltip-tfr" href="{{ url('/portal') }}">
                 <svg class="menu-item-link-icon icon-newsfeed">
@@ -115,7 +116,7 @@
             </a>
         </li>
         @endauth
-
+        @action('theme_sidebar_menu_end')
     </ul>
     <ul class="menu">
         @foreach($site_menus as $menu)
