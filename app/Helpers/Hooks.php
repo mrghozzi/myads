@@ -13,9 +13,9 @@ namespace App\Helpers {
          * @param string $hook
          * @param callable $callback
          * @param int $priority
-         * @param int $accepted_args
+         * @param int|null $accepted_args
          */
-        public static function add_action($hook, $callback, $priority = 10, $accepted_args = 1)
+        public static function add_action($hook, $callback, $priority = 10, $accepted_args = null)
         {
             static::$actions[$hook][$priority][] = [
                 'callback' => $callback,
@@ -35,7 +35,10 @@ namespace App\Helpers {
                 ksort(static::$actions[$hook]);
                 foreach (static::$actions[$hook] as $priority => $callbacks) {
                     foreach ($callbacks as $callback_data) {
-                        call_user_func_array($callback_data['callback'], array_slice($args, 0, $callback_data['accepted_args']));
+                        $callArgs = $callback_data['accepted_args'] !== null
+                            ? array_slice($args, 0, $callback_data['accepted_args'])
+                            : $args;
+                        call_user_func_array($callback_data['callback'], $callArgs);
                     }
                 }
             }
@@ -47,9 +50,9 @@ namespace App\Helpers {
          * @param string $hook
          * @param callable $callback
          * @param int $priority
-         * @param int $accepted_args
+         * @param int|null $accepted_args
          */
-        public static function add_filter($hook, $callback, $priority = 10, $accepted_args = 1)
+        public static function add_filter($hook, $callback, $priority = 10, $accepted_args = null)
         {
             static::$filters[$hook][$priority][] = [
                 'callback' => $callback,
@@ -71,7 +74,9 @@ namespace App\Helpers {
                 ksort(static::$filters[$hook]);
                 foreach (static::$filters[$hook] as $priority => $callbacks) {
                     foreach ($callbacks as $callback_data) {
-                        $args_for_callback = array_merge([$value], array_slice($args, 0, $callback_data['accepted_args'] - 1));
+                        $args_for_callback = $callback_data['accepted_args'] !== null
+                            ? array_merge([$value], array_slice($args, 0, max(0, $callback_data['accepted_args'] - 1)))
+                            : array_merge([$value], $args);
                         $value = call_user_func_array($callback_data['callback'], $args_for_callback);
                     }
                 }
@@ -213,7 +218,7 @@ namespace {
         /**
          * Global helper to add an action hook.
          */
-        function add_action($hook, $callback, $priority = 10, $accepted_args = 1)
+        function add_action($hook, $callback, $priority = 10, $accepted_args = null)
         {
             \App\Helpers\Hooks::add_action($hook, $callback, $priority, $accepted_args);
         }
@@ -233,7 +238,7 @@ namespace {
         /**
          * Global helper to add a filter hook.
          */
-        function add_filter($hook, $callback, $priority = 10, $accepted_args = 1)
+        function add_filter($hook, $callback, $priority = 10, $accepted_args = null)
         {
             \App\Helpers\Hooks::add_filter($hook, $callback, $priority, $accepted_args);
         }
