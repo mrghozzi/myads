@@ -6532,7 +6532,7 @@ class AdminController extends Controller
             return redirect()->route('admin.themes')->with('error', __('messages.extension_not_installed'));
         }
 
-        return redirect()->to(url('/?preview_theme=' . $slug));
+        return redirect()->route('index', ['preview_theme' => $slug]);
     }
 
 

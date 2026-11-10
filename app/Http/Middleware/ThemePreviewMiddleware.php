@@ -16,6 +16,11 @@ class ThemePreviewMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
+        // Skip theme preview logic on admin backend routes so admin UI stays completely intact
+        if ($request->is('admin') || $request->is('admin/*')) {
+            return $next($request);
+        }
+
         $previewCandidate = null;
         $shouldQueueCookie = false;
         $shouldClearCookie = false;

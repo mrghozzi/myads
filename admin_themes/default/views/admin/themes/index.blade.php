@@ -1026,8 +1026,18 @@ document.addEventListener('DOMContentLoaded', function () {
         var deviceButtons = themePreviewModal.querySelectorAll('.preview-device-btn');
         var currentPreviewSlug = '';
 
+        function getAppBaseUrl() {
+            var pathname = window.location.pathname;
+            var adminIndex = pathname.indexOf('/admin');
+            var baseSubPath = adminIndex !== -1 ? pathname.substring(0, adminIndex) : '';
+            return window.location.origin + baseSubPath;
+        }
+
         function buildPreviewUrl(path) {
-            var url = new URL(path, window.location.origin);
+            var baseUrl = getAppBaseUrl().replace(/\/+$/, '');
+            var cleanPath = path ? path.replace(/^\/+/, '') : '';
+            var fullUrl = cleanPath ? (baseUrl + '/' + cleanPath) : (baseUrl + '/');
+            var url = new URL(fullUrl);
             if (currentPreviewSlug) {
                 url.searchParams.set('preview_theme', currentPreviewSlug);
             }
@@ -1089,6 +1099,11 @@ document.addEventListener('DOMContentLoaded', function () {
             if (previewSpinner) previewSpinner.style.display = 'block';
             // Clear the preview cookie so regular browsing outside the modal is unaffected
             document.cookie = "preview_theme=; path=/; max-age=0;";
+            var sub = getAppBaseUrl().replace(window.location.origin, '');
+            if (sub) {
+                document.cookie = "preview_theme=; path=" + sub + "; max-age=0;";
+                document.cookie = "preview_theme=; path=" + sub + "/; max-age=0;";
+            }
         });
 
         // Responsive Device Switching
