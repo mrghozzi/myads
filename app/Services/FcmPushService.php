@@ -45,21 +45,35 @@ class FcmPushService
      */
     public function sendToToken(string $token, string $title, string $body, array $data = []): bool
     {
-        // 1. Check for Firebase Service Account (HTTP v1 API)
-        $serviceAccountPath = config('services.firebase.credentials', env('FIREBASE_CREDENTIALS'));
-        $projectId = config('services.firebase.project_id', env('FIREBASE_PROJECT_ID'));
+        // 0. Check database options first
+        $firebaseOptions = Option::where('o_type', 'firebase')->get()->keyBy('name');
+        $mode = $firebaseOptions->get('mode')?->o_valuer ?? '';
 
-        if (!empty($serviceAccountPath) && file_exists($serviceAccountPath)) {
-            return $this->sendViaHttpV1($token, $title, $body, $data, $serviceAccountPath, $projectId);
+        if ($mode === 'disabled') {
+            Log::debug("FcmPushService: Push notifications are disabled in admin settings.");
+            return false;
+        }
+
+        // 1. Check for Firebase Service Account (HTTP v1 API)
+        if ($mode === 'fcm_v1' || $mode === '') {
+            $serviceAccountPath = $firebaseOptions->get('credentials_path')?->o_valuer
+                ?: config('services.firebase.credentials', env('FIREBASE_CREDENTIALS'));
+            $projectId = $firebaseOptions->get('project_id')?->o_valuer
+                ?: config('services.firebase.project_id', env('FIREBASE_PROJECT_ID'));
+
+            if (!empty($serviceAccountPath) && file_exists($serviceAccountPath)) {
+                return $this->sendViaHttpV1($token, $title, $body, $data, $serviceAccountPath, $projectId);
+            }
         }
 
         // 2. Fallback: Legacy FCM Server Key
-        $serverKey = config('services.firebase.server_key', env('FCM_SERVER_KEY'));
+        $serverKey = $firebaseOptions->get('server_key')?->o_valuer
+            ?: config('services.firebase.server_key', env('FCM_SERVER_KEY'));
         if (!empty($serverKey)) {
             return $this->sendViaLegacy($token, $title, $body, $data, $serverKey);
         }
 
-        // Graceful no-op when Firebase credentials are not yet configured in .env
+        // Graceful no-op when Firebase credentials are not yet configured
         Log::debug("FcmPushService: FCM credentials not configured. Push skipped for token: " . substr($token, 0, 15) . "...");
         return false;
     }

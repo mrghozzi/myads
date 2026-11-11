@@ -27,6 +27,40 @@
 * **Automated Test Coverage & Verification (`tests/Feature/V470RoadmapHardeningTest.php`)**:
   * Created dedicated test suite with 9 feature tests and 62 assertions validating dual DocumentRoot resolution, webhook timestamp & replay defense, strict nonce CSP headers, deflection text normalization, AJAX endpoints, Turnstile service verification, and admin security settings updates.
 
+### Firebase Cloud Messaging (FCM) Push Engine & Tier-1 Notifications Ecosystem
+* **Firebase Cloud Messaging Push Notification Engine (`app/Services/FcmPushService.php`)**:
+  * Engineered a dual-protocol mobile push notification service supporting Google's modern **FCM HTTP v1 API** (OAuth2 JWT signing via `firebase/php-jwt`) alongside legacy server key fallback.
+  * Added high-priority Android alert configurations with notification sound, vibration, channel ID (`myads_general`), and structured data payloads (`click_action: FLUTTER_NOTIFICATION_CLICK`, `target_route`, `type`, `notification_id`, `actor_id`).
+  * Built database-first option resolution (`Option::where('o_type', 'firebase')`) with fallback to `.env` variables (`FIREBASE_CREDENTIALS`, `FIREBASE_PROJECT_ID`, `FCM_SERVER_KEY`), enabling zero-downtime configuration via the Admin Control Panel.
+  * Implemented safe no-op logging in debug mode when Firebase credentials are not yet configured, preventing uncaught exceptions or request blocking.
+* **Push Notification Integration & Route Resolution in Notification Core (`app/Services/NotificationService.php`)**:
+  * Upgraded `NotificationService::send()` to automatically record `sender_id` in database notifications and dispatch real-time mobile push notifications to recipients.
+  * Implemented an intelligent mobile route resolver (`resolveMobileRoute()`) translating web URLs into clean Flutter GoRouter paths (`/clips/{id}`, `/post?id={id}`, `/messages/{username}`, `/user-profile?username={username}`, `/orders/{id}`, `/settings/history`).
+  * Integrated recipient push preference evaluation (`push_reaction`, `push_new_comment`, `push_new_message`, `push_mention`, `push_new_follower`, `push_forum_reply`) ensuring members only receive opted-in push alerts.
+* **Tier-1 Mobile Notifications API Overhaul (`app/Http/Controllers/Api/NotificationController.php`, `routes/api.php`)**:
+  * **Category Filtering:** Added support for `?filter=` query parameter (`all`, `mentions`, `reactions`, `comments`, `system`) with database-level logo scoping.
+  * **Rich Sender Identity Hydration:** Enriched notification items with complete sender objects (`id`, `username`, `name`, `avatar`, `is_verified`) using `sender_id` relation or fallback username parsing for legacy records.
+  * **Human-Readable Relative Timestamps:** Added `time_ago` formatting via Carbon (`diffForHumans()`).
+  * **Clean In-App Mobile Routes:** Added `target_route` to payloads for direct in-app deep linking.
+  * **Categorized Unread Counts:** Upgraded `GET /api/notifications/unread-count` to return both total `unread_count` and a detailed category breakdown (`counts: {all, mentions, reactions, comments}`).
+  * **Single Notification Deletion:** Added `DELETE /api/notifications/{id}` endpoint with ownership authorization for dismissible swipe-to-delete gestures.
+* **Mobile Push Preferences API (`app/Http/Controllers/Api/SettingsController.php`)**:
+  * Extended `GET /api/settings/notifications` and `POST /api/settings/notifications` to handle granular mobile push toggles (`push_mentions`, `push_messages`, `push_follows`, `push_comments`, `push_reactions`).
+  * Maintained seamless backward compatibility with legacy email preferences.
+* **Database Architecture Migration (`database/migrations/2026_11_11_000001_add_push_settings_and_sender_id_to_notifications.php`)**:
+  * Added `push_new_follower`, `push_new_comment`, `push_new_message`, `push_mention`, `push_reaction`, and `push_forum_reply` boolean columns to `user_notification_settings` table.
+  * Added indexed `sender_id` unsigned big integer foreign column to `notif` table.
+  * Synchronized Eloquent model definitions in `UserNotificationSetting.php` and `Notification.php`.
+* **Admin Control Panel Mobile & Firebase Push Management (`/admin/settings/mobile`, `AdminController.php`, `mobile_settings.blade.php`)**:
+  * Redesigned `/admin/settings/mobile` with a dedicated **Firebase Cloud Messaging (FCM Push Engine Hub)** card.
+  * Added protocol mode selector (`fcm_v1` OAuth2 Service Account, `legacy` Server Key, `disabled`).
+  * Built file upload support (`enctype="multipart/form-data"`) for `service-account.json` with automatic secure storage in `storage/app/firebase/`.
+  * Added live registered device tokens KPI counter badge (`Option::where('o_type', 'fcm_token')->count()`).
+  * Created an instant **Live Test Push Dispatcher** (`POST /admin/settings/mobile/test-push`) allowing administrators to trigger immediate test notifications to verify Firebase connectivity.
+* **Automated Test Coverage (`tests/Feature/MobileNotificationApiTest.php`, `tests/Feature/AdminMobileSettingsTest.php`)**:
+  * Created `MobileNotificationApiTest.php` with 19 assertions validating notification retrieval, category filtering, unread count breakdowns, read status toggling, and individual deletion.
+  * Expanded `AdminMobileSettingsTest.php` with tests verifying Firebase setting persistence, service account handling, and live test push triggers (20 assertions, 100% pass rate).
+
 ### Directory Categories & Taxonomy Management Overhaul (`/admin/directory/categories`)
 * **Next-Gen Directory Taxonomy Engine (`DirectoryCategory.php`, `AdminController.php`, `routes/web.php`)**:
   * Added `directories()` and `listings()` relationships to `DirectoryCategory` model with automatic eager-loading and `withCount('directories as listings_count')`.

@@ -906,10 +906,141 @@ MYADS v4.6.2 introduces true threaded comments supporting recursive parent-child
 
 ### F. Notifications & Gamification
 
-- `GET /api/notifications`: Retrieve user notifications (paginated).
-- `GET /api/notifications/unread-count`: Get integer count of unread notifications.
-- `POST|GET /api/notifications/{id}/read` & `POST|GET /api/notifications/{id}/mark-read`: Mark specific notification as read.
-- `POST|GET /api/notifications/read-all` & `POST|GET /api/notifications/mark-all-read`: Mark all notifications as read.
+#### 1. Notifications Stream (`GET /api/notifications`)
+Retrieves paginated notifications for the authenticated user, supporting real-time category filtering and rich sender identity hydration.
+
+* **Query Parameters:**
+  * `page` *(optional, integer)*: Target pagination page (default: `1`).
+  * `filter` *(optional, string)*: Filter notifications by category:
+    * `all` (default): All notifications including quests and system announcements.
+    * `mentions`: Mentions in comments, topics, and feed posts (`@username`).
+    * `reactions`: Post and clip likes, loves, and emoji reactions.
+    * `comments`: Comments and replies across social feed, clips, and forums.
+    * `system`: Administrative alerts, completed quests, and store orders.
+
+* **Response Payload (`200 OK`):**
+  ```json
+  {
+      "success": true,
+      "data": [
+          {
+              "id": 232,
+              "type": "reaction",
+              "text": "قام mrghozzi بالتفاعل مع منشورك.",
+              "time": 1792376350,
+              "time_ago": "منذ 3 دقائق",
+              "state": 0,
+              "is_unread": true,
+              "icon": "like",
+              "target_url": "/clips/208",
+              "target_route": "/clips/208",
+              "sender": {
+                  "id": 1,
+                  "username": "mrghozzi",
+                  "name": "mrghozzi",
+                  "avatar": "https://adstn.ovh/upload/avatar.png",
+                  "is_verified": true
+              },
+              "source_user_id": 1
+          }
+      ],
+      "current_page": 1,
+      "last_page": 4,
+      "has_more": true,
+      "filter": "all"
+  }
+  ```
+
+#### 2. Unread Notification Counts (`GET /api/notifications/unread-count`)
+Returns the global unread count along with a categorized breakdown for filter badges:
+
+* **Response Payload (`200 OK`):**
+  ```json
+  {
+      "success": true,
+      "unread_count": 12,
+      "counts": {
+          "all": 12,
+          "mentions": 3,
+          "reactions": 6,
+          "comments": 3
+      }
+  }
+  ```
+
+#### 3. Mark Notification as Read (`POST /api/notifications/{id}/read`)
+Marks an individual notification as read (`state = 1`). Also aliased to `/api/notifications/{id}/mark-read`.
+
+* **Response Payload (`200 OK`):**
+  ```json
+  {
+      "success": true,
+      "message": "Notification marked as read"
+  }
+  ```
+
+#### 4. Mark All as Read (`POST /api/notifications/read-all`)
+Marks all unread notifications belonging to the user as read. Also aliased to `/api/notifications/mark-all-read`.
+
+* **Response Payload (`200 OK`):**
+  ```json
+  {
+      "success": true,
+      "message": "All notifications marked as read"
+  }
+  ```
+
+#### 5. Delete Notification (`DELETE /api/notifications/{id}`)
+Permanently deletes an individual notification record belonging to the authenticated user (powers mobile swipe-to-delete gestures).
+
+* **Response Payload (`200 OK`):**
+  ```json
+  {
+      "success": true,
+      "message": "Notification deleted"
+  }
+  ```
+
+#### 6. Register Device Token for FCM Push (`POST /api/settings/device-token`)
+Registers or updates the mobile device's Firebase Cloud Messaging registration token for push alert delivery.
+
+* **Payload:**
+  ```json
+  {
+      "token": "eX_91aBc...fcm_registration_token"
+  }
+  ```
+* **Response Payload (`200 OK`):**
+  ```json
+  {
+      "success": true,
+      "message": "Device token updated"
+  }
+  ```
+
+#### 7. Notification Preferences (`GET & POST /api/settings/notifications`)
+Retrieves and updates dual-mode notification preferences (Mobile Push Alerts & Email Notifications).
+
+* **GET Response (`200 OK`):**
+  ```json
+  {
+      "settings": { ... },
+      "push_mentions": true,
+      "push_messages": true,
+      "push_follows": true,
+      "push_comments": true,
+      "push_reactions": true,
+      "email_mentions": true,
+      "email_messages": true,
+      "email_follows": true,
+      "email_comments": true
+  }
+  ```
+* **POST Payload:** Supports boolean flags for any combination of `push_*` and `email_*` keys.
+
+---
+
+### G. Gamification & Wallet
 - `GET /api/wallet/balance`: Get current Points (PTS) balance and credit balances.
 - `GET /api/quests` (and `/api/gamification/quests`): Retrieve active gamification quests.
   - *Returns:*

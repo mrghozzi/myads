@@ -667,6 +667,7 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::post('/settings/system', [AdminController::class, 'updateSystemSettings'])->name('admin.settings.system.update');
     Route::get('/settings/mobile', [AdminController::class, 'mobileSettings'])->name('admin.settings.mobile');
     Route::post('/settings/mobile', [AdminController::class, 'updateMobileSettings'])->name('admin.settings.mobile.update');
+    Route::post('/settings/mobile/test-push', [AdminController::class, 'sendTestPushNotification'])->name('admin.settings.mobile.test_push');
     Route::get('/settings/performance', [AdminController::class, 'performanceSettings'])->name('admin.settings.performance');
     Route::post('/settings/performance', [AdminController::class, 'updatePerformanceSettings'])->name('admin.settings.performance.update');
     Route::get('/profile-verification/requests', [App\Http\Controllers\AdminProfileVerificationController::class, 'index'])->name('admin.profile_verification.requests');

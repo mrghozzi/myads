@@ -1055,13 +1055,25 @@ class AdminController extends Controller
 
     public function mobileSettings()
     {
-        $options = Option::where('o_type', 'mobile_api')->get()->keyBy('name');
+        $options = Option::whereIn('o_type', ['mobile_api', 'firebase'])->get()->groupBy('o_type');
+        $mobileOptions = $options->get('mobile_api', collect())->keyBy('name');
+        $firebaseOptions = $options->get('firebase', collect())->keyBy('name');
+
+        $deviceTokensCount = Option::where('o_type', 'fcm_token')->count();
+
+        $defaultMode = env('FIREBASE_CREDENTIALS') ? 'fcm_v1' : (env('FCM_SERVER_KEY') ? 'legacy' : 'disabled');
 
         $mobileSettings = [
-            'api_key' => $options->has('api_key') ? $options['api_key']->o_valuer : null,
-            'enabled' => $options->has('enabled') ? $options['enabled']->o_valuer : '1',
-            'maintenance_mode' => $options->has('maintenance_mode') ? $options['maintenance_mode']->o_valuer : '0',
-            'min_version' => $options->has('min_version') ? $options['min_version']->o_valuer : '1.0.0',
+            'api_key' => $mobileOptions->has('api_key') ? $mobileOptions['api_key']->o_valuer : null,
+            'enabled' => $mobileOptions->has('enabled') ? $mobileOptions['enabled']->o_valuer : '1',
+            'maintenance_mode' => $mobileOptions->has('maintenance_mode') ? $mobileOptions['maintenance_mode']->o_valuer : '0',
+            'min_version' => $mobileOptions->has('min_version') ? $mobileOptions['min_version']->o_valuer : '1.0.0',
+            // Firebase Push Notifications (FCM)
+            'firebase_mode' => $firebaseOptions->has('mode') ? $firebaseOptions['mode']->o_valuer : $defaultMode,
+            'firebase_project_id' => $firebaseOptions->has('project_id') ? $firebaseOptions['project_id']->o_valuer : env('FIREBASE_PROJECT_ID', ''),
+            'firebase_credentials' => $firebaseOptions->has('credentials_path') ? $firebaseOptions['credentials_path']->o_valuer : env('FIREBASE_CREDENTIALS', ''),
+            'fcm_server_key' => $firebaseOptions->has('server_key') ? $firebaseOptions['server_key']->o_valuer : env('FCM_SERVER_KEY', ''),
+            'device_tokens_count' => $deviceTokensCount,
         ];
 
         return view('admin::admin.mobile_settings', compact('mobileSettings'));
@@ -1085,6 +1097,11 @@ class AdminController extends Controller
             'enabled' => 'required|in:0,1',
             'maintenance_mode' => 'required|in:0,1',
             'min_version' => 'nullable|string|max:20',
+            'firebase_mode' => 'nullable|in:disabled,fcm_v1,legacy',
+            'firebase_project_id' => 'nullable|string|max:100',
+            'firebase_credentials' => 'nullable|string|max:255',
+            'fcm_server_key' => 'nullable|string|max:255',
+            'service_account_file' => 'nullable|file|max:2048',
         ]);
 
         Option::updateOrCreate(
@@ -1102,7 +1119,78 @@ class AdminController extends Controller
             ['o_valuer' => (string)($validated['min_version'] ?? '1.0.0')]
         );
 
+        // Update Firebase Push Settings
+        if ($request->hasFile('service_account_file')) {
+            $path = $request->file('service_account_file')->storeAs('firebase', 'service-account.json');
+            $fullPath = storage_path('app/' . $path);
+            Option::updateOrCreate(
+                ['o_type' => 'firebase', 'name' => 'credentials_path'],
+                ['o_valuer' => $fullPath]
+            );
+        } elseif ($request->filled('firebase_credentials')) {
+            Option::updateOrCreate(
+                ['o_type' => 'firebase', 'name' => 'credentials_path'],
+                ['o_valuer' => (string)$validated['firebase_credentials']]
+            );
+        }
+
+        if (isset($validated['firebase_mode'])) {
+            Option::updateOrCreate(
+                ['o_type' => 'firebase', 'name' => 'mode'],
+                ['o_valuer' => (string)$validated['firebase_mode']]
+            );
+        }
+
+        if (isset($validated['firebase_project_id'])) {
+            Option::updateOrCreate(
+                ['o_type' => 'firebase', 'name' => 'project_id'],
+                ['o_valuer' => (string)$validated['firebase_project_id']]
+            );
+        }
+
+        if (isset($validated['fcm_server_key'])) {
+            Option::updateOrCreate(
+                ['o_type' => 'firebase', 'name' => 'server_key'],
+                ['o_valuer' => (string)$validated['fcm_server_key']]
+            );
+        }
+
         return redirect()->route('admin.settings.mobile')->with('success', __('messages.mobile_settings_updated') ?? __('Mobile app settings updated successfully.'));
+    }
+
+    public function sendTestPushNotification(Request $request)
+    {
+        $fcm = app(\App\Services\FcmPushService::class);
+        $user = \Illuminate\Support\Facades\Auth::user();
+
+        // 1. Try to find the logged-in admin's device token
+        $tokenOption = Option::where('o_type', 'fcm_token')->where('o_parent', $user->id)->first();
+
+        // 2. Fallback to any registered device token in the database
+        if (!$tokenOption) {
+            $tokenOption = Option::where('o_type', 'fcm_token')->latest('id')->first();
+        }
+
+        if (!$tokenOption || empty($tokenOption->o_valuer)) {
+            return redirect()->route('admin.settings.mobile')->with('error', __('messages.no_device_tokens_found') ?? 'No registered mobile devices found. Open the mobile app and log in first to register your device token.');
+        }
+
+        $sent = $fcm->sendToToken(
+            $tokenOption->o_valuer,
+            '🔔 MYADS Test Push Notification',
+            'This is a live test notification from your MYADS Admin Panel (' . now()->format('H:i:s') . ')!',
+            [
+                'target_route' => '/notifications',
+                'type' => 'system',
+                'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
+            ]
+        );
+
+        if ($sent) {
+            return redirect()->route('admin.settings.mobile')->with('success', 'Test push notification dispatched successfully to device (' . substr($tokenOption->o_valuer, 0, 15) . '...)!');
+        } else {
+            return redirect()->route('admin.settings.mobile')->with('error', 'Push dispatch failed. Please verify that your Firebase Project ID, Service Account credentials, or Server Key are configured correctly.');
+        }
     }
 
 
