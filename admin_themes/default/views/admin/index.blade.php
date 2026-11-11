@@ -1157,26 +1157,24 @@
             }
 
             // ── SEQUENTIAL AJAX LOADER (توالياً) ──
-            async function loadDashboardSequentially() {
-                function withRefreshParam(url, isRefresh) {
-                    if (!isRefresh || !url) return url;
-                    return url + (url.indexOf('?') === -1 ? '?refresh=1' : '&refresh=1');
-                }
+            function withRefreshParam(url, isRefresh) {
+                if (!isRefresh || !url) return url;
+                return url + (url.indexOf('?') === -1 ? '?refresh=1' : '&refresh=1');
+            }
 
-                async function loadDashboardSequentially(isRefresh) {
-                    isRefresh = !!isRefresh;
+            async function loadDashboardSequentially(isRefresh) {
+                isRefresh = !!isRefresh;
 
-                    // Step 1: Top KPIs & Hero Counters
-                    try {
-                        var kpisContainer = document.getElementById('dashboard-kpis-container');
-                        if (kpisContainer) {
-                            var res = await fetch(kpisContainer.getAttribute('data-url'), {
-                                var url = withRefreshParam(kpisContainer.getAttribute('data-url'), isRefresh);
-                                var res = await fetch(url, {
-                                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
-                                });
-                                if(res.ok) {
-                                    var html = await res.text();
+                // Step 1: Top KPIs & Hero Counters
+                try {
+                    var kpisContainer = document.getElementById('dashboard-kpis-container');
+                    if (kpisContainer) {
+                        var url = withRefreshParam(kpisContainer.getAttribute('data-url'), isRefresh);
+                        var res = await fetch(url, {
+                            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                        });
+                        if (res.ok) {
+                            var html = await res.text();
                             kpisContainer.innerHTML = html;
                             var kpisRow = document.getElementById('kpis-row');
                             if (kpisRow) {
@@ -1189,7 +1187,7 @@
                             }
                         }
                     }
-            } catch (e) {
+                } catch (e) {
                     console.error('Error loading KPIs:', e);
                 }
 
@@ -1197,110 +1195,104 @@
                 try {
                     var reactionsContainer = document.getElementById('dashboard-reactions-container');
                     if (reactionsContainer) {
-                        var res = await fetch(reactionsContainer.getAttribute('data-url'), {
-                            var url = withRefreshParam(reactionsContainer.getAttribute('data-url'), isRefresh);
-                            var res = await fetch(url, {
-                                headers: { 'X-Requested-With': 'XMLHttpRequest' }
-                            });
-                            if(res.ok) {
-                                var html = await res.text();
-                        reactionsContainer.innerHTML = html;
-                        reactionsContainer.classList.add('sd-fade-in');
+                        var url = withRefreshParam(reactionsContainer.getAttribute('data-url'), isRefresh);
+                        var res = await fetch(url, {
+                            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                        });
+                        if (res.ok) {
+                            var html = await res.text();
+                            reactionsContainer.innerHTML = html;
+                            reactionsContainer.classList.add('sd-fade-in');
+                        }
                     }
+                } catch (e) {
+                    console.error('Error loading Reactions:', e);
                 }
-            } catch (e) {
-                console.error('Error loading Reactions:', e);
-            }
 
-            // Step 3: Activity & Breakdown
-            try {
-                var activityContainer = document.getElementById('dashboard-activity-container');
-                if (activityContainer) {
-                    var res = await fetch(activityContainer.getAttribute('data-url'), {
+                // Step 3: Activity & Breakdown
+                try {
+                    var activityContainer = document.getElementById('dashboard-activity-container');
+                    if (activityContainer) {
                         var url = withRefreshParam(activityContainer.getAttribute('data-url'), isRefresh);
                         var res = await fetch(url, {
                             headers: { 'X-Requested-With': 'XMLHttpRequest' }
                         });
-                        if(res.ok) {
+                        if (res.ok) {
                             var html = await res.text();
-                    activityContainer.innerHTML = html;
-                    activityContainer.classList.add('sd-fade-in');
+                            activityContainer.innerHTML = html;
+                            activityContainer.classList.add('sd-fade-in');
 
-                    var card = document.getElementById('dashboard-activity-card');
-                    if (card) {
-                        var reportsBadge = document.getElementById('quick-action-reports-badge');
-                        if (reportsBadge) reportsBadge.textContent = card.getAttribute('data-pending-reports') || '0';
-                    }
-                }
-            }
-            } catch (e) {
-            console.error('Error loading Activity:', e);
-        }
-
-        // Step 4: Ad Analytics Charts
-        try {
-            var adChartsContainer = document.getElementById('dashboard-ad-charts-container');
-            if (adChartsContainer) {
-                var res = await fetch(adChartsContainer.getAttribute('data-url'), {
-                    var url = withRefreshParam(adChartsContainer.getAttribute('data-url'), isRefresh);
-                    var res = await fetch(url, {
-                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
-                    });
-                    if(res.ok) {
-                        var adData = await res.json();
-                renderAdCharts(adData);
-            }
-        }
-            } catch (e) {
-            console.error('Error loading Ad Charts:', e);
-        }
-
-        // Step 5: Community Trend Charts (30 days)
-        try {
-            var commChartsContainer = document.getElementById('dashboard-community-charts-container');
-            if (commChartsContainer) {
-                var res = await fetch(commChartsContainer.getAttribute('data-url'), {
-                    var url = withRefreshParam(commChartsContainer.getAttribute('data-url'), isRefresh);
-                    var res = await fetch(url, {
-                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
-                    });
-                    if(res.ok) {
-                        var commData = await res.json();
-                renderCommunityCharts(commData);
-            }
-        }
-            } catch (e) {
-            console.error('Error loading Community Charts:', e);
-        }
-
-        // Step 6: Marketplace Recommendations
-        try {
-            var marketContainer = document.getElementById('marketplace-recommendations-container');
-            if (marketContainer) {
-                if (marketContainer && !isRefresh) {
-                    var res = await fetch(marketContainer.getAttribute('data-url'), {
-                        headers: {
-                            'X-Requested-With': 'XMLHttpRequest',
-                            'Accept': 'text/html'
+                            var card = document.getElementById('dashboard-activity-card');
+                            if (card) {
+                                var reportsBadge = document.getElementById('quick-action-reports-badge');
+                                if (reportsBadge) reportsBadge.textContent = card.getAttribute('data-pending-reports') || '0';
+                            }
                         }
-                    });
-                    if (res.ok) {
-                        var html = await res.text();
-                        marketContainer.innerHTML = html;
-                    } else {
-                        marketContainer.innerHTML = '';
                     }
+                } catch (e) {
+                    console.error('Error loading Activity:', e);
                 }
-            } catch (e) {
-                var marketContainer = document.getElementById('marketplace-recommendations-container');
-                if (marketContainer) marketContainer.innerHTML = '';
-                console.error('Error loading Marketplace Recommendations:', e);
-            }
 
-            // Step 7: Background Version Check Alert
-            try {
-                var updateContainer = document.getElementById('admin-update-alert-container');
-                if (updateContainer) {
+                // Step 4: Ad Analytics Charts
+                try {
+                    var adChartsContainer = document.getElementById('dashboard-ad-charts-container');
+                    if (adChartsContainer) {
+                        var url = withRefreshParam(adChartsContainer.getAttribute('data-url'), isRefresh);
+                        var res = await fetch(url, {
+                            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                        });
+                        if (res.ok) {
+                            var adData = await res.json();
+                            renderAdCharts(adData);
+                        }
+                    }
+                } catch (e) {
+                    console.error('Error loading Ad Charts:', e);
+                }
+
+                // Step 5: Community Trend Charts (30 days)
+                try {
+                    var commChartsContainer = document.getElementById('dashboard-community-charts-container');
+                    if (commChartsContainer) {
+                        var url = withRefreshParam(commChartsContainer.getAttribute('data-url'), isRefresh);
+                        var res = await fetch(url, {
+                            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                        });
+                        if (res.ok) {
+                            var commData = await res.json();
+                            renderCommunityCharts(commData);
+                        }
+                    }
+                } catch (e) {
+                    console.error('Error loading Community Charts:', e);
+                }
+
+                // Step 6: Marketplace Recommendations
+                try {
+                    var marketContainer = document.getElementById('marketplace-recommendations-container');
+                    if (marketContainer && !isRefresh) {
+                        var res = await fetch(marketContainer.getAttribute('data-url'), {
+                            headers: {
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'Accept': 'text/html'
+                            }
+                        });
+                        if (res.ok) {
+                            var html = await res.text();
+                            marketContainer.innerHTML = html;
+                        } else {
+                            marketContainer.innerHTML = '';
+                        }
+                    }
+                } catch (e) {
+                    var marketContainer = document.getElementById('marketplace-recommendations-container');
+                    if (marketContainer) marketContainer.innerHTML = '';
+                    console.error('Error loading Marketplace Recommendations:', e);
+                }
+
+                // Step 7: Background Version Check Alert
+                try {
+                    var updateContainer = document.getElementById('admin-update-alert-container');
                     if (updateContainer && !isRefresh) {
                         var res = await fetch(updateContainer.getAttribute('data-url'), {
                             headers: { 'X-Requested-With': 'XMLHttpRequest' }
@@ -1334,31 +1326,30 @@
                 try {
                     var healthBar = document.getElementById('sd-live-health-bar');
                     if (healthBar) {
-                        var res = await fetch('{{ route("admin.ajax.site_health") }}', {
-                            var healthUrl = withRefreshParam('{{ route("admin.ajax.site_health") }}', isRefresh);
-                            var res = await fetch(healthUrl, {
-                                headers: { 'X-Requested-With': 'XMLHttpRequest' }
-                            });
-                            if(res.ok) {
-                                var hData = await res.json();
-                        if (hData && hData.score !== undefined) {
-                            var dot = document.getElementById('sd-health-dot');
-                            var dotColor = hData.grade === 'excellent' ? '#10b981' : (hData.grade === 'good' ? '#f59e0b' : '#ef4444');
-                            if (dot) dot.style.background = dotColor;
+                        var healthUrl = withRefreshParam('{{ route("admin.ajax.site_health") }}', isRefresh);
+                        var res = await fetch(healthUrl, {
+                            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                        });
+                        if (res.ok) {
+                            var hData = await res.json();
+                            if (hData && hData.score !== undefined) {
+                                var dot = document.getElementById('sd-health-dot');
+                                var dotColor = hData.grade === 'excellent' ? '#10b981' : (hData.grade === 'good' ? '#f59e0b' : '#ef4444');
+                                if (dot) dot.style.background = dotColor;
 
-                            var scoreBadge = document.getElementById('sd-health-score-badge');
-                            if (scoreBadge) {
-                                var badgeBg = hData.grade === 'excellent' ? 'bg-success' : (hData.grade === 'good' ? 'bg-warning text-dark' : 'bg-danger text-white');
-                                scoreBadge.className = 'badge ' + badgeBg + ' ms-1';
-                                scoreBadge.textContent = hData.score + '% ' + hData.grade_label;
+                                var scoreBadge = document.getElementById('sd-health-score-badge');
+                                if (scoreBadge) {
+                                    var badgeBg = hData.grade === 'excellent' ? 'bg-success' : (hData.grade === 'good' ? 'bg-warning text-dark' : 'bg-danger text-white');
+                                    scoreBadge.className = 'badge ' + badgeBg + ' ms-1';
+                                    scoreBadge.textContent = hData.score + '% ' + hData.grade_label;
+                                }
                             }
                         }
                     }
+                } catch (e) {
+                    console.error('Error loading Site Health:', e);
                 }
-            } catch (e) {
-                console.error('Error loading Site Health:', e);
             }
-        }
 
         // Refresh Statistics Button Handler
         var refreshBtn = document.getElementById('btn-refresh-dashboard-stats');
