@@ -98,6 +98,9 @@ custom_variables.css
 !/tests/Feature/ForumModernizationTest.php
 !/tests/Feature/AllLanguagesCompatibilityTest.php
 !/tests/Feature/V470RoadmapHardeningTest.php
+!/tests/Feature/GroupsFeatureTest.php
+!/tests/Feature/GroupApiTest.php
+!/tests/Feature/V430GroupsTranslationsFeatureTest.php
 !/tests/Feature/Themes/
 !/tests/Feature/Themes/*
 ~/.pi/

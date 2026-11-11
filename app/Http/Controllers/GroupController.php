@@ -34,10 +34,13 @@ class GroupController extends Controller
         $this->ensureFeatureEnabled();
 
         $search = trim((string) $request->query('search', ''));
+        $category = (string) $request->query('category', 'all');
+        $sort = (string) $request->query('sort', 'trending');
         $user = Auth::user();
-        $groups = $this->discovery->discover($user, $search);
+        $groups = $this->discovery->discover($user, $search, $category, $sort);
         $myGroups = $this->discovery->myGroups($user);
         $creationEligibility = $user ? $this->access->creationEligibility($user) : null;
+        $categories = Group::CATEGORIES;
 
         $this->seo([
             'scope_key' => 'groups_index',
@@ -52,7 +55,7 @@ class GroupController extends Controller
             ],
         ]);
 
-        return view('theme::groups.index', compact('groups', 'myGroups', 'search', 'creationEligibility'));
+        return view('theme::groups.index', compact('groups', 'myGroups', 'search', 'category', 'sort', 'creationEligibility', 'categories'));
     }
 
     public function create()
@@ -67,6 +70,8 @@ class GroupController extends Controller
                 ->with('error', $eligibility['message'] ?: __('messages.groups_creation_denied'));
         }
 
+        $categories = Group::CATEGORIES;
+
         $this->noindex([
             'scope_key' => 'groups_create',
             'resource_title' => __('messages.groups_create_title'),
@@ -78,7 +83,7 @@ class GroupController extends Controller
             ],
         ]);
 
-        return view('theme::groups.create', compact('eligibility'));
+        return view('theme::groups.create', compact('eligibility', 'categories'));
     }
 
     public function store(Request $request)
@@ -96,11 +101,17 @@ class GroupController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:120',
             'slug' => 'nullable|string|max:140|unique:groups,slug',
+            'category' => 'nullable|string|max:64',
             'privacy' => 'required|in:public,private_request',
+            'posting_permission' => 'nullable|in:all_members,moderators_only',
+            'join_fee_pts' => 'nullable|integer|min:0|max:100000',
             'short_description' => 'nullable|string|max:280',
             'description' => 'nullable|string|max:10000',
             'rules_markdown' => 'nullable|string|max:15000',
         ]);
+
+        $validated['posting_permission'] = $validated['posting_permission'] ?? Group::POSTING_ALL;
+        $validated['join_fee_pts'] = (int) ($validated['join_fee_pts'] ?? 0);
 
         $group = $this->memberships->createGroup(
             $user,
@@ -126,6 +137,8 @@ class GroupController extends Controller
             abort(403);
         }
 
+        $categories = Group::CATEGORIES;
+
         $this->noindex([
             'scope_key' => 'groups_edit',
             'resource_title' => __('messages.groups_edit_title'),
@@ -138,7 +151,7 @@ class GroupController extends Controller
             ],
         ]);
 
-        return view('theme::groups.edit', compact('group'));
+        return view('theme::groups.edit', compact('group', 'categories'));
     }
 
     public function update(Request $request, Group $group)
@@ -153,7 +166,10 @@ class GroupController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:120',
             'slug' => 'nullable|string|max:140|unique:groups,slug,' . $group->id,
+            'category' => 'nullable|string|max:64',
             'privacy' => 'required|in:public,private_request',
+            'posting_permission' => 'nullable|in:all_members,moderators_only',
+            'join_fee_pts' => 'nullable|integer|min:0|max:100000',
             'short_description' => 'nullable|string|max:280',
             'description' => 'nullable|string|max:10000',
             'rules_markdown' => 'nullable|string|max:15000',
@@ -161,24 +177,35 @@ class GroupController extends Controller
             'cover' => 'nullable|image|max:4096',
         ]);
 
+        if (array_key_exists('posting_permission', $validated) && $validated['posting_permission'] === null) {
+            unset($validated['posting_permission']);
+        }
+
         if ($request->hasFile('avatar')) {
-            $file = $request->file('avatar');
-            $filename = 'group_avatar_' . $group->id . '_' . time() . '.' . ($file->getClientOriginalExtension() ?: 'jpg');
-            $file->move(base_path('upload'), $filename);
-            $group->avatar_path = 'upload/' . $filename;
+            $group->avatar_path = $this->memberships->saveGroupImage(
+                $request->file('avatar'),
+                'avatar',
+                $group->id,
+                $group->avatar_path
+            );
         }
 
         if ($request->hasFile('cover')) {
-            $file = $request->file('cover');
-            $filename = 'group_cover_' . $group->id . '_' . time() . '.' . ($file->getClientOriginalExtension() ?: 'jpg');
-            $file->move(base_path('upload'), $filename);
-            $group->cover_path = 'upload/' . $filename;
+            $group->cover_path = $this->memberships->saveGroupImage(
+                $request->file('cover'),
+                'cover',
+                $group->id,
+                $group->cover_path
+            );
         }
 
         $group->update([
             'name' => $validated['name'],
             'slug' => $validated['slug'] ?: $group->slug,
+            'category' => $validated['category'] ?? 'general',
             'privacy' => $validated['privacy'],
+            'posting_permission' => $validated['posting_permission'] ?? Group::POSTING_ALL,
+            'join_fee_pts' => (int) ($validated['join_fee_pts'] ?? 0),
             'short_description' => $validated['short_description'],
             'description' => $validated['description'],
             'rules_markdown' => $validated['rules_markdown'],
@@ -212,8 +239,20 @@ class GroupController extends Controller
         $discussions = $this->emptyPaginator('discussion_page', 10);
         $members = $this->emptyPaginator('members_page', 20);
         $pendingMemberships = collect();
+        $bannedMemberships = collect();
+        $pinnedPost = null;
 
         if ($canViewContent) {
+            if ($group->pinned_post_id) {
+                $pinnedPost = Status::visible($user)
+                    ->with(['group', 'user'])
+                    ->where('id', $group->pinned_post_id)
+                    ->first();
+                if ($pinnedPost) {
+                    $activityService->decorateMany(collect([$pinnedPost]));
+                }
+            }
+
             $activities = Status::visible($user)
                 ->with(['group'])
                 ->where('group_id', $group->id)
@@ -248,6 +287,13 @@ class GroupController extends Controller
                     ->where('group_id', $group->id)
                     ->where('status', GroupMembership::STATUS_PENDING)
                     ->orderBy('requested_at', 'asc')
+                    ->get();
+
+                $bannedMemberships = GroupMembership::query()
+                    ->with(['user'])
+                    ->where('group_id', $group->id)
+                    ->where('status', GroupMembership::STATUS_BANNED)
+                    ->orderBy('banned_at', 'desc')
                     ->get();
             }
         }
@@ -288,6 +334,8 @@ class GroupController extends Controller
             'discussions',
             'members',
             'pendingMemberships',
+            'bannedMemberships',
+            'pinnedPost',
             'cover',
             'avatar'
         ));
@@ -389,6 +437,67 @@ class GroupController extends Controller
         return redirect()
             ->route('groups.show', $group)
             ->with('success', __('messages.groups_transfer_success'));
+    }
+
+    public function banMember(Group $group, GroupMembership $membership)
+    {
+        $this->ensureFeatureEnabled();
+        $this->ensureMembershipBelongsToGroup($group, $membership);
+
+        $this->memberships->ban($membership, Auth::user());
+
+        return back()->with('success', __('messages.groups_member_banned'));
+    }
+
+    public function unbanMember(Group $group, GroupMembership $membership)
+    {
+        $this->ensureFeatureEnabled();
+        $this->ensureMembershipBelongsToGroup($group, $membership);
+
+        $this->memberships->unban($membership, Auth::user());
+
+        return back()->with('success', __('messages.groups_member_unbanned'));
+    }
+
+    public function togglePinPost(Request $request, Group $group, int $status)
+    {
+        $this->ensureFeatureEnabled();
+
+        $isPinned = $this->memberships->togglePinPost($group, $status, Auth::user());
+
+        return back()->with('success', $isPinned ? __('messages.groups_post_pinned') : __('messages.groups_post_unpinned'));
+    }
+
+    public function deletePost(Group $group, Status $status, \App\Services\StatusPostService $statusPostService)
+    {
+        $this->ensureFeatureEnabled();
+
+        if ((int) $status->group_id !== (int) $group->id) {
+            abort(404);
+        }
+
+        $user = Auth::user();
+        if (!$this->access->canDeleteGroupPost($group, $user, $status)) {
+            abort(403);
+        }
+
+        $statusPostService->delete($status, $user);
+
+        return back()->with('success', __('messages.post_deleted_successfully'));
+    }
+
+    public function destroy(Request $request, Group $group)
+    {
+        $this->ensureFeatureEnabled();
+
+        $user = Auth::user();
+        if (!$this->access->isOwner($group, $user) && !$user->isAdmin()) {
+            abort(403);
+        }
+
+        $this->memberships->deleteGroup($group, $user);
+
+        return redirect()->route('groups.index')->with('success', __('messages.groups_deleted_success'));
     }
 
     public function storeDiscussion(

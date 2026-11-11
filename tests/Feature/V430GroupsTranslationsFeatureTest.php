@@ -1,0 +1,117 @@
+<?php
+
+namespace Tests\Feature;
+
+use Tests\TestCase;
+
+class V430GroupsTranslationsFeatureTest extends TestCase
+{
+    public function test_group_translation_keys_exist_for_all_supported_locales(): void
+    {
+        $locales = ['ar', 'de', 'en', 'es', 'fa', 'fr', 'it', 'ja', 'pt', 'ru', 'sr', 'tr', 'zh_CN', 'zh_TW'];
+        $requiredKeys = [
+            'groups_title',
+            'groups_search_description',
+            'groups_discover_description',
+            'groups_find_your_corner',
+            'groups_index_intro',
+            'groups_search_placeholder',
+            'groups_my_groups',
+            'groups_featured',
+            'groups_public',
+            'groups_private',
+            'groups_open_group',
+            'groups_search_results',
+            'groups_discover_groups',
+            'groups_followed_members_inside',
+            'groups_empty_state',
+            'groups_create_title',
+            'groups_create_description',
+            'groups_creation_denied',
+            'groups_creation_policy',
+            'groups_policy_all_members',
+            'groups_policy_approval',
+            'groups_policy_paid_plan',
+            'groups_creation_review_notice',
+            'groups_short_description',
+            'groups_privacy',
+            'groups_public_hint',
+            'groups_private_hint',
+            'groups_rules',
+            'groups_rules_empty',
+            'groups_create_submit',
+            'groups_feature_disabled',
+            'groups_paid_plan_unavailable',
+            'groups_paid_plan_required',
+            'groups_created_pending_review',
+            'groups_created_success',
+            'groups_directory_publish_disabled',
+            'groups_reposts_disabled',
+            'groups_post_created',
+            'groups_join_blocked',
+            'groups_joined_success',
+            'groups_join_request_sent',
+            'groups_left_success',
+            'groups_member_approved',
+            'groups_member_rejected',
+            'groups_role_updated',
+            'groups_discussion_created',
+            'groups_owner_cannot_leave',
+            'groups_owner_role_locked',
+            'groups_tab_overview',
+            'groups_tab_feed',
+            'groups_tab_discussions',
+            'groups_tab_members',
+            'groups_private_shell_title',
+            'groups_private_shell_description',
+            'groups_no_description',
+            'groups_share_with_group',
+            'groups_post_placeholder',
+            'groups_publish_post',
+            'groups_latest_feed',
+            'groups_feed_empty',
+            'groups_latest_discussions',
+            'groups_discussions_empty',
+            'groups_start_discussion',
+            'groups_publish_discussion',
+            'groups_members_title',
+            'groups_members_empty',
+            'groups_pending_requests',
+            'groups_pending_empty',
+            'groups_request_pending',
+            'groups_join_now',
+            'groups_request_join',
+            'groups_leave',
+            'groups_status_active',
+            'groups_status_pending_review',
+            'groups_status_suspended',
+            'groups_status_rejected',
+            'groups_enabled',
+            'groups_eligible_plans',
+            'groups_eligible_plans_hint',
+            'groups_role_owner',
+            'groups_role_moderator',
+            'groups_role_member',
+            'groups_feature',
+            'groups_unfeature',
+            'admin_groups_title',
+            'admin_groups_description',
+            'admin_groups_status_updated',
+            'admin_groups_featured_updated',
+            'admin_groups_settings_title',
+            'admin_groups_settings_description',
+            'admin_groups_settings_saved',
+        ];
+
+        foreach ($locales as $locale) {
+            $messages = include base_path('lang/' . $locale . '/messages.php');
+
+            $this->assertIsArray($messages, 'The locale file for ' . $locale . ' could not be loaded as an array.');
+
+            foreach ($requiredKeys as $key) {
+                $this->assertArrayHasKey($key, $messages, sprintf('Missing key [%s] in locale [%s].', $key, $locale));
+                $this->assertNotSame('', trim((string) $messages[$key]), sprintf('Empty translation for key [%s] in locale [%s].', $key, $locale));
+            }
+        }
+    }
+}

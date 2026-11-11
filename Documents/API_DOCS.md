@@ -30,6 +30,7 @@ The MYADS v4.7.0 API ecosystem delivers high-performance, secure, and extensible
 16. **Clips 2.0 Short-Form Vertical Video Engine (`/api/clips/*`, `/clips/*`):** TikTok/Reels-style vertical video discovery with feed tabs (`latest`, `trending`, `following`), deep-link targeting, continuous watch view recording (`POST /api/clips/view`), double-tap heart pops, and saved clips collections.
 17. **Directory 2.0 & Developer Upvoting Platform (`/directory/*`, `/api/directory/*`):** Web discovery and curation suite featuring community upvoting (`POST /directory/{id}/upvote`), dynamic SVG badges (`/directory/{id}/badge`), ownership claim verification (`POST /directory/{id}/claim`), and Schema.org JSON-LD structured data.
 18. **Dedicated Support Forum & Technical Support Tickets System (`/support/*`, `/tickets/*`, `/admin/tickets/*`, `/admin/support/*`):** Autonomous, enterprise support ecosystem separating public community discussions from direct technical tickets. Features dedicated support categories, solution marking (`is_solution`), collision-free ticket reference codes (`TKT-YYYYMMDD-XXXX`), 4-department/priority workflows, secure file attachments, and notification webhooks.
+19. **Next-Gen Community Groups & Moderation Suite (`/api/groups/*`, `/groups/*`):** Full-featured social groups ecosystem with categories, public and request-based private groups, VIP paid entry fees in PTS, posting permission policies, pinned announcements, member moderation (join, leave, approve, reject, role changes, kick, ban/unban), and post moderation.
 
 ---
 
@@ -1559,6 +1560,105 @@ All admin endpoints require `admin` middleware and permission verification:
 - `POST /admin/support/topics/{id}/pin`: Toggle topic sticky status (`is_pinned`).
 - `POST /admin/support/topics/{id}/lock`: Toggle topic discussion lock (`is_locked`).
 - `MATCH ['POST', 'DELETE'] /admin/support/topics/{id}`: Delete support topic.
+
+---
+
+### 8.8. Next-Gen Community Groups & Moderation API (`/api/groups/*`)
+
+The Groups API allows mobile companion clients (`myads_app`) and authorized web interfaces to discover, join, post, and administer community groups.
+
+All endpoints require both `X-API-KEY` and Sanctum `Authorization: Bearer {token}` headers.
+
+#### 1. Group Discovery & Details
+- `GET /api/groups`: List groups with pagination, search, category filter, and sorting.
+  - **Query Parameters:**
+    - `search`: (optional, string) Search by group name or description.
+    - `category`: (optional, string) Filter by taxonomy category: `technology`, `business`, `crypto`, `marketing`, `design`, `gaming`, `education`, `entertainment`, `community`, `other`.
+    - `sort`: (optional, enum) `trending` (default), `members`, `active`, `newest`.
+    - `per_page`: (optional, integer, default: 15).
+  - **Response:** Paginated list of groups transformed via `GroupResource`.
+
+- `GET /api/groups/my`: List groups joined or owned by the authenticated user.
+  - **Response:** List of groups with membership role metadata.
+
+- `POST /api/groups`: Create a new community group.
+  - **Payload:**
+    ```json
+    {
+      "name": "Full-Stack Webmasters",
+      "slug": "full-stack-webmasters",
+      "category": "technology",
+      "privacy": "public",
+      "posting_permission": "all_members",
+      "join_fee_pts": 0,
+      "short_description": "A group for discussing web development & hosting.",
+      "description": "Comprehensive long-form markdown description...",
+      "rules_markdown": "1. Be respectful\n2. No spam or clickbait."
+    }
+    ```
+  - **Response:** `HTTP 201 Created` with created group resource.
+
+- `GET /api/groups/{id_or_slug}`: Retrieve full group profile, membership status, and contextual user permissions.
+  - **Parameters:** Numeric `id` or string `slug`.
+  - **Response Data Object:**
+    ```json
+    {
+      "id": 12,
+      "name": "Full-Stack Webmasters",
+      "slug": "full-stack-webmasters",
+      "category": "technology",
+      "privacy": "public",
+      "posting_permission": "all_members",
+      "join_fee_pts": 0,
+      "members_count": 48,
+      "posts_count": 120,
+      "avatar_url": "http://localhost/storage/groups/avatar_xxx.webp",
+      "cover_url": "http://localhost/storage/groups/cover_xxx.webp",
+      "membership": {
+        "is_member": true,
+        "role": "moderator",
+        "status": "active"
+      },
+      "permissions": {
+        "can_view_content": true,
+        "can_post": true,
+        "can_moderate": true,
+        "can_manage": false
+      }
+    }
+    ```
+
+- `PUT /api/groups/{id}`: Update group settings (Owner / Admin only).
+  - **Payload:** Accepts `name`, `category`, `privacy`, `posting_permission`, `join_fee_pts`, `short_description`, `description`, `rules_markdown`.
+
+- `DELETE /api/groups/{id}`: Safely delete group (Owner / Super-Admin only).
+  - **Action:** Cascades cleanup of group posts, forum topics, memberships, join requests, and image files.
+
+#### 2. Membership & Moderation
+- `POST /api/groups/{id}/join`: Join public group or submit request for private group.
+  - **VIP Paid Groups:** If `join_fee_pts > 0`, verifies authenticated user has sufficient PTS balance, deducts the fee, and credits the group owner.
+- `POST /api/groups/{id}/leave`: Leave group (owners must transfer ownership or delete group first).
+- `GET /api/groups/{id}/members`: Paginated member roster with filters for `status` (`active`, `pending`, `banned`).
+- `POST /api/groups/{id}/members/{userId}/approve`: Approve membership request (Moderator/Admin).
+- `POST /api/groups/{id}/members/{userId}/reject`: Reject membership request (Moderator/Admin).
+- `PUT /api/groups/{id}/members/{userId}/role`: Change member role (`role`: `member` or `moderator`) (Owner/Admin).
+- `POST /api/groups/{id}/members/{userId}/kick`: Remove member from group (Moderator/Admin).
+- `POST /api/groups/{id}/members/{userId}/ban`: Toggle ban on a member (Moderator/Admin).
+  - **Payload:** `{"ban": true}` to ban or `{"ban": false}` to unban.
+  - **Effect:** Immediately revokes posting and content viewing privileges in private groups.
+
+#### 3. Post Moderation & Feed Controls
+- `POST /api/groups/{id}/posts/{postId}/pin`: Toggle pinning an announcement to the top of the group feed (Moderator/Admin).
+  - **Validation:** Target post must belong to `group_id` and be a valid root feed status (`s_type = 100`).
+  - **Response:**
+    ```json
+    {
+      "success": true,
+      "message": "Post pin state updated successfully.",
+      "pinned_post_id": 412,
+      "is_pinned": true
+    }
+    ```
 
 ---
 

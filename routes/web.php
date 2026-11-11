@@ -262,10 +262,15 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/groups/{group}/discussions', [GroupController::class, 'storeDiscussion'])->name('groups.discussions.store');
     Route::post('/groups/{group}/members/{membership}/approve', [GroupController::class, 'approveMembership'])->name('groups.members.approve');
     Route::post('/groups/{group}/members/{membership}/reject', [GroupController::class, 'rejectMembership'])->name('groups.members.reject');
+    Route::post('/groups/{group}/members/{membership}/ban', [GroupController::class, 'banMember'])->name('groups.members.ban');
+    Route::post('/groups/{group}/members/{membership}/unban', [GroupController::class, 'unbanMember'])->name('groups.members.unban');
     Route::post('/groups/{group}/members/{membership}/role', [GroupController::class, 'updateRole'])->name('groups.members.role');
     Route::post('/groups/{group}/members/{membership}/transfer', [GroupController::class, 'transferOwnership'])->name('groups.transfer');
+    Route::post('/groups/{group}/posts/{status}/pin', [GroupController::class, 'togglePinPost'])->name('groups.posts.pin');
+    Route::delete('/groups/{group}/posts/{status}', [GroupController::class, 'deletePost'])->name('groups.posts.delete');
     Route::get('/groups/{group:slug}/edit', [GroupController::class, 'edit'])->name('groups.edit');
     Route::match(['put', 'patch'], '/groups/{group:slug}', [GroupController::class, 'update'])->name('groups.update');
+    Route::delete('/groups/{group:slug}', [GroupController::class, 'destroy'])->name('groups.destroy');
 });
 Route::get('/groups/{group:slug}', [GroupController::class, 'show'])->name('groups.show');
 
@@ -780,8 +785,11 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::post('/groups/{group}/feature', [AdminGroupController::class, 'toggleFeatured'])->name('admin.groups.feature');
     Route::get('/groups/{group}/edit', [AdminGroupController::class, 'edit'])->name('admin.groups.edit');
     Route::match(['put', 'patch'], '/groups/{group}', [AdminGroupController::class, 'update'])->name('admin.groups.update');
+    Route::delete('/groups/{group}', [AdminGroupController::class, 'destroy'])->name('admin.groups.destroy');
+    Route::post('/groups/{group}/media/clear', [AdminGroupController::class, 'clearMedia'])->name('admin.groups.media.clear');
     Route::get('/groups/{group}/members', [AdminGroupController::class, 'members'])->name('admin.groups.members');
     Route::post('/groups/{group}/members/{membership}/role', [AdminGroupController::class, 'updateMemberRole'])->name('admin.groups.members.role');
+    Route::post('/groups/{group}/members/{membership}/ban', [AdminGroupController::class, 'banMember'])->name('admin.groups.members.ban');
     Route::delete('/groups/{group}/members/{membership}', [AdminGroupController::class, 'removeMember'])->name('admin.groups.members.delete');
     Route::get('/groups/settings', [AdminGroupController::class, 'settings'])->name('admin.groups.settings');
     Route::post('/groups/settings', [AdminGroupController::class, 'updateSettings'])->name('admin.groups.settings.update');

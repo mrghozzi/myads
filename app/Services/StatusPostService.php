@@ -524,7 +524,16 @@ class StatusPostService
 
     public function delete(Status $status, User $user): void
     {
-        if ((int)$status->uid !== (int)$user->id && !$user->isAdmin()) {
+        $canDelete = (int)$status->uid === (int)$user->id || $user->isAdmin();
+        $group = null;
+        if (!$canDelete && $status->group_id && $this->schema->supports('groups')) {
+            $group = Group::find($status->group_id);
+            if ($group && app(GroupAccessService::class)->canManageGroup($group, $user)) {
+                $canDelete = true;
+            }
+        }
+
+        if (!$canDelete) {
             throw new \RuntimeException(__('messages.unauthorized'));
         }
 
@@ -557,7 +566,20 @@ class StatusPostService
             DB::table('status_mentions')->where('status_id', $status->id)->delete();
             DB::table('like')->where('post', $status->id)->delete();
             
+            $statusGroupId = $status->group_id;
+            $statusId = $status->id;
             $status->delete();
+
+            if ($statusGroupId && $this->schema->supports('groups')) {
+                $targetGroup = $group ?: Group::find($statusGroupId);
+                if ($targetGroup) {
+                    if ((int)$targetGroup->pinned_post_id === (int)$statusId) {
+                        $targetGroup->update(['pinned_post_id' => null]);
+                    }
+                    app(GroupMembershipService::class)->syncCounts($targetGroup);
+                }
+            }
+
             DB::commit();
         } catch (\Throwable $e) {
             DB::rollBack();

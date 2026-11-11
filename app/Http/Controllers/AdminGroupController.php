@@ -21,6 +21,9 @@ class AdminGroupController extends Controller
     public function index(Request $request)
     {
         $filter = (string) $request->query('status', 'all');
+        $category = (string) $request->query('category', 'all');
+        $search = trim((string) $request->query('search', ''));
+
         $allowedFilters = [
             'all',
             Group::STATUS_PENDING_REVIEW,
@@ -34,10 +37,34 @@ class AdminGroupController extends Controller
         }
 
         $groups = collect();
+        $stats = [
+            'total' => 0,
+            'active' => 0,
+            'pending' => 0,
+            'total_members' => 0,
+            'total_posts' => 0,
+        ];
+
         if ($this->schema->supports('groups')) {
+            $stats = [
+                'total' => Group::count(),
+                'active' => Group::where('status', Group::STATUS_ACTIVE)->count(),
+                'pending' => Group::where('status', Group::STATUS_PENDING_REVIEW)->count(),
+                'total_members' => Group::sum('members_count'),
+                'total_posts' => Group::sum('posts_count'),
+            ];
+
             $groups = Group::query()
                 ->with(['owner'])
-                ->when($filter !== 'all', fn ($query) => $query->where('status', $filter))
+                ->when($filter !== 'all', fn($query) => $query->where('status', $filter))
+                ->when($category !== 'all', fn($query) => $query->where('category', $category))
+                ->when($search !== '', function ($query) use ($search) {
+                    $query->where(function ($sub) use ($search) {
+                        $sub->where('name', 'like', "%{$search}%")
+                            ->orWhere('slug', 'like', "%{$search}%")
+                            ->orWhereHas('owner', fn($ownerQ) => $ownerQ->where('username', 'like', "%{$search}%"));
+                    });
+                })
                 ->orderByRaw("FIELD(status, 'pending_review', 'active', 'suspended', 'rejected')")
                 ->orderByDesc('last_activity_at')
                 ->paginate(20)
@@ -53,6 +80,10 @@ class AdminGroupController extends Controller
         return view('admin::admin.groups.index', [
             'groups' => $groups,
             'filter' => $filter,
+            'category' => $category,
+            'search' => $search,
+            'stats' => $stats,
+            'categories' => Group::CATEGORIES,
             'schemaReady' => $this->schema->supports('groups'),
         ]);
     }
@@ -129,7 +160,9 @@ class AdminGroupController extends Controller
             'description' => __('messages.admin_groups_description'),
         ]);
 
-        return view('admin::admin.groups.edit', compact('group'));
+        $categories = Group::CATEGORIES;
+
+        return view('admin::admin.groups.edit', compact('group', 'categories'));
     }
 
     public function update(Request $request, Group $group)
@@ -139,10 +172,13 @@ class AdminGroupController extends Controller
 
         $validated = $request->validate([
             'name' => 'required|string|max:120',
+            'category' => 'nullable|string|max:64',
             'short_description' => 'nullable|string|max:280',
             'description' => 'nullable|string|max:10000',
             'rules_markdown' => 'nullable|string|max:15000',
             'privacy' => 'required|in:public,private_request',
+            'posting_permission' => 'required|in:all_members,moderators_only',
+            'join_fee_pts' => 'nullable|integer|min:0|max:100000',
             'owner_id' => 'required|exists:users,id',
         ]);
 
@@ -153,10 +189,10 @@ class AdminGroupController extends Controller
         if ($oldOwnerId !== $newOwnerId) {
             $newOwner = \App\Models\User::find($newOwnerId);
             $oldOwner = \App\Models\User::find($oldOwnerId);
-            
+
             // Ensure new owner is at least a member
             $this->memberships->join($group, $newOwner);
-            
+
             // transferOwnership will update group->owner_id and sync roles
             $this->memberships->transferOwnership($group, $newOwner, \Illuminate\Support\Facades\Auth::user());
 
@@ -176,6 +212,38 @@ class AdminGroupController extends Controller
         }
 
         return back()->with('success', __('messages.admin_groups_updated'));
+    }
+
+    public function destroy(Group $group)
+    {
+        $this->memberships->deleteGroup($group, \Illuminate\Support\Facades\Auth::user());
+
+        return redirect()->route('admin.groups.index')->with('success', __('messages.groups_deleted_success'));
+    }
+
+    public function clearMedia(Request $request, Group $group)
+    {
+        $type = (string) $request->input('type');
+        if ($type === 'avatar') {
+            if ($group->avatar_path && file_exists(base_path($group->avatar_path)) && !str_contains($group->avatar_path, 'group.png')) {
+                @unlink(base_path($group->avatar_path));
+            }
+            $group->update(['avatar_path' => null]);
+        } elseif ($type === 'cover') {
+            if ($group->cover_path && file_exists(base_path($group->cover_path)) && !str_contains($group->cover_path, 'cover')) {
+                @unlink(base_path($group->cover_path));
+            }
+            $group->update(['cover_path' => null]);
+        }
+
+        return back()->with('success', __('messages.media_cleared_success') ?? 'Media cleared successfully');
+    }
+
+    public function banMember(Group $group, \App\Models\GroupMembership $membership)
+    {
+        $this->memberships->ban($membership, \Illuminate\Support\Facades\Auth::user());
+
+        return back()->with('success', __('messages.groups_member_banned'));
     }
 
     public function members(Group $group)

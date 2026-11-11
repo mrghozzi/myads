@@ -4,6 +4,8 @@ namespace App\Services;
 
 use App\Models\Group;
 use App\Models\GroupMembership;
+use App\Models\ForumTopic;
+use App\Models\Option;
 use App\Models\Status;
 use App\Models\User;
 use Illuminate\Support\Carbon;
@@ -26,10 +28,13 @@ class GroupMembershipService
                 'owner_id' => $owner->id,
                 'slug' => $this->uniqueSlug((string) ($attributes['slug'] ?? $attributes['name'] ?? 'group')),
                 'name' => trim((string) ($attributes['name'] ?? '')),
+                'category' => (string) ($attributes['category'] ?? 'general'),
                 'short_description' => trim((string) ($attributes['short_description'] ?? '')),
                 'description' => trim((string) ($attributes['description'] ?? '')),
                 'rules_markdown' => trim((string) ($attributes['rules_markdown'] ?? '')),
                 'privacy' => (string) ($attributes['privacy'] ?? Group::PRIVACY_PUBLIC),
+                'posting_permission' => (string) ($attributes['posting_permission'] ?? Group::POSTING_ALL),
+                'join_fee_pts' => (int) ($attributes['join_fee_pts'] ?? 0),
                 'status' => $initialStatus,
                 'avatar_path' => $attributes['avatar_path'] ?? null,
                 'cover_path' => $attributes['cover_path'] ?? null,
@@ -55,6 +60,10 @@ class GroupMembershipService
 
     public function join(Group $group, User $user): GroupMembership
     {
+        if ($this->access->isBanned($group, $user)) {
+            throw new \RuntimeException(__('messages.groups_user_is_banned'));
+        }
+
         return DB::transaction(function () use ($group, $user) {
             $membership = GroupMembership::query()
                 ->firstOrNew([
@@ -62,10 +71,50 @@ class GroupMembershipService
                     'user_id' => $user->id,
                 ]);
 
+            if ($membership->status === GroupMembership::STATUS_ACTIVE) {
+                return $membership;
+            }
+
+            // Check PTS join fee
+            $joinFee = (int) ($group->join_fee_pts ?? 0);
+            if ($joinFee > 0 && (int) $group->owner_id !== (int) $user->id) {
+                if ((int) $user->pts < $joinFee) {
+                    throw new \RuntimeException(__('messages.groups_insufficient_pts_for_join', ['pts' => $joinFee]));
+                }
+
+                $user->decrement('pts', $joinFee);
+                $owner = User::find($group->owner_id);
+                if ($owner) {
+                    $owner->increment('pts', $joinFee);
+                }
+
+                Option::create([
+                    'name' => 'GroupJoin',
+                    'o_valuer' => "-$joinFee",
+                    'o_type' => 'hest_pts',
+                    'o_parent' => $user->id,
+                    'o_order' => $group->id,
+                    'o_mode' => time(),
+                ]);
+
+                if ($owner) {
+                    Option::create([
+                        'name' => 'GroupJoin',
+                        'o_valuer' => "$joinFee",
+                        'o_type' => 'hest_pts',
+                        'o_parent' => $owner->id,
+                        'o_order' => $user->id,
+                        'o_mode' => time(),
+                    ]);
+                }
+            }
+
             $now = now();
             $membership->requested_at = $now;
             $membership->rejected_at = null;
             $membership->rejected_by = null;
+            $membership->banned_at = null;
+            $membership->banned_by = null;
 
             if ($group->privacy === Group::PRIVACY_PUBLIC) {
                 $membership->role = $membership->role ?: GroupMembership::ROLE_MEMBER;
@@ -207,6 +256,103 @@ class GroupMembershipService
             __('messages.groups_notification_ownership_transferred', ['group' => $group->name]),
             route('groups.show', $group)
         );
+    }
+
+    public function ban(GroupMembership $membership, User $actor): GroupMembership
+    {
+        $membership->loadMissing('group');
+
+        if (!$this->access->canBanMember($membership->group, $actor, $membership)) {
+            abort(403);
+        }
+
+        $membership->forceFill([
+            'status' => GroupMembership::STATUS_BANNED,
+            'banned_at' => now(),
+            'banned_by' => $actor->id,
+            'approved_at' => null,
+            'approved_by' => null,
+        ])->save();
+
+        $this->syncCounts($membership->group);
+
+        $this->notifications->send(
+            $membership->user_id,
+            __('messages.groups_notification_banned', ['group' => $membership->group->name]),
+            route('groups.index')
+        );
+
+        return $membership->fresh(['group', 'user']);
+    }
+
+    public function unban(GroupMembership $membership, User $actor): void
+    {
+        $membership->loadMissing('group');
+
+        if (!$this->access->canManageGroup($membership->group, $actor)) {
+            abort(403);
+        }
+
+        $membership->delete();
+        $this->syncCounts($membership->group);
+    }
+
+    public function togglePinPost(Group $group, int $statusId, User $actor): bool
+    {
+        if (!$this->access->canPinPost($group, $actor)) {
+            abort(403);
+        }
+
+        $status = Status::where('id', $statusId)->where('group_id', $group->id)->firstOrFail();
+
+        $isPinnedNow = false;
+        if ((int) $group->pinned_post_id === (int) $status->id) {
+            $group->update(['pinned_post_id' => null]);
+            $isPinnedNow = false;
+        } else {
+            $group->update(['pinned_post_id' => $status->id]);
+            $isPinnedNow = true;
+        }
+
+        return $isPinnedNow;
+    }
+
+    public function deleteGroup(Group $group, User $actor): void
+    {
+        if (!$actor->isAdmin() && !$this->access->isOwner($group, $actor)) {
+            abort(403);
+        }
+
+        DB::transaction(function () use ($group) {
+            if ($group->avatar_path && file_exists(base_path($group->avatar_path)) && !str_contains($group->avatar_path, 'group.png')) {
+                @unlink(base_path($group->avatar_path));
+            }
+            if ($group->cover_path && file_exists(base_path($group->cover_path)) && !str_contains($group->cover_path, 'cover')) {
+                @unlink(base_path($group->cover_path));
+            }
+
+            Status::where('group_id', $group->id)->update(['group_id' => null]);
+            ForumTopic::where('group_id', $group->id)->update(['group_id' => null]);
+            GroupMembership::where('group_id', $group->id)->delete();
+            $group->delete();
+        });
+    }
+
+    public function saveGroupImage(\Illuminate\Http\UploadedFile $file, string $prefix, int $groupId, ?string $oldPath = null): string
+    {
+        $extension = strtolower($file->guessExtension() ?: $file->getClientOriginalExtension() ?: 'jpg');
+        if (!in_array($extension, ['jpg', 'jpeg', 'png', 'webp', 'gif'], true)) {
+            $extension = 'jpg';
+        }
+
+        $filename = "group_{$prefix}_{$groupId}_" . time() . '_' . Str::random(8) . '.' . $extension;
+        $file->move(base_path('upload'), $filename);
+
+        if ($oldPath && file_exists(base_path($oldPath)) && !str_contains($oldPath, 'group.png') && !str_contains($oldPath, 'cover')) {
+            @unlink(base_path($oldPath));
+        }
+
+        return 'upload/' . $filename;
     }
 
     public function syncCounts(Group $group): void

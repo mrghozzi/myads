@@ -14,11 +14,27 @@
             <h1 class="admin-hero__title">{{ __('messages.admin_groups_title') }}</h1>
             <p class="admin-hero__copy">{{ __('messages.admin_groups_description') }}</p>
 
-            @if($schemaReady && $groups instanceof \Illuminate\Contracts\Pagination\LengthAwarePaginator)
-                <div class="admin-stat-strip">
+            @if($schemaReady)
+                <div class="admin-stat-strip mt-3">
                     <div class="admin-stat-card">
-                        <span class="admin-stat-label">{{ __('messages.groups') ?? 'Groups' }}</span>
-                        <span class="admin-stat-value">{{ number_format($groups->total()) }}</span>
+                        <span class="admin-stat-label">{{ __('messages.groups_stats_total') }}</span>
+                        <span class="admin-stat-value text-primary">{{ number_format($stats['total']) }}</span>
+                    </div>
+                    <div class="admin-stat-card">
+                        <span class="admin-stat-label">{{ __('messages.groups_status_active') }}</span>
+                        <span class="admin-stat-value text-success">{{ number_format($stats['active']) }}</span>
+                    </div>
+                    <div class="admin-stat-card">
+                        <span class="admin-stat-label">{{ __('messages.groups_status_pending_review') }}</span>
+                        <span class="admin-stat-value text-warning">{{ number_format($stats['pending']) }}</span>
+                    </div>
+                    <div class="admin-stat-card">
+                        <span class="admin-stat-label">{{ __('messages.groups_stats_members') }}</span>
+                        <span class="admin-stat-value">{{ number_format($stats['total_members']) }}</span>
+                    </div>
+                    <div class="admin-stat-card">
+                        <span class="admin-stat-label">{{ __('messages.groups_stats_posts') }}</span>
+                        <span class="admin-stat-value">{{ number_format($stats['total_posts']) }}</span>
                     </div>
                 </div>
             @endif
@@ -53,14 +69,32 @@
                     </h2>
                 </div>
                 <div class="admin-hero__actions p-0 shadow-none bg-transparent">
-                    <form method="GET" class="d-flex gap-2">
-                        <select name="status" class="form-select w-auto" onchange="this.form.submit()">
+                    <form method="GET" class="d-flex gap-2 flex-wrap align-items-center">
+                        <div class="input-group input-group-sm" style="width: 220px;">
+                            <span class="input-group-text"><i class="feather-search"></i></span>
+                            <input type="text" name="search" class="form-control" placeholder="{{ __('messages.search') }}..." value="{{ $search }}">
+                        </div>
+
+                        <select name="category" class="form-select form-select-sm w-auto" onchange="this.form.submit()">
+                            <option value="all">{{ __('messages.groups_all_categories') }}</option>
+                            @foreach($categories as $catKey => $catLabelKey)
+                                <option value="{{ $catKey }}" {{ $category === $catKey ? 'selected' : '' }}>
+                                    {{ __($catLabelKey) }}
+                                </option>
+                            @endforeach
+                        </select>
+
+                        <select name="status" class="form-select form-select-sm w-auto" onchange="this.form.submit()">
                             <option value="all" {{ $filter === 'all' ? 'selected' : '' }}>{{ __('messages.all') }}</option>
                             <option value="pending_review" {{ $filter === 'pending_review' ? 'selected' : '' }}>{{ __('messages.groups_status_pending_review') }}</option>
                             <option value="active" {{ $filter === 'active' ? 'selected' : '' }}>{{ __('messages.groups_status_active') }}</option>
                             <option value="suspended" {{ $filter === 'suspended' ? 'selected' : '' }}>{{ __('messages.groups_status_suspended') }}</option>
                             <option value="rejected" {{ $filter === 'rejected' ? 'selected' : '' }}>{{ __('messages.groups_status_rejected') }}</option>
                         </select>
+
+                        <button type="submit" class="btn btn-sm btn-outline-secondary">
+                            <i class="feather-filter"></i>
+                        </button>
                     </form>
                 </div>
             </div>
@@ -72,6 +106,7 @@
                             <tr>
                                 <th>{{ __('messages.name') }}</th>
                                 <th>{{ __('messages.author') }}</th>
+                                <th>{{ __('messages.groups_category') }}</th>
                                 <th>{{ __('messages.groups_privacy') }}</th>
                                 <th>{{ __('messages.status') }}</th>
                                 <th>{{ __('messages.members') }}</th>
@@ -83,8 +118,13 @@
                             @forelse($groups as $group)
                                 <tr>
                                     <td data-label="{{ __('messages.name') }}">
-                                        <div class="fw-bold text-dark">{{ $group->name }}</div>
-                                        <div class="text-muted small">@ {{ $group->slug }}</div>
+                                        <div class="d-flex align-items-center gap-2">
+                                            <img src="{{ $group->avatarUrl() }}" alt="{{ $group->name }}" style="width: 34px; height: 34px; border-radius: 8px; object-fit: cover;">
+                                            <div>
+                                                <div class="fw-bold text-dark">{{ $group->name }}</div>
+                                                <div class="text-muted small">@ {{ $group->slug }}</div>
+                                            </div>
+                                        </div>
                                     </td>
                                     <td data-label="{{ __('messages.author') }}">
                                         @if($group->owner)
@@ -98,6 +138,11 @@
                                             <span class="text-muted small">{{ __('messages.unknown_user') }}</span>
                                         @endif
                                     </td>
+                                    <td data-label="{{ __('messages.groups_category') }}">
+                                        <span class="badge bg-light text-dark border">
+                                            {{ __(\App\Models\Group::CATEGORIES[$group->category] ?? 'messages.groups_cat_general') }}
+                                        </span>
+                                    </td>
                                     <td data-label="{{ __('messages.groups_privacy') }}">
                                         @if($group->privacy === \App\Models\Group::PRIVACY_PUBLIC)
                                             <span class="badge bg-soft-success text-success">
@@ -106,6 +151,11 @@
                                         @else
                                             <span class="badge bg-soft-warning text-warning">
                                                 <i class="feather-lock me-1"></i> {{ __('messages.groups_private') }}
+                                            </span>
+                                        @endif
+                                        @if($group->join_fee_pts > 0)
+                                            <span class="badge bg-warning text-dark ms-1">
+                                                {{ $group->join_fee_pts }} PTS
                                             </span>
                                         @endif
                                     </td>
@@ -143,9 +193,9 @@
                                             <form method="POST" action="{{ route('admin.groups.status', $group) }}" class="d-inline-block">
                                                 @csrf
                                                 <select name="status" class="form-select form-select-sm d-inline-block w-auto" onchange="this.form.submit()">
-                                                    @foreach(['pending_review', 'active', 'suspended', 'rejected'] as $status)
-                                                        <option value="{{ $status }}" {{ $group->status === $status ? 'selected' : '' }}>
-                                                            {{ __('messages.groups_status_' . $status) }}
+                                                    @foreach(['pending_review', 'active', 'suspended', 'rejected'] as $statusOption)
+                                                        <option value="{{ $statusOption }}" {{ $group->status === $statusOption ? 'selected' : '' }}>
+                                                            {{ __('messages.groups_status_' . $statusOption) }}
                                                         </option>
                                                     @endforeach
                                                 </select>
@@ -156,19 +206,20 @@
                                                     <i class="feather-star"></i>
                                                 </button>
                                             </form>
+                                            <form method="POST" action="{{ route('admin.groups.destroy', $group) }}" class="d-inline-block ms-1" onsubmit="return confirm('{{ __('messages.groups_delete_confirm') }}')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button class="btn btn-sm btn-outline-danger admin-icon-btn" type="submit" title="{{ __('messages.groups_delete_group') }}">
+                                                    <i class="feather-trash-2"></i>
+                                                </button>
+                                            </form>
                                         </div>
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="7">
-                                        <div class="admin-empty-state py-5">
-                                            <div class="admin-avatar-circle mb-3">
-                                                <i class="feather-users"></i>
-                                            </div>
-                                            <h4 class="mb-1">{{ __('messages.groups_empty_state') }}</h4>
-                                            <p class="text-muted">{{ __('messages.admin_groups_description') }}</p>
-                                        </div>
+                                    <td colspan="8" class="text-center py-4 text-muted">
+                                        {{ __('messages.groups_empty_state') }}
                                     </td>
                                 </tr>
                             @endforelse
@@ -177,9 +228,9 @@
                 </div>
             </div>
 
-            @if($groups instanceof \Illuminate\Contracts\Pagination\Paginator && $groups->hasPages())
+            @if($groups instanceof \Illuminate\Contracts\Pagination\LengthAwarePaginator && $groups->hasPages())
                 <div class="admin-panel__footer">
-                    {{ $groups->links('pagination::bootstrap-5') }}
+                    {{ $groups->links() }}
                 </div>
             @endif
         </section>

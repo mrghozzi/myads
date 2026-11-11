@@ -6,6 +6,7 @@ use App\Models\ForumTopic;
 use App\Models\Group;
 use App\Models\GroupMembership;
 use App\Models\MemberSubscription;
+use App\Models\Status;
 use App\Models\User;
 use App\Support\GroupSettings;
 use App\Support\SubscriptionSettings;
@@ -45,6 +46,17 @@ class GroupAccessService
         $membership = $this->membership($group, $user);
 
         return (bool) ($membership && $membership->status === GroupMembership::STATUS_ACTIVE);
+    }
+
+    public function isBanned(?Group $group, ?User $user): bool
+    {
+        if (!$group || !$user || !$this->featureEnabled()) {
+            return false;
+        }
+
+        $membership = $this->membership($group, $user);
+
+        return (bool) ($membership && $membership->status === GroupMembership::STATUS_BANNED);
     }
 
     public function isOwner(?Group $group, ?User $user): bool
@@ -106,6 +118,10 @@ class GroupAccessService
             return false;
         }
 
+        if ($user && $this->isBanned($group, $user)) {
+            return false;
+        }
+
         if ($user?->isAdmin()) {
             return true;
         }
@@ -127,12 +143,73 @@ class GroupAccessService
             return false;
         }
 
+        if ($this->isBanned($group, $user)) {
+            return false;
+        }
+
         if ($user->isAdmin()) {
             return (string) $group->status === Group::STATUS_ACTIVE;
         }
 
-        return (string) $group->status === Group::STATUS_ACTIVE
-            && $this->hasActiveMembership($group, $user);
+        if ((string) $group->status !== Group::STATUS_ACTIVE) {
+            return false;
+        }
+
+        if (!$this->hasActiveMembership($group, $user)) {
+            return false;
+        }
+
+        // Check if posting is restricted to moderators only
+        if ((string) ($group->posting_permission ?? Group::POSTING_ALL) === Group::POSTING_MODERATORS) {
+            return $this->isModerator($group, $user);
+        }
+
+        return true;
+    }
+
+    public function canPinPost(?Group $group, ?User $user): bool
+    {
+        return $this->canManageGroup($group, $user);
+    }
+
+    public function canBanMember(?Group $group, ?User $user, ?GroupMembership $targetMembership): bool
+    {
+        if (!$group || !$user || !$targetMembership) {
+            return false;
+        }
+
+        if ($user->isAdmin()) {
+            return (int) $group->owner_id !== (int) $targetMembership->user_id;
+        }
+
+        if (!$this->canManageGroup($group, $user)) {
+            return false;
+        }
+
+        // Cannot ban owner
+        if ((int) $group->owner_id === (int) $targetMembership->user_id) {
+            return false;
+        }
+
+        // Moderator cannot ban another moderator or owner
+        if (!$this->isOwner($group, $user) && in_array($targetMembership->role, [GroupMembership::ROLE_OWNER, GroupMembership::ROLE_MODERATOR], true)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public function canDeleteGroupPost(?Group $group, ?User $user, Status $status): bool
+    {
+        if (!$user) {
+            return false;
+        }
+
+        if ($user->isAdmin() || (int) $status->uid === (int) $user->id) {
+            return true;
+        }
+
+        return $this->canManageGroup($group, $user);
     }
 
     public function ensureCanViewGroupShell(Group $group, ?User $user): void
@@ -221,7 +298,7 @@ class GroupAccessService
             ->where('status', Group::STATUS_ACTIVE)
             ->where('privacy', Group::PRIVACY_PUBLIC)
             ->pluck('id')
-            ->map(fn ($id) => (int) $id)
+            ->map(fn($id) => (int) $id)
             ->all();
 
         if (!$user || $user->isAdmin()) {
@@ -244,7 +321,7 @@ class GroupAccessService
             ->where('user_id', $user->id)
             ->where('status', GroupMembership::STATUS_ACTIVE)
             ->pluck('group_id')
-            ->map(fn ($id) => (int) $id)
+            ->map(fn($id) => (int) $id)
             ->all();
     }
 

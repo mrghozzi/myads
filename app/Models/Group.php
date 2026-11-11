@@ -17,20 +17,38 @@ class Group extends Model
     public const STATUS_SUSPENDED = 'suspended';
     public const STATUS_REJECTED = 'rejected';
 
+    public const POSTING_ALL = 'all_members';
+    public const POSTING_MODERATORS = 'moderators_only';
+
+    public const CATEGORIES = [
+        'general' => 'groups_cat_general',
+        'technology' => 'groups_cat_technology',
+        'business' => 'groups_cat_business',
+        'programming' => 'groups_cat_programming',
+        'marketing' => 'groups_cat_marketing',
+        'design' => 'groups_cat_design',
+        'gaming' => 'groups_cat_gaming',
+        'trading' => 'groups_cat_trading',
+    ];
+
     protected $fillable = [
         'owner_id',
         'slug',
         'name',
+        'category',
         'short_description',
         'description',
         'rules_markdown',
         'privacy',
+        'posting_permission',
+        'join_fee_pts',
         'status',
         'avatar_path',
         'cover_path',
         'is_featured',
         'members_count',
         'posts_count',
+        'pinned_post_id',
         'last_activity_at',
     ];
 
@@ -38,6 +56,8 @@ class Group extends Model
         'is_featured' => 'boolean',
         'members_count' => 'integer',
         'posts_count' => 'integer',
+        'join_fee_pts' => 'integer',
+        'pinned_post_id' => 'integer',
         'last_activity_at' => 'datetime',
     ];
 
@@ -64,6 +84,16 @@ class Group extends Model
     public function pendingMemberships()
     {
         return $this->memberships()->where('status', GroupMembership::STATUS_PENDING);
+    }
+
+    public function bannedMemberships()
+    {
+        return $this->memberships()->where('status', GroupMembership::STATUS_BANNED);
+    }
+
+    public function pinnedPost()
+    {
+        return $this->belongsTo(Status::class, 'pinned_post_id');
     }
 
     public function topics()

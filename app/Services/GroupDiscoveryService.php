@@ -31,7 +31,7 @@ class GroupDiscoveryService
             ->get();
     }
 
-    public function discover(?User $user, string $search = '', int $perPage = 12): LengthAwarePaginator
+    public function discover(?User $user, string $search = '', string $category = 'all', string $sort = 'trending', int $perPage = 12): LengthAwarePaginator
     {
         $search = trim($search);
         $followingIds = $user
@@ -88,11 +88,25 @@ class GroupDiscoveryService
             });
         }
 
+        if ($category !== '' && $category !== 'all') {
+            $query->where('category', $category);
+        }
+
+        if ($sort === 'members') {
+            $query->orderByDesc('members_count')->orderByDesc('last_activity_at');
+        } elseif ($sort === 'active') {
+            $query->orderByDesc('last_activity_at')->orderByDesc('members_count');
+        } elseif ($sort === 'newest') {
+            $query->orderByDesc('id');
+        } else { // 'trending' default
+            $query
+                ->orderByDesc('is_featured')
+                ->orderByDesc('active_followed_members_count')
+                ->orderByDesc('last_activity_at')
+                ->orderByDesc('members_count');
+        }
+
         return $query
-            ->orderByDesc('is_featured')
-            ->orderByDesc('active_followed_members_count')
-            ->orderByDesc('last_activity_at')
-            ->orderByDesc('members_count')
             ->paginate($perPage)
             ->withQueryString();
     }

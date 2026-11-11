@@ -16,6 +16,7 @@ class GroupMembership extends Model
     public const STATUS_ACTIVE = 'active';
     public const STATUS_PENDING = 'pending';
     public const STATUS_REJECTED = 'rejected';
+    public const STATUS_BANNED = 'banned';
 
     protected $fillable = [
         'group_id',
@@ -27,12 +28,15 @@ class GroupMembership extends Model
         'rejected_at',
         'approved_by',
         'rejected_by',
+        'banned_at',
+        'banned_by',
     ];
 
     protected $casts = [
         'requested_at' => 'datetime',
         'approved_at' => 'datetime',
         'rejected_at' => 'datetime',
+        'banned_at' => 'datetime',
     ];
 
     public function group()
@@ -53,6 +57,11 @@ class GroupMembership extends Model
     public function rejectedBy()
     {
         return $this->belongsTo(User::class, 'rejected_by');
+    }
+
+    public function bannedBy()
+    {
+        return $this->belongsTo(User::class, 'banned_by');
     }
 
     public function scopeActive($query)

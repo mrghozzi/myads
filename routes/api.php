@@ -151,6 +151,23 @@ Route::middleware(['api.key', 'auth:sanctum'])->group(function () {
     Route::post('/forums/comments/{commentId}/best-answer', [App\Http\Controllers\Api\ForumApiController::class, 'toggleBestAnswer']);
     Route::delete('/forums/comments/{commentId}', [App\Http\Controllers\Api\ForumApiController::class, 'deleteComment']);
 
+    // Groups API
+    Route::get('/groups', [App\Http\Controllers\Api\GroupApiController::class, 'index']);
+    Route::get('/groups/my', [App\Http\Controllers\Api\GroupApiController::class, 'myGroups']);
+    Route::get('/groups/{identifier}', [App\Http\Controllers\Api\GroupApiController::class, 'show']);
+    Route::post('/groups', [App\Http\Controllers\Api\GroupApiController::class, 'store']);
+    Route::put('/groups/{id}', [App\Http\Controllers\Api\GroupApiController::class, 'update']);
+    Route::post('/groups/{id}/join', [App\Http\Controllers\Api\GroupApiController::class, 'join']);
+    Route::post('/groups/{id}/leave', [App\Http\Controllers\Api\GroupApiController::class, 'leave']);
+    Route::get('/groups/{id}/feed', [App\Http\Controllers\Api\GroupApiController::class, 'feed']);
+    Route::get('/groups/{id}/discussions', [App\Http\Controllers\Api\GroupApiController::class, 'discussions']);
+    Route::get('/groups/{id}/members', [App\Http\Controllers\Api\GroupApiController::class, 'members']);
+    Route::post('/groups/{id}/members/{membershipId}/approve', [App\Http\Controllers\Api\GroupApiController::class, 'approveMember']);
+    Route::post('/groups/{id}/members/{membershipId}/reject', [App\Http\Controllers\Api\GroupApiController::class, 'rejectMember']);
+    Route::post('/groups/{id}/members/{membershipId}/ban', [App\Http\Controllers\Api\GroupApiController::class, 'banMember']);
+    Route::post('/groups/{id}/members/{membershipId}/role', [App\Http\Controllers\Api\GroupApiController::class, 'updateRole']);
+    Route::post('/groups/{id}/posts/{statusId}/pin', [App\Http\Controllers\Api\GroupApiController::class, 'togglePinPost']);
+
     // Store API (Mobile specific)
     Route::get('/store/products', [App\Http\Controllers\Api\StoreApiController::class, 'index']);
     Route::get('/store/products/{id}', [App\Http\Controllers\Api\StoreApiController::class, 'show']);

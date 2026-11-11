@@ -153,6 +153,55 @@
   * Completely updated `Documents/THEME_GUIDE.md` detailing the modern parent/child inheritance system, manifest specification, CLI tools, lifecycle hooks, and security standards.
   * Created dedicated test suite `tests/Feature/Themes/AdvancedThemeSystemTest.php` with 9 feature tests and 54 assertions covering scaffolding, inheritance, syntax validation, deletion safeguards, archive hardening, live preview routing, cookie persistence, and admin endpoints (100% pass rate).
 
+### Next-Gen Community Groups & Enterprise Moderation Suite (`/groups`, `/admin/groups/*`, `/api/groups/*`)
+* **Database Architecture & Model Enhancements (`database/migrations/2026_11_11_020000_upgrade_groups_system_tables.php`)**:
+  * Added `category` string column with index supporting 10 taxonomy categories (`technology`, `business`, `crypto`, `marketing`, `design`, `gaming`, `education`, `entertainment`, `community`, `other`).
+  * Added `posting_permission` enum column (`all_members`, `moderators_only`) giving owners control over who can post in the group feed.
+  * Added `join_fee_pts` unsigned integer column supporting VIP paid membership groups with points-based entrance fees.
+  * Added `pinned_post_id` nullable unsigned big integer with foreign key cascading to `status` table for pinning key announcements to the group feed.
+  * Added `banned_at` and `banned_by` columns to `group_memberships` table, alongside compound index `gm_group_status_role_idx` (`[group_id, status, role]`) for high-performance membership and access checks.
+  * Updated `Group` and `GroupMembership` Eloquent models with constants, fillable attributes, casts, and relations (`pinnedPost()`, `bannedMemberships()`, `bannedBy()`).
+* **Granular Moderation & Permissions Logic (`GroupAccessService`, `GroupMembershipService`, `StatusPostService`)**:
+  * Enhanced `GroupAccessService` with `isBanned()`, updated `canViewGroupContent()` to enforce ban restrictions, updated `canPostToGroup()` to respect posting permissions and active ban states, and added `canPinPost()`, `canBanMember()`, and `canDeleteGroupPost()`.
+  * Enhanced `GroupMembershipService` with VIP group join PTS settlement: deducting entrance points from joining members and crediting the group owner with a clear ledger note.
+  * Implemented `ban()` and `unban()` member enforcement actions, updating membership status and timestamps.
+  * Implemented `togglePinPost()` with validation ensuring the target post belongs to the group and is an active root topic status (`s_type = 100`).
+  * Implemented safe group deletion (`deleteGroup`) with cascading cleanups of posts, topics, memberships, join requests, and avatar/cover file assets.
+  * Updated `StatusPostService::delete()` so group owners and moderators can delete spam or abusive posts belonging to their group (`status->group_id`), and automatically unpins the post if it was pinned.
+  * Upgraded avatar and cover uploads in `saveGroupImage()` with strict MIME validation (`image/jpeg, image/png, image/webp, image/gif`), extension whitelisting, cryptographic filenames, and cleanup of obsolete media assets.
+* **Modern `@.superdesign` Frontend Experience (`themes/default/views/groups/`)**:
+  * **Groups Directory (`index.blade.php`)**: Completely overhauled with a glassmorphic hero header, category filter pills with active counters, multi-criteria sorting pills (Trending, Most Members, Most Active, Newest), PTS fee badge chips, privacy indicators, and responsive card layouts.
+  * **Group Showcase (`show.blade.php`)**: Enhanced group header with category pill, posting permission badge, PTS fee badge, pinned post hero widget at the top of the feed with visual unpin controls, in-feed moderation action dropdowns (Pin/Unpin and Delete Post), member moderation flyouts (Ban Member), banned members inspection drawer, and owner group deletion with confirmation modal.
+  * **Group Creation Wizard (`create.blade.php`)**: Rebuilt as a modern 2-column layout with an interactive live preview card that updates dynamically as the user types group name, description, privacy, category, and PTS fee.
+  * **Group Settings Editor (`edit.blade.php`)**: Enhanced with category selector, posting permissions, PTS entry fee, and a danger zone panel for group deletion.
+* **Administrative Control Center (`admin_themes/default/views/admin/groups/`, `AdminGroupController`)**:
+  * Upgraded `/admin/groups` with 5 real-time KPI summary cards: Total Groups, Active, Pending Review, Total Memberships, and VIP Paid Groups.
+  * Integrated debounced live search and category dropdown filters.
+  * Added administrative group deletion with confirmation modal and media asset purging.
+  * Added avatar and cover media clearing buttons in `/admin/groups/{id}/edit` allowing administrators to safely reset inappropriate group media to defaults.
+  * Added direct administrative member ban enforcement in `/admin/groups/{id}/members`.
+* **Mobile Sanctum RESTful API Suite (`/api/groups/*`, `GroupApiController`)**:
+  * Created 15 RESTful endpoints under `Route::middleware(['api.key', 'auth:sanctum'])`:
+    * `GET /api/groups` (Directory listing with category and search filters)
+    * `GET /api/groups/my` (Authenticated user's joined groups)
+    * `POST /api/groups` (Create group with validation and eligibility checks)
+    * `GET /api/groups/{id_or_slug}` (Detailed group metadata and user permissions)
+    * `PUT /api/groups/{id}` (Update group settings)
+    * `DELETE /api/groups/{id}` (Delete group)
+    * `POST /api/groups/{id}/join` (Join group or request membership, with VIP PTS handling)
+    * `POST /api/groups/{id}/leave` (Leave group)
+    * `GET /api/groups/{id}/members` (Paginated member listing)
+    * `POST /api/groups/{id}/members/{userId}/approve` (Approve membership request)
+    * `POST /api/groups/{id}/members/{userId}/reject` (Reject membership request)
+    * `PUT /api/groups/{id}/members/{userId}/role` (Change member role: member, moderator, admin)
+    * `POST /api/groups/{id}/members/{userId}/kick` (Remove member)
+    * `POST /api/groups/{id}/members/{userId}/ban` (Ban/unban member)
+    * `POST /api/groups/{id}/posts/{postId}/pin` (Pin/unpin post)
+  * Built `GroupResource` and `GroupMembershipResource` transforming model data with computed fields, active role, permissions flags (`can_post`, `can_moderate`, `can_manage`), and formatted URLs.
+* **Comprehensive 14-Language Localization & Automated Test Coverage**:
+  * Added 43 localized keys across all 14 platform languages (`lang/*/messages.php`).
+  * Created comprehensive test suites: `tests/Feature/GroupsFeatureTest.php`, `tests/Feature/GroupApiTest.php`, and `tests/Feature/V430GroupsTranslationsFeatureTest.php` with 20 passing tests and 2,657 assertions (100% pass rate).
+
 ---
 
 # v4.6.4
