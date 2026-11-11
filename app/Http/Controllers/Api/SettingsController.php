@@ -290,18 +290,35 @@ class SettingsController extends Controller
         $followerVal = (int) ($settings->email_new_follower ?? 1);
         $commentVal = (int) ($settings->email_new_comment ?? 1);
 
+        $pushMentionVal = (int) ($settings->push_mention ?? 1);
+        $pushMessageVal = (int) ($settings->push_new_message ?? 1);
+        $pushFollowerVal = (int) ($settings->push_new_follower ?? 1);
+        $pushCommentVal = (int) ($settings->push_new_comment ?? 1);
+        $pushReactionVal = (int) ($settings->push_reaction ?? 1);
+
         return response()->json([
             'settings' => $settings,
-            // Mobile app shorthand keys
+            // Mobile app shorthand keys (Email)
             'email_mentions' => $mentionVal,
             'email_messages' => $messageVal,
             'email_follows' => $followerVal,
             'email_comments' => $commentVal,
+            // Mobile app shorthand keys (Push)
+            'push_mentions' => $pushMentionVal,
+            'push_messages' => $pushMessageVal,
+            'push_follows' => $pushFollowerVal,
+            'push_comments' => $pushCommentVal,
+            'push_reactions' => $pushReactionVal,
             // Canonical schema keys
             'email_mention' => (bool) $mentionVal,
             'email_new_message' => (bool) $messageVal,
             'email_new_follower' => (bool) $followerVal,
             'email_new_comment' => (bool) $commentVal,
+            'push_mention' => (bool) $pushMentionVal,
+            'push_new_message' => (bool) $pushMessageVal,
+            'push_new_follower' => (bool) $pushFollowerVal,
+            'push_new_comment' => (bool) $pushCommentVal,
+            'push_reaction' => (bool) $pushReactionVal,
         ]);
     }
 
@@ -315,6 +332,11 @@ class SettingsController extends Controller
             'email_messages' => 'email_new_message',
             'email_follows' => 'email_new_follower',
             'email_comments' => 'email_new_comment',
+            'push_mentions' => 'push_mention',
+            'push_messages' => 'push_new_message',
+            'push_follows' => 'push_new_follower',
+            'push_comments' => 'push_new_comment',
+            'push_reactions' => 'push_reaction',
         ];
         foreach ($aliasMap as $mobileKey => $canonicalKey) {
             if ($request->has($mobileKey) && !$request->has($canonicalKey)) {
@@ -323,9 +345,20 @@ class SettingsController extends Controller
         }
 
         $fields = [
-            'email_new_follower', 'email_new_comment', 'email_new_message', 
-            'email_mention', 'email_repost', 'email_reaction', 
-            'email_forum_reply', 'email_marketplace_update'
+            'email_new_follower',
+            'email_new_comment',
+            'email_new_message',
+            'email_mention',
+            'email_repost',
+            'email_reaction',
+            'email_forum_reply',
+            'email_marketplace_update',
+            'push_new_follower',
+            'push_new_comment',
+            'push_new_message',
+            'push_mention',
+            'push_reaction',
+            'push_forum_reply',
         ];
 
         $data = [];
@@ -424,8 +457,8 @@ class SettingsController extends Controller
         $user = Auth::user();
         $rawInput = $request->input('badge_ids', $request->input('showcase', []));
         $badgeIds = collect($rawInput)
-            ->filter(fn ($id) => is_numeric($id))
-            ->map(fn ($id) => (int) $id)
+            ->filter(fn($id) => is_numeric($id))
+            ->map(fn($id) => (int) $id)
             ->unique()
             ->take(6)
             ->values();
@@ -495,7 +528,7 @@ class SettingsController extends Controller
         ]);
 
         $user = Auth::user();
-        
+
         \App\Models\Option::updateOrCreate(
             ['o_type' => 'fcm_token', 'o_parent' => $user->id],
             ['o_valuer' => $request->input('token'), 'name' => 'FCM Device Token', 'o_order' => 0]

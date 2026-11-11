@@ -132,6 +132,7 @@ Route::middleware(['api.key', 'auth:sanctum'])->group(function () {
     Route::match(['POST', 'GET'], '/notifications/mark-all-read', [App\Http\Controllers\Api\NotificationController::class, 'markAllAsRead']);
     Route::match(['POST', 'GET'], '/notifications/{id}/read', [App\Http\Controllers\Api\NotificationController::class, 'markAsRead']);
     Route::match(['POST', 'GET'], '/notifications/{id}/mark-read', [App\Http\Controllers\Api\NotificationController::class, 'markAsRead']);
+    Route::delete('/notifications/{id}', [App\Http\Controllers\Api\NotificationController::class, 'destroy']);
 
     // Live Event Stream (SSE)
     Route::get('/live/stream', [App\Http\Controllers\LiveStreamController::class, 'stream'])->name('api.live.stream');

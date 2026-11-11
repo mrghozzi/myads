@@ -14,6 +14,7 @@ class Notification extends Model
 
     protected $fillable = [
         'uid',
+        'sender_id',
         'name',
         'nurl',
         'logo',
@@ -33,5 +34,10 @@ class Notification extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'uid');
+    }
+
+    public function sender()
+    {
+        return $this->belongsTo(User::class, 'sender_id');
     }
 }

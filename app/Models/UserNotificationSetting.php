@@ -19,6 +19,12 @@ class UserNotificationSetting extends Model
         'email_reaction',
         'email_forum_reply',
         'email_marketplace_update',
+        'push_new_follower',
+        'push_new_comment',
+        'push_new_message',
+        'push_mention',
+        'push_reaction',
+        'push_forum_reply',
     ];
 
     protected $casts = [
@@ -30,6 +36,12 @@ class UserNotificationSetting extends Model
         'email_reaction' => 'boolean',
         'email_forum_reply' => 'boolean',
         'email_marketplace_update' => 'boolean',
+        'push_new_follower' => 'boolean',
+        'push_new_comment' => 'boolean',
+        'push_new_message' => 'boolean',
+        'push_mention' => 'boolean',
+        'push_reaction' => 'boolean',
+        'push_forum_reply' => 'boolean',
     ];
 
     public function user()
