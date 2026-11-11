@@ -24,14 +24,17 @@ class StatusController extends Controller
         $user = Auth::user();
         
         $groups = [];
-        // Check if user has groups() relation
-        if (method_exists($user, 'groups')) {
-            $groups = $user->groups()->get()->map(function ($group) {
+        if ($user && method_exists($user, 'groups')) {
+            $groups = $user->groups()->where('groups.status', \App\Models\Group::STATUS_ACTIVE)->get()->map(function ($group) {
                 return [
                     'id' => $group->id,
                     'name' => $group->name,
                     'slug' => $group->slug,
-                    'image_url' => $group->image_url ? asset($group->image_url) : null,
+                    'image_url' => $group->avatarUrl(),
+                    'avatar_url' => $group->avatarUrl(),
+                    'category' => $group->category,
+                    'category_name' => \App\Models\Group::categoryLabel($group->category),
+                    'posting_permission' => $group->posting_permission,
                 ];
             });
         }

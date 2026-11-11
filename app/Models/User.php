@@ -396,6 +396,12 @@ class User extends Authenticatable
         return $this->hasMany(GroupMembership::class, 'user_id');
     }
 
+    public function groups()
+    {
+        return $this->belongsToMany(Group::class, 'group_memberships', 'user_id', 'group_id')
+            ->wherePivot('status', GroupMembership::STATUS_ACTIVE);
+    }
+
     public static function generatePublicUid(): string
     {
         do {

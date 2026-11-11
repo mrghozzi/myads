@@ -2,7 +2,7 @@
 > **Specification Version:** `v4.7.0` (Active Development / Current Release)  
 > **Target Framework:** Laravel 12 (PHP 8.2+)  
 > **Authentication Engines:** Laravel Sanctum (Mobile & Web API), OAuth 2.0 (Developer Platform), and Server-Sent Events (SSE Live Stream).  
-> **Mobile Companion Client:** `myads_app` (v1.8.7+29)  
+> **Mobile Companion Client:** `myads_app` (v1.8.9+31)  
 > **Last Updated:** October 2026  
 
 ---
@@ -12,7 +12,7 @@
 The MYADS v4.7.0 API ecosystem delivers high-performance, secure, and extensible interfaces connecting web clients, companion mobile applications (Flutter), and third-party developer integrations.
 
 ### Primary API Subsystems
-1. **Internal Mobile & Web API (`/api/*`):** Powered by Laravel Sanctum for mobile app companion clients (`myads_app` v1.8.7+29) and web AJAX workflows.
+1. **Internal Mobile & Web API (`/api/*`):** Powered by Laravel Sanctum for mobile app companion clients (`myads_app` v1.8.9+31) and web AJAX workflows.
 2. **Video Hub & Cinema Watch Engine (`/api/video/*`, `/video/watch/{id}`, `/video/{id}`):** Dedicated video endpoints providing content-isolated feeds, dynamic categories, multi-criteria sorting, and cinema watch pages with suggested videos collections.
 3. **Modern Community Forum & Moderation API (`/api/forums/*`, `/forum/*`):** Hierarchical category discovery with custom colors, real-time filtered topic streams, threaded 2-level comment trees, pinned comments, best answer resolution, and topic lock/pin controls.
 4. **Real-Time Events Engine (`/live/stream` & `/api/live/stream` — RT-04):** Zero-overhead Server-Sent Events (SSE) streaming engine delivering instant unread counters (synchronized with `MessageConversationService`), live toasts, and feed updates.
@@ -725,7 +725,44 @@ All settings mutation endpoints accept `POST`, `PUT`, and `PATCH` HTTP verbs for
 - `GET /api/tags/suggest`: Query hashtag autocomplete suggestions (`?q=tag_keyword`).
 - `GET /api/mentions/users`: Query user mention autocomplete suggestions (`?q=username_keyword`). Returns user avatar, username, and name.
 - `GET /api/statuses/{id}`: Retrieve detailed post payload. For video posts, includes `suggested_videos` collection, `is_following`, and `is_saved`.
-- `GET /api/composer/options`: Retrieve post composer options (`groups`, `directory_categories`, `supported_kinds`).
+- `GET /api/composer/options`: Retrieve post composer options and authorized publishing targets for the authenticated member.
+  - *Headers:* `X-API-KEY: {key}`, `Authorization: Bearer {token}`
+  - *Response Schema (HTTP 200):*
+    ```json
+    {
+        "groups": [
+            {
+                "id": 12,
+                "name": "Full-Stack Webmasters",
+                "slug": "full-stack-webmasters",
+                "image_url": "https://domain.com/upload/groups/avatar_xxx.webp",
+                "avatar_url": "https://domain.com/upload/groups/avatar_xxx.webp",
+                "category": "technology",
+                "category_name": "Technology & Dev",
+                "posting_permission": "all_members"
+            }
+        ],
+        "directory_categories": [
+            { "id": 1, "name": "Software & Tools" }
+        ],
+        "supported_kinds": ["text", "gallery", "link", "repost", "video", "audio", "file", "music", "clips"]
+    }
+    ```
+- `StatusResource` **Group Metadata Payload (`group`):**
+  When a status post belongs to a community group (`group_id != null`), the API transforms and embeds the target group object:
+  ```json
+  {
+      "group_id": 12,
+      "group": {
+          "id": 12,
+          "name": "Full-Stack Webmasters",
+          "slug": "full-stack-webmasters",
+          "category": "technology",
+          "category_name": "Technology & Dev",
+          "avatar_url": "https://domain.com/upload/groups/avatar_xxx.webp"
+      }
+  }
+  ```
 - `POST /api/statuses/link-preview`: Generate live metadata preview for a target URL (`{"link_url": "..."}`).
 - `POST /api/statuses`: Publish a new post (Multipart Form-Data supporting `text`, `post_kind`, `video_title`, `video_thumbnail`, `images[]`, `videos[]`, `audios[]`, `files[]`, `link_url`, `group_id`, `poll_question`, `poll_options[]`, `poll_duration_days`).
   - *Poll Parameters (when `post_kind` is `"poll"`):*

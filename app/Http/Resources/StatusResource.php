@@ -49,12 +49,18 @@ class StatusResource extends JsonResource
         $canDelete = $canEdit;
 
         $groupMeta = null;
-        if ($this->group_id && $this->relationLoaded('groupRecord') && $this->groupRecord) {
-            $groupMeta = [
-                'id' => $this->groupRecord->id,
-                'name' => $this->groupRecord->name,
-                'slug' => $this->groupRecord->slug,
-            ];
+        if ($this->group_id) {
+            $group = $this->relationLoaded('groupRecord') ? $this->groupRecord : $this->groupRecord;
+            if ($group) {
+                $groupMeta = [
+                    'id' => $group->id,
+                    'name' => $group->name,
+                    'slug' => $group->slug,
+                    'category' => $group->category,
+                    'category_name' => \App\Models\Group::categoryLabel($group->category),
+                    'avatar_url' => $group->avatarUrl(),
+                ];
+            }
         }
 
         $videoTitle = null;
