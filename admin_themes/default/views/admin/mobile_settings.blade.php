@@ -86,13 +86,13 @@
                         <i class="feather-bell"></i>
                     </div>
                     <div>
-                        <div class="text-muted fs-12 fw-semibold text-uppercase">FCM Push Engine</div>
+                        <div class="text-muted fs-12 fw-semibold text-uppercase">{{ __('messages.fcm_push_engine') }}</div>
                         @if(($mobileSettings['firebase_mode'] ?? '') == 'fcm_v1')
-                            <div class="fs-15 fw-bold text-success"><i class="feather-check-circle me-1"></i>HTTP v1 (OAuth2)</div>
+                            <div class="fs-15 fw-bold text-success"><i class="feather-check-circle me-1"></i>{{ __('messages.fcm_mode_v1_short') }}</div>
                         @elseif(($mobileSettings['firebase_mode'] ?? '') == 'legacy')
-                            <div class="fs-15 fw-bold text-info"><i class="feather-zap me-1"></i>Legacy FCM Key</div>
+                            <div class="fs-15 fw-bold text-info"><i class="feather-zap me-1"></i>{{ __('messages.fcm_mode_legacy_short') }}</div>
                         @else
-                            <div class="fs-15 fw-bold text-muted"><i class="feather-slash me-1"></i>Push Disabled</div>
+                            <div class="fs-15 fw-bold text-muted"><i class="feather-slash me-1"></i>{{ __('messages.fcm_mode_disabled_short') }}</div>
                         @endif
                     </div>
                 </div>
@@ -106,8 +106,8 @@
                         <i class="feather-smartphone"></i>
                     </div>
                     <div>
-                        <div class="text-muted fs-12 fw-semibold text-uppercase">Registered Devices</div>
-                        <div class="fs-15 fw-bold text-dark"><span class="badge bg-success rounded-pill px-2.5 py-1">{{ $mobileSettings['device_tokens_count'] ?? 0 }}</span> Devices</div>
+                        <div class="text-muted fs-12 fw-semibold text-uppercase">{{ __('messages.mobile_registered_devices') }}</div>
+                        <div class="fs-15 fw-bold text-dark"><span class="badge bg-success rounded-pill px-2.5 py-1">{{ $mobileSettings['device_tokens_count'] ?? 0 }}</span> {{ __('messages.mobile_devices_count_suffix') }}</div>
                     </div>
                 </div>
             </div>
@@ -140,7 +140,7 @@
                                     <i class="feather-eye" id="toggleApiKeyIcon"></i>
                                 </button>
                                 <button type="button" class="btn btn-primary" onclick="copyApiKey()" {{ empty($mobileSettings['api_key']) ? 'disabled' : '' }}>
-                                    <i class="feather-copy me-1"></i> {{ __('messages.Clik') ?? 'Copy' }}
+                                    <i class="feather-copy me-1"></i> {{ __('messages.copy') }}
                                 </button>
                             </div>
                             <div id="copyFeedback" class="form-text text-success d-none mt-1 fw-semibold">
@@ -227,14 +227,14 @@
                 <div class="card-header bg-transparent border-bottom py-3 d-flex align-items-center justify-content-between flex-wrap gap-2">
                     <h5 class="card-title mb-0 d-flex align-items-center">
                         <i class="feather-bell me-2 text-primary"></i>
-                        {{ __('messages.fcm_push_engine_title') ?? 'محرك إرسال الإشعارات عبر Firebase (FCM v1 & Legacy)' }}
+                        {{ __('messages.fcm_push_engine_title') }}
                     </h5>
                     <div class="d-flex align-items-center gap-2">
                         <span class="badge bg-soft-info text-info px-3 py-1.5 rounded-pill fs-12">
-                            <i class="feather-smartphone me-1"></i> {{ $mobileSettings['device_tokens_count'] ?? 0 }} {{ __('messages.registered_devices') ?? 'Registered Devices' }}
+                            <i class="feather-smartphone me-1"></i> {{ $mobileSettings['device_tokens_count'] ?? 0 }} {{ __('messages.mobile_registered_devices') }}
                         </span>
                         <span class="badge bg-soft-primary text-primary px-3 py-1.5 rounded-pill fs-12">
-                            {{ ($mobileSettings['firebase_mode'] ?? '') == 'fcm_v1' ? 'HTTP v1 OAuth2' : (($mobileSettings['firebase_mode'] ?? '') == 'legacy' ? 'Legacy Key' : 'Push Inactive') }}
+                            {{ ($mobileSettings['firebase_mode'] ?? '') == 'fcm_v1' ? __('messages.fcm_mode_v1_short') : (($mobileSettings['firebase_mode'] ?? '') == 'legacy' ? __('messages.fcm_mode_legacy_short') : __('messages.fcm_mode_disabled_short')) }}
                         </span>
                     </div>
                 </div>
@@ -245,65 +245,65 @@
                             <form action="{{ route('admin.settings.mobile.update') }}" method="POST" enctype="multipart/form-data">
                                 @csrf
                                 <div class="mb-4">
-                                    <label class="form-label fw-bold fs-13">بروتوكول إرسال الإشعارات (FCM Engine Protocol)</label>
+                                    <label class="form-label fw-bold fs-13">{{ __('messages.fcm_engine_protocol') }}</label>
                                     <select name="firebase_mode" class="form-select" id="firebaseModeSelect" onchange="updateFcmModeFields()">
                                         <option value="fcm_v1" {{ ($mobileSettings['firebase_mode'] ?? '') == 'fcm_v1' ? 'selected' : '' }}>
-                                            ⭐ FCM HTTP v1 (OAuth2 Service Account JSON - الموصى به رسمياً)
+                                            ⭐ {{ __('messages.fcm_mode_v1_option') }}
                                         </option>
                                         <option value="legacy" {{ ($mobileSettings['firebase_mode'] ?? '') == 'legacy' ? 'selected' : '' }}>
-                                            ⚡ Legacy FCM Server Key (المفتاح القديم)
+                                            ⚡ {{ __('messages.fcm_mode_legacy_option') }}
                                         </option>
                                         <option value="disabled" {{ ($mobileSettings['firebase_mode'] ?? '') == 'disabled' ? 'selected' : '' }}>
-                                            ❌ تعطيل إرسال إشعارات الـ Push
+                                            ❌ {{ __('messages.fcm_mode_disabled_option') }}
                                         </option>
                                     </select>
-                                    <div class="form-text fs-12">اختر البروتوكول المعتمد لدفع الإشعارات الفورية إلى هواتف الأعضاء عبر Firebase Cloud Messaging.</div>
+                                    <div class="form-text fs-12">{{ __('messages.fcm_engine_protocol_help') }}</div>
                                 </div>
 
                                 <div id="fcmV1Fields">
                                     <div class="mb-3">
-                                        <label class="form-label fw-bold fs-13">معرف مشروع فايربيس (Firebase Project ID)</label>
+                                        <label class="form-label fw-bold fs-13">{{ __('messages.fcm_project_id') }}</label>
                                         <div class="input-group">
                                             <span class="input-group-text"><i class="feather-box"></i></span>
                                             <input type="text" name="firebase_project_id" class="form-control" value="{{ $mobileSettings['firebase_project_id'] ?? '' }}" placeholder="myads-production-12345">
                                         </div>
-                                        <div class="form-text fs-12">معرف المشروع كما يظهر في Firebase Console (Project Settings ➔ General).</div>
+                                        <div class="form-text fs-12">{{ __('messages.fcm_project_id_help') }}</div>
                                     </div>
 
                                     <div class="mb-3">
-                                        <label class="form-label fw-bold fs-13">ملف حساب الخدمة (Service Account JSON File)</label>
+                                        <label class="form-label fw-bold fs-13">{{ __('messages.fcm_service_account_file') }}</label>
                                         <input type="file" name="service_account_file" class="form-control" accept=".json,application/json">
-                                        <div class="form-text fs-12">قم برفع ملف <code>service-account.json</code> المحمّل من Google Cloud IAM أو Firebase Console. سيتم حفظه تلقائياً في <code>storage/app/firebase/</code> بشكل مشفر ومحمي.</div>
+                                        <div class="form-text fs-12">{{ __('messages.fcm_service_account_file_help') }}</div>
                                     </div>
 
                                     <div class="mb-3">
-                                        <label class="form-label fw-bold fs-13">أو مسار الملف بالسيرفر (Service Account JSON Path)</label>
+                                        <label class="form-label fw-bold fs-13">{{ __('messages.fcm_service_account_path') }}</label>
                                         <div class="input-group">
                                             <span class="input-group-text"><i class="feather-folder"></i></span>
                                             <input type="text" name="firebase_credentials" class="form-control font-monospace fs-12" value="{{ $mobileSettings['firebase_credentials'] ?? '' }}" placeholder="storage/app/firebase/service-account.json">
                                         </div>
                                         @if(!empty($mobileSettings['firebase_credentials']) && file_exists($mobileSettings['firebase_credentials']))
-                                            <div class="text-success fs-12 mt-1"><i class="feather-check-circle me-1"></i> الملف موجود ومتصل بنجاح في السيرفر.</div>
+                                            <div class="text-success fs-12 mt-1"><i class="feather-check-circle me-1"></i> {{ __('messages.fcm_file_connected') }}</div>
                                         @elseif(!empty($mobileSettings['firebase_credentials']))
-                                            <div class="text-warning fs-12 mt-1"><i class="feather-alert-triangle me-1"></i> لم يتم العثور على الملف بالمسار المحدد. تأكد من صحة المسار أو ارفعه أعلاه.</div>
+                                            <div class="text-warning fs-12 mt-1"><i class="feather-alert-triangle me-1"></i> {{ __('messages.fcm_file_not_found') }}</div>
                                         @endif
                                     </div>
                                 </div>
 
                                 <div id="fcmLegacyFields">
                                     <div class="mb-3">
-                                        <label class="form-label fw-bold fs-13">مفتاح الخادم القديم (Legacy FCM Server Key)</label>
+                                        <label class="form-label fw-bold fs-13">{{ __('messages.fcm_legacy_server_key') }}</label>
                                         <div class="input-group">
                                             <span class="input-group-text"><i class="feather-lock"></i></span>
                                             <input type="password" name="fcm_server_key" class="form-control font-monospace fs-12" value="{{ $mobileSettings['fcm_server_key'] ?? '' }}" placeholder="AAAA...your_legacy_server_key">
                                         </div>
-                                        <div class="form-text fs-12">مفتاح Server Key من تبويب Cloud Messaging القديم في إعدادات المشروع.</div>
+                                        <div class="form-text fs-12">{{ __('messages.fcm_legacy_server_key_help') }}</div>
                                     </div>
                                 </div>
 
                                 <div class="pt-3 border-top d-flex justify-content-end">
                                     <button type="submit" class="btn btn-primary px-4">
-                                        <i class="feather-save me-1"></i> حفظ إعدادات Firebase
+                                        <i class="feather-save me-1"></i> {{ __('messages.fcm_save_settings') }}
                                     </button>
                                 </div>
                             </form>
@@ -314,27 +314,27 @@
                             <div class="p-4 bg-light border rounded-3 h-100 d-flex flex-column justify-content-between">
                                 <div>
                                     <h6 class="fw-bold mb-3 d-flex align-items-center text-primary">
-                                        <i class="feather-send me-2"></i> اختبار الإرسال الفوري (Live Push Test)
+                                        <i class="feather-send me-2"></i> {{ __('messages.fcm_live_push_test_title') }}
                                     </h6>
                                     <p class="text-muted fs-13 mb-3">
-                                        يمكنك إرسال إشعار تجريبي مباشر إلى أجهزة الهواتف المسجلة في النظام للتحقق من تكامل المفاتيح وسرعة الوصول.
+                                        {{ __('messages.fcm_live_push_test_desc') }}
                                     </p>
 
                                     <div class="p-3 bg-white border rounded-3 mb-4 shadow-xs">
                                         <div class="d-flex justify-content-between align-items-center mb-2">
-                                            <span class="text-muted fs-12">أجهزة مسجلة (FCM Tokens):</span>
+                                            <span class="text-muted fs-12">{{ __('messages.fcm_registered_tokens_label') }}</span>
                                             <span class="badge bg-soft-success text-success fw-bold">{{ $mobileSettings['device_tokens_count'] ?? 0 }}</span>
                                         </div>
                                         <div class="d-flex justify-content-between align-items-center mb-2">
-                                            <span class="text-muted fs-12">بروتوكول التشفير:</span>
+                                            <span class="text-muted fs-12">{{ __('messages.fcm_encryption_protocol_label') }}</span>
                                             <span class="badge bg-soft-primary text-primary">{{ ($mobileSettings['firebase_mode'] ?? '') == 'fcm_v1' ? 'OAuth2 JWT v1' : 'Legacy Key' }}</span>
                                         </div>
                                         <div class="d-flex justify-content-between align-items-center">
-                                            <span class="text-muted fs-12">حالة الاتصال:</span>
+                                            <span class="text-muted fs-12">{{ __('messages.fcm_connection_status_label') }}</span>
                                             @if(($mobileSettings['firebase_mode'] ?? '') != 'disabled' && (!empty($mobileSettings['firebase_credentials']) || !empty($mobileSettings['fcm_server_key'])))
-                                                <span class="badge bg-success">جاهز للإرسال (Ready)</span>
+                                                <span class="badge bg-success">{{ __('messages.fcm_status_ready') }}</span>
                                             @else
-                                                <span class="badge bg-warning">بانتظار الإعداد (Not Configured)</span>
+                                                <span class="badge bg-warning">{{ __('messages.fcm_status_not_configured') }}</span>
                                             @endif
                                         </div>
                                     </div>
@@ -342,11 +342,11 @@
                                     <form action="{{ route('admin.settings.mobile.test_push') }}" method="POST">
                                         @csrf
                                         <button type="submit" class="btn btn-outline-primary w-100 py-2.5 fw-bold" {{ ($mobileSettings['device_tokens_count'] ?? 0) == 0 ? 'disabled' : '' }}>
-                                            <i class="feather-send me-1"></i> إرسال إشعار تجريبي فوري
+                                            <i class="feather-send me-1"></i> {{ __('messages.fcm_send_test_push_btn') }}
                                         </button>
                                         @if(($mobileSettings['device_tokens_count'] ?? 0) == 0)
                                             <div class="form-text text-danger fs-11 mt-1 text-center">
-                                                <i class="feather-info me-1"></i> افتح التطبيق في هاتفك وسجل الدخول ليتم تسجيل التوكن أولاً.
+                                                <i class="feather-info me-1"></i> {{ __('messages.fcm_no_devices_hint') }}
                                             </div>
                                         @endif
                                     </form>
@@ -355,7 +355,7 @@
                                 <div class="mt-4 pt-3 border-top">
                                     <div class="d-flex align-items-center gap-2 text-muted fs-12">
                                         <i class="feather-shield text-success"></i>
-                                        <span>جميع الإشعارات ترسل مشفرة وتدعم التوجيه الذكي (Deep-Linking).</span>
+                                        <span>{{ __('messages.fcm_encrypted_deep_link_notice') }}</span>
                                     </div>
                                 </div>
                             </div>
@@ -489,7 +489,7 @@ flutter build appbundle</pre>
                 </div>
             </div>
             <div class="modal-footer border-top-0 pt-3">
-                <button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ __('messages.cancel') ?? 'Cancel' }}</button>
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ __('messages.cancel') }}</button>
                 <form action="{{ route('admin.settings.api_key.generate') }}" method="POST" class="d-inline">
                     @csrf
                     <button type="submit" class="btn btn-danger">
