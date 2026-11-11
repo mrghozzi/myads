@@ -449,7 +449,7 @@
         @foreach($categories as $catKey => $catLabelKey)
             <a href="{{ route('groups.index', array_merge(request()->except(['category', 'page']), ['category' => $catKey])) }}" 
                class="groups-hub__cat-pill {{ request('category') === $catKey ? 'is-active' : '' }}">
-                {{ __($catLabelKey) }}
+                {{ str_starts_with($catLabelKey, 'messages.') ? __($catLabelKey) : __('messages.' . $catLabelKey) }}
             </a>
         @endforeach
     </div>
@@ -483,7 +483,7 @@
                                     <div class="groups-card__body">
                                         <div class="groups-card__avatar-wrap">
                                             <img class="groups-card__avatar" src="{{ $group->avatarUrl() }}" alt="{{ $group->name }}">
-                                            <span class="groups-card__category">{{ __(\App\Models\Group::CATEGORIES[$group->category] ?? 'messages.groups_cat_general') }}</span>
+                                            <span class="groups-card__category">{{ \App\Models\Group::categoryLabel($group->category) }}</span>
                                         </div>
                                         <h3 class="groups-card__title">
                                             <a href="{{ route('groups.show', $group) }}">{{ $group->name }}</a>
@@ -536,7 +536,7 @@
                                 <div class="groups-card__body">
                                     <div class="groups-card__avatar-wrap">
                                         <img class="groups-card__avatar" src="{{ $group->avatarUrl() }}" alt="{{ $group->name }}">
-                                        <span class="groups-card__category">{{ __(\App\Models\Group::CATEGORIES[$group->category] ?? 'messages.groups_cat_general') }}</span>
+                                        <span class="groups-card__category">{{ \App\Models\Group::categoryLabel($group->category) }}</span>
                                     </div>
                                     <h3 class="groups-card__title">
                                         <a href="{{ route('groups.show', $group) }}">{{ $group->name }}</a>

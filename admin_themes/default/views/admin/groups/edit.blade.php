@@ -48,7 +48,7 @@
                                                         <select name="category" class="form-select">
                                                             @foreach($categories as $catKey => $catLabelKey)
                                                                 <option value="{{ $catKey }}" {{ old('category', $group->category) === $catKey ? 'selected' : '' }}>
-                                                                    {{ __($catLabelKey) }}
+                                                                    {{ str_starts_with($catLabelKey, 'messages.') ? __($catLabelKey) : __('messages.' . $catLabelKey) }}
                                                                 </option>
                                                             @endforeach
                                                         </select>

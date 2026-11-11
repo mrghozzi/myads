@@ -158,7 +158,7 @@
                                     style="height: 48px; border-radius: 12px; width: 100%; border: 1px solid #e8ebf5; padding: 0 14px;">
                                     @foreach($categories as $catKey => $catLabelKey)
                                         <option value="{{ $catKey }}" {{ old('category', $group->category) === $catKey ? 'selected' : '' }}>
-                                            {{ __($catLabelKey) }}
+                                            {{ str_starts_with($catLabelKey, 'messages.') ? __($catLabelKey) : __('messages.' . $catLabelKey) }}
                                         </option>
                                     @endforeach
                                 </select>

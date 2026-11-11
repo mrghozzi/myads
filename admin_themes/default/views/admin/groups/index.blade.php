@@ -79,7 +79,7 @@
                             <option value="all">{{ __('messages.groups_all_categories') }}</option>
                             @foreach($categories as $catKey => $catLabelKey)
                                 <option value="{{ $catKey }}" {{ $category === $catKey ? 'selected' : '' }}>
-                                    {{ __($catLabelKey) }}
+                                    {{ str_starts_with($catLabelKey, 'messages.') ? __($catLabelKey) : __('messages.' . $catLabelKey) }}
                                 </option>
                             @endforeach
                         </select>
@@ -140,7 +140,7 @@
                                     </td>
                                     <td data-label="{{ __('messages.groups_category') }}">
                                         <span class="badge bg-light text-dark border">
-                                            {{ __(\App\Models\Group::CATEGORIES[$group->category] ?? 'messages.groups_cat_general') }}
+                                            {{ \App\Models\Group::categoryLabel($group->category) }}
                                         </span>
                                     </td>
                                     <td data-label="{{ __('messages.groups_privacy') }}">

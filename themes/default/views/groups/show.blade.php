@@ -255,7 +255,7 @@
                         <span class="badge"
                             style="background: rgba(97, 93, 250, 0.15); color: var(--groups-accent, #615dfa); font-weight: 800; font-size: 0.78rem; padding: 6px 12px; border-radius: 999px;">
                             <i class="fa fa-tag me-1"></i>
-                            {{ __(\App\Models\Group::CATEGORIES[$group->category] ?? 'messages.groups_cat_general') }}
+                            {{ \App\Models\Group::categoryLabel($group->category) }}
                         </span>
                         <span class="badge"
                             style="background: rgba(0, 0, 0, 0.08); color: var(--group-shell-text); font-weight: 700; font-size: 0.78rem; padding: 6px 12px; border-radius: 999px;">

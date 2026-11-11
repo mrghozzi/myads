@@ -21,15 +21,21 @@ class Group extends Model
     public const POSTING_MODERATORS = 'moderators_only';
 
     public const CATEGORIES = [
-        'general' => 'groups_cat_general',
-        'technology' => 'groups_cat_technology',
-        'business' => 'groups_cat_business',
-        'programming' => 'groups_cat_programming',
-        'marketing' => 'groups_cat_marketing',
-        'design' => 'groups_cat_design',
-        'gaming' => 'groups_cat_gaming',
-        'trading' => 'groups_cat_trading',
+        'general' => 'messages.groups_cat_general',
+        'technology' => 'messages.groups_cat_technology',
+        'business' => 'messages.groups_cat_business',
+        'programming' => 'messages.groups_cat_programming',
+        'marketing' => 'messages.groups_cat_marketing',
+        'design' => 'messages.groups_cat_design',
+        'gaming' => 'messages.groups_cat_gaming',
+        'trading' => 'messages.groups_cat_trading',
     ];
+
+    public static function categoryLabel(?string $category): string
+    {
+        $key = self::CATEGORIES[$category] ?? 'messages.groups_cat_general';
+        return str_starts_with($key, 'messages.') ? __($key) : __('messages.' . $key);
+    }
 
     protected $fillable = [
         'owner_id',

@@ -19,7 +19,7 @@ class GroupResource extends JsonResource
             'slug' => $this->slug,
             'name' => $this->name,
             'category' => $this->category ?? 'general',
-            'category_name' => __(\App\Models\Group::CATEGORIES[$this->category] ?? 'messages.groups_cat_general'),
+            'category_name' => \App\Models\Group::categoryLabel($this->category),
             'short_description' => $this->short_description,
             'description' => $this->description,
             'rules_markdown' => $this->rules_markdown,

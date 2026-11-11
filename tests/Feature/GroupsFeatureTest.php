@@ -658,4 +658,23 @@ class GroupsFeatureTest extends TestCase
 
         return [$topic, $status];
     }
+
+    public function test_group_create_page_renders_localized_category_names(): void
+    {
+        $user = User::factory()->create();
+
+        // English
+        $responseEn = $this->actingAs($user)->withSession(['locale' => 'en'])->get(route('groups.create'));
+        $responseEn->assertOk()
+            ->assertDontSeeText('groups_cat_general')
+            ->assertSeeText('General & Community')
+            ->assertSeeText('Technology & AI');
+
+        // Arabic
+        $responseAr = $this->actingAs($user)->withSession(['locale' => 'ar'])->get(route('groups.create'));
+        $responseAr->assertOk()
+            ->assertDontSeeText('groups_cat_general')
+            ->assertSeeText('عام ومجتمعي')
+            ->assertSeeText('التكنولوجيا والذكاء الاصطناعي');
+    }
 }
