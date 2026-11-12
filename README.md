@@ -214,11 +214,20 @@ graph TD
 - **Duralux Admin Management (`/admin/tickets` & `/admin/support/*`):** Administrative ticket resolution console with KPI cards, department and status filters, admin replies with status transition controls, forum categories CRUD with modal backdrop isolation, and topic moderation (pinning, locking, deletion).
 - **Bilingual & Notification Integration:** 100% Arabic and English translation parity in `lang/ar/support.php` and `lang/en/support.php`, linked directly from Help Center (`/help`), and integrated with `NotificationService` across all ticket and forum lifecycle actions.
 
+### 🛡️ 9. Zero-Trust Security, AI Deflection & Limitless Extensibility (v4.7.0)
+- **Zero-Trust Security & Hardening:** Dynamic per-request cryptographic nonces (`Strict Nonce-based CSP`), Cloudflare Turnstile human verification (`<x-turnstile />`), webhook timestamp replay defense v2 (`X-MYADS-Timestamp`, `X-MYADS-Signature`), and dual DocumentRoot path resolution (`public/index.php` and root `index.php`).
+- **AI Support Deflection Engine:** Semantic matching and bilingual text normalization analyzing user inquiries before ticket creation to suggest verified solutions from the Help Center and solved support topics (`/tickets/deflect`, `/support/deflect`).
+- **Enterprise Firebase Push Notifications (FCM):** Dual-protocol push notification engine supporting Google FCM HTTP v1 (OAuth2 JWT) and legacy server key with intelligent mobile deep-link route resolution and live test dispatcher in `/admin/settings/mobile`.
+- **Next-Gen Community Groups Suite:** Categorized social groups, VIP paid membership tiers in PTS, fine-grained posting permissions, pinned feed announcements, and in-feed moderation flyouts (`/groups`, `/admin/groups/*`, `/api/groups/*`).
+- **Limitless & Secure Plugin Architecture:** First-class global hook functions (`add_action`, `do_action`, `add_filter`, `apply_filters`), custom Blade directives (`@action`, `@filter`), zero-config PSR-4 autoloading, dynamic view overrides, and pre-activation PHP syntax validation (`token_get_all`).
+- **Hierarchical Parent/Child Theme Inheritance:** Clean declarative theme inheritance (`parent: default`), CLI scaffolding command (`php artisan theme:create`), and responsive split-screen live preview mode.
+- **Interactive Community Polls (`/portal`):** Dedicated poll post type with dynamic options, expiration limits, real-time AJAX voting, and anti-duplicate vote enforcement.
+
 ---
 
 ## 📱 Official Flutter Mobile App
 
-MYADS features a first-party, cross-platform mobile client built with **Flutter 3.27+** for Android and iOS (**`myads_app` v1.8.7+29**).
+MYADS features a first-party, cross-platform mobile client built with **Flutter 3.27+** for Android and iOS (**`myads_app` v1.8.9+31**).
 
 <div align="center">
   <a href="https://github.com/mrghozzi/myads_app">
@@ -227,6 +236,8 @@ MYADS features a first-party, cross-platform mobile client built with **Flutter 
 </div>
 
 ### Mobile Highlights:
+- **Next-Gen Groups & Feed Parity (`v1.8.9`):** Community groups discovery tile in Explore screen, interactive group attribution badges in post card headers, and composer group targeting.
+- **MYADS v4.7.0 Core Synchronization (`v1.8.8`):** Seamless compatibility with backend v4.7.0 strict CSP nonces, Turnstile challenges, and AI Support Deflection.
 - **Help Center, Support Forum & Tickets (`v1.8.7`):** Direct in-app access to `/help`, `/support`, and `/tickets` via authenticated `SupportWebviewScreen` with token injection and external browser fallback.
 - **Clips 2.0 & Reels Discovery Engine (`v1.8.6`):** Multi-tab discovery streams (Following, Trending, Latest), direct clip routing (`/clips/:id`), automated 2.5-second continuous-playback view registration with deduplication, and double-tap heart pop animation.
 - **Video Hub & Cinema Watch (`v1.8.5`):** Dedicated `VideoHubScreen` with dynamic category pills, multi-criteria sorting (Latest, Most Viewed, Most Reacted, Oldest), direct routing (`/video/watch/:id`), and Shorts shelf.

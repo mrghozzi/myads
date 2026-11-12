@@ -113,21 +113,19 @@
   * Extended all AJAX dashboard endpoints (`kpis`, `reactions`, `activity`, `ad-charts`, `community-charts`, `site-health`) with support for dynamic `?refresh=1` cache bypass.
   * Expanded automated test suite `AdminDashboardAjaxTest.php` with 10 feature tests and 58 assertions covering live refresh and new metric structures.
 
-* **Symfony Ecosystem Security Remediation & DoS Prevention (`symfony/yaml`, Dependabot #98, `composer.lock`)**:
-  * Upgraded `symfony/yaml` and `symfony/mime` from `7.4.13` to `7.4.22` resolving GitHub Dependabot security alert #98 (`CVE-2026-109413`) and email header advisory (`CVE-2026-45070`).
-  * Fixed unbounded recursion in YAML inline lexer (`lexInlineStructure()`) where deeply nested inline sequences or mappings crashed PHP processes due to stack exhaustion.
+* **Symfony Security Vulnerabilities Remediation & Zero-Advisory Hardening (`symfony/*`, `composer.lock`)**:
+  * Upgraded core Symfony components (`symfony/http-foundation`, `symfony/http-kernel`, `symfony/routing`, `symfony/yaml`, `symfony/console`, `symfony/finder`, `symfony/translation`) to version `v7.4.23`.
+  * Fully remediated 7 security advisories and CVEs reported on November 4, 2026:
+    * `CVE-2026-118514`: Fixed HEAD request bypass in access control rules and firewalls.
+    * `CVE-2026-118516`: Prevented host placeholders from matching path start in compiled URL matchers.
+    * `CVE-2026-123339`: Prevented untrusted forwarded headers from setting host, scheme, and port in inline fragments.
+    * `CVE-2026-123792`: Resolved exponential and quadratic parsing times in YAML parser.
+    * `GHSA-3h27-hjv7-fqjx`: Blocked path rules enforcement bypass via script name concatenation.
+    * `GHSA-xg2q-4rrq-657q`: Remediated `private_ranges` trusted proxies shortcut vulnerability with IPv4-mapped/6to4/NAT64 addresses.
+    * `GHSA-5mx8-mwrp-5693`: Prevented client-specified host poisoning in generated URLs.
+  * Verified HTTP request/response handling lifecycle, session management, routing, and regression-free compatibility with Laravel 12 on PHP 8.2+.
+  * Achieved clean zero-vulnerability audit report across both `composer audit` and `npm audit`.
 * **NPM Dependency Vulnerability Remediation (`follow-redirects`, Dependabot #99, `package-lock.json`)**:
-  * Upgraded `follow-redirects` from `1.16.1` to `1.16.2` resolving GitHub Dependabot security alert #99 (`CVE-2026-116689`).
-  * Fixed cross-realm `sensitiveHeaders` array validation bug where `instanceof Array` discarded custom sensitive headers in multi-realm execution contexts, preventing accidental forwarding of credentials during cross-origin redirects.
-* **Composer Dependency Maintenance (`symfony/http-foundation`, PR #143, `composer.lock`)**:
-  * Upgraded `symfony/http-foundation` from `7.4.13` to `7.4.22` in the composer group across 1 directory (`/`).
-  * Updated associated indirect dependencies and polyfill packages in the composer group:
-    * Upgraded `symfony/polyfill-mbstring` from `v1.38.2` to `v1.43.3`.
-    * Upgraded `symfony/polyfill-php80` from `v1.37.0` to `v1.43.0`.
-    * Upgraded `symfony/polyfill-php83` from `v1.38.2` to `v1.43.0`.
-    * Synchronized Composer `plugin-api-version` from `2.6.0` to `2.9.0`.
-  * Verified HTTP request/response handling lifecycle, header parsing, session management security, and regression-free compatibility with Laravel 12 on PHP 8.2+.
-  * Achieved zero reported security vulnerabilities across both `composer audit` and `npm audit`.
 
 ### Limitless & Secure Plugin Architecture Overhaul (`PluginServiceProvider`, `Hooks`, `PluginManager`, `PLUGIN_GUIDE.md`)
 * **Global Hooks & Filters Engine (`app/Helpers/Hooks.php`, `app/helpers.php`)**:
