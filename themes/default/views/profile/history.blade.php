@@ -44,7 +44,7 @@
                                     <i class="fa-solid fa-paper-plane"></i>
                                     <span>{{ __('messages.pts_quick_transfer') }}</span>
                                 </a>
-                                <a href="{{ route('visits.surf') }}" class="points-hero-action-btn is-earn">
+                                <a href="{{ route('visits.surf') }}" class="points-hero-action-btn is-earn" target="_blank" rel="noopener noreferrer" onclick="var w = window.open(this.href, 'SurfWindow', 'width=1024,height=768,scrollbars=yes,resizable=yes'); if (w) { w.focus(); return false; }">
                                     <i class="fa-solid fa-bolt"></i>
                                     <span>{{ __('messages.pts_earn_more') }}</span>
                                 </a>
