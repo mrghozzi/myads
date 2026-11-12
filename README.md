@@ -221,6 +221,7 @@ graph TD
 - **Next-Gen Community Groups Suite:** Categorized social groups, VIP paid membership tiers in PTS, fine-grained posting permissions, pinned feed announcements, and in-feed moderation flyouts (`/groups`, `/admin/groups/*`, `/api/groups/*`).
 - **Limitless & Secure Plugin Architecture:** First-class global hook functions (`add_action`, `do_action`, `add_filter`, `apply_filters`), custom Blade directives (`@action`, `@filter`), zero-config PSR-4 autoloading, dynamic view overrides, and pre-activation PHP syntax validation (`token_get_all`).
 - **Hierarchical Parent/Child Theme Inheritance:** Clean declarative theme inheritance (`parent: default`), CLI scaffolding command (`php artisan theme:create`), and responsive split-screen live preview mode.
+- **Double-Entry PTS Ledger Engine:** Banking-grade accounting architecture (`pts_ledger_entries`, `DoubleEntryLedgerService`) ensuring every transaction has equal and opposite debit/credit entries ($\sum \Delta = 0.00$), dedicated system contra accounts, and automated CLI integrity auditing (`php artisan myads:pts:audit`).
 - **Interactive Community Polls (`/portal`):** Dedicated poll post type with dynamic options, expiration limits, real-time AJAX voting, and anti-duplicate vote enforcement.
 
 ---

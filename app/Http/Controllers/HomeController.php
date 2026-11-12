@@ -26,16 +26,16 @@ class HomeController extends Controller
         ]);
 
         $user = Auth::user();
-        
+
         $bannerStats = [
             'vu' => Banner::where('uid', $user->id)->sum('vu'),
             'clik' => Banner::where('uid', $user->id)->sum('clik'),
         ];
-        
+
         $linkStats = [
             'clik' => Link::where('uid', $user->id)->sum('clik'),
         ];
-        
+
         $visitStats = [
             'vu' => Visit::where('uid', $user->id)->sum('vu'),
         ];
@@ -45,13 +45,13 @@ class HomeController extends Controller
             'clicks' => SmartAd::where('uid', $user->id)->sum('clicks'),
             'total' => SmartAd::where('uid', $user->id)->count(),
         ];
-        
+
         $totalReferrals = \App\Models\Referral::where('uid', $user->id)->count();
         $referralStats = [
             'total' => $totalReferrals,
             'pts' => $totalReferrals * 10,
         ];
-        
+
         $site_settings = Setting::first();
 
         try {
@@ -140,7 +140,7 @@ class HomeController extends Controller
                     $lockedUser->nlink += $le_go;
                     $lockedUser->pts -= $points;
                     $lockedUser->save();
-                    
+
                     $msg = __('messages.points_converted_link', [
                         'points' => $points,
                         'amount' => number_format($le_go, 0),
@@ -245,6 +245,31 @@ class HomeController extends Controller
                 // Lock recipient
                 $lockedRecipient = User::where('username', $recipientUsername)->lockForUpdate()->first();
 
+                $txUuid = (string) \Illuminate\Support\Str::uuid();
+
+                // Direct balanced double-entry ledger record
+                try {
+                    app(\App\Services\DoubleEntryLedgerService::class)->recordDoubleEntry(
+                        debitAccount: "user:{$lockedSender->id}",
+                        creditAccount: "user:{$lockedRecipient->id}",
+                        amount: $amount,
+                        entryType: 'transfer',
+                        description: "PTS transfer from {$lockedSender->username} to {$lockedRecipient->username}",
+                        referenceType: 'user',
+                        referenceId: $lockedRecipient->id,
+                        metadata: [
+                            'sender_id' => $lockedSender->id,
+                            'recipient_id' => $lockedRecipient->id,
+                            'sender_username' => $lockedSender->username,
+                            'recipient_username' => $lockedRecipient->username,
+                        ],
+                        adjustUserPoints: false, // Award calls below handle user pts mutation
+                        transactionUuid: $txUuid
+                    );
+                } catch (\Throwable) {
+                    // Fail-safe
+                }
+
                 // Deduct from sender
                 $ledger->award(
                     $lockedSender,
@@ -253,7 +278,7 @@ class HomeController extends Controller
                     'transfer_sent_desc',
                     'user',
                     $lockedRecipient->id,
-                    ['recipient_username' => $lockedRecipient->username],
+                    ['recipient_username' => $lockedRecipient->username, 'double_entry_skip' => true, 'tx_uuid' => $txUuid],
                     true
                 );
 
@@ -265,7 +290,7 @@ class HomeController extends Controller
                     'transfer_received_desc',
                     'user',
                     $lockedSender->id,
-                    ['sender_username' => $lockedSender->username],
+                    ['sender_username' => $lockedSender->username, 'double_entry_skip' => true, 'tx_uuid' => $txUuid],
                     true
                 );
 

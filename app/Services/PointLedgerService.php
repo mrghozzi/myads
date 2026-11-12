@@ -8,9 +8,13 @@ use App\Models\User;
 
 class PointLedgerService
 {
+    private readonly DoubleEntryLedgerService $doubleEntry;
+
     public function __construct(
-        private readonly V420SchemaService $schema
+        private readonly V420SchemaService $schema,
+        ?DoubleEntryLedgerService $doubleEntry = null
     ) {
+        $this->doubleEntry = $doubleEntry ?? app(DoubleEntryLedgerService::class);
     }
 
     public function award(
@@ -30,6 +34,25 @@ class PointLedgerService
         $userModel->pts = (float) $userModel->pts + $amount;
         $userModel->save();
 
+        // 1. Mirror into Double-Entry Ledger (balanced debit/credit)
+        try {
+            if ($amount != 0 && empty($meta['double_entry_skip'])) {
+                $this->doubleEntry->systemAward(
+                    user: $userModel,
+                    amount: $amount,
+                    entryType: $type,
+                    description: $descriptionKey ?: $type,
+                    referenceType: $referenceType,
+                    referenceId: $referenceId,
+                    metadata: $meta,
+                    adjustUserPoints: false // Points already mutated above
+                );
+            }
+        } catch (\Throwable) {
+            // Defensive: ensure existing workflows never break if table does not yet exist
+        }
+
+        // 2. Mirror into legacy single-entry PointTransaction
         if (!$this->schema->supports('point_history')) {
             if ($mirrorLegacyHistory) {
                 Option::create([
