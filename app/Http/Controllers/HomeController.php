@@ -26,16 +26,16 @@ class HomeController extends Controller
         ]);
 
         $user = Auth::user();
-
+        
         $bannerStats = [
             'vu' => Banner::where('uid', $user->id)->sum('vu'),
             'clik' => Banner::where('uid', $user->id)->sum('clik'),
         ];
-
+        
         $linkStats = [
             'clik' => Link::where('uid', $user->id)->sum('clik'),
         ];
-
+        
         $visitStats = [
             'vu' => Visit::where('uid', $user->id)->sum('vu'),
         ];
@@ -45,13 +45,13 @@ class HomeController extends Controller
             'clicks' => SmartAd::where('uid', $user->id)->sum('clicks'),
             'total' => SmartAd::where('uid', $user->id)->count(),
         ];
-
+        
         $totalReferrals = \App\Models\Referral::where('uid', $user->id)->count();
         $referralStats = [
             'total' => $totalReferrals,
             'pts' => $totalReferrals * 10,
         ];
-
+        
         $site_settings = Setting::first();
 
         try {
@@ -140,7 +140,7 @@ class HomeController extends Controller
                     $lockedUser->nlink += $le_go;
                     $lockedUser->pts -= $points;
                     $lockedUser->save();
-
+                    
                     $msg = __('messages.points_converted_link', [
                         'points' => $points,
                         'amount' => number_format($le_go, 0),
