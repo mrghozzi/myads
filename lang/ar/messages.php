@@ -5728,6 +5728,17 @@ return [
     'groups_stats_total' => 'إجمالي المجموعات',
     'groups_stats_members' => 'إجمالي الأعضاء',
     'groups_stats_posts' => 'إجمالي المنشورات',
+    'pts_running_balance' => 'الرصيد بعد الحركة',
+    'pts_filter_all' => 'الكل',
+    'pts_filter_credits' => 'المكتسبة (+)',
+    'pts_filter_debits' => 'المصروفة (-)',
+    'pts_filter_transfers' => 'التحويلات',
+    'pts_filter_ads' => 'الإعلانات',
+    'pts_filter_rewards' => 'الجوائز والمهام',
+    'pts_export_statement' => 'تصدير كشف الحساب (CSV)',
+    'pts_quick_transfer' => 'تحويل نقاط',
+    'pts_earn_more' => 'كسب نقاط إضافية',
+    'pts_search_placeholder' => 'البحث بالاسم أو المعرف #ID...',
 ];
 
 

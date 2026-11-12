@@ -554,6 +554,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/profile/edit', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::get('/settings', [ProfileController::class, 'edit'])->name('settings'); // Alias for settings
     Route::get('/history', [ProfileController::class, 'history'])->name('profile.history');
+    Route::get('/history/export', [ProfileController::class, 'exportHistoryCsv'])->name('profile.history.export');
     Route::get('/my-activity', [ProfileController::class, 'personalActivity'])->name('profile.personal_activity');
     Route::get('/settings/privacy', [ProfileController::class, 'privacy'])->name('profile.privacy');
     Route::post('/settings/privacy', [ProfileController::class, 'updatePrivacy'])->name('profile.privacy.update');

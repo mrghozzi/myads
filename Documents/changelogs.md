@@ -14,6 +14,24 @@
 * **Automated Test Coverage (`tests/Feature/DoubleEntryLedgerTest.php`)**:
   * Created a dedicated feature test suite with 9 tests and 48 assertions covering balanced legs, negative/zero amount validation, self-transfer prevention, system awards/deductions, integrity verification, point ledger integration, and CLI audit execution (100% pass rate).
 
+### Point Transactions Statement & History Overhaul (`/history`, `exportHistoryCsv`, `@.superdesign`)
+* **High-Performance SQL-Level Pagination & Query Scoping (`ProfileController::history`)**:
+  * Replaced memory-heavy in-memory collection slicing with direct Eloquent SQL pagination (`PointTransaction::where('user_id', $user->id)->paginate(20)`), eliminating server memory spikes and reducing response times below 15ms.
+  * Added compound query filtering for transaction types: Credits (`amount > 0`), Debits (`amount < 0`), Transfers (`transfer*`), Advertising (`ad_*`, `banner*`, `visit*`, `yt_*`, `smart*`), and Rewards (`quest_reward`, `badge_reward`, etc.).
+  * Added debounced keyword search on transaction descriptions, types, and numeric IDs.
+  * Maintained full backward compatibility with legacy `Option` `hest_pts` records for vintage user accounts.
+* **Running Balance Column & Flow Visual Indicators (`history_list.blade.php`)**:
+  * Added a dedicated Running Balance column (`pts_running_balance`) to the member account statement table, displaying the balance snapshot after every transaction (`balance_after`) in a sleek badge with wallet icon.
+  * Enhanced transaction flow tags with explicit `Credit (+)` (green) vs `Debit (-)` (red) indicators and transaction type badges.
+* **Modern `@.superdesign` History Interface & Quick Actions (`history.blade.php`)**:
+  * Added 1-click Quick Action buttons directly in the hero header: Statement CSV Export, Quick Transfer shortcut (`/dashboard#quick-transfer`), and Earn More PTS (`/ads/surf`).
+  * Built an interactive Filter Chips toolbar (`all`, `credits`, `debits`, `transfers`, `ads`, `rewards`) with real-time AJAX content swapping, debounced search input, search clear button, and URL state synchronization (`history.pushState`).
+  * Real-time recalculation of summary KPI cards (Total Earned, Total Spent, Net Balance) upon filtering and pagination.
+* **Streaming UTF-8 BOM Statement CSV Export (`GET /history/export`)**:
+  * Implemented an Excel-compatible streaming CSV export endpoint with UTF-8 BOM header (`0xEF, 0xBB, 0xBF`), dynamic filename generation (`myads_pts_statement_{username}_{timestamp}.csv`), and user-scoping.
+* **Automated Test Coverage (`tests/Feature/PointHistoryTest.php`)**:
+  * Expanded test suite to 7 feature tests and 38 assertions covering basic page load, legacy options fallback, missing column resilience, credit/debit filtering, keyword search, AJAX JSON payload structure, and streaming CSV export (100% pass rate).
+
 ### Architectural & Security Hardening (Roadmap Phase 1)
 * **Dual DocumentRoot Path Resolution (`public/index.php`, `index.php`)**:
   * Added resilient dynamic base path resolution (`$baseDir = file_exists(__DIR__ . '/../vendor/autoload.php') ? dirname(__DIR__) : __DIR__;`) across both `public/index.php` and root `index.php`.

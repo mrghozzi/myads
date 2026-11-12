@@ -6,6 +6,8 @@
     $negTotal = isset($negativeTotal) ? abs((float) $negativeTotal) : abs(collect($history->items())->sum(fn ($item) => min(0, (float) $item->amount)));
     $totalCount = isset($totalTransactions) ? (int) $totalTransactions : (method_exists($history, 'total') ? $history->total() : $history->count());
     $netBalance = $posTotal - $negTotal;
+    $currentFilter = $activeFilter ?? request('filter', 'all');
+    $currentSearch = $activeSearch ?? request('search', '');
 @endphp
 
 <div class="section-banner">
@@ -29,6 +31,22 @@
                         </div>
                         <h3 class="points-hero-title">{{ __('messages.pts_history') }}</h3>
                         <p class="points-hero-subtitle">{{ __('messages.pts_history_desc') }}</p>
+
+                        <!-- Quick Wallet Actions -->
+                        <div class="points-hero-actions">
+                            <a href="{{ route('profile.history.export', ['filter' => $currentFilter, 'search' => $currentSearch]) }}" id="ptsExportBtn" class="points-hero-action-btn is-export" download>
+                                <i class="fa-solid fa-file-arrow-down"></i>
+                                <span>{{ __('messages.pts_export_statement') }}</span>
+                            </a>
+                            <a href="{{ route('dashboard') }}#quick-transfer" class="points-hero-action-btn is-transfer">
+                                <i class="fa-solid fa-paper-plane"></i>
+                                <span>{{ __('messages.pts_quick_transfer') }}</span>
+                            </a>
+                            <a href="{{ url('/ads/surf') }}" class="points-hero-action-btn is-earn">
+                                <i class="fa-solid fa-bolt"></i>
+                                <span>{{ __('messages.pts_earn_more') }}</span>
+                            </a>
+                        </div>
                     </div>
 
                     <!-- Live KPI Counters -->
@@ -88,8 +106,46 @@
                     </span>
                 </div>
 
+                <!-- Interactive Filter & Search Bar -->
+                <div class="points-filter-bar">
+                    <div class="points-chips-group" id="ptsFilterChips">
+                        <button type="button" class="pts-filter-chip {{ $currentFilter === 'all' ? 'is-active' : '' }}" data-filter="all">
+                            <i class="fa-solid fa-layer-group"></i>
+                            <span>{{ __('messages.pts_filter_all') }}</span>
+                        </button>
+                        <button type="button" class="pts-filter-chip {{ $currentFilter === 'credits' ? 'is-active' : '' }}" data-filter="credits">
+                            <i class="fa-solid fa-arrow-down-left"></i>
+                            <span>{{ __('messages.pts_filter_credits') }}</span>
+                        </button>
+                        <button type="button" class="pts-filter-chip {{ $currentFilter === 'debits' ? 'is-active' : '' }}" data-filter="debits">
+                            <i class="fa-solid fa-arrow-up-right"></i>
+                            <span>{{ __('messages.pts_filter_debits') }}</span>
+                        </button>
+                        <button type="button" class="pts-filter-chip {{ $currentFilter === 'transfers' ? 'is-active' : '' }}" data-filter="transfers">
+                            <i class="fa-solid fa-arrow-right-arrow-left"></i>
+                            <span>{{ __('messages.pts_filter_transfers') }}</span>
+                        </button>
+                        <button type="button" class="pts-filter-chip {{ $currentFilter === 'ads' ? 'is-active' : '' }}" data-filter="ads">
+                            <i class="fa-solid fa-rectangle-ad"></i>
+                            <span>{{ __('messages.pts_filter_ads') }}</span>
+                        </button>
+                        <button type="button" class="pts-filter-chip {{ $currentFilter === 'rewards' ? 'is-active' : '' }}" data-filter="rewards">
+                            <i class="fa-solid fa-gift"></i>
+                            <span>{{ __('messages.pts_filter_rewards') }}</span>
+                        </button>
+                    </div>
+
+                    <div class="points-search-wrap">
+                        <i class="fa-solid fa-magnifying-glass points-search-icon"></i>
+                        <input type="text" id="ptsSearchInput" class="points-search-input" placeholder="{{ __('messages.pts_search_placeholder') }}" value="{{ $currentSearch }}" autocomplete="off">
+                        <button type="button" id="ptsSearchClear" class="points-search-clear" style="{{ !empty($currentSearch) ? 'display: flex;' : 'display: none;' }}" title="Clear">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+                </div>
+
                 <div class="widget-box-content points-ledger-content">
-                    <!-- Loading Overlay for AJAX Pagination -->
+                    <!-- Loading Overlay for AJAX Pagination & Filtering -->
                     <div id="pointsLoadingOverlay" class="points-loading-overlay" style="display: none;">
                         <div class="points-spinner">
                             <div class="spinner-ring"></div>
@@ -139,7 +195,7 @@
     }
 
     .points-hero-text {
-        max-width: 540px;
+        max-width: 560px;
     }
 
     .points-hero-badge {
@@ -175,6 +231,57 @@
         margin: 0;
         font-weight: 500;
         text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Hero Quick Actions */
+    .points-hero-actions {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 20px;
+    }
+
+    .points-hero-action-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border-radius: 12px;
+        font-size: 13px;
+        font-weight: 700;
+        text-decoration: none;
+        transition: all 0.25s ease;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        color: #ffffff !important;
+        background: rgba(255, 255, 255, 0.16);
+    }
+
+    .points-hero-action-btn:hover {
+        transform: translateY(-2px);
+        background: rgba(255, 255, 255, 0.28);
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+        color: #ffffff !important;
+    }
+
+    .points-hero-action-btn.is-export {
+        background: rgba(16, 185, 129, 0.28);
+        border-color: rgba(16, 185, 129, 0.45);
+    }
+
+    .points-hero-action-btn.is-export:hover {
+        background: rgba(16, 185, 129, 0.42);
+    }
+
+    .points-hero-action-btn.is-earn {
+        background: rgba(245, 158, 11, 0.28);
+        border-color: rgba(245, 158, 11, 0.45);
+    }
+
+    .points-hero-action-btn.is-earn:hover {
+        background: rgba(245, 158, 11, 0.42);
     }
 
     .points-kpi-group {
@@ -296,6 +403,122 @@
         border-radius: 20px;
         font-size: 12px;
         font-weight: 700;
+    }
+
+    /* Interactive Filter & Search Bar */
+    .points-filter-bar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 18px 28px;
+        border-bottom: 1px solid var(--border-color, #ebebeb);
+        background: var(--dark-light-color, #fafbfe);
+        flex-wrap: wrap;
+    }
+
+    .points-chips-group {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .pts-filter-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        padding: 8px 16px;
+        border-radius: 12px;
+        border: 1px solid var(--border-color, #e2e8f0);
+        background: var(--widget-box-bg, #ffffff);
+        color: var(--text-color-alt, #64748b);
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        white-space: nowrap;
+    }
+
+    .pts-filter-chip:hover {
+        border-color: var(--primary-color, #615dfa);
+        color: var(--primary-color, #615dfa);
+        transform: translateY(-1px);
+    }
+
+    .pts-filter-chip.is-active {
+        background: var(--primary-color, #615dfa);
+        border-color: var(--primary-color, #615dfa);
+        color: #ffffff;
+        box-shadow: 0 4px 12px rgba(97, 93, 250, 0.28);
+    }
+
+    .points-search-wrap {
+        position: relative;
+        display: flex;
+        align-items: center;
+        min-width: 240px;
+        flex: 1 1 240px;
+        max-width: 340px;
+    }
+
+    .points-search-icon {
+        position: absolute;
+        left: 14px;
+        color: var(--text-color-alt, #94a3b8);
+        font-size: 13px;
+        pointer-events: none;
+    }
+
+    [dir="rtl"] .points-search-icon {
+        left: auto;
+        right: 14px;
+    }
+
+    .points-search-input {
+        width: 100%;
+        height: 40px;
+        padding: 8px 36px;
+        border-radius: 12px;
+        border: 1px solid var(--border-color, #e2e8f0);
+        background: var(--widget-box-bg, #ffffff);
+        color: var(--text-color, #1e293b);
+        font-size: 13.5px;
+        font-weight: 500;
+        outline: none;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .points-search-input:focus {
+        border-color: var(--primary-color, #615dfa);
+        box-shadow: 0 0 0 3px rgba(97, 93, 250, 0.15);
+    }
+
+    .points-search-clear {
+        position: absolute;
+        right: 10px;
+        background: none;
+        border: none;
+        color: var(--text-color-alt, #94a3b8);
+        cursor: pointer;
+        font-size: 13px;
+        width: 24px;
+        height: 24px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: background 0.15s, color 0.15s;
+    }
+
+    [dir="rtl"] .points-search-clear {
+        right: auto;
+        left: 10px;
+    }
+
+    .points-search-clear:hover {
+        background: var(--dark-light-color, #e2e8f0);
+        color: var(--text-color, #1e293b);
     }
 
     .points-ledger-content {
@@ -421,6 +644,13 @@
         color: #dc2626;
     }
 
+    .points-flow-tag.is-type {
+        background: rgba(97, 93, 250, 0.08);
+        color: var(--primary-color, #615dfa);
+        font-size: 10px;
+        letter-spacing: 0.04em;
+    }
+
     .points-flow-tag.is-legacy {
         background: var(--dark-light-color, #f3f4f6);
         color: var(--text-color-alt, #6b7280);
@@ -454,6 +684,20 @@
 
     .points-amount-badge.is-negative {
         color: #ef4444;
+    }
+
+    .points-running-balance-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--primary-color, #615dfa);
+        background: rgba(97, 93, 250, 0.08);
+        padding: 5px 12px;
+        border-radius: 10px;
+        border: 1px solid rgba(97, 93, 250, 0.18);
+        font-family: inherit;
     }
 
     .points-unit {
@@ -564,10 +808,6 @@
         transition: opacity 0.2s ease;
     }
 
-    html[data-theme="css_d"] .points-loading-overlay {
-        background: rgba(29, 35, 51, 0.78);
-    }
-
     .points-spinner {
         display: flex;
         flex-direction: column;
@@ -591,6 +831,39 @@
         to { transform: rotate(360deg); }
     }
 
+    /* Dark Mode Theme Parity */
+    html[data-theme="css_d"] .points-loading-overlay {
+        background: rgba(29, 35, 51, 0.78);
+    }
+
+    html[data-theme="css_d"] .points-filter-bar {
+        background: rgba(255, 255, 255, 0.02);
+    }
+
+    html[data-theme="css_d"] .pts-filter-chip {
+        background: #1f2738;
+        border-color: #2b364d;
+        color: #94a3b8;
+    }
+
+    html[data-theme="css_d"] .pts-filter-chip.is-active {
+        background: var(--primary-color, #615dfa);
+        border-color: var(--primary-color, #615dfa);
+        color: #ffffff;
+    }
+
+    html[data-theme="css_d"] .points-search-input {
+        background: #1f2738;
+        border-color: #2b364d;
+        color: #f1f5f9;
+    }
+
+    html[data-theme="css_d"] .points-running-balance-badge {
+        background: rgba(97, 93, 250, 0.16);
+        border-color: rgba(97, 93, 250, 0.3);
+        color: #a5b4fc;
+    }
+
     /* RTL Support */
     [dir="rtl"] .points-entry-details {
         text-align: right;
@@ -608,6 +881,15 @@
             align-items: flex-start;
         }
 
+        .points-hero-actions {
+            width: 100%;
+        }
+
+        .points-hero-action-btn {
+            flex: 1 1 calc(50% - 6px);
+            justify-content: center;
+        }
+
         .points-kpi-group {
             width: 100%;
         }
@@ -620,6 +902,17 @@
 
         .points-kpi-pill .kpi-value {
             font-size: 17px;
+        }
+
+        .points-filter-bar {
+            padding: 14px 16px;
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .points-search-wrap {
+            max-width: none;
+            width: 100%;
         }
 
         .points-ledger-content {
@@ -648,6 +941,14 @@ document.addEventListener('DOMContentLoaded', function () {
     const negativeElem = document.getElementById('negativePointsTotal');
     const totalCountElem = document.getElementById('pointsTotalCountNum');
     const netBalanceElem = document.getElementById('netPointsBalance');
+    const searchInput = document.getElementById('ptsSearchInput');
+    const searchClear = document.getElementById('ptsSearchClear');
+    const filterChipsHolder = document.getElementById('ptsFilterChips');
+    const exportBtn = document.getElementById('ptsExportBtn');
+
+    let currentFilter = @json($currentFilter);
+    let currentSearch = @json($currentSearch);
+    let searchDebounceTimer = null;
 
     function showLoading() {
         if (loadingOverlay) loadingOverlay.style.display = 'flex';
@@ -657,7 +958,17 @@ document.addEventListener('DOMContentLoaded', function () {
         if (loadingOverlay) loadingOverlay.style.display = 'none';
     }
 
-    function loadHistoryPage(url, pushState = true) {
+    function updateExportUrl() {
+        if (!exportBtn) return;
+        const exportBase = @json(route('profile.history.export'));
+        const params = new URLSearchParams();
+        if (currentFilter && currentFilter !== 'all') params.set('filter', currentFilter);
+        if (currentSearch && currentSearch.trim() !== '') params.set('search', currentSearch.trim());
+        const qs = params.toString();
+        exportBtn.href = exportBase + (qs ? '?' + qs : '');
+    }
+
+    function loadHistory(url, pushState = true) {
         showLoading();
 
         fetch(url, {
@@ -699,16 +1010,73 @@ document.addEventListener('DOMContentLoaded', function () {
                 window.history.pushState({ path: url }, '', url);
             }
 
-            if (dynamicContainer) {
-                window.scrollTo({ top: dynamicContainer.offsetTop - 120, behavior: 'smooth' });
-            }
+            updateExportUrl();
         })
         .catch(err => {
-            console.error('AJAX History Pagination error:', err);
+            console.error('AJAX History error:', err);
             window.location.href = url;
         })
         .finally(() => {
             hideLoading();
+        });
+    }
+
+    function triggerHistoryQuery(page = 1) {
+        const base = @json(route('profile.history'));
+        const params = new URLSearchParams();
+        if (currentFilter && currentFilter !== 'all') params.set('filter', currentFilter);
+        if (currentSearch && currentSearch.trim() !== '') params.set('search', currentSearch.trim());
+        if (page > 1) params.set('page', page);
+
+        const qs = params.toString();
+        const url = base + (qs ? '?' + qs : '');
+        loadHistory(url, true);
+    }
+
+    // Filter Chips click
+    if (filterChipsHolder) {
+        filterChipsHolder.addEventListener('click', function (e) {
+            const btn = e.target.closest('.pts-filter-chip');
+            if (!btn) return;
+
+            const selected = btn.getAttribute('data-filter') || 'all';
+            if (selected === currentFilter) return;
+
+            currentFilter = selected;
+            filterChipsHolder.querySelectorAll('.pts-filter-chip').forEach(c => c.classList.remove('is-active'));
+            btn.classList.add('is-active');
+
+            triggerHistoryQuery(1);
+        });
+    }
+
+    // Search Input with Debounce
+    if (searchInput) {
+        searchInput.addEventListener('input', function () {
+            const val = this.value;
+            currentSearch = val;
+
+            if (searchClear) {
+                searchClear.style.display = val.trim().length > 0 ? 'inline-flex' : 'none';
+            }
+
+            clearTimeout(searchDebounceTimer);
+            searchDebounceTimer = setTimeout(() => {
+                triggerHistoryQuery(1);
+            }, 350);
+        });
+    }
+
+    // Search Clear Button
+    if (searchClear) {
+        searchClear.addEventListener('click', function () {
+            if (searchInput) {
+                searchInput.value = '';
+                currentSearch = '';
+                searchInput.focus();
+            }
+            searchClear.style.display = 'none';
+            triggerHistoryQuery(1);
         });
     }
 
@@ -720,16 +1088,19 @@ document.addEventListener('DOMContentLoaded', function () {
         const href = link.getAttribute('href');
         if (href && href !== '#' && !link.closest('.disabled') && !link.closest('.active')) {
             e.preventDefault();
-            loadHistoryPage(href, true);
+            loadHistory(href, true);
+            if (dynamicContainer) {
+                window.scrollTo({ top: dynamicContainer.offsetTop - 120, behavior: 'smooth' });
+            }
         }
     });
 
-    // Handle back / forward buttons
+    // Handle back / forward browser navigation
     window.addEventListener('popstate', function (e) {
         if (e.state && e.state.path) {
-            loadHistoryPage(e.state.path, false);
+            loadHistory(e.state.path, false);
         } else {
-            loadHistoryPage(window.location.href, false);
+            loadHistory(window.location.href, false);
         }
     });
 });

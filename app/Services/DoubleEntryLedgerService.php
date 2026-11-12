@@ -320,6 +320,115 @@ class DoubleEntryLedgerService
     }
 
     /**
+     * Backfill legacy PointTransaction records into the double-entry ledger.
+     * Idempotent: skips transactions that already exist.
+     */
+    public function backfillFromLegacyPointTransactions(): int
+    {
+        $transactions = DB::table('point_transactions')
+            ->orderBy('id')
+            ->get();
+
+        $count = 0;
+
+        foreach ($transactions as $pt) {
+            $amount = (float) $pt->amount;
+            if ($amount == 0) {
+                continue;
+            }
+
+            // Check if already backfilled
+            $exists = DB::table('pts_ledger_entries')
+                ->where('reference_type', 'point_transaction')
+                ->where('reference_id', (string) $pt->id)
+                ->exists();
+
+            if ($exists) {
+                continue;
+            }
+
+            $uuid = Str::uuid()->toString();
+            $contraAccount = $this->resolveSystemAccountForType($pt->type ?? 'reward');
+            $createdAt = $pt->created_at ?? now();
+
+            if ($amount > 0) {
+                // System pays user: Debit System, Credit User
+                DB::table('pts_ledger_entries')->insert([
+                    [
+                        'transaction_uuid' => $uuid,
+                        'account_type' => $this->extractAccountType($contraAccount),
+                        'account_id' => $contraAccount,
+                        'user_id' => null,
+                        'amount' => -$amount,
+                        'balance_after' => null,
+                        'entry_type' => $pt->type ?: 'legacy_reward',
+                        'reference_type' => 'point_transaction',
+                        'reference_id' => (string) $pt->id,
+                        'description' => $pt->description_key ?: 'legacy_point_award',
+                        'metadata' => json_encode(['backfilled' => true, 'legacy_pt_id' => $pt->id, 'leg' => 'debit']),
+                        'created_at' => $createdAt,
+                        'updated_at' => $createdAt,
+                    ],
+                    [
+                        'transaction_uuid' => $uuid,
+                        'account_type' => 'user',
+                        'account_id' => "user:{$pt->user_id}",
+                        'user_id' => $pt->user_id,
+                        'amount' => $amount,
+                        'balance_after' => $pt->balance_after ? (float) $pt->balance_after : null,
+                        'entry_type' => $pt->type ?: 'legacy_reward',
+                        'reference_type' => 'point_transaction',
+                        'reference_id' => (string) $pt->id,
+                        'description' => $pt->description_key ?: 'legacy_point_award',
+                        'metadata' => json_encode(['backfilled' => true, 'legacy_pt_id' => $pt->id, 'leg' => 'credit']),
+                        'created_at' => $createdAt,
+                        'updated_at' => $createdAt,
+                    ]
+                ]);
+            } else {
+                // User pays system: Debit User, Credit System
+                $absAmount = abs($amount);
+                DB::table('pts_ledger_entries')->insert([
+                    [
+                        'transaction_uuid' => $uuid,
+                        'account_type' => 'user',
+                        'account_id' => "user:{$pt->user_id}",
+                        'user_id' => $pt->user_id,
+                        'amount' => -$absAmount,
+                        'balance_after' => $pt->balance_after ? (float) $pt->balance_after : null,
+                        'entry_type' => $pt->type ?: 'legacy_spend',
+                        'reference_type' => 'point_transaction',
+                        'reference_id' => (string) $pt->id,
+                        'description' => $pt->description_key ?: 'legacy_point_spend',
+                        'metadata' => json_encode(['backfilled' => true, 'legacy_pt_id' => $pt->id, 'leg' => 'debit']),
+                        'created_at' => $createdAt,
+                        'updated_at' => $createdAt,
+                    ],
+                    [
+                        'transaction_uuid' => $uuid,
+                        'account_type' => $this->extractAccountType($contraAccount),
+                        'account_id' => $contraAccount,
+                        'user_id' => null,
+                        'amount' => $absAmount,
+                        'balance_after' => null,
+                        'entry_type' => $pt->type ?: 'legacy_spend',
+                        'reference_type' => 'point_transaction',
+                        'reference_id' => (string) $pt->id,
+                        'description' => $pt->description_key ?: 'legacy_point_spend',
+                        'metadata' => json_encode(['backfilled' => true, 'legacy_pt_id' => $pt->id, 'leg' => 'credit']),
+                        'created_at' => $createdAt,
+                        'updated_at' => $createdAt,
+                    ]
+                ]);
+            }
+
+            $count++;
+        }
+
+        return $count;
+    }
+
+    /**
      * Extract normalized account type string from account identifier.
      */
     private function extractAccountType(string $account): string

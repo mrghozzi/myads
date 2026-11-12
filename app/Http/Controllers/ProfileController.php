@@ -397,94 +397,82 @@ class ProfileController extends Controller
         return view('theme::profile.edit', compact('user', 'privacySettings'));
     }
 
-    public function history()
+    public function history(Request $request)
     {
         $user = Auth::user();
         $schema = app(V420SchemaService::class);
         $featureAvailable = $schema->supports('point_history');
         $upgradeNotice = $schema->notice('point_history', __('messages.pts_history'));
 
-        $legacyReferenceIds = [];
-        $ledgerHistory = collect();
+        $filter = (string) $request->query('filter', 'all');
+        $search = trim((string) $request->query('search', ''));
 
-        if ($featureAvailable) {
-            try {
-                $legacyReferenceIds = PointTransaction::where('user_id', $user->id)
-                    ->where('reference_type', 'legacy_option')
-                    ->pluck('reference_id')
-                    ->filter()
-                    ->map(static fn ($id) => (int) $id)
-                    ->all();
+        // 1. Build Query on PointTransaction
+        $query = PointTransaction::query()->where('user_id', $user->id);
 
-                $orderColumn = $schema->hasColumn('point_transactions', 'created_at') ? 'created_at' : 'id';
-
-                $ledgerHistory = PointTransaction::where('user_id', $user->id)
-                    ->orderByDesc($orderColumn)
-                    ->get()
-                    ->toBase()
-                    ->map(function (PointTransaction $item) {
-                        return (object) [
-                            'id' => $item->id,
-                            'amount' => (float) $item->amount,
-                            'description_key' => $item->description_key,
-                            'created_at_ts' => optional($item->created_at)->timestamp ?? time(),
-                            'is_legacy' => false,
-                        ];
-                    });
-            } catch (\Throwable $e) {
-                Log::error('Failed to load ledger history: ' . $e->getMessage());
-                $ledgerHistory = collect();
-                $legacyReferenceIds = [];
-            }
+        if ($filter === 'credits') {
+            $query->where('amount', '>', 0);
+        } elseif ($filter === 'debits') {
+            $query->where('amount', '<', 0);
+        } elseif ($filter === 'transfers') {
+            $query->whereIn('type', ['transfer', 'transfer_sent', 'transfer_received']);
+        } elseif ($filter === 'ads') {
+            $query->where(function ($q) {
+                $q->where('type', 'like', 'ad_%')
+                  ->orWhere('type', 'like', 'banner%')
+                  ->orWhere('type', 'like', 'visit%')
+                  ->orWhere('type', 'like', 'yt_%')
+                  ->orWhere('type', 'like', 'smart%');
+            });
+        } elseif ($filter === 'rewards') {
+            $query->where(function ($q) {
+                $q->whereIn('type', ['quest_reward', 'badge_reward', 'comment_reward', 'reaction_reward', 'referral_bonus', 'daily_bonus', 'subscription_bonus_pts'])
+                  ->orWhere('type', 'like', 'reward%');
+            });
         }
 
-        $mirroredSubscriptionBonusEntries = $ledgerHistory
-            ->filter(fn ($item) => (string) $item->description_key === 'subscription_bonus_pts')
-            ->map(fn ($item) => [
-                'amount' => round((float) $item->amount, 2),
-                'created_at_ts' => (int) $item->created_at_ts,
-            ])
-            ->values();
+        if ($search !== '') {
+            $query->where(function ($q) use ($search) {
+                $q->where('description_key', 'like', "%{$search}%")
+                  ->orWhere('type', 'like', "%{$search}%")
+                  ->orWhere('id', $search);
+            });
+        }
 
-        $history = collect($ledgerHistory)
-            ->toBase()
-            ->merge(
-                Option::where('o_type', 'hest_pts')
-                    ->where('o_parent', $user->id)
-                    ->when(!empty($legacyReferenceIds), fn ($query) => $query->whereNotIn('id', $legacyReferenceIds))
-                    ->orderByDesc('id')
-                    ->get()
-                    ->toBase()
-                    ->map(function (Option $item) {
-                        return (object) [
-                            'id' => $item->id,
-                            'amount' => (float) (is_numeric($item->o_valuer) ? $item->o_valuer : 0),
-                            'description_key' => $item->name,
-                            'created_at_ts' => is_numeric($item->o_mode) ? (int) $item->o_mode : time(),
-                            'is_legacy' => true,
-                        ];
-                    })
-                    ->reject(function (object $item) use ($mirroredSubscriptionBonusEntries) {
-                        if ((string) $item->description_key !== 'subscription_bonus_pts' || $mirroredSubscriptionBonusEntries->isEmpty()) {
-                            return false;
-                        }
+        $orderColumn = $schema->hasColumn('point_transactions', 'created_at') ? 'created_at' : 'id';
+        $paginatedHistory = $query->orderByDesc($orderColumn)->orderByDesc('id')->paginate(20)->withQueryString();
 
-                        return $mirroredSubscriptionBonusEntries->contains(function (array $mirror) use ($item) {
-                            return abs($mirror['amount'] - round((float) $item->amount, 2)) < 0.01
-                                && abs($mirror['created_at_ts'] - (int) $item->created_at_ts) <= 5;
-                        });
-                    })
-            )
-            ->sortByDesc('created_at_ts')
-            ->values();
+        // 2. High-Performance SQL Aggregates
+        $positiveTotal = (float) PointTransaction::where('user_id', $user->id)->where('amount', '>', 0)->sum('amount');
+        $negativeTotal = (float) PointTransaction::where('user_id', $user->id)->where('amount', '<', 0)->sum('amount');
+        $totalTransactions = PointTransaction::where('user_id', $user->id)->count();
 
-        $paginatedHistory = $this->paginateCollection($history, 20, request()->integer('page', 1));
+        // Fallback for legacy options if user has zero point_transactions
+        if ($totalTransactions === 0 && Option::where('o_type', 'hest_pts')->where('o_parent', $user->id)->exists()) {
+            $legacyHistory = Option::where('o_type', 'hest_pts')
+                ->where('o_parent', $user->id)
+                ->orderByDesc('id')
+                ->paginate(20)
+                ->withQueryString();
 
-        $positiveTotal = (float) $history->sum(fn ($item) => max(0, (float) $item->amount));
-        $negativeTotal = (float) $history->sum(fn ($item) => min(0, (float) $item->amount));
-        $totalTransactions = $history->count();
+            $paginatedHistory = $legacyHistory->through(function ($item) {
+                return (object) [
+                    'id' => $item->id,
+                    'amount' => (float) (is_numeric($item->o_valuer) ? $item->o_valuer : 0),
+                    'balance_after' => null,
+                    'type' => 'legacy',
+                    'description_key' => $item->name,
+                    'created_at' => is_numeric($item->o_mode) ? \Carbon\Carbon::createFromTimestamp((int) $item->o_mode) : now(),
+                    'is_legacy' => true,
+                ];
+            });
 
-        if (request()->ajax() || request()->wantsJson()) {
+            $positiveTotal = (float) Option::where('o_type', 'hest_pts')->where('o_parent', $user->id)->whereRaw('CAST(o_valuer AS DECIMAL(14,2)) > 0')->sum('o_valuer');
+            $negativeTotal = (float) Option::where('o_type', 'hest_pts')->where('o_parent', $user->id)->whereRaw('CAST(o_valuer AS DECIMAL(14,2)) < 0')->sum('o_valuer');
+            $totalTransactions = Option::where('o_type', 'hest_pts')->where('o_parent', $user->id)->count();
+        }
+
+        if ($request->ajax() || $request->wantsJson()) {
             return response()->json([
                 'success' => true,
                 'html' => view('theme::profile.partials.history_list', [
@@ -493,7 +481,7 @@ class ProfileController extends Controller
                 ])->render(),
                 'positive_total' => rtrim(rtrim(number_format($positiveTotal, 2), '0'), '.'),
                 'negative_total' => rtrim(rtrim(number_format(abs($negativeTotal), 2), '0'), '.'),
-                'total_count' => $totalTransactions,
+                'total_count' => $paginatedHistory->total(),
                 'current_page' => $paginatedHistory->currentPage(),
                 'last_page' => $paginatedHistory->lastPage(),
             ]);
@@ -507,6 +495,82 @@ class ProfileController extends Controller
             'positiveTotal' => $positiveTotal,
             'negativeTotal' => $negativeTotal,
             'totalTransactions' => $totalTransactions,
+            'activeFilter' => $filter,
+            'activeSearch' => $search,
+        ]);
+    }
+
+    public function exportHistoryCsv(Request $request)
+    {
+        $user = Auth::user();
+        $filter = (string) $request->query('filter', 'all');
+        $search = trim((string) $request->query('search', ''));
+
+        $query = PointTransaction::query()->where('user_id', $user->id);
+
+        if ($filter === 'credits') {
+            $query->where('amount', '>', 0);
+        } elseif ($filter === 'debits') {
+            $query->where('amount', '<', 0);
+        } elseif ($filter === 'transfers') {
+            $query->whereIn('type', ['transfer', 'transfer_sent', 'transfer_received']);
+        } elseif ($filter === 'ads') {
+            $query->where(function ($q) {
+                $q->where('type', 'like', 'ad_%')
+                  ->orWhere('type', 'like', 'banner%')
+                  ->orWhere('type', 'like', 'visit%')
+                  ->orWhere('type', 'like', 'yt_%')
+                  ->orWhere('type', 'like', 'smart%');
+            });
+        } elseif ($filter === 'rewards') {
+            $query->where(function ($q) {
+                $q->whereIn('type', ['quest_reward', 'badge_reward', 'comment_reward', 'reaction_reward', 'referral_bonus', 'daily_bonus', 'subscription_bonus_pts'])
+                  ->orWhere('type', 'like', 'reward%');
+            });
+        }
+
+        if ($search !== '') {
+            $query->where(function ($q) use ($search) {
+                $q->where('description_key', 'like', "%{$search}%")
+                  ->orWhere('type', 'like', "%{$search}%")
+                  ->orWhere('id', $search);
+            });
+        }
+
+        $orderColumn = app(V420SchemaService::class)->hasColumn('point_transactions', 'created_at') ? 'created_at' : 'id';
+        $items = $query->orderByDesc($orderColumn)->orderByDesc('id')->get();
+
+        $filename = 'myads_pts_statement_' . $user->username . '_' . date('Ymd_His') . '.csv';
+
+        return response()->streamDownload(function () use ($items) {
+            $handle = fopen('php://output', 'w');
+            // Write UTF-8 BOM for Microsoft Excel compatibility
+            fprintf($handle, chr(0xEF) . chr(0xBB) . chr(0xBF));
+
+            // Write CSV headers
+            fputcsv($handle, ['#ID', 'Date', 'Type', 'Description', 'Flow', 'Amount (PTS)', 'Running Balance (PTS)']);
+
+            foreach ($items as $item) {
+                $amount = (float) $item->amount;
+                $descKey = $item->description_key ?: $item->type;
+                $desc = __('messages.' . $descKey);
+                $desc = ($desc !== 'messages.' . $descKey) ? $desc : $descKey;
+                $dateStr = $item->created_at ? (is_numeric($item->created_at) ? date('Y-m-d H:i:s', $item->created_at) : optional($item->created_at)->format('Y-m-d H:i:s')) : '';
+
+                fputcsv($handle, [
+                    $item->id,
+                    $dateStr,
+                    $item->type,
+                    $desc,
+                    $amount >= 0 ? 'Credit (+)' : 'Debit (-)',
+                    sprintf('%.2f', $amount),
+                    $item->balance_after !== null ? sprintf('%.2f', (float) $item->balance_after) : '',
+                ]);
+            }
+
+            fclose($handle);
+        }, $filename, [
+            'Content-Type' => 'text/csv; charset=UTF-8',
         ]);
     }
 

@@ -5728,6 +5728,17 @@ return [
     'groups_stats_total' => 'Total Groups',
     'groups_stats_members' => 'Total Members',
     'groups_stats_posts' => 'Total Posts',
+    'pts_running_balance' => 'Running Balance',
+    'pts_filter_all' => 'All',
+    'pts_filter_credits' => 'Earned (+)',
+    'pts_filter_debits' => 'Spent (-)',
+    'pts_filter_transfers' => 'Transfers',
+    'pts_filter_ads' => 'Advertising',
+    'pts_filter_rewards' => 'Rewards & Quests',
+    'pts_export_statement' => 'Export Statement (CSV)',
+    'pts_quick_transfer' => 'Transfer PTS',
+    'pts_earn_more' => 'Earn More PTS',
+    'pts_search_placeholder' => 'Search by keyword or #ID...',
 ];
 
 
