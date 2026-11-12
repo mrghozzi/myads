@@ -447,6 +447,7 @@ Route::get('/show.php', [AdsServingController::class, 'redirect'])->name('ads.re
 Route::get('/ads/redirect', [AdsServingController::class, 'redirect']); // Alias
 
 // Visits Exchange Routes
+Route::redirect('/ads/surf', '/visits/surf');
 Route::middleware(['auth'])->group(function () {
     Route::get('/visits', [VisitController::class, 'index'])->name('visits.index');
     Route::get('/visits/create', [VisitController::class, 'create'])->name('visits.create');
