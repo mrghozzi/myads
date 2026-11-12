@@ -481,19 +481,71 @@ class SettingsController extends Controller
         return response()->json(['message' => 'Badge showcase updated']);
     }
 
-    public function getHistory()
+    public function getHistory(Request $request)
     {
         $user = Auth::user();
         $schema = app(V420SchemaService::class);
         $orderColumn = $schema->hasColumn('point_transactions', 'created_at') ? 'created_at' : 'id';
+        
+        $filter = (string) $request->query('filter', 'all');
+        $query = PointTransaction::where('user_id', $user->id);
+
+        if ($filter === 'credits') {
+            $query->where('amount', '>', 0);
+        } elseif ($filter === 'debits') {
+            $query->where('amount', '<', 0);
+        } elseif ($filter === 'transfers') {
+            $query->whereIn('type', ['transfer', 'transfer_sent', 'transfer_received']);
+        } elseif ($filter === 'ads') {
+            $query->where(function ($q) {
+                $q->where('type', 'like', 'ad_%')
+                  ->orWhere('type', 'like', 'banner%')
+                  ->orWhere('type', 'like', 'visit%')
+                  ->orWhere('type', 'like', 'yt_%')
+                  ->orWhere('type', 'like', 'smart%');
+            });
+        } elseif ($filter === 'rewards') {
+            $query->where(function ($q) {
+                $q->whereIn('type', ['quest_reward', 'badge_reward', 'comment_reward', 'reaction_reward', 'referral_bonus', 'daily_bonus', 'subscription_bonus_pts'])
+                  ->orWhere('type', 'like', 'reward%');
+            });
+        }
+
         try {
-            $history = PointTransaction::where('user_id', $user->id)
-                ->orderByDesc($orderColumn)
-                ->paginate(20);
-            return response()->json($history);
+            $paginated = $query->orderByDesc($orderColumn)->orderByDesc('id')->paginate(20);
+
+            $transformedItems = $paginated->getCollection()->map(function ($item) {
+                $descKey = $item->description_key ?: ($item->type ?? 'points_awarded');
+                $desc = __('messages.' . $descKey);
+                $desc = ($desc !== 'messages.' . $descKey) ? $desc : $descKey;
+
+                return [
+                    'id' => $item->id,
+                    'amount' => (float) $item->amount,
+                    'balance_after' => $item->balance_after !== null ? (float) $item->balance_after : null,
+                    'type' => $item->type,
+                    'description_key' => $descKey,
+                    'description' => $desc,
+                    'created_at' => $item->created_at ? (is_numeric($item->created_at) ? date('Y-m-d H:i', $item->created_at) : optional($item->created_at)->format('Y-m-d H:i')) : null,
+                ];
+            })->all();
+
+            return response()->json([
+                'success' => true,
+                'data' => $transformedItems,
+                'history' => $transformedItems, // dual-key compatibility for legacy & new mobile clients
+                'current_page' => $paginated->currentPage(),
+                'last_page' => $paginated->lastPage(),
+                'total' => $paginated->total(),
+            ]);
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error('Failed to load API point history: ' . $e->getMessage());
-            return response()->json(new \Illuminate\Pagination\LengthAwarePaginator([], 0, 20));
+            return response()->json([
+                'success' => false,
+                'data' => [],
+                'history' => [],
+                'total' => 0,
+            ], 500);
         }
     }
 
