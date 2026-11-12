@@ -422,130 +422,130 @@
             font-weight: 700;
         }
 
-        /* Interactive Filter & Search Bar - Compact & Streamlined */
-        .points-filter-bar {
-            display: flex !important;
-            align-items: center !important;
-            justify-content: space-between !important;
-            gap: 12px !important;
-            padding: 10px 20px !important;
-            border-bottom: 1px solid var(--border-color, #ebebeb) !important;
-            background: var(--dark-light-color, #fafbfe) !important;
-            flex-wrap: wrap !important;
-            min-height: 50px !important;
-        }
+    /* Interactive Filter & Search Bar - Compact & Streamlined */
+    .points-filter-bar {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        gap: 12px !important;
+        padding: 10px 20px !important;
+        border-bottom: 1px solid var(--border-color, #ebebeb) !important;
+        background: var(--dark-light-color, #fafbfe) !important;
+        flex-wrap: wrap !important;
+        min-height: 50px !important;
+    }
 
-        .points-chips-group {
-            display: flex !important;
-            align-items: center !important;
-            gap: 6px !important;
-            flex-wrap: wrap !important;
-            flex: 1 1 auto !important;
-            margin: 0 !important;
-        }
+    .points-chips-group {
+        display: flex !important;
+        align-items: center !important;
+        gap: 6px !important;
+        flex-wrap: wrap !important;
+        flex: 1 1 auto !important;
+        margin: 0 !important;
+    }
 
-        .pts-filter-chip {
-            width: auto !important;
-            max-width: max-content !important;
-            flex: 0 0 auto !important;
-            display: inline-flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            gap: 6px !important;
-            padding: 5px 13px !important;
-            height: 32px !important;
-            min-height: 32px !important;
-            border-radius: 20px !important;
-            border: 1px solid var(--border-color, #e2e8f0) !important;
-            background: var(--widget-box-bg, #ffffff) !important;
-            color: var(--text-color-alt, #64748b) !important;
-            font-size: 12.5px !important;
-            font-weight: 700 !important;
-            cursor: pointer !important;
-            transition: all 0.2s ease !important;
-            white-space: nowrap !important;
-            line-height: 1 !important;
-            box-shadow: none !important;
-            margin: 0 !important;
-        }
+    .pts-filter-chip {
+        width: auto !important;
+        max-width: max-content !important;
+        flex: 0 0 auto !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 6px !important;
+        padding: 5px 13px !important;
+        height: 32px !important;
+        min-height: 32px !important;
+        border-radius: 20px !important;
+        border: 1px solid var(--border-color, #e2e8f0) !important;
+        background: var(--widget-box-bg, #ffffff) !important;
+        color: var(--text-color-alt, #64748b) !important;
+        font-size: 12.5px !important;
+        font-weight: 700 !important;
+        cursor: pointer !important;
+        transition: all 0.2s ease !important;
+        white-space: nowrap !important;
+        line-height: 1 !important;
+        box-shadow: none !important;
+        margin: 0 !important;
+    }
 
-        .pts-filter-chip:hover {
-            border-color: var(--primary-color, #615dfa) !important;
-            color: var(--primary-color, #615dfa) !important;
-            transform: translateY(-1px);
-        }
+    .pts-filter-chip:hover {
+        border-color: var(--primary-color, #615dfa) !important;
+        color: var(--primary-color, #615dfa) !important;
+        transform: translateY(-1px);
+    }
 
-        .pts-filter-chip.is-active {
-            background: var(--primary-color, #615dfa) !important;
-            border-color: var(--primary-color, #615dfa) !important;
-            color: #ffffff !important;
-            box-shadow: 0 2px 8px rgba(97, 93, 250, 0.25) !important;
-        }
+    .pts-filter-chip.is-active {
+        background: var(--primary-color, #615dfa) !important;
+        border-color: var(--primary-color, #615dfa) !important;
+        color: #ffffff !important;
+        box-shadow: 0 2px 8px rgba(97, 93, 250, 0.25) !important;
+    }
 
-        .points-search-wrap {
-            position: relative !important;
-            display: flex !important;
-            align-items: center !important;
-            width: 220px !important;
-            max-width: 240px !important;
-            flex: 0 0 220px !important;
-            margin: 0 !important;
-        }
+    .points-search-wrap {
+        position: relative !important;
+        display: flex !important;
+        align-items: center !important;
+        width: 220px !important;
+        max-width: 240px !important;
+        flex: 0 0 220px !important;
+        margin: 0 !important;
+    }
 
-        .points-search-icon {
-            position: absolute;
-            left: 10px;
-            color: var(--text-color-alt, #94a3b8);
-            font-size: 12px;
-            pointer-events: none;
-        }
+    .points-search-icon {
+        position: absolute;
+        left: 10px;
+        color: var(--text-color-alt, #94a3b8);
+        font-size: 12px;
+        pointer-events: none;
+    }
 
-        [dir="rtl"] .points-search-icon {
-            left: auto;
-            right: 10px;
-        }
+    [dir="rtl"] .points-search-icon {
+        left: auto;
+        right: 10px;
+    }
 
-        .points-search-input {
-            width: 100% !important;
-            height: 32px !important;
-            min-height: 32px !important;
-            padding: 4px 28px !important;
-            border-radius: 16px !important;
-            border: 1px solid var(--border-color, #e2e8f0) !important;
-            background: var(--widget-box-bg, #ffffff) !important;
-            color: var(--text-color, #1e293b) !important;
-            font-size: 12px !important;
-            font-weight: 500 !important;
-            outline: none !important;
-            transition: border-color 0.2s, box-shadow 0.2s !important;
-        }
+    .points-search-input {
+        width: 100% !important;
+        height: 32px !important;
+        min-height: 32px !important;
+        padding: 4px 28px !important;
+        border-radius: 16px !important;
+        border: 1px solid var(--border-color, #e2e8f0) !important;
+        background: var(--widget-box-bg, #ffffff) !important;
+        color: var(--text-color, #1e293b) !important;
+        font-size: 12px !important;
+        font-weight: 500 !important;
+        outline: none !important;
+        transition: border-color 0.2s, box-shadow 0.2s !important;
+    }
 
-        .points-search-input:focus {
-            border-color: var(--primary-color, #615dfa) !important;
-            box-shadow: 0 0 0 3px rgba(97, 93, 250, 0.15) !important;
-        }
+    .points-search-input:focus {
+        border-color: var(--primary-color, #615dfa) !important;
+        box-shadow: 0 0 0 3px rgba(97, 93, 250, 0.15) !important;
+    }
 
-        .points-search-clear {
-            position: absolute;
-            right: 8px;
-            background: none;
-            border: none;
-            color: var(--text-color-alt, #94a3b8);
-            cursor: pointer;
-            font-size: 11px;
-            width: 18px;
-            height: 18px;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-            transition: background 0.15s, color 0.15s;
-        }
+    .points-search-clear {
+        position: absolute;
+        right: 8px;
+        background: none;
+        border: none;
+        color: var(--text-color-alt, #94a3b8);
+        cursor: pointer;
+        font-size: 11px;
+        width: 18px;
+        height: 18px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: background 0.15s, color 0.15s;
+    }
 
-        [dir="rtl"] .points-search-clear {
-            right: auto;
-            left: 8px;
-        }
+    [dir="rtl"] .points-search-clear {
+        right: auto;
+        left: 8px;
+    }
 
         .points-search-clear:hover {
             background: var(--dark-light-color, #e2e8f0);
